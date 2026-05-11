@@ -1,14 +1,26 @@
 package thaumcraft.common.config;
 
 import net.minecraft.item.Item;
+import thaumcraft.common.items.ItemBathSalts;
+import thaumcraft.common.items.ItemBottleTaint;
+import thaumcraft.common.items.ItemBucketDeath;
+import thaumcraft.common.items.ItemBucketPure;
+import thaumcraft.common.items.ItemCompassStone;
 import thaumcraft.common.items.ItemCrystalEssence;
 import thaumcraft.common.items.ItemEldritchObject;
 import thaumcraft.common.items.ItemEssence;
+import thaumcraft.common.items.ItemInkwell;
+import thaumcraft.common.items.ItemKey;
 import thaumcraft.common.items.ItemLootBag;
+import thaumcraft.common.items.ItemManaBean;
 import thaumcraft.common.items.ItemNugget;
+import thaumcraft.common.items.ItemResearchNotes;
 import thaumcraft.common.items.ItemResource;
+import thaumcraft.common.items.ItemSanitySoap;
 import thaumcraft.common.items.ItemShard;
+import thaumcraft.common.items.ItemTripleMeatTreat;
 import thaumcraft.common.items.ItemWispEssence;
+import thaumcraft.common.items.ItemZombieBrain;
 import thaumcraft.common.items.wands.ItemWandCap;
 import thaumcraft.common.items.wands.ItemWandCasting;
 import thaumcraft.common.items.wands.ItemWandRod;
@@ -51,6 +63,20 @@ public class ConfigItems {
     public static ItemNugget itemNugget;
     public static ItemEldritchObject itemEldritchObject;
     public static ItemLootBag itemLootBag;
+
+    // Phase 5.2 utility items
+    public static ItemBottleTaint itemBottleTaint;
+    public static ItemBucketDeath itemBucketDeath;
+    public static ItemBucketPure itemBucketPure;
+    public static ItemBathSalts itemBathSalts;
+    public static ItemCompassStone itemCompassStone;
+    public static ItemInkwell itemInkwell;
+    public static ItemKey itemKey;
+    public static ItemManaBean itemManaBean;
+    public static ItemResearchNotes itemResearchNotes;
+    public static ItemSanitySoap itemSanitySoap;
+    public static ItemTripleMeatTreat itemTripleMeatTreat;
+    public static ItemZombieBrain itemZombieBrain;
 
     // Future items (stubs for compilation compatibility)
     public static Object itemAmuletVis;
@@ -188,6 +214,78 @@ public class ConfigItems {
                 .setTranslationKey("thaumcraft.loot_bag")
                 .setCreativeTab(tab);
         allItems.add(itemLootBag);
+
+        itemBottleTaint = (ItemBottleTaint) new ItemBottleTaint()
+                .setRegistryName("thaumcraft", "bottle_taint")
+                .setTranslationKey("thaumcraft.bottle_taint")
+                .setCreativeTab(tab);
+        allItems.add(itemBottleTaint);
+
+        itemBucketDeath = (ItemBucketDeath) new ItemBucketDeath()
+                .setRegistryName("thaumcraft", "bucket_death")
+                .setTranslationKey("thaumcraft.bucket_death")
+                .setCreativeTab(tab);
+        allItems.add(itemBucketDeath);
+
+        itemBucketPure = (ItemBucketPure) new ItemBucketPure()
+                .setRegistryName("thaumcraft", "bucket_pure")
+                .setTranslationKey("thaumcraft.bucket_pure")
+                .setCreativeTab(tab);
+        allItems.add(itemBucketPure);
+
+        itemBathSalts = (ItemBathSalts) new ItemBathSalts()
+                .setRegistryName("thaumcraft", "bath_salts")
+                .setTranslationKey("thaumcraft.bath_salts")
+                .setCreativeTab(tab);
+        allItems.add(itemBathSalts);
+
+        itemCompassStone = (ItemCompassStone) new ItemCompassStone()
+                .setRegistryName("thaumcraft", "compass_stone")
+                .setTranslationKey("thaumcraft.compass_stone")
+                .setCreativeTab(tab);
+        allItems.add(itemCompassStone);
+
+        itemInkwell = (ItemInkwell) new ItemInkwell()
+                .setRegistryName("thaumcraft", "inkwell")
+                .setTranslationKey("thaumcraft.inkwell")
+                .setCreativeTab(tab);
+        allItems.add(itemInkwell);
+
+        itemKey = (ItemKey) new ItemKey()
+                .setRegistryName("thaumcraft", "key")
+                .setTranslationKey("thaumcraft.key")
+                .setCreativeTab(tab);
+        allItems.add(itemKey);
+
+        itemManaBean = (ItemManaBean) new ItemManaBean()
+                .setRegistryName("thaumcraft", "mana_bean")
+                .setTranslationKey("thaumcraft.mana_bean")
+                .setCreativeTab(tab);
+        allItems.add(itemManaBean);
+
+        itemResearchNotes = (ItemResearchNotes) new ItemResearchNotes()
+                .setRegistryName("thaumcraft", "research_notes")
+                .setTranslationKey("thaumcraft.research_notes")
+                .setCreativeTab(tab);
+        allItems.add(itemResearchNotes);
+
+        itemSanitySoap = (ItemSanitySoap) new ItemSanitySoap()
+                .setRegistryName("thaumcraft", "sanity_soap")
+                .setTranslationKey("thaumcraft.sanity_soap")
+                .setCreativeTab(tab);
+        allItems.add(itemSanitySoap);
+
+        itemTripleMeatTreat = (ItemTripleMeatTreat) new ItemTripleMeatTreat()
+                .setRegistryName("thaumcraft", "triple_meat_treat")
+                .setTranslationKey("thaumcraft.triple_meat_treat")
+                .setCreativeTab(tab);
+        allItems.add(itemTripleMeatTreat);
+
+        itemZombieBrain = (ItemZombieBrain) new ItemZombieBrain()
+                .setRegistryName("thaumcraft", "zombie_brain")
+                .setTranslationKey("thaumcraft.zombie_brain")
+                .setCreativeTab(tab);
+        allItems.add(itemZombieBrain);
     }
 
     public static Item[] getAllItems() {
