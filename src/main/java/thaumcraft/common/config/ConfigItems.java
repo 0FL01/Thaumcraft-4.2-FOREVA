@@ -28,6 +28,7 @@ import thaumcraft.common.items.ItemZombieBrain;
 import thaumcraft.common.items.armor.*;
 import thaumcraft.common.items.baubles.*;
 import thaumcraft.common.items.equipment.*;
+import thaumcraft.common.items.relics.*;
 import thaumcraft.common.items.wands.ItemWandCap;
 import thaumcraft.common.items.wands.ItemWandCasting;
 import thaumcraft.common.items.wands.ItemWandRod;
@@ -162,8 +163,12 @@ public class ConfigItems {
     public static ItemGirdleHover itemGirdleHover;
     public static ItemBaubleBlanks itemBaubleBlanks;
 
-    // Future items (stubs for compilation compatibility - not yet ported)
-    public static Object itemThaumonomicon;
+    // Relics
+    public static ItemThaumometer itemThaumometer;
+    public static ItemThaumonomicon itemThaumonomicon;
+    public static ItemHandMirror itemHandMirror;
+    public static ItemResonator itemResonator;
+    public static ItemSanityChecker itemSanityChecker;
 
     public static void init() {
         CreativeTabThaumcraft tab = CreativeTabThaumcraft.tabThaumcraft;
@@ -697,6 +702,37 @@ public class ConfigItems {
                 .setTranslationKey("thaumcraft.bauble_blanks")
                 .setCreativeTab(tab);
         allItems.add(itemBaubleBlanks);
+
+        // Relics
+        itemThaumometer = (ItemThaumometer) new ItemThaumometer()
+                .setRegistryName("thaumcraft", "thaumometer")
+                .setTranslationKey("thaumcraft.thaumometer")
+                .setCreativeTab(tab);
+        allItems.add(itemThaumometer);
+
+        itemThaumonomicon = (ItemThaumonomicon) new ItemThaumonomicon()
+                .setRegistryName("thaumcraft", "thaumonomicon")
+                .setTranslationKey("thaumcraft.thaumonomicon")
+                .setCreativeTab(tab);
+        allItems.add(itemThaumonomicon);
+
+        itemHandMirror = (ItemHandMirror) new ItemHandMirror()
+                .setRegistryName("thaumcraft", "hand_mirror")
+                .setTranslationKey("thaumcraft.hand_mirror")
+                .setCreativeTab(tab);
+        allItems.add(itemHandMirror);
+
+        itemResonator = (ItemResonator) new ItemResonator()
+                .setRegistryName("thaumcraft", "resonator")
+                .setTranslationKey("thaumcraft.resonator")
+                .setCreativeTab(tab);
+        allItems.add(itemResonator);
+
+        itemSanityChecker = (ItemSanityChecker) new ItemSanityChecker()
+                .setRegistryName("thaumcraft", "sanity_checker")
+                .setTranslationKey("thaumcraft.sanity_checker")
+                .setCreativeTab(tab);
+        allItems.add(itemSanityChecker);
     }
 
     public static Item[] getAllItems() {
