@@ -51,6 +51,11 @@ import thaumcraft.common.tiles.TileJarFillableVoid;
 import thaumcraft.common.tiles.TileCrystal;
 import thaumcraft.common.tiles.TileEldritchCrystal;
 import thaumcraft.common.tiles.TileNode;
+import thaumcraft.common.tiles.TileTable;
+import thaumcraft.common.tiles.TileArcaneWorkbench;
+import thaumcraft.common.tiles.TileDeconstructionTable;
+import thaumcraft.common.tiles.TileResearchTable;
+import thaumcraft.common.tiles.TileMagicWorkbench;
 import thaumcraft.common.blocks.BlockJarItem;
 import thaumcraft.common.lib.world.ThaumcraftWorldGenerator;
 
@@ -138,6 +143,11 @@ public class Thaumcraft {
         GameRegistry.registerTileEntity(TileCrystal.class, new net.minecraft.util.ResourceLocation("thaumcraft", "crystal"));
         GameRegistry.registerTileEntity(TileEldritchCrystal.class, new net.minecraft.util.ResourceLocation("thaumcraft", "eldritch_crystal"));
         GameRegistry.registerTileEntity(TileNode.class, new net.minecraft.util.ResourceLocation("thaumcraft", "node"));
+        GameRegistry.registerTileEntity(TileTable.class, new net.minecraft.util.ResourceLocation("thaumcraft", "table"));
+        GameRegistry.registerTileEntity(TileMagicWorkbench.class, new net.minecraft.util.ResourceLocation("thaumcraft", "magic_workbench"));
+        GameRegistry.registerTileEntity(TileArcaneWorkbench.class, new net.minecraft.util.ResourceLocation("thaumcraft", "arcane_workbench"));
+        GameRegistry.registerTileEntity(TileDeconstructionTable.class, new net.minecraft.util.ResourceLocation("thaumcraft", "deconstruction_table"));
+        GameRegistry.registerTileEntity(TileResearchTable.class, new net.minecraft.util.ResourceLocation("thaumcraft", "research_table"));
     }
 
     @Mod.EventHandler
@@ -182,6 +192,8 @@ public class Thaumcraft {
         event.getRegistry().register(new BlockJarItem(ConfigBlocks.blockJar).setRegistryName("thaumcraft", "jar"));
         event.getRegistry().register(new net.minecraft.item.ItemBlock(ConfigBlocks.blockCrystal)
                 .setRegistryName("thaumcraft", "crystal"));
+        event.getRegistry().register(new net.minecraft.item.ItemBlock(ConfigBlocks.blockTable)
+                .setRegistryName("thaumcraft", "table"));
     }
 
     @SubscribeEvent
