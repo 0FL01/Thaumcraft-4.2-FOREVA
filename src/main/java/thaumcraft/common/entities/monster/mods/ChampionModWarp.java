@@ -1,19 +1,20 @@
 package thaumcraft.common.entities.monster.mods;
 
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.util.DamageSource;
 
-public class ChampionModWarp implements IChampionModifierEffect {
-    public ChampionModWarp() {}
-
-    @Override
-    public float applyEffect(EntityLivingBase entity, EntityLivingBase target, float damage, int tier) { return damage; }
+public class ChampionModWarp extends java.lang.Object implements IChampionModifierEffect {
 
     @Override
-    public void onHit(EntityLivingBase entity, EntityLivingBase target, int tier) {}
+    public float performEffect(EntityLivingBase mob, EntityLivingBase target, DamageSource source, float amount) {
+        if (target != null && target instanceof net.minecraft.entity.player.EntityPlayer && mob.getRNG().nextFloat() < 0.33f) {
+            // TODO: add warp to player
+        }
+        return amount;
+    }
 
     @Override
-    public void onSpawn(EntityLivingBase entity, int tier) {}
-
-    @Override
-    public void onDeath(EntityLivingBase entity, int tier) {}
+    public void showFX(EntityLivingBase boss) {
+        // TODO: client FX
+    }
 }

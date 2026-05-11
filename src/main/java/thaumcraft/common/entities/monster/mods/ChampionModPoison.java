@@ -1,19 +1,20 @@
 package thaumcraft.common.entities.monster.mods;
 
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.util.DamageSource;
 
-public class ChampionModPoison implements IChampionModifierEffect {
-    public ChampionModPoison() {}
-
-    @Override
-    public float applyEffect(EntityLivingBase entity, EntityLivingBase target, float damage, int tier) { return damage; }
+public class ChampionModPoison extends java.lang.Object implements IChampionModifierEffect {
 
     @Override
-    public void onHit(EntityLivingBase entity, EntityLivingBase target, int tier) {}
+    public float performEffect(EntityLivingBase mob, EntityLivingBase target, DamageSource source, float amount) {
+        if (target != null && mob.getRNG().nextFloat() < 0.3f) {
+            target.addPotionEffect(new net.minecraft.potion.PotionEffect(net.minecraft.init.MobEffects.POISON, 100, 0));
+        }
+        return amount;
+    }
 
     @Override
-    public void onSpawn(EntityLivingBase entity, int tier) {}
-
-    @Override
-    public void onDeath(EntityLivingBase entity, int tier) {}
+    public void showFX(EntityLivingBase boss) {
+        // TODO: client FX
+    }
 }

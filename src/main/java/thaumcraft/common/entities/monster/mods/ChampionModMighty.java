@@ -1,19 +1,17 @@
 package thaumcraft.common.entities.monster.mods;
 
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.util.DamageSource;
 
-public class ChampionModMighty implements IChampionModifierEffect {
-    public ChampionModMighty() {}
-
-    @Override
-    public float applyEffect(EntityLivingBase entity, EntityLivingBase target, float damage, int tier) { return damage; }
+public class ChampionModMighty extends java.lang.Object implements IChampionModifierEffect {
 
     @Override
-    public void onHit(EntityLivingBase entity, EntityLivingBase target, int tier) {}
+    public float performEffect(EntityLivingBase mob, EntityLivingBase target, DamageSource source, float amount) {
+        return amount;
+    }
 
     @Override
-    public void onSpawn(EntityLivingBase entity, int tier) {}
-
-    @Override
-    public void onDeath(EntityLivingBase entity, int tier) {}
+    public void showFX(EntityLivingBase boss) {
+        // TODO: client FX
+    }
 }
