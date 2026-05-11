@@ -324,6 +324,28 @@ Confirmed sources: `mcmod.info` (dependencies: `["Baubles"]`), `dependancies.inf
 - Add `@Override` annotations when overriding Forge methods
 - Use `EnumHelper` / `ObfuscationReflectionHelper` for Forge internals if needed
 
+### Automated Code Fixing Prohibitions
+
+- **Never fix broken method signatures with ad‑hoc regex replacements.**
+  If a transformed file contains a dangling `@Override` followed by a method
+  body without its declaration, **stop immediately**. Such corruption means
+  the porting script (`port_v2.py`) or a subsequent fix‑up script has
+  stripped the signature. Do **not** write a Python/Shell one‑liner that
+  tries to guess and re‑insert the declaration. That approach has been
+  proven to silently damage code.
+
+- **Required recovery procedure:**
+  1. Re‑run `transform_1_7_10_to_1_12_2` on the original raw source from
+     `_p4_raw/` and place the result back into the source tree.
+  2. Apply only **known, repeatable** targeted fixes (e.g., renamed MCP
+     methods, changed imports) through the central porting utility, not
+     through ad‑hoc scripts.
+  3. If a file requires more than two standalone regex fixes, abandon the
+     automated approach and port the file manually.
+
+- **Audit past damage:** Any file already affected by the `fix_compile_errors.py`
+  script must be regenerated from raw source before further development.
+
 ## Commit Style
 
 Full commit messages with conventional commit prefix:

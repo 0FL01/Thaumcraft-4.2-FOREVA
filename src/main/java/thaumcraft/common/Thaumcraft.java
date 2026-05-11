@@ -1,4 +1,7 @@
 package thaumcraft.common;
+import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.item.ItemStack;
+import net.minecraft.init.Items;
 
 import net.minecraft.block.Block;
 import net.minecraft.enchantment.Enchantment;
@@ -41,6 +44,8 @@ import thaumcraft.common.lib.events.EventHandlerRunic;
 import thaumcraft.common.lib.events.EventHandlerWorld;
 import thaumcraft.common.lib.events.ServerTickEventsFML;
 import thaumcraft.common.lib.network.PacketHandler;
+import thaumcraft.common.tiles.*;
+import thaumcraft.common.blocks.BlockJarItem;
 import thaumcraft.common.lib.world.ThaumcraftWorldGenerator;
 
 @Mod(
@@ -51,6 +56,10 @@ import thaumcraft.common.lib.world.ThaumcraftWorldGenerator;
     guiFactory = "thaumcraft.client.gui.GuiFactory"
 )
 public class Thaumcraft {
+    public static final CreativeTabs tabTC = new CreativeTabs("thaumcraft") {
+        public ItemStack createIcon() { return new ItemStack(Items.ENDER_EYE); }
+        public ItemStack getTabIconItem() { return createIcon(); }
+    };
 
     public static final String MODID = "thaumcraft";
     public static final String NAME = "Thaumcraft";
@@ -114,6 +123,12 @@ public class Thaumcraft {
         ConfigBlocks.init();
         ConfigItems.init();
         ConfigEntities.init();
+
+        // Register tile entities
+        GameRegistry.registerTileEntity(TileJarFillable.class, new net.minecraft.util.ResourceLocation("thaumcraft", "jar_fillable"));
+        GameRegistry.registerTileEntity(TileJarBrain.class, new net.minecraft.util.ResourceLocation("thaumcraft", "jar_brain"));
+        GameRegistry.registerTileEntity(TileJarNode.class, new net.minecraft.util.ResourceLocation("thaumcraft", "jar_node"));
+        GameRegistry.registerTileEntity(TileJarFillableVoid.class, new net.minecraft.util.ResourceLocation("thaumcraft", "jar_fillable_void"));
     }
 
     @Mod.EventHandler
@@ -147,13 +162,15 @@ public class Thaumcraft {
     @SubscribeEvent
     public void registerBlocks(RegistryEvent.Register<Block> event) {
         log.info("Registering blocks");
-        // Phase 4: register actual blocks
+        event.getRegistry().registerAll(ConfigBlocks.getAllBlocks());
     }
 
     @SubscribeEvent
     public void registerItems(RegistryEvent.Register<Item> event) {
         log.info("Registering items");
         event.getRegistry().registerAll(ConfigItems.getAllItems());
+        // Register ItemBlocks for blocks
+        event.getRegistry().register(new BlockJarItem(ConfigBlocks.blockJar).setRegistryName("thaumcraft", "jar"));
     }
 
     @SubscribeEvent

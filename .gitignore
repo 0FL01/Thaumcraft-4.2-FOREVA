@@ -29,3 +29,9 @@ Thumbs.db
 
 # Temp
 *.tmp
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+_p4_ref/
