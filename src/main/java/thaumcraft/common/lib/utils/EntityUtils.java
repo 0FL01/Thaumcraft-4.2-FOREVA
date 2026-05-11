@@ -1,7 +1,7 @@
-
 package thaumcraft.common.lib.utils;
 
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
@@ -14,5 +14,11 @@ public class EntityUtils {
     
     public static EntityItem dropItemStack(World world, double x, double y, double z, ItemStack stack) {
         return new EntityItem(world, x, y, z, stack);
+    }
+
+    public static void setRecentlyHit(Entity entity, int time) {
+        if (entity instanceof EntityLivingBase) {
+            ((EntityLivingBase)entity).hurtResistantTime = time;
+        }
     }
 }
