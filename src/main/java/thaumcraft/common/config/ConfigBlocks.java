@@ -1,10 +1,7 @@
 package thaumcraft.common.config;
 
 import net.minecraft.block.Block;
-import thaumcraft.common.blocks.BlockJar;
-import thaumcraft.common.blocks.BlockCrystal;
-import thaumcraft.common.blocks.BlockTable;
-import thaumcraft.common.blocks.BlockStoneDevice;
+import thaumcraft.common.blocks.*;
 
 public class ConfigBlocks {
 
@@ -13,6 +10,9 @@ public class ConfigBlocks {
     public static BlockCrystal blockCrystal;
     public static BlockTable blockTable;
     public static BlockStoneDevice blockStoneDevice;
+    public static BlockWoodenDevice blockWoodenDevice;
+    public static BlockMetalDevice blockMetalDevice;
+    public static BlockMagicalLog blockMagicalLog;
 
     public static void init() {
         blockJar = (BlockJar) new BlockJar()
@@ -30,6 +30,18 @@ public class ConfigBlocks {
         blockStoneDevice = (BlockStoneDevice) new BlockStoneDevice()
                 .setRegistryName("thaumcraft", "stone_device")
                 .setTranslationKey("thaumcraft.stone_device");
+
+        blockWoodenDevice = (BlockWoodenDevice) new BlockWoodenDevice()
+                .setRegistryName("thaumcraft", "wooden_device")
+                .setTranslationKey("thaumcraft.wooden_device");
+
+        blockMetalDevice = (BlockMetalDevice) new BlockMetalDevice()
+                .setRegistryName("thaumcraft", "metal_device")
+                .setTranslationKey("thaumcraft.metal_device");
+
+        blockMagicalLog = (BlockMagicalLog) new BlockMagicalLog()
+                .setRegistryName("thaumcraft", "magical_log")
+                .setTranslationKey("thaumcraft.magical_log");
     }
 
     public static Block[] getAllBlocks() {
@@ -37,7 +49,10 @@ public class ConfigBlocks {
                 blockJar,
                 blockCrystal,
                 blockTable,
-                blockStoneDevice
+                blockStoneDevice,
+                blockWoodenDevice,
+                blockMetalDevice,
+                blockMagicalLog
         };
     }
 }

@@ -147,6 +147,30 @@ public class Thaumcraft {
         GameRegistry.registerTileEntity(TileSpa.class, new net.minecraft.util.ResourceLocation("thaumcraft", "spa"));
         GameRegistry.registerTileEntity(TileFocalManipulator.class, new net.minecraft.util.ResourceLocation("thaumcraft", "focal_manipulator"));
         GameRegistry.registerTileEntity(TileFluxScrubber.class, new net.minecraft.util.ResourceLocation("thaumcraft", "flux_scrubber"));
+        GameRegistry.registerTileEntity(TileCrucible.class, new net.minecraft.util.ResourceLocation("thaumcraft", "crucible"));
+        GameRegistry.registerTileEntity(TileArcaneBore.class, new net.minecraft.util.ResourceLocation("thaumcraft", "arcane_bore"));
+        GameRegistry.registerTileEntity(TileArcaneBoreBase.class, new net.minecraft.util.ResourceLocation("thaumcraft", "arcane_bore_base"));
+        GameRegistry.registerTileEntity(TileArcaneFurnace.class, new net.minecraft.util.ResourceLocation("thaumcraft", "arcane_furnace"));
+        GameRegistry.registerTileEntity(TileArcaneFurnaceNozzle.class, new net.minecraft.util.ResourceLocation("thaumcraft", "arcane_furnace_nozzle"));
+        GameRegistry.registerTileEntity(TileBellows.class, new net.minecraft.util.ResourceLocation("thaumcraft", "bellows"));
+        GameRegistry.registerTileEntity(TileCentrifuge.class, new net.minecraft.util.ResourceLocation("thaumcraft", "centrifuge"));
+        GameRegistry.registerTileEntity(TileEssentiaReservoir.class, new net.minecraft.util.ResourceLocation("thaumcraft", "essentia_reservoir"));
+        GameRegistry.registerTileEntity(TileMirror.class, new net.minecraft.util.ResourceLocation("thaumcraft", "mirror"));
+        GameRegistry.registerTileEntity(TileMirrorEssentia.class, new net.minecraft.util.ResourceLocation("thaumcraft", "mirror_essentia"));
+        GameRegistry.registerTileEntity(TileVisRelay.class, new net.minecraft.util.ResourceLocation("thaumcraft", "vis_relay"));
+        GameRegistry.registerTileEntity(TileMagicWorkbenchCharger.class, new net.minecraft.util.ResourceLocation("thaumcraft", "magic_workbench_charger"));
+        GameRegistry.registerTileEntity(TileOwned.class, new net.minecraft.util.ResourceLocation("thaumcraft", "owned"));
+        GameRegistry.registerTileEntity(TileArcanePressurePlate.class, new net.minecraft.util.ResourceLocation("thaumcraft", "arcane_pressure_plate"));
+        GameRegistry.registerTileEntity(TileBanner.class, new net.minecraft.util.ResourceLocation("thaumcraft", "banner"));
+        GameRegistry.registerTileEntity(TileSensor.class, new net.minecraft.util.ResourceLocation("thaumcraft", "sensor"));
+        GameRegistry.registerTileEntity(TileLifter.class, new net.minecraft.util.ResourceLocation("thaumcraft", "lifter"));
+        GameRegistry.registerTileEntity(TileHole.class, new net.minecraft.util.ResourceLocation("thaumcraft", "hole"));
+        GameRegistry.registerTileEntity(TileGrate.class, new net.minecraft.util.ResourceLocation("thaumcraft", "grate"));
+        GameRegistry.registerTileEntity(TileAlembic.class, new net.minecraft.util.ResourceLocation("thaumcraft", "alembic"));
+        GameRegistry.registerTileEntity(TileArcaneLamp.class, new net.minecraft.util.ResourceLocation("thaumcraft", "arcane_lamp"));
+        GameRegistry.registerTileEntity(TileArcaneLampGrowth.class, new net.minecraft.util.ResourceLocation("thaumcraft", "arcane_lamp_growth"));
+        GameRegistry.registerTileEntity(TileThaumatorium.class, new net.minecraft.util.ResourceLocation("thaumcraft", "thaumatorium"));
+        GameRegistry.registerTileEntity(TileThaumatoriumTop.class, new net.minecraft.util.ResourceLocation("thaumcraft", "thaumatorium_top"));
     }
 
     @Mod.EventHandler
@@ -195,6 +219,12 @@ public class Thaumcraft {
                 .setRegistryName("thaumcraft", "table"));
         event.getRegistry().register(new net.minecraft.item.ItemBlock(ConfigBlocks.blockStoneDevice)
                 .setRegistryName("thaumcraft", "stone_device"));
+        event.getRegistry().register(new net.minecraft.item.ItemBlock(ConfigBlocks.blockWoodenDevice)
+                .setRegistryName("thaumcraft", "wooden_device"));
+        event.getRegistry().register(new net.minecraft.item.ItemBlock(ConfigBlocks.blockMetalDevice)
+                .setRegistryName("thaumcraft", "metal_device"));
+        event.getRegistry().register(new net.minecraft.item.ItemBlock(ConfigBlocks.blockMagicalLog)
+                .setRegistryName("thaumcraft", "magical_log"));
     }
 
     @SubscribeEvent
