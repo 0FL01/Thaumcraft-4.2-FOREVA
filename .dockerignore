@@ -1,0 +1,24 @@
+# ── Heavy / derivable ────────────────────────────────────────────────────────
+# Original JAR — keep in git, not needed in Docker build context
+Thaumcraft-1.7.10-4.2.3.5.jar
+
+# Extracted class files — derivable from JAR via decompiler
+*.class
+
+# ── IDE / editors ────────────────────────────────────────────────────────────
+.idea/
+.vscode/
+*.iml
+*.ipr
+*.iws
+
+# ── System ───────────────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+
+# ── Git ──────────────────────────────────────────────────────────────────────
+.git/
+
+# ── Build artifacts (host-side) ──────────────────────────────────────────────
+build/
+.gradle/
