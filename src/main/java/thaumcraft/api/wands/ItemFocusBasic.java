@@ -5,6 +5,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import java.text.DecimalFormat;
 import java.util.LinkedHashMap;
 import java.util.List;
+import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.EnumRarity;
@@ -41,7 +42,8 @@ extends Item {
         return false;
     }
 
-    public void addInformation(ItemStack stack, EntityPlayer player, List list, boolean par4) {
+    @SideOnly(Side.CLIENT)
+    public void addInformation(ItemStack stack, World worldIn, List<String> list, ITooltipFlag flagIn) {
         AspectList al = this.getVisCost(stack);
         if (al != null && al.size() > 0) {
             list.add(I18n.translateToLocal((String)(this.isVisCostPerTick(stack) ? "item.Focus.cost2" : "item.Focus.cost1")));
@@ -51,10 +53,11 @@ extends Item {
                 list.add(" \u00a7" + aspect.getChatcolor() + aspect.getName() + "\u00a7r x " + amount);
             }
         }
-        this.addFocusInformation(stack, player, list, par4);
+        net.minecraft.client.Minecraft mc = net.minecraft.client.Minecraft.getMinecraft();
+        this.addFocusInformation(stack, mc.player, list, flagIn.isAdvanced());
     }
 
-    public void addFocusInformation(ItemStack focusstack, EntityPlayer player, List list, boolean par4) {
+    public void addFocusInformation(ItemStack focusstack, EntityPlayer player, List<String> list, boolean advanced) {
         LinkedHashMap<Short, Integer> map = new LinkedHashMap<Short, Integer>();
         for (short id : this.getAppliedUpgrades(focusstack)) {
             if (id < 0) continue;
@@ -187,6 +190,10 @@ extends Item {
             f.setShort("id", id);
             tlist.appendTag((NBTBase)f);
         }
+    }
+
+    public boolean acceptsEnchant(int id) {
+        return true;
     }
 
     public void onUpdate(ItemStack stack, World world, Entity entity, int p_77663_4_, boolean p_77663_5_) {

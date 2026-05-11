@@ -4,6 +4,7 @@ import net.minecraft.block.Block;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.entity.Entity;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
 import net.minecraft.potion.Potion;
 import net.minecraft.util.SoundEvent;
 import net.minecraft.world.biome.Biome;
@@ -22,6 +23,9 @@ import net.minecraftforge.fml.common.registry.GameRegistry;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import thaumcraft.api.ThaumcraftApi;
+import thaumcraft.api.aspects.Aspect;
+import thaumcraft.api.wands.WandCap;
+import thaumcraft.api.wands.WandRod;
 import thaumcraft.common.config.Config;
 import thaumcraft.common.config.ConfigAspects;
 import thaumcraft.common.config.ConfigBlocks;
@@ -30,6 +34,8 @@ import thaumcraft.common.config.ConfigItems;
 import thaumcraft.common.config.ConfigRecipes;
 import thaumcraft.common.config.ConfigResearch;
 import thaumcraft.common.lib.InternalMethodHandler;
+import thaumcraft.common.lib.capabilities.IPlayerKnowledge;
+import thaumcraft.common.lib.capabilities.PlayerKnowledgeProvider;
 import thaumcraft.common.lib.events.EventHandlerEntity;
 import thaumcraft.common.lib.events.EventHandlerRunic;
 import thaumcraft.common.lib.events.EventHandlerWorld;
@@ -71,6 +77,21 @@ public class Thaumcraft {
 
         Config.init(event.getSuggestedConfigurationFile());
 
+        // Register capabilities
+        PlayerKnowledgeProvider.register();
+
+        // Initialise aspects (must happen early)
+        initAspects();
+
+        // Register default wand rods and caps
+        initWandComponents();
+
+        // Register potion instances (registry names set here; actual registry via event)
+        Config.initPotions();
+
+        // Enchantment instances (registry names set here; actual registry via event)
+        initEnchantments();
+
         // Set up internal method handler bridge
         ThaumcraftApi.internalMethods = new InternalMethodHandler();
 
@@ -104,7 +125,6 @@ public class Thaumcraft {
         proxy.registerKeyBindings();
 
         Config.registerBiomes();
-        Config.initPotions();
         Config.initLoot();
         Config.initMisc();
     }
@@ -133,7 +153,7 @@ public class Thaumcraft {
     @SubscribeEvent
     public void registerItems(RegistryEvent.Register<Item> event) {
         log.info("Registering items");
-        // Phase 5: register actual items
+        event.getRegistry().registerAll(ConfigItems.getAllItems());
     }
 
     @SubscribeEvent
@@ -145,13 +165,29 @@ public class Thaumcraft {
     @SubscribeEvent
     public void registerPotions(RegistryEvent.Register<Potion> event) {
         log.info("Registering potions");
-        // Phase 6: register actual potions
+        event.getRegistry().registerAll(
+                Config.potionFluxTaint,
+                Config.potionVisExhaust,
+                Config.potionInfectiousVisExhaust,
+                Config.potionUnnaturalHunger,
+                Config.potionWarpWard,
+                Config.potionDeathGaze,
+                Config.potionBlurredVision,
+                Config.potionSunScorned,
+                Config.potionThaumarhia
+        );
     }
 
     @SubscribeEvent
     public void registerEnchantments(RegistryEvent.Register<Enchantment> event) {
         log.info("Registering enchantments");
-        // Phase 6: register actual enchantments
+        event.getRegistry().registerAll(
+                Config.enchHaste,
+                Config.enchRepair,
+                Config.enchFrugal,
+                Config.enchPotency,
+                Config.enchWandFortune
+        );
     }
 
     @SubscribeEvent
@@ -166,13 +202,65 @@ public class Thaumcraft {
         // Phase 7: register actual sounds
     }
 
-    // ---- Warp utilities (called by API / InternalMethodHandler) ----
+    // ---- Warp utilities ----
 
     public static void addWarpToPlayer(net.minecraft.entity.player.EntityPlayer player, int amount, boolean temporary) {
-        // Phase 3: implement via capabilities
+        IPlayerKnowledge knowledge = player.getCapability(PlayerKnowledgeProvider.PLAYER_KNOWLEDGE, null);
+        if (knowledge != null) {
+            if (temporary) {
+                knowledge.addWarpTemp(amount);
+            } else {
+                knowledge.addWarpPerm(amount);
+            }
+        }
     }
 
     public static void addStickyWarpToPlayer(net.minecraft.entity.player.EntityPlayer player, int amount) {
-        // Phase 3: implement via capabilities
+        IPlayerKnowledge knowledge = player.getCapability(PlayerKnowledgeProvider.PLAYER_KNOWLEDGE, null);
+        if (knowledge != null) {
+            knowledge.addWarpSticky(amount);
+        }
+    }
+
+    // ---- Aspect Initialisation ----
+
+    private void initAspects() {
+        // Primal aspects are already created as static fields in Aspect class.
+        // Ensure the aspect order list matches the original game.
+        // The 6 primal aspects are automatically registered as static fields.
+        // Compound aspects are created via the Aspect constructor chaining.
+        log.info("Aspects initialised: {} total", Aspect.aspects.size());
+    }
+
+    // ---- Wand Component Registration ----
+
+    private void initWandComponents() {
+        // Wand Rods
+        // Note: these use the item field from ConfigItems - but ConfigItems.init() hasn't been called yet.
+        // We create ItemStack references that will be filled in later.
+        // For now, register rods with null items (the game will still work).
+        new WandRod("wood", 100, ItemStack.EMPTY, 5);
+        new WandRod("greatwood", 500, ItemStack.EMPTY, 25);
+        new WandRod("silverwood", 1000, ItemStack.EMPTY, 75);
+
+        // Wand Caps
+        new WandCap("iron", 1.0f, ItemStack.EMPTY, 5);
+        new WandCap("gold", 1.2f, ItemStack.EMPTY, 7);
+        new WandCap("thaumium", 0.9f, ItemStack.EMPTY, 15);
+        new WandCap("void", 0.8f, ItemStack.EMPTY, 25);
+        new WandCap("bone", 0.85f, ItemStack.EMPTY, 10);
+        new WandCap("alchemical", 0.75f, ItemStack.EMPTY, 30);
+
+        log.info("Wand components registered: {} rods, {} caps", WandRod.rods.size(), WandCap.caps.size());
+    }
+
+    // ---- Enchantment Initialisation ----
+
+    private void initEnchantments() {
+        Config.enchFrugal = new thaumcraft.common.lib.enchantment.EnchantmentFrugal();
+        Config.enchPotency = new thaumcraft.common.lib.enchantment.EnchantmentPotency();
+        Config.enchHaste = new thaumcraft.common.lib.enchantment.EnchantmentHaste();
+        Config.enchWandFortune = new thaumcraft.common.lib.enchantment.EnchantmentWandFortune();
+        Config.enchRepair = new thaumcraft.common.lib.enchantment.EnchantmentRepair();
     }
 }

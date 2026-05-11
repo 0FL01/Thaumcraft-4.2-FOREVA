@@ -8,6 +8,20 @@ import net.minecraft.enchantment.Enchantment;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.common.config.Property;
 import thaumcraft.api.aspects.Aspect;
+import thaumcraft.api.potions.PotionFluxTaint;
+import thaumcraft.api.potions.PotionVisExhaust;
+import thaumcraft.common.lib.enchantment.EnchantmentFrugal;
+import thaumcraft.common.lib.enchantment.EnchantmentHaste;
+import thaumcraft.common.lib.enchantment.EnchantmentPotency;
+import thaumcraft.common.lib.enchantment.EnchantmentRepair;
+import thaumcraft.common.lib.enchantment.EnchantmentWandFortune;
+import thaumcraft.common.lib.potions.PotionBlurredVision;
+import thaumcraft.common.lib.potions.PotionDeathGaze;
+import thaumcraft.common.lib.potions.PotionInfectiousVisExhaust;
+import thaumcraft.common.lib.potions.PotionSunScorned;
+import thaumcraft.common.lib.potions.PotionThaumarhia;
+import thaumcraft.common.lib.potions.PotionUnnaturalHunger;
+import thaumcraft.common.lib.potions.PotionWarpWard;
 
 public class Config {
 
@@ -124,6 +138,20 @@ public class Config {
     // Enchantments
     public static Enchantment enchHaste = null;
     public static Enchantment enchRepair = null;
+    public static Enchantment enchFrugal = null;
+    public static Enchantment enchPotency = null;
+    public static Enchantment enchWandFortune = null;
+
+    // Potions
+    public static PotionFluxTaint potionFluxTaint;
+    public static PotionVisExhaust potionVisExhaust;
+    public static PotionInfectiousVisExhaust potionInfectiousVisExhaust;
+    public static PotionUnnaturalHunger potionUnnaturalHunger;
+    public static PotionWarpWard potionWarpWard;
+    public static PotionDeathGaze potionDeathGaze;
+    public static PotionBlurredVision potionBlurredVision;
+    public static PotionSunScorned potionSunScorned;
+    public static PotionThaumarhia potionThaumarhia;
 
     // Aspects
     public static ArrayList<Aspect> aspectOrder = new ArrayList<>();
@@ -170,7 +198,32 @@ public class Config {
     }
 
     public static void initPotions() {
-        // Potions registered via RegistryEvent in 1.12.2 — stub for now
+        potionFluxTaint = new PotionFluxTaint(true, 0x800080);
+        potionFluxTaint.setRegistryName("thaumcraft", "flux_taint");
+
+        potionVisExhaust = new PotionVisExhaust(true, 0x8888FF);
+        potionVisExhaust.setRegistryName("thaumcraft", "vis_exhaust");
+
+        potionInfectiousVisExhaust = new PotionInfectiousVisExhaust(true, 0x4444AA);
+        potionInfectiousVisExhaust.setRegistryName("thaumcraft", "infectious_vis_exhaust");
+
+        potionUnnaturalHunger = new PotionUnnaturalHunger(true, 0x55AA55);
+        potionUnnaturalHunger.setRegistryName("thaumcraft", "unnatural_hunger");
+
+        potionWarpWard = new PotionWarpWard(false, 0xFFAA00);
+        potionWarpWard.setRegistryName("thaumcraft", "warp_ward");
+
+        potionDeathGaze = new PotionDeathGaze(true, 0x440044);
+        potionDeathGaze.setRegistryName("thaumcraft", "death_gaze");
+
+        potionBlurredVision = new PotionBlurredVision(true, 0x888888);
+        potionBlurredVision.setRegistryName("thaumcraft", "blurred_vision");
+
+        potionSunScorned = new PotionSunScorned(true, 0xFFAA00);
+        potionSunScorned.setRegistryName("thaumcraft", "sun_scorned");
+
+        potionThaumarhia = new PotionThaumarhia(true, 0xAA0000);
+        potionThaumarhia.setRegistryName("thaumcraft", "thaumarhia");
     }
 
     public static void syncConfigurable() {

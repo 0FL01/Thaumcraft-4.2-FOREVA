@@ -124,6 +124,7 @@ Confirmed sources: `mcmod.info` (dependencies: `["Baubles"]`), `dependancies.inf
 | 0 | Forge 1.12.2 MDK, Gradle 4.10.3, build chain | ✅ Done | 4 (stubs) |
 | 1 | API + CCL + TrueType port to 1.12.2 | ✅ Done | 140 (105 source files) |
 | 2 | Registration framework + config + networking + events | ✅ Done | ~230 (189 source files) |
+| 3 | Core game systems (capabilities, wands, research, vis net, potions, enchants) | ✅ Done | ~270 (217 source files) |
 
 ## Where To Look
 | `thaumcraft_src/thaumcraft/common/CommonProxy.class` | Server proxy (registration, network, config) |

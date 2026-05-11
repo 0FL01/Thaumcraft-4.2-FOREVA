@@ -1,4 +1,4 @@
-package thaumcraft.api.potions;
+package thaumcraft.common.lib.potions;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.EntityLivingBase;
@@ -7,17 +7,15 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class PotionVisExhaust extends Potion {
+public class PotionBlurredVision extends Potion {
 
-    public static PotionVisExhaust instance = null;
-    private int statusIconIndex = -1;
+    public static PotionBlurredVision instance;
     static final ResourceLocation rl = new ResourceLocation("thaumcraft", "textures/misc/potions.png");
 
-    public PotionVisExhaust(boolean isBadEffect, int liquidColor) {
+    public PotionBlurredVision(boolean isBadEffect, int liquidColor) {
         super(isBadEffect, liquidColor);
-        this.setIconIndex(0, 0);
-        this.setPotionName("potion.visexhaust");
-        this.setRegistryName("thaumcraft", "vis_exhaust");
+        setIconIndex(1, 2);
+        setPotionName("potion.blurredvision");
     }
 
     @SideOnly(Side.CLIENT)
@@ -28,7 +26,7 @@ public class PotionVisExhaust extends Potion {
     }
 
     @Override
-    public void performEffect(EntityLivingBase target, int par2) {
+    public void performEffect(EntityLivingBase target, int amplifier) {
     }
 
     @Override

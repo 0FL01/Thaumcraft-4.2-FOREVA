@@ -1,23 +1,24 @@
-package thaumcraft.api.potions;
+package thaumcraft.common.lib.potions;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.potion.Potion;
+import net.minecraft.potion.PotionEffect;
+import net.minecraft.util.DamageSource;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class PotionVisExhaust extends Potion {
+public class PotionDeathGaze extends Potion {
 
-    public static PotionVisExhaust instance = null;
-    private int statusIconIndex = -1;
+    public static PotionDeathGaze instance;
     static final ResourceLocation rl = new ResourceLocation("thaumcraft", "textures/misc/potions.png");
 
-    public PotionVisExhaust(boolean isBadEffect, int liquidColor) {
+    public PotionDeathGaze(boolean isBadEffect, int liquidColor) {
         super(isBadEffect, liquidColor);
-        this.setIconIndex(0, 0);
-        this.setPotionName("potion.visexhaust");
-        this.setRegistryName("thaumcraft", "vis_exhaust");
+        setIconIndex(2, 2);
+        setPotionName("potion.deathgaze");
     }
 
     @SideOnly(Side.CLIENT)
@@ -28,11 +29,15 @@ public class PotionVisExhaust extends Potion {
     }
 
     @Override
-    public void performEffect(EntityLivingBase target, int par2) {
+    public void performEffect(EntityLivingBase target, int amplifier) {
+        if (target.getHealth() <= 1.0f && target.isEntityUndead()) {
+            target.attackEntityFrom(DamageSource.MAGIC, 20.0f);
+        }
     }
 
     @Override
     public boolean isReady(int duration, int amplifier) {
-        return false;
+        int k = 60 >> amplifier;
+        return k > 0 && duration % k == 0;
     }
 }

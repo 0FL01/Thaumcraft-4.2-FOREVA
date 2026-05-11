@@ -7,8 +7,15 @@ import thaumcraft.api.aspects.Aspect;
 import thaumcraft.api.aspects.AspectList;
 import thaumcraft.api.internal.IInternalMethodHandler;
 import thaumcraft.common.Thaumcraft;
+import thaumcraft.common.items.wands.ItemWandCasting;
+import thaumcraft.common.lib.capabilities.IPlayerKnowledge;
+import thaumcraft.common.lib.capabilities.PlayerKnowledgeProvider;
+import thaumcraft.common.lib.research.PlayerKnowledge;
+import thaumcraft.common.lib.research.ResearchManager;
 
 public class InternalMethodHandler implements IInternalMethodHandler {
+
+    private final PlayerKnowledge playerKnowledge = new PlayerKnowledge();
 
     @Override
     public void generateVisEffect(int dim, int x, int y, int z, int x2, int y2, int z2, int color) {
@@ -17,20 +24,17 @@ public class InternalMethodHandler implements IInternalMethodHandler {
 
     @Override
     public boolean isResearchComplete(String username, String researchkey) {
-        // Phase 9: research system
-        return false;
+        return ResearchManager.isResearchComplete(username, researchkey);
     }
 
     @Override
     public boolean hasDiscoveredAspect(String username, Aspect aspect) {
-        // Phase 3: aspect discovery
-        return false;
+        return playerKnowledge.hasDiscoveredAspect(username, aspect);
     }
 
     @Override
     public AspectList getDiscoveredAspects(String username) {
-        // Phase 3: aspect discovery
-        return new AspectList();
+        return playerKnowledge.getAspectsDiscovered(username);
     }
 
     @Override
@@ -41,37 +45,55 @@ public class InternalMethodHandler implements IInternalMethodHandler {
 
     @Override
     public AspectList getObjectAspects(ItemStack is) {
-        // Phase 3: aspect mapping
-        return new AspectList();
+        if (is.isEmpty()) return new AspectList();
+        // Look up in the object tags registry
+        java.util.List<Object> key = java.util.Arrays.asList(is.getItem(), is.getMetadata());
+        AspectList aspects = thaumcraft.api.ThaumcraftApi.objectTags.get(key);
+        if (aspects == null) {
+            key = java.util.Arrays.asList(is.getItem(), Short.MAX_VALUE);
+            aspects = thaumcraft.api.ThaumcraftApi.objectTags.get(key);
+        }
+        return aspects != null ? aspects.copy() : new AspectList();
     }
 
     @Override
     public AspectList getBonusObjectTags(ItemStack is, AspectList ot) {
-        // Phase 3: aspect mapping
+        // Phase 3: bonus tags from components
         return new AspectList();
     }
 
     @Override
     public AspectList generateTags(Item item, int meta) {
-        // Phase 3: aspect mapping
+        // Phase 3: auto-generate tags from materials
         return new AspectList();
     }
 
     @Override
     public boolean consumeVisFromWand(ItemStack wand, EntityPlayer player, AspectList cost, boolean doit, boolean crafting) {
-        // Phase 5: wand system
-        return false;
+        if (wand.isEmpty() || !(wand.getItem() instanceof ItemWandCasting)) return false;
+        ItemWandCasting wandItem = (ItemWandCasting) wand.getItem();
+        return wandItem.consumeAllVis(wand, player, cost, doit, crafting);
     }
 
     @Override
     public boolean consumeVisFromWandCrafting(ItemStack wand, EntityPlayer player, AspectList cost, boolean doit) {
-        // Phase 5: wand system
-        return false;
+        if (wand.isEmpty() || !(wand.getItem() instanceof ItemWandCasting)) return false;
+        ItemWandCasting wandItem = (ItemWandCasting) wand.getItem();
+        return wandItem.consumeAllVisCrafting(wand, player, cost, doit);
     }
 
     @Override
     public boolean consumeVisFromInventory(EntityPlayer player, AspectList cost) {
-        // Phase 5: wand system
+        // Try all inventory slots for wands
+        for (int i = 0; i < player.inventory.getSizeInventory(); i++) {
+            ItemStack stack = player.inventory.getStackInSlot(i);
+            if (!stack.isEmpty() && stack.getItem() instanceof ItemWandCasting) {
+                ItemWandCasting wandItem = (ItemWandCasting) stack.getItem();
+                if (wandItem.consumeAllVis(stack, player, cost, true, false)) {
+                    return true;
+                }
+            }
+        }
         return false;
     }
 

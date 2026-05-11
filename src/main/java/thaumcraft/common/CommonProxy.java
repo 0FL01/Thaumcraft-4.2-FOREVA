@@ -5,20 +5,28 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.network.IGuiHandler;
 import thaumcraft.common.container.*;
+import thaumcraft.common.lib.capabilities.IPlayerKnowledge;
+import thaumcraft.common.lib.capabilities.PlayerKnowledgeProvider;
 import thaumcraft.common.lib.research.PlayerKnowledge;
 import thaumcraft.common.lib.research.ResearchManager;
 
 public class CommonProxy implements IGuiHandler {
 
-    protected PlayerKnowledge playerKnowledge = new PlayerKnowledge();
-    protected ResearchManager researchManager = new ResearchManager();
+    // Capability-based player data accessors
 
-    public PlayerKnowledge getPlayerKnowledge() {
-        return playerKnowledge;
+    /**
+     * Get the IPlayerKnowledge capability for a player.
+     */
+    public static IPlayerKnowledge getPlayerKnowledge(EntityPlayer player) {
+        if (player == null) return null;
+        return player.getCapability(PlayerKnowledgeProvider.PLAYER_KNOWLEDGE, null);
     }
 
+    /**
+     * Get the research manager (delegates to capability system).
+     */
     public ResearchManager getResearchManager() {
-        return researchManager;
+        return new ResearchManager();
     }
 
     // ---- IGuiHandler ----

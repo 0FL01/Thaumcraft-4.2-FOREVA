@@ -1,38 +1,36 @@
 package thaumcraft.api.potions;
 
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.potion.Potion;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import thaumcraft.api.damagesource.DamageSourceThaumcraft;
 import thaumcraft.api.entities.ITaintedMob;
 
-public class PotionFluxTaint
-extends Potion {
+public class PotionFluxTaint extends Potion {
+
     public static PotionFluxTaint instance = null;
     private int statusIconIndex = -1;
     static final ResourceLocation rl = new ResourceLocation("thaumcraft", "textures/misc/potions.png");
 
-    public PotionFluxTaint(boolean par2, int par3) {
-        super(par2, par3);
+    public PotionFluxTaint(boolean isBadEffect, int liquidColor) {
+        super(isBadEffect, liquidColor);
         this.setIconIndex(0, 0);
+        this.setPotionName("potion.fluxtaint");
+        this.setRegistryName("thaumcraft", "flux_taint");
     }
 
-    public static void init() {
-        instance.setPotionName("potion.fluxtaint");
-        instance.setIconIndex(3, 1);
-        instance.setEffectiveness(0.25);
-    }
-
-    @SideOnly(value=Side.CLIENT)
+    @SideOnly(Side.CLIENT)
+    @Override
     public int getStatusIconIndex() {
         Minecraft.getMinecraft().getTextureManager().bindTexture(rl);
         return super.getStatusIconIndex();
     }
 
+    @Override
     public void performEffect(EntityLivingBase target, int par2) {
         if (target instanceof ITaintedMob) {
             target.heal(1.0f);
@@ -43,6 +41,7 @@ extends Potion {
         }
     }
 
+    @Override
     public boolean isReady(int par1, int par2) {
         int k = 40 >> par2;
         return k > 0 ? par1 % k == 0 : true;
