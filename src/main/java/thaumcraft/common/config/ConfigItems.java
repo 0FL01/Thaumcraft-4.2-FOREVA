@@ -1,7 +1,9 @@
 package thaumcraft.common.config;
 
+import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.item.Item;
 import net.minecraft.item.Item.ToolMaterial;
+import net.minecraft.item.ItemArmor.ArmorMaterial;
 import net.minecraftforge.common.util.EnumHelper;
 import thaumcraft.common.items.ItemBathSalts;
 import thaumcraft.common.items.ItemBottleTaint;
@@ -23,6 +25,7 @@ import thaumcraft.common.items.ItemShard;
 import thaumcraft.common.items.ItemTripleMeatTreat;
 import thaumcraft.common.items.ItemWispEssence;
 import thaumcraft.common.items.ItemZombieBrain;
+import thaumcraft.common.items.armor.*;
 import thaumcraft.common.items.equipment.*;
 import thaumcraft.common.items.wands.ItemWandCap;
 import thaumcraft.common.items.wands.ItemWandCasting;
@@ -63,6 +66,49 @@ public class ConfigItems {
     public static ToolMaterial TOOLMAT_THAUMIUM;
     public static ToolMaterial TOOLMAT_VOID;
     public static ToolMaterial TOOLMAT_ELEMENTAL;
+
+    // Armor materials
+    public static ArmorMaterial ARMOR_THAUMIUM;
+    public static ArmorMaterial ARMOR_VOID;
+    public static ArmorMaterial ARMOR_FORTRESS;
+    public static ArmorMaterial ARMOR_ROBE;
+    public static ArmorMaterial ARMOR_VOID_ROBE;
+    public static ArmorMaterial ARMOR_CULTIST;
+    public static ArmorMaterial ARMOR_CULTIST_PLATE;
+    public static ArmorMaterial ARMOR_CULTIST_LEADER;
+    public static ArmorMaterial ARMOR_CULTIST_BOOTS;
+    public static ArmorMaterial ARMOR_GOGGLES;
+    public static ArmorMaterial ARMOR_TRAVELLER;
+    public static ArmorMaterial ARMOR_HOVER;
+
+    // Armor items
+    public static ItemThaumiumArmor itemHelmThaumium;
+    public static ItemThaumiumArmor itemChestThaumium;
+    public static ItemThaumiumArmor itemLegsThaumium;
+    public static ItemThaumiumArmor itemBootsThaumium;
+    public static ItemVoidArmor itemHelmVoid;
+    public static ItemVoidArmor itemChestVoid;
+    public static ItemVoidArmor itemLegsVoid;
+    public static ItemVoidArmor itemBootsVoid;
+    public static ItemFortressArmor itemHelmFortress;
+    public static ItemFortressArmor itemChestFortress;
+    public static ItemFortressArmor itemLegsFortress;
+    public static ItemFortressArmor itemBootsFortress;
+    public static ItemRobeArmor itemHelmRobe;
+    public static ItemRobeArmor itemChestRobe;
+    public static ItemRobeArmor itemLegsRobe;
+    public static ItemRobeArmor itemBootsRobe;
+    public static ItemVoidRobeArmor itemHelmVoidRobe;
+    public static ItemVoidRobeArmor itemChestVoidRobe;
+    public static ItemVoidRobeArmor itemLegsVoidRobe;
+    public static ItemVoidRobeArmor itemBootsVoidRobe;
+    public static ItemCultistRobeArmor itemCultistRobe;
+    public static ItemCultistPlateArmor itemCultistPlate;
+    public static ItemCultistLeaderArmor itemCultistLeader;
+    public static ItemCultistBoots itemCultistBoots;
+    public static ItemGoggles itemGoggles;
+    public static ItemBootsTraveller itemBootsTraveller;
+    public static ItemHoverHarness itemHoverHarness;
 
     // Equipment items
     public static ItemThaumiumSword itemSwordThaumium;
@@ -120,6 +166,20 @@ public class ConfigItems {
         TOOLMAT_THAUMIUM = EnumHelper.addToolMaterial("THAUMIUM", 3, 500, 7.0f, 2.5f, 18);
         TOOLMAT_VOID = EnumHelper.addToolMaterial("VOID", 4, 600, 8.0f, 3.0f, 20);
         TOOLMAT_ELEMENTAL = EnumHelper.addToolMaterial("ELEMENTAL", 4, 1561, 10.0f, 4.0f, 22);
+
+        // Use armor materials from ThaumcraftApi (defined there with EnumHelper)
+        ARMOR_THAUMIUM = thaumcraft.api.ThaumcraftApi.armorMatThaumium;
+        ARMOR_VOID = thaumcraft.api.ThaumcraftApi.armorMatVoid;
+        ARMOR_FORTRESS = thaumcraft.api.ThaumcraftApi.armorMatThaumiumFortress;
+        ARMOR_ROBE = thaumcraft.api.ThaumcraftApi.armorMatSpecial;
+        ARMOR_VOID_ROBE = thaumcraft.api.ThaumcraftApi.armorMatVoidFortress;
+        ARMOR_CULTIST = thaumcraft.api.ThaumcraftApi.armorMatSpecial;
+        ARMOR_CULTIST_PLATE = thaumcraft.api.ThaumcraftApi.armorMatThaumium;
+        ARMOR_CULTIST_LEADER = thaumcraft.api.ThaumcraftApi.armorMatVoid;
+        ARMOR_CULTIST_BOOTS = thaumcraft.api.ThaumcraftApi.armorMatSpecial;
+        ARMOR_GOGGLES = thaumcraft.api.ThaumcraftApi.armorMatSpecial;
+        ARMOR_TRAVELLER = thaumcraft.api.ThaumcraftApi.armorMatSpecial;
+        ARMOR_HOVER = thaumcraft.api.ThaumcraftApi.armorMatSpecial;
 
         itemWandCasting = (ItemWandCasting) new ItemWandCasting()
                 .setRegistryName("thaumcraft", "wand_casting")
@@ -431,6 +491,169 @@ public class ConfigItems {
                 .setTranslationKey("thaumcraft.primal_crusher")
                 .setCreativeTab(tab);
         allItems.add(itemPrimalCrusher);
+
+        // Armor
+        itemHelmThaumium = (ItemThaumiumArmor) new ItemThaumiumArmor(ARMOR_THAUMIUM, 0, EntityEquipmentSlot.HEAD)
+                .setRegistryName("thaumcraft", "helm_thaumium")
+                .setTranslationKey("thaumcraft.helm_thaumium")
+                .setCreativeTab(tab);
+        allItems.add(itemHelmThaumium);
+
+        itemChestThaumium = (ItemThaumiumArmor) new ItemThaumiumArmor(ARMOR_THAUMIUM, 0, EntityEquipmentSlot.CHEST)
+                .setRegistryName("thaumcraft", "chest_thaumium")
+                .setTranslationKey("thaumcraft.chest_thaumium")
+                .setCreativeTab(tab);
+        allItems.add(itemChestThaumium);
+
+        itemLegsThaumium = (ItemThaumiumArmor) new ItemThaumiumArmor(ARMOR_THAUMIUM, 0, EntityEquipmentSlot.LEGS)
+                .setRegistryName("thaumcraft", "legs_thaumium")
+                .setTranslationKey("thaumcraft.legs_thaumium")
+                .setCreativeTab(tab);
+        allItems.add(itemLegsThaumium);
+
+        itemBootsThaumium = (ItemThaumiumArmor) new ItemThaumiumArmor(ARMOR_THAUMIUM, 0, EntityEquipmentSlot.FEET)
+                .setRegistryName("thaumcraft", "boots_thaumium")
+                .setTranslationKey("thaumcraft.boots_thaumium")
+                .setCreativeTab(tab);
+        allItems.add(itemBootsThaumium);
+
+        itemHelmVoid = (ItemVoidArmor) new ItemVoidArmor(ARMOR_VOID, 0, EntityEquipmentSlot.HEAD)
+                .setRegistryName("thaumcraft", "helm_void")
+                .setTranslationKey("thaumcraft.helm_void")
+                .setCreativeTab(tab);
+        allItems.add(itemHelmVoid);
+
+        itemChestVoid = (ItemVoidArmor) new ItemVoidArmor(ARMOR_VOID, 0, EntityEquipmentSlot.CHEST)
+                .setRegistryName("thaumcraft", "chest_void")
+                .setTranslationKey("thaumcraft.chest_void")
+                .setCreativeTab(tab);
+        allItems.add(itemChestVoid);
+
+        itemLegsVoid = (ItemVoidArmor) new ItemVoidArmor(ARMOR_VOID, 0, EntityEquipmentSlot.LEGS)
+                .setRegistryName("thaumcraft", "legs_void")
+                .setTranslationKey("thaumcraft.legs_void")
+                .setCreativeTab(tab);
+        allItems.add(itemLegsVoid);
+
+        itemBootsVoid = (ItemVoidArmor) new ItemVoidArmor(ARMOR_VOID, 0, EntityEquipmentSlot.FEET)
+                .setRegistryName("thaumcraft", "boots_void")
+                .setTranslationKey("thaumcraft.boots_void")
+                .setCreativeTab(tab);
+        allItems.add(itemBootsVoid);
+
+        itemHelmFortress = (ItemFortressArmor) new ItemFortressArmor(ARMOR_FORTRESS, 0, EntityEquipmentSlot.HEAD)
+                .setRegistryName("thaumcraft", "helm_fortress")
+                .setTranslationKey("thaumcraft.helm_fortress")
+                .setCreativeTab(tab);
+        allItems.add(itemHelmFortress);
+
+        itemChestFortress = (ItemFortressArmor) new ItemFortressArmor(ARMOR_FORTRESS, 0, EntityEquipmentSlot.CHEST)
+                .setRegistryName("thaumcraft", "chest_fortress")
+                .setTranslationKey("thaumcraft.chest_fortress")
+                .setCreativeTab(tab);
+        allItems.add(itemChestFortress);
+
+        itemLegsFortress = (ItemFortressArmor) new ItemFortressArmor(ARMOR_FORTRESS, 0, EntityEquipmentSlot.LEGS)
+                .setRegistryName("thaumcraft", "legs_fortress")
+                .setTranslationKey("thaumcraft.legs_fortress")
+                .setCreativeTab(tab);
+        allItems.add(itemLegsFortress);
+
+        itemBootsFortress = (ItemFortressArmor) new ItemFortressArmor(ARMOR_FORTRESS, 0, EntityEquipmentSlot.FEET)
+                .setRegistryName("thaumcraft", "boots_fortress")
+                .setTranslationKey("thaumcraft.boots_fortress")
+                .setCreativeTab(tab);
+        allItems.add(itemBootsFortress);
+
+        itemHelmRobe = (ItemRobeArmor) new ItemRobeArmor(ARMOR_ROBE, 0, EntityEquipmentSlot.HEAD)
+                .setRegistryName("thaumcraft", "helm_robe")
+                .setTranslationKey("thaumcraft.helm_robe")
+                .setCreativeTab(tab);
+        allItems.add(itemHelmRobe);
+
+        itemChestRobe = (ItemRobeArmor) new ItemRobeArmor(ARMOR_ROBE, 0, EntityEquipmentSlot.CHEST)
+                .setRegistryName("thaumcraft", "chest_robe")
+                .setTranslationKey("thaumcraft.chest_robe")
+                .setCreativeTab(tab);
+        allItems.add(itemChestRobe);
+
+        itemLegsRobe = (ItemRobeArmor) new ItemRobeArmor(ARMOR_ROBE, 0, EntityEquipmentSlot.LEGS)
+                .setRegistryName("thaumcraft", "legs_robe")
+                .setTranslationKey("thaumcraft.legs_robe")
+                .setCreativeTab(tab);
+        allItems.add(itemLegsRobe);
+
+        itemBootsRobe = (ItemRobeArmor) new ItemRobeArmor(ARMOR_ROBE, 0, EntityEquipmentSlot.FEET)
+                .setRegistryName("thaumcraft", "boots_robe")
+                .setTranslationKey("thaumcraft.boots_robe")
+                .setCreativeTab(tab);
+        allItems.add(itemBootsRobe);
+
+        itemHelmVoidRobe = (ItemVoidRobeArmor) new ItemVoidRobeArmor(ARMOR_VOID_ROBE, 0, EntityEquipmentSlot.HEAD)
+                .setRegistryName("thaumcraft", "helm_void_robe")
+                .setTranslationKey("thaumcraft.helm_void_robe")
+                .setCreativeTab(tab);
+        allItems.add(itemHelmVoidRobe);
+
+        itemChestVoidRobe = (ItemVoidRobeArmor) new ItemVoidRobeArmor(ARMOR_VOID_ROBE, 0, EntityEquipmentSlot.CHEST)
+                .setRegistryName("thaumcraft", "chest_void_robe")
+                .setTranslationKey("thaumcraft.chest_void_robe")
+                .setCreativeTab(tab);
+        allItems.add(itemChestVoidRobe);
+
+        itemLegsVoidRobe = (ItemVoidRobeArmor) new ItemVoidRobeArmor(ARMOR_VOID_ROBE, 0, EntityEquipmentSlot.LEGS)
+                .setRegistryName("thaumcraft", "legs_void_robe")
+                .setTranslationKey("thaumcraft.legs_void_robe")
+                .setCreativeTab(tab);
+        allItems.add(itemLegsVoidRobe);
+
+        itemBootsVoidRobe = (ItemVoidRobeArmor) new ItemVoidRobeArmor(ARMOR_VOID_ROBE, 0, EntityEquipmentSlot.FEET)
+                .setRegistryName("thaumcraft", "boots_void_robe")
+                .setTranslationKey("thaumcraft.boots_void_robe")
+                .setCreativeTab(tab);
+        allItems.add(itemBootsVoidRobe);
+
+        itemCultistRobe = (ItemCultistRobeArmor) new ItemCultistRobeArmor(ARMOR_CULTIST, 0, EntityEquipmentSlot.CHEST)
+                .setRegistryName("thaumcraft", "cultist_robe")
+                .setTranslationKey("thaumcraft.cultist_robe")
+                .setCreativeTab(tab);
+        allItems.add(itemCultistRobe);
+
+        itemCultistPlate = (ItemCultistPlateArmor) new ItemCultistPlateArmor(ARMOR_CULTIST_PLATE, 0, EntityEquipmentSlot.CHEST)
+                .setRegistryName("thaumcraft", "cultist_plate")
+                .setTranslationKey("thaumcraft.cultist_plate")
+                .setCreativeTab(tab);
+        allItems.add(itemCultistPlate);
+
+        itemCultistLeader = (ItemCultistLeaderArmor) new ItemCultistLeaderArmor(ARMOR_CULTIST_LEADER, 0, EntityEquipmentSlot.CHEST)
+                .setRegistryName("thaumcraft", "cultist_leader")
+                .setTranslationKey("thaumcraft.cultist_leader")
+                .setCreativeTab(tab);
+        allItems.add(itemCultistLeader);
+
+        itemCultistBoots = (ItemCultistBoots) new ItemCultistBoots(ARMOR_CULTIST_BOOTS, 0, EntityEquipmentSlot.FEET)
+                .setRegistryName("thaumcraft", "cultist_boots")
+                .setTranslationKey("thaumcraft.cultist_boots")
+                .setCreativeTab(tab);
+        allItems.add(itemCultistBoots);
+
+        itemGoggles = (ItemGoggles) new ItemGoggles(ARMOR_GOGGLES, 0, EntityEquipmentSlot.HEAD)
+                .setRegistryName("thaumcraft", "goggles")
+                .setTranslationKey("thaumcraft.goggles")
+                .setCreativeTab(tab);
+        allItems.add(itemGoggles);
+
+        itemBootsTraveller = (ItemBootsTraveller) new ItemBootsTraveller(ARMOR_TRAVELLER, 0, EntityEquipmentSlot.FEET)
+                .setRegistryName("thaumcraft", "boots_traveller")
+                .setTranslationKey("thaumcraft.boots_traveller")
+                .setCreativeTab(tab);
+        allItems.add(itemBootsTraveller);
+
+        itemHoverHarness = (ItemHoverHarness) new ItemHoverHarness(ARMOR_HOVER, 0, EntityEquipmentSlot.CHEST)
+                .setRegistryName("thaumcraft", "hover_harness")
+                .setTranslationKey("thaumcraft.hover_harness")
+                .setCreativeTab(tab);
+        allItems.add(itemHoverHarness);
     }
 
     public static Item[] getAllItems() {
