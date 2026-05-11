@@ -10,7 +10,57 @@ CodeChicken Lib (bundled in JAR).
 
 - `Thaumcraft-1.7.10-4.2.3.5.jar` -- original compiled JAR (942 classes)
 - `thaumcraft_src/` -- unpacked JAR contents
+- `Dockerfile` -- dev container (Java 8 + CFR + git + build tools)
+- `.dockerignore` -- excludes heavy/derivable files from Docker builds
 - `AGENTS.md` -- this file
+
+## Development Toolchain
+
+All development runs inside a Docker container with Java 8 (required by Forge
+1.12.2) and all necessary tools:
+
+| File | Description |
+|------|-------------|
+| `Dockerfile` | Based on `eclipse-temurin:8-jdk` (JDK 8u482, Ubuntu 24.04 Noble) |
+| `.dockerignore` | Excludes `.class`, `.git`, JAR, IDE files from build context |
+
+### Tools Inside the Container
+
+| Tool | Version | Purpose |
+|------|---------|---------|
+| `java`/`javac` | 1.8.0_482 (Temurin) | Required by Forge 1.12.2 |
+| `cfr` | 0.152 | `.class` → `.java` decompiler |
+| `git` | 2.43.0 | Version control |
+| `make`/`gcc`/`g++` | - | Native library compilation |
+| `python3` | 3.12 | Scripting |
+| `rg` (ripgrep) | 14.1.0 | Fast code search in source |
+| `jq` | 1.7 | JSON processing |
+| `gradlew` | guard script | Reminds to generate wrapper if missing |
+
+Also includes OpenGL (libGL/libGLU/libGLX/Mesa DRI), X11, ALSA and OpenAL
+libraries — enough for `gradlew runClient` with X11 forwarding.
+
+### Typical Usage
+
+```bash
+# Interactive session (mount project, X11 forwarding for client testing)
+docker run --rm -it \
+  -v $(pwd):/workspace/thaumcraft \
+  -e DISPLAY=$DISPLAY \
+  -v /tmp/.X11-unix:/tmp/.X11-unix \
+  thaumcraft-dev
+
+# Build the mod
+docker run --rm -v $(pwd):/workspace/thaumcraft thaumcraft-dev -c './gradlew build'
+
+# Decompile a .class file
+docker run --rm -v $(pwd):/workspace/thaumcraft thaumcraft-dev \
+  -c 'cfr thaumcraft_src/thaumcraft/common/Thaumcraft.class'
+
+# Find which class defines a symbol
+docker run --rm -v $(pwd):/workspace/thaumcraft thaumcraft-dev \
+  -c "rg -l 'class AspectList' thaumcraft_src/"
+```
 
 ## Dependencies (Confirmed)
 
