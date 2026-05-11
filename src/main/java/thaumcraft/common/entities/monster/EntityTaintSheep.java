@@ -1,8 +1,30 @@
 package thaumcraft.common.entities.monster;
 
 public class EntityTaintSheep extends net.minecraft.entity.monster.EntityMob implements thaumcraft.api.entities.ITaintedMob, net.minecraftforge.common.IShearable {
-    public EntityTaintSheep(net.minecraft.world.World world) { super(world); }
+    public EntityTaintSheep(net.minecraft.world.World world) {
+        super(world);
+        this.setSize(0.9f, 1.3f);
+    }
+
+    @Override
+    protected void applyEntityAttributes() {
+        super.applyEntityAttributes();
+        this.getEntityAttribute(net.minecraft.entity.SharedMonsterAttributes.MAX_HEALTH).setBaseValue(10.0);
+        this.getEntityAttribute(net.minecraft.entity.SharedMonsterAttributes.ATTACK_DAMAGE).setBaseValue(3.0);
+        this.getEntityAttribute(net.minecraft.entity.SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(0.23);
+    }
 
     @Override public boolean isShearable(net.minecraft.item.ItemStack item, net.minecraft.world.IBlockAccess world, net.minecraft.util.math.BlockPos pos) { return false; }
     @Override public java.util.List<net.minecraft.item.ItemStack> onSheared(net.minecraft.item.ItemStack item, net.minecraft.world.IBlockAccess world, net.minecraft.util.math.BlockPos pos, int fortune) { return new java.util.ArrayList<>(); }
+
+    // TODO: sound events
+
+    @Override
+    protected void dropFewItems(boolean wasRecentlyHit, int looting) {
+        if (this.world.rand.nextBoolean()) {
+            this.entityDropItem(new net.minecraft.item.ItemStack(thaumcraft.common.config.ConfigItems.itemResource, 1, 11), this.height / 2.0f);
+        } else {
+            this.entityDropItem(new net.minecraft.item.ItemStack(thaumcraft.common.config.ConfigItems.itemResource, 1, 12), this.height / 2.0f);
+        }
+    }
 }
