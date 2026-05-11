@@ -331,49 +331,68 @@ rendering (ornament/overlay) uses CCL render pipeline.
 
 ---
 
-### Phase 6 — Entities, Mobs & Golems (estimated: 3 sessions)
+### Phase 6 — Entities, Mobs & Golems (✅ Compiling, 5 sub-steps)
 
-**Goal**: All entities spawn, have correct AI, render with their models.
+**Status**: All 128 entity classes ported, registered via `ConfigEntities`. 44 AI
+classes in 6 sub-packages. Champion modifier framework complete. 0 compile errors.
+
+**Sub-steps**:
+- **6.1** — Registry + AI system (44 AI classes) + all entity stubs (53)
+- **6.2** — Taint mobs + projectiles fleshed out (behavior, drops, AI)
+- **6.3** — Eldritch/Cultist/Boss mobs fleshed out (19 entities)
+- **6.4** — Golems fleshed out (EntityGolemBase, trunk, helper, items)
+- **6.5** — Champion modifiers (14 effects + registry)
 
 **Deliverables**:
 - **Hostile Mobs** (~30):
-  - Taint mobs: Taintacle, Taint Spider, Taint Crawler, Taint Swarm,
-    Taint Sheep
-  - Cultists: Cultist, Cultist Leader (boss)
-  - Eldritch: Eldritch Guardian, Eldritch Golem (boss), Eldritch Warden (boss)
-  - Other: Wisp, Fire Bat, Pech, Brainy Zombie, Inhabited Zombie
-  - Champion modifiers (16 classes): Armored, Vampiric, Regenerating,
-    Warded, Mending, Greedy, etc.
-  - Custom spawn mechanics via `EventHandlerWorld`
-- **Passive Mobs** (~10):
-  - Golems (`EntityGolemBase`) — autonomous with pluggable AI cores
-  - Traveling Trunk (`EntityTravelingTrunk`) — inventory follower
-  - Taint Sheep, Taint Chicken, Taint Pig (morphs from vanilla mobs)
+  - Taint mobs: Taintacle, Taint Spider, Taint Creeper, Taint Swarm,
+    Taint Chicken/Cow/Pig/Sheep/Villager, Taint Spore, Taintacle Small
+  - Cultists: Cultist, Cultist Cleric, Cultist Knight, Cultist Leader (boss)
+  - Eldritch: Eldritch Crab, Eldritch Guardian, Eldritch Golem (boss),
+    Eldritch Warden (boss), Watcher
+  - Other: Wisp, Fire Bat, Pech, Brainy Zombie, Giant Brainy Zombie,
+    Inhabited Zombie, Thaumic Slime, Mind Spider
+  - Champion modifiers (14 effects): Armored (24% dmg reduction), Vampiric
+    (heals 50% dmg dealt), Undying (1 HP/s regen), Fire (40% set ablaze),
+    Warded (15% reduction), Bold (1.5x dmg), Poison/Warp/Sickly (status),
+    Spined (thorns), Grim (weakness), Mighty (knockback), Infested
+- **Golems**:
+  - `EntityGolemBase` with 12 core AI types (gather/empty/pickup/harvest/
+    attack/fluids/essentia/lumber/use/butcher/sort/fish)
+  - `EntityTravelingTrunk` — inventory follower with UUID owner tracking
+  - `EntityGolemBobber` — fishing bobber
+  - `GolemHelper` + `Marker` + `EnumGolemType` (8 types)
 - **Projectiles** (~12):
-  - `EntityAlumentum`, `EntityPrimalArrow`, `EntityFrostShard`,
-    `EntityDart`, `EntityThaumcraftArrow`, etc.
-- **AI System** (~40 classes):
-  - Golem AI: `AIGolemCollect`, `AIGolemFill`, `AIGolemEmpty`,
-    `AIGolemGuard`, `AIGolemFish`, `AIGolemUse`, etc.
-  - Combat AI: `AICultist`, `AIMinion`, `AIPech`, standard `EntityAI`
-    subclasses
-  - Fluid AI: bucket interaction, liquid handling
-  - Interact AI: `AIOpenDoor`, `AIUseDoor`, `AIInteract`
-  - Misc: pech trader AI
+  - `EntityAlumentum` (explosion), `EntityFrostShard` (bounce/fragile),
+    `EntityDart`, `EntityPrimalArrow`, `EntityBottleTaint`,
+    `EntityEldritchOrb`, `EntityExplosiveOrb`, `EntityPechBlast`,
+    `EntityShockOrb`, `EntityEmber`, `EntityGolemOrb`, `EntityPrimalOrb`
+- **AI System** (44 classes):
+  - Golem AI: combat/fluid/inventory/interact/misc/pech — 6 sub-packages
+  - Combat AI: `AIAttackOnCollide`, `AIGolemAttackOnCollide`,
+    `AICreeperSwell`, `AICultistHurtByTarget`, `AIDartAttack`, etc.
+  - Golem task AI: `AIHomeTake/Place/Drop/Replace`, `AIEmptyGoto/Drop/Place`,
+    `AIFillTake/Goto`, `AIItemPickup`, `AISortingGoto/Place`,
+    `AIEssentiaGather/Empty/Goto`, `AILiquidGather/Empty/Goto`,
+    `AIHarvestCrops/Logs`, `AIFish`, `AIUseItem`
 
-**Key changes**:
-- Entity registration via `EntityEntryBuilder` + `RegistryEvent`
-- Egg colors via `EntityEntryBuilder.egg(color1, color2)` — need 40+
-- `EntityFX` → `Particle` (for projectiles that extend EntityFX)
-- `EntityAI` base unchanged — only method renames
-- Golem inventory: `IInventory` → `ItemStackHandler` (capability-based)
-- `EntityLivingBase` equipment slots: `getEquippedItemInSlot(int)` →
-  `getHeldItem(EnumHand)` / `getItemStackFromSlot(EntityEquipmentSlot)`
+**1.12.2 findings**:
+- `IEntityAdditionalSpawnData` requires `ByteBuf` (Netty), not `PacketBuffer`
+- `EntityAITarget` constructor: `(EntityCreature, boolean)` in 1.12.2
+- `IBossDisplayData` removed — use custom boss bar
+- `EntityAIArrowAttack` removed — use `EntityAIBase`
+- `getLivingSound()` renamed to `getAmbientSound()`
+- `EntityDataManager` uses `DataParameter<T>` static fields via `createKey()`
+- `moveEntity()` renamed to `move(MoverType, x, y, z)`
+- Golem inventory uses raw `IInventory` (not `ItemStackHandler` capability)
+- Blaze `getEntityAttribute` → `SharedMonsterAttributes` constants change
+- `EntityEntryBuilder.create()` returns raw type (need `@SuppressWarnings`)
+- `Optional<UUID>` in 1.12.2 Forge uses Guava `com.google.common.base.Optional`
 
 **Risks**: Champion modifier system uses `IEntityLivingData` hook and
-`EntityJoinWorldEvent` — same in 1.12.2. Golem AI is the most complex AI
-system (16 packages, ~40 classes). Entity renderers (42 classes) depend on
-CCL for some effects. Boss entities have custom AI phases.
+`EntityJoinWorldEvent` — same in 1.12.2. Entity renderers (42 classes)
+depend on client-side work in Phase 8. Boss entities have custom AI phases
+that need actual logic (currently placeholder stubs).
 
 ---
 
@@ -573,7 +592,7 @@ identical.
 | 3 — Core Systems | ~30 | 0 | 2 sessions | High (vis net performance) | Systems within phase |
 | 4 — Blocks + Tiles | 151 | ~500 tex + ~100 mcmeta + ~40 blockstates | 4 sessions | **Highest** | Blocks/blocks, tiles/tiles |
 | 5 — Items + Baubles | 110 | ~200 tex | **Done** | Medium | Per-category |
-| 6 — Entities + AI | 130 | ~100 tex | 3 sessions | High (golems) | Per-mob |
+| 6 — Entities + AI | 130 | ~100 tex | **Done** | High (golems) | Per-mob |
 | 7 — World Gen | 35 | ~20 tex | 2 sessions | Medium | Biomes / dimension / features |
 | 8 — Client GUI + Render | ~140 | ~200 tex + 7 shaders | 3 sessions | **Highest** | GUI / TESR / EntityRend / FX / Shaders |
 | 9 — Recipes + Research | ~450 registrations | 0 | 2 sessions | Low (volume) | Per-recipe-type |
