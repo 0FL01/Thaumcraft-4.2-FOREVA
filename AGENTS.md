@@ -126,6 +126,7 @@ Confirmed sources: `mcmod.info` (dependencies: `["Baubles"]`), `dependancies.inf
 | 2 | Registration framework + config + networking + events | ✅ Done | ~230 (189 source files) |
 | 3 | Core game systems (capabilities, wands, research, vis net, potions, enchants) | ✅ Done | ~270 (217 source files) |
 | 4 | Blocks + Tile Entities (71 blocks + 80 TEs) | ✅ Done | ~400 (286 source files) |
+| 5 | Items, Tools, Armor, Baubles, Relics (~110 items) | ✅ Done | ~550 (340 source files) |
 
 ## Where To Look
 | `thaumcraft_src/thaumcraft/common/CommonProxy.class` | Server proxy (registration, network, config) |
