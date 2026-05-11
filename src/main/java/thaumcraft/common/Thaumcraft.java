@@ -230,7 +230,7 @@ public class Thaumcraft {
     @SubscribeEvent
     public void registerEntities(RegistryEvent.Register<EntityEntry> event) {
         log.info("Registering entities");
-        // Phase 6: register actual entities
+        event.getRegistry().registerAll(ConfigEntities.ENTITIES.toArray(new EntityEntry[0]));
     }
 
     @SubscribeEvent
