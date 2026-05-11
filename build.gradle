@@ -1,0 +1,87 @@
+buildscript {
+    repositories {
+        mavenCentral()
+        maven {
+            name = "forge"
+            url = "https://maven.minecraftforge.net/"
+        }
+        maven {
+            name = "sonatype"
+            url = "https://oss.sonatype.org/content/repositories/snapshots/"
+        }
+    }
+    dependencies {
+        classpath 'net.minecraftforge.gradle:ForgeGradle:2.3-SNAPSHOT'
+    }
+}
+
+apply plugin: 'net.minecraftforge.gradle.forge'
+
+version = "1.0.0"
+group = "thaumcraft"
+archivesBaseName = "Thaumcraft"
+
+sourceCompatibility = targetCompatibility = '1.8'
+
+minecraft {
+    version = "1.12.2-14.23.5.2847"
+    runDir = "run"
+    mappings = "stable_39"
+
+    replace '@VERSION@', project.version
+    replaceIn 'Thaumcraft.java'
+}
+
+repositories {
+    maven {
+        name = "curse"
+        url = "https://www.cursemaven.com"
+    }
+}
+
+dependencies {
+    compile 'curse.maven:baubles-227083:2518667'
+}
+
+processResources {
+    from(sourceSets.main.resources.srcDirs) {
+        include 'mcmod.info'
+        expand version: version
+    }
+
+    from(sourceSets.main.resources.srcDirs) {
+        exclude 'mcmod.info'
+    }
+}
+
+jar {
+    classifier = 'universal'
+    from sourceSets.main.output
+}
+
+// API jar: packages thaumcraft.api.* for addon mods
+task apiJar(type: Jar) {
+    classifier = 'api'
+    from(sourceSets.main.output) {
+        include 'thaumcraft/api/**'
+    }
+}
+
+// Dev jar: all classes + sources for IDE debugging
+task devJar(type: Jar) {
+    classifier = 'dev'
+    from sourceSets.main.output
+    from sourceSets.main.allJava
+}
+
+artifacts {
+    archives apiJar
+    archives devJar
+}
+
+// Re-obfuscation: keep API jar readable (no SRG names)
+reobf {
+    apiJar { }
+}
+
+idea { module { inheritOutputDirs = true } }

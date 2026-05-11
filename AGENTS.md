@@ -29,6 +29,11 @@ See `PRD.md §6` for full detail. All open questions resolved:
 - `.dockerignore` -- excludes heavy/derivable files from Docker builds
 - `AGENTS.md` -- this file
 - `PRD.md` -- product requirements doc with phased porting plan
+- `build.gradle` -- ForgeGradle 2.3, Forge 14.23.5.2847, Baubles via CurseMaven
+- `gradlew` / `gradle/wrapper/` -- Gradle 4.10.3
+- `src/main/java/` -- mod source (stub `Thaumcraft.java` + proxies)
+- `src/main/resources/` -- mcmod.info, assets later
+- `.gradle_home/` -- Gradle/Forge cache (**excluded from git**)
 
 ## Development Toolchain
 
@@ -56,6 +61,18 @@ All development runs inside a Docker container with Java 8 (required by Forge
 Also includes OpenGL (libGL/libGLU/libGLX/Mesa DRI), X11, ALSA and OpenAL
 libraries — enough for `gradlew runClient` with X11 forwarding.
 
+### ForgeGradle Build Caching
+
+The `.gradle_home/` directory (excluded from git) caches all Forge/MCP/Gradle
+artifacts after the first `setupDecompWorkspace` run. Use it as a Docker
+bind mount to avoid re-downloading:
+
+```bash
+docker run --rm -v $(pwd):/workspace/thaumcraft \
+  -v $(pwd)/.gradle_home:/home/ubuntu/.gradle \
+  --user 1000:1000 --entrypoint ./gradlew thaumcraft-dev build
+```
+
 ### Typical Usage
 
 ```bash
@@ -67,7 +84,9 @@ docker run --rm -it \
   thaumcraft-dev
 
 # Build the mod
-docker run --rm -v $(pwd):/workspace/thaumcraft thaumcraft-dev -c './gradlew build'
+docker run --rm -v $(pwd):/workspace/thaumcraft \
+  -v $(pwd)/.gradle_home:/home/ubuntu/.gradle \
+  --user 1000:1000 --entrypoint ./gradlew thaumcraft-dev build
 
 # Decompile a .class file
 docker run --rm -v $(pwd):/workspace/thaumcraft thaumcraft-dev \

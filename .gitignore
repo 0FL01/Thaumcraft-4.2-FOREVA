@@ -3,8 +3,10 @@
 
 # Gradle / Forge workspace
 .gradle/
+.gradle_home/
 build/
 out/
+run/
 eclipse/
 *.launch
 

@@ -1,0 +1,11 @@
+[{
+  "modid": "thaumcraft",
+  "name": "Thaumcraft",
+  "version": "${version}",
+  "description": "Thaumcraft port to Minecraft 1.12.2",
+  "authorList": ["Azanor"],
+  "credits": "Azanor",
+  "logoFile": "",
+  "screenshots": [],
+  "dependencies": ["baubles"]
+}]
