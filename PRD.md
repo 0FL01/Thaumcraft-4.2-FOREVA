@@ -582,46 +582,75 @@ identical.
 
 ---
 
-## 6. Key Architectural Decisions
+## 6. Architectural Decisions (All Confirmed)
 
-### Decision 1: Rendering Strategy
+### Decision 1: API Packaging — Separate Mod
 
-| Approach | Pros | Cons |
-|----------|------|------|
-| **Full IBakedModel rewrite** | Future-proof, uses modern Forge, no minify conflicts | ~80 complex block models + ~60 model JSONs; breaks CCL pipeline rendering |
-| **CCL adaptation for TESR** | Minimal porting surface, preserves math library | CCL render pipeline uses deprecated `Tessellator`; must refactor to `BufferBuilder` |
-| **Recommended**: hybrid | Use JSON model for simple blocks, CCL for TESR, OBJ for complex static models | Mixed approach requires clear boundaries |
+`thaumcraft.api` ships as a **separate JAR** (`thaumcraft-api-1.12.2.jar`).
+This is the only hard dependency for addon mods (e.g., Thaumic Tinkerer,
+Forbidden Magic). The main mod JAR declares it as `required-after`.
 
-**Decision**: Hybrid. Static cube blocks → JSON models. OBJ models →
-`OBJLoader` + `IBakedModel` wrapper. Complex tile renders (nodes,
-crucible, jars) → TESR with adapted CCL. Entity models → `ModelBase`
-(unchanged).
+- Main JAR: `Thaumcraft-1.12.2-<version>.jar`
+- API JAR: `ThaumcraftAPI-1.12.2-<version>.jar` (thin, no game code)
+- Build: multi-project Gradle setup (`:api` + `:main`)
+- Internal bridge: `ThaumcraftApi.internalMethods` set at startup
 
-### Decision 2: DepLoader Removal
+### Decision 2: Rendering Strategy — Hybrid (CCL for TESR Only)
 
-`DepLoader` (FMLCorePlugin) auto-downloaded Baubles at runtime in 1.7.10.
-In 1.12.2, Baubles is declared in `build.gradle` via CurseMaven. **Delete
-all 10 `codechicken.core.launch` classes** and remove `FMLCorePlugin` entry
-from `META-INF/MANIFEST.MF`.
+| Scope | Render Approach | How |
+|-------|----------------|-----|
+| Simple blocks (dirt-like) | JSON model + blockstates | `assets/thaumcraft/blockstates/*.json` |
+| Complex static blocks | OBJ loader wrapper | `OBJLoader.INSTANCE.addDomain("thaumcraft")` |
+| Tile entities (nodes, crucible, jars, tubes, mirrors) | TESR with adapted CCL | Port `CCRenderState` → `BufferBuilder` |
+| Entity models | `ModelBase` (unchanged) | OpenGL calls → `GlStateManager` |
+| Particles | Custom `ParticleEngine` | 22 FX classes, `EntityFX` → `Particle` |
+| Beams/bolts | Custom Tessellator/BufferBuilder | Direct vertex rendering |
 
-### Decision 3: Potion Registration
+- All `RenderBlocks` and `ISimpleBlockRenderingHandler` usage is **deleted**
+- 52 TESR + 42 entity renders use CCL math + adapted render pipeline
+- `CCRenderState`, `CCModel`, `Vertex5` ported to target `BufferBuilder`
 
-1.7.10 Thaumcraft extended `Potion.potionTypes` array via reflection
-(Config.class). In 1.12.2, use `RegistryEvent.Register<Potion>`. **Remove
-reflection hack entirely**.
+### Decision 3: DepLoader Removal — Delete
 
-### Decision 4: Capabilities for Player Data
+Delete all 10 classes under `thaumcraft.codechicken.core.launch`. Remove
+`FMLCorePlugin` entry from `META-INF/MANIFEST.MF`. Baubles declared in
+`build.gradle` via CurseMaven replaces runtime auto-download.
 
-Replace `IExtendedEntityProperties` with `Capability<IPlayerKnowledge>` /
-`Capability<IPlayerWarp>`. Attach via `AttachCapabilitiesEvent<Entity>` in
-`EventHandlerEntity`.
+### Decision 4: Potion Registration — Registry Events
 
-### Decision 5: Package Naming
+Remove the reflection-based `Potion.potionTypes` array extension. Register
+all 7 custom potions via `RegistryEvent.Register<Potion>`.
 
-Keep `thaumcraft.*` (drop `common`/`client` sub-packages OR flatten based
-on original structure). **Recommendation**: keep original sub-package names
-(`thaumcraft.common.tiles`, `thaumcraft.client.gui`, etc.) to maintain
-direct diffability with decompiled CFR output.
+### Decision 5: Player Data — Capabilities
+
+Replace `IExtendedEntityProperties` with a single
+`Capability<IPlayerKnowledge>` attached via
+`AttachCapabilitiesEvent<Entity>`. Include:
+- Warp (normal + sticky + temporary)
+- Known aspects discovered
+- Scanned entities, items, phenomena
+- Research completion flags
+
+Sync via existing packet system (39 registered packets).
+
+### Decision 6: Config — Both (Configuration First, @Config Later)
+
+- **Now**: Keep `net.minecraftforge.common.config.Configuration` (same API
+  as 1.7.10). Minimal code change to Config.java.
+- **Phase 10**: Migrate to `@Config` annotation with auto-GUI. 50+ settings
+  across 8 categories (Enchantments, Entities, Biomes, Research, World Gen,
+  Monster Spawning, Runic Shielding, Misc).
+
+### Decision 7: Package Naming — Keep Original Structure
+
+Maintain `thaumcraft.common.*` and `thaumcraft.client.*` sub-packages to
+preserve 1:1 mapping with decompiled CFR output. This makes diffing and
+validation against the original bytecode straightforward.
+
+### Decision 8: Localization — en_US Only First
+
+Port all 22 `.lang` files only when strings stabilise after Phase 9.
+Initial releases ship with `en_US` only.
 
 ---
 
@@ -634,7 +663,7 @@ direct diffability with decompiled CFR output.
 | Baubles 1.12 API differs from 1.7.10 | Baubles items non-functional | Medium | Decompile Baubles 1.12 API jar; adapt item implementations |
 | Infusion stability scan CPU/perf | TPS lag on complex altars | Medium | Add configurable scan interval; cache stability results between changes |
 | Eldritch dimension maze gen slow | Long join times | Low | Verify maze gen uses `MapGen` patterns; add progress logging |
-| 22 language files need update | Incomplete translations on first build | Low | Ship with `en_US` only initially; add others when strings stabilize |
+| API separate mod adds build complexity | Multi-project gradle config | Low | Use `:` project references; API is pure interfaces, no game deps |
 | OptiFine shader conflicts | Visual artifacts | Medium | Runtime detection (already in 1.7.10); fallback to non-shader rendering |
 | JEI recipe integration breaks | No recipe viewing | Low | JEI is optional — mod works without it |
 

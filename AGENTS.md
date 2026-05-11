@@ -6,6 +6,21 @@ Reverse-engineering and port of Azanor's Thaumcraft 4.2.3.5 from Minecraft
 Tech stack: Java 8, MinecraftForge 1.12.2, Gradle, Baubles (hard dependency),
 CodeChicken Lib (bundled in JAR).
 
+## Architectural Decisions (Closed)
+
+See `PRD.md §6` for full detail. All open questions resolved:
+
+| Decision | Choice |
+|----------|--------|
+| API packaging | **Separate mod** (`ThaumcraftAPI-1.12.2.jar`) |
+| Rendering | **Hybrid**: JSON models + CCL TESR + OBJ |
+| DepLoader | **Delete** (Baubles via CurseMaven) |
+| Potion hack | **Remove** (use `RegistryEvent`) |
+| Player data | **Capabilities** on `EntityPlayer` |
+| Config | **Both**: `Configuration` now, `@Config` in Phase 10 |
+| Packages | **Keep** `thaumcraft.common.*` / `thaumcraft.client.*` |
+| Lang files | **`en_US` only** until strings stabilise |
+
 ## Workspace Overview
 
 - `Thaumcraft-1.7.10-4.2.3.5.jar` -- original compiled JAR (942 classes)
