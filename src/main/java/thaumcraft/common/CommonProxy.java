@@ -1,19 +1,49 @@
 package thaumcraft.common;
 
+import javax.annotation.Nullable;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.network.IGuiHandler;
-
-import javax.annotation.Nullable;
+import thaumcraft.common.container.*;
+import thaumcraft.common.lib.research.PlayerKnowledge;
+import thaumcraft.common.lib.research.ResearchManager;
 
 public class CommonProxy implements IGuiHandler {
+
+    protected PlayerKnowledge playerKnowledge = new PlayerKnowledge();
+    protected ResearchManager researchManager = new ResearchManager();
+
+    public PlayerKnowledge getPlayerKnowledge() {
+        return playerKnowledge;
+    }
+
+    public ResearchManager getResearchManager() {
+        return researchManager;
+    }
 
     // ---- IGuiHandler ----
 
     @Nullable
     @Override
     public Object getServerGuiElement(int ID, EntityPlayer player, World world, int x, int y, int z) {
-        return null;
+        switch (ID) {
+            case 0: return new ContainerArcaneWorkbench();
+            case 1: return new ContainerResearchTable();
+            case 2: return new ContainerArcaneBore();
+            case 3: return new ContainerAlchemyFurnace();
+            case 4: return new ContainerDeconstructionTable();
+            case 5: return new ContainerFocusPouch();
+            case 6: return new ContainerGolem();
+            case 7: return new ContainerPech();
+            case 8: return new ContainerTravelingTrunk();
+            case 9: return new ContainerThaumatorium();
+            case 10: return new ContainerHandMirror();
+            case 11: return new ContainerHoverHarness();
+            case 12: return new ContainerMagicBox();
+            case 13: return new ContainerSpa();
+            case 14: return new ContainerFocalManipulator();
+            default: return null;
+        }
     }
 
     @Nullable
@@ -28,6 +58,9 @@ public class CommonProxy implements IGuiHandler {
     }
 
     public void registerKeyBindings() {
+    }
+
+    public void registerHandlers() {
     }
 
     // ---- FX stubs (ClientProxy overrides with actual GL calls) ----

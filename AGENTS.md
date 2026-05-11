@@ -117,11 +117,15 @@ No other dependencies. The bundled `DepLoader` (in `META-INF/MANIFEST.MF` as `FM
 
 Confirmed sources: `mcmod.info` (dependencies: `["Baubles"]`), `dependancies.info` (Baubles 1.0.1.10 auto-download URL), `META-INF/MANIFEST.MF` (FMLCorePlugin: DepLoader), Thaumcraft 6 (1.12.2) official source code build.gradle (single dependency: `curse.maven:baubles-227083:2518667`).
 
-## Where To Look
+## Development Status
 
-| Path | Why |
-|------|-----|
-| `thaumcraft_src/thaumcraft/common/Thaumcraft.class` | Main mod entry point |
+| Phase | Scope | Status | Classes |
+|-------|-------|--------|---------|
+| 0 | Forge 1.12.2 MDK, Gradle 4.10.3, build chain | ✅ Done | 4 (stubs) |
+| 1 | API + CCL + TrueType port to 1.12.2 | ✅ Done | 140 (105 source files) |
+| 2 | Registration framework + config + networking + events | ✅ Done | ~230 (189 source files) |
+
+## Where To Look
 | `thaumcraft_src/thaumcraft/common/CommonProxy.class` | Server proxy (registration, network, config) |
 | `thaumcraft_src/thaumcraft/client/ClientProxy.class` | Client proxy (renderers, GUI, sounds) |
 | `thaumcraft_src/thaumcraft/api/` | Public API (67 classes) -- port as standalone API mod |
@@ -251,13 +255,6 @@ Confirmed sources: `mcmod.info` (dependencies: `["Baubles"]`), `dependancies.inf
 | Package | Content |
 |---------|---------|
 | `truetyper` | `TrueTypeFont`, `FontLoader`, `FontHelper`, `Formatter` |
-
-## Development Status
-
-| Phase | Scope | Status | Classes |
-|-------|-------|--------|---------|
-| 0 | Forge 1.12.2 MDK, Gradle 4.10.3, build chain | ✅ Done | 4 (stubs) |
-| 1 | API + CCL + TrueType port to 1.12.2 | ✅ Done | 140 (105 source files) |
 
 ## Porting Strategy
 

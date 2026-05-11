@@ -1,10 +1,9 @@
 package thaumcraft.client.gui;
 
+import java.util.Set;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraftforge.fml.client.IModGuiFactory;
-
-import java.util.Set;
 
 public class GuiFactory implements IModGuiFactory {
 
@@ -23,7 +22,7 @@ public class GuiFactory implements IModGuiFactory {
     }
 
     @Override
-    public Set<RuntimeOptionCategoryElement> runtimeGuiCategories() {
+    public Set<IModGuiFactory.RuntimeOptionCategoryElement> runtimeGuiCategories() {
         return null;
     }
 }
