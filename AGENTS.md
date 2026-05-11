@@ -31,7 +31,7 @@ See `PRD.md §6` for full detail. All open questions resolved:
 - `PRD.md` -- product requirements doc with phased porting plan
 - `build.gradle` -- ForgeGradle 2.3, Forge 14.23.5.2847, Baubles via CurseMaven
 - `gradlew` / `gradle/wrapper/` -- Gradle 4.10.3
-- `src/main/java/` -- mod source (stub `Thaumcraft.java` + proxies)
+- `src/main/java/` -- mod source (stub `Thaumcraft.java` + proxies + ported API/CCL/TrueType)
 - `src/main/resources/` -- mcmod.info, assets later
 - `.gradle_home/` -- Gradle/Forge cache (**excluded from git**)
 
@@ -246,11 +246,18 @@ Confirmed sources: `mcmod.info` (dependencies: `["Baubles"]`), `dependancies.inf
 | `codechicken.lib.colour` | `ColourRGBA`, `ColourARGB` |
 | `codechicken.lib.raytracer` | `RayTracer`, `ExtendedMOP` |
 
-### TrueType Font Renderer
+### TrueType Font Renderer (Ported)
 
 | Package | Content |
 |---------|---------|
 | `truetyper` | `TrueTypeFont`, `FontLoader`, `FontHelper`, `Formatter` |
+
+## Development Status
+
+| Phase | Scope | Status | Classes |
+|-------|-------|--------|---------|
+| 0 | Forge 1.12.2 MDK, Gradle 4.10.3, build chain | ✅ Done | 4 (stubs) |
+| 1 | API + CCL + TrueType port to 1.12.2 | ✅ Done | 140 (105 source files) |
 
 ## Porting Strategy
 
