@@ -13,6 +13,7 @@ CodeChicken Lib (bundled in JAR).
 - `Dockerfile` -- dev container (Java 8 + CFR + git + build tools)
 - `.dockerignore` -- excludes heavy/derivable files from Docker builds
 - `AGENTS.md` -- this file
+- `PRD.md` -- product requirements doc with phased porting plan
 
 ## Development Toolchain
 
