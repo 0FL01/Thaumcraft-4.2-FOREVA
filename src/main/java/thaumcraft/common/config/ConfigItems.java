@@ -17,6 +17,7 @@ import thaumcraft.common.items.ItemInkwell;
 import thaumcraft.common.items.ItemKey;
 import thaumcraft.common.items.ItemLootBag;
 import thaumcraft.common.items.ItemManaBean;
+import thaumcraft.common.items.ItemNuggetEdible;
 import thaumcraft.common.items.ItemNugget;
 import thaumcraft.common.items.ItemResearchNotes;
 import thaumcraft.common.items.ItemResource;
@@ -29,6 +30,8 @@ import thaumcraft.common.items.armor.*;
 import thaumcraft.common.items.baubles.*;
 import thaumcraft.common.items.equipment.*;
 import thaumcraft.common.items.relics.*;
+import thaumcraft.common.items.wands.ItemFocusPouch;
+import thaumcraft.common.items.wands.ItemFocusPouchBauble;
 import thaumcraft.common.items.wands.ItemWandCap;
 import thaumcraft.common.items.wands.ItemWandCasting;
 import thaumcraft.common.items.wands.ItemWandRod;
@@ -44,6 +47,9 @@ public class ConfigItems {
     public static ItemWandCasting itemWandCasting;
     public static ItemWandRod itemWandRod;
     public static ItemWandCap itemWandCap;
+
+    public static ItemFocusPouch itemFocusPouch;
+    public static ItemFocusPouchBauble itemFocusPouchBauble;
 
     // Wand foci
     public static FocusShock focusShock;
@@ -138,6 +144,7 @@ public class ConfigItems {
     public static ItemEssence itemEssence;
     public static ItemCrystalEssence itemCrystalEssence;
     public static ItemNugget itemNugget;
+    public static ItemNuggetEdible itemNuggetEdible;
     public static ItemEldritchObject itemEldritchObject;
     public static ItemLootBag itemLootBag;
 
@@ -209,6 +216,18 @@ public class ConfigItems {
                 .setTranslationKey("thaumcraft.wand_cap")
                 .setCreativeTab(tab);
         allItems.add(itemWandCap);
+
+        itemFocusPouch = (ItemFocusPouch) new ItemFocusPouch()
+                .setRegistryName("thaumcraft", "focus_pouch")
+                .setTranslationKey("thaumcraft.focus_pouch")
+                .setCreativeTab(tab);
+        allItems.add(itemFocusPouch);
+
+        itemFocusPouchBauble = (ItemFocusPouchBauble) new ItemFocusPouchBauble()
+                .setRegistryName("thaumcraft", "focus_pouch_bauble")
+                .setTranslationKey("thaumcraft.focus_pouch_bauble")
+                .setCreativeTab(tab);
+        allItems.add(itemFocusPouchBauble);
 
         focusShock = (FocusShock) new FocusShock()
                 .setRegistryName("thaumcraft", "focus_shock")
@@ -303,6 +322,12 @@ public class ConfigItems {
                 .setTranslationKey("thaumcraft.nugget")
                 .setCreativeTab(tab);
         allItems.add(itemNugget);
+
+        itemNuggetEdible = (ItemNuggetEdible) new ItemNuggetEdible()
+                .setRegistryName("thaumcraft", "nugget_edible")
+                .setTranslationKey("thaumcraft.nugget_edible")
+                .setCreativeTab(tab);
+        allItems.add(itemNuggetEdible);
 
         itemEldritchObject = (ItemEldritchObject) new ItemEldritchObject()
                 .setRegistryName("thaumcraft", "eldritch_object")
