@@ -1,0 +1,283 @@
+4.2.3.5
+- API: minor bugfixes and enhancements
+- minor bugfixes
+- arcane levitator checks against shift instead of if the entity is sneaking
+- fixed wisp hitbox
+- bone bow recipe now actually checks if it is craftable against its own research instead of arcane stone
+- possible fix for amber rendering crash
+
+4.2.3.4
+- nerfed some of the loot that can appear in uncommon loot bags
+- increased the difficulty of champion mobs
+- the arcane spa can no longer place water in the nether
+- traveling trunks should no longer despawn if commanded to stay put in unloaded chunks
+- added chunk check to prevent possible recursion crash with vis relay network
+
+4.2.3.3
+- the cultist portal will now always drop its reward no matter how it is destroyed
+- added a check to prevent infinite loop with spined champion mobs attacking other entities with thorns
+- dowsing on the excavation focus will now add the native clusters ability to the arcane bore
+- various bugfixes
+
+4.2.3.2
+- fix for crash caused by mods that add copper or silver ore.
+- re-added old, dead code since apparently Thaumic Tinkerer was using it. Directly accessing non-api code is bad m'kay. 
+
+4.2.3.1
+- API: ItemFocusBasic is no longer abstract - it seemed to cause issues for some people when using the creative search function with certain combinations of mods.
+- small bugfixes
+- golems can now draw any amount of essentia from buffers, not just multiples of their carrying capacity.
+- removed lies from cake
+- glimmers of light produced by arcane lamps are no longer tile entities and do not produce particle FX anymore.
+- fixed some rendering issues with the advanced alchemical furnace
+- warp events will now steadily reduce in frequency and eventually stop if you refrain from gaining warp or doing any warp related activities. The moment you gain warp again this resets. 
+
+4.2.3.0
+- various small bugfixes
+- added greatwood and silverwood slabs to the ore dictionary
+- fixed advanced alchemy furnace render bug
+- added a small chance for certain mobs to spawn as "champions" with slightly more advanced abilities compared to their normal counterparts.
+- champions have a much higher chance of spawning in dangerous biomes or locations
+- this can be partly disabled in the config and there is a IMC message that can be used to add other mobs to the whitelist
+- removed the old wand enchants from infusion enchantment recipe list
+- the creative obelisk creator now makes an altar stone at the base. Just a word of warning - even when completed you may not get a maze on the other side if it is near an existing obelisk.
+- removed coin related trades from vanilla villagers and added a new "moneychanger" villager to change your coins into useful objects
+- fixed vis cost for the silk touch focus upgrade so it doesn't ask for the impossible
+- added a new level 3 upgrade for the excavation focus
+- fire focus embers won't be able to pass through solid objects anymore
+- removed hard-coding of various tool harvest levels
+- added a recipe to craft your own eldritch eyes once the proper research has been unlocked
+- fixed flux scrubber tube connections
+
+4.2.2.1
+- fixed symbols on banners not following the banner movements or placement
+- fixed greatwood and silverwood stairs bounding boxes
+- fixed essentia loss that occurs when using alchemy golems to fill thaumatoriums
+- unupgraded warding focus will now only ward 1 block like it is supposed to
+- frost focus projectiles will now lose a lot of momentum once they hit an entity
+- sun scorned "positive" effect now just does a straight heal instead of trying to add the regeneration buff
+- arcane crafting will no longer consume double the required vis
+- focus manipulator now plays a sound when it completes
+- fire resistant golems are now truly fire resistant
+- I now register my biome tags a lot earlier which should hopefully reduce the chance of odd creatures from other mods spawning where they shouldn't
+
+4.2.2.0
+- BAUBLES: updated to 1.0.1.10
+- Custom thaumcraft shaders can now be turned off in the config for those that experience FPS drops when they are active.
+- Some runic shielding parameters can now be modified in the config.
+- Eldritch guardians are now weaker in some realities
+- Fixed an exploit which allowed essentia crystalizers to be used as essentia converters for infusion crafting
+- You won't be able to pipe staves (or other non-wand items) into workbenches anymore
+- When holding a warding focus all warded blocks will be visible, but those not belonging to you will have a reddish color
+- Crafting sceptres now have in innate 10% vis discount instead of 5%
+- Crafting a thaumonomicon with a focus attached will fail. Apparently people want the ability to mass-replace bookshelves with an equal trade focus or something.
+- Crash prevention in nodes and buffers
+- Reverting to previous way of rendering infused ores, but added a new fix for AF.
+- Void robe and fortress armor should no longer absorb damage from normally unblockable sources like starvation
+- Made some significant changes to object aspects
+- Increased the cap per aspect when scanning to 64 (from 10). This cannot be changed in the config file anymore. The big soft-cap to research still remains. 
+- Changed the way I generate the unique identifier I use to save what you have scanned. Turns out it wasn't than unique for some blocks (like mushrooms). Since the identifier has changed most blocks and items will be scannable again - enjoy the free RP. 
+- Fixed a terrible and far-reaching bug that meant most crafting-grid recipes were only using their top 3 slots to calculate the aspect value in items. DERP. Who knows how long this bug has been around.
+- No item can have more than 6 aspects linked to it. The aspects chosen are based on their amount and how complex they are (complexity increases chances of being chosen)
+- Reworked how aspect values are calculated from ingredients. Raw essentia or vis used to craft with alchemy, arcane and infusion crafting will make up a much smaller part of the whole.
+- Even with all the above changes the net result should still be a lot more aspects per item than before.
+- Cignitio is now ignis + spiritus and telum is now ignis + instrumentum. This was done to reduce to alleviate the general lack of ignis in compound aspects
+- Now sinister and pure nodes won't alter biomes or spawn creatures in the nether, end or blacklisted dimensions and biomes
+- Now golems won't take something from an inventory unless they think there is somewhere for that item to go
+- Any items that a golem doesn't immediately find a use or destination for is placed on an ignore list for 10 seconds (configurable in config). This is mostly to prevent possible lag with large golem sorting systems.
+- Fill golems will now properly iterate through all specified items 
+- Alchemy golems can now interact with all sides of a reservoir and can take essentia from it
+- Alchemy golems will now fill empty void jars as their lowest possible priority
+- Liquid golems now have a handy new ability with the proper upgrade installed. 
+- Fixed crash caused by hungry node FX referencing the wrong block type
+- Fix for possible stack overflow error in vis relays
+- Forbidden knowledge research icons will pulse if they can be learned like those of other researches
+- Fixed (I hope) the travelling trunk dupe bug
+- The colors on a vis relay can now be cycled through by clicking with a wand - shards still work but are not required.
+- Triple meat treats no longer require a bowl to craft. 
+- Warded glass is now immune to explosions and wither destruction
+- Hungry nodes will no longer gain aspects even when not able to destroy a block
+- Altered the way hungry nodes break blocks
+- Hungry nodes now have more particles which should make them more visible. Will also draw particles from blocks that it didn't do previously (like water)
+- Essentia mirrors no longer have a chance to lose essentia in transit. 
+- Changed the way wand foci are upgraded. The old potency, frugal and treasure enchants are no more.
+- improved NBT data checking for infusion matrix during the crafting process
+- native ore clusters for modded ores (copper, tin, etc) should once again drop.
+- the effective area of the lamp of growth should now be properly centered on the lamp.
+- fixed essentia valve rotation with a wand - any direction without a possible connection is now valid
+- added a way to create obelisks in creative mode
+- slightly increased the spawning rate of eldritch stone rings in the overworld
+- added loot and stuff to spend the loot on
+- shovel of the earthmover now has more interesting placement mechanics - read the thaumonomicon entry
+- fixed some hover harness exploits
+- The hover harness will no longer reduce your block breaking speed while you are flying with it like some other forms of flight
+- excavation focus will now drop xp when you mine a block that normally drops xp
+- infusion crafting will now properly handle damage wildcards. 
+- slightly altered the way "tuned" relays connect 
+- vis relays now require line of sight to each other to connect - the beam cannot pass through solid blocks. 
+- this was always supposed to be how they worked, but I disabled it for various reasons. 
+- dupe fix for mods that spawn custom dropped items that pass through mirrors.
+- rebalanced some focus upgrades
+- fixed exploit where it was possible to apply foci to sceptres
+
+4.2.1.4
+- updated to Forge 10.13.1.1224
+- the new forge should resolve the biome weights issue where they had to be multiples of 10
+- removed the hitch or lag that occurs when you read a recipe in the thaumonomicon for the first time
+- primal wand focus is no longer affected by the mob griefing rule in regards to its explosions
+- fixed rendering bug with certain resourcepack particles losing their transparency
+- infernal furnace is once again looking in the right place when it counts bellows
+- thaumatorium will once again be able to draw essentia from all adjacent blocks
+- many thaumcraft "machine" or storage blocks now interact with comparators
+- fixed a suction related bug with buffers and added a way to choke the suction on a side to 0 as well as 1
+- corrected crimson rites tooltip
+- thaumcraft plants, leaves and logs had their asbestos removed to address health and safety concerns
+- fix crash that occurs when a travelling trunk with an entropy upgrade picks up an item.
+- when using fragments to try and find hidden research you must now right-click the resulting "unknown research" note to turn it into the research. If none was found it will automatically turn back into fragments. As in the old days you are not guaranteed to get all 9 your fragments back
+- silk touch on shovel of the earthmover now works as it should
+- axe of the stream now works as it did in previous versions. Any blocks it breaks automatically move towards player, but right click draws in items instead of harvesting faster.
+- the pickaxe of the core now only shows ores, lava and water 
+
+4.2.1.3
+- anisotropic filtering was causing a strange rendering issue with infused ores so I changed the rendering method slightly.
+- void jars can now be used to empty alembics just like normal jars
+- further improvements to the essentia reservoir making it easier for blocks like the essentia buffer to get stuff out if it
+- the essentia buffer can now have connections toggled on and off just like tubes. 
+- the essentia buffer connections can also be shift-clicked to choke the suction down to 1 on that side no matter how many bellows are attached.
+- altered the essentia buffer recipe to reflect its new super powers - don't worry, it basically only costs a stone block and a lever more than before.
+- the arcane bellows can now be placed in all possible orientations and is a lot less picky about where it is placed. Even though an infernal furnace can now technically have 4 or more connected bellows, its speed still caps out at only 3.
+- mana pods should now properly keep track of what beans they are supposed to drop if a non-player entity breaks them
+- increased the chance of fully grown pods dropping two beans from 50% to 66%
+- fixed axe of the stream desync issue
+- node-in-a-jar should once again render its jar when in item form
+- toned down the visuals of the essentia reservoir to make it less laggy and easier to see how close to full it is. Still has a fugly model though. :(
+- fixed a derp which could cause custom crops from other mods not to be harvested at the correct growth stage if they extend vanilla BlockCrops
+
+4.2.1.2
+- herba mana pods should now be a lot less common in worldgen
+- the arcane bore will now only repair broken pickaxes with the repair enchant instead of just constantly draining vis.
+- the invisible fence block for paving stones of warding no longer emit light and can now be clicked through when placing blocks.
+- climbing mobs like spiders will have a much harder time getting over paving stones of warding
+- improved jar rendering by getting rid of the odd transparency issues. Unfortunately they lost the ability to wobble. ;.;
+- tubes and machines will now be able to draw from the essentia reservoir
+- harvest golems can harvest stacked (reeds, cactus) and clickable (pams, etc) crops again. Seems I left in some debug code disabling it. 
+
+4.2.1.1
+- fixed crash that occurs when you step near a relay while wearing a fully charged vis amulet
+- the essentia centrifuge and crystallizer now both respond to redstone signals by turning off and while processing vis their suction drops by half (to 64)
+- some spelling and grammer fixes
+- fix for possible research and aspect knowledge syncing issue
+
+4.2.1.0
+- API: changes to recipe handlers to better work with nbt data in items
+- API: added IWarpingGear interface to have gear that add warp while worn or held
+- as a temporary fix for the Forge biome spawning issue I will change all biome weights to multiples of 10 behind the scenes
+- change save filenames back to using username instead of UUID to prevent issues in offline mode. 
+- saves will break if you change your username, but it is the lesser of two evils imo and easy enough to fix by hand
+- warp is now split into permanent warp, warp and temporary warp
+- permanent and temporary warp works like they did previously, but plain old warp can be removed via special means
+- the first time you log on half of all your permanent warp should be converted into "plain" warp
+- forbidden research now gives a mixture of warp and permanent warp, instead if just permanent warp
+- put a soft cap on most warp effects to prevent craziness when people have silly amounts of warp
+- rebalanced warp effects in general. 
+- most effects now only scale their duration -or- strength from your warp total, not both
+- death gaze has a shorter, capped range and a narrower cone of effect
+- sun scorned now requires higher light levels to be dangerous, though any light still triggers the effect. It is also not all bad now.
+- crash fix when scanning certain things  
+- fix for optifine crashing with greatwood and silverwood logs.
+- fix for arcane ears not taking note octaves into account
+- sun scorned now only hurts you in sunlight, but is a bit more dangerous than it used to be
+- the eldritch guardian can no longer use its screech ability through walls.
+- added support for the new biome type tags. It was causing minor strangeness with the generated aspects within aura nodes.
+- fixed directional essentia tubes to work correctly - previously they would not work unless used in a straight section.
+- added a new way to store essentia for the slightly deranged 
+- fluid golems now carry multiples of the default bucket volume, instead of fractions thereof which was causing all kinds of derpiness.
+- harvest golems now properly check the blocks above and below their current level and the crop api should once again pick up the correct blocks (including mana bean pods)
+- inventory golems, hungry chests and travelling trunks will now try and fill existing stacks first before filling empty ones
+- fill golems will now properly handle stack sizes greater than 64
+- golems should now interact better with double chests
+- thaumcraft plants should now work on most modded soil or sand blocks
+- the arcane workbench charging relay now charges in small chunks each tick, instead of bigger chunks every 5 ticks. This should increase wand recharge rates a lot, though at the cost of a bit of server TPS.
+- vis amulets now recharges up to 5 times faster.
+- added a recipe to convert quicksilver into 9x quicksilver drops
+- made tubes quite a bit cheaper on gold and quicksilver 
+- eldritch guardians no longer naturally spawn in normal "magic" biomes - that was a bug. They can still spawn in other places though...
+- most of the current thaumcraft baubles should now be able to become runic items.
+- the arcane bore can once again repair pickaxes enchanted with the repair enchantment. It will require vis from a vis energy network to do so however
+- any pickaxe in the bore slot will also have its normal updates performed allowing for void pickaxes and certain other mod pickaxes to perform their "per tick repair" functions
+- when attuning a vis relay to a new color it should properly link to neighbours and not occasionally cause a stack overflow crash
+- fixed a general bug where TE's weren't saving their data in a timely manner - the most common symptom of this was pedestals duping or losing items.
+- new mobs and structures: WARNING, these are still a work in progress and for now I have disabled most features linked to them.
+
+4.2.0.1
+- minor text fixes for research
+- removed dependency checking via the web. It could possibly mess with mod packs or servers that are slow to update
+- optimised the sun scorned shader a bit. It was adding fxaa which wasn't needed
+- crash fix for scanning certain blocks like buildcraft facades
+- added the "all" option to the "/tc aspect" console command allowing ops to give a certain amount of all aspects to a player
+- bath salts last a bit longer 
+- fixed warded glass connected textures
+- fixed blocking animation while wearing fortress armor
+- it is no longer possible to make a energised node without a stabiliser
+- void fortress armor has changed into something else
+- tweaked some recipes
+- there is now an upper limit to the number of entities that can spawn during warp events
+- shovel of the earthmover, mining focus and equal trade focus now respects vanilla spawn protection rules
+
+4.2.0.0
+- update for MC 1.7.10
+- requires Forge 10.13.0.1199
+- BAUBLES: requires Baubles 1.0.1.5
+- BAUBLES: Automatic download now checks the web first for the latest required build before defaulting to the included dependency files. This should allow me to update the baubles version required without having to create a new version of TC
+- API: added a way to add permanent and temporary warp
+- API: Altered the way the WandTriggerRegistry works to avoid block conflicts
+- API: new stuff for vis energy net (see below)
+- API: added smelting recipe page type
+- API: WandCap and WandRod has a new method which you can override to alter what research is required to be able to craft something with that cap or rod.
+- loads of bug fixes
+- loads of new stuff
+- added two major new systems: warp and the vis energy network. Both are explained via thaumonomicon entries
+- mana beans revamped. They now have 8 growth stages and can only be attached to the bottom of logs. 
+- mana beans found in the wild only contain primal aspects, but if planted adjacent to existing bean pods they may breed into compound aspects made up of combinations of its own and adjacent aspects.
+- added a wuss-mode config option for those that don't want Warp.
+- added warp console command
+- most config settings can now be set ingame from the mod menu.
+- some research seems to have dissapeared - where could they have gone?
+- shuffled research tiers a bit to account for new additions
+- moved saving/loading to new forge events. Pre-1.7.10 *.thaum files should automatically be converted to the new format
+- nodes in jars are no longer valid targets for recharging wands
+- stopped assuming vanilla would get things right and implemented my own item dropping code. Should fix some crucible related issues.
+- moved potion initialization to post-init
+- potions now use a dynamic range that should help prevent overlaps with other mod defined potions.
+- wand pedestal now properly interacts with amulet of vis in regards to automation and displaying aspects.
+- added some custom shader effects
+- arcane ears now respect the new noteblock events and will trigger on non-vanilla noteblocks
+- added liquid death. Do not drink.
+- added missing aspects to a few items
+- hover harness now uses its own hotkey (default 'H')
+- fixed haste effect on the hover harness. It was improving its speed 10x more than it should have been doing.
+- removed some item dupe bugs
+- fixed alchemy recipes oredict checking
+- fixed directional essentia tubes 
+- equal trade focus no longer requires or gathers blocks while in creative mode
+- equal trade focus now ignores liquids
+- node stabilizers can now be turned off with a redstone signal
+- made magic mirrors easier to craft by increasing the infusion base stability a lot 
+- switched to default Forge implementation of Netty
+- runic augmentation now increases the runic charge by the proper amount
+- jarring nodes is once again possible when using forge versions after 1091
+- fixed dropping of native clusters
+- remove the gravel and sand alchemy recipes. Who really needed that anyway?
+- increased capacity of the vis storage amulets and they now automatically recharge from nearby relays when worn
+- fixed a possible crash bugs when other mods add ores to the oredict, but not the ingots for them
+- crafting tc stuff in the crucible, infusion altar or thaumatorium now triggers the forge ItemCraftedEvent.
+- Sword of the Zephyr area attack will no longer effect dead entities and the area has been increased slightly
+- mounted horses can now be lifted by arcane levitators
+- arcane furnace now has a input slot on its bottom as well (for those special occasions)
+- removed ender pearl from void jar recipe
+- the infusion altar is now the only device that will be able to draw essentia directly from jars through the air - all other devices either need essentia piped into them or supplied via the vis energy net
+- optimised particles and revamped particle engine
+- zombie brains have now become a separate item and any old brains have thus become defunct. To make up for this the new zombie brains are 30% more delicious.
+- normal zombies now have a small chance of dropping zombie brains. I'm not sure where they got them from.   
+- shift-clicking an unlabeled jar now properly resets its suction
+- golems now retain their item filters when picked up

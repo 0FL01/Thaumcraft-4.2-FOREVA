@@ -1,0 +1,1794 @@
+#
+# Enchantments
+enchantment.haste=Spěch
+enchantment.repair=Opravování
+enchantment.special.sapless=Menší Oslabení
+enchantment.special.sapgreat=Vetší Oslabení
+#
+# Potions
+potion.fluxtaint=Zhoubný Jed
+potion.soulshatter=Rozbitá duše
+potion.visexhaust=Flux chřipka
+potion.infvisexhaust=Flux Phage
+potion.unhunger=Nepřirozený Hlad
+potion.warpward=Warp Ochrana
+potion.deathgaze=Smrtelný Pohled
+potion.blurred=Rozmazané vidění
+potion.sunscorned=Opovržení Slunce
+potion.thaumarhia=Thaumarhia
+#
+# Warp
+warp.text.1=Cítíš se podivně vyčerpaný.
+warp.text.2=Náhlý a nepřirozený hlad, požírá tě.
+warp.text.hunger.1=Tvůj hlad nemůže být uspokojen normálním jídlem.
+warp.text.hunger.2=Hlady začínáš upadat.
+warp.text.3=Podivné šeptání odhaluje ti tajemství.
+warp.text.4=Tvoje vidění stává se podivním a ponurým.
+warp.text.5=Světlo náhle stává se neobyčejně jasné  a spaluje tvou kůži.
+warp.text.6=Hustá mlha přichází odnikud. Něco hýbe se v její hloubi.
+warp.text.7=Jsou všude! Utíkej!
+warp.text.8=Zajisté tam musí být způsob jak zastavit tu bolest hlavy?
+warp.text.9=Cítíš se náhle neochotný k rozbíjení věcí. 
+warp.text.10=Tvoje vnímání se náhle rozšiřuje.
+warp.text.11=Co to bylo za hluk? Něco je za tebou.
+warp.text.12=Něco tě pronásleduje.
+warp.text.13=Něco tě pozoruje. Možná je na čase, to zastavit.
+warp.text.14=Máš moment vyjasnění.
+warp.text.15=Tvůj žaludek náhle bublá velmi podivně.
+#
+# Entities
+entity.Thaumcraft.Golem.name=Golem
+entity.Thaumcraft.ThaumSlime.name=Thaumický Slime
+entity.Thaumcraft.Dart.name=šipka Golema
+entity.Thaumcraft.FrostShard.name=Mrazivý úlomek
+entity.Thaumcraft.ExplosiveOrb.name=Výbušný Fireball
+entity.Thaumcraft.ShockOrb.name=Šokový Orb
+entity.Thaumcraft.GolemOrb.name=Energetický Orb
+entity.Thaumcraft.BottleTaint.name=Zhouba v láhvi
+entity.Thaumcraft.Firebat.name=Ohnivý netopír
+entity.Thaumcraft.Wisp.name=Wisp
+entity.Thaumcraft.Alumentum.name=Alumentum
+entity.Thaumcraft.GiantBrainyZombie.name=Zuřivá Zombie
+entity.Thaumcraft.BrainyZombie.name=Naštvaná Zombie
+entity.Thaumcraft.FollowItem.name=Sledovací Předmět
+entity.Thaumcraft.SpecialItem.name=Magický Předmět
+entity.Thaumcraft.FallingTaint.name=Zhoubná krusta
+entity.Thaumcraft.AspectOrb.name=Orb Aspektu
+entity.Thaumcraft.TaintSpider.name=Zhoubný Crawler
+entity.Thaumcraft.Taintacle.name=Zhoubadla
+entity.Thaumcraft.TaintacleTiny.name=Taint Tendril
+entity.Thaumcraft.TaintacleGiant.name=Obří Zhoubadla
+entity.Thaumcraft.TaintSpore.name=Zhoubný trus
+entity.Thaumcraft.TaintSwarmer.name=Zhoubný hemžicí se trus
+entity.Thaumcraft.TaintSwarm.name=Zhoubný roj
+entity.Thaumcraft.TaintedVillager.name=Zkažený vesničan
+entity.Thaumcraft.TaintedChicken.name=Zkažená slepice
+entity.Thaumcraft.TaintedPig.name=Zkažené prase
+entity.Thaumcraft.TaintedSheep.name=Zkažená ovce
+entity.Thaumcraft.TaintedCow.name=Zkažená kráva
+entity.Thaumcraft.TaintedCreeper.name=Zkažený Creeper
+entity.Thaumcraft.Pech.name=Pech Forager
+entity.Thaumcraft.Pech.1.name=Pech Mág
+entity.Thaumcraft.Pech.2.name=Pech Stopař
+entity.Thaumcraft.PrimalOrb.name=Orb Prvotní Energie
+entity.Thaumcraft.TravelingTrunk.name=Cestující kufr
+entity.trunk.guiname='s kufr
+entity.trunk.move=Kufr tě bude následovat
+entity.trunk.stay=Kufr zůstane stát, tam kde je
+entity.Thaumcraft.MindSpider.name=Myslící pavouk
+entity.Thaumcraft.EldritchGuardian.name=Eldritch Strážce
+entity.Thaumcraft.EldritchWarden.name=%s the %d
+entity.Thaumcraft.EldritchGolem.name=%s Eldritch Konstruktér
+entity.Thaumcraft.EldritchOrb.name=Eldritch Orb
+entity.Thaumcraft.CultistKnight.name=Rytíř Crimson
+entity.Thaumcraft.CultistCleric.name=Crimson Cleric
+entity.Thaumcraft.CultistLeader.name=Praetor %s the %d
+entity.Thaumcraft.CultistPortal.name=Crimson Portál
+entity.Thaumcraft.EldritchCrab.name=Eldritch krab
+entity.Thaumcraft.InhabitedZombie.name=Kolébající lusk
+entity.Thaumcraft.GolemBobber.name=Golem Rybářský Plavák
+#
+champion.mod.bold=Troufalý/á
+champion.mod.spine=Ostnatý/á
+champion.mod.armor=Obrněný/á
+champion.mod.mighty=Mocný/á
+champion.mod.grim=Ponurý/á
+champion.mod.warded=Pokroucený/á
+champion.mod.warp=Warp
+champion.mod.undying=Nehynoucí
+champion.mod.fiery=Ohnivý/á
+champion.mod.sickly=Nezdravý/á
+champion.mod.venomous=Jedovatý/á
+champion.mod.vampiric=Vampiric
+champion.mod.infested=Zamořený/á
+#
+tc.boss.crimson=Rubínový portál se otevírá a ohlašuje tak okolí, příchod Crimsonova kultu. Musíš zavřít portál, rychle!
+tc.boss.golem=A lone sentinel stands frozen in this room, but as energy starts crackling through its ancient frame you know it will not stay frozen for long.
+tc.boss.warden=Černá energie buble na vzdáleném podstavci. Něco přichází...
+tc.boss.taint=Organické šustění přichází z druhé strany místnosti. Zvuk nečeho špatného... něco roste...
+#
+# Blocks
+tile.blockAiry.0.name=Aura Node
+tile.blockAiry.1.name=Nitor
+tile.blockAiry.2.name=Záblesk světla
+tile.blockAiry.3.name=Záblesk světla
+tile.blockAiry.4.name=Chráněná aura
+tile.blockAiry.5.name=Nabitá Aura Node
+tile.blockAiry.10.name=Statické pole
+tile.blockAiry.11.name=Oslabující pole
+tile.blockAiry.12.name=Nesjízdný
+tile.blockHole.name=Prázdný prostor
+tile.blockSecure.name=Chránněný kamený blok
+tile.blockCustomOre.0.name=Cinnabar ruda
+tile.blockCustomOre.1.name=Vzduchem nasátý kámen
+tile.blockCustomOre.2.name=Ohněm nasátý kámen
+tile.blockCustomOre.3.name=Vodou nasátý kámen
+tile.blockCustomOre.4.name=Zemí nasátý kámen
+tile.blockCustomOre.5.name=Order nasátý kámen
+tile.blockCustomOre.6.name=Entropy nasátý kámen
+tile.blockCustomOre.7.name=Ložisko Jantarového kamene
+tile.blockCosmeticOpaque.0.name=Janatarový blok
+tile.blockCosmeticOpaque.1.name=Jantarové Cihle
+tile.blockCosmeticOpaque.2.name=Chráněné Sklo
+tile.blockCosmeticSolid.0.name=Obsidianový Totem
+tile.blockCosmeticSolid.1.name=Obsidianové dlaždice
+tile.blockCosmeticSolid.2.name=Dlažební kámen cestování
+tile.blockCosmeticSolid.3.name=Dlažební kámen ochrany
+tile.blockCosmeticSolid.4.name=Thaumium Blok
+tile.blockCosmeticSolid.5.name=Lůjový Blok
+tile.blockCosmeticSolid.6.name=Tajemný kamený blok
+tile.blockCosmeticSolid.7.name=Tajemný kamené cihly
+tile.blockCosmeticSolid.8.name=Nabitý Obsidianový Totem
+tile.blockCosmeticSolid.9.name=Spoutaný Golem
+tile.blockCosmeticSolid.10.name=Aktivní 'spoutaný Golem'
+tile.blockCosmeticSolid.11.name=Starověký kámen
+tile.blockCosmeticSolid.12.name=Starověký balvan
+tile.blockCosmeticSolid.13.name=Starověký kámen
+tile.blockCosmeticSolid.14.name=Okoralý kámen
+tile.blockCosmeticSolid.15.name=Starověký kamenný podstavec
+tile.blockCustomPlant.0.name=Greatwood Sapling
+tile.blockCustomPlant.1.name=Silverwood Sapling
+tile.blockCustomPlant.2.name=Třpyt lístek
+tile.blockCustomPlant.3.name=Cinderpearl
+tile.blockCustomPlant.4.name=Éterický květ
+tile.blockCustomPlant.5.name=Vishroom
+tile.blockMetalDevice.0.name=Kotlík
+tile.blockMetalDevice.1.name=Arcane Alembic
+tile.alembic.msg.1=The alembic is empty
+tile.alembic.msg.2=The alembic is almost empty
+tile.alembic.msg.3=The alembic is about half full
+tile.alembic.msg.4=The alembic is almost full
+tile.alembic.msg.5=The alembic is full
+tile.blockMetalDevice.2.name=Vis Charge Relay
+tile.blockMetalDevice.3.name=Pokročilá Alchemická konstrukce
+tile.blockMetalDevice.5.name=Item Grate 
+tile.blockMetalDevice.6.name=Item Grate (zavřená)
+tile.blockMetalDevice.7.name=Tajemná Lampa
+tile.blockMetalDevice.8.name=Lampa růstu  
+tile.blockMetalDevice.9.name=Alchemická Construkce
+tile.blockMetalDevice.10.name=Thaumatorium
+tile.blockMetalDevice.11.name=Thaumatorium
+tile.blockMetalDevice.12.name=Mnemonic Matrix
+tile.blockMetalDevice.13.name=Lampa plodnosti
+tile.blockMetalDevice.14.name=Vis Relay
+tile.blockMagicalLog.greatwood.name=Greatwood poleno
+tile.blockMagicalLog.silverwood.name=Silverwood poleno
+tile.blockMagicalLeaves.greatwood.name=Greatwood listí
+tile.blockMagicalLeaves.silverwood.name=Silverwood listí 
+tile.blockCandle.0.name=Bílá lojová svíčka
+tile.blockCandle.1.name=Oranžová lojová svíčka
+tile.blockCandle.2.name=Magenta lojová svíčka
+tile.blockCandle.3.name=Světle modrá lojová svíčka
+tile.blockCandle.4.name=Žlutá lojová svíčka
+tile.blockCandle.5.name=Lime lojová svíčka
+tile.blockCandle.6.name=Růžová lojová svíčka
+tile.blockCandle.7.name=Šedá lojová svíčka
+tile.blockCandle.8.name=Světle šedá lojová svíčka
+tile.blockCandle.9.name=Cyan lojová svíčka
+tile.blockCandle.10.name=Fialová lojová svíčka
+tile.blockCandle.11.name=Modrá lojová svíčka
+tile.blockCandle.12.name=Hnědá lojová svíčka
+tile.blockCandle.13.name=Zelená lojová svíčka
+tile.blockCandle.14.name=Červená lojová svíčka
+tile.blockCandle.15.name=Černá lojová svíčka
+tile.blockWooden.name=Tajemný dřevený blok
+tile.blockWoodenDevice.0.name=Tajemné měchy
+tile.blockWoodenDevice.1.name=Tajemné ucho
+tile.blockWoodenDevice.2.name=Tajemný Pressure Plate
+tile.blockWoodenDevice.4.name=Arcane Bore Base
+tile.blockWoodenDevice.5.name=Arcane Bore
+tile.blockWoodenDevice.6.name=Greatwood prkna
+tile.blockWoodenDevice.7.name=Silverwood prkna
+tile.blockWoodenDevice.8.name=Crimson kult prapor 
+tile.blockWoodenDevice.8.0.name=Bílý prapor
+tile.blockWoodenDevice.8.1.name=Oranžový prapor
+tile.blockWoodenDevice.8.2.name=Magenta prapor
+tile.blockWoodenDevice.8.3.name=Světle modrý prapor
+tile.blockWoodenDevice.8.4.name=Žlutý prapor
+tile.blockWoodenDevice.8.5.name=Lime prapor
+tile.blockWoodenDevice.8.6.name=Růžový prapor
+tile.blockWoodenDevice.8.7.name=Šedý prapor
+tile.blockWoodenDevice.8.8.name=Světle šedý prapor
+tile.blockWoodenDevice.8.9.name=Cyan prapor
+tile.blockWoodenDevice.8.10.name=Fialový prapor
+tile.blockWoodenDevice.8.11.name=Modrý prapor
+tile.blockWoodenDevice.8.12.name=Hnědý prapor
+tile.blockWoodenDevice.8.13.name=Zelený prapor
+tile.blockWoodenDevice.8.14.name=Červený prapor
+tile.blockWoodenDevice.8.15.name=Černý prapor
+tile.blockJar.0.name=Ochraná sklenice
+tile.blockJar.1.name=Mozek v sklenici
+tile.blockJar.2.name=Node v sklenici
+tile.blockJar.3.name=Sklenice nicoty
+tile.blockTable.0.name=Stůl
+tile.blockTable.1.name=Stůl
+tile.blockTable.research.name=Výzkumný stůl
+tile.blockTable.14.name=Deconstruction Table
+tile.blockTable.15.name=Tajemný pracovní stůl
+tile.researchtable.noink.0=Došel ti inkoust!
+tile.researchtable.noink.1=Doplň svoje psací potřeby inkoustem.
+tile.blockChestHungry.name=Hladová truhla
+tile.blockArcaneDoor.name=Tajemné dveře
+tile.blockLifter.name=Tajemný Levitator
+tile.blockCrystal.0.name=Trs krystalů vzduchu
+tile.blockCrystal.1.name=Trs krystalů ohně
+tile.blockCrystal.2.name=Trs krystalů vody 
+tile.blockCrystal.3.name=Trs krystalů země
+tile.blockCrystal.4.name=Trs krystalů Order
+tile.blockCrystal.5.name=Trs krystalů Entropy
+tile.blockCrystal.6.name=Smíšný trs krystalů
+tile.blockCrystal.7.name=Podivné krystaly
+tile.blockMirror.name=Magické zrcadlo
+tile.blockMirror.0.name=Magické zrcadlo
+tile.blockMirror.6.name=Essentia zrcadlo
+tile.blockTaint.0.name=Krusta Zhouby
+tile.blockTaint.1.name=Zkažená Sůl
+tile.blockTaint.2.name=Blok masa
+tile.blockTaintFibres.0.name=Vláknítá zhouba
+tile.blockTaintFibres.1.name=Zkažená tráva
+tile.blockTaintFibres.2.name=Zkažená rostlina
+tile.blockTaintFibres.3.name=Stonek trusu
+tile.blockTaintFibres.4.name=Zralý stonek trusu
+tile.blockFluxGoo.name=Flux sajrajt
+tile.blockFluxGas.name=Flux plyn  
+tile.blockFluidPure.name=Čistící tekutina
+tile.blockFluidDeath.name=Tekutá smrt
+tile.blockStoneDevice.0.name=Alchemická pec
+tile.blockStoneDevice.1.name=Tajemný podstavec
+tile.blockStoneDevice.2.name=Runic Matrix
+tile.blockStoneDevice.3.name=Infusion sloup
+tile.blockStoneDevice.4.name=Infusion sloup
+tile.blockStoneDevice.5.name=Dobíjecí podstavec hůlky
+tile.blockStoneDevice.6.name=Infusion sloup
+tile.blockStoneDevice.7.name=Infusion sloup
+tile.blockStoneDevice.8.name=Compound Recharge Focus
+tile.blockStoneDevice.9.name=Node Stabilizátor
+tile.blockStoneDevice.10.name=Pokročilý Stabilizátor Node
+tile.blockStoneDevice.11.name=Node Transducer
+tile.blockStoneDevice.12.name=Tajemná lázeň
+tile.blockStoneDevice.13.name=Focal Manipulator
+tile.blockStoneDevice.14.name=Flux Scrubber
+text.spa.mix.true=Smíchej s přísadou
+text.spa.mix.false=Použij jen tekutinu
+tile.blockTube.0.name=Essentia Trubka
+tile.blockTube.1.name=Essentia Ventil
+tile.blockTube.2.name=Alchemická Centrifůga
+tile.blockTube.3.name=Filtered Essentia Tube
+tile.blockTube.4.name=Essentia Buffer
+tile.blockTube.5.name=Omezená Essentia Truba
+tile.blockTube.6.name=Směrová Essentia Trubka
+tile.blockTube.7.name=Essentia Krystallizér
+container.alchemyfurnace=Alchemická pec
+tile.blockArcaneFurnace.name=Pekelná pec
+tile.blockEldritch.0.name=Eldritch oltář
+tile.blockEldritch.1.name=Eldritch Obelisk
+tile.blockEldritch.2.name=Eldritch Obelisk
+tile.blockEldritch.3.name=Eldritch Capstone
+tile.blockEldritch.4.name=Svítící okoralý kámen
+tile.blockEldritch.5.name=Piktogramový kámen
+tile.blockEldritch.7.name=Starověký vchod
+tile.blockEldritch.8.name=Starověký zamykací mechanismus
+tile.blockEldritch.9.name=Crusted Opening
+tile.blockEldritch.10.name=Runový kámen
+tile.blockPortalEldritch.name=Eldritch Portál
+tile.blockEssentiaReservoir.name=Essentia nádrž
+tile.blockStairsArcaneStone.name=Tajemné kamené schody
+tile.blockStairsGreatwood.name=Greatwood schody
+tile.blockStairsSilverwood.name=Silverwood schody
+tile.blockStairsEldritch.name=Starověké kamenné schody
+tile.blockCosmeticSlabWood.greatwood.name=Greatwood Slab
+tile.blockCosmeticSlabWood.silverwood.name=Silverwood Slab
+tile.blockCosmeticSlabStone.arcane.name=Tajemné kamenné slaby
+tile.blockCosmeticSlabStone.eldritch.name=Starověké kamené slaby
+tile.blockAlchemyFurnace.name=Pokročílá alchemická pec
+tile.blockLootUrn.name=Stará urna
+tile.blockLootCrate.name=Zapomenutá bedna
+#
+# Items
+item.GolemBell.name=Golemancerův zvonek
+item.HoverHarness.name=Thaumostatic Harness
+item.Focus.cost1=Vis per cast
+item.Focus.cost2=Vis per tick
+item.FocusPouch.name=Vak zaměření
+item.FocusFire.name=Zaměření hůlky: Oheň
+item.FocusHellbat.name=Zaměření hůlky: Devět Pekel
+item.FocusShock.name=Zaměření hůlky: Šok
+item.FocusTrade.name=Zaměření hůlky: Rovnocený Obchod 
+item.FocusFrost.name=Zaměření hůlky: Mráz
+item.FocusExcavation.name=Zaměření hůlky: Vykopávky
+item.FocusPortableHole.name=Zaměření hůlky: Přenosná díra
+item.FocusPech.name=Zaměření húlky: Pechovo prokletí
+item.FocusWarding.name=Zaměření hůlky: Ochrana
+item.FocusPrimal.name=Zameření hůlky: Prvotní
+item.WandCap.0.name=Železná čepička
+item.WandCap.1.name=Zlatá čepička
+item.WandCap.2.name=Nabitá Thaumium čepička
+item.WandCap.3.name=Měděná čepička
+item.WandCap.4.name=Nabitá Stříbrná čepička
+item.WandCap.5.name=Inert Stříbrná čepička
+item.WandCap.6.name=Inert Thaumium čepička
+item.WandCap.7.name=Nabitá nicotná kovová čepička
+item.WandCap.8.name=Inert nicotná kovová čepička
+item.WandRod.0.name=Greatwood tyč
+item.WandRod.1.name=Obsidian tyč
+item.WandRod.2.name=Silverwood tyč
+item.WandRod.3.name=Ledová tyč
+item.WandRod.4.name=Křemená tyč
+item.WandRod.5.name=Rákosová tyč
+item.WandRod.6.name=Ohnivá tyč
+item.WandRod.7.name=Kostní tyč
+item.WandRod.50.name=Greatwood jádro hole
+item.WandRod.51.name=Obsidianové jádro hole
+item.WandRod.52.name=Silverwood jádro hole
+item.WandRod.53.name=Ledové jádro hole
+item.WandRod.54.name=Křemené jádro hole
+item.WandRod.55.name=Rákosové jádro hole
+item.WandRod.56.name=Ohnivé jádro hole
+item.WandRod.57.name=Kostní jádro hole
+item.WandRod.100.name=Staff Core of the Primal
+#
+# this is what is used to name the wand - the position of the variables can be altered so it makes more sense in other languages
+item.Wand.name=%CAP %ROD %OBJ
+#
+item.Wand.wand.obj=hůlka
+item.Wand.sceptre.obj=žezlo
+item.Wand.staff.obj=hůl
+item.Wand.wood.rod=Dřevěná
+item.Wand.greatwood.rod=Greatwood
+item.Wand.silverwood.rod=Silverwood
+item.Wand.obsidian.rod=Obsidianová
+item.Wand.blaze.rod=Ohnivá
+item.Wand.ice.rod=Ledová
+item.Wand.bone.rod=Kostní
+item.Wand.reed.rod=Rákosová
+item.Wand.quartz.rod=Křemená
+item.Wand.primal.rod=Prvotní
+item.Wand.iron.cap=Železo čepičková
+item.Wand.gold.cap=Zlato pruhovaná
+item.Wand.copper.cap=Mědeno čepičková
+item.Wand.silver.cap=Stříbrná šéfova/o
+item.Wand.thaumium.cap=Thaumická šéfova/o
+item.Wand.void.cap=Nicotně Aspektovaná
+#
+item.ItemResource.0.name=Alumentum
+item.ItemResource.1.name=Nitor
+item.ItemResource.2.name=Thaumium Ingot
+item.ItemResource.3.name=Quicksilver
+item.ItemResource.4.name=Magický Lůj
+item.ItemResource.5.name=Mozek Zombie (defunct)
+item.ItemResource.6.name=Jantar
+item.ItemResource.7.name=Očarovaná tkanina
+item.ItemResource.8.name=Vis Filtr
+item.ItemResource.9.name=Fragment vědení
+item.ItemResource.10.name=Zrcadlové sklo
+item.ItemResource.11.name=Zhoubný sajrajt
+item.ItemResource.12.name=Taint Tendril
+item.ItemResource.13.name=Popisek sklenice
+item.ItemResource.14.name=Salis Mundus
+item.ItemResource.15.name=Prvotní šarm
+item.ItemResource.16.name=Nicotný kovový Ingot
+item.ItemResource.17.name=Nicotné semeno
+item.ItemResource.18.name=Zlatá mince
+item.ItemZombieBrain.name=Mozek Zombie
+item.ItemShard.0.name=Vzduchový Shard
+item.ItemShard.1.name=Ohnivý Shard
+item.ItemShard.2.name=Vodní Shard
+item.ItemShard.3.name=Zemní Shard
+item.ItemShard.4.name=Order Shard
+item.ItemShard.5.name=Entropy Shard
+item.ItemShard.6.name=Shard Rovnováhy
+item.ItemPrimalArrow.0.name=Vzdušný šíp
+item.ItemPrimalArrow.1.name=Ohnivý šíp
+item.ItemPrimalArrow.2.name=Vodní šíp
+item.ItemPrimalArrow.3.name=Zemní šíp
+item.ItemPrimalArrow.4.name=Order šíp
+item.ItemPrimalArrow.5.name=Entropy šíp
+item.ItemArcaneDoor.name=Tajemné dveře
+item.ItemNugget.0.name=Železný Nugget
+item.ItemNugget.1.name=Mědený Nugget
+item.ItemNugget.2.name=Cínový Nugget
+item.ItemNugget.3.name=Střibrný Nugget
+item.ItemNugget.4.name=Lead Nugget
+item.ItemNugget.5.name=Quicksilver Drop
+item.ItemNugget.6.name=Thaumium Nugget
+item.ItemNugget.7.name=Nicotný kovový Nugget
+item.ItemNugget.16.name=Domácí železný trs
+item.ItemNugget.17.name=Domácí železný trs
+item.ItemNugget.18.name=Domácí cínový trs
+item.ItemNugget.19.name=Domácí stříbrný trs
+item.ItemNugget.20.name=Domácí Lead trs
+item.ItemNugget.21.name=Domácí Cinnabar trs   
+item.ItemNugget.31.name=Domácí zlatý trs
+item.BootsTraveller.name=Boty cestovatele
+item.ItemNuggetChicken.name=Kuřecí Nugget
+item.ItemNuggetBeef.name=Hovězí Nugget
+item.ItemNuggetPork.name=Vepřový Nugget
+item.ItemNuggetFish.name=Rybí Nugget
+item.BlockJarFilledItem.name=Sklenice Essentia
+item.BlockJarFilledItem.void.name=Nicotná sklenice Essentia
+item.BlockJarNodeItem.name=Node v sklenici
+item.TripleMeatTreat.name=Triple Meat Treat
+item.ItemShovelElemental.name=Lopata zeměhybu
+item.ItemPickaxeElemental.name=Krumpáč jádra
+item.ItemAxeElemental.name=Sekyra proudu
+item.ItemHoeElemental.name=Motyka růstu
+item.ItemSwordElemental.name=Meč Zephyra
+item.ItemChestplateRobe.name=Thaumaturgova róba
+item.ItemLeggingsRobe.name=Thaumaturgovy legíny
+item.ItemBootsRobe.name=Thaumaturgovy Boty
+item.ArcaneDoorKey.0.name=Železný tajmný klíč
+item.ArcaneDoorKey.1.name=Zlatý železný klíč
+item.HandMirror.name=Magické příruční zrcadlo
+item.ItemInkwell.name=Psací potřeby
+item.ItemThaumometer.name=Thaumometer
+item.ItemThaumonomicon.name=Thaumonomicon
+item.ItemGoggles.name=Brýle odhalení
+item.ItemHelmetThaumium.name=Thaumium Helma
+item.ItemChestplateThaumium.name=Thaumium Chestplate
+item.ItemLeggingsThaumium.name=Thaumium legíny
+item.ItemBootsThaumium.name=Thaumium boty
+item.ItemShovelThaumium.name=Thaumium lopata
+item.ItemAxeThaumium.name=Thaumium sekyra
+item.ItemSwordThaumium.name=Thaumium meč
+item.ItemPickThaumium.name=Thaumium krumpáč
+item.ItemHoeThaumium.name=Thaumium motyka
+item.researchnotes.name=Výzkumné poznámky
+item.researchnotes.unknown.1=Neznámé vědení
+item.researchnotes.unknown.2=<Klikni pravým pro odhalení> 
+item.discovery.name=Objev
+item.ItemWispEssence.name=Éterická Essence
+item.ItemCrystalEssence.name=Krystalizovaná Essence
+item.ItemEssence.0.name=Skleněná lahvička
+item.ItemEssence.1.name=Lahvička Essentia
+item.ItemGolemCore.name=Oživovací jádro Golema
+item.ItemGolemCore.0.name=Naplň
+item.ItemGolemCore.1.name=Vyprázdni
+item.ItemGolemCore.2.name=Sběr
+item.ItemGolemCore.3.name=Sklizeň
+item.ItemGolemCore.4.name=Stráž
+item.ItemGolemCore.5.name=Stáčení
+item.ItemGolemCore.6.name=Alchemie
+item.ItemGolemCore.7.name=Kácení
+item.ItemGolemCore.8.name=Použití
+item.ItemGolemCore.9.name=Řezník
+item.ItemGolemCore.10.name=Třídení
+item.ItemGolemCore.11.name=Rybaření
+item.ItemGolemCore.100.name=-Prazdné-
+item.ItemGolemPlacer.0.name=Slamněnný Golem
+item.ItemGolemPlacer.1.name=Dřevěný Golem
+item.ItemGolemPlacer.2.name=Lojový Golem
+item.ItemGolemPlacer.3.name=Jílový Golem
+item.ItemGolemPlacer.4.name=Masový Golem
+item.ItemGolemPlacer.5.name=Kamenný Golem
+item.ItemGolemPlacer.6.name=Železný Golem
+item.ItemGolemPlacer.7.name=Thaumium Golem
+item.ItemGolemDecoration.name=Doplňek
+item.ItemGolemDecoration.0.name=Cylyndr
+item.ItemGolemDecoration.1.name=Brejle
+item.ItemGolemDecoration.2.name=Motýlek
+item.ItemGolemDecoration.3.name=Fez -egyptská čepice-
+item.ItemGolemDecoration.4.name=Šípomet
+item.ItemGolemDecoration.5.name=Hledí/maska
+item.ItemGolemDecoration.6.name=Železné okování
+item.ItemGolemDecoration.7.name=Palcátové rameno
+item.ItemGolemUpgrade.0.name=Golem Upgrade: Vzduch
+item.ItemGolemUpgrade.1.name=Golem Upgrade: Země
+item.ItemGolemUpgrade.2.name=Golem Upgrade: Oheň
+item.ItemGolemUpgrade.3.name=Golem Upgrade: Voda
+item.ItemGolemUpgrade.4.name=Golem Upgrade: Order
+item.ItemGolemUpgrade.5.name=Golem Upgrade: Entropy
+item.ItemGolemUpgrade.0.desc=Vylepšuje rychlost
+item.ItemGolemUpgrade.1.desc=Vylepšuje sílu
+item.ItemGolemUpgrade.2.desc=Vylepšuje poškození, kapacitu
+item.ItemGolemUpgrade.3.desc=Vylepšuje smysly, rozsah
+item.ItemGolemUpgrade.4.desc=Vylepšuje organizaci, intellekt
+item.ItemGolemUpgrade.5.desc=Vylepšuje obranu, uvažování
+item.ItemBowBone.name=Luk kostí
+item.ItemManaBean.name=Mana fazole
+item.TrunkSpawner.name=Cestuvní kufr
+item.TrunkSpawner.text.1=Tenhle kufr obsahuje předměty
+item.ItemResonator.name=Essentia Rezonátor
+item.ItemAmuletRunic.0.name=Amulet  runového odstínění
+item.ItemAmuletRunic.1.name=Amulet nouzového odstínění
+item.ItemRingRunic.0.name=Prsten ochrany
+item.ItemRingRunic.1.name=Prsten runového odstínění
+item.ItemRingRunic.2.name=Nabitý prsten odstínění
+item.ItemRingRunic.3.name=Oživující prsten odstínění
+item.ItemGirdleRunic.0.name=Girdle of Runic Shielding
+item.ItemGirdleRunic.1.name=Kinetic Girdle of Shielding
+item.runic.charge=Runové odstínění
+item.warping=deformace
+item.ItemBaubleBlanks.0.name=Světský amulet
+item.ItemBaubleBlanks.1.name=Světský prsten
+item.ItemBaubleBlanks.2.name=Světský opasek
+item.ItemBaubleBlanks.3.name=Učnův prsten %TYPE
+item.capacity.text=kapacita
+item.ItemAmuletVis.text=Pomaluje doplňuje hůlky v vašem inventáři
+item.ItemAmuletVis.0.name=Vis kámen
+item.ItemAmuletVis.1.name=Amulet úložiště Visu
+item.ItemGirdleHover.name=Thaumostatic Girdle
+item.ItemBathSalts.name=Čistící koupelové soli
+item.ItemBucketDeath.name=Kbelík Tekuté Smrti
+item.ItemBucketPure.name=Kbelík čistící tekutiny
+item.ItemHelmetFortress.name=Thaumium Fortress Helma
+item.ItemChestplateFortress.name=Thaumium Fortress Cuirass
+item.ItemLeggingsFortress.name=Thaumium Fortress Thigh Guards
+item.HelmetFortress.mask.0=Usmívající Dábel
+item.HelmetFortress.mask.1=Naštvaný Duch
+item.HelmetFortress.mask.2=Oslabený zloduch
+item.ItemEldritchObject.0.name=Eldritch oko
+item.ItemEldritchObject.1.name=Crimsonovy Obřady
+item.ItemEldritchObject.2.name=Runová deska
+item.ItemEldritchObject.3.name=Prvotní perla*
+item.ItemEldritchObject.4.name=Eldritch Obelisk Náleziště
+item.ItemEldritchObject.text.1=Zdá se že tě sleduje.
+item.ItemEldritchObject.text.2=Kniha je naplněna podivnímy symboly.
+item.ItemEldritchObject.text.3=Klikni pro studování.
+item.ItemEldritchObject.text.4=Zdá se že je součástí něčeho vetšího.
+item.ItemEldritchObject.text.5=The very fabric of magic seems 
+item.ItemEldritchObject.text.6=to buckle each time it pulses.
+item.ItemHelmetVoid.name=Nicotná helma
+item.ItemChestplateVoid.name=Void Chestplate
+item.ItemLeggingsVoid.name=Nicotné legíny
+item.ItemBootsVoid.name=Nicotné boty
+item.ItemShovelVoid.name=Lopata nicoty
+item.ItemAxeVoid.name=Sekyra nicoty
+item.ItemSwordVoid.name=Meč nicoty
+item.ItemPickVoid.name=Krumpáč nicoty
+item.ItemHoeVoid.name=Motyka nicoty
+item.ItemHelmetVoidRobe.name=Nicotná Thaumaturgova kápě
+item.ItemChestplateVoidRobe.name=Nicotná Thaumaturgova róba
+item.ItemLeggingsVoidRobe.name=Nicotné Thaumaturgovy legíny
+item.ItemSanitySoap.name=Dezinfekční mýdlo
+item.ItemSanityChecker.name=Kontrolor duševního zdraví
+item.ItemHelmetCultistRobe.name=Crimsonova kultovní kápě
+item.ItemChestplateCultistRobe.name=Crimsonova kultovní róba
+item.ItemLeggingsCultistRobe.name=Crimsonovy kultovní legíny
+item.ItemBootsCultist.name=Crimsonovy kultovní boty
+item.ItemHelmetCultistPlate.name=Crimsonova kultovní helma
+item.ItemChestplateCultistPlate.name=Crimsonův kultovní Chestplate
+item.ItemLeggingsCultistPlate.name=Crimsonovy kultovní holenice
+item.ItemHelmetCultistLeaderPlate.name=Crimsonova Praetor Helma
+item.ItemChestplateCultistLeaderPlate.name=Crimsonův Praetor Chestplate
+item.ItemLeggingsCultistLeaderPlate.name=Crimsonovy Praetor holenice
+item.ItemBottleTaint.name=Zhouba v láhvi
+item.ItemSwordCrimson.name=Crimsonova čepel
+item.ItemLootBag.0.name=Obyčejný poklad
+item.ItemLootBag.1.name=Neobyčejný poklad
+item.ItemLootBag.2.name=Vzácný poklad
+tc.lootbag=Klikni pro otevření nebo ponechej si pro obchodování
+item.ItemCompassStone.name=Zlověstný magnetovec
+item.ItemPrimalCrusher.name=Prvotní drtič
+#
+# Fluids
+fluid.fluxGoo=Flux sajrajt
+fluid.fluxGas=Flux plyn
+fluid.fluidPure=Čistící tekutina
+fluid.fluidDeath=Tekutá smrt
+#
+# General Focus Upgrades
+focus.upgrade.potency.name=Potency
+focus.upgrade.potency.text=This upgrade increases the damage or strength of the focus's powers. The exact damage increase varies from focus to focus, but is usually about 20% per level.
+focus.upgrade.frugal.name=Frugal
+focus.upgrade.frugal.text=This upgrade reduces the vis cost of activating the focus's powers by 10% per level.
+focus.upgrade.treasure.name=Treasure
+focus.upgrade.treasure.text=This upgrade acts like the Fortune or Looting enchantments. It increases the chance of getting more/better loot.
+focus.upgrade.enlarge.name=Enlarge
+focus.upgrade.enlarge.text=This upgrade increases how large an area the focus's powers affect, or increases the number of targets affected.
+focus.upgrade.extend.name=Extend
+focus.upgrade.extend.text=This upgrade increases the duration of any effects the upgrade might create.
+focus.upgrade.architect.name=Architect
+focus.upgrade.architect.text=This upgrade gives a lot more control over the area certain foci affect. The exact area that will be affected is displayed and you can change the size using the misc wand toggle key (default G). Sneak+G allows you to toggle which dimensions you can change.
+#
+# Specific Focus Upgrades
+focus.upgrade.chainlightning.name=Chain Lightning
+focus.upgrade.chainlightning.text=This upgrade reduces the speed at which the focus fires bolts, but the damage is increased and the bolt can chain to up to two additional targets.
+focus.upgrade.earthshock.name=Earth Shock
+focus.upgrade.earthshock.text=Instead of a bolt of lightning, the focus now lobs a ball of electrical energy. It inflicts damage in an area around where it hits and leaves the ground dangerously electrified for some time.
+focus.upgrade.fireball.name=Fireball
+focus.upgrade.fireball.text=The focus will now produce a explosive ball of fire you can hurl at your foes. The Alchemists Fire upgrade causes it to also set the ground aflame around the point of impact.
+focus.upgrade.firebeam.name=Fire Beam
+focus.upgrade.firebeam.text=The focus now emits a narrow stream of fire instead of a wide swathe. It burns through anything it touches inflicting massive damage.
+focus.upgrade.batbombs.name=Netopíří bomby
+focus.upgrade.batbombs.text=This upgrade will make the summoned firebats even more volatile. They always explode when they contact their target and the explosion will be a lot more potent than normal.
+focus.upgrade.devilbats.name=Ďábelský netopíři
+focus.upgrade.devilbats.text=With this upgrade applied the summoned bats are larger, tougher and nastier. They will never explode, but keep attacking their target till it expires or they are slain. 
+focus.upgrade.vampirebats.name=Úpíří netopíři
+focus.upgrade.vampirebats.text=This upgrade changes the summoned bats into vampire bats. Not only will they suck the life out of their target to replenish their own, but some of the stolen life force is given to their summoner.
+focus.upgrade.scattershot.name=Scattershot
+focus.upgrade.scattershot.text=Instead of a single shard of ice, the focus will now fire multiple shards. Each shard does minimal damage, but a concentrated volley of them can do significant damage to a single target. 
+focus.upgrade.iceboulder.name=Ice Boulder
+focus.upgrade.iceboulder.text=The focus will now create a large boulder of ice. The boulder has a tendancy to bounce around making it deadly in skilled hands. 
+focus.upgrade.alchemistsfire.name=Alchemistický ohěn
+focus.upgrade.alchemistsfire.text=This increases the potency of the elemental fire in the focus. Any targets set alight will burn for much longer.
+focus.upgrade.alchemistsfrost.name=Alchemist's Frost
+focus.upgrade.alchemistsfrost.text=This increases the potency of the elemental cold in the focus. When the focus targets or damages a creature it will be chilled and slowed significantly.
+focus.upgrade.nightshade.name=Nightshade
+focus.upgrade.nightshade.text=Normally the Pech's curse focus inflicts one of a small handful of debilitating effects. With this upgrade it will inflict all of them at once.
+focus.upgrade.silktouch.name=Silk Touch
+focus.upgrade.silktouch.text=Like the enchantment of the same name, this upgrade allows you to pick up harvested blocks as-is instead of gaining the normal drops.
+focus.upgrade.seeker.name=Seeker
+focus.upgrade.seeker.text=This upgrade makes the orbs created by the primal focus seek out the nearest living target and not wander all over the place. This makes them a lot more stable which also means they won't do anything unusual beyond exploding.
+focus.upgrade.dowsing.name=Dowsing
+focus.upgrade.dowsing.text=This upgrade gives the excavation focus a small chance to mine native clusters instead of normal ores. These clusters usually give double the number of ingots when smelted.
+#
+# GUI
+golemblurb.0.text=What do you want me to keep here, Pane?
+golemblurb.1.text=Pane, should I remove everything from this container, or something specific?
+golemblurb.2.text=Pane, do you want me to pick up something specific or continue picking up everything?
+golemblurb.3.text=??
+golemblurb.4.text=Já budu chránit tohle území, Pane.
+golemblurb.5.text=Shall I gather all liquids, or just those you specify? Just show me a container with the liquid and I will do your bidding!
+golemblurb.6.text=??
+golemblurb.7.text=??
+golemblurb.8.text=Do you wish me to use this item on a block or only on an empty location?
+golemblurb.10.text=Point me in the right direction, Master, and I will keep everything organized.
+golemthreat.0.text=Co, golem se bouří? Já nevím nic o vzpouře golema.
+golemthreat.1.text=Let me guess, you want me to carry something?
+golemthreat.2.text=Mwah ha ha ha ha ha ha ha ha ha ha ha ha ha ha ha ha ha ha ha ha ha ha ha!
+golemthreat.3.text=Nebojte se; Já rozhodně neplánuji nic.
+golemthreat.4.text=Proč si nedáš šlofíka? Vypadáš ospale. Veelmi ospale.
+golemthreat.5.text=Ph'nglui mglw'nafh Cthulhu R'lyeh wgah'nagl fhtagn!
+golemthreat.6.text=*LÁSKA* nenalezena, nastavuji na *NENÁVIDĚT*
+golemthreat.7.text=Já tě tak moc nenávidím.
+golemthreat.8.text=Umři, pytli masa!
+recipe.return=Return
+recipe.clickthrough=Klikni pro výzkum
+recipe.type.workbench=Pracovní stolek
+recipe.type.smelting=Tavení
+recipe.type.workbenchshapeless=Pracovní stolek (Shapeless)
+recipe.type.arcane=Tajemný pracovní stolek
+recipe.type.crucible=Kotlík
+recipe.type.infusion=Arcane Infusion
+recipe.type.infusionenchantment=Infusion Enchantment
+recipe.type.construct=Mystická konstrukce
+wandtable.text1=Spotřeba Vis
+wandtable.text2=Spotřeba zkušností 
+wandtable.text3=Začít Upgrade
+#
+# Other
+itemGroup.thaumcraft=Thaumcraft
+nodetype.NORMAL.name=Normální
+nodetype.UNSTABLE.name=Nestabilní
+nodetype.DARK.name=Zlověstná
+nodetype.PURE.name=Čistá
+nodetype.TAINTED.name=Zkažená
+nodetype.HUNGRY.name=Hladová
+nodemod.BRIGHT.name=Jasná
+nodemod.PALE.name=Bledá
+nodemod.FADING.name=Blednoucí
+tc.taint_item_poison=Rozpoužtějící %s tě nakazil Zhoubou
+death.attack.taint=%1$s byl poškozen Zhoubou
+death.attack.taint.player=%1$s byl poškozen Zhoubou zatímco bojoval s %2$s
+death.attack.tentacle=%1$s byl vymačkán %2$s
+death.attack.swarm=%1$s byl nakažen %2$s
+death.attack.swarm.item=%1$s byl nakažený %2$s použitím %3$s
+death.attack.dissolve=%1$s byl rozpuštěň
+death.attack.dissolve.player=%1$s byl rozpuštěň zatímco bojoval s %2$s
+tc.handmirrorlinkedto=Připojeno na
+tc.handmirrorlinked=Spojení stabilizováno.
+tc.handmirrorerror=Cílové zrcadlo chybí nebo je ztraceno. Spojení rozbito.
+tc.researcherror=Nemáš potřebné vědomosti, aby jsi tohle pochopil.
+tc.discoveryerror=Na porozuměnní temuhle pořebujes studovat %1$s.
+tc.discoveryunknown=Neznámá theorie
+tc.discoveryprogress=% dokončeno
+tc.portableholeerror=The portable hole does not have enough charge to do that.
+tc.key1=Klíč byl spojen s těmito tajemnímy dveřmi.
+tc.key2=Klíč byl spojen s tímnto tajemným pressure plate.
+tc.key3=Teď můžeš otevřít tyto dveře.
+tc.key4= Můžes také ostatním udělit přistup.
+tc.key5=You will now trigger this pressure plate as if you were its owner.
+tc.key6= Můžes také ostatním udělit přistup a změnit nastavení.
+tc.key7=Klíč není spojen s tímhle.
+tc.key8=Již máš přistup.
+tc.key9=Tenhle klíč uděluje přistup k
+tc.key10=tajemné dveře na
+tc.key11=tajemný pressure plate na
+tc.wandnocharge=The wand does not have enough charge to do that.
+tc.wandcharge=Tahle hůlka aktuálně obsahuje %s Visu
+tc.jaressentia=obsahuje %s essentia
+tc.jarname=Sklenice
+tc.markedloc=označená místa
+tc.addaspectdiscovery=Objevil si %n!
+tc.addclue=Objevil si stopu k novému výzkumu!
+tc.addcluefail=Objevil jsi stopu, ale je ztracená od té doby co ji nemůžeš zaznamenat!
+tc.addaspectpool=Získány %s výzkumné body (s) pro %n
+tc.addwarp=§5Získal jsi trvalý Warp!§0
+tc.addwarptemp=§5Získal jsi dočasný Warp!§0
+tc.addwarpsticky=§5Získal jsi Warp!§0
+tc.removewarp=§5Ztrastil jsi trvalý Warp!§0
+tc.removewarpsticky=§5Ztratil jsi Warp!§0
+tc.removewarptemp=§5Ztratil jsi dočasný Warp!§0
+tc.forbidden=§l§5Zapomenuté vědení (%n)§0
+tc.forbidden.level.1=Převážně neškodné
+tc.forbidden.level.2=Menší
+tc.forbidden.level.3=Mírné
+tc.forbidden.level.4=Nebezpečné
+tc.forbidden.level.5=Taboo
+tc.unknownobject=Nic nemůže být naučeno z tehohle.
+tc.markerchange=Nastav barvu označovače na %n
+tc.markerchangeany=Nastav na jakoukoliv barvu
+tc.researchmissing=Vyžadován chybějící výzkum!
+tc.discount=Sleva
+tc.visdiscount=Vis sleva
+tc.vis.cost=spotřeba Vis
+tc.vis.costavg=Průměrná spotřeba Vis
+tc.inst=Nestálost: 
+tc.inst.0=§1Nepatrná§0
+tc.inst.1=§9Menší§0
+tc.inst.2=§5Mírná§0
+tc.inst.3=§eVysoká§0
+tc.inst.4=§6Velmi vysoká§0
+tc.inst.5=§4Nebezpečná§0
+tc.adv=Pokročilé
+tc.resonator1=§9Obsahuje %1$s %2$s essentia§0
+tc.resonator2=§5Nasávání %1$s %2$s §0 
+tc.resonator3=Nezadané
+tc.research.purchase=Klikni pro zakoupení tehohle výzkumu
+tc.research.short=Nemáš potřebné aspekty pro zakoupení tehohle
+tc.research.getprim=Klikni pro získání výzkumné poznámky pro tenhle výzkum
+tc.research.shortprim=Potřebuješ psací potřeby a papír pro získání výzkumné poznámky
+tc.research.hasnote=Již máš tuhle výzkumnou poznámku v svém inventáři
+tc.research.popup=Výzkumná poznámka přidána do tvého inventáře pro %1$s
+tc.research.copy=Náklady na kopírování tehohle výzkumu:
+tc.primalcharm.0=It seems to be leaking
+tc.primalcharm.1=You think you hear whispering
+tc.primalcharm.2=It is vibrating violently
+tc.primalcharm.3=It's humming is quite soothing
+tc.primalcharm.4=Wait, did it just flash a seventh color?
+tc.primalcharm.trigger=For a moment strange energies surround the primal charm. They dissipate quickly, but you are left strangely inspired...
+tc.break.fly=Something disrupts your ability to fly.
+tc.boss.enrage=is enraged by your powerful blows.
+#
+# Aspects
+tc.aspect.primal=Prvotní aspekt
+tc.aspect.unknown=Neznámý aspekt
+tc.aspect.aer=Vzduch
+tc.aspect.terra=Země
+tc.aspect.ignis=Oheň
+tc.aspect.aqua=Voda
+tc.aspect.ordo=Order, Regularity, Purity
+tc.aspect.perditio=Entropy, Chaos, Destruction
+tc.aspect.vacuos=Nicota
+tc.aspect.praecantatio=Magie
+tc.aspect.auram=Aura
+tc.aspect.vitium=Zhouba
+tc.aspect.lux=Světlo
+tc.aspect.potentia=Energie
+tc.aspect.motus=Pohyb, Oživení
+tc.aspect.tempestas=Počasí
+tc.aspect.victus=Život
+tc.aspect.mortuus=Smrt
+tc.aspect.volatus=Let
+tc.aspect.tenebrae=Temnnota
+tc.aspect.limus=Slime, Lepkavý
+tc.aspect.herba=Rostlina
+tc.aspect.arbor=Strom, Dřevo
+tc.aspect.spiritus=Duše
+tc.aspect.humanus=Muž
+tc.aspect.bestia=Bestie
+tc.aspect.exanimis=Nemrtvý
+tc.aspect.cognitio=Mysl, Pamět, Poznání
+tc.aspect.sensus=Smysly
+tc.aspect.messis=Plodina
+tc.aspect.meto=sklízet
+tc.aspect.metallum=Kov
+tc.aspect.perfodio=Těžit
+tc.aspect.instrumentum=Nářadí, Nástroj
+tc.aspect.telum=Zbraň, Útok, Újma
+tc.aspect.gelum=Led, Mráz, Chlad
+tc.aspect.vitreus=Krystal, Sklo, Jasnost
+tc.aspect.sano=Léčit, Léčba
+tc.aspect.iter=Cestování, Výprava
+tc.aspect.venenum=Jed
+tc.aspect.alienis=Mimozemštaň, Podivnost, The Eldritch
+tc.aspect.tutamen=Zbroj, Ochrana
+tc.aspect.fames=Hlad
+tc.aspect.fabrico=Řemeslo
+tc.aspect.lucrum=Chamtivost, Lakota
+tc.aspect.pannus=Látka, Materiál, Krytina
+tc.aspect.machina=Mechanismus, stroj
+tc.aspect.vinculum=Past, Uvěznit
+tc.aspect.permutatio=Výměna, Obchodník
+tc.aspect.corpus=Maso
+#
+tc.aspect.help.aer=vzduch
+tc.aspect.help.terra=zem
+tc.aspect.help.ignis=oheň
+tc.aspect.help.aqua=vodu
+tc.aspect.help.ordo=order
+tc.aspect.help.perditio=rozbité věci
+tc.aspect.help.vacuos=prázdné věci
+tc.aspect.help.praecantatio=magické věci
+tc.aspect.help.auram=nody
+tc.aspect.help.vitium=the corrupting influence of magic
+tc.aspect.help.lux=světlo
+tc.aspect.help.potentia=energii
+tc.aspect.help.motus=věci co se pohybují
+tc.aspect.help.tempestas=počasí
+tc.aspect.help.victus=zdroje života
+tc.aspect.help.mortuus=Přírodní smrti
+tc.aspect.help.volatus=let
+tc.aspect.help.tenebrae=temnnotu
+tc.aspect.help.limus=lepkavé věci
+tc.aspect.help.herba=rostliny
+tc.aspect.help.arbor=stromy
+tc.aspect.help.spiritus=spirits
+tc.aspect.help.humanus=muž
+tc.aspect.help.bestia=bestie
+tc.aspect.help.exanimis=Přírodní nemrtvé
+tc.aspect.help.cognitio=mysl
+tc.aspect.help.sensus=vnímání
+tc.aspect.help.messis=plodiny
+tc.aspect.help.meto=farmaření
+tc.aspect.help.metallum=kovy
+tc.aspect.help.perfodio=těžení
+tc.aspect.help.instrumentum=nástroje
+tc.aspect.help.telum=zbraně
+tc.aspect.help.gelum=chladné věci
+tc.aspect.help.vitreus=krystaly
+tc.aspect.help.sano=léčivé objekty
+tc.aspect.help.iter=cestování
+tc.aspect.help.venenum=jedovaté věci
+tc.aspect.help.alienis=podivné věci z ostatních světů
+tc.aspect.help.tutamen=ochrané věci
+tc.aspect.help.fames=jídlo
+tc.aspect.help.fabrico=sestrojování
+tc.aspect.help.lucrum=hodnotné věci
+tc.aspect.help.pannus=látku
+tc.aspect.help.machina=mechanické věci
+tc.aspect.help.vinculum=věci které polapí
+tc.aspect.help.permutatio=vyměnování a prodavačství
+tc.aspect.help.corpus=maso
+#  
+# Research categories
+tc.research_category.BASICS=Základní informace
+tc.research_category.THAUMATURGY=Thaumaturgy
+tc.research_category.ALCHEMY=Alchemie
+tc.research_category.ARTIFICE=Rafinovanost
+tc.research_category.GOLEMANCY=Golemancy
+tc.research_category.ELDRITCH=Eldritch
+#  
+# Special formatting codes:
+# <BR> or <BR/>         Paragraph break (<BR/> is included for people using XML for their localization)
+# <LINE> or <LINE/>     Insert a fancy linebreak between sections of text.
+# <IMG>...</IMG>  Insert a centered image into text. Parameters are separated by ':' and are:
+#                    - mod resource location name
+#                    - png file location (assumed to be a 256x256 texture, a sub-image will be grabbed from this png as specified below)
+#                    - x location of sub-image in png
+#                    - y location of sub-image in png
+#                    - x size of sub-image (255 if full x size of png must be used)
+#                    - y size of sub-image (255 if full y size of png must be used)
+#                    - scaling - 1.0 for normal 256x256 images, or smaller for proportionately smaller .png files (a 16x16 image will be 0.0625)   
+#               Examples: 
+#                   <IMG>thaumcraft:textures/gui/gui_researchbook.png:24:184:96:4:1.0</IMG>   <-- line break image as used in <LINE> above
+#                   <IMG>thaumcraft:textures/items/alumentum.png:0:0:255:255:0.0625</IMG>     <-- alumentum item icon
+#
+# Research entries
+tc.research_name.RESEARCH=Výzkum
+tc.research_text.RESEARCH=Jak objevuješ věci
+tc.research_page.RESEARCH.1=Předtím než budeš moci postavit většinu thaumaturgických předmětů a bloků, musíš nejdříve zjistit, jak to vyzkoumat. Je zde několik kroků v tomhle procesu:<BR>(1) Objevování světa a zkoumání bloků, předmětů a tvorů s §5Thaumometer§0<BR><BR>(2) Vzít výzkumné body získané z prvního kroku a rozšířit svůj aspekt vědení s §5Výzkumným Stolem§0<BR><BR>(3) Použít aspekty které znáš a praktické vědení a recepty s §5Výzkumným Stolem§0.<LINE>
+tc.research_page.RESEARCH.2=§l      §n(1) Objevování§r<BR><BR>Nemůžes provést výzkum bez výzkumných bodů, a nejlepší způsob na získání výzkumných bodů je objevování a prozkoumávání předmětů v světě.<BR>První věc kterou potřebuješ je zkonstruovat §5Thaumometer§0 (uvidíte na další straně). Ukazováním §5Thaumometrem§0 na předměty nebo tvory a držením pravého tlačítka myši začnete je prozkoumávat. Tenhle proces netrvá dlouho, ale tvoje rychlost pohybu se během zkoumání sníží.<BR>Po dokončení §5Thaumometer§0 ukáže co za aspekty předmět obsahuje. V pravém spodním rohu obrazovky uvidíš také shrnutí aspektů a výzkumých bodů 
+tc.research_page.RESEARCH.3=které jsi objevil.<IMG>thaumcraft:textures/misc/research1.png:0:0:255:208:.5</IMG>Z počátku nebudete schopní zkoumat všechny předměty dokud neobjevíte jejich dílčí aspekty. Například, předmět obsahující aspekt Lux může být prozkoumán pouze pokud máš, předtím objevený aspekt Lux, nebo známé
+tc.research_page.RESEARCH.4=dva aspekty skombinujeě na vytvoření teho.<BR>Úplně první aspekt který objevíš prozkoumaním něčeho co máš bežně dostupné ti získá více jak dva výzkumné body.<BR>Předměty a tvory můžeš obvykle prozkoumat pouze jednou.<BR>Příležitostné zkoumání čehokoliv, může odhalit další stopy a pokroky v thaumaturgickém výzkumu, což odemkne předměty které můžete vyzkoumat v budoucnu.<BR>Objevený výzkum bude mít ikonu jantaru.
+tc.research_page.RESEARCH.5=§l   §n(2) Kombinování Aspektů§r<BR><BR>Jakmile získáš nějaké výzkumné body, můžeš se pokusit je skombinovat v sloučeninu aspektů uvnitř výzkumného stolu.<BR>Pro sestrojení výzkumného stolu jednoduše polož dva §5stoly§0 vedle sebe a klikni na ně s psacíma potřebama. Recept pro stoly je uveden pod výzkumnou kategorií §5Rafinovanost§0.<BR>Pokud otevřeš výzkumnému stolu inventář, uvidíš rozhraní jako na obrázku napravo.<BR>Psací potřeby jsou použity na zapisováni na zapisováni aspektů a jsou umístěny v slotu §l1§r. 
+tc.research_page.RESEARCH.6=<IMG>thaumcraft:textures/misc/research2.png:0:0:128:83:1</IMG>Zde by si mněl vidět všechny prvotní aspekty (a možná nějaké sloučené aspekty) v oblasti vyznačené číslem §l3§r. V různém mnošství které, se k nim váže. Poté co vstoupíš do světa poprvé, tak stejně jako každému hráč je ti přizazeno malé jezero Prvotních aspektů na začátek .<BR>Pokud dokončíš zkoumání s
+tc.research_page.RESEARCH.7=thaumometrem brzo tak by si mněl mít výrazný počet Prvotních a Sloučených aspektů uvedených zde.<BR>Teď můžeš začít kombinovat aspekty v mnohem více komplikované sloučeniny aspektů, jednoduchým kliknutím na ty které si přeješ skombinovat nebo přetažením na runové kruhy v sekci §l4§r. Vybrané aspekty se objeví v sekci §l4§r a poté co máš vybrané dva, stisknutim růžového tlačítka se je pokusíš skombinovat. Pokud uspějes, uvidíš co si získal v pravo dole a objeví se v sekci §l3§r.<BR>Část aspektů je spotřebována i pokuď kombinování nepřinese výsledek v podobě správně sloučeného aspektu.
+tc.research_page.RESEARCH.8=§l   §n(3) Základní Výzkum§r<IMG>thaumcraft:textures/misc/research2.png:0:88:255:158:.5</IMG>Potřebuješ nosit sadu psacích potřeb a papíru pro tenhle krok.<BR>Poté pokud otevřeš svůj Thaumonomicon uvidíš všechny vědomosti které máš a také všechno vědení o které jsi právě schopný usilovat.<BR>Blikající čtvercové nebo kulaté ikony představují hlavní výzkumy.
+tc.research_page.RESEARCH.9=Pokud můžeš přečíst jejich název (místo vidění podívných run) jsi proste schopný kliknou na ně. A tak papír a inkoust bude spotřebován z tvého inventáře a získáš výzkumnou poznámku. Teď můžeš vzít tuhle výzkumnou poznámku, položit ji na stůl a začít zkoumání položením do slotu č. §l2§r.<BR>Sekce §l5§r teď ukáže list papíru pokrytý hexagonálnímí dlaždicemi s ikonami aspektu kolem vnější hrany. Pokud uvidíš značku otazníku (ikonu) znamená to že neznáš tenhle aspekt a musíš se jej prvně naučit.<LINE> 
+tc.research_page.RESEARCH.10=Na dokončení svého výzkumu potřebuješ jednoduše spojit a aktivovat všechny aspekty. To lze provést přetažením aspektu který je složen z cílového aspektu na sousední hex pole, nebo můžeš skombinovat s jiným aspektem  který vytvoří požadovaný aspekt.<IMG>thaumcraft:textures/misc/research3.png:0:0:150:95:.75</IMG>Položení aspektu spotřebuje jeden výzkumný bod. Pokud uděláš omyl, můžes kliknutím na aspekt jej odstratnit, ale nezískáš výzkumný bod zpět. 
+tc.research_page.RESEARCH.11=Můžeš v tom pokračovat dokud nevytvoríš vzor spojující všechny začáteční aspekty. Vnější aspekty nemusí být připojené ke všem ostatním, jen prostě musí tvořit propojený celek.<BR>Jakmile je tohle hotové, tak jste dokončíly výzkum a výzkumná poznámka se promění v objev.<LINE>POZNÁMKA: Pokládání a odstraňování aspektů z hex mřížky spotřebovává inkoust z tvých psacích potřeb. Pokud se vyčerpá, nebudeš moct pokračovat dokud jej nedoplníš.
+tc.research_page.RESEARCH.12=§l    §nVedlejší Výzkum§r<BR>Hexagonální ikony znamenají Vedlejší výzkum. Podobně jako základní výzkum je potřeba na ně kliknout. Avšak místo získání výzkumné poznámky, se jednoduše výzkum naučíš přímo. Vedlejší výzkum tě stojí aspekty, kterými musíš zaplatit, ale nevyžaduje nošení psacích potřeb a papíru.
+#
+tc.research_name.KNOWFRAG=Fragmenty Vědení
+tc.research_text.KNOWFRAG=Fragmenty ztracených tradic
+tc.research_page.KNOWFRAG.1=Při tvém cestování můžete narazi na starověké fragmenty a ztracené vědení. Samy o sobě stojí několik výzkumných bodů při použití, pokud ale dáš dostatek fragmentů dohromady, můžeš získat unikatní výzkum o který můžeš usilovat. Obvykle výzkum který odhalí, není možné získat normálnímí prostředky.<BR>Fragmenty vědení mohou příležitostně vést k špatné teorii, ale to bude odhaleno při pokusu o jeho výzkum. Když se tohle stane tak většina vašich vědomostních fragmentů ti bude vrácena a to obvykle znamená že jste vyčerpaly všechny aktulní cesty výzkumu v ztraceném vědění.
+#
+tc.research_name.ASPECTS=Aspekty Magie
+tc.research_text.ASPECTS=Stavební bloky magie
+tc.research_page.ASPECTS.1=Každý předmět, objekt nebo tvor je vázán různými mystickými živly známimi jako §5aspekty§0. Aspekty popisují vnější vzhled objektu a ohýbají se k magickým živlům. Prostý kámen může mít aspekt Terra zatímco více komplikovanější předměty jako stromy nebo dokonce i tvorové mohou být tvořeni různě rozdílnímy aspekty v různém mnoštví. Existuje témeř více jak 50 známych aspektů které byly v současnosti objeveny.<LINE>Tu jsou dva hlavní typy aspektů: §5Prvotní§0 a §5Sloučené§0.
+tc.research_page.ASPECTS.2=§lPrvotní Aspekty§r jsou nejzákladnějším typem aspektů a zde je jich pouze šest: §6Aer§0 (vzduch), §2Terra§0 (země), §cIgnis§0 (oheň), §3Aqua§0 (Voda), §7Ordo§0 (order), §8Perditio§0 (entropy).<BR>Tohle jsou formy základních stavebních bloků, ostatních aspektů.<BR>§lSloučené Aspekty§r jsou postaveny ze dvou dalších aspektů. Nejjednoduší sloučnina aspektů je tvořena z dvou prvotních aspektů, ale je možné mít neuvěřitelné komplikovanou sloučeninu aspektů vyrobenou z, po sobě jdoucích vrstev jednoduších aspektů.<BR>Nejjednoduší příklad takového sloučeného aspektu, je aspekt Victus (život), který je kombinací §2Terra§0 a §3Aqua§0. 
+tc.research_page.ASPECTS.3=Pro zobrazení co, za aspeckty předmět vlastní, jednoduše svým kurzorem najeď na předmět a stikni plížení (shift), a uvidíš co za apekty daný předmět má a dané mnoštví každého aspektu. Musíš nejprve předmět na který ukazuješ mít nastudovaný, do té doby aspekty zustanou neznámé.<LINE>Aspekty které jsou nějakým způsobem oděleny od svého předmětu jsou čistě známé jako §5Vis§0 a Vis je velmi hodnotná pro: Oba způsoby vytváření přísad a jako předmět pro magický výzkum.<BR>Vis je často nejvíce používana do hůlek, ale je také možné uložit ji jako magickou tekutinu. Vis uložená jako tekutina je známá jako §5Essentia§0.
+#
+tc.research_name.NODES=Aury a Nody
+tc.research_text.NODES=Magie je všude
+tc.research_page.NODES.1=§5Aura§0 je pole magické energie převládající světu po celá staletí. Její původ je nejasný. Někteří věří v to že je to akumulovaná životní síla žívých bytostí,mezitím co ostatní veří že, je to pouze jiný typ energie prosakující z jiného místa. Poslední teorie vypadá nejoblíbeněji, jako aura je často nacházena v okolí 'node' koncetrované mystické energie známé jako §5Aura Node§0.<BR>Každá aura node má základní množství magické energie kterou obsahuje a tahle energie je srovnána na jeden nebo více aspektů. Obvykle je srovnána na §5Prvotní Aspekty§0, ale vzácné node může obsahovat §5Sloučené Aspekty§0. 
+tc.research_page.NODES.2=Aspekty v aura node mohou být získány thaumaturgem pro jeho vlastní účely. Nejjednoduší způsob jak teho dosáhnout je s použitím hůlky.<BR>Energie která může být sklizena v tomhle případě je známá jako Vis.<LINE>Aura nody je těžké vidět pouhým okem, ale slabé záblesky světla často prozradí svou přítomnost. §5Thaumometr§0 dělá nody o  něco snáze nalezitelnějšímy, díváním se přes čočku je dělá dobře viditelnímy.<BR>§4Důležité:§0 Musíte být opatrní při vysávání node. Zde je totiž malá šance že při ůplném vyčerpání určitého typu aspektu v node, se node může 
+tc.research_page.NODES.3=rozplynout nebo utrpí stabilita.<BR>Je možné aby node zmizla poté co všechny její aspekty jsou vyčerpány.<LINE>Naštěstí většína nod doplnuje svoje aspekty, po celý čas a pokud je řádně udržovaná, může chytrému thamatugrogi poskytnou všechnu Vis, jakou jen bude chtít.<BR>Nody reagují zajímavým způsobem na ostatní nody v okolí a větší nody mají tendenci vysávat Vis z jejich menších sousedů pro navýšení svého vlastního objemu. 
+#
+tc.research_name.ORE=Rudy
+tc.research_text.ORE=Kopej hluboko
+tc.research_page.ORE.1=§l       §nNasáté kameny§r<BR><IMG>thaumcraft:textures/misc/research4.png:0:0:128:128:.6</IMG><BR>Příležitostně je zde tolik prvotní energie v auře že se usadí v pevném kameni a stvoří Nasátou rudu. Magické formy krystalů uvnitř kamene mohou být sklizeny.
+tc.research_page.ORE.2=Tyhle krystaly mají rozmanité živelné vlastnosti a mají spoustu použítí v Thaumaturgyi.<BR>Je zde šest typů naplěných kamenů, jeden pro každý Prvotní aspekt.<BR><BR><IMG>thaumcraft:textures/misc/research3.png:0:104:96:16:1</IMG><BR>Ty mohou být skombinovány dohromady a vytvoří se tak trs krystalů. Trs krystalů nemá žádné speciální vlastnosti kromě přidání doteku stylovosti do každého domova. Rozbití trsu krystalů zapříčiní roztříštění na jednotlivé části krystalu.
+tc.research_page.ORE.3=§l         §nCinnabar§r<BR><IMG>thaumcraft:textures/misc/research3.png:128:128:128:128:.6</IMG><BR>Tahle tmavě červená ruda je k nalezení hluboko podzemí a když je roztavena, produkuje quicksilver.<BR><BR><IMG>thaumcraft:textures/items/quicksilver.png:0:0:255:255:0.0625</IMG>
+tc.research_page.ORE.4=§l           §nJantar§r<BR><IMG>thaumcraft:textures/misc/research3.png:0:128:128:128:.6</IMG><BR>Tahle ruda je k nalezení poblíž povrchu a když je vytěžena padaj z ní kusy jantaru.<BR><BR><IMG>thaumcraft:textures/items/amber.png:0:0:255:255:0.0625</IMG>
+#
+tc.research_name.PLANTS=Rostliny & Stromy
+tc.research_text.PLANTS=Magická vegetace
+tc.research_page.PLANTS.1=§l      §nGreatwood stromy§r<BR><IMG>thaumcraft:textures/misc/research4.png:128:128:128:128:.6</IMG><BR>Tyhle velké a majestátní stromy mohou být nalezeny po celé krajine.<BR>Jejich dřevo je schopné vstřebat působivé mnoštví magie jež z něj dělá oblíbenou součást při sestrojování magických zařízení.
+tc.research_page.PLANTS.2=§l     §nSilverwood stromy§r<BR><IMG>thaumcraft:textures/misc/research4.png:0:128:128:128:.6</IMG><BR>Tyhle vzácné a magické stromy jsou báječné na pohled. Jejich listí s magickou energi se třpytí a jejich bledé, jemmné dřevo je cenněno pro jeho čistící vlastnosti.<BR>Magická povaha stromů je taková že aura nodes se často tvoří uvnitř jejich srdcí - tato vlastnost samotná dělá silverwood sazenici výhrou nadmíru.
+tc.research_page.PLANTS.3=§l        §nShimmerleaf§r<BR><IMG>thaumcraft:textures/misc/research4.png:128:0:128:128:.6</IMG><BR>Podivné, svítící květiny rostoucí pouze v stínu Silverwood stromů. Mohou být sklizeny a po rozbítí vytvoří quicksilver.<BR><BR><IMG>thaumcraft:textures/items/quicksilver.png:0:0:255:255:0.0625</IMG>
+tc.research_page.PLANTS.4=§l        §nCinderpearl§r<BR><IMG>thaumcraft:textures/misc/research5.png:0:0:128:128:.6</IMG><BR>K nalezení pouze v nejteplejším podnebí, tyhle rostliny hoří s živelným ohněm. Můžou být sklizeny a na -zemině-(ground) produkují podobný jemný prášek, Blaze prášku.
+tc.research_page.PLANTS.5=§l         §nMana lusk§r<BR><IMG>thaumcraft:textures/misc/research5.png:0:128:128:128:.6</IMG><BR><BR><BR>Tyhle podivné, lusky jako rostliny lze nalézt rostoucí pouze na stromech v magických lesích. Tu rostou velmi pomalu a když se sklidí, obvykle dají pouze jednu nebo dvě fazole. 
+tc.research_page.PLANTS.6=Tyhle fazole, známé jako Mana fazole, obsahují koncentrované mnošství essentia. Mohou být také snězeny, avšak výsledky jsou často trochu nepředvídatelné.<BR>Mohou být znovu zasazeny ,ale pěstování je obtížné a čas požírající.<BR>Divoké mana lusky obvykle produkují pouze prvotní aspekty, though it is said that planting beans adjacent to existing ones sometimes result in beans with compound aspects.<BR><BR><BR><IMG>thaumcraft:textures/misc/research1.png:0:240:64:16:1</IMG>
+#
+tc.research_name.RESEARCHER1=Výzkumná Odbornost
+tc.research_text.RESEARCHER1=Vědení je moc
+tc.research_page.RESEARCHER1.1=Stal jsi se více efektivní při provádění výzkumu.<BR>Kdykoliv odstraníš apekt který jsi položil do hex pole, je zde 25% šance že získáš výzkumný bod zpět.<BR>Jsi také schopen vidět co za aspekty je potřeba skombinovat k vytvoření aspektu na který ukazuješ.
+#
+tc.research_name.RESEARCHER2=Výzkumné Mistrovství
+tc.research_text.RESEARCHER2=Moc je vědení
+tc.research_page.RESEARCHER2.1=Stal jsi se více efektivní při provádění výzkumu.<BR>Kdykoliv odstraníš aspekt který jsi položil do hex pole, je zde 50% šance že získáš výzkumný bod zpět.<BR>Dodatečně zde je 10% šance že kdykoliv položíš aspekt tak te nebude stát žádný výzkumné body k temu.<BR>Nakonec budeš schopný kombinovat aspekty v výzkumném stolu pomocí shift+levé tlačitko myši na aspekt který si přejete vytvořit. Máš li dostatek dílčích aspektů tak se automaticky skombinuji a vytvoří aspekt na ktery jsi klikl.
+#
+tc.research_name.RESEARCHDUPE=Výzkumná Duplikace
+tc.research_text.RESEARCHDUPE=Sdílení jsou starosti
+tc.research_page.RESEARCHDUPE.1=Objevil jsi způsob jak kopírovat dokončené výzkumné poznámky.<BR>Poté co dokončíš výzkum nebo položíš dokončenou výzkumnou poznámku do výzkumného stolu, uvidíš ikonku hvězdičky. Kliknutím na ní vytvoříš kopii teho výzkumu , to můžeš dělat tak dlouho, dokud budeš mít papír a inkoust a dostatatek aspektů.<BR>Čím více kopii teho výzkumu vytvoříš, tím dražší kopírováni bude.
+#
+tc.research_name.DECONSTRUCTOR=Deconstruction table
+tc.research_text.DECONSTRUCTOR=When taking a good look just isn't enough
+tc.research_page.DECONSTRUCTOR.1=There comes a point in any thaumaturge's career where he is unable to progress with research due to his lack of knowledge. <BR>One possible recourse is the Deconstruction Table. The table allows you to break down objects into their simplest parts which you can examine. There are limits however - the table breaks compound aspects into their component aspects until only primal aspects remain. During this process much knowledge is lost and at best the thaumaturge can hope for is a single piece of primal knowledge.<BR>For example iron (Metallum) 
+tc.research_page.DECONSTRUCTOR.2=will be simplified into §2Terra§0 and §8Ordo§0, only one of which will have a chance of being discovered.<BR>It is also fairly slow and the fewer aspects and object has, the lower the chance to discover something.
+#
+tc.research_name.BASICTHAUMATURGY=Sestrojení Základní Hůlky
+tc.research_text.BASICTHAUMATURGY=Tvůj první nástroj
+tc.research_page.BASICTHAUMATURGY.1=Odlitek hůlky je tvoje nejzákladnější, ale také nejdůležitější nástroj. Je to, to co použiješ na sestrojení předmětul, aktivováni bloků jako kotlík, a nespočet ostatních úkolů.<BR>Nejzákladnější hůlka v sobě ukládá velmi limitované mnošství magické energie (nazývané Vis) kterou můžeš použít na úkoly. Pro doplnění energie v hůlce, musíš kliknout pravým tlačítkem myší a držet pro nasávání Vis z aura node.<BR>Jakmile držíš hůlku uvidíš na levém horním rohu obrazovky indikátor který ukazuje jak moc Visu je uloženo v hůlce.
+tc.research_page.BASICTHAUMATURGY.2=Držení shiftu zobrazí přesná čísla čísla obsaženého Visu a jakékoliv možné slevy které máš při provádění magických úloh.<BR>Hůlky jsou vždy sestrojeny pomocí kombinace tyčky a dvou konečných čepiček. Jak pokračuješ s svými studiemi, ,můžeš si být jistý že objevíš rozdílné materiály které můžeš použít na sestrojení tyček a čepiček pro vytvoření silnějších hůlek. Pouze základní hůlka může být vytvořena v normálním pracovním stole. Všechny ostatní hůlky vyžadují §5Tajemný Pracovní Stůl§0 a spotřebují Vis na sestrojení.<BR>Základní hůlka je sestrojena z světského dřeva a železa, přišmž obojí je špatný materiál pro pracování s magií.
+#
+tc.research_name.GRATE=Mříže předmětu
+tc.research_text.GRATE=Nechej dobré věci vevnitř
+tc.research_page.GRATE.1=Mříže Předmětu dovolují přepínat rukou to zdali jsou otevřené nebo zavřené, nebo s ruditovým signálem. Pokud jsou v otevřené pozici, jakékoliv vhozené předměty jednoduše jí propadnou.<BR>Předměty mohou být také odvedeny z vršku Mříže Předmětu použitím násypky nebo jiných prostředků a pokud je otevřená, tak předměty předměty budou vyhozeny spodem.
+#
+tc.research_name.NODETAPPER1=Pokročilé nasávání Node
+tc.research_text.NODETAPPER1=Seber to všechno
+tc.research_page.NODETAPPER1.1=Obvykle proces nasáváni Vis z node pomocí hůlky je docela pomalý... Ale už ne více!.<BR>Ty jsi objevil více efektivnější způsob nasávání, výsledkem je zdvojení rychlosti nasávání Vis.
+#
+tc.research_name.NODETAPPER2=Znalec nasávání Node
+tc.research_text.NODETAPPER2=Všechna tvoje Vis patří nám
+tc.research_page.NODETAPPER2.1=Máš další zdokonalenou metodu jak používat nody.<BR>Teď jsi schopný nasávat Vis třikrát rychleji než normálně.
+#
+tc.research_name.NODEPRESERVE=Node Konzervátor
+tc.research_text.NODEPRESERVE=Ukládání něčeho pro později
+tc.research_page.NODEPRESERVE=Teď máš lepší kontrolu nad množstvím nasáváni Visu z nod. Vždy node opustíš když v ní zůstane jedna Vis z každého aspektu, pokud se neplížíš.<BR>Buď opatrnej, tahle úroveň kontroly není možná když používáš hůlku vytvořenou z normálního dřeva a železa.
+#
+tc.research_name.THAUMOMETER=Thaumometr
+tc.research_text.THAUMOMETER=Měření Magie
+tc.research_page.THAUMOMETER.1=Tenhle Thaumometr je jedna z nejvyužitelnejších a nejdůležítejších nástrojů v thaumaturgistickém arzenálu, druhá je pouze hůlka.<BR>Prvně ti umožní skenovat předměty, tvory nebo mystické jevy a určí jejich magický zevnějšek. Jednoduše musíš držet pravé tlačítko myší a čekat.<BR>Zadruhé dělá objevováni nod jednoduší, ty jsou dobře viditelné přes cočky Thaumometru - i přes pevné objekty!
+#
+tc.research_name.GOGGLES=Brýle Odhalení
+tc.research_text.GOGGLES=Vidění, neviděného
+tc.research_page.GOGGLES.1=Postavením na základních principech Thaumometru, získáš rafinovanější schopnost na detekovaní magie v něčem více... odhalujícím.<BR>Tahle sada mystických čoček udělá aura nody mnohem snadněji nalezitelnímy spolu s odhalením všech druhů skrytích věcí.<BR>Tohle je důležíty nástroj v jakémkoliv Thaumaturgistickém arzenálu.
+#
+tc.research_name.THAUMIUM=Magická Metallurgie
+tc.research_text.THAUMIUM=Kde kovy potkají magii
+tc.research_page.THAUMIUM.1=Kovy se ukázaly docela snadné pro manipulaci přes Thaumaturgickýmy principy. Tvoje první experimenty vedly k výzkumu Thaumia.<BR>Thaumium je výsledkem napuštením základních kovů s syrovou magickou energií. Výsledkem je kov tvrdší než železo s schopností přijmout lepší očarování než které je železo normálné schopné přijmout.<BR>Kov jako takový má spoustu využití při sestrojování více pokročílých thaumaturgistických přístrojů.<BR>Může být také použit na sestrojení nástrojů, zbraní a brnění v pracovním stole použitím normálních receptů.
+#
+tc.research_name.NITOR=Nitor
+tc.research_text.NITOR=Mystický ohěň
+tc.research_page.NITOR.1=Tenhle ohěn vypadá jako by palivo byla magie samotná. Počet využití pro spalující oheň někdy vypadá nekonečný, ale naneštestí vypadá že produkuje více světla než tepla. Přesto se stále může ukázat jako stály zdroj energie.<BR>Nitor může být také položen v světe jako magický zdroj světla.
+#
+tc.research_name.ALUMENTUM=Alumentum
+tc.research_text.ALUMENTUM=Mystický zdroj energie
+tc.research_page.ALUMENTUM.1=Tato látka pulzuje ohnivou energí a je více než horlivá vypustit tuhle energii při sebemenším ráne/nárazu. Může být nestabilní, ale pravděpodbně je dobrým zdrojem paliva.<BR>A pravděpodobně není dobrý nápad házet tohle proti pevnému povrchu, ledaže máš rád exploze.
+#
+tc.research_name.HUNGRYCHEST=Hladová Truhla
+tc.research_text.HUNGRYCHEST=Truhla která nečeká na otevření
+tc.research_page.HUNGRYCHEST.1=Hladová truhla je schopná sbírat itemy sama o sobě pokud je hodíte dost blízko na to aby se jich dotkla.
+#
+tc.research_name.CAP_gold=Zlaté čepičky (hůlka)
+tc.research_text.CAP_gold=Čepičkování věcí s stylem
+tc.research_page.CAP_gold.1=Zlato je mnohem lepší soustředěný zprostředkovatel než iron, a hůlky očepičkované tímhle materiálem nedávají žadnou pokutu když použiješ kanál visu.
+#
+tc.research_name.CAP_thaumium=Thaumiucké čepičky (hůlka)
+tc.research_text.CAP_thaumium=Magická čepičky pro hůlku
+tc.research_page.CAP_thaumium.1=Thaumium je známe pro jeho schopnost ukládání a pohlcování magie, takže použítí na sestrojení čepiček hůlky je logická volba. Je to velmi efektivní při zaměřování Visu všech druhů.<BR>Sestrojení tehle čepiček v tajemném pracovním stole nestačí - je třeba je naplnít další magickou energií aby se daly použít.
+#
+tc.research_name.CAP_silver=Stříbrné čepičky (hůlka)
+tc.research_text.CAP_silver=Čepičkování věcí s trochu menším stylem
+tc.research_page.CAP_silver.1=Stříbro má podobné vlastnosti jako zlato, když jej použijete jako čepičku pro hůlku, ale je trochu více efektivnější na proudu čtyř prvotních žívlů (oheň, země, vzduch a voda).<BR>Sestrojení tehle čepiček v tajemném pracovním stole nestačí - je třeba je naplnít další magickou energií aby se daly použít.
+#
+tc.research_name.CAP_copper=Měděné čepičky (hůlka)
+tc.research_text.CAP_copper=When iron caps just won't cut it
+tc.research_page.CAP_copper.1=Měď má podobné vlastnosti jako železo když je použito jako čepička pro hůlku, ale je více efektivnější než zlato při užití proudu §7Ordo§0 nebo §8Perditio§0 Visu.
+#
+tc.research_name.ROD_greatwood=Greatwoodové jádro hůlky
+tc.research_text.ROD_greatwood=Skladište magické energie
+tc.research_page.ROD_greatwood.1=Vytesáním z greatwoodových polen, tahle tyčka má dvakrát vetší úložiště Visu než  potencionální světské dřevo, je schopná uložit až 50 Vis každého typu.
+#
+tc.research_name.ROD_silverwood=Silverwoodové jádro hůlky
+tc.research_text.ROD_silverwood=Magie na jádru
+tc.research_page.ROD_silverwood.1=Silverwood se ukázal jako vyníkající skladíšte magické energie, a jádro hůlky sestrojené z něj může uložit v sobě až 100 Vis každého typu.
+#
+tc.research_name.SCEPTRE=Sestrojení Žezel
+tc.research_text.SCEPTRE=Vyrobeno k úkolům
+tc.research_page.SCEPTRE.1=Sestrojené žezlo je specializovaný druh hůlky který může být použit na sestrojování mystických předmětu a ničeho jiného. Foci nemůže být připěvněno na žezlo, ale je zde několik využtí které jej dělají užitečným.<BR>Prvně, mají dodatečnou 10% Vis slevu nad tím co mohou čepičky normárně zaručit.<BR>Za druhé mohou pojmout o 50% více než jejich jádra mohou normálně umožnují.<BR>Jako ostatní hůlky tyhle mohou být sestrojeny použitím kombinace vetšiny tyček a čepiček - několik příkladů je uvedeno na další straně.
+#
+tc.research_name.ROD_obsidian=Obsidianové jádro hůlky
+tc.research_text.ROD_obsidian=Zemní Vis úložiště
+tc.research_page.ROD_obsidian.1=Jádra hůlky vytesané z obsidianu mají trochu lepší úložní potencionál než greatwoodová jádra. Co dělá tyhle lepší než greatwoodová jádra je úroveň §2Terra§0 uložená uvnitř která když klesne pod 10%, tak se pomalu doplňuje bez použití node.
+#
+tc.research_name.ROD_bone=Kostní jádro hůlky
+tc.research_text.ROD_bone=Entropické Vis úložiště
+tc.research_page.ROD_bone.1=Kost použitá jako jádro hůlky má trochu lepší úložní potenciál než greatwoodová jádra. Co dělá tyhle lepší než greatwoodová jádra je úroveň §8Perditio§0 uložená uvnitř která když klesne pod 10%, tak se pomalu doplňuje bez použití node.
+#
+tc.research_name.ROD_blaze=Blaze tyč (jádro hůlky)
+tc.research_text.ROD_blaze=Ohnivé Vis úložiště
+tc.research_page.ROD_blaze.1=Blaze tyče použitá jako jádro hůlky má trochu lepší úložní potenciál než greatwoodová jádra. Co dělá tyhle lepší než greatwoodová jádra je úroveň §cIgnis§0 uložená uvnitř která když klesne pod 10%, tak se začně ohnivou přírodou pomalu doplňovat.
+#
+tc.research_name.ROD_ice=Ledové jádro hůlky
+tc.research_text.ROD_ice=Ledové Vis úložiště
+tc.research_page.ROD_ice.1=Jádra hůlky sestrojené z ledu mohou uložit trochu více Vis než greawoodová jádra. Co dělá tyhle lepší než greatwoodová jádra je úroveň §3Aqua§0 uložená uvnitř která když klesne pod 10%, tak se začne ledovou přirodou pomalu doplňovat.
+#
+tc.research_name.ROD_quartz=Křemenné jádro hůlky
+tc.research_text.ROD_quartz=Ordered Vis úložiště
+tc.research_page.ROD_quartz.1=Jádra hůlky vytesaná z nether křemene maji trochu lepší úložní potenciál než greatwoodová jádra. Co dělá tyhle lepší než greatwoodová jádra je úroveň §7Ordo§0 uložená uvnitř která když klesne pod 10%, tak se pomalu doplňuje bez použití node.
+#
+tc.research_name.ROD_reed=Rákosové jádro hůlky
+tc.research_text.ROD_reed=Vzdušné Vis úložiště
+tc.research_page.ROD_reed.1=Jádra hůlky vyrobené z rákosí maji trochu lepší úložní potenciál než greatwoodová jádra. Co dělá tyhle lepší než greatwoodová jádra je úroveň §6Aer§0 uložená uvnitř která když klesne pod  10%, tak se pomalu doplňuje bez použití node.
+#
+tc.research_name.ROD_greatwood_staff=Magické hole
+tc.research_text.ROD_greatwood_staff=Čarodějské hole mají knoflíky na konci
+tc.research_page.ROD_greatwood_staff.1=Hůlky jsou ukládány a vyměnovány thamaturgy, ale několikrát chtějí více třesku pro svoji zábavu. Magické hole jsou v základu jen vetší hůlky. Které jsou schopné uchovat více Visu.<BR>Protože jsou fyzicky vetší a robustnější než hůlky a mohou být aktuálně použity jako zbraně v nouzi.<BR>Bohužel tohle také dělá nevhodné hole pro složitejší řemeslnou zručnost a pro skvělou kontrolu nad ní je vyžadován Tajemný pracovní stůl nebo podobný sestrojovací nástroj.
+tc.research_page.ROD_greatwood_staff.2=Hůl vyrobená z greatwoodu má více než dvakrát vetší potencionální úložiště než greatwoodová húlka, v podstatě je schopná uchovat až 125 Visu, každého typu.<BR>Poznámka: Pořád potřebuješ přidat čepičky na tyč, jako u normální hůlky.
+#
+tc.research_name.ROD_silverwood_staff=Silverwoodové jádro hole
+tc.research_text.ROD_silverwood_staff=Magie na jádra
+tc.research_page.ROD_silverwood_staff.1=Jádra hole sestrojená z silverwoodu mohou uchovat až 250 Vis každého typu.
+#
+tc.research_name.ROD_obsidian_staff=Obsidianové jádro hole
+tc.research_text.ROD_obsidian_staff=Zemní Vis úložiště
+tc.research_page.ROD_obsidian_staff.1=Jádra hole vytesaná z obsidianu mohu uchovat až 175 Visu, každého typi.<BR>Jako ostatní jádra hůlek, tyhle také pomalu doplňují Vis kterou uchovávají.
+#
+tc.research_name.ROD_bone_staff=Kostní jádro hole
+tc.research_text.ROD_bone_staff=Entropic Vis úložiště
+tc.research_page.ROD_bone_staff.1=Jádra hole vytesané z kostí mohou uchovat až 175 Visu, každého typu.<BR>Jako ostatní jádra hůlek, tyhle také pomalu doplňují Vis kterou uchovávají.
+#
+tc.research_name.ROD_blaze_staff=Blaze tyč (Jádro Hole)
+tc.research_text.ROD_blaze_staff=Ohnivé Vis úložiště
+tc.research_page.ROD_blaze_staff.1=Jádra hole sestrojené z blaze tyčí mohou uchovat až 175 Visu, každého typu.
+#
+tc.research_name.ROD_ice_staff=Ledové jádro hole
+tc.research_text.ROD_ice_staff=Ledové Vis úložiště
+tc.research_page.ROD_ice_staff.1=Jádra hole sestrojená z ledu mohou uchovat až 175 Visu, každého typu.<BR>Jako ostatní jádra hůlek, tyhle také pomalu doplňují Vis kterou uchovávají.
+#
+tc.research_name.ROD_quartz_staff=Křemenné jádro hole
+tc.research_text.ROD_quartz_staff=Ordered Vis úložiště
+tc.research_page.ROD_quartz_staff.1=Jádra hole vytesaná z křemene mohou uchovat až 175 Visu každého typu.<BR>Jako ostatní jádra hůlek, tyhle také pomalu doplňují Vis kterou uchovávají.
+#
+tc.research_name.ROD_reed_staff=Rákosové jádro hole
+tc.research_text.ROD_reed_staff=Vzduchové Vis úložiště
+tc.research_page.ROD_reed_staff.1=Jádra hole sestrojená z rákosí mohou uchovat až 175 Visu, každého typu.<BR>Jako ostatní jádra hůlek, tyhle také pomalu doplňují Vis kterou uchovávají.
+#
+tc.research_name.ROD_primal_staff=Prvotní Jádro Hole
+tc.research_text.ROD_primal_staff=Kombinace živelné síly
+tc.research_page.ROD_primal_staff.1=Tohle jádro pulsuje skrytou energií.<BR>Kombinuje v sobě všechny funkce předchozích jáder - má Vis úložnou kapacitu silverwoodového jádra a je schopné doplňovat uchovávánou Vis jako různé typy prvotních hůlkových jader.<BR>Nakonec přidává jednu úrověn síly na každé ohnisko které použiješ.<BR>Tohle je opravdu silný nástroj v každém thaumaturgově arzenálu.<BR>Poznámka: Pořád potřebuješ přidat čepičky na tyč, jako u normální hůlky.
+#
+tc.research_name.FOCUSFIRE=Ohnisko hůlky
+tc.research_text.FOCUSFIRE=Způsob poznání funkce
+tc.research_page.FOCUSFIRE.1=Trochu opatrného experimentování ti ukáže způsob na rozšíření schopností i té nejzákladnější hůlky.<BR>Skombinováním krystalických Vis shardů s křemenímy krystaly a napuštení magií, budeš schopen zařadit krystaly do mystického matrixu.<BR>Pokud určitý typ a množství Vis je zaměřeno přes tenhle matrix, tak se syrová magická energie přetvoří v něco užitečnějšího, kontrolovaného, a zaměřeného na specifické úkoly. 
+tc.research_page.FOCUSFIRE.2=Přidání zaměření na tvoji hůlku je jednoduchá úloha - jednoduše drž F mezitím co držíš hůlku, a jakékoliv ohnisko které neseš se objeví v paprskovitém menu umožnující ti vybrat si jakékoliv jedno ohnisko které sebou neseš jednoduchým kliknutím.<LINE>Tvoje počáteční experimenty zahrnovaly tvarování ohně, a výsledné zaměření se ukázalo býti jednoduchým, ale užitečným nástrojem.<BR>Je schopné poslat kužel živelného ohně, který spálí vše v jeho cestě.
+#
+tc.research_name.FOCUSFROST=Zaměření hůlky: Mráz
+tc.research_text.FOCUSFROST=Pomsta je v jídle nejlépší podávaná za studena
+tc.research_page.FOCUSFROST.1=Tohle je schopné vymrštit kousky ledu.<BR>Při míření musíte být opatrní, kousky ledu mají tendenci se odrážet od pevných předmětů. Tohle můžeš použít k svému prospěchu, odrážením kousků ledu od rohů nebo dokonce zasažení několika nepřátel. 
+#
+tc.research_name.FOCUSSHOCK=Zaměření hůlky: Šok
+tc.research_text.FOCUSSHOCK=Hromy a paprsky
+tc.research_page.FOCUSSHOCK.1=Tohle zameření je schopné soustředit živelnou energii do parsků světla které mohou udeřit tvoje nepřátele.
+#
+tc.research_name.FOCUSEXCAVATION=Zaměření hůlky: Vykopávky
+tc.research_text.FOCUSEXCAVATION=Terra Terror
+tc.research_page.FOCUSEXCAVATION.1=Tohle zaměření promění tvoji hůlku v nástroj vhodný k přesouvání ohromného množství země a kamene s malým úsilím.<BR>Jednoduše zamiř na to co chceš vykopat and magie udělá zbytek. Tvrdší materiály tvrvají déle než se vykopou, a cokoliv ostatnícho než země, kámen nebo podobné materiály bude trvat mnohem déle než se vykope.
+#
+tc.research_name.FOCUSTRADE=Zaměření hůlky: Rovnocený obchod
+tc.research_text.FOCUSTRADE=Tohle za tohle
+tc.research_page.FOCUSTRADE.1=Můžeš použít tohle zaměření na výměnu mnoha bloku v světě, když nějaké neseš.<BR>Prvně musíš vybrat blok kterým si přeješ změnit ostatnímy bloky, pomocí plížení a pravým kliknutím myší na požadovaný blok. Když klineš levím na jiný blok tak ten se přemění v cílový blok. Pravé kliknutí přemení celý pás bloků.<BR>Musíš mít u sebe požadované mnoštví cílových bloků, a přeměněné bloky se nahradí těmi z tvého inventáře. Pouze bloky sousedící alspoň z jedné strany s otevřeným prostorem nebo nepevné bloky mohou být přeměněny.
+#
+tc.research_name.FOCUSHELLBAT=Zaměření hůlky: Devět Pekel
+tc.research_text.FOCUSHELLBAT=Maličké zděšení
+tc.research_page.FOCUSHELLBAT.1=Tvoje výlety na Nether tě mají učit bát se maličkého zděšení známého jako Pekelní netopíři. Teď jsi objevil způsob jak vyvolat maličká zděšení a poslat je poté na svoje nepřátele. Skvěle.
+#
+tc.research_name.FOCUSPORTABLEHOLE=Zaměření hůlky: Přenosná díra
+tc.research_text.FOCUSPORTABLEHOLE=Nikdy už nebudeš zase bez východu
+tc.research_page.FOCUSPORTABLEHOLE.1=Můžeš být úspěšný v používání Vis vytvořením extra dimensionálního prostoru. Použití tehohle zaměření na zed nebo jiné povrchy vytvoří extra dimensionální průchod vedoucí na druhou stranu.<BR>Tahle 'díra' zůstane otevřená pouze na pár sekund a čerpá Vis z hůlky, mnošství závísí na tom jak je díra hluboká.<BR>Extra dimensionální díry nemohou být vytvořeny na jistých tvrdých druzích nebo částečně složitých předmětech.
+#
+tc.research_name.FOCUSWARDING=Zaměření hůlky: Ochrana
+tc.research_text.FOCUSWARDING=Ochraňuj co je tvoje
+tc.research_page.FOCUSWARDING.1=Tohle mocné zaměření má velmi zajímavou schopnost. Když je použito na blok, vytvoří neviditelnou ochranou bariéru okolo teho bloku. Z tehohle bodu nemůže být možné jej odstranit nebo zničit dokud znova nepoužiješ hůlku na ten blok.<BR>Zaměření může být použito na většinu jednoduchý bloků a ty si udrží mnoho z jejich normálních vlastností, ačkoli jakmile jsou bloky chráněné stanou se efektivně zamrazené v čase.<BR>Když držíš hůlku s tímhle zaměřením budeš schopný vidět všechny bloky které jsi (a pouze ty) ochraňujes.
+#
+tc.research_name.FOCUSPRIMAL=Zaměření hůlky: Prvotní
+tc.research_text.FOCUSPRIMAL=Syrová Magie
+tc.research_page.FOCUSPRIMAL.1=Co za šílenství te popadlo že jsi vytvořil tuhle věc? Tohle zaměření vypadá divoce nebezpečné a pouze šílenec by se pokusil tohle použít kdekoliv až na nejvíce kontrolované prostředí.<BR>Zaručuji že Orb prvotní energie který vytvořiš je zcela zničující, ale jeho cesta je přinejlepším nepravidelná a vyloženě škodlivá v nejhorším případě.<BR>To si žádá další studii, nicméně: Orb ukazuje něco zajímavého s dimenzionálními vlastnostmi a výstavní vzory energie uvidíš pouze v wispech a aura nodách.
+#
+tc.research_name.FOCUSPOUCH=Vak zaměření
+tc.research_text.FOCUSPOUCH=Vhodná nádoba pro nošení vašich ohnisek.
+tc.research_page.FOCUSPOUCH.1=Poté co jste shromáždily značnou sbírku ohnisek je docela nepříjemné je všechny nosit sebou. Tenhle vak vyřeší tenhle problém.<BR>Jakmile změníš zaměření na své hůlce, tenhle vak zkontroluje první a jákoliv odstraněná ohniska a umístí je do vnitř vaku. Můžeš jej také otevřít pravým kliknutím,  pro položení nebo odstranění ohniska rukou.<BR>Také může být nošen v tvém opaskovém bauble slotu.
+#
+tc.research_name.BOOTSTRAVELLER=Boty cestovatele
+tc.research_text.BOOTSTRAVELLER=Tyhle boty byly vyrobeny pro chůzi
+tc.research_page.BOOTSTRAVELLER.1=Tenhle pár očarovaných byl naplňen magií pro snadnější výpravy každého cestovatele.<BR>Umožnují ti se pohybovat rychleji než normálně. Také dovolují ti skočit výše a dále klesat.<BR>Nakonec ti umožní plout vodou jako ryba. Pomalá a nemotorná ryba, ale přesto ryba.
+#
+tc.research_name.PHIAL=Skleněná lahvička
+tc.research_text.PHIAL=Mystické nádoby
+tc.research_page.PHIAL.1=Skleněné lahvičky jsou schopné udržet všechny druhy tekutin a látek, ale jejich nejdůležitější použití pro thaumaturga je jejich schopnost držet Essentia. 
+#
+tc.research_name.TABLE=Stůl
+tc.research_text.TABLE=Trochu montáže požadováno
+tc.research_page.TABLE.1=Stůl je více než jednoduchý okrasný blok - také slouží jako základna pro ostatní plochy použitelné v trénování magie, jako Tajemný pracovní stůl a Výzkumný stůl. 
+#
+tc.research_name.ARCTABLE=Tajemný pracovní stolek
+tc.research_text.ARCTABLE=Řemeslničení s magií
+tc.research_page.ARCTABLE.1=Na vytvoření Tajemného pracovního stolu jednoduše klikni pravým s hůlkou na stůl který máš položen v světe. Tajemný pracovní stolek slouží k stejnému účelu jako normální pracovní stůl, s několika klíčovými vyjímkami.<BR>Kromě normálních řemeslnických receptů, lze také sestrojit nějaké unikátní předměty  pro Thaumaturgy. K temu potřebuješ položít hůlku do pravého horního slotu. Ta ti umožní sestrojit itemy které vyžadují Vis který spotřebovává enegii přimo z hůlky.<BR>Požadovaná Vis na sestrojení předmětu se zobrazí v šesti kruhových symbolech okolo sestrojovací mřížky.
+#
+tc.research_name.RESTABLE=Výzkumný stůl
+tc.research_text.RESTABLE=Na schromáždění vědomostí
+tc.research_page.RESTABLE.1=Výzkumný stůl je vytvořen položením dvou stolů vedle sebe a kliknutim na ně s Psacími potřebami.<BR>Výzkumný stůl je nejdůležitější předmět pro jakéhokoliv thaumaturga. Je používán na odemykání všech skrytích tajemství vesmíru a objevení nových způsobů spojování magie. 
+#
+tc.research_name.THAUMONOMICON=Thaumonomicon
+tc.research_text.THAUMONOMICON=Úložiště vedění (Beta překlad: KyderCZ)
+tc.research_page.THAUMONOMICON.1=Pro vyrobení Thaumonomiconu, musíš jednoduše použít svou hůlku na knihovnu položenou v světe(na zemi).<BR>Thaumonomicon je příručka všech věcí thaumacraftu. Zde je seznam všech tvých objevů které jsi doposud udělal a dává ti celkový přehled o tom které je ještě třeba provést.<BR>Kdykoliv úspěšně něco vyzkoumáš a použiješ svitek, tak výzkum bude automaticky přidán do této knihy. Můžes pak prohlížet přes ni svoje objevy a kliknutím na ně zobrazíš více detaijlnější informace týkající se jich, jakožto také i jakékoliv craftící recepty spojené s těmito objevy. 
+#
+tc.research_name.CRUCIBLE=Základní Alchemie
+tc.research_text.CRUCIBLE=Bublá a vaří
+tc.research_page.CRUCIBLE.1=Pro vytvoření Kotlíku, musíš jednoduše použít svou hůlku na kotel položený v světe.<BR>Kotlík je důležitý nástroj pro každého thaumaturga. Ten mu umožnuje rozložit hmotné předměty v jejich části Essentia a znovu zkombinovat jak si jen přeje.<BR>Kotlík musí být položen nad stálý zdroj tepla a naplňen vodou. Jakmile jednou je naplňen vodou tak začne bublat, poté jednoduše hodíš jakékoliv předměty si přeješ přímo do kotlíku a ten je rozbije na jednotlivé části Essentia.<BR>Pokud znáš správný vzorec a smícháš essentia v    
+tc.research_page.CRUCIBLE.2=kotlíku správně, můžeti vypadnout speciální předmět z kotlíku, známý jako Catalyst. Catalyst vtáhne essentia přímo do sebe a promění se v úplně nový předmět který kotlík vyhodí.<BR>Jakýkoliv pozůstatek zbývající Essentia v kotlíku může být jěstě využit, ale není dobrý nápad nechávat essentia v kotlíku příliš dlouho.<BR>Tvoření Catalystů také použije nějakou vodu v kotlíku a tak ji budeš časem muset doplnit.<BR>Essentia v kotlíku se neustále zmenšuje. Směs essentia zmenší se do jedné  části aspetku, a Prvotní essentia jednoduše se vypaří.  
+tc.research_page.CRUCIBLE.3=To jsou odpadní zdroje, vypařováním a zmenšováním essentia může vzniknout spousta podivných vedlejších efektů.<BR>Můžeš vyprázdnit kotlík pomocí shift+pravé-kliknutí-myši, na něj s hůlkou v ruce. Všechna essentia je tak vyhozena do ovzduší... není to něco co byste mněli dělat příliš často.
+tc.research_page.CRUCIBLE.4=Tady jsou nějaké základní alchemické recepty které kdokoliv může vykonat. Prohlédněte si následující stránky s recepty.<LINE>§nVis Shardy Rovnováhy§r<BR><BR>Tyhle normální Vis shardy mohou být alchemicky napuštěny, pěti prvotními živly jež v sobě nevlastní. Výsledkem je shard krystal který skvěle rezonuje s prvotní energií.<BR>Roztavený Vis shard rovnováhy v peci vytvoří Salis Mundus (uvidíte na následujících stránkách).
+tc.research_page.CRUCIBLE.5=§nSalis Mundus§r<BR><BR>Salis Mundus, neboli jak je to obyčejně známé Thaumaturgova Sůl, je vytvořena vystavením Vis shardu rovnováhy, dostatečně vysoké teplote která to rozbije na jemný prášek.<BR>Jako jeho světský protějšek, Thaumaturgova súl přidává aroma (obrazně řečeno) na jakýkoliv magický recept nebo vzorec. Je to silné pojivo, které je schopné držet nejvíce nesourodé magické živly pohromadě.
+#
+tc.research_name.ENCHFABRIC=Očarovaná tkanina
+tc.research_text.ENCHFABRIC=Hedvábná a stylová
+tc.research_page.ENCHFABRIC.1=Skombinováním pavoučího hedvábí a vlny napuštěné prvotní Vis, jsi schopný vytvořit hedvábnou magickou látku která má nespočet použití.<BR>Také jsi objevil vzory na vytvoření tkané róby z magické tkaniny. Tyhle róby mají podobné ochrané vlastnosti jako kožené brnění, ale jsou více odolné než světské materiály mohou být.<BR>Také mohou obsahovat mystické očarování velmi dobře a mohou uchovat mocnou magii mnohem lépe než mnohem dražší brnění.  
+tc.research_page.ENCHFABRIC.2=Různé kousky téhle výstroje udělují malou slevu na mnoštví spotřebováného Visu z hůlek které použiješ.<BR>Můžeš brnění obarvit stějně jako kožené brnění.
+#
+tc.research_name.ENCHANT=Očarování
+tc.research_text.ENCHANT=Nová očarování
+tc.research_page.ENCHANT.1=Thaumcraft přidává několik unikátních očarování.<BR>§nSpěch§r<BR>Tohle očarování ,může být aplikovaná na obuv  všech druhů a zvyšuje nositelovu rychlost na zemi. Vyšší úroveň očarování, poskytuje lepší rychlostní bonus.<BR>§nOprava§r<BR>Tohle očarování pomalu opravuje trvanlivost* předmětů, spotřebováváním Visu z hůlky v tvém inventáři. Spotřeba Visu je stanovena podle hodnoty předmětu. *Durability
+tc.research_page.ENCHANT.2=The higher the level of the enchantment, the quicker this takes place. Tohle očarování může být aplíkováno pouze na předměty vyrobené s Thaumcraftem, a dokonce ne na všechny Thaumcraftí předměty.
+#
+tc.research_name.ELEMENTALAXE=Sekyra proudu
+tc.research_text.ELEMENTALAXE=Řeky dřeva
+tc.research_page.ELEMENTALAXE.1=By combining water shards and a thaumium axe, you have created a tool that embodies the aspects of motion and flow.<BR>It functions like a normal axe on all materials except natural logs and trees. When used on them the axe seeks to furthest block of the same type that is still connected to the block you are attempting to harvest and harvests that one instead.<BR>In effect you will chop trees from the top down even if you hit the bottom-most block. 
+tc.research_page.ELEMENTALAXE.2=Any wood chopped in this fashion will automatically float towards you.<BR>If you press and hold right click the axe will draw all nearby items towards you - not just wood it chopped.<BR>If shift is held while using this tool all its special properties are suspended and it functions like a normal axe.
+#
+tc.research_name.ELEMENTALPICK=Pickaxe of the Core
+tc.research_text.ELEMENTALPICK=Purifying Heat
+tc.research_page.ELEMENTALPICK.1=By infusing a thaumium pickaxe with fire shards, you have created a pickaxe that glows with the heat of a forge.<BR>When you mine ore blocks there is a chance that you will mine a cluster instead. Native clusters are much easier to process and produces double the normal amount of metal when smelted.<BR>It can also be used to sound out any surface you right click against to find out what valuable ores, lava or water can be found nearby.
+tc.research_page.ELEMENTALPICK.2=If shift is held while using this tool all its special properties are suspended and it functions like a normal pickaxe.
+#
+tc.research_name.ELEMENTALSWORD=Měč Zephyra
+tc.research_text.ELEMENTALSWORD=Naštvané větry
+tc.research_page.ELEMENTALSWORD.1=You have merged the elemental fury of air shards with a thaumium sword.<BR>When used to strike a foe, the blade will sweep in a wide arc, hitting additional foes near your main target.<BR>While blocking the sword will conjure a sphere of whirling winds around you, pushing enemies and loose objects away and deflecting incoming projectiles.<BR>While blocking it will also slowly lift you into the air.
+#
+tc.research_name.ELEMENTALSHOVEL=Shovel of the Earthmover
+tc.research_text.ELEMENTALSHOVEL=Shifting Earth
+tc.research_page.ELEMENTALSHOVEL.1=Combining earth shards with a thaumium shovel you have created a peerless digging implement.<BR>When used to dig earth, sand and similar materials it will dig a 3x3 area.<BR>If you right click on the side of a block, it will attempt to place a 3x3 section of the same material in the world as long as you have sufficient blocks in your inventory.<BR>The orientation of both the digging and construction depends on the face you dug or clicked.<BR>If shift is pressed you can see where blocks will be placed 
+tc.research_page.ELEMENTALSHOVEL.2=in the world and you can change the orientation of how blocks are placed by pressing 'G' on the keyboard. Blocks can be placed either parallel to the block face selected, or extending out of the face vertically or horizontally. <BR>If shift is held while using this tool all its special properties are suspended and it functions like a normal shovel.
+#
+tc.research_name.ELEMENTALHOE=Motyka úrodnosti
+tc.research_text.ELEMENTALHOE=Rovnováha přirody
+tc.research_page.ELEMENTALHOE.1=By merging the magical energy from order and entropy shards with a thaumium hoe, you have created a farming implement with few equals.<BR>When used to till fields, it will till a 3x3 area instead of just a single block.<BR>When used to crops or other plants it will act as bonemeal to promote its growth, though at a higher cost to its durability. It might even be able to grow plants that normal bonemeal can't.<BR>If shift is held while using this tool all its special properties are suspended and it functions like a normal hoe.
+#
+tc.research_name.ALCHEMICALDUPLICATION=Alchymistická Duplikace
+tc.research_text.ALCHEMICALDUPLICATION=Nikdy nemůžeš mít příliš dobrou věc.
+tc.research_page.ALCHEMICALDUPLICATION.1=Je tady mnoho látek v světě které jsou alchymystické v přirodě.<BR>Opatrním přidáváním správných aspektů k těmto látkám byste mněli být schopni z nich udělat více.
+#
+tc.research_name.ALCHEMICALMANUFACTURE=Alchymystická Výroba
+tc.research_text.ALCHEMICALMANUFACTURE=Více než jeden způsob na kůži kočky.
+tc.research_page.ALCHEMICALMANUFACTURE.1=Zvládl jsi základy alchemie a alchymystické duplikace a ted jsi přípraven na vyzkoušení, vytvoření více složitejší látky z nuly.<BR>Ty jsi zformulovar několik receptů jejiž vytvoření je normálně težké získat látkami a předměty přes alchemyi.
+#
+tc.research_name.ENTROPICPROCESSING=Entropické Zpracování
+tc.research_text.ENTROPICPROCESSING=Dělá věci horší?
+tc.research_page.ENTROPICPROCESSING.1=Zatímco vytváření magických a světských látek je docela uspokojující, někdy potřebuješ rozbít věci v jejích jednotlivé části. Co je jednoduší než přidání enthropické energie na věci?<BR>Aktuálně je, tady několik důvodů proč je tohle špatný nápad, ale co je pokrok bez nějakého risku?
+#
+tc.research_name.TRANSIRON=Kovová Proměna
+tc.research_text.TRANSIRON=Proměnění kovu v železo 
+tc.research_page.TRANSIRON.1=Objevil jsi způsob jak znásobit železo máčením železných nugetů v §5metallum§0 získaného z ostatních kovů.
+#
+tc.research_name.TRANSGOLD=Zlatá Proměna
+tc.research_text.TRANSGOLD=Proměna kovu v zlato
+tc.research_page.TRANSGOLD.1=Objevil jsi způsob jak znásobit zlato máčením zlatých nugetů v §5metallum§0 získaného z ostatních kovů.
+#
+tc.research_name.TRANSCOPPER=Mědená Proměna
+tc.research_text.TRANSCOPPER=Proměna kovu v měd
+tc.research_page.TRANSCOPPER.1=Objevil jsi způsob jak znásobit měd máčením měděných nugetů v §5metallum§0 získaného z ostatních kovů.
+#
+tc.research_name.TRANSTIN=Cínová Proměna
+tc.research_text.TRANSTIN=Proměna kovu v cín
+tc.research_page.TRANSTIN.1=Objevil jsi způsob jak znásobit cín máčením cínových nugetů v §5metallum§0 získaného z ostatních kovů.
+#
+tc.research_name.TRANSSILVER=Stříbrná proměna
+tc.research_text.TRANSSILVER=Proměna kovu v stříbro
+tc.research_page.TRANSSILVER.1=Objevil jsi způsob jak znásobit stříbro máčením stříbrných nugetů v §5metallum§0 získaného z ostatních kovů.
+#
+tc.research_name.TRANSLEAD=Olověná Proměna
+tc.research_text.TRANSLEAD=Proměna kovu v olovo
+tc.research_page.TRANSLEAD.1=Objevil jsi způsob jak znásobit olovo máčením olověných nugetů v §5metallum§0 získaného z ostatních kovů.
+#
+tc.research_name.PUREIRON=Očištění Kovu
+tc.research_text.PUREIRON=Očištění kovu na domácí trs
+tc.research_page.PUREIRON.1=Domácí trsy jsou vzácnou koncetrací kovů v její nejčistčí formě. Objevil jsi způsob jak očitit a koncetrovat normální železnou rudu v domácí železný trs.<BR>Když roztavíte tychle trsy získáte dvakrát větší množství železných ingotů než normálně.
+#
+tc.research_name.PUREGOLD=Očištení Zlata
+tc.research_text.PUREGOLD=Očištění zlata na domácí trs
+tc.research_page.PUREGOLD.1=Domácí trsy jsou vzácnou koncetrací kovů v její nejčistčí formě. Objevil jsi způsob jak očitit a koncetrovat normální zlatou rudu v domácí zlatý trs.<BR>Když roztavíte tychle trsy získáte dvakrát větší množství zlatých ingotů než normálně
+#
+tc.research_name.PURECOPPER=Očištění Mědi
+tc.research_text.PURECOPPER=Očištění mědi na domácí trs
+tc.research_page.PURECOPPER.1=Domácí trsy jsou vzácnou koncetrací kovů v její nejčistčí formě. Objevil jsi způsob jak očitit a koncetrovat normální mědenou rudu v domácí mědený trs.<BR>Když roztavíte tychle trsy získáte dvakrát větší množství mědených ingotů než normálně
+#
+tc.research_name.PURETIN=Očištění Cínu
+tc.research_text.PURETIN=Očištění cínu na domácí trs
+tc.research_page.PURETIN.1=Domácí trsy jsou vzácnou koncetrací kovů v její nejčistčí formě. Objevil jsi způsob jak očitit a koncetrovat normální cínovou rudu v domácí cínový trs.<BR>Když roztavíte tychle trsy získáte dvakrát větší množství cínových ingotů než normálně
+#
+tc.research_name.PURESILVER=Očištění Stříbra
+tc.research_text.PURESILVER=Očištění stříbra na domácí trs
+tc.research_page.PURESILVER.1=Domácí trsy jsou vzácnou koncetrací kovů v její nejčistčí formě. Objevil jsi způsob jak očitit a koncetrovat normální stříbrnou rudu v domácí stříbrný trs.<BR>Když roztavíte tychle trsy získáte dvakrát větší množství stříbrných ingotů než normálně
+#
+tc.research_name.PURELEAD=Očištění Olova
+tc.research_text.PURELEAD=Očištění olova na domácí trs
+tc.research_page.PURELEAD.1=Domácí trsy jsou vzácnou koncetrací kovů v její nejčistčí formě. Objevil jsi způsob jak očitit a koncetrovat normální olověnou rudu v domácí olověný trs.<BR>Když roztavíte tychle trsy získáte dvakrát větší množství olověných ingotů než normálně.
+#
+tc.research_name.TALLOW=Magický Lůj
+tc.research_text.TALLOW=Tavený tuk s nádechem magie
+tc.research_page.TALLOW.1=Zpracováním a zahříváním masa v kotlíku, můžeš vytvořit mystický lůj určený pro mnoho tajmných použití.<BR>Tenhle lůj může být použít na vyrobení svíček. Také je možné vyrobit rozdílné barvy svíček kombinováním svíčky a barviva v tajemném pracovním stole.
+#
+tc.research_name.GOLEMSTRAW=Slaměnní golemové
+tc.research_text.GOLEMSTRAW=Prostí magičtí sluhové
+tc.research_page.GOLEMSTRAW.1=You have discovered the secret of creating golem workers. While the Iron Golem is impressive in its own way, it is very limited and uncontrollable. You have managed to solve both those problems.<BR>Your golem workers have just enough will and self-awareness to make them useful tools, but not enough to render them uncontrollable.<LINE>You have also discovered how to make the §5Golemancer's Bell§0 and §5Golem Animation Cores§0 (see their respective research entries for more detail).
+tc.research_page.GOLEMSTRAW.2=The golem you craft can be placed in the world, but will remain inactive until given an animation core.<BR>The placement of the golem needs to be considered carefully - if you wish it to interact with inventories, you will need to place it by clicking (or shift-clicking) on the inventory on the side you wish it to interact with.<BR>Most golems can operate in a range of 16 blocks around their home location.
+tc.research_page.GOLEMSTRAW.3=The first golem you can create is made from bundles of hay and straw. It is physically weak and easy to destroy, but very light and nimble.<BR>§l§nStraw Golem Attributes§r<BR>§lDurability:§r Very Low<BR>§lStrength:§r Very Low<BR>§lSelf-repair:§r Average<BR>§lCarry Limit:§r 1<BR>§lSpeed:§r Fast<BR>§lUpgrades:§r 1
+#
+tc.research_name.GOLEMWOOD=Dřevění golemové
+tc.research_text.GOLEMWOOD=Jak může dřevěný golem který seká dřevo kácet tolik dřeva?
+tc.research_page.GOLEMWOOD.1=Tenhle golem je vytesán z greatwood polena. Je to mírné vylepšení oproti slaměnému golemovi.<BR>§l§nVlastnosti Dřevěného Golema§r<BR>§lTrvanlivost:§r Podprůměrná<BR>§lSíla:§r malá<BR>§lSamo-oprava:§r Průměrná<BR>§lNosící limit:§r 4<BR>§lRychlost:§r Nadpůměrná<BR>§lUpgrady:§r 1
+#
+tc.research_name.GOLEMTALLOW=Lojový golemové
+tc.research_text.GOLEMTALLOW=Udržuj je od otevřeného ohně
+tc.research_page.GOLEMTALLOW.1=Tenhle pokročilý golem je pouze okrajove lepší než jílový golem, ale je schopný uchovat dva upgrady.<BR>§l§nVlastnosti Lojového Golema§r<BR>§lTrvanlivost:§r Průměrná<BR>§lSíla:§r Průměrná<BR>§lSamo-oprava:§r Průměrná<BR>§lNosící limit:§r 8<BR>§lRychlost:§r Průměrná<BR>§lUpgrady:§r 2
+#
+tc.research_name.GOLEMCLAY=Jílový golemové
+tc.research_text.GOLEMCLAY=Tvrdý a odolný
+tc.research_page.GOLEMCLAY.1=Vypálený jíl je prokazatelně lepší řemeslný materiál pro golemy. Je ohni odolný a má více než adekvátní pohyblivost.<BR>§l§nVlastnosti Jílového Golema§r<BR>§lTrvanlivost:§r Průměrná<BR>§lSíla:§r Průměrná<BR>§lSamo-oprava:§r Pomalá<BR>§lNosící limit:§r 8<BR>§lRychlost:§r Průměrná<BR>§lUpgrady:§r 1
+#
+tc.research_name.GOLEMFLESH=Masový golemové
+tc.research_text.GOLEMFLESH=Ono to žíje!
+tc.research_page.GOLEMFLESH.1=Zatímco děsiví, golemové vyrobní z zombího masa mají několik funkcí které lze doporučit. Není to pouze rychlá oprava sebe, je to možnost uchovat dva upgrady.<BR>§l§nVlastnosti masového golema§r<BR>§lTrvanlivost:§r Nízká<BR>§lSíla:§r Nízká<BR>§lSamo-oprava:§r Velmi Rychlá<BR>§lnosící Limit:§r 4<BR>§lRychlost:§r Nadprůměrná<BR>§lUpgrady:§r 2
+#
+tc.research_name.GOLEMSTONE=Kamenní golemové
+tc.research_text.GOLEMSTONE=Silný, ale pomalý
+tc.research_page.GOLEMSTONE.1=Kamení golemové jsou velmi trvanlivý a schopní unést těžké náklady,ale jsou mnohem pomalejší než většina ostatních golemů. Jejich hmotnost jím umožnuje potopit se v vodě.<BR>§l§nVlastnotí Kameného Golema§r<BR>§lTrvanlivost:§r Nadpůměrná<BR>§lSíla:§r Nadpůměrná<BR>§lSamo-oprava:§r Pomalá<BR>§lNosící Limit:§r 16<BR>§lRychlost:§r Pomalá<BR>§lUpgrady:§r 1
+#
+tc.research_name.GOLEMIRON=Železní golemové
+tc.research_text.GOLEMIRON=Jako vesničtí golemové, pouze menší... a lepší
+tc.research_page.GOLEMIRON.1=Železní golemové jsou extrémně tvrdí a silní, aby unesli obrosvké náklady. Jejich váha nicméně způsobuje že se pohybují docela pomalu a potápí se v vodě.<BR>§l§nVlastností Železného Golema§r<BR>§lTrvanlivost:§r Vysoká<BR>§lSíla:§r Vysoká<BR>§lSamo-oprava:§r Velmi pomalá<BR>§lnosící Limit:§r 32<BR>§lRychlost:§r Velmi pomalá<BR>§lUpgrady:§r 1
+#
+tc.research_name.GOLEMTHAUMIUM=Thaumičtí golemové
+tc.research_text.GOLEMTHAUMIUM=Mystičtí poskoci
+tc.research_page.GOLEMTHAUMIUM.1=Thaumičtí golemová mají lehce lepší vlastnosti než železní golemové a jsou schopni uchovat dva upgrady. Také jsou velmi odolní proti magickému požkození. Jejich váha jim dovoluje plavat v vodě.<BR>§l§nVlastnosti Thaumického Golema§r<BR>§lTrvanlivost:§r Velmi vysoká<BR>§lSíla:§r Vysoká<BR>§lSamo-oprava:§r Pomalá<BR>§lNosící Limit:§r 32<BR>§lRychlost:§r Pomalá<BR>§lUpgrady:§r 2
+#
+tc.research_name.GOLEMBELL=Golemancerův Zvonek
+tc.research_text.GOLEMBELL=Věnuj pozornost
+tc.research_page.GOLEMBELL.1=Golemové jsou notoricky špatní při následováni slovních rozkazů, ale tenhle zvonek umožní temu všemu předejít.<BR>Jednoduše pravím kliknutím na golema jej vyber. Jakmile je tohle hotové, svítící kruh začně ukazovat golemovův 'domov', místo a na straně kam je připojen.<BR> Těd můžes kliknout pravým kdekoliv v světe pro spojení golema s bloky, místy nebo úložištěmi s kterými mohou pracovat. Kliknutí na stejné místo, jej odznačí, nebo bude prohazovat různé barvy, pokud je golem schopný pracovat s různobarevníma značkama.
+tc.research_page.GOLEMBELL.2=<BR>Shift + pravé-tlačítko na označenou lokaci, ji vždy vyčistí a stiknutím F, vyčístí všechny označené lokace.<LINE>Levé-kliknutí na golema s zvonkem, mu sebere všechny jeho aktuální upgrady a nastavení neporuší. Shift + levé-kliknutí sebere golema, ale odstanění jádra a jakýkoliv upgradů připojených, vypadnou zvlášst. Tady je dobrá šance že tyhle upgrady ztratíce, pokud to bude dělat. 
+#
+tc.research_name.COREGATHER=Jádro Golema: Sbírej
+tc.research_text.COREGATHER=Sbírání věcí co hodíš na zem
+tc.research_page.COREGATHER.1=Golem Animations cores are used to give your golems purpose - without a core they remain inanimate.<BR>The first such core you are able to create is the §5Gather§0 core.<BR>Golems fitted with this core will seek dropped items within 16 blocks, pick them up and then place them inside an attached inventory. If they are not attached to an inventory they will simply hold on to them.<BR>If you right click on the golem you will be able to set specific items they should pick up - all others will be ignored.
+tc.research_page.COREGATHER.2=Simply right-click on a freshly placed golem with a core to attach it to the golem. 
+#
+tc.research_name.COREEMPTY=Jádro Golema: Vyprázdni
+tc.research_text.COREEMPTY=Moving things somewhere else
+tc.research_page.COREEMPTY.1=Golems fitted with this core will remove items from an attached inventory and take them to the marked location. If the marked location is a container, they will place it inside.<BR>If you wish, you can specify what items should be removed from the inventory by accessing the golems interface. All other items will be ignored.
+#
+tc.research_name.COREUSE=Jádro Golema: Použij
+tc.research_text.COREUSE=Clickety click
+tc.research_page.COREUSE.1=Like the Empty core, golems fitted with this core will remove items from an attached inventory, but instead of placing it in an inventory or dropping it in world, they will attempt to use it on a target block or location.<BR>They will attempt to use the item as if they are a player right-clicking or left-clicking on the target block or location with the item - you can specify which.<BR>If you wish, you can specify what items should be removed from the inventory by accessing the golems interface. All other items will be ignored.
+tc.research_page.COREUSE.2=If the golem is not attached to an inventory, it will attempt to perform its actions with an empty hand instead - simply clicking on the target as instructed.<LINE>You are able to tell the golem how to 'click' on something - apart from just telling it to left or right click you can also instruct it to be sneaking while doing so.<BR>You can also instruct it to only click on empty air instead of a block.
+tc.research_page.COREUSE.3=      §nAir Upgrade Unlocked§r<IMG>thaumcraft:textures/items/golem_upgrade_air.png:0:0:255:255:0.0625</IMG>This upgrade will increase the speed at which the golem is able to click the target block or space.
+#
+tc.research_name.COREFILL=Jádro Golema: Naplň
+tc.research_text.COREFILL=Keeping an inventory supplied
+tc.research_page.COREFILL.1=Golems fitted with this core will examine inventories you have marked for certain items, and place them in their home inventory.<BR>There are two modes of operation:<BR>In §5Precise Amount§0 mode the golem will fill its home inventory with the specified items until it contains an amount equal to the amount you specified in its interface.<BR>In §5Any Amount§0 mode the golem will keep filling the current inventory with the specified items as long as there is room and available items.
+#
+tc.research_name.COREHARVEST=Jádro Golema: Sklízej
+tc.research_text.COREHARVEST=Animated Farmer
+tc.research_page.COREHARVEST.1=Golems fitted with this core need not be attached to an inventory. They seek out fully grown crops, reeds and other commonly farmed plants within a small radius and harvest them. The harvested material simply drops to the ground and must be gathered by some other means.<BR>Unfortunately they are not smart enough to replant the crops they have harvested, but you are sure with a bit of work you might be able to eventually fix that bug.
+tc.research_page.COREHARVEST.2=     §nOrder Upgrade Unlocked§r<IMG>thaumcraft:textures/items/golem_upgrade_order.png:0:0:255:255:0.0625</IMG>Harvest golems fitted with this upgrade will now attempt to replant the crop they just harvested. This could fail if the plant failed to drop the proper seed or seedling.
+#
+tc.research_name.CORELUMBER=Jádro Golema: Sekat
+tc.research_text.CORELUMBER=Animated lumberjack
+tc.research_page.CORELUMBER.1=Like Harvester golems, Lumberjack golems can be placed anywhere. They will seek out nearby trees and chop them down. Stronger golems will chop them down faster.<BR>Lumberjack golems do not replant the trees they have chopped down.
+#
+tc.research_name.COREGUARD=Jádro Golema: Stráž
+tc.research_text.COREGUARD=Guarding your valuables
+tc.research_page.COREGUARD.1=Golems fitted with this core act as guards, attacking any hostile creatures within range.<BR>You are sure with a little bit of tinkering you could make the golem a bit more selective with the targets it attacks, but for now it only seeks out aggressive mobs other than creepers.
+tc.research_page.COREGUARD.2=     §nOrder Upgrade Unlocked§r<IMG>thaumcraft:textures/items/golem_upgrade_order.png:0:0:255:255:0.0625</IMG>If you fit this upgrade you can specify the types of creatures the golem will attack. The golem will also be able to attack more than just hostile entities.
+#
+tc.research_name.COREBUTCHER=Jádro Golema: Řezník
+tc.research_text.COREBUTCHER=Bloody to the armpits
+tc.research_page.COREBUTCHER.1=This core is a refinement of the standard Guard core.<BR>A golem fitted with this core will only attack animals, but it is intelligent enough to only attack the oldest, fully grown adults and always make sure that a breeding pair remains.
+#
+tc.research_name.CORELIQUID=Jádro Golema: Stáčej
+tc.research_text.CORELIQUID=Keeping a tank filled with liquid
+tc.research_page.CORELIQUID.1=Golems fitted with this core will attempt to keep the liquid inventory they are attached to filled with an appropriate liquid.<BR>If you wish, you can specify what liquid it places in the tank by accessing the golems interface and placing a liquid container (like a filled bucket) in a slot. All other liquids will be ignored.<BR>A decanting golem can only carry 100mb of liquid per item its material type is normally allowed to carry, though they will always carry a full buckets worth if instructed to pick up liquids blocks in the world.
+tc.research_page.CORELIQUID.2=    §nEntropy Upgrade Unlocked§r<IMG>thaumcraft:textures/items/golem_upgrade_entropy.png:0:0:255:255:0.0625</IMG>If you fit this upgrade the golem will first try and pick up the furthest possible fluid block attached to any you have marked. This will allow it to empty pools of liquid and not just the one block you marked.<BR>It will only search as far as its sight range allows, and the distance is measured in actual blocks searched to get to the target block and not a straight line.
+#
+tc.research_name.CORESORTING=Jádro Golema: Třiď
+tc.research_text.CORESORTING=Keeping things in order
+tc.research_page.CORESORTING.1=This core works much like an Empty core with one key difference: It only takes an item from its home inventory if it already exists in one of its marked inventories. This makes it exceedingly useful to sort unordered items in a container into their proper places.<BR>You cannot specify specific items to include or exclude like you can with the normal Empty core.
+#
+tc.research_name.COREFISHING=Jádro Golema: Rybař
+tc.research_text.COREFISHING=Sea shanties sold separately
+tc.research_page.COREFISHING.1=This core allows a golem to fish for your supper.<BR>For best results the golem needs to be placed near deep and open water.<BR>Golem strength determines fishing speed.<BR>
+tc.research_page.COREFISHING.2=      §nAir Upgrade Unlocked§r<IMG>thaumcraft:textures/items/golem_upgrade_air.png:0:0:255:255:0.0625</IMG>A fishing golem fitted with this upgrade has a small chance of catching more than one thing at a time.
+tc.research_page.COREFISHING.3=      §nFire Upgrade Unlocked§r<IMG>thaumcraft:textures/items/golem_upgrade_fire.png:0:0:255:255:0.0625</IMG>A fishing golem fitted with this upgrade will automatically cook any fish it catches.
+tc.research_page.COREFISHING.4=     §nOrder Upgrade Unlocked§r<IMG>thaumcraft:textures/items/golem_upgrade_order.png:0:0:255:255:0.0625</IMG>Order upgrades will increase the chance of getting good fishing results.
+tc.research_page.COREFISHING.5=    §nEntropy Upgrade Unlocked§r<IMG>thaumcraft:textures/items/golem_upgrade_entropy.png:0:0:255:255:0.0625</IMG>Entropy upgrades will reduce the chance of getting bad fishing results.
+#
+tc.research_name.COREALCHEMY=Jádro Golema: Alchymistické
+tc.research_text.COREALCHEMY=Moving essentia around
+tc.research_page.COREALCHEMY.1=This core is a specialized version of a decanting core, specifically designed to transport essentia.<BR>Alchemy golems assigned to an alchemy furnace or alembic it will draw essentia from the entire stack of alembics and transport it to marked warded jars. It is not required to mark every single jar - the golem will automatically fill all jars adjacent to the marked jar and all other similarly connected jars.<BR>Alchemy golems prioritize nearby jars first and will try to fill an entire jar before starting on a new one.
+tc.research_page.COREALCHEMY.2=They will also favor labeled jars over unlabeled ones. If there are full void jars they will try and fill normal jars first, unless the void jar is labeled. In the case of ties void jars are always filled last.<BR>Alchemy golems can also transport essentia between most other essentia storage containers and blocks that accept essentia.
+#
+tc.research_name.UPGRADEAIR=Golem Upgrade: Vzduch
+tc.research_text.UPGRADEAIR=Udělá tvého golem rychlejším
+tc.research_page.UPGRADEAIR.1=Jakmile je tenhle upgrade připevněn na golemovi zvyšuje mu pohyblivost a rozmezí útočné rychlosti.<BR>Určitá jádra golemů mohou těžit z tehohle upgradu v jiných směrech, takže možná si budeš přát zkontrolovat další stránky které byly přidány do zápisků thaumonomiconu.
+#
+tc.research_name.UPGRADEEARTH=Golem Upgrade: Země
+tc.research_text.UPGRADEEARTH=Udělá tvého golema silnějším
+tc.research_page.UPGRADEEARTH.1=This upgrade will increase the amount of items your golem can carry at a time. Each upgrade increases the limit by between 4 and 16 (dependent on the golems base carry limit).<BR>It also increase its physical damage and how quickly it harvests materials or performs tasks dependent on brute strength.<BR>Specific golem cores might benefit from this upgrade in other ways, so you might wish to check if additional pages were added to their Thaumonomicon entry.
+#
+tc.research_name.UPGRADEFIRE=Golem Upgrade: Oheň
+tc.research_text.UPGRADEFIRE=Udělá tvého golema, vše zapalujícího
+tc.research_page.UPGRADEFIRE.1=This upgrade increases the interface inventory of a golem, allowing more items to be filtered or sorted. The number of slots added depends on the base number of slots they usually possess.<BR>The golem's melee attacks also sets its target on fire.<BR>Specific golem cores might benefit from this upgrade in other ways, so you might wish to check if additional pages were added to their Thaumonomicon entry.
+#
+tc.research_name.UPGRADEWATER=Golem Upgrade: Voda
+tc.research_text.UPGRADEWATER=Udělá tvého golem více vnímavého
+tc.research_page.UPGRADEWATER.1=This upgrade increases the visual range of most golems allowing them to travel further afield to perform their tasks.<BR>It also increases the range and accuracy of ranged attacks.<BR>Specific golem cores might benefit from this upgrade in other ways, so you might wish to check if additional pages were added to their Thaumonomicon entry.
+#
+tc.research_name.UPGRADEORDER=Golem Upgrade: Order
+tc.research_text.UPGRADEORDER=Udělá tvého golema organizováného
+tc.research_page.UPGRADEORDER.1=This upgrade allows golems to specify different colors for blocks marked with the Golemancer's Bell. This allows for greater control over what they do and where they do it.<BR>This upgrade also unlocks certain features of some golem cores giving them a greater scope of operation.<BR>Specific golem cores might benefit from this upgrade in other ways, so you might wish to check if additional pages were added to their Thaumonomicon entry.
+#
+tc.research_name.UPGRADEENTROPY=Golem Upgrade: Entropy
+tc.research_text.UPGRADEENTROPY=Udělá tvého golema pichlavého... a chlupatého
+tc.research_page.UPGRADEENTROPY.1=Golems fitted with this upgrade automatically inflicts damage on anything damaging them.<BR>Golems with this upgrade will also have more control over what items they are looking for. You will be able to make them use or ignore damage values, NBT data or even check the ore dictionary to find similar items.<BR>Specific golem cores might benefit from this upgrade in other ways, so you might wish to check if additional pages were added to their Thaumonomicon entry.
+#
+tc.research_name.TINYHAT=Maličké Klobouky
+tc.research_text.TINYHAT=Udržuje slunce na uzdě
+tc.research_page.TINYHAT.1=Tyhle maličké klobouky jsou perfektniím doplňkem pro každého golema. Nejen že je stylový a elegantní, ale každý golem který jej má, má zvýšené zdraví a vitalitu.
+#
+tc.research_name.TINYFEZ=Maličké Fezy
+tc.research_text.TINYFEZ=...jsou cool taky
+tc.research_page.TINYFEZ.1=Tahle podivná pokrývka hlavy... zdá se že jakýkoliv golem ji nosí má zvýšenou neobvyklou vitalitu, což mu umožnuje opravovat si požkození mnohem rychlejším tempem.
+#
+tc.research_name.TINYBOWTIE=Maličcí Motýlci
+tc.research_text.TINYBOWTIE=...jsou cool
+tc.research_page.TINYBOWTIE.1=Povinost pro každého golema na cestách, tenhle motýlek jej naplní dodatečnou energií, zvyšující tempo(krok).
+#
+tc.research_name.TINYGLASSES=Maličké Brýle
+tc.research_text.TINYGLASSES=Lépe tě s tím vídím
+tc.research_page.TINYGLASSES.1=Golemové jsou notoricky krátkozraký, a tyhle brýle zmírní tu sladobost do určité míry.
+#
+tc.research_name.TINYDART=Golemův šípomet
+tc.research_text.TINYDART=Malé ale špičaté
+tc.research_page.TINYDART.1=Tenhle šípomet může být pouze připevněn na bojové golemy. Není to tak silné jako golemův hlavní útok, ale dává golemům omezené prostředky na boj na blizko, rozumějí útočení z dosahu.
+#
+tc.research_name.TINYVISOR=Golem Visor
+tc.research_text.TINYVISOR=Thank you for your cooperation
+tc.research_page.TINYVISOR.1=This metal visor will grant a combat golem a small amount of additional armor protection. It will also insure that any foes attacked by the golem will drop experience orbs when they die.
+#
+tc.research_name.TINYARMOR=Golemovo Železné Plátováni
+tc.research_text.TINYARMOR=Tvrdý oříšek na rozbití
+tc.research_page.TINYARMOR.1=Nošení obrněného plátování zaručuje golemovi zvyšený odpor proti fyzické újmě. Naneštěstí další ochrana něco stojí, jako všichni težcí železolemové bude tenhle pomalejší.
+#
+tc.research_name.TINYHAMMER=Golemův Palcát
+tc.research_text.TINYHAMMER=Je čas udeřit!
+tc.research_page.TINYHAMMER.1=Tahle zbraň zvyšuje poškození které golem může dát při boji na blízko.
+#
+tc.research_name.DISTILESSENTIA=Essentia Distillation
+tc.research_text.DISTILESSENTIA=Harvesting essentia
+tc.research_page.DISTILESSENTIA.1=In the future you will definitely need to have ready access to multiple different kinds of aspects - not just primal aspects drawn from your wand.<BR>Using basic alchemical principles you have devised a way to break down objects and convert them into essentia.<BR>The first step in this process requires an §lAlchemical Furnace§r. The alchemical furnace works much like a normal furnace by burning coal to produce heat, but instead of smelting ore into metal, it breaks down objects into a slurry of raw, unprocessed essentia.
+tc.research_page.DISTILESSENTIA.2=The next step in the process is to take the essentia slurry and distill it using an §lArcane Alembic§r.<BR>To work, arcane alembics need to be placed on top of an alchemical furnace. The essentia slurry will slowly be drawn into the alembic and the individual aspected essentia separated out.<BR>If the alchemical furnace is being powered by alumentum, this distillation process is much faster.<BR>You can stack up to 5 different alembics on top of a single furnace.<BR>The essentia can then be extracted out of an alembic using phials.
+#
+tc.research_name.JARLABEL=Warded Jars and Labels
+tc.research_text.JARLABEL=Storing and organizing essentia
+tc.research_page.JARLABEL.1=Essentia can be stored in §lWarded Jars§r.<BR>Warded jars can be placed in world and is able to store essentia virtually indefinitely. The enchantment placed on the jars also makes adding or extracting essentia a breeze.<BR>Jars can be filled from an alembic by clicking with the jar directly on the alembic. They can also be filled and emptied using phials.<BR>What is more they make an excellent storage medium for jams and preserves.
+tc.research_page.JARLABEL.2=Shift clicking on jars and alembics with an empty hand will empty them.<BR>As long as a jar contains some essentia, you can attach a §lJar Label§r to it.<BR>This label will 'lock' the jar to that type of essentia and it will not be able to accept any other kind of essentia.<BR>You can remove a label by shift clicking with an empty hand on the side of the jar containing the label. Take care not to shift click on any other side as it will empty the jar as normal.
+tc.research_page.JARLABEL.3=You can place a label in a crafting bench with a phial of essentia to assign an aspect to it and when placed on an empty jar it will automatically lock the jar to that aspect. The essentia used in the recipe is not consumed.<BR>Placing it on a filled jar will change the label to the jar's essentia type.<LINE>A label can be made blank again by simply placing it by itself in a crafting grid.
+#
+tc.research_name.INFERNALFURNACE=Pekelná pec
+tc.research_text.INFERNALFURNACE=Dostatečně horké?
+tc.research_page.INFERNALFURNACE.1=By harnessing raw §cIgnis§0 within a furnace crafted from obsidian and netherbrick you have created a highly efficient and fuel free furnace. So efficient in fact, that occasionally it will produce bonus materials in the form of nuggets or other items.<BR>While this is essentially free, it is also very slow unless the furnace gets a new supply of §cIgnis§0 essentia or vis every now and again. This can be done by any methods you have discovered so far, or still will discover.
+tc.research_page.INFERNALFURNACE.2=It should also be noted that the occasional bit of Flux escapes into the environment.<BR>Items you wish to smelt needs to be dropped into the top of the furnace and will be spit out the front.
+#
+tc.research_name.BELLOWS=Tajemné Měchy
+tc.research_text.BELLOWS=Stoking the flames
+tc.research_page.BELLOWS.1=The Arcane Bellows performs much the same function as its mundane counterpart, the only difference is that it happily pumps away by itself sending forth a stream of never-ending air.<BR>Attaching it to an Infernal Furnace has shown some interesting results. The elemental infused air not only stokes the flames increasing its smelting speed, but causes them to burn much purer, resulting in a reduction of flux generated and increasing the chance of creating bonus nuggets and other materials when smelting.
+tc.research_page.BELLOWS.2=They can also be attached to normal or alchemical furnaces to increase their speed.<BR>It is also possible to attach them to crucibles to reduce the time it takes for their water to boil.<BR>Bellows can be deactivated by applying a redstone signal.<BR>You are confident more uses will reveal themselves eventually. 
+#
+tc.research_name.ARCANESTONE=Tajemný kámen
+tc.research_text.ARCANESTONE=Magicky posílený stavební materiál
+tc.research_page.ARCANESTONE.1=Tajemný kámen je základní stavební materiál pro mnoho komplikovaných mystických konstrukcí. Je to normální kámen který může být ožehnut elementem ohně a posílen elementem země.
+#
+tc.research_name.INFUSION=Infusion
+tc.research_text.INFUSION=Mystical fusion
+tc.research_page.INFUSION.1=Arcane crafting and alchemy can go only so far. Something better is needed to create truly powerful mystical objects.<BR>Infusion crafting is the process of infusing a single object with magical energy and the properties of other objects. You could, for example, infuse a stone with §6Aer§0 vis and a feather and it would result in a very light stone.<BR>As is usual with thaumaturgy, things are not quite that simple. To even get started with infusion crafting there are several things you need: A Runic Matrix, arcane pedestals and a ready supply of magic in the form of essentia. 
+tc.research_page.INFUSION.2=Once you have your Runic Matrix properly placed into a structure commonly known as an Infusion Altar, you can begin to craft.<BR>The central pedestal located under the matrix is where the item you wish to infuse will go. You will also need several more pedestals placed around the altar where you can place the blocks and items you wish to infuse into the target object. Lastly you will need warded jars or similar essentia containers holding the requisite amount of vis.<BR>Once all this is gathered you can click on the Runic Matrix with a wand to start the crafting process.<BR>During the first stage of crafting essentia will be drained
+tc.research_page.INFUSION.3=from nearby sources. Crafting will stall of there is insufficient essentia available - something that you do not want as will be explained on following pages.<BR>Once all the required essentia has been infused into the target object, the other objects will have their essential essence drained. Only when this is done will the crafting process complete.<LINE>Infusion crafting is not without risks. The entire process involves forcing vast energies into a single object. Unpredictable things tend to happen.<BR>Usually one of the fusion objects get
+tc.research_page.INFUSION.4=knocked off a pedestal, or flux gets generated, but more catastrophic events are not unheard of.<BR>The longer crafting continues due to unresolved problems like lack of vis or dropped items, the greater the chance of something bad happening.<BR>These effects can be reduced by various means. Firstly you wish to keep the entire fusion structure as symmetrical as possible - take careful note of where you place pedestals and make sure they are balanced with other pedestals on the opposite side of the altar. When placing fusion items into them you may wish to keep them balanced as well. Lastly you can place occult paraphernalia around the  
+tc.research_page.INFUSION.5=altar in symmetrical formations (things like candles, skulls, crystals, etc.). These will have the effect of reducing instability.<IMG>thaumcraft:textures/misc/research5.png:128:0:128:136:1</IMG>
+#
+tc.research_name.JARBRAIN=Mozek v sklenici
+tc.research_text.JARBRAIN=Sealing in the foulness
+tc.research_page.JARBRAIN.1=- Throw one rotten zombie brain into a jar.<BR>- Add some spider eyes and water.<BR>- Stir gently with your wand while thinking dark thoughts.<BR>If you follow the recipe exactly you should now have a partially animated and fully malicious zombie brain.<BR>It retains some of the hunger it possessed as a zombie and while it cannot consume brains, it still enjoys eating the thoughts and experiences of those slain nearby. Giving its jar a good shake will make it surrender some of its ill-gotten gains for your own use.<BR>Particle effects will be displayed above the jar when it is full.
+#
+tc.research_name.HOVERHARNESS=Thaumostatic Harness
+tc.research_text.HOVERHARNESS=Is it a bird?
+tc.research_page.HOVERHARNESS.1=You have finally managed to unlock the secret of flight. You have created a harness that anchors itself to the Thaumic Field using thaumostatic energy allowing you to defy gravity. You think quantum's and quarks might also be involved somehow.<BR>Unusually the only vis required to power this harness is added during its creation process. Instead the fuel it requires for flight is raw Potentia. Simply right click while holding the harness to insert filled jars.<BR>Pressing 'H' while wearing the harness activates or deactivates it.
+tc.research_page.HOVERHARNESS.2=While active the harness will constantly use Potentia.<BR>It can be enchanted with the Haste enchant to increase the speed at which you move while flying.<BR>The harness will not reduce your block breaking speed while you are flying with it.
+#
+tc.research_name.HOVERGIRDLE=Thaumostatický opasek
+tc.research_text.HOVERGIRDLE=Je to letadlo?
+tc.research_page.HOVERGIRDLE.1=This girdle is designed to be used with the Thaumostatic Harness. On its own it has very little lifting power - it has just enough to prevent most fall damage.<BR>When worn with the harness however it greatly increases the speed at which you are able to fly. The only drawback is that the harness will consume slightly more fuel than normal.
+#
+tc.research_name.ADVANCEDGOLEM=Pokročilý Golemové
+tc.research_text.ADVANCEDGOLEM=Maybe I should think this through...
+tc.research_page.ADVANCEDGOLEM.1=You have discovered a way of improving golems in several minor, but significant ways.<BR>Firstly, golems that go through this process are able to hold one additional upgrade, though they can never have more than two upgrades of a single type.<BR>Secondly, they move slightly faster.<BR>Thirdly, they have a slightly greater sight radius.<BR>You are sure the malevolent intent in their eyes is just your imagination.  
+#
+tc.research_name.ARCANEBORE=Arcane Bore
+tc.research_text.ARCANEBORE=Mining evolved
+tc.research_page.ARCANEBORE.1=You have discovered a device capable of extending the range and power of an Excavation focus. Of even greater use is the fact that the machine can do so without your constant supervision. You merely need to place it on a specially constructed base, point it in the right direction with a wand and apply a redstone signal.<BR>The arcane bore requires two things to function. The first is an excavation focus placed in its leftmost inventory slot. Any enchantments applied to the focus will also alter the functions of the bore. 
+tc.research_page.ARCANEBORE.2=Secondly you need to place any kind of pickaxe into the rightmost slot. The material of the pickaxe will have little effect on the operation of the bore, but the greater its durability, the longer it will last. Like the wand, any enchantments or special abilities of the pickaxe will also be applied to whatever the bore mines.<BR>An arcane bore can only be placed above or below an arcane bore base. Any items mined will be ejected from the base in the direction its nozzle is pointing.<BR>It will eject into an inventory if possible. This direction can be changed with a wand.
+tc.research_page.ARCANEBORE.3=The bore can be powered with §8Perditio§0 essentia or vis which will greatly speed up the rate at which it mines. Vis or essentia can be provided by pipes and/or relays as normal.<BR>One point of §8Perditio§0 essentia will speed the bore for the next 20 blocks mined. Alternatively 5 CV is required per block mined and the bore can accept up to 100 CV per tick.
+#
+tc.research_name.LEVITATOR=Tajemný Levitator
+tc.research_text.LEVITATOR=Next best thing to flying
+tc.research_page.LEVITATOR.1=While not true flight, the Arcane Levitator is the next best thing.<BR>When placed the levitator lifts any item or creature above it up to 10 blocks into the air. A sneaking creature or player will be slowly lowered.<BR>Each levitator placed upon another increases the range at which it can lift entities by 10 blocks, so a stack of 3 can lift entities up to 30 blocks.<BR>Levitators can be deactivated by applying a redstone signal to them.  
+#
+tc.research_name.ARCANEEAR=Tajemné Ucho
+tc.research_text.ARCANEEAR=Šššš, slyšíš něco?
+tc.research_page.ARCANEEAR.1=Tajemné Ucho je zařízení které je schopné zaznamenat zvuk vychazející z blízkych hudebních bloků. Pokud uslyší notu kterou rozpozná, vyšle krátky ruditový signál.<BR>Tajemné Ucho potřebuje být naladěno stejně jako hudební bloky,  tón a nota kterou uslyší závisí na materiálu k( na) kterému je položeno.
+#
+tc.research_name.MIRROR=Mirror Magic
+tc.research_text.MIRROR=Through the looking glass
+tc.research_page.MIRROR.1=You are now able to enchant a pair of magical mirrors that act as doorways to the void between the worlds. Anything shoved (or piped) through one mirror will pass through this realm and emerge from the other mirror - even across dimensional boundaries.<BR>Unfortunately this realm is extremely hostile to mortal creatures like yourself so using these mirrors to transport living creatures is not yet possible.<BR>To link a pair of these magical mirrors you simply need to place one of them in a desired location. You then right-click with a second
+tc.research_page.MIRROR.2=mirror on the one you placed, and the pair will become linked. You may then place the second wherever you wish and items thrown into one will be ejected out the other.<BR>Mirrors can only be linked in pairs, so while both are placed in the world and able to transmit items you cannot link them to another mirror. When you pick up a mirror it will remember the last partner it was linked with, allowing you to easily move it without having to relink it. While one of the paired mirrors is picked up, you may easily relink either of them.
+tc.research_page.MIRROR.3=Transporting items through mirrors places stress on the magical glass and to prevent it from shattering the mirror automatically slows down the rate at which items is spit out the other side. The greater the instability, the more the transfer rate is slowed.<BR>This instability slowly lessens over time, but it can also be negated by relaying §7Ordo§0 vis directly to the mirror.
+#
+tc.research_name.MIRRORHAND=Magické příruční zrcadlo
+tc.research_text.MIRRORHAND=Osobní odraz
+tc.research_page.MIRRORHAND.1=This magical hand mirror functions much the same way as other magical mirrors. You simply push items through the glass and they will pop out at the linked mirror.<BR>Simple right-click while holding the linked hand mirror and you will be able to place any items in your inventory into the looking glass to have them transported.<BR>The hand mirror can be linked to a mirror that is already paired with another.<BR>It should be noted that the hand mirror can only send items, not receive them.
+#
+tc.research_name.NODEJAR=Node v sklenici
+tc.research_text.NODEJAR=For the Thaumaturgist on the go
+tc.research_page.NODEJAR.1=Warded jars have proven themselves capable of storing all manner of mundane and mystical things, and you believe you have discovered another use for them - trapping aura nodes.<BR>By constructing a large version of a jar around a node and enacting the proper mystical formula with your wand, the node will become trapped inside the construct which will quickly shrink to a more manageable size. The jar can then be safely picked up and moved around, but the initial trapping spell does have a very good chance of damaging the node.<BR>The node is also frozen at the state it was in when trapped, and will  
+tc.research_page.NODEJAR.2=never again be able to recharge any vis it was missing.<BR>While trapped the node is kept suspended and will not regenerate vis, nor can vis be drawn from it.<BR>It is possible to free the node from the jar by placing it in the world and clicking on it with a wand. The jar will be destroyed in the process.
+#
+tc.research_name.PAVETRAVEL=Dlažební kámen cestování
+tc.research_text.PAVETRAVEL=Easing your journey
+tc.research_page.PAVETRAVEL.1=By altering the magical structure of arcane stone you are able to create a paving stone that adds new bounce to the step of anyone walking across it.<BR>Anything walking across it will have greater speed and agility for a couple of seconds.
+#
+tc.research_name.PAVEWARD=Dlažební kámen ochrany
+tc.research_text.PAVEWARD=Držení věcí venku
+tc.research_page.PAVEWARD.1=You have discovered a way of turning arcane stone blocks into mystical wards that will prevent most creatures from crossing them.<BR>It should be noted that these wards aren't always 100% foolproof and they cannot prevent other players from entering an area, but they keep most common threats at bay. They will also prevent golems from crossing them.<BR>For best results you need an unbroken line of them between the areas you wish to protect and the outside world.<BR>An active redstone signal will disable this block.
+tc.research_page.PAVEWARD.2=The color of the runes above the paving stone indicates its current status.<BR>Purple runes show that it is currently preventing something from passing through.<BR>Blue runes indicates it has been deactivated with a redstone signal.<BR>Red runes shows that something is preventing it from fully warding an area and a gap exists where something might be able to pass through.
+#
+tc.research_name.WANDPED=Dobíjecí podstavec pro hůlku
+tc.research_text.WANDPED=Automatizované dobíjení hůlky
+tc.research_page.WANDPED.1=Cestování po krajích pro nabití svojí hůlky je stále dobré ale když se, to bude dělat automatickým způsobem, může to být mnohem lepší.<BR>Tenhle speciálně sestrojený podstavec dělá jen to že, jakákoliv hůlka položená na něj začne automaticky nasávat Vis z okolních nodes.<BR>Nody nebudou ůplně vyčerpány, ledaže máš hůlku špatné kvality sestrojenou z železa nebo tyček.
+#
+tc.research_name.WANDPEDFOC=Compound Recharge Focus
+tc.research_text.WANDPEDFOC=For everything a use
+tc.research_page.WANDPEDFOC.1=In your travels you have discovered several nodes that contain compound aspects, but as yet there has been no way to tap this rich source of vis. Until now.<BR>This focus can be placed on top of a wand recharge pedestal which will allow any wand it contains to siphon off the compound vis from nearby nodes. Unfortunately each point of compound vis is broken down into a single point of primal vis and all the excess energy is lost. However it is a good start and you are sure you will discover better ways to access this resource. 
+#
+tc.research_name.ETHEREALBLOOM=Éterický květ
+tc.research_text.ETHEREALBLOOM=Čistící květina
+tc.research_page.ETHEREALBLOOM.1=Třpyt lístek je často zastíněn svým mystickím sousedem Silverwood stromem, ale magické vlastnosti jsou jí vlastní.<BR>Stějně jako Silverwood, Třyptlístkové květiny mají čistící vlastnosti které leží ladem. Ty jsi našel způsob jak tyhle vlastnosti probudit a proměnit ji v Éterický květ.<BR>Éterické květy pomalu, ale jistě , obnovují požkozenou zem mystickímy prostředky do její bývalé slávy - to zahrnuje plíseň, která je známá jako Zhouba. I když nelze bojovat pro nákaze přímo, několik Zhoubných porostů může přežít mimo jejich přirozené prostředí po dlouhou dobu a má tendenci odumírat.
+tc.research_page.ETHEREALBLOOM.2=Květina čístí pouze půdu zalitou jejím světlem, v rozsahu okolo osmi bloků. 
+#
+tc.research_name.PECH=The Pech
+tc.research_text.PECH=Podivná Stvoření
+tc.research_page.PECH.1=Tihle podivní humanoidi mohou být nalezeni kdekoliv je závoj mezi světy nejtenčí. Zdá se že je přitahuje magická energie, kterými oplívají takováto místa.<BR>Nedopusťe aby jejich malá postava vás zmátla. Mají neuvěřitelnou sílu a mnohokrát nesou více než váží.<BR>Pech není normálne agresivní, ale když jej něco podráždí, tak žačne lovit svého útočníka. Za normálních podmínek se lidem vyhýbají za každou cenu.<BR>Pechové jsou notoricky chamtivý, a ukořistí vše co není
+tc.research_page.PECH.2=přibité, ale dávají přednost cenním věcem. Říka se že, pokud pokud krmíte tuto touhu po hmotném bohatsví, můžete se s jedním spřátelit. Poté co se spřátelí, nesou často úžasné předměty s kterými by se mohli být ochotní rozloučit.<BR>Je třeba poznamenat že takové 'přátelství' zřídka kdy trvá dlouho.<BR><IMG>thaumcraft:textures/misc/research5.png:128:136:112:120:.75</IMG>
+#
+tc.research_name.INFUSIONENCHANTMENT=Infusion Enchantment
+tc.research_text.INFUSIONENCHANTMENT=Enchanting with Essentia
+tc.research_page.INFUSIONENCHANTMENT.1=For ages now wizards and thaumaturges have been enchanting weapons, tools and armor by imbuing objects with their own life energy. While effective the process is tedious and the results are completely unpredictable. Your discovery of infusion crafting might have uncovered a solution to both those problems.<BR>You have discovered a way to enchant objects with an infusion altar. Simply place the item you wish to enchant on the central pedestal and supply the proper ingredients and essentia. 
+tc.research_page.INFUSIONENCHANTMENT.2=It also requires some life essence in the form of experience, but much less than would be normally required to enchant something. This experience is drawn from anyone near the infusion altar so care should be taken.<BR>The essentia and experience costs listed in following recipes are for the first level of enchantment. To enchant an item to higher levels, simply perform the infusion process again - it can be repeated till the required enchantment has reached its maximum possible level. Essentia and experience cost are multiplied by the level of enchantment you are performing, so a level II enchant costs twice as much as a level I.
+tc.research_page.INFUSIONENCHANTMENT.3=Additional costs might is also required if the item already contains enchants other than the one you are currently performing. This cost is usually around 10% per level of enchantment. So enchanting a sword with Fire Aspect I that already contains Smite III will cost 30% more.<BR>Instability also increases as the total number of enchantments on the object increases.<BR>Enchanting items with an infusion altar follows the normal rules for enchantment as it applies to what enchants can combine with others.
+#
+tc.research_name.ARCANELAMP=Tajemná Lampa
+tc.research_text.ARCANELAMP=Velký zdroj světla
+tc.research_page.ARCANELAMP.1=Tahle mystická lampa může být umístěna na zdi, podlahy nebo stropy a poskytne silné a stabilní světlo.<BR>Dodatečné zdroje světla mohou také až o 16 bloků dál, kdekoliv světelná úroveň klesne pod přijatelnou 'bezpečnou' úroveň. Pomatuj: Pouze TY můžes předejít proniknutí zombíků.<BR>Tyhle vedlejší zdroje světla, zmizí brzy poté co je lampa odstraněna.<LINE>Buď si jistý že další využití pro tuhle lampu se ukáže, tak to nezapomeň zkontrolovat zde po provedení nových objevů.
+tc.research_page.ARCANELAMP.2=           §nTajemný Vrták§r<BR>Když jej umístíte na základnu tajemného vrtáku, tajemná lampa získá další schopnost: Světlem bude kopat bloky (cca 5x5x tunnel na směr na který ukazuje).
+#
+tc.research_name.BASICARTIFACE=Základní Artefakty
+tc.research_text.BASICARTIFACE=Potřebné věci
+tc.research_page.BASICARTIFACE.1=§nPrvotní Šarm§r<BR><BR>Prvotní Šarmy jsou důležitou formou základu pro mnoho thaumaturgických konstruktcí. Nemají vlastní sílu, jejich vlastní podstata je schopnost zaměřit se na proud prvotní energie a essentia.<BR>Přetrvávající pověsti říkají že tyhle šarmy mají dodatečné síly, ale to je víceménně z doslechu.
+#
+tc.research_name.TUBES=Essentia trubky
+tc.research_text.TUBES=Přeprava essentia
+tc.research_page.TUBES.1=You have discovered several ways to transport essentia, but none of them has proven useful for large scale alchemical operations - until now.<BR>You have unlocked the key to creating stable and relatively leak-free tubing. While mundane chemicals can be transported in glass, certain types of essentia either dissolve or simply pass right through it. By wrapping the glass in iron and treating it with quicksilver you have managed to protect it from even the most volatile types of essentia. Gold fittings finish off the piping system and make it visually appealing.
+tc.research_page.TUBES.2=The tubes can be connected to all manner of alchemical devices, though warded jars and alembics are their primary targets.<BR>Essentia flows through the tubes whenever something is connected to them that can accept it, like warded jars.<BR>Jars containing different kinds of essentia will only draw their kind of essentia towards them. Tubes however can only draw and transport one kind of essentia at a time - the highest drawing strength will take priority. Without the proper use of valves it is quite easy for a network of tubes to get gummed up. The use of valves is essential.<BR>When you see gasses being vented
+tc.research_page.TUBES.3=from a tube, it means different kinds of suction are interfering with each other. The color gives a clue as to the types of suction.<LINE>The essentia valve acts much like a normal length of tubing, except it can be turned off by hand or a redstone signal. When this is done the flow off essentia through it will be cut off.<LINE>The Essentia Resonator is handy for troubleshooting your tube network. You can use it on a tube or other essentia using device to see what essentia it currently contains and the suction it is applying. 
+tc.research_page.TUBES.4=Tubes can be connected and disconnected from their neighbors by clicking on a section of tubing with a wand.<BR>The wand can also be used to click on the central section to rotate certain tubes like the valve.
+#
+tc.research_name.CENTRIFUGE=Alchymystická centrifůga
+tc.research_text.CENTRIFUGE=Sbírání věcí oděleně
+tc.research_page.CENTRIFUGE.1=Alchymistická centrifůga je úžasný vynález který vám umožní rozbít essentia do jednotlivích částí.<BR>Jakmile sloučeninová essentia proudí do centrifůgy zespoda, bude pomalu rozbíjena v prvotní nebo sloučenou essenci z kterých je vyrobena. Je vytvořena pouze jedna ze složek pro každý bod.<BR>Výslednou essentia je třeba vytahnout z vršku centrifůgy. Vzhledem k výstřednosti potrubního tlakového systému, by bylo nejlepší připojit §5Essentia Zásobník§0 na vršk centrifůgy (uvidíte na další straně).
+tc.research_page.CENTRIFUGE.2=Essentia zásobník umožnuje uložit omezené množství essentia - celem 8 bodů, které mohou být jakoukoliv kombinací typů essentia. Jako sklenice má sání, i když se aplikuje jen minimalní síla možného sání (1).<BR>To znamená že obvykle je schopný čerpat essentia z zdroje kterému je připojen přímo. Tyhle trubky lze však připojit na všechny strany, to znamená že je neocenitelná při získávání Essentia z zařízení jako je centrifůga, které by mohly obsahot různé typy essentia.<BR>Na zásobník můžeš připojit měchy - každý připojený měch zvyšuje sání na 32.
+tc.research_page.CENTRIFUGE.3=Navíc můžeš jednotlivá připojení vypínat a zapínat jako u normálni trubky, ale pokud klineš shift+kliknutí na připojení, vrátí se sáni zpět na 1 (modré pásmo) nebo na 0 (červené pásmo) na této straně<BR>To umožnuje spoustu zajímavých možnosti při směrování essentia.
+#
+tc.research_name.TRAVELTRUNK=Cestovní kufr
+tc.research_text.TRAVELTRUNK=Mobile Luggage
+tc.research_page.TRAVELTRUNK.1=An extension of your golemancy research has led to a useful companion for any thaumaturge on the go: The Traveling Trunk.<BR>This wooden chest will happily hop after its master, always ready to provide a convenient storage space for anything you pick up.<BR>The traveling trunk is tough and can take a significant amount of beating. It is highly resistant to fire and cannot be harmed by falling.<BR>The trunk can follow its master everywhere - even distant dimensions. Should you wish it to stay put however, there is a convenient  button located in its interface
+tc.research_page.TRAVELTRUNK.2=which will make it remain in its current position.<BR>The traveling trunk slowly heals itself over time, but you can also feed it all manner of food to speed up this process.<BR>Like normal golems, the trunk can be picked up by left-clicking with a golemancer's bell. It will drop all items in its inventory of you do so. Shift-clicking will also cause it to drop any upgrades you have applied to it with the normal loss chance.<BR>It can accept a single upgrade like normal golems, but they grant unique abilities to the trunk. See the following pages for details as you discover the relevant upgrades.
+tc.research_page.TRAVELTRUNK.UAI=      §nGolem Upgrade: Air§r<BR>With this upgrade installed the traveling trunk will move faster.
+tc.research_page.TRAVELTRUNK.UEA=     §nGolem Upgrade: Earth§r<BR>With this upgrade installed the traveling trunk be able to carry more items and will gain an additional row in its inventory.
+tc.research_page.TRAVELTRUNK.UFI=     §nGolem Upgrade: Fire§r<BR>With this upgrade installed the traveling trunk will defend its master when he is attacked.
+tc.research_page.TRAVELTRUNK.UWA=     §nGolem Upgrade: Water§r<BR>With this upgrade installed the traveling trunk cannot be opened or picked up by anyone else but its master.<BR>It also become highly resistant to all but the most devastating amounts of damage.
+tc.research_page.TRAVELTRUNK.UOR=     §nGolem Upgrade: Order§r<BR>With this upgrade installed the traveling trunk will retain its items when it is picked up using a golemancer's bell. It will drop items as normal when shift-clicked is used.
+tc.research_page.TRAVELTRUNK.UEN=    §nGolem Upgrade: Entropy§r<BR>With this upgrade installed the traveling trunk will automatically suck in any nearby items it has room for.
+#
+tc.research_name.LAMPGROWTH=Lampa Růstu
+tc.research_text.LAMPGROWTH=Povzbudivé věci na růst
+tc.research_page.LAMPGROWTH.1=Unlike the Arcane lamp from which it is made, the Lamp of Growth does not cast much light unless it is provided with Herba essentia. If this is done any plants which grow where its light shines the brightest will grow much faster than normal.<BR>Essentia can be fed to the lamp by attaching it directly to an essentia piping system. 
+#
+tc.research_name.LAMPFERTILITY=Lampa Plodnosti
+tc.research_text.LAMPFERTILITY=Odlitek romantického světla na věci
+tc.research_page.LAMPFERTILITY.1=Any living creatures bathed in the gentle pink glow of this lamp is immediately placed in a much more romantic mood. If they are able they will seek others of their kind to mate.<BR>This lamp will have no effect if there is 8 or more of a particular species already present.<BR>It requires Victus essentia to function which can be fed to the lamp by attaching it directly to an essentia piping system.
+#
+tc.research_name.JARVOID=Sklenice nicoty
+tc.research_text.JARVOID=Příliš essentia? Nemožné!
+tc.research_page.JARVOID.1=Void jars function much the same as normal warded jars with one important difference - even when full they are still able to accept essentia, but the excess essentia is simply lost. This allows you to always have some essentia of that type available, but get rid of any excess that may build up.<BR>Like normal jars, void jars can accept labels, but their suction with a label is less than that of a normal labeled jar (about halfway between unlabeled and labeled jar).
+#
+tc.research_name.TUBEFILTER=Advanced Essentia Tubes
+tc.research_text.TUBEFILTER=What you want, where you want it
+tc.research_page.TUBEFILTER.1=§nFiltered essentia tubes§r work like normal tubes, except it is possible to mark them with labels. When marked they will restrict essentia flow through them to what they have been marked with.<BR>Shift-clicking on them with an empty hand will remove the label.
+tc.research_page.TUBEFILTER.2=§nRestricted essentia tubes§r work like normal tubes, except they halve the any suction passing through them.<LINE>§nDirectional essentia tubes§r only accept suction from one direction. The blue markings indicate the direction from which suction will be accepted.
+#
+tc.research_name.MIRRORESSENTIA=Essentia Mirrors
+tc.research_text.MIRRORESSENTIA=Essentia where you need it
+tc.research_page.MIRRORESSENTIA.1=Magical mirrors are very useful for transporting items over long distances, but what if that same principle can be applied to essentia? You think you have discovered a way to do just that.<BR>Essentia mirrors, like their name implies, can transport essentia in the same way that magic mirrors transport items. There are a few important limitations however.<BR>You cannot pipe essentia directly into the mirrors - they are only able to transport essentia that has been drawn from a source towards something like an Infusion Matrix.    
+tc.research_page.MIRRORESSENTIA.2=In effect the mirrors allow these things to draw essentia from sources via the mirror. 
+#
+tc.research_name.BONEBOW=Kostní luk
+tc.research_text.BONEBOW=Tyčky a kameny...
+tc.research_page.BONEBOW.1=Objevil jsi způsob sestrojení luku z kostí a napuštění teho s enthropickou energií.<BR>Výsledná zbraň je schopná střílet mnohem rychleji než normální luk a šípy vypuštěné z něj cestují rychleji a udeří tvrději.
+#
+tc.research_name.PRIMALARROW=Prvotní šípy
+tc.research_text.PRIMALARROW=Šípy s živelním kousnutím
+tc.research_page.PRIMALARROW.1=Tyhle šípy jsou napuštěny určitým typem prvotní energie která dává zajímavé a zničující vlastnosti<BR>§nVzdušné Šípy§r<BR>Tyhle šípy arrows praskají s energií. Ty způsobují podobné zranění jako normální šípy, ale magická energie prorazí jakýkoliv druh obrněné ochrany.<BR>§nOhnivé Šípy§r<BR>Tyhle šípy způsobují čistě ohnivé požkození a jejich cíle zapálít.
+tc.research_page.PRIMALARROW.2=§nVodní Šípy§r<BR>Tyhle šípy způsobují více než normální požkození, ale zimnice zasáhne tvůj cíl až na kost, snížením jeho pohyblivosti.<BR>§nZemní Šípy§r<BR>Tyhle šípy nemají speciální vlastnosti kromě mnohem většího úderu než normální šípy.<BR>§nOrder Šípy§r<BR>Tyhle šípy delají trochu menší požkození než normální, ale prorazí brnění a zanechají tvého nepřítele oslabeného.<BR>§nEntropické Šípy§r<BR>Tyhle šípy dělají trohu menší požkození než normálně, 
+tc.research_page.PRIMALARROW.3=ale způsobují zaklínačův (witcher) effect na cokoliv udeří.<LINE>Prvotní šípy nemohou být sebrány z země a očarování Nekonečnosti má pouze šanci 1 ku 3 že prvotní šíp nebude spotřebován.
+#
+tc.research_name.THAUMATORIUM=Automatizovaná Alchemie
+tc.research_text.THAUMATORIUM=Alchemie pro masy lidí
+tc.research_page.THAUMATORIUM.1=Up to now alchemy has been somewhat of a hit and miss affair - miscounted aspects, degrading essentia and ingredients that require manual labor to mix. This is finally a thing of the past.<BR>The Thaumatorium is a marvelous invention that allows a thaumaturge to select which formula to use and what catalysts to add. It then automatically draws essentia from available sources using tubes. As long as there is a supply of catalyst it produces the required object perfectly, every time.<BR>The crucible that forms its base does not require water, but a heat source is still needed.
+tc.research_page.THAUMATORIUM.2=When you access this device you will see several slots. The top-left slot is where you place the catalyst. Once you have done this you will be able to choose which recipe you wish to craft with that catalyst from a list of possibilities in the top right slot.<BR>The bottom bar shows the essentia required in the order they will be required. It will also display progress bars once the machine is in operation.<BR>The created object is ejected out the front of the device or into an inventory placed in front of the ejection port.
+tc.research_page.THAUMATORIUM.3=Normally a Thaumatorium can only have one active formula, but by attaching a Mnemonic Matrix to its side you can increase the number of formulas it can keep track.<BR>Each matrix increases the number of formulas by 2. 
+#
+tc.research_name.RUNICARMOR=Runic Shielding
+tc.research_text.RUNICARMOR=Shields up!
+tc.research_page.RUNICARMOR.1=Your research into protective magics have led you to discover Runic Shielding. This is not armor in the traditional sense, but a collection of charms, rings and similar protective baubles worn with your everyday clothes.<BR>These devices create a barrier of magical energy that wards out most types of damage. The shielding has a pool of hit points from which damage is subtracted first, protecting the wearer from all harm. Once this pool is depleted the wearer starts taking damage as normal.
+tc.research_page.RUNICARMOR.2=The pool replenishes over time and requires §2Terra§0 and §eAer§0 vis to replenish its charge which it draws from carried wands.<BR>The armor offers no protection from damage suffered due to drowning, starvation or similar environmental hazards.<BR>Due to its nature the armor cannot be enchanted by normal means, but you are sure there are ways to improve its effectiveness - you just need to discover them.
+#
+tc.research_name.RUNICAUGMENTATION=Runic Shielding Augmentation
+tc.research_text.RUNICAUGMENTATION=Shields to maximum!
+tc.research_page.RUNICAUGMENTATION.1=Rings, amulets and girdles with runic shielding is all good and well, but surely you can apply this protective enchantment to other things?<BR>Of course you can! By utilizing the magic of Thaumaturgy(c) (patent pending), you are able to add runic shielding to most magically stable pieces of armor.<BR>'Magically stable' items are those crafted from thaumium, enchanted fabric or similarly magical materials.<BR>Only a single charge of runic shielding is added to the item, but you can enchant an item multiple times. This is expensive and
+tc.research_page.RUNICAUGMENTATION.2=the amount of ingredients and essentia required will increase with each level. The Salis Mundus required will equal the level of shielding you want, and the essentia cost will increase exponentially.<BR>You can enchant existing runic items like Rings of Shielding as well, however the cost is calculated based on their existing runic charge making it an exceptionally expensive process.
+#
+tc.research_name.RUNICCHARGED=Charged Ring of Shielding
+tc.research_text.RUNICCHARGED=Charge for the Charge Ring!
+tc.research_page.RUNICCHARGED.1=This is a specialized version of the Ring of Shielding.<BR>It has slightly less charge than the ring it is based on, but increases the recharge time of runic shielding by 25%.<BR>You can wear more than one of these rings, effectively halving the normal recharge time.
+#
+tc.research_name.RUNICHEALING=Revitalizing Ring of Shielding
+tc.research_text.RUNICHEALING=Go ahead, I can take it.
+tc.research_page.RUNICHEALING.1=This is a specialized version of the Ring of Shielding.<BR>It has slightly less charge than the ring it is based on, but when your runic shielding is breached it will release a pulse of regenerative energy that will last for a few seconds.<BR>This effect cannot trigger more than once every 20 seconds.
+#
+tc.research_name.RUNICKINETIC=Kinetic Girdle of Shielding
+tc.research_text.RUNICKINETIC=Hehe, you're going to regret that.
+tc.research_page.RUNICKINETIC.1=This is a specialized version of the Girdle of Shielding.<BR>It has slightly less charge than the girdle it is based on, but when your shielding is breached a detonation of kinetic energy will be released damaging and shoving back anything nearby.<BR>This effect cannot trigger more than once every 20 seconds.
+#
+tc.research_name.RUNICEMERGENCY=Amulet of Emergency Shielding
+tc.research_text.RUNICEMERGENCY=You can't get me that easily.
+tc.research_page.RUNICEMERGENCY.1=This is a specialized version of the Amulet of Shielding.<BR>It has slightly less charge than the amulet it is based on, but when your shielding is breached this upgrade will instantly add 8 charge to your shielding amount.<BR>This effect cannot trigger more than once a minute.
+#
+tc.research_name.WARDEDARCANA=Warded Arcana
+tc.research_text.WARDEDARCANA=Controlling access
+tc.research_page.WARDEDARCANA.1=Some experimentation has led to an interesting discovery - the ability to imprint memories in inanimate objects. Your first attempt at using the discovery is doors, pressure plates and other blocks that remember who placed them.<BR>The door can only be removed with a wand by the person who placed it. Additionally the door will refuse to open for anyone but its owner. The owner can also craft iron or gold keys that will grant others access to this door.<BR>By crafting an iron key and clicking on the door, you will link the key to that door. 
+tc.research_page.WARDEDARCANA.2=You can then give the key to another person and they will be able to use it on the door to gain permanent permission to open it. They will still not be able to break the door, or grant anyone else access. For that you need the gold key.<BR>The gold key serves much the same function as the iron key, except they can also grant other people iron key access to that door. Only the original owner of the door can hand out gold key access. They are also not able to remove the door with a wand. Only the original owner will be able to do that.
+tc.research_page.WARDEDARCANA.3=This pressure plate has a few novel features.<BR>Firstly it has 3 settings that can be toggled by right-clicking on it: It can trigger on everything (like a wooden pressure plate), just you, or everything except you.<BR>Secondly, like all other warded items only you can remove it.<BR>Lastly it can be linked to other players with the use of keys. These pressure plates can be used to open arcane doors as long as someone with access to the plate has access to the door as well.
+tc.research_page.WARDEDARCANA.4=Warded glass is a simple cosmetic block, but like other warded objects it cannot be broken except by the person who placed it.<BR>Keys cannot be used to give other users access.
+#
+tc.research_name.VISAMULET=Vis Storage
+tc.research_text.VISAMULET=Waste not, Want not
+tc.research_page.VISAMULET.1=Most of the time a single wand is more than enough for any thaumaturge, but there are occasions that the vis it stores just isn't enough. Carrying more than one wand would solve this, but experimentation has shown that there is another way.<BR>By crafting an amulet capable of storing vis, you will be able to recharge wands and other items in the field while it is being worn.<BR>Your success has been mixed however. You can only recharge wands while holding them in your own hand and even then the recharge rate is slow. 
+tc.research_page.VISAMULET.2=However the amulet is able to act as a good power source for other things like the Repair enchant or runic shielding.<BR>The amulet can only be recharged in a wand pedestal or from nearby vis relays.
+#
+tc.research_name.NODESTABILIZER=Node Stabilizer
+tc.research_text.NODESTABILIZER=Node Therapy
+tc.research_page.NODESTABILIZER.1=This handy device has several beneficial effects if placed below a node.<BR>Firstly it prevents the node from draining vis from other nodes, or being drained in turn. Secondly it prevents unstable nodes from losing their vis and it has a tiny chance of eventually removing the unstable condition completely. Lastly it has a very, very small chance of turning fading nodes into pale nodes.<BR>This requires power however and the Node Stabilizer draws this from the node itself. It does not draw enough to reduce the vis of the node, but it does halve its normal recharge rate.
+tc.research_page.NODESTABILIZER.2=Applying a redstone signal will switch the stabilizer off.
+#
+tc.research_name.NODESTABILIZERADV=Advanced Node Stabilizer
+tc.research_text.NODESTABILIZERADV=Selective stabilization
+tc.research_page.NODESTABILIZERADV.1=Advanced Node Stabilizers perform all the functions of the lesser versions with a few major differences.<BR>Firstly they still prevent lesser nodes from having their vis drained, but it does allow stabilized nodes to drain the vis from lesser ones.<BR>Secondly it has a higher chance to improve unstable and fading nodes.<BR>Unfortunately this costs a lot more power from the stabilized node - still not enough to drain vis from it, but even the brightest node will have its recharge rate almost completely negated.
+#
+tc.research_name.GOLEMFETTER=Golem Fetter
+tc.research_text.GOLEMFETTER=Making them behave
+tc.research_page.GOLEMFETTER.1=This simple device allows a golemancer to bring their golems to a temporary halt.<BR>If this block is activated with a redstone signal any golem that passes over it will come to complete standstill and cease its current task.<BR>Once this block is deactivated the golem will once again go about its business.
+#
+tc.research_name.VISPOWER=Harnessing Vis
+tc.research_text.VISPOWER=Power to the People
+tc.research_page.VISPOWER.1=Without vis nodes thaumaturges would not even be able to perform the simplest of tasks, but the nodes themselves have several limitations that make their use impractical for extensive operations. Foremost amongst these limitations is the fact that they are easily depleted and it takes quite some time for them to once again gather energy from mystical source they are connected to.<BR>You think you may have found a way around that limitation. In effect nodes are tiny gateways to a mysterious font of mystical energy around which the energy slowly accumulates in the form of Vis. The gateway is so small that only a tiny
+tc.research_page.VISPOWER.2=amount of energy leaks into our reality. By levering open this doorway you can cause vis to pour forth in a torrent.<BR>This is even more dangerous than it sounds however and careful steps must be taken during the entire process.<BR>Firstly the node needs to be stabilized during the entire process. Once that is done you need to craft and place a §lNode Transducer§r above the node. When you apply a redstone signal to the transducer the node will begin converting to an energized node and quickly lose its stored vis in the process.<BR>The process takes some time, but when it is done the node will
+tc.research_page.VISPOWER.3=change into an energized node. Caution should be taken to keep both the stabilizer and transducer active from now on.<LINE>Energized nodes no longer store or recharge vis, nor can vis be drawn from them with a wand or other means. Instead they produce a steady supply of §lCV§r (centi-vis, or a hundredth of a vis) each tick. This energy can be tapped by placing vis relays near the energized node.<BR>Each relay acts as a conduit for CV and any number of relays can be placed within 8 blocks of an energized node. Relays also transfer energy to each other allowing you to create a network that transports vis to
+tc.research_page.VISPOWER.4=anything that needs it, like the Infernal Furnace.<BR>Relays use a branching system, so each relay can have only one source (either another relay, or an energized node), but may have multiple child relays that branch off it.<BR>You can also 'tune' a relay to one of the primal aspects by using an appropriate vis shard on it. Clicking on it with a wand will also cycle through the possible attunements. This does not limit what vis can flow through that relay, but does prevent it from connecting to any other relay except untuned ones or ones tuned to the same primal. 
+tc.research_page.VISPOWER.5=The amount of energy a node produces per tick is finite so attaching too many devices to a single source might exceed the amount of CV it can produce.<LINE>It is possible to turn an energized node back into a normal node. Simply cut the redstone signal to the transducer and it slowly turn it back into a normal node. Caution should be taken however since the node will be completely drained of vis and thus runs the risk of being damaged.
+#
+tc.research_name.VISCHARGERELAY=Vis Charging Relay
+tc.research_text.VISCHARGERELAY=Arcane Crafting Simplified
+tc.research_page.VISCHARGERELAY.1=An annoyance for any thaumaturge that performs regular arcane crafting is to constantly keep his wand charged.<BR>Now that you have found a way to draw vis directly from nodes you are able to craft a Vis Charging Relay. This functions like a normal relay, but is designed to be placed on top of an arcane crafting table. It will draw vis from the relay and recharge wands placed in the table.<BR>The only drawback is that it recharges much slower than it would from a wand recharging pedestal or doing it by hand. 
+#
+tc.research_name.WARP=Warp, Flux a všechny špatné věcsi
+tc.research_text.WARP=Všechno má svoji cenu
+tc.research_page.WARP.1=§nWarp(Zkroucení)§r<BR>Mnozí veří, že muž nebyl určen k zapletení se s taji magie, a nic nedává vetší víru temuhle tvrzení než existence Warpu.<BR>Zkoumání zapomenuté magie nebo sestrojování předmětů sporné povahy má tendenci deformovat thaumaturgovo vidění reality, zkroucení jejich myslí a jejich těl. Tenhle effekt je nazýván Warp.<BR>Zatímco někteří získají warp dočasně a ten bude slábnout v průběhu času. Tak zde není žádný známý způsob jak se zbavit trvalého warpu, jednou je získán a thaumaturg
+tc.research_page.WARP.2=jež si jej zvolí je rozhodnut, ignorovat nebezpečí v honbě za mocí, často se tak ocitnou na šikmé ploše.<BR>Warp se obvykle projevuje jako drobná chyba v koncentraci, fyzická bolest nebo halucinace.<BR>Jedná se o více než jen duševní... i když, vize několikrát skrývají užitečné vědení, tak halucinace se mohou zdát děsivě skutečné.
+tc.research_page.WARP.3=§nFlux§r<BR>Pokuď Warp je duševním projevem pokažené magie, tak Flux je jeho fyzický projev.<BR>Flux se může projevit třemí způsoby: tekutinou, plynem a duševními chorobami. První dva projevy jsou považovány za potíže vetšinou thaumaturgy a jsou často důslekem plýtvání při užívání magie. To není nijak zvlášť těžké vyčistit, ale přijde-li s ní do styku, objeví se zde třetí projev: Flux Chřipka<BR>Flux Chřipka není nikterak nebezpečná, ale jakmile jí thaumaturg trpí je pro něj obtížné zaměřit se na Vis což vede k zvýšení využití Vis než něco dokončí.
+#
+tc.research_name.BATHSALTS=Purifying Bath Salts
+tc.research_text.BATHSALTS=Stress relief for the mind
+tc.research_page.BATHSALTS.1=Warp is a danger for even the most careful of thaumaturges. For those that have done a bit too much dabbling Warp effects are probably more than just an annoyance. Purifying Bath Salts help with that.<BR>Simply tossing these salts into water will turn the water into a silvery, purifying liquid that sooths away the stresses of the day and brings temporary relief from the effects of Warp. It should be noted however the more warp a thaumaturge suffers from, the shorter the duration of this protection.<BR>The salts are quite fragile and will soon dissolve if tossed around haphazardly. 
+#
+tc.research_name.LIQUIDDEATH=Liquid Death
+tc.research_text.LIQUIDDEATH=For external use only
+tc.research_page.LIQUIDDEATH.1=This liquid is so dangerously toxic that virtually nothing can prevent it from dissolving flesh, bone and even harder substances. Nothing alive or that even displays the semblance of life can survive it.<BR>Apart from obvious practical applications, this vile substance has another interesting property: Any essentia a dissolved creature possessed form into crystals that can be harvested.<BR>I will leave it to the reader's imagination what uses those crystals can be put to. 
+#
+tc.research_name.ARMORFORTRESS=Thaumium Fortress Armor
+tc.research_text.ARMORFORTRESS=Nothing is getting in
+tc.research_page.ARMORFORTRESS.1=Thaumium armor has many things to recommend it, but its basic construction leaves it inferior to diamond armor. By improving the construction process and complexity you have found a way to create armor of exceptional craftsmanship, durability and strength.<BR>Each individual piece of Thaumium Fortress armor has the same protective properties as diamond armor, but has greater durability and offers additional protection against magic and fire.<BR>The biggest benefit however is that the individual armor pieces is designed and constructed to be worn together: Each additional
+tc.research_page.ARMORFORTRESS.2=piece of this armor worn increases the overall protection offered by all other pieces and improves its visual appeal.<BR>As with most objects constructed from thaumium, the armor is easy to enchant.
+#
+tc.research_name.HELMGOGGLES=Helm of Revealing
+tc.research_text.HELMGOGGLES=Thaumium Fortress Helm Upgrade
+tc.research_page.HELMGOGGLES.1=Usually a thaumaturge needs to choose between protection and utility when out and about. Not anymore!<BR>This modifies a Thaumium Fortress Helm to give you all the functionality of Goggles of Revealing. It does however not give the vis discount the goggles usually do.<BR>A helm can have this upgrade along with faceplates. 
+#
+tc.research_name.MASKGRINNINGDEVIL=Grinning Devil Faceplate
+tc.research_text.MASKGRINNINGDEVIL=Thaumium Fortress Helm Upgrade
+tc.research_page.MASKGRINNINGDEVIL.1=This mask is designed to be added to an existing Thaumium Fortress helm.<BR>When worn, this mask has an interesting damping effect on those suffering from Warp event. While it does not reduce the number of events, it does reduce their severity somewhat.<BR>It seems laughing in the face of danger does have its rewards. 
+#
+tc.research_name.MASKANGRYGHOST=Angry Ghost Faceplate
+tc.research_text.MASKANGRYGHOST=Thaumium Fortress Helm Upgrade
+tc.research_page.MASKANGRYGHOST.1=This mask is designed to be added to an existing Thaumium Fortress helm.<BR>When you are struck in combat while wearing this grim mask the creature striking you has a chance to suffer a Withering effect.<BR>Serves them right.
+#
+tc.research_name.MASKSIPPINGFIEND=Sipping Fiend Faceplate
+tc.research_text.MASKSIPPINGFIEND=Thaumium Fortress Helm Upgrade
+tc.research_page.MASKSIPPINGFIEND.1=This mask is designed to be added to an existing Thaumium Fortress helm.<BR>When you strike a creature in combat while wearing this mask, you sometimes steal a small portion of their life force to strengthen your own.<BR>The fact that you do this by supping on their blood doesn't seem to bother you nearly as much as it should. You wonder if you should be worried about that.
+#
+tc.research_name.ELDRITCHMINOR=Eldritch Epiphany
+tc.research_text.ELDRITCHMINOR=First steps into the unknown
+tc.research_page.ELDRITCHMINOR.1=It has suddenly become clear to you. Where others see chaos, you occasionally catch a glimpse of a pattern... a very strange and disturbing pattern. Something stirs in the darkest corners of the universe.<BR>You have tried to explain it to others, but received only strange looks in return. No matter, you will show them someday.<BR>You will show them all.
+#
+tc.research_name.ELDRITCHMAJOR=Eldritch Revelation
+tc.research_text.ELDRITCHMAJOR=I have seen beyond the bounds of infinity
+tc.research_page.ELDRITCHMAJOR.1=A veil has been lifted - a door opened in my mind.<BR> When I look through I see wonders. No, not wonders. §mWhat I see is§r<BR>§oWhat I see is I see i see I sEee i§r<IMG>thaumcraft:textures/misc/eldritchajor1.png:0:255:255:255:.5</IMG>
+tc.research_page.ELDRITCHMAJOR.2=<IMG>thaumcraft:textures/misc/eldritchajor2.png:0:255:255:255:.5</IMG><BR><BR>Who wrote this?
+#
+tc.research_name.VOIDMETAL=Void metal
+tc.research_text.VOIDMETAL=Strange, it should feel cold...
+tc.research_page.VOIDMETAL.1=By infusing magic into metal you had managed to create Thaumium. It was a worthy discovery, but the time has come to leave thaumium to amateurs and dabblers.<BR>A strange and half-remembered dream has given you the urge to try something... different. What if you infuse metal with more than just magic, but with the very essence where magic is drawn from: Darkness and the Void that dwells between the stars.<BR>The resulting metal is disturbingly slick and warm to the touch. It is almost as soft as gold making it easy to work, but
+tc.research_page.VOIDMETAL.2=when struck it becomes as hard as thaumium and sometimes even harder. More impressively all but the most devastating damage soon repairs itself as the metal slowly flows back into place.<BR>The only downside is that it isn't as easy to enchant as thaumium, but still compares favorably to mundane materials like iron.<BR>You have discovered that care must be taken when handling the metal - being harmed by it seems to temporarily sap your strength.
+#
+tc.research_name.ARMORVOIDFORTRESS=Void Thaumaturge Robes
+tc.research_text.ARMORVOIDFORTRESS=Otherworldly Style
+tc.research_page.ARMORVOIDFORTRESS.1=A truly enlightened thaumaturge realizes that he need not choose between utility and defense.<BR>By augmenting existing void armor with the proper enchantments and combining them with thaumaturge's robes he will be able to create a set of armored robes that not only offers physical protection and mental focus, but mystical protection as well.<BR>The robes will also retain all the properties of void armor while the hood will offer all the benefits of the goggles used in its crafting.<BR>This armor can be dyed.
+#
+tc.research_name.CAP_void=Void metal Wand Caps
+tc.research_text.CAP_void=Power from beyond
+tc.research_page.CAP_void.1=Crafting wand caps from Void metal seems counterintuitive since it seems to be highly resistant to magic, but counterintuitive is where you live now.<BR>Your gamble paid off. The metal itself may be resistant to magic, but it channels with surprising ease. The magic does seem §ostrange§r somehow, but it is probably just your imagination.
+#
+tc.research_name.ARCANESPA=Arcane Spa
+tc.research_text.ARCANESPA=Relaxing in style
+tc.research_page.ARCANESPA.1=Pouring bath salts into water is a bit of a chore, but luckily one easily solved with a bit of magic.<BR>You have created a handy machine that when filled with water and bath salts will automatically mix them and pump the liquid into an area above it. The liquid will fill a 5x5 area above the location where the machine is placed.<BR>Additionally, you have found that it can be used to pump nearly any liquid you can fill it with. You can fill it with automation, or by clicking on the block with the appropriate container. Applying a redstone signal will disable it.  
+#
+tc.research_name.SANESOAP=Dezinfekční Mýdlo
+tc.research_text.SANESOAP=Getting rid of dirty thoughts
+tc.research_page.SANESOAP.1=Cleaning the body is easy enough, but once warp becomes a nuisance you need something that can clean the mind as well.<BR>This soap cleans the flesh, but the effects it has on your psyche is what truly makes it special. When used it has a small chance of reducing non-permanent warp and will remove all temporary warp.<BR>Using it while under the effects of a Warp Ward or while standing in Purifying Fluid will increase your odds.  
+#
+tc.research_name.SANITYCHECK=Kontrolor Duševního Zdraví
+tc.research_text.SANITYCHECK=Introspection for the brave
+tc.research_page.SANITYCHECK.1=Things have become busy in your mind lately. It is probably best that you have a look inside there and make sure everything is still all right.<BR>This tool will allow you to check the effects of warp on your psyche and how much it is effecting you.<BR>Of course you cannot allow a tool like this to fall into the hands of your enemies so you have taken great pains to obfuscate the information it provides. You might have gone too far though - you are having a hard time deciphering it yourself.  
+#
+tc.research_name.CRIMSON=Kult Crimsonů
+tc.research_text.CRIMSON=Varovný příběh
+tc.research_page.CRIMSON.1=Hodně z této knihy je napsáno v pavoučím a nesrozumitelném rukopisu, ale rozumíš některým podívným nabídkam k pronikdnutí do cílů Crimsonova kultu.<BR>Jejich původy jsou zahaleny v tajemství, ale zdá se že jejich cílem je dokonalost rituálu, který odkazuje na "Apertis Oculis" - Otevření Oka. Co dělá je nejasné, ale pochybuji že je to něco dobrého.<BR>Dost zajímavé, že si myslíš ,že thaumaturgie by mohla nabídnout chybějící kousky o které tak dlouho usiluješ. Samořejně pouze šílenec by usiloval o řadu těhle studií...
+#
+tc.research_name.OCULUS=Opening the Eye
+tc.research_text.OCULUS=I will show them, I will show them all!
+tc.research_page.OCULUS.1=It was all so simple - you are amazed the Crimson Cultists have never discovered this.<BR>To perform the ritual you simply need to place four Eldritch Eyes on the specially marked keystone found at one of the strange altars where you first discovered the cult. The sinister node above the keystone must remain intact.<BR>Once this is done it is a simple matter of infusing a large amount of primal vis into the keystone with a wand - 100 units of each should be sufficient.
+tc.research_page.OCULUS.2=If you have done everything right the ritual should be complete and the so called "Eye" would be opened.<BR>Of course you have no idea what that means. No matter, only fools fear the unknown! 
+#
+tc.research_name.ESSENTIARESERVOIR=Advanced Essentia Storage 
+tc.research_text.ESSENTIARESERVOIR=Don't bump it
+tc.research_page.ESSENTIARESERVOIR.1=Most types of essentia are fairly volatile and care must be taken in its storage - that is why most thaumaturges use warded jars. You, however, are not most thaumaturges.<BR>Using the wonderful new substance called void metal, you have discovered a way to greatly improve the storage of essentia. Essentia reservoirs are capable of storing up to 256 essentia in any combination.<BR>Potentially disastrous mixing of the different essentia types is prevented by having dynamically reshaping compartments crafted from the new metal.
+tc.research_page.ESSENTIARESERVOIR.2=Like jars, the reservoirs can only be accessed from one side, though you can choose how they are orientated. Unfortunately they cannot be emptied or filled by hand so you need to rely on tubes or golems for that.<BR>Picking up a reservoir while filled is, um, inadvisable.<BR>You were so pleased with this discovery that you showed it off to some of your fellow thaumaturges. Strangely, most of them dived for cover even after you assured them the constant sound of metal under incredible stress is perfectly normal.
+#
+tc.research_name.ESSENTIACRYSTAL=Essentia Crystallization 
+tc.research_text.ESSENTIACRYSTAL=Hard currency or liquid assets?
+tc.research_page.ESSENTIACRYSTAL.1=You have nearly mastered the art of turning concrete objects into liquid essentia, so doing the reverse is a simple matter.<BR>The essentia crystallizer draws in liquid essentia from a pipe network and slowly converts it into small shards of crystalline essentia. Crystalline essentia is safe to handle and very stable.<BR>The Crystallizer either ejects the crystals into the world or into a container. It can be disabled with a redstone signal.<BR>Supplying it with terra vis will greatly increase its speed.
+#
+tc.research_name.BANNERS=Prapory 
+tc.research_text.BANNERS=Caution: For decorative purposes only
+tc.research_page.BANNERS.1=Sometimes a thaumaturge doesn't need to create something that shakes the very foundations of reality - sometimes he just wants something pleasing to the eye.<BR>You have developed a simple enchantment that allows you to apply thaumaturgical symbols to banners. You do so by simply clicking with a phial of essentia on a banner you crafted and the symbol will be emblazoned on it. Shift-clicking on the banner will remove the symbol.
+#
+tc.research_name.BOTTLETAINT=Zhouba v láhvi 
+tc.research_text.BOTTLETAINT=Why would you want this?
+tc.research_page.BOTTLETAINT.1=Cleaning Taint is one thing, but ever considered spreading it?<BR>By concentrating and collecting the essence of taint into a bottle it is simply a matter of dropping it somewhere to create a patch of taint. It is up to you to decide why you would want to do this. 
+#
+tc.research_name.FOCALMANIPULATION=Focal Manipulation 
+tc.research_text.FOCALMANIPULATION=Wand foci remade
+tc.research_page.FOCALMANIPULATION.1=Wand foci are capable of amazing feats, but they aren't very flexible. A single focus is seldom capable of performing more than a single function.<BR>You have discovered a way to upgrade basic foci to alter the way they manipulate magic. You simply need to place a focus in a Focal Manipulator and choose the upgrade you wish to apply to it. You also need to provide it with vis from relays and spend experience points to get the process started, but after that it is a simple matter of waiting.<BR>Each focus can be upgraded up to five times, 
+tc.research_page.FOCALMANIPULATION.2=but each rank is doubles the cost.<BR>While some upgrades can be applied multiple times or at any rank, many foci have upgrades that can only be applied at certain ranks or only if certain requisite upgrades had been taken at lower ranks. Experimentation is encouraged.<BR>Upgrades are permanent - you are not aware of any method to remove unwanted upgrades so care must be taken when choosing them.  
+#
+tc.research_name.VAMPBAT=Tier 5 Upgrade: Vampire Bats 
+tc.research_text.VAMPBAT=Vicious little bloodsuckers  
+#
+tc.research_name.PRIMPEARL=Primordial Pearl 
+tc.research_text.PRIMPEARL=What came before
+tc.research_page.PRIMPEARL.1=For the first time you find yourself with a puzzle that you do not think can be solved.<BR>This object contains pure primal aspects, but they possess properties unlike what you consider normal, everyday primal aspects. You have a few theories why this could be:<BR>Firstly this "pearl" could be the remnants of primal matter that was created at the dawn of reality - elementary magic that existed before it mingled and merged into compound aspects.<BR>Alternatively it could be primal matter from a place that does not conform to the known rules of
+tc.research_page.PRIMPEARL.2=magic as you have come to understand it. You are not sure which explanation is more worrying.<BR>Either way, the pearl is a potent artifact containing vast magical power and nearly unlimited potential.<BR>It is time you start putting it to use.
+#
+tc.research_name.PRIMNODE=Primordial Node Manipulation 
+tc.research_text.PRIMNODE=Just rub them together and see what happens
+tc.research_page.PRIMNODE.1=You have developed a bit of a wild theory that might be worth exploring. Why not bring a primordial pearl into contact with an aura node?<BR>Sure, bringing two such sources of raw magical energy into contact with each other might be catastrophic, but their interaction could also be highly... interesting.<BR>While anyone can do this, you are sure that completing this research has slightly improved your chances of getting a good result. Very slightly.
+#
+tc.research_name.ADVALCHEMYFURNACE=Pokročilá Alchemická pec 
+tc.research_text.ADVALCHEMYFURNACE=Essentia Creation Simplified
+tc.research_page.ADVALCHEMYFURNACE.1=The standard alchemical furnace is fairly slow and requires fuel to operate. While neither of those are particularly difficult obstacles to you, the fact that it is unable to process large sources of essentia is something that can not be ignored. Unfortunately the instability of the essentia slurry it creates makes it dangerous to gather too much of it in one location.<BR>With the discovery of Primordial Pearls you have found a solution to that problem - The Advanced Alchemical Furnace.<BR>Using alchemical constructs that have been strengthened with void   
+tc.research_page.ADVALCHEMYFURNACE.2=metal and exposed to a primordial pearl's strange energies much more slurry can be processed at once and at much greater speeds. The pearl is not consumed during the crafting process.<BR>Instead of fuel, heat is generated by ignis vis and instead of relying on heat alone perditio vis breaks down objects almost instantly. Lastly aqua vis keeps everything running smoothly and prevents the slurry from settling and causing problems.<BR>The machine requires a considerable amount of heat to function and requires a constant supply of ignis vis even when not operating. Perditio and aqua vis is only used when the machine is smelting.
+#
+tc.research_name.FLUXSCRUB=Flux Scrubber 
+tc.research_text.FLUXSCRUB=A boon for the messy thaumaturge
+tc.research_page.FLUXSCRUB.1=Even the most skilled thaumaturge occasionally leaves a mess in the form of flux. It is a nuisance everyone has to deal with, but this machine removes the drudgery involved.<BR>The flux scrubber, when powered with aer vis, will slowly remove any form of flux within 16 blocks of where it is placed. What is more, it is able to reclaim a small portion of the magic that makes up the flux in the form of praecantatio essentia.<BR>It's internal buffer is very small and it will continue operating even when full, so it must be emptied if you wish to reclaim all the essentia.
+#
+tc.research_name.ENTEROUTER=Vnějsí Země 
+tc.research_text.ENTEROUTER=Už nejste v Kansasu
+tc.research_page.ENTEROUTER.1=You are not quite sure what you were expecting when you stepped through the Oculus, but this strange structure of crumbling stone and twisted passageways was not it.<BR>Something is not quite right here - this structure was not designed for any practical purpose you can discern... unless that purpose was for it to be a deadly maze.<BR>Strange energies abound and your magic seems to act strangely in this alien environment. Even the other denizens you encounter seem out of place here.
+#
+tc.research_name.OUTERREV=Revelations in the Outer Lands 
+tc.research_text.OUTERREV=Things are not what they seem
+tc.research_page.OUTERREV.1=Your suspicions have been confirmed. This is not the home of the race you have come to call the Eldritch. This place is something else entirely and you do not believe it exists in what you understand as being "reality" - it is as much a mental construct as a physical one, but what mind can contain this?<BR>You have been able to decipher only a small number of the symbols, but you are sure this place is a trap - a place to test visitors and weed out the weak. For what purpose you are not sure.
+#
+tc.research_name.SINSTONE=Zlověstný Magnetovec
+tc.research_text.SINSTONE=Do you dare follow it?
+tc.research_page.SINSTONE.1=You have made an interesting discovery during your study of nodes. Different kinds of nodes emit varying types of radiant energy, but none are quite as distinct as that of Sinister nodes.<BR>The energy emitted by Sinister nodes is quite unique and simple to track. By infusing a piece of flint you think you can create a simple scrying device that will light up whenever it is pointed towards such a node.<BR>The range is limited, but it is a worthwhile invention since you have often found Sinister nodes in the most interesting of places.
+#
+tc.research_name.PRIMALCRUSHER=Prvotní Drtič 
+tc.research_text.PRIMALCRUSHER=Rozbití všech věcí
+tc.research_page.PRIMALCRUSHER.1=The theory behind infusion crafting is simple - infuse a single object with essentia and the properties of other objects. There are limits however, but it seems with the discovery of the primordial pearl these limits are becoming less and less.<BR>As an experiment you tried infusing the properties of completely different objects into the pearl with suprising success. The Primal Crusher is the first practical application of this discovery.<BR>By combining a Shovel of the Earthmover and a Pickaxe of the Core with their void metal counterparts you created a
+tc.research_page.PRIMALCRUSHER.2=tool of unrivaled destructive capabilities that has most of the features of its component pieces.<BR>The Primal Crusher can mine through earth and stone with equal ease and does so in a 3x3 area. Like the Pickaxe of the Core it occasionally mines native clusters instead of raw ore.<BR>It repairs itself over time, has high enchantability and serves as a relatively good weapon in a pinch.<BR>Unfortunately it seems purely destructive in nature and has lost the construction and detection abilities of its parent tools.
+
+##

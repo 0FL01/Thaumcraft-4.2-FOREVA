@@ -1,0 +1,29 @@
+# Compiled Java bytecode (derived from JAR)
+*.class
+
+# Gradle / Forge workspace
+.gradle/
+build/
+out/
+eclipse/
+*.launch
+
+# IDE
+.idea/
+*.iml
+*.ipr
+*.iws
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Temp
+*.tmp
