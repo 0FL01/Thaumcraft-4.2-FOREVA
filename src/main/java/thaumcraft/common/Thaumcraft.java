@@ -44,7 +44,13 @@ import thaumcraft.common.lib.events.EventHandlerRunic;
 import thaumcraft.common.lib.events.EventHandlerWorld;
 import thaumcraft.common.lib.events.ServerTickEventsFML;
 import thaumcraft.common.lib.network.PacketHandler;
-import thaumcraft.common.tiles.*;
+import thaumcraft.common.tiles.TileJarFillable;
+import thaumcraft.common.tiles.TileJarBrain;
+import thaumcraft.common.tiles.TileJarNode;
+import thaumcraft.common.tiles.TileJarFillableVoid;
+import thaumcraft.common.tiles.TileCrystal;
+import thaumcraft.common.tiles.TileEldritchCrystal;
+import thaumcraft.common.tiles.TileNode;
 import thaumcraft.common.blocks.BlockJarItem;
 import thaumcraft.common.lib.world.ThaumcraftWorldGenerator;
 
@@ -129,6 +135,9 @@ public class Thaumcraft {
         GameRegistry.registerTileEntity(TileJarBrain.class, new net.minecraft.util.ResourceLocation("thaumcraft", "jar_brain"));
         GameRegistry.registerTileEntity(TileJarNode.class, new net.minecraft.util.ResourceLocation("thaumcraft", "jar_node"));
         GameRegistry.registerTileEntity(TileJarFillableVoid.class, new net.minecraft.util.ResourceLocation("thaumcraft", "jar_fillable_void"));
+        GameRegistry.registerTileEntity(TileCrystal.class, new net.minecraft.util.ResourceLocation("thaumcraft", "crystal"));
+        GameRegistry.registerTileEntity(TileEldritchCrystal.class, new net.minecraft.util.ResourceLocation("thaumcraft", "eldritch_crystal"));
+        GameRegistry.registerTileEntity(TileNode.class, new net.minecraft.util.ResourceLocation("thaumcraft", "node"));
     }
 
     @Mod.EventHandler
@@ -171,6 +180,8 @@ public class Thaumcraft {
         event.getRegistry().registerAll(ConfigItems.getAllItems());
         // Register ItemBlocks for blocks
         event.getRegistry().register(new BlockJarItem(ConfigBlocks.blockJar).setRegistryName("thaumcraft", "jar"));
+        event.getRegistry().register(new net.minecraft.item.ItemBlock(ConfigBlocks.blockCrystal)
+                .setRegistryName("thaumcraft", "crystal"));
     }
 
     @SubscribeEvent

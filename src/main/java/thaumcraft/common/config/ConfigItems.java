@@ -1,6 +1,8 @@
 package thaumcraft.common.config;
 
 import net.minecraft.item.Item;
+import thaumcraft.common.items.ItemShard;
+import thaumcraft.common.items.ItemWispEssence;
 import thaumcraft.common.items.wands.ItemWandCap;
 import thaumcraft.common.items.wands.ItemWandCasting;
 import thaumcraft.common.items.wands.ItemWandRod;
@@ -28,6 +30,10 @@ public class ConfigItems {
     public static FocusPech focusPech;
     public static FocusTrade focusTrade;
     public static FocusPortableHole focusPortableHole;
+
+    // Basic items
+    public static ItemShard itemShard;
+    public static ItemWispEssence itemWispEssence;
 
     // All registered items
     private static final List<Item> allItems = new ArrayList<>();
@@ -127,6 +133,16 @@ public class ConfigItems {
                 .setTranslationKey("thaumcraft.focus_portable_hole")
                 .setCreativeTab(tab);
         allItems.add(focusPortableHole);
+
+        itemShard = (ItemShard) new ItemShard()
+                .setRegistryName("thaumcraft", "shard")
+                .setTranslationKey("thaumcraft.shard");
+        allItems.add(itemShard);
+
+        itemWispEssence = (ItemWispEssence) new ItemWispEssence()
+                .setRegistryName("thaumcraft", "wisp_essence")
+                .setTranslationKey("thaumcraft.wisp_essence");
+        allItems.add(itemWispEssence);
     }
 
     public static Item[] getAllItems() {
