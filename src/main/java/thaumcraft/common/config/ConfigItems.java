@@ -1,6 +1,12 @@
 package thaumcraft.common.config;
 
 import net.minecraft.item.Item;
+import thaumcraft.common.items.ItemCrystalEssence;
+import thaumcraft.common.items.ItemEldritchObject;
+import thaumcraft.common.items.ItemEssence;
+import thaumcraft.common.items.ItemLootBag;
+import thaumcraft.common.items.ItemNugget;
+import thaumcraft.common.items.ItemResource;
 import thaumcraft.common.items.ItemShard;
 import thaumcraft.common.items.ItemWispEssence;
 import thaumcraft.common.items.wands.ItemWandCap;
@@ -38,20 +44,23 @@ public class ConfigItems {
     // All registered items
     private static final List<Item> allItems = new ArrayList<>();
 
+    // Phase 5 items
+    public static ItemResource itemResource;
+    public static ItemEssence itemEssence;
+    public static ItemCrystalEssence itemCrystalEssence;
+    public static ItemNugget itemNugget;
+    public static ItemEldritchObject itemEldritchObject;
+    public static ItemLootBag itemLootBag;
+
     // Future items (stubs for compilation compatibility)
     public static Object itemAmuletVis;
     public static Object itemRingRunic;
     public static Object itemBaubleBlanks;
-    public static Object itemResource;
-    public static Object itemLootbag;
     public static Object itemThaumonomicon;
     public static Object itemSwordThaumium;
     public static Object itemPickThaumium;
     public static Object itemAxeThaumium;
     public static Object itemHoeThaumium;
-    public static Object itemEldritchObject;
-    public static Object itemNugget;
-    public static Object itemEssence;
 
     public static void init() {
         CreativeTabThaumcraft tab = CreativeTabThaumcraft.tabThaumcraft;
@@ -143,6 +152,42 @@ public class ConfigItems {
                 .setRegistryName("thaumcraft", "wisp_essence")
                 .setTranslationKey("thaumcraft.wisp_essence");
         allItems.add(itemWispEssence);
+
+        itemResource = (ItemResource) new ItemResource()
+                .setRegistryName("thaumcraft", "resource")
+                .setTranslationKey("thaumcraft.resource")
+                .setCreativeTab(tab);
+        allItems.add(itemResource);
+
+        itemEssence = (ItemEssence) new ItemEssence()
+                .setRegistryName("thaumcraft", "essence")
+                .setTranslationKey("thaumcraft.essence")
+                .setCreativeTab(tab);
+        allItems.add(itemEssence);
+
+        itemCrystalEssence = (ItemCrystalEssence) new ItemCrystalEssence()
+                .setRegistryName("thaumcraft", "crystal_essence")
+                .setTranslationKey("thaumcraft.crystal_essence")
+                .setCreativeTab(tab);
+        allItems.add(itemCrystalEssence);
+
+        itemNugget = (ItemNugget) new ItemNugget()
+                .setRegistryName("thaumcraft", "nugget")
+                .setTranslationKey("thaumcraft.nugget")
+                .setCreativeTab(tab);
+        allItems.add(itemNugget);
+
+        itemEldritchObject = (ItemEldritchObject) new ItemEldritchObject()
+                .setRegistryName("thaumcraft", "eldritch_object")
+                .setTranslationKey("thaumcraft.eldritch_object")
+                .setCreativeTab(tab);
+        allItems.add(itemEldritchObject);
+
+        itemLootBag = (ItemLootBag) new ItemLootBag()
+                .setRegistryName("thaumcraft", "loot_bag")
+                .setTranslationKey("thaumcraft.loot_bag")
+                .setCreativeTab(tab);
+        allItems.add(itemLootBag);
     }
 
     public static Item[] getAllItems() {
