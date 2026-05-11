@@ -26,6 +26,7 @@ import thaumcraft.common.items.ItemTripleMeatTreat;
 import thaumcraft.common.items.ItemWispEssence;
 import thaumcraft.common.items.ItemZombieBrain;
 import thaumcraft.common.items.armor.*;
+import thaumcraft.common.items.baubles.*;
 import thaumcraft.common.items.equipment.*;
 import thaumcraft.common.items.wands.ItemWandCap;
 import thaumcraft.common.items.wands.ItemWandCasting;
@@ -153,10 +154,15 @@ public class ConfigItems {
     public static ItemTripleMeatTreat itemTripleMeatTreat;
     public static ItemZombieBrain itemZombieBrain;
 
+    // Baubles
+    public static ItemRingRunic itemRingRunic;
+    public static ItemAmuletRunic itemAmuletRunic;
+    public static ItemAmuletVis itemAmuletVis;
+    public static ItemGirdleRunic itemGirdleRunic;
+    public static ItemGirdleHover itemGirdleHover;
+    public static ItemBaubleBlanks itemBaubleBlanks;
+
     // Future items (stubs for compilation compatibility - not yet ported)
-    public static Object itemAmuletVis;
-    public static Object itemRingRunic;
-    public static Object itemBaubleBlanks;
     public static Object itemThaumonomicon;
 
     public static void init() {
@@ -654,6 +660,43 @@ public class ConfigItems {
                 .setTranslationKey("thaumcraft.hover_harness")
                 .setCreativeTab(tab);
         allItems.add(itemHoverHarness);
+
+        // Baubles
+        itemRingRunic = (ItemRingRunic) new ItemRingRunic()
+                .setRegistryName("thaumcraft", "ring_runic")
+                .setTranslationKey("thaumcraft.ring_runic")
+                .setCreativeTab(tab);
+        allItems.add(itemRingRunic);
+
+        itemAmuletRunic = (ItemAmuletRunic) new ItemAmuletRunic()
+                .setRegistryName("thaumcraft", "amulet_runic")
+                .setTranslationKey("thaumcraft.amulet_runic")
+                .setCreativeTab(tab);
+        allItems.add(itemAmuletRunic);
+
+        itemAmuletVis = (ItemAmuletVis) new ItemAmuletVis()
+                .setRegistryName("thaumcraft", "amulet_vis")
+                .setTranslationKey("thaumcraft.amulet_vis")
+                .setCreativeTab(tab);
+        allItems.add(itemAmuletVis);
+
+        itemGirdleRunic = (ItemGirdleRunic) new ItemGirdleRunic()
+                .setRegistryName("thaumcraft", "girdle_runic")
+                .setTranslationKey("thaumcraft.girdle_runic")
+                .setCreativeTab(tab);
+        allItems.add(itemGirdleRunic);
+
+        itemGirdleHover = (ItemGirdleHover) new ItemGirdleHover()
+                .setRegistryName("thaumcraft", "girdle_hover")
+                .setTranslationKey("thaumcraft.girdle_hover")
+                .setCreativeTab(tab);
+        allItems.add(itemGirdleHover);
+
+        itemBaubleBlanks = (ItemBaubleBlanks) new ItemBaubleBlanks()
+                .setRegistryName("thaumcraft", "bauble_blanks")
+                .setTranslationKey("thaumcraft.bauble_blanks")
+                .setCreativeTab(tab);
+        allItems.add(itemBaubleBlanks);
     }
 
     public static Item[] getAllItems() {

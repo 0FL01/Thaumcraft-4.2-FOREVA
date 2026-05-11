@@ -2,30 +2,43 @@ package thaumcraft.common.items.baubles;
 
 import baubles.api.BaubleType;
 import baubles.api.IBauble;
+import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import thaumcraft.api.aspects.Aspect;
-import thaumcraft.api.aspects.AspectList;
-import thaumcraft.api.aspects.IEssentiaContainerItem;
+import net.minecraft.util.NonNullList;
+import thaumcraft.api.ItemRunic;
 import thaumcraft.common.lib.CreativeTabThaumcraft;
 
-public class ItemAmuletVis extends Item implements IBauble, IEssentiaContainerItem {
+public class ItemGirdleRunic extends ItemRunic implements IBauble {
 
-    public ItemAmuletVis() {
+    public static final int META_NORMAL = 0;
+    public static final int META_KINETIC = 1;
+
+    public ItemGirdleRunic() {
+        super(10);
         this.setMaxStackSize(1);
         this.setMaxDamage(0);
         this.setNoRepair();
+        this.setHasSubtypes(true);
         this.setCreativeTab(CreativeTabThaumcraft.tabThaumcraft);
     }
 
-    public void addVis(ItemStack stack, Aspect aspect, int amount, boolean doit) {
-        // TBD: vis storage on amulet
+    @Override
+    public String getTranslationKey(ItemStack stack) {
+        return super.getTranslationKey() + "." + stack.getItemDamage();
+    }
+
+    @Override
+    public void getSubItems(CreativeTabs tab, NonNullList<ItemStack> items) {
+        if (this.isInCreativeTab(tab)) {
+            items.add(new ItemStack(this, 1, META_NORMAL));
+            items.add(new ItemStack(this, 1, META_KINETIC));
+        }
     }
 
     @Override
     public BaubleType getBaubleType(ItemStack itemstack) {
-        return BaubleType.AMULET;
+        return BaubleType.BELT;
     }
 
     @Override
@@ -45,22 +58,4 @@ public class ItemAmuletVis extends Item implements IBauble, IEssentiaContainerIt
 
     @Override
     public boolean willAutoSync(ItemStack itemstack, EntityLivingBase player) { return true; }
-
-    @Override
-    public AspectList getAspects(ItemStack itemstack) {
-        if (itemstack.hasTagCompound()) {
-            AspectList aspects = new AspectList();
-            aspects.readFromNBT(itemstack.getTagCompound());
-            return aspects;
-        }
-        return null;
-    }
-
-    @Override
-    public void setAspects(ItemStack itemstack, AspectList aspects) {
-        if (!itemstack.hasTagCompound()) {
-            itemstack.setTagCompound(new net.minecraft.nbt.NBTTagCompound());
-        }
-        aspects.writeToNBT(itemstack.getTagCompound());
-    }
 }
