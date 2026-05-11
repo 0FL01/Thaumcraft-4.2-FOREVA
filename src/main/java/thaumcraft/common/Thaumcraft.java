@@ -44,18 +44,7 @@ import thaumcraft.common.lib.events.EventHandlerRunic;
 import thaumcraft.common.lib.events.EventHandlerWorld;
 import thaumcraft.common.lib.events.ServerTickEventsFML;
 import thaumcraft.common.lib.network.PacketHandler;
-import thaumcraft.common.tiles.TileJarFillable;
-import thaumcraft.common.tiles.TileJarBrain;
-import thaumcraft.common.tiles.TileJarNode;
-import thaumcraft.common.tiles.TileJarFillableVoid;
-import thaumcraft.common.tiles.TileCrystal;
-import thaumcraft.common.tiles.TileEldritchCrystal;
-import thaumcraft.common.tiles.TileNode;
-import thaumcraft.common.tiles.TileTable;
-import thaumcraft.common.tiles.TileArcaneWorkbench;
-import thaumcraft.common.tiles.TileDeconstructionTable;
-import thaumcraft.common.tiles.TileResearchTable;
-import thaumcraft.common.tiles.TileMagicWorkbench;
+import thaumcraft.common.tiles.*;
 import thaumcraft.common.blocks.BlockJarItem;
 import thaumcraft.common.lib.world.ThaumcraftWorldGenerator;
 
@@ -148,6 +137,16 @@ public class Thaumcraft {
         GameRegistry.registerTileEntity(TileArcaneWorkbench.class, new net.minecraft.util.ResourceLocation("thaumcraft", "arcane_workbench"));
         GameRegistry.registerTileEntity(TileDeconstructionTable.class, new net.minecraft.util.ResourceLocation("thaumcraft", "deconstruction_table"));
         GameRegistry.registerTileEntity(TileResearchTable.class, new net.minecraft.util.ResourceLocation("thaumcraft", "research_table"));
+        GameRegistry.registerTileEntity(TilePedestal.class, new net.minecraft.util.ResourceLocation("thaumcraft", "pedestal"));
+        GameRegistry.registerTileEntity(TileWandPedestal.class, new net.minecraft.util.ResourceLocation("thaumcraft", "wand_pedestal"));
+        GameRegistry.registerTileEntity(TileAlchemyFurnace.class, new net.minecraft.util.ResourceLocation("thaumcraft", "alchemy_furnace"));
+        GameRegistry.registerTileEntity(TileInfusionMatrix.class, new net.minecraft.util.ResourceLocation("thaumcraft", "infusion_matrix"));
+        GameRegistry.registerTileEntity(TileInfusionPillar.class, new net.minecraft.util.ResourceLocation("thaumcraft", "infusion_pillar"));
+        GameRegistry.registerTileEntity(TileNodeStabilizer.class, new net.minecraft.util.ResourceLocation("thaumcraft", "node_stabilizer"));
+        GameRegistry.registerTileEntity(TileNodeConverter.class, new net.minecraft.util.ResourceLocation("thaumcraft", "node_converter"));
+        GameRegistry.registerTileEntity(TileSpa.class, new net.minecraft.util.ResourceLocation("thaumcraft", "spa"));
+        GameRegistry.registerTileEntity(TileFocalManipulator.class, new net.minecraft.util.ResourceLocation("thaumcraft", "focal_manipulator"));
+        GameRegistry.registerTileEntity(TileFluxScrubber.class, new net.minecraft.util.ResourceLocation("thaumcraft", "flux_scrubber"));
     }
 
     @Mod.EventHandler
@@ -194,6 +193,8 @@ public class Thaumcraft {
                 .setRegistryName("thaumcraft", "crystal"));
         event.getRegistry().register(new net.minecraft.item.ItemBlock(ConfigBlocks.blockTable)
                 .setRegistryName("thaumcraft", "table"));
+        event.getRegistry().register(new net.minecraft.item.ItemBlock(ConfigBlocks.blockStoneDevice)
+                .setRegistryName("thaumcraft", "stone_device"));
     }
 
     @SubscribeEvent
