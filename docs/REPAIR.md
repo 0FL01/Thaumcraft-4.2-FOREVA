@@ -24,8 +24,9 @@ ContainerGhostSlots + 3 container fixes, InventoryTrunk/Pech, ChampionModifiers,
 generateVisEffect+PacketFXVisDrain, ItemSpawnerEgg deleted+18 eggs added,
 EntityEldritchOrb Wither fix, EntityWatcher gaze (AIGuardianAttack inner class),
 EntityCultistCleric ranged attack (homing orb + triple fireball + spawn data),
-EntityPech NBT persistence (PECH_TYPE/ANGER/TAMED DataSerializers + loot array).
-Pending: D8 (3 empty entity shells).
+EntityPech NBT persistence (PECH_TYPE/ANGER/TAMED DataSerializers + loot array),
+EntityAspectOrb/EntityFallingTaint/EntityGolemBobber shell implementations.
+Pending: no Round D items.
 
 **Next milestone:** Complete all work that does NOT require Phase 8-10 (client GUI,
 rendering, recipes, research data). This is documented in the
@@ -768,13 +769,13 @@ All 22 entity classes with null/wrong/missing sound methods updated to return co
 | 2 | `EntityWisp.java` | NBT Type persistence | L | ✅ |
 | 3 | `EntityFrostShard.java` | Save/load DAMAGE, FROSTY fields | L | ✅ |
 
-### 6r.13 — Empty base entity shells (MEDIUM)
+### 6r.13 — Empty base entity shells (MEDIUM) ✅ DONE
 
-| # | File | Fix | Effort |
-|---|------|-----|--------|
-| 1 | `EntityAspectOrb.java` | Implement `entityInit` (data watcher), NBT save/load, `onUpdate` (lifetime + merge) | L |
-| 2 | `EntityFallingTaint.java` | Implement taint falling entity (similar to EntityFallingBlock) | L |
-| 3 | `EntityGolemBobber.java` | Implement fishing bobber behavior | L |
+| # | File | Fix | Effort | Status |
+|---|------|-----|--------|--------|
+| 1 | `EntityAspectOrb.java` | Aspect orb physics, player attraction, wand vis pickup, NBT + spawn data | L | ✅ |
+| 2 | `EntityFallingTaint.java` | Manual falling taint physics, placement, NBT + spawn data | L | ✅ |
+| 3 | `EntityGolemBobber.java` | Fishing bobber physics, water sampling, splash timers, spawn data | L | ✅ |
 
 ---
 
@@ -874,7 +875,7 @@ re-runs world gen for retrogen.
 Inner classes: `RestorableWardedBlock` (block NBT snapshot), `VirtualSwapper` (swap op).
 Uses `BlockUtils.breakFurthestBlock` for adjacency chain detection.
 
-### Round D — Remaining gaps
+### Round D — Closed gaps
 
 | # | Task | Phase | Effort | Dependencies |
 |---|------|-------|--------|-------------|
