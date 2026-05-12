@@ -46,12 +46,16 @@ public class EntityCultistPortal extends EntityThaumcraftBoss {
     public void writeEntityToNBT(NBTTagCompound nbt) {
         super.writeEntityToNBT(nbt);
         nbt.setInteger("stage", this.stage);
+        nbt.setInteger("stageCounter", this.stageCounter);
     }
 
     @Override
     public void readEntityFromNBT(NBTTagCompound nbt) {
         super.readEntityFromNBT(nbt);
         this.stage = nbt.getInteger("stage");
+        if (nbt.hasKey("stageCounter")) {
+            this.stageCounter = nbt.getInteger("stageCounter");
+        }
     }
 
     @Override
@@ -281,7 +285,7 @@ public class EntityCultistPortal extends EntityThaumcraftBoss {
 
     @Override
     protected void onDeathUpdate() {
-        if (!this.world.isRemote) {
+        if (!this.world.isRemote && this.deathTime == 0) {
             this.world.createExplosion(this, this.posX, this.posY, this.posZ, 2.0F, false);
         }
         super.onDeathUpdate();
