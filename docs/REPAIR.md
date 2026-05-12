@@ -22,9 +22,9 @@ static helpers, runic charge state), `EventHandlerWorld` (11 handlers + chunk re
 Round D complete: CultistPortal boss stages, EldritchGuardian attacks,
 ContainerGhostSlots + 3 container fixes, InventoryTrunk/Pech, ChampionModifiers,
 generateVisEffect+PacketFXVisDrain, ItemSpawnerEgg deleted+18 eggs added,
-EntityEldritchOrb Wither fix, EntityWatcher gaze (AIGuardianAttack inner class).
-Pending: D1.4 (Cleric ranged), D2 (Pech NBT persistence/types),
-D8 (3 empty entity shells).
+EntityEldritchOrb Wither fix, EntityWatcher gaze (AIGuardianAttack inner class),
+EntityCultistCleric ranged attack (homing orb + triple fireball + spawn data).
+Pending: D2 (Pech NBT persistence/types), D8 (3 empty entity shells).
 
 **Next milestone:** Complete all work that does NOT require Phase 8-10 (client GUI,
 rendering, recipes, research data). This is documented in the
@@ -665,8 +665,8 @@ Group B manual AI (5 entities) has lifecycle migration (updateAITasks/onLivingUp
 | 4 | `EntityThaumicSlime` | Split on death, spit projectile, merge, jump | L | ✅ |
 | 5 | `EntityInhabitedZombie` | On death: spawn `EntityEldritchCrab` | L | ⏳ |
 | 6 | `EntityCultistPortal` | Spawn cultists on timer | L | ⏳ |
-| 7 | `EntityEldritchGuardian` | Fire EldritchOrb projectile, sonic screech AoE | M | ⏳ |
-| 8 | `EntityCultistCleric` | Fire dart projectile, healing aura | L | ⏳ |
+| 7 | `EntityEldritchGuardian` | Fire EldritchOrb projectile, sonic screech AoE | M | ✅ |
+| 8 | `EntityCultistCleric` | Fire dart projectile, healing aura | L | ✅ |
 
 ### 6r.6 — Champion modifier fixes (MEDIUM)
 
