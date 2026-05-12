@@ -2,9 +2,11 @@ package thaumcraft.common.entities.projectile;
 
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.projectile.EntityThrowable;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.DamageSource;
+import net.minecraft.util.EntityDamageSourceIndirect;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
 public class EntityExplosiveOrb extends EntityThrowable {
@@ -21,14 +23,43 @@ public class EntityExplosiveOrb extends EntityThrowable {
     @Override
     protected void onImpact(RayTraceResult result) {
         if (result == null) return;
-        if (this.world.isRemote) {
-            return;
+        if (!this.world.isRemote) {
+            if (result.typeOfHit == RayTraceResult.Type.ENTITY && result.entityHit != null) {
+                DamageSource ds = this.getThrower() != null
+                    ? new EntityDamageSourceIndirect("fireball", this, this.getThrower())
+                        .setFireDamage().setProjectile()
+                    : new EntityDamageSourceIndirect("onFire", this, this)
+                        .setFireDamage().setProjectile();
+                result.entityHit.attackEntityFrom(ds, this.strength * 1.5f);
+            }
+            this.world.newExplosion(null, this.posX, this.posY, this.posZ,
+                this.strength, this.onFire, false);
         }
-        // Both entity and block hits trigger explosion
-        if (result.typeOfHit == RayTraceResult.Type.ENTITY && result.entityHit != null) {
-            // Direct hit bonus damage (Phase 3)
-        }
-        // Explosion at impact point (Phase 3)
         this.setDead();
+    }
+
+    @Override
+    public void onUpdate() {
+        super.onUpdate();
+        if (this.ticksExisted > 500) this.setDead();
+    }
+
+    @Override
+    public boolean attackEntityFrom(DamageSource source, float amount) {
+        if (this.isEntityInvulnerable(source)) return false;
+        this.velocityChanged = true;
+        if (source.getTrueSource() != null) {
+            Vec3d look = source.getTrueSource().getLookVec();
+            if (look != null) {
+                this.motionX = look.x;
+                this.motionY = look.y;
+                this.motionZ = look.z;
+                this.motionX *= 0.9;
+                this.motionY *= 0.9;
+                this.motionZ *= 0.9;
+            }
+            return true;
+        }
+        return false;
     }
 }
