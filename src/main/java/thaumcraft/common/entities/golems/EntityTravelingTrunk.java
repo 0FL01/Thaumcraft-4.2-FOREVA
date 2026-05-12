@@ -3,10 +3,17 @@ package thaumcraft.common.entities.golems;
 public class EntityTravelingTrunk extends net.minecraft.entity.EntityLiving implements net.minecraft.entity.IEntityOwnable {
 
     private net.minecraft.entity.EntityLivingBase owner;
+    public final InventoryTrunk inventory = new InventoryTrunk();
+    private boolean open;
+    private boolean stay;
     private static final net.minecraft.network.datasync.DataParameter<com.google.common.base.Optional<java.util.UUID>> OWNER_UUID =
         net.minecraft.network.datasync.EntityDataManager.createKey(EntityTravelingTrunk.class, net.minecraft.network.datasync.DataSerializers.OPTIONAL_UNIQUE_ID);
 
-    public EntityTravelingTrunk(net.minecraft.world.World world) { super(world); this.setSize(0.7f, 0.5f); }
+    public EntityTravelingTrunk(net.minecraft.world.World world) {
+        super(world);
+        this.setSize(0.7f, 0.5f);
+        this.inventory.setEntity(this);
+    }
 
     @Override
     protected void entityInit() {
@@ -52,5 +59,48 @@ public class EntityTravelingTrunk extends net.minecraft.entity.EntityLiving impl
 
     public void setOwnerId(java.util.UUID id) {
         this.dataManager.set(OWNER_UUID, com.google.common.base.Optional.fromNullable(id));
+    }
+
+    public int getRows() {
+        return Math.max(1, Math.min(4, (this.inventory.getSizeInventory() + 8) / 9));
+    }
+
+    public void setOpen(boolean open) {
+        this.open = open;
+    }
+
+    public boolean getOpen() {
+        return this.open;
+    }
+
+    public void setStay(boolean stay) {
+        this.stay = stay;
+    }
+
+    public boolean getStay() {
+        return this.stay;
+    }
+
+    @Override
+    public boolean processInteract(net.minecraft.entity.player.EntityPlayer player, net.minecraft.util.EnumHand hand) {
+        if (!this.world.isRemote) {
+            player.openGui(thaumcraft.common.Thaumcraft.instance, 8, this.world, this.getEntityId(), 0, 0);
+        }
+        return true;
+    }
+
+    @Override
+    public void readEntityFromNBT(net.minecraft.nbt.NBTTagCompound compound) {
+        super.readEntityFromNBT(compound);
+        this.stay = compound.getBoolean("Stay");
+        this.inventory.readFromNBT(compound.getTagList("Inventory", 10));
+        this.inventory.setEntity(this);
+    }
+
+    @Override
+    public void writeEntityToNBT(net.minecraft.nbt.NBTTagCompound compound) {
+        super.writeEntityToNBT(compound);
+        compound.setBoolean("Stay", this.stay);
+        compound.setTag("Inventory", this.inventory.writeToNBT(new net.minecraft.nbt.NBTTagList()));
     }
 }

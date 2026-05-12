@@ -345,8 +345,10 @@ public class EntityGolemBase extends net.minecraft.entity.monster.EntityGolem im
 
     public boolean customInteraction(net.minecraft.entity.player.EntityPlayer player) {
         if (this.getCore() > -1 && thaumcraft.common.entities.golems.ItemGolemCore.hasGUI(this.getCore())) {
-            // TODO: open GUI
-            return false;
+            if (!this.world.isRemote) {
+                player.openGui(thaumcraft.common.Thaumcraft.instance, 6, this.world, this.getEntityId(), 0, 0);
+            }
+            return true;
         }
         return false;
     }

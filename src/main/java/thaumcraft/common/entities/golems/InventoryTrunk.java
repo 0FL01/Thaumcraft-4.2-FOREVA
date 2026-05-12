@@ -83,20 +83,20 @@ public class InventoryTrunk implements IInventory {
 
     @Override
     public boolean isUsableByPlayer(EntityPlayer player) {
-        return false;
+        return this.ent != null && !this.ent.isDead && player.getDistanceSq(this.ent) <= 64.0D;
     }
 
     @Override
     public void openInventory(EntityPlayer player) {
         if (this.ent != null) {
-            // TODO: ent.setOpen(true) when EntityTravelingTrunk has open/close state
+            this.ent.setOpen(true);
         }
     }
 
     @Override
     public void closeInventory(EntityPlayer player) {
         if (this.ent != null) {
-            // TODO: ent.setOpen(false) when EntityTravelingTrunk has open/close state
+            this.ent.setOpen(false);
         }
     }
 

@@ -1,13 +1,17 @@
 package thaumcraft.common;
 
 import javax.annotation.Nullable;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.network.IGuiHandler;
 import thaumcraft.common.container.*;
 import thaumcraft.common.entities.ContainerPech;
 import thaumcraft.common.entities.golems.ContainerGolem;
+import thaumcraft.common.entities.golems.EntityGolemBase;
+import thaumcraft.common.entities.golems.EntityTravelingTrunk;
 import thaumcraft.common.entities.golems.ContainerTravelingTrunk;
+import thaumcraft.common.entities.monster.EntityPech;
 import thaumcraft.common.lib.capabilities.IPlayerKnowledge;
 import thaumcraft.common.lib.capabilities.PlayerKnowledgeProvider;
 import thaumcraft.common.lib.research.PlayerKnowledge;
@@ -37,6 +41,7 @@ public class CommonProxy implements IGuiHandler {
     @Nullable
     @Override
     public Object getServerGuiElement(int ID, EntityPlayer player, World world, int x, int y, int z) {
+        Entity entity = world.getEntityByID(x);
         switch (ID) {
             case 0: return new ContainerArcaneWorkbench();
             case 1: return new ContainerResearchTable();
@@ -44,9 +49,9 @@ public class CommonProxy implements IGuiHandler {
             case 3: return new ContainerAlchemyFurnace();
             case 4: return new ContainerDeconstructionTable();
             case 5: return new ContainerFocusPouch();
-            case 6: return new ContainerGolem();
-            case 7: return new ContainerPech();
-            case 8: return new ContainerTravelingTrunk();
+            case 6: return entity instanceof EntityGolemBase ? new ContainerGolem(player.inventory, (EntityGolemBase) entity) : null;
+            case 7: return entity instanceof EntityPech ? new ContainerPech(player.inventory, world, (EntityPech) entity) : null;
+            case 8: return entity instanceof EntityTravelingTrunk ? new ContainerTravelingTrunk(player.inventory, world, (EntityTravelingTrunk) entity) : null;
             case 9: return new ContainerThaumatorium();
             case 10: return new ContainerHandMirror();
             case 11: return new ContainerHoverHarness();

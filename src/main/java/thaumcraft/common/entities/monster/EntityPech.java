@@ -222,6 +222,17 @@ public class EntityPech extends net.minecraft.entity.monster.EntityMob implement
     @Override
     public void setSwingingArms(boolean swinging) {}
 
+    @Override
+    public boolean processInteract(EntityPlayer player, net.minecraft.util.EnumHand hand) {
+        if (this.isTamed()) {
+            if (!this.world.isRemote) {
+                player.openGui(thaumcraft.common.Thaumcraft.instance, 7, this.world, this.getEntityId(), 0, 0);
+            }
+            return true;
+        }
+        return super.processInteract(player, hand);
+    }
+
     // ------------------------------------------------------------------
     // Inventory / pickup
     // ------------------------------------------------------------------
