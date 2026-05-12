@@ -447,29 +447,42 @@ generator all compile. Ores, trees, and structures generate via
 
 | # | Компонент | Статус | Проблема | Fix |
 |---|-----------|--------|----------|-----|
-| 1 | **Biome color** (все 4 биома) | 🩹 Костыль | Поле `Biome.field_180277_b` (`color`) не замаплено в MCP stable 39. Убрали присвоение — на F3 биомы чёрные | `ColorHandlerEvent.Biome` — зарегистрировать хендлер, который возвращает цвет через `biome.getDefaultBiomeColor()` или кастомную мапу |
-| 2 | **MazeHandler persistence** (dim) | 🩹 Костыль | `WorldInfo.getCustomData()`/`setCustomData()` удалены в 1.12.2. `loadMaze()`/`saveMaze()` — пустые заглушки | Переписать на `WorldSavedData` (паттерн как `MapBossData`). CFR: `MazeHandler.class` → `readNBT()`/`writeNBT()` логика уже портирована, осталось привязать к `WorldSavedData` |
-| 3 | **7 room generators** (dim) | ❌ Заглушки | GenBossRoom, GenKeyRoom, GenLibraryRoom, GenNestRoom, GenPassage, GenPortal, Gen2x2 — пустые классы без расстановки блоков/мобов/сокровищ | CFR декомпиляция оригиналов `thaumcraft_src/.../dim/*.class` + адаптация Block ID → `IBlockState` |
-| 4 | **GenCommon.placeBlock()** (dim) | ❌ Полупустой | Использует числовые Block ID (1.7.10), есть только минимальная обёртка | CFR `GenCommon.class` — статические константы `BEDROCK`, `STONE`, `VOID` и т.д. нужно заменить на `Blocks.*` |
-| 5 | **BlockStairsEldritch** (dim) | ❌ Не портирован | Нужен для лестниц в GenPassage | CFR `thaumcraft_src/.../blocks/BlockCosmeticStairs.class` — extends `BlockStairs` в 1.12.2 |
-| 6 | **BlockEldritchPortal.onEntityCollision** (dim) | 🩹 Костыль | Заглушка — телепортация не реализована | CFR `TileEldritchPortal.class` + `WorldGenEldritchRing.class` — реализовать вызов `TeleporterThaumcraft` |
-| 7 | **EntityPermanentItem** (dim) | ❌ Не портирован | Нужен для GenKeyRoom (ключ на пьедестале, не деспавнится) | CFR `thaumcraft_src/.../entities/EntityPermanentItem.class` — extends `EntityItem` с `isImmuneToExplosions` = true |
-| 8 | **Village components** | ❌ Не портированы | ComponentWizardTower, ComponentBankerHome, VillageWizardManager, VillageBankerManager — деревни без ТС структур | CFR `thaumcraft_src/.../world/*.class` — адаптация `ComponentVillage` → `StructureVillagePieces` |
+| 1 | **Biome color** (все 4 биома) | ❌ Deferred | Поле `Biome.color` удалено в 1.12.2 MCP. На F3 биомы без цветного фона (косметика) | Разобраться с 1.12.2 способом установки debug overlay цвета (возможно через `Biome` events) |
+| 2 | **MazeHandler persistence** (dim) | ✅ Done | `loadMaze()`/`saveMaze()` через `CompressedStreamTools` + `labyrinth.dat` (прямая файловая запись, как в оригинале) | Реализовано в `MazeHandler.loadMaze/saveMaze` |
+| 3 | **7 room generators** (dim) | ✅ Done | GenBossRoom, GenKeyRoom, GenLibraryRoom, GenNestRoom, GenPassage, GenPortal, Gen2x2 — полный порт из оригиналов | Все 7 классов портированы с CFR-декопилей |
+| 4 | **GenCommon.placeBlock()** (dim) | ✅ Done | 21 Block ID (BEDROCK=1…CRUST=21), PAT_CONNECT, processDecorations, generateConnections, isBedrockShowing | Реализовано в `GenCommon` |
+| 5 | **BlockStairsEldritch** (dim) | ✅ Done | Новый класс `BlockStairsEldritch` (extends `BlockStairs`, ссылается на `blockCosmeticSolid`) | Зарегистрирован в `ConfigBlocks` |
+| 6 | **BlockEldritchPortal.onEntityCollision** (dim) | ✅ Done | Телепортация в `OuterLands` (dim -42) через `TeleporterThaumcraft` с 40-тик кулдауном | Реализовано в `BlockEldritchPortal` + `TileEldritchPortal` |
+| 7 | **EntityPermanentItem** (dim) | ✅ Done | `EntityPermanentItem` расширен: иммунитет к урону/взрывам, `lifespan = Integer.MAX_VALUE` | Реализовано |
+| 8 | **Village components** | ❌ Deferred | ComponentWizardTower, ComponentBankerHome, VillageWizardManager, VillageBankerManager — API 1.12.2 сильно изменилось | TODO: изучить 1.12.2 `StructureVillagePieces`, `IVillageCreationHandler` |
 | 9 | **WorldGenSilverwoodTreesOld** | ❌ Не портирован | Legacy генератор серебряных деревьев | CFR `thaumcraft_src/.../world/WorldGenSilverwoodTreesOld.class` |
 
-#### Remediation Order
+#### Выполнено
 
-| Step | Scope | Источник | Объём |
-|------|-------|----------|-------|
-| **7r.1** | Biome color fix | `ColorHandlerEvent.Biome` + CFR vanilla биомов | ~30 строк |
-| **7r.2** | MazeHandler + MapBossData persistence | `WorldSavedData` паттерн, CFR `MazeHandler.class` | ~50 строк |
-| **7r.3** | BlockStairsEldritch + EntityPermanentItem | CFR оригиналов | ~120 строк |
-| **7r.4** | Portal teleport (Tile + Block) | CFR оригиналов + `TeleporterThaumcraft` | ~60 строк |
-| **7r.5** | Room generators (7 + GenCommon) | CFR `thaumcraft_src/.../dim/` | ~800 строк |
-| **7r.6** | Village components (4 класса) | CFR `thaumcraft_src/.../world/` | ~300 строк |
+| Step | Scope | Статус |
+|------|-------|--------|
+| **7r.2** | MazeHandler persistence | ✅ CompressedStreamTools file I/O |
+| **7r.3** | BlockStairsEldritch + EntityPermanentItem | ✅ |
+| **7r.4** | Portal teleport (Tile + Block) | ✅ |
+| **7r.5** | Room generators (7 + GenCommon) | ✅ ~800 строк |
+| **7r.5** | MazeGenerator (feature assignment, exit room, dead-end rooms) | ✅ |
+| **7r.5** | MazeThread (proper grid feature storage) | ✅ |
+| **7r.5** | BlockUtils.countExposedSides / isBlockAdjacentToAtleast / isAdjacentToSolidBlock | ✅ |
+| **7r.5** | Utils.setBiomeAt | ✅ |
+| **7r.5** | EntityUtils.makeChampion (minimal) | ✅ |
+| **7r.5** | TileEldritchCrabSpawner / TileEldritchLock (setFacing + NBT) | ✅ |
 
-**Risks**: Room generators — самый объёмный блок (~800 строк). Village components
-требуют изучения `StructureVillagePieces` API (отличается от 1.7.10).
+#### Deferred (следующая итерация)
+
+| Step | Scope | Почему | План |
+|------|-------|--------|------|
+| **7r.1** | Biome color fix | `Biome.color` удалён в 1.12.2; `ColorHandlerEvent.Biome` не существует в Forge 1.12.2 | Найти 1.12.2-способ задания debug overlay цвета для биома |
+| **7r.6** | Village components (4 класса) | API 1.12.2: `setCoordBaseMode(EnumFacing)`, `placeDoorCurrentPosition(EnumFacing)`, `IVillageTradeHandler` удалён, `WeightedRandomChestContent`/`ChestGenHooks` удалены | Новая попытка порта с нуля с учётом 1.12.2 API |
+| **7r.7** | WorldGenSilverwoodTreesOld | Legacy tree gen, не влияет на генерацию | Портировать при необходимости |
+
+**Risks**: Village components требуют изучения `StructureVillagePieces` 1.12.2 API (значительно
+отличается от 1.7.10). `IVillageTradeHandler` удалён — торговлю придётся регистрировать
+через `EntityVillager.ITradeList` или villager profession registry.
 
 ---
 
