@@ -23,8 +23,9 @@ Round D complete: CultistPortal boss stages, EldritchGuardian attacks,
 ContainerGhostSlots + 3 container fixes, InventoryTrunk/Pech, ChampionModifiers,
 generateVisEffect+PacketFXVisDrain, ItemSpawnerEgg deleted+18 eggs added,
 EntityEldritchOrb Wither fix, EntityWatcher gaze (AIGuardianAttack inner class),
-EntityCultistCleric ranged attack (homing orb + triple fireball + spawn data).
-Pending: D2 (Pech NBT persistence/types), D8 (3 empty entity shells).
+EntityCultistCleric ranged attack (homing orb + triple fireball + spawn data),
+EntityPech NBT persistence (PECH_TYPE/ANGER/TAMED DataSerializers + loot array).
+Pending: D8 (3 empty entity shells).
 
 **Next milestone:** Complete all work that does NOT require Phase 8-10 (client GUI,
 rendering, recipes, research data). This is documented in the
@@ -763,7 +764,7 @@ All 22 entity classes with null/wrong/missing sound methods updated to return co
 
 | # | File | Fix | Effort | Status |
 |---|------|-----|--------|--------|
-| 1 | `EntityPech.java` | `readEntityFromNBT`/`writeEntityToNBT`: save/load PECH_TYPE, ANGRY | L | ⏳ |
+| 1 | `EntityPech.java` | `readEntityFromNBT`/`writeEntityToNBT`: save/load PECH_TYPE, ANGER, TAMED, loot[] | L | ✅ |
 | 2 | `EntityWisp.java` | NBT Type persistence | L | ✅ |
 | 3 | `EntityFrostShard.java` | Save/load DAMAGE, FROSTY fields | L | ✅ |
 
@@ -878,7 +879,7 @@ Uses `BlockUtils.breakFurthestBlock` for adjacency chain detection.
 | # | Task | Phase | Effort | Dependencies |
 |---|------|-------|--------|-------------|
 | 1 | Mob special abilities: CultistPortal spawn timer, Watcher gaze, EldritchGuardian projectile | 6r.5 | M | Projectiles (✅) |
-| 2 | Entity NBT persistence: EntityPech PECH_TYPE/ANGRY | 6r.12 | L | None |
+| 2 | Entity NBT persistence: EntityPech PECH_TYPE/ANGER/TAMED | 6r.12 | L | None |
 | 3 | Container GUIs canInteractWith (3 containers) | 6r.9 | L | None |
 | 4 | InventoryTrunk + InventoryPech | 6r.10 | L | None |
 | 5 | ItemSpawnerEgg registration | 6r.11 | L | None |
