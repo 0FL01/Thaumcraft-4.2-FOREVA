@@ -80,7 +80,18 @@ public class EntityWatcher extends EntityMob {
         // Custom look/move helpers
         this.watcherLookHelper = new GuardianLookHelper(this);
         this.watcherMoveHelper = new GuardianMoveHelper();
+        this.moveHelper = this.watcherMoveHelper;
         this.tailAngle = this.prevTailAngle = this.rand.nextFloat();
+    }
+
+    @Override
+    public EntityLookHelper getLookHelper() {
+        return this.watcherLookHelper != null ? this.watcherLookHelper : super.getLookHelper();
+    }
+
+    @Override
+    public EntityMoveHelper getMoveHelper() {
+        return this.watcherMoveHelper != null ? this.watcherMoveHelper : super.getMoveHelper();
     }
 
     @Override
@@ -282,6 +293,9 @@ public class EntityWatcher extends EntityMob {
         }
 
         super.onLivingUpdate();
+        if (this.watcherLookHelper != null) {
+            this.watcherLookHelper.onUpdateLook();
+        }
     }
 
     public float getTailAngle(float partialTicks) {
