@@ -12,7 +12,10 @@ variant: high
 permission:
   write: deny
   edit: deny
-  read: allow
+  read:
+    "*": allow
+    "/tmp": deny
+    "/tmp/*": deny
   tavily-local_*: allow
   bash:
     "*": allow

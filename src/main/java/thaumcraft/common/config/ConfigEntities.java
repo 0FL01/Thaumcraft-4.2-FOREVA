@@ -3,6 +3,7 @@ package thaumcraft.common.config;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.common.registry.EntityEntry;
 import net.minecraftforge.fml.common.registry.EntityEntryBuilder;
+import net.minecraftforge.fml.common.registry.VillagerRegistry;
 import thaumcraft.common.entities.*;
 import thaumcraft.common.entities.golems.*;
 import thaumcraft.common.entities.monster.*;
@@ -16,6 +17,11 @@ public class ConfigEntities {
 
     public static int entWizardId = 190;
     public static int entBankerId = 191;
+
+    // Villager professions
+    public static VillagerRegistry.VillagerProfession PROF_WIZARD;
+    public static VillagerRegistry.VillagerProfession PROF_BANKER;
+    public static List<VillagerRegistry.VillagerProfession> PROFESSIONS = new ArrayList<>();
 
     private static int id = 0;
 
@@ -120,5 +126,21 @@ public class ConfigEntities {
 
         // Item grate
         ENTITIES.add(makeEntry(EntityItemGrate.class, "item_grate", 64, 20, true, false, 0, 0));
+
+        // Villager professions (textures use vanilla farmer as placeholder)
+        PROFESSIONS.clear();
+        PROF_WIZARD = new VillagerRegistry.VillagerProfession(
+                "thaumcraft:wizard",
+                "minecraft:textures/entity/villager/farmer.png",
+                "minecraft:textures/entity/zombie_villager/zombie_farmer.png"
+        ).setRegistryName("thaumcraft:wizard");
+        PROFESSIONS.add(PROF_WIZARD);
+
+        PROF_BANKER = new VillagerRegistry.VillagerProfession(
+                "thaumcraft:banker",
+                "minecraft:textures/entity/villager/farmer.png",
+                "minecraft:textures/entity/zombie_villager/zombie_farmer.png"
+        ).setRegistryName("thaumcraft:banker");
+        PROFESSIONS.add(PROF_BANKER);
     }
 }

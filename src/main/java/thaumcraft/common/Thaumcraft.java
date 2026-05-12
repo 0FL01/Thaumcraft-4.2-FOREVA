@@ -21,8 +21,10 @@ import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
+import net.minecraft.world.gen.structure.MapGenStructureIO;
 import net.minecraftforge.fml.common.registry.EntityEntry;
 import net.minecraftforge.fml.common.registry.GameRegistry;
+import net.minecraftforge.fml.common.registry.VillagerRegistry;
 import net.minecraftforge.common.DimensionManager;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -47,6 +49,10 @@ import thaumcraft.common.lib.events.ServerTickEventsFML;
 import thaumcraft.common.lib.network.PacketHandler;
 import thaumcraft.common.tiles.*;
 import thaumcraft.common.blocks.BlockJarItem;
+import thaumcraft.common.lib.world.ComponentBankerHome;
+import thaumcraft.common.lib.world.ComponentWizardTower;
+import thaumcraft.common.lib.world.VillageBankerManager;
+import thaumcraft.common.lib.world.VillageWizardManager;
 import thaumcraft.common.lib.world.ThaumcraftWorldGenerator;
 
 @Mod(
@@ -205,6 +211,14 @@ public class Thaumcraft {
         Config.registerBiomes();
         Config.initLoot();
         Config.initMisc();
+
+        // Register village components with MapGenStructureIO
+        MapGenStructureIO.registerStructureComponent(ComponentWizardTower.class, "TCWizTower");
+        MapGenStructureIO.registerStructureComponent(ComponentBankerHome.class, "TCBankerHome");
+
+        // Register village creation handlers
+        VillagerRegistry.instance().registerVillageCreationHandler(new VillageWizardManager());
+        VillagerRegistry.instance().registerVillageCreationHandler(new VillageBankerManager());
     }
 
     @Mod.EventHandler
@@ -286,6 +300,12 @@ public class Thaumcraft {
     public void registerSounds(RegistryEvent.Register<SoundEvent> event) {
         log.info("Registering sound events");
         // Phase 7: register actual sounds
+    }
+
+    @SubscribeEvent
+    public void registerVillagerProfessions(RegistryEvent.Register<VillagerRegistry.VillagerProfession> event) {
+        log.info("Registering villager professions");
+        event.getRegistry().registerAll(ConfigEntities.PROFESSIONS.toArray(new VillagerRegistry.VillagerProfession[0]));
     }
 
     // ---- Warp utilities ----

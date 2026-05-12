@@ -13,6 +13,16 @@ permission:
   read:
     "*": allow
     "*.env.example": allow
+    "/tmp": deny
+    "/tmp/*": deny
+  write:
+    "*": allow
+    "/tmp": deny
+    "/tmp/*": deny
+  edit:
+    "*": allow
+    "/tmp": deny
+    "/tmp/*": deny
 ---
 # Тон и стиль
 - Без emoji. Вывод для CLI: короткий, лаконичный, GitHub-flavored markdown (monospace).
