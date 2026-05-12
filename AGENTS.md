@@ -128,6 +128,7 @@ Confirmed sources: `mcmod.info` (dependencies: `["Baubles"]`), `dependancies.inf
 | 4 | Blocks + Tile Entities (71 blocks + 80 TEs) | ✅ Done | ~400 (286 source files) |
 | 5 | Items, Tools, Armor, Baubles, Relics (~110 items) | ✅ Done | ~550 (340 source files) |
 | 6 | Entities, Mobs, Golems (~128 classes + 44 AI) | ✅ Done | ~660 (480 source files) |
+| 7 | World Generation (biomes, dimension, trees, structures) | ✅ Done | ~700 (530 source files) |
 
 ## Where To Look
 | `thaumcraft_src/thaumcraft/common/CommonProxy.class` | Server proxy (registration, network, config) |

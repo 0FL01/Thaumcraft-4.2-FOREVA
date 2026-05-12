@@ -396,43 +396,45 @@ that need actual logic (currently placeholder stubs).
 
 ---
 
-### Phase 7 — World Generation (estimated: 2 sessions)
+### Phase 7 — World Generation (✅ Compiling, 4 sub-steps)
 
-**Goal**: Custom biomes appear, Eldritch dimension accessible, world
-features generate.
+**Status**: 4 biomes, Eldritch dimension, trees, structures, and world
+generator all compile. Ores, trees, and structures generate via
+`ThaumcraftWorldGenerator`. Custom dimension accessible via `WorldProviderOuter`.
 
-**Deliverables**:
-- **Biomes** (4):
-  - `BiomeGenTaint` → `BiomeTaint`
-  - `BiomeGenMagicalForest` → `BiomeMagicalForest`
-  - `BiomeGenEerie` → `BiomeEerie`
-  - `BiomeGenEldritch` → `BiomeEldritch`
-  - Biome dictionary registration (MAGICAL, WASTELAND, SPOOKY, FOREST, END)
-  - Biome → primal aspect mapping via `BiomeHandler`
-- **Eldritch Dimension** (dim ID: -42):
-  - `WorldProviderOuter` — custom sky, fog, lighting
-  - `MazeGenerator` — cell-based maze generation
-  - `ChunkProviderOuter` — maze chunk population
-  - Room types: spawn, treasure, guardian, boss, library, fountain
-  - `TeleporterOuter` — custom teleportation
-- **World Features**:
-  - Greatwood / Silverwood trees (custom `WorldGenAbstractTree`)
-  - Node generation (auric nodes, taint nodes)
-  - Cinnabar ore, Amber ore
-  - Infusion altar ruins, wizard towers, obsidian pillars
-  - `ThaumcraftWorldGenerator` implements `IWorldGenerator`
+**Sub-steps**:
+- **7.1** — Missing world-gen blocks: BlockMagicalLeaves (2 types), BlockCustomOre
+  (8 ores), BlockCustomPlant (6 plants), BlockCosmeticSolid (16 types),
+  BlockCosmeticOpaque (5 types), BlockTaint (3 types), BlockTaintFibres (5 types),
+  BlockAiry (13 types), BlockManaPod (8 stages), ItemBlocks + tile stubs
+- **7.2** — Biomes: BiomeMagicalForest (custom trees/flowers/decor), BiomeTaint
+  (taint blobs/fibres spread), BiomeEerie (spooky mobs), BiomeEldritch (stone
+  surface), BiomeHandler (aura/aspect mapping from 30 BiomeDictionary types)
+- **7.3** — Eldritch Dimension: WorldProviderOuter (black sky, fog, no day cycle),
+  ChunkProviderOuter (flat stone terrain), MazeGenerator (DFS randomized maze),
+  MazeThread/MazeHandler (threaded gen + hashmap storage), TeleporterThaumcraft,
+  7 room gen stubs, BlockEldritch/Portal/Nothing + 8 tile entities, dimension
+  registration via DimensionType/DimensionManager
+- **7.4** — World features: WorldGenGreatwoodTrees (3-wide trunk, oval canopy),
+  WorldGenSilverwoodTrees (node knot, layered canopy), WorldGenBigMagicTree
+  (3x3 trunk, huge canopy), WorldGenManaPods, WorldGenMound/EldritchRing/
+  HilltopStones/CustomFlowers, ThaumcraftWorldGenerator with ore/tree/structure
+  generation and biome/dimension blacklist
 
-**Key changes**:
-- `BiomeGenBase` → `Biome` (class rename)
-- `WorldProvider.dimensionId` → `WorldProvider.dimension` (field rename)
-- `BiomeManager.addBiome` — same API
-- `WorldGenAbstractTree` — same base, some method signature changes
-- `MapGenBase` → use `MapGen` (base class renamed)
-
-**Risks**: Eldritch dimension maze generator uses custom `MapGenMaze`
-extending `MapGenBase` — port to `MapGen` base. Chunk provider performs
-heavy maze cell computation. `WorldProvider` sky rendering uses custom GL
-calls — update to `GlStateManager`.
+**1.12.2 findings**:
+- `Biome.color` field unmapped in MCP stable 39 — removed from code
+- `getRandomTreeGen()` renamed to `getRandomTreeFeature()` on `Biome`
+- `calcSunriseColor()` renamed to `calcSunriseSunsetColors()` on `WorldProvider`
+- `WorldSavedData` moved to `net.minecraft.world.storage.WorldSavedData`
+- `getWelcomeMessage()`/`getDepartMessage()` removed from `WorldProvider`
+- `IChunkProvider` → `IChunkGenerator` in 1.12.2; `provideChunk`→`generateChunk`,
+  `getPossibleCreatures` gains `BlockPos` param
+- `BiomeDictionary.Type` is a class (not enum) in 1.12.2; `getTypes()` returns
+  `Set<Type>` not `Type[]`; no `FROZEN`/`DESERT` types
+- `WorldInfo.getCustomData()`/`setCustomData()` removed — use `WorldSavedData`
+- `DimensionType` and `DimensionManager` required for dimension registration
+- Forge patches remove `WorldProvider.dimensionId` field — use
+  `world.provider.getDimension()` or `getDimensionType()`
 
 ---
 
@@ -593,7 +595,7 @@ identical.
 | 4 — Blocks + Tiles | 151 | ~500 tex + ~100 mcmeta + ~40 blockstates | 4 sessions | **Highest** | Blocks/blocks, tiles/tiles |
 | 5 — Items + Baubles | 110 | ~200 tex | **Done** | Medium | Per-category |
 | 6 — Entities + AI | 130 | ~100 tex | **Done** | High (golems) | Per-mob |
-| 7 — World Gen | 35 | ~20 tex | 2 sessions | Medium | Biomes / dimension / features |
+| 7 — World Gen | 35 | ~20 tex | **Done** | Medium | Biomes / dimension / features |
 | 8 — Client GUI + Render | ~140 | ~200 tex + 7 shaders | 3 sessions | **Highest** | GUI / TESR / EntityRend / FX / Shaders |
 | 9 — Recipes + Research | ~450 registrations | 0 | 2 sessions | Low (volume) | Per-recipe-type |
 | 10 — Polish | 5-10 | all | 1 session | Low | JEI / Config / Compatibility |
