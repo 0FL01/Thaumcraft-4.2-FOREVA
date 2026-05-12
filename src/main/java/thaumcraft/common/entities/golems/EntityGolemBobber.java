@@ -82,7 +82,6 @@ public class EntityGolemBobber extends Entity implements IEntityAdditionalSpawnD
     public void onUpdate() {
         super.onUpdate();
 
-        this.ticksExisted++;
         if (this.ticksExisted > 4000) {
             this.setDead();
             return;

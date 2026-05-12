@@ -190,7 +190,7 @@ public class EntityFallingTaint extends Entity implements IEntityAdditionalSpawn
             this.block = Block.getBlockById(compound.getInteger("TileID"));
         }
         this.metadata = compound.getByte("Data") & 0xFF;
-        this.fallTime = compound.getByte("Time") & 0xFF;
+        this.fallTime = compound.getInteger("Time");
         this.oldX = compound.getInteger("OldX");
         this.oldY = compound.getInteger("OldY");
         this.oldZ = compound.getInteger("OldZ");
@@ -207,7 +207,7 @@ public class EntityFallingTaint extends Entity implements IEntityAdditionalSpawn
     public void writeEntityToNBT(NBTTagCompound compound) {
         compound.setInteger("TileID", Block.getIdFromBlock(this.block));
         compound.setByte("Data", (byte) this.metadata);
-        compound.setByte("Time", (byte) this.fallTime);
+        compound.setInteger("Time", this.fallTime);
         compound.setFloat("FallHurtAmount", this.fallHurtAmount);
         compound.setInteger("FallHurtMax", this.fallHurtMax);
         compound.setInteger("OldX", this.oldX);
@@ -229,6 +229,6 @@ public class EntityFallingTaint extends Entity implements IEntityAdditionalSpawn
 
     @Override
     public boolean isInRangeToRender3d(double x, double y, double z) {
-        return false;
+        return super.isInRangeToRender3d(x, y, z);
     }
 }

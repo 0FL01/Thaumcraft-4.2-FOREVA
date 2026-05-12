@@ -134,7 +134,7 @@ public class EntityAspectOrb extends Entity implements IEntityAdditionalSpawnDat
             double dz = (this.closestPlayer.posZ - this.posZ) / range;
             double dist = Math.sqrt(dx * dx + dy * dy + dz * dz);
             double weight = 1.0D - dist;
-            if (weight > 0.0D) {
+            if (weight > 0.0D && dist > 1.0E-6D) {
                 weight *= weight;
                 this.motionX += dx / dist * weight * 0.1D;
                 this.motionY += dy / dist * weight * 0.1D;

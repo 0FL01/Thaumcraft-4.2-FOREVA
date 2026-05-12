@@ -1,5 +1,6 @@
 package thaumcraft.common.entities.monster;
 
+import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.pathfinding.PathNavigate;
 import net.minecraft.pathfinding.PathNavigateGround;
 import net.minecraft.pathfinding.PathNodeType;
@@ -18,6 +19,11 @@ import net.minecraft.entity.ai.EntityAIWander;
 import net.minecraft.entity.ai.EntityAIWatchClosest;
 import net.minecraft.entity.ai.EntityAIWatchClosest2;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.projectile.EntityArrow;
+import net.minecraft.entity.projectile.EntityTippedArrow;
+import net.minecraft.init.Enchantments;
+import net.minecraft.init.Items;
+import net.minecraft.init.SoundEvents;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
@@ -25,13 +31,21 @@ import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.EntityDataManager;
 import net.minecraft.util.DamageSource;
+import net.minecraft.util.EnumHand;
 import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.SoundEvent;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
+import thaumcraft.api.aspects.Aspect;
+import thaumcraft.api.aspects.AspectList;
+import thaumcraft.common.config.ConfigItems;
 import thaumcraft.common.entities.ai.combat.AIAttackOnCollide;
 import thaumcraft.common.entities.ai.pech.AIPechItemEntityGoto;
 import thaumcraft.common.entities.ai.pech.AIPechTradePlayer;
+import thaumcraft.common.entities.projectile.EntityPechBlast;
+import thaumcraft.common.items.wands.ItemWandCasting;
 import thaumcraft.common.lib.TCSounds;
+import thaumcraft.common.lib.crafting.ThaumcraftCraftingManager;
 
 public class EntityPech extends net.minecraft.entity.monster.EntityMob implements IRangedAttackMob {
 
@@ -171,7 +185,9 @@ public class EntityPech extends net.minecraft.entity.monster.EntityMob implement
         this.tasks.removeTask(this.aiRangedAttack);
         this.tasks.removeTask(this.aiAvoidPlayer);
         ItemStack held = this.getHeldItemMainhand();
-        if (!held.isEmpty() && held.getItem() instanceof net.minecraft.item.ItemBow) {
+        boolean hasBow = !held.isEmpty() && held.getItem() instanceof net.minecraft.item.ItemBow;
+        boolean hasWand = !held.isEmpty() && held.getItem() instanceof ItemWandCasting;
+        if (hasBow || hasWand || this.getPechType() == 1 || this.getPechType() == 2) {
             this.tasks.addTask(2, this.aiRangedAttack);
         } else {
             this.tasks.addTask(2, this.aiMeleeAttack);
@@ -216,7 +232,44 @@ public class EntityPech extends net.minecraft.entity.monster.EntityMob implement
 
     @Override
     public void attackEntityWithRangedAttack(EntityLivingBase target, float distance) {
-        // TODO: pech blast / arrow (Phase 5 focus port)
+        ItemStack held = this.getHeldItemMainhand();
+        int type = this.getPechType();
+        if (type == 0 && !held.isEmpty() && held.getItem() instanceof net.minecraft.item.ItemBow) {
+            type = 2;
+        } else if (type == 0 && !held.isEmpty() && held.getItem() instanceof ItemWandCasting) {
+            type = 1;
+        }
+
+        if (type == 2) {
+            EntityArrow arrow = new EntityTippedArrow(this.world, this);
+            double d0 = target.posX - this.posX;
+            double d1 = target.getEntityBoundingBox().minY + (double) (target.height / 3.0F) - arrow.posY;
+            double d2 = target.posZ - this.posZ;
+            double d3 = MathHelper.sqrt(d0 * d0 + d2 * d2);
+            arrow.shoot(d0, d1 + d3 * 0.2D, d2, 1.6F, (float) (14 - this.world.getDifficulty().getId() * 4));
+
+            int power = EnchantmentHelper.getEnchantmentLevel(Enchantments.POWER, held);
+            int punch = EnchantmentHelper.getEnchantmentLevel(Enchantments.PUNCH, held);
+            arrow.setDamage((double) (distance * 2.0F) + this.rand.nextGaussian() * 0.25D + (double) ((float) this.world.getDifficulty().getId() * 0.11F));
+            if (power > 0) {
+                arrow.setDamage(arrow.getDamage() + (double) power * 0.5D + 0.5D);
+            }
+            if (punch > 0) {
+                arrow.setKnockbackStrength(punch);
+            }
+            this.playSound(SoundEvents.ENTITY_ARROW_SHOOT, 1.0F, 1.0F / (this.rand.nextFloat() * 0.4F + 0.8F));
+            this.world.spawnEntity(arrow);
+        } else if (type == 1) {
+            EntityPechBlast blast = new EntityPechBlast(this.world, this, 1, 0, this.rand.nextFloat() < 0.1F);
+            double d0 = target.posX + target.motionX - this.posX;
+            double d1 = target.posY + (double) target.getEyeHeight() - 1.500000023841858D - this.posY;
+            double d2 = target.posZ + target.motionZ - this.posZ;
+            float d3 = MathHelper.sqrt(d0 * d0 + d2 * d2);
+            blast.shoot(d0, d1 + (double) (d3 * 0.1F), d2, 1.5F, 4.0F);
+            this.playSound(TCSounds.ICE, 0.4F, 1.0F + this.rand.nextFloat() * 0.1F);
+            this.world.spawnEntity(blast);
+        }
+        this.swingArm(EnumHand.MAIN_HAND);
     }
 
     @Override
@@ -241,7 +294,7 @@ public class EntityPech extends net.minecraft.entity.monster.EntityMob implement
         if (stack == null || stack.isEmpty()) return false;
         if (!this.isEntityAlive() || this.trading) return false;
         // Untamed pechs only pick up valued items
-        if (!this.isTamed()) return true; // will check value later
+        if (!this.isTamed()) return this.isValued(stack);
         // Tamed pechs: check if there's room in loot array
         for (int a = 0; a < this.loot.length; a++) {
             if (this.loot[a] == null || this.loot[a].isEmpty()) return true;
@@ -256,11 +309,15 @@ public class EntityPech extends net.minecraft.entity.monster.EntityMob implement
         if (stack == null || stack.isEmpty()) return stack;
         if (!this.isEntityAlive() || this.trading) return stack;
 
-        // For untamed pechs: valued items can tame them (simplified — real logic uses ThaumcraftCraftingManager)
+        // For untamed pechs: only valued items can tame them.
         if (!this.isTamed()) {
-            if (!stack.isEmpty()) {
-                stack.shrink(1);
+            if (!this.isValued(stack)) return stack;
+            int value = this.getValue(stack);
+            stack.shrink(1);
+            if (!this.world.isRemote && this.rand.nextInt(10) < value) {
                 this.setTamed(true);
+                this.setCombatTask();
+                this.world.setEntityState(this, (byte) 18);
             }
             if (stack.isEmpty()) return ItemStack.EMPTY;
             return stack;
@@ -285,6 +342,37 @@ public class EntityPech extends net.minecraft.entity.monster.EntityMob implement
             }
         }
         return stack;
+    }
+
+    public boolean isValued(ItemStack item) {
+        return this.getValue(item) > 0;
+    }
+
+    public int getValue(ItemStack item) {
+        if (item == null || item.isEmpty()) return 0;
+        int value = this.getConfiguredValue(item);
+        if (value > 0) return value;
+
+        int greed = 0;
+        AspectList objectTags = ThaumcraftCraftingManager.getObjectTags(item);
+        if (objectTags != null) {
+            greed = Math.max(greed, objectTags.getAmount(Aspect.GREED));
+        }
+        AspectList bonusTags = ThaumcraftCraftingManager.getBonusTags(item, objectTags);
+        if (bonusTags != null) {
+            greed = Math.max(greed, bonusTags.getAmount(Aspect.GREED));
+        }
+        return Math.min(32, greed);
+    }
+
+    private int getConfiguredValue(ItemStack item) {
+        if (ConfigItems.itemManaBean != null && item.getItem() == ConfigItems.itemManaBean) return 1;
+        if (item.getItem() == Items.GOLD_INGOT) return 2;
+        if (item.getItem() == Items.GOLDEN_APPLE) return 2;
+        if (item.getItem() == Items.ENDER_PEARL) return 3;
+        if (item.getItem() == Items.DIAMOND) return 4;
+        if (item.getItem() == Items.EMERALD) return 5;
+        return 0;
     }
 
     // ------------------------------------------------------------------

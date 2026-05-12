@@ -2,6 +2,7 @@ package thaumcraft.common.entities.monster;
 
 import net.minecraft.entity.*;
 import net.minecraft.entity.ai.*;
+import net.minecraft.entity.ai.attributes.IAttributeInstance;
 import net.minecraft.entity.monster.EntityMob;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.SoundEvents;
@@ -210,7 +211,9 @@ public class EntityEldritchGuardian extends EntityMob implements IRangedAttackMo
     public IEntityLivingData onInitialSpawn(DifficultyInstance difficulty, IEntityLivingData livingdata) {
         IEntityLivingData data = super.onInitialSpawn(difficulty, livingdata);
         if (this.world.provider.getDimension() == Config.dimensionOuterId) {
-            int bonusHP = (int) this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).getBaseValue() / 2;
+            IAttributeInstance maxHealth = this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH);
+            double bonusHP = maxHealth.getBaseValue() / 2.0D;
+            maxHealth.setBaseValue(maxHealth.getBaseValue() + bonusHP);
             this.setHealth(this.getHealth() + (float) bonusHP);
         }
         return data;
@@ -246,7 +249,7 @@ public class EntityEldritchGuardian extends EntityMob implements IRangedAttackMo
 
     @Override
     protected boolean isMovementBlocked() {
-        return !this.hasHome();
+        return !this.isWithinHomeDistanceCurrentPosition();
     }
 
     @Override

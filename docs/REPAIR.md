@@ -780,6 +780,9 @@ All 22 entity classes with null/wrong/missing sound methods updated to return co
 Stabilization pass: AspectOrb null/spawn-data guards, Pech AI rebuild after NBT
 and server-side anger countdown, GolemBobber fisher world/type guards,
 `InventoryUtils.isWandInHotbarWithRoom()` hotbar scan for wand vis room.
+Runtime polish pass: EldritchGuardian Outer Lands max-health/home movement,
+Pech ranged attacks + valued-only taming, FallingTaint int fallTime/render range,
+AspectOrb zero-distance guard, GolemBobber single tick, ItemWandCasting vis guards.
 
 ---
 

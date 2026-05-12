@@ -80,19 +80,23 @@ public class ItemWandCasting extends Item {
     // ---- Vis Storage ----
 
     public static int getVis(ItemStack stack, Aspect aspect) {
+        if (stack == null || stack.isEmpty() || aspect == null) return 0;
         if (!stack.hasTagCompound()) return 0;
         return stack.getTagCompound().getInteger(TAG_VIS_PREFIX + aspect.getTag());
     }
 
     public static void setVis(ItemStack stack, Aspect aspect, int amount) {
+        if (stack == null || stack.isEmpty() || aspect == null) return;
         ensureTag(stack).setInteger(TAG_VIS_PREFIX + aspect.getTag(), Math.max(0, Math.min(amount, getMaxVis(stack))));
     }
 
     public static void addVis(ItemStack stack, Aspect aspect, int amount) {
+        if (stack == null || stack.isEmpty() || aspect == null || amount == 0) return;
         setVis(stack, aspect, getVis(stack, aspect) + amount);
     }
 
     public static int getMaxVis(ItemStack stack) {
+        if (stack == null || stack.isEmpty()) return 0;
         WandRod rod = getRod(stack);
         return rod != null ? rod.getCapacity() : 100;
     }
