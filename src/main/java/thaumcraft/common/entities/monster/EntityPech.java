@@ -49,7 +49,7 @@ import thaumcraft.common.lib.crafting.ThaumcraftCraftingManager;
 
 public class EntityPech extends net.minecraft.entity.monster.EntityMob implements IRangedAttackMob {
 
-    // Data watcher keys — corrected 1.12.2 types per ROUND_D_ANSWERS.md §D2
+    // Data watcher keys — corrected 1.12.2
     private static final DataParameter<Integer> PECH_TYPE =
         EntityDataManager.createKey(EntityPech.class, DataSerializers.VARINT);
     private static final DataParameter<Integer> ANGER =
