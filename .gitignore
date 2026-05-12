@@ -36,3 +36,5 @@ __pycache__/
 *.pyo
 _p4_ref/
 cfr.jar
+
+.opencode/
