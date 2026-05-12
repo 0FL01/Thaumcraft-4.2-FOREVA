@@ -56,12 +56,12 @@ See `docs/PRD.md §4` for per-phase deliverables and `docs/PRD.md §5` for compl
 | 1 | API + CCL + TrueType | ✅ Done |
 | 2 | Registration, config, networking, events | ✅ Done |
 | 3 | Core systems (capabilities, wands, research, vis, potions, enchants) | ⚠️ **Stubs: WarpEvents missing, 27+ HIGH issues** |
-| 4 | Blocks (71) + Tile Entities (80) | ⚠️ **Stubs: 45/61 TE empty, 6 Tube files missing, no block metadata** |
+| 4 | Blocks (71) + Tile Entities (80) | ⚠️ **Stubs: 45/61 TE empty, 6 Tube files missing (block metadata ✅)** |
 | 5 | Items, Tools, Armor, Baubles, Relics (~110) | ⚠️ **Stubs: 10 foci, 5 relics, 4 baubles non-functional** |
-| 6 | Entities, Mobs, Golems (~128 + 44 AI) | ⚠️ **Stubs: 39/44 AI classes return false, projectiles no damage** |
+| 6 | Entities, Mobs, Golems (~128 + 44 AI) | ⚠️ **Stubs: 14/44 AI return false, projectiles no damage (Combat AI ✅, Inventory AI ✅)** |
 | 7 | World Gen (biomes, dimension, trees, structures) | ✅ Done |
 | 7r | World Gen Remediation (room gens, village, persistence) | ✅ Done |
-| 3r-6r | Remediation (see docs/REPAIR.md) | ❌ **~85 critical/high issues** |
+| 3r-6r | Remediation (see docs/REPAIR.md) | ❌ **~69 critical/high issues** |
 | 8 | Client GUI + Rendering (~140 classes) | ❌ |
 | 9 | Recipes + Research (~450 registrations) | ❌ |
 | 10 | Polish (JEI, Config, Sound) | ❌ |
