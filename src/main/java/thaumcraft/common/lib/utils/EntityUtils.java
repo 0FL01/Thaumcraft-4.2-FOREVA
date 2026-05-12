@@ -4,8 +4,13 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+
+import javax.annotation.Nullable;
+import java.util.ArrayList;
+import java.util.List;
 
 public class EntityUtils {
     public static EntityItem dropItemStack(World world, BlockPos pos, ItemStack stack) {
@@ -23,10 +28,50 @@ public class EntityUtils {
     }
 
     /**
-     * Mark an entity as a champion mob with increased attributes.
-     * Full champion modifier system is in Phase 6.5 (EntityChampionModifier).
-     * This is a minimal implementation for Eldritch dimension room gen.
+     * Find all entities of the given class within range of a position.
      */
+    @SuppressWarnings("unchecked")
+    public static <T extends Entity> List<T> getEntitiesInRange(
+            World world, double x, double y, double z,
+            @Nullable Entity exclude, Class<T> clazz, double range) {
+        List<T> result = new ArrayList<>();
+        AxisAlignedBB aabb = new AxisAlignedBB(x - range, y - range, z - range,
+                                                x + range, y + range, z + range);
+        for (Entity e : world.getEntitiesInAABBexcluding(exclude, aabb,
+                e2 -> e2 != null && clazz.isAssignableFrom(e2.getClass()))) {
+            result.add((T) e);
+        }
+        return result;
+    }
+
+    public static <T extends Entity> List<T> getEntitiesInRange(
+            World world, double x, double y, double z,
+            @Nullable Entity exclude, Class<T> clazz, double range,
+            boolean ignoreY) {
+        if (!ignoreY) return getEntitiesInRange(world, x, y, z, exclude, clazz, range);
+        List<T> result = new ArrayList<>();
+        AxisAlignedBB aabb = new AxisAlignedBB(x - range, 0, z - range,
+                                                x + range, 256, z + range);
+        for (Entity e : world.getEntitiesInAABBexcluding(exclude, aabb,
+                e2 -> e2 != null && clazz.isAssignableFrom(e2.getClass()))) {
+            if (e.getDistance(x, y, z) <= range) {
+                result.add((T) e);
+            }
+        }
+        return result;
+    }
+
+    /**
+     * Drop a special item from an entity (with pickup delay).
+     */
+    public static void entityDropSpecialItem(Entity entity, ItemStack stack, float offsetY) {
+        if (stack.isEmpty()) return;
+        EntityItem entityitem = new EntityItem(entity.world,
+            entity.posX, entity.posY + (double)offsetY, entity.posZ, stack);
+        entityitem.setDefaultPickupDelay();
+        entity.world.spawnEntity(entityitem);
+    }
+
     public static void makeChampion(EntityLivingBase entity, boolean isBoss) {
         if (entity == null) return;
         // Scale max health

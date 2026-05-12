@@ -45,7 +45,7 @@ public class EntityEldritchOrb extends EntityThrowable {
                     DamageSource.causeIndirectDamage(this, this.getThrower()),
                     baseDamage);
                 ((EntityLivingBase)entity).addPotionEffect(
-                    new PotionEffect(MobEffects.WEAKNESS, 160, 0));
+                    new PotionEffect(MobEffects.WITHER, 160, 0));
             }
             this.world.playEvent(null, 2001, this.getPosition(), 0);
             this.ticksExisted = 100; // triggers death next tick

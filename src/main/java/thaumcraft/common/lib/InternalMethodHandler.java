@@ -19,7 +19,12 @@ public class InternalMethodHandler implements IInternalMethodHandler {
 
     @Override
     public void generateVisEffect(int dim, int x, int y, int z, int x2, int y2, int z2, int color) {
-        // Phase 8: particle FX
+        net.minecraft.world.World world = net.minecraftforge.common.DimensionManager.getWorld(dim);
+        if (world != null) {
+            thaumcraft.common.lib.utils.Utils.generateVisEffect(world,
+                new net.minecraft.util.math.BlockPos(x, y, z),
+                new net.minecraft.util.math.BlockPos(x2, y2, z2), color);
+        }
     }
 
     @Override

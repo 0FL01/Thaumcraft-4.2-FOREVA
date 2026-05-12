@@ -79,51 +79,51 @@ public class ConfigEntities {
         ENTITIES.add(makeEntry(EntityGolemBobber.class, "golem_bobber", 64, 64, false, false, 0, 0));
 
         // Monsters - Zombies
-        ENTITIES.add(makeEntry(EntityBrainyZombie.class, "brainy_zombie", 64, 3, true, true, 0x4F784F, 0x0B0B0B));
-        ENTITIES.add(makeEntry(EntityGiantBrainyZombie.class, "giant_brainy_zombie", 64, 3, true, false, 0, 0));
-        ENTITIES.add(makeEntry(EntityInhabitedZombie.class, "inhabited_zombie", 64, 3, true, false, 0, 0));
+        ENTITIES.add(makeEntry(EntityBrainyZombie.class, "brainy_zombie", 64, 3, true, true, 0xFFC0FF, 0x008000));
+        ENTITIES.add(makeEntry(EntityGiantBrainyZombie.class, "giant_brainy_zombie", 64, 3, true, true, 0xFFC0FF, 0x004000));
+        ENTITIES.add(makeEntry(EntityInhabitedZombie.class, "inhabited_zombie", 64, 3, true, true, 0x557755, 0x550000));
 
         // Monsters - Wisps and Bats
-        ENTITIES.add(makeEntry(EntityWisp.class, "wisp", 64, 3, true, true, 0x4E7A9F, 0xBDD0DB));
-        ENTITIES.add(makeEntry(EntityFireBat.class, "fire_bat", 64, 3, true, true, 0x4F784F, 0xCD3700));
+        ENTITIES.add(makeEntry(EntityWisp.class, "wisp", 64, 3, true, true, 0xFFC0FF, 0xFFFFFF));
+        ENTITIES.add(makeEntry(EntityFireBat.class, "fire_bat", 64, 3, true, true, 0xFFC0FF, 0xC00000));
 
         // Monsters - Pech
-        ENTITIES.add(makeEntry(EntityPech.class, "pech", 64, 3, true, true, 0x936E4B, 0xDED3B4));
+        ENTITIES.add(makeEntry(EntityPech.class, "pech", 64, 3, true, true, 0xFFC0FF, 0x400040));
 
         // Monsters - Eldritch
-        ENTITIES.add(makeEntry(EntityMindSpider.class, "mind_spider", 64, 3, true, false, 0, 0));
-        ENTITIES.add(makeEntry(EntityEldritchGuardian.class, "eldritch_guardian", 64, 3, true, false, 0, 0));
-        ENTITIES.add(makeEntry(EntityEldritchCrab.class, "eldritch_crab", 64, 3, true, false, 0, 0));
+        ENTITIES.add(makeEntry(EntityMindSpider.class, "mind_spider", 64, 3, true, true, 0xAAAAAA, 0x404040));
+        ENTITIES.add(makeEntry(EntityEldritchGuardian.class, "eldritch_guardian", 64, 3, true, true, 0x222222, 0x404040));
+        ENTITIES.add(makeEntry(EntityEldritchCrab.class, "eldritch_crab", 64, 3, true, true, 0x555555, 0x550000));
         ENTITIES.add(makeEntry(EntityWatcher.class, "watcher", 64, 3, true, false, 0, 0));
 
         // Monsters - Cultists
-        ENTITIES.add(makeEntry(EntityCultistKnight.class, "cultist_knight", 64, 3, true, false, 0, 0));
-        ENTITIES.add(makeEntry(EntityCultistCleric.class, "cultist_cleric", 64, 3, true, false, 0, 0));
+        ENTITIES.add(makeEntry(EntityCultistKnight.class, "cultist_knight", 64, 3, true, true, 0xFF5055, 0x000080));
+        ENTITIES.add(makeEntry(EntityCultistCleric.class, "cultist_cleric", 64, 3, true, true, 0xFF5055, 0x800000));
         ENTITIES.add(makeEntry(EntityCultist.class, "cultist", 64, 3, true, false, 0, 0));
 
         // Bosses
-        ENTITIES.add(makeEntry(EntityCultistLeader.class, "cultist_leader", 64, 3, true, false, 0, 0));
-        ENTITIES.add(makeEntry(EntityCultistPortal.class, "cultist_portal", 64, 20, false, false, 0, 0));
-        ENTITIES.add(makeEntry(EntityEldritchGolem.class, "eldritch_golem", 64, 3, true, false, 0, 0));
-        ENTITIES.add(makeEntry(EntityEldritchWarden.class, "eldritch_warden", 64, 3, true, false, 0, 0));
-        ENTITIES.add(makeEntry(EntityTaintacleGiant.class, "taintacle_giant", 64, 3, false, false, 0, 0));
+        ENTITIES.add(makeEntry(EntityCultistLeader.class, "cultist_leader", 64, 3, true, true, 0xFF5055, 0x505050));
+        ENTITIES.add(makeEntry(EntityCultistPortal.class, "cultist_portal", 64, 20, false, true, 0xFF5055, 0xFF50FF));
+        ENTITIES.add(makeEntry(EntityEldritchGolem.class, "eldritch_golem", 64, 3, true, true, 0x555555, 0x404040));
+        ENTITIES.add(makeEntry(EntityEldritchWarden.class, "eldritch_warden", 64, 3, true, true, 0x552222, 0x404040));
+        ENTITIES.add(makeEntry(EntityTaintacleGiant.class, "taintacle_giant", 64, 3, false, true, 0xFFC0FF, 0x808080));
 
         // Monsters - Thaumic Slime
-        ENTITIES.add(makeEntry(EntityThaumicSlime.class, "thaumic_slime", 64, 3, true, false, 0, 0));
+        ENTITIES.add(makeEntry(EntityThaumicSlime.class, "thaumic_slime", 64, 3, true, true, 0xFFC0FF, 0xFF80FF));
 
         // Monsters - Taint mobs
-        ENTITIES.add(makeEntry(EntityTaintSpider.class, "taint_spider", 64, 3, true, false, 0, 0));
-        ENTITIES.add(makeEntry(EntityTaintacle.class, "taintacle", 64, 3, false, false, 0, 0));
-        ENTITIES.add(makeEntry(EntityTaintacleSmall.class, "taintacle_tiny", 64, 3, false, false, 0, 0));
-        ENTITIES.add(makeEntry(EntityTaintSpore.class, "taint_spore", 64, 20, false, false, 0, 0));
-        ENTITIES.add(makeEntry(EntityTaintSporeSwarmer.class, "taint_swarmer", 64, 20, false, false, 0, 0));
-        ENTITIES.add(makeEntry(EntityTaintSwarm.class, "taint_swarm", 64, 3, true, false, 0, 0));
-        ENTITIES.add(makeEntry(EntityTaintChicken.class, "taint_chicken", 64, 3, true, false, 0, 0));
-        ENTITIES.add(makeEntry(EntityTaintCow.class, "taint_cow", 64, 3, true, false, 0, 0));
-        ENTITIES.add(makeEntry(EntityTaintCreeper.class, "taint_creeper", 64, 3, true, true, 0x5BDD5B, 0x0B0B0B));
-        ENTITIES.add(makeEntry(EntityTaintPig.class, "taint_pig", 64, 3, true, false, 0, 0));
-        ENTITIES.add(makeEntry(EntityTaintSheep.class, "taint_sheep", 64, 3, true, false, 0, 0));
-        ENTITIES.add(makeEntry(EntityTaintVillager.class, "taint_villager", 64, 3, true, false, 0, 0));
+        ENTITIES.add(makeEntry(EntityTaintSpider.class, "taint_spider", 64, 3, true, true, 0xFFC0FF, 0x404040));
+        ENTITIES.add(makeEntry(EntityTaintacle.class, "taintacle", 64, 3, false, true, 0xFFC0FF, 0x800080));
+        ENTITIES.add(makeEntry(EntityTaintacleSmall.class, "taintacle_tiny", 64, 3, false, true, 0xFFC0FF, 0x800090));
+        ENTITIES.add(makeEntry(EntityTaintSpore.class, "taint_spore", 64, 20, false, true, 0xFFC0FF, 0x800070));
+        ENTITIES.add(makeEntry(EntityTaintSporeSwarmer.class, "taint_swarmer", 64, 20, false, true, 0xFFC0FF, 0x800060));
+        ENTITIES.add(makeEntry(EntityTaintSwarm.class, "taint_swarm", 64, 3, true, true, 0xFFC0FF, 0x800050));
+        ENTITIES.add(makeEntry(EntityTaintChicken.class, "taint_chicken", 64, 3, true, true, 0xFFC0FF, 0xC0C0C0));
+        ENTITIES.add(makeEntry(EntityTaintCow.class, "taint_cow", 64, 3, true, true, 0xFFC0FF, 0x7E3C3B));
+        ENTITIES.add(makeEntry(EntityTaintCreeper.class, "taint_creeper", 64, 3, true, true, 0xFFC0FF, 0x00FF00));
+        ENTITIES.add(makeEntry(EntityTaintPig.class, "taint_pig", 64, 3, true, true, 0xFFC0FF, 0xEF99EF));
+        ENTITIES.add(makeEntry(EntityTaintSheep.class, "taint_sheep", 64, 3, true, true, 0xFFC0FF, 0x808080));
+        ENTITIES.add(makeEntry(EntityTaintVillager.class, "taint_villager", 64, 3, true, true, 0xFFC0FF, 0x00FFFF));
 
         // Item grate
         ENTITIES.add(makeEntry(EntityItemGrate.class, "item_grate", 64, 20, true, false, 0, 0));

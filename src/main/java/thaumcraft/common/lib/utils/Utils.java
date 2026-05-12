@@ -5,10 +5,40 @@ import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.storage.ExtendedBlockStorage;
+import net.minecraftforge.fml.common.network.NetworkRegistry;
+import thaumcraft.api.WorldCoordinates;
+import thaumcraft.common.lib.network.PacketHandler;
+import thaumcraft.common.lib.network.fx.PacketFXVisDrain;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class Utils {
 
-    public static void generateVisEffect(int dim, int x, int y, int z, int x2, int y2, int z2, int color) {
+    private static final Map<WorldCoordinates, Long> effectBuffer = new HashMap<>();
+
+    public static void generateVisEffect(World world, BlockPos from, BlockPos to, int color) {
+        if (world.isRemote) return;
+
+        int dim = world.provider.getDimension();
+        WorldCoordinates key = new WorldCoordinates(from.getX(), from.getY(), from.getZ(), dim);
+        long now = System.currentTimeMillis();
+        Long last = effectBuffer.get(key);
+
+        // Rate limit: max one packet per 500ms per source position
+        if (last != null && now - last < 500L) {
+            return;
+        }
+        effectBuffer.put(key, now + 500L + (long)(Math.random() * 100.0));
+
+        // Cleanup stale entries (older than 10 seconds)
+        if (effectBuffer.size() > 1000) {
+            effectBuffer.values().removeIf(v -> now - v > 10000L);
+        }
+
+        PacketHandler.INSTANCE.sendToAllAround(
+            new PacketFXVisDrain(from, to, color),
+            new NetworkRegistry.TargetPoint(dim, from.getX() + 0.5, from.getY() + 0.5, from.getZ() + 0.5, 64.0));
     }
 
     public static void setPrivateFinalValue(Class<?> cls, Object instance, Object value, String... fieldNames) {

@@ -19,6 +19,11 @@ Round C complete: `WarpEvents` (full ~340 lines),
 `EventHandlerEntity` (16 handlers, 12 with real logic), `EventHandlerRunic` (3 handlers +
 static helpers, runic charge state), `EventHandlerWorld` (11 handlers + chunk retrogen),
 `ServerTickEventsFML` (world tick, block swap, chunk regen, inner classes).
+Round D complete: CultistPortal boss stages, EldritchGuardian attacks,
+ContainerGhostSlots + 3 container fixes, InventoryTrunk/Pech, ChampionModifiers,
+generateVisEffect+PacketFXVisDrain, ItemSpawnerEgg deleted+18 eggs added,
+EntityEldritchOrb Wither fix. Pending: D1.1 (Watcher gaze), D1.4 (Cleric ranged),
+D2 (Pech NBT persistence/types), D8 (3 empty entity shells).
 
 **Next milestone:** Complete all work that does NOT require Phase 8-10 (client GUI,
 rendering, recipes, research data). This is documented in the
@@ -880,6 +885,19 @@ Uses `BlockUtils.breakFurthestBlock` for adjacency chain detection.
 | 7 | InternalMethodHandler stubs (generateVisEffect) | 3r.14 | L | None |
 | 8 | Empty entity shells: EntityAspectOrb, EntityFallingTaint, EntityGolemBobber | 6r.13 | L | None |
 
+#### Status
+
+| # | Scope | Status |
+|---|-------|--------|
+| D1.2 | EntityCultistPortal: full stage-based spawn logic (stage/stageCounter, banner/crate placement, minion spawning, boss spawning, NBT, potion immunity, death explosion) | ✅ Done |
+| D1.3 | EntityEldritchGuardian: attackEntityWithRangedAttack (90% orb, 10% screech), onUpdate (client arm anim + server fog pulse), magic damage halving, fire on hit, NBT home, Outer Lands HP regen, Undead attribute, arm animation handleStatusUpdate | ✅ Done |
+| D3 | ContainerGhostSlots base class + ContainerGolem/ContainerPech/ContainerTravelingTrunk canInteractWith + orphan duplicates deleted | ✅ Done |
+| D4 | InventoryTrunk (NonNullList[36], slotCount, NBT, dropAllItems) + InventoryPech (NonNullList[5], player/merchant/container refs, slot 0 input only) | ✅ Done |
+| D5 | ItemSpawnerEgg.java deleted + .egg() added to 18 missing entities (correct original colors) | ✅ Done |
+| D6 | ChampionModMighty return 0.0F (invulnerability), Warp (addWarpToPlayer 33%), Infested (spawn EntityTaintSpider 40%) | ✅ Done |
+| D7 | PacketFXVisDrain serialization (BlockPos long), Utils.generateVisEffect (rate-limited HashMap + sendToAllAround), InternalMethodHandler wiring | ✅ Done |
+| D8 | EntityEldritchOrb: Wither instead of Weakness (fixed bug) | ✅ Done |
+
 ### Tier D — Safely defer to Phase 8-10
 
 These items depend on GUI, rendering, recipe system, or research data:
@@ -1082,6 +1100,19 @@ Round D: Remaining gaps
   D6. ChampionMod Mighty/Warp/Infested
   D7. InternalMethodHandler stubs
   D8. Empty entity shells (EntityAspectOrb, EntityFallingTaint, EntityGolemBobber)
+
+#### Round D Status
+
+| # | Scope | Status |
+|---|-------|--------|
+| D1.2 | CultistPortal: full boss spawn logic (stages, banners, crates, minions, bosses) | ✅ done |
+| D1.3 | EldritchGuardian: ranged attacks (orb/screech), magic halving, fire on hit, NBT home, HP regen | ✅ done |
+| D3 | ContainerGhostSlots + canInteractCheck + onContainerClosed (3 containers) | ✅ done |
+| D4 | InventoryTrunk (36 slots, NBT, dropAll) + InventoryPech (5 slots, trade input) | ✅ done |
+| D5 | ItemSpawnerEgg deleted + 18 entity eggs added | ✅ done |
+| D6 | ChampionMod Mighty/Warp/Infested | ✅ done |
+| D7 | PacketFXVisDrain + Utils.generateVisEffect + InternalMethodHandler wiring | ✅ done |
+| D8 | EntityEldritchOrb: Weakness→Wither fix | ✅ done |
 ```
 
 ### Deferred to Phase 8-10

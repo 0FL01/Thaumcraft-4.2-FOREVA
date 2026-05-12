@@ -7,7 +7,7 @@ public class ChampionModMighty extends java.lang.Object implements IChampionModi
 
     @Override
     public float performEffect(EntityLivingBase mob, EntityLivingBase target, DamageSource source, float amount) {
-        return amount;
+        return 0.0F; // Mighty champions are immune to damage
     }
 
     @Override
