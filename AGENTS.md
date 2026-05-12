@@ -6,12 +6,12 @@ Reverse-engineering and port of Azanor's Thaumcraft 4.2.3.5 from Minecraft
 Tech stack: Java 8, MinecraftForge 1.12.2, Gradle, Baubles (hard dependency),
 CodeChicken Lib (bundled in JAR).
 
-All detailed docs in **`PRD.md`**: architecture, source inventory, porting
+All detailed docs in **`docs/PRD.md`**: architecture, source inventory, porting
 phases, complexity assessment, risks, success criteria.
 
 ## Architectural Decisions (Closed)
 
-See `PRD.md §6`. All resolved:
+See `docs/PRD.md §6`. All resolved:
 
 | Decision | Choice |
 |----------|--------|
@@ -29,8 +29,8 @@ See `PRD.md §6`. All resolved:
 - `Thaumcraft-1.7.10-4.2.3.5.jar` -- original compiled JAR (942 classes)
 - `thaumcraft_src/` -- unpacked JAR contents
 - `Dockerfile` -- dev container (Java 8 + CFR + git + build tools)
-- `PRD.md` -- product requirements doc with phased porting plan
-- `AGENTS.md` -- this file (concise navigation, points to PRD.md)
+- `docs/PRD.md` -- product requirements doc with phased porting plan
+- `AGENTS.md` -- this file (concise navigation, points to docs/PRD.md)
 - `build.gradle` -- ForgeGradle 2.3, Forge 14.23.5.2847, Baubles via CurseMaven
 - `gradlew` / `gradle/wrapper/` -- Gradle 4.10.3
 - `src/main/java/` -- mod source (port output, ~530 Java source files)
@@ -38,7 +38,7 @@ See `PRD.md §6`. All resolved:
 
 ## Dependencies
 
-See `PRD.md §3` for full dependency graph and versions.
+See `docs/PRD.md §3` for full dependency graph and versions.
 
 | Dep | 1.7.10 | 1.12.2 |
 |-----|--------|--------|
@@ -47,7 +47,7 @@ See `PRD.md §3` for full dependency graph and versions.
 
 ## Development Status
 
-See `PRD.md §4` for per-phase deliverables and `PRD.md §5` for complexity.
+See `docs/PRD.md §4` for per-phase deliverables and `docs/PRD.md §5` for complexity.
 
 | Phase | Scope | Status |
 |-------|-------|--------|
@@ -60,7 +60,7 @@ See `PRD.md §4` for per-phase deliverables and `PRD.md §5` for complexity.
 | 6 | Entities, Mobs, Golems (~128 + 44 AI) | ⚠️ **Stubs: 39/44 AI classes return false, projectiles no damage** |
 | 7 | World Gen (biomes, dimension, trees, structures) | ✅ Done |
 | 7r | World Gen Remediation (room gens, village, persistence) | ✅ Done |
-| 3r-6r | Remediation (see PRD.md §9) | ❌ **~85 critical/high issues** |
+| 3r-6r | Remediation (see docs/PRD.md §9) | ❌ **~85 critical/high issues** |
 | 8 | Client GUI + Rendering (~140 classes) | ❌ |
 | 9 | Recipes + Research (~450 registrations) | ❌ |
 | 10 | Polish (JEI, Config, Sound) | ❌ |
@@ -69,7 +69,7 @@ See `PRD.md §4` for per-phase deliverables and `PRD.md §5` for complexity.
 
 Original source (for CFR decompilation reference):
 
-| Path | Content | PRD.md § |
+| Path | Content | docs/PRD.md § |
 |------|---------|----------|
 | `thaumcraft_src/thaumcraft/api/` | Public API (67 classes) | §2 |
 | `thaumcraft_src/thaumcraft/common/blocks/` | 71 block classes | §2, §4 |
