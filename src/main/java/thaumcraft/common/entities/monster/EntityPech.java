@@ -1,8 +1,12 @@
 package thaumcraft.common.entities.monster;
 
-import net.minecraft.entity.item.EntityItem;
+import net.minecraft.entity.ai.*;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import thaumcraft.common.entities.ai.combat.AIAttackOnCollide;
+import thaumcraft.common.entities.ai.pech.AIPechItemEntityGoto;
+import thaumcraft.common.entities.ai.pech.AIPechTradePlayer;
 
 public class EntityPech extends net.minecraft.entity.monster.EntityMob implements net.minecraft.entity.IRangedAttackMob {
     private static final net.minecraft.network.datasync.DataParameter<Integer> PECH_TYPE =
@@ -12,7 +16,42 @@ public class EntityPech extends net.minecraft.entity.monster.EntityMob implement
 
     public boolean trading = false;
 
-    public EntityPech(net.minecraft.world.World world) { super(world); }
+    public EntityPech(net.minecraft.world.World world) {
+        super(world);
+        this.tasks.addTask(0, new EntityAISwimming(this));
+        this.tasks.addTask(1, new AIPechTradePlayer(this));
+        this.tasks.addTask(3, new AIPechItemEntityGoto(this));
+        this.tasks.addTask(5, new EntityAIOpenDoor(this, true));
+        this.tasks.addTask(6, new EntityAIMoveTowardsRestriction(this, 0.5));
+        this.tasks.addTask(6, new EntityAIMoveThroughVillage(this, 1.0, false));
+        this.tasks.addTask(9, new EntityAIWander(this, 0.6));
+        this.tasks.addTask(9, new EntityAIWatchClosest(this, EntityPlayer.class, 3.0f, 1.0f));
+        this.tasks.addTask(10, new EntityAIWatchClosest(this, net.minecraft.entity.EntityLiving.class, 8.0f));
+        this.tasks.addTask(11, new EntityAILookIdle(this));
+        this.targetTasks.addTask(1, new net.minecraft.entity.ai.EntityAIHurtByTarget(this, false));
+    }
+
+    public void setCombatTask() {
+        this.tasks.removeTask(this.aiMeleeAttack);
+        // Replaced EntityAIArrowAttack with EntityAIAttackRanged
+        this.tasks.removeTask(this.aiRangedAttack);
+        ItemStack itemstack = this.getHeldItemMainhand();
+        if (!itemstack.isEmpty() && itemstack.getItem() instanceof net.minecraft.item.ItemBow) {
+            this.tasks.addTask(2, this.aiRangedAttack);
+        } else {
+            this.tasks.addTask(2, this.aiMeleeAttack);
+        }
+        if (!this.isTamed()) {
+            this.tasks.addTask(4, this.aiAvoidPlayer);
+        } else {
+            this.tasks.removeTask(this.aiAvoidPlayer);
+        }
+    }
+
+    private final AIAttackOnCollide aiMeleeAttack = new AIAttackOnCollide(this, net.minecraft.entity.EntityLivingBase.class, 0.6, false);
+    private final EntityAIAttackRanged aiRangedAttack = new EntityAIAttackRanged(this, 0.6, 20, 50, 15.0f);
+    private final EntityAIAvoidEntity<EntityPlayer> aiAvoidPlayer =
+        new EntityAIAvoidEntity<>(this, EntityPlayer.class, 8.0f, 0.5, 0.6);
 
     @Override
     protected void entityInit() {
@@ -43,7 +82,6 @@ public class EntityPech extends net.minecraft.entity.monster.EntityMob implement
 
     public ItemStack pickupItem(ItemStack stack) {
         if (!canPickup(stack)) return stack;
-        // Pech consumes items it picks up; no inventory storage implemented yet
         return ItemStack.EMPTY;
     }
 

@@ -1,10 +1,25 @@
 package thaumcraft.common.entities.monster;
 
+import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.ai.*;
+import net.minecraft.entity.player.EntityPlayer;
+import thaumcraft.common.entities.ai.combat.AIAttackOnCollide;
+
 public class EntityEldritchCrab extends net.minecraft.entity.monster.EntityMob {
     private static final net.minecraft.network.datasync.DataParameter<Byte> HELM = 
         net.minecraft.network.datasync.EntityDataManager.createKey(EntityEldritchCrab.class, net.minecraft.network.datasync.DataSerializers.BYTE);
 
-    public EntityEldritchCrab(net.minecraft.world.World world) { super(world); }
+    public EntityEldritchCrab(net.minecraft.world.World world) {
+        super(world);
+        this.tasks.addTask(0, new EntityAISwimming(this));
+        this.tasks.addTask(2, new EntityAILeapAtTarget(this, 0.63f));
+        this.tasks.addTask(3, new AIAttackOnCollide(this, EntityLivingBase.class, 1.0, false));
+        this.tasks.addTask(7, new EntityAIWander(this, 0.8));
+        this.tasks.addTask(8, new EntityAILookIdle(this));
+        this.targetTasks.addTask(1, new net.minecraft.entity.ai.EntityAIHurtByTarget(this, true));
+        this.targetTasks.addTask(2, new EntityAINearestAttackableTarget(this, EntityPlayer.class, true));
+        this.targetTasks.addTask(3, new EntityAINearestAttackableTarget(this, EntityCultist.class, true));
+    }
 
     @Override
     protected void entityInit() {

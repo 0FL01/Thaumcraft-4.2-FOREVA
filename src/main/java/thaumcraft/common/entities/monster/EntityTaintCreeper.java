@@ -1,8 +1,13 @@
 package thaumcraft.common.entities.monster;
 
+import net.minecraft.entity.ai.*;
+import net.minecraft.entity.passive.EntityOcelot;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.EntityDataManager;
+import thaumcraft.common.entities.ai.combat.AIAttackOnCollide;
+import thaumcraft.common.entities.ai.combat.AICreeperSwell;
 
 public class EntityTaintCreeper extends net.minecraft.entity.monster.EntityMob implements thaumcraft.api.entities.ITaintedMob {
     private int lastActiveTime;
@@ -15,6 +20,15 @@ public class EntityTaintCreeper extends net.minecraft.entity.monster.EntityMob i
 
     public EntityTaintCreeper(net.minecraft.world.World world) {
         super(world);
+        this.tasks.addTask(1, new EntityAISwimming(this));
+        this.tasks.addTask(2, new AICreeperSwell(this));
+        this.tasks.addTask(3, new EntityAIAvoidEntity(this, EntityOcelot.class, 6.0f, 1.0, 1.2));
+        this.tasks.addTask(4, new AIAttackOnCollide(this, 1.0, false));
+        this.tasks.addTask(5, new EntityAIWander(this, 1.0));
+        this.tasks.addTask(6, new EntityAIWatchClosest(this, EntityPlayer.class, 8.0f));
+        this.tasks.addTask(6, new EntityAILookIdle(this));
+        this.targetTasks.addTask(1, new EntityAINearestAttackableTarget(this, EntityPlayer.class, true));
+        this.targetTasks.addTask(2, new net.minecraft.entity.ai.EntityAIHurtByTarget(this, false));
     }
 
     @Override
