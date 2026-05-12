@@ -19,6 +19,7 @@ public class PlayerKnowledgeCapability implements IPlayerKnowledge {
     private int warpPerm = 0;
     private int warpSticky = 0;
     private int warpTemp = 0;
+    private int warpCounter = 0;
 
     // Aspects discovered
     private final Set<String> discoveredAspects = new HashSet<>();
@@ -98,6 +99,16 @@ public class PlayerKnowledgeCapability implements IPlayerKnowledge {
     @Override
     public int getTotalWarp() {
         return warpPerm + warpSticky + warpTemp;
+    }
+
+    @Override
+    public int getWarpCounter() {
+        return warpCounter;
+    }
+
+    @Override
+    public void setWarpCounter(int counter) {
+        this.warpCounter = Math.max(0, counter);
     }
 
     // ---- Aspect Discovery ----
@@ -219,6 +230,7 @@ public class PlayerKnowledgeCapability implements IPlayerKnowledge {
     private static final String TAG_WARP_PERM = "warpPerm";
     private static final String TAG_WARP_STICKY = "warpSticky";
     private static final String TAG_WARP_TEMP = "warpTemp";
+    private static final String TAG_WARP_COUNTER = "warpCounter";
     private static final String TAG_DISCOVERED_ASPECTS = "discoveredAspects";
     private static final String TAG_SCANNED_ENTITIES = "scannedEntities";
     private static final String TAG_SCANNED_ITEMS = "scannedItems";
@@ -232,6 +244,7 @@ public class PlayerKnowledgeCapability implements IPlayerKnowledge {
         nbt.setInteger(TAG_WARP_PERM, warpPerm);
         nbt.setInteger(TAG_WARP_STICKY, warpSticky);
         nbt.setInteger(TAG_WARP_TEMP, warpTemp);
+        nbt.setInteger(TAG_WARP_COUNTER, warpCounter);
 
         writeStringSet(nbt, TAG_DISCOVERED_ASPECTS, discoveredAspects);
         writeStringSet(nbt, TAG_SCANNED_ENTITIES, scannedEntities);
@@ -249,6 +262,7 @@ public class PlayerKnowledgeCapability implements IPlayerKnowledge {
         warpPerm = nbt.getInteger(TAG_WARP_PERM);
         warpSticky = nbt.getInteger(TAG_WARP_STICKY);
         warpTemp = nbt.getInteger(TAG_WARP_TEMP);
+        warpCounter = nbt.getInteger(TAG_WARP_COUNTER);
 
         readStringSet(nbt, TAG_DISCOVERED_ASPECTS, discoveredAspects);
         readStringSet(nbt, TAG_SCANNED_ENTITIES, scannedEntities);

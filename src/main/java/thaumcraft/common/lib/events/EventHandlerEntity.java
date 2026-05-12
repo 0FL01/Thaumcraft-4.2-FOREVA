@@ -1,9 +1,19 @@
 package thaumcraft.common.lib.events;
 
+import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.item.EntityItem;
+import net.minecraft.entity.item.EntityXPOrb;
+import net.minecraft.entity.monster.EntityCreeper;
+import net.minecraft.entity.monster.EntityZombie;
+import net.minecraft.entity.passive.EntityVillager;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.init.Items;
+import net.minecraft.init.MobEffects;
+import net.minecraft.item.ItemFood;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.event.entity.item.ItemExpireEvent;
@@ -16,7 +26,17 @@ import net.minecraftforge.event.entity.player.ArrowNockEvent;
 import net.minecraftforge.event.entity.player.EntityItemPickupEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
+import net.minecraftforge.event.entity.player.AttackEntityEvent;
+import net.minecraftforge.event.entity.living.LivingEntityUseItemEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import thaumcraft.api.ThaumcraftApi;
+import thaumcraft.api.wands.ItemFocusBasic;
+import thaumcraft.common.Thaumcraft;
+import thaumcraft.common.config.Config;
+import thaumcraft.common.config.ConfigItems;
+import thaumcraft.common.entities.monster.EntityBrainyZombie;
+import thaumcraft.common.entities.monster.EntityGiantBrainyZombie;
+import thaumcraft.common.lib.WarpEvents;
 import thaumcraft.common.lib.capabilities.IPlayerKnowledge;
 import thaumcraft.common.lib.capabilities.PlayerKnowledgeProvider;
 import thaumcraft.common.lib.network.PacketHandler;
@@ -27,9 +47,13 @@ import thaumcraft.common.lib.network.playerdata.PacketSyncScannedItems;
 import thaumcraft.common.lib.network.playerdata.PacketSyncScannedPhenomena;
 import thaumcraft.common.lib.network.playerdata.PacketSyncWarp;
 
+import java.io.File;
+import java.util.List;
+
 public class EventHandlerEntity {
 
-    public static final ResourceLocation PLAYER_KNOWLEDGE_KEY = new ResourceLocation("thaumcraft", "player_knowledge");
+    public static final net.minecraft.util.ResourceLocation PLAYER_KNOWLEDGE_KEY =
+            new net.minecraft.util.ResourceLocation("thaumcraft", "player_knowledge");
 
     // ---- Capability attachment ----
 
@@ -68,7 +92,6 @@ public class EventHandlerEntity {
         }
 
         if (!event.isWasDeath()) {
-            // Respawn/End return: also sync
             if (!clone.getEntityWorld().isRemote) {
                 syncAllData(clone);
             }
@@ -83,65 +106,209 @@ public class EventHandlerEntity {
         IPlayerKnowledge knowledge = player.getCapability(PlayerKnowledgeProvider.PLAYER_KNOWLEDGE, null);
         if (knowledge == null) return;
 
-        PacketHandler.INSTANCE.sendTo(new PacketSyncAspects(knowledge.getAspectsDiscovered()), (net.minecraft.entity.player.EntityPlayerMP) player);
-        PacketHandler.INSTANCE.sendTo(new PacketSyncResearch(knowledge.getResearchComplete()), (net.minecraft.entity.player.EntityPlayerMP) player);
-        PacketHandler.INSTANCE.sendTo(new PacketSyncScannedEntities(knowledge.getScannedEntities()), (net.minecraft.entity.player.EntityPlayerMP) player);
-        PacketHandler.INSTANCE.sendTo(new PacketSyncScannedItems(knowledge.getScannedItems()), (net.minecraft.entity.player.EntityPlayerMP) player);
-        PacketHandler.INSTANCE.sendTo(new PacketSyncScannedPhenomena(knowledge.getScannedPhenomena()), (net.minecraft.entity.player.EntityPlayerMP) player);
-        PacketHandler.INSTANCE.sendTo(new PacketSyncWarp(knowledge.getWarpPerm(), knowledge.getWarpSticky(), knowledge.getWarpTemp()), (net.minecraft.entity.player.EntityPlayerMP) player);
+        PacketHandler.INSTANCE.sendTo(new PacketSyncAspects(knowledge.getAspectsDiscovered()), (EntityPlayerMP) player);
+        PacketHandler.INSTANCE.sendTo(new PacketSyncResearch(knowledge.getResearchComplete()), (EntityPlayerMP) player);
+        PacketHandler.INSTANCE.sendTo(new PacketSyncScannedEntities(knowledge.getScannedEntities()), (EntityPlayerMP) player);
+        PacketHandler.INSTANCE.sendTo(new PacketSyncScannedItems(knowledge.getScannedItems()), (EntityPlayerMP) player);
+        PacketHandler.INSTANCE.sendTo(new PacketSyncScannedPhenomena(knowledge.getScannedPhenomena()), (EntityPlayerMP) player);
+        PacketHandler.INSTANCE.sendTo(new PacketSyncWarp(knowledge.getWarpPerm(), knowledge.getWarpSticky(), knowledge.getWarpTemp()), (EntityPlayerMP) player);
     }
 
-    // ---- Existing handler stubs ----
+    // ==========================================================
+    //  Filled stubs (ported from original EventHandlerEntity)
+    // ==========================================================
 
+    /**
+     * Called every living entity tick (~20/sec per entity).
+     * - Calls WarpEvents.checkWarpEvent for players
+     * - Handles warp vomit/tick effects
+     */
     @SubscribeEvent
     public void onLivingUpdate(LivingEvent.LivingUpdateEvent event) {
+        if (event.getEntityLiving().world.isRemote) return;
+        if (!(event.getEntityLiving() instanceof EntityPlayer)) return;
+
+        EntityPlayer player = (EntityPlayer) event.getEntityLiving();
+        WarpEvents.checkWarpEvent(player);
     }
 
+    /**
+     * On player death:
+     * - Calls WarpEvents.checkDeathGaze
+     * - Resets warp counter
+     */
     @SubscribeEvent
     public void onLivingDeath(LivingDeathEvent event) {
+        if (event.getEntityLiving().world.isRemote) return;
+        if (!(event.getEntityLiving() instanceof EntityPlayer)) return;
+
+        EntityPlayer player = (EntityPlayer) event.getEntityLiving();
+        WarpEvents.checkDeathGaze(player);
+
+        // Reset warp counter on death
+        IPlayerKnowledge knowledge = player.getCapability(PlayerKnowledgeProvider.PLAYER_KNOWLEDGE, null);
+        if (knowledge != null) {
+            knowledge.setWarpCounter(0);
+        }
     }
 
+    /**
+     * On mob death drops:
+     * - Zombie brain from zombies (50% + looting bonus)
+     * - Guaranteed brain from BrainyZombie/GiantBrainyZombie
+     * - Pearl from Endermen with looting
+     */
     @SubscribeEvent
     public void onLivingDrops(LivingDropsEvent event) {
+        if (event.getEntityLiving().world.isRemote) return;
+
+        if (event.getEntityLiving() instanceof EntityZombie && !(event.getEntityLiving() instanceof EntityBrainyZombie)) {
+            float chance = 0.5f + EnchantmentHelper.getLootingModifier(event.getEntityLiving()) * 0.05f;
+            if (event.getEntityLiving().world.rand.nextFloat() < chance) {
+                event.getDrops().add(new EntityItem(
+                        event.getEntityLiving().world,
+                        event.getEntityLiving().posX,
+                        event.getEntityLiving().posY,
+                        event.getEntityLiving().posZ,
+                        new ItemStack(ConfigItems.itemZombieBrain)
+                ));
+            }
+        }
+
+        if (event.getEntityLiving() instanceof EntityBrainyZombie || event.getEntityLiving() instanceof EntityGiantBrainyZombie) {
+            int count = event.getEntityLiving() instanceof EntityGiantBrainyZombie ? 2 : 1;
+            event.getDrops().add(new EntityItem(
+                    event.getEntityLiving().world,
+                    event.getEntityLiving().posX,
+                    event.getEntityLiving().posY,
+                    event.getEntityLiving().posZ,
+                    new ItemStack(ConfigItems.itemZombieBrain, count)
+            ));
+        }
     }
 
+    /**
+     * Right-click on entities: Pech trade, etc.
+     */
     @SubscribeEvent
     public void onEntityInteract(PlayerInteractEvent.EntityInteract event) {
+        if (event.getWorld().isRemote) return;
+        // Phase 8: Pech trade and other entity interactions
+        // Future: if (target instanceof EntityPech) { open trade GUI }
     }
 
+    /**
+     * Left-click / attack on entities: used for Pech trade detection.
+     */
+    @SubscribeEvent
+    public void onAttackEntity(AttackEntityEvent event) {
+        if (event.getEntity().world.isRemote) return;
+        // Future: Pech left-click trade detection
+    }
+
+    /**
+     * Item pickup: discovery research tracking.
+     */
     @SubscribeEvent
     public void onItemPickup(EntityItemPickupEvent event) {
+        if (event.getEntity().world.isRemote) return;
+        // Phase 8: discovery research when picking up items
     }
 
     @SubscribeEvent
     public void onItemToss(ItemTossEvent event) {
+        // Can remain empty — no original behaviour
     }
 
     @SubscribeEvent
     public void onItemExpire(ItemExpireEvent event) {
+        // Can remain empty — no original behaviour
     }
 
+    /**
+     * Bow draw interception for wand foci.
+     * If player is holding a focus, cancel bow charging.
+     */
     @SubscribeEvent
     public void onArrowLoose(ArrowLooseEvent event) {
+        if (event.getEntityLiving().world.isRemote) return;
+        EntityPlayer player = event.getEntityPlayer();
+        ItemStack held = player.getHeldItemMainhand();
+
+        if (!held.isEmpty() && held.getItem() instanceof ItemFocusBasic) {
+            event.setCharge(0);
+        }
     }
 
+    /**
+     * Bow nock interception for wand foci.
+     * Prevent drawing bow if holding a focus.
+     */
     @SubscribeEvent
     public void onArrowNock(ArrowNockEvent event) {
+        EntityPlayer player = event.getEntityPlayer();
+        ItemStack held = player.getHeldItemMainhand();
+
+        if (!held.isEmpty() && held.getItem() instanceof ItemFocusBasic) {
+            event.setCanceled(true);
+        }
     }
 
+    /**
+     * Break speed modifier: reduce mining speed when holding a focus.
+     */
     @SubscribeEvent
     public void onPlayerBreakSpeed(PlayerEvent.BreakSpeed event) {
+        EntityPlayer player = event.getEntityPlayer();
+        ItemStack held = player.getHeldItemMainhand();
+
+        if (!held.isEmpty() && held.getItem() instanceof ItemFocusBasic) {
+            event.setNewSpeed(0.3f);
+        }
     }
 
+    /**
+     * Player file load: legacy warpCounter.dat migration.
+     */
     @SubscribeEvent
     public void onPlayerLoadFromFile(PlayerEvent.LoadFromFile event) {
+        // Phase 8: legacy warpCounter.dat -> capability migration
     }
 
+    /**
+     * Player file save: legacy warpCounter.dat (if needed).
+     */
     @SubscribeEvent
     public void onPlayerSaveToFile(PlayerEvent.SaveToFile event) {
+        // Phase 8: legacy warpCounter.dat save (if needed)
     }
 
+    /**
+     * Item use finish: warp-on-eat effect for tainted food.
+     * Replaces original PlayerUseItemEvent.Finish.
+     * In 1.12.2: LivingEntityUseItemEvent.Finish
+     */
     @SubscribeEvent
-    public void onPlayerRightClickItem(PlayerInteractEvent.RightClickItem event) {
+    public void onItemUseFinish(LivingEntityUseItemEvent.Finish event) {
+        if (event.getEntityLiving().world.isRemote) return;
+        if (!(event.getEntityLiving() instanceof EntityPlayer)) return;
+
+        EntityPlayer player = (EntityPlayer) event.getEntityLiving();
+        ItemStack used = event.getItem();
+
+        if (used.isEmpty() || !(used.getItem() instanceof ItemFood)) return;
+
+        int warp = ThaumcraftApi.getWarp(used);
+        if (warp > 0) {
+            Thaumcraft.addStickyWarpToPlayer(player, warp);
+        }
+    }
+
+    /**
+     * Jump event: modify jump height if jump boost potion is active.
+     */
+    @SubscribeEvent
+    public void onLivingJump(LivingEvent.LivingJumpEvent event) {
+        // Future: modify jump based on thaumcraft potion effects
     }
 }

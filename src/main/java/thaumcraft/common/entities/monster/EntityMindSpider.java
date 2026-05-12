@@ -29,4 +29,16 @@ public class EntityMindSpider extends net.minecraft.entity.monster.EntitySpider 
 
     @Override protected void dropFewItems(boolean wasRecentlyHit, int looting) {}
     @Override public int getMaxSpawnedInChunk() { return 200; }
+
+    // ---- WarpEvents phantom spider support ----
+
+    private String viewer = null;
+
+    public void setViewer(String name) {
+        this.viewer = name;
+    }
+
+    public void setHarmless(boolean harmless) {
+        this.harmlessTicks = harmless ? 1200 : 0;
+    }
 }

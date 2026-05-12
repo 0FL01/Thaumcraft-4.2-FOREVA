@@ -38,6 +38,12 @@ public interface IPlayerKnowledge {
 
     int getTotalWarp();
 
+    // ---- Warp Counter (used by WarpEvents random trigger) ----
+
+    int getWarpCounter();
+
+    void setWarpCounter(int counter);
+
     // ---- Aspect Discovery ----
 
     boolean hasDiscoveredAspect(String tag);

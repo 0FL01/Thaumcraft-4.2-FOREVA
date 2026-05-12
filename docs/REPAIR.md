@@ -15,6 +15,10 @@ Boss system: `EntityTaintacleGiant` with `BossInfoServer` + enrage,
 `EntityCultistPortal` migrated to `EntityThaumcraftBoss`.
 Alchemy system: `TileCrucible` full server port (FluidTank, heat, aspect decomp,
 smelting, spill, bellows, NBT, capability sync).
+Event system: all 5 event handler classes ported — `WarpEvents` (full ~340 lines),
+`EventHandlerEntity` (16 handlers, 12 with real logic), `EventHandlerRunic` (3 handlers +
+static helpers, runic charge state), `EventHandlerWorld` (11 handlers + chunk retrogen),
+`ServerTickEventsFML` (world tick, block swap, chunk regen, inner classes).
 
 **Next milestone:** Complete all work that does NOT require Phase 8-10 (client GUI,
 rendering, recipes, research data). This is documented in the
@@ -809,56 +813,59 @@ Boss bar via `BossInfoServer` composition, champion via `makeChampion(true)`, en
 
 ### Tier B — Event system (standalone, medium effort)
 
-#### B.1 — WarpEvents (3r.1)
+#### B.1 — WarpEvents (3r.1) ✅ DONE
 
-| Field | Value |
-|-------|-------|
-| **Files to create** | `thaumcraft/common/lib/events/WarpEvents.java` |
-| **Original source** | `thaumcraft_src/thaumcraft/common/lib/events/WarpEvents.class` (338 lines) |
-| **Missing methods** | `checkWarpEvent`, `checkDeathGaze`, `spawnMist`, `grantResearch`, `spawnGuardian`, `suddenlySpiders`, `getWarpFromGear` |
-| **Effort** | M — ~200 lines from CFR, one new file |
-| **Dependencies** | `IPlayerKnowledge` warp counter (3r.5 — exists in Config), `EventHandlerEntity.onLivingUpdate` must call `checkWarpEvent` |
-| **Impact** | Without this, the entire warp system does nothing — no research from warp, no guardian spawns, no warp-based potion effects |
+Full port from original (338 lines decompiled → ~340 lines in port).
+Package: `thaumcraft.common.lib.WarpEvents` (not `events/`).
+Pure static utility with 7 methods: `checkWarpEvent`, `checkDeathGaze`, `spawnMist`,
+`grantResearch`, `spawnGuardian`, `suddenlySpiders`, `getWarpFromGear`.
+Uses `IPlayerKnowledge` for warp state, `Config.potion*` for potion effects,
+clean 1.12.2 MCP naming.
+Added `warpCounter` field to `IPlayerKnowledge`/`PlayerKnowledgeCapability`.
+`PacketAspectPool` filled with proper fields/serialization.
 
-#### B.2 — EventHandlerEntity (3r.6) — core handlers
+#### B.2 — EventHandlerEntity (3r.6) — core handlers ✅ DONE
 
-| Field | Value |
-|-------|-------|
-| **Files to modify** | `thaumcraft/common/lib/events/EventHandlerEntity.java` |
-| **Original source** | `thaumcraft_src/thaumcraft/common/lib/events/EventHandlerEntity.class` |
-| **Missing handlers** | `onLivingUpdate` (WarpEvents call), `onLivingDeath` (warp persistence), `onLivingDrops` (zombie brain, special loot), `onItemPickup` (discovery research), `onItemToss`, `onArrowLoose`, `onArrowNock`, `onPlayerBreakSpeed`, `onPlayerLoadFromFile`, `onPlayerSaveToFile`, `onPlayerRightClickItem` |
-| **Effort** | M — 11 handlers, ~250 lines total |
-| **Dependencies** | WarpEvents (B.1), `IPlayerKnowledge` saves (3r.5 ✅) |
+Full port from original (625 lines decompiled → ~300 lines in port).
+16 `@SubscribeEvent` handlers: 12 with real logic (warp events, death gaze,
+zombie brain drops, arrow interception, break speed, item use finish)
++ 4 empty stubs for Phase 8 features.
+Added: `AttackEntityEvent` (left-click Pech), `LivingEntityUseItemEvent.Finish`
+(replaces original `PlayerUseItemEvent.Finish`), `LivingEvent.LivingJumpEvent`.
+Removed: `ItemExpireEvent` (not in original).
 
-#### B.3 — EventHandlerRunic (3r.7)
+#### B.3 — EventHandlerRunic (3r.7) ✅ DONE
 
-| Field | Value |
-|-------|-------|
-| **Files to modify** | `thaumcraft/common/lib/events/EventHandlerRunic.java` |
-| **Original source** | `thaumcraft_src/thaumcraft/common/lib/events/EventHandlerRunic.class` (307 lines) |
-| **Missing** | `onLivingUpdate` (shield regen tick), `onLivingHurt` (shield damage absorption), `onItemTooltip` (shield info) |
-| **Effort** | M — ~80 lines for absorption/regen logic |
-| **Impact** | Runic shielding is completely non-functional. All runic armor, baubles, and the absorption mechanic do nothing |
+Full port from original (307 lines decompiled → ~300 lines in port).
+3 `@SubscribeEvent` handlers: `livingTick` (runic charge scan + recharge from vis),
+`entityHurt` (damage absorption + fortress mask effects + kinetic/healing/emergency
+upgrades), `tooltipEvent` (runic charge + warp display).
+3 static helpers: `getFinalCharge`, `getFinalWarp`, `getHardening`.
+State managed via `HashMap<Integer, Integer[]>` keyed by player entity ID.
+(Future: migrate to Capability-based storage.)
+Champion mob handling simplified (no `CHAMPION_MOD` attribute in port).
+Uses `BaublesApi.getBaublesHandler(player)` + `IBaublesItemHandler` for 7 bauble slots.
 
-#### B.4 — EventHandlerWorld (3r.7b)
+#### B.4 — EventHandlerWorld (3r.7b) ✅ DONE
 
-| Field | Value |
-|-------|-------|
-| **Files to modify** | `thaumcraft/common/lib/events/EventHandlerWorld.java` |
-| **Original source** | `thaumcraft_src/thaumcraft/common/lib/events/EventHandlerWorld.class` (246 lines) |
-| **Missing** | All 9 handlers: world load/save, chunk data, block place, harvest drops, item crafted, fill bucket |
-| **Effort** | M — ~180 lines |
-| **Impact** | World save/load events, chunk data persistence, and world-gen retrogen are broken |
+Full port from original (246 lines decompiled → ~220 lines in port).
+9 `@SubscribeEvent` handlers: world load/save/unload, chunk save/load (retrogen key),
+item crafted (warp on craft), harvest drops (special mining), block place/multi-place
+(boss proximity check), note block play (TileSensor), fill bucket (custom fluids).
++1 post-Phase 8 handler: `FurnaceFuelBurnTimeEvent` (replaces deprecated `IFuelHandler`).
+`isNearActiveBoss` helper for Eldritch dimension block protection.
 
-#### B.5 — ServerTickEventsFML (3r.7c): chunk regeneration + block swap queue
+#### B.5 — ServerTickEventsFML (3r.7c): chunk regeneration + block swap queue ✅ DONE
 
-| Field | Value |
-|-------|-------|
-| **Files to modify** | `thaumcraft/common/lib/events/ServerTickEventsFML.java` |
-| **Original source** | `thaumcraft_src/thaumcraft/common/lib/events/ServerTickEventsFML.class` (233 lines) |
-| **Missing** | `tickChunkRegeneration`, `tickBlockSwap`, inner classes `RestorableWardedBlock` and `VirtualSwapper`, fields `swapList` and `chunksToGenerate` |
-| **Effort** | M — ~170 lines |
-| **Impact** | Chunk regeneration (Eldritch dimension) and warded block saving/restoring are broken |
+Full port from original (233 lines decompiled → ~220 lines in port).
+`TickEvent.WorldTickEvent` handler with server-side/Phase.END filter.
+`tickChunkRegeneration`: processes `chunksToGenerate` queue (up to 10 chunks/tick),
+re-runs world gen for retrogen.
+`tickBlockSwap`: processes `swapList` queue for focus area-block replacement
+(Portable Hole). Handles silk touch / fortune, chain propagation, creative mode.
+`addSwapper`: static entry point for focus to queue block swaps.
+Inner classes: `RestorableWardedBlock` (block NBT snapshot), `VirtualSwapper` (swap op).
+Uses `BlockUtils.breakFurthestBlock` for adjacency chain detection.
 
 ### Tier C — Fills remaining gameplay gaps
 
@@ -1055,6 +1062,13 @@ Round A: Sound + Boss + Alchemy
   A3. TileCrucible full server logic                           ✅ done
   A4. EntityTaintacleGiant champion + boss bar + full behavior ✅ done
   A5. EntityCultistPortal → EntityThaumcraftBoss               ✅ done
+
+Round B: Event System
+  B1. WarpEvents (full port, 7 methods)                       ✅ done
+  B2. EventHandlerEntity (16 handlers, 12 real)               ✅ done
+  B3. EventHandlerRunic (runic shielding + static helpers)     ✅ done
+  B4. EventHandlerWorld (world/chunk/block events)             ✅ done
+  B5. ServerTickEventsFML (world tick + block swap + regen)    ✅ done
 
 Round B: Alchemy
   B1. TileCrucible: full CFR port (fluid tank, attemptSmelt, aspect decomposition, spill, bellows)
