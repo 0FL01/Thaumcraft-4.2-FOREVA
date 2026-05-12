@@ -9,7 +9,6 @@ import net.minecraft.entity.Entity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.potion.Potion;
-import net.minecraft.util.SoundEvent;
 import net.minecraft.world.biome.Biome;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.RegistryEvent;
@@ -294,12 +293,6 @@ public class Thaumcraft {
                 ThaumcraftWorldGenerator.biomeEerie,
                 ThaumcraftWorldGenerator.biomeEldritchLands
         );
-    }
-
-    @SubscribeEvent
-    public void registerSounds(RegistryEvent.Register<SoundEvent> event) {
-        log.info("Registering sound events");
-        // Phase 7: register actual sounds
     }
 
     @SubscribeEvent

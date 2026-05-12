@@ -672,10 +672,10 @@ No `sounds.json` exists, no `.ogg` files are present. 7 entity/AI files do
 
 **This is a pre-Phase 8-10 item** — pure data + registration work, no GUI needed.
 
-#### 6r.7.1 — Create sounds.json + OGG assets ✅ DONE
+#### 6r.7.1 — Create sounds.json + register sounds ✅ DONE
 
-**Status:** ✅ `sounds.json` (67 entries) + 111 OGG files copied to `src/main/resources/assets/thaumcraft/`.
-`TCSounds` class + `registerSounds` body still pending (next commit).
+**Status:** ✅ All 66 SoundEvent fields registered via `TCSounds`, 111 OGG in `assets/thaumcraft/sounds/`.
+Empty `registerSounds()` stub removed from `Thaumcraft.java`.
 
 | Field | Value |
 |-------|-------|
@@ -764,10 +764,9 @@ and no research tree definitions.
 
 ### Tier A — Must-do before Phases 8-10
 
-#### A.1 — Sound registration (6r.7.1): sounds.json + OGG assets ✅ DONE
+#### A.1 — Sound registration (6r.7.1): sounds.json + TCSounds ✅ DONE
 
-Files: `sounds.json` (67 entries) + 111 OGG files copied to `src/main/resources/assets/thaumcraft/`.
-`TCSounds` class + `registerSounds` body still pending (next commit).
+Files: `sounds.json` (66 entries) + 111 OGG copied, `TCSounds` class with 66 static SoundEvent fields + `registerSounds` handler. Empty stub removed from `Thaumcraft.java`.
 Effort: M (~1h). Dependencies: none.
 
 #### A.2 — Entity sound methods (6r.7.2): fix 12 entity classes
@@ -931,7 +930,7 @@ P0: PacketHandler (3r.13)         ⚠️  →  Dispatch works, 11 non-FX packets
 | 3 | Boss mob AI tasks (6r.2) | 6r | M | ✅ *addTask + BossInfoServer* |
 | 4 | Projectile onImpact (6r.4) | 6r | M | ✅ *11/11 full behavior* |
 | 5 | Group B manual AI lifecycle | 6r | M | ✅ *5 entities* |
-| 6 | **Sound registration (A.1)** | 6r | M | ✅ *assets copied; TCSounds pending* |
+| 6 | **Sound registration (A.1)** | 6r | M | ✅ *all 66 SoundEvents registered* |
 | 7 | **Entity sound methods (A.2)** | 6r | M | ⏳ *pre-8-10* |
 | 8 | **TileCrucible (A.3)** | 4r | XL | ⏳ *pre-8-10* |
 | 9 | **EntityTaintacleGiant boss (A.4)** | 6r | M | ⏳ *pre-8-10* |
@@ -1041,8 +1040,7 @@ These rounds produce BUILD SUCCESSFUL after each step.
 
 ```
 Round A: Sound + Boss
-  A1. Create sounds.json + registerSounds body (~30 SoundEvent)  ✅ assets done
-  A1b. TCSounds class with 67 SoundEvent fields + registerSounds handler
+  A1. Create sounds.json + TCSounds (66 SoundEvents)           ✅ done
   A2. Fix entity sound methods (26 classes: return real SoundEvent)
   A3. EntityTaintacleGiant champion + boss bar + full behavior
 
