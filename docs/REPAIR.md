@@ -13,6 +13,8 @@ have full `onImpact`/`onHit` behavior from decompiled original source.
 Sound system complete: 66 registered SoundEvents, 22 entity sound classes fixed.
 Boss system: `EntityTaintacleGiant` with `BossInfoServer` + enrage,
 `EntityCultistPortal` migrated to `EntityThaumcraftBoss`.
+Alchemy system: `TileCrucible` full server port (FluidTank, heat, aspect decomp,
+smelting, spill, bellows, NBT, capability sync).
 
 **Next milestone:** Complete all work that does NOT require Phase 8-10 (client GUI,
 rendering, recipes, research data). This is documented in the
@@ -793,17 +795,12 @@ All 22 entity classes with null/wrong/missing sound methods updated to return co
 Requires A.1 to be done first.
 Effort: M (~30m). Dependencies: A.1.
 
-#### A.3 — TileCrucible (4r.2): alchemy mechanic — standalone, no recipe system needed
+#### A.3 — TileCrucible (4r.2): alchemy mechanic ✅ DONE
 
-| Field | Value |
-|-------|-------|
-| **Files to modify** | `thaumcraft/common/tiles/TileCrucible.java` |
-| **Original source** | `thaumcraft_src/thaumcraft/common/tiles/TileCrucible.class` |
-| **Current state** | 7 lines — empty class |
-| **Missing** | ~350 lines: fluid tank, `attemptSmelt()` with recipe lookup, aspect decomposition (non-primal → primal when heat > 150), `spill()`/`spillRemnants()` (flux cleanup), `getBellows()`, `readCustomNBT`/`writeCustomNBT` |
-| **Effort** | XL — full CFR decompile, port entire class |
-| **Dependencies** | `BlockStoneDevice` createBlockState (4r.10 ✅), `TileJarFillable` (✅), `ConfigBlocks.blockCrucible` (✅) |
-| **Impact** | Enables the entire alchemy pipeline. Without this, essentia gameplay is broken |
+Full server-side port: `FluidTank` with water-only restriction via `canFillFluidType`, `IFluidHandler` capability via `CapabilityFluidHandler`, heat management (fire/lava/blockAiry heat), aspect decomposition (non-primal → primal at 150+ heat), item smelting via `findMatchingCrucibleRecipe`, spill/flux overflow (`blockFluxGoo`/`blockFluxGas` placement + thickening), `spillRemnants` (wand clear), NBT persistence, `getUpdateTag/handleUpdateTag` for chunk sync, `notifyBlockUpdate` for block sync.
+Client FX guarded under `// Phase 8:` comments.
+Dependencies created: `InventoryFake`, `BlockFluxGoo`/`BlockFluxGas` (minimal `LEVEL 0..7` blocks), `ThaumcraftCraftingManager.findMatchingCrucibleRecipe()` ported from original.
+Requires `FMLCommonHandler.instance().firePlayerCraftingEvent` — available in official 1.12.2 Forge.
 
 #### A.4 — EntityTaintacleGiant champion + boss bar (6r.8) ✅ DONE
 
@@ -945,7 +942,7 @@ P0: PacketHandler (3r.13)         ⚠️  →  Dispatch works, 11 non-FX packets
 | 5 | Group B manual AI lifecycle | 6r | M | ✅ *5 entities* |
 | 6 | **Sound registration (A.1)** | 6r | M | ✅ *all 66 SoundEvents registered* |
 | 7 | **Entity sound methods (A.2)** | 6r | M | ✅ *22 entity classes fixed* |
-| 8 | **TileCrucible (A.3)** | 4r | XL | ⏳ *pre-8-10* |
+| 8 | **TileCrucible (A.3)** | 4r | XL | ✅ *full server logic + FluidTank + flux blocks* |
 | 9 | **EntityTaintacleGiant boss (A.4)** | 6r | M | ✅ *boss bar + champion + enrage* |
 | 10 | **WarpEvents (B.1)** | 3r | M | ⏳ *pre-8-10* |
 | 11 | **EventHandlerEntity (B.2)** | 3r | M | ⏳ *pre-8-10* |
@@ -1052,11 +1049,12 @@ Round 5: P1 Projectiles               ✅ 11/11 onImpact full behavior
 These rounds produce BUILD SUCCESSFUL after each step.
 
 ```
-Round A: Sound + Boss
+Round A: Sound + Boss + Alchemy
   A1. Create sounds.json + TCSounds (66 SoundEvents)           ✅ done
   A2. Fix entity sound methods (22 classes)                    ✅ done
-  A3. EntityTaintacleGiant champion + boss bar + full behavior ✅ done
-  A4. EntityCultistPortal → EntityThaumcraftBoss               ✅ done
+  A3. TileCrucible full server logic                           ✅ done
+  A4. EntityTaintacleGiant champion + boss bar + full behavior ✅ done
+  A5. EntityCultistPortal → EntityThaumcraftBoss               ✅ done
 
 Round B: Alchemy
   B1. TileCrucible: full CFR port (fluid tank, attemptSmelt, aspect decomposition, spill, bellows)

@@ -22,6 +22,8 @@ public class ConfigBlocks {
     public static BlockTaint blockTaint;
     public static BlockTaintFibres blockTaintFibres;
     public static BlockAiry blockAiry;
+    public static BlockFluxGoo blockFluxGoo;
+    public static BlockFluxGas blockFluxGas;
     public static BlockManaPod blockManaPod;
     public static BlockEldritch blockEldritch;
     public static BlockEldritchNothing blockEldritchNothing;
@@ -37,6 +39,8 @@ public class ConfigBlocks {
     public static BlockTaintItem blockTaintItem;
     public static BlockTaintFibresItem blockTaintFibresItem;
     public static BlockAiryItem blockAiryItem;
+    public static BlockFluxGooItem blockFluxGooItem;
+    public static BlockFluxGasItem blockFluxGasItem;
     public static BlockCrystalItem blockCrystalItem;
 
     public static void init() {
@@ -100,6 +104,14 @@ public class ConfigBlocks {
                 .setRegistryName("thaumcraft", "airy")
                 .setTranslationKey("thaumcraft.airy");
 
+        blockFluxGoo = (BlockFluxGoo) new BlockFluxGoo()
+                .setRegistryName("thaumcraft", "flux_goo")
+                .setTranslationKey("thaumcraft.flux_goo");
+
+        blockFluxGas = (BlockFluxGas) new BlockFluxGas()
+                .setRegistryName("thaumcraft", "flux_gas")
+                .setTranslationKey("thaumcraft.flux_gas");
+
         blockManaPod = (BlockManaPod) new BlockManaPod()
                 .setRegistryName("thaumcraft", "mana_pod")
                 .setTranslationKey("thaumcraft.mana_pod");
@@ -145,6 +157,12 @@ public class ConfigBlocks {
         blockAiryItem = (BlockAiryItem) new BlockAiryItem(blockAiry)
                 .setRegistryName("thaumcraft", "airy");
 
+        blockFluxGooItem = (BlockFluxGooItem) new BlockFluxGooItem(blockFluxGoo)
+                .setRegistryName("thaumcraft", "flux_goo");
+
+        blockFluxGasItem = (BlockFluxGasItem) new BlockFluxGasItem(blockFluxGas)
+                .setRegistryName("thaumcraft", "flux_gas");
+
         blockCrystalItem = (BlockCrystalItem) new BlockCrystalItem(blockCrystal)
                 .setRegistryName("thaumcraft", "crystal");
     }
@@ -166,6 +184,8 @@ public class ConfigBlocks {
                 blockTaint,
                 blockTaintFibres,
                 blockAiry,
+                blockFluxGoo,
+                blockFluxGas,
                 blockManaPod,
                 blockEldritch,
                 blockEldritchNothing,
@@ -184,6 +204,8 @@ public class ConfigBlocks {
             blockTaintItem,
             blockTaintFibresItem,
             blockAiryItem,
+            blockFluxGooItem,
+            blockFluxGasItem,
             blockCrystalItem
         );
         registry.register(new BlockEldritchItem(blockEldritch)

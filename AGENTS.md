@@ -56,7 +56,7 @@ See `docs/PRD.md §4` for per-phase deliverables and `docs/PRD.md §5` for compl
 | 1 | API + CCL + TrueType | ✅ Done |
 | 2 | Registration, config, networking, events | ✅ Done |
 | 3 | Core systems (capabilities, wands, research, vis, potions, enchants) | ⚠️ **Stubs: WarpEvents missing, 27+ HIGH issues** |
-| 4 | Blocks (71) + Tile Entities (80) | ⚠️ **Stubs: 45/61 TE empty, 6 Tube files missing (block metadata ✅)** |
+| 4 | Blocks (71) + Tile Entities (80) | ⚠️ **Stubs: 45/61 TE empty, 6 Tube files missing — TileCrucible? full server,? block metadata ✅** |
 | 5 | Items, Tools, Armor, Baubles, Relics (~110) | ⚠️ **Stubs: 10 foci, 5 relics, 4 baubles non-functional** |
 | 6 | Entities, Mobs, Golems (~128 + 44 AI) | ⚠️ **Stubs: all 11 projectiles have full CFR-ported behavior, Group B manual AI (5 entities), 5 bosses with AI registration ✅** |
 | 7 | World Gen (biomes, dimension, trees, structures) | ✅ Done |
