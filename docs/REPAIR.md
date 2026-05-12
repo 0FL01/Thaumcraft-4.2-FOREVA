@@ -778,7 +778,8 @@ All 22 entity classes with null/wrong/missing sound methods updated to return co
 | 3 | `EntityGolemBobber.java` | Fishing bobber physics, water sampling, splash timers, spawn data | L | ✅ |
 
 Stabilization pass: AspectOrb null/spawn-data guards, Pech AI rebuild after NBT
-and server-side anger countdown, GolemBobber fisher world/type guards.
+and server-side anger countdown, GolemBobber fisher world/type guards,
+`InventoryUtils.isWandInHotbarWithRoom()` hotbar scan for wand vis room.
 
 ---
 

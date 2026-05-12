@@ -19,6 +19,7 @@ import net.minecraft.world.World;
 import net.minecraftforge.oredict.OreDictionary;
 import thaumcraft.api.ThaumcraftApiHelper;
 import thaumcraft.api.aspects.Aspect;
+import thaumcraft.common.items.wands.ItemWandCasting;
 import thaumcraft.common.tiles.TileArcaneWorkbench;
 import thaumcraft.common.tiles.TileResearchTable;
 
@@ -352,7 +353,15 @@ public class InventoryUtils {
     }
 
     public static int isWandInHotbarWithRoom(Aspect aspect, int amount, EntityPlayer player) {
-        // Wand vis system not fully ported — return -1 (no wand with room)
+        if (aspect == null || amount <= 0 || player == null) return -1;
+        int hotbarSize = Math.min(9, player.inventory.mainInventory.size());
+        for (int slot = 0; slot < hotbarSize; slot++) {
+            ItemStack stack = player.inventory.mainInventory.get(slot);
+            if (stack.isEmpty() || !(stack.getItem() instanceof ItemWandCasting)) continue;
+            int current = ItemWandCasting.getVis(stack, aspect);
+            int max = ItemWandCasting.getMaxVis(stack);
+            if (current + amount <= max) return slot;
+        }
         return -1;
     }
 
