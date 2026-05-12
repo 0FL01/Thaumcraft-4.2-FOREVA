@@ -840,7 +840,7 @@ This is the recommended sequence of git commits. Each produces BUILD SUCCESSFUL.
 ```
 1. Block metadata: 18 blocks + createBlockState/getStateFromMeta/getMetaFromState + getStateForPlacement  ✅
 2. Harvest levels: setHarvestLevel on all 19 block classes  ✅
-3. PacketHandler: dispatch pattern + 7 playerdata handlers  ⚠️ (32/39 still need work)
+3. PacketHandler: dispatch pattern + 7 playerdata handlers  ⚠️ (11 non-FX packets + 14 FX in Phase 8r.1 still need work)
 ```
 
 ### Round 2: P1 Tile Entities
