@@ -9,6 +9,7 @@ import thaumcraft.common.entities.golems.*;
 import thaumcraft.common.entities.monster.*;
 import thaumcraft.common.entities.monster.boss.*;
 import thaumcraft.common.entities.projectile.*;
+import thaumcraft.common.lib.world.ThaumcraftVillagerTrades;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -142,5 +143,11 @@ public class ConfigEntities {
                 "minecraft:textures/entity/zombie_villager/zombie_farmer.png"
         ).setRegistryName("thaumcraft:banker");
         PROFESSIONS.add(PROF_BANKER);
+
+        // Initialize villager careers with trade lists
+        new VillagerRegistry.VillagerCareer(PROF_WIZARD, "wizard")
+                .addTrade(1, ThaumcraftVillagerTrades.WIZARD_TRADES);
+        new VillagerRegistry.VillagerCareer(PROF_BANKER, "banker")
+                .addTrade(1, ThaumcraftVillagerTrades.BANKER_TRADES);
     }
 }
