@@ -211,20 +211,9 @@ public class Thaumcraft {
     public void registerItems(RegistryEvent.Register<Item> event) {
         log.info("Registering items");
         event.getRegistry().registerAll(ConfigItems.getAllItems());
-        // Register ItemBlocks for blocks
+        // Register ItemBlocks for blocks (via ConfigBlocks helper + manual jar)
         event.getRegistry().register(new BlockJarItem(ConfigBlocks.blockJar).setRegistryName("thaumcraft", "jar"));
-        event.getRegistry().register(new net.minecraft.item.ItemBlock(ConfigBlocks.blockCrystal)
-                .setRegistryName("thaumcraft", "crystal"));
-        event.getRegistry().register(new net.minecraft.item.ItemBlock(ConfigBlocks.blockTable)
-                .setRegistryName("thaumcraft", "table"));
-        event.getRegistry().register(new net.minecraft.item.ItemBlock(ConfigBlocks.blockStoneDevice)
-                .setRegistryName("thaumcraft", "stone_device"));
-        event.getRegistry().register(new net.minecraft.item.ItemBlock(ConfigBlocks.blockWoodenDevice)
-                .setRegistryName("thaumcraft", "wooden_device"));
-        event.getRegistry().register(new net.minecraft.item.ItemBlock(ConfigBlocks.blockMetalDevice)
-                .setRegistryName("thaumcraft", "metal_device"));
-        event.getRegistry().register(new net.minecraft.item.ItemBlock(ConfigBlocks.blockMagicalLog)
-                .setRegistryName("thaumcraft", "magical_log"));
+        ConfigBlocks.registerItemBlocks(event.getRegistry());
     }
 
     @SubscribeEvent

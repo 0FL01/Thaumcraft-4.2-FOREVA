@@ -2,6 +2,7 @@ package thaumcraft.common.config;
 
 import net.minecraft.block.Block;
 import thaumcraft.common.blocks.*;
+import thaumcraft.common.blocks.ItemBlocks.*;
 
 public class ConfigBlocks {
 
@@ -13,6 +14,26 @@ public class ConfigBlocks {
     public static BlockWoodenDevice blockWoodenDevice;
     public static BlockMetalDevice blockMetalDevice;
     public static BlockMagicalLog blockMagicalLog;
+    public static BlockMagicalLeaves blockMagicalLeaves;
+    public static BlockCustomOre blockCustomOre;
+    public static BlockCustomPlant blockCustomPlant;
+    public static BlockCosmeticSolid blockCosmeticSolid;
+    public static BlockCosmeticOpaque blockCosmeticOpaque;
+    public static BlockTaint blockTaint;
+    public static BlockTaintFibres blockTaintFibres;
+    public static BlockAiry blockAiry;
+    public static BlockManaPod blockManaPod;
+
+    // ItemBlock instances
+    public static BlockMagicalLeavesItem blockMagicalLeavesItem;
+    public static BlockCustomOreItem blockCustomOreItem;
+    public static BlockCustomPlantItem blockCustomPlantItem;
+    public static BlockCosmeticSolidItem blockCosmeticSolidItem;
+    public static BlockCosmeticOpaqueItem blockCosmeticOpaqueItem;
+    public static BlockTaintItem blockTaintItem;
+    public static BlockTaintFibresItem blockTaintFibresItem;
+    public static BlockAiryItem blockAiryItem;
+    public static BlockCrystalItem blockCrystalItem;
 
     public static void init() {
         blockJar = (BlockJar) new BlockJar()
@@ -42,6 +63,70 @@ public class ConfigBlocks {
         blockMagicalLog = (BlockMagicalLog) new BlockMagicalLog()
                 .setRegistryName("thaumcraft", "magical_log")
                 .setTranslationKey("thaumcraft.magical_log");
+
+        blockMagicalLeaves = (BlockMagicalLeaves) new BlockMagicalLeaves()
+                .setRegistryName("thaumcraft", "magical_leaves")
+                .setTranslationKey("thaumcraft.magical_leaves");
+
+        blockCustomOre = (BlockCustomOre) new BlockCustomOre()
+                .setRegistryName("thaumcraft", "custom_ore")
+                .setTranslationKey("thaumcraft.custom_ore");
+
+        blockCustomPlant = (BlockCustomPlant) new BlockCustomPlant()
+                .setRegistryName("thaumcraft", "custom_plant")
+                .setTranslationKey("thaumcraft.custom_plant");
+
+        blockCosmeticSolid = (BlockCosmeticSolid) new BlockCosmeticSolid()
+                .setRegistryName("thaumcraft", "cosmetic_solid")
+                .setTranslationKey("thaumcraft.cosmetic_solid");
+
+        blockCosmeticOpaque = (BlockCosmeticOpaque) new BlockCosmeticOpaque()
+                .setRegistryName("thaumcraft", "cosmetic_opaque")
+                .setTranslationKey("thaumcraft.cosmetic_opaque");
+
+        blockTaint = (BlockTaint) new BlockTaint()
+                .setRegistryName("thaumcraft", "taint")
+                .setTranslationKey("thaumcraft.taint");
+
+        blockTaintFibres = (BlockTaintFibres) new BlockTaintFibres()
+                .setRegistryName("thaumcraft", "taint_fibres")
+                .setTranslationKey("thaumcraft.taint_fibres");
+
+        blockAiry = (BlockAiry) new BlockAiry()
+                .setRegistryName("thaumcraft", "airy")
+                .setTranslationKey("thaumcraft.airy");
+
+        blockManaPod = (BlockManaPod) new BlockManaPod()
+                .setRegistryName("thaumcraft", "mana_pod")
+                .setTranslationKey("thaumcraft.mana_pod");
+
+        // ItemBlock instances (cast needed because setRegistryName returns Item)
+        blockMagicalLeavesItem = (BlockMagicalLeavesItem) new BlockMagicalLeavesItem(blockMagicalLeaves)
+                .setRegistryName("thaumcraft", "magical_leaves");
+
+        blockCustomOreItem = (BlockCustomOreItem) new BlockCustomOreItem(blockCustomOre)
+                .setRegistryName("thaumcraft", "custom_ore");
+
+        blockCustomPlantItem = (BlockCustomPlantItem) new BlockCustomPlantItem(blockCustomPlant)
+                .setRegistryName("thaumcraft", "custom_plant");
+
+        blockCosmeticSolidItem = (BlockCosmeticSolidItem) new BlockCosmeticSolidItem(blockCosmeticSolid)
+                .setRegistryName("thaumcraft", "cosmetic_solid");
+
+        blockCosmeticOpaqueItem = (BlockCosmeticOpaqueItem) new BlockCosmeticOpaqueItem(blockCosmeticOpaque)
+                .setRegistryName("thaumcraft", "cosmetic_opaque");
+
+        blockTaintItem = (BlockTaintItem) new BlockTaintItem(blockTaint)
+                .setRegistryName("thaumcraft", "taint");
+
+        blockTaintFibresItem = (BlockTaintFibresItem) new BlockTaintFibresItem(blockTaintFibres)
+                .setRegistryName("thaumcraft", "taint_fibres");
+
+        blockAiryItem = (BlockAiryItem) new BlockAiryItem(blockAiry)
+                .setRegistryName("thaumcraft", "airy");
+
+        blockCrystalItem = (BlockCrystalItem) new BlockCrystalItem(blockCrystal)
+                .setRegistryName("thaumcraft", "crystal");
     }
 
     public static Block[] getAllBlocks() {
@@ -52,7 +137,30 @@ public class ConfigBlocks {
                 blockStoneDevice,
                 blockWoodenDevice,
                 blockMetalDevice,
-                blockMagicalLog
+                blockMagicalLog,
+                blockMagicalLeaves,
+                blockCustomOre,
+                blockCustomPlant,
+                blockCosmeticSolid,
+                blockCosmeticOpaque,
+                blockTaint,
+                blockTaintFibres,
+                blockAiry,
+                blockManaPod
         };
+    }
+
+    public static void registerItemBlocks(net.minecraftforge.registries.IForgeRegistry<net.minecraft.item.Item> registry) {
+        registry.registerAll(
+            blockMagicalLeavesItem,
+            blockCustomOreItem,
+            blockCustomPlantItem,
+            blockCosmeticSolidItem,
+            blockCosmeticOpaqueItem,
+            blockTaintItem,
+            blockTaintFibresItem,
+            blockAiryItem,
+            blockCrystalItem
+        );
     }
 }
