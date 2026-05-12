@@ -146,13 +146,15 @@ fix plan with original source reference, fix approach, and effort estimate.
 
 | Field | Value |
 |-------|-------|
-| **Files to modify** | All 39 `Packet*.java` classes in `thaumcraft/common/lib/network/` |
+| **Files to modify** | 18 packet classes (8 misc + 10 playerdata stubs) in `thaumcraft/common/lib/network/` |
 | **Original source** | Individual `.class` files in `thaumcraft_src/thaumcraft/common/lib/network/` |
-| **Missing** | `fromBytes()` and `toBytes()` in every packet — currently empty |
-| **Effort** | XL — 39 files each need CFR decompile then port. Bulk of work is identifying correct fields per packet type |
-| **Strategy** | Process in batches: sync packets first (aspects, research, warp), then FX packets |
+| **Missing** | `fromBytes()` and `toBytes()` in each packet — currently empty |
+| **Effort** | M — 18 files, each 5-20 lines for serialization + onMessage handler |
+| **Strategy** | Process in 3 batches: (1) ScannedToServer, (2) remaining playerdata stubs, (3) misc packets |
 
-**Status**: ⚠️ PARTIAL (3 commits). Dispatch pattern in place (PacketBase.onMessage + PacketHandler.DISPATCH_HANDLER). STUB_HANDLER deleted. 7 playerdata packets have real `onMessage()` handlers. 32 remaining (14 FX + 8 misc + 10 playerdata stubs) still need fromBytes/toBytes + onMessage.
+**Note**: 14 FX packets moved to Phase 8r.1 (pure client-side, no game logic dependency).
+
+**Status**: ⚠️ PARTIAL. Dispatch pattern in place (PacketBase.onMessage + PacketHandler.DISPATCH_HANDLER). STUB_HANDLER deleted. 7 playerdata sync packets (Aspects, Research, ScannedEntities/Items/Phenomena, Warp, ResearchComplete) have real `onMessage()` handlers. 18 remaining:
 
 ### 3r.14 — InternalMethodHandler stubs (MEDIUM)
 
@@ -689,6 +691,35 @@ CFR decompile to get correct AI priorities and target conditions.
 | 1 | `EntityAspectOrb.java` | Implement `entityInit` (data watcher), NBT save/load, `onUpdate` (lifetime + merge) | L |
 | 2 | `EntityFallingTaint.java` | Implement taint falling entity (similar to EntityFallingBlock) | L |
 | 3 | `EntityGolemBobber.java` | Implement fishing bobber behavior | L |
+
+---
+
+## Phase 8r — Client Network & FX
+
+### 8r.1 — FX network packets (14 files)
+
+**Moved from 3r.13.** These are pure client-side visual packets (particles, beams, zaps, bubbles).
+No game logic dependency — safe to defer until Phase 8 client rendering.
+
+| # | File | Effort |
+|---|------|--------|
+| 1 | `PacketFXBeamPulse.java` | L |
+| 2 | `PacketFXBeamPulseGolemBoss.java` | L |
+| 3 | `PacketFXBlockArc.java` | L |
+| 4 | `PacketFXBlockBubble.java` | L |
+| 5 | `PacketFXBlockDig.java` | L |
+| 6 | `PacketFXBlockSparkle.java` | L |
+| 7 | `PacketFXBlockZap.java` | L |
+| 8 | `PacketFXEssentiaSource.java` | L |
+| 9 | `PacketFXInfusionSource.java` | L |
+| 10 | `PacketFXShield.java` | L |
+| 11 | `PacketFXSonic.java` | L |
+| 12 | `PacketFXVisDrain.java` | L |
+| 13 | `PacketFXWispZap.java` | L |
+| 14 | `PacketFXZap.java` | L |
+
+Each needs fromBytes/toBytes for position/color/target fields + a side-only onMessage
+to spawn the corresponding particle effect on the client.
 
 ---
 
