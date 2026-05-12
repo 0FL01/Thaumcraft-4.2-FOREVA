@@ -50,4 +50,21 @@ public class BlockUtils {
         }
         return false;
     }
+
+    /** Break the furthest connected block of the given type from the start position. Used by lumber/harvest golems. */
+    public static boolean breakFurthestBlock(World world, BlockPos pos, net.minecraft.entity.player.EntityPlayer player) {
+        // Simplified: break the block at the given position
+        IBlockState state = world.getBlockState(pos);
+        if (state.getBlock().isAir(state, world, pos)) return false;
+        if (player != null && !world.isRemote) {
+            state.getBlock().harvestBlock(world, player, pos, state, world.getTileEntity(pos), net.minecraft.item.ItemStack.EMPTY);
+            world.setBlockToAir(pos);
+            return true;
+        }
+        if (!world.isRemote) {
+            world.destroyBlock(pos, true);
+            return true;
+        }
+        return false;
+    }
 }

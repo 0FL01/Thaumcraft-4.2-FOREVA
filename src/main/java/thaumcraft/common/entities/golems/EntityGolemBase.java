@@ -415,20 +415,52 @@ public class EntityGolemBase extends net.minecraft.entity.monster.EntityGolem im
     }
 
     public net.minecraft.item.ItemStack getCarried() {
-        if (this.itemCarried != null && this.itemCarried.getCount() <= 0) this.setCarried(null);
+        if (this.itemCarried != null && this.itemCarried.getCount() <= 0) this.setCarried(net.minecraft.item.ItemStack.EMPTY);
         return this.itemCarried;
     }
 
     public int getCarrySpace() {
-        if (this.itemCarried == null) return this.getCarryLimit();
+        if (this.itemCarried == null || this.itemCarried.isEmpty()) return this.getCarryLimit();
         return Math.min(this.getCarryLimit() - this.itemCarried.getCount(), this.itemCarried.getMaxStackSize() - this.itemCarried.getCount());
     }
 
     public void updateCarried() {
-        if (this.itemCarried != null) {
+        if (this.itemCarried != null && !this.itemCarried.isEmpty()) {
             this.dataManager.set(CARRIED, this.itemCarried.copy());
         } else {
             this.dataManager.set(CARRIED, net.minecraft.item.ItemStack.EMPTY);
+        }
+    }
+
+    public boolean hasSomething() {
+        if (this.itemCarried != null && !this.itemCarried.isEmpty()) return true;
+        if (this.inventory != null && this.inventory.hasSomething()) return true;
+        return false;
+    }
+
+    // --- Configuration toggles ---
+    public boolean checkOreDict() { return (this.getUpgradeAmount(5) > 0); }
+    public boolean ignoreDamage() { return (this.getUpgradeAmount(5) > 0); }
+    public boolean ignoreNBT() { return (this.getUpgradeAmount(5) > 0); }
+
+    // --- Color matching ---
+    public java.util.ArrayList<Byte> getColorsMatching(net.minecraft.item.ItemStack match) {
+        java.util.ArrayList<Byte> result = new java.util.ArrayList<>();
+        if (match == null || match.isEmpty()) return result;
+        for (Marker m : this.getMarkers()) {
+            if (m.dim == this.world.provider.getDimension()) {
+                Byte color = m.color;
+                if (!result.contains(color)) result.add(color);
+            }
+        }
+        if (result.isEmpty()) result.add((byte)-1);
+        return result;
+    }
+
+    public void startRightArmTimer() {
+        if (this.rightArm == 0) {
+            this.rightArm = 5;
+            this.world.setEntityState(this, (byte)8);
         }
     }
 

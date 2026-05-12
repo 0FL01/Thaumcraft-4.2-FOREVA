@@ -22,4 +22,9 @@ public class Marker extends java.lang.Object {
     public int hashCode() {
         return (this.x * 31 + this.y) * 31 + this.z;
     }
+
+    public boolean equalsFuzzy(Marker m) {
+        return this.x == m.x && this.y == m.y && this.z == m.z
+            && this.dim == m.dim && this.side == m.side && this.color == m.color;
+    }
 }

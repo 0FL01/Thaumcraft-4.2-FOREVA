@@ -103,4 +103,63 @@ public class InventoryMob implements IInventory {
         for (ItemStack s : this.inventory) { if (!s.isEmpty()) return true; }
         return false;
     }
+
+    public boolean allEmpty() { return this.isEmpty(); }
+
+    public int getAmountNeededSmart(ItemStack stack, boolean fuzzy) {
+        if (stack == null || stack.isEmpty()) return 0;
+        int needed = stack.getMaxStackSize();
+        int total = 0;
+        for (ItemStack s : this.inventory) {
+            if (s.isEmpty()) continue;
+            if (fuzzy) {
+                if (s.getItem() == stack.getItem()) total += s.getCount();
+            } else {
+                if (s.getItem() == stack.getItem() && s.getMetadata() == stack.getMetadata()
+                    && net.minecraft.item.ItemStack.areItemStackTagsEqual(s, stack)) total += s.getCount();
+            }
+        }
+        int maxStack = Math.min(stack.getMaxStackSize(), this.getInventoryStackLimit());
+        int capacity = this.slotCount * maxStack;
+        if (total >= capacity) return 0;
+        int perSlotRoom = maxStack;
+        int totalRoom = 0;
+        for (ItemStack s : this.inventory) {
+            if (s.isEmpty()) {
+                totalRoom += perSlotRoom;
+            } else {
+                boolean match = fuzzy ? (s.getItem() == stack.getItem())
+                    : (s.getItem() == stack.getItem() && s.getMetadata() == stack.getMetadata()
+                        && net.minecraft.item.ItemStack.areItemStackTagsEqual(s, stack));
+                if (match) totalRoom += (perSlotRoom - s.getCount());
+            }
+        }
+        return Math.min(needed, Math.max(0, totalRoom));
+    }
+
+    public java.util.ArrayList<ItemStack> getItemsNeeded(boolean fuzzy) {
+        java.util.ArrayList<ItemStack> needed = new java.util.ArrayList<>();
+        for (int a = 0; a < this.slotCount; a++) {
+            if (this.inventory[a] == null || this.inventory[a].isEmpty()) continue;
+            if (fuzzy) {
+                int[] ids = net.minecraftforge.oredict.OreDictionary.getOreIDs(this.inventory[a]);
+                if (ids.length > 0) {
+                    for (int id : ids) {
+                        String oreName = net.minecraftforge.oredict.OreDictionary.getOreName(id);
+                        if (oreName != null && !oreName.isEmpty()) {
+                            net.minecraft.util.NonNullList<ItemStack> ores = net.minecraftforge.oredict.OreDictionary.getOres(oreName);
+                            for (ItemStack ore : ores) {
+                                needed.add(ore.copy());
+                            }
+                        }
+                    }
+                    continue;
+                }
+                needed.add(this.inventory[a].copy());
+            } else {
+                needed.add(this.inventory[a].copy());
+            }
+        }
+        return needed;
+    }
 }

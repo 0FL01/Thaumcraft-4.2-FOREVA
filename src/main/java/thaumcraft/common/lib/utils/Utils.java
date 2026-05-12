@@ -41,4 +41,12 @@ public class Utils {
         }
         return bits;
     }
+
+    public static boolean isWoodLog(net.minecraft.world.IBlockAccess world, BlockPos pos) {
+        net.minecraft.block.Block block = world.getBlockState(pos).getBlock();
+        if (block == net.minecraft.init.Blocks.AIR) return false;
+        // Check if the block can sustain leaves (all vanilla and most mod logs do this)
+        if (block.canSustainLeaves(world.getBlockState(pos), world, pos)) return true;
+        return false;
+    }
 }

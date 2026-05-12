@@ -4,6 +4,11 @@ public class EntityGolemBobber extends net.minecraft.entity.Entity implements ne
 
     public EntityGolemBobber(net.minecraft.world.World world) { super(world); }
 
+    public EntityGolemBobber(net.minecraft.world.World world, EntityGolemBase golem, int x, int y, int z) {
+        super(world);
+        this.setPosition(x + 0.5, y + 1.0, z + 0.5);
+    }
+
     @Override protected void entityInit() {}
     @Override protected void readEntityFromNBT(net.minecraft.nbt.NBTTagCompound nbt) {}
     @Override protected void writeEntityToNBT(net.minecraft.nbt.NBTTagCompound nbt) {}
