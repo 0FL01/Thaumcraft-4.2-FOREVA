@@ -9,7 +9,10 @@ import net.minecraft.entity.Entity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.NonNullList;
+import net.minecraft.block.properties.PropertyInteger;
+import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import thaumcraft.common.Thaumcraft;
@@ -21,6 +24,7 @@ import thaumcraft.common.tiles.TileWardingStoneFence;
 public class BlockAiry extends BlockContainer {
 
     public static final String[] airyTypes = {"node", "nitor", "leavesFiller1", "leavesFiller2", "wardingFence", "energizedNode", null, null, null, null, "fire", "eerie", "barrier"};
+    public static final PropertyInteger TYPE = PropertyInteger.create("type", 0, 12);
 
     public BlockAiry() {
         super(Material.AIR);
@@ -28,7 +32,7 @@ public class BlockAiry extends BlockContainer {
         this.setResistance(200.0f);
         this.setSoundType(SoundType.CLOTH);
         this.setCreativeTab(Thaumcraft.tabTC);
-        this.setDefaultState(this.blockState.getBaseState());
+        this.setDefaultState(this.blockState.getBaseState().withProperty(TYPE, 0));
     }
 
     @Override
@@ -92,5 +96,25 @@ public class BlockAiry extends BlockContainer {
     @Override
     public TileEntity createTileEntity(World world, IBlockState state) {
         return createNewTileEntity(world, this.getMetaFromState(state));
+    }
+
+    @Override
+    protected BlockStateContainer createBlockState() {
+        return new BlockStateContainer(this, TYPE);
+    }
+
+    @Override
+    public IBlockState getStateFromMeta(int meta) {
+        return this.getDefaultState().withProperty(TYPE, MathHelper.clamp(meta, 0, 12));
+    }
+
+    @Override
+    public int getMetaFromState(IBlockState state) {
+        return state.getValue(TYPE);
+    }
+
+    @Override
+    public IBlockState getStateForPlacement(World worldIn, BlockPos pos, net.minecraft.util.EnumFacing facing, float hitX, float hitY, float hitZ, int meta, net.minecraft.entity.EntityLivingBase placer, net.minecraft.util.EnumHand hand) {
+        return this.getDefaultState().withProperty(TYPE, MathHelper.clamp(meta, 0, 12));
     }
 }

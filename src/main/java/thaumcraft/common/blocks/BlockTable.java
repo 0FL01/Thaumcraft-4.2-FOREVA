@@ -3,6 +3,8 @@ package thaumcraft.common.blocks;
 import net.minecraft.block.BlockContainer;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
+import net.minecraft.block.properties.PropertyInteger;
+import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.EntityLivingBase;
@@ -32,11 +34,15 @@ import javax.annotation.Nullable;
 public class BlockTable
 extends BlockContainer {
 
+    public static final PropertyInteger TYPE = PropertyInteger.create("type", 0, 15);
+
     public BlockTable() {
         super(Material.WOOD);
         this.setHardness(2.5f);
         this.setSoundType(SoundType.WOOD);
         this.setCreativeTab(Thaumcraft.tabTC);
+        this.setDefaultState(this.blockState.getBaseState().withProperty(TYPE, 0));
+        this.setHarvestLevel("axe", 0);
     }
 
     @Override
@@ -188,5 +194,25 @@ extends BlockContainer {
                 return new AxisAlignedBB(x, y, z - 1, x, y + 1, z);
         }
         return FULL_BLOCK_AABB;
+    }
+
+    @Override
+    protected BlockStateContainer createBlockState() {
+        return new BlockStateContainer(this, TYPE);
+    }
+
+    @Override
+    public IBlockState getStateFromMeta(int meta) {
+        return this.getDefaultState().withProperty(TYPE, MathHelper.clamp(meta, 0, 15));
+    }
+
+    @Override
+    public int getMetaFromState(IBlockState state) {
+        return state.getValue(TYPE);
+    }
+
+    @Override
+    public IBlockState getStateForPlacement(World worldIn, BlockPos pos, EnumFacing facing, float hitX, float hitY, float hitZ, int meta, EntityLivingBase placer, EnumHand hand) {
+        return this.getDefaultState().withProperty(TYPE, MathHelper.clamp(meta, 0, 15));
     }
 }

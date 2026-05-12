@@ -3,12 +3,18 @@ package thaumcraft.common.blocks;
 import net.minecraft.block.Block;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
+import net.minecraft.block.properties.PropertyInteger;
+import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.EnumHand;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import thaumcraft.common.Thaumcraft;
@@ -17,13 +23,14 @@ import java.util.Random;
 public class BlockMagicalLeaves extends Block implements net.minecraftforge.common.IShearable {
 
     public static final String[] leafType = {"greatwood", "silverwood"};
+    public static final PropertyInteger TYPE = PropertyInteger.create("type", 0, 1);
 
     public BlockMagicalLeaves() {
         super(Material.LEAVES);
         this.setHardness(0.2f);
         this.setSoundType(SoundType.PLANT);
         this.setCreativeTab(Thaumcraft.tabTC);
-        this.setDefaultState(this.blockState.getBaseState());
+        this.setDefaultState(this.blockState.getBaseState().withProperty(TYPE, 0));
     }
 
     @Override
@@ -80,5 +87,25 @@ public class BlockMagicalLeaves extends Block implements net.minecraftforge.comm
     @Override
     public int getFireSpreadSpeed(IBlockAccess world, BlockPos pos, net.minecraft.util.EnumFacing face) {
         return 30;
+    }
+
+    @Override
+    protected BlockStateContainer createBlockState() {
+        return new BlockStateContainer(this, TYPE);
+    }
+
+    @Override
+    public IBlockState getStateFromMeta(int meta) {
+        return this.getDefaultState().withProperty(TYPE, MathHelper.clamp(meta, 0, 1));
+    }
+
+    @Override
+    public int getMetaFromState(IBlockState state) {
+        return state.getValue(TYPE);
+    }
+
+    @Override
+    public IBlockState getStateForPlacement(World worldIn, BlockPos pos, EnumFacing facing, float hitX, float hitY, float hitZ, int meta, EntityLivingBase placer, EnumHand hand) {
+        return this.getDefaultState().withProperty(TYPE, MathHelper.clamp(meta, 0, 1));
     }
 }

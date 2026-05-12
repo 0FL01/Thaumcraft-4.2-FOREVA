@@ -4,6 +4,7 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockContainer;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
+import net.minecraft.block.properties.PropertyInteger;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.creativetab.CreativeTabs;
@@ -45,6 +46,7 @@ extends BlockContainer {
 
     protected static final AxisAlignedBB JAR_AABB = new AxisAlignedBB(0.1875, 0.0, 0.1875, 0.8125, 0.75, 0.8125);
     protected static final AxisAlignedBB FULL_AABB = new AxisAlignedBB(0.0, 0.0, 0.0, 1.0, 1.0, 1.0);
+    public static final PropertyInteger TYPE = PropertyInteger.create("type", 0, 3);
 
     public BlockJar() {
         super(Material.GLASS);
@@ -52,7 +54,7 @@ extends BlockContainer {
         this.setSoundType(new CustomStepSound("jar", 1.0f, 1.0f));
         this.setCreativeTab(Thaumcraft.tabTC);
         this.setLightLevel(0.66f);
-        this.setDefaultState(this.blockState.getBaseState());
+        this.setDefaultState(this.blockState.getBaseState().withProperty(TYPE, 0));
     }
 
     @Override
@@ -324,16 +326,21 @@ extends BlockContainer {
 
     @Override
     protected BlockStateContainer createBlockState() {
-        return new BlockStateContainer(this);
+        return new BlockStateContainer(this, TYPE);
     }
 
     @Override
     public IBlockState getStateFromMeta(int meta) {
-        return this.getDefaultState();
+        return this.getDefaultState().withProperty(TYPE, MathHelper.clamp(meta, 0, 3));
     }
 
     @Override
     public int getMetaFromState(IBlockState state) {
-        return 0;
+        return state.getValue(TYPE);
+    }
+
+    @Override
+    public IBlockState getStateForPlacement(World worldIn, BlockPos pos, EnumFacing facing, float hitX, float hitY, float hitZ, int meta, EntityLivingBase placer, EnumHand hand) {
+        return this.getDefaultState().withProperty(TYPE, MathHelper.clamp(meta, 0, 3));
     }
 }
