@@ -44,10 +44,20 @@ public class EntityTaintCreeper extends net.minecraft.entity.monster.EntityMob i
     public void onUpdate() {
         if (this.isEntityAlive()) {
             this.lastActiveTime = this.timeSinceIgnited;
-            if (this.timeSinceIgnited >= 30) {
-                this.timeSinceIgnited = 30;
+
+            int state = this.getCreeperState();
+            if (state > 0 && this.timeSinceIgnited < this.fuseTime) {
+                this.timeSinceIgnited++;
+            } else if (state <= 0 && this.timeSinceIgnited > 0) {
+                this.timeSinceIgnited--;
+            }
+
+            if (this.timeSinceIgnited >= this.fuseTime) {
+                this.timeSinceIgnited = this.fuseTime;
                 if (!this.world.isRemote) {
-                    this.world.createExplosion(this, this.posX, this.posY + (double)(this.height / 2.0f), this.posZ, 1.5f, false);
+                    boolean powered = this.dataManager.get(POWERED);
+                    float power = powered ? 2.0F : 1.5F;
+                    this.world.createExplosion(this, this.posX, this.posY + (double)(this.height / 2.0F), this.posZ, power, false);
                     this.setDead();
                 }
             }
@@ -56,8 +66,21 @@ public class EntityTaintCreeper extends net.minecraft.entity.monster.EntityMob i
     }
 
     @Override
-    public void readEntityFromNBT(net.minecraft.nbt.NBTTagCompound nbt) { super.readEntityFromNBT(nbt); }
-    @Override public void writeEntityToNBT(net.minecraft.nbt.NBTTagCompound nbt) { super.writeEntityToNBT(nbt); }
+    public void readEntityFromNBT(net.minecraft.nbt.NBTTagCompound nbt) {
+        super.readEntityFromNBT(nbt);
+        this.timeSinceIgnited = nbt.getShort("Fuse");
+        this.lastActiveTime = this.timeSinceIgnited;
+        this.dataManager.set(CREEPER_STATE, (int)nbt.getByte("CreeperState"));
+        this.dataManager.set(POWERED, nbt.getBoolean("Powered"));
+    }
+
+    @Override
+    public void writeEntityToNBT(net.minecraft.nbt.NBTTagCompound nbt) {
+        super.writeEntityToNBT(nbt);
+        nbt.setShort("Fuse", (short)this.timeSinceIgnited);
+        nbt.setByte("CreeperState", (byte)this.getCreeperState());
+        nbt.setBoolean("Powered", this.dataManager.get(POWERED));
+    }
 
     @Override protected net.minecraft.util.SoundEvent getHurtSound(net.minecraft.util.DamageSource source) { return null; }
     @Override protected net.minecraft.util.SoundEvent getDeathSound() { return null; }
