@@ -6,18 +6,48 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockLiquid;
+import net.minecraft.block.state.IBlockState;
+import net.minecraft.init.Blocks;
+import net.minecraftforge.fluids.Fluid;
+import net.minecraftforge.fluids.FluidRegistry;
+import net.minecraftforge.fluids.FluidStack;
+import net.minecraftforge.fluids.IFluidBlock;
+import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
+import net.minecraftforge.fluids.capability.IFluidHandler;
+import net.minecraftforge.fluids.capability.IFluidTankProperties;
+import thaumcraft.api.aspects.Aspect;
+import thaumcraft.api.aspects.IEssentiaTransport;
 import thaumcraft.common.config.Config;
 import thaumcraft.common.lib.utils.InventoryUtils;
+import thaumcraft.common.tiles.TileEssentiaReservoir;
+import thaumcraft.common.tiles.TileJarFillable;
+import thaumcraft.common.tiles.TileJarFillableVoid;
 
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Queue;
 
 public class GolemHelper {
 
     public static final double ADJACENT_RANGE = 4.0;
     private static ArrayList<SortingItemTimeout> itemTimeout = new ArrayList<>();
+
+    // --- Essentia/Liquid scanning state ---
+    public static HashMap<String, TileJarFillable> jarlist = new HashMap<>();
+    private static ArrayList<Fluid> reggedLiquids = new ArrayList<>();
+
+    private static void ensureLiquidsRegistered() {
+        if (reggedLiquids.isEmpty()) {
+            reggedLiquids.addAll(FluidRegistry.getRegisteredFluids().values());
+        }
+    }
 
     // --- Marker/Container Discovery ---
 
@@ -525,6 +555,360 @@ public class GolemHelper {
             if (!s.isEmpty() && s.isItemEqual(stack)) return true;
         }
         return false;
+    }
+
+    // --- Connected Jar BFS ---
+
+    public static ArrayList<TileJarFillable> getConnectedJars(TileJarFillable root) {
+        ArrayList<TileJarFillable> result = new ArrayList<>();
+        if (root == null || root.getWorld() == null || root.getPos() == null) return result;
+
+        Queue<TileJarFillable> queue = new ArrayDeque<>();
+        HashSet<String> seen = new HashSet<>();
+        queue.add(root);
+
+        while (!queue.isEmpty()) {
+            TileJarFillable jar = queue.poll();
+            if (jar == null || jar.getWorld() == null || jar.getPos() == null) continue;
+
+            BlockPos p = jar.getPos();
+            String key = jar.getWorld().provider.getDimension() + ":" + p.getX() + ":" + p.getY() + ":" + p.getZ();
+            if (!seen.add(key)) continue;
+
+            result.add(jar);
+            jarlist.put(key, jar);
+
+            for (EnumFacing face : EnumFacing.VALUES) {
+                BlockPos np = p.offset(face);
+                TileEntity te = jar.getWorld().getTileEntity(np);
+                if (te instanceof TileJarFillable) {
+                    queue.add((TileJarFillable) te);
+                }
+            }
+        }
+        return result;
+    }
+
+    // --- Find Jar With Room ---
+
+    public static BlockPos findJarWithRoom(EntityGolemBase golem) {
+        BlockPos dest = null;
+        World world = golem.world;
+        float range = golem.getRange();
+        float dmod = range * range;
+
+        if (golem.essentia == null || golem.essentiaAmount <= 0) return null;
+
+        ArrayList<TileJarFillable> jars = new ArrayList<>();
+        ArrayList<TileEntity> others = new ArrayList<>();
+
+        for (Marker marker : golem.getMarkers()) {
+            if (marker.dim != world.provider.getDimension()) continue;
+            TileEntity te = world.getTileEntity(new BlockPos(marker.x, marker.y, marker.z));
+            if (te == null) continue;
+
+            if (te instanceof TileJarFillable) {
+                TileJarFillable jar = (TileJarFillable) te;
+                if (te.getDistanceSq(golem.getHomePosition().getX(), golem.getHomePosition().getY(), golem.getHomePosition().getZ()) <= dmod) {
+                    jars.add(jar);
+                    getConnectedJars(jar);
+                }
+                continue;
+            }
+
+            if (te instanceof TileEssentiaReservoir) {
+                TileEssentiaReservoir res = (TileEssentiaReservoir) te;
+                if (res.getSuctionAmount(res.facing) <= 0) continue;
+                Aspect suctionType = res.getSuctionType(res.facing);
+                if (suctionType != null && !suctionType.equals(golem.essentia)) continue;
+                if (te.getDistanceSq(golem.getHomePosition().getX(), golem.getHomePosition().getY(), golem.getHomePosition().getZ()) > dmod) continue;
+                others.add(te);
+                continue;
+            }
+
+            if (te instanceof IEssentiaTransport) {
+                IEssentiaTransport trans = (IEssentiaTransport) te;
+                if (golem.essentia == null || golem.essentiaAmount <= 0) continue;
+                EnumFacing side = EnumFacing.VALUES[marker.side % EnumFacing.VALUES.length];
+                if (!trans.canInputFrom(side)) continue;
+                if (trans.getSuctionAmount(side) <= 0) continue;
+                Aspect suctType = trans.getSuctionType(side);
+                if (suctType != null && !suctType.equals(golem.essentia)) continue;
+                if (te.getDistanceSq(golem.getHomePosition().getX(), golem.getHomePosition().getY(), golem.getHomePosition().getZ()) > dmod) continue;
+                others.add(te);
+            }
+        }
+
+        // Collect jars from jarlist
+        ArrayList<TileJarFillable> jarCandidates = new ArrayList<>();
+        jarCandidates.addAll(jars);
+        for (TileJarFillable jf : jarlist.values()) {
+            if (!jarCandidates.contains(jf)) jarCandidates.add(jf);
+        }
+
+        // Phase 1: jars with matching aspect and filter, non-full
+        for (TileJarFillable jar : jarCandidates) {
+            if (jar.aspect != null && jar.amount > 0 && jar.amount < jar.maxAmount
+                && jar.aspectFilter != null && golem.essentia != null
+                && golem.essentiaAmount > 0 && jar.aspect.equals(golem.essentia)
+                && jar.doesContainerAccept(golem.essentia)) {
+                if (dest == null) dest = jar.getPos();
+            }
+        }
+
+        // Phase 2: empty jars with matching filter
+        if (dest == null) {
+            for (TileJarFillable jar : jarCandidates) {
+                if ((jar.aspect == null || jar.amount == 0)
+                    && jar.aspectFilter != null
+                    && jar.doesContainerAccept(golem.essentia)) {
+                    if (dest == null) dest = jar.getPos();
+                }
+            }
+        }
+
+        // Phase 3: void jars with filter
+        if (dest == null) {
+            for (TileJarFillable jar : jarCandidates) {
+                if (jar instanceof TileJarFillableVoid
+                    && jar.aspect != null && jar.amount >= jar.maxAmount
+                    && jar.aspectFilter != null && golem.essentia != null
+                    && golem.essentiaAmount > 0 && jar.aspect.equals(golem.essentia)
+                    && jar.doesContainerAccept(golem.essentia)) {
+                    if (dest == null) dest = jar.getPos();
+                }
+            }
+        }
+
+        // Phase 4: jars with matching aspect, no filter
+        if (dest == null) {
+            for (TileJarFillable jar : jarCandidates) {
+                if (jar.aspect != null && jar.amount > 0 && jar.amount < jar.maxAmount
+                    && jar.aspectFilter == null && golem.essentia != null
+                    && golem.essentiaAmount > 0 && jar.aspect.equals(golem.essentia)
+                    && jar.doesContainerAccept(golem.essentia)) {
+                    if (dest == null) dest = jar.getPos();
+                }
+            }
+        }
+
+        // Phase 5: empty unlabeled jars (not void)
+        if (dest == null) {
+            for (TileJarFillable jar : jarCandidates) {
+                if ((jar.aspect == null || jar.amount == 0)
+                    && jar.aspectFilter == null
+                    && !(jar instanceof TileJarFillableVoid)
+                    && jar.doesContainerAccept(golem.essentia)) {
+                    if (dest == null) dest = jar.getPos();
+                }
+            }
+        }
+
+        // Phase 6: void jars with matching aspect, no filter
+        if (dest == null) {
+            for (TileJarFillable jar : jarCandidates) {
+                if (jar instanceof TileJarFillableVoid
+                    && jar.aspect != null && jar.amount >= jar.maxAmount
+                    && jar.aspectFilter == null && golem.essentia != null
+                    && golem.essentiaAmount > 0 && jar.aspect.equals(golem.essentia)
+                    && jar.doesContainerAccept(golem.essentia)) {
+                    if (dest == null) dest = jar.getPos();
+                }
+            }
+        }
+
+        // Phase 7: empty void jars
+        if (dest == null) {
+            for (TileJarFillable jar : jarCandidates) {
+                if ((jar.aspect == null || jar.amount == 0)
+                    && jar.aspectFilter == null && (jar instanceof TileJarFillableVoid)
+                    && jar.doesContainerAccept(golem.essentia)) {
+                    if (dest == null) dest = jar.getPos();
+                }
+            }
+        }
+
+        // Fall back to others (non-jar IEssentiaTransport)
+        if (dest == null && !others.isEmpty()) {
+            dest = ((TileEntity) others.get(0)).getPos();
+        }
+
+        return dest;
+    }
+
+    // --- Missing Liquids ---
+
+    public static ArrayList<FluidStack> getMissingLiquids(EntityGolemBase golem) {
+        ensureLiquidsRegistered();
+        ArrayList<FluidStack> missing = new ArrayList<>();
+
+        for (Marker marker : golem.getMarkers()) {
+            if (marker.dim != golem.world.provider.getDimension()) continue;
+            BlockPos pos = new BlockPos(marker.x, marker.y, marker.z);
+            TileEntity te = golem.world.getTileEntity(pos);
+            if (te == null) continue;
+
+            for (EnumFacing side : EnumFacing.VALUES) {
+                if (!te.hasCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, side.getOpposite())) continue;
+                IFluidHandler handler = te.getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, side.getOpposite());
+                if (handler == null) continue;
+
+                IFluidTankProperties[] tanks = handler.getTankProperties();
+                if (tanks == null) continue;
+
+                for (IFluidTankProperties tank : tanks) {
+                    FluidStack contents = tank.getContents();
+                    int capacity = tank.getCapacity();
+
+                    if (contents != null && contents.amount > 0 && contents.amount < capacity) {
+                        // Partially filled tank — we need more of this fluid
+                        FluidStack needed = contents.copy();
+                        needed.amount = Math.min(capacity - contents.amount, golem.getFluidCarryLimit());
+                        if (handler.fill(needed.copy(), false) > 0) {
+                            missing.add(needed);
+                        }
+                    } else if (contents == null || contents.amount == 0) {
+                        // Empty tank — accept any registered fluid the handler can take
+                        for (Fluid fluid : reggedLiquids) {
+                            FluidStack test = new FluidStack(fluid, golem.getFluidCarryLimit());
+                            if (handler.fill(test, false) > 0) {
+                                missing.add(new FluidStack(fluid, capacity));
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        return missing.isEmpty() ? null : missing;
+    }
+
+    // --- Marked Fluid Handlers Adjacent to Golem ---
+
+    public static ArrayList<Marker> getMarkedFluidHandlersAdjacentToGolem(FluidStack ls, World world, EntityGolemBase golem) {
+        ArrayList<Marker> results = new ArrayList<>();
+        for (Marker marker : golem.getMarkers()) {
+            if (marker.dim != world.provider.getDimension()) continue;
+            BlockPos pos = new BlockPos(marker.x, marker.y, marker.z);
+            TileEntity te = world.getTileEntity(pos);
+            if (te == null) continue;
+
+            EnumFacing side = EnumFacing.VALUES[marker.side % EnumFacing.VALUES.length];
+            if (!te.hasCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, side.getOpposite())) continue;
+
+            // Check proximity
+            double dist = golem.getDistanceSq(marker.x + 0.5, marker.y + 0.5, marker.z + 0.5);
+            if (dist > ADJACENT_RANGE) continue;
+
+            IFluidHandler handler = te.getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, side.getOpposite());
+            if (handler == null) continue;
+
+            if (ls != null) {
+                FluidStack drained = handler.drain(ls.copy(), false);
+                if (drained == null || drained.amount <= 0) continue;
+            }
+
+            results.add(marker);
+        }
+        return results;
+    }
+
+    // --- Drain World Fluid Block ---
+
+    private static FluidStack drainWorldFluidBlock(World world, BlockPos pos, boolean doDrain) {
+        IBlockState state = world.getBlockState(pos);
+        Block block = state.getBlock();
+
+        if (block instanceof IFluidBlock) {
+            IFluidBlock fluidBlock = (IFluidBlock) block;
+            if (!fluidBlock.canDrain(world, pos)) return null;
+            FluidStack drained = fluidBlock.drain(world, pos, doDrain);
+            return (drained != null && drained.amount > 0) ? drained : null;
+        }
+
+        Fluid fluid = null;
+        if (block == Blocks.WATER || block == Blocks.FLOWING_WATER) {
+            fluid = FluidRegistry.WATER;
+        } else if (block == Blocks.LAVA || block == Blocks.FLOWING_LAVA) {
+            fluid = FluidRegistry.LAVA;
+        }
+
+        if (fluid == null) return null;
+        if (!(block instanceof BlockLiquid)) return null;
+
+        Integer level = state.getValue(BlockLiquid.LEVEL);
+        if (level == null || level.intValue() != 0) return null;
+
+        if (doDrain) {
+            world.setBlockToAir(pos);
+        }
+
+        return new FluidStack(fluid, Fluid.BUCKET_VOLUME);
+    }
+
+    // --- Find Possible Liquid ---
+
+    public static Vec3d findPossibleLiquid(FluidStack ls, EntityGolemBase golem) {
+        ensureLiquidsRegistered();
+
+        // 1. Check marked IFluidHandler sources
+        for (Marker marker : golem.getMarkers()) {
+            if (marker.dim != golem.world.provider.getDimension()) continue;
+            BlockPos pos = new BlockPos(marker.x, marker.y, marker.z);
+            TileEntity te = golem.world.getTileEntity(pos);
+            if (te == null) continue;
+
+            EnumFacing side = EnumFacing.VALUES[marker.side % EnumFacing.VALUES.length];
+            if (!te.hasCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, side.getOpposite())) continue;
+
+            IFluidHandler handler = te.getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, side.getOpposite());
+            if (handler == null) continue;
+
+            int maxDrain = golem.getFluidCarryLimit();
+            if (golem.fluidCarried != null) {
+                maxDrain -= golem.fluidCarried.amount;
+            }
+
+            FluidStack probe;
+            if (ls != null) {
+                FluidStack simDrain = ls.copy();
+                simDrain.amount = Math.min(simDrain.amount, maxDrain);
+                probe = handler.drain(simDrain, false);
+            } else {
+                probe = handler.drain(maxDrain, false);
+            }
+
+            if (probe != null && probe.amount > 0) {
+                return new Vec3d(marker.x + 0.5, marker.y + 0.5, marker.z + 0.5);
+            }
+        }
+
+        // 2. Check world fluid source blocks within range
+        float range = golem.getRange();
+        BlockPos home = golem.getHomePosition();
+        int minX = home.getX() - (int) range;
+        int maxX = home.getX() + (int) range;
+        int minZ = home.getZ() - (int) range;
+        int maxZ = home.getZ() + (int) range;
+
+        for (int x = minX; x <= maxX; x++) {
+            for (int z = minZ; z <= maxZ; z++) {
+                for (int y = home.getY() - 3; y <= home.getY() + 3; y++) {
+                    BlockPos scanPos = new BlockPos(x, y, z);
+                    if (!golem.world.isBlockLoaded(scanPos)) continue;
+
+                    FluidStack drained = drainWorldFluidBlock(golem.world, scanPos, false);
+                    if (drained != null && drained.amount > 0) {
+                        if (ls == null || drained.isFluidEqual(ls)) {
+                            return new Vec3d(x + 0.5, y + 0.5, z + 0.5);
+                        }
+                    }
+                }
+            }
+        }
+
+        return null;
     }
 
     // --- Inner class for timeout ---

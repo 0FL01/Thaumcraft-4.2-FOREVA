@@ -383,7 +383,7 @@ Champion modifier framework complete. 0 compile errors.
     `checkOreDict`, `ignoreDamage`, `ignoreNBT`, `getColorsMatching`,
     `startRightArmTimer`), `CropUtils.isGrownCrop`, `BlockUtils.breakFurthestBlock`,
     `Utils.isWoodLog`.
-  - Still stubbed: 7 fluid/essentia AI + 3 interact/misc AI + 2 pech AI + 4 misc AI = 16 files
+  - Still stubbed: 4 misc AI files (AIChangeFocus, AIChampionBash, AIMoveHome, AISitChampion)
 
 **1.12.2 findings**:
 - `IEntityAdditionalSpawnData` requires `ByteBuf` (Netty), not `PacketBuffer`
@@ -792,7 +792,7 @@ Initial releases ship with `en_US` only.
 
 ## 9. Remediation Plans
 
-**~69 critical/high issues** were discovered across Phases 3-6 where ported
+**~59 critical/high issues** (after AI Batch 3: 10 files ported) were discovered across Phases 3-6 where ported
 classes are structural stubs with no real gameplay logic. The full decomposed
 repair plan with file-level breakdown, dependencies, and execution order is
 at **`docs/REPAIR.md`**.
@@ -804,9 +804,9 @@ Per-phase remediation progress:
 | **3r** Core Systems | 3 | 12 | 4 | 1 | Not started |
 | **4r** Blocks & Tiles | 11 | 5 | 3 | 2 | Not started |
 | **5r** Items & Baubles | 7 | 11 | 2 | 1 | Not started |
-| **6r** Entities & AI | 4 | 11 | 6 | 0 | **Batch 1 (Combat AI) ✅  Batch 2 (Inventory AI) ✅** |
+| **6r** Entities & AI | 4 | 11 | 6 | 0 | **Batch 1 (Combat AI) ✅  Batch 2 (Inventory AI) ✅  Batch 3 (Fluid/Pech AI) ✅** |
 | **8r** Client Network | — | — | — | — | 14 FX packets moved here (no game logic) |
-| **Total** | **25** | **39** | **15** | **4** | **26/44 AI classes ported** |
+| **Total** | **25** | **39** | **15** | **4** | **36/44 AI classes ported** |
 
 See `docs/REPAIR.md` for full tables, original source references, fix
 approaches, and a prioritized execution plan.

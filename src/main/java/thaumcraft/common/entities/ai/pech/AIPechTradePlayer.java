@@ -1,38 +1,34 @@
 package thaumcraft.common.entities.ai.pech;
 
-import net.minecraft.entity.Entity;
 import net.minecraft.entity.ai.EntityAIBase;
-import net.minecraft.world.World;
 import thaumcraft.common.entities.monster.EntityPech;
 
-public class AIPechTradePlayer extends net.minecraft.entity.ai.EntityAIBase {
+public class AIPechTradePlayer extends EntityAIBase {
 
     private EntityPech pech;
 
     public AIPechTradePlayer(EntityPech pech) {
         this.pech = pech;
-        this.setMutexBits(3);
+        this.setMutexBits(5);
     }
 
     @Override
     public boolean shouldExecute() {
-        return false;
-    }
-
-    @Override
-    public boolean shouldContinueExecuting() {
-        return this.shouldExecute();
+        if (!this.pech.isEntityAlive()) return false;
+        if (this.pech.isInWater()) return false;
+        if (this.pech.isTamed()) return false;
+        if (!this.pech.onGround) return false;
+        if (this.pech.isRiding()) return false;
+        return this.pech.trading;
     }
 
     @Override
     public void startExecuting() {
+        this.pech.getNavigator().clearPath();
     }
 
     @Override
     public void resetTask() {
-    }
-
-    @Override
-    public void updateTask() {
+        this.pech.trading = false;
     }
 }
