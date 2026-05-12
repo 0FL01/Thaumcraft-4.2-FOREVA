@@ -22,8 +22,9 @@ static helpers, runic charge state), `EventHandlerWorld` (11 handlers + chunk re
 Round D complete: CultistPortal boss stages, EldritchGuardian attacks,
 ContainerGhostSlots + 3 container fixes, InventoryTrunk/Pech, ChampionModifiers,
 generateVisEffect+PacketFXVisDrain, ItemSpawnerEgg deleted+18 eggs added,
-EntityEldritchOrb Wither fix. Pending: D1.1 (Watcher gaze), D1.4 (Cleric ranged),
-D2 (Pech NBT persistence/types), D8 (3 empty entity shells).
+EntityEldritchOrb Wither fix, EntityWatcher gaze (AIGuardianAttack inner class).
+Pending: D1.4 (Cleric ranged), D2 (Pech NBT persistence/types),
+D8 (3 empty entity shells).
 
 **Next milestone:** Complete all work that does NOT require Phase 8-10 (client GUI,
 rendering, recipes, research data). This is documented in the
@@ -659,7 +660,7 @@ Group B manual AI (5 entities) has lifecycle migration (updateAITasks/onLivingUp
 | # | Mob | Missing ability | Effort | Status |
 |---|-----|-----------------|--------|--------|
 | 1 | `EntityWisp` | Lightning zap attack, wispFX particles, drop ItemWispEssence | L | ✅ |
-| 2 | `EntityWatcher` | Gaze attack: potion effect on player looking at it within 16 blocks | L | ⏳ |
+| 2 | `EntityWatcher` | Gaze attack: potion effect on player looking at it within 16 blocks | L | ✅ |
 | 3 | `EntityPech` | Pech blast projectile when angry, NBT PECH_TYPE/ANGRY, trade GUI | M | ⏳ |
 | 4 | `EntityThaumicSlime` | Split on death, spit projectile, merge, jump | L | ✅ |
 | 5 | `EntityInhabitedZombie` | On death: spawn `EntityEldritchCrab` | L | ⏳ |
@@ -884,19 +885,6 @@ Uses `BlockUtils.breakFurthestBlock` for adjacency chain detection.
 | 6 | Champion modifier Mighty/Warp/Infested | 6r.6 | L | None |
 | 7 | InternalMethodHandler stubs (generateVisEffect) | 3r.14 | L | None |
 | 8 | Empty entity shells: EntityAspectOrb, EntityFallingTaint, EntityGolemBobber | 6r.13 | L | None |
-
-#### Status
-
-| # | Scope | Status |
-|---|-------|--------|
-| D1.2 | EntityCultistPortal: full stage-based spawn logic (stage/stageCounter, banner/crate placement, minion spawning, boss spawning, NBT, potion immunity, death explosion) | ✅ Done |
-| D1.3 | EntityEldritchGuardian: attackEntityWithRangedAttack (90% orb, 10% screech), onUpdate (client arm anim + server fog pulse), magic damage halving, fire on hit, NBT home, Outer Lands HP regen, Undead attribute, arm animation handleStatusUpdate | ✅ Done |
-| D3 | ContainerGhostSlots base class + ContainerGolem/ContainerPech/ContainerTravelingTrunk canInteractWith + orphan duplicates deleted | ✅ Done |
-| D4 | InventoryTrunk (NonNullList[36], slotCount, NBT, dropAllItems) + InventoryPech (NonNullList[5], player/merchant/container refs, slot 0 input only) | ✅ Done |
-| D5 | ItemSpawnerEgg.java deleted + .egg() added to 18 missing entities (correct original colors) | ✅ Done |
-| D6 | ChampionModMighty return 0.0F (invulnerability), Warp (addWarpToPlayer 33%), Infested (spawn EntityTaintSpider 40%) | ✅ Done |
-| D7 | PacketFXVisDrain serialization (BlockPos long), Utils.generateVisEffect (rate-limited HashMap + sendToAllAround), InternalMethodHandler wiring | ✅ Done |
-| D8 | EntityEldritchOrb: Wither instead of Weakness (fixed bug) | ✅ Done |
 
 ### Tier D — Safely defer to Phase 8-10
 
