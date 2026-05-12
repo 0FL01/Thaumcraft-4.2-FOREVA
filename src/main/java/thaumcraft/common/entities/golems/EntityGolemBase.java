@@ -174,7 +174,7 @@ public class EntityGolemBase extends net.minecraft.entity.monster.EntityGolem im
                 if (this.decoration.contains("R")) this.tasks.addTask(2, new thaumcraft.common.entities.ai.combat.AIDartAttack(this));
                 this.tasks.addTask(3, new thaumcraft.common.entities.ai.combat.AIGolemAttackOnCollide(this));
                 this.targetTasks.addTask(1, new thaumcraft.common.entities.ai.combat.AIHurtByTarget(this, false));
-                this.targetTasks.addTask(2, new thaumcraft.common.entities.ai.combat.AINearestAttackableTarget(this, net.minecraft.entity.EntityLivingBase.class, true));
+                this.targetTasks.addTask(2, new thaumcraft.common.entities.ai.combat.AINearestAttackableTarget(this, 0, true));
                 break;
             case 5: // Fluids
                 this.tasks.addTask(1, new thaumcraft.common.entities.ai.fluid.AILiquidEmpty(this));
@@ -527,6 +527,39 @@ public class EntityGolemBase extends net.minecraft.entity.monster.EntityGolem im
         speed *= 1.0f + (float) this.getUpgradeAmount(0) * 0.15f;
         if (this.advanced) speed *= 1.1f;
         return speed;
+    }
+
+    public int getAttackSpeed() {
+        return 20 - (this.advanced ? 2 : 0);
+    }
+
+    public void startActionTimer() {
+        if (this.action == 0) {
+            this.action = 6;
+            this.world.setEntityState(this, (byte)4);
+        }
+    }
+
+    public void startLeftArmTimer() {
+        if (this.leftArm == 0) {
+            this.leftArm = 5;
+            this.world.setEntityState(this, (byte)6);
+        }
+    }
+
+    public void attackEntityWithRangedAttack(net.minecraft.entity.EntityLivingBase target) {
+        thaumcraft.common.entities.projectile.EntityDart dart = new thaumcraft.common.entities.projectile.EntityDart(this.world, this);
+        double dx = target.posX - this.posX;
+        double dy = target.getEntityBoundingBox().minY + (double)(target.height / 3.0F) - dart.posY;
+        double dz = target.posZ - this.posZ;
+        float speed = 1.6F;
+        float inaccuracy = 7.0F - (float)this.getUpgradeAmount(3) * 1.75F;
+        dart.shoot(dx, dy, dz, speed, inaccuracy);
+        double dmg = this.getEntityAttribute(net.minecraft.entity.SharedMonsterAttributes.ATTACK_DAMAGE).getAttributeValue();
+        dart.setDamage(dmg * 0.4D);
+        // Sound: golemironshoot (requires ConfigSounds port)
+        this.world.spawnEntity(dart);
+        this.startLeftArmTimer();
     }
 
     @Override

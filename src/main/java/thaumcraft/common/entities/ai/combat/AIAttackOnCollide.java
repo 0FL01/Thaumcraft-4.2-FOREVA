@@ -42,7 +42,7 @@ public class AIAttackOnCollide extends EntityAIBase {
         if (!target.isEntityAlive()) return false;
         if (this.classTarget != null && !this.classTarget.isAssignableFrom(target.getClass())) return false;
         if (--this.field_75445_i <= 0) {
-            this.entityPathEntity = this.attacker.getNavigator().getPathToPos(target.getPosition());
+            this.entityPathEntity = this.attacker.getNavigator().getPathToEntityLiving(target);
             this.field_75445_i = 4 + this.attacker.getRNG().nextInt(7);
             return this.entityPathEntity != null;
         }
@@ -55,12 +55,7 @@ public class AIAttackOnCollide extends EntityAIBase {
         if (target == null) return false;
         if (!target.isEntityAlive()) return false;
         if (!this.longMemory) return !this.attacker.getNavigator().noPath();
-        if (this.attacker.hasHome()) {
-            double d = this.attacker.getHomePosition().distanceSq(new BlockPos(MathHelper.floor(target.posX), MathHelper.floor(target.posY), MathHelper.floor(target.posZ)));
-            float range = this.attacker.getMaximumHomeDistance();
-            return range <= -1.0F || d <= (double)(range * range);
-        }
-        return true;
+        return this.attacker.isWithinHomeDistanceFromPosition(new BlockPos(MathHelper.floor(target.posX), MathHelper.floor(target.posY), MathHelper.floor(target.posZ)));
     }
 
     @Override
@@ -83,7 +78,7 @@ public class AIAttackOnCollide extends EntityAIBase {
         double width = (double)(this.attacker.width * 2.0F * this.attacker.width * 2.0F + target.width);
         --this.field_75445_i;
         if (this.attackTick > 0) --this.attackTick;
-        if ((this.longMemory || this.attacker.canEntityBeSeen(target)) && this.field_75445_i <= 0 && (this.field_151497_i == 0.0D && this.field_151495_j == 0.0D && this.field_151496_k == 0.0D || target.getDistanceSq(this.field_151497_i, this.field_151495_j, this.field_151496_k) >= 1.0D || this.attacker.getRNG().nextFloat() < 0.05F)) {
+        if ((this.longMemory || this.attacker.getEntitySenses().canSee(target)) && this.field_75445_i <= 0 && (this.field_151497_i == 0.0D && this.field_151495_j == 0.0D && this.field_151496_k == 0.0D || target.getDistanceSq(this.field_151497_i, this.field_151495_j, this.field_151496_k) >= 1.0D || this.attacker.getRNG().nextFloat() < 0.05F)) {
             this.field_151497_i = target.posX;
             this.field_151495_j = target.getEntityBoundingBox().minY;
             this.field_151496_k = target.posZ;

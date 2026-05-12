@@ -32,6 +32,14 @@ public class EntityTaintCreeper extends net.minecraft.entity.monster.EntityMob i
         this.getEntityAttribute(net.minecraft.entity.SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(0.25);
     }
 
+    public int getCreeperState() {
+        return this.dataManager.get(CREEPER_STATE);
+    }
+
+    public void setCreeperState(int state) {
+        this.dataManager.set(CREEPER_STATE, state);
+    }
+
     @Override
     public void onUpdate() {
         if (this.isEntityAlive()) {

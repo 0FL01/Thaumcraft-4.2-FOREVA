@@ -41,7 +41,7 @@ public abstract class AITarget extends EntityAIBase {
         if (!target.isEntityAlive()) return false;
         if (this.taskOwner.getDistanceSq(target) > (double)(this.targetDistance * this.targetDistance)) return false;
         if (this.shouldCheckSight) {
-            if (this.taskOwner.canEntityBeSeen(target)) {
+            if (this.taskOwner.getEntitySenses().canSee(target)) {
                 this.field_75298_g = 0;
             } else if (++this.field_75298_g > 60) {
                 return false;
@@ -76,12 +76,8 @@ public abstract class AITarget extends EntityAIBase {
             if (target instanceof EntityPlayer && !par2 && ((EntityPlayer)target).capabilities.disableDamage) return false;
             if (target instanceof EntityPlayer && this.taskOwner instanceof EntityGolemBase && ((EntityPlayer)target).getName().equals(((EntityGolemBase)this.taskOwner).getOwnerName())) return false;
         }
-        if (this.taskOwner.hasHome()) {
-            double dist = this.taskOwner.getHomePosition().distanceSq(new BlockPos(MathHelper.floor(target.posX), MathHelper.floor(target.posY), MathHelper.floor(target.posZ)));
-            float range = this.taskOwner.getMaximumHomeDistance();
-            if (range > -1.0F && dist > (double)(range * range)) return false;
-        }
-        if (this.shouldCheckSight && !this.taskOwner.canEntityBeSeen(target)) return false;
+        if (!this.taskOwner.isWithinHomeDistanceFromPosition(new BlockPos(MathHelper.floor(target.posX), MathHelper.floor(target.posY), MathHelper.floor(target.posZ)))) return false;
+        if (this.shouldCheckSight && !this.taskOwner.getEntitySenses().canSee(target)) return false;
         if (this.field_75303_a) {
             if (--this.field_75302_c <= 0) this.field_75301_b = 0;
             if (this.field_75301_b == 0) {
@@ -94,7 +90,7 @@ public abstract class AITarget extends EntityAIBase {
 
     private boolean func_75295_a(EntityLivingBase target) {
         this.field_75302_c = 10 + this.taskOwner.getRNG().nextInt(5);
-        Path path = this.taskOwner.getNavigator().getPathToPos(target.getPosition());
+        Path path = this.taskOwner.getNavigator().getPathToEntityLiving(target);
         if (path == null) return false;
         PathPoint finalPoint = path.getFinalPathPoint();
         if (finalPoint == null) return false;
