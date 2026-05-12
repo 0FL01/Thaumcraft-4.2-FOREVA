@@ -1,5 +1,7 @@
 package thaumcraft.common.entities.golems;
 
+import thaumcraft.common.lib.TCSounds;
+
 public class EntityGolemBase extends net.minecraft.entity.monster.EntityGolem implements net.minecraftforge.fml.common.registry.IEntityAdditionalSpawnData {
 
     public thaumcraft.common.entities.InventoryMob inventory;
@@ -322,7 +324,7 @@ public class EntityGolemBase extends net.minecraft.entity.monster.EntityGolem im
             this.setupGolem();
             this.setupGolemInventory();
             stack.shrink(1);
-            this.world.playSound(null, this.getPosition(), net.minecraft.util.SoundEvent.REGISTRY.getObject(new net.minecraft.util.ResourceLocation("thaumcraft:upgrade")), net.minecraft.util.SoundCategory.NEUTRAL, 0.5f, 1.0f);
+            this.world.playSound(null, this.getPosition(), TCSounds.UPGRADE, net.minecraft.util.SoundCategory.NEUTRAL, 0.5f, 1.0f);
             player.swingArm(hand);
             return true;
         }
@@ -332,7 +334,7 @@ public class EntityGolemBase extends net.minecraft.entity.monster.EntityGolem im
                 this.setUpgrade(a, (byte) stack.getItemDamage());
                 this.setupGolem();
                 stack.shrink(1);
-                this.world.playSound(null, this.getPosition(), net.minecraft.util.SoundEvent.REGISTRY.getObject(new net.minecraft.util.ResourceLocation("thaumcraft:upgrade")), net.minecraft.util.SoundCategory.NEUTRAL, 0.5f, 1.0f);
+                this.world.playSound(null, this.getPosition(), TCSounds.UPGRADE, net.minecraft.util.SoundCategory.NEUTRAL, 0.5f, 1.0f);
                 player.swingArm(hand);
                 return true;
             }

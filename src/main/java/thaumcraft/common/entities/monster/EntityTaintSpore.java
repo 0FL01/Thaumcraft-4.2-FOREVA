@@ -13,7 +13,6 @@ import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.EntityDataManager;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.EnumParticleTypes;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundEvent;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
@@ -23,6 +22,7 @@ import thaumcraft.api.entities.ITaintedMob;
 import thaumcraft.common.blocks.BlockTaintFibres;
 import thaumcraft.common.config.ConfigBlocks;
 import thaumcraft.common.config.ConfigItems;
+import thaumcraft.common.lib.TCSounds;
 import thaumcraft.common.lib.world.ThaumcraftWorldGenerator;
 
 public class EntityTaintSpore extends EntityMob implements ITaintedMob, IEntityAdditionalSpawnData {
@@ -116,8 +116,7 @@ public class EntityTaintSpore extends EntityMob implements ITaintedMob, IEntityA
 
     protected void spiderBurst() {
         if (!this.world.isRemote) {
-            SoundEvent gore = SoundEvent.REGISTRY.getObject(new ResourceLocation("thaumcraft:gore"));
-            if (gore != null) this.playSound(gore, 1.0f, 0.9f + this.rand.nextFloat() * 0.1f);
+            this.playSound(TCSounds.GORE, 1.0f, 0.9f + this.rand.nextFloat() * 0.1f);
             int q = this.getSporeSize() / 3 + this.rand.nextInt(this.getSporeSize() / 2 + 1);
             for (int a = 0; a < q; ++a) {
                 EntityTaintSpider spiderling = new EntityTaintSpider(this.world);

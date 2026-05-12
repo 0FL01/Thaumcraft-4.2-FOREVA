@@ -13,7 +13,6 @@ import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.EntityDataManager;
 import net.minecraft.util.DamageSource;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundEvent;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.MathHelper;
@@ -23,6 +22,7 @@ import thaumcraft.api.aspects.Aspect;
 import thaumcraft.common.Thaumcraft;
 import thaumcraft.common.config.ConfigItems;
 import thaumcraft.common.items.ItemWispEssence;
+import thaumcraft.common.lib.TCSounds;
 import thaumcraft.common.lib.world.ThaumcraftWorldGenerator;
 
 public class EntityWisp extends EntityFlying implements IMob {
@@ -158,8 +158,7 @@ public class EntityWisp extends EntityFlying implements IMob {
             if (this.canEntityBeSeen(this.targetedEntity)) {
                 ++this.attackCounter;
                 if (this.attackCounter == 20) {
-                    SoundEvent zapSound = SoundEvent.REGISTRY.getObject(new ResourceLocation("thaumcraft:zap"));
-                    if (zapSound != null) this.playSound(zapSound, 1.0f, 1.1f);
+                    this.playSound(TCSounds.ZAP, 1.0f, 1.1f);
                     float damage = (float)this.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).getAttributeValue();
                     if (Math.abs(this.targetedEntity.motionX) > 0.1
                         || Math.abs(this.targetedEntity.motionY) > 0.1

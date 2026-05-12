@@ -7,13 +7,13 @@ import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.monster.EntityMob;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.DamageSource;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundEvent;
 import net.minecraft.world.World;
 import thaumcraft.api.damagesource.DamageSourceThaumcraft;
 import thaumcraft.api.entities.ITaintedMob;
 import thaumcraft.common.Thaumcraft;
 import thaumcraft.common.config.ConfigItems;
+import thaumcraft.common.lib.TCSounds;
 import thaumcraft.common.lib.world.ThaumcraftWorldGenerator;
 
 public class EntityTaintacle extends EntityMob implements ITaintedMob {
@@ -84,8 +84,7 @@ public class EntityTaintacle extends EntityMob implements ITaintedMob {
     public boolean attackEntityAsMob(Entity entity) {
         float dmg = (float)this.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).getAttributeValue();
         if (entity.attackEntityFrom(DamageSourceThaumcraft.causeTentacleDamage(this), dmg)) {
-            SoundEvent sound = SoundEvent.REGISTRY.getObject(new ResourceLocation("thaumcraft:tentacle"));
-            if (sound != null) this.playSound(sound, this.getSoundVolume(), this.getSoundPitch());
+            this.playSound(TCSounds.TENTACLE, this.getSoundVolume(), this.getSoundPitch());
             return true;
         }
         return false;
