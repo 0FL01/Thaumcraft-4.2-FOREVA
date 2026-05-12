@@ -30,6 +30,7 @@ See `docs/PRD.md §6`. All resolved:
 - `thaumcraft_src/` -- unpacked JAR contents
 - `Dockerfile` -- dev container (Java 8 + CFR + git + build tools)
 - `docs/PRD.md` -- product requirements doc with phased porting plan
+- `docs/REPAIR.md` -- decomposed repair plan for stub remediation (3r-6r)
 - `AGENTS.md` -- this file (concise navigation, points to docs/PRD.md)
 - `build.gradle` -- ForgeGradle 2.3, Forge 14.23.5.2847, Baubles via CurseMaven
 - `gradlew` / `gradle/wrapper/` -- Gradle 4.10.3
@@ -60,7 +61,7 @@ See `docs/PRD.md §4` for per-phase deliverables and `docs/PRD.md §5` for compl
 | 6 | Entities, Mobs, Golems (~128 + 44 AI) | ⚠️ **Stubs: 39/44 AI classes return false, projectiles no damage** |
 | 7 | World Gen (biomes, dimension, trees, structures) | ✅ Done |
 | 7r | World Gen Remediation (room gens, village, persistence) | ✅ Done |
-| 3r-6r | Remediation (see docs/PRD.md §9) | ❌ **~85 critical/high issues** |
+| 3r-6r | Remediation (see docs/REPAIR.md) | ❌ **~85 critical/high issues** |
 | 8 | Client GUI + Rendering (~140 classes) | ❌ |
 | 9 | Recipes + Research (~450 registrations) | ❌ |
 | 10 | Polish (JEI, Config, Sound) | ❌ |
