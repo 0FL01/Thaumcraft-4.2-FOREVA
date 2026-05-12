@@ -480,9 +480,8 @@ generator all compile. Ores, trees, and structures generate via
 | **7r.1** | Biome color fix | `Biome.color` удалён в 1.12.2; `ColorHandlerEvent.Biome` не существует в Forge 1.12.2 | Найти 1.12.2-способ задания debug overlay цвета для биома |
 | **7r.7** | WorldGenSilverwoodTreesOld | Legacy tree gen, не влияет на генерацию | Портировать при необходимости |
 
-**Примечание**: `IVillageTradeHandler` удалён в 1.12.2. Торговля для wizard/banker
-пока не добавлена — при необходимости можно реализовать через `EntityVillager.ITradeList`
-или `EntityJoinWorldEvent`.
+**Примечание**: торговля заменена с удалённого `IVillageTradeHandler` на
+1.12.2-систему `VillagerCareer.addTrade()` + кастомные `EntityVillager.ITradeList`.
 
 ---
 
