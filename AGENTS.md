@@ -61,10 +61,10 @@ See `docs/PRD.md §4` for per-phase deliverables and `docs/PRD.md §5` for compl
 | 6 | Entities, Mobs, Golems (~128 + 44 AI) | ⚠️ **Stubs: all 11 projectiles have full CFR-ported behavior, Group B manual AI (5 entities), 5 bosses with AI registration ✅** |
 | 7 | World Gen (biomes, dimension, trees, structures) | ✅ Done |
 | 7r | World Gen Remediation (room gens, village, persistence) | ✅ Done |
-| 3r-6r | Remediation (see docs/REPAIR.md) | ❌ **~36 critical/high issues** |
+| 3r-6r | Remediation (see docs/REPAIR.md) | ❌ **~36 critical/high issues** — A.1 assets done 🠶 |
 | 8 | Client GUI + Rendering (~140 classes) | ❌ |
 | 9 | Recipes + Research (~450 registrations) | ❌ |
-| 10 | Polish (JEI, Config, Sound) | ❌ |
+| 10 | Polish (JEI, Config, Sound) | ⚠️ **Sound assets (sounds.json + 111 OGG) copied; TCSounds class pending** |
 
 ## Where To Look
 
