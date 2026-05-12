@@ -23,6 +23,9 @@ public class ConfigBlocks {
     public static BlockTaintFibres blockTaintFibres;
     public static BlockAiry blockAiry;
     public static BlockManaPod blockManaPod;
+    public static BlockEldritch blockEldritch;
+    public static BlockEldritchNothing blockEldritchNothing;
+    public static BlockEldritchPortal blockEldritchPortal;
 
     // ItemBlock instances
     public static BlockMagicalLeavesItem blockMagicalLeavesItem;
@@ -100,6 +103,18 @@ public class ConfigBlocks {
                 .setRegistryName("thaumcraft", "mana_pod")
                 .setTranslationKey("thaumcraft.mana_pod");
 
+        blockEldritch = (BlockEldritch) new BlockEldritch()
+                .setRegistryName("thaumcraft", "eldritch")
+                .setTranslationKey("thaumcraft.eldritch");
+
+        blockEldritchNothing = (BlockEldritchNothing) new BlockEldritchNothing()
+                .setRegistryName("thaumcraft", "eldritch_nothing")
+                .setTranslationKey("thaumcraft.eldritch_nothing");
+
+        blockEldritchPortal = (BlockEldritchPortal) new BlockEldritchPortal()
+                .setRegistryName("thaumcraft", "eldritch_portal")
+                .setTranslationKey("thaumcraft.eldritch_portal");
+
         // ItemBlock instances (cast needed because setRegistryName returns Item)
         blockMagicalLeavesItem = (BlockMagicalLeavesItem) new BlockMagicalLeavesItem(blockMagicalLeaves)
                 .setRegistryName("thaumcraft", "magical_leaves");
@@ -146,7 +161,10 @@ public class ConfigBlocks {
                 blockTaint,
                 blockTaintFibres,
                 blockAiry,
-                blockManaPod
+                blockManaPod,
+                blockEldritch,
+                blockEldritchNothing,
+                blockEldritchPortal
         };
     }
 
@@ -162,5 +180,11 @@ public class ConfigBlocks {
             blockAiryItem,
             blockCrystalItem
         );
+        registry.register(new BlockEldritchItem(blockEldritch)
+                .setRegistryName("thaumcraft", "eldritch"));
+        registry.register(new net.minecraft.item.ItemBlock(blockEldritchNothing)
+                .setRegistryName("thaumcraft", "eldritch_nothing"));
+        registry.register(new net.minecraft.item.ItemBlock(blockEldritchPortal)
+                .setRegistryName("thaumcraft", "eldritch_portal"));
     }
 }

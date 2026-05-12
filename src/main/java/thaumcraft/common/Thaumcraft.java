@@ -23,6 +23,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.common.registry.EntityEntry;
 import net.minecraftforge.fml.common.registry.GameRegistry;
+import net.minecraftforge.common.DimensionManager;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import thaumcraft.api.ThaumcraftApi;
@@ -175,6 +176,22 @@ public class Thaumcraft {
         GameRegistry.registerTileEntity(TileArcaneLampGrowth.class, new net.minecraft.util.ResourceLocation("thaumcraft", "arcane_lamp_growth"));
         GameRegistry.registerTileEntity(TileThaumatorium.class, new net.minecraft.util.ResourceLocation("thaumcraft", "thaumatorium"));
         GameRegistry.registerTileEntity(TileThaumatoriumTop.class, new net.minecraft.util.ResourceLocation("thaumcraft", "thaumatorium_top"));
+
+        // Register Eldritch dimension tiles
+        GameRegistry.registerTileEntity(TileEldritchPortal.class, new net.minecraft.util.ResourceLocation("thaumcraft", "eldritch_portal"));
+        GameRegistry.registerTileEntity(TileEldritchNothing.class, new net.minecraft.util.ResourceLocation("thaumcraft", "eldritch_nothing"));
+        GameRegistry.registerTileEntity(TileEldritchLock.class, new net.minecraft.util.ResourceLocation("thaumcraft", "eldritch_lock"));
+        GameRegistry.registerTileEntity(TileEldritchCrabSpawner.class, new net.minecraft.util.ResourceLocation("thaumcraft", "eldritch_crab_spawner"));
+        GameRegistry.registerTileEntity(TileEldritchAltar.class, new net.minecraft.util.ResourceLocation("thaumcraft", "eldritch_altar"));
+        GameRegistry.registerTileEntity(TileEldritchCap.class, new net.minecraft.util.ResourceLocation("thaumcraft", "eldritch_cap"));
+        GameRegistry.registerTileEntity(TileEldritchObelisk.class, new net.minecraft.util.ResourceLocation("thaumcraft", "eldritch_obelisk"));
+        GameRegistry.registerTileEntity(TileEldritchTrap.class, new net.minecraft.util.ResourceLocation("thaumcraft", "eldritch_trap"));
+
+        // Register dimension
+        net.minecraft.world.DimensionType outerLands = net.minecraft.world.DimensionType.register(
+                "OUTER_LANDS", "_outerlands", Config.dimensionOuterId,
+                thaumcraft.common.lib.world.dim.WorldProviderOuter.class, false);
+        DimensionManager.registerDimension(Config.dimensionOuterId, outerLands);
     }
 
     @Mod.EventHandler
