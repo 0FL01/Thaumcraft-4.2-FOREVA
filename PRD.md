@@ -454,7 +454,7 @@ generator all compile. Ores, trees, and structures generate via
 | 5 | **BlockStairsEldritch** (dim) | ✅ Done | Новый класс `BlockStairsEldritch` (extends `BlockStairs`, ссылается на `blockCosmeticSolid`) | Зарегистрирован в `ConfigBlocks` |
 | 6 | **BlockEldritchPortal.onEntityCollision** (dim) | ✅ Done | Телепортация в `OuterLands` (dim -42) через `TeleporterThaumcraft` с 40-тик кулдауном | Реализовано в `BlockEldritchPortal` + `TileEldritchPortal` |
 | 7 | **EntityPermanentItem** (dim) | ✅ Done | `EntityPermanentItem` расширен: иммунитет к урону/взрывам, `lifespan = Integer.MAX_VALUE` | Реализовано |
-| 8 | **Village components** | ❌ Deferred | ComponentWizardTower, ComponentBankerHome, VillageWizardManager, VillageBankerManager — API 1.12.2 сильно изменилось | TODO: изучить 1.12.2 `StructureVillagePieces`, `IVillageCreationHandler` |
+| 8 | **Village components** | ✅ Done | ComponentWizardTower, ComponentBankerHome, VillageWizardManager, VillageBankerManager — полный порт с адаптацией под 1.12.2 API | IVillageCreationHandler (EnumFacing вместо int), setBlockState/IBlockState, generateDoor, MapGenStructureIO, VillagerProfession |
 | 9 | **WorldGenSilverwoodTreesOld** | ❌ Не портирован | Legacy генератор серебряных деревьев | CFR `thaumcraft_src/.../world/WorldGenSilverwoodTreesOld.class` |
 
 #### Выполнено
@@ -471,18 +471,18 @@ generator all compile. Ores, trees, and structures generate via
 | **7r.5** | Utils.setBiomeAt | ✅ |
 | **7r.5** | EntityUtils.makeChampion (minimal) | ✅ |
 | **7r.5** | TileEldritchCrabSpawner / TileEldritchLock (setFacing + NBT) | ✅ |
+| **7r.6** | Village components (4 класса + профессии + регистрация) | ✅ ComponentWizardTower, ComponentBankerHome, VillageWizardManager, VillageBankerManager. Адаптация: EnumFacing coordBaseMode, IBlockState, generateDoor, MapGenStructureIO, VillagerProfession, ручной chest loot |
 
 #### Deferred (следующая итерация)
 
 | Step | Scope | Почему | План |
 |------|-------|--------|------|
 | **7r.1** | Biome color fix | `Biome.color` удалён в 1.12.2; `ColorHandlerEvent.Biome` не существует в Forge 1.12.2 | Найти 1.12.2-способ задания debug overlay цвета для биома |
-| **7r.6** | Village components (4 класса) | API 1.12.2: `setCoordBaseMode(EnumFacing)`, `placeDoorCurrentPosition(EnumFacing)`, `IVillageTradeHandler` удалён, `WeightedRandomChestContent`/`ChestGenHooks` удалены | Новая попытка порта с нуля с учётом 1.12.2 API |
 | **7r.7** | WorldGenSilverwoodTreesOld | Legacy tree gen, не влияет на генерацию | Портировать при необходимости |
 
-**Risks**: Village components требуют изучения `StructureVillagePieces` 1.12.2 API (значительно
-отличается от 1.7.10). `IVillageTradeHandler` удалён — торговлю придётся регистрировать
-через `EntityVillager.ITradeList` или villager profession registry.
+**Примечание**: `IVillageTradeHandler` удалён в 1.12.2. Торговля для wizard/banker
+пока не добавлена — при необходимости можно реализовать через `EntityVillager.ITradeList`
+или `EntityJoinWorldEvent`.
 
 ---
 

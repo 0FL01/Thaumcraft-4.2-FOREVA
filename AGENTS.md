@@ -59,7 +59,7 @@ See `PRD.md §4` for per-phase deliverables and `PRD.md §5` for complexity.
 | 5 | Items, Tools, Armor, Baubles, Relics (~110) | ✅ Done |
 | 6 | Entities, Mobs, Golems (~128 + 44 AI) | ✅ Done |
 | 7 | World Gen (biomes, dimension, trees, structures) | ✅ Done |
-| 7r | World Gen Remediation (room gens, village, persistence) | Plan in PRD.md |
+| 7r | World Gen Remediation (room gens, village, persistence) | ✅ Done |
 | 8 | Client GUI + Rendering (~140 classes) | ❌ |
 | 9 | Recipes + Research (~450 registrations) | ❌ |
 | 10 | Polish (JEI, Config, Sound) | ❌ |
