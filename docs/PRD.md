@@ -331,10 +331,11 @@ rendering (ornament/overlay) uses CCL render pipeline.
 
 ---
 
-### Phase 6 — Entities, Mobs & Golems (✅ Compiling, 5 sub-steps)
+### Phase 6 — Entities, Mobs & Golems (✅ Compiling, ✅ AI Batch 1-2 done)
 
 **Status**: All 128 entity classes ported, registered via `ConfigEntities`. 44 AI
-classes in 6 sub-packages. Champion modifier framework complete. 0 compile errors.
+classes in 6 sub-packages. 26/44 AI classes have full port (10 combat + 16 inventory).
+Champion modifier framework complete. 0 compile errors.
 
 **Sub-steps**:
 - **6.1** — Registry + AI system (44 AI classes) + all entity stubs (53)
@@ -371,10 +372,18 @@ classes in 6 sub-packages. Champion modifier framework complete. 0 compile error
   - Golem AI: combat/fluid/inventory/interact/misc/pech — 6 sub-packages
   - Combat AI: `AIAttackOnCollide`, `AIGolemAttackOnCollide`,
     `AICreeperSwell`, `AICultistHurtByTarget`, `AIDartAttack`, etc.
-  - Golem task AI: `AIHomeTake/Place/Drop/Replace`, `AIEmptyGoto/Drop/Place`,
-    `AIFillTake/Goto`, `AIItemPickup`, `AISortingGoto/Place`,
-    `AIEssentiaGather/Empty/Goto`, `AILiquidGather/Empty/Goto`,
-    `AIHarvestCrops/Logs`, `AIFish`, `AIUseItem`
+    **10/10 combat AI ported** (commit 97f2703).
+  - Golem task AI (Inventory): `AIHomeTake/Place/Drop/Replace`,
+    `AIEmptyGoto/Drop/Place`, `AIFillTake/Goto`, `AIItemPickup`,
+    `AISortingGoto/Place`, `AIHarvestCrops`, `AIHarvestLogs`, `AIFish`
+    **16/16 inventory AI ported** (commit 7122ab5). Dependencies:
+    `InventoryUtils` (full 12-method port), `GolemHelper` (~22 methods),
+    `InventoryMob` additions (`allEmpty`, `getAmountNeededSmart`,
+    `getItemsNeeded`), `EntityGolemBase` additions (`hasSomething`,
+    `checkOreDict`, `ignoreDamage`, `ignoreNBT`, `getColorsMatching`,
+    `startRightArmTimer`), `CropUtils.isGrownCrop`, `BlockUtils.breakFurthestBlock`,
+    `Utils.isWoodLog`.
+  - Still stubbed: 7 fluid/essentia AI + 3 interact/misc AI + 2 pech AI + 4 misc AI = 16 files
 
 **1.12.2 findings**:
 - `IEntityAdditionalSpawnData` requires `ByteBuf` (Netty), not `PacketBuffer`
@@ -783,20 +792,21 @@ Initial releases ship with `en_US` only.
 
 ## 9. Remediation Plans
 
-**~85 critical/high issues** were discovered across Phases 3-6 where ported
+**~69 critical/high issues** were discovered across Phases 3-6 where ported
 classes are structural stubs with no real gameplay logic. The full decomposed
 repair plan with file-level breakdown, dependencies, and execution order is
 at **`docs/REPAIR.md`**.
 
-Summary by phase:
+Per-phase remediation progress:
 
-| Plan | CRITICAL | HIGH | MEDIUM | LOW |
-|------|----------|------|--------|-----|
-| **3r** Core Systems | 3 | 12 | 4 | 1 |
-| **4r** Blocks & Tiles | 11 | 5 | 3 | 2 |
-| **5r** Items & Baubles | 7 | 11 | 2 | 1 |
-| **6r** Entities & AI | 4 | 11 | 6 | 0 |
-| **Total** | **25** | **39** | **15** | **4** |
+| Plan | CRITICAL | HIGH | MEDIUM | LOW | Status |
+|------|----------|------|--------|-----|--------|
+| **3r** Core Systems | 3 | 12 | 4 | 1 | Not started |
+| **4r** Blocks & Tiles | 11 | 5 | 3 | 2 | Not started |
+| **5r** Items & Baubles | 7 | 11 | 2 | 1 | Not started |
+| **6r** Entities & AI | 4 | 11 | 6 | 0 | **Batch 1 (Combat AI) ✅  Batch 2 (Inventory AI) ✅** |
+| **8r** Client Network | — | — | — | — | 14 FX packets moved here (no game logic) |
+| **Total** | **25** | **39** | **15** | **4** | **26/44 AI classes ported** |
 
 See `docs/REPAIR.md` for full tables, original source references, fix
-approaches, and a prioritized 7-round execution plan.
+approaches, and a prioritized execution plan.

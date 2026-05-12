@@ -521,40 +521,42 @@ This is the single largest remediation task. 39/44 AI classes are empty shells.
 
 **Strategy**: Port Combat AI, Inventory AI, and Golem task AI in 3 batches.
 
-#### Batch 1: Combat AI (9 files)
+#### Batch 1: Combat AI (9 files) ✅ DONE
 
-| # | File | Source class | Effort |
-|---|------|--------------|--------|
-| 1 | `AIAttackOnCollide.java` | `thaumcraft_src/.../AIAttackOnCollide.class` | L |
-| 2 | `AIGolemAttackOnCollide.java` | `thaumcraft_src/.../AIGolemAttackOnCollide.class` | L |
-| 3 | `AICreeperSwell.java` | `thaumcraft_src/.../AICreeperSwell.class` | L |
-| 4 | `AIAvoidCreeperSwell.java` | `thaumcraft_src/.../AIAvoidCreeperSwell.class` | L |
-| 5 | `AICultistHurtByTarget.java` | `thaumcraft_src/.../AICultistHurtByTarget.class` | L |
-| 6 | `AIDartAttack.java` | `thaumcraft_src/.../AIDartAttack.class` | L |
-| 7 | `AIHurtByTarget.java` | `thaumcraft_src/.../AIHurtByTarget.class` | L |
-| 8 | `AILongRangeAttack.java` | `thaumcraft_src/.../AILongRangeAttack.class` | L |
-| 9 | `AINearestAttackableTarget.java` | `thaumcraft_src/.../AINearestAttackableTarget.class` | L |
+| # | File | Source class | Effort | Status |
+|---|------|--------------|--------|--------|
+| 1 | `AIAttackOnCollide.java` | `thaumcraft_src/.../AIAttackOnCollide.class` | L | ✅ |
+| 2 | `AIGolemAttackOnCollide.java` | `thaumcraft_src/.../AIGolemAttackOnCollide.class` | L | ✅ |
+| 3 | `AICreeperSwell.java` | `thaumcraft_src/.../AICreeperSwell.class` | L | ✅ |
+| 4 | `AIAvoidCreeperSwell.java` | `thaumcraft_src/.../AIAvoidCreeperSwell.class` | L | ✅ |
+| 5 | `AICultistHurtByTarget.java` | `thaumcraft_src/.../AICultistHurtByTarget.class` | L | ✅ |
+| 6 | `AIDartAttack.java` | `thaumcraft_src/.../AIDartAttack.class` | L | ✅ |
+| 7 | `AIHurtByTarget.java` | `thaumcraft_src/.../AIHurtByTarget.class` | L | ✅ |
+| 8 | `AILongRangeAttack.java` | `thaumcraft_src/.../AILongRangeAttack.class` | L | ✅ |
+| 9 | `AINearestAttackableTarget.java` | `thaumcraft_src/.../AINearestAttackableTarget.class` | L | ✅ |
 
-#### Batch 2: Golem Inventory/Task AI (16 files)
+Also ported: `AINearestAttackableTargetSorter`, `AINearestButcherTarget`, `AIOldestAttackableTargetSorter`, `AITarget`.
 
-| # | File | Source class | Effort |
-|---|------|--------------|--------|
-| 1 | `AIHomeTake.java` | `thaumcraft_src/.../AIHomeTake.class` | L |
-| 2 | `AIHomePlace.java` | `thaumcraft_src/.../AIHomePlace.class` | L |
-| 3 | `AIHomeDrop.java` | `thaumcraft_src/.../AIHomeDrop.class` | L |
-| 4 | `AIHomeReplace.java` | `thaumcraft_src/.../AIHomeReplace.class` | L |
-| 5 | `AIHomeTakeSorting.java` | `thaumcraft_src/.../AIHomeTakeSorting.class` | L |
-| 6 | `AIEmptyGoto.java` | `thaumcraft_src/.../AIEmptyGoto.class` | L |
-| 7 | `AIEmptyDrop.java` | `thaumcraft_src/.../AIEmptyDrop.class` | L |
-| 8 | `AIEmptyPlace.java` | `thaumcraft_src/.../AIEmptyPlace.class` | L |
-| 9 | `AIFillTake.java` | `thaumcraft_src/.../AIFillTake.class` | L |
-| 10 | `AIFillGoto.java` | `thaumcraft_src/.../AIFillGoto.class` | L |
-| 11 | `AIItemPickup.java` | `thaumcraft_src/.../AIItemPickup.class` | L |
-| 12 | `AISortingGoto.java` | `thaumcraft_src/.../AISortingGoto.class` | L |
-| 13 | `AISortingPlace.java` | `thaumcraft_src/.../AISortingPlace.class` | L |
-| 14 | `AIHarvestCrops.java` | `thaumcraft_src/.../AIHarvestCrops.class` | L |
-| 15 | `AIHarvestLogs.java` | `thaumcraft_src/.../AIHarvestLogs.class` | L |
-| 16 | `AIFish.java` | `thaumcraft_src/.../AIFish.class` | L |
+#### Batch 2: Golem Inventory/Task AI (16 files) ✅ DONE
+
+| # | File | Source class | Effort | Status | Dependencies also ported |
+|---|------|--------------|--------|--------|------------------------|
+| 1 | `AIHomeTake.java` | `AIHomeTake.class` | L | ✅ | `InventoryUtils`, `GolemHelper.getItemsNeeded`, `getFirstItemUsingTimeout`, `getDoubleChest` |
+| 2 | `AIHomePlace.java` | `AIHomePlace.class` | L | ✅ | `InventoryUtils.placeItemStackIntoInventory`, `getDoubleChest` |
+| 3 | `AIHomeDrop.java` | `AIHomeDrop.class` | L | ✅ | EntityItem API (`setPickupDelay`) |
+| 4 | `AIHomeReplace.java` | `AIHomeReplace.class` | L | ✅ | `GolemHelper.isOnTimeOut`, `findSomething*Core` |
+| 5 | `AIHomeTakeSorting.java` | `AIHomeTakeSorting.class` | L | ✅ | `GolemHelper.getItemsNeeded`, `InventoryUtils.extractStack` |
+| 6 | `AIEmptyGoto.java` | `AIEmptyGoto.class` | L | ✅ | `GolemHelper.getContainersWithRoom`, `RandomPositionGenerator`, `Vec3d` |
+| 7 | `AIEmptyDrop.java` | `AIEmptyDrop.class` | L | ✅ | `GolemHelper.getMarkedBlocksAdjacentToGolem` |
+| 8 | `AIEmptyPlace.java` | `AIEmptyPlace.class` | L | ✅ | `getMarkedContainersAdjacentToGolem`, `getMarkedSides` |
+| 9 | `AIFillTake.java` | `AIFillTake.class` | L | ✅ | `GolemHelper.getMarkedContainersAdjacentToGolem`, `getMarkedSides` |
+| 10 | `AIFillGoto.java` | `AIFillGoto.class` | L | ✅ | `GolemHelper.getMissingItems`, `getContainersWithGoods`, `OreDictionary` |
+| 11 | `AIItemPickup.java` | `AIItemPickup.class` | L | ✅ | `AxisAlignedBB` search, `EntityItem.getItem()`, `InventoryUtils.areItemStacksEqualStrict` |
+| 12 | `AISortingGoto.java` | `AISortingGoto.class` | L | ✅ | `GolemHelper.getMarkedContainers` |
+| 13 | `AISortingPlace.java` | `AISortingPlace.class` | L | ✅ | `getMarkedContainersAdjacentToGolem`, `getMarkedSides`, `placeItemStackIntoInventory` |
+| 14 | `AIHarvestCrops.java` | `AIHarvestCrops.class` | L | ✅ | `CropUtils.isGrownCrop`, `FakePlayer`, `Block.harvestBlock` |
+| 15 | `AIHarvestLogs.java` | `AIHarvestLogs.class` | L | ✅ | `Utils.isWoodLog`, `BlockUtils.breakFurthestBlock` |
+| 16 | `AIFish.java` | `AIFish.class` | L | ✅ | `EntityGolemBobber`, `EnumParticleTypes`, custom `WeightedLoot` (replaces removed `WeightedRandomFishable`) |
 
 #### Batch 3: Golem Essentia/Liquid AI + Pech AI (10 files)
 
@@ -741,7 +743,11 @@ Priority  Dependency Graph:
 | Order | Task | Phase | Effort | Dependencies |
 |-------|------|-------|--------|-------------|
 | 1 | TileNode recharge (4r.3) | 4r | XL | Must fix `createBlockState` for `BlockStoneDevice` first (node block) |
-| 2 | 39/44 AI classes (6r.1) | 6r | XL | None — self-contained CFR ports |
+| 1 | 39/44 AI classes (6r.1) | 6r | XL | None — self-contained CFR ports |
+| | *Batch 1 (Combat AI, 9 files)* | | | ✅ *done* |
+| | *Batch 2 (Inventory AI, 16 files)* | | | ✅ *done — incl. InventoryUtils, GolemHelper, EntityGolemBase additions* |
+| | Batch 3 (Essentia/Liquid/Pech, 10 files) | | | pending |
+| | Batch 4 (Misc, 4 files) | | | pending |
 | 3 | Hostile mob AI (6r.3) | 6r | M | AI classes from 6r.1 must exist |
 | 4 | Boss mob AI (6r.2) | 6r | M | AI classes from 6r.1 must exist |
 | 5 | Projectile onImpact (6r.4) | 6r | M | None — self-contained |
@@ -856,8 +862,8 @@ This is the recommended sequence of git commits. Each produces BUILD SUCCESSFUL.
 
 ### Round 3: P1 AI
 ```
-11. AI Batch 1 (Combat): 9 classes
-12. AI Batch 2 (Inventory): 16 classes
+11. AI Batch 1 (Combat): 9 classes  ✅
+12. AI Batch 2 (Inventory): 16 classes  ✅
 13. AI Batch 3 (Essentia/Liquid/Pech): 10 classes
 14. AI Batch 4 (Misc): 4 classes
 15. Hostile mob AI task registration: 24 mobs
@@ -923,6 +929,6 @@ This map shows which original classes were verified vs. trusted-as-ported.
 | 3 | ~30 | 30 | 0 | **~60%** |
 | 4 | 151 | 80 | 71 (blocks) | **~74%** |
 | 5 | 110 | 55 | 55 | **~40%** |
-| 6 | 130 | 90 | 40 | **~85%** |
+| 6 | 130 | 110 | 20 | **~85%** (26/44 AI classes ported) |
 | 7 | 35 | 35 | 0 | **~20%** (trees simplified) |
-| **Total** | **~476** | **310** | **166** | **~55%** |
+| **Total** | **~476** | **330** | **146** | **~55%** |
