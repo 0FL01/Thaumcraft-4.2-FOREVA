@@ -1,6 +1,9 @@
 package thaumcraft.common.lib.network;
 
 import net.minecraftforge.fml.common.network.NetworkRegistry;
+import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
+import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
+import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 import net.minecraftforge.fml.relauncher.Side;
 import thaumcraft.common.lib.network.fx.PacketFXBeamPulse;
@@ -45,12 +48,12 @@ import thaumcraft.common.lib.network.playerdata.PacketWarpMessage;
 public class PacketHandler {
     public static final SimpleNetworkWrapper INSTANCE = NetworkRegistry.INSTANCE.newSimpleChannel("thaumcraft");
 
-    // Single handler instance used for all stub packets
-    private static final PacketStubHandler STUB_HANDLER = new PacketStubHandler();
+    // Single dispatch handler that calls onMessage() on each packet
+    private static final IMessageHandler<PacketBase, IMessage> DISPATCH_HANDLER =
+        (message, ctx) -> message.onMessage(ctx);
 
     public static void init() {
         int idx = 0;
-        // All stubs use the same handler — real handlers added in Phase 7
         register(PacketBiomeChange.class, idx++, Side.CLIENT);
         register(PacketConfig.class, idx++, Side.CLIENT);
         register(PacketMiscEvent.class, idx++, Side.CLIENT);
@@ -94,7 +97,6 @@ public class PacketHandler {
 
     @SuppressWarnings("unchecked")
     private static void register(Class<? extends PacketBase> clazz, int discriminator, Side side) {
-        // Use the instance-based overload to work around wildcard capture issues
-        INSTANCE.registerMessage(STUB_HANDLER, (Class) clazz, discriminator, side);
+        INSTANCE.registerMessage(DISPATCH_HANDLER, (Class) clazz, discriminator, side);
     }
 }
