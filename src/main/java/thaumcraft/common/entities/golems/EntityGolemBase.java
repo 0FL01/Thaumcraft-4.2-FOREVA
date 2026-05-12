@@ -173,7 +173,7 @@ public class EntityGolemBase extends net.minecraft.entity.monster.EntityGolem im
             case 4: // Attack
                 if (this.decoration.contains("R")) this.tasks.addTask(2, new thaumcraft.common.entities.ai.combat.AIDartAttack(this));
                 this.tasks.addTask(3, new thaumcraft.common.entities.ai.combat.AIGolemAttackOnCollide(this));
-                this.targetTasks.addTask(1, new thaumcraft.common.entities.ai.combat.AIHurtByTarget(this));
+                this.targetTasks.addTask(1, new thaumcraft.common.entities.ai.combat.AIHurtByTarget(this, false));
                 this.targetTasks.addTask(2, new thaumcraft.common.entities.ai.combat.AINearestAttackableTarget(this, net.minecraft.entity.EntityLivingBase.class, true));
                 break;
             case 5: // Fluids
