@@ -38,3 +38,5 @@ _p4_ref/
 cfr.jar
 
 .opencode/
+.decompile_out/
+gradlew.bat
