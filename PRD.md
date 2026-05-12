@@ -438,6 +438,41 @@ generator all compile. Ores, trees, and structures generate via
 
 ---
 
+### Phase 7r — World Gen Remediation (estimated: 1 session)
+
+**Цель**: Довести world gen до рабочего состояния — закрыть костыли,
+заполнить заглушки, портировать недостающие блоки/сущности.
+
+#### Known Issues
+
+| # | Компонент | Статус | Проблема | Fix |
+|---|-----------|--------|----------|-----|
+| 1 | **Biome color** (все 4 биома) | 🩹 Костыль | Поле `Biome.field_180277_b` (`color`) не замаплено в MCP stable 39. Убрали присвоение — на F3 биомы чёрные | `ColorHandlerEvent.Biome` — зарегистрировать хендлер, который возвращает цвет через `biome.getDefaultBiomeColor()` или кастомную мапу |
+| 2 | **MazeHandler persistence** (dim) | 🩹 Костыль | `WorldInfo.getCustomData()`/`setCustomData()` удалены в 1.12.2. `loadMaze()`/`saveMaze()` — пустые заглушки | Переписать на `WorldSavedData` (паттерн как `MapBossData`). CFR: `MazeHandler.class` → `readNBT()`/`writeNBT()` логика уже портирована, осталось привязать к `WorldSavedData` |
+| 3 | **7 room generators** (dim) | ❌ Заглушки | GenBossRoom, GenKeyRoom, GenLibraryRoom, GenNestRoom, GenPassage, GenPortal, Gen2x2 — пустые классы без расстановки блоков/мобов/сокровищ | CFR декомпиляция оригиналов `thaumcraft_src/.../dim/*.class` + адаптация Block ID → `IBlockState` |
+| 4 | **GenCommon.placeBlock()** (dim) | ❌ Полупустой | Использует числовые Block ID (1.7.10), есть только минимальная обёртка | CFR `GenCommon.class` — статические константы `BEDROCK`, `STONE`, `VOID` и т.д. нужно заменить на `Blocks.*` |
+| 5 | **BlockStairsEldritch** (dim) | ❌ Не портирован | Нужен для лестниц в GenPassage | CFR `thaumcraft_src/.../blocks/BlockCosmeticStairs.class` — extends `BlockStairs` в 1.12.2 |
+| 6 | **BlockEldritchPortal.onEntityCollision** (dim) | 🩹 Костыль | Заглушка — телепортация не реализована | CFR `TileEldritchPortal.class` + `WorldGenEldritchRing.class` — реализовать вызов `TeleporterThaumcraft` |
+| 7 | **EntityPermanentItem** (dim) | ❌ Не портирован | Нужен для GenKeyRoom (ключ на пьедестале, не деспавнится) | CFR `thaumcraft_src/.../entities/EntityPermanentItem.class` — extends `EntityItem` с `isImmuneToExplosions` = true |
+| 8 | **Village components** | ❌ Не портированы | ComponentWizardTower, ComponentBankerHome, VillageWizardManager, VillageBankerManager — деревни без ТС структур | CFR `thaumcraft_src/.../world/*.class` — адаптация `ComponentVillage` → `StructureVillagePieces` |
+| 9 | **WorldGenSilverwoodTreesOld** | ❌ Не портирован | Legacy генератор серебряных деревьев | CFR `thaumcraft_src/.../world/WorldGenSilverwoodTreesOld.class` |
+
+#### Remediation Order
+
+| Step | Scope | Источник | Объём |
+|------|-------|----------|-------|
+| **7r.1** | Biome color fix | `ColorHandlerEvent.Biome` + CFR vanilla биомов | ~30 строк |
+| **7r.2** | MazeHandler + MapBossData persistence | `WorldSavedData` паттерн, CFR `MazeHandler.class` | ~50 строк |
+| **7r.3** | BlockStairsEldritch + EntityPermanentItem | CFR оригиналов | ~120 строк |
+| **7r.4** | Portal teleport (Tile + Block) | CFR оригиналов + `TeleporterThaumcraft` | ~60 строк |
+| **7r.5** | Room generators (7 + GenCommon) | CFR `thaumcraft_src/.../dim/` | ~800 строк |
+| **7r.6** | Village components (4 класса) | CFR `thaumcraft_src/.../world/` | ~300 строк |
+
+**Risks**: Room generators — самый объёмный блок (~800 строк). Village components
+требуют изучения `StructureVillagePieces` API (отличается от 1.7.10).
+
+---
+
 ### Phase 8 — Client GUI & Rendering (estimated: 3 sessions)
 
 **Goal**: All GUIs open, all tile/entity renders correct, particles and
@@ -596,6 +631,7 @@ identical.
 | 5 — Items + Baubles | 110 | ~200 tex | **Done** | Medium | Per-category |
 | 6 — Entities + AI | 130 | ~100 tex | **Done** | High (golems) | Per-mob |
 | 7 — World Gen | 35 | ~20 tex | **Done** | Medium | Biomes / dimension / features |
+| 7r — World Gen Remediation | ~12 classes | 0 | 1 session | Medium (room gens) | Per-component |
 | 8 — Client GUI + Render | ~140 | ~200 tex + 7 shaders | 3 sessions | **Highest** | GUI / TESR / EntityRend / FX / Shaders |
 | 9 — Recipes + Research | ~450 registrations | 0 | 2 sessions | Low (volume) | Per-recipe-type |
 | 10 — Polish | 5-10 | all | 1 session | Low | JEI / Config / Compatibility |
