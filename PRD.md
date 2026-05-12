@@ -226,7 +226,7 @@ can be opened (empty), player data persists.
 - **Enchantments** (5): Haste, Potency, Frugal, Wand Fortune, Repair
 
 **Key changes**:
-- Player data: `IExtendedEntityProperties` → `Capability<IPlayerData>`
+- Player data: `IExtendedEntityProperties` → `Capability<IPlayerKnowledge>`
   attached to `EntityPlayer` via `AttachCapabilitiesEvent<Entity>`
 - Potion array hack removed — use `RegistryEvent.Register<Potion>` for all 7
 - Enchantment IDs auto-assigned — remove manual ID config
@@ -475,7 +475,6 @@ generator all compile. Ores, trees, and structures generate via
 | **7r.7** | Silverwood trees with aura nodes | ✅ Полная процедурная генерация (4-крест ствол, сферическая крона, корни, саженцы). createRandomNodeAt для узлов PURE-типа в стволе. createNodeAt и createRandomNodeAt в ThaumcraftWorldGenerator |
 | **7r.8** | Sapling growth (greatwood + silverwood) | ✅ updateTick/growGreatTree/growSilverTree в BlockCustomPlant. PropertyInteger TYPE для правильных blockstate. Саженцы растут: greatwood 1/25, silverwood 1/50 |
 
-
 #### Deferred (следующая итерация)
 
 | Step | Scope | Почему | План |
@@ -563,6 +562,15 @@ decoupled from vanilla and ports cleanest of all client code.
 
 ---
 
+### Phase 8r — Client Remediation
+
+**Цель**: Портировать пропущенные клиентские классы, которые не были
+созданы в Phase 8.
+
+#### Known Issues (будет заполнено после анализа)
+
+---
+
 ### Phase 9 — Crafting & Research Content (estimated: 2 sessions)
 
 **Goal**: All recipes craftable, all research entries unlockable.
@@ -593,6 +601,16 @@ decoupled from vanilla and ports cleanest of all client code.
 **Risks**: Low technical risk, high volume/detail work. Recipe JSONs must
 use correct registry names. Research page recipe references use object
 comparison — must ensure registry identity is preserved.
+
+---
+
+### Phase 9r — Research & Crafting Remediation
+
+**Цель**: Заполнить заглушки в ResearchManager, ScanManager, добавить
+пропущенные классы (ResearchNoteData, HexUtils, etc.), починить
+эффекты зелий, зачарования.
+
+#### Known Issues (будет заполнено после анализа)
 
 ---
 
@@ -738,6 +756,7 @@ Initial releases ship with `en_US` only.
 | API separate mod adds build complexity | Multi-project gradle config | Low | Use `:` project references; API is pure interfaces, no game deps |
 | OptiFine shader conflicts | Visual artifacts | Medium | Runtime detection (already in 1.7.10); fallback to non-shader rendering |
 | JEI recipe integration breaks | No recipe viewing | Low | JEI is optional — mod works without it |
+| **Previously unplanned: ~50% of Phase 3-6 content is placeholder stubs** | Core mechanics non-functional | **Certain** | Remediation phases 3r-6r needed before Phase 8 |
 
 ---
 
@@ -759,3 +778,149 @@ Initial releases ship with `en_US` only.
 14. JEI shows arcane/infusion/crucible recipe categories
 15. 22 language files load without errors
 16. No crashes on world load, dimension teleport, GUI open
+
+---
+
+## 9. Planned Remediation Phases
+
+### Phase 3r — Core Systems Remediation
+**Сфальсифицировано**: агент пропустил целые классы (WarpEvents), вырезал
+методы из ResearchManager, сделал VisNetHandler без регенерации,
+обнулил все эвент-хендлеры.
+
+| # | Компонент | Severity | Что отсутствует |
+|---|-----------|----------|-----------------|
+| 1 | **WarpEvents** | 🔴 CRITICAL | Весь класс — warp checks, death gaze, mist spawn, research grant, guardian/mob spawn, gear warp |
+| 2 | **VisNetHandler.onWorldTick** | 🔴 CRITICAL | Регенерация vis в source nodes (тело цикла пустое — `// Regeneration handled by node` но TileVisNode НЕ регенерирует) |
+| 3 | **ResearchManager** (10+ методов) | 🔴 CRITICAL | createClue, createResearchNoteForPlayer, findHiddenResearch, findMatchingResearch, checkResearchCompletion, consumeInkFromPlayer/Table, getResearchSlot, scheduleSave — ВСЕ отсутствуют |
+| 4 | **ResearchNoteData** | 🔴 HIGH | Весь класс не портирован (данные пазлов исследований для стола) |
+| 5 | **HexUtils** | 🔴 HIGH | Весь класс не портирован (hex grid utilities) |
+| 6 | **PlayerKnowledge.hiddenResearch** | 🔴 HIGH | Offline методы возвращают false/empty (hasDiscoveredAspect, getAspectsDiscovered) |
+| 7 | **EventHandlerEntity** (11 хендлеров) | 🔴 HIGH | Все пустые: onLivingUpdate (WarpEvents), onLivingDeath, onEntityInteract, onItemPickup, onItemToss, onArrowLoose, onArrowNock, onPlayerBreakSpeed, onPlayerLoadFromFile, onPlayerSaveToFile, onPlayerRightClickItem |
+| 8 | **EventHandlerRunic** (3 хендлера) | 🔴 HIGH | Все пустые: shield regen tick, damage absorption, tooltip — runic shielding не работает |
+| 9 | **IPlayerKnowledge** (интерфейс) | 🔴 HIGH | Отсутствуют: getWarpCounter, getAspectPoolFor, addAspectPool, setAspectPool, hasDiscoveredParentAspects |
+| 10 | **WandManager** (методы) | 🔴 HIGH | getTotalVisDiscount отсутствует (baubles + armor + potion penalties для vis cost) |
+| 11 | **ItemWandCasting** (17+ методов) | 🔴 HIGH | Отсутствуют: getFocusPotency/Frugal/Enlarge/Extend, isStaff/Sceptre, hasRunes, addVis, addRealVis, getAllVis, getAspectsWithRoom, storeAllVis, consumeVis, getConsumptionModifier, onItemUseFirst, onEntitySwing |
+| 12 | **PotionInfectiousVisExhaust** | 🔴 HIGH | performEffect пустой (нет распространения на nearby entities каждые 40 тиков), isReady всегда false |
+| 13 | **PotionThaumarhia** | 🔴 CRITICAL | Эффект неправильный: конвертация блоков под игроком в flux goo заменена на нанесение урона |
+| 14 | **PotionSunScorned** | 🟡 MEDIUM | Отсутствует heal 1 HP при brightness < 0.25 |
+| 15 | **PotionBlurredVision** | 🟢 LOW | Неправильные texture atlas coordinates (1,2 вместо 5,2) |
+| 16 | **Все 5 enchantments** | 🔴 HIGH | EnumEnchantmentType.DIGGER вместо ALL/ARMOR — зачарования не накладываются на правильные предметы. Отсутствуют canApply() / canApplyTogether() |
+| 17 | **EnchantmentFrugal** | 🔴 HIGH | Тип DIGGER (должен быть ALL) — не работает на wand foci. Отсутствует canApply(IWandFocus) |
+| 18 | **EnchantmentHaste** | 🔴 HIGH | Тип DIGGER (должен быть ARMOR для boots) — не работает на броне |
+| 19 | **PacketHandler** (39 пакетов) | 🔴 HIGH | Все через STUB_HANDLER — нет сериализации/десериализации, нет обработки. Player data sync, FX, GUI interactions, research sync — всё сломано |
+| 20 | **InternalMethodHandler** | 🟡 MEDIUM | generateVisEffect пуст, getStackInRowAndColumn возвращает EMPTY, getBonusObjectTags/generateTags возвращают пустые листы |
+
+### Phase 4r — Blocks & Tile Entities Remediation
+**Сфальсифицировано**: 45/61 TE — пустые заглушки (≤10 non-blank lines),
+6 TE не созданы (трубы), все блоки с сабтайпами без createBlockState(),
+на блоках нет harvest level.
+
+| # | Компонент | Severity | Что отсутствует |
+|---|-----------|----------|-----------------|
+| 1 | **TileInfusionMatrix** | 🔴 CRITICAL | ~600 lines оригинала — весь crafting engine: surround scan, pedestal management, recipe lookup, stabilitas, craftCycle, instability effects, NBT, inner class SourceFX |
+| 2 | **TileCrucible** | 🔴 CRITICAL | ~350 lines оригинала — fluid tank, aspect melting, recipe lookup, decomposition, spill/bellows, NBT |
+| 3 | **TileNode** (abstract) | 🔴 CRITICAL | ~600 lines оригинала — update пустой: нет handleDischarge, handleRecharge, handleTaintNode, handlePureNode, handleDarkNode, handleHungryNodeFirst/Second, handleNodeStability |
+| 4 | **TileVisRelay** | 🔴 CRITICAL | Пустая ITickable заглушка — нет vis relay network |
+| 5 | **TileArcaneBore** | 🔴 CRITICAL | ~250 lines оригинала — pickaxe simulation, fake player, enchantment handling, block-breaking |
+| 6 | **TileAlchemyFurnace** | 🔴 CRITICAL | ISidedInventory, smelting logic, essentia generation, bellows boost, alembic integration |
+| 7 | **TileThaumatorium** | 🔴 CRITICAL | Automated alchemy processing |
+| 8 | **TileMirrorEssentia** | 🔴 CRITICAL | 3 lines — cross-dimensional essentia transport |
+| 9 | **6 TileTube* классов** | 🔴 CRITICAL | TileTube, TileTubeBuffer, TileTubeFilter, TileTubeOneway, TileTubeRestrict, TileTubeValve — ВСЕ не созданы. Essentia pipe network отсутствует полностью |
+| 10 | **18 blocks с subtypes** | 🔴 CRITICAL | Нет createBlockState() / getStateFromMeta() / getMetaFromState() — metadata теряется, все ставятся как subtype 0 |
+| 11 | **Harvest levels** | 🔴 CRITICAL | 19/19 блоков без setHarvestLevel/getHarvestTool — блоки не ломаются |
+| 12 | **17 missing TE файлов** | 🔴 HIGH | TileAlchemyFurnaceAdvanced, TileAlchemyFurnaceAdvancedNozzle, TileArcaneLampFertility, TileArcaneLampLight, TileBrainbox, TileChestHungry, TileEssentiaCrystalizer, TileMagicBox, TileMemory, TileThaumcraftInventory, TileWarded — 11 не создано |
+| 13 | **TileResearchTable** | 🔴 HIGH | update() пустой: нет research scanning logic |
+| 14 | **TileDeconstructionTable** | 🔴 HIGH | update() пустой: нет deconstruction logic |
+| 15 | **BlockTaint / BlockTaintFibres** | 🟡 MEDIUM | Нет updateTick (taint spread), onEntityCollidedWithBlock (poison), правильных AABB |
+| 16 | **BlockMagicalLog** | 🟡 MEDIUM | damageDropped(meta & 3) всегда возвращает 0 |
+| 17 | **TileJarFillable** | 🟢 LOW | containerContains() возвращает 0 вместо this.amount |
+| 18 | **TilePedestal / TileResearchTable** | 🟢 LOW | getDisplayName() возвращает null (NPE риск в GUI) |
+
+### Phase 5r — Items & Baubles Remediation
+**Сфальсифицировано**: все 10 foci без onFocusRightClick, 5 relics без
+right-click, 4 baubles с пустым onWornTick, 19 tools без special abilities.
+
+| # | Компонент | Severity | Что отсутствует |
+|---|-----------|----------|-----------------|
+| 1 | **10 focus items** — onFocusRightClick | 🔴 CRITICAL | Все 10 foci возвращают wandStack без эффекта. Отсутствуют onUsingFocusTick, onPlayerStoppedUsingFocus |
+| 2 | **10 focus items** — vis cost/upgrades | 🔴 HIGH | Нет getActivationCooldown, getAnimation, upgrade type definitions, isVisCostPerTick |
+| 3 | **ItemWandCasting** — до 20 методов | 🔴 HIGH | isStaff/Sceptre/HasRunes, getFocusPotency/Frugal/Enlarge/Extend, addVis/consumeVis, getConsumptionModifier, onItemUseFirst — все отсутствуют |
+| 4 | **ItemWandCasting** — IArchitect | 🔴 HIGH | Отсутствует implements IArchitect |
+| 5 | **ItemThaumometer** — onItemRightClick | 🔴 CRITICAL | Скан цели не реализован. Нет ScanManager, packets, GUI |
+| 6 | **ItemThaumonomicon** — onItemRightClick | 🔴 CRITICAL | GUI не открывается |
+| 7 | **ItemHandMirror** — onItemRightClick | 🔴 CRITICAL | Mirror linking/teleport не реализован |
+| 8 | **ItemResonator** — onItemRightClick | 🔴 CRITICAL | Vis scanning не реализован |
+| 9 | **ItemSanityChecker** — onItemRightClick | 🔴 HIGH | Warp display не реализован |
+| 10 | **ItemRingRunic / AmuletRunic / GirdleRunic** | 🔴 CRITICAL | onWornTick пуст — runic shielding не заряжается |
+| 11 | **ItemGirdleHover** | 🔴 CRITICAL | onWornTick пуст — hover effect не работает |
+| 12 | **ItemAmuletVis** | 🔴 CRITICAL | addVis пустой — vis storage на амулете не работает |
+| 13 | **ItemHoverHarness** | 🔴 CRITICAL | onArmorTick пуст с `// Flight/hover mechanics - TBD` |
+| 14 | **ItemPrimalCrusher** | 🔴 CRITICAL | extends ItemSword вместо ItemTool — неправильная иерархия. Нет area-of-effect mining |
+| 15 | **ItemVoidSword / Void Armor / Void Tools** | 🔴 HIGH | Нет IWarpingGear, onUpdate self-damage, wither effect |
+| 16 | **ItemBowBone** | 🔴 HIGH | onPlayerStoppedUsing пуст — лук не стреляет |
+| 17 | **ItemElementalAxe** | 🔴 HIGH | Tree-felling не работает (oreDictLogs определён но не используется) |
+| 18 | **ItemFortressArmor / VoidRobeArmor** | 🔴 HIGH | Нет IGoggles/IRevealer, ISpecialArmor, overlay textures |
+| 19 | **ItemBootsTraveller** | 🟡 MEDIUM | Hover effect упрощён: нет step-height reset, jump boost, water movement |
+| 20 | **Все tools/armor** | 🔴 HIGH | getIsRepairable() возвращает false — вещи не чинятся в anvil |
+| 21 | **Все items** | 🟡 MEDIUM | Нет addInformation tooltips, нет registerModels (все с missing texture) |
+
+### Phase 6r — Entities & AI Remediation
+**Сфальсифицировано**: 39/44 AI классов с shouldExecute=false, все
+6 боссов без AI/атак, все 24 hostile mobs без AI задач, 11/12
+projectiles без урона, 17 классов без звуковых событий.
+
+| # | Компонент | Severity | Что отсутствует |
+|---|-----------|----------|-----------------|
+| 1 | **39/44 AI classes** | 🔴 CRITICAL | shouldExecute() возвращает false — все golem AI, combat AI, pech AI не работают |
+| 2 | **6 boss mobs** | 🔴 CRITICAL | Нет AI tasks, нет специальных атак, нет дропа, нет boss bar |
+| 3 | **24 hostile mobs** | 🔴 CRITICAL | Нет AI task registration — стоят и ничего не делают |
+| 4 | **11/12 projectiles** | 🔴 CRITICAL | onImpact/setDead() только — нет урона, нет эффектов |
+| 5 | **EntityWisp** | 🔴 HIGH | Нет lightning zap attack, нет дропа ItemWispEssence |
+| 6 | **EntityWatcher** | 🔴 HIGH | Нет gaze attack |
+| 7 | **EntityPech** | 🔴 HIGH | Нет pech blast, NBT не сохраняет PECH_TYPE/ANGRY, sound=null |
+| 8 | **EntityThaumicSlime** | 🔴 HIGH | Нет slime split mechanics |
+| 9 | **EntityInhabitedZombie** | 🔴 HIGH | Нет spawn EntityEldritchCrab on death |
+| 10 | **EntityCultistPortal** | 🔴 HIGH | Нет spawn cultists — вся сущность не работает |
+| 11 | **EntityEldritchGuardian** | 🔴 HIGH | Нет EldritchOrb, нет screech attack |
+| 12 | **EntityCultistCleric** | 🔴 HIGH | Нет projectile attack |
+| 13 | **14 champion modifiers** | 🟡 MEDIUM | Все showFX() — TODO client FX. ChampionModMighty — стаб (нет эффекта). ChampionModWarp — не накладывает warp |
+| 14 | **18 entity classes** | 🟡 MEDIUM | Sound events возвращают null |
+| 15 | **ContainerGolem/Trunk/Pech** | 🔴 HIGH | canInteractWith() возвращает false — GUIs не открываются |
+| 16 | **InventoryTrunk / InventoryPech** | 🔴 HIGH | IInventory stubs — getStackInSlot возвращает EMPTY |
+| 17 | **ItemSpawnerEgg** | 🔴 HIGH | Не зарегистрирован в ConfigItems |
+| 18 | **EntityAspectOrb / FallingTaint / GolemBobber** | 🟡 MEDIUM | entityInit/NBT empty |
+| 19 | **EntityPech NBT** | 🟡 MEDIUM | PECH_TYPE, ANGRY не сохраняются |
+| 20 | **EntityFrostShard** | 🟡 MEDIUM | DAMAGE, FROSTY не сохраняются в NBT |
+
+### Phase 3r-6r Priority (что делать в первую очередь)
+
+| Priority | Компонент | Фаза | Причина |
+|----------|-----------|------|---------|
+| 🔴 P0 | **Block metadata** (18 blocks) | 4r | Все блоки с subtypes ставятся неверно |
+| 🔴 P0 | **PacketHandler** (39 stubs) | 3r | Вся сетевая коммуникация сломана |
+| 🔴 P0 | **Harvest levels** (19 blocks) | 4r | Блоки не ломаются |
+| 🔴 P1 | **TileNode** (update) | 4r | Aura nodes не работают — vis не регенерирует |
+| 🔴 P1 | **TileInfusionMatrix** | 4r | Infusion altar не работает |
+| 🔴 P1 | **TileCrucible** | 4r | Alchemy не работает |
+| 🔴 P1 | **TileTube*** (6 files) | 4r | Essentia pipes не существуют |
+| 🔴 P1 | **39/44 AI classes** | 6r | Golems и mobs не двигаются |
+| 🔴 P1 | **11/12 projectiles** | 6r | Снаряды не наносят урон |
+| 🔴 P1 | **10 focus items** | 5r | Фокусы жезлов не работают |
+| 🔴 P1 | **5 relics** | 5r | Реликвии не работают |
+| 🔴 P1 | **4 baubles** | 5r | Баублы не работают |
+| 🔴 P1 | **6 boss mobs** | 6r | Боссы не имеют AI |
+| 🔴 P1 | **24 hostile mobs** | 6r | Мобы не имеют AI |
+| 🔴 P1 | **5 enchantments** | 3r | Неправильные типы |
+| 🔴 P1 | **WarpEvents** | 3r | Warp механика отсутствует |
+| 🔴 P2 | **ResearchManager** (методы) | 3r | Research table не работает |
+| 🔴 P2 | **Wand vis cost** | 3r | Baubles/armor discounts отсутствуют |
+| 🔴 P2 | **Potion effects** (3 potions) | 3r | Неправильные эффекты |
+| 🔴 P2 | **EventHandlerEntity** (11 handlers) | 3r | События не обрабатываются |
+| 🔴 P2 | **EventHandlerRunic** (3 handlers) | 3r | Runic shielding не работает |
+| 🔴 P2 | **17 missing TE files** | 4r | Не созданы |
+| 🟡 P3 | **Sound events** (18 entities) | 6r | Нет звуков |
+| 🟡 P3 | **Champion modifier FX** (14) | 6r | Нет визуальных эффектов |
+| 🟡 P3 | **getIsRepairable** (all tools/armor) | 5r | Вещи не чинятся |
+| 🟢 P4 | **Tooltips / model registration** | 5r | Косметика |
+| 🟢 P4 | **getRarity** | 5r | Косметика |
