@@ -1,15 +1,37 @@
 package thaumcraft.common.entities.monster;
 
+import io.netty.buffer.ByteBuf;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.MoverType;
+import net.minecraft.entity.SharedMonsterAttributes;
+import net.minecraft.entity.monster.EntityMob;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.EntityDataManager;
+import net.minecraft.util.DamageSource;
+import net.minecraft.util.EnumParticleTypes;
+import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.SoundEvent;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.MathHelper;
+import net.minecraft.world.World;
+import net.minecraftforge.fml.common.registry.IEntityAdditionalSpawnData;
+import thaumcraft.api.entities.ITaintedMob;
+import thaumcraft.common.blocks.BlockTaintFibres;
+import thaumcraft.common.config.ConfigBlocks;
+import thaumcraft.common.config.ConfigItems;
+import thaumcraft.common.lib.world.ThaumcraftWorldGenerator;
 
-public class EntityTaintSpore extends net.minecraft.entity.monster.EntityMob implements thaumcraft.api.entities.ITaintedMob, net.minecraftforge.fml.common.registry.IEntityAdditionalSpawnData {
+public class EntityTaintSpore extends EntityMob implements ITaintedMob, IEntityAdditionalSpawnData {
     protected int growth = 0;
     public float displaySize = 0.0f;
-    private static final DataParameter<Integer> SPORE_SIZE = EntityDataManager.createKey(EntityTaintSpore.class, DataSerializers.VARINT);
+    private static final DataParameter<Integer> SPORE_SIZE =
+        EntityDataManager.createKey(EntityTaintSpore.class, DataSerializers.VARINT);
 
-    public EntityTaintSpore(net.minecraft.world.World world) {
+    public EntityTaintSpore(World world) {
         super(world);
         this.setSporeSize(2);
     }
@@ -35,58 +57,142 @@ public class EntityTaintSpore extends net.minecraft.entity.monster.EntityMob imp
     @Override
     protected void applyEntityAttributes() {
         super.applyEntityAttributes();
-        this.getEntityAttribute(net.minecraft.entity.SharedMonsterAttributes.MAX_HEALTH).setBaseValue(1.0);
-        this.getEntityAttribute(net.minecraft.entity.SharedMonsterAttributes.ATTACK_DAMAGE).setBaseValue(1.0);
+        this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(1.0);
+        this.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).setBaseValue(1.0);
     }
 
+    // --- No AI ---
+    @Override protected void updateAITasks() {}
+
+    // --- Rooted movement ---
+    @Override
+    public void move(MoverType type, double x, double y, double z) {
+        x = 0.0; z = 0.0;
+        if (y > 0.0) y = 0.0;
+        BlockPos below = new BlockPos(MathHelper.floor(this.posX), MathHelper.floor(this.getEntityBoundingBox().minY) - 1, MathHelper.floor(this.posZ));
+        if (this.world.getBlockState(below).getBlock() == ConfigBlocks.blockTaintFibres
+            && this.world.getBlockState(below).getValue(BlockTaintFibres.TYPE) == 4) {
+            return;
+        }
+        super.move(type, x, y, z);
+    }
+
+    // --- Core update ---
     @Override
     public void onUpdate() {
         super.onUpdate();
-        if (!this.world.isRemote && this.ticksExisted % 20 == 0) {
-            // TODO: check biome taint
+        if (!this.world.isRemote && this.ticksExisted % 20 == 0
+                && this.world.getBiome(this.getPosition()) != ThaumcraftWorldGenerator.biomeTaint) {
+            this.attackEntityFrom(DamageSource.DROWN, 1.0f);
         }
+        this.sporeOnUpdate();
+    }
+
+    protected void sporeOnUpdate() {
+        // Growth
         if (this.getSporeSize() < 10 && this.growth++ == 1200) {
             this.setSporeSize(this.getSporeSize() + 1);
             this.growth = 0;
         }
+        // Client visual
+        if (this.world.isRemote) {
+            if (this.displaySize < (float)this.getSporeSize()) {
+                this.displaySize += 0.02f;
+            }
+        }
+        // Burst check
+        BlockPos below = new BlockPos(MathHelper.floor(this.posX), MathHelper.floor(this.getEntityBoundingBox().minY) - 1, MathHelper.floor(this.posZ));
+        boolean onMatureFibre = this.world.getBlockState(below).getBlock() == ConfigBlocks.blockTaintFibres
+            && this.world.getBlockState(below).getValue(BlockTaintFibres.TYPE) == 4;
+        if (!onMatureFibre || this.hurtResistantTime > 0) {
+            this.spiderBurst();
+        }
     }
 
+    @Override
+    public void onCollideWithPlayer(EntityPlayer player) {
+        this.spiderBurst();
+    }
+
+    protected void spiderBurst() {
+        if (!this.world.isRemote) {
+            SoundEvent gore = SoundEvent.REGISTRY.getObject(new ResourceLocation("thaumcraft:gore"));
+            if (gore != null) this.playSound(gore, 1.0f, 0.9f + this.rand.nextFloat() * 0.1f);
+            int q = this.getSporeSize() / 3 + this.rand.nextInt(this.getSporeSize() / 2 + 1);
+            for (int a = 0; a < q; ++a) {
+                EntityTaintSpider spiderling = new EntityTaintSpider(this.world);
+                spiderling.setLocationAndAngles(
+                    this.posX + (double)(this.rand.nextFloat() - this.rand.nextFloat()),
+                    this.posY + (double)this.rand.nextFloat(),
+                    this.posZ + (double)(this.rand.nextFloat() - this.rand.nextFloat()),
+                    this.rand.nextFloat() * 360.0f, 0.0f);
+                this.world.spawnEntity(spiderling);
+            }
+            // Deplete fibre
+            BlockPos below = new BlockPos(MathHelper.floor(this.posX), MathHelper.floor(this.getEntityBoundingBox().minY) - 1, MathHelper.floor(this.posZ));
+            if (this.world.getBlockState(below).getBlock() == ConfigBlocks.blockTaintFibres) {
+                int meta = this.world.getBlockState(below).getValue(BlockTaintFibres.TYPE);
+                if (meta == 4) {
+                    this.world.setBlockState(below, ConfigBlocks.blockTaintFibres.getDefaultState()
+                        .withProperty(BlockTaintFibres.TYPE, 3), 3);
+                }
+            }
+            this.setDead();
+        } else {
+            // Client burst
+            for (int a = 0; a < 50; ++a) {
+                this.world.spawnParticle(EnumParticleTypes.SLIME,
+                    this.posX + (double)((this.rand.nextFloat() - this.rand.nextFloat()) * this.width),
+                    this.posY + (double)(this.rand.nextFloat() * this.height),
+                    this.posZ + (double)(this.rand.nextFloat() - this.rand.nextFloat()) * this.width,
+                    (this.rand.nextFloat() - this.rand.nextFloat()) * 0.5,
+                    this.rand.nextFloat() * 0.5,
+                    (this.rand.nextFloat() - this.rand.nextFloat()) * 0.5);
+            }
+        }
+    }
+
+    // --- Misc ---
     @Override public boolean canBeCollidedWith() { return true; }
     @Override public boolean canBePushed() { return false; }
 
+    // --- NBT ---
     @Override
-    public void move(net.minecraft.entity.MoverType type, double x, double y, double z) {
-        x = 0.0; z = 0.0;
-        if (y > 0.0) y = 0.0;
-        super.move(type, x, y, z);
-    }
-
-    @Override
-    public void readEntityFromNBT(net.minecraft.nbt.NBTTagCompound nbt) {
+    public void readEntityFromNBT(NBTTagCompound nbt) {
         super.readEntityFromNBT(nbt);
         this.setSporeSize(nbt.getInteger("Size") + 1);
     }
 
     @Override
-    public void writeEntityToNBT(net.minecraft.nbt.NBTTagCompound nbt) {
+    public void writeEntityToNBT(NBTTagCompound nbt) {
         super.writeEntityToNBT(nbt);
         nbt.setInteger("Size", this.getSporeSize() - 1);
     }
 
-    @Override public void readSpawnData(io.netty.buffer.ByteBuf buf) {}
-    @Override public void writeSpawnData(io.netty.buffer.ByteBuf buf) {}
-
-    // TODO: add sound events
-    // @Override protected net.minecraft.util.SoundEvent getAmbientSound() { return null; }
-    @Override protected net.minecraft.util.SoundEvent getHurtSound(net.minecraft.util.DamageSource source) { return null; }
-    @Override protected net.minecraft.util.SoundEvent getDeathSound() { return null; }
+    @Override
+    public void readSpawnData(ByteBuf data) {
+        try { this.displaySize = data.readFloat(); }
+        catch (Exception e) {}
+    }
 
     @Override
+    public void writeSpawnData(ByteBuf data) {
+        data.writeFloat((float)this.getSporeSize());
+    }
+
+    // --- Sounds ---
+    @Override protected SoundEvent getAmbientSound() { return null; }
+    @Override protected SoundEvent getHurtSound(DamageSource ds) { return null; }
+    @Override protected SoundEvent getDeathSound() { return null; }
+    @Override protected float getSoundVolume() { return 0.1f; }
+    @Override protected int getExperiencePoints(EntityPlayer player) { return 200; }
+
+    // --- Drops ---
+    @Override
     protected void dropFewItems(boolean wasRecentlyHit, int looting) {
-        if (this.world.rand.nextBoolean()) {
-            this.entityDropItem(new net.minecraft.item.ItemStack(thaumcraft.common.config.ConfigItems.itemResource, 1, 11), this.height / 2.0f);
-        } else {
-            this.entityDropItem(new net.minecraft.item.ItemStack(thaumcraft.common.config.ConfigItems.itemResource, 1, 12), this.height / 2.0f);
-        }
+        ItemStack drop = this.world.rand.nextBoolean()
+            ? new ItemStack(ConfigItems.itemResource, 1, 11)
+            : new ItemStack(ConfigItems.itemResource, 1, 12);
+        this.entityDropItem(drop, this.height / 2.0f);
     }
 }
