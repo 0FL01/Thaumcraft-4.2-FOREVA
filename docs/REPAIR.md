@@ -15,7 +15,7 @@ Boss system: `EntityTaintacleGiant` with `BossInfoServer` + enrage,
 `EntityCultistPortal` migrated to `EntityThaumcraftBoss`.
 Alchemy system: `TileCrucible` full server port (FluidTank, heat, aspect decomp,
 smelting, spill, bellows, NBT, capability sync).
-Event system: all 5 event handler classes ported — `WarpEvents` (full ~340 lines),
+Round C complete: `WarpEvents` (full ~340 lines),
 `EventHandlerEntity` (16 handlers, 12 with real logic), `EventHandlerRunic` (3 handlers +
 static helpers, runic charge state), `EventHandlerWorld` (11 handlers + chunk retrogen),
 `ServerTickEventsFML` (world tick, block swap, chunk regen, inner classes).
@@ -811,9 +811,9 @@ Requires `FMLCommonHandler.instance().firePlayerCraftingEvent` — available in 
 Boss bar via `BossInfoServer` composition, champion via `makeChampion(true)`, enrage/anger/damage-cap, `isEntityInvulnerable`, `decreaseAirSupply`, particles, special drops with proximity check.
 `EntityCultistPortal` migrated to `extends EntityThaumcraftBoss`.
 
-### Tier B — Event system (standalone, medium effort)
+### Round C — Events ✅ DONE
 
-#### B.1 — WarpEvents (3r.1) ✅ DONE
+#### C.1 — WarpEvents (3r.1) ✅ DONE
 
 Full port from original (338 lines decompiled → ~340 lines in port).
 Package: `thaumcraft.common.lib.WarpEvents` (not `events/`).
@@ -824,7 +824,7 @@ clean 1.12.2 MCP naming.
 Added `warpCounter` field to `IPlayerKnowledge`/`PlayerKnowledgeCapability`.
 `PacketAspectPool` filled with proper fields/serialization.
 
-#### B.2 — EventHandlerEntity (3r.6) — core handlers ✅ DONE
+#### C.2 — EventHandlerEntity (3r.6) — core handlers ✅ DONE
 
 Full port from original (625 lines decompiled → ~300 lines in port).
 16 `@SubscribeEvent` handlers: 12 with real logic (warp events, death gaze,
@@ -834,7 +834,7 @@ Added: `AttackEntityEvent` (left-click Pech), `LivingEntityUseItemEvent.Finish`
 (replaces original `PlayerUseItemEvent.Finish`), `LivingEvent.LivingJumpEvent`.
 Removed: `ItemExpireEvent` (not in original).
 
-#### B.3 — EventHandlerRunic (3r.7) ✅ DONE
+#### C.3 — EventHandlerRunic (3r.7) ✅ DONE
 
 Full port from original (307 lines decompiled → ~300 lines in port).
 3 `@SubscribeEvent` handlers: `livingTick` (runic charge scan + recharge from vis),
@@ -846,7 +846,7 @@ State managed via `HashMap<Integer, Integer[]>` keyed by player entity ID.
 Champion mob handling simplified (no `CHAMPION_MOD` attribute in port).
 Uses `BaublesApi.getBaublesHandler(player)` + `IBaublesItemHandler` for 7 bauble slots.
 
-#### B.4 — EventHandlerWorld (3r.7b) ✅ DONE
+#### C.4 — EventHandlerWorld (3r.7b) ✅ DONE
 
 Full port from original (246 lines decompiled → ~220 lines in port).
 9 `@SubscribeEvent` handlers: world load/save/unload, chunk save/load (retrogen key),
@@ -855,7 +855,7 @@ item crafted (warp on craft), harvest drops (special mining), block place/multi-
 +1 post-Phase 8 handler: `FurnaceFuelBurnTimeEvent` (replaces deprecated `IFuelHandler`).
 `isNearActiveBoss` helper for Eldritch dimension block protection.
 
-#### B.5 — ServerTickEventsFML (3r.7c): chunk regeneration + block swap queue ✅ DONE
+#### C.5 — ServerTickEventsFML (3r.7c): chunk regeneration + block swap queue ✅ DONE
 
 Full port from original (233 lines decompiled → ~220 lines in port).
 `TickEvent.WorldTickEvent` handler with server-side/Phase.END filter.
@@ -867,7 +867,7 @@ re-runs world gen for retrogen.
 Inner classes: `RestorableWardedBlock` (block NBT snapshot), `VirtualSwapper` (swap op).
 Uses `BlockUtils.breakFurthestBlock` for adjacency chain detection.
 
-### Tier C — Fills remaining gameplay gaps
+### Round D — Remaining gaps
 
 | # | Task | Phase | Effort | Dependencies |
 |---|------|-------|--------|-------------|
@@ -951,11 +951,11 @@ P0: PacketHandler (3r.13)         ⚠️  →  Dispatch works, 11 non-FX packets
 | 7 | **Entity sound methods (A.2)** | 6r | M | ✅ *22 entity classes fixed* |
 | 8 | **TileCrucible (A.3)** | 4r | XL | ✅ *full server logic + FluidTank + flux blocks* |
 | 9 | **EntityTaintacleGiant boss (A.4)** | 6r | M | ✅ *boss bar + champion + enrage* |
-| 10 | **WarpEvents (B.1)** | 3r | M | ⏳ *pre-8-10* |
-| 11 | **EventHandlerEntity (B.2)** | 3r | M | ⏳ *pre-8-10* |
-| 12 | **EventHandlerRunic (B.3)** | 3r | M | ⏳ *pre-8-10* |
-| 13 | **EventHandlerWorld (B.4)** | 3r | M | ⏳ *pre-8-10* |
-| 14 | **ServerTickEventsFML (B.5)** | 3r | M | ⏳ *pre-8-10* |
+| 10 | **WarpEvents (C.1)** | 3r | M | ✅ *full 338-line port* |
+| 11 | **EventHandlerEntity (C.2)** | 3r | M | ✅ *16 handlers, 12 real* |
+| 12 | **EventHandlerRunic (C.3)** | 3r | M | ✅ *3 handlers + helpers* |
+| 13 | **EventHandlerWorld (C.4)** | 3r | M | ✅ *11 handlers + retrogen* |
+| 14 | **ServerTickEventsFML (C.5)** | 3r | M | ✅ *world tick + swap* |
 | 15 | Focus items (5r.1) | 5r | M | *defer to 8-10* |
 | 16 | Relic right-click (5r.2) | 5r | L | *defer to 8-10* |
 | 17 | Baubles onWornTick (5r.3) | 5r | M | *defer to 8-10* |
@@ -1056,29 +1056,22 @@ Round 5: P1 Projectiles               ✅ 11/11 onImpact full behavior
 These rounds produce BUILD SUCCESSFUL after each step.
 
 ```
-Round A: Sound + Boss + Alchemy
+Round A: Sound + Boss + Alchemy (A.5 — EntityCultistPortal)
   A1. Create sounds.json + TCSounds (66 SoundEvents)           ✅ done
   A2. Fix entity sound methods (22 classes)                    ✅ done
   A3. TileCrucible full server logic                           ✅ done
   A4. EntityTaintacleGiant champion + boss bar + full behavior ✅ done
   A5. EntityCultistPortal → EntityThaumcraftBoss               ✅ done
 
-Round B: Event System
-  B1. WarpEvents (full port, 7 methods)                       ✅ done
-  B2. EventHandlerEntity (16 handlers, 12 real)               ✅ done
-  B3. EventHandlerRunic (runic shielding + static helpers)     ✅ done
-  B4. EventHandlerWorld (world/chunk/block events)             ✅ done
-  B5. ServerTickEventsFML (world tick + block swap + regen)    ✅ done
-
 Round B: Alchemy
-  B1. TileCrucible: full CFR port (fluid tank, attemptSmelt, aspect decomposition, spill, bellows)
+  B1. TileCrucible: full CFR port (fluid tank, attemptSmelt, aspect decomposition, spill, bellows) ✅ done
 
 Round C: Events
-  C1. WarpEvents: new class from CFR (checkWarpEvent, checkDeathGaze, spawnMist, etc.)
-  C2. EventHandlerEntity: fill 11 live handlers
-  C3. EventHandlerRunic: shield regen + absorption
-  C4. EventHandlerWorld: world save/load + block events
-  C5. ServerTickEventsFML: chunk generation + block swap queue
+  C1. WarpEvents: new class from CFR (checkWarpEvent, checkDeathGaze, spawnMist, etc.)   ✅ done
+  C2. EventHandlerEntity: fill 11 live handlers                                            ✅ done
+  C3. EventHandlerRunic: shield regen + absorption                                        ✅ done
+  C4. EventHandlerWorld: world save/load + block events                                    ✅ done
+  C5. ServerTickEventsFML: chunk generation + block swap queue                             ✅ done
 
 Round D: Remaining gaps
   D1. Mob special abilities (CultistPortal, Watcher, EldritchGuardian, CultistCleric)

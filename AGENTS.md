@@ -55,13 +55,13 @@ See `docs/PRD.md §4` for per-phase deliverables and `docs/PRD.md §5` for compl
 | 0 | Forge MDK, Gradle, build chain | ✅ Done |
 | 1 | API + CCL + TrueType | ✅ Done |
 | 2 | Registration, config, networking, events | ✅ Done |
-| 3 | Core systems (capabilities, wands, research, vis, potions, enchants) | ⚠️ **WarpEvents ✅, EventHandlerEntity ✅, EventHandlerRunic ✅, EventHandlerWorld ✅, ServerTickEventsFML ✅, 27+ HIGH issues** |
+| 3 | Core systems (capabilities, wands, research, vis, potions, enchants) | ⚠️ **Round C (Events) ✅ — WarpEvents, EventHandlerEntity, EventHandlerRunic, EventHandlerWorld, ServerTickEventsFML all ported. 27+ HIGH issues remain** |
 | 4 | Blocks (71) + Tile Entities (80) | ⚠️ **Stubs: 45/61 TE empty, 6 Tube files missing — TileCrucible? full server,? block metadata ✅** |
 | 5 | Items, Tools, Armor, Baubles, Relics (~110) | ⚠️ **Stubs: 10 foci, 5 relics, 4 baubles non-functional** |
 | 6 | Entities, Mobs, Golems (~128 + 44 AI) | ⚠️ **Stubs: all 11 projectiles have full CFR-ported behavior, Group B manual AI (5 entities), 5 bosses with AI registration ✅** |
 | 7 | World Gen (biomes, dimension, trees, structures) | ✅ Done |
 | 7r | World Gen Remediation (room gens, village, persistence) | ✅ Done |
-| 3r-6r | Remediation (see docs/REPAIR.md) | ❌ **~36 critical/high issues** — A.1-A.4 assets/sound/boss done 🠶 |
+| 3r-6r | Remediation (see docs/REPAIR.md) | ❌ **~36 critical/high issues — Rounds A-C assets/sound/boss/events done 🠶** |
 | 8 | Client GUI + Rendering (~140 classes) | ❌ |
 | 9 | Recipes + Research (~450 registrations) | ❌ |
 | 10 | Polish (JEI, Config, Sound) | ⚠️ **Sound: all 66 SoundEvents + 22 entity fixes + boss bar done** |
