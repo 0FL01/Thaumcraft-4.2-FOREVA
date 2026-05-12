@@ -21,4 +21,28 @@ public class EntityUtils {
             ((EntityLivingBase)entity).hurtResistantTime = time;
         }
     }
+
+    /**
+     * Mark an entity as a champion mob with increased attributes.
+     * Full champion modifier system is in Phase 6.5 (EntityChampionModifier).
+     * This is a minimal implementation for Eldritch dimension room gen.
+     */
+    public static void makeChampion(EntityLivingBase entity, boolean isBoss) {
+        if (entity == null) return;
+        // Scale max health
+        double healthMultiplier = isBoss ? 3.0 : 2.0;
+        entity.getEntityAttribute(net.minecraft.entity.SharedMonsterAttributes.MAX_HEALTH)
+                .setBaseValue(entity.getMaxHealth() * healthMultiplier);
+        entity.setHealth(entity.getMaxHealth());
+        // Scale attack damage
+        if (entity.getEntityAttribute(net.minecraft.entity.SharedMonsterAttributes.ATTACK_DAMAGE) != null) {
+            entity.getEntityAttribute(net.minecraft.entity.SharedMonsterAttributes.ATTACK_DAMAGE)
+                    .setBaseValue(entity.getEntityAttribute(net.minecraft.entity.SharedMonsterAttributes.ATTACK_DAMAGE).getBaseValue() * 1.5);
+        }
+        // Add fire resistance for boss champions
+        if (isBoss) {
+            entity.addPotionEffect(new net.minecraft.potion.PotionEffect(
+                    net.minecraft.init.MobEffects.FIRE_RESISTANCE, Integer.MAX_VALUE, 0));
+        }
+    }
 }

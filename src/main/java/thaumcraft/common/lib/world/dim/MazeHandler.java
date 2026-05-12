@@ -1,7 +1,13 @@
 package thaumcraft.common.lib.world.dim;
 
+import net.minecraft.nbt.CompressedStreamTools;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTTagList;
 import net.minecraft.world.World;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class MazeHandler {
@@ -35,39 +41,78 @@ public class MazeHandler {
     }
 
     private static void readNBT(NBTTagCompound nbt) {
-        clearHashMap();
-        int[] xArr = nbt.getIntArray("xArr");
-        int[] zArr = nbt.getIntArray("zArr");
-        byte[] dArr = nbt.getByteArray("dArr");
-        for (int i = 0; i < xArr.length && i < zArr.length && i < dArr.length; i++) {
-            putToHashMapRaw(new CellLoc(xArr[i], zArr[i]), (short)dArr[i]);
+        NBTTagList tagList = nbt.getTagList("cells", 10);
+        for (int a = 0; a < tagList.tagCount(); a++) {
+            NBTTagCompound cell = tagList.getCompoundTagAt(a);
+            int x = cell.getInteger("x");
+            int z = cell.getInteger("z");
+            short v = cell.getShort("cell");
+            putToHashMapRaw(new CellLoc(x, z), v);
         }
     }
 
     private static NBTTagCompound writeNBT() {
         NBTTagCompound nbt = new NBTTagCompound();
-        int[] xArr = new int[labyrinth.size()];
-        int[] zArr = new int[labyrinth.size()];
-        byte[] dArr = new byte[labyrinth.size()];
-        int i = 0;
-        for (java.util.Map.Entry<CellLoc, Short> entry : labyrinth.entrySet()) {
-            xArr[i] = entry.getKey().x;
-            zArr[i] = entry.getKey().z;
-            dArr[i] = entry.getValue().byteValue();
-            i++;
+        NBTTagList tagList = new NBTTagList();
+        for (CellLoc loc : labyrinth.keySet()) {
+            short v = getFromHashMapRaw(loc);
+            if (v <= 0) continue;
+            NBTTagCompound cell = new NBTTagCompound();
+            cell.setInteger("x", loc.x);
+            cell.setInteger("z", loc.z);
+            cell.setShort("cell", v);
+            tagList.appendTag(cell);
         }
-        nbt.setIntArray("xArr", xArr);
-        nbt.setIntArray("zArr", zArr);
-        nbt.setByteArray("dArr", dArr);
+        nbt.setTag("cells", tagList);
         return nbt;
     }
 
     public static void loadMaze(World world) {
-        // Maze persistence via WorldSavedData in Phase 7.4
+        clearHashMap();
+        File file1 = new File(world.getSaveHandler().getWorldDirectory(), "labyrinth.dat");
+        if (file1.exists()) {
+            try {
+                NBTTagCompound nbttagcompound = CompressedStreamTools.readCompressed(new FileInputStream(file1));
+                NBTTagCompound nbttagcompound1 = nbttagcompound.getCompoundTag("Data");
+                readNBT(nbttagcompound1);
+                return;
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        // Try backup
+        File file2 = new File(world.getSaveHandler().getWorldDirectory(), "labyrinth.dat_old");
+        if (file2.exists()) {
+            try {
+                NBTTagCompound nbttagcompound = CompressedStreamTools.readCompressed(new FileInputStream(file2));
+                NBTTagCompound nbttagcompound1 = nbttagcompound.getCompoundTag("Data");
+                readNBT(nbttagcompound1);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     public static void saveMaze(World world) {
-        // Maze persistence via WorldSavedData in Phase 7.4
+        NBTTagCompound nbttagcompound = writeNBT();
+        NBTTagCompound wrapper = new NBTTagCompound();
+        wrapper.setTag("Data", nbttagcompound);
+        try {
+            File dir = world.getSaveHandler().getWorldDirectory();
+            File fileNew = new File(dir, "labyrinth.dat_new");
+            File fileOld = new File(dir, "labyrinth.dat_old");
+            File fileCur = new File(dir, "labyrinth.dat");
+
+            CompressedStreamTools.writeCompressed(wrapper, new FileOutputStream(fileNew));
+
+            if (fileOld.exists()) fileOld.delete();
+            if (fileCur.exists()) fileCur.renameTo(fileOld);
+            if (fileCur.exists()) fileCur.delete();
+            fileNew.renameTo(fileCur);
+            if (fileNew.exists()) fileNew.delete();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public static boolean mazesInRange(int cx, int cz, int range, int min) {
@@ -84,7 +129,31 @@ public class MazeHandler {
         return false;
     }
 
-    public static void generateEldritch(World world, java.util.Random rand, int cx, int cz) {
-        // Stub: will generate maze rooms in Phase 7.4
+    public static void generateEldritch(World world, Random random, int cx, int cz) {
+        CellLoc loc = new CellLoc(cx, cz);
+        Cell cell = getFromHashMap(loc);
+        if (cell != null) {
+            switch (cell.feature) {
+                case 1:
+                    GenPortal.generatePortal(world, random, cx, cz, 50, cell);
+                    break;
+                case 2: case 3: case 4: case 5:
+                    GenBossRoom.generateRoom(world, random, cx, cz, 50, cell);
+                    break;
+                case 6:
+                    GenKeyRoom.generateRoom(world, random, cx, cz, 50, cell);
+                    break;
+                case 7:
+                    GenNestRoom.generateRoom(world, random, cx, cz, 50, cell);
+                    break;
+                case 8:
+                    GenLibraryRoom.generateRoom(world, random, cx, cz, 50, cell);
+                    break;
+                default:
+                    GenPassage.generateDefaultPassage(world, random, cx, cz, 50, cell);
+                    break;
+            }
+            GenCommon.processDecorations(world);
+        }
     }
 }

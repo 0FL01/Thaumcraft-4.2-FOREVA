@@ -26,6 +26,7 @@ public class ConfigBlocks {
     public static BlockEldritch blockEldritch;
     public static BlockEldritchNothing blockEldritchNothing;
     public static BlockEldritchPortal blockEldritchPortal;
+    public static BlockStairsEldritch blockStairsEldritch;
 
     // ItemBlock instances
     public static BlockMagicalLeavesItem blockMagicalLeavesItem;
@@ -115,6 +116,10 @@ public class ConfigBlocks {
                 .setRegistryName("thaumcraft", "eldritch_portal")
                 .setTranslationKey("thaumcraft.eldritch_portal");
 
+        blockStairsEldritch = (BlockStairsEldritch) new BlockStairsEldritch()
+                .setRegistryName("thaumcraft", "stairs_eldritch")
+                .setTranslationKey("thaumcraft.stairs_eldritch");
+
         // ItemBlock instances (cast needed because setRegistryName returns Item)
         blockMagicalLeavesItem = (BlockMagicalLeavesItem) new BlockMagicalLeavesItem(blockMagicalLeaves)
                 .setRegistryName("thaumcraft", "magical_leaves");
@@ -164,7 +169,8 @@ public class ConfigBlocks {
                 blockManaPod,
                 blockEldritch,
                 blockEldritchNothing,
-                blockEldritchPortal
+                blockEldritchPortal,
+                blockStairsEldritch
         };
     }
 
@@ -186,5 +192,7 @@ public class ConfigBlocks {
                 .setRegistryName("thaumcraft", "eldritch_nothing"));
         registry.register(new net.minecraft.item.ItemBlock(blockEldritchPortal)
                 .setRegistryName("thaumcraft", "eldritch_portal"));
+        registry.register(new net.minecraft.item.ItemBlock(blockStairsEldritch)
+                .setRegistryName("thaumcraft", "stairs_eldritch"));
     }
 }
