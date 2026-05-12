@@ -1,5 +1,8 @@
 package thaumcraft.common.entities.monster;
 
+import net.minecraft.pathfinding.PathNavigate;
+import net.minecraft.pathfinding.PathNavigateGround;
+import net.minecraft.pathfinding.PathNodeType;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.IRangedAttackMob;
 import net.minecraft.entity.SharedMonsterAttributes;
@@ -52,6 +55,17 @@ public class EntityPech extends net.minecraft.entity.monster.EntityMob implement
     public EntityPech(World world) {
         super(world);
         this.setSize(0.6F, 1.8F);
+
+        // PathNavigateGround-specific settings (1.12.2: setBreakDoors moved from base PathNavigate)
+        PathNavigate nav = this.getNavigator();
+        if (nav instanceof PathNavigateGround) {
+            PathNavigateGround ground = (PathNavigateGround) nav;
+            ground.setBreakDoors(true);
+            ground.setEnterDoors(true);
+            ground.setCanSwim(true);
+        }
+        this.setPathPriority(PathNodeType.WATER, 0.0F);
+
         this.tasks.addTask(0, new EntityAISwimming(this));
         this.tasks.addTask(1, new AIPechTradePlayer(this));
         this.tasks.addTask(3, new AIPechItemEntityGoto(this));
