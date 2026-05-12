@@ -473,6 +473,8 @@ generator all compile. Ores, trees, and structures generate via
 | **7r.5** | TileEldritchCrabSpawner / TileEldritchLock (setFacing + NBT) | ✅ |
 | **7r.6** | Village components (4 класса + профессии + регистрация) | ✅ ComponentWizardTower, ComponentBankerHome, VillageWizardManager, VillageBankerManager. Адаптация: EnumFacing coordBaseMode, IBlockState, generateDoor, MapGenStructureIO, VillagerProfession, ручной chest loot |
 | **7r.7** | Silverwood trees with aura nodes | ✅ Полная процедурная генерация (4-крест ствол, сферическая крона, корни, саженцы). createRandomNodeAt для узлов PURE-типа в стволе. createNodeAt и createRandomNodeAt в ThaumcraftWorldGenerator |
+| **7r.8** | Sapling growth (greatwood + silverwood) | ✅ updateTick/growGreatTree/growSilverTree в BlockCustomPlant. PropertyInteger TYPE для правильных blockstate. Саженцы растут: greatwood 1/25, silverwood 1/50 |
+
 
 #### Deferred (следующая итерация)
 
