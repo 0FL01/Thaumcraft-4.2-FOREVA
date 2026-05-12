@@ -152,6 +152,8 @@ fix plan with original source reference, fix approach, and effort estimate.
 | **Effort** | XL — 39 files each need CFR decompile then port. Bulk of work is identifying correct fields per packet type |
 | **Strategy** | Process in batches: sync packets first (aspects, research, warp), then FX packets |
 
+**Status**: ⚠️ PARTIAL (3 commits). Dispatch pattern in place (PacketBase.onMessage + PacketHandler.DISPATCH_HANDLER). STUB_HANDLER deleted. 7 playerdata packets have real `onMessage()` handlers. 32 remaining (14 FX + 8 misc + 10 playerdata stubs) still need fromBytes/toBytes + onMessage.
+
 ### 3r.14 — InternalMethodHandler stubs (MEDIUM)
 
 | # | Method | Fix | Effort |
@@ -807,7 +809,7 @@ This is the recommended sequence of git commits. Each produces BUILD SUCCESSFUL.
 ```
 1. Block metadata: 18 blocks + createBlockState/getStateFromMeta/getMetaFromState + getStateForPlacement  ✅
 2. Harvest levels: setHarvestLevel on all 19 block classes  ✅
-3. PacketHandler: port fromBytes/toBytes for all 39 packets (can be spread over multiple commits)  ⬜
+3. PacketHandler: dispatch pattern + 7 playerdata handlers  ⚠️ (32/39 still need work)
 ```
 
 ### Round 2: P1 Tile Entities
