@@ -1,6 +1,8 @@
 package thaumcraft.common.lib.network;
 
 import io.netty.buffer.ByteBuf;
+import java.util.function.Consumer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
@@ -31,5 +33,16 @@ public class PacketBase implements IMessage {
      */
     public IMessage onMessage(MessageContext ctx) {
         return null;
+    }
+
+    protected EntityPlayerMP getServerPlayer(MessageContext ctx) {
+        return ctx != null && ctx.getServerHandler() != null ? ctx.getServerHandler().player : null;
+    }
+
+    protected void scheduleServer(MessageContext ctx, Consumer<EntityPlayerMP> task) {
+        EntityPlayerMP player = this.getServerPlayer(ctx);
+        if (player != null && player.getServerWorld() != null && task != null) {
+            player.getServerWorld().addScheduledTask(() -> task.accept(player));
+        }
     }
 }
