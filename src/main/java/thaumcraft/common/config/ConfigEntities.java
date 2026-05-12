@@ -127,18 +127,18 @@ public class ConfigEntities {
         // Item grate
         ENTITIES.add(makeEntry(EntityItemGrate.class, "item_grate", 64, 20, true, false, 0, 0));
 
-        // Villager professions (textures use vanilla farmer as placeholder)
+        // Villager professions with original Thaumcraft skins
         PROFESSIONS.clear();
         PROF_WIZARD = new VillagerRegistry.VillagerProfession(
                 "thaumcraft:wizard",
-                "minecraft:textures/entity/villager/farmer.png",
+                "thaumcraft:textures/models/wizard.png",
                 "minecraft:textures/entity/zombie_villager/zombie_farmer.png"
         ).setRegistryName("thaumcraft:wizard");
         PROFESSIONS.add(PROF_WIZARD);
 
         PROF_BANKER = new VillagerRegistry.VillagerProfession(
                 "thaumcraft:banker",
-                "minecraft:textures/entity/villager/farmer.png",
+                "thaumcraft:textures/models/moneychanger.png",
                 "minecraft:textures/entity/zombie_villager/zombie_farmer.png"
         ).setRegistryName("thaumcraft:banker");
         PROFESSIONS.add(PROF_BANKER);
