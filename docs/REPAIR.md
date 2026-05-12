@@ -291,6 +291,8 @@ Each also needs `getStateForPlacement(World, BlockPos, EnumFacing, float, float,
 
 **This must happen before any block placing can work. P0 priority.**
 
+**Status: ✅ COMPLETED** (commit 0b893af)
+
 ### 4r.11 — Harvest levels for all blocks (CRITICAL)
 
 Add to every block constructor or `init()`:
@@ -315,6 +317,8 @@ Block groups and their tool requirements (from original):
 | `BlockEldritch` | pickaxe | 2 | L |
 
 **19 blocks, ~5 min each = ~1.5 hours. P0 priority.**
+
+**Status: ✅ COMPLETED** (11 block classes: CosmeticSolid/Opaque, CustomOre, Crystal, Eldritch, StoneDevice, MetalDevice, WoodenDevice, MagicalLog, Table, Taint. Remaining 8 are hand-mineable or unbreakable.)
 
 ### 4r.12 — Create 11 missing tile entity files (HIGH)
 
@@ -801,9 +805,9 @@ This is the recommended sequence of git commits. Each produces BUILD SUCCESSFUL.
 
 ### Round 1: P0 Foundation
 ```
-1. Block metadata: 18 blocks + createBlockState/getStateFromMeta/getMetaFromState + getStateForPlacement
-2. Harvest levels: setHarvestLevel on all 19 block classes
-3. PacketHandler: port fromBytes/toBytes for all 39 packets (can be spread over multiple commits)
+1. Block metadata: 18 blocks + createBlockState/getStateFromMeta/getMetaFromState + getStateForPlacement  ✅
+2. Harvest levels: setHarvestLevel on all 19 block classes  ✅
+3. PacketHandler: port fromBytes/toBytes for all 39 packets (can be spread over multiple commits)  ⬜
 ```
 
 ### Round 2: P1 Tile Entities
