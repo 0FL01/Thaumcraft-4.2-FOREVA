@@ -38,13 +38,12 @@ public class EntityTaintChicken extends net.minecraft.entity.monster.EntityMob i
         this.field_752_b += this.field_755_h * 2.0f;
     }
 
-    // TODO: add sound events
-    // @Override
-    // protected net.minecraft.util.SoundEvent getAmbientSound() { return null; }
     @Override
-    protected net.minecraft.util.SoundEvent getHurtSound(net.minecraft.util.DamageSource source) { return null; }
+    protected net.minecraft.util.SoundEvent getAmbientSound() { return net.minecraft.init.SoundEvents.ENTITY_CHICKEN_AMBIENT; }
     @Override
-    protected net.minecraft.util.SoundEvent getDeathSound() { return null; }
+    protected net.minecraft.util.SoundEvent getHurtSound(net.minecraft.util.DamageSource source) { return net.minecraft.init.SoundEvents.ENTITY_CHICKEN_HURT; }
+    @Override
+    protected net.minecraft.util.SoundEvent getDeathSound() { return net.minecraft.init.SoundEvents.ENTITY_CHICKEN_DEATH; }
     @Override
     protected float getSoundPitch() { return 0.7f; }
 

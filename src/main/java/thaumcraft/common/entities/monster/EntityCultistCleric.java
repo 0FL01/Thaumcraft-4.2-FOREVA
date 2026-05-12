@@ -10,6 +10,7 @@ import thaumcraft.common.entities.ai.combat.AIAttackOnCollide;
 import thaumcraft.common.entities.ai.combat.AICultistHurtByTarget;
 import thaumcraft.common.entities.ai.combat.AILongRangeAttack;
 import thaumcraft.common.entities.ai.misc.AIAltarFocus;
+import thaumcraft.common.lib.TCSounds;
 
 public class EntityCultistCleric extends EntityCultist implements net.minecraft.entity.IRangedAttackMob, net.minecraftforge.fml.common.registry.IEntityAdditionalSpawnData {
 
@@ -52,6 +53,8 @@ public class EntityCultistCleric extends EntityCultist implements net.minecraft.
 
     @Override
     public void setSwingingArms(boolean swinging) {}
+
+    @Override public net.minecraft.util.SoundEvent getAmbientSound() { return TCSounds.CHANT; }
 
     @Override
     public void readSpawnData(io.netty.buffer.ByteBuf buf) {}

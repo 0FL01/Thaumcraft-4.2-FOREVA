@@ -121,9 +121,9 @@ public class EntityPech extends net.minecraft.entity.monster.EntityMob implement
         nbt.setBoolean("trading", this.trading);
     }
 
-    @Override protected net.minecraft.util.SoundEvent getAmbientSound() { return null; }
-    @Override protected net.minecraft.util.SoundEvent getHurtSound(net.minecraft.util.DamageSource src) { return null; }
-    @Override protected net.minecraft.util.SoundEvent getDeathSound() { return null; }
+    @Override protected net.minecraft.util.SoundEvent getAmbientSound() { return thaumcraft.common.lib.TCSounds.PECH_IDLE; }
+    @Override protected net.minecraft.util.SoundEvent getHurtSound(net.minecraft.util.DamageSource src) { return thaumcraft.common.lib.TCSounds.PECH_HIT; }
+    @Override protected net.minecraft.util.SoundEvent getDeathSound() { return thaumcraft.common.lib.TCSounds.PECH_DEATH; }
 
     @Override protected void dropFewItems(boolean wasRecentlyHit, int looting) {
         super.dropFewItems(wasRecentlyHit, looting);

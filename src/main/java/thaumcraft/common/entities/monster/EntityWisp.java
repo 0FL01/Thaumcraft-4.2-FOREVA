@@ -283,13 +283,13 @@ public class EntityWisp extends EntityFlying implements IMob {
 
     // --- Sounds ---
     @Override protected net.minecraft.util.SoundEvent getAmbientSound() {
-        return net.minecraft.init.SoundEvents.ENTITY_BAT_AMBIENT;
+        return TCSounds.WISPLIVE;
     }
     @Override protected net.minecraft.util.SoundEvent getHurtSound(DamageSource ds) {
-        return net.minecraft.init.SoundEvents.ENTITY_BAT_HURT;
+        return net.minecraft.init.SoundEvents.BLOCK_FIRE_EXTINGUISH;
     }
     @Override protected net.minecraft.util.SoundEvent getDeathSound() {
-        return net.minecraft.init.SoundEvents.ENTITY_BAT_DEATH;
+        return TCSounds.WISPDEAD;
     }
     @Override protected float getSoundPitch() { return 0.25f; }
 }

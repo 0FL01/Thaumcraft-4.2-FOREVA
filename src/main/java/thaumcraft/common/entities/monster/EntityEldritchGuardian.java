@@ -44,6 +44,10 @@ public class EntityEldritchGuardian extends net.minecraft.entity.monster.EntityM
         // TODO: sonic screech attack
     }
 
+    @Override protected net.minecraft.util.SoundEvent getAmbientSound() { return thaumcraft.common.lib.TCSounds.EGIDLE; }
+    @Override protected net.minecraft.util.SoundEvent getDeathSound() { return thaumcraft.common.lib.TCSounds.EGDEATH; }
+    @Override protected float getSoundVolume() { return 1.5f; }
+
     @Override protected void dropFewItems(boolean wasRecentlyHit, int looting) {
         super.dropFewItems(wasRecentlyHit, looting);
     }

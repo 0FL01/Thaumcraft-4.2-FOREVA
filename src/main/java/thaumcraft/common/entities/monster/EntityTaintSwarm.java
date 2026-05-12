@@ -13,9 +13,10 @@ public class EntityTaintSwarm extends net.minecraft.entity.monster.EntityMob imp
         this.getEntityAttribute(net.minecraft.entity.SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(0.25);
     }
 
-    // TODO: sound events
-    // @Override
-    // protected net.minecraft.util.SoundEvent getLivingSound() { return null; }
+    @Override protected net.minecraft.util.SoundEvent getAmbientSound() { return null; }
+    @Override protected net.minecraft.util.SoundEvent getHurtSound(net.minecraft.util.DamageSource src) { return thaumcraft.common.lib.TCSounds.SWARMATTACK; }
+    @Override protected net.minecraft.util.SoundEvent getDeathSound() { return thaumcraft.common.lib.TCSounds.SWARMATTACK; }
+    @Override protected float getSoundVolume() { return 0.1f; }
 
     @Override
     protected void dropFewItems(boolean wasRecentlyHit, int looting) {

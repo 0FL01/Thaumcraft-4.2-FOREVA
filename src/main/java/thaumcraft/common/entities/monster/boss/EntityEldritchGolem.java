@@ -44,6 +44,9 @@ public class EntityEldritchGolem extends EntityThaumcraftBoss implements thaumcr
     @Override
     public void setSwingingArms(boolean swinging) {}
 
+    @Override protected net.minecraft.util.SoundEvent getHurtSound(net.minecraft.util.DamageSource src) { return net.minecraft.init.SoundEvents.ENTITY_IRONGOLEM_HURT; }
+    @Override protected net.minecraft.util.SoundEvent getDeathSound() { return net.minecraft.init.SoundEvents.ENTITY_IRONGOLEM_DEATH; }
+
     @Override
     public boolean attackEntityFrom(net.minecraft.util.DamageSource source, float amount) {
         // TODO: go headless at lethal damage

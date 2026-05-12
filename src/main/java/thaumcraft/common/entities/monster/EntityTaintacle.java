@@ -112,8 +112,8 @@ public class EntityTaintacle extends EntityMob implements ITaintedMob {
     public int getMaxSpawnedInChunk() { return 200; }
 
     // --- Sounds ---
-    @Override protected SoundEvent getAmbientSound() { return null; }
-    @Override protected SoundEvent getHurtSound(DamageSource ds) { return null; }
-    @Override protected SoundEvent getDeathSound() { return null; }
-    @Override protected float getSoundVolume() { return 1.3f - this.height / 10.0f; }
+    @Override protected SoundEvent getAmbientSound() { return TCSounds.ROOTS; }
+    @Override protected SoundEvent getHurtSound(DamageSource ds) { return TCSounds.TENTACLE; }
+    @Override protected SoundEvent getDeathSound() { return TCSounds.TENTACLE; }
+    @Override protected float getSoundVolume() { return this.height / 8.0f; }
 }

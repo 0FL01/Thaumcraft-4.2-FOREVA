@@ -50,6 +50,10 @@ public class EntityEldritchCrab extends net.minecraft.entity.monster.EntityMob {
     public void readEntityFromNBT(net.minecraft.nbt.NBTTagCompound nbt) { super.readEntityFromNBT(nbt); }
     @Override public void writeEntityToNBT(net.minecraft.nbt.NBTTagCompound nbt) { super.writeEntityToNBT(nbt); }
 
+    @Override protected net.minecraft.util.SoundEvent getAmbientSound() { return thaumcraft.common.lib.TCSounds.CRABTALK; }
+    @Override protected net.minecraft.util.SoundEvent getHurtSound(net.minecraft.util.DamageSource src) { return net.minecraft.init.SoundEvents.ENTITY_GUARDIAN_HURT; }
+    @Override protected net.minecraft.util.SoundEvent getDeathSound() { return thaumcraft.common.lib.TCSounds.CRABDEATH; }
+
     @Override protected void dropFewItems(boolean wasRecentlyHit, int looting) {
         super.dropFewItems(wasRecentlyHit, looting);
     }

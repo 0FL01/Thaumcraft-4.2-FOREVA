@@ -14,7 +14,7 @@ public class EntityTaintSpider extends net.minecraft.entity.monster.EntitySpider
         this.getEntityAttribute(net.minecraft.entity.SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(0.3);
     }
 
-    // TODO: sound events
+    @Override protected float getSoundPitch() { return 0.7f; }
 
     @Override
     protected void dropFewItems(boolean wasRecentlyHit, int looting) {

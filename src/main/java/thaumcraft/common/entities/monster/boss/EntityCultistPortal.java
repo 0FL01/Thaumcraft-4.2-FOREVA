@@ -9,6 +9,10 @@ public class EntityCultistPortal extends net.minecraft.entity.monster.EntityMob 
         this.getEntityAttribute(net.minecraft.entity.SharedMonsterAttributes.MAX_HEALTH).setBaseValue(200.0);
     }
 
+    @Override protected net.minecraft.util.SoundEvent getAmbientSound() { return thaumcraft.common.lib.TCSounds.MONOLITH; }
+    @Override protected net.minecraft.util.SoundEvent getHurtSound(net.minecraft.util.DamageSource src) { return thaumcraft.common.lib.TCSounds.ZAP; }
+    @Override protected net.minecraft.util.SoundEvent getDeathSound() { return thaumcraft.common.lib.TCSounds.SHOCK; }
+
     @Override
     public void onUpdate() {
         super.onUpdate();

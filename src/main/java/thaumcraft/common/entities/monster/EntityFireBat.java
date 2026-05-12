@@ -16,7 +16,6 @@ import net.minecraft.network.datasync.EntityDataManager;
 import net.minecraft.potion.PotionEffect;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.EnumParticleTypes;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundEvent;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
@@ -189,9 +188,7 @@ public class EntityFireBat extends EntityMob {
                 entity.setFire(this.getIsSummoned() ? 4 : 2);
             }
         }
-        SoundEvent hitSound = SoundEvent.REGISTRY.getObject(new ResourceLocation("entity.bat.hurt"));
-        if (hitSound == null) hitSound = SoundEvents.ENTITY_BAT_HURT;
-        this.playSound(hitSound, 0.5f, 0.9f + this.rand.nextFloat() * 0.2f);
+        this.playSound(SoundEvents.ENTITY_BAT_HURT, 0.5f, 0.9f + this.rand.nextFloat() * 0.2f);
     }
 
     // --- Per-tick living update ---
@@ -271,6 +268,12 @@ public class EntityFireBat extends EntityMob {
         nbt.setByte("BatFlags", this.dataManager.get(FLAGS));
         nbt.setByte("damBonus", (byte)this.damBonus);
     }
+
+    @Override protected SoundEvent getAmbientSound() { return SoundEvents.ENTITY_BAT_AMBIENT; }
+    @Override protected SoundEvent getHurtSound(DamageSource src) { return SoundEvents.ENTITY_BAT_HURT; }
+    @Override protected SoundEvent getDeathSound() { return SoundEvents.ENTITY_BAT_DEATH; }
+    @Override protected float getSoundVolume() { return 0.1f; }
+    @Override protected float getSoundPitch() { return (this.rand.nextFloat() - this.rand.nextFloat()) * 0.2f + 1.0f; }
 
     // --- Drops ---
     @Override

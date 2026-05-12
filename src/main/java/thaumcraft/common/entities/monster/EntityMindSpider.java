@@ -21,6 +21,8 @@ public class EntityMindSpider extends net.minecraft.entity.monster.EntitySpider 
         }
     }
 
+    @Override protected float getSoundPitch() { return 0.7f; }
+
     @Override public boolean isAIDisabled() { return this.harmlessTicks > 0; }
 
     @Override public boolean isEntityInvulnerable(net.minecraft.util.DamageSource src) { return this.harmlessTicks > 0; }

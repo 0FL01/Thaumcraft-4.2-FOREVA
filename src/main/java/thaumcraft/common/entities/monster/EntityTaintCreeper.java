@@ -96,8 +96,8 @@ public class EntityTaintCreeper extends net.minecraft.entity.monster.EntityMob i
         nbt.setBoolean("Powered", this.dataManager.get(POWERED));
     }
 
-    @Override protected net.minecraft.util.SoundEvent getHurtSound(net.minecraft.util.DamageSource source) { return null; }
-    @Override protected net.minecraft.util.SoundEvent getDeathSound() { return null; }
+    @Override protected net.minecraft.util.SoundEvent getHurtSound(net.minecraft.util.DamageSource source) { return net.minecraft.init.SoundEvents.ENTITY_CREEPER_HURT; }
+    @Override protected net.minecraft.util.SoundEvent getDeathSound() { return net.minecraft.init.SoundEvents.ENTITY_CREEPER_DEATH; }
     @Override protected float getSoundPitch() { return 0.7f; }
 
     @Override

@@ -39,6 +39,9 @@ public class EntityEldritchWarden extends EntityThaumcraftBoss implements net.mi
     @Override
     public void setSwingingArms(boolean swinging) {}
 
+    @Override protected net.minecraft.util.SoundEvent getAmbientSound() { return thaumcraft.common.lib.TCSounds.EGIDLE; }
+    @Override protected net.minecraft.util.SoundEvent getDeathSound() { return thaumcraft.common.lib.TCSounds.EGDEATH; }
+
     @Override
     public void onUpdate() {
         super.onUpdate();

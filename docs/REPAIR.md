@@ -10,7 +10,8 @@ fix plan with original source reference, fix approach, and effort estimate.
 **Current state:** AI classes 44/44 fully ported, hostile mob + boss
 task registration complete, Group B manual AI lifecycle migrated, all 11 projectiles
 have full `onImpact`/`onHit` behavior from decompiled original source.
-Sound assets (`sounds.json` + 111 OGG) copied to `src/main/resources/`.
+Sound system complete: `sounds.json` + 111 OGG in assets, `TCSounds` with 66 registered
+SoundEvents, 22 entity classes with correct sound methods.
 
 **Next milestone:** Complete all work that does NOT require Phase 8-10 (client GUI,
 rendering, recipes, research data). This is documented in the
@@ -683,17 +684,34 @@ Empty `registerSounds()` stub removed from `Thaumcraft.java`.
 | **Original source** | `thaumcraft_src/assets/thaumcraft/sounds.json` (sound definitions) + `thaumcraft_src/thaumcraft/common/Thaumcraft.class` (registration) |
 | **Effort** | M — ~30 SoundEvent registrations + JSON file |
 
-#### 6r.7.2 — Fix entity sound methods to return real SoundEvent
+#### 6r.7.2 — Fix entity sound methods to return real SoundEvent ✅ DONE
+
+All 22 entity classes with null/wrong/missing sound methods updated to return correct `SoundEvent`:
 
 | # | Entity | Sounds from original | Effort | Status |
-|---|--------|---------------------|--------|--------|
-| 1 | `EntityTaintacle` | ambient:`thaumcraft:roots`, hurt:`thaumcraft:tentacle`, death:`thaumcraft:tentacle` | L | ⏳ |
-| 2 | `EntityTaintSpore` | ambient:`thaumcraft:swarm`, hurt:`thaumcraft:gore`, death:`thaumcraft:gore` | L | ⏳ |
-| 3 | `EntityTaintCreeper` | (vanilla creeper sounds or custom) | L | ⏳ |
-| 4 | `EntityPech` | (custom pech sounds) | L | ⏳ |
-| 5 | `EntityWatcher` | (eldritch sounds) | L | ⏳ |
-| 6 | `EntityCultist` | (cultist sounds) | L | ⏳ |
-| 7-11 | 5 taint animals | living/hurt/death per original | L | ⏳ |
+|--:|--------|---------------------|:------:|:-----:|
+| 1 | `EntityTaintacle` | `TCSounds.ROOTS` / `TENTACLE` / `TENTACLE` | L | ✅ |
+| 2 | `EntityTaintSpore` | `TCSounds.SWARM` / `GORE` / `GORE` | L | ✅ |
+| 3 | `EntityTaintCreeper` | `SoundEvents.ENTITY_CREEPER_HURT/DEATH` | L | ✅ |
+| 4 | `EntityPech` | `TCSounds.PECH_IDLE` / `PECH_HIT` / `PECH_DEATH` | L | ✅ |
+| 5 | `EntityWatcher` | `SoundEvents.ENTITY_GUARDIAN_*_LAND` | L | ✅ |
+| 6 | `EntityCultist` | null (base class, intentional silence) | L | ✅ |
+| 7 | `EntityCultistCleric` | `TCSounds.CHANT` (ambient only) | L | ✅ |
+| 8 | `EntityTaintChicken` | `SoundEvents.ENTITY_CHICKEN_AMBIENT/HURT/DEATH` | L | ✅ |
+| 9 | `EntityTaintPig` | `SoundEvents.ENTITY_PIG_AMBIENT/HURT/DEATH` | L | ✅ |
+| 10 | `EntityTaintCow` | `SoundEvents.ENTITY_COW_AMBIENT/HURT/DEATH` | L | ✅ |
+| 11 | `EntityTaintSheep` | `SoundEvents.ENTITY_SHEEP_AMBIENT/HURT/DEATH` | L | ✅ |
+| 12 | `EntityTaintSwarm` | `TCSounds.SWARMATTACK` (hurt/death), `null` (ambient) | L | ✅ |
+| 13 | `EntityTaintVillager` | `SoundEvents.ENTITY_VILLAGER_AMBIENT/HURT/DEATH` | L | ✅ |
+| 14 | `EntityWisp` | `TCSounds.WISPLIVE` / `BLOCK_FIRE_EXTINGUISH` / `WISPDEAD` | L | ✅ |
+| 15 | `EntityFireBat` | `SoundEvents.ENTITY_BAT_AMBIENT/HURT/DEATH` + vol 0.1f | L | ✅ |
+| 16 | `EntityEldritchCrab` | `TCSounds.CRABTALK` / `ENTITY_GUARDIAN_HURT` / `CRABDEATH` | L | ✅ |
+| 17 | `EntityEldritchGuardian` | `TCSounds.EGIDLE` / none / `EGDEATH` + vol 1.5f | L | ✅ |
+| 18 | `EntityEldritchWarden` | `TCSounds.EGIDLE` / none / `EGDEATH` | L | ✅ |
+| 19 | `EntityEldritchGolem` | `SoundEvents.ENTITY_IRONGOLEM_HURT/DEATH` | L | ✅ |
+| 20 | `EntityCultistPortal` | `TCSounds.MONOLITH` / `ZAP` / `SHOCK` | L | ✅ |
+| 21 | `EntityTaintSpider` | `getSoundPitch` = 0.7f only (inherits spider sounds) | L | ✅ |
+| 22 | `EntityMindSpider` | `getSoundPitch` = 0.7f only (inherits spider sounds) | L | ✅ |
 
 ### 6r.8 — EntityTaintacleGiant champion + boss bar (MEDIUM)
 
@@ -769,10 +787,10 @@ and no research tree definitions.
 Files: `sounds.json` (66 entries) + 111 OGG copied, `TCSounds` class with 66 static SoundEvent fields + `registerSounds` handler. Empty stub removed from `Thaumcraft.java`.
 Effort: M (~1h). Dependencies: none.
 
-#### A.2 — Entity sound methods (6r.7.2): fix 12 entity classes
+#### A.2 — Entity sound methods (6r.7.2): fix 22 entity classes ✅ DONE
 
-Fix `getAmbientSound()`/`getHurtSound()`/`getDeathSound()` to return real SoundEvent
-instead of `null`. Requires A.1 to be done first.
+All 22 entity classes with null/wrong/missing sound methods updated to return correct `SoundEvent`.
+Requires A.1 to be done first.
 Effort: M (~30m). Dependencies: A.1.
 
 #### A.3 — TileCrucible (4r.2): alchemy mechanic — standalone, no recipe system needed
@@ -931,7 +949,7 @@ P0: PacketHandler (3r.13)         ⚠️  →  Dispatch works, 11 non-FX packets
 | 4 | Projectile onImpact (6r.4) | 6r | M | ✅ *11/11 full behavior* |
 | 5 | Group B manual AI lifecycle | 6r | M | ✅ *5 entities* |
 | 6 | **Sound registration (A.1)** | 6r | M | ✅ *all 66 SoundEvents registered* |
-| 7 | **Entity sound methods (A.2)** | 6r | M | ⏳ *pre-8-10* |
+| 7 | **Entity sound methods (A.2)** | 6r | M | ✅ *22 entity classes fixed* |
 | 8 | **TileCrucible (A.3)** | 4r | XL | ⏳ *pre-8-10* |
 | 9 | **EntityTaintacleGiant boss (A.4)** | 6r | M | ⏳ *pre-8-10* |
 | 10 | **WarpEvents (B.1)** | 3r | M | ⏳ *pre-8-10* |
@@ -1041,7 +1059,7 @@ These rounds produce BUILD SUCCESSFUL after each step.
 ```
 Round A: Sound + Boss
   A1. Create sounds.json + TCSounds (66 SoundEvents)           ✅ done
-  A2. Fix entity sound methods (26 classes: return real SoundEvent)
+  A2. Fix entity sound methods (22 classes)                    ✅ done
   A3. EntityTaintacleGiant champion + boss bar + full behavior
 
 Round B: Alchemy

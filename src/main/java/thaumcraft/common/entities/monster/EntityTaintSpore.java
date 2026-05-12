@@ -180,9 +180,9 @@ public class EntityTaintSpore extends EntityMob implements ITaintedMob, IEntityA
     }
 
     // --- Sounds ---
-    @Override protected SoundEvent getAmbientSound() { return null; }
-    @Override protected SoundEvent getHurtSound(DamageSource ds) { return null; }
-    @Override protected SoundEvent getDeathSound() { return null; }
+    @Override protected SoundEvent getAmbientSound() { return TCSounds.SWARM; }
+    @Override protected SoundEvent getHurtSound(DamageSource ds) { return TCSounds.GORE; }
+    @Override protected SoundEvent getDeathSound() { return TCSounds.GORE; }
     @Override protected float getSoundVolume() { return 0.1f; }
     @Override protected int getExperiencePoints(EntityPlayer player) { return 200; }
 

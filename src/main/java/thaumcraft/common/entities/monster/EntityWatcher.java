@@ -16,9 +16,9 @@ public class EntityWatcher extends net.minecraft.entity.monster.EntityMob {
         // TODO: gaze attack
     }
 
-    @Override protected net.minecraft.util.SoundEvent getAmbientSound() { return null; }
-    @Override protected net.minecraft.util.SoundEvent getHurtSound(net.minecraft.util.DamageSource src) { return null; }
-    @Override protected net.minecraft.util.SoundEvent getDeathSound() { return null; }
+    @Override protected net.minecraft.util.SoundEvent getAmbientSound() { return net.minecraft.init.SoundEvents.ENTITY_GUARDIAN_AMBIENT_LAND; }
+    @Override protected net.minecraft.util.SoundEvent getHurtSound(net.minecraft.util.DamageSource src) { return net.minecraft.init.SoundEvents.ENTITY_GUARDIAN_HURT_LAND; }
+    @Override protected net.minecraft.util.SoundEvent getDeathSound() { return net.minecraft.init.SoundEvents.ENTITY_GUARDIAN_DEATH_LAND; }
 
     @Override protected void dropFewItems(boolean wasRecentlyHit, int looting) {
         super.dropFewItems(wasRecentlyHit, looting);

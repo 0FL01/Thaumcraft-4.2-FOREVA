@@ -13,9 +13,11 @@ public class EntityTaintCow extends net.minecraft.entity.monster.EntityMob imple
         this.getEntityAttribute(net.minecraft.entity.SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(0.25);
     }
 
-    // TODO: sound events
-    // @Override
-    // protected net.minecraft.util.SoundEvent getLivingSound() { return null; }
+    @Override protected net.minecraft.util.SoundEvent getAmbientSound() { return net.minecraft.init.SoundEvents.ENTITY_COW_AMBIENT; }
+    @Override protected net.minecraft.util.SoundEvent getHurtSound(net.minecraft.util.DamageSource src) { return net.minecraft.init.SoundEvents.ENTITY_COW_HURT; }
+    @Override protected net.minecraft.util.SoundEvent getDeathSound() { return net.minecraft.init.SoundEvents.ENTITY_COW_DEATH; }
+    @Override protected float getSoundVolume() { return 0.4f; }
+    @Override protected float getSoundPitch() { return 0.7f; }
 
     @Override
     protected void dropFewItems(boolean wasRecentlyHit, int looting) {
