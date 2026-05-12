@@ -119,6 +119,10 @@ public class Thaumcraft {
         worldGen = new ThaumcraftWorldGenerator();
         GameRegistry.registerWorldGenerator(worldGen, 0);
 
+        // Init biomes (creates biome instances, must happen before registry event)
+        ThaumcraftWorldGenerator.initBiomes();
+        ThaumcraftWorldGenerator.registerBiomeManager();
+
         // Init config sub-modules
         ConfigBlocks.init();
         ConfigItems.init();
@@ -253,7 +257,12 @@ public class Thaumcraft {
     @SubscribeEvent
     public void registerBiomes(RegistryEvent.Register<Biome> event) {
         log.info("Registering biomes");
-        // Phase 6: register actual biomes
+        event.getRegistry().registerAll(
+                ThaumcraftWorldGenerator.biomeMagicalForest,
+                ThaumcraftWorldGenerator.biomeTaint,
+                ThaumcraftWorldGenerator.biomeEerie,
+                ThaumcraftWorldGenerator.biomeEldritchLands
+        );
     }
 
     @SubscribeEvent

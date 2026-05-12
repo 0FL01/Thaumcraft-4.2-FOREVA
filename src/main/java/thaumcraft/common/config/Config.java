@@ -10,6 +10,7 @@ import net.minecraftforge.common.config.Property;
 import thaumcraft.api.aspects.Aspect;
 import thaumcraft.api.potions.PotionFluxTaint;
 import thaumcraft.api.potions.PotionVisExhaust;
+import thaumcraft.common.lib.world.ThaumcraftWorldGenerator;
 import thaumcraft.common.lib.enchantment.EnchantmentFrugal;
 import thaumcraft.common.lib.enchantment.EnchantmentHaste;
 import thaumcraft.common.lib.enchantment.EnchantmentPotency;
@@ -305,7 +306,92 @@ public class Config {
     }
 
     public static void registerBiomes() {
-        // Phase 6: register biome dictionary types
+        // Register BiomeDictionary types for Thaumcraft biomes
+        if (ThaumcraftWorldGenerator.biomeMagicalForest != null) {
+            net.minecraftforge.common.BiomeDictionary.addTypes(ThaumcraftWorldGenerator.biomeMagicalForest,
+                    net.minecraftforge.common.BiomeDictionary.Type.MAGICAL,
+                    net.minecraftforge.common.BiomeDictionary.Type.FOREST);
+        }
+        if (ThaumcraftWorldGenerator.biomeTaint != null) {
+            net.minecraftforge.common.BiomeDictionary.addTypes(ThaumcraftWorldGenerator.biomeTaint,
+                    net.minecraftforge.common.BiomeDictionary.Type.MAGICAL,
+                    net.minecraftforge.common.BiomeDictionary.Type.WASTELAND);
+        }
+        if (ThaumcraftWorldGenerator.biomeEerie != null) {
+            net.minecraftforge.common.BiomeDictionary.addTypes(ThaumcraftWorldGenerator.biomeEerie,
+                    net.minecraftforge.common.BiomeDictionary.Type.MAGICAL,
+                    net.minecraftforge.common.BiomeDictionary.Type.SPOOKY);
+        }
+        if (ThaumcraftWorldGenerator.biomeEldritchLands != null) {
+            net.minecraftforge.common.BiomeDictionary.addTypes(ThaumcraftWorldGenerator.biomeEldritchLands,
+                    net.minecraftforge.common.BiomeDictionary.Type.MAGICAL,
+                    net.minecraftforge.common.BiomeDictionary.Type.SPOOKY,
+                    net.minecraftforge.common.BiomeDictionary.Type.END);
+        }
+
+        // Register biome info for aura/aspect/greatwood support
+        thaumcraft.common.lib.world.biomes.BiomeHandler.registerBiomeInfo(
+                net.minecraftforge.common.BiomeDictionary.Type.WATER, 100, Aspect.WATER, false, 0.0f);
+        thaumcraft.common.lib.world.biomes.BiomeHandler.registerBiomeInfo(
+                net.minecraftforge.common.BiomeDictionary.Type.OCEAN, 120, Aspect.WATER, false, 0.0f);
+        thaumcraft.common.lib.world.biomes.BiomeHandler.registerBiomeInfo(
+                net.minecraftforge.common.BiomeDictionary.Type.RIVER, 100, Aspect.WATER, false, 0.0f);
+        thaumcraft.common.lib.world.biomes.BiomeHandler.registerBiomeInfo(
+                net.minecraftforge.common.BiomeDictionary.Type.WET, 80, Aspect.WATER, false, 0.0f);
+        thaumcraft.common.lib.world.biomes.BiomeHandler.registerBiomeInfo(
+                net.minecraftforge.common.BiomeDictionary.Type.HOT, 100, Aspect.FIRE, false, 0.0f);
+        thaumcraft.common.lib.world.biomes.BiomeHandler.registerBiomeInfo(
+                net.minecraftforge.common.BiomeDictionary.Type.SANDY, 100, Aspect.FIRE, false, 0.0f);
+        thaumcraft.common.lib.world.biomes.BiomeHandler.registerBiomeInfo(
+                net.minecraftforge.common.BiomeDictionary.Type.NETHER, 120, Aspect.FIRE, false, 0.0f);
+        thaumcraft.common.lib.world.biomes.BiomeHandler.registerBiomeInfo(
+                net.minecraftforge.common.BiomeDictionary.Type.MESA, 80, Aspect.FIRE, false, 0.0f);
+        thaumcraft.common.lib.world.biomes.BiomeHandler.registerBiomeInfo(
+                net.minecraftforge.common.BiomeDictionary.Type.DENSE, 100, Aspect.ORDER, false, 0.0f);
+        thaumcraft.common.lib.world.biomes.BiomeHandler.registerBiomeInfo(
+                net.minecraftforge.common.BiomeDictionary.Type.SNOWY, 80, Aspect.ORDER, false, 0.0f);
+        thaumcraft.common.lib.world.biomes.BiomeHandler.registerBiomeInfo(
+                net.minecraftforge.common.BiomeDictionary.Type.COLD, 80, Aspect.ORDER, false, 0.0f);
+        thaumcraft.common.lib.world.biomes.BiomeHandler.registerBiomeInfo(
+                net.minecraftforge.common.BiomeDictionary.Type.SNOWY, 100, Aspect.ORDER, false, 0.0f);
+        thaumcraft.common.lib.world.biomes.BiomeHandler.registerBiomeInfo(
+                net.minecraftforge.common.BiomeDictionary.Type.MUSHROOM, 140, Aspect.ORDER, false, 0.0f);
+        thaumcraft.common.lib.world.biomes.BiomeHandler.registerBiomeInfo(
+                net.minecraftforge.common.BiomeDictionary.Type.CONIFEROUS, 100, Aspect.EARTH, true, 0.2f);
+        thaumcraft.common.lib.world.biomes.BiomeHandler.registerBiomeInfo(
+                net.minecraftforge.common.BiomeDictionary.Type.FOREST, 120, Aspect.EARTH, true, 1.0f);
+        thaumcraft.common.lib.world.biomes.BiomeHandler.registerBiomeInfo(
+                net.minecraftforge.common.BiomeDictionary.Type.SANDY, 80, Aspect.EARTH, false, 0.0f);
+        thaumcraft.common.lib.world.biomes.BiomeHandler.registerBiomeInfo(
+                net.minecraftforge.common.BiomeDictionary.Type.BEACH, 80, Aspect.EARTH, false, 0.0f);
+        thaumcraft.common.lib.world.biomes.BiomeHandler.registerBiomeInfo(
+                net.minecraftforge.common.BiomeDictionary.Type.SAVANNA, 80, Aspect.AIR, true, 0.2f);
+        thaumcraft.common.lib.world.biomes.BiomeHandler.registerBiomeInfo(
+                net.minecraftforge.common.BiomeDictionary.Type.MOUNTAIN, 100, Aspect.AIR, false, 0.0f);
+        thaumcraft.common.lib.world.biomes.BiomeHandler.registerBiomeInfo(
+                net.minecraftforge.common.BiomeDictionary.Type.HILLS, 120, Aspect.AIR, false, 0.0f);
+        thaumcraft.common.lib.world.biomes.BiomeHandler.registerBiomeInfo(
+                net.minecraftforge.common.BiomeDictionary.Type.PLAINS, 80, Aspect.AIR, true, 0.2f);
+        thaumcraft.common.lib.world.biomes.BiomeHandler.registerBiomeInfo(
+                net.minecraftforge.common.BiomeDictionary.Type.DRY, 80, Aspect.ENTROPY, false, 0.0f);
+        thaumcraft.common.lib.world.biomes.BiomeHandler.registerBiomeInfo(
+                net.minecraftforge.common.BiomeDictionary.Type.SPARSE, 80, Aspect.ENTROPY, false, 0.0f);
+        thaumcraft.common.lib.world.biomes.BiomeHandler.registerBiomeInfo(
+                net.minecraftforge.common.BiomeDictionary.Type.SWAMP, 120, Aspect.ENTROPY, true, 0.2f);
+        thaumcraft.common.lib.world.biomes.BiomeHandler.registerBiomeInfo(
+                net.minecraftforge.common.BiomeDictionary.Type.WASTELAND, 80, Aspect.ENTROPY, false, 0.0f);
+        thaumcraft.common.lib.world.biomes.BiomeHandler.registerBiomeInfo(
+                net.minecraftforge.common.BiomeDictionary.Type.JUNGLE, 100, Aspect.PLANT, false, 0.0f);
+        thaumcraft.common.lib.world.biomes.BiomeHandler.registerBiomeInfo(
+                net.minecraftforge.common.BiomeDictionary.Type.LUSH, 100, Aspect.PLANT, true, 0.5f);
+        thaumcraft.common.lib.world.biomes.BiomeHandler.registerBiomeInfo(
+                net.minecraftforge.common.BiomeDictionary.Type.MAGICAL, 100, null, true, 1.0f);
+        thaumcraft.common.lib.world.biomes.BiomeHandler.registerBiomeInfo(
+                net.minecraftforge.common.BiomeDictionary.Type.END, 80, Aspect.VOID, false, 0.0f);
+        thaumcraft.common.lib.world.biomes.BiomeHandler.registerBiomeInfo(
+                net.minecraftforge.common.BiomeDictionary.Type.SPOOKY, 80, Aspect.SOUL, false, 0.0f);
+        thaumcraft.common.lib.world.biomes.BiomeHandler.registerBiomeInfo(
+                net.minecraftforge.common.BiomeDictionary.Type.DEAD, 50, Aspect.DEATH, false, 0.0f);
     }
 
     public static void initMisc() {
