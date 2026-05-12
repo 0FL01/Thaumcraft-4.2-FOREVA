@@ -125,6 +125,10 @@ public class EntityPech extends net.minecraft.entity.monster.EntityMob implement
                 this.loot[i] = new ItemStack(list.getCompoundTagAt(i));
             }
         }
+
+        if (!this.world.isRemote) {
+            this.setCombatTask();
+        }
     }
 
     @Override
@@ -165,6 +169,7 @@ public class EntityPech extends net.minecraft.entity.monster.EntityMob implement
     public void setCombatTask() {
         this.tasks.removeTask(this.aiMeleeAttack);
         this.tasks.removeTask(this.aiRangedAttack);
+        this.tasks.removeTask(this.aiAvoidPlayer);
         ItemStack held = this.getHeldItemMainhand();
         if (!held.isEmpty() && held.getItem() instanceof net.minecraft.item.ItemBow) {
             this.tasks.addTask(2, this.aiRangedAttack);
@@ -185,7 +190,7 @@ public class EntityPech extends net.minecraft.entity.monster.EntityMob implement
     @Override
     public void onUpdate() {
         // Anger countdown (server)
-        if (this.getAnger() > 0) {
+        if (!this.world.isRemote && this.getAnger() > 0) {
             this.setAnger(this.getAnger() - 1);
         }
         super.onUpdate();

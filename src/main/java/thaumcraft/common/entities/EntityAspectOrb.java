@@ -114,7 +114,7 @@ public class EntityAspectOrb extends Entity implements IEntityAdditionalSpawnDat
 
         // Find closest player with room for this aspect in their wand
         double range = 8.0D;
-        if (this.ticksExisted % 5 == 0 && this.closestPlayer == null) {
+        if (this.getAspect() != null && this.ticksExisted % 5 == 0 && this.closestPlayer == null) {
             double closestDist = Double.MAX_VALUE;
             for (EntityPlayer player : this.world.playerEntities) {
                 if (player.getDistanceSq(this) >= range * range) continue;
@@ -191,8 +191,9 @@ public class EntityAspectOrb extends Entity implements IEntityAdditionalSpawnDat
     @Override
     public void onCollideWithPlayer(EntityPlayer player) {
         if (!this.world.isRemote) {
+            if (this.getAspect() == null || !this.getAspect().isPrimal()) return;
             int slot = InventoryUtils.isWandInHotbarWithRoom(this.getAspect(), this.aspectValue, player);
-            if (this.orbCooldown == 0 && this.getAspect().isPrimal() && slot >= 0) {
+            if (this.orbCooldown == 0 && slot >= 0) {
                 ItemWandCasting wand = (ItemWandCasting) player.inventory.mainInventory.get(slot).getItem();
                 wand.addVis(player.inventory.mainInventory.get(slot), this.getAspect(), this.aspectValue);
                 this.orbCooldown = 2;
@@ -230,12 +231,10 @@ public class EntityAspectOrb extends Entity implements IEntityAdditionalSpawnDat
 
     @Override
     public void writeSpawnData(ByteBuf buf) {
-        if (this.getAspect() != null) {
-            String tag = this.getAspect().getTag();
-            buf.writeShort(tag.length());
-            for (char c : tag.toCharArray()) {
-                buf.writeChar(c);
-            }
+        String tag = this.getAspect() != null ? this.getAspect().getTag() : "";
+        buf.writeShort(tag.length());
+        for (char c : tag.toCharArray()) {
+            buf.writeChar(c);
         }
     }
 
@@ -243,6 +242,10 @@ public class EntityAspectOrb extends Entity implements IEntityAdditionalSpawnDat
     public void readSpawnData(ByteBuf buf) {
         try {
             int len = buf.readShort();
+            if (len <= 0) {
+                this.setAspect(null);
+                return;
+            }
             StringBuilder sb = new StringBuilder();
             for (int i = 0; i < len; i++) {
                 sb.append(buf.readChar());

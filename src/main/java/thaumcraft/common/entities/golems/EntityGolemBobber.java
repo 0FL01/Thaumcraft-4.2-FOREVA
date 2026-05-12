@@ -90,7 +90,7 @@ public class EntityGolemBobber extends Entity implements IEntityAdditionalSpawnD
 
         // Server: check fisher validity
         if (!this.world.isRemote) {
-            if (this.fisher == null || !this.fisher.isEntityAlive()) {
+            if (this.fisher == null || !this.fisher.isEntityAlive() || this.fisher.world != this.world) {
                 this.setDead();
                 return;
             }
@@ -266,7 +266,10 @@ public class EntityGolemBobber extends Entity implements IEntityAdditionalSpawnD
         this.motionZ = buf.readDouble();
         int fid = buf.readInt();
         if (fid >= 0) {
-            this.fisher = (EntityGolemBase) this.world.getEntityByID(fid);
+            Entity entity = this.world.getEntityByID(fid);
+            if (entity instanceof EntityGolemBase && entity.world == this.world) {
+                this.fisher = (EntityGolemBase) entity;
+            }
         }
     }
 }
