@@ -10,8 +10,9 @@ fix plan with original source reference, fix approach, and effort estimate.
 **Current state:** AI classes 44/44 fully ported, hostile mob + boss
 task registration complete, Group B manual AI lifecycle migrated, all 11 projectiles
 have full `onImpact`/`onHit` behavior from decompiled original source.
-Sound system complete: `sounds.json` + 111 OGG in assets, `TCSounds` with 66 registered
-SoundEvents, 22 entity classes with correct sound methods.
+Sound system complete: 66 registered SoundEvents, 22 entity sound classes fixed.
+Boss system: `EntityTaintacleGiant` with `BossInfoServer` + enrage,
+`EntityCultistPortal` migrated to `EntityThaumcraftBoss`.
 
 **Next milestone:** Complete all work that does NOT require Phase 8-10 (client GUI,
 rendering, recipes, research data). This is documented in the
@@ -713,16 +714,15 @@ All 22 entity classes with null/wrong/missing sound methods updated to return co
 | 21 | `EntityTaintSpider` | `getSoundPitch` = 0.7f only (inherits spider sounds) | L | ✅ |
 | 22 | `EntityMindSpider` | `getSoundPitch` = 0.7f only (inherits spider sounds) | L | ✅ |
 
-### 6r.8 — EntityTaintacleGiant champion + boss bar (MEDIUM)
+### 6r.8 — EntityTaintacleGiant champion + boss bar (MEDIUM) ✅ DONE
 
 | Field | Value |
 |-------|-------|
 | **Files to modify** | `thaumcraft/common/entities/monster/boss/EntityTaintacleGiant.java` |
-| **Current state** | 15 lines — extends `EntityTaintacle`, changes only size + attributes. No champion, no boss bar, no abilities |
-| **Missing** | Implement `EntityThaumcraftBoss` interface for boss bar. Add champion modifiers (see `EntityUtils.makeChampion()`). Add `onUpdate()` anger mechanic + potion effects + heal + particle. Override `dropFewItems` with special loot check. Override `getCanSpawnHere()` |
-| **Original source** | `thaumcraft_src/thaumcraft/common/entities/monster/boss/EntityTaintacleGiant.class` (150+ lines) |
-| **Effort** | M — ~80 lines from CFR + boss bar wiring |
-| **Dependencies** | `EntityThaumcraftBoss` base class exists with BossInfoServer |
+| **Original source** | `thaumcraft_src/.../boss/EntityTaintacleGiant.class` |
+| **Missing** | Boss bar via `BossInfoServer` (composition), champion modifiers, anger mechanic, potion effects on damage, particles, special loot drop |
+| **Effort** | M — ~80 lines from CFR |
+| **Dependencies** | `EntityThaumcraftBoss` (✅), `EntityUtils.makeChampion()` (✅) |
 
 ### 6r.9 — Container GUIs canInteractWith (HIGH)
 
@@ -805,15 +805,10 @@ Effort: M (~30m). Dependencies: A.1.
 | **Dependencies** | `BlockStoneDevice` createBlockState (4r.10 ✅), `TileJarFillable` (✅), `ConfigBlocks.blockCrucible` (✅) |
 | **Impact** | Enables the entire alchemy pipeline. Without this, essentia gameplay is broken |
 
-#### A.4 — EntityTaintacleGiant champion + boss bar (6r.8)
+#### A.4 — EntityTaintacleGiant champion + boss bar (6r.8) ✅ DONE
 
-| Field | Value |
-|-------|-------|
-| **Files to modify** | `EntityTaintacleGiant.java` |
-| **Original source** | `thaumcraft_src/.../boss/EntityTaintacleGiant.class` |
-| **Missing** | Boss bar via `EntityThaumcraftBoss`, champion modifiers, anger mechanic, potion effects on damage, particles, special loot drop |
-| **Effort** | M — ~80 lines from CFR |
-| **Dependencies** | `EntityThaumcraftBoss` (✅), `EntityUtils.makeChampion()` (✅) |
+Boss bar via `BossInfoServer` composition, champion via `makeChampion(true)`, enrage/anger/damage-cap, `isEntityInvulnerable`, `decreaseAirSupply`, particles, special drops with proximity check.
+`EntityCultistPortal` migrated to `extends EntityThaumcraftBoss`.
 
 ### Tier B — Event system (standalone, medium effort)
 
@@ -951,7 +946,7 @@ P0: PacketHandler (3r.13)         ⚠️  →  Dispatch works, 11 non-FX packets
 | 6 | **Sound registration (A.1)** | 6r | M | ✅ *all 66 SoundEvents registered* |
 | 7 | **Entity sound methods (A.2)** | 6r | M | ✅ *22 entity classes fixed* |
 | 8 | **TileCrucible (A.3)** | 4r | XL | ⏳ *pre-8-10* |
-| 9 | **EntityTaintacleGiant boss (A.4)** | 6r | M | ⏳ *pre-8-10* |
+| 9 | **EntityTaintacleGiant boss (A.4)** | 6r | M | ✅ *boss bar + champion + enrage* |
 | 10 | **WarpEvents (B.1)** | 3r | M | ⏳ *pre-8-10* |
 | 11 | **EventHandlerEntity (B.2)** | 3r | M | ⏳ *pre-8-10* |
 | 12 | **EventHandlerRunic (B.3)** | 3r | M | ⏳ *pre-8-10* |
@@ -1060,7 +1055,8 @@ These rounds produce BUILD SUCCESSFUL after each step.
 Round A: Sound + Boss
   A1. Create sounds.json + TCSounds (66 SoundEvents)           ✅ done
   A2. Fix entity sound methods (22 classes)                    ✅ done
-  A3. EntityTaintacleGiant champion + boss bar + full behavior
+  A3. EntityTaintacleGiant champion + boss bar + full behavior ✅ done
+  A4. EntityCultistPortal → EntityThaumcraftBoss               ✅ done
 
 Round B: Alchemy
   B1. TileCrucible: full CFR port (fluid tank, attemptSmelt, aspect decomposition, spill, bellows)
