@@ -26,7 +26,12 @@ EntityEldritchOrb Wither fix, EntityWatcher gaze (AIGuardianAttack inner class),
 EntityCultistCleric ranged attack (homing orb + triple fireball + spawn data),
 EntityPech NBT persistence (PECH_TYPE/ANGER/TAMED DataSerializers + loot array),
 EntityAspectOrb/EntityFallingTaint/EntityGolemBobber shell implementations.
-Pending: no Round D items.
+Round E runtime polish complete: Watcher/CultistPortal/EldritchGuardian fixes,
+entity GUI binding, server input packets, and runtime safety guards.
+Phase 5 pre-client cleanup started: projectile foci `FocusFire`, `FocusFrost`,
+`FocusShock`, and `FocusPrimal` now have server-side behavior. Pending work is
+not client-only: remaining foci, bauble ticks, relic actions, and selected
+server containers still need gameplay logic.
 
 **Next milestone:** Complete all work that does NOT require Phase 8-10 (client GUI,
 rendering, recipes, research data). This is documented in the
@@ -425,19 +430,19 @@ Each needs CFR decompile, 1.12.2 adaptation. ~50-150 lines each.
 |-------|-------|
 | **Files to modify** | All 10 `Focus*.java` in `thaumcraft/common/items/wands/foci/` |
 | **Original source** | `thaumcraft_src/thaumcraft/common/items/wands/foci/Focus*.class` |
-| **Current state** | All 10 have identical stub: `onFocusRightClick()` returns `wandStack` with `// Phase 8:` comment |
-| **Missing** | Per-focus behavior (see table below), `onUsingFocusTick()`, `onPlayerStoppedUsingFocus()` |
+| **Current state** | 4/10 projectile foci have server-side behavior (`FocusFire`, `FocusFrost`, `FocusShock`, `FocusPrimal`) |
+| **Missing** | 6 foci still need gameplay; client FX/GUI can wait for Phase 8, but server effects cannot be treated as client-only |
 | **Strategy** | Batch-process by porting `IFocusEffect` interface methods. Each focus needs 3-5 methods plus custom upgrade types |
 
 Per-focus behavior to port:
 
 | Focus | Original behavior |
 |-------|-------------------|
-| `FocusShock` | Lightning bolt entity (zap), chain lightning upgrade, vis cost: 8 |
-| `FocusFire` | Fireball (explosive) or flame beam (continuous), vis cost: 15/tick beam |
-| `FocusFrost` | Frost shard projectile + freeze effect, vis cost: 10 |
+| `FocusShock` | ✅ Server lightning/chain/earthshock behavior; client FX later |
+| `FocusFire` | ✅ Server ember/fireball behavior; client FX later |
+| `FocusFrost` | ✅ Server frost shard/scatter/boulder behavior; client FX later |
 | `FocusExcavation` | Block-breaking beam (3×3 area), fortune/silk touch support, vis cost: 12 |
-| `FocusPrimal` | Random primal aspect bolt (6 types), vis cost: 20 |
+| `FocusPrimal` | ✅ Server primal orb behavior; client FX later |
 | `FocusWarding` | Place warded blocks/jar, vis cost: 5 per block |
 | `FocusHellbat` | Summon fire bats as projectiles |
 | `FocusPech` | Trade with pechs |
@@ -799,7 +804,7 @@ and no research tree definitions.
 | **A** | Must-do before 8-10: unblocks gameplay | Sound, TileCrucible, boss |
 | **B** | High value, standalone: event system | WarpEvents, EventHandlerEntity, EventHandlerRunic |
 | **C** | Medium value: fills gaps | EntityTaintacleGiant, mob special abilities |
-| **D** | Defer to Phase 8-10: needs GUI/recipes/research | Foci, InfusionMatrix, ResearchTable |
+| **D** | Defer to Phase 8-10 only when client-only or data-bound | FX packets, model registration, research GUI/data |
 
 ### Tier A — Must-do before Phases 8-10
 
@@ -897,20 +902,19 @@ Uses `BlockUtils.breakFurthestBlock` for adjacency chain detection.
 
 ### Tier D — Safely defer to Phase 8-10
 
-These items depend on GUI, rendering, recipe system, or research data:
+These items depend on GUI, rendering, recipe system, or research data. Server
+gameplay for foci, baubles, and relics is **not** a safe client-only deferral.
 
 | # | Task | Reason to defer |
 |---|------|----------------|
-| 1 | Focus onFocusRightClick (10 foci) | Wand interaction GUI needed |
-| 2 | TileInfusionMatrix | Depends on recipe system (Phase 9) |
-| 3 | TileResearchTable update() | Depends on ResearchNoteData + research system |
-| 4 | TileDeconstructionTable update() | Connects to infusion/essentia system |
-| 5 | ResearchManager missing methods | Research data is Phase 9 |
-| 6 | FX network packets (14 files) | Pure client-side, needs rendering |
-| 7 | ChampionFX.showFX() | Client particles, Phase 8 |
-| 8 | Model registration + tooltips | Client-side, Phase 8 |
-| 9 | Most empty TEs (Tube*, Bore, AlchemyFurnace, etc.) | Connect to systems not yet built |
-| 10 | Foci, relics, baubles onWornTick | Depend on ItemWandCasting (Phase 10) |
+| 1 | TileInfusionMatrix | Depends on recipe system (Phase 9) |
+| 2 | TileResearchTable update() | Depends on ResearchNoteData + research system |
+| 3 | TileDeconstructionTable update() | Connects to infusion/essentia system |
+| 4 | ResearchManager missing methods | Research data is Phase 9 |
+| 5 | FX network packets (14 files) | Pure client-side, needs rendering |
+| 6 | ChampionFX.showFX() | Client particles, Phase 8 |
+| 7 | Model registration + tooltips | Client-side, Phase 8 |
+| 8 | Focus/bauble/relic client GUI+FX only | After server gameplay is fixed |
 
 ---
 
@@ -943,7 +947,7 @@ to spawn the corresponding particle effect on the client.
 
 ---
 
-## Priority Execution Matrix (updated: commit 1796857)
+## Priority Execution Matrix (legacy snapshot, status corrected)
 
 ### P0 — Must fix first (blocks + networking) ✅ DONE
 
@@ -971,37 +975,37 @@ P0: PacketHandler (3r.13)         ⚠️  →  Dispatch works, 11 non-FX packets
 | 12 | **EventHandlerRunic (C.3)** | 3r | M | ✅ *3 handlers + helpers* |
 | 13 | **EventHandlerWorld (C.4)** | 3r | M | ✅ *11 handlers + retrogen* |
 | 14 | **ServerTickEventsFML (C.5)** | 3r | M | ✅ *world tick + swap* |
-| 15 | Focus items (5r.1) | 5r | M | *defer to 8-10* |
-| 16 | Relic right-click (5r.2) | 5r | L | *defer to 8-10* |
-| 17 | Baubles onWornTick (5r.3) | 5r | M | *defer to 8-10* |
-| 18 | TileInfusionMatrix (4r.1) | 4r | XL | *defer to 8-10* |
-| 19 | TileTube* network (4r.9) | 4r | L | *defer to 8-10* |
-| 20 | TileNode recharge (4r.3) | 4r | XL | *defer to 8-10* |
-| 21 | Enchantment fixes (3r.12) | 3r | L | *defer to 8-10* |
-| 22 | WandManager discount (3r.9) | 3r | L | *defer to 8-10* |
-| 23 | ItemWandCasting methods (3r.10) | 3r | M | *defer to 8-10* |
-| 24 | Potion fixes (3r.11) | 3r | L | *defer to 8-10* |
+| 15 | Focus items (5r.1) | 5r | M | ⚠️ *4/10 server done; 6 pending pre-8* |
+| 16 | Relic right-click (5r.2) | 5r | L | ⚠️ *server actions pending pre-8; GUI later* |
+| 17 | Baubles onWornTick (5r.3) | 5r | M | ⚠️ *server ticks/storage pending pre-8* |
+| 18 | TileInfusionMatrix (4r.1) | 4r | XL | *Phase 9 recipe-bound* |
+| 19 | TileTube* network (4r.9) | 4r | L | ⚠️ *server system pending* |
+| 20 | TileNode recharge (4r.3) | 4r | XL | ⚠️ *server system pending* |
+| 21 | Enchantment fixes (3r.12) | 3r | L | ⚠️ *server gameplay pending* |
+| 22 | WandManager discount (3r.9) | 3r | L | ⚠️ *server gameplay pending* |
+| 23 | ItemWandCasting methods (3r.10) | 3r | M | ⚠️ *server gameplay pending* |
+| 24 | Potion fixes (3r.11) | 3r | L | ⚠️ *server gameplay pending* |
 
 ### P2 — Subsystems
 
 | Order | Task | Phase | Effort | Dependencies |
 |-------|------|-------|--------|-------------|
-| 1 | ResearchManager methods (3r.3) | 3r | L | *defer to 8-10* |
-| 2 | ResearchNoteData + HexUtils (3r.4) | 3r | L | *defer to 8-10* |
-| 3 | TileResearchTable update (4r.13) | 4r | M | *defer to 8-10* |
-| 4 | TileDeconstructionTable (4r.14) | 4r | M | *defer to 8-10* |
-| 5 | IPlayerKnowledge expansion (3r.8) | 3r | L | *defer to 8-10* |
-| 6 | 17 missing TE files (4r.12) | 4r | L | *defer to 8-10* |
-| 7 | PrimalCrusher hierarchy (5r.4) | 5r | L | *defer to 8-10* |
-| 8 | Void equipment (5r.5) | 5r | L | *defer to 8-10* |
-| 9 | Elemental tools (5r.7) | 5r | L | *defer to 8-10* |
-| 10 | Armor interfaces (5r.9) | 5r | L | *defer to 8-10* |
-| 11 | Mob special abilities (6r.5) | 6r | M | *defer to 8-10* |
-| 12 | Container GUIs (6r.9) | 6r | L | *defer to 8-10* |
-| 13 | InventoryTrunk/Pech (6r.10) | 6r | L | *defer to 8-10* |
-| 14 | ItemSpawnerEgg (6r.11) | 6r | L | *defer to 8-10* |
-| 15 | ChampionMod Mighty/Warp/Infested (6r.6) | 6r | L | *defer to 8-10* |
-| 16 | InternalMethodHandler (3r.14) | 3r | L | *defer to 8-10* |
+| 1 | ResearchManager methods (3r.3) | 3r | L | *Phase 9 research-bound* |
+| 2 | ResearchNoteData + HexUtils (3r.4) | 3r | L | *Phase 9 research-bound* |
+| 3 | TileResearchTable update (4r.13) | 4r | M | *Phase 9 research-bound* |
+| 4 | TileDeconstructionTable (4r.14) | 4r | M | ⚠️ *server system pending* |
+| 5 | IPlayerKnowledge expansion (3r.8) | 3r | L | *Phase 9 research-bound* |
+| 6 | 17 missing TE files (4r.12) | 4r | L | ⚠️ *server system pending* |
+| 7 | PrimalCrusher hierarchy (5r.4) | 5r | L | ⚠️ *server item gameplay pending* |
+| 8 | Void equipment (5r.5) | 5r | L | ⚠️ *server item gameplay pending* |
+| 9 | Elemental tools (5r.7) | 5r | L | ⚠️ *server item gameplay pending* |
+| 10 | Armor interfaces (5r.9) | 5r | L | ⚠️ *server item gameplay pending* |
+| 11 | Mob special abilities (6r.5) | 6r | M | ✅ *Round D/E runtime done except client FX/placeholders* |
+| 12 | Entity GUI containers (6r.9) | 6r | L | ✅ *Golem/Pech/Trunk bound; other GUI containers later* |
+| 13 | InventoryTrunk/Pech (6r.10) | 6r | L | ✅ *done* |
+| 14 | ItemSpawnerEgg (6r.11) | 6r | L | ✅ *done* |
+| 15 | ChampionMod Mighty/Warp/Infested (6r.6) | 6r | L | ✅ *server effects done; client FX later* |
+| 16 | InternalMethodHandler (3r.14) | 3r | L | ✅ *generateVisEffect/VisDrain wired; tag generation still future* |
 
 ### P3 — Audio & FX (mostly deferred)
 
@@ -1114,7 +1118,7 @@ Round D: Remaining gaps
 
 ### Deferred to Phase 8-10
 ```
-Round 6: P1 Items (Foci, Relics, Baubles)       — needs wand GUI
+Round 6: P1 Items client GUI/FX only             — server gameplay is pre-8
 Round 7: P1 Core (TileInfusionMatrix)             — needs recipe system
 Round 8: P2 Research (ResearchManager, etc.)      — needs research data
 Round 9: Missing TEs (Tube*, Bore, Furnace, etc.) — connect to other systems
@@ -1128,9 +1132,9 @@ Round 10: P3-P4 Polish (models, tooltips)          — client-side
 | Phase | Total classes | Verified | Remaining stubs | Stub rate | Notes |
 |-------|--------------|----------|----------------|-----------|-------|
 | 0-2 | ~20 | 20 | 0 | 0% | Framework complete |
-| 3 | ~30 | 30 | ~12 (events, handlers) | **~40%** | Events, WarpEvents, Runic still stub |
+| 3 | ~30 | 30 | research/vis/potion/enchant gaps | — | Events, WarpEvents, Runic ✅ |
 | 4 | 151 | 80 | ~49 (TEs) + 0 (blocks) | **~32%** | 49/61 TEs empty; blocks all ✅ |
-| 5 | 110 | 55 | ~55 (all foci + relics) | **~50%** | Foci 10/10 stub; relics 0/5 exist |
+| 5 | 110 | 55 | item gameplay gaps | — | Foci 4/10 server done; relic files exist but actions pending |
 | 6 | 130 | 128 | ~6 | **~5%** | AI 44/44 ✅, projectiles 11/11 ✅, bosses ✅ |
 | 7 | 35 | 35 | 0 | 0% | World gen complete |
 | **Total** | **~476** | **348** | **~122** | **~26%** | Down from ~55% at project start |
@@ -1140,4 +1144,4 @@ Round 10: P3-P4 Polish (models, tooltips)          — client-side
 - Projectiles: 10/11 stubs → 11/11 full behavior
 - Boss AI: 0/5 → 5/5 registration + bar
 - Group B manual AI: 0/5 → 5/5 lifecycle migration
-- Sound: not tracked → 0% (pre-8-10 work remains)
+- Sound: not tracked → complete registration + entity sound pass

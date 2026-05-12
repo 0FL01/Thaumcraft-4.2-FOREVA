@@ -1,14 +1,27 @@
 package thaumcraft.common.items.wands.foci;
 
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.EnumHand;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.World;
 import thaumcraft.api.aspects.Aspect;
 import thaumcraft.api.aspects.AspectList;
+import thaumcraft.api.wands.FocusUpgradeType;
 import thaumcraft.api.wands.ItemFocusBasic;
+import thaumcraft.common.entities.projectile.EntityFrostShard;
+import thaumcraft.common.items.wands.ItemWandCasting;
+import thaumcraft.common.lib.TCSounds;
 
 public class FocusFrost extends ItemFocusBasic {
+
+    private static final AspectList COST_BASE = new AspectList().add(Aspect.WATER, 5).add(Aspect.FIRE, 2).add(Aspect.ENTROPY, 2);
+    private static final AspectList COST_SCATTER = new AspectList().add(Aspect.WATER, 20).add(Aspect.FIRE, 2).add(Aspect.ENTROPY, 2).add(Aspect.AIR, 5);
+    private static final AspectList COST_BOULDER = new AspectList().add(Aspect.WATER, 20).add(Aspect.FIRE, 2).add(Aspect.ENTROPY, 2).add(Aspect.EARTH, 5);
+    public static final FocusUpgradeType scattershot = new FocusUpgradeType(11, new ResourceLocation("thaumcraft", "textures/foci/scattershot.png"), "focus.upgrade.scattershot.name", "focus.upgrade.scattershot.text", new AspectList().add(Aspect.COLD, 1).add(Aspect.WEAPON, 1));
+    public static final FocusUpgradeType iceboulder = new FocusUpgradeType(12, new ResourceLocation("thaumcraft", "textures/foci/iceboulder.png"), "focus.upgrade.iceboulder.name", "focus.upgrade.iceboulder.text", new AspectList().add(Aspect.COLD, 1).add(Aspect.CRYSTAL, 1));
 
     public FocusFrost() {
         super();
@@ -22,12 +35,44 @@ public class FocusFrost extends ItemFocusBasic {
 
     @Override
     public AspectList getVisCost(ItemStack stack) {
-        return new AspectList().add(Aspect.WATER, 500).add(Aspect.COLD, 250);
+        return this.isUpgradedWith(stack, scattershot) ? COST_SCATTER : (this.isUpgradedWith(stack, iceboulder) ? COST_BOULDER : COST_BASE);
     }
 
     @Override
     public ItemStack onFocusRightClick(ItemStack wandStack, World world, EntityPlayer player, RayTraceResult movingobjectposition) {
-        // Phase 8: frost projectile
+        if (!(wandStack.getItem() instanceof ItemWandCasting)) return wandStack;
+        ItemWandCasting wand = (ItemWandCasting) wandStack.getItem();
+        ItemStack focusStack = wand.getFocusItem(wandStack);
+        if (!world.isRemote && wand.consumeAllVis(wandStack, player, this.getVisCost(focusStack), true, false)) {
+            int potency = this.getUpgradeLevel(focusStack, FocusUpgradeType.potency);
+            int frosty = this.getUpgradeLevel(focusStack, FocusUpgradeType.alchemistsfrost);
+            EntityFrostShard shard = null;
+            if (this.isUpgradedWith(focusStack, scattershot)) {
+                for (int a = 0; a < 5 + potency * 2; ++a) {
+                    shard = new EntityFrostShard(world, (EntityLivingBase) player, 8.0F);
+                    shard.setDamage(1.0F);
+                    shard.fragile = true;
+                    shard.setFrosty(frosty);
+                    world.spawnEntity(shard);
+                }
+            } else if (this.isUpgradedWith(focusStack, iceboulder)) {
+                shard = new EntityFrostShard(world, (EntityLivingBase) player, 1.0F);
+                shard.setDamage(4.0F + potency * 2.0F);
+                shard.bounce = 0.8D;
+                shard.bounceLimit = 6;
+                shard.setFrosty(frosty);
+                world.spawnEntity(shard);
+            } else {
+                shard = new EntityFrostShard(world, (EntityLivingBase) player, 1.0F);
+                shard.setDamage((float) (3.0D + (double) potency * 1.5D));
+                shard.setFrosty(frosty);
+                world.spawnEntity(shard);
+            }
+            if (shard != null) {
+                shard.playSound(TCSounds.ICE, 0.4F, 1.0F + world.rand.nextFloat() * 0.1F);
+            }
+        }
+        player.swingArm(EnumHand.MAIN_HAND);
         return wandStack;
     }
 

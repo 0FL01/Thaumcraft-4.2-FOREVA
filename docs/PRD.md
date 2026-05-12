@@ -90,7 +90,7 @@ JEI Integration + Polish
 | Dep | Type | 1.12.2 Version | Source |
 |-----|------|---------------|--------|
 | **Baubles** | Hard | `Baubles-1.12-1.5.2` | CurseMaven (ID 227083, file 2518667) |
-| **MinecraftForge** | Hard | `1.12.2-14.23.5.2860` (recommended) | Forge MDK |
+| **MinecraftForge** | Hard | `1.12.2-14.23.5.2847` | ForgeGradle pin |
 | **CodeChickenLib** | **Bundled** | N/A — port `thaumcraft.codechicken.*` | Internal |
 | **JEI** (optional) | Soft | `jei_1.12.2` | CurseMaven, phase 9+ |
 | **OptiFine** (detected) | Optional | Via reflection check | Runtime detection |
@@ -331,11 +331,12 @@ rendering (ornament/overlay) uses CCL render pipeline.
 
 ---
 
-### Phase 6 — Entities, Mobs & Golems (✅ Compiling, ✅ AI Batch 1-2 done)
+### Phase 6 — Entities, Mobs & Golems (✅ Compiling, ✅ AI complete)
 
-**Status**: All 128 entity classes ported, registered via `ConfigEntities`. 44 AI
-classes in 6 sub-packages. 26/44 AI classes have full port (10 combat + 16 inventory).
-Champion modifier framework complete. 0 compile errors.
+**Status**: All 128 entity classes ported, registered via `ConfigEntities`. All
+44 AI classes are fully ported, all 11 projectile `onImpact`/`onHit` paths are
+implemented, Group B manual AI lifecycle is migrated, and boss bars/task
+registration are in place. 0 compile errors.
 
 **Sub-steps**:
 - **6.1** — Registry + AI system (44 AI classes) + all entity stubs (53)
@@ -790,23 +791,18 @@ Initial releases ship with `en_US` only.
 
 ---
 
-## 9. Remediation Plans
+## 9. Remediation Status
 
-**~55 critical/high issues** (after AI Batch 4: 4 files ported) were discovered across Phases 3-6 where ported
-classes are structural stubs with no real gameplay logic. The full decomposed
-repair plan with file-level breakdown, dependencies, and execution order is
-at **`docs/REPAIR.md`**.
+The detailed repair backlog is tracked in **`docs/REPAIR.md`**. Current baseline:
 
-Per-phase remediation progress:
+- Rounds A-D are complete for sound, boss/alchemy, events, entity runtime gaps,
+  containers, packets, champion modifiers, and empty entity shells.
+- Round E pre-client runtime polish is complete for Watcher, CultistPortal,
+  EldritchGuardian, AspectOrb, FallingTaint, GolemBobber, wand vis guards,
+  entity GUI binding, and minimal server input packets.
+- Phase 5 server gameplay is still active: 4/10 projectile foci now have
+  server-side behavior; remaining foci, bauble ticks, relic actions, and some
+  containers are not client-only work.
 
-| Plan | CRITICAL | HIGH | MEDIUM | LOW | Status |
-|------|----------|------|--------|-----|--------|
-| **3r** Core Systems | 3 | 12 | 4 | 1 | Not started |
-| **4r** Blocks & Tiles | 11 | 5 | 3 | 2 | Not started |
-| **5r** Items & Baubles | 7 | 11 | 2 | 1 | Not started |
-| **6r** Entities & AI | 4 | 11 | 6 | 0 | **Batch 1 (Combat) ✅  Batch 2 (Inventory) ✅  Batch 3 (Fluid/Pech) ✅  Batch 4 (Misc) ✅** |
-| **8r** Client Network | — | — | — | — | 14 FX packets moved here (no game logic) |
-| **Total** | **25** | **39** | **15** | **4** | **40/44 AI classes ported** |
-
-See `docs/REPAIR.md` for full tables, original source references, fix
-approaches, and a prioritized execution plan.
+Phase 8 should start only after the remaining server-side foci/bauble/relic
+baseline is either fixed or explicitly accepted as deferred risk.
