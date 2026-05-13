@@ -56,7 +56,7 @@ See `docs/PRD.md §4` for per-phase deliverables and `docs/PRD.md §5` for compl
 | 1 | API + CCL + TrueType | ✅ Done |
 | 2 | Registration, config, networking, events | ✅ Done |
 | 3 | Core systems (capabilities, wands, research, vis, potions, enchants) | ⚠️ **Partial: vis regen/wand discounts/potions/online research baseline fixed; scan, offline research, bauble storage, enchant applicability remain** |
-| 4 | Blocks + Tile Entities | ⚠️ **Partial: registered block set + metadata/harvest work; crucible server baseline fixed; major TE systems pending** |
+| 4 | Blocks + Tile Entities | ⚠️ **Partial: registered block set + metadata/harvest work; crucible + major TE server baselines started; full infusion/bore systems pending** |
 | 5 | Items, Tools, Armor, Baubles, Relics | ⚠️ **Partial: 4/10 projectile foci server behavior done; 6 foci, baubles, relics, tools/repairability remain** |
 | 6 | Entities, Mobs, Golems | ⚠️ **Partial: AI/projectile pass strong; boss special attacks, Pech loot, InhabitedZombie death spawn remain** |
 | 7 | World Gen (biomes, dimension, trees, structures) | ⚠️ **Partial: biomes/trees/villages present; Outer Lands runtime hookup fixed; room-gen fallback TODOs remain** |

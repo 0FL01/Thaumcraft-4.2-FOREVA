@@ -23,6 +23,7 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import thaumcraft.common.Thaumcraft;
+import thaumcraft.common.items.wands.ItemWandCasting;
 import thaumcraft.common.tiles.*;
 
 import javax.annotation.Nullable;
@@ -113,9 +114,23 @@ extends BlockContainer {
     @Override
     public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
         TileEntity te = worldIn.getTileEntity(pos);
-        if (te instanceof TileInfusionMatrix) {
+        if (te instanceof TileAlchemyFurnace) {
             if (!worldIn.isRemote) {
-                playerIn.openGui(Thaumcraft.instance, 2, worldIn, pos.getX(), pos.getY(), pos.getZ());
+                playerIn.openGui(Thaumcraft.instance, 3, worldIn, pos.getX(), pos.getY(), pos.getZ());
+            }
+            return true;
+        }
+        if (te instanceof TileInfusionMatrix) {
+            ItemStack held = playerIn.getHeldItem(hand);
+            if (!held.isEmpty() && held.getItem() instanceof ItemWandCasting) {
+                return ((TileInfusionMatrix) te).onWandRightClick(worldIn, held, playerIn,
+                        pos.getX(), pos.getY(), pos.getZ(), facing.getIndex(), state.getValue(TYPE)) >= 0;
+            }
+            return false;
+        }
+        if (te instanceof TileFocalManipulator) {
+            if (!worldIn.isRemote) {
+                playerIn.openGui(Thaumcraft.instance, 14, worldIn, pos.getX(), pos.getY(), pos.getZ());
             }
             return true;
         }

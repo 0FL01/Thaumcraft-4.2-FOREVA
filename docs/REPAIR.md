@@ -33,21 +33,24 @@ Phase 8. Recipe/research-content work belongs to Phase 9.
 | Phase 3 core baseline | Aura nodes persist base aspects and regenerate missing vis; wand centi-vis units, discounts, and no-passive-recharge behavior are restored. |
 | Research/potions partial | Online username research/aspect lookup uses capabilities/cache; Infectious Vis Exhaust and Thaumarhia server effects are restored. |
 | Crucible baseline | Boiling crucibles ingest dropped items from `BlockMetalDevice`, accept water through Forge fluid interaction, spill on break, and expose stored aspects through `IAspectContainer`. |
+| Major TE baseline partial | Alchemy Furnace, Bellows, Centrifuge, Thaumatorium, Arcane Bore, Infusion Matrix, and Focal Manipulator are no longer empty shells; NBT/inventory/aspect-transport/server hook baselines are wired where applicable. |
 
 ## P0 -- Must Fix Before Phase 8
 
 ### P0.1 -- Major TE server interactions
 
-The crucible server baseline is closed. The remaining Phase 4 blocker is the
-set of major tile entities that still have empty/no-op server logic.
+The crucible and first major-TE server baselines are closed. Remaining Phase 4
+work is full machine gameplay, not empty-shell remediation.
 
 | Finding | Evidence |
 |---------|----------|
-| Multiple major TE classes remain empty/no-op | `TileAlchemyFurnace`, `TileThaumatorium`, `TileInfusionMatrix`, `TileArcaneBore`, `TileBellows`, `TileCentrifuge`, `TileFocalManipulator` |
+| Full infusion crafting lifecycle is still partial | `TileInfusionMatrix` validates structure and exposes stored aspects, but full pedestal scan/craft cycle remains pending. |
+| Arcane Bore mining loop is still partial | `TileArcaneBore` has inventory/orientation/NBT baseline, but block scanning/digging remains pending. |
+| Thaumatorium/Focal Manipulator need GUI/content completion | Server inventory/aspect baselines exist; recipe programming and upgrade UI flow depend on later GUI/content work. |
 
 Exit criteria:
-- Empty/no-op TE classes are either ported enough for server gameplay or moved
-  to a clearly marked Phase 9/data-bound bucket.
+- Decide whether full Infusion Matrix and Arcane Bore gameplay block Phase 8 or
+  are accepted as deferred server risk.
 
 ### P0.2 -- Remaining focus server actions
 
@@ -114,7 +117,7 @@ Exit criteria:
 ## Recommended Execution Order
 
 1. Fix remaining six focus server actions.
-2. Classify and port major empty Phase 4 TEs.
+2. Decide/defer or finish remaining Infusion Matrix and Arcane Bore server gameplay.
 3. Fix bauble vis storage/consumption, relic actions, and research offline compatibility.
 4. Fix enchantment applicability and high-impact bauble actions.
 5. Fix boss/special mob TODOs that are server-visible.

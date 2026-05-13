@@ -11,6 +11,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.DamageSource;
@@ -108,6 +109,24 @@ public class BlockMetalDevice extends BlockContainer {
                 && FluidUtil.interactWithFluidHandler(playerIn, hand, worldIn, pos, facing)) {
             return true;
         }
+        if (state.getValue(TYPE) == 10) {
+            TileEntity te = worldIn.getTileEntity(pos);
+            if (te instanceof TileThaumatorium) {
+                if (!worldIn.isRemote) {
+                    playerIn.openGui(Thaumcraft.instance, 9, worldIn, pos.getX(), pos.getY(), pos.getZ());
+                }
+                return true;
+            }
+        }
+        if (state.getValue(TYPE) == 11) {
+            TileEntity te = worldIn.getTileEntity(pos.down());
+            if (te instanceof TileThaumatorium) {
+                if (!worldIn.isRemote) {
+                    playerIn.openGui(Thaumcraft.instance, 9, worldIn, pos.getX(), pos.getY() - 1, pos.getZ());
+                }
+                return true;
+            }
+        }
         return super.onBlockActivated(worldIn, pos, state, playerIn, hand, facing, hitX, hitY, hitZ);
     }
 
@@ -116,6 +135,18 @@ public class BlockMetalDevice extends BlockContainer {
         TileEntity te = worldIn.getTileEntity(pos);
         if (te instanceof TileCrucible) {
             ((TileCrucible) te).spillRemnants();
+        } else if (te instanceof IInventory) {
+            IInventory inventory = (IInventory) te;
+            for (int i = 0; i < inventory.getSizeInventory(); ++i) {
+                ItemStack stack = inventory.getStackInSlot(i);
+                if (!stack.isEmpty()) {
+                    worldIn.spawnEntity(new EntityItem(worldIn,
+                            (double) pos.getX() + 0.5D,
+                            (double) pos.getY() + 0.5D,
+                            (double) pos.getZ() + 0.5D,
+                            stack.copy()));
+                }
+            }
         }
         super.breakBlock(worldIn, pos, state);
     }

@@ -8,6 +8,9 @@ import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.item.EntityItem;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumBlockRenderType;
@@ -18,6 +21,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 import thaumcraft.common.Thaumcraft;
+import thaumcraft.common.items.wands.ItemWandCasting;
 import thaumcraft.common.tiles.*;
 
 public class BlockWoodenDevice extends BlockContainer {
@@ -64,6 +68,43 @@ public class BlockWoodenDevice extends BlockContainer {
 
     @Override
     public int damageDropped(IBlockState state) { return getMetaFromState(state); }
+
+    @Override
+    public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn,
+                                    EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
+        TileEntity te = worldIn.getTileEntity(pos);
+        if (te instanceof TileArcaneBore) {
+            ItemStack held = playerIn.getHeldItem(hand);
+            if (!held.isEmpty() && held.getItem() instanceof ItemWandCasting) {
+                return ((TileArcaneBore) te).onWandRightClick(worldIn, held, playerIn,
+                        pos.getX(), pos.getY(), pos.getZ(), facing.getIndex(), state.getValue(TYPE)) >= 0;
+            }
+            if (!worldIn.isRemote) {
+                playerIn.openGui(Thaumcraft.instance, 2, worldIn, pos.getX(), pos.getY(), pos.getZ());
+            }
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public void breakBlock(World worldIn, BlockPos pos, IBlockState state) {
+        TileEntity te = worldIn.getTileEntity(pos);
+        if (te instanceof IInventory) {
+            IInventory inventory = (IInventory) te;
+            for (int i = 0; i < inventory.getSizeInventory(); ++i) {
+                ItemStack stack = inventory.getStackInSlot(i);
+                if (!stack.isEmpty()) {
+                    worldIn.spawnEntity(new EntityItem(worldIn,
+                            (double) pos.getX() + 0.5D,
+                            (double) pos.getY() + 0.5D,
+                            (double) pos.getZ() + 0.5D,
+                            stack.copy()));
+                }
+            }
+        }
+        super.breakBlock(worldIn, pos, state);
+    }
 
     @Override
     protected BlockStateContainer createBlockState() {
