@@ -360,7 +360,7 @@ public class InventoryUtils {
             if (stack.isEmpty() || !(stack.getItem() instanceof ItemWandCasting)) continue;
             int current = ItemWandCasting.getVis(stack, aspect);
             int max = ItemWandCasting.getMaxVis(stack);
-            if (current + amount <= max) return slot;
+            if (current + amount * 100 <= max) return slot;
         }
         return -1;
     }

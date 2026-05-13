@@ -807,6 +807,10 @@ The detailed repair backlog is tracked in **`docs/REPAIR.md`**. Current baseline
   work is fallback block/loot replacement TODOs and cosmetic biome color.
 - Server container hard-locks are fixed: `CommonProxy` binds player/tile/entity
   context and `canInteractWith` checks are no longer unconditional `false`.
+- Phase 3 core baseline improved: aura nodes now regenerate missing vis,
+  wand centi-vis units/discounts are restored, online research/aspect lookups
+  use capabilities/cache, and Infectious Vis Exhaust/Thaumarhia have server
+  effects.
 - Phase 5 server gameplay is still active: 4/10 projectile foci now have
   server-side behavior; remaining foci, bauble ticks, and relic actions are not
   client-only work.

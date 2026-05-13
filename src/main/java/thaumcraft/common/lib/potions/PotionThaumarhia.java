@@ -1,14 +1,14 @@
 package thaumcraft.common.lib.potions;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.potion.Potion;
-import net.minecraft.util.DamageSource;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import thaumcraft.api.ThaumcraftApiHelper;
+import thaumcraft.common.config.ConfigBlocks;
 
 public class PotionThaumarhia extends Potion {
 
@@ -30,14 +30,18 @@ public class PotionThaumarhia extends Potion {
 
     @Override
     public void performEffect(EntityLivingBase target, int amplifier) {
-        if (target instanceof EntityPlayer && ((EntityPlayer) target).getMaxHealth() > 1.0f) {
-            target.attackEntityFrom(DamageSource.MAGIC, 1.0f);
+        if (target == null || target.world == null || target.world.isRemote || ConfigBlocks.blockFluxGoo == null) return;
+        if (target.world.rand.nextInt(15) != 0) return;
+
+        BlockPos pos = new BlockPos(target.posX, target.posY, target.posZ);
+        if (target.world.isAirBlock(pos)) {
+            IBlockState state = ConfigBlocks.blockFluxGoo.getDefaultState();
+            target.world.setBlockState(pos, state, 3);
         }
     }
 
     @Override
     public boolean isReady(int duration, int amplifier) {
-        int k = 60 >> amplifier;
-        return k > 0 && duration % k == 0;
+        return duration % 20 == 0;
     }
 }

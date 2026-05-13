@@ -2,6 +2,7 @@ package thaumcraft.common.items.wands;
 
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
@@ -28,7 +29,9 @@ import thaumcraft.api.wands.IWandFocus;
 import thaumcraft.api.wands.IWandRodOnUpdate;
 import thaumcraft.api.wands.WandCap;
 import thaumcraft.api.wands.WandRod;
+import thaumcraft.common.config.Config;
 
+import java.text.DecimalFormat;
 import java.util.List;
 
 public class ItemWandCasting extends Item {
@@ -92,62 +95,96 @@ public class ItemWandCasting extends Item {
 
     public static void addVis(ItemStack stack, Aspect aspect, int amount) {
         if (stack == null || stack.isEmpty() || aspect == null || amount == 0) return;
-        setVis(stack, aspect, getVis(stack, aspect) + amount);
+        addRealVis(stack, aspect, amount * 100);
+    }
+
+    public static int addVis(ItemStack stack, Aspect aspect, int amount, boolean doit) {
+        if (stack == null || stack.isEmpty() || aspect == null || !aspect.isPrimal()) return amount;
+        int storeAmount = getVis(stack, aspect) + amount * 100;
+        int leftover = Math.max(storeAmount - getMaxVis(stack), 0);
+        if (doit) {
+            setVis(stack, aspect, Math.min(storeAmount, getMaxVis(stack)));
+        }
+        return leftover / 100;
+    }
+
+    public static int addRealVis(ItemStack stack, Aspect aspect, int amount) {
+        return addRealVis(stack, aspect, amount, true);
+    }
+
+    public static int addRealVis(ItemStack stack, Aspect aspect, int amount, boolean doit) {
+        if (stack == null || stack.isEmpty() || aspect == null || !aspect.isPrimal()) return amount;
+        int storeAmount = getVis(stack, aspect) + amount;
+        int leftover = Math.max(storeAmount - getMaxVis(stack), 0);
+        if (doit) {
+            setVis(stack, aspect, Math.min(storeAmount, getMaxVis(stack)));
+        }
+        return leftover;
     }
 
     public static int getMaxVis(ItemStack stack) {
         if (stack == null || stack.isEmpty()) return 0;
         WandRod rod = getRod(stack);
-        return rod != null ? rod.getCapacity() : 100;
+        return rod != null ? rod.getCapacity() * (isSceptre(stack) ? 150 : 100) : 10000;
     }
 
     public static float getVisDiscount(ItemStack stack, EntityPlayer player, Aspect aspect) {
+        return getConsumptionModifier(stack, player, aspect, false);
+    }
+
+    public static float getConsumptionModifier(ItemStack stack, EntityPlayer player, Aspect aspect, boolean crafting) {
         WandCap cap = getCap(stack);
-        float discount = cap != null ? cap.getBaseCostModifier() : 1.0f;
-        // Check for special aspect discounts
+        float discount = cap != null ? cap.getBaseCostModifier() : 1.0F;
         if (cap != null && cap.getSpecialCostModifierAspects() != null && cap.getSpecialCostModifierAspects().contains(aspect)) {
             discount = Math.min(discount, cap.getSpecialCostModifier());
         }
-        return discount;
+        if (player != null) {
+            discount -= WandManager.getTotalVisDiscount(player, aspect);
+            if (!crafting) {
+                discount -= (float) getFocusFrugal(stack) / 10.0F;
+            }
+        }
+        if (isSceptre(stack)) {
+            discount -= 0.1F;
+        }
+        return Math.max(discount, 0.1F);
     }
 
     /**
      * Checks if the wand can supply the given vis cost. Uses crafting mode for exact matching.
      */
     public boolean consumeAllVis(ItemStack stack, EntityPlayer player, AspectList cost, boolean doit, boolean crafting) {
-        if (cost == null) return true;
-        if (player.capabilities.isCreativeMode) return true;
+        if (cost == null || cost.size() == 0) return false;
+        if (player != null && player.capabilities.isCreativeMode) return true;
 
-        // Check if we have enough
+        AspectList realCost = new AspectList();
         for (Aspect aspect : cost.getAspects()) {
-            int needed = cost.getAmount(aspect);
-            int discount = 0;
-            if (!crafting) {
-                // Calculate enchantment-based discount (Frugal)
-                // Simplified: apply cap discount
-                float discountMult = getVisDiscount(stack, player, aspect);
-                needed = Math.round(needed * discountMult);
-            }
+            int needed = Math.round((float) cost.getAmount(aspect) * getConsumptionModifier(stack, player, aspect, crafting));
+            realCost.add(aspect, needed);
+        }
+
+        for (Aspect aspect : realCost.getAspects()) {
+            int needed = realCost.getAmount(aspect);
             if (needed > 0 && getVis(stack, aspect) < needed) {
                 return false;
             }
         }
 
-        if (doit) {
-            for (Aspect aspect : cost.getAspects()) {
-                int needed = cost.getAmount(aspect);
-                float discountMult = getVisDiscount(stack, player, aspect);
-                if (!crafting) {
-                    needed = Math.round(needed * discountMult);
-                }
-                addVis(stack, aspect, -needed);
+        if (doit && (player == null || !player.world.isRemote)) {
+            for (Aspect aspect : realCost.getAspects()) {
+                addRealVis(stack, aspect, -realCost.getAmount(aspect));
             }
         }
         return true;
     }
 
     public boolean consumeAllVisCrafting(ItemStack stack, EntityPlayer player, AspectList cost, boolean doit) {
-        return consumeAllVis(stack, player, cost, doit, true);
+        if (cost == null || cost.size() == 0) return false;
+        AspectList realCost = new AspectList();
+        for (Aspect aspect : cost.getAspects()) {
+            realCost.add(aspect, cost.getAmount(aspect) * 100);
+        }
+        return consumeAllVis(stack, player, realCost, doit, true);
     }
 
     // ---- Focus ----
@@ -188,6 +225,29 @@ public class ItemWandCasting extends Item {
         return 0;
     }
 
+    public static int getFocusFrugal(ItemStack stack) {
+        ItemStack focusStack = getFocusItemStatic(stack);
+        int level = 0;
+        if (!focusStack.isEmpty() && focusStack.getItem() instanceof ItemFocusBasic) {
+            level += ((ItemFocusBasic) focusStack.getItem()).getUpgradeLevel(focusStack, FocusUpgradeType.frugal);
+            if (Config.enchFrugal != null) {
+                level += EnchantmentHelper.getEnchantmentLevel(Config.enchFrugal, focusStack);
+            }
+        }
+        return level;
+    }
+
+    private static ItemStack getFocusItemStatic(ItemStack stack) {
+        if (stack != null && !stack.isEmpty() && stack.hasTagCompound() && stack.getTagCompound().hasKey(TAG_FOCUS)) {
+            return new ItemStack(stack.getTagCompound().getCompoundTag(TAG_FOCUS));
+        }
+        return ItemStack.EMPTY;
+    }
+
+    public static boolean isSceptre(ItemStack stack) {
+        return stack != null && !stack.isEmpty() && stack.hasTagCompound() && stack.getTagCompound().getBoolean("sceptre");
+    }
+
     // ---- Item Overrides ----
 
     @Override
@@ -197,21 +257,6 @@ public class ItemWandCasting extends Item {
             WandRod rod = getRod(stack);
             if (rod != null && rod.getOnUpdate() != null) {
                 rod.getOnUpdate().onUpdate(stack, player);
-            }
-
-            // Recharge vis from the environment (simplified)
-            if (world.getTotalWorldTime() % 20 == 0) {
-                for (Aspect aspect : Aspect.getPrimalAspects()) {
-                    int current = getVis(stack, aspect);
-                    int max = getMaxVis(stack);
-                    if (current < max) {
-                        int regen = Math.max(1, max / 100);
-                        if (rod != null && rod.getTag().equals("greatwood")) {
-                            regen *= 2;
-                        }
-                        addVis(stack, aspect, regen);
-                    }
-                }
             }
         }
     }
@@ -232,6 +277,7 @@ public class ItemWandCasting extends Item {
         }
 
         // Vis display
+        DecimalFormat formatter = new DecimalFormat("#####.##");
         tooltip.add(TextFormatting.AQUA + "" + TextFormatting.ITALIC + I18n.translateToLocal("item.WandCasting.vis"));
         for (Aspect aspect : Aspect.getPrimalAspects()) {
             if (aspect == null) continue;
@@ -239,7 +285,7 @@ public class ItemWandCasting extends Item {
             int max = getMaxVis(stack);
             if (vis > 0 || max > 0) {
                 tooltip.add(" " + TextFormatting.GRAY + aspect.getName() + ": " +
-                        TextFormatting.WHITE + vis + "/" + max);
+                        TextFormatting.WHITE + formatter.format((float) vis / 100.0F) + "/" + formatter.format((float) max / 100.0F));
             }
         }
 
@@ -263,7 +309,7 @@ public class ItemWandCasting extends Item {
                     setCap(stack, cap);
                     // Fill with max vis for creative tab display
                     for (Aspect aspect : Aspect.getPrimalAspects()) {
-                        setVis(stack, aspect, rod.getCapacity());
+                        setVis(stack, aspect, getMaxVis(stack));
                     }
                     items.add(stack);
                 }

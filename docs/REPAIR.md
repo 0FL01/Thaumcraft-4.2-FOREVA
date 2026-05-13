@@ -30,26 +30,12 @@ Phase 8. Recipe/research-content work belongs to Phase 9.
 | Outer Lands runtime | Provider type, void chunk baseline, maze populate dispatch, MazeThread centering, and structure query hooks are wired. |
 | Worldgen partial | Biomes, trees, village components, room-gen classes, and maze persistence exist. |
 | Container hard-locks | `CommonProxy` server IDs bind player/tile/entity context; container `canInteractWith` checks no longer return unconditional `false`. |
+| Phase 3 core baseline | Aura nodes persist base aspects and regenerate missing vis; wand centi-vis units, discounts, and no-passive-recharge behavior are restored. |
+| Research/potions partial | Online username research/aspect lookup uses capabilities/cache; Infectious Vis Exhaust and Thaumarhia server effects are restored. |
 
 ## P0 -- Must Fix Before Phase 8
 
-### P0.1 -- Vis network and node recharge
-
-The vis system is structurally present, but recharge is still effectively a
-stub.
-
-| Finding | Evidence |
-|---------|----------|
-| `TileNode.update()` does nothing | `src/main/java/thaumcraft/common/tiles/TileNode.java:93` |
-| `VisNetHandler.onWorldTick()` delegates regen to node update that is empty | `src/main/java/thaumcraft/api/visnet/VisNetHandler.java:42` |
-| Wand recharge is simplified and bypasses real visnet behavior | `src/main/java/thaumcraft/common/items/wands/ItemWandCasting.java:202` |
-
-Exit criteria:
-- Source nodes regenerate/decay according to a defined server-side rule.
-- Wands no longer get unconditional environmental vis unless that behavior is
-  intentionally accepted as a temporary compatibility simplification.
-
-### P0.2 -- Crucible and core TE server interactions
+### P0.1 -- Crucible and core TE server interactions
 
 `TileCrucible` has substantial logic, but it is not complete enough to mark the
 alchemy/server TE baseline done.
@@ -66,7 +52,7 @@ Exit criteria:
 - Empty/no-op TE classes are either ported enough for server gameplay or moved
   to a clearly marked Phase 9/data-bound bucket.
 
-### P0.3 -- Remaining focus server actions
+### P0.2 -- Remaining focus server actions
 
 Six focus items are still no-op server actions and were incorrectly labelled as
 Phase 8 client work.
@@ -86,22 +72,20 @@ Exit criteria:
 
 ## P1 -- Should Fix Before Phase 8 Unless Explicitly Deferred
 
-### P1.1 -- Baubles, relics, and wand discounts
+### P1.1 -- Baubles, relics, and remaining wand integration
 
 | Finding | Evidence |
 |---------|----------|
 | Runic ring tick is TBD | `src/main/java/thaumcraft/common/items/baubles/ItemRingRunic.java:48` |
 | Vis amulet storage is TBD | `src/main/java/thaumcraft/common/items/baubles/ItemAmuletVis.java:22` |
 | Thaumometer scan action is placeholder | `src/main/java/thaumcraft/common/items/relics/ItemThaumometer.java:29` |
-| Wand discount/enchantment logic is simplified | `src/main/java/thaumcraft/common/items/wands/ItemWandCasting.java:124` |
-| Inventory vis consumption ignores bauble storage | `src/main/java/thaumcraft/common/items/wands/WandManager.java:20` |
+| Inventory vis consumption ignores bauble storage | `src/main/java/thaumcraft/common/items/wands/WandManager.java:62` |
 
-### P1.2 -- Potions and enchantments
+### P1.2 -- Research compatibility and enchantments
 
 | Finding | Evidence |
 |---------|----------|
-| Infectious Vis Exhaust does nothing and is never ready | `src/main/java/thaumcraft/common/lib/potions/PotionInfectiousVisExhaust.java:29`, `src/main/java/thaumcraft/common/lib/potions/PotionInfectiousVisExhaust.java:33` |
-| Thaumarhia behavior does not match intended flux-goo style effect | `src/main/java/thaumcraft/common/lib/potions/PotionThaumarhia.java:32` |
+| Offline research/aspect loading is cache-only, not original `.thaum`/`.thaumbak` compatible | `src/main/java/thaumcraft/common/lib/research/ResearchManager.java:95`, `src/main/java/thaumcraft/common/lib/research/PlayerKnowledge.java:14` |
 | Frugal is registered as a digger enchantment and lacks focus-specific applicability | `src/main/java/thaumcraft/common/lib/enchantment/EnchantmentFrugal.java:9` |
 
 ### P1.3 -- Boss and special mob behavior
@@ -133,8 +117,8 @@ Exit criteria:
 ## Recommended Execution Order
 
 1. Fix remaining six focus server actions.
-2. Fix vis node recharge and wand/bauble vis integration.
-3. Fix crucible ingestion/aspect container and classify major empty TEs.
-4. Fix potions/enchantments and high-impact relic/bauble actions.
+2. Fix crucible ingestion/aspect container and classify major empty TEs.
+3. Fix bauble vis storage/consumption, relic actions, and research offline compatibility.
+4. Fix enchantment applicability and high-impact bauble actions.
 5. Fix boss/special mob TODOs that are server-visible.
 6. Run `compileJava`, then update `AGENTS.md` and `docs/PRD.md` statuses before Phase 8.

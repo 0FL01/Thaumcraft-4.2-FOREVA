@@ -8,6 +8,7 @@ import thaumcraft.api.aspects.AspectList;
 import thaumcraft.api.internal.IInternalMethodHandler;
 import thaumcraft.common.Thaumcraft;
 import thaumcraft.common.items.wands.ItemWandCasting;
+import thaumcraft.common.items.wands.WandManager;
 import thaumcraft.common.lib.capabilities.IPlayerKnowledge;
 import thaumcraft.common.lib.capabilities.PlayerKnowledgeProvider;
 import thaumcraft.common.lib.research.PlayerKnowledge;
@@ -89,17 +90,7 @@ public class InternalMethodHandler implements IInternalMethodHandler {
 
     @Override
     public boolean consumeVisFromInventory(EntityPlayer player, AspectList cost) {
-        // Try all inventory slots for wands
-        for (int i = 0; i < player.inventory.getSizeInventory(); i++) {
-            ItemStack stack = player.inventory.getStackInSlot(i);
-            if (!stack.isEmpty() && stack.getItem() instanceof ItemWandCasting) {
-                ItemWandCasting wandItem = (ItemWandCasting) stack.getItem();
-                if (wandItem.consumeAllVis(stack, player, cost, true, false)) {
-                    return true;
-                }
-            }
-        }
-        return false;
+        return WandManager.consumeVisFromInventory(player, cost);
     }
 
     @Override

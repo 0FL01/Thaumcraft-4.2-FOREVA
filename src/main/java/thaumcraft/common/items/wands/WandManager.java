@@ -1,18 +1,60 @@
 package thaumcraft.common.items.wands;
 
+import baubles.api.BaublesApi;
+import baubles.api.cap.IBaublesItemHandler;
+import net.minecraft.potion.PotionEffect;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.world.World;
 import thaumcraft.api.IArchitect;
+import thaumcraft.api.IVisDiscountGear;
+import thaumcraft.api.aspects.Aspect;
 import thaumcraft.api.aspects.AspectList;
 import thaumcraft.api.wands.FocusUpgradeType;
 import thaumcraft.api.wands.ItemFocusBasic;
+import thaumcraft.common.config.Config;
 import thaumcraft.common.lib.TCSounds;
 
 import java.util.TreeMap;
 
 public class WandManager {
+
+    public static float getTotalVisDiscount(EntityPlayer player, Aspect aspect) {
+        if (player == null) return 0.0F;
+
+        int total = 0;
+        IBaublesItemHandler baubles = BaublesApi.getBaublesHandler(player);
+        if (baubles != null) {
+            for (int slot = 0; slot < baubles.getSlots(); slot++) {
+                ItemStack stack = baubles.getStackInSlot(slot);
+                if (!stack.isEmpty() && stack.getItem() instanceof IVisDiscountGear) {
+                    total += ((IVisDiscountGear) stack.getItem()).getVisDiscount(stack, player, aspect);
+                }
+            }
+        }
+
+        for (ItemStack stack : player.inventory.armorInventory) {
+            if (!stack.isEmpty() && stack.getItem() instanceof IVisDiscountGear) {
+                total += ((IVisDiscountGear) stack.getItem()).getVisDiscount(stack, player, aspect);
+            }
+        }
+
+        int exhaustionLevel = -1;
+        if (Config.potionVisExhaust != null) {
+            PotionEffect effect = player.getActivePotionEffect(Config.potionVisExhaust);
+            if (effect != null) exhaustionLevel = Math.max(exhaustionLevel, effect.getAmplifier());
+        }
+        if (Config.potionInfectiousVisExhaust != null) {
+            PotionEffect effect = player.getActivePotionEffect(Config.potionInfectiousVisExhaust);
+            if (effect != null) exhaustionLevel = Math.max(exhaustionLevel, effect.getAmplifier());
+        }
+        if (exhaustionLevel >= 0) {
+            total -= (exhaustionLevel + 1) * 10;
+        }
+
+        return (float) total / 100.0F;
+    }
 
     /**
      * Try to consume vis from any wand in the player's inventory.

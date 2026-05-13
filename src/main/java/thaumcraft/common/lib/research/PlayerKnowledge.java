@@ -12,12 +12,9 @@ public class PlayerKnowledge {
      * Check if a player has discovered a specific aspect.
      */
     public boolean hasDiscoveredAspect(String username, Aspect aspect) {
-        // For online players, check capability directly
-        // For offline, we'd need a cache (offline support deferred)
         if (aspect == null) return false;
-        // The capability-based approach is used at runtime
-        // This method exists for API compatibility
-        return false;
+        IPlayerKnowledge knowledge = ResearchManager.getResearchData(username);
+        return knowledge != null && knowledge.hasDiscoveredAspect(aspect);
     }
 
     /**
@@ -33,7 +30,8 @@ public class PlayerKnowledge {
      * Get the aspects a player has discovered.
      */
     public AspectList getAspectsDiscovered(String username) {
-        return new AspectList();
+        IPlayerKnowledge knowledge = ResearchManager.getResearchData(username);
+        return knowledge != null ? knowledge.getAspectsDiscovered() : new AspectList();
     }
 
     /**

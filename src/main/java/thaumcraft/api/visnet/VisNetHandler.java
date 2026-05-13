@@ -25,11 +25,11 @@ public class VisNetHandler {
     static ArrayList<WorldCoordinates> cache = new ArrayList<>();
     private static HashMap<WorldCoordinates, ArrayList<WeakReference<TileVisNode>>> nearbyNodes = new HashMap<>();
 
-    // Tick counter for world regeneration
+    // Tick counter for source reference cleanup.
     private static int tickCounter = 0;
 
     /**
-     * World tick handler for vis regeneration. Called every 100 ticks.
+     * World tick handler for stale source cleanup. Natural aura-node recharge is owned by TileNode.update().
      */
     @SubscribeEvent
     public void onWorldTick(TickEvent.WorldTickEvent event) {
@@ -39,25 +39,8 @@ public class VisNetHandler {
         tickCounter++;
         if (tickCounter % 100 != 0) return;
 
-        // Regenerate vis in all source nodes
         HashMap<WorldCoordinates, WeakReference<TileVisNode>> dimSources = sources.get(event.world.provider.getDimension());
         if (dimSources == null) return;
-
-        for (WeakReference<TileVisNode> ref : dimSources.values()) {
-            if (!isNodeValid(ref)) continue;
-            TileVisNode node = ref.get();
-            // Source nodes regenerate vis naturally
-            // Each source regens 1 vis per tick to all primal aspects
-            if (node != null && node.isSource()) {
-                for (Aspect aspect : Aspect.getPrimalAspects()) {
-                    if (aspect != null) {
-                        // Regeneration handled by the node itself via its update() method
-                    }
-                }
-            }
-        }
-
-        // Clean up invalid references
         cleanInvalidReferences(event.world);
     }
 
