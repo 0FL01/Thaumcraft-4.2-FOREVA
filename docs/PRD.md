@@ -196,7 +196,7 @@ Goal:
 
 Expected status:
 
-- Mostly done, but every run must verify locally.
+- Build baseline exists, but every run must verify locally. This is not a parity claim.
 
 Validation:
 
@@ -243,14 +243,16 @@ Goal:
 
 - Aspects, aura/vis, wands, research, scan state, warp, potions, enchantments, and player capabilities work.
 
+Current baseline:
+
+- Aura/wand centi-vis units, wand discounts, online capability-backed research lookup, server potion effects, Vis Amulet integration, Thaumometer scan hook, and Frugal focus applicability have implementation baselines.
+- Phase 3 is not closed or validated; build-only evidence is insufficient.
+
 Known risk areas:
 
-- Wand centi-vis units.
-- Wand discounts.
-- Bauble vis storage and inventory vis consumption.
-- Thaumometer scan action.
-- Offline `.thaum` and `.thaumbak` compatibility.
-- Frugal/focus enchant applicability.
+- Bauble vis storage and inventory vis consumption runtime scenarios.
+- Runic Ring tick behavior versus original behavior.
+- Offline `.thaum` and `.thaumbak` compatibility, currently deferred.
 - Research sync timing.
 - Capability persistence.
 
@@ -265,9 +267,15 @@ Goal:
 
 - Blocks and tile entities are placeable, persistent, interactive, and server-functional.
 
+Current baseline:
+
+- Crucible, Infusion Matrix lifecycle, Arcane Bore mining-loop, Portable Hole wrapper, and Warding wrapper server baselines exist.
+- Phase 4 is not closed or validated; GUI/content-dependent machines and runtime scenarios remain open.
+
 Known risk areas:
 
-- Arcane Bore full mining loop.
+- Arcane Bore runtime/manual mining validation.
+- `TileArcaneBoreBase` original-behavior verification.
 - Thaumatorium recipe programming/content flow.
 - Focal Manipulator upgrade UI/content flow.
 - Infusion Matrix lifecycle and instability.
@@ -286,13 +294,20 @@ Goal:
 
 - Items and equipment preserve original gameplay behavior.
 
+Current baseline:
+
+- Focus server actions for Pech, Hellbat, Trade, Excavation, Portable Hole, and Warding have common/server baselines.
+- Vis Amulet, Thaumometer, Frugal, targeted repairability, and Primal Crusher baselines exist.
+- Phase 5 is not closed or validated; manual scenarios and remaining item mechanics are still required.
+
 Known risk areas:
 
-- Six remaining focus server actions.
-- Bauble storage and tick behavior.
-- Thaumometer scan behavior.
-- Tool and armor repairability.
-- Primal Crusher inheritance/behavior.
+- Focus cost consumption and world/entity scenarios.
+- Focus visual feedback and FX, deferred to Phase 8.
+- Bauble storage and tick behavior validation.
+- Hover Harness flight/hover behavior.
+- Tool and armor repairability broad parity.
+- Primal Crusher behavior validation.
 - Wand/focus upgrade costs and side effects.
 
 Acceptance:
@@ -307,14 +322,17 @@ Goal:
 
 - Entities, AI, projectiles, bosses, golems, drops, sounds, and special behaviors are ported.
 
+Current baseline:
+
+- Cultist Leader, Eldritch Golem, Eldritch Warden, Inhabited Zombie crab spawn, Pech death loot, major projectile, and main AI source baselines exist.
+- Phase 6 is not closed or validated; runtime/manual spawn and combat checks remain required.
+
 Known risk areas:
 
-- Boss special attacks.
-- Cultist leader equipment/ranged/aura behavior.
-- Eldritch Golem beam/headless behavior.
-- Eldritch Warden ranged/frenzy behavior.
-- Inhabited Zombie death spawn.
-- Pech loot/trade behavior.
+- Boss special attacks runtime validation.
+- Pech trade, taming, pickup, and combat behavior.
+- Golem AI behavior and interaction flows.
+- Drops and sounds under runtime scenarios.
 - Client renderers are Phase 8.
 
 Acceptance:
@@ -327,6 +345,11 @@ Acceptance:
 Goal:
 
 - Biomes, trees, structures, dimensions, maze generation, portals, persistence, and world data behave correctly.
+
+Current baseline:
+
+- Outer Lands registration/runtime-hook baseline exists.
+- Phase 7 is not closed or validated; generation, portal safety, and persistence need runtime evidence.
 
 Known risk areas:
 

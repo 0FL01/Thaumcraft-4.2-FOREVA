@@ -1,350 +1,141 @@
-# Thaumcraft 4.2.3.5 -> Forge 1.12.2 Port Repair Backlog
+# Thaumcraft 4.2.3.5 -> Forge 1.12.2 Repair Mine List
 
 ## 1. Purpose
 
-This document is the active repair backlog for closing parity gaps. It is intentionally narrower than `docs/PRD.md`.
+This is the active pre-Phase8 mine list. It is intentionally shorter than `docs/PRD.md` and is not a parity-complete ledger.
 
-Use this file to decide what the next Codex `/goal` run should implement.
+Use it to pick the next focused checkpoint and to avoid reopening areas that already have a common/server baseline unless current code or runtime evidence contradicts them.
 
-Do not start Phase 8 client work until the pre-Phase8 gates below are fixed or explicitly deferred with evidence.
+Do not start Phase 8 client work as a parity claim until the mines below are verified or explicitly deferred with evidence in the checkpoint report.
 
-## 2. Baseline rules
+## 2. Required baseline workflow
 
-Before changing code:
+Before changing implementation code:
 
 - Run `git status --short`.
-- Read `AGENTS.md`.
-- Read `docs/PRD.md`.
-- Read this file.
-- Read `docs/CODEX_GOAL.md`.
-- Run or document baseline validation.
+- Read `AGENTS.md`, `docs/PRD.md`, this file, `docs/CODEX_GOAL.md`, `build.gradle`, and `Dockerfile`.
 - Inspect original 1.7.10 behavior for every gameplay-critical touched class.
+- Run focused validation with `./scripts/dev.sh`; use Docker unless the local environment is known Java 8/Forge-compatible.
 
-A compile-passing class is not automatically parity-complete.
+Compile/build success is not a parity close. Runtime-affecting claims need server/client smoke or explicit manual scenario notes.
 
-## 3. Baseline validation
+## 3. Current common/server baseline, not phase closure
 
-Preferred baseline command:
+The following baselines exist in current source and should not be re-audited as fresh blockers without contrary evidence:
 
-    docker run --rm \
-      -v "$(pwd):/workspace/thaumcraft" \
-      -v "$(pwd)/.gradle_home:/home/ubuntu/.gradle" \
-      --user "$(id -u):$(id -g)" \
-      --entrypoint ./gradlew \
-      thaumcraft-dev compileJava
+- Aura/wand centi-vis units, wand discounts, and no passive wand recharge baseline.
+- Online capability/cache-backed research lookup and restored server potion-effect baseline.
+- Crucible item ingestion, water interaction, spill behavior, and aspect-container exposure baseline.
+- Infusion Matrix server lifecycle baseline.
+- Focus server actions for Pech, Hellbat, Trade, Excavation, Portable Hole, and Warding.
+- Portable Hole and Warding server/common wrapper blocks and tile entities. Their visual renderer work remains Phase 8.
+- Arcane Bore server mining-loop baseline with focus/pickaxe gates, fortune/silk handling, pickaxe damage, and base inventory output.
+- Vis Amulet storage/bauble consumption integration, Thaumometer entity/block scan hook, and Frugal focus applicability baseline.
+- Material-based repair items, Primal Crusher tool baseline, and targeted removal of incorrect always-false repair checks.
+- Cultist Leader, Eldritch Golem, Eldritch Warden, Inhabited Zombie crab spawn, Pech death loot, and `blockAiry` meta 10/11 server baselines.
+- Outer Lands registration/runtime-hook baseline.
 
-If Docker image does not exist:
+Last recorded checkpoint evidence for the boss/special-mob pass was Docker `compileJava` and `build` on 2026-05-13. That is build evidence only, not runtime/manual parity validation.
 
-    docker build -t thaumcraft-dev .
+## 4. Active pre-Phase8 mines
 
-If a fresh workspace is not initialized:
+### M1. Build/runtime/manual validation gap
 
-    docker run --rm \
-      -v "$(pwd):/workspace/thaumcraft" \
-      -v "$(pwd)/.gradle_home:/home/ubuntu/.gradle" \
-      --user "$(id -u):$(id -g)" \
-      --entrypoint ./gradlew \
-      thaumcraft-dev setupDecompWorkspace
+Required before treating the pre-Phase8 server gate as closed:
 
-## 4. Closed or do-not-reopen without evidence
+- Run current `compileJava`/`build` or document a pre-existing environment failure.
+- Run `./scripts/dev.sh smoke-server` for common/server changes when possible.
+- Document focused manual scenarios for foci, Arcane Bore, baubles/Thaumometer, repairability, bosses/special mobs, golems, and Outer Lands where those systems are claimed.
 
-Do not re-audit these as blockers unless current code contradicts them:
+### M2. Phase 3 core-system risk
 
-- Sound registration baseline exists.
-- Major projectile baseline exists.
-- Main AI source baseline exists.
-- Outer Lands runtime hookup baseline exists.
-- Container hard-locks were previously remediated.
-- Phase 3 core baseline exists for aura persistence, wand centi-vis units, discounts, and no passive wand recharge.
-- Research/potion baseline exists for online capability-backed lookup and restored server potion effects.
-- Crucible baseline exists for item ingestion, water interaction, spill behavior, and aspect container exposure.
-- Major tile entity baseline exists for several machines, but full machine gameplay remains separate.
-- Infusion Matrix server lifecycle baseline exists.
+Still not closed:
 
-These statements must still be verified locally before being used as final parity claims.
+- Offline `.thaum`/`.thaumbak` research migration remains deferred; current lookup is capability/cache based.
+- Research sync timing and capability persistence require runtime verification.
+- Runic Ring charge values exist, but tick behavior must be checked against original behavior before any parity claim.
+- Vis Amulet and inventory vis consumption need manual source/combination scenarios, not only code inspection.
 
-## 5. Pre-Phase8 gate: P0 blockers
+### M3. Phase 4 block/tile risk
 
-P0 items block Phase 8 unless explicitly deferred in the final report with a reason.
+Still not closed:
 
-### P0.1 Remaining focus server actions
+- Arcane Bore has a mining-loop baseline, but needs runtime/manual mining scenarios.
+- `TileArcaneBoreBase` is minimal; verify no original base-side server behavior was omitted before final parity claims.
+- Thaumatorium, Focal Manipulator, essentia transport, tile sync, and GUI-dependent flows remain separate risks.
+- Portable Hole/Warding wrapper visuals are Phase 8, even though server wrappers exist.
 
-Problem:
+### M4. Phase 5 item/equipment/focus risk
 
-Six focus items still have no-op or placeholder server behavior. These are server/common gameplay features, not Phase 8 visual/client work.
+Still not closed:
 
-Target files:
+- Focus server baselines need manual world/entity scenarios and cost-consumption checks.
+- Focus visual feedback, beams, particles, and render-only effects are Phase 8.
+- Hover Harness flight/hover mechanics remain deferred.
+- Equipment and armor repairability had targeted fixes, but broad parity still needs original-reference spot checks.
 
-- `src/main/java/thaumcraft/common/items/wands/foci/FocusPortableHole.java`
-- `src/main/java/thaumcraft/common/items/wands/foci/FocusTrade.java`
-- `src/main/java/thaumcraft/common/items/wands/foci/FocusPech.java`
-- `src/main/java/thaumcraft/common/items/wands/foci/FocusHellbat.java`
-- `src/main/java/thaumcraft/common/items/wands/foci/FocusExcavation.java`
-- `src/main/java/thaumcraft/common/items/wands/foci/FocusWarding.java`
+### M5. Phase 6 entity/golem risk
 
-Related files:
+Still not closed:
 
-- `src/main/java/thaumcraft/common/items/wands/ItemWandCasting.java`
-- `src/main/java/thaumcraft/common/items/wands/WandManager.java`
-- projectile/entity/helper classes needed by original behavior
-- relevant packet/client FX hooks only if server behavior requires a notification
+- Boss/special-mob server baselines need runtime/manual spawn and combat validation.
+- Pech death loot was restored; Pech trade, taming, pickup, and combat behavior were not fully revalidated by that checkpoint.
+- Golem core AI and GUI/client presentation need separate verification; renderers are Phase 8.
 
-Required method:
+### M6. Phase 7 worldgen/Outer Lands risk
 
-- Compare each focus against the original 1.7.10 reference.
-- Implement server-side behavior first.
-- Preserve existing cost units and focus upgrade semantics.
-- Keep visual-only feedback deferred to Phase 8 if needed.
-- Add side checks to avoid client-only world mutation.
-- Keep public API stable.
+Still not closed:
 
-Exit criteria:
+- Outer Lands generation/runtime smoke tests are still required.
+- Room-generator parity, maze persistence, structure query hooks, and portal teleport safety remain risk areas.
+- Biome color/debug overlay cosmetics are not server blockers, but must be documented if deferred.
 
-- Each focus has server behavior or a documented explicit blocker.
-- Vis costs are consumed through existing wand logic.
-- Safe side checks are present.
-- `compileJava` passes.
-- Focus-specific manual scenario is documented in final report.
+## 5. Explicit deferrals
 
-### P0.2 Arcane Bore server mining loop decision
+Keep these visible in final reports until implemented or consciously accepted as out of scope:
 
-Problem:
+- Offline `.thaum`/`.thaumbak` research migration: deferred; current source uses capability/cache research state.
+- Portable Hole and Warding visual renderers/FX: deferred to Phase 8.
+- Phase 8 client GUI/renderers/keybinds/particles/beams/bolts/shaders/resources: not complete.
+- Phase 9 recipes/research/content registrations: not complete; `ConfigRecipes` and `ConfigResearch` remain placeholders.
+- Hover Harness flight/hover mechanics: deferred item/equipment work.
+- Outer Lands runtime smoke, room parity, maze persistence, and portal safety: Phase 7 validation remains open.
 
-Arcane Bore has baseline inventory/orientation/NBT behavior, but full block scanning/digging/mining loop may still be partial.
+## 6. Phase 8 client backlog
 
-Target files:
+Start with an inventory of current `thaumcraft.client.*` against `thaumcraft_src/thaumcraft/client/**`.
 
-- `src/main/java/thaumcraft/common/tiles/TileArcaneBore.java`
-- `src/main/java/thaumcraft/common/tiles/TileArcaneBoreBase.java`
-- related block/item/render-independent helpers only if required
+Implement in small groups:
 
-Required method:
-
-- Inspect original 1.7.10 bore behavior.
-- Decide whether full bore gameplay blocks Phase 8.
-- If it blocks, implement server mining loop.
-- If it is deferred, document why it is safe to move to Phase 8 before completion.
-
-Exit criteria:
-
-- Either full server mining behavior works, or deferral is explicitly documented.
-- `compileJava` passes.
-- If implemented, a manual scenario is documented.
-
-## 6. Pre-Phase8 gate: P1 blockers
-
-P1 items should be fixed before Phase 8 unless explicitly deferred with evidence.
-
-### P1.1 Baubles, relics, and wand integration
-
-Problems:
-
-- Runic ring tick behavior needs verification/implementation.
-- Vis amulet storage behavior needs verification/implementation.
-- Thaumometer scan action needs verification/implementation.
-- Inventory vis consumption needs to include bauble storage where original behavior requires it.
-
-Target files:
-
-- `src/main/java/thaumcraft/common/items/baubles/ItemRingRunic.java`
-- `src/main/java/thaumcraft/common/items/baubles/ItemAmuletVis.java`
-- `src/main/java/thaumcraft/common/items/relics/ItemThaumometer.java`
-- `src/main/java/thaumcraft/common/items/wands/WandManager.java`
-- `src/main/java/thaumcraft/common/items/wands/ItemWandCasting.java`
-- relevant capability/research helper classes
-
-Exit criteria:
-
-- Bauble tick/storage behavior works server-side.
-- Wand inventory vis consumption accounts for allowed sources.
-- Thaumometer scan action updates scan/research state.
-- Existing wand discount/centi-vis behavior remains unchanged.
-- `compileJava` passes.
-
-### P1.2 Research compatibility and enchantments
-
-Problems:
-
-- Offline `.thaum` and `.thaumbak` compatibility may not be original-compatible.
-- Frugal enchantment applicability may not match focus-specific original behavior.
-
-Target files:
-
-- `src/main/java/thaumcraft/common/lib/research/ResearchManager.java`
-- `src/main/java/thaumcraft/common/lib/research/PlayerKnowledge.java`
-- `src/main/java/thaumcraft/common/lib/enchantment/EnchantmentFrugal.java`
-- related API/crafting/research helper classes only if required
-
-Exit criteria:
-
-- Original-compatible offline research/aspect loading exists or deferral is documented.
-- Frugal applies only where original behavior allows.
-- Public API remains compatible.
-- `compileJava` passes.
-
-### P1.3 Boss and special mob behavior
-
-Status after the 2026-05-13 boss/special mob checkpoint:
-
-- Cultist Leader server equipment, ranged attack, and nearby cultist buff behavior are implemented.
-- Eldritch Golem headless transition and headless ranged attack behavior are implemented.
-- Eldritch Warden ranged attack, screech, teleport, and field frenzy behavior are implemented.
-- Inhabited Zombie Eldritch Crab death spawn was implemented in the earlier P0/P1 server pass.
-- Pech death loot is implemented; existing trade/taming/pickup/combat behavior remains outside this checkpoint except where preserved by the death loot change.
-- Runtime/manual mob combat validation is still needed before marking these behaviors as fully validated.
-
-Target files:
-
-- `src/main/java/thaumcraft/common/entities/monster/boss/EntityCultistLeader.java`
-- `src/main/java/thaumcraft/common/entities/monster/boss/EntityEldritchGolem.java`
-- `src/main/java/thaumcraft/common/entities/monster/boss/EntityEldritchWarden.java`
-- `src/main/java/thaumcraft/common/entities/monster/EntityInhabitedZombie.java`
-- `src/main/java/thaumcraft/common/entities/monster/EntityPech.java`
-- related projectile/AI/loot/helper classes only if required
-
-Exit criteria:
-
-- Server-visible special behavior is implemented or explicitly deferred.
-- Entity registration and existing AI behavior remain stable.
-- `compileJava` passes.
-- Manual spawn/behavior scenario is documented.
-
-### P1.4 Tools, armor, and repairability
-
-Problems:
-
-- Primal Crusher inheritance/behavior and repair check need verification.
-- Multiple tools/armor classes may still return incorrect placeholder repair checks.
-
-Target files:
-
-- `src/main/java/thaumcraft/common/items/equipment/ItemPrimalCrusher.java`
-- `src/main/java/thaumcraft/common/items/equipment/**`
-- `src/main/java/thaumcraft/common/items/armor/**`
-- relevant `IRepairable` and `IRepairableExtended` implementations
-
-Exit criteria:
-
-- Repairability matches original behavior.
-- Placeholder always-false checks are removed where incorrect.
-- No unrelated equipment behavior changes.
-- `compileJava` passes.
-
-## 7. Checkpoint notes from 2026-05-13 P0/P1 server pass
-
-Implemented in this pass:
-
-- P0.1 server behavior for Pech, Hellbat, Trade, and Excavation foci.
-- P0.2 baseline Arcane Bore server mining loop with powered operation, focus/pickaxe validation, fortune/silk handling, pickaxe damage, and base inventory output.
-- P1.1 Vis Amulet storage/bauble consumption integration, Runic Ring charge values, and Thaumometer entity/block scan hook.
-- P1.2 Frugal enchantment focus applicability.
-- P1.3 Inhabited Zombie Eldritch Crab death spawn.
-- P1.4 material-based repair items, Primal Crusher tool baseline, and removal of incorrect always-false repair checks for the targeted tools/armor.
-
-Implemented in the follow-up wrapper-block checkpoint:
-
-- Portable Hole focus now has original-compatible server/common `blockHole`/`TileHole` support: hidden tunnel blocks store original block state, countdown, direction, chain length, and restore themselves after the duration.
-- Warding focus now has original-compatible server/common `blockWarded`/`TileWarded` support: hidden warded blocks store owner hash, original block, metadata, and light, and owner wand use can unwrap them.
-- Both wrapper systems are registered as hidden blocks/tile entities and keep visual renderer work deferred to Phase 8.
-
-Implemented in the boss/special mob checkpoint:
-
-- Cultist Leader now has original-compatible server equipment setup, title NBT/data sync, GolemOrb ranged attack, nearby cultist Strength II aura, cultist ally targeting guards, and loot bag drop.
-- Eldritch Golem now has original-compatible headless NBT/data sync, lethal-damage headless transition, headless ranged GolemOrb beam attack cadence, armor/eye-height adjustments, and headless melee knockback.
-- Eldritch Warden now has original-compatible title NBT/data sync, absorption shield, EldritchOrb ranged attack, screech knockback/debuff/warp behavior, frenzy trigger, home teleport, and temporary `blockAiry` field placement.
-- Pech death loot now drops carried loot, aspect-tagged mana beans, coins, and rare knowledge fragments using the original drop probabilities mapped to current item metadata.
-- `blockAiry` meta 10/11 now has the original temporary scheduled removal and server collision effects required by Warden field frenzy and existing shock-fire airy blocks.
-- Docker `compileJava` and `build` passed for this checkpoint on 2026-05-13.
-
-Explicitly deferred with evidence:
-
-- Offline `.thaum`/`.thaumbak` research migration remains deferred; current research lookup is capability/cache based.
-
-## 8. Phase 8 client backlog
-
-Start only after P0 is closed or explicitly deferred.
-
-Target areas:
-
-- `src/main/java/thaumcraft/client/ClientProxy.java`
-- `src/main/java/thaumcraft/client/gui/**`
-- client event handlers
-- key bindings
-- GUI screens
-- tile entity special renderers
-- entity renderers
-- model classes
-- particle engine
-- beam/bolt effects
-- shader/post-processing support
-- GUI/model/texture/lang/sound resources
-
-Required first step:
-
-- Inventory current `thaumcraft.client.*` implementation.
-- Compare against original `thaumcraft_src/thaumcraft/client/**`.
-- Create a small class-by-class client backlog.
-- Implement in groups:
-  - proxy registrations;
-  - core GUIs;
-  - TESRs;
-  - entity renderers;
-  - particles/beams/bolts;
-  - shaders/resources.
+- client proxy registrations;
+- core GUI screens;
+- TESRs;
+- entity renderers;
+- particles, beams, and bolts;
+- shaders and required resources.
 
 Validation:
 
-- `compileJava`.
-- `processResources` after resource changes.
-- `runClient` if display is available.
+- `./scripts/dev.sh compileJava`.
+- `./scripts/dev.sh gradle processResources` after resource changes.
+- `./scripts/dev.sh smoke-client` if display/X11 is available.
 - Manual GUI/render smoke scenarios.
 
-## 9. Phase 9 content backlog
+## 7. Phase 9 and Phase 10 backlog
 
-Start after required GUI/client pathways are usable enough to verify content.
+Phase 9 starts after required GUI/client paths are usable enough to verify content:
 
-Target areas:
+- recipe registration;
+- research registration;
+- Thaumonomicon references;
+- aspect tags;
+- critical progression smoke tests.
 
-- `src/main/java/thaumcraft/common/config/ConfigRecipes.java`
-- `src/main/java/thaumcraft/common/config/ConfigResearch.java`
-- `src/main/java/thaumcraft/common/lib/crafting/**`
-- `src/main/java/thaumcraft/common/lib/research/**`
-- `src/main/resources/assets/thaumcraft/recipes/**`
-- research/Thaumonomicon resource references
-- aspect tag registration
+Phase 10 polish starts only after gameplay, client, and content baselines exist. Do not use polish, localization breadth, optional integration, or broad cleanup to hide unresolved core parity gaps.
 
-Required first step:
+## 8. Required final report per checkpoint
 
-- Inventory current recipe/research registration.
-- Compare against original reference.
-- Separate missing content from broken registration mechanics.
-
-Exit criteria:
-
-- Recipes register.
-- Research registers.
-- Thaumonomicon references valid content.
-- Critical progression path is manually smoke-tested.
-
-## 10. Phase 10 polish backlog
-
-Allowed only after gameplay, client, and content baselines exist.
-
-Possible items:
-
-- JEI integration if optional.
-- Config GUI if scaffolded or necessary.
-- Localization breadth.
-- Sound completeness verification.
-- Optional compatibility.
-- Performance tuning.
-- Crash test pass.
-
-Do not let polish work hide unresolved core parity gaps.
-
-## 10. Required final report per checkpoint
-
-Every `/goal` run must end with:
+Every checkpoint must end with:
 
 - Summary of changes.
 - Files modified.
@@ -353,15 +144,8 @@ Every `/goal` run must end with:
 - Acceptance checklist.
 - Validation commands and results.
 - Runtime/manual checks.
-- Known limitations.
+- Known limitations and explicit deferrals.
 - Blockers.
 - Suggested next checkpoint.
 
-## 11. Update policy
-
-After a blocker is fixed:
-
-- Update this file to move it from active blocker to closed status.
-- Keep the update factual.
-- Include validation evidence.
-- Do not mark a phase done unless runtime/manual evidence supports it.
+After a blocker is fixed, update this file factually and include validation evidence. Do not mark a phase done unless runtime/manual evidence supports it.

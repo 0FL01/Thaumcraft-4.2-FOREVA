@@ -1,18 +1,28 @@
-# Goal Manifest: Boss and Special Mob Server Parity
+# Goal Manifest: Boss and Special Mob Server Parity (Retired Checkpoint)
 
-## Objective
+## Status
 
-Complete the remaining deferred pre-Phase8 boss/special mob server parity.
+This manifest records the 2026-05-13 boss/special-mob server checkpoint. It is not the active `/goal` for new work unless a user explicitly refreshes it.
 
-Current state:
+Current documentation status:
+
+- Boss/special-mob server baselines are implemented, but not runtime/manual validated as Phase 6 parity.
+- Phases 3, 4, 5, 6, and 7 remain open baselines, not closed phases.
+- Use `docs/REPAIR.md` for the current pre-Phase8 mine list and explicit deferrals.
+
+## Historical objective
+
+Complete the remaining deferred pre-Phase8 boss/special mob server baseline.
+
+Historical starting state:
 
 - Portable Hole and Warding wrapper systems are already implemented.
 - P0 focus/block wrapper blockers are closed.
-- Boss/special mob parity remains deferred.
+- Boss/special mob server behavior remained deferred before this checkpoint.
 - Offline `.thaum/.thaumbak` research migration remains deferred and is out of scope for this checkpoint.
 - Phase 8 client work is out of scope.
 
-Target state:
+Historical target state:
 
 - Cultist Leader has original-compatible equipment, ranged attack, and nearby cultist buff behavior.
 - Eldritch Golem has original-compatible headless transition and beam/ranged behavior.

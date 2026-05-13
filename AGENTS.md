@@ -53,6 +53,12 @@ Asset origin: assets (textures, sounds, models, lang, shaders, etc.) for the por
 - `src/main/resources/assets/thaumcraft/**`: assets, sounds, textures, models, recipes, lang, GUI resources.
 - `thaumcraft_src/**`: read-only original reference.
 
+## Current status guard
+
+As of the 2026-05-13 documentation cleanup, Phases 3, 4, 5, 6, and 7 are not closed or parity-validated. They have important common/server baselines, but still need runtime/manual validation and documented deferrals before any phase can be claimed complete.
+
+Use `docs/REPAIR.md` as the active pre-Phase8 mine list. Do not convert prior `compileJava`/`build` success into parity closure. Current explicit deferrals include offline `.thaum`/`.thaumbak` migration, Portable Hole/Warding visual renderers, Phase 8 client GUI/render/FX/shader work, Phase 9 recipe/research/content registration, Hover Harness flight behavior, and Outer Lands runtime/portal parity validation.
+
 ## Commit policy
 
 Work on a dedicated branch. Do not work directly on `master` or `main`.
