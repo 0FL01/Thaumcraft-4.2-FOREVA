@@ -805,9 +805,11 @@ The detailed repair backlog is tracked in **`docs/REPAIR.md`**. Current baseline
   entity GUI binding, and minimal server input packets.
 - Outer Lands provider/chunk/maze runtime hookup is fixed; remaining Phase 7
   work is fallback block/loot replacement TODOs and cosmetic biome color.
+- Server container hard-locks are fixed: `CommonProxy` binds player/tile/entity
+  context and `canInteractWith` checks are no longer unconditional `false`.
 - Phase 5 server gameplay is still active: 4/10 projectile foci now have
-  server-side behavior; remaining foci, bauble ticks, relic actions, and some
-  containers are not client-only work.
+  server-side behavior; remaining foci, bauble ticks, and relic actions are not
+  client-only work.
 
 Phase 8 should start only after the remaining `docs/REPAIR.md` P0 server/runtime
 items are fixed or explicitly accepted as deferred risk.

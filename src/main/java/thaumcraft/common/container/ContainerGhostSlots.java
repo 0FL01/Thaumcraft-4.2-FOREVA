@@ -11,7 +11,7 @@ import net.minecraft.item.ItemStack;
  * Ghost slots visually display items but cannot be taken by the player.
  * Subclasses mark ghost slots via isGhostSlot().
  */
-public class ContainerGhostSlots extends Container {
+public abstract class ContainerGhostSlots extends Container {
 
     /**
      * Override in subclasses to identify which slots are ghost slots.
@@ -42,10 +42,5 @@ public class ContainerGhostSlots extends Container {
             }
         }
         return super.slotClick(slotId, dragType, clickType, player);
-    }
-
-    @Override
-    public boolean canInteractWith(EntityPlayer player) {
-        return false;
     }
 }

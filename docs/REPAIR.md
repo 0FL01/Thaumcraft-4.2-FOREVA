@@ -29,31 +29,11 @@ Phase 8. Recipe/research-content work belongs to Phase 9.
 | Foci partial | `FocusFire`, `FocusFrost`, `FocusShock`, `FocusPrimal` have server actions. |
 | Outer Lands runtime | Provider type, void chunk baseline, maze populate dispatch, MazeThread centering, and structure query hooks are wired. |
 | Worldgen partial | Biomes, trees, village components, room-gen classes, and maze persistence exist. |
+| Container hard-locks | `CommonProxy` server IDs bind player/tile/entity context; container `canInteractWith` checks no longer return unconditional `false`. |
 
 ## P0 -- Must Fix Before Phase 8
 
-### P0.1 -- Server containers and GUI binding
-
-Many server containers are currently unusable because they return `false` from
-`canInteractWith`. Several `CommonProxy` mappings also instantiate empty no-arg
-containers instead of binding player/tile/entity state.
-
-| Finding | Evidence |
-|---------|----------|
-| No-arg server container mappings | `src/main/java/thaumcraft/common/CommonProxy.java:46`, `src/main/java/thaumcraft/common/CommonProxy.java:60` |
-| Base ghost container hard-locks interaction | `src/main/java/thaumcraft/common/container/ContainerGhostSlots.java:47` |
-| Arcane workbench hard-locked | `src/main/java/thaumcraft/common/container/ContainerArcaneWorkbench.java:7` |
-| Focal manipulator hard-locked | `src/main/java/thaumcraft/common/container/ContainerFocalManipulator.java:8` |
-| Other hard-locked containers | Research table, alchemy furnace, deconstruction table, thaumatorium, spa, hand mirror, hover harness, focus pouch, magic box, arcane bore. |
-
-Exit criteria:
-- All pre-client server containers have valid `canInteractWith` checks.
-- `CommonProxy.getServerGuiElement` binds tile/entity/player inventories where
-  needed.
-- Client GUI classes can remain Phase 8 work, but server containers must not be
-  hard-locked.
-
-### P0.2 -- Vis network and node recharge
+### P0.1 -- Vis network and node recharge
 
 The vis system is structurally present, but recharge is still effectively a
 stub.
@@ -69,7 +49,7 @@ Exit criteria:
 - Wands no longer get unconditional environmental vis unless that behavior is
   intentionally accepted as a temporary compatibility simplification.
 
-### P0.3 -- Crucible and core TE server interactions
+### P0.2 -- Crucible and core TE server interactions
 
 `TileCrucible` has substantial logic, but it is not complete enough to mark the
 alchemy/server TE baseline done.
@@ -86,7 +66,7 @@ Exit criteria:
 - Empty/no-op TE classes are either ported enough for server gameplay or moved
   to a clearly marked Phase 9/data-bound bucket.
 
-### P0.4 -- Remaining focus server actions
+### P0.3 -- Remaining focus server actions
 
 Six focus items are still no-op server actions and were incorrectly labelled as
 Phase 8 client work.
@@ -152,10 +132,9 @@ Exit criteria:
 
 ## Recommended Execution Order
 
-1. Fix server containers and `CommonProxy` bindings.
-2. Fix remaining six focus server actions.
-3. Fix vis node recharge and wand/bauble vis integration.
-4. Fix crucible ingestion/aspect container and classify major empty TEs.
-5. Fix potions/enchantments and high-impact relic/bauble actions.
-6. Fix boss/special mob TODOs that are server-visible.
-7. Run `compileJava`, then update `AGENTS.md` and `docs/PRD.md` statuses before Phase 8.
+1. Fix remaining six focus server actions.
+2. Fix vis node recharge and wand/bauble vis integration.
+3. Fix crucible ingestion/aspect container and classify major empty TEs.
+4. Fix potions/enchantments and high-impact relic/bauble actions.
+5. Fix boss/special mob TODOs that are server-visible.
+6. Run `compileJava`, then update `AGENTS.md` and `docs/PRD.md` statuses before Phase 8.
