@@ -1,496 +1,217 @@
-# Codex Goal Runbook — Thaumcraft 4.2.3.5 -> Forge 1.12.2 Parity
+# Goal Manifest: Portable Hole and Warding Server Wrapper Parity
 
-## 1. Purpose
+## Objective
 
-This file exists to keep Codex `/goal` objectives short.
+Implement the deferred server/common block-wrapper systems needed by `FocusPortableHole` and `FocusWarding`.
 
-The `/goal` command should point to this file instead of embedding the full plan in the objective.
+Current state:
 
-Do not create `GOAL.md`.
+- `FocusPortableHole` is deferred because no original-compatible `BlockHole` + `TileHole` restoration system exists.
+- `TileHole` exists only as a placeholder.
+- `FocusWarding` is deferred because no original-compatible arbitrary block wrapper equivalent to `blockWarded` + `TileWarded` exists.
+- There is no current registered `BlockHole`/`BlockWarded` implementation in the active 1.12.2 source.
 
-## 2. Primary objective
+Target state:
 
-Complete the Thaumcraft 4.2.3.5 to Minecraft Forge 1.12.2 port to the closest safe parity possible, preserving original gameplay behavior, addon API compatibility, registry identity, save data, config keys, NBT keys, research/crafting progression, worldgen behavior, and client presentation.
+- `FocusPortableHole` creates temporary pass-through holes using a registered block/tile system.
+- The hole tile stores original block state, tile data if safely supported, side/direction, duration/expiry, owner/caster data if original behavior requires it, and restores safely.
+- `FocusWarding` wraps valid target blocks in a warded wrapper block/tile.
+- The warded tile stores owner and original block state/data needed to render/drop/restore/protect the block.
+- Public API, config keys, NBT semantics, registry identity, and existing behavior remain compatible.
+- No client Phase 8 GUI/rendering work is started.
 
-Work checkpoint by checkpoint. Do not attempt the whole port as one unbounded cleanup.
+## Required reference workflow
 
-## 3. Required reading order
+Before implementation:
 
-Before changing code, read:
+- Inspect current 1.12.2 files:
+  - `FocusPortableHole.java`
+  - `FocusWarding.java`
+  - `TileHole.java`
+  - `ConfigBlocks.java`
+  - block registration/event registration paths
+  - tile registration paths
+  - relevant block utilities
+  - relevant wand/vis helpers
 
-1. `AGENTS.md`
-2. `docs/PRD.md`
-3. `docs/REPAIR.md`
-4. `docs/CODEX_GOAL.md`
-5. `build.gradle`
-6. `Dockerfile`
-7. Relevant current source files under `src/main/java/**`
-8. Matching original reference files under `thaumcraft_src/**` or CFR decompile output
+- Decompile/read original 1.7.10 classes from `Thaumcraft-1.7.10-4.2.3.5.jar` using CFR:
+  - original `FocusPortableHole`
+  - original `BlockHole`
+  - original `TileHole`
+  - original `FocusWarding`
+  - original `BlockWarded`
+  - original `TileWarded`
+  - any original helper classes they call
 
-## 4. Operating rules
+Do not rely on memory or PRD text for behavior.
 
-- Preserve behavior unless explicitly allowed.
-- Prefer small reversible changes.
-- Keep the diff scoped.
-- Do not perform unrelated cleanup.
-- Do not add new dependencies unless necessary and justified.
-- Do not silently change public contracts.
-- Do not ignore failing validation.
-- Do not continue through major ambiguity.
-- Keep the repository coherent after each checkpoint.
-- Prefer existing project conventions over new patterns.
-- Compare against original 1.7.10 behavior before implementing gameplay-critical code.
-- Separate server/common behavior from client-only rendering behavior.
-- Update docs only after implementation and validation.
+## Scope
 
-## 5. Forbidden changes
+Allowed paths:
 
-- Do not edit `thaumcraft_src/**`.
-- Do not edit `Thaumcraft-1.7.10-4.2.3.5.jar`.
-- Do not create `GOAL.md`.
-- Do not change public `thaumcraft.api.*` signatures unless unavoidable.
-- Do not change mod id.
-- Do not change registry names silently.
-- Do not change NBT keys silently.
-- Do not change config keys silently.
-- Do not change packet ids or GUI ids silently.
-- Do not upgrade Forge, Gradle, Java, Baubles, or bundled CodeChicken code for convenience.
-- Do not introduce broad formatting-only diffs.
-- Do not touch unrelated modules.
-- Do not commit generated build output.
-- Do not mark docs as complete without validation evidence.
+- `src/main/java/thaumcraft/common/items/wands/foci/FocusPortableHole.java`
+- `src/main/java/thaumcraft/common/items/wands/foci/FocusWarding.java`
+- `src/main/java/thaumcraft/common/tiles/TileHole.java`
+- new `src/main/java/thaumcraft/common/tiles/TileWarded.java` if required
+- new `src/main/java/thaumcraft/common/blocks/BlockHole.java` if required
+- new `src/main/java/thaumcraft/common/blocks/BlockWarded.java` if required
+- `src/main/java/thaumcraft/common/config/ConfigBlocks.java`
+- existing block/tile registration paths
+- existing `BlockUtils`/`EntityUtils` only if a small helper is required
+- minimal `docs/REPAIR.md` status update after validation
 
-## 6. Checkpoint sequence
+Out of scope:
 
-### Checkpoint A: Documentation and baseline audit
+- `thaumcraft.client.*`
+- Phase 8 GUI/renderers/FX/shaders
+- `ConfigRecipes`
+- `ConfigResearch`
+- Phase 9 recipes/research
+- bosses/special mobs
+- Pech loot
+- offline `.thaum`/`.thaumbak` migration
+- JEI
+- config GUI
+- broad formatting
+- dependency upgrades
+- public API signature changes
+- registry/config/NBT renames
 
-Goal:
+## Implementation checkpoints
 
-- Verify that docs match the local repository.
-- Do not change production code.
+### Checkpoint 1: Original behavior mapping
 
-Allowed files:
-
-- `AGENTS.md`
-- `docs/PRD.md`
-- `docs/REPAIR.md`
-- `docs/CODEX_GOAL.md`
+- Decompile/read original Portable Hole and Warding classes.
+- Identify exact NBT fields, duration behavior, restoration behavior, owner checks, target validity checks, and blacklist/edge-case behavior.
+- Inspect current registration lifecycle for blocks and tile entities.
+- Do not modify code yet except optional notes in final report.
 
 Validation:
 
 - `git status --short`
-- `find . -maxdepth 3 -type f | sort`
-- `find . -maxdepth 3 -type d | sort`
-- `./gradlew tasks` through Docker if practical
-- `compileJava` through Docker if practical
+- `rg -n "TileHole|BlockHole|TileWarded|BlockWarded|FocusPortableHole|FocusWarding" src/main/java thaumcraft_src docs`
 
-Stop condition:
+Stop if original behavior cannot be determined.
 
-- Docs are accurate enough for implementation.
-- Any local contradictions are documented.
+### Checkpoint 2: Implement BlockHole/TileHole baseline
 
-### Checkpoint B: Pre-Phase8 P0 server blockers
-
-Goal:
-
-- Close or explicitly defer P0 server blockers from `docs/REPAIR.md`.
-
-Targets:
-
-- Remaining no-op focus server actions.
-- Arcane Bore mining loop decision/implementation.
+- Implement registered `BlockHole` if absent.
+- Expand `TileHole` from placeholder into original-compatible temporary restoration tile.
+- Store original block state safely for 1.12.2.
+- Restore block on expiry/removal/server tick according to original behavior.
+- Avoid corrupting tile entities; if tile entity restoration is ambiguous, document blocker rather than guessing.
+- Wire registration without changing unrelated block registry names.
 
 Validation:
 
 - `compileJava`
-- focused placeholder scan
-- manual scenario notes
-
-Stop condition:
-
-- P0 is closed or deferred with evidence.
-
-### Checkpoint C: Pre-Phase8 P1 server blockers
-
-Goal:
-
-- Close high-priority server/common parity gaps before client work.
-
-Targets:
-
-- Baubles/relic/wand integration.
-- Research compatibility and Frugal enchant applicability.
-- Boss/special mob behavior.
-- Tool/armor repairability.
-
-Validation:
-
-- `compileJava`
-- `build` if practical
+- `processResources` if resources changed
 - focused manual scenario notes
 
-Stop condition:
+### Checkpoint 3: Wire FocusPortableHole
 
-- P1 is closed or deferred with evidence.
-
-### Checkpoint D: Phase 8 client GUI/rendering/FX
-
-Goal:
-
-- Implement missing client-only GUI/rendering/FX/shader support in focused groups.
-
-Targets:
-
-- `thaumcraft.client.*`
-- GUI screens.
-- `ClientProxy`.
-- key bindings.
-- client event handlers.
-- TESRs.
-- entity renderers.
-- models.
-- particles/beams/bolts.
-- resources required for client rendering.
+- Replace deferred no-op with server-side targeting and hole placement.
+- Consume vis through existing wand logic.
+- Respect side checks and block modification checks.
+- Do not mutate world on client side.
+- Add safe failure behavior.
 
 Validation:
 
 - `compileJava`
-- `processResources`
-- `runClient` if display is available
-- manual GUI/render smoke checks
+- manual scenario:
+  - cast on normal solid block;
+  - hole appears;
+  - player can pass/use intended behavior;
+  - original block restores after duration;
+  - invalid target fails safely;
+  - insufficient vis fails safely.
 
-Stop condition:
+### Checkpoint 4: Implement BlockWarded/TileWarded baseline
 
-- Critical GUI/render/FX flows work or blockers are documented.
-
-### Checkpoint E: Phase 9 recipes/research/content
-
-Goal:
-
-- Complete recipe/research/content registration needed for progression parity.
-
-Targets:
-
-- `ConfigRecipes`
-- `ConfigResearch`
-- crafting classes
-- research classes
-- recipe resources
-- research/Thaumonomicon references
-- aspect tag registration
+- Implement registered `BlockWarded` if absent.
+- Implement `TileWarded`.
+- Store owner identity.
+- Store original block state and light/metadata-equivalent data required by original behavior.
+- Enforce owner/protection behavior according to original behavior.
+- Preserve drops/restoration semantics where original-compatible and safe.
 
 Validation:
 
 - `compileJava`
-- `processResources`
-- `build`
-- `runClient` if practical
-- manual progression/content checks
+- focused manual scenario notes
 
-Stop condition:
+### Checkpoint 5: Wire FocusWarding
 
-- Critical progression path is usable or blockers are documented.
-
-### Checkpoint F: Final parity and polish
-
-Goal:
-
-- Verify runtime stability and close limited polish items.
-
-Targets:
-
-- optional JEI only if optional;
-- config GUI only if required and scaffolded;
-- localization/resource completeness;
-- performance-sensitive completed systems;
-- crash/runtimes.
+- Replace deferred no-op with server-side warding behavior.
+- Consume vis through existing wand logic.
+- Respect target validity, owner, world modification, and protected-block checks.
+- Do not mutate client world.
+- Do not ward forbidden blocks.
 
 Validation:
 
-- `clean build`
-- `apiJar devJar`
-- `runClient`
-- `runServer` if available
-- final placeholder scan
-- final diff review
+- `compileJava`
+- manual scenario:
+  - ward normal block;
+  - owner can interact/break if original allows;
+  - non-owner behavior matches original;
+  - block restores/drops safely;
+  - invalid target fails safely;
+  - insufficient vis fails safely.
 
-Stop condition:
+### Checkpoint 6: Final validation and commit
 
-- Acceptance criteria are satisfied or remaining blockers are explicitly documented.
+Run:
 
-## 7. Required validation commands
+- `git status --short`
+- `git diff --stat`
+- `git diff --name-only`
+- Docker `compileJava`
+- Docker `build` if practical
+- Docker `apiJar devJar` if practical
+- placeholder scan for touched scope
 
-Build Docker image:
+Commit only if scoped and validated:
 
-    docker build -t thaumcraft-dev .
+- suggested commit message:
+  - `port: implement portable hole and warding block wrappers`
 
-Discover tasks:
+If blocked, do not commit; stop with final report.
 
-    docker run --rm \
-      -v "$(pwd):/workspace/thaumcraft" \
-      -v "$(pwd)/.gradle_home:/home/ubuntu/.gradle" \
-      --user "$(id -u):$(id -g)" \
-      --entrypoint ./gradlew \
-      thaumcraft-dev tasks
-
-Fresh workspace setup if required:
-
-    docker run --rm \
-      -v "$(pwd):/workspace/thaumcraft" \
-      -v "$(pwd)/.gradle_home:/home/ubuntu/.gradle" \
-      --user "$(id -u):$(id -g)" \
-      --entrypoint ./gradlew \
-      thaumcraft-dev setupDecompWorkspace
-
-Compile:
-
-    docker run --rm \
-      -v "$(pwd):/workspace/thaumcraft" \
-      -v "$(pwd)/.gradle_home:/home/ubuntu/.gradle" \
-      --user "$(id -u):$(id -g)" \
-      --entrypoint ./gradlew \
-      thaumcraft-dev compileJava
-
-Process resources:
-
-    docker run --rm \
-      -v "$(pwd):/workspace/thaumcraft" \
-      -v "$(pwd)/.gradle_home:/home/ubuntu/.gradle" \
-      --user "$(id -u):$(id -g)" \
-      --entrypoint ./gradlew \
-      thaumcraft-dev processResources
-
-Test if task exists:
-
-    docker run --rm \
-      -v "$(pwd):/workspace/thaumcraft" \
-      -v "$(pwd)/.gradle_home:/home/ubuntu/.gradle" \
-      --user "$(id -u):$(id -g)" \
-      --entrypoint ./gradlew \
-      thaumcraft-dev test
-
-Build:
-
-    docker run --rm \
-      -v "$(pwd):/workspace/thaumcraft" \
-      -v "$(pwd)/.gradle_home:/home/ubuntu/.gradle" \
-      --user "$(id -u):$(id -g)" \
-      --entrypoint ./gradlew \
-      thaumcraft-dev build
-
-Build jars:
-
-    docker run --rm \
-      -v "$(pwd):/workspace/thaumcraft" \
-      -v "$(pwd)/.gradle_home:/home/ubuntu/.gradle" \
-      --user "$(id -u):$(id -g)" \
-      --entrypoint ./gradlew \
-      thaumcraft-dev apiJar devJar
-
-Clean build before final success:
-
-    docker run --rm \
-      -v "$(pwd):/workspace/thaumcraft" \
-      -v "$(pwd)/.gradle_home:/home/ubuntu/.gradle" \
-      --user "$(id -u):$(id -g)" \
-      --entrypoint ./gradlew \
-      thaumcraft-dev clean build
-
-Client smoke test if display is available:
-
-    docker run --rm -it \
-      -v "$(pwd):/workspace/thaumcraft" \
-      -v "$(pwd)/.gradle_home:/home/ubuntu/.gradle" \
-      -e DISPLAY="$DISPLAY" \
-      -v /tmp/.X11-unix:/tmp/.X11-unix \
-      --user "$(id -u):$(id -g)" \
-      --entrypoint ./gradlew \
-      thaumcraft-dev runClient
-
-Server smoke test if available:
-
-    docker run --rm \
-      -v "$(pwd):/workspace/thaumcraft" \
-      -v "$(pwd)/.gradle_home:/home/ubuntu/.gradle" \
-      --user "$(id -u):$(id -g)" \
-      --entrypoint ./gradlew \
-      thaumcraft-dev runServer
-
-Placeholder scan:
-
-    rg -n "TODO|TBD|placeholder|Phase 8:|return false|return null|no-op" src/main/java/thaumcraft docs
-
-Diff review:
-
-    git status --short
-    git diff --stat
-    git diff --name-only
-
-API jar inspection after `apiJar`:
-
-    jar tf build/libs/Thaumcraft-*-api.jar | rg '^thaumcraft/api/'
-
-## 8. Original reference workflow
-
-For every touched gameplay class:
-
-1. Find matching class under `thaumcraft_src/**`.
-2. If only `.class` exists, decompile with CFR:
-
-       docker run --rm \
-         -v "$(pwd):/workspace/thaumcraft" \
-         thaumcraft-dev \
-         -c "cfr thaumcraft_src/path/to/Class.class"
-
-3. Compare original behavior to current 1.12.2 behavior.
-4. Port behavior manually.
-5. Adapt only the APIs that changed from 1.7.10 to 1.12.2.
-6. Keep original names where practical.
-7. Document the inspected reference class in the final report.
-
-## 9. Acceptance criteria
-
-Functional acceptance:
-
-- Existing working behavior remains preserved.
-- Public API remains compatible.
-- Registry names remain compatible.
-- NBT/config/save data contracts remain compatible.
-- Critical user flows work.
-- Edge cases related to changed systems are covered by tests or manual scenarios.
-
-Architecture acceptance:
-
-- Server gameplay remains in `thaumcraft.common.*`.
-- Client-only rendering remains in `thaumcraft.client.*`.
-- Public addon API remains in `thaumcraft.api.*`.
-- Shared helpers are introduced only for real repeated logic.
-- Old placeholders are removed only after replacements are connected.
-- No speculative abstractions are introduced.
-
-Validation acceptance:
-
-- Required commands are run where practical.
-- Failing commands are investigated.
-- Pre-existing failures are documented with evidence.
-- Environment skips are documented with reason.
-- Final report includes exact commands and results.
-
-Diff acceptance:
-
-- Diff stays inside checkpoint scope.
-- No unrelated files are changed.
-- No generated output is committed.
-- No local paths, secrets, or machine-specific values are introduced.
-- Diff is reviewable module by module.
-
-## 10. Final report template
-
-Every run must end with this structure:
-
-# Final Report: Thaumcraft 4.2.3.5 -> Forge 1.12.2 Checkpoint
-
-## 1. Summary of changes
-
-- ...
-
-## 2. Files modified
-
-- `path` — reason
-
-## 3. Original reference inspected
-
-- `thaumcraft_src/path` — what was compared
-
-## 4. Architecture before/after
-
-Before:
-
-- ...
-
-After:
-
-- ...
-
-## 5. Public contract status
-
-- API signatures:
-- Registry names:
-- NBT keys:
-- Config keys:
-- Packet/GUI ids:
-- Resource paths:
-
-## 6. Acceptance criteria checklist
+## Acceptance criteria
 
 Functional:
 
-- [ ] ...
+- `FocusPortableHole` is no longer a no-op unless blocked by documented original behavior ambiguity.
+- `FocusWarding` is no longer a no-op unless blocked by documented original behavior ambiguity.
+- Hole restoration does not lose block state in common valid cases.
+- Warded blocks preserve original block identity/state in common valid cases.
+- Vis is consumed only on successful server-side action.
+- Invalid targets fail safely.
+- Existing foci/wand behavior remains unchanged.
 
 Architecture:
 
-- [ ] ...
+- Server/common behavior stays in `thaumcraft.common.*`.
+- No client Phase 8 code is touched.
+- No recipes/research code is touched.
+- Public API is unchanged.
+- Registry additions are minimal and named consistently with existing Thaumcraft registry style.
+- No speculative abstraction is introduced.
 
 Validation:
 
-- [ ] ...
+- `compileJava` passes.
+- `build` passes or blocker/pre-existing failure is documented.
+- Final report lists exact commands and results.
+- Final report lists original reference classes inspected.
+- Final report lists manual scenarios performed or skipped with reason.
 
 Diff:
 
-- [ ] ...
-
-## 7. Validation commands and results
-
-- Command: `...`
-- Result:
-- Evidence:
-
-## 8. Manual/runtime checks
-
-- Scenario:
-- Result:
-- Evidence or limitation:
-
-## 9. Known limitations
-
-- ...
-
-## 10. Blockers
-
-- ...
-
-## 11. Suggested next checkpoint
-
-- ...
-
-## 11. Short `/goal` commands
-
-### Audit-only goal
-
-Use this before implementation if docs may be stale:
-
-    /goal Read AGENTS.md, docs/CODEX_GOAL.md, docs/PRD.md, docs/REPAIR.md and audit the repository against them. Do not modify production code. Only update docs if the local tree contradicts them. Verify build/tooling commands are discoverable, report exact blockers, and stop with an audit report.
-
-### P0/P1 server blocker goal
-
-Use this for the next implementation slice:
-
-    /goal Read AGENTS.md, docs/CODEX_GOAL.md, docs/PRD.md, docs/REPAIR.md first. Complete only the pre-Phase8 P0/P1 server parity blockers documented in docs/REPAIR.md. Preserve public API, registry names, NBT/config keys, and existing behavior. Use original 1.7.10 reference sources before each gameplay implementation. Run documented Docker/Gradle validation after each checkpoint. Stop only when complete or blocked with a final report.
-
-### Phase 8 client goal
-
-Use only after P0 is closed or deferred:
-
-    /goal Read AGENTS.md, docs/CODEX_GOAL.md, docs/PRD.md, docs/REPAIR.md first. Complete the next Phase 8 client GUI/rendering/FX checkpoint only. Keep server gameplay unchanged, preserve public contracts, port from original client references, run compile/resource/client smoke validation where practical, and stop with a final report when complete or blocked.
-
-### Phase 9 content goal
-
-Use after client basics are ready:
-
-    /goal Read AGENTS.md, docs/CODEX_GOAL.md, docs/PRD.md, docs/REPAIR.md first. Complete the next Phase 9 recipes/research/content checkpoint only. Preserve registry names, research keys, recipe ids, public API, and progression semantics. Validate build/resources and document manual progression checks. Stop with a final report when complete or blocked.
-
-### Final parity goal
-
-Use only after earlier checkpoints are closed:
-
-    /goal Read AGENTS.md, docs/CODEX_GOAL.md, docs/PRD.md, docs/REPAIR.md first. Perform a final parity audit and limited polish pass for already implemented systems. Do not add broad cleanup or new dependencies. Run full validation where practical, document remaining limitations, and stop with a final report.
+- Diff stays inside stated scope.
+- No generated output is committed.
+- No `thaumcraft_src/**` changes.
+- No `Thaumcraft-1.7.10-4.2.3.5.jar` changes.
+- No broad formatting-only changes.
