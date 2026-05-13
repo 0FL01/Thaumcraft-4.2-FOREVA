@@ -87,14 +87,14 @@ public class BiomeMagicalForest extends Biome {
         int z = pos.getZ();
         // Stone blobs
         for (int i = 0; i < 3; ++i) {
-            int bx = x + rand.nextInt(16) + 8;
-            int bz = z + rand.nextInt(16) + 8;
+            int bx = x + rand.nextInt(16);
+            int bz = z + rand.nextInt(16);
             blobs.generate(world, rand, world.getHeight(new BlockPos(bx, 0, bz)));
         }
         // Big mushrooms
         for (int i = 0; i < 16; ++i) {
-            int mx = x + rand.nextInt(16) + 8;
-            int mz = z + rand.nextInt(16) + 8;
+            int mx = x + rand.nextInt(16);
+            int mz = z + rand.nextInt(16);
             BlockPos mpos = world.getHeight(new BlockPos(mx, 0, mz));
             if (rand.nextInt(40) == 0) {
                 (new WorldGenBigMushroom()).generate(world, rand, mpos);
@@ -103,15 +103,15 @@ public class BiomeMagicalForest extends Biome {
         super.decorate(world, rand, pos);
         // Mana pods
         for (int i = 0; i < 10; ++i) {
-            int px = x + rand.nextInt(16) + 8;
-            int pz = z + rand.nextInt(16) + 8;
+            int px = x + rand.nextInt(16);
+            int pz = z + rand.nextInt(16);
             BlockPos ppos = new BlockPos(px, 64, pz);
             (new WorldGenManaPods()).generate(world, rand, ppos);
         }
         // Shimmerleaf adjacent to wood
         for (int i = 0; i < 8; ++i) {
-            int sx = x + rand.nextInt(16) + 8;
-            int sz = z + rand.nextInt(16) + 8;
+            int sx = x + rand.nextInt(16);
+            int sz = z + rand.nextInt(16);
             BlockPos spos = world.getHeight(new BlockPos(sx, 0, sz));
             if (isBlockAdjacentToWood(world, spos)) {
                 world.setBlockState(spos, ConfigBlocks.blockCustomPlant.getStateFromMeta(2), 2);
@@ -123,7 +123,8 @@ public class BiomeMagicalForest extends Biome {
         for (int dx = -1; dx <= 1; ++dx) {
             for (int dy = -1; dy <= 1; ++dy) {
                 for (int dz = -1; dz <= 1; ++dz) {
-                    if (world.getBlockState(pos.add(dx, dy, dz)).getBlock().isWood(world, pos.add(dx, dy, dz))) {
+                    BlockPos check = pos.add(dx, dy, dz);
+                    if (world.isBlockLoaded(check, false) && world.getBlockState(check).getBlock().isWood(world, check)) {
                         return true;
                     }
                 }

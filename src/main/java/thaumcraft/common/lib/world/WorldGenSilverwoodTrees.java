@@ -36,6 +36,7 @@ public class WorldGenSilverwoodTrees extends WorldGenAbstractTree {
         boolean flag = true;
 
         if (pos.getY() < 1 || pos.getY() + height + 1 > 256) return false;
+        if (this.worldgen && !world.isAreaLoaded(pos.add(-6, 0, -6), pos.add(6, height + 3, 6), false)) return false;
 
         // Check space and ground
         for (int y = pos.getY(); y <= pos.getY() + 1 + height; y++) {

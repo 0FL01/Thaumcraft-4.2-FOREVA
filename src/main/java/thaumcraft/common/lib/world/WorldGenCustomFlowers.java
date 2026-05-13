@@ -18,6 +18,7 @@ public class WorldGenCustomFlowers extends WorldGenerator {
     public boolean generate(World world, Random rand, BlockPos pos) {
         for (int i = 0; i < 64; i++) {
             BlockPos bp = pos.add(rand.nextInt(8) - rand.nextInt(8), rand.nextInt(4) - rand.nextInt(4), rand.nextInt(8) - rand.nextInt(8));
+            if (!world.isAreaLoaded(bp.down(), bp, false)) continue;
             if (world.isAirBlock(bp) && bp.getY() < 255) {
                 IBlockState state = world.getBlockState(bp.down());
                 if (state.getBlock().canSustainPlant(state, world, bp.down(), net.minecraft.util.EnumFacing.UP, (net.minecraft.block.BlockSapling)null)) {

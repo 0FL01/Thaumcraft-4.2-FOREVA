@@ -158,6 +158,7 @@ public class Thaumcraft {
         GameRegistry.registerTileEntity(TileFocalManipulator.class, new net.minecraft.util.ResourceLocation("thaumcraft", "focal_manipulator"));
         GameRegistry.registerTileEntity(TileFluxScrubber.class, new net.minecraft.util.ResourceLocation("thaumcraft", "flux_scrubber"));
         GameRegistry.registerTileEntity(TileCrucible.class, new net.minecraft.util.ResourceLocation("thaumcraft", "crucible"));
+        GameRegistry.registerTileEntity(TileManaPod.class, new net.minecraft.util.ResourceLocation("thaumcraft", "mana_pod"));
         GameRegistry.registerTileEntity(TileArcaneBore.class, new net.minecraft.util.ResourceLocation("thaumcraft", "arcane_bore"));
         GameRegistry.registerTileEntity(TileArcaneBoreBase.class, new net.minecraft.util.ResourceLocation("thaumcraft", "arcane_bore_base"));
         GameRegistry.registerTileEntity(TileArcaneFurnace.class, new net.minecraft.util.ResourceLocation("thaumcraft", "arcane_furnace"));
