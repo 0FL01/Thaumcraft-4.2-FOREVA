@@ -103,6 +103,7 @@ Each final report must include:
 - commit hash if a commit was created;
 - files included in the commit;
 - validation commands run before the commit;
+- whether runtime smoke validation was required, run, passed, failed, or skipped with a concrete reason;
 - known limitations after the commit.
 
 ## Required workflow
@@ -133,65 +134,42 @@ Each final report must include:
 
 Use Docker unless the local environment is already known to be Java 8 Forge-compatible.
 
-Build the Docker image:
+Use the project wrapper instead of repeating long Docker commands:
 
-    docker build -t thaumcraft-dev .
+    ./scripts/dev.sh image
+    ./scripts/dev.sh tasks
+    ./scripts/dev.sh compileJava
+    ./scripts/dev.sh build
+    ./scripts/dev.sh apiJar devJar
+    ./scripts/dev.sh test
 
-Discover Gradle tasks:
+Run arbitrary Gradle tasks through Docker with:
 
-    docker run --rm \
-      -v "$(pwd):/workspace/thaumcraft" \
-      -v "$(pwd)/.gradle_home:/home/ubuntu/.gradle" \
-      --user "$(id -u):$(id -g)" \
-      --entrypoint ./gradlew \
-      thaumcraft-dev tasks
+    ./scripts/dev.sh gradle <task> [args...]
 
-Compile Java:
+## Runtime smoke validation
 
-    docker run --rm \
-      -v "$(pwd):/workspace/thaumcraft" \
-      -v "$(pwd)/.gradle_home:/home/ubuntu/.gradle" \
-      --user "$(id -u):$(id -g)" \
-      --entrypoint ./gradlew \
-      thaumcraft-dev compileJava
+Compile success is not enough for parity or checkpoint completion.
 
-Build:
+Run runtime smoke validation whenever a change can affect mod loading, registries, config, items, blocks, materials, recipes, entities, dimensions, networking, proxies, GUI registration, renderers, models, assets, or lifecycle handlers.
 
-    docker run --rm \
-      -v "$(pwd):/workspace/thaumcraft" \
-      -v "$(pwd)/.gradle_home:/home/ubuntu/.gradle" \
-      --user "$(id -u):$(id -g)" \
-      --entrypoint ./gradlew \
-      thaumcraft-dev build
+For common/server-side changes, run the dedicated server smoke test first:
 
-Build API/dev jars:
+    ./scripts/dev.sh smoke-server
 
-    docker run --rm \
-      -v "$(pwd):/workspace/thaumcraft" \
-      -v "$(pwd)/.gradle_home:/home/ubuntu/.gradle" \
-      --user "$(id -u):$(id -g)" \
-      --entrypoint ./gradlew \
-      thaumcraft-dev apiJar devJar
+The smoke wrapper creates `run/eula.txt`, runs `runServer -x getAssets --no-daemon`, writes `run/smoke-server.log`, and fails on crash markers or new crash reports. `-x getAssets` avoids old ForgeGradle Mojang asset URL failures. The `run/` directory is generated/ignored and must not be staged.
 
-Run tests if the Gradle task exists:
+A server smoke test passes only when Forge reaches normal ready state, for example a log line containing `Done (`, and no crash markers are present.
 
-    docker run --rm \
-      -v "$(pwd):/workspace/thaumcraft" \
-      -v "$(pwd)/.gradle_home:/home/ubuntu/.gradle" \
-      --user "$(id -u):$(id -g)" \
-      --entrypoint ./gradlew \
-      thaumcraft-dev test
+A runtime smoke test fails if `crash-reports/` contains a new crash report, or logs contain crash markers such as `LoaderException`, `LoaderExceptionModCrash`, `Game crashed`, `Caught exception`, `NoClassDefFoundError`, `ClassNotFoundException`, `NoSuchMethodError`, `NoSuchFieldError`, `ExceptionInInitializerError`, `Repair material has already been set`, or any Forge/FML fatal loading error.
+
+Run client smoke for client-only or mixed client/common changes. It may be terminated by timeout after the main menu/load phase; timeout alone is not failure if there are no new crash reports or crash markers and Forge/FML reports successful mod loading.
+
+Do not mark runtime-affecting checkpoints complete based only on `compileJava`, `build`, `apiJar`, or `devJar`. Documentation-only diffs do not require runtime smoke.
 
 Run client smoke test if display/X11 is available:
 
-    docker run --rm -it \
-      -v "$(pwd):/workspace/thaumcraft" \
-      -v "$(pwd)/.gradle_home:/home/ubuntu/.gradle" \
-      -e DISPLAY="$DISPLAY" \
-      -v /tmp/.X11-unix:/tmp/.X11-unix \
-      --user "$(id -u):$(id -g)" \
-      --entrypoint ./gradlew \
-      thaumcraft-dev runClient
+    ./scripts/dev.sh smoke-client
 
 ## Stop conditions
 
