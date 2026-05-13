@@ -56,12 +56,12 @@ See `docs/PRD.md §4` for per-phase deliverables and `docs/PRD.md §5` for compl
 | 1 | API + CCL + TrueType | ✅ Done |
 | 2 | Registration, config, networking, events | ✅ Done |
 | 3 | Core systems (capabilities, wands, research, vis, potions, enchants) | ⚠️ **Partial: vis regen/wand discounts/potions/online research baseline fixed; scan, offline research, bauble storage, enchant applicability remain** |
-| 4 | Blocks + Tile Entities | ⚠️ **Partial: registered block set + metadata/harvest work; crucible + major TE server baselines started; full infusion/bore systems pending** |
+| 4 | Blocks + Tile Entities | ⚠️ **Partial: registered block set + metadata/harvest work; crucible + major TE baselines and Infusion Matrix server lifecycle fixed; full bore mining loop pending** |
 | 5 | Items, Tools, Armor, Baubles, Relics | ⚠️ **Partial: 4/10 projectile foci server behavior done; 6 foci, baubles, relics, tools/repairability remain** |
 | 6 | Entities, Mobs, Golems | ⚠️ **Partial: AI/projectile pass strong; boss special attacks, Pech loot, InhabitedZombie death spawn remain** |
 | 7 | World Gen (biomes, dimension, trees, structures) | ⚠️ **Partial: biomes/trees/villages present; Outer Lands runtime hookup fixed; room-gen fallback TODOs remain** |
 | 7r | World Gen Remediation (room gens, village, persistence) | ⚠️ **Partial: provider/chunk/maze hookup fixed; room-gen replacement TODOs and biome color remain** |
-| 3r-6r | Remediation (see docs/REPAIR.md) | ⚠️ **Active pre-Phase8 mine list; container, Phase 3, and crucible baselines closed; remaining P0 items still block Phase 8** |
+| 3r-6r | Remediation (see docs/REPAIR.md) | ⚠️ **Active pre-Phase8 mine list; container, Phase 3, crucible, and infusion lifecycle baselines closed; remaining P0 items still block Phase 8** |
 | 8 | Client GUI + Rendering (~140 classes) | ❌ |
 | 9 | Recipes + Research (~450 registrations) | ❌ |
 | 10 | Polish (JEI, Config, Sound) | ⚠️ **Sound: all 66 SoundEvents + 22 entity fixes + boss bar done** |

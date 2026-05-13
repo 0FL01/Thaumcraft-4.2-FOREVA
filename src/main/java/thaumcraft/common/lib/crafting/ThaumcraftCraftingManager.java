@@ -1,11 +1,15 @@
 package thaumcraft.common.lib.crafting;
 
+import java.util.ArrayList;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import thaumcraft.api.ThaumcraftApi;
 import thaumcraft.api.ThaumcraftApiHelper;
 import thaumcraft.api.aspects.AspectList;
 import thaumcraft.api.crafting.CrucibleRecipe;
+import thaumcraft.api.crafting.InfusionEnchantmentRecipe;
+import thaumcraft.api.crafting.InfusionRecipe;
 import thaumcraft.common.lib.research.ResearchManager;
 
 public class ThaumcraftCraftingManager {
@@ -20,6 +24,26 @@ public class ThaumcraftCraftingManager {
 
     public static AspectList generateTags(Item item, int meta) {
         return ThaumcraftApiHelper.generateTags(item, meta);
+    }
+
+    public static InfusionRecipe findMatchingInfusionRecipe(ArrayList<ItemStack> items, ItemStack input, EntityPlayer player) {
+        if (items == null || input == null || input.isEmpty() || player == null) return null;
+        for (Object recipe : ThaumcraftApi.getCraftingRecipes()) {
+            if (!(recipe instanceof InfusionRecipe)) continue;
+            InfusionRecipe infusionRecipe = (InfusionRecipe) recipe;
+            if (infusionRecipe.matches(items, input, player.world, player)) return infusionRecipe;
+        }
+        return null;
+    }
+
+    public static InfusionEnchantmentRecipe findMatchingInfusionEnchantmentRecipe(ArrayList<ItemStack> items, ItemStack input, EntityPlayer player) {
+        if (items == null || input == null || input.isEmpty() || player == null) return null;
+        for (Object recipe : ThaumcraftApi.getCraftingRecipes()) {
+            if (!(recipe instanceof InfusionEnchantmentRecipe)) continue;
+            InfusionEnchantmentRecipe infusionRecipe = (InfusionEnchantmentRecipe) recipe;
+            if (infusionRecipe.matches(items, input, player.world, player)) return infusionRecipe;
+        }
+        return null;
     }
 
     /**

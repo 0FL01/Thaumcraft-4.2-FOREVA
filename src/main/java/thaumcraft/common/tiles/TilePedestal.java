@@ -41,12 +41,12 @@ implements ISidedInventory {
             if (inventory[0].getCount() <= count) {
                 ItemStack stack = inventory[0];
                 inventory[0] = ItemStack.EMPTY;
-                this.markDirty();
+                this.markDirtyAndSync();
                 return stack;
             }
             ItemStack stack = inventory[0].splitStack(count);
             if (inventory[0].getCount() == 0) inventory[0] = ItemStack.EMPTY;
-            this.markDirty();
+            this.markDirtyAndSync();
             return stack;
         }
         return ItemStack.EMPTY;
@@ -57,7 +57,7 @@ implements ISidedInventory {
         if (index == 0 && !inventory[0].isEmpty()) {
             ItemStack stack = inventory[0];
             inventory[0] = ItemStack.EMPTY;
-            this.markDirty();
+            this.markDirtyAndSync();
             return stack;
         }
         return ItemStack.EMPTY;
@@ -66,16 +66,29 @@ implements ISidedInventory {
     @Override
     public void setInventorySlotContents(int index, ItemStack stack) {
         if (index == 0) {
-            inventory[0] = stack;
-            this.markDirty();
+            inventory[0] = stack == null ? ItemStack.EMPTY : stack;
+            if (!inventory[0].isEmpty() && inventory[0].getCount() > this.getInventoryStackLimit()) {
+                inventory[0].setCount(this.getInventoryStackLimit());
+            }
+            this.markDirtyAndSync();
+        }
+    }
+
+    public void setInventorySlotContentsFromInfusion(int index, ItemStack stack) {
+        this.setInventorySlotContents(index, stack);
+        if (this.world != null && !this.world.isRemote) {
+            this.world.addBlockEvent(this.pos, this.world.getBlockState(this.pos).getBlock(), 12, 0);
         }
     }
 
     @Override
-    public int getInventoryStackLimit() { return 64; }
+    public int getInventoryStackLimit() { return 1; }
 
     @Override
-    public boolean isUsableByPlayer(EntityPlayer player) { return true; }
+    public boolean isUsableByPlayer(EntityPlayer player) {
+        return this.world != null && this.world.getTileEntity(this.pos) == this
+                && player.getDistanceSq(this.pos.getX() + 0.5D, this.pos.getY() + 0.5D, this.pos.getZ() + 0.5D) <= 64.0D;
+    }
 
     @Override
     public void openInventory(EntityPlayer player) {}
@@ -90,7 +103,7 @@ implements ISidedInventory {
     public int[] getSlotsForFace(EnumFacing side) { return slots; }
 
     @Override
-    public boolean canInsertItem(int index, ItemStack stack, EnumFacing direction) { return true; }
+    public boolean canInsertItem(int index, ItemStack stack, EnumFacing direction) { return index == 0 && inventory[0].isEmpty(); }
 
     @Override
     public boolean canExtractItem(int index, ItemStack stack, EnumFacing direction) { return true; }
@@ -105,7 +118,10 @@ implements ISidedInventory {
     public int getFieldCount() { return 0; }
 
     @Override
-    public void clear() { inventory[0] = ItemStack.EMPTY; }
+    public void clear() {
+        inventory[0] = ItemStack.EMPTY;
+        this.markDirtyAndSync();
+    }
 
     @Override
     public String getName() { return "container.pedestal"; }
@@ -121,13 +137,19 @@ implements ISidedInventory {
 
     @Override
     public void readCustomNBT(NBTTagCompound compound) {
-        NBTTagList list = compound.getTagList("Inventory", 10);
+        NBTTagList list = compound.getTagList(compound.hasKey("Items", 9) ? "Items" : "Inventory", 10);
         if (list.tagCount() > 0) {
             NBTTagCompound item = list.getCompoundTagAt(0);
             inventory[0] = new ItemStack(item);
         } else {
             inventory[0] = ItemStack.EMPTY;
         }
+    }
+
+    @Override
+    public boolean receiveClientEvent(int id, int type) {
+        if (id == 11 || id == 12) return true;
+        return super.receiveClientEvent(id, type);
     }
 
     @Override
@@ -145,5 +167,12 @@ implements ISidedInventory {
     @Override
     public boolean shouldRefresh(net.minecraft.world.World worldIn, net.minecraft.util.math.BlockPos pos, net.minecraft.block.state.IBlockState oldState, net.minecraft.block.state.IBlockState newState) {
         return oldState.getBlock() != newState.getBlock();
+    }
+
+    private void markDirtyAndSync() {
+        this.markDirty();
+        if (this.world != null && !this.world.isRemote) {
+            this.world.notifyBlockUpdate(this.pos, this.world.getBlockState(this.pos), this.world.getBlockState(this.pos), 3);
+        }
     }
 }

@@ -10,6 +10,7 @@ import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.SoundEvents;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
@@ -17,6 +18,7 @@ import net.minecraft.util.EnumBlockRenderType;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.NonNullList;
+import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
@@ -120,6 +122,9 @@ extends BlockContainer {
             }
             return true;
         }
+        if (state.getValue(TYPE) == 1 && te instanceof TilePedestal) {
+            return this.handlePedestalActivation(worldIn, pos, playerIn, hand, (TilePedestal) te);
+        }
         if (te instanceof TileInfusionMatrix) {
             ItemStack held = playerIn.getHeldItem(hand);
             if (!held.isEmpty() && held.getItem() instanceof ItemWandCasting) {
@@ -134,6 +139,42 @@ extends BlockContainer {
             }
             return true;
         }
+        return false;
+    }
+
+    private boolean handlePedestalActivation(World world, BlockPos pos, EntityPlayer player, EnumHand hand, TilePedestal pedestal) {
+        if (world.isRemote) return true;
+
+        ItemStack stored = pedestal.getStackInSlot(0);
+        if (!stored.isEmpty()) {
+            ItemStack remaining = pedestal.removeStackFromSlot(0).copy();
+            if (!player.inventory.addItemStackToInventory(remaining) || !remaining.isEmpty()) {
+                EntityItem entity = new EntityItem(world, player.posX, player.posY + player.height / 2.0F, player.posZ, remaining.copy());
+                entity.setNoPickupDelay();
+                world.spawnEntity(entity);
+            }
+            player.inventoryContainer.detectAndSendChanges();
+            world.playSound(null, pos, SoundEvents.ENTITY_ITEM_PICKUP, SoundCategory.BLOCKS,
+                    0.2F, ((world.rand.nextFloat() - world.rand.nextFloat()) * 0.7F + 1.0F) * 1.5F);
+            return true;
+        }
+
+        ItemStack held = player.getHeldItem(hand);
+        if (!held.isEmpty()) {
+            ItemStack placed = held.copy();
+            placed.setCount(1);
+            pedestal.setInventorySlotContents(0, placed);
+            if (!player.capabilities.isCreativeMode) {
+                held.shrink(1);
+                if (held.isEmpty()) player.setHeldItem(hand, ItemStack.EMPTY);
+            }
+            player.inventory.markDirty();
+            player.inventoryContainer.detectAndSendChanges();
+            world.playSound(null, pos, SoundEvents.ENTITY_ITEM_PICKUP, SoundCategory.BLOCKS,
+                    0.2F, ((world.rand.nextFloat() - world.rand.nextFloat()) * 0.7F + 1.0F) * 1.6F);
+            return true;
+        }
+
         return false;
     }
 

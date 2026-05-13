@@ -809,10 +809,10 @@ The detailed repair backlog is tracked in **`docs/REPAIR.md`**. Current baseline
   context and `canInteractWith` checks are no longer unconditional `false`.
 - Crucible server baseline improved: boiling item collision, water-container
   fill, break spill, and stored-aspect container methods are wired.
-- Major Phase 4 TE empty-shell pass started: Alchemy Furnace, Bellows,
-  Centrifuge, Thaumatorium, Arcane Bore, Infusion Matrix, and Focal Manipulator
-  now have NBT/inventory/aspect/server-hook baselines where applicable; full
-  infusion and bore gameplay remain explicit remediation items.
+- Major Phase 4 TE server work improved: Infusion Matrix now has pedestal scan,
+  infusion/enchantment recipe lifecycle, essentia/XP drain, ingredient
+  consumption, output application, and server instability events; full Arcane
+  Bore mining remains an explicit remediation item.
 - Phase 3 core baseline improved: aura nodes now regenerate missing vis,
   wand centi-vis units/discounts are restored, online research/aspect lookups
   use capabilities/cache, and Infectious Vis Exhaust/Thaumarhia have server

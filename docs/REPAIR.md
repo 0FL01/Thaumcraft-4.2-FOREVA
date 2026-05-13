@@ -34,6 +34,7 @@ Phase 8. Recipe/research-content work belongs to Phase 9.
 | Research/potions partial | Online username research/aspect lookup uses capabilities/cache; Infectious Vis Exhaust and Thaumarhia server effects are restored. |
 | Crucible baseline | Boiling crucibles ingest dropped items from `BlockMetalDevice`, accept water through Forge fluid interaction, spill on break, and expose stored aspects through `IAspectContainer`. |
 | Major TE baseline partial | Alchemy Furnace, Bellows, Centrifuge, Thaumatorium, Arcane Bore, Infusion Matrix, and Focal Manipulator are no longer empty shells; NBT/inventory/aspect-transport/server hook baselines are wired where applicable. |
+| Infusion Matrix server lifecycle | Matrix activation now scans pedestals/stabilizers, matches infusion/enchantment recipes, drains essentia/XP, consumes pedestal ingredients, applies outputs, and runs server instability events. |
 
 ## P0 -- Must Fix Before Phase 8
 
@@ -44,13 +45,12 @@ work is full machine gameplay, not empty-shell remediation.
 
 | Finding | Evidence |
 |---------|----------|
-| Full infusion crafting lifecycle is still partial | `TileInfusionMatrix` validates structure and exposes stored aspects, but full pedestal scan/craft cycle remains pending. |
 | Arcane Bore mining loop is still partial | `TileArcaneBore` has inventory/orientation/NBT baseline, but block scanning/digging remains pending. |
 | Thaumatorium/Focal Manipulator need GUI/content completion | Server inventory/aspect baselines exist; recipe programming and upgrade UI flow depend on later GUI/content work. |
 
 Exit criteria:
-- Decide whether full Infusion Matrix and Arcane Bore gameplay block Phase 8 or
-  are accepted as deferred server risk.
+- Decide whether full Arcane Bore gameplay blocks Phase 8 or is accepted as
+  deferred server risk.
 
 ### P0.2 -- Remaining focus server actions
 
@@ -117,7 +117,7 @@ Exit criteria:
 ## Recommended Execution Order
 
 1. Fix remaining six focus server actions.
-2. Decide/defer or finish remaining Infusion Matrix and Arcane Bore server gameplay.
+2. Decide/defer or finish remaining Arcane Bore server gameplay.
 3. Fix bauble vis storage/consumption, relic actions, and research offline compatibility.
 4. Fix enchantment applicability and high-impact bauble actions.
 5. Fix boss/special mob TODOs that are server-visible.
