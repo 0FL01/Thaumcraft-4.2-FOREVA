@@ -1,10 +1,10 @@
 package thaumcraft.common.lib.world;
 
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.init.Blocks;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.gen.feature.WorldGenerator;
-import thaumcraft.common.config.ConfigBlocks;
 import java.util.Random;
 
 public class WorldGenCustomFlowers extends WorldGenerator {
@@ -16,13 +16,13 @@ public class WorldGenCustomFlowers extends WorldGenerator {
 
     @Override
     public boolean generate(World world, Random rand, BlockPos pos) {
-        for (int i = 0; i < 64; i++) {
+        for (int i = 0; i < 18; i++) {
             BlockPos bp = pos.add(rand.nextInt(8) - rand.nextInt(8), rand.nextInt(4) - rand.nextInt(4), rand.nextInt(8) - rand.nextInt(8));
             if (!world.isAreaLoaded(bp.down(), bp, false)) continue;
             if (world.isAirBlock(bp) && bp.getY() < 255) {
                 IBlockState state = world.getBlockState(bp.down());
-                if (state.getBlock().canSustainPlant(state, world, bp.down(), net.minecraft.util.EnumFacing.UP, (net.minecraft.block.BlockSapling)null)) {
-                    world.setBlockState(bp, this.flower, 2);
+                if (state.getBlock() == Blocks.GRASS || state.getBlock() == Blocks.SAND) {
+                    world.setBlockState(bp, this.flower, 3);
                 }
             }
         }

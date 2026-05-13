@@ -39,13 +39,22 @@ public class PacketSyncAspects extends PacketBase {
 
     @Override
     public void toBytes(ByteBuf buf) {
-        if (aspects == null) {
+        if (aspects == null || aspects.size() <= 0) {
             buf.writeInt(0);
             return;
         }
         Aspect[] aspectArray = aspects.getAspects();
-        buf.writeInt(aspectArray.length);
+        int count = 0;
         for (Aspect aspect : aspectArray) {
+            if (aspect != null) {
+                count++;
+            }
+        }
+        buf.writeInt(count);
+        for (Aspect aspect : aspectArray) {
+            if (aspect == null) {
+                continue;
+            }
             ByteBufUtils.writeUTF8String(buf, aspect.getTag());
             buf.writeInt(aspects.getAmount(aspect));
         }
@@ -60,6 +69,9 @@ public class PacketSyncAspects extends PacketBase {
                 IPlayerKnowledge knowledge = player.getCapability(PlayerKnowledgeProvider.PLAYER_KNOWLEDGE, null);
                 if (knowledge != null) {
                     for (Aspect aspect : aspects.getAspects()) {
+                        if (aspect == null) {
+                            continue;
+                        }
                         int amount = aspects.getAmount(aspect);
                         for (int i = 0; i < amount; i++) {
                             knowledge.addDiscoveredAspect(aspect.getTag());
