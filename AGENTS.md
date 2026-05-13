@@ -30,7 +30,7 @@ See `docs/PRD.md §6`. All resolved:
 - `thaumcraft_src/` -- unpacked JAR contents
 - `Dockerfile` -- dev container (Java 8 + CFR + git + build tools)
 - `docs/PRD.md` -- product requirements doc with phased porting plan
-- `docs/REPAIR.md` -- decomposed repair plan for stub remediation (3r-6r)
+- `docs/REPAIR.md` -- active pre-Phase8 mine list from latest RECON
 - `AGENTS.md` -- this file (concise navigation, points to docs/PRD.md)
 - `build.gradle` -- ForgeGradle 2.3, Forge 14.23.5.2847, Baubles via CurseMaven
 - `gradlew` / `gradle/wrapper/` -- Gradle 4.10.3
@@ -55,13 +55,13 @@ See `docs/PRD.md §4` for per-phase deliverables and `docs/PRD.md §5` for compl
 | 0 | Forge MDK, Gradle, build chain | ✅ Done |
 | 1 | API + CCL + TrueType | ✅ Done |
 | 2 | Registration, config, networking, events | ✅ Done |
-| 3 | Core systems (capabilities, wands, research, vis, potions, enchants) | ⚠️ **Events/runic/world/server ticks ✅; research/vis/enchant/potion gaps remain** |
-| 4 | Blocks (71) + Tile Entities (80) | ⚠️ **Block metadata/harvest + TileCrucible server ✅; many TE systems still pending** |
-| 5 | Items, Tools, Armor, Baubles, Relics (~110) | ⚠️ **4/10 projectile foci server behavior ✅; 6 foci, bauble ticks, relic actions remain** |
-| 6 | Entities, Mobs, Golems (~128 + 44 AI) | ✅ **44/44 AI, 11/11 projectiles, boss bars, entity runtime polish done** |
-| 7 | World Gen (biomes, dimension, trees, structures) | ✅ Done |
-| 7r | World Gen Remediation (room gens, village, persistence) | ✅ Done |
-| 3r-6r | Remediation (see docs/REPAIR.md) | ⚠️ **Rounds A-E done; pre-Phase8 item gameplay cleanup in progress** |
+| 3 | Core systems (capabilities, wands, research, vis, potions, enchants) | ⚠️ **Partial: events/runic active; vis regen, research/scan, potion/enchant, wand discount gaps remain** |
+| 4 | Blocks + Tile Entities | ⚠️ **Partial: registered block set + metadata/harvest work; crucible incomplete; many TE/container systems pending** |
+| 5 | Items, Tools, Armor, Baubles, Relics | ⚠️ **Partial: 4/10 projectile foci server behavior done; 6 foci, baubles, relics, tools/repairability remain** |
+| 6 | Entities, Mobs, Golems | ⚠️ **Partial: AI/projectile pass strong; boss special attacks, Pech loot, InhabitedZombie death spawn remain** |
+| 7 | World Gen (biomes, dimension, trees, structures) | ⚠️ **Partial: biomes/trees/villages present; Outer Lands provider/chunk/maze hookup still blocking** |
+| 7r | World Gen Remediation (room gens, village, persistence) | ⚠️ **Partial: room-gen/village/persistence present; dimension runtime hookup and replacement TODOs remain** |
+| 3r-6r | Remediation (see docs/REPAIR.md) | ⚠️ **Active pre-Phase8 mine list; do not start Phase 8 until P0 items are fixed or accepted as risk** |
 | 8 | Client GUI + Rendering (~140 classes) | ❌ |
 | 9 | Recipes + Research (~450 registrations) | ❌ |
 | 10 | Polish (JEI, Config, Sound) | ⚠️ **Sound: all 66 SoundEvents + 22 entity fixes + boss bar done** |
