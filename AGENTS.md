@@ -140,12 +140,15 @@ Use the project wrapper instead of repeating long Docker commands:
     ./scripts/dev.sh tasks
     ./scripts/dev.sh compileJava
     ./scripts/dev.sh build
+    ./scripts/dev.sh check-jar
     ./scripts/dev.sh apiJar devJar
     ./scripts/dev.sh test
 
 Run arbitrary Gradle tasks through Docker with:
 
     ./scripts/dev.sh gradle <task> [args...]
+
+Run `./scripts/dev.sh check-jar` after building a jar meant for Prism/normal Forge. It scans the built jar for MCP-named Minecraft field/method references that dev `runServer` can miss but production Forge reports as `NoSuchFieldError` or `NoSuchMethodError`.
 
 ## Runtime smoke validation
 
