@@ -20,7 +20,6 @@ public class PotionFluxTaint extends Potion {
         super(isBadEffect, liquidColor);
         this.setIconIndex(0, 0);
         this.setPotionName("potion.fluxtaint");
-        this.setRegistryName("thaumcraft", "flux_taint");
     }
 
     @SideOnly(Side.CLIENT)

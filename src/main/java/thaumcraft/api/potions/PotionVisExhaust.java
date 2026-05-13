@@ -17,7 +17,6 @@ public class PotionVisExhaust extends Potion {
         super(isBadEffect, liquidColor);
         this.setIconIndex(0, 0);
         this.setPotionName("potion.visexhaust");
-        this.setRegistryName("thaumcraft", "vis_exhaust");
     }
 
     @SideOnly(Side.CLIENT)
