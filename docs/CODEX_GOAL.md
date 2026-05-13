@@ -1,64 +1,39 @@
-# Goal Manifest: Portable Hole and Warding Server Wrapper Parity
+# Goal Manifest: Boss and Special Mob Server Parity
 
 ## Objective
 
-Implement the deferred server/common block-wrapper systems needed by `FocusPortableHole` and `FocusWarding`.
+Complete the remaining deferred pre-Phase8 boss/special mob server parity.
 
 Current state:
 
-- `FocusPortableHole` is deferred because no original-compatible `BlockHole` + `TileHole` restoration system exists.
-- `TileHole` exists only as a placeholder.
-- `FocusWarding` is deferred because no original-compatible arbitrary block wrapper equivalent to `blockWarded` + `TileWarded` exists.
-- There is no current registered `BlockHole`/`BlockWarded` implementation in the active 1.12.2 source.
+- Portable Hole and Warding wrapper systems are already implemented.
+- P0 focus/block wrapper blockers are closed.
+- Boss/special mob parity remains deferred.
+- Offline `.thaum/.thaumbak` research migration remains deferred and is out of scope for this checkpoint.
+- Phase 8 client work is out of scope.
 
 Target state:
 
-- `FocusPortableHole` creates temporary pass-through holes using a registered block/tile system.
-- The hole tile stores original block state, tile data if safely supported, side/direction, duration/expiry, owner/caster data if original behavior requires it, and restores safely.
-- `FocusWarding` wraps valid target blocks in a warded wrapper block/tile.
-- The warded tile stores owner and original block state/data needed to render/drop/restore/protect the block.
-- Public API, config keys, NBT semantics, registry identity, and existing behavior remain compatible.
-- No client Phase 8 GUI/rendering work is started.
-
-## Required reference workflow
-
-Before implementation:
-
-- Inspect current 1.12.2 files:
-  - `FocusPortableHole.java`
-  - `FocusWarding.java`
-  - `TileHole.java`
-  - `ConfigBlocks.java`
-  - block registration/event registration paths
-  - tile registration paths
-  - relevant block utilities
-  - relevant wand/vis helpers
-
-- Decompile/read original 1.7.10 classes from `Thaumcraft-1.7.10-4.2.3.5.jar` using CFR:
-  - original `FocusPortableHole`
-  - original `BlockHole`
-  - original `TileHole`
-  - original `FocusWarding`
-  - original `BlockWarded`
-  - original `TileWarded`
-  - any original helper classes they call
-
-Do not rely on memory or PRD text for behavior.
+- Cultist Leader has original-compatible equipment, ranged attack, and nearby cultist buff behavior.
+- Eldritch Golem has original-compatible headless transition and beam/ranged behavior.
+- Eldritch Warden has original-compatible ranged attack and frenzy/teleport/screech behavior.
+- Pech death loot is original-compatible.
+- Entity registry names, NBT/data parameters, AI task structure, drops, and server behavior remain compatible.
+- No client rendering, GUI, recipe, research, Portable Hole, Warding, or Hover Harness work is included.
 
 ## Scope
 
-Allowed paths:
+Allowed files:
 
-- `src/main/java/thaumcraft/common/items/wands/foci/FocusPortableHole.java`
-- `src/main/java/thaumcraft/common/items/wands/foci/FocusWarding.java`
-- `src/main/java/thaumcraft/common/tiles/TileHole.java`
-- new `src/main/java/thaumcraft/common/tiles/TileWarded.java` if required
-- new `src/main/java/thaumcraft/common/blocks/BlockHole.java` if required
-- new `src/main/java/thaumcraft/common/blocks/BlockWarded.java` if required
-- `src/main/java/thaumcraft/common/config/ConfigBlocks.java`
-- existing block/tile registration paths
-- existing `BlockUtils`/`EntityUtils` only if a small helper is required
-- minimal `docs/REPAIR.md` status update after validation
+- `src/main/java/thaumcraft/common/entities/monster/boss/EntityCultistLeader.java`
+- `src/main/java/thaumcraft/common/entities/monster/boss/EntityEldritchGolem.java`
+- `src/main/java/thaumcraft/common/entities/monster/boss/EntityEldritchWarden.java`
+- `src/main/java/thaumcraft/common/entities/monster/EntityPech.java`
+- `src/main/java/thaumcraft/common/entities/projectile/EntityGolemOrb.java`
+- `src/main/java/thaumcraft/common/entities/projectile/EntityEldritchOrb.java`
+- `src/main/java/thaumcraft/common/entities/projectile/EntityPechBlast.java`
+- related AI/helper/loot/config classes only if original behavior requires them
+- `docs/REPAIR.md` after validation
 
 Out of scope:
 
@@ -67,100 +42,88 @@ Out of scope:
 - `ConfigRecipes`
 - `ConfigResearch`
 - Phase 9 recipes/research
-- bosses/special mobs
-- Pech loot
-- offline `.thaum`/`.thaumbak` migration
-- JEI
-- config GUI
-- broad formatting
+- Portable Hole/Warding files
+- Offline `.thaum/.thaumbak` migration
+- Hover Harness flight
+- JEI/config GUI/localization polish
 - dependency upgrades
-- public API signature changes
-- registry/config/NBT renames
+- broad formatting
 
-## Implementation checkpoints
+## Required reference workflow
 
-### Checkpoint 1: Original behavior mapping
+Before changing each class, inspect the original 1.7.10 behavior via CFR:
 
-- Decompile/read original Portable Hole and Warding classes.
-- Identify exact NBT fields, duration behavior, restoration behavior, owner checks, target validity checks, and blacklist/edge-case behavior.
-- Inspect current registration lifecycle for blocks and tile entities.
-- Do not modify code yet except optional notes in final report.
+- `EntityCultistLeader`
+- `EntityEldritchGolem`
+- `EntityEldritchWarden`
+- `EntityPech`
+- `EntityGolemOrb`
+- `EntityEldritchOrb`
+- any original loot/helper classes used by Pech death drops
+
+Do not infer boss behavior from comments alone.
+
+## Implementation plan
+
+### Checkpoint 1: Behavior mapping
+
+- Decompile/read original classes.
+- Map current TODOs to original methods.
+- Identify NBT/data watcher fields that must be preserved.
+- Identify whether existing projectile classes are sufficient or need small corrections.
 
 Validation:
 
 - `git status --short`
-- `rg -n "TileHole|BlockHole|TileWarded|BlockWarded|FocusPortableHole|FocusWarding" src/main/java thaumcraft_src docs`
+- focused `rg` scan for boss/Pech TODOs
 
-Stop if original behavior cannot be determined.
+### Checkpoint 2: Cultist Leader
 
-### Checkpoint 2: Implement BlockHole/TileHole baseline
-
-- Implement registered `BlockHole` if absent.
-- Expand `TileHole` from placeholder into original-compatible temporary restoration tile.
-- Store original block state safely for 1.12.2.
-- Restore block on expiry/removal/server tick according to original behavior.
-- Avoid corrupting tile entities; if tile entity restoration is ambiguous, document blocker rather than guessing.
-- Wire registration without changing unrelated block registry names.
+- Add original-compatible equipment.
+- Implement ranged GolemOrb attack.
+- Implement nearby cultist buff behavior.
+- Preserve AI task structure unless original behavior requires adjustment.
 
 Validation:
 
 - `compileJava`
-- `processResources` if resources changed
-- focused manual scenario notes
+- manual spawn scenario notes
 
-### Checkpoint 3: Wire FocusPortableHole
+### Checkpoint 3: Eldritch Golem
 
-- Replace deferred no-op with server-side targeting and hole placement.
-- Consume vis through existing wand logic.
-- Respect side checks and block modification checks.
-- Do not mutate world on client side.
-- Add safe failure behavior.
+- Implement headless transition behavior.
+- Persist/sync headless state if original behavior requires it.
+- Implement beam/ranged attack through existing projectile/helper path where possible.
+- Preserve boss attributes and existing AI.
 
 Validation:
 
 - `compileJava`
-- manual scenario:
-  - cast on normal solid block;
-  - hole appears;
-  - player can pass/use intended behavior;
-  - original block restores after duration;
-  - invalid target fails safely;
-  - insufficient vis fails safely.
+- manual spawn/damage scenario notes
 
-### Checkpoint 4: Implement BlockWarded/TileWarded baseline
+### Checkpoint 4: Eldritch Warden
 
-- Implement registered `BlockWarded` if absent.
-- Implement `TileWarded`.
-- Store owner identity.
-- Store original block state and light/metadata-equivalent data required by original behavior.
-- Enforce owner/protection behavior according to original behavior.
-- Preserve drops/restoration semantics where original-compatible and safe.
+- Implement EldritchOrb ranged attack.
+- Implement frenzy/teleport/screech behavior.
+- Preserve target behavior and existing sounds unless original behavior requires changes.
 
 Validation:
 
 - `compileJava`
-- focused manual scenario notes
+- manual spawn/combat scenario notes
 
-### Checkpoint 5: Wire FocusWarding
+### Checkpoint 5: Pech death loot
 
-- Replace deferred no-op with server-side warding behavior.
-- Consume vis through existing wand logic.
-- Respect target validity, owner, world modification, and protected-block checks.
-- Do not mutate client world.
-- Do not ward forbidden blocks.
+- Implement original-compatible death loot.
+- Preserve existing trading/taming/pickup/combat behavior.
+- Do not move Pech GUI/client work into this checkpoint.
 
 Validation:
 
 - `compileJava`
-- manual scenario:
-  - ward normal block;
-  - owner can interact/break if original allows;
-  - non-owner behavior matches original;
-  - block restores/drops safely;
-  - invalid target fails safely;
-  - insufficient vis fails safely.
+- manual Pech death/drop scenario notes
 
-### Checkpoint 6: Final validation and commit
+### Checkpoint 6: Final validation and docs
 
 Run:
 
@@ -168,50 +131,48 @@ Run:
 - `git diff --stat`
 - `git diff --name-only`
 - Docker `compileJava`
-- Docker `build` if practical
-- Docker `apiJar devJar` if practical
-- placeholder scan for touched scope
+- Docker `build`
+- `git diff --check`
+- focused placeholder scan for touched files
+
+Update `docs/REPAIR.md` only after validation.
 
 Commit only if scoped and validated:
 
-- suggested commit message:
-  - `port: implement portable hole and warding block wrappers`
+- `port: restore boss and special mob server parity`
 
-If blocked, do not commit; stop with final report.
+If blocked, do not commit.
 
 ## Acceptance criteria
 
 Functional:
 
-- `FocusPortableHole` is no longer a no-op unless blocked by documented original behavior ambiguity.
-- `FocusWarding` is no longer a no-op unless blocked by documented original behavior ambiguity.
-- Hole restoration does not lose block state in common valid cases.
-- Warded blocks preserve original block identity/state in common valid cases.
-- Vis is consumed only on successful server-side action.
-- Invalid targets fail safely.
-- Existing foci/wand behavior remains unchanged.
+- Cultist Leader no longer has ranged/equipment/aura TODO behavior.
+- Eldritch Golem no longer has headless/beam TODO behavior.
+- Eldritch Warden no longer has ranged/frenzy TODO behavior.
+- Pech death loot is no longer a stub.
+- Existing entity registration and spawn behavior remain compatible.
+- Existing projectile behavior is preserved unless corrected against original reference.
 
 Architecture:
 
-- Server/common behavior stays in `thaumcraft.common.*`.
-- No client Phase 8 code is touched.
-- No recipes/research code is touched.
-- Public API is unchanged.
-- Registry additions are minimal and named consistently with existing Thaumcraft registry style.
-- No speculative abstraction is introduced.
+- Server behavior remains in `thaumcraft.common.*`.
+- No client Phase 8 files are touched.
+- No recipe/research files are touched.
+- No Portable Hole/Warding files are touched.
+- No public API change is introduced.
 
 Validation:
 
 - `compileJava` passes.
-- `build` passes or blocker/pre-existing failure is documented.
-- Final report lists exact commands and results.
+- `build` passes or pre-existing/environment failure is documented.
 - Final report lists original reference classes inspected.
-- Final report lists manual scenarios performed or skipped with reason.
+- Final report lists manual runtime scenarios performed or skipped with reason.
 
 Diff:
 
 - Diff stays inside stated scope.
-- No generated output is committed.
+- No generated files are committed.
 - No `thaumcraft_src/**` changes.
-- No `Thaumcraft-1.7.10-4.2.3.5.jar` changes.
+- No original jar changes.
 - No broad formatting-only changes.
