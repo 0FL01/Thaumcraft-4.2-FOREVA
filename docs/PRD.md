@@ -53,8 +53,6 @@ Documentation:
 
 - `AGENTS.md`
 - `docs/PRD.md`
-- `docs/REPAIR.md`
-- `docs/CODEX_GOAL.md`
 
 ## 5. Public contracts that must remain stable
 
@@ -259,7 +257,7 @@ Known risk areas:
 Acceptance:
 
 - Existing working baselines remain intact.
-- Remaining gaps from `docs/REPAIR.md` are fixed or explicitly deferred.
+- Remaining gaps are fixed or explicitly deferred.
 
 ### Phase 4: Blocks and tile entities
 

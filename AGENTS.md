@@ -8,8 +8,6 @@ Read these files before changing code:
 
 - `AGENTS.md`
 - `docs/PRD.md`
-- `docs/REPAIR.md`
-- `docs/CODEX_GOAL.md`
 - `build.gradle`
 - `Dockerfile`
 
@@ -21,7 +19,6 @@ Asset origin: assets (textures, sounds, models, lang, shaders, etc.) for the por
 
 - Do not edit `thaumcraft_src/**`.
 - Do not edit `Thaumcraft-1.7.10-4.2.3.5.jar`.
-- Do not create `GOAL.md`.
 - Do not change public `thaumcraft.api.*` signatures unless there is no Forge 1.12.2-compatible alternative.
 - Do not rename packages away from original Thaumcraft package boundaries.
 - Do not change mod id, registry names, NBT keys, config keys, packet ids, GUI ids, or dimension ids silently.
@@ -29,7 +26,7 @@ Asset origin: assets (textures, sounds, models, lang, shaders, etc.) for the por
 - Do not perform broad formatting-only cleanup.
 - Do not make unrelated dependency changes.
 - Do not claim parity based on compile success alone.
-- Preserve existing behavior unless `docs/REPAIR.md` or `docs/CODEX_GOAL.md` explicitly authorizes a behavior change.
+- Preserve existing behavior unless the current task or `docs/PRD.md` explicitly authorizes a behavior change.
 
 ## Project stack
 
@@ -57,7 +54,7 @@ Asset origin: assets (textures, sounds, models, lang, shaders, etc.) for the por
 
 As of the 2026-05-13 documentation cleanup, Phases 3, 4, 5, 6, and 7 are not closed or parity-validated. They have important common/server baselines, but still need runtime/manual validation and documented deferrals before any phase can be claimed complete.
 
-Use `docs/REPAIR.md` as the active pre-Phase8 mine list. Do not convert prior `compileJava`/`build` success into parity closure. Current explicit deferrals include offline `.thaum`/`.thaumbak` migration, Portable Hole/Warding visual renderers, Phase 8 client GUI/render/FX/shader work, Phase 9 recipe/research/content registration, Hover Harness flight behavior, and Outer Lands runtime/portal parity validation.
+Use the phase guidance in `docs/PRD.md` and the explicit deferrals below as the active pre-Phase8 mine list. Do not convert prior `compileJava`/`build` success into parity closure. Current explicit deferrals include offline `.thaum`/`.thaumbak` migration, Portable Hole/Warding visual renderers, Phase 8 client GUI/render/FX/shader work, Phase 9 recipe/research/content registration, Hover Harness flight behavior, and Outer Lands runtime/portal parity validation.
 
 ## Commit policy
 
