@@ -771,21 +771,43 @@ public class ConfigItems {
         ItemStack voidIngot = new ItemStack(itemResource, 1, ItemResource.META_VOID_INGOT);
         ItemStack cloth = new ItemStack(itemResource, 1, ItemResource.META_CLOTH);
 
-        TOOLMAT_THAUMIUM.setRepairItem(thaumium);
-        TOOLMAT_ELEMENTAL.setRepairItem(thaumium);
-        TOOLMAT_VOID.setRepairItem(voidIngot);
+        setRepairItem(TOOLMAT_THAUMIUM, thaumium);
+        setRepairItem(TOOLMAT_ELEMENTAL, thaumium);
+        setRepairItem(TOOLMAT_VOID, voidIngot);
 
-        ARMOR_THAUMIUM.setRepairItem(thaumium);
-        ARMOR_FORTRESS.setRepairItem(thaumium);
-        ARMOR_VOID.setRepairItem(voidIngot);
-        ARMOR_VOID_ROBE.setRepairItem(voidIngot);
-        ARMOR_ROBE.setRepairItem(cloth);
-        ARMOR_CULTIST.setRepairItem(cloth);
-        ARMOR_CULTIST_PLATE.setRepairItem(thaumium);
-        ARMOR_CULTIST_LEADER.setRepairItem(voidIngot);
-        ARMOR_CULTIST_BOOTS.setRepairItem(cloth);
-        ARMOR_GOGGLES.setRepairItem(cloth);
-        ARMOR_TRAVELLER.setRepairItem(cloth);
-        ARMOR_HOVER.setRepairItem(cloth);
+        setRepairItem(ARMOR_THAUMIUM, thaumium);
+        setRepairItem(ARMOR_FORTRESS, thaumium);
+        setRepairItem(ARMOR_VOID, voidIngot);
+        setRepairItem(ARMOR_VOID_ROBE, voidIngot);
+        setRepairItem(ARMOR_ROBE, cloth);
+        setRepairItem(ARMOR_CULTIST, cloth);
+        setRepairItem(ARMOR_CULTIST_PLATE, thaumium);
+        setRepairItem(ARMOR_CULTIST_LEADER, voidIngot);
+        setRepairItem(ARMOR_CULTIST_BOOTS, cloth);
+        setRepairItem(ARMOR_GOGGLES, cloth);
+        setRepairItem(ARMOR_TRAVELLER, cloth);
+        setRepairItem(ARMOR_HOVER, cloth);
+    }
+
+    private static void setRepairItem(ToolMaterial material, ItemStack repairItem) {
+        ItemStack current = material.getRepairItemStack();
+        if (current.isEmpty()) {
+            material.setRepairItem(repairItem);
+            return;
+        }
+        if (!ItemStack.areItemsEqual(current, repairItem)) {
+            throw new IllegalStateException("Conflicting repair item for tool material " + material + ": " + current + " vs " + repairItem);
+        }
+    }
+
+    private static void setRepairItem(ArmorMaterial material, ItemStack repairItem) {
+        ItemStack current = material.getRepairItemStack();
+        if (current.isEmpty()) {
+            material.setRepairItem(repairItem);
+            return;
+        }
+        if (!ItemStack.areItemsEqual(current, repairItem)) {
+            throw new IllegalStateException("Conflicting repair item for armor material " + material + ": " + current + " vs " + repairItem);
+        }
     }
 }
