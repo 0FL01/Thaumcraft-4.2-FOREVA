@@ -207,6 +207,7 @@ public class Thaumcraft {
 
         // Register key bindings
         proxy.registerKeyBindings();
+        proxy.registerHandlers();
 
         Config.registerBiomes();
         Config.initLoot();

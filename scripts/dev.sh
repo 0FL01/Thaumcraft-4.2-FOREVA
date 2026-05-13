@@ -88,11 +88,11 @@ with open(mappings_path, 'r', encoding='utf-8') as fh:
             if src_owner.startswith('net/minecraft/') and src_name != dst_name:
                 mapped_fields[(src_owner, src_name)] = dst_name
         elif parts[0] == 'MD:' and len(parts) >= 5:
-            src, dst = parts[1], parts[3]
+            src, src_desc, dst = parts[1], parts[2], parts[3]
             src_owner, src_name = src.rsplit('/', 1)
             dst_owner, dst_name = dst.rsplit('/', 1)
             if src_owner.startswith('net/minecraft/') and src_name != dst_name:
-                mapped_methods[(src_owner, src_name)] = dst_name
+                mapped_methods[(src_owner, src_name, src_desc)] = dst_name
 
 def parse_class(data):
     if data[:4] != b'\xca\xfe\xba\xbe':
@@ -156,9 +156,9 @@ def parse_class(data):
         if not owner or not name or not owner.startswith('net/minecraft/'):
             continue
         if tag == 9 and (owner, name) in mapped_fields:
-            leaks.append(('field', owner, name, mapped_fields[(owner, name)]))
-        elif tag in (10, 11) and (owner, name) in mapped_methods:
-            leaks.append(('method', owner, name, mapped_methods[(owner, name)]))
+            leaks.append(('field', owner, name, desc, mapped_fields[(owner, name)]))
+        elif tag in (10, 11) and (owner, name, desc) in mapped_methods:
+            leaks.append(('method', owner, name, desc, mapped_methods[(owner, name, desc)]))
     return leaks
 
 findings = []
@@ -180,8 +180,11 @@ if unique:
     print('Jar check FAILED: built jar contains MCP-named Minecraft references.')
     print('This usually means the jar is not production-reobfuscated and can crash in Prism/normal Forge.')
     prioritized = sorted(unique, key=lambda row: (0 if row[2] == 'net/minecraft/block/material/MapColor' else 1, 0 if row[1] == 'field' else 1, row))
-    for cls, kind, owner, name, mapped in prioritized[:80]:
-        print('{}: {} {}.{} should be {}'.format(cls, kind, owner.replace('/', '.'), name, mapped))
+    for cls, kind, owner, name, desc, mapped in prioritized[:80]:
+        if kind == 'method':
+            print('{}: {} {}.{}{} should be {}'.format(cls, kind, owner.replace('/', '.'), name, desc, mapped))
+        else:
+            print('{}: {} {}.{} should be {}'.format(cls, kind, owner.replace('/', '.'), name, mapped))
     if len(unique) > 80:
         print('... and {} more'.format(len(unique) - 80))
     sys.exit(1)
@@ -197,6 +200,15 @@ smoke_server() {
   local log="$ROOT/run/smoke-server.log"
   rm -f "$log"
 
+  local prod_jar="$ROOT/build/libs/Thaumcraft-1.0.0-universal.jar"
+  local jar_backup=""
+  local had_prod_jar=0
+  if [[ -f "$prod_jar" ]]; then
+    jar_backup="$(mktemp)"
+    cp -p "$prod_jar" "$jar_backup"
+    had_prod_jar=1
+  fi
+
   set +e
   timeout "$SMOKE_TIMEOUT" docker run --rm \
     -v "$ROOT:/workspace/thaumcraft" \
@@ -206,6 +218,13 @@ smoke_server() {
     "$IMAGE" runServer -x getAssets --no-daemon 2>&1 | tee "$log"
   local status="${PIPESTATUS[0]}"
   set -e
+
+  if [[ "$had_prod_jar" -eq 1 ]]; then
+    cp -p "$jar_backup" "$prod_jar"
+    rm -f "$jar_backup"
+  elif [[ -f "$prod_jar" ]]; then
+    rm -f "$prod_jar"
+  fi
 
   local markers
   markers="$(crash_markers "$log")"
@@ -252,14 +271,26 @@ smoke_client() {
   local log="$ROOT/run/smoke-client.log"
   rm -f "$log"
 
+  local xauth="${XAUTHORITY:-$HOME/.Xauthority}"
+  local docker_args=(
+    --rm
+    -v "$ROOT:/workspace/thaumcraft"
+    -v "$GRADLE_HOME_DIR:/home/ubuntu/.gradle"
+    -e DISPLAY="$DISPLAY"
+    -v /tmp/.X11-unix:/tmp/.X11-unix
+    --user "$(id -u):$(id -g)"
+    --entrypoint ./gradlew
+  )
+
+  if [[ -f "$xauth" ]]; then
+    docker_args+=(
+      -e XAUTHORITY=/tmp/.thaumcraft.Xauthority
+      -v "$xauth:/tmp/.thaumcraft.Xauthority:ro"
+    )
+  fi
+
   set +e
-  timeout "$SMOKE_TIMEOUT" docker run --rm \
-    -v "$ROOT:/workspace/thaumcraft" \
-    -v "$GRADLE_HOME_DIR:/home/ubuntu/.gradle" \
-    -e DISPLAY="$DISPLAY" \
-    -v /tmp/.X11-unix:/tmp/.X11-unix \
-    --user "$(id -u):$(id -g)" \
-    --entrypoint ./gradlew \
+  timeout "$SMOKE_TIMEOUT" docker run "${docker_args[@]}" \
     "$IMAGE" runClient -x getAssets 2>&1 | tee "$log"
   local status="${PIPESTATUS[0]}"
   set -e

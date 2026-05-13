@@ -79,9 +79,9 @@ artifacts {
     archives devJar
 }
 
-// Re-obfuscation: keep API jar readable (no SRG names)
+// Re-obfuscation: production main jar only. Keep API/dev jars readable.
 reobf {
-    apiJar { }
+    jar { }
 }
 
 idea { module { inheritOutputDirs = true } }

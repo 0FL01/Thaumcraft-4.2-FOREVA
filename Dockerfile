@@ -52,6 +52,7 @@ RUN set -eux; \
         libxinerama1 \
         libxcursor1 \
         libxi6 \
+        libxtst6 \
         libopenal1 \
         libasound2t64; \
     apt-get clean; \

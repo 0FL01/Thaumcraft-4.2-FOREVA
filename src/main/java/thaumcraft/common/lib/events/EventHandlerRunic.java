@@ -11,11 +11,8 @@ import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.potion.PotionEffect;
 import net.minecraft.util.DamageSource;
-import net.minecraft.util.text.TextFormatting;
-import net.minecraft.util.text.translation.I18n;
 import net.minecraftforge.event.entity.living.LivingEvent;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
-import net.minecraftforge.event.entity.player.ItemTooltipEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
 import thaumcraft.api.IRunicArmor;
@@ -317,19 +314,6 @@ public class EventHandlerRunic {
         //     new NetworkRegistry.TargetPoint(mob.world.provider.getDimension(), mob.posX, mob.posY, mob.posZ, 32.0));
 
         // Phase 8: mob.world.playSound(null, mob.posX, mob.posY, mob.posZ, TCSounds.RUNICSHIELDEFFECT, ...);
-    }
-
-    @SubscribeEvent
-    public void onItemTooltip(ItemTooltipEvent event) {
-        int charge = getFinalCharge(event.getItemStack());
-        int warp = getFinalWarp(event.getItemStack(), event.getEntityPlayer());
-
-        if (charge > 0) {
-            event.getToolTip().add(TextFormatting.GOLD + I18n.translateToLocal("item.runic.charge") + " +" + charge);
-        }
-        if (warp > 0 && event.getEntityPlayer() != null) {
-            event.getToolTip().add(TextFormatting.DARK_PURPLE + I18n.translateToLocal("item.warping") + " " + warp);
-        }
     }
 
     // ---- Static utility methods ----

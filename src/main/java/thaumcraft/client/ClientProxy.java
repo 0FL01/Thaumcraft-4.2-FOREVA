@@ -2,8 +2,14 @@ package thaumcraft.client;
 
 import javax.annotation.Nullable;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.util.text.TextFormatting;
+import net.minecraft.util.text.translation.I18n;
 import net.minecraft.world.World;
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.entity.player.ItemTooltipEvent;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import thaumcraft.common.CommonProxy;
+import thaumcraft.common.lib.events.EventHandlerRunic;
 
 public class ClientProxy extends CommonProxy {
 
@@ -19,7 +25,22 @@ public class ClientProxy extends CommonProxy {
 
     @Override
     public void registerHandlers() {
-        // Phase 8: register client event handlers
+        MinecraftForge.EVENT_BUS.register(new ClientEventHandler());
+    }
+
+    private static final class ClientEventHandler {
+        @SubscribeEvent
+        public void onItemTooltip(ItemTooltipEvent event) {
+            int charge = EventHandlerRunic.getFinalCharge(event.getItemStack());
+            int warp = EventHandlerRunic.getFinalWarp(event.getItemStack(), event.getEntityPlayer());
+
+            if (charge > 0) {
+                event.getToolTip().add(TextFormatting.GOLD + I18n.translateToLocal("item.runic.charge") + " +" + charge);
+            }
+            if (warp > 0 && event.getEntityPlayer() != null) {
+                event.getToolTip().add(TextFormatting.DARK_PURPLE + I18n.translateToLocal("item.warping") + " " + warp);
+            }
+        }
     }
 
     @Override

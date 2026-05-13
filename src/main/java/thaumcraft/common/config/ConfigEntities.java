@@ -134,14 +134,14 @@ public class ConfigEntities {
                 "thaumcraft:wizard",
                 "thaumcraft:textures/models/wizard.png",
                 "minecraft:textures/entity/zombie_villager/zombie_farmer.png"
-        ).setRegistryName("thaumcraft:wizard");
+        );
         PROFESSIONS.add(PROF_WIZARD);
 
         PROF_BANKER = new VillagerRegistry.VillagerProfession(
                 "thaumcraft:banker",
                 "thaumcraft:textures/models/moneychanger.png",
                 "minecraft:textures/entity/zombie_villager/zombie_farmer.png"
-        ).setRegistryName("thaumcraft:banker");
+        );
         PROFESSIONS.add(PROF_BANKER);
 
         // Initialize villager careers with trade lists
