@@ -1,159 +1,157 @@
-# Thaumcraft 4.2.3.5 (1.7.10) -> 1.12.2 Port
+# Agent Instructions — Thaumcraft 4.2.3.5 -> Forge 1.12.2 Port
 
-Reverse-engineering and port of Azanor's Thaumcraft 4.2.3.5 from Minecraft
-1.7.10 to 1.12.2.
+This repository is a work-in-progress Java 8 Minecraft Forge 1.12.2 port of Thaumcraft 4.2.3.5 from Minecraft 1.7.10.
 
-Tech stack: Java 8, MinecraftForge 1.12.2, Gradle, Baubles (hard dependency),
-CodeChicken Lib (bundled in JAR).
+## Sources of truth
 
-All detailed docs in **`docs/PRD.md`**: architecture, source inventory, porting
-phases, complexity assessment, risks, success criteria.
+Read these files before changing code:
 
-## Architectural Decisions (Closed)
+- `AGENTS.md`
+- `docs/PRD.md`
+- `docs/REPAIR.md`
+- `docs/CODEX_GOAL.md`
+- `build.gradle`
+- `Dockerfile`
 
-See `docs/PRD.md §6`. All resolved:
+Use `thaumcraft_src/**` and `Thaumcraft-1.7.10-4.2.3.5.jar` as read-only original 1.7.10 reference material.
 
-| Decision | Choice |
-|----------|--------|
-| API packaging | **Separate mod** (`ThaumcraftAPI-1.12.2.jar`) |
-| Rendering | **Hybrid**: JSON models + CCL TESR + OBJ |
-| DepLoader | **Delete** (Baubles via CurseMaven) |
-| Potion hack | **Remove** (use `RegistryEvent`) |
-| Player data | **Capabilities** on `EntityPlayer` |
-| Config | **Both**: `Configuration` now, `@Config` in Phase 10 |
-| Packages | **Keep** `thaumcraft.common.*` / `thaumcraft.client.*` |
-| Lang files | **`en_US` only** until strings stabilise |
+## Hard rules
 
-## Workspace Overview
+- Do not edit `thaumcraft_src/**`.
+- Do not edit `Thaumcraft-1.7.10-4.2.3.5.jar`.
+- Do not create `GOAL.md`.
+- Do not change public `thaumcraft.api.*` signatures unless there is no Forge 1.12.2-compatible alternative.
+- Do not rename packages away from original Thaumcraft package boundaries.
+- Do not change mod id, registry names, NBT keys, config keys, packet ids, GUI ids, or dimension ids silently.
+- Do not upgrade Forge, Gradle, Java, Baubles, or bundled CodeChicken code unless the final report documents a hard blocker.
+- Do not perform broad formatting-only cleanup.
+- Do not make unrelated dependency changes.
+- Do not claim parity based on compile success alone.
+- Preserve existing behavior unless `docs/REPAIR.md` or `docs/CODEX_GOAL.md` explicitly authorizes a behavior change.
 
-- `Thaumcraft-1.7.10-4.2.3.5.jar` -- original compiled JAR (942 classes)
-- `thaumcraft_src/` -- unpacked JAR contents
-- `Dockerfile` -- dev container (Java 8 + CFR + git + build tools)
-- `docs/PRD.md` -- product requirements doc with phased porting plan
-- `docs/REPAIR.md` -- active pre-Phase8 mine list from latest RECON
-- `AGENTS.md` -- this file (concise navigation, points to docs/PRD.md)
-- `build.gradle` -- ForgeGradle 2.3, Forge 14.23.5.2847, Baubles via CurseMaven
-- `gradlew` / `gradle/wrapper/` -- Gradle 4.10.3
-- `src/main/java/` -- mod source (port output, ~530 Java source files)
-- `.gradle_home/` -- Gradle/Forge cache (**excluded from git**)
+## Project stack
 
-## Dependencies
+- Language: Java.
+- Runtime target: Minecraft Forge 1.12.2.
+- Java target: Java 8.
+- Build system: Gradle wrapper with ForgeGradle 2.3.
+- Forge version: `1.12.2-14.23.5.2847`.
+- MCP mappings: `stable_39`.
+- Hard dependency: Baubles via CurseMaven.
+- Bundled library: `thaumcraft.codechicken.*`.
+- Public addon API boundary: `thaumcraft.api.*`.
 
-See `docs/PRD.md §3` for full dependency graph and versions.
+## Architecture boundaries
 
-| Dep | 1.7.10 | 1.12.2 |
-|-----|--------|--------|
-| **Baubles** | Hard (auto-downloaded) | Hard (CurseMaven) |
-| **CodeChickenLib** | Bundled under `thaumcraft.codechicken.*` | Same (port bundled code) |
+- `thaumcraft.api.*`: public addon API and API jar output. Keep stable.
+- `thaumcraft.common.*`: server/common gameplay, registration, config, blocks, items, tiles, entities, worldgen, research, crafting, network.
+- `thaumcraft.client.*`: client-only GUI, rendering, models, particles, shaders, keybinds, client event handlers.
+- `thaumcraft.codechicken.*`: bundled CCL-style rendering/math helpers.
+- `truetyper.*`: font rendering support.
+- `src/main/resources/assets/thaumcraft/**`: assets, sounds, textures, models, recipes, lang, GUI resources.
+- `thaumcraft_src/**`: read-only original reference.
 
-## Development Status
+## Required workflow
 
-See `docs/PRD.md §4` for per-phase deliverables and `docs/PRD.md §5` for complexity.
+1. Start with `git status --short`.
+2. Read the relevant docs and code before editing.
+3. For every gameplay-critical class, inspect the original 1.7.10 behavior first:
+   - read matching source if present under `thaumcraft_src/**`;
+   - or decompile with CFR from the original class.
+4. Make small reversible changes.
+5. Run focused validation after each checkpoint.
+6. If validation fails, fix the failure before expanding scope.
+7. Keep the final diff scoped and reviewable.
+8. End with a final report listing exact commands and results.
 
-| Phase | Scope | Status |
-|-------|-------|--------|
-| 0 | Forge MDK, Gradle, build chain | ✅ Done |
-| 1 | API + CCL + TrueType | ✅ Done |
-| 2 | Registration, config, networking, events | ✅ Done |
-| 3 | Core systems (capabilities, wands, research, vis, potions, enchants) | ⚠️ **Partial: vis regen/wand discounts/potions/online research baseline fixed; scan, offline research, bauble storage, enchant applicability remain** |
-| 4 | Blocks + Tile Entities | ⚠️ **Partial: registered block set + metadata/harvest work; crucible + major TE baselines and Infusion Matrix server lifecycle fixed; full bore mining loop pending** |
-| 5 | Items, Tools, Armor, Baubles, Relics | ⚠️ **Partial: 4/10 projectile foci server behavior done; 6 foci, baubles, relics, tools/repairability remain** |
-| 6 | Entities, Mobs, Golems | ⚠️ **Partial: AI/projectile pass strong; boss special attacks, Pech loot, InhabitedZombie death spawn remain** |
-| 7 | World Gen (biomes, dimension, trees, structures) | ⚠️ **Partial: biomes/trees/villages present; Outer Lands runtime hookup fixed; room-gen fallback TODOs remain** |
-| 7r | World Gen Remediation (room gens, village, persistence) | ⚠️ **Partial: provider/chunk/maze hookup fixed; room-gen replacement TODOs and biome color remain** |
-| 3r-6r | Remediation (see docs/REPAIR.md) | ⚠️ **Active pre-Phase8 mine list; container, Phase 3, crucible, and infusion lifecycle baselines closed; remaining P0 items still block Phase 8** |
-| 8 | Client GUI + Rendering (~140 classes) | ❌ |
-| 9 | Recipes + Research (~450 registrations) | ❌ |
-| 10 | Polish (JEI, Config, Sound) | ⚠️ **Sound: all 66 SoundEvents + 22 entity fixes + boss bar done** |
+## Development practices
 
-## Where To Look
+- Keep original package names.
+- Prefer original field/method names when practical for traceability.
+- Prefer porting original behavior over inventing new behavior.
+- Prefer existing project conventions over new abstractions.
+- Use small helpers only when they remove real duplication across multiple callers.
+- Do not introduce speculative abstraction.
+- Do not use ad-hoc regex fixes for broken Java signatures.
+- If a generated or transformed file has corrupted method signatures, stop and regenerate from the original source or manually port the file.
 
-Original source (for CFR decompilation reference):
+## Validation commands
 
-| Path | Content | docs/PRD.md § |
-|------|---------|----------|
-| `thaumcraft_src/thaumcraft/api/` | Public API (67 classes) | §2 |
-| `thaumcraft_src/thaumcraft/common/blocks/` | 71 block classes | §2, §4 |
-| `thaumcraft_src/thaumcraft/common/tiles/` | 80 tile entity classes | §2, §4 |
-| `thaumcraft_src/thaumcraft/common/items/` | All item/equipment/bauble classes | §2, §5 |
-| `thaumcraft_src/thaumcraft/common/entities/` | All entity/AI classes | §2, §6 |
-| `thaumcraft_src/thaumcraft/common/container/` | 26 container classes | §2 |
-| `thaumcraft_src/thaumcraft/common/lib/` | World, research, network, events, crafting, potions, enchants | §2 |
-| `thaumcraft_src/thaumcraft/common/lib/world/` | World gen, biomes, Eldritch dimension | §2, §7 |
-| `thaumcraft_src/thaumcraft/common/config/` | Config classes | §2 |
-| `thaumcraft_src/thaumcraft/codechicken/` | Bundled CCL (render, vec, lighting) | §2, §1 |
-| `thaumcraft_src/thaumcraft/client/` | GUIs, renderers, models, FX, shaders | §2, §8 |
-| `thaumcraft_src/truetyper/` | TrueType font renderer | §2, §1 |
-| `thaumcraft_src/assets/thaumcraft/` | Textures, models, sounds, lang, shaders | §2 |
+Use Docker unless the local environment is already known to be Java 8 Forge-compatible.
 
-## Development Toolchain
+Build the Docker image:
 
-All work inside Docker container (Java 8 required by Forge 1.12.2):
+    docker build -t thaumcraft-dev .
 
-| Tool | Version | Purpose |
-|------|---------|---------|
-| `java`/`javac` | 1.8.0_482 (Temurin) | JDK |
-| `cfr` | 0.152 | `.class` → `.java` decompiler |
-| `rg` (ripgrep) | 14.1.0 | Fast code search |
-| `python3` | 3.12 | Code generation scripts |
+Discover Gradle tasks:
 
-```bash
-# Build
-docker run --rm -v $(pwd):/workspace/thaumcraft \
-  -v $(pwd)/.gradle_home:/home/ubuntu/.gradle \
-  --user 1000:1000 --entrypoint ./gradlew thaumcraft-dev build
+    docker run --rm \
+      -v "$(pwd):/workspace/thaumcraft" \
+      -v "$(pwd)/.gradle_home:/home/ubuntu/.gradle" \
+      --user 1000:1000 \
+      --entrypoint ./gradlew \
+      thaumcraft-dev tasks
 
-# Decompile a .class file
-docker run --rm -v $(pwd):/workspace/thaumcraft thaumcraft-dev \
-  -c 'cfr thaumcraft_src/thaumcraft/common/Thaumcraft.class'
+Compile Java:
 
-# Find symbol in original source
-docker run --rm -v $(pwd):/workspace/thaumcraft thaumcraft-dev \
-  -c "rg -l 'class AspectList' thaumcraft_src/"
+    docker run --rm \
+      -v "$(pwd):/workspace/thaumcraft" \
+      -v "$(pwd)/.gradle_home:/home/ubuntu/.gradle" \
+      --user 1000:1000 \
+      --entrypoint ./gradlew \
+      thaumcraft-dev compileJava
 
-# Interactive session with X11
-docker run --rm -it -v $(pwd):/workspace/thaumcraft \
-  -e DISPLAY=$DISPLAY -v /tmp/.X11-unix:/tmp/.X11-unix thaumcraft-dev
-```
+Build:
 
-### ForgeGradle Build Caching
+    docker run --rm \
+      -v "$(pwd):/workspace/thaumcraft" \
+      -v "$(pwd)/.gradle_home:/home/ubuntu/.gradle" \
+      --user 1000:1000 \
+      --entrypoint ./gradlew \
+      thaumcraft-dev build
 
-`.gradle_home/` caches Forge/MCP/Gradle artifacts — mount as bind volume.
-Use environment variable `GRADLE_USER_HOME` if needed inside container
-(default: `/home/ubuntu/.gradle`).
+Build API/dev jars:
 
-## Development Practices
+    docker run --rm \
+      -v "$(pwd):/workspace/thaumcraft" \
+      -v "$(pwd)/.gradle_home:/home/ubuntu/.gradle" \
+      --user 1000:1000 \
+      --entrypoint ./gradlew \
+      thaumcraft-dev apiJar devJar
 
-- **Decompile with CFR** for reference, port per-package
-- **CFR first, then adapt**: Always decompile original `.class` before writing port
-- **Keep original package names** (`thaumcraft.common.*` / `thaumcraft.client.*`)
-- **Keep original field/method names** for traceability
-- **BUILD SUCCESSFUL after every micro-step**
-- **Commit after each micro-step** with conventional commit prefix
-- **No ad-hoc regex fixes** for broken signatures — regenerate from raw source
-- **Python generators** (`gen*.py`) for bulk class creation, deleted after use
-- **No emoji in output**, GitHub-flavored markdown, monospace for CLI
+Run tests if the Gradle task exists:
 
-### Automated Code Fixing Prohibitions
+    docker run --rm \
+      -v "$(pwd):/workspace/thaumcraft" \
+      -v "$(pwd)/.gradle_home:/home/ubuntu/.gradle" \
+      --user 1000:1000 \
+      --entrypoint ./gradlew \
+      thaumcraft-dev test
 
-- **Never fix broken method signatures with ad‑hoc regex replacements.**
-  If a transformed file contains a dangling `@Override` followed by a method
-  body without its declaration, **stop immediately**. 
-- **Required recovery:**
-  1. Re-run `transform_1_7_10_to_1_12_2` on original raw source from `_p4_raw/`
-  2. Apply only known, repeatable targeted fixes through the central porting utility
-  3. If a file requires more than two standalone regex fixes, port manually
-- **Audit past damage:** Files affected by `fix_compile_errors.py` must be
-  regenerated from raw source before further development.
+Run client smoke test if display/X11 is available:
 
-### Commit Style
+    docker run --rm -it \
+      -v "$(pwd):/workspace/thaumcraft" \
+      -v "$(pwd)/.gradle_home:/home/ubuntu/.gradle" \
+      -e DISPLAY="$DISPLAY" \
+      -v /tmp/.X11-unix:/tmp/.X11-unix \
+      --user 1000:1000 \
+      --entrypoint ./gradlew \
+      thaumcraft-dev runClient
 
-```
-<type>(<scope>): <description>
+## Stop conditions
 
-  Changes:
-  - <bullet>
-  - <bullet>
-```
+Stop successfully when:
 
-Types: `feat`, `fix`, `chore`, `docs`, `refactor`, `test`
+- the current checkpoint is complete;
+- validation passes, or pre-existing/environment failures are documented;
+- final diff is scoped;
+- final report is complete.
+
+Stop as blocked when:
+
+- original behavior cannot be determined safely;
+- implementation requires forbidden public contract changes;
+- validation cannot run due to missing environment;
+- build/test failures are unclear;
+- completing the task would require out-of-scope dependency or architecture changes.
