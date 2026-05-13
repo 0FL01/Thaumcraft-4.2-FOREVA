@@ -29,6 +29,8 @@ public class ConfigBlocks {
     public static BlockEldritchNothing blockEldritchNothing;
     public static BlockEldritchPortal blockEldritchPortal;
     public static BlockStairsEldritch blockStairsEldritch;
+    public static BlockHole blockHole;
+    public static BlockWarded blockWarded;
 
     // ItemBlock instances
     public static BlockMagicalLeavesItem blockMagicalLeavesItem;
@@ -132,6 +134,14 @@ public class ConfigBlocks {
                 .setRegistryName("thaumcraft", "stairs_eldritch")
                 .setTranslationKey("thaumcraft.stairs_eldritch");
 
+        blockHole = (BlockHole) new BlockHole()
+                .setRegistryName("thaumcraft", "hole")
+                .setTranslationKey("thaumcraft.hole");
+
+        blockWarded = (BlockWarded) new BlockWarded()
+                .setRegistryName("thaumcraft", "warded")
+                .setTranslationKey("thaumcraft.warded");
+
         // ItemBlock instances (cast needed because setRegistryName returns Item)
         blockMagicalLeavesItem = (BlockMagicalLeavesItem) new BlockMagicalLeavesItem(blockMagicalLeaves)
                 .setRegistryName("thaumcraft", "magical_leaves");
@@ -190,7 +200,9 @@ public class ConfigBlocks {
                 blockEldritch,
                 blockEldritchNothing,
                 blockEldritchPortal,
-                blockStairsEldritch
+                blockStairsEldritch,
+                blockHole,
+                blockWarded
         };
     }
 

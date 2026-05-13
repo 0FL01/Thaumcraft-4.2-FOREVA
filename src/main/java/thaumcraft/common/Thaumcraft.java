@@ -175,6 +175,7 @@ public class Thaumcraft {
         GameRegistry.registerTileEntity(TileSensor.class, new net.minecraft.util.ResourceLocation("thaumcraft", "sensor"));
         GameRegistry.registerTileEntity(TileLifter.class, new net.minecraft.util.ResourceLocation("thaumcraft", "lifter"));
         GameRegistry.registerTileEntity(TileHole.class, new net.minecraft.util.ResourceLocation("thaumcraft", "hole"));
+        GameRegistry.registerTileEntity(TileWarded.class, new net.minecraft.util.ResourceLocation("thaumcraft", "warded"));
         GameRegistry.registerTileEntity(TileGrate.class, new net.minecraft.util.ResourceLocation("thaumcraft", "grate"));
         GameRegistry.registerTileEntity(TileAlembic.class, new net.minecraft.util.ResourceLocation("thaumcraft", "alembic"));
         GameRegistry.registerTileEntity(TileArcaneLamp.class, new net.minecraft.util.ResourceLocation("thaumcraft", "arcane_lamp"));

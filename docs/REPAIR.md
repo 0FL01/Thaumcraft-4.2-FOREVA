@@ -240,10 +240,14 @@ Implemented in this pass:
 - P1.3 Inhabited Zombie Eldritch Crab death spawn.
 - P1.4 material-based repair items, Primal Crusher tool baseline, and removal of incorrect always-false repair checks for the targeted tools/armor.
 
+Implemented in the follow-up wrapper-block checkpoint:
+
+- Portable Hole focus now has original-compatible server/common `blockHole`/`TileHole` support: hidden tunnel blocks store original block state, countdown, direction, chain length, and restore themselves after the duration.
+- Warding focus now has original-compatible server/common `blockWarded`/`TileWarded` support: hidden warded blocks store owner hash, original block, metadata, and light, and owner wand use can unwrap them.
+- Both wrapper systems are registered as hidden blocks/tile entities and keep visual renderer work deferred to Phase 8.
+
 Explicitly deferred with evidence:
 
-- Portable Hole focus still needs an original-compatible `blockHole` plus `TileHole` implementation that stores original block state, duration, side, and restoration behavior. Current `TileHole` is only a placeholder and there is no registered hole block.
-- Warding focus still needs an original-compatible warded wrapper block/tile equivalent to `blockWarded`/`TileWarded` that stores owner, original block, metadata, and light. Current warding stone/fence tiles do not provide arbitrary block wrapping.
 - Boss/special mob parity beyond Inhabited Zombie remains deferred: Cultist Leader ranged/buff behavior, Eldritch Golem headless beam behavior, Eldritch Warden ranged/frenzy behavior, and Pech death loot still require class-specific original behavior ports.
 - Offline `.thaum`/`.thaumbak` research migration remains deferred; current research lookup is capability/cache based.
 
