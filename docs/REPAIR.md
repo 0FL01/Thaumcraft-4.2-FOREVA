@@ -29,7 +29,7 @@ Preferred baseline command:
     docker run --rm \
       -v "$(pwd):/workspace/thaumcraft" \
       -v "$(pwd)/.gradle_home:/home/ubuntu/.gradle" \
-      --user 1000:1000 \
+      --user "$(id -u):$(id -g)" \
       --entrypoint ./gradlew \
       thaumcraft-dev compileJava
 
@@ -42,7 +42,7 @@ If a fresh workspace is not initialized:
     docker run --rm \
       -v "$(pwd):/workspace/thaumcraft" \
       -v "$(pwd)/.gradle_home:/home/ubuntu/.gradle" \
-      --user 1000:1000 \
+      --user "$(id -u):$(id -g)" \
       --entrypoint ./gradlew \
       thaumcraft-dev setupDecompWorkspace
 

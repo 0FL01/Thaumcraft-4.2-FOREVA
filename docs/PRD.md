@@ -426,28 +426,28 @@ Primary commands:
     docker run --rm \
       -v "$(pwd):/workspace/thaumcraft" \
       -v "$(pwd)/.gradle_home:/home/ubuntu/.gradle" \
-      --user 1000:1000 \
+      --user "$(id -u):$(id -g)" \
       --entrypoint ./gradlew \
       thaumcraft-dev tasks
 
     docker run --rm \
       -v "$(pwd):/workspace/thaumcraft" \
       -v "$(pwd)/.gradle_home:/home/ubuntu/.gradle" \
-      --user 1000:1000 \
+      --user "$(id -u):$(id -g)" \
       --entrypoint ./gradlew \
       thaumcraft-dev compileJava
 
     docker run --rm \
       -v "$(pwd):/workspace/thaumcraft" \
       -v "$(pwd)/.gradle_home:/home/ubuntu/.gradle" \
-      --user 1000:1000 \
+      --user "$(id -u):$(id -g)" \
       --entrypoint ./gradlew \
       thaumcraft-dev build
 
     docker run --rm \
       -v "$(pwd):/workspace/thaumcraft" \
       -v "$(pwd)/.gradle_home:/home/ubuntu/.gradle" \
-      --user 1000:1000 \
+      --user "$(id -u):$(id -g)" \
       --entrypoint ./gradlew \
       thaumcraft-dev apiJar devJar
 
@@ -456,7 +456,7 @@ Run `test` if available:
     docker run --rm \
       -v "$(pwd):/workspace/thaumcraft" \
       -v "$(pwd)/.gradle_home:/home/ubuntu/.gradle" \
-      --user 1000:1000 \
+      --user "$(id -u):$(id -g)" \
       --entrypoint ./gradlew \
       thaumcraft-dev test
 
@@ -467,7 +467,7 @@ Client smoke test when display is available:
       -v "$(pwd)/.gradle_home:/home/ubuntu/.gradle" \
       -e DISPLAY="$DISPLAY" \
       -v /tmp/.X11-unix:/tmp/.X11-unix \
-      --user 1000:1000 \
+      --user "$(id -u):$(id -g)" \
       --entrypoint ./gradlew \
       thaumcraft-dev runClient
 
@@ -476,7 +476,7 @@ Server smoke test if task/environment supports it:
     docker run --rm \
       -v "$(pwd):/workspace/thaumcraft" \
       -v "$(pwd)/.gradle_home:/home/ubuntu/.gradle" \
-      --user 1000:1000 \
+      --user "$(id -u):$(id -g)" \
       --entrypoint ./gradlew \
       thaumcraft-dev runServer
 

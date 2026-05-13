@@ -229,7 +229,7 @@ Discover tasks:
     docker run --rm \
       -v "$(pwd):/workspace/thaumcraft" \
       -v "$(pwd)/.gradle_home:/home/ubuntu/.gradle" \
-      --user 1000:1000 \
+      --user "$(id -u):$(id -g)" \
       --entrypoint ./gradlew \
       thaumcraft-dev tasks
 
@@ -238,7 +238,7 @@ Fresh workspace setup if required:
     docker run --rm \
       -v "$(pwd):/workspace/thaumcraft" \
       -v "$(pwd)/.gradle_home:/home/ubuntu/.gradle" \
-      --user 1000:1000 \
+      --user "$(id -u):$(id -g)" \
       --entrypoint ./gradlew \
       thaumcraft-dev setupDecompWorkspace
 
@@ -247,7 +247,7 @@ Compile:
     docker run --rm \
       -v "$(pwd):/workspace/thaumcraft" \
       -v "$(pwd)/.gradle_home:/home/ubuntu/.gradle" \
-      --user 1000:1000 \
+      --user "$(id -u):$(id -g)" \
       --entrypoint ./gradlew \
       thaumcraft-dev compileJava
 
@@ -256,7 +256,7 @@ Process resources:
     docker run --rm \
       -v "$(pwd):/workspace/thaumcraft" \
       -v "$(pwd)/.gradle_home:/home/ubuntu/.gradle" \
-      --user 1000:1000 \
+      --user "$(id -u):$(id -g)" \
       --entrypoint ./gradlew \
       thaumcraft-dev processResources
 
@@ -265,7 +265,7 @@ Test if task exists:
     docker run --rm \
       -v "$(pwd):/workspace/thaumcraft" \
       -v "$(pwd)/.gradle_home:/home/ubuntu/.gradle" \
-      --user 1000:1000 \
+      --user "$(id -u):$(id -g)" \
       --entrypoint ./gradlew \
       thaumcraft-dev test
 
@@ -274,7 +274,7 @@ Build:
     docker run --rm \
       -v "$(pwd):/workspace/thaumcraft" \
       -v "$(pwd)/.gradle_home:/home/ubuntu/.gradle" \
-      --user 1000:1000 \
+      --user "$(id -u):$(id -g)" \
       --entrypoint ./gradlew \
       thaumcraft-dev build
 
@@ -283,7 +283,7 @@ Build jars:
     docker run --rm \
       -v "$(pwd):/workspace/thaumcraft" \
       -v "$(pwd)/.gradle_home:/home/ubuntu/.gradle" \
-      --user 1000:1000 \
+      --user "$(id -u):$(id -g)" \
       --entrypoint ./gradlew \
       thaumcraft-dev apiJar devJar
 
@@ -292,7 +292,7 @@ Clean build before final success:
     docker run --rm \
       -v "$(pwd):/workspace/thaumcraft" \
       -v "$(pwd)/.gradle_home:/home/ubuntu/.gradle" \
-      --user 1000:1000 \
+      --user "$(id -u):$(id -g)" \
       --entrypoint ./gradlew \
       thaumcraft-dev clean build
 
@@ -303,7 +303,7 @@ Client smoke test if display is available:
       -v "$(pwd)/.gradle_home:/home/ubuntu/.gradle" \
       -e DISPLAY="$DISPLAY" \
       -v /tmp/.X11-unix:/tmp/.X11-unix \
-      --user 1000:1000 \
+      --user "$(id -u):$(id -g)" \
       --entrypoint ./gradlew \
       thaumcraft-dev runClient
 
@@ -312,7 +312,7 @@ Server smoke test if available:
     docker run --rm \
       -v "$(pwd):/workspace/thaumcraft" \
       -v "$(pwd)/.gradle_home:/home/ubuntu/.gradle" \
-      --user 1000:1000 \
+      --user "$(id -u):$(id -g)" \
       --entrypoint ./gradlew \
       thaumcraft-dev runServer
 

@@ -88,7 +88,7 @@ Discover Gradle tasks:
     docker run --rm \
       -v "$(pwd):/workspace/thaumcraft" \
       -v "$(pwd)/.gradle_home:/home/ubuntu/.gradle" \
-      --user 1000:1000 \
+      --user "$(id -u):$(id -g)" \
       --entrypoint ./gradlew \
       thaumcraft-dev tasks
 
@@ -97,7 +97,7 @@ Compile Java:
     docker run --rm \
       -v "$(pwd):/workspace/thaumcraft" \
       -v "$(pwd)/.gradle_home:/home/ubuntu/.gradle" \
-      --user 1000:1000 \
+      --user "$(id -u):$(id -g)" \
       --entrypoint ./gradlew \
       thaumcraft-dev compileJava
 
@@ -106,7 +106,7 @@ Build:
     docker run --rm \
       -v "$(pwd):/workspace/thaumcraft" \
       -v "$(pwd)/.gradle_home:/home/ubuntu/.gradle" \
-      --user 1000:1000 \
+      --user "$(id -u):$(id -g)" \
       --entrypoint ./gradlew \
       thaumcraft-dev build
 
@@ -115,7 +115,7 @@ Build API/dev jars:
     docker run --rm \
       -v "$(pwd):/workspace/thaumcraft" \
       -v "$(pwd)/.gradle_home:/home/ubuntu/.gradle" \
-      --user 1000:1000 \
+      --user "$(id -u):$(id -g)" \
       --entrypoint ./gradlew \
       thaumcraft-dev apiJar devJar
 
@@ -124,7 +124,7 @@ Run tests if the Gradle task exists:
     docker run --rm \
       -v "$(pwd):/workspace/thaumcraft" \
       -v "$(pwd)/.gradle_home:/home/ubuntu/.gradle" \
-      --user 1000:1000 \
+      --user "$(id -u):$(id -g)" \
       --entrypoint ./gradlew \
       thaumcraft-dev test
 
@@ -135,7 +135,7 @@ Run client smoke test if display/X11 is available:
       -v "$(pwd)/.gradle_home:/home/ubuntu/.gradle" \
       -e DISPLAY="$DISPLAY" \
       -v /tmp/.X11-unix:/tmp/.X11-unix \
-      --user 1000:1000 \
+      --user "$(id -u):$(id -g)" \
       --entrypoint ./gradlew \
       thaumcraft-dev runClient
 
