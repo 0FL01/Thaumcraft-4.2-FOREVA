@@ -5,28 +5,22 @@ import java.util.Random;
 import javax.annotation.Nullable;
 import net.minecraft.block.BlockFalling;
 import net.minecraft.entity.EnumCreatureType;
-import net.minecraft.init.Blocks;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import net.minecraft.world.WorldType;
 import net.minecraft.world.biome.Biome;
-import net.minecraft.world.biome.BiomeProvider;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.ChunkPrimer;
 import net.minecraft.world.gen.IChunkGenerator;
-import net.minecraft.world.gen.MapGenBase;
 import net.minecraftforge.event.ForgeEventFactory;
 
 public class ChunkProviderOuter implements IChunkGenerator {
     private final Random rand;
     private final World world;
-    private final WorldType worldType;
     private Biome[] biomesForGeneration;
 
     public ChunkProviderOuter(World world, long seed, boolean mapFeaturesEnabled) {
         this.world = world;
         this.rand = new Random(seed);
-        this.worldType = world.getWorldInfo().getTerrainType();
     }
 
     @Override
@@ -46,29 +40,11 @@ public class ChunkProviderOuter implements IChunkGenerator {
     }
 
     public void setBlocksInChunk(int x, int z, ChunkPrimer primer) {
-        int seaLevel = 63;
-        for (int bx = 0; bx < 16; bx++) {
-            for (int bz = 0; bz < 16; bz++) {
-                for (int by = 0; by < 128; by++) {
-                    if (by == 0) {
-                        primer.setBlockState(bx, by, bz, Blocks.BEDROCK.getDefaultState());
-                    } else if (by < 60) {
-                        primer.setBlockState(bx, by, bz, Blocks.STONE.getDefaultState());
-                    } else {
-                        primer.setBlockState(bx, by, bz, Blocks.AIR.getDefaultState());
-                    }
-                }
-            }
-        }
+        // Original Outer Lands chunks start empty; room generation fills maze cells during populate().
     }
 
     public void buildSurfaces(int x, int z, ChunkPrimer primer) {
-        // Flat stone surface for Outer Lands
-        for (int bx = 0; bx < 16; bx++) {
-            for (int bz = 0; bz < 16; bz++) {
-                primer.setBlockState(bx, 60, bz, Blocks.DOUBLE_STONE_SLAB.getDefaultState());
-            }
-        }
+        // No natural surface in the Outer Lands void.
     }
 
     @Override
@@ -85,13 +61,14 @@ public class ChunkProviderOuter implements IChunkGenerator {
         boolean flag = false;
         ForgeEventFactory.onChunkPopulate(true, this, this.world, this.rand, x, z, flag);
         biome.decorate(this.world, this.rand, blockpos);
+        MazeHandler.generateEldritch(this.world, this.rand, x, z);
         ForgeEventFactory.onChunkPopulate(false, this, this.world, this.rand, x, z, flag);
         BlockFalling.fallInstantly = false;
     }
 
     @Override
     public boolean generateStructures(Chunk chunk, int x, int z) {
-        return false;
+        return MazeHandler.getFromHashMap(new CellLoc(x, z)) != null;
     }
 
     @Override
@@ -103,14 +80,39 @@ public class ChunkProviderOuter implements IChunkGenerator {
     @Nullable
     @Override
     public BlockPos getNearestStructurePos(World worldIn, String structureName, BlockPos position, boolean findUnexplored) {
+        if (!isOuterMazeStructure(structureName)) return null;
+        int chunkX = position.getX() >> 4;
+        int chunkZ = position.getZ() >> 4;
+        for (int radius = 0; radius <= 64; radius++) {
+            for (int dx = -radius; dx <= radius; dx++) {
+                for (int dz = -radius; dz <= radius; dz++) {
+                    if (Math.abs(dx) != radius && Math.abs(dz) != radius) continue;
+                    int cx = chunkX + dx;
+                    int cz = chunkZ + dz;
+                    if (MazeHandler.getFromHashMap(new CellLoc(cx, cz)) != null) {
+                        return new BlockPos(cx * 16 + 8, 53, cz * 16 + 8);
+                    }
+                }
+            }
+        }
         return null;
     }
 
     @Override
     public boolean isInsideStructure(World worldIn, String structureName, BlockPos pos) {
-        return false;
+        return isOuterMazeStructure(structureName)
+                && MazeHandler.getFromHashMap(new CellLoc(pos.getX() >> 4, pos.getZ() >> 4)) != null;
     }
 
     @Override
-    public void recreateStructures(Chunk chunk, int x, int z) {}
+    public void recreateStructures(Chunk chunk, int x, int z) {
+        // Structures are generated during populate(); do not overwrite saved chunks on reload.
+    }
+
+    private static boolean isOuterMazeStructure(String structureName) {
+        return structureName != null
+                && ("EldritchMaze".equalsIgnoreCase(structureName)
+                || "OuterLands".equalsIgnoreCase(structureName)
+                || "Eldritch".equalsIgnoreCase(structureName));
+    }
 }

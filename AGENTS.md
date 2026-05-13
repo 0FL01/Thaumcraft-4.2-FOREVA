@@ -59,8 +59,8 @@ See `docs/PRD.md §4` for per-phase deliverables and `docs/PRD.md §5` for compl
 | 4 | Blocks + Tile Entities | ⚠️ **Partial: registered block set + metadata/harvest work; crucible incomplete; many TE/container systems pending** |
 | 5 | Items, Tools, Armor, Baubles, Relics | ⚠️ **Partial: 4/10 projectile foci server behavior done; 6 foci, baubles, relics, tools/repairability remain** |
 | 6 | Entities, Mobs, Golems | ⚠️ **Partial: AI/projectile pass strong; boss special attacks, Pech loot, InhabitedZombie death spawn remain** |
-| 7 | World Gen (biomes, dimension, trees, structures) | ⚠️ **Partial: biomes/trees/villages present; Outer Lands provider/chunk/maze hookup still blocking** |
-| 7r | World Gen Remediation (room gens, village, persistence) | ⚠️ **Partial: room-gen/village/persistence present; dimension runtime hookup and replacement TODOs remain** |
+| 7 | World Gen (biomes, dimension, trees, structures) | ⚠️ **Partial: biomes/trees/villages present; Outer Lands runtime hookup fixed; room-gen fallback TODOs remain** |
+| 7r | World Gen Remediation (room gens, village, persistence) | ⚠️ **Partial: provider/chunk/maze hookup fixed; room-gen replacement TODOs and biome color remain** |
 | 3r-6r | Remediation (see docs/REPAIR.md) | ⚠️ **Active pre-Phase8 mine list; do not start Phase 8 until P0 items are fixed or accepted as risk** |
 | 8 | Client GUI + Rendering (~140 classes) | ❌ |
 | 9 | Recipes + Research (~450 registrations) | ❌ |

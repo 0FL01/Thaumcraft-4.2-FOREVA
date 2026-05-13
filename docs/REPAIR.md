@@ -27,30 +27,12 @@ Phase 8. Recipe/research-content work belongs to Phase 9.
 | Projectiles | 12 projectile source files exist; main projectile behavior pass is largely done. |
 | Entity GUI IDs | Golem/Pech/TravelingTrunk server IDs are entity-bound in `CommonProxy`. |
 | Foci partial | `FocusFire`, `FocusFrost`, `FocusShock`, `FocusPrimal` have server actions. |
+| Outer Lands runtime | Provider type, void chunk baseline, maze populate dispatch, MazeThread centering, and structure query hooks are wired. |
 | Worldgen partial | Biomes, trees, village components, room-gen classes, and maze persistence exist. |
 
 ## P0 -- Must Fix Before Phase 8
 
-### P0.1 -- Outer Lands runtime hookup
-
-Outer Lands is not safe to mark done yet. The provider/dimension pieces exist,
-but maze generation is not connected to chunk generation.
-
-| Finding | Evidence |
-|---------|----------|
-| Provider returns `null` dimension type | `src/main/java/thaumcraft/common/lib/world/dim/WorldProviderOuter.java:18` |
-| Chunk provider generates flat stone/slab terrain | `src/main/java/thaumcraft/common/lib/world/dim/ChunkProviderOuter.java:48`, `src/main/java/thaumcraft/common/lib/world/dim/ChunkProviderOuter.java:65` |
-| `populate` decorates biome only; no maze/room dispatch | `src/main/java/thaumcraft/common/lib/world/dim/ChunkProviderOuter.java:75` |
-| Structure hooks are no-op | `src/main/java/thaumcraft/common/lib/world/dim/ChunkProviderOuter.java:93`, `src/main/java/thaumcraft/common/lib/world/dim/ChunkProviderOuter.java:110`, `src/main/java/thaumcraft/common/lib/world/dim/ChunkProviderOuter.java:115` |
-| Room dispatcher exists but is not called from chunk gen | `src/main/java/thaumcraft/common/lib/world/dim/MazeHandler.java:132` |
-
-Exit criteria:
-- `WorldProviderOuter.getDimensionType()` returns the registered type.
-- Outer Lands chunks invoke the maze/room generation path.
-- Existing room-gen TODO replacements are resolved or explicitly deferred with
-  harmless fallback behavior.
-
-### P0.2 -- Server containers and GUI binding
+### P0.1 -- Server containers and GUI binding
 
 Many server containers are currently unusable because they return `false` from
 `canInteractWith`. Several `CommonProxy` mappings also instantiate empty no-arg
@@ -71,7 +53,7 @@ Exit criteria:
 - Client GUI classes can remain Phase 8 work, but server containers must not be
   hard-locked.
 
-### P0.3 -- Vis network and node recharge
+### P0.2 -- Vis network and node recharge
 
 The vis system is structurally present, but recharge is still effectively a
 stub.
@@ -87,7 +69,7 @@ Exit criteria:
 - Wands no longer get unconditional environmental vis unless that behavior is
   intentionally accepted as a temporary compatibility simplification.
 
-### P0.4 -- Crucible and core TE server interactions
+### P0.3 -- Crucible and core TE server interactions
 
 `TileCrucible` has substantial logic, but it is not complete enough to mark the
 alchemy/server TE baseline done.
@@ -104,7 +86,7 @@ Exit criteria:
 - Empty/no-op TE classes are either ported enough for server gameplay or moved
   to a clearly marked Phase 9/data-bound bucket.
 
-### P0.5 -- Remaining focus server actions
+### P0.4 -- Remaining focus server actions
 
 Six focus items are still no-op server actions and were incorrectly labelled as
 Phase 8 client work.
@@ -170,11 +152,10 @@ Exit criteria:
 
 ## Recommended Execution Order
 
-1. Fix Outer Lands provider/chunk/maze hookup.
-2. Fix server containers and `CommonProxy` bindings.
-3. Fix remaining six focus server actions.
-4. Fix vis node recharge and wand/bauble vis integration.
-5. Fix crucible ingestion/aspect container and classify major empty TEs.
-6. Fix potions/enchantments and high-impact relic/bauble actions.
-7. Fix boss/special mob TODOs that are server-visible.
-8. Run `compileJava`, then update `AGENTS.md` and `docs/PRD.md` statuses before Phase 8.
+1. Fix server containers and `CommonProxy` bindings.
+2. Fix remaining six focus server actions.
+3. Fix vis node recharge and wand/bauble vis integration.
+4. Fix crucible ingestion/aspect container and classify major empty TEs.
+5. Fix potions/enchantments and high-impact relic/bauble actions.
+6. Fix boss/special mob TODOs that are server-visible.
+7. Run `compileJava`, then update `AGENTS.md` and `docs/PRD.md` statuses before Phase 8.

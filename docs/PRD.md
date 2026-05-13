@@ -409,8 +409,9 @@ that need actual logic (currently placeholder stubs).
 ### Phase 7 — World Generation (✅ Compiling, 4 sub-steps)
 
 **Status**: 4 biomes, Eldritch dimension, trees, structures, and world
-generator all compile. Ores, trees, and structures generate via
-`ThaumcraftWorldGenerator`. Custom dimension accessible via `WorldProviderOuter`.
+generator all compile. Ores, trees, and surface structures generate via
+`ThaumcraftWorldGenerator`; Outer Lands rooms generate from
+`ChunkProviderOuter.populate()` via `MazeHandler.generateEldritch()`.
 
 **Sub-steps**:
 - **7.1** — Missing world-gen blocks: BlockMagicalLeaves (2 types), BlockCustomOre
@@ -421,9 +422,9 @@ generator all compile. Ores, trees, and structures generate via
   (taint blobs/fibres spread), BiomeEerie (spooky mobs), BiomeEldritch (stone
   surface), BiomeHandler (aura/aspect mapping from 30 BiomeDictionary types)
 - **7.3** — Eldritch Dimension: WorldProviderOuter (black sky, fog, no day cycle),
-  ChunkProviderOuter (flat stone terrain), MazeGenerator (DFS randomized maze),
+  ChunkProviderOuter (void chunks + maze room populate), MazeGenerator (DFS randomized maze),
   MazeThread/MazeHandler (threaded gen + hashmap storage), TeleporterThaumcraft,
-  7 room gen stubs, BlockEldritch/Portal/Nothing + 8 tile entities, dimension
+  7 room generators, BlockEldritch/Portal/Nothing + 8 tile entities, dimension
   registration via DimensionType/DimensionManager
 - **7.4** — World features: WorldGenGreatwoodTrees (3-wide trunk, oval canopy),
   WorldGenSilverwoodTrees (node knot, layered canopy), WorldGenBigMagicTree
@@ -466,6 +467,7 @@ generator all compile. Ores, trees, and structures generate via
 | 7 | **EntityPermanentItem** (dim) | ✅ Done | `EntityPermanentItem` расширен: иммунитет к урону/взрывам, `lifespan = Integer.MAX_VALUE` | Реализовано |
 | 8 | **Village components** | ✅ Done | ComponentWizardTower, ComponentBankerHome, VillageWizardManager, VillageBankerManager — полный порт с адаптацией под 1.12.2 API | IVillageCreationHandler (EnumFacing вместо int), setBlockState/IBlockState, generateDoor, MapGenStructureIO, VillagerProfession |
 | 9 | **WorldGenSilverwoodTreesOld** | ✅ Done | Legacy tree gen портирован и встроен в WorldGenSilverwoodTrees | Полная процедурная генерация + createRandomNodeAt для узлов PURE-типа |
+| 10 | **Outer Lands runtime hookup** | ✅ Done | Provider type, void chunk baseline, populate-time room dispatch, MazeThread centering, and structure query hooks | Реализовано в `WorldProviderOuter`, `ChunkProviderOuter`, `MazeThread`, `WorldGenEldritchRing` |
 
 #### Выполнено
 
@@ -484,6 +486,7 @@ generator all compile. Ores, trees, and structures generate via
 | **7r.6** | Village components (4 класса + профессии + регистрация) | ✅ ComponentWizardTower, ComponentBankerHome, VillageWizardManager, VillageBankerManager. Адаптация: EnumFacing coordBaseMode, IBlockState, generateDoor, MapGenStructureIO, VillagerProfession, ручной chest loot |
 | **7r.7** | Silverwood trees with aura nodes | ✅ Полная процедурная генерация (4-крест ствол, сферическая крона, корни, саженцы). createRandomNodeAt для узлов PURE-типа в стволе. createNodeAt и createRandomNodeAt в ThaumcraftWorldGenerator |
 | **7r.8** | Sapling growth (greatwood + silverwood) | ✅ updateTick/growGreatTree/growSilverTree в BlockCustomPlant. PropertyInteger TYPE для правильных blockstate. Саженцы растут: greatwood 1/25, silverwood 1/50 |
+| **7r.9** | Outer Lands runtime hookup | ✅ `getDimensionType`, void chunks, maze room dispatch from `populate`, centered MazeThread storage, structure query hooks |
 
 #### Deferred (следующая итерация)
 
@@ -800,9 +803,11 @@ The detailed repair backlog is tracked in **`docs/REPAIR.md`**. Current baseline
 - Round E pre-client runtime polish is complete for Watcher, CultistPortal,
   EldritchGuardian, AspectOrb, FallingTaint, GolemBobber, wand vis guards,
   entity GUI binding, and minimal server input packets.
+- Outer Lands provider/chunk/maze runtime hookup is fixed; remaining Phase 7
+  work is fallback block/loot replacement TODOs and cosmetic biome color.
 - Phase 5 server gameplay is still active: 4/10 projectile foci now have
   server-side behavior; remaining foci, bauble ticks, relic actions, and some
   containers are not client-only work.
 
-Phase 8 should start only after the remaining server-side foci/bauble/relic
-baseline is either fixed or explicitly accepted as deferred risk.
+Phase 8 should start only after the remaining `docs/REPAIR.md` P0 server/runtime
+items are fixed or explicitly accepted as deferred risk.

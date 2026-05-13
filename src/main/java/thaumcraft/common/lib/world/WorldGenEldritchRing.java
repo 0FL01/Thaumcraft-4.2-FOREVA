@@ -31,8 +31,8 @@ public class WorldGenEldritchRing extends WorldGenerator {
         // Trigger maze generation
         int cx = pos.getX() >> 4;
         int cz = pos.getZ() >> 4;
-        if (!MazeHandler.mazesInRange(cx, cz, 32, 1)) {
-            Thread mazeThread = new Thread(new MazeThread(cx - 16, cz - 16, 32, 32, world.getSeed()));
+        if (!MazeHandler.mazesInRange(cx, cz, 32, 32)) {
+            Thread mazeThread = new Thread(new MazeThread(cx, cz, 32, 32, world.getSeed()));
             mazeThread.start();
         }
 

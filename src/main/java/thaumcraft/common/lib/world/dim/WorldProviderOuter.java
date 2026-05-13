@@ -7,8 +7,10 @@ import net.minecraft.world.DimensionType;
 import net.minecraft.world.WorldProvider;
 import net.minecraft.world.biome.BiomeProviderSingle;
 import net.minecraft.world.gen.IChunkGenerator;
+import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import thaumcraft.common.config.Config;
 
 public class WorldProviderOuter extends WorldProvider {
     public WorldProviderOuter() {
@@ -17,7 +19,7 @@ public class WorldProviderOuter extends WorldProvider {
 
     @Override
     public DimensionType getDimensionType() {
-        return null; // Will be set when dimension is registered
+        return DimensionManager.getProviderType(Config.dimensionOuterId);
     }
 
     @Override
@@ -100,7 +102,7 @@ public class WorldProviderOuter extends WorldProvider {
 
     @Override
     public boolean shouldMapSpin(String entity, double x, double y, double z) {
-        return false;
+        return true;
     }
 
     @Override

@@ -115,15 +115,10 @@ public class MazeHandler {
         }
     }
 
-    public static boolean mazesInRange(int cx, int cz, int range, int min) {
-        int count = 0;
-        for (int x = cx - range; x <= cx + range; x++) {
-            for (int z = cz - range; z <= cz + range; z++) {
-                Cell cell = getFromHashMap(new CellLoc(x, z));
-                if (cell != null && cell.feature != 0) {
-                    count++;
-                    if (count >= min) return true;
-                }
+    public static boolean mazesInRange(int chunkX, int chunkZ, int w, int h) {
+        for (int x = -w; x <= w; ++x) {
+            for (int z = -h; z <= h; ++z) {
+                if (getFromHashMap(new CellLoc(chunkX + x, chunkZ + z)) != null) return true;
             }
         }
         return false;

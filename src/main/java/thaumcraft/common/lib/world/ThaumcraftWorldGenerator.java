@@ -254,6 +254,9 @@ public class ThaumcraftWorldGenerator implements IWorldGenerator {
     public void generate(Random random, int chunkX, int chunkZ, World world, IChunkGenerator chunkGenerator, IChunkProvider chunkProvider) {
         int dim = world.provider.getDimension();
 
+        // Outer Lands room generation is owned by ChunkProviderOuter.populate().
+        if (dim == Config.dimensionOuterId) return;
+
         // Check dimension blacklist
         if (dimensionBlacklist.containsKey(dim) && dimensionBlacklist.get(dim) >= 0) return;
 
@@ -352,7 +355,7 @@ public class ThaumcraftWorldGenerator implements IWorldGenerator {
         }
 
         // Eldritch rings (sparse)
-        if (rand.nextInt(800) == 0 && !MazeHandler.mazesInRange(x >> 4, z >> 4, 32, 1)) {
+        if (rand.nextInt(800) == 0 && !MazeHandler.mazesInRange(x >> 4, z >> 4, 32, 32)) {
             int bx = x + rand.nextInt(16) + 8;
             int bz = z + rand.nextInt(16) + 8;
             BlockPos pos = world.getHeight(new BlockPos(bx, 0, bz));
