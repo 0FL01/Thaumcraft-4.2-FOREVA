@@ -51,6 +51,60 @@ Use `thaumcraft_src/**` and `Thaumcraft-1.7.10-4.2.3.5.jar` as read-only origina
 - `src/main/resources/assets/thaumcraft/**`: assets, sounds, textures, models, recipes, lang, GUI resources.
 - `thaumcraft_src/**`: read-only original reference.
 
+## Commit policy
+
+Work on a dedicated branch. Do not work directly on `master` or `main`.
+
+Use one commit per completed checkpoint.
+
+A checkpoint commit is allowed only when:
+
+- the checkpoint scope is complete;
+- the diff is limited to the checkpoint;
+- `git status --short` was reviewed;
+- relevant validation commands were run;
+- failures are either fixed or documented as pre-existing/environment failures;
+- no forbidden files were modified;
+- no generated build output is staged.
+
+Do not commit broken work unless explicitly instructed by the user. If a blocker is reached, stop with a final report and leave the diff uncommitted.
+
+Before every commit, run:
+
+    git status --short
+    git diff --stat
+    git diff --name-only
+
+Stage only files that belong to the checkpoint:
+
+    git add <explicit paths>
+
+Do not use broad staging commands like:
+
+    git add .
+    git add -A
+
+Use commit messages in this format:
+
+    docs: add Codex parity runbook
+    port: close pre-Phase8 focus server blockers
+    port: restore wand and bauble vis integration
+    port: restore research compatibility and frugal applicability
+    port: restore boss and special mob server behavior
+    client: add Phase 8 GUI registrations
+    client: port core Thaumcraft GUIs
+    client: port TESR and entity renderer baseline
+    client: port particles beams and shader baseline
+    content: restore recipes and research registrations
+    polish: finalize runtime parity checks
+
+Each final report must include:
+
+- commit hash if a commit was created;
+- files included in the commit;
+- validation commands run before the commit;
+- known limitations after the commit.
+
 ## Required workflow
 
 1. Start with `git status --short`.
