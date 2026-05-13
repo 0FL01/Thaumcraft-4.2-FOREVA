@@ -4,6 +4,7 @@ import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.item.Item;
 import net.minecraft.item.Item.ToolMaterial;
 import net.minecraft.item.ItemArmor.ArmorMaterial;
+import net.minecraft.item.ItemStack;
 import net.minecraftforge.common.util.EnumHelper;
 import thaumcraft.common.items.ItemBathSalts;
 import thaumcraft.common.items.ItemBottleTaint;
@@ -304,6 +305,7 @@ public class ConfigItems {
                 .setTranslationKey("thaumcraft.resource")
                 .setCreativeTab(tab);
         allItems.add(itemResource);
+        configureRepairMaterials();
 
         itemEssence = (ItemEssence) new ItemEssence()
                 .setRegistryName("thaumcraft", "essence")
@@ -762,5 +764,28 @@ public class ConfigItems {
 
     public static Item[] getAllItems() {
         return allItems.toArray(new Item[0]);
+    }
+
+    private static void configureRepairMaterials() {
+        ItemStack thaumium = new ItemStack(itemResource, 1, ItemResource.META_THAUMIUM_INGOT);
+        ItemStack voidIngot = new ItemStack(itemResource, 1, ItemResource.META_VOID_INGOT);
+        ItemStack cloth = new ItemStack(itemResource, 1, ItemResource.META_CLOTH);
+
+        TOOLMAT_THAUMIUM.setRepairItem(thaumium);
+        TOOLMAT_ELEMENTAL.setRepairItem(thaumium);
+        TOOLMAT_VOID.setRepairItem(voidIngot);
+
+        ARMOR_THAUMIUM.setRepairItem(thaumium);
+        ARMOR_FORTRESS.setRepairItem(thaumium);
+        ARMOR_VOID.setRepairItem(voidIngot);
+        ARMOR_VOID_ROBE.setRepairItem(voidIngot);
+        ARMOR_ROBE.setRepairItem(cloth);
+        ARMOR_CULTIST.setRepairItem(cloth);
+        ARMOR_CULTIST_PLATE.setRepairItem(thaumium);
+        ARMOR_CULTIST_LEADER.setRepairItem(voidIngot);
+        ARMOR_CULTIST_BOOTS.setRepairItem(cloth);
+        ARMOR_GOGGLES.setRepairItem(cloth);
+        ARMOR_TRAVELLER.setRepairItem(cloth);
+        ARMOR_HOVER.setRepairItem(cloth);
     }
 }

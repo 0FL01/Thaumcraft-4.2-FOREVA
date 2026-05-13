@@ -27,7 +27,7 @@ public class FocusWarding extends ItemFocusBasic {
 
     @Override
     public ItemStack onFocusRightClick(ItemStack wandStack, World world, EntityPlayer player, RayTraceResult movingobjectposition) {
-        // Phase 8: place warding stone
+        // Deferred: original behavior needs a blockWarded/TileWarded wrapper for arbitrary blocks.
         return wandStack;
     }
 

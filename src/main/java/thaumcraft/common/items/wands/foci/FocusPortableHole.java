@@ -27,7 +27,7 @@ public class FocusPortableHole extends ItemFocusBasic {
 
     @Override
     public ItemStack onFocusRightClick(ItemStack wandStack, World world, EntityPlayer player, RayTraceResult movingobjectposition) {
-        // Phase 8: create portable hole
+        // Deferred: original behavior needs blockHole/TileHole block restoration support.
         return wandStack;
     }
 

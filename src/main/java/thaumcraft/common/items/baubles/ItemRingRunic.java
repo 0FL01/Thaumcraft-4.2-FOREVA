@@ -46,9 +46,15 @@ public class ItemRingRunic extends ItemRunic implements IBauble {
     }
 
     @Override
-    public void onWornTick(ItemStack itemstack, EntityLivingBase player) {
-        // Runic shielding recharge - TBD
+    public int getRunicCharge(ItemStack itemstack) {
+        int meta = itemstack.getItemDamage();
+        if (meta == META_LESSER) return 1;
+        if (meta == META_NORMAL) return 5;
+        return 4;
     }
+
+    @Override
+    public void onWornTick(ItemStack itemstack, EntityLivingBase player) {}
 
     @Override
     public void onEquipped(ItemStack itemstack, EntityLivingBase player) {}

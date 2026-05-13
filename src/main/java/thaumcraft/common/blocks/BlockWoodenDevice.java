@@ -84,6 +84,14 @@ public class BlockWoodenDevice extends BlockContainer {
             }
             return true;
         }
+        if (te instanceof TileArcaneBoreBase) {
+            ItemStack held = playerIn.getHeldItem(hand);
+            if (!held.isEmpty() && held.getItem() instanceof ItemWandCasting) {
+                return ((TileArcaneBoreBase) te).onWandRightClick(worldIn, held, playerIn,
+                        pos.getX(), pos.getY(), pos.getZ(), facing.getIndex(), state.getValue(TYPE)) >= 0;
+            }
+            return true;
+        }
         return false;
     }
 

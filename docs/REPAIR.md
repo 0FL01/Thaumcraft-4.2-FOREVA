@@ -229,7 +229,25 @@ Exit criteria:
 - No unrelated equipment behavior changes.
 - `compileJava` passes.
 
-## 7. Phase 8 client backlog
+## 7. Checkpoint notes from 2026-05-13 P0/P1 server pass
+
+Implemented in this pass:
+
+- P0.1 server behavior for Pech, Hellbat, Trade, and Excavation foci.
+- P0.2 baseline Arcane Bore server mining loop with powered operation, focus/pickaxe validation, fortune/silk handling, pickaxe damage, and base inventory output.
+- P1.1 Vis Amulet storage/bauble consumption integration, Runic Ring charge values, and Thaumometer entity/block scan hook.
+- P1.2 Frugal enchantment focus applicability.
+- P1.3 Inhabited Zombie Eldritch Crab death spawn.
+- P1.4 material-based repair items, Primal Crusher tool baseline, and removal of incorrect always-false repair checks for the targeted tools/armor.
+
+Explicitly deferred with evidence:
+
+- Portable Hole focus still needs an original-compatible `blockHole` plus `TileHole` implementation that stores original block state, duration, side, and restoration behavior. Current `TileHole` is only a placeholder and there is no registered hole block.
+- Warding focus still needs an original-compatible warded wrapper block/tile equivalent to `blockWarded`/`TileWarded` that stores owner, original block, metadata, and light. Current warding stone/fence tiles do not provide arbitrary block wrapping.
+- Boss/special mob parity beyond Inhabited Zombie remains deferred: Cultist Leader ranged/buff behavior, Eldritch Golem headless beam behavior, Eldritch Warden ranged/frenzy behavior, and Pech death loot still require class-specific original behavior ports.
+- Offline `.thaum`/`.thaumbak` research migration remains deferred; current research lookup is capability/cache based.
+
+## 8. Phase 8 client backlog
 
 Start only after P0 is closed or explicitly deferred.
 
@@ -268,7 +286,7 @@ Validation:
 - `runClient` if display is available.
 - Manual GUI/render smoke scenarios.
 
-## 8. Phase 9 content backlog
+## 9. Phase 9 content backlog
 
 Start after required GUI/client pathways are usable enough to verify content.
 
@@ -295,7 +313,7 @@ Exit criteria:
 - Thaumonomicon references valid content.
 - Critical progression path is manually smoke-tested.
 
-## 9. Phase 10 polish backlog
+## 10. Phase 10 polish backlog
 
 Allowed only after gameplay, client, and content baselines exist.
 

@@ -14,6 +14,7 @@ import thaumcraft.api.aspects.AspectList;
 import thaumcraft.api.wands.FocusUpgradeType;
 import thaumcraft.api.wands.ItemFocusBasic;
 import thaumcraft.common.config.Config;
+import thaumcraft.common.items.baubles.ItemAmuletVis;
 import thaumcraft.common.lib.TCSounds;
 
 import java.util.TreeMap;
@@ -61,6 +62,17 @@ public class WandManager {
      */
     public static boolean consumeVisFromInventory(EntityPlayer player, AspectList cost) {
         if (player == null || cost == null) return false;
+
+        IBaublesItemHandler baubles = BaublesApi.getBaublesHandler(player);
+        if (baubles != null) {
+            for (int slot = 0; slot < baubles.getSlots(); slot++) {
+                ItemStack stack = baubles.getStackInSlot(slot);
+                if (!stack.isEmpty() && stack.getItem() instanceof ItemAmuletVis
+                        && ((ItemAmuletVis) stack.getItem()).consumeAllVis(stack, player, cost, true, true)) {
+                    return true;
+                }
+            }
+        }
 
         // Check main hand
         ItemStack mainHand = player.getHeldItemMainhand();
