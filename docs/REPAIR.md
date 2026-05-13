@@ -32,23 +32,20 @@ Phase 8. Recipe/research-content work belongs to Phase 9.
 | Container hard-locks | `CommonProxy` server IDs bind player/tile/entity context; container `canInteractWith` checks no longer return unconditional `false`. |
 | Phase 3 core baseline | Aura nodes persist base aspects and regenerate missing vis; wand centi-vis units, discounts, and no-passive-recharge behavior are restored. |
 | Research/potions partial | Online username research/aspect lookup uses capabilities/cache; Infectious Vis Exhaust and Thaumarhia server effects are restored. |
+| Crucible baseline | Boiling crucibles ingest dropped items from `BlockMetalDevice`, accept water through Forge fluid interaction, spill on break, and expose stored aspects through `IAspectContainer`. |
 
 ## P0 -- Must Fix Before Phase 8
 
-### P0.1 -- Crucible and core TE server interactions
+### P0.1 -- Major TE server interactions
 
-`TileCrucible` has substantial logic, but it is not complete enough to mark the
-alchemy/server TE baseline done.
+The crucible server baseline is closed. The remaining Phase 4 blocker is the
+set of major tile entities that still have empty/no-op server logic.
 
 | Finding | Evidence |
 |---------|----------|
-| `attemptSmelt(EntityItem)` exists, but no caller was found in current source | `src/main/java/thaumcraft/common/tiles/TileCrucible.java:324` |
-| Aspect container mutators/checks are stubs | `src/main/java/thaumcraft/common/tiles/TileCrucible.java:444`, `src/main/java/thaumcraft/common/tiles/TileCrucible.java:449`, `src/main/java/thaumcraft/common/tiles/TileCrucible.java:454`, `src/main/java/thaumcraft/common/tiles/TileCrucible.java:474` |
 | Multiple major TE classes remain empty/no-op | `TileAlchemyFurnace`, `TileThaumatorium`, `TileInfusionMatrix`, `TileArcaneBore`, `TileBellows`, `TileCentrifuge`, `TileFocalManipulator` |
 
 Exit criteria:
-- Crucible item ingestion is triggered server-side.
-- Crucible aspect container methods reflect stored aspects.
 - Empty/no-op TE classes are either ported enough for server gameplay or moved
   to a clearly marked Phase 9/data-bound bucket.
 
@@ -117,7 +114,7 @@ Exit criteria:
 ## Recommended Execution Order
 
 1. Fix remaining six focus server actions.
-2. Fix crucible ingestion/aspect container and classify major empty TEs.
+2. Classify and port major empty Phase 4 TEs.
 3. Fix bauble vis storage/consumption, relic actions, and research offline compatibility.
 4. Fix enchantment applicability and high-impact bauble actions.
 5. Fix boss/special mob TODOs that are server-visible.

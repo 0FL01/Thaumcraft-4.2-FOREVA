@@ -239,6 +239,10 @@ public class TileCrucible extends TileThaumcraft implements ITickable, IWandable
         return output;
     }
 
+    public boolean canProcessItems() {
+        return this.heat > 150 && this.tank.getFluidAmount() > 0;
+    }
+
     // ========== Spill / overflow ==========
 
     public void spill() {
@@ -443,41 +447,70 @@ public class TileCrucible extends TileThaumcraft implements ITickable, IWandable
 
     @Override
     public void setAspects(AspectList aspects) {
+        this.aspects = aspects == null ? new AspectList() : aspects.copy();
+        this.markDirtyAndSync();
     }
 
     @Override
     public int addToContainer(Aspect tag, int amount) {
-        return 0;
+        if (tag == null || amount <= 0) return amount;
+        int add = Math.min(amount, Math.max(0, this.maxTags - this.tagAmount()));
+        if (add <= 0) return amount;
+        this.aspects.add(tag, add);
+        this.markDirtyAndSync();
+        return amount - add;
     }
 
     @Override
     public boolean takeFromContainer(Aspect tag, int amount) {
-        return false;
+        if (tag == null || amount <= 0 || this.aspects.getAmount(tag) < amount) return false;
+        this.aspects.remove(tag, amount);
+        this.markDirtyAndSync();
+        return true;
     }
 
     @Override
     public boolean takeFromContainer(AspectList ot) {
-        return false;
+        if (ot == null || !this.doesContainerContain(ot)) return false;
+        for (Aspect tag : ot.getAspects()) {
+            if (tag == null) continue;
+            this.aspects.remove(tag, ot.getAmount(tag));
+        }
+        this.markDirtyAndSync();
+        return true;
     }
 
     @Override
     public boolean doesContainerContainAmount(Aspect tag, int amount) {
-        return false;
+        return tag != null && this.aspects.getAmount(tag) >= amount;
     }
 
     @Override
     public boolean doesContainerContain(AspectList ot) {
-        return false;
+        if (ot == null) return false;
+        for (Aspect tag : ot.getAspects()) {
+            if (tag == null) continue;
+            if (this.aspects.getAmount(tag) < ot.getAmount(tag)) return false;
+        }
+        return true;
     }
 
     @Override
     public int containerContains(Aspect tag) {
-        return 0;
+        return tag == null ? this.tagAmount() : this.aspects.getAmount(tag);
     }
 
     @Override
     public boolean doesContainerAccept(Aspect tag) {
-        return true;
+        return tag != null && this.tagAmount() < this.maxTags;
+    }
+
+    private void markDirtyAndSync() {
+        this.markDirty();
+        if (this.world != null && !this.world.isRemote) {
+            IBlockState state = this.world.getBlockState(this.pos);
+            this.world.notifyBlockUpdate(this.pos, state, state, 3);
+        }
     }
 
     // ========== Client event ==========
