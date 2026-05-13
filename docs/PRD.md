@@ -41,7 +41,7 @@ Primary implementation:
 - `src/main/java/thaumcraft/common/**`
 - `src/main/java/thaumcraft/client/**`
 - `src/main/java/thaumcraft/codechicken/**`
-- `src/main/java/truetyper/**`
+- `src/main/java/thaumcraft/truetyper/**` (declares package `truetyper`)
 - `src/main/resources/**`
 
 Reference material:
