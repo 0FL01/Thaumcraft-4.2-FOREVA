@@ -6,8 +6,13 @@ import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.MobEffects;
 import net.minecraft.item.ItemStack;
+import net.minecraft.potion.PotionEffect;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.DamageSource;
 import net.minecraft.util.NonNullList;
 import net.minecraft.block.properties.PropertyInteger;
 import net.minecraft.block.state.BlockStateContainer;
@@ -16,10 +21,13 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import thaumcraft.common.Thaumcraft;
+import thaumcraft.api.entities.IEldritchMob;
 import thaumcraft.common.tiles.TileNode;
 import thaumcraft.common.tiles.TileNodeEnergized;
 import thaumcraft.common.tiles.TileNitor;
 import thaumcraft.common.tiles.TileWardingStoneFence;
+
+import java.util.Random;
 
 public class BlockAiry extends BlockContainer {
 
@@ -96,6 +104,40 @@ public class BlockAiry extends BlockContainer {
     @Override
     public TileEntity createTileEntity(World world, IBlockState state) {
         return createNewTileEntity(world, this.getMetaFromState(state));
+    }
+
+    @Override
+    public void onEntityCollision(World worldIn, BlockPos pos, IBlockState state, Entity entityIn) {
+        int meta = this.getMetaFromState(state);
+        if (meta == 10) {
+            entityIn.attackEntityFrom(DamageSource.IN_FIRE, (float) (1 + worldIn.rand.nextInt(2)));
+            entityIn.motionX *= 0.8D;
+            entityIn.motionZ *= 0.8D;
+            if (!worldIn.isRemote && worldIn.rand.nextInt(100) == 0) {
+                worldIn.setBlockToAir(pos);
+            }
+        } else if (meta == 11 && !(entityIn instanceof IEldritchMob)) {
+            if (worldIn.rand.nextInt(100) == 0) {
+                entityIn.attackEntityFrom(DamageSource.MAGIC, 1.0F);
+            }
+            entityIn.motionX *= 0.66D;
+            entityIn.motionZ *= 0.66D;
+            if (entityIn instanceof EntityPlayer) {
+                ((EntityPlayer) entityIn).addExhaustion(0.05F);
+            }
+            if (entityIn instanceof EntityLivingBase) {
+                ((EntityLivingBase) entityIn).addPotionEffect(new PotionEffect(MobEffects.WEAKNESS, 100, 1, true, false));
+            }
+        }
+    }
+
+    @Override
+    public void updateTick(World worldIn, BlockPos pos, IBlockState state, Random rand) {
+        super.updateTick(worldIn, pos, state, rand);
+        int meta = this.getMetaFromState(state);
+        if (!worldIn.isRemote && (meta == 10 || meta == 11)) {
+            worldIn.setBlockToAir(pos);
+        }
     }
 
     @Override

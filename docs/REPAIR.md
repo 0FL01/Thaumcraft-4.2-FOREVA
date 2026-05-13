@@ -184,13 +184,14 @@ Exit criteria:
 
 ### P1.3 Boss and special mob behavior
 
-Problems:
+Status after the 2026-05-13 boss/special mob checkpoint:
 
-- Cultist Leader special behavior needs verification/implementation.
-- Eldritch Golem beam/headless behavior needs verification/implementation.
-- Eldritch Warden ranged/frenzy behavior needs verification/implementation.
-- Inhabited Zombie death spawn needs verification/implementation.
-- Pech loot/trade behavior needs verification/implementation.
+- Cultist Leader server equipment, ranged attack, and nearby cultist buff behavior are implemented.
+- Eldritch Golem headless transition and headless ranged attack behavior are implemented.
+- Eldritch Warden ranged attack, screech, teleport, and field frenzy behavior are implemented.
+- Inhabited Zombie Eldritch Crab death spawn was implemented in the earlier P0/P1 server pass.
+- Pech death loot is implemented; existing trade/taming/pickup/combat behavior remains outside this checkpoint except where preserved by the death loot change.
+- Runtime/manual mob combat validation is still needed before marking these behaviors as fully validated.
 
 Target files:
 
@@ -246,9 +247,17 @@ Implemented in the follow-up wrapper-block checkpoint:
 - Warding focus now has original-compatible server/common `blockWarded`/`TileWarded` support: hidden warded blocks store owner hash, original block, metadata, and light, and owner wand use can unwrap them.
 - Both wrapper systems are registered as hidden blocks/tile entities and keep visual renderer work deferred to Phase 8.
 
+Implemented in the boss/special mob checkpoint:
+
+- Cultist Leader now has original-compatible server equipment setup, title NBT/data sync, GolemOrb ranged attack, nearby cultist Strength II aura, cultist ally targeting guards, and loot bag drop.
+- Eldritch Golem now has original-compatible headless NBT/data sync, lethal-damage headless transition, headless ranged GolemOrb beam attack cadence, armor/eye-height adjustments, and headless melee knockback.
+- Eldritch Warden now has original-compatible title NBT/data sync, absorption shield, EldritchOrb ranged attack, screech knockback/debuff/warp behavior, frenzy trigger, home teleport, and temporary `blockAiry` field placement.
+- Pech death loot now drops carried loot, aspect-tagged mana beans, coins, and rare knowledge fragments using the original drop probabilities mapped to current item metadata.
+- `blockAiry` meta 10/11 now has the original temporary scheduled removal and server collision effects required by Warden field frenzy and existing shock-fire airy blocks.
+- Docker `compileJava` and `build` passed for this checkpoint on 2026-05-13.
+
 Explicitly deferred with evidence:
 
-- Boss/special mob parity beyond Inhabited Zombie remains deferred: Cultist Leader ranged/buff behavior, Eldritch Golem headless beam behavior, Eldritch Warden ranged/frenzy behavior, and Pech death loot still require class-specific original behavior ports.
 - Offline `.thaum`/`.thaumbak` research migration remains deferred; current research lookup is capability/cache based.
 
 ## 8. Phase 8 client backlog
