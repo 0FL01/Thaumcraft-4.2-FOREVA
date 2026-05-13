@@ -58,7 +58,7 @@ import thaumcraft.common.lib.world.ThaumcraftWorldGenerator;
     modid = Thaumcraft.MODID,
     name = Thaumcraft.NAME,
     version = Thaumcraft.VERSION,
-    dependencies = "required-after:forge@[14.23.5.2847,);required-after:baubles@[1.12-1.5.2,)",
+    dependencies = "required-after:forge@[14.23.5.2847,);required-after:baubles@[1.5.2,)",
     guiFactory = "thaumcraft.client.gui.GuiFactory"
 )
 public class Thaumcraft {
