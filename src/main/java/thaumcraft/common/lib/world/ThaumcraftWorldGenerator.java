@@ -473,47 +473,39 @@ public class ThaumcraftWorldGenerator implements IWorldGenerator {
     }
 
     private boolean generateStructures(World world, Random rand, int x, int z, Biome biome, boolean auraGen) {
-        if (biome == biomeMagicalForest || biome == biomeTaint) {
-            // Barrow mounds
-            if (rand.nextInt(400) == 0) {
-                int bx = x + rand.nextInt(16);
-                int bz = z + rand.nextInt(16);
-                BlockPos pos = world.getHeight(new BlockPos(bx, 0, bz));
-                new WorldGenMound().generate(world, rand, pos);
-            }
-        }
-
-        // Eldritch rings
         int chunkX = x >> 4;
         int chunkZ = z >> 4;
         int ringX = x + rand.nextInt(16);
         int ringZ = z + rand.nextInt(16);
         int ringY = world.getHeight(new BlockPos(ringX, 0, ringZ)).getY() - 9;
-        if (ringY < world.getSeaLevel() && rand.nextInt(66) == 0) {
-            WorldGenEldritchRing ring = new WorldGenEldritchRing();
-            int width = 11 + rand.nextInt(6) * 2;
-            int height = 11 + rand.nextInt(6) * 2;
-            ring.chunkX = chunkX;
-            ring.chunkZ = chunkZ;
-            ring.width = width;
-            ring.height = height;
-            BlockPos pos = new BlockPos(ringX, ringY + 8, ringZ);
-            if (ring.generate(world, rand, pos)) {
-                createRandomNodeAt(world, pos.up(2), rand, false, true, false);
-                auraGen = true;
-                Thread mazeThread = new Thread(new MazeThread(chunkX, chunkZ, width, height, rand.nextLong()));
-                mazeThread.start();
-            }
-        }
-
-        // Hilltop stones
-        if (rand.nextInt(600) == 0) {
-            int bx = x + rand.nextInt(16);
-            int bz = z + rand.nextInt(16);
-            BlockPos pos = world.getHeight(new BlockPos(bx, 0, bz));
-            if (new WorldGenHilltopStones().generate(world, rand, pos)) {
-                createRandomNodeAt(world, pos.up(4), rand, false, true, false);
-                auraGen = true;
+        if (ringY < world.getSeaLevel()) {
+            BlockPos moundPos = new BlockPos(ringX, ringY, ringZ);
+            if (rand.nextInt(150) == 0) {
+                if (new WorldGenMound().generate(world, rand, moundPos)) {
+                    createRandomNodeAt(world, moundPos.add(9, 8, 9), rand, false, true, false);
+                    auraGen = true;
+                }
+            } else if (rand.nextInt(66) == 0) {
+                WorldGenEldritchRing ring = new WorldGenEldritchRing();
+                int width = 11 + rand.nextInt(6) * 2;
+                int height = 11 + rand.nextInt(6) * 2;
+                ring.chunkX = chunkX;
+                ring.chunkZ = chunkZ;
+                ring.width = width;
+                ring.height = height;
+                BlockPos pos = new BlockPos(ringX, ringY + 8, ringZ);
+                if (ring.generate(world, rand, pos)) {
+                    createRandomNodeAt(world, pos.up(2), rand, false, true, false);
+                    auraGen = true;
+                    Thread mazeThread = new Thread(new MazeThread(chunkX, chunkZ, width, height, rand.nextLong()));
+                    mazeThread.start();
+                }
+            } else if (rand.nextInt(40) == 0) {
+                BlockPos pos = new BlockPos(ringX, ringY + 9, ringZ);
+                if (new WorldGenHilltopStones().generate(world, rand, pos)) {
+                    createRandomNodeAt(world, pos.up(5), rand, false, true, false);
+                    auraGen = true;
+                }
             }
         }
         return auraGen;

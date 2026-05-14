@@ -380,11 +380,35 @@ Remaining limits:
 - Ore and flower placement have not been observed in a fresh runtime world because smoke-server remains environment-blocked and user-driven client/manual scenarios are excluded.
 - The simplified mound/barrow structure remains open under GAP-11.
 
+### 2026-05-14 — Stage 7 mound/barrow functional layout
+
+Scope:
+
+- Replaced the small procedural `WorldGenMound` placeholder with a bounded 19x19 barrow generator using the reference validation points.
+- Added a buried cobblestone/mossy-cobblestone chamber, dirt/grass mound shell, and open central node handoff position.
+- Placed loot urn/crate blocks at the reference offsets with matching meta probabilities and crate/urn split.
+- Added a dungeon-loot-table chest at the reference chest offset, including the original trapped-chest/TNT chance.
+- Configured skeleton and zombie mob spawners at the reference offsets.
+- Reworked `ThaumcraftWorldGenerator.generateStructures(...)` to use the reference-like mutually exclusive mound/ring/hilltop chance ordering from the shared `getHeight(...) - 9` branch instead of the old independent Magical Forest/Taint-only mound chance.
+
+Validation:
+
+- `./scripts/dev.sh compileJava` — passed.
+- `./scripts/dev.sh build` — passed.
+- `./scripts/dev.sh check-jar` — failed before jar inspection because the wrapper's expected MCP mapping cache file is still absent at `.gradle_home/caches/minecraft/de/oceanlabs/mcp/mcp_stable/39/1.12.2/srgs/mcp-srg.srg`.
+- `./scripts/dev.sh smoke-server` — failed by timeout before ready state; log again stopped after `Calling tweak class net.minecraftforge.fml.common.launcher.FMLServerTweaker`, with only Log4j console appender initialization errors. `run/crash-reports/` does not exist, and the configured crash-marker scan found no matches. This matches the clean `da3f307` baseline reproduction recorded above.
+
+Remaining limits:
+
+- The mound shell is a compact functional equivalent rather than the exact 2,500-line fixed block dump from the 1.7.10 class.
+- Mound/barrow generation has not been observed in a fresh runtime world because smoke-server remains environment-blocked and user-driven client/manual scenarios are excluded.
+- GAP-1 still has `newGen`/regen chunk dirty-marker parity and broader runtime edge cases open.
+
 ## Next Checkpoint Candidate
 
 After the portal trigger and ring bootstrap checkpoints, the next pre-Phase8 candidates are:
 
-- Remaining Stage 7 surface/worldgen placeholders, especially mound/barrow and `newGen`/regen marker behavior.
+- Remaining Stage 7 surface/worldgen behavior, especially `newGen`/regen marker behavior and runtime evidence.
 - Remaining Stage 7 Outer Lands room/tile behavior, especially `TileEldritchAltar` portal opening, lock/boss-room lifecycle, key/boss room traversal, and maze save/load race validation.
 - Stage 9 loot/content registration, because `Utils.generateLoot(...)` now has a shared reward path but the full reference loot pool distribution still depends on populated content tables.
 - Stage 6 server-side boss/manual scenario evidence remains excluded from user-driven validation, but static/reference parity blockers should continue to be reduced where possible.

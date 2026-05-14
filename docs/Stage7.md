@@ -525,6 +525,11 @@ Dependency: loot urn/crate block registration and mob entity ids must be availab
 
 Remaining GAP-11 limits after this checkpoint: `WorldGenMound` is still a placeholder, the broader `generateSurface(...)`/chance semantics remain part of GAP-1, and hilltop generation has not been observed in a runtime world because server smoke remains environment-blocked.
 
+**Checkpoint 2026-05-14 — Mound/barrow functional layout:**
+`WorldGenMound` is no longer the small grass/dirt mound with an empty chest. It now uses the reference 19x19 footprint validation points, builds a buried barrow shell with interior chamber, places loot urn/crate blocks at the reference offsets, adds a dungeon-loot-table chest with the original trapped-chest/TNT chance, configures skeleton and zombie spawners at the reference offsets, and leaves the central dark-node handoff position open. `ThaumcraftWorldGenerator.generateStructures(...)` now uses the reference-like mutually exclusive mound/ring/hilltop chance ordering from the shared `randPosY = getHeight(...) - 9` branch instead of the old independent Magical Forest/Taint-only mound branch.
+
+Remaining GAP-11 limits after this checkpoint: the mound block shell is a compact functional equivalent rather than the exact 2,500-line fixed block dump from the 1.7.10 class, and mound generation has not been observed in a runtime world because server smoke remains environment-blocked.
+
 ## 6. Итоговый checklist закрытия Stage 7
 
 - [ ] GAP-1 closed: reference-like fresh-world generation pipeline restored and tested.
