@@ -8,6 +8,7 @@ import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.player.ItemTooltipEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import thaumcraft.client.gui.GuiHandMirror;
 import thaumcraft.common.CommonProxy;
 import thaumcraft.common.lib.events.EventHandlerRunic;
 
@@ -59,6 +60,7 @@ public class ClientProxy extends CommonProxy {
             case GUI_ARCANE_WORKBENCH:
             case GUI_ARCANE_BORE:
             case GUI_HAND_MIRROR:
+                return new GuiHandMirror(player.inventory, world, x, y, z);
             case GUI_HOVER_HARNESS:
             case GUI_MAGIC_BOX:
             case GUI_SPA:

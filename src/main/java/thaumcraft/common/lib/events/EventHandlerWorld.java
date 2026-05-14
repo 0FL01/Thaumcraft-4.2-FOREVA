@@ -173,16 +173,11 @@ public class EventHandlerWorld {
         Block block = event.getWorld().getBlockState(pos).getBlock();
         int meta = block.getMetaFromState(event.getWorld().getBlockState(pos));
 
-        // Phase 8: handle custom fluid bucket fills
-        // if (block == ConfigBlocks.blockFluidPure && meta == 0) {
-        //     event.getWorld().setBlockToAir(pos);
-        //     event.setFilledBucket(new ItemStack(ConfigItems.itemBucketPure));
-        //     event.setResult(Event.Result.ALLOW);
-        // } else if (block == ConfigBlocks.blockFluidDeath && meta == 3) {
-        //     event.getWorld().setBlockToAir(pos);
-        //     event.setFilledBucket(new ItemStack(ConfigItems.itemBucketDeath));
-        //     event.setResult(Event.Result.ALLOW);
-        // }
+        if (block == ConfigBlocks.blockFluidDeath && meta == 3) {
+            event.getWorld().setBlockToAir(pos);
+            event.setFilledBucket(new ItemStack(ConfigItems.itemBucketDeath));
+            event.setResult(Event.Result.ALLOW);
+        }
     }
 
     // ---- Fuel burning ----

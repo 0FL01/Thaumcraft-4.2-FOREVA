@@ -1,9 +1,12 @@
 package thaumcraft.common.config;
 
 import net.minecraft.block.Block;
+import net.minecraft.item.EnumRarity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.common.registry.GameRegistry;
+import net.minecraftforge.fluids.Fluid;
+import net.minecraftforge.fluids.FluidRegistry;
 import thaumcraft.common.blocks.*;
 import thaumcraft.common.blocks.ItemBlocks.*;
 import thaumcraft.common.tiles.*;
@@ -11,6 +14,9 @@ import thaumcraft.common.tiles.*;
 import java.util.Locale;
 
 public class ConfigBlocks {
+
+    // Fluid instances
+    public static Fluid FLUIDDEATH;
 
     // Block instances
     public static BlockJar blockJar;
@@ -33,6 +39,7 @@ public class ConfigBlocks {
     public static BlockAiry blockAiry;
     public static BlockFluxGoo blockFluxGoo;
     public static BlockFluxGas blockFluxGas;
+    public static BlockFluidDeath blockFluidDeath;
     public static BlockManaPod blockManaPod;
     public static BlockEldritch blockEldritch;
     public static BlockEldritchNothing blockEldritchNothing;
@@ -55,6 +62,8 @@ public class ConfigBlocks {
     public static BlockCrystalItem blockCrystalItem;
 
     public static void init() {
+        initFluids();
+
         blockJar = (BlockJar) new BlockJar()
                 .setRegistryName("thaumcraft", legacyPath("blockJar"))
                 .setTranslationKey("thaumcraft.jar");
@@ -134,6 +143,10 @@ public class ConfigBlocks {
         blockFluxGas = (BlockFluxGas) new BlockFluxGas()
                 .setRegistryName("thaumcraft", legacyPath("blockFluxGas"))
                 .setTranslationKey("thaumcraft.flux_gas");
+
+        blockFluidDeath = (BlockFluidDeath) new BlockFluidDeath()
+                .setRegistryName("thaumcraft", legacyPath("blockFluidDeath"))
+                .setTranslationKey("thaumcraft.fluid_death");
 
         blockManaPod = (BlockManaPod) new BlockManaPod()
                 .setRegistryName("thaumcraft", legacyPath("blockManaPod"))
@@ -220,6 +233,7 @@ public class ConfigBlocks {
                 blockAiry,
                 blockFluxGoo,
                 blockFluxGas,
+                blockFluidDeath,
                 blockManaPod,
                 blockEldritch,
                 blockEldritchNothing,
@@ -284,6 +298,22 @@ public class ConfigBlocks {
 
     public static String legacyPath(String legacyToken) {
         return legacyToken.toLowerCase(Locale.ROOT);
+    }
+
+    private static void initFluids() {
+        Fluid existing = FluidRegistry.getFluid("fluidDeath");
+        if (existing != null) {
+            FLUIDDEATH = existing;
+            return;
+        }
+        FLUIDDEATH = new Fluid("fluidDeath",
+                new ResourceLocation("thaumcraft", "blocks/fluiddeath"),
+                new ResourceLocation("thaumcraft", "blocks/fluiddeath"))
+                .setGaseous(false)
+                .setLuminosity(8)
+                .setViscosity(1500)
+                .setRarity(EnumRarity.RARE);
+        FluidRegistry.registerFluid(FLUIDDEATH);
     }
 
     private static ResourceLocation legacyLocation(String legacyToken) {
