@@ -44,7 +44,7 @@ public class FocusWarding extends ItemFocusBasic implements IArchitect {
 
     @Override
     public AspectList getVisCost(ItemStack stack) {
-        return new AspectList().add(Aspect.EARTH, 2500).add(Aspect.ORDER, 2500).add(Aspect.WATER, 1000);
+        return new AspectList().add(Aspect.EARTH, 25).add(Aspect.ORDER, 25).add(Aspect.WATER, 10);
     }
 
     @Override

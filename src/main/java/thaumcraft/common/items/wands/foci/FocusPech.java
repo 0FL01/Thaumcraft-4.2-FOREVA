@@ -31,7 +31,11 @@ public class FocusPech extends ItemFocusBasic {
 
     @Override
     public AspectList getVisCost(ItemStack stack) {
-        return new AspectList().add(Aspect.EARTH, 500).add(Aspect.EXCHANGE, 500);
+        if (this.isUpgradedWith(stack, nightshade)) {
+            return new AspectList().add(Aspect.AIR, 10).add(Aspect.FIRE, 10).add(Aspect.EARTH, 10)
+                    .add(Aspect.ORDER, 10).add(Aspect.ENTROPY, 10).add(Aspect.WATER, 10);
+        }
+        return new AspectList().add(Aspect.EARTH, 10).add(Aspect.ENTROPY, 10).add(Aspect.WATER, 10);
     }
 
     @Override
@@ -76,7 +80,7 @@ public class FocusPech extends ItemFocusBasic {
 
     @Override
     public String getSortingHelper(ItemStack stack) {
-        return "PECH";
+        return "PP" + super.getSortingHelper(stack);
     }
 
     @Override

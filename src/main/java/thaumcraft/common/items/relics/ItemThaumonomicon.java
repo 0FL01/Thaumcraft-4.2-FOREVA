@@ -10,6 +10,8 @@ import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.NonNullList;
 import net.minecraft.world.World;
+import thaumcraft.common.CommonProxy;
+import thaumcraft.common.Thaumcraft;
 import thaumcraft.common.lib.CreativeTabThaumcraft;
 
 public class ItemThaumonomicon extends Item {
@@ -42,7 +44,7 @@ public class ItemThaumonomicon extends Item {
     public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer player, EnumHand hand) {
         ItemStack stack = player.getHeldItem(hand);
         if (!world.isRemote) {
-            // Open Thaumonomicon GUI - TBD
+            player.openGui(Thaumcraft.instance, CommonProxy.GUI_THAUMONOMICON, world, 0, 0, 0);
         }
         return new ActionResult<>(EnumActionResult.SUCCESS, stack);
     }

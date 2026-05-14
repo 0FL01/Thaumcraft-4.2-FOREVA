@@ -30,6 +30,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import thaumcraft.api.ThaumcraftApi;
 import thaumcraft.api.aspects.Aspect;
+import thaumcraft.api.wands.StaffRod;
 import thaumcraft.api.wands.WandCap;
 import thaumcraft.api.wands.WandRod;
 import thaumcraft.common.config.Config;
@@ -54,6 +55,9 @@ import thaumcraft.common.lib.world.ComponentWizardTower;
 import thaumcraft.common.lib.world.VillageBankerManager;
 import thaumcraft.common.lib.world.VillageWizardManager;
 import thaumcraft.common.lib.world.ThaumcraftWorldGenerator;
+import thaumcraft.common.items.wands.WandRodPrimalOnUpdate;
+
+import java.util.Arrays;
 
 @Mod(
     modid = Thaumcraft.MODID,
@@ -101,9 +105,6 @@ public class Thaumcraft {
         initAspects();
         ThaumcraftApi.registerScanEventhandler(new ScanManager());
 
-        // Register default wand rods and caps
-        initWandComponents();
-
         // Register potion instances (registry names set here; actual registry via event)
         Config.initPotions();
 
@@ -134,6 +135,7 @@ public class Thaumcraft {
         // Init config sub-modules
         ConfigBlocks.init();
         ConfigItems.init();
+        initWandComponents();
         ConfigEntities.init();
         ThaumcraftWorldGenerator.registerBiomeManager();
 
@@ -313,21 +315,41 @@ public class Thaumcraft {
     // ---- Wand Component Registration ----
 
     private void initWandComponents() {
-        // Wand Rods
-        // Note: these use the item field from ConfigItems - but ConfigItems.init() hasn't been called yet.
-        // We create ItemStack references that will be filled in later.
-        // For now, register rods with null items (the game will still work).
-        new WandRod("wood", 100, ItemStack.EMPTY, 5);
-        new WandRod("greatwood", 500, ItemStack.EMPTY, 25);
-        new WandRod("silverwood", 1000, ItemStack.EMPTY, 75);
+        WandRod.rods.clear();
+        WandCap.caps.clear();
 
-        // Wand Caps
-        new WandCap("iron", 1.0f, ItemStack.EMPTY, 5);
-        new WandCap("gold", 1.2f, ItemStack.EMPTY, 7);
-        new WandCap("thaumium", 0.9f, ItemStack.EMPTY, 15);
-        new WandCap("void", 0.8f, ItemStack.EMPTY, 25);
-        new WandCap("bone", 0.85f, ItemStack.EMPTY, 10);
-        new WandCap("alchemical", 0.75f, ItemStack.EMPTY, 30);
+        new WandCap("iron", 1.1f, new ItemStack(ConfigItems.itemWandCap, 1, 0), 1);
+        new WandCap("gold", 1.0f, new ItemStack(ConfigItems.itemWandCap, 1, 1), 3);
+        new WandCap("thaumium", 0.9f, new ItemStack(ConfigItems.itemWandCap, 1, 2), 6);
+        new WandCap("void", 0.8f, new ItemStack(ConfigItems.itemWandCap, 1, 7), 9);
+        if (Config.foundCopperIngot) {
+            new WandCap("copper", 1.1f, Arrays.asList(Aspect.ORDER, Aspect.ENTROPY), 1.0f, new ItemStack(ConfigItems.itemWandCap, 1, 3), 2);
+        }
+        if (Config.foundSilverIngot) {
+            new WandCap("silver", 1.0f, Arrays.asList(Aspect.AIR, Aspect.EARTH, Aspect.FIRE, Aspect.WATER), 0.95f, new ItemStack(ConfigItems.itemWandCap, 1, 4), 4);
+        }
+
+        new WandRod("wood", 25, new ItemStack(Items.STICK), 1);
+        new WandRod("greatwood", 50, new ItemStack(ConfigItems.itemWandRod, 1, 0), 3);
+        new WandRod("obsidian", 75, new ItemStack(ConfigItems.itemWandRod, 1, 1), 6, new WandRodPrimalOnUpdate(Aspect.EARTH));
+        new WandRod("blaze", 75, new ItemStack(ConfigItems.itemWandRod, 1, 6), 6, new WandRodPrimalOnUpdate(Aspect.FIRE)).setGlowing(true);
+        new WandRod("ice", 75, new ItemStack(ConfigItems.itemWandRod, 1, 3), 6, new WandRodPrimalOnUpdate(Aspect.WATER));
+        new WandRod("quartz", 75, new ItemStack(ConfigItems.itemWandRod, 1, 4), 6, new WandRodPrimalOnUpdate(Aspect.ORDER));
+        new WandRod("bone", 75, new ItemStack(ConfigItems.itemWandRod, 1, 7), 6, new WandRodPrimalOnUpdate(Aspect.ENTROPY));
+        new WandRod("reed", 75, new ItemStack(ConfigItems.itemWandRod, 1, 5), 6, new WandRodPrimalOnUpdate(Aspect.AIR));
+        new WandRod("silverwood", 100, new ItemStack(ConfigItems.itemWandRod, 1, 2), 9);
+
+        new StaffRod("greatwood", 125, new ItemStack(ConfigItems.itemWandRod, 1, 50), 8);
+        new StaffRod("obsidian", 175, new ItemStack(ConfigItems.itemWandRod, 1, 51), 14, new WandRodPrimalOnUpdate(Aspect.EARTH));
+        StaffRod blazeStaff = new StaffRod("blaze", 175, new ItemStack(ConfigItems.itemWandRod, 1, 56), 14, new WandRodPrimalOnUpdate(Aspect.FIRE));
+        blazeStaff.setGlowing(true);
+        new StaffRod("ice", 175, new ItemStack(ConfigItems.itemWandRod, 1, 53), 14, new WandRodPrimalOnUpdate(Aspect.WATER));
+        new StaffRod("quartz", 175, new ItemStack(ConfigItems.itemWandRod, 1, 54), 14, new WandRodPrimalOnUpdate(Aspect.ORDER));
+        new StaffRod("bone", 175, new ItemStack(ConfigItems.itemWandRod, 1, 57), 14, new WandRodPrimalOnUpdate(Aspect.ENTROPY));
+        new StaffRod("reed", 175, new ItemStack(ConfigItems.itemWandRod, 1, 55), 14, new WandRodPrimalOnUpdate(Aspect.AIR));
+        new StaffRod("silverwood", 250, new ItemStack(ConfigItems.itemWandRod, 1, 52), 24);
+        StaffRod primal = new StaffRod("primal", 250, new ItemStack(ConfigItems.itemWandRod, 1, 100), 32, new WandRodPrimalOnUpdate());
+        primal.setRunes(true);
 
         log.info("Wand components registered: {} rods, {} caps", WandRod.rods.size(), WandCap.caps.size());
     }

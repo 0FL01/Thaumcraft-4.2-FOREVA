@@ -38,7 +38,7 @@ public class FocusPortableHole extends ItemFocusBasic {
 
     @Override
     public AspectList getVisCost(ItemStack stack) {
-        return new AspectList().add(Aspect.ENTROPY, 1000).add(Aspect.AIR, 1000);
+        return new AspectList().add(Aspect.ENTROPY, 10).add(Aspect.AIR, 10);
     }
 
     public static boolean createHole(World world, int x, int y, int z, int side, byte count, int max) {

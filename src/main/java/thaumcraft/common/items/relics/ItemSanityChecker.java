@@ -7,7 +7,10 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumHand;
+import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.world.World;
+import thaumcraft.common.lib.capabilities.IPlayerKnowledge;
+import thaumcraft.common.lib.capabilities.PlayerKnowledgeProvider;
 import thaumcraft.common.lib.CreativeTabThaumcraft;
 
 public class ItemSanityChecker extends Item {
@@ -28,9 +31,9 @@ public class ItemSanityChecker extends Item {
     public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer player, EnumHand hand) {
         ItemStack stack = player.getHeldItem(hand);
         if (!world.isRemote) {
-            // Display current warp level - TBD
-            player.sendStatusMessage(new net.minecraft.util.text.TextComponentString(
-                    "Warp level: TBD"), true);
+            IPlayerKnowledge knowledge = player.getCapability(PlayerKnowledgeProvider.PLAYER_KNOWLEDGE, null);
+            int warp = knowledge == null ? 0 : knowledge.getTotalWarp();
+            player.sendStatusMessage(new TextComponentTranslation("tc.sanity", warp), true);
         }
         return new ActionResult<>(EnumActionResult.SUCCESS, stack);
     }

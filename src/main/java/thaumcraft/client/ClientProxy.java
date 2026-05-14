@@ -55,6 +55,7 @@ public class ClientProxy extends CommonProxy {
             case GUI_DECONSTRUCTION_TABLE:
             case GUI_ALCHEMY_FURNACE:
             case GUI_RESEARCH_TABLE:
+            case GUI_THAUMONOMICON:
             case GUI_ARCANE_WORKBENCH:
             case GUI_ARCANE_BORE:
             case GUI_HAND_MIRROR:

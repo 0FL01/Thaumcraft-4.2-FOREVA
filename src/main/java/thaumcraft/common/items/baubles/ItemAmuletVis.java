@@ -10,6 +10,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.NonNullList;
+import thaumcraft.api.IRunicArmor;
 import thaumcraft.api.aspects.Aspect;
 import thaumcraft.api.aspects.AspectList;
 import thaumcraft.api.aspects.IEssentiaContainerItem;
@@ -20,7 +21,7 @@ import thaumcraft.common.tiles.TileVisRelay;
 
 import java.lang.ref.WeakReference;
 
-public class ItemAmuletVis extends Item implements IBauble, IEssentiaContainerItem {
+public class ItemAmuletVis extends Item implements IBauble, IEssentiaContainerItem, IRunicArmor {
 
     public ItemAmuletVis() {
         this.setMaxStackSize(1);
@@ -66,7 +67,7 @@ public class ItemAmuletVis extends Item implements IBauble, IEssentiaContainerIt
     }
 
     public int addVis(ItemStack stack, Aspect aspect, int amount, boolean doit) {
-        if (aspect == null || !aspect.isPrimal()) return amount;
+        if (aspect == null || !aspect.isPrimal()) return 0;
         int storeAmount = this.getVis(stack, aspect) + amount * 100;
         int leftover = Math.max(storeAmount - this.getMaxVis(stack), 0);
         if (doit) {
@@ -76,7 +77,7 @@ public class ItemAmuletVis extends Item implements IBauble, IEssentiaContainerIt
     }
 
     public int addRealVis(ItemStack stack, Aspect aspect, int amount, boolean doit) {
-        if (aspect == null || !aspect.isPrimal()) return amount;
+        if (aspect == null || !aspect.isPrimal()) return 0;
         int storeAmount = this.getVis(stack, aspect) + amount;
         int leftover = Math.max(storeAmount - this.getMaxVis(stack), 0);
         if (doit) {
@@ -175,6 +176,11 @@ public class ItemAmuletVis extends Item implements IBauble, IEssentiaContainerIt
 
     @Override
     public boolean willAutoSync(ItemStack itemstack, EntityLivingBase player) { return true; }
+
+    @Override
+    public int getRunicCharge(ItemStack itemstack) {
+        return 0;
+    }
 
     @Override
     public AspectList getAspects(ItemStack itemstack) {

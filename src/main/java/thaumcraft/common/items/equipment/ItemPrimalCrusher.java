@@ -33,7 +33,7 @@ public class ItemPrimalCrusher extends ItemTool implements IRepairable, IWarping
             Blocks.LAPIS_ORE, Blocks.LAPIS_BLOCK, Blocks.COAL_ORE, Blocks.COAL_BLOCK,
             Blocks.NETHERRACK, Blocks.QUARTZ_ORE, Blocks.GRASS, Blocks.DIRT, Blocks.SAND,
             Blocks.GRAVEL, Blocks.CLAY, Blocks.SNOW, Blocks.SNOW_LAYER, Blocks.SOUL_SAND,
-            Blocks.MYCELIUM, Blocks.CONCRETE, Blocks.CONCRETE_POWDER, ConfigBlocks.blockTaint,
+            Blocks.MYCELIUM, Blocks.WEB, Blocks.CONCRETE, Blocks.CONCRETE_POWDER, ConfigBlocks.blockTaint,
             ConfigBlocks.blockTaintFibres
     ));
 

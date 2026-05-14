@@ -45,7 +45,15 @@ public class FocusExcavation extends ItemFocusBasic {
 
     @Override
     public AspectList getVisCost(ItemStack stack) {
-        return new AspectList().add(Aspect.EARTH, 500).add(Aspect.TOOL, 250);
+        AspectList cost = new AspectList().add(Aspect.EARTH, 15);
+        if (this.isUpgradedWith(stack, FocusUpgradeType.silktouch)) {
+            return new AspectList().add(Aspect.AIR, 1).add(Aspect.FIRE, 1).add(Aspect.EARTH, 1)
+                    .add(Aspect.WATER, 1).add(Aspect.ORDER, 1).add(Aspect.ENTROPY, 1).add(cost);
+        }
+        if (this.isUpgradedWith(stack, dowsing)) {
+            return new AspectList().add(Aspect.FIRE, 2).add(Aspect.ORDER, 2).add(cost);
+        }
+        return cost;
     }
 
     @Override
@@ -197,7 +205,7 @@ public class FocusExcavation extends ItemFocusBasic {
 
     @Override
     public String getSortingHelper(ItemStack stack) {
-        return "EXCAVATION";
+        return "BE" + super.getSortingHelper(stack);
     }
 
     @Override

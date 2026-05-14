@@ -30,6 +30,7 @@ public class CommonProxy implements IGuiHandler {
     public static final int GUI_DECONSTRUCTION_TABLE = 8;
     public static final int GUI_ALCHEMY_FURNACE = 9;
     public static final int GUI_RESEARCH_TABLE = 10;
+    public static final int GUI_THAUMONOMICON = 12;
     public static final int GUI_ARCANE_WORKBENCH = 13;
     public static final int GUI_ARCANE_BORE = 15;
     public static final int GUI_HAND_MIRROR = 16;
@@ -91,6 +92,7 @@ public class CommonProxy implements IGuiHandler {
                 TileEntity tile = world.getTileEntity(pos);
                 return tile instanceof TileResearchTable ? new ContainerResearchTable(player.inventory, (TileResearchTable) tile) : null;
             }
+            case GUI_THAUMONOMICON: return null;
             case GUI_ARCANE_WORKBENCH: {
                 TileEntity tile = world.getTileEntity(pos);
                 return tile instanceof TileArcaneWorkbench ? new ContainerArcaneWorkbench(player.inventory, (TileArcaneWorkbench) tile) : null;

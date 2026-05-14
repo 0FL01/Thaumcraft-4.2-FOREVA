@@ -12,6 +12,7 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import thaumcraft.api.aspects.Aspect;
 import thaumcraft.api.aspects.AspectList;
+import thaumcraft.api.ThaumcraftApiHelper;
 import thaumcraft.api.wands.FocusUpgradeType;
 import thaumcraft.api.wands.ItemFocusBasic;
 import thaumcraft.common.entities.monster.EntityFireBat;
@@ -24,8 +25,9 @@ public class FocusHellbat extends ItemFocusBasic {
     public static final FocusUpgradeType batbombs = new FocusUpgradeType(13, new ResourceLocation("thaumcraft", "textures/foci/batbombs.png"), "focus.upgrade.batbombs.name", "focus.upgrade.batbombs.text", new AspectList().add(Aspect.ENERGY, 1).add(Aspect.TRAP, 1));
     public static final FocusUpgradeType devilbats = new FocusUpgradeType(14, new ResourceLocation("thaumcraft", "textures/foci/devilbats.png"), "focus.upgrade.devilbats.name", "focus.upgrade.devilbats.text", new AspectList().add(Aspect.ARMOR, 1));
     public static final FocusUpgradeType vampirebats = new FocusUpgradeType(19, new ResourceLocation("thaumcraft", "textures/foci/vampirebats.png"), "focus.upgrade.vampirebats.name", "focus.upgrade.vampirebats.text", new AspectList().add(Aspect.HUNGER, 1).add(Aspect.LIFE, 1));
-    private static final AspectList COST_BOMB = new AspectList().add(Aspect.FIRE, 500).add(Aspect.ENTROPY, 1000).add(Aspect.FLIGHT, 500);
-    private static final AspectList COST_DEVIL = new AspectList().add(Aspect.FIRE, 1000).add(Aspect.FLIGHT, 500).add(Aspect.BEAST, 250).add(Aspect.EARTH, 500);
+    private static final AspectList COST_BASE = new AspectList().add(Aspect.FIRE, 200).add(Aspect.ENTROPY, 100).add(Aspect.AIR, 100);
+    private static final AspectList COST_BOMB = new AspectList().add(Aspect.FIRE, 100).add(Aspect.ENTROPY, 200).add(Aspect.AIR, 100);
+    private static final AspectList COST_DEVIL = new AspectList().add(Aspect.FIRE, 100).add(Aspect.ENTROPY, 100).add(Aspect.AIR, 100).add(Aspect.EARTH, 100);
 
     public FocusHellbat() {
         super();
@@ -41,7 +43,7 @@ public class FocusHellbat extends ItemFocusBasic {
     public AspectList getVisCost(ItemStack stack) {
         if (this.isUpgradedWith(stack, batbombs)) return COST_BOMB;
         if (this.isUpgradedWith(stack, devilbats)) return COST_DEVIL;
-        return new AspectList().add(Aspect.FIRE, 1000).add(Aspect.FLIGHT, 500).add(Aspect.BEAST, 250);
+        return COST_BASE;
     }
 
     @Override
@@ -121,7 +123,12 @@ public class FocusHellbat extends ItemFocusBasic {
 
     @Override
     public String getSortingHelper(ItemStack stack) {
-        return "HELLBAT";
+        return "HH" + super.getSortingHelper(stack);
+    }
+
+    @Override
+    public boolean canApplyUpgrade(ItemStack focusstack, EntityPlayer player, FocusUpgradeType type, int rank) {
+        return !type.equals(vampirebats) || player != null && ThaumcraftApiHelper.isResearchComplete(player.getName(), "VAMPBAT");
     }
 
     @Override

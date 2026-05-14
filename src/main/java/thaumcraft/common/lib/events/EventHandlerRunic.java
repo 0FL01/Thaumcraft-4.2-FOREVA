@@ -75,7 +75,7 @@ public class EventHandlerRunic {
             // Check baubles (use IBaublesItemHandler)
             IBaublesItemHandler baubles = BaublesApi.getBaublesHandler(player);
             if (baubles != null) {
-                for (int a = 0; a < baubles.getSlots(); a++) {
+                for (int a = 0; a < Math.min(4, baubles.getSlots()); a++) {
                     ItemStack stack = baubles.getStackInSlot(a);
                     if (stack.isEmpty() || !(stack.getItem() instanceof IRunicArmor)) continue;
                     int amount = getFinalCharge(stack);

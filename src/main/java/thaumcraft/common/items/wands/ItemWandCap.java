@@ -4,6 +4,7 @@ import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.NonNullList;
+import thaumcraft.api.wands.WandCap;
 
 public class ItemWandCap extends Item {
 
@@ -20,6 +21,12 @@ public class ItemWandCap extends Item {
 
     @Override
     public void getSubItems(CreativeTabs tab, NonNullList<ItemStack> items) {
-        // Registration handles subtypes via WandCap registry
+        if (!this.isInCreativeTab(tab)) return;
+        for (WandCap cap : WandCap.caps.values()) {
+            ItemStack stack = cap.getItem();
+            if (!stack.isEmpty() && stack.getItem() == this) {
+                items.add(stack.copy());
+            }
+        }
     }
 }

@@ -39,7 +39,12 @@ public class FocusTrade extends ItemFocusBasic implements IArchitect {
 
     @Override
     public AspectList getVisCost(ItemStack stack) {
-        return new AspectList().add(Aspect.AIR, 500).add(Aspect.EXCHANGE, 250);
+        AspectList cost = new AspectList().add(Aspect.ENTROPY, 5).add(Aspect.EARTH, 5).add(Aspect.ORDER, 5);
+        if (this.isUpgradedWith(stack, FocusUpgradeType.silktouch)) {
+            return new AspectList().add(Aspect.AIR, 1).add(Aspect.FIRE, 1).add(Aspect.EARTH, 1)
+                    .add(Aspect.WATER, 1).add(Aspect.ORDER, 1).add(Aspect.ENTROPY, 1).add(cost);
+        }
+        return cost;
     }
 
     @Override
@@ -220,7 +225,7 @@ public class FocusTrade extends ItemFocusBasic implements IArchitect {
 
     @Override
     public String getSortingHelper(ItemStack stack) {
-        return "TRADE";
+        return "BT" + super.getSortingHelper(stack);
     }
 
     @Override

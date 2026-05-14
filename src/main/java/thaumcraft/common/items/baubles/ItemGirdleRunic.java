@@ -43,6 +43,11 @@ public class ItemGirdleRunic extends ItemRunic implements IBauble {
     }
 
     @Override
+    public int getRunicCharge(ItemStack itemstack) {
+        return itemstack.getItemDamage() == META_NORMAL ? 10 : 9;
+    }
+
+    @Override
     public void onWornTick(ItemStack itemstack, EntityLivingBase player) {}
 
     @Override

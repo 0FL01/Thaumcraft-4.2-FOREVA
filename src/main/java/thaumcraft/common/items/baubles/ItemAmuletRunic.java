@@ -44,6 +44,11 @@ public class ItemAmuletRunic extends ItemRunic implements IBauble, IRunicArmor {
     }
 
     @Override
+    public int getRunicCharge(ItemStack itemstack) {
+        return itemstack.getItemDamage() == META_NORMAL ? 8 : 7;
+    }
+
+    @Override
     public void onWornTick(ItemStack itemstack, EntityLivingBase player) {}
 
     @Override

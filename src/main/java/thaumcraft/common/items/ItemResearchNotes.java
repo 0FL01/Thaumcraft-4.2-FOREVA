@@ -9,8 +9,10 @@ import net.minecraft.util.ActionResult;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.NonNullList;
+import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.world.World;
 import thaumcraft.common.lib.CreativeTabThaumcraft;
+import thaumcraft.common.lib.research.ResearchManager;
 
 public class ItemResearchNotes extends Item {
 
@@ -41,9 +43,14 @@ public class ItemResearchNotes extends Item {
     public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer player, EnumHand hand) {
         ItemStack stack = player.getHeldItem(hand);
         if (!world.isRemote) {
-            // Grant research from notes - TBD
-            stack.shrink(1);
+            String key = stack.hasTagCompound() ? stack.getTagCompound().getString("key") : "";
+            if (!key.isEmpty()) {
+                ResearchManager.addResearch(player, key);
+                if (!player.capabilities.isCreativeMode) stack.shrink(1);
+                return new ActionResult<>(EnumActionResult.SUCCESS, stack);
+            }
+            player.sendStatusMessage(new TextComponentTranslation("tc.researchnotes.invalid"), true);
         }
-        return new ActionResult<>(EnumActionResult.SUCCESS, stack);
+        return new ActionResult<>(EnumActionResult.PASS, stack);
     }
 }

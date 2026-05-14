@@ -41,7 +41,7 @@ public class ItemBaubleBlanks extends Item implements IBauble, IVisDiscountGear,
     @Override
     public void getSubItems(CreativeTabs tab, NonNullList<ItemStack> items) {
         if (this.isInCreativeTab(tab)) {
-            for (int i = 0; i <= 8; i++) {
+            for (int i = 0; i <= 2; i++) {
                 items.add(new ItemStack(this, 1, i));
             }
         }
@@ -54,16 +54,19 @@ public class ItemBaubleBlanks extends Item implements IBauble, IVisDiscountGear,
 
     @Override
     public int getVisDiscount(ItemStack stack, EntityPlayer player, Aspect aspect) {
+        int meta = stack.getItemDamage();
+        if (meta >= 3 && meta <= 8 && aspect != null && aspect.isPrimal()) {
+            return Aspect.getPrimalAspects().indexOf(aspect) == meta - 3 ? 1 : 0;
+        }
         return 0;
     }
 
     @Override
     public BaubleType getBaubleType(ItemStack itemstack) {
         int dmg = itemstack.getItemDamage();
-        if (dmg == META_RING) return BaubleType.RING;
-        if (dmg == META_AMULET) return BaubleType.AMULET;
-        if (dmg == META_GIRDLE) return BaubleType.BELT;
-        return BaubleType.TRINKET;
+        if (dmg == META_TABLET) return BaubleType.BELT;
+        if (dmg == META_VIS_STONE) return BaubleType.AMULET;
+        return BaubleType.RING;
     }
 
     @Override

@@ -14,6 +14,7 @@ import thaumcraft.api.wands.ItemFocusBasic;
 import thaumcraft.common.entities.projectile.EntityEmber;
 import thaumcraft.common.entities.projectile.EntityExplosiveOrb;
 import thaumcraft.common.items.wands.ItemWandCasting;
+import thaumcraft.common.items.wands.WandManager;
 import thaumcraft.common.lib.TCSounds;
 
 public class FocusFire extends ItemFocusBasic {
@@ -54,8 +55,26 @@ public class FocusFire extends ItemFocusBasic {
                 orb.playSound(TCSounds.FIRELOOP, 0.33F, 2.0F);
             }
             player.swingArm(EnumHand.MAIN_HAND);
+        } else {
+            player.setActiveHand(EnumHand.MAIN_HAND);
+            WandManager.setCooldown(player, -1);
         }
         return wandStack;
+    }
+
+    @Override
+    public int getActivationCooldown(ItemStack focusstack) {
+        return this.isUpgradedWith(focusstack, fireball) ? 1000 : 0;
+    }
+
+    @Override
+    public boolean isVisCostPerTick(ItemStack focusstack) {
+        return true;
+    }
+
+    @Override
+    public ItemFocusBasic.WandFocusAnimation getAnimation(ItemStack focusstack) {
+        return this.isUpgradedWith(focusstack, fireball) ? ItemFocusBasic.WandFocusAnimation.WAVE : ItemFocusBasic.WandFocusAnimation.CHARGE;
     }
 
     @Override
@@ -97,7 +116,32 @@ public class FocusFire extends ItemFocusBasic {
 
     @Override
     public String getSortingHelper(ItemStack stack) {
-        return "FIRE";
+        return "AF" + super.getSortingHelper(stack);
+    }
+
+    @Override
+    public FocusUpgradeType[] getPossibleUpgradesByRank(ItemStack itemstack, int rank) {
+        switch (rank) {
+            case 1:
+                return new FocusUpgradeType[]{FocusUpgradeType.frugal, FocusUpgradeType.potency};
+            case 2:
+                return new FocusUpgradeType[]{FocusUpgradeType.frugal, FocusUpgradeType.potency, FocusUpgradeType.alchemistsfire};
+            case 3:
+                return new FocusUpgradeType[]{FocusUpgradeType.frugal, FocusUpgradeType.potency, fireball, firebeam};
+            case 4:
+                return new FocusUpgradeType[]{FocusUpgradeType.frugal, FocusUpgradeType.potency, FocusUpgradeType.alchemistsfire};
+            case 5:
+                return new FocusUpgradeType[]{FocusUpgradeType.frugal, FocusUpgradeType.potency};
+            default:
+                return null;
+        }
+    }
+
+    @Override
+    public boolean canApplyUpgrade(ItemStack focusstack, EntityPlayer player, FocusUpgradeType type, int rank) {
+        return !type.equals(FocusUpgradeType.alchemistsfire)
+                || !this.isUpgradedWith(focusstack, fireball)
+                || !this.isUpgradedWith(focusstack, FocusUpgradeType.alchemistsfire);
     }
 
     @Override

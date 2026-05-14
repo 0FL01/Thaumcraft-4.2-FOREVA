@@ -75,6 +75,7 @@ public class ConfigItems {
     public static ToolMaterial TOOLMAT_THAUMIUM;
     public static ToolMaterial TOOLMAT_VOID;
     public static ToolMaterial TOOLMAT_ELEMENTAL;
+    public static ToolMaterial TOOLMAT_PRIMALVOID;
 
     // Armor materials
     public static ArmorMaterial ARMOR_THAUMIUM;
@@ -185,6 +186,7 @@ public class ConfigItems {
         TOOLMAT_THAUMIUM = EnumHelper.addToolMaterial("THAUMIUM", 3, 500, 7.0f, 2.5f, 18);
         TOOLMAT_VOID = EnumHelper.addToolMaterial("VOID", 4, 600, 8.0f, 3.0f, 20);
         TOOLMAT_ELEMENTAL = EnumHelper.addToolMaterial("ELEMENTAL", 4, 1561, 10.0f, 4.0f, 22);
+        TOOLMAT_PRIMALVOID = EnumHelper.addToolMaterial("PRIMALVOID", 5, 500, 8.0f, 4.0f, 20);
 
         // Use armor materials from ThaumcraftApi (defined there with EnumHelper)
         ARMOR_THAUMIUM = thaumcraft.api.ThaumcraftApi.armorMatThaumium;
@@ -524,7 +526,7 @@ public class ConfigItems {
                 .setCreativeTab(tab);
         allItems.add(itemPrimalArrow);
 
-        itemPrimalCrusher = (ItemPrimalCrusher) new ItemPrimalCrusher(TOOLMAT_ELEMENTAL)
+        itemPrimalCrusher = (ItemPrimalCrusher) new ItemPrimalCrusher(TOOLMAT_PRIMALVOID)
                 .setRegistryName("thaumcraft", ConfigBlocks.legacyPath("ItemPrimalCrusher"))
                 .setTranslationKey("thaumcraft.primal_crusher")
                 .setCreativeTab(tab);
@@ -774,6 +776,7 @@ public class ConfigItems {
         setRepairItem(TOOLMAT_THAUMIUM, thaumium);
         setRepairItem(TOOLMAT_ELEMENTAL, thaumium);
         setRepairItem(TOOLMAT_VOID, voidIngot);
+        setRepairItem(TOOLMAT_PRIMALVOID, new ItemStack(itemResource, 1, ItemResource.META_CHARM));
 
         setRepairItem(ARMOR_THAUMIUM, thaumium);
         setRepairItem(ARMOR_FORTRESS, thaumium);

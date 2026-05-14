@@ -782,3 +782,22 @@ Recommended checkpoint order for Stage 5 implementation:
 2. `port: restore wand and pouch NBT compatibility` — canonical wand vis NBT, 18-slot Focus Pouch `Inventory`/`Slot` NBT, Baubles focus pouch shared inventory.
 3. `port: restore Vis Amulet relay boundary` — either documented Stage 4 blocker or minimal `TileVisRelay` plus amulet relay fill.
 4. `client/resources: add Stage5 item static resources` — original item textures, item model JSONs, adapted lang keys.
+
+### 8.6 2026-05-14 implementation checkpoint
+
+Additional Stage 5 work in the current uncommitted diff:
+
+- Wand core now forwards architect area preview methods through `IArchitect`, uses staff runes for focus potency, keeps frugal upgrade-only, and passes the embedded focus stack into focus animation lookup: `src/main/java/thaumcraft/common/items/wands/ItemWandCasting.java:48`, `src/main/java/thaumcraft/common/items/wands/ItemWandCasting.java:247-277`, `src/main/java/thaumcraft/common/items/wands/ItemWandCasting.java:494-503`, `src/main/java/thaumcraft/common/items/wands/ItemWandCasting.java:542-560`.
+- Focus Pouch subtype semantics were aligned with reference while keeping the 18-slot `Inventory`/`Slot` NBT baseline: `src/main/java/thaumcraft/common/items/wands/ItemFocusPouch.java:22-31`, `src/main/java/thaumcraft/common/items/wands/ItemFocusPouch.java:51-86`.
+- Hover Harness fuel consumption now restricts stored fuel to jar item stacks rather than any essentia container and turns hover off when the last ENERGY is consumed: `src/main/java/thaumcraft/common/items/armor/Hover.java:87-113`.
+- Robe and Void Robe color NBT, cauldron color clearing, vis discount, void robe warp value, and shared dye recipe logic were restored at common-layer level: `src/main/java/thaumcraft/common/items/armor/ItemRobeArmor.java:22-109`, `src/main/java/thaumcraft/common/items/armor/ItemVoidRobeArmor.java:23-95`, `src/main/java/thaumcraft/common/items/armor/RecipesRobeArmorDyes.java:13-109`, `src/main/java/thaumcraft/common/items/armor/RecipesVoidRobeArmorDyes.java:5-10`.
+
+Validation evidence for this checkpoint:
+
+- `./scripts/dev.sh compileJava` passed.
+- `./scripts/dev.sh build` passed.
+- `./scripts/dev.sh check-jar` passed.
+- `./scripts/dev.sh smoke-server` passed and reached `Done (` with no crash markers.
+- `./scripts/dev.sh smoke-client` was attempted because `DISPLAY` was set, but failed before mod initialization with LWJGL display mode discovery: `java.lang.ArrayIndexOutOfBoundsException: 0` in `org.lwjgl.opengl.LinuxDisplay.getAvailableDisplayModes`. Treat this as an environment/display failure, not Stage 5 parity evidence.
+
+Stage 5 remains open after this checkpoint. Remaining high-risk work includes Death Bucket fluid placement because the current port has no `ConfigBlocks.blockFluidDeath`, Hand Mirror cross-dimension transport, full Hover client toggle/sound/movement parity, static item resources/models/lang, recipe registration ownership, and manual in-world scenario validation for every focus, bauble, relic, utility item and armor/tool behavior.
