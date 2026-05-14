@@ -89,19 +89,16 @@ Do not use broad staging commands like:
     git add .
     git add -A
 
-Use commit messages in this format:
+Use commit messages in this format (example):
 
-    docs: add Codex parity runbook
-    port: close pre-Phase8 focus server blockers
-    port: restore wand and bauble vis integration
-    port: restore research compatibility and frugal applicability
-    port: restore boss and special mob server behavior
-    client: add Phase 8 GUI registrations
-    client: port core Thaumcraft GUIs
-    client: port TESR and entity renderer baseline
-    client: port particles beams and shader baseline
-    content: restore recipes and research registrations
-    polish: finalize runtime parity checks
+```text
+feat(sources): add bybit proof of reserves source
+
+    Changes:
+    - Add Bybit proof-of-reserves source using the official frontend reserve ratio JSON endpoint
+    - Normalize target asset reserve ratio and missing-asset transparency candidates with source-local tests
+    - Wire scheduled checks and refresh source docs
+```
 
 Each final report must include:
 
