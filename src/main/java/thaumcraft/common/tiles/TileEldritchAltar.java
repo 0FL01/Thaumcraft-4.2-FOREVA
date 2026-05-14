@@ -1,14 +1,48 @@
 package thaumcraft.common.tiles;
 
+import java.util.List;
+import net.minecraft.entity.EntityCreature;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.ITickable;
+import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.util.math.BlockPos;
 import thaumcraft.api.TileThaumcraft;
+import thaumcraft.common.entities.monster.EntityCultist;
+import thaumcraft.common.entities.monster.EntityCultistCleric;
+import thaumcraft.common.entities.monster.EntityCultistKnight;
+import thaumcraft.common.entities.monster.EntityEldritchGuardian;
+import thaumcraft.common.lib.world.dim.MazeHandler;
+import thaumcraft.common.lib.world.dim.MazeThread;
 
-public class TileEldritchAltar extends TileThaumcraft {
+public class TileEldritchAltar extends TileThaumcraft implements ITickable {
     private boolean spawner = false;
     private boolean open = false;
     private boolean spawnedClerics = false;
     private byte spawnType = 0;
     private byte eyes = 0;
+    private int counter = 0;
+
+    @Override
+    public void update() {
+        if (this.world == null || this.world.isRemote || !this.spawner) return;
+        if (this.counter++ < 80 || this.counter % 40 != 0) return;
+
+        if (this.spawnType == 0) {
+            if (!this.spawnedClerics) {
+                spawnClerics();
+            } else {
+                spawnGuards();
+            }
+        } else if (this.spawnType == 1) {
+            spawnGuardian();
+        }
+    }
+
+    @Override
+    public double getMaxRenderDistanceSquared() {
+        return 9216.0;
+    }
 
     @Override
     public void readCustomNBT(NBTTagCompound compound) {
@@ -73,5 +107,92 @@ public class TileEldritchAltar extends TileThaumcraft {
     public void setOpen(boolean open) {
         this.open = open;
         this.markDirty();
+    }
+
+    public boolean checkForMaze() {
+        if (this.world == null) return true;
+        int width = 15 + this.world.rand.nextInt(8) * 2;
+        int height = 15 + this.world.rand.nextInt(8) * 2;
+        int chunkX = this.pos.getX() >> 4;
+        int chunkZ = this.pos.getZ() >> 4;
+        if (!MazeHandler.mazesInRange(chunkX, chunkZ, width, height)) {
+            Thread mazeThread = new Thread(new MazeThread(chunkX, chunkZ, width, height, this.world.rand.nextLong()));
+            mazeThread.start();
+            return false;
+        }
+        return true;
+    }
+
+    private void spawnGuards() {
+        AxisAlignedBB area = new AxisAlignedBB(this.pos).grow(24.0, 16.0, 24.0);
+        List<EntityCultistCleric> clerics = this.world.getEntitiesWithinAABB(EntityCultistCleric.class, area);
+        if (clerics.isEmpty()) {
+            setSpawner(false);
+            return;
+        }
+
+        List<EntityCultist> cultists = this.world.getEntitiesWithinAABB(EntityCultist.class, area);
+        if (cultists.size() >= 8) return;
+
+        EntityCultistKnight knight = new EntityCultistKnight(this.world);
+        BlockPos spawnPos = randomSpawnPos(4, 10, 3);
+        if (canSpawnAt(spawnPos, knight)) {
+            spawnLiving(knight, spawnPos, 16);
+        }
+    }
+
+    private void spawnGuardian() {
+        EntityEldritchGuardian guardian = new EntityEldritchGuardian(this.world);
+        BlockPos spawnPos = randomSpawnPos(4, 10, 3);
+        if (canSpawnAt(spawnPos, guardian) && guardian.getCanSpawnHere()) {
+            spawnLiving(guardian, spawnPos, 16);
+        }
+    }
+
+    private void spawnClerics() {
+        int success = 0;
+        int[][] offsets = {{-2, -2}, {-2, 2}, {2, -2}, {2, 2}};
+        for (int[] offset : offsets) {
+            BlockPos spawnPos = this.pos.add(offset[0], 0, offset[1]);
+            EntityCultistCleric cleric = new EntityCultistCleric(this.world);
+            if (!canSpawnAt(spawnPos, cleric)) continue;
+            if (spawnLiving(cleric, spawnPos, 8)) {
+                success++;
+                cleric.setIsRitualist(true);
+            }
+        }
+        if (success > 2) {
+            this.spawnedClerics = true;
+            this.markDirty();
+        }
+    }
+
+    private BlockPos randomSpawnPos(int minHorizontal, int maxHorizontal, int maxVertical) {
+        int xOffset = randomSignedRange(minHorizontal, maxHorizontal);
+        int yOffset = randomSignedRange(0, maxVertical);
+        int zOffset = randomSignedRange(minHorizontal, maxHorizontal);
+        return this.pos.add(xOffset, yOffset, zOffset);
+    }
+
+    private int randomSignedRange(int min, int max) {
+        int value = min + this.world.rand.nextInt(max - min + 1);
+        return value * (this.world.rand.nextBoolean() ? 1 : -1);
+    }
+
+    private boolean canSpawnAt(BlockPos spawnPos, EntityCreature entity) {
+        BlockPos floor = spawnPos.down();
+        if (!this.world.getBlockState(floor).isSideSolid(this.world, floor, EnumFacing.UP)) return false;
+        entity.setPosition(spawnPos.getX() + 0.5, spawnPos.getY(), spawnPos.getZ() + 0.5);
+        return this.world.checkNoEntityCollision(entity.getEntityBoundingBox())
+                && this.world.getCollisionBoxes(entity, entity.getEntityBoundingBox()).isEmpty()
+                && !this.world.containsAnyLiquid(entity.getEntityBoundingBox());
+    }
+
+    private boolean spawnLiving(EntityCreature entity, BlockPos spawnPos, int homeDistance) {
+        entity.setPosition(spawnPos.getX() + 0.5, spawnPos.getY(), spawnPos.getZ() + 0.5);
+        entity.onInitialSpawn(this.world.getDifficultyForLocation(spawnPos), null);
+        entity.enablePersistence();
+        entity.setHomePosAndDistance(this.pos, homeDistance);
+        return this.world.spawnEntity(entity);
     }
 }

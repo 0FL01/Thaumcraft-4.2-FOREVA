@@ -194,9 +194,34 @@ Validation:
 
 Remaining limits:
 
-- Full `TileEldritchAltar` cultist/guardian spawning and portal-opening behavior is still not ported by this checkpoint.
+- Full `TileEldritchAltar` cultist/guardian spawning and portal-opening behavior was not ported by this ring checkpoint; the following altar checkpoint handles the spawner part while portal opening remains open.
 - Runtime ring discovery, `labyrinth.dat` save evidence, and portal traversal were not manually run because user-driven GUI/client control is excluded from this durable goal and the smoke-server environment remains blocked by the known pre-Forge timeout.
 - Hilltop altar, mound/barrow, normal/spider Greatwood, and broader surface worldgen parity remain open Stage 7 work.
+
+### 2026-05-14 — Stage 7 Eldritch altar spawner lifecycle
+
+Scope:
+
+- Ported the server-side `TileEldritchAltar` tick loop for generated altar spawners.
+- Restored persistent altar fields for `spawner`, `spawnedClerics`, `spawntype`, `eyes`, and `open`.
+- Added ritual cleric spawning for spawn type `0`, including ritualist flagging and altar home positions.
+- Added follow-up guard spawning for spawn type `0` once ritual clerics exist, with nearby cultist caps.
+- Added Eldritch Guardian spawning for spawn type `1`, with home positions and persistence.
+- Added the reference-like `checkForMaze()` helper that starts a new odd-sized maze thread when no maze exists around the altar.
+
+Validation:
+
+- `./scripts/dev.sh compileJava` — initially failed because the first 1.12.2 adaptation used unavailable `World.doesBlockHaveSolidTopSurface(...)` and typed the spawn helper as `EntityLiving`, which does not expose `setHomePosAndDistance(...)`; fixed during the checkpoint.
+- `./scripts/dev.sh compileJava` — passed after switching to `IBlockState.isSideSolid(...)` and `EntityCreature`.
+- `./scripts/dev.sh build` — passed.
+- `./scripts/dev.sh check-jar` — failed before jar inspection because the wrapper's expected MCP mapping cache file is still absent at `.gradle_home/caches/minecraft/de/oceanlabs/mcp/mcp_stable/39/1.12.2/srgs/mcp-srg.srg`.
+- `./scripts/dev.sh smoke-server` — failed by timeout before ready state; log again stopped immediately after `Calling tweak class net.minecraftforge.fml.common.launcher.FMLServerTweaker`, with only Log4j console appender initialization errors, no new crash reports, and no mod-load crash markers. This matches the clean `da3f307` baseline reproduction recorded above.
+
+Remaining limits:
+
+- Portal-opening behavior that consumes altar eyes/open state is still not implemented.
+- Cultist/guardian spawning has not been observed in a runtime world because smoke/manual runtime validation remains environment-blocked or excluded as user-driven client control.
+- Stage 6 entity combat behavior can still affect full in-world altar scenario parity.
 
 ## Next Checkpoint Candidate
 
