@@ -127,6 +127,28 @@ Remaining limits:
 - Renderer parity for altar/obelisk/cap/lock/crab spawner/trap remains Stage 8 work; JSONs are non-GUI resource fallbacks only.
 - Full Outer Lands room traversal/manual generation validation remains skipped by user instruction.
 
+### 2026-05-14 — Stage 7 safe Outer Lands teleporter placement
+
+Scope:
+
+- Replaced fixed `y=60` placement in `TeleporterThaumcraft` with reference-like search for the nearest `ConfigBlocks.blockEldritchPortal` within 128 blocks.
+- Added per-teleporter portal-position caching through the inherited Forge 1.12.2 `destinationCoordinateCache`.
+- Zeroed entity velocity on placement and moved arrivals beside the found portal instead of inside an arbitrary fixed column.
+- Added a safe top-position fallback when no existing portal can be found, avoiding silent placement at a hardcoded Y coordinate.
+- Added null target-world guards in `BlockEldritchPortal` before calling `changeDimension(...)`.
+
+Validation:
+
+- `./scripts/dev.sh compileJava` — passed.
+- `./scripts/dev.sh build` — passed.
+- `./scripts/dev.sh check-jar` — failed before jar inspection because the wrapper's expected MCP mapping cache file is still absent at `.gradle_home/caches/minecraft/de/oceanlabs/mcp/mcp_stable/39/1.12.2/srgs/mcp-srg.srg`.
+- `./scripts/dev.sh smoke-server` — failed by timeout before ready state; log again stopped immediately after `Calling tweak class net.minecraftforge.fml.common.launcher.FMLServerTweaker`, with only Log4j console appender initialization errors, no new crash reports, and no mod-load crash markers. This matches the clean `da3f307` baseline reproduction recorded above.
+
+Remaining limits:
+
+- Safe teleporter placement is advanced, but GAP-3 is not fully closed because the reference-like `TileEldritchPortal` tick trigger and manual portal traversal evidence remain out of scope for user-driven validation.
+- Portal generation/maze placement is not proven by this checkpoint.
+
 ## Next Checkpoint Candidate
 
 After the BlockLoot urn/crate checkpoint, the next pre-Phase8 candidates are:

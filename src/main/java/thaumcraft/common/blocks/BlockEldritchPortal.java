@@ -10,6 +10,7 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldServer;
 import thaumcraft.common.config.Config;
 import thaumcraft.common.config.ConfigBlocks;
 import thaumcraft.common.lib.world.dim.TeleporterThaumcraft;
@@ -66,11 +67,15 @@ public class BlockEldritchPortal extends Block {
 
                     if (player.dimension != targetDim) {
                         // Clamp position to valid area in target dimension
-                        TeleporterThaumcraft teleporter = new TeleporterThaumcraft(server.getWorld(targetDim));
+                        WorldServer targetWorld = server.getWorld(targetDim);
+                        if (targetWorld == null) return;
+                        TeleporterThaumcraft teleporter = new TeleporterThaumcraft(targetWorld);
                         player.changeDimension(targetDim, teleporter);
                     } else {
                         // Already in dimension - teleport to overworld
-                        player.changeDimension(0, new TeleporterThaumcraft(server.getWorld(0)));
+                        WorldServer targetWorld = server.getWorld(0);
+                        if (targetWorld == null) return;
+                        player.changeDimension(0, new TeleporterThaumcraft(targetWorld));
                     }
                 }
             }
