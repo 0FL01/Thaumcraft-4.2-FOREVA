@@ -46,6 +46,9 @@ import thaumcraft.common.lib.network.playerdata.PacketSyncScannedEntities;
 import thaumcraft.common.lib.network.playerdata.PacketSyncScannedItems;
 import thaumcraft.common.lib.network.playerdata.PacketSyncScannedPhenomena;
 import thaumcraft.common.lib.network.playerdata.PacketSyncWarp;
+import thaumcraft.common.lib.network.playerdata.PacketSyncWipe;
+import thaumcraft.common.lib.network.playerdata.PacketRunicCharge;
+import thaumcraft.common.lib.research.ResearchManager;
 
 import java.io.File;
 import java.util.List;
@@ -72,6 +75,16 @@ public class EventHandlerEntity {
     public void onEntityJoinWorld(EntityJoinWorldEvent event) {
         if (!event.getWorld().isRemote && event.getEntity() instanceof EntityPlayer) {
             EntityPlayer player = (EntityPlayer) event.getEntity();
+            IPlayerKnowledge knowledge = player.getCapability(PlayerKnowledgeProvider.PLAYER_KNOWLEDGE, null);
+            if (knowledge != null) {
+                knowledge.setPlayer(player);
+                ResearchManager.initializeFreshPlayerData(player);
+                if (Thaumcraft.instance != null && Thaumcraft.instance.runicEventHandler != null) {
+                    Thaumcraft.instance.runicEventHandler.runicCharge.put(player.getEntityId(), knowledge.getRunicCharge());
+                    Thaumcraft.instance.runicEventHandler.isDirty = true;
+                }
+                ResearchManager.updateCache(player.getName(), knowledge);
+            }
             syncAllData(player);
         }
     }
@@ -89,29 +102,35 @@ public class EventHandlerEntity {
         if (oldCap != null && newCap != null) {
             newCap.deserializeNBT(oldCap.serializeNBT());
             newCap.setPlayer(clone);
+            ResearchManager.updateCache(clone.getName(), newCap);
         }
 
-        if (!event.isWasDeath()) {
-            if (!clone.getEntityWorld().isRemote) {
-                syncAllData(clone);
-            }
+        if (!clone.getEntityWorld().isRemote) {
+            syncAllData(clone);
         }
     }
 
     // ---- Sync helper ----
 
     public static void syncAllData(EntityPlayer player) {
-        if (player.getEntityWorld().isRemote) return;
+        if (player.getEntityWorld().isRemote || !(player instanceof EntityPlayerMP)) return;
 
         IPlayerKnowledge knowledge = player.getCapability(PlayerKnowledgeProvider.PLAYER_KNOWLEDGE, null);
         if (knowledge == null) return;
 
+        PacketHandler.INSTANCE.sendTo(new PacketSyncWipe(), (EntityPlayerMP) player);
         PacketHandler.INSTANCE.sendTo(new PacketSyncAspects(knowledge.getAspectsDiscovered()), (EntityPlayerMP) player);
         PacketHandler.INSTANCE.sendTo(new PacketSyncResearch(knowledge.getResearchComplete()), (EntityPlayerMP) player);
         PacketHandler.INSTANCE.sendTo(new PacketSyncScannedEntities(knowledge.getScannedEntities()), (EntityPlayerMP) player);
         PacketHandler.INSTANCE.sendTo(new PacketSyncScannedItems(knowledge.getScannedItems()), (EntityPlayerMP) player);
         PacketHandler.INSTANCE.sendTo(new PacketSyncScannedPhenomena(knowledge.getScannedPhenomena()), (EntityPlayerMP) player);
-        PacketHandler.INSTANCE.sendTo(new PacketSyncWarp(knowledge.getWarpPerm(), knowledge.getWarpSticky(), knowledge.getWarpTemp()), (EntityPlayerMP) player);
+        PacketHandler.INSTANCE.sendTo(new PacketSyncWarp(knowledge.getWarpPerm(), knowledge.getWarpSticky(), knowledge.getWarpTemp(), knowledge.getWarpCounter()), (EntityPlayerMP) player);
+        if (Thaumcraft.instance != null && Thaumcraft.instance.runicEventHandler != null) {
+            Integer[] info = Thaumcraft.instance.runicEventHandler.runicInfo.get(player.getEntityId());
+            int max = info == null || info.length == 0 ? 0 : info[0];
+            PacketHandler.INSTANCE.sendTo(new PacketRunicCharge(player.getEntityId(), knowledge.getRunicCharge(), max), (EntityPlayerMP) player);
+        }
+        ResearchManager.updateCache(player.getName(), knowledge);
     }
 
     // ==========================================================
@@ -149,6 +168,7 @@ public class EventHandlerEntity {
         IPlayerKnowledge knowledge = player.getCapability(PlayerKnowledgeProvider.PLAYER_KNOWLEDGE, null);
         if (knowledge != null) {
             knowledge.setWarpCounter(0);
+            ResearchManager.syncWarp(player);
         }
     }
 
@@ -272,7 +292,7 @@ public class EventHandlerEntity {
      */
     @SubscribeEvent
     public void onPlayerLoadFromFile(PlayerEvent.LoadFromFile event) {
-        // Phase 8: legacy warpCounter.dat -> capability migration
+        // Fresh-world Stage 3 data is stored by Forge capability serialization.
     }
 
     /**
@@ -280,7 +300,9 @@ public class EventHandlerEntity {
      */
     @SubscribeEvent
     public void onPlayerSaveToFile(PlayerEvent.SaveToFile event) {
-        // Phase 8: legacy warpCounter.dat save (if needed)
+        if (event.getEntityPlayer() != null) {
+            ResearchManager.updateCache(event.getEntityPlayer());
+        }
     }
 
     /**

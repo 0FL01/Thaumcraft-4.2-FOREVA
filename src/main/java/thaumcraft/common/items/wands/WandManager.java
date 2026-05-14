@@ -74,30 +74,11 @@ public class WandManager {
             }
         }
 
-        // Check main hand
-        ItemStack mainHand = player.getHeldItemMainhand();
-        if (!mainHand.isEmpty() && mainHand.getItem() instanceof ItemWandCasting) {
-            ItemWandCasting wand = (ItemWandCasting) mainHand.getItem();
-            if (wand.consumeAllVis(mainHand, player, cost, true, false)) {
-                return true;
-            }
-        }
-
-        // Check off hand
-        ItemStack offHand = player.getHeldItemOffhand();
-        if (!offHand.isEmpty() && offHand.getItem() instanceof ItemWandCasting) {
-            ItemWandCasting wand = (ItemWandCasting) offHand.getItem();
-            if (wand.consumeAllVis(offHand, player, cost, true, false)) {
-                return true;
-            }
-        }
-
-        // Check hotbar and inventory
-        for (int i = 0; i < player.inventory.getSizeInventory(); i++) {
-            ItemStack stack = player.inventory.getStackInSlot(i);
+        for (int i = player.inventory.mainInventory.size() - 1; i >= 0; i--) {
+            ItemStack stack = player.inventory.mainInventory.get(i);
             if (!stack.isEmpty() && stack.getItem() instanceof ItemWandCasting) {
                 ItemWandCasting wand = (ItemWandCasting) stack.getItem();
-                if (wand.consumeAllVis(stack, player, cost, true, false)) {
+                if (wand.consumeAllVis(stack, player, cost, true, true)) {
                     return true;
                 }
             }

@@ -21,8 +21,10 @@ public class PlayerKnowledgeCapability implements IPlayerKnowledge {
     private int warpTemp = 0;
     private int warpCounter = 0;
 
-    // Aspects discovered
-    private final Set<String> discoveredAspects = new HashSet<>();
+    // Discovered aspects and their research pool amounts. Reference PlayerKnowledge
+    // stores both concepts in one AspectList: presence means discovered, amount is pool.
+    private final AspectList discoveredAspects = new AspectList();
+    private boolean initializedAspects = false;
 
     // Scanned entities, items, phenomena
     private final Set<String> scannedEntities = new HashSet<>();
@@ -31,6 +33,9 @@ public class PlayerKnowledgeCapability implements IPlayerKnowledge {
 
     // Completed research
     private final Set<String> researchComplete = new HashSet<>();
+
+    // Player runic shield charge. Max charge is equipment-derived and resynced live.
+    private int runicCharge = 0;
 
     public PlayerKnowledgeCapability() {
     }
@@ -115,31 +120,94 @@ public class PlayerKnowledgeCapability implements IPlayerKnowledge {
 
     @Override
     public boolean hasDiscoveredAspect(String tag) {
-        return discoveredAspects.contains(tag);
+        Aspect aspect = Aspect.getAspect(tag);
+        return aspect != null && discoveredAspects.aspects.containsKey(aspect);
     }
 
     @Override
     public boolean hasDiscoveredAspect(Aspect aspect) {
-        return aspect != null && discoveredAspects.contains(aspect.getTag());
+        return aspect != null && discoveredAspects.aspects.containsKey(aspect);
     }
 
     @Override
     public void addDiscoveredAspect(String tag) {
-        if (tag != null) {
-            discoveredAspects.add(tag);
+        Aspect aspect = Aspect.getAspect(tag);
+        if (aspect != null && !discoveredAspects.aspects.containsKey(aspect)) {
+            discoveredAspects.add(aspect, 0);
         }
     }
 
     @Override
     public AspectList getAspectsDiscovered() {
-        AspectList list = new AspectList();
-        for (String tag : discoveredAspects) {
-            Aspect aspect = Aspect.aspects.get(tag);
-            if (aspect != null) {
-                list.add(aspect, 1);
+        addDiscoveredPrimalAspects();
+        return discoveredAspects.copy();
+    }
+
+    @Override
+    public void setAspectsDiscovered(AspectList aspects) {
+        discoveredAspects.aspects.clear();
+        if (aspects != null) {
+            for (Aspect aspect : aspects.getAspects()) {
+                if (aspect != null) {
+                    discoveredAspects.aspects.put(aspect, Math.max(0, aspects.getAmount(aspect)));
+                }
             }
         }
-        return list;
+        addDiscoveredPrimalAspects();
+    }
+
+    @Override
+    public boolean hasDiscoveredParentAspects(Aspect aspect) {
+        if (aspect == null) return false;
+        Aspect[] components = aspect.getComponents();
+        if (components == null) return true;
+        for (Aspect component : components) {
+            if (!hasDiscoveredAspect(component)) return false;
+        }
+        return true;
+    }
+
+    @Override
+    public void addDiscoveredPrimalAspects() {
+        for (Aspect aspect : Aspect.getPrimalAspects()) {
+            if (aspect != null && !discoveredAspects.aspects.containsKey(aspect)) {
+                discoveredAspects.add(aspect, 0);
+            }
+        }
+    }
+
+    @Override
+    public int getAspectPoolFor(Aspect aspect) {
+        return aspect == null ? 0 : Math.max(0, discoveredAspects.getAmount(aspect));
+    }
+
+    @Override
+    public boolean addAspectPool(Aspect aspect, int amount) {
+        if (aspect == null || amount == 0) return false;
+        if (!discoveredAspects.aspects.containsKey(aspect)) {
+            discoveredAspects.add(aspect, 0);
+        }
+        int current = discoveredAspects.getAmount(aspect);
+        int updated = Math.max(0, current + amount);
+        discoveredAspects.aspects.put(aspect, updated);
+        return updated != current;
+    }
+
+    @Override
+    public boolean setAspectPool(Aspect aspect, int amount) {
+        if (aspect == null) return false;
+        discoveredAspects.aspects.put(aspect, Math.max(0, amount));
+        return true;
+    }
+
+    @Override
+    public boolean hasInitializedAspects() {
+        return initializedAspects;
+    }
+
+    @Override
+    public void setInitializedAspects(boolean initialized) {
+        this.initializedAspects = initialized;
     }
 
     // ---- Scanned Entities ----
@@ -157,7 +225,7 @@ public class PlayerKnowledgeCapability implements IPlayerKnowledge {
     @Override
     public void scanEntity(String entityName) {
         if (entityName != null) {
-            scannedEntities.add(entityName);
+            addScanKey(scannedEntities, entityName);
         }
     }
 
@@ -176,7 +244,7 @@ public class PlayerKnowledgeCapability implements IPlayerKnowledge {
     @Override
     public void scanItem(String registryName) {
         if (registryName != null) {
-            scannedItems.add(registryName);
+            addScanKey(scannedItems, registryName);
         }
     }
 
@@ -195,7 +263,7 @@ public class PlayerKnowledgeCapability implements IPlayerKnowledge {
     @Override
     public void scanPhenomena(String key) {
         if (key != null) {
-            scannedPhenomena.add(key);
+            addScanKey(scannedPhenomena, key);
         }
     }
 
@@ -225,6 +293,31 @@ public class PlayerKnowledgeCapability implements IPlayerKnowledge {
         }
     }
 
+    @Override
+    public int getRunicCharge() {
+        return runicCharge;
+    }
+
+    @Override
+    public void setRunicCharge(int amount) {
+        this.runicCharge = Math.max(0, amount);
+    }
+
+    @Override
+    public void reset() {
+        warpPerm = 0;
+        warpSticky = 0;
+        warpTemp = 0;
+        warpCounter = 0;
+        runicCharge = 0;
+        initializedAspects = false;
+        discoveredAspects.aspects.clear();
+        scannedEntities.clear();
+        scannedItems.clear();
+        scannedPhenomena.clear();
+        researchComplete.clear();
+    }
+
     // ---- NBT Serialization ----
 
     private static final String TAG_WARP_PERM = "warpPerm";
@@ -232,10 +325,12 @@ public class PlayerKnowledgeCapability implements IPlayerKnowledge {
     private static final String TAG_WARP_TEMP = "warpTemp";
     private static final String TAG_WARP_COUNTER = "warpCounter";
     private static final String TAG_DISCOVERED_ASPECTS = "discoveredAspects";
+    private static final String TAG_INITIALIZED_ASPECTS = "initializedAspects";
     private static final String TAG_SCANNED_ENTITIES = "scannedEntities";
     private static final String TAG_SCANNED_ITEMS = "scannedItems";
     private static final String TAG_SCANNED_PHENOMENA = "scannedPhenomena";
     private static final String TAG_RESEARCH_COMPLETE = "researchComplete";
+    private static final String TAG_RUNIC_CHARGE = "runicCharge";
 
     @Override
     public NBTTagCompound serializeNBT() {
@@ -245,8 +340,10 @@ public class PlayerKnowledgeCapability implements IPlayerKnowledge {
         nbt.setInteger(TAG_WARP_STICKY, warpSticky);
         nbt.setInteger(TAG_WARP_TEMP, warpTemp);
         nbt.setInteger(TAG_WARP_COUNTER, warpCounter);
+        nbt.setInteger(TAG_RUNIC_CHARGE, runicCharge);
+        nbt.setBoolean(TAG_INITIALIZED_ASPECTS, initializedAspects);
 
-        writeStringSet(nbt, TAG_DISCOVERED_ASPECTS, discoveredAspects);
+        writeAspectList(nbt, TAG_DISCOVERED_ASPECTS, discoveredAspects);
         writeStringSet(nbt, TAG_SCANNED_ENTITIES, scannedEntities);
         writeStringSet(nbt, TAG_SCANNED_ITEMS, scannedItems);
         writeStringSet(nbt, TAG_SCANNED_PHENOMENA, scannedPhenomena);
@@ -263,8 +360,10 @@ public class PlayerKnowledgeCapability implements IPlayerKnowledge {
         warpSticky = nbt.getInteger(TAG_WARP_STICKY);
         warpTemp = nbt.getInteger(TAG_WARP_TEMP);
         warpCounter = nbt.getInteger(TAG_WARP_COUNTER);
+        runicCharge = nbt.getInteger(TAG_RUNIC_CHARGE);
+        initializedAspects = nbt.getBoolean(TAG_INITIALIZED_ASPECTS);
 
-        readStringSet(nbt, TAG_DISCOVERED_ASPECTS, discoveredAspects);
+        readAspectList(nbt, TAG_DISCOVERED_ASPECTS, discoveredAspects);
         readStringSet(nbt, TAG_SCANNED_ENTITIES, scannedEntities);
         readStringSet(nbt, TAG_SCANNED_ITEMS, scannedItems);
         readStringSet(nbt, TAG_SCANNED_PHENOMENA, scannedPhenomena);
@@ -286,6 +385,38 @@ public class PlayerKnowledgeCapability implements IPlayerKnowledge {
             for (int i = 0; i < list.tagCount(); i++) {
                 set.add(list.getStringTagAt(i));
             }
+        }
+    }
+
+    private void writeAspectList(NBTTagCompound nbt, String tag, AspectList aspects) {
+        NBTTagList list = new NBTTagList();
+        for (Aspect aspect : aspects.getAspects()) {
+            if (aspect == null) continue;
+            NBTTagCompound entry = new NBTTagCompound();
+            entry.setString("key", aspect.getTag());
+            entry.setInteger("amount", Math.max(0, aspects.getAmount(aspect)));
+            list.appendTag(entry);
+        }
+        nbt.setTag(tag, list);
+    }
+
+    private void readAspectList(NBTTagCompound nbt, String tag, AspectList aspects) {
+        aspects.aspects.clear();
+        if (!nbt.hasKey(tag, Constants.NBT.TAG_LIST)) return;
+        NBTTagList list = nbt.getTagList(tag, Constants.NBT.TAG_COMPOUND);
+        for (int i = 0; i < list.tagCount(); i++) {
+            NBTTagCompound entry = list.getCompoundTagAt(i);
+            Aspect aspect = Aspect.getAspect(entry.getString("key"));
+            if (aspect != null) {
+                aspects.aspects.put(aspect, Math.max(0, entry.getInteger("amount")));
+            }
+        }
+    }
+
+    private void addScanKey(Set<String> set, String key) {
+        set.add(key);
+        if (key.startsWith("#")) {
+            set.remove("@" + key.substring(1));
         }
     }
 }

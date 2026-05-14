@@ -225,11 +225,12 @@ public final class WarpEvents {
             IPlayerKnowledge knowledge = CommonProxy.getPlayerKnowledge(player);
             if (knowledge != null) {
                 knowledge.addDiscoveredAspect(aspect.getTag());
-                // Phase 8: sync aspect pool to client
-                // PacketHandler.INSTANCE.sendTo(new PacketAspectPool(aspect.getTag(), (short)1, 0), (EntityPlayerMP)player);
+                if (knowledge.addAspectPool(aspect, 1)) {
+                    PacketHandler.INSTANCE.sendTo(new PacketAspectPool(aspect.getTag(), (short)1, knowledge.getAspectPoolFor(aspect)), (EntityPlayerMP)player);
+                }
+                ResearchManager.updateCache(player.getName(), knowledge);
             }
         }
-        // ResearchManager.scheduleSave(player); -- not available in port
     }
 
     private static void spawnGuardian(EntityPlayer player) {
@@ -336,8 +337,9 @@ public final class WarpEvents {
         IPlayerKnowledge knowledge = CommonProxy.getPlayerKnowledge(player);
         if (knowledge == null) return;
         PacketHandler.INSTANCE.sendTo(
-                new PacketSyncWarp(knowledge.getWarpPerm(), knowledge.getWarpSticky(), knowledge.getWarpTemp()),
+                new PacketSyncWarp(knowledge.getWarpPerm(), knowledge.getWarpSticky(), knowledge.getWarpTemp(), knowledge.getWarpCounter()),
                 (EntityPlayerMP) player
         );
+        ResearchManager.updateCache(player.getName(), knowledge);
     }
 }

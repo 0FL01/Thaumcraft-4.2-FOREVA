@@ -6,12 +6,14 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.EnumRarity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.World;
+import thaumcraft.api.nodes.INode;
 import thaumcraft.common.lib.research.ScanManager;
 import thaumcraft.common.lib.utils.BlockUtils;
 import thaumcraft.common.lib.utils.EntityUtils;
@@ -43,6 +45,16 @@ public class ItemThaumometer extends Item {
             RayTraceResult mop = this.rayTrace(world, player, true);
             if (mop != null && mop.typeOfHit == RayTraceResult.Type.BLOCK) {
                 BlockPos pos = mop.getBlockPos();
+                TileEntity tile = world.getTileEntity(pos);
+                if (tile instanceof INode) {
+                    INode node = (INode)tile;
+                    String id = node.getId();
+                    if (id == null || id.isEmpty()) {
+                        id = world.provider.getDimension() + ":" + pos.getX() + ":" + pos.getY() + ":" + pos.getZ();
+                    }
+                    ScanManager.scanPhenomena(player, "NODE" + id);
+                    return new ActionResult<>(EnumActionResult.SUCCESS, stack);
+                }
                 IBlockState state = world.getBlockState(pos);
                 ItemStack target = state.getBlock().getPickBlock(state, mop, world, pos, player);
                 if (target == null || target.isEmpty()) {

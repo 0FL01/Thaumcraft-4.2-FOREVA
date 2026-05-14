@@ -16,6 +16,9 @@ import thaumcraft.api.aspects.IEssentiaContainerItem;
 import thaumcraft.common.items.wands.ItemWandCasting;
 import thaumcraft.common.lib.CreativeTabThaumcraft;
 import thaumcraft.common.lib.research.ResearchManager;
+import thaumcraft.common.tiles.TileVisRelay;
+
+import java.lang.ref.WeakReference;
 
 public class ItemAmuletVis extends Item implements IBauble, IEssentiaContainerItem {
 
@@ -132,6 +135,24 @@ public class ItemAmuletVis extends Item implements IBauble, IEssentiaContainerIt
                 if (amount <= 0) continue;
                 this.storeVis(itemstack, aspect, stored - amount);
                 ItemWandCasting.addRealVis(held, aspect, amount);
+            }
+        }
+        if (player instanceof EntityPlayer) {
+            WeakReference<TileVisRelay> relayRef = TileVisRelay.nearbyPlayers.get(player.getEntityId());
+            TileVisRelay relay = relayRef == null ? null : relayRef.get();
+            if (relay == null || relay.isInvalid() || relay.getWorld() != player.world || player.getDistanceSq(relay.getPos()) >= 26.0D) {
+                TileVisRelay.nearbyPlayers.remove(player.getEntityId());
+                return;
+            }
+            for (Aspect aspect : Aspect.getPrimalAspects()) {
+                int room = this.getMaxVis(itemstack) - this.getVis(itemstack, aspect);
+                int amount = Math.min(5, room);
+                if (amount <= 0) continue;
+                int drained = relay.consumeVis(aspect, amount);
+                if (drained > 0) {
+                    this.addRealVis(itemstack, aspect, drained, true);
+                    relay.triggerConsumeEffect(aspect);
+                }
             }
         }
     }

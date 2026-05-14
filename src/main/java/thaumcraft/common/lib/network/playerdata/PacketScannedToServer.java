@@ -71,15 +71,15 @@ public class PacketScannedToServer extends PacketBase {
             if (this.type == 1) {
                 Item item = Item.getItemById(this.id);
                 if (item != null) {
-                    result = ScanManager.scanItem(player, new ItemStack(item, 1, this.md));
+                    result = new ScanResult((byte)1, this.id, this.md, null, null);
                 }
             } else if (this.type == 2) {
                 Entity entity = this.entityid == 0 ? null : player.world.getEntityByID(this.entityid);
-                result = ScanManager.scanEntity(player, entity);
+                result = entity == null ? null : new ScanResult((byte)2, 0, 0, entity, null);
             } else if (this.type == 3) {
-                result = ScanManager.scanPhenomena(player, this.phenomena);
+                result = new ScanResult((byte)3, 0, 0, null, this.phenomena);
             }
-            if (result != null) {
+            if (result != null && ScanManager.completeScan(player, result, this.prefix)) {
                 syncKnowledge(player);
             }
         });

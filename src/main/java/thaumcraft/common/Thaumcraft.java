@@ -84,6 +84,7 @@ public class Thaumcraft {
     public static CommonProxy proxy;
 
     public ThaumcraftWorldGenerator worldGen;
+    public final EventHandlerRunic runicEventHandler = new EventHandlerRunic();
 
     // ---- Mod lifecycle ----
 
@@ -116,7 +117,7 @@ public class Thaumcraft {
         MinecraftForge.EVENT_BUS.register(this);
         MinecraftForge.EVENT_BUS.register(new EventHandlerWorld());
         MinecraftForge.EVENT_BUS.register(new EventHandlerEntity());
-        MinecraftForge.EVENT_BUS.register(new EventHandlerRunic());
+        MinecraftForge.EVENT_BUS.register(runicEventHandler);
         MinecraftForge.EVENT_BUS.register(new ServerTickEventsFML());
         MinecraftForge.TERRAIN_GEN_BUS.register(new EventHandlerWorld());
 
@@ -287,6 +288,7 @@ public class Thaumcraft {
             } else {
                 knowledge.addWarpPerm(amount);
             }
+            thaumcraft.common.lib.research.ResearchManager.syncWarp(player);
         }
     }
 
@@ -294,6 +296,7 @@ public class Thaumcraft {
         IPlayerKnowledge knowledge = player.getCapability(PlayerKnowledgeProvider.PLAYER_KNOWLEDGE, null);
         if (knowledge != null) {
             knowledge.addWarpSticky(amount);
+            thaumcraft.common.lib.research.ResearchManager.syncWarp(player);
         }
     }
 

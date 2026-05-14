@@ -21,7 +21,7 @@ public class PacketSyncScannedEntities extends PacketBase {
     public PacketSyncScannedEntities() {}
 
     public PacketSyncScannedEntities(Set<String> scannedEntities) {
-        this.scannedEntities = scannedEntities;
+        this.scannedEntities = scannedEntities == null ? new HashSet<>() : new HashSet<>(scannedEntities);
     }
 
     @Override
@@ -57,6 +57,7 @@ public class PacketSyncScannedEntities extends PacketBase {
             if (player != null && scannedEntities != null) {
                 IPlayerKnowledge knowledge = player.getCapability(PlayerKnowledgeProvider.PLAYER_KNOWLEDGE, null);
                 if (knowledge != null) {
+                    knowledge.getScannedEntities().clear();
                     for (String key : scannedEntities) {
                         knowledge.scanEntity(key);
                     }

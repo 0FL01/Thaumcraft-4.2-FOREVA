@@ -7,6 +7,7 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.NonNullList;
 import thaumcraft.api.ItemRunic;
+import thaumcraft.common.Thaumcraft;
 import thaumcraft.common.lib.CreativeTabThaumcraft;
 
 public class ItemGirdleRunic extends ItemRunic implements IBauble {
@@ -45,10 +46,16 @@ public class ItemGirdleRunic extends ItemRunic implements IBauble {
     public void onWornTick(ItemStack itemstack, EntityLivingBase player) {}
 
     @Override
-    public void onEquipped(ItemStack itemstack, EntityLivingBase player) {}
+    public void onEquipped(ItemStack itemstack, EntityLivingBase player) { markRunicDirty(); }
 
     @Override
-    public void onUnequipped(ItemStack itemstack, EntityLivingBase player) {}
+    public void onUnequipped(ItemStack itemstack, EntityLivingBase player) { markRunicDirty(); }
+
+    private void markRunicDirty() {
+        if (Thaumcraft.instance != null && Thaumcraft.instance.runicEventHandler != null) {
+            Thaumcraft.instance.runicEventHandler.isDirty = true;
+        }
+    }
 
     @Override
     public boolean canEquip(ItemStack itemstack, EntityLivingBase player) { return true; }

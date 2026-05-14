@@ -39,7 +39,7 @@ public class ItemWandCasting extends Item {
     public static final String TAG_ROD = "rod";
     public static final String TAG_CAP = "cap";
     public static final String TAG_FOCUS = "focus";
-    public static final String TAG_VIS_PREFIX = "vis_";
+    public static final String TAG_VIS_PREFIX = "";
 
     public ItemWandCasting() {
         this.setMaxStackSize(1);
@@ -159,7 +159,7 @@ public class ItemWandCasting extends Item {
 
         AspectList realCost = new AspectList();
         for (Aspect aspect : cost.getAspects()) {
-            int needed = Math.round((float) cost.getAmount(aspect) * getConsumptionModifier(stack, player, aspect, crafting));
+            int needed = (int)((float) cost.getAmount(aspect) * getConsumptionModifier(stack, player, aspect, crafting));
             realCost.add(aspect, needed);
         }
 

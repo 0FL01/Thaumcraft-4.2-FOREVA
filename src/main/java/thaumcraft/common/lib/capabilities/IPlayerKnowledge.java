@@ -54,6 +54,22 @@ public interface IPlayerKnowledge {
 
     AspectList getAspectsDiscovered();
 
+    void setAspectsDiscovered(AspectList aspects);
+
+    boolean hasDiscoveredParentAspects(Aspect aspect);
+
+    void addDiscoveredPrimalAspects();
+
+    int getAspectPoolFor(Aspect aspect);
+
+    boolean addAspectPool(Aspect aspect, int amount);
+
+    boolean setAspectPool(Aspect aspect, int amount);
+
+    boolean hasInitializedAspects();
+
+    void setInitializedAspects(boolean initialized);
+
     // ---- Scanned Entities ----
 
     Set<String> getScannedEntities();
@@ -87,6 +103,16 @@ public interface IPlayerKnowledge {
     void addResearch(String key);
 
     void removeResearch(String key);
+
+    // ---- Runic shielding ----
+
+    int getRunicCharge();
+
+    void setRunicCharge(int amount);
+
+    // ---- Full-state replacement ----
+
+    void reset();
 
     // ---- NBT ----
 
