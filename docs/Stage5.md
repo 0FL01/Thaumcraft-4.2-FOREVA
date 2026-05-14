@@ -870,3 +870,24 @@ Validation evidence for this checkpoint:
 - `./scripts/dev.sh smoke-client` was attempted because `DISPLAY=:0`, but failed before mod initialization with the same environment/display failure: `java.lang.ArrayIndexOutOfBoundsException: 0` in `org.lwjgl.opengl.LinuxDisplay.getAvailableDisplayModes`. Client-side missing model confirmation remains environment-blocked.
 
 GAP-12 is advanced but not fully closed by runtime evidence. Remaining resource/client work includes true client smoke validation, metadata-specific model variants/tints for dynamic aspect/subtype items, wand dynamic composition, armor equipped-layer polish, and any Phase 8 renderers that cannot be represented by static generated item models.
+
+### 8.10 2026-05-14 ItemKey and owned-tile checkpoint
+
+Implemented in the current checkpoint:
+
+- Replaced the `ItemKey` `TBD` entry point with reference-backed pressure-plate linking/access behavior for current `blockWoodenDevice` metas `2`/`3`: unlinked keys create linked key copies for the owner or iron keys held by gold-access players, linked keys grant iron/gold access strings using the original `0<name>` / `1<name>` format, and key chat/tooltips use original `tc.key*` language keys: `src/main/java/thaumcraft/common/items/ItemKey.java:41-155`.
+- Restored reference-compatible key subtype/glint behavior and added the current 1.12 lang keys for the two subtypes: `src/main/java/thaumcraft/common/items/ItemKey.java:41-54`, `src/main/resources/assets/thaumcraft/lang/en_us.lang:33-35`.
+- Restored `TileOwned` owner/access-list persistence with original NBT keys `owner`, `access`, and entry key `name`: `src/main/java/thaumcraft/common/tiles/TileOwned.java:8-47`.
+- Changed `TileArcanePressurePlate` to extend `TileOwned`, persist original `setting`, and refresh client block state after tile update packets: `src/main/java/thaumcraft/common/tiles/TileArcanePressurePlate.java:7-29`.
+- Assigned `TileOwned.owner` when placing wooden device item blocks so fresh pressure plates have an owner path for key linking: `src/main/java/thaumcraft/common/blocks/ItemBlocks/BlockWoodenDeviceItem.java:29-34`.
+- Added original English `tc.key1` through `tc.key11` strings used by key messages/tooltips: `src/main/resources/assets/thaumcraft/lang/en_us.lang:104-114`.
+
+Validation evidence for this checkpoint:
+
+- `./scripts/dev.sh compileJava` passed.
+- `./scripts/dev.sh build` passed.
+- `./scripts/dev.sh check-jar` passed with `Jar check PASSED: no MCP-named Minecraft field/method references found in /home/stfu/ai/dont/thaumcraft/build/libs/Thaumcraft-1.0.0-universal.jar`.
+- `./scripts/dev.sh smoke-server` passed and reached `Done (` with no crash markers in `run/smoke-server.log`.
+- `./scripts/dev.sh smoke-client` was attempted because this checkpoint touches item lang/tooltips, but failed before mod initialization with the known local LWJGL display failure: `java.lang.ExceptionInInitializerError` caused by `java.lang.ArrayIndexOutOfBoundsException: 0` in `org.lwjgl.opengl.LinuxDisplay.getAvailableDisplayModes`. This is an environment/display blocker, not Stage 5 parity evidence.
+
+GAP-11 is advanced but not closed. Remaining ItemKey dependencies are the missing Arcane Door block path in the current port, pressure-plate redstone/settings runtime parity in `BlockWoodenDevice`, and manual in-world validation for linked-key creation, access grants, owner/gold-key paths, inventory-full drops, and tooltip localization.
