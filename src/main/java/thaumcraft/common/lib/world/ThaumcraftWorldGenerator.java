@@ -28,7 +28,7 @@ import thaumcraft.common.config.Config;
 import thaumcraft.common.config.ConfigBlocks;
 import thaumcraft.common.lib.world.biomes.BiomeHandler;
 import thaumcraft.common.lib.world.biomes.BiomeTaint;
-import thaumcraft.common.lib.world.dim.MazeHandler;
+import thaumcraft.common.lib.world.dim.MazeThread;
 import thaumcraft.common.tiles.TileNode;
 
 public class ThaumcraftWorldGenerator implements IWorldGenerator {
@@ -354,12 +354,26 @@ public class ThaumcraftWorldGenerator implements IWorldGenerator {
             }
         }
 
-        // Eldritch rings (sparse)
-        if (rand.nextInt(800) == 0 && !MazeHandler.mazesInRange(x >> 4, z >> 4, 32, 32)) {
-            int bx = x + rand.nextInt(16);
-            int bz = z + rand.nextInt(16);
-            BlockPos pos = world.getHeight(new BlockPos(bx, 0, bz));
-            new WorldGenEldritchRing().generate(world, rand, pos);
+        // Eldritch rings
+        int chunkX = x >> 4;
+        int chunkZ = z >> 4;
+        int ringX = x + rand.nextInt(16);
+        int ringZ = z + rand.nextInt(16);
+        int ringY = world.getHeight(new BlockPos(ringX, 0, ringZ)).getY() - 9;
+        if (ringY < world.getSeaLevel() && rand.nextInt(66) == 0) {
+            WorldGenEldritchRing ring = new WorldGenEldritchRing();
+            int width = 11 + rand.nextInt(6) * 2;
+            int height = 11 + rand.nextInt(6) * 2;
+            ring.chunkX = chunkX;
+            ring.chunkZ = chunkZ;
+            ring.width = width;
+            ring.height = height;
+            BlockPos pos = new BlockPos(ringX, ringY + 8, ringZ);
+            if (ring.generate(world, rand, pos)) {
+                createRandomNodeAt(world, pos.up(2), rand, false, true, false);
+                Thread mazeThread = new Thread(new MazeThread(chunkX, chunkZ, width, height, rand.nextLong()));
+                mazeThread.start();
+            }
         }
 
         // Hilltop stones

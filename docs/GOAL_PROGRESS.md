@@ -173,11 +173,37 @@ Remaining limits:
 - The smoke-server environment still has the pre-existing timeout before Forge reaches ready state; full runtime proof must remain blocked until that environment issue is resolved.
 - GAP-3 is advanced but not fully closed because arrival beside a generated `GenPortal` room still depends on Stage 7 ring/maze/room generation validation.
 
+### 2026-05-14 — Stage 7 Eldritch ring and maze bootstrap
+
+Scope:
+
+- Replaced the placeholder Overworld `WorldGenEldritchRing` obsidian-circle-plus-portal layout with a reference-like support pad, altar, cap, obelisk, and banner layout.
+- Added reference-like surface validation for ring spawn points and `MazeHandler.mazesInRange(...)` overlap checks using ring `chunkX`, `chunkZ`, `width`, and `height`.
+- Moved ring maze bootstrap back into the surface structure branch with odd random `11..21` maze dimensions and `MazeThread(chunkX, chunkZ, width, height, random.nextLong())`.
+- Restored reference-like sea-level/top-height gating and dark/eerie aura node creation above the ring altar.
+- Added minimal persistent `TileEldritchAltar` state for `spawner`, `spawntype`, `spawnedClerics`, `open`, and `eyes`.
+- Added minimal persistent `TileBanner.facing` state so generated ring banners can keep their orientation.
+
+Validation:
+
+- `./scripts/dev.sh compileJava` — initially failed because ring-local `bx`/`bz` variables shadowed later hilltop variables in `generateStructures(...)`; fixed during the checkpoint.
+- `./scripts/dev.sh compileJava` — passed after the fix.
+- `./scripts/dev.sh build` — passed.
+- `./scripts/dev.sh check-jar` — failed before jar inspection because the wrapper's expected MCP mapping cache file is still absent at `.gradle_home/caches/minecraft/de/oceanlabs/mcp/mcp_stable/39/1.12.2/srgs/mcp-srg.srg`.
+- `./scripts/dev.sh smoke-server` — failed by timeout before ready state; log again stopped immediately after `Calling tweak class net.minecraftforge.fml.common.launcher.FMLServerTweaker`, with only Log4j console appender initialization errors, no new crash reports, and no mod-load crash markers. This matches the clean `da3f307` baseline reproduction recorded above.
+
+Remaining limits:
+
+- Full `TileEldritchAltar` cultist/guardian spawning and portal-opening behavior is still not ported by this checkpoint.
+- Runtime ring discovery, `labyrinth.dat` save evidence, and portal traversal were not manually run because user-driven GUI/client control is excluded from this durable goal and the smoke-server environment remains blocked by the known pre-Forge timeout.
+- Hilltop altar, mound/barrow, normal/spider Greatwood, and broader surface worldgen parity remain open Stage 7 work.
+
 ## Next Checkpoint Candidate
 
-After the BlockLoot urn/crate checkpoint, the next pre-Phase8 candidates are:
+After the portal trigger and ring bootstrap checkpoints, the next pre-Phase8 candidates are:
 
-- Remaining Stage 7 Outer Lands room/worldgen placeholders, because traversal and structure parity are still not closed by the urn/crate/slab block-content checkpoints alone.
+- Remaining Stage 7 surface/worldgen placeholders, especially hilltop altar, mound/barrow, and spider Greatwood.
+- Remaining Stage 7 Outer Lands room/tile behavior, especially full `TileEldritchAltar`, lock, trap, crab spawner, key/boss room traversal, and maze save/load race validation.
 - Stage 9 loot/content registration, because `Utils.generateLoot(...)` now has a shared reward path but the full reference loot pool distribution still depends on populated content tables.
 - Stage 6 server-side boss/manual scenario evidence remains excluded from user-driven validation, but static/reference parity blockers should continue to be reduced where possible.
 

@@ -34,7 +34,7 @@ Stage 7 закрывает серверную часть генерации ми
 - Maze persistence exists and uses original file names/keys (`labyrinth.dat`, `labyrinth.dat_old`, `Data`, `cells`, `x`, `z`, `cell`): `src/main/java/thaumcraft/common/lib/world/dim/MazeHandler.java:43-116`; it is loaded/saved on Overworld world load/save: `src/main/java/thaumcraft/common/lib/events/EventHandlerWorld.java:45-57`.
 - Several current room/template classes remain partial even after the 2026-05-14 urn/crate/slab and `BlockEldritch` content checkpoints; full traversal/runtime validation is still missing.
 - Current surface generator is much narrower than the reference. It skips Outer Lands in the general world generator at `src/main/java/thaumcraft/common/lib/world/ThaumcraftWorldGenerator.java:257-258`; generates ores with modern `WorldGenMinable` at `src/main/java/thaumcraft/common/lib/world/ThaumcraftWorldGenerator.java:275-285`; only generates trees when the sampled biome equals Magical Forest at `src/main/java/thaumcraft/common/lib/world/ThaumcraftWorldGenerator.java:288-292`; only generates structures in dim 0 at `src/main/java/thaumcraft/common/lib/world/ThaumcraftWorldGenerator.java:294-297`; does not call any wild-aura-node generation path from `generate(...)` despite `Config.genAura`/`Config.regenAura` existing.
-- Current Overworld structure/tree generators contain gameplay placeholders: `WorldGenEldritchRing` places only obsidian plus a portal at `src/main/java/thaumcraft/common/lib/world/WorldGenEldritchRing.java:17-29`; `WorldGenHilltopStones` places only a stonebrick ring and empty chest at `src/main/java/thaumcraft/common/lib/world/WorldGenHilltopStones.java:14-31`; `WorldGenMound` places a small dirt/grass mound and empty chest at `src/main/java/thaumcraft/common/lib/world/WorldGenMound.java:14-36`; `WorldGenGreatwoodTrees` lacks the reference spider variant at `src/main/java/thaumcraft/common/lib/world/WorldGenGreatwoodTrees.java:24-89`.
+- Current Overworld structure/tree generators still contain gameplay placeholders in hilltop altar, mound/barrow, and spider Greatwood generation. `WorldGenEldritchRing` is no longer the old obsidian-plus-portal placeholder after the 2026-05-14 ring checkpoint, but it still needs runtime evidence and fuller altar lifecycle behavior.
 - Portal entry now uses the reference-like ticked `TileEldritchPortal` flow and the safer `TeleporterThaumcraft` search/cache placement. This remains a partial GAP-3 closure until manual traversal evidence proves arrival/return beside generated portal rooms.
 
 ## 5. Gap list
@@ -77,7 +77,7 @@ Dependency: Stage 3 node/tile behavior must be stable enough for generated aura 
 
 ### GAP-2: Overworld Eldritch ring generation does not match reference maze bootstrap
 
-**Статус:** реализовано неправильно
+**Статус:** частично реализовано
 **Критичность:** blocker
 
 **Текущая реализация:**
@@ -91,17 +91,14 @@ Dependency: Stage 3 node/tile behavior must be stable enough for generated aura 
 - `thaumcraft_src/thaumcraft/common/lib/world/dim/MazeThread.class`
 
 **Что не совпадает:**
-Reference `ThaumcraftWorldGenerator` creates Eldritch rings from the surface structure branch with `randPosY = getHeight(...) - 9`, only attempts the structure when that value is below sea level, then calls `WorldGenEldritchRing.LocationIsValidSpawn(...)` before placing blocks. It uses random odd maze width/height `11 + random.nextInt(6) * 2`, assigns those dimensions to the `WorldGenEldritchRing`, creates a dark node, and starts `new MazeThread(chunkX, chunkZ, w, h, random.nextLong())`. Reference `WorldGenEldritchRing` places cosmetic-solid/obsidian support blocks, eldritch altar/cap/obelisk metas, banners, and altar spawner state. Current generator uses `world.getHeight(...)` directly at `src/main/java/thaumcraft/common/lib/world/ThaumcraftWorldGenerator.java:359-362`, has no sea-level or `LocationIsValidSpawn` guard, ignores ring width/height, places only a simple obsidian circle plus portal, and starts `MazeThread(cx, cz, 32, 32, world.getSeed())`: `src/main/java/thaumcraft/common/lib/world/WorldGenEldritchRing.java:17-36`. This matches the reported symptom where Eldritch/priest altars can appear in water/at sea surface and contain only obsidian/portal instead of the reference altar layout. Current surface structure chance also differs: `rand.nextInt(800)` at `src/main/java/thaumcraft/common/lib/world/ThaumcraftWorldGenerator.java:358`, while the reference branch uses ring chance inside the structure branch and also creates the maze dimensions/dark node.
+Reference `ThaumcraftWorldGenerator` creates Eldritch rings from the surface structure branch with `randPosY = getHeight(...) - 9`, only attempts the structure when that value is below sea level, then calls `WorldGenEldritchRing.LocationIsValidSpawn(...)` before placing blocks. It uses random odd maze width/height `11 + random.nextInt(6) * 2`, assigns those dimensions to the `WorldGenEldritchRing`, creates a dark node, and starts `new MazeThread(chunkX, chunkZ, w, h, random.nextLong())`. Reference `WorldGenEldritchRing` places cosmetic-solid/obsidian support blocks, eldritch altar/cap/obelisk metas, banners, and altar spawner state. The 2026-05-14 ring checkpoint ports this server-side ring layout, surface validation, dark node creation, and odd-dimension maze bootstrap. Remaining mismatch is runtime/manual evidence and the fuller `TileEldritchAltar` behavior: the tile now persists spawner/open/eye state needed by generated rings, but it still does not execute the original cultist/guardian spawning or portal-opening lifecycle.
 
 **Что нужно доделать:**
-Port the reference ring structure and maze bootstrap behavior instead of the current placeholder ring. The ring must reserve/generate a maze whose dimensions and seed come from the worldgen branch, and the surface ring must match original block layout and node behavior.
+Runtime-validate the reference-like ring structure and maze bootstrap added by the 2026-05-14 checkpoint, then finish the altar lifecycle that makes the generated ring usable for normal progression.
 
 **Как доделать:**
-- Add `chunkX`, `chunkZ`, `width`, `height` fields or equivalent to `WorldGenEldritchRing` if needed by the reference generator.
-- Move maze-thread creation back to the worldgen structure branch, or make `WorldGenEldritchRing` receive the exact reference dimensions/seed.
-- Port reference block layout from `thaumcraft_src/thaumcraft/common/lib/world/WorldGenEldritchRing.class` to `src/main/java/thaumcraft/common/lib/world/WorldGenEldritchRing.java`.
-- Port/adapt `WorldGenEldritchRing.LocationIsValidSpawn(...)` and the reference sea-level/top-height gating so rings do not generate on water, in mid-air, or on invalid surface blocks.
-- Ensure a dark/eerie aura node is generated at the ring as in the reference branch.
+- Validate the new ring layout and maze bootstrap in a fresh runtime world.
+- Port the missing `TileEldritchAltar` cultist/guardian spawning and portal-opening lifecycle in a later tile behavior checkpoint.
 - Verify `MazeHandler.mazesInRange(...)` prevents overlapping mazes with the same radius semantics as reference.
 
 **Критерии приемки:**
@@ -115,6 +112,11 @@ Port the reference ring structure and maze bootstrap behavior instead of the cur
 
 **Риски / зависимости:**
 Race risk: `MazeThread` is asynchronous, so saving/teleporting immediately after ring generation can race with maze population. This needs runtime validation or synchronization rules.
+
+**Checkpoint 2026-05-14 — Eldritch ring and maze bootstrap:**
+`WorldGenEldritchRing` now receives `chunkX`, `chunkZ`, `width`, and `height`, validates the reference surface points, rejects overlapping maze reservations through `MazeHandler.mazesInRange(...)`, replaces the old obsidian-circle-plus-portal placeholder with the original support pad/altar/cap/obelisk/banner layout, and preserves altar spawner metadata. The surface structure branch now uses reference-like `getHeight(...) - 9`/sea-level gating, random odd maze dimensions in the `11..21` range, dark node creation above the ring altar, and `MazeThread(chunkX, chunkZ, width, height, random.nextLong())`. `TileEldritchAltar` and `TileBanner` gained the minimal persistent state needed by this generated structure.
+
+Remaining GAP-2 limits after this checkpoint: runtime generation has not been observed in a fresh world, async maze race/saving behavior is still unproven, and full altar spawn/open/portal lifecycle remains a separate Stage 7 tile-behavior gap.
 
 ### GAP-3: Portal teleporter is unsafe and does not search/cache destination portals
 
@@ -273,7 +275,7 @@ Runtime validation may expose Stage 6 entity issues in guardian/boss/spawner roo
 - `thaumcraft_src/thaumcraft/common/lib/world/dim/MazeThread.class`
 
 **Что не совпадает:**
-Current NBT format matches the reference at a high level, but generation remains asynchronous (`new Thread(new MazeThread(...)).start()` at `src/main/java/thaumcraft/common/lib/world/WorldGenEldritchRing.java:35-36`) and only positive cells are saved: `src/main/java/thaumcraft/common/lib/world/dim/MazeHandler.java:57-66`. The reference also uses async `MazeThread`, but current code changes the ring dimensions/seed and exposes teleport from `BlockEldritchPortal` immediately, increasing the chance that a player can teleport before the maze cell map is ready. Load/save is tied to dimension 0 only: `src/main/java/thaumcraft/common/lib/events/EventHandlerWorld.java:45-57`; this matches original file location but needs validation in integrated server lifecycle.
+Current NBT format matches the reference at a high level, but generation remains asynchronous through the surface structure branch's `new Thread(new MazeThread(...)).start()` and only positive cells are saved: `src/main/java/thaumcraft/common/lib/world/dim/MazeHandler.java:57-66`. The reference also uses async `MazeThread`, and the 2026-05-14 ring checkpoint restored odd reference-like dimensions/seeds. Remaining risk is runtime ordering: the maze cells must exist before an altar/portal entry path allows the player to transfer. Load/save is tied to dimension 0 only: `src/main/java/thaumcraft/common/lib/events/EventHandlerWorld.java:45-57`; this matches original file location but needs validation in integrated server lifecycle.
 
 **Что нужно доделать:**
 Keep the original file format but make Stage 7 scenarios safe: maze cells must exist before portal use, saving must not miss just-created mazes, and reload must rehydrate `MazeHandler.labyrinth` before Outer Lands population queries.
