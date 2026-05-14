@@ -74,8 +74,9 @@ public class ServerTickEventsFML {
                 long zSeed = fmlRandom.nextLong() >> 3;
                 fmlRandom.setSeed(xSeed * (long) loc.x + zSeed * (long) loc.z ^ worldSeed);
 
-                // Re-run world gen for this chunk
-                // Phase 8: Thaumcraft.instance.worldGen.generate(fmlRandom, loc.x, loc.z, world, false);
+                if (Thaumcraft.instance != null && Thaumcraft.instance.worldGen != null) {
+                    Thaumcraft.instance.worldGen.worldGeneration(fmlRandom, loc.x, loc.z, world, false);
+                }
                 processed++;
             }
             chunksToGenerate.put(dim, chunks);

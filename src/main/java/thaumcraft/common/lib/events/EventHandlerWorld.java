@@ -96,7 +96,10 @@ public class EventHandlerWorld {
                 chunks = ServerTickEventsFML.chunksToGenerate.get(dim);
             }
             if (chunks != null) {
-                chunks.add(new ChunkLoc(chunk.x, chunk.z));
+                ChunkLoc loc = new ChunkLoc(chunk.x, chunk.z);
+                if (!chunks.contains(loc)) {
+                    chunks.add(loc);
+                }
                 ServerTickEventsFML.chunksToGenerate.put(dim, chunks);
             }
         }

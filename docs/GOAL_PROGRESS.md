@@ -450,11 +450,34 @@ Remaining limits:
 - Generated ring activation has not been observed in a fresh runtime world because smoke-server remains environment-blocked and user-driven client/manual scenarios are excluded.
 - The async case where `checkForMaze()` has just started a `MazeThread` still needs runtime/save validation before GAP-2/GAP-3 can close.
 
+### 2026-05-14 — Stage 7 retrogen newGen marker execution
+
+Scope:
+
+- Added `ThaumcraftWorldGenerator.worldGeneration(Random, int, int, World, boolean newGen)` as the reference-style fresh/regen entry point.
+- Routed Forge fresh world generation through `worldGeneration(..., true)`.
+- Routed queued chunk regeneration through `worldGeneration(..., false)` from `ServerTickEventsFML`.
+- Restored fresh-vs-regen gates for aura, structures, trees, cinnabar, amber, infused stone, and Nether branches as `Config.genX && (newGen || Config.regenX)`.
+- Marked non-fresh generated chunks dirty after the generation pass.
+- Avoided duplicate `ChunkLoc` queue entries when the same missing-marker chunk loads repeatedly before the queue drains.
+
+Validation:
+
+- `./scripts/dev.sh compileJava` — passed.
+- `./scripts/dev.sh build` — passed.
+- `./scripts/dev.sh check-jar` — failed before jar inspection because the wrapper's expected MCP mapping cache file is still absent at `.gradle_home/caches/minecraft/de/oceanlabs/mcp/mcp_stable/39/1.12.2/srgs/mcp-srg.srg`.
+- `./scripts/dev.sh smoke-server` — failed by timeout before ready state; log again stopped after `Calling tweak class net.minecraftforge.fml.common.launcher.FMLServerTweaker`, with only Log4j console appender initialization errors. `run/crash-reports/` does not exist, and the configured crash-marker scan found no matches. This matches the clean `da3f307` baseline reproduction recorded above.
+
+Remaining limits:
+
+- Fresh-world and retrogen runtime scenarios have not been observed because smoke-server remains environment-blocked and user-driven client/manual scenarios are excluded.
+- Broader biome blacklist/runtime edge cases remain open until generation can be observed in-world.
+
 ## Next Checkpoint Candidate
 
 After the portal trigger and ring bootstrap checkpoints, the next pre-Phase8 candidates are:
 
-- Remaining Stage 7 surface/worldgen behavior, especially `newGen`/regen marker behavior and runtime evidence.
+- Remaining Stage 7 surface/worldgen runtime evidence and broader biome blacklist edge cases.
 - Remaining Stage 7 Outer Lands room/tile behavior, especially full boss-room block-template mutation, key/boss room traversal, and maze save/load race validation.
 - Stage 9 loot/content registration, because `Utils.generateLoot(...)` now has a shared reward path but the full reference loot pool distribution still depends on populated content tables.
 - Stage 6 server-side boss/manual scenario evidence remains excluded from user-driven validation, but static/reference parity blockers should continue to be reduced where possible.

@@ -31,6 +31,7 @@ import thaumcraft.common.config.Config;
 import thaumcraft.common.config.ConfigBlocks;
 import thaumcraft.common.lib.world.biomes.BiomeHandler;
 import thaumcraft.common.lib.world.biomes.BiomeTaint;
+import thaumcraft.common.lib.world.dim.MazeHandler;
 import thaumcraft.common.lib.world.dim.MazeThread;
 import thaumcraft.common.tiles.TileNode;
 
@@ -256,18 +257,45 @@ public class ThaumcraftWorldGenerator implements IWorldGenerator {
 
     @Override
     public void generate(Random random, int chunkX, int chunkZ, World world, IChunkGenerator chunkGenerator, IChunkProvider chunkProvider) {
+        worldGeneration(random, chunkX, chunkZ, world, true);
+    }
+
+    public void worldGeneration(Random random, int chunkX, int chunkZ, World world, boolean newGen) {
         int dim = world.provider.getDimension();
 
         // Outer Lands room generation is owned by ChunkProviderOuter.populate().
-        if (dim == Config.dimensionOuterId) return;
+        if (dim == Config.dimensionOuterId) {
+            if (!newGen) {
+                MazeHandler.generateEldritch(world, random, chunkX, chunkZ);
+                markChunkDirty(world, chunkX, chunkZ);
+            }
+            return;
+        }
 
         if (dim == -1) {
-            generateNether(world, random, chunkX, chunkZ);
+            generateNether(world, random, chunkX, chunkZ, newGen);
+            if (!newGen) {
+                markChunkDirty(world, chunkX, chunkZ);
+            }
             return;
         }
 
         // End generation is intentionally skipped by the reference generator.
-        if (world.provider.getDimensionType() == net.minecraft.world.DimensionType.THE_END) return;
+        if (world.provider.getDimensionType() != net.minecraft.world.DimensionType.THE_END) {
+            generateSurface(world, random, chunkX, chunkZ, newGen);
+        }
+
+        if (!newGen) {
+            markChunkDirty(world, chunkX, chunkZ);
+        }
+    }
+
+    private void markChunkDirty(World world, int chunkX, int chunkZ) {
+        world.getChunk(chunkX, chunkZ).markDirty();
+    }
+
+    private void generateSurface(World world, Random random, int chunkX, int chunkZ, boolean newGen) {
+        int dim = world.provider.getDimension();
 
         int dimBlacklist = getDimBlacklist(dim);
         if (dimBlacklist == 0 || dimBlacklist == 2) return;
@@ -283,20 +311,20 @@ public class ThaumcraftWorldGenerator implements IWorldGenerator {
 
         boolean flatWorld = world.getWorldInfo().getTerrainType() == WorldType.FLAT;
 
-        generateOres(world, random, x, z, biome, biomeBlacklistLevel);
+        generateOres(world, random, x, z, biome, biomeBlacklistLevel, newGen);
 
         boolean auraGen = false;
-        if ((Config.genAura || Config.regenAura) && biomeBlacklistLevel < 1) {
+        if (Config.genAura && (newGen || Config.regenAura) && biomeBlacklistLevel < 1) {
             auraGen = generateStructureNode(world, random, x, z);
             auraGen = generateWildNodes(world, random, x, z, auraGen) || auraGen;
         }
 
-        if ((Config.genTrees || Config.regenTrees) && dimBlacklist == -1 && !flatWorld && biomeBlacklistLevel == -1) {
+        if (Config.genTrees && (newGen || Config.regenTrees) && dimBlacklist == -1 && !flatWorld && biomeBlacklistLevel == -1) {
             generateVegetation(world, random, x, z, biome);
         }
 
         // Generate structures (surface)
-        if ((Config.genStructure || Config.regenStructure) && dimBlacklist == -1 && dim == 0 && !flatWorld) {
+        if (Config.genStructure && (newGen || Config.regenStructure) && dimBlacklist == -1 && dim == 0 && !flatWorld) {
             auraGen = generateStructures(world, random, x, z, biome, auraGen) || auraGen;
             generateTotem(world, random, chunkX, chunkZ, auraGen);
         }
@@ -371,17 +399,17 @@ public class ThaumcraftWorldGenerator implements IWorldGenerator {
         }
     }
 
-    private void generateOres(World world, Random rand, int x, int z, Biome biome, int biomeBlacklistLevel) {
+    private void generateOres(World world, Random rand, int x, int z, Biome biome, int biomeBlacklistLevel, boolean newGen) {
         if (biomeBlacklistLevel == 0 || biomeBlacklistLevel == 2) {
             return;
         }
-        if (Config.genCinnibar || Config.regenCinnibar) {
+        if (Config.genCinnibar && (newGen || Config.regenCinnibar)) {
             for (int i = 0; i < 18; ++i) {
                 BlockPos pos = new BlockPos(x + rand.nextInt(16), rand.nextInt(Math.max(1, world.getActualHeight() / 5)), z + rand.nextInt(16));
                 placeOreBlockIfStone(world, pos, ConfigBlocks.blockCustomOre.getStateFromMeta(0), 0);
             }
         }
-        if (Config.genAmber || Config.regenAmber) {
+        if (Config.genAmber && (newGen || Config.regenAmber)) {
             for (int i = 0; i < 20; ++i) {
                 int bx = x + rand.nextInt(16);
                 int bz = z + rand.nextInt(16);
@@ -389,7 +417,7 @@ public class ThaumcraftWorldGenerator implements IWorldGenerator {
                 placeOreBlockIfStone(world, pos, ConfigBlocks.blockCustomOre.getStateFromMeta(7), 2);
             }
         }
-        if (Config.genInfusedStone || Config.regenInfusedStone) {
+        if (Config.genInfusedStone && (newGen || Config.regenInfusedStone)) {
             for (int i = 0; i < 8; ++i) {
                 int bx = x + rand.nextInt(16);
                 int bz = z + rand.nextInt(16);
@@ -511,13 +539,13 @@ public class ThaumcraftWorldGenerator implements IWorldGenerator {
         return auraGen;
     }
 
-    private void generateNether(World world, Random rand, int chunkX, int chunkZ) {
+    private void generateNether(World world, Random rand, int chunkX, int chunkZ, boolean newGen) {
         boolean auraGen = false;
         boolean flatWorld = world.getWorldInfo().getTerrainType() == WorldType.FLAT;
-        if (!flatWorld && (Config.genStructure || Config.regenStructure)) {
+        if (!flatWorld && Config.genStructure && (newGen || Config.regenStructure)) {
             auraGen = generateTotem(world, rand, chunkX, chunkZ, auraGen) || auraGen;
         }
-        if (Config.genAura || Config.regenAura) {
+        if (Config.genAura && (newGen || Config.regenAura)) {
             generateWildNodes(world, rand, chunkX * 16, chunkZ * 16, auraGen);
         }
     }
