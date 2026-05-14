@@ -2,7 +2,6 @@ package thaumcraft.common.entities.monster.boss;
 
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.potion.PotionEffect;
@@ -140,9 +139,8 @@ public class EntityCultistPortal extends EntityThaumcraftBoss {
                         this.world.setEntityState(this, (byte) 16);
                         float rr = this.world.rand.nextFloat();
                         int md = rr < 0.05F ? 2 : (rr < 0.2F ? 1 : 0);
-                        // Use vanilla chest as loot crate placeholder (BlockLoot not yet ported)
                         this.world.setBlockState(new BlockPos(a, (int)this.posY, b),
-                            net.minecraft.init.Blocks.CHEST.getStateFromMeta(md), 3);
+                            ConfigBlocks.blockLootCrate.getStateFromMeta(md), 3);
                         PacketHandler.INSTANCE.sendToAllAround(
                             new PacketFXBlockArc(a, (int)this.posY, b, this.getEntityId()),
                             new NetworkRegistry.TargetPoint(this.world.provider.getDimension(), this.posX, this.posY, this.posZ, 32.0));

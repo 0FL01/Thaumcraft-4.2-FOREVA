@@ -48,11 +48,44 @@ Branch: `codex/durable-goal-stage8-9`
 
 - `./scripts/dev.sh compileJava` — passed on 2026-05-14 before gameplay/code changes.
 
+## Checkpoint Log
+
+### 2026-05-14 — Stage 6/7 BlockLoot urn/crate path
+
+Scope:
+
+- Ported `BlockLoot` and `BlockLootItem` for the three reference rarity metas.
+- Registered `blockLootUrn` and `blockLootCrate` with item blocks.
+- Copied original urn/crate textures from `thaumcraft_src/assets/thaumcraft/textures/blocks/`.
+- Added simple Forge 1.12.2 blockstate/model fallbacks so the blocks resolve as resources until Stage 8 renderer parity work.
+- Moved shared loot reward generation into `Utils.generateLoot(...)`.
+- Replaced the Cultist Portal stage 0 vanilla chest placeholder with `blockLootCrate`.
+- Replaced Outer Lands `GenCommon`/`GenNestRoom` urn/crate placeholders with `blockLootUrn`/`blockLootCrate`.
+
+Validation:
+
+- `./scripts/dev.sh compileJava` — initially failed because `BlockLoot.getSubBlocks(...)` used a non-existent 1.12.2 `Block.isInCreativeTab(...)`; fixed during the checkpoint.
+- `./scripts/dev.sh compileJava` — passed after the fix.
+- `./scripts/dev.sh build` — passed.
+- `./scripts/dev.sh check-jar` — failed before jar inspection because the wrapper's expected MCP mapping cache file is absent at `.gradle_home/caches/minecraft/de/oceanlabs/mcp/mcp_stable/39/1.12.2/srgs/mcp-srg.srg`.
+- `./scripts/dev.sh smoke-server` — failed by timeout before ready state at 180s; no new crash reports and no mod-load crash marker in `run/smoke-server.log`.
+- `THAUMCRAFT_SMOKE_TIMEOUT=300s ./scripts/dev.sh smoke-server` — failed by timeout before ready state; log stopped immediately after `Calling tweak class net.minecraftforge.fml.common.launcher.FMLServerTweaker`, with only Log4j console appender initialization errors and no new crash reports.
+- Clean recon commit `da3f307` was checked in `/tmp/tc-baseline-smoke` with `THAUMCRAFT_GRADLE_HOME='/home/opencode/ai/Thaumcraft-4.2-FOREVA/?/.gradle' ./scripts/dev.sh smoke-server`; it reproduced the same timeout before mod loading with no crash reports or crash markers. The runtime smoke failure is therefore classified as pre-existing smoke wrapper/runtime environment failure, not evidence of the BlockLoot diff crashing mod load.
+
+Remaining limits:
+
+- This closes the direct vanilla chest/stone substitution for the shared urn/crate path only.
+- Full loot-table parity still depends on completing/populating the broader loot registration tables currently deferred to Stage 9/content work.
+- Stage 6 Cultist Portal stage progression/reward scenario was not manually run by user instruction.
+- Stage 7 full Outer Lands room traversal, `blockSlabStone`, other room templates, and worldgen runtime evidence remain open.
+- GUI/client visual validation for the new model fallbacks was not run.
+
 ## Next Checkpoint Candidate
 
-Stage 6 and Stage 7 share a concrete blocker around missing reference-compatible `BlockLoot` urn/crate behavior:
+After the BlockLoot urn/crate checkpoint, the next pre-Phase8 candidates are:
 
-- `docs/Stage6.md` requires replacing `EntityCultistPortal` vanilla chest reward placeholders.
-- `docs/Stage7.md` requires Outer Lands room templates to stop silently substituting vanilla chests/stone for loot urns/crates and related progression room blocks.
+- Stage 7 `blockSlabStone` and remaining Outer Lands room template placeholders, because they still affect traversal and room parity.
+- Stage 9 loot/content registration, because `Utils.generateLoot(...)` now has a shared reward path but the full reference loot pool distribution still depends on populated content tables.
+- Stage 6 server-side boss/manual scenario evidence remains excluded from user-driven validation, but static/reference parity blockers should continue to be reduced where possible.
 
-This is a tightly coupled candidate only if the original reference behavior confirms one block/item contract can serve both portal rewards and Outer Lands rooms.
+Do not mark Stage 6 or Stage 7 complete from this checkpoint alone.

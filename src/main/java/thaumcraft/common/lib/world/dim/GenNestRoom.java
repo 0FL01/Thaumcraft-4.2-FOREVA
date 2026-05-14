@@ -119,10 +119,11 @@ public class GenNestRoom extends GenCommon {
                 if (random.nextFloat() < 0.15f && world.isAirBlock(pos(x + 8 + a, y + 2, z + 8 + b))) {
                     float rr = random.nextFloat();
                     int md = rr < 0.15f ? 2 : (rr < 0.4f ? 1 : 0);
-                    // TODO: Replace with ConfigBlocks.blockLootUrn / blockLootCrate when ported
                     world.setBlockState(pos(x + 8 + a, y + 2, z + 8 + b),
-                            random.nextFloat() < 0.2f ? net.minecraft.init.Blocks.CHEST.getStateFromMeta(md) :
-                                    net.minecraft.init.Blocks.CHEST.getStateFromMeta(md), 3);
+                            random.nextFloat() < 0.2f
+                                    ? ConfigBlocks.blockLootCrate.getStateFromMeta(md)
+                                    : ConfigBlocks.blockLootUrn.getStateFromMeta(md),
+                            3);
                 }
             }
         }

@@ -200,6 +200,11 @@ Complete room-template parity and remove TODO placeholders inside Stage 7. If so
 **Риски / зависимости:**
 Dependency: some block/item classes may belong to content/registration work outside Stage 7. If missing blocks are not available, the Stage 7 plan must label those as dependencies instead of silently using vanilla placeholders.
 
+**Checkpoint 2026-05-14:**
+`BlockLoot`/`BlockLootItem`, `blockLootUrn`, and `blockLootCrate` are now present and registered. `GenCommon` now places `blockLootUrn` instead of vanilla stone for the urn slot, and `GenNestRoom` now uses reference-like rarity-dependent `blockLootCrate` or `blockLootUrn` instead of vanilla chest placeholders. Original urn/crate textures were copied from `thaumcraft_src/assets/`; temporary model JSONs are present only as Forge 1.12.2 resource fallbacks until Stage 8 renderer parity work.
+
+Remaining GAP-4 limits after this checkpoint: `blockSlabStone` is still unresolved, other room templates still need reference audit, full room traversal has not been runtime/manual validated, and loot-table distribution remains dependent on Stage 9/content registration.
+
 ### GAP-5: Outer Lands generation has no runtime smoke/manual validation evidence
 
 **Статус:** требует проверки  

@@ -255,8 +255,7 @@ public class GenCommon {
                 world.setBlockState(cc, ConfigBlocks.blockCosmeticSolid.getStateFromMeta(15), 3);
                 float rr = world.rand.nextFloat();
                 int meta = rr < 0.025f ? 2 : (rr < 0.1f ? 1 : 0);
-                // TODO: Replace with ConfigBlocks.blockLootUrn when ported
-                world.setBlockState(cc.up(), Blocks.STONE.getStateFromMeta(meta), 3);
+                world.setBlockState(cc.up(), ConfigBlocks.blockLootUrn.getStateFromMeta(meta), 3);
             }
         }
 
