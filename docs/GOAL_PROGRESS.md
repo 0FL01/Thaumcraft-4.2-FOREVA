@@ -104,6 +104,29 @@ Remaining limits:
 - Other Stage 7 room/worldgen placeholders still need separate reference audits.
 - Client visual/model inspection was not run; JSONs are resource fallbacks, not a renderer parity claim.
 
+### 2026-05-14 — Stage 7 Eldritch room block metadata contract
+
+Scope:
+
+- Expanded `BlockEldritch` from the current `0..4` meta clamp to the reference `0..10` meta range used by Outer Lands rooms.
+- Restored server-side tile entity creation for metas `0` altar, `1` obelisk, `3` cap, `8` lock, `9` crab spawner, and `10` trap.
+- Restored reference-like hardness, resistance, light, drop, XP, and no-creature-spawn behavior for the expanded metas.
+- Added temporary resource fallbacks for `blockeldritch` meta variants and copied the matching original textures from `thaumcraft_src/assets/thaumcraft/textures/blocks/`.
+
+Validation:
+
+- `./scripts/dev.sh compileJava` — initially failed on a duplicate `damageDropped(...)` method left from the current implementation; fixed during the checkpoint.
+- `./scripts/dev.sh compileJava` — passed after the fix.
+- `./scripts/dev.sh build` — passed.
+- `./scripts/dev.sh check-jar` — failed before jar inspection because the wrapper's expected MCP mapping cache file is still absent at `.gradle_home/caches/minecraft/de/oceanlabs/mcp/mcp_stable/39/1.12.2/srgs/mcp-srg.srg`.
+- `./scripts/dev.sh smoke-server` — failed by timeout before ready state; log again stopped immediately after `Calling tweak class net.minecraftforge.fml.common.launcher.FMLServerTweaker`, with only Log4j console appender initialization errors, no new crash reports, and no mod-load crash markers. This matches the clean `da3f307` baseline reproduction recorded above.
+
+Remaining limits:
+
+- This closes the metadata/TE instantiation contract needed by generated room blocks, but not full `TileEldritchAltar`, `TileEldritchLock`, `TileEldritchCrabSpawner`, or `TileEldritchTrap` behavioral parity.
+- Renderer parity for altar/obelisk/cap/lock/crab spawner/trap remains Stage 8 work; JSONs are non-GUI resource fallbacks only.
+- Full Outer Lands room traversal/manual generation validation remains skipped by user instruction.
+
 ## Next Checkpoint Candidate
 
 After the BlockLoot urn/crate checkpoint, the next pre-Phase8 candidates are:
