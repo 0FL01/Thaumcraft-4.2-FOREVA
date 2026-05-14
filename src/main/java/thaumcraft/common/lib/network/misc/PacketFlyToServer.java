@@ -2,9 +2,12 @@ package thaumcraft.common.lib.network.misc;
 
 import io.netty.buffer.ByteBuf;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.inventory.EntityEquipmentSlot;
+import net.minecraft.item.ItemStack;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 import thaumcraft.common.items.armor.Hover;
+import thaumcraft.common.items.armor.ItemHoverHarness;
 import thaumcraft.common.lib.network.PacketBase;
 
 public class PacketFlyToServer extends PacketBase {
@@ -34,7 +37,12 @@ public class PacketFlyToServer extends PacketBase {
     public IMessage onMessage(MessageContext ctx) {
         this.scheduleServer(ctx, player -> {
             if (player.getEntityId() == this.playerid) {
-                Hover.setHover(this.playerid, this.hover);
+                ItemStack harness = player.getItemStackFromSlot(EntityEquipmentSlot.CHEST);
+                if (!harness.isEmpty() && harness.getItem() instanceof ItemHoverHarness) {
+                    Hover.setHover(player, harness, this.hover);
+                } else if (!this.hover) {
+                    Hover.setHover(this.playerid, false);
+                }
             }
         });
         return null;

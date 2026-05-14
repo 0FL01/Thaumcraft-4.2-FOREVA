@@ -830,3 +830,22 @@ Validation evidence for this checkpoint:
 - `./scripts/dev.sh smoke-client` was attempted because `DISPLAY=:0`, but failed before mod initialization with the same environment/display failure as the prior checkpoint: `java.lang.ArrayIndexOutOfBoundsException: 0` in `org.lwjgl.opengl.LinuxDisplay.getAvailableDisplayModes`. This is not Stage 5 parity evidence.
 
 Stage 5 remains open after this checkpoint. Next RECON-backed implementation targets are: Hover Harness common container/state authority, Stage 5 static item resources/models/lang, and remaining utility/relic simplifications (`ItemKey`, Thaumometer timed scan, Research Notes, Mana Bean, Resonator, Compass Stone).
+
+### 8.8 2026-05-14 Hover Harness common-layer checkpoint
+
+Implemented in the current checkpoint:
+
+- Replaced the Hover Harness container stub with a one-slot jar container that loads and stores harness NBT key `jar`, binds player inventory, protects the source harness slot, and accepts only `BlockJarItem` stacks with `Aspect.ENERGY`: `src/main/java/thaumcraft/common/container/ContainerHoverHarness.java:29-64`, `src/main/java/thaumcraft/common/container/ContainerHoverHarness.java:73-113`, `src/main/java/thaumcraft/common/container/ContainerHoverHarness.java:116-190`.
+- Added a minimal `GuiHoverHarness` and wired `GUI_HOVER_HARNESS` to it so the common container has a usable client entry point; visual polish remains Phase 8: `src/main/java/thaumcraft/client/gui/GuiHoverHarness.java:9-30`, `src/main/java/thaumcraft/client/ClientProxy.java:53-72`.
+- Changed Hover state authority to load persisted `hover` NBT into the server/client map only when no map entry exists, then use the map as authoritative. This removes the old `NBT || map` latch that could re-enable hover after a false packet: `src/main/java/thaumcraft/common/items/armor/Hover.java:41-49`, `src/main/java/thaumcraft/common/items/armor/Hover.java:65-89`.
+- Hardened `PacketFlyToServer` so server-side hover changes require the authenticated player id and an equipped chest `ItemHoverHarness`; enabling hover also passes fuel validation through `Hover.setHover`: `src/main/java/thaumcraft/common/lib/network/misc/PacketFlyToServer.java:37-47`.
+
+Validation evidence for this checkpoint:
+
+- `./scripts/dev.sh compileJava` passed.
+- `./scripts/dev.sh build` passed.
+- `./scripts/dev.sh check-jar` passed.
+- `./scripts/dev.sh smoke-server` passed and reached `Done (` with no crash markers.
+- `./scripts/dev.sh smoke-client` was attempted because `DISPLAY=:0`, but failed before mod initialization with the same environment/display failure: `java.lang.ArrayIndexOutOfBoundsException: 0` in `org.lwjgl.opengl.LinuxDisplay.getAvailableDisplayModes`. This remains environment-limited, not Stage 5 parity evidence.
+
+GAP-5 is advanced but not closed. Remaining Hover work includes the actual client H-key toggle path, reference on/off/periodic sounds, client horizontal motion damping with haste/girdle modifiers, anti-float counter reset parity if safely portable, tooltip parity for stored jar aspects/discounts, and manual in-world fuel/toggle/fall validation.

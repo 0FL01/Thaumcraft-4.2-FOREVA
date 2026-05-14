@@ -38,6 +38,16 @@ public class Hover {
         HOVERING.put(playerId, hover);
     }
 
+    public static boolean setHover(EntityPlayer player, ItemStack harness, boolean hover) {
+        if (player == null || harness == null || harness.isEmpty()) return false;
+        if (hover && !expendCharge(player, harness, false)) {
+            hover = false;
+        }
+        setHover(player.getEntityId(), hover);
+        ensureTag(harness).setBoolean("hover", hover);
+        return hover;
+    }
+
     public static boolean getHover(int playerId) {
         Boolean hover = HOVERING.get(playerId);
         return hover != null && hover;
@@ -49,21 +59,16 @@ public class Hover {
 
     public static boolean toggleHover(EntityPlayer player, int playerId, ItemStack harness) {
         if (player == null || harness.isEmpty()) return false;
-        boolean hover = !getHover(playerId);
-        if (hover && !expendCharge(player, harness, false)) {
-            hover = false;
-        }
-        setHover(playerId, hover);
-        if (!harness.hasTagCompound()) harness.setTagCompound(new NBTTagCompound());
-        harness.getTagCompound().setBoolean("hover", hover);
-        return hover;
+        return setHover(player, harness, !getHover(playerId));
     }
 
     public static void handleHoverArmor(EntityPlayer player, ItemStack harness) {
         if (player == null || harness.isEmpty()) return;
-        if (!harness.hasTagCompound()) harness.setTagCompound(new NBTTagCompound());
-        NBTTagCompound tag = harness.getTagCompound();
-        boolean hover = tag.getBoolean("hover") || getHover(player);
+        NBTTagCompound tag = ensureTag(harness);
+        if (!HOVERING.containsKey(player.getEntityId())) {
+            setHover(player.getEntityId(), tag.getBoolean("hover"));
+        }
+        boolean hover = getHover(player);
         if (hover && !expendCharge(player, harness, true)) {
             hover = false;
         }
@@ -82,6 +87,11 @@ public class Hover {
         if (!player.world.isRemote && player instanceof EntityPlayerMP) {
             ((EntityPlayerMP) player).sendPlayerAbilities();
         }
+    }
+
+    private static NBTTagCompound ensureTag(ItemStack harness) {
+        if (!harness.hasTagCompound()) harness.setTagCompound(new NBTTagCompound());
+        return harness.getTagCompound();
     }
 
     public static boolean expendCharge(EntityPlayer player, ItemStack harness, boolean doit) {

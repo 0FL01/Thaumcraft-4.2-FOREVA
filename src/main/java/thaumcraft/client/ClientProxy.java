@@ -10,6 +10,7 @@ import net.minecraftforge.event.entity.player.ItemTooltipEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import thaumcraft.client.gui.GuiFocusPouch;
 import thaumcraft.client.gui.GuiHandMirror;
+import thaumcraft.client.gui.GuiHoverHarness;
 import thaumcraft.common.CommonProxy;
 import thaumcraft.common.lib.events.EventHandlerRunic;
 
@@ -53,6 +54,8 @@ public class ClientProxy extends CommonProxy {
                 return new GuiFocusPouch(player.inventory, world, x, y, z);
             case GUI_HAND_MIRROR:
                 return new GuiHandMirror(player.inventory, world, x, y, z);
+            case GUI_HOVER_HARNESS:
+                return new GuiHoverHarness(player.inventory, world, x, y, z);
             case GUI_GOLEM:
             case GUI_PECH:
             case GUI_TRAVELING_TRUNK:
@@ -63,7 +66,6 @@ public class ClientProxy extends CommonProxy {
             case GUI_THAUMONOMICON:
             case GUI_ARCANE_WORKBENCH:
             case GUI_ARCANE_BORE:
-            case GUI_HOVER_HARNESS:
             case GUI_MAGIC_BOX:
             case GUI_SPA:
             case GUI_FOCAL_MANIPULATOR:
