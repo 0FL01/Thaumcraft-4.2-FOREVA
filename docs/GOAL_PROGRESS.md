@@ -242,12 +242,34 @@ Remaining limits:
 - Cultist Portal stage progression has not been observed in runtime/manual validation because user-driven scenarios are excluded and smoke-server remains environment-blocked.
 - This only closes the direct banner-facing TODO; full boss/minion/drop/loot distribution parity remains open.
 
+### 2026-05-14 — Stage 7 Eldritch crab spawner and trap server ticks
+
+Scope:
+
+- Ported `TileEldritchCrabSpawner` from its facing-only shell to the reference server tick loop.
+- Restored the crab spawner's randomized startup tick, countdown/reset cadence, 16-block player activation check, 32-block nearby-crab cap, warning block event, fizz/gore sounds, and facing-based `EntityEldritchCrab` spawn with outward motion.
+- Kept `facing` under the original NBT key and moved the tile to `TileThaumcraft` custom NBT like the reference.
+- Ported `TileEldritchTrap` from an empty shell to the reference server tick pulse: 10-34 tick reset, 3-block player check, 2 magic damage, and 50% temporary warp application.
+
+Validation:
+
+- `./scripts/dev.sh compileJava` — passed.
+- `./scripts/dev.sh build` — passed.
+- `./scripts/dev.sh check-jar` — failed before jar inspection because the wrapper's expected MCP mapping cache file is still absent at `.gradle_home/caches/minecraft/de/oceanlabs/mcp/mcp_stable/39/1.12.2/srgs/mcp-srg.srg`.
+- `./scripts/dev.sh smoke-server` — failed by timeout before ready state; log again stopped after `Calling tweak class net.minecraftforge.fml.common.launcher.FMLServerTweaker`, with only Log4j console appender initialization errors, no new crash reports, and no configured crash markers. This matches the clean `da3f307` baseline reproduction recorded above.
+
+Remaining limits:
+
+- Client vent particles and trap zap packet visuals are still Stage 8 FX work; `PacketFXBlockZap` currently has no payload constructor/handler.
+- Spawn/trap behavior has not been observed in an Outer Lands runtime traversal because smoke-server remains environment-blocked and user-driven client/manual scenarios are excluded.
+- `TileEldritchLock`, boss-room lifecycle, full room traversal, and broader room-template audit remain open Stage 7 work.
+
 ## Next Checkpoint Candidate
 
 After the portal trigger and ring bootstrap checkpoints, the next pre-Phase8 candidates are:
 
 - Remaining Stage 7 surface/worldgen placeholders, especially hilltop altar, mound/barrow, and spider Greatwood.
-- Remaining Stage 7 Outer Lands room/tile behavior, especially full `TileEldritchAltar`, lock, trap, crab spawner, key/boss room traversal, and maze save/load race validation.
+- Remaining Stage 7 Outer Lands room/tile behavior, especially `TileEldritchAltar` portal opening, lock/boss-room lifecycle, key/boss room traversal, and maze save/load race validation.
 - Stage 9 loot/content registration, because `Utils.generateLoot(...)` now has a shared reward path but the full reference loot pool distribution still depends on populated content tables.
 - Stage 6 server-side boss/manual scenario evidence remains excluded from user-driven validation, but static/reference parity blockers should continue to be reduced where possible.
 
