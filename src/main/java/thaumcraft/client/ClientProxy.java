@@ -1,10 +1,14 @@
 package thaumcraft.client;
 
 import javax.annotation.Nullable;
+import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.Item;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.translation.I18n;
 import net.minecraft.world.World;
+import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.player.ItemTooltipEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -12,13 +16,21 @@ import thaumcraft.client.gui.GuiFocusPouch;
 import thaumcraft.client.gui.GuiHandMirror;
 import thaumcraft.client.gui.GuiHoverHarness;
 import thaumcraft.common.CommonProxy;
+import thaumcraft.common.config.ConfigItems;
 import thaumcraft.common.lib.events.EventHandlerRunic;
 
 public class ClientProxy extends CommonProxy {
 
     @Override
     public void registerDisplayInformation() {
-        // Phase 8: register models, entity renderers, etc.
+        for (Item item : ConfigItems.getAllItems()) {
+            ResourceLocation registryName = item.getRegistryName();
+            if (registryName == null) continue;
+            ModelResourceLocation model = new ModelResourceLocation(registryName, "inventory");
+            for (int meta = 0; meta < 64; meta++) {
+                ModelLoader.setCustomModelResourceLocation(item, meta, model);
+            }
+        }
     }
 
     @Override

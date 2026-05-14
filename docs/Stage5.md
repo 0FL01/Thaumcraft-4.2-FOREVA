@@ -849,3 +849,24 @@ Validation evidence for this checkpoint:
 - `./scripts/dev.sh smoke-client` was attempted because `DISPLAY=:0`, but failed before mod initialization with the same environment/display failure: `java.lang.ArrayIndexOutOfBoundsException: 0` in `org.lwjgl.opengl.LinuxDisplay.getAvailableDisplayModes`. This remains environment-limited, not Stage 5 parity evidence.
 
 GAP-5 is advanced but not closed. Remaining Hover work includes the actual client H-key toggle path, reference on/off/periodic sounds, client horizontal motion damping with haste/girdle modifiers, anti-float counter reset parity if safely portable, tooltip parity for stored jar aspects/discounts, and manual in-world fuel/toggle/fall validation.
+
+### 8.9 2026-05-14 static item resource checkpoint
+
+Implemented in the current checkpoint:
+
+- Copied original static item textures from `thaumcraft_src/assets/thaumcraft/textures/items/**` into the port resource tree: `src/main/resources/assets/thaumcraft/textures/items/`.
+- Copied original focus upgrade icons from `thaumcraft_src/assets/thaumcraft/textures/foci/**` into the port resource tree: `src/main/resources/assets/thaumcraft/textures/foci/`.
+- Added 1.12 item model JSON coverage for all 93 `ConfigItems` registry paths plus Bone Bow pulling-state models under `src/main/resources/assets/thaumcraft/models/item/`; example base model: `src/main/resources/assets/thaumcraft/models/item/focusfire.json:1-6`, bow override model: `src/main/resources/assets/thaumcraft/models/item/itembowbone.json:1-28`.
+- Added `en_us.lang` entries for the current `item.thaumcraft.*.name` translation keys and static GUI labels used by Stage 5 containers: `src/main/resources/assets/thaumcraft/lang/en_us.lang:1-101`.
+- Registered base item model resource locations for all `ConfigItems` entries on the client side: `src/main/java/thaumcraft/client/ClientProxy.java:24-33`.
+
+Validation evidence for this checkpoint:
+
+- Local resource consistency check found 96 item model JSON files and `0` missing texture references.
+- `./scripts/dev.sh compileJava` passed.
+- `./scripts/dev.sh build` passed.
+- `./scripts/dev.sh check-jar` passed.
+- `./scripts/dev.sh smoke-server` passed and reached `Done (` with no crash markers.
+- `./scripts/dev.sh smoke-client` was attempted because `DISPLAY=:0`, but failed before mod initialization with the same environment/display failure: `java.lang.ArrayIndexOutOfBoundsException: 0` in `org.lwjgl.opengl.LinuxDisplay.getAvailableDisplayModes`. Client-side missing model confirmation remains environment-blocked.
+
+GAP-12 is advanced but not fully closed by runtime evidence. Remaining resource/client work includes true client smoke validation, metadata-specific model variants/tints for dynamic aspect/subtype items, wand dynamic composition, armor equipped-layer polish, and any Phase 8 renderers that cannot be represented by static generated item models.
