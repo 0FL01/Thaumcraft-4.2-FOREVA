@@ -10,6 +10,8 @@ import thaumcraft.api.aspects.IAspectContainer;
 import thaumcraft.api.nodes.INode;
 import thaumcraft.api.nodes.NodeModifier;
 import thaumcraft.api.nodes.NodeType;
+import thaumcraft.api.WorldCoordinates;
+import thaumcraft.common.items.ItemCompassStone;
 
 public class TileNode
 extends TileThaumcraft
@@ -145,9 +147,13 @@ implements ITickable, INode, IAspectContainer {
         if (this.id == null || this.id.isEmpty()) {
             this.id = generateId();
         }
-        if (this.world.isRemote) return;
-
         this.count++;
+        if (this.world.isRemote) {
+            if (this.nodeType == NodeType.DARK && this.count % 50 == 0) {
+                ItemCompassStone.sinisterNodes.put(new WorldCoordinates(this), System.currentTimeMillis());
+            }
+            return;
+        }
         if (this.regeneration < 0) {
             this.regeneration = getRegenerationInterval();
         }

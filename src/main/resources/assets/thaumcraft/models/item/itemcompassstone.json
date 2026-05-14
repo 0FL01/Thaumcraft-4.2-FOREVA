@@ -2,5 +2,13 @@
   "parent": "item/generated",
   "textures": {
     "layer0": "thaumcraft:items/sinister_stone"
-  }
+  },
+  "overrides": [
+    {
+      "predicate": {
+        "thaumcraft:active": 1.0
+      },
+      "model": "thaumcraft:item/itemcompassstone_active"
+    }
+  ]
 }

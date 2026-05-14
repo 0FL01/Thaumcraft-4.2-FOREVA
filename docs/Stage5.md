@@ -891,3 +891,24 @@ Validation evidence for this checkpoint:
 - `./scripts/dev.sh smoke-client` was attempted because this checkpoint touches item lang/tooltips, but failed before mod initialization with the known local LWJGL display failure: `java.lang.ExceptionInInitializerError` caused by `java.lang.ArrayIndexOutOfBoundsException: 0` in `org.lwjgl.opengl.LinuxDisplay.getAvailableDisplayModes`. This is an environment/display blocker, not Stage 5 parity evidence.
 
 GAP-11 is advanced but not closed. Remaining ItemKey dependencies are the missing Arcane Door block path in the current port, pressure-plate redstone/settings runtime parity in `BlockWoodenDevice`, and manual in-world validation for linked-key creation, access grants, owner/gold-key paths, inventory-full drops, and tooltip localization.
+
+### 8.11 2026-05-14 RECON and Compass Stone checkpoint
+
+Fresh RECON after the ItemKey checkpoint found no literal `TBD` markers remaining under `src/main/java/thaumcraft/common/items/**`, but several Stage 5 items still had no-op or simplified behavior. The smallest isolated GAP-11 target was `ItemCompassStone`, whose reference class does not right-click but tracks nearby sinister/DARK nodes client-side and switches to the active sinister-stone icon while the player is looking toward a recent DARK node.
+
+Implemented in the current checkpoint:
+
+- Restored the reference-style `ItemCompassStone.sinisterNodes` cache, 10-second stale-entry pruning, 256-block look-cone check, rare rarity, and active item-model property for visible sinister nodes: `src/main/java/thaumcraft/common/items/ItemCompassStone.java:21-86`.
+- Updated `TileNode` client ticks so DARK nodes add their `WorldCoordinates` to `ItemCompassStone.sinisterNodes` every 50 ticks, matching the original client-side discovery path: `src/main/java/thaumcraft/common/tiles/TileNode.java:144-156`.
+- Added a 1.12 item-model override for the active sinister stone texture copied from the original assets: `src/main/resources/assets/thaumcraft/models/item/itemcompassstone.json:1-14`, `src/main/resources/assets/thaumcraft/models/item/itemcompassstone_active.json:1-6`.
+
+Validation evidence for this checkpoint:
+
+- `./scripts/dev.sh compileJava` passed after the Compass Stone/TileNode changes.
+- Local item-model texture consistency check found 97 item model JSON files and `0` missing texture references.
+- `./scripts/dev.sh build` passed.
+- `./scripts/dev.sh check-jar` passed with `Jar check PASSED: no MCP-named Minecraft field/method references found in /home/stfu/ai/dont/thaumcraft/build/libs/Thaumcraft-1.0.0-universal.jar`.
+- `./scripts/dev.sh smoke-server` passed and reached `Done (` with no crash markers in `run/smoke-server.log`.
+- `./scripts/dev.sh smoke-client` was attempted because this checkpoint touches client item-model/property behavior, but failed before mod initialization with the known local LWJGL display failure: `java.lang.ExceptionInInitializerError` caused by `java.lang.ArrayIndexOutOfBoundsException: 0` in `org.lwjgl.opengl.LinuxDisplay.getAvailableDisplayModes`. This remains an environment/display blocker, not Compass Stone parity evidence.
+
+GAP-11 is advanced but not closed. Remaining utility/relic no-op or simplified targets from RECON include `ItemBucketPure`, `ItemResonator`, `ItemBathSalts`, `ItemResearchNotes`, `ItemEldritchObject`, `ItemEssence`, `ItemLootBag`, `ItemManaBean`, `ItemSanitySoap`, and the remaining relic/tool/bauble validation work listed above.
