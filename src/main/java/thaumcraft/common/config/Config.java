@@ -200,9 +200,13 @@ public class Config {
 
     public static void initPotions() {
         potionFluxTaint = new PotionFluxTaint(true, 0x800080);
+        PotionFluxTaint.instance = potionFluxTaint;
+        PotionFluxTaint.init();
         potionFluxTaint.setRegistryName("thaumcraft", "flux_taint");
 
         potionVisExhaust = new PotionVisExhaust(true, 0x8888FF);
+        PotionVisExhaust.instance = potionVisExhaust;
+        PotionVisExhaust.init();
         potionVisExhaust.setRegistryName("thaumcraft", "vis_exhaust");
 
         potionInfectiousVisExhaust = new PotionInfectiousVisExhaust(true, 0x4444AA);

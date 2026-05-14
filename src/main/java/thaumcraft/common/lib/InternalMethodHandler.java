@@ -9,10 +9,12 @@ import thaumcraft.api.internal.IInternalMethodHandler;
 import thaumcraft.common.Thaumcraft;
 import thaumcraft.common.items.wands.ItemWandCasting;
 import thaumcraft.common.items.wands.WandManager;
+import thaumcraft.common.lib.crafting.ThaumcraftCraftingManager;
 import thaumcraft.common.lib.capabilities.IPlayerKnowledge;
 import thaumcraft.common.lib.capabilities.PlayerKnowledgeProvider;
 import thaumcraft.common.lib.research.PlayerKnowledge;
 import thaumcraft.common.lib.research.ResearchManager;
+import thaumcraft.common.tiles.TileMagicWorkbench;
 
 public class InternalMethodHandler implements IInternalMethodHandler {
 
@@ -45,33 +47,25 @@ public class InternalMethodHandler implements IInternalMethodHandler {
 
     @Override
     public ItemStack getStackInRowAndColumn(Object instance, int row, int column) {
-        // Phase 4: tile entity integration
+        if (instance instanceof TileMagicWorkbench) {
+            return ((TileMagicWorkbench)instance).getStackInRowAndColumn(row, column);
+        }
         return ItemStack.EMPTY;
     }
 
     @Override
     public AspectList getObjectAspects(ItemStack is) {
-        if (is.isEmpty()) return new AspectList();
-        // Look up in the object tags registry
-        java.util.List<Object> key = java.util.Arrays.asList(is.getItem(), is.getMetadata());
-        AspectList aspects = thaumcraft.api.ThaumcraftApi.objectTags.get(key);
-        if (aspects == null) {
-            key = java.util.Arrays.asList(is.getItem(), Short.MAX_VALUE);
-            aspects = thaumcraft.api.ThaumcraftApi.objectTags.get(key);
-        }
-        return aspects != null ? aspects.copy() : new AspectList();
+        return ThaumcraftCraftingManager.getObjectTags(is);
     }
 
     @Override
     public AspectList getBonusObjectTags(ItemStack is, AspectList ot) {
-        // Phase 3: bonus tags from components
-        return new AspectList();
+        return ThaumcraftCraftingManager.getBonusTags(is, ot);
     }
 
     @Override
     public AspectList generateTags(Item item, int meta) {
-        // Phase 3: auto-generate tags from materials
-        return new AspectList();
+        return ThaumcraftCraftingManager.generateTags(item, meta);
     }
 
     @Override

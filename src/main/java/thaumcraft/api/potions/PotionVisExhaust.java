@@ -15,8 +15,24 @@ public class PotionVisExhaust extends Potion {
 
     public PotionVisExhaust(boolean isBadEffect, int liquidColor) {
         super(isBadEffect, liquidColor);
-        this.setIconIndex(0, 0);
-        this.setPotionName("potion.visexhaust");
+        configure(this);
+    }
+
+    @Deprecated
+    public PotionVisExhaust(int ignoredId, boolean isBadEffect, int liquidColor) {
+        this(isBadEffect, liquidColor);
+    }
+
+    public static void init() {
+        if (instance != null) {
+            configure(instance);
+        }
+    }
+
+    private static void configure(PotionVisExhaust potion) {
+        potion.setPotionName("potion.visexhaust");
+        potion.setIconIndex(5, 1);
+        potion.setEffectiveness(0.25D);
     }
 
     @SideOnly(Side.CLIENT)
@@ -28,6 +44,11 @@ public class PotionVisExhaust extends Potion {
 
     @Override
     public void performEffect(EntityLivingBase target, int par2) {
+    }
+
+    @Override
+    public boolean isInstant() {
+        return true;
     }
 
     @Override

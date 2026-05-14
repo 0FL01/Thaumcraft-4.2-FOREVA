@@ -18,8 +18,24 @@ public class PotionFluxTaint extends Potion {
 
     public PotionFluxTaint(boolean isBadEffect, int liquidColor) {
         super(isBadEffect, liquidColor);
-        this.setIconIndex(0, 0);
-        this.setPotionName("potion.fluxtaint");
+        configure(this);
+    }
+
+    @Deprecated
+    public PotionFluxTaint(int ignoredId, boolean isBadEffect, int liquidColor) {
+        this(isBadEffect, liquidColor);
+    }
+
+    public static void init() {
+        if (instance != null) {
+            configure(instance);
+        }
+    }
+
+    private static void configure(PotionFluxTaint potion) {
+        potion.setPotionName("potion.fluxtaint");
+        potion.setIconIndex(3, 1);
+        potion.setEffectiveness(0.25D);
     }
 
     @SideOnly(Side.CLIENT)
@@ -38,6 +54,11 @@ public class PotionFluxTaint extends Potion {
         } else if (!target.isEntityUndead() && (target.getMaxHealth() > 1.0f || target instanceof EntityPlayer)) {
             target.attackEntityFrom(DamageSourceThaumcraft.taint, 1.0f);
         }
+    }
+
+    @Override
+    public boolean isInstant() {
+        return true;
     }
 
     @Override

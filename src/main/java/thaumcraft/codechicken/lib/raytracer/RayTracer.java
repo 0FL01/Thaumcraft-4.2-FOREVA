@@ -112,8 +112,7 @@ public class RayTracer {
     public RayTraceResult rayTraceCuboid(Vector3 start, Vector3 end, Cuboid6 cuboid, BlockCoord pos) {
         RayTraceResult mop = this.rayTraceCuboid(start, end, cuboid);
         if (mop != null) {
-            mop.typeOfHit = RayTraceResult.Type.BLOCK;
-            mop.hitVec = new Vec3d((double)pos.x, (double)pos.y, (double)pos.z);
+            mop = RayTracer.withBlockPos(mop, pos);
         }
         return mop;
     }
@@ -144,8 +143,7 @@ public class RayTracer {
     public RayTraceResult rayTraceCuboids(Vector3 start, Vector3 end, List<IndexedCuboid6> cuboids, BlockCoord pos, Block block) {
         RayTraceResult mop = this.rayTraceCuboids(start, end, cuboids);
         if (mop != null) {
-            mop.typeOfHit = RayTraceResult.Type.BLOCK;
-            mop.hitVec = new Vec3d((double)pos.x, (double)pos.y, (double)pos.z);
+            mop = RayTracer.withBlockPos(mop, pos);
             if (block != null) {
                 this.c_cuboid.add(new Vector3(-pos.x, -pos.y, -pos.z)).setBlockBounds(block);
             }
@@ -157,11 +155,20 @@ public class RayTracer {
         for (IndexedCuboid6 cuboid : cuboids) {
             RayTraceResult mop = this.rayTraceCuboid(start, end, cuboid);
             if (mop == null) continue;
-            ExtendedMOP emop = new ExtendedMOP(mop, cuboid.data, this.s_dist);
-            emop.typeOfHit = RayTraceResult.Type.BLOCK;
-            emop.hitVec = new Vec3d((double)pos.x, (double)pos.y, (double)pos.z);
+            ExtendedMOP emop = new ExtendedMOP(RayTracer.withBlockPos(mop, pos), cuboid.data, this.s_dist);
             hitList.add(emop);
         }
+    }
+
+    private static RayTraceResult withBlockPos(RayTraceResult mop, BlockCoord pos) {
+        RayTraceResult blockMop = new RayTraceResult(RayTraceResult.Type.BLOCK, mop.hitVec, mop.sideHit, new BlockPos(pos.x, pos.y, pos.z));
+        blockMop.entityHit = mop.entityHit;
+        blockMop.subHit = mop.subHit;
+        if (mop instanceof ExtendedMOP) {
+            ExtendedMOP extended = (ExtendedMOP)mop;
+            return new ExtendedMOP(blockMop, extended.data, extended.dist);
+        }
+        return blockMop;
     }
 
     public static RayTraceResult retraceBlock(World world, EntityPlayer player, int x, int y, int z) {
