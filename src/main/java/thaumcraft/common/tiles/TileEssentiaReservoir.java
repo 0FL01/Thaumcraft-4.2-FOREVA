@@ -1,15 +1,23 @@
 package thaumcraft.common.tiles;
 
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.EnumHand;
 import net.minecraft.util.ITickable;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.ItemStack;
+import net.minecraft.world.World;
+import thaumcraft.api.ThaumcraftApiHelper;
 import thaumcraft.api.TileThaumcraft;
 import thaumcraft.api.aspects.Aspect;
 import thaumcraft.api.aspects.AspectList;
+import thaumcraft.api.aspects.IAspectSource;
 import thaumcraft.api.aspects.IAspectContainer;
 import thaumcraft.api.aspects.IEssentiaTransport;
+import thaumcraft.api.wands.IWandable;
 
-public class TileEssentiaReservoir extends TileThaumcraft implements ITickable, IAspectContainer, IEssentiaTransport {
+public class TileEssentiaReservoir extends TileThaumcraft implements ITickable, IAspectSource, IEssentiaTransport, IWandable {
     public AspectList essentia = new AspectList();
     public int maxAmount = 256;
     public EnumFacing facing = EnumFacing.DOWN;
@@ -17,9 +25,29 @@ public class TileEssentiaReservoir extends TileThaumcraft implements ITickable, 
     public float colorG = 1.0f;
     public float colorB = 1.0f;
     public Aspect displayAspect = null;
+    private int count = 0;
 
     @Override
-    public void update() {}
+    public void update() {
+        if (this.world != null && !this.world.isRemote && ++this.count % 5 == 0 && this.essentia.visSize() < this.maxAmount) {
+            this.fillReservoir();
+        }
+    }
+
+    private void fillReservoir() {
+        TileEntity tile = ThaumcraftApiHelper.getConnectableTile(this.world, this.pos.getX(), this.pos.getY(), this.pos.getZ(), this.facing);
+        if (!(tile instanceof IEssentiaTransport)) return;
+        IEssentiaTransport transport = (IEssentiaTransport) tile;
+        EnumFacing remote = this.facing.getOpposite();
+        if (!transport.canOutputTo(remote)) return;
+        if (transport.getEssentiaAmount(remote) <= 0) return;
+        if (transport.getSuctionAmount(remote) >= this.getSuctionAmount(this.facing)) return;
+        if (this.getSuctionAmount(this.facing) < transport.getMinimumSuction()) return;
+        Aspect aspect = transport.getEssentiaType(remote);
+        if (aspect != null) {
+            this.addToContainer(aspect, transport.takeEssentia(aspect, 1, remote));
+        }
+    }
 
     // --- NBT ---
 
@@ -28,10 +56,14 @@ public class TileEssentiaReservoir extends TileThaumcraft implements ITickable, 
         super.readCustomNBT(nbt);
         this.essentia = new AspectList();
         this.essentia.readFromNBT(nbt);
-        this.maxAmount = nbt.getInteger("maxAmount");
-        if (nbt.hasKey("facing")) {
+        if (this.essentia.visSize() > this.maxAmount) this.essentia = new AspectList();
+        if (nbt.hasKey("maxAmount")) this.maxAmount = nbt.getInteger("maxAmount");
+        if (nbt.hasKey("face")) {
+            this.facing = EnumFacing.byIndex(nbt.getByte("face"));
+        } else if (nbt.hasKey("facing")) {
             this.facing = EnumFacing.byIndex(nbt.getByte("facing"));
         }
+        if (this.facing == null) this.facing = EnumFacing.DOWN;
         if (nbt.hasKey("displayAspect")) {
             this.displayAspect = Aspect.getAspect(nbt.getString("displayAspect"));
         } else {
@@ -48,8 +80,7 @@ public class TileEssentiaReservoir extends TileThaumcraft implements ITickable, 
         if (this.essentia != null) {
             this.essentia.writeToNBT(nbt);
         }
-        nbt.setInteger("maxAmount", this.maxAmount);
-        nbt.setByte("facing", (byte) this.facing.getIndex());
+        nbt.setByte("face", (byte) this.facing.getIndex());
         if (this.displayAspect != null) {
             nbt.setString("displayAspect", this.displayAspect.getTag());
         }
@@ -143,17 +174,17 @@ public class TileEssentiaReservoir extends TileThaumcraft implements ITickable, 
 
     @Override
     public boolean isConnectable(EnumFacing face) {
-        return true;
+        return face == this.facing;
     }
 
     @Override
     public boolean canInputFrom(EnumFacing face) {
-        return face == this.facing || true;
+        return face == this.facing;
     }
 
     @Override
     public boolean canOutputTo(EnumFacing face) {
-        return face == this.facing || true;
+        return face == this.facing;
     }
 
     @Override
@@ -166,16 +197,12 @@ public class TileEssentiaReservoir extends TileThaumcraft implements ITickable, 
 
     @Override
     public int getSuctionAmount(EnumFacing loc) {
-        if (loc != null && loc == this.facing) return 0;
         return this.containerContains(null) < this.maxAmount ? 24 : 0;
     }
 
     @Override
     public Aspect getEssentiaType(EnumFacing loc) {
-        if (loc == this.facing) return this.displayAspect;
-        Aspect[] aspects = this.essentia.getAspects();
-        if (aspects.length == 1) return aspects[0];
-        return this.displayAspect;
+        return this.essentia.visSize() > 0 && loc == null ? this.essentia.getAspects()[0] : null;
     }
 
     @Override
@@ -185,12 +212,12 @@ public class TileEssentiaReservoir extends TileThaumcraft implements ITickable, 
 
     @Override
     public int getMinimumSuction() {
-        return 0;
+        return 24;
     }
 
     @Override
     public boolean renderExtendedTube() {
-        return true;
+        return false;
     }
 
     @Override
@@ -208,4 +235,24 @@ public class TileEssentiaReservoir extends TileThaumcraft implements ITickable, 
         int leftover = this.addToContainer(aspect, amount);
         return amount - leftover;
     }
+
+    @Override
+    public int onWandRightClick(World world, ItemStack wandstack, EntityPlayer player, int x, int y, int z, int side, int md) {
+        EnumFacing clicked = EnumFacing.byIndex(side);
+        if (clicked == null) return 0;
+        this.facing = player != null && player.isSneaking() ? clicked : clicked.getOpposite();
+        if (player != null) player.swingArm(EnumHand.MAIN_HAND);
+        this.markDirty();
+        if (world != null && !world.isRemote) world.notifyBlockUpdate(this.pos, world.getBlockState(this.pos), world.getBlockState(this.pos), 3);
+        return 0;
+    }
+
+    @Override
+    public ItemStack onWandRightClick(World world, ItemStack wandstack, EntityPlayer player) { return wandstack; }
+
+    @Override
+    public void onUsingWandTick(ItemStack wandstack, EntityPlayer player, int count) {}
+
+    @Override
+    public void onWandStoppedUsing(ItemStack wandstack, World world, EntityPlayer player, int count) {}
 }

@@ -1,19 +1,27 @@
 package thaumcraft.common.tiles;
 
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.EnumHand;
 import net.minecraft.util.ITickable;
+import net.minecraft.world.World;
 import thaumcraft.api.TileThaumcraft;
 import thaumcraft.api.aspects.Aspect;
 import thaumcraft.api.aspects.AspectList;
 import thaumcraft.api.aspects.IAspectContainer;
 import thaumcraft.api.aspects.IEssentiaTransport;
+import thaumcraft.api.wands.IWandable;
 
-public class TileAlembic extends TileThaumcraft implements ITickable, IAspectContainer, IEssentiaTransport {
+public class TileAlembic extends TileThaumcraft implements ITickable, IAspectContainer, IEssentiaTransport, IWandable {
     public Aspect aspect = null;
+    public Aspect aspectFilter = null;
     public int amount = 0;
     public int maxAmount = 32;
     public int facing = 2;
+    public boolean aboveAlembic = false;
+    public boolean aboveFurnace = false;
 
     @Override
     public void update() {}
@@ -28,8 +36,9 @@ public class TileAlembic extends TileThaumcraft implements ITickable, IAspectCon
         } else {
             this.aspect = null;
         }
+        this.aspectFilter = Aspect.getAspect(nbt.getString("AspectFilter"));
         this.amount = nbt.getInteger("amount");
-        this.maxAmount = nbt.getInteger("maxAmount");
+        if (nbt.hasKey("maxAmount")) this.maxAmount = nbt.getInteger("maxAmount");
         this.facing = nbt.getByte("facing");
     }
 
@@ -39,8 +48,10 @@ public class TileAlembic extends TileThaumcraft implements ITickable, IAspectCon
         if (this.aspect != null) {
             nbt.setString("aspect", this.aspect.getTag());
         }
+        if (this.aspectFilter != null) {
+            nbt.setString("AspectFilter", this.aspectFilter.getTag());
+        }
         nbt.setInteger("amount", this.amount);
-        nbt.setInteger("maxAmount", this.maxAmount);
         nbt.setByte("facing", (byte) this.facing);
     }
 
@@ -69,7 +80,8 @@ public class TileAlembic extends TileThaumcraft implements ITickable, IAspectCon
 
     @Override
     public boolean doesContainerAccept(Aspect tag) {
-        return tag != null && this.amount < this.maxAmount && (this.aspect == null || this.aspect.equals(tag));
+        return tag != null && (this.aspectFilter == null || this.aspectFilter == tag)
+                && this.amount < this.maxAmount && (this.aspect == null || this.aspect.equals(tag));
     }
 
     @Override
@@ -127,7 +139,7 @@ public class TileAlembic extends TileThaumcraft implements ITickable, IAspectCon
 
     @Override
     public boolean isConnectable(EnumFacing face) {
-        return true;
+        return face != EnumFacing.byIndex(this.facing) && face != EnumFacing.DOWN;
     }
 
     @Override
@@ -137,7 +149,7 @@ public class TileAlembic extends TileThaumcraft implements ITickable, IAspectCon
 
     @Override
     public boolean canOutputTo(EnumFacing face) {
-        return this.amount > 0;
+        return face != EnumFacing.byIndex(this.facing) && face != EnumFacing.DOWN;
     }
 
     @Override
@@ -175,14 +187,44 @@ public class TileAlembic extends TileThaumcraft implements ITickable, IAspectCon
 
     @Override
     public int takeEssentia(Aspect aspect, int amount, EnumFacing face) {
-        if (!this.canOutputTo(face) || !aspect.equals(this.aspect)) return 0;
-        int taken = Math.min(amount, this.amount);
-        this.takeFromContainer(aspect, taken);
-        return taken;
+        return this.canOutputTo(face) && this.takeFromContainer(aspect, amount) ? amount : 0;
     }
 
     @Override
     public int addEssentia(Aspect aspect, int amount, EnumFacing face) {
         return 0;
     }
+
+    public void getAppearance() {
+        this.aboveAlembic = false;
+        this.aboveFurnace = false;
+        if (this.world == null) return;
+        if (this.world.getBlockState(this.pos.down()).getBlock() == thaumcraft.common.config.ConfigBlocks.blockStoneDevice
+                && thaumcraft.common.config.ConfigBlocks.blockStoneDevice.getMetaFromState(this.world.getBlockState(this.pos.down())) == 0) {
+            this.aboveFurnace = true;
+        }
+        if (this.world.getBlockState(this.pos.down()).getBlock() == thaumcraft.common.config.ConfigBlocks.blockMetalDevice
+                && thaumcraft.common.config.ConfigBlocks.blockMetalDevice.getMetaFromState(this.world.getBlockState(this.pos.down())) == 1) {
+            this.aboveAlembic = true;
+        }
+    }
+
+    @Override
+    public int onWandRightClick(World world, ItemStack wandstack, EntityPlayer player, int x, int y, int z, int side, int md) {
+        if (side <= 1) return 0;
+        this.facing = side;
+        if (player != null) player.swingArm(EnumHand.MAIN_HAND);
+        this.markDirty();
+        if (world != null && !world.isRemote) world.notifyBlockUpdate(this.pos, world.getBlockState(this.pos), world.getBlockState(this.pos), 3);
+        return 0;
+    }
+
+    @Override
+    public ItemStack onWandRightClick(World world, ItemStack wandstack, EntityPlayer player) { return wandstack; }
+
+    @Override
+    public void onUsingWandTick(ItemStack wandstack, EntityPlayer player, int count) {}
+
+    @Override
+    public void onWandStoppedUsing(ItemStack wandstack, World world, EntityPlayer player, int count) {}
 }

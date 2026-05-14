@@ -88,10 +88,17 @@ extends BlockContainer {
 
     @Override
     public void getSubBlocks(CreativeTabs tab, NonNullList<ItemStack> list) {
+        list.add(new ItemStack(this, 1, 0)); // alchemy furnace
         list.add(new ItemStack(this, 1, 1)); // pedestal
         list.add(new ItemStack(this, 1, 2)); // infusion matrix
         list.add(new ItemStack(this, 1, 3)); // infusion pillar
         list.add(new ItemStack(this, 1, 5)); // wand pedestal
+        list.add(new ItemStack(this, 1, 9)); // node stabilizer
+        list.add(new ItemStack(this, 1, 10)); // advanced node stabilizer
+        list.add(new ItemStack(this, 1, 11)); // node converter
+        list.add(new ItemStack(this, 1, 12)); // spa
+        list.add(new ItemStack(this, 1, 13)); // focal manipulator
+        list.add(new ItemStack(this, 1, 14)); // flux scrubber
     }
 
     @Override

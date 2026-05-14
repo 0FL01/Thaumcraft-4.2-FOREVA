@@ -19,6 +19,9 @@ public class ConfigBlocks {
     public static BlockStoneDevice blockStoneDevice;
     public static BlockWoodenDevice blockWoodenDevice;
     public static BlockMetalDevice blockMetalDevice;
+    public static BlockTube blockTube;
+    public static BlockMirror blockMirror;
+    public static BlockEssentiaReservoir blockEssentiaReservoir;
     public static BlockMagicalLog blockMagicalLog;
     public static BlockMagicalLeaves blockMagicalLeaves;
     public static BlockCustomOre blockCustomOre;
@@ -75,6 +78,18 @@ public class ConfigBlocks {
         blockMetalDevice = (BlockMetalDevice) new BlockMetalDevice()
                 .setRegistryName("thaumcraft", legacyPath("blockMetalDevice"))
                 .setTranslationKey("thaumcraft.metal_device");
+
+        blockTube = (BlockTube) new BlockTube()
+                .setRegistryName("thaumcraft", legacyPath("blockTube"))
+                .setTranslationKey("thaumcraft.tube");
+
+        blockMirror = (BlockMirror) new BlockMirror()
+                .setRegistryName("thaumcraft", legacyPath("blockMirror"))
+                .setTranslationKey("thaumcraft.mirror");
+
+        blockEssentiaReservoir = (BlockEssentiaReservoir) new BlockEssentiaReservoir()
+                .setRegistryName("thaumcraft", legacyPath("blockEssentiaReservoir"))
+                .setTranslationKey("thaumcraft.essentia_reservoir");
 
         blockMagicalLog = (BlockMagicalLog) new BlockMagicalLog()
                 .setRegistryName("thaumcraft", legacyPath("blockMagicalLog"))
@@ -191,6 +206,9 @@ public class ConfigBlocks {
                 blockStoneDevice,
                 blockWoodenDevice,
                 blockMetalDevice,
+                blockTube,
+                blockMirror,
+                blockEssentiaReservoir,
                 blockMagicalLog,
                 blockMagicalLeaves,
                 blockCustomOre,
@@ -226,15 +244,21 @@ public class ConfigBlocks {
             blockFluxGasItem,
             blockCrystalItem
         );
-        registry.register(new net.minecraft.item.ItemBlock(blockTable)
+        registry.register(new BlockMetadataItem(blockTable)
                 .setRegistryName(blockTable.getRegistryName()));
-        registry.register(new net.minecraft.item.ItemBlock(blockStoneDevice)
+        registry.register(new BlockMetadataItem(blockStoneDevice)
                 .setRegistryName(blockStoneDevice.getRegistryName()));
-        registry.register(new net.minecraft.item.ItemBlock(blockWoodenDevice)
+        registry.register(new BlockWoodenDeviceItem(blockWoodenDevice)
                 .setRegistryName(blockWoodenDevice.getRegistryName()));
-        registry.register(new net.minecraft.item.ItemBlock(blockMetalDevice)
+        registry.register(new BlockMetadataItem(blockMetalDevice)
                 .setRegistryName(blockMetalDevice.getRegistryName()));
-        registry.register(new net.minecraft.item.ItemBlock(blockMagicalLog)
+        registry.register(new BlockTubeItem(blockTube)
+                .setRegistryName(blockTube.getRegistryName()));
+        registry.register(new BlockMirrorItem(blockMirror)
+                .setRegistryName(blockMirror.getRegistryName()));
+        registry.register(new BlockEssentiaReservoirItem(blockEssentiaReservoir)
+                .setRegistryName(blockEssentiaReservoir.getRegistryName()));
+        registry.register(new BlockMetadataItem(blockMagicalLog)
                 .setRegistryName(blockMagicalLog.getRegistryName()));
         registry.register(new net.minecraft.item.ItemBlock(blockManaPod)
                 .setRegistryName(blockManaPod.getRegistryName()));
@@ -296,6 +320,12 @@ public class ConfigBlocks {
             new TileRegistration(TileArcaneFurnace.class, "TileArcaneFurnace"),
             new TileRegistration(TileArcaneFurnaceNozzle.class, "TileArcaneFurnaceNozzle"),
             new TileRegistration(TileBellows.class, "TileBellows"),
+            new TileRegistration(TileTube.class, "TileTube"),
+            new TileRegistration(TileTubeValve.class, "TileTubeValve"),
+            new TileRegistration(TileTubeFilter.class, "TileTubeFilter"),
+            new TileRegistration(TileTubeBuffer.class, "TileTubeBuffer"),
+            new TileRegistration(TileTubeRestrict.class, "TileTubeRestrict"),
+            new TileRegistration(TileTubeOneway.class, "TileTubeOneway"),
             new TileRegistration(TileCentrifuge.class, "TileCentrifuge"),
             new TileRegistration(TileEssentiaReservoir.class, "TileEssentiaReservoir"),
             new TileRegistration(TileMirror.class, "TileMirror"),

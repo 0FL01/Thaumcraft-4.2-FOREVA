@@ -132,9 +132,6 @@ public class TileHole extends TileThaumcraft implements net.minecraft.util.ITick
         if (!name.isEmpty()) {
             this.oldblock = ForgeRegistries.BLOCKS.getValue(new ResourceLocation(name));
         }
-        if (this.oldblock == null || this.oldblock == Blocks.AIR) {
-            this.oldblock = Block.getBlockById(nbt.getInteger("oldblock"));
-        }
         if (this.oldblock == null) {
             this.oldblock = Blocks.AIR;
         }
@@ -150,7 +147,6 @@ public class TileHole extends TileThaumcraft implements net.minecraft.util.ITick
 
     @Override
     public void writeCustomNBT(NBTTagCompound nbt) {
-        nbt.setInteger("oldblock", Block.getIdFromBlock(this.oldblock));
         if (this.oldblock != null && this.oldblock.getRegistryName() != null) {
             nbt.setString("oldblockName", this.oldblock.getRegistryName().toString());
         }

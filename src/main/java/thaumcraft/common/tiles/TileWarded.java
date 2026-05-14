@@ -50,9 +50,6 @@ public class TileWarded extends TileThaumcraft {
         if (!name.isEmpty()) {
             this.block = ForgeRegistries.BLOCKS.getValue(new ResourceLocation(name));
         }
-        if (this.block == null || this.block == Blocks.AIR) {
-            this.block = Block.getBlockById(nbt.getInteger("bi"));
-        }
         if (this.block == null) {
             this.block = Blocks.STONE;
         }
@@ -66,7 +63,6 @@ public class TileWarded extends TileThaumcraft {
 
     @Override
     public void writeCustomNBT(NBTTagCompound nbt) {
-        nbt.setInteger("bi", Block.getIdFromBlock(this.block));
         if (this.block != null && this.block.getRegistryName() != null) {
             nbt.setString("blockName", this.block.getRegistryName().toString());
         }

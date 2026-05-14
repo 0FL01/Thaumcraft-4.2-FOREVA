@@ -30,6 +30,8 @@ import net.minecraftforge.common.ForgeHooks;
 import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.common.util.FakePlayerFactory;
 import thaumcraft.api.TileThaumcraft;
+import thaumcraft.api.aspects.Aspect;
+import thaumcraft.api.visnet.VisNetHandler;
 import thaumcraft.api.wands.FocusUpgradeType;
 import thaumcraft.api.wands.IWandable;
 import thaumcraft.common.items.wands.foci.FocusExcavation;
@@ -55,6 +57,7 @@ public class TileArcaneBore extends TileThaumcraft implements ITickable, IInvent
     private int digCooldown = 20;
     private int scanIndex = 0;
     private FakePlayer fakePlayer = null;
+    private float speedyTime = 0.0F;
 
     @Override
     public void update() {
@@ -64,8 +67,24 @@ public class TileArcaneBore extends TileThaumcraft implements ITickable, IInvent
         }
         this.topRotation = (this.topRotation + (this.hasFocus && this.hasPickaxe ? 4 : 1)) % 360;
         if (this.world != null && !this.world.isRemote) {
+            this.rechargeSpeedyTime();
             this.updateMining();
         }
+    }
+
+    private void rechargeSpeedyTime() {
+        if (this.speedyTime >= 20.0F) return;
+        int drained = VisNetHandler.drainVis(this.world, this.pos.getX(), this.pos.getY(), this.pos.getZ(), Aspect.ENTROPY, 100);
+        if (drained > 0) {
+            this.speedyTime += (float) drained / 5.0F;
+        }
+        if (this.speedyTime < 20.0F) {
+            TileArcaneBoreBase base = this.getBase();
+            if (base != null && base.drawEssentia()) {
+                this.speedyTime += 20.0F;
+            }
+        }
+        if (this.speedyTime > 20.0F) this.speedyTime = 20.0F;
     }
 
     public void setOrientation(EnumFacing orientation, boolean initial) {
@@ -107,6 +126,9 @@ public class TileArcaneBore extends TileThaumcraft implements ITickable, IInvent
     public void readCustomNBT(NBTTagCompound nbt) {
         this.orientation = EnumFacing.byIndex(nbt.getInteger("orientation"));
         this.baseOrientation = EnumFacing.byIndex(nbt.getInteger("baseOrientation"));
+        if (this.orientation == null) this.orientation = EnumFacing.UP;
+        if (this.baseOrientation == null) this.baseOrientation = EnumFacing.UP;
+        this.speedyTime = nbt.getFloat("SpeedyTime");
         this.contents = new ItemStack[]{ItemStack.EMPTY, ItemStack.EMPTY};
         NBTTagList list = nbt.getTagList("Inventory", 10);
         for (int i = 0; i < list.tagCount(); ++i) {
@@ -123,6 +145,7 @@ public class TileArcaneBore extends TileThaumcraft implements ITickable, IInvent
     public void writeCustomNBT(NBTTagCompound nbt) {
         nbt.setInteger("orientation", this.orientation.getIndex());
         nbt.setInteger("baseOrientation", this.baseOrientation.getIndex());
+        nbt.setFloat("SpeedyTime", this.speedyTime);
         NBTTagList list = new NBTTagList();
         for (int i = 0; i < this.contents.length; ++i) {
             if (this.contents[i].isEmpty()) continue;
@@ -295,7 +318,11 @@ public class TileArcaneBore extends TileThaumcraft implements ITickable, IInvent
         IBlockState state = this.world.getBlockState(target);
         float hardness = state.getBlockHardness(this.world, target);
         this.digCooldown = Math.max(4, 12 + (int) (Math.max(0.0F, hardness) * 2.0F) - this.speed * 2);
+        if (this.speedyTime < 1.0F) {
+            this.digCooldown *= 4;
+        }
         if (this.mineBlock(target, state)) {
+            if (this.speedyTime > 0.0F) this.speedyTime -= 1.0F;
             this.topRotation = (this.topRotation + 30) % 360;
         }
     }

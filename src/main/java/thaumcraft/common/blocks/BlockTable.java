@@ -121,7 +121,7 @@ extends BlockContainer {
         if (md < 14) {
             int l = MathHelper.floor((placer.rotationYaw * 4.0F / 360.0F) + 0.5D) & 3;
             int out = (l == 0 || l == 2) ? 0 : 1;
-            worldIn.setBlockState(pos, state, 3);
+            worldIn.setBlockState(pos, state.withProperty(TYPE, out), 3);
         }
     }
 

@@ -63,8 +63,12 @@ public class BlockWoodenDevice extends BlockContainer {
     @Override
     public void getSubBlocks(CreativeTabs tab, NonNullList<ItemStack> list) {
         list.add(new ItemStack(this, 1, 0)); // bellows
+        list.add(new ItemStack(this, 1, 1)); // sensor
+        list.add(new ItemStack(this, 1, 2)); // pressure plate
+        list.add(new ItemStack(this, 1, 3)); // pressure plate
         list.add(new ItemStack(this, 1, 4)); // bore base
         list.add(new ItemStack(this, 1, 5)); // bore
+        list.add(new ItemStack(this, 1, 8)); // banner
     }
 
     @Override
