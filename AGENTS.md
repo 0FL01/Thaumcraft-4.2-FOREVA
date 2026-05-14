@@ -1,159 +1,194 @@
-# Thaumcraft 4.2.3.5 (1.7.10) -> 1.12.2 Port
+# Agent Instructions — Thaumcraft 4.2.3.5 -> Forge 1.12.2 Port
 
-Reverse-engineering and port of Azanor's Thaumcraft 4.2.3.5 from Minecraft
-1.7.10 to 1.12.2.
+This repository is a work-in-progress Java 8 Minecraft Forge 1.12.2 port of Thaumcraft 4.2.3.5 from Minecraft 1.7.10.
 
-Tech stack: Java 8, MinecraftForge 1.12.2, Gradle, Baubles (hard dependency),
-CodeChicken Lib (bundled in JAR).
+## Sources of truth
 
-All detailed docs in **`docs/PRD.md`**: architecture, source inventory, porting
-phases, complexity assessment, risks, success criteria.
+Read these files before changing code:
 
-## Architectural Decisions (Closed)
+- `AGENTS.md`
+- `docs/PRD.md`
+- `build.gradle`
+- `Dockerfile`
 
-See `docs/PRD.md §6`. All resolved:
+Use `thaumcraft_src/**` and `Thaumcraft-1.7.10-4.2.3.5.jar` as read-only original 1.7.10 reference material.
 
-| Decision | Choice |
-|----------|--------|
-| API packaging | **Separate mod** (`ThaumcraftAPI-1.12.2.jar`) |
-| Rendering | **Hybrid**: JSON models + CCL TESR + OBJ |
-| DepLoader | **Delete** (Baubles via CurseMaven) |
-| Potion hack | **Remove** (use `RegistryEvent`) |
-| Player data | **Capabilities** on `EntityPlayer` |
-| Config | **Both**: `Configuration` now, `@Config` in Phase 10 |
-| Packages | **Keep** `thaumcraft.common.*` / `thaumcraft.client.*` |
-| Lang files | **`en_US` only** until strings stabilise |
+Asset origin: assets (textures, sounds, models, lang, shaders, etc.) for the port can be copied from `thaumcraft_src/assets/` into `src/main/resources/assets/thaumcraft/`. This is the source of truth for all ported assets — do not recreate assets from scratch when a working original exists in `thaumcraft_src/assets/`.
 
-## Workspace Overview
+## Hard rules
 
-- `Thaumcraft-1.7.10-4.2.3.5.jar` -- original compiled JAR (942 classes)
-- `thaumcraft_src/` -- unpacked JAR contents
-- `Dockerfile` -- dev container (Java 8 + CFR + git + build tools)
-- `docs/PRD.md` -- product requirements doc with phased porting plan
-- `docs/REPAIR.md` -- active pre-Phase8 mine list from latest RECON
-- `AGENTS.md` -- this file (concise navigation, points to docs/PRD.md)
-- `build.gradle` -- ForgeGradle 2.3, Forge 14.23.5.2847, Baubles via CurseMaven
-- `gradlew` / `gradle/wrapper/` -- Gradle 4.10.3
-- `src/main/java/` -- mod source (port output, ~530 Java source files)
-- `.gradle_home/` -- Gradle/Forge cache (**excluded from git**)
+- Do not edit `thaumcraft_src/**`.
+- Do not edit `Thaumcraft-1.7.10-4.2.3.5.jar`.
+- Do not change public `thaumcraft.api.*` signatures unless there is no Forge 1.12.2-compatible alternative.
+- Do not rename packages away from original Thaumcraft package boundaries.
+- Do not change mod id, registry names, NBT keys, config keys, packet ids, GUI ids, or dimension ids silently.
+- Do not upgrade Forge, Gradle, Java, Baubles, or bundled CodeChicken code unless the final report documents a hard blocker.
+- Do not perform broad formatting-only cleanup.
+- Do not make unrelated dependency changes.
+- Do not claim parity based on compile success alone.
+- Preserve existing behavior unless the current task or `docs/PRD.md` explicitly authorizes a behavior change.
 
-## Dependencies
+## Project stack
 
-See `docs/PRD.md §3` for full dependency graph and versions.
+- Language: Java.
+- Runtime target: Minecraft Forge 1.12.2.
+- Java target: Java 8.
+- Build system: Gradle wrapper with ForgeGradle 2.3.
+- Forge version: `1.12.2-14.23.5.2847`.
+- MCP mappings: `stable_39`.
+- Hard dependency: Baubles via CurseMaven.
+- Bundled library: `thaumcraft.codechicken.*`.
+- Public addon API boundary: `thaumcraft.api.*`.
 
-| Dep | 1.7.10 | 1.12.2 |
-|-----|--------|--------|
-| **Baubles** | Hard (auto-downloaded) | Hard (CurseMaven) |
-| **CodeChickenLib** | Bundled under `thaumcraft.codechicken.*` | Same (port bundled code) |
+## Architecture boundaries
 
-## Development Status
+- `thaumcraft.api.*`: public addon API and API jar output. Keep stable.
+- `thaumcraft.common.*`: server/common gameplay, registration, config, blocks, items, tiles, entities, worldgen, research, crafting, network.
+- `thaumcraft.client.*`: client-only GUI, rendering, models, particles, shaders, keybinds, client event handlers.
+- `thaumcraft.codechicken.*`: bundled CCL-style rendering/math helpers.
+- `truetyper.*`: font rendering support.
+- `src/main/resources/assets/thaumcraft/**`: assets, sounds, textures, models, recipes, lang, GUI resources.
+- `thaumcraft_src/**`: read-only original reference.
 
-See `docs/PRD.md §4` for per-phase deliverables and `docs/PRD.md §5` for complexity.
+## Current status guard
 
-| Phase | Scope | Status |
-|-------|-------|--------|
-| 0 | Forge MDK, Gradle, build chain | ✅ Done |
-| 1 | API + CCL + TrueType | ✅ Done |
-| 2 | Registration, config, networking, events | ✅ Done |
-| 3 | Core systems (capabilities, wands, research, vis, potions, enchants) | ⚠️ **Partial: vis regen/wand discounts/potions/online research baseline fixed; scan, offline research, bauble storage, enchant applicability remain** |
-| 4 | Blocks + Tile Entities | ⚠️ **Partial: registered block set + metadata/harvest work; crucible + major TE baselines and Infusion Matrix server lifecycle fixed; full bore mining loop pending** |
-| 5 | Items, Tools, Armor, Baubles, Relics | ⚠️ **Partial: 4/10 projectile foci server behavior done; 6 foci, baubles, relics, tools/repairability remain** |
-| 6 | Entities, Mobs, Golems | ⚠️ **Partial: AI/projectile pass strong; boss special attacks, Pech loot, InhabitedZombie death spawn remain** |
-| 7 | World Gen (biomes, dimension, trees, structures) | ⚠️ **Partial: biomes/trees/villages present; Outer Lands runtime hookup fixed; room-gen fallback TODOs remain** |
-| 7r | World Gen Remediation (room gens, village, persistence) | ⚠️ **Partial: provider/chunk/maze hookup fixed; room-gen replacement TODOs and biome color remain** |
-| 3r-6r | Remediation (see docs/REPAIR.md) | ⚠️ **Active pre-Phase8 mine list; container, Phase 3, crucible, and infusion lifecycle baselines closed; remaining P0 items still block Phase 8** |
-| 8 | Client GUI + Rendering (~140 classes) | ❌ |
-| 9 | Recipes + Research (~450 registrations) | ❌ |
-| 10 | Polish (JEI, Config, Sound) | ⚠️ **Sound: all 66 SoundEvents + 22 entity fixes + boss bar done** |
+As of the 2026-05-13 documentation cleanup, Phases 3, 4, 5, 6, and 7 are not closed or parity-validated. They have important common/server baselines, but still need runtime/manual validation and documented deferrals before any phase can be claimed complete.
 
-## Where To Look
+Use the phase guidance in `docs/PRD.md` and the explicit deferrals below as the active pre-Phase8 mine list. Do not convert prior `compileJava`/`build` success into parity closure. Current explicit deferrals include Portable Hole/Warding visual renderers, Phase 8 client GUI/render/FX/shader work, Phase 9 recipe/research/content registration, Hover Harness flight behavior, and Outer Lands runtime/portal parity validation. The active target is fresh worlds; old 1.7.10/WIP saves and external player-data imports are out of scope.
 
-Original source (for CFR decompilation reference):
+## Commit policy
 
-| Path | Content | docs/PRD.md § |
-|------|---------|----------|
-| `thaumcraft_src/thaumcraft/api/` | Public API (67 classes) | §2 |
-| `thaumcraft_src/thaumcraft/common/blocks/` | 71 block classes | §2, §4 |
-| `thaumcraft_src/thaumcraft/common/tiles/` | 80 tile entity classes | §2, §4 |
-| `thaumcraft_src/thaumcraft/common/items/` | All item/equipment/bauble classes | §2, §5 |
-| `thaumcraft_src/thaumcraft/common/entities/` | All entity/AI classes | §2, §6 |
-| `thaumcraft_src/thaumcraft/common/container/` | 26 container classes | §2 |
-| `thaumcraft_src/thaumcraft/common/lib/` | World, research, network, events, crafting, potions, enchants | §2 |
-| `thaumcraft_src/thaumcraft/common/lib/world/` | World gen, biomes, Eldritch dimension | §2, §7 |
-| `thaumcraft_src/thaumcraft/common/config/` | Config classes | §2 |
-| `thaumcraft_src/thaumcraft/codechicken/` | Bundled CCL (render, vec, lighting) | §2, §1 |
-| `thaumcraft_src/thaumcraft/client/` | GUIs, renderers, models, FX, shaders | §2, §8 |
-| `thaumcraft_src/truetyper/` | TrueType font renderer | §2, §1 |
-| `thaumcraft_src/assets/thaumcraft/` | Textures, models, sounds, lang, shaders | §2 |
+Work on a dedicated branch. Do not work directly on `master` or `main`.
 
-## Development Toolchain
+Use one commit per completed checkpoint.
 
-All work inside Docker container (Java 8 required by Forge 1.12.2):
+A checkpoint commit is allowed only when:
 
-| Tool | Version | Purpose |
-|------|---------|---------|
-| `java`/`javac` | 1.8.0_482 (Temurin) | JDK |
-| `cfr` | 0.152 | `.class` → `.java` decompiler |
-| `rg` (ripgrep) | 14.1.0 | Fast code search |
-| `python3` | 3.12 | Code generation scripts |
+- the checkpoint scope is complete;
+- the diff is limited to the checkpoint;
+- `git status --short` was reviewed;
+- relevant validation commands were run;
+- failures are either fixed or documented as pre-existing/environment failures;
+- no forbidden files were modified;
+- no generated build output is staged.
 
-```bash
-# Build
-docker run --rm -v $(pwd):/workspace/thaumcraft \
-  -v $(pwd)/.gradle_home:/home/ubuntu/.gradle \
-  --user 1000:1000 --entrypoint ./gradlew thaumcraft-dev build
+Do not commit broken work unless explicitly instructed by the user. If a blocker is reached, stop with a final report and leave the diff uncommitted.
 
-# Decompile a .class file
-docker run --rm -v $(pwd):/workspace/thaumcraft thaumcraft-dev \
-  -c 'cfr thaumcraft_src/thaumcraft/common/Thaumcraft.class'
+Before every commit, run:
 
-# Find symbol in original source
-docker run --rm -v $(pwd):/workspace/thaumcraft thaumcraft-dev \
-  -c "rg -l 'class AspectList' thaumcraft_src/"
+    git status --short
+    git diff --stat
+    git diff --name-only
 
-# Interactive session with X11
-docker run --rm -it -v $(pwd):/workspace/thaumcraft \
-  -e DISPLAY=$DISPLAY -v /tmp/.X11-unix:/tmp/.X11-unix thaumcraft-dev
+Stage only files that belong to the checkpoint:
+
+    git add <explicit paths>
+
+Do not use broad staging commands like:
+
+    git add .
+    git add -A
+
+Use commit messages in this format (example):
+
+```text
+feat(sources): add bybit proof of reserves source
+
+    Changes:
+    - Add Bybit proof-of-reserves source using the official frontend reserve ratio JSON endpoint
+    - Normalize target asset reserve ratio and missing-asset transparency candidates with source-local tests
+    - Wire scheduled checks and refresh source docs
 ```
 
-### ForgeGradle Build Caching
+Each final report must include:
 
-`.gradle_home/` caches Forge/MCP/Gradle artifacts — mount as bind volume.
-Use environment variable `GRADLE_USER_HOME` if needed inside container
-(default: `/home/ubuntu/.gradle`).
+- commit hash if a commit was created;
+- files included in the commit;
+- validation commands run before the commit;
+- whether runtime smoke validation was required, run, passed, failed, or skipped with a concrete reason;
+- known limitations after the commit.
 
-## Development Practices
+## Required workflow
 
-- **Decompile with CFR** for reference, port per-package
-- **CFR first, then adapt**: Always decompile original `.class` before writing port
-- **Keep original package names** (`thaumcraft.common.*` / `thaumcraft.client.*`)
-- **Keep original field/method names** for traceability
-- **BUILD SUCCESSFUL after every micro-step**
-- **Commit after each micro-step** with conventional commit prefix
-- **No ad-hoc regex fixes** for broken signatures — regenerate from raw source
-- **Python generators** (`gen*.py`) for bulk class creation, deleted after use
-- **No emoji in output**, GitHub-flavored markdown, monospace for CLI
+1. Start with `git status --short`.
+2. Read the relevant docs and code before editing.
+3. For every gameplay-critical class, inspect the original 1.7.10 behavior first:
+   - read matching source if present under `thaumcraft_src/**`;
+   - or decompile with CFR from the original class.
+4. Make small reversible changes.
+5. Run focused validation after each checkpoint.
+6. If validation fails, fix the failure before expanding scope.
+7. Keep the final diff scoped and reviewable.
+8. End with a final report listing exact commands and results.
 
-### Automated Code Fixing Prohibitions
+## Development practices
 
-- **Never fix broken method signatures with ad‑hoc regex replacements.**
-  If a transformed file contains a dangling `@Override` followed by a method
-  body without its declaration, **stop immediately**. 
-- **Required recovery:**
-  1. Re-run `transform_1_7_10_to_1_12_2` on original raw source from `_p4_raw/`
-  2. Apply only known, repeatable targeted fixes through the central porting utility
-  3. If a file requires more than two standalone regex fixes, port manually
-- **Audit past damage:** Files affected by `fix_compile_errors.py` must be
-  regenerated from raw source before further development.
+- Keep original package names.
+- Prefer original field/method names when practical for traceability.
+- Prefer porting original behavior over inventing new behavior.
+- Prefer existing project conventions over new abstractions.
+- Use small helpers only when they remove real duplication across multiple callers.
+- Do not introduce speculative abstraction.
+- Do not use ad-hoc regex fixes for broken Java signatures.
+- If a generated or transformed file has corrupted method signatures, stop and regenerate from the original source or manually port the file.
 
-### Commit Style
+## Validation commands
 
-```
-<type>(<scope>): <description>
+Use Docker unless the local environment is already known to be Java 8 Forge-compatible.
 
-  Changes:
-  - <bullet>
-  - <bullet>
-```
+Use the project wrapper instead of repeating long Docker commands:
 
-Types: `feat`, `fix`, `chore`, `docs`, `refactor`, `test`
+    ./scripts/dev.sh image
+    ./scripts/dev.sh tasks
+    ./scripts/dev.sh compileJava
+    ./scripts/dev.sh build
+    ./scripts/dev.sh check-jar
+    ./scripts/dev.sh apiJar devJar
+    ./scripts/dev.sh test
+
+Run arbitrary Gradle tasks through Docker with:
+
+    ./scripts/dev.sh gradle <task> [args...]
+
+Run `./scripts/dev.sh check-jar` after building a jar meant for Prism/normal Forge. It scans the built jar for MCP-named Minecraft field/method references that dev `runServer` can miss but production Forge reports as `NoSuchFieldError` or `NoSuchMethodError`.
+
+## Runtime smoke validation
+
+Compile success is not enough for parity or checkpoint completion.
+
+Run runtime smoke validation whenever a change can affect mod loading, registries, config, items, blocks, materials, recipes, entities, dimensions, networking, proxies, GUI registration, renderers, models, assets, or lifecycle handlers.
+
+For common/server-side changes, run the dedicated server smoke test first:
+
+    ./scripts/dev.sh smoke-server
+
+The smoke wrapper creates `run/eula.txt`, runs `runServer -x getAssets --no-daemon`, writes `run/smoke-server.log`, and fails on crash markers or new crash reports. `-x getAssets` avoids old ForgeGradle Mojang asset URL failures. The `run/` directory is generated/ignored and must not be staged.
+
+A server smoke test passes only when Forge reaches normal ready state, for example a log line containing `Done (`, and no crash markers are present.
+
+A runtime smoke test fails if `crash-reports/` contains a new crash report, or logs contain crash markers such as `LoaderException`, `LoaderExceptionModCrash`, `Game crashed`, `Caught exception`, `NoClassDefFoundError`, `ClassNotFoundException`, `NoSuchMethodError`, `NoSuchFieldError`, `ExceptionInInitializerError`, `Repair material has already been set`, or any Forge/FML fatal loading error.
+
+Run client smoke for client-only or mixed client/common changes. It may be terminated by timeout after the main menu/load phase; timeout alone is not failure if there are no new crash reports or crash markers and Forge/FML reports successful mod loading.
+
+Do not mark runtime-affecting checkpoints complete based only on `compileJava`, `build`, `apiJar`, or `devJar`. Documentation-only diffs do not require runtime smoke.
+
+Run client smoke test if display/X11 is available:
+
+    ./scripts/dev.sh smoke-client
+
+## Stop conditions
+
+Stop successfully when:
+
+- the current checkpoint is complete;
+- validation passes, or pre-existing/environment failures are documented;
+- final diff is scoped;
+- final report is complete.
+
+Stop as blocked when:
+
+- original behavior cannot be determined safely;
+- implementation requires forbidden public contract changes;
+- validation cannot run due to missing environment;
+- build/test failures are unclear;
+- completing the task would require out-of-scope dependency or architecture changes.

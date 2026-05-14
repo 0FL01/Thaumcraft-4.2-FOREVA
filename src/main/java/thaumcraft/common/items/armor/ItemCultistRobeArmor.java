@@ -21,6 +21,6 @@ public class ItemCultistRobeArmor extends ItemArmor implements IRepairable, IRun
 
     @Override
     public boolean getIsRepairable(ItemStack toRepair, ItemStack repair) {
-        return false;
+        return super.getIsRepairable(toRepair, repair);
     }
 }

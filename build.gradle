@@ -41,6 +41,7 @@ repositories {
 
 dependencies {
     compile 'curse.maven:baubles-227083:2518667'
+    testCompile 'junit:junit:4.12'
 }
 
 processResources {
@@ -79,9 +80,9 @@ artifacts {
     archives devJar
 }
 
-// Re-obfuscation: keep API jar readable (no SRG names)
+// Re-obfuscation: production main jar only. Keep API/dev jars readable.
 reobf {
-    apiJar { }
+    jar { }
 }
 
 idea { module { inheritOutputDirs = true } }

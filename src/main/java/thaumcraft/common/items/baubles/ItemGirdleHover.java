@@ -30,7 +30,9 @@ public class ItemGirdleHover extends Item implements IBauble, IRunicArmor {
 
     @Override
     public void onWornTick(ItemStack itemstack, EntityLivingBase player) {
-        // Hover effect - TBD
+        if (player.fallDistance > 0.0F) {
+            player.fallDistance = Math.max(0.0F, player.fallDistance - 0.33F);
+        }
     }
 
     @Override

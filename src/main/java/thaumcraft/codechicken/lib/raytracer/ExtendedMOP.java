@@ -23,12 +23,15 @@ implements Comparable<ExtendedMOP> {
     }
 
     public ExtendedMOP(RayTraceResult mop, Object data, double dist) {
-        super(mop.hitVec, mop.sideHit);
-        this.typeOfHit = mop.typeOfHit;
-        this.hitVec = new Vec3d(mop.hitVec.x, mop.hitVec.y, mop.hitVec.z);
+        super(mop.typeOfHit, copyHitVec(mop), mop.sideHit, mop.getBlockPos());
+        this.entityHit = mop.entityHit;
         this.subHit = mop.subHit;
         this.setData(data);
         this.dist = dist;
+    }
+
+    private static Vec3d copyHitVec(RayTraceResult mop) {
+        return mop.hitVec == null ? null : new Vec3d(mop.hitVec.x, mop.hitVec.y, mop.hitVec.z);
     }
 
     public void setData(Object data) {

@@ -1,42 +1,48 @@
 package thaumcraft.common.lib.world;
 
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.init.Blocks;
-import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.gen.feature.WorldGenerator;
+import net.minecraftforge.common.BiomeDictionary;
 import thaumcraft.common.config.ConfigBlocks;
 import java.util.Random;
 
 public class WorldGenManaPods extends WorldGenerator {
     @Override
     public boolean generate(World world, Random rand, BlockPos pos) {
-        for (int i = 0; i < 20; i++) {
-            int x = pos.getX() + rand.nextInt(8) - rand.nextInt(8);
-            int z = pos.getZ() + rand.nextInt(8) - rand.nextInt(8);
-            BlockPos bp = world.getHeight(new BlockPos(x, 0, z));
+        int baseX = pos.getX();
+        int baseZ = pos.getZ();
+        int x = baseX;
+        int z = baseZ;
 
-            // Must be adjacent to magical log or oak/spruce log
-            boolean hasWood = false;
-            for (EnumFacing face : EnumFacing.values()) {
-                BlockPos neighbor = bp.offset(face);
-                if (world.getBlockState(neighbor).getBlock().isWood(world, neighbor)) {
-                    hasWood = true;
-                    break;
-                }
+        for (int y = pos.getY(); y < 128; y++) {
+            BlockPos column = new BlockPos(x, 0, z);
+            if (!world.isBlockLoaded(column, false)) {
+                x = baseX + rand.nextInt(4) - rand.nextInt(4);
+                z = baseZ + rand.nextInt(4) - rand.nextInt(4);
+                continue;
             }
-            if (!hasWood) continue;
 
-            // Check biome
-            if (!world.getBiome(bp).getBiomeName().equals("Magical Forest")) continue;
+            if (y >= Math.min(128, world.getHeight(column).getY())) break;
 
-            // Place mana pod stem
-            if (world.isAirBlock(bp)) {
-                world.setBlockState(bp, ConfigBlocks.blockManaPod.getStateFromMeta(0), 2);
+            BlockPos bp = new BlockPos(x, y, z);
+            if (!world.isAreaLoaded(bp.down(), bp.up(), false)) continue;
+
+            if (canGenerateAt(world, bp)) {
+                world.setBlockState(bp, ConfigBlocks.blockManaPod.getStateFromMeta(2 + rand.nextInt(5)), 2);
                 return true;
             }
+
+            x = baseX + rand.nextInt(4) - rand.nextInt(4);
+            z = baseZ + rand.nextInt(4) - rand.nextInt(4);
         }
-        return false;
+        return true;
+    }
+
+    private boolean canGenerateAt(World world, BlockPos pos) {
+        if (!BiomeDictionary.hasType(world.getBiome(pos), BiomeDictionary.Type.MAGICAL)) return false;
+        if (!world.isAirBlock(pos) || !world.isAirBlock(pos.down())) return false;
+        BlockPos support = pos.up();
+        return world.getBlockState(support).getBlock().isWood(world, support);
     }
 }

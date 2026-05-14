@@ -279,7 +279,7 @@ public class EntityPech extends net.minecraft.entity.monster.EntityMob implement
     public boolean processInteract(EntityPlayer player, net.minecraft.util.EnumHand hand) {
         if (this.isTamed()) {
             if (!this.world.isRemote) {
-                player.openGui(thaumcraft.common.Thaumcraft.instance, 7, this.world, this.getEntityId(), 0, 0);
+                player.openGui(thaumcraft.common.Thaumcraft.instance, thaumcraft.common.CommonProxy.GUI_PECH, this.world, this.getEntityId(), 0, 0);
             }
             return true;
         }
@@ -388,8 +388,28 @@ public class EntityPech extends net.minecraft.entity.monster.EntityMob implement
 
     @Override
     protected void dropFewItems(boolean wasRecentlyHit, int looting) {
+        for (ItemStack stack : this.loot) {
+            if (stack != null && !stack.isEmpty() && this.world.rand.nextFloat() < 0.88F) {
+                this.entityDropItem(stack.copy(), 1.5F);
+            }
+        }
+        Aspect[] aspects = Aspect.getPrimalAspects().toArray(new Aspect[0]);
+        for (int a = 0; a < 1 + looting; ++a) {
+            if (ConfigItems.itemManaBean != null && aspects.length > 0 && this.rand.nextBoolean()) {
+                ItemStack bean = new ItemStack(ConfigItems.itemManaBean);
+                NBTTagCompound tag = new NBTTagCompound();
+                new AspectList().add(aspects[this.rand.nextInt(aspects.length)], 1).writeToNBT(tag);
+                bean.setTagCompound(tag);
+                this.entityDropItem(bean, 1.5F);
+            }
+        }
+        if (ConfigItems.itemResource != null && this.world.rand.nextInt(10) < 1 + looting) {
+            this.entityDropItem(new ItemStack(ConfigItems.itemResource, 1, thaumcraft.common.items.ItemResource.META_COIN), 1.5F);
+        }
+        if (wasRecentlyHit && ConfigItems.itemResource != null && this.rand.nextInt(200) - looting < 5) {
+            this.entityDropItem(new ItemStack(ConfigItems.itemResource, 1, thaumcraft.common.items.ItemResource.META_KNOWLEDGE_FRAGMENT), 1.5F);
+        }
         super.dropFewItems(wasRecentlyHit, looting);
-        // Loot drops handled in onDeath by original — stub for now
     }
 
     @Override

@@ -3,6 +3,12 @@ package thaumcraft.common.lib.utils;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.entity.item.EntityItem;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Items;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraft.util.NonNullList;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
@@ -17,6 +23,41 @@ public class BlockUtils {
 
     public static void setBlock(World world, BlockPos pos, IBlockState state) {
         world.setBlockState(pos, state, 3);
+    }
+
+    public static ItemStack createStackedBlock(Block block, int meta) {
+        if (block == null) return ItemStack.EMPTY;
+        Item item = Item.getItemFromBlock(block);
+        if (item == Items.AIR) return ItemStack.EMPTY;
+        return new ItemStack(item, 1, meta);
+    }
+
+    public static boolean isBlockExposed(World world, int x, int y, int z) {
+        BlockPos pos = new BlockPos(x, y, z);
+        for (EnumFacing facing : EnumFacing.VALUES) {
+            if (world.isAirBlock(pos.offset(facing))) return true;
+        }
+        return false;
+    }
+
+    public static void dropBlockAsItem(World world, int x, int y, int z, ItemStack stack, Block block) {
+        if (world == null || world.isRemote || stack == null || stack.isEmpty()) return;
+        Block.spawnAsEntity(world, new BlockPos(x, y, z), stack);
+    }
+
+    public static void dropBlockAsItemWithChance(World world, Block block, int x, int y, int z, int meta, float chance, int fortune, EntityPlayer player) {
+        if (world == null || world.isRemote || block == null) return;
+        BlockPos pos = new BlockPos(x, y, z);
+        IBlockState state = world.getBlockState(pos);
+        NonNullList<ItemStack> drops = NonNullList.create();
+        block.getDrops(drops, world, pos, state, fortune);
+        float actualChance = net.minecraftforge.event.ForgeEventFactory.fireBlockHarvesting(drops, world, pos, state, fortune, chance, false, player);
+        for (ItemStack drop : drops) {
+            if (drop.isEmpty() || world.rand.nextFloat() > actualChance) continue;
+            EntityItem entity = new EntityItem(world, (double) x + 0.5D, (double) y + 0.5D, (double) z + 0.5D, drop);
+            entity.setDefaultPickupDelay();
+            world.spawnEntity(entity);
+        }
     }
 
     /** Count how many sides of a block are exposed to air. */

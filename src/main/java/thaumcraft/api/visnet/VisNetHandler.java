@@ -222,8 +222,6 @@ public class VisNetHandler {
                 new Vec3d(target.getPos().getX() + 0.5, target.getPos().getY() + 0.5, target.getPos().getZ() + 0.5),
                 false, true, false);
         return mop == null || (mop.typeOfHit == RayTraceResult.Type.BLOCK
-                && mop.hitVec.x == target.getPos().getX()
-                && mop.hitVec.y == target.getPos().getY()
-                && mop.hitVec.z == target.getPos().getZ());
+                && target.getPos().equals(mop.getBlockPos()));
     }
 }

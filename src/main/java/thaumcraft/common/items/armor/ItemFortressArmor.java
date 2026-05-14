@@ -21,6 +21,6 @@ public class ItemFortressArmor extends ItemArmor implements IRepairable, IRunicA
 
     @Override
     public boolean getIsRepairable(ItemStack toRepair, ItemStack repair) {
-        return false;
+        return super.getIsRepairable(toRepair, repair);
     }
 }

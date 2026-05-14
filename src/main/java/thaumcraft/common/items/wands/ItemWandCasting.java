@@ -2,16 +2,18 @@ package thaumcraft.common.items.wands;
 
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.creativetab.CreativeTabs;
-import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.item.EnumAction;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTTagList;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.EnumActionResult;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
@@ -19,27 +21,38 @@ import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.translation.I18n;
 import net.minecraft.world.World;
+import net.minecraft.block.Block;
+import net.minecraft.block.state.IBlockState;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import thaumcraft.api.BlockCoordinates;
+import thaumcraft.api.IArchitect;
 import thaumcraft.api.aspects.Aspect;
 import thaumcraft.api.aspects.AspectList;
 import thaumcraft.api.wands.FocusUpgradeType;
 import thaumcraft.api.wands.ItemFocusBasic;
 import thaumcraft.api.wands.IWandFocus;
 import thaumcraft.api.wands.IWandRodOnUpdate;
+import thaumcraft.api.wands.IWandable;
+import thaumcraft.api.wands.StaffRod;
 import thaumcraft.api.wands.WandCap;
 import thaumcraft.api.wands.WandRod;
-import thaumcraft.common.config.Config;
+import thaumcraft.api.wands.WandTriggerRegistry;
 
 import java.text.DecimalFormat;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
-public class ItemWandCasting extends Item {
+public class ItemWandCasting extends Item implements IArchitect {
+
+    private static final UUID STAFF_ATTACK_UUID = UUID.fromString("1d082610-4093-11e4-916c-0800200c9a66");
 
     public static final String TAG_ROD = "rod";
     public static final String TAG_CAP = "cap";
     public static final String TAG_FOCUS = "focus";
-    public static final String TAG_VIS_PREFIX = "vis_";
+    public static final String TAG_VIS_PREFIX = "";
 
     public ItemWandCasting() {
         this.setMaxStackSize(1);
@@ -59,7 +72,22 @@ public class ItemWandCasting extends Item {
     // ---- Rod / Cap ----
 
     public static void setRod(ItemStack stack, WandRod rod) {
-        ensureTag(stack).setString(TAG_ROD, rod.getTag());
+        NBTTagCompound tag = ensureTag(stack);
+        tag.setString(TAG_ROD, rod.getTag());
+        if (rod instanceof StaffRod) {
+            NBTTagList modifiers = new NBTTagList();
+            NBTTagCompound attack = new NBTTagCompound();
+            attack.setString("AttributeName", SharedMonsterAttributes.ATTACK_DAMAGE.getName());
+            attack.setString("Name", "Weapon modifier");
+            attack.setDouble("Amount", 6.0D);
+            attack.setInteger("Operation", 0);
+            attack.setLong("UUIDMost", STAFF_ATTACK_UUID.getMostSignificantBits());
+            attack.setLong("UUIDLeast", STAFF_ATTACK_UUID.getLeastSignificantBits());
+            modifiers.appendTag(attack);
+            tag.setTag("AttributeModifiers", modifiers);
+        } else if (tag.hasKey("AttributeModifiers")) {
+            tag.removeTag("AttributeModifiers");
+        }
     }
 
     public static WandRod getRod(ItemStack stack) {
@@ -159,7 +187,7 @@ public class ItemWandCasting extends Item {
 
         AspectList realCost = new AspectList();
         for (Aspect aspect : cost.getAspects()) {
-            int needed = Math.round((float) cost.getAmount(aspect) * getConsumptionModifier(stack, player, aspect, crafting));
+            int needed = (int)((float) cost.getAmount(aspect) * getConsumptionModifier(stack, player, aspect, crafting));
             realCost.add(aspect, needed);
         }
 
@@ -217,24 +245,35 @@ public class ItemWandCasting extends Item {
     }
 
     public int getFocusTreasure(ItemStack stack) {
-        ItemFocusBasic focus = getFocus(stack);
-        if (focus != null) {
-            // Default treasure level
-            return 0;
+        return getFocusUpgradeLevel(stack, FocusUpgradeType.treasure);
+    }
+
+    public int getFocusPotency(ItemStack stack) {
+        return getFocusUpgradeLevel(stack, FocusUpgradeType.potency) + (hasRunes(stack) ? 1 : 0);
+    }
+
+    public int getFocusEnlarge(ItemStack stack) {
+        return getFocusUpgradeLevel(stack, FocusUpgradeType.enlarge);
+    }
+
+    public int getFocusExtend(ItemStack stack) {
+        return getFocusUpgradeLevel(stack, FocusUpgradeType.extend);
+    }
+
+    private static int getFocusUpgradeLevel(ItemStack stack, FocusUpgradeType type) {
+        ItemStack focusStack = getFocusItemStatic(stack);
+        if (!focusStack.isEmpty() && focusStack.getItem() instanceof ItemFocusBasic) {
+            return ((ItemFocusBasic) focusStack.getItem()).getUpgradeLevel(focusStack, type);
         }
         return 0;
     }
 
     public static int getFocusFrugal(ItemStack stack) {
         ItemStack focusStack = getFocusItemStatic(stack);
-        int level = 0;
         if (!focusStack.isEmpty() && focusStack.getItem() instanceof ItemFocusBasic) {
-            level += ((ItemFocusBasic) focusStack.getItem()).getUpgradeLevel(focusStack, FocusUpgradeType.frugal);
-            if (Config.enchFrugal != null) {
-                level += EnchantmentHelper.getEnchantmentLevel(Config.enchFrugal, focusStack);
-            }
+            return ((ItemFocusBasic) focusStack.getItem()).getUpgradeLevel(focusStack, FocusUpgradeType.frugal);
         }
-        return level;
+        return 0;
     }
 
     private static ItemStack getFocusItemStatic(ItemStack stack) {
@@ -246,6 +285,38 @@ public class ItemWandCasting extends Item {
 
     public static boolean isSceptre(ItemStack stack) {
         return stack != null && !stack.isEmpty() && stack.hasTagCompound() && stack.getTagCompound().getBoolean("sceptre");
+    }
+
+    public boolean isStaff(ItemStack stack) {
+        return getRod(stack) instanceof StaffRod;
+    }
+
+    public boolean hasRunes(ItemStack stack) {
+        WandRod rod = getRod(stack);
+        return rod instanceof StaffRod && ((StaffRod) rod).hasRunes();
+    }
+
+    public void setObjectInUse(ItemStack stack, int x, int y, int z) {
+        NBTTagCompound tag = ensureTag(stack);
+        tag.setInteger("IIUX", x);
+        tag.setInteger("IIUY", y);
+        tag.setInteger("IIUZ", z);
+    }
+
+    public void clearObjectInUse(ItemStack stack) {
+        if (!stack.hasTagCompound()) return;
+        NBTTagCompound tag = stack.getTagCompound();
+        tag.removeTag("IIUX");
+        tag.removeTag("IIUY");
+        tag.removeTag("IIUZ");
+    }
+
+    public IWandable getObjectInUse(ItemStack stack, World world) {
+        if (stack == null || stack.isEmpty() || world == null || !stack.hasTagCompound()) return null;
+        NBTTagCompound tag = stack.getTagCompound();
+        if (!tag.hasKey("IIUX") || !tag.hasKey("IIUY") || !tag.hasKey("IIUZ")) return null;
+        TileEntity tile = world.getTileEntity(new BlockPos(tag.getInteger("IIUX"), tag.getInteger("IIUY"), tag.getInteger("IIUZ")));
+        return tile instanceof IWandable ? (IWandable) tile : null;
     }
 
     // ---- Item Overrides ----
@@ -318,24 +389,65 @@ public class ItemWandCasting extends Item {
     }
 
     @Override
+    public EnumActionResult onItemUseFirst(EntityPlayer player, World world, BlockPos pos, EnumFacing side,
+                                           float hitX, float hitY, float hitZ, EnumHand hand) {
+        ItemStack stack = player.getHeldItem(hand);
+        IBlockState state = world.getBlockState(pos);
+        Block block = state.getBlock();
+        int meta = block.getMetaFromState(state);
+        int sideIndex = side == null ? 1 : side.getIndex();
+
+        if (block instanceof IWandable) {
+            int ret = ((IWandable) block).onWandRightClick(world, stack, player, pos.getX(), pos.getY(), pos.getZ(), sideIndex, meta);
+            if (ret >= 0) return ret == 1 ? EnumActionResult.SUCCESS : EnumActionResult.PASS;
+        }
+
+        TileEntity tile = world.getTileEntity(pos);
+        if (tile instanceof IWandable) {
+            int ret = ((IWandable) tile).onWandRightClick(world, stack, player, pos.getX(), pos.getY(), pos.getZ(), sideIndex, meta);
+            if (ret >= 0) return ret == 1 ? EnumActionResult.SUCCESS : EnumActionResult.PASS;
+        }
+
+        if (WandTriggerRegistry.hasTrigger(block, meta)
+                && WandTriggerRegistry.performTrigger(world, stack, player, pos.getX(), pos.getY(), pos.getZ(), sideIndex, block, meta)) {
+            return EnumActionResult.SUCCESS;
+        }
+
+        return EnumActionResult.PASS;
+    }
+
+    @Override
     public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer player, EnumHand hand) {
         ItemStack stack = player.getHeldItem(hand);
-        ItemFocusBasic focus = getFocus(stack);
+        RayTraceResult mop = this.rayTrace(world, player, false);
 
+        if (mop != null && mop.typeOfHit == RayTraceResult.Type.BLOCK) {
+            TileEntity tile = world.getTileEntity(mop.getBlockPos());
+            if (tile instanceof IWandable) {
+                ItemStack result = ((IWandable) tile).onWandRightClick(world, stack, player);
+                if (result != null) return new ActionResult<>(EnumActionResult.SUCCESS, result);
+            }
+            Block block = world.getBlockState(mop.getBlockPos()).getBlock();
+            if (block instanceof IWandable) {
+                ItemStack result = ((IWandable) block).onWandRightClick(world, stack, player);
+                if (result != null) return new ActionResult<>(EnumActionResult.SUCCESS, result);
+            }
+        }
+
+        ItemFocusBasic focus = getFocus(stack);
         if (focus != null) {
             if (player.isSneaking()) {
                 // Open focal manipulator if sneaking
                 return new ActionResult<>(EnumActionResult.SUCCESS, stack);
             }
 
-            RayTraceResult mop = this.rayTrace(world, player, false);
-            ItemStack result = focus.onFocusRightClick(stack, world, player, mop);
-            if (result != null && result != stack) {
-                return new ActionResult<>(EnumActionResult.SUCCESS, result);
+            if (!WandManager.isOnCooldown(player)) {
+                WandManager.setCooldown(player, focus.getActivationCooldown(getFocusItem(stack)));
+                ItemStack result = focus.onFocusRightClick(stack, world, player, mop);
+                if (result != null) {
+                    return new ActionResult<>(EnumActionResult.SUCCESS, result);
+                }
             }
-
-            // Start using the focus
-            player.setActiveHand(hand);
             return new ActionResult<>(EnumActionResult.SUCCESS, stack);
         }
 
@@ -345,8 +457,14 @@ public class ItemWandCasting extends Item {
     @Override
     public void onUsingTick(ItemStack stack, EntityLivingBase player, int count) {
         if (player instanceof EntityPlayer) {
+            IWandable wandable = getObjectInUse(stack, player.world);
+            if (wandable != null) {
+                wandable.onUsingWandTick(stack, (EntityPlayer) player, count);
+                return;
+            }
             ItemFocusBasic focus = getFocus(stack);
-            if (focus != null) {
+            if (focus != null && !WandManager.isOnCooldown(player)) {
+                WandManager.setCooldown(player, focus.getActivationCooldown(getFocusItem(stack)));
                 focus.onUsingFocusTick(stack, (EntityPlayer) player, count);
             }
         }
@@ -355,10 +473,16 @@ public class ItemWandCasting extends Item {
     @Override
     public void onPlayerStoppedUsing(ItemStack stack, World world, EntityLivingBase player, int timeLeft) {
         if (player instanceof EntityPlayer) {
-            ItemFocusBasic focus = getFocus(stack);
-            if (focus != null) {
+            IWandable wandable = getObjectInUse(stack, world);
+            if (wandable != null) {
+                wandable.onWandStoppedUsing(stack, world, (EntityPlayer) player, this.getMaxItemUseDuration(stack) - timeLeft);
+            } else {
+                ItemFocusBasic focus = getFocus(stack);
+                if (focus != null) {
                 focus.onPlayerStoppedUsingFocus(stack, world, (EntityPlayer) player, this.getMaxItemUseDuration(stack) - timeLeft);
+                }
             }
+            clearObjectInUse(stack);
         }
     }
 
@@ -371,7 +495,7 @@ public class ItemWandCasting extends Item {
     public EnumAction getItemUseAction(ItemStack stack) {
         ItemFocusBasic focus = getFocus(stack);
         if (focus != null) {
-            ItemFocusBasic.WandFocusAnimation anim = focus.getAnimation(stack);
+            ItemFocusBasic.WandFocusAnimation anim = focus.getAnimation(getFocusItem(stack));
             if (anim == ItemFocusBasic.WandFocusAnimation.CHARGE) {
                 return EnumAction.BOW;
             }
@@ -380,10 +504,20 @@ public class ItemWandCasting extends Item {
     }
 
     @Override
+    public float getDestroySpeed(ItemStack stack, IBlockState state) {
+        ItemStack focusStack = getFocusItem(stack);
+        if (!focusStack.isEmpty()) {
+            return focusStack.getItem().getDestroySpeed(focusStack, state);
+        }
+        return super.getDestroySpeed(stack, state);
+    }
+
+    @Override
     public boolean onBlockStartBreak(ItemStack stack, BlockPos pos, EntityPlayer player) {
         if (!player.getEntityWorld().isRemote) {
             ItemFocusBasic focus = getFocus(stack);
-            if (focus != null) {
+            if (focus != null && !WandManager.isOnCooldown(player)) {
+                WandManager.setCooldown(player, focus.getActivationCooldown(getFocusItem(stack)));
                 return focus.onFocusBlockStartBreak(stack, pos.getX(), pos.getY(), pos.getZ(), player);
             }
         }
@@ -391,8 +525,38 @@ public class ItemWandCasting extends Item {
     }
 
     @Override
+    public boolean onEntitySwing(EntityLivingBase entityLiving, ItemStack stack) {
+        ItemFocusBasic focus = getFocus(stack);
+        if (focus != null && !WandManager.isOnCooldown(entityLiving)) {
+            WandManager.setCooldown(entityLiving, focus.getActivationCooldown(getFocusItem(stack)));
+            return focus.onEntitySwing(entityLiving, stack);
+        }
+        return super.onEntitySwing(entityLiving, stack);
+    }
+
+    @Override
     public boolean shouldCauseReequipAnimation(ItemStack oldStack, ItemStack newStack, boolean slotChanged) {
         return slotChanged;
+    }
+
+    @Override
+    public ArrayList<BlockCoordinates> getArchitectBlocks(ItemStack stack, World world, int x, int y, int z, int side, EntityPlayer player) {
+        ItemFocusBasic focus = getFocus(stack);
+        ItemStack focusStack = getFocusItem(stack);
+        if (focus instanceof IArchitect && !focusStack.isEmpty() && focus.isUpgradedWith(focusStack, FocusUpgradeType.architect)) {
+            return ((IArchitect) focus).getArchitectBlocks(stack, world, x, y, z, side, player);
+        }
+        return null;
+    }
+
+    @Override
+    public boolean showAxis(ItemStack stack, World world, EntityPlayer player, int side, IArchitect.EnumAxis axis) {
+        ItemFocusBasic focus = getFocus(stack);
+        ItemStack focusStack = getFocusItem(stack);
+        return focus instanceof IArchitect
+                && !focusStack.isEmpty()
+                && focus.isUpgradedWith(focusStack, FocusUpgradeType.architect)
+                && ((IArchitect) focus).showAxis(stack, world, player, side, axis);
     }
 
     @SideOnly(Side.CLIENT)

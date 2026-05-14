@@ -11,11 +11,8 @@ import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.potion.PotionEffect;
 import net.minecraft.util.DamageSource;
-import net.minecraft.util.text.TextFormatting;
-import net.minecraft.util.text.translation.I18n;
 import net.minecraftforge.event.entity.living.LivingEvent;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
-import net.minecraftforge.event.entity.player.ItemTooltipEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
 import thaumcraft.api.IRunicArmor;
@@ -30,9 +27,12 @@ import thaumcraft.common.items.baubles.ItemAmuletRunic;
 import thaumcraft.common.items.baubles.ItemGirdleRunic;
 import thaumcraft.common.items.baubles.ItemRingRunic;
 import thaumcraft.common.items.wands.WandManager;
+import thaumcraft.common.lib.capabilities.IPlayerKnowledge;
+import thaumcraft.common.lib.capabilities.PlayerKnowledgeProvider;
 import thaumcraft.common.lib.network.PacketHandler;
 import thaumcraft.common.lib.network.fx.PacketFXShield;
 import thaumcraft.common.lib.network.playerdata.PacketRunicCharge;
+import thaumcraft.common.lib.research.ResearchManager;
 import thaumcraft.common.lib.utils.EntityUtils;
 
 import java.util.HashMap;
@@ -47,11 +47,6 @@ public class EventHandlerRunic {
     private HashMap<String, Long> upgradeCooldown = new HashMap<>();
     public boolean isDirty = true;
     private int rechargeDelay = 0;
-
-    // ---- Configuration (defaults from original Thaumcraft 4.2.3.5) ----
-    private static final int SHIELD_COST = 1;
-    private static final long SHIELD_RECHARGE_MS = 60000L; // 60 seconds
-    private static final int SHIELD_WAIT_TICKS = 100; // 5 seconds
 
     @SubscribeEvent
     public void onLivingUpdate(LivingEvent.LivingUpdateEvent event) {
@@ -80,7 +75,7 @@ public class EventHandlerRunic {
             // Check baubles (use IBaublesItemHandler)
             IBaublesItemHandler baubles = BaublesApi.getBaublesHandler(player);
             if (baubles != null) {
-                for (int a = 0; a < baubles.getSlots(); a++) {
+                for (int a = 0; a < Math.min(4, baubles.getSlots()); a++) {
                     ItemStack stack = baubles.getStackInSlot(a);
                     if (stack.isEmpty() || !(stack.getItem() instanceof IRunicArmor)) continue;
                     int amount = getFinalCharge(stack);
@@ -106,14 +101,12 @@ public class EventHandlerRunic {
                 if (this.runicCharge.containsKey(player.getEntityId())) {
                     int charge = this.runicCharge.get(player.getEntityId());
                     if (charge > max) {
-                        this.runicCharge.put(player.getEntityId(), max);
-                        // Phase 8: PacketHandler.INSTANCE.sendTo(new PacketRunicCharge(player, (short)max, max), (EntityPlayerMP)player);
+                        setRunicCharge(player, max, max, true);
                     }
                 }
             } else {
                 this.runicInfo.remove(player.getEntityId());
-                this.runicCharge.put(player.getEntityId(), 0);
-                // Phase 8: PacketHandler.INSTANCE.sendTo(new PacketRunicCharge(player, (short)0, 0), (EntityPlayerMP)player);
+                setRunicCharge(player, 0, 0, true);
             }
         }
 
@@ -140,14 +133,14 @@ public class EventHandlerRunic {
             } else if (charge < maxCharge
                     && this.nextCycle.get(player.getEntityId()) < time
                     && WandManager.consumeVisFromInventory(player,
-                    new AspectList().add(Aspect.AIR, SHIELD_COST).add(Aspect.EARTH, SHIELD_COST))) {
-                long interval = SHIELD_RECHARGE_MS - this.runicInfo.get(player.getEntityId())[1] * 500;
+                    new AspectList().add(Aspect.AIR, Config.shieldCost).add(Aspect.EARTH, Config.shieldCost))) {
+                long interval = Math.max(0, Config.shieldRecharge - this.runicInfo.get(player.getEntityId())[1] * 500L);
                 this.nextCycle.put(player.getEntityId(), time + interval);
-                this.runicCharge.put(player.getEntityId(), ++charge);
+                setRunicCharge(player, ++charge, maxCharge, false);
             }
 
             if (this.lastCharge.get(player.getEntityId()) != charge) {
-                // Phase 8: PacketHandler.INSTANCE.sendTo(new PacketRunicCharge(player, (short)charge, maxCharge), (EntityPlayerMP)player);
+                syncRunicCharge(player, charge, maxCharge);
                 this.lastCharge.put(player.getEntityId(), charge);
             }
         }
@@ -265,11 +258,10 @@ public class EventHandlerRunic {
                 }
 
                 if (charge <= 0) {
-                    this.rechargeDelay = SHIELD_WAIT_TICKS;
+                    this.rechargeDelay = Config.shieldWait;
                 }
 
-                this.runicCharge.put(player.getEntityId(), charge);
-                // Phase 8: PacketHandler.INSTANCE.sendTo(new PacketRunicCharge(player, (short)charge, max), (EntityPlayerMP)player);
+                setRunicCharge(player, charge, max, true);
             }
         }
 
@@ -319,16 +311,22 @@ public class EventHandlerRunic {
         // Phase 8: mob.world.playSound(null, mob.posX, mob.posY, mob.posZ, TCSounds.RUNICSHIELDEFFECT, ...);
     }
 
-    @SubscribeEvent
-    public void onItemTooltip(ItemTooltipEvent event) {
-        int charge = getFinalCharge(event.getItemStack());
-        int warp = getFinalWarp(event.getItemStack(), event.getEntityPlayer());
-
-        if (charge > 0) {
-            event.getToolTip().add(TextFormatting.GOLD + I18n.translateToLocal("item.runic.charge") + " +" + charge);
+    private void setRunicCharge(EntityPlayer player, int charge, int max, boolean send) {
+        int safeCharge = Math.max(0, charge);
+        this.runicCharge.put(player.getEntityId(), safeCharge);
+        IPlayerKnowledge knowledge = player.getCapability(PlayerKnowledgeProvider.PLAYER_KNOWLEDGE, null);
+        if (knowledge != null) {
+            knowledge.setRunicCharge(safeCharge);
+            ResearchManager.updateCache(player.getName(), knowledge);
         }
-        if (warp > 0 && event.getEntityPlayer() != null) {
-            event.getToolTip().add(TextFormatting.DARK_PURPLE + I18n.translateToLocal("item.warping") + " " + warp);
+        if (send) {
+            syncRunicCharge(player, safeCharge, max);
+        }
+    }
+
+    private void syncRunicCharge(EntityPlayer player, int charge, int max) {
+        if (player instanceof EntityPlayerMP) {
+            PacketHandler.INSTANCE.sendTo(new PacketRunicCharge(player.getEntityId(), Math.max(0, charge), Math.max(0, max)), (EntityPlayerMP)player);
         }
     }
 

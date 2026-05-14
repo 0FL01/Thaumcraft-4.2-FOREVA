@@ -1,15 +1,33 @@
 package thaumcraft.common.entities.monster.boss;
 
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.IEntityLivingData;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.ai.*;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.network.datasync.DataParameter;
+import net.minecraft.network.datasync.DataSerializers;
+import net.minecraft.network.datasync.EntityDataManager;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.DifficultyInstance;
 import thaumcraft.common.entities.ai.combat.AIAttackOnCollide;
+import thaumcraft.common.entities.ai.combat.AILongRangeAttack;
+import thaumcraft.common.entities.projectile.EntityGolemOrb;
+import thaumcraft.common.lib.TCSounds;
 
 public class EntityEldritchGolem extends EntityThaumcraftBoss implements thaumcraft.api.entities.IEldritchMob, net.minecraft.entity.IRangedAttackMob {
-    private boolean headless = false;
+    private static final DataParameter<Boolean> HEADLESS = EntityDataManager.createKey(EntityEldritchGolem.class, DataSerializers.BOOLEAN);
+    private int beamCharge = 0;
+    private boolean chargingBeam = false;
+    private boolean headlessAttackAdded = false;
+    private int attackTimer = 0;
 
     public EntityEldritchGolem(net.minecraft.world.World world) {
         super(world);
+        this.setSize(1.75F, 3.5F);
+        this.isImmuneToFire = true;
         this.tasks.addTask(0, new EntityAISwimming(this));
         this.tasks.addTask(3, new AIAttackOnCollide(this, EntityLivingBase.class, 1.1, false));
         this.tasks.addTask(6, new EntityAIMoveTowardsRestriction(this, 0.8));
@@ -21,6 +39,12 @@ public class EntityEldritchGolem extends EntityThaumcraftBoss implements thaumcr
     }
 
     @Override
+    protected void entityInit() {
+        super.entityInit();
+        this.dataManager.register(HEADLESS, false);
+    }
+
+    @Override
     protected void applyEntityAttributes() {
         super.applyEntityAttributes();
         this.getEntityAttribute(net.minecraft.entity.SharedMonsterAttributes.MAX_HEALTH).setBaseValue(250.0);
@@ -28,17 +52,71 @@ public class EntityEldritchGolem extends EntityThaumcraftBoss implements thaumcr
         this.getEntityAttribute(net.minecraft.entity.SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(0.3);
     }
 
-    public boolean isHeadless() { return this.headless; }
+    public boolean isHeadless() {
+        return this.dataManager.get(HEADLESS);
+    }
+
+    public void setHeadless(boolean headless) {
+        this.dataManager.set(HEADLESS, headless);
+    }
 
     public void makeHeadless() {
-        this.headless = true;
-        // Add ranged attack when headless — use AILongRangeAttack
-        this.tasks.addTask(2, new thaumcraft.common.entities.ai.combat.AILongRangeAttack(this, 3.0, 1.0, 5, 5, 24.0f));
+        this.setHeadless(true);
+        if (!this.headlessAttackAdded) {
+            this.tasks.addTask(2, new AILongRangeAttack(this, 3.0, 1.0, 5, 5, 24.0f));
+            this.headlessAttackAdded = true;
+        }
+    }
+
+    @Override
+    public void writeEntityToNBT(NBTTagCompound compound) {
+        super.writeEntityToNBT(compound);
+        compound.setBoolean("headless", this.isHeadless());
+    }
+
+    @Override
+    public void readEntityFromNBT(NBTTagCompound compound) {
+        super.readEntityFromNBT(compound);
+        this.setHeadless(compound.getBoolean("headless"));
+        if (this.isHeadless()) {
+            this.makeHeadless();
+        }
+    }
+
+    @Override
+    public IEntityLivingData onInitialSpawn(DifficultyInstance difficulty, IEntityLivingData livingdata) {
+        return super.onInitialSpawn(difficulty, livingdata);
+    }
+
+    @Override
+    public float getEyeHeight() {
+        return this.isHeadless() ? 3.33F : 3.0F;
+    }
+
+    @Override
+    public int getTotalArmorValue() {
+        return super.getTotalArmorValue() + 6;
     }
 
     @Override
     public void attackEntityWithRangedAttack(EntityLivingBase target, float distance) {
-        // TODO: beam attack
+        if (this.canEntityBeSeen(target) && !this.chargingBeam && this.beamCharge > 0) {
+            this.beamCharge -= 15 + this.rand.nextInt(5);
+            this.getLookHelper().setLookPosition(target.posX, target.getEntityBoundingBox().minY + (double) (target.height / 2.0F), target.posZ, 30.0F, 30.0F);
+            Vec3d look = this.getLook(1.0F);
+            EntityGolemOrb blast = new EntityGolemOrb(this.world, this, target, false);
+            blast.posX += look.x;
+            blast.posZ += look.z;
+            blast.setPosition(blast.posX, blast.posY, blast.posZ);
+            double d0 = target.posX + target.motionX - this.posX;
+            double d1 = target.posY - this.posY - (double) (target.height / 2.0F);
+            double d2 = target.posZ + target.motionZ - this.posZ;
+            blast.shoot(d0, d1, d2, 0.66F, 5.0F);
+            this.playSound(TCSounds.EGATTACK, 1.0F, 1.0F + this.rand.nextFloat() * 0.1F);
+            if (!this.world.isRemote) {
+                this.world.spawnEntity(blast);
+            }
+        }
     }
 
     @Override
@@ -49,7 +127,66 @@ public class EntityEldritchGolem extends EntityThaumcraftBoss implements thaumcr
 
     @Override
     public boolean attackEntityFrom(net.minecraft.util.DamageSource source, float amount) {
-        // TODO: go headless at lethal damage
+        if (!this.world.isRemote && amount > this.getHealth() && !this.isHeadless()) {
+            this.setHeadless(true);
+            double xx = MathHelper.cos(this.rotationYaw % 360.0F / 180.0F * (float) Math.PI) * 0.75F;
+            double zz = MathHelper.sin(this.rotationYaw % 360.0F / 180.0F * (float) Math.PI) * 0.75F;
+            this.world.createExplosion(this, this.posX + xx, this.posY + (double) this.getEyeHeight(), this.posZ + zz, 2.0F, false);
+            this.makeHeadless();
+            return false;
+        }
         return super.attackEntityFrom(source, amount);
+    }
+
+    @Override
+    public boolean attackEntityAsMob(Entity target) {
+        if (this.attackTimer > 0) {
+            return false;
+        }
+        this.attackTimer = 10;
+        this.world.setEntityState(this, (byte) 4);
+        boolean hit = target.attackEntityFrom(net.minecraft.util.DamageSource.causeMobDamage(this), (float) this.getEntityAttribute(net.minecraft.entity.SharedMonsterAttributes.ATTACK_DAMAGE).getAttributeValue() * 0.75F);
+        if (hit) {
+            target.motionY += 0.2000000059604645D;
+            if (this.isHeadless()) {
+                target.addVelocity(-MathHelper.sin(this.rotationYaw * (float) Math.PI / 180.0F) * 1.5F, 0.1D, MathHelper.cos(this.rotationYaw * (float) Math.PI / 180.0F) * 1.5F);
+            }
+        }
+        return hit;
+    }
+
+    @Override
+    public void onLivingUpdate() {
+        super.onLivingUpdate();
+        if (this.attackTimer > 0) {
+            --this.attackTimer;
+        }
+    }
+
+    @Override
+    public void onUpdate() {
+        super.onUpdate();
+        if (!this.world.isRemote) {
+            if (this.isHeadless() && this.beamCharge <= 0) {
+                this.chargingBeam = true;
+            }
+            if (this.isHeadless() && this.chargingBeam) {
+                ++this.beamCharge;
+                this.world.setEntityState(this, (byte) 19);
+                if (this.beamCharge == 150) {
+                    this.chargingBeam = false;
+                }
+            }
+        }
+    }
+
+    @Override
+    public void handleStatusUpdate(byte id) {
+        if (id == 4) {
+            this.attackTimer = 10;
+            this.playSound(net.minecraft.init.SoundEvents.ENTITY_IRONGOLEM_ATTACK, 1.0F, 1.0F);
+        } else {
+            super.handleStatusUpdate(id);
+        }
     }
 }

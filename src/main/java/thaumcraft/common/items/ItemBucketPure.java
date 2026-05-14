@@ -27,11 +27,7 @@ public class ItemBucketPure extends Item {
         ItemStack stack = player.getHeldItem(hand);
         RayTraceResult mop = this.rayTrace(world, player, false);
         if (mop != null && mop.typeOfHit == RayTraceResult.Type.BLOCK) {
-            world.playSound(player, mop.getBlockPos(), SoundEvents.ITEM_BUCKET_EMPTY, SoundCategory.NEUTRAL, 1.0f, 1.0f);
-            if (!player.capabilities.isCreativeMode) {
-                player.setHeldItem(hand, new ItemStack(Items.BUCKET));
-            }
-            return new ActionResult<>(EnumActionResult.SUCCESS, stack);
+            return new ActionResult<>(EnumActionResult.FAIL, stack);
         }
         return new ActionResult<>(EnumActionResult.PASS, stack);
     }

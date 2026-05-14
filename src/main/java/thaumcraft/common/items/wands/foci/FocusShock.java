@@ -18,6 +18,7 @@ import thaumcraft.api.wands.FocusUpgradeType;
 import thaumcraft.api.wands.ItemFocusBasic;
 import thaumcraft.common.entities.projectile.EntityShockOrb;
 import thaumcraft.common.items.wands.ItemWandCasting;
+import thaumcraft.common.items.wands.WandManager;
 import thaumcraft.common.lib.TCSounds;
 import thaumcraft.common.lib.utils.EntityUtils;
 
@@ -58,8 +59,21 @@ public class FocusShock extends ItemFocusBasic {
                 orb.playSound(TCSounds.ZAP, 1.0F, 1.0F + (world.rand.nextFloat() - world.rand.nextFloat()) * 0.2F);
             }
             player.swingArm(EnumHand.MAIN_HAND);
+        } else {
+            player.setActiveHand(EnumHand.MAIN_HAND);
+            WandManager.setCooldown(player, -1);
         }
         return wandStack;
+    }
+
+    @Override
+    public int getActivationCooldown(ItemStack focusstack) {
+        return this.isUpgradedWith(focusstack, chainlightning) ? 500 : (this.isUpgradedWith(focusstack, earthshock) ? 1000 : 250);
+    }
+
+    @Override
+    public ItemFocusBasic.WandFocusAnimation getAnimation(ItemStack focusstack) {
+        return this.isUpgradedWith(focusstack, earthshock) ? ItemFocusBasic.WandFocusAnimation.WAVE : ItemFocusBasic.WandFocusAnimation.CHARGE;
     }
 
     @Override
@@ -135,7 +149,32 @@ public class FocusShock extends ItemFocusBasic {
 
     @Override
     public String getSortingHelper(ItemStack stack) {
-        return "SHOCK";
+        return "BL" + super.getSortingHelper(stack);
+    }
+
+    @Override
+    public boolean canApplyUpgrade(ItemStack focusstack, EntityPlayer player, FocusUpgradeType type, int rank) {
+        return !type.equals(FocusUpgradeType.enlarge)
+                || this.isUpgradedWith(focusstack, chainlightning)
+                || this.isUpgradedWith(focusstack, earthshock);
+    }
+
+    @Override
+    public FocusUpgradeType[] getPossibleUpgradesByRank(ItemStack itemstack, int rank) {
+        switch (rank) {
+            case 1:
+                return new FocusUpgradeType[]{FocusUpgradeType.frugal, FocusUpgradeType.potency};
+            case 2:
+                return new FocusUpgradeType[]{FocusUpgradeType.frugal, FocusUpgradeType.potency};
+            case 3:
+                return new FocusUpgradeType[]{FocusUpgradeType.frugal, FocusUpgradeType.potency, chainlightning, earthshock};
+            case 4:
+                return new FocusUpgradeType[]{FocusUpgradeType.frugal, FocusUpgradeType.potency, FocusUpgradeType.enlarge};
+            case 5:
+                return new FocusUpgradeType[]{FocusUpgradeType.frugal, FocusUpgradeType.potency, FocusUpgradeType.enlarge};
+            default:
+                return null;
+        }
     }
 
     @Override

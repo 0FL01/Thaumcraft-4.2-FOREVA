@@ -21,6 +21,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 import thaumcraft.common.Thaumcraft;
+import thaumcraft.common.CommonProxy;
 import thaumcraft.common.items.wands.ItemWandCasting;
 import thaumcraft.common.tiles.*;
 
@@ -62,8 +63,12 @@ public class BlockWoodenDevice extends BlockContainer {
     @Override
     public void getSubBlocks(CreativeTabs tab, NonNullList<ItemStack> list) {
         list.add(new ItemStack(this, 1, 0)); // bellows
+        list.add(new ItemStack(this, 1, 1)); // sensor
+        list.add(new ItemStack(this, 1, 2)); // pressure plate
+        list.add(new ItemStack(this, 1, 3)); // pressure plate
         list.add(new ItemStack(this, 1, 4)); // bore base
         list.add(new ItemStack(this, 1, 5)); // bore
+        list.add(new ItemStack(this, 1, 8)); // banner
     }
 
     @Override
@@ -80,7 +85,15 @@ public class BlockWoodenDevice extends BlockContainer {
                         pos.getX(), pos.getY(), pos.getZ(), facing.getIndex(), state.getValue(TYPE)) >= 0;
             }
             if (!worldIn.isRemote) {
-                playerIn.openGui(Thaumcraft.instance, 2, worldIn, pos.getX(), pos.getY(), pos.getZ());
+                playerIn.openGui(Thaumcraft.instance, CommonProxy.GUI_ARCANE_BORE, worldIn, pos.getX(), pos.getY(), pos.getZ());
+            }
+            return true;
+        }
+        if (te instanceof TileArcaneBoreBase) {
+            ItemStack held = playerIn.getHeldItem(hand);
+            if (!held.isEmpty() && held.getItem() instanceof ItemWandCasting) {
+                return ((TileArcaneBoreBase) te).onWandRightClick(worldIn, held, playerIn,
+                        pos.getX(), pos.getY(), pos.getZ(), facing.getIndex(), state.getValue(TYPE)) >= 0;
             }
             return true;
         }

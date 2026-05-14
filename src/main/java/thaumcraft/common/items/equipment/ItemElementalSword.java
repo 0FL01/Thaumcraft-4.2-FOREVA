@@ -14,6 +14,6 @@ public class ItemElementalSword extends ItemSword implements IRepairable {
 
     @Override
     public boolean getIsRepairable(ItemStack toRepair, ItemStack repair) {
-        return false;
+        return super.getIsRepairable(toRepair, repair);
     }
 }

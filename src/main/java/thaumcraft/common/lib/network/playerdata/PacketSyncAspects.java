@@ -20,7 +20,7 @@ public class PacketSyncAspects extends PacketBase {
     public PacketSyncAspects() {}
 
     public PacketSyncAspects(AspectList aspects) {
-        this.aspects = aspects;
+        this.aspects = aspects == null ? new AspectList() : aspects.copy();
     }
 
     @Override
@@ -39,16 +39,29 @@ public class PacketSyncAspects extends PacketBase {
 
     @Override
     public void toBytes(ByteBuf buf) {
-        if (aspects == null) {
+        if (aspects == null || aspects.size() <= 0) {
             buf.writeInt(0);
             return;
         }
         Aspect[] aspectArray = aspects.getAspects();
-        buf.writeInt(aspectArray.length);
+        int count = 0;
         for (Aspect aspect : aspectArray) {
+            if (aspect != null) {
+                count++;
+            }
+        }
+        buf.writeInt(count);
+        for (Aspect aspect : aspectArray) {
+            if (aspect == null) {
+                continue;
+            }
             ByteBufUtils.writeUTF8String(buf, aspect.getTag());
             buf.writeInt(aspects.getAmount(aspect));
         }
+    }
+
+    public AspectList getAspects() {
+        return aspects == null ? new AspectList() : aspects.copy();
     }
 
     @Override
@@ -59,12 +72,7 @@ public class PacketSyncAspects extends PacketBase {
             if (player != null && aspects != null) {
                 IPlayerKnowledge knowledge = player.getCapability(PlayerKnowledgeProvider.PLAYER_KNOWLEDGE, null);
                 if (knowledge != null) {
-                    for (Aspect aspect : aspects.getAspects()) {
-                        int amount = aspects.getAmount(aspect);
-                        for (int i = 0; i < amount; i++) {
-                            knowledge.addDiscoveredAspect(aspect.getTag());
-                        }
-                    }
+                    knowledge.setAspectsDiscovered(aspects);
                 }
             }
         });

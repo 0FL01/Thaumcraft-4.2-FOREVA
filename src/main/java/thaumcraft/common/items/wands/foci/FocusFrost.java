@@ -78,7 +78,30 @@ public class FocusFrost extends ItemFocusBasic {
 
     @Override
     public String getSortingHelper(ItemStack stack) {
-        return "FROST";
+        return "BF" + super.getSortingHelper(stack);
+    }
+
+    @Override
+    public int getActivationCooldown(ItemStack focusstack) {
+        return this.isUpgradedWith(focusstack, scattershot) || this.isUpgradedWith(focusstack, iceboulder) ? 500 : 200;
+    }
+
+    @Override
+    public FocusUpgradeType[] getPossibleUpgradesByRank(ItemStack itemstack, int rank) {
+        switch (rank) {
+            case 1:
+                return new FocusUpgradeType[]{FocusUpgradeType.frugal, FocusUpgradeType.potency, FocusUpgradeType.alchemistsfrost};
+            case 2:
+                return new FocusUpgradeType[]{FocusUpgradeType.frugal, FocusUpgradeType.potency};
+            case 3:
+                return new FocusUpgradeType[]{FocusUpgradeType.frugal, FocusUpgradeType.potency, scattershot, iceboulder, FocusUpgradeType.alchemistsfrost};
+            case 4:
+                return new FocusUpgradeType[]{FocusUpgradeType.frugal, FocusUpgradeType.potency};
+            case 5:
+                return new FocusUpgradeType[]{FocusUpgradeType.frugal, FocusUpgradeType.potency, FocusUpgradeType.alchemistsfrost};
+            default:
+                return null;
+        }
     }
 
     @Override

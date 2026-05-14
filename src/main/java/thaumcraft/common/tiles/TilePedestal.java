@@ -161,7 +161,7 @@ implements ISidedInventory {
             inventory[0].writeToNBT(item);
             list.appendTag(item);
         }
-        compound.setTag("Inventory", list);
+        compound.setTag("Items", list);
     }
 
     @Override

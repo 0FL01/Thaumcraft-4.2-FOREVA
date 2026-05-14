@@ -263,8 +263,8 @@ public class ThaumcraftWorldGenerator implements IWorldGenerator {
         // Surface generation only
         if (world.provider.isNether() || world.provider.getDimensionType() == net.minecraft.world.DimensionType.THE_END) return;
 
-        int x = chunkX * 16 + 8;
-        int z = chunkZ * 16 + 8;
+        int x = chunkX * 16;
+        int z = chunkZ * 16;
 
         Biome biome = world.getBiome(new BlockPos(x, 64, z));
         int biomeId = Biome.getIdForBiome(biome);
@@ -312,16 +312,16 @@ public class ThaumcraftWorldGenerator implements IWorldGenerator {
         if (!Config.genTrees && !Config.regenTrees) return;
         float chance = BiomeHandler.getBiomeSupportsGreatwood(biome);
         if (chance > 0 && rand.nextFloat() < chance) {
-            int bx = x + rand.nextInt(16) + 8;
-            int bz = z + rand.nextInt(16) + 8;
+            int bx = x + rand.nextInt(16);
+            int bz = z + rand.nextInt(16);
             BlockPos pos = world.getHeight(new BlockPos(bx, 0, bz));
             new WorldGenGreatwoodTrees(false).generate(world, rand, pos);
         }
     }
 
     public static void generateSilverwood(World world, Random rand, int x, int z, Biome biome) {
-        int bx = x + rand.nextInt(16) + 8;
-        int bz = z + rand.nextInt(16) + 8;
+        int bx = x + rand.nextInt(16);
+        int bz = z + rand.nextInt(16);
         BlockPos pos = world.getHeight(new BlockPos(bx, 0, bz));
 
         boolean shouldGen = biome == biomeMagicalForest
@@ -336,8 +336,8 @@ public class ThaumcraftWorldGenerator implements IWorldGenerator {
     }
 
     public static void generateFlowers(World world, Random rand, int x, int z, int flowerType) {
-        int bx = x + rand.nextInt(16) + 8;
-        int bz = z + rand.nextInt(16) + 8;
+        int bx = x + rand.nextInt(16);
+        int bz = z + rand.nextInt(16);
         BlockPos pos = world.getHeight(new BlockPos(bx, 0, bz));
         new WorldGenCustomFlowers(ConfigBlocks.blockCustomPlant.getStateFromMeta(flowerType))
                 .generate(world, rand, pos);
@@ -347,8 +347,8 @@ public class ThaumcraftWorldGenerator implements IWorldGenerator {
         if (biome == biomeMagicalForest || biome == biomeTaint) {
             // Barrow mounds
             if (rand.nextInt(400) == 0) {
-                int bx = x + rand.nextInt(16) + 8;
-                int bz = z + rand.nextInt(16) + 8;
+                int bx = x + rand.nextInt(16);
+                int bz = z + rand.nextInt(16);
                 BlockPos pos = world.getHeight(new BlockPos(bx, 0, bz));
                 new WorldGenMound().generate(world, rand, pos);
             }
@@ -356,16 +356,16 @@ public class ThaumcraftWorldGenerator implements IWorldGenerator {
 
         // Eldritch rings (sparse)
         if (rand.nextInt(800) == 0 && !MazeHandler.mazesInRange(x >> 4, z >> 4, 32, 32)) {
-            int bx = x + rand.nextInt(16) + 8;
-            int bz = z + rand.nextInt(16) + 8;
+            int bx = x + rand.nextInt(16);
+            int bz = z + rand.nextInt(16);
             BlockPos pos = world.getHeight(new BlockPos(bx, 0, bz));
             new WorldGenEldritchRing().generate(world, rand, pos);
         }
 
         // Hilltop stones
         if (rand.nextInt(600) == 0) {
-            int bx = x + rand.nextInt(16) + 8;
-            int bz = z + rand.nextInt(16) + 8;
+            int bx = x + rand.nextInt(16);
+            int bz = z + rand.nextInt(16);
             BlockPos pos = world.getHeight(new BlockPos(bx, 0, bz));
             new WorldGenHilltopStones().generate(world, rand, pos);
         }

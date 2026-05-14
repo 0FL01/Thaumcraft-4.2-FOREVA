@@ -21,7 +21,7 @@ public class PacketSyncResearch extends PacketBase {
     public PacketSyncResearch() {}
 
     public PacketSyncResearch(Set<String> research) {
-        this.research = research;
+        this.research = research == null ? new HashSet<>() : new HashSet<>(research);
     }
 
     @Override
@@ -57,6 +57,7 @@ public class PacketSyncResearch extends PacketBase {
             if (player != null && research != null) {
                 IPlayerKnowledge knowledge = player.getCapability(PlayerKnowledgeProvider.PLAYER_KNOWLEDGE, null);
                 if (knowledge != null) {
+                    knowledge.getResearchComplete().clear();
                     for (String key : research) {
                         knowledge.addResearch(key);
                     }

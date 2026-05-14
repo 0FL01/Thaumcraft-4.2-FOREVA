@@ -26,7 +26,9 @@ import net.minecraft.world.World;
 import net.minecraft.init.SoundEvents;
 import net.minecraftforge.fluids.FluidUtil;
 import thaumcraft.common.Thaumcraft;
+import thaumcraft.common.CommonProxy;
 import thaumcraft.common.entities.EntitySpecialItem;
+import thaumcraft.common.items.wands.ItemWandCasting;
 import thaumcraft.common.tiles.*;
 
 public class BlockMetalDevice extends BlockContainer {
@@ -55,11 +57,13 @@ public class BlockMetalDevice extends BlockContainer {
     public TileEntity createNewTileEntity(World worldIn, int meta) {
         if (meta == 0) return new TileCrucible();
         if (meta == 1) return new TileAlembic();
+        if (meta == 2) return new TileMagicWorkbenchCharger();
         if (meta == 5 || meta == 6) return new TileGrate();
         if (meta == 7) return new TileArcaneLamp();
         if (meta == 8) return new TileArcaneLampGrowth();
         if (meta == 10) return new TileThaumatorium();
         if (meta == 11) return new TileThaumatoriumTop();
+        if (meta == 14) return new TileVisRelay();
         return new TilePedestal();
     }
 
@@ -72,7 +76,14 @@ public class BlockMetalDevice extends BlockContainer {
     public void getSubBlocks(CreativeTabs tab, NonNullList<ItemStack> list) {
         list.add(new ItemStack(this, 1, 0)); // crucible
         list.add(new ItemStack(this, 1, 1)); // alembic
+        list.add(new ItemStack(this, 1, 2)); // magic workbench charger
+        list.add(new ItemStack(this, 1, 5)); // grate
+        list.add(new ItemStack(this, 1, 6)); // grate
         list.add(new ItemStack(this, 1, 7)); // lamp
+        list.add(new ItemStack(this, 1, 8)); // growth lamp
+        list.add(new ItemStack(this, 1, 10)); // thaumatorium
+        list.add(new ItemStack(this, 1, 11)); // thaumatorium top
+        list.add(new ItemStack(this, 1, 14)); // vis relay
     }
 
     @Override
@@ -109,11 +120,19 @@ public class BlockMetalDevice extends BlockContainer {
                 && FluidUtil.interactWithFluidHandler(playerIn, hand, worldIn, pos, facing)) {
             return true;
         }
+        TileEntity tileEntity = worldIn.getTileEntity(pos);
+        if (tileEntity instanceof TileAlembic) {
+            ItemStack held = playerIn.getHeldItem(hand);
+            if (!held.isEmpty() && held.getItem() instanceof ItemWandCasting) {
+                return ((TileAlembic) tileEntity).onWandRightClick(worldIn, held, playerIn,
+                        pos.getX(), pos.getY(), pos.getZ(), facing.getIndex(), state.getValue(TYPE)) >= 0;
+            }
+        }
         if (state.getValue(TYPE) == 10) {
-            TileEntity te = worldIn.getTileEntity(pos);
+            TileEntity te = tileEntity;
             if (te instanceof TileThaumatorium) {
                 if (!worldIn.isRemote) {
-                    playerIn.openGui(Thaumcraft.instance, 9, worldIn, pos.getX(), pos.getY(), pos.getZ());
+                    playerIn.openGui(Thaumcraft.instance, CommonProxy.GUI_THAUMATORIUM, worldIn, pos.getX(), pos.getY(), pos.getZ());
                 }
                 return true;
             }
@@ -122,7 +141,7 @@ public class BlockMetalDevice extends BlockContainer {
             TileEntity te = worldIn.getTileEntity(pos.down());
             if (te instanceof TileThaumatorium) {
                 if (!worldIn.isRemote) {
-                    playerIn.openGui(Thaumcraft.instance, 9, worldIn, pos.getX(), pos.getY() - 1, pos.getZ());
+                    playerIn.openGui(Thaumcraft.instance, CommonProxy.GUI_THAUMATORIUM, worldIn, pos.getX(), pos.getY() - 1, pos.getZ());
                 }
                 return true;
             }

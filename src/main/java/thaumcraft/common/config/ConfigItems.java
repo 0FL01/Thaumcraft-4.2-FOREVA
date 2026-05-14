@@ -4,6 +4,7 @@ import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.item.Item;
 import net.minecraft.item.Item.ToolMaterial;
 import net.minecraft.item.ItemArmor.ArmorMaterial;
+import net.minecraft.item.ItemStack;
 import net.minecraftforge.common.util.EnumHelper;
 import thaumcraft.common.items.ItemBathSalts;
 import thaumcraft.common.items.ItemBottleTaint;
@@ -74,6 +75,7 @@ public class ConfigItems {
     public static ToolMaterial TOOLMAT_THAUMIUM;
     public static ToolMaterial TOOLMAT_VOID;
     public static ToolMaterial TOOLMAT_ELEMENTAL;
+    public static ToolMaterial TOOLMAT_PRIMALVOID;
 
     // Armor materials
     public static ArmorMaterial ARMOR_THAUMIUM;
@@ -184,6 +186,7 @@ public class ConfigItems {
         TOOLMAT_THAUMIUM = EnumHelper.addToolMaterial("THAUMIUM", 3, 500, 7.0f, 2.5f, 18);
         TOOLMAT_VOID = EnumHelper.addToolMaterial("VOID", 4, 600, 8.0f, 3.0f, 20);
         TOOLMAT_ELEMENTAL = EnumHelper.addToolMaterial("ELEMENTAL", 4, 1561, 10.0f, 4.0f, 22);
+        TOOLMAT_PRIMALVOID = EnumHelper.addToolMaterial("PRIMALVOID", 5, 500, 8.0f, 4.0f, 20);
 
         // Use armor materials from ThaumcraftApi (defined there with EnumHelper)
         ARMOR_THAUMIUM = thaumcraft.api.ThaumcraftApi.armorMatThaumium;
@@ -200,561 +203,562 @@ public class ConfigItems {
         ARMOR_HOVER = thaumcraft.api.ThaumcraftApi.armorMatSpecial;
 
         itemWandCasting = (ItemWandCasting) new ItemWandCasting()
-                .setRegistryName("thaumcraft", "wand_casting")
+                .setRegistryName("thaumcraft", ConfigBlocks.legacyPath("WandCasting"))
                 .setTranslationKey("thaumcraft.wand_casting")
                 .setCreativeTab(tab);
         allItems.add(itemWandCasting);
 
         itemWandRod = (ItemWandRod) new ItemWandRod()
-                .setRegistryName("thaumcraft", "wand_rod")
+                .setRegistryName("thaumcraft", ConfigBlocks.legacyPath("WandRod"))
                 .setTranslationKey("thaumcraft.wand_rod")
                 .setCreativeTab(tab);
         allItems.add(itemWandRod);
 
         itemWandCap = (ItemWandCap) new ItemWandCap()
-                .setRegistryName("thaumcraft", "wand_cap")
+                .setRegistryName("thaumcraft", ConfigBlocks.legacyPath("WandCap"))
                 .setTranslationKey("thaumcraft.wand_cap")
                 .setCreativeTab(tab);
         allItems.add(itemWandCap);
 
         itemFocusPouch = (ItemFocusPouch) new ItemFocusPouch()
-                .setRegistryName("thaumcraft", "focus_pouch")
+                .setRegistryName("thaumcraft", ConfigBlocks.legacyPath("FocusPouch"))
                 .setTranslationKey("thaumcraft.focus_pouch")
                 .setCreativeTab(tab);
         allItems.add(itemFocusPouch);
 
         itemFocusPouchBauble = (ItemFocusPouchBauble) new ItemFocusPouchBauble()
-                .setRegistryName("thaumcraft", "focus_pouch_bauble")
+                .setRegistryName("thaumcraft", ConfigBlocks.legacyPath("FocusPouchBauble"))
                 .setTranslationKey("thaumcraft.focus_pouch_bauble")
                 .setCreativeTab(tab);
         allItems.add(itemFocusPouchBauble);
 
         focusShock = (FocusShock) new FocusShock()
-                .setRegistryName("thaumcraft", "focus_shock")
+                .setRegistryName("thaumcraft", ConfigBlocks.legacyPath("FocusShock"))
                 .setTranslationKey("thaumcraft.focus_shock")
                 .setCreativeTab(tab);
         allItems.add(focusShock);
 
         focusFire = (FocusFire) new FocusFire()
-                .setRegistryName("thaumcraft", "focus_fire")
+                .setRegistryName("thaumcraft", ConfigBlocks.legacyPath("FocusFire"))
                 .setTranslationKey("thaumcraft.focus_fire")
                 .setCreativeTab(tab);
         allItems.add(focusFire);
 
         focusFrost = (FocusFrost) new FocusFrost()
-                .setRegistryName("thaumcraft", "focus_frost")
+                .setRegistryName("thaumcraft", ConfigBlocks.legacyPath("FocusFrost"))
                 .setTranslationKey("thaumcraft.focus_frost")
                 .setCreativeTab(tab);
         allItems.add(focusFrost);
 
         focusExcavation = (FocusExcavation) new FocusExcavation()
-                .setRegistryName("thaumcraft", "focus_excavation")
+                .setRegistryName("thaumcraft", ConfigBlocks.legacyPath("FocusExcavation"))
                 .setTranslationKey("thaumcraft.focus_excavation")
                 .setCreativeTab(tab);
         allItems.add(focusExcavation);
 
         focusPrimal = (FocusPrimal) new FocusPrimal()
-                .setRegistryName("thaumcraft", "focus_primal")
+                .setRegistryName("thaumcraft", ConfigBlocks.legacyPath("FocusPrimal"))
                 .setTranslationKey("thaumcraft.focus_primal")
                 .setCreativeTab(tab);
         allItems.add(focusPrimal);
 
         focusWarding = (FocusWarding) new FocusWarding()
-                .setRegistryName("thaumcraft", "focus_warding")
+                .setRegistryName("thaumcraft", ConfigBlocks.legacyPath("FocusWarding"))
                 .setTranslationKey("thaumcraft.focus_warding")
                 .setCreativeTab(tab);
         allItems.add(focusWarding);
 
         focusHellbat = (FocusHellbat) new FocusHellbat()
-                .setRegistryName("thaumcraft", "focus_hellbat")
+                .setRegistryName("thaumcraft", ConfigBlocks.legacyPath("FocusHellbat"))
                 .setTranslationKey("thaumcraft.focus_hellbat")
                 .setCreativeTab(tab);
         allItems.add(focusHellbat);
 
         focusPech = (FocusPech) new FocusPech()
-                .setRegistryName("thaumcraft", "focus_pech")
+                .setRegistryName("thaumcraft", ConfigBlocks.legacyPath("FocusPech"))
                 .setTranslationKey("thaumcraft.focus_pech")
                 .setCreativeTab(tab);
         allItems.add(focusPech);
 
         focusTrade = (FocusTrade) new FocusTrade()
-                .setRegistryName("thaumcraft", "focus_trade")
+                .setRegistryName("thaumcraft", ConfigBlocks.legacyPath("FocusTrade"))
                 .setTranslationKey("thaumcraft.focus_trade")
                 .setCreativeTab(tab);
         allItems.add(focusTrade);
 
         focusPortableHole = (FocusPortableHole) new FocusPortableHole()
-                .setRegistryName("thaumcraft", "focus_portable_hole")
+                .setRegistryName("thaumcraft", ConfigBlocks.legacyPath("FocusPortableHole"))
                 .setTranslationKey("thaumcraft.focus_portable_hole")
                 .setCreativeTab(tab);
         allItems.add(focusPortableHole);
 
         itemShard = (ItemShard) new ItemShard()
-                .setRegistryName("thaumcraft", "shard")
+                .setRegistryName("thaumcraft", ConfigBlocks.legacyPath("ItemShard"))
                 .setTranslationKey("thaumcraft.shard");
         allItems.add(itemShard);
 
         itemWispEssence = (ItemWispEssence) new ItemWispEssence()
-                .setRegistryName("thaumcraft", "wisp_essence")
+                .setRegistryName("thaumcraft", ConfigBlocks.legacyPath("ItemWispEssence"))
                 .setTranslationKey("thaumcraft.wisp_essence");
         allItems.add(itemWispEssence);
 
         itemResource = (ItemResource) new ItemResource()
-                .setRegistryName("thaumcraft", "resource")
+                .setRegistryName("thaumcraft", ConfigBlocks.legacyPath("ItemResource"))
                 .setTranslationKey("thaumcraft.resource")
                 .setCreativeTab(tab);
         allItems.add(itemResource);
+        configureRepairMaterials();
 
         itemEssence = (ItemEssence) new ItemEssence()
-                .setRegistryName("thaumcraft", "essence")
+                .setRegistryName("thaumcraft", ConfigBlocks.legacyPath("ItemEssence"))
                 .setTranslationKey("thaumcraft.essence")
                 .setCreativeTab(tab);
         allItems.add(itemEssence);
 
         itemCrystalEssence = (ItemCrystalEssence) new ItemCrystalEssence()
-                .setRegistryName("thaumcraft", "crystal_essence")
+                .setRegistryName("thaumcraft", ConfigBlocks.legacyPath("ItemCrystalEssence"))
                 .setTranslationKey("thaumcraft.crystal_essence")
                 .setCreativeTab(tab);
         allItems.add(itemCrystalEssence);
 
         itemNugget = (ItemNugget) new ItemNugget()
-                .setRegistryName("thaumcraft", "nugget")
+                .setRegistryName("thaumcraft", ConfigBlocks.legacyPath("ItemNugget"))
                 .setTranslationKey("thaumcraft.nugget")
                 .setCreativeTab(tab);
         allItems.add(itemNugget);
 
         itemNuggetEdible = (ItemNuggetEdible) new ItemNuggetEdible()
-                .setRegistryName("thaumcraft", "nugget_edible")
+                .setRegistryName("thaumcraft", ConfigBlocks.legacyPath("ItemNuggetEdible"))
                 .setTranslationKey("thaumcraft.nugget_edible")
                 .setCreativeTab(tab);
         allItems.add(itemNuggetEdible);
 
         itemEldritchObject = (ItemEldritchObject) new ItemEldritchObject()
-                .setRegistryName("thaumcraft", "eldritch_object")
+                .setRegistryName("thaumcraft", ConfigBlocks.legacyPath("ItemEldritchObject"))
                 .setTranslationKey("thaumcraft.eldritch_object")
                 .setCreativeTab(tab);
         allItems.add(itemEldritchObject);
 
         itemLootBag = (ItemLootBag) new ItemLootBag()
-                .setRegistryName("thaumcraft", "loot_bag")
+                .setRegistryName("thaumcraft", ConfigBlocks.legacyPath("ItemLootBag"))
                 .setTranslationKey("thaumcraft.loot_bag")
                 .setCreativeTab(tab);
         allItems.add(itemLootBag);
 
         itemBottleTaint = (ItemBottleTaint) new ItemBottleTaint()
-                .setRegistryName("thaumcraft", "bottle_taint")
+                .setRegistryName("thaumcraft", ConfigBlocks.legacyPath("ItemBottleTaint"))
                 .setTranslationKey("thaumcraft.bottle_taint")
                 .setCreativeTab(tab);
         allItems.add(itemBottleTaint);
 
         itemBucketDeath = (ItemBucketDeath) new ItemBucketDeath()
-                .setRegistryName("thaumcraft", "bucket_death")
+                .setRegistryName("thaumcraft", ConfigBlocks.legacyPath("ItemBucketDeath"))
                 .setTranslationKey("thaumcraft.bucket_death")
                 .setCreativeTab(tab);
         allItems.add(itemBucketDeath);
 
         itemBucketPure = (ItemBucketPure) new ItemBucketPure()
-                .setRegistryName("thaumcraft", "bucket_pure")
+                .setRegistryName("thaumcraft", ConfigBlocks.legacyPath("ItemBucketPure"))
                 .setTranslationKey("thaumcraft.bucket_pure")
                 .setCreativeTab(tab);
         allItems.add(itemBucketPure);
 
         itemBathSalts = (ItemBathSalts) new ItemBathSalts()
-                .setRegistryName("thaumcraft", "bath_salts")
+                .setRegistryName("thaumcraft", ConfigBlocks.legacyPath("ItemBathSalts"))
                 .setTranslationKey("thaumcraft.bath_salts")
                 .setCreativeTab(tab);
         allItems.add(itemBathSalts);
 
         itemCompassStone = (ItemCompassStone) new ItemCompassStone()
-                .setRegistryName("thaumcraft", "compass_stone")
+                .setRegistryName("thaumcraft", ConfigBlocks.legacyPath("ItemCompassStone"))
                 .setTranslationKey("thaumcraft.compass_stone")
                 .setCreativeTab(tab);
         allItems.add(itemCompassStone);
 
         itemInkwell = (ItemInkwell) new ItemInkwell()
-                .setRegistryName("thaumcraft", "inkwell")
+                .setRegistryName("thaumcraft", ConfigBlocks.legacyPath("ItemInkwell"))
                 .setTranslationKey("thaumcraft.inkwell")
                 .setCreativeTab(tab);
         allItems.add(itemInkwell);
 
         itemKey = (ItemKey) new ItemKey()
-                .setRegistryName("thaumcraft", "key")
+                .setRegistryName("thaumcraft", ConfigBlocks.legacyPath("ArcaneDoorKey"))
                 .setTranslationKey("thaumcraft.key")
                 .setCreativeTab(tab);
         allItems.add(itemKey);
 
         itemManaBean = (ItemManaBean) new ItemManaBean()
-                .setRegistryName("thaumcraft", "mana_bean")
+                .setRegistryName("thaumcraft", ConfigBlocks.legacyPath("ItemManaBean"))
                 .setTranslationKey("thaumcraft.mana_bean")
                 .setCreativeTab(tab);
         allItems.add(itemManaBean);
 
         itemResearchNotes = (ItemResearchNotes) new ItemResearchNotes()
-                .setRegistryName("thaumcraft", "research_notes")
+                .setRegistryName("thaumcraft", ConfigBlocks.legacyPath("ItemResearchNotes"))
                 .setTranslationKey("thaumcraft.research_notes")
                 .setCreativeTab(tab);
         allItems.add(itemResearchNotes);
 
         itemSanitySoap = (ItemSanitySoap) new ItemSanitySoap()
-                .setRegistryName("thaumcraft", "sanity_soap")
+                .setRegistryName("thaumcraft", ConfigBlocks.legacyPath("ItemSanitySoap"))
                 .setTranslationKey("thaumcraft.sanity_soap")
                 .setCreativeTab(tab);
         allItems.add(itemSanitySoap);
 
         itemTripleMeatTreat = (ItemTripleMeatTreat) new ItemTripleMeatTreat()
-                .setRegistryName("thaumcraft", "triple_meat_treat")
+                .setRegistryName("thaumcraft", ConfigBlocks.legacyPath("TripleMeatTreat"))
                 .setTranslationKey("thaumcraft.triple_meat_treat")
                 .setCreativeTab(tab);
         allItems.add(itemTripleMeatTreat);
 
         itemZombieBrain = (ItemZombieBrain) new ItemZombieBrain()
-                .setRegistryName("thaumcraft", "zombie_brain")
+                .setRegistryName("thaumcraft", ConfigBlocks.legacyPath("ItemZombieBrain"))
                 .setTranslationKey("thaumcraft.zombie_brain")
                 .setCreativeTab(tab);
         allItems.add(itemZombieBrain);
 
         // Equipment
         itemSwordThaumium = (ItemThaumiumSword) new ItemThaumiumSword(TOOLMAT_THAUMIUM)
-                .setRegistryName("thaumcraft", "sword_thaumium")
+                .setRegistryName("thaumcraft", ConfigBlocks.legacyPath("ItemSwordThaumium"))
                 .setTranslationKey("thaumcraft.sword_thaumium")
                 .setCreativeTab(tab);
         allItems.add(itemSwordThaumium);
 
         itemPickThaumium = (ItemThaumiumPickaxe) new ItemThaumiumPickaxe(TOOLMAT_THAUMIUM)
-                .setRegistryName("thaumcraft", "pick_thaumium")
+                .setRegistryName("thaumcraft", ConfigBlocks.legacyPath("ItemPickThaumium"))
                 .setTranslationKey("thaumcraft.pick_thaumium")
                 .setCreativeTab(tab);
         allItems.add(itemPickThaumium);
 
         itemAxeThaumium = (ItemThaumiumAxe) new ItemThaumiumAxe(TOOLMAT_THAUMIUM)
-                .setRegistryName("thaumcraft", "axe_thaumium")
+                .setRegistryName("thaumcraft", ConfigBlocks.legacyPath("ItemAxeThaumium"))
                 .setTranslationKey("thaumcraft.axe_thaumium")
                 .setCreativeTab(tab);
         allItems.add(itemAxeThaumium);
 
         itemShovelThaumium = (ItemThaumiumShovel) new ItemThaumiumShovel(TOOLMAT_THAUMIUM)
-                .setRegistryName("thaumcraft", "shovel_thaumium")
+                .setRegistryName("thaumcraft", ConfigBlocks.legacyPath("ItemShovelThaumium"))
                 .setTranslationKey("thaumcraft.shovel_thaumium")
                 .setCreativeTab(tab);
         allItems.add(itemShovelThaumium);
 
         itemHoeThaumium = (ItemThaumiumHoe) new ItemThaumiumHoe(TOOLMAT_THAUMIUM)
-                .setRegistryName("thaumcraft", "hoe_thaumium")
+                .setRegistryName("thaumcraft", ConfigBlocks.legacyPath("ItemHoeThaumium"))
                 .setTranslationKey("thaumcraft.hoe_thaumium")
                 .setCreativeTab(tab);
         allItems.add(itemHoeThaumium);
 
         itemSwordVoid = (ItemVoidSword) new ItemVoidSword(TOOLMAT_VOID)
-                .setRegistryName("thaumcraft", "sword_void")
+                .setRegistryName("thaumcraft", ConfigBlocks.legacyPath("ItemSwordVoid"))
                 .setTranslationKey("thaumcraft.sword_void")
                 .setCreativeTab(tab);
         allItems.add(itemSwordVoid);
 
         itemPickVoid = (ItemVoidPickaxe) new ItemVoidPickaxe(TOOLMAT_VOID)
-                .setRegistryName("thaumcraft", "pick_void")
+                .setRegistryName("thaumcraft", ConfigBlocks.legacyPath("ItemPickVoid"))
                 .setTranslationKey("thaumcraft.pick_void")
                 .setCreativeTab(tab);
         allItems.add(itemPickVoid);
 
         itemAxeVoid = (ItemVoidAxe) new ItemVoidAxe(TOOLMAT_VOID)
-                .setRegistryName("thaumcraft", "axe_void")
+                .setRegistryName("thaumcraft", ConfigBlocks.legacyPath("ItemAxeVoid"))
                 .setTranslationKey("thaumcraft.axe_void")
                 .setCreativeTab(tab);
         allItems.add(itemAxeVoid);
 
         itemShovelVoid = (ItemVoidShovel) new ItemVoidShovel(TOOLMAT_VOID)
-                .setRegistryName("thaumcraft", "shovel_void")
+                .setRegistryName("thaumcraft", ConfigBlocks.legacyPath("ItemShovelVoid"))
                 .setTranslationKey("thaumcraft.shovel_void")
                 .setCreativeTab(tab);
         allItems.add(itemShovelVoid);
 
         itemHoeVoid = (ItemVoidHoe) new ItemVoidHoe(TOOLMAT_VOID)
-                .setRegistryName("thaumcraft", "hoe_void")
+                .setRegistryName("thaumcraft", ConfigBlocks.legacyPath("ItemHoeVoid"))
                 .setTranslationKey("thaumcraft.hoe_void")
                 .setCreativeTab(tab);
         allItems.add(itemHoeVoid);
 
         itemSwordElemental = (ItemElementalSword) new ItemElementalSword(TOOLMAT_ELEMENTAL)
-                .setRegistryName("thaumcraft", "sword_elemental")
+                .setRegistryName("thaumcraft", ConfigBlocks.legacyPath("ItemSwordElemental"))
                 .setTranslationKey("thaumcraft.sword_elemental")
                 .setCreativeTab(tab);
         allItems.add(itemSwordElemental);
 
         itemPickElemental = (ItemElementalPickaxe) new ItemElementalPickaxe(TOOLMAT_ELEMENTAL)
-                .setRegistryName("thaumcraft", "pick_elemental")
+                .setRegistryName("thaumcraft", ConfigBlocks.legacyPath("ItemPickaxeElemental"))
                 .setTranslationKey("thaumcraft.pick_elemental")
                 .setCreativeTab(tab);
         allItems.add(itemPickElemental);
 
         itemAxeElemental = (ItemElementalAxe) new ItemElementalAxe(TOOLMAT_ELEMENTAL)
-                .setRegistryName("thaumcraft", "axe_elemental")
+                .setRegistryName("thaumcraft", ConfigBlocks.legacyPath("ItemAxeElemental"))
                 .setTranslationKey("thaumcraft.axe_elemental")
                 .setCreativeTab(tab);
         allItems.add(itemAxeElemental);
 
         itemShovelElemental = (ItemElementalShovel) new ItemElementalShovel(TOOLMAT_ELEMENTAL)
-                .setRegistryName("thaumcraft", "shovel_elemental")
+                .setRegistryName("thaumcraft", ConfigBlocks.legacyPath("ItemShovelElemental"))
                 .setTranslationKey("thaumcraft.shovel_elemental")
                 .setCreativeTab(tab);
         allItems.add(itemShovelElemental);
 
         itemHoeElemental = (ItemElementalHoe) new ItemElementalHoe(TOOLMAT_ELEMENTAL)
-                .setRegistryName("thaumcraft", "hoe_elemental")
+                .setRegistryName("thaumcraft", ConfigBlocks.legacyPath("ItemHoeElemental"))
                 .setTranslationKey("thaumcraft.hoe_elemental")
                 .setCreativeTab(tab);
         allItems.add(itemHoeElemental);
 
         itemBowBone = (ItemBowBone) new ItemBowBone()
-                .setRegistryName("thaumcraft", "bow_bone")
+                .setRegistryName("thaumcraft", ConfigBlocks.legacyPath("ItemBowBone"))
                 .setTranslationKey("thaumcraft.bow_bone")
                 .setCreativeTab(tab);
         allItems.add(itemBowBone);
 
         itemCrimsonSword = (ItemCrimsonSword) new ItemCrimsonSword(TOOLMAT_VOID)
-                .setRegistryName("thaumcraft", "crimson_sword")
+                .setRegistryName("thaumcraft", ConfigBlocks.legacyPath("ItemSwordCrimson"))
                 .setTranslationKey("thaumcraft.crimson_sword")
                 .setCreativeTab(tab);
         allItems.add(itemCrimsonSword);
 
         itemPrimalArrow = (ItemPrimalArrow) new ItemPrimalArrow()
-                .setRegistryName("thaumcraft", "primal_arrow")
+                .setRegistryName("thaumcraft", ConfigBlocks.legacyPath("PrimalArrow"))
                 .setTranslationKey("thaumcraft.primal_arrow")
                 .setCreativeTab(tab);
         allItems.add(itemPrimalArrow);
 
-        itemPrimalCrusher = (ItemPrimalCrusher) new ItemPrimalCrusher(TOOLMAT_ELEMENTAL)
-                .setRegistryName("thaumcraft", "primal_crusher")
+        itemPrimalCrusher = (ItemPrimalCrusher) new ItemPrimalCrusher(TOOLMAT_PRIMALVOID)
+                .setRegistryName("thaumcraft", ConfigBlocks.legacyPath("ItemPrimalCrusher"))
                 .setTranslationKey("thaumcraft.primal_crusher")
                 .setCreativeTab(tab);
         allItems.add(itemPrimalCrusher);
 
         // Armor
         itemHelmThaumium = (ItemThaumiumArmor) new ItemThaumiumArmor(ARMOR_THAUMIUM, 0, EntityEquipmentSlot.HEAD)
-                .setRegistryName("thaumcraft", "helm_thaumium")
+                .setRegistryName("thaumcraft", ConfigBlocks.legacyPath("ItemHelmetThaumium"))
                 .setTranslationKey("thaumcraft.helm_thaumium")
                 .setCreativeTab(tab);
         allItems.add(itemHelmThaumium);
 
         itemChestThaumium = (ItemThaumiumArmor) new ItemThaumiumArmor(ARMOR_THAUMIUM, 0, EntityEquipmentSlot.CHEST)
-                .setRegistryName("thaumcraft", "chest_thaumium")
+                .setRegistryName("thaumcraft", ConfigBlocks.legacyPath("ItemChestplateThaumium"))
                 .setTranslationKey("thaumcraft.chest_thaumium")
                 .setCreativeTab(tab);
         allItems.add(itemChestThaumium);
 
         itemLegsThaumium = (ItemThaumiumArmor) new ItemThaumiumArmor(ARMOR_THAUMIUM, 0, EntityEquipmentSlot.LEGS)
-                .setRegistryName("thaumcraft", "legs_thaumium")
+                .setRegistryName("thaumcraft", ConfigBlocks.legacyPath("ItemLeggingsThaumium"))
                 .setTranslationKey("thaumcraft.legs_thaumium")
                 .setCreativeTab(tab);
         allItems.add(itemLegsThaumium);
 
         itemBootsThaumium = (ItemThaumiumArmor) new ItemThaumiumArmor(ARMOR_THAUMIUM, 0, EntityEquipmentSlot.FEET)
-                .setRegistryName("thaumcraft", "boots_thaumium")
+                .setRegistryName("thaumcraft", ConfigBlocks.legacyPath("ItemBootsThaumium"))
                 .setTranslationKey("thaumcraft.boots_thaumium")
                 .setCreativeTab(tab);
         allItems.add(itemBootsThaumium);
 
         itemHelmVoid = (ItemVoidArmor) new ItemVoidArmor(ARMOR_VOID, 0, EntityEquipmentSlot.HEAD)
-                .setRegistryName("thaumcraft", "helm_void")
+                .setRegistryName("thaumcraft", ConfigBlocks.legacyPath("ItemHelmetVoid"))
                 .setTranslationKey("thaumcraft.helm_void")
                 .setCreativeTab(tab);
         allItems.add(itemHelmVoid);
 
         itemChestVoid = (ItemVoidArmor) new ItemVoidArmor(ARMOR_VOID, 0, EntityEquipmentSlot.CHEST)
-                .setRegistryName("thaumcraft", "chest_void")
+                .setRegistryName("thaumcraft", ConfigBlocks.legacyPath("ItemChestplateVoid"))
                 .setTranslationKey("thaumcraft.chest_void")
                 .setCreativeTab(tab);
         allItems.add(itemChestVoid);
 
         itemLegsVoid = (ItemVoidArmor) new ItemVoidArmor(ARMOR_VOID, 0, EntityEquipmentSlot.LEGS)
-                .setRegistryName("thaumcraft", "legs_void")
+                .setRegistryName("thaumcraft", ConfigBlocks.legacyPath("ItemLeggingsVoid"))
                 .setTranslationKey("thaumcraft.legs_void")
                 .setCreativeTab(tab);
         allItems.add(itemLegsVoid);
 
         itemBootsVoid = (ItemVoidArmor) new ItemVoidArmor(ARMOR_VOID, 0, EntityEquipmentSlot.FEET)
-                .setRegistryName("thaumcraft", "boots_void")
+                .setRegistryName("thaumcraft", ConfigBlocks.legacyPath("ItemBootsVoid"))
                 .setTranslationKey("thaumcraft.boots_void")
                 .setCreativeTab(tab);
         allItems.add(itemBootsVoid);
 
         itemHelmFortress = (ItemFortressArmor) new ItemFortressArmor(ARMOR_FORTRESS, 0, EntityEquipmentSlot.HEAD)
-                .setRegistryName("thaumcraft", "helm_fortress")
+                .setRegistryName("thaumcraft", ConfigBlocks.legacyPath("ItemHelmetFortress"))
                 .setTranslationKey("thaumcraft.helm_fortress")
                 .setCreativeTab(tab);
         allItems.add(itemHelmFortress);
 
         itemChestFortress = (ItemFortressArmor) new ItemFortressArmor(ARMOR_FORTRESS, 0, EntityEquipmentSlot.CHEST)
-                .setRegistryName("thaumcraft", "chest_fortress")
+                .setRegistryName("thaumcraft", ConfigBlocks.legacyPath("ItemChestplateFortress"))
                 .setTranslationKey("thaumcraft.chest_fortress")
                 .setCreativeTab(tab);
         allItems.add(itemChestFortress);
 
         itemLegsFortress = (ItemFortressArmor) new ItemFortressArmor(ARMOR_FORTRESS, 0, EntityEquipmentSlot.LEGS)
-                .setRegistryName("thaumcraft", "legs_fortress")
+                .setRegistryName("thaumcraft", ConfigBlocks.legacyPath("ItemLeggingsFortress"))
                 .setTranslationKey("thaumcraft.legs_fortress")
                 .setCreativeTab(tab);
         allItems.add(itemLegsFortress);
 
         itemBootsFortress = (ItemFortressArmor) new ItemFortressArmor(ARMOR_FORTRESS, 0, EntityEquipmentSlot.FEET)
-                .setRegistryName("thaumcraft", "boots_fortress")
+                .setRegistryName("thaumcraft", ConfigBlocks.legacyPath("ItemBootsFortress"))
                 .setTranslationKey("thaumcraft.boots_fortress")
                 .setCreativeTab(tab);
         allItems.add(itemBootsFortress);
 
         itemHelmRobe = (ItemRobeArmor) new ItemRobeArmor(ARMOR_ROBE, 0, EntityEquipmentSlot.HEAD)
-                .setRegistryName("thaumcraft", "helm_robe")
+                .setRegistryName("thaumcraft", ConfigBlocks.legacyPath("ItemHelmetRobe"))
                 .setTranslationKey("thaumcraft.helm_robe")
                 .setCreativeTab(tab);
         allItems.add(itemHelmRobe);
 
         itemChestRobe = (ItemRobeArmor) new ItemRobeArmor(ARMOR_ROBE, 0, EntityEquipmentSlot.CHEST)
-                .setRegistryName("thaumcraft", "chest_robe")
+                .setRegistryName("thaumcraft", ConfigBlocks.legacyPath("ItemChestplateRobe"))
                 .setTranslationKey("thaumcraft.chest_robe")
                 .setCreativeTab(tab);
         allItems.add(itemChestRobe);
 
         itemLegsRobe = (ItemRobeArmor) new ItemRobeArmor(ARMOR_ROBE, 0, EntityEquipmentSlot.LEGS)
-                .setRegistryName("thaumcraft", "legs_robe")
+                .setRegistryName("thaumcraft", ConfigBlocks.legacyPath("ItemLeggingsRobe"))
                 .setTranslationKey("thaumcraft.legs_robe")
                 .setCreativeTab(tab);
         allItems.add(itemLegsRobe);
 
         itemBootsRobe = (ItemRobeArmor) new ItemRobeArmor(ARMOR_ROBE, 0, EntityEquipmentSlot.FEET)
-                .setRegistryName("thaumcraft", "boots_robe")
+                .setRegistryName("thaumcraft", ConfigBlocks.legacyPath("ItemBootsRobe"))
                 .setTranslationKey("thaumcraft.boots_robe")
                 .setCreativeTab(tab);
         allItems.add(itemBootsRobe);
 
         itemHelmVoidRobe = (ItemVoidRobeArmor) new ItemVoidRobeArmor(ARMOR_VOID_ROBE, 0, EntityEquipmentSlot.HEAD)
-                .setRegistryName("thaumcraft", "helm_void_robe")
+                .setRegistryName("thaumcraft", ConfigBlocks.legacyPath("ItemHelmetVoidFortress"))
                 .setTranslationKey("thaumcraft.helm_void_robe")
                 .setCreativeTab(tab);
         allItems.add(itemHelmVoidRobe);
 
         itemChestVoidRobe = (ItemVoidRobeArmor) new ItemVoidRobeArmor(ARMOR_VOID_ROBE, 0, EntityEquipmentSlot.CHEST)
-                .setRegistryName("thaumcraft", "chest_void_robe")
+                .setRegistryName("thaumcraft", ConfigBlocks.legacyPath("ItemChestplateVoidFortress"))
                 .setTranslationKey("thaumcraft.chest_void_robe")
                 .setCreativeTab(tab);
         allItems.add(itemChestVoidRobe);
 
         itemLegsVoidRobe = (ItemVoidRobeArmor) new ItemVoidRobeArmor(ARMOR_VOID_ROBE, 0, EntityEquipmentSlot.LEGS)
-                .setRegistryName("thaumcraft", "legs_void_robe")
+                .setRegistryName("thaumcraft", ConfigBlocks.legacyPath("ItemLeggingsVoidFortress"))
                 .setTranslationKey("thaumcraft.legs_void_robe")
                 .setCreativeTab(tab);
         allItems.add(itemLegsVoidRobe);
 
         itemBootsVoidRobe = (ItemVoidRobeArmor) new ItemVoidRobeArmor(ARMOR_VOID_ROBE, 0, EntityEquipmentSlot.FEET)
-                .setRegistryName("thaumcraft", "boots_void_robe")
+                .setRegistryName("thaumcraft", ConfigBlocks.legacyPath("ItemBootsVoidRobe"))
                 .setTranslationKey("thaumcraft.boots_void_robe")
                 .setCreativeTab(tab);
         allItems.add(itemBootsVoidRobe);
 
         itemCultistRobe = (ItemCultistRobeArmor) new ItemCultistRobeArmor(ARMOR_CULTIST, 0, EntityEquipmentSlot.CHEST)
-                .setRegistryName("thaumcraft", "cultist_robe")
+                .setRegistryName("thaumcraft", ConfigBlocks.legacyPath("ItemChestplateCultistRobe"))
                 .setTranslationKey("thaumcraft.cultist_robe")
                 .setCreativeTab(tab);
         allItems.add(itemCultistRobe);
 
         itemCultistPlate = (ItemCultistPlateArmor) new ItemCultistPlateArmor(ARMOR_CULTIST_PLATE, 0, EntityEquipmentSlot.CHEST)
-                .setRegistryName("thaumcraft", "cultist_plate")
+                .setRegistryName("thaumcraft", ConfigBlocks.legacyPath("ItemChestplateCultistPlate"))
                 .setTranslationKey("thaumcraft.cultist_plate")
                 .setCreativeTab(tab);
         allItems.add(itemCultistPlate);
 
         itemCultistLeader = (ItemCultistLeaderArmor) new ItemCultistLeaderArmor(ARMOR_CULTIST_LEADER, 0, EntityEquipmentSlot.CHEST)
-                .setRegistryName("thaumcraft", "cultist_leader")
+                .setRegistryName("thaumcraft", ConfigBlocks.legacyPath("ItemChestplateCultistLeaderPlate"))
                 .setTranslationKey("thaumcraft.cultist_leader")
                 .setCreativeTab(tab);
         allItems.add(itemCultistLeader);
 
         itemCultistBoots = (ItemCultistBoots) new ItemCultistBoots(ARMOR_CULTIST_BOOTS, 0, EntityEquipmentSlot.FEET)
-                .setRegistryName("thaumcraft", "cultist_boots")
+                .setRegistryName("thaumcraft", ConfigBlocks.legacyPath("ItemBootsCultist"))
                 .setTranslationKey("thaumcraft.cultist_boots")
                 .setCreativeTab(tab);
         allItems.add(itemCultistBoots);
 
         itemGoggles = (ItemGoggles) new ItemGoggles(ARMOR_GOGGLES, 0, EntityEquipmentSlot.HEAD)
-                .setRegistryName("thaumcraft", "goggles")
+                .setRegistryName("thaumcraft", ConfigBlocks.legacyPath("ItemGoggles"))
                 .setTranslationKey("thaumcraft.goggles")
                 .setCreativeTab(tab);
         allItems.add(itemGoggles);
 
         itemBootsTraveller = (ItemBootsTraveller) new ItemBootsTraveller(ARMOR_TRAVELLER, 0, EntityEquipmentSlot.FEET)
-                .setRegistryName("thaumcraft", "boots_traveller")
+                .setRegistryName("thaumcraft", ConfigBlocks.legacyPath("BootsTraveller"))
                 .setTranslationKey("thaumcraft.boots_traveller")
                 .setCreativeTab(tab);
         allItems.add(itemBootsTraveller);
 
         itemHoverHarness = (ItemHoverHarness) new ItemHoverHarness(ARMOR_HOVER, 0, EntityEquipmentSlot.CHEST)
-                .setRegistryName("thaumcraft", "hover_harness")
+                .setRegistryName("thaumcraft", ConfigBlocks.legacyPath("HoverHarness"))
                 .setTranslationKey("thaumcraft.hover_harness")
                 .setCreativeTab(tab);
         allItems.add(itemHoverHarness);
 
         // Baubles
         itemRingRunic = (ItemRingRunic) new ItemRingRunic()
-                .setRegistryName("thaumcraft", "ring_runic")
+                .setRegistryName("thaumcraft", ConfigBlocks.legacyPath("ItemRingRunic"))
                 .setTranslationKey("thaumcraft.ring_runic")
                 .setCreativeTab(tab);
         allItems.add(itemRingRunic);
 
         itemAmuletRunic = (ItemAmuletRunic) new ItemAmuletRunic()
-                .setRegistryName("thaumcraft", "amulet_runic")
+                .setRegistryName("thaumcraft", ConfigBlocks.legacyPath("ItemAmuletRunic"))
                 .setTranslationKey("thaumcraft.amulet_runic")
                 .setCreativeTab(tab);
         allItems.add(itemAmuletRunic);
 
         itemAmuletVis = (ItemAmuletVis) new ItemAmuletVis()
-                .setRegistryName("thaumcraft", "amulet_vis")
+                .setRegistryName("thaumcraft", ConfigBlocks.legacyPath("ItemAmuletVis"))
                 .setTranslationKey("thaumcraft.amulet_vis")
                 .setCreativeTab(tab);
         allItems.add(itemAmuletVis);
 
         itemGirdleRunic = (ItemGirdleRunic) new ItemGirdleRunic()
-                .setRegistryName("thaumcraft", "girdle_runic")
+                .setRegistryName("thaumcraft", ConfigBlocks.legacyPath("ItemGirdleRunic"))
                 .setTranslationKey("thaumcraft.girdle_runic")
                 .setCreativeTab(tab);
         allItems.add(itemGirdleRunic);
 
         itemGirdleHover = (ItemGirdleHover) new ItemGirdleHover()
-                .setRegistryName("thaumcraft", "girdle_hover")
+                .setRegistryName("thaumcraft", ConfigBlocks.legacyPath("ItemGirdleHover"))
                 .setTranslationKey("thaumcraft.girdle_hover")
                 .setCreativeTab(tab);
         allItems.add(itemGirdleHover);
 
         itemBaubleBlanks = (ItemBaubleBlanks) new ItemBaubleBlanks()
-                .setRegistryName("thaumcraft", "bauble_blanks")
+                .setRegistryName("thaumcraft", ConfigBlocks.legacyPath("ItemBaubleBlanks"))
                 .setTranslationKey("thaumcraft.bauble_blanks")
                 .setCreativeTab(tab);
         allItems.add(itemBaubleBlanks);
 
         // Relics
         itemThaumometer = (ItemThaumometer) new ItemThaumometer()
-                .setRegistryName("thaumcraft", "thaumometer")
+                .setRegistryName("thaumcraft", ConfigBlocks.legacyPath("ItemThaumometer"))
                 .setTranslationKey("thaumcraft.thaumometer")
                 .setCreativeTab(tab);
         allItems.add(itemThaumometer);
 
         itemThaumonomicon = (ItemThaumonomicon) new ItemThaumonomicon()
-                .setRegistryName("thaumcraft", "thaumonomicon")
+                .setRegistryName("thaumcraft", ConfigBlocks.legacyPath("ItemThaumonomicon"))
                 .setTranslationKey("thaumcraft.thaumonomicon")
                 .setCreativeTab(tab);
         allItems.add(itemThaumonomicon);
 
         itemHandMirror = (ItemHandMirror) new ItemHandMirror()
-                .setRegistryName("thaumcraft", "hand_mirror")
+                .setRegistryName("thaumcraft", ConfigBlocks.legacyPath("HandMirror"))
                 .setTranslationKey("thaumcraft.hand_mirror")
                 .setCreativeTab(tab);
         allItems.add(itemHandMirror);
 
         itemResonator = (ItemResonator) new ItemResonator()
-                .setRegistryName("thaumcraft", "resonator")
+                .setRegistryName("thaumcraft", ConfigBlocks.legacyPath("ItemResonator"))
                 .setTranslationKey("thaumcraft.resonator")
                 .setCreativeTab(tab);
         allItems.add(itemResonator);
 
         itemSanityChecker = (ItemSanityChecker) new ItemSanityChecker()
-                .setRegistryName("thaumcraft", "sanity_checker")
+                .setRegistryName("thaumcraft", ConfigBlocks.legacyPath("ItemSanityChecker"))
                 .setTranslationKey("thaumcraft.sanity_checker")
                 .setCreativeTab(tab);
         allItems.add(itemSanityChecker);
@@ -762,5 +766,51 @@ public class ConfigItems {
 
     public static Item[] getAllItems() {
         return allItems.toArray(new Item[0]);
+    }
+
+    private static void configureRepairMaterials() {
+        ItemStack thaumium = new ItemStack(itemResource, 1, ItemResource.META_THAUMIUM_INGOT);
+        ItemStack voidIngot = new ItemStack(itemResource, 1, ItemResource.META_VOID_INGOT);
+        ItemStack cloth = new ItemStack(itemResource, 1, ItemResource.META_CLOTH);
+
+        setRepairItem(TOOLMAT_THAUMIUM, thaumium);
+        setRepairItem(TOOLMAT_ELEMENTAL, thaumium);
+        setRepairItem(TOOLMAT_VOID, voidIngot);
+        setRepairItem(TOOLMAT_PRIMALVOID, new ItemStack(itemResource, 1, ItemResource.META_CHARM));
+
+        setRepairItem(ARMOR_THAUMIUM, thaumium);
+        setRepairItem(ARMOR_FORTRESS, thaumium);
+        setRepairItem(ARMOR_VOID, voidIngot);
+        setRepairItem(ARMOR_VOID_ROBE, voidIngot);
+        setRepairItem(ARMOR_ROBE, cloth);
+        setRepairItem(ARMOR_CULTIST, cloth);
+        setRepairItem(ARMOR_CULTIST_PLATE, thaumium);
+        setRepairItem(ARMOR_CULTIST_LEADER, voidIngot);
+        setRepairItem(ARMOR_CULTIST_BOOTS, cloth);
+        setRepairItem(ARMOR_GOGGLES, cloth);
+        setRepairItem(ARMOR_TRAVELLER, cloth);
+        setRepairItem(ARMOR_HOVER, cloth);
+    }
+
+    private static void setRepairItem(ToolMaterial material, ItemStack repairItem) {
+        ItemStack current = material.getRepairItemStack();
+        if (current.isEmpty()) {
+            material.setRepairItem(repairItem);
+            return;
+        }
+        if (!ItemStack.areItemsEqual(current, repairItem)) {
+            throw new IllegalStateException("Conflicting repair item for tool material " + material + ": " + current + " vs " + repairItem);
+        }
+    }
+
+    private static void setRepairItem(ArmorMaterial material, ItemStack repairItem) {
+        ItemStack current = material.getRepairItemStack();
+        if (current.isEmpty()) {
+            material.setRepairItem(repairItem);
+            return;
+        }
+        if (!ItemStack.areItemsEqual(current, repairItem)) {
+            throw new IllegalStateException("Conflicting repair item for armor material " + material + ": " + current + " vs " + repairItem);
+        }
     }
 }

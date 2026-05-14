@@ -25,6 +25,7 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import thaumcraft.common.Thaumcraft;
+import thaumcraft.common.CommonProxy;
 import thaumcraft.common.items.wands.ItemWandCasting;
 import thaumcraft.common.tiles.*;
 
@@ -87,10 +88,17 @@ extends BlockContainer {
 
     @Override
     public void getSubBlocks(CreativeTabs tab, NonNullList<ItemStack> list) {
+        list.add(new ItemStack(this, 1, 0)); // alchemy furnace
         list.add(new ItemStack(this, 1, 1)); // pedestal
         list.add(new ItemStack(this, 1, 2)); // infusion matrix
         list.add(new ItemStack(this, 1, 3)); // infusion pillar
         list.add(new ItemStack(this, 1, 5)); // wand pedestal
+        list.add(new ItemStack(this, 1, 9)); // node stabilizer
+        list.add(new ItemStack(this, 1, 10)); // advanced node stabilizer
+        list.add(new ItemStack(this, 1, 11)); // node converter
+        list.add(new ItemStack(this, 1, 12)); // spa
+        list.add(new ItemStack(this, 1, 13)); // focal manipulator
+        list.add(new ItemStack(this, 1, 14)); // flux scrubber
     }
 
     @Override
@@ -118,7 +126,7 @@ extends BlockContainer {
         TileEntity te = worldIn.getTileEntity(pos);
         if (te instanceof TileAlchemyFurnace) {
             if (!worldIn.isRemote) {
-                playerIn.openGui(Thaumcraft.instance, 3, worldIn, pos.getX(), pos.getY(), pos.getZ());
+                playerIn.openGui(Thaumcraft.instance, CommonProxy.GUI_ALCHEMY_FURNACE, worldIn, pos.getX(), pos.getY(), pos.getZ());
             }
             return true;
         }
@@ -135,7 +143,7 @@ extends BlockContainer {
         }
         if (te instanceof TileFocalManipulator) {
             if (!worldIn.isRemote) {
-                playerIn.openGui(Thaumcraft.instance, 14, worldIn, pos.getX(), pos.getY(), pos.getZ());
+                playerIn.openGui(Thaumcraft.instance, CommonProxy.GUI_FOCAL_MANIPULATOR, worldIn, pos.getX(), pos.getY(), pos.getZ());
             }
             return true;
         }

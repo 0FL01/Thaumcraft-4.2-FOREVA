@@ -105,6 +105,7 @@ public class TileAlchemyFurnace extends TileThaumcraft implements ITickable, ISi
 
             TileAlembic alembic = (TileAlembic) tile;
             if (alembic.aspect != null && alembic.amount < alembic.maxAmount
+                    && (alembic.aspectFilter == null || alembic.aspectFilter == alembic.aspect)
                     && this.aspects.getAmount(alembic.aspect) > 0) {
                 this.takeFromContainer(alembic.aspect, 1);
                 alembic.addToContainer(alembic.aspect, 1);
@@ -121,8 +122,15 @@ public class TileAlchemyFurnace extends TileThaumcraft implements ITickable, ISi
             TileAlembic alembic = (TileAlembic) tile;
             if (alembic.aspect != null && alembic.amount != 0) continue;
 
-            Aspect aspect = this.takeRandomAspect(exclude);
+            Aspect aspect;
+            if (alembic.aspectFilter != null) {
+                if (this.aspects.getAmount(alembic.aspectFilter) <= 0) continue;
+                aspect = alembic.aspectFilter;
+            } else {
+                aspect = this.takeRandomAspect(exclude);
+            }
             if (aspect == null) continue;
+            if (aspect == alembic.aspectFilter) this.takeFromContainer(aspect, 1);
 
             alembic.addToContainer(aspect, 1);
             this.notifyUpdate();

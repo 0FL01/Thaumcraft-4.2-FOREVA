@@ -12,7 +12,10 @@ import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.World;
+import thaumcraft.common.blocks.BlockEldritch;
+import thaumcraft.common.config.ConfigBlocks;
 import thaumcraft.common.lib.CreativeTabThaumcraft;
+import thaumcraft.common.lib.research.ResearchManager;
 
 public class ItemEldritchObject extends Item {
 
@@ -58,12 +61,13 @@ public class ItemEldritchObject extends Item {
     public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer player, EnumHand hand) {
         ItemStack stack = player.getHeldItem(hand);
         if (stack.getItemDamage() == META_OB_PLACER) {
-            // Place eldritch obelisk - TBD
             RayTraceResult mop = this.rayTrace(world, player, false);
             if (mop != null && mop.typeOfHit == RayTraceResult.Type.BLOCK) {
-                BlockPos pos = mop.getBlockPos();
-                if (world.isAirBlock(pos.up())) {
-                    world.setBlockState(pos.up(), net.minecraft.init.Blocks.OBSIDIAN.getDefaultState());
+                BlockPos pos = mop.getBlockPos().up();
+                if (canPlaceObelisk(world, pos)) {
+                    if (!world.isRemote) {
+                        placeObelisk(world, pos);
+                    }
                     if (!player.capabilities.isCreativeMode) {
                         stack.shrink(1);
                     }
@@ -72,9 +76,26 @@ public class ItemEldritchObject extends Item {
             }
         }
         if (stack.getItemDamage() == META_CRIMSON_RITES) {
-            // Open eldritch research - TBD
+            if (!world.isRemote) {
+                ResearchManager.addResearch(player, "CRIMSON");
+                if (!player.capabilities.isCreativeMode) stack.shrink(1);
+            }
             return new ActionResult<>(EnumActionResult.SUCCESS, stack);
         }
         return super.onItemRightClick(world, player, hand);
+    }
+
+    private boolean canPlaceObelisk(World world, BlockPos pos) {
+        for (int y = 0; y < 5; y++) {
+            if (!world.isAirBlock(pos.up(y))) return false;
+        }
+        return ConfigBlocks.blockEldritch != null;
+    }
+
+    private void placeObelisk(World world, BlockPos pos) {
+        for (int y = 0; y < 5; y++) {
+            int meta = y == 4 ? 3 : y == 0 ? 1 : 2;
+            world.setBlockState(pos.up(y), ConfigBlocks.blockEldritch.getDefaultState().withProperty(BlockEldritch.TYPE, meta), 3);
+        }
     }
 }

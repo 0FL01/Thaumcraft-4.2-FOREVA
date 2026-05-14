@@ -21,6 +21,6 @@ public class ItemCultistBoots extends ItemArmor implements IRepairable, IRunicAr
 
     @Override
     public boolean getIsRepairable(ItemStack toRepair, ItemStack repair) {
-        return false;
+        return super.getIsRepairable(toRepair, repair);
     }
 }

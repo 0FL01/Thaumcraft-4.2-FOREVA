@@ -14,8 +14,11 @@ import thaumcraft.common.config.ConfigBlocks;
 import java.util.Random;
 
 public class WorldGenGreatwoodTrees extends WorldGenAbstractTree {
+    private final boolean worldgen;
+
     public WorldGenGreatwoodTrees(boolean notify) {
         super(notify);
+        this.worldgen = !notify;
     }
 
     @Override
@@ -24,6 +27,7 @@ public class WorldGenGreatwoodTrees extends WorldGenAbstractTree {
         boolean flag = true;
 
         if (pos.getY() < 1 || pos.getY() + height + 1 > 256) return false;
+        if (this.worldgen && !world.isAreaLoaded(pos.add(-5, 0, -5), pos.add(5, height + 1, 5), false)) return false;
 
         // Check space and ground
         for (int y = pos.getY(); y <= pos.getY() + height; y++) {

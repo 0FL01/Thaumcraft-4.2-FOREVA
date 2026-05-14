@@ -68,8 +68,7 @@ public class ItemResource extends Item implements IEssentiaContainerItem {
     public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer player, EnumHand hand) {
         ItemStack stack = player.getHeldItem(hand);
         if (stack.getItemDamage() == META_KNOWLEDGE_FRAGMENT) {
-            // Research knowledge fragment behavior - for later
-            return new ActionResult<>(EnumActionResult.SUCCESS, stack);
+            return new ActionResult<>(EnumActionResult.PASS, stack);
         }
         return super.onItemRightClick(world, player, hand);
     }

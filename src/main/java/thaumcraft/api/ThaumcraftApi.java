@@ -75,7 +75,7 @@ public class ThaumcraftApi {
     public static ItemStack getSmeltingBonus(ItemStack in) {
         ItemStack out = smeltingBonus.get(Arrays.asList(in.getItem(), in.getMetadata()));
         if (out == null) {
-            out = smeltingBonus.get(Arrays.asList(in.getItem(), Short.MAX_VALUE));
+            out = smeltingBonus.get(Arrays.asList(in.getItem(), (int)Short.MAX_VALUE));
         }
         if (out == null) {
             int[] oreIDs = OreDictionary.getOreIDs(in);
@@ -190,11 +190,23 @@ public class ThaumcraftApi {
     public static boolean exists(Item item, int meta) {
         AspectList tmp = objectTags.get(Arrays.asList(item, meta));
         if (tmp == null) {
-            tmp = objectTags.get(Arrays.asList(item, Short.MAX_VALUE));
+            int[] group = groupedObjectTags.get(Arrays.asList(item, meta));
+            if (group != null && group.length > 0) {
+                tmp = objectTags.get(Arrays.asList(item, group[0]));
+            }
+        }
+        if (tmp == null) {
+            tmp = objectTags.get(Arrays.asList(item, (int)Short.MAX_VALUE));
             if (meta == Short.MAX_VALUE && tmp == null) {
                 int index = 0;
                 do {
                     tmp = objectTags.get(Arrays.asList(item, index));
+                    if (tmp == null) {
+                        int[] group = groupedObjectTags.get(Arrays.asList(item, index));
+                        if (group != null && group.length > 0) {
+                            tmp = objectTags.get(Arrays.asList(item, group[0]));
+                        }
+                    }
                 } while (++index < 16 && tmp == null);
             }
             if (tmp == null) {
@@ -338,4 +350,3 @@ public class ThaumcraftApi {
         }
     }
 }
-

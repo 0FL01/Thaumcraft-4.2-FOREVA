@@ -2,11 +2,16 @@ package thaumcraft.common.config;
 
 import java.io.File;
 import java.util.ArrayList;
+import net.minecraft.block.Block;
 import net.minecraft.block.material.MapColor;
 import net.minecraft.block.material.Material;
 import net.minecraft.enchantment.Enchantment;
+import net.minecraft.init.Blocks;
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.common.config.Property;
+import net.minecraftforge.fml.common.registry.ForgeRegistries;
+import thaumcraft.api.ThaumcraftApi;
 import thaumcraft.api.aspects.Aspect;
 import thaumcraft.api.potions.PotionFluxTaint;
 import thaumcraft.api.potions.PotionVisExhaust;
@@ -200,9 +205,13 @@ public class Config {
 
     public static void initPotions() {
         potionFluxTaint = new PotionFluxTaint(true, 0x800080);
+        PotionFluxTaint.instance = potionFluxTaint;
+        PotionFluxTaint.init();
         potionFluxTaint.setRegistryName("thaumcraft", "flux_taint");
 
         potionVisExhaust = new PotionVisExhaust(true, 0x8888FF);
+        PotionVisExhaust.instance = potionVisExhaust;
+        PotionVisExhaust.init();
         potionVisExhaust.setRegistryName("thaumcraft", "vis_exhaust");
 
         potionInfectiousVisExhaust = new PotionInfectiousVisExhaust(true, 0x4444AA);
@@ -245,6 +254,17 @@ public class Config {
         regenTrees = config.get(CATEGORY_REGEN, "trees", false).getBoolean(false);
         regenTaint = config.get(CATEGORY_REGEN, "taint", false).getBoolean(false);
 
+        biomeTaintWeight = config.get(CATEGORY_BIOMES, "taint_biome_weight", 2).getInt();
+        biomeTaintID = config.get(CATEGORY_BIOMES, "biome_taint", 192).getInt();
+        biomeMagicalForestWeight = config.get(CATEGORY_BIOMES, "magical_forest_biome_weight", 5).getInt();
+        biomeMagicalForestID = config.get(CATEGORY_BIOMES, "biome_magical_forest", 193).getInt();
+        biomeEerieID = config.get(CATEGORY_BIOMES, "biome_eerie", 194).getInt();
+        biomeEldritchID = config.get(CATEGORY_BIOMES, "biome_eldritch", 195).getInt();
+        dimensionOuterId = config.get(CATEGORY_BIOMES, "outer_lands_dim", -42).getInt();
+
+        ThaumcraftApi.enchantHaste = config.get(CATEGORY_ENCH, "ench_haste", 150).getInt();
+        ThaumcraftApi.enchantRepair = config.get(CATEGORY_ENCH, "ench_repair", 151).getInt();
+
         researchDifficulty = config.get(CATEGORY_RESEARCH, "research_difficulty", 0).getInt();
         CresearchDifficulty = researchDifficulty;
         aspectTotalCap = config.get(CATEGORY_RESEARCH, "aspect_total_cap", 100).getInt();
@@ -286,7 +306,10 @@ public class Config {
         CallowCheatSheet = allowCheatSheet;
         wardedStone = config.get("general", "allow_warded_stone", true).getBoolean(false);
         CwardedStone = wardedStone;
+        ConfigEntities.entWizardId = config.get("general", "thaumcraft_villager_id", 190).getInt();
+        ConfigEntities.entBankerId = config.get("general", "thaumcraft_banker_id", 191).getInt();
         golemChestInteract = config.get("general", "golem_chest_interact", true).getBoolean(false);
+        syncPortableHoleBlacklist(config.get("general", "portablehole_blacklist", "iron_door").getString());
         blueBiome = config.get("general", "blue_magical_forest", false).getBoolean(false);
         taintFromFlux = config.get("general", "biome_taint_from_flux", true).getBoolean(true);
         taintSpreadRate = config.get("general", "biome_taint_spread", 200).getInt();
@@ -295,6 +318,35 @@ public class Config {
         shieldRecharge = Math.max(500, config.get(CATEGORY_RUNIC, "runic_recharge_speed", 2000).getInt());
         shieldWait = Math.max(0, config.get(CATEGORY_RUNIC, "runic_recharge_delay", 80).getInt());
         shieldCost = Math.max(0, config.get(CATEGORY_RUNIC, "runic_cost", 50).getInt());
+    }
+
+    private static void syncPortableHoleBlacklist(String rawList) {
+        ThaumcraftApi.portableHoleBlackList.clear();
+        if (rawList == null || rawList.trim().isEmpty()) {
+            return;
+        }
+        String[] names = rawList.split(",");
+        for (String name : names) {
+            Block block = resolveBlockName(name.trim());
+            if (block != null && block != Blocks.AIR) {
+                ThaumcraftApi.portableHoleBlackList.add(block);
+            }
+        }
+    }
+
+    private static Block resolveBlockName(String name) {
+        if (name.isEmpty()) {
+            return null;
+        }
+        try {
+            Block block = ForgeRegistries.BLOCKS.getValue(new ResourceLocation(name));
+            if (block == null && name.indexOf(':') < 0) {
+                block = ForgeRegistries.BLOCKS.getValue(new ResourceLocation("minecraft", name));
+            }
+            return block;
+        } catch (RuntimeException ignored) {
+            return null;
+        }
     }
 
     public static void initLoot() {

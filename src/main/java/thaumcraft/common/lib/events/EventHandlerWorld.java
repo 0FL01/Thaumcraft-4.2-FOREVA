@@ -173,16 +173,11 @@ public class EventHandlerWorld {
         Block block = event.getWorld().getBlockState(pos).getBlock();
         int meta = block.getMetaFromState(event.getWorld().getBlockState(pos));
 
-        // Phase 8: handle custom fluid bucket fills
-        // if (block == ConfigBlocks.blockFluidPure && meta == 0) {
-        //     event.getWorld().setBlockToAir(pos);
-        //     event.setFilledBucket(new ItemStack(ConfigItems.itemBucketPure));
-        //     event.setResult(Event.Result.ALLOW);
-        // } else if (block == ConfigBlocks.blockFluidDeath && meta == 3) {
-        //     event.getWorld().setBlockToAir(pos);
-        //     event.setFilledBucket(new ItemStack(ConfigItems.itemBucketDeath));
-        //     event.setResult(Event.Result.ALLOW);
-        // }
+        if (block == ConfigBlocks.blockFluidDeath && meta == 3) {
+            event.getWorld().setBlockToAir(pos);
+            event.setFilledBucket(new ItemStack(ConfigItems.itemBucketDeath));
+            event.setResult(Event.Result.ALLOW);
+        }
     }
 
     // ---- Fuel burning ----
@@ -209,9 +204,8 @@ public class EventHandlerWorld {
      * Used to prevent block placement during boss fights.
      */
     private boolean isNearActiveBoss(World world, EntityPlayer player, BlockPos pos) {
-        if (world.provider.getDimension() != net.minecraftforge.common.DimensionManager.getProviderType(-42).getId()) return false;
+        if (world.provider.getDimension() != Config.dimensionOuterId) return false;
 
-        // Replace -42 check with Config.dimensionOuterId if available
         if (player == null || player.capabilities.isCreativeMode) return false;
 
         List<Entity> bosses = world.getEntitiesWithinAABB(EntityThaumcraftBoss.class,

@@ -3,9 +3,12 @@ package thaumcraft.common.lib.utils;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.item.EntityItem;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.RayTraceResult;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
 import javax.annotation.Nullable;
@@ -70,6 +73,31 @@ public class EntityUtils {
             entity.posX, entity.posY + (double)offsetY, entity.posZ, stack);
         entityitem.setDefaultPickupDelay();
         entity.world.spawnEntity(entityitem);
+    }
+
+    public static Entity getPointedEntity(World world, EntityPlayer player, double range, @Nullable Class<? extends Entity> excludedClass) {
+        if (world == null || player == null) return null;
+        Vec3d eyes = player.getPositionEyes(1.0F);
+        Vec3d look = player.getLook(1.0F);
+        Vec3d end = eyes.add(look.x * range, look.y * range, look.z * range);
+        Entity pointed = null;
+        double closest = range * range;
+        AxisAlignedBB searchBox = player.getEntityBoundingBox()
+                .expand(look.x * range, look.y * range, look.z * range)
+                .grow(1.0D);
+        for (Entity entity : world.getEntitiesInAABBexcluding(player, searchBox, entity -> {
+            if (entity == null || !entity.canBeCollidedWith()) return false;
+            return excludedClass == null || !excludedClass.isAssignableFrom(entity.getClass());
+        })) {
+            RayTraceResult hit = entity.getEntityBoundingBox().grow(0.3D).calculateIntercept(eyes, end);
+            if (hit == null) continue;
+            double distance = eyes.squareDistanceTo(hit.hitVec);
+            if (distance < closest) {
+                pointed = entity;
+                closest = distance;
+            }
+        }
+        return pointed;
     }
 
     public static void makeChampion(EntityLivingBase entity, boolean isBoss) {
