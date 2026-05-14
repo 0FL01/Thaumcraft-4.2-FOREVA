@@ -223,6 +223,25 @@ Remaining limits:
 - Cultist/guardian spawning has not been observed in a runtime world because smoke/manual runtime validation remains environment-blocked or excluded as user-driven client control.
 - Stage 6 entity combat behavior can still affect full in-world altar scenario parity.
 
+### 2026-05-14 — Stage 6 Cultist Portal banner facing
+
+Scope:
+
+- Removed the `TileBanner.setFacing()` TODO from `EntityCultistPortal` now that `TileBanner` has persistent facing state.
+- Ported the reference stage-0 banner facing mapping for the four generated portal banners.
+
+Validation:
+
+- `./scripts/dev.sh compileJava` — passed.
+- `./scripts/dev.sh build` — passed.
+- `./scripts/dev.sh check-jar` — failed before jar inspection because the wrapper's expected MCP mapping cache file is still absent at `.gradle_home/caches/minecraft/de/oceanlabs/mcp/mcp_stable/39/1.12.2/srgs/mcp-srg.srg`.
+- `./scripts/dev.sh smoke-server` — failed by timeout before ready state; log again stopped immediately after `Calling tweak class net.minecraftforge.fml.common.launcher.FMLServerTweaker`, with only Log4j console appender initialization errors, no new crash reports, and no mod-load crash markers. This matches the clean `da3f307` baseline reproduction recorded above.
+
+Remaining limits:
+
+- Cultist Portal stage progression has not been observed in runtime/manual validation because user-driven scenarios are excluded and smoke-server remains environment-blocked.
+- This only closes the direct banner-facing TODO; full boss/minion/drop/loot distribution parity remains open.
+
 ## Next Checkpoint Candidate
 
 After the portal trigger and ring bootstrap checkpoints, the next pre-Phase8 candidates are:

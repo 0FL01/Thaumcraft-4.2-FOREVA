@@ -122,7 +122,24 @@ public class EntityCultistPortal extends EntityThaumcraftBoss {
 
                         TileEntity te = this.world.getTileEntity(bannerPos);
                         if (te instanceof TileBanner) {
-                            // TODO: TileBanner.setFacing() — TileBanner is a stub until Phase 8
+                            int face = 0;
+                            switch (a) {
+                                case 2:
+                                    face = 8;
+                                    break;
+                                case 3:
+                                    face = 0;
+                                    break;
+                                case 4:
+                                    face = 12;
+                                    break;
+                                case 5:
+                                    face = 4;
+                                    break;
+                                default:
+                                    break;
+                            }
+                            ((TileBanner) te).setFacing((byte) face);
                         }
                         PacketHandler.INSTANCE.sendToAllAround(
                             new PacketFXBlockArc(bannerPos.getX(), bannerPos.getY(), bannerPos.getZ(), this.getEntityId()),
