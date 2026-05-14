@@ -120,7 +120,7 @@ Stage 1 не считается закрытой только по факту к
 
 ### GAP-1: Potion API classes потеряли часть reference contract и behavior
 
-**Статус:** реализовано, client visual validation deferred
+**Статус:** реализовано и manual client-validated
 **Критичность:** high
 
 **Текущая реализация:**
@@ -157,7 +157,7 @@ Use a compatibility shim. Preserve the Forge 1.12 registry-owned constructor pat
 - [x] `javap -public` shows expected 1.12-compatible public contract, including compatibility constructor and `static init()`.
 - [x] `PotionVisExhaust` and `PotionFluxTaint` match reference `isInstant`, icon index and effectiveness semantics where Forge 1.12 allows.
 - [x] `compileJava`, `apiJar`, and `devJar` pass.
-- [ ] Runtime/manual check confirms both potion icons and effect cadence in-game; deferred because client smoke fails before mod init in the current LWJGL display environment.
+- [x] Runtime/manual check confirms both potion icons and effect cadence in-game.
 
 **Риски / зависимости:**
 
@@ -438,9 +438,10 @@ Validation commands and results:
 - Targeted `rg` checks: no source/resource references to `DepLoader` or `thaumcraft.codechicken.core.launch`; no remaining `hitVec` block-coordinate overwrite patterns; no `Phase 3`/`Phase 4` placeholder strings in active API-facing handler paths.
 - `./scripts/dev.sh smoke-server`: PASSED; server reached ready state and did not attempt legacy dependency loading.
 - `./scripts/dev.sh smoke-client`: FAILED before mod init with `java.lang.ExceptionInInitializerError` caused by `org.lwjgl.opengl.LinuxDisplay.getAvailableDisplayModes` `ArrayIndexOutOfBoundsException`; treated as environment/display failure, not a Stage 1 code failure.
+- Manual client potion validation by user: `/effect @p thaumcraft:flux_taint 400 0 false` showed the effect in vanilla inventory, rendered a valid icon, and applied periodic taint damage; `/effect @p thaumcraft:vis_exhaust 400 0 false` showed the effect in vanilla inventory, rendered a valid icon, and caused no crash.
 
 Remaining limitations after implementation closure:
 
 - CCL render helpers and TrueType drawing still require a working client/manual scene for visual parity.
-- Potion icon visual confirmation and in-game effect cadence remain manual/client validation items because current client smoke cannot initialize LWJGL display.
+- Potion icon visual confirmation and in-game effect cadence are manually validated; automated client smoke remains blocked by the current LWJGL display environment.
 - Full content/progression recipe parity remains Phase 9; Stage 1 only restores the addon-facing API helper backend minimum.
