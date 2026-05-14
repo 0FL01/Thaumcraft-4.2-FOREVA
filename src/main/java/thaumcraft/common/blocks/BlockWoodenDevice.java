@@ -21,6 +21,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 import thaumcraft.common.Thaumcraft;
+import thaumcraft.common.CommonProxy;
 import thaumcraft.common.items.wands.ItemWandCasting;
 import thaumcraft.common.tiles.*;
 
@@ -80,7 +81,7 @@ public class BlockWoodenDevice extends BlockContainer {
                         pos.getX(), pos.getY(), pos.getZ(), facing.getIndex(), state.getValue(TYPE)) >= 0;
             }
             if (!worldIn.isRemote) {
-                playerIn.openGui(Thaumcraft.instance, 2, worldIn, pos.getX(), pos.getY(), pos.getZ());
+                playerIn.openGui(Thaumcraft.instance, CommonProxy.GUI_ARCANE_BORE, worldIn, pos.getX(), pos.getY(), pos.getZ());
             }
             return true;
         }

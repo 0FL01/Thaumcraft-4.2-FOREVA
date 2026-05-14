@@ -46,8 +46,26 @@ public class ClientProxy extends CommonProxy {
     @Override
     @Nullable
     public Object getClientGuiElement(int ID, EntityPlayer player, World world, int x, int y, int z) {
-        // Phase 8: return GUI screens
-        return null;
+        switch (ID) {
+            case GUI_GOLEM:
+            case GUI_PECH:
+            case GUI_TRAVELING_TRUNK:
+            case GUI_THAUMATORIUM:
+            case GUI_FOCUS_POUCH:
+            case GUI_DECONSTRUCTION_TABLE:
+            case GUI_ALCHEMY_FURNACE:
+            case GUI_RESEARCH_TABLE:
+            case GUI_ARCANE_WORKBENCH:
+            case GUI_ARCANE_BORE:
+            case GUI_HAND_MIRROR:
+            case GUI_HOVER_HARNESS:
+            case GUI_MAGIC_BOX:
+            case GUI_SPA:
+            case GUI_FOCAL_MANIPULATOR:
+                return null;
+            default:
+                return null;
+        }
     }
 
     // ---- FX overrides ----

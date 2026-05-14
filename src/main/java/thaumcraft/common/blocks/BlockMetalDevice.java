@@ -26,6 +26,7 @@ import net.minecraft.world.World;
 import net.minecraft.init.SoundEvents;
 import net.minecraftforge.fluids.FluidUtil;
 import thaumcraft.common.Thaumcraft;
+import thaumcraft.common.CommonProxy;
 import thaumcraft.common.entities.EntitySpecialItem;
 import thaumcraft.common.tiles.*;
 
@@ -113,7 +114,7 @@ public class BlockMetalDevice extends BlockContainer {
             TileEntity te = worldIn.getTileEntity(pos);
             if (te instanceof TileThaumatorium) {
                 if (!worldIn.isRemote) {
-                    playerIn.openGui(Thaumcraft.instance, 9, worldIn, pos.getX(), pos.getY(), pos.getZ());
+                    playerIn.openGui(Thaumcraft.instance, CommonProxy.GUI_THAUMATORIUM, worldIn, pos.getX(), pos.getY(), pos.getZ());
                 }
                 return true;
             }
@@ -122,7 +123,7 @@ public class BlockMetalDevice extends BlockContainer {
             TileEntity te = worldIn.getTileEntity(pos.down());
             if (te instanceof TileThaumatorium) {
                 if (!worldIn.isRemote) {
-                    playerIn.openGui(Thaumcraft.instance, 9, worldIn, pos.getX(), pos.getY() - 1, pos.getZ());
+                    playerIn.openGui(Thaumcraft.instance, CommonProxy.GUI_THAUMATORIUM, worldIn, pos.getX(), pos.getY() - 1, pos.getZ());
                 }
                 return true;
             }

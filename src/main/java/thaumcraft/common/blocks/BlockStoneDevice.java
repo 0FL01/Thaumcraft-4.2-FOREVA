@@ -25,6 +25,7 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import thaumcraft.common.Thaumcraft;
+import thaumcraft.common.CommonProxy;
 import thaumcraft.common.items.wands.ItemWandCasting;
 import thaumcraft.common.tiles.*;
 
@@ -118,7 +119,7 @@ extends BlockContainer {
         TileEntity te = worldIn.getTileEntity(pos);
         if (te instanceof TileAlchemyFurnace) {
             if (!worldIn.isRemote) {
-                playerIn.openGui(Thaumcraft.instance, 3, worldIn, pos.getX(), pos.getY(), pos.getZ());
+                playerIn.openGui(Thaumcraft.instance, CommonProxy.GUI_ALCHEMY_FURNACE, worldIn, pos.getX(), pos.getY(), pos.getZ());
             }
             return true;
         }
@@ -135,7 +136,7 @@ extends BlockContainer {
         }
         if (te instanceof TileFocalManipulator) {
             if (!worldIn.isRemote) {
-                playerIn.openGui(Thaumcraft.instance, 14, worldIn, pos.getX(), pos.getY(), pos.getZ());
+                playerIn.openGui(Thaumcraft.instance, CommonProxy.GUI_FOCAL_MANIPULATOR, worldIn, pos.getX(), pos.getY(), pos.getZ());
             }
             return true;
         }

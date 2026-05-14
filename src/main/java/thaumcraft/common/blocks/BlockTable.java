@@ -24,6 +24,7 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import thaumcraft.common.Thaumcraft;
+import thaumcraft.common.CommonProxy;
 import thaumcraft.common.tiles.TileArcaneWorkbench;
 import thaumcraft.common.tiles.TileDeconstructionTable;
 import thaumcraft.common.tiles.TileResearchTable;
@@ -150,22 +151,22 @@ extends BlockContainer {
             return true;
         }
         if (tileEntity instanceof TileArcaneWorkbench) {
-            playerIn.openGui(Thaumcraft.instance, 0, worldIn, pos.getX(), pos.getY(), pos.getZ());
+            playerIn.openGui(Thaumcraft.instance, CommonProxy.GUI_ARCANE_WORKBENCH, worldIn, pos.getX(), pos.getY(), pos.getZ());
             return true;
         }
         if (tileEntity instanceof TileDeconstructionTable) {
-            playerIn.openGui(Thaumcraft.instance, 4, worldIn, pos.getX(), pos.getY(), pos.getZ());
+            playerIn.openGui(Thaumcraft.instance, CommonProxy.GUI_DECONSTRUCTION_TABLE, worldIn, pos.getX(), pos.getY(), pos.getZ());
             return true;
         }
         if (tileEntity instanceof TileResearchTable) {
-            playerIn.openGui(Thaumcraft.instance, 1, worldIn, pos.getX(), pos.getY(), pos.getZ());
+            playerIn.openGui(Thaumcraft.instance, CommonProxy.GUI_RESEARCH_TABLE, worldIn, pos.getX(), pos.getY(), pos.getZ());
         } else {
             // Check adjacent blocks for research table
             for (EnumFacing dir : EnumFacing.HORIZONTALS) {
                 TileEntity tile = worldIn.getTileEntity(pos.offset(dir));
                 if (tile instanceof TileResearchTable) {
                     BlockPos rp = pos.offset(dir);
-                    playerIn.openGui(Thaumcraft.instance, 1, worldIn, rp.getX(), rp.getY(), rp.getZ());
+                    playerIn.openGui(Thaumcraft.instance, CommonProxy.GUI_RESEARCH_TABLE, worldIn, rp.getX(), rp.getY(), rp.getZ());
                     break;
                 }
             }

@@ -279,7 +279,7 @@ public class EntityPech extends net.minecraft.entity.monster.EntityMob implement
     public boolean processInteract(EntityPlayer player, net.minecraft.util.EnumHand hand) {
         if (this.isTamed()) {
             if (!this.world.isRemote) {
-                player.openGui(thaumcraft.common.Thaumcraft.instance, 7, this.world, this.getEntityId(), 0, 0);
+                player.openGui(thaumcraft.common.Thaumcraft.instance, thaumcraft.common.CommonProxy.GUI_PECH, this.world, this.getEntityId(), 0, 0);
             }
             return true;
         }

@@ -46,7 +46,9 @@ import thaumcraft.common.lib.network.playerdata.PacketSyncWipe;
 import thaumcraft.common.lib.network.playerdata.PacketWarpMessage;
 
 public class PacketHandler {
-    public static final SimpleNetworkWrapper INSTANCE = NetworkRegistry.INSTANCE.newSimpleChannel("thaumcraft");
+    public static final String CHANNEL = "thaumcraft";
+    public static final int REFERENCE_PACKET_COUNT = 39;
+    public static final SimpleNetworkWrapper INSTANCE = NetworkRegistry.INSTANCE.newSimpleChannel(CHANNEL);
 
     // Single dispatch handler that calls onMessage() on each packet
     private static final IMessageHandler<PacketBase, IMessage> DISPATCH_HANDLER =
@@ -93,6 +95,9 @@ public class PacketHandler {
         register(PacketFXVisDrain.class, idx++, Side.CLIENT);
         register(PacketFXBeamPulse.class, idx++, Side.CLIENT);
         register(PacketFXBeamPulseGolemBoss.class, idx++, Side.CLIENT);
+        if (idx != REFERENCE_PACKET_COUNT) {
+            throw new IllegalStateException("Thaumcraft packet discriminator table changed: expected " + REFERENCE_PACKET_COUNT + " entries, got " + idx);
+        }
     }
 
     @SuppressWarnings("unchecked")

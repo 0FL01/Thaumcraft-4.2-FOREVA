@@ -209,9 +209,8 @@ public class EventHandlerWorld {
      * Used to prevent block placement during boss fights.
      */
     private boolean isNearActiveBoss(World world, EntityPlayer player, BlockPos pos) {
-        if (world.provider.getDimension() != net.minecraftforge.common.DimensionManager.getProviderType(-42).getId()) return false;
+        if (world.provider.getDimension() != Config.dimensionOuterId) return false;
 
-        // Replace -42 check with Config.dimensionOuterId if available
         if (player == null || player.capabilities.isCreativeMode) return false;
 
         List<Entity> bosses = world.getEntitiesWithinAABB(EntityThaumcraftBoss.class,

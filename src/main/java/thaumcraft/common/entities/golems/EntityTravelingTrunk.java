@@ -84,7 +84,7 @@ public class EntityTravelingTrunk extends net.minecraft.entity.EntityLiving impl
     @Override
     public boolean processInteract(net.minecraft.entity.player.EntityPlayer player, net.minecraft.util.EnumHand hand) {
         if (!this.world.isRemote) {
-            player.openGui(thaumcraft.common.Thaumcraft.instance, 8, this.world, this.getEntityId(), 0, 0);
+            player.openGui(thaumcraft.common.Thaumcraft.instance, thaumcraft.common.CommonProxy.GUI_TRAVELING_TRUNK, this.world, this.getEntityId(), 0, 0);
         }
         return true;
     }

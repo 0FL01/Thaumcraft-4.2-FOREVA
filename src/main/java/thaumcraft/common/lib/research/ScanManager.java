@@ -6,16 +6,23 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.world.World;
 import thaumcraft.api.ThaumcraftApi;
 import thaumcraft.api.aspects.Aspect;
 import thaumcraft.api.aspects.AspectList;
+import thaumcraft.api.research.IScanEventHandler;
 import thaumcraft.api.research.ScanResult;
 import thaumcraft.common.lib.capabilities.IPlayerKnowledge;
 import thaumcraft.common.lib.capabilities.PlayerKnowledgeProvider;
 
 import java.util.Arrays;
 
-public class ScanManager {
+public class ScanManager implements IScanEventHandler {
+
+    @Override
+    public ScanResult scanPhenomena(ItemStack stack, World world, EntityPlayer player) {
+        return stack == null || stack.isEmpty() ? null : scanItem(player, stack);
+    }
 
     /**
      * Scan an entity with the thaumometer.

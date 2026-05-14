@@ -5,16 +5,17 @@ import net.minecraft.init.Items;
 
 import net.minecraft.block.Block;
 import net.minecraft.enchantment.Enchantment;
-import net.minecraft.entity.Entity;
 import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
 import net.minecraft.potion.Potion;
+import net.minecraft.world.DimensionType;
 import net.minecraft.world.biome.Biome;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.RegistryEvent;
+import net.minecraftforge.fml.client.event.ConfigChangedEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.SidedProxy;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
+import net.minecraftforge.fml.common.event.FMLInterModComms;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
@@ -46,7 +47,7 @@ import thaumcraft.common.lib.events.EventHandlerRunic;
 import thaumcraft.common.lib.events.EventHandlerWorld;
 import thaumcraft.common.lib.events.ServerTickEventsFML;
 import thaumcraft.common.lib.network.PacketHandler;
-import thaumcraft.common.tiles.*;
+import thaumcraft.common.lib.research.ScanManager;
 import thaumcraft.common.blocks.BlockJarItem;
 import thaumcraft.common.lib.world.ComponentBankerHome;
 import thaumcraft.common.lib.world.ComponentWizardTower;
@@ -97,6 +98,7 @@ public class Thaumcraft {
 
         // Initialise aspects (must happen early)
         initAspects();
+        ThaumcraftApi.registerScanEventhandler(new ScanManager());
 
         // Register default wand rods and caps
         initWandComponents();
@@ -127,75 +129,30 @@ public class Thaumcraft {
 
         // Init biomes (creates biome instances, must happen before registry event)
         ThaumcraftWorldGenerator.initBiomes();
-        ThaumcraftWorldGenerator.registerBiomeManager();
 
         // Init config sub-modules
         ConfigBlocks.init();
         ConfigItems.init();
         ConfigEntities.init();
+        ThaumcraftWorldGenerator.registerBiomeManager();
 
         // Register tile entities
-        GameRegistry.registerTileEntity(TileJarFillable.class, new net.minecraft.util.ResourceLocation("thaumcraft", "jar_fillable"));
-        GameRegistry.registerTileEntity(TileJarBrain.class, new net.minecraft.util.ResourceLocation("thaumcraft", "jar_brain"));
-        GameRegistry.registerTileEntity(TileJarNode.class, new net.minecraft.util.ResourceLocation("thaumcraft", "jar_node"));
-        GameRegistry.registerTileEntity(TileJarFillableVoid.class, new net.minecraft.util.ResourceLocation("thaumcraft", "jar_fillable_void"));
-        GameRegistry.registerTileEntity(TileCrystal.class, new net.minecraft.util.ResourceLocation("thaumcraft", "crystal"));
-        GameRegistry.registerTileEntity(TileEldritchCrystal.class, new net.minecraft.util.ResourceLocation("thaumcraft", "eldritch_crystal"));
-        GameRegistry.registerTileEntity(TileNode.class, new net.minecraft.util.ResourceLocation("thaumcraft", "node"));
-        GameRegistry.registerTileEntity(TileTable.class, new net.minecraft.util.ResourceLocation("thaumcraft", "table"));
-        GameRegistry.registerTileEntity(TileMagicWorkbench.class, new net.minecraft.util.ResourceLocation("thaumcraft", "magic_workbench"));
-        GameRegistry.registerTileEntity(TileArcaneWorkbench.class, new net.minecraft.util.ResourceLocation("thaumcraft", "arcane_workbench"));
-        GameRegistry.registerTileEntity(TileDeconstructionTable.class, new net.minecraft.util.ResourceLocation("thaumcraft", "deconstruction_table"));
-        GameRegistry.registerTileEntity(TileResearchTable.class, new net.minecraft.util.ResourceLocation("thaumcraft", "research_table"));
-        GameRegistry.registerTileEntity(TilePedestal.class, new net.minecraft.util.ResourceLocation("thaumcraft", "pedestal"));
-        GameRegistry.registerTileEntity(TileWandPedestal.class, new net.minecraft.util.ResourceLocation("thaumcraft", "wand_pedestal"));
-        GameRegistry.registerTileEntity(TileAlchemyFurnace.class, new net.minecraft.util.ResourceLocation("thaumcraft", "alchemy_furnace"));
-        GameRegistry.registerTileEntity(TileInfusionMatrix.class, new net.minecraft.util.ResourceLocation("thaumcraft", "infusion_matrix"));
-        GameRegistry.registerTileEntity(TileInfusionPillar.class, new net.minecraft.util.ResourceLocation("thaumcraft", "infusion_pillar"));
-        GameRegistry.registerTileEntity(TileNodeStabilizer.class, new net.minecraft.util.ResourceLocation("thaumcraft", "node_stabilizer"));
-        GameRegistry.registerTileEntity(TileNodeConverter.class, new net.minecraft.util.ResourceLocation("thaumcraft", "node_converter"));
-        GameRegistry.registerTileEntity(TileSpa.class, new net.minecraft.util.ResourceLocation("thaumcraft", "spa"));
-        GameRegistry.registerTileEntity(TileFocalManipulator.class, new net.minecraft.util.ResourceLocation("thaumcraft", "focal_manipulator"));
-        GameRegistry.registerTileEntity(TileFluxScrubber.class, new net.minecraft.util.ResourceLocation("thaumcraft", "flux_scrubber"));
-        GameRegistry.registerTileEntity(TileCrucible.class, new net.minecraft.util.ResourceLocation("thaumcraft", "crucible"));
-        GameRegistry.registerTileEntity(TileManaPod.class, new net.minecraft.util.ResourceLocation("thaumcraft", "mana_pod"));
-        GameRegistry.registerTileEntity(TileArcaneBore.class, new net.minecraft.util.ResourceLocation("thaumcraft", "arcane_bore"));
-        GameRegistry.registerTileEntity(TileArcaneBoreBase.class, new net.minecraft.util.ResourceLocation("thaumcraft", "arcane_bore_base"));
-        GameRegistry.registerTileEntity(TileArcaneFurnace.class, new net.minecraft.util.ResourceLocation("thaumcraft", "arcane_furnace"));
-        GameRegistry.registerTileEntity(TileArcaneFurnaceNozzle.class, new net.minecraft.util.ResourceLocation("thaumcraft", "arcane_furnace_nozzle"));
-        GameRegistry.registerTileEntity(TileBellows.class, new net.minecraft.util.ResourceLocation("thaumcraft", "bellows"));
-        GameRegistry.registerTileEntity(TileCentrifuge.class, new net.minecraft.util.ResourceLocation("thaumcraft", "centrifuge"));
-        GameRegistry.registerTileEntity(TileEssentiaReservoir.class, new net.minecraft.util.ResourceLocation("thaumcraft", "essentia_reservoir"));
-        GameRegistry.registerTileEntity(TileMirror.class, new net.minecraft.util.ResourceLocation("thaumcraft", "mirror"));
-        GameRegistry.registerTileEntity(TileMirrorEssentia.class, new net.minecraft.util.ResourceLocation("thaumcraft", "mirror_essentia"));
-        GameRegistry.registerTileEntity(TileVisRelay.class, new net.minecraft.util.ResourceLocation("thaumcraft", "vis_relay"));
-        GameRegistry.registerTileEntity(TileMagicWorkbenchCharger.class, new net.minecraft.util.ResourceLocation("thaumcraft", "magic_workbench_charger"));
-        GameRegistry.registerTileEntity(TileOwned.class, new net.minecraft.util.ResourceLocation("thaumcraft", "owned"));
-        GameRegistry.registerTileEntity(TileArcanePressurePlate.class, new net.minecraft.util.ResourceLocation("thaumcraft", "arcane_pressure_plate"));
-        GameRegistry.registerTileEntity(TileBanner.class, new net.minecraft.util.ResourceLocation("thaumcraft", "banner"));
-        GameRegistry.registerTileEntity(TileSensor.class, new net.minecraft.util.ResourceLocation("thaumcraft", "sensor"));
-        GameRegistry.registerTileEntity(TileLifter.class, new net.minecraft.util.ResourceLocation("thaumcraft", "lifter"));
-        GameRegistry.registerTileEntity(TileHole.class, new net.minecraft.util.ResourceLocation("thaumcraft", "hole"));
-        GameRegistry.registerTileEntity(TileWarded.class, new net.minecraft.util.ResourceLocation("thaumcraft", "warded"));
-        GameRegistry.registerTileEntity(TileGrate.class, new net.minecraft.util.ResourceLocation("thaumcraft", "grate"));
-        GameRegistry.registerTileEntity(TileAlembic.class, new net.minecraft.util.ResourceLocation("thaumcraft", "alembic"));
-        GameRegistry.registerTileEntity(TileArcaneLamp.class, new net.minecraft.util.ResourceLocation("thaumcraft", "arcane_lamp"));
-        GameRegistry.registerTileEntity(TileArcaneLampGrowth.class, new net.minecraft.util.ResourceLocation("thaumcraft", "arcane_lamp_growth"));
-        GameRegistry.registerTileEntity(TileThaumatorium.class, new net.minecraft.util.ResourceLocation("thaumcraft", "thaumatorium"));
-        GameRegistry.registerTileEntity(TileThaumatoriumTop.class, new net.minecraft.util.ResourceLocation("thaumcraft", "thaumatorium_top"));
-
-        // Register Eldritch dimension tiles
-        GameRegistry.registerTileEntity(TileEldritchPortal.class, new net.minecraft.util.ResourceLocation("thaumcraft", "eldritch_portal"));
-        GameRegistry.registerTileEntity(TileEldritchNothing.class, new net.minecraft.util.ResourceLocation("thaumcraft", "eldritch_nothing"));
-        GameRegistry.registerTileEntity(TileEldritchLock.class, new net.minecraft.util.ResourceLocation("thaumcraft", "eldritch_lock"));
-        GameRegistry.registerTileEntity(TileEldritchCrabSpawner.class, new net.minecraft.util.ResourceLocation("thaumcraft", "eldritch_crab_spawner"));
-        GameRegistry.registerTileEntity(TileEldritchAltar.class, new net.minecraft.util.ResourceLocation("thaumcraft", "eldritch_altar"));
-        GameRegistry.registerTileEntity(TileEldritchCap.class, new net.minecraft.util.ResourceLocation("thaumcraft", "eldritch_cap"));
-        GameRegistry.registerTileEntity(TileEldritchObelisk.class, new net.minecraft.util.ResourceLocation("thaumcraft", "eldritch_obelisk"));
-        GameRegistry.registerTileEntity(TileEldritchTrap.class, new net.minecraft.util.ResourceLocation("thaumcraft", "eldritch_trap"));
+        ConfigBlocks.registerTileEntities();
 
         // Register dimension
-        net.minecraft.world.DimensionType outerLands = net.minecraft.world.DimensionType.register(
+        registerOuterLandsDimension();
+    }
+
+    private void registerOuterLandsDimension() {
+        if (DimensionManager.isDimensionRegistered(Config.dimensionOuterId)) {
+            throw new IllegalStateException("Thaumcraft Outer Lands dimension id already registered: " + Config.dimensionOuterId);
+        }
+        for (DimensionType type : DimensionType.values()) {
+            if (type.getId() == Config.dimensionOuterId) {
+                throw new IllegalStateException("Thaumcraft Outer Lands dimension type id already registered: " + Config.dimensionOuterId);
+            }
+        }
+        DimensionType outerLands = DimensionType.register(
                 "OUTER_LANDS", "_outerlands", Config.dimensionOuterId,
                 thaumcraft.common.lib.world.dim.WorldProviderOuter.class, false);
         DimensionManager.registerDimension(Config.dimensionOuterId, outerLands);
@@ -229,11 +186,27 @@ public class Thaumcraft {
         ConfigAspects.init();
         ConfigResearch.init();
         Config.initModCompatibility();
+        ConfigEntities.initEntitySpawns();
     }
 
     @Mod.EventHandler
     public void serverLoad(FMLServerStartingEvent event) {
-        // Will register server commands in Phase 4
+        log.info("Thaumcraft server command registration deferred until CommandThaumcraft is ported");
+    }
+
+    @Mod.EventHandler
+    public void processIMC(FMLInterModComms.IMCEvent event) {
+        ConfigEntities.processIMC(event.getMessages());
+    }
+
+    @SubscribeEvent
+    public void onConfigChanged(ConfigChangedEvent.OnConfigChangedEvent event) {
+        if (MODID.equals(event.getModID()) && Config.config != null) {
+            Config.syncConfigurable();
+            if (Config.config.hasChanged()) {
+                Config.save();
+            }
+        }
     }
 
     // ---- Registry events (1.12.2 pattern) ----
@@ -249,7 +222,7 @@ public class Thaumcraft {
         log.info("Registering items");
         event.getRegistry().registerAll(ConfigItems.getAllItems());
         // Register ItemBlocks for blocks (via ConfigBlocks helper + manual jar)
-        event.getRegistry().register(new BlockJarItem(ConfigBlocks.blockJar).setRegistryName("thaumcraft", "jar"));
+        event.getRegistry().register(new BlockJarItem(ConfigBlocks.blockJar).setRegistryName(ConfigBlocks.blockJar.getRegistryName()));
         ConfigBlocks.registerItemBlocks(event.getRegistry());
     }
 

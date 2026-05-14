@@ -22,6 +22,22 @@ import thaumcraft.common.tiles.*;
 
 public class CommonProxy implements IGuiHandler {
 
+    public static final int GUI_GOLEM = 0;
+    public static final int GUI_PECH = 1;
+    public static final int GUI_TRAVELING_TRUNK = 2;
+    public static final int GUI_THAUMATORIUM = 3;
+    public static final int GUI_FOCUS_POUCH = 5;
+    public static final int GUI_DECONSTRUCTION_TABLE = 8;
+    public static final int GUI_ALCHEMY_FURNACE = 9;
+    public static final int GUI_RESEARCH_TABLE = 10;
+    public static final int GUI_ARCANE_WORKBENCH = 13;
+    public static final int GUI_ARCANE_BORE = 15;
+    public static final int GUI_HAND_MIRROR = 16;
+    public static final int GUI_HOVER_HARNESS = 17;
+    public static final int GUI_MAGIC_BOX = 18;
+    public static final int GUI_SPA = 19;
+    public static final int GUI_FOCAL_MANIPULATOR = 20;
+
     // Capability-based player data accessors
 
     /**
@@ -46,54 +62,54 @@ public class CommonProxy implements IGuiHandler {
     public Object getServerGuiElement(int ID, EntityPlayer player, World world, int x, int y, int z) {
         BlockPos pos = new BlockPos(x, y, z);
         switch (ID) {
-            case 0: {
-                TileEntity tile = world.getTileEntity(pos);
-                return tile instanceof TileArcaneWorkbench ? new ContainerArcaneWorkbench(player.inventory, (TileArcaneWorkbench) tile) : null;
-            }
-            case 1: {
-                TileEntity tile = world.getTileEntity(pos);
-                return tile instanceof TileResearchTable ? new ContainerResearchTable(player.inventory, (TileResearchTable) tile) : null;
-            }
-            case 2: {
-                TileEntity tile = world.getTileEntity(pos);
-                return tile instanceof TileArcaneBore ? new ContainerArcaneBore(player.inventory, (TileArcaneBore) tile) : null;
-            }
-            case 3: {
-                TileEntity tile = world.getTileEntity(pos);
-                return tile instanceof TileAlchemyFurnace ? new ContainerAlchemyFurnace(player.inventory, (TileAlchemyFurnace) tile) : null;
-            }
-            case 4: {
-                TileEntity tile = world.getTileEntity(pos);
-                return tile instanceof TileDeconstructionTable ? new ContainerDeconstructionTable(player.inventory, (TileDeconstructionTable) tile) : null;
-            }
-            case 5: return new ContainerFocusPouch(player.inventory, world, x, y, z);
-            case 6: {
+            case GUI_GOLEM: {
                 Entity entity = world.getEntityByID(x);
                 return entity instanceof EntityGolemBase ? new ContainerGolem(player.inventory, (EntityGolemBase) entity) : null;
             }
-            case 7: {
+            case GUI_PECH: {
                 Entity entity = world.getEntityByID(x);
                 return entity instanceof EntityPech ? new ContainerPech(player.inventory, world, (EntityPech) entity) : null;
             }
-            case 8: {
+            case GUI_TRAVELING_TRUNK: {
                 Entity entity = world.getEntityByID(x);
                 return entity instanceof EntityTravelingTrunk ? new ContainerTravelingTrunk(player.inventory, world, (EntityTravelingTrunk) entity) : null;
             }
-            case 9: {
+            case GUI_THAUMATORIUM: {
                 TileEntity tile = world.getTileEntity(pos);
                 return tile instanceof TileThaumatorium ? new ContainerThaumatorium(player.inventory, (TileThaumatorium) tile) : null;
             }
-            case 10: return new ContainerHandMirror(player.inventory, world, x, y, z);
-            case 11: return new ContainerHoverHarness(player.inventory, world, x, y, z);
-            case 12: {
+            case GUI_FOCUS_POUCH: return new ContainerFocusPouch(player.inventory, world, x, y, z);
+            case GUI_DECONSTRUCTION_TABLE: {
+                TileEntity tile = world.getTileEntity(pos);
+                return tile instanceof TileDeconstructionTable ? new ContainerDeconstructionTable(player.inventory, (TileDeconstructionTable) tile) : null;
+            }
+            case GUI_ALCHEMY_FURNACE: {
+                TileEntity tile = world.getTileEntity(pos);
+                return tile instanceof TileAlchemyFurnace ? new ContainerAlchemyFurnace(player.inventory, (TileAlchemyFurnace) tile) : null;
+            }
+            case GUI_RESEARCH_TABLE: {
+                TileEntity tile = world.getTileEntity(pos);
+                return tile instanceof TileResearchTable ? new ContainerResearchTable(player.inventory, (TileResearchTable) tile) : null;
+            }
+            case GUI_ARCANE_WORKBENCH: {
+                TileEntity tile = world.getTileEntity(pos);
+                return tile instanceof TileArcaneWorkbench ? new ContainerArcaneWorkbench(player.inventory, (TileArcaneWorkbench) tile) : null;
+            }
+            case GUI_ARCANE_BORE: {
+                TileEntity tile = world.getTileEntity(pos);
+                return tile instanceof TileArcaneBore ? new ContainerArcaneBore(player.inventory, (TileArcaneBore) tile) : null;
+            }
+            case GUI_HAND_MIRROR: return new ContainerHandMirror(player.inventory, world, x, y, z);
+            case GUI_HOVER_HARNESS: return new ContainerHoverHarness(player.inventory, world, x, y, z);
+            case GUI_MAGIC_BOX: {
                 TileEntity tile = world.getTileEntity(pos);
                 return tile != null ? new ContainerMagicBox(player.inventory, tile) : null;
             }
-            case 13: {
+            case GUI_SPA: {
                 TileEntity tile = world.getTileEntity(pos);
                 return tile instanceof TileSpa ? new ContainerSpa(player.inventory, (TileSpa) tile) : null;
             }
-            case 14: {
+            case GUI_FOCAL_MANIPULATOR: {
                 TileEntity tile = world.getTileEntity(pos);
                 return tile instanceof TileFocalManipulator ? new ContainerFocalManipulator(player.inventory, (TileFocalManipulator) tile) : null;
             }
