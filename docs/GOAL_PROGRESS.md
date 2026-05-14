@@ -309,11 +309,35 @@ Remaining limits:
 - Silverwood parameter/chance parity and ore placement parity remain open Stage 7 work.
 - Spider Greatwood has not been observed in a fresh runtime world because smoke-server remains environment-blocked and user-driven client/manual scenarios are excluded.
 
+### 2026-05-14 — Stage 7 surface vegetation and wild aura baseline
+
+Scope:
+
+- Updated `ThaumcraftWorldGenerator` to sample biome data from the chunk center, matching the reference surface-generation entry point more closely.
+- Restored a `generateVegetation(...)` path with the reference outer Silverwood `random.nextInt(60) == 3` and Greatwood `random.nextInt(25) == 7` chance gates.
+- Allowed Greatwood/Silverwood generation outside Magical Forest when current `BiomeHandler`/biome checks allow it, rather than only calling tree generation for exact Magical Forest chunks.
+- Switched Silverwood worldgen to the reference `WorldGenSilverwoodTrees(false, 7, 4)` constructor parameters and removed the extra current-port 5% inner chance.
+- Added wild aura node generation gated by `Config.genAura`/`regenAura` and `Config.nodeRarity`, using `createRandomNodeAt(..., false, false, false)` independently of Silverwood trees.
+- Restored flat-world skip behavior for tree/structure generation and reintroduced dimension blacklist level distinction for normal surface tree/structure generation versus ore/aura generation.
+
+Validation:
+
+- `./scripts/dev.sh compileJava` — passed.
+- `./scripts/dev.sh build` — passed.
+- `./scripts/dev.sh check-jar` — failed before jar inspection because the wrapper's expected MCP mapping cache file is still absent at `.gradle_home/caches/minecraft/de/oceanlabs/mcp/mcp_stable/39/1.12.2/srgs/mcp-srg.srg`.
+- `./scripts/dev.sh smoke-server` — failed by timeout before ready state; log again stopped after `Calling tweak class net.minecraftforge.fml.common.launcher.FMLServerTweaker`, with only Log4j console appender initialization errors, no new crash reports, and no configured crash markers. This matches the clean `da3f307` baseline reproduction recorded above.
+
+Remaining limits:
+
+- GAP-1 is still not closed: Nether node/totem generation, scattered-feature structure nodes, `newGen`/regen marker parity, full ore placement parity, and runtime evidence remain open.
+- Wild aura node placement has not been observed in a fresh runtime world because smoke-server remains environment-blocked and user-driven client/manual scenarios are excluded.
+- The simplified mound/barrow structure remains open under GAP-11.
+
 ## Next Checkpoint Candidate
 
 After the portal trigger and ring bootstrap checkpoints, the next pre-Phase8 candidates are:
 
-- Remaining Stage 7 surface/worldgen placeholders, especially mound/barrow and the broader vegetation/ore worldgen pipeline.
+- Remaining Stage 7 surface/worldgen placeholders, especially mound/barrow, Nether/totem/structure-node generation, and ore placement parity.
 - Remaining Stage 7 Outer Lands room/tile behavior, especially `TileEldritchAltar` portal opening, lock/boss-room lifecycle, key/boss room traversal, and maze save/load race validation.
 - Stage 9 loot/content registration, because `Utils.generateLoot(...)` now has a shared reward path but the full reference loot pool distribution still depends on populated content tables.
 - Stage 6 server-side boss/manual scenario evidence remains excluded from user-driven validation, but static/reference parity blockers should continue to be reduced where possible.

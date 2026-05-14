@@ -11,6 +11,7 @@ import net.minecraft.init.Blocks;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldType;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.chunk.IChunkProvider;
 import net.minecraft.world.gen.IChunkGenerator;
@@ -257,20 +258,22 @@ public class ThaumcraftWorldGenerator implements IWorldGenerator {
         // Outer Lands room generation is owned by ChunkProviderOuter.populate().
         if (dim == Config.dimensionOuterId) return;
 
-        // Check dimension blacklist
-        if (dimensionBlacklist.containsKey(dim) && dimensionBlacklist.get(dim) >= 0) return;
-
         // Surface generation only
         if (world.provider.isNether() || world.provider.getDimensionType() == net.minecraft.world.DimensionType.THE_END) return;
+
+        int dimBlacklist = getDimBlacklist(dim);
+        if (dimBlacklist == 0 || dimBlacklist == 2) return;
 
         int x = chunkX * 16;
         int z = chunkZ * 16;
 
-        Biome biome = world.getBiome(new BlockPos(x, 64, z));
+        Biome biome = world.getBiome(new BlockPos(x + 8, 64, z + 8));
         int biomeId = Biome.getIdForBiome(biome);
 
-        // Check biome blacklist
-        if (biomeBlacklist.containsKey(biomeId) && biomeBlacklist.get(biomeId) >= 2) return;
+        int biomeBlacklistLevel = getBiomeBlacklist(biomeId);
+        if (biomeBlacklistLevel >= 2) return;
+
+        boolean flatWorld = world.getWorldInfo().getTerrainType() == WorldType.FLAT;
 
         // Generate ores
         if (Config.genCinnibar || Config.regenCinnibar) {
@@ -285,15 +288,64 @@ public class ThaumcraftWorldGenerator implements IWorldGenerator {
             }
         }
 
-        // Generate trees
-        if ((Config.genTrees || Config.regenTrees) && biome == biomeMagicalForest) {
-            generateGreatwood(world, random, x, z, biome);
-            generateSilverwood(world, random, x, z, biome);
+        if ((Config.genAura || Config.regenAura) && biomeBlacklistLevel < 1) {
+            generateWildNodes(world, random, x, z);
+        }
+
+        if ((Config.genTrees || Config.regenTrees) && dimBlacklist == -1 && !flatWorld && biomeBlacklistLevel == -1) {
+            generateVegetation(world, random, x, z, biome);
         }
 
         // Generate structures (surface)
-        if ((Config.genStructure || Config.regenStructure) && dim == 0) {
+        if ((Config.genStructure || Config.regenStructure) && dimBlacklist == -1 && dim == 0 && !flatWorld) {
             generateStructures(world, random, x, z, biome);
+        }
+    }
+
+    private boolean generateWildNodes(World world, Random rand, int x, int z) {
+        if (Config.nodeRarity <= 0 || rand.nextInt(Config.nodeRarity) != 0) return false;
+
+        int bx = x + rand.nextInt(16);
+        int bz = z + rand.nextInt(16);
+        int y = getFirstUncoveredY(world, bx, bz);
+        if (y < 2) {
+            y = world.getSeaLevel() + rand.nextInt(64) - 32 + getFirstUncoveredY(world, bx, bz);
+        }
+        if (y < 2) {
+            y = 32 + rand.nextInt(64);
+        }
+
+        BlockPos pos = new BlockPos(bx, y, bz);
+        if (world.isAirBlock(pos.up())) {
+            pos = pos.up();
+        }
+        BlockPos candidate = pos.up(rand.nextInt(4));
+        IBlockState candidateState = world.getBlockState(candidate);
+        if (world.isAirBlock(candidate) || candidateState.getBlock().isReplaceable(world, candidate)) {
+            pos = candidate;
+        }
+        if (pos.getY() > world.getSeaLevel()) {
+            return false;
+        }
+
+        createRandomNodeAt(world, pos, rand, false, false, false);
+        return true;
+    }
+
+    private static int getFirstUncoveredY(World world, int x, int z) {
+        int y = 5;
+        while (y < world.getHeight() - 2 && !world.isAirBlock(new BlockPos(x, y + 1, z))) {
+            ++y;
+        }
+        return y;
+    }
+
+    private void generateVegetation(World world, Random rand, int x, int z, Biome biome) {
+        if (rand.nextInt(60) == 3) {
+            generateSilverwood(world, rand, x, z, biome);
+        }
+        if (rand.nextInt(25) == 7) {
+            generateGreatwood(world, rand, x, z, biome);
         }
     }
 
@@ -330,8 +382,8 @@ public class ThaumcraftWorldGenerator implements IWorldGenerator {
                 && biome != Biome.getBiome(0)  // ocean
                 && biome != Biome.getBiome(1); // plains
 
-        if (shouldGen && rand.nextInt(100) < 5) {
-            new WorldGenSilverwoodTrees(false, 8, 5).generate(world, rand, pos);
+        if (shouldGen) {
+            new WorldGenSilverwoodTrees(false, 7, 4).generate(world, rand, pos);
         }
     }
 

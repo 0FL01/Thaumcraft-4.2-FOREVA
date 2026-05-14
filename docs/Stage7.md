@@ -75,6 +75,11 @@ Reintroduce the reference worldgen control flow with a 1.12.2 API adaptation for
 **Риски / зависимости:**
 Dependency: Stage 3 node/tile behavior must be stable enough for generated aura nodes to work. Runtime validation is required because compile success cannot prove worldgen parity.
 
+**Checkpoint 2026-05-14 — Surface vegetation and wild aura baseline:**
+`ThaumcraftWorldGenerator` now samples the chunk-center biome, restores a `generateVegetation(...)` path with the reference outer Silverwood and Greatwood chance gates, allows tree generation outside Magical Forest where `BiomeHandler` and biome checks allow it, switches Silverwood worldgen to the reference `WorldGenSilverwoodTrees(false, 7, 4)` parameters, and adds a `generateWildNodes(...)` caller gated by `Config.genAura`/`regenAura` and `Config.nodeRarity`. Flat worlds now skip trees/structures, and dimension blacklist levels again distinguish total/ore-aura-only behavior from normal surface structure/tree generation.
+
+Remaining GAP-1 limits after this checkpoint: Nether generation, totems, scattered-feature structure nodes, `newGen`/regen marker parity, full ore placement parity, and runtime evidence are still open.
+
 ### GAP-2: Overworld Eldritch ring generation does not match reference maze bootstrap
 
 **Статус:** частично реализовано
