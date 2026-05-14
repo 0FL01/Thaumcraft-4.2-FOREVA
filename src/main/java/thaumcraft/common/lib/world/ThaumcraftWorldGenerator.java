@@ -381,7 +381,9 @@ public class ThaumcraftWorldGenerator implements IWorldGenerator {
             int bx = x + rand.nextInt(16);
             int bz = z + rand.nextInt(16);
             BlockPos pos = world.getHeight(new BlockPos(bx, 0, bz));
-            new WorldGenHilltopStones().generate(world, rand, pos);
+            if (new WorldGenHilltopStones().generate(world, rand, pos)) {
+                createRandomNodeAt(world, pos.up(4), rand, false, true, false);
+            }
         }
     }
 

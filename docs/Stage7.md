@@ -500,6 +500,11 @@ Port the original Overworld surface structure templates and validation rules for
 **Риски / зависимости:**
 Dependency: loot urn/crate block registration and mob entity ids must be available before full parity. If entity ids changed during the 1.12.2 port, the executor must map them deliberately and document the registry-name compatibility decision instead of leaving vanilla spawners unconfigured.
 
+**Checkpoint 2026-05-14 — Hilltop wisp altar template:**
+`WorldGenHilltopStones` is no longer a stonebrick-ring/empty-chest placeholder. It now ports the reference surface validation, rejects low/invalid placements, builds the seven-by-seven obsidian/obsidian-totem altar footprint, places variable perimeter columns with vine growth, adds a dungeon-loot-table chest, and configures the central mob spawner for the ported `thaumcraft:wisp` entity id. The structure call site now only creates the companion aura node after a successful hilltop generation.
+
+Remaining GAP-11 limits after this checkpoint: `WorldGenMound` is still a placeholder, the broader `generateSurface(...)`/chance semantics remain part of GAP-1, and hilltop generation has not been observed in a runtime world because server smoke remains environment-blocked.
+
 ## 6. Итоговый checklist закрытия Stage 7
 
 - [ ] GAP-1 closed: reference-like fresh-world generation pipeline restored and tested.

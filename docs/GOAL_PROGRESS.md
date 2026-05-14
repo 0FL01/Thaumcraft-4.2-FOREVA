@@ -264,11 +264,34 @@ Remaining limits:
 - Spawn/trap behavior has not been observed in an Outer Lands runtime traversal because smoke-server remains environment-blocked and user-driven client/manual scenarios are excluded.
 - `TileEldritchLock`, boss-room lifecycle, full room traversal, and broader room-template audit remain open Stage 7 work.
 
+### 2026-05-14 — Stage 7 hilltop wisp altar template
+
+Scope:
+
+- Replaced the simplified `WorldGenHilltopStones` stonebrick-ring/empty-chest placeholder with the reference-like hilltop altar structure.
+- Restored surface validation through `LocationIsValidSpawn(...)`, including high-altitude gating and air/surface-cover handling.
+- Restored the seven-by-seven obsidian/obsidian-totem footprint, perimeter columns, optional vines, dungeon loot chest, and central mob spawner.
+- Mapped the original `Thaumcraft.Wisp` spawner target deliberately to the 1.12.2 entity registry id `thaumcraft:wisp`.
+- Updated the surface structure call site so the companion aura node is only created when the hilltop altar successfully generates.
+
+Validation:
+
+- `./scripts/dev.sh compileJava` — passed.
+- `./scripts/dev.sh build` — passed.
+- `./scripts/dev.sh check-jar` — failed before jar inspection because the wrapper's expected MCP mapping cache file is still absent at `.gradle_home/caches/minecraft/de/oceanlabs/mcp/mcp_stable/39/1.12.2/srgs/mcp-srg.srg`.
+- `./scripts/dev.sh smoke-server` — failed by timeout before ready state; log again stopped after `Calling tweak class net.minecraftforge.fml.common.launcher.FMLServerTweaker`, with only Log4j console appender initialization errors, no new crash reports, and no configured crash markers. This matches the clean `da3f307` baseline reproduction recorded above.
+
+Remaining limits:
+
+- `WorldGenMound` is still the simplified placeholder and remains a Stage 7 GAP-11 blocker.
+- The full reference `generateSurface(...)` control flow/chance semantics remain under GAP-1, so this checkpoint restores hilltop contents but not the entire surface worldgen pipeline.
+- Hilltop generation has not been observed in a fresh runtime world because smoke-server remains environment-blocked and user-driven client/manual scenarios are excluded.
+
 ## Next Checkpoint Candidate
 
 After the portal trigger and ring bootstrap checkpoints, the next pre-Phase8 candidates are:
 
-- Remaining Stage 7 surface/worldgen placeholders, especially hilltop altar, mound/barrow, and spider Greatwood.
+- Remaining Stage 7 surface/worldgen placeholders, especially mound/barrow and spider Greatwood.
 - Remaining Stage 7 Outer Lands room/tile behavior, especially `TileEldritchAltar` portal opening, lock/boss-room lifecycle, key/boss room traversal, and maze save/load race validation.
 - Stage 9 loot/content registration, because `Utils.generateLoot(...)` now has a shared reward path but the full reference loot pool distribution still depends on populated content tables.
 - Stage 6 server-side boss/manual scenario evidence remains excluded from user-driven validation, but static/reference parity blockers should continue to be reduced where possible.
