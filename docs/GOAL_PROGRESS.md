@@ -80,11 +80,35 @@ Remaining limits:
 - Stage 7 full Outer Lands room traversal, `blockSlabStone`, other room templates, and worldgen runtime evidence remain open.
 - GUI/client visual validation for the new model fallbacks was not run.
 
+### 2026-05-14 — Stage 7 cosmetic stone slab room block
+
+Scope:
+
+- Ported the reference `blockCosmeticSlabStone`/`blockCosmeticDoubleSlabStone` pair as Forge 1.12.2 `BlockSlab` implementations.
+- Registered the single and double slab blocks; registered the `ItemSlab` bridge for the single slab item.
+- Replaced `GenLibraryRoom`'s vanilla `Blocks.DOUBLE_STONE_SLAB` helper with `ConfigBlocks.blockSlabStone.getStateFromMeta(meta)`.
+- Copied the reference slab source textures `arcane_stone.png` and `es_1.png` from `thaumcraft_src/assets/thaumcraft/textures/blocks/`.
+- Added temporary Forge 1.12.2 blockstate/model fallbacks for arcane/eldritch bottom, top, and double slab states.
+
+Validation:
+
+- `./scripts/dev.sh compileJava` — passed.
+- `./scripts/dev.sh build` — passed.
+- `./scripts/dev.sh check-jar` — failed before jar inspection because the wrapper's expected MCP mapping cache file is still absent at `.gradle_home/caches/minecraft/de/oceanlabs/mcp/mcp_stable/39/1.12.2/srgs/mcp-srg.srg`.
+- `./scripts/dev.sh smoke-server` — failed by timeout before ready state; log again stopped immediately after `Calling tweak class net.minecraftforge.fml.common.launcher.FMLServerTweaker`, with only Log4j console appender initialization errors, no new crash reports, and no mod-load crash markers. This matches the clean `da3f307` baseline reproduction recorded above.
+
+Remaining limits:
+
+- Direct `blockSlabStone` room-block substitution is closed for `GenLibraryRoom`.
+- Full Outer Lands room traversal/manual generation validation remains skipped by user instruction.
+- Other Stage 7 room/worldgen placeholders still need separate reference audits.
+- Client visual/model inspection was not run; JSONs are resource fallbacks, not a renderer parity claim.
+
 ## Next Checkpoint Candidate
 
 After the BlockLoot urn/crate checkpoint, the next pre-Phase8 candidates are:
 
-- Stage 7 `blockSlabStone` and remaining Outer Lands room template placeholders, because they still affect traversal and room parity.
+- Remaining Stage 7 Outer Lands room/worldgen placeholders, because traversal and structure parity are still not closed by the urn/crate/slab block-content checkpoints alone.
 - Stage 9 loot/content registration, because `Utils.generateLoot(...)` now has a shared reward path but the full reference loot pool distribution still depends on populated content tables.
 - Stage 6 server-side boss/manual scenario evidence remains excluded from user-driven validation, but static/reference parity blockers should continue to be reduced where possible.
 

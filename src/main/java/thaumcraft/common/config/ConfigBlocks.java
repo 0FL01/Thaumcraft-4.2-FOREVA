@@ -45,6 +45,8 @@ public class ConfigBlocks {
     public static BlockEldritchNothing blockEldritchNothing;
     public static BlockEldritchPortal blockEldritchPortal;
     public static BlockStairsEldritch blockStairsEldritch;
+    public static BlockCosmeticStoneSlab blockSlabStone;
+    public static BlockCosmeticStoneSlab blockDoubleSlabStone;
     public static BlockLoot blockLootUrn;
     public static BlockLoot blockLootCrate;
     public static BlockHole blockHole;
@@ -170,6 +172,14 @@ public class ConfigBlocks {
                 .setRegistryName("thaumcraft", legacyPath("blockStairsEldritch"))
                 .setTranslationKey("thaumcraft.stairs_eldritch");
 
+        blockSlabStone = (BlockCosmeticStoneSlab) new BlockCosmeticStoneSlab.Half()
+                .setRegistryName("thaumcraft", legacyPath("blockCosmeticSlabStone"))
+                .setTranslationKey("blockCosmeticSlabStone");
+
+        blockDoubleSlabStone = (BlockCosmeticStoneSlab) new BlockCosmeticStoneSlab.Double()
+                .setRegistryName("thaumcraft", legacyPath("blockCosmeticDoubleSlabStone"))
+                .setTranslationKey("blockCosmeticSlabStone");
+
         blockLootUrn = (BlockLoot) new BlockLoot(net.minecraft.block.material.Material.CIRCUITS, 1)
                 .setRegistryName("thaumcraft", legacyPath("blockLootUrn"))
                 .setTranslationKey("thaumcraft.loot_urn");
@@ -249,6 +259,8 @@ public class ConfigBlocks {
                 blockEldritchNothing,
                 blockEldritchPortal,
                 blockStairsEldritch,
+                blockSlabStone,
+                blockDoubleSlabStone,
                 blockLootUrn,
                 blockLootCrate,
                 blockHole,
@@ -300,6 +312,8 @@ public class ConfigBlocks {
                 .setRegistryName(blockEldritchPortal.getRegistryName()));
         registry.register(new net.minecraft.item.ItemBlock(blockStairsEldritch)
                 .setRegistryName(blockStairsEldritch.getRegistryName()));
+        registry.register(new BlockCosmeticStoneSlabItem(blockSlabStone)
+                .setRegistryName(blockSlabStone.getRegistryName()));
         registry.register(new BlockLootItem(blockLootUrn)
                 .setRegistryName(blockLootUrn.getRegistryName()));
         registry.register(new BlockLootItem(blockLootCrate)

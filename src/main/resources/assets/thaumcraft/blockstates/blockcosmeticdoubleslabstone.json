@@ -1,0 +1,8 @@
+{
+  "variants": {
+    "seamless=false,variant=arcane": { "model": "thaumcraft:blockcosmeticslabstone_arcane_double" },
+    "seamless=true,variant=arcane": { "model": "thaumcraft:blockcosmeticslabstone_arcane_double" },
+    "seamless=false,variant=eldritch": { "model": "thaumcraft:blockcosmeticslabstone_eldritch_double" },
+    "seamless=true,variant=eldritch": { "model": "thaumcraft:blockcosmeticslabstone_eldritch_double" }
+  }
+}

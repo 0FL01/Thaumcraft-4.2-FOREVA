@@ -123,10 +123,8 @@ public class GenLibraryRoom extends GenCommon {
         GenCommon.generateConnections(world, random, cx, cz, y, cell, 3, true);
     }
 
-    // Helper: get slab block state from meta
-    // TODO: Replace with ConfigBlocks.blockSlabStone when ported
     private static net.minecraft.block.state.IBlockState getSlabBlock(int meta) {
-        return net.minecraft.init.Blocks.DOUBLE_STONE_SLAB.getStateFromMeta(meta);
+        return ConfigBlocks.blockSlabStone.getStateFromMeta(meta);
     }
 
     private static net.minecraft.util.math.BlockPos pos(int x, int y, int z) {
