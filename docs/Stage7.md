@@ -17,14 +17,14 @@ Stage 7 закрывает серверную часть генерации ми
 - Outer Lands room templates: `src/main/java/thaumcraft/common/lib/world/dim/GenCommon.java`, `src/main/java/thaumcraft/common/lib/world/dim/GenPortal.java`, `src/main/java/thaumcraft/common/lib/world/dim/GenPassage.java`, `src/main/java/thaumcraft/common/lib/world/dim/Gen2x2.java`, `src/main/java/thaumcraft/common/lib/world/dim/GenBossRoom.java`, `src/main/java/thaumcraft/common/lib/world/dim/GenKeyRoom.java`, `src/main/java/thaumcraft/common/lib/world/dim/GenNestRoom.java`, `src/main/java/thaumcraft/common/lib/world/dim/GenLibraryRoom.java`.
 - Portals/teleport safety: `src/main/java/thaumcraft/common/blocks/BlockEldritchPortal.java`, `src/main/java/thaumcraft/common/lib/world/dim/TeleporterThaumcraft.java`, generated portal room at `src/main/java/thaumcraft/common/lib/world/dim/GenPortal.java:135-138`.
 - Persistence/world events: `src/main/java/thaumcraft/common/lib/events/EventHandlerWorld.java:45-57`, boss world data at `src/main/java/thaumcraft/common/lib/world/dim/MapBossData.java`.
-- Scenarios that should work after closure: new Overworld generation creates ores, aura nodes, magical/taint/eerie/eldritch biome behavior, Greatwood/Silverwood and plants; Eldritch rings create matching maze reservations and saved `labyrinth.dat`; entering an Eldritch portal reaches a safe Outer Lands portal cell; Outer Lands chunks populate rooms/passages/boss/key/nest/library; saving/reloading preserves maze cells and generated rooms; `/locate`-style structure query hooks do not crash.
+- Scenarios that should work after closure: new Overworld generation creates ores, aura nodes, magical/taint/eerie/eldritch biome behavior, Greatwood/Silverwood and plants; normal Greatwood and spider Greatwood variants generate with their reference contents; surface structures generate complete Eldritch rings, hilltop wisp altars, and mound/barrow loot/spawner layouts; Eldritch rings create matching maze reservations and saved `labyrinth.dat`; entering an Eldritch portal reaches a safe Outer Lands portal cell; Outer Lands chunks populate rooms/passages/boss/key/nest/library; saving/reloading preserves maze cells and generated rooms; `/locate`-style structure query hooks do not crash.
 
 ## 3. Источники сравнения
 
 - PRD Stage 7 scope and risk lines: `docs/PRD.md:341-364`.
 - Current implementation: `src/main/java/thaumcraft/common/lib/world/**`, `src/main/java/thaumcraft/common/lib/world/dim/**`, `src/main/java/thaumcraft/common/lib/world/biomes/**`, `src/main/java/thaumcraft/common/blocks/BlockEldritchPortal.java`, `src/main/java/thaumcraft/common/config/Config.java`, `src/main/java/thaumcraft/common/Thaumcraft.java`, `src/main/java/thaumcraft/common/lib/events/EventHandlerWorld.java`.
-- Reference classes are `.class` files under `thaumcraft_src/**`; decompiled with `cfr --silent true ...` for Stage 7 classes. Key reference paths: `thaumcraft_src/thaumcraft/common/lib/world/ThaumcraftWorldGenerator.class`, `thaumcraft_src/thaumcraft/common/lib/world/WorldGenEldritchRing.class`, `thaumcraft_src/thaumcraft/common/lib/world/dim/ChunkProviderOuter.class`, `thaumcraft_src/thaumcraft/common/lib/world/dim/WorldProviderOuter.class`, `thaumcraft_src/thaumcraft/common/lib/world/dim/MazeHandler.class`, `thaumcraft_src/thaumcraft/common/lib/world/dim/MazeGenerator.class`, `thaumcraft_src/thaumcraft/common/lib/world/dim/MazeThread.class`, `thaumcraft_src/thaumcraft/common/lib/world/dim/TeleporterThaumcraft.class`, `thaumcraft_src/thaumcraft/common/blocks/BlockEldritchPortal.class`, `thaumcraft_src/thaumcraft/common/lib/world/biomes/BiomeGenMagicalForest.class`, `thaumcraft_src/thaumcraft/common/lib/world/biomes/BiomeGenTaint.class`, `thaumcraft_src/thaumcraft/common/lib/world/biomes/BiomeGenEerie.class`, `thaumcraft_src/thaumcraft/common/lib/world/biomes/BiomeGenEldritch.class`.
-- Lightweight commands run for this analysis: `git status --short`; `find thaumcraft_src/thaumcraft/common/lib/world -type f`; `cfr --silent true` on selected Stage 7 reference classes; `rg`-backed searches via tools for `Outer`, `Eldritch`, `Biome`, `Dimension`, `Teleporter`, `WorldSavedData`, `Maze`, `TODO`.
+- Reference classes are `.class` files under `thaumcraft_src/**`; decompiled with `cfr --silent true ...` for Stage 7 classes. Key reference paths: `thaumcraft_src/thaumcraft/common/lib/world/ThaumcraftWorldGenerator.class`, `thaumcraft_src/thaumcraft/common/lib/world/WorldGenEldritchRing.class`, `thaumcraft_src/thaumcraft/common/lib/world/WorldGenHilltopStones.class`, `thaumcraft_src/thaumcraft/common/lib/world/WorldGenMound.class`, `thaumcraft_src/thaumcraft/common/lib/world/WorldGenGreatwoodTrees.class`, `thaumcraft_src/thaumcraft/common/lib/world/dim/ChunkProviderOuter.class`, `thaumcraft_src/thaumcraft/common/lib/world/dim/WorldProviderOuter.class`, `thaumcraft_src/thaumcraft/common/lib/world/dim/MazeHandler.class`, `thaumcraft_src/thaumcraft/common/lib/world/dim/MazeGenerator.class`, `thaumcraft_src/thaumcraft/common/lib/world/dim/MazeThread.class`, `thaumcraft_src/thaumcraft/common/lib/world/dim/TeleporterThaumcraft.class`, `thaumcraft_src/thaumcraft/common/blocks/BlockEldritchPortal.class`, `thaumcraft_src/thaumcraft/common/lib/world/biomes/BiomeGenMagicalForest.class`, `thaumcraft_src/thaumcraft/common/lib/world/biomes/BiomeGenTaint.class`, `thaumcraft_src/thaumcraft/common/lib/world/biomes/BiomeGenEerie.class`, `thaumcraft_src/thaumcraft/common/lib/world/biomes/BiomeGenEldritch.class`.
+- Lightweight checks used for this static analysis: `git status --short`; file discovery under `thaumcraft_src/thaumcraft/common/lib/world`; `cfr --silent true` on selected Stage 7 reference classes, including `WorldGenEldritchRing`, `WorldGenHilltopStones`, `WorldGenMound`, `WorldGenGreatwoodTrees`, and `ThaumcraftWorldGenerator`; `rg`-backed searches via tools for `Outer`, `Eldritch`, `Biome`, `Dimension`, `Teleporter`, `WorldSavedData`, `Maze`, `TODO`.
 - No build, server smoke, or client smoke validation was run; this document is static gap analysis only.
 
 ## 4. Текущее состояние Stage 7
@@ -33,7 +33,8 @@ Stage 7 закрывает серверную часть генерации ми
 - Outer Lands provider/chunk generator exists: provider uses a single Eldritch biome and returns `ChunkProviderOuter`: `src/main/java/thaumcraft/common/lib/world/dim/WorldProviderOuter.java:38-48`; chunk provider makes empty chunks and populates maze rooms through `MazeHandler.generateEldritch`: `src/main/java/thaumcraft/common/lib/world/dim/ChunkProviderOuter.java:27-39`, `src/main/java/thaumcraft/common/lib/world/dim/ChunkProviderOuter.java:50-67`.
 - Maze persistence exists and uses original file names/keys (`labyrinth.dat`, `labyrinth.dat_old`, `Data`, `cells`, `x`, `z`, `cell`): `src/main/java/thaumcraft/common/lib/world/dim/MazeHandler.java:43-116`; it is loaded/saved on Overworld world load/save: `src/main/java/thaumcraft/common/lib/events/EventHandlerWorld.java:45-57`.
 - Several current room/template classes are clearly partial or temporary: `src/main/java/thaumcraft/common/lib/world/dim/GenCommon.java:258-259`, `src/main/java/thaumcraft/common/lib/world/dim/GenNestRoom.java:122-125`, `src/main/java/thaumcraft/common/lib/world/dim/GenLibraryRoom.java:126-130`.
-- Current surface generator is much narrower than the reference. It skips Outer Lands in the general world generator at `src/main/java/thaumcraft/common/lib/world/ThaumcraftWorldGenerator.java:257-258`; generates ores with modern `WorldGenMinable` at `src/main/java/thaumcraft/common/lib/world/ThaumcraftWorldGenerator.java:275-285`; only generates trees when the sampled biome equals Magical Forest at `src/main/java/thaumcraft/common/lib/world/ThaumcraftWorldGenerator.java:288-292`; only generates structures in dim 0 at `src/main/java/thaumcraft/common/lib/world/ThaumcraftWorldGenerator.java:294-297`.
+- Current surface generator is much narrower than the reference. It skips Outer Lands in the general world generator at `src/main/java/thaumcraft/common/lib/world/ThaumcraftWorldGenerator.java:257-258`; generates ores with modern `WorldGenMinable` at `src/main/java/thaumcraft/common/lib/world/ThaumcraftWorldGenerator.java:275-285`; only generates trees when the sampled biome equals Magical Forest at `src/main/java/thaumcraft/common/lib/world/ThaumcraftWorldGenerator.java:288-292`; only generates structures in dim 0 at `src/main/java/thaumcraft/common/lib/world/ThaumcraftWorldGenerator.java:294-297`; does not call any wild-aura-node generation path from `generate(...)` despite `Config.genAura`/`Config.regenAura` existing.
+- Current Overworld structure/tree generators contain gameplay placeholders: `WorldGenEldritchRing` places only obsidian plus a portal at `src/main/java/thaumcraft/common/lib/world/WorldGenEldritchRing.java:17-29`; `WorldGenHilltopStones` places only a stonebrick ring and empty chest at `src/main/java/thaumcraft/common/lib/world/WorldGenHilltopStones.java:14-31`; `WorldGenMound` places a small dirt/grass mound and empty chest at `src/main/java/thaumcraft/common/lib/world/WorldGenMound.java:14-36`; `WorldGenGreatwoodTrees` lacks the reference spider variant at `src/main/java/thaumcraft/common/lib/world/WorldGenGreatwoodTrees.java:24-89`.
 - Current portal collision actively teleports players at `src/main/java/thaumcraft/common/blocks/BlockEldritchPortal.java:48-78`, but current teleporter only places the entity at same X/Z and fixed Y=60: `src/main/java/thaumcraft/common/lib/world/dim/TeleporterThaumcraft.java:12-29`.
 
 ## 5. Gap list
@@ -51,7 +52,7 @@ Stage 7 закрывает серверную часть генерации ми
 - `thaumcraft_src/thaumcraft/common/lib/world/ThaumcraftWorldGenerator.class`
 
 **Что не совпадает:**
-Reference `ThaumcraftWorldGenerator` has a `worldGeneration(random, chunkX, chunkZ, world, newGen)` path that handles Outer Lands, Nether, End skip, surface generation, and generation markers. It calls `generateWildNodes`, `generateTotem`, `generateVegetation`, `generateOres`, and structure-node placement near scattered features. Current `generate(...)` has no `worldGeneration` method, no `newGen` parameter, no nether branch, no wild node generation despite `Config.genAura`, no totem generation, and no `MapGenScatteredFeature` structure-node behavior.
+Reference `ThaumcraftWorldGenerator` has a `worldGeneration(random, chunkX, chunkZ, world, newGen)` path that handles Outer Lands, Nether, End skip, surface generation, and generation markers. It calls `generateWildNodes`, `generateTotem`, `generateVegetation`, `generateOres`, and structure-node placement near scattered features. Reference `generateWildNodes` gates on `Config.genAura`, `Config.nodeRarity`, and existing structure-node generation before creating a random node with `createRandomNodeAt(..., false, false, false)`. Current `generate(...)` has no `worldGeneration` method, no `newGen` parameter, no nether branch, no wild node generation despite `Config.genAura`, no totem generation, and no `MapGenScatteredFeature` structure-node behavior. Current `createRandomNodeAt(...)` exists at `src/main/java/thaumcraft/common/lib/world/ThaumcraftWorldGenerator.java:97-250`, but static RECON found no normal worldgen caller for wild nodes; natural node creation is therefore absent except indirect Silverwood knot attempts.
 
 **Что нужно доделать:**
 Reintroduce the reference worldgen control flow with a 1.12.2 API adaptation for fresh-world generation, preserving config toggles, dimension/biome blacklist semantics, flat-world skip behavior, nether node/totem behavior, surface aura generation, structure-node generation, vegetation, ores, structures, and chunk dirty marking where appropriate.
@@ -59,11 +60,14 @@ Reintroduce the reference worldgen control flow with a 1.12.2 API adaptation for
 **Как доделать:**
 - Port `worldGeneration(Random, int, int, World, boolean)` into `src/main/java/thaumcraft/common/lib/world/ThaumcraftWorldGenerator.java`.
 - Port/adapt `generateWildNodes`, `generateTotem`, `generateSurface`, `generateVegetation`, `generateOres`, `generateNether` from `thaumcraft_src/thaumcraft/common/lib/world/ThaumcraftWorldGenerator.class`.
+- Wire `Config.genAura`, `Config.regenAura`, and `Config.nodeRarity` into the restored `generateWildNodes` path; verify that normal `blockAiry`/`TileNode` aura nodes can be created independently of Silverwood trees.
 - Preserve fresh-world generation config toggles such as `Config.genAura`, `Config.genStructure`, `Config.genTrees`, and ore toggles from `src/main/java/thaumcraft/common/config/Config.java:230-246`.
 - Keep Stage 7 changes isolated from unrelated entity/render/client phases.
 
 **Критерии приемки:**
 - [ ] New Overworld chunks can generate aura nodes when `Config.genAura=true` and `Config.nodeRarity` allows it.
+- [ ] Wild aura nodes still appear when tree generation is disabled but aura generation is enabled, proving nodes do not depend on Silverwood generation.
+- [ ] Structure-nearby aura node placement and random wild node placement both use reference-like `auraGen` suppression so a chunk does not duplicate nodes unexpectedly.
 - [ ] Nether chunks can generate the original node/totem subset and End chunks remain skipped.
 - [ ] Flat worlds skip structures where the reference skipped them.
 - [ ] `./scripts/dev.sh smoke-server` reaches ready state after generating a new world with Thaumcraft worldgen enabled.
@@ -87,7 +91,7 @@ Dependency: Stage 3 node/tile behavior must be stable enough for generated aura 
 - `thaumcraft_src/thaumcraft/common/lib/world/dim/MazeThread.class`
 
 **Что не совпадает:**
-Reference `ThaumcraftWorldGenerator` creates Eldritch rings from the surface structure branch with random odd maze width/height `11 + random.nextInt(6) * 2`, assigns those dimensions to the `WorldGenEldritchRing`, creates a dark node, and starts `new MazeThread(chunkX, chunkZ, w, h, random.nextLong())`. Current `WorldGenEldritchRing` ignores ring width/height, places a simple obsidian circle plus portal, and starts `MazeThread(cx, cz, 32, 32, world.getSeed())`: `src/main/java/thaumcraft/common/lib/world/WorldGenEldritchRing.java:17-36`. Current surface structure chance also differs: `rand.nextInt(800)` at `src/main/java/thaumcraft/common/lib/world/ThaumcraftWorldGenerator.java:358`, while the reference branch uses ring chance inside the structure branch and also creates the maze dimensions/dark node.
+Reference `ThaumcraftWorldGenerator` creates Eldritch rings from the surface structure branch with `randPosY = getHeight(...) - 9`, only attempts the structure when that value is below sea level, then calls `WorldGenEldritchRing.LocationIsValidSpawn(...)` before placing blocks. It uses random odd maze width/height `11 + random.nextInt(6) * 2`, assigns those dimensions to the `WorldGenEldritchRing`, creates a dark node, and starts `new MazeThread(chunkX, chunkZ, w, h, random.nextLong())`. Reference `WorldGenEldritchRing` places cosmetic-solid/obsidian support blocks, eldritch altar/cap/obelisk metas, banners, and altar spawner state. Current generator uses `world.getHeight(...)` directly at `src/main/java/thaumcraft/common/lib/world/ThaumcraftWorldGenerator.java:359-362`, has no sea-level or `LocationIsValidSpawn` guard, ignores ring width/height, places only a simple obsidian circle plus portal, and starts `MazeThread(cx, cz, 32, 32, world.getSeed())`: `src/main/java/thaumcraft/common/lib/world/WorldGenEldritchRing.java:17-36`. This matches the reported symptom where Eldritch/priest altars can appear in water/at sea surface and contain only obsidian/portal instead of the reference altar layout. Current surface structure chance also differs: `rand.nextInt(800)` at `src/main/java/thaumcraft/common/lib/world/ThaumcraftWorldGenerator.java:358`, while the reference branch uses ring chance inside the structure branch and also creates the maze dimensions/dark node.
 
 **Что нужно доделать:**
 Port the reference ring structure and maze bootstrap behavior instead of the current placeholder ring. The ring must reserve/generate a maze whose dimensions and seed come from the worldgen branch, and the surface ring must match original block layout and node behavior.
@@ -96,6 +100,7 @@ Port the reference ring structure and maze bootstrap behavior instead of the cur
 - Add `chunkX`, `chunkZ`, `width`, `height` fields or equivalent to `WorldGenEldritchRing` if needed by the reference generator.
 - Move maze-thread creation back to the worldgen structure branch, or make `WorldGenEldritchRing` receive the exact reference dimensions/seed.
 - Port reference block layout from `thaumcraft_src/thaumcraft/common/lib/world/WorldGenEldritchRing.class` to `src/main/java/thaumcraft/common/lib/world/WorldGenEldritchRing.java`.
+- Port/adapt `WorldGenEldritchRing.LocationIsValidSpawn(...)` and the reference sea-level/top-height gating so rings do not generate on water, in mid-air, or on invalid surface blocks.
 - Ensure a dark/eerie aura node is generated at the ring as in the reference branch.
 - Verify `MazeHandler.mazesInRange(...)` prevents overlapping mazes with the same radius semantics as reference.
 
@@ -103,6 +108,8 @@ Port the reference ring structure and maze bootstrap behavior instead of the cur
 - [ ] A generated Overworld Eldritch ring produces non-empty maze cells in `MazeHandler.labyrinth` around the expected chunk center.
 - [ ] Maze width/height are odd values in the reference range rather than a fixed 32x32 grid.
 - [ ] Ring generation creates the reference dark node/totem behavior.
+- [ ] Eldritch rings fail generation on water/air/invalid surfaces and do not spawn at ocean surface with missing support blocks.
+- [ ] Generated Eldritch ring contains the reference altar/cap/obelisk/banner/spawner-capable block layout, not only obsidian plus portal.
 - [ ] Saving after ring generation writes expected `labyrinth.dat` cell entries.
 - [ ] Manual new-world test can find an Eldritch ring and enter the associated Outer Lands maze.
 
@@ -350,6 +357,8 @@ Client-side biome color validation overlaps Stage 8 rendering, but server spawn/
 **Текущая реализация:**
 - `src/main/java/thaumcraft/common/lib/world/ThaumcraftWorldGenerator.java:275-285`
 - `src/main/java/thaumcraft/common/lib/world/ThaumcraftWorldGenerator.java:288-335`
+- `src/main/java/thaumcraft/common/lib/world/WorldGenGreatwoodTrees.java:24-89`
+- `src/main/java/thaumcraft/common/lib/world/WorldGenSilverwoodTrees.java:14-127`
 - `src/main/java/thaumcraft/common/lib/world/biomes/BiomeMagicalForest.java:57-120`
 - `src/main/java/thaumcraft/common/lib/world/biomes/BiomeTaint.java:68-110`
 
@@ -361,22 +370,27 @@ Client-side biome color validation overlaps Stage 8 rendering, but server spawn/
 - `thaumcraft_src/thaumcraft/common/lib/world/WorldGenManaPods.class`
 
 **Что не совпадает:**
-Reference vegetation runs in surface generation for non-blacklisted biomes, with Silverwood chance `random.nextInt(60) == 3`, Greatwood chance `random.nextInt(25) == 7`, and shimmerleaf-like flower placement in sandy/humid conditions. Current generator only calls `generateGreatwood`/`generateSilverwood` when the sampled biome is exactly Magical Forest: `src/main/java/thaumcraft/common/lib/world/ThaumcraftWorldGenerator.java:288-292`, so most reference tree generation paths are skipped. Current ore generation uses `WorldGenMinable` vein counts/chances at `src/main/java/thaumcraft/common/lib/world/ThaumcraftWorldGenerator.java:275-285`; reference cinnabar/amber placement is per-block attempts with different height rules, and infused stone chooses aspect metadata partly from biome tag.
+Reference vegetation runs in surface generation for non-blacklisted biomes, with Silverwood chance `random.nextInt(60) == 3`, Greatwood chance `random.nextInt(25) == 7`, and shimmerleaf-like flower placement in sandy/humid conditions. Reference `generateSilverwood(...)` constructs `new WorldGenSilverwoodTrees(false, 7, 4)` and the Silverwood generator can place `blockMagicalLog` meta `2` plus `createRandomNodeAt(..., true, false, false)` for a pure knot node. Current generator only calls `generateGreatwood`/`generateSilverwood` when the sampled biome is exactly Magical Forest: `src/main/java/thaumcraft/common/lib/world/ThaumcraftWorldGenerator.java:288-292`, so most reference tree generation paths are skipped. Current `generateSilverwood(...)` has an internal 5% chance and uses `new WorldGenSilverwoodTrees(false, 8, 5)` at `src/main/java/thaumcraft/common/lib/world/ThaumcraftWorldGenerator.java:322-335`; Magical Forest biome decoration can also pick Silverwood with the same `8,5` parameters at `src/main/java/thaumcraft/common/lib/world/biomes/BiomeMagicalForest.java:57-60`, but that does not replace the missing global `generateVegetation` path. Current `WorldGenSilverwoodTrees` statically has a knot-node path: it places meta `2` and calls `createRandomNodeAt(..., true, false, false)` at `src/main/java/thaumcraft/common/lib/world/WorldGenSilverwoodTrees.java:70-87`, and `BlockMagicalLog` creates a `TileNode` for `TYPE == 2` at `src/main/java/thaumcraft/common/blocks/BlockMagicalLog.java:49-58`; this still needs runtime validation after natural Silverwood generation is restored. Reference `generateGreatwood(...)` calls `WorldGenGreatwoodTrees.generate(..., random.nextInt(8) == 0)`, and the spider variant places a `CaveSpider` spawner under the trunk, web blocks near Greatwood logs/leaves, and a dungeon-loot chest below the spawner. Current `generateGreatwood(...)` always calls `new WorldGenGreatwoodTrees(false).generate(...)` without a spider-variant flag: `src/main/java/thaumcraft/common/lib/world/ThaumcraftWorldGenerator.java:311-318`; current `WorldGenGreatwoodTrees` only generates trunk/canopy and has no `CaveSpider` spawner, webs, or loot chest path at `src/main/java/thaumcraft/common/lib/world/WorldGenGreatwoodTrees.java:24-89`. Current ore generation uses `WorldGenMinable` vein counts/chances at `src/main/java/thaumcraft/common/lib/world/ThaumcraftWorldGenerator.java:275-285`; reference cinnabar/amber placement is per-block attempts with different height rules, and infused stone chooses aspect metadata partly from biome tag.
 
 **Что нужно доделать:**
 Port reference vegetation/ore probability and placement rules, adapted to 1.12.2 APIs, while preserving current block states/metas.
 
 **Как доделать:**
 - Move tree generation into a reference-like `generateVegetation` path rather than only Magical Forest chunks.
-- Match Silverwood/Greatwood chance gating and `BiomeHandler.getBiomeSupportsGreatwood` logic.
+- Match Silverwood/Greatwood chance gating and `BiomeHandler.getBiomeSupportsGreatwood` logic, including reference Silverwood chance `random.nextInt(60) == 3` before `generateSilverwood(...)`.
+- Align or explicitly justify Silverwood generator parameters: reference uses `WorldGenSilverwoodTrees(false, 7, 4)`, while current worldgen and Magical Forest decorator use `8, 5`.
+- Runtime-validate Silverwood knot-node creation: generated meta `2` log must create a `TileNode`, become `NodeType.PURE`, retain aspects, and survive save/reload.
+- Port/adapt `WorldGenGreatwoodTrees.generate(World, Random, ..., boolean spiders)` semantics: `random.nextInt(8) == 0` spider variant, `CaveSpider` spawner below trunk, up to 50 webs adjacent to Greatwood leaves/logs, and a dungeon-loot chest below the spawner.
 - Restore cinnabar/amber/infused stone placement counts, Y-ranges, and biome-aspect metadata selection.
 - Verify `WorldGenGreatwoodTrees`, `WorldGenSilverwoodTrees`, `WorldGenBigMagicTree`, `WorldGenManaPods`, and `WorldGenCustomFlowers` against reference classes after generator-level parity is fixed.
 
 **Критерии приемки:**
 - [ ] Greatwood and Silverwood can generate outside Magical Forest where reference conditions allow.
+- [ ] Natural Silverwood generation uses the reference global vegetation path and does not rely only on `BiomeMagicalForest.getRandomTreeFeature(...)`.
 - [ ] Cinnabar, amber, and infused stone use reference-like count/chance/Y/metadata behavior.
 - [ ] Biome blacklist levels block trees/ores/structures at the same levels as reference.
-- [ ] Generated Silverwood still creates a pure node when reference behavior expects it.
+- [ ] Generated Silverwood still creates a pure node when reference behavior expects it; the knot block has `TYPE == 2`, a `TileNode`, `NodeType.PURE`, non-empty aspects, and persists after chunk save/reload.
+- [ ] Spider Greatwood variant can generate at the reference chance and includes a `CaveSpider` spawner, webs near Greatwood blocks, and a populated dungeon-loot chest.
 - [ ] Manual new-world sampling confirms ores and trees appear at plausible original rates.
 
 **Риски / зависимости:**
@@ -418,6 +432,44 @@ Verify and wire boss-room world data where the reference uses it, and replace ha
 **Риски / зависимости:**
 Dependency: boss entity combat behavior belongs mainly to Stage 6. Stage 7 should verify room/world-data integration and label combat AI issues as Stage 6 dependencies.
 
+### GAP-11: Overworld hilltop altar and mound/barrow structures are gameplay placeholders
+
+**Статус:** реализовано неправильно  
+**Критичность:** high
+
+**Текущая реализация:**
+- `src/main/java/thaumcraft/common/lib/world/ThaumcraftWorldGenerator.java:346-370`
+- `src/main/java/thaumcraft/common/lib/world/WorldGenHilltopStones.java:14-31`
+- `src/main/java/thaumcraft/common/lib/world/WorldGenMound.java:14-36`
+
+**Референс:**
+- `thaumcraft_src/thaumcraft/common/lib/world/ThaumcraftWorldGenerator.class`
+- `thaumcraft_src/thaumcraft/common/lib/world/WorldGenHilltopStones.class`
+- `thaumcraft_src/thaumcraft/common/lib/world/WorldGenMound.class`
+
+**Что не совпадает:**
+Current `generateStructures(...)` calls simplified placeholder generators with independent chances at `src/main/java/thaumcraft/common/lib/world/ThaumcraftWorldGenerator.java:346-370`. `WorldGenHilltopStones` currently places only a stonebrick/cobblestone-like ring and an empty vanilla chest: `src/main/java/thaumcraft/common/lib/world/WorldGenHilltopStones.java:14-31`. The reference hilltop altar rejects low/invalid surfaces through `LocationIsValidSpawn(...)`, builds a full altar/stones layout, places a dungeon-loot chest, places a mob spawner, and sets its entity id to `Thaumcraft.Wisp`. `WorldGenMound` currently places only a small procedural grass/dirt mound and an empty vanilla chest: `src/main/java/thaumcraft/common/lib/world/WorldGenMound.java:14-36`. The reference mound/barrow is a large fixed structure with interior block template, loot urn/crate placements (`blockLootCrate`/`blockLootUrn`), a populated dungeon chest, and `Skeleton`/`Zombie` spawners. This directly covers the reported bug where an altar/mound appears as only a ring plus empty chest and lacks wisp spawner, structure columns/details, and populated loot.
+
+**Что нужно доделать:**
+Port the original Overworld surface structure templates and validation rules for `WorldGenHilltopStones` and `WorldGenMound`, not just their existence in the simplified generator branch. These are Stage 7 gameplay structures because they affect world exploration, loot, mob spawning, and aura/node placement.
+
+**Как доделать:**
+- Fold `WorldGenHilltopStones` and `WorldGenMound` back into the reference-like `generateSurface(...)` branch from GAP-1 so they share original `randPosY = getHeight(...) - 9`, sea-level, flat-world, blacklist, and chance semantics.
+- Port/adapt `WorldGenHilltopStones.LocationIsValidSpawn(...)`, full block layout, columns/details/vines, populated dungeon chest, mob spawner tile setup, and `Thaumcraft.Wisp` spawner id.
+- Port/adapt `WorldGenMound` fixed barrow template, support/fill behavior, loot urn/crate placements, populated dungeon chest, trap/loot details, and `Skeleton`/`Zombie` spawner ids.
+- Ensure generated chests use the Forge 1.12.2 loot/table or inventory-fill equivalent of original `ChestGenHooks.getInfo("dungeonChest")` without leaving empty vanilla chests.
+- If `blockLootUrn`/`blockLootCrate` are still missing, resolve them with the Stage 7 block-content work rather than silently substituting empty chests.
+
+**Критерии приемки:**
+- [ ] Generated hilltop altar refuses low/invalid/water surfaces and only generates where `LocationIsValidSpawn`-equivalent checks pass.
+- [ ] Generated hilltop altar contains the reference altar/stones layout, populated loot chest, and a spawner configured for `Thaumcraft.Wisp`.
+- [ ] Generated mound/barrow contains the original internal structure, loot urn/crate placements or documented functional equivalents, populated loot chest, and skeleton/zombie spawners.
+- [ ] Chests generated by `WorldGenHilltopStones` and `WorldGenMound` are not empty in a fresh runtime world.
+- [ ] Manual new-world sampling covers at least one successful hilltop altar and one mound/barrow, and records no chunk-population crash.
+
+**Риски / зависимости:**
+Dependency: loot urn/crate block registration and mob entity ids must be available before full parity. If entity ids changed during the 1.12.2 port, the executor must map them deliberately and document the registry-name compatibility decision instead of leaving vanilla spawners unconfigured.
+
 ## 6. Итоговый checklist закрытия Stage 7
 
 - [ ] GAP-1 closed: reference-like fresh-world generation pipeline restored and tested.
@@ -430,10 +482,11 @@ Dependency: boss entity combat behavior belongs mainly to Stage 6. Stage 7 shoul
 - [ ] GAP-8 closed or documented: biome registration/config ID policy and color/decorator verification complete.
 - [ ] GAP-9 closed: tree/plant/ore generation probabilities and placement match reference closely enough.
 - [ ] GAP-10 closed or dependency-labeled: boss room world data and dimension safety integration verified.
+- [ ] GAP-11 closed: hilltop altar and mound/barrow Overworld structures have reference-like validation, blocks, spawners, and populated loot.
 - [ ] `rg -n "TODO|TBD|placeholder|Replace with|return null|no-op" src/main/java/thaumcraft/common/lib/world src/main/java/thaumcraft/common/lib/world/dim src/main/java/thaumcraft/common/blocks/BlockEldritchPortal.java` reviewed with no unresolved Stage 7 gameplay stubs.
 - [ ] `./scripts/dev.sh compileJava` passes after implementation work.
 - [ ] `./scripts/dev.sh smoke-server` passes after implementation work.
-- [ ] Manual Stage 7 smoke notes include new world generation, Eldritch ring, portal entry, maze traversal, save/reload, and portal return.
+- [ ] Manual Stage 7 smoke notes include new world generation, Eldritch ring, hilltop altar, mound/barrow, normal/spider Greatwood, portal entry, maze traversal, save/reload, and portal return.
 
 ## 7. Definition of Done
 
@@ -479,9 +532,11 @@ Stage 7 считается ПОЛНОСТЬЮ завершенной тольк�
    - убрать Stage 7 gameplay TODO/placeholders из room generators.
 5. Worldgen/maze/checkpoint:
    - восстановить normal generation control flow в `ThaumcraftWorldGenerator`;
-   - исправить Eldritch ring bootstrap: reference-like width/height/seed и dark node/altar behavior;
+   - исправить Eldritch ring bootstrap: reference-like width/height/seed, sea-level/surface validation, full altar layout и dark node/altar behavior;
+   - восстановить `WorldGenHilltopStones`/`WorldGenMound` templates: validation, filled loot, `Thaumcraft.Wisp`/skeleton/zombie spawners, urn/crate placements;
+   - восстановить normal/spider Greatwood generation path: non-Magical-Forest vegetation chance, `CaveSpider` spawner, webs, and loot chest;
    - проверить maze race: portal activation only after maze cells exist or generation is completed.
 6. Validation/checkpoint:
    - `./scripts/dev.sh compileJava`;
    - `./scripts/dev.sh smoke-server`;
-   - manual Stage 7 smoke: new world generation, ring, portal entry, several Outer Lands chunks, traversal, save/reload, return portal.
+   - manual Stage 7 smoke: new world generation, Eldritch ring, hilltop altar, mound/barrow, normal/spider Greatwood, portal entry, several Outer Lands chunks, traversal, save/reload, return portal.
