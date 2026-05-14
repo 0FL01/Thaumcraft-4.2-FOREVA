@@ -146,8 +146,32 @@ Validation:
 
 Remaining limits:
 
-- Safe teleporter placement is advanced, but GAP-3 is not fully closed because the reference-like `TileEldritchPortal` tick trigger and manual portal traversal evidence remain out of scope for user-driven validation.
+- Safe teleporter placement is advanced, but GAP-3 is not fully closed until trigger ownership and manual portal traversal evidence are handled.
 - Portal generation/maze placement is not proven by this checkpoint.
+
+### 2026-05-14 — Stage 7 Eldritch portal trigger ownership
+
+Scope:
+
+- Ported `TileEldritchPortal` to a tickable server-side trigger matching the original ownership model.
+- Added a 5-tick player scan around the portal block, mounted/ridden player guards, and the original 100-tick player portal cooldown behavior.
+- Moved dimension transfer out of `BlockEldritchPortal` collision handling and into the tile entity.
+- Preserved the safe `TeleporterThaumcraft` placement/search path from the previous checkpoint for both Outer Lands entry and Overworld return.
+- Granted `ENTEROUTER` through the current `ResearchManager` when a player enters the Outer Lands for the first time.
+- Made the portal block pass-through, non-replaceable, and unbreakable, aligning it with the original non-colliding portal block contract.
+
+Validation:
+
+- `./scripts/dev.sh compileJava` — passed.
+- `./scripts/dev.sh build` — passed.
+- `./scripts/dev.sh check-jar` — failed before jar inspection because the wrapper's expected MCP mapping cache file is still absent at `.gradle_home/caches/minecraft/de/oceanlabs/mcp/mcp_stable/39/1.12.2/srgs/mcp-srg.srg`.
+- `./scripts/dev.sh smoke-server` — failed by timeout before ready state; log again stopped immediately after `Calling tweak class net.minecraftforge.fml.common.launcher.FMLServerTweaker`, with only Log4j console appender initialization errors, no new crash reports, and no mod-load crash markers. This matches the clean `da3f307` baseline reproduction recorded above.
+
+Remaining limits:
+
+- Runtime portal traversal was not manually run because user-driven GUI/client control is excluded from this durable goal.
+- The smoke-server environment still has the pre-existing timeout before Forge reaches ready state; full runtime proof must remain blocked until that environment issue is resolved.
+- GAP-3 is advanced but not fully closed because arrival beside a generated `GenPortal` room still depends on Stage 7 ring/maze/room generation validation.
 
 ## Next Checkpoint Candidate
 

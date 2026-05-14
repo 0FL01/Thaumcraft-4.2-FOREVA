@@ -1,26 +1,25 @@
 package thaumcraft.common.blocks;
 
+import java.util.List;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Blocks;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
-import net.minecraft.world.WorldServer;
-import thaumcraft.common.config.Config;
 import thaumcraft.common.config.ConfigBlocks;
-import thaumcraft.common.lib.world.dim.TeleporterThaumcraft;
 import thaumcraft.common.tiles.TileEldritchPortal;
 
 public class BlockEldritchPortal extends Block {
 
     public BlockEldritchPortal() {
         super(Material.PORTAL);
-        this.setHardness(0.0f);
+        this.setBlockUnbreakable();
+        this.setResistance(200000.0f);
         this.setLightLevel(1.0f);
         this.setDefaultState(this.blockState.getBaseState());
         this.setTickRandomly(false);
@@ -47,39 +46,23 @@ public class BlockEldritchPortal extends Block {
     }
 
     @Override
-    public void onEntityCollision(World world, BlockPos pos, IBlockState state, Entity entity) {
-        if (!world.isRemote && entity.getRidingEntity() == null && !entity.isBeingRidden()) {
-            // Teleport players to Outer Lands dimension
-            if (entity instanceof EntityPlayerMP) {
-                EntityPlayerMP player = (EntityPlayerMP) entity;
-                // Check cooldown to prevent rapid teleport loops
-                TileEntity te = world.getTileEntity(pos);
-                if (te instanceof TileEldritchPortal) {
-                    TileEldritchPortal portal = (TileEldritchPortal) te;
-                    long now = world.getTotalWorldTime();
-                    if (now - portal.lastTeleport < 40) return; // 2 second cooldown
-                    portal.lastTeleport = now;
-                }
+    public AxisAlignedBB getCollisionBoundingBox(IBlockState state, IBlockAccess world, BlockPos pos) {
+        return null;
+    }
 
-                MinecraftServer server = player.getServer();
-                if (server != null) {
-                    int targetDim = Config.dimensionOuterId; // Eldritch dimension ID from config
+    @Override
+    public void addCollisionBoxToList(IBlockState state, World world, BlockPos pos, AxisAlignedBB entityBox,
+                                      List<AxisAlignedBB> collidingBoxes, Entity entity, boolean isActualState) {
+    }
 
-                    if (player.dimension != targetDim) {
-                        // Clamp position to valid area in target dimension
-                        WorldServer targetWorld = server.getWorld(targetDim);
-                        if (targetWorld == null) return;
-                        TeleporterThaumcraft teleporter = new TeleporterThaumcraft(targetWorld);
-                        player.changeDimension(targetDim, teleporter);
-                    } else {
-                        // Already in dimension - teleport to overworld
-                        WorldServer targetWorld = server.getWorld(0);
-                        if (targetWorld == null) return;
-                        player.changeDimension(0, new TeleporterThaumcraft(targetWorld));
-                    }
-                }
-            }
-        }
+    @Override
+    public boolean isPassable(IBlockAccess world, BlockPos pos) {
+        return true;
+    }
+
+    @Override
+    public boolean isReplaceable(IBlockAccess world, BlockPos pos) {
+        return false;
     }
 
     @Override
