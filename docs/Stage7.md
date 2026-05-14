@@ -85,6 +85,11 @@ Remaining GAP-1 limits after this checkpoint: Nether generation, totems, scatter
 
 Remaining GAP-1 limits after this checkpoint: `newGen`/regen chunk dirty-marker parity, full ore placement parity, flower placement parity, biome blacklist edge cases, mound/barrow parity, and runtime evidence are still open.
 
+**Checkpoint 2026-05-14 — Ore and flower placement parity:**
+`ThaumcraftWorldGenerator` now routes ore generation through a reference-like `generateOres(...)` path instead of the old generic vein helper. Cinnabar and amber use single-block stone replacement attempts with the original per-chunk counts and height selection, infused stone uses eight biome-aspect-weighted six-block veins, and ore generation now honors biome blacklist levels `0` and `2` like the reference. `generateVegetation(...)` also restores the humid-sand flower placement branch and exact-position `generateFlowers(...)` overload used by the original generator.
+
+Remaining GAP-1 limits after this checkpoint: `newGen`/regen chunk dirty-marker parity, broader biome blacklist/runtime edge cases, mound/barrow parity, and runtime evidence are still open.
+
 ### GAP-2: Overworld Eldritch ring generation does not match reference maze bootstrap
 
 **Статус:** частично реализовано

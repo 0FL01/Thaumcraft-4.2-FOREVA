@@ -7,6 +7,7 @@ import java.util.Random;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.state.pattern.BlockMatcher;
 import net.minecraft.init.Blocks;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
@@ -282,18 +283,7 @@ public class ThaumcraftWorldGenerator implements IWorldGenerator {
 
         boolean flatWorld = world.getWorldInfo().getTerrainType() == WorldType.FLAT;
 
-        // Generate ores
-        if (Config.genCinnibar || Config.regenCinnibar) {
-            generateOre(world, random, x, z, ConfigBlocks.blockCustomOre.getStateFromMeta(0), 4, 12, 10, 0, 32);
-        }
-        if (Config.genAmber || Config.regenAmber) {
-            generateOre(world, random, x, z, ConfigBlocks.blockCustomOre.getStateFromMeta(7), 4, 8, 8, 0, 32);
-        }
-        if (Config.genInfusedStone || Config.regenInfusedStone) {
-            for (int i = 1; i <= 6; i++) {
-                generateOre(world, random, x, z, ConfigBlocks.blockCustomOre.getStateFromMeta(i), 6, 4, 6, 0, 48);
-            }
-        }
+        generateOres(world, random, x, z, biome, biomeBlacklistLevel);
 
         boolean auraGen = false;
         if ((Config.genAura || Config.regenAura) && biomeBlacklistLevel < 1) {
@@ -368,17 +358,77 @@ public class ThaumcraftWorldGenerator implements IWorldGenerator {
         if (rand.nextInt(25) == 7) {
             generateGreatwood(world, rand, x, z, biome);
         }
+
+        int bx = x + rand.nextInt(16);
+        int bz = z + rand.nextInt(16);
+        int by = world.getHeight(new BlockPos(bx, 0, bz)).getY();
+        if (by > world.getSeaLevel()) {
+            return;
+        }
+        Biome flowerBiome = world.getBiome(new BlockPos(bx, 0, bz));
+        if (flowerBiome.topBlock.getBlock() == Blocks.SAND && flowerBiome.getRainfall() > 1.0f && rand.nextInt(30) == 0) {
+            generateFlowers(world, rand, bx, by, bz, 3);
+        }
     }
 
-    private void generateOre(World world, Random rand, int x, int z, net.minecraft.block.state.IBlockState ore, int veinSize, int veinsPerChunk, int chance, int minY, int maxY) {
-        if (veinsPerChunk == 0) return;
-        for (int i = 0; i < veinsPerChunk; i++) {
-            if (rand.nextInt(chance) != 0) continue;
-            int bx = x + rand.nextInt(16);
-            int bz = z + rand.nextInt(16);
-            int by = minY + rand.nextInt(maxY - minY);
-            new WorldGenMinable(ore, veinSize).generate(world, rand, new BlockPos(bx, by, bz));
+    private void generateOres(World world, Random rand, int x, int z, Biome biome, int biomeBlacklistLevel) {
+        if (biomeBlacklistLevel == 0 || biomeBlacklistLevel == 2) {
+            return;
         }
+        if (Config.genCinnibar || Config.regenCinnibar) {
+            for (int i = 0; i < 18; ++i) {
+                BlockPos pos = new BlockPos(x + rand.nextInt(16), rand.nextInt(Math.max(1, world.getActualHeight() / 5)), z + rand.nextInt(16));
+                placeOreBlockIfStone(world, pos, ConfigBlocks.blockCustomOre.getStateFromMeta(0), 0);
+            }
+        }
+        if (Config.genAmber || Config.regenAmber) {
+            for (int i = 0; i < 20; ++i) {
+                int bx = x + rand.nextInt(16);
+                int bz = z + rand.nextInt(16);
+                BlockPos pos = new BlockPos(bx, world.getHeight(new BlockPos(bx, 0, bz)).getY() - rand.nextInt(25), bz);
+                placeOreBlockIfStone(world, pos, ConfigBlocks.blockCustomOre.getStateFromMeta(7), 2);
+            }
+        }
+        if (Config.genInfusedStone || Config.regenInfusedStone) {
+            for (int i = 0; i < 8; ++i) {
+                int bx = x + rand.nextInt(16);
+                int bz = z + rand.nextInt(16);
+                int top = Math.max(5, world.getHeight(new BlockPos(bx, 0, bz)).getY() - 5);
+                int by = rand.nextInt(top);
+                int meta = getInfusedOreMeta(world, rand, bx, bz, biome);
+                new WorldGenMinable(ConfigBlocks.blockCustomOre.getStateFromMeta(meta), 6, BlockMatcher.forBlock(Blocks.STONE))
+                        .generate(world, rand, new BlockPos(bx, by, bz));
+            }
+        }
+    }
+
+    private boolean placeOreBlockIfStone(World world, BlockPos pos, IBlockState ore, int flags) {
+        IBlockState state = world.getBlockState(pos);
+        if (state.getBlock().isReplaceableOreGen(state, world, pos, BlockMatcher.forBlock(Blocks.STONE))) {
+            return world.setBlockState(pos, ore, flags);
+        }
+        return false;
+    }
+
+    private int getInfusedOreMeta(World world, Random rand, int x, int z, Biome fallbackBiome) {
+        int meta = rand.nextInt(6) + 1;
+        if (rand.nextInt(3) != 0) {
+            return meta;
+        }
+        Aspect tag = BiomeHandler.getRandomBiomeTag(world.getBiome(new BlockPos(x, 0, z)), rand);
+        if (tag == null) {
+            tag = BiomeHandler.getRandomBiomeTag(fallbackBiome, rand);
+        }
+        if (tag == null) {
+            return rand.nextInt(6) + 1;
+        }
+        if (tag == Aspect.AIR) return 1;
+        if (tag == Aspect.FIRE) return 2;
+        if (tag == Aspect.WATER) return 3;
+        if (tag == Aspect.EARTH) return 4;
+        if (tag == Aspect.ORDER) return 5;
+        if (tag == Aspect.ENTROPY) return 6;
+        return meta;
     }
 
     public static void generateGreatwood(World world, Random rand, int x, int z, Biome biome) {
@@ -412,8 +462,14 @@ public class ThaumcraftWorldGenerator implements IWorldGenerator {
         int bx = x + rand.nextInt(16);
         int bz = z + rand.nextInt(16);
         BlockPos pos = world.getHeight(new BlockPos(bx, 0, bz));
+        generateFlowers(world, rand, pos.getX(), pos.getY(), pos.getZ(), flowerType);
+    }
+
+    public static boolean generateFlowers(World world, Random rand, int x, int y, int z, int flowerType) {
+        BlockPos pos = new BlockPos(x, y, z);
         new WorldGenCustomFlowers(ConfigBlocks.blockCustomPlant.getStateFromMeta(flowerType))
                 .generate(world, rand, pos);
+        return true;
     }
 
     private boolean generateStructures(World world, Random rand, int x, int z, Biome biome, boolean auraGen) {
