@@ -931,3 +931,26 @@ Validation evidence for this checkpoint:
 - `./scripts/dev.sh smoke-client` was not rerun for this checkpoint because the same local LWJGL display blocker was already reproduced immediately before this checkpoint (`ArrayIndexOutOfBoundsException` in `LinuxDisplay.getAvailableDisplayModes`). Client model override validation remains environment-blocked.
 
 GAP-11 is advanced but not closed. Remaining utility/relic no-op or simplified targets from RECON include `ItemBucketPure`, `ItemResonator`, `ItemBathSalts`, `ItemResearchNotes`, `ItemEldritchObject`, `ItemEssence`, `ItemManaBean`, `ItemSanitySoap`, and the remaining relic/tool/bauble validation work listed above.
+
+### 8.13 2026-05-14 RECON and wand/focus parity checkpoint
+
+Fresh RECON focused on GAP-1/2/3 compared the current wand/focus classes against decompiled `Thaumcraft-1.7.10-4.2.3.5` reference classes for `ItemWandCasting`, `WandManager`, `ItemFocusShock`, `ItemFocusTrade`, `ItemFocusExcavation`, `ItemFocusPortableHole`, and `ItemFocusWarding`.
+
+Implemented in the current checkpoint:
+
+- Restored reference wand use-duration/action metadata: wand use now reports `Integer.MAX_VALUE` duration and bow use action instead of the previous 72000-tick/conditional action fallback: `src/main/java/thaumcraft/common/items/wands/ItemWandCasting.java:525-532`.
+- Matched Chain Lightning first-target damage: Shock now applies `6 + potency` to the first target when the chain upgrade is present and keeps `4 + potency` for non-chain hits: `src/main/java/thaumcraft/common/items/wands/foci/FocusShock.java:92-100`.
+- Restored Trade focus block-pick fallback and taint-material target rejection: sneak-pick falls back to a direct block stack when the helper cannot build one, and swap/architect paths reject `Config.taintMaterial` blocks: `src/main/java/thaumcraft/common/items/wands/foci/FocusTrade.java:61-68`, `src/main/java/thaumcraft/common/items/wands/foci/FocusTrade.java:123-130`.
+- Aligned Excavation harvest hooks with the reference: block-break events use the reference capability-derived game type, silk harvesting fires `ForgeEventFactory.fireBlockHarvesting`, and XP uses `block.getExpDrop(..., fortune)` instead of the break-event return value: `src/main/java/thaumcraft/common/items/wands/foci/FocusExcavation.java:149-181`.
+- Restored Portable Hole zero-distance activation attempt: the focus now consumes the scaled zero-distance cost and attempts `createHole(..., distance + 1, ...)` even when the distance scan returns `0`, matching the reference flow while server mutation remains authoritative: `src/main/java/thaumcraft/common/items/wands/foci/FocusPortableHole.java:96-110`.
+- Fixed Warding architect overlay axis parity for full-volume mode: `aread == 0` now exposes every axis, matching reference `showAxis`: `src/main/java/thaumcraft/common/items/wands/foci/FocusWarding.java:217-240`.
+
+Validation evidence for this checkpoint:
+
+- `./scripts/dev.sh compileJava` passed after the wand/focus changes.
+- `./scripts/dev.sh build` passed.
+- `./scripts/dev.sh check-jar` passed with `Jar check PASSED: no MCP-named Minecraft field/method references found in /home/stfu/ai/dont/thaumcraft/build/libs/Thaumcraft-1.0.0-universal.jar`.
+- `./scripts/dev.sh smoke-server` passed and reached `Done (` with no crash markers in `run/smoke-server.log`.
+- `./scripts/dev.sh smoke-client` was attempted because `DISPLAY=:0`, but failed before mod initialization with the known local LWJGL display failure: `java.lang.ExceptionInInitializerError` caused by `java.lang.ArrayIndexOutOfBoundsException: 0` in `org.lwjgl.opengl.LinuxDisplay.getAvailableDisplayModes`. This remains an environment/display blocker, not wand/focus parity evidence.
+
+GAP-1/2/3 are advanced but not closed. Remaining RECON findings include missing original wand trigger registrations/`IWandTriggerManager` transformation behavior in the current post-init recipe path, direct warded-door/warded-device removal paths that depend on unavailable current block parity, remaining Portable Hole/Warding client visual renderer parity deferred to Phase 8, 1.12-adapted `TileHole`/`TileWarded` stored-block NBT keys requiring an explicit compatibility decision before changing canonical writes, and missing in-world manual scenarios for focus costs, invalid targets, entity spawns, block mutation and focus cycling.

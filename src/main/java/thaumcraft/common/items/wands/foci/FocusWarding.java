@@ -216,21 +216,24 @@ public class FocusWarding extends ItemFocusBasic implements IArchitect {
     @Override
     public boolean showAxis(ItemStack stack, World world, EntityPlayer player, int side, IArchitect.EnumAxis axis) {
         int dim = WandManager.getAreaDim(stack);
+        if (dim == 0) {
+            return true;
+        }
         switch (side) {
             case 0:
             case 1:
-                return axis == IArchitect.EnumAxis.X && (dim == 0 || dim == 1)
-                        || axis == IArchitect.EnumAxis.Z && (dim == 0 || dim == 2)
+                return axis == IArchitect.EnumAxis.X && dim == 1
+                        || axis == IArchitect.EnumAxis.Z && dim == 2
                         || axis == IArchitect.EnumAxis.Y && dim == 3;
             case 2:
             case 3:
-                return axis == IArchitect.EnumAxis.Y && (dim == 0 || dim == 1)
-                        || axis == IArchitect.EnumAxis.X && (dim == 0 || dim == 2)
+                return axis == IArchitect.EnumAxis.Y && dim == 1
+                        || axis == IArchitect.EnumAxis.X && dim == 2
                         || axis == IArchitect.EnumAxis.Z && dim == 3;
             case 4:
             case 5:
-                return axis == IArchitect.EnumAxis.Y && (dim == 0 || dim == 1)
-                        || axis == IArchitect.EnumAxis.Z && (dim == 0 || dim == 2)
+                return axis == IArchitect.EnumAxis.Y && dim == 1
+                        || axis == IArchitect.EnumAxis.Z && dim == 2
                         || axis == IArchitect.EnumAxis.X && dim == 3;
             default:
                 return false;

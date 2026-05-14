@@ -94,8 +94,9 @@ public class FocusShock extends ItemFocusBasic {
             Entity target = this.getPointedEntity(player.world, player, 20.0D);
             player.playSound(TCSounds.SHOCK, 0.25F, 1.0F);
             if (target instanceof EntityLivingBase && this.canDamageTarget(player, target)) {
-                target.attackEntityFrom(DamageSource.causePlayerDamage(player), 4.0F + potency);
-                int chains = this.getUpgradeLevel(focusStack, chainlightning) * 2 + this.getUpgradeLevel(focusStack, FocusUpgradeType.enlarge) * 2;
+                int chainUpgrade = this.getUpgradeLevel(focusStack, chainlightning);
+                target.attackEntityFrom(DamageSource.causePlayerDamage(player), (chainUpgrade > 0 ? 6.0F : 4.0F) + potency);
+                int chains = chainUpgrade * 2 + this.getUpgradeLevel(focusStack, FocusUpgradeType.enlarge) * 2;
                 this.chainLightning(player, (EntityLivingBase) target, potency, chains);
             }
         }

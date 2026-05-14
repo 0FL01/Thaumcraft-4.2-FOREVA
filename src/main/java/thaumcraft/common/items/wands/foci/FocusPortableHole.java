@@ -97,7 +97,7 @@ public class FocusPortableHole extends ItemFocusBasic {
         ItemStack focusStack = wand.getFocusItem(wandStack);
         int distance = getTunnelDistance(world, start, movingobjectposition.sideHit,
                 33 + this.getUpgradeLevel(focusStack, FocusUpgradeType.enlarge) * 8);
-        if (distance > 0 && !world.isRemote) {
+        if (!world.isRemote) {
             AspectList cost = scaleCost(this.getVisCost(focusStack), distance);
             if (wand.consumeAllVis(wandStack, player, cost, true, false)) {
                 int extend = this.getUpgradeLevel(focusStack, FocusUpgradeType.extend);

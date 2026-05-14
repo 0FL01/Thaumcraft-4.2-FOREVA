@@ -18,6 +18,7 @@ import thaumcraft.api.aspects.Aspect;
 import thaumcraft.api.aspects.AspectList;
 import thaumcraft.api.wands.FocusUpgradeType;
 import thaumcraft.api.wands.ItemFocusBasic;
+import thaumcraft.common.config.Config;
 import thaumcraft.common.items.wands.ItemWandCasting;
 import thaumcraft.common.items.wands.WandManager;
 import thaumcraft.common.lib.events.ServerTickEventsFML;
@@ -60,6 +61,9 @@ public class FocusTrade extends ItemFocusBasic implements IArchitect {
         if (player.isSneaking()) {
             if (!world.isRemote && world.getTileEntity(pos) == null) {
                 ItemStack picked = BlockUtils.createStackedBlock(block, meta);
+                if (picked.isEmpty() && block != Blocks.AIR && !block.isAir(state, world, pos)) {
+                    picked = new ItemStack(block, 1, meta);
+                }
                 if (!picked.isEmpty()) {
                     this.storePickedBlock(wandStack, picked);
                 }
@@ -121,6 +125,7 @@ public class FocusTrade extends ItemFocusBasic implements IArchitect {
         Block block = state.getBlock();
         return block != Blocks.AIR
                 && !block.isAir(state, world, pos)
+                && state.getMaterial() != Config.taintMaterial
                 && block.getBlockHardness(state, world, pos) >= 0.0F
                 && world.isBlockModifiable(player, pos);
     }

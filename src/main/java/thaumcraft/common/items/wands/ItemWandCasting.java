@@ -524,19 +524,12 @@ public class ItemWandCasting extends Item implements IArchitect {
 
     @Override
     public int getMaxItemUseDuration(ItemStack stack) {
-        return 72000;
+        return Integer.MAX_VALUE;
     }
 
     @Override
     public EnumAction getItemUseAction(ItemStack stack) {
-        ItemFocusBasic focus = getFocus(stack);
-        if (focus != null) {
-            ItemFocusBasic.WandFocusAnimation anim = focus.getAnimation(getFocusItem(stack));
-            if (anim == ItemFocusBasic.WandFocusAnimation.CHARGE) {
-                return EnumAction.BOW;
-            }
-        }
-        return EnumAction.NONE;
+        return EnumAction.BOW;
     }
 
     @Override

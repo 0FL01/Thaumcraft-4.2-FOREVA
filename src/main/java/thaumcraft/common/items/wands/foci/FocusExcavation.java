@@ -14,11 +14,14 @@ import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
+import net.minecraft.util.NonNullList;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
+import net.minecraft.world.GameType;
 import net.minecraft.world.World;
 import net.minecraftforge.common.ForgeHooks;
+import net.minecraftforge.event.ForgeEventFactory;
 import thaumcraft.api.aspects.Aspect;
 import thaumcraft.api.aspects.AspectList;
 import thaumcraft.api.wands.FocusUpgradeType;
@@ -145,7 +148,7 @@ public class FocusExcavation extends ItemFocusBasic {
 
     private boolean excavate(World world, ItemStack stack, EntityPlayer player, Block block, IBlockState state, int meta, BlockPos pos) {
         if (!(player instanceof EntityPlayerMP)) return false;
-        int xp = ForgeHooks.onBlockBreakEvent(world, ((EntityPlayerMP) player).interactionManager.getGameType(), (EntityPlayerMP) player, pos);
+        int xp = ForgeHooks.onBlockBreakEvent(world, getReferenceBreakGameType(player), (EntityPlayerMP) player, pos);
         if (xp < 0) return false;
 
         ItemWandCasting wand = (ItemWandCasting) stack.getItem();
@@ -153,17 +156,29 @@ public class FocusExcavation extends ItemFocusBasic {
         int fortune = this.getUpgradeLevel(focusStack, FocusUpgradeType.treasure);
         boolean silk = this.isUpgradedWith(focusStack, FocusUpgradeType.silktouch);
         if (silk && block.canSilkHarvest(world, pos, state, player)) {
+            NonNullList<ItemStack> items = NonNullList.create();
             ItemStack itemstack = BlockUtils.createStackedBlock(block, meta);
             if (!itemstack.isEmpty()) {
-                BlockUtils.dropBlockAsItem(world, pos.getX(), pos.getY(), pos.getZ(), itemstack, block);
+                items.add(itemstack);
+            }
+            ForgeEventFactory.fireBlockHarvesting(items, world, pos, state, 0, 1.0F, true, player);
+            for (ItemStack item : items) {
+                BlockUtils.dropBlockAsItem(world, pos.getX(), pos.getY(), pos.getZ(), item, block);
             }
         } else {
             BlockUtils.dropBlockAsItemWithChance(world, block, pos.getX(), pos.getY(), pos.getZ(), meta, 1.0F, fortune, player);
-            block.dropXpOnBlockBreak(world, pos, xp);
+            block.dropXpOnBlockBreak(world, pos, block.getExpDrop(state, world, pos, fortune));
         }
         world.setBlockToAir(pos);
         world.playEvent(2001, pos, Block.getStateId(state));
         return true;
+    }
+
+    private static GameType getReferenceBreakGameType(EntityPlayer player) {
+        if (player.capabilities.disableDamage) {
+            return player.capabilities.isCreativeMode ? GameType.CREATIVE : GameType.SURVIVAL;
+        }
+        return GameType.ADVENTURE;
     }
 
     private boolean breakNeighbour(EntityPlayer player, BlockPos pos, Block block, int meta, ItemStack stack) {
