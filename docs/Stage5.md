@@ -801,3 +801,32 @@ Validation evidence for this checkpoint:
 - `./scripts/dev.sh smoke-client` was attempted because `DISPLAY` was set, but failed before mod initialization with LWJGL display mode discovery: `java.lang.ArrayIndexOutOfBoundsException: 0` in `org.lwjgl.opengl.LinuxDisplay.getAvailableDisplayModes`. Treat this as an environment/display failure, not Stage 5 parity evidence.
 
 Stage 5 remains open after this checkpoint. Remaining high-risk work includes Death Bucket fluid placement because the current port has no `ConfigBlocks.blockFluidDeath`, Hand Mirror cross-dimension transport, full Hover client toggle/sound/movement parity, static item resources/models/lang, recipe registration ownership, and manual in-world scenario validation for every focus, bauble, relic, utility item and armor/tool behavior.
+
+### 8.7 2026-05-14 RECON and wand/pouch compatibility checkpoint
+
+Fresh RECON after merging the Stage 5 work into `master` showed that several GAP descriptions above are stale relative to current source. Important current facts:
+
+- Focus Pouch storage is no longer absent: it has 18-slot `Inventory`/`Slot` NBT, server container slots and wand focus cycling through inventory/Baubles pouches. Remaining work was client GUI routing and protecting the pouch slot while its own GUI is open.
+- Wand vis NBT is no longer `vis_`-prefixed: current writes use direct aspect tags via empty `TAG_VIS_PREFIX`.
+- Hand Mirror and Death Bucket are implemented at common/server entry-point level, but still need in-world/manual scenario validation before closing their GAP rows.
+- `ClientProxy` was accidentally routing many unrelated GUI ids to `GuiHandMirror`; this was a live client/container regression, not Phase 8 polish.
+
+Implemented in the current checkpoint:
+
+- Added a dedicated `GuiFocusPouch` for GUI id `5`: `src/main/java/thaumcraft/client/gui/GuiFocusPouch.java:9-36`.
+- Corrected client GUI routing so only Focus Pouch and Hand Mirror return their own GUIs; unrelated unimplemented GUI ids now return `null` instead of `GuiHandMirror`: `src/main/java/thaumcraft/client/ClientProxy.java:50-70`.
+- Added Focus Pouch protected-slot handling matching the reference container intent: the source pouch player slot is locked, shift-click from it is rejected, and direct slot clicks are rejected: `src/main/java/thaumcraft/common/container/ContainerFocusPouch.java:20-32`, `src/main/java/thaumcraft/common/container/ContainerFocusPouch.java:78-101`, `src/main/java/thaumcraft/common/container/ContainerFocusPouch.java:104-119`.
+- Restored wand vis helper surface used by reference/addon-facing common code: `getAllVis`, `getAspectsWithRoom`, `storeAllVis`, `storeVis`, and single-aspect `consumeVis`: `src/main/java/thaumcraft/common/items/wands/ItemWandCasting.java:124-153`, `src/main/java/thaumcraft/common/items/wands/ItemWandCasting.java:249-257`.
+- Matched reference non-primal vis-add behavior by returning `0` for non-primal aspects in `addVis`/`addRealVis`: `src/main/java/thaumcraft/common/items/wands/ItemWandCasting.java:160-181`.
+- Made `setFocus` null-safe and removed the current sneaking no-op that suppressed focus right-click activation unlike the reference flow: `src/main/java/thaumcraft/common/items/wands/ItemWandCasting.java:277-285`, `src/main/java/thaumcraft/common/items/wands/ItemWandCasting.java:478-487`.
+
+Validation evidence for this checkpoint:
+
+- `./scripts/dev.sh compileJava` passed after Focus Pouch GUI/container changes.
+- `./scripts/dev.sh compileJava` passed again after wand helper changes.
+- `./scripts/dev.sh build` passed.
+- `./scripts/dev.sh check-jar` passed.
+- `./scripts/dev.sh smoke-server` passed and reached `Done (` with no crash markers.
+- `./scripts/dev.sh smoke-client` was attempted because `DISPLAY=:0`, but failed before mod initialization with the same environment/display failure as the prior checkpoint: `java.lang.ArrayIndexOutOfBoundsException: 0` in `org.lwjgl.opengl.LinuxDisplay.getAvailableDisplayModes`. This is not Stage 5 parity evidence.
+
+Stage 5 remains open after this checkpoint. Next RECON-backed implementation targets are: Hover Harness common container/state authority, Stage 5 static item resources/models/lang, and remaining utility/relic simplifications (`ItemKey`, Thaumometer timed scan, Research Notes, Mana Bean, Resonator, Compass Stone).

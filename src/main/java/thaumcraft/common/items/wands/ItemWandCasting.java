@@ -121,13 +121,44 @@ public class ItemWandCasting extends Item implements IArchitect {
         ensureTag(stack).setInteger(TAG_VIS_PREFIX + aspect.getTag(), Math.max(0, Math.min(amount, getMaxVis(stack))));
     }
 
+    public AspectList getAllVis(ItemStack stack) {
+        AspectList out = new AspectList();
+        for (Aspect aspect : Aspect.getPrimalAspects()) {
+            out.merge(aspect, getVis(stack, aspect));
+        }
+        return out;
+    }
+
+    public AspectList getAspectsWithRoom(ItemStack stack) {
+        AspectList out = new AspectList();
+        AspectList current = this.getAllVis(stack);
+        for (Aspect aspect : current.getAspects()) {
+            if (current.getAmount(aspect) < getMaxVis(stack)) {
+                out.add(aspect, 1);
+            }
+        }
+        return out;
+    }
+
+    public void storeAllVis(ItemStack stack, AspectList in) {
+        if (stack == null || stack.isEmpty() || in == null) return;
+        for (Aspect aspect : in.getAspects()) {
+            this.storeVis(stack, aspect, in.getAmount(aspect));
+        }
+    }
+
+    public void storeVis(ItemStack stack, Aspect aspect, int amount) {
+        if (stack == null || stack.isEmpty() || aspect == null) return;
+        ensureTag(stack).setInteger(TAG_VIS_PREFIX + aspect.getTag(), amount);
+    }
+
     public static void addVis(ItemStack stack, Aspect aspect, int amount) {
         if (stack == null || stack.isEmpty() || aspect == null || amount == 0) return;
         addRealVis(stack, aspect, amount * 100);
     }
 
     public static int addVis(ItemStack stack, Aspect aspect, int amount, boolean doit) {
-        if (stack == null || stack.isEmpty() || aspect == null || !aspect.isPrimal()) return amount;
+        if (stack == null || stack.isEmpty() || aspect == null || !aspect.isPrimal()) return 0;
         int storeAmount = getVis(stack, aspect) + amount * 100;
         int leftover = Math.max(storeAmount - getMaxVis(stack), 0);
         if (doit) {
@@ -141,7 +172,7 @@ public class ItemWandCasting extends Item implements IArchitect {
     }
 
     public static int addRealVis(ItemStack stack, Aspect aspect, int amount, boolean doit) {
-        if (stack == null || stack.isEmpty() || aspect == null || !aspect.isPrimal()) return amount;
+        if (stack == null || stack.isEmpty() || aspect == null || !aspect.isPrimal()) return 0;
         int storeAmount = getVis(stack, aspect) + amount;
         int leftover = Math.max(storeAmount - getMaxVis(stack), 0);
         if (doit) {
@@ -215,6 +246,16 @@ public class ItemWandCasting extends Item implements IArchitect {
         return consumeAllVis(stack, player, realCost, doit, true);
     }
 
+    public boolean consumeVis(ItemStack stack, EntityPlayer player, Aspect aspect, int amount, boolean crafting) {
+        if (stack == null || stack.isEmpty() || aspect == null) return false;
+        int modifiedAmount = (int)((float) amount * getConsumptionModifier(stack, player, aspect, crafting));
+        if (getVis(stack, aspect) >= modifiedAmount) {
+            this.storeVis(stack, aspect, getVis(stack, aspect) - modifiedAmount);
+            return true;
+        }
+        return false;
+    }
+
     // ---- Focus ----
 
     public ItemStack getFocusItem(ItemStack stack) {
@@ -235,7 +276,7 @@ public class ItemWandCasting extends Item implements IArchitect {
 
     public void setFocus(ItemStack stack, ItemStack focus) {
         NBTTagCompound tag = ensureTag(stack);
-        if (!focus.isEmpty()) {
+        if (focus != null && !focus.isEmpty()) {
             NBTTagCompound focusTag = new NBTTagCompound();
             focus.writeToNBT(focusTag);
             tag.setTag(TAG_FOCUS, focusTag);
@@ -436,11 +477,6 @@ public class ItemWandCasting extends Item implements IArchitect {
 
         ItemFocusBasic focus = getFocus(stack);
         if (focus != null) {
-            if (player.isSneaking()) {
-                // Open focal manipulator if sneaking
-                return new ActionResult<>(EnumActionResult.SUCCESS, stack);
-            }
-
             if (!WandManager.isOnCooldown(player)) {
                 WandManager.setCooldown(player, focus.getActivationCooldown(getFocusItem(stack)));
                 ItemStack result = focus.onFocusRightClick(stack, world, player, mop);

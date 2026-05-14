@@ -2,6 +2,7 @@ package thaumcraft.common.container;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
+import net.minecraft.inventory.ClickType;
 import net.minecraft.inventory.Container;
 import net.minecraft.inventory.InventoryBasic;
 import net.minecraft.inventory.Slot;
@@ -16,6 +17,8 @@ public class ContainerFocusPouch extends Container {
     private final ItemStack pouchStack;
     private final ItemFocusPouch pouchItem;
     private final InventoryFocusPouch pouchInventory;
+    private final int pouchPlayerSlot;
+    private final int blockedContainerSlot;
 
     public ContainerFocusPouch() {
         this(null, null, 0, 0, 0);
@@ -24,7 +27,9 @@ public class ContainerFocusPouch extends Container {
     public ContainerFocusPouch(InventoryPlayer playerInventory, World world, int x, int y, int z) {
         this.player = playerInventory != null ? playerInventory.player : null;
         this.worldObj = world;
-        this.pouchStack = findPouch(this.player);
+        this.pouchPlayerSlot = findPouchSlot(playerInventory);
+        this.blockedContainerSlot = toContainerSlot(this.pouchPlayerSlot);
+        this.pouchStack = findPouch(playerInventory, this.pouchPlayerSlot);
         this.pouchItem = !this.pouchStack.isEmpty() && this.pouchStack.getItem() instanceof ItemFocusPouch
                 ? (ItemFocusPouch) this.pouchStack.getItem() : null;
         this.pouchInventory = new InventoryFocusPouch();
@@ -44,11 +49,11 @@ public class ContainerFocusPouch extends Container {
         if (playerInventory != null) {
             for (int row = 0; row < 3; row++) {
                 for (int col = 0; col < 9; col++) {
-                    this.addSlotToContainer(new Slot(playerInventory, col + row * 9 + 9, 8 + col * 18, 84 + row * 18));
+                    this.addPlayerSlot(playerInventory, col + row * 9 + 9, 8 + col * 18, 84 + row * 18);
                 }
             }
             for (int col = 0; col < 9; col++) {
-                this.addSlotToContainer(new Slot(playerInventory, col, 8 + col * 18, 142));
+                this.addPlayerSlot(playerInventory, col, 8 + col * 18, 142);
             }
         }
     }
@@ -72,6 +77,7 @@ public class ContainerFocusPouch extends Container {
 
     @Override
     public ItemStack transferStackInSlot(EntityPlayer playerIn, int index) {
+        if (index == this.blockedContainerSlot) return ItemStack.EMPTY;
         ItemStack copy = ItemStack.EMPTY;
         Slot slot = index >= 0 && index < this.inventorySlots.size() ? this.inventorySlots.get(index) : null;
         if (slot != null && slot.getHasStack()) {
@@ -89,15 +95,60 @@ public class ContainerFocusPouch extends Container {
         return copy;
     }
 
-    private static ItemStack findPouch(EntityPlayer player) {
-        if (player == null) return ItemStack.EMPTY;
-        ItemStack main = player.getHeldItemMainhand();
+    @Override
+    public ItemStack slotClick(int slotId, int dragType, ClickType clickTypeIn, EntityPlayer player) {
+        if (slotId == this.blockedContainerSlot) return ItemStack.EMPTY;
+        return super.slotClick(slotId, dragType, clickTypeIn, player);
+    }
+
+    private void addPlayerSlot(InventoryPlayer inventory, int index, int x, int y) {
+        if (index == this.pouchPlayerSlot) {
+            this.addSlotToContainer(new Slot(inventory, index, x, y) {
+                @Override
+                public boolean canTakeStack(EntityPlayer playerIn) {
+                    return false;
+                }
+
+                @Override
+                public boolean isItemValid(ItemStack stack) {
+                    return false;
+                }
+            });
+        } else {
+            this.addSlotToContainer(new Slot(inventory, index, x, y));
+        }
+    }
+
+    private static ItemStack findPouch(InventoryPlayer inventory, int slot) {
+        if (inventory == null) return ItemStack.EMPTY;
+        ItemStack main = inventory.player.getHeldItemMainhand();
         if (!main.isEmpty() && main.getItem() instanceof ItemFocusPouch) return main;
-        ItemStack off = player.getHeldItemOffhand();
+        ItemStack off = inventory.player.getHeldItemOffhand();
         if (!off.isEmpty() && off.getItem() instanceof ItemFocusPouch) return off;
-        ItemStack current = player.inventory.getCurrentItem();
+        if (slot >= 0 && slot < inventory.mainInventory.size()) {
+            ItemStack stack = inventory.mainInventory.get(slot);
+            if (!stack.isEmpty() && stack.getItem() instanceof ItemFocusPouch) return stack;
+        }
+        ItemStack current = inventory.getCurrentItem();
         if (!current.isEmpty() && current.getItem() instanceof ItemFocusPouch) return current;
         return ItemStack.EMPTY;
+    }
+
+    private static int findPouchSlot(InventoryPlayer inventory) {
+        if (inventory == null) return -1;
+        ItemStack held = inventory.player.getHeldItemMainhand();
+        if (!held.isEmpty() && held.getItem() instanceof ItemFocusPouch) return inventory.currentItem;
+        for (int i = 0; i < inventory.mainInventory.size(); i++) {
+            ItemStack stack = inventory.mainInventory.get(i);
+            if (!stack.isEmpty() && stack.getItem() instanceof ItemFocusPouch) return i;
+        }
+        return -1;
+    }
+
+    private static int toContainerSlot(int playerSlot) {
+        if (playerSlot >= 0 && playerSlot < 9) return 45 + playerSlot;
+        if (playerSlot >= 9 && playerSlot < 36) return 18 + (playerSlot - 9);
+        return -1;
     }
 
     private static final class InventoryFocusPouch extends InventoryBasic {
