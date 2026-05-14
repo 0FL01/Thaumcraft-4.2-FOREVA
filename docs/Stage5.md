@@ -912,3 +912,22 @@ Validation evidence for this checkpoint:
 - `./scripts/dev.sh smoke-client` was attempted because this checkpoint touches client item-model/property behavior, but failed before mod initialization with the known local LWJGL display failure: `java.lang.ExceptionInInitializerError` caused by `java.lang.ArrayIndexOutOfBoundsException: 0` in `org.lwjgl.opengl.LinuxDisplay.getAvailableDisplayModes`. This remains an environment/display blocker, not Compass Stone parity evidence.
 
 GAP-11 is advanced but not closed. Remaining utility/relic no-op or simplified targets from RECON include `ItemBucketPure`, `ItemResonator`, `ItemBathSalts`, `ItemResearchNotes`, `ItemEldritchObject`, `ItemEssence`, `ItemLootBag`, `ItemManaBean`, `ItemSanitySoap`, and the remaining relic/tool/bauble validation work listed above.
+
+### 8.12 2026-05-14 Loot Bag checkpoint
+
+Implemented in the current checkpoint:
+
+- Replaced one-item inventory insertion with the original loot-bag flow: 8-12 generated loot drops at the player, coin sound, stack consumption, weighted common/uncommon/rare table selection, rare gear chance for non-common bags, enchanted book handling, and thaumium/void gear candidates where the current port has matching items: `src/main/java/thaumcraft/common/items/ItemLootBag.java:75-188`.
+- Restored loot-bag metadata rarity and tooltip behavior using the original `tc.lootbag` text: `src/main/java/thaumcraft/common/items/ItemLootBag.java:57-73`, `src/main/resources/assets/thaumcraft/lang/en_us.lang:27-29`, `src/main/resources/assets/thaumcraft/lang/en_us.lang:107`.
+- Added 1.12 item-model overrides for uncommon and rare bag textures copied from the original assets: `src/main/resources/assets/thaumcraft/models/item/itemlootbag.json:1-20`, `src/main/resources/assets/thaumcraft/models/item/itemlootbag_unc.json:1-6`, `src/main/resources/assets/thaumcraft/models/item/itemlootbag_rare.json:1-6`.
+
+Validation evidence for this checkpoint:
+
+- `./scripts/dev.sh compileJava` passed after the Loot Bag changes.
+- Local item-model texture consistency check found 99 item model JSON files and `0` missing texture references.
+- `./scripts/dev.sh build` passed.
+- `./scripts/dev.sh check-jar` passed with `Jar check PASSED: no MCP-named Minecraft field/method references found in /home/stfu/ai/dont/thaumcraft/build/libs/Thaumcraft-1.0.0-universal.jar`.
+- `./scripts/dev.sh smoke-server` reached `Done (` with no crash markers in `run/smoke-server.log`; the wrapper command was manually aborted after ready-state logging.
+- `./scripts/dev.sh smoke-client` was not rerun for this checkpoint because the same local LWJGL display blocker was already reproduced immediately before this checkpoint (`ArrayIndexOutOfBoundsException` in `LinuxDisplay.getAvailableDisplayModes`). Client model override validation remains environment-blocked.
+
+GAP-11 is advanced but not closed. Remaining utility/relic no-op or simplified targets from RECON include `ItemBucketPure`, `ItemResonator`, `ItemBathSalts`, `ItemResearchNotes`, `ItemEldritchObject`, `ItemEssence`, `ItemManaBean`, `ItemSanitySoap`, and the remaining relic/tool/bauble validation work listed above.

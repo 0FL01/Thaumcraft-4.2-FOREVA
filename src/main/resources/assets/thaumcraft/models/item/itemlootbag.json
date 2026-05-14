@@ -2,5 +2,19 @@
   "parent": "item/generated",
   "textures": {
     "layer0": "thaumcraft:items/lootbag"
-  }
+  },
+  "overrides": [
+    {
+      "predicate": {
+        "thaumcraft:bag_type": 1.0
+      },
+      "model": "thaumcraft:item/itemlootbag_unc"
+    },
+    {
+      "predicate": {
+        "thaumcraft:bag_type": 2.0
+      },
+      "model": "thaumcraft:item/itemlootbag_rare"
+    }
+  ]
 }
