@@ -17,6 +17,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.NonNullList;
+import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.Explosion;
@@ -24,7 +25,9 @@ import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import thaumcraft.common.Thaumcraft;
 import thaumcraft.common.config.ConfigItems;
+import thaumcraft.common.items.ItemEldritchObject;
 import thaumcraft.common.items.ItemResource;
+import thaumcraft.common.lib.TCSounds;
 import thaumcraft.common.tiles.TileEldritchAltar;
 import thaumcraft.common.tiles.TileEldritchCap;
 import thaumcraft.common.tiles.TileEldritchCrabSpawner;
@@ -194,6 +197,32 @@ public class BlockEldritch extends Block {
     @Override
     public boolean canCreatureSpawn(IBlockState state, IBlockAccess world, BlockPos pos, EntityLiving.SpawnPlacementType type) {
         return false;
+    }
+
+    @Override
+    public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, net.minecraft.entity.player.EntityPlayer player,
+                                    EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
+        if (this.getMetaFromState(state) == 8) {
+            ItemStack stack = player.getHeldItem(hand);
+            TileEntity tile = world.getTileEntity(pos);
+            if (!stack.isEmpty()
+                    && stack.getItem() instanceof ItemEldritchObject
+                    && stack.getItemDamage() == ItemEldritchObject.META_ELDRITCH_OBJECT_2
+                    && tile instanceof TileEldritchLock
+                    && ((TileEldritchLock) tile).count < 0) {
+                if (!world.isRemote) {
+                    ((TileEldritchLock) tile).count = 0;
+                    tile.markDirty();
+                    world.notifyBlockUpdate(pos, state, state, 3);
+                    if (!player.capabilities.isCreativeMode) {
+                        stack.shrink(1);
+                    }
+                    world.playSound(null, pos, TCSounds.RUNICSHIELDCHARGE, SoundCategory.BLOCKS, 1.0F, 1.0F);
+                }
+                return true;
+            }
+        }
+        return super.onBlockActivated(world, pos, state, player, hand, facing, hitX, hitY, hitZ);
     }
 
     @Override

@@ -404,12 +404,35 @@ Remaining limits:
 - Mound/barrow generation has not been observed in a fresh runtime world because smoke-server remains environment-blocked and user-driven client/manual scenarios are excluded.
 - GAP-1 still has `newGen`/regen chunk dirty-marker parity and broader runtime edge cases open.
 
+### 2026-05-14 — Stage 7 Eldritch lock boss trigger baseline
+
+Scope:
+
+- Restored `BlockEldritch` meta `8` activation with `ItemEldritchObject` meta `2`, including lock countdown start, block update, item consumption outside creative mode, and runic shield charge sound.
+- Changed `TileEldritchLock` to the same `TileThaumcraft` custom NBT/update path used by the original tile and persisted/synced `facing` plus `count`.
+- Restored the server-side 100-tick pump countdown, ice completion sound, nearby airy-door clearing, and lock removal.
+- Wired `BossMapData` load/create/update and the original `bossCount % 4` boss selection with the 25% extra-count chance.
+- Spawned Warden, Golem, Cultist Portal, and five Taintacle/TaintacleGiant boss patterns at reference-like room anchors, including Warden/Golem initial spawn hooks.
+
+Validation:
+
+- `./scripts/dev.sh compileJava` — initially passed after removing bad imports/redundant direct home calls, then passed again after switching the lock to `TileThaumcraft` and refining spawn anchors.
+- `./scripts/dev.sh build` — passed.
+- `./scripts/dev.sh check-jar` — failed before jar inspection because the wrapper's expected MCP mapping cache file is still absent at `.gradle_home/caches/minecraft/de/oceanlabs/mcp/mcp_stable/39/1.12.2/srgs/mcp-srg.srg`.
+- `./scripts/dev.sh smoke-server` — failed by timeout before ready state; log again stopped after `Calling tweak class net.minecraftforge.fml.common.launcher.FMLServerTweaker`, with only Log4j console appender initialization errors. `run/crash-reports/` does not exist, and the configured crash-marker scan found no matches. This matches the clean `da3f307` baseline reproduction recorded above.
+
+Remaining limits:
+
+- Full reference boss-room block mutation is not ported: obelisk/trap/urn/crate scatter, cultist-room decoration, taint/biome patching, and sparkle packets remain open.
+- Boss-room activation and save/reload progression have not been observed in a fresh runtime world because smoke-server remains environment-blocked and user-driven client/manual scenarios are excluded.
+- Stage 8 client lock sparkle/render parity remains open.
+
 ## Next Checkpoint Candidate
 
 After the portal trigger and ring bootstrap checkpoints, the next pre-Phase8 candidates are:
 
 - Remaining Stage 7 surface/worldgen behavior, especially `newGen`/regen marker behavior and runtime evidence.
-- Remaining Stage 7 Outer Lands room/tile behavior, especially `TileEldritchAltar` portal opening, lock/boss-room lifecycle, key/boss room traversal, and maze save/load race validation.
+- Remaining Stage 7 Outer Lands room/tile behavior, especially `TileEldritchAltar` portal opening, full boss-room block-template mutation, key/boss room traversal, and maze save/load race validation.
 - Stage 9 loot/content registration, because `Utils.generateLoot(...)` now has a shared reward path but the full reference loot pool distribution still depends on populated content tables.
 - Stage 6 server-side boss/manual scenario evidence remains excluded from user-driven validation, but static/reference parity blockers should continue to be reduced where possible.
 
