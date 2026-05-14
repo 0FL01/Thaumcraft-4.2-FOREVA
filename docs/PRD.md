@@ -53,6 +53,9 @@ Documentation:
 
 - `AGENTS.md`
 - `docs/PRD.md`
+- `docs/Stage1.md` through `docs/Stage7.md` — phase-specific gap analyses and closure plans.
+- `docs/Stage8-a.md` through `docs/Stage8-e.md` — split Stage 8 client GUI/render/FX gap analyses and closure plans.
+- `docs/Stage9-a.md` through `docs/Stage9-e.md` — split Stage 9 content/recipe/research gap analyses and closure plans.
 
 ## 5. Public contracts that must remain stable
 
@@ -205,6 +208,10 @@ Validation:
 
 ### Phase 1: API, bundled CCL, TrueType
 
+Detailed gap analysis:
+
+- [`docs/Stage1.md`](Stage1.md)
+
 Goal:
 
 - `thaumcraft.api.*`, `thaumcraft.codechicken.*`, and `truetyper.*` compile and preserve their intended role.
@@ -221,6 +228,10 @@ Risk:
 
 ### Phase 2: Forge lifecycle, registration, config, networking
 
+Detailed gap analysis:
+
+- [`docs/Stage2.md`](Stage2.md)
+
 Goal:
 
 - Mod lifecycle and registries are connected through Forge 1.12.2 APIs.
@@ -236,6 +247,10 @@ Risk:
 - Registry identity, packet ordering, GUI ids, and config keys are compatibility-sensitive.
 
 ### Phase 3: Core systems
+
+Detailed gap analysis:
+
+- [`docs/Stage3.md`](Stage3.md)
 
 Goal:
 
@@ -259,6 +274,10 @@ Acceptance:
 - Remaining gaps are fixed or explicitly deferred.
 
 ### Phase 4: Blocks and tile entities
+
+Detailed gap analysis:
+
+- [`docs/Stage4.md`](Stage4.md)
 
 Goal:
 
@@ -286,6 +305,10 @@ Acceptance:
 - GUI-dependent completion is deferred only where documented.
 
 ### Phase 5: Items, tools, armor, baubles, relics, wands, foci
+
+Detailed gap analysis:
+
+- [`docs/Stage5.md`](Stage5.md)
 
 Goal:
 
@@ -315,6 +338,10 @@ Acceptance:
 
 ### Phase 6: Entities, mobs, bosses, golems
 
+Detailed gap analysis:
+
+- [`docs/Stage6.md`](Stage6.md)
+
 Goal:
 
 - Entities, AI, projectiles, bosses, golems, drops, sounds, and special behaviors are ported.
@@ -338,6 +365,10 @@ Acceptance:
 - Client rendering remains separate.
 
 ### Phase 7: World generation and Outer Lands
+
+Detailed gap analysis:
+
+- [`docs/Stage7.md`](Stage7.md)
 
 Goal:
 
@@ -363,6 +394,14 @@ Acceptance:
 - Deferred cosmetic issues are explicitly documented.
 
 ### Phase 8: Client GUI, rendering, particles, shaders
+
+Detailed gap analyses:
+
+- [`docs/Stage8-a.md`](Stage8-a.md) — client bootstrap, side separation, proxy/event/keybind boundaries.
+- [`docs/Stage8-b.md`](Stage8-b.md) — client GUI screens and GUI resources.
+- [`docs/Stage8-c.md`](Stage8-c.md) — tile entity renderers, tile/block models, render resources.
+- [`docs/Stage8-d.md`](Stage8-d.md) — entity renderers, entity models, entity render resources.
+- [`docs/Stage8-e.md`](Stage8-e.md) — particles, beams, bolts, shaders, FX packets/resources.
 
 Goal:
 
@@ -393,6 +432,14 @@ Risk:
 - Runtime smoke testing is required.
 
 ### Phase 9: Recipes, research, and content registrations
+
+Detailed gap analyses:
+
+- [`docs/Stage9-a.md`](Stage9-a.md) — recipe registration foundation, vanilla/Forge recipes, smelting, aspect tags.
+- [`docs/Stage9-b.md`](Stage9-b.md) — arcane crafting recipes and Arcane Workbench content flow.
+- [`docs/Stage9-c.md`](Stage9-c.md) — infusion crafting/enchantment recipes and content flow.
+- [`docs/Stage9-d.md`](Stage9-d.md) — crucible/alchemy recipes and alchemical content flow.
+- [`docs/Stage9-e.md`](Stage9-e.md) — research categories/items/pages, Thaumonomicon content, unlock flows.
 
 Goal:
 

@@ -1,0 +1,461 @@
+# Stage 9-e — Gap-анализ и план закрытия
+
+## 1. Цель фазы
+
+Stage 9-e закрывает research content и Thaumonomicon progression для порта Thaumcraft 4.2.3.5 на Forge 1.12.2: категории исследований, research entries, страницы Thaumonomicon, ссылки страниц на рецепты/аспекты/сущности/блоки/предметы, и контентные условия открытия исследований.
+
+Фаза не включает глубокую реализацию рецептов и клиентского GUI, но должна проверить, что research keys, page references, category icons/backgrounds, lang keys и unlock-flow совместимы с оригинальным контентом. По PRD Stage 9 должен обеспечить progression parity, а риск прямо связан с совпадением registry names, research keys, recipe ids и GUI references (`docs/PRD.md:395`, `docs/PRD.md:399`, `docs/PRD.md:403`, `docs/PRD.md:408`, `docs/PRD.md:409`, `docs/PRD.md:410`, `docs/PRD.md:411`, `docs/PRD.md:415`, `docs/PRD.md:416`).
+
+## 2. Scope фазы
+
+- Research categories: `BASICS`, `THAUMATURGY`, `ALCHEMY`, `ARTIFICE`, `GOLEMANCY`, `ELDRITCH`.
+- Research items/entries: ключи, категории, координаты, complexity, aspect tags, parents, hidden parents, siblings, флаги `autoUnlock`, `stub`, `round`, `secondary`, `concealed`, `hidden`, `lost`, `special`, triggers.
+- Research pages: text pages, concealed text pages, image/aspect pages, vanilla crafting pages, arcane crafting pages, crucible pages, infusion pages, infusion-enchantment pages, compound/list pages, smelting pages.
+- Thaumonomicon content references: category icons/backgrounds, page text keys, image paths, recipe page objects, item/entity/aspect trigger IDs.
+- Lang keys: category names, research names, research subtitles, research page text, research-note status text.
+- Recipe/research unlock flow as references only: recipe keys and page references must align with arcane/infusion/crucible recipe registration, without deep-analyzing recipe implementation.
+- Research note/content flow required by original behavior: note creation, hex-grid note data, completion, discovery use, hidden research from knowledge fragments.
+- Scanning/discovery prerequisites only as research-content gates: hidden/lost research triggers from item/entity/aspect scans.
+- Thaumonomicon GUI references only as content data/IDs; client GUI rendering itself is a dependency outside Stage 9-e.
+
+## 3. Источники сравнения
+
+- `docs/PRD.md:395`-`docs/PRD.md:416` — Stage 9 scope and risks.
+- `src/main/java/thaumcraft/common/Thaumcraft.java:186`-`src/main/java/thaumcraft/common/Thaumcraft.java:191` — current lifecycle calls `ConfigRecipes.init()`, `ConfigAspects.init()`, `ConfigResearch.init()` in post-init.
+- `src/main/java/thaumcraft/common/config/ConfigResearch.java:1`-`src/main/java/thaumcraft/common/config/ConfigResearch.java:8` — current research registration placeholder.
+- `.stage9e-ref/thaumcraft/common/config/ConfigResearch.java:50`-`.stage9e-ref/thaumcraft/common/config/ConfigResearch.java:65` — original `ConfigResearch.init()` flow.
+- `.stage9e-ref/thaumcraft/common/config/ConfigResearch.java:67`-`.stage9e-ref/thaumcraft/common/config/ConfigResearch.java:73` — original category registration.
+- `.stage9e-ref/thaumcraft/common/config/ConfigResearch.java:76`-`.stage9e-ref/thaumcraft/common/config/ConfigResearch.java:417` — original research entries across all six categories.
+- `src/main/java/thaumcraft/api/research/ResearchCategories.java:12`-`src/main/java/thaumcraft/api/research/ResearchCategories.java:67` and `.stage9e-ref/thaumcraft/api/research/ResearchCategories.java:21`-`.stage9e-ref/thaumcraft/api/research/ResearchCategories.java:76` — category container API, structurally ported.
+- `src/main/java/thaumcraft/api/research/ResearchItem.java:13`-`src/main/java/thaumcraft/api/research/ResearchItem.java:256` and `.stage9e-ref/thaumcraft/api/research/ResearchItem.java:19`-`.stage9e-ref/thaumcraft/api/research/ResearchItem.java:256` — research item API, structurally ported with one current extra callback field.
+- `src/main/java/thaumcraft/api/research/ResearchPage.java:15`-`src/main/java/thaumcraft/api/research/ResearchPage.java:128` — current page model and page types.
+- `.stage9e-ref/thaumcraft/common/lib/research/ResearchManager.java:84`-`.stage9e-ref/thaumcraft/common/lib/research/ResearchManager.java:160` — original clue, note creation entry points, hidden research selection.
+- `.stage9e-ref/thaumcraft/common/lib/research/ResearchManager.java:268`-`.stage9e-ref/thaumcraft/common/lib/research/ResearchManager.java:387` — original research note NBT/hex-grid serialization.
+- `.stage9e-ref/thaumcraft/common/lib/research/ResearchManager.java:428`-`.stage9e-ref/thaumcraft/common/lib/research/ResearchManager.java:455` — original parent/hidden-parent requisite checks.
+- `.stage9e-ref/thaumcraft/common/lib/research/ResearchNoteData.java:10`-`.stage9e-ref/thaumcraft/common/lib/research/ResearchNoteData.java:21` — original note data model.
+- `.stage9e-ref/thaumcraft/common/items/ItemResearchNotes.java:87`-`.stage9e-ref/thaumcraft/common/items/ItemResearchNotes.java:119` — original note/discovery use behavior.
+- `.stage9e-ref/thaumcraft/common/lib/research/ScanManager.java:351`-`.stage9e-ref/thaumcraft/common/lib/research/ScanManager.java:418` — original scan completion clue unlock hook.
+- `thaumcraft_src/assets/thaumcraft/lang/en_US.lang:865`-`thaumcraft_src/assets/thaumcraft/lang/en_US.lang:870` — original category lang keys.
+- `thaumcraft_src/assets/thaumcraft/lang/en_US.lang:888`-`thaumcraft_src/assets/thaumcraft/lang/en_US.lang:1003` and following research section through the same file — original research name/text/page keys.
+- `src/main/resources/assets/thaumcraft/lang/en_us.lang:1`-`src/main/resources/assets/thaumcraft/lang/en_us.lang:118` — current lang file with item/static GUI keys only.
+- `thaumcraft_src/assets/thaumcraft/textures/gui/gui_researchback.png`, `thaumcraft_src/assets/thaumcraft/textures/gui/gui_researchbackeldritch.png`, `thaumcraft_src/assets/thaumcraft/textures/gui/gui_researchbook.png`, `thaumcraft_src/assets/thaumcraft/textures/gui/gui_researchbook_overlay.png` — original Thaumonomicon GUI/content backgrounds.
+- `thaumcraft_src/assets/thaumcraft/textures/misc/r_thaumaturgy.png`, `thaumcraft_src/assets/thaumcraft/textures/misc/r_crucible.png`, `thaumcraft_src/assets/thaumcraft/textures/misc/r_artifice.png`, `thaumcraft_src/assets/thaumcraft/textures/misc/r_golemancy.png`, `thaumcraft_src/assets/thaumcraft/textures/misc/r_eldritch.png` — original category icons.
+- `src/main/resources/assets/thaumcraft/textures/items/researchnotes.png`, `src/main/resources/assets/thaumcraft/textures/items/researchnotesoverlay.png`, `src/main/resources/assets/thaumcraft/textures/items/thaumonomicon.png`, `src/main/resources/assets/thaumcraft/textures/items/thaumonomiconcheat.png` — current research-adjacent item textures present.
+
+Lightweight analysis commands run:
+
+- `git status --short` — showed only pre-existing untracked Stage 8/9 docs before this document was created.
+- `jar tf Thaumcraft-1.7.10-4.2.3.5.jar | rg 'Research|ConfigResearch|Thaumonomicon|research|lang/en_US|textures/gui/gui_research|researchback'` — confirmed reference class/resource locations.
+- `cfr --silent true --outputdir .stage9e-ref Thaumcraft-1.7.10-4.2.3.5.jar ...` — temporary decompile for reference analysis.
+- `rg -o 'new ResearchItem\("[^"]+' .stage9e-ref/thaumcraft/common/config/ConfigResearch.java | sed 's/.*("//' | sort > .stage9e-ref/ref_research_keys.txt && wc -l .stage9e-ref/ref_research_keys.txt` — counted 201 original research entries.
+- `rg -o 'recipes\.get\("[^"]+' .stage9e-ref/thaumcraft/common/config/ConfigResearch.java | sed 's/.*("//' | sort -u | wc -l` — counted 276 unique original recipe references used by research pages.
+- `rg -o 'tc\.research_page\.[A-Za-z0-9_]+\.[0-9]+' .stage9e-ref/thaumcraft/common/config/ConfigResearch.java | sort -u | wc -l` — counted 302 explicit original research page text references from `ConfigResearch`.
+- `rg -c '^tc\.research_' thaumcraft_src/assets/thaumcraft/lang/en_US.lang` — counted 713 original research localization keys.
+
+## 4. Текущее состояние Stage 9-e
+
+Current implementation is not Stage 9-e complete.
+
+The port does call `ConfigResearch.init()` during post-init after recipe and aspect initialization (`src/main/java/thaumcraft/common/Thaumcraft.java:186`-`src/main/java/thaumcraft/common/Thaumcraft.java:191`), but `ConfigResearch.init()` contains only a placeholder comment and registers no categories, research entries, pages, recipe page references, triggers, or warp metadata (`src/main/java/thaumcraft/common/config/ConfigResearch.java:3`-`src/main/java/thaumcraft/common/config/ConfigResearch.java:7`). Therefore `ResearchCategories.researchCategories` remains empty unless addons register their own entries.
+
+The low-level API containers for categories, items, and pages are mostly present and structurally close to the 1.7.10 reference (`src/main/java/thaumcraft/api/research/ResearchCategories.java:12`-`src/main/java/thaumcraft/api/research/ResearchCategories.java:67`, `src/main/java/thaumcraft/api/research/ResearchItem.java:13`-`src/main/java/thaumcraft/api/research/ResearchItem.java:256`, `src/main/java/thaumcraft/api/research/ResearchPage.java:15`-`src/main/java/thaumcraft/api/research/ResearchPage.java:128`). This is an API baseline, not content parity.
+
+The current lang file has no `tc.research_*` or `tc.research_category.*` content; it only contains item/static GUI keys (`src/main/resources/assets/thaumcraft/lang/en_us.lang:1`-`src/main/resources/assets/thaumcraft/lang/en_us.lang:118`). The reference English lang has six category keys and 713 research keys, beginning at `thaumcraft_src/assets/thaumcraft/lang/en_US.lang:865`.
+
+The current resources include research-note and thaumonomicon item textures, but no Thaumonomicon/research backgrounds under `src/main/resources/assets/thaumcraft/textures/gui/` and no research category/icon/page images under `src/main/resources/assets/thaumcraft/textures/misc/`. The reference assets exist under `thaumcraft_src/assets/thaumcraft/textures/gui/` and `thaumcraft_src/assets/thaumcraft/textures/misc/`.
+
+The current research note flow is incomplete. `ItemResearchNotes` directly grants the `key` NBT value on right click and consumes the stack (`src/main/java/thaumcraft/common/items/ItemResearchNotes.java:43`-`src/main/java/thaumcraft/common/items/ItemResearchNotes.java:54`), while the reference distinguishes incomplete notes, completed discoveries, knowledge fragments, prerequisite errors, sounds, tooltips, rarity, colors, and hidden-research conversion (`.stage9e-ref/thaumcraft/common/items/ItemResearchNotes.java:87`-`.stage9e-ref/thaumcraft/common/items/ItemResearchNotes.java:174`). The reference `ResearchNoteData` class has no current port file.
+
+The current scan flow records scans and awards aspects, but does not call the original clue creation logic after a successful scan (`src/main/java/thaumcraft/common/lib/research/ScanManager.java:175`-`src/main/java/thaumcraft/common/lib/research/ScanManager.java:220`). The reference calls `ResearchManager.createClue(...)` after successful scan aspect awards (`.stage9e-ref/thaumcraft/common/lib/research/ScanManager.java:398`-`.stage9e-ref/thaumcraft/common/lib/research/ScanManager.java:414`).
+
+The current direct completion packet grants research without checking prerequisites or research cost, except for null research lookup and duplicate completion (`src/main/java/thaumcraft/common/lib/network/playerdata/PacketPlayerCompleteToServer.java:45`-`src/main/java/thaumcraft/common/lib/network/playerdata/PacketPlayerCompleteToServer.java:69`). Original primary research normally creates a note first and completed discoveries check prerequisites before granting (`.stage9e-ref/thaumcraft/common/lib/research/ResearchManager.java:120`-`.stage9e-ref/thaumcraft/common/lib/research/ResearchManager.java:134`, `.stage9e-ref/thaumcraft/common/items/ItemResearchNotes.java:87`-`.stage9e-ref/thaumcraft/common/items/ItemResearchNotes.java:104`).
+
+## 5. Gap list
+
+### GAP-1: Research categories and research entries are not registered
+
+**Статус:** отсутствует  
+**Критичность:** blocker
+
+**Текущая реализация:**
+- `src/main/java/thaumcraft/common/config/ConfigResearch.java:3`-`src/main/java/thaumcraft/common/config/ConfigResearch.java:7`
+- `src/main/java/thaumcraft/common/Thaumcraft.java:186`-`src/main/java/thaumcraft/common/Thaumcraft.java:191`
+
+**Референс:**
+- `.stage9e-ref/thaumcraft/common/config/ConfigResearch.java:50`-`.stage9e-ref/thaumcraft/common/config/ConfigResearch.java:65`
+- `.stage9e-ref/thaumcraft/common/config/ConfigResearch.java:67`-`.stage9e-ref/thaumcraft/common/config/ConfigResearch.java:73`
+- `.stage9e-ref/thaumcraft/common/config/ConfigResearch.java:76`-`.stage9e-ref/thaumcraft/common/config/ConfigResearch.java:417`
+
+**Что не совпадает:**
+
+Reference creates a default wood/iron wand icon, registers six categories, then registers 201 research entries across Thaumaturgy, Artifice, Alchemy, Golemancy, Basics, and Eldritch. Current `ConfigResearch.init()` registers nothing, so Thaumonomicon content and research progression have no data.
+
+Reference category IDs and assets:
+
+- `BASICS` icon `textures/items/thaumonomiconcheat.png`, background `textures/gui/gui_researchback.png`.
+- `THAUMATURGY` icon `textures/misc/r_thaumaturgy.png`, background `textures/gui/gui_researchback.png`.
+- `ALCHEMY` icon `textures/misc/r_crucible.png`, background `textures/gui/gui_researchback.png`.
+- `ARTIFICE` icon `textures/misc/r_artifice.png`, background `textures/gui/gui_researchback.png`.
+- `GOLEMANCY` icon `textures/misc/r_golemancy.png`, background `textures/gui/gui_researchback.png`.
+- `ELDRITCH` icon `textures/misc/r_eldritch.png`, background `textures/gui/gui_researchbackeldritch.png`.
+
+**Что нужно доделать:**
+
+Port `ConfigResearch` content registration from the 1.7.10 reference, adapted to 1.12.2 names/classes while preserving research keys, category IDs, coordinates, parents, flags, triggers, page order, recipe keys, page text keys, icons, and warp metadata.
+
+**Как доделать:**
+- Implement `ConfigResearch.wand` and `ConfigResearch.recipes` equivalents if not already provided elsewhere.
+- Implement `initCategories()` with the six original category keys and resource paths.
+- Implement `initBasicResearch()`, `initThaumaturgyResearch()`, `initAlchemyResearch()`, `initArtificeResearch()`, `initGolemancyResearch()`, `initEldritchResearch()`.
+- Preserve all original research keys such as `RESEARCH`, `ASPECTS`, `BASICTHAUMATURGY`, `INFUSION`, `DISTILESSENTIA`, `GOLEMCORE`, `VOIDMETAL`, `ELDRITCHMINOR`, and `OUTERREV`.
+- Preserve all original `setParents`, `setParentsHidden`, `setSiblings`, `setAutoUnlock`, `setStub`, `setRound`, `setSecondary`, `setConcealed`, `setHidden`, `setLost`, `setSpecial`, `setItemTriggers`, `setEntityTriggers`, and `setAspectTriggers` usage.
+- Preserve original `ThaumcraftApi.addWarpToResearch(...)` and item warp calls associated with research entries.
+- Files to change: `src/main/java/thaumcraft/common/config/ConfigResearch.java`; likely dependent fixes in `src/main/java/thaumcraft/common/config/ConfigRecipes.java`, `src/main/java/thaumcraft/common/config/ConfigItems.java`, `src/main/java/thaumcraft/common/config/ConfigBlocks.java` only where needed for referenced icons/stacks to compile.
+
+**Критерии приемки:**
+- [ ] `ResearchCategories.getResearchList("BASICS")`, `THAUMATURGY`, `ALCHEMY`, `ARTIFICE`, `GOLEMANCY`, and `ELDRITCH` are non-null after post-init.
+- [ ] Current `ConfigResearch` registers the same 201 original research keys or every intentional omission is documented with a concrete unavailable dependency.
+- [ ] Parent/hidden-parent/sibling relationships match the reference for all registered entries.
+- [ ] Research entry flags, coordinates, complexity values, aspect tags, icons, and triggers match the reference.
+- [ ] Warp metadata for forbidden research matches the reference.
+
+**Риски / зависимости:**
+
+Dependency: Stage 9 recipe registration must provide recipe objects for page references, or research registration will either crash on null recipe pages or create unusable pages. Do not claim Stage 9-e complete until the registered research graph is populated and inspectable in game.
+
+### GAP-2: Research pages cannot resolve recipe references because recipe map/content is absent
+
+**Статус:** отсутствует  
+**Критичность:** blocker
+
+**Текущая реализация:**
+- `src/main/java/thaumcraft/common/config/ConfigRecipes.java:5`-`src/main/java/thaumcraft/common/config/ConfigRecipes.java:14`
+- `src/main/java/thaumcraft/common/config/ConfigResearch.java:3`-`src/main/java/thaumcraft/common/config/ConfigResearch.java:7`
+- `src/main/java/thaumcraft/api/research/ResearchPage.java:35`-`src/main/java/thaumcraft/api/research/ResearchPage.java:93`
+
+**Референс:**
+- `.stage9e-ref/thaumcraft/common/config/ConfigResearch.java:51`-`.stage9e-ref/thaumcraft/common/config/ConfigResearch.java:52`
+- `.stage9e-ref/thaumcraft/common/config/ConfigResearch.java:77`-`.stage9e-ref/thaumcraft/common/config/ConfigResearch.java:417`
+
+**Что не совпадает:**
+
+Reference `ConfigResearch` uses `recipes.get("...")` throughout research pages. The decompiled reference contains 276 unique recipe keys referenced by research pages. Current `ConfigRecipes.init()` is a placeholder and current `ConfigResearch` has no `recipes` map. Current `ResearchPage` constructors dereference recipe outputs for single `IRecipe`, `IArcaneRecipe`, `CrucibleRecipe`, and `InfusionRecipe` pages, so a null recipe reference will become a registration-time crash rather than a usable missing page.
+
+**Что нужно доделать:**
+
+Provide a complete research-visible recipe lookup contract before or together with porting `ConfigResearch`, and validate every recipe page reference used by Stage 9-e.
+
+**Как доделать:**
+- Define how 1.12.2 recipe registration stores objects under original research page keys such as `WandBasic`, `FocusFire`, `InfusionMatrix`, `Thaumium`, `Nitor`, `GolemCore`, and the infusion-enchantment keys.
+- Populate `ConfigResearch.recipes` or an equivalent stable lookup before research registration runs.
+- Make research registration fail loudly with a useful log for missing recipe references during development, not silently create broken pages.
+- Keep page order and page type identical to reference; do not replace arcane/infusion/crucible pages with text-only placeholders.
+- Files to change: `src/main/java/thaumcraft/common/config/ConfigRecipes.java`, `src/main/java/thaumcraft/common/config/ConfigResearch.java`, possibly recipe classes under `src/main/java/thaumcraft/api/crafting/**` and `src/main/java/thaumcraft/common/lib/crafting/**` only for key alignment.
+
+**Критерии приемки:**
+- [ ] All recipe keys referenced by current `ConfigResearch` resolve to non-null recipe/list objects before pages are created.
+- [ ] Thaumonomicon pages for arcane, crucible, infusion, normal crafting, smelting, compound/list, and infusion-enchantment recipes render or expose valid recipe objects.
+- [ ] `ThaumcraftApi.getCraftingRecipeKey(...)` can find research/page references for implemented recipe outputs (`src/main/java/thaumcraft/api/ThaumcraftApi.java:151`-`src/main/java/thaumcraft/api/ThaumcraftApi.java:187`).
+- [ ] Crucible recipe matching still gates on completed research keys (`src/main/java/thaumcraft/common/lib/crafting/ThaumcraftCraftingManager.java:468`-`src/main/java/thaumcraft/common/lib/crafting/ThaumcraftCraftingManager.java:483`).
+
+**Риски / зависимости:**
+
+Dependency: this overlaps Stage 9 recipe chunks. Stage 9-e should only validate key/page alignment, not deep recipe behavior. However, missing recipe objects block Thaumonomicon page parity and therefore block Stage 9-e completion.
+
+### GAP-3: Research localization is absent from the port
+
+**Статус:** отсутствует  
+**Критичность:** blocker
+
+**Текущая реализация:**
+- `src/main/resources/assets/thaumcraft/lang/en_us.lang:1`-`src/main/resources/assets/thaumcraft/lang/en_us.lang:118`
+
+**Референс:**
+- `thaumcraft_src/assets/thaumcraft/lang/en_US.lang:865`-`thaumcraft_src/assets/thaumcraft/lang/en_US.lang:870`
+- `thaumcraft_src/assets/thaumcraft/lang/en_US.lang:888` and following research section through the file
+
+**Что не совпадает:**
+
+Current `en_us.lang` has no `tc.research_category.*`, `tc.research_name.*`, `tc.research_text.*`, or `tc.research_page.*` keys. Reference English lang contains six research category keys and 713 research localization keys. Current `ResearchCategories.getCategoryName(...)`, `ResearchItem.getName()`, `ResearchItem.getText()`, and `ResearchPage.getTranslatedText()` all depend on these keys (`src/main/java/thaumcraft/api/research/ResearchCategories.java:19`-`src/main/java/thaumcraft/api/research/ResearchCategories.java:20`, `src/main/java/thaumcraft/api/research/ResearchItem.java:176`-`src/main/java/thaumcraft/api/research/ResearchItem.java:182`, `src/main/java/thaumcraft/api/research/ResearchPage.java:106`-`src/main/java/thaumcraft/api/research/ResearchPage.java:112`).
+
+**Что нужно доделать:**
+
+Copy/adapt the original English research localization into the 1.12.2 lang file using lowercase locale naming while preserving every key string referenced by `ConfigResearch` and research-note flow.
+
+**Как доделать:**
+- Add category keys `tc.research_category.BASICS`, `THAUMATURGY`, `ALCHEMY`, `ARTIFICE`, `GOLEMANCY`, `ELDRITCH`.
+- Add all `tc.research_name.*`, `tc.research_text.*`, and `tc.research_page.*` keys referenced by the ported `ConfigResearch`.
+- Add research-note/discovery status keys used by item flow, including keys visible in the reference such as `tc.researcherror`, `item.discovery.name`, `item.researchnotes.unknown.1`, and `item.researchnotes.unknown.2` if they are not already present.
+- Preserve original formatting tokens used by the content (`<BR>`, `<LINE>`, `<IMG>...`, section signs) unless the 1.12.2 renderer requires a documented adaptation.
+- Files to change: `src/main/resources/assets/thaumcraft/lang/en_us.lang`; optionally other locale files only if the project later chooses broader localization, not required for Stage 9-e parity.
+
+**Критерии приемки:**
+- [ ] Every research category registered by `ConfigResearch` has a matching `tc.research_category.*` key.
+- [ ] Every non-virtual research item has matching `tc.research_name.*` and `tc.research_text.*` keys unless the reference also lacks them.
+- [ ] Every text page key referenced by `ConfigResearch` resolves to translated text instead of displaying the raw key.
+- [ ] Research note/discovery tooltips and errors resolve to localized text.
+
+**Риски / зависимости:**
+
+The original file is `en_US.lang`; the port uses `en_us.lang`. File naming must remain Forge 1.12.2-compatible while preserving key names exactly.
+
+### GAP-4: Thaumonomicon/research content assets are missing from current resources
+
+**Статус:** отсутствует  
+**Критичность:** high
+
+**Текущая реализация:**
+- `src/main/resources/assets/thaumcraft/textures/items/researchnotes.png`
+- `src/main/resources/assets/thaumcraft/textures/items/researchnotesoverlay.png`
+- `src/main/resources/assets/thaumcraft/textures/items/thaumonomicon.png`
+- `src/main/resources/assets/thaumcraft/textures/items/thaumonomiconcheat.png`
+- `src/main/resources/assets/thaumcraft/textures/gui/` is absent.
+- `src/main/resources/assets/thaumcraft/textures/misc/r_*.png` is absent.
+- `src/main/resources/assets/thaumcraft/textures/misc/research*.png` is absent.
+
+**Референс:**
+- `thaumcraft_src/assets/thaumcraft/textures/gui/gui_researchback.png`
+- `thaumcraft_src/assets/thaumcraft/textures/gui/gui_researchbackeldritch.png`
+- `thaumcraft_src/assets/thaumcraft/textures/gui/gui_researchbook.png`
+- `thaumcraft_src/assets/thaumcraft/textures/gui/gui_researchbook_overlay.png`
+- `thaumcraft_src/assets/thaumcraft/textures/gui/gui_research.png`
+- `thaumcraft_src/assets/thaumcraft/textures/misc/r_thaumaturgy.png`
+- `thaumcraft_src/assets/thaumcraft/textures/misc/r_crucible.png`
+- `thaumcraft_src/assets/thaumcraft/textures/misc/r_artifice.png`
+- `thaumcraft_src/assets/thaumcraft/textures/misc/r_golemancy.png`
+- `thaumcraft_src/assets/thaumcraft/textures/misc/r_eldritch.png`
+- `thaumcraft_src/assets/thaumcraft/textures/misc/research1.png` through `research5.png`
+- `thaumcraft_src/assets/thaumcraft/textures/misc/r_researcher1.png`, `r_researcher2.png`, `r_resdupe.png`, `r_nodes.png`, `r_aspects.png`, and other `r_*.png` icons referenced by research pages.
+
+**Что не совпадает:**
+
+Reference category icons, category backgrounds, research book textures, and image-page textures exist under original assets. Current port has only item textures for research notes and thaumonomicon. Even after data registration, categories and pages that use resource icons/images would point at missing resources.
+
+**Что нужно доделать:**
+
+Copy original research/Thaumonomicon content assets from `thaumcraft_src/assets/thaumcraft/` into `src/main/resources/assets/thaumcraft/` without recreating or renaming them.
+
+**Как доделать:**
+- Copy `textures/gui/gui_research*.png` and `textures/gui/guiresearchtable2.png` if note/table pages need it.
+- Copy `textures/misc/r_*.png` icons used by `ConfigResearch`.
+- Copy `textures/misc/research1.png` through `research5.png` and any image referenced by `<IMG>` tags in research lang text.
+- Copy missing discovery item overlays if original note/discovery rendering is restored: `thaumcraft_src/assets/thaumcraft/textures/items/discovery.png` and `discoveryoverlay.png`, if present in source assets.
+- Files/resources to change: `src/main/resources/assets/thaumcraft/textures/gui/**`, `src/main/resources/assets/thaumcraft/textures/misc/**`, possibly `src/main/resources/assets/thaumcraft/textures/items/**`.
+
+**Критерии приемки:**
+- [ ] All `ResourceLocation` paths used by research categories exist under `src/main/resources/assets/thaumcraft/`.
+- [ ] All `ResourceLocation` icon paths used by research entries exist.
+- [ ] All `<IMG>thaumcraft:...` paths in research lang text exist.
+- [ ] Missing-texture warnings are absent when opening the Thaumonomicon research browser.
+
+**Риски / зависимости:**
+
+Dependency: client GUI rendering is Stage 8, but Stage 9-e still owns content resource paths. Missing assets do not block compilation, so this requires runtime/manual verification.
+
+### GAP-5: Research note, discovery, and hex-grid content flow is missing
+
+**Статус:** отсутствует  
+**Критичность:** blocker
+
+**Текущая реализация:**
+- `src/main/java/thaumcraft/common/items/ItemResearchNotes.java:17`-`src/main/java/thaumcraft/common/items/ItemResearchNotes.java:56`
+- `src/main/java/thaumcraft/common/lib/research/ResearchManager.java:38`-`src/main/java/thaumcraft/common/lib/research/ResearchManager.java:387`
+- `src/main/java/thaumcraft/common/lib/research/ResearchNoteData.java` is absent.
+- `src/main/java/thaumcraft/common/lib/utils/HexUtils.java` is absent.
+- `src/main/java/thaumcraft/common/container/ContainerResearchTable.java:10`-`src/main/java/thaumcraft/common/container/ContainerResearchTable.java:32`
+
+**Референс:**
+- `.stage9e-ref/thaumcraft/common/lib/research/ResearchNoteData.java:10`-`.stage9e-ref/thaumcraft/common/lib/research/ResearchNoteData.java:21`
+- `.stage9e-ref/thaumcraft/common/lib/research/ResearchManager.java:120`-`.stage9e-ref/thaumcraft/common/lib/research/ResearchManager.java:134`
+- `.stage9e-ref/thaumcraft/common/lib/research/ResearchManager.java:199`-`.stage9e-ref/thaumcraft/common/lib/research/ResearchManager.java:219`
+- `.stage9e-ref/thaumcraft/common/lib/research/ResearchManager.java:221`-`.stage9e-ref/thaumcraft/common/lib/research/ResearchManager.java:266`
+- `.stage9e-ref/thaumcraft/common/lib/research/ResearchManager.java:268`-`.stage9e-ref/thaumcraft/common/lib/research/ResearchManager.java:387`
+- `.stage9e-ref/thaumcraft/common/items/ItemResearchNotes.java:87`-`.stage9e-ref/thaumcraft/common/items/ItemResearchNotes.java:174`
+
+**Что не совпадает:**
+
+Original primary research requires creating a research note from a Thaumonomicon/research action, consuming scribing tools and paper, generating a hex-grid from the research aspects and complexity, completing the note in the research table, turning it into a discovery, and then using the discovery to grant research if prerequisites still pass. Current `ItemResearchNotes` is a simple right-click grant for any non-empty `key` tag, and the data model/methods for notes are absent.
+
+**Что нужно доделать:**
+
+Port the research note data flow needed by original content progression or explicitly replace it only if an equivalent behavior is authorized. For parity, the original flow should be ported.
+
+**Как доделать:**
+- Add `ResearchNoteData` with `key`, `color`, `hexEntries`, `hexes`, `complete`, `copies`, and `isComplete()`.
+- Add/port `HexUtils` and `ResearchManager.HexEntry` support required by note grid generation and connection checking.
+- Port `ResearchManager.createResearchNoteForPlayer`, `createNote`, `getData`, `updateData`, `checkResearchCompletion`, `checkConnections`, `consumeInkFromPlayer`, `consumeInkFromTable`, `getResearchSlot`, and research-note duplication helpers if required by original content.
+- Replace direct right-click grant in `ItemResearchNotes` with original note/discovery behavior: only completed discoveries grant research, incomplete notes do not, unknown fragments can reveal hidden research or fail into knowledge fragments.
+- Wire the research table container/tile flow so notes can be solved, not just stored.
+- Files/classes to change: `src/main/java/thaumcraft/common/lib/research/ResearchNoteData.java`, `src/main/java/thaumcraft/common/lib/research/ResearchManager.java`, `src/main/java/thaumcraft/common/lib/utils/HexUtils.java`, `src/main/java/thaumcraft/common/items/ItemResearchNotes.java`, `src/main/java/thaumcraft/common/container/ContainerResearchTable.java`, `src/main/java/thaumcraft/common/tiles/TileResearchTable.java`.
+
+**Критерии приемки:**
+- [ ] Clicking a primary research in the Thaumonomicon creates a research note instead of immediately completing the research.
+- [ ] Created notes contain original-compatible NBT keys: `key`, `color`, `complete`, `copies`, `hexgrid`, `hexq`, `hexr`, `type`, `aspect`.
+- [ ] Research table can complete a note by satisfying the original hex connectivity rules.
+- [ ] Completed discoveries grant research only if prerequisites pass and then consume the discovery.
+- [ ] Knowledge fragments/unknown notes can reveal hidden research or fail according to original behavior.
+
+**Риски / зависимости:**
+
+Dependency: client-side research table GUI/rendering is outside Stage 9-e, but the server/content data flow must exist for progression parity. This gap blocks Stage 9-e because original content depends on primary research notes.
+
+### GAP-6: Hidden/lost research discovery from scans is not wired
+
+**Статус:** отсутствует  
+**Критичность:** blocker
+
+**Текущая реализация:**
+- `src/main/java/thaumcraft/common/lib/research/ScanManager.java:175`-`src/main/java/thaumcraft/common/lib/research/ScanManager.java:220`
+- `src/main/java/thaumcraft/common/lib/research/ResearchManager.java:38`-`src/main/java/thaumcraft/common/lib/research/ResearchManager.java:387`
+- `src/main/java/thaumcraft/api/research/ResearchItem.java:144`-`src/main/java/thaumcraft/api/research/ResearchItem.java:169`
+
+**Референс:**
+- `.stage9e-ref/thaumcraft/common/lib/research/ResearchManager.java:84`-`.stage9e-ref/thaumcraft/common/lib/research/ResearchManager.java:118`
+- `.stage9e-ref/thaumcraft/common/lib/research/ResearchManager.java:137`-`.stage9e-ref/thaumcraft/common/lib/research/ResearchManager.java:160`
+- `.stage9e-ref/thaumcraft/common/lib/research/ScanManager.java:351`-`.stage9e-ref/thaumcraft/common/lib/research/ScanManager.java:418`
+- `.stage9e-ref/thaumcraft/common/config/ConfigResearch.java:80`, `.stage9e-ref/thaumcraft/common/config/ConfigResearch.java:199`, `.stage9e-ref/thaumcraft/common/config/ConfigResearch.java:211`, `.stage9e-ref/thaumcraft/common/config/ConfigResearch.java:213`, `.stage9e-ref/thaumcraft/common/config/ConfigResearch.java:219`-`.stage9e-ref/thaumcraft/common/config/ConfigResearch.java:221`, `.stage9e-ref/thaumcraft/common/config/ConfigResearch.java:235`, `.stage9e-ref/thaumcraft/common/config/ConfigResearch.java:393`-`.stage9e-ref/thaumcraft/common/config/ConfigResearch.java:417`
+
+**Что не совпадает:**
+
+`ResearchItem` supports item/entity/aspect triggers in the port, but no current code uses them to unlock `@KEY` clue research from scans. Reference `ScanManager.completeScan` builds a clue object and awarded aspect list, then calls `ResearchManager.createClue(...)`, which finds hidden/lost research whose triggers match scanned item/entity/aspects and grants `@KEY`. Current scan completion ends after marking scans and syncing aspect pools.
+
+**Что нужно доделать:**
+
+Port hidden/lost research clue creation and call it from scan completion after aspect awards.
+
+**Как доделать:**
+- Add `ResearchManager.createClue(World, EntityPlayer, Object, AspectList)` with original matching semantics for item, entity, and aspect triggers.
+- Add/port `ResearchManager.findHiddenResearch(EntityPlayer)` for knowledge-fragment behavior.
+- In `ScanManager.completeScan`, preserve the scanned clue object (`ItemStack` or entity ID string) and pass awarded aspects to `ResearchManager.createClue(...)` after successful scan.
+- Ensure clue grants use `@`-prefixed research keys and do not mark the full research complete prematurely.
+- Verify trigger strings remain original-compatible, especially entity IDs such as `Thaumcraft.Firebat`, `Thaumcraft.BrainyZombie`, and vanilla IDs used in reference entries.
+- Files/classes to change: `src/main/java/thaumcraft/common/lib/research/ResearchManager.java`, `src/main/java/thaumcraft/common/lib/research/ScanManager.java`, `src/main/java/thaumcraft/common/config/ConfigResearch.java`.
+
+**Критерии приемки:**
+- [ ] Scanning a matching item trigger grants only `@RESEARCHKEY` clue state, not full research completion.
+- [ ] Scanning a matching entity trigger grants the same hidden clue keys as the original.
+- [ ] Aspect-triggered hidden research unlocks only when awarded scan aspects include the configured aspect.
+- [ ] Hidden/lost research remains unavailable until parent and hidden-parent prerequisites match original rules.
+- [ ] Knowledge-fragment use can select eligible hidden research with trigger metadata.
+
+**Риски / зависимости:**
+
+Entity registry names changed between 1.7.10 and 1.12.2. Trigger strings must either preserve original keys where the rest of the port does so, or be mapped explicitly and documented.
+
+### GAP-7: Research completion packet bypasses original progression rules
+
+**Статус:** реализовано неправильно  
+**Критичность:** high
+
+**Текущая реализация:**
+- `src/main/java/thaumcraft/common/lib/network/playerdata/PacketPlayerCompleteToServer.java:45`-`src/main/java/thaumcraft/common/lib/network/playerdata/PacketPlayerCompleteToServer.java:69`
+- `src/main/java/thaumcraft/common/lib/research/ResearchManager.java:267`-`src/main/java/thaumcraft/common/lib/research/ResearchManager.java:281`
+- `src/main/java/thaumcraft/common/lib/research/ResearchManager.java:66`-`src/main/java/thaumcraft/common/lib/research/ResearchManager.java:97`
+
+**Референс:**
+- `.stage9e-ref/thaumcraft/common/lib/research/ResearchManager.java:120`-`.stage9e-ref/thaumcraft/common/lib/research/ResearchManager.java:134`
+- `.stage9e-ref/thaumcraft/common/items/ItemResearchNotes.java:87`-`.stage9e-ref/thaumcraft/common/items/ItemResearchNotes.java:104`
+- `.stage9e-ref/thaumcraft/common/lib/research/ResearchManager.java:428`-`.stage9e-ref/thaumcraft/common/lib/research/ResearchManager.java:455`
+
+**Что не совпадает:**
+
+Current packet completes any non-null research key for type `0`, without checking `doesPlayerHaveRequisites`, without distinguishing primary vs secondary research, without creating notes, and without charging paper/ink/aspects. Reference completion path creates notes for primary research and completed discoveries check prerequisites before granting. Current `ResearchManager.doesPlayerHaveRequisites` exists but is not used by the packet.
+
+**Что нужно доделать:**
+
+Restore original content progression semantics for Thaumonomicon clicks and direct completion requests.
+
+**Как доделать:**
+- Define packet `type` semantics to match the client research action: primary note creation, secondary direct purchase, creative/admin completion if needed.
+- Before any grant, call `ResearchManager.doesPlayerHaveRequisites(player.getName(), research.key)` and reject if false.
+- For primary/non-secondary research, call `ResearchManager.createResearchNoteForPlayer(...)` instead of `addResearch(...)`.
+- For secondary research, charge required aspect points according to original difficulty/content rules before calling `addResearch(...)`.
+- Preserve sibling completion only after the main research completion is valid.
+- Files/classes to change: `src/main/java/thaumcraft/common/lib/network/playerdata/PacketPlayerCompleteToServer.java`, `src/main/java/thaumcraft/common/lib/research/ResearchManager.java`, client Thaumonomicon action code when it exists.
+
+**Критерии приемки:**
+- [ ] Packet cannot complete research if visible or hidden parents are missing.
+- [ ] Primary research click produces a note and does not immediately add the research key to completed research.
+- [ ] Secondary research direct completion consumes the correct research aspect cost before granting.
+- [ ] Sibling research grants occur only after a valid main completion and preserve original sibling behavior.
+- [ ] Invalid packet data cannot grant arbitrary research keys.
+
+**Риски / зависимости:**
+
+Dependency: client Thaumonomicon GUI action implementation is outside this chunk, but server-side content progression must reject invalid completion requests regardless of GUI status.
+
+### GAP-8: Manual/runtime validation for research content is not possible yet and has not been performed
+
+**Статус:** требует проверки  
+**Критичность:** high
+
+**Текущая реализация:**
+- `src/main/java/thaumcraft/common/config/ConfigResearch.java:3`-`src/main/java/thaumcraft/common/config/ConfigResearch.java:7`
+- `src/main/resources/assets/thaumcraft/lang/en_us.lang:1`-`src/main/resources/assets/thaumcraft/lang/en_us.lang:118`
+- `src/main/resources/assets/thaumcraft/textures/gui/` is absent.
+
+**Референс:**
+- `docs/PRD.md:415`-`docs/PRD.md:416`
+- `docs/PRD.md:544`-`docs/PRD.md:545`
+
+**Что не совпадает:**
+
+PRD explicitly says content can compile while unusable, and runtime/manual checks must verify Thaumonomicon pages and progression. Current Stage 9-e cannot be meaningfully smoke-tested for content because categories, entries, lang keys, page assets, and note flow are absent.
+
+**Что нужно доделать:**
+
+After implementation gaps close, run focused validation and document results in this file.
+
+**Как доделать:**
+- Add a lightweight diagnostic/test that counts registered categories, research entries, null pages, null recipe page objects, missing lang keys, missing assets, missing parent targets, and impossible parent cycles.
+- Run `./scripts/dev.sh compileJava` after implementation.
+- Run `./scripts/dev.sh build` and `./scripts/dev.sh check-jar` before packaging.
+- Run server smoke if common registration changes are included.
+- Run client/manual smoke for Thaumonomicon opening, category display, sample page rendering, primary note creation, secondary direct unlock, hidden scan clue, and recipe page unlock display.
+- Update this document with validation commands/results after implementation.
+
+**Критерии приемки:**
+- [ ] Automated/static validation reports no missing category, parent, hidden-parent, sibling, lang, asset, or page recipe references inside Stage 9-e scope.
+- [ ] `compileJava`, `build`, and `check-jar` pass or failures are documented as pre-existing/environmental.
+- [ ] Server smoke reaches normal ready state after research registration changes.
+- [ ] Client/manual Thaumonomicon scenarios pass for at least one entry in each category.
+- [ ] Manual progression scenarios pass for primary note, secondary research, hidden scan clue, and recipe-gated craft visibility.
+
+**Риски / зависимости:**
+
+Client GUI/rendering dependencies from Stage 8 may block visual verification. If so, Stage 9-e can only be marked partially implemented, not complete, until content can be opened and validated in game.
+
+## 6. Итоговый checklist закрытия Stage 9-e
+
+- [ ] Port original `ConfigResearch` category registration.
+- [ ] Port original 201 research entries or document any intentionally deferred entry with a concrete blocker.
+- [ ] Preserve all original research keys, category IDs, parent/hidden-parent/sibling links, flags, triggers, aspects, coordinates, complexity values, icons, and page order.
+- [ ] Provide valid recipe objects/lists for every research page recipe reference used by ported entries.
+- [ ] Copy or adapt all required English research lang keys into `en_us.lang`.
+- [ ] Copy all required category icons, backgrounds, research-book textures, and image-page textures from `thaumcraft_src/assets/thaumcraft/`.
+- [ ] Port research note NBT/data flow, note generation, note completion, discovery use, and unknown fragment hidden-research behavior.
+- [ ] Wire scan-triggered hidden clue unlocks through `ResearchManager.createClue(...)`.
+- [ ] Fix server-side completion packet so it cannot bypass prerequisites, note creation, or aspect/paper/ink costs.
+- [ ] Add static validation for missing research references and run it after registration.
+- [ ] Run compile/build validation after implementation.
+- [ ] Run runtime/manual validation for Thaumonomicon content and progression scenarios.
+- [ ] Update `docs/Stage9-e.md` with closure status and validation results.
+
+## 7. Definition of Done
+
+Stage 9-e считается ПОЛНОСТЬЮ завершенной только если:
+- все blocker gaps закрыты;
+- все high gaps закрыты;
+- все элементы из scope Stage 9-e реализованы;
+- текущая реализация соответствует референсу по поведению;
+- все нужные файлы, ресурсы и регистрации присутствуют;
+- отсутствуют TODO и заглушки внутри scope Stage 9-e;
+- проект собирается без ошибок;
+- базовые игровые сценарии Stage 9-e проверены вручную или тестами;
+- ./docs/Stage9-e.md обновлен и не содержит критичных открытых вопросов.
+
+## 8. Открытые вопросы
+
+- No open question replaces implementation work: current blockers are known and actionable.
+- Dependency: Stage 9 recipe chunks must supply valid recipe objects for the 276 original research page recipe references before Stage 9-e can be accepted.
+- Dependency: Stage 8/client GUI may block visual Thaumonomicon smoke validation, but it does not remove the Stage 9-e requirement to register valid content data, lang, assets, and server-side progression rules.

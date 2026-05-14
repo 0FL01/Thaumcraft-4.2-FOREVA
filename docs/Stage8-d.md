@@ -1,0 +1,500 @@
+# Stage 8-d — Gap-анализ и план закрытия
+
+## 1. Цель фазы
+
+Stage 8-d закрывает только клиентский рендер зарегистрированных сущностей Thaumcraft: регистрацию entity renderers, классы renderers, классы entity models и необходимые ресурсы моделей/текстур. Цель - вернуть визуальное поведение Thaumcraft 4.2.3.5 для мобов, боссов, големов, projectiles, aspect orb, falling taint, item/grate/following/special entities и прочих зарегистрированных сущностей на Forge 1.12.2 без изменения серверной логики и registry identity.
+
+Stage 8-d не включает TESR, GUI, particles/shaders как самостоятельные системы. Если renderer сущности напрямую рисует beam/quad/FX-подобный эффект, это учитывается только как часть renderer behavior.
+
+## 2. Scope фазы
+
+В scope Stage 8-d входят:
+
+- Entity renderer registration из client proxy / клиентского lifecycle.
+- Renderer classes для всех сущностей, зарегистрированных в `ConfigEntities.ENTITIES`.
+- Entity model classes, используемые renderer classes.
+- Entity-specific textures и OBJ/model resources, на которые ссылаются renderer/model classes.
+- Smoke/manual scenarios для загрузки клиента и визуальной проверки зарегистрированных сущностей.
+
+Текущий набор зарегистрированных сущностей задается в `src/main/java/thaumcraft/common/config/ConfigEntities.java:72-144` и регистрируется через Forge registry event в `src/main/java/thaumcraft/common/Thaumcraft.java:232-235`. В scope попадают, как минимум, эти группы:
+
+- Base/item-like entities: `EntitySpecialItem`, `EntityPermanentItem`, `EntityFollowingItem`, `EntityAspectOrb`, `EntityFallingTaint`, `EntityItemGrate`.
+- Projectiles: `EntityAlumentum`, `EntityPrimalOrb`, `EntityFrostShard`, `EntityDart`, `EntityPrimalArrow`, `EntityPechBlast`, `EntityEldritchOrb`, `EntityBottleTaint`, `EntityGolemOrb`, `EntityShockOrb`, `EntityExplosiveOrb`, `EntityEmber`, `EntityGolemBobber`.
+- Golems: `EntityGolemBase`, `EntityTravelingTrunk`.
+- Mobs and bosses: brainy/inhabited zombies, wisp, firebat, pech, mind spider, eldritch guardian/warden/golem/crab, cultists/leader/portal, thaumic slime, taint mobs, taintacles.
+- Required client resources under `src/main/resources/assets/thaumcraft/textures/**` and model resources such as OBJ files referenced by entity renderers.
+
+Out of scope for this document:
+
+- Stage 8-a/b/c/e analysis.
+- Stage 9 recipes/research/content work, except as a dependency if an entity cannot be spawned for manual visual testing.
+- TESR, GUI, keybind, particle/shader systems unless directly invoked by an entity renderer.
+
+## 3. Источники сравнения
+
+Current implementation:
+
+- `src/main/java/thaumcraft/client/ClientProxy.java:24-34` - current client display registration only assigns item model resource locations.
+- `src/main/java/thaumcraft/client/ClientProxy.java:36-44` - current key/handler registration; no entity renderer registration hook exists.
+- `src/main/java/thaumcraft/client/ClientProxy.java:90-105` - FX placeholders, relevant only for renderer-adjacent visual risk.
+- `src/main/java/thaumcraft/common/config/ConfigEntities.java:72-144` - current registered entity scope.
+- `src/main/java/thaumcraft/common/Thaumcraft.java:165-171` - current client proxy lifecycle calls.
+- `src/main/java/thaumcraft/common/Thaumcraft.java:232-235` - current entity registry event.
+- `src/main/resources/assets/thaumcraft/textures/models/` - currently contains only `wizard.png` and `moneychanger.png` for model textures.
+- `src/main/resources/assets/thaumcraft/textures/misc/` - currently contains only `potions.png`.
+- No current files exist under `src/main/java/thaumcraft/client/renderers/**`.
+
+Reference implementation:
+
+- `thaumcraft_src/thaumcraft/client/ClientProxy.class` - original client proxy; `registerDisplayInformation()` calls `setupItemRenderers`, `setupEntityRenderers`, `setupBlockRenderers`, and `setupTileRenderers`.
+- `thaumcraft_src/thaumcraft/client/renderers/entity/*.class` - original entity renderer class set.
+- `thaumcraft_src/thaumcraft/client/renderers/models/entities/*.class` - original entity model class set.
+- `thaumcraft_src/assets/thaumcraft/textures/models/**` - original entity/model textures and model resources.
+- `thaumcraft_src/assets/thaumcraft/textures/misc/**` - original wisp/cultist portal resources.
+- `thaumcraft_src/assets/thaumcraft/textures/entity/**` - original arrow/creeper overlay resources.
+- `Thaumcraft-1.7.10-4.2.3.5.jar` - fallback original artifact if a class must be decompiled from bytecode.
+
+Inspection commands run for this document:
+
+- `git status --short`
+- `rg -n "Phase 8|entity renderer|Model classes|renderers" docs/PRD.md`
+- `find thaumcraft_src/thaumcraft/client/renderers -type f \( -path '*/entity/*' -o -path '*/models/entities/*' \) | sort`
+- `javap -classpath thaumcraft_src -p thaumcraft.client.ClientProxy`
+- `javap -classpath thaumcraft_src -p -c thaumcraft.client.ClientProxy`
+- `strings thaumcraft_src/thaumcraft/client/renderers/entity/*.class thaumcraft_src/thaumcraft/client/renderers/models/entities/*.class | rg 'textures/(models|items|misc|entity)'`
+- `find src/main/java/thaumcraft/client -type f | sort`
+- `find src/main/resources/assets/thaumcraft -maxdepth 3 -type d | sort`
+- `rg -n 'ENTITIES\.add\(makeEntry' src/main/java/thaumcraft/common/config/ConfigEntities.java`
+
+## 4. Текущее состояние Stage 8-d
+
+Stage 8-d сейчас не закрыт.
+
+В текущем порте уже есть common/entity registrations: `ConfigEntities.init()` наполняет `ENTITIES` в `src/main/java/thaumcraft/common/config/ConfigEntities.java:66-169`, а `Thaumcraft.registerEntities()` регистрирует их в `src/main/java/thaumcraft/common/Thaumcraft.java:232-235`. Однако клиентская часть для entity rendering отсутствует полностью: в `src/main/java/thaumcraft/client/ClientProxy.java:24-34` выполняется только универсальная регистрация item model resource locations, а вызова аналога reference `setupEntityRenderers()` нет.
+
+В текущем source tree отсутствуют все renderer/model packages, необходимые Stage 8-d:
+
+- Отсутствует `src/main/java/thaumcraft/client/renderers/entity/`.
+- Отсутствует `src/main/java/thaumcraft/client/renderers/models/entities/`.
+- Отсутствуют `src/main/java/thaumcraft/client/renderers/models/ModelFireBat.java`, `ModelCube.java` и прочие shared models, если они будут нужны при портировании reference renderers.
+
+Reference entity renderer set содержит классы `RenderAlumentum`, `RenderAspectOrb`, `RenderBrainyZombie`, `RenderCultist`, `RenderCultistPortal`, `RenderDart`, `RenderEldritchCrab`, `RenderEldritchGolem`, `RenderEldritchGuardian`, `RenderEldritchOrb`, `RenderElectricOrb`, `RenderEmber`, `RenderExplosiveOrb`, `RenderFallingTaint`, `RenderFireBat`, `RenderFollowingItem`, `RenderFrostShard`, `RenderGolemBase`, `RenderGolemBobber`, `RenderInhabitedZombie`, `RenderMindSpider`, `RenderPechBlast`, `RenderPech`, `RenderPrimalArrow`, `RenderPrimalOrb`, `RenderSpecialItem`, `RenderTaintacle`, tainted animal/mob renderers, `RenderThaumicSlime`, `RenderTravelingTrunk`, `RenderWisp`, and several unused-or-conditional classes such as `RenderWatcher` under `thaumcraft_src/thaumcraft/client/renderers/entity/`.
+
+Reference entity model set contains `ModelEldritchCrab`, `ModelEldritchGolem`, `ModelEldritchGuardian`, `ModelFireBat`, `ModelGolemAccessories`, `ModelGolem`, `ModelPech`, `ModelRendererTaintacle`, `ModelTaintacle`, `ModelTaintSheep1`, `ModelTaintSheep2`, `ModelTaintSpore`, `ModelTaintSporeSwarmer`, `ModelTrunk`, and `ModelWatcher` under `thaumcraft_src/thaumcraft/client/renderers/models/entities/`.
+
+Current resources are also incomplete for Stage 8-d. Only `wizard.png`, `moneychanger.png`, and `potions.png` are present in the relevant current texture directories, while the reference renderer classes require many model/entity/misc textures and OBJ resources listed in GAP-5.
+
+## 5. Gap list
+
+### GAP-1: Нет регистрации entity renderers в клиентском lifecycle
+
+**Статус:** отсутствует  
+**Критичность:** blocker
+
+**Текущая реализация:**
+- `src/main/java/thaumcraft/client/ClientProxy.java:24-34`
+- `src/main/java/thaumcraft/client/ClientProxy.java:36-44`
+- `src/main/java/thaumcraft/common/Thaumcraft.java:165-171`
+
+**Референс:**
+- `thaumcraft_src/thaumcraft/client/ClientProxy.class`
+- `thaumcraft_src/thaumcraft/client/renderers/entity/*.class`
+
+**Что не совпадает:**
+
+В reference `ClientProxy.registerDisplayInformation()` вызывает private `setupEntityRenderers()` сразу после item renderer setup. Декомпиляция через `javap -c` показывает, что reference `setupEntityRenderers()` регистрирует renderer для `EntityItemGrate`, `EntitySpecialItem`, `EntityFollowingItem`, `EntityPermanentItem`, `EntityAspectOrb`, `EntityGolemBobber`, `EntityGolemBase`, `EntityWisp`, всех projectile classes, mobs, bosses, taint mobs, `EntityTravelingTrunk`, `EntityBottleTaint`, `EntityEldritchCrab`, а также villager skins.
+
+В current `ClientProxy.registerDisplayInformation()` только проходит по `ConfigItems.getAllItems()` и вызывает `ModelLoader.setCustomModelResourceLocation()` для items. Нет вызова `RenderingRegistry.registerEntityRenderingHandler` или 1.12.2 equivalent `RenderingRegistry.registerEntityRenderingHandler(EntityClass, IRenderFactory)`.
+
+**Что нужно доделать:**
+
+Добавить Forge 1.12.2 entity renderer registration в client-only code path. Регистрация должна покрывать все сущности из `ConfigEntities.ENTITIES`, для которых reference имеет renderer или vanilla-compatible renderer.
+
+**Как доделать:**
+- Добавить метод наподобие `setupEntityRenderers()` в `src/main/java/thaumcraft/client/ClientProxy.java` или отдельный client-only registrar class, вызываемый из `registerDisplayInformation()` или корректного client init/preinit hook.
+- Использовать `net.minecraftforge.fml.client.registry.RenderingRegistry.registerEntityRenderingHandler` с `IRenderFactory` и `RenderManager`, а не 1.7.10 constructor style.
+- Зарегистрировать `EntityItemGrate` через 1.12 item renderer equivalent, `EntityBottleTaint` через snowball/item renderer equivalent, а custom entities через ported custom renderers.
+- Проверить, что common/server classes не импортируют client renderer packages.
+- Сверить mapping current registered classes из `src/main/java/thaumcraft/common/config/ConfigEntities.java:72-144` с registration table.
+
+**Критерии приемки:**
+- [ ] `ClientProxy` или client registrar содержит explicit renderer registration для всех Stage 8-d registered entity classes.
+- [ ] Dedicated server smoke не загружает client renderer classes и не падает на `ClassNotFoundException`/`NoClassDefFoundError`.
+- [ ] Client smoke доходит до mod loading/main menu без missing renderer crashes.
+
+**Риски / зависимости:**
+
+Forge 1.12.2 renderer registration API отличается от 1.7.10. Нельзя механически копировать constructors из reference; каждый renderer должен быть адаптирован под `RenderManager`. Runtime smoke обязателен, потому что client/server side separation риск высокий по PRD `docs/PRD.md:389-393`.
+
+### GAP-2: Отсутствуют renderer classes для item-like, orb, projectile и transient entities
+
+**Статус:** отсутствует  
+**Критичность:** blocker
+
+**Текущая реализация:**
+- `src/main/java/thaumcraft/client/renderers/entity/` отсутствует
+- `src/main/java/thaumcraft/common/config/ConfigEntities.java:72-91`
+- `src/main/java/thaumcraft/common/config/ConfigEntities.java:142-144`
+
+**Референс:**
+- `thaumcraft_src/thaumcraft/client/renderers/entity/RenderSpecialItem.class`
+- `thaumcraft_src/thaumcraft/client/renderers/entity/RenderFollowingItem.class`
+- `thaumcraft_src/thaumcraft/client/renderers/entity/RenderAspectOrb.class`
+- `thaumcraft_src/thaumcraft/client/renderers/entity/RenderFallingTaint.class`
+- `thaumcraft_src/thaumcraft/client/renderers/entity/RenderAlumentum.class`
+- `thaumcraft_src/thaumcraft/client/renderers/entity/RenderPrimalOrb.class`
+- `thaumcraft_src/thaumcraft/client/renderers/entity/RenderFrostShard.class`
+- `thaumcraft_src/thaumcraft/client/renderers/entity/RenderDart.class`
+- `thaumcraft_src/thaumcraft/client/renderers/entity/RenderPrimalArrow.class`
+- `thaumcraft_src/thaumcraft/client/renderers/entity/RenderPechBlast.class`
+- `thaumcraft_src/thaumcraft/client/renderers/entity/RenderEldritchOrb.class`
+- `thaumcraft_src/thaumcraft/client/renderers/entity/RenderElectricOrb.class`
+- `thaumcraft_src/thaumcraft/client/renderers/entity/RenderExplosiveOrb.class`
+- `thaumcraft_src/thaumcraft/client/renderers/entity/RenderEmber.class`
+- `thaumcraft_src/thaumcraft/client/renderers/entity/RenderGolemBobber.class`
+
+**Что не совпадает:**
+
+Current registers the underlying entities in `ConfigEntities`, but has no renderer implementations for their visuals. Reference has specialized renderers for item stacks, following/special permanent items, aspect orb billboard, falling taint block render, projectile quads/models, primal arrow trail-like rendering, electric/golem/shock orb visuals, ember/explosive/eldritch orb visuals, frost shard OBJ rendering, and golem fishing bobber rendering.
+
+Without these classes, client fallback behavior is either no renderer, wrong vanilla renderer, or runtime failure once renderer registration is added. This blocks all projectile/focus visual parity and item-like entity visuals.
+
+**Что нужно доделать:**
+
+Port each reference renderer in this group to Forge 1.12.2 and Minecraft 1.12 rendering APIs.
+
+**Как доделать:**
+- Add `src/main/java/thaumcraft/client/renderers/entity/RenderSpecialItem.java` for `EntitySpecialItem` and `EntityPermanentItem`.
+- Add `RenderFollowingItem.java` for `EntityFollowingItem`.
+- Add `RenderAspectOrb.java` for `EntityAspectOrb`.
+- Add `RenderFallingTaint.java` for `EntityFallingTaint`, adapted from 1.7 `RenderBlocks` to 1.12 block rendering APIs.
+- Add projectile renderers: `RenderAlumentum`, `RenderPrimalOrb`, `RenderFrostShard`, `RenderDart`, `RenderPrimalArrow`, `RenderPechBlast`, `RenderEldritchOrb`, `RenderElectricOrb`, `RenderExplosiveOrb`, `RenderEmber`, `RenderGolemBobber`.
+- Register `EntityGolemOrb` and `EntityShockOrb` with the adapted electric orb renderer, matching reference `setupEntityRenderers()`.
+- Register `EntityBottleTaint` with a 1.12 equivalent of `RenderSnowball` using `ConfigItems.itemBottleTaint` from `src/main/java/thaumcraft/common/config/ConfigEntities.java:87` and item definition in `ConfigItems`.
+- Verify GL state restoration in every custom renderer, especially alpha/blend/lighting/depth mask changes.
+
+**Критерии приемки:**
+- [ ] Every current item-like/projectile/transient entity in `ConfigEntities.java:72-91` and `ConfigEntities.java:142-144` has an explicit renderer registration.
+- [ ] Projectiles spawned by wand foci and mobs render with reference-equivalent color, scale, rotation, alpha/blend, and texture behavior.
+- [ ] Aspect orb, falling taint, special/permanent/following items, item grate, bottle taint, and golem bobber render without missing texture or GL state corruption.
+
+**Риски / зависимости:**
+
+Several reference renderers are GL immediate-mode style and use 1.7.10 names/APIs. `RenderFrostShard` references `textures/models/orb.obj`; OBJ loading in 1.12 may require Forge model loader adaptation. Projectile spawn paths may depend on common/focus behavior being usable enough for manual testing.
+
+### GAP-3: Отсутствуют renderer classes для мобов, боссов, големов и taint-сущностей
+
+**Статус:** отсутствует  
+**Критичность:** blocker
+
+**Текущая реализация:**
+- `src/main/java/thaumcraft/client/renderers/entity/` отсутствует
+- `src/main/java/thaumcraft/common/config/ConfigEntities.java:93-140`
+
+**Референс:**
+- `thaumcraft_src/thaumcraft/client/renderers/entity/RenderGolemBase.class`
+- `thaumcraft_src/thaumcraft/client/renderers/entity/RenderTravelingTrunk.class`
+- `thaumcraft_src/thaumcraft/client/renderers/entity/RenderBrainyZombie.class`
+- `thaumcraft_src/thaumcraft/client/renderers/entity/RenderInhabitedZombie.class`
+- `thaumcraft_src/thaumcraft/client/renderers/entity/RenderWisp.class`
+- `thaumcraft_src/thaumcraft/client/renderers/entity/RenderFireBat.class`
+- `thaumcraft_src/thaumcraft/client/renderers/entity/RenderPech.class`
+- `thaumcraft_src/thaumcraft/client/renderers/entity/RenderMindSpider.class`
+- `thaumcraft_src/thaumcraft/client/renderers/entity/RenderEldritchGuardian.class`
+- `thaumcraft_src/thaumcraft/client/renderers/entity/RenderCultist.class`
+- `thaumcraft_src/thaumcraft/client/renderers/entity/RenderCultistPortal.class`
+- `thaumcraft_src/thaumcraft/client/renderers/entity/RenderEldritchGolem.class`
+- `thaumcraft_src/thaumcraft/client/renderers/entity/RenderEldritchCrab.class`
+- `thaumcraft_src/thaumcraft/client/renderers/entity/RenderThaumicSlime.class`
+- `thaumcraft_src/thaumcraft/client/renderers/entity/RenderTaintSpider.class`
+- `thaumcraft_src/thaumcraft/client/renderers/entity/RenderTaintacle.class`
+- `thaumcraft_src/thaumcraft/client/renderers/entity/RenderTaintSpore.class`
+- `thaumcraft_src/thaumcraft/client/renderers/entity/RenderTaintSporeSwarmer.class`
+- `thaumcraft_src/thaumcraft/client/renderers/entity/RenderTaintSwarm.class`
+- `thaumcraft_src/thaumcraft/client/renderers/entity/RenderTaintChicken.class`
+- `thaumcraft_src/thaumcraft/client/renderers/entity/RenderTaintCow.class`
+- `thaumcraft_src/thaumcraft/client/renderers/entity/RenderTaintCreeper.class`
+- `thaumcraft_src/thaumcraft/client/renderers/entity/RenderTaintPig.class`
+- `thaumcraft_src/thaumcraft/client/renderers/entity/RenderTaintSheep.class`
+- `thaumcraft_src/thaumcraft/client/renderers/entity/RenderTaintVillager.class`
+
+**Что не совпадает:**
+
+Current has common mob/entity classes and registrations, but no visual renderers. Reference mob/boss renderers include non-trivial behavior: giant brainy zombie scaling, pech held item/overlay handling, firebat hanging/flying transforms and alternate vampire texture, cultist floating line/beam-style visual, eldritch guardian/warden texture selection and scaling, eldritch golem scaling/headless-related model behavior, eldritch crab overlay pass, taint spider eye pass, taint sheep wool pass, taint creeper armor/effect pass, taintacle length/scale variants, thaumic slime translucent pass, golem carried item/accessory/damage rendering, and traveling trunk angry texture/lid transform.
+
+**Что нужно доделать:**
+
+Port all mob/boss/golem renderers that correspond to current registered entities and preserve reference-specific render passes, scaling, overlays, carried items, held items, death/animation transforms, and texture selection.
+
+**Как доделать:**
+- Add renderer classes under `src/main/java/thaumcraft/client/renderers/entity/` with 1.12 `RenderLiving`, `RenderBiped`, `RenderZombie`, `RenderSlime`, or custom `Render` bases as appropriate.
+- For `EntityGolemBase`, port carried item rendering, golem type texture selection, damage overlay, accessories/decorations, bucket model handling, and color/upgrades/decorations interpretation from current golem data accessors.
+- For `EntityTravelingTrunk`, port normal/angry texture selection and trunk lid animation.
+- For `EntityPech`, port pech type texture selection, held item rendering, overlay behavior, and GUI/trading visual assumptions.
+- For cultists and bosses, port armor/held item visual handling and special portal/cultist line visuals.
+- For taint mobs, port overlay/pass behavior rather than falling back to vanilla animals with changed textures.
+- Register every renderer through the Stage 8-d registrar from GAP-1.
+
+**Критерии приемки:**
+- [ ] Every mob/boss/golem entity in `ConfigEntities.java:93-140` has explicit renderer registration.
+- [ ] Visual variants render correctly: golem type/decorations/damage/carrying, pech type, firebat variants, eldritch guardian vs warden, taint mob overlays, cultist/portal visuals.
+- [ ] Spawn eggs or commands can spawn each registered mob/boss without client crash, missing texture, or invisible entity.
+
+**Риски / зависимости:**
+
+This is the largest behavior-risk area in Stage 8-d. Some visuals depend on current entity data manager fields and methods matching original semantics. If common entity state accessors differ from reference, renderer porting may expose common-side parity gaps, but those should be treated as dependencies and not solved by changing renderer identity silently.
+
+### GAP-4: Отсутствуют entity model classes
+
+**Статус:** отсутствует  
+**Критичность:** blocker
+
+**Текущая реализация:**
+- `src/main/java/thaumcraft/client/renderers/models/entities/` отсутствует
+- `src/main/java/thaumcraft/client/renderers/models/` отсутствует
+
+**Референс:**
+- `thaumcraft_src/thaumcraft/client/renderers/models/entities/ModelEldritchCrab.class`
+- `thaumcraft_src/thaumcraft/client/renderers/models/entities/ModelEldritchGolem.class`
+- `thaumcraft_src/thaumcraft/client/renderers/models/entities/ModelEldritchGuardian.class`
+- `thaumcraft_src/thaumcraft/client/renderers/models/entities/ModelFireBat.class`
+- `thaumcraft_src/thaumcraft/client/renderers/models/entities/ModelGolemAccessories.class`
+- `thaumcraft_src/thaumcraft/client/renderers/models/entities/ModelGolem.class`
+- `thaumcraft_src/thaumcraft/client/renderers/models/entities/ModelPech.class`
+- `thaumcraft_src/thaumcraft/client/renderers/models/entities/ModelRendererTaintacle.class`
+- `thaumcraft_src/thaumcraft/client/renderers/models/entities/ModelTaintacle.class`
+- `thaumcraft_src/thaumcraft/client/renderers/models/entities/ModelTaintSheep1.class`
+- `thaumcraft_src/thaumcraft/client/renderers/models/entities/ModelTaintSheep2.class`
+- `thaumcraft_src/thaumcraft/client/renderers/models/entities/ModelTaintSpore.class`
+- `thaumcraft_src/thaumcraft/client/renderers/models/entities/ModelTaintSporeSwarmer.class`
+- `thaumcraft_src/thaumcraft/client/renderers/models/entities/ModelTrunk.class`
+
+**Что не совпадает:**
+
+Reference renderers instantiate custom model classes for golems, trunk, pech, eldritch mobs, firebat, taintacle, spores, taint sheep overlays, and crab. Current source tree has no corresponding model classes. Vanilla fallback models cannot reproduce reference shapes/animations for these entities.
+
+`ModelWatcher` exists in reference at `thaumcraft_src/thaumcraft/client/renderers/models/entities/ModelWatcher.class`, but `EntityWatcher` is not currently registered in `ConfigEntities.ENTITIES`; this is a dependency note only, not a Stage 8-d blocker for currently registered entities.
+
+**Что нужно доделать:**
+
+Port all model classes used by registered entity renderers and update obfuscated 1.7.10 methods to 1.12.2 method names.
+
+**Как доделать:**
+- Add `src/main/java/thaumcraft/client/renderers/models/entities/ModelGolem.java`, `ModelGolemAccessories.java`, `ModelTrunk.java`, `ModelPech.java`, `ModelFireBat.java`, `ModelEldritchGuardian.java`, `ModelEldritchGolem.java`, `ModelEldritchCrab.java`, `ModelTaintacle.java`, `ModelRendererTaintacle.java`, `ModelTaintSpore.java`, `ModelTaintSporeSwarmer.java`, `ModelTaintSheep1.java`, `ModelTaintSheep2.java`.
+- Keep original model field names where practical for traceability.
+- Translate `func_78088_a`, `func_78087_a`, `func_78086_a` and related obfuscated model methods to 1.12.2 names such as `render`, `setRotationAngles`, and `setLivingAnimations`.
+- Verify model rotations against entity state fields such as attack timers, headless state, carried item state, trunk angry state, taintacle length, and sheep head animation.
+- Do not port unused `ModelWatcher` unless `EntityWatcher` becomes registered or a renderer needs it.
+
+**Критерии приемки:**
+- [ ] Every custom renderer for registered entities compiles without missing model classes.
+- [ ] Custom model geometry and animation visibly match reference for golems, pech, trunk, taintacles, eldritch mobs, firebat, spores, crab, and taint sheep.
+- [ ] No placeholder model classes or empty `render`/`setRotationAngles` implementations remain in Stage 8-d scope.
+
+**Риски / зависимости:**
+
+Model porting is sensitive to MCP name changes and 1.12 `ModelRenderer` behavior. `ModelRendererTaintacle` used custom display-list behavior in 1.7; it must be adapted carefully or replaced with equivalent 1.12-safe rendering while preserving shape and animation.
+
+### GAP-5: Отсутствуют required entity textures and model resources
+
+**Статус:** отсутствует  
+**Критичность:** blocker
+
+**Текущая реализация:**
+- `src/main/resources/assets/thaumcraft/textures/models/wizard.png`
+- `src/main/resources/assets/thaumcraft/textures/models/moneychanger.png`
+- `src/main/resources/assets/thaumcraft/textures/misc/potions.png`
+
+**Референс:**
+- `thaumcraft_src/assets/thaumcraft/textures/entity/arrow.png`
+- `thaumcraft_src/assets/thaumcraft/textures/entity/creeper/creeper_armor.png`
+- `thaumcraft_src/assets/thaumcraft/textures/misc/cultist_portal.png`
+- `thaumcraft_src/assets/thaumcraft/textures/misc/wisp.png`
+- `thaumcraft_src/assets/thaumcraft/textures/misc/wispy.png`
+- `thaumcraft_src/assets/thaumcraft/textures/models/*.png`
+- `thaumcraft_src/assets/thaumcraft/textures/models/*.obj`
+
+**Что не совпадает:**
+
+Reference renderers/models require these assets that are absent from current resources:
+
+- `assets/thaumcraft/textures/entity/arrow.png`
+- `assets/thaumcraft/textures/entity/creeper/creeper_armor.png`
+- `assets/thaumcraft/textures/misc/cultist_portal.png`
+- `assets/thaumcraft/textures/misc/wisp.png`
+- `assets/thaumcraft/textures/misc/wispy.png`
+- `assets/thaumcraft/textures/models/bucket.obj`
+- `assets/thaumcraft/textures/models/bucket.png`
+- `assets/thaumcraft/textures/models/bzombie.png`
+- `assets/thaumcraft/textures/models/bzombievil.png`
+- `assets/thaumcraft/textures/models/chicken.png`
+- `assets/thaumcraft/textures/models/cow.png`
+- `assets/thaumcraft/textures/models/crab.png`
+- `assets/thaumcraft/textures/models/craboverlay.png`
+- `assets/thaumcraft/textures/models/creeper.png`
+- `assets/thaumcraft/textures/models/cultist.png`
+- `assets/thaumcraft/textures/models/czombie.png`
+- `assets/thaumcraft/textures/models/eldritch_golem.png`
+- `assets/thaumcraft/textures/models/eldritch_guardian.png`
+- `assets/thaumcraft/textures/models/eldritch_warden.png`
+- `assets/thaumcraft/textures/models/firebat.png`
+- `assets/thaumcraft/textures/models/golem_clay.png`
+- `assets/thaumcraft/textures/models/golem_damage.png`
+- `assets/thaumcraft/textures/models/golem_decoration.png`
+- `assets/thaumcraft/textures/models/golem_flesh.png`
+- `assets/thaumcraft/textures/models/golem_iron.png`
+- `assets/thaumcraft/textures/models/golem_stone.png`
+- `assets/thaumcraft/textures/models/golem_straw.png`
+- `assets/thaumcraft/textures/models/golem_tallow.png`
+- `assets/thaumcraft/textures/models/golem_thaumium.png`
+- `assets/thaumcraft/textures/models/golem_wood.png`
+- `assets/thaumcraft/textures/models/orb.obj`
+- `assets/thaumcraft/textures/models/pech_forage.png`
+- `assets/thaumcraft/textures/models/pech_stalker.png`
+- `assets/thaumcraft/textures/models/pech_thaum.png`
+- `assets/thaumcraft/textures/models/pig.png`
+- `assets/thaumcraft/textures/models/sheep.png`
+- `assets/thaumcraft/textures/models/sheep_fur.png`
+- `assets/thaumcraft/textures/models/taint_spider.png`
+- `assets/thaumcraft/textures/models/taint_spider_eyes.png`
+- `assets/thaumcraft/textures/models/taint_spore.png`
+- `assets/thaumcraft/textures/models/taintacle.png`
+- `assets/thaumcraft/textures/models/trunk.png`
+- `assets/thaumcraft/textures/models/trunkangry.png`
+- `assets/thaumcraft/textures/models/tslime.png`
+- `assets/thaumcraft/textures/models/vampirebat.png`
+- `assets/thaumcraft/textures/models/villager.png`
+- `assets/thaumcraft/textures/models/watcher.png` and `watcher_beam.png` only if `EntityWatcher` is brought into registration scope.
+
+**Что нужно доделать:**
+
+Copy required assets from `thaumcraft_src/assets/thaumcraft/` into `src/main/resources/assets/thaumcraft/` preserving paths, because AGENTS.md identifies `thaumcraft_src/assets/` as the source of truth for ported assets.
+
+**Как доделать:**
+- Copy exact reference resources into the same relative paths under `src/main/resources/assets/thaumcraft/`.
+- Include `.mcmeta` files where reference textures use animation metadata.
+- For OBJ resources such as `bucket.obj` and `orb.obj`, verify 1.12 loader/resource path expectations and update renderer loading code accordingly.
+- Run a missing-resource scan after implementing renderers to catch string/path differences introduced during porting.
+
+**Критерии приемки:**
+- [ ] All texture/model resource paths referenced by Stage 8-d renderer/model classes exist under `src/main/resources/assets/thaumcraft/`.
+- [ ] Client log has no missing texture/model warnings for Stage 8-d entities during smoke scenarios.
+- [ ] Copied assets preserve original filenames, relative paths, and metadata from `thaumcraft_src/assets/thaumcraft/`.
+
+**Риски / зависимости:**
+
+Resource paths are public presentation contracts per PRD `docs/PRD.md:140-158`. Renaming paths to fit current code would create avoidable parity risk; renderer code should use original paths unless Forge 1.12 resource loading requires a documented technical adaptation.
+
+### GAP-6: Reference renderer behavior has not been ported or parity-checked
+
+**Статус:** отсутствует  
+**Критичность:** high
+
+**Текущая реализация:**
+- `src/main/java/thaumcraft/client/ClientProxy.java:24-105`
+- `src/main/java/thaumcraft/client/renderers/entity/` отсутствует
+- `src/main/java/thaumcraft/client/renderers/models/entities/` отсутствует
+
+**Референс:**
+- `thaumcraft_src/thaumcraft/client/renderers/entity/*.class`
+- `thaumcraft_src/thaumcraft/client/renderers/models/entities/*.class`
+
+**Что не совпадает:**
+
+Даже после добавления class shells, Stage 8-d не будет закрыт без переноса renderer-specific behavior. Reference renderers содержат много поведения, которое нельзя заменить простыми vanilla renderers: texture pass selection, alpha/blend/depth state, billboards, custom quads, held item rendering, golem carried items, overlay passes, entity scaling, model animations, portal/wisp visuals, primal arrow colors, taintacle length, taint sheep wool pass, taint creeper charged overlay, eldritch boss scaling and alternate textures.
+
+Current code не содержит ни одного такого behavior point.
+
+**Что нужно доделать:**
+
+Для каждого renderer/model класса выполнить method-by-method comparison against reference и портировать поведение на 1.12.2 APIs.
+
+**Как доделать:**
+- Для каждого renderer из GAP-2/GAP-3 снять reference structure через CFR/javap и вручную перенести в Java source с 1.12 method names.
+- Составить registration matrix: entity class -> renderer class -> model class -> textures/resources -> smoke spawn command/scenario.
+- Проверить GL state push/pop или `GlStateManager` symmetry для blend, alpha, lighting, cull, depth mask, rescale normal, color reset.
+- Для renderers, которые используют item/block rendering, заменить 1.7 `RenderBlocks`, `IIcon`, `Tessellator` usage на 1.12 `RenderItem`, `BlockRendererDispatcher`, `TextureAtlasSprite`, `BufferBuilder`/`Tessellator` equivalents.
+- Для boss/mob renderers проверить current entity accessors and data manager fields before adding visual assumptions.
+
+**Критерии приемки:**
+- [ ] Каждый renderer имеет documented/static comparison с reference class and methods before being marked done.
+- [ ] Нет placeholder render methods, empty render passes, or TODO stubs in `thaumcraft.client.renderers.entity` and `thaumcraft.client.renderers.models.entities`.
+- [ ] Visual behavior for variants and special passes is manually verified or covered by targeted smoke checks.
+
+**Риски / зависимости:**
+
+Некоторые reference renderers используют old GL/Tessellator idioms and obfuscated MCP 1.7 method names. Static compile success не доказывает visual parity; нужен client runtime/manual validation. Particle/shader systems may affect perceived visuals for wisp/orb/cultist effects, but standalone Stage 8-d acceptance should focus on renderer-local drawing and not require completing unrelated Stage 8 chunks.
+
+### GAP-7: Нет Stage 8-d smoke/manual validation coverage
+
+**Статус:** требует проверки  
+**Критичность:** high
+
+**Текущая реализация:**
+- `docs/PRD.md:389-393`
+- `docs/PRD.md:483-492`
+- `docs/PRD.md:534-535`
+- `src/main/java/thaumcraft/common/config/ConfigEntities.java:72-144`
+
+**Референс:**
+- `thaumcraft_src/thaumcraft/client/ClientProxy.class`
+- `thaumcraft_src/thaumcraft/client/renderers/entity/*.class`
+- `thaumcraft_src/thaumcraft/client/renderers/models/entities/*.class`
+
+**Что не совпадает:**
+
+PRD requires runtime smoke for client rendering risk, including that entity renderers do not crash for registered mobs/projectiles. No Stage 8-d-specific validation matrix exists, and no client smoke/manual scenarios have been recorded for entity rendering. Current `ClientProxy` has no entity renderer code to validate yet.
+
+**Что нужно доделать:**
+
+Define and run a minimal but complete Stage 8-d validation matrix after implementation.
+
+**Как доделать:**
+- Run `./scripts/dev.sh compileJava` after renderer/model source is added.
+- Run `./scripts/dev.sh build` and `./scripts/dev.sh check-jar` before a checkpoint intended for normal Forge/Prism usage.
+- Run `./scripts/dev.sh smoke-client` if display/X11 is available.
+- Run `./scripts/dev.sh smoke-server` to confirm client-only renderer classes are not loaded on dedicated server.
+- In a client dev world, spawn or trigger each entity group: item-like entities, aspect orb, falling taint, every projectile renderer, golem/trunk variants, pech variants, wisp/firebat, eldritch mobs/bosses, cultists/portal, thaumic slime, taint mobs/taintacles.
+- Record any scenarios that cannot be triggered due to non-Stage8-d content dependencies as dependencies, not as Stage 8-d completion.
+
+**Критерии приемки:**
+- [ ] Client smoke reaches main menu or playable world with no Stage 8-d renderer crash markers.
+- [ ] Dedicated server smoke passes with no client classloading failures.
+- [ ] Manual/entity spawn matrix covers every renderer registration or documents a concrete dependency for any missing scenario.
+
+**Риски / зависимости:**
+
+Some entities may be hard to trigger naturally until recipes/research/spawn content are complete. This is a Stage 9/content dependency only for manual scenario setup; it does not remove the need to validate renderers via spawn commands, test items, or controlled dev-world setup.
+
+## 6. Итоговый checklist закрытия Stage 8-d
+
+- [ ] Add client-only entity renderer registration hook.
+- [ ] Register every entity from `ConfigEntities.ENTITIES` with a custom or vanilla-equivalent renderer.
+- [ ] Port item-like/transient/projectile renderers.
+- [ ] Port mob, boss, golem, trunk, taint, cultist, eldritch, wisp/firebat renderers.
+- [ ] Port all entity model classes needed by registered renderers.
+- [ ] Copy all required entity renderer textures and OBJ/model resources from `thaumcraft_src/assets/thaumcraft/`.
+- [ ] Replace all 1.7-only rendering APIs with Forge/Minecraft 1.12.2 equivalents.
+- [ ] Verify no client renderer classes are referenced from common/server-only initialization.
+- [ ] Run compile/build/check-jar validation after implementation.
+- [ ] Run server smoke to check side separation.
+- [ ] Run client smoke and manual spawn/render scenarios for every renderer group.
+- [ ] Update this document with closed gaps and validation evidence after implementation.
+
+## 7. Definition of Done
+
+Stage 8-d считается ПОЛНОСТЬЮ завершенной только если:
+- все blocker gaps закрыты;
+- все high gaps закрыты;
+- все элементы из scope Stage 8-d реализованы;
+- текущая реализация соответствует референсу по поведению;
+- все нужные файлы, ресурсы и регистрации присутствуют;
+- отсутствуют TODO и заглушки внутри scope Stage 8-d;
+- проект собирается без ошибок;
+- базовые игровые сценарии Stage 8-d проверены вручную или тестами;
+- ./docs/Stage8-d.md обновлен и не содержит критичных открытых вопросов.
+
+## 8. Открытые вопросы
+
+- `EntityWatcher` and `RenderWatcher` exist in reference material (`thaumcraft_src/thaumcraft/common/entities/monster/EntityWatcher.class`, `thaumcraft_src/thaumcraft/client/renderers/entity/RenderWatcher.class`, `thaumcraft_src/thaumcraft/client/renderers/models/entities/ModelWatcher.class`) and current source has `src/main/java/thaumcraft/common/entities/monster/EntityWatcher.java`, but `EntityWatcher` is not registered in `src/main/java/thaumcraft/common/config/ConfigEntities.java:72-144`. Stage 8-d should not port/register `RenderWatcher` unless entity registration is added by the relevant common/content scope.
+- Static analysis cannot confirm final visual parity for GL state, animation timing, model rotations, held items, overlays, and resource binding. These require client runtime/manual verification after implementation.

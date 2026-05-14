@@ -1,0 +1,384 @@
+# Stage 9-b — Gap-анализ и план закрытия
+
+## 1. Цель фазы
+
+Stage 9-b закрывает arcane crafting parity для Thaumcraft 4.2.3.5 на Forge 1.12.2: данные arcane recipes, API `IArcaneRecipe`, shaped/shapeless behavior, Arcane Workbench matching/output/vis consumption, dynamic wand/sceptre recipes, recipe research gates and research recipe handles.
+
+Stage 9-b сейчас нельзя считать завершенной: blocker gaps остаются в регистрации рецептов, workbench crafting flow, dynamic wand/sceptre recipes, research recipe map/gates и 1.12.2 `ItemStack.EMPTY` совместимости.
+
+## 2. Scope фазы
+
+- Arcane crafting recipes only: shaped, shapeless and dynamic arcane recipes.
+- `thaumcraft.api.crafting.IArcaneRecipe`, `ShapedArcaneRecipe`, `ShapelessArcaneRecipe` API behavior as required by arcane recipe data.
+- `ThaumcraftApi.addArcaneCraftingRecipe`, `addShapelessArcaneCraftingRecipe`, `getCraftingRecipes` manager integration.
+- `ConfigRecipes.initializeArcaneRecipes()` equivalent and all reference arcane recipe keys/outputs/costs/research gates.
+- Arcane Workbench server container/output slot/vis consumption path required to craft these recipes.
+- Wand/rod/cap/sceptre dynamic recipes and vis/aspect cost calculation.
+- Research gates/unlocks only where they directly gate arcane recipes or store arcane recipe handles.
+- Excluded except as direct dependency: infusion/crucible recipe data, normal recipe data, full research page content, Stage 8 render/FX/client polish.
+
+## 3. Источники сравнения
+
+- Current PRD Stage 9 scope: `docs/PRD.md:400-416`.
+- Current API: `src/main/java/thaumcraft/api/ThaumcraftApi.java:90-103`, `src/main/java/thaumcraft/api/crafting/IArcaneRecipe.java:9-23`, `src/main/java/thaumcraft/api/crafting/ShapedArcaneRecipe.java:16-193`, `src/main/java/thaumcraft/api/crafting/ShapelessArcaneRecipe.java:16-133`.
+- Current recipe config stubs: `src/main/java/thaumcraft/common/config/ConfigRecipes.java:5-13`, `src/main/java/thaumcraft/common/config/ConfigResearch.java:3-8`.
+- Current workbench integration: `src/main/java/thaumcraft/common/container/ContainerArcaneWorkbench.java:10-43`, `src/main/java/thaumcraft/common/tiles/TileArcaneWorkbench.java:6-18`, `src/main/java/thaumcraft/common/blocks/BlockTable.java:145-155`, `src/main/java/thaumcraft/common/CommonProxy.java:96-99`, `src/main/java/thaumcraft/client/ClientProxy.java:79-84`.
+- Current wand component/cost support: `src/main/java/thaumcraft/api/wands/WandCap.java:76-86`, `src/main/java/thaumcraft/api/wands/WandRod.java:88-114`, `src/main/java/thaumcraft/common/items/wands/ItemWandCasting.java:215-247`, `src/main/java/thaumcraft/common/Thaumcraft.java:317-354`.
+- Current aspect generation consumer for arcane recipes: `src/main/java/thaumcraft/common/lib/crafting/ThaumcraftCraftingManager.java:262-300`, `src/main/java/thaumcraft/common/lib/crafting/ThaumcraftCraftingManager.java:349-360`.
+- Reference arcane recipe registrations: `thaumcraft_src/thaumcraft/common/config/ConfigRecipes.class`, decompiled with `cfr --silent true thaumcraft_src/thaumcraft/common/config/ConfigRecipes.class`; relevant output lines include `initializeArcaneRecipes` at decompiled lines 183-276 and dynamic adds at 225-228, plus `ThaumcraftApi.getCraftingRecipes().add(ra)` at decompiled line 358.
+- Reference workbench flow: `thaumcraft_src/thaumcraft/common/container/ContainerArcaneWorkbench.class`, `thaumcraft_src/thaumcraft/common/container/SlotCraftingArcaneWorkbench.class`, `thaumcraft_src/thaumcraft/common/lib/crafting/ThaumcraftCraftingManager.class`, `thaumcraft_src/thaumcraft/common/lib/crafting/ArcaneWandRecipe.class`, `thaumcraft_src/thaumcraft/common/lib/crafting/ArcaneSceptreRecipe.class`.
+- Commands run for this analysis: `git status --short`; `jar tf Thaumcraft-1.7.10-4.2.3.5.jar | rg 'Arcane|MagicWorkbench|ConfigRecipes|crafting|ContainerArcane|GuiArcane'`; `find thaumcraft_src -path '*ConfigRecipes*' -o -path '*ArcaneRecipe*' -o -path '*ArcaneWorkbench*' -o -path '*ArcaneWandRecipe*' -o -path '*ArcaneSceptreRecipe*' | sort`; focused `rg` scans for `addArcaneCraftingRecipe`, `IArcaneRecipe`, `findMatchingArcaneRecipe`, `ConfigResearch.recipes`, workbench classes and Stage 9 stubs; `cfr --silent true` decompiles listed above; `cfr --silent true thaumcraft_src/thaumcraft/common/config/ConfigRecipes.class | rg -c 'addArcaneCraftingRecipe|addShapelessArcaneCraftingRecipe'` returned `89`.
+
+## 4. Текущее состояние Stage 9-b
+
+- `ThaumcraftApi` can allocate and append `ShapedArcaneRecipe`/`ShapelessArcaneRecipe` to the global `craftingRecipes` list, but no current code calls either method (`src/main/java/thaumcraft/api/ThaumcraftApi.java:94-103`; focused scan found no current calls outside the API itself).
+- `ConfigRecipes.init()` is a Stage 9 stub and does not call any arcane recipe initialization (`src/main/java/thaumcraft/common/config/ConfigRecipes.java:7-13`).
+- `ConfigResearch` is also a Stage 9 stub and lacks the reference `recipes` map used to store arcane recipe handles by keys such as `PrimalCharm`, `ArcaneStone1`, `WandCapGold`, `FocusFire`, `Goggles` (`src/main/java/thaumcraft/common/config/ConfigResearch.java:3-8`; reference `ConfigRecipes.class` decompiled lines 188-276).
+- Current `IArcaneRecipe`, `ShapedArcaneRecipe` and `ShapelessArcaneRecipe` are structurally close to the 1.7.10 API, but their matching code still uses `null` emptiness assumptions that are unsafe with Forge 1.12.2 inventories returning `ItemStack.EMPTY` (`src/main/java/thaumcraft/api/crafting/ShapedArcaneRecipe.java:143-167`, `src/main/java/thaumcraft/api/crafting/ShapelessArcaneRecipe.java:81-105`; `TileMagicWorkbench.getStackInSlot` returns `ItemStack.EMPTY` at `src/main/java/thaumcraft/common/tiles/TileMagicWorkbench.java:28-30`).
+- Current `ThaumcraftCraftingManager` uses arcane recipes only as an aspect generation source, not for Arcane Workbench matching/output (`src/main/java/thaumcraft/common/lib/crafting/ThaumcraftCraftingManager.java:285-300`; no current `findMatchingArcaneRecipe` or `findMatchingArcaneRecipeAspects` exists).
+- Current `ContainerArcaneWorkbench` has no slots, no crafting result update, no shift-click implementation, no output slot, no wand slot restriction and no vis consumption path (`src/main/java/thaumcraft/common/container/ContainerArcaneWorkbench.java:10-43`).
+- `TileArcaneWorkbench` is effectively only a named ticking `TileMagicWorkbench`; inventory storage exists in the parent, but no workbench-specific crafting behavior is present (`src/main/java/thaumcraft/common/tiles/TileArcaneWorkbench.java:6-18`, `src/main/java/thaumcraft/common/tiles/TileMagicWorkbench.java:19-20`).
+- Server GUI routing opens `ContainerArcaneWorkbench`, but the client GUI route returns `null`, so a player cannot use the normal Arcane Workbench UI even if server recipes existed (`src/main/java/thaumcraft/common/CommonProxy.java:96-99`, `src/main/java/thaumcraft/client/ClientProxy.java:79-84`). This is a direct dependency from Stage 8/client GUI work.
+- Reference `initializeArcaneRecipes()` registers 89 shaped/shapeless arcane recipes and additional dynamic recipes; current implementation registers zero.
+
+## 5. Gap list
+
+### GAP-1: Arcane recipe data registration отсутствует полностью
+
+**Статус:** отсутствует  
+**Критичность:** blocker
+
+**Текущая реализация:**
+- `src/main/java/thaumcraft/common/config/ConfigRecipes.java:5-13`
+- `src/main/java/thaumcraft/api/ThaumcraftApi.java:94-103`
+
+**Референс:**
+- `thaumcraft_src/thaumcraft/common/config/ConfigRecipes.class`, decompiled `initializeArcaneRecipes()` lines 183-276
+- `thaumcraft_src/thaumcraft/api/ThaumcraftApi.class`, arcane recipe add methods equivalent to current API
+
+**Что не совпадает:**
+Reference calls `initializeArcaneRecipes()` from `ConfigRecipes.init()` before normal/infusion recipe initialization and fills `ConfigResearch.recipes` with arcane recipe objects. Current `ConfigRecipes.init()` has only `// Phase 9: register all recipes`, and no current source calls `ThaumcraftApi.addArcaneCraftingRecipe` or `addShapelessArcaneCraftingRecipe`. Reference decompile scan found 89 shaped/shapeless arcane recipe add calls; current count is zero.
+
+**Что нужно доделать:**
+Port `initializeArcaneRecipes()` into Forge 1.12.2 source and register all original arcane recipe entries with matching research keys, outputs, ingredients, aspect costs and conditional ore-dictionary branches.
+
+**Как доделать:**
+- `src/main/java/thaumcraft/common/config/ConfigRecipes.java`: add an `initializeArcaneRecipes()` method or equivalent Stage 9-b split called from the lifecycle point where items/blocks/wand components and `ConfigResearch.recipes` are ready.
+- `src/main/java/thaumcraft/common/config/ConfigRecipes.java`: port reference entries from decompiled lines 188-276, including `Banner_0..15`, `PrimalCharm`, `ArcaneDoor`, `WardedGlass`, `IronKey`, `GoldKey`, `ArcanePressurePlate`, `NodeStabilizer`, `NodeRelay`, `FocalManipulator`, `ArcaneStone1`, `PaveTravel`, `ArcaneLamp`, `ArcaneSpa`, `Levitator`, `ArcaneEar`, `MirrorGlass`, `BoneBow`, `PrimalArrow_0..5`, `InfusionMatrix`, `ArcanePedestal`, `WardedJar`, `JarVoid`, wand caps/rods/staff rods/foci/golem upgrades/robe/goggles and decoration entries.
+- `src/main/java/thaumcraft/common/config/ConfigRecipes.java`: preserve `Config.foundCopperIngot`/`Config.foundSilverIngot` conditional recipes for copper and silver caps.
+- `src/main/java/thaumcraft/common/config/ConfigResearch.java`: expose/store the same recipe-key map used by research pages.
+
+**Критерии приемки:**
+- [ ] Focused audit shows every reference arcane key from `initializeArcaneRecipes()` exists in current registration or is documented with a concrete missing-content blocker.
+- [ ] `ThaumcraftApi.getCraftingRecipes()` contains the expected `IArcaneRecipe` instances after mod initialization.
+- [ ] Aspect costs and research strings match the reference for representative recipes: `PrimalCharm`, `ArcaneStone1`, `WandCapGold`, `WandRodGreatwood`, `FocusFire`, `Goggles`.
+
+**Риски / зависимости:**
+Depends on Stage 9-a lifecycle/recipe foundation and current item/block registry names. Missing item/block variants must be handled as concrete blockers, not silently skipped.
+
+### GAP-2: Dynamic wand and sceptre arcane recipes отсутствуют
+
+**Статус:** отсутствует  
+**Критичность:** blocker
+
+**Текущая реализация:**
+- `src/main/java/thaumcraft/common/lib/crafting/` lacks `ArcaneWandRecipe.java`
+- `src/main/java/thaumcraft/common/lib/crafting/` lacks `ArcaneSceptreRecipe.java`
+- `src/main/java/thaumcraft/common/Thaumcraft.java:317-354`
+- `src/main/java/thaumcraft/api/wands/WandCap.java:76-86`
+- `src/main/java/thaumcraft/api/wands/WandRod.java:88-114`
+
+**Референс:**
+- `thaumcraft_src/thaumcraft/common/lib/crafting/ArcaneWandRecipe.class`
+- `thaumcraft_src/thaumcraft/common/lib/crafting/ArcaneSceptreRecipe.class`
+- `thaumcraft_src/thaumcraft/common/config/ConfigRecipes.class`, decompiled lines 225-228
+
+**Что не совпадает:**
+Reference adds `new ArcaneWandRecipe()` and `new ArcaneSceptreRecipe()` directly to `ThaumcraftApi.getCraftingRecipes()`. These recipes dynamically validate cap/rod combinations, research completion, layout, output NBT, primal vis cost and sceptre NBT. Current source has wand cap/rod registries and `ItemWandCasting` NBT helpers, but no dynamic arcane recipe classes and no registration.
+
+**Что нужно доделать:**
+Port both dynamic recipes to 1.12.2, using `ItemStack.EMPTY` semantics and current static `ItemWandCasting.setCap`, `setRod`, `isSceptre` conventions.
+
+**Как доделать:**
+- Add `src/main/java/thaumcraft/common/lib/crafting/ArcaneWandRecipe.java` implementing `IArcaneRecipe`.
+- Add `src/main/java/thaumcraft/common/lib/crafting/ArcaneSceptreRecipe.java` implementing `IArcaneRecipe`.
+- Register both in `ConfigRecipes.initializeArcaneRecipes()` via `ThaumcraftApi.getCraftingRecipes().add(...)` like reference decompiled lines 225-228.
+- Verify layout rules: wand uses caps at `(0,2)` and `(2,0)`, rod at `(1,1)`; sceptre uses three caps, rod, primal charm/focus item, and requires `SCEPTRE` research.
+- Verify cost rules: wand adds all primal aspects at `capCraftCost * rodCraftCost`; sceptre adds all primal aspects at `1.5 * capCraftCost * rodCraftCost`.
+
+**Критерии приемки:**
+- [ ] Dynamic wand crafting creates a wand with correct cap/rod NBT and damage/cost metadata.
+- [ ] Dynamic sceptre crafting creates a wand stack with sceptre NBT and correct cap/rod NBT.
+- [ ] Research gates for caps, rods and `SCEPTRE` prevent output until complete.
+
+**Риски / зависимости:**
+Depends on wand component registration (`src/main/java/thaumcraft/common/Thaumcraft.java:317-354`) and on research completion checks. Staff rod tags in current `StaffRod` must match reference recipe names before sceptre/staff scenarios can pass.
+
+### GAP-3: Arcane Workbench matching methods отсутствуют в crafting manager
+
+**Статус:** отсутствует  
+**Критичность:** blocker
+
+**Текущая реализация:**
+- `src/main/java/thaumcraft/common/lib/crafting/ThaumcraftCraftingManager.java:43-90`
+- `src/main/java/thaumcraft/common/lib/crafting/ThaumcraftCraftingManager.java:285-300`
+
+**Референс:**
+- `thaumcraft_src/thaumcraft/common/lib/crafting/ThaumcraftCraftingManager.class`, decompiled `findMatchingArcaneRecipe` and `findMatchingArcaneRecipeAspects` methods lines 147-193
+
+**Что не совпадает:**
+Reference has public methods used by the Arcane Workbench container to find matching `IArcaneRecipe` output and aspect cost. Current manager only uses arcane recipes to generate object aspects and has no methods for live workbench crafting.
+
+**Что нужно доделать:**
+Add 1.12.2-safe equivalents of `findMatchingArcaneRecipe(IInventory, EntityPlayer)` and `findMatchingArcaneRecipeAspects(IInventory, EntityPlayer)`.
+
+**Как доделать:**
+- `src/main/java/thaumcraft/common/lib/crafting/ThaumcraftCraftingManager.java`: add the two public methods, iterate `ThaumcraftApi.getCraftingRecipes()`, filter `IArcaneRecipe`, call `matches(inv, player.world, player)`, return recipe output/cost.
+- Treat `ItemStack.EMPTY` as empty when scanning inventory.
+- Return `ItemStack.EMPTY` or `null` consistently with the container implementation chosen for Forge 1.12.2; avoid leaking 1.7.10 null assumptions into slots.
+
+**Критерии приемки:**
+- [ ] Container can query a matching arcane recipe output for `ArcaneStone1` after research is complete.
+- [ ] Container can query a matching aspect cost for both static and dynamic recipes.
+- [ ] No `NullPointerException` or false mismatch occurs when empty workbench slots contain `ItemStack.EMPTY`.
+
+**Риски / зависимости:**
+Depends on GAP-1/GAP-2 recipe data. The method signatures are internal current source behavior, not public API, so they can be adapted to 1.12.2 conventions if all call sites agree.
+
+### GAP-4: Arcane Workbench container/output/vis consumption flow не реализован
+
+**Статус:** частично реализовано  
+**Критичность:** blocker
+
+**Текущая реализация:**
+- `src/main/java/thaumcraft/common/container/ContainerArcaneWorkbench.java:10-43`
+- `src/main/java/thaumcraft/common/tiles/TileMagicWorkbench.java:19-20`
+- `src/main/java/thaumcraft/common/tiles/TileArcaneWorkbench.java:6-18`
+- `src/main/java/thaumcraft/common/items/wands/ItemWandCasting.java:240-247`
+
+**Референс:**
+- `thaumcraft_src/thaumcraft/common/container/ContainerArcaneWorkbench.class`
+- `thaumcraft_src/thaumcraft/common/container/SlotCraftingArcaneWorkbench.class`
+
+**Что не совпадает:**
+Reference container creates output slot 9, wand slot 10, 3x3 crafting input slots, player inventory/hotbar slots, updates output from vanilla crafting first, then arcane recipes if a wand can pay `findMatchingArcaneRecipeAspects(..., false)`. Reference `SlotCraftingArcaneWorkbench` consumes vis on craft, consumes input items, handles container items and fires crafting events. Current container has no slots and only validates interaction distance.
+
+**Что нужно доделать:**
+Implement the Arcane Workbench server container and craft-result slot for Forge 1.12.2.
+
+**Как доделать:**
+- Add or port `src/main/java/thaumcraft/common/container/SlotCraftingArcaneWorkbench.java`.
+- Add or port a wand-only slot equivalent to reference `SlotLimitedByWand` if not already present; current scan found no `SlotLimitedByWand` source.
+- Update `ContainerArcaneWorkbench` to add slots with reference-compatible indices: result slot `9`, wand slot `10`, grid slots `0..8`, player inventory and hotbar.
+- Implement `onCraftMatrixChanged` to compute vanilla crafting result first and arcane output second when a non-staff wand in slot 10 can pay the aspect cost.
+- Implement `transferStackInSlot` and click handling equivalent to reference behavior, adapted to Forge 1.12.2 names and `ItemStack.EMPTY`.
+
+**Критерии приемки:**
+- [ ] Opening the Arcane Workbench server container exposes 47 slots with the reference role layout.
+- [ ] Crafting a static arcane recipe consumes ingredients and the required vis from the wand.
+- [ ] Shift-click behavior moves crafted output to player inventory and routes wands into slot 10 without duplicating items.
+
+**Риски / зависимости:**
+Directly depends on GAP-3 and on client GUI availability for manual testing. Forge 1.12.2 `SlotCrafting` event names and container item handling differ from 1.7.10 and need careful porting.
+
+### GAP-5: `ItemStack.EMPTY` compatibility breaks shaped/shapeless arcane matching
+
+**Статус:** реализовано неправильно  
+**Критичность:** blocker
+
+**Текущая реализация:**
+- `src/main/java/thaumcraft/api/crafting/ShapedArcaneRecipe.java:134-168`
+- `src/main/java/thaumcraft/api/crafting/ShapelessArcaneRecipe.java:77-112`
+- `src/main/java/thaumcraft/common/tiles/TileMagicWorkbench.java:28-38`
+- `src/main/java/thaumcraft/common/lib/InternalMethodHandler.java:49-54`
+
+**Референс:**
+- `thaumcraft_src/thaumcraft/api/crafting/ShapedArcaneRecipe.class`
+- `thaumcraft_src/thaumcraft/api/crafting/ShapelessArcaneRecipe.class`
+- `thaumcraft_src/thaumcraft/common/tiles/TileMagicWorkbench.class`
+
+**Что не совпадает:**
+Reference 1.7.10 inventories use `null` for empty slots. Current 1.12.2 `TileMagicWorkbench.getStackInSlot` returns `ItemStack.EMPTY`, but `ShapedArcaneRecipe.checkMatch` checks `slot == null` and `ShapelessArcaneRecipe.matches` only skips `slot == null`. Empty slots will be treated as real nonmatching items, making many shaped/shapeless recipes fail even after data is registered.
+
+**Что нужно доделать:**
+Make `IArcaneRecipe` implementations consistently use `ItemStack.isEmpty()` for Forge 1.12.2 while preserving public signatures.
+
+**Как доделать:**
+- `ShapedArcaneRecipe.checkMatch`: normalize `ItemStack.EMPTY` to empty and accept empty slot when target is `null`.
+- `ShapelessArcaneRecipe.matches`: skip empty stacks, not just `null`.
+- `checkItemEquals` in both classes: handle `null` and `.isEmpty()` safely before item/meta/tag checks.
+- `InternalMethodHandler.getStackInRowAndColumn`: returning `ItemStack.EMPTY` is fine if recipe code is fixed; do not reintroduce nulls globally.
+
+**Критерии приемки:**
+- [ ] Static shaped arcane recipe with empty padding slots matches correctly.
+- [ ] Static shapeless arcane recipe ignores empty workbench slots correctly.
+- [ ] NBT-sensitive comparisons still preserve `areItemStackTagsEqualForCrafting` behavior.
+
+**Риски / зависимости:**
+This touches public API classes. Do not change method signatures. Existing addon-facing behavior should remain compatible except for required 1.12.2 empty-stack semantics.
+
+### GAP-6: Research recipe map and direct arcane gates отсутствуют
+
+**Статус:** отсутствует  
+**Критичность:** blocker
+
+**Текущая реализация:**
+- `src/main/java/thaumcraft/common/config/ConfigResearch.java:3-8`
+- `src/main/java/thaumcraft/api/research/ResearchPage.java:46-66`
+- `src/main/java/thaumcraft/api/ThaumcraftApi.java:151-188`
+
+**Референс:**
+- `thaumcraft_src/thaumcraft/common/config/ConfigRecipes.class`, decompiled lines 188-276 for direct `ConfigResearch.recipes.put(...)` arcane entries
+- `thaumcraft_src/thaumcraft/api/research/ResearchPage.class`
+
+**Что не совпадает:**
+Reference stores recipe objects under stable research recipe keys, and arcane recipe `matches` checks `ThaumcraftApiHelper.isResearchComplete(playerName, research)`. Current `ConfigResearch` has no `recipes` map at all and no research entries/pages, so recipe handles cannot be stored or displayed/unlocked. `ThaumcraftApi.getCraftingRecipeKey` scans research pages for recipe outputs, but current research setup cannot provide pages for arcane recipes.
+
+**Что нужно доделать:**
+Restore the `ConfigResearch.recipes` storage contract and wire arcane recipe registrations into it with reference keys, then ensure direct research strings on recipes correspond to actual research keys.
+
+**Как доделать:**
+- `src/main/java/thaumcraft/common/config/ConfigResearch.java`: add the recipe handle map used by config and research pages.
+- `ConfigRecipes.initializeArcaneRecipes()`: use exact reference map keys from decompiled lines 188-276.
+- Research implementation owner must ensure keys such as `BASICARTIFACE`, `WARDEDARCANA`, `NODESTABILIZER`, `VISPOWER`, `FOCALMANIPULATION`, `ARCANESTONE`, `PAVETRAVEL`, `ARCANELAMP`, `INFUSION`, `CAP_gold`, `ROD_greatwood`, `FOCUSFIRE`, `GOGGLES`, `GOLEMBELL` exist and unlock recipe visibility.
+- Add focused validation that an incomplete player cannot match a gated arcane recipe and a completed player can.
+
+**Критерии приемки:**
+- [ ] `ConfigResearch.recipes` contains all Stage 9-b arcane recipe handles after recipe initialization.
+- [ ] Each arcane recipe's `getResearch()` key maps to a real current research entry or an explicit documented dependency.
+- [ ] Research-gated crafting fails before completion and succeeds after completion for representative recipes.
+
+**Риски / зависимости:**
+Dependency: broader research page/content implementation belongs to Stage 9-d/e, but the recipe handle map and direct recipe gate keys block Stage 9-b and must exist enough for arcane recipe registration/testing.
+
+### GAP-7: Recipe IDs/names/content coverage audit отсутствует
+
+**Статус:** отсутствует  
+**Критичность:** high
+
+**Текущая реализация:**
+- `src/main/java/thaumcraft/common/config/ConfigRecipes.java:5-13`
+- `src/main/resources/assets/thaumcraft/recipes/` absent
+
+**Референс:**
+- `thaumcraft_src/thaumcraft/common/config/ConfigRecipes.class`, decompiled lines 188-276 and dynamic adds at 225-228, 358
+
+**Что не совпадает:**
+Reference arcane recipes are keyed by `ConfigResearch.recipes` names and stored in the `ThaumcraftApi` recipe list, not by Forge JSON ids. Forge 1.12.2 still needs stable resource/registry naming for any Java recipes registered through Forge recipe infrastructure, while arcane-only recipes need stable audit names for research pages and debugging. Current source has no mapping/audit from reference keys to current recipe ids, output registry names, meta values, or missing content.
+
+**Что нужно доделать:**
+Create an implementation-side audit while porting recipes: reference key, research gate, output item/block registry name/meta/NBT, shaped/shapeless/dynamic type, aspect cost, current registration owner, validation status.
+
+**Как доделать:**
+- Keep audit close to `ConfigRecipes.initializeArcaneRecipes()` or in a dedicated Stage 9 implementation doc updated during implementation.
+- Confirm each output exists in current `ConfigItems`/`ConfigBlocks` before adding the recipe.
+- Assign stable Forge registry names only if any arcane recipe is implemented as an `IRecipe`; otherwise preserve stable `ConfigResearch.recipes` keys and `ThaumcraftApi` list order.
+- Include conditional recipes for copper/silver separately from always-present recipes.
+
+**Критерии приемки:**
+- [ ] All 89 reference shaped/shapeless arcane add calls are mapped to current entries.
+- [ ] Dynamic entries `ArcaneWandRecipe`, `ArcaneSceptreRecipe` and the custom runic augment recipe at reference decompiled line 358 are either owned by Stage 9-b if arcane or explicitly deferred if infusion-only.
+- [ ] No duplicate research recipe keys or unstable generated names exist in Stage 9-b data.
+
+**Риски / зависимости:**
+Some outputs may depend on content not yet ported or renamed. Missing content must become concrete implementation blockers for that recipe; do not change registry identities to make recipes easier.
+
+### GAP-8: Arcane Workbench client GUI is absent as a direct usability dependency
+
+**Статус:** отсутствует  
+**Критичность:** high
+
+**Текущая реализация:**
+- `src/main/java/thaumcraft/client/ClientProxy.java:79-84`
+- `src/main/java/thaumcraft/common/blocks/BlockTable.java:153-155`
+- `src/main/java/thaumcraft/common/CommonProxy.java:96-99`
+
+**Референс:**
+- `thaumcraft_src/thaumcraft/client/gui/GuiArcaneWorkbench.class`
+- `thaumcraft_src/thaumcraft/common/container/ContainerArcaneWorkbench.class`
+
+**Что не совпадает:**
+Server-side block activation routes to `GUI_ARCANE_WORKBENCH`, but current client proxy returns `null` for that GUI id. Even if server recipe logic is implemented, normal player use and manual validation of arcane crafting are blocked through the GUI path.
+
+**Что нужно доделать:**
+Provide enough client GUI integration for manual Stage 9-b validation, or explicitly coordinate with the Stage 8 GUI chunk before claiming Stage 9-b complete.
+
+**Как доделать:**
+- Dependency only: implement or unblock `GuiArcaneWorkbench` in the client scope so it can open against `ContainerArcaneWorkbench`.
+- Ensure the GUI uses the same server slot indices and displays wand/vis costs accurately enough for manual validation.
+- Do not let Stage 9-b claim completion until at least server container tests and one GUI/manual craft path are validated.
+
+**Критерии приемки:**
+- [ ] Right-clicking an Arcane Workbench opens a client GUI instead of returning `null`.
+- [ ] The GUI displays the server result slot and wand slot consistently with the container.
+- [ ] At least one shaped and one shapeless arcane recipe are manually craftable through the GUI.
+
+**Риски / зависимости:**
+Dependency: this is primarily Stage 8 client GUI work, but it directly blocks Stage 9-b manual validation and normal player usability.
+
+### GAP-9: Runtime/manual validation scenarios for arcane progression отсутствуют
+
+**Статус:** требует проверки  
+**Критичность:** high
+
+**Текущая реализация:**
+- `docs/PRD.md:413-416`
+- `src/main/java/thaumcraft/common/config/ConfigRecipes.java:7-13`
+- `src/main/java/thaumcraft/common/container/ContainerArcaneWorkbench.java:10-43`
+
+**Референс:**
+- `thaumcraft_src/thaumcraft/common/config/ConfigRecipes.class`, decompiled lines 188-276
+- `thaumcraft_src/thaumcraft/common/container/SlotCraftingArcaneWorkbench.class`
+
+**Что не совпадает:**
+The PRD explicitly warns that content can compile while unusable. Current Stage 9-b has no recipe data and no validation scenarios. No evidence exists that recipe gates, vis consumption, ingredient consumption, NBT outputs, dynamic wand/sceptre outputs or conditional ore recipes work in a runtime environment.
+
+**Что нужно доделать:**
+Define and run focused validation after implementation. Compile success is not sufficient.
+
+**Как доделать:**
+- Add lightweight tests or manual checklist for representative recipes: `ArcaneStone1`, `MirrorGlass`, `WandedJar`, `WandCapGold`, `WandRodGreatwood`, dynamic wand, dynamic sceptre, `FocusFire`, `Goggles`, one golem upgrade and one conditional copper/silver cap when ore dictionary entries exist.
+- Run `./scripts/dev.sh compileJava` after implementation.
+- Run `./scripts/dev.sh smoke-server` because recipes, containers and lifecycle are runtime-affecting.
+- Run client smoke/manual GUI validation if display is available because Arcane Workbench use requires client GUI interaction.
+
+**Критерии приемки:**
+- [ ] Server smoke reaches ready state with no recipe, registry, classloading or GUI handler fatal errors.
+- [ ] Manual/test craft consumes ingredients and wand vis exactly once for representative recipes.
+- [ ] Research-gated recipes are unavailable before unlock and available after unlock.
+
+**Риски / зависимости:**
+Runtime validation depends on Stage 8 GUI availability for full manual gameplay checks. Server-side container tests can still catch recipe registration, matching and vis consumption defects before GUI parity is complete.
+
+## 6. Итоговый checklist закрытия Stage 9-b
+
+- [ ] Replace `ConfigRecipes` Stage 9 stubs with a concrete arcane recipe initialization path.
+- [ ] Port all reference shaped and shapeless arcane recipe registrations from `ConfigRecipes.initializeArcaneRecipes()`.
+- [ ] Port and register `ArcaneWandRecipe` and `ArcaneSceptreRecipe`.
+- [ ] Add current `ThaumcraftCraftingManager.findMatchingArcaneRecipe` and `findMatchingArcaneRecipeAspects` equivalents.
+- [ ] Implement Arcane Workbench slots, output update, craft result slot, wand slot restriction, shift-click and vis consumption.
+- [ ] Fix `ItemStack.EMPTY` handling in shaped and shapeless arcane recipe matching.
+- [ ] Restore `ConfigResearch.recipes` handle storage enough for Stage 9-b recipe keys.
+- [ ] Verify all direct arcane research gate keys exist or are documented as concrete dependencies.
+- [ ] Produce a recipe key/output/aspect/research coverage audit for all Stage 9-b arcane recipes.
+- [ ] Run focused compile and runtime smoke validation after implementation.
+- [ ] Manually validate representative arcane crafting scenarios, including dynamic wand/sceptre and at least one shapeless recipe.
+
+## 7. Definition of Done
+
+Stage 9-b считается ПОЛНОСТЬЮ завершенной только если:
+- все blocker gaps закрыты;
+- все high gaps закрыты;
+- все элементы из scope Stage 9-b реализованы;
+- текущая реализация соответствует референсу по поведению;
+- все нужные файлы, ресурсы и регистрации присутствуют;
+- отсутствуют TODO и заглушки внутри scope Stage 9-b;
+- проект собирается без ошибок;
+- базовые игровые сценарии Stage 9-b проверены вручную или тестами;
+- ./docs/Stage9-b.md обновлен и не содержит критичных открытых вопросов.
+
+## 8. Открытые вопросы
+
+- Нужно подтвердить после Stage 9-a lifecycle work, где именно в Forge 1.12.2 будут создаваться arcane recipe objects: во время config/init для `ThaumcraftApi` list или через отдельный registry/event-safe bridge, если часть рецептов будет представлена Forge `IRecipe`.
+- Нужно подтвердить после content audit, какие из reference output items/blocks/metas отсутствуют в текущем порте и должны быть закрыты до recipe parity, а какие относятся к другим Stage 9 chunks.
+- Нужно подтвердить GUI dependency schedule: Stage 9-b может реализовать server/container behavior, но не может быть полностью закрыта без клиентского открытия Arcane Workbench или эквивалентной manual/test validation path.
