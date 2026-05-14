@@ -202,9 +202,34 @@ public class BlockEldritch extends Block {
     @Override
     public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, net.minecraft.entity.player.EntityPlayer player,
                                     EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
-        if (this.getMetaFromState(state) == 8) {
-            ItemStack stack = player.getHeldItem(hand);
-            TileEntity tile = world.getTileEntity(pos);
+        int meta = this.getMetaFromState(state);
+        ItemStack stack = player.getHeldItem(hand);
+        TileEntity tile = world.getTileEntity(pos);
+
+        if (meta == 0
+                && !player.isSneaking()
+                && !stack.isEmpty()
+                && stack.getItem() instanceof ItemEldritchObject
+                && stack.getItemDamage() == ItemEldritchObject.META_ELDRITCH_OBJECT
+                && tile instanceof TileEldritchAltar
+                && ((TileEldritchAltar) tile).getEyes() < 4) {
+            if (!world.isRemote) {
+                TileEldritchAltar altar = (TileEldritchAltar) tile;
+                if (altar.getEyes() >= 2) {
+                    altar.setSpawner(true);
+                    altar.setSpawnType((byte) 1);
+                }
+                altar.setEyes((byte) (altar.getEyes() + 1));
+                altar.checkForMaze();
+                stack.shrink(1);
+                tile.markDirty();
+                world.notifyBlockUpdate(pos, state, state, 3);
+                world.playSound(null, pos, TCSounds.CRYSTAL, SoundCategory.BLOCKS, 0.2F, 1.0F);
+            }
+            return true;
+        }
+
+        if (meta == 8) {
             if (!stack.isEmpty()
                     && stack.getItem() instanceof ItemEldritchObject
                     && stack.getItemDamage() == ItemEldritchObject.META_ELDRITCH_OBJECT_2

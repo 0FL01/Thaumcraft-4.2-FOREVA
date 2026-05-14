@@ -2,20 +2,32 @@ package thaumcraft.common.tiles;
 
 import java.util.List;
 import net.minecraft.entity.EntityCreature;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ITickable;
+import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
 import thaumcraft.api.TileThaumcraft;
+import thaumcraft.api.aspects.Aspect;
+import thaumcraft.api.aspects.AspectList;
+import thaumcraft.api.nodes.NodeType;
+import thaumcraft.api.wands.IWandable;
+import thaumcraft.common.config.ConfigBlocks;
 import thaumcraft.common.entities.monster.EntityCultist;
 import thaumcraft.common.entities.monster.EntityCultistCleric;
 import thaumcraft.common.entities.monster.EntityCultistKnight;
 import thaumcraft.common.entities.monster.EntityEldritchGuardian;
+import thaumcraft.common.items.wands.ItemWandCasting;
+import thaumcraft.common.lib.TCSounds;
+import thaumcraft.common.lib.research.ResearchManager;
 import thaumcraft.common.lib.world.dim.MazeHandler;
 import thaumcraft.common.lib.world.dim.MazeThread;
 
-public class TileEldritchAltar extends TileThaumcraft implements ITickable {
+public class TileEldritchAltar extends TileThaumcraft implements ITickable, IWandable {
     private boolean spawner = false;
     private boolean open = false;
     private boolean spawnedClerics = false;
@@ -121,6 +133,57 @@ public class TileEldritchAltar extends TileThaumcraft implements ITickable {
             return false;
         }
         return true;
+    }
+
+    @Override
+    public int onWandRightClick(World world, ItemStack wandstack, EntityPlayer player, int x, int y, int z, int side, int md) {
+        if (world.isRemote) return 0;
+        if (player == null
+                || wandstack.isEmpty()
+                || !(wandstack.getItem() instanceof ItemWandCasting)
+                || !ResearchManager.isResearchComplete(player.getName(), "OCULUS")
+                || this.eyes != 4
+                || this.open) {
+            return -1;
+        }
+
+        net.minecraft.tileentity.TileEntity node = world.getTileEntity(this.pos.up());
+        if (!(node instanceof TileNode) || ((TileNode) node).getNodeType() != NodeType.DARK || !this.checkForMaze()) {
+            return -1;
+        }
+
+        ItemWandCasting wand = (ItemWandCasting) wandstack.getItem();
+        AspectList cost = new AspectList()
+                .add(Aspect.AIR, 100)
+                .add(Aspect.FIRE, 100)
+                .add(Aspect.EARTH, 100)
+                .add(Aspect.WATER, 100)
+                .add(Aspect.ORDER, 100)
+                .add(Aspect.ENTROPY, 100);
+        if (!wand.consumeAllVisCrafting(wandstack, player, cost, true)) {
+            return -1;
+        }
+
+        world.playSound(null, this.pos, TCSounds.WAND, SoundCategory.BLOCKS, 1.0F, 1.0F);
+        this.setOpen(true);
+        world.setBlockToAir(this.pos.up());
+        world.setBlockState(this.pos.up(), ConfigBlocks.blockEldritchPortal.getDefaultState(), 3);
+        this.markDirty();
+        world.notifyBlockUpdate(this.pos, world.getBlockState(this.pos), world.getBlockState(this.pos), 3);
+        return 1;
+    }
+
+    @Override
+    public ItemStack onWandRightClick(World world, ItemStack wandstack, EntityPlayer player) {
+        return wandstack;
+    }
+
+    @Override
+    public void onUsingWandTick(ItemStack wandstack, EntityPlayer player, int count) {
+    }
+
+    @Override
+    public void onWandStoppedUsing(ItemStack wandstack, World world, EntityPlayer player, int count) {
     }
 
     private void spawnGuards() {

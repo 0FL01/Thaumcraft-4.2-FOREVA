@@ -427,12 +427,35 @@ Remaining limits:
 - Boss-room activation and save/reload progression have not been observed in a fresh runtime world because smoke-server remains environment-blocked and user-driven client/manual scenarios are excluded.
 - Stage 8 client lock sparkle/render parity remains open.
 
+### 2026-05-14 — Stage 7 Eldritch altar eye and portal activation
+
+Scope:
+
+- Restored `BlockEldritch` meta `0` activation with `ItemEldritchObject` meta `0` while not sneaking.
+- Restored altar eye insertion: increments `TileEldritchAltar.eyes`, consumes the eye item, syncs the tile, plays the crystal sound, and calls `checkForMaze()`.
+- Restored the reference guardian-spawner transition when adding the third and fourth eyes by setting altar `spawner` and `spawntype = 1`.
+- Made `TileEldritchAltar` wand-activatable for the portal-opening path.
+- Restored the portal-opening gates: `OCULUS` research, exactly four eyes, not already open, dark `TileNode` above the altar, existing maze from `checkForMaze()`, and six primal aspects at 100 vis each through `consumeAllVisCrafting(...)`.
+- On success, sets altar `open`, removes the dark node, places `blockEldritchPortal` above the altar, syncs the tile, and plays the wand sound.
+
+Validation:
+
+- `./scripts/dev.sh compileJava` — passed.
+- `./scripts/dev.sh build` — passed.
+- `./scripts/dev.sh check-jar` — failed before jar inspection because the wrapper's expected MCP mapping cache file is still absent at `.gradle_home/caches/minecraft/de/oceanlabs/mcp/mcp_stable/39/1.12.2/srgs/mcp-srg.srg`.
+- `./scripts/dev.sh smoke-server` — failed by timeout before ready state; log again stopped after `Calling tweak class net.minecraftforge.fml.common.launcher.FMLServerTweaker`, with only Log4j console appender initialization errors. `run/crash-reports/` does not exist, and the configured crash-marker scan found no matches. This matches the clean `da3f307` baseline reproduction recorded above.
+
+Remaining limits:
+
+- Generated ring activation has not been observed in a fresh runtime world because smoke-server remains environment-blocked and user-driven client/manual scenarios are excluded.
+- The async case where `checkForMaze()` has just started a `MazeThread` still needs runtime/save validation before GAP-2/GAP-3 can close.
+
 ## Next Checkpoint Candidate
 
 After the portal trigger and ring bootstrap checkpoints, the next pre-Phase8 candidates are:
 
 - Remaining Stage 7 surface/worldgen behavior, especially `newGen`/regen marker behavior and runtime evidence.
-- Remaining Stage 7 Outer Lands room/tile behavior, especially `TileEldritchAltar` portal opening, full boss-room block-template mutation, key/boss room traversal, and maze save/load race validation.
+- Remaining Stage 7 Outer Lands room/tile behavior, especially full boss-room block-template mutation, key/boss room traversal, and maze save/load race validation.
 - Stage 9 loot/content registration, because `Utils.generateLoot(...)` now has a shared reward path but the full reference loot pool distribution still depends on populated content tables.
 - Stage 6 server-side boss/manual scenario evidence remains excluded from user-driven validation, but static/reference parity blockers should continue to be reduced where possible.
 
