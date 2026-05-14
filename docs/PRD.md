@@ -66,7 +66,7 @@ The following are compatibility boundaries:
 - Network packet registration and payload compatibility where already established.
 - Resource paths under `assets/thaumcraft/**`.
 - Baubles integration semantics.
-- Save-game compatibility where original 1.7.10 data can be reasonably mapped to 1.12.2.
+- Fresh-world runtime identity for registry, config, NBT, network, resource, and API data. Old 1.7.10/WIP saves are not a target.
 
 ## 6. Architecture
 
@@ -250,9 +250,8 @@ Known risk areas:
 
 - Bauble vis storage and inventory vis consumption runtime scenarios.
 - Runic Ring tick behavior versus original behavior.
-- Offline `.thaum` and `.thaumbak` compatibility, currently deferred.
 - Research sync timing.
-- Capability persistence.
+- Capability persistence and fresh-world player-data reload.
 
 Acceptance:
 
@@ -518,7 +517,7 @@ For any successful parity claim, document which of these were run.
 Server/common checks:
 
 - New world loads without registry/config crash.
-- Existing world loads without NBT/capability crash.
+- Fresh world reloads after first save without NBT/capability crash.
 - Wand can hold/use focus.
 - Focus actions mutate world/entities only on server side.
 - Vis costs and discounts are consumed correctly.

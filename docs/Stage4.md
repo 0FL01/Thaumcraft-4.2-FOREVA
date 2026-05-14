@@ -162,7 +162,7 @@ Add proper metadata-preserving ItemBlock registrations for Stage 4 device blocks
 
 **Риски / зависимости:**
 
-Dependency: Phase 9 recipes/research will be unable to grant/place Stage 4 devices until ItemBlocks exist. Do not rename current block registry ids without migration rationale.
+Dependency: Phase 9 recipes/research will be unable to grant/place Stage 4 devices until ItemBlocks exist. Do not rename current block registry ids without compatibility rationale.
 
 ### GAP-2: Arcane Bore server container has no slots or transfer behavior
 
@@ -626,7 +626,7 @@ Visual appearance is Phase 8, but fields that control connection/filter state ar
 
 **Что не совпадает:**
 
-Current wrapper stores block registry name plus old numeric id fallback and tile NBT, then restores after countdown. This is a reasonable 1.12 adaptation, but static analysis cannot prove parity for multi-block opening planes, scheduled updates, neighbor notifications, tile entity restore order and modded tile compatibility. PRD lists Portable Hole wrapper as baseline but not validated in `docs/PRD.md:270-287`.
+Current wrapper stores block registry name plus numeric id fallback and tile NBT, then restores after countdown. This is a reasonable 1.12 adaptation, but static analysis cannot prove parity for multi-block opening planes, scheduled updates, neighbor notifications, tile entity restore order and modded tile compatibility. PRD lists Portable Hole wrapper as baseline but not validated in `docs/PRD.md:270-287`.
 
 **Что нужно доделать:**
 
