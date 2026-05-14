@@ -426,6 +426,11 @@ Port reference vegetation/ore probability and placement rules, adapted to 1.12.2
 **Риски / зависимости:**
 Ore/block metadata must match existing 1.12.2 blockstate mappings in `ConfigBlocks`; wrong metadata can create invalid ore variants.
 
+**Checkpoint 2026-05-14 — Spider Greatwood contents:**
+`WorldGenGreatwoodTrees` now exposes the reference-style `generate(..., boolean spiders)` path and the default generation path uses the original `random.nextInt(8) == 0` spider-variant chance. When the variant triggers, it places a cave-spider spawner under the trunk, attempts up to 50 webs adjacent to Greatwood logs/leaves, and places a dungeon-loot-table chest below the spawner.
+
+Remaining GAP-9 limits after this checkpoint: the full reference vegetation control flow is still missing from GAP-1, Greatwood/Silverwood natural generation is still mostly limited by the current worldgen caller, Silverwood parameter/chance parity remains open, ore placement parity remains open, and spider Greatwood has not been observed in a runtime world because server smoke remains environment-blocked.
+
 ### GAP-10: Boss/world data exists but integration with boss-room lifecycle is unverified
 
 **Статус:** требует проверки  

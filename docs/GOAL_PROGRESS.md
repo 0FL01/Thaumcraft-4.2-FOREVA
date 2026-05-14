@@ -287,11 +287,33 @@ Remaining limits:
 - The full reference `generateSurface(...)` control flow/chance semantics remain under GAP-1, so this checkpoint restores hilltop contents but not the entire surface worldgen pipeline.
 - Hilltop generation has not been observed in a fresh runtime world because smoke-server remains environment-blocked and user-driven client/manual scenarios are excluded.
 
+### 2026-05-14 — Stage 7 spider Greatwood contents
+
+Scope:
+
+- Added the reference-style `WorldGenGreatwoodTrees.generate(..., boolean spiders)` path.
+- Restored the default `random.nextInt(8) == 0` spider-variant chance.
+- Restored the variant contents: cave-spider spawner under the trunk, up to 50 webs placed adjacent to Greatwood logs/leaves, and a dungeon-loot chest below the spawner.
+- Mapped the original `CaveSpider` spawner target to the 1.12.2 entity registry id `minecraft:cave_spider`.
+
+Validation:
+
+- `./scripts/dev.sh compileJava` — passed.
+- `./scripts/dev.sh build` — passed.
+- `./scripts/dev.sh check-jar` — failed before jar inspection because the wrapper's expected MCP mapping cache file is still absent at `.gradle_home/caches/minecraft/de/oceanlabs/mcp/mcp_stable/39/1.12.2/srgs/mcp-srg.srg`.
+- `./scripts/dev.sh smoke-server` — failed by timeout before ready state; log again stopped after `Calling tweak class net.minecraftforge.fml.common.launcher.FMLServerTweaker`, with only Log4j console appender initialization errors, no new crash reports, and no configured crash markers. This matches the clean `da3f307` baseline reproduction recorded above.
+
+Remaining limits:
+
+- The full reference vegetation pipeline is still open under GAP-1, so Greatwood/Silverwood natural placement rates and allowed biome coverage are not closed by this checkpoint.
+- Silverwood parameter/chance parity and ore placement parity remain open Stage 7 work.
+- Spider Greatwood has not been observed in a fresh runtime world because smoke-server remains environment-blocked and user-driven client/manual scenarios are excluded.
+
 ## Next Checkpoint Candidate
 
 After the portal trigger and ring bootstrap checkpoints, the next pre-Phase8 candidates are:
 
-- Remaining Stage 7 surface/worldgen placeholders, especially mound/barrow and spider Greatwood.
+- Remaining Stage 7 surface/worldgen placeholders, especially mound/barrow and the broader vegetation/ore worldgen pipeline.
 - Remaining Stage 7 Outer Lands room/tile behavior, especially `TileEldritchAltar` portal opening, lock/boss-room lifecycle, key/boss room traversal, and maze save/load race validation.
 - Stage 9 loot/content registration, because `Utils.generateLoot(...)` now has a shared reward path but the full reference loot pool distribution still depends on populated content tables.
 - Stage 6 server-side boss/manual scenario evidence remains excluded from user-driven validation, but static/reference parity blockers should continue to be reduced where possible.
