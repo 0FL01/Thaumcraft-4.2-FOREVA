@@ -18,6 +18,7 @@ import net.minecraft.world.gen.IChunkGenerator;
 import net.minecraft.world.gen.feature.WorldGenBlockBlob;
 import net.minecraft.world.gen.feature.WorldGenMinable;
 import net.minecraft.world.gen.feature.WorldGenTrees;
+import net.minecraft.world.gen.structure.MapGenScatteredFeature;
 import net.minecraftforge.common.BiomeDictionary;
 import net.minecraftforge.common.BiomeManager;
 import net.minecraftforge.fml.common.IWorldGenerator;
@@ -40,6 +41,7 @@ public class ThaumcraftWorldGenerator implements IWorldGenerator {
     public static Biome biomeEldritchLands;
     public static HashMap<Integer, Integer> dimensionBlacklist = new HashMap<>();
     public static HashMap<Integer, Integer> biomeBlacklist = new HashMap<>();
+    private final HashMap<Integer, Boolean> structureNode = new HashMap<>();
 
     // Aspect caches for node generation (lazy-init)
     private static ArrayList<Aspect> basicAspects = new ArrayList<>();
@@ -258,8 +260,13 @@ public class ThaumcraftWorldGenerator implements IWorldGenerator {
         // Outer Lands room generation is owned by ChunkProviderOuter.populate().
         if (dim == Config.dimensionOuterId) return;
 
-        // Surface generation only
-        if (world.provider.isNether() || world.provider.getDimensionType() == net.minecraft.world.DimensionType.THE_END) return;
+        if (dim == -1) {
+            generateNether(world, random, chunkX, chunkZ);
+            return;
+        }
+
+        // End generation is intentionally skipped by the reference generator.
+        if (world.provider.getDimensionType() == net.minecraft.world.DimensionType.THE_END) return;
 
         int dimBlacklist = getDimBlacklist(dim);
         if (dimBlacklist == 0 || dimBlacklist == 2) return;
@@ -288,8 +295,10 @@ public class ThaumcraftWorldGenerator implements IWorldGenerator {
             }
         }
 
+        boolean auraGen = false;
         if ((Config.genAura || Config.regenAura) && biomeBlacklistLevel < 1) {
-            generateWildNodes(world, random, x, z);
+            auraGen = generateStructureNode(world, random, x, z);
+            auraGen = generateWildNodes(world, random, x, z, auraGen) || auraGen;
         }
 
         if ((Config.genTrees || Config.regenTrees) && dimBlacklist == -1 && !flatWorld && biomeBlacklistLevel == -1) {
@@ -298,18 +307,30 @@ public class ThaumcraftWorldGenerator implements IWorldGenerator {
 
         // Generate structures (surface)
         if ((Config.genStructure || Config.regenStructure) && dimBlacklist == -1 && dim == 0 && !flatWorld) {
-            generateStructures(world, random, x, z, biome);
+            auraGen = generateStructures(world, random, x, z, biome, auraGen) || auraGen;
+            generateTotem(world, random, chunkX, chunkZ, auraGen);
         }
     }
 
-    private boolean generateWildNodes(World world, Random rand, int x, int z) {
-        if (Config.nodeRarity <= 0 || rand.nextInt(Config.nodeRarity) != 0) return false;
+    private boolean generateStructureNode(World world, Random rand, int x, int z) {
+        BlockPos origin = new BlockPos(x + 8, world.getHeight(new BlockPos(x + 8, 0, z + 8)).getY(), z + 8);
+        BlockPos nearest = new MapGenScatteredFeature().getNearestStructurePos(world, origin, false);
+        if (nearest == null || structureNode.containsKey(nearest.hashCode())) return false;
+
+        structureNode.put(nearest.hashCode(), true);
+        BlockPos nodePos = new BlockPos(nearest.getX(), world.getHeight(nearest).getY() + 3, nearest.getZ());
+        createRandomNodeAt(world, nodePos, rand, false, false, false);
+        return true;
+    }
+
+    private boolean generateWildNodes(World world, Random rand, int x, int z, boolean auraGen) {
+        if (auraGen || Config.nodeRarity <= 0 || rand.nextInt(Config.nodeRarity) != 0) return false;
 
         int bx = x + rand.nextInt(16);
         int bz = z + rand.nextInt(16);
         int y = getFirstUncoveredY(world, bx, bz);
         if (y < 2) {
-            y = world.getSeaLevel() + rand.nextInt(64) - 32 + getFirstUncoveredY(world, bx, bz);
+            y = world.provider.getAverageGroundLevel() + rand.nextInt(64) - 32 + getFirstUncoveredY(world, bx, bz);
         }
         if (y < 2) {
             y = 32 + rand.nextInt(64);
@@ -395,7 +416,7 @@ public class ThaumcraftWorldGenerator implements IWorldGenerator {
                 .generate(world, rand, pos);
     }
 
-    private void generateStructures(World world, Random rand, int x, int z, Biome biome) {
+    private boolean generateStructures(World world, Random rand, int x, int z, Biome biome, boolean auraGen) {
         if (biome == biomeMagicalForest || biome == biomeTaint) {
             // Barrow mounds
             if (rand.nextInt(400) == 0) {
@@ -423,6 +444,7 @@ public class ThaumcraftWorldGenerator implements IWorldGenerator {
             BlockPos pos = new BlockPos(ringX, ringY + 8, ringZ);
             if (ring.generate(world, rand, pos)) {
                 createRandomNodeAt(world, pos.up(2), rand, false, true, false);
+                auraGen = true;
                 Thread mazeThread = new Thread(new MazeThread(chunkX, chunkZ, width, height, rand.nextLong()));
                 mazeThread.start();
             }
@@ -435,8 +457,102 @@ public class ThaumcraftWorldGenerator implements IWorldGenerator {
             BlockPos pos = world.getHeight(new BlockPos(bx, 0, bz));
             if (new WorldGenHilltopStones().generate(world, rand, pos)) {
                 createRandomNodeAt(world, pos.up(4), rand, false, true, false);
+                auraGen = true;
             }
         }
+        return auraGen;
+    }
+
+    private void generateNether(World world, Random rand, int chunkX, int chunkZ) {
+        boolean auraGen = false;
+        boolean flatWorld = world.getWorldInfo().getTerrainType() == WorldType.FLAT;
+        if (!flatWorld && (Config.genStructure || Config.regenStructure)) {
+            auraGen = generateTotem(world, rand, chunkX, chunkZ, auraGen) || auraGen;
+        }
+        if (Config.genAura || Config.regenAura) {
+            generateWildNodes(world, rand, chunkX * 16, chunkZ * 16, auraGen);
+        }
+    }
+
+    private boolean generateTotem(World world, Random rand, int chunkX, int chunkZ, boolean auraGen) {
+        int dim = world.provider.getDimension();
+        if (!Config.genStructure || auraGen || Config.nodeRarity <= 0 || rand.nextInt(Config.nodeRarity * 10) != 0) {
+            return false;
+        }
+        if (dim != 0 && dim != -1) {
+            return false;
+        }
+
+        int x = chunkX * 16 + rand.nextInt(16);
+        int z = chunkZ * 16 + rand.nextInt(16);
+        int topY = dim == -1 ? getFirstUncoveredY(world, x, z) - 1 : world.getHeight(new BlockPos(x, 0, z)).getY() - 1;
+        if (topY > world.getSeaLevel()) {
+            return false;
+        }
+
+        BlockPos base = new BlockPos(x, topY, z);
+        IBlockState baseState = world.getBlockState(base);
+        if (baseState.getBlock().isLeaves(baseState, world, base)) {
+            while (topY > 40) {
+                --topY;
+                base = new BlockPos(x, topY, z);
+                if (world.getBlockState(base).getBlock() == Blocks.GRASS) {
+                    break;
+                }
+            }
+        }
+
+        if (isSnowLayerOrTallGrass(world, base)) {
+            --topY;
+            base = new BlockPos(x, topY, z);
+        }
+        if (!isValidTotemBase(world.getBlockState(base).getBlock())) {
+            return false;
+        }
+
+        int count;
+        for (count = 1; isTotemReplaceable(world, base.up(count)) && count < 3; ++count) {
+        }
+        if (count < 2) {
+            return false;
+        }
+
+        world.setBlockState(base, ConfigBlocks.blockCosmeticSolid.getStateFromMeta(1), 3);
+        count = 1;
+        while (isTotemReplaceable(world, base.up(count)) && count < 5) {
+            BlockPos pos = base.up(count);
+            world.setBlockState(pos, ConfigBlocks.blockCosmeticSolid.getStateFromMeta(0), 3);
+            if (count > 1 && rand.nextInt(4) == 0) {
+                world.setBlockState(pos, ConfigBlocks.blockCosmeticSolid.getStateFromMeta(8), 3);
+                createRandomNodeAt(world, pos, rand, false, true, false);
+                return true;
+            }
+            ++count;
+            if (count >= 5) {
+                BlockPos node = base.up(5);
+                world.setBlockState(node, ConfigBlocks.blockCosmeticSolid.getStateFromMeta(8), 3);
+                createRandomNodeAt(world, node, rand, false, true, false);
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean isTotemReplaceable(World world, BlockPos pos) {
+        return world.isAirBlock(pos) || isSnowLayerOrTallGrass(world, pos);
+    }
+
+    private boolean isSnowLayerOrTallGrass(World world, BlockPos pos) {
+        Block block = world.getBlockState(pos).getBlock();
+        return block == Blocks.SNOW_LAYER || block == Blocks.TALLGRASS;
+    }
+
+    private boolean isValidTotemBase(Block block) {
+        return block == Blocks.GRASS
+                || block == Blocks.SAND
+                || block == Blocks.DIRT
+                || block == Blocks.STONE
+                || block == Blocks.NETHERRACK;
     }
 
     public static int getFirstFreeBiomeSlot(int startingId) {

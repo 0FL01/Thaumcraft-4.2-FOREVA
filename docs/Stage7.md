@@ -80,6 +80,11 @@ Dependency: Stage 3 node/tile behavior must be stable enough for generated aura 
 
 Remaining GAP-1 limits after this checkpoint: Nether generation, totems, scattered-feature structure nodes, `newGen`/regen marker parity, full ore placement parity, and runtime evidence are still open.
 
+**Checkpoint 2026-05-14 — Structure nodes, totems, and Nether aura baseline:**
+`ThaumcraftWorldGenerator` now preserves a reference-like `structureNode` cache, places aura nodes above nearest scattered features via the 1.12.2 `MapGenScatteredFeature#getNearestStructurePos(...)` API, and threads an `auraGen` flag through structure, wild-node, and totem generation so the same chunk does not generate duplicate aura sources from those paths. Dimension `-1` is no longer skipped: Nether chunks now run the reference Nether aura path, and the totem helper includes the reference Nether top-Y branch when structure generation is enabled. End chunks remain skipped, and the wild-node fallback now uses `WorldProvider#getAverageGroundLevel()` like the reference rather than sea level.
+
+Remaining GAP-1 limits after this checkpoint: `newGen`/regen chunk dirty-marker parity, full ore placement parity, flower placement parity, biome blacklist edge cases, mound/barrow parity, and runtime evidence are still open.
+
 ### GAP-2: Overworld Eldritch ring generation does not match reference maze bootstrap
 
 **Статус:** частично реализовано

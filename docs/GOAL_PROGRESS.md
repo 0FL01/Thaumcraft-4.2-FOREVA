@@ -333,11 +333,34 @@ Remaining limits:
 - Wild aura node placement has not been observed in a fresh runtime world because smoke-server remains environment-blocked and user-driven client/manual scenarios are excluded.
 - The simplified mound/barrow structure remains open under GAP-11.
 
+### 2026-05-14 — Stage 7 structure nodes, totems, and Nether aura baseline
+
+Scope:
+
+- Added a `structureNode` cache to `ThaumcraftWorldGenerator` and restored scattered-feature aura node placement through `MapGenScatteredFeature#getNearestStructurePos(...)`.
+- Threaded `auraGen` through scattered-feature, wild-node, structure-node, and totem generation so successful aura-source placement suppresses later duplicate node paths in the same chunk.
+- Reintroduced totem pillar generation with the reference substrate checks, snow/tallgrass clearance, obsidian-totem base, obsidian-tile shaft, and node-stone cap/random mid-column node placement.
+- Stopped skipping dimension `-1` in the top-level generator and added a Nether path for wild aura nodes plus the reference Nether-specific totem top-Y branch when structure generation is enabled.
+- Kept End generation skipped and moved the wild-node fallback height from sea level to `WorldProvider#getAverageGroundLevel()`, matching the reference source more closely.
+
+Validation:
+
+- `./scripts/dev.sh compileJava` — passed.
+- `./scripts/dev.sh build` — passed.
+- `./scripts/dev.sh check-jar` — failed before jar inspection because the wrapper's expected MCP mapping cache file is still absent at `.gradle_home/caches/minecraft/de/oceanlabs/mcp/mcp_stable/39/1.12.2/srgs/mcp-srg.srg`.
+- `./scripts/dev.sh smoke-server` — failed by timeout before ready state; log again stopped after `Calling tweak class net.minecraftforge.fml.common.launcher.FMLServerTweaker`, with only Log4j console appender initialization errors. `run/crash-reports/` does not exist, and the configured crash-marker scan found no matches. This matches the clean `da3f307` baseline reproduction recorded above.
+
+Remaining limits:
+
+- GAP-1 is still not closed: `newGen`/regen chunk dirty-marker parity, full ore placement parity, flower placement parity, biome blacklist edge cases, and runtime generation evidence remain open.
+- Nether aura/totem and scattered-feature node placement have not been observed in a fresh runtime world because smoke-server remains environment-blocked and user-driven client/manual scenarios are excluded.
+- The simplified mound/barrow structure remains open under GAP-11.
+
 ## Next Checkpoint Candidate
 
 After the portal trigger and ring bootstrap checkpoints, the next pre-Phase8 candidates are:
 
-- Remaining Stage 7 surface/worldgen placeholders, especially mound/barrow, Nether/totem/structure-node generation, and ore placement parity.
+- Remaining Stage 7 surface/worldgen placeholders, especially mound/barrow, ore placement parity, flower placement, and `newGen`/regen marker behavior.
 - Remaining Stage 7 Outer Lands room/tile behavior, especially `TileEldritchAltar` portal opening, lock/boss-room lifecycle, key/boss room traversal, and maze save/load race validation.
 - Stage 9 loot/content registration, because `Utils.generateLoot(...)` now has a shared reward path but the full reference loot pool distribution still depends on populated content tables.
 - Stage 6 server-side boss/manual scenario evidence remains excluded from user-driven validation, but static/reference parity blockers should continue to be reduced where possible.
