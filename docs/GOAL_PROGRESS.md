@@ -1383,9 +1383,25 @@ Remaining limits:
 
 - Runtime confirmation of Outer Lands load, room generation, chunk population, traversal, and save/reload remains unavailable while smoke-server is blocked before ready state and user-driven manual scenarios are excluded.
 
+### 2026-05-15 — Stage 7 current-status docs refresh
+
+Scope:
+
+- Updated `docs/Stage7.md` GAP-1 to reflect the current worldgen control-flow baseline instead of the older missing-method audit.
+- Updated GAP-11 to reflect the hilltop, mound/barrow, and shared structure-branch checkpoints already present in code and progress notes.
+- Reworded the remaining Stage 7 worldgen checklist from "restore" to "validate" for already-ported server-side baselines.
+
+Validation:
+
+- `git diff --check` — passed.
+
+Remaining limits:
+
+- Documentation refresh only; it does not close Stage 7 runtime/manual validation, exact mound-template parity, worldgen distribution parity, or save/reload evidence.
+
 ## Next Checkpoint Candidate
 
-After the golem carried-display, trunk transfer, death logging, fire-resistance, armor, water-pathing, no-drowning, melee-enchantment, upgrade-retaliation, target-range, animal-target-filter, butcher-acquisition, item-pickup-delay, essentia-jar-destination, liquid-target-tank, portal-support, outer-provider-spawn, outer-structure-query, outer-worldgen-ownership, biome policy, and Greatwood-support checkpoints, the next pre-Phase8 candidates are:
+After the golem carried-display, trunk transfer, death logging, fire-resistance, armor, water-pathing, no-drowning, melee-enchantment, upgrade-retaliation, target-range, animal-target-filter, butcher-acquisition, item-pickup-delay, essentia-jar-destination, liquid-target-tank, portal-support, outer-provider-spawn, outer-structure-query, outer-worldgen-ownership, Stage7-docs-refresh, biome policy, and Greatwood-support checkpoints, the next pre-Phase8 candidates are:
 
 - Remaining Stage 6 selected low-risk golem AI helper fixes, if they can be kept server-safe.
 - Remaining Stage 7 surface/worldgen runtime evidence and broader biome blacklist edge cases.
