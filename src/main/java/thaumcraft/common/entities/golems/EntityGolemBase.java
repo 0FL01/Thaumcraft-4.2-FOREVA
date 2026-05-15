@@ -1,5 +1,8 @@
 package thaumcraft.common.entities.golems;
 
+import net.minecraft.pathfinding.PathNavigate;
+import net.minecraft.pathfinding.PathNavigateGround;
+import net.minecraft.pathfinding.PathNodeType;
 import thaumcraft.common.Thaumcraft;
 import thaumcraft.common.lib.TCSounds;
 
@@ -143,6 +146,14 @@ public class EntityGolemBase extends net.minecraft.entity.monster.EntityGolem im
             this.dataManager.set(GOLEM_TYPE, this.golemType.ordinal());
         }
 
+        PathNavigate nav = this.getNavigator();
+        if (nav instanceof PathNavigateGround) {
+            boolean avoidsWater = this.getGolemType() != EnumGolemType.STONE
+                    && this.getGolemType() != EnumGolemType.IRON
+                    && this.getGolemType() != EnumGolemType.THAUMIUM;
+            ((PathNavigateGround) nav).setCanSwim(!avoidsWater);
+            this.setPathPriority(PathNodeType.WATER, avoidsWater ? -1.0F : 0.0F);
+        }
         this.isImmuneToFire = this.getGolemType().fireResist;
 
         int bonus = this.decoration.contains("H") ? 5 : 0;
