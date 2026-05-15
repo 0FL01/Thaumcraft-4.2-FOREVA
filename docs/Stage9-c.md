@@ -255,7 +255,7 @@ Keep Infusion Matrix completion aligned with reference by firing the crafting ev
 
 ### GAP-6: Infusion recipe page localization keys are missing from current assets
 
-**Статус:** отсутствует  
+**Статус:** частично закрыт (ключи добавлены, GUI-runtime проверка открыта)  
 **Критичность:** medium
 
 **Текущая реализация:**
@@ -268,24 +268,24 @@ Keep Infusion Matrix completion aligned with reference by firing the crafting ev
 
 **Что не совпадает:**
 
-Reference has `recipe.type.infusion=Arcane Infusion` and `recipe.type.infusionenchantment=Infusion Enchantment`. Current `en_us.lang` is a small Stage 5 item/static GUI subset and does not include these recipe type keys in the inspected file. Recipe data could technically register without these lang entries, but Thaumonomicon display would show missing localization for infusion recipe pages.
+Reference has `recipe.type.infusion=Arcane Infusion` and `recipe.type.infusionenchantment=Infusion Enchantment`. These keys are now present in the current `en_us.lang`, removing the known missing-localization baseline for infusion recipe type labels.
 
 **Что нужно доделать:**
 
-Copy the reference recipe type localization keys into current assets when implementing infusion research/page display.
+Keep the reference recipe type localization keys in current assets for infusion research/page display.
 
 **Как доделать:**
-- Add `recipe.type.infusion` and `recipe.type.infusionenchantment` to `src/main/resources/assets/thaumcraft/lang/en_us.lang` from `thaumcraft_src/assets/thaumcraft/lang/en_US.lang`.
-- If broader lang copy is being handled by another Stage 9 chunk, keep this as a direct dependency and ensure these two keys land before Stage 9-c is claimed complete.
+- Keep `recipe.type.infusion` and `recipe.type.infusionenchantment` in `src/main/resources/assets/thaumcraft/lang/en_us.lang`.
+- Verify live GUI rendering once Stage 8/9 client research-page runtime checks are available.
 
 **Критерии приемки:**
-- [ ] Current `en_us.lang` contains `recipe.type.infusion=Arcane Infusion`.
-- [ ] Current `en_us.lang` contains `recipe.type.infusionenchantment=Infusion Enchantment`.
+- [x] Current `en_us.lang` contains `recipe.type.infusion=Arcane Infusion`.
+- [x] Current `en_us.lang` contains `recipe.type.infusionenchantment=Infusion Enchantment`.
 - [ ] Infusion and infusion enchantment Thaumonomicon pages render localized recipe type names.
 
 **Риски / зависимости:**
 
-This is content/display-facing and may overlap with broader lang/resource restoration. It should not be used as a reason to postpone recipe registration, but Stage 9-c cannot be called fully polished while infusion pages have missing keys.
+This is content/display-facing and overlaps with broader research GUI/runtime parity. Key presence is now covered; live page rendering still depends on Stage 8/9 client runtime validation.
 
 ### GAP-7: Infusion Matrix runtime scenarios are not manually validated
 
@@ -339,7 +339,7 @@ Dependency: Stage 8/client FX/render work may affect visual confirmation and cli
 - [ ] Add/restore dynamic `InfusionRunicAugmentRecipe` and register it.
 - [ ] Ensure `TileInfusionMatrix` handles dynamic runic components correctly.
 - [x] Fix `ItemCraftedEvent` inventory context for infusion completion.
-- [ ] Add missing infusion recipe type localization keys.
+- [x] Add missing infusion recipe type localization keys.
 - [ ] Confirm all recipe outputs, central inputs and components refer to existing 1.12.2 registered items/blocks/enchantments.
 - [ ] Confirm `ThaumcraftApi.getCraftingRecipes()` contains the expected infusion recipes after post-init.
 - [ ] Confirm `ThaumcraftCraftingManager.findMatchingInfusionRecipe` and `findMatchingInfusionEnchantmentRecipe` find representative recipes.

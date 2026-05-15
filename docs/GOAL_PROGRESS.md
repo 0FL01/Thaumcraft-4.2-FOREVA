@@ -67,6 +67,25 @@ Branch: `codex/durable-goal-stage8-9`
 
 ## Checkpoint Log
 
+### 2026-05-15 — Stage 9-c infusion recipe-type localization keys baseline
+
+Scope:
+
+- Added missing reference localization keys `recipe.type.infusion` and `recipe.type.infusionenchantment` to `src/main/resources/assets/thaumcraft/lang/en_us.lang`.
+- Updated `docs/Stage9-c.md` GAP-6 status/acceptance/checklist to reflect that the key-presence part is now covered and only runtime GUI rendering confirmation remains open.
+
+Validation:
+
+- `./scripts/dev.sh validate --smoke` — passed: status, compile, tests `10/10`, jar, check-jar summary `5428` MCP leak lines / `1063` unique leaks, and server smoke.
+- `run/smoke-server.log` evidence: `Registering entities`; `Forge Mod Loader has successfully loaded 6 mods`; `Done (1.349s)!`.
+- Crash report scan under `run/` returned no files.
+- `./scripts/dev.sh smoke-client` — skipped because `DISPLAY=` and GUI/graphics/user-interactive validation is excluded.
+
+Remaining limits:
+
+- This checkpoint only restores recipe-type localization keys and does not validate live Thaumonomicon page rendering in a client runtime session.
+- Broader Stage 9-c recipe/research population blockers remain open.
+
 ### 2026-05-15 — Stage 9-c infusion crafted-event inventory source alignment
 
 Scope:
