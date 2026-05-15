@@ -67,6 +67,30 @@ Branch: `codex/durable-goal-stage8-9`
 
 ## Checkpoint Log
 
+### 2026-05-15 — Stage 9-c infusion equipment/armor/mask/utility baseline
+
+Scope:
+
+- Expanded Stage 9-c GAP-1 infusion crafting coverage with the remaining equipment-heavy reference subset:
+  - hover/runic/bauble chain: `HoverHarness`, `HoverGirdle`, `VisAmulet`, `RunicAmulet`, `RunicAmuletEmergency`, `RunicRing`, `RunicRingCharged`, `RunicRingHealing`, `RunicGirdle`, `RunicGirdleKinetic`, `RunicGirdleKinetic_2`
+  - elemental/tool/armor chain: `ElementalAxe`, `ElementalPick`, `ElementalSword`, `ElementalShovel`, `ElementalHoe`, `BootsTraveller`, `ThaumiumFortressHelm`, `ThaumiumFortressChest`, `ThaumiumFortressLegs`, `VoidRobeHelm`, `VoidRobeChest`, `VoidRobeLegs`
+  - object-output and utility chain: `HelmGoggles`, `MaskGrinningDevil`, `MaskAngryGhost`, `MaskSippingFiend`, `SanityCheck`, `SinStone`, `PrimalCrusher`, `EldritchEye`
+- Added `NBTTagInt` support for reference mask object outputs (`{"mask", NBTTagInt(...)}`).
+- Preserved reference keys/research gates/instability/aspect formulas/central inputs/components, including potion metadata variants for runic upgrades.
+- Ran focused key audit (`ConfigRecipes.class` vs `registerInfusionRecipe`): unresolved reference infusion crafting keys reduced from `32` to `1`; only `TravelTrunk` remains blocked by missing `ConfigBlocks.blockChestHungry`.
+
+Validation:
+
+- `./scripts/dev.sh validate --smoke` — passed: status, compile, tests `10/10`, jar, check-jar summary `5579` MCP leak lines / `1098` unique leaks, and server smoke.
+- `run/smoke-server.log` evidence: `Registering entities`; `Forge Mod Loader has successfully loaded 6 mods`; `Done (1.083s)!`.
+- Crash report scan under `run/` returned no files.
+- `./scripts/dev.sh smoke-client` — skipped because `DISPLAY=` and GUI/graphics/user-interactive validation is excluded.
+
+Remaining limits:
+
+- `TravelTrunk` reference infusion recipe is still blocked until `ConfigBlocks.blockChestHungry` (or an explicit 1.12.2-compatible equivalent) exists.
+- Stage 9-c runtime/research-page/manual scenario matrix remains open.
+
 ### 2026-05-15 — Stage 9-c infusion golem/core/device baseline
 
 Scope:
