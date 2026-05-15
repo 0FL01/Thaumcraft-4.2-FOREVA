@@ -67,6 +67,29 @@ Branch: `codex/durable-goal-stage8-9`
 
 ## Checkpoint Log
 
+### 2026-05-15 — Stage 8-b Research Table container polish
+
+Scope:
+
+- Restored `ContainerResearchTable` baseline behavior: `IScribeTools` + `ItemResearchNotes` slot restrictions, reference slot layout, player inventory binding, shift-click routing, and button-id `5` duplicate wiring.
+- Added `TileResearchTable.duplicate(EntityPlayer)` server-side path for completed notes: validates required resources, deducts aspect pool cost through capability data, consumes paper/feather, increments note copy metadata in NBT, and produces a duplicate note item.
+- Added `bonusAspects` persistence and slot validation hooks in `TileResearchTable` to better match reference data surfaces used by research GUI logic.
+- Updated `docs/Stage8-b.md` gap status/evidence for this container-side parity step.
+
+Validation:
+
+- `./scripts/dev.sh compileJava` — passed.
+- `./scripts/dev.sh validate --smoke` — passed: status, compile, tests `10/10`, jar, check-jar summary `5404` MCP leak lines / `1057` unique leaks, and server smoke.
+- `run/smoke-server.log` evidence: `Registering entities`; `Forge Mod Loader has successfully loaded 6 mods`; `Done (1.276s)!`.
+- Crash report scan under `run/` returned no files.
+- `./scripts/dev.sh smoke-client` — skipped because `DISPLAY=` and GUI/graphics/user-interactive validation is excluded.
+
+Remaining limits:
+
+- Full research-note puzzle and aspect placement/erase interaction parity is still not implemented.
+- No-ink/copy GUI text-key parity is still open (`tile.researchtable.noink.*`, `tc.research.copy`).
+- Manual GUI runtime checks remain skipped under current constraints.
+
 ### 2026-05-15 — Stage 8-b research support texture baseline
 
 Scope:

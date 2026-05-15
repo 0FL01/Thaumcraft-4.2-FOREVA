@@ -1,19 +1,34 @@
 package thaumcraft.common.tiles;
 
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Items;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.util.ITickable;
+import net.minecraft.util.NonNullList;
 import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.TextComponentString;
+import thaumcraft.api.IScribeTools;
 import thaumcraft.api.TileThaumcraft;
+import thaumcraft.api.aspects.Aspect;
+import thaumcraft.api.aspects.AspectList;
+import thaumcraft.api.research.ResearchCategories;
+import thaumcraft.api.research.ResearchItem;
+import thaumcraft.common.CommonProxy;
+import thaumcraft.common.items.ItemResearchNotes;
+import thaumcraft.common.lib.capabilities.IPlayerKnowledge;
+import thaumcraft.common.lib.research.ResearchManager;
+import thaumcraft.common.lib.research.ResearchNoteData;
+import thaumcraft.common.lib.utils.InventoryUtils;
 
 public class TileResearchTable
 extends TileThaumcraft
 implements IInventory, ITickable {
 
     private ItemStack[] stackList = new ItemStack[2];
+    public AspectList bonusAspects = new AspectList();
 
     public TileResearchTable() {
         for (int i = 0; i < stackList.length; i++) {
@@ -84,9 +99,6 @@ implements IInventory, ITickable {
     public void closeInventory(EntityPlayer player) {}
 
     @Override
-    public boolean isItemValidForSlot(int index, ItemStack stack) { return true; }
-
-    @Override
     public int getField(int id) { return 0; }
 
     @Override
@@ -103,10 +115,10 @@ implements IInventory, ITickable {
     }
 
     @Override
-    public String getName() { return "container.researchtable"; }
+    public String getName() { return "Research Table"; }
 
     @Override
-    public ITextComponent getDisplayName() { return null; }
+    public ITextComponent getDisplayName() { return new TextComponentString(getName()); }
 
     @Override
     public boolean isEmpty() {
@@ -120,11 +132,24 @@ implements IInventory, ITickable {
     public void readCustomNBT(NBTTagCompound compound) {
         NBTTagList list = compound.getTagList("Inventory", 10);
         this.stackList = new ItemStack[this.getSizeInventory()];
+        for (int i = 0; i < this.stackList.length; i++) {
+            this.stackList[i] = ItemStack.EMPTY;
+        }
         for (int i = 0; i < list.tagCount(); i++) {
             NBTTagCompound item = list.getCompoundTagAt(i);
             int slot = item.getByte("Slot") & 0xFF;
             if (slot >= 0 && slot < this.stackList.length) {
                 this.stackList[slot] = new ItemStack(item);
+            }
+        }
+
+        this.bonusAspects = new AspectList();
+        NBTTagList bonus = compound.getTagList("bonusAspects", 10);
+        for (int i = 0; i < bonus.tagCount(); i++) {
+            NBTTagCompound tag = bonus.getCompoundTagAt(i);
+            Aspect aspect = Aspect.getAspect(tag.getString("tag"));
+            if (aspect != null) {
+                this.bonusAspects.merge(aspect, tag.getInteger("amount"));
             }
         }
     }
@@ -141,10 +166,93 @@ implements IInventory, ITickable {
             }
         }
         compound.setTag("Inventory", list);
+
+        NBTTagList bonus = new NBTTagList();
+        for (Aspect aspect : this.bonusAspects.getAspects()) {
+            if (aspect == null) continue;
+            int amount = this.bonusAspects.getAmount(aspect);
+            if (amount <= 0) continue;
+            NBTTagCompound tag = new NBTTagCompound();
+            tag.setString("tag", aspect.getTag());
+            tag.setInteger("amount", amount);
+            bonus.appendTag(tag);
+        }
+        compound.setTag("bonusAspects", bonus);
     }
 
     @Override
     public void update() {
         // Research scanning logic will be added later
+    }
+
+    @Override
+    public boolean isItemValidForSlot(int index, ItemStack stack) {
+        if (stack == null || stack.isEmpty()) return false;
+        switch (index) {
+            case 0:
+                return stack.getItem() instanceof IScribeTools;
+            case 1:
+                return stack.getItem() instanceof ItemResearchNotes && stack.getMetadata() < 64;
+            default:
+                return false;
+        }
+    }
+
+    public void duplicate(EntityPlayer player) {
+        if (player == null || this.world == null || this.world.isRemote) return;
+
+        ItemStack notesStack = getStackInSlot(1);
+        if (notesStack.isEmpty() || !(notesStack.getItem() instanceof ItemResearchNotes) || notesStack.getMetadata() != 64) {
+            return;
+        }
+
+        ResearchNoteData data = ResearchManager.getData(notesStack);
+        if (data == null || data.key == null || data.key.isEmpty()) return;
+
+        ResearchItem research = ResearchCategories.getResearch(data.key);
+        if (research == null || research.tags == null) return;
+
+        if (!playerHasItem(player, Items.FEATHER) || !playerHasItem(player, Items.PAPER)) return;
+
+        IPlayerKnowledge knowledge = CommonProxy.getPlayerKnowledge(player);
+        if (knowledge == null) return;
+
+        for (Aspect aspect : research.tags.getAspects()) {
+            if (aspect == null) continue;
+            int needed = research.tags.getAmount(aspect) + data.copies;
+            if (knowledge.getAspectPoolFor(aspect) < needed) {
+                return;
+            }
+        }
+
+        for (Aspect aspect : research.tags.getAspects()) {
+            if (aspect == null) continue;
+            int cost = research.tags.getAmount(aspect) + data.copies;
+            knowledge.addAspectPool(aspect, -cost);
+        }
+
+        InventoryUtils.consumeInventoryItem(player, Items.FEATHER, 0);
+        InventoryUtils.consumeInventoryItem(player, Items.PAPER, 0);
+
+        data.copies++;
+        ResearchManager.updateData(notesStack, data);
+        setInventorySlotContents(1, notesStack);
+
+        ItemStack duplicate = notesStack.copy();
+        duplicate.setCount(1);
+        if (!player.inventory.addItemStackToInventory(duplicate)) {
+            player.dropItem(duplicate, false);
+        }
+
+        markDirty();
+        this.world.notifyBlockUpdate(this.pos, this.world.getBlockState(this.pos), this.world.getBlockState(this.pos), 3);
+    }
+
+    private boolean playerHasItem(EntityPlayer player, net.minecraft.item.Item item) {
+        NonNullList<ItemStack> main = player.inventory.mainInventory;
+        for (ItemStack stack : main) {
+            if (!stack.isEmpty() && stack.getItem() == item) return true;
+        }
+        return false;
     }
 }

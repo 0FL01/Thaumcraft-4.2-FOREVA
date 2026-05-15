@@ -477,7 +477,8 @@ Dependency: actual research category/item population is Stage 9/content-sensitiv
 - `src/main/java/thaumcraft/common/blocks/BlockTable.java:161-170`
 - `src/main/java/thaumcraft/client/gui/GuiResearchTable.java` exists as a 1.12.2 baseline `GuiContainer`.
 - `src/main/resources/assets/thaumcraft/textures/gui/guiresearchtable2.png` exists and matches the original asset.
-- `hex1.png` and `hex2.png` remain absent.
+- `src/main/java/thaumcraft/common/container/ContainerResearchTable.java` now has reference-style slot restrictions (`IScribeTools` + `ItemResearchNotes`), player inventory binding, shift-click routing, and button id `5` wiring to tile duplication.
+- `src/main/java/thaumcraft/common/tiles/TileResearchTable.java` now has slot validation parity hooks, persisted `bonusAspects`, and a server-side `duplicate(EntityPlayer)` path for completed notes.
 - Current lang still has no `tile.researchtable.noink.*` or `tc.research.copy` entries.
 
 **Референс:**
@@ -486,7 +487,7 @@ Dependency: actual research category/item population is Stage 9/content-sensitiv
 - Reference resource constants include `textures/gui/guiresearchtable2.png`, `textures/gui/hex1.png`, `textures/gui/hex2.png`, `textures/aspects/_back.png`, `textures/aspects/_unknown.png`, `textures/misc/parchment3.png`, `textures/misc/script.png`.
 
 **Что не совпадает:**
-Server/common can open `GUI_RESEARCH_TABLE`, and client now opens a baseline research-table screen with reference background assets. Reference note-puzzle interactions, aspect/rune logic, and no-ink/copy states are still not implemented.
+Server/common can open `GUI_RESEARCH_TABLE`, and client now opens a baseline research-table screen with reference background assets. Container slot behavior and duplicate button path are now wired server-side. Reference note-puzzle interactions, aspect/rune logic, and no-ink/copy states are still not implemented.
 
 **Что нужно доделать:**
 Finish `GuiResearchTable` parity: note puzzle surface, aspect/rune interactions, and no-ink/copy state behavior.
@@ -503,7 +504,7 @@ Finish `GuiResearchTable` parity: note puzzle surface, aspect/rune interactions,
 **Критерии приемки:**
 - [ ] GUI ID `10` opens for the research table and adjacent paired table path.
 - [ ] Research note puzzle surface renders with hex/rune/aspect visuals.
-- [ ] Aspect interactions send expected container/button actions.
+- [x] Container/button interaction path for duplicate action (`button id 5`) is wired to the tile.
 - [ ] No missing lang key is visible for no-ink/copy states.
 
 **Checkpoint 2026-05-15 — Research Table GUI baseline:**
@@ -513,6 +514,13 @@ Finish `GuiResearchTable` parity: note puzzle surface, aspect/rune interactions,
 - Validation: `./scripts/dev.sh compileJava` passed; `./scripts/dev.sh validate --smoke` passed with tests `10/10`, jar/check-jar summary `5380` MCP leak lines / `1057` unique leaks, server smoke ready, and no crash reports under `run/`.
 - Client smoke/manual GUI checks were skipped because `DISPLAY=` and user-driven GUI/graphics validation is excluded for this run.
 - Remaining: puzzle/aspect/rune logic parity, full research support textures, and lang key coverage.
+
+**Checkpoint 2026-05-15 — Research Table container polish:**
+- Restored `ContainerResearchTable` slot restrictions/layout from reference (`IScribeTools` + `ItemResearchNotes`, player inventory rows), shift-click routing, and button-id handling for duplicate notes.
+- Added `TileResearchTable` server-side `duplicate(EntityPlayer)` flow with completed-note checks, aspect-cost deduction via player knowledge capability, paper/feather consumption, note copy creation, and NBT persistence for `bonusAspects`.
+- Validation: `./scripts/dev.sh compileJava` passed; `./scripts/dev.sh validate --smoke` passed with tests `10/10`, jar/check-jar summary `5404` MCP leak lines / `1057` unique leaks, server smoke ready at `Done (1.276s)!`, and no crash reports under `run/`.
+- Client smoke/manual GUI checks were skipped because `DISPLAY=` and user-driven GUI/graphics validation is excluded for this run.
+- Remaining: full note puzzle/aspect placement logic parity and lang/text parity (`tile.researchtable.noink.*`, `tc.research.copy`).
 
 **Риски / зависимости:**
 Depends on current `ResearchNoteData`, aspect lists and `ContainerResearchTable` behavior. Full note-solving parity may require Stage 3/9 research data completion.
