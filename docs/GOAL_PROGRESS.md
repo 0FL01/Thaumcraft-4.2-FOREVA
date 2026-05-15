@@ -67,6 +67,31 @@ Branch: `codex/durable-goal-stage8-9`
 
 ## Checkpoint Log
 
+### 2026-05-15 — Stage 9-e early THAUMATURGY arcane chain baseline
+
+Scope:
+
+- Expanded `ConfigResearch` THAUMATURGY baseline with reference-aligned early arcane entries whose recipe keys are already present:
+  - `FOCUSFIRE`
+  - `FOCUSFROST`
+  - `CAP_gold`
+  - `ROD_greatwood`
+  - `CAP_copper` (conditional on `Config.foundCopperIngot`, matching reference gate)
+- Preserved reference metadata for this slice: coordinates, aspect tags, page key order, parent links, and `concealed`/`secondary` flags for `FOCUSFROST`.
+- Kept virtual unlock stubs (`CAP_iron`, `ROD_wood`) unchanged.
+
+Validation:
+
+- `./scripts/dev.sh validate --smoke` — passed: status, compile, tests, jar, check-jar summary, and server smoke.
+- `run/smoke-server.log` evidence: server ready (`Done (...)`), no fatal markers.
+- Crash report scan under `run/` remained clean during smoke stage.
+- `./scripts/dev.sh smoke-client` — skipped because `DISPLAY=` and GUI/graphics/user-interactive validation is excluded.
+
+Remaining limits:
+
+- Stage 9-e graph remains partial; most THAUMATURGY chains and other categories are still unported.
+- GUI/manual Thaumonomicon progression checks remain skipped by instruction and headless environment limits.
+
 ### 2026-05-15 — Stage 9-e BASICTHAUMATURGY onboarding baseline
 
 Scope:

@@ -9,6 +9,7 @@ import net.minecraft.util.ResourceLocation;
 import thaumcraft.api.ThaumcraftApi;
 import thaumcraft.api.aspects.Aspect;
 import thaumcraft.api.aspects.AspectList;
+import thaumcraft.api.crafting.IArcaneRecipe;
 import thaumcraft.api.research.ResearchCategories;
 import thaumcraft.api.research.ResearchItem;
 import thaumcraft.api.research.ResearchPage;
@@ -281,6 +282,95 @@ public class ConfigResearch {
                 .setAutoUnlock()
                 .setStub()
                 .setRound()
+                .registerResearchItem();
+
+        new ResearchItem(
+                "FOCUSFIRE",
+                "THAUMATURGY",
+                new AspectList()
+                        .add(Aspect.FIRE, 3)
+                        .add(Aspect.MAGIC, 3),
+                2,
+                -2,
+                1,
+                new ItemStack(ConfigItems.focusFire))
+                .setPages(
+                        new ResearchPage("tc.research_page.FOCUSFIRE.1"),
+                        new ResearchPage("tc.research_page.FOCUSFIRE.2"),
+                        new ResearchPage((IArcaneRecipe) recipes.get("FocusFire")))
+                .setParents("BASICTHAUMATURGY")
+                .registerResearchItem();
+
+        new ResearchItem(
+                "FOCUSFROST",
+                "THAUMATURGY",
+                new AspectList()
+                        .add(Aspect.WATER, 3)
+                        .add(Aspect.MAGIC, 3)
+                        .add(Aspect.COLD, 6),
+                1,
+                -5,
+                1,
+                new ItemStack(ConfigItems.focusFrost))
+                .setPages(
+                        new ResearchPage("tc.research_page.FOCUSFROST.1"),
+                        new ResearchPage((IArcaneRecipe) recipes.get("FocusFrost")))
+                .setConcealed()
+                .setSecondary()
+                .setParents("FOCUSFIRE")
+                .registerResearchItem();
+
+        new ResearchItem(
+                "CAP_gold",
+                "THAUMATURGY",
+                new AspectList()
+                        .add(Aspect.METAL, 3)
+                        .add(Aspect.GREED, 3)
+                        .add(Aspect.TOOL, 3),
+                3,
+                2,
+                1,
+                new ItemStack(ConfigItems.itemWandCap, 1, 1))
+                .setPages(
+                        new ResearchPage("tc.research_page.CAP_gold.1"),
+                        new ResearchPage((IArcaneRecipe) recipes.get("WandCapGold")))
+                .setParents("BASICTHAUMATURGY")
+                .registerResearchItem();
+
+        if (Config.foundCopperIngot) {
+            new ResearchItem(
+                    "CAP_copper",
+                    "THAUMATURGY",
+                    new AspectList()
+                            .add(Aspect.METAL, 3)
+                            .add(Aspect.EXCHANGE, 3)
+                            .add(Aspect.TOOL, 3),
+                    2,
+                    0,
+                    1,
+                    new ItemStack(ConfigItems.itemWandCap, 1, 3))
+                    .setPages(
+                            new ResearchPage("tc.research_page.CAP_copper.1"),
+                            new ResearchPage((IArcaneRecipe) recipes.get("WandCapCopper")))
+                    .setParents("BASICTHAUMATURGY")
+                    .registerResearchItem();
+        }
+
+        new ResearchItem(
+                "ROD_greatwood",
+                "THAUMATURGY",
+                new AspectList()
+                        .add(Aspect.TOOL, 3)
+                        .add(Aspect.TREE, 6)
+                        .add(Aspect.MAGIC, 3),
+                -5,
+                2,
+                1,
+                new ItemStack(ConfigItems.itemWandRod, 1, 0))
+                .setPages(
+                        new ResearchPage("tc.research_page.ROD_greatwood.1"),
+                        new ResearchPage((IArcaneRecipe) recipes.get("WandRodGreatwood")))
+                .setParents("BASICTHAUMATURGY")
                 .registerResearchItem();
     }
 
