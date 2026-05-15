@@ -685,6 +685,10 @@ public class EntityGolemBase extends net.minecraft.entity.monster.EntityGolem im
 
     @Override
     protected void dropFewItems(boolean wasRecentlyHit, int looting) {
+        this.dropStuff();
+    }
+
+    public void dropStuff() {
         if (!this.world.isRemote && this.itemCarried != null) {
             this.entityDropItem(this.itemCarried, 0.5f);
         }

@@ -16,7 +16,9 @@ import net.minecraft.util.NonNullList;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import thaumcraft.common.config.ConfigItems;
 import thaumcraft.common.lib.CreativeTabThaumcraft;
+import thaumcraft.common.lib.TCSounds;
 
 import java.util.ArrayList;
 
@@ -138,6 +140,96 @@ public class ItemGolemBell extends Item {
                     SoundCategory.NEUTRAL, 0.7F, 1.0F + target.world.rand.nextFloat() * 0.1F);
         }
         player.swingArm(hand);
+        return true;
+    }
+
+    @Override
+    public boolean onLeftClickEntity(ItemStack stack, EntityPlayer player, Entity entity) {
+        if (entity instanceof EntityTravelingTrunk && !entity.isDead) {
+            return pickupTrunk(player, (EntityTravelingTrunk) entity);
+        }
+        if (entity instanceof EntityGolemBase && !entity.isDead) {
+            return pickupGolem(player, (EntityGolemBase) entity);
+        }
+        return false;
+    }
+
+    private static boolean pickupTrunk(EntityPlayer player, EntityTravelingTrunk trunk) {
+        int upgrade = trunk.getUpgrade();
+        if (upgrade == 3 && trunk.getOwnerId() != null && !trunk.getOwnerId().equals(player.getUniqueID())) {
+            return false;
+        }
+        if (trunk.world.isRemote) {
+            player.swingArm(EnumHand.MAIN_HAND);
+            return true;
+        }
+
+        ItemStack dropped = new ItemStack(ConfigItems.itemTrunkSpawner);
+        if (player.isSneaking()) {
+            if (upgrade > -1 && trunk.world.rand.nextBoolean()) {
+                trunk.entityDropItem(new ItemStack(ConfigItems.itemGolemUpgrade, 1, upgrade), 0.5F);
+            }
+        } else {
+            if (trunk.hasCustomName()) {
+                dropped.setStackDisplayName(trunk.getCustomNameTag());
+            }
+            NBTTagCompound tag = getOrCreateTag(dropped);
+            tag.setByte("upgrade", (byte) upgrade);
+            if (upgrade == 4) {
+                tag.setTag("inventory", trunk.inventory.writeToNBT(new NBTTagList()));
+            }
+        }
+
+        trunk.entityDropItem(dropped, 0.5F);
+        if (upgrade != 4 || player.isSneaking()) {
+            trunk.inventory.dropAllItems();
+        }
+        trunk.world.playSound(null, trunk.getPosition(), TCSounds.ZAP, SoundCategory.NEUTRAL, 0.5F, 1.0F);
+        trunk.setDead();
+        return true;
+    }
+
+    private static boolean pickupGolem(EntityPlayer player, EntityGolemBase golem) {
+        if (golem.world.isRemote) {
+            player.swingArm(EnumHand.MAIN_HAND);
+            return true;
+        }
+
+        ItemStack dropped = new ItemStack(ConfigItems.itemGolemPlacer, 1, golem.golemType.ordinal());
+        if (golem.advanced) {
+            getOrCreateTag(dropped).setBoolean("advanced", true);
+        }
+        if (player.isSneaking()) {
+            if (golem.getCore() > -1) {
+                golem.entityDropItem(new ItemStack(ConfigItems.itemGolemCore, 1, golem.getCore()), 0.5F);
+            }
+            for (byte upgrade : golem.upgrades) {
+                if (upgrade > -1 && golem.world.rand.nextBoolean()) {
+                    golem.entityDropItem(new ItemStack(ConfigItems.itemGolemUpgrade, 1, upgrade), 0.5F);
+                }
+            }
+        } else {
+            if (golem.hasCustomName()) {
+                dropped.setStackDisplayName(golem.getCustomNameTag());
+            }
+            NBTTagCompound tag = getOrCreateTag(dropped);
+            if (golem.decoration.length() > 0) {
+                tag.setString("deco", golem.decoration);
+            }
+            if (golem.getCore() > -1) {
+                tag.setByte("core", golem.getCore());
+            }
+            tag.setByteArray("upgrades", golem.upgrades);
+            tag.setTag("markers", writeMarkers(golem.getMarkers()));
+            if (golem.inventory != null) {
+                tag.setTag("Inventory", golem.inventory.writeToNBT(new NBTTagList()));
+            }
+        }
+
+        golem.entityDropItem(dropped, 0.5F);
+        golem.dropStuff();
+        golem.world.playSound(null, golem.getPosition(), TCSounds.ZAP, SoundCategory.NEUTRAL, 0.5F, 1.0F);
+        golem.setDead();
         return true;
     }
 

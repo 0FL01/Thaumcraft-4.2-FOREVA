@@ -835,6 +835,28 @@ Remaining limits:
 - Runtime marker/deco/healing evidence remains unavailable while smoke-server is blocked before ready state and user-driven manual scenarios are excluded.
 - Client marker visuals and golem/trunk rendering remain Phase 8 work.
 
+### 2026-05-15 — Stage 6 golem bell pickup
+
+Scope:
+
+- Ported bell left-click pickup for traveling trunks, including owner check for upgrade `3`, sneak upgrade split-drop chance, order-upgrade inventory packing, normal inventory drops, zap sound, and entity removal.
+- Ported bell left-click pickup for golems, including placer metadata, advanced/core/upgrades/deco/marker/inventory NBT packing, sneak core/upgrades split-drop behavior, custom name preservation, carried-item drop, zap sound, and entity removal.
+- Added `EntityGolemBase.dropStuff()` as the shared carried-item drop path used by normal drops and bell pickup.
+
+Validation:
+
+- `./scripts/dev.sh compileJava` — passed.
+- `./scripts/dev.sh build` — passed.
+- `./scripts/dev.sh check-jar` — failed before jar inspection because the wrapper's expected MCP mapping cache file is still absent at `.gradle_home/caches/minecraft/de/oceanlabs/mcp/mcp_stable/39/1.12.2/srgs/mcp-srg.srg`.
+- `./scripts/dev.sh smoke-server` — failed by timeout before ready state; log again stopped after `Calling tweak class net.minecraftforge.fml.common.launcher.FMLServerTweaker`, with only Log4j console appender initialization errors. `run/crash-reports/` does not exist, and the configured crash-marker scan found no matches. This matches the clean `da3f307` baseline reproduction recorded above.
+- `git diff --check` — passed.
+
+Remaining limits:
+
+- Full traveling trunk upgrade behavior remains open beyond pickup/packing and placement persistence.
+- Runtime pickup/packing evidence remains unavailable while smoke-server is blocked before ready state and user-driven manual scenarios are excluded.
+- Client pickup animation/visual parity remains Phase 8 work.
+
 ## Next Checkpoint Candidate
 
 After the portal trigger and ring bootstrap checkpoints, the next pre-Phase8 candidates are:

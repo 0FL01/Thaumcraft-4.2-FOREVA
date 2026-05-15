@@ -83,7 +83,7 @@ Client-only renderer/particle TODOs are Phase 8 dependencies. They are not count
 - `thaumcraft_src/thaumcraft/common/entities/golems/EntityGolemBase.class`
 
 **Что не совпадает:**
-Checkpoints 8.2.15 and 8.2.16 add `ConfigItems` fields/registrations for `itemGolemBell`, `itemGolemCore`, `itemGolemPlacer`, `itemGolemUpgrade`, `itemGolemDecoration`, and `itemTrunkSpawner`, restore the original metadata/subitem surface, and port the server-side golem/trunk item spawn paths. Checkpoint 8.2.17 restores bell link/marker editing, marker side/color identity, decoration application, wheat healing, and upgrade inventory refresh. Remaining workflow gaps are bell left-click pickup/packing behavior, full trunk upgrade behavior, and runtime/manual placement evidence.
+Checkpoints 8.2.15 and 8.2.16 add `ConfigItems` fields/registrations for `itemGolemBell`, `itemGolemCore`, `itemGolemPlacer`, `itemGolemUpgrade`, `itemGolemDecoration`, and `itemTrunkSpawner`, restore the original metadata/subitem surface, and port the server-side golem/trunk item spawn paths. Checkpoint 8.2.17 restores bell link/marker editing, marker side/color identity, decoration application, wheat healing, and upgrade inventory refresh. Checkpoint 8.2.18 restores bell left-click pickup/packing behavior for golems and trunks. Remaining workflow gaps are full trunk upgrade behavior and runtime/manual placement evidence.
 
 **Что нужно доделать:**
 Register the golem/trunk items with stable Thaumcraft names and port their server behavior so players can obtain, place, configure, and link golems/trunks.
@@ -1086,6 +1086,30 @@ Mapping:
 - Full traveling trunk upgrade behavior remains open beyond the minimal placement/persistence route.
 - Runtime marker/deco/healing scenarios have not been observed because smoke-server remains environment-blocked and manual scenarios are excluded.
 - Client marker visuals and golem/trunk rendering remain Phase 8 work.
+
+### 8.2.18 Golem bell pickup checkpoint — 2026-05-15
+
+Статус: bell left-click pickup/packing behavior restored; runtime evidence remains open.
+
+Что сделано:
+
+- Ported `ItemGolemBell.onLeftClickEntity(...)` pickup for traveling trunks, including owner check for upgrade `3`, upgrade item chance on sneak pickup, order-upgrade inventory packing, normal inventory drops when not packed, zap sound, and entity removal.
+- Ported bell pickup for golems, including placer stack metadata, advanced/core/upgrades/deco/marker/inventory NBT packing, sneak pickup core/upgrades split-drop behavior, custom name restore path, carried-item drop, zap sound, and entity removal.
+- Added `EntityGolemBase.dropStuff()` as the shared carried-item drop path used by normal drops and bell pickup.
+
+Проверки:
+
+- `./scripts/dev.sh compileJava` — passed.
+- `./scripts/dev.sh build` — passed.
+- `./scripts/dev.sh check-jar` — не дошел до jar inspection: отсутствует wrapper-ожидаемый MCP mapping cache `.gradle_home/caches/minecraft/de/oceanlabs/mcp/mcp_stable/39/1.12.2/srgs/mcp-srg.srg`.
+- `./scripts/dev.sh smoke-server` — timeout before ready state на уже задокументированном pre-Forge/log4j этапе; `run/crash-reports/` не существует, and the configured crash-marker scan found no matches.
+- `git diff --check` — passed.
+
+Оставшиеся ограничения:
+
+- Full traveling trunk upgrade behavior remains open beyond pickup/packing and placement persistence.
+- Runtime pickup/packing scenarios have not been observed because smoke-server remains environment-blocked and manual scenarios are excluded.
+- Client pickup animation/visual parity remains Phase 8 work.
 
 ### 8.3 Minimal Stage 6 manual scenario matrix
 
