@@ -45,6 +45,7 @@ Branch: `codex/durable-goal-stage8-9`
 
 - Arcane Workbench client smoke/manual open/visual parity was skipped on 2026-05-15 because `DISPLAY=` and user-driven GUI/graphics validation is excluded by instruction.
 - Arcane Bore client smoke/manual open/visual parity was skipped on 2026-05-15 because `DISPLAY=` and user-driven GUI/graphics validation is excluded by instruction.
+- Thaumatorium client smoke/manual open/visual parity was skipped on 2026-05-15 because `DISPLAY=` and user-driven GUI/graphics validation is excluded by instruction.
 - Future GUI/client visual checks that require user-driven Minecraft control, screenshots, or unavailable X11/graphics stack will be recorded as: `SKIPPED by user instruction: GUI/graphics/user-interactive validation excluded`.
 
 ## Baseline Validation
@@ -56,6 +57,30 @@ Branch: `codex/durable-goal-stage8-9`
 - `./scripts/dev.sh validate --smoke` — passed on 2026-05-15, including compact server smoke validation.
 
 ## Checkpoint Log
+
+### 2026-05-15 — Stage 8-b Thaumatorium GUI baseline
+
+Scope:
+
+- Added `GuiThaumatorium` backed by `ContainerThaumatorium`.
+- Ported the original GUI baseline: recipe index tracking, output rendering, aspect icon/progress rendering, recipe/aspect scroll controls, and selection click handling through `sendEnchantPacket`.
+- Routed client GUI ID `3` through `ClientProxy#getClientGuiElement` with a `TileThaumatorium` type check.
+- Copied the original `gui_thaumatorium.png` and the original `textures/aspects/**` icon set from `thaumcraft_src/assets/thaumcraft/`.
+- Updated `docs/Stage8-b.md` with the implemented baseline and remaining client/manual validation limits.
+
+Validation:
+
+- `./scripts/dev.sh compileJava` — passed.
+- `./scripts/dev.sh validate --smoke` — passed: status, compile, tests `10/10`, jar, check-jar summary `5173` MCP leak lines / `1039` unique leaks, and server smoke.
+- `run/smoke-server.log` evidence: `Registering entities`; `Forge Mod Loader has successfully loaded 6 mods`; `Done (1.236s)!`.
+- Crash report scan under `run/` returned no files.
+- `./scripts/dev.sh smoke-client` — skipped because `DISPLAY=` and GUI/graphics/user-interactive validation is excluded.
+
+Remaining limits:
+
+- Thaumatorium lower/top block open was not manually observed.
+- Empty and populated catalyst scenarios still need client/runtime inspection.
+- Stage 9 recipe/content registration can still affect available recipe lists and output behavior.
 
 ### 2026-05-15 — Stage 8-b Arcane Bore GUI baseline
 

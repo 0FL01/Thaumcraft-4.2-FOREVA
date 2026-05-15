@@ -20,6 +20,7 @@ import thaumcraft.client.gui.GuiArcaneWorkbench;
 import thaumcraft.client.gui.GuiFocusPouch;
 import thaumcraft.client.gui.GuiHandMirror;
 import thaumcraft.client.gui.GuiHoverHarness;
+import thaumcraft.client.gui.GuiThaumatorium;
 import thaumcraft.client.fx.ParticleEngine;
 import thaumcraft.client.lib.ClientTickEventsFML;
 import thaumcraft.client.lib.KeyHandler;
@@ -29,6 +30,7 @@ import thaumcraft.common.config.ConfigItems;
 import thaumcraft.common.lib.events.EventHandlerRunic;
 import thaumcraft.common.tiles.TileArcaneBore;
 import thaumcraft.common.tiles.TileArcaneWorkbench;
+import thaumcraft.common.tiles.TileThaumatorium;
 
 public class ClientProxy extends CommonProxy {
 
@@ -125,7 +127,14 @@ public class ClientProxy extends CommonProxy {
             case GUI_GOLEM:
             case GUI_PECH:
             case GUI_TRAVELING_TRUNK:
+                return null;
             case GUI_THAUMATORIUM:
+            {
+                TileEntity tile = world.getTileEntity(new BlockPos(x, y, z));
+                return tile instanceof TileThaumatorium
+                        ? new GuiThaumatorium(player.inventory, (TileThaumatorium) tile)
+                        : null;
+            }
             case GUI_DECONSTRUCTION_TABLE:
             case GUI_ALCHEMY_FURNACE:
             case GUI_RESEARCH_TABLE:

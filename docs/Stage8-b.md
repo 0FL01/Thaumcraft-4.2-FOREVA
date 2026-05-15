@@ -65,7 +65,7 @@ Lightweight commands run during analysis:
 
 ## 4. Текущее состояние Stage 8-b
 
-Current state is not closeable. Server/common GUI IDs and containers exist for many screens, but client-side routing and client GUI classes are mostly absent. GUI IDs `13` and `15` now have texture-backed Arcane Workbench and Arcane Bore baselines, but full visual parity and manual client validation remain open.
+Current state is not closeable. Server/common GUI IDs and containers exist for many screens, but client-side routing and client GUI classes are mostly absent. GUI IDs `3`, `13`, and `15` now have texture-backed Thaumatorium, Arcane Workbench, and Arcane Bore baselines, but full visual parity and manual client validation remain open.
 
 Concrete current findings:
 
@@ -73,9 +73,10 @@ Concrete current findings:
 - Server GUI routing exists for Golem, Pech, Traveling Trunk, Thaumatorium, Focus Pouch, Deconstruction Table, Alchemy Furnace, Research Table, Arcane Workbench, Arcane Bore, Hand Mirror, Hover Harness, Magic Box, Spa, and Focal Manipulator in `src/main/java/thaumcraft/common/CommonProxy.java:61-119`.
 - Thaumonomicon is intentionally server-null in `src/main/java/thaumcraft/common/CommonProxy.java:95`, matching the reference pattern that its GUI is client-only.
 - Base `CommonProxy.getClientGuiElement` returns null in `src/main/java/thaumcraft/common/CommonProxy.java:122-126`, as expected for common proxy.
-- `ClientProxy.getClientGuiElement` constructs `GuiFocusPouch`, `GuiHandMirror`, `GuiHoverHarness`, and now routes `GUI_ARCANE_WORKBENCH`/`GUI_ARCANE_BORE` to matching tile-backed screens; the remaining Stage 8-b/current GUI IDs still return null.
+- `ClientProxy.getClientGuiElement` constructs `GuiFocusPouch`, `GuiHandMirror`, `GuiHoverHarness`, and now routes `GUI_THAUMATORIUM`, `GUI_ARCANE_WORKBENCH`, and `GUI_ARCANE_BORE` to matching tile-backed screens; the remaining Stage 8-b/current GUI IDs still return null.
 - Existing GUI screens are placeholder-style grey rectangles and do not bind original textures: `GuiFocusPouch.java:23-35`, `GuiHandMirror.java:23-29`, `GuiHoverHarness.java:23-29`.
-- `src/main/resources/assets/thaumcraft/textures/gui/gui_arcaneworkbench.png` and `gui_arcanebore.png` are copied byte-for-byte from `thaumcraft_src/assets/thaumcraft/textures/gui/`; the other reference GUI textures are still absent from current resources.
+- `src/main/resources/assets/thaumcraft/textures/gui/gui_thaumatorium.png`, `gui_arcaneworkbench.png`, and `gui_arcanebore.png` are copied byte-for-byte from `thaumcraft_src/assets/thaumcraft/textures/gui/`; the other reference GUI textures are still absent from current resources.
+- `src/main/resources/assets/thaumcraft/textures/aspects/**` now contains the original aspect icon set needed by Thaumatorium and later research/aspect GUI rendering.
 - Current English lang has only `container.focus_pouch`, `container.handmirror`, `container.hoverharness`, and `container.inventory` for implemented GUI labels in `src/main/resources/assets/thaumcraft/lang/en_us.lang:101-104`; research/golem/trunk/interaction GUI keys are absent.
 - Thaumonomicon right-click opens GUI ID `12` server-side in `src/main/java/thaumcraft/common/items/relics/ItemThaumonomicon.java:43-50`, but client ID `12` returns null in `src/main/java/thaumcraft/client/ClientProxy.java:78-84`.
 - Thaumometer currently performs server-side scanning in `src/main/java/thaumcraft/common/items/relics/ItemThaumometer.java:37-69`; no `GuiScreen`/overlay implementation was found under `src/main/java/thaumcraft/client/**`.
@@ -175,15 +176,16 @@ Depends on `TileArcaneBore` state fields and `ContainerArcaneBore` slot layout m
 
 ### GAP-3: Thaumatorium GUI отсутствует на клиенте
 
-**Статус:** отсутствует  
+**Статус:** частично реализовано
 **Критичность:** blocker
 
 **Текущая реализация:**
-- `src/main/java/thaumcraft/client/ClientProxy.java:74-84`
+- `src/main/java/thaumcraft/client/ClientProxy.java#getClientGuiElement` routes GUI ID `3` to `GuiThaumatorium` only when the client tile at the provided coordinates is `TileThaumatorium`.
 - `src/main/java/thaumcraft/common/CommonProxy.java:78-81`
 - `src/main/java/thaumcraft/common/blocks/BlockMetalDevice.java:131-147`
-- Отсутствует `src/main/java/thaumcraft/client/gui/GuiThaumatorium.java`.
-- Отсутствует `src/main/resources/assets/thaumcraft/textures/gui/gui_thaumatorium.png`.
+- `src/main/java/thaumcraft/client/gui/GuiThaumatorium.java` exists as a 1.12.2 `GuiContainer` baseline using `ContainerThaumatorium`.
+- `src/main/resources/assets/thaumcraft/textures/gui/gui_thaumatorium.png` exists and matches the original asset.
+- `src/main/resources/assets/thaumcraft/textures/aspects/**` contains the original aspect icons used by recipe display.
 
 **Референс:**
 - `Thaumcraft-1.7.10-4.2.3.5.jar!/thaumcraft/client/ClientProxy.class`, offsets `200-224` instantiate `GuiThaumatorium` for GUI ID `3`.
@@ -191,22 +193,30 @@ Depends on `TileArcaneBore` state fields and `ContainerArcaneBore` slot layout m
 - `thaumcraft_src/assets/thaumcraft/textures/gui/gui_thaumatorium.png`.
 
 **Что не совпадает:**
-Reference GUI has recipe selection state (`index`, `lastSize`, `startAspect`), aspect output drawing, click handlers and button sounds. Current client returns null and has no class or texture, so Automated Alchemy cannot be operated visually from the client.
+Reference GUI has recipe selection state (`index`, `lastSize`, `startAspect`), aspect output drawing, click handlers and button sounds. Current client now has those baseline state fields, output rendering, aspect icon/progress rendering, recipe navigation, and `sendEnchantPacket` selection, but visual/manual parity is not yet verified in a client runtime.
 
 **Что нужно доделать:**
-Port `GuiThaumatorium`, including recipe list refresh, aspect requirement/progress display, output selection, mouse interactions and button sound feedback.
+Finish Thaumatorium GUI parity by manually validating lower/top block opening, empty and populated recipe lists, aspect/progress visuals, and selected recipe behavior in a client runtime.
 
 **Как доделать:**
-- Add `src/main/java/thaumcraft/client/gui/GuiThaumatorium.java`.
-- Route `GUI_THAUMATORIUM` in `ClientProxy#getClientGuiElement` to `TileThaumatorium`.
-- Copy `gui_thaumatorium.png`; ensure aspect textures are present.
+- Done: add `src/main/java/thaumcraft/client/gui/GuiThaumatorium.java`.
+- Done: route `GUI_THAUMATORIUM` in `ClientProxy#getClientGuiElement` to `TileThaumatorium`.
+- Done: copy `gui_thaumatorium.png` and the original aspect texture set needed by the GUI.
 - Scenario: open both lower and upper Thaumatorium block variants through `BlockMetalDevice.java:134-145`.
 
 **Критерии приемки:**
 - [ ] GUI ID `3` opens a Thaumatorium GUI for both base and top block activation paths.
-- [ ] Catalyst/recipe/aspect/progress areas render with original texture and layout.
-- [ ] Selecting recipes sends/uses the same container interaction semantics as reference.
+- [x] Catalyst/recipe/aspect/progress areas are implemented with original texture resources and current tile/container data.
+- [x] Selecting recipes sends/uses the same container interaction semantics as reference.
 - [ ] Manual check covers empty recipe list and at least one valid catalyst.
+
+**Checkpoint 2026-05-15 — Thaumatorium GUI baseline:**
+- Added `GuiThaumatorium` with recipe index tracking, output rendering, aspect icon/progress rendering, recipe/aspect scroll controls, selection click handling, and reference button sounds.
+- Routed client GUI ID `3` to the screen with a `TileThaumatorium` type check.
+- Copied original `gui_thaumatorium.png` and the original `textures/aspects/**` set needed by aspect display.
+- Validation: `./scripts/dev.sh compileJava` passed; `./scripts/dev.sh validate --smoke` passed with tests `10/10`, jar/check-jar summary `5173` MCP leak lines / `1039` unique leaks, server ready at `Done (1.236s)!`, and no crash reports under `run/`.
+- Client smoke/manual GUI open was skipped because `DISPLAY=` and user-driven GUI/graphics validation is excluded for this run.
+- Remaining: manual lower/top block open, empty and populated catalyst scenarios, visual comparison, and Stage 9 recipe availability coverage.
 
 **Риски / зависимости:**
 Dependency: recipe availability may depend on Stage 9 content/recipe registration. GUI opening and empty-state rendering are still Stage 8-b requirements.
@@ -534,13 +544,13 @@ Inventory-slot blocking is behavior-sensitive and can cause item loss/duplicatio
 
 ### GAP-12: GUI texture resource tree is missing from current resources
 
-**Статус:** отсутствует  
+**Статус:** частично реализовано
 **Критичность:** blocker
 
 **Текущая реализация:**
-- No files found for `src/main/resources/assets/thaumcraft/textures/gui/*`.
+- `src/main/resources/assets/thaumcraft/textures/gui/` now contains `gui_thaumatorium.png`, `gui_arcaneworkbench.png`, and `gui_arcanebore.png`.
 - `src/main/resources/assets/thaumcraft/textures/misc/potions.png` is the only current `textures/misc` file found.
-- No files found for `src/main/resources/assets/thaumcraft/textures/aspects/*`.
+- `src/main/resources/assets/thaumcraft/textures/aspects/**` now contains the original aspect icon set copied for Thaumatorium/aspect GUI rendering.
 
 **Референс:**
 - `thaumcraft_src/assets/thaumcraft/textures/gui/arcane.png`.
@@ -567,7 +577,7 @@ Inventory-slot blocking is behavior-sensitive and can cause item loss/duplicatio
 - Research support textures under `thaumcraft_src/assets/thaumcraft/textures/misc/**` and aspect icons under `thaumcraft_src/assets/thaumcraft/textures/aspects/**`.
 
 **Что не совпадает:**
-Even after GUI classes are ported, current resources would produce missing textures for every GUI texture. Existing placeholder GUIs avoid binding resources, masking this gap.
+The texture resource tree now covers the newly ported Thaumatorium, Arcane Workbench, Arcane Bore and aspect-icon paths, but most remaining Stage 8-b GUI textures and direct research misc support textures are still absent. Existing placeholder GUIs avoid binding resources, masking the remaining gap.
 
 **Что нужно доделать:**
 Copy original GUI and directly used support textures from `thaumcraft_src/assets/` to `src/main/resources/assets/thaumcraft/`.
