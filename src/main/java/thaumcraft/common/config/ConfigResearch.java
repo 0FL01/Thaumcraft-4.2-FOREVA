@@ -401,6 +401,144 @@ public class ConfigResearch {
 
     private static void initArtificeResearchBaseline() {
         new ResearchItem(
+                "ARCANESTONE",
+                "ARTIFICE",
+                new AspectList(),
+                5,
+                -2,
+                0,
+                new ItemStack(ConfigBlocks.blockCosmeticSolid, 1, 6))
+                .setPages(
+                        new ResearchPage("tc.research_page.ARCANESTONE.1"),
+                        new ResearchPage((IArcaneRecipe) recipes.get("ArcaneStone1")),
+                        new ResearchPage((IRecipe) recipes.get("ArcaneStone2")),
+                        new ResearchPage((IRecipe) recipes.get("ArcaneStone3")),
+                        new ResearchPage((IRecipe) recipes.get("ArcaneStone4")))
+                .setStub()
+                .setAutoUnlock()
+                .setRound()
+                .registerResearchItem();
+
+        new ResearchItem(
+                "GRATE",
+                "ARTIFICE",
+                new AspectList(),
+                2,
+                -1,
+                0,
+                new ItemStack(ConfigBlocks.blockMetalDevice, 1, 5))
+                .setPages(
+                        new ResearchPage("tc.research_page.GRATE.1"),
+                        new ResearchPage((IRecipe) recipes.get("Grate")))
+                .setStub()
+                .setAutoUnlock()
+                .setRound()
+                .registerResearchItem();
+
+        new ResearchItem(
+                "TABLE",
+                "ARTIFICE",
+                new AspectList(),
+                0,
+                -1,
+                0,
+                new ItemStack(ConfigBlocks.blockTable))
+                .setPages(
+                        new ResearchPage("tc.research_page.TABLE.1"),
+                        new ResearchPage((IRecipe) recipes.get("Table")))
+                .setStub()
+                .setAutoUnlock()
+                .setRound()
+                .registerResearchItem();
+
+        new ResearchItem(
+                "ARCTABLE",
+                "ARTIFICE",
+                new AspectList(),
+                -1,
+                -3,
+                0,
+                new ItemStack(ConfigBlocks.blockTable, 1, 15))
+                .setPages(
+                        new ResearchPage("tc.research_page.ARCTABLE.1"),
+                        new ResearchPage((List<?>) recipes.get("ArcTable")))
+                .setStub()
+                .setAutoUnlock()
+                .setRound()
+                .setParents("TABLE")
+                .registerResearchItem();
+
+        new ResearchItem(
+                "RESTABLE",
+                "ARTIFICE",
+                new AspectList(),
+                1,
+                -3,
+                0,
+                new ItemStack(ConfigBlocks.blockTable, 1, 1))
+                .setPages(
+                        new ResearchPage("tc.research_page.RESTABLE.1"),
+                        new ResearchPage((List<?>) recipes.get("ResTable")))
+                .setStub()
+                .setAutoUnlock()
+                .setRound()
+                .setParents("TABLE")
+                .registerResearchItem();
+
+        new ResearchItem(
+                "THAUMOMETER",
+                "ARTIFICE",
+                new AspectList(),
+                2,
+                1,
+                0,
+                new ItemStack(ConfigItems.itemThaumometer))
+                .setPages(
+                        new ResearchPage("tc.research_page.THAUMOMETER.1"),
+                        new ResearchPage((IRecipe) recipes.get("Thaumometer")))
+                .setStub()
+                .setAutoUnlock()
+                .setRound()
+                .registerResearchItem();
+
+        new ResearchItem(
+                "PAVETRAVEL",
+                "ARTIFICE",
+                new AspectList()
+                        .add(Aspect.TRAVEL, 3)
+                        .add(Aspect.EARTH, 3)
+                        .add(Aspect.FLIGHT, 3),
+                4,
+                -4,
+                1,
+                new ItemStack(ConfigBlocks.blockCosmeticSolid, 1, 2))
+                .setPages(
+                        new ResearchPage("tc.research_page.PAVETRAVEL.1"),
+                        new ResearchPage((IArcaneRecipe) recipes.get("PaveTravel")))
+                .setParents("ARCANESTONE")
+                .setSecondary()
+                .registerResearchItem();
+
+        new ResearchItem(
+                "PAVEWARD",
+                "ARTIFICE",
+                new AspectList()
+                        .add(Aspect.MOTION, 3)
+                        .add(Aspect.TRAP, 3)
+                        .add(Aspect.BEAST, 3),
+                6,
+                -4,
+                1,
+                new ItemStack(ConfigBlocks.blockCosmeticSolid, 1, 3))
+                .setPages(
+                        new ResearchPage("tc.research_page.PAVEWARD.1"),
+                        new ResearchPage((IArcaneRecipe) recipes.get("PaveWard")),
+                        new ResearchPage("tc.research_page.PAVEWARD.2"))
+                .setParents("ARCANESTONE")
+                .setSecondary()
+                .registerResearchItem();
+
+        new ResearchItem(
                 "INFUSION",
                 "ARTIFICE",
                 new AspectList()
