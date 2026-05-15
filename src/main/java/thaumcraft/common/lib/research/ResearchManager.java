@@ -31,6 +31,7 @@ import thaumcraft.common.lib.capabilities.PlayerKnowledgeProvider;
 import thaumcraft.common.lib.network.PacketHandler;
 import thaumcraft.common.lib.network.playerdata.PacketSyncWarp;
 import thaumcraft.common.lib.network.playerdata.PacketResearchComplete;
+import thaumcraft.common.lib.utils.InventoryUtils;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -429,6 +430,56 @@ public class ResearchManager {
         if (candidates.isEmpty()) return "FAIL";
         int pick = new java.util.Random(player.world.getTotalWorldTime() / 50L).nextInt(candidates.size());
         return candidates.get(pick);
+    }
+
+    /**
+     * Grant a hidden/lost research clue entry (@KEY) from a scan clue object + awarded aspects.
+     */
+    public static boolean createClue(World world, EntityPlayer player, Object clue, AspectList aspects) {
+        if (world == null || player == null) return false;
+        ArrayList<String> keys = new ArrayList<>();
+        for (ResearchCategoryList category : ResearchCategories.researchCategories.values()) {
+            clueCheck:
+            for (ResearchItem research : category.research.values()) {
+                if (research == null || research.tags == null || research.tags.size() <= 0) continue;
+                if (!research.isHidden() && !research.isLost()) continue;
+                if (isResearchComplete(player.getName(), research.key)) continue;
+                if (isResearchComplete(player.getName(), "@" + research.key)) continue;
+
+                if (clue instanceof ItemStack) {
+                    ItemStack[] triggers = research.getItemTriggers();
+                    if (triggers != null && triggers.length > 0) {
+                        for (ItemStack trigger : triggers) {
+                            if (!InventoryUtils.areItemStacksEqual(trigger, (ItemStack) clue, true, true, false)) continue;
+                            keys.add(research.key);
+                            continue clueCheck;
+                        }
+                    }
+                } else if (clue instanceof String) {
+                    String[] triggers = research.getEntityTriggers();
+                    if (triggers != null && triggers.length > 0) {
+                        for (String trigger : triggers) {
+                            if (!clue.equals(trigger)) continue;
+                            keys.add(research.key);
+                            continue clueCheck;
+                        }
+                    }
+                }
+
+                Aspect[] aspectTriggers = research.getAspectTriggers();
+                if (aspects == null || aspects.size() <= 0 || aspectTriggers == null || aspectTriggers.length <= 0) continue;
+                for (Aspect aspect : aspectTriggers) {
+                    if (aspect == null || aspects.getAmount(aspect) <= 0) continue;
+                    keys.add(research.key);
+                    continue clueCheck;
+                }
+            }
+        }
+
+        if (keys.isEmpty()) return false;
+        String key = keys.get(world.rand.nextInt(keys.size()));
+        addResearch(player, "@" + key);
+        return true;
     }
 
     public static ItemStack createNote(ItemStack stack, String key, World world) {

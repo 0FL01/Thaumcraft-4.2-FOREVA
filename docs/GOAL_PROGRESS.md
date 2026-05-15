@@ -67,6 +67,33 @@ Branch: `codex/durable-goal-stage8-9`
 
 ## Checkpoint Log
 
+### 2026-05-15 — Stage 9-e scan clue unlock baseline (`@KEY`)
+
+Scope:
+
+- Added `ResearchManager.createClue(World, EntityPlayer, Object, AspectList)` with reference-aligned matching path for hidden/lost entries:
+  - item triggers via `InventoryUtils.areItemStacksEqual(...)`;
+  - entity trigger string matches;
+  - aspect trigger matches against awarded scan aspects.
+- Wired `ScanManager.completeScan` to:
+  - preserve scan clue object (`ItemStack` or entity key string),
+  - track actually awarded aspects from `checkAndSyncAspectKnowledge(...)`,
+  - call `ResearchManager.createClue(...)` after successful server-side scan completion.
+- Clue unlocks are now granted as `@KEY` through normal research completion sync path, avoiding direct full-research completion.
+- Updated `docs/Stage9-e.md` GAP-6 status from absent to partial with remaining entity-ID/runtime parity limits documented.
+
+Validation:
+
+- `./scripts/dev.sh validate --smoke` — passed: status, compile, tests `10/10`, jar, check-jar summary `5662` MCP leak lines / `1114` unique leaks, and server smoke.
+- `run/smoke-server.log` evidence: server ready (`Done (...)`), no fatal markers.
+- Crash report scan under `run/` remained clean during smoke stage.
+- `./scripts/dev.sh smoke-client` — skipped because `DISPLAY=` and GUI/graphics/user-interactive validation is excluded.
+
+Remaining limits:
+
+- Full hidden/lost clue parity still depends on broader trigger-bearing `ConfigResearch` population and runtime verification scenarios.
+- Entity-trigger string compatibility (`Thaumcraft.*` legacy IDs vs modern registry names) still needs targeted parity validation.
+
 ### 2026-05-15 — Stage 9-e text-only research graph expansion baseline
 
 Scope:

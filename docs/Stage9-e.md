@@ -301,7 +301,7 @@ Dependency: client-side research table GUI/rendering is outside Stage 9-e, but t
 
 ### GAP-6: Hidden/lost research discovery from scans is not wired
 
-**Статус:** отсутствует  
+**Статус:** частично реализовано  
 **Критичность:** blocker
 
 **Текущая реализация:**
@@ -317,11 +317,11 @@ Dependency: client-side research table GUI/rendering is outside Stage 9-e, but t
 
 **Что не совпадает:**
 
-`ResearchItem` supports item/entity/aspect triggers in the port, but no current code uses them to unlock `@KEY` clue research from scans. Reference `ScanManager.completeScan` builds a clue object and awarded aspect list, then calls `ResearchManager.createClue(...)`, which finds hidden/lost research whose triggers match scanned item/entity/aspects and grants `@KEY`. Current scan completion ends after marking scans and syncing aspect pools.
+The port now includes `ResearchManager.createClue(World, EntityPlayer, Object, AspectList)` and `ScanManager.completeScan` now forwards scan clue objects plus awarded-aspect data to it after successful server-side scan completion. Clue grants are stored as `@KEY` via normal research completion path. Remaining mismatch is runtime parity validation and possible entity-trigger identifier drift (`Thaumcraft.*` legacy names vs 1.12 registry IDs).
 
 **Что нужно доделать:**
 
-Port hidden/lost research clue creation and call it from scan completion after aspect awards.
+Finish parity validation of hidden/lost clue unlocks with populated trigger-bearing research content and confirm entity-trigger key compatibility.
 
 **Как доделать:**
 - Add `ResearchManager.createClue(World, EntityPlayer, Object, AspectList)` with original matching semantics for item, entity, and aspect triggers.

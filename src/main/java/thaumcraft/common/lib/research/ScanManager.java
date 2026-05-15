@@ -208,12 +208,20 @@ public class ScanManager implements IScanEventHandler {
                 }
             }
             boolean scannedByThaumometerFallback = "#".equals(prefix) && !isValidScanTarget(player, scan, "@");
+            AspectList awardedAspects = new AspectList();
             for (Aspect aspect : aspects.getAspects()) {
                 if (aspect == null || !knowledge.hasDiscoveredParentAspects(aspect)) continue;
                 int amount = aspects.getAmount(aspect);
                 if (scannedByThaumometerFallback) amount = 0;
                 if ("#".equals(prefix)) amount++;
-                checkAndSyncAspectKnowledge(player, aspect, amount);
+                int awarded = checkAndSyncAspectKnowledge(player, aspect, amount);
+                if (awarded > 0) {
+                    awardedAspects.merge(aspect, awarded);
+                }
+            }
+            Object clue = createScanClue(scan);
+            if (clue != null) {
+                ResearchManager.createClue(player.world, player, clue, awardedAspects);
             }
             ResearchManager.updateCache(player.getName(), knowledge);
         }
@@ -349,6 +357,22 @@ public class ScanManager implements IScanEventHandler {
 
     private static String normalizePrefix(String prefix) {
         return (prefix == null || prefix.isEmpty()) ? "@" : prefix;
+    }
+
+    private static Object createScanClue(ScanResult scan) {
+        if (scan == null) return null;
+        if (scan.type == 1) {
+            Item item = Item.getItemById(scan.id);
+            if (item == null) return null;
+            return new ItemStack(item, 1, normalizeGroupedMeta(item, scan.meta));
+        }
+        if (scan.type == 2) {
+            if (scan.entity instanceof EntityItem) {
+                return getScannedItemStack((EntityItem) scan.entity);
+            }
+            return scan.entity == null ? null : getEntityKey(scan.entity);
+        }
+        return null;
     }
 
     private static String getEntityKey(Entity entity) {
