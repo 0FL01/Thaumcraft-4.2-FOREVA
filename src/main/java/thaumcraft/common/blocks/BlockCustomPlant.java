@@ -86,10 +86,11 @@ public class BlockCustomPlant extends BlockBush {
 
     @Override
     public EnumPlantType getPlantType(IBlockAccess world, BlockPos pos) {
-        int type = world.getBlockState(pos).getValue(TYPE);
-        if (type == 2) return EnumPlantType.Plains;
+        IBlockState state = world.getBlockState(pos);
+        if (state.getBlock() != this) return EnumPlantType.Plains;
+        int type = state.getValue(TYPE);
         if (type == 3) return EnumPlantType.Desert;
-        if (type >= 4) return EnumPlantType.Cave;
+        if (type == 4) return EnumPlantType.Cave;
         return EnumPlantType.Plains;
     }
 
