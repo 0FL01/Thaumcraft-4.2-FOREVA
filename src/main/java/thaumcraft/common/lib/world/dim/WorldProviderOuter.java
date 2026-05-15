@@ -1,7 +1,6 @@
 package thaumcraft.common.lib.world.dim;
 
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.DimensionType;
 import net.minecraft.world.WorldProvider;
@@ -81,7 +80,8 @@ public class WorldProviderOuter extends WorldProvider {
 
     @Override
     public boolean canCoordinateBeSpawn(int x, int z) {
-        return false;
+        BlockPos top = this.world.getTopSolidOrLiquidBlock(new BlockPos(x, 0, z));
+        return this.world.getBlockState(top).getMaterial().blocksMovement();
     }
 
     @Override
@@ -91,7 +91,7 @@ public class WorldProviderOuter extends WorldProvider {
 
     @Override
     public int getAverageGroundLevel() {
-        return 0;
+        return 50;
     }
 
     @Override

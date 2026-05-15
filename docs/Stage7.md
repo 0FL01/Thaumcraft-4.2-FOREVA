@@ -294,7 +294,7 @@ Remaining GAP-4 limits after this checkpoint: key-room generation has not been o
 - `thaumcraft_src/thaumcraft/common/lib/world/dim/MazeHandler.class`
 
 **Что не совпадает:**
-Static comparison shows a plausible 1.12.2 adaptation, but no evidence that a new world reaches ready state, an Outer Lands dimension loads, chunks populate, or maze rooms generate without crashes. PRD explicitly lists this as a known risk: `docs/PRD.md:352-356`. Current `ChunkProviderOuter.populate` calls `biome.decorate` and then `MazeHandler.generateEldritch`: `src/main/java/thaumcraft/common/lib/world/dim/ChunkProviderOuter.java:61-65`, while the reference `ChunkProviderOuter` invokes biome decoration and Outer room generation via the original generator/hook pipeline. This adaptation needs runtime proof.
+Static comparison shows a plausible 1.12.2 adaptation, but no evidence that a new world reaches ready state, an Outer Lands dimension loads, chunks populate, or maze rooms generate without crashes. PRD explicitly lists this as a known risk: `docs/PRD.md:352-356`. Current `ChunkProviderOuter.populate` calls `biome.decorate` and then `MazeHandler.generateEldritch`: `src/main/java/thaumcraft/common/lib/world/dim/ChunkProviderOuter.java:61-65`, while the reference `ChunkProviderOuter` invokes biome decoration and Outer room generation via the original generator/hook pipeline. The 2026-05-15 provider spawn checkpoint restores the reference top-block spawn-coordinate test and average ground level `50`. This adaptation still needs runtime proof.
 
 **Что нужно доделать:**
 Run and document dedicated runtime scenarios after code gaps are closed: server smoke, new world generation, entering Outer Lands, forced chunk population around a maze, save/reload, and portal return.
@@ -314,6 +314,18 @@ Run and document dedicated runtime scenarios after code gaps are closed: server 
 
 **Риски / зависимости:**
 Runtime validation may expose Stage 6 entity issues in guardian/boss/spawner rooms; those should be labeled as dependencies if entity behavior blocks Stage 7 room verification.
+
+**Checkpoint 2026-05-15 — Outer Lands provider spawn baseline:**
+`WorldProviderOuter.canCoordinateBeSpawn(...)` now checks the material of the top solid/liquid block at the requested X/Z instead of always returning `false`, and `getAverageGroundLevel()` now returns the reference value `50` instead of `0`.
+
+Validation:
+- `./scripts/dev.sh compileJava` — passed.
+- `./scripts/dev.sh build` — passed.
+- `./scripts/dev.sh check-jar` — не дошел до jar inspection: отсутствует wrapper-ожидаемый MCP mapping cache `.gradle_home/caches/minecraft/de/oceanlabs/mcp/mcp_stable/39/1.12.2/srgs/mcp-srg.srg`.
+- `./scripts/dev.sh smoke-server` — timeout before ready state на уже задокументированном pre-Forge/log4j этапе; `run/crash-reports/` не существует, and the configured crash-marker scan found no matches.
+- `git diff --check` — passed.
+
+Remaining GAP-5 limits after this checkpoint: actual Outer Lands load, spawn fallback behavior, chunk population, save/reload, and traversal remain unavailable while smoke-server is blocked before ready state and manual scenarios are excluded.
 
 ### GAP-6: Maze persistence and async generation can race with save/load and teleport
 

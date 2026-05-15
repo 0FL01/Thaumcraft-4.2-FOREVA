@@ -1323,9 +1323,29 @@ Remaining limits:
 
 - Runtime portal support updates, traversal, and save/reload validation remain unavailable while smoke-server is blocked before ready state and user-driven manual scenarios are excluded.
 
+### 2026-05-15 — Stage 7 Outer Lands provider spawn baseline
+
+Scope:
+
+- Restored `WorldProviderOuter.canCoordinateBeSpawn(...)` to check the top block material instead of always returning `false`.
+- Restored the reference average ground level `50` for the Outer Lands provider.
+- Left `getSpawnPoint()` unchanged to avoid introducing a nullable 1.12.2 spawn point without runtime evidence.
+
+Validation:
+
+- `./scripts/dev.sh compileJava` — passed.
+- `./scripts/dev.sh build` — passed.
+- `./scripts/dev.sh check-jar` — failed before jar inspection because the wrapper's expected MCP mapping cache file is still absent at `.gradle_home/caches/minecraft/de/oceanlabs/mcp/mcp_stable/39/1.12.2/srgs/mcp-srg.srg`.
+- `./scripts/dev.sh smoke-server` — failed by timeout before ready state; log again stopped after `Calling tweak class net.minecraftforge.fml.common.launcher.FMLServerTweaker`, with only Log4j console appender initialization errors. `run/crash-reports/` does not exist, and the configured crash-marker scan found no matches. This matches the clean `da3f307` baseline reproduction recorded above.
+- `git diff --check` — passed.
+
+Remaining limits:
+
+- Runtime confirmation of Outer Lands load, spawn fallback behavior, chunk population, traversal, and save/reload remains unavailable while smoke-server is blocked before ready state and user-driven manual scenarios are excluded.
+
 ## Next Checkpoint Candidate
 
-After the golem carried-display, trunk transfer, death logging, fire-resistance, armor, water-pathing, no-drowning, melee-enchantment, upgrade-retaliation, target-range, animal-target-filter, butcher-acquisition, item-pickup-delay, essentia-jar-destination, liquid-target-tank, portal-support, biome policy, and Greatwood-support checkpoints, the next pre-Phase8 candidates are:
+After the golem carried-display, trunk transfer, death logging, fire-resistance, armor, water-pathing, no-drowning, melee-enchantment, upgrade-retaliation, target-range, animal-target-filter, butcher-acquisition, item-pickup-delay, essentia-jar-destination, liquid-target-tank, portal-support, outer-provider-spawn, biome policy, and Greatwood-support checkpoints, the next pre-Phase8 candidates are:
 
 - Remaining Stage 6 selected low-risk golem AI helper fixes, if they can be kept server-safe.
 - Remaining Stage 7 surface/worldgen runtime evidence and broader biome blacklist edge cases.
