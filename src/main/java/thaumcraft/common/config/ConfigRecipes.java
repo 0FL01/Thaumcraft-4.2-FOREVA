@@ -45,6 +45,7 @@ public class ConfigRecipes {
     private static IRecipe recipeWandBasic;
     private static CrucibleRecipe recipeNitor;
     private static CrucibleRecipe recipeAlumentum;
+    private static CrucibleRecipe recipeThaumium;
 
     public static void init() {
         ConfigResearch.recipes.clear();
@@ -106,6 +107,9 @@ public class ConfigRecipes {
         if (recipeAlumentum != null) {
             ConfigResearch.recipes.put("Alumentum", recipeAlumentum);
         }
+        if (recipeThaumium != null) {
+            ConfigResearch.recipes.put("Thaumium", recipeThaumium);
+        }
         ItemStack basicWand = new ItemStack(ConfigItems.itemWandCasting, 1, 0);
         ConfigResearch.recipes.put("Thaumonomicon",
                 Arrays.asList(new AspectList(), 1, 2, 1,
@@ -157,6 +161,12 @@ public class ConfigRecipes {
                 new ItemStack(ConfigItems.itemResource, 1, 1),
                 "dustGlowstone",
                 new AspectList().merge(Aspect.ENERGY, 3).merge(Aspect.FIRE, 3).merge(Aspect.LIGHT, 3));
+
+        recipeThaumium = ThaumcraftApi.addCrucibleRecipe(
+                "THAUMIUM",
+                new ItemStack(ConfigItems.itemResource, 1, 2),
+                new ItemStack(Items.IRON_INGOT),
+                new AspectList().merge(Aspect.MAGIC, 4));
     }
 
     private static void initializeArcaneRecipeBaseline() {

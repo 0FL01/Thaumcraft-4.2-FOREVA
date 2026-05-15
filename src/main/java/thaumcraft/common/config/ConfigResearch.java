@@ -378,6 +378,24 @@ public class ConfigResearch {
                 .setSiblings("JARLABEL")
                 .setParents("NITOR", "ALUMENTUM")
                 .registerResearchItem();
+
+        new ResearchItem(
+                "THAUMIUM",
+                "ALCHEMY",
+                new AspectList()
+                        .add(Aspect.METAL, 3)
+                        .add(Aspect.MAGIC, 3),
+                -1,
+                3,
+                1,
+                new ItemStack(ConfigItems.itemResource, 1, 2))
+                .setPages(
+                        new ResearchPage("tc.research_page.THAUMIUM.1"),
+                        new ResearchPage((CrucibleRecipe) recipes.get("Thaumium")))
+                .setHidden()
+                .setAspectTriggers(Aspect.METAL)
+                .setParents("CRUCIBLE")
+                .registerResearchItem();
     }
 
     private static void initArtificeResearchBaseline() {
@@ -631,6 +649,25 @@ public class ConfigResearch {
                     .setParents("BASICTHAUMATURGY")
                     .registerResearchItem();
         }
+
+        new ResearchItem(
+                "CAP_thaumium",
+                "THAUMATURGY",
+                new AspectList()
+                        .add(Aspect.METAL, 6)
+                        .add(Aspect.MAGIC, 6)
+                        .add(Aspect.TOOL, 3)
+                        .add(Aspect.AURA, 3),
+                5,
+                4,
+                2,
+                new ItemStack(ConfigItems.itemWandCap, 1, 2))
+                .setPages(
+                        new ResearchPage("tc.research_page.CAP_thaumium.1"),
+                        new ResearchPage((IArcaneRecipe) recipes.get("WandCapThaumiumInert")),
+                        new ResearchPage((InfusionRecipe) recipes.get("WandCapThaumium")))
+                .setParents("CAP_gold", "THAUMIUM", "INFUSION")
+                .registerResearchItem();
 
         if (Config.foundSilverIngot) {
             new ResearchItem(
