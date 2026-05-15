@@ -22,7 +22,7 @@ Stage 9-e закрывает research content и Thaumonomicon progression дл�
 
 - `docs/PRD.md:395`-`docs/PRD.md:416` — Stage 9 scope and risks.
 - `src/main/java/thaumcraft/common/Thaumcraft.java:186`-`src/main/java/thaumcraft/common/Thaumcraft.java:191` — current lifecycle calls `ConfigRecipes.init()`, `ConfigAspects.init()`, `ConfigResearch.init()` in post-init.
-- `src/main/java/thaumcraft/common/config/ConfigResearch.java:1`-`src/main/java/thaumcraft/common/config/ConfigResearch.java:8` — current research registration placeholder.
+- `src/main/java/thaumcraft/common/config/ConfigResearch.java:1`-`src/main/java/thaumcraft/common/config/ConfigResearch.java:13` — current research registration placeholder with a baseline `recipes` map scaffold.
 - `.stage9e-ref/thaumcraft/common/config/ConfigResearch.java:50`-`.stage9e-ref/thaumcraft/common/config/ConfigResearch.java:65` — original `ConfigResearch.init()` flow.
 - `.stage9e-ref/thaumcraft/common/config/ConfigResearch.java:67`-`.stage9e-ref/thaumcraft/common/config/ConfigResearch.java:73` — original category registration.
 - `.stage9e-ref/thaumcraft/common/config/ConfigResearch.java:76`-`.stage9e-ref/thaumcraft/common/config/ConfigResearch.java:417` — original research entries across all six categories.
@@ -56,7 +56,7 @@ Lightweight analysis commands run:
 
 Current implementation is not Stage 9-e complete.
 
-The port does call `ConfigResearch.init()` during post-init after recipe and aspect initialization (`src/main/java/thaumcraft/common/Thaumcraft.java:186`-`src/main/java/thaumcraft/common/Thaumcraft.java:191`), but `ConfigResearch.init()` contains only a placeholder comment and registers no categories, research entries, pages, recipe page references, triggers, or warp metadata (`src/main/java/thaumcraft/common/config/ConfigResearch.java:3`-`src/main/java/thaumcraft/common/config/ConfigResearch.java:7`). Therefore `ResearchCategories.researchCategories` remains empty unless addons register their own entries.
+The port does call `ConfigResearch.init()` during post-init after recipe and aspect initialization (`src/main/java/thaumcraft/common/Thaumcraft.java:186`-`src/main/java/thaumcraft/common/Thaumcraft.java:191`), but `ConfigResearch.init()` still registers no categories, research entries, pages, triggers, or warp metadata; it currently only clears the baseline `recipes` map scaffold (`src/main/java/thaumcraft/common/config/ConfigResearch.java:6`-`src/main/java/thaumcraft/common/config/ConfigResearch.java:10`). Therefore `ResearchCategories.researchCategories` remains empty unless addons register their own entries.
 
 The low-level API containers for categories, items, and pages are mostly present and structurally close to the 1.7.10 reference (`src/main/java/thaumcraft/api/research/ResearchCategories.java:12`-`src/main/java/thaumcraft/api/research/ResearchCategories.java:67`, `src/main/java/thaumcraft/api/research/ResearchItem.java:13`-`src/main/java/thaumcraft/api/research/ResearchItem.java:256`, `src/main/java/thaumcraft/api/research/ResearchPage.java:15`-`src/main/java/thaumcraft/api/research/ResearchPage.java:128`). This is an API baseline, not content parity.
 
@@ -139,7 +139,7 @@ Dependency: Stage 9 recipe registration must provide recipe objects for page ref
 
 **Что не совпадает:**
 
-Reference `ConfigResearch` uses `recipes.get("...")` throughout research pages. The decompiled reference contains 276 unique recipe keys referenced by research pages. Current `ConfigRecipes.init()` is a placeholder and current `ConfigResearch` has no `recipes` map. Current `ResearchPage` constructors dereference recipe outputs for single `IRecipe`, `IArcaneRecipe`, `CrucibleRecipe`, and `InfusionRecipe` pages, so a null recipe reference will become a registration-time crash rather than a usable missing page.
+Reference `ConfigResearch` uses `recipes.get("...")` throughout research pages. The decompiled reference contains 276 unique recipe keys referenced by research pages. Current `ConfigRecipes.init()` is a placeholder, and while current `ConfigResearch` now has a baseline `recipes` map scaffold, it is not populated with reference recipe handles yet. Current `ResearchPage` constructors dereference recipe outputs for single `IRecipe`, `IArcaneRecipe`, `CrucibleRecipe`, and `InfusionRecipe` pages, so an unpopulated map will still become a registration-time crash rather than a usable missing page.
 
 **Что нужно доделать:**
 

@@ -67,6 +67,26 @@ Branch: `codex/durable-goal-stage8-9`
 
 ## Checkpoint Log
 
+### 2026-05-15 — Stage 9 research map scaffold baseline
+
+Scope:
+
+- Added baseline `ConfigResearch.recipes` scaffold (`Map<String, Object>`) to restore the reference-side contract used by Stage 9 research page recipe lookups.
+- Updated `ConfigResearch.init()` to clear the recipe map as an explicit pre-registration reset point.
+- Updated `docs/Stage9-e.md` analysis text to reflect that the map scaffold now exists while content/category/page registration and recipe-map population are still open.
+
+Validation:
+
+- `./scripts/dev.sh validate --smoke` — passed: status, compile, tests `10/10`, jar, check-jar summary `5428` MCP leak lines / `1063` unique leaks, and server smoke.
+- `run/smoke-server.log` evidence: `Registering entities`; `Forge Mod Loader has successfully loaded 6 mods`; `Done (1.134s)!`.
+- Crash report scan under `run/` returned no files.
+- `./scripts/dev.sh smoke-client` — skipped because `DISPLAY=` and GUI/graphics/user-interactive validation is excluded.
+
+Remaining limits:
+
+- The scaffold is intentionally empty; no Stage 9 recipe keys are populated yet.
+- `ConfigResearch.init()` still does not register categories/research entries/pages.
+
 ### 2026-05-15 — Stage 9-e research completion packet progression guardrails
 
 Scope:
