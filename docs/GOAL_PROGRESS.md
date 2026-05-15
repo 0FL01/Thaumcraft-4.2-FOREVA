@@ -67,6 +67,30 @@ Branch: `codex/durable-goal-stage8-9`
 
 ## Checkpoint Log
 
+### 2026-05-15 — Stage 9-e text-only research graph expansion baseline
+
+Scope:
+
+- Expanded `ConfigResearch` with additional reference-aligned entries that do not depend on `recipes.get(...)` objects:
+  - BASICS: `ENCHANT`, `NODETAPPER1`, `NODEPRESERVE`, `NODETAPPER2`, `CRIMSON`
+  - THAUMATURGY (virtual auto-unlock): `CAP_iron`, `ROD_wood`
+  - ELDRITCH: `ELDRITCHMAJOR`
+- Preserved reference metadata for this slice: category IDs, coordinates, aspect tags, parent links, flags (`stub/round/hidden/special/autoUnlock`), and page text keys.
+- Added reference warp metadata for `CRIMSON` via `ThaumcraftApi.addWarpToResearch("CRIMSON", 3)`.
+- Updated `docs/Stage9-e.md` current-state summary to reflect the expanded safe subset while keeping recipe-backed graph work open.
+
+Validation:
+
+- `./scripts/dev.sh validate --smoke` — passed: status, compile, tests `10/10`, jar, check-jar summary `5662` MCP leak lines / `1114` unique leaks, and server smoke.
+- `run/smoke-server.log` evidence: server ready (`Done (...)`), no fatal markers.
+- Crash report scan under `run/` remained clean during smoke stage.
+- `./scripts/dev.sh smoke-client` — skipped because `DISPLAY=` and GUI/graphics/user-interactive validation is excluded.
+
+Remaining limits:
+
+- Stage 9-e still lacks the majority of research entries/pages and most recipe-backed page wiring.
+- Hidden/lost clue unlock flow and full research-note progression parity remain open.
+
 ### 2026-05-15 — Stage 9-e BASIC text-only research entry baseline
 
 Scope:

@@ -2,7 +2,10 @@ package thaumcraft.common.config;
 
 import java.util.HashMap;
 import java.util.Map;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
+import thaumcraft.api.ThaumcraftApi;
+import thaumcraft.api.aspects.Aspect;
 import thaumcraft.api.aspects.AspectList;
 import thaumcraft.api.research.ResearchCategories;
 import thaumcraft.api.research.ResearchItem;
@@ -14,6 +17,9 @@ public class ConfigResearch {
     public static void init() {
         initCategories();
         initBasicResearchBaseline();
+        initBasicResearchTextOnlyExtended();
+        initThaumaturgyResearchTextOnlyBaseline();
+        initEldritchResearchTextOnlyBaseline();
         // Stage 9-e research item/page graph registration remains in progress.
     }
 
@@ -110,6 +116,119 @@ public class ConfigResearch {
                 .setStub()
                 .setRound()
                 .setAutoUnlock()
+                .registerResearchItem();
+    }
+
+    private static void initBasicResearchTextOnlyExtended() {
+        new ResearchItem(
+                "ENCHANT",
+                "BASICS",
+                new AspectList(),
+                -4,
+                -2,
+                0,
+                new ResourceLocation("thaumcraft", "textures/misc/r_enchant.png"))
+                .setPages(
+                        new ResearchPage("tc.research_page.ENCHANT.1"),
+                        new ResearchPage("tc.research_page.ENCHANT.2"))
+                .setStub()
+                .setRound()
+                .setAutoUnlock()
+                .registerResearchItem();
+
+        new ResearchItem(
+                "NODETAPPER1",
+                "BASICS",
+                new AspectList()
+                        .add(Aspect.AURA, 3)
+                        .add(Aspect.MAGIC, 3)
+                        .add(Aspect.MOTION, 3)
+                        .add(Aspect.EXCHANGE, 3),
+                -4,
+                1,
+                2,
+                new ResourceLocation("thaumcraft", "textures/misc/r_nodetap1.png"))
+                .setPages(new ResearchPage("tc.research_page.NODETAPPER1.1"))
+                .setParents("NODES")
+                .setRound()
+                .registerResearchItem();
+
+        new ResearchItem(
+                "NODEPRESERVE",
+                "BASICS",
+                new AspectList()
+                        .add(Aspect.AURA, 3)
+                        .add(Aspect.GREED, 3)
+                        .add(Aspect.SENSES, 3),
+                -6,
+                2,
+                2,
+                new ResourceLocation("thaumcraft", "textures/misc/r_nodepreserve.png"))
+                .setPages(new ResearchPage("tc.research_page.NODEPRESERVE"))
+                .setParents("NODETAPPER1")
+                .setRound()
+                .registerResearchItem();
+
+        new ResearchItem(
+                "NODETAPPER2",
+                "BASICS",
+                new AspectList()
+                        .add(Aspect.AURA, 6)
+                        .add(Aspect.MAGIC, 3)
+                        .add(Aspect.MOTION, 3)
+                        .add(Aspect.EXCHANGE, 3),
+                -3,
+                3,
+                2,
+                new ResourceLocation("thaumcraft", "textures/misc/r_nodetap2.png"))
+                .setPages(new ResearchPage("tc.research_page.NODETAPPER2.1"))
+                .setParents("NODETAPPER1")
+                .setSpecial()
+                .setRound()
+                .registerResearchItem();
+
+        new ResearchItem(
+                "CRIMSON",
+                "BASICS",
+                new AspectList(),
+                0,
+                4,
+                0,
+                new ItemStack(ConfigItems.itemEldritchObject, 1, 1))
+                .setPages(new ResearchPage("tc.research_page.CRIMSON.1"))
+                .setStub()
+                .setHidden()
+                .setRound()
+                .setSpecial()
+                .registerResearchItem();
+        ThaumcraftApi.addWarpToResearch("CRIMSON", 3);
+    }
+
+    private static void initThaumaturgyResearchTextOnlyBaseline() {
+        new ResearchItem("CAP_iron", "THAUMATURGY")
+                .setAutoUnlock()
+                .registerResearchItem();
+        new ResearchItem("ROD_wood", "THAUMATURGY")
+                .setAutoUnlock()
+                .registerResearchItem();
+    }
+
+    private static void initEldritchResearchTextOnlyBaseline() {
+        new ResearchItem(
+                "ELDRITCHMAJOR",
+                "ELDRITCH",
+                new AspectList(),
+                -1,
+                0,
+                0,
+                new ResourceLocation("thaumcraft", "textures/misc/r_eldritchmajor.png"))
+                .setPages(
+                        new ResearchPage("tc.research_page.ELDRITCHMAJOR.1"),
+                        new ResearchPage("tc.research_page.ELDRITCHMAJOR.2"))
+                .setStub()
+                .setHidden()
+                .setRound()
+                .setSpecial()
                 .registerResearchItem();
     }
 }
