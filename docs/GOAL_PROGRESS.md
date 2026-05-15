@@ -638,6 +638,25 @@ Remaining limits:
 - Cultist and Taint Swarm drops/sounds have not been observed in a runtime world because smoke-server remains environment-blocked and user-driven manual scenarios are excluded.
 - The broader Stage 6 drop/sound table remains open for other mobs and bosses.
 
+### 2026-05-15 — Stage 6 entity registry mapping
+
+Scope:
+
+- Documented the Stage 6 reference token to current Forge 1.12 registry-name mapping.
+- Documented current local registration order for Stage 6 entities.
+- Documented egg color parity and the decision to use Forge 1.12 entity eggs as the fresh-world replacement for the absent 1.7.10 `ItemSpawnerEgg`.
+- Corrected the Stage 6 note that current registry paths are lowercase legacy tokens, not snake_case.
+
+Validation:
+
+- `git diff --check` — passed.
+- No compile/build/smoke command required for this documentation-only checkpoint.
+
+Remaining limits:
+
+- Runtime registry smoke remains blocked by the pre-Forge smoke-server timeout, so duplicate/missing registry warnings and actual Forge egg spawning remain unobserved.
+- External 1.7.10 save/item compatibility remains out of scope for the active fresh-world target.
+
 ## Next Checkpoint Candidate
 
 After the portal trigger and ring bootstrap checkpoints, the next pre-Phase8 candidates are:
