@@ -98,7 +98,13 @@ public class EntityGolemBase extends net.minecraft.entity.monster.EntityGolem im
         int xx = net.minecraft.util.math.MathHelper.floor(this.posX);
         int yy = net.minecraft.util.math.MathHelper.floor(this.posY);
         int zz = net.minecraft.util.math.MathHelper.floor(this.posZ);
-        this.inactive = false;
+        net.minecraft.util.math.BlockPos below = new net.minecraft.util.math.BlockPos(xx, yy - 1, zz);
+        net.minecraft.block.state.IBlockState belowState = yy > 0
+                ? this.world.getBlockState(below)
+                : net.minecraft.init.Blocks.AIR.getDefaultState();
+        this.inactive = yy > 0
+                && belowState.getBlock() == thaumcraft.common.config.ConfigBlocks.blockCosmeticSolid
+                && belowState.getBlock().getMetaFromState(belowState) == 10;
 
         if (!this.world.isRemote) {
             if (this.regenTimer > 0) {

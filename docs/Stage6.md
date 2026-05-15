@@ -122,14 +122,14 @@ Depends on item/content registration outside pure entity classes. This is a dire
 - `thaumcraft_src/thaumcraft/common/entities/golems/EntityGolemBase.class`
 
 **Что не совпадает:**
-Reference behavior includes inactive state from the pedestal/cosmetic block under the golem, bootup sounds/status, fire resistance override, death logging, bell/deco/wheat interactions, fluid-carried NBT for fluid cores, GUI blocking while holding wand, setup inventory after upgrades, spawn data reconstruction, and item/bell constants through `ConfigItems`. Checkpoints 8.2.17 and 8.2.20 restore the main bell/deco/wheat interaction branch, held-wand GUI exclusion, upgrade inventory refresh, fluid-carried/toggle NBT persistence, carried item sync after reload, and ranged golem shot sound. Current remaining static gaps include the simplified `inactive = false` path in `onLivingUpdate` (`EntityGolemBase.java:101`), death logging/bootup client sound parity, carried fluid/essentia display sync, and runtime/manual evidence for the full core matrix.
+Reference behavior includes inactive state from the pedestal/cosmetic block under the golem, bootup sounds/status, fire resistance override, death logging, bell/deco/wheat interactions, fluid-carried NBT for fluid cores, GUI blocking while holding wand, setup inventory after upgrades, spawn data reconstruction, and item/bell constants through `ConfigItems`. Checkpoints 8.2.17, 8.2.20, and 8.2.21 restore the main bell/deco/wheat interaction branch, held-wand GUI exclusion, upgrade inventory refresh, fluid-carried/toggle NBT persistence, carried item sync after reload, ranged golem shot sound, and the golem-stone inactive state. Current remaining static gaps include death logging/bootup client sound parity, carried fluid/essentia display sync, and runtime/manual evidence for the full core matrix.
 
 **Что нужно доделать:**
 Port the missing server-visible golem lifecycle and interaction details from reference, without moving renderer/FX work into Stage 6.
 
 **Как доделать:**
 - files/classes/methods/registrations/resources/scenarios
-- Update `EntityGolemBase.onLivingUpdate` to match reference inactive-home behavior using the correct current block/state equivalent.
+- Inactive golem-stone behavior is restored; verify it in runtime placement scenarios.
 - Core 5 fluid-carried NBT, toggle NBT, and ranged shot sound are restored; verify them in runtime save/load/combat scenarios.
 - Decoration application/removal, wheat healing/speed behavior, bell interaction behavior, held-wand GUI exclusion, and upgrade inventory refresh are restored; verify them in runtime scenarios.
 - Runtime scenarios: gather, empty, pickup, harvest, attack, fluid, essentia, lumber, use, butcher, sort, fish.
@@ -705,6 +705,7 @@ Stage 6 считается ПОЛНОСТЬЮ завершенной тольк�
 - `./scripts/dev.sh build` — passed.
 - `./scripts/dev.sh check-jar` — не дошел до jar inspection: отсутствует wrapper-ожидаемый MCP mapping cache `.gradle_home/caches/minecraft/de/oceanlabs/mcp/mcp_stable/39/1.12.2/srgs/mcp-srg.srg`.
 - `./scripts/dev.sh smoke-server` — timeout before ready state на уже задокументированном pre-Forge/log4j этапе; `run/crash-reports/` не существует, and the configured crash-marker scan found no matches.
+- `git diff --check` — passed.
 
 Оставшиеся ограничения:
 
@@ -1160,6 +1161,28 @@ Mapping:
 
 - Runtime save/load evidence for fluid, toggle, and carried item display sync remains unavailable while smoke-server is blocked before ready state and manual scenarios are excluded.
 - The inactive pedestal/cosmetic-block state, death logging/bootup client sound parity, and carried fluid/essentia display sync remain open.
+- Full per-core golem AI runtime scenarios remain open.
+
+### 8.2.21 Golem inactive stone checkpoint — 2026-05-15
+
+Статус: reference inactive golem-stone behavior restored; runtime placement evidence remains open.
+
+Что сделано:
+
+- Restored the original `onLivingUpdate` inactive-state check for golems standing on `ConfigBlocks.blockCosmeticSolid` meta `10` (`golemStoneActive`).
+- Kept the restored behavior server-visible by reusing the current Forge 1.12 block-state metadata contract rather than introducing a new block or registry name.
+
+Проверки:
+
+- `./scripts/dev.sh compileJava` — passed.
+- `./scripts/dev.sh build` — passed.
+- `./scripts/dev.sh check-jar` — не дошел до jar inspection: отсутствует wrapper-ожидаемый MCP mapping cache `.gradle_home/caches/minecraft/de/oceanlabs/mcp/mcp_stable/39/1.12.2/srgs/mcp-srg.srg`.
+- `./scripts/dev.sh smoke-server` — timeout before ready state на уже задокументированном pre-Forge/log4j этапе; `run/crash-reports/` не существует, and the configured crash-marker scan found no matches.
+
+Оставшиеся ограничения:
+
+- Runtime confirmation that golems pause on active golem stone and resume off it remains unavailable while smoke-server is blocked before ready state and manual scenarios are excluded.
+- Death logging/bootup client sound parity and carried fluid/essentia display sync remain open.
 - Full per-core golem AI runtime scenarios remain open.
 
 ### 8.3 Minimal Stage 6 manual scenario matrix

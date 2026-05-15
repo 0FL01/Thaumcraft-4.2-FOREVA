@@ -349,6 +349,7 @@ Validation:
 - `./scripts/dev.sh build` — passed.
 - `./scripts/dev.sh check-jar` — failed before jar inspection because the wrapper's expected MCP mapping cache file is still absent at `.gradle_home/caches/minecraft/de/oceanlabs/mcp/mcp_stable/39/1.12.2/srgs/mcp-srg.srg`.
 - `./scripts/dev.sh smoke-server` — failed by timeout before ready state; log again stopped after `Calling tweak class net.minecraftforge.fml.common.launcher.FMLServerTweaker`, with only Log4j console appender initialization errors. `run/crash-reports/` does not exist, and the configured crash-marker scan found no matches. This matches the clean `da3f307` baseline reproduction recorded above.
+- `git diff --check` — passed.
 
 Remaining limits:
 
@@ -905,11 +906,31 @@ Remaining limits:
 - The inactive pedestal/cosmetic-block state, death logging/bootup client sound parity, and carried fluid/essentia display sync remain open.
 - Full per-core golem AI runtime scenarios remain open.
 
+### 2026-05-15 — Stage 6 golem inactive stone
+
+Scope:
+
+- Restored the reference inactive-state check for golems standing on `ConfigBlocks.blockCosmeticSolid` meta `10` (`golemStoneActive`).
+- Used the current Forge 1.12 block-state metadata contract for `BlockCosmeticSolid` instead of adding a new block or registry name.
+
+Validation:
+
+- `./scripts/dev.sh compileJava` — passed.
+- `./scripts/dev.sh build` — passed.
+- `./scripts/dev.sh check-jar` — failed before jar inspection because the wrapper's expected MCP mapping cache file is still absent at `.gradle_home/caches/minecraft/de/oceanlabs/mcp/mcp_stable/39/1.12.2/srgs/mcp-srg.srg`.
+- `./scripts/dev.sh smoke-server` — failed by timeout before ready state; log again stopped after `Calling tweak class net.minecraftforge.fml.common.launcher.FMLServerTweaker`, with only Log4j console appender initialization errors. `run/crash-reports/` does not exist, and the configured crash-marker scan found no matches. This matches the clean `da3f307` baseline reproduction recorded above.
+
+Remaining limits:
+
+- Runtime confirmation that golems pause on active golem stone and resume off it remains unavailable while smoke-server is blocked before ready state and user-driven manual scenarios are excluded.
+- Death logging/bootup client sound parity and carried fluid/essentia display sync remain open.
+- Full per-core golem AI runtime scenarios remain open.
+
 ## Next Checkpoint Candidate
 
-After the golem fluid NBT and trunk baseline checkpoints, the next pre-Phase8 candidates are:
+After the golem inactive-state and trunk baseline checkpoints, the next pre-Phase8 candidates are:
 
-- Remaining Stage 6 golem inactive-state/static parity and selected low-risk golem AI helper fixes.
+- Remaining Stage 6 selected low-risk golem AI helper fixes and carried fluid/essentia display sync, if they can be kept server-safe.
 - Remaining Stage 6 traveling trunk upgrade `2` owner-target defense/combat and cross-dimension owner-follow transfer.
 - Remaining Stage 7 surface/worldgen runtime evidence and broader biome blacklist edge cases.
 - Remaining Stage 7 Outer Lands room/tile behavior, especially key/boss room traversal, boss-room runtime/save evidence, and maze save/load race validation.
