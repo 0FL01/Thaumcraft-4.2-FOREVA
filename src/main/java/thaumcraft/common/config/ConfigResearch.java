@@ -617,6 +617,47 @@ public class ConfigResearch {
                 .registerResearchItem();
 
         new ResearchItem(
+                "INFERNALFURNACE",
+                "ARTIFICE",
+                new AspectList()
+                        .add(Aspect.FIRE, 6)
+                        .add(Aspect.METAL, 3)
+                        .add(Aspect.CRAFT, 3)
+                        .add(Aspect.AURA, 3),
+                -4,
+                -1,
+                2,
+                new ResourceLocation("thaumcraft", "textures/misc/r_infernalfurnace.png"))
+                .setPages(
+                        new ResearchPage("tc.research_page.INFERNALFURNACE.1"),
+                        new ResearchPage((List<?>) recipes.get("InfernalFurnace")),
+                        new ResearchPage("tc.research_page.INFERNALFURNACE.2"))
+                .setParents("NITOR", "ALUMENTUM")
+                .setConcealed()
+                .registerResearchItem();
+        ThaumcraftApi.addWarpToResearch("INFERNALFURNACE", 2);
+
+        new ResearchItem(
+                "BELLOWS",
+                "ARTIFICE",
+                new AspectList()
+                        .add(Aspect.AIR, 6)
+                        .add(Aspect.MECHANISM, 3)
+                        .add(Aspect.MOTION, 3),
+                -6,
+                -2,
+                1,
+                new ItemStack(ConfigBlocks.blockWoodenDevice, 1, 0))
+                .setPages(
+                        new ResearchPage("tc.research_page.BELLOWS.1"),
+                        new ResearchPage((IArcaneRecipe) recipes.get("Bellows")),
+                        new ResearchPage("tc.research_page.BELLOWS.2"))
+                .setParents("INFERNALFURNACE")
+                .setSecondary()
+                .setConcealed()
+                .registerResearchItem();
+
+        new ResearchItem(
                 "ARCANEBORE",
                 "ARTIFICE",
                 new AspectList()
