@@ -1772,6 +1772,30 @@ public class ConfigResearch {
         ThaumcraftApi.addWarpToResearch("PRIMNODE", 1);
 
         new ResearchItem(
+                "PRIMALCRUSHER",
+                "ELDRITCH",
+                new AspectList()
+                        .add(Aspect.MINE, 6)
+                        .add(Aspect.TOOL, 6)
+                        .add(Aspect.ENTROPY, 6)
+                        .add(Aspect.VOID, 6)
+                        .add(Aspect.WEAPON, 6)
+                        .add(Aspect.ELDRITCH, 6)
+                        .add(Aspect.GREED, 6),
+                2,
+                5,
+                2,
+                new ItemStack(ConfigItems.itemPrimalCrusher))
+                .setPages(
+                        new ResearchPage("tc.research_page.PRIMALCRUSHER.1"),
+                        new ResearchPage((InfusionRecipe) recipes.get("PrimalCrusher")),
+                        new ResearchPage("tc.research_page.PRIMALCRUSHER.2"))
+                .setConcealed()
+                .setParents("PRIMPEARL")
+                .setParentsHidden("VOIDMETAL", "ELEMENTALPICK", "ELEMENTALSHOVEL")
+                .registerResearchItem();
+
+        new ResearchItem(
                 "VOIDMETAL",
                 "ELDRITCH",
                 new AspectList()
@@ -1811,6 +1835,29 @@ public class ConfigResearch {
                 .setParents("CAP_thaumium", "VOIDMETAL")
                 .registerResearchItem();
         ThaumcraftApi.addWarpToResearch("CAP_void", 1);
+
+        new ResearchItem(
+                "ARMORVOIDFORTRESS",
+                "ELDRITCH",
+                new AspectList()
+                        .add(Aspect.ARMOR, 5)
+                        .add(Aspect.ELDRITCH, 3)
+                        .add(Aspect.CLOTH, 3)
+                        .add(Aspect.DARKNESS, 3)
+                        .add(Aspect.VOID, 5),
+                0,
+                -3,
+                3,
+                new ItemStack(ConfigItems.itemHelmVoidRobe))
+                .setPages(
+                        new ResearchPage("tc.research_page.ARMORVOIDFORTRESS.1"),
+                        new ResearchPage((InfusionRecipe) recipes.get("VoidRobeHelm")),
+                        new ResearchPage((InfusionRecipe) recipes.get("VoidRobeChest")),
+                        new ResearchPage((InfusionRecipe) recipes.get("VoidRobeLegs")))
+                .setParents("VOIDMETAL", "ENCHFABRIC", "ELDRITCHMAJOR")
+                .setConcealed()
+                .setSecondary()
+                .registerResearchItem();
 
         new ResearchItem(
                 "FOCUSPRIMAL",
