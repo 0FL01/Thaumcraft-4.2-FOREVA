@@ -1064,3 +1064,23 @@ Validation evidence for this checkpoint:
 - `./scripts/dev.sh smoke-client` — skipped because `DISPLAY` is unset in the current environment.
 
 GAP-11 is advanced but not closed. Remaining Sanity Soap gaps are the reference pure-fluid bonus, blocked by the current absence of `blockFluidPure`/pure-water block parity, and client roots/craftstart sounds/bubble FX, which belong to Stage 8 visual/audio work. Manual soap-use validation remains open.
+
+### 8.20 2026-05-15 Essence phial checkpoint
+
+Implemented in the current checkpoint:
+
+- Restored `ItemEssence` metadata behavior for empty Glass Phials and filled Phials of Essentia, including localization keys and creative subitems with 8 essentia per aspect.
+- Restored phial transfer behavior against `TileAlembic` and `TileJarFillable`/void jars: empty phials extract 8 essentia into a filled phial, and filled phials add 8 essentia back into compatible jars while returning an empty phial.
+- Declared `TileJarFillable` as an `IAspectContainer`, matching the aspect-container methods it already exposed and allowing shared phial transfer logic.
+- Restored aspect tooltips and item-color hooks for phials, Crystal Essence, and Wisp Essence.
+- Restored Crystal Essence random aspect assignment and Wisp Essence creative variants with 2 points of each aspect.
+
+Validation evidence for this checkpoint:
+
+- `./scripts/dev.sh compileJava` — passed.
+- `./scripts/dev.sh build` — passed.
+- `./scripts/dev.sh check-jar` — failed before jar inspection because the wrapper's expected MCP mapping cache file is still absent at `.gradle_home/caches/minecraft/de/oceanlabs/mcp/mcp_stable/39/1.12.2/srgs/mcp-srg.srg`.
+- `./scripts/dev.sh smoke-server` — failed by timeout before ready state; log again stopped after `Calling tweak class net.minecraftforge.fml.common.launcher.FMLServerTweaker`, with only Log4j console appender initialization errors. `run/crash-reports/` does not exist, and the configured crash-marker scan found no matches.
+- `./scripts/dev.sh smoke-client` — skipped because `DISPLAY` is unset in the current environment.
+
+GAP-11 is advanced but not closed. Essence phials still need in-world/manual checks against alembics, normal jars, void jars, filtered/full jars, and full inventories. Item tint/tooltip display remains unvalidated without client GUI/runtime access, and full jar/alembic renderer parity remains Stage 8.

@@ -6,6 +6,7 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.world.World;
 import thaumcraft.api.ThaumcraftApiHelper;
 import thaumcraft.api.aspects.Aspect;
+import thaumcraft.api.aspects.IAspectContainer;
 import thaumcraft.api.aspects.AspectList;
 import thaumcraft.api.aspects.IAspectSource;
 import thaumcraft.api.aspects.IEssentiaTransport;
@@ -14,7 +15,7 @@ import thaumcraft.common.tiles.TileJar;
 
 public class TileJarFillable
 extends TileJar
-implements ITickable, IAspectSource,
+implements ITickable, IAspectContainer, IAspectSource,
 IEssentiaTransport {
     public Aspect aspect = null;
     public Aspect aspectFilter = null;

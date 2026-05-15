@@ -39,6 +39,24 @@ public class ClientProxy extends CommonProxy {
                     ConfigItems.itemManaBean
             );
         }
+        if (ConfigItems.itemEssence != null) {
+            Minecraft.getMinecraft().getItemColors().registerItemColorHandler(
+                    (stack, tintIndex) -> ConfigItems.itemEssence.getColorFromItemStack(stack, tintIndex),
+                    ConfigItems.itemEssence
+            );
+        }
+        if (ConfigItems.itemCrystalEssence != null) {
+            Minecraft.getMinecraft().getItemColors().registerItemColorHandler(
+                    (stack, tintIndex) -> ConfigItems.itemCrystalEssence.getColorFromItemStack(stack),
+                    ConfigItems.itemCrystalEssence
+            );
+        }
+        if (ConfigItems.itemWispEssence != null) {
+            Minecraft.getMinecraft().getItemColors().registerItemColorHandler(
+                    (stack, tintIndex) -> ConfigItems.itemWispEssence.getColorFromItemStack(stack),
+                    ConfigItems.itemWispEssence
+            );
+        }
     }
 
     @Override

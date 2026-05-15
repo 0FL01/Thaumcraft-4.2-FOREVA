@@ -1548,6 +1548,30 @@ Remaining limits:
 - Client roots/craftstart sounds and bubble FX remain Stage 8 visual/audio work.
 - Manual soap-use validation still needs an in-world player scenario.
 
+### 2026-05-15 — Stage 5 essence phial behavior
+
+Scope:
+
+- Restored Glass Phial vs Phial of Essentia metadata/name behavior and creative subitems with 8 essentia per filled phial.
+- Restored phial transfer behavior for alembics and fillable/void jars: empty phials extract 8 essentia into a filled phial, and filled phials return 8 essentia to compatible jars while producing an empty phial.
+- Declared `TileJarFillable` as an `IAspectContainer`, matching its existing method surface and allowing shared phial transfer logic.
+- Restored aspect tooltips and item-color hooks for essence phials, crystal essence, and wisp essence.
+- Restored Crystal Essence random aspect assignment on creation/inventory update and Wisp Essence creative variants with 2 points of each aspect.
+
+Validation:
+
+- `./scripts/dev.sh compileJava` — passed.
+- `./scripts/dev.sh build` — passed.
+- `./scripts/dev.sh check-jar` — failed before jar inspection because the wrapper's expected MCP mapping cache file is still absent at `.gradle_home/caches/minecraft/de/oceanlabs/mcp/mcp_stable/39/1.12.2/srgs/mcp-srg.srg`.
+- `./scripts/dev.sh smoke-server` — failed by timeout before ready state; log again stopped after `Calling tweak class net.minecraftforge.fml.common.launcher.FMLServerTweaker`, with only Log4j console appender initialization errors. `run/crash-reports/` does not exist, and the configured crash-marker scan found no matches.
+- `./scripts/dev.sh smoke-client` — skipped because `DISPLAY` is unset in the current environment.
+
+Remaining limits:
+
+- Phial transfer needs in-world/manual checks against alembics, normal jars, void jars, full jars, filtered jars, and full player inventories.
+- Item tint/tooltip behavior is implemented but not visually validated because GUI/client validation is unavailable.
+- Full jar/alembic visual renderer parity remains Stage 8.
+
 ## Next Checkpoint Candidate
 
 After the golem carried-display, trunk transfer, death logging, fire-resistance, armor, water-pathing, no-drowning, melee-enchantment, upgrade-retaliation, target-range, animal-target-filter, butcher-acquisition, item-pickup-delay, essentia-jar-destination, liquid-target-tank, portal-support, outer-provider-spawn, outer-structure-query, outer-worldgen-ownership, Stage7-docs-refresh, hover-motion, biome policy, and Greatwood-support checkpoints, the next pre-Phase8 candidates are:
