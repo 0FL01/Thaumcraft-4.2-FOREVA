@@ -701,6 +701,11 @@ public class EntityGolemBase extends net.minecraft.entity.monster.EntityGolem im
     }
 
     @Override
+    protected int decreaseAirSupply(int air) {
+        return air;
+    }
+
+    @Override
     public void onDeath(net.minecraft.util.DamageSource cause) {
         if (!this.world.isRemote) {
             Thaumcraft.log.info("[Thaumcraft] {} was killed by {} ({})", this, cause.getTrueSource(), cause.getDamageType());

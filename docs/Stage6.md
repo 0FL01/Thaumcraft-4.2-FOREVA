@@ -122,7 +122,7 @@ Depends on item/content registration outside pure entity classes. This is a dire
 - `thaumcraft_src/thaumcraft/common/entities/golems/EntityGolemBase.class`
 
 **Что не совпадает:**
-Reference behavior includes inactive state from the pedestal/cosmetic block under the golem, bootup sounds/status, fire resistance override, armor calculation, material-dependent water pathing, death logging, bell/deco/wheat interactions, fluid-carried NBT for fluid cores, GUI blocking while holding wand, setup inventory after upgrades, spawn data reconstruction, and item/bell constants through `ConfigItems`. Checkpoints 8.2.17, 8.2.20, 8.2.21, 8.2.24, 8.2.25, 8.2.26, 8.2.27, and 8.2.28 restore the main bell/deco/wheat interaction branch, held-wand GUI exclusion, upgrade inventory refresh, fluid-carried/toggle NBT persistence, carried item sync after reload, ranged golem shot sound, the golem-stone inactive state, carried item/fluid/essentia display sync, server-side death logging, fire-resistance guards, reference armor calculation, and material-dependent water pathing. Current remaining static gaps include bootup client sound parity and runtime/manual evidence for the full core matrix.
+Reference behavior includes inactive state from the pedestal/cosmetic block under the golem, bootup sounds/status, fire resistance override, armor calculation, material-dependent water pathing, no-drowning air handling, death logging, bell/deco/wheat interactions, fluid-carried NBT for fluid cores, GUI blocking while holding wand, setup inventory after upgrades, spawn data reconstruction, and item/bell constants through `ConfigItems`. Checkpoints 8.2.17, 8.2.20, 8.2.21, 8.2.24, 8.2.25, 8.2.26, 8.2.27, 8.2.28, and 8.2.29 restore the main bell/deco/wheat interaction branch, held-wand GUI exclusion, upgrade inventory refresh, fluid-carried/toggle NBT persistence, carried item sync after reload, ranged golem shot sound, the golem-stone inactive state, carried item/fluid/essentia display sync, server-side death logging, fire-resistance guards, reference armor calculation, material-dependent water pathing, and no-drowning air handling. Current remaining static gaps include bootup client sound parity and runtime/manual evidence for the full core matrix.
 
 **Что нужно доделать:**
 Port the missing server-visible golem lifecycle and interaction details from reference, without moving renderer/FX work into Stage 6.
@@ -136,6 +136,7 @@ Port the missing server-visible golem lifecycle and interaction details from ref
 - Fire-resistant golems now reject fire damage and ignition; verify clay/stone/iron/thaumium fire scenarios in runtime.
 - Golem armor now includes type armor plus visor/plate decoration bonuses; verify damage reduction in runtime combat.
 - Stone, iron, and thaumium golems now get the non-avoiding water pathing adaptation; verify water traversal in runtime.
+- Golems now preserve air supply while submerged; verify drowning immunity in runtime.
 - Runtime scenarios: gather, empty, pickup, harvest, attack, fluid, essentia, lumber, use, butcher, sort, fish.
 
 **Критерии приемки:**
@@ -1357,6 +1358,27 @@ Mapping:
 
 - Runtime confirmation of water traversal and avoidance per golem material remains unavailable while smoke-server is blocked before ready state and manual scenarios are excluded.
 - This is a Forge 1.12 API adaptation of the reference water-avoidance knob, not direct use of the removed old method.
+- Full per-core golem AI runtime scenarios remain open.
+
+### 8.2.29 Golem no-drowning checkpoint — 2026-05-15
+
+Статус: reference air-supply preservation restored; runtime drowning evidence remains open.
+
+Что сделано:
+
+- Restored `EntityGolemBase.decreaseAirSupply(...)` to return the current air value unchanged, matching the original golem no-drowning behavior.
+
+Проверки:
+
+- `./scripts/dev.sh compileJava` — passed.
+- `./scripts/dev.sh build` — passed.
+- `./scripts/dev.sh check-jar` — не дошел до jar inspection: отсутствует wrapper-ожидаемый MCP mapping cache `.gradle_home/caches/minecraft/de/oceanlabs/mcp/mcp_stable/39/1.12.2/srgs/mcp-srg.srg`.
+- `./scripts/dev.sh smoke-server` — timeout before ready state на уже задокументированном pre-Forge/log4j этапе; `run/crash-reports/` не существует, and the configured crash-marker scan found no matches.
+- `git diff --check` — passed.
+
+Оставшиеся ограничения:
+
+- Runtime confirmation that submerged golems do not drown remains unavailable while smoke-server is blocked before ready state and manual scenarios are excluded.
 - Full per-core golem AI runtime scenarios remain open.
 
 ### 8.3 Minimal Stage 6 manual scenario matrix
