@@ -258,6 +258,11 @@ Dependency: some block/item classes may belong to content/registration work outs
 
 Remaining GAP-4 limits after this checkpoint: other room templates still need reference audit, full room traversal has not been runtime/manual validated, `TileEldritchLock`/boss-room lifecycle is advanced by the GAP-10 checkpoint but decorative boss-room block-template parity remains open, and loot-table distribution remains dependent on Stage 9/content registration.
 
+**Checkpoint 2026-05-14 — Key room arch and guardian count parity:**
+`GenKeyRoom` now matches the reference inner wall/arch block selection more closely: default key-room walls use the `ROCK` placement, the side arch detail uses `STONE_NOSPAWN`, and only the intended center arch slot remains open. The guardian spawn count now starts at two, adds one on Normal and two on Hard, and therefore restores the reference HARD-mode champion guardian path.
+
+Remaining GAP-4 limits after this checkpoint: key-room generation has not been observed in a runtime Outer Lands maze, full portal/passage/nest/library/boss room traversal remains unvalidated, and boss-room decorative block mutation remains open.
+
 ### GAP-5: Outer Lands generation has no runtime smoke/manual validation evidence
 
 **Статус:** требует проверки  

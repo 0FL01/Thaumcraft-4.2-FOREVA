@@ -54,9 +54,13 @@ public class GenKeyRoom extends GenCommon {
             for (int b = 3; b <= 13; b++) {
                 for (int c = 2; c < 11; c++) {
                     if (a == 3 || a == 13 || b == 3 || b == 13) {
-                        if (c > 3 && c < 9 && (a == 8 || b == 8)) continue;
-                        if (c > 4 && c < 8 && (a == 7 || b == 7 || a == 9 || b == 9)) continue;
-                        placeBlock(world, x + a, y + c, z + b, STONE_NOSPAWN, cell);
+                        if (c > 3 && c < 9 && (a == 8 || b == 8)
+                                || c > 4 && c < 8 && (a == 7 || b == 7 || a == 9 || b == 9)) {
+                            if ((a == 8 || b == 8) && c == 6) continue;
+                            placeBlock(world, x + a, y + c, z + b, STONE_NOSPAWN, cell);
+                            continue;
+                        }
+                        placeBlock(world, x + a, y + c, z + b, ROCK, cell);
                     }
                 }
             }
@@ -113,7 +117,7 @@ public class GenKeyRoom extends GenCommon {
         world.spawnEntity(entityitem);
 
         // Spawn eldritch guardians
-        int guardianCount = 1 +
+        int guardianCount = 2 +
                 (world.getDifficulty() == EnumDifficulty.HARD ? 2 :
                  world.getDifficulty() == EnumDifficulty.NORMAL ? 1 : 0);
         for (int qq = 0; qq < guardianCount; qq++) {
