@@ -14,6 +14,8 @@ public class ConfigRecipes {
     private static boolean specialRecipesRegistered = false;
 
     public static void init() {
+        ConfigResearch.recipes.clear();
+
         boolean hasArcaneWand = false;
         boolean hasArcaneSceptre = false;
         boolean hasRunicAugment = false;

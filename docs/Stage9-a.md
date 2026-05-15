@@ -355,7 +355,7 @@ Changing recipe ids later can break research page references and manual validati
 
 ### GAP-9: Current lifecycle can make content compile while unusable at runtime
 
-**Статус:** реализовано неправильно  
+**Статус:** частично закрыт (recipe-handle reset ordering fixed; broader lifecycle remains open)
 **Критичность:** high
 
 **Текущая реализация:**
@@ -368,7 +368,7 @@ Changing recipe ids later can break research page references and manual validati
 
 **Что не совпадает:**
 
-Current postInit order calls recipes before aspects and calls ore compatibility after research. In Forge 1.12.2, JSON recipes are loaded by the recipe registry, and custom `IRecipe` entries must be registered during the recipe registry event; postInit registration cannot be the only path. The current order also means object tags generated from recipes may run before the relevant recipes/aspects/ore flags are complete.
+Current postInit order still differs from reference and keeps ore compatibility later than ideal. However, one concrete runtime blocker is now addressed: recipe-handle map reset no longer runs after recipe registration (map clear moved from `ConfigResearch.init()` into the start of `ConfigRecipes.init()`), so post-init recipe handle registrations are not erased by subsequent research init calls.
 
 **Что нужно доделать:**
 
@@ -379,9 +379,10 @@ Separate data preparation from registry event registration and order ore flags, 
 - Keep postInit for data that legitimately depends on all registries and ore dictionary data.
 - Ensure `ConfigAspects.init()` runs after any recipe/ore data it reads and before manual scanning validation.
 - Ensure `ConfigResearch.init()` can reference recipe handles already registered or stored.
+- Keep recipe-handle map reset before recipe registration, not after it.
 
 **Критерии приемки:**
-- [ ] Mod load reaches server ready state with no recipe registry errors.
+- [x] Mod load reaches server ready state with no recipe registry errors.
 - [ ] Stage 9-a recipes are present in `ForgeRegistries.RECIPES` after load.
 - [ ] Aspect/object tag lookup is populated after postInit for items produced by Stage 9-a recipes.
 - [ ] Research recipe handle lookups do not see null/missing recipe objects for Stage 9-a normal recipes.

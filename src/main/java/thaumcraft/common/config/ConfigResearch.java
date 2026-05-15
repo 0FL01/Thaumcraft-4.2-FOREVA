@@ -8,6 +8,5 @@ public class ConfigResearch {
 
     public static void init() {
         // Stage 9 research/category/page registration remains in progress.
-        recipes.clear();
     }
 }

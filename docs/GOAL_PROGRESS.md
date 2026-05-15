@@ -67,6 +67,27 @@ Branch: `codex/durable-goal-stage8-9`
 
 ## Checkpoint Log
 
+### 2026-05-15 — Stage 9 lifecycle recipe-map reset ordering fix
+
+Scope:
+
+- Fixed a post-init ordering side effect where research recipe-handle map resets could erase recipe registrations made earlier in the same lifecycle.
+- Moved `ConfigResearch.recipes.clear()` from `ConfigResearch.init()` to the start of `ConfigRecipes.init()` so clearing occurs before dynamic recipe registration.
+- Kept existing post-init call order while preventing recipe-handle wipeouts after `ConfigRecipes.init()`.
+- Updated `docs/Stage9-a.md` GAP-9 notes/status to capture this targeted lifecycle fix and remaining broader lifecycle gaps.
+
+Validation:
+
+- `./scripts/dev.sh validate --smoke` — passed: status, compile, tests `10/10`, jar, check-jar summary `5480` MCP leak lines / `1069` unique leaks, and server smoke.
+- `run/smoke-server.log` evidence: `Registering entities`; `Forge Mod Loader has successfully loaded 6 mods`; `Done (1.296s)!`.
+- Crash report scan under `run/` returned no files.
+- `./scripts/dev.sh smoke-client` — skipped because `DISPLAY=` and GUI/graphics/user-interactive validation is excluded.
+
+Remaining limits:
+
+- This fixes map-reset ordering only; full Stage 9 lifecycle parity (ore-compat timing, static recipe population, aspect/object-tag completeness, research content order) remains open.
+- Recipe/event registration remains partial and needs additional Stage 9-a/9-b/9-e implementation checkpoints.
+
 ### 2026-05-15 — Stage 9-b dynamic arcane wand/sceptre recipe baseline
 
 Scope:
