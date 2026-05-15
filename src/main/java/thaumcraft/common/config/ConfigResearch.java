@@ -29,6 +29,7 @@ public class ConfigResearch {
         initBasicResearchProgressionBaseline();
         initAlchemyResearchBaseline();
         initArtificeResearchBaseline();
+        initGolemancyResearchBaseline();
         initThaumaturgyResearchBaseline();
         initBasicResearchTextOnlyExtended();
         initThaumaturgyResearchTextOnlyBaseline();
@@ -2057,6 +2058,24 @@ public class ConfigResearch {
                 .setParentsHidden("ROD_greatwood")
                 .setSecondary()
                 .setConcealed()
+                .registerResearchItem();
+    }
+
+    private static void initGolemancyResearchBaseline() {
+        new ResearchItem(
+                "HUNGRYCHEST",
+                "GOLEMANCY",
+                new AspectList()
+                        .add(Aspect.HUNGER, 3)
+                        .add(Aspect.VOID, 3),
+                -1,
+                0,
+                1,
+                new ItemStack(ConfigBlocks.blockChestHungry))
+                .setPages(
+                        new ResearchPage("tc.research_page.HUNGRYCHEST.1"),
+                        new ResearchPage((IArcaneRecipe) recipes.get("HungryChest")))
+                .setSecondary()
                 .registerResearchItem();
     }
 
