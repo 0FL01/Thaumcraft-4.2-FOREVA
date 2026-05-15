@@ -228,6 +228,25 @@ public class ConfigResearch {
                 .registerResearchItem();
 
         new ResearchItem(
+                "DECONSTRUCTOR",
+                "BASICS",
+                new AspectList()
+                        .add(Aspect.MIND, 3)
+                        .add(Aspect.CRAFT, 3)
+                        .add(Aspect.ENTROPY, 3),
+                6,
+                2,
+                1,
+                new ItemStack(ConfigBlocks.blockTable, 1, 14))
+                .setPages(
+                        new ResearchPage("tc.research_page.DECONSTRUCTOR.1"),
+                        new ResearchPage((IArcaneRecipe) recipes.get("Deconstructor")),
+                        new ResearchPage("tc.research_page.DECONSTRUCTOR.2"))
+                .setRound()
+                .setParents("RESEARCHER1")
+                .registerResearchItem();
+
+        new ResearchItem(
                 "RESEARCHER2",
                 "BASICS",
                 new AspectList()

@@ -67,6 +67,29 @@ Branch: `codex/durable-goal-stage8-9`
 
 ## Checkpoint Log
 
+### 2026-05-15 — Stage 9-e BASICS deconstructor baseline
+
+Scope:
+
+- Added BASICS research entry `DECONSTRUCTOR` to `ConfigResearch`.
+- Preserved reference wiring for this entry:
+  - coordinates/aspects/complexity,
+  - page order (`text` -> `arcane recipe` -> `text`),
+  - parent requirement `RESEARCHER1`.
+- Bound recipe page to existing `Deconstructor` arcane recipe key from `ConfigResearch.recipes`.
+
+Validation:
+
+- `./scripts/dev.sh validate --smoke` — passed: status, compile, tests, jar, check-jar summary, and server smoke.
+- `run/smoke-server.log` evidence: server ready (`Done (...)`), no fatal markers.
+- Crash report scan under `run/` remained clean during smoke stage.
+- `./scripts/dev.sh smoke-client` — skipped because `DISPLAY=` and GUI/graphics/user-interactive validation is excluded.
+
+Remaining limits:
+
+- Stage 9-e graph remains partial; this closes only one BASICS recipe-backed node.
+- GUI/manual Thaumonomicon progression checks remain skipped by instruction and headless environment limits.
+
 ### 2026-05-15 — Stage 9-e additional THAUMATURGY focus branch baseline
 
 Scope:
