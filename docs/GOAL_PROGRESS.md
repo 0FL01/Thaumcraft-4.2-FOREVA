@@ -515,6 +515,27 @@ Remaining limits:
 - Boss-room activation, room mutation, and save/reload progression have not been observed in a fresh runtime world because smoke-server remains environment-blocked and user-driven client/manual scenarios are excluded.
 - Reference sparkle packets while clearing nearby airy door blocks remain Stage 8/client FX work.
 
+### 2026-05-15 — Stage 6 Pech trade output generation
+
+Scope:
+
+- Restored the server-side Pech trade-roll button path through `ContainerPech.enchantItem(..., 0)`.
+- Added current-port Pech trade tables split by Pech type, mapping reference outputs to available 1.12.2 items/blocks where direct equivalents exist.
+- Restored value splitting, one-item offers from the Pech carried pack, high-value shared loot offers, one-input consumption after a roll, de-tame chance with Pech trade sound, and `PechDrop` tagging for unclaimed GUI drops.
+
+Validation:
+
+- `./scripts/dev.sh compileJava` — initially failed because `Items.ENCHANTED_BOOK` is typed as `Item` in 1.12.2; fixed by using `ItemEnchantedBook.getEnchantedItemStack(...)`, then passed.
+- `./scripts/dev.sh build` — passed.
+- `./scripts/dev.sh check-jar` — failed before jar inspection because the wrapper's expected MCP mapping cache file is still absent at `.gradle_home/caches/minecraft/de/oceanlabs/mcp/mcp_stable/39/1.12.2/srgs/mcp-srg.srg`.
+- `./scripts/dev.sh smoke-server` — failed by timeout before ready state; log again stopped after `Calling tweak class net.minecraftforge.fml.common.launcher.FMLServerTweaker`, with only Log4j console appender initialization errors. `run/crash-reports/` does not exist, and the configured crash-marker scan found no matches. This matches the clean `da3f307` baseline reproduction recorded above.
+
+Remaining limits:
+
+- `GuiPech` is still absent because `ClientProxy` returns `null` for `GUI_PECH`; player-driven GUI validation remains Phase 8/client work.
+- Original potion metadata and candle trade outputs do not have direct current-port equivalents in this branch and remain documented content dependencies.
+- Manual Pech trade interaction, output extraction, and save/reload scenarios remain unrun because user-driven manual validation is excluded and smoke-server remains environment-blocked.
+
 ## Next Checkpoint Candidate
 
 After the portal trigger and ring bootstrap checkpoints, the next pre-Phase8 candidates are:

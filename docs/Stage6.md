@@ -285,6 +285,11 @@ Port Pech trade tables and inventory recalculation semantics.
 **Риски / зависимости:**
 Depends on content/item availability from earlier/later phases. Missing output items should be mapped to current equivalents or documented as content dependency, not silently skipped.
 
+**Checkpoint 2026-05-15 — Pech trade output generation:**
+`ContainerPech` now handles the reference trade-roll button path through `enchantItem(..., 0)`: valued input in slot 0 generates up to four output offers, consumes one input item after the roll, can pull one-item offers from the Pech's carried pack, can roll the shared current loot reward path for high-value offers, plays the Pech trade sound on the reference de-tame chance, and tags unclaimed dropped GUI stacks as `PechDrop` so Pechs do not immediately re-collect them. The current-port trade tables are split by Pech type and map original outputs to available 1.12.2 items/blocks where they exist: mana beans, clusters, shards, crystals, knowledge fragments, thaumium tools/boots, focus pouch, Pech focus, vis amulet, runic ring, vanilla apples/XP/blaze/ghast/enchantment books, and custom plants.
+
+Remaining GAP-6 limits after this checkpoint: `GuiPech` is still absent because `ClientProxy` returns `null` for `GUI_PECH`, so player-driven GUI validation remains Phase 8/client work. Original potion metadata and candle outputs do not have direct current-port equivalents in this branch and remain documented content dependencies. Runtime trade interaction, output extraction, and save/reload scenarios are still unvalidated because smoke-server remains environment-blocked and user-driven manual scenarios are excluded.
+
 ### GAP-7: Cultist Portal loot crate behavior uses a placeholder because BlockLoot is absent
 
 **Статус:** отсутствует / реализовано неправильно  
@@ -684,6 +689,29 @@ Stage 6 считается ПОЛНОСТЬЮ завершенной тольк�
 
 - `S6-BOSS-01` runtime/manual Cultist Portal stage progression remains unverified.
 - Full boss/minion combat, drops, and loot distribution parity remains open.
+
+### 8.2.3 Pech trade output checkpoint — 2026-05-15
+
+Статус: server-side offer generation implemented; client GUI/runtime evidence remains open.
+
+Что сделано:
+
+- `ContainerPech.enchantItem(..., 0)` now runs the reference trade roll path for the existing one-input/four-output Pech inventory.
+- Added current-port Pech trade tables by Pech type with available equivalents for reference outputs.
+- Restored input value splitting, pack-loot one-item offers, high-value shared loot offers, input consumption after roll, de-tame chance with Pech trade sound, and `PechDrop` owner tagging for unclaimed GUI drops.
+
+Проверки:
+
+- `./scripts/dev.sh compileJava` — initially failed because `Items.ENCHANTED_BOOK` is typed as `Item` in 1.12.2; fixed by using `ItemEnchantedBook.getEnchantedItemStack(...)`, then passed.
+- `./scripts/dev.sh build` — passed.
+- `./scripts/dev.sh check-jar` — не дошел до jar inspection: отсутствует wrapper-ожидаемый MCP mapping cache `.gradle_home/caches/minecraft/de/oceanlabs/mcp/mcp_stable/39/1.12.2/srgs/mcp-srg.srg`.
+- `./scripts/dev.sh smoke-server` — timeout before ready state на уже задокументированном pre-Forge/log4j этапе; `run/crash-reports/` не существует, and the configured crash-marker scan found no matches.
+
+Оставшиеся ограничения:
+
+- `GuiPech` remains Phase 8/client work; current `ClientProxy` still returns `null` for `GUI_PECH`.
+- Original potion metadata/candle trade outputs are not directly available in the current branch and remain content/client dependencies rather than silently fabricated items.
+- Manual `S6-PECH-02` trade scenario remains unrun.
 
 ### 8.3 Minimal Stage 6 manual scenario matrix
 
