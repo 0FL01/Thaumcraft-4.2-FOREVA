@@ -2193,6 +2193,162 @@ public class ConfigResearch {
                         new ResearchPage((IArcaneRecipe) recipes.get("HungryChest")))
                 .setSecondary()
                 .registerResearchItem();
+
+        new ResearchItem(
+                "TINYHAT",
+                "GOLEMANCY",
+                new AspectList()
+                        .add(Aspect.CLOTH, 2)
+                        .add(Aspect.LIFE, 1)
+                        .add(Aspect.GREED, 1),
+                5,
+                10,
+                1,
+                new ItemStack(ConfigItems.itemGolemDecoration, 1, 0))
+                .setPages(
+                        new ResearchPage("tc.research_page.TINYHAT.1"),
+                        new ResearchPage((IArcaneRecipe) recipes.get("TinyHat")))
+                .setHidden()
+                .setSecondary()
+                .setItemTriggers(new ItemStack(Blocks.WOOL, 1, Short.MAX_VALUE))
+                .setAspectTriggers(Aspect.CLOTH)
+                .registerResearchItem();
+
+        new ResearchItem(
+                "TINYGLASSES",
+                "GOLEMANCY",
+                new AspectList()
+                        .add(Aspect.CLOTH, 2)
+                        .add(Aspect.SENSES, 1)
+                        .add(Aspect.GREED, 1),
+                6,
+                10,
+                1,
+                new ItemStack(ConfigItems.itemGolemDecoration, 1, 1))
+                .setPages(
+                        new ResearchPage("tc.research_page.TINYGLASSES.1"),
+                        new ResearchPage((IArcaneRecipe) recipes.get("TinyGlasses")))
+                .setHidden()
+                .setSecondary()
+                .setItemTriggers(new ItemStack(Blocks.WOOL, 1, Short.MAX_VALUE))
+                .setAspectTriggers(Aspect.CLOTH)
+                .registerResearchItem();
+
+        new ResearchItem(
+                "TINYBOWTIE",
+                "GOLEMANCY",
+                new AspectList()
+                        .add(Aspect.CLOTH, 2)
+                        .add(Aspect.TRAVEL, 1)
+                        .add(Aspect.GREED, 1),
+                7,
+                10,
+                1,
+                new ItemStack(ConfigItems.itemGolemDecoration, 1, 2))
+                .setPages(
+                        new ResearchPage("tc.research_page.TINYBOWTIE.1"),
+                        new ResearchPage((IArcaneRecipe) recipes.get("TinyBowtie")))
+                .setHidden()
+                .setSecondary()
+                .setItemTriggers(new ItemStack(Blocks.WOOL, 1, Short.MAX_VALUE))
+                .setAspectTriggers(Aspect.CLOTH)
+                .registerResearchItem();
+
+        new ResearchItem(
+                "TINYFEZ",
+                "GOLEMANCY",
+                new AspectList()
+                        .add(Aspect.CLOTH, 2)
+                        .add(Aspect.ENERGY, 1)
+                        .add(Aspect.GREED, 1),
+                8,
+                10,
+                1,
+                new ItemStack(ConfigItems.itemGolemDecoration, 1, 3))
+                .setPages(
+                        new ResearchPage("tc.research_page.TINYFEZ.1"),
+                        new ResearchPage((IArcaneRecipe) recipes.get("TinyFez")))
+                .setHidden()
+                .setSecondary()
+                .setItemTriggers(new ItemStack(Blocks.WOOL, 1, Short.MAX_VALUE))
+                .setAspectTriggers(Aspect.CLOTH)
+                .registerResearchItem();
+
+        new ResearchItem(
+                "TINYDART",
+                "GOLEMANCY",
+                new AspectList()
+                        .add(Aspect.FLIGHT, 1)
+                        .add(Aspect.WEAPON, 2)
+                        .add(Aspect.GREED, 1),
+                5,
+                11,
+                1,
+                new ItemStack(ConfigItems.itemGolemDecoration, 1, 4))
+                .setPages(
+                        new ResearchPage("tc.research_page.TINYDART.1"),
+                        new ResearchPage((IArcaneRecipe) recipes.get("TinyDart")))
+                .setHidden()
+                .setSecondary()
+                .setAspectTriggers(Aspect.WEAPON)
+                .registerResearchItem();
+
+        new ResearchItem(
+                "TINYVISOR",
+                "GOLEMANCY",
+                new AspectList()
+                        .add(Aspect.SENSES, 1)
+                        .add(Aspect.ARMOR, 2)
+                        .add(Aspect.GREED, 1),
+                6,
+                11,
+                1,
+                new ItemStack(ConfigItems.itemGolemDecoration, 1, 5))
+                .setPages(
+                        new ResearchPage("tc.research_page.TINYVISOR.1"),
+                        new ResearchPage((IArcaneRecipe) recipes.get("TinyVisor")))
+                .setHidden()
+                .setSecondary()
+                .setAspectTriggers(Aspect.ARMOR)
+                .registerResearchItem();
+
+        new ResearchItem(
+                "TINYARMOR",
+                "GOLEMANCY",
+                new AspectList()
+                        .add(Aspect.METAL, 1)
+                        .add(Aspect.ARMOR, 2)
+                        .add(Aspect.GREED, 1),
+                7,
+                11,
+                1,
+                new ItemStack(ConfigItems.itemGolemDecoration, 1, 6))
+                .setPages(
+                        new ResearchPage("tc.research_page.TINYARMOR.1"),
+                        new ResearchPage((IArcaneRecipe) recipes.get("TinyArmor")))
+                .setHidden()
+                .setSecondary()
+                .setAspectTriggers(Aspect.ARMOR)
+                .registerResearchItem();
+
+        new ResearchItem(
+                "TINYHAMMER",
+                "GOLEMANCY",
+                new AspectList()
+                        .add(Aspect.METAL, 1)
+                        .add(Aspect.WEAPON, 2)
+                        .add(Aspect.GREED, 1),
+                8,
+                11,
+                1,
+                new ItemStack(ConfigItems.itemGolemDecoration, 1, 7))
+                .setPages(
+                        new ResearchPage("tc.research_page.TINYHAMMER.1"),
+                        new ResearchPage((IArcaneRecipe) recipes.get("TinyHammer")))
+                .setHidden()
+                .setSecondary()
+                .setAspectTriggers(Aspect.WEAPON)
+                .registerResearchItem();
     }
 
     private static void initBasicResearchTextOnlyExtended() {
