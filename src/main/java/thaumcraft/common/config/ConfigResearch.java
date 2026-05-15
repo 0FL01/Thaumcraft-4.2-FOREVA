@@ -678,6 +678,108 @@ public class ConfigResearch {
                 .registerResearchItem();
 
         new ResearchItem(
+                "RUNICARMOR",
+                "ARTIFICE",
+                new AspectList()
+                        .add(Aspect.ARMOR, 6)
+                        .add(Aspect.AIR, 3)
+                        .add(Aspect.MAGIC, 3)
+                        .add(Aspect.ENERGY, 3)
+                        .add(Aspect.MIND, 3),
+                3,
+                4,
+                3,
+                new ItemStack(ConfigItems.itemRingRunic, 1, 1))
+                .setPages(
+                        new ResearchPage("tc.research_page.RUNICARMOR.1"),
+                        new ResearchPage("tc.research_page.RUNICARMOR.2"),
+                        new ResearchPage((InfusionRecipe) recipes.get("RunicRing")),
+                        new ResearchPage((InfusionRecipe) recipes.get("RunicAmulet")),
+                        new ResearchPage((InfusionRecipe) recipes.get("RunicGirdle")))
+                .setParentsHidden("INFUSION")
+                .setParents("ENCHFABRIC")
+                .setConcealed()
+                .registerResearchItem();
+
+        new ResearchItem(
+                "RUNICCHARGED",
+                "ARTIFICE",
+                new AspectList()
+                        .add(Aspect.MAGIC, 3)
+                        .add(Aspect.ARMOR, 3)
+                        .add(Aspect.ENERGY, 6),
+                2,
+                3,
+                2,
+                new ItemStack(ConfigItems.itemRingRunic, 1, 2))
+                .setPages(
+                        new ResearchPage("tc.research_page.RUNICCHARGED.1"),
+                        new ResearchPage((InfusionRecipe) recipes.get("RunicRingCharged")))
+                .setParents("RUNICARMOR")
+                .setSecondary()
+                .setConcealed()
+                .registerResearchItem();
+
+        new ResearchItem(
+                "RUNICHEALING",
+                "ARTIFICE",
+                new AspectList()
+                        .add(Aspect.MAGIC, 3)
+                        .add(Aspect.ARMOR, 3)
+                        .add(Aspect.HEAL, 4)
+                        .add(Aspect.WATER, 4),
+                4,
+                3,
+                2,
+                new ItemStack(ConfigItems.itemRingRunic, 1, 3))
+                .setPages(
+                        new ResearchPage("tc.research_page.RUNICHEALING.1"),
+                        new ResearchPage((InfusionRecipe) recipes.get("RunicRingHealing")))
+                .setParents("RUNICARMOR")
+                .setSecondary()
+                .setConcealed()
+                .registerResearchItem();
+
+        new ResearchItem(
+                "RUNICKINETIC",
+                "ARTIFICE",
+                new AspectList()
+                        .add(Aspect.MAGIC, 3)
+                        .add(Aspect.ARMOR, 3)
+                        .add(Aspect.AIR, 6),
+                2,
+                5,
+                2,
+                new ItemStack(ConfigItems.itemGirdleRunic, 1, 1))
+                .setPages(
+                        new ResearchPage("tc.research_page.RUNICKINETIC.1"),
+                        new ResearchPage((InfusionRecipe) recipes.get("RunicGirdleKinetic")))
+                .setParents("RUNICARMOR")
+                .setSecondary()
+                .setConcealed()
+                .registerResearchItem();
+
+        new ResearchItem(
+                "RUNICEMERGENCY",
+                "ARTIFICE",
+                new AspectList()
+                        .add(Aspect.MAGIC, 3)
+                        .add(Aspect.ARMOR, 3)
+                        .add(Aspect.EARTH, 4)
+                        .add(Aspect.VOID, 4),
+                4,
+                5,
+                2,
+                new ItemStack(ConfigItems.itemAmuletRunic, 1, 1))
+                .setPages(
+                        new ResearchPage("tc.research_page.RUNICEMERGENCY.1"),
+                        new ResearchPage((InfusionRecipe) recipes.get("RunicAmuletEmergency")))
+                .setParents("RUNICARMOR")
+                .setSecondary()
+                .setConcealed()
+                .registerResearchItem();
+
+        new ResearchItem(
                 "ELEMENTALAXE",
                 "ARTIFICE",
                 new AspectList()
