@@ -1262,9 +1262,30 @@ Remaining limits:
 - Runtime confirmation that golems pick up player-thrown items after the reference delay window remains unavailable while smoke-server is blocked before ready state and user-driven manual scenarios are excluded.
 - Full per-core golem AI runtime scenarios remain open.
 
+### 2026-05-15 — Stage 6 golem essentia jar destination
+
+Scope:
+
+- Restored `GolemHelper.findJarWithRoom(...)` to rebuild the connected-jar cache per search instead of allowing stale `jarlist` state to affect later searches.
+- Preserved the original priority tiers: suction-capable non-jar transports plus matching labeled non-full jars first, then progressively looser jar categories.
+- Restored the reference nearest-candidate choice inside the selected tier, including the distance penalty for void jars.
+
+Validation:
+
+- `./scripts/dev.sh compileJava` — passed.
+- `./scripts/dev.sh build` — passed.
+- `./scripts/dev.sh check-jar` — failed before jar inspection because the wrapper's expected MCP mapping cache file is still absent at `.gradle_home/caches/minecraft/de/oceanlabs/mcp/mcp_stable/39/1.12.2/srgs/mcp-srg.srg`.
+- `./scripts/dev.sh smoke-server` — failed by timeout before ready state; log again stopped after `Calling tweak class net.minecraftforge.fml.common.launcher.FMLServerTweaker`, with only Log4j console appender initialization errors. `run/crash-reports/` does not exist, and the configured crash-marker scan found no matches. This matches the clean `da3f307` baseline reproduction recorded above.
+- `git diff --check` — passed.
+
+Remaining limits:
+
+- Runtime confirmation of essentia emptying destination choice across labeled jars, unlabeled jars, void jars, reservoirs, and transports remains unavailable while smoke-server is blocked before ready state and user-driven manual scenarios are excluded.
+- Full per-core golem AI runtime scenarios remain open.
+
 ## Next Checkpoint Candidate
 
-After the golem carried-display, trunk transfer, death logging, fire-resistance, armor, water-pathing, no-drowning, melee-enchantment, upgrade-retaliation, target-range, animal-target-filter, butcher-acquisition, item-pickup-delay, biome policy, and Greatwood-support checkpoints, the next pre-Phase8 candidates are:
+After the golem carried-display, trunk transfer, death logging, fire-resistance, armor, water-pathing, no-drowning, melee-enchantment, upgrade-retaliation, target-range, animal-target-filter, butcher-acquisition, item-pickup-delay, essentia-jar-destination, biome policy, and Greatwood-support checkpoints, the next pre-Phase8 candidates are:
 
 - Remaining Stage 6 selected low-risk golem AI helper fixes, if they can be kept server-safe.
 - Remaining Stage 7 surface/worldgen runtime evidence and broader biome blacklist edge cases.

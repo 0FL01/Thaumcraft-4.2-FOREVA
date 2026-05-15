@@ -169,7 +169,7 @@ Depends on GAP-1 item registration. Some visual status bytes are Phase 8, but se
 - `thaumcraft_src/thaumcraft/common/entities/golems/EntityGolemBase.class`
 
 **Что не совпадает:**
-Current AI classes exist and `EntityGolemBase.setupGolem()` wires all reference core categories (`EntityGolemBase.java:152-213`), but there is no runtime evidence for inventory/fluid/essentia interactions. Helper logic depends on block/tile APIs and inventory semantics that changed between 1.7.10 and 1.12.2. Checkpoint 8.2.34 restores butcher target acquisition from the original AI: the task sorts candidates by age and only starts when more than two valid same-type targets are nearby. Checkpoint 8.2.35 restores golem item-pickup delay handling so player-thrown items are skipped only while their pickup delay is still high instead of being ignored forever. Remaining null-return paths in `GolemHelper` and AI classes may be valid search failures, but they have not been proven equivalent under real containers, Forge capabilities, fluids, and tile entities.
+Current AI classes exist and `EntityGolemBase.setupGolem()` wires all reference core categories (`EntityGolemBase.java:152-213`), but there is no runtime evidence for inventory/fluid/essentia interactions. Helper logic depends on block/tile APIs and inventory semantics that changed between 1.7.10 and 1.12.2. Checkpoint 8.2.34 restores butcher target acquisition from the original AI: the task sorts candidates by age and only starts when more than two valid same-type targets are nearby. Checkpoint 8.2.35 restores golem item-pickup delay handling so player-thrown items are skipped only while their pickup delay is still high instead of being ignored forever. Checkpoint 8.2.36 restores the reference nearest-candidate selection and void-jar penalty for essentia emptying destinations. Remaining null-return paths in `GolemHelper` and AI classes may be valid search failures, but they have not been proven equivalent under real containers, Forge capabilities, fluids, and tile entities.
 
 **Что нужно доделать:**
 Run focused manual/server validation per golem core and fix any API mismatch found in AI/helper methods.
@@ -180,6 +180,7 @@ Run focused manual/server validation per golem core and fix any API mismatch fou
 - Validate chest insertion/extraction, color filters, marker range, ore dictionary/NBT/damage toggles, Forge fluid handling, essentia containers, crop/log harvesting, fishing, and combat target selection.
 - Butcher target acquisition is restored; verify culling threshold and oldest-target selection in runtime.
 - Item pickup delay handling is restored; verify recently thrown items become eligible after the reference delay window.
+- Essentia jar destination selection is restored; verify nearest non-void/void target choice in runtime.
 - Fix task priority or helper API mismatches in the specific AI classes that fail scenarios.
 
 **Критерии приемки:**
@@ -1521,6 +1522,29 @@ Mapping:
 Оставшиеся ограничения:
 
 - Runtime confirmation that golems pick up player-thrown items after the reference delay window remains unavailable while smoke-server is blocked before ready state and manual scenarios are excluded.
+- Full per-core golem AI runtime scenarios remain open.
+
+### 8.2.36 Golem essentia jar destination checkpoint — 2026-05-15
+
+Статус: reference nearest-destination selection restored for essentia emptying; runtime essentia evidence remains open.
+
+Что сделано:
+
+- Restored `GolemHelper.findJarWithRoom(...)` to rebuild the connected-jar cache per search instead of allowing stale `jarlist` state to affect later searches.
+- Preserved the original priority tiers: suction-capable non-jar transports plus matching labeled non-full jars first, then progressively looser jar categories.
+- Restored the reference nearest-candidate choice inside the selected tier, including the distance penalty for void jars.
+
+Проверки:
+
+- `./scripts/dev.sh compileJava` — passed.
+- `./scripts/dev.sh build` — passed.
+- `./scripts/dev.sh check-jar` — не дошел до jar inspection: отсутствует wrapper-ожидаемый MCP mapping cache `.gradle_home/caches/minecraft/de/oceanlabs/mcp/mcp_stable/39/1.12.2/srgs/mcp-srg.srg`.
+- `./scripts/dev.sh smoke-server` — timeout before ready state на уже задокументированном pre-Forge/log4j этапе; `run/crash-reports/` не существует, and the configured crash-marker scan found no matches.
+- `git diff --check` — passed.
+
+Оставшиеся ограничения:
+
+- Runtime confirmation of essentia emptying destination choice across labeled jars, unlabeled jars, void jars, reservoirs, and transports remains unavailable while smoke-server is blocked before ready state and manual scenarios are excluded.
 - Full per-core golem AI runtime scenarios remain open.
 
 ### 8.3 Minimal Stage 6 manual scenario matrix

@@ -592,14 +592,14 @@ public class GolemHelper {
     // --- Find Jar With Room ---
 
     public static BlockPos findJarWithRoom(EntityGolemBase golem) {
-        BlockPos dest = null;
         World world = golem.world;
         float range = golem.getRange();
         float dmod = range * range;
 
+        jarlist.clear();
         if (golem.essentia == null || golem.essentiaAmount <= 0) return null;
 
-        ArrayList<TileJarFillable> jars = new ArrayList<>();
+        ArrayList<TileJarFillable> markedJars = new ArrayList<>();
         ArrayList<TileEntity> others = new ArrayList<>();
 
         for (Marker marker : golem.getMarkers()) {
@@ -610,8 +610,7 @@ public class GolemHelper {
             if (te instanceof TileJarFillable) {
                 TileJarFillable jar = (TileJarFillable) te;
                 if (te.getDistanceSq(golem.getHomePosition().getX(), golem.getHomePosition().getY(), golem.getHomePosition().getZ()) <= dmod) {
-                    jars.add(jar);
-                    getConnectedJars(jar);
+                    markedJars.add(jar);
                 }
                 continue;
             }
@@ -639,100 +638,118 @@ public class GolemHelper {
             }
         }
 
-        // Collect jars from jarlist
-        ArrayList<TileJarFillable> jarCandidates = new ArrayList<>();
-        jarCandidates.addAll(jars);
-        for (TileJarFillable jf : jarlist.values()) {
-            if (!jarCandidates.contains(jf)) jarCandidates.add(jf);
+        if (!markedJars.isEmpty()) {
+            for (TileJarFillable jar : markedJars) {
+                getConnectedJars(jar);
+            }
+        } else if (others.isEmpty()) {
+            return null;
         }
 
-        // Phase 1: jars with matching aspect and filter, non-full
-        for (TileJarFillable jar : jarCandidates) {
+        ArrayList<TileEntity> candidates = new ArrayList<>();
+        candidates.addAll(others);
+
+        // Phase 1: jars with matching aspect and filter, non-full.
+        for (TileJarFillable jar : jarlist.values()) {
             if (jar.aspect != null && jar.amount > 0 && jar.amount < jar.maxAmount
                 && jar.aspectFilter != null && golem.essentia != null
                 && golem.essentiaAmount > 0 && jar.aspect.equals(golem.essentia)
                 && jar.doesContainerAccept(golem.essentia)) {
-                if (dest == null) dest = jar.getPos();
+                candidates.add(jar);
             }
         }
 
-        // Phase 2: empty jars with matching filter
-        if (dest == null) {
-            for (TileJarFillable jar : jarCandidates) {
+        // Phase 2: empty jars with matching filter.
+        if (candidates.isEmpty()) {
+            for (TileJarFillable jar : jarlist.values()) {
                 if ((jar.aspect == null || jar.amount == 0)
                     && jar.aspectFilter != null
                     && jar.doesContainerAccept(golem.essentia)) {
-                    if (dest == null) dest = jar.getPos();
+                    candidates.add(jar);
                 }
             }
         }
 
-        // Phase 3: void jars with filter
-        if (dest == null) {
-            for (TileJarFillable jar : jarCandidates) {
+        // Phase 3: void jars with filter.
+        if (candidates.isEmpty()) {
+            for (TileJarFillable jar : jarlist.values()) {
                 if (jar instanceof TileJarFillableVoid
                     && jar.aspect != null && jar.amount >= jar.maxAmount
                     && jar.aspectFilter != null && golem.essentia != null
                     && golem.essentiaAmount > 0 && jar.aspect.equals(golem.essentia)
                     && jar.doesContainerAccept(golem.essentia)) {
-                    if (dest == null) dest = jar.getPos();
+                    candidates.add(jar);
                 }
             }
         }
 
-        // Phase 4: jars with matching aspect, no filter
-        if (dest == null) {
-            for (TileJarFillable jar : jarCandidates) {
+        // Phase 4: jars with matching aspect, no filter.
+        if (candidates.isEmpty()) {
+            for (TileJarFillable jar : jarlist.values()) {
                 if (jar.aspect != null && jar.amount > 0 && jar.amount < jar.maxAmount
                     && jar.aspectFilter == null && golem.essentia != null
                     && golem.essentiaAmount > 0 && jar.aspect.equals(golem.essentia)
                     && jar.doesContainerAccept(golem.essentia)) {
-                    if (dest == null) dest = jar.getPos();
+                    candidates.add(jar);
                 }
             }
         }
 
-        // Phase 5: empty unlabeled jars (not void)
-        if (dest == null) {
-            for (TileJarFillable jar : jarCandidates) {
+        // Phase 5: empty unlabeled jars (not void).
+        if (candidates.isEmpty()) {
+            for (TileJarFillable jar : jarlist.values()) {
                 if ((jar.aspect == null || jar.amount == 0)
                     && jar.aspectFilter == null
                     && !(jar instanceof TileJarFillableVoid)
                     && jar.doesContainerAccept(golem.essentia)) {
-                    if (dest == null) dest = jar.getPos();
+                    candidates.add(jar);
                 }
             }
         }
 
-        // Phase 6: void jars with matching aspect, no filter
-        if (dest == null) {
-            for (TileJarFillable jar : jarCandidates) {
+        // Phase 6: void jars with matching aspect, no filter.
+        if (candidates.isEmpty()) {
+            for (TileJarFillable jar : jarlist.values()) {
                 if (jar instanceof TileJarFillableVoid
                     && jar.aspect != null && jar.amount >= jar.maxAmount
                     && jar.aspectFilter == null && golem.essentia != null
                     && golem.essentiaAmount > 0 && jar.aspect.equals(golem.essentia)
                     && jar.doesContainerAccept(golem.essentia)) {
-                    if (dest == null) dest = jar.getPos();
+                    candidates.add(jar);
                 }
             }
         }
 
-        // Phase 7: empty void jars
-        if (dest == null) {
-            for (TileJarFillable jar : jarCandidates) {
+        // Phase 7: empty void jars.
+        if (candidates.isEmpty()) {
+            for (TileJarFillable jar : jarlist.values()) {
                 if ((jar.aspect == null || jar.amount == 0)
                     && jar.aspectFilter == null && (jar instanceof TileJarFillableVoid)
                     && jar.doesContainerAccept(golem.essentia)) {
-                    if (dest == null) dest = jar.getPos();
+                    candidates.add(jar);
                 }
             }
         }
 
-        // Fall back to others (non-jar IEssentiaTransport)
-        if (dest == null && !others.isEmpty()) {
-            dest = ((TileEntity) others.get(0)).getPos();
-        }
+        BlockPos dest = getNearestEssentiaDestination(golem, candidates, dmod);
+        jarlist.clear();
+        return dest;
+    }
 
+    private static BlockPos getNearestEssentiaDestination(EntityGolemBase golem, List<? extends TileEntity> candidates, float rangeSq) {
+        BlockPos dest = null;
+        double distance = Double.MAX_VALUE;
+        BlockPos home = golem.getHomePosition();
+        for (TileEntity candidate : candidates) {
+            double candidateDistance = candidate.getDistanceSq(home.getX(), home.getY(), home.getZ());
+            if (candidate instanceof TileJarFillableVoid) {
+                candidateDistance += rangeSq;
+            }
+            if (candidateDistance < distance) {
+                distance = candidateDistance;
+                dest = candidate.getPos();
+            }
+        }
         return dest;
     }
 
