@@ -183,7 +183,7 @@ Depends on GAP-1 and GAP-2. Some inventories/tiles/essentia containers are owned
 
 ### GAP-4: Pech spawn equipment, type setup, names, and combat task switching are incomplete
 
-**Статус:** частично реализовано  
+**Статус:** server-side baseline implemented; runtime evidence open
 **Критичность:** high
 
 **Текущая реализация:**
@@ -195,23 +195,22 @@ Depends on GAP-1 and GAP-2. Some inventories/tiles/essentia containers are owned
 - `thaumcraft_src/thaumcraft/common/entities/monster/EntityPech.class`
 
 **Что не совпадает:**
-Reference Pech initializes random held equipment and derives Pech type during initial spawn: wand Pech gets Pech focus/vis, bow Pech becomes type 2, and equipment drop chances are adjusted. Current `EntityPech` has no `onInitialSpawn` or equipment initialization method, so `getPechType()` remains default 0 unless NBT sets it. Current `setCombatTask()` treats `getPechType() == 1 || getPechType() == 2` as ranged (`EntityPech.java:190-191`), but without spawn-time type/equipment setup normal spawned Pechs are likely melee-only. Current display-name/type localization parity is also absent.
+Reference Pech initializes random held equipment and derives Pech type during initial spawn: wand Pech gets Pech focus/vis, bow Pech becomes type 2, and equipment drop chances are adjusted. The 2026-05-15 checkpoints restore spawn equipment/type setup, ranged combat-task refresh, and type-specific display names from the original localization keys. Runtime confirmation of natural/command-spawn variants is still open.
 
 **Что нужно доделать:**
-Port reference spawn equipment/type logic to Forge 1.12.2 and update combat AI when held item changes.
+Run runtime evidence for reference spawn equipment/type logic, combat AI selection, NBT persistence, and type-specific names.
 
 **Как доделать:**
 - files/classes/methods/registrations/resources/scenarios
-- Implement `onInitialSpawn` and equivalent equipment selection in `EntityPech`.
-- Ensure wand Pech is given a wand/focus compatible with current wand API and Pech type 1.
-- Ensure bow Pech gets Pech type 2 and ranged AI.
-- Re-run `setCombatTask()` when mainhand equipment changes.
-- Verify type-specific names/localization keys or document dependency on lang/content.
+- Server-side implementation is in `EntityPech.onInitialSpawn(...)`, `setCombatTask()`, and `getName()`.
+- English type-name keys are in `src/main/resources/assets/thaumcraft/lang/en_us.lang`.
+- Runtime scenario: spawn Pechs with each type, verify name/combat variant/NBT persistence.
 
 **Критерии приемки:**
 - [ ] Naturally or command-spawned Pechs produce expected melee, archer, and thaumaturge variants.
 - [ ] Type 1 Pech fires `EntityPechBlast`; type 2 Pech fires arrows; default Pech uses melee.
 - [ ] Pech type persists through NBT and reload.
+- [x] Type-specific display-name localization is restored for default, mage, and stalker Pechs.
 
 **Риски / зависимости:**
 Depends on current wand/focus items from earlier phases. If wand NBT/focus API is incomplete, document as dependency but keep Pech type/equipment behavior intact.
@@ -219,7 +218,7 @@ Depends on current wand/focus items from earlier phases. If wand NBT/focus API i
 **Checkpoint 2026-05-15 — Pech spawn variants:**
 `EntityPech.onInitialSpawn(...)` now restores the reference random mainhand selection and type derivation. Spawned Pechs can receive a Pech-focus wand with starting primal vis and become type `1`, receive a bow and become type `2`, or receive the reference melee/tool/fishing-rod equipment set and remain the default type. The mainhand drop chance is lowered for wand Pechs, non-wand equipment can receive difficulty-based enchantments, pickup-loot chance follows the reference local-difficulty gate, and `setCombatTask()` is rerun after spawn setup so type `1`/`2` Pechs use ranged AI immediately.
 
-Remaining GAP-4 limits after this checkpoint: type-specific display-name localization is still not restored, held-item change hooks after arbitrary equipment mutation are still limited to existing combat-task calls, and natural/command-spawn runtime coverage remains unvalidated because smoke-server remains environment-blocked and user-driven manual scenarios are excluded.
+Remaining GAP-4 limits after these checkpoints: held-item change hooks after arbitrary equipment mutation are still limited to existing combat-task calls, and natural/command-spawn runtime coverage remains unvalidated because smoke-server remains environment-blocked and user-driven manual scenarios are excluded.
 
 ### GAP-5: Pech anger/group retaliation behavior is incomplete
 
@@ -735,7 +734,7 @@ Stage 6 считается ПОЛНОСТЬЮ завершенной тольк�
 
 Оставшиеся ограничения:
 
-- Type-specific Pech display-name localization is still not restored.
+- Type-specific Pech display-name localization is restored in checkpoint 8.2.6 below.
 - Spawn variants have not been observed in a runtime world because smoke-server remains environment-blocked and manual scenarios are excluded.
 - Pech group anger/trade runtime scenarios remain separate Stage 6 work.
 
@@ -760,6 +759,28 @@ Stage 6 считается ПОЛНОСТЬЮ завершенной тольк�
 
 - Group anger, charge sound/status, and anger expiry have not been observed in a runtime world because smoke-server remains environment-blocked and manual scenarios are excluded.
 - Client angry particle/status handling remains Phase 8/client work if reference visual parity is required beyond the server status byte.
+
+### 8.2.6 Pech type-name checkpoint — 2026-05-15
+
+Статус: type-specific display-name baseline implemented; runtime evidence remains open.
+
+Что сделано:
+
+- Restored the reference `PechType` name switch in `EntityPech.getName()`, preserving custom names before falling back to type localization.
+- Added the original English Pech type strings to `en_us.lang`: `Pech Forager`, `Pech Mage`, and `Pech Stalker`.
+- Added lowercase 1.12 entity-name aliases beside the original `entity.Thaumcraft.Pech.*` keys so normal entity translation paths have matching strings.
+
+Проверки:
+
+- `./scripts/dev.sh compileJava` — passed.
+- `./scripts/dev.sh build` — passed.
+- `./scripts/dev.sh check-jar` — не дошел до jar inspection: отсутствует wrapper-ожидаемый MCP mapping cache `.gradle_home/caches/minecraft/de/oceanlabs/mcp/mcp_stable/39/1.12.2/srgs/mcp-srg.srg`.
+- `./scripts/dev.sh smoke-server` — timeout before ready state на уже задокументированном pre-Forge/log4j этапе; `run/crash-reports/` не существует, and the configured crash-marker scan found no matches.
+
+Оставшиеся ограничения:
+
+- Type names have not been observed over an in-game entity because smoke-server remains environment-blocked and manual scenarios are excluded.
+- Natural/command-spawn variant runtime coverage remains open under S6-PECH-01.
 
 ### 8.3 Minimal Stage 6 manual scenario matrix
 

@@ -552,7 +552,7 @@ Validation:
 
 Remaining limits:
 
-- Type-specific Pech display-name localization is still not restored.
+- Type-specific Pech display-name localization is restored in the Pech type-name checkpoint below.
 - Spawn variants have not been observed in a runtime world because smoke-server remains environment-blocked and user-driven manual scenarios are excluded.
 - Pech group anger/trade runtime scenarios remain separate Stage 6 work.
 
@@ -575,6 +575,26 @@ Remaining limits:
 
 - Pech group anger, charge sound/status, and anger expiry have not been observed in a runtime world because smoke-server remains environment-blocked and user-driven manual scenarios are excluded.
 - Client angry particle/status visual handling remains Phase 8/client work if reference visual parity is required beyond the emitted status byte.
+
+### 2026-05-15 — Stage 6 Pech type names
+
+Scope:
+
+- Restored `EntityPech.getName()` to use the reference `PechType` name switch while preserving custom names.
+- Added original English Pech type strings for default, mage, and stalker Pechs.
+- Added lowercase 1.12 entity-name aliases beside the original `entity.Thaumcraft.Pech.*` localization keys.
+
+Validation:
+
+- `./scripts/dev.sh compileJava` — passed.
+- `./scripts/dev.sh build` — passed.
+- `./scripts/dev.sh check-jar` — failed before jar inspection because the wrapper's expected MCP mapping cache file is still absent at `.gradle_home/caches/minecraft/de/oceanlabs/mcp/mcp_stable/39/1.12.2/srgs/mcp-srg.srg`.
+- `./scripts/dev.sh smoke-server` — failed by timeout before ready state; log again stopped after `Calling tweak class net.minecraftforge.fml.common.launcher.FMLServerTweaker`, with only Log4j console appender initialization errors. `run/crash-reports/` does not exist, and the configured crash-marker scan found no matches. This matches the clean `da3f307` baseline reproduction recorded above.
+
+Remaining limits:
+
+- Type names have not been observed on in-game Pech entities because smoke-server remains environment-blocked and user-driven manual scenarios are excluded.
+- Natural/command-spawn variant runtime coverage remains open under the Stage 6 manual matrix.
 
 ## Next Checkpoint Candidate
 

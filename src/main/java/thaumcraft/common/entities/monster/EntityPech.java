@@ -40,6 +40,7 @@ import net.minecraft.util.EnumHand;
 import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.SoundEvent;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.text.translation.I18n;
 import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.World;
 import thaumcraft.api.aspects.Aspect;
@@ -99,6 +100,26 @@ public class EntityPech extends net.minecraft.entity.monster.EntityMob implement
         this.targetTasks.addTask(1, new EntityAIHurtByTarget(this, false));
         if (world != null && !world.isRemote) {
             this.setCombatTask();
+        }
+    }
+
+    @Override
+    public String getName() {
+        if (this.hasCustomName()) {
+            return this.getCustomNameTag();
+        }
+        return I18n.translateToLocal(getPechNameKey());
+    }
+
+    private String getPechNameKey() {
+        switch (this.getPechType()) {
+            case 1:
+                return "entity.Thaumcraft.Pech.1.name";
+            case 2:
+                return "entity.Thaumcraft.Pech.2.name";
+            case 0:
+            default:
+                return "entity.Thaumcraft.Pech.name";
         }
     }
 
