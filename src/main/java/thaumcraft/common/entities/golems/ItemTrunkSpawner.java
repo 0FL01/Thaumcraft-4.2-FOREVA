@@ -8,8 +8,16 @@ import thaumcraft.common.lib.CreativeTabThaumcraft;
 
 public class ItemTrunkSpawner extends Item {
     public ItemTrunkSpawner() {
-        this.setMaxStackSize(64);
+        this.setMaxStackSize(1);
+        this.setHasSubtypes(true);
+        this.setMaxDamage(0);
         this.setCreativeTab(CreativeTabThaumcraft.tabThaumcraft);
+    }
 
+    @Override
+    public void getSubItems(CreativeTabs tab, NonNullList<ItemStack> items) {
+        if (this.isInCreativeTab(tab)) {
+            items.add(new ItemStack(this, 1, 0));
+        }
     }
 }

@@ -762,6 +762,29 @@ Remaining limits:
 - Projectile damage/effect/sound/block side effects have not been observed in a runtime world because smoke-server remains environment-blocked and user-driven manual scenarios are excluded.
 - Client particles for projectile trails/impacts remain Phase 8 FX work.
 
+### 2026-05-15 — Stage 6 golem item registration
+
+Scope:
+
+- Added append-only `ConfigItems` registrations for the original TC4 golem/trunk item tokens: `TrunkSpawner`, `ItemGolemPlacer`, `ItemGolemCore`, `ItemGolemUpgrade`, `GolemBell`, and `ItemGolemDecoration`.
+- Restored creative metadata ranges for golem placers, golem cores, golem upgrades, decorations, and traveling trunk spawner.
+- Restored reference stack-size/subtype basics, golem core GUI/inventory helper metadata, golem core/upgrade rarity, and the decoration metadata-to-character helper.
+- Added English localization for golem/trunk item display names and golem upgrade descriptions.
+
+Validation:
+
+- `./scripts/dev.sh compileJava` — passed.
+- `./scripts/dev.sh build` — passed.
+- `./scripts/dev.sh check-jar` — failed before jar inspection because the wrapper's expected MCP mapping cache file is still absent at `.gradle_home/caches/minecraft/de/oceanlabs/mcp/mcp_stable/39/1.12.2/srgs/mcp-srg.srg`.
+- `./scripts/dev.sh smoke-server` — failed by timeout before ready state; log again stopped after `Calling tweak class net.minecraftforge.fml.common.launcher.FMLServerTweaker`, with only Log4j console appender initialization errors. `run/crash-reports/` does not exist, and the configured crash-marker scan found no matches. This matches the clean `da3f307` baseline reproduction recorded above.
+- `git diff --check` — passed.
+
+Remaining limits:
+
+- Golem and traveling trunk placement/on-use behavior remains open; this checkpoint only restores the registry and metadata surface needed to reach those workflows.
+- Bell marker/linking, decoration, healing, and wheat interaction parity remains open.
+- Golem/trunk runtime placement evidence remains unavailable while smoke-server is blocked before ready state and user-driven manual scenarios are excluded.
+
 ## Next Checkpoint Candidate
 
 After the portal trigger and ring bootstrap checkpoints, the next pre-Phase8 candidates are:

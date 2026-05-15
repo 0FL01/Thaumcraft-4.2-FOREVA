@@ -83,7 +83,7 @@ Client-only renderer/particle TODOs are Phase 8 dependencies. They are not count
 - `thaumcraft_src/thaumcraft/common/entities/golems/EntityGolemBase.class`
 
 **Что не совпадает:**
-Current `ConfigItems` has no `itemGolemBell`, `itemGolemCore`, `itemGolemPlacer`, `itemGolemUpgrade`, `itemGolemDecoration`, or `itemTrunkSpawner` fields/registrations. The item classes are present but do not implement normal placement/subitem/metadata behavior: `ItemGolemPlacer` and `ItemTrunkSpawner` only set stack size and creative tab; current golem item classes have no on-use placement logic. Reference golem interaction code expects registered `ConfigItems.itemGolemBell`, `ConfigItems.itemGolemCore`, and `ConfigItems.itemGolemUpgrade` when applying cores/upgrades and bell workflows.
+Checkpoint 8.2.15 adds `ConfigItems` fields/registrations for `itemGolemBell`, `itemGolemCore`, `itemGolemPlacer`, `itemGolemUpgrade`, `itemGolemDecoration`, and `itemTrunkSpawner`, and restores the original metadata/subitem surface. The normal placement/workflow behavior is still incomplete: `ItemGolemPlacer` and `ItemTrunkSpawner` do not yet port the reference on-use entity spawning path, and the bell/decoration marker workflows still need a dedicated server-side parity pass. Reference golem interaction code expects registered `ConfigItems.itemGolemBell`, `ConfigItems.itemGolemCore`, and `ConfigItems.itemGolemUpgrade` when applying cores/upgrades and bell workflows.
 
 **Что нужно доделать:**
 Register the golem/trunk items with stable Thaumcraft names and port their server behavior so players can obtain, place, configure, and link golems/trunks.
@@ -1003,6 +1003,33 @@ Mapping:
 
 - Projectile damage/effect/sound/block side effects have not been observed in a runtime world because smoke-server remains environment-blocked and manual scenarios are excluded.
 - Client particles for projectile trails/impacts remain Phase 8 FX work.
+
+### 8.2.15 Golem item registration checkpoint — 2026-05-15
+
+Статус: golem/trunk item registration and metadata surface restored; placement/workflows remain open.
+
+Что сделано:
+
+- Added append-only `ConfigItems` registrations for `TrunkSpawner`, `ItemGolemPlacer`, `ItemGolemCore`, `ItemGolemUpgrade`, `GolemBell`, and `ItemGolemDecoration` using the original TC4 registry/translation tokens.
+- Restored creative metadata ranges for golem placer metas `0..7`, golem core blank meta `100` plus metas `0..11`, golem upgrades `0..5`, decorations `0..7`, and trunk meta `0`.
+- Restored reference stack-size/subtype basics for golem placers, trunks, bell, cores, upgrades, and decorations.
+- Restored golem core GUI/inventory helper metadata parity and added the reference decoration metadata-to-character helper for later decoration workflow work.
+- Added English localization for golem/trunk item names and golem upgrade descriptions.
+
+Проверки:
+
+- `./scripts/dev.sh compileJava` — passed.
+- `./scripts/dev.sh build` — passed.
+- `./scripts/dev.sh check-jar` — не дошел до jar inspection: отсутствует wrapper-ожидаемый MCP mapping cache `.gradle_home/caches/minecraft/de/oceanlabs/mcp/mcp_stable/39/1.12.2/srgs/mcp-srg.srg`.
+- `./scripts/dev.sh smoke-server` — timeout before ready state на уже задокументированном pre-Forge/log4j этапе; `run/crash-reports/` не существует, and the configured crash-marker scan found no matches.
+- `git diff --check` — passed.
+
+Оставшиеся ограничения:
+
+- `ItemGolemPlacer` still needs the reference on-use spawn path: owner/home/facing/core/upgrades/advanced/deco/markers/inventory transfer, setup, spawn, sound/status, and stack consume behavior.
+- `ItemTrunkSpawner` still needs the reference on-use spawn path: owner/custom name/upgrade/inventory transfer, spawn, living initialization, and stack consume behavior.
+- `ItemGolemBell` and `EntityGolemBase` still need a dedicated bell marker/linking, decoration, healing, and wheat interaction parity pass.
+- Golem/trunk placement has not been observed in a runtime world because smoke-server remains environment-blocked and manual scenarios are excluded.
 
 ### 8.3 Minimal Stage 6 manual scenario matrix
 

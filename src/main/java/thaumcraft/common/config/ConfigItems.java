@@ -6,6 +6,12 @@ import net.minecraft.item.Item.ToolMaterial;
 import net.minecraft.item.ItemArmor.ArmorMaterial;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.common.util.EnumHelper;
+import thaumcraft.common.entities.golems.ItemGolemBell;
+import thaumcraft.common.entities.golems.ItemGolemCore;
+import thaumcraft.common.entities.golems.ItemGolemDecoration;
+import thaumcraft.common.entities.golems.ItemGolemPlacer;
+import thaumcraft.common.entities.golems.ItemGolemUpgrade;
+import thaumcraft.common.entities.golems.ItemTrunkSpawner;
 import thaumcraft.common.items.ItemBathSalts;
 import thaumcraft.common.items.ItemBottleTaint;
 import thaumcraft.common.items.ItemBucketDeath;
@@ -178,6 +184,14 @@ public class ConfigItems {
     public static ItemHandMirror itemHandMirror;
     public static ItemResonator itemResonator;
     public static ItemSanityChecker itemSanityChecker;
+
+    // Golems and trunks
+    public static Item itemGolemPlacer;
+    public static Item itemGolemBell;
+    public static Item itemGolemDecoration;
+    public static Item itemGolemCore;
+    public static Item itemGolemUpgrade;
+    public static Item itemTrunkSpawner;
 
     public static void init() {
         CreativeTabThaumcraft tab = CreativeTabThaumcraft.tabThaumcraft;
@@ -762,6 +776,42 @@ public class ConfigItems {
                 .setTranslationKey("thaumcraft.sanity_checker")
                 .setCreativeTab(tab);
         allItems.add(itemSanityChecker);
+
+        itemTrunkSpawner = new ItemTrunkSpawner()
+                .setRegistryName("thaumcraft", ConfigBlocks.legacyPath("TrunkSpawner"))
+                .setTranslationKey("TrunkSpawner")
+                .setCreativeTab(tab);
+        allItems.add(itemTrunkSpawner);
+
+        itemGolemPlacer = new ItemGolemPlacer()
+                .setRegistryName("thaumcraft", ConfigBlocks.legacyPath("ItemGolemPlacer"))
+                .setTranslationKey("ItemGolemPlacer")
+                .setCreativeTab(tab);
+        allItems.add(itemGolemPlacer);
+
+        itemGolemCore = new ItemGolemCore()
+                .setRegistryName("thaumcraft", ConfigBlocks.legacyPath("ItemGolemCore"))
+                .setTranslationKey("ItemGolemCore")
+                .setCreativeTab(tab);
+        allItems.add(itemGolemCore);
+
+        itemGolemUpgrade = new ItemGolemUpgrade()
+                .setRegistryName("thaumcraft", ConfigBlocks.legacyPath("ItemGolemUpgrade"))
+                .setTranslationKey("ItemGolemUpgrade")
+                .setCreativeTab(tab);
+        allItems.add(itemGolemUpgrade);
+
+        itemGolemBell = new ItemGolemBell()
+                .setRegistryName("thaumcraft", ConfigBlocks.legacyPath("GolemBell"))
+                .setTranslationKey("GolemBell")
+                .setCreativeTab(tab);
+        allItems.add(itemGolemBell);
+
+        itemGolemDecoration = new ItemGolemDecoration()
+                .setRegistryName("thaumcraft", ConfigBlocks.legacyPath("ItemGolemDecoration"))
+                .setTranslationKey("ItemGolemDecoration")
+                .setCreativeTab(tab);
+        allItems.add(itemGolemDecoration);
     }
 
     public static Item[] getAllItems() {

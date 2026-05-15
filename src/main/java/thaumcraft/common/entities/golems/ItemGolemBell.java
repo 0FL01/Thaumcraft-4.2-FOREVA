@@ -15,7 +15,8 @@ import java.util.ArrayList;
 
 public class ItemGolemBell extends Item {
     public ItemGolemBell() {
-        this.setMaxStackSize(64);
+        this.setMaxStackSize(1);
+        this.setHasSubtypes(false);
         this.setCreativeTab(CreativeTabThaumcraft.tabThaumcraft);
 
     }
