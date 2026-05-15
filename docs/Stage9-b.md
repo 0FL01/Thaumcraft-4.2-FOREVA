@@ -116,7 +116,7 @@ Depends on wand component registration (`src/main/java/thaumcraft/common/Thaumcr
 
 ### GAP-3: Arcane Workbench matching methods отсутствуют в crafting manager
 
-**Статус:** отсутствует  
+**Статус:** частично закрыт (method surface restored; runtime flow depends on GAP-1/2/4)
 **Критичность:** blocker
 
 **Текущая реализация:**
@@ -127,20 +127,26 @@ Depends on wand component registration (`src/main/java/thaumcraft/common/Thaumcr
 - `thaumcraft_src/thaumcraft/common/lib/crafting/ThaumcraftCraftingManager.class`, decompiled `findMatchingArcaneRecipe` and `findMatchingArcaneRecipeAspects` methods lines 147-193
 
 **Что не совпадает:**
-Reference has public methods used by the Arcane Workbench container to find matching `IArcaneRecipe` output and aspect cost. Current manager only uses arcane recipes to generate object aspects and has no methods for live workbench crafting.
+Reference has public methods used by the Arcane Workbench container to find matching `IArcaneRecipe` output and aspect cost. Port now restores both methods in `ThaumcraftCraftingManager`:
+- `findMatchingArcaneRecipe(IInventory, EntityPlayer)`
+- `findMatchingArcaneRecipeAspects(IInventory, EntityPlayer)`
+
+The methods iterate `ThaumcraftApi.getCraftingRecipes()`, filter `IArcaneRecipe`, call `matches(inv, player.world, player)`, and return recipe output/aspects. They are null-safe for `IInventory`/`EntityPlayer` and use 1.12-safe empty result conventions (`ItemStack.EMPTY`, empty `AspectList`).
 
 **Что нужно доделать:**
-Add 1.12.2-safe equivalents of `findMatchingArcaneRecipe(IInventory, EntityPlayer)` and `findMatchingArcaneRecipeAspects(IInventory, EntityPlayer)`.
+Keep the restored matching methods and wire them into the Arcane Workbench runtime container flow.
 
 **Как доделать:**
-- `src/main/java/thaumcraft/common/lib/crafting/ThaumcraftCraftingManager.java`: add the two public methods, iterate `ThaumcraftApi.getCraftingRecipes()`, filter `IArcaneRecipe`, call `matches(inv, player.world, player)`, return recipe output/cost.
-- Treat `ItemStack.EMPTY` as empty when scanning inventory.
-- Return `ItemStack.EMPTY` or `null` consistently with the container implementation chosen for Forge 1.12.2; avoid leaking 1.7.10 null assumptions into slots.
+- Keep `findMatchingArcaneRecipe` and `findMatchingArcaneRecipeAspects` in `ThaumcraftCraftingManager`.
+- When implementing GAP-4, route `ContainerArcaneWorkbench` output/vis checks through these methods.
+- Preserve `ItemStack.EMPTY` conventions across all container call sites.
 
 **Критерии приемки:**
+- [x] `ThaumcraftCraftingManager` now exposes `findMatchingArcaneRecipe` and `findMatchingArcaneRecipeAspects`.
+- [x] The restored methods are null-safe for inventory/player input and return 1.12-safe empty values.
 - [ ] Container can query a matching arcane recipe output for `ArcaneStone1` after research is complete.
 - [ ] Container can query a matching aspect cost for both static and dynamic recipes.
-- [ ] No `NullPointerException` or false mismatch occurs when empty workbench slots contain `ItemStack.EMPTY`.
+- [ ] No false mismatch occurs for representative Arcane Workbench runtime scenarios with `ItemStack.EMPTY`.
 
 **Риски / зависимости:**
 Depends on GAP-1/GAP-2 recipe data. The method signatures are internal current source behavior, not public API, so they can be adapted to 1.12.2 conventions if all call sites agree.

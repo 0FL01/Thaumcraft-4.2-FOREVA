@@ -10,6 +10,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Enchantments;
 import net.minecraft.init.Items;
 import net.minecraft.init.MobEffects;
+import net.minecraft.inventory.IInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemArmor;
 import net.minecraft.item.ItemBow;
@@ -437,6 +438,30 @@ public class ThaumcraftCraftingManager {
         for (Aspect aspect : aspects.copy().getAspects()) {
             if (aspect == null || aspects.getAmount(aspect) <= 0) aspects.remove(aspect);
         }
+    }
+
+    public static ItemStack findMatchingArcaneRecipe(IInventory awb, EntityPlayer player) {
+        if (awb == null || player == null) return ItemStack.EMPTY;
+        for (Object recipe : ThaumcraftApi.getCraftingRecipes()) {
+            if (!(recipe instanceof IArcaneRecipe)) continue;
+            IArcaneRecipe arcaneRecipe = (IArcaneRecipe) recipe;
+            if (arcaneRecipe.matches(awb, player.world, player)) {
+                ItemStack out = arcaneRecipe.getCraftingResult(awb);
+                return out == null ? ItemStack.EMPTY : out;
+            }
+        }
+        return ItemStack.EMPTY;
+    }
+
+    public static AspectList findMatchingArcaneRecipeAspects(IInventory awb, EntityPlayer player) {
+        if (awb == null || player == null) return new AspectList();
+        for (Object recipe : ThaumcraftApi.getCraftingRecipes()) {
+            if (!(recipe instanceof IArcaneRecipe)) continue;
+            IArcaneRecipe arcaneRecipe = (IArcaneRecipe) recipe;
+            if (!arcaneRecipe.matches(awb, player.world, player)) continue;
+            return arcaneRecipe.getAspects() != null ? arcaneRecipe.getAspects() : arcaneRecipe.getAspects(awb);
+        }
+        return new AspectList();
     }
 
     public static InfusionRecipe findMatchingInfusionRecipe(ArrayList<ItemStack> items, ItemStack input, EntityPlayer player) {

@@ -67,6 +67,28 @@ Branch: `codex/durable-goal-stage8-9`
 
 ## Checkpoint Log
 
+### 2026-05-15 — Stage 9-b arcane matcher method surface baseline
+
+Scope:
+
+- Restored missing `ThaumcraftCraftingManager` arcane workbench matcher methods:
+  - `findMatchingArcaneRecipe(IInventory, EntityPlayer)`
+  - `findMatchingArcaneRecipeAspects(IInventory, EntityPlayer)`
+- Implemented reference-aligned recipe iteration (`ThaumcraftApi.getCraftingRecipes()` + `IArcaneRecipe.matches(...)`) with 1.12-safe empty fallbacks (`ItemStack.EMPTY`, empty `AspectList`) and null guards.
+- Updated `docs/Stage9-b.md` GAP-3 to reflect that manager method surface exists while runtime workbench flow remains blocked by GAP-1/2/4.
+
+Validation:
+
+- `./scripts/dev.sh validate --smoke` — passed: status, compile, tests `10/10`, jar, check-jar summary `5437` MCP leak lines / `1063` unique leaks, and server smoke.
+- `run/smoke-server.log` evidence: `Registering entities`; `Forge Mod Loader has successfully loaded 6 mods`; `Done (1.313s)!`.
+- Crash report scan under `run/` returned no files.
+- `./scripts/dev.sh smoke-client` — skipped because `DISPLAY=` and GUI/graphics/user-interactive validation is excluded.
+
+Remaining limits:
+
+- This checkpoint restores only manager-side query methods; `ContainerArcaneWorkbench` is still placeholder-level and does not consume vis/output via these methods.
+- Arcane recipe content registration/research gates are still open (Stage 9-b GAP-1/2/6/7).
+
 ### 2026-05-15 — Stage 9-b arcane matcher EMPTY/null compatibility baseline
 
 Scope:
