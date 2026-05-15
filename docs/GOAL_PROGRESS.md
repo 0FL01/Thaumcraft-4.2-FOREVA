@@ -493,12 +493,34 @@ Remaining limits:
 - Key-room generation has not been observed in a fresh runtime Outer Lands maze because smoke-server remains environment-blocked and user-driven client/manual scenarios are excluded.
 - Full portal/passage/nest/library/boss room traversal remains unvalidated, and boss-room decorative block mutation remains open.
 
+### 2026-05-14 — Stage 7 boss room mutation parity
+
+Scope:
+
+- Restored the reference Warden boss-room mutations: offset obelisks/caps, urn scatter, center traps/cosmetic supports, and the offset stair/crystal pedestal before spawning the Warden.
+- Restored the Golem room mutations: three obelisks/caps, central pedestal, and corner-biased urn/crate scatter before spawning the Golem.
+- Restored the Cultist room mutations: randomized eldritch floor pattern and the perimeter pillar/slab layout before spawning the Cultist Portal.
+- Restored the Taint room mutations: 25x25 taint biome patching, taint fibre growth on exposed air, taint block scatter, and central taint crust before spawning the five taint bosses.
+- Kept the existing reference-like boss spawn anchors and `BossMapData` selection flow from the prior lock checkpoint.
+
+Validation:
+
+- `./scripts/dev.sh compileJava` — passed.
+- `./scripts/dev.sh build` — passed.
+- `./scripts/dev.sh check-jar` — failed before jar inspection because the wrapper's expected MCP mapping cache file is still absent at `.gradle_home/caches/minecraft/de/oceanlabs/mcp/mcp_stable/39/1.12.2/srgs/mcp-srg.srg`.
+- `./scripts/dev.sh smoke-server` — failed by timeout before ready state; log again stopped after `Calling tweak class net.minecraftforge.fml.common.launcher.FMLServerTweaker`, with only Log4j console appender initialization errors. `run/crash-reports/` does not exist, and the configured crash-marker scan found no matches. This matches the clean `da3f307` baseline reproduction recorded above.
+
+Remaining limits:
+
+- Boss-room activation, room mutation, and save/reload progression have not been observed in a fresh runtime world because smoke-server remains environment-blocked and user-driven client/manual scenarios are excluded.
+- Reference sparkle packets while clearing nearby airy door blocks remain Stage 8/client FX work.
+
 ## Next Checkpoint Candidate
 
 After the portal trigger and ring bootstrap checkpoints, the next pre-Phase8 candidates are:
 
 - Remaining Stage 7 surface/worldgen runtime evidence and broader biome blacklist edge cases.
-- Remaining Stage 7 Outer Lands room/tile behavior, especially full boss-room block-template mutation, key/boss room traversal, and maze save/load race validation.
+- Remaining Stage 7 Outer Lands room/tile behavior, especially key/boss room traversal, boss-room runtime/save evidence, and maze save/load race validation.
 - Stage 9 loot/content registration, because `Utils.generateLoot(...)` now has a shared reward path but the full reference loot pool distribution still depends on populated content tables.
 - Stage 6 server-side boss/manual scenario evidence remains excluded from user-driven validation, but static/reference parity blockers should continue to be reduced where possible.
 

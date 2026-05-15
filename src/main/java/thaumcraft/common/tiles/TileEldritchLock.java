@@ -1,5 +1,6 @@
 package thaumcraft.common.tiles;
 
+import net.minecraft.block.Block;
 import net.minecraft.entity.EntityCreature;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
@@ -18,14 +19,19 @@ import thaumcraft.common.entities.monster.boss.EntityEldritchGolem;
 import thaumcraft.common.entities.monster.boss.EntityEldritchWarden;
 import thaumcraft.common.entities.monster.boss.EntityTaintacleGiant;
 import thaumcraft.common.lib.TCSounds;
+import thaumcraft.common.lib.utils.BlockUtils;
 import thaumcraft.common.lib.utils.EntityUtils;
+import thaumcraft.common.lib.utils.Utils;
+import thaumcraft.common.lib.world.ThaumcraftWorldGenerator;
 import thaumcraft.common.lib.world.dim.Cell;
 import thaumcraft.common.lib.world.dim.CellLoc;
+import thaumcraft.common.lib.world.dim.GenCommon;
 import thaumcraft.common.lib.world.dim.MapBossData;
 import thaumcraft.common.lib.world.dim.MazeHandler;
 
 public class TileEldritchLock extends TileThaumcraft implements ITickable {
     private static final int BOSS_ROOM_Y = 50;
+    private static final int[][] PEDESTAL = new int[][]{{2, 2, 2}, {0, -1, 1}, {3, 3, 3}};
     public int count = -1;
     private byte facing = 0;
 
@@ -101,6 +107,7 @@ public class TileEldritchLock extends TileThaumcraft implements ITickable {
 
     private void spawnEldritchWarden(BossRoom room) {
         notifyNearbyPlayers("tc.boss.warden");
+        decorateWardenRoom(room);
         BlockPos spawn = room.getOffsetSpawnPos();
         EntityEldritchWarden boss = new EntityEldritchWarden(this.world);
         placeBoss(boss, spawn, room.getCenterHomePos());
@@ -110,6 +117,7 @@ public class TileEldritchLock extends TileThaumcraft implements ITickable {
 
     private void spawnEldritchGolem(BossRoom room) {
         notifyNearbyPlayers("tc.boss.golem");
+        decorateGolemRoom(room);
         BlockPos spawn = room.getCenterSpawnPos();
         EntityEldritchGolem boss = new EntityEldritchGolem(this.world);
         placeBoss(boss, spawn, null);
@@ -119,6 +127,7 @@ public class TileEldritchLock extends TileThaumcraft implements ITickable {
 
     private void spawnCultistPortal(BossRoom room) {
         notifyNearbyPlayers("tc.boss.crimson");
+        decorateCultistRoom(room);
         BlockPos spawn = room.getCenterPos(BOSS_ROOM_Y + 2);
         EntityCultistPortal boss = new EntityCultistPortal(this.world);
         boss.setPositionAndRotation(spawn.getX() + 0.5D, spawn.getY(), spawn.getZ() + 0.5D, 0.0F, 0.0F);
@@ -127,6 +136,7 @@ public class TileEldritchLock extends TileThaumcraft implements ITickable {
 
     private void spawnTaintBoss(BossRoom room) {
         notifyNearbyPlayers("tc.boss.taint");
+        decorateTaintRoom(room);
         BlockPos center = room.getCenterSpawnPos();
         boolean secondGiant = this.world.rand.nextBoolean();
         boolean fourthGiant = this.world.rand.nextBoolean();
@@ -144,6 +154,157 @@ public class TileEldritchLock extends TileThaumcraft implements ITickable {
         boss.setPositionAndRotation(spawn.getX() + 0.5D, spawn.getY(), spawn.getZ() + 0.5D, 0.0F, 0.0F);
         EntityUtils.makeChampion(boss, true);
         this.world.spawnEntity(boss);
+    }
+
+    private void decorateWardenRoom(BossRoom room) {
+        int x = room.centerBlockX();
+        int z = room.centerBlockZ();
+        int y = BOSS_ROOM_Y;
+        BlockPos offset = room.getOffsetPos(y + 2);
+        int x2 = offset.getX();
+        int z2 = offset.getZ();
+
+        GenCommon.genObelisk(this.world, x2, y + 4, z);
+        GenCommon.genObelisk(this.world, x, y + 4, z2);
+        setBlock(new BlockPos(x2, y + 2, z), ConfigBlocks.blockEldritch, 3);
+        setBlock(new BlockPos(x, y + 2, z2), ConfigBlocks.blockEldritch, 3);
+
+        for (int a = -1; a <= 1; ++a) {
+            for (int b = -1; b <= 1; ++b) {
+                if (a != 0 && b != 0 && this.world.rand.nextFloat() < 0.9F) {
+                    setBlock(new BlockPos(x2 + a, y + 2, z + b), ConfigBlocks.blockLootUrn, rollLootMeta(0.1F, 0.3F));
+                }
+                if (a != 0 && b != 0 && this.world.rand.nextFloat() < 0.9F) {
+                    setBlock(new BlockPos(x + a, y + 2, z2 + b), ConfigBlocks.blockLootUrn, rollLootMeta(0.1F, 0.3F));
+                }
+            }
+        }
+
+        placeCornerBlocks(x, y + 3, z, ConfigBlocks.blockEldritch, 10);
+        placeCornerBlocks(x, y + 2, z, ConfigBlocks.blockCosmeticSolid, 15);
+        placePedestal(x2, y + 2, z2);
+    }
+
+    private void decorateGolemRoom(BossRoom room) {
+        int x = room.centerBlockX();
+        int z = room.centerBlockZ();
+        int y = BOSS_ROOM_Y;
+        int x2 = room.offsetX();
+        int z2 = room.offsetZ();
+
+        GenCommon.genObelisk(this.world, x + x2, y + 4, z + z2);
+        GenCommon.genObelisk(this.world, x - x2, y + 4, z + z2);
+        GenCommon.genObelisk(this.world, x + x2, y + 4, z - z2);
+        setBlock(new BlockPos(x + x2, y + 2, z + z2), ConfigBlocks.blockEldritch, 3);
+        setBlock(new BlockPos(x - x2, y + 2, z + z2), ConfigBlocks.blockEldritch, 3);
+        setBlock(new BlockPos(x + x2, y + 2, z - z2), ConfigBlocks.blockEldritch, 3);
+
+        placePedestal(x, y + 2, z);
+
+        for (int a = -10; a <= 10; ++a) {
+            for (int b = -10; b <= 10; ++b) {
+                BlockPos pos = new BlockPos(x + a, y + 2, z + b);
+                if (Math.abs(a) <= 2 || Math.abs(b) <= 2 || this.world.rand.nextFloat() >= 0.15F || !this.world.isAirBlock(pos)) {
+                    continue;
+                }
+                int meta = rollLootMeta(0.05F, 0.2F);
+                Block block = this.world.rand.nextFloat() < 0.3F ? ConfigBlocks.blockLootCrate : ConfigBlocks.blockLootUrn;
+                setBlock(pos, block, meta);
+            }
+        }
+    }
+
+    private void decorateCultistRoom(BossRoom room) {
+        int x = room.centerBlockX();
+        int z = room.centerBlockZ();
+        int y = BOSS_ROOM_Y;
+
+        for (int a = -4; a <= 4; ++a) {
+            for (int b = -4; b <= 4; ++b) {
+                if ((Math.abs(a) == 2 || Math.abs(b) == 2) && this.world.rand.nextBoolean()
+                        || (Math.abs(a) == 3 || Math.abs(b) == 3) && this.world.rand.nextFloat() > 0.33F
+                        || (Math.abs(a) == 4 || Math.abs(b) == 4) && this.world.rand.nextFloat() > 0.25F) {
+                    continue;
+                }
+                setBlock(new BlockPos(x + b, y + 1, z + a), ConfigBlocks.blockEldritch, 7);
+            }
+        }
+
+        for (int a = 0; a < 5; ++a) {
+            for (int b = 0; b < 5; ++b) {
+                if (a != 0 && a != 4 && b != 0 && b != 4) {
+                    continue;
+                }
+                BlockPos pillar = new BlockPos(x - 8 + b * 4, y, z - 8 + a * 4);
+                setBlock(pillar.up(2), ConfigBlocks.blockCosmeticSolid, 11);
+                setBlock(pillar.up(3), ConfigBlocks.blockEldritch, 5);
+                setBlock(pillar.up(4), ConfigBlocks.blockSlabStone, 1);
+                setBlock(pillar.up(10), ConfigBlocks.blockCosmeticSolid, 11);
+                setBlock(pillar.up(9), ConfigBlocks.blockEldritch, 5);
+                setBlock(pillar.up(8), ConfigBlocks.blockSlabStone, 9);
+            }
+        }
+    }
+
+    private void decorateTaintRoom(BossRoom room) {
+        int x = room.centerBlockX();
+        int z = room.centerBlockZ();
+        int y = BOSS_ROOM_Y;
+
+        for (int a = -12; a <= 12; ++a) {
+            for (int b = -12; b <= 12; ++b) {
+                Utils.setBiomeAt(this.world, x + b, z + a, ThaumcraftWorldGenerator.biomeTaint);
+                for (int c = 0; c < 9; ++c) {
+                    BlockPos fibre = new BlockPos(x + b, y + 2 + c, z + a);
+                    if (this.world.isAirBlock(fibre)
+                            && BlockUtils.isAdjacentToSolidBlock(this.world, fibre)
+                            && this.world.rand.nextInt(3) != 0) {
+                        setBlock(fibre, ConfigBlocks.blockTaintFibres, this.world.rand.nextInt(4) == 0 ? 1 : 0);
+                    }
+                }
+                if (this.world.rand.nextFloat() < 0.15F) {
+                    setBlock(new BlockPos(x + b, y + 2, z + a), ConfigBlocks.blockTaint, 0);
+                    if (this.world.rand.nextFloat() < 0.2F) {
+                        setBlock(new BlockPos(x + b, y + 3, z + a), ConfigBlocks.blockTaint, 0);
+                    }
+                }
+                if ((Math.abs(a) == 4 || Math.abs(b) == 4) && this.world.rand.nextBoolean()
+                        || (Math.abs(a) >= 5 || Math.abs(b) >= 5) && this.world.rand.nextFloat() > 0.33F
+                        || (Math.abs(a) >= 7 || Math.abs(b) >= 7) && this.world.rand.nextFloat() > 0.25F) {
+                    continue;
+                }
+                setBlock(new BlockPos(x + b, y + 1, z + a), ConfigBlocks.blockTaint, 1);
+            }
+        }
+    }
+
+    private void placeCornerBlocks(int x, int y, int z, Block block, int meta) {
+        setBlock(new BlockPos(x - 2, y, z - 2), block, meta);
+        setBlock(new BlockPos(x - 2, y, z + 2), block, meta);
+        setBlock(new BlockPos(x + 2, y, z + 2), block, meta);
+        setBlock(new BlockPos(x + 2, y, z - 2), block, meta);
+    }
+
+    private void placePedestal(int x, int y, int z) {
+        for (int a = 0; a < 3; ++a) {
+            for (int b = 0; b < 3; ++b) {
+                int meta = PEDESTAL[a][b];
+                if (meta < 0) {
+                    setBlock(new BlockPos(x - 1 + b, y, z - 1 + a), ConfigBlocks.blockEldritch, 4);
+                } else {
+                    setBlock(new BlockPos(x - 1 + b, y, z - 1 + a), ConfigBlocks.blockStairsEldritch, meta);
+                }
+            }
+        }
+    }
+
+    private int rollLootMeta(float rareThreshold, float uncommonThreshold) {
+        float roll = this.world.rand.nextFloat();
+        return roll < rareThreshold ? 2 : (roll < uncommonThreshold ? 1 : 0);
+    }
+
+    private void setBlock(BlockPos pos, Block block, int meta) {
+        this.world.setBlockState(pos, block.getStateFromMeta(meta), 3);
     }
 
     private void placeBoss(EntityLivingBase boss, BlockPos spawn, BlockPos home) {
@@ -220,7 +381,7 @@ public class TileEldritchLock extends TileThaumcraft implements ITickable {
         }
 
         BlockPos getCenterPos(int y) {
-            return new BlockPos(this.centerX * 16 + 16, y, this.centerZ * 16 + 16);
+            return new BlockPos(centerBlockX(), y, centerBlockZ());
         }
 
         BlockPos getCenterSpawnPos() {
@@ -232,29 +393,45 @@ public class TileEldritchLock extends TileThaumcraft implements ITickable {
         }
 
         BlockPos getOffsetSpawnPos() {
-            int x = this.centerX * 16 + 16;
-            int z = this.centerZ * 16 + 16;
+            return getOffsetPos(BOSS_ROOM_Y + 3);
+        }
+
+        BlockPos getOffsetPos(int y) {
+            return new BlockPos(centerBlockX() + offsetX(), y, centerBlockZ() + offsetZ());
+        }
+
+        int centerBlockX() {
+            return this.centerX * 16 + 16;
+        }
+
+        int centerBlockZ() {
+            return this.centerZ * 16 + 16;
+        }
+
+        int offsetX() {
             switch (this.exit) {
                 case 2:
-                    x += 8;
-                    z += 8;
-                    break;
-                case 3:
-                    x -= 8;
-                    z += 8;
-                    break;
                 case 4:
-                    x += 8;
-                    z -= 8;
-                    break;
+                    return 8;
+                case 3:
                 case 5:
-                    x -= 8;
-                    z -= 8;
-                    break;
+                    return -8;
                 default:
-                    break;
+                    return 0;
             }
-            return new BlockPos(x, BOSS_ROOM_Y + 3, z);
+        }
+
+        int offsetZ() {
+            switch (this.exit) {
+                case 2:
+                case 3:
+                    return 8;
+                case 4:
+                case 5:
+                    return -8;
+                default:
+                    return 0;
+            }
         }
     }
 }
