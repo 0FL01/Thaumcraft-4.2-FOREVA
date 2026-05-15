@@ -11,6 +11,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagInt;
 import net.minecraftforge.oredict.OreDictionary;
 import net.minecraftforge.oredict.ShapedOreRecipe;
+import net.minecraftforge.oredict.ShapelessOreRecipe;
 import net.minecraftforge.registries.IForgeRegistry;
 import thaumcraft.api.ThaumcraftApi;
 import thaumcraft.api.aspects.Aspect;
@@ -28,6 +29,16 @@ public class ConfigRecipes {
     private static IRecipe recipeArcaneStone2;
     private static IRecipe recipeArcaneStone3;
     private static IRecipe recipeArcaneStone4;
+    private static IRecipe recipeKnowFrag;
+    private static IRecipe recipePlankGreatwood;
+    private static IRecipe recipePlankSilverwood;
+    private static IRecipe recipeGrate;
+    private static IRecipe recipePhial;
+    private static IRecipe recipeTable;
+    private static IRecipe recipeScribe1;
+    private static IRecipe recipeScribe2;
+    private static IRecipe recipeScribe3;
+    private static IRecipe recipeThaumometer;
 
     public static void init() {
         ConfigResearch.recipes.clear();
@@ -45,6 +56,36 @@ public class ConfigRecipes {
         }
         if (recipeArcaneStone4 != null) {
             ConfigResearch.recipes.put("ArcaneStone4", recipeArcaneStone4);
+        }
+        if (recipeKnowFrag != null) {
+            ConfigResearch.recipes.put("KnowFrag", recipeKnowFrag);
+        }
+        if (recipePlankGreatwood != null) {
+            ConfigResearch.recipes.put("PlankGreatwood", recipePlankGreatwood);
+        }
+        if (recipePlankSilverwood != null) {
+            ConfigResearch.recipes.put("PlankSilverwood", recipePlankSilverwood);
+        }
+        if (recipeGrate != null) {
+            ConfigResearch.recipes.put("Grate", recipeGrate);
+        }
+        if (recipePhial != null) {
+            ConfigResearch.recipes.put("Phial", recipePhial);
+        }
+        if (recipeTable != null) {
+            ConfigResearch.recipes.put("Table", recipeTable);
+        }
+        if (recipeScribe1 != null) {
+            ConfigResearch.recipes.put("Scribe1", recipeScribe1);
+        }
+        if (recipeScribe2 != null) {
+            ConfigResearch.recipes.put("Scribe2", recipeScribe2);
+        }
+        if (recipeScribe3 != null) {
+            ConfigResearch.recipes.put("Scribe3", recipeScribe3);
+        }
+        if (recipeThaumometer != null) {
+            ConfigResearch.recipes.put("Thaumometer", recipeThaumometer);
         }
 
         boolean hasArcaneWand = false;
@@ -1672,6 +1713,91 @@ public class ConfigRecipes {
                 'K', new ItemStack(ConfigBlocks.blockCosmeticSolid, 1, 7))
                 .setRegistryName("thaumcraft", "arcanestone4");
         registry.register(recipeArcaneStone4);
+
+        recipeKnowFrag = new ShapedOreRecipe(null,
+                new ItemStack(ConfigItems.itemResearchNotes, 1, 42),
+                "KKK",
+                "KKK",
+                "KKK",
+                'K', new ItemStack(ConfigItems.itemResource, 1, 9))
+                .setRegistryName("thaumcraft", "knowfrag");
+        registry.register(recipeKnowFrag);
+
+        recipePlankGreatwood = new ShapedOreRecipe(null,
+                new ItemStack(ConfigBlocks.blockWoodenDevice, 4, 6),
+                "W",
+                'W', new ItemStack(ConfigBlocks.blockMagicalLog, 1, 0))
+                .setRegistryName("thaumcraft", "plankgreatwood");
+        registry.register(recipePlankGreatwood);
+
+        recipePlankSilverwood = new ShapedOreRecipe(null,
+                new ItemStack(ConfigBlocks.blockWoodenDevice, 4, 7),
+                "W",
+                'W', new ItemStack(ConfigBlocks.blockMagicalLog, 1, 1))
+                .setRegistryName("thaumcraft", "planksilverwood");
+        registry.register(recipePlankSilverwood);
+
+        recipeGrate = new ShapedOreRecipe(null,
+                new ItemStack(ConfigBlocks.blockMetalDevice, 1, 5),
+                "#",
+                "T",
+                '#', new ItemStack(Blocks.IRON_BARS),
+                'T', new ItemStack(Blocks.TRAPDOOR))
+                .setRegistryName("thaumcraft", "grate");
+        registry.register(recipeGrate);
+
+        recipePhial = new ShapedOreRecipe(null,
+                new ItemStack(ConfigItems.itemEssence, 8, 0),
+                " C ",
+                "G G",
+                " G ",
+                'G', Blocks.GLASS,
+                'C', Items.CLAY_BALL)
+                .setRegistryName("thaumcraft", "phial");
+        registry.register(recipePhial);
+
+        recipeTable = new ShapedOreRecipe(null,
+                new ItemStack(ConfigBlocks.blockTable, 1, 0),
+                "SSS",
+                "W W",
+                'S', "slabWood",
+                'W', "plankWood")
+                .setRegistryName("thaumcraft", "table");
+        registry.register(recipeTable);
+
+        recipeScribe1 = new ShapelessOreRecipe(null,
+                new ItemStack(ConfigItems.itemInkwell),
+                new ItemStack(ConfigItems.itemEssence, 1, 0),
+                Items.FEATHER,
+                "dyeBlack")
+                .setRegistryName("thaumcraft", "scribe1");
+        registry.register(recipeScribe1);
+
+        recipeScribe2 = new ShapelessOreRecipe(null,
+                new ItemStack(ConfigItems.itemInkwell),
+                Items.FEATHER,
+                Items.DYE,
+                "dyeBlack")
+                .setRegistryName("thaumcraft", "scribe2");
+        registry.register(recipeScribe2);
+
+        recipeScribe3 = new ShapelessOreRecipe(null,
+                new ItemStack(ConfigItems.itemInkwell),
+                new ItemStack(ConfigItems.itemInkwell, 1, OreDictionary.WILDCARD_VALUE),
+                "dyeBlack")
+                .setRegistryName("thaumcraft", "scribe3");
+        registry.register(recipeScribe3);
+
+        recipeThaumometer = new ShapedOreRecipe(null,
+                new ItemStack(ConfigItems.itemThaumometer),
+                " 1 ",
+                "IGI",
+                " 1 ",
+                'I', Items.IRON_INGOT,
+                'G', Blocks.GLASS,
+                '1', new ItemStack(ConfigItems.itemShard, 1, OreDictionary.WILDCARD_VALUE))
+                .setRegistryName("thaumcraft", "thaumometer");
+        registry.register(recipeThaumometer);
         specialRecipesRegistered = true;
     }
 }

@@ -56,7 +56,7 @@ Lightweight analysis commands run:
 
 Current implementation is not Stage 9-e complete.
 
-The port does call `ConfigResearch.init()` during post-init after recipe and aspect initialization (`src/main/java/thaumcraft/common/Thaumcraft.java:186`-`src/main/java/thaumcraft/common/Thaumcraft.java:191`). Current `ConfigResearch.init()` now registers the six reference research categories and a safe text-only/no-recipe subset across BASICS/THAUMATURGY/ELDRITCH (`ASPECTS`, `PECH`, `NODES`, `WARP`, `ENCHANT`, `NODETAPPER1`, `NODEPRESERVE`, `NODETAPPER2`, `CRIMSON`, `CAP_iron`, `ROD_wood`, `ELDRITCHMAJOR`), but the broader research graph, recipe-backed pages, triggers, and warp metadata are still incomplete (`src/main/java/thaumcraft/common/config/ConfigResearch.java`).
+The port does call `ConfigResearch.init()` during post-init after recipe and aspect initialization (`src/main/java/thaumcraft/common/Thaumcraft.java:186`-`src/main/java/thaumcraft/common/Thaumcraft.java:191`). Current `ConfigResearch.init()` now registers the six reference research categories plus a broader safe baseline across BASICS/THAUMATURGY/ELDRITCH (`ASPECTS`, `PECH`, `NODES`, `WARP`, `RESEARCH`, `KNOWFRAG`, `RESEARCHER1`, `RESEARCHER2`, `RESEARCHDUPE`, `ENCHANT`, `NODETAPPER1`, `NODEPRESERVE`, `NODETAPPER2`, `CRIMSON`, `CAP_iron`, `ROD_wood`, `ELDRITCHMAJOR`). The full graph, most recipe-backed pages, and full trigger parity are still incomplete (`src/main/java/thaumcraft/common/config/ConfigResearch.java`).
 
 The low-level API containers for categories, items, and pages are mostly present and structurally close to the 1.7.10 reference (`src/main/java/thaumcraft/api/research/ResearchCategories.java:12`-`src/main/java/thaumcraft/api/research/ResearchCategories.java:67`, `src/main/java/thaumcraft/api/research/ResearchItem.java:13`-`src/main/java/thaumcraft/api/research/ResearchItem.java:256`, `src/main/java/thaumcraft/api/research/ResearchPage.java:15`-`src/main/java/thaumcraft/api/research/ResearchPage.java:128`). This is an API baseline, not content parity.
 
@@ -139,7 +139,7 @@ Dependency: Stage 9 recipe registration must provide recipe objects for page ref
 
 **Что не совпадает:**
 
-Reference `ConfigResearch` uses `recipes.get("...")` throughout research pages. The decompiled reference contains 276 unique recipe keys referenced by research pages. Current `ConfigRecipes.init()` is a placeholder, and while current `ConfigResearch` now has a baseline `recipes` map scaffold, it is not populated with reference recipe handles yet. Current `ResearchPage` constructors dereference recipe outputs for single `IRecipe`, `IArcaneRecipe`, `CrucibleRecipe`, and `InfusionRecipe` pages, so an unpopulated map will still become a registration-time crash rather than a usable missing page.
+Reference `ConfigResearch` uses `recipes.get("...")` throughout research pages. The decompiled reference contains 276 unique recipe keys referenced by research pages. Current `ConfigRecipes.init()` is still partial for Stage 9, but the map is no longer empty: the port now registers baseline handles for `ArcaneStone2/3/4` and basic BASICS progression keys (`KnowFrag`, `PlankGreatwood`, `PlankSilverwood`, `Grate`, `Phial`, `Table`, `Scribe1/2/3`, `Thaumometer`). Most reference recipe keys remain unported. Current `ResearchPage` constructors dereference recipe outputs for single `IRecipe`, `IArcaneRecipe`, `CrucibleRecipe`, and `InfusionRecipe` pages, so missing map keys still become registration-time failures or broken pages.
 
 **Что нужно доделать:**
 

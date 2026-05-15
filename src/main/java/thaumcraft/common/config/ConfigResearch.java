@@ -3,6 +3,7 @@ package thaumcraft.common.config;
 import java.util.HashMap;
 import java.util.Map;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.util.ResourceLocation;
 import thaumcraft.api.ThaumcraftApi;
 import thaumcraft.api.aspects.Aspect;
@@ -17,6 +18,7 @@ public class ConfigResearch {
     public static void init() {
         initCategories();
         initBasicResearchBaseline();
+        initBasicResearchProgressionBaseline();
         initBasicResearchTextOnlyExtended();
         initThaumaturgyResearchTextOnlyBaseline();
         initEldritchResearchTextOnlyBaseline();
@@ -116,6 +118,108 @@ public class ConfigResearch {
                 .setStub()
                 .setRound()
                 .setAutoUnlock()
+                .registerResearchItem();
+    }
+
+    private static void initBasicResearchProgressionBaseline() {
+        new ResearchItem(
+                "RESEARCH",
+                "BASICS",
+                new AspectList(),
+                2,
+                0,
+                0,
+                new ItemStack(ConfigItems.itemInkwell))
+                .setPages(
+                        new ResearchPage("tc.research_page.RESEARCH.1"),
+                        new ResearchPage("tc.research_page.RESEARCH.2"),
+                        new ResearchPage((IRecipe) recipes.get("Thaumometer")),
+                        new ResearchPage("tc.research_page.RESEARCH.3"),
+                        new ResearchPage("tc.research_page.RESEARCH.4"),
+                        new ResearchPage((IRecipe) recipes.get("Scribe1")),
+                        new ResearchPage((IRecipe) recipes.get("Scribe2")),
+                        new ResearchPage((IRecipe) recipes.get("Scribe3")),
+                        new ResearchPage("tc.research_page.RESEARCH.5"),
+                        new ResearchPage("tc.research_page.RESEARCH.6"),
+                        new ResearchPage("tc.research_page.RESEARCH.7"),
+                        new ResearchPage("tc.research_page.RESEARCH.8"),
+                        new ResearchPage("tc.research_page.RESEARCH.9"),
+                        new ResearchPage("tc.research_page.RESEARCH.10"),
+                        new ResearchPage("tc.research_page.RESEARCH.11"),
+                        new ResearchPage("tc.research_page.RESEARCH.12"))
+                .setAutoUnlock()
+                .setStub()
+                .setRound()
+                .registerResearchItem();
+
+        new ResearchItem(
+                "KNOWFRAG",
+                "BASICS",
+                new AspectList(),
+                3,
+                -2,
+                0,
+                new ItemStack(ConfigItems.itemResource, 1, 9))
+                .setPages(
+                        new ResearchPage("tc.research_page.KNOWFRAG.1"),
+                        new ResearchPage((IRecipe) recipes.get("KnowFrag")))
+                .setStub()
+                .setRound()
+                .setAutoUnlock()
+                .setParents("RESEARCH")
+                .registerResearchItem();
+
+        new ResearchItem(
+                "RESEARCHER1",
+                "BASICS",
+                new AspectList()
+                        .add(Aspect.MIND, 3)
+                        .add(Aspect.SENSES, 3)
+                        .add(Aspect.ORDER, 3),
+                4,
+                1,
+                1,
+                new ResourceLocation("thaumcraft", "textures/misc/r_researcher1.png"))
+                .setPages(new ResearchPage("tc.research_page.RESEARCHER1.1"))
+                .setRound()
+                .setParents("RESEARCH")
+                .registerResearchItem();
+
+        new ResearchItem(
+                "RESEARCHER2",
+                "BASICS",
+                new AspectList()
+                        .add(Aspect.MIND, 6)
+                        .add(Aspect.ORDER, 3)
+                        .add(Aspect.SENSES, 3)
+                        .add(Aspect.MAGIC, 3),
+                3,
+                3,
+                2,
+                new ResourceLocation("thaumcraft", "textures/misc/r_researcher2.png"))
+                .setPages(new ResearchPage("tc.research_page.RESEARCHER2.1"))
+                .setRound()
+                .setSpecial()
+                .setParents("RESEARCHER1")
+                .registerResearchItem();
+        ThaumcraftApi.addWarpToResearch("RESEARCHER2", 1);
+
+        new ResearchItem(
+                "RESEARCHDUPE",
+                "BASICS",
+                new AspectList()
+                        .add(Aspect.MIND, 6)
+                        .add(Aspect.EXCHANGE, 3)
+                        .add(Aspect.SENSES, 3)
+                        .add(Aspect.GREED, 3)
+                        .add(Aspect.CRAFT, 3),
+                4,
+                5,
+                3,
+                new ResourceLocation("thaumcraft", "textures/misc/r_resdupe.png"))
+                .setPages(new ResearchPage("tc.research_page.RESEARCHDUPE.1"))
+                .setRound()
+                .setParents("RESEARCHER2")
                 .registerResearchItem();
     }
 

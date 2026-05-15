@@ -67,6 +67,43 @@ Branch: `codex/durable-goal-stage8-9`
 
 ## Checkpoint Log
 
+### 2026-05-15 — Stage 9-e BASICS research progression + recipe-key baseline
+
+Scope:
+
+- Expanded `ConfigRecipes` special-registration baseline with concrete `IRecipe` handles and `ConfigResearch.recipes` keys for:
+  - `KnowFrag`
+  - `PlankGreatwood`
+  - `PlankSilverwood`
+  - `Grate`
+  - `Phial`
+  - `Table`
+  - `Scribe1`
+  - `Scribe2`
+  - `Scribe3`
+  - `Thaumometer`
+- Expanded `ConfigResearch` BASICS progression baseline with reference-aligned keys and metadata:
+  - `RESEARCH`
+  - `KNOWFRAG`
+  - `RESEARCHER1`
+  - `RESEARCHER2`
+  - `RESEARCHDUPE`
+- Added reference warp metadata for `RESEARCHER2` via `ThaumcraftApi.addWarpToResearch("RESEARCHER2", 1)`.
+- Wired `RESEARCH`/`KNOWFRAG` pages to recipe-backed `ResearchPage(IRecipe)` entries using the newly mapped recipe keys.
+- Updated `docs/Stage9-e.md` current status and GAP-2 text to reflect partial recipe-key parity progress.
+
+Validation:
+
+- `./scripts/dev.sh validate --smoke` — passed: status, compile, tests, jar, check-jar summary, and server smoke.
+- `run/smoke-server.log` evidence: server ready (`Done (...)`), no fatal markers.
+- Crash report scan under `run/` remained clean during smoke stage.
+- `./scripts/dev.sh smoke-client` — skipped because `DISPLAY=` and GUI/graphics/user-interactive validation is excluded.
+
+Remaining limits:
+
+- Stage 9-e still lacks the majority of the full reference research graph and recipe-backed page coverage.
+- Thaumonomicon GUI/manual progression checks remain skipped by instruction and headless environment limits.
+
 ### 2026-05-15 — Stage 9-e static research graph validation baseline
 
 Scope:
