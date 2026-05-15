@@ -5,7 +5,9 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.translation.I18n;
 import net.minecraft.world.World;
@@ -13,6 +15,7 @@ import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.player.ItemTooltipEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import thaumcraft.client.gui.GuiArcaneWorkbench;
 import thaumcraft.client.gui.GuiFocusPouch;
 import thaumcraft.client.gui.GuiHandMirror;
 import thaumcraft.client.gui.GuiHoverHarness;
@@ -23,6 +26,7 @@ import thaumcraft.client.lib.RenderEventHandler;
 import thaumcraft.common.CommonProxy;
 import thaumcraft.common.config.ConfigItems;
 import thaumcraft.common.lib.events.EventHandlerRunic;
+import thaumcraft.common.tiles.TileArcaneWorkbench;
 
 public class ClientProxy extends CommonProxy {
 
@@ -124,7 +128,14 @@ public class ClientProxy extends CommonProxy {
             case GUI_ALCHEMY_FURNACE:
             case GUI_RESEARCH_TABLE:
             case GUI_THAUMONOMICON:
+                return null;
             case GUI_ARCANE_WORKBENCH:
+            {
+                TileEntity tile = world.getTileEntity(new BlockPos(x, y, z));
+                return tile instanceof TileArcaneWorkbench
+                        ? new GuiArcaneWorkbench(player.inventory, (TileArcaneWorkbench) tile)
+                        : null;
+            }
             case GUI_ARCANE_BORE:
             case GUI_MAGIC_BOX:
             case GUI_SPA:

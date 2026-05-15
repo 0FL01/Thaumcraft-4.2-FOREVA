@@ -43,7 +43,7 @@ Branch: `codex/durable-goal-stage8-9`
 
 ## Skipped GUI/Manual Graphics Checks
 
-- None attempted in this run yet.
+- Arcane Workbench client smoke/manual open/visual parity was skipped on 2026-05-15 because `DISPLAY=` and user-driven GUI/graphics validation is excluded by instruction.
 - Future GUI/client visual checks that require user-driven Minecraft control, screenshots, or unavailable X11/graphics stack will be recorded as: `SKIPPED by user instruction: GUI/graphics/user-interactive validation excluded`.
 
 ## Baseline Validation
@@ -55,6 +55,29 @@ Branch: `codex/durable-goal-stage8-9`
 - `./scripts/dev.sh validate --smoke` — passed on 2026-05-15, including compact server smoke validation.
 
 ## Checkpoint Log
+
+### 2026-05-15 — Stage 8-b Arcane Workbench GUI baseline
+
+Scope:
+
+- Added a minimal `GuiArcaneWorkbench` client screen backed by `ContainerArcaneWorkbench`.
+- Routed client GUI ID `13` through `ClientProxy#getClientGuiElement` with a `TileArcaneWorkbench` type check.
+- Copied the original `gui_arcaneworkbench.png` from `thaumcraft_src/assets/thaumcraft/textures/gui/` into the port resource tree.
+- Updated `docs/Stage8-b.md` to record this as a baseline, not full GUI parity.
+
+Validation:
+
+- `./scripts/dev.sh compileJava` — passed.
+- `./scripts/dev.sh validate --smoke` — passed: status, compile, tests `10/10`, jar, check-jar summary `5134` MCP leak lines / `1028` unique leaks, and server smoke.
+- `run/smoke-server.log` evidence: `Registering entities`; `Forge Mod Loader has successfully loaded 6 mods`; `Done (1.205s)!`.
+- Crash report scan under `run/` returned no files.
+- `./scripts/dev.sh smoke-client` — skipped because `DISPLAY=` and GUI/graphics/user-interactive validation is excluded.
+
+Remaining limits:
+
+- Arcane Workbench right-click/open was not manually observed.
+- The screen currently provides the original background texture baseline only; wand vis, recipe aspect cost display, and full visual parity remain open.
+- Stage 9 recipe/content availability can still affect workbench output behavior.
 
 ### 2026-05-14 — Stage 6/7 BlockLoot urn/crate path
 

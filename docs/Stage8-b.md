@@ -65,7 +65,7 @@ Lightweight commands run during analysis:
 
 ## 4. Текущее состояние Stage 8-b
 
-Current state is not closeable. Server/common GUI IDs and containers exist for many screens, but client-side routing and client GUI classes are mostly absent.
+Current state is not closeable. Server/common GUI IDs and containers exist for many screens, but client-side routing and client GUI classes are mostly absent. GUI ID `13` now has a minimal texture-backed Arcane Workbench baseline, but the full wand/aspect/crafting display and manual client validation remain open.
 
 Concrete current findings:
 
@@ -73,9 +73,9 @@ Concrete current findings:
 - Server GUI routing exists for Golem, Pech, Traveling Trunk, Thaumatorium, Focus Pouch, Deconstruction Table, Alchemy Furnace, Research Table, Arcane Workbench, Arcane Bore, Hand Mirror, Hover Harness, Magic Box, Spa, and Focal Manipulator in `src/main/java/thaumcraft/common/CommonProxy.java:61-119`.
 - Thaumonomicon is intentionally server-null in `src/main/java/thaumcraft/common/CommonProxy.java:95`, matching the reference pattern that its GUI is client-only.
 - Base `CommonProxy.getClientGuiElement` returns null in `src/main/java/thaumcraft/common/CommonProxy.java:122-126`, as expected for common proxy.
-- `ClientProxy.getClientGuiElement` only constructs `GuiFocusPouch`, `GuiHandMirror`, and `GuiHoverHarness` in `src/main/java/thaumcraft/client/ClientProxy.java:63-70`; all other Stage 8-b/current GUI IDs return null in `src/main/java/thaumcraft/client/ClientProxy.java:71-84`.
+- `ClientProxy.getClientGuiElement` constructs `GuiFocusPouch`, `GuiHandMirror`, `GuiHoverHarness`, and now routes `GUI_ARCANE_WORKBENCH` to `GuiArcaneWorkbench` when the client tile is a `TileArcaneWorkbench`; the remaining Stage 8-b/current GUI IDs still return null.
 - Existing GUI screens are placeholder-style grey rectangles and do not bind original textures: `GuiFocusPouch.java:23-35`, `GuiHandMirror.java:23-29`, `GuiHoverHarness.java:23-29`.
-- No current `src/main/resources/assets/thaumcraft/textures/gui/**` files exist, while reference GUI textures are present under `thaumcraft_src/assets/thaumcraft/textures/gui/**`.
+- `src/main/resources/assets/thaumcraft/textures/gui/gui_arcaneworkbench.png` is copied byte-for-byte from `thaumcraft_src/assets/thaumcraft/textures/gui/gui_arcaneworkbench.png`; the other reference GUI textures are still absent from current resources.
 - Current English lang has only `container.focus_pouch`, `container.handmirror`, `container.hoverharness`, and `container.inventory` for implemented GUI labels in `src/main/resources/assets/thaumcraft/lang/en_us.lang:101-104`; research/golem/trunk/interaction GUI keys are absent.
 - Thaumonomicon right-click opens GUI ID `12` server-side in `src/main/java/thaumcraft/common/items/relics/ItemThaumonomicon.java:43-50`, but client ID `12` returns null in `src/main/java/thaumcraft/client/ClientProxy.java:78-84`.
 - Thaumometer currently performs server-side scanning in `src/main/java/thaumcraft/common/items/relics/ItemThaumometer.java:37-69`; no `GuiScreen`/overlay implementation was found under `src/main/java/thaumcraft/client/**`.
@@ -84,15 +84,15 @@ Concrete current findings:
 
 ### GAP-1: Arcane Workbench GUI отсутствует на клиенте
 
-**Статус:** отсутствует  
+**Статус:** частично реализовано
 **Критичность:** blocker
 
 **Текущая реализация:**
-- `src/main/java/thaumcraft/client/ClientProxy.java:79-84`
+- `src/main/java/thaumcraft/client/ClientProxy.java#getClientGuiElement` routes GUI ID `13` to `GuiArcaneWorkbench` only when the client tile at the provided coordinates is `TileArcaneWorkbench`.
 - `src/main/java/thaumcraft/common/CommonProxy.java:96-99`
 - `src/main/java/thaumcraft/common/blocks/BlockTable.java:153-155`
-- Отсутствует `src/main/java/thaumcraft/client/gui/GuiArcaneWorkbench.java`.
-- Отсутствует `src/main/resources/assets/thaumcraft/textures/gui/gui_arcaneworkbench.png`.
+- `src/main/java/thaumcraft/client/gui/GuiArcaneWorkbench.java` exists as a minimal 1.12.2 `GuiContainer` baseline using `ContainerArcaneWorkbench`.
+- `src/main/resources/assets/thaumcraft/textures/gui/gui_arcaneworkbench.png` exists and matches the original asset.
 
 **Референс:**
 - `Thaumcraft-1.7.10-4.2.3.5.jar!/thaumcraft/client/ClientProxy.class`, `getClientGuiElement` offsets `255-279` instantiate `GuiArcaneWorkbench` for GUI ID `13`.
@@ -100,15 +100,15 @@ Concrete current findings:
 - `thaumcraft_src/assets/thaumcraft/textures/gui/gui_arcaneworkbench.png`.
 
 **Что не совпадает:**
-Current server routing opens `GUI_ARCANE_WORKBENCH`, but client routing returns null. Reference GUI draws the arcane workbench texture and has fields for `TileArcaneWorkbench`, `InventoryPlayer`, primal aspects and aspect positions; current client has no class, no texture, no vis/aspect display, and no foreground/background parity.
+Current server routing opens `GUI_ARCANE_WORKBENCH`, and the client now returns a minimal texture-backed `GuiArcaneWorkbench` for the matching tile. Reference GUI also draws wand vis, recipe aspect costs, primal aspect positions and reference-specific state; those foreground/background parity pieces are still not ported.
 
 **Что нужно доделать:**
-Port `GuiArcaneWorkbench` for 1.12.2, bind the original texture, draw slots/background/aspect costs, and route GUI ID `13` to it.
+Finish `GuiArcaneWorkbench` parity for 1.12.2: draw wand/vis and recipe aspect costs, align any slot/background overlays with the original, and manually validate the right-click open scenario.
 
 **Как доделать:**
-- Add `src/main/java/thaumcraft/client/gui/GuiArcaneWorkbench.java`.
-- Update `src/main/java/thaumcraft/client/ClientProxy.java#getClientGuiElement` case `GUI_ARCANE_WORKBENCH` to fetch `TileArcaneWorkbench` and instantiate the GUI.
-- Copy `thaumcraft_src/assets/thaumcraft/textures/gui/gui_arcaneworkbench.png` to `src/main/resources/assets/thaumcraft/textures/gui/gui_arcaneworkbench.png`.
+- Done: add `src/main/java/thaumcraft/client/gui/GuiArcaneWorkbench.java`.
+- Done: update `src/main/java/thaumcraft/client/ClientProxy.java#getClientGuiElement` case `GUI_ARCANE_WORKBENCH` to fetch `TileArcaneWorkbench` and instantiate the GUI.
+- Done: copy `thaumcraft_src/assets/thaumcraft/textures/gui/gui_arcaneworkbench.png` to `src/main/resources/assets/thaumcraft/textures/gui/gui_arcaneworkbench.png`.
 - Verify all referenced aspect icon resources exist in `src/main/resources/assets/thaumcraft/textures/aspects/**`.
 - Scenario: right-click Arcane Workbench table from `BlockTable.java:153-155` and craft/open with wand/vis display visible.
 
@@ -117,6 +117,13 @@ Port `GuiArcaneWorkbench` for 1.12.2, bind the original texture, draw slots/back
 - [ ] GUI uses `gui_arcaneworkbench.png` and does not render placeholder rectangles.
 - [ ] Wand/crafting/aspect display matches reference layout closely enough for manual parity review.
 - [ ] No missing texture errors for the workbench GUI path.
+
+**Checkpoint 2026-05-15 — Arcane Workbench GUI baseline:**
+- Added `GuiArcaneWorkbench` with reference size `190x234`, `ContainerArcaneWorkbench`, and original `gui_arcaneworkbench.png`.
+- Routed client GUI ID `13` to the screen with a `TileArcaneWorkbench` type check.
+- Validation: `./scripts/dev.sh compileJava` passed; `./scripts/dev.sh validate --smoke` passed with tests `10/10`, jar/check-jar summary `5134` MCP leak lines / `1028` unique leaks, server ready at `Done (1.205s)!`, and no crash reports under `run/`.
+- Client smoke/manual GUI open was skipped because `DISPLAY=` and user-driven GUI/graphics validation is excluded for this run.
+- Remaining: full wand/cost/aspect display, manual right-click/open scenario, visual parity, and Stage 9 recipe output coverage.
 
 **Риски / зависимости:**
 Depends on current `ContainerArcaneWorkbench` and tile vis/wand data being behaviorally correct. Stage 9 recipe registration can affect whether recipe output appears, but it should not block GUI opening/layout.
