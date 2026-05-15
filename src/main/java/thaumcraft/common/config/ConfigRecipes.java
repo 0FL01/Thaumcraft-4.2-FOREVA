@@ -24,6 +24,7 @@ public class ConfigRecipes {
     public static void init() {
         ConfigResearch.recipes.clear();
         initializeArcaneRecipeBaseline();
+        initializeInfusionWandRecipeBaseline();
 
         boolean hasArcaneWand = false;
         boolean hasArcaneSceptre = false;
@@ -741,6 +742,152 @@ public class ConfigRecipes {
 
     private static void registerShapelessArcaneRecipe(String key, String research, ItemStack output, AspectList aspects, Object... recipe) {
         ConfigResearch.recipes.put(key, ThaumcraftApi.addShapelessArcaneCraftingRecipe(research, output, aspects, recipe));
+    }
+
+    private static void initializeInfusionWandRecipeBaseline() {
+        if (Config.foundSilverIngot) {
+            registerInfusionRecipe("WandCapSilver", "CAP_silver",
+                    new ItemStack(ConfigItems.itemWandCap, 1, 4),
+                    4,
+                    new AspectList().add(Aspect.ENERGY, getWandCapCost("silver") * 2)
+                            .add(Aspect.AURA, getWandCapCost("silver")),
+                    new ItemStack(ConfigItems.itemWandCap, 1, 5),
+                    new ItemStack(ConfigItems.itemResource, 1, 14),
+                    new ItemStack(ConfigItems.itemResource, 1, 14));
+        }
+
+        registerInfusionRecipe("WandCapThaumium", "CAP_thaumium",
+                new ItemStack(ConfigItems.itemWandCap, 1, 2),
+                5,
+                new AspectList().add(Aspect.ENERGY, getWandCapCost("thaumium") * 2)
+                        .add(Aspect.AURA, getWandCapCost("thaumium")),
+                new ItemStack(ConfigItems.itemWandCap, 1, 6),
+                new ItemStack(ConfigItems.itemResource, 1, 14),
+                new ItemStack(ConfigItems.itemResource, 1, 14),
+                new ItemStack(ConfigItems.itemResource, 1, 14));
+
+        registerInfusionRecipe("WandCapVoid", "CAP_void",
+                new ItemStack(ConfigItems.itemWandCap, 1, 7),
+                8,
+                new AspectList().add(Aspect.ENERGY, getWandCapCost("void") * 2)
+                        .add(Aspect.VOID, getWandCapCost("void") * 2)
+                        .add(Aspect.ELDRITCH, getWandCapCost("void") * 2)
+                        .add(Aspect.AURA, getWandCapCost("void") * 2),
+                new ItemStack(ConfigItems.itemWandCap, 1, 8),
+                new ItemStack(ConfigItems.itemResource, 1, 14),
+                new ItemStack(ConfigItems.itemResource, 1, 14),
+                new ItemStack(ConfigItems.itemResource, 1, 14),
+                new ItemStack(ConfigItems.itemResource, 1, 14));
+
+        registerInfusionRecipe("WandRodObsidian", "ROD_obsidian",
+                new ItemStack(ConfigItems.itemWandRod, 1, 1),
+                3,
+                new AspectList().add(Aspect.EARTH, getWandRodCost("obsidian") * 2)
+                        .add(Aspect.MAGIC, getWandRodCost("obsidian"))
+                        .add(Aspect.DARKNESS, getWandRodCost("blaze")),
+                new ItemStack(Blocks.OBSIDIAN),
+                new ItemStack(ConfigItems.itemShard, 1, 6),
+                new ItemStack(ConfigItems.itemShard, 1, 3));
+
+        registerInfusionRecipe("WandRodIce", "ROD_ice",
+                new ItemStack(ConfigItems.itemWandRod, 1, 3),
+                3,
+                new AspectList().add(Aspect.WATER, getWandRodCost("ice") * 2)
+                        .add(Aspect.MAGIC, getWandRodCost("ice"))
+                        .add(Aspect.COLD, getWandRodCost("blaze")),
+                new ItemStack(Blocks.PACKED_ICE),
+                new ItemStack(ConfigItems.itemShard, 1, 6),
+                new ItemStack(ConfigItems.itemShard, 1, 2));
+
+        registerInfusionRecipe("WandRodQuartz", "ROD_quartz",
+                new ItemStack(ConfigItems.itemWandRod, 1, 4),
+                3,
+                new AspectList().add(Aspect.ORDER, getWandRodCost("quartz") * 2)
+                        .add(Aspect.MAGIC, getWandRodCost("quartz"))
+                        .add(Aspect.CRYSTAL, getWandRodCost("blaze")),
+                new ItemStack(Blocks.QUARTZ_BLOCK),
+                new ItemStack(ConfigItems.itemShard, 1, 6),
+                new ItemStack(ConfigItems.itemShard, 1, 4));
+
+        registerInfusionRecipe("WandRodReed", "ROD_reed",
+                new ItemStack(ConfigItems.itemWandRod, 1, 5),
+                3,
+                new AspectList().add(Aspect.AIR, getWandRodCost("reed") * 2)
+                        .add(Aspect.MAGIC, getWandRodCost("reed"))
+                        .add(Aspect.MOTION, getWandRodCost("blaze")),
+                new ItemStack(Items.REEDS),
+                new ItemStack(ConfigItems.itemShard, 1, 6),
+                new ItemStack(ConfigItems.itemShard, 1, 0));
+
+        registerInfusionRecipe("WandRodBlaze", "ROD_blaze",
+                new ItemStack(ConfigItems.itemWandRod, 1, 6),
+                3,
+                new AspectList().add(Aspect.FIRE, getWandRodCost("blaze") * 2)
+                        .add(Aspect.MAGIC, getWandRodCost("blaze"))
+                        .add(Aspect.BEAST, getWandRodCost("blaze")),
+                new ItemStack(Items.BLAZE_ROD),
+                new ItemStack(ConfigItems.itemShard, 1, 6),
+                new ItemStack(ConfigItems.itemShard, 1, 1));
+
+        registerInfusionRecipe("WandRodBone", "ROD_bone",
+                new ItemStack(ConfigItems.itemWandRod, 1, 7),
+                3,
+                new AspectList().add(Aspect.ENTROPY, getWandRodCost("bone") * 2)
+                        .add(Aspect.MAGIC, getWandRodCost("bone"))
+                        .add(Aspect.UNDEAD, getWandRodCost("blaze")),
+                new ItemStack(Items.BONE),
+                new ItemStack(ConfigItems.itemShard, 1, 6),
+                new ItemStack(ConfigItems.itemShard, 1, 5));
+
+        registerInfusionRecipe("WandRodSilverwood", "ROD_silverwood",
+                new ItemStack(ConfigItems.itemWandRod, 1, 2),
+                5,
+                new AspectList().add(Aspect.AIR, getWandRodCost("silverwood"))
+                        .add(Aspect.FIRE, getWandRodCost("silverwood"))
+                        .add(Aspect.WATER, getWandRodCost("silverwood"))
+                        .add(Aspect.EARTH, getWandRodCost("silverwood"))
+                        .add(Aspect.ORDER, getWandRodCost("silverwood"))
+                        .add(Aspect.ENTROPY, getWandRodCost("silverwood"))
+                        .add(Aspect.MAGIC, getWandRodCost("silverwood")),
+                new ItemStack(ConfigBlocks.blockMagicalLog, 1, 1),
+                new ItemStack(ConfigItems.itemShard, 1, 6),
+                new ItemStack(ConfigItems.itemShard, 1, 0),
+                new ItemStack(ConfigItems.itemShard, 1, 1),
+                new ItemStack(ConfigItems.itemShard, 1, 2),
+                new ItemStack(ConfigItems.itemShard, 1, 3),
+                new ItemStack(ConfigItems.itemShard, 1, 4),
+                new ItemStack(ConfigItems.itemShard, 1, 5));
+
+        registerInfusionRecipe("WandRodPrimalStaff", "ROD_primal_staff",
+                new ItemStack(ConfigItems.itemWandRod, 1, 100),
+                8,
+                new AspectList().add(Aspect.AIR, getWandRodCost("primal_staff"))
+                        .add(Aspect.FIRE, getWandRodCost("primal_staff"))
+                        .add(Aspect.WATER, getWandRodCost("primal_staff"))
+                        .add(Aspect.EARTH, getWandRodCost("primal_staff"))
+                        .add(Aspect.ORDER, getWandRodCost("primal_staff"))
+                        .add(Aspect.ENTROPY, getWandRodCost("primal_staff"))
+                        .add(Aspect.MAGIC, getWandRodCost("primal_staff") * 2),
+                new ItemStack(ConfigItems.itemWandRod, 1, 2),
+                new ItemStack(ConfigItems.itemResource, 1, 15),
+                new ItemStack(ConfigItems.itemWandRod, 1, 1),
+                new ItemStack(ConfigItems.itemWandRod, 1, 3),
+                new ItemStack(ConfigItems.itemWandRod, 1, 4),
+                new ItemStack(ConfigItems.itemResource, 1, 15),
+                new ItemStack(ConfigItems.itemWandRod, 1, 5),
+                new ItemStack(ConfigItems.itemWandRod, 1, 6),
+                new ItemStack(ConfigItems.itemWandRod, 1, 7));
+    }
+
+    private static void registerInfusionRecipe(String key, String research, ItemStack output, int instability, AspectList aspects,
+                                               ItemStack centralInput, ItemStack... components) {
+        ConfigResearch.recipes.put(key, ThaumcraftApi.addInfusionCraftingRecipe(
+                research,
+                output,
+                instability,
+                aspects,
+                centralInput,
+                components));
     }
 
     private static int getWandCapCost(String tag) {

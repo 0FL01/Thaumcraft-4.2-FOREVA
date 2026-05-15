@@ -67,6 +67,29 @@ Branch: `codex/durable-goal-stage8-9`
 
 ## Checkpoint Log
 
+### 2026-05-15 — Stage 9-c infusion wand-component baseline
+
+Scope:
+
+- Started Stage 9-c GAP-1 recipe-data population by adding infusion wand component registrations to `ConfigRecipes.init()` via a dedicated helper (`registerInfusionRecipe`).
+- Ported reference-aligned infusion crafting entries with stable `ConfigResearch.recipes` keys:
+  - `WandCapSilver`, `WandCapThaumium`, `WandCapVoid`
+  - `WandRodObsidian`, `WandRodIce`, `WandRodQuartz`, `WandRodReed`, `WandRodBlaze`, `WandRodBone`, `WandRodSilverwood`, `WandRodPrimalStaff`
+- Preserved reference research keys, instability values, aspect formulas (including reference blaze-cost secondary aspects), central inputs, and component lists for this subset.
+- Updated `docs/Stage9-c.md` GAP-1 status/analysis from absent to partial for this baseline.
+
+Validation:
+
+- `./scripts/dev.sh validate --smoke` — passed: status, compile, tests `10/10`, jar, check-jar summary `5519` MCP leak lines / `1086` unique leaks, and server smoke.
+- `run/smoke-server.log` evidence: `Registering entities`; `Forge Mod Loader has successfully loaded 6 mods`; `Done (1.181s)!`.
+- Crash report scan under `run/` returned no files.
+- `./scripts/dev.sh smoke-client` — skipped because `DISPLAY=` and GUI/graphics/user-interactive validation is excluded.
+
+Remaining limits:
+
+- This checkpoint ports only the wand-component infusion subset; Stage 9-c still needs the remaining infusion crafting set and all infusion enchantment registrations.
+- Full Stage 9-c acceptance (63 crafting + 24 enchantment registrations, research page/display parity, runtime scenario matrix) remains open.
+
 ### 2026-05-15 — Stage 9-b arcane remaining static subset and key audit
 
 Scope:
