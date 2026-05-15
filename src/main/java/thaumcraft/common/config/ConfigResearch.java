@@ -654,6 +654,119 @@ public class ConfigResearch {
                 .registerResearchItem();
 
         new ResearchItem(
+                "ENCHFABRIC",
+                "ARTIFICE",
+                new AspectList()
+                        .add(Aspect.CLOTH, 3)
+                        .add(Aspect.MAGIC, 3),
+                0,
+                3,
+                1,
+                new ItemStack(ConfigItems.itemResource, 1, 7))
+                .setPages(
+                        new ResearchPage("tc.research_page.ENCHFABRIC.1"),
+                        new ResearchPage((IArcaneRecipe) recipes.get("EnchantedFabric")),
+                        new ResearchPage("tc.research_page.ENCHFABRIC.2"),
+                        new ResearchPage((IArcaneRecipe) recipes.get("RobeChest")),
+                        new ResearchPage((IArcaneRecipe) recipes.get("RobeLegs")),
+                        new ResearchPage((IArcaneRecipe) recipes.get("RobeBoots")))
+                .setSecondary()
+                .registerResearchItem();
+
+        new ResearchItem(
+                "ELEMENTALAXE",
+                "ARTIFICE",
+                new AspectList()
+                        .add(Aspect.TOOL, 3)
+                        .add(Aspect.WATER, 3)
+                        .add(Aspect.MOTION, 3),
+                -7,
+                4,
+                2,
+                new ItemStack(ConfigItems.itemAxeElemental))
+                .setPages(
+                        new ResearchPage("tc.research_page.ELEMENTALAXE.1"),
+                        new ResearchPage((InfusionRecipe) recipes.get("ElementalAxe")),
+                        new ResearchPage("tc.research_page.ELEMENTALAXE.2"))
+                .setParents("THAUMIUM", "INFUSION")
+                .setConcealed()
+                .registerResearchItem();
+
+        new ResearchItem(
+                "ELEMENTALPICK",
+                "ARTIFICE",
+                new AspectList()
+                        .add(Aspect.TOOL, 3)
+                        .add(Aspect.FIRE, 3)
+                        .add(Aspect.SENSES, 3),
+                -7,
+                3,
+                2,
+                new ItemStack(ConfigItems.itemPickElemental))
+                .setPages(
+                        new ResearchPage("tc.research_page.ELEMENTALPICK.1"),
+                        new ResearchPage((InfusionRecipe) recipes.get("ElementalPick")),
+                        new ResearchPage("tc.research_page.ELEMENTALPICK.2"))
+                .setParents("THAUMIUM", "INFUSION")
+                .setConcealed()
+                .registerResearchItem();
+
+        new ResearchItem(
+                "ELEMENTALSWORD",
+                "ARTIFICE",
+                new AspectList()
+                        .add(Aspect.WEAPON, 3)
+                        .add(Aspect.AIR, 3)
+                        .add(Aspect.ENERGY, 3),
+                -7,
+                5,
+                2,
+                new ItemStack(ConfigItems.itemSwordElemental))
+                .setPages(
+                        new ResearchPage("tc.research_page.ELEMENTALSWORD.1"),
+                        new ResearchPage((InfusionRecipe) recipes.get("ElementalSword")))
+                .setParents("THAUMIUM", "INFUSION")
+                .setConcealed()
+                .registerResearchItem();
+
+        new ResearchItem(
+                "ELEMENTALSHOVEL",
+                "ARTIFICE",
+                new AspectList()
+                        .add(Aspect.TOOL, 3)
+                        .add(Aspect.EARTH, 3)
+                        .add(Aspect.CRAFT, 3),
+                -7,
+                6,
+                2,
+                new ItemStack(ConfigItems.itemShovelElemental))
+                .setPages(
+                        new ResearchPage("tc.research_page.ELEMENTALSHOVEL.1"),
+                        new ResearchPage((InfusionRecipe) recipes.get("ElementalShovel")),
+                        new ResearchPage("tc.research_page.ELEMENTALSHOVEL.2"))
+                .setParents("THAUMIUM", "INFUSION")
+                .setConcealed()
+                .registerResearchItem();
+
+        new ResearchItem(
+                "ELEMENTALHOE",
+                "ARTIFICE",
+                new AspectList()
+                        .add(Aspect.TOOL, 3)
+                        .add(Aspect.LIFE, 3)
+                        .add(Aspect.CROP, 3),
+                -7,
+                7,
+                2,
+                new ItemStack(ConfigItems.itemHoeElemental))
+                .setPages(
+                        new ResearchPage("tc.research_page.ELEMENTALHOE.1"),
+                        new ResearchPage((InfusionRecipe) recipes.get("ElementalHoe")))
+                .setParents("THAUMIUM", "INFUSION")
+                .setConcealed()
+                .registerResearchItem();
+
+        new ResearchItem(
                 "INFUSION",
                 "ARTIFICE",
                 new AspectList()
