@@ -1046,3 +1046,21 @@ Validation evidence for this checkpoint:
 - `./scripts/dev.sh smoke-client` — skipped because `DISPLAY` is unset in the current environment.
 
 GAP-11 is advanced but not closed. Remaining utility/relic simplification targets from RECON include `ItemBucketPure`, `ItemResonator`, `ItemResearchNotes`, `ItemEldritchObject`, `ItemEssence`, `ItemSanitySoap`, and the remaining relic/tool/bauble validation work listed above. Mana Bean still needs manual eating/planting/harvest validation, and mana pod visual renderer/model parity remains Stage 8.
+
+### 8.19 2026-05-15 Sanity Soap use-completion checkpoint
+
+Implemented in the current checkpoint:
+
+- Restored the reference `onUsingTick` behavior that automatically stops Sanity Soap use after more than 195 ticks, allowing the cleanse path to complete without the player manually releasing at the exact end.
+- Restored the Warp Ward potion chance bonus for sticky warp cleansing: base chance remains 33%, and active `Config.potionWarpWard` adds 25%.
+- Kept the current server-side temporary warp removal and non-creative stack consumption path.
+
+Validation evidence for this checkpoint:
+
+- `./scripts/dev.sh compileJava` — passed.
+- `./scripts/dev.sh build` — passed.
+- `./scripts/dev.sh check-jar` — failed before jar inspection because the wrapper's expected MCP mapping cache file is still absent at `.gradle_home/caches/minecraft/de/oceanlabs/mcp/mcp_stable/39/1.12.2/srgs/mcp-srg.srg`.
+- `./scripts/dev.sh smoke-server` — failed by timeout before ready state; log again stopped after `Calling tweak class net.minecraftforge.fml.common.launcher.FMLServerTweaker`, with only Log4j console appender initialization errors. `run/crash-reports/` does not exist, and the configured crash-marker scan found no matches.
+- `./scripts/dev.sh smoke-client` — skipped because `DISPLAY` is unset in the current environment.
+
+GAP-11 is advanced but not closed. Remaining Sanity Soap gaps are the reference pure-fluid bonus, blocked by the current absence of `blockFluidPure`/pure-water block parity, and client roots/craftstart sounds/bubble FX, which belong to Stage 8 visual/audio work. Manual soap-use validation remains open.

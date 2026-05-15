@@ -12,6 +12,7 @@ import net.minecraft.util.EnumHand;
 import net.minecraft.util.NonNullList;
 import net.minecraft.world.World;
 import thaumcraft.common.Thaumcraft;
+import thaumcraft.common.config.Config;
 import thaumcraft.common.lib.capabilities.IPlayerKnowledge;
 import thaumcraft.common.lib.capabilities.PlayerKnowledgeProvider;
 import thaumcraft.common.lib.CreativeTabThaumcraft;
@@ -43,6 +44,14 @@ public class ItemSanitySoap extends Item {
     }
 
     @Override
+    public void onUsingTick(ItemStack stack, EntityLivingBase entity, int count) {
+        int used = this.getMaxItemUseDuration(stack) - count;
+        if (used > 195) {
+            entity.resetActiveHand();
+        }
+    }
+
+    @Override
     public void onPlayerStoppedUsing(ItemStack stack, World world, EntityLivingBase entity, int timeLeft) {
         if (!(entity instanceof EntityPlayer)) return;
         EntityPlayer player = (EntityPlayer) entity;
@@ -51,7 +60,11 @@ public class ItemSanitySoap extends Item {
         if (!world.isRemote) {
             IPlayerKnowledge knowledge = player.getCapability(PlayerKnowledgeProvider.PLAYER_KNOWLEDGE, null);
             if (knowledge != null) {
-                if (knowledge.getWarpSticky() > 0 && world.rand.nextFloat() < 0.33F) {
+                float chance = 0.33F;
+                if (Config.potionWarpWard != null && player.isPotionActive(Config.potionWarpWard)) {
+                    chance += 0.25F;
+                }
+                if (knowledge.getWarpSticky() > 0 && world.rand.nextFloat() < chance) {
                     Thaumcraft.addStickyWarpToPlayer(player, -1);
                 }
                 if (knowledge.getWarpTemp() > 0) {

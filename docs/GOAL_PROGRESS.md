@@ -1526,6 +1526,28 @@ Remaining limits:
 - Mana pod blockstate/model/renderer parity remains Stage 8 visual work; this checkpoint only restores common/server behavior plus item tint registration.
 - Broader Stage 7 vegetation/ore probability parity and runtime new-world sampling remain open.
 
+### 2026-05-15 — Stage 5 Sanity Soap use completion
+
+Scope:
+
+- Restored the reference automatic use completion after more than 195 ticks by stopping the active hand from `onUsingTick`.
+- Restored the Warp Ward potion bonus to sticky-warp cleansing chance, raising the server-side chance from 33% to 58% while the potion is active.
+- Kept the existing temporary-warp removal and non-creative stack consumption behavior.
+
+Validation:
+
+- `./scripts/dev.sh compileJava` — passed.
+- `./scripts/dev.sh build` — passed.
+- `./scripts/dev.sh check-jar` — failed before jar inspection because the wrapper's expected MCP mapping cache file is still absent at `.gradle_home/caches/minecraft/de/oceanlabs/mcp/mcp_stable/39/1.12.2/srgs/mcp-srg.srg`.
+- `./scripts/dev.sh smoke-server` — failed by timeout before ready state; log again stopped after `Calling tweak class net.minecraftforge.fml.common.launcher.FMLServerTweaker`, with only Log4j console appender initialization errors. `run/crash-reports/` does not exist, and the configured crash-marker scan found no matches.
+- `./scripts/dev.sh smoke-client` — skipped because `DISPLAY` is unset in the current environment.
+
+Remaining limits:
+
+- Pure-fluid bonus chance remains blocked by the current absence of the original `blockFluidPure`/pure-water block in this port.
+- Client roots/craftstart sounds and bubble FX remain Stage 8 visual/audio work.
+- Manual soap-use validation still needs an in-world player scenario.
+
 ## Next Checkpoint Candidate
 
 After the golem carried-display, trunk transfer, death logging, fire-resistance, armor, water-pathing, no-drowning, melee-enchantment, upgrade-retaliation, target-range, animal-target-filter, butcher-acquisition, item-pickup-delay, essentia-jar-destination, liquid-target-tank, portal-support, outer-provider-spawn, outer-structure-query, outer-worldgen-ownership, Stage7-docs-refresh, hover-motion, biome policy, and Greatwood-support checkpoints, the next pre-Phase8 candidates are:
