@@ -87,8 +87,29 @@ Validation:
 Remaining limits:
 
 - Full research-note puzzle and aspect placement/erase interaction parity is still not implemented.
-- No-ink/copy GUI text-key parity is still open (`tile.researchtable.noink.*`, `tc.research.copy`).
+- No-ink/copy GUI paths still need manual runtime verification under client GUI checks.
 - Manual GUI runtime checks remain skipped under current constraints.
+
+### 2026-05-15 — Stage 8-b research GUI localization baseline
+
+Scope:
+
+- Added missing research/browser/table language keys from the 1.7.10 reference into `src/main/resources/assets/thaumcraft/lang/en_us.lang`.
+- Included the current Stage 8-b baseline set: `tc.researchmissing`, `tc.research.purchase`, `tc.research.short`, `tc.research.getprim`, `tc.research.shortprim`, `tc.research.hasnote`, `tc.research.popup`, `tc.research.copy`, `tc.research_category.BASICS`, `tc.research_category.THAUMATURGY`, `tc.research_category.ALCHEMY`, `tc.research_category.ARTIFICE`, `tc.research_category.GOLEMANCY`, `tc.research_category.ELDRITCH`, `tile.researchtable.noink.0`, `tile.researchtable.noink.1`.
+- Updated `docs/Stage8-b.md` GAP-13 and research-table notes to reflect that these baseline keys are now present while font/runtime verification remains open.
+
+Validation:
+
+- `./scripts/dev.sh validate --smoke` — passed: status, compile, tests `10/10`, jar, check-jar summary `5404` MCP leak lines / `1057` unique leaks, and server smoke.
+- `run/smoke-server.log` evidence: `Registering entities`; `Forge Mod Loader has successfully loaded 6 mods`; `Done (1.296s)!`.
+- Crash report scan under `run/` returned no files.
+- `./scripts/dev.sh smoke-client` — skipped because `DISPLAY=` and GUI/graphics/user-interactive validation is excluded.
+
+Remaining limits:
+
+- This checkpoint only adds localization keys; it does not complete research puzzle/interaction parity.
+- Research GUI special-font parity (`galFontRenderer` path vs current FontRenderer baseline) is still open.
+- Manual GUI visual/runtime checks remain skipped under current constraints.
 
 ### 2026-05-15 — Stage 8-b research support texture baseline
 

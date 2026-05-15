@@ -520,7 +520,7 @@ Finish `GuiResearchTable` parity: note puzzle surface, aspect/rune interactions,
 - Added `TileResearchTable` server-side `duplicate(EntityPlayer)` flow with completed-note checks, aspect-cost deduction via player knowledge capability, paper/feather consumption, note copy creation, and NBT persistence for `bonusAspects`.
 - Validation: `./scripts/dev.sh compileJava` passed; `./scripts/dev.sh validate --smoke` passed with tests `10/10`, jar/check-jar summary `5404` MCP leak lines / `1057` unique leaks, server smoke ready at `Done (1.276s)!`, and no crash reports under `run/`.
 - Client smoke/manual GUI checks were skipped because `DISPLAY=` and user-driven GUI/graphics validation is excluded for this run.
-- Remaining: full note puzzle/aspect placement logic parity and lang/text parity (`tile.researchtable.noink.*`, `tc.research.copy`).
+- Remaining: full note puzzle/aspect placement logic parity and manual runtime verification for no-ink/copy text paths.
 
 **Риски / зависимости:**
 Depends on current `ResearchNoteData`, aspect lists and `ContainerResearchTable` behavior. Full note-solving parity may require Stage 3/9 research data completion.
@@ -711,9 +711,9 @@ Resource path case changed from 1.7 `en_US.lang` style to 1.12 lowercase languag
 **Критичность:** high
 
 **Текущая реализация:**
-- `src/main/resources/assets/thaumcraft/lang/en_us.lang` now contains the existing container labels plus focus upgrade names/descriptions and `wandtable.text1..3` for `GuiFocalManipulator`.
+- `src/main/resources/assets/thaumcraft/lang/en_us.lang` now contains the existing container labels, focus upgrade names/descriptions, `wandtable.text1..3`, trunk GUI labels, and research/browser/table keys used by current Stage 8-b baselines (`tc.researchmissing`, `tc.research.purchase`, `tc.research.short`, `tc.research.getprim`, `tc.research.shortprim`, `tc.research.hasnote`, `tc.research.popup`, `tc.research.copy`, `tc.research_category.*`, `tile.researchtable.noink.0`, `tile.researchtable.noink.1`).
 - TrueType helper classes exist under `src/main/java/thaumcraft/truetyper/TrueTypeFont.java`, `Formatter.java`, `FontLoader.java`, `FontHelper.java`, but no Stage 8-b GUI currently uses them.
-- `src/main/java/thaumcraft/client/gui/**` has no research browser/table classes that would initialize the reference `galFontRenderer` fields.
+- `src/main/java/thaumcraft/client/gui/GuiResearchTable.java` and `GuiResearchBrowser.java` exist as baselines, but they currently render through standard `FontRenderer` and do not initialize the reference `galFontRenderer` path.
 
 **Референс:**
 - `Thaumcraft-1.7.10-4.2.3.5.jar!/assets/thaumcraft/lang/en_US.lang` contains GUI/research/trunk keys including `tc.research.copy`, `tile.researchtable.noink.0`, `tile.researchtable.noink.1`, `entity.trunk.guiname`, `entity.trunk.move`, `entity.trunk.stay`, `tc.research.shortprim`, `tc.research.short`, `tc.forbidden`, `tc.forbidden.level.*`, `tc.research.hasnote`, `tc.research.getprim`, `tc.research.purchase`, `tc.researchmissing`, `tc.research.popup`.
@@ -721,7 +721,7 @@ Resource path case changed from 1.7 `en_US.lang` style to 1.12 lowercase languag
 - `Thaumcraft-1.7.10-4.2.3.5.jar!/truetyper/**` provides the reference font helpers.
 
 **Что не совпадает:**
-Current localization is insufficient for research browser/table, trunk controls, no-ink messages, forbidden/locked research states, and other GUI labels. Font helper code exists, but the research GUIs that use special fonts are absent, so font parity is unverified.
+Research/browser/table baseline localization keys are now present, but runtime/manual GUI verification is still pending under current `DISPLAY=` constraints. Font helper code exists, but the reference special-font path is not wired/verified in the current 1.12.2 research GUIs.
 
 **Что нужно доделать:**
 Add all Stage 8-b lang keys used by ported GUI code and verify the research font path initializes/render text correctly in 1.12.2.
