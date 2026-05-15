@@ -444,7 +444,8 @@ Finish Thaumonomicon research-browser parity: category map, node interactions, r
 - Done: add `GuiResearchBrowser`, `GuiResearchRecipe`, and `GuiResearchPopup` baseline screens.
 - Done: route `GUI_THAUMONOMICON` case `12` to `new GuiResearchBrowser()` in `ClientProxy#getClientGuiElement` while keeping server element null.
 - Done: copy direct baseline GUI textures used by these screens (`gui_research.png`, `gui_researchbook.png`, `gui_researchbook_overlay.png`).
-- Remaining: copy extended research textures (`gui_researchback*.png`, `hex*.png`) and direct support textures from `textures/misc/**` / `textures/aspects/**` required for full parity rendering.
+- Done: copy extended research textures used by reference research flows (`gui_researchback.png`, `gui_researchbackeldritch.png`, `hex1.png`, `hex2.png`, `hud.png`).
+- Remaining: full wiring to reference rendering logic plus any additional direct support textures discovered during full parity port.
 - Add required lang keys from reference `en_US.lang` into `src/main/resources/assets/thaumcraft/lang/en_us.lang` using 1.12 lowercase locale path.
 - Scenario: right-click Thaumonomicon, switch categories, click known and locked research entries, open recipe page.
 
@@ -494,7 +495,8 @@ Finish `GuiResearchTable` parity: note puzzle surface, aspect/rune interactions,
 - Done: add baseline `src/main/java/thaumcraft/client/gui/GuiResearchTable.java`.
 - Done: route `GUI_RESEARCH_TABLE` to `TileResearchTable`.
 - Done: copy `guiresearchtable2.png`.
-- Remaining: copy `hex1.png`, `hex2.png`, aspect back/unknown textures, `parchment3.png`, `script.png` and any directly used research GUI misc textures.
+- Done: copy `hex1.png`, `hex2.png`, `parchment3.png`, and `script.png` (`script.png.mcmeta` included).
+- Remaining: full wiring for advanced note/rune/aspect rendering and any additional direct support resources discovered during parity work.
 - Add reference lang keys such as `tc.research.copy`, `tile.researchtable.noink.0`, `tile.researchtable.noink.1`.
 - Scenario: open research table with no note, with a note, with ink missing, and attempt aspect/rune interaction.
 
@@ -646,8 +648,8 @@ Inventory-slot blocking is behavior-sensitive and can cause item loss/duplicatio
 **Критичность:** blocker
 
 **Текущая реализация:**
-- `src/main/resources/assets/thaumcraft/textures/gui/` now contains `gui_thaumatorium.png`, `gui_arcaneworkbench.png`, `gui_arcanebore.png`, `gui_wandtable.png`, `gui_decontable.png`, `gui_alchemyfurnace.png`, `gui_spa.png`, `guitrunkbase.png`, `guigolem.png`, `gui_pech.png`, `guiresearchtable2.png`, `gui_research.png`, `gui_researchbook.png`, `gui_researchbook_overlay.png`, `gui_focuspouch.png`, `guihandmirror.png`, and `guihoverharness.png`.
-- `src/main/resources/assets/thaumcraft/textures/misc/potions.png` is the only current `textures/misc` file found.
+- `src/main/resources/assets/thaumcraft/textures/gui/` now contains `arcane.png`, `gui_thaumatorium.png`, `gui_arcaneworkbench.png`, `gui_arcanebore.png`, `gui_wandtable.png`, `gui_decontable.png`, `gui_alchemyfurnace.png`, `gui_spa.png`, `guitrunkbase.png`, `guigolem.png`, `gui_pech.png`, `guiresearchtable2.png`, `gui_research.png`, `gui_researchbook.png`, `gui_researchbook_overlay.png`, `gui_researchback.png`, `gui_researchbackeldritch.png`, `hex1.png`, `hex2.png`, `hud.png`, `gui_focuspouch.png`, `guihandmirror.png`, and `guihoverharness.png`.
+- `src/main/resources/assets/thaumcraft/textures/misc/` now contains `potions.png`, `parchment3.png`, `script.png`, and `script.png.mcmeta`.
 - `src/main/resources/assets/thaumcraft/textures/aspects/**` now contains the original aspect icon set copied for Thaumatorium/aspect GUI rendering.
 
 **Референс:**
@@ -675,7 +677,7 @@ Inventory-slot blocking is behavior-sensitive and can cause item loss/duplicatio
 - Research support textures under `thaumcraft_src/assets/thaumcraft/textures/misc/**` and aspect icons under `thaumcraft_src/assets/thaumcraft/textures/aspects/**`.
 
 **Что не совпадает:**
-The texture resource tree now covers the newly ported Thaumatorium, Arcane Workbench, Arcane Bore, Focal Manipulator, Deconstruction Table, Alchemy Furnace, Golem, Pech, Traveling Trunk, Research Table/Browser baselines, Spa, Focus Pouch, Hand Mirror, Hover Harness, and aspect-icon paths, but remaining advanced research GUI textures and direct research misc support textures are still absent.
+The texture resource tree now covers the newly ported Thaumatorium, Arcane Workbench, Arcane Bore, Focal Manipulator, Deconstruction Table, Alchemy Furnace, Golem, Pech, Traveling Trunk, Research Table/Browser baselines, Spa, Focus Pouch, Hand Mirror, Hover Harness, core research GUI backgrounds, and aspect-icon paths. Remaining gaps are primarily advanced research-flow rendering/resource wiring parity rather than missing baseline files.
 
 **Что нужно доделать:**
 Copy original GUI and directly used support textures from `thaumcraft_src/assets/` to `src/main/resources/assets/thaumcraft/`.

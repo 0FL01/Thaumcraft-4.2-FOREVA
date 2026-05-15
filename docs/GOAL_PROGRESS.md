@@ -67,6 +67,25 @@ Branch: `codex/durable-goal-stage8-9`
 
 ## Checkpoint Log
 
+### 2026-05-15 — Stage 8-b research support texture baseline
+
+Scope:
+
+- Copied additional reference research GUI textures: `arcane.png`, `gui_researchback.png`, `gui_researchbackeldritch.png`, `hex1.png`, `hex2.png`, `hud.png`.
+- Copied direct reference research misc textures: `parchment3.png`, `script.png`, and `script.png.mcmeta`.
+- Updated `docs/Stage8-b.md` GAP-12 and research-GUI gap notes to reflect the expanded resource baseline and remaining parity wiring limits.
+
+Validation:
+
+- `./scripts/dev.sh validate --smoke` — passed: status, compile, tests `10/10`, jar, check-jar summary `5380` MCP leak lines / `1057` unique leaks, and server smoke.
+- `run/smoke-server.log` evidence: `Registering entities`; `Forge Mod Loader has successfully loaded 6 mods`; `Done (1.147s)!`.
+- Crash report scan under `run/` returned no files.
+
+Remaining limits:
+
+- Research Table and Thaumonomicon advanced behavior is still baseline-only; texture presence does not imply full rendering/interaction parity.
+- Manual GUI visual checks remain skipped under current `DISPLAY=` / user-interaction constraints.
+
 ### 2026-05-15 — Stage 8-b Research Table and Thaumonomicon GUI baseline
 
 Scope:
