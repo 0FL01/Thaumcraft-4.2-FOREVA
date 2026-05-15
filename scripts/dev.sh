@@ -303,8 +303,8 @@ smoke_server() {
       -e JAVA_TOOL_OPTIONS="$log4j_arg" \
       --user "$(id -u):$(id -g)" \
       --entrypoint ./gradlew \
-      "$IMAGE" runServer -x getAssets --no-daemon 2>&1 | tee "$log"
-    printf '%s' "${PIPESTATUS[0]}" > "$status_file"
+      "$IMAGE" runServer -x getAssets --no-daemon --console=plain > "$log" 2>&1
+    printf '%s' "$?" > "$status_file"
   ) &
   local runner_pid="$!"
   set -e
@@ -420,8 +420,8 @@ smoke_client() {
 
   set +e
   timeout "$SMOKE_TIMEOUT" docker run "${docker_args[@]}" \
-    "$IMAGE" runClient -x getAssets 2>&1 | tee "$log"
-  local status="${PIPESTATUS[0]}"
+    "$IMAGE" runClient -x getAssets --console=plain > "$log" 2>&1
+  local status="$?"
   set -e
 
   local markers
