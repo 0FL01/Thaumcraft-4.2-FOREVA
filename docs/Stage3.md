@@ -795,7 +795,31 @@ Validation run for this closure:
 
 Remaining documented dependencies/deferrals after Stage 3 closure:
 
-- Full Phase 9 research/content registration and research-note gameplay remain Phase 9/content work; Stage 3 backend completes and syncs registered keys without API changes.
+- Full Phase 9 research/content registration and research-table gameplay remain Phase 9/content work; Stage 3 backend completes and syncs registered keys without API changes, and the 2026-05-15 checkpoint below restores the research-note NBT/use baseline.
 - Manual in-game scenario matrix for death/End clone, relog/restart with populated player data, scan item/entity/node, live wand/amulet costs, runic damage/recharge, and potion/enchantment effects is still recommended before claiming full gameplay parity beyond the fresh-world core checkpoint.
 - `TileVisRelay` is a minimal Stage 3 server relay for Vis Amulet charging; full relay block interaction visuals/consume FX remain Stage 4/Phase 8 validation work.
 - Champion mob runic shielding remains a Stage 6 entity/champion dependency; Stage 3 closure covers player runic shielding only.
+
+## 10. Research Notes Checkpoint, 2026-05-15
+
+Implemented in the current checkpoint:
+
+- Added `ResearchNoteData` with the original note fields `key`, `color`, `complete`, `copies`, `hexEntries`, and `hexes`.
+- Added research-note NBT read/write helpers using the original keys `key`, `color`, `complete`, `copies`, `hexgrid`, `hexq`, `hexr`, `type`, and `aspect`.
+- Restored the solved-note completion gate: right-click only completes research when note data is present, marked complete, not already known, and the player has requisites.
+- Restored sibling completion and the reference learn/write/erase sound paths for completed notes and unknown discovery reveal/failure.
+- Added hidden-research discovery selection from registered hidden entries with item/entity/aspect triggers.
+
+Validation evidence for this checkpoint:
+
+- Reference source inspected through the original jar bytecode for `ItemResearchNotes`, `ResearchNoteData`, and `ResearchManager`.
+- `./scripts/dev.sh compileJava` — passed.
+- `./scripts/dev.sh test` — initially failed because a new test instantiated `ItemStack` before Minecraft item bootstrap; coverage was moved to plain NBT helpers, then passed.
+- `./scripts/dev.sh validate --smoke` — passed: compile, tests `10/10`, jar, compact `check-jar` MCP leak summary, and server smoke readiness.
+- `run/smoke-server.log` reached `Done (1.353s)!`; no crash reports were found under `run/`.
+
+Remaining limits:
+
+- This does not port the full reference hex-grid generation/solving algorithm, clue creation, Research Table GUI flow, or full research content registration.
+- Current `ConfigResearch.init()` remains Phase 9 content scope, so hidden-discovery reveal depends on later registered hidden research entries.
+- Manual research-note completion, discovery reveal, and Research Table gameplay scenarios remain unvalidated because user-driven/manual validation is excluded.

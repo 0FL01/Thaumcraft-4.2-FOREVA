@@ -5,9 +5,13 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.nbt.CompressedStreamTools;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTTagList;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.item.ItemStack;
+import net.minecraft.world.World;
 import net.minecraft.world.storage.ISaveHandler;
 import net.minecraft.world.storage.SaveHandler;
+import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import thaumcraft.api.ThaumcraftApi;
 import thaumcraft.api.aspects.Aspect;
@@ -31,6 +35,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
@@ -39,6 +44,17 @@ public class ResearchManager {
 
     // Cache of player research data (server-side)
     private static final Map<String, IPlayerKnowledge> playerDataCache = new HashMap<>();
+    private static List<ResearchItem> allHiddenResearch;
+
+    public static class HexEntry {
+        public Aspect aspect;
+        public int type;
+
+        public HexEntry(Aspect aspect, int type) {
+            this.aspect = aspect;
+            this.type = type;
+        }
+    }
 
     /**
      * Check if a player has completed a specific research.
@@ -313,6 +329,136 @@ public class ResearchManager {
             }
         }
         return out;
+    }
+
+    public static String findHiddenResearch(EntityPlayer player) {
+        if (player == null || player.world == null) return "FAIL";
+        if (allHiddenResearch == null) {
+            allHiddenResearch = new ArrayList<>();
+            for (ResearchCategoryList category : ResearchCategories.researchCategories.values()) {
+                for (ResearchItem research : category.research.values()) {
+                    if (research != null && research.isHidden() && hasUsableResearchTags(research)) {
+                        allHiddenResearch.add(research);
+                    }
+                }
+            }
+        }
+
+        ArrayList<String> candidates = new ArrayList<>();
+        for (ResearchItem research : allHiddenResearch) {
+            if (research == null) continue;
+            if (isResearchComplete(player.getName(), research.key)) continue;
+            if (!doesPlayerHaveRequisites(player.getName(), research.key)) continue;
+            if (research.getItemTriggers() == null && research.getEntityTriggers() == null && research.getAspectTriggers() == null) {
+                continue;
+            }
+            candidates.add(research.key);
+        }
+        if (candidates.isEmpty()) return "FAIL";
+        int pick = new java.util.Random(player.world.getTotalWorldTime() / 50L).nextInt(candidates.size());
+        return candidates.get(pick);
+    }
+
+    public static ItemStack createNote(ItemStack stack, String key, World world) {
+        if (stack == null || stack.isEmpty() || key == null || key.isEmpty()) return ItemStack.EMPTY;
+        ResearchItem research = ResearchCategories.getResearch(key);
+        Aspect primary = getResearchPrimaryTag(research);
+        if (research == null || primary == null) return ItemStack.EMPTY;
+        if (!stack.hasTagCompound()) {
+            stack.setTagCompound(new NBTTagCompound());
+        }
+        NBTTagCompound tag = stack.getTagCompound();
+        tag.setString("key", key);
+        tag.setInteger("color", primary.getColor());
+        tag.setBoolean("complete", false);
+        tag.setInteger("copies", 0);
+
+        NBTTagList hexGrid = new NBTTagList();
+        Aspect[] aspects = research.tags == null ? new Aspect[0] : research.tags.getAspects();
+        for (int i = 0; i < aspects.length; i++) {
+            Aspect aspect = aspects[i];
+            if (aspect == null) continue;
+            NBTTagCompound hex = new NBTTagCompound();
+            hex.setByte("hexq", (byte)i);
+            hex.setByte("hexr", (byte)0);
+            hex.setByte("type", (byte)1);
+            hex.setString("aspect", aspect.getTag());
+            hexGrid.appendTag(hex);
+        }
+        tag.setTag("hexgrid", hexGrid);
+        return stack;
+    }
+
+    public static ResearchNoteData getData(ItemStack stack) {
+        if (stack == null || stack.isEmpty() || !stack.hasTagCompound()) return null;
+        return readNoteData(stack.getTagCompound());
+    }
+
+    static ResearchNoteData readNoteData(NBTTagCompound tag) {
+        if (tag == null) return null;
+        ResearchNoteData data = new ResearchNoteData();
+        data.key = tag.getString("key");
+        data.color = tag.getInteger("color");
+        data.complete = tag.getBoolean("complete");
+        data.copies = tag.getInteger("copies");
+
+        NBTTagList hexGrid = tag.getTagList("hexgrid", Constants.NBT.TAG_COMPOUND);
+        for (int i = 0; i < hexGrid.tagCount(); i++) {
+            NBTTagCompound hexTag = hexGrid.getCompoundTagAt(i);
+            int q = hexTag.getByte("hexq");
+            int r = hexTag.getByte("hexr");
+            int type = hexTag.getByte("type");
+            Aspect aspect = Aspect.getAspect(hexTag.getString("aspect"));
+            ResearchNoteData.HexCoord hex = new ResearchNoteData.HexCoord(q, r);
+            String hexKey = hex.toString();
+            data.hexes.put(hexKey, hex);
+            data.hexEntries.put(hexKey, new HexEntry(aspect, type));
+        }
+        return data;
+    }
+
+    public static void updateData(ItemStack stack, ResearchNoteData data) {
+        if (stack == null || stack.isEmpty() || data == null) return;
+        if (!stack.hasTagCompound()) {
+            stack.setTagCompound(new NBTTagCompound());
+        }
+        writeNoteData(stack.getTagCompound(), data);
+    }
+
+    static void writeNoteData(NBTTagCompound tag, ResearchNoteData data) {
+        if (tag == null || data == null) return;
+        tag.setString("key", data.key == null ? "" : data.key);
+        tag.setInteger("color", data.color);
+        tag.setBoolean("complete", data.complete);
+        tag.setInteger("copies", data.copies);
+
+        NBTTagList hexGrid = new NBTTagList();
+        for (ResearchNoteData.HexCoord hex : data.hexes.values()) {
+            String hexKey = hex.toString();
+            HexEntry entry = data.hexEntries.get(hexKey);
+            if (entry == null) continue;
+            NBTTagCompound hexTag = new NBTTagCompound();
+            hexTag.setByte("hexq", (byte)hex.q);
+            hexTag.setByte("hexr", (byte)hex.r);
+            hexTag.setByte("type", (byte)entry.type);
+            if (entry.aspect != null) {
+                hexTag.setString("aspect", entry.aspect.getTag());
+            }
+            hexGrid.appendTag(hexTag);
+        }
+        tag.setTag("hexgrid", hexGrid);
+    }
+
+    private static boolean hasUsableResearchTags(ResearchItem research) {
+        return research.tags != null && getResearchPrimaryTag(research) != null;
+    }
+
+    private static Aspect getResearchPrimaryTag(ResearchItem research) {
+        if (research == null || research.tags == null) return null;
+        for (Aspect aspect : research.tags.getAspects()) {
+            if (aspect != null) return aspect;
+        }
+        return null;
     }
 
     public static void syncWarp(EntityPlayer player) {

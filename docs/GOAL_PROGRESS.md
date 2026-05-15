@@ -1683,6 +1683,29 @@ Remaining limits:
 - Pure Fluid placement, pickup, Warp Ward collision, and Sanity Soap pure-fluid cleanse bonus still need in-world/manual scenario evidence; user-driven manual validation remains out of scope.
 - Pure Fluid client particles/sounds and full fluid visual parity remain Stage 8 client work.
 
+### 2026-05-15 — Stage 3/5 Research Notes NBT and use baseline
+
+Scope:
+
+- Added `ResearchNoteData` and research-note NBT helpers preserving original keys for `key`, `color`, `complete`, `copies`, and `hexgrid` entries.
+- Changed `ItemResearchNotes` so right-click research completion requires solved note data (`complete=true`) and requisite checks instead of granting any stack with a `key` tag.
+- Restored sibling completion for solved notes, hidden-discovery reveal/failure handling, knowledge fragment fallback, learn/write/erase sounds, and the note/discovery rarity split.
+- Added localization for research-note invalid/requisite/forbidden messages used by the restored paths.
+
+Validation:
+
+- Original behavior inspected from `Thaumcraft-1.7.10-4.2.3.5.jar` with `javap` for `ItemResearchNotes`, `ResearchNoteData`, and `ResearchManager`.
+- `./scripts/dev.sh compileJava` — passed.
+- `./scripts/dev.sh test` — initially failed because a new unit test instantiated `ItemStack` before Minecraft item bootstrap; the test was adjusted to cover the plain NBT helpers directly, then passed.
+- `./scripts/dev.sh validate --smoke` — passed: `compileJava`, tests `10/10`, jar, compact MCP leak summary `5161` lines / `1028` unique leaks, and server smoke readiness.
+- Server smoke evidence: `run/smoke-server.log` contained `Registering entities` at line `108`, `Forge Mod Loader has successfully loaded 6 mods` at line `126`, and `Done (1.353s)!` at line `138`; no crash reports were present under `run/`.
+- `./scripts/dev.sh smoke-client` — skipped because `DISPLAY` is unset in the current environment.
+
+Remaining limits:
+
+- This does not port the full reference hex-grid generation/solving algorithm, clue creation, Research Table GUI flow, or Phase 9 research content registration.
+- Manual solved-note completion, hidden-discovery reveal, and research-table scenarios remain unvalidated because user-driven/manual validation is out of scope.
+
 ### 2026-05-15 — Stage 6 registration smoke evidence
 
 Scope:

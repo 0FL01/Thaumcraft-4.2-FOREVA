@@ -1161,3 +1161,23 @@ Validation evidence for this checkpoint:
 - `./scripts/dev.sh smoke-client` — skipped because `DISPLAY` is unset in the current environment.
 
 GAP-11 is advanced but not closed. Pure Fluid placement, bucket pickup, Warp Ward collision, and Sanity Soap pure-fluid cleanse bonus still need runtime/manual scenario evidence. Pure Fluid particles/sounds and full fluid visual parity remain Phase 8 client work.
+
+### 8.25 2026-05-15 Research Notes NBT/use checkpoint
+
+Implemented in the current checkpoint:
+
+- Added the missing `ResearchNoteData` carrier used by the original research-note flow.
+- Added `ResearchManager.getData(...)`, `updateData(...)`, `createNote(...)`, and `findHiddenResearch(...)` baselines preserving the original note NBT keys.
+- Replaced the simplified `ItemResearchNotes` right-click path that granted any stack with a `key` tag. Research is now granted only from solved note data (`complete=true`) after requisite checks.
+- Restored sibling completion for solved notes and the unknown-discovery reveal/failure server paths, including knowledge fragment fallback and learn/write/erase sounds.
+- Restored research-note rarity split: notes are rare, discoveries are epic.
+
+Validation evidence for this checkpoint:
+
+- Original behavior was inspected from `Thaumcraft-1.7.10-4.2.3.5.jar` with `javap` for `ItemResearchNotes`, `ResearchNoteData`, and `ResearchManager`.
+- `./scripts/dev.sh compileJava` — passed.
+- `./scripts/dev.sh test` — initially failed because a new test instantiated `ItemStack` before Minecraft item bootstrap; the test was adjusted to cover the NBT helpers directly, then passed.
+- `./scripts/dev.sh validate --smoke` — passed: compile, tests `10/10`, jar, compact `check-jar` summary, and server smoke readiness.
+- Server smoke evidence: `run/smoke-server.log` reached `Done (1.353s)!`; no crash reports were present under `run/`.
+
+GAP-11 is advanced but not closed. Full research-note puzzle generation/solving, Research Table GUI flow, complete research content registration, and manual in-world note/discovery scenarios remain open Stage 3/Stage 8/Stage 9 dependencies.
