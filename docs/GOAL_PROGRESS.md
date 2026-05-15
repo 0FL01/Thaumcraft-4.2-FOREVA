@@ -67,6 +67,29 @@ Branch: `codex/durable-goal-stage8-9`
 
 ## Checkpoint Log
 
+### 2026-05-15 — Stage 9-c infusion golem/core/device baseline
+
+Scope:
+
+- Expanded Stage 9-c GAP-1 with a tightly coupled golem/core/device infusion subset:
+  - `AdvancedGolem`, `CoreAlchemy`, `CoreSorting`, `CoreLumber`, `CoreFishing`, `CoreUse`
+  - `ArcaneBore`, `LampGrowth`, `LampFertility`, `EssentiaReservoir`
+- Added support for reference object-output infusion entry (`AdvancedGolem`) via helper accepting `Object` result payload (`{"advanced", NBTTagByte(1)}`).
+- Preserved reference keys/research gates/instability/aspect formulas/central inputs/components for this subset.
+- Refreshed infusion key audit: unresolved reference infusion crafting keys reduced from `42` to `32`.
+
+Validation:
+
+- `./scripts/dev.sh validate --smoke` — passed: status, compile, tests `10/10`, jar, check-jar summary `5570` MCP leak lines / `1095` unique leaks, and server smoke.
+- `run/smoke-server.log` evidence: `Registering entities`; `Forge Mod Loader has successfully loaded 6 mods`; `Done (1.222s)!`.
+- Crash report scan under `run/` returned no files.
+- `./scripts/dev.sh smoke-client` — skipped because `DISPLAY=` and GUI/graphics/user-interactive validation is excluded.
+
+Remaining limits:
+
+- Stage 9-c infusion crafting coverage remains incomplete (`32` keys outstanding by reference key audit), including runic/armor/tool/bauble progression groups and `TravelTrunk`.
+- Runtime/research-page verification matrix is still open.
+
 ### 2026-05-15 — Stage 9-c infusion focus/device/mirror baseline
 
 Scope:

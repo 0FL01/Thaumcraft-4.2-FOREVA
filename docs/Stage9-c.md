@@ -68,8 +68,10 @@ Reference `ConfigRecipes.initializeArcaneRecipes()` регистрирует 63 
 - `FocusHellbat`, `FocusPortableHole`, `FocusWarding`;
 - `WandPed`, `WandPedFocus`, `NodeStabilizerAdv`, `JarBrain`;
 - optional mirror branch under `Config.allowMirrors`: `Mirror`, `MirrorHand`, `MirrorEssentia`.
+- `AdvancedGolem`, `CoreAlchemy`, `CoreSorting`, `CoreLumber`, `CoreFishing`, `CoreUse`;
+- `ArcaneBore`, `LampGrowth`, `LampFertility`, `EssentiaReservoir`.
 
-These entries preserve reference keys/research/instability/aspect formulas and `ConfigResearch.recipes` handle writes, but full infusion coverage is still open. Current key audit leaves 42 unresolved infusion crafting keys.
+These entries preserve reference keys/research/instability/aspect formulas and `ConfigResearch.recipes` handle writes, but full infusion coverage is still open. Current key audit leaves 32 unresolved infusion crafting keys.
 
 Reference set включает как минимум recipe keys/outputs из decompiled `ConfigRecipes.class`: wand caps/rods (`WandCapSilver`, `WandCapThaumium`, `WandCapVoid`, `WandRodObsidian`, `WandRodIce`, `WandRodQuartz`, `WandRodReed`, `WandRodBlaze`, `WandRodBone`, `WandRodSilverwood`, `WandRodPrimalStaff`), foci (`FocusHellbat`, `FocusPortableHole`, `FocusWarding`), blocks/devices (`WandPed`, `WandPedFocus`, `NodeStabilizerAdv`, `JarBrain`, `ArcaneBore`, `LampGrowth`, `LampFertility`, `EssentiaReservoir`), golem/core recipes (`AdvancedGolem`, `CoreAlchemy`, `CoreSorting`, `CoreLumber`, `CoreFishing`, `CoreUse`), baubles/runic/flight (`HoverHarness`, `HoverGirdle`, `VisAmulet`, `RunicAmulet`, `RunicAmuletEmergency`, `RunicRing`, `RunicRingCharged`, `RunicRingHealing`, `RunicGirdle`, `RunicGirdleKinetic`, `RunicGirdleKinetic_2`), optional mirrors under `Config.allowMirrors`, elemental tools, armor/robes/masks, `SanityCheck`, `SinStone`, `PrimalCrusher`, `EldritchEye`.
 
