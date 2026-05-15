@@ -415,6 +415,11 @@ Keep documenting the 1.12.2-compatible policy for numeric biome IDs, and verify 
 **Риски / зависимости:**
 Client-side biome color validation overlaps Stage 8 rendering, but server spawn/decorator and biome dictionary behavior are Stage 7.
 
+**Checkpoint 2026-05-15 — Greatwood biome-support flag:**
+`BiomeHandler.getBiomeSupportsGreatwood(...)` now matches the reference behavior by ignoring biome dictionary entries whose registered greatwood-support flag is false. This prevents mixed-tag biomes such as wet/swamp or hot/savanna from losing their Greatwood chance when a non-supporting tag is encountered before a supporting tag.
+
+Remaining GAP-8 limits after this checkpoint: `getBiomeAura(...)`, `getRandomBiomeTag(...)`, biome decoration/spawn behavior, and biome color/debug overlay behavior still need runtime/client evidence before GAP-8 can close.
+
 ### GAP-9: Tree, plant, and ore generation probabilities/placement differ from reference
 
 **Статус:** частично реализовано  

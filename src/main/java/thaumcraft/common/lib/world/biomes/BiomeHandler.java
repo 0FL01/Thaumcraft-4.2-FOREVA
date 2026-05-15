@@ -53,7 +53,7 @@ public class BiomeHandler {
         Set<BiomeDictionary.Type> types = BiomeDictionary.getTypes(biome);
         for (BiomeDictionary.Type type : types) {
             List info = biomeInfo.get(type);
-            if (info != null) {
+            if (info != null && Boolean.TRUE.equals(info.get(2))) {
                 return (float) info.get(3);
             }
         }
