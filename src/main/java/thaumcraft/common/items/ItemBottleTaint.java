@@ -28,7 +28,9 @@ public class ItemBottleTaint extends Item implements IScribeTools {
         ItemStack stack = player.getHeldItem(hand);
         world.playSound(null, player.posX, player.posY, player.posZ, SoundEvents.ENTITY_ARROW_SHOOT, SoundCategory.PLAYERS, 0.5F, 0.4F / (world.rand.nextFloat() * 0.4F + 0.8F));
         if (!world.isRemote) {
-            world.spawnEntity(new EntityBottleTaint(world, player));
+            EntityBottleTaint bottle = new EntityBottleTaint(world, player);
+            bottle.shoot(player, player.rotationPitch, player.rotationYaw, -20.0F, 0.5F, 1.0F);
+            world.spawnEntity(bottle);
             if (!player.capabilities.isCreativeMode) {
                 stack.shrink(1);
             }

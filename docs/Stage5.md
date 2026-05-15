@@ -1103,3 +1103,21 @@ Validation evidence for this checkpoint:
 - `./scripts/dev.sh smoke-client` — skipped because `DISPLAY` is unset in the current environment.
 
 GAP-6 is advanced but not closed. Remaining Resonator limits are the original CCL sub-hit retrace for exact tube-face diagnostics and manual checks against jars, alembics, tubes, and buffers.
+
+### 8.22 2026-05-15 Taint Bottle projectile checkpoint
+
+Implemented in the current checkpoint:
+
+- Restored explicit Forge 1.12 projectile launch for `ItemBottleTaint` by calling `EntityBottleTaint.shoot(...)` before spawning.
+- Matched the original launch constants from the 1.7.10 throwable path: `-20.0F` pitch offset, `0.5F` velocity, and `1.0F` inaccuracy.
+- Kept the existing server-side `EntityBottleTaint` impact behavior unchanged.
+
+Validation evidence for this checkpoint:
+
+- `./scripts/dev.sh compileJava` — passed.
+- `./scripts/dev.sh build` — passed.
+- `./scripts/dev.sh check-jar` — failed before jar inspection because the wrapper's expected MCP mapping cache file is still absent at `.gradle_home/caches/minecraft/de/oceanlabs/mcp/mcp_stable/39/1.12.2/srgs/mcp-srg.srg`.
+- `./scripts/dev.sh smoke-server` — passed; the server reached `Done (1.282s)!`, the configured crash-marker scan only found the ready-state line, and no crash reports were present.
+- `./scripts/dev.sh smoke-client` — skipped because `DISPLAY` is unset in the current environment.
+
+GAP-11 is advanced but not closed. Taint Bottle still needs manual projectile flight, impact, biome-taint, fibre-placement, and entity-poison scenario checks. Original client-side taintsplosion and bottle-break FX remain Phase 8 visual work.

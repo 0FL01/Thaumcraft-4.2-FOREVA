@@ -1594,11 +1594,32 @@ Remaining limits:
 - The old CCL sub-hit retrace for per-tube-face diagnostics is not restored in this checkpoint; current output uses the clicked block side exposed by Forge's item-use callback.
 - Manual diagnostics against jars, alembics, tubes, and tube buffers remain open.
 
+### 2026-05-15 — Stage 5 Taint Bottle projectile launch
+
+Scope:
+
+- Restored Forge 1.12 projectile launch for `ItemBottleTaint` by calling `EntityBottleTaint.shoot(...)` before spawning the entity.
+- Preserved the original reference launch profile: `-20.0F` pitch offset, `0.5F` velocity, and `1.0F` inaccuracy.
+- Left the existing server-side impact behavior in `EntityBottleTaint` unchanged.
+
+Validation:
+
+- `./scripts/dev.sh compileJava` — passed.
+- `./scripts/dev.sh build` — passed.
+- `./scripts/dev.sh check-jar` — failed before jar inspection because the wrapper's expected MCP mapping cache file is still absent at `.gradle_home/caches/minecraft/de/oceanlabs/mcp/mcp_stable/39/1.12.2/srgs/mcp-srg.srg`.
+- `./scripts/dev.sh smoke-server` — passed; the server reached `Done (1.282s)!`, the configured crash-marker scan only found the ready-state line, and no crash reports were present.
+- `./scripts/dev.sh smoke-client` — skipped because `DISPLAY` is unset in the current environment.
+
+Remaining limits:
+
+- Manual projectile flight, impact, biome-taint, fibre-placement, and entity-poison scenario checks remain open.
+- Original client-side taintsplosion and bottle-break FX remain Phase 8 client visual work.
+
 ## Next Checkpoint Candidate
 
 After the golem carried-display, trunk transfer, death logging, fire-resistance, armor, water-pathing, no-drowning, melee-enchantment, upgrade-retaliation, target-range, animal-target-filter, butcher-acquisition, item-pickup-delay, essentia-jar-destination, liquid-target-tank, portal-support, outer-provider-spawn, outer-structure-query, outer-worldgen-ownership, Stage7-docs-refresh, hover-motion, biome policy, and Greatwood-support checkpoints, the next pre-Phase8 candidates are:
 
-- Remaining Stage 5 low-risk Hover Harness/common-layer item fixes, if they can be validated without GUI/client control.
+- Remaining Stage 5 low-risk Hover Harness/common-layer item and utility/relic fixes, if they can be validated without GUI/client control.
 - Remaining Stage 6 selected low-risk golem AI helper fixes, if they can be kept server-safe.
 - Remaining Stage 7 surface/worldgen runtime evidence and broader biome blacklist edge cases.
 - Remaining Stage 7 Outer Lands room/tile behavior, especially key/boss room traversal, boss-room runtime/save evidence, and maze save/load race validation.
