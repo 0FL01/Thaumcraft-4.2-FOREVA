@@ -995,9 +995,30 @@ Remaining limits:
 - Actual visual/render parity for displayed carried stacks remains Phase 8 work.
 - Death logging and bootup client sound parity remain open.
 
+### 2026-05-15 — Stage 6 golem death logging
+
+Scope:
+
+- Restored the original server-side golem death log hook in `EntityGolemBase.onDeath(...)`.
+- Logged the golem instance, true damage source, and damage type before vanilla death handling, matching the reference diagnostic behavior with Forge 1.12 accessors.
+
+Validation:
+
+- `./scripts/dev.sh compileJava` — passed.
+- `./scripts/dev.sh build` — passed.
+- `./scripts/dev.sh check-jar` — failed before jar inspection because the wrapper's expected MCP mapping cache file is still absent at `.gradle_home/caches/minecraft/de/oceanlabs/mcp/mcp_stable/39/1.12.2/srgs/mcp-srg.srg`.
+- `./scripts/dev.sh smoke-server` — failed by timeout before ready state; log again stopped after `Calling tweak class net.minecraftforge.fml.common.launcher.FMLServerTweaker`, with only Log4j console appender initialization errors. `run/crash-reports/` does not exist, and the configured crash-marker scan found no matches. This matches the clean `da3f307` baseline reproduction recorded above.
+- `git diff --check` — passed.
+
+Remaining limits:
+
+- Runtime confirmation of the emitted golem death log remains unavailable while smoke-server is blocked before ready state and user-driven manual scenarios are excluded.
+- Bootup client sound parity remains open and belongs with Phase 8 client/visual work.
+- Full per-core golem AI runtime scenarios remain open.
+
 ## Next Checkpoint Candidate
 
-After the golem carried-display and trunk transfer checkpoints, the next pre-Phase8 candidates are:
+After the golem carried-display, trunk transfer, and death logging checkpoints, the next pre-Phase8 candidates are:
 
 - Remaining Stage 6 selected low-risk golem AI helper fixes, if they can be kept server-safe.
 - Remaining Stage 7 surface/worldgen runtime evidence and broader biome blacklist edge cases.

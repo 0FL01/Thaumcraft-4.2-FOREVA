@@ -1,5 +1,6 @@
 package thaumcraft.common.entities.golems;
 
+import thaumcraft.common.Thaumcraft;
 import thaumcraft.common.lib.TCSounds;
 
 public class EntityGolemBase extends net.minecraft.entity.monster.EntityGolem implements net.minecraftforge.fml.common.registry.IEntityAdditionalSpawnData {
@@ -670,6 +671,14 @@ public class EntityGolemBase extends net.minecraft.entity.monster.EntityGolem im
         if (source == net.minecraft.util.DamageSource.IN_WALL) return false;
         if (this.getGolemType() == EnumGolemType.THAUMIUM && source == net.minecraft.util.DamageSource.MAGIC) amount *= 0.5f;
         return super.attackEntityFrom(source, amount);
+    }
+
+    @Override
+    public void onDeath(net.minecraft.util.DamageSource cause) {
+        if (!this.world.isRemote) {
+            Thaumcraft.log.info("[Thaumcraft] {} was killed by {} ({})", this, cause.getTrueSource(), cause.getDamageType());
+        }
+        super.onDeath(cause);
     }
 
     // --- Misc ---
