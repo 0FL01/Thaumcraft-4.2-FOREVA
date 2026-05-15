@@ -857,6 +857,31 @@ Remaining limits:
 - Runtime pickup/packing evidence remains unavailable while smoke-server is blocked before ready state and user-driven manual scenarios are excluded.
 - Client pickup animation/visual parity remains Phase 8 work.
 
+### 2026-05-15 — Stage 6 traveling trunk baseline
+
+Scope:
+
+- Restored reference-like traveling trunk durability, attack damage attribute, fire immunity, persistence, and size.
+- Restored stay-aware owner following and Air-upgrade faster follow speed.
+- Restored upgrade application, food healing, upgrade `3` owner access blocking, and GUI interaction routing.
+- Restored fall-damage immunity, upgrade `3` damage immunity, passive healing, and upgrade `3` accelerated healing.
+- Restored pickup upgrade `5` item attraction/insertion behavior with inventory remainder handling, eat sound, and status trigger.
+- Restored inventory drops on normal trunk death.
+
+Validation:
+
+- `./scripts/dev.sh compileJava` — passed.
+- `./scripts/dev.sh build` — passed.
+- `./scripts/dev.sh check-jar` — failed before jar inspection because the wrapper's expected MCP mapping cache file is still absent at `.gradle_home/caches/minecraft/de/oceanlabs/mcp/mcp_stable/39/1.12.2/srgs/mcp-srg.srg`.
+- `./scripts/dev.sh smoke-server` — failed by timeout before ready state; log again stopped after `Calling tweak class net.minecraftforge.fml.common.launcher.FMLServerTweaker`, with only Log4j console appender initialization errors. `run/crash-reports/` does not exist, and the configured crash-marker scan found no matches. This matches the clean `da3f307` baseline reproduction recorded above.
+- `git diff --check` — passed.
+
+Remaining limits:
+
+- Upgrade `2` owner-target defense/combat behavior and cross-dimension owner-follow transfer remain open.
+- Runtime trunk upgrade, feeding, pickup, and inventory-drop evidence remains unavailable while smoke-server is blocked before ready state and user-driven manual scenarios are excluded.
+- Client lid/heart/smoke animation parity remains Phase 8 work.
+
 ## Next Checkpoint Candidate
 
 After the portal trigger and ring bootstrap checkpoints, the next pre-Phase8 candidates are:

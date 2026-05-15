@@ -12,7 +12,9 @@ public class EntityTravelingTrunk extends net.minecraft.entity.EntityLiving impl
 
     public EntityTravelingTrunk(net.minecraft.world.World world) {
         super(world);
-        this.setSize(0.7f, 0.5f);
+        this.isImmuneToFire = true;
+        this.enablePersistence();
+        this.setSize(0.8f, 0.8f);
         this.inventory.setEntity(this);
     }
 
@@ -25,17 +27,71 @@ public class EntityTravelingTrunk extends net.minecraft.entity.EntityLiving impl
     @Override
     protected void applyEntityAttributes() {
         super.applyEntityAttributes();
-        this.getEntityAttribute(net.minecraft.entity.SharedMonsterAttributes.MAX_HEALTH).setBaseValue(20.0);
+        this.getEntityAttribute(net.minecraft.entity.SharedMonsterAttributes.MAX_HEALTH).setBaseValue(75.0);
         this.getEntityAttribute(net.minecraft.entity.SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(0.5);
+        if (this.getEntityAttribute(net.minecraft.entity.SharedMonsterAttributes.ATTACK_DAMAGE) == null) {
+            this.getAttributeMap().registerAttribute(net.minecraft.entity.SharedMonsterAttributes.ATTACK_DAMAGE);
+        }
+        this.getEntityAttribute(net.minecraft.entity.SharedMonsterAttributes.ATTACK_DAMAGE).setBaseValue(4.0);
     }
 
     @Override
     public void onLivingUpdate() {
         super.onLivingUpdate();
+        if (this.getUpgrade() == 5) {
+            this.pullItems();
+        }
+        if (!this.world.isRemote && this.getHealth() < this.getMaxHealth()
+                && (this.getUpgrade() == 3 || this.ticksExisted % 50 == 0)) {
+            this.heal(1.0F);
+        }
         net.minecraft.entity.Entity ownerEntity = this.getOwner();
         net.minecraft.entity.EntityLivingBase owner = (ownerEntity instanceof net.minecraft.entity.EntityLivingBase) ? (net.minecraft.entity.EntityLivingBase)ownerEntity : null;
-        if (owner != null && this.getDistance(owner) > 4.0f) {
-            this.getNavigator().tryMoveToEntityLiving(owner, 0.5);
+        if (!this.getStay() && owner != null && this.getDistance(owner) > 4.0f) {
+            this.getNavigator().tryMoveToEntityLiving(owner, this.getUpgrade() == 0 ? 0.65 : 0.5);
+        }
+    }
+
+    private void pullItems() {
+        if (this.isDead || this.getHealth() <= 0.0F) {
+            return;
+        }
+        if (!this.world.isRemote) {
+            java.util.List<net.minecraft.entity.item.EntityItem> closeItems = this.world.getEntitiesWithinAABB(
+                    net.minecraft.entity.item.EntityItem.class,
+                    new net.minecraft.util.math.AxisAlignedBB(this.posX - 0.5D, this.posY - 0.5D, this.posZ - 0.5D,
+                            this.posX + 0.5D, this.posY + 0.5D, this.posZ + 0.5D));
+            for (net.minecraft.entity.item.EntityItem itemEntity : closeItems) {
+                net.minecraft.item.ItemStack stack = itemEntity.getItem().copy();
+                net.minecraft.item.ItemStack remaining = thaumcraft.common.lib.utils.InventoryUtils
+                        .placeItemStackIntoInventory(stack, this.inventory, 0, true);
+                if (remaining.isEmpty()) {
+                    itemEntity.setDead();
+                } else if (remaining.getCount() != stack.getCount()) {
+                    itemEntity.setItem(remaining);
+                } else {
+                    continue;
+                }
+                this.world.playSound(null, this.getPosition(), net.minecraft.init.SoundEvents.ENTITY_GENERIC_EAT,
+                        net.minecraft.util.SoundCategory.NEUTRAL, 0.5F, this.world.rand.nextFloat() * 0.5F + 0.5F);
+                this.world.setEntityState(this, (byte) 17);
+            }
+        }
+
+        java.util.List<net.minecraft.entity.item.EntityItem> nearbyItems = this.world.getEntitiesWithinAABB(
+                net.minecraft.entity.item.EntityItem.class, this.getEntityBoundingBox().grow(3.0D));
+        for (net.minecraft.entity.item.EntityItem itemEntity : nearbyItems) {
+            double dx = itemEntity.posX - this.posX;
+            double dy = itemEntity.posY - this.posY + this.height * 0.8F;
+            double dz = itemEntity.posZ - this.posZ;
+            double distance = net.minecraft.util.math.MathHelper.sqrt(dx * dx + dy * dy + dz * dz);
+            if (distance <= 0.0D) {
+                continue;
+            }
+            double strength = 0.075D;
+            itemEntity.motionX -= dx / distance * strength;
+            itemEntity.motionY -= dy / distance * strength;
+            itemEntity.motionZ -= dz / distance * strength;
         }
     }
 
@@ -104,10 +160,78 @@ public class EntityTravelingTrunk extends net.minecraft.entity.EntityLiving impl
 
     @Override
     public boolean processInteract(net.minecraft.entity.player.EntityPlayer player, net.minecraft.util.EnumHand hand) {
+        if (player.isSneaking()) {
+            return false;
+        }
+        net.minecraft.item.ItemStack stack = player.getHeldItem(hand);
+        if (!stack.isEmpty() && stack.getItem() == thaumcraft.common.config.ConfigItems.itemGolemBell) {
+            return this.getUpgrade() == 3 && !this.isOwner(player);
+        }
+        if (this.getUpgrade() == -1 && !stack.isEmpty()
+                && stack.getItem() == thaumcraft.common.config.ConfigItems.itemGolemUpgrade) {
+            if (!this.world.isRemote) {
+                this.setUpgrade(stack.getItemDamage());
+                this.setInvSize();
+                stack.shrink(1);
+                this.world.playSound(null, this.getPosition(), thaumcraft.common.lib.TCSounds.UPGRADE,
+                        net.minecraft.util.SoundCategory.NEUTRAL, 0.5F, 1.0F);
+            }
+            player.swingArm(hand);
+            return true;
+        }
+        if (!stack.isEmpty() && stack.getItem() instanceof net.minecraft.item.ItemFood && this.getHealth() < this.getMaxHealth()) {
+            if (!this.world.isRemote) {
+                net.minecraft.item.ItemFood food = (net.minecraft.item.ItemFood) stack.getItem();
+                int healAmount = food.getHealAmount(stack);
+                stack.shrink(1);
+                this.heal(healAmount);
+                this.world.playSound(null, this.getPosition(),
+                        this.getHealth() == this.getMaxHealth()
+                                ? net.minecraft.init.SoundEvents.ENTITY_PLAYER_BURP
+                                : net.minecraft.init.SoundEvents.ENTITY_GENERIC_EAT,
+                        net.minecraft.util.SoundCategory.NEUTRAL, 0.5F, this.world.rand.nextFloat() * 0.5F + 0.5F);
+                this.world.setEntityState(this, (byte) 18);
+            }
+            player.swingArm(hand);
+            return true;
+        }
         if (!this.world.isRemote) {
+            if (this.getUpgrade() == 3 && !this.isOwner(player)) {
+                return true;
+            }
             player.openGui(thaumcraft.common.Thaumcraft.instance, thaumcraft.common.CommonProxy.GUI_TRAVELING_TRUNK, this.world, this.getEntityId(), 0, 0);
         }
         return true;
+    }
+
+    private boolean isOwner(net.minecraft.entity.player.EntityPlayer player) {
+        java.util.UUID ownerId = this.getOwnerId();
+        return ownerId == null || ownerId.equals(player.getUniqueID());
+    }
+
+    @Override
+    public boolean attackEntityFrom(net.minecraft.util.DamageSource source, float amount) {
+        if (source == net.minecraft.util.DamageSource.FALL || this.getUpgrade() == 3) {
+            return false;
+        }
+        return super.attackEntityFrom(source, amount);
+    }
+
+    @Override
+    public void onDeath(net.minecraft.util.DamageSource cause) {
+        if (!this.world.isRemote) {
+            this.inventory.dropAllItems();
+        }
+        super.onDeath(cause);
+    }
+
+    @Override
+    public void handleStatusUpdate(byte id) {
+        if (id == 17 || id == 18) {
+            this.open = true;
+        } else {
+            super.handleStatusUpdate(id);
+        }
     }
 
     @Override
