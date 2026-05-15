@@ -6,6 +6,8 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.SoundEvents;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTTagList;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.world.World;
@@ -26,6 +28,19 @@ public class ItemGolemBell extends Item {
             return stack.getTagCompound().getInteger("golemid");
         }
         return -1;
+    }
+
+    public static ArrayList<Marker> getMarkers(ItemStack stack) {
+        ArrayList<Marker> markers = new ArrayList<>();
+        if (stack != null && stack.hasTagCompound() && stack.getTagCompound().hasKey("markers")) {
+            NBTTagList tagList = stack.getTagCompound().getTagList("markers", 10);
+            for (int i = 0; i < tagList.tagCount(); i++) {
+                NBTTagCompound tag = tagList.getCompoundTagAt(i);
+                markers.add(new Marker(tag.getInteger("x"), tag.getInteger("y"), tag.getInteger("z"),
+                        (byte) tag.getInteger("dim"), tag.getByte("side"), tag.getByte("color")));
+            }
+        }
+        return markers;
     }
 
     public static void resetMarkers(ItemStack stack, World world, EntityPlayer player) {

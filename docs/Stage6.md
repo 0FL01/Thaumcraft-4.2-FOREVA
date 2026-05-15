@@ -83,7 +83,7 @@ Client-only renderer/particle TODOs are Phase 8 dependencies. They are not count
 - `thaumcraft_src/thaumcraft/common/entities/golems/EntityGolemBase.class`
 
 **Что не совпадает:**
-Checkpoint 8.2.15 adds `ConfigItems` fields/registrations for `itemGolemBell`, `itemGolemCore`, `itemGolemPlacer`, `itemGolemUpgrade`, `itemGolemDecoration`, and `itemTrunkSpawner`, and restores the original metadata/subitem surface. The normal placement/workflow behavior is still incomplete: `ItemGolemPlacer` and `ItemTrunkSpawner` do not yet port the reference on-use entity spawning path, and the bell/decoration marker workflows still need a dedicated server-side parity pass. Reference golem interaction code expects registered `ConfigItems.itemGolemBell`, `ConfigItems.itemGolemCore`, and `ConfigItems.itemGolemUpgrade` when applying cores/upgrades and bell workflows.
+Checkpoints 8.2.15 and 8.2.16 add `ConfigItems` fields/registrations for `itemGolemBell`, `itemGolemCore`, `itemGolemPlacer`, `itemGolemUpgrade`, `itemGolemDecoration`, and `itemTrunkSpawner`, restore the original metadata/subitem surface, and port the server-side golem/trunk item spawn paths. Remaining workflow gaps are bell marker/linking behavior, decoration/healing/wheat interactions, full trunk upgrade behavior, and runtime/manual placement evidence. Reference golem interaction code expects registered `ConfigItems.itemGolemBell`, `ConfigItems.itemGolemCore`, and `ConfigItems.itemGolemUpgrade` when applying cores/upgrades and bell workflows.
 
 **Что нужно доделать:**
 Register the golem/trunk items with stable Thaumcraft names and port their server behavior so players can obtain, place, configure, and link golems/trunks.
@@ -1030,6 +1030,33 @@ Mapping:
 - `ItemTrunkSpawner` still needs the reference on-use spawn path: owner/custom name/upgrade/inventory transfer, spawn, living initialization, and stack consume behavior.
 - `ItemGolemBell` and `EntityGolemBase` still need a dedicated bell marker/linking, decoration, healing, and wheat interaction parity pass.
 - Golem/trunk placement has not been observed in a runtime world because smoke-server remains environment-blocked and manual scenarios are excluded.
+
+### 8.2.16 Golem/trunk placement checkpoint — 2026-05-15
+
+Статус: golem/trunk item spawn paths ported; interaction parity and runtime evidence remain open.
+
+Что сделано:
+
+- Ported `ItemGolemPlacer` server-side placement: side-offset spawn position, golem type metadata, advanced/core/upgrades/deco/marker/inventory NBT restore, home/facing setup, owner assignment, custom name persistence, entity spawn, living sound, and survival stack consume behavior.
+- Ported `ItemTrunkSpawner` server-side placement: side-offset spawn position, owner UUID assignment, custom name, upgrade/inventory NBT restore, living initialization, entity spawn, and survival stack consume behavior.
+- Restored reference golem type metadata ordering and baseline values so placer metas `0..7` map to Straw, Wood, Tallow, Clay, Flesh, Stone, Iron, and Thaumium.
+- Added golem setup/read helpers for home-facing setup, inventory sizing, upgrade data sync, decoration data sync, and inventory persistence after reload.
+- Added minimal traveling trunk upgrade/inventory-size and owner UUID persistence needed by the item spawn path.
+- Added `ItemGolemBell.getMarkers(...)` item-NBT parsing for placer marker restore.
+
+Проверки:
+
+- `./scripts/dev.sh compileJava` — passed.
+- `./scripts/dev.sh build` — passed.
+- `./scripts/dev.sh check-jar` — не дошел до jar inspection: отсутствует wrapper-ожидаемый MCP mapping cache `.gradle_home/caches/minecraft/de/oceanlabs/mcp/mcp_stable/39/1.12.2/srgs/mcp-srg.srg`.
+- `./scripts/dev.sh smoke-server` — timeout before ready state на уже задокументированном pre-Forge/log4j этапе; `run/crash-reports/` не существует, and the configured crash-marker scan found no matches.
+- `git diff --check` — passed.
+
+Оставшиеся ограничения:
+
+- Bell marker editing/linking, decoration application/removal, golem healing/wheat interaction, and full trunk upgrade behavior remain open Stage 6 work.
+- Runtime placement was not observed in a world because smoke-server remains environment-blocked and manual scenarios are excluded.
+- Client models/rendering for the placed golems/trunks remain Phase 8 work.
 
 ### 8.3 Minimal Stage 6 manual scenario matrix
 

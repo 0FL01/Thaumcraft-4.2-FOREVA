@@ -785,6 +785,31 @@ Remaining limits:
 - Bell marker/linking, decoration, healing, and wheat interaction parity remains open.
 - Golem/trunk runtime placement evidence remains unavailable while smoke-server is blocked before ready state and user-driven manual scenarios are excluded.
 
+### 2026-05-15 — Stage 6 golem and trunk placement
+
+Scope:
+
+- Ported `ItemGolemPlacer` server-side spawn behavior for golem metadata, advanced/core/upgrades/deco/marker/inventory NBT, home/facing setup, owner/custom name state, entity spawn, sound, and survival stack consumption.
+- Ported `ItemTrunkSpawner` server-side spawn behavior for owner UUID, custom name, upgrade/inventory NBT, living initialization, entity spawn, and survival stack consumption.
+- Restored reference golem type ordering and baseline values so item metadata maps to the correct golem material.
+- Added golem setup/read helpers for inventory sizing, upgrade sync, decoration sync, and placement/reload persistence.
+- Added minimal traveling trunk upgrade/inventory-size and owner UUID persistence needed by the item route.
+- Added `ItemGolemBell.getMarkers(...)` marker NBT restore support for golem placer stacks.
+
+Validation:
+
+- `./scripts/dev.sh compileJava` — passed.
+- `./scripts/dev.sh build` — passed.
+- `./scripts/dev.sh check-jar` — failed before jar inspection because the wrapper's expected MCP mapping cache file is still absent at `.gradle_home/caches/minecraft/de/oceanlabs/mcp/mcp_stable/39/1.12.2/srgs/mcp-srg.srg`.
+- `./scripts/dev.sh smoke-server` — failed by timeout before ready state; log again stopped after `Calling tweak class net.minecraftforge.fml.common.launcher.FMLServerTweaker`, with only Log4j console appender initialization errors. `run/crash-reports/` does not exist, and the configured crash-marker scan found no matches. This matches the clean `da3f307` baseline reproduction recorded above.
+- `git diff --check` — passed.
+
+Remaining limits:
+
+- Bell marker editing/linking, decoration application/removal, golem healing/wheat interaction, and full trunk upgrade behavior remain open.
+- Golem/trunk runtime placement evidence remains unavailable while smoke-server is blocked before ready state and user-driven manual scenarios are excluded.
+- Client renderer/model parity remains Phase 8 work.
+
 ## Next Checkpoint Candidate
 
 After the portal trigger and ring bootstrap checkpoints, the next pre-Phase8 candidates are:

@@ -221,21 +221,43 @@ public class EntityGolemBase extends net.minecraft.entity.monster.EntityGolem im
     }
 
     public boolean setupGolemInventory() {
-        if (this.getCore() > -1) {
-            int invSize = 0;
-            switch (this.getCore()) {
-                default: invSize = 6 + this.getUpgradeAmount(2) * 6; break;
-                case 5: invSize = 1 + this.getUpgradeAmount(2); break;
-                case 3: case 4: case 6: invSize = 0; break;
-            }
-            this.inventory = new thaumcraft.common.entities.InventoryMob(invSize);
-            byte[] oldcolors = this.colors;
-            this.colors = new byte[this.inventory.getSizeInventory()];
-            for (int a = 0; a < this.inventory.getSizeInventory(); a++) {
-                this.colors[a] = (a < oldcolors.length) ? oldcolors[a] : -1;
+        if (!ItemGolemCore.hasInventory(this.getCore())) {
+            this.inventory = null;
+            return false;
+        }
+        int invSize;
+        switch (this.getCore()) {
+            case 5:
+                invSize = 1 + this.getUpgradeAmount(2);
+                break;
+            default:
+                invSize = 6 + this.getUpgradeAmount(2) * 6;
+                break;
+        }
+        thaumcraft.common.entities.InventoryMob oldInventory = this.inventory;
+        this.inventory = new thaumcraft.common.entities.InventoryMob(invSize);
+        if (oldInventory != null) {
+            int copySlots = Math.min(oldInventory.getSizeInventory(), this.inventory.getSizeInventory());
+            for (int slot = 0; slot < copySlots; slot++) {
+                this.inventory.setInventorySlotContents(slot, oldInventory.getStackInSlot(slot));
             }
         }
+        byte[] oldcolors = this.colors == null ? new byte[0] : this.colors;
+        this.colors = new byte[this.inventory.getSizeInventory()];
+        for (int a = 0; a < this.inventory.getSizeInventory(); a++) {
+            this.colors[a] = (a < oldcolors.length) ? oldcolors[a] : -1;
+        }
         return true;
+    }
+
+    public void setup(int side) {
+        this.homeFacing = side;
+        this.setHomePosAndDistance(new net.minecraft.util.math.BlockPos(
+                net.minecraft.util.math.MathHelper.floor(this.posX),
+                net.minecraft.util.math.MathHelper.floor(this.posY),
+                net.minecraft.util.math.MathHelper.floor(this.posZ)), 32);
+        this.setupGolem();
+        this.setupGolemInventory();
     }
 
     // --- NBT ---
@@ -290,6 +312,7 @@ public class EntityGolemBase extends net.minecraft.entity.monster.EntityGolem im
         net.minecraft.nbt.NBTTagCompound itemNBT = nbt.getCompoundTag("ItemCarried");
         this.itemCarried = new net.minecraft.item.ItemStack(itemNBT);
         this.decoration = nbt.getString("Decoration");
+        this.setGolemDecoration(this.decoration);
         String owner = nbt.getString("Owner");
         if (owner.length() > 0) this.setOwner(owner);
         net.minecraft.nbt.NBTTagList markersList = nbt.getTagList("Markers", 10);
@@ -298,8 +321,15 @@ public class EntityGolemBase extends net.minecraft.entity.monster.EntityGolem im
             this.markers.add(new Marker(tc.getInteger("x"), tc.getInteger("y"), tc.getInteger("z"),
                 (byte) tc.getInteger("dim"), tc.getByte("side"), tc.getByte("color")));
         }
-        this.upgrades = nbt.getByteArray("upgrades");
+        byte[] savedUpgrades = nbt.getByteArray("upgrades");
+        this.upgrades = new byte[this.golemType.upgrades + (this.advanced ? 1 : 0)];
+        java.util.Arrays.fill(this.upgrades, (byte) -1);
+        System.arraycopy(savedUpgrades, 0, this.upgrades, 0, Math.min(savedUpgrades.length, this.upgrades.length));
         this.setupGolem();
+        for (int slot = 0; slot < this.upgrades.length; slot++) {
+            this.setUpgrade(slot, this.upgrades[slot]);
+        }
+        this.setupGolemInventory();
         if (nbt.hasKey("Inventory")) {
             net.minecraft.nbt.NBTTagList invList = nbt.getTagList("Inventory", 10);
             if (this.inventory != null) this.inventory.readFromNBT(invList);
@@ -392,7 +422,7 @@ public class EntityGolemBase extends net.minecraft.entity.monster.EntityGolem im
     public void setUpgrade(int slot, byte upgrade) {
         this.upgrades[slot] = upgrade;
         StringBuilder sb = new StringBuilder();
-        for (byte c : this.upgrades) sb.append(Integer.toHexString(c));
+        for (byte c : this.upgrades) sb.append(Integer.toHexString(c < 0 ? 15 : c));
         this.dataManager.set(UPGRADES_STR, sb.toString());
     }
 

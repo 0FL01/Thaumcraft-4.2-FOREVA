@@ -1,14 +1,14 @@
 package thaumcraft.common.entities.golems;
 
 public enum EnumGolemType {
-    WOOD(20, 6, 1, 0, 0.15, false, 0, 200, 7),
-    IRON(30, 10, 2, 2, 0.2, false, 1, 100, 12),
-    CLAY(15, 6, 1, 0, 0.2, false, 1, 150, 6),
-    STRAW(12, 4, 0, -1, 0.25, true, 0, 100, 5),
-    FLESH(25, 8, 2, 0, 0.2, false, 1, 50, 10),
-    TALLOW(10, 4, 0, 0, 0.3, true, 0, 50, 8),
-    STONE(40, 12, 3, 3, 0.15, false, 1, 200, 15),
-    THAUMIUM(50, 10, 3, 2, 0.25, false, 2, 50, 20);
+    STRAW(10, 1, 0, 0, 0.38, false, 1, 75, 0),
+    WOOD(20, 4, 1, 6, 0.35, false, 1, 75, 1),
+    TALLOW(20, 8, 2, 9, 0.33, false, 2, 75, 2),
+    CLAY(25, 8, 2, 9, 0.33, true, 1, 100, 2),
+    FLESH(15, 4, 1, 6, 0.35, false, 2, 40, 1),
+    STONE(30, 16, 3, 12, 0.32, true, 1, 100, 3),
+    IRON(35, 32, 4, 15, 0.31, true, 1, 125, 4),
+    THAUMIUM(40, 32, 4, 15, 0.32, true, 2, 100, 4);
 
     public final int health;
     public final int carry;
@@ -33,6 +33,6 @@ public enum EnumGolemType {
     }
 
     public static EnumGolemType getType(int id) {
-        return values()[id % values().length];
+        return values()[Math.floorMod(id, values().length)];
     }
 }
