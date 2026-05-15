@@ -1084,3 +1084,22 @@ Validation evidence for this checkpoint:
 - `./scripts/dev.sh smoke-client` — skipped because `DISPLAY` is unset in the current environment.
 
 GAP-11 is advanced but not closed. Essence phials still need in-world/manual checks against alembics, normal jars, void jars, filtered/full jars, and full inventories. Item tint/tooltip display remains unvalidated without client GUI/runtime access, and full jar/alembic renderer parity remains Stage 8.
+
+### 8.21 2026-05-15 Resonator diagnostics checkpoint
+
+Implemented in the current checkpoint:
+
+- Restored the reference glint for NBT-bearing Essentia Resonators.
+- Restored readable `TileTubeBuffer` diagnostics by sending one contains-line per stored aspect/count instead of exposing a raw `AspectList` object in chat.
+- Added the missing `tc.resonator1`, `tc.resonator2`, and `tc.resonator3` language keys and restored the untyped suction fallback text.
+- Restored the alembic-knock sound on successful server-side diagnostics.
+
+Validation evidence for this checkpoint:
+
+- `./scripts/dev.sh compileJava` — passed.
+- `./scripts/dev.sh build` — passed.
+- `./scripts/dev.sh check-jar` — failed before jar inspection because the wrapper's expected MCP mapping cache file is still absent at `.gradle_home/caches/minecraft/de/oceanlabs/mcp/mcp_stable/39/1.12.2/srgs/mcp-srg.srg`.
+- `./scripts/dev.sh smoke-server` — failed by timeout before ready state; log again stopped after `Calling tweak class net.minecraftforge.fml.common.launcher.FMLServerTweaker`, with only Log4j console appender initialization errors. `run/crash-reports/` does not exist, and the configured crash-marker scan found no matches.
+- `./scripts/dev.sh smoke-client` — skipped because `DISPLAY` is unset in the current environment.
+
+GAP-6 is advanced but not closed. Remaining Resonator limits are the original CCL sub-hit retrace for exact tube-face diagnostics and manual checks against jars, alembics, tubes, and buffers.
