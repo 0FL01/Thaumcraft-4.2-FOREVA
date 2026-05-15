@@ -147,6 +147,12 @@ extends BlockContainer {
             }
             return true;
         }
+        if (te instanceof TileSpa) {
+            if (!worldIn.isRemote) {
+                playerIn.openGui(Thaumcraft.instance, CommonProxy.GUI_SPA, worldIn, pos.getX(), pos.getY(), pos.getZ());
+            }
+            return true;
+        }
         return false;
     }
 

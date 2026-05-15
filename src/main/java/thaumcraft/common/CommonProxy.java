@@ -3,6 +3,7 @@ package thaumcraft.common;
 import javax.annotation.Nullable;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.inventory.IInventory;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -105,7 +106,7 @@ public class CommonProxy implements IGuiHandler {
             case GUI_HOVER_HARNESS: return new ContainerHoverHarness(player.inventory, world, x, y, z);
             case GUI_MAGIC_BOX: {
                 TileEntity tile = world.getTileEntity(pos);
-                return tile != null ? new ContainerMagicBox(player.inventory, tile) : null;
+                return tile instanceof IInventory ? new ContainerMagicBox(player.inventory, tile) : null;
             }
             case GUI_SPA: {
                 TileEntity tile = world.getTileEntity(pos);

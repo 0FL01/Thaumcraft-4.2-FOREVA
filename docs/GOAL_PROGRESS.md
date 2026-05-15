@@ -49,6 +49,7 @@ Branch: `codex/durable-goal-stage8-9`
 - Focal Manipulator client smoke/manual open/visual parity was skipped on 2026-05-15 because `DISPLAY=` and user-driven GUI/graphics validation is excluded by instruction.
 - Focus Pouch, Hand Mirror, and Hover Harness client smoke/manual open/item movement parity was skipped on 2026-05-15 because `DISPLAY=` and user-driven GUI/graphics validation is excluded by instruction.
 - Deconstruction Table and Alchemy Furnace client smoke/manual open/visual parity was skipped on 2026-05-15 because `DISPLAY=` and user-driven GUI/graphics validation is excluded by instruction.
+- Magic Box and Spa client smoke/manual open/visual parity was skipped on 2026-05-15 because `DISPLAY=` and user-driven GUI/graphics validation is excluded by instruction.
 - Future GUI/client visual checks that require user-driven Minecraft control, screenshots, or unavailable X11/graphics stack will be recorded as: `SKIPPED by user instruction: GUI/graphics/user-interactive validation excluded`.
 
 ## Baseline Validation
@@ -60,6 +61,34 @@ Branch: `codex/durable-goal-stage8-9`
 - `./scripts/dev.sh validate --smoke` — passed on 2026-05-15, including compact server smoke validation.
 
 ## Checkpoint Log
+
+### 2026-05-15 — Stage 8-b Magic Box and Spa GUI baseline
+
+Scope:
+
+- Added `GuiMagicBox` backed by `ContainerMagicBox`.
+- Ported a chest-style Magic Box GUI baseline using `textures/gui/container/generic_54.png`.
+- Added `GuiSpa` backed by `ContainerSpa`.
+- Ported a texture-backed Spa GUI baseline: original `gui_spa.png`, fluid tooltip/level bar rendering from tile tank state, and mix-toggle icon/tooltip/click handling.
+- Routed client GUI IDs `18` and `19` through `ClientProxy#getClientGuiElement`.
+- Restored baseline server/container support needed by these screens: Magic Box chest/player slot binding and shift-click routing; Spa bath-salts slot, mix-toggle button path, and minimal persisted `TileSpa` inventory/tank/capability state.
+- Added Spa open routing in `BlockStoneDevice` for active stone-device meta `12`.
+- Copied original `gui_spa.png` and added `thaumcraft.spa` plus `text.spa.mix.true/false` language keys.
+- Updated `docs/Stage8-b.md` with the implemented baseline and remaining client/manual/gameplay limits.
+
+Validation:
+
+- `./scripts/dev.sh compileJava` — passed.
+- `./scripts/dev.sh validate --smoke` — passed: status, compile, tests `10/10`, jar, check-jar summary `5292` MCP leak lines / `1047` unique leaks, and server smoke.
+- `run/smoke-server.log` evidence: `Registering entities`; `Forge Mod Loader has successfully loaded 6 mods`; `Done (1.175s)!`.
+- Crash report scan under `run/` returned no files.
+- `./scripts/dev.sh smoke-client` — skipped because `DISPLAY=` and GUI/graphics/user-interactive validation is excluded.
+
+Remaining limits:
+
+- Magic Box and Spa open scenarios were not manually observed.
+- Exact visual layout and hover/click behavior still need client inspection.
+- Magic Box linked-storage behavior and Spa world-fluid automation remain outside this GUI checkpoint.
 
 ### 2026-05-15 — Stage 8-b Deconstruction and Alchemy Furnace GUI baseline
 

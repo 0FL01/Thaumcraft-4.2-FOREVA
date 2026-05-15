@@ -4,6 +4,7 @@ import javax.annotation.Nullable;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.inventory.IInventory;
 import net.minecraft.item.Item;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
@@ -23,6 +24,8 @@ import thaumcraft.client.gui.GuiFocalManipulator;
 import thaumcraft.client.gui.GuiFocusPouch;
 import thaumcraft.client.gui.GuiHandMirror;
 import thaumcraft.client.gui.GuiHoverHarness;
+import thaumcraft.client.gui.GuiMagicBox;
+import thaumcraft.client.gui.GuiSpa;
 import thaumcraft.client.gui.GuiThaumatorium;
 import thaumcraft.client.fx.ParticleEngine;
 import thaumcraft.client.lib.ClientTickEventsFML;
@@ -36,6 +39,7 @@ import thaumcraft.common.tiles.TileArcaneBore;
 import thaumcraft.common.tiles.TileArcaneWorkbench;
 import thaumcraft.common.tiles.TileDeconstructionTable;
 import thaumcraft.common.tiles.TileFocalManipulator;
+import thaumcraft.common.tiles.TileSpa;
 import thaumcraft.common.tiles.TileThaumatorium;
 
 public class ClientProxy extends CommonProxy {
@@ -173,8 +177,19 @@ public class ClientProxy extends CommonProxy {
                         : null;
             }
             case GUI_MAGIC_BOX:
+            {
+                TileEntity tile = world.getTileEntity(new BlockPos(x, y, z));
+                return tile instanceof IInventory
+                        ? new GuiMagicBox(player.inventory, tile)
+                        : null;
+            }
             case GUI_SPA:
-                return null;
+            {
+                TileEntity tile = world.getTileEntity(new BlockPos(x, y, z));
+                return tile instanceof TileSpa
+                        ? new GuiSpa(player.inventory, (TileSpa) tile)
+                        : null;
+            }
             case GUI_FOCAL_MANIPULATOR:
             {
                 TileEntity tile = world.getTileEntity(new BlockPos(x, y, z));
