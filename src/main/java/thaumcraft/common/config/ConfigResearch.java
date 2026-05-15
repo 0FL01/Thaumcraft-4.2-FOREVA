@@ -28,6 +28,7 @@ public class ConfigResearch {
         initThaumaturgyResearchBaseline();
         initBasicResearchTextOnlyExtended();
         initThaumaturgyResearchTextOnlyBaseline();
+        initEldritchResearchBaseline();
         initEldritchResearchTextOnlyBaseline();
         // Stage 9-e research item/page graph registration remains in progress.
     }
@@ -1104,6 +1105,89 @@ public class ConfigResearch {
         new ResearchItem("ROD_wood", "THAUMATURGY")
                 .setAutoUnlock()
                 .registerResearchItem();
+    }
+
+    private static void initEldritchResearchBaseline() {
+        new ResearchItem(
+                "ELDRITCHMINOR",
+                "ELDRITCH",
+                new AspectList(),
+                1,
+                0,
+                0,
+                new ResourceLocation("thaumcraft", "textures/misc/r_eldritchminor.png"))
+                .setPages(
+                        new ResearchPage("tc.research_page.ELDRITCHMINOR.1"),
+                        new ResearchPage((CrucibleRecipe) recipes.get("VoidSeed")))
+                .setHidden()
+                .setRound()
+                .setSpecial()
+                .registerResearchItem();
+
+        new ResearchItem(
+                "VOIDMETAL",
+                "ELDRITCH",
+                new AspectList()
+                        .add(Aspect.METAL, 3)
+                        .add(Aspect.ELDRITCH, 3)
+                        .add(Aspect.DARKNESS, 3)
+                        .add(Aspect.VOID, 5),
+                2,
+                -2,
+                2,
+                new ItemStack(ConfigItems.itemResource, 1, 16))
+                .setPages(
+                        new ResearchPage("tc.research_page.VOIDMETAL.1"),
+                        new ResearchPage((CrucibleRecipe) recipes.get("VoidMetal")),
+                        new ResearchPage("tc.research_page.VOIDMETAL.2"))
+                .setParents("THAUMIUM", "ELDRITCHMINOR")
+                .registerResearchItem();
+
+        new ResearchItem(
+                "CAP_void",
+                "ELDRITCH",
+                new AspectList()
+                        .add(Aspect.VOID, 5)
+                        .add(Aspect.ELDRITCH, 5)
+                        .add(Aspect.TOOL, 3)
+                        .add(Aspect.MAGIC, 3)
+                        .add(Aspect.AURA, 3),
+                5,
+                -1,
+                3,
+                new ItemStack(ConfigItems.itemWandCap, 1, 7))
+                .setPages(
+                        new ResearchPage("tc.research_page.CAP_void.1"),
+                        new ResearchPage((IArcaneRecipe) recipes.get("WandCapVoidInert")),
+                        new ResearchPage((InfusionRecipe) recipes.get("WandCapVoid")))
+                .setConcealed()
+                .setParents("CAP_thaumium", "VOIDMETAL")
+                .registerResearchItem();
+        ThaumcraftApi.addWarpToResearch("CAP_void", 1);
+
+        new ResearchItem(
+                "FOCUSPRIMAL",
+                "ELDRITCH",
+                new AspectList()
+                        .add(Aspect.AIR, 6)
+                        .add(Aspect.WATER, 6)
+                        .add(Aspect.FIRE, 6)
+                        .add(Aspect.EARTH, 6)
+                        .add(Aspect.ORDER, 6)
+                        .add(Aspect.ENTROPY, 6)
+                        .add(Aspect.MAGIC, 6),
+                4,
+                1,
+                2,
+                new ItemStack(ConfigItems.focusPrimal))
+                .setPages(
+                        new ResearchPage("tc.research_page.FOCUSPRIMAL.1"),
+                        new ResearchPage((IArcaneRecipe) recipes.get("FocusPrimal")))
+                .setConcealed()
+                .setParents("ELDRITCHMINOR")
+                .registerResearchItem();
+        ThaumcraftApi.addWarpToResearch("FOCUSPRIMAL", 2);
+        ThaumcraftApi.addWarpToItem(new ItemStack(ConfigItems.focusPrimal), 1);
     }
 
     private static void initEldritchResearchTextOnlyBaseline() {

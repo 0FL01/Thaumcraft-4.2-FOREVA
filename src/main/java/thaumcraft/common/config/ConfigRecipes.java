@@ -46,6 +46,8 @@ public class ConfigRecipes {
     private static CrucibleRecipe recipeNitor;
     private static CrucibleRecipe recipeAlumentum;
     private static CrucibleRecipe recipeThaumium;
+    private static CrucibleRecipe recipeVoidMetal;
+    private static CrucibleRecipe recipeVoidSeed;
 
     public static void init() {
         ConfigResearch.recipes.clear();
@@ -110,6 +112,12 @@ public class ConfigRecipes {
         if (recipeThaumium != null) {
             ConfigResearch.recipes.put("Thaumium", recipeThaumium);
         }
+        if (recipeVoidMetal != null) {
+            ConfigResearch.recipes.put("VoidMetal", recipeVoidMetal);
+        }
+        if (recipeVoidSeed != null) {
+            ConfigResearch.recipes.put("VoidSeed", recipeVoidSeed);
+        }
         ItemStack basicWand = new ItemStack(ConfigItems.itemWandCasting, 1, 0);
         ConfigResearch.recipes.put("Thaumonomicon",
                 Arrays.asList(new AspectList(), 1, 2, 1,
@@ -167,6 +175,18 @@ public class ConfigRecipes {
                 new ItemStack(ConfigItems.itemResource, 1, 2),
                 new ItemStack(Items.IRON_INGOT),
                 new AspectList().merge(Aspect.MAGIC, 4));
+
+        recipeVoidMetal = ThaumcraftApi.addCrucibleRecipe(
+                "VOIDMETAL",
+                new ItemStack(ConfigItems.itemResource, 1, 16),
+                new ItemStack(ConfigItems.itemResource, 1, 17),
+                new AspectList().merge(Aspect.METAL, 8));
+
+        recipeVoidSeed = ThaumcraftApi.addCrucibleRecipe(
+                "VOIDMETAL",
+                new ItemStack(ConfigItems.itemResource, 1, 17),
+                new ItemStack(Items.ENDER_PEARL),
+                new AspectList().merge(Aspect.DARKNESS, 8).merge(Aspect.VOID, 8).merge(Aspect.ELDRITCH, 2));
     }
 
     private static void initializeArcaneRecipeBaseline() {
