@@ -50,6 +50,7 @@ Branch: `codex/durable-goal-stage8-9`
 - Focus Pouch, Hand Mirror, and Hover Harness client smoke/manual open/item movement parity was skipped on 2026-05-15 because `DISPLAY=` and user-driven GUI/graphics validation is excluded by instruction.
 - Deconstruction Table and Alchemy Furnace client smoke/manual open/visual parity was skipped on 2026-05-15 because `DISPLAY=` and user-driven GUI/graphics validation is excluded by instruction.
 - Magic Box and Spa client smoke/manual open/visual parity was skipped on 2026-05-15 because `DISPLAY=` and user-driven GUI/graphics validation is excluded by instruction.
+- Traveling Trunk client smoke/manual open/visual parity was skipped on 2026-05-15 because `DISPLAY=` and user-driven GUI/graphics validation is excluded by instruction.
 - Future GUI/client visual checks that require user-driven Minecraft control, screenshots, or unavailable X11/graphics stack will be recorded as: `SKIPPED by user instruction: GUI/graphics/user-interactive validation excluded`.
 
 ## Baseline Validation
@@ -61,6 +62,33 @@ Branch: `codex/durable-goal-stage8-9`
 - `./scripts/dev.sh validate --smoke` — passed on 2026-05-15, including compact server smoke validation.
 
 ## Checkpoint Log
+
+### 2026-05-15 — Stage 8-b Traveling Trunk GUI baseline
+
+Scope:
+
+- Added `GuiTravelingTrunk` backed by `ContainerTravelingTrunk`.
+- Ported a texture-backed Traveling Trunk GUI baseline: original `guitrunkbase.png`, health bar, stay icon, and stay/move toggle click handling through the existing container button path.
+- Routed client GUI ID `2` through `ClientProxy#getClientGuiElement` using entity id lookup and `EntityTravelingTrunk` type validation.
+- Added trunk GUI language keys `entity.trunk.guiname`, `entity.trunk.move`, and `entity.trunk.stay`.
+- Updated `ContainerTravelingTrunk` to handle button id `1` so stay/move toggles server-side.
+- Copied original `guitrunkbase.png`.
+- Updated `docs/Stage8-b.md` with the implemented baseline and remaining client/manual limits.
+
+Validation:
+
+- `./scripts/dev.sh compileJava` — failed once due to a bad `SoundEvents` import path in `GuiTravelingTrunk`; fixed in-checkpoint.
+- `./scripts/dev.sh compileJava` — passed after the import fix.
+- `./scripts/dev.sh validate --smoke` — passed: status, compile, tests `10/10`, jar, check-jar summary `5316` MCP leak lines / `1051` unique leaks, and server smoke.
+- `run/smoke-server.log` evidence: `Registering entities`; `Forge Mod Loader has successfully loaded 6 mods`; `Done (1.294s)!`.
+- Crash report scan under `run/` returned no files.
+- `./scripts/dev.sh smoke-client` — skipped because `DISPLAY=` and GUI/graphics/user-interactive validation is excluded.
+
+Remaining limits:
+
+- Traveling Trunk open/toggle/close scenarios were not manually observed.
+- Exact owner-label text and stay-toggle UX parity still need client inspection.
+- Runtime verification across trunk upgrade variants still needs manual coverage.
 
 ### 2026-05-15 — Stage 8-b Magic Box and Spa GUI baseline
 

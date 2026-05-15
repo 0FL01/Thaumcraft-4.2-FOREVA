@@ -53,6 +53,15 @@ public class ContainerTravelingTrunk extends Container {
     }
 
     @Override
+    public boolean enchantItem(EntityPlayer playerIn, int id) {
+        if (id == 1 && this.trunk != null && !this.trunk.isDead) {
+            this.trunk.setStay(!this.trunk.getStay());
+            return true;
+        }
+        return false;
+    }
+
+    @Override
     public ItemStack transferStackInSlot(EntityPlayer player, int index) {
         ItemStack result = ItemStack.EMPTY;
         Slot slot = index >= 0 && index < this.inventorySlots.size() ? this.inventorySlots.get(index) : null;

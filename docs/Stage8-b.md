@@ -65,7 +65,7 @@ Lightweight commands run during analysis:
 
 ## 4. Текущее состояние Stage 8-b
 
-Current state is not closeable. Server/common GUI IDs and containers exist for many screens, but client-side routing and client GUI classes are still incomplete. GUI IDs `3`, `5`, `8`, `9`, `13`, `15`, `16`, `17`, `18`, `19`, and `20` now have texture-backed Thaumatorium, Focus Pouch, Deconstruction Table, Alchemy Furnace, Arcane Workbench, Arcane Bore, Hand Mirror, Hover Harness, Magic Box, Spa, and Focal Manipulator baselines, but full visual parity and manual client validation remain open.
+Current state is not closeable. Server/common GUI IDs and containers exist for many screens, but client-side routing and client GUI classes are still incomplete. GUI IDs `2`, `3`, `5`, `8`, `9`, `13`, `15`, `16`, `17`, `18`, `19`, and `20` now have texture-backed Traveling Trunk, Thaumatorium, Focus Pouch, Deconstruction Table, Alchemy Furnace, Arcane Workbench, Arcane Bore, Hand Mirror, Hover Harness, Magic Box, Spa, and Focal Manipulator baselines, but full visual parity and manual client validation remain open.
 
 Concrete current findings:
 
@@ -73,11 +73,11 @@ Concrete current findings:
 - Server GUI routing exists for Golem, Pech, Traveling Trunk, Thaumatorium, Focus Pouch, Deconstruction Table, Alchemy Furnace, Research Table, Arcane Workbench, Arcane Bore, Hand Mirror, Hover Harness, Magic Box, Spa, and Focal Manipulator in `src/main/java/thaumcraft/common/CommonProxy.java:61-119`.
 - Thaumonomicon is intentionally server-null in `src/main/java/thaumcraft/common/CommonProxy.java:95`, matching the reference pattern that its GUI is client-only.
 - Base `CommonProxy.getClientGuiElement` returns null in `src/main/java/thaumcraft/common/CommonProxy.java:122-126`, as expected for common proxy.
-- `ClientProxy.getClientGuiElement` constructs `GuiFocusPouch`, `GuiHandMirror`, `GuiHoverHarness`, `GuiMagicBox`, and `GuiSpa`, and now routes `GUI_THAUMATORIUM`, `GUI_DECONSTRUCTION_TABLE`, `GUI_ALCHEMY_FURNACE`, `GUI_ARCANE_WORKBENCH`, `GUI_ARCANE_BORE`, and `GUI_FOCAL_MANIPULATOR` to matching tile-backed screens; the remaining Stage 8-b/current GUI IDs still return null.
+- `ClientProxy.getClientGuiElement` constructs `GuiFocusPouch`, `GuiHandMirror`, `GuiHoverHarness`, `GuiMagicBox`, `GuiSpa`, and `GuiTravelingTrunk`, and now routes `GUI_THAUMATORIUM`, `GUI_DECONSTRUCTION_TABLE`, `GUI_ALCHEMY_FURNACE`, `GUI_ARCANE_WORKBENCH`, `GUI_ARCANE_BORE`, and `GUI_FOCAL_MANIPULATOR` to matching tile-backed screens; the remaining Stage 8-b/current GUI IDs still return null.
 - `GuiFocusPouch`, `GuiHandMirror`, and `GuiHoverHarness` now bind original textures instead of grey placeholder rectangles.
-- `src/main/resources/assets/thaumcraft/textures/gui/gui_thaumatorium.png`, `gui_arcaneworkbench.png`, `gui_arcanebore.png`, `gui_wandtable.png`, `gui_decontable.png`, `gui_alchemyfurnace.png`, `gui_spa.png`, `gui_focuspouch.png`, `guihandmirror.png`, and `guihoverharness.png` are copied byte-for-byte from `thaumcraft_src/assets/thaumcraft/textures/gui/`; the other reference GUI textures are still absent from current resources.
+- `src/main/resources/assets/thaumcraft/textures/gui/gui_thaumatorium.png`, `gui_arcaneworkbench.png`, `gui_arcanebore.png`, `gui_wandtable.png`, `gui_decontable.png`, `gui_alchemyfurnace.png`, `gui_spa.png`, `guitrunkbase.png`, `gui_focuspouch.png`, `guihandmirror.png`, and `guihoverharness.png` are copied byte-for-byte from `thaumcraft_src/assets/thaumcraft/textures/gui/`; the other reference GUI textures are still absent from current resources.
 - `src/main/resources/assets/thaumcraft/textures/aspects/**` now contains the original aspect icon set needed by Thaumatorium and later research/aspect GUI rendering.
-- Current English lang has only `container.focus_pouch`, `container.handmirror`, `container.hoverharness`, and `container.inventory` for implemented GUI labels in `src/main/resources/assets/thaumcraft/lang/en_us.lang:101-104`; research/golem/trunk/interaction GUI keys are absent.
+- Current English lang now includes item GUI labels plus focal/trunk/spa GUI keys used by implemented screens, but research-browser/table and other remaining Stage 8-b GUI key coverage is still incomplete.
 - Thaumonomicon right-click opens GUI ID `12` server-side in `src/main/java/thaumcraft/common/items/relics/ItemThaumonomicon.java:43-50`, but client ID `12` returns null in `src/main/java/thaumcraft/client/ClientProxy.java:78-84`.
 - Thaumometer currently performs server-side scanning in `src/main/java/thaumcraft/common/items/relics/ItemThaumometer.java:37-69`; no `GuiScreen`/overlay implementation was found under `src/main/java/thaumcraft/client/**`.
 
@@ -350,15 +350,17 @@ Pech taming/trade item valuation is common gameplay; if incomplete, GUI can stil
 
 ### GAP-7: Traveling Trunk GUI отсутствует на клиенте
 
-**Статус:** отсутствует  
+**Статус:** частично реализовано
 **Критичность:** blocker
 
 **Текущая реализация:**
-- `src/main/java/thaumcraft/client/ClientProxy.java:73-84`
+- `src/main/java/thaumcraft/client/ClientProxy.java#getClientGuiElement` routes GUI ID `2` through `world.getEntityByID(x)` to `GuiTravelingTrunk` when the entity is `EntityTravelingTrunk`.
 - `src/main/java/thaumcraft/common/CommonProxy.java:74-77`
 - `src/main/java/thaumcraft/common/entities/golems/EntityTravelingTrunk.java:84-90`
-- Отсутствует `src/main/java/thaumcraft/client/gui/GuiTravelingTrunk.java`.
-- Отсутствует `src/main/resources/assets/thaumcraft/textures/gui/guitrunkbase.png`.
+- `src/main/java/thaumcraft/client/gui/GuiTravelingTrunk.java` exists as a 1.12.2 `GuiContainer` baseline using `ContainerTravelingTrunk`.
+- `src/main/java/thaumcraft/common/entities/golems/ContainerTravelingTrunk.java` now handles button id `1` for stay/move toggle via `enchantItem`.
+- `src/main/resources/assets/thaumcraft/textures/gui/guitrunkbase.png` exists and matches the original asset.
+- `src/main/resources/assets/thaumcraft/lang/en_us.lang` now contains `entity.trunk.guiname`, `entity.trunk.move`, and `entity.trunk.stay`.
 
 **Референс:**
 - `Thaumcraft-1.7.10-4.2.3.5.jar!/thaumcraft/client/ClientProxy.class`, offsets `154-174` instantiate `GuiTravelingTrunk` for GUI ID `2`.
@@ -366,23 +368,32 @@ Pech taming/trade item valuation is common gameplay; if incomplete, GUI can stil
 - `thaumcraft_src/assets/thaumcraft/textures/gui/guitrunkbase.png`.
 
 **Что не совпадает:**
-Reference GUI sizes itself by trunk inventory rows, draws owner/name text via `entity.trunk.guiname`, has stay/move button text (`entity.trunk.move`, `entity.trunk.stay`), and sends a button action. Current client returns null and has no trunk texture or lang keys.
+Reference GUI sizes itself by trunk inventory rows, draws owner/name text via `entity.trunk.guiname`, has stay/move button text (`entity.trunk.move`, `entity.trunk.stay`), and sends a button action. Current client now opens a texture-backed baseline, routes the stay/move button packet path, and includes trunk lang/texture resources. Manual runtime parity and some owner-label nuances are still unverified.
 
 **Что нужно доделать:**
-Port Traveling Trunk GUI, including dynamic rows, open/close behavior, stay/move toggle and lang keys.
+Finish Traveling Trunk parity by manually validating open/toggle/close behavior, owner label text, and inventory row behavior against runtime trunk upgrades.
 
 **Как доделать:**
-- Add `src/main/java/thaumcraft/client/gui/GuiTravelingTrunk.java`.
-- Route `GUI_TRAVELING_TRUNK` through `world.getEntityByID(x)` and `EntityTravelingTrunk` validation.
-- Copy `guitrunkbase.png`.
-- Add lang keys equivalent to reference: `entity.trunk.guiname`, `entity.trunk.move`, `entity.trunk.stay`.
+- Done: add `src/main/java/thaumcraft/client/gui/GuiTravelingTrunk.java`.
+- Done: route `GUI_TRAVELING_TRUNK` through `world.getEntityByID(x)` and `EntityTravelingTrunk` validation.
+- Done: copy `guitrunkbase.png`.
+- Done: add lang keys equivalent to reference: `entity.trunk.guiname`, `entity.trunk.move`, `entity.trunk.stay`.
 - Scenario: interact with Traveling Trunk and toggle stay/move.
 
 **Критерии приемки:**
 - [ ] GUI ID `2` opens for Traveling Trunk.
-- [ ] Inventory row count matches trunk capacity.
-- [ ] Stay/move toggle renders localized text and updates state through container button interaction.
+- [x] Inventory row count and base layout follow trunk row data from `EntityTravelingTrunk`.
+- [x] Stay/move toggle renders localized text and updates state through container button interaction.
 - [ ] Closing GUI calls the appropriate open-state cleanup without client/server desync.
+
+**Checkpoint 2026-05-15 — Traveling Trunk GUI baseline:**
+- Added `GuiTravelingTrunk` with original `guitrunkbase.png`, health bar, stay icon, and stay/move toggle click behavior through `sendEnchantPacket(windowId, 1)`.
+- Routed client GUI ID `2` to the screen through entity lookup and `EntityTravelingTrunk` type check.
+- Added trunk GUI language keys (`entity.trunk.guiname`, `entity.trunk.move`, `entity.trunk.stay`) and copied the original trunk GUI texture.
+- Updated `ContainerTravelingTrunk` with button id `1` handling to toggle stay/move server-side.
+- Validation: `./scripts/dev.sh compileJava` passed; `./scripts/dev.sh validate --smoke` passed with tests `10/10`, jar/check-jar summary `5316` MCP leak lines / `1051` unique leaks, server ready at `Done (1.294s)!`, and no crash reports under `run/`.
+- Client smoke/manual GUI open was skipped because `DISPLAY=` and user-driven GUI/graphics validation is excluded for this run.
+- Remaining: manual open/toggle/close checks, owner-label parity, and full runtime verification across trunk upgrade variants.
 
 **Риски / зависимости:**
 Depends on current `EntityTravelingTrunk` and `ContainerTravelingTrunk` preserving reference state fields and button IDs.
@@ -602,7 +613,7 @@ Inventory-slot blocking is behavior-sensitive and can cause item loss/duplicatio
 **Критичность:** blocker
 
 **Текущая реализация:**
-- `src/main/resources/assets/thaumcraft/textures/gui/` now contains `gui_thaumatorium.png`, `gui_arcaneworkbench.png`, `gui_arcanebore.png`, `gui_wandtable.png`, `gui_decontable.png`, `gui_alchemyfurnace.png`, `gui_spa.png`, `gui_focuspouch.png`, `guihandmirror.png`, and `guihoverharness.png`.
+- `src/main/resources/assets/thaumcraft/textures/gui/` now contains `gui_thaumatorium.png`, `gui_arcaneworkbench.png`, `gui_arcanebore.png`, `gui_wandtable.png`, `gui_decontable.png`, `gui_alchemyfurnace.png`, `gui_spa.png`, `guitrunkbase.png`, `gui_focuspouch.png`, `guihandmirror.png`, and `guihoverharness.png`.
 - `src/main/resources/assets/thaumcraft/textures/misc/potions.png` is the only current `textures/misc` file found.
 - `src/main/resources/assets/thaumcraft/textures/aspects/**` now contains the original aspect icon set copied for Thaumatorium/aspect GUI rendering.
 
@@ -631,7 +642,7 @@ Inventory-slot blocking is behavior-sensitive and can cause item loss/duplicatio
 - Research support textures under `thaumcraft_src/assets/thaumcraft/textures/misc/**` and aspect icons under `thaumcraft_src/assets/thaumcraft/textures/aspects/**`.
 
 **Что не совпадает:**
-The texture resource tree now covers the newly ported Thaumatorium, Arcane Workbench, Arcane Bore, Focal Manipulator, Deconstruction Table, Alchemy Furnace, Spa, Focus Pouch, Hand Mirror, Hover Harness, and aspect-icon paths, but most remaining Stage 8-b GUI textures and direct research misc support textures are still absent.
+The texture resource tree now covers the newly ported Thaumatorium, Arcane Workbench, Arcane Bore, Focal Manipulator, Deconstruction Table, Alchemy Furnace, Traveling Trunk, Spa, Focus Pouch, Hand Mirror, Hover Harness, and aspect-icon paths, but most remaining Stage 8-b GUI textures and direct research misc support textures are still absent.
 
 **Что нужно доделать:**
 Copy original GUI and directly used support textures from `thaumcraft_src/assets/` to `src/main/resources/assets/thaumcraft/`.

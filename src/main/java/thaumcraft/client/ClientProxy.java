@@ -27,6 +27,7 @@ import thaumcraft.client.gui.GuiHoverHarness;
 import thaumcraft.client.gui.GuiMagicBox;
 import thaumcraft.client.gui.GuiSpa;
 import thaumcraft.client.gui.GuiThaumatorium;
+import thaumcraft.client.gui.GuiTravelingTrunk;
 import thaumcraft.client.fx.ParticleEngine;
 import thaumcraft.client.lib.ClientTickEventsFML;
 import thaumcraft.client.lib.KeyHandler;
@@ -41,6 +42,7 @@ import thaumcraft.common.tiles.TileDeconstructionTable;
 import thaumcraft.common.tiles.TileFocalManipulator;
 import thaumcraft.common.tiles.TileSpa;
 import thaumcraft.common.tiles.TileThaumatorium;
+import thaumcraft.common.entities.golems.EntityTravelingTrunk;
 
 public class ClientProxy extends CommonProxy {
 
@@ -136,8 +138,14 @@ public class ClientProxy extends CommonProxy {
                 return new GuiHoverHarness(player.inventory, world, x, y, z);
             case GUI_GOLEM:
             case GUI_PECH:
-            case GUI_TRAVELING_TRUNK:
                 return null;
+            case GUI_TRAVELING_TRUNK:
+            {
+                net.minecraft.entity.Entity entity = world.getEntityByID(x);
+                return entity instanceof EntityTravelingTrunk
+                        ? new GuiTravelingTrunk(player, (EntityTravelingTrunk) entity)
+                        : null;
+            }
             case GUI_THAUMATORIUM:
             {
                 TileEntity tile = world.getTileEntity(new BlockPos(x, y, z));
