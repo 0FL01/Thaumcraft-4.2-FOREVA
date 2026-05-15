@@ -94,7 +94,7 @@ Some referenced outputs/items/blocks may still be partial in earlier phases; tha
 
 ### GAP-2: Отсутствует регистрация всех infusion enchantment recipes
 
-**Статус:** отсутствует  
+**Статус:** частично закрыт (24 reference enchantment entries added via helper baseline)  
 **Критичность:** blocker
 
 **Текущая реализация:**
@@ -110,7 +110,13 @@ Some referenced outputs/items/blocks may still be partial in earlier phases; tha
 
 **Что не совпадает:**
 
-Current API can construct `InfusionEnchantmentRecipe`, and the matrix can look for them, but current code registers zero enchantment infusion recipes. Reference `ConfigRecipes.class` registers 24 entries: `InfEnchRepair`, `InfEnchHaste`, and `InfEnch0` through `InfEnch21`, all gated by `"INFUSIONENCHANTMENT"`, with specific vanilla/custom enchantment IDs, instability values, aspects and components. Without these registrations, the reference Thaumonomicon infusion enchantment flow is unusable even if `InfusionEnchantmentRecipe.matches()` exists (`src/main/java/thaumcraft/api/crafting/InfusionEnchantmentRecipe.java:31`, `src/main/java/thaumcraft/common/tiles/TileInfusionMatrix.java:234`).
+Current API can construct `InfusionEnchantmentRecipe`, and the matrix can look for them. Port now includes helper-based registration in `ConfigRecipes.init()` for the full reference key set:
+- `InfEnchRepair`, `InfEnchHaste`, `InfEnch0` ... `InfEnch21` (24 total),
+- all under `"INFUSIONENCHANTMENT"` with reference instability/aspect/component data,
+- custom enchant hooks through current `Config.enchRepair` and `Config.enchHaste`,
+- vanilla enchant mappings to 1.12 `Enchantments.*`.
+
+Remaining open work is runtime/research-page verification, not raw recipe-entry absence.
 
 **Что нужно доделать:**
 
@@ -124,9 +130,9 @@ Port all reference infusion enchantment registrations to 1.12.2 enchantment obje
 - Verify `InfusionEnchantmentRecipe.matches()` works for enchantable vanilla tools/armor and respects max level/compatibility (`src/main/java/thaumcraft/api/crafting/InfusionEnchantmentRecipe.java:35`, `src/main/java/thaumcraft/api/crafting/InfusionEnchantmentRecipe.java:38`, `src/main/java/thaumcraft/api/crafting/InfusionEnchantmentRecipe.java:42`).
 
 **Критерии приемки:**
-- [ ] `rg -n "addInfusionEnchantmentRecipe" src/main/java/thaumcraft/common/config/ConfigRecipes.java` reports the expected reference count: 24.
-- [ ] Custom enchant recipes for Repair and Haste are registered and use current 1.12.2 custom enchant objects.
-- [ ] Vanilla enchant recipes map to the correct 1.12.2 enchantments and preserve reference instability/aspect/component data.
+- [x] 24 reference enchantment keys are registered (`InfEnchRepair`, `InfEnchHaste`, `InfEnch0` ... `InfEnch21`) via helper-based `ConfigRecipes` registration.
+- [x] Custom enchant recipes for Repair and Haste are registered and use current 1.12.2 custom enchant objects.
+- [x] Vanilla enchant recipes map to the correct 1.12.2 enchantments and preserve reference instability/aspect/component data.
 - [ ] Manual or focused test scenario can perform at least one armor enchant, one weapon enchant and one tool enchant through Infusion Matrix.
 
 **Риски / зависимости:**

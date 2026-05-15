@@ -1,7 +1,9 @@
 package thaumcraft.common.config;
 
 import net.minecraft.init.Blocks;
+import net.minecraft.init.Enchantments;
 import net.minecraft.init.Items;
+import net.minecraft.enchantment.Enchantment;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.nbt.NBTTagCompound;
@@ -25,6 +27,7 @@ public class ConfigRecipes {
         ConfigResearch.recipes.clear();
         initializeArcaneRecipeBaseline();
         initializeInfusionWandRecipeBaseline();
+        initializeInfusionEnchantmentRecipeBaseline();
 
         boolean hasArcaneWand = false;
         boolean hasArcaneSceptre = false;
@@ -879,6 +882,191 @@ public class ConfigRecipes {
                 new ItemStack(ConfigItems.itemWandRod, 1, 7));
     }
 
+    private static void initializeInfusionEnchantmentRecipeBaseline() {
+        registerInfusionEnchantmentRecipe("InfEnchRepair", "INFUSIONENCHANTMENT",
+                Config.enchRepair,
+                4,
+                new AspectList().add(Aspect.MAGIC, 8).add(Aspect.CRAFT, 10).add(Aspect.ORDER, 10),
+                new ItemStack(Blocks.ANVIL),
+                new ItemStack(ConfigItems.itemResource, 1, 14));
+
+        registerInfusionEnchantmentRecipe("InfEnchHaste", "INFUSIONENCHANTMENT",
+                Config.enchHaste,
+                3,
+                new AspectList().add(Aspect.MAGIC, 4).add(Aspect.TRAVEL, 8).add(Aspect.FLIGHT, 8),
+                new ItemStack(ConfigItems.itemResource, 1, 1),
+                new ItemStack(ConfigItems.itemResource, 1, 14));
+
+        registerInfusionEnchantmentRecipe("InfEnch0", "INFUSIONENCHANTMENT",
+                Enchantments.PROTECTION,
+                1,
+                new AspectList().add(Aspect.MAGIC, 4).add(Aspect.ARMOR, 8),
+                new ItemStack(Items.IRON_INGOT),
+                new ItemStack(ConfigItems.itemResource, 1, 14));
+
+        registerInfusionEnchantmentRecipe("InfEnch1", "INFUSIONENCHANTMENT",
+                Enchantments.FIRE_PROTECTION,
+                1,
+                new AspectList().add(Aspect.MAGIC, 4).add(Aspect.ARMOR, 4).add(Aspect.FIRE, 4),
+                new ItemStack(Items.IRON_INGOT),
+                new ItemStack(Items.MAGMA_CREAM),
+                new ItemStack(ConfigItems.itemResource, 1, 14));
+
+        registerInfusionEnchantmentRecipe("InfEnch2", "INFUSIONENCHANTMENT",
+                Enchantments.FEATHER_FALLING,
+                1,
+                new AspectList().add(Aspect.MAGIC, 4).add(Aspect.ARMOR, 4).add(Aspect.ENTROPY, 4),
+                new ItemStack(Items.IRON_INGOT),
+                new ItemStack(Items.GUNPOWDER),
+                new ItemStack(ConfigItems.itemResource, 1, 14));
+
+        registerInfusionEnchantmentRecipe("InfEnch3", "INFUSIONENCHANTMENT",
+                Enchantments.BLAST_PROTECTION,
+                1,
+                new AspectList().add(Aspect.MAGIC, 4).add(Aspect.ARMOR, 4).add(Aspect.FLIGHT, 4),
+                new ItemStack(Items.IRON_INGOT),
+                new ItemStack(Items.ARROW),
+                new ItemStack(ConfigItems.itemResource, 1, 14));
+
+        registerInfusionEnchantmentRecipe("InfEnch4", "INFUSIONENCHANTMENT",
+                Enchantments.PROJECTILE_PROTECTION,
+                1,
+                new AspectList().add(Aspect.MAGIC, 4).add(Aspect.AIR, 4).add(Aspect.FLIGHT, 4),
+                new ItemStack(Items.FEATHER),
+                new ItemStack(ConfigItems.itemResource, 1, 14));
+
+        registerInfusionEnchantmentRecipe("InfEnch5", "INFUSIONENCHANTMENT",
+                Enchantments.RESPIRATION,
+                2,
+                new AspectList().add(Aspect.MAGIC, 4).add(Aspect.AIR, 8).add(Aspect.WATER, 8),
+                new ItemStack(Items.REEDS),
+                new ItemStack(ConfigItems.itemResource, 1, 14));
+
+        registerInfusionEnchantmentRecipe("InfEnch6", "INFUSIONENCHANTMENT",
+                Enchantments.AQUA_AFFINITY,
+                2,
+                new AspectList().add(Aspect.MAGIC, 4).add(Aspect.MOTION, 8).add(Aspect.WATER, 8),
+                new ItemStack(Items.REEDS),
+                new ItemStack(Items.SLIME_BALL),
+                new ItemStack(ConfigItems.itemResource, 1, 14));
+
+        registerInfusionEnchantmentRecipe("InfEnch7", "INFUSIONENCHANTMENT",
+                Enchantments.THORNS,
+                2,
+                new AspectList().add(Aspect.MAGIC, 4).add(Aspect.WEAPON, 8).add(Aspect.PLANT, 8),
+                new ItemStack(Blocks.DEADBUSH),
+                new ItemStack(Items.QUARTZ),
+                new ItemStack(ConfigItems.itemResource, 1, 14));
+
+        registerInfusionEnchantmentRecipe("InfEnch8", "INFUSIONENCHANTMENT",
+                Enchantments.SHARPNESS,
+                2,
+                new AspectList().add(Aspect.MAGIC, 4).add(Aspect.WEAPON, 8),
+                new ItemStack(Items.IRON_SWORD),
+                new ItemStack(ConfigItems.itemResource, 1, 14));
+
+        registerInfusionEnchantmentRecipe("InfEnch9", "INFUSIONENCHANTMENT",
+                Enchantments.SMITE,
+                2,
+                new AspectList().add(Aspect.MAGIC, 4).add(Aspect.WEAPON, 4).add(Aspect.UNDEAD, 4),
+                new ItemStack(Items.IRON_SWORD),
+                new ItemStack(Items.GLOWSTONE_DUST),
+                new ItemStack(ConfigItems.itemResource, 1, 14));
+
+        registerInfusionEnchantmentRecipe("InfEnch10", "INFUSIONENCHANTMENT",
+                Enchantments.BANE_OF_ARTHROPODS,
+                2,
+                new AspectList().add(Aspect.MAGIC, 4).add(Aspect.WEAPON, 4).add(Aspect.BEAST, 4),
+                new ItemStack(Items.IRON_SWORD),
+                new ItemStack(ConfigItems.itemResource, 1, 6),
+                new ItemStack(ConfigItems.itemResource, 1, 14));
+
+        registerInfusionEnchantmentRecipe("InfEnch11", "INFUSIONENCHANTMENT",
+                Enchantments.KNOCKBACK,
+                1,
+                new AspectList().add(Aspect.MAGIC, 4).add(Aspect.WEAPON, 3).add(Aspect.MOTION, 3),
+                new ItemStack(Blocks.PISTON),
+                new ItemStack(ConfigItems.itemResource, 1, 14));
+
+        registerInfusionEnchantmentRecipe("InfEnch12", "INFUSIONENCHANTMENT",
+                Enchantments.FIRE_ASPECT,
+                3,
+                new AspectList().add(Aspect.MAGIC, 4).add(Aspect.WEAPON, 4).add(Aspect.FIRE, 8),
+                new ItemStack(Items.IRON_SWORD),
+                new ItemStack(Items.BLAZE_POWDER),
+                new ItemStack(ConfigItems.itemResource, 1, 14));
+
+        registerInfusionEnchantmentRecipe("InfEnch13", "INFUSIONENCHANTMENT",
+                Enchantments.LOOTING,
+                3,
+                new AspectList().add(Aspect.MAGIC, 4).add(Aspect.WEAPON, 4).add(Aspect.GREED, 8),
+                new ItemStack(Items.IRON_SWORD),
+                new ItemStack(Items.DIAMOND),
+                new ItemStack(ConfigItems.itemResource, 1, 14));
+
+        registerInfusionEnchantmentRecipe("InfEnch14", "INFUSIONENCHANTMENT",
+                Enchantments.EFFICIENCY,
+                2,
+                new AspectList().add(Aspect.MAGIC, 4).add(Aspect.TOOL, 4).add(Aspect.ORDER, 4),
+                new ItemStack(Items.IRON_PICKAXE),
+                new ItemStack(ConfigItems.itemResource, 1, 14));
+
+        registerInfusionEnchantmentRecipe("InfEnch15", "INFUSIONENCHANTMENT",
+                Enchantments.SILK_TOUCH,
+                5,
+                new AspectList().add(Aspect.MAGIC, 16).add(Aspect.TOOL, 16).add(Aspect.ORDER, 16)
+                        .add(Aspect.HARVEST, 16).add(Aspect.MINE, 16),
+                new ItemStack(Items.IRON_PICKAXE),
+                new ItemStack(Blocks.WEB),
+                new ItemStack(ConfigItems.itemResource, 1, 14));
+
+        registerInfusionEnchantmentRecipe("InfEnch16", "INFUSIONENCHANTMENT",
+                Enchantments.UNBREAKING,
+                2,
+                new AspectList().add(Aspect.MAGIC, 4).add(Aspect.TOOL, 4).add(Aspect.ORDER, 8),
+                new ItemStack(Items.IRON_PICKAXE),
+                new ItemStack(Blocks.OBSIDIAN),
+                new ItemStack(ConfigItems.itemResource, 1, 14));
+
+        registerInfusionEnchantmentRecipe("InfEnch17", "INFUSIONENCHANTMENT",
+                Enchantments.FORTUNE,
+                3,
+                new AspectList().add(Aspect.MAGIC, 4).add(Aspect.TOOL, 4).add(Aspect.GREED, 8),
+                new ItemStack(Items.IRON_PICKAXE),
+                new ItemStack(Items.DIAMOND),
+                new ItemStack(ConfigItems.itemResource, 1, 14));
+
+        registerInfusionEnchantmentRecipe("InfEnch18", "INFUSIONENCHANTMENT",
+                Enchantments.POWER,
+                2,
+                new AspectList().add(Aspect.MAGIC, 4).add(Aspect.WEAPON, 8),
+                new ItemStack(Items.BOW),
+                new ItemStack(ConfigItems.itemResource, 1, 14));
+
+        registerInfusionEnchantmentRecipe("InfEnch19", "INFUSIONENCHANTMENT",
+                Enchantments.PUNCH,
+                2,
+                new AspectList().add(Aspect.MAGIC, 4).add(Aspect.WEAPON, 3).add(Aspect.MOTION, 3),
+                new ItemStack(Blocks.PISTON),
+                new ItemStack(ConfigItems.itemResource, 1, 14));
+
+        registerInfusionEnchantmentRecipe("InfEnch20", "INFUSIONENCHANTMENT",
+                Enchantments.FLAME,
+                3,
+                new AspectList().add(Aspect.MAGIC, 4).add(Aspect.WEAPON, 4).add(Aspect.FIRE, 8),
+                new ItemStack(Items.BOW),
+                new ItemStack(Items.BLAZE_POWDER),
+                new ItemStack(ConfigItems.itemResource, 1, 14));
+
+        registerInfusionEnchantmentRecipe("InfEnch21", "INFUSIONENCHANTMENT",
+                Enchantments.INFINITY,
+                5,
+                new AspectList().add(Aspect.MAGIC, 8).add(Aspect.WEAPON, 16).add(Aspect.VOID, 16).add(Aspect.EXCHANGE, 16),
+                new ItemStack(Items.BOW),
+                new ItemStack(Items.ARROW),
+                new ItemStack(ConfigItems.itemResource, 1, 14));
+    }
+
     private static void registerInfusionRecipe(String key, String research, ItemStack output, int instability, AspectList aspects,
                                                ItemStack centralInput, ItemStack... components) {
         ConfigResearch.recipes.put(key, ThaumcraftApi.addInfusionCraftingRecipe(
@@ -887,6 +1075,16 @@ public class ConfigRecipes {
                 instability,
                 aspects,
                 centralInput,
+                components));
+    }
+
+    private static void registerInfusionEnchantmentRecipe(String key, String research, Enchantment enchantment, int instability,
+                                                          AspectList aspects, ItemStack... components) {
+        ConfigResearch.recipes.put(key, ThaumcraftApi.addInfusionEnchantmentRecipe(
+                research,
+                enchantment,
+                instability,
+                aspects,
                 components));
     }
 

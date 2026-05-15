@@ -67,6 +67,28 @@ Branch: `codex/durable-goal-stage8-9`
 
 ## Checkpoint Log
 
+### 2026-05-15 — Stage 9-c infusion enchantment baseline
+
+Scope:
+
+- Added helper-based infusion enchantment registration block to `ConfigRecipes.init()`:
+  - custom recipes: `InfEnchRepair`, `InfEnchHaste` (using current `Config.enchRepair`, `Config.enchHaste`);
+  - vanilla set: `InfEnch0` ... `InfEnch21` mapped to 1.12 `Enchantments.*`.
+- Preserved reference keys, gate (`INFUSIONENCHANTMENT`), instability, aspect costs, and component lists for all 24 entries.
+- Added `registerInfusionEnchantmentRecipe(...)` helper and updated `docs/Stage9-c.md` GAP-2 status to partial closure with key-level coverage.
+
+Validation:
+
+- `./scripts/dev.sh validate --smoke` — passed: status, compile, tests `10/10`, jar, check-jar summary `5552` MCP leak lines / `1088` unique leaks, and server smoke.
+- `run/smoke-server.log` evidence: `Registering entities`; `Forge Mod Loader has successfully loaded 6 mods`; `Done (1.186s)!`.
+- Crash report scan under `run/` returned no files.
+- `./scripts/dev.sh smoke-client` — skipped because `DISPLAY=` and GUI/graphics/user-interactive validation is excluded.
+
+Remaining limits:
+
+- Runtime verification of representative armor/weapon/tool infusion enchant scenarios remains open.
+- Research page/display parity and broader Stage 9-c acceptance matrix remain open.
+
 ### 2026-05-15 — Stage 9-c infusion wand-component baseline
 
 Scope:
