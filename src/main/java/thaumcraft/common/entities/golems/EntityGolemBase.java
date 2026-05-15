@@ -651,15 +651,26 @@ public class EntityGolemBase extends net.minecraft.entity.monster.EntityGolem im
                 net.minecraft.util.math.MathHelper.floor(target.posY),
                 net.minecraft.util.math.MathHelper.floor(target.posZ))) return false;
         if (this.getCore() == 9) {
-            if ((target instanceof net.minecraft.entity.passive.EntityAnimal || target instanceof net.minecraft.entity.passive.IAnimals)
-                && !(target instanceof net.minecraft.entity.monster.IMob)) return true;
+            if (this.isValidAnimalTarget(target, true)) return true;
         } else {
             if (this.canAttackCreepers() && this.getUpgradeAmount(4) > 0 && target instanceof net.minecraft.entity.monster.EntityCreeper) return true;
             if (this.canAttackHostiles() && target instanceof net.minecraft.entity.monster.IMob && !(target instanceof net.minecraft.entity.monster.EntityCreeper)) return true;
-            if (this.canAttackAnimals() && this.getUpgradeAmount(4) > 0 && target instanceof net.minecraft.entity.passive.IAnimals) return true;
+            if (this.canAttackAnimals() && this.getUpgradeAmount(4) > 0 && this.isValidAnimalTarget(target, false)) return true;
             if (this.canAttackPlayers() && this.getUpgradeAmount(4) > 0 && target instanceof net.minecraft.entity.player.EntityPlayer) return true;
         }
         return false;
+    }
+
+    private boolean isValidAnimalTarget(net.minecraft.entity.Entity target, boolean excludeChildren) {
+        if (!(target instanceof net.minecraft.entity.passive.EntityAnimal)
+                && !(target instanceof net.minecraft.entity.passive.IAnimals)) return false;
+        if (target instanceof net.minecraft.entity.monster.IMob) return false;
+        if (target instanceof net.minecraft.entity.passive.EntityTameable
+                && ((net.minecraft.entity.passive.EntityTameable) target).isTamed()) return false;
+        if (target instanceof net.minecraft.entity.monster.EntityGolem) return false;
+        return !excludeChildren
+                || !(target instanceof net.minecraft.entity.passive.EntityAnimal)
+                || !((net.minecraft.entity.passive.EntityAnimal) target).isChild();
     }
 
     public boolean canAttackHostiles() { return !this.getToggles()[1]; }
