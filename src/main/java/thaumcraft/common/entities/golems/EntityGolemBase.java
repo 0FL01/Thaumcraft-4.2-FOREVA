@@ -667,11 +667,30 @@ public class EntityGolemBase extends net.minecraft.entity.monster.EntityGolem im
     @Override
     public boolean attackEntityAsMob(net.minecraft.entity.Entity target) {
         float f = (float) this.getEntityAttribute(net.minecraft.entity.SharedMonsterAttributes.ATTACK_DAMAGE).getAttributeValue();
+        int knockback = 0;
+        if (target instanceof net.minecraft.entity.EntityLivingBase) {
+            net.minecraft.entity.EntityLivingBase livingTarget = (net.minecraft.entity.EntityLivingBase) target;
+            f += net.minecraft.enchantment.EnchantmentHelper.getModifierForCreature(
+                    this.getHeldItemMainhand(), livingTarget.getCreatureAttribute());
+            knockback += net.minecraft.enchantment.EnchantmentHelper.getKnockbackModifier(this);
+        }
         boolean flag = target.attackEntityFrom(net.minecraft.util.DamageSource.causeMobDamage(this), f);
         if (flag) {
             if (this.decoration.contains("V")) thaumcraft.common.lib.utils.EntityUtils.setRecentlyHit(target, 100);
+            if (knockback > 0) {
+                target.addVelocity(
+                        -net.minecraft.util.math.MathHelper.sin(this.rotationYaw * (float)Math.PI / 180.0F) * (float)knockback * 0.5F,
+                        0.1D,
+                        net.minecraft.util.math.MathHelper.cos(this.rotationYaw * (float)Math.PI / 180.0F) * (float)knockback * 0.5F);
+                this.motionX *= 0.6D;
+                this.motionZ *= 0.6D;
+            }
             int fire = net.minecraft.enchantment.EnchantmentHelper.getFireAspectModifier(this) + this.getUpgradeAmount(2);
             if (fire > 0) target.setFire(fire * 4);
+            if (target instanceof net.minecraft.entity.EntityLivingBase) {
+                net.minecraft.enchantment.EnchantmentHelper.applyThornEnchantments((net.minecraft.entity.EntityLivingBase) target, this);
+            }
+            net.minecraft.enchantment.EnchantmentHelper.applyArthropodEnchantments(this, target);
         }
         return flag;
     }
