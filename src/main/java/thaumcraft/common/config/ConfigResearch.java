@@ -865,6 +865,45 @@ public class ConfigResearch {
                 .setParents("DISTILESSENTIA")
                 .setConcealed()
                 .registerResearchItem();
+
+        new ResearchItem(
+                "LAMPGROWTH",
+                "ARTIFICE",
+                new AspectList()
+                        .add(Aspect.LIGHT, 3)
+                        .add(Aspect.PLANT, 6)
+                        .add(Aspect.LIFE, 3)
+                        .add(Aspect.CROP, 3),
+                -4,
+                3,
+                2,
+                new ItemStack(ConfigBlocks.blockMetalDevice, 1, 8))
+                .setPages(
+                        new ResearchPage("tc.research_page.LAMPGROWTH.1"),
+                        new ResearchPage((InfusionRecipe) recipes.get("LampGrowth")))
+                .setHidden()
+                .setAspectTriggers(Aspect.LIGHT, Aspect.CROP)
+                .setParents("ARCANELAMP", "INFUSION")
+                .registerResearchItem();
+
+        new ResearchItem(
+                "LAMPFERTILITY",
+                "ARTIFICE",
+                new AspectList()
+                        .add(Aspect.BEAST, 6)
+                        .add(Aspect.LIFE, 6)
+                        .add(Aspect.LIGHT, 3),
+                -2,
+                3,
+                2,
+                new ItemStack(ConfigBlocks.blockMetalDevice, 1, 13))
+                .setPages(
+                        new ResearchPage("tc.research_page.LAMPFERTILITY.1"),
+                        new ResearchPage((InfusionRecipe) recipes.get("LampFertility")))
+                .setHidden()
+                .setAspectTriggers(Aspect.LIGHT, Aspect.LIFE)
+                .setParents("ARCANELAMP", "INFUSION")
+                .registerResearchItem();
     }
 
     private static void initThaumaturgyResearchBaseline() {
