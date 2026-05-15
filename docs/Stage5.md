@@ -1121,3 +1121,22 @@ Validation evidence for this checkpoint:
 - `./scripts/dev.sh smoke-client` — skipped because `DISPLAY` is unset in the current environment.
 
 GAP-11 is advanced but not closed. Taint Bottle still needs manual projectile flight, impact, biome-taint, fibre-placement, and entity-poison scenario checks. Original client-side taintsplosion and bottle-break FX remain Phase 8 visual work.
+
+### 8.23 2026-05-15 Eldritch Object common-use checkpoint
+
+Implemented in the current checkpoint:
+
+- Restored the reference rarity split for `ItemEldritchObject`: meta `2` is rare, meta `3` is epic, and the other metas are uncommon.
+- Restored Crimson Rites right-click behavior as a non-consuming `CRIMSON` research completion trigger with the learn sound.
+- Restored primordial pearl/meta `3` node use against `TileNode`, including item consumption, base-aspect randomization, primal aspect seeding, node modifier improvement/degradation, block update, explosion, and flux goo/gas scatter.
+- Restored creative obelisk placer/meta `4` to use block activation instead of ray-traced right click, require top-side activation, preserve the original air-check range, place the original eldritch block metadata layout, and avoid survival item consumption.
+
+Validation evidence for this checkpoint:
+
+- `./scripts/dev.sh compileJava` — passed.
+- `./scripts/dev.sh build` — passed.
+- `./scripts/dev.sh check-jar` — passed; no MCP-named Minecraft field/method references were found in the built universal jar.
+- `./scripts/dev.sh smoke-server` — required and attempted repeatedly, but failed by timeout before ready state. The latest log stopped after early `FMLServerTweaker`/Log4j launch lines, the configured crash-marker scan found no matches, and no crash reports were present.
+- `./scripts/dev.sh smoke-client` — skipped because `DISPLAY` is unset in the current environment.
+
+GAP-11 is advanced but not closed. Eldritch Object still needs runtime/manual scenario evidence for Crimson Rites research sync, primordial pearl node mutation/flux scatter, and creative obelisk placement. Tooltip text and item overlay/render parity remain Phase 8/client-resource work.

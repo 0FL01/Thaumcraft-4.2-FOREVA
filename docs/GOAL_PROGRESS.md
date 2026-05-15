@@ -1617,6 +1617,28 @@ Remaining limits:
 - Manual projectile flight, impact, biome-taint, fibre-placement, and entity-poison scenario checks remain open.
 - Original client-side taintsplosion and bottle-break FX remain Phase 8 client visual work.
 
+### 2026-05-15 — Stage 5 Eldritch Object common use behavior
+
+Scope:
+
+- Restored `ItemEldritchObject` rarity tiers from the reference: meta `2` is rare, meta `3` is epic, other metas are uncommon.
+- Restored Crimson Rites right-click behavior as a non-consuming research-completion trigger with the learn sound, instead of consuming the item on use.
+- Restored the primordial pearl/meta `3` node-use path: consumes the item, mutates node base aspects/modifier with the reference random ranges, syncs the node, creates the explosion, and scatters flux goo/gas around open positions.
+- Restored creative obelisk placer/meta `4` block-use placement: top-side-only activation, original air checks, original block metadata layout, and no survival consumption.
+
+Validation:
+
+- `./scripts/dev.sh compileJava` — passed.
+- `./scripts/dev.sh build` — passed.
+- `./scripts/dev.sh check-jar` — passed; no MCP-named Minecraft field/method references were found in the built universal jar.
+- `./scripts/dev.sh smoke-server` — required and attempted repeatedly, but failed by timeout before ready state. The latest log stopped after the early `FMLServerTweaker`/Log4j launch lines, the configured crash-marker scan found no matches, and no crash reports were present.
+- `./scripts/dev.sh smoke-client` — skipped because `DISPLAY` is unset in the current environment.
+
+Remaining limits:
+
+- Runtime scenarios for Crimson Rites research sync, primordial pearl node mutation/flux scatter, and obelisk placement remain unvalidated because server smoke did not reach ready state and manual in-world scenarios are out of scope.
+- Original tooltip text and item overlay/render parity remain Phase 8/client-resource work.
+
 ## Next Checkpoint Candidate
 
 After the golem carried-display, trunk transfer, death logging, fire-resistance, armor, water-pathing, no-drowning, melee-enchantment, upgrade-retaliation, target-range, animal-target-filter, butcher-acquisition, item-pickup-delay, essentia-jar-destination, liquid-target-tank, portal-support, outer-provider-spawn, outer-structure-query, outer-worldgen-ownership, Stage7-docs-refresh, hover-motion, biome policy, and Greatwood-support checkpoints, the next pre-Phase8 candidates are:
