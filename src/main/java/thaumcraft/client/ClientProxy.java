@@ -1,6 +1,7 @@
 package thaumcraft.client;
 
 import javax.annotation.Nullable;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
@@ -31,6 +32,12 @@ public class ClientProxy extends CommonProxy {
             for (int meta = 0; meta < 64; meta++) {
                 ModelLoader.setCustomModelResourceLocation(item, meta, model);
             }
+        }
+        if (ConfigItems.itemManaBean != null) {
+            Minecraft.getMinecraft().getItemColors().registerItemColorHandler(
+                    (stack, tintIndex) -> ConfigItems.itemManaBean.getColorFromItemStack(stack),
+                    ConfigItems.itemManaBean
+            );
         }
     }
 

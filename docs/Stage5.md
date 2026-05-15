@@ -1026,3 +1026,23 @@ Validation evidence for this checkpoint:
 - `./scripts/dev.sh smoke-client` — skipped because `DISPLAY` is unset in the current environment.
 
 GAP-5 is advanced but not closed. Remaining Hover work includes client/manual H-key and sound validation, client/manual tooltip display validation, and manual in-world fuel/toggle/fall/float validation.
+
+### 8.18 2026-05-15 Mana Bean and mana pod checkpoint
+
+Implemented in the current checkpoint:
+
+- Restored Mana Bean reference-style `Aspects` NBT writes with legacy `aspect` fallback reads, 10-tick use duration, original nutrition/saturation shape, and discovered/unknown aspect tooltip text.
+- Restored eating side effects using a reference-shaped old potion table roll and the original 25% aspect-pool gain path, including capability cache refresh and `PacketAspectPool` sync for multiplayer clients.
+- Restored planting constraints and side effects: underside-only placement, vanilla/magical-log support, Magical-biome requirement, pod placement below the clicked log, bean aspect transfer to `TileManaPod`, and non-creative stack consumption.
+- Restored mana pod tile aspect persistence, mature `IAspectContainer` exposure, growth/crossbreeding/default aspect behavior, support validation, aspect-preserving bean drops, and worldgen growth initialization.
+- Added client item-color registration for Mana Beans through `ClientProxy` while keeping the color handler client-side.
+
+Validation evidence for this checkpoint:
+
+- `./scripts/dev.sh compileJava` — passed.
+- `./scripts/dev.sh build` — passed.
+- `./scripts/dev.sh check-jar` — failed before jar inspection because the wrapper's expected MCP mapping cache file is still absent at `.gradle_home/caches/minecraft/de/oceanlabs/mcp/mcp_stable/39/1.12.2/srgs/mcp-srg.srg`.
+- `./scripts/dev.sh smoke-server` — failed by timeout before ready state; log again stopped after `Calling tweak class net.minecraftforge.fml.common.launcher.FMLServerTweaker`, with only Log4j console appender initialization errors. `run/crash-reports/` does not exist, and the configured crash-marker scan found no matches.
+- `./scripts/dev.sh smoke-client` — skipped because `DISPLAY` is unset in the current environment.
+
+GAP-11 is advanced but not closed. Remaining utility/relic simplification targets from RECON include `ItemBucketPure`, `ItemResonator`, `ItemResearchNotes`, `ItemEldritchObject`, `ItemEssence`, `ItemSanitySoap`, and the remaining relic/tool/bauble validation work listed above. Mana Bean still needs manual eating/planting/harvest validation, and mana pod visual renderer/model parity remains Stage 8.

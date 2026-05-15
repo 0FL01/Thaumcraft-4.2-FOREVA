@@ -519,6 +519,11 @@ Ore/block metadata must match existing 1.12.2 blockstate mappings in `ConfigBloc
 
 Remaining GAP-9 limits after this checkpoint: the full reference vegetation control flow is still missing from GAP-1, Greatwood/Silverwood natural generation is still mostly limited by the current worldgen caller, Silverwood parameter/chance parity remains open, ore placement parity remains open, and spider Greatwood has not been observed in a runtime world because server smoke remains environment-blocked.
 
+**Checkpoint 2026-05-15 — Mana pod support/growth baseline:**
+`WorldGenManaPods` now uses the mana pod block's reference-like underside/support checks, places pods only below valid vanilla/magical logs in Magical biomes, and triggers tile growth initialization after generation. `BlockManaPod` now has random growth ticks, support removal checks, aspect-preserving Mana Bean drops, and mature light/hardness behavior, while `TileManaPod` persists its aspect and performs the reference neighboring-pod aspect combination/default assignment logic.
+
+Remaining GAP-9 limits after this checkpoint: mana pod generation/harvest still needs fresh-world runtime sampling, mana pod visual model/renderer parity is Stage 8, and the broader vegetation/ore probability gaps listed above remain open.
+
 ### GAP-10: Boss/world data exists but integration with boss-room lifecycle is unverified
 
 **Статус:** требует проверки  

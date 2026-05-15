@@ -1502,6 +1502,30 @@ Remaining limits:
 - Stage 8-a keybindings still need client Controls-screen and in-world packet/manual validation.
 - Focus radial rendering remains a later Stage 8 client-rendering task; this checkpoint only restores the key state/dispatch boundary.
 
+### 2026-05-15 — Stage 5/7 Mana Bean and mana pod behavior
+
+Scope:
+
+- Restored Mana Bean reference-style `Aspects` NBT storage with legacy `aspect` fallback, 10-tick use duration, original nutrition/saturation shape, tooltip aspect disclosure, and client item-color registration.
+- Restored eating side effects: a reference-shaped old potion table roll and 25% aspect-pool gain with capability cache refresh and `PacketAspectPool` sync.
+- Restored planting constraints: beans only plant on the underside of vanilla/magical logs in Magical biomes, place the pod below the clicked log, transfer the bean aspect to `TileManaPod`, and consume one bean outside creative.
+- Restored `TileManaPod` aspect persistence, mature `IAspectContainer` exposure, growth, neighboring pod aspect combination, and default primal/Herba assignment.
+- Restored mana pod support checks, random growth tick, aspect-preserving bean drops, pick-block return, and worldgen growth initialization through `WorldGenManaPods`.
+
+Validation:
+
+- `./scripts/dev.sh compileJava` — passed.
+- `./scripts/dev.sh build` — passed.
+- `./scripts/dev.sh check-jar` — failed before jar inspection because the wrapper's expected MCP mapping cache file is still absent at `.gradle_home/caches/minecraft/de/oceanlabs/mcp/mcp_stable/39/1.12.2/srgs/mcp-srg.srg`.
+- `./scripts/dev.sh smoke-server` — failed by timeout before ready state; log again stopped after `Calling tweak class net.minecraftforge.fml.common.launcher.FMLServerTweaker`, with only Log4j console appender initialization errors. `run/crash-reports/` does not exist, and the configured crash-marker scan found no matches.
+- `./scripts/dev.sh smoke-client` — skipped because `DISPLAY` is unset in the current environment.
+
+Remaining limits:
+
+- Mana Bean eating, planting, pod harvest drops, and natural pod generation still need in-world/manual scenario validation.
+- Mana pod blockstate/model/renderer parity remains Stage 8 visual work; this checkpoint only restores common/server behavior plus item tint registration.
+- Broader Stage 7 vegetation/ore probability parity and runtime new-world sampling remain open.
+
 ## Next Checkpoint Candidate
 
 After the golem carried-display, trunk transfer, death logging, fire-resistance, armor, water-pathing, no-drowning, melee-enchantment, upgrade-retaliation, target-range, animal-target-filter, butcher-acquisition, item-pickup-delay, essentia-jar-destination, liquid-target-tank, portal-support, outer-provider-spawn, outer-structure-query, outer-worldgen-ownership, Stage7-docs-refresh, hover-motion, biome policy, and Greatwood-support checkpoints, the next pre-Phase8 candidates are:
