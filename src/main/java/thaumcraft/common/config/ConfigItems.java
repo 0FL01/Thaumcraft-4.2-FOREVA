@@ -12,6 +12,7 @@ import thaumcraft.common.entities.golems.ItemGolemDecoration;
 import thaumcraft.common.entities.golems.ItemGolemPlacer;
 import thaumcraft.common.entities.golems.ItemGolemUpgrade;
 import thaumcraft.common.entities.golems.ItemTrunkSpawner;
+import thaumcraft.common.blocks.ItemArcaneDoor;
 import thaumcraft.common.items.ItemBathSalts;
 import thaumcraft.common.items.ItemBottleTaint;
 import thaumcraft.common.items.ItemBucketDeath;
@@ -163,6 +164,7 @@ public class ConfigItems {
     public static ItemBathSalts itemBathSalts;
     public static ItemCompassStone itemCompassStone;
     public static ItemInkwell itemInkwell;
+    public static ItemArcaneDoor itemArcaneDoor;
     public static ItemKey itemKey;
     public static ItemManaBean itemManaBean;
     public static ItemResearchNotes itemResearchNotes;
@@ -394,6 +396,12 @@ public class ConfigItems {
                 .setTranslationKey("thaumcraft.inkwell")
                 .setCreativeTab(tab);
         allItems.add(itemInkwell);
+
+        itemArcaneDoor = (ItemArcaneDoor) new ItemArcaneDoor()
+                .setRegistryName("thaumcraft", ConfigBlocks.legacyPath("ItemArcaneDoor"))
+                .setTranslationKey("thaumcraft.arcane_door")
+                .setCreativeTab(tab);
+        allItems.add(itemArcaneDoor);
 
         itemKey = (ItemKey) new ItemKey()
                 .setRegistryName("thaumcraft", ConfigBlocks.legacyPath("ArcaneDoorKey"))

@@ -67,6 +67,33 @@ Branch: `codex/durable-goal-stage8-9`
 
 ## Checkpoint Log
 
+### 2026-05-15 — Stage 9-b Arcane Door unblock baseline
+
+Scope:
+
+- Added missing Arcane Door content surface:
+  - `BlockArcaneDoor` with ownership-gated activation (`TileOwned` owner/access checks) and locked-fail sound path;
+  - `ItemArcaneDoor` placement flow for two-block door placement plus owner assignment on both halves.
+- Wired Arcane Door into registries:
+  - `ConfigBlocks.blockArcaneDoor` init/getAllBlocks registration;
+  - `ConfigItems.itemArcaneDoor` declaration/init/registration in item bootstrap.
+- Added missing Stage 9-b arcane recipe key:
+  - `ArcaneDoor` (`WARDEDARCANA`) with reference-aligned aspects/pattern/components.
+- Added Arcane Door item model/lang entries and copied door block textures from `thaumcraft_src` (`adoorbot`, `adoortop`).
+- Focused arcane key audit now reports `0` missing arcane API keys (`addArcaneCraftingRecipe` + `addShapelessArcaneCraftingRecipe`); remaining Stage 9-b recipe-key deltas are only non-arcane `GameRegistry` keys (`ArcaneStone2/3/4`).
+
+Validation:
+
+- `./scripts/dev.sh validate --smoke` — passed: status, compile, tests `10/10`, jar, check-jar summary `5660` MCP leak lines / `1114` unique leaks, and server smoke.
+- `run/smoke-server.log` evidence: `Registering entities`; `Forge Mod Loader has successfully loaded 6 mods`; `Done (1.069s)!`.
+- Crash report scan under `run/` returned no files.
+- `./scripts/dev.sh smoke-client` — skipped because `DISPLAY=` and GUI/graphics/user-interactive validation is excluded.
+
+Remaining limits:
+
+- Stage 9-b still has unresolved non-arcane reference keys (`ArcaneStone2/3/4`) tied to missing `blockStairsArcaneStone` and non-arcane `GameRegistry` path parity.
+- Arcane Workbench runtime/manual scenario matrix and Stage 9-d/e research/content closure remain open.
+
 ### 2026-05-15 — Stage 9-b Levitator unblock baseline
 
 Scope:

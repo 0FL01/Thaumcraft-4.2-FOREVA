@@ -52,6 +52,7 @@ public class ConfigBlocks {
     public static BlockLoot blockLootUrn;
     public static BlockLoot blockLootCrate;
     public static BlockChestHungry blockChestHungry;
+    public static BlockArcaneDoor blockArcaneDoor;
     public static BlockLifter blockLifter;
     public static BlockHole blockHole;
     public static BlockWarded blockWarded;
@@ -200,6 +201,10 @@ public class ConfigBlocks {
                 .setRegistryName("thaumcraft", legacyPath("blockChestHungry"))
                 .setTranslationKey("thaumcraft.hungry_chest");
 
+        blockArcaneDoor = (BlockArcaneDoor) new BlockArcaneDoor()
+                .setRegistryName("thaumcraft", legacyPath("blockArcaneDoor"))
+                .setTranslationKey("thaumcraft.arcane_door");
+
         blockLifter = (BlockLifter) new BlockLifter()
                 .setRegistryName("thaumcraft", legacyPath("blockLifter"))
                 .setTranslationKey("thaumcraft.lifter");
@@ -281,6 +286,7 @@ public class ConfigBlocks {
                 blockLootUrn,
                 blockLootCrate,
                 blockChestHungry,
+                blockArcaneDoor,
                 blockLifter,
                 blockHole,
                 blockWarded

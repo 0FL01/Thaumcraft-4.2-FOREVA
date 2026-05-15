@@ -94,6 +94,14 @@ public class ConfigRecipes {
                 'I', Items.IRON_INGOT,
                 'N', "nuggetIron");
 
+        registerArcaneRecipe("ArcaneDoor", "WARDEDARCANA",
+                new ItemStack(ConfigItems.itemArcaneDoor),
+                new AspectList().add(Aspect.WATER, 20).add(Aspect.ORDER, 10).add(Aspect.EARTH, 10).add(Aspect.FIRE, 5),
+                "TDT", "DBD", "TDT",
+                'T', "ingotThaumium",
+                'B', new ItemStack(ConfigItems.itemZombieBrain),
+                'D', new ItemStack(ConfigBlocks.blockWoodenDevice, 1, 6));
+
         registerArcaneRecipe("WardedGlass", "WARDEDARCANA",
                 new ItemStack(ConfigBlocks.blockCosmeticOpaque, 8, 2),
                 new AspectList().add(Aspect.WATER, 5).add(Aspect.ORDER, 10).add(Aspect.EARTH, 5).add(Aspect.FIRE, 5),
