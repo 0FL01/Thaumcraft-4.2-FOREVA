@@ -1,21 +1,22 @@
 package thaumcraft.common.entities.ai.inventory;
 
+import java.lang.reflect.Field;
+import java.util.List;
+
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.ai.EntityAIBase;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.SoundCategory;
-import net.minecraft.util.SoundEvent;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
+import net.minecraftforge.fml.relauncher.ReflectionHelper;
 import thaumcraft.common.config.Config;
 import thaumcraft.common.entities.golems.EntityGolemBase;
 import thaumcraft.common.lib.utils.InventoryUtils;
 
-import java.util.List;
-
 public class AIItemPickup extends EntityAIBase {
+    private static final Field PICKUP_DELAY_FIELD = findPickupDelayField();
+
     private EntityGolemBase theGolem;
     private Entity targetEntity;
     int count = 0;
@@ -44,7 +45,7 @@ public class AIItemPickup extends EntityAIBase {
             if (!(e instanceof EntityItem)) continue;
             EntityItem ei = (EntityItem) e;
             if (ei.getItem().isEmpty()) continue;
-            if (ei.getThrower() != null && !ei.getThrower().isEmpty()) continue; // thrown by player, delay
+            if (hasPickupDelay(ei)) continue;
             if (!theGolem.inventory.allEmpty() && theGolem.inventory.getAmountNeededSmart(ei.getItem(),
                 theGolem.checkOreDict()) <= 0) continue;
             if (theGolem.getCarried() != null && !theGolem.getCarried().isEmpty()
@@ -106,12 +107,31 @@ public class AIItemPickup extends EntityAIBase {
         theGolem.world.playSound(null, theGolem.getPosition(),
             net.minecraft.util.SoundEvent.REGISTRY.getObject(new net.minecraft.util.ResourceLocation("random.pop")),
             net.minecraft.util.SoundCategory.NEUTRAL, 0.2F,
-            (theGolem.world.rand.nextFloat() - theGolem.world.rand.nextFloat()) * 0.7F + 1.0F);
+            ((theGolem.world.rand.nextFloat() - theGolem.world.rand.nextFloat()) * 0.7F + 1.0F) * 2.0F);
     }
 
     @Override
     public void startExecuting() {
         this.count = 200;
         this.theGolem.getNavigator().tryMoveToEntityLiving(this.targetEntity, this.theGolem.getAIMoveSpeed());
+    }
+
+    private static boolean hasPickupDelay(EntityItem item) {
+        if (PICKUP_DELAY_FIELD != null) {
+            try {
+                return PICKUP_DELAY_FIELD.getInt(item) >= 5;
+            } catch (IllegalAccessException ignored) {
+                // Fall through to the public 1.12 API if the private field cannot be read.
+            }
+        }
+        return item.cannotPickup();
+    }
+
+    private static Field findPickupDelayField() {
+        try {
+            return ReflectionHelper.findField(EntityItem.class, "pickupDelay", "field_145804_b");
+        } catch (RuntimeException ignored) {
+            return null;
+        }
     }
 }
