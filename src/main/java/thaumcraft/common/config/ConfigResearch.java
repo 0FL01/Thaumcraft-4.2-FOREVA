@@ -321,6 +321,79 @@ public class ConfigResearch {
                 .registerResearchItem();
 
         new ResearchItem(
+                "FOCUSEXCAVATION",
+                "THAUMATURGY",
+                new AspectList()
+                        .add(Aspect.EARTH, 3)
+                        .add(Aspect.ENTROPY, 3)
+                        .add(Aspect.MAGIC, 3),
+                0,
+                -3,
+                2,
+                new ItemStack(ConfigItems.focusExcavation))
+                .setPages(
+                        new ResearchPage("tc.research_page.FOCUSEXCAVATION.1"),
+                        new ResearchPage((IArcaneRecipe) recipes.get("FocusExcavation")))
+                .setConcealed()
+                .setParents("FOCUSFIRE")
+                .registerResearchItem();
+
+        new ResearchItem(
+                "FOCUSSHOCK",
+                "THAUMATURGY",
+                new AspectList()
+                        .add(Aspect.AIR, 3)
+                        .add(Aspect.ENERGY, 6)
+                        .add(Aspect.MAGIC, 3),
+                3,
+                -5,
+                1,
+                new ItemStack(ConfigItems.focusShock))
+                .setPages(
+                        new ResearchPage("tc.research_page.FOCUSSHOCK.1"),
+                        new ResearchPage((IArcaneRecipe) recipes.get("FocusShock")))
+                .setConcealed()
+                .setSecondary()
+                .setParents("FOCUSFIRE")
+                .registerResearchItem();
+
+        new ResearchItem(
+                "FOCUSTRADE",
+                "THAUMATURGY",
+                new AspectList()
+                        .add(Aspect.EARTH, 3)
+                        .add(Aspect.EXCHANGE, 6)
+                        .add(Aspect.MAGIC, 3),
+                4,
+                -3,
+                2,
+                new ItemStack(ConfigItems.focusTrade))
+                .setPages(
+                        new ResearchPage("tc.research_page.FOCUSTRADE.1"),
+                        new ResearchPage((IArcaneRecipe) recipes.get("FocusTrade")))
+                .setConcealed()
+                .setParents("FOCUSFIRE")
+                .registerResearchItem();
+
+        new ResearchItem(
+                "FOCUSPOUCH",
+                "THAUMATURGY",
+                new AspectList()
+                        .add(Aspect.VOID, 6)
+                        .add(Aspect.MAGIC, 3)
+                        .add(Aspect.TOOL, 3),
+                4,
+                -1,
+                1,
+                new ItemStack(ConfigItems.itemFocusPouch))
+                .setPages(
+                        new ResearchPage("tc.research_page.FOCUSPOUCH.1"),
+                        new ResearchPage((IArcaneRecipe) recipes.get("FocusPouch")))
+                .setParents("FOCUSFIRE")
+                .setSecondary()
+                .registerResearchItem();
+
+        new ResearchItem(
                 "CAP_gold",
                 "THAUMATURGY",
                 new AspectList()

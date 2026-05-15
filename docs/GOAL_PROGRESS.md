@@ -67,6 +67,30 @@ Branch: `codex/durable-goal-stage8-9`
 
 ## Checkpoint Log
 
+### 2026-05-15 — Stage 9-e additional THAUMATURGY focus branch baseline
+
+Scope:
+
+- Expanded `ConfigResearch` THAUMATURGY baseline with additional reference-aligned arcane-focus entries:
+  - `FOCUSEXCAVATION`
+  - `FOCUSSHOCK`
+  - `FOCUSTRADE`
+  - `FOCUSPOUCH`
+- Preserved reference coordinates, aspect tags, page order, and flags (`concealed`/`secondary`) for this slice.
+- Kept dependencies constrained to already-ported arcane recipe keys (`FocusExcavation`, `FocusShock`, `FocusTrade`, `FocusPouch`) to avoid introducing new null recipe page paths.
+
+Validation:
+
+- `./scripts/dev.sh validate --smoke` — passed: status, compile, tests, jar, check-jar summary, and server smoke.
+- `run/smoke-server.log` evidence: server ready (`Done (...)`), no fatal markers.
+- Crash report scan under `run/` remained clean during smoke stage.
+- `./scripts/dev.sh smoke-client` — skipped because `DISPLAY=` and GUI/graphics/user-interactive validation is excluded.
+
+Remaining limits:
+
+- Stage 9-e graph remains partial; infusion/trigger-heavy THAUMATURGY nodes and most non-BASICS categories are still open.
+- GUI/manual Thaumonomicon progression checks remain skipped by instruction and headless environment limits.
+
 ### 2026-05-15 — Stage 9-e early THAUMATURGY arcane chain baseline
 
 Scope:
