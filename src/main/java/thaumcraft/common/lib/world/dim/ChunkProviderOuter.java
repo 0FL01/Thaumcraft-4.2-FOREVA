@@ -68,7 +68,7 @@ public class ChunkProviderOuter implements IChunkGenerator {
 
     @Override
     public boolean generateStructures(Chunk chunk, int x, int z) {
-        return MazeHandler.getFromHashMap(new CellLoc(x, z)) != null;
+        return false;
     }
 
     @Override
@@ -80,39 +80,16 @@ public class ChunkProviderOuter implements IChunkGenerator {
     @Nullable
     @Override
     public BlockPos getNearestStructurePos(World worldIn, String structureName, BlockPos position, boolean findUnexplored) {
-        if (!isOuterMazeStructure(structureName)) return null;
-        int chunkX = position.getX() >> 4;
-        int chunkZ = position.getZ() >> 4;
-        for (int radius = 0; radius <= 64; radius++) {
-            for (int dx = -radius; dx <= radius; dx++) {
-                for (int dz = -radius; dz <= radius; dz++) {
-                    if (Math.abs(dx) != radius && Math.abs(dz) != radius) continue;
-                    int cx = chunkX + dx;
-                    int cz = chunkZ + dz;
-                    if (MazeHandler.getFromHashMap(new CellLoc(cx, cz)) != null) {
-                        return new BlockPos(cx * 16 + 8, 53, cz * 16 + 8);
-                    }
-                }
-            }
-        }
         return null;
     }
 
     @Override
     public boolean isInsideStructure(World worldIn, String structureName, BlockPos pos) {
-        return isOuterMazeStructure(structureName)
-                && MazeHandler.getFromHashMap(new CellLoc(pos.getX() >> 4, pos.getZ() >> 4)) != null;
+        return false;
     }
 
     @Override
     public void recreateStructures(Chunk chunk, int x, int z) {
         // Structures are generated during populate(); do not overwrite saved chunks on reload.
-    }
-
-    private static boolean isOuterMazeStructure(String structureName) {
-        return structureName != null
-                && ("EldritchMaze".equalsIgnoreCase(structureName)
-                || "OuterLands".equalsIgnoreCase(structureName)
-                || "Eldritch".equalsIgnoreCase(structureName));
     }
 }

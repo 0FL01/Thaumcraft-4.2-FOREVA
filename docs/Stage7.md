@@ -376,25 +376,36 @@ Changing async behavior can affect worldgen performance. If synchronization is a
 - `thaumcraft_src/thaumcraft/common/lib/world/dim/ChunkProviderOuter.class`
 
 **Что не совпадает:**
-Reference `ChunkProviderOuter.func_147416_a(...)` returns `null` for nearest structure queries. Current 1.12.2 implementation adds `generateStructures`, `getNearestStructurePos`, and `isInsideStructure` backed by `MazeHandler`: `src/main/java/thaumcraft/common/lib/world/dim/ChunkProviderOuter.java:69-105`. This may be a useful 1.12.2 adaptation, but it is not original behavior and must not crash or report stale structures from a global labyrinth map.
+Reference `ChunkProviderOuter.func_147416_a(...)` returns `null` for nearest structure queries. The 2026-05-15 structure-query checkpoint removes the previous 1.12.2 maze-backed query adaptation: `generateStructures(...)` and `isInsideStructure(...)` now return `false`, and `getNearestStructurePos(...)` returns `null`. This restores the reference no-structure-query contract and avoids reporting stale cells from the global labyrinth map.
 
 **Что нужно доделать:**
-Verify that these hooks are necessary for Forge 1.12.2 compatibility and that they operate only on loaded/restored maze data for the current save.
+Keep the hooks as explicit no-ops unless a hard Forge 1.12.2 compatibility requirement appears, and runtime-check that command/query callers do not crash against the provider.
 
 **Как доделать:**
-- Confirm whether any vanilla/Forge command or feature calls these methods for the Outer Lands provider.
-- If retained, restrict accepted names to documented Stage 7 names and ensure stale data is cleared on world load/unload.
+- Leave maze discovery to portal/room generation logic rather than `IChunkGenerator` structure queries.
 - Add manual check with `/locate` or an equivalent call if available in the dev environment.
+- If a future Forge compatibility issue requires non-null structure responses, document the caller and reintroduce only a save-local, runtime-validated query path.
 
 **Критерии приемки:**
-- [ ] `getNearestStructurePos` returns null before any maze exists.
-- [ ] After maze generation/load, structure queries return positions inside generated maze cells only.
-- [ ] Structure query names are documented and case handling is intentional.
-- [ ] Querying after world reload does not use stale cells from another save.
+- [x] `getNearestStructurePos` returns null before any maze exists.
+- [x] Structure query hooks do not expose maze cells as named structures.
+- [x] Querying after world reload cannot use stale cells from another save through these hooks.
 - [ ] No command/runtime crash occurs when querying structures in Outer Lands.
 
 **Риски / зависимости:**
-This is a 1.12.2 adaptation rather than reference parity. It should be kept only if it solves a Forge API need or helps validation without changing gameplay.
+Reintroducing locate/queryable Outer Lands structures would be a 1.12.2 adaptation rather than reference parity. It should only happen if it solves a documented Forge API need or helps validation without changing gameplay.
+
+**Checkpoint 2026-05-15 — Outer Lands structure query no-op:**
+`ChunkProviderOuter` now keeps the 1.12.2 `IChunkGenerator` structure-query hooks explicit no-ops: `generateStructures(...)` returns `false`, `getNearestStructurePos(...)` returns `null`, and `isInsideStructure(...)` returns `false`. The previous accepted-name helper and `MazeHandler`-backed search were removed because the reference provider does not expose Outer Lands maze cells as locate/queryable structures.
+
+Validation:
+- `./scripts/dev.sh compileJava` — passed.
+- `./scripts/dev.sh build` — passed.
+- `./scripts/dev.sh check-jar` — не дошел до jar inspection: отсутствует wrapper-ожидаемый MCP mapping cache `.gradle_home/caches/minecraft/de/oceanlabs/mcp/mcp_stable/39/1.12.2/srgs/mcp-srg.srg`.
+- `./scripts/dev.sh smoke-server` — timeout before ready state на уже задокументированном pre-Forge/log4j этапе; `run/crash-reports/` не существует, and the configured crash-marker scan found no matches.
+- `git diff --check` — passed.
+
+Remaining GAP-7 limits after this checkpoint: the hooks now match the reference no-op contract statically, but command/runtime crash evidence remains unavailable while smoke-server is blocked before ready state and manual scenarios are excluded.
 
 ### GAP-8: Biome registration/config ID parity is incomplete and cosmetic biome behavior needs verification
 
