@@ -59,22 +59,22 @@ Current bootstrap exists but is only a minimal skeleton:
 - In `init`, current lifecycle calls `proxy.registerDisplayInformation()`, registers `NetworkRegistry` GUI handler, then calls `proxy.registerKeyBindings()` and `proxy.registerHandlers()`: `src/main/java/thaumcraft/common/Thaumcraft.java:164-172`.
 - `CommonProxy` implements `IGuiHandler`, owns GUI IDs, server GUI containers, client GUI null fallback, registration stubs and a small subset of FX stubs: `src/main/java/thaumcraft/common/CommonProxy.java:23-162`.
 - `ClientProxy.registerDisplayInformation()` registers one generic inventory model location for every item and every meta `0..63`: `src/main/java/thaumcraft/client/ClientProxy.java:24-34`.
-- `ClientProxy.registerKeyBindings()` is an explicit Phase 8 stub: `src/main/java/thaumcraft/client/ClientProxy.java:36-39`.
+- `ClientProxy.registerKeyBindings()` now registers a client-only `KeyHandler` for the Hover Harness `H` key only; full reference `F`/`G` key dispatch and radial focus state remain open: `src/main/java/thaumcraft/client/ClientProxy.java:36-39`, `src/main/java/thaumcraft/client/lib/KeyHandler.java:1-54`.
 - `ClientProxy.registerHandlers()` registers only an inner tooltip handler on `MinecraftForge.EVENT_BUS`: `src/main/java/thaumcraft/client/ClientProxy.java:41-59`.
 - `ClientProxy.getClientGuiElement()` opens only focus pouch, hand mirror, and hover harness; all other declared GUI IDs return `null`: `src/main/java/thaumcraft/client/ClientProxy.java:61-88`.
 - FX proxy overrides for sparkle/beam/bolt are explicit Phase 8 stubs: `src/main/java/thaumcraft/client/ClientProxy.java:90-105`.
 - Packet discriminator table mostly mirrors the reference ordering and validates `REFERENCE_PACKET_COUNT = 39`: `src/main/java/thaumcraft/common/lib/network/PacketHandler.java:48-107`.
 - Several current client-bound packet handlers live under `thaumcraft.common.*` and import `net.minecraft.client.Minecraft` directly, guarded only by `@SideOnly(Side.CLIENT)` on `onMessage`: for example `src/main/java/thaumcraft/common/lib/network/playerdata/PacketSyncWarp.java:3-9`, `src/main/java/thaumcraft/common/lib/network/playerdata/PacketSyncWarp.java:54-70`, `src/main/java/thaumcraft/common/lib/network/playerdata/PacketRunicCharge.java:3-8`, `src/main/java/thaumcraft/common/lib/network/playerdata/PacketRunicCharge.java:43-53`.
-- No current source files exist for `src/main/java/thaumcraft/common/lib/events/KeyHandler.java`, `src/main/java/thaumcraft/client/lib/ClientTickEventsFML.java`, `src/main/java/thaumcraft/client/lib/RenderEventHandler.java`, or `src/main/java/thaumcraft/client/fx/ParticleEngine.java`.
+- No current source files exist for `src/main/java/thaumcraft/common/lib/events/KeyHandler.java`, `src/main/java/thaumcraft/client/lib/ClientTickEventsFML.java`, `src/main/java/thaumcraft/client/lib/RenderEventHandler.java`, or `src/main/java/thaumcraft/client/fx/ParticleEngine.java`; the current `thaumcraft.client.lib.KeyHandler` is a narrow Hover Harness H-key path, not the full reference key handler.
 - No shader resources currently exist under `src/main/resources/**/shaders/**/*`; this is only a Stage 8-a dependency because the reference bootstrap registers client tick/render shader handlers.
 
-Stage 8-a cannot be considered complete now: blocker/high gaps remain in keybind registration, client event bootstrap, GUI routing boundary, proxy registration entry points, and client smoke verification.
+Stage 8-a cannot be considered complete now: blocker/high gaps remain in full keybind dispatch, client event bootstrap, GUI routing boundary, proxy registration entry points, and client smoke verification.
 
 ## 5. Gap list
 
 ### GAP-1: `ClientProxy.registerDisplayInformation` не содержит renderer/model registration entry points
 
-**Статус:** частично реализовано  
+**Статус:** частично реализовано
 **Критичность:** high
 
 **Текущая реализация:**
@@ -113,7 +113,7 @@ Dependency: concrete renderer/model/TESR class parity belongs to later Stage 8 c
 
 ### GAP-2: Отсутствует полноценный client event bootstrap
 
-**Статус:** частично реализовано  
+**Статус:** частично реализовано
 **Критичность:** blocker
 
 **Текущая реализация:**
@@ -156,7 +156,7 @@ Dependency: detailed HUD, scan overlay, shader, and particle behavior belongs to
 
 ### GAP-3: Key binding registration and dispatch отсутствуют
 
-**Статус:** отсутствует  
+**Статус:** частично реализовано
 **Критичность:** blocker
 
 **Текущая реализация:**
@@ -171,7 +171,7 @@ Dependency: detailed HUD, scan overlay, shader, and particle behavior belongs to
 
 Reference `registerKeyBindings()` registers a `KeyHandler` on the FML event bus. Reference `KeyHandler` creates three bindings: `Change Wand Focus` (`F`), `Activate Hover Harness` (`H`), and `Misc Wand Toggle` (`G`); tracks press state and timestamps; opens/locks wand focus radial behavior; sends `PacketFocusChangeToServer` for focus removal; sends `PacketItemKeyToServer` for golem bell reset and misc wand toggle; toggles hover harness on client key press.
 
-Current `registerKeyBindings()` is a Phase 8 comment and performs no registration. The server packet classes needed by key dispatch do exist: `src/main/java/thaumcraft/common/lib/network/misc/PacketItemKeyToServer.java:14-58` and `src/main/java/thaumcraft/common/lib/network/misc/PacketFocusChangeToServer.java:13-52`.
+Current `registerKeyBindings()` registers a client-only `thaumcraft.client.lib.KeyHandler` for the Hover Harness `H` binding, and `Hover.toggleHover` now sends `PacketFlyToServer` plus `hhon`/`hhoff` sounds for successful client toggles. The reference `F` and `G` bindings are still absent, as are the focus radial state transitions and misc wand/golem-bell packet dispatch paths. The server packet classes needed by those remaining key dispatches do exist: `src/main/java/thaumcraft/common/lib/network/misc/PacketItemKeyToServer.java:14-58` and `src/main/java/thaumcraft/common/lib/network/misc/PacketFocusChangeToServer.java:13-52`.
 
 **Что нужно доделать:**
 

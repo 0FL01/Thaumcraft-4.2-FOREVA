@@ -15,6 +15,8 @@ import thaumcraft.common.blocks.BlockJarItem;
 import thaumcraft.common.config.Config;
 import thaumcraft.common.items.baubles.ItemGirdleHover;
 import thaumcraft.common.lib.TCSounds;
+import thaumcraft.common.lib.network.PacketHandler;
+import thaumcraft.common.lib.network.misc.PacketFlyToServer;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -64,7 +66,14 @@ public class Hover {
 
     public static boolean toggleHover(EntityPlayer player, int playerId, ItemStack harness) {
         if (player == null || harness.isEmpty()) return false;
-        return setHover(player, harness, !getHover(playerId));
+        boolean hover = !getHover(playerId);
+        boolean actualHover = setHover(player, harness, hover);
+        if (hover && !actualHover) return false;
+        if (player.world.isRemote) {
+            PacketHandler.INSTANCE.sendToServer(new PacketFlyToServer(player, hover));
+            player.playSound(hover ? TCSounds.HHON : TCSounds.HHOFF, 0.1F, 1.0F);
+        }
+        return true;
     }
 
     public static void handleHoverArmor(EntityPlayer player, ItemStack harness) {

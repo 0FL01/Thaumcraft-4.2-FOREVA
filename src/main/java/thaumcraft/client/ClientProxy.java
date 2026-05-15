@@ -15,6 +15,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import thaumcraft.client.gui.GuiFocusPouch;
 import thaumcraft.client.gui.GuiHandMirror;
 import thaumcraft.client.gui.GuiHoverHarness;
+import thaumcraft.client.lib.KeyHandler;
 import thaumcraft.common.CommonProxy;
 import thaumcraft.common.config.ConfigItems;
 import thaumcraft.common.lib.events.EventHandlerRunic;
@@ -35,7 +36,7 @@ public class ClientProxy extends CommonProxy {
 
     @Override
     public void registerKeyBindings() {
-        // Phase 8: register key bindings
+        MinecraftForge.EVENT_BUS.register(new KeyHandler());
     }
 
     @Override
