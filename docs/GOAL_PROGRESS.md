@@ -51,6 +51,7 @@ Branch: `codex/durable-goal-stage8-9`
 - Deconstruction Table and Alchemy Furnace client smoke/manual open/visual parity was skipped on 2026-05-15 because `DISPLAY=` and user-driven GUI/graphics validation is excluded by instruction.
 - Magic Box and Spa client smoke/manual open/visual parity was skipped on 2026-05-15 because `DISPLAY=` and user-driven GUI/graphics validation is excluded by instruction.
 - Traveling Trunk client smoke/manual open/visual parity was skipped on 2026-05-15 because `DISPLAY=` and user-driven GUI/graphics validation is excluded by instruction.
+- Pech client smoke/manual open/trade visual parity was skipped on 2026-05-15 because `DISPLAY=` and user-driven GUI/graphics validation is excluded by instruction.
 - Future GUI/client visual checks that require user-driven Minecraft control, screenshots, or unavailable X11/graphics stack will be recorded as: `SKIPPED by user instruction: GUI/graphics/user-interactive validation excluded`.
 
 ## Baseline Validation
@@ -62,6 +63,30 @@ Branch: `codex/durable-goal-stage8-9`
 - `./scripts/dev.sh validate --smoke` — passed on 2026-05-15, including compact server smoke validation.
 
 ## Checkpoint Log
+
+### 2026-05-15 — Stage 8-b Pech GUI baseline
+
+Scope:
+
+- Added `GuiPech` backed by `ContainerPech`.
+- Ported a texture-backed Pech GUI baseline: original `gui_pech.png`, reference window size (`175x232`), valued-input/output-empty trade-button visibility logic, and trade click handling through the existing container button path.
+- Routed client GUI ID `1` through `ClientProxy#getClientGuiElement` using entity id lookup and `EntityPech` type validation.
+- Copied original `gui_pech.png`.
+- Updated `docs/Stage8-b.md` with the implemented baseline and remaining client/manual limits.
+
+Validation:
+
+- `./scripts/dev.sh compileJava` — passed.
+- `./scripts/dev.sh validate --smoke` — passed: status, compile, tests `10/10`, jar, check-jar summary `5333` MCP leak lines / `1052` unique leaks, and server smoke.
+- `run/smoke-server.log` evidence: `Registering entities`; `Forge Mod Loader has successfully loaded 6 mods`; `Done (1.167s)!`.
+- Crash report scan under `run/` returned no files.
+- `./scripts/dev.sh smoke-client` — skipped because `DISPLAY=` and GUI/graphics/user-interactive validation is excluded.
+
+Remaining limits:
+
+- Pech GUI open/trade scenarios were not manually observed.
+- Exact visual/button UX parity still needs client inspection.
+- Full tamed-Pech trade loop validation remains tied to manual runtime coverage.
 
 ### 2026-05-15 — Stage 8-b Traveling Trunk GUI baseline
 

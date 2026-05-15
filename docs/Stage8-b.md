@@ -65,7 +65,7 @@ Lightweight commands run during analysis:
 
 ## 4. Текущее состояние Stage 8-b
 
-Current state is not closeable. Server/common GUI IDs and containers exist for many screens, but client-side routing and client GUI classes are still incomplete. GUI IDs `2`, `3`, `5`, `8`, `9`, `13`, `15`, `16`, `17`, `18`, `19`, and `20` now have texture-backed Traveling Trunk, Thaumatorium, Focus Pouch, Deconstruction Table, Alchemy Furnace, Arcane Workbench, Arcane Bore, Hand Mirror, Hover Harness, Magic Box, Spa, and Focal Manipulator baselines, but full visual parity and manual client validation remain open.
+Current state is not closeable. Server/common GUI IDs and containers exist for many screens, but client-side routing and client GUI classes are still incomplete. GUI IDs `1`, `2`, `3`, `5`, `8`, `9`, `13`, `15`, `16`, `17`, `18`, `19`, and `20` now have texture-backed Pech, Traveling Trunk, Thaumatorium, Focus Pouch, Deconstruction Table, Alchemy Furnace, Arcane Workbench, Arcane Bore, Hand Mirror, Hover Harness, Magic Box, Spa, and Focal Manipulator baselines, but full visual parity and manual client validation remain open.
 
 Concrete current findings:
 
@@ -73,7 +73,7 @@ Concrete current findings:
 - Server GUI routing exists for Golem, Pech, Traveling Trunk, Thaumatorium, Focus Pouch, Deconstruction Table, Alchemy Furnace, Research Table, Arcane Workbench, Arcane Bore, Hand Mirror, Hover Harness, Magic Box, Spa, and Focal Manipulator in `src/main/java/thaumcraft/common/CommonProxy.java:61-119`.
 - Thaumonomicon is intentionally server-null in `src/main/java/thaumcraft/common/CommonProxy.java:95`, matching the reference pattern that its GUI is client-only.
 - Base `CommonProxy.getClientGuiElement` returns null in `src/main/java/thaumcraft/common/CommonProxy.java:122-126`, as expected for common proxy.
-- `ClientProxy.getClientGuiElement` constructs `GuiFocusPouch`, `GuiHandMirror`, `GuiHoverHarness`, `GuiMagicBox`, `GuiSpa`, and `GuiTravelingTrunk`, and now routes `GUI_THAUMATORIUM`, `GUI_DECONSTRUCTION_TABLE`, `GUI_ALCHEMY_FURNACE`, `GUI_ARCANE_WORKBENCH`, `GUI_ARCANE_BORE`, and `GUI_FOCAL_MANIPULATOR` to matching tile-backed screens; the remaining Stage 8-b/current GUI IDs still return null.
+- `ClientProxy.getClientGuiElement` constructs `GuiFocusPouch`, `GuiHandMirror`, `GuiHoverHarness`, `GuiMagicBox`, `GuiSpa`, `GuiTravelingTrunk`, and `GuiPech`, and now routes `GUI_THAUMATORIUM`, `GUI_DECONSTRUCTION_TABLE`, `GUI_ALCHEMY_FURNACE`, `GUI_ARCANE_WORKBENCH`, `GUI_ARCANE_BORE`, and `GUI_FOCAL_MANIPULATOR` to matching tile-backed screens; remaining Stage 8-b/current GUI IDs returning null are Golem (`0`), Research Table (`10`), and Thaumonomicon (`12`).
 - `GuiFocusPouch`, `GuiHandMirror`, and `GuiHoverHarness` now bind original textures instead of grey placeholder rectangles.
 - `src/main/resources/assets/thaumcraft/textures/gui/gui_thaumatorium.png`, `gui_arcaneworkbench.png`, `gui_arcanebore.png`, `gui_wandtable.png`, `gui_decontable.png`, `gui_alchemyfurnace.png`, `gui_spa.png`, `guitrunkbase.png`, `gui_focuspouch.png`, `guihandmirror.png`, and `guihoverharness.png` are copied byte-for-byte from `thaumcraft_src/assets/thaumcraft/textures/gui/`; the other reference GUI textures are still absent from current resources.
 - `src/main/resources/assets/thaumcraft/textures/aspects/**` now contains the original aspect icon set needed by Thaumatorium and later research/aspect GUI rendering.
@@ -312,15 +312,15 @@ Golem AI/task parity is outside Stage 8-b, but the GUI depends on current `Conta
 
 ### GAP-6: Pech trade GUI отсутствует на клиенте
 
-**Статус:** отсутствует  
+**Статус:** частично реализовано  
 **Критичность:** blocker
 
 **Текущая реализация:**
-- `src/main/java/thaumcraft/client/ClientProxy.java:72-84`
+- `src/main/java/thaumcraft/client/ClientProxy.java#getClientGuiElement` routes GUI ID `1` through `world.getEntityByID(x)` to `GuiPech` when the entity is `EntityPech`.
 - `src/main/java/thaumcraft/common/CommonProxy.java:70-73`
 - `src/main/java/thaumcraft/common/entities/monster/EntityPech.java:279-286`
-- Отсутствует `src/main/java/thaumcraft/client/gui/GuiPech.java`.
-- Отсутствует `src/main/resources/assets/thaumcraft/textures/gui/gui_pech.png`.
+- `src/main/java/thaumcraft/client/gui/GuiPech.java` exists as a 1.12.2 `GuiContainer` baseline using `ContainerPech`.
+- `src/main/resources/assets/thaumcraft/textures/gui/gui_pech.png` exists and matches the original asset.
 
 **Референс:**
 - `Thaumcraft-1.7.10-4.2.3.5.jar!/thaumcraft/client/ClientProxy.class`, offsets `129-153` instantiate `GuiPech` for GUI ID `1`.
@@ -328,22 +328,29 @@ Golem AI/task parity is outside Stage 8-b, but the GUI depends on current `Conta
 - `thaumcraft_src/assets/thaumcraft/textures/gui/gui_pech.png`.
 
 **Что не совпадает:**
-Reference GUI draws `gui_pech.png`, checks trade offer slot/value state, and sends button interaction when trade conditions are satisfied. Current client returns null for the Pech GUI, so tamed Pech interaction cannot open the trade screen.
+Reference GUI draws `gui_pech.png`, checks trade offer slot/value state, and sends button interaction when trade conditions are satisfied. Current client now opens a texture-backed baseline and sends button id `0` through the existing container path; manual runtime parity is still unverified.
 
 **Что нужно доделать:**
-Port `GuiPech`, including trade button state, click handling and original texture.
+Finish Pech trade GUI parity by manually validating tamed-Pech interaction, trade button visibility state, and output roll behavior in a client runtime.
 
 **Как доделать:**
-- Add `src/main/java/thaumcraft/client/gui/GuiPech.java`.
-- Route `GUI_PECH` through `world.getEntityByID(x)` and `EntityPech` validation.
-- Copy `gui_pech.png`.
+- Done: add `src/main/java/thaumcraft/client/gui/GuiPech.java`.
+- Done: route `GUI_PECH` through `world.getEntityByID(x)` and `EntityPech` validation.
+- Done: copy `gui_pech.png`.
 - Scenario: interact with a tamed Pech as implemented in `EntityPech.java:279-283`.
 
 **Критерии приемки:**
 - [ ] GUI ID `1` opens for tamed Pech.
-- [ ] Trade button only appears/enables under reference-equivalent valued-item conditions.
-- [ ] Trade click sends the expected container/enchantment-button action.
-- [ ] Original Pech GUI texture is used.
+- [x] Trade button visibility/enable checks follow reference-equivalent valued-item and output-slot-empty conditions.
+- [x] Trade click sends the expected container/enchantment-button action (`sendEnchantPacket(..., 0)`).
+- [x] Original Pech GUI texture is used.
+
+**Checkpoint 2026-05-15 — Pech GUI baseline:**
+- Added `GuiPech` with reference size `175x232`, `ContainerPech`, original `gui_pech.png`, valued-input/output-empty trade button visibility logic, and click handling that sends button id `0`.
+- Routed client GUI ID `1` in `ClientProxy#getClientGuiElement` through `world.getEntityByID(x)` with `EntityPech` type validation.
+- Validation: `./scripts/dev.sh compileJava` passed; `./scripts/dev.sh validate --smoke` passed with tests `10/10`, jar/check-jar summary `5333` MCP leak lines / `1052` unique leaks, server smoke ready, and no crash reports under `run/`.
+- Client smoke/manual GUI open was skipped because `DISPLAY=` and user-driven GUI/graphics validation is excluded for this run.
+- Remaining: manual tamed-Pech open/trade scenario coverage and visual parity checks in a client runtime.
 
 **Риски / зависимости:**
 Pech taming/trade item valuation is common gameplay; if incomplete, GUI can still be implemented but final acceptance requires a valid in-game trade scenario.
@@ -613,7 +620,7 @@ Inventory-slot blocking is behavior-sensitive and can cause item loss/duplicatio
 **Критичность:** blocker
 
 **Текущая реализация:**
-- `src/main/resources/assets/thaumcraft/textures/gui/` now contains `gui_thaumatorium.png`, `gui_arcaneworkbench.png`, `gui_arcanebore.png`, `gui_wandtable.png`, `gui_decontable.png`, `gui_alchemyfurnace.png`, `gui_spa.png`, `guitrunkbase.png`, `gui_focuspouch.png`, `guihandmirror.png`, and `guihoverharness.png`.
+- `src/main/resources/assets/thaumcraft/textures/gui/` now contains `gui_thaumatorium.png`, `gui_arcaneworkbench.png`, `gui_arcanebore.png`, `gui_wandtable.png`, `gui_decontable.png`, `gui_alchemyfurnace.png`, `gui_spa.png`, `guitrunkbase.png`, `gui_pech.png`, `gui_focuspouch.png`, `guihandmirror.png`, and `guihoverharness.png`.
 - `src/main/resources/assets/thaumcraft/textures/misc/potions.png` is the only current `textures/misc` file found.
 - `src/main/resources/assets/thaumcraft/textures/aspects/**` now contains the original aspect icon set copied for Thaumatorium/aspect GUI rendering.
 
@@ -642,7 +649,7 @@ Inventory-slot blocking is behavior-sensitive and can cause item loss/duplicatio
 - Research support textures under `thaumcraft_src/assets/thaumcraft/textures/misc/**` and aspect icons under `thaumcraft_src/assets/thaumcraft/textures/aspects/**`.
 
 **Что не совпадает:**
-The texture resource tree now covers the newly ported Thaumatorium, Arcane Workbench, Arcane Bore, Focal Manipulator, Deconstruction Table, Alchemy Furnace, Traveling Trunk, Spa, Focus Pouch, Hand Mirror, Hover Harness, and aspect-icon paths, but most remaining Stage 8-b GUI textures and direct research misc support textures are still absent.
+The texture resource tree now covers the newly ported Thaumatorium, Arcane Workbench, Arcane Bore, Focal Manipulator, Deconstruction Table, Alchemy Furnace, Pech, Traveling Trunk, Spa, Focus Pouch, Hand Mirror, Hover Harness, and aspect-icon paths, but most remaining Stage 8-b GUI textures and direct research misc support textures are still absent.
 
 **Что нужно доделать:**
 Copy original GUI and directly used support textures from `thaumcraft_src/assets/` to `src/main/resources/assets/thaumcraft/`.
