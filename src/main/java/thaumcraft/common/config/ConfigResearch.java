@@ -632,6 +632,28 @@ public class ConfigResearch {
                     .registerResearchItem();
         }
 
+        if (Config.foundSilverIngot) {
+            new ResearchItem(
+                    "CAP_silver",
+                    "THAUMATURGY",
+                    new AspectList()
+                            .add(Aspect.METAL, 3)
+                            .add(Aspect.GREED, 3)
+                            .add(Aspect.TOOL, 3)
+                            .add(Aspect.AURA, 3),
+                    5,
+                    1,
+                    1,
+                    new ItemStack(ConfigItems.itemWandCap, 1, 4))
+                    .setPages(
+                            new ResearchPage("tc.research_page.CAP_silver.1"),
+                            new ResearchPage((IArcaneRecipe) recipes.get("WandCapSilverInert")),
+                            new ResearchPage((InfusionRecipe) recipes.get("WandCapSilver")))
+                    .setConcealed()
+                    .setParents("CAP_gold", "INFUSION")
+                    .registerResearchItem();
+        }
+
         new ResearchItem(
                 "ROD_greatwood",
                 "THAUMATURGY",
@@ -647,6 +669,144 @@ public class ConfigResearch {
                         new ResearchPage("tc.research_page.ROD_greatwood.1"),
                         new ResearchPage((IArcaneRecipe) recipes.get("WandRodGreatwood")))
                 .setParents("BASICTHAUMATURGY")
+                .registerResearchItem();
+
+        new ResearchItem(
+                "ROD_reed",
+                "THAUMATURGY",
+                new AspectList()
+                        .add(Aspect.TOOL, 3)
+                        .add(Aspect.AIR, 6)
+                        .add(Aspect.PLANT, 3)
+                        .add(Aspect.MAGIC, 3),
+                -5,
+                -1,
+                2,
+                new ItemStack(ConfigItems.itemWandRod, 1, 5))
+                .setPages(
+                        new ResearchPage("tc.research_page.ROD_reed.1"),
+                        new ResearchPage((InfusionRecipe) recipes.get("WandRodReed")))
+                .setSecondary()
+                .setConcealed()
+                .setParents("ROD_greatwood", "INFUSION")
+                .registerResearchItem();
+
+        new ResearchItem(
+                "ROD_blaze",
+                "THAUMATURGY",
+                new AspectList()
+                        .add(Aspect.TOOL, 3)
+                        .add(Aspect.FIRE, 6)
+                        .add(Aspect.ENERGY, 3)
+                        .add(Aspect.MAGIC, 3),
+                -7,
+                0,
+                2,
+                new ItemStack(ConfigItems.itemWandRod, 1, 6))
+                .setPages(
+                        new ResearchPage("tc.research_page.ROD_blaze.1"),
+                        new ResearchPage((InfusionRecipe) recipes.get("WandRodBlaze")))
+                .setSecondary()
+                .setConcealed()
+                .setParents("ROD_greatwood", "INFUSION")
+                .registerResearchItem();
+
+        new ResearchItem(
+                "ROD_obsidian",
+                "THAUMATURGY",
+                new AspectList()
+                        .add(Aspect.TOOL, 3)
+                        .add(Aspect.EARTH, 6)
+                        .add(Aspect.FIRE, 3)
+                        .add(Aspect.MAGIC, 3),
+                -8,
+                2,
+                2,
+                new ItemStack(ConfigItems.itemWandRod, 1, 1))
+                .setPages(
+                        new ResearchPage("tc.research_page.ROD_obsidian.1"),
+                        new ResearchPage((InfusionRecipe) recipes.get("WandRodObsidian")))
+                .setSecondary()
+                .setConcealed()
+                .setParents("ROD_greatwood", "INFUSION")
+                .registerResearchItem();
+
+        new ResearchItem(
+                "ROD_ice",
+                "THAUMATURGY",
+                new AspectList()
+                        .add(Aspect.TOOL, 3)
+                        .add(Aspect.COLD, 6)
+                        .add(Aspect.WATER, 3)
+                        .add(Aspect.MAGIC, 3),
+                -7,
+                4,
+                2,
+                new ItemStack(ConfigItems.itemWandRod, 1, 3))
+                .setPages(
+                        new ResearchPage("tc.research_page.ROD_ice.1"),
+                        new ResearchPage((InfusionRecipe) recipes.get("WandRodIce")))
+                .setSecondary()
+                .setConcealed()
+                .setParents("ROD_greatwood", "INFUSION")
+                .registerResearchItem();
+
+        new ResearchItem(
+                "ROD_quartz",
+                "THAUMATURGY",
+                new AspectList()
+                        .add(Aspect.TOOL, 3)
+                        .add(Aspect.ORDER, 6)
+                        .add(Aspect.CRYSTAL, 3)
+                        .add(Aspect.MAGIC, 3),
+                -5,
+                5,
+                2,
+                new ItemStack(ConfigItems.itemWandRod, 1, 4))
+                .setPages(
+                        new ResearchPage("tc.research_page.ROD_quartz.1"),
+                        new ResearchPage((InfusionRecipe) recipes.get("WandRodQuartz")))
+                .setSecondary()
+                .setConcealed()
+                .setParents("ROD_greatwood", "INFUSION")
+                .registerResearchItem();
+
+        new ResearchItem(
+                "ROD_bone",
+                "THAUMATURGY",
+                new AspectList()
+                        .add(Aspect.TOOL, 3)
+                        .add(Aspect.ENTROPY, 6)
+                        .add(Aspect.UNDEAD, 3)
+                        .add(Aspect.MAGIC, 3),
+                -3,
+                0,
+                2,
+                new ItemStack(ConfigItems.itemWandRod, 1, 7))
+                .setPages(
+                        new ResearchPage("tc.research_page.ROD_bone.1"),
+                        new ResearchPage((InfusionRecipe) recipes.get("WandRodBone")))
+                .setSecondary()
+                .setConcealed()
+                .setParents("ROD_greatwood", "INFUSION")
+                .registerResearchItem();
+        ThaumcraftApi.addWarpToResearch("ROD_bone", 1);
+
+        new ResearchItem(
+                "ROD_silverwood",
+                "THAUMATURGY",
+                new AspectList()
+                        .add(Aspect.TOOL, 6)
+                        .add(Aspect.TREE, 6)
+                        .add(Aspect.MAGIC, 9),
+                -2,
+                5,
+                3,
+                new ItemStack(ConfigItems.itemWandRod, 1, 2))
+                .setPages(
+                        new ResearchPage("tc.research_page.ROD_silverwood.1"),
+                        new ResearchPage((InfusionRecipe) recipes.get("WandRodSilverwood")))
+                .setParents("ROD_greatwood", "INFUSION")
                 .registerResearchItem();
     }
 
