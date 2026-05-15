@@ -536,6 +536,26 @@ Remaining limits:
 - Original potion metadata and candle trade outputs do not have direct current-port equivalents in this branch and remain documented content dependencies.
 - Manual Pech trade interaction, output extraction, and save/reload scenarios remain unrun because user-driven manual validation is excluded and smoke-server remains environment-blocked.
 
+### 2026-05-15 — Stage 6 Pech spawn variants
+
+Scope:
+
+- Added `EntityPech.onInitialSpawn(...)` to restore random mainhand equipment selection from the reference spawn path.
+- Restored Pech-focus wand setup with starting primal vis and type `1`, bow setup with type `2`, melee/tool/fishing-rod equipment possibilities, reduced wand drop chance, difficulty-based enchantment for non-wand gear, pickup-loot chance, and combat-task refresh after spawn setup.
+
+Validation:
+
+- `./scripts/dev.sh compileJava` — passed.
+- `./scripts/dev.sh build` — passed.
+- `./scripts/dev.sh check-jar` — failed before jar inspection because the wrapper's expected MCP mapping cache file is still absent at `.gradle_home/caches/minecraft/de/oceanlabs/mcp/mcp_stable/39/1.12.2/srgs/mcp-srg.srg`.
+- `./scripts/dev.sh smoke-server` — failed by timeout before ready state; log again stopped after `Calling tweak class net.minecraftforge.fml.common.launcher.FMLServerTweaker`, with only Log4j console appender initialization errors. `run/crash-reports/` does not exist, and the configured crash-marker scan found no matches. This matches the clean `da3f307` baseline reproduction recorded above.
+
+Remaining limits:
+
+- Type-specific Pech display-name localization is still not restored.
+- Spawn variants have not been observed in a runtime world because smoke-server remains environment-blocked and user-driven manual scenarios are excluded.
+- Pech group anger/trade runtime scenarios remain separate Stage 6 work.
+
 ## Next Checkpoint Candidate
 
 After the portal trigger and ring bootstrap checkpoints, the next pre-Phase8 candidates are:

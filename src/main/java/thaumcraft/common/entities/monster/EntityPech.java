@@ -4,6 +4,7 @@ import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.pathfinding.PathNavigate;
 import net.minecraft.pathfinding.PathNavigateGround;
 import net.minecraft.pathfinding.PathNodeType;
+import net.minecraft.entity.IEntityLivingData;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.IRangedAttackMob;
 import net.minecraft.entity.SharedMonsterAttributes;
@@ -23,6 +24,7 @@ import net.minecraft.entity.projectile.EntityArrow;
 import net.minecraft.entity.projectile.EntityTippedArrow;
 import net.minecraft.init.Enchantments;
 import net.minecraft.init.Items;
+import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.init.SoundEvents;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -35,6 +37,7 @@ import net.minecraft.util.EnumHand;
 import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.SoundEvent;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.World;
 import thaumcraft.api.aspects.Aspect;
 import thaumcraft.api.aspects.AspectList;
@@ -174,6 +177,86 @@ public class EntityPech extends net.minecraft.entity.monster.EntityMob implement
         this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(30.0D);
         this.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).setBaseValue(3.0D);
         this.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(0.25D);
+    }
+
+    @Override
+    public IEntityLivingData onInitialSpawn(DifficultyInstance difficulty, IEntityLivingData livingdata) {
+        IEntityLivingData data = super.onInitialSpawn(difficulty, livingdata);
+        this.setRandomHeldItem();
+        ItemStack held = this.getHeldItemMainhand();
+        if (!held.isEmpty() && held.getItem() == ConfigItems.itemWandCasting) {
+            this.setPechType(1);
+            this.setDropChance(EntityEquipmentSlot.MAINHAND, 0.1F);
+        } else if (!held.isEmpty()) {
+            if (held.getItem() == Items.BOW) {
+                this.setPechType(2);
+            }
+            this.enchantHeldItem(difficulty);
+        }
+        this.setCanPickUpLoot(this.rand.nextFloat() < 0.75F * difficulty.getClampedAdditionalDifficulty());
+        this.setCombatTask();
+        return data;
+    }
+
+    private void setRandomHeldItem() {
+        switch (this.rand.nextInt(20)) {
+            case 0:
+            case 12:
+                this.setItemStackToSlot(EntityEquipmentSlot.MAINHAND, createPechWand());
+                break;
+            case 1:
+                this.setItemStackToSlot(EntityEquipmentSlot.MAINHAND, new ItemStack(Items.STONE_SWORD));
+                break;
+            case 3:
+                this.setItemStackToSlot(EntityEquipmentSlot.MAINHAND, new ItemStack(Items.STONE_AXE));
+                break;
+            case 5:
+                this.setItemStackToSlot(EntityEquipmentSlot.MAINHAND, new ItemStack(Items.IRON_SWORD));
+                break;
+            case 6:
+                this.setItemStackToSlot(EntityEquipmentSlot.MAINHAND, new ItemStack(Items.IRON_AXE));
+                break;
+            case 7:
+                this.setItemStackToSlot(EntityEquipmentSlot.MAINHAND, new ItemStack(Items.FISHING_ROD));
+                break;
+            case 8:
+                this.setItemStackToSlot(EntityEquipmentSlot.MAINHAND, new ItemStack(Items.STONE_PICKAXE));
+                break;
+            case 9:
+                this.setItemStackToSlot(EntityEquipmentSlot.MAINHAND, new ItemStack(Items.IRON_PICKAXE));
+                break;
+            case 2:
+            case 4:
+            case 10:
+            case 11:
+            case 13:
+                this.setItemStackToSlot(EntityEquipmentSlot.MAINHAND, new ItemStack(Items.BOW));
+                break;
+            default:
+                break;
+        }
+    }
+
+    private ItemStack createPechWand() {
+        ItemStack wand = new ItemStack(ConfigItems.itemWandCasting);
+        if (ConfigItems.focusPech != null && wand.getItem() instanceof ItemWandCasting) {
+            ((ItemWandCasting) wand.getItem()).setFocus(wand, new ItemStack(ConfigItems.focusPech));
+        }
+        ItemWandCasting.addVis(wand, Aspect.EARTH, 2 + this.rand.nextInt(6), true);
+        ItemWandCasting.addVis(wand, Aspect.ENTROPY, 2 + this.rand.nextInt(6), true);
+        ItemWandCasting.addVis(wand, Aspect.WATER, 2 + this.rand.nextInt(6), true);
+        ItemWandCasting.addVis(wand, Aspect.AIR, this.rand.nextInt(4), true);
+        ItemWandCasting.addVis(wand, Aspect.FIRE, this.rand.nextInt(4), true);
+        ItemWandCasting.addVis(wand, Aspect.ORDER, this.rand.nextInt(4), true);
+        return wand;
+    }
+
+    private void enchantHeldItem(DifficultyInstance difficulty) {
+        ItemStack held = this.getHeldItemMainhand();
+        float localDifficulty = difficulty.getClampedAdditionalDifficulty();
+        if (!held.isEmpty() && this.rand.nextFloat() < 0.5F * localDifficulty) {
+            EnchantmentHelper.addRandomEnchantment(this.rand, held, (int) (7.0F + localDifficulty * (float) this.rand.nextInt(22)), false);
+        }
     }
 
     // ------------------------------------------------------------------

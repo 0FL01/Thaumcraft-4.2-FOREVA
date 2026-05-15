@@ -216,6 +216,11 @@ Port reference spawn equipment/type logic to Forge 1.12.2 and update combat AI w
 **Риски / зависимости:**
 Depends on current wand/focus items from earlier phases. If wand NBT/focus API is incomplete, document as dependency but keep Pech type/equipment behavior intact.
 
+**Checkpoint 2026-05-15 — Pech spawn variants:**
+`EntityPech.onInitialSpawn(...)` now restores the reference random mainhand selection and type derivation. Spawned Pechs can receive a Pech-focus wand with starting primal vis and become type `1`, receive a bow and become type `2`, or receive the reference melee/tool/fishing-rod equipment set and remain the default type. The mainhand drop chance is lowered for wand Pechs, non-wand equipment can receive difficulty-based enchantments, pickup-loot chance follows the reference local-difficulty gate, and `setCombatTask()` is rerun after spawn setup so type `1`/`2` Pechs use ranged AI immediately.
+
+Remaining GAP-4 limits after this checkpoint: type-specific display-name localization is still not restored, held-item change hooks after arbitrary equipment mutation are still limited to existing combat-task calls, and natural/command-spawn runtime coverage remains unvalidated because smoke-server remains environment-blocked and user-driven manual scenarios are excluded.
+
 ### GAP-5: Pech anger/group retaliation behavior is incomplete
 
 **Статус:** частично реализовано  
@@ -712,6 +717,29 @@ Stage 6 считается ПОЛНОСТЬЮ завершенной тольк�
 - `GuiPech` remains Phase 8/client work; current `ClientProxy` still returns `null` for `GUI_PECH`.
 - Original potion metadata/candle trade outputs are not directly available in the current branch and remain content/client dependencies rather than silently fabricated items.
 - Manual `S6-PECH-02` trade scenario remains unrun.
+
+### 8.2.4 Pech spawn variant checkpoint — 2026-05-15
+
+Статус: spawn equipment/type baseline implemented; runtime evidence remains open.
+
+Что сделано:
+
+- Added `EntityPech.onInitialSpawn(...)` to run the reference random held-item setup.
+- Restored wand Pech setup with Pech focus, starting primal vis, type `1`, and reduced mainhand drop chance.
+- Restored bow Pech type `2`, melee/tool/fishing-rod equipment possibilities, difficulty-based enchantment for non-wand gear, pickup-loot chance, and combat-task refresh after spawn setup.
+
+Проверки:
+
+- `./scripts/dev.sh compileJava` — passed.
+- `./scripts/dev.sh build` — passed.
+- `./scripts/dev.sh check-jar` — не дошел до jar inspection: отсутствует wrapper-ожидаемый MCP mapping cache `.gradle_home/caches/minecraft/de/oceanlabs/mcp/mcp_stable/39/1.12.2/srgs/mcp-srg.srg`.
+- `./scripts/dev.sh smoke-server` — timeout before ready state на уже задокументированном pre-Forge/log4j этапе; `run/crash-reports/` не существует, and the configured crash-marker scan found no matches.
+
+Оставшиеся ограничения:
+
+- Type-specific Pech display-name localization is still not restored.
+- Spawn variants have not been observed in a runtime world because smoke-server remains environment-blocked and manual scenarios are excluded.
+- Pech group anger/trade runtime scenarios remain separate Stage 6 work.
 
 ### 8.3 Minimal Stage 6 manual scenario matrix
 
