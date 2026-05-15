@@ -83,7 +83,7 @@ Client-only renderer/particle TODOs are Phase 8 dependencies. They are not count
 - `thaumcraft_src/thaumcraft/common/entities/golems/EntityGolemBase.class`
 
 **Что не совпадает:**
-Checkpoints 8.2.15 and 8.2.16 add `ConfigItems` fields/registrations for `itemGolemBell`, `itemGolemCore`, `itemGolemPlacer`, `itemGolemUpgrade`, `itemGolemDecoration`, and `itemTrunkSpawner`, restore the original metadata/subitem surface, and port the server-side golem/trunk item spawn paths. Checkpoint 8.2.17 restores bell link/marker editing, marker side/color identity, decoration application, wheat healing, and upgrade inventory refresh. Checkpoint 8.2.18 restores bell left-click pickup/packing behavior for golems and trunks. Checkpoint 8.2.19 restores traveling trunk baseline stats, upgrade application, feeding, stay-aware following, pickup upgrade pull behavior, and death inventory drops. Checkpoint 8.2.22 restores upgrade `2` owner-target defense. Remaining workflow gaps are cross-dimension trunk owner-follow behavior and runtime/manual placement evidence.
+Checkpoints 8.2.15 and 8.2.16 add `ConfigItems` fields/registrations for `itemGolemBell`, `itemGolemCore`, `itemGolemPlacer`, `itemGolemUpgrade`, `itemGolemDecoration`, and `itemTrunkSpawner`, restore the original metadata/subitem surface, and port the server-side golem/trunk item spawn paths. Checkpoint 8.2.17 restores bell link/marker editing, marker side/color identity, decoration application, wheat healing, and upgrade inventory refresh. Checkpoint 8.2.18 restores bell left-click pickup/packing behavior for golems and trunks. Checkpoint 8.2.19 restores traveling trunk baseline stats, upgrade application, feeding, stay-aware following, pickup upgrade pull behavior, and death inventory drops. Checkpoint 8.2.22 restores upgrade `2` owner-target defense, and checkpoint 8.2.23 restores linked cross-dimension owner-follow transfer. Remaining workflow gaps are runtime/manual placement and transfer evidence.
 
 **Что нужно доделать:**
 Register the golem/trunk items with stable Thaumcraft names and port their server behavior so players can obtain, place, configure, and link golems/trunks.
@@ -1208,6 +1208,31 @@ Mapping:
 
 - Runtime confirmation of owner-defense target acquisition and attack cadence remains unavailable while smoke-server is blocked before ready state and manual scenarios are excluded.
 - Cross-dimension owner-follow transfer remains open.
+- Client lid/heart/smoke animation parity remains Phase 8 work.
+
+### 8.2.23 Traveling trunk dimension transfer checkpoint — 2026-05-15
+
+Статус: linked cross-dimension owner-follow transfer restored; runtime transfer evidence remains open.
+
+Что сделано:
+
+- Added a server-side linked-trunk registry keyed by owner UUID in `EventHandlerEntity`, matching the original weak-reference linked entity pattern.
+- Registered owned traveling trunks while they tick near their owner.
+- Moved linked trunks to the owner player's destination world when the player joins a different world, preserving owner UUID, upgrade, stay flag, inventory, health, and custom name.
+- Removed transferred source trunks only after the replacement entity successfully spawns in the target world.
+
+Проверки:
+
+- `./scripts/dev.sh compileJava` — passed.
+- `./scripts/dev.sh build` — passed.
+- `./scripts/dev.sh check-jar` — не дошел до jar inspection: отсутствует wrapper-ожидаемый MCP mapping cache `.gradle_home/caches/minecraft/de/oceanlabs/mcp/mcp_stable/39/1.12.2/srgs/mcp-srg.srg`.
+- `./scripts/dev.sh smoke-server` — timeout before ready state на уже задокументированном pre-Forge/log4j этапе; `run/crash-reports/` не существует, and the configured crash-marker scan found no matches.
+- `git diff --check` — passed.
+
+Оставшиеся ограничения:
+
+- Runtime confirmation of cross-dimension trunk transfer remains unavailable while smoke-server is blocked before ready state and manual scenarios are excluded.
+- Event-driven transfer depends on the trunk being linked to its owner while both are loaded before the dimension change, matching the original linked-entity model.
 - Client lid/heart/smoke animation parity remains Phase 8 work.
 
 ### 8.3 Minimal Stage 6 manual scenario matrix

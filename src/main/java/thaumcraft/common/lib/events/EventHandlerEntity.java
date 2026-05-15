@@ -34,6 +34,7 @@ import thaumcraft.api.wands.ItemFocusBasic;
 import thaumcraft.common.Thaumcraft;
 import thaumcraft.common.config.Config;
 import thaumcraft.common.config.ConfigItems;
+import thaumcraft.common.entities.golems.EntityTravelingTrunk;
 import thaumcraft.common.entities.monster.EntityBrainyZombie;
 import thaumcraft.common.entities.monster.EntityGiantBrainyZombie;
 import thaumcraft.common.lib.WarpEvents;
@@ -51,12 +52,19 @@ import thaumcraft.common.lib.network.playerdata.PacketRunicCharge;
 import thaumcraft.common.lib.research.ResearchManager;
 
 import java.io.File;
+import java.lang.ref.WeakReference;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 public class EventHandlerEntity {
 
     public static final net.minecraft.util.ResourceLocation PLAYER_KNOWLEDGE_KEY =
             new net.minecraft.util.ResourceLocation("thaumcraft", "player_knowledge");
+    private static final Map<UUID, ArrayList<WeakReference<EntityTravelingTrunk>>> LINKED_TRUNKS = new HashMap<>();
 
     // ---- Capability attachment ----
 
@@ -75,6 +83,9 @@ public class EventHandlerEntity {
     public void onEntityJoinWorld(EntityJoinWorldEvent event) {
         if (!event.getWorld().isRemote && event.getEntity() instanceof EntityPlayer) {
             EntityPlayer player = (EntityPlayer) event.getEntity();
+            if (player instanceof EntityPlayerMP) {
+                moveLinkedTravelingTrunks((EntityPlayerMP) player);
+            }
             IPlayerKnowledge knowledge = player.getCapability(PlayerKnowledgeProvider.PLAYER_KNOWLEDGE, null);
             if (knowledge != null) {
                 knowledge.setPlayer(player);
@@ -86,6 +97,49 @@ public class EventHandlerEntity {
                 ResearchManager.updateCache(player.getName(), knowledge);
             }
             syncAllData(player);
+        }
+    }
+
+    public static void linkTravelingTrunk(EntityTravelingTrunk trunk, UUID ownerId) {
+        if (trunk == null || ownerId == null || trunk.isDead || trunk.world == null || trunk.world.isRemote) {
+            return;
+        }
+        ArrayList<WeakReference<EntityTravelingTrunk>> trunks = LINKED_TRUNKS.get(ownerId);
+        if (trunks == null) {
+            trunks = new ArrayList<>();
+            LINKED_TRUNKS.put(ownerId, trunks);
+        }
+        Iterator<WeakReference<EntityTravelingTrunk>> iterator = trunks.iterator();
+        while (iterator.hasNext()) {
+            EntityTravelingTrunk linked = iterator.next().get();
+            if (linked == null || linked.isDead) {
+                iterator.remove();
+                continue;
+            }
+            if (linked.getEntityId() == trunk.getEntityId() && linked.world == trunk.world) {
+                return;
+            }
+        }
+        trunks.add(new WeakReference<>(trunk));
+    }
+
+    private static void moveLinkedTravelingTrunks(EntityPlayerMP player) {
+        ArrayList<WeakReference<EntityTravelingTrunk>> trunks = LINKED_TRUNKS.get(player.getUniqueID());
+        if (trunks == null) {
+            return;
+        }
+        Iterator<WeakReference<EntityTravelingTrunk>> iterator = trunks.iterator();
+        while (iterator.hasNext()) {
+            EntityTravelingTrunk trunk = iterator.next().get();
+            if (trunk == null || trunk.isDead) {
+                iterator.remove();
+                continue;
+            }
+            if (trunk.world != player.world) {
+                if (trunk.transferToOwnerDimension(player)) {
+                    iterator.remove();
+                }
+            }
         }
     }
 

@@ -55,6 +55,9 @@ public class EntityTravelingTrunk extends net.minecraft.entity.EntityLiving impl
         }
         net.minecraft.entity.Entity ownerEntity = this.getOwner();
         net.minecraft.entity.EntityLivingBase owner = (ownerEntity instanceof net.minecraft.entity.EntityLivingBase) ? (net.minecraft.entity.EntityLivingBase)ownerEntity : null;
+        if (!this.world.isRemote && owner != null) {
+            thaumcraft.common.lib.events.EventHandlerEntity.linkTravelingTrunk(this, owner.getUniqueID());
+        }
         if (!this.world.isRemote) {
             this.updateDefensiveTarget(owner);
         }
@@ -263,6 +266,36 @@ public class EntityTravelingTrunk extends net.minecraft.entity.EntityLiving impl
     private boolean isOwner(net.minecraft.entity.player.EntityPlayer player) {
         java.util.UUID ownerId = this.getOwnerId();
         return ownerId == null || ownerId.equals(player.getUniqueID());
+    }
+
+    public boolean transferToOwnerDimension(net.minecraft.entity.player.EntityPlayerMP player) {
+        if (player == null || this.world.isRemote || this.getStay() || this.isDead || player.world == this.world) {
+            return false;
+        }
+        java.util.UUID ownerId = this.getOwnerId();
+        if (ownerId == null || !ownerId.equals(player.getUniqueID())) {
+            return false;
+        }
+        EntityTravelingTrunk copy = new EntityTravelingTrunk(player.world);
+        copy.setOwnerId(ownerId);
+        copy.setUpgrade(this.getUpgrade());
+        copy.setInvSize();
+        net.minecraft.nbt.NBTTagList inventoryTag = this.inventory.writeToNBT(new net.minecraft.nbt.NBTTagList());
+        copy.inventory.readFromNBT(inventoryTag);
+        copy.inventory.setEntity(copy);
+        copy.setStay(this.getStay());
+        copy.setHealth(this.getHealth());
+        if (this.hasCustomName()) {
+            copy.setCustomNameTag(this.getCustomNameTag());
+        }
+        copy.setLocationAndAngles(player.posX, player.posY + 0.25D, player.posZ, this.rotationYaw, this.rotationPitch);
+        copy.rotationYawHead = copy.rotationYaw;
+        copy.renderYawOffset = copy.rotationYaw;
+        if (player.world.spawnEntity(copy)) {
+            this.setDead();
+            return true;
+        }
+        return false;
     }
 
     @Override
