@@ -67,6 +67,31 @@ Branch: `codex/durable-goal-stage8-9`
 
 ## Checkpoint Log
 
+### 2026-05-15 — Stage 9-b arcane alchemy/tube static subset
+
+Scope:
+
+- Expanded `ConfigRecipes.initializeArcaneRecipeBaseline()` with the next tightly coupled static arcane subset from reference `initializeArcaneRecipes()`:
+  - `Filter`, `AlchemyFurnace`, `Alembic`, `Bellows`, `Tube`, `Resonator`
+  - `TubeValve`, `TubeFilter`, `TubeRestrict`, `TubeOneway`, `TubeBuffer`
+  - `AlchemicalConstruct`, `AdvAlchemyConstruct`, `Centrifuge`, `EssentiaCrystalizer`, `MnemonicMatrix`
+- Reused the shapeless arcane helper path for tube conversion variants and persisted all handles to `ConfigResearch.recipes`.
+- Preserved reference-aligned research keys/aspect costs/patterns with 1.12 constants resolved through MCP stable_39 mappings.
+- Updated `docs/Stage9-b.md` GAP-1/GAP-6 notes to include this alchemy/tube subset coverage.
+
+Validation:
+
+- `./scripts/dev.sh validate --smoke` — passed: status, compile, tests `10/10`, jar, check-jar summary `5506` MCP leak lines / `1080` unique leaks, and server smoke.
+- `run/smoke-server.log` evidence: `Registering entities`; `Forge Mod Loader has successfully loaded 6 mods`; `Done (1.188s)!`.
+- Crash report scan under `run/` returned no files.
+- `./scripts/dev.sh smoke-client` — skipped because `DISPLAY=` and GUI/graphics/user-interactive validation is excluded.
+
+Remaining limits:
+
+- Stage 9-b static arcane coverage is now broader but still incomplete versus full reference `initializeArcaneRecipes()` set.
+- Stage 9-d/e research content/category/page population is still required for full gate-key and recipe-key lookup parity.
+- Arcane Workbench manual/client scenarios remain outside current non-GUI validation scope.
+
 ### 2026-05-15 — Stage 9-b arcane focus/golem/utility static subset
 
 Scope:

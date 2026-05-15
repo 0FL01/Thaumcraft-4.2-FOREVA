@@ -375,6 +375,131 @@ public class ConfigRecipes {
                 "NNN", "NCN", "NNN",
                 'N', Items.GOLD_NUGGET,
                 'C', new ItemStack(ConfigItems.itemShard, 1, 5));
+
+        registerArcaneRecipe("Filter", "DISTILESSENTIA",
+                new ItemStack(ConfigItems.itemResource, 2, 8),
+                new AspectList().add(Aspect.ORDER, 5).add(Aspect.WATER, 5),
+                "GWG",
+                'G', Items.GOLD_INGOT,
+                'W', new ItemStack(ConfigBlocks.blockWoodenDevice, 1, 7));
+
+        registerArcaneRecipe("AlchemyFurnace", "DISTILESSENTIA",
+                new ItemStack(ConfigBlocks.blockStoneDevice, 1, 0),
+                new AspectList().add(Aspect.FIRE, 5).add(Aspect.WATER, 5),
+                "SCS", "SFS", "SSS",
+                'C', new ItemStack(ConfigBlocks.blockMetalDevice, 1, 0),
+                'F', Blocks.FURNACE,
+                'S', new ItemStack(ConfigBlocks.blockCosmeticSolid, 1, 6));
+
+        registerArcaneRecipe("Alembic", "DISTILESSENTIA",
+                new ItemStack(ConfigBlocks.blockMetalDevice, 1, 1),
+                new AspectList().add(Aspect.AIR, 5).add(Aspect.WATER, 5),
+                "FIG", "IBI", "I I",
+                'I', Items.IRON_INGOT,
+                'B', Items.BUCKET,
+                'G', Items.GOLD_INGOT,
+                'F', new ItemStack(ConfigItems.itemResource, 1, 8),
+                'L', new ItemStack(ConfigBlocks.blockMagicalLeaves, 1, 1));
+
+        registerArcaneRecipe("Bellows", "BELLOWS",
+                new ItemStack(ConfigBlocks.blockWoodenDevice, 1, 0),
+                new AspectList().add(Aspect.AIR, 10).add(Aspect.ORDER, 5),
+                "WW ", "LCI", "WW ",
+                'W', "plankWood",
+                'C', new ItemStack(ConfigItems.itemShard, 1, 0),
+                'I', Items.IRON_INGOT,
+                'L', Items.LEATHER);
+
+        registerArcaneRecipe("Tube", "TUBES",
+                new ItemStack(ConfigBlocks.blockTube, 8, 0),
+                new AspectList().add(Aspect.WATER, 5).add(Aspect.ORDER, 5),
+                " Q ", "IGI", " B ",
+                'I', Items.IRON_INGOT,
+                'B', Items.GOLD_NUGGET,
+                'G', Blocks.GLASS,
+                'Q', new ItemStack(ConfigItems.itemNugget, 1, 5));
+
+        registerArcaneRecipe("Resonator", "TUBES",
+                new ItemStack(ConfigItems.itemResonator),
+                new AspectList().add(Aspect.WATER, 5).add(Aspect.AIR, 5),
+                "I I", "INI", " S ",
+                'I', Items.IRON_INGOT,
+                'N', Items.QUARTZ,
+                'S', "stickWood");
+
+        registerShapelessArcaneRecipe("TubeValve", "TUBES",
+                new ItemStack(ConfigBlocks.blockTube, 1, 1),
+                new AspectList().add(Aspect.WATER, 5).add(Aspect.ORDER, 5),
+                new ItemStack(ConfigBlocks.blockTube, 1, 0), new ItemStack(Blocks.LEVER));
+
+        registerShapelessArcaneRecipe("TubeFilter", "TUBEFILTER",
+                new ItemStack(ConfigBlocks.blockTube, 1, 3),
+                new AspectList().add(Aspect.WATER, 5).add(Aspect.ORDER, 16),
+                new ItemStack(ConfigBlocks.blockTube, 1, 0), new ItemStack(ConfigItems.itemResource, 1, 8));
+
+        registerShapelessArcaneRecipe("TubeRestrict", "TUBEFILTER",
+                new ItemStack(ConfigBlocks.blockTube, 1, 5),
+                new AspectList().add(Aspect.WATER, 5).add(Aspect.EARTH, 16),
+                new ItemStack(ConfigBlocks.blockTube, 1, 0), "stone");
+
+        registerShapelessArcaneRecipe("TubeOneway", "TUBEFILTER",
+                new ItemStack(ConfigBlocks.blockTube, 1, 6),
+                new AspectList().add(Aspect.WATER, 5).add(Aspect.ORDER, 8).add(Aspect.ENTROPY, 8),
+                new ItemStack(ConfigBlocks.blockTube, 1, 0), "dyeBlue");
+
+        registerArcaneRecipe("TubeBuffer", "CENTRIFUGE",
+                new ItemStack(ConfigBlocks.blockTube, 1, 4),
+                new AspectList().add(Aspect.WATER, 5).add(Aspect.ORDER, 5),
+                "PVP", "T T", "PRP",
+                'T', new ItemStack(ConfigBlocks.blockTube, 1, 0),
+                'V', new ItemStack(ConfigBlocks.blockTube, 1, 1),
+                'R', new ItemStack(ConfigBlocks.blockTube, 1, 5),
+                'P', new ItemStack(ConfigItems.itemEssence, 1, 0));
+
+        registerArcaneRecipe("AlchemicalConstruct", "DISTILESSENTIA",
+                new ItemStack(ConfigBlocks.blockMetalDevice, 1, 9),
+                new AspectList().add(Aspect.WATER, 5).add(Aspect.ORDER, 5),
+                "VTF", "TWT", "FTV",
+                'W', new ItemStack(ConfigBlocks.blockWoodenDevice, 1, 6),
+                'V', new ItemStack(ConfigBlocks.blockTube, 1, 1),
+                'T', new ItemStack(ConfigBlocks.blockTube, 1, 0),
+                'F', new ItemStack(ConfigItems.itemResource, 1, 8));
+
+        registerArcaneRecipe("AdvAlchemyConstruct", "ADVALCHEMYFURNACE",
+                new ItemStack(ConfigBlocks.blockMetalDevice, 4, 3),
+                new AspectList().add(Aspect.WATER, 10).add(Aspect.ORDER, 30).add(Aspect.EARTH, 10),
+                "VAV", "APA", "VAV",
+                'A', new ItemStack(ConfigBlocks.blockMetalDevice, 1, 9),
+                'V', new ItemStack(ConfigItems.itemResource, 1, 16),
+                'P', new ItemStack(ConfigItems.itemEldritchObject, 1, 3));
+
+        registerArcaneRecipe("Centrifuge", "CENTRIFUGE",
+                new ItemStack(ConfigBlocks.blockTube, 1, 2),
+                new AspectList().add(Aspect.WATER, 5).add(Aspect.ORDER, 5).add(Aspect.ENTROPY, 5),
+                " T ", "ACP", " T ",
+                'T', new ItemStack(ConfigBlocks.blockTube, 1, 0),
+                'P', new ItemStack(Blocks.PISTON),
+                'A', new ItemStack(ConfigBlocks.blockMetalDevice, 1, 1),
+                'C', new ItemStack(ConfigBlocks.blockMetalDevice, 1, 9));
+
+        registerArcaneRecipe("EssentiaCrystalizer", "ESSENTIACRYSTAL",
+                new ItemStack(ConfigBlocks.blockTube, 1, 7),
+                new AspectList().add(Aspect.WATER, 5).add(Aspect.EARTH, 15).add(Aspect.ORDER, 5),
+                "IDI", "QCQ", "WTW",
+                'T', new ItemStack(ConfigBlocks.blockTube, 1, 0),
+                'D', new ItemStack(Blocks.DISPENSER),
+                'Q', new ItemStack(ConfigItems.itemShard, 1, 6),
+                'I', "ingotIron",
+                'W', "plankWood",
+                'C', new ItemStack(ConfigBlocks.blockMetalDevice, 1, 9));
+
+        registerArcaneRecipe("MnemonicMatrix", "THAUMATORIUM",
+                new ItemStack(ConfigBlocks.blockMetalDevice, 1, 12),
+                new AspectList().add(Aspect.FIRE, 5).add(Aspect.WATER, 5).add(Aspect.ORDER, 5),
+                "IAI", "ABA", "IAI",
+                'B', new ItemStack(ConfigItems.itemZombieBrain),
+                'A', new ItemStack(ConfigItems.itemResource, 1, 6),
+                'I', new ItemStack(Items.IRON_INGOT));
     }
 
     private static void registerArcaneRecipe(String key, String research, ItemStack output, AspectList aspects, Object... recipe) {

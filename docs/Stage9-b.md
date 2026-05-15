@@ -60,6 +60,7 @@ Stage 9-b сейчас нельзя считать завершенной: block
 Reference calls `initializeArcaneRecipes()` from `ConfigRecipes.init()` and fills `ConfigResearch.recipes` with arcane recipe objects. Port now has a concrete arcane baseline method in `ConfigRecipes.init()` and registers an expanded static subset with direct `ConfigResearch.recipes.put(...)` handles, including:
 - baseline keys from prior checkpoint (`PrimalCharm`, `IronKey`/`GoldKey`, `ArcaneStone1`, `WardedJar`, `JarVoid`, representative wand cap/rod staff keys, `FocusFire`/`FocusFrost`, robe parts, `Goggles`);
 - added focus/golem/utility block (`MirrorGlass`, `BoneBow`, `PrimalArrow_0..5`, `InfusionMatrix`, `ArcanePedestal`, `FocusShock`, `FocusTrade`, `FocusExcavation`, `FocusPrimal`, `FocusPouch`, `Deconstructor`, `ArcaneBoreBase`, `EnchantedFabric`, `GolemBell`, `CoreBlank`, `UpgradeAir`..`UpgradeEntropy`).
+- added alchemy/tube/thaumatorium block (`Filter`, `AlchemyFurnace`, `Alembic`, `Bellows`, `Tube`, `Resonator`, `TubeValve`, `TubeFilter`, `TubeRestrict`, `TubeOneway`, `TubeBuffer`, `AlchemicalConstruct`, `AdvAlchemyConstruct`, `Centrifuge`, `EssentiaCrystalizer`, `MnemonicMatrix`).
 
 Full parity is still open: many of the 89 reference arcane adds are not yet ported.
 
@@ -258,6 +259,7 @@ This touches public API classes. Do not change method signatures. Existing addon
 Reference stores recipe objects under stable research recipe keys, and arcane recipe `matches` checks `ThaumcraftApiHelper.isResearchComplete(playerName, research)`. Port now has `ConfigResearch.recipes` plus direct arcane key writes from `ConfigRecipes` for:
 - representative baseline entries (`PrimalCharm`, `IronKey`/`GoldKey`, `ArcaneStone1`, `WardedJar`, `JarVoid`, wand cap/rod keys, `FocusFire`/`FocusFrost`, robe parts, `Goggles`);
 - focus/golem/utility entries (`MirrorGlass`, `BoneBow`, `PrimalArrow_0..5`, `InfusionMatrix`, `ArcanePedestal`, `FocusShock`, `FocusTrade`, `FocusExcavation`, `FocusPrimal`, `FocusPouch`, `Deconstructor`, `ArcaneBoreBase`, `EnchantedFabric`, `GolemBell`, `CoreBlank`, `UpgradeAir`..`UpgradeEntropy`).
+- alchemy/tube/thaumatorium entries (`Filter`, `AlchemyFurnace`, `Alembic`, `Bellows`, `Tube`, `Resonator`, `TubeValve`, `TubeFilter`, `TubeRestrict`, `TubeOneway`, `TubeBuffer`, `AlchemicalConstruct`, `AdvAlchemyConstruct`, `Centrifuge`, `EssentiaCrystalizer`, `MnemonicMatrix`).
 
 Still missing: full key coverage, actual Stage 9-d/e research page/content population, and runtime gate verification scenarios.
 
