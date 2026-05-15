@@ -1038,9 +1038,31 @@ Remaining limits:
 - Bootup client sound parity remains open and belongs with Phase 8 client/visual work.
 - Full per-core golem AI runtime scenarios remain open.
 
+### 2026-05-15 — Stage 6 golem armor calculation
+
+Scope:
+
+- Restored `EntityGolemBase.getTotalArmorValue()` to include the golem type armor value from `EnumGolemType`.
+- Restored the reference visor and plate decoration armor bonuses.
+- Kept the armor result capped at `20` like the reference/vanilla armor cap.
+
+Validation:
+
+- `./scripts/dev.sh compileJava` — passed.
+- `./scripts/dev.sh build` — passed.
+- `./scripts/dev.sh check-jar` — failed before jar inspection because the wrapper's expected MCP mapping cache file is still absent at `.gradle_home/caches/minecraft/de/oceanlabs/mcp/mcp_stable/39/1.12.2/srgs/mcp-srg.srg`.
+- `./scripts/dev.sh smoke-server` — failed by timeout before ready state; log again stopped after `Calling tweak class net.minecraftforge.fml.common.launcher.FMLServerTweaker`, with only Log4j console appender initialization errors. `run/crash-reports/` does not exist, and the configured crash-marker scan found no matches. This matches the clean `da3f307` baseline reproduction recorded above.
+- `git diff --check` — passed.
+
+Remaining limits:
+
+- Runtime confirmation of type/decor armor damage reduction remains unavailable while smoke-server is blocked before ready state and user-driven manual scenarios are excluded.
+- Bootup client sound parity remains open and belongs with Phase 8 client/visual work.
+- Full per-core golem AI runtime scenarios remain open.
+
 ## Next Checkpoint Candidate
 
-After the golem carried-display, trunk transfer, death logging, and fire-resistance checkpoints, the next pre-Phase8 candidates are:
+After the golem carried-display, trunk transfer, death logging, fire-resistance, and armor checkpoints, the next pre-Phase8 candidates are:
 
 - Remaining Stage 6 selected low-risk golem AI helper fixes, if they can be kept server-safe.
 - Remaining Stage 7 surface/worldgen runtime evidence and broader biome blacklist edge cases.

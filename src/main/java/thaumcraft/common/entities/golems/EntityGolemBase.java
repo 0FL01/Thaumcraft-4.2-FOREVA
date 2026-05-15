@@ -666,6 +666,14 @@ public class EntityGolemBase extends net.minecraft.entity.monster.EntityGolem im
     }
 
     @Override
+    public int getTotalArmorValue() {
+        int armor = super.getTotalArmorValue() + this.getGolemType().armor;
+        if (this.decoration.contains("V")) armor++;
+        if (this.decoration.contains("P")) armor += 4;
+        return Math.min(armor, 20);
+    }
+
+    @Override
     public boolean attackEntityFrom(net.minecraft.util.DamageSource source, float amount) {
         this.paused = false;
         if (source == net.minecraft.util.DamageSource.IN_WALL) return false;
