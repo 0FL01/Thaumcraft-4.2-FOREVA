@@ -509,6 +509,10 @@ public class EntityGolemBase extends net.minecraft.entity.monster.EntityGolem im
     }
 
     // --- Carried item ---
+    public net.minecraft.item.ItemStack getCarriedForDisplay() {
+        return this.dataManager.get(CARRIED);
+    }
+
     public void setCarried(net.minecraft.item.ItemStack stack) {
         this.itemCarried = stack;
         this.updateCarried();
@@ -527,6 +531,24 @@ public class EntityGolemBase extends net.minecraft.entity.monster.EntityGolem im
     public void updateCarried() {
         if (this.itemCarried != null && !this.itemCarried.isEmpty()) {
             this.dataManager.set(CARRIED, this.itemCarried.copy());
+        } else if (this.getCore() == 5 && this.fluidCarried != null) {
+            net.minecraft.block.Block fluidBlock = this.fluidCarried.getFluid().getBlock();
+            if (fluidBlock != null) {
+                this.dataManager.set(CARRIED, new net.minecraft.item.ItemStack(fluidBlock, 1, this.fluidCarried.amount));
+            } else {
+                this.dataManager.set(CARRIED, net.minecraft.item.ItemStack.EMPTY);
+            }
+        } else if (this.getCore() == 6) {
+            net.minecraft.item.ItemStack display = thaumcraft.common.config.ConfigBlocks.blockJar == null
+                    ? net.minecraft.item.ItemStack.EMPTY
+                    : new net.minecraft.item.ItemStack(thaumcraft.common.config.ConfigBlocks.blockJar);
+            if (!display.isEmpty() && display.getItem() instanceof thaumcraft.api.aspects.IEssentiaContainerItem
+                    && this.essentia != null && this.essentiaAmount > 0) {
+                int amount = (int)(64.0F * ((float)this.essentiaAmount / (float)Math.max(1, this.getCarryLimit())));
+                ((thaumcraft.api.aspects.IEssentiaContainerItem) display.getItem())
+                        .setAspects(display, new thaumcraft.api.aspects.AspectList().add(this.essentia, amount));
+            }
+            this.dataManager.set(CARRIED, display);
         } else {
             this.dataManager.set(CARRIED, net.minecraft.item.ItemStack.EMPTY);
         }

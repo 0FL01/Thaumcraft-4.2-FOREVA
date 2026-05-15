@@ -122,7 +122,7 @@ Depends on item/content registration outside pure entity classes. This is a dire
 - `thaumcraft_src/thaumcraft/common/entities/golems/EntityGolemBase.class`
 
 **Что не совпадает:**
-Reference behavior includes inactive state from the pedestal/cosmetic block under the golem, bootup sounds/status, fire resistance override, death logging, bell/deco/wheat interactions, fluid-carried NBT for fluid cores, GUI blocking while holding wand, setup inventory after upgrades, spawn data reconstruction, and item/bell constants through `ConfigItems`. Checkpoints 8.2.17, 8.2.20, and 8.2.21 restore the main bell/deco/wheat interaction branch, held-wand GUI exclusion, upgrade inventory refresh, fluid-carried/toggle NBT persistence, carried item sync after reload, ranged golem shot sound, and the golem-stone inactive state. Current remaining static gaps include death logging/bootup client sound parity, carried fluid/essentia display sync, and runtime/manual evidence for the full core matrix.
+Reference behavior includes inactive state from the pedestal/cosmetic block under the golem, bootup sounds/status, fire resistance override, death logging, bell/deco/wheat interactions, fluid-carried NBT for fluid cores, GUI blocking while holding wand, setup inventory after upgrades, spawn data reconstruction, and item/bell constants through `ConfigItems`. Checkpoints 8.2.17, 8.2.20, 8.2.21, and 8.2.24 restore the main bell/deco/wheat interaction branch, held-wand GUI exclusion, upgrade inventory refresh, fluid-carried/toggle NBT persistence, carried item sync after reload, ranged golem shot sound, the golem-stone inactive state, and carried item/fluid/essentia display sync. Current remaining static gaps include death logging/bootup client sound parity and runtime/manual evidence for the full core matrix.
 
 **Что нужно доделать:**
 Port the missing server-visible golem lifecycle and interaction details from reference, without moving renderer/FX work into Stage 6.
@@ -1234,6 +1234,31 @@ Mapping:
 - Runtime confirmation of cross-dimension trunk transfer remains unavailable while smoke-server is blocked before ready state and manual scenarios are excluded.
 - Event-driven transfer depends on the trunk being linked to its owner while both are loaded before the dimension change, matching the original linked-entity model.
 - Client lid/heart/smoke animation parity remains Phase 8 work.
+
+### 8.2.24 Golem carried display sync checkpoint — 2026-05-15
+
+Статус: carried item/fluid/essentia data-manager display sync restored; renderer parity remains Phase 8.
+
+Что сделано:
+
+- Added `EntityGolemBase.getCarriedForDisplay()` for the synced carried stack, matching the original data-watcher access pattern.
+- Restored `updateCarried()` display sync for carried items.
+- Restored fluid-core display sync by publishing the carried fluid block stack with the carried amount as metadata when a fluid block exists.
+- Restored essentia-core display sync with a jar display stack populated through the current `IEssentiaContainerItem` jar item path.
+
+Проверки:
+
+- `./scripts/dev.sh compileJava` — passed.
+- `./scripts/dev.sh build` — passed.
+- `./scripts/dev.sh check-jar` — не дошел до jar inspection: отсутствует wrapper-ожидаемый MCP mapping cache `.gradle_home/caches/minecraft/de/oceanlabs/mcp/mcp_stable/39/1.12.2/srgs/mcp-srg.srg`.
+- `./scripts/dev.sh smoke-server` — timeout before ready state на уже задокументированном pre-Forge/log4j этапе; `run/crash-reports/` не существует, and the configured crash-marker scan found no matches.
+- `git diff --check` — passed.
+
+Оставшиеся ограничения:
+
+- Runtime confirmation of carried item/fluid/essentia display changes remains unavailable while smoke-server is blocked before ready state and manual scenarios are excluded.
+- Actual visual/render parity for displayed carried stacks remains Phase 8 work.
+- Death logging and bootup client sound parity remain open.
 
 ### 8.3 Minimal Stage 6 manual scenario matrix
 

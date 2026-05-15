@@ -972,11 +972,34 @@ Remaining limits:
 - Event-driven transfer depends on the trunk being linked to its owner while both are loaded before the dimension change, matching the original linked-entity model.
 - Client lid/heart/smoke animation parity remains Phase 8 work.
 
+### 2026-05-15 — Stage 6 golem carried display sync
+
+Scope:
+
+- Added `EntityGolemBase.getCarriedForDisplay()` for the synced carried stack, matching the original data-watcher access pattern.
+- Restored `updateCarried()` display sync for carried items.
+- Restored fluid-core display sync by publishing the carried fluid block stack with the carried amount as metadata when a fluid block exists.
+- Restored essentia-core display sync with a jar display stack populated through the current `IEssentiaContainerItem` jar item path.
+
+Validation:
+
+- `./scripts/dev.sh compileJava` — passed.
+- `./scripts/dev.sh build` — passed.
+- `./scripts/dev.sh check-jar` — failed before jar inspection because the wrapper's expected MCP mapping cache file is still absent at `.gradle_home/caches/minecraft/de/oceanlabs/mcp/mcp_stable/39/1.12.2/srgs/mcp-srg.srg`.
+- `./scripts/dev.sh smoke-server` — failed by timeout before ready state; log again stopped after `Calling tweak class net.minecraftforge.fml.common.launcher.FMLServerTweaker`, with only Log4j console appender initialization errors. `run/crash-reports/` does not exist, and the configured crash-marker scan found no matches. This matches the clean `da3f307` baseline reproduction recorded above.
+- `git diff --check` — passed.
+
+Remaining limits:
+
+- Runtime confirmation of carried item/fluid/essentia display changes remains unavailable while smoke-server is blocked before ready state and user-driven manual scenarios are excluded.
+- Actual visual/render parity for displayed carried stacks remains Phase 8 work.
+- Death logging and bootup client sound parity remain open.
+
 ## Next Checkpoint Candidate
 
-After the golem inactive-state and trunk transfer checkpoints, the next pre-Phase8 candidates are:
+After the golem carried-display and trunk transfer checkpoints, the next pre-Phase8 candidates are:
 
-- Remaining Stage 6 selected low-risk golem AI helper fixes and carried fluid/essentia display sync, if they can be kept server-safe.
+- Remaining Stage 6 selected low-risk golem AI helper fixes, if they can be kept server-safe.
 - Remaining Stage 7 surface/worldgen runtime evidence and broader biome blacklist edge cases.
 - Remaining Stage 7 Outer Lands room/tile behavior, especially key/boss room traversal, boss-room runtime/save evidence, and maze save/load race validation.
 - Stage 9 loot/content registration, because `Utils.generateLoot(...)` now has a shared reward path but the full reference loot pool distribution still depends on populated content tables.
