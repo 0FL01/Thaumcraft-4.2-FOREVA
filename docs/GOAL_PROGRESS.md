@@ -67,6 +67,32 @@ Branch: `codex/durable-goal-stage8-9`
 
 ## Checkpoint Log
 
+### 2026-05-15 — Stage 9-b arcane focus/golem/utility static subset
+
+Scope:
+
+- Expanded `ConfigRecipes.initializeArcaneRecipeBaseline()` with a tightly coupled static arcane subset from the reference `initializeArcaneRecipes()` block:
+  - `MirrorGlass`, `BoneBow`, `PrimalArrow_0..5`, `InfusionMatrix`, `ArcanePedestal`
+  - `FocusShock`, `FocusTrade`, `FocusExcavation`, `FocusPrimal`, `FocusPouch`
+  - `Deconstructor`, `ArcaneBoreBase`, `EnchantedFabric`
+  - `GolemBell`, `CoreBlank`, `UpgradeAir`..`UpgradeEntropy`
+- Added shapeless arcane helper registration path (`registerShapelessArcaneRecipe`) with `ConfigResearch.recipes` handle writes.
+- Kept recipes reference-aligned for pattern/research/aspect keys and 1.12 constants resolved from MCP stable_39 field mappings.
+- Updated `docs/Stage9-b.md` GAP-1/GAP-6 notes to reflect the expanded static subset coverage.
+
+Validation:
+
+- `./scripts/dev.sh validate --smoke` — passed: status, compile, tests `10/10`, jar, check-jar summary `5502` MCP leak lines / `1078` unique leaks, and server smoke.
+- `run/smoke-server.log` evidence: `Registering entities`; `Forge Mod Loader has successfully loaded 6 mods`; `Done (1.134s)!`.
+- Crash report scan under `run/` returned no files.
+- `./scripts/dev.sh smoke-client` — skipped because `DISPLAY=` and GUI/graphics/user-interactive validation is excluded.
+
+Remaining limits:
+
+- This checkpoint adds a larger static subset, but full Stage 9-b arcane recipe coverage from reference `initializeArcaneRecipes()` is still incomplete.
+- Stage 9-d/e research content/category/page population is still required for full recipe-key lookup and unlock parity.
+- Arcane Workbench manual/client scenario validation remains outside current non-GUI scope.
+
 ### 2026-05-15 — Stage 9-b static arcane recipe baseline subset
 
 Scope:

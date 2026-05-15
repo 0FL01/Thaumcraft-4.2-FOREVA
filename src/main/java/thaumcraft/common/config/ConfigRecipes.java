@@ -215,10 +215,174 @@ public class ConfigRecipes {
                 'T', ConfigItems.itemThaumometer,
                 'G', Items.GOLD_INGOT,
                 'L', Items.LEATHER);
+
+        registerShapelessArcaneRecipe("MirrorGlass", "BASICARTIFACE",
+                new ItemStack(ConfigItems.itemResource, 1, 10),
+                new AspectList().add(Aspect.FIRE, 10).add(Aspect.EARTH, 10),
+                new ItemStack(ConfigItems.itemResource, 1, 3), Blocks.GLASS_PANE);
+
+        registerArcaneRecipe("BoneBow", "BONEBOW",
+                new ItemStack(ConfigItems.itemBowBone),
+                new AspectList().add(Aspect.AIR, 16).add(Aspect.ENTROPY, 32),
+                "SB ", "SEB", "SB ",
+                'E', new ItemStack(ConfigItems.itemShard, 1, 5),
+                'B', Items.BONE,
+                'S', Items.STRING);
+
+        Aspect[] primalAspects = new Aspect[]{Aspect.AIR, Aspect.FIRE, Aspect.WATER, Aspect.EARTH, Aspect.ORDER, Aspect.ENTROPY};
+        for (int i = 0; i < primalAspects.length; i++) {
+            registerArcaneRecipe("PrimalArrow_" + i, "PRIMALARROW",
+                    new ItemStack(ConfigItems.itemPrimalArrow, 8, i),
+                    new AspectList().add(primalAspects[i], 8),
+                    "AAA", "ASA", "AAA",
+                    'A', Items.ARROW,
+                    'S', new ItemStack(ConfigItems.itemShard, 1, i));
+        }
+
+        registerArcaneRecipe("InfusionMatrix", "INFUSION",
+                new ItemStack(ConfigBlocks.blockStoneDevice, 1, 2),
+                new AspectList().add(Aspect.ORDER, 40),
+                "SBS", "BEB", "SBS",
+                'S', new ItemStack(ConfigBlocks.blockCosmeticSolid, 1, 6),
+                'E', Items.ENDER_PEARL,
+                'B', new ItemStack(ConfigItems.itemShard, 1, OreDictionary.WILDCARD_VALUE));
+
+        registerArcaneRecipe("ArcanePedestal", "INFUSION",
+                new ItemStack(ConfigBlocks.blockStoneDevice, 2, 1),
+                new AspectList().add(Aspect.AIR, 5),
+                "SSS", " S ", "SSS",
+                'S', new ItemStack(ConfigBlocks.blockCosmeticSolid, 1, 6));
+
+        registerArcaneRecipe("FocusShock", "FOCUSSHOCK",
+                new ItemStack(ConfigItems.focusShock),
+                new AspectList().add(Aspect.AIR, 10).add(Aspect.ORDER, 10).add(Aspect.ENTROPY, 10),
+                "CQC", "Q#Q", "CQC",
+                '#', Items.POTATO,
+                'Q', Items.QUARTZ,
+                'C', new ItemStack(ConfigItems.itemShard, 1, 0));
+
+        registerArcaneRecipe("FocusTrade", "FOCUSTRADE",
+                new ItemStack(ConfigItems.focusTrade),
+                new AspectList().add(Aspect.ORDER, 15).add(Aspect.ENTROPY, 15).add(Aspect.EARTH, 10),
+                "CQE", "Q#Q", "CQE",
+                '#', new ItemStack(ConfigItems.itemResource, 1, 3),
+                'Q', Items.QUARTZ,
+                'C', new ItemStack(ConfigItems.itemShard, 1, 6),
+                'E', new ItemStack(ConfigItems.itemShard, 1, 6));
+
+        registerArcaneRecipe("FocusExcavation", "FOCUSEXCAVATION",
+                new ItemStack(ConfigItems.focusExcavation),
+                new AspectList().add(Aspect.EARTH, 20).add(Aspect.ENTROPY, 5).add(Aspect.ORDER, 5),
+                "CQC", "Q#Q", "CQC",
+                '#', "gemEmerald",
+                'Q', Items.QUARTZ,
+                'C', new ItemStack(ConfigItems.itemShard, 1, 3));
+
+        registerArcaneRecipe("FocusPrimal", "FOCUSPRIMAL",
+                new ItemStack(ConfigItems.focusPrimal),
+                new AspectList().add(Aspect.EARTH, 25).add(Aspect.ENTROPY, 25).add(Aspect.ORDER, 25)
+                        .add(Aspect.AIR, 25).add(Aspect.FIRE, 25).add(Aspect.WATER, 25),
+                "CQC", "Q#Q", "CQC",
+                '#', new ItemStack(ConfigItems.itemResource, 1, 15),
+                'Q', Items.QUARTZ,
+                'C', Items.DIAMOND);
+
+        registerArcaneRecipe("FocusPouch", "FOCUSPOUCH",
+                new ItemStack(ConfigItems.itemFocusPouch),
+                new AspectList().add(Aspect.EARTH, 10).add(Aspect.ORDER, 10).add(Aspect.ENTROPY, 10),
+                "LGL", "LBL", "LLL",
+                'B', new ItemStack(ConfigItems.itemBaubleBlanks, 1, 2),
+                'L', Items.LEATHER,
+                'G', Items.GOLD_INGOT);
+
+        registerArcaneRecipe("Deconstructor", "DECONSTRUCTOR",
+                new ItemStack(ConfigBlocks.blockTable, 1, 14),
+                new AspectList().add(Aspect.ENTROPY, 20),
+                " S ", "ATP",
+                'T', new ItemStack(ConfigBlocks.blockTable, 1, 0),
+                'S', new ItemStack(ConfigItems.itemThaumometer),
+                'P', new ItemStack(Items.GOLDEN_PICKAXE),
+                'A', new ItemStack(Items.GOLDEN_AXE));
+
+        registerArcaneRecipe("ArcaneBoreBase", "ARCANEBORE",
+                new ItemStack(ConfigBlocks.blockWoodenDevice, 1, 4),
+                new AspectList().add(Aspect.AIR, 10).add(Aspect.ORDER, 10),
+                "WIW", "IDI", "WIW",
+                'W', new ItemStack(ConfigBlocks.blockWoodenDevice, 1, 6),
+                'I', Items.IRON_INGOT,
+                'D', Blocks.DISPENSER);
+
+        registerArcaneRecipe("EnchantedFabric", "ENCHFABRIC",
+                new ItemStack(ConfigItems.itemResource, 1, 7),
+                new AspectList().add(Aspect.AIR, 1).add(Aspect.EARTH, 1).add(Aspect.FIRE, 1)
+                        .add(Aspect.WATER, 1).add(Aspect.ORDER, 1).add(Aspect.ENTROPY, 1),
+                " S ", "SCS", " S ",
+                'S', new ItemStack(Items.STRING, 1, OreDictionary.WILDCARD_VALUE),
+                'C', new ItemStack(Blocks.WOOL, 1, OreDictionary.WILDCARD_VALUE));
+
+        registerArcaneRecipe("GolemBell", "GOLEMBELL",
+                new ItemStack(ConfigItems.itemGolemBell),
+                new AspectList().add(Aspect.ORDER, 5),
+                " QQ", " QQ", "S  ",
+                'S', "stickWood",
+                'Q', Items.QUARTZ);
+
+        registerArcaneRecipe("CoreBlank", "COREGATHER",
+                new ItemStack(ConfigItems.itemGolemCore, 1, 100),
+                new AspectList().add(Aspect.ORDER, 5).add(Aspect.FIRE, 5),
+                " C ", "CNC", " C ",
+                'C', Items.BRICK,
+                'N', new ItemStack(ConfigItems.itemResource, 1, 1));
+
+        registerArcaneRecipe("UpgradeAir", "UPGRADEAIR",
+                new ItemStack(ConfigItems.itemGolemUpgrade, 1, 0),
+                new AspectList().add(Aspect.AIR, 10),
+                "NNN", "NCN", "NNN",
+                'N', Items.GOLD_NUGGET,
+                'C', new ItemStack(ConfigItems.itemShard, 1, 0));
+
+        registerArcaneRecipe("UpgradeEarth", "UPGRADEEARTH",
+                new ItemStack(ConfigItems.itemGolemUpgrade, 1, 1),
+                new AspectList().add(Aspect.EARTH, 10),
+                "NNN", "NCN", "NNN",
+                'N', Items.GOLD_NUGGET,
+                'C', new ItemStack(ConfigItems.itemShard, 1, 3));
+
+        registerArcaneRecipe("UpgradeFire", "UPGRADEFIRE",
+                new ItemStack(ConfigItems.itemGolemUpgrade, 1, 2),
+                new AspectList().add(Aspect.FIRE, 10),
+                "NNN", "NCN", "NNN",
+                'N', Items.GOLD_NUGGET,
+                'C', new ItemStack(ConfigItems.itemShard, 1, 1));
+
+        registerArcaneRecipe("UpgradeWater", "UPGRADEWATER",
+                new ItemStack(ConfigItems.itemGolemUpgrade, 1, 3),
+                new AspectList().add(Aspect.WATER, 10),
+                "NNN", "NCN", "NNN",
+                'N', Items.GOLD_NUGGET,
+                'C', new ItemStack(ConfigItems.itemShard, 1, 2));
+
+        registerArcaneRecipe("UpgradeOrder", "UPGRADEORDER",
+                new ItemStack(ConfigItems.itemGolemUpgrade, 1, 4),
+                new AspectList().add(Aspect.ORDER, 10),
+                "NNN", "NCN", "NNN",
+                'N', Items.GOLD_NUGGET,
+                'C', new ItemStack(ConfigItems.itemShard, 1, 4));
+
+        registerArcaneRecipe("UpgradeEntropy", "UPGRADEENTROPY",
+                new ItemStack(ConfigItems.itemGolemUpgrade, 1, 5),
+                new AspectList().add(Aspect.ENTROPY, 10),
+                "NNN", "NCN", "NNN",
+                'N', Items.GOLD_NUGGET,
+                'C', new ItemStack(ConfigItems.itemShard, 1, 5));
     }
 
     private static void registerArcaneRecipe(String key, String research, ItemStack output, AspectList aspects, Object... recipe) {
         ConfigResearch.recipes.put(key, ThaumcraftApi.addArcaneCraftingRecipe(research, output, aspects, recipe));
+    }
+
+    private static void registerShapelessArcaneRecipe(String key, String research, ItemStack output, AspectList aspects, Object... recipe) {
+        ConfigResearch.recipes.put(key, ThaumcraftApi.addShapelessArcaneCraftingRecipe(research, output, aspects, recipe));
     }
 
     private static int getWandCapCost(String tag) {

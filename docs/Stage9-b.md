@@ -57,7 +57,11 @@ Stage 9-b сейчас нельзя считать завершенной: block
 - `thaumcraft_src/thaumcraft/api/ThaumcraftApi.class`, arcane recipe add methods equivalent to current API
 
 **Что не совпадает:**
-Reference calls `initializeArcaneRecipes()` from `ConfigRecipes.init()` and fills `ConfigResearch.recipes` with arcane recipe objects. Port now has a concrete arcane baseline method in `ConfigRecipes.init()` and registers a first subset of static entries (`PrimalCharm`, `IronKey`/`GoldKey`, `ArcaneStone1`, `WardedJar`, `JarVoid`, wand cap/rod staff keys, `FocusFire`/`FocusFrost`, robe parts, `Goggles`) with direct `ConfigResearch.recipes.put(...)` handles. Full parity is still open: most of the 89 reference arcane adds are not yet ported.
+Reference calls `initializeArcaneRecipes()` from `ConfigRecipes.init()` and fills `ConfigResearch.recipes` with arcane recipe objects. Port now has a concrete arcane baseline method in `ConfigRecipes.init()` and registers an expanded static subset with direct `ConfigResearch.recipes.put(...)` handles, including:
+- baseline keys from prior checkpoint (`PrimalCharm`, `IronKey`/`GoldKey`, `ArcaneStone1`, `WardedJar`, `JarVoid`, representative wand cap/rod staff keys, `FocusFire`/`FocusFrost`, robe parts, `Goggles`);
+- added focus/golem/utility block (`MirrorGlass`, `BoneBow`, `PrimalArrow_0..5`, `InfusionMatrix`, `ArcanePedestal`, `FocusShock`, `FocusTrade`, `FocusExcavation`, `FocusPrimal`, `FocusPouch`, `Deconstructor`, `ArcaneBoreBase`, `EnchantedFabric`, `GolemBell`, `CoreBlank`, `UpgradeAir`..`UpgradeEntropy`).
+
+Full parity is still open: many of the 89 reference arcane adds are not yet ported.
 
 **Что нужно доделать:**
 Port `initializeArcaneRecipes()` into Forge 1.12.2 source and register all original arcane recipe entries with matching research keys, outputs, ingredients, aspect costs and conditional ore-dictionary branches.
@@ -251,7 +255,11 @@ This touches public API classes. Do not change method signatures. Existing addon
 - `thaumcraft_src/thaumcraft/api/research/ResearchPage.class`
 
 **Что не совпадает:**
-Reference stores recipe objects under stable research recipe keys, and arcane recipe `matches` checks `ThaumcraftApiHelper.isResearchComplete(playerName, research)`. Port now has `ConfigResearch.recipes` plus direct baseline arcane key writes from `ConfigRecipes` for representative entries (`PrimalCharm`, `IronKey`/`GoldKey`, `ArcaneStone1`, `WardedJar`, `JarVoid`, wand cap/rod keys, `FocusFire`/`FocusFrost`, robe parts, `Goggles`). Still missing: full key coverage, actual Stage 9-d/e research page/content population, and runtime gate verification scenarios.
+Reference stores recipe objects under stable research recipe keys, and arcane recipe `matches` checks `ThaumcraftApiHelper.isResearchComplete(playerName, research)`. Port now has `ConfigResearch.recipes` plus direct arcane key writes from `ConfigRecipes` for:
+- representative baseline entries (`PrimalCharm`, `IronKey`/`GoldKey`, `ArcaneStone1`, `WardedJar`, `JarVoid`, wand cap/rod keys, `FocusFire`/`FocusFrost`, robe parts, `Goggles`);
+- focus/golem/utility entries (`MirrorGlass`, `BoneBow`, `PrimalArrow_0..5`, `InfusionMatrix`, `ArcanePedestal`, `FocusShock`, `FocusTrade`, `FocusExcavation`, `FocusPrimal`, `FocusPouch`, `Deconstructor`, `ArcaneBoreBase`, `EnchantedFabric`, `GolemBell`, `CoreBlank`, `UpgradeAir`..`UpgradeEntropy`).
+
+Still missing: full key coverage, actual Stage 9-d/e research page/content population, and runtime gate verification scenarios.
 
 **Что нужно доделать:**
 Restore the `ConfigResearch.recipes` storage contract and wire arcane recipe registrations into it with reference keys, then ensure direct research strings on recipes correspond to actual research keys.
