@@ -169,7 +169,7 @@ Depends on GAP-1 item registration. Some visual status bytes are Phase 8, but se
 - `thaumcraft_src/thaumcraft/common/entities/golems/EntityGolemBase.class`
 
 **Что не совпадает:**
-Current AI classes exist and `EntityGolemBase.setupGolem()` wires all reference core categories (`EntityGolemBase.java:152-213`), but there is no runtime evidence for inventory/fluid/essentia interactions. Helper logic depends on block/tile APIs and inventory semantics that changed between 1.7.10 and 1.12.2. Static inspection also shows null-return paths in `GolemHelper` and AI classes that may be valid search failures, but they have not been proven equivalent under real containers, Forge capabilities, fluids, and tile entities.
+Current AI classes exist and `EntityGolemBase.setupGolem()` wires all reference core categories (`EntityGolemBase.java:152-213`), but there is no runtime evidence for inventory/fluid/essentia interactions. Helper logic depends on block/tile APIs and inventory semantics that changed between 1.7.10 and 1.12.2. Checkpoint 8.2.34 restores butcher target acquisition from the original AI: the task sorts candidates by age and only starts when more than two valid same-type targets are nearby. Remaining null-return paths in `GolemHelper` and AI classes may be valid search failures, but they have not been proven equivalent under real containers, Forge capabilities, fluids, and tile entities.
 
 **Что нужно доделать:**
 Run focused manual/server validation per golem core and fix any API mismatch found in AI/helper methods.
@@ -178,6 +178,7 @@ Run focused manual/server validation per golem core and fix any API mismatch fou
 - files/classes/methods/registrations/resources/scenarios
 - Audit `GolemHelper` methods used by each core against reference method intent.
 - Validate chest insertion/extraction, color filters, marker range, ore dictionary/NBT/damage toggles, Forge fluid handling, essentia containers, crop/log harvesting, fishing, and combat target selection.
+- Butcher target acquisition is restored; verify culling threshold and oldest-target selection in runtime.
 - Fix task priority or helper API mismatches in the specific AI classes that fail scenarios.
 
 **Критерии приемки:**
@@ -1473,6 +1474,29 @@ Mapping:
 Оставшиеся ограничения:
 
 - Runtime confirmation of animal/butcher target choice around tamed animals, child animals, and golems remains unavailable while smoke-server is blocked before ready state and manual scenarios are excluded.
+- Full per-core golem AI runtime scenarios remain open.
+
+### 8.2.34 Golem butcher target acquisition checkpoint — 2026-05-15
+
+Статус: reference butcher acquisition baseline restored; runtime culling evidence remains open.
+
+Что сделано:
+
+- Replaced the `AINearestButcherTarget.shouldExecute()` stub with the original acquisition rule.
+- Butcher golems now scan within golem range, sort valid candidates by oldest entity age, and select the oldest valid target only when more than two valid same-type targets are nearby.
+- Restored `AIOldestAttackableTargetSorter` to sort by `ticksExisted` descending instead of distance, matching its original butcher-task role.
+
+Проверки:
+
+- `./scripts/dev.sh compileJava` — passed.
+- `./scripts/dev.sh build` — passed.
+- `./scripts/dev.sh check-jar` — не дошел до jar inspection: отсутствует wrapper-ожидаемый MCP mapping cache `.gradle_home/caches/minecraft/de/oceanlabs/mcp/mcp_stable/39/1.12.2/srgs/mcp-srg.srg`.
+- `./scripts/dev.sh smoke-server` — timeout before ready state на уже задокументированном pre-Forge/log4j этапе; `run/crash-reports/` не существует, and the configured crash-marker scan found no matches.
+- `git diff --check` — passed.
+
+Оставшиеся ограничения:
+
+- Runtime confirmation of butcher culling threshold, same-type counting, and oldest-target selection remains unavailable while smoke-server is blocked before ready state and manual scenarios are excluded.
 - Full per-core golem AI runtime scenarios remain open.
 
 ### 8.3 Minimal Stage 6 manual scenario matrix
