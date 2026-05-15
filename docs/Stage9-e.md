@@ -56,7 +56,7 @@ Lightweight analysis commands run:
 
 Current implementation is not Stage 9-e complete.
 
-The port does call `ConfigResearch.init()` during post-init after recipe and aspect initialization (`src/main/java/thaumcraft/common/Thaumcraft.java:186`-`src/main/java/thaumcraft/common/Thaumcraft.java:191`). Current `ConfigResearch.init()` now registers the six reference research categories and their icon/background paths, but still does not register research entries/pages/triggers/warp metadata (`src/main/java/thaumcraft/common/config/ConfigResearch.java`). Therefore category containers exist, while the research graph itself remains unpopulated.
+The port does call `ConfigResearch.init()` during post-init after recipe and aspect initialization (`src/main/java/thaumcraft/common/Thaumcraft.java:186`-`src/main/java/thaumcraft/common/Thaumcraft.java:191`). Current `ConfigResearch.init()` now registers the six reference research categories and a first safe BASIC text-only subset (`ASPECTS`, `PECH`, `NODES`, `WARP`), but the broader research graph, recipe-backed pages, triggers, and warp metadata are still incomplete (`src/main/java/thaumcraft/common/config/ConfigResearch.java`).
 
 The low-level API containers for categories, items, and pages are mostly present and structurally close to the 1.7.10 reference (`src/main/java/thaumcraft/api/research/ResearchCategories.java:12`-`src/main/java/thaumcraft/api/research/ResearchCategories.java:67`, `src/main/java/thaumcraft/api/research/ResearchItem.java:13`-`src/main/java/thaumcraft/api/research/ResearchItem.java:256`, `src/main/java/thaumcraft/api/research/ResearchPage.java:15`-`src/main/java/thaumcraft/api/research/ResearchPage.java:128`). This is an API baseline, not content parity.
 
@@ -88,7 +88,7 @@ The current direct completion packet grants research without checking prerequisi
 
 **Что не совпадает:**
 
-Reference creates a default wood/iron wand icon, registers six categories, then registers 201 research entries across Thaumaturgy, Artifice, Alchemy, Golemancy, Basics, and Eldritch. Current `ConfigResearch.init()` registers nothing, so Thaumonomicon content and research progression have no data.
+Reference creates a default wood/iron wand icon, registers six categories, then registers 201 research entries across Thaumaturgy, Artifice, Alchemy, Golemancy, Basics, and Eldritch. Current `ConfigResearch.init()` now has categories plus a small BASIC text-only baseline, but the vast majority of entries are still missing.
 
 Reference category IDs and assets:
 

@@ -67,6 +67,30 @@ Branch: `codex/durable-goal-stage8-9`
 
 ## Checkpoint Log
 
+### 2026-05-15 — Stage 9-e BASIC text-only research entry baseline
+
+Scope:
+
+- Extended `ConfigResearch` beyond categories with a safe first research-entry slice that has no recipe-object dependencies:
+  - `ASPECTS`
+  - `PECH`
+  - `NODES`
+  - `WARP`
+- Preserved reference category, icon, coordinate, and page-key wiring for this subset, including `stub`/`round`/`autoUnlock` flags.
+- Kept scope intentionally narrow to avoid null recipe-page crashes while Stage 9-e recipe-backed page graph is still incomplete.
+
+Validation:
+
+- `./scripts/dev.sh validate --smoke` — passed: status, compile, tests `10/10`, jar, check-jar summary `5662` MCP leak lines / `1114` unique leaks, and server smoke.
+- `run/smoke-server.log` evidence: server ready (`Done (...)`), no fatal markers.
+- Crash report scan under `run/` remained clean during smoke stage.
+- `./scripts/dev.sh smoke-client` — skipped because `DISPLAY=` and GUI/graphics/user-interactive validation is excluded.
+
+Remaining limits:
+
+- Stage 9-e research graph remains mostly unported (201 reference entries target).
+- Recipe-backed research pages/triggers/warp metadata are still open and require incremental guarded registration.
+
 ### 2026-05-15 — Stage 9-e research localization corpus import baseline
 
 Scope:
