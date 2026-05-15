@@ -11,6 +11,7 @@ import net.minecraft.block.state.pattern.BlockMatcher;
 import net.minecraft.init.Blocks;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldType;
 import net.minecraft.world.biome.Biome;
@@ -381,7 +382,7 @@ public class ThaumcraftWorldGenerator implements IWorldGenerator {
             generateSilverwood(world, rand, x, z, biome);
         }
         if (rand.nextInt(25) == 7) {
-            generateGreatwood(world, rand, x, z);
+            generateGreatwood(world, rand, x >> 4, z >> 4);
         }
 
         int bx = x + rand.nextInt(16);
@@ -456,10 +457,10 @@ public class ThaumcraftWorldGenerator implements IWorldGenerator {
         return meta;
     }
 
-    public static void generateGreatwood(World world, Random rand, int x, int z) {
+    public static void generateGreatwood(World world, Random rand, int chunkX, int chunkZ) {
         if (!Config.genTrees && !Config.regenTrees) return;
-        int bx = x + rand.nextInt(16);
-        int bz = z + rand.nextInt(16);
+        int bx = chunkX * 16 + 8 + MathHelper.getInt(rand, -4, 4);
+        int bz = chunkZ * 16 + 8 + MathHelper.getInt(rand, -4, 4);
         Biome biome = world.getBiome(new BlockPos(bx, 0, bz));
         float chance = BiomeHandler.getBiomeSupportsGreatwood(biome);
         if (chance > 0 && rand.nextFloat() < chance) {

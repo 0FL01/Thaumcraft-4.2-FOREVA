@@ -370,8 +370,13 @@ public class WorldGenGreatwoodTrees extends WorldGenAbstractTree {
             return false;
         }
 
-        this.basePos[0] = this.basePos[0] + chosenA;
-        this.basePos[2] = this.basePos[2] + chosenB;
+        this.basePos[0] += chosenA;
+        this.basePos[2] += chosenB;
+
+        // Save final base position for second pass alignment
+        int finalBaseX = this.basePos[0];
+        int finalBaseY = this.basePos[1];
+        int finalBaseZ = this.basePos[2];
 
         // First pass
         this.generateLeafNodeList();
@@ -379,11 +384,11 @@ public class WorldGenGreatwoodTrees extends WorldGenAbstractTree {
         this.generateLeafNodeBases();
         this.generateTrunk();
 
-        // Second pass with wider canopy
+        // Second pass with wider canopy — aligned to same base as first pass
         this.scaleWidth = 1.66;
-        this.basePos[0] = x;
-        this.basePos[1] = y + this.height;
-        this.basePos[2] = z;
+        this.basePos[0] = finalBaseX;
+        this.basePos[1] = finalBaseY + this.height;
+        this.basePos[2] = finalBaseZ;
 
         this.generateLeafNodeList();
         this.generateLeaves();
