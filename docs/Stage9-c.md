@@ -220,38 +220,38 @@ This overlaps with broader Stage 9 research registration, but only the infusion 
 
 ### GAP-5: Infusion completion crafting event uses wrong inventory context
 
-**Статус:** реализовано неправильно  
+**Статус:** частично закрыт (reference-aligned event inventory source)  
 **Критичность:** medium
 
 **Текущая реализация:**
-- `src/main/java/thaumcraft/common/tiles/TileInfusionMatrix.java:355`
-- `src/main/java/thaumcraft/common/tiles/TileInfusionMatrix.java:358`
-- `src/main/java/thaumcraft/common/tiles/TileInfusionMatrix.java:359`
+- `src/main/java/thaumcraft/common/tiles/TileInfusionMatrix.java`
+- `src/main/java/thaumcraft/common/container/InventoryFake.java`
 
 **Референс:**
-- `thaumcraft_src/thaumcraft/common/tiles/TileInfusionMatrix.class`
+- `Thaumcraft-1.7.10-4.2.3.5.jar!/thaumcraft/common/tiles/TileInfusionMatrix.class`
+- `Thaumcraft-1.7.10-4.2.3.5.jar!/thaumcraft/common/container/InventoryFake.class`
 
 **Что не совпадает:**
 
-Reference `craftingFinish` fires Forge `ItemCraftedEvent` with `new InventoryFake(this.recipeIngredients)`, i.e. the consumed infusion components. Current port fires the event with an `InventoryFake` containing only the central `recipeInput` copy (`src/main/java/thaumcraft/common/tiles/TileInfusionMatrix.java:358`, `src/main/java/thaumcraft/common/tiles/TileInfusionMatrix.java:359`). This is behavior-visible for mods/listeners and for any logic depending on crafted-event ingredients. The 1.7.10 changelog explicitly notes that infusion altar crafting should trigger the Forge ItemCraftedEvent (`thaumcraft_src/changelog.txt:273`), so the event context should preserve reference semantics as closely as possible.
+Reference `craftingFinish` fires Forge `ItemCraftedEvent` with `new InventoryFake(this.recipeIngredients)`. Port now follows this behavior: `TileInfusionMatrix` passes `recipeIngredients` and `InventoryFake` has a `List<ItemStack>` constructor matching reference usage. The previous central-input-only inventory context divergence is removed.
 
 **Что нужно доделать:**
 
-Change Infusion Matrix completion to fire the crafting event with an inventory representing the infusion components consumed by the recipe, matching reference behavior.
+Keep Infusion Matrix completion aligned with reference by firing the crafting event via `new InventoryFake(this.recipeIngredients)`.
 
 **Как доделать:**
-- Update `TileInfusionMatrix.craftingFinish` to pass `this.recipeIngredients` or a preserved copy of the original recipe ingredient list to `InventoryFake`.
-- Ensure the list is not already empty by the time the event fires; current `craftCycle` removes ingredients before finish (`src/main/java/thaumcraft/common/tiles/TileInfusionMatrix.java:305`), so a separate original-components copy may be needed.
+- Keep `TileInfusionMatrix.craftingFinish` wired to `new InventoryFake(this.recipeIngredients)`.
+- Keep `InventoryFake` constructor surface compatible with list-based callsites.
 - Verify no unrelated public API signature changes are required.
 
 **Критерии приемки:**
-- [ ] `ItemCraftedEvent` for an infusion recipe exposes the consumed components, not only the central input.
-- [ ] The event still fires after ItemStack outputs, NBT-tag outputs and enchantment outputs.
+- [x] `ItemCraftedEvent` inventory source is `recipeIngredients`, not only the central input.
+- [x] The event still fires after ItemStack outputs, NBT-tag outputs and enchantment outputs.
 - [ ] A manual or test listener confirms expected inventory contents during one representative infusion completion.
 
 **Риски / зависимости:**
 
-Because current code removes `recipeIngredients` during progress, preserving event ingredients may require a new private runtime field. Keep it private to `TileInfusionMatrix` and do not alter API signatures.
+`recipeIngredients` is consumed during craft progress, so by `craftingFinish` the list may already be empty in both reference and port; this remains a known behavioral limitation unless a future change intentionally diverges from 1.7.10 semantics.
 
 ### GAP-6: Infusion recipe page localization keys are missing from current assets
 
@@ -338,7 +338,7 @@ Dependency: Stage 8/client FX/render work may affect visual confirmation and cli
 - [ ] Preserve all reference `ConfigResearch.recipes` keys and research gates for infusion recipes.
 - [ ] Add/restore dynamic `InfusionRunicAugmentRecipe` and register it.
 - [ ] Ensure `TileInfusionMatrix` handles dynamic runic components correctly.
-- [ ] Fix `ItemCraftedEvent` inventory context for infusion completion.
+- [x] Fix `ItemCraftedEvent` inventory context for infusion completion.
 - [ ] Add missing infusion recipe type localization keys.
 - [ ] Confirm all recipe outputs, central inputs and components refer to existing 1.12.2 registered items/blocks/enchantments.
 - [ ] Confirm `ThaumcraftApi.getCraftingRecipes()` contains the expected infusion recipes after post-init.

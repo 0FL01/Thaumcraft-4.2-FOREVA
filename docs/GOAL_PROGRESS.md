@@ -67,6 +67,26 @@ Branch: `codex/durable-goal-stage8-9`
 
 ## Checkpoint Log
 
+### 2026-05-15 — Stage 9-c infusion crafted-event inventory source alignment
+
+Scope:
+
+- Aligned infusion completion crafted-event inventory source with 1.7.10 reference usage by switching `TileInfusionMatrix` to `new InventoryFake(this.recipeIngredients)` instead of a central-input-only fake inventory.
+- Added a `List<ItemStack>` constructor overload in `InventoryFake` to preserve the reference call pattern without changing public addon API surfaces.
+- Updated `docs/Stage9-c.md` GAP-5 status/notes and Stage 9-c closure checklist to reflect the implemented fix and remaining runtime-listener verification gap.
+
+Validation:
+
+- `./scripts/dev.sh validate --smoke` — passed: status, compile, tests `10/10`, jar, check-jar summary `5428` MCP leak lines / `1063` unique leaks, and server smoke.
+- `run/smoke-server.log` evidence: `Registering entities`; `Forge Mod Loader has successfully loaded 6 mods`; `Done (1.102s)!`.
+- Crash report scan under `run/` returned no files.
+- `./scripts/dev.sh smoke-client` — skipped because `DISPLAY=` and GUI/graphics/user-interactive validation is excluded.
+
+Remaining limits:
+
+- This checkpoint aligns event inventory source to reference (`recipeIngredients`), but does not alter the original behavior where the ingredient list may already be depleted by completion time.
+- No dedicated runtime listener assertion for crafted-event inventory contents has been added yet.
+
 ### 2026-05-15 — Stage 9 research map scaffold baseline
 
 Scope:

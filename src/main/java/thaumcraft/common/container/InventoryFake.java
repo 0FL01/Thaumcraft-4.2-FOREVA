@@ -1,5 +1,6 @@
 package thaumcraft.common.container;
 
+import java.util.List;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
@@ -28,6 +29,10 @@ public class InventoryFake implements IInventory {
                 this.stacks.set(i, stackList[i].copy());
             }
         }
+    }
+
+    public InventoryFake(List<ItemStack> stackList) {
+        this(stackList.toArray(new ItemStack[0]));
     }
 
     @Override

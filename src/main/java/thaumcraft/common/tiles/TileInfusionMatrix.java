@@ -355,8 +355,7 @@ public class TileInfusionMatrix extends TileThaumcraft implements ITickable, IWa
         EntityPlayer player = this.recipePlayer == null ? null : this.world.getPlayerEntityByName(this.recipePlayer);
         if (player != null) {
             ItemStack crafted = center.getStackInSlot(0);
-            FMLCommonHandler.instance().firePlayerCraftingEvent(player, crafted,
-                    new InventoryFake(new ItemStack[]{this.recipeInput == null ? ItemStack.EMPTY : this.recipeInput.copy()}));
+            FMLCommonHandler.instance().firePlayerCraftingEvent(player, crafted, new InventoryFake(this.recipeIngredients));
         }
         this.recipeEssentia = new AspectList();
         this.recipeIngredients.clear();
