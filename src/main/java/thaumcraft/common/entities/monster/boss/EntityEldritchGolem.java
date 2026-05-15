@@ -1,17 +1,24 @@
 package thaumcraft.common.entities.monster.boss;
 
+import net.minecraft.block.Block;
+import net.minecraft.block.material.Material;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.IEntityLivingData;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.ai.*;
+import net.minecraft.init.SoundEvents;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.EntityDataManager;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.util.EnumParticleTypes;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.DifficultyInstance;
+import thaumcraft.common.blocks.BlockLoot;
 import thaumcraft.common.entities.ai.combat.AIAttackOnCollide;
 import thaumcraft.common.entities.ai.combat.AILongRangeAttack;
 import thaumcraft.common.entities.projectile.EntityGolemOrb;
@@ -127,6 +134,11 @@ public class EntityEldritchGolem extends EntityThaumcraftBoss implements thaumcr
     @Override protected net.minecraft.util.SoundEvent getDeathSound() { return net.minecraft.init.SoundEvents.ENTITY_IRONGOLEM_DEATH; }
 
     @Override
+    protected void playStepSound(BlockPos pos, Block blockIn) {
+        this.playSound(SoundEvents.ENTITY_IRONGOLEM_STEP, 1.0F, 1.0F);
+    }
+
+    @Override
     public boolean attackEntityFrom(net.minecraft.util.DamageSource source, float amount) {
         if (!this.world.isRemote && amount > this.getHealth() && !this.isHeadless()) {
             this.setHeadless(true);
@@ -162,6 +174,37 @@ public class EntityEldritchGolem extends EntityThaumcraftBoss implements thaumcr
         super.onLivingUpdate();
         if (this.attackTimer > 0) {
             --this.attackTimer;
+        }
+        if (this.motionX * this.motionX + this.motionZ * this.motionZ > 2.500000277905201E-7D && this.rand.nextInt(5) == 0) {
+            BlockPos foot = new BlockPos(
+                    MathHelper.floor(this.posX),
+                    MathHelper.floor(this.getEntityBoundingBox().minY - 0.2D),
+                    MathHelper.floor(this.posZ));
+            IBlockState footState = this.world.getBlockState(foot);
+            if (footState.getMaterial() != Material.AIR) {
+                this.world.spawnParticle(EnumParticleTypes.BLOCK_CRACK,
+                        this.posX + ((double) this.rand.nextFloat() - 0.5D) * (double) this.width,
+                        this.getEntityBoundingBox().minY + 0.1D,
+                        this.posZ + ((double) this.rand.nextFloat() - 0.5D) * (double) this.width,
+                        4.0D * ((double) this.rand.nextFloat() - 0.5D),
+                        0.5D,
+                        ((double) this.rand.nextFloat() - 0.5D) * 4.0D,
+                        Block.getStateId(footState));
+            }
+            if (!this.world.isRemote && footState.getBlock() instanceof BlockLoot) {
+                this.world.destroyBlock(foot, true);
+            }
+        }
+        if (!this.world.isRemote) {
+            BlockPos ahead = new BlockPos(
+                    MathHelper.floor(this.posX + this.motionX),
+                    MathHelper.floor(this.getEntityBoundingBox().minY),
+                    MathHelper.floor(this.posZ + this.motionZ));
+            IBlockState aheadState = this.world.getBlockState(ahead);
+            float hardness = aheadState.getBlockHardness(this.world, ahead);
+            if (hardness >= 0.0F && hardness <= 0.15F) {
+                this.world.destroyBlock(ahead, true);
+            }
         }
     }
 

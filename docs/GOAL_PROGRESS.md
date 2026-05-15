@@ -718,7 +718,28 @@ Remaining limits:
 
 - Boss combat, aggro retargeting, player scaling, spawn invulnerability, and reward drops have not been observed in a runtime world because smoke-server remains environment-blocked and user-driven manual scenarios are excluded.
 - Champion-name parity remains a separate dependency because the current branch still has a simplified champion modifier helper and no restored `EntityUtils.CHAMPION_MOD` custom attribute path.
-- Eldritch Golem low-hardness block-breaking / `BlockLoot` stomping remains open under GAP-8.
+- Eldritch Golem low-hardness block-breaking / `BlockLoot` stomping is restored in the next checkpoint below, but remains runtime-unobserved.
+
+### 2026-05-15 — Stage 6 Eldritch Golem movement behavior
+
+Scope:
+
+- Restored Eldritch Golem iron-golem step sound override.
+- Restored movement block-crack particles using current block state ids.
+- Restored server-side `BlockLoot` destruction when the Golem walks over loot blocks.
+- Restored server-side low-hardness block breaking directly in the moving Golem's path.
+
+Validation:
+
+- `./scripts/dev.sh compileJava` — passed.
+- `./scripts/dev.sh build` — passed.
+- `./scripts/dev.sh check-jar` — failed before jar inspection because the wrapper's expected MCP mapping cache file is still absent at `.gradle_home/caches/minecraft/de/oceanlabs/mcp/mcp_stable/39/1.12.2/srgs/mcp-srg.srg`.
+- `./scripts/dev.sh smoke-server` — failed by timeout before ready state; log again stopped after `Calling tweak class net.minecraftforge.fml.common.launcher.FMLServerTweaker`, with only Log4j console appender initialization errors. `run/crash-reports/` does not exist, and the configured crash-marker scan found no matches. This matches the clean `da3f307` baseline reproduction recorded above.
+
+Remaining limits:
+
+- Eldritch Golem movement block breaking, `BlockLoot` stomping, and step sound have not been observed in a runtime world because smoke-server remains environment-blocked and user-driven manual scenarios are excluded.
+- Headless combat timing and save/reload persistence still need runtime scenario evidence before GAP-8 can close.
 
 ## Next Checkpoint Candidate
 

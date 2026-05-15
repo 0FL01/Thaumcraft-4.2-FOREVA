@@ -329,7 +329,7 @@ Depends on block/content registration. This is a direct Stage 6 blocker because 
 
 ### GAP-8: Eldritch Golem special server behavior is incomplete and unvalidated
 
-**Статус:** drop baseline improved; runtime evidence open
+**Статус:** server baseline improved; runtime evidence open
 **Критичность:** high
 
 **Текущая реализация:**
@@ -342,16 +342,16 @@ Depends on block/content registration. This is a direct Stage 6 blocker because 
 - `thaumcraft_src/thaumcraft/common/entities/monster/boss/EntityEldritchGolem.class`
 
 **Что не совпадает:**
-Current code ports headless transition, beam charge, melee knockback, and ranged orb baseline. Reference also sets a spawn timer on initial spawn/headless transition, heals while spawn timer is active, emits status 18/19, plays golem walk/throw sounds, breaks low-hardness blocks while moving, and breaks `BlockLoot` server-side when walking over it. Current implementation has no `spawnTimer` use, no movement block-breaking logic, no `BlockLoot` interaction, no footstep override, and only handles status byte 4 (`EntityEldritchGolem.java:183-191`).
+Current code ports headless transition, beam charge, melee knockback, ranged orb baseline, spawn/headless transition timers, spawn-timer healing, iron-golem step/throw sounds, movement block-crack particles, low-hardness block breaking, and `BlockLoot` stomping. Acceptance still requires runtime evidence for headless phase timing, movement block breaking, and drops/sounds.
 
 **Что нужно доделать:**
 Port server-visible movement/block/spawn-timer behavior and validate headless beam combat in game.
 
 **Как доделать:**
 - files/classes/methods/registrations/resources/scenarios
-- Implement initial spawn/headless spawn timer equivalent in current `EntityThaumcraftBoss` model.
-- Port low-hardness block breaking and `BlockLoot` interaction if `BlockLoot` is restored by GAP-7.
-- Add footstep/attack sounds with current sound events.
+- Validate initial spawn/headless spawn timer behavior in the current `EntityThaumcraftBoss` model.
+- Validate low-hardness block breaking and `BlockLoot` interaction now that `BlockLoot` is restored by GAP-7.
+- Validate footstep/attack sounds with current sound events.
 - Runtime scenario: spawn Eldritch Golem, damage below lethal threshold, trigger headless transition, verify explosion, beam charge, orb attack, melee knockback, drops/sounds, and no crash.
 
 **Критерии приемки:**
@@ -956,7 +956,30 @@ Mapping:
 
 - Boss combat, aggro retargeting, player scaling, spawn invulnerability, and reward drops have not been observed in a runtime world because smoke-server remains environment-blocked and manual scenarios are excluded.
 - Champion-name parity remains a separate dependency because the current branch still has a simplified champion modifier helper and no restored `EntityUtils.CHAMPION_MOD` custom attribute path.
-- Eldritch Golem low-hardness block-breaking / `BlockLoot` stomping remains open under GAP-8.
+- Eldritch Golem low-hardness block-breaking / `BlockLoot` stomping is restored by checkpoint 8.2.13 below, but remains runtime-unobserved.
+
+### 8.2.13 Eldritch Golem movement checkpoint — 2026-05-15
+
+Статус: focused Eldritch Golem server-visible movement behavior restored; runtime evidence remains open.
+
+Что сделано:
+
+- Restored the reference iron-golem step sound override for Eldritch Golem movement.
+- Restored movement block-crack particles using the current block state id.
+- Restored server-side `BlockLoot` destruction when the Golem walks over loot blocks.
+- Restored server-side low-hardness block breaking for blocks directly in the moving Golem's path.
+
+Проверки:
+
+- `./scripts/dev.sh compileJava` — passed.
+- `./scripts/dev.sh build` — passed.
+- `./scripts/dev.sh check-jar` — не дошел до jar inspection: отсутствует wrapper-ожидаемый MCP mapping cache `.gradle_home/caches/minecraft/de/oceanlabs/mcp/mcp_stable/39/1.12.2/srgs/mcp-srg.srg`.
+- `./scripts/dev.sh smoke-server` — timeout before ready state на уже задокументированном pre-Forge/log4j этапе; `run/crash-reports/` не существует, and the configured crash-marker scan found no matches.
+
+Оставшиеся ограничения:
+
+- Eldritch Golem movement block breaking, `BlockLoot` stomping, and step sound have not been observed in a runtime world because smoke-server remains environment-blocked and manual scenarios are excluded.
+- Headless combat timing and save/reload persistence still need runtime scenario evidence before GAP-8 can close.
 
 ### 8.3 Minimal Stage 6 manual scenario matrix
 
