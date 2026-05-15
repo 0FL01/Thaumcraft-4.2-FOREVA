@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.IRecipe;
@@ -904,6 +905,76 @@ public class ConfigResearch {
                 .setAspectTriggers(Aspect.LIGHT, Aspect.LIFE)
                 .setParents("ARCANELAMP", "INFUSION")
                 .registerResearchItem();
+
+        if (Config.allowMirrors) {
+            new ResearchItem(
+                    "MIRROR",
+                    "ARTIFICE",
+                    new AspectList()
+                            .add(Aspect.TRAVEL, 6)
+                            .add(Aspect.ELDRITCH, 3)
+                            .add(Aspect.DARKNESS, 3)
+                            .add(Aspect.CRYSTAL, 3),
+                    -1,
+                    8,
+                    2,
+                    new ItemStack(ConfigBlocks.blockMirror, 1, 0))
+                    .setPages(
+                            new ResearchPage("tc.research_page.MIRROR.1"),
+                            new ResearchPage("tc.research_page.MIRROR.2"),
+                            new ResearchPage((InfusionRecipe) recipes.get("Mirror")),
+                            new ResearchPage("tc.research_page.MIRROR.3"))
+                    .setHidden()
+                    .setEntityTriggers("Enderman")
+                    .setItemTriggers(
+                            new ItemStack(Items.ENDER_PEARL),
+                            new ItemStack(Blocks.STAINED_GLASS, 1, Short.MAX_VALUE),
+                            new ItemStack(Blocks.STAINED_GLASS_PANE, 1, Short.MAX_VALUE),
+                            new ItemStack(Blocks.OBSIDIAN, 1, Short.MAX_VALUE))
+                    .setParents("INFUSION")
+                    .registerResearchItem();
+
+            new ResearchItem(
+                    "MIRRORHAND",
+                    "ARTIFICE",
+                    new AspectList()
+                            .add(Aspect.TOOL, 6)
+                            .add(Aspect.ELDRITCH, 3)
+                            .add(Aspect.CRYSTAL, 3)
+                            .add(Aspect.TRAVEL, 3),
+                    1,
+                    9,
+                    2,
+                    new ItemStack(ConfigItems.itemHandMirror))
+                    .setPages(
+                            new ResearchPage("tc.research_page.MIRRORHAND.1"),
+                            new ResearchPage((InfusionRecipe) recipes.get("MirrorHand")))
+                    .setConcealed()
+                    .setSecondary()
+                    .setParents("MIRROR")
+                    .registerResearchItem();
+
+            new ResearchItem(
+                    "MIRRORESSENTIA",
+                    "ARTIFICE",
+                    new AspectList()
+                            .add(Aspect.TRAVEL, 6)
+                            .add(Aspect.ELDRITCH, 3)
+                            .add(Aspect.WATER, 3)
+                            .add(Aspect.MAGIC, 3),
+                    -1,
+                    10,
+                    2,
+                    new ItemStack(ConfigBlocks.blockMirror, 1, 6))
+                    .setPages(
+                            new ResearchPage("tc.research_page.MIRRORESSENTIA.1"),
+                            new ResearchPage((InfusionRecipe) recipes.get("MirrorEssentia")),
+                            new ResearchPage("tc.research_page.MIRRORESSENTIA.2"))
+                    .setSecondary()
+                    .setConcealed()
+                    .setParents("MIRROR")
+                    .registerResearchItem();
+        }
     }
 
     private static void initThaumaturgyResearchBaseline() {
