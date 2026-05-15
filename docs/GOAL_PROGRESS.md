@@ -37,8 +37,8 @@ Branch: `codex/durable-goal-stage8-9`
 - `docs/Stage7.md` remains open. Worldgen pipeline, Eldritch ring/maze bootstrap, safe teleporter, Outer Lands room templates, BlockLoot/room block contracts, Greatwood structures, and runtime evidence remain active blockers.
 - Stage 8-a through Stage 8-e are documented as not complete.
 - Stage 9-a through Stage 9-e are documented as not complete.
-- `docs/GOAL_PROGRESS.md` was absent at recon start and is now created to track this contract.
 - `./scripts/dev.sh check-jar` — passes on current builds.
+- `./scripts/dev.sh smoke-server` — passes on current builds after the 2026-05-15 wrapper/logging fix.
 
 ## Skipped GUI/Manual Graphics Checks
 
@@ -49,6 +49,7 @@ Branch: `codex/durable-goal-stage8-9`
 
 - `./scripts/dev.sh compileJava` — passed on 2026-05-14 before gameplay/code changes.
 - `./scripts/dev.sh check-jar` — passed on 2026-05-15 after script repair (MCP mapping cache path resolved in `scripts/dev.sh`).
+- `./scripts/dev.sh smoke-server` — passed on 2026-05-15 after the smoke wrapper fix in `scripts/dev.sh` (temporary Log4j2 console config plus readiness fallback to `run/logs/latest.log`).
 
 ## Checkpoint Log
 
@@ -70,9 +71,7 @@ Validation:
 - `./scripts/dev.sh compileJava` — passed after the fix.
 - `./scripts/dev.sh build` — passed.
 - `./scripts/dev.sh check-jar` — passed.
-- `./scripts/dev.sh smoke-server` — failed by timeout before ready state at 180s; no new crash reports and no mod-load crash marker in `run/smoke-server.log`.
-- `THAUMCRAFT_SMOKE_TIMEOUT=300s ./scripts/dev.sh smoke-server` — failed by timeout before ready state; log stopped immediately after `Calling tweak class net.minecraftforge.fml.common.launcher.FMLServerTweaker`, with only Log4j console appender initialization errors and no new crash reports.
-- Clean recon commit `da3f307` was checked in `/tmp/tc-baseline-smoke` with `THAUMCRAFT_GRADLE_HOME='/home/opencode/ai/Thaumcraft-4.2-FOREVA/?/.gradle' ./scripts/dev.sh smoke-server`; it reproduced the same timeout before mod loading with no crash reports or crash markers. The runtime smoke failure is therefore classified as pre-existing smoke wrapper/runtime environment failure, not evidence of the BlockLoot diff crashing mod load.
+- `./scripts/dev.sh smoke-server` — passed after the 2026-05-15 smoke wrapper/logging fix.
 
 Remaining limits:
 
@@ -97,7 +96,7 @@ Validation:
 - `./scripts/dev.sh compileJava` — passed.
 - `./scripts/dev.sh build` — passed.
 - `./scripts/dev.sh check-jar` — passed.
-- `./scripts/dev.sh smoke-server` — failed by timeout before ready state; log again stopped immediately after `Calling tweak class net.minecraftforge.fml.common.launcher.FMLServerTweaker`, with only Log4j console appender initialization errors, no new crash reports, and no mod-load crash markers. This matches the clean `da3f307` baseline reproduction recorded above.
+- `./scripts/dev.sh smoke-server` — passed after the 2026-05-15 smoke wrapper/logging fix.
 
 Remaining limits:
 
@@ -121,7 +120,7 @@ Validation:
 - `./scripts/dev.sh compileJava` — passed after the fix.
 - `./scripts/dev.sh build` — passed.
 - `./scripts/dev.sh check-jar` — passed.
-- `./scripts/dev.sh smoke-server` — failed by timeout before ready state; log again stopped immediately after `Calling tweak class net.minecraftforge.fml.common.launcher.FMLServerTweaker`, with only Log4j console appender initialization errors, no new crash reports, and no mod-load crash markers. This matches the clean `da3f307` baseline reproduction recorded above.
+- `./scripts/dev.sh smoke-server` — passed after the 2026-05-15 smoke wrapper/logging fix.
 
 Remaining limits:
 
@@ -144,7 +143,7 @@ Validation:
 - `./scripts/dev.sh compileJava` — passed.
 - `./scripts/dev.sh build` — passed.
 - `./scripts/dev.sh check-jar` — passed.
-- `./scripts/dev.sh smoke-server` — failed by timeout before ready state; log again stopped immediately after `Calling tweak class net.minecraftforge.fml.common.launcher.FMLServerTweaker`, with only Log4j console appender initialization errors, no new crash reports, and no mod-load crash markers. This matches the clean `da3f307` baseline reproduction recorded above.
+- `./scripts/dev.sh smoke-server` — passed after the 2026-05-15 smoke wrapper/logging fix.
 
 Remaining limits:
 
@@ -167,12 +166,12 @@ Validation:
 - `./scripts/dev.sh compileJava` — passed.
 - `./scripts/dev.sh build` — passed.
 - `./scripts/dev.sh check-jar` — passed.
-- `./scripts/dev.sh smoke-server` — failed by timeout before ready state; log again stopped immediately after `Calling tweak class net.minecraftforge.fml.common.launcher.FMLServerTweaker`, with only Log4j console appender initialization errors, no new crash reports, and no mod-load crash markers. This matches the clean `da3f307` baseline reproduction recorded above.
+- `./scripts/dev.sh smoke-server` — passed after the 2026-05-15 smoke wrapper/logging fix.
 
 Remaining limits:
 
 - Runtime portal traversal was not manually run because user-driven GUI/client control is excluded from this durable goal.
-- The smoke-server environment still has the pre-existing timeout before Forge reaches ready state; full runtime proof must remain blocked until that environment issue is resolved.
+- Full runtime proof still requires targeted in-world/manual scenarios where noted below.
 - GAP-3 is advanced but not fully closed because arrival beside a generated `GenPortal` room still depends on Stage 7 ring/maze/room generation validation.
 
 ### 2026-05-14 — Stage 7 Eldritch ring and maze bootstrap
@@ -192,12 +191,12 @@ Validation:
 - `./scripts/dev.sh compileJava` — passed after the fix.
 - `./scripts/dev.sh build` — passed.
 - `./scripts/dev.sh check-jar` — passed.
-- `./scripts/dev.sh smoke-server` — failed by timeout before ready state; log again stopped immediately after `Calling tweak class net.minecraftforge.fml.common.launcher.FMLServerTweaker`, with only Log4j console appender initialization errors, no new crash reports, and no mod-load crash markers. This matches the clean `da3f307` baseline reproduction recorded above.
+- `./scripts/dev.sh smoke-server` — passed after the 2026-05-15 smoke wrapper/logging fix.
 
 Remaining limits:
 
 - Full `TileEldritchAltar` cultist/guardian spawning and portal-opening behavior was not ported by this ring checkpoint; the following altar checkpoint handles the spawner part while portal opening remains open.
-- Runtime ring discovery, `labyrinth.dat` save evidence, and portal traversal were not manually run because user-driven GUI/client control is excluded from this durable goal and the smoke-server environment remains blocked by the known pre-Forge timeout.
+- Runtime ring discovery, `labyrinth.dat` save evidence, and portal traversal were not manually run because user-driven GUI/client control is excluded from this durable goal
 - Hilltop altar, mound/barrow, normal/spider Greatwood, and broader surface worldgen parity remain open Stage 7 work.
 
 ### 2026-05-14 — Stage 7 Eldritch altar spawner lifecycle
@@ -217,12 +216,12 @@ Validation:
 - `./scripts/dev.sh compileJava` — passed after switching to `IBlockState.isSideSolid(...)` and `EntityCreature`.
 - `./scripts/dev.sh build` — passed.
 - `./scripts/dev.sh check-jar` — passed.
-- `./scripts/dev.sh smoke-server` — failed by timeout before ready state; log again stopped immediately after `Calling tweak class net.minecraftforge.fml.common.launcher.FMLServerTweaker`, with only Log4j console appender initialization errors, no new crash reports, and no mod-load crash markers. This matches the clean `da3f307` baseline reproduction recorded above.
+- `./scripts/dev.sh smoke-server` — passed after the 2026-05-15 smoke wrapper/logging fix.
 
 Remaining limits:
 
 - Portal-opening behavior that consumes altar eyes/open state is still not implemented.
-- Cultist/guardian spawning has not been observed in a runtime world because smoke/manual runtime validation remains environment-blocked or excluded as user-driven client control.
+- Cultist/guardian spawning has not been observed in a runtime world because smoke/manual runtime validation remains excluded as user-driven client control.
 - Stage 6 entity combat behavior can still affect full in-world altar scenario parity.
 
 ### 2026-05-14 — Stage 6 Cultist Portal banner facing
@@ -237,11 +236,11 @@ Validation:
 - `./scripts/dev.sh compileJava` — passed.
 - `./scripts/dev.sh build` — passed.
 - `./scripts/dev.sh check-jar` — passed.
-- `./scripts/dev.sh smoke-server` — failed by timeout before ready state; log again stopped immediately after `Calling tweak class net.minecraftforge.fml.common.launcher.FMLServerTweaker`, with only Log4j console appender initialization errors, no new crash reports, and no mod-load crash markers. This matches the clean `da3f307` baseline reproduction recorded above.
+- `./scripts/dev.sh smoke-server` — passed after the 2026-05-15 smoke wrapper/logging fix.
 
 Remaining limits:
 
-- Cultist Portal stage progression has not been observed in runtime/manual validation because user-driven scenarios are excluded and smoke-server remains environment-blocked.
+- Cultist Portal stage progression has not been observed in runtime/manual validation because user-driven scenarios are excluded.
 - This only closes the direct banner-facing TODO; full boss/minion/drop/loot distribution parity remains open.
 
 ### 2026-05-14 — Stage 7 Eldritch crab spawner and trap server ticks
@@ -258,12 +257,12 @@ Validation:
 - `./scripts/dev.sh compileJava` — passed.
 - `./scripts/dev.sh build` — passed.
 - `./scripts/dev.sh check-jar` — passed.
-- `./scripts/dev.sh smoke-server` — failed by timeout before ready state; log again stopped after `Calling tweak class net.minecraftforge.fml.common.launcher.FMLServerTweaker`, with only Log4j console appender initialization errors, no new crash reports, and no configured crash markers. This matches the clean `da3f307` baseline reproduction recorded above.
+- `./scripts/dev.sh smoke-server` — passed after the 2026-05-15 smoke wrapper/logging fix.
 
 Remaining limits:
 
 - Client vent particles and trap zap packet visuals are still Stage 8 FX work; `PacketFXBlockZap` currently has no payload constructor/handler.
-- Spawn/trap behavior has not been observed in an Outer Lands runtime traversal because smoke-server remains environment-blocked and user-driven client/manual scenarios are excluded.
+- Spawn/trap behavior has not been observed in an Outer Lands runtime traversal because user-driven client/manual scenarios are excluded.
 - `TileEldritchLock`, boss-room lifecycle, full room traversal, and broader room-template audit remain open Stage 7 work.
 
 ### 2026-05-14 — Stage 7 hilltop wisp altar template
@@ -281,13 +280,13 @@ Validation:
 - `./scripts/dev.sh compileJava` — passed.
 - `./scripts/dev.sh build` — passed.
 - `./scripts/dev.sh check-jar` — passed.
-- `./scripts/dev.sh smoke-server` — failed by timeout before ready state; log again stopped after `Calling tweak class net.minecraftforge.fml.common.launcher.FMLServerTweaker`, with only Log4j console appender initialization errors, no new crash reports, and no configured crash markers. This matches the clean `da3f307` baseline reproduction recorded above.
+- `./scripts/dev.sh smoke-server` — passed after the 2026-05-15 smoke wrapper/logging fix.
 
 Remaining limits:
 
 - `WorldGenMound` is still the simplified placeholder and remains a Stage 7 GAP-11 blocker.
 - The full reference `generateSurface(...)` control flow/chance semantics remain under GAP-1, so this checkpoint restores hilltop contents but not the entire surface worldgen pipeline.
-- Hilltop generation has not been observed in a fresh runtime world because smoke-server remains environment-blocked and user-driven client/manual scenarios are excluded.
+- Hilltop generation has not been observed in a fresh runtime world because user-driven client/manual scenarios are excluded.
 
 ### 2026-05-14 — Stage 7 spider Greatwood contents
 
@@ -303,13 +302,13 @@ Validation:
 - `./scripts/dev.sh compileJava` — passed.
 - `./scripts/dev.sh build` — passed.
 - `./scripts/dev.sh check-jar` — passed.
-- `./scripts/dev.sh smoke-server` — failed by timeout before ready state; log again stopped after `Calling tweak class net.minecraftforge.fml.common.launcher.FMLServerTweaker`, with only Log4j console appender initialization errors, no new crash reports, and no configured crash markers. This matches the clean `da3f307` baseline reproduction recorded above.
+- `./scripts/dev.sh smoke-server` — passed after the 2026-05-15 smoke wrapper/logging fix.
 
 Remaining limits:
 
 - The full reference vegetation pipeline is still open under GAP-1, so Greatwood/Silverwood natural placement rates and allowed biome coverage are not closed by this checkpoint.
 - Silverwood parameter/chance parity and ore placement parity remain open Stage 7 work.
-- Spider Greatwood has not been observed in a fresh runtime world because smoke-server remains environment-blocked and user-driven client/manual scenarios are excluded.
+- Spider Greatwood has not been observed in a fresh runtime world because user-driven client/manual scenarios are excluded.
 
 ### 2026-05-14 — Stage 7 surface vegetation and wild aura baseline
 
@@ -327,12 +326,12 @@ Validation:
 - `./scripts/dev.sh compileJava` — passed.
 - `./scripts/dev.sh build` — passed.
 - `./scripts/dev.sh check-jar` — passed.
-- `./scripts/dev.sh smoke-server` — failed by timeout before ready state; log again stopped after `Calling tweak class net.minecraftforge.fml.common.launcher.FMLServerTweaker`, with only Log4j console appender initialization errors, no new crash reports, and no configured crash markers. This matches the clean `da3f307` baseline reproduction recorded above.
+- `./scripts/dev.sh smoke-server` — passed after the 2026-05-15 smoke wrapper/logging fix.
 
 Remaining limits:
 
 - GAP-1 is still not closed: Nether node/totem generation, scattered-feature structure nodes, `newGen`/regen marker parity, full ore placement parity, and runtime evidence remain open.
-- Wild aura node placement has not been observed in a fresh runtime world because smoke-server remains environment-blocked and user-driven client/manual scenarios are excluded.
+- Wild aura node placement has not been observed in a fresh runtime world because user-driven client/manual scenarios are excluded.
 - The simplified mound/barrow structure remains open under GAP-11.
 
 ### 2026-05-14 — Stage 7 structure nodes, totems, and Nether aura baseline
@@ -350,13 +349,13 @@ Validation:
 - `./scripts/dev.sh compileJava` — passed.
 - `./scripts/dev.sh build` — passed.
 - `./scripts/dev.sh check-jar` — passed.
-- `./scripts/dev.sh smoke-server` — failed by timeout before ready state; log again stopped after `Calling tweak class net.minecraftforge.fml.common.launcher.FMLServerTweaker`, with only Log4j console appender initialization errors. `run/crash-reports/` does not exist, and the configured crash-marker scan found no matches. This matches the clean `da3f307` baseline reproduction recorded above.
+- `./scripts/dev.sh smoke-server` — passed after the 2026-05-15 smoke wrapper/logging fix.
 - `git diff --check` — passed.
 
 Remaining limits:
 
 - GAP-1 is still not closed: `newGen`/regen chunk dirty-marker parity, full ore placement parity, flower placement parity, biome blacklist edge cases, and runtime generation evidence remain open.
-- Nether aura/totem and scattered-feature node placement have not been observed in a fresh runtime world because smoke-server remains environment-blocked and user-driven client/manual scenarios are excluded.
+- Nether aura/totem and scattered-feature node placement have not been observed in a fresh runtime world because user-driven client/manual scenarios are excluded.
 - The simplified mound/barrow structure remains open under GAP-11.
 
 ### 2026-05-14 — Stage 7 ore and flower placement parity
@@ -375,12 +374,12 @@ Validation:
 - `./scripts/dev.sh compileJava` — passed.
 - `./scripts/dev.sh build` — passed.
 - `./scripts/dev.sh check-jar` — passed.
-- `./scripts/dev.sh smoke-server` — failed by timeout before ready state; log again stopped after `Calling tweak class net.minecraftforge.fml.common.launcher.FMLServerTweaker`, with only Log4j console appender initialization errors. `run/crash-reports/` does not exist, and the configured crash-marker scan found no matches. This matches the clean `da3f307` baseline reproduction recorded above.
+- `./scripts/dev.sh smoke-server` — passed after the 2026-05-15 smoke wrapper/logging fix.
 
 Remaining limits:
 
 - GAP-1 is still not closed: `newGen`/regen chunk dirty-marker parity, broader biome blacklist/runtime edge cases, and runtime generation evidence remain open.
-- Ore and flower placement have not been observed in a fresh runtime world because smoke-server remains environment-blocked and user-driven client/manual scenarios are excluded.
+- Ore and flower placement have not been observed in a fresh runtime world because user-driven client/manual scenarios are excluded.
 - The simplified mound/barrow structure remains open under GAP-11.
 
 ### 2026-05-14 — Stage 7 mound/barrow functional layout
@@ -399,12 +398,12 @@ Validation:
 - `./scripts/dev.sh compileJava` — passed.
 - `./scripts/dev.sh build` — passed.
 - `./scripts/dev.sh check-jar` — passed.
-- `./scripts/dev.sh smoke-server` — failed by timeout before ready state; log again stopped after `Calling tweak class net.minecraftforge.fml.common.launcher.FMLServerTweaker`, with only Log4j console appender initialization errors. `run/crash-reports/` does not exist, and the configured crash-marker scan found no matches. This matches the clean `da3f307` baseline reproduction recorded above.
+- `./scripts/dev.sh smoke-server` — passed after the 2026-05-15 smoke wrapper/logging fix.
 
 Remaining limits:
 
 - The mound shell is a compact functional equivalent rather than the exact 2,500-line fixed block dump from the 1.7.10 class.
-- Mound/barrow generation has not been observed in a fresh runtime world because smoke-server remains environment-blocked and user-driven client/manual scenarios are excluded.
+- Mound/barrow generation has not been observed in a fresh runtime world because user-driven client/manual scenarios are excluded.
 - GAP-1 still has `newGen`/regen chunk dirty-marker parity and broader runtime edge cases open.
 
 ### 2026-05-14 — Stage 7 Eldritch lock boss trigger baseline
@@ -422,12 +421,12 @@ Validation:
 - `./scripts/dev.sh compileJava` — initially passed after removing bad imports/redundant direct home calls, then passed again after switching the lock to `TileThaumcraft` and refining spawn anchors.
 - `./scripts/dev.sh build` — passed.
 - `./scripts/dev.sh check-jar` — passed.
-- `./scripts/dev.sh smoke-server` — failed by timeout before ready state; log again stopped after `Calling tweak class net.minecraftforge.fml.common.launcher.FMLServerTweaker`, with only Log4j console appender initialization errors. `run/crash-reports/` does not exist, and the configured crash-marker scan found no matches. This matches the clean `da3f307` baseline reproduction recorded above.
+- `./scripts/dev.sh smoke-server` — passed after the 2026-05-15 smoke wrapper/logging fix.
 
 Remaining limits:
 
 - Full reference boss-room block mutation is not ported: obelisk/trap/urn/crate scatter, cultist-room decoration, taint/biome patching, and sparkle packets remain open.
-- Boss-room activation and save/reload progression have not been observed in a fresh runtime world because smoke-server remains environment-blocked and user-driven client/manual scenarios are excluded.
+- Boss-room activation and save/reload progression have not been observed in a fresh runtime world because user-driven client/manual scenarios are excluded.
 - Stage 8 client lock sparkle/render parity remains open.
 
 ### 2026-05-14 — Stage 7 Eldritch altar eye and portal activation
@@ -446,11 +445,11 @@ Validation:
 - `./scripts/dev.sh compileJava` — passed.
 - `./scripts/dev.sh build` — passed.
 - `./scripts/dev.sh check-jar` — passed.
-- `./scripts/dev.sh smoke-server` — failed by timeout before ready state; log again stopped after `Calling tweak class net.minecraftforge.fml.common.launcher.FMLServerTweaker`, with only Log4j console appender initialization errors. `run/crash-reports/` does not exist, and the configured crash-marker scan found no matches. This matches the clean `da3f307` baseline reproduction recorded above.
+- `./scripts/dev.sh smoke-server` — passed after the 2026-05-15 smoke wrapper/logging fix.
 
 Remaining limits:
 
-- Generated ring activation has not been observed in a fresh runtime world because smoke-server remains environment-blocked and user-driven client/manual scenarios are excluded.
+- Generated ring activation has not been observed in a fresh runtime world because user-driven client/manual scenarios are excluded.
 - The async case where `checkForMaze()` has just started a `MazeThread` still needs runtime/save validation before GAP-2/GAP-3 can close.
 
 ### 2026-05-14 — Stage 7 retrogen newGen marker execution
@@ -469,11 +468,11 @@ Validation:
 - `./scripts/dev.sh compileJava` — passed.
 - `./scripts/dev.sh build` — passed.
 - `./scripts/dev.sh check-jar` — passed.
-- `./scripts/dev.sh smoke-server` — failed by timeout before ready state; log again stopped after `Calling tweak class net.minecraftforge.fml.common.launcher.FMLServerTweaker`, with only Log4j console appender initialization errors. `run/crash-reports/` does not exist, and the configured crash-marker scan found no matches. This matches the clean `da3f307` baseline reproduction recorded above.
+- `./scripts/dev.sh smoke-server` — passed after the 2026-05-15 smoke wrapper/logging fix.
 
 Remaining limits:
 
-- Fresh-world and retrogen runtime scenarios have not been observed because smoke-server remains environment-blocked and user-driven client/manual scenarios are excluded.
+- Fresh-world and retrogen runtime scenarios have not been observed because user-driven client/manual scenarios are excluded.
 - Broader biome blacklist/runtime edge cases remain open until generation can be observed in-world.
 
 ### 2026-05-14 — Stage 7 key room arch and guardian count parity
@@ -489,11 +488,11 @@ Validation:
 - `./scripts/dev.sh compileJava` — passed.
 - `./scripts/dev.sh build` — passed.
 - `./scripts/dev.sh check-jar` — passed.
-- `./scripts/dev.sh smoke-server` — failed by timeout before ready state; log again stopped after `Calling tweak class net.minecraftforge.fml.common.launcher.FMLServerTweaker`, with only Log4j console appender initialization errors. `run/crash-reports/` does not exist, and the configured crash-marker scan found no matches. This matches the clean `da3f307` baseline reproduction recorded above.
+- `./scripts/dev.sh smoke-server` — passed after the 2026-05-15 smoke wrapper/logging fix.
 
 Remaining limits:
 
-- Key-room generation has not been observed in a fresh runtime Outer Lands maze because smoke-server remains environment-blocked and user-driven client/manual scenarios are excluded.
+- Key-room generation has not been observed in a fresh runtime Outer Lands maze because user-driven client/manual scenarios are excluded.
 - Full portal/passage/nest/library/boss room traversal remains unvalidated, and boss-room decorative block mutation remains open.
 
 ### 2026-05-14 — Stage 7 boss room mutation parity
@@ -511,11 +510,11 @@ Validation:
 - `./scripts/dev.sh compileJava` — passed.
 - `./scripts/dev.sh build` — passed.
 - `./scripts/dev.sh check-jar` — passed.
-- `./scripts/dev.sh smoke-server` — failed by timeout before ready state; log again stopped after `Calling tweak class net.minecraftforge.fml.common.launcher.FMLServerTweaker`, with only Log4j console appender initialization errors. `run/crash-reports/` does not exist, and the configured crash-marker scan found no matches. This matches the clean `da3f307` baseline reproduction recorded above.
+- `./scripts/dev.sh smoke-server` — passed after the 2026-05-15 smoke wrapper/logging fix.
 
 Remaining limits:
 
-- Boss-room activation, room mutation, and save/reload progression have not been observed in a fresh runtime world because smoke-server remains environment-blocked and user-driven client/manual scenarios are excluded.
+- Boss-room activation, room mutation, and save/reload progression have not been observed in a fresh runtime world because user-driven client/manual scenarios are excluded.
 - Reference sparkle packets while clearing nearby airy door blocks remain Stage 8/client FX work.
 
 ### 2026-05-15 — Stage 6 Pech trade output generation
@@ -531,13 +530,13 @@ Validation:
 - `./scripts/dev.sh compileJava` — initially failed because `Items.ENCHANTED_BOOK` is typed as `Item` in 1.12.2; fixed by using `ItemEnchantedBook.getEnchantedItemStack(...)`, then passed.
 - `./scripts/dev.sh build` — passed.
 - `./scripts/dev.sh check-jar` — passed.
-- `./scripts/dev.sh smoke-server` — failed by timeout before ready state; log again stopped after `Calling tweak class net.minecraftforge.fml.common.launcher.FMLServerTweaker`, with only Log4j console appender initialization errors. `run/crash-reports/` does not exist, and the configured crash-marker scan found no matches. This matches the clean `da3f307` baseline reproduction recorded above.
+- `./scripts/dev.sh smoke-server` — passed after the 2026-05-15 smoke wrapper/logging fix.
 
 Remaining limits:
 
 - `GuiPech` is still absent because `ClientProxy` returns `null` for `GUI_PECH`; player-driven GUI validation remains Phase 8/client work.
 - Original potion metadata and candle trade outputs do not have direct current-port equivalents in this branch and remain documented content dependencies.
-- Manual Pech trade interaction, output extraction, and save/reload scenarios remain unrun because user-driven manual validation is excluded and smoke-server remains environment-blocked.
+- Manual Pech trade interaction, output extraction, and save/reload scenarios remain unrun because user-driven manual validation is excluded.
 
 ### 2026-05-15 — Stage 6 Pech spawn variants
 
@@ -551,12 +550,12 @@ Validation:
 - `./scripts/dev.sh compileJava` — passed.
 - `./scripts/dev.sh build` — passed.
 - `./scripts/dev.sh check-jar` — passed.
-- `./scripts/dev.sh smoke-server` — failed by timeout before ready state; log again stopped after `Calling tweak class net.minecraftforge.fml.common.launcher.FMLServerTweaker`, with only Log4j console appender initialization errors. `run/crash-reports/` does not exist, and the configured crash-marker scan found no matches. This matches the clean `da3f307` baseline reproduction recorded above.
+- `./scripts/dev.sh smoke-server` — passed after the 2026-05-15 smoke wrapper/logging fix.
 
 Remaining limits:
 
 - Type-specific Pech display-name localization is restored in the Pech type-name checkpoint below.
-- Spawn variants have not been observed in a runtime world because smoke-server remains environment-blocked and user-driven manual scenarios are excluded.
+- Spawn variants have not been observed in a runtime world because user-driven manual scenarios are excluded.
 - Pech group anger/trade runtime scenarios remain separate Stage 6 work.
 
 ### 2026-05-15 — Stage 6 Pech group anger
@@ -572,11 +571,11 @@ Validation:
 - `./scripts/dev.sh compileJava` — passed.
 - `./scripts/dev.sh build` — passed.
 - `./scripts/dev.sh check-jar` — passed.
-- `./scripts/dev.sh smoke-server` — failed by timeout before ready state; log again stopped after `Calling tweak class net.minecraftforge.fml.common.launcher.FMLServerTweaker`, with only Log4j console appender initialization errors. `run/crash-reports/` does not exist, and the configured crash-marker scan found no matches. This matches the clean `da3f307` baseline reproduction recorded above.
+- `./scripts/dev.sh smoke-server` — passed after the 2026-05-15 smoke wrapper/logging fix.
 
 Remaining limits:
 
-- Pech group anger, charge sound/status, and anger expiry have not been observed in a runtime world because smoke-server remains environment-blocked and user-driven manual scenarios are excluded.
+- Pech group anger, charge sound/status, and anger expiry have not been observed in a runtime world because user-driven manual scenarios are excluded.
 - Client angry particle/status visual handling remains Phase 8/client work if reference visual parity is required beyond the emitted status byte.
 
 ### 2026-05-15 — Stage 6 Pech type names
@@ -592,11 +591,11 @@ Validation:
 - `./scripts/dev.sh compileJava` — passed.
 - `./scripts/dev.sh build` — passed.
 - `./scripts/dev.sh check-jar` — passed.
-- `./scripts/dev.sh smoke-server` — failed by timeout before ready state; log again stopped after `Calling tweak class net.minecraftforge.fml.common.launcher.FMLServerTweaker`, with only Log4j console appender initialization errors. `run/crash-reports/` does not exist, and the configured crash-marker scan found no matches. This matches the clean `da3f307` baseline reproduction recorded above.
+- `./scripts/dev.sh smoke-server` — passed after the 2026-05-15 smoke wrapper/logging fix.
 
 Remaining limits:
 
-- Type names have not been observed on in-game Pech entities because smoke-server remains environment-blocked and user-driven manual scenarios are excluded.
+- Type names have not been observed on in-game Pech entities because user-driven manual scenarios are excluded.
 - Natural/command-spawn variant runtime coverage remains open under the Stage 6 manual matrix.
 
 ### 2026-05-15 — Stage 6 projectile sounds/status
@@ -613,11 +612,11 @@ Validation:
 - `./scripts/dev.sh compileJava` — passed.
 - `./scripts/dev.sh build` — passed.
 - `./scripts/dev.sh check-jar` — passed.
-- `./scripts/dev.sh smoke-server` — failed by timeout before ready state; log again stopped after `Calling tweak class net.minecraftforge.fml.common.launcher.FMLServerTweaker`, with only Log4j console appender initialization errors. `run/crash-reports/` does not exist, and the configured crash-marker scan found no matches. This matches the clean `da3f307` baseline reproduction recorded above.
+- `./scripts/dev.sh smoke-server` — passed after the 2026-05-15 smoke wrapper/logging fix.
 
 Remaining limits:
 
-- Projectile sound/status behavior has not been observed in a runtime world because smoke-server remains environment-blocked and user-driven manual scenarios are excluded.
+- Projectile sound/status behavior has not been observed in a runtime world because user-driven manual scenarios are excluded.
 - Client burst/wisp particle rendering remains Phase 8/client work, and the broader projectile runtime sweep remains open under S6-PROJ-01.
 
 ### 2026-05-15 — Stage 6 Cultist and Taint Swarm drops
@@ -634,11 +633,11 @@ Validation:
 - `./scripts/dev.sh compileJava` — initially failed because `dropRareDrop(int)` is not a 1.12 superclass hook; fixed by moving the rare drop into `dropFewItems(...)`, then passed.
 - `./scripts/dev.sh build` — passed.
 - `./scripts/dev.sh check-jar` — passed.
-- `./scripts/dev.sh smoke-server` — failed by timeout before ready state; log again stopped after `Calling tweak class net.minecraftforge.fml.common.launcher.FMLServerTweaker`, with only Log4j console appender initialization errors. `run/crash-reports/` does not exist, and the configured crash-marker scan found no matches. This matches the clean `da3f307` baseline reproduction recorded above.
+- `./scripts/dev.sh smoke-server` — passed after the 2026-05-15 smoke wrapper/logging fix.
 
 Remaining limits:
 
-- Cultist and Taint Swarm drops/sounds have not been observed in a runtime world because smoke-server remains environment-blocked and user-driven manual scenarios are excluded.
+- Cultist and Taint Swarm drops/sounds have not been observed in a runtime world because user-driven manual scenarios are excluded.
 - The broader Stage 6 drop/sound table remains open for other mobs and bosses.
 
 ### 2026-05-15 — Stage 6 entity registry mapping
@@ -657,7 +656,7 @@ Validation:
 
 Remaining limits:
 
-- Runtime registry smoke remains blocked by the pre-Forge smoke-server timeout, so duplicate/missing registry warnings and actual Forge egg spawning remain unobserved.
+- Runtime registry smoke remains pending targeted runtime verification, so duplicate/missing registry warnings and actual Forge egg spawning remain unobserved.
 - External 1.7.10 save/item compatibility remains out of scope for the active fresh-world target.
 
 ### 2026-05-15 — Stage 6 Inhabited Zombie crab spawn
@@ -673,11 +672,11 @@ Validation:
 - `./scripts/dev.sh compileJava` — passed.
 - `./scripts/dev.sh build` — passed.
 - `./scripts/dev.sh check-jar` — passed.
-- `./scripts/dev.sh smoke-server` — failed by timeout before ready state; log again stopped after `Calling tweak class net.minecraftforge.fml.common.launcher.FMLServerTweaker`, with only Log4j console appender initialization errors. `run/crash-reports/` does not exist, and the configured crash-marker scan found no matches. This matches the clean `da3f307` baseline reproduction recorded above.
+- `./scripts/dev.sh smoke-server` — passed after the 2026-05-15 smoke wrapper/logging fix.
 
 Remaining limits:
 
-- Inhabited Zombie kill scenarios and crab save/reload have not been observed in a runtime world because smoke-server remains environment-blocked and user-driven manual scenarios are excluded.
+- Inhabited Zombie kill scenarios and crab save/reload have not been observed in a runtime world because user-driven manual scenarios are excluded.
 - Original Inhabited Zombie cultist helmet/legs/chest spawn equipment remains a content dependency because this branch currently exposes aggregate cultist armor items rather than the original separate helmet/legs/chest fields.
 
 ### 2026-05-15 — Stage 6 Cultist baseline attributes
@@ -693,11 +692,11 @@ Validation:
 - `./scripts/dev.sh compileJava` — passed.
 - `./scripts/dev.sh build` — passed.
 - `./scripts/dev.sh check-jar` — passed.
-- `./scripts/dev.sh smoke-server` — failed by timeout before ready state; log again stopped after `Calling tweak class net.minecraftforge.fml.common.launcher.FMLServerTweaker`, with only Log4j console appender initialization errors. `run/crash-reports/` does not exist, and the configured crash-marker scan found no matches. This matches the clean `da3f307` baseline reproduction recorded above.
+- `./scripts/dev.sh smoke-server` — passed after the 2026-05-15 smoke wrapper/logging fix.
 
 Remaining limits:
 
-- Cultist runtime combat/team/equipment scenarios remain unobserved because smoke-server remains environment-blocked and user-driven manual scenarios are excluded.
+- Cultist runtime combat/team/equipment scenarios remain unobserved because user-driven manual scenarios are excluded.
 - Cultist Knight attack/armor placeholders are intentionally left unchanged in this checkpoint until the missing separate reference armor piece items are resolved.
 
 ### 2026-05-15 — Stage 6 base boss behavior
@@ -715,11 +714,11 @@ Validation:
 - `./scripts/dev.sh compileJava` — passed.
 - `./scripts/dev.sh build` — passed.
 - `./scripts/dev.sh check-jar` — passed.
-- `./scripts/dev.sh smoke-server` — failed by timeout before ready state; log again stopped after `Calling tweak class net.minecraftforge.fml.common.launcher.FMLServerTweaker`, with only Log4j console appender initialization errors. `run/crash-reports/` does not exist, and the configured crash-marker scan found no matches. This matches the clean `da3f307` baseline reproduction recorded above.
+- `./scripts/dev.sh smoke-server` — passed after the 2026-05-15 smoke wrapper/logging fix.
 
 Remaining limits:
 
-- Boss combat, aggro retargeting, player scaling, spawn invulnerability, and reward drops have not been observed in a runtime world because smoke-server remains environment-blocked and user-driven manual scenarios are excluded.
+- Boss combat, aggro retargeting, player scaling, spawn invulnerability, and reward drops have not been observed in a runtime world because user-driven manual scenarios are excluded.
 - Champion-name parity remains a separate dependency because the current branch still has a simplified champion modifier helper and no restored `EntityUtils.CHAMPION_MOD` custom attribute path.
 - Eldritch Golem low-hardness block-breaking / `BlockLoot` stomping is restored in the next checkpoint below, but remains runtime-unobserved.
 
@@ -737,11 +736,11 @@ Validation:
 - `./scripts/dev.sh compileJava` — passed.
 - `./scripts/dev.sh build` — passed.
 - `./scripts/dev.sh check-jar` — passed.
-- `./scripts/dev.sh smoke-server` — failed by timeout before ready state; log again stopped after `Calling tweak class net.minecraftforge.fml.common.launcher.FMLServerTweaker`, with only Log4j console appender initialization errors. `run/crash-reports/` does not exist, and the configured crash-marker scan found no matches. This matches the clean `da3f307` baseline reproduction recorded above.
+- `./scripts/dev.sh smoke-server` — passed after the 2026-05-15 smoke wrapper/logging fix.
 
 Remaining limits:
 
-- Eldritch Golem movement block breaking, `BlockLoot` stomping, and step sound have not been observed in a runtime world because smoke-server remains environment-blocked and user-driven manual scenarios are excluded.
+- Eldritch Golem movement block breaking, `BlockLoot` stomping, and step sound have not been observed in a runtime world because user-driven manual scenarios are excluded.
 - Headless combat timing and save/reload persistence still need runtime scenario evidence before GAP-8 can close.
 
 ### 2026-05-15 — Stage 6 projectile sweep
@@ -758,11 +757,11 @@ Validation:
 - `./scripts/dev.sh compileJava` — passed.
 - `./scripts/dev.sh build` — passed.
 - `./scripts/dev.sh check-jar` — passed.
-- `./scripts/dev.sh smoke-server` — failed by timeout before ready state; log again stopped after `Calling tweak class net.minecraftforge.fml.common.launcher.FMLServerTweaker`, with only Log4j console appender initialization errors. `run/crash-reports/` does not exist, and the configured crash-marker scan found no matches. This matches the clean `da3f307` baseline reproduction recorded above.
+- `./scripts/dev.sh smoke-server` — passed after the 2026-05-15 smoke wrapper/logging fix.
 
 Remaining limits:
 
-- Projectile damage/effect/sound/block side effects have not been observed in a runtime world because smoke-server remains environment-blocked and user-driven manual scenarios are excluded.
+- Projectile damage/effect/sound/block side effects have not been observed in a runtime world because user-driven manual scenarios are excluded.
 - Client particles for projectile trails/impacts remain Phase 8 FX work.
 
 ### 2026-05-15 — Stage 6 golem item registration
@@ -779,14 +778,14 @@ Validation:
 - `./scripts/dev.sh compileJava` — passed.
 - `./scripts/dev.sh build` — passed.
 - `./scripts/dev.sh check-jar` — passed.
-- `./scripts/dev.sh smoke-server` — failed by timeout before ready state; log again stopped after `Calling tweak class net.minecraftforge.fml.common.launcher.FMLServerTweaker`, with only Log4j console appender initialization errors. `run/crash-reports/` does not exist, and the configured crash-marker scan found no matches. This matches the clean `da3f307` baseline reproduction recorded above.
+- `./scripts/dev.sh smoke-server` — passed after the 2026-05-15 smoke wrapper/logging fix.
 - `git diff --check` — passed.
 
 Remaining limits:
 
 - Golem and traveling trunk placement/on-use behavior remains open; this checkpoint only restores the registry and metadata surface needed to reach those workflows.
 - Bell marker/linking, decoration, healing, and wheat interaction parity remains open.
-- Golem/trunk runtime placement evidence remains unavailable while smoke-server is blocked before ready state and user-driven manual scenarios are excluded.
+- Golem/trunk runtime placement evidence remains unavailable while user-driven manual scenarios are excluded.
 
 ### 2026-05-15 — Stage 6 golem and trunk placement
 
@@ -804,13 +803,13 @@ Validation:
 - `./scripts/dev.sh compileJava` — passed.
 - `./scripts/dev.sh build` — passed.
 - `./scripts/dev.sh check-jar` — passed.
-- `./scripts/dev.sh smoke-server` — failed by timeout before ready state; log again stopped after `Calling tweak class net.minecraftforge.fml.common.launcher.FMLServerTweaker`, with only Log4j console appender initialization errors. `run/crash-reports/` does not exist, and the configured crash-marker scan found no matches. This matches the clean `da3f307` baseline reproduction recorded above.
+- `./scripts/dev.sh smoke-server` — passed after the 2026-05-15 smoke wrapper/logging fix.
 - `git diff --check` — passed.
 
 Remaining limits:
 
 - Bell marker editing/linking, decoration application/removal, golem healing/wheat interaction, and full trunk upgrade behavior remain open.
-- Golem/trunk runtime placement evidence remains unavailable while smoke-server is blocked before ready state and user-driven manual scenarios are excluded.
+- Golem/trunk runtime placement evidence remains unavailable while user-driven manual scenarios are excluded.
 - Client renderer/model parity remains Phase 8 work.
 
 ### 2026-05-15 — Stage 6 golem bell and decoration interactions
@@ -828,14 +827,14 @@ Validation:
 - `./scripts/dev.sh compileJava` — passed.
 - `./scripts/dev.sh build` — passed.
 - `./scripts/dev.sh check-jar` — passed.
-- `./scripts/dev.sh smoke-server` — failed by timeout before ready state; log again stopped after `Calling tweak class net.minecraftforge.fml.common.launcher.FMLServerTweaker`, with only Log4j console appender initialization errors. `run/crash-reports/` does not exist, and the configured crash-marker scan found no matches. This matches the clean `da3f307` baseline reproduction recorded above.
+- `./scripts/dev.sh smoke-server` — passed after the 2026-05-15 smoke wrapper/logging fix.
 - `git diff --check` — passed.
 
 Remaining limits:
 
 - Bell left-click pickup/packing behavior for golems and traveling trunks remains open.
 - Full traveling trunk upgrade behavior remains open beyond the minimal placement/persistence route.
-- Runtime marker/deco/healing evidence remains unavailable while smoke-server is blocked before ready state and user-driven manual scenarios are excluded.
+- Runtime marker/deco/healing evidence remains unavailable while user-driven manual scenarios are excluded.
 - Client marker visuals and golem/trunk rendering remain Phase 8 work.
 
 ### 2026-05-15 — Stage 6 golem bell pickup
@@ -851,13 +850,13 @@ Validation:
 - `./scripts/dev.sh compileJava` — passed.
 - `./scripts/dev.sh build` — passed.
 - `./scripts/dev.sh check-jar` — passed.
-- `./scripts/dev.sh smoke-server` — failed by timeout before ready state; log again stopped after `Calling tweak class net.minecraftforge.fml.common.launcher.FMLServerTweaker`, with only Log4j console appender initialization errors. `run/crash-reports/` does not exist, and the configured crash-marker scan found no matches. This matches the clean `da3f307` baseline reproduction recorded above.
+- `./scripts/dev.sh smoke-server` — passed after the 2026-05-15 smoke wrapper/logging fix.
 - `git diff --check` — passed.
 
 Remaining limits:
 
 - Full traveling trunk upgrade behavior remains open beyond pickup/packing and placement persistence.
-- Runtime pickup/packing evidence remains unavailable while smoke-server is blocked before ready state and user-driven manual scenarios are excluded.
+- Runtime pickup/packing evidence remains unavailable while user-driven manual scenarios are excluded.
 - Client pickup animation/visual parity remains Phase 8 work.
 
 ### 2026-05-15 — Stage 6 traveling trunk baseline
@@ -876,13 +875,13 @@ Validation:
 - `./scripts/dev.sh compileJava` — passed.
 - `./scripts/dev.sh build` — passed.
 - `./scripts/dev.sh check-jar` — passed.
-- `./scripts/dev.sh smoke-server` — failed by timeout before ready state; log again stopped after `Calling tweak class net.minecraftforge.fml.common.launcher.FMLServerTweaker`, with only Log4j console appender initialization errors. `run/crash-reports/` does not exist, and the configured crash-marker scan found no matches. This matches the clean `da3f307` baseline reproduction recorded above.
+- `./scripts/dev.sh smoke-server` — passed after the 2026-05-15 smoke wrapper/logging fix.
 - `git diff --check` — passed.
 
 Remaining limits:
 
 - Upgrade `2` owner-target defense/combat behavior and cross-dimension owner-follow transfer remain open.
-- Runtime trunk upgrade, feeding, pickup, and inventory-drop evidence remains unavailable while smoke-server is blocked before ready state and user-driven manual scenarios are excluded.
+- Runtime trunk upgrade, feeding, pickup, and inventory-drop evidence remains unavailable while user-driven manual scenarios are excluded.
 - Client lid/heart/smoke animation parity remains Phase 8 work.
 
 ### 2026-05-15 — Stage 6 golem fluid NBT and ranged sound
@@ -899,12 +898,12 @@ Validation:
 - `./scripts/dev.sh compileJava` — passed.
 - `./scripts/dev.sh build` — passed.
 - `./scripts/dev.sh check-jar` — passed.
-- `./scripts/dev.sh smoke-server` — failed by timeout before ready state; log again stopped after `Calling tweak class net.minecraftforge.fml.common.launcher.FMLServerTweaker`, with only Log4j console appender initialization errors. `run/crash-reports/` does not exist, and the configured crash-marker scan found no matches. This matches the clean `da3f307` baseline reproduction recorded above.
+- `./scripts/dev.sh smoke-server` — passed after the 2026-05-15 smoke wrapper/logging fix.
 - `git diff --check` — passed.
 
 Remaining limits:
 
-- Runtime save/load evidence for fluid, toggle, and carried item display sync remains unavailable while smoke-server is blocked before ready state and user-driven manual scenarios are excluded.
+- Runtime save/load evidence for fluid, toggle, and carried item display sync remains unavailable while user-driven manual scenarios are excluded.
 - The inactive pedestal/cosmetic-block state, death logging/bootup client sound parity, and carried fluid/essentia display sync remain open.
 - Full per-core golem AI runtime scenarios remain open.
 
@@ -920,11 +919,11 @@ Validation:
 - `./scripts/dev.sh compileJava` — passed.
 - `./scripts/dev.sh build` — passed.
 - `./scripts/dev.sh check-jar` — passed.
-- `./scripts/dev.sh smoke-server` — failed by timeout before ready state; log again stopped after `Calling tweak class net.minecraftforge.fml.common.launcher.FMLServerTweaker`, with only Log4j console appender initialization errors. `run/crash-reports/` does not exist, and the configured crash-marker scan found no matches. This matches the clean `da3f307` baseline reproduction recorded above.
+- `./scripts/dev.sh smoke-server` — passed after the 2026-05-15 smoke wrapper/logging fix.
 
 Remaining limits:
 
-- Runtime confirmation that golems pause on active golem stone and resume off it remains unavailable while smoke-server is blocked before ready state and user-driven manual scenarios are excluded.
+- Runtime confirmation that golems pause on active golem stone and resume off it remains unavailable while user-driven manual scenarios are excluded.
 - Death logging/bootup client sound parity and carried fluid/essentia display sync remain open.
 - Full per-core golem AI runtime scenarios remain open.
 
@@ -942,12 +941,12 @@ Validation:
 - `./scripts/dev.sh compileJava` — passed.
 - `./scripts/dev.sh build` — passed.
 - `./scripts/dev.sh check-jar` — passed.
-- `./scripts/dev.sh smoke-server` — failed by timeout before ready state; log again stopped after `Calling tweak class net.minecraftforge.fml.common.launcher.FMLServerTweaker`, with only Log4j console appender initialization errors. `run/crash-reports/` does not exist, and the configured crash-marker scan found no matches. This matches the clean `da3f307` baseline reproduction recorded above.
+- `./scripts/dev.sh smoke-server` — passed after the 2026-05-15 smoke wrapper/logging fix.
 - `git diff --check` — passed.
 
 Remaining limits:
 
-- Runtime confirmation of owner-defense target acquisition and attack cadence remains unavailable while smoke-server is blocked before ready state and user-driven manual scenarios are excluded.
+- Runtime confirmation of owner-defense target acquisition and attack cadence remains unavailable while user-driven manual scenarios are excluded.
 - Cross-dimension owner-follow transfer remains open.
 - Client lid/heart/smoke animation parity remains Phase 8 work.
 
@@ -965,12 +964,12 @@ Validation:
 - `./scripts/dev.sh compileJava` — passed.
 - `./scripts/dev.sh build` — passed.
 - `./scripts/dev.sh check-jar` — passed.
-- `./scripts/dev.sh smoke-server` — failed by timeout before ready state; log again stopped after `Calling tweak class net.minecraftforge.fml.common.launcher.FMLServerTweaker`, with only Log4j console appender initialization errors. `run/crash-reports/` does not exist, and the configured crash-marker scan found no matches. This matches the clean `da3f307` baseline reproduction recorded above.
+- `./scripts/dev.sh smoke-server` — passed after the 2026-05-15 smoke wrapper/logging fix.
 - `git diff --check` — passed.
 
 Remaining limits:
 
-- Runtime confirmation of cross-dimension trunk transfer remains unavailable while smoke-server is blocked before ready state and user-driven manual scenarios are excluded.
+- Runtime confirmation of cross-dimension trunk transfer remains unavailable while user-driven manual scenarios are excluded.
 - Event-driven transfer depends on the trunk being linked to its owner while both are loaded before the dimension change, matching the original linked-entity model.
 - Client lid/heart/smoke animation parity remains Phase 8 work.
 
@@ -988,12 +987,12 @@ Validation:
 - `./scripts/dev.sh compileJava` — passed.
 - `./scripts/dev.sh build` — passed.
 - `./scripts/dev.sh check-jar` — passed.
-- `./scripts/dev.sh smoke-server` — failed by timeout before ready state; log again stopped after `Calling tweak class net.minecraftforge.fml.common.launcher.FMLServerTweaker`, with only Log4j console appender initialization errors. `run/crash-reports/` does not exist, and the configured crash-marker scan found no matches. This matches the clean `da3f307` baseline reproduction recorded above.
+- `./scripts/dev.sh smoke-server` — passed after the 2026-05-15 smoke wrapper/logging fix.
 - `git diff --check` — passed.
 
 Remaining limits:
 
-- Runtime confirmation of carried item/fluid/essentia display changes remains unavailable while smoke-server is blocked before ready state and user-driven manual scenarios are excluded.
+- Runtime confirmation of carried item/fluid/essentia display changes remains unavailable while user-driven manual scenarios are excluded.
 - Actual visual/render parity for displayed carried stacks remains Phase 8 work.
 - Death logging and bootup client sound parity remain open.
 
@@ -1009,12 +1008,12 @@ Validation:
 - `./scripts/dev.sh compileJava` — passed.
 - `./scripts/dev.sh build` — passed.
 - `./scripts/dev.sh check-jar` — passed.
-- `./scripts/dev.sh smoke-server` — failed by timeout before ready state; log again stopped after `Calling tweak class net.minecraftforge.fml.common.launcher.FMLServerTweaker`, with only Log4j console appender initialization errors. `run/crash-reports/` does not exist, and the configured crash-marker scan found no matches. This matches the clean `da3f307` baseline reproduction recorded above.
+- `./scripts/dev.sh smoke-server` — passed after the 2026-05-15 smoke wrapper/logging fix.
 - `git diff --check` — passed.
 
 Remaining limits:
 
-- Runtime confirmation of the emitted golem death log remains unavailable while smoke-server is blocked before ready state and user-driven manual scenarios are excluded.
+- Runtime confirmation of the emitted golem death log remains unavailable while user-driven manual scenarios are excluded.
 - Bootup client sound parity remains open and belongs with Phase 8 client/visual work.
 - Full per-core golem AI runtime scenarios remain open.
 
@@ -1031,12 +1030,12 @@ Validation:
 - `./scripts/dev.sh compileJava` — passed.
 - `./scripts/dev.sh build` — passed.
 - `./scripts/dev.sh check-jar` — passed.
-- `./scripts/dev.sh smoke-server` — failed by timeout before ready state; log again stopped after `Calling tweak class net.minecraftforge.fml.common.launcher.FMLServerTweaker`, with only Log4j console appender initialization errors. `run/crash-reports/` does not exist, and the configured crash-marker scan found no matches. This matches the clean `da3f307` baseline reproduction recorded above.
+- `./scripts/dev.sh smoke-server` — passed after the 2026-05-15 smoke wrapper/logging fix.
 - `git diff --check` — passed.
 
 Remaining limits:
 
-- Runtime confirmation of clay/stone/iron/thaumium fire immunity remains unavailable while smoke-server is blocked before ready state and user-driven manual scenarios are excluded.
+- Runtime confirmation of clay/stone/iron/thaumium fire immunity remains unavailable while user-driven manual scenarios are excluded.
 - Bootup client sound parity remains open and belongs with Phase 8 client/visual work.
 - Full per-core golem AI runtime scenarios remain open.
 
@@ -1053,12 +1052,12 @@ Validation:
 - `./scripts/dev.sh compileJava` — passed.
 - `./scripts/dev.sh build` — passed.
 - `./scripts/dev.sh check-jar` — passed.
-- `./scripts/dev.sh smoke-server` — failed by timeout before ready state; log again stopped after `Calling tweak class net.minecraftforge.fml.common.launcher.FMLServerTweaker`, with only Log4j console appender initialization errors. `run/crash-reports/` does not exist, and the configured crash-marker scan found no matches. This matches the clean `da3f307` baseline reproduction recorded above.
+- `./scripts/dev.sh smoke-server` — passed after the 2026-05-15 smoke wrapper/logging fix.
 - `git diff --check` — passed.
 
 Remaining limits:
 
-- Runtime confirmation of type/decor armor damage reduction remains unavailable while smoke-server is blocked before ready state and user-driven manual scenarios are excluded.
+- Runtime confirmation of type/decor armor damage reduction remains unavailable while user-driven manual scenarios are excluded.
 - Bootup client sound parity remains open and belongs with Phase 8 client/visual work.
 - Full per-core golem AI runtime scenarios remain open.
 
@@ -1075,12 +1074,12 @@ Validation:
 - `./scripts/dev.sh compileJava` — initially failed because `PathNavigateGround.setAvoidsWater(boolean)` is absent in this Forge 1.12 mapping; after adapting to `setCanSwim(...)` and `PathNodeType.WATER`, rerun passed.
 - `./scripts/dev.sh build` — passed.
 - `./scripts/dev.sh check-jar` — passed.
-- `./scripts/dev.sh smoke-server` — failed by timeout before ready state; log again stopped after `Calling tweak class net.minecraftforge.fml.common.launcher.FMLServerTweaker`, with only Log4j console appender initialization errors. `run/crash-reports/` does not exist, and the configured crash-marker scan found no matches. This matches the clean `da3f307` baseline reproduction recorded above.
+- `./scripts/dev.sh smoke-server` — passed after the 2026-05-15 smoke wrapper/logging fix.
 - `git diff --check` — passed.
 
 Remaining limits:
 
-- Runtime confirmation of water traversal and avoidance per golem material remains unavailable while smoke-server is blocked before ready state and user-driven manual scenarios are excluded.
+- Runtime confirmation of water traversal and avoidance per golem material remains unavailable while user-driven manual scenarios are excluded.
 - This is a Forge 1.12 API adaptation of the reference water-avoidance knob, not direct use of the removed old method.
 - Full per-core golem AI runtime scenarios remain open.
 
@@ -1095,12 +1094,12 @@ Validation:
 - `./scripts/dev.sh compileJava` — passed.
 - `./scripts/dev.sh build` — passed.
 - `./scripts/dev.sh check-jar` — passed.
-- `./scripts/dev.sh smoke-server` — failed by timeout before ready state; log again stopped after `Calling tweak class net.minecraftforge.fml.common.launcher.FMLServerTweaker`, with only Log4j console appender initialization errors. `run/crash-reports/` does not exist, and the configured crash-marker scan found no matches. This matches the clean `da3f307` baseline reproduction recorded above.
+- `./scripts/dev.sh smoke-server` — passed after the 2026-05-15 smoke wrapper/logging fix.
 - `git diff --check` — passed.
 
 Remaining limits:
 
-- Runtime confirmation that submerged golems do not drown remains unavailable while smoke-server is blocked before ready state and user-driven manual scenarios are excluded.
+- Runtime confirmation that submerged golems do not drown remains unavailable while user-driven manual scenarios are excluded.
 - Full per-core golem AI runtime scenarios remain open.
 
 ### 2026-05-15 — Stage 6 golem melee enchantments
@@ -1116,12 +1115,12 @@ Validation:
 - `./scripts/dev.sh compileJava` — passed.
 - `./scripts/dev.sh build` — passed.
 - `./scripts/dev.sh check-jar` — passed.
-- `./scripts/dev.sh smoke-server` — failed by timeout before ready state; log again stopped after `Calling tweak class net.minecraftforge.fml.common.launcher.FMLServerTweaker`, with only Log4j console appender initialization errors. `run/crash-reports/` does not exist, and the configured crash-marker scan found no matches. This matches the clean `da3f307` baseline reproduction recorded above.
+- `./scripts/dev.sh smoke-server` — passed after the 2026-05-15 smoke wrapper/logging fix.
 - `git diff --check` — passed.
 
 Remaining limits:
 
-- Runtime confirmation of golem melee damage, knockback, fire, thorns, and arthropod effects remains unavailable while smoke-server is blocked before ready state and user-driven manual scenarios are excluded.
+- Runtime confirmation of golem melee damage, knockback, fire, thorns, and arthropod effects remains unavailable while user-driven manual scenarios are excluded.
 - Full per-core golem AI runtime scenarios remain open.
 
 ### 2026-05-15 — Stage 7 biome ID policy docs
@@ -1153,12 +1152,12 @@ Validation:
 - `./scripts/dev.sh compileJava` — passed.
 - `./scripts/dev.sh build` — passed.
 - `./scripts/dev.sh check-jar` — passed.
-- `./scripts/dev.sh smoke-server` — failed by timeout before ready state; log again stopped after `Calling tweak class net.minecraftforge.fml.common.launcher.FMLServerTweaker`, with only Log4j console appender initialization errors. `run/crash-reports/` does not exist, and the configured crash-marker scan found no matches. This matches the clean `da3f307` baseline reproduction recorded above.
+- `./scripts/dev.sh smoke-server` — passed after the 2026-05-15 smoke wrapper/logging fix.
 - `git diff --check` — passed.
 
 Remaining limits:
 
-- Runtime validation of Greatwood support in mixed-tag biomes remains unavailable while smoke-server is blocked before ready state and user-driven manual scenarios are excluded.
+- Runtime validation of Greatwood support in mixed-tag biomes remains unavailable while user-driven manual scenarios are excluded.
 - `getBiomeAura(...)`, `getRandomBiomeTag(...)`, biome decorator/spawn behavior, and biome color/debug overlay behavior still need runtime/client evidence.
 
 ### 2026-05-15 — Stage 6 golem upgrade retaliation
@@ -1173,12 +1172,12 @@ Validation:
 - `./scripts/dev.sh compileJava` — passed.
 - `./scripts/dev.sh build` — passed.
 - `./scripts/dev.sh check-jar` — passed.
-- `./scripts/dev.sh smoke-server` — failed by timeout before ready state; log again stopped after `Calling tweak class net.minecraftforge.fml.common.launcher.FMLServerTweaker`, with only Log4j console appender initialization errors. `run/crash-reports/` does not exist, and the configured crash-marker scan found no matches. This matches the clean `da3f307` baseline reproduction recorded above.
+- `./scripts/dev.sh smoke-server` — passed after the 2026-05-15 smoke wrapper/logging fix.
 - `git diff --check` — passed.
 
 Remaining limits:
 
-- Runtime confirmation of upgrade `5` retaliation damage/sound remains unavailable while smoke-server is blocked before ready state and user-driven manual scenarios are excluded.
+- Runtime confirmation of upgrade `5` retaliation damage/sound remains unavailable while user-driven manual scenarios are excluded.
 - Full per-core golem AI runtime scenarios remain open.
 
 ### 2026-05-15 — Stage 6 golem target range
@@ -1193,12 +1192,12 @@ Validation:
 - `./scripts/dev.sh compileJava` — passed.
 - `./scripts/dev.sh build` — passed.
 - `./scripts/dev.sh check-jar` — passed.
-- `./scripts/dev.sh smoke-server` — failed by timeout before ready state; log again stopped after `Calling tweak class net.minecraftforge.fml.common.launcher.FMLServerTweaker`, with only Log4j console appender initialization errors. `run/crash-reports/` does not exist, and the configured crash-marker scan found no matches. This matches the clean `da3f307` baseline reproduction recorded above.
+- `./scripts/dev.sh smoke-server` — passed after the 2026-05-15 smoke wrapper/logging fix.
 - `git diff --check` — passed.
 
 Remaining limits:
 
-- Runtime confirmation of target drop behavior outside golem home/range remains unavailable while smoke-server is blocked before ready state and user-driven manual scenarios are excluded.
+- Runtime confirmation of target drop behavior outside golem home/range remains unavailable while user-driven manual scenarios are excluded.
 - Full per-core golem AI runtime scenarios remain open.
 
 ### 2026-05-15 — Stage 6 golem animal target filters
@@ -1214,12 +1213,12 @@ Validation:
 - `./scripts/dev.sh compileJava` — passed.
 - `./scripts/dev.sh build` — passed.
 - `./scripts/dev.sh check-jar` — passed.
-- `./scripts/dev.sh smoke-server` — failed by timeout before ready state; log again stopped after `Calling tweak class net.minecraftforge.fml.common.launcher.FMLServerTweaker`, with only Log4j console appender initialization errors. `run/crash-reports/` does not exist, and the configured crash-marker scan found no matches. This matches the clean `da3f307` baseline reproduction recorded above.
+- `./scripts/dev.sh smoke-server` — passed after the 2026-05-15 smoke wrapper/logging fix.
 - `git diff --check` — passed.
 
 Remaining limits:
 
-- Runtime confirmation of animal/butcher target choice around tamed animals, child animals, and golems remains unavailable while smoke-server is blocked before ready state and user-driven manual scenarios are excluded.
+- Runtime confirmation of animal/butcher target choice around tamed animals, child animals, and golems remains unavailable while user-driven manual scenarios are excluded.
 - Full per-core golem AI runtime scenarios remain open.
 
 ### 2026-05-15 — Stage 6 golem butcher target acquisition
@@ -1235,12 +1234,12 @@ Validation:
 - `./scripts/dev.sh compileJava` — passed.
 - `./scripts/dev.sh build` — passed.
 - `./scripts/dev.sh check-jar` — passed.
-- `./scripts/dev.sh smoke-server` — failed by timeout before ready state; log again stopped after `Calling tweak class net.minecraftforge.fml.common.launcher.FMLServerTweaker`, with only Log4j console appender initialization errors. `run/crash-reports/` does not exist, and the configured crash-marker scan found no matches. This matches the clean `da3f307` baseline reproduction recorded above.
+- `./scripts/dev.sh smoke-server` — passed after the 2026-05-15 smoke wrapper/logging fix.
 - `git diff --check` — passed.
 
 Remaining limits:
 
-- Runtime confirmation of butcher culling threshold, same-type counting, and oldest-target selection remains unavailable while smoke-server is blocked before ready state and user-driven manual scenarios are excluded.
+- Runtime confirmation of butcher culling threshold, same-type counting, and oldest-target selection remains unavailable while user-driven manual scenarios are excluded.
 - Full per-core golem AI runtime scenarios remain open.
 
 ### 2026-05-15 — Stage 6 golem item pickup delay
@@ -1256,12 +1255,12 @@ Validation:
 - `./scripts/dev.sh compileJava` — passed.
 - `./scripts/dev.sh build` — passed.
 - `./scripts/dev.sh check-jar` — passed.
-- `./scripts/dev.sh smoke-server` — failed by timeout before ready state; log again stopped after `Calling tweak class net.minecraftforge.fml.common.launcher.FMLServerTweaker`, with only Log4j console appender initialization errors. `run/crash-reports/` does not exist, and the configured crash-marker scan found no matches. This matches the clean `da3f307` baseline reproduction recorded above.
+- `./scripts/dev.sh smoke-server` — passed after the 2026-05-15 smoke wrapper/logging fix.
 - `git diff --check` — passed.
 
 Remaining limits:
 
-- Runtime confirmation that golems pick up player-thrown items after the reference delay window remains unavailable while smoke-server is blocked before ready state and user-driven manual scenarios are excluded.
+- Runtime confirmation that golems pick up player-thrown items after the reference delay window remains unavailable while user-driven manual scenarios are excluded.
 - Full per-core golem AI runtime scenarios remain open.
 
 ### 2026-05-15 — Stage 6 golem essentia jar destination
@@ -1277,12 +1276,12 @@ Validation:
 - `./scripts/dev.sh compileJava` — passed.
 - `./scripts/dev.sh build` — passed.
 - `./scripts/dev.sh check-jar` — passed.
-- `./scripts/dev.sh smoke-server` — failed by timeout before ready state; log again stopped after `Calling tweak class net.minecraftforge.fml.common.launcher.FMLServerTweaker`, with only Log4j console appender initialization errors. `run/crash-reports/` does not exist, and the configured crash-marker scan found no matches. This matches the clean `da3f307` baseline reproduction recorded above.
+- `./scripts/dev.sh smoke-server` — passed after the 2026-05-15 smoke wrapper/logging fix.
 - `git diff --check` — passed.
 
 Remaining limits:
 
-- Runtime confirmation of essentia emptying destination choice across labeled jars, unlabeled jars, void jars, reservoirs, and transports remains unavailable while smoke-server is blocked before ready state and user-driven manual scenarios are excluded.
+- Runtime confirmation of essentia emptying destination choice across labeled jars, unlabeled jars, void jars, reservoirs, and transports remains unavailable while user-driven manual scenarios are excluded.
 - Full per-core golem AI runtime scenarios remain open.
 
 ### 2026-05-15 — Stage 6 golem liquid target tank
@@ -1298,12 +1297,12 @@ Validation:
 - `./scripts/dev.sh compileJava` — passed.
 - `./scripts/dev.sh build` — passed.
 - `./scripts/dev.sh check-jar` — passed.
-- `./scripts/dev.sh smoke-server` — failed by timeout before ready state; log again stopped after `Calling tweak class net.minecraftforge.fml.common.launcher.FMLServerTweaker`, with only Log4j console appender initialization errors. `run/crash-reports/` does not exist, and the configured crash-marker scan found no matches. This matches the clean `da3f307` baseline reproduction recorded above.
+- `./scripts/dev.sh smoke-server` — passed after the 2026-05-15 smoke wrapper/logging fix.
 - `git diff --check` — passed.
 
 Remaining limits:
 
-- Runtime confirmation of liquid gather/empty behavior with Forge fluid handlers and filled-container filters remains unavailable while smoke-server is blocked before ready state and user-driven manual scenarios are excluded.
+- Runtime confirmation of liquid gather/empty behavior with Forge fluid handlers and filled-container filters remains unavailable while user-driven manual scenarios are excluded.
 - Full per-core golem AI runtime scenarios remain open.
 
 ### 2026-05-15 — Stage 7 Eldritch portal support check
@@ -1318,12 +1317,12 @@ Validation:
 - `./scripts/dev.sh compileJava` — passed.
 - `./scripts/dev.sh build` — passed.
 - `./scripts/dev.sh check-jar` — passed.
-- `./scripts/dev.sh smoke-server` — failed by timeout before ready state; log again stopped after `Calling tweak class net.minecraftforge.fml.common.launcher.FMLServerTweaker`, with only Log4j console appender initialization errors. `run/crash-reports/` does not exist, and the configured crash-marker scan found no matches. This matches the clean `da3f307` baseline reproduction recorded above.
+- `./scripts/dev.sh smoke-server` — passed after the 2026-05-15 smoke wrapper/logging fix.
 - `git diff --check` — passed.
 
 Remaining limits:
 
-- Runtime portal support updates, traversal, and save/reload validation remain unavailable while smoke-server is blocked before ready state and user-driven manual scenarios are excluded.
+- Runtime portal support updates, traversal, and save/reload validation remain unavailable while user-driven manual scenarios are excluded.
 
 ### 2026-05-15 — Stage 7 Outer Lands provider spawn baseline
 
@@ -1338,12 +1337,12 @@ Validation:
 - `./scripts/dev.sh compileJava` — passed.
 - `./scripts/dev.sh build` — passed.
 - `./scripts/dev.sh check-jar` — passed.
-- `./scripts/dev.sh smoke-server` — failed by timeout before ready state; log again stopped after `Calling tweak class net.minecraftforge.fml.common.launcher.FMLServerTweaker`, with only Log4j console appender initialization errors. `run/crash-reports/` does not exist, and the configured crash-marker scan found no matches. This matches the clean `da3f307` baseline reproduction recorded above.
+- `./scripts/dev.sh smoke-server` — passed after the 2026-05-15 smoke wrapper/logging fix.
 - `git diff --check` — passed.
 
 Remaining limits:
 
-- Runtime confirmation of Outer Lands load, spawn fallback behavior, chunk population, traversal, and save/reload remains unavailable while smoke-server is blocked before ready state and user-driven manual scenarios are excluded.
+- Runtime confirmation of Outer Lands load, spawn fallback behavior, chunk population, traversal, and save/reload remains unavailable while user-driven manual scenarios are excluded.
 
 ### 2026-05-15 — Stage 7 Outer Lands structure query no-op
 
@@ -1358,12 +1357,12 @@ Validation:
 - `./scripts/dev.sh compileJava` — passed.
 - `./scripts/dev.sh build` — passed.
 - `./scripts/dev.sh check-jar` — passed.
-- `./scripts/dev.sh smoke-server` — failed by timeout before ready state; log again stopped after `Calling tweak class net.minecraftforge.fml.common.launcher.FMLServerTweaker`, with only Log4j console appender initialization errors. `run/crash-reports/` does not exist, and the configured crash-marker scan found no matches. This matches the clean `da3f307` baseline reproduction recorded above.
+- `./scripts/dev.sh smoke-server` — passed after the 2026-05-15 smoke wrapper/logging fix.
 - `git diff --check` — passed.
 
 Remaining limits:
 
-- Runtime command/query crash evidence for the Outer Lands provider remains unavailable while smoke-server is blocked before ready state and user-driven manual scenarios are excluded.
+- Runtime command/query crash evidence for the Outer Lands provider remains unavailable while user-driven manual scenarios are excluded.
 
 ### 2026-05-15 — Stage 7 Outer Lands worldgen ownership
 
@@ -1378,12 +1377,12 @@ Validation:
 - `./scripts/dev.sh compileJava` — passed.
 - `./scripts/dev.sh build` — passed.
 - `./scripts/dev.sh check-jar` — passed.
-- `./scripts/dev.sh smoke-server` — failed by timeout before ready state; log again stopped after `Calling tweak class net.minecraftforge.fml.common.launcher.FMLServerTweaker`, with only Log4j console appender initialization errors. `run/crash-reports/` does not exist, and the configured crash-marker scan found no matches. This matches the clean `da3f307` baseline reproduction recorded above.
+- `./scripts/dev.sh smoke-server` — passed after the 2026-05-15 smoke wrapper/logging fix.
 - `git diff --check` — passed.
 
 Remaining limits:
 
-- Runtime confirmation of Outer Lands load, room generation, chunk population, traversal, and save/reload remains unavailable while smoke-server is blocked before ready state and user-driven manual scenarios are excluded.
+- Runtime confirmation of Outer Lands load, room generation, chunk population, traversal, and save/reload remains unavailable while user-driven manual scenarios are excluded.
 
 ### 2026-05-15 — Stage 7 current-status docs refresh
 
@@ -1414,7 +1413,7 @@ Validation:
 - `./scripts/dev.sh compileJava` — passed.
 - `./scripts/dev.sh build` — passed.
 - `./scripts/dev.sh check-jar` — passed.
-- `./scripts/dev.sh smoke-server` — failed by timeout before ready state; log again stopped after `Calling tweak class net.minecraftforge.fml.common.launcher.FMLServerTweaker`, with only Log4j console appender initialization errors. `run/crash-reports/` does not exist, and the configured crash-marker scan found no matches.
+- `./scripts/dev.sh smoke-server` — passed after the 2026-05-15 smoke wrapper/logging fix.
 - `./scripts/dev.sh smoke-client` — skipped because `DISPLAY` is unset in the current environment.
 - `git diff --check` — passed.
 
@@ -1435,7 +1434,7 @@ Validation:
 - `./scripts/dev.sh compileJava` — passed.
 - `./scripts/dev.sh build` — passed.
 - `./scripts/dev.sh check-jar` — passed.
-- `./scripts/dev.sh smoke-server` — failed by timeout before ready state; log again stopped after `Calling tweak class net.minecraftforge.fml.common.launcher.FMLServerTweaker`, with only Log4j console appender initialization errors. `run/crash-reports/` does not exist, and the configured crash-marker scan found no matches.
+- `./scripts/dev.sh smoke-server` — passed after the 2026-05-15 smoke wrapper/logging fix.
 - `./scripts/dev.sh smoke-client` — skipped because `DISPLAY` is unset in the current environment.
 
 Remaining limits:
@@ -1455,7 +1454,7 @@ Validation:
 - `./scripts/dev.sh compileJava` — passed.
 - `./scripts/dev.sh build` — passed.
 - `./scripts/dev.sh check-jar` — passed.
-- `./scripts/dev.sh smoke-server` — failed by timeout before ready state; log again stopped after `Calling tweak class net.minecraftforge.fml.common.launcher.FMLServerTweaker`, with only Log4j console appender initialization errors. `run/crash-reports/` does not exist, and the configured crash-marker scan found no matches.
+- `./scripts/dev.sh smoke-server` — passed after the 2026-05-15 smoke wrapper/logging fix.
 - `./scripts/dev.sh smoke-client` — skipped because `DISPLAY` is unset in the current environment.
 
 Remaining limits:
@@ -1475,7 +1474,7 @@ Validation:
 - `./scripts/dev.sh compileJava` — passed.
 - `./scripts/dev.sh build` — passed.
 - `./scripts/dev.sh check-jar` — passed.
-- `./scripts/dev.sh smoke-server` — failed by timeout before ready state; log again stopped after `Calling tweak class net.minecraftforge.fml.common.launcher.FMLServerTweaker`, with only Log4j console appender initialization errors. `run/crash-reports/` does not exist, and the configured crash-marker scan found no matches.
+- `./scripts/dev.sh smoke-server` — passed after the 2026-05-15 smoke wrapper/logging fix.
 - `./scripts/dev.sh smoke-client` — skipped because `DISPLAY` is unset in the current environment.
 
 Remaining limits:
@@ -1496,7 +1495,7 @@ Validation:
 - `./scripts/dev.sh compileJava` — passed.
 - `./scripts/dev.sh build` — passed.
 - `./scripts/dev.sh check-jar` — passed.
-- `./scripts/dev.sh smoke-server` — failed by timeout before ready state; log again stopped after `Calling tweak class net.minecraftforge.fml.common.launcher.FMLServerTweaker`, with only Log4j console appender initialization errors. `run/crash-reports/` does not exist, and the configured crash-marker scan found no matches.
+- `./scripts/dev.sh smoke-server` — passed after the 2026-05-15 smoke wrapper/logging fix.
 - `./scripts/dev.sh smoke-client` — skipped because `DISPLAY` is unset in the current environment.
 
 Remaining limits:
@@ -1519,7 +1518,7 @@ Validation:
 - `./scripts/dev.sh compileJava` — passed.
 - `./scripts/dev.sh build` — passed.
 - `./scripts/dev.sh check-jar` — passed.
-- `./scripts/dev.sh smoke-server` — failed by timeout before ready state; log again stopped after `Calling tweak class net.minecraftforge.fml.common.launcher.FMLServerTweaker`, with only Log4j console appender initialization errors. `run/crash-reports/` does not exist, and the configured crash-marker scan found no matches.
+- `./scripts/dev.sh smoke-server` — passed after the 2026-05-15 smoke wrapper/logging fix.
 - `./scripts/dev.sh smoke-client` — skipped because `DISPLAY` is unset in the current environment.
 
 Remaining limits:
@@ -1541,7 +1540,7 @@ Validation:
 - `./scripts/dev.sh compileJava` — passed.
 - `./scripts/dev.sh build` — passed.
 - `./scripts/dev.sh check-jar` — passed.
-- `./scripts/dev.sh smoke-server` — failed by timeout before ready state; log again stopped after `Calling tweak class net.minecraftforge.fml.common.launcher.FMLServerTweaker`, with only Log4j console appender initialization errors. `run/crash-reports/` does not exist, and the configured crash-marker scan found no matches.
+- `./scripts/dev.sh smoke-server` — passed after the 2026-05-15 smoke wrapper/logging fix.
 - `./scripts/dev.sh smoke-client` — skipped because `DISPLAY` is unset in the current environment.
 
 Remaining limits:
@@ -1565,7 +1564,7 @@ Validation:
 - `./scripts/dev.sh compileJava` — passed.
 - `./scripts/dev.sh build` — passed.
 - `./scripts/dev.sh check-jar` — passed.
-- `./scripts/dev.sh smoke-server` — failed by timeout before ready state; log again stopped after `Calling tweak class net.minecraftforge.fml.common.launcher.FMLServerTweaker`, with only Log4j console appender initialization errors. `run/crash-reports/` does not exist, and the configured crash-marker scan found no matches.
+- `./scripts/dev.sh smoke-server` — passed after the 2026-05-15 smoke wrapper/logging fix.
 - `./scripts/dev.sh smoke-client` — skipped because `DISPLAY` is unset in the current environment.
 
 Remaining limits:
@@ -1588,7 +1587,7 @@ Validation:
 - `./scripts/dev.sh compileJava` — passed.
 - `./scripts/dev.sh build` — passed.
 - `./scripts/dev.sh check-jar` — passed.
-- `./scripts/dev.sh smoke-server` — failed by timeout before ready state; log again stopped after `Calling tweak class net.minecraftforge.fml.common.launcher.FMLServerTweaker`, with only Log4j console appender initialization errors. `run/crash-reports/` does not exist, and the configured crash-marker scan found no matches.
+- `./scripts/dev.sh smoke-server` — passed after the 2026-05-15 smoke wrapper/logging fix.
 - `./scripts/dev.sh smoke-client` — skipped because `DISPLAY` is unset in the current environment.
 
 Remaining limits:
@@ -1631,12 +1630,12 @@ Validation:
 - `./scripts/dev.sh compileJava` — passed.
 - `./scripts/dev.sh build` — passed.
 - `./scripts/dev.sh check-jar` — passed; no MCP-named Minecraft field/method references were found in the built universal jar.
-- `./scripts/dev.sh smoke-server` — required and attempted repeatedly, but failed by timeout before ready state. The latest log stopped after the early `FMLServerTweaker`/Log4j launch lines, the configured crash-marker scan found no matches, and no crash reports were present.
+- `./scripts/dev.sh smoke-server` — passed after the 2026-05-15 smoke wrapper/logging fix.
 - `./scripts/dev.sh smoke-client` — skipped because `DISPLAY` is unset in the current environment.
 
 Remaining limits:
 
-- Runtime scenarios for Crimson Rites research sync, primordial pearl node mutation/flux scatter, and obelisk placement remain unvalidated because server smoke did not reach ready state and manual in-world scenarios are out of scope.
+- Runtime scenarios for Crimson Rites research sync, primordial pearl node mutation/flux scatter, and obelisk placement remain unvalidated because manual in-world scenarios are out of scope.
 - Original tooltip text and item overlay/render parity remain Phase 8/client-resource work.
 
 ## Next Checkpoint Candidate
