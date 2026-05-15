@@ -1420,6 +1420,26 @@ Remaining limits:
 
 - Hover Harness H-key toggle path, on/off sounds, anti-float counter reset parity, tooltip parity, and manual fuel/toggle/fall validation remain open.
 
+### 2026-05-15 — Stage 5 Hover Harness tooltip and rarity
+
+Scope:
+
+- Restored reference rarity values for Hover Harness (`EPIC`) and Hover Girdle (`RARE`).
+- Restored Hover Harness stored-jar tooltip behavior for discovered aspect counts, unknown aspect fallback text, and vis-discount lines.
+- Added the original `tc.visdiscount` and `tc.aspect.unknown` language keys needed by the tooltip.
+
+Validation:
+
+- `./scripts/dev.sh compileJava` — passed.
+- `./scripts/dev.sh build` — passed.
+- `./scripts/dev.sh check-jar` — failed before jar inspection because the wrapper's expected MCP mapping cache file is still absent at `.gradle_home/caches/minecraft/de/oceanlabs/mcp/mcp_stable/39/1.12.2/srgs/mcp-srg.srg`.
+- `./scripts/dev.sh smoke-server` — failed by timeout before ready state; log again stopped after `Calling tweak class net.minecraftforge.fml.common.launcher.FMLServerTweaker`, with only Log4j console appender initialization errors. `run/crash-reports/` does not exist, and the configured crash-marker scan found no matches.
+- `./scripts/dev.sh smoke-client` — skipped because `DISPLAY` is unset in the current environment.
+
+Remaining limits:
+
+- Hover Harness H-key toggle path, on/off sounds, anti-float counter reset parity, client/manual tooltip display validation, and manual fuel/toggle/fall validation remain open.
+
 ## Next Checkpoint Candidate
 
 After the golem carried-display, trunk transfer, death logging, fire-resistance, armor, water-pathing, no-drowning, melee-enchantment, upgrade-retaliation, target-range, animal-target-filter, butcher-acquisition, item-pickup-delay, essentia-jar-destination, liquid-target-tank, portal-support, outer-provider-spawn, outer-structure-query, outer-worldgen-ownership, Stage7-docs-refresh, hover-motion, biome policy, and Greatwood-support checkpoints, the next pre-Phase8 candidates are:

@@ -973,3 +973,21 @@ Validation evidence for this checkpoint:
 - `git diff --check` — passed.
 
 GAP-5 is advanced but not closed. Remaining Hover work includes the actual client H-key toggle path, reference on/off sounds, anti-float counter reset parity if safely portable, tooltip parity for stored jar aspects/discounts, and manual in-world fuel/toggle/fall validation.
+
+### 8.15 2026-05-15 Hover Harness tooltip and rarity checkpoint
+
+Implemented in the current checkpoint:
+
+- Restored the reference Hover Harness rarity as epic and Hover Girdle rarity as rare.
+- Restored the Hover Harness tooltip surface for its stored `jar` NBT: stored jar aspects are listed by discovered aspect name/count, undiscovered aspects use the original unknown-aspect text, and both reference vis-discount lines are shown.
+- Added the original `tc.visdiscount` and `tc.aspect.unknown` language keys used by the restored tooltip.
+
+Validation evidence for this checkpoint:
+
+- `./scripts/dev.sh compileJava` — passed.
+- `./scripts/dev.sh build` — passed.
+- `./scripts/dev.sh check-jar` — failed before jar inspection because the wrapper's expected MCP mapping cache file is still absent at `.gradle_home/caches/minecraft/de/oceanlabs/mcp/mcp_stable/39/1.12.2/srgs/mcp-srg.srg`.
+- `./scripts/dev.sh smoke-server` — failed by timeout before ready state; log again stopped after `Calling tweak class net.minecraftforge.fml.common.launcher.FMLServerTweaker`, with only Log4j console appender initialization errors. `run/crash-reports/` does not exist, and the configured crash-marker scan found no matches.
+- `./scripts/dev.sh smoke-client` — skipped because `DISPLAY` is unset in the current environment.
+
+GAP-5 is advanced but not closed. Remaining Hover work includes the actual client H-key toggle path, reference on/off sounds, anti-float counter reset parity if safely portable, client/manual tooltip display validation, and manual in-world fuel/toggle/fall validation.
