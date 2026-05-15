@@ -169,7 +169,7 @@ Depends on GAP-1 item registration. Some visual status bytes are Phase 8, but se
 - `thaumcraft_src/thaumcraft/common/entities/golems/EntityGolemBase.class`
 
 **Что не совпадает:**
-Current AI classes exist and `EntityGolemBase.setupGolem()` wires all reference core categories (`EntityGolemBase.java:152-213`), but there is no runtime evidence for inventory/fluid/essentia interactions. Helper logic depends on block/tile APIs and inventory semantics that changed between 1.7.10 and 1.12.2. Checkpoint 8.2.34 restores butcher target acquisition from the original AI: the task sorts candidates by age and only starts when more than two valid same-type targets are nearby. Checkpoint 8.2.35 restores golem item-pickup delay handling so player-thrown items are skipped only while their pickup delay is still high instead of being ignored forever. Checkpoint 8.2.36 restores the reference nearest-candidate selection and void-jar penalty for essentia emptying destinations. Remaining null-return paths in `GolemHelper` and AI classes may be valid search failures, but they have not been proven equivalent under real containers, Forge capabilities, fluids, and tile entities.
+Current AI classes exist and `EntityGolemBase.setupGolem()` wires all reference core categories (`EntityGolemBase.java:152-213`), but there is no runtime evidence for inventory/fluid/essentia interactions. Helper logic depends on block/tile APIs and inventory semantics that changed between 1.7.10 and 1.12.2. Checkpoint 8.2.34 restores butcher target acquisition from the original AI: the task sorts candidates by age and only starts when more than two valid same-type targets are nearby. Checkpoint 8.2.35 restores golem item-pickup delay handling so player-thrown items are skipped only while their pickup delay is still high instead of being ignored forever. Checkpoint 8.2.36 restores the reference nearest-candidate selection and void-jar penalty for essentia emptying destinations. Checkpoint 8.2.37 restores liquid-core missing-fluid discovery to query the home-adjacent target tank instead of marked source tanks. Remaining null-return paths in `GolemHelper` and AI classes may be valid search failures, but they have not been proven equivalent under real containers, Forge capabilities, fluids, and tile entities.
 
 **Что нужно доделать:**
 Run focused manual/server validation per golem core and fix any API mismatch found in AI/helper methods.
@@ -181,6 +181,7 @@ Run focused manual/server validation per golem core and fix any API mismatch fou
 - Butcher target acquisition is restored; verify culling threshold and oldest-target selection in runtime.
 - Item pickup delay handling is restored; verify recently thrown items become eligible after the reference delay window.
 - Essentia jar destination selection is restored; verify nearest non-void/void target choice in runtime.
+- Liquid target-tank discovery is restored; verify fluid empty/gather loops against home-adjacent target tanks in runtime.
 - Fix task priority or helper API mismatches in the specific AI classes that fail scenarios.
 
 **Критерии приемки:**
@@ -1545,6 +1546,29 @@ Mapping:
 Оставшиеся ограничения:
 
 - Runtime confirmation of essentia emptying destination choice across labeled jars, unlabeled jars, void jars, reservoirs, and transports remains unavailable while smoke-server is blocked before ready state and manual scenarios are excluded.
+- Full per-core golem AI runtime scenarios remain open.
+
+### 8.2.37 Golem liquid target tank checkpoint — 2026-05-15
+
+Статус: reference home-tank missing-fluid discovery restored; runtime fluid evidence remains open.
+
+Что сделано:
+
+- Restored `GolemHelper.getMissingLiquids(...)` to inspect the home-adjacent target fluid handler, matching the original flow that decides what the golem should fetch or empty into.
+- Adapted the original `IFluidHandler.canFill(...)` and fluid-container filter to Forge 1.12.2 capabilities with simulated `IFluidHandler.fill(...)` and `FluidUtil.getFluidContained(...)`.
+- Preserved the reference constraint that an already-carried fluid restricts candidates to the same fluid.
+
+Проверки:
+
+- `./scripts/dev.sh compileJava` — passed.
+- `./scripts/dev.sh build` — passed.
+- `./scripts/dev.sh check-jar` — не дошел до jar inspection: отсутствует wrapper-ожидаемый MCP mapping cache `.gradle_home/caches/minecraft/de/oceanlabs/mcp/mcp_stable/39/1.12.2/srgs/mcp-srg.srg`.
+- `./scripts/dev.sh smoke-server` — timeout before ready state на уже задокументированном pre-Forge/log4j этапе; `run/crash-reports/` не существует, and the configured crash-marker scan found no matches.
+- `git diff --check` — passed.
+
+Оставшиеся ограничения:
+
+- Runtime confirmation of liquid gather/empty behavior with Forge fluid handlers and filled-container filters remains unavailable while smoke-server is blocked before ready state and manual scenarios are excluded.
 - Full per-core golem AI runtime scenarios remain open.
 
 ### 8.3 Minimal Stage 6 manual scenario matrix

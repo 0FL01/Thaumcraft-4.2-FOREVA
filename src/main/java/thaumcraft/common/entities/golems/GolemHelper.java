@@ -15,10 +15,10 @@ import net.minecraft.init.Blocks;
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidRegistry;
 import net.minecraftforge.fluids.FluidStack;
+import net.minecraftforge.fluids.FluidUtil;
 import net.minecraftforge.fluids.IFluidBlock;
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandler;
-import net.minecraftforge.fluids.capability.IFluidTankProperties;
 import thaumcraft.api.aspects.Aspect;
 import thaumcraft.api.aspects.IEssentiaTransport;
 import thaumcraft.common.config.Config;
@@ -757,48 +757,46 @@ public class GolemHelper {
 
     public static ArrayList<FluidStack> getMissingLiquids(EntityGolemBase golem) {
         ensureLiquidsRegistered();
-        ArrayList<FluidStack> missing = new ArrayList<>();
+        ArrayList<FluidStack> out = new ArrayList<>();
 
-        for (Marker marker : golem.getMarkers()) {
-            if (marker.dim != golem.world.provider.getDimension()) continue;
-            BlockPos pos = new BlockPos(marker.x, marker.y, marker.z);
-            TileEntity te = golem.world.getTileEntity(pos);
-            if (te == null) continue;
+        EnumFacing facing = EnumFacing.VALUES[golem.homeFacing % EnumFacing.VALUES.length];
+        BlockPos home = golem.getHomePosition();
+        BlockPos target = home.offset(facing.getOpposite());
+        TileEntity tile = golem.world.getTileEntity(target);
+        if (tile == null) return out;
 
-            for (EnumFacing side : EnumFacing.VALUES) {
-                if (!te.hasCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, side.getOpposite())) continue;
-                IFluidHandler handler = te.getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, side.getOpposite());
-                if (handler == null) continue;
+        EnumFacing capSide = facing.getOpposite();
+        if (!tile.hasCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, capSide)) return out;
+        IFluidHandler handler = tile.getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, capSide);
+        if (handler == null) return out;
 
-                IFluidTankProperties[] tanks = handler.getTankProperties();
-                if (tanks == null) continue;
+        for (Fluid fluid : reggedLiquids) {
+            if (fluid == null) continue;
+            if (golem.fluidCarried != null
+                    && golem.fluidCarried.amount > 0
+                    && !golem.fluidCarried.getFluid().equals(fluid)) {
+                continue;
+            }
 
-                for (IFluidTankProperties tank : tanks) {
-                    FluidStack contents = tank.getContents();
-                    int capacity = tank.getCapacity();
+            FluidStack probe = new FluidStack(fluid, golem.getFluidCarryLimit());
+            if (handler.fill(probe, false) <= 0) continue;
 
-                    if (contents != null && contents.amount > 0 && contents.amount < capacity) {
-                        // Partially filled tank — we need more of this fluid
-                        FluidStack needed = contents.copy();
-                        needed.amount = Math.min(capacity - contents.amount, golem.getFluidCarryLimit());
-                        if (handler.fill(needed.copy(), false) > 0) {
-                            missing.add(needed);
-                        }
-                    } else if (contents == null || contents.amount == 0) {
-                        // Empty tank — accept any registered fluid the handler can take
-                        for (Fluid fluid : reggedLiquids) {
-                            FluidStack test = new FluidStack(fluid, golem.getFluidCarryLimit());
-                            if (handler.fill(test, false) > 0) {
-                                missing.add(new FluidStack(fluid, capacity));
-                                break;
-                            }
-                        }
+            if (golem.inventory.hasSomething()) {
+                boolean found = false;
+                for (int slot = 0; slot < golem.inventory.slotCount; ++slot) {
+                    FluidStack contained = FluidUtil.getFluidContained(golem.inventory.getStackInSlot(slot));
+                    if (contained != null && contained.isFluidEqual(probe)) {
+                        found = true;
+                        break;
                     }
                 }
+                if (!found) continue;
             }
+
+            out.add(new FluidStack(fluid, Integer.MAX_VALUE));
         }
 
-        return missing.isEmpty() ? null : missing;
+        return out;
     }
 
     // --- Marked Fluid Handlers Adjacent to Golem ---
