@@ -595,6 +595,65 @@ public class ConfigResearch {
         ThaumcraftApi.addWarpToResearch("SINSTONE", 2);
 
         new ResearchItem(
+                "LEVITATOR",
+                "ARTIFICE",
+                new AspectList()
+                        .add(Aspect.MOTION, 3)
+                        .add(Aspect.FLIGHT, 3)
+                        .add(Aspect.AIR, 3),
+                -3,
+                -3,
+                1,
+                new ItemStack(ConfigBlocks.blockLifter))
+                .setPages(
+                        new ResearchPage("tc.research_page.LEVITATOR.1"),
+                        new ResearchPage((IArcaneRecipe) recipes.get("Levitator")))
+                .setConcealed()
+                .setParents("NITOR")
+                .registerResearchItem();
+
+        new ResearchItem(
+                "ARCANEBORE",
+                "ARTIFICE",
+                new AspectList()
+                        .add(Aspect.MINE, 6)
+                        .add(Aspect.MOTION, 3)
+                        .add(Aspect.MECHANISM, 3)
+                        .add(Aspect.TOOL, 3),
+                -3,
+                8,
+                2,
+                new ItemStack(ConfigBlocks.blockWoodenDevice, 1, 5))
+                .setPages(
+                        new ResearchPage("tc.research_page.ARCANEBORE.1"),
+                        new ResearchPage((InfusionRecipe) recipes.get("ArcaneBore")),
+                        new ResearchPage("tc.research_page.ARCANEBORE.2"),
+                        new ResearchPage((IArcaneRecipe) recipes.get("ArcaneBoreBase")),
+                        new ResearchPage("tc.research_page.ARCANEBORE.3"))
+                .setConcealed()
+                .setParents("FOCUSEXCAVATION", "INFUSION")
+                .registerResearchItem();
+
+        new ResearchItem(
+                "ARCANELAMP",
+                "ARTIFICE",
+                new AspectList()
+                        .add(Aspect.LIGHT, 3)
+                        .add(Aspect.SENSES, 3)
+                        .add(Aspect.DARKNESS, 3),
+                -3,
+                1,
+                1,
+                new ItemStack(ConfigBlocks.blockMetalDevice, 1, 7))
+                .setPages(
+                        new ResearchPage("tc.research_page.ARCANELAMP.1"),
+                        new ResearchPage((IArcaneRecipe) recipes.get("ArcaneLamp")),
+                        new ResearchPage("ARCANEBORE", "tc.research_page.ARCANELAMP.2"))
+                .setSecondary()
+                .setParents("NITOR")
+                .registerResearchItem();
+
+        new ResearchItem(
                 "INFUSION",
                 "ARTIFICE",
                 new AspectList()
