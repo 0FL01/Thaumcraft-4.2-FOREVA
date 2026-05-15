@@ -677,6 +677,26 @@ Remaining limits:
 - Inhabited Zombie kill scenarios and crab save/reload have not been observed in a runtime world because smoke-server remains environment-blocked and user-driven manual scenarios are excluded.
 - Original Inhabited Zombie cultist helmet/legs/chest spawn equipment remains a content dependency because this branch currently exposes aggregate cultist armor items rather than the original separate helmet/legs/chest fields.
 
+### 2026-05-15 — Stage 6 Cultist baseline attributes
+
+Scope:
+
+- Restored base Cultist size, XP value, break/enter-door navigation flags, 32-block follow range, and 0.3 movement speed from the reference.
+- Removed the non-reference base Cultist max-health override so subclasses own their health values.
+- Restored Cultist Knight max health from `35` to the reference `36`.
+
+Validation:
+
+- `./scripts/dev.sh compileJava` — passed.
+- `./scripts/dev.sh build` — passed.
+- `./scripts/dev.sh check-jar` — failed before jar inspection because the wrapper's expected MCP mapping cache file is still absent at `.gradle_home/caches/minecraft/de/oceanlabs/mcp/mcp_stable/39/1.12.2/srgs/mcp-srg.srg`.
+- `./scripts/dev.sh smoke-server` — failed by timeout before ready state; log again stopped after `Calling tweak class net.minecraftforge.fml.common.launcher.FMLServerTweaker`, with only Log4j console appender initialization errors. `run/crash-reports/` does not exist, and the configured crash-marker scan found no matches. This matches the clean `da3f307` baseline reproduction recorded above.
+
+Remaining limits:
+
+- Cultist runtime combat/team/equipment scenarios remain unobserved because smoke-server remains environment-blocked and user-driven manual scenarios are excluded.
+- Cultist Knight attack/armor placeholders are intentionally left unchanged in this checkpoint until the missing separate reference armor piece items are resolved.
+
 ## Next Checkpoint Candidate
 
 After the portal trigger and ring bootstrap checkpoints, the next pre-Phase8 candidates are:

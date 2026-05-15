@@ -1,20 +1,32 @@
 package thaumcraft.common.entities.monster;
 
 import net.minecraft.item.ItemStack;
+import net.minecraft.pathfinding.PathNavigate;
+import net.minecraft.pathfinding.PathNavigateGround;
 import thaumcraft.common.config.ConfigItems;
 import thaumcraft.common.items.ItemResource;
 
 public class EntityCultist extends net.minecraft.entity.monster.EntityMob {
     private int homeX, homeY, homeZ;
 
-    public EntityCultist(net.minecraft.world.World world) { super(world); }
+    public EntityCultist(net.minecraft.world.World world) {
+        super(world);
+        this.setSize(0.6F, 1.8F);
+        this.experienceValue = 10;
+        PathNavigate nav = this.getNavigator();
+        if (nav instanceof PathNavigateGround) {
+            PathNavigateGround ground = (PathNavigateGround) nav;
+            ground.setBreakDoors(true);
+            ground.setEnterDoors(true);
+        }
+    }
 
     @Override
     protected void applyEntityAttributes() {
         super.applyEntityAttributes();
-        this.getEntityAttribute(net.minecraft.entity.SharedMonsterAttributes.MAX_HEALTH).setBaseValue(25.0);
         this.getEntityAttribute(net.minecraft.entity.SharedMonsterAttributes.ATTACK_DAMAGE).setBaseValue(4.0);
-        this.getEntityAttribute(net.minecraft.entity.SharedMonsterAttributes.FOLLOW_RANGE).setBaseValue(8.0);
+        this.getEntityAttribute(net.minecraft.entity.SharedMonsterAttributes.FOLLOW_RANGE).setBaseValue(32.0);
+        this.getEntityAttribute(net.minecraft.entity.SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(0.3);
     }
 
     @Override

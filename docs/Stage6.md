@@ -420,7 +420,7 @@ Client particles/renderers are Phase 8. Sounds depend on `TCSounds` entries and 
 - `thaumcraft_src/thaumcraft/common/entities/monster/boss/EntityThaumcraftBoss.class`
 
 **Что не совпадает:**
-Cultist Leader, Eldritch Warden, and Cultist Portal have substantial server baselines, but acceptance requires runtime evidence. Warden field frenzy, teleport-home, absorption regeneration, warp application, cultist targeting, eldritch field block placement, and portal minion/boss sequence are all behavior-sensitive. Current `EntityThaumcraftBoss` still has TODOs for enrage/scaling (`src/main/java/thaumcraft/common/entities/monster/boss/EntityThaumcraftBoss.java:29-37`), which may be intended boss baseline behavior depending on reference champion/boss modifiers.
+Cultist Leader, Eldritch Warden, and Cultist Portal have substantial server baselines, but acceptance requires runtime evidence. Warden field frenzy, teleport-home, absorption regeneration, warp application, cultist targeting, eldritch field block placement, and portal minion/boss sequence are all behavior-sensitive. The 2026-05-15 Cultist baseline checkpoint restores base Cultist size/XP/navigation/follow/move attributes and Cultist Knight reference max health, but full Cultist equipment parity remains blocked by missing separate armor piece items. Current `EntityThaumcraftBoss` still has TODOs for enrage/scaling (`src/main/java/thaumcraft/common/entities/monster/boss/EntityThaumcraftBoss.java:29-37`), which may be intended boss baseline behavior depending on reference champion/boss modifiers.
 
 **Что нужно доделать:**
 Perform targeted runtime validation for every boss phase and fix behavior mismatches found. Resolve or explicitly prove non-applicability of boss TODOs.
@@ -909,6 +909,28 @@ Mapping:
 
 - Inhabited Zombie kill scenarios and crab save/reload have not been observed in a runtime world because smoke-server remains environment-blocked and manual scenarios are excluded.
 - Original Inhabited Zombie cultist helmet/legs/chest spawn equipment remains a content dependency because this branch currently exposes aggregate cultist armor items rather than the original separate helmet/legs/chest fields.
+
+### 8.2.11 Cultist baseline attributes checkpoint — 2026-05-15
+
+Статус: focused Cultist server baseline improved; runtime evidence remains open.
+
+Что сделано:
+
+- Restored base `EntityCultist` size `0.6 x 1.8`, 10 XP value, break/enter-door navigation flags, 32-block follow range, and 0.3 movement speed from the reference.
+- Removed the non-reference base Cultist max-health override so subclass max-health values control health as in the reference.
+- Restored `EntityCultistKnight` max health from `35` to the reference `36`.
+
+Проверки:
+
+- `./scripts/dev.sh compileJava` — passed.
+- `./scripts/dev.sh build` — passed.
+- `./scripts/dev.sh check-jar` — не дошел до jar inspection: отсутствует wrapper-ожидаемый MCP mapping cache `.gradle_home/caches/minecraft/de/oceanlabs/mcp/mcp_stable/39/1.12.2/srgs/mcp-srg.srg`.
+- `./scripts/dev.sh smoke-server` — timeout before ready state на уже задокументированном pre-Forge/log4j этапе; `run/crash-reports/` не существует, and the configured crash-marker scan found no matches.
+
+Оставшиеся ограничения:
+
+- Cultist runtime combat/team/equipment scenarios remain unobserved because smoke-server remains environment-blocked and manual scenarios are excluded.
+- Cultist Knight attack/armor placeholders are intentionally left unchanged in this checkpoint until the missing separate reference armor piece items are resolved.
 
 ### 8.3 Minimal Stage 6 manual scenario matrix
 
