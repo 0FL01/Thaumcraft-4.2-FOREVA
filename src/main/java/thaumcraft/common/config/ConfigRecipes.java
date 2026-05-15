@@ -4,6 +4,8 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.IRecipe;
 import net.minecraftforge.registries.IForgeRegistry;
 import thaumcraft.api.ThaumcraftApi;
+import thaumcraft.common.lib.crafting.ArcaneSceptreRecipe;
+import thaumcraft.common.lib.crafting.ArcaneWandRecipe;
 import thaumcraft.common.items.armor.RecipesRobeArmorDyes;
 import thaumcraft.common.lib.crafting.InfusionRunicAugmentRecipe;
 import thaumcraft.common.items.armor.RecipesVoidRobeArmorDyes;
@@ -12,12 +14,24 @@ public class ConfigRecipes {
     private static boolean specialRecipesRegistered = false;
 
     public static void init() {
+        boolean hasArcaneWand = false;
+        boolean hasArcaneSceptre = false;
         boolean hasRunicAugment = false;
         for (Object recipe : ThaumcraftApi.getCraftingRecipes()) {
+            if (recipe instanceof ArcaneWandRecipe) {
+                hasArcaneWand = true;
+            } else if (recipe instanceof ArcaneSceptreRecipe) {
+                hasArcaneSceptre = true;
+            }
             if (recipe instanceof InfusionRunicAugmentRecipe) {
                 hasRunicAugment = true;
-                break;
             }
+        }
+        if (!hasArcaneWand) {
+            ThaumcraftApi.getCraftingRecipes().add(new ArcaneWandRecipe());
+        }
+        if (!hasArcaneSceptre) {
+            ThaumcraftApi.getCraftingRecipes().add(new ArcaneSceptreRecipe());
         }
         if (!hasRunicAugment) {
             ThaumcraftApi.getCraftingRecipes().add(new InfusionRunicAugmentRecipe());

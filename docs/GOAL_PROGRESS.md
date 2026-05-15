@@ -67,6 +67,27 @@ Branch: `codex/durable-goal-stage8-9`
 
 ## Checkpoint Log
 
+### 2026-05-15 — Stage 9-b dynamic arcane wand/sceptre recipe baseline
+
+Scope:
+
+- Added `ArcaneWandRecipe` and `ArcaneSceptreRecipe` under `thaumcraft.common.lib.crafting` as `IArcaneRecipe` implementations.
+- Ported reference-style layout checks, cap/rod matching, research gating (`CAP_*`, `ROD_*`, `SCEPTRE`), primal aspect cost formulas, and output tagging for wand/sceptre craft results.
+- Wired `ConfigRecipes.init()` to register dynamic arcane recipes into `ThaumcraftApi.getCraftingRecipes()` with duplicate guards.
+- Updated `docs/Stage9-b.md` GAP-2 status/acceptance notes to reflect class+registration closure and remaining runtime scenario limits.
+
+Validation:
+
+- `./scripts/dev.sh validate --smoke` — passed: status, compile, tests `10/10`, jar, check-jar summary `5480` MCP leak lines / `1069` unique leaks, and server smoke.
+- `run/smoke-server.log` evidence: `Registering entities`; `Forge Mod Loader has successfully loaded 6 mods`; `Done (1.165s)!`.
+- Crash report scan under `run/` returned no files.
+- `./scripts/dev.sh smoke-client` — skipped because `DISPLAY=` and GUI/graphics/user-interactive validation is excluded.
+
+Remaining limits:
+
+- This checkpoint restores dynamic recipe classes and registration only; full end-to-end proof still depends on broader Stage 9-b static recipe/research content population.
+- Manual/client Arcane Workbench interaction remains outside current non-GUI validation scope.
+
 ### 2026-05-15 — Stage 9-b Arcane Workbench server container baseline
 
 Scope:

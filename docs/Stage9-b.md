@@ -78,12 +78,13 @@ Depends on Stage 9-a lifecycle/recipe foundation and current item/block registry
 
 ### GAP-2: Dynamic wand and sceptre arcane recipes отсутствуют
 
-**Статус:** отсутствует  
+**Статус:** частично закрыт (dynamic recipes + registration baseline implemented)
 **Критичность:** blocker
 
 **Текущая реализация:**
-- `src/main/java/thaumcraft/common/lib/crafting/` lacks `ArcaneWandRecipe.java`
-- `src/main/java/thaumcraft/common/lib/crafting/` lacks `ArcaneSceptreRecipe.java`
+- `src/main/java/thaumcraft/common/lib/crafting/ArcaneWandRecipe.java`
+- `src/main/java/thaumcraft/common/lib/crafting/ArcaneSceptreRecipe.java`
+- `src/main/java/thaumcraft/common/config/ConfigRecipes.java`
 - `src/main/java/thaumcraft/common/Thaumcraft.java:317-354`
 - `src/main/java/thaumcraft/api/wands/WandCap.java:76-86`
 - `src/main/java/thaumcraft/api/wands/WandRod.java:88-114`
@@ -94,22 +95,24 @@ Depends on Stage 9-a lifecycle/recipe foundation and current item/block registry
 - `thaumcraft_src/thaumcraft/common/config/ConfigRecipes.class`, decompiled lines 225-228
 
 **Что не совпадает:**
-Reference adds `new ArcaneWandRecipe()` and `new ArcaneSceptreRecipe()` directly to `ThaumcraftApi.getCraftingRecipes()`. These recipes dynamically validate cap/rod combinations, research completion, layout, output NBT, primal vis cost and sceptre NBT. Current source has wand cap/rod registries and `ItemWandCasting` NBT helpers, but no dynamic arcane recipe classes and no registration.
+Port now includes both dynamic recipes and registration:
+- `ArcaneWandRecipe` and `ArcaneSceptreRecipe` implement `IArcaneRecipe`;
+- `ConfigRecipes.init()` adds both into `ThaumcraftApi.getCraftingRecipes()` with duplicate guards;
+- recipe logic follows reference layouts, research checks, cap/rod matching, primal-aspect cost formulas, and sceptre output tagging.
 
 **Что нужно доделать:**
-Port both dynamic recipes to 1.12.2, using `ItemStack.EMPTY` semantics and current static `ItemWandCasting.setCap`, `setRod`, `isSceptre` conventions.
+Keep and runtime-validate dynamic arcane recipe behavior once broader Stage 9-b recipe population is in place.
 
 **Как доделать:**
-- Add `src/main/java/thaumcraft/common/lib/crafting/ArcaneWandRecipe.java` implementing `IArcaneRecipe`.
-- Add `src/main/java/thaumcraft/common/lib/crafting/ArcaneSceptreRecipe.java` implementing `IArcaneRecipe`.
-- Register both in `ConfigRecipes.initializeArcaneRecipes()` via `ThaumcraftApi.getCraftingRecipes().add(...)` like reference decompiled lines 225-228.
-- Verify layout rules: wand uses caps at `(0,2)` and `(2,0)`, rod at `(1,1)`; sceptre uses three caps, rod, primal charm/focus item, and requires `SCEPTRE` research.
-- Verify cost rules: wand adds all primal aspects at `capCraftCost * rodCraftCost`; sceptre adds all primal aspects at `1.5 * capCraftCost * rodCraftCost`.
+- Keep dynamic recipe registration in `ConfigRecipes.init()` with duplicate guards.
+- Preserve layout and cost rules from reference for wand/sceptre dynamic outputs.
+- Add focused runtime scenarios once arcane static recipe registration/research map population is available.
 
 **Критерии приемки:**
-- [ ] Dynamic wand crafting creates a wand with correct cap/rod NBT and damage/cost metadata.
-- [ ] Dynamic sceptre crafting creates a wand stack with sceptre NBT and correct cap/rod NBT.
-- [ ] Research gates for caps, rods and `SCEPTRE` prevent output until complete.
+- [x] Dynamic `ArcaneWandRecipe` and `ArcaneSceptreRecipe` classes exist and are registered into `ThaumcraftApi.getCraftingRecipes()`.
+- [x] Wand/sceptre output paths set cap/rod metadata and sceptre tag with reference-aligned cost formulas.
+- [x] Recipe `matches` logic enforces cap/rod research gates and `SCEPTRE` gate.
+- [ ] Runtime scenario validates dynamic crafting outputs and vis costs through Arcane Workbench flow.
 
 **Риски / зависимости:**
 Depends on wand component registration (`src/main/java/thaumcraft/common/Thaumcraft.java:317-354`) and on research completion checks. Staff rod tags in current `StaffRod` must match reference recipe names before sceptre/staff scenarios can pass.
