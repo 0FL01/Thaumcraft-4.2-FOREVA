@@ -56,13 +56,13 @@ Lightweight analysis commands run:
 
 Current implementation is not Stage 9-e complete.
 
-The port does call `ConfigResearch.init()` during post-init after recipe and aspect initialization (`src/main/java/thaumcraft/common/Thaumcraft.java:186`-`src/main/java/thaumcraft/common/Thaumcraft.java:191`), but `ConfigResearch.init()` still registers no categories, research entries, pages, triggers, or warp metadata; it currently only clears the baseline `recipes` map scaffold (`src/main/java/thaumcraft/common/config/ConfigResearch.java:6`-`src/main/java/thaumcraft/common/config/ConfigResearch.java:10`). Therefore `ResearchCategories.researchCategories` remains empty unless addons register their own entries.
+The port does call `ConfigResearch.init()` during post-init after recipe and aspect initialization (`src/main/java/thaumcraft/common/Thaumcraft.java:186`-`src/main/java/thaumcraft/common/Thaumcraft.java:191`). Current `ConfigResearch.init()` now registers the six reference research categories and their icon/background paths, but still does not register research entries/pages/triggers/warp metadata (`src/main/java/thaumcraft/common/config/ConfigResearch.java`). Therefore category containers exist, while the research graph itself remains unpopulated.
 
 The low-level API containers for categories, items, and pages are mostly present and structurally close to the 1.7.10 reference (`src/main/java/thaumcraft/api/research/ResearchCategories.java:12`-`src/main/java/thaumcraft/api/research/ResearchCategories.java:67`, `src/main/java/thaumcraft/api/research/ResearchItem.java:13`-`src/main/java/thaumcraft/api/research/ResearchItem.java:256`, `src/main/java/thaumcraft/api/research/ResearchPage.java:15`-`src/main/java/thaumcraft/api/research/ResearchPage.java:128`). This is an API baseline, not content parity.
 
-The current lang file has no `tc.research_*` or `tc.research_category.*` content; it only contains item/static GUI keys (`src/main/resources/assets/thaumcraft/lang/en_us.lang:1`-`src/main/resources/assets/thaumcraft/lang/en_us.lang:118`). The reference English lang has six category keys and 713 research keys, beginning at `thaumcraft_src/assets/thaumcraft/lang/en_US.lang:865`.
+The current lang file includes `tc.research_category.*` keys and runtime research-note status keys, but still lacks the full `tc.research_name.*`, `tc.research_text.*`, and `tc.research_page.*` corpus expected by fully ported `ConfigResearch`. The reference English lang has 713 research keys, beginning at `thaumcraft_src/assets/thaumcraft/lang/en_US.lang:865`.
 
-The current resources include research-note and thaumonomicon item textures, but no Thaumonomicon/research backgrounds under `src/main/resources/assets/thaumcraft/textures/gui/` and no research category/icon/page images under `src/main/resources/assets/thaumcraft/textures/misc/`. The reference assets exist under `thaumcraft_src/assets/thaumcraft/textures/gui/` and `thaumcraft_src/assets/thaumcraft/textures/misc/`.
+The current resources now include Thaumonomicon/research GUI backgrounds and baseline research misc icons (`r_*.png`) with `research1..5` images under `src/main/resources/assets/thaumcraft/textures/misc/`. Additional image paths referenced by full research-page text still need validation once the full research text corpus is ported.
 
 The current research note flow is incomplete. `ItemResearchNotes` directly grants the `key` NBT value on right click and consumes the stack (`src/main/java/thaumcraft/common/items/ItemResearchNotes.java:43`-`src/main/java/thaumcraft/common/items/ItemResearchNotes.java:54`), while the reference distinguishes incomplete notes, completed discoveries, knowledge fragments, prerequisite errors, sounds, tooltips, rarity, colors, and hidden-research conversion (`.stage9e-ref/thaumcraft/common/items/ItemResearchNotes.java:87`-`.stage9e-ref/thaumcraft/common/items/ItemResearchNotes.java:174`). The reference `ResearchNoteData` class has no current port file.
 
@@ -74,7 +74,7 @@ The current direct completion packet grants research without checking prerequisi
 
 ### GAP-1: Research categories and research entries are not registered
 
-**Статус:** отсутствует  
+**Статус:** partial  
 **Критичность:** blocker
 
 **Текущая реализация:**
@@ -125,7 +125,7 @@ Dependency: Stage 9 recipe registration must provide recipe objects for page ref
 
 ### GAP-2: Research pages cannot resolve recipe references because recipe map/content is absent
 
-**Статус:** отсутствует  
+**Статус:** partial  
 **Критичность:** blocker
 
 **Текущая реализация:**
@@ -164,7 +164,7 @@ Dependency: this overlaps Stage 9 recipe chunks. Stage 9-e should only validate 
 
 ### GAP-3: Research localization is absent from the port
 
-**Статус:** отсутствует  
+**Статус:** partial  
 **Критичность:** blocker
 
 **Текущая реализация:**

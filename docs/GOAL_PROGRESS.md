@@ -67,6 +67,33 @@ Branch: `codex/durable-goal-stage8-9`
 
 ## Checkpoint Log
 
+### 2026-05-15 — Stage 9-e research category + icon/backdrop baseline
+
+Scope:
+
+- Restored Stage 9-e category registration baseline in `ConfigResearch`:
+  - `ConfigResearch.init()` now calls `initCategories()`;
+  - registered `BASICS`, `THAUMATURGY`, `ALCHEMY`, `ARTIFICE`, `GOLEMANCY`, `ELDRITCH` with reference icon/background `ResourceLocation` paths.
+- Added missing research-content misc assets from `thaumcraft_src`:
+  - copied `textures/misc/r_*.png` and `textures/misc/research1.png` … `research5.png` into port resources.
+- Updated Stage 9-e gap doc status to reflect partial closure:
+  - GAP-1 moved from absent to partial (categories registered; entries/pages still open);
+  - GAP-3 moved from absent to partial (category/status keys present; full research text corpus still missing);
+  - GAP-4 moved from absent to partial (baseline research GUI/misc assets present; full page-image coverage still pending).
+
+Validation:
+
+- `./scripts/dev.sh validate --smoke` — passed: status, compile, tests `10/10`, jar, check-jar summary `5662` MCP leak lines / `1114` unique leaks, and server smoke.
+- `run/smoke-server.log` evidence: server ready (`Done (...)`), no fatal markers.
+- Crash report scan under `run/` remained clean during smoke stage.
+- `./scripts/dev.sh smoke-client` — skipped because `DISPLAY=` and GUI/graphics/user-interactive validation is excluded.
+
+Remaining limits:
+
+- `ConfigResearch` still does not register research items/pages, so category containers are populated but progression graph is still absent.
+- Full `tc.research_name.*` / `tc.research_text.*` / `tc.research_page.*` localization corpus remains to be ported.
+- Stage 9-e note/clue progression, scan-trigger clue unlocks, and packet-side prerequisite enforcement remain open.
+
 ### 2026-05-15 — Stage 9-b ArcaneStone2/3/4 non-arcane recipe parity baseline
 
 Scope:
