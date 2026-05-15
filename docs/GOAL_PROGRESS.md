@@ -1122,6 +1122,23 @@ Remaining limits:
 - Runtime confirmation of golem melee damage, knockback, fire, thorns, and arthropod effects remains unavailable while smoke-server is blocked before ready state and user-driven manual scenarios are excluded.
 - Full per-core golem AI runtime scenarios remain open.
 
+### 2026-05-15 — Stage 7 biome ID policy docs
+
+Scope:
+
+- Corrected the Stage 7 GAP-8 text to reflect current code: legacy numeric biome ID config keys are read in `Config.syncConfigurable()`.
+- Documented the active Forge 1.12 policy that Thaumcraft biome identity is registry-name based and those numeric ID values are retained only as legacy config no-ops.
+
+Validation:
+
+- `git diff --check` — passed.
+- Runtime smoke was not required because this checkpoint is documentation-only.
+
+Remaining limits:
+
+- Runtime validation of biome registration, decorators, colors, and `BiomeHandler` behavior remains open.
+- The policy does not close Stage 7; it only removes the stale config-loading documentation mismatch.
+
 ## Next Checkpoint Candidate
 
 After the golem carried-display, trunk transfer, death logging, fire-resistance, armor, water-pathing, no-drowning, and melee-enchantment checkpoints, the next pre-Phase8 candidates are:
