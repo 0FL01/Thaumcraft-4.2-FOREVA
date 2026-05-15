@@ -67,6 +67,29 @@ Branch: `codex/durable-goal-stage8-9`
 
 ## Checkpoint Log
 
+### 2026-05-15 — Stage 9-c infusion focus/device/mirror baseline
+
+Scope:
+
+- Expanded Stage 9-c GAP-1 infusion crafting coverage with a tightly coupled focus/device/mirror subset:
+  - `FocusHellbat`, `FocusPortableHole`, `FocusWarding`
+  - `WandPed`, `WandPedFocus`, `NodeStabilizerAdv`, `JarBrain`
+  - conditional mirror branch under `Config.allowMirrors`: `Mirror`, `MirrorHand`, `MirrorEssentia`
+- Preserved reference keys, research gates, instability, aspect costs, central inputs, and component lists for this subset.
+- Updated Stage 9-c infusion key audit: unresolved infusion crafting keys reduced to `42`.
+
+Validation:
+
+- `./scripts/dev.sh validate --smoke` — passed: status, compile, tests `10/10`, jar, check-jar summary `5558` MCP leak lines / `1092` unique leaks, and server smoke.
+- `run/smoke-server.log` evidence: `Registering entities`; `Forge Mod Loader has successfully loaded 6 mods`; `Done (1.160s)!`.
+- Crash report scan under `run/` returned no files.
+- `./scripts/dev.sh smoke-client` — skipped because `DISPLAY=` and GUI/graphics/user-interactive validation is excluded.
+
+Remaining limits:
+
+- Stage 9-c infusion crafting registrations remain incomplete (`42` keys outstanding by reference key audit).
+- Runtime/research-page verification for infusion scenarios remains open.
+
 ### 2026-05-15 — Stage 9-c infusion enchantment baseline
 
 Scope:

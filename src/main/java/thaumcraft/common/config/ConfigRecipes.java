@@ -28,6 +28,7 @@ public class ConfigRecipes {
         initializeArcaneRecipeBaseline();
         initializeInfusionWandRecipeBaseline();
         initializeInfusionEnchantmentRecipeBaseline();
+        initializeInfusionFocusDeviceRecipeBaseline();
 
         boolean hasArcaneWand = false;
         boolean hasArcaneSceptre = false;
@@ -1065,6 +1066,107 @@ public class ConfigRecipes {
                 new ItemStack(Items.BOW),
                 new ItemStack(Items.ARROW),
                 new ItemStack(ConfigItems.itemResource, 1, 14));
+    }
+
+    private static void initializeInfusionFocusDeviceRecipeBaseline() {
+        registerInfusionRecipe("FocusHellbat", "FOCUSHELLBAT",
+                new ItemStack(ConfigItems.focusHellbat),
+                3,
+                new AspectList().add(Aspect.FIRE, 25).add(Aspect.AIR, 15).add(Aspect.BEAST, 15).add(Aspect.ENTROPY, 25),
+                new ItemStack(Items.MAGMA_CREAM),
+                new ItemStack(Items.QUARTZ), new ItemStack(ConfigItems.itemShard, 1, 1),
+                new ItemStack(Items.QUARTZ), new ItemStack(ConfigItems.itemShard, 1, 0),
+                new ItemStack(Items.QUARTZ), new ItemStack(ConfigItems.itemShard, 1, 5));
+
+        registerInfusionRecipe("FocusPortableHole", "FOCUSPORTABLEHOLE",
+                new ItemStack(ConfigItems.focusPortableHole),
+                3,
+                new AspectList().add(Aspect.TRAVEL, 25).add(Aspect.ELDRITCH, 10).add(Aspect.EXCHANGE, 10).add(Aspect.ENTROPY, 25),
+                new ItemStack(Items.ENDER_PEARL),
+                new ItemStack(Items.QUARTZ), new ItemStack(ConfigItems.itemShard, 1, 3),
+                new ItemStack(Items.QUARTZ), new ItemStack(ConfigItems.itemShard, 1, 0),
+                new ItemStack(Items.QUARTZ), new ItemStack(ConfigItems.itemShard, 1, 5));
+
+        registerInfusionRecipe("FocusWarding", "FOCUSWARDING",
+                new ItemStack(ConfigItems.focusWarding),
+                4,
+                new AspectList().add(Aspect.EARTH, 25).add(Aspect.ARMOR, 25).add(Aspect.ORDER, 25).add(Aspect.MIND, 10),
+                new ItemStack(Items.NETHER_STAR),
+                new ItemStack(ConfigItems.itemResource, 1, 3), new ItemStack(ConfigItems.itemShard, 1, 3),
+                new ItemStack(Items.QUARTZ), new ItemStack(ConfigItems.itemShard, 1, 4),
+                new ItemStack(ConfigItems.itemResource, 1, 3), new ItemStack(ConfigItems.itemShard, 1, 3),
+                new ItemStack(Items.QUARTZ), new ItemStack(ConfigItems.itemShard, 1, 4));
+
+        registerInfusionRecipe("WandPed", "WANDPED",
+                new ItemStack(ConfigBlocks.blockStoneDevice, 1, 5),
+                3,
+                new AspectList().add(Aspect.AURA, 10).add(Aspect.MAGIC, 15).add(Aspect.EXCHANGE, 15),
+                new ItemStack(ConfigBlocks.blockStoneDevice, 1, 1),
+                new ItemStack(Items.GOLD_INGOT),
+                new ItemStack(Items.DIAMOND),
+                new ItemStack(ConfigItems.itemResource, 1, 15),
+                new ItemStack(Items.DIAMOND));
+
+        registerInfusionRecipe("WandPedFocus", "WANDPEDFOC",
+                new ItemStack(ConfigBlocks.blockStoneDevice, 1, 8),
+                4,
+                new AspectList().add(Aspect.ORDER, 10).add(Aspect.MAGIC, 15).add(Aspect.EXCHANGE, 10),
+                new ItemStack(Items.COMPARATOR),
+                new ItemStack(ConfigItems.itemShard, 1, 3), new ItemStack(ConfigItems.itemResource, 1, 8),
+                new ItemStack(ConfigItems.itemShard, 1, 3), new ItemStack(ConfigItems.itemResource, 1, 8),
+                new ItemStack(ConfigItems.itemShard, 1, 3), new ItemStack(ConfigItems.itemResource, 1, 8),
+                new ItemStack(ConfigItems.itemShard, 1, 3), new ItemStack(ConfigItems.itemResource, 1, 8));
+
+        registerInfusionRecipe("NodeStabilizerAdv", "NODESTABILIZERADV",
+                new ItemStack(ConfigBlocks.blockStoneDevice, 1, 10),
+                10,
+                new AspectList().add(Aspect.AURA, 32).add(Aspect.MAGIC, 16).add(Aspect.ORDER, 16).add(Aspect.ENERGY, 16),
+                new ItemStack(ConfigBlocks.blockStoneDevice, 1, 9),
+                new ItemStack(ConfigItems.itemResource, 1, 1), new ItemStack(Blocks.REDSTONE_BLOCK),
+                new ItemStack(ConfigItems.itemResource, 1, 0), new ItemStack(Blocks.REDSTONE_BLOCK),
+                new ItemStack(ConfigItems.itemResource, 1, 1), new ItemStack(Blocks.REDSTONE_BLOCK),
+                new ItemStack(ConfigItems.itemResource, 1, 0), new ItemStack(Blocks.REDSTONE_BLOCK));
+
+        registerInfusionRecipe("JarBrain", "JARBRAIN",
+                new ItemStack(ConfigBlocks.blockJar, 1, 1),
+                4,
+                new AspectList().add(Aspect.MIND, 10).add(Aspect.SENSES, 10).add(Aspect.UNDEAD, 20),
+                new ItemStack(ConfigBlocks.blockJar, 1, 0),
+                new ItemStack(ConfigItems.itemZombieBrain),
+                new ItemStack(Items.SPIDER_EYE),
+                new ItemStack(Items.WATER_BUCKET),
+                new ItemStack(Items.SPIDER_EYE));
+
+        if (Config.allowMirrors) {
+            registerInfusionRecipe("Mirror", "MIRROR",
+                    new ItemStack(ConfigBlocks.blockMirror, 1, 0),
+                    1,
+                    new AspectList().add(Aspect.TRAVEL, 8).add(Aspect.DARKNESS, 8).add(Aspect.EXCHANGE, 8),
+                    new ItemStack(ConfigItems.itemResource, 1, 10),
+                    new ItemStack(Items.GOLD_INGOT),
+                    new ItemStack(Items.GOLD_INGOT),
+                    new ItemStack(Items.GOLD_INGOT),
+                    new ItemStack(Items.ENDER_PEARL));
+
+            registerInfusionRecipe("MirrorHand", "MIRRORHAND",
+                    new ItemStack(ConfigItems.itemHandMirror),
+                    5,
+                    new AspectList().add(Aspect.TOOL, 16).add(Aspect.TRAVEL, 16),
+                    new ItemStack(ConfigBlocks.blockMirror, 1, 0),
+                    new ItemStack(Items.STICK),
+                    new ItemStack(Items.COMPASS),
+                    new ItemStack(Items.MAP));
+
+            registerInfusionRecipe("MirrorEssentia", "MIRRORESSENTIA",
+                    new ItemStack(ConfigBlocks.blockMirror, 1, 6),
+                    2,
+                    new AspectList().add(Aspect.TRAVEL, 8).add(Aspect.WATER, 8).add(Aspect.EXCHANGE, 8),
+                    new ItemStack(ConfigItems.itemResource, 1, 10),
+                    new ItemStack(Items.IRON_INGOT),
+                    new ItemStack(Items.IRON_INGOT),
+                    new ItemStack(Items.IRON_INGOT),
+                    new ItemStack(Items.ENDER_PEARL));
+        }
     }
 
     private static void registerInfusionRecipe(String key, String research, ItemStack output, int instability, AspectList aspects,
