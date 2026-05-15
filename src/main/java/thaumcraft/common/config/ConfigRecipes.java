@@ -10,6 +10,7 @@ import net.minecraft.nbt.NBTTagByte;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagInt;
 import net.minecraftforge.oredict.OreDictionary;
+import net.minecraftforge.oredict.ShapedOreRecipe;
 import net.minecraftforge.registries.IForgeRegistry;
 import thaumcraft.api.ThaumcraftApi;
 import thaumcraft.api.aspects.Aspect;
@@ -24,6 +25,9 @@ import thaumcraft.common.items.armor.RecipesVoidRobeArmorDyes;
 
 public class ConfigRecipes {
     private static boolean specialRecipesRegistered = false;
+    private static IRecipe recipeArcaneStone2;
+    private static IRecipe recipeArcaneStone3;
+    private static IRecipe recipeArcaneStone4;
 
     public static void init() {
         ConfigResearch.recipes.clear();
@@ -33,6 +37,15 @@ public class ConfigRecipes {
         initializeInfusionFocusDeviceRecipeBaseline();
         initializeInfusionGolemDeviceRecipeBaseline();
         initializeInfusionEquipmentArmorRecipeBaseline();
+        if (recipeArcaneStone2 != null) {
+            ConfigResearch.recipes.put("ArcaneStone2", recipeArcaneStone2);
+        }
+        if (recipeArcaneStone3 != null) {
+            ConfigResearch.recipes.put("ArcaneStone3", recipeArcaneStone3);
+        }
+        if (recipeArcaneStone4 != null) {
+            ConfigResearch.recipes.put("ArcaneStone4", recipeArcaneStone4);
+        }
 
         boolean hasArcaneWand = false;
         boolean hasArcaneSceptre = false;
@@ -1638,6 +1651,27 @@ public class ConfigRecipes {
         }
         registry.register(new RecipesRobeArmorDyes().setRegistryName("forge", "robearmordye"));
         registry.register(new RecipesVoidRobeArmorDyes().setRegistryName("forge", "voidrobearmordye"));
+        recipeArcaneStone2 = new ShapedOreRecipe(null,
+                new ItemStack(ConfigBlocks.blockCosmeticSolid, 4, 7),
+                "SS",
+                "SS",
+                'S', new ItemStack(ConfigBlocks.blockCosmeticSolid, 1, 6))
+                .setRegistryName("thaumcraft", "arcanestone2");
+        registry.register(recipeArcaneStone2);
+        recipeArcaneStone3 = new ShapedOreRecipe(null,
+                new ItemStack(ConfigBlocks.blockStairsArcaneStone, 4, 0),
+                "K  ",
+                "KK ",
+                "KKK",
+                'K', new ItemStack(ConfigBlocks.blockCosmeticSolid, 1, 7))
+                .setRegistryName("thaumcraft", "arcanestone3");
+        registry.register(recipeArcaneStone3);
+        recipeArcaneStone4 = new ShapedOreRecipe(null,
+                new ItemStack(ConfigBlocks.blockSlabStone, 6, 0),
+                "KKK",
+                'K', new ItemStack(ConfigBlocks.blockCosmeticSolid, 1, 7))
+                .setRegistryName("thaumcraft", "arcanestone4");
+        registry.register(recipeArcaneStone4);
         specialRecipesRegistered = true;
     }
 }

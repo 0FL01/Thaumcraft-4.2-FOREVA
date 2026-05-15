@@ -162,6 +162,7 @@ entity.trunk.stay=The trunk will stay where it is
 tile.thaumcraft.hungry_chest.name=Hungry Chest
 tile.thaumcraft.arcane_door.name=Arcane Door
 tile.thaumcraft.lifter.name=Levitator
+tile.thaumcraft.stairs_arcane.name=Arcane Stone Stairs
 container.focus_pouch=Focus Pouch
 container.handmirror=Hand Mirror
 container.hoverharness=Hover Harness

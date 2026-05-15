@@ -63,9 +63,8 @@ Reference calls `initializeArcaneRecipes()` from `ConfigRecipes.init()` and fill
 - added alchemy/tube/thaumatorium block (`Filter`, `AlchemyFurnace`, `Alembic`, `Bellows`, `Tube`, `Resonator`, `TubeValve`, `TubeFilter`, `TubeRestrict`, `TubeOneway`, `TubeBuffer`, `AlchemicalConstruct`, `AdvAlchemyConstruct`, `Centrifuge`, `EssentiaCrystalizer`, `MnemonicMatrix`).
 
 Full parity is still open: many of the 89 reference arcane adds are not yet ported.
-Current key audit for arcane API registrations now has no missing `addArcaneCraftingRecipe` / `addShapelessArcaneCraftingRecipe` keys.
-Remaining unresolved reference keys are only non-arcane-path entries:
-- `ArcaneStone2`, `ArcaneStone3`, `ArcaneStone4` (reference registers these via `GameRegistry.addShapedRecipe`; `ArcaneStone3` also depends on missing `ConfigBlocks.blockStairsArcaneStone`).
+Current key audit for arcane API registrations has no missing `addArcaneCraftingRecipe` / `addShapelessArcaneCraftingRecipe` keys.
+The remaining non-arcane reference keys (`ArcaneStone2`, `ArcaneStone3`, `ArcaneStone4`) are now covered via registered shaped recipes in `registerSpecialRecipes`, with `ConfigResearch.recipes` handles restored and `blockStairsArcaneStone` added.
 
 **Что нужно доделать:**
 Port `initializeArcaneRecipes()` into Forge 1.12.2 source and register all original arcane recipe entries with matching research keys, outputs, ingredients, aspect costs and conditional ore-dictionary branches.

@@ -67,6 +67,33 @@ Branch: `codex/durable-goal-stage8-9`
 
 ## Checkpoint Log
 
+### 2026-05-15 — Stage 9-b ArcaneStone2/3/4 non-arcane recipe parity baseline
+
+Scope:
+
+- Added missing `blockStairsArcaneStone` content path:
+  - new `BlockStairsArcaneStone` class based on `blockCosmeticSolid` meta `7` (arcane stone);
+  - `ConfigBlocks` registration (`init`, `getAllBlocks`, `registerItemBlocks`) and resource wiring.
+- Added resource coverage for the new stairs block:
+  - `blockstates/blockstairsarcanestone.json`;
+  - block models (`blockstairsarcanestone`, `_inner`, `_outer`);
+  - item model (`models/item/blockstairsarcanestone.json`).
+- Implemented non-arcane reference key registrations in recipe registry stage:
+  - added `arcanestone2`, `arcanestone3`, `arcanestone4` shaped recipes via `ShapedOreRecipe` in `registerSpecialRecipes`;
+  - persisted `IRecipe` handles and restored `ConfigResearch.recipes` keys `ArcaneStone2`, `ArcaneStone3`, `ArcaneStone4` during `ConfigRecipes.init()`.
+- Added lang entry for the new stairs block.
+
+Validation:
+
+- `./scripts/dev.sh validate --smoke` — passed: status, compile, tests `10/10`, jar, check-jar summary `5661` MCP leak lines / `1114` unique leaks, and server smoke.
+- `run/smoke-server.log` evidence: `Registering entities`; `Forge Mod Loader has successfully loaded 6 mods`; `Done (1.167s)!`.
+- Crash report scan under `run/` returned no files.
+- `./scripts/dev.sh smoke-client` — skipped because `DISPLAY=` and GUI/graphics/user-interactive validation is excluded.
+
+Remaining limits:
+
+- Stage 9-b recipe key parity is now functionally broader, but Arcane Workbench runtime/manual scenario matrix and Stage 9-d/e research/content closure remain open.
+
 ### 2026-05-15 — Stage 9-b Arcane Door unblock baseline
 
 Scope:

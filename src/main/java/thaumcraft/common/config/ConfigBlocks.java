@@ -46,6 +46,7 @@ public class ConfigBlocks {
     public static BlockEldritch blockEldritch;
     public static BlockEldritchNothing blockEldritchNothing;
     public static BlockEldritchPortal blockEldritchPortal;
+    public static BlockStairsArcaneStone blockStairsArcaneStone;
     public static BlockStairsEldritch blockStairsEldritch;
     public static BlockCosmeticStoneSlab blockSlabStone;
     public static BlockCosmeticStoneSlab blockDoubleSlabStone;
@@ -177,6 +178,10 @@ public class ConfigBlocks {
                 .setRegistryName("thaumcraft", legacyPath("blockPortalEldritch"))
                 .setTranslationKey("thaumcraft.eldritch_portal");
 
+        blockStairsArcaneStone = (BlockStairsArcaneStone) new BlockStairsArcaneStone()
+                .setRegistryName("thaumcraft", legacyPath("blockStairsArcaneStone"))
+                .setTranslationKey("thaumcraft.stairs_arcane");
+
         blockStairsEldritch = (BlockStairsEldritch) new BlockStairsEldritch()
                 .setRegistryName("thaumcraft", legacyPath("blockStairsEldritch"))
                 .setTranslationKey("thaumcraft.stairs_eldritch");
@@ -280,6 +285,7 @@ public class ConfigBlocks {
                 blockEldritch,
                 blockEldritchNothing,
                 blockEldritchPortal,
+                blockStairsArcaneStone,
                 blockStairsEldritch,
                 blockSlabStone,
                 blockDoubleSlabStone,
@@ -335,6 +341,8 @@ public class ConfigBlocks {
                 .setRegistryName(blockEldritchNothing.getRegistryName()));
         registry.register(new net.minecraft.item.ItemBlock(blockEldritchPortal)
                 .setRegistryName(blockEldritchPortal.getRegistryName()));
+        registry.register(new net.minecraft.item.ItemBlock(blockStairsArcaneStone)
+                .setRegistryName(blockStairsArcaneStone.getRegistryName()));
         registry.register(new net.minecraft.item.ItemBlock(blockStairsEldritch)
                 .setRegistryName(blockStairsEldritch.getRegistryName()));
         registry.register(new BlockCosmeticStoneSlabItem(blockSlabStone)
