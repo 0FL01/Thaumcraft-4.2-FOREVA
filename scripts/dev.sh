@@ -633,12 +633,16 @@ validate_git_status() {
 }
 
 validate_compile_java() {
-  if validate_gradle_log compileJava compileJava; then
+  set +e
+  validate_gradle_log compileJava compileJava
+  local status="$?"
+  set -e
+
+  if [[ "$status" -eq 0 ]]; then
     printf 'ok; log: %s' "$VALIDATE_LAST_LOG"
     return 0
   fi
 
-  local status="$?"
   printf 'exit %s; log: %s' "$status" "$VALIDATE_LAST_LOG"
   return "$status"
 }
