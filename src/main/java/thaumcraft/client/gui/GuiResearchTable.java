@@ -1,5 +1,6 @@
 package thaumcraft.client.gui;
 
+import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.player.EntityPlayer;
@@ -12,12 +13,19 @@ public class GuiResearchTable extends GuiContainer {
     private static final ResourceLocation TEXTURE = new ResourceLocation("thaumcraft", "textures/gui/guiresearchtable2.png");
 
     private final TileResearchTable tile;
+    private FontRenderer galFontRenderer;
 
     public GuiResearchTable(EntityPlayer player, TileResearchTable tile) {
         super(new ContainerResearchTable(player.inventory, tile));
         this.tile = tile;
         this.xSize = 255;
         this.ySize = 255;
+    }
+
+    @Override
+    public void initGui() {
+        super.initGui();
+        this.galFontRenderer = this.fontRenderer != null ? this.fontRenderer : this.mc.fontRenderer;
     }
 
     @Override
@@ -29,6 +37,9 @@ public class GuiResearchTable extends GuiContainer {
         if (this.tile.isInvalid() && this.mc.player != null) {
             this.mc.player.closeScreen();
             return;
+        }
+        if (this.galFontRenderer == null) {
+            this.galFontRenderer = this.fontRenderer != null ? this.fontRenderer : this.mc.fontRenderer;
         }
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
         this.mc.getTextureManager().bindTexture(TEXTURE);

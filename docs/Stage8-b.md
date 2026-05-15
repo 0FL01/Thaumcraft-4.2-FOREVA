@@ -713,7 +713,7 @@ Resource path case changed from 1.7 `en_US.lang` style to 1.12 lowercase languag
 **Текущая реализация:**
 - `src/main/resources/assets/thaumcraft/lang/en_us.lang` now contains the existing container labels, focus upgrade names/descriptions, `wandtable.text1..3`, trunk GUI labels, and research/browser/table keys used by current Stage 8-b baselines (`tc.researchmissing`, `tc.research.purchase`, `tc.research.short`, `tc.research.getprim`, `tc.research.shortprim`, `tc.research.hasnote`, `tc.research.popup`, `tc.research.copy`, `tc.research_category.*`, `tile.researchtable.noink.0`, `tile.researchtable.noink.1`).
 - TrueType helper classes exist under `src/main/java/thaumcraft/truetyper/TrueTypeFont.java`, `Formatter.java`, `FontLoader.java`, `FontHelper.java`, but no Stage 8-b GUI currently uses them.
-- `src/main/java/thaumcraft/client/gui/GuiResearchTable.java` and `GuiResearchBrowser.java` exist as baselines, but they currently render through standard `FontRenderer` and do not initialize the reference `galFontRenderer` path.
+- `src/main/java/thaumcraft/client/gui/GuiResearchTable.java` and `GuiResearchBrowser.java` now initialize `galFontRenderer` from the client `FontRenderer` in `initGui()` with a draw-time null fallback, matching the reference `galFontRenderer` baseline path without introducing client-only `truetyper` coupling.
 
 **Референс:**
 - `Thaumcraft-1.7.10-4.2.3.5.jar!/assets/thaumcraft/lang/en_US.lang` contains GUI/research/trunk keys including `tc.research.copy`, `tile.researchtable.noink.0`, `tile.researchtable.noink.1`, `entity.trunk.guiname`, `entity.trunk.move`, `entity.trunk.stay`, `tc.research.shortprim`, `tc.research.short`, `tc.forbidden`, `tc.forbidden.level.*`, `tc.research.hasnote`, `tc.research.getprim`, `tc.research.purchase`, `tc.researchmissing`, `tc.research.popup`.
@@ -721,7 +721,7 @@ Resource path case changed from 1.7 `en_US.lang` style to 1.12 lowercase languag
 - `Thaumcraft-1.7.10-4.2.3.5.jar!/truetyper/**` provides the reference font helpers.
 
 **Что не совпадает:**
-Research/browser/table baseline localization keys are now present, but runtime/manual GUI verification is still pending under current `DISPLAY=` constraints. Font helper code exists, but the reference special-font path is not wired/verified in the current 1.12.2 research GUIs.
+Research/browser/table baseline localization keys and `galFontRenderer` initialization are now present, but runtime/manual GUI verification is still pending under current `DISPLAY=` constraints. Full visual parity for research text rendering remains open.
 
 **Что нужно доделать:**
 Add all Stage 8-b lang keys used by ported GUI code and verify the research font path initializes/render text correctly in 1.12.2.

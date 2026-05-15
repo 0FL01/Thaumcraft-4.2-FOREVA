@@ -108,8 +108,28 @@ Validation:
 Remaining limits:
 
 - This checkpoint only adds localization keys; it does not complete research puzzle/interaction parity.
-- Research GUI special-font parity (`galFontRenderer` path vs current FontRenderer baseline) is still open.
+- Research GUI visual text parity is still open despite baseline key coverage.
 - Manual GUI visual/runtime checks remain skipped under current constraints.
+
+### 2026-05-15 — Stage 8-b research GUI font-init baseline
+
+Scope:
+
+- Added reference-style `galFontRenderer` fields in `GuiResearchTable` and `GuiResearchBrowser`.
+- Initialized `galFontRenderer` in `initGui()` using the client `FontRenderer` with draw-time null fallback, mirroring the 1.7.10 baseline where research GUIs keep a dedicated font renderer handle.
+- Updated `docs/Stage8-b.md` GAP-13 notes to reflect that language keys and baseline font-init wiring are in place while visual/runtime verification remains open.
+
+Validation:
+
+- `./scripts/dev.sh validate --smoke` — passed: status, compile, tests `10/10`, jar, check-jar summary `5408` MCP leak lines / `1060` unique leaks, and server smoke.
+- `run/smoke-server.log` evidence: `Registering entities`; `Forge Mod Loader has successfully loaded 6 mods`; `Done (1.198s)!`.
+- Crash report scan under `run/` returned no files.
+- `./scripts/dev.sh smoke-client` — skipped because `DISPLAY=` and GUI/graphics/user-interactive validation is excluded.
+
+Remaining limits:
+
+- This checkpoint wires font initialization only; it does not port full research browser/table interaction parity.
+- Research GUI visual parity still needs manual/client verification.
 
 ### 2026-05-15 — Stage 8-b research support texture baseline
 
