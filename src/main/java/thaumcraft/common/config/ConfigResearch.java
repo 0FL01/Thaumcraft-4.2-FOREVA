@@ -975,6 +975,29 @@ public class ConfigResearch {
                     .setParents("MIRROR")
                     .registerResearchItem();
         }
+
+        new ResearchItem(
+                "JARBRAIN",
+                "ARTIFICE",
+                new AspectList()
+                        .add(Aspect.HUNGER, 3)
+                        .add(Aspect.MIND, 3)
+                        .add(Aspect.UNDEAD, 3)
+                        .add(Aspect.GREED, 3),
+                -5,
+                9,
+                2,
+                new ItemStack(ConfigBlocks.blockJar, 1, 1))
+                .setPages(
+                        new ResearchPage("tc.research_page.JARBRAIN.1"),
+                        new ResearchPage((InfusionRecipe) recipes.get("JarBrain")))
+                .setParents("INFUSION")
+                .setHidden()
+                .setItemTriggers(new ItemStack(ConfigItems.itemResource, 1, 3))
+                .setEntityTriggers("Thaumcraft.BrainyZombie", "Thaumcraft.GiantBrainyZombie")
+                .registerResearchItem();
+        ThaumcraftApi.addWarpToResearch("JARBRAIN", 3);
+        ThaumcraftApi.addWarpToItem(new ItemStack(ConfigBlocks.blockJar, 1, 1), 1);
     }
 
     private static void initThaumaturgyResearchBaseline() {
