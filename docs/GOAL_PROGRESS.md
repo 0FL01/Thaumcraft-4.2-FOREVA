@@ -697,6 +697,29 @@ Remaining limits:
 - Cultist runtime combat/team/equipment scenarios remain unobserved because smoke-server remains environment-blocked and user-driven manual scenarios are excluded.
 - Cultist Knight attack/armor placeholders are intentionally left unchanged in this checkpoint until the missing separate reference armor piece items are resolved.
 
+### 2026-05-15 — Stage 6 base boss behavior
+
+Scope:
+
+- Restored `EntityThaumcraftBoss` reference-derived XP, home persistence, spawn-home assignment, spawn-timer invulnerability/push suppression, air-supply immunity, non-despawn behavior, and eldritch-mob team rule.
+- Restored boss anger/enrage damage cap, buffs, player message, anger particles, passive regen, aggro accounting, target reassessment, and player-count health/damage scaling.
+- Restored inherited base-boss rare loot drops for Eldritch Golem/Warden-style bosses while keeping Cultist Leader's reference override to its own rare loot bag.
+- Restored Eldritch Golem spawn/headless transition timers and Eldritch Warden spawn timer/status trigger.
+- Added English localization for `tc.boss.enrage`.
+
+Validation:
+
+- `./scripts/dev.sh compileJava` — passed.
+- `./scripts/dev.sh build` — passed.
+- `./scripts/dev.sh check-jar` — failed before jar inspection because the wrapper's expected MCP mapping cache file is still absent at `.gradle_home/caches/minecraft/de/oceanlabs/mcp/mcp_stable/39/1.12.2/srgs/mcp-srg.srg`.
+- `./scripts/dev.sh smoke-server` — failed by timeout before ready state; log again stopped after `Calling tweak class net.minecraftforge.fml.common.launcher.FMLServerTweaker`, with only Log4j console appender initialization errors. `run/crash-reports/` does not exist, and the configured crash-marker scan found no matches. This matches the clean `da3f307` baseline reproduction recorded above.
+
+Remaining limits:
+
+- Boss combat, aggro retargeting, player scaling, spawn invulnerability, and reward drops have not been observed in a runtime world because smoke-server remains environment-blocked and user-driven manual scenarios are excluded.
+- Champion-name parity remains a separate dependency because the current branch still has a simplified champion modifier helper and no restored `EntityUtils.CHAMPION_MOD` custom attribute path.
+- Eldritch Golem low-hardness block-breaking / `BlockLoot` stomping remains open under GAP-8.
+
 ## Next Checkpoint Candidate
 
 After the portal trigger and ring bootstrap checkpoints, the next pre-Phase8 candidates are:

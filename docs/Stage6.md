@@ -420,14 +420,14 @@ Client particles/renderers are Phase 8. Sounds depend on `TCSounds` entries and 
 - `thaumcraft_src/thaumcraft/common/entities/monster/boss/EntityThaumcraftBoss.class`
 
 **Что не совпадает:**
-Cultist Leader, Eldritch Warden, and Cultist Portal have substantial server baselines, but acceptance requires runtime evidence. Warden field frenzy, teleport-home, absorption regeneration, warp application, cultist targeting, eldritch field block placement, and portal minion/boss sequence are all behavior-sensitive. The 2026-05-15 Cultist baseline checkpoint restores base Cultist size/XP/navigation/follow/move attributes and Cultist Knight reference max health, but full Cultist equipment parity remains blocked by missing separate armor piece items. Current `EntityThaumcraftBoss` still has TODOs for enrage/scaling (`src/main/java/thaumcraft/common/entities/monster/boss/EntityThaumcraftBoss.java:29-37`), which may be intended boss baseline behavior depending on reference champion/boss modifiers.
+Cultist Leader, Eldritch Warden, and Cultist Portal have substantial server baselines, but acceptance requires runtime evidence. Warden field frenzy, teleport-home, absorption regeneration, warp application, cultist targeting, eldritch field block placement, and portal minion/boss sequence are all behavior-sensitive. The 2026-05-15 Cultist baseline checkpoint restores base Cultist size/XP/navigation/follow/move attributes and Cultist Knight reference max health, but full Cultist equipment parity remains blocked by missing separate armor piece items. The 2026-05-15 boss baseline checkpoint ports `EntityThaumcraftBoss` spawn/home/anger/enrage/regen/aggro/player-scaling/drop behavior and removes the server-behavior TODOs from that class.
 
 **Что нужно доделать:**
-Perform targeted runtime validation for every boss phase and fix behavior mismatches found. Resolve or explicitly prove non-applicability of boss TODOs.
+Perform targeted runtime validation for every boss phase and fix behavior mismatches found. Continue auditing boss subclasses for remaining server-visible reference deltas.
 
 **Как доделать:**
 - files/classes/methods/registrations/resources/scenarios
-- Compare `EntityThaumcraftBoss` reference for spawn timer, boss health/name/champion/enrage mechanics.
+- Compare boss subclasses against reference for remaining spawn timer, phase, boss health/name/champion/enrage mechanics.
 - Spawn each boss on a dedicated server and force combat states.
 - Validate Cultist Leader ranged orb and cultist strength aura.
 - Validate Cultist Portal stage progression, minion types, boss spawn, collision damage, drops, and death explosion.
@@ -931,6 +931,32 @@ Mapping:
 
 - Cultist runtime combat/team/equipment scenarios remain unobserved because smoke-server remains environment-blocked and manual scenarios are excluded.
 - Cultist Knight attack/armor placeholders are intentionally left unchanged in this checkpoint until the missing separate reference armor piece items are resolved.
+
+### 8.2.12 Base boss behavior checkpoint — 2026-05-15
+
+Статус: `EntityThaumcraftBoss` server TODOs replaced with reference-derived behavior; runtime evidence remains open.
+
+Что сделано:
+
+- Restored base boss XP, home NBT persistence, spawn-home assignment, spawn-timer invulnerability/push suppression, air-supply immunity, non-despawn behavior, and eldritch-mob team rule.
+- Restored boss anger tracking, over-35-damage cap, strength/resistance/speed enrage buffs, localized enrage player message, anger particles, passive regeneration, aggro accounting, target reassessment, and player-count health/damage scaling.
+- Restored inherited boss reward drops for Eldritch Golem/Warden-style bosses: eldritch object meta `3` plus rare loot bag.
+- Kept Cultist Leader's override reference-compatible by removing the inherited base-boss drop call, leaving the leader rare loot bag only.
+- Restored Eldritch Golem spawn/headless transition timers and Warden spawn timer/status trigger so the new base spawn invulnerability path is exercised by the subclasses that used it in 1.7.10.
+- Added the missing English `tc.boss.enrage` localization key.
+
+Проверки:
+
+- `./scripts/dev.sh compileJava` — passed.
+- `./scripts/dev.sh build` — passed.
+- `./scripts/dev.sh check-jar` — не дошел до jar inspection: отсутствует wrapper-ожидаемый MCP mapping cache `.gradle_home/caches/minecraft/de/oceanlabs/mcp/mcp_stable/39/1.12.2/srgs/mcp-srg.srg`.
+- `./scripts/dev.sh smoke-server` — timeout before ready state на уже задокументированном pre-Forge/log4j этапе; `run/crash-reports/` не существует, and the configured crash-marker scan found no matches.
+
+Оставшиеся ограничения:
+
+- Boss combat, aggro retargeting, player scaling, spawn invulnerability, and reward drops have not been observed in a runtime world because smoke-server remains environment-blocked and manual scenarios are excluded.
+- Champion-name parity remains a separate dependency because the current branch still has a simplified champion modifier helper and no restored `EntityUtils.CHAMPION_MOD` custom attribute path.
+- Eldritch Golem low-hardness block-breaking / `BlockLoot` stomping remains open under GAP-8.
 
 ### 8.3 Minimal Stage 6 manual scenario matrix
 

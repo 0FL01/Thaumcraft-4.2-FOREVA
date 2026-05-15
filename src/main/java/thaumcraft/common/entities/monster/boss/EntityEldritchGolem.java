@@ -85,6 +85,7 @@ public class EntityEldritchGolem extends EntityThaumcraftBoss implements thaumcr
 
     @Override
     public IEntityLivingData onInitialSpawn(DifficultyInstance difficulty, IEntityLivingData livingdata) {
+        this.spawnTimer = 100;
         return super.onInitialSpawn(difficulty, livingdata);
     }
 
@@ -129,6 +130,7 @@ public class EntityEldritchGolem extends EntityThaumcraftBoss implements thaumcr
     public boolean attackEntityFrom(net.minecraft.util.DamageSource source, float amount) {
         if (!this.world.isRemote && amount > this.getHealth() && !this.isHeadless()) {
             this.setHeadless(true);
+            this.spawnTimer = 100;
             double xx = MathHelper.cos(this.rotationYaw % 360.0F / 180.0F * (float) Math.PI) * 0.75F;
             double zz = MathHelper.sin(this.rotationYaw % 360.0F / 180.0F * (float) Math.PI) * 0.75F;
             this.world.createExplosion(this, this.posX + xx, this.posY + (double) this.getEyeHeight(), this.posZ + zz, 2.0F, false);
@@ -165,6 +167,9 @@ public class EntityEldritchGolem extends EntityThaumcraftBoss implements thaumcr
 
     @Override
     public void onUpdate() {
+        if (this.getSpawnTimer() > 0) {
+            this.heal(2.0F);
+        }
         super.onUpdate();
         if (!this.world.isRemote) {
             if (this.isHeadless() && this.beamCharge <= 0) {

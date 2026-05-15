@@ -70,6 +70,7 @@ public class EntityEldritchWarden extends EntityThaumcraftBoss implements net.mi
 
     @Override
     public IEntityLivingData onInitialSpawn(DifficultyInstance difficulty, IEntityLivingData livingdata) {
+        this.spawnTimer = 150;
         this.setTitle(this.rand.nextInt(TITLES.length));
         this.setAbsorptionAmount(this.getAbsorptionAmount() + (float) (this.getEntityAttribute(net.minecraft.entity.SharedMonsterAttributes.MAX_HEALTH).getBaseValue() * 0.66D));
         return super.onInitialSpawn(difficulty, livingdata);
@@ -156,6 +157,9 @@ public class EntityEldritchWarden extends EntityThaumcraftBoss implements net.mi
 
     @Override
     public void onUpdate() {
+        if (!this.world.isRemote && this.getSpawnTimer() == 150) {
+            this.world.setEntityState(this, (byte) 18);
+        }
         super.onUpdate();
         if (this.world.isRemote) {
             if (this.armLiftL > 0.0F) {

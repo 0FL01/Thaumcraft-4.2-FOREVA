@@ -108,6 +108,7 @@ container.focus_pouch=Focus Pouch
 container.handmirror=Hand Mirror
 container.hoverharness=Hover Harness
 container.inventory=Inventory
+tc.boss.enrage=is enraged by your powerful blows.
 tile.thaumcraft.loot_urn.name=Loot Urn
 tile.thaumcraft.loot_crate.name=Loot Crate
 tile.blockCosmeticSlabStone.arcane.name=Arcane Stone Slab

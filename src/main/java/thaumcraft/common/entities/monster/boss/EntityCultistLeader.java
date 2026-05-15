@@ -162,6 +162,5 @@ public class EntityCultistLeader extends EntityThaumcraftBoss implements net.min
     @Override
     protected void dropFewItems(boolean wasRecentlyHit, int looting) {
         this.entityDropItem(new ItemStack(ConfigItems.itemLootBag, 1, 2), 1.5F);
-        super.dropFewItems(wasRecentlyHit, looting);
     }
 }
