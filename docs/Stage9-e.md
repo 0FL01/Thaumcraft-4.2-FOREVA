@@ -385,13 +385,14 @@ Dependency: client Thaumonomicon GUI action implementation is outside this chunk
 
 ### GAP-8: Manual/runtime validation for research content is not possible yet and has not been performed
 
-**Статус:** требует проверки  
+**Статус:** частично реализовано  
 **Критичность:** high
 
 **Текущая реализация:**
-- `src/main/java/thaumcraft/common/config/ConfigResearch.java:3`-`src/main/java/thaumcraft/common/config/ConfigResearch.java:7`
-- `src/main/resources/assets/thaumcraft/lang/en_us.lang:1`-`src/main/resources/assets/thaumcraft/lang/en_us.lang:118`
-- `src/main/resources/assets/thaumcraft/textures/gui/` is absent.
+- `src/main/java/thaumcraft/common/config/ConfigResearch.java` — partial category+entry baseline.
+- `src/main/resources/assets/thaumcraft/lang/en_us.lang` — imported research localization corpus.
+- `src/main/resources/assets/thaumcraft/textures/gui/` and `textures/misc/r_*.png` — research GUI/icon assets partially restored.
+- `src/test/java/thaumcraft/common/config/ConfigResearchStaticGraphTest.java` — static non-GUI graph/lang validation baseline.
 
 **Референс:**
 - `docs/PRD.md:415`-`docs/PRD.md:416`
@@ -399,7 +400,7 @@ Dependency: client Thaumonomicon GUI action implementation is outside this chunk
 
 **Что не совпадает:**
 
-PRD explicitly says content can compile while unusable, and runtime/manual checks must verify Thaumonomicon pages and progression. Current Stage 9-e cannot be meaningfully smoke-tested for content because categories, entries, lang keys, page assets, and note flow are absent.
+PRD explicitly says content can compile while unusable, and runtime/manual checks must verify Thaumonomicon pages and progression. The port now has an initial static validation layer and baseline content data, but full runtime/manual progression coverage is still missing.
 
 **Что нужно доделать:**
 

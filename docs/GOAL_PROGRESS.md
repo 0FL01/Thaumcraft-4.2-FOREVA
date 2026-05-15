@@ -67,6 +67,32 @@ Branch: `codex/durable-goal-stage8-9`
 
 ## Checkpoint Log
 
+### 2026-05-15 — Stage 9-e static research graph validation baseline
+
+Scope:
+
+- Added `ConfigResearchStaticGraphTest` (`src/test/java/thaumcraft/common/config/ConfigResearchStaticGraphTest.java`) for non-GUI Stage 9-e safety checks.
+- Test performs static source/lang validation for the currently ported `ConfigResearch` subset:
+  - duplicate research keys;
+  - allowed category IDs;
+  - missing parent/hidden-parent references;
+  - missing `tc.research_name.*` / `tc.research_text.*` keys for non-virtual entries;
+  - missing `tc.research_page.*` lang keys referenced by registered text pages.
+- This introduces the first automated regression gate for research graph consistency while full runtime/manual Thaumonomicon validation remains out-of-scope in headless mode.
+- Updated `docs/Stage9-e.md` GAP-8 status/context to reflect partial non-GUI validation coverage.
+
+Validation:
+
+- `./scripts/dev.sh validate --smoke` — passed: status, compile, tests `11/11`, jar, check-jar summary `5662` MCP leak lines / `1114` unique leaks, and server smoke.
+- `run/smoke-server.log` evidence: server ready (`Done (...)`), no fatal markers.
+- Crash report scan under `run/` remained clean during smoke stage.
+- `./scripts/dev.sh smoke-client` — skipped because `DISPLAY=` and GUI/graphics/user-interactive validation is excluded.
+
+Remaining limits:
+
+- Static validation currently covers only the already ported subset in source form; it does not yet prove full 201-entry parity.
+- Runtime/manual Thaumonomicon scenario matrix (primary note, secondary unlock, recipe pages, hidden clue UX) remains open.
+
 ### 2026-05-15 — Stage 9-e scan clue unlock baseline (`@KEY`)
 
 Scope:
