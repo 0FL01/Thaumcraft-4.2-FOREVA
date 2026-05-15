@@ -1011,6 +1011,105 @@ public class ConfigResearch {
                 .setParents("ROD_silverwood")
                 .setParentsHidden("ROD_greatwood_staff")
                 .registerResearchItem();
+
+        new ResearchItem(
+                "NODESTABILIZER",
+                "THAUMATURGY",
+                new AspectList()
+                        .add(Aspect.AURA, 4)
+                        .add(Aspect.ORDER, 4)
+                        .add(Aspect.ENERGY, 4),
+                -7,
+                -4,
+                1,
+                new ItemStack(ConfigBlocks.blockStoneDevice, 1, 9))
+                .setPages(
+                        new ResearchPage("tc.research_page.NODESTABILIZER.1"),
+                        new ResearchPage((IArcaneRecipe) recipes.get("NodeStabilizer")),
+                        new ResearchPage("tc.research_page.NODESTABILIZER.2"))
+                .setParents("NODEPRESERVE")
+                .registerResearchItem();
+
+        new ResearchItem(
+                "NODESTABILIZERADV",
+                "THAUMATURGY",
+                new AspectList()
+                        .add(Aspect.AURA, 9)
+                        .add(Aspect.MAGIC, 6)
+                        .add(Aspect.ORDER, 6)
+                        .add(Aspect.ENERGY, 6),
+                -8,
+                -3,
+                2,
+                new ItemStack(ConfigBlocks.blockStoneDevice, 1, 9))
+                .setPages(
+                        new ResearchPage("tc.research_page.NODESTABILIZERADV.1"),
+                        new ResearchPage((InfusionRecipe) recipes.get("NodeStabilizerAdv")))
+                .setSecondary()
+                .setConcealed()
+                .setParents("NODESTABILIZER")
+                .registerResearchItem();
+
+        new ResearchItem(
+                "VISPOWER",
+                "THAUMATURGY",
+                new AspectList()
+                        .add(Aspect.AURA, 3)
+                        .add(Aspect.MECHANISM, 3)
+                        .add(Aspect.ENERGY, 6),
+                -5,
+                -6,
+                2,
+                new ItemStack(ConfigBlocks.blockStoneDevice, 1, 11))
+                .setPages(
+                        new ResearchPage("tc.research_page.VISPOWER.1"),
+                        new ResearchPage((IArcaneRecipe) recipes.get("NodeTransducer")),
+                        new ResearchPage("tc.research_page.VISPOWER.2"),
+                        new ResearchPage("tc.research_page.VISPOWER.3"),
+                        new ResearchPage((IArcaneRecipe) recipes.get("NodeRelay")),
+                        new ResearchPage("tc.research_page.VISPOWER.4"),
+                        new ResearchPage("tc.research_page.VISPOWER.5"))
+                .setParents("NODESTABILIZER")
+                .setSpecial()
+                .registerResearchItem();
+
+        new ResearchItem(
+                "FOCALMANIPULATION",
+                "THAUMATURGY",
+                new AspectList()
+                        .add(Aspect.MAGIC, 8)
+                        .add(Aspect.TOOL, 8)
+                        .add(Aspect.CRAFT, 5)
+                        .add(Aspect.CRYSTAL, 5)
+                        .add(Aspect.ENERGY, 5),
+                -3,
+                -8,
+                2,
+                new ItemStack(ConfigBlocks.blockStoneDevice, 1, 13))
+                .setPages(
+                        new ResearchPage("tc.research_page.FOCALMANIPULATION.1"),
+                        new ResearchPage((IArcaneRecipe) recipes.get("FocalManipulator")),
+                        new ResearchPage("tc.research_page.FOCALMANIPULATION.2"))
+                .setParentsHidden("INFUSION", "FOCUSFIRE")
+                .setParents("VISPOWER")
+                .registerResearchItem();
+
+        new ResearchItem(
+                "VAMPBAT",
+                "THAUMATURGY",
+                new AspectList()
+                        .add(Aspect.HUNGER, 5)
+                        .add(Aspect.LIFE, 5)
+                        .add(Aspect.MAGIC, 5),
+                4,
+                -8,
+                1,
+                new ResourceLocation("thaumcraft", "textures/foci/vampirebats.png"))
+                .setPages(new ResearchPage("focus.upgrade.vampirebats.text"))
+                .setSecondary()
+                .setParents("FOCUSHELLBAT")
+                .setParentsHidden("FOCALMANIPULATION")
+                .registerResearchItem();
     }
 
     private static void initBasicResearchTextOnlyExtended() {

@@ -42,7 +42,7 @@ Branch: `codex/durable-goal-stage8-9`
 
 | Area | Condensed status |
 | --- | --- |
-| Stage 9-e | Research/lang corpus, category/icon baseline, static graph checks, clue unlocks, completion guards, expanded BASICS+THAUMATURGY slices (including infusion-dependent focus, rod/cap, and staff branches), plus ALCHEMY/ARTIFICE/ELDRITCH prerequisites (`PHIAL`/`CRUCIBLE`/`NITOR`/`ALUMENTUM`/`THAUMIUM`/`DISTILESSENTIA`/`INFUSION` and `ELDRITCHMINOR`/`OCULUS`/Outer chain/`VOIDMETAL`/`FOCUSPRIMAL`/`ROD_primal_staff` baseline) are partially ported. |
+| Stage 9-e | Research/lang corpus, category/icon baseline, static graph checks, clue unlocks, completion guards, expanded BASICS+THAUMATURGY slices (including infusion-dependent focus, rod/cap, staff, and node/vis/focal-manipulation branches), plus ALCHEMY/ARTIFICE/ELDRITCH prerequisites (`PHIAL`/`CRUCIBLE`/`NITOR`/`ALUMENTUM`/`THAUMIUM`/`DISTILESSENTIA`/`INFUSION` and `ELDRITCHMINOR`/`OCULUS`/Outer chain/`VOIDMETAL`/`FOCUSPRIMAL`/`ROD_primal_staff` baseline) are partially ported. |
 | Stage 9-c | Infusion crafting/enchanting, runic augment, recipe-type localization, and inventory-source alignment are partially ported. |
 | Stage 9-b | Arcane workbench/container behavior, static/dynamic arcane recipes, and recipe-key audits are partially ported. |
 | Stage 8-a/b | Client bootstrap, keybindings, GUI baselines, textures, and rendering scaffolding are partially ported. |
