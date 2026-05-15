@@ -1044,6 +1044,48 @@ public class ConfigResearch {
                 .setConcealed()
                 .setParents("JARBRAIN")
                 .registerResearchItem();
+
+        new ResearchItem(
+                "ARMORFORTRESS",
+                "ARTIFICE",
+                new AspectList()
+                        .add(Aspect.METAL, 3)
+                        .add(Aspect.ARMOR, 5)
+                        .add(Aspect.CRAFT, 5),
+                -8,
+                9,
+                2,
+                new ItemStack(ConfigItems.itemHelmFortress))
+                .setPages(
+                        new ResearchPage("tc.research_page.ARMORFORTRESS.1"),
+                        new ResearchPage("tc.research_page.ARMORFORTRESS.2"),
+                        new ResearchPage((InfusionRecipe) recipes.get("ThaumiumFortressHelm")),
+                        new ResearchPage((InfusionRecipe) recipes.get("ThaumiumFortressChest")),
+                        new ResearchPage((InfusionRecipe) recipes.get("ThaumiumFortressLegs")))
+                .setParents("THAUMIUM", "INFUSIONENCHANTMENT")
+                .setHidden()
+                .setAspectTriggers(Aspect.ARMOR)
+                .registerResearchItem();
+
+        new ResearchItem(
+                "HELMGOGGLES",
+                "ARTIFICE",
+                new AspectList()
+                        .add(Aspect.SENSES, 5)
+                        .add(Aspect.AURA, 3)
+                        .add(Aspect.ARMOR, 3),
+                -9,
+                7,
+                2,
+                new ItemStack(ConfigItems.itemGoggles))
+                .setPages(
+                        new ResearchPage("tc.research_page.HELMGOGGLES.1"),
+                        new ResearchPage((InfusionRecipe) recipes.get("HelmGoggles")))
+                .setParentsHidden("GOGGLES")
+                .setParents("ARMORFORTRESS")
+                .setConcealed()
+                .setSecondary()
+                .registerResearchItem();
     }
 
     private static void initThaumaturgyResearchBaseline() {
