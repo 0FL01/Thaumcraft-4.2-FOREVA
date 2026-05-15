@@ -3,14 +3,25 @@ package thaumcraft.common.config;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.IRecipe;
 import net.minecraftforge.registries.IForgeRegistry;
+import thaumcraft.api.ThaumcraftApi;
 import thaumcraft.common.items.armor.RecipesRobeArmorDyes;
+import thaumcraft.common.lib.crafting.InfusionRunicAugmentRecipe;
 import thaumcraft.common.items.armor.RecipesVoidRobeArmorDyes;
 
 public class ConfigRecipes {
     private static boolean specialRecipesRegistered = false;
 
     public static void init() {
-        // Stage 9 recipe registration (arcane/infusion/crucible/research-linked content) remains in progress.
+        boolean hasRunicAugment = false;
+        for (Object recipe : ThaumcraftApi.getCraftingRecipes()) {
+            if (recipe instanceof InfusionRunicAugmentRecipe) {
+                hasRunicAugment = true;
+                break;
+            }
+        }
+        if (!hasRunicAugment) {
+            ThaumcraftApi.getCraftingRecipes().add(new InfusionRunicAugmentRecipe());
+        }
     }
 
     public static void oreDictRecipe(Object input, Object[] output) {

@@ -67,6 +67,27 @@ Branch: `codex/durable-goal-stage8-9`
 
 ## Checkpoint Log
 
+### 2026-05-15 — Stage 9-c dynamic runic augment infusion baseline
+
+Scope:
+
+- Added `InfusionRunicAugmentRecipe` port in `thaumcraft.common.lib.crafting` with reference-aligned server behavior: research gate, runic-armor central-item match, dynamic components by current runic charge, `RS.HARDEN` output mutation, dynamic aspect costs, and instability scaling.
+- Wired `ConfigRecipes.init()` to register `InfusionRunicAugmentRecipe` into `ThaumcraftApi.getCraftingRecipes()` with a duplicate guard.
+- Updated `TileInfusionMatrix.craftingStart` to mirror the reference special-case path and capture dynamic components via `InfusionRunicAugmentRecipe#getComponents(recipeInput)`.
+- Updated `docs/Stage9-c.md` GAP-3 status/acceptance/checklist to mark implementation closure and keep runtime scenario verification open.
+
+Validation:
+
+- `./scripts/dev.sh validate --smoke` — passed: status, compile, tests `10/10`, jar, check-jar summary `5435` MCP leak lines / `1063` unique leaks, and server smoke.
+- `run/smoke-server.log` evidence: `Registering entities`; `Forge Mod Loader has successfully loaded 6 mods`; `Done (1.258s)!`.
+- Crash report scan under `run/` returned no files.
+- `./scripts/dev.sh smoke-client` — skipped because `DISPLAY=` and GUI/graphics/user-interactive validation is excluded.
+
+Remaining limits:
+
+- This checkpoint restores runic augment recipe class/registration/matrix dynamic component wiring, but does not yet include a dedicated runtime infusion scenario asserting per-charge component consumption and repeated hardening attempts.
+- Stage 9-c recipe population blockers (GAP-1/2/4) remain open.
+
 ### 2026-05-15 — Stage 9-c infusion recipe-type localization keys baseline
 
 Scope:

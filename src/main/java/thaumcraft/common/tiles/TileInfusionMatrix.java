@@ -37,6 +37,7 @@ import thaumcraft.common.Thaumcraft;
 import thaumcraft.common.config.Config;
 import thaumcraft.common.config.ConfigBlocks;
 import thaumcraft.common.container.InventoryFake;
+import thaumcraft.common.lib.crafting.InfusionRunicAugmentRecipe;
 import thaumcraft.common.lib.TCSounds;
 import thaumcraft.common.lib.crafting.ThaumcraftCraftingManager;
 import thaumcraft.common.lib.events.EssentiaHandler;
@@ -213,7 +214,10 @@ public class TileInfusionMatrix extends TileThaumcraft implements ITickable, IWa
         if (recipe != null) {
             this.recipeType = 0;
             this.recipeIngredients = new ArrayList<ItemStack>();
-            for (ItemStack ingredient : recipe.getComponents()) {
+            ItemStack[] recipeComponents = recipe instanceof InfusionRunicAugmentRecipe
+                    ? ((InfusionRunicAugmentRecipe) recipe).getComponents(this.recipeInput)
+                    : recipe.getComponents();
+            for (ItemStack ingredient : recipeComponents) {
                 if (ingredient != null && !ingredient.isEmpty()) this.recipeIngredients.add(this.copySingle(ingredient));
             }
             this.setRecipeOutput(recipe.getRecipeOutput(this.recipeInput));

@@ -131,40 +131,37 @@ Custom enchant registration must already expose usable 1.12.2 `Enchantment` inst
 
 ### GAP-3: Отсутствует dynamic InfusionRunicAugmentRecipe
 
-**Статус:** отсутствует  
+**Статус:** частично закрыт (server/runtime baseline implemented)
 **Критичность:** high
 
 **Текущая реализация:**
-- `src/main/java/thaumcraft/common/lib/crafting/` has no `InfusionRunicAugmentRecipe.java` file.
-- `src/main/java/thaumcraft/common/tiles/TileInfusionMatrix.java:212`
-- `src/main/java/thaumcraft/common/tiles/TileInfusionMatrix.java:216`
+- `src/main/java/thaumcraft/common/lib/crafting/InfusionRunicAugmentRecipe.java`
+- `src/main/java/thaumcraft/common/config/ConfigRecipes.java`
+- `src/main/java/thaumcraft/common/tiles/TileInfusionMatrix.java`
 
 **Референс:**
-- `thaumcraft_src/thaumcraft/common/lib/crafting/InfusionRunicAugmentRecipe.class`
-- `thaumcraft_src/thaumcraft/common/tiles/TileInfusionMatrix.class`
-- `thaumcraft_src/thaumcraft/common/config/ConfigRecipes.class`
+- `Thaumcraft-1.7.10-4.2.3.5.jar!/thaumcraft/common/lib/crafting/InfusionRunicAugmentRecipe.class`
+- `Thaumcraft-1.7.10-4.2.3.5.jar!/thaumcraft/common/tiles/TileInfusionMatrix.class`
+- `Thaumcraft-1.7.10-4.2.3.5.jar!/thaumcraft/common/config/ConfigRecipes.class`
 
 **Что не совпадает:**
 
-Reference has `InfusionRunicAugmentRecipe extends InfusionRecipe`. It gates on `"RUNICAUGMENTATION"`, matches central items implementing `IRunicArmor`, dynamically computes components from `EventHandlerRunic.getFinalCharge(input)`, outputs the same item with `RS.HARDEN`, computes aspects from final charge, and computes instability as `5 + finalCharge / 2`. Reference `ConfigRecipes` creates `new InfusionRunicAugmentRecipe()` and adds it directly to `ThaumcraftApi.getCraftingRecipes()`. Current source has no such class and no direct registration, so runic armor hardening cannot be crafted through infusion.
+Port now contains `InfusionRunicAugmentRecipe extends InfusionRecipe` with reference-aligned research gate (`RUNICAUGMENTATION`), `IRunicArmor` central-item check, dynamic component sizing from `EventHandlerRunic.getFinalCharge(input)`, `RS.HARDEN` output mutation, dynamic aspects (`32 * 2^charge` split into ARMOR/MAGIC and full ENERGY), and instability formula `5 + finalCharge / 2`.
 
-Reference `TileInfusionMatrix.craftingStart` also special-cases `recipe instanceof InfusionRunicAugmentRecipe` to call `getComponents(this.recipeInput)` before storing recipe ingredients. Current matrix just copies `recipe.getComponents()` (`src/main/java/thaumcraft/common/tiles/TileInfusionMatrix.java:216`), which would be wrong for a dynamic recipe even after adding the class unless the class overrides `getComponents()` safely for the current input.
+`ConfigRecipes.init()` now adds `new InfusionRunicAugmentRecipe()` into `ThaumcraftApi.getCraftingRecipes()` with an idempotence guard, and `TileInfusionMatrix.craftingStart` now special-cases `InfusionRunicAugmentRecipe` to use `getComponents(recipeInput)` for dynamic pedestal ingredient capture as in reference.
 
 **Что нужно доделать:**
 
-Port `InfusionRunicAugmentRecipe` and integrate its dynamic component behavior with current 1.12.2 matrix startup.
+Keep and validate the runic augment recipe path in live infusion scenarios.
 
 **Как доделать:**
-- Create `src/main/java/thaumcraft/common/lib/crafting/InfusionRunicAugmentRecipe.java` from reference behavior.
-- Preserve API inheritance from `thaumcraft.api.crafting.InfusionRecipe`.
-- Map reference `Items.field_151045_i` and `ConfigItems.itemResource, meta 14` components to current 1.12.2 items.
-- Use current `IRunicArmor` path and current runic event helper equivalent for final charge/hardening; if `EventHandlerRunic` is absent or renamed, port or locate the current replacement before implementing the recipe.
-- Register the recipe in `ConfigRecipes.init()` via `ThaumcraftApi.getCraftingRecipes().add(new InfusionRunicAugmentRecipe())`.
-- Update `TileInfusionMatrix.craftingStart` to store dynamic `getComponents(recipeInput)` for this recipe, or design the recipe so `getComponents()` returns a correct per-input list without breaking public API behavior.
+- Add focused runtime coverage for first and repeated runic augment infusions.
+- Confirm final consumed components count and hardening NBT mutation under server runtime.
 
 **Критерии приемки:**
-- [ ] `src/main/java/thaumcraft/common/lib/crafting/InfusionRunicAugmentRecipe.java` exists and matches reference behavior for research, matching, output NBT, aspects, instability and components.
-- [ ] The recipe is present in `ThaumcraftApi.getCraftingRecipes()` after `ConfigRecipes.init()`.
+- [x] `src/main/java/thaumcraft/common/lib/crafting/InfusionRunicAugmentRecipe.java` exists and matches reference behavior for research, matching, output NBT, aspects, instability and components.
+- [x] The recipe is present in `ThaumcraftApi.getCraftingRecipes()` after `ConfigRecipes.init()`.
+- [x] `TileInfusionMatrix` uses dynamic `getComponents(recipeInput)` for this recipe path.
 - [ ] Infusion Matrix consumes the correct number of runic augmentation components for current central-item final charge.
 - [ ] Manual scenario verifies at least first and repeated runic augmentation attempts on a supported runic armor/bauble item.
 
@@ -336,8 +333,8 @@ Dependency: Stage 8/client FX/render work may affect visual confirmation and cli
 - [ ] Port all 63 reference infusion crafting recipe registrations into `ConfigRecipes.init()` or a called helper.
 - [ ] Port all 24 reference infusion enchantment recipe registrations.
 - [ ] Preserve all reference `ConfigResearch.recipes` keys and research gates for infusion recipes.
-- [ ] Add/restore dynamic `InfusionRunicAugmentRecipe` and register it.
-- [ ] Ensure `TileInfusionMatrix` handles dynamic runic components correctly.
+- [x] Add/restore dynamic `InfusionRunicAugmentRecipe` and register it.
+- [x] Ensure `TileInfusionMatrix` handles dynamic runic components correctly.
 - [x] Fix `ItemCraftedEvent` inventory context for infusion completion.
 - [x] Add missing infusion recipe type localization keys.
 - [ ] Confirm all recipe outputs, central inputs and components refer to existing 1.12.2 registered items/blocks/enchantments.
@@ -365,6 +362,5 @@ Stage 9-c считается ПОЛНОСТЬЮ завершенной толь�
 ## 8. Открытые вопросы
 
 - Нужно подтвердить точные 1.12.2 mappings для двух custom infusion enchantments Repair/Haste: reference использует `ThaumcraftApi.enchantRepair` и `ThaumcraftApi.enchantHaste`, а текущий порт должен предоставить реальные `Enchantment` instances для `ThaumcraftApi.addInfusionEnchantmentRecipe`.
-- Нужно подтвердить текущие имена/наличие runic armor helpers для `EventHandlerRunic.getFinalCharge` и `getHardening`; если они отсутствуют, их нужно портировать или заменить совместимым эквивалентом до реализации `InfusionRunicAugmentRecipe`.
 - Нужно подтвердить текущий mirror config field для условных `Mirror`, `MirrorHand`, `MirrorEssentia` recipes; reference gates them by `Config.allowMirrors`.
 - Нужно подтвердить после реализации, что все reference outputs/components существуют в текущем 1.12.2 item/block registry; отсутствующие цели являются dependency blockers для соответствующих recipes.
