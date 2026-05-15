@@ -401,7 +401,7 @@ Client particles/renderers are Phase 8. Sounds depend on `TCSounds` entries and 
 
 ### GAP-10: Boss special attacks and phase flows are not runtime-validated
 
-**Статус:** требует проверки  
+**Статус:** server-side baseline improved; runtime evidence open
 **Критичность:** high
 
 **Текущая реализация:**
@@ -531,10 +531,10 @@ Entity id remapping for external saves is not a Stage 6 target. Keep this gap sc
 - `thaumcraft_src/thaumcraft/common/entities/monster/EntityEldritchCrab.class`
 
 **Что не совпадает:**
-Current implementation spawns an `EntityEldritchCrab` with helm at `deathTime == 0` and suppresses normal zombie drops (`EntityInhabitedZombie.java:18-45`). This is the baseline mentioned by PRD, but it is sensitive to 1.12 death update ordering, XP/drop timing, and crab NBT/data manager setup. It has not been runtime-validated.
+Current implementation spawns an `EntityEldritchCrab` with helm and suppresses normal zombie drops. The 2026-05-15 checkpoint restores reference death-update termination after the manual crab/XP path, reference attributes, Cultist targeting, local spawn-density guard, crabtalk/hurt sounds, and crab helm persistence. Runtime validation is still required for exact spawn count, XP, and save/reload behavior.
 
 **Что нужно доделать:**
-Validate death update ordering and spawned crab behavior on a dedicated server.
+Run dedicated-server evidence for death update ordering and spawned crab behavior.
 
 **Как доделать:**
 - files/classes/methods/registrations/resources/scenarios
@@ -546,10 +546,11 @@ Validate death update ordering and spawned crab behavior on a dedicated server.
 **Критерии приемки:**
 - [ ] Player kill spawns one helmed Eldritch Crab and expected XP.
 - [ ] Non-player kill follows reference XP/drop semantics.
-- [ ] Crab helm state survives save/load.
+- [x] Server-side helm state is persisted through `EntityEldritchCrab` NBT.
+- [ ] Crab helm state survives save/load in a runtime world.
 
 **Риски / зависимости:**
-Client crab renderer is Phase 8; server entity state and spawn count are Stage 6.
+Client crab renderer is Phase 8; server entity state and spawn count are Stage 6. Original Inhabited Zombie cultist helmet/legs/chest spawn equipment cannot be fully restored until separate cultist armor piece items exist in this branch.
 
 ### GAP-14: Runtime smoke/manual validation for Stage 6 has not been run
 
@@ -883,6 +884,31 @@ Mapping:
 
 - Runtime registry smoke remains blocked by the pre-Forge smoke-server timeout, so duplicate/missing registry warnings and actual Forge egg spawning remain unobserved.
 - External 1.7.10 save/item compatibility remains out of scope for the active fresh-world target.
+
+### 8.2.10 Inhabited Zombie crab-spawn checkpoint — 2026-05-15
+
+Статус: server-side crab-spawn baseline improved; runtime evidence remains open.
+
+Что сделано:
+
+- Restored `EntityInhabitedZombie` reference attributes: 30 health, 5 attack damage, and zero zombie reinforcement chance.
+- Restored the reference target hooks for retaliation and Cultist targeting.
+- Changed `EntityInhabitedZombie.onDeathUpdate()` to finish with `setDead()` after the manual crab/XP/particle path instead of calling vanilla zombie death update, preventing delayed duplicate vanilla death handling after the crab spawn.
+- Restored the reference local spawn-density guard for Inhabited Zombies.
+- Restored reference crabtalk ambient and generic hostile hurt sounds for Inhabited Zombie.
+- Restored `EntityEldritchCrab` helm NBT persistence, hard/random natural helm initialization, 0.8 x 0.6 size, 6 XP value, 4 attack damage, helm-dependent armor/speed, and cultist-plate drop when the helm breaks below half health.
+
+Проверки:
+
+- `./scripts/dev.sh compileJava` — passed.
+- `./scripts/dev.sh build` — passed.
+- `./scripts/dev.sh check-jar` — не дошел до jar inspection: отсутствует wrapper-ожидаемый MCP mapping cache `.gradle_home/caches/minecraft/de/oceanlabs/mcp/mcp_stable/39/1.12.2/srgs/mcp-srg.srg`.
+- `./scripts/dev.sh smoke-server` — timeout before ready state на уже задокументированном pre-Forge/log4j этапе; `run/crash-reports/` не существует, and the configured crash-marker scan found no matches.
+
+Оставшиеся ограничения:
+
+- Inhabited Zombie kill scenarios and crab save/reload have not been observed in a runtime world because smoke-server remains environment-blocked and manual scenarios are excluded.
+- Original Inhabited Zombie cultist helmet/legs/chest spawn equipment remains a content dependency because this branch currently exposes aggregate cultist armor items rather than the original separate helmet/legs/chest fields.
 
 ### 8.3 Minimal Stage 6 manual scenario matrix
 

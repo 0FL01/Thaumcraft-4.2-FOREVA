@@ -657,6 +657,26 @@ Remaining limits:
 - Runtime registry smoke remains blocked by the pre-Forge smoke-server timeout, so duplicate/missing registry warnings and actual Forge egg spawning remain unobserved.
 - External 1.7.10 save/item compatibility remains out of scope for the active fresh-world target.
 
+### 2026-05-15 — Stage 6 Inhabited Zombie crab spawn
+
+Scope:
+
+- Restored Inhabited Zombie reference health, attack damage, zero reinforcement chance, Cultist targeting, local spawn-density guard, and crabtalk/hurt sounds.
+- Changed Inhabited Zombie death update to terminate after the manual crab/XP path instead of continuing through vanilla zombie death update.
+- Restored Eldritch Crab helm NBT persistence, natural helm initialization, size, XP value, attack damage, helm-dependent armor/speed, and cultist-plate drop when the helm breaks.
+
+Validation:
+
+- `./scripts/dev.sh compileJava` — passed.
+- `./scripts/dev.sh build` — passed.
+- `./scripts/dev.sh check-jar` — failed before jar inspection because the wrapper's expected MCP mapping cache file is still absent at `.gradle_home/caches/minecraft/de/oceanlabs/mcp/mcp_stable/39/1.12.2/srgs/mcp-srg.srg`.
+- `./scripts/dev.sh smoke-server` — failed by timeout before ready state; log again stopped after `Calling tweak class net.minecraftforge.fml.common.launcher.FMLServerTweaker`, with only Log4j console appender initialization errors. `run/crash-reports/` does not exist, and the configured crash-marker scan found no matches. This matches the clean `da3f307` baseline reproduction recorded above.
+
+Remaining limits:
+
+- Inhabited Zombie kill scenarios and crab save/reload have not been observed in a runtime world because smoke-server remains environment-blocked and user-driven manual scenarios are excluded.
+- Original Inhabited Zombie cultist helmet/legs/chest spawn equipment remains a content dependency because this branch currently exposes aggregate cultist armor items rather than the original separate helmet/legs/chest fields.
+
 ## Next Checkpoint Candidate
 
 After the portal trigger and ring bootstrap checkpoints, the next pre-Phase8 candidates are:
