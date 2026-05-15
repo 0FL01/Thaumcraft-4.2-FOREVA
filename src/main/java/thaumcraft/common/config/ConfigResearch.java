@@ -1110,6 +1110,87 @@ public class ConfigResearch {
                 .setParents("FOCUSHELLBAT")
                 .setParentsHidden("FOCALMANIPULATION")
                 .registerResearchItem();
+
+        new ResearchItem(
+                "WANDPED",
+                "THAUMATURGY",
+                new AspectList()
+                        .add(Aspect.AURA, 6)
+                        .add(Aspect.MAGIC, 3)
+                        .add(Aspect.EXCHANGE, 3)
+                        .add(Aspect.ENERGY, 3),
+                -9,
+                -6,
+                2,
+                new ItemStack(ConfigBlocks.blockStoneDevice, 1, 5))
+                .setPages(
+                        new ResearchPage("tc.research_page.WANDPED.1"),
+                        new ResearchPage((InfusionRecipe) recipes.get("WandPed")))
+                .setConcealed()
+                .setParents("INFUSION", "NODEPRESERVE", "NODESTABILIZER")
+                .registerResearchItem();
+
+        new ResearchItem(
+                "VISAMULET",
+                "THAUMATURGY",
+                new AspectList()
+                        .add(Aspect.AURA, 3)
+                        .add(Aspect.MAGIC, 6)
+                        .add(Aspect.ENERGY, 3)
+                        .add(Aspect.VOID, 3),
+                -9,
+                -8,
+                2,
+                new ItemStack(ConfigItems.itemAmuletVis, 1, 1))
+                .setPages(
+                        new ResearchPage("tc.research_page.VISAMULET.1"),
+                        new ResearchPage((InfusionRecipe) recipes.get("VisAmulet")),
+                        new ResearchPage("tc.research_page.VISAMULET.2"))
+                .setConcealed()
+                .setParents("WANDPED")
+                .registerResearchItem();
+
+        new ResearchItem(
+                "WANDPEDFOC",
+                "THAUMATURGY",
+                new AspectList()
+                        .add(Aspect.AURA, 6)
+                        .add(Aspect.MAGIC, 6)
+                        .add(Aspect.EXCHANGE, 6)
+                        .add(Aspect.ENERGY, 3)
+                        .add(Aspect.TOOL, 3),
+                -10,
+                -7,
+                3,
+                new ItemStack(ConfigBlocks.blockStoneDevice, 1, 8))
+                .setPages(
+                        new ResearchPage("tc.research_page.WANDPEDFOC.1"),
+                        new ResearchPage((InfusionRecipe) recipes.get("WandPedFocus")))
+                .setSecondary()
+                .setConcealed()
+                .setParents("WANDPED")
+                .registerResearchItem();
+
+        new ResearchItem(
+                "VISCHARGERELAY",
+                "THAUMATURGY",
+                new AspectList()
+                        .add(Aspect.MAGIC, 3)
+                        .add(Aspect.AURA, 3)
+                        .add(Aspect.MECHANISM, 3)
+                        .add(Aspect.ENERGY, 6),
+                -7,
+                -6,
+                2,
+                new ItemStack(ConfigBlocks.blockMetalDevice, 1, 2))
+                .setPages(
+                        new ResearchPage("tc.research_page.VISCHARGERELAY.1"),
+                        new ResearchPage((IArcaneRecipe) recipes.get("NodeChargeRelay")))
+                .setParents("VISPOWER", "WANDPED")
+                .setParentsHidden("ROD_greatwood")
+                .setSecondary()
+                .setConcealed()
+                .registerResearchItem();
     }
 
     private static void initBasicResearchTextOnlyExtended() {
