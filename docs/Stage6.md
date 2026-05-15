@@ -83,7 +83,7 @@ Client-only renderer/particle TODOs are Phase 8 dependencies. They are not count
 - `thaumcraft_src/thaumcraft/common/entities/golems/EntityGolemBase.class`
 
 **Что не совпадает:**
-Checkpoints 8.2.15 and 8.2.16 add `ConfigItems` fields/registrations for `itemGolemBell`, `itemGolemCore`, `itemGolemPlacer`, `itemGolemUpgrade`, `itemGolemDecoration`, and `itemTrunkSpawner`, restore the original metadata/subitem surface, and port the server-side golem/trunk item spawn paths. Checkpoint 8.2.17 restores bell link/marker editing, marker side/color identity, decoration application, wheat healing, and upgrade inventory refresh. Checkpoint 8.2.18 restores bell left-click pickup/packing behavior for golems and trunks. Checkpoint 8.2.19 restores traveling trunk baseline stats, upgrade application, feeding, stay-aware following, pickup upgrade pull behavior, and death inventory drops. Remaining workflow gaps are complex trunk combat/cross-dimension behavior and runtime/manual placement evidence.
+Checkpoints 8.2.15 and 8.2.16 add `ConfigItems` fields/registrations for `itemGolemBell`, `itemGolemCore`, `itemGolemPlacer`, `itemGolemUpgrade`, `itemGolemDecoration`, and `itemTrunkSpawner`, restore the original metadata/subitem surface, and port the server-side golem/trunk item spawn paths. Checkpoint 8.2.17 restores bell link/marker editing, marker side/color identity, decoration application, wheat healing, and upgrade inventory refresh. Checkpoint 8.2.18 restores bell left-click pickup/packing behavior for golems and trunks. Checkpoint 8.2.19 restores traveling trunk baseline stats, upgrade application, feeding, stay-aware following, pickup upgrade pull behavior, and death inventory drops. Checkpoint 8.2.22 restores upgrade `2` owner-target defense. Remaining workflow gaps are cross-dimension trunk owner-follow behavior and runtime/manual placement evidence.
 
 **Что нужно доделать:**
 Register the golem/trunk items with stable Thaumcraft names and port their server behavior so players can obtain, place, configure, and link golems/trunks.
@@ -1184,6 +1184,31 @@ Mapping:
 - Runtime confirmation that golems pause on active golem stone and resume off it remains unavailable while smoke-server is blocked before ready state and manual scenarios are excluded.
 - Death logging/bootup client sound parity and carried fluid/essentia display sync remain open.
 - Full per-core golem AI runtime scenarios remain open.
+
+### 8.2.22 Traveling trunk defense checkpoint — 2026-05-15
+
+Статус: upgrade `2` owner-target defense baseline restored; cross-dimension owner-follow remains open.
+
+Что сделано:
+
+- Restored the reference defensive anger timer for traveling trunks.
+- Restored upgrade `2` target acquisition from the owner's revenge or attack target when the trunk is not staying.
+- Added defensive target pursuit, melee damage using the trunk attack-damage attribute, hit status, and blaze-hit sound feedback.
+- Cleared stale attack targets when anger expires or the target dies so normal owner following can resume.
+
+Проверки:
+
+- `./scripts/dev.sh compileJava` — passed.
+- `./scripts/dev.sh build` — passed.
+- `./scripts/dev.sh check-jar` — не дошел до jar inspection: отсутствует wrapper-ожидаемый MCP mapping cache `.gradle_home/caches/minecraft/de/oceanlabs/mcp/mcp_stable/39/1.12.2/srgs/mcp-srg.srg`.
+- `./scripts/dev.sh smoke-server` — timeout before ready state на уже задокументированном pre-Forge/log4j этапе; `run/crash-reports/` не существует, and the configured crash-marker scan found no matches.
+- `git diff --check` — passed.
+
+Оставшиеся ограничения:
+
+- Runtime confirmation of owner-defense target acquisition and attack cadence remains unavailable while smoke-server is blocked before ready state and manual scenarios are excluded.
+- Cross-dimension owner-follow transfer remains open.
+- Client lid/heart/smoke animation parity remains Phase 8 work.
 
 ### 8.3 Minimal Stage 6 manual scenario matrix
 

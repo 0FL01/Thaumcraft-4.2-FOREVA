@@ -926,12 +926,35 @@ Remaining limits:
 - Death logging/bootup client sound parity and carried fluid/essentia display sync remain open.
 - Full per-core golem AI runtime scenarios remain open.
 
+### 2026-05-15 — Stage 6 traveling trunk defense
+
+Scope:
+
+- Restored the reference defensive anger timer for traveling trunks.
+- Restored upgrade `2` target acquisition from the owner's revenge or attack target when the trunk is not staying.
+- Added defensive target pursuit, melee damage through the trunk attack-damage attribute, hit status, and blaze-hit sound feedback.
+- Cleared stale attack targets when anger expires or the target dies so normal owner following can resume.
+
+Validation:
+
+- `./scripts/dev.sh compileJava` — passed.
+- `./scripts/dev.sh build` — passed.
+- `./scripts/dev.sh check-jar` — failed before jar inspection because the wrapper's expected MCP mapping cache file is still absent at `.gradle_home/caches/minecraft/de/oceanlabs/mcp/mcp_stable/39/1.12.2/srgs/mcp-srg.srg`.
+- `./scripts/dev.sh smoke-server` — failed by timeout before ready state; log again stopped after `Calling tweak class net.minecraftforge.fml.common.launcher.FMLServerTweaker`, with only Log4j console appender initialization errors. `run/crash-reports/` does not exist, and the configured crash-marker scan found no matches. This matches the clean `da3f307` baseline reproduction recorded above.
+- `git diff --check` — passed.
+
+Remaining limits:
+
+- Runtime confirmation of owner-defense target acquisition and attack cadence remains unavailable while smoke-server is blocked before ready state and user-driven manual scenarios are excluded.
+- Cross-dimension owner-follow transfer remains open.
+- Client lid/heart/smoke animation parity remains Phase 8 work.
+
 ## Next Checkpoint Candidate
 
-After the golem inactive-state and trunk baseline checkpoints, the next pre-Phase8 candidates are:
+After the golem inactive-state and trunk defense checkpoints, the next pre-Phase8 candidates are:
 
 - Remaining Stage 6 selected low-risk golem AI helper fixes and carried fluid/essentia display sync, if they can be kept server-safe.
-- Remaining Stage 6 traveling trunk upgrade `2` owner-target defense/combat and cross-dimension owner-follow transfer.
+- Remaining Stage 6 traveling trunk cross-dimension owner-follow transfer.
 - Remaining Stage 7 surface/worldgen runtime evidence and broader biome blacklist edge cases.
 - Remaining Stage 7 Outer Lands room/tile behavior, especially key/boss room traversal, boss-room runtime/save evidence, and maze save/load race validation.
 - Stage 9 loot/content registration, because `Utils.generateLoot(...)` now has a shared reward path but the full reference loot pool distribution still depends on populated content tables.
