@@ -67,6 +67,33 @@ Branch: `codex/durable-goal-stage8-9`
 
 ## Checkpoint Log
 
+### 2026-05-15 — Stage 9-e THAUMONOMICON/PLANTS baseline expansion
+
+Scope:
+
+- Extended `ConfigRecipes` Stage 9-e map baseline with list-backed research layout keys:
+  - `Thaumonomicon`
+  - `ArcTable`
+  - `ResTable`
+  - `Crucible`
+- Extended `ConfigResearch` BASICS baseline with:
+  - `THAUMONOMICON` (text + list recipe layout page)
+  - `PLANTS` (text + `PlankGreatwood`/`PlankSilverwood` recipe pages)
+- Kept scope to BASICS-only entries whose page dependencies are now satisfied by currently ported recipe keys.
+- Updated `docs/Stage9-e.md` current-state and GAP-2 wording for this additional partial coverage.
+
+Validation:
+
+- `./scripts/dev.sh validate --smoke` — passed: status, compile, tests, jar, check-jar summary, and server smoke.
+- `run/smoke-server.log` evidence: server ready (`Done (...)`), no fatal markers.
+- Crash report scan under `run/` remained clean during smoke stage.
+- `./scripts/dev.sh smoke-client` — skipped because `DISPLAY=` and GUI/graphics/user-interactive validation is excluded.
+
+Remaining limits:
+
+- The majority of Stage 9-e research graph and recipe-backed page surface is still pending.
+- GUI/manual Thaumonomicon validation remains skipped by instruction and headless environment limits.
+
 ### 2026-05-15 — Stage 9-e BASICS research progression + recipe-key baseline
 
 Scope:

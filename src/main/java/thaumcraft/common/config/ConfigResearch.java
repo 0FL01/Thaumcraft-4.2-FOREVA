@@ -1,6 +1,7 @@
 package thaumcraft.common.config;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.IRecipe;
@@ -167,6 +168,45 @@ public class ConfigResearch {
                 .setRound()
                 .setAutoUnlock()
                 .setParents("RESEARCH")
+                .registerResearchItem();
+
+        new ResearchItem(
+                "THAUMONOMICON",
+                "BASICS",
+                new AspectList(),
+                1,
+                -2,
+                0,
+                new ItemStack(ConfigItems.itemThaumonomicon))
+                .setPages(
+                        new ResearchPage("tc.research_page.THAUMONOMICON.1"),
+                        new ResearchPage((List<?>) recipes.get("Thaumonomicon")))
+                .setAutoUnlock()
+                .setStub()
+                .setRound()
+                .setParents("RESEARCH")
+                .registerResearchItem();
+
+        new ResearchItem(
+                "PLANTS",
+                "BASICS",
+                new AspectList(),
+                -2,
+                -4,
+                0,
+                new ItemStack(ConfigBlocks.blockCustomPlant, 1, 0))
+                .setPages(
+                        new ResearchPage("tc.research_page.PLANTS.1"),
+                        new ResearchPage((IRecipe) recipes.get("PlankGreatwood")),
+                        new ResearchPage("tc.research_page.PLANTS.2"),
+                        new ResearchPage((IRecipe) recipes.get("PlankSilverwood")),
+                        new ResearchPage("tc.research_page.PLANTS.3"),
+                        new ResearchPage("tc.research_page.PLANTS.4"),
+                        new ResearchPage("tc.research_page.PLANTS.5"),
+                        new ResearchPage("tc.research_page.PLANTS.6"))
+                .setStub()
+                .setRound()
+                .setAutoUnlock()
                 .registerResearchItem();
 
         new ResearchItem(

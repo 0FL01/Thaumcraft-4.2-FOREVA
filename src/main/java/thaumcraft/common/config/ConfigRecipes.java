@@ -1,5 +1,6 @@
 package thaumcraft.common.config;
 
+import java.util.Arrays;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Enchantments;
 import net.minecraft.init.Items;
@@ -87,6 +88,20 @@ public class ConfigRecipes {
         if (recipeThaumometer != null) {
             ConfigResearch.recipes.put("Thaumometer", recipeThaumometer);
         }
+        ItemStack basicWand = new ItemStack(ConfigItems.itemWandCasting, 1, 0);
+        ConfigResearch.recipes.put("Thaumonomicon",
+                Arrays.asList(new AspectList(), 1, 2, 1,
+                        Arrays.asList(basicWand, new ItemStack(Blocks.BOOKSHELF))));
+        ConfigResearch.recipes.put("ArcTable",
+                Arrays.asList(new AspectList(), 1, 2, 1,
+                        Arrays.asList(basicWand, new ItemStack(ConfigBlocks.blockTable))));
+        ConfigResearch.recipes.put("ResTable",
+                Arrays.asList(new AspectList(), 1, 2, 2,
+                        Arrays.asList(null, new ItemStack(ConfigItems.itemInkwell),
+                                new ItemStack(ConfigBlocks.blockTable), new ItemStack(ConfigBlocks.blockTable))));
+        ConfigResearch.recipes.put("Crucible",
+                Arrays.asList(new AspectList(), 1, 2, 1,
+                        Arrays.asList(basicWand, new ItemStack(Items.CAULDRON))));
 
         boolean hasArcaneWand = false;
         boolean hasArcaneSceptre = false;
