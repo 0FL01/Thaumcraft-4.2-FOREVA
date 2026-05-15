@@ -596,6 +596,27 @@ Remaining limits:
 - Type names have not been observed on in-game Pech entities because smoke-server remains environment-blocked and user-driven manual scenarios are excluded.
 - Natural/command-spawn variant runtime coverage remains open under the Stage 6 manual matrix.
 
+### 2026-05-15 — Stage 6 projectile sounds/status
+
+Scope:
+
+- Restored `EntityGolemOrb` reference `shock` impact sound and `zap` redirect sound instead of generic block event placeholders.
+- Restored `EntityGolemOrb` squared-distance homing acceleration to match the reference path.
+- Restored `EntityEldritchOrb` reference fizz sound, status byte `16`, and next-tick expiry after impact.
+- Restored the original `0.1F` collision border on Golem orb, Eldritch orb, and Pech blast, while documenting Pech blast impact particles as Phase 8 visual work.
+
+Validation:
+
+- `./scripts/dev.sh compileJava` — passed.
+- `./scripts/dev.sh build` — passed.
+- `./scripts/dev.sh check-jar` — failed before jar inspection because the wrapper's expected MCP mapping cache file is still absent at `.gradle_home/caches/minecraft/de/oceanlabs/mcp/mcp_stable/39/1.12.2/srgs/mcp-srg.srg`.
+- `./scripts/dev.sh smoke-server` — failed by timeout before ready state; log again stopped after `Calling tweak class net.minecraftforge.fml.common.launcher.FMLServerTweaker`, with only Log4j console appender initialization errors. `run/crash-reports/` does not exist, and the configured crash-marker scan found no matches. This matches the clean `da3f307` baseline reproduction recorded above.
+
+Remaining limits:
+
+- Projectile sound/status behavior has not been observed in a runtime world because smoke-server remains environment-blocked and user-driven manual scenarios are excluded.
+- Client burst/wisp particle rendering remains Phase 8/client work, and the broader projectile runtime sweep remains open under S6-PROJ-01.
+
 ## Next Checkpoint Candidate
 
 After the portal trigger and ring bootstrap checkpoints, the next pre-Phase8 candidates are:

@@ -30,6 +30,9 @@ public class EntityPechBlast extends EntityThrowable {
     protected float getGravityVelocity() { return 0.025f; }
 
     @Override
+    public float getCollisionBorderSize() { return 0.1F; }
+
+    @Override
     public void onUpdate() {
         super.onUpdate();
         if (this.ticksExisted > 500) this.setDead();

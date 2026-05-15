@@ -8,6 +8,7 @@ import net.minecraft.util.DamageSource;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.registry.IEntityAdditionalSpawnData;
+import thaumcraft.common.lib.TCSounds;
 
 public class EntityGolemOrb extends EntityThrowable implements IEntityAdditionalSpawnData {
     private int targetId = 0;
@@ -25,12 +26,15 @@ public class EntityGolemOrb extends EntityThrowable implements IEntityAdditional
     protected float getGravityVelocity() { return 0.0f; }
 
     @Override
+    public float getCollisionBorderSize() { return 0.1F; }
+
+    @Override
     public void onUpdate() {
         super.onUpdate();
         if (this.ticksExisted > (this.red ? 240 : 160)) { this.setDead(); return; }
         // Homing
-        if (this.target != null && this.target.isEntityAlive()) {
-            double d = this.getDistance(this.target);
+        if (this.target != null) {
+            double d = this.getDistanceSq(this.target);
             if (d > 0.01) {
                 double dx = (this.target.posX - this.posX) / d;
                 double dy = (this.target.getEntityBoundingBox().minY + (double)this.target.height * 0.6 - this.posY) / d;
@@ -57,9 +61,7 @@ public class EntityGolemOrb extends EntityThrowable implements IEntityAdditional
                 DamageSource.causeIndirectDamage(this, this.getThrower()),
                 atk * (this.red ? 1.0f : 0.6f));
         }
-        if (this.world.isRemote) {
-            this.world.playEvent(null, 2001, this.getPosition(), 0);
-        }
+        this.playSound(TCSounds.SHOCK, 1.0F, 1.0F + (this.rand.nextFloat() - this.rand.nextFloat()) * 0.2F);
         this.setDead();
     }
 
@@ -71,7 +73,7 @@ public class EntityGolemOrb extends EntityThrowable implements IEntityAdditional
             this.motionX = source.getTrueSource().getLookVec().x * 0.9;
             this.motionY = source.getTrueSource().getLookVec().y * 0.9;
             this.motionZ = source.getTrueSource().getLookVec().z * 0.9;
-            this.world.playEvent(null, 2001, this.getPosition(), 0);
+            this.playSound(TCSounds.ZAP, 1.0F, 1.0F + (this.rand.nextFloat() - this.rand.nextFloat()) * 0.2F);
             return true;
         }
         return false;

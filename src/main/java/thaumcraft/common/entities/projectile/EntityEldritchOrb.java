@@ -6,10 +6,10 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.projectile.EntityThrowable;
 import net.minecraft.init.MobEffects;
+import net.minecraft.init.SoundEvents;
 import net.minecraft.potion.PotionEffect;
 import net.minecraft.util.DamageSource;
-import net.minecraft.util.math.AxisAlignedBB;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.World;
 
@@ -20,6 +20,9 @@ public class EntityEldritchOrb extends EntityThrowable {
 
     @Override
     protected float getGravityVelocity() { return 0.0f; }
+
+    @Override
+    public float getCollisionBorderSize() { return 0.1F; }
 
     @Override
     public void onUpdate() {
@@ -47,9 +50,19 @@ public class EntityEldritchOrb extends EntityThrowable {
                 ((EntityLivingBase)entity).addPotionEffect(
                     new PotionEffect(MobEffects.WITHER, 160, 0));
             }
-            this.world.playEvent(null, 2001, this.getPosition(), 0);
+            this.world.playSound(null, this.posX, this.posY, this.posZ,
+                    SoundEvents.BLOCK_FIRE_EXTINGUISH, SoundCategory.HOSTILE,
+                    0.5F, 2.6F + (this.rand.nextFloat() - this.rand.nextFloat()) * 0.8F);
             this.ticksExisted = 100; // triggers death next tick
+            this.world.setEntityState(this, (byte) 16);
         }
-        this.setDead();
+    }
+
+    @Override
+    public void handleStatusUpdate(byte id) {
+        if (id == 16) {
+            return;
+        }
+        super.handleStatusUpdate(id);
     }
 }
