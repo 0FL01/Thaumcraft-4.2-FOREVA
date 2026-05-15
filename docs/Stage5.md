@@ -585,7 +585,7 @@ Dependency: advanced item renderers and focus FX are Phase 8. Static item resour
 
 ### GAP-13: Robe dye recipes are explicit stubs
 
-**Статус:** отсутствует  
+**Статус:** частично реализовано  
 **Критичность:** medium
 
 **Текущая реализация:**
@@ -598,16 +598,17 @@ Dependency: advanced item renderers and focus FX are Phase 8. Static item resour
 
 **Что не совпадает:**
 
-Both recipe classes return `false` with `TBD` comments: `src/main/java/thaumcraft/common/items/armor/RecipesRobeArmorDyes.java:14`, `src/main/java/thaumcraft/common/items/armor/RecipesVoidRobeArmorDyes.java:14`. Reference robe classes also have color NBT/display handling and item-use behavior. Current `ItemRobeArmor`/`ItemVoidRobeArmor` do not show equivalent dye NBT support in the inspected lines.
+Recipe logic and robe/void-robe color NBT support are now implemented, and recipe registration is wired through `RegistryEvent.Register<IRecipe>` in `Thaumcraft#registerRecipes` using `ConfigRecipes.registerSpecialRecipes(...)`. Remaining mismatch is runtime/manual verification coverage under current non-GUI constraints.
 
 **Что нужно доделать:**
 
-Port robe dye crafting and color NBT behavior.
+Verify robe and void-robe dye scenarios in runtime checks when manual/client validation is available.
 
 **Как доделать:**
-- Implement recipe matching/crafting result for robe and void robe dyes in Forge 1.12 recipe APIs.
-- Port robe color getter/setter/clear behavior and display NBT semantics from reference.
-- Register recipes only in the appropriate recipe registration layer; if Stage 9 owns final recipe registration, document that dependency but keep item NBT support in Stage 5.
+- Done: implement robe and void-robe dye recipe matching/crafting result in Forge 1.12 recipe APIs.
+- Done: keep robe color getter/setter/remove behavior in `ItemRobeArmor` and `ItemVoidRobeArmor`.
+- Done: register `forge:robearmordye` and `forge:voidrobearmordye` via `RegistryEvent.Register<IRecipe>`.
+- Remaining: runtime/manual scenario evidence for dyeing flows.
 
 **Критерии приемки:**
 - [ ] Robe dye recipes match and produce colored robe stacks.

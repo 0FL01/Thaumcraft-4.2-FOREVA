@@ -67,6 +67,27 @@ Branch: `codex/durable-goal-stage8-9`
 
 ## Checkpoint Log
 
+### 2026-05-15 — Stage 5 robe dye recipe registration baseline
+
+Scope:
+
+- Added Forge 1.12 recipe registry wiring for robe dyes via `Thaumcraft#registerRecipes(RegistryEvent.Register<IRecipe>)`.
+- Implemented `ConfigRecipes.registerSpecialRecipes(...)` and registered `forge:robearmordye` plus `forge:voidrobearmordye`.
+- Kept recipe registration idempotent with an internal one-time guard.
+- Updated `docs/Stage5.md` GAP-13 status/details to reflect that recipe logic, armor color NBT support, and registration baseline are now present.
+
+Validation:
+
+- `./scripts/dev.sh validate --smoke` — passed: status, compile, tests `10/10`, jar, check-jar summary `5408` MCP leak lines / `1060` unique leaks, and server smoke.
+- `run/smoke-server.log` evidence: `Registering entities`; `Forge Mod Loader has successfully loaded 6 mods`; `Done (` ready-state present.
+- Crash report scan under `run/` returned no files.
+- `./scripts/dev.sh smoke-client` — skipped because `DISPLAY=` and GUI/graphics/user-interactive validation is excluded.
+
+Remaining limits:
+
+- This checkpoint registers only the robe/void-robe special dye recipes; it does not implement the full Stage 9 recipe content set.
+- Manual/runtime robe dye scenarios remain unverified under current non-GUI constraints.
+
 ### 2026-05-15 — Stage 8-b Research Table container polish
 
 Scope:

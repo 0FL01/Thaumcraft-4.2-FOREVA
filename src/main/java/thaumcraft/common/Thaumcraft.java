@@ -6,6 +6,7 @@ import net.minecraft.init.Items;
 import net.minecraft.block.Block;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.item.Item;
+import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.potion.Potion;
 import net.minecraft.world.DimensionType;
 import net.minecraft.world.biome.Biome;
@@ -227,6 +228,12 @@ public class Thaumcraft {
         // Register ItemBlocks for blocks (via ConfigBlocks helper + manual jar)
         event.getRegistry().register(new BlockJarItem(ConfigBlocks.blockJar).setRegistryName(ConfigBlocks.blockJar.getRegistryName()));
         ConfigBlocks.registerItemBlocks(event.getRegistry());
+    }
+
+    @SubscribeEvent
+    public void registerRecipes(RegistryEvent.Register<IRecipe> event) {
+        log.info("Registering recipes");
+        ConfigRecipes.registerSpecialRecipes(event.getRegistry());
     }
 
     @SubscribeEvent
