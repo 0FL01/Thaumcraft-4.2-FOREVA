@@ -67,8 +67,8 @@ public class BlockEldritchPortal extends Block {
 
     @Override
     public void neighborChanged(IBlockState state, World world, BlockPos pos, Block block, BlockPos fromPos) {
-        // Portal breaks if center altar (blockEldritch meta 3) is missing below
-        if (world.getBlockState(pos.down()).getBlock() != ConfigBlocks.blockEldritch) {
+        if (world.getBlockState(pos.up()).getBlock() != ConfigBlocks.blockEldritch
+                || world.getBlockState(pos.down()).getBlock() != ConfigBlocks.blockEldritch) {
             world.setBlockState(pos, Blocks.AIR.getDefaultState(), 3);
         }
     }

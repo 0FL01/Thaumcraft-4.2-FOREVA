@@ -170,7 +170,7 @@ Remaining altar limits after this checkpoint: generated ring activation has not 
 **Что не совпадает:**
 Reference `TeleporterThaumcraft` searches within 128 blocks for `ConfigBlocks.blockEldritchPortal`, caches portal positions by chunk/dimension key, places the entity beside the found portal with zero velocity, falls back to safe top Y in dimension 1-style logic, and expires cache entries. The 2026-05-14 teleporter checkpoint ports the search/cache/velocity-reset placement path and removes fixed `y=60` placement.
 
-The reference `BlockEldritchPortal` is a pass-through portal block and does not own dimension transfer. The reference `TileEldritchPortal` scans nearby `EntityPlayerMP` instances every 5 ticks, uses the player portal cooldown, transfers to `Config.dimensionOuterId` or Overworld, and grants `ENTEROUTER` on first entry. The 2026-05-14 portal trigger checkpoint ports that server-side ownership to the 1.12.2 tile and removes collision-driven transfer from the block. Remaining mismatch is unvalidated portal/maze runtime behavior: the code still needs an in-world traversal proof that an Overworld portal reaches an already generated Outer Lands portal room and returns safely.
+The reference `BlockEldritchPortal` is a pass-through portal block and does not own dimension transfer. The reference `TileEldritchPortal` scans nearby `EntityPlayerMP` instances every 5 ticks, uses the player portal cooldown, transfers to `Config.dimensionOuterId` or Overworld, and grants `ENTEROUTER` on first entry. The 2026-05-14 portal trigger checkpoint ports that server-side ownership to the 1.12.2 tile and removes collision-driven transfer from the block. The 2026-05-15 portal support checkpoint restores the reference behavior where portal blocks self-remove if either eldritch support block above or below is missing. Remaining mismatch is unvalidated portal/maze runtime behavior: the code still needs an in-world traversal proof that an Overworld portal reaches an already generated Outer Lands portal room and returns safely.
 
 **Что нужно доделать:**
 Verify the correct trigger for entering/leaving Outer Lands and runtime-test the 1.12.2 `Teleporter` adaptation. The player should arrive adjacent to an existing Eldritch portal room, not a fallback position, when a generated portal room exists.
@@ -200,6 +200,18 @@ Remaining GAP-3 limits after this checkpoint were trigger ownership and manual p
 `TileEldritchPortal` now implements the reference-like ticked player scan. Every 5 ticks on the server it scans a grown one-block AABB, ignores mounted/ridden players, respects `EntityPlayerMP.timeUntilPortal` with the original 100-tick cooldown behavior, transfers to `Config.dimensionOuterId` or Overworld using `TeleporterThaumcraft`, null-guards missing target worlds, and grants `ENTEROUTER` through the current `ResearchManager` when entering the Outer Lands. `BlockEldritchPortal` no longer performs collision-driven dimension changes; it is now pass-through/non-replaceable/unbreakable and leaves transfer ownership to the tile entity.
 
 Remaining GAP-3 limits after this checkpoint: the code path now matches reference ownership more closely, but no manual portal traversal/save-reload validation has been run. GAP-3 also still depends on GAP-2/GAP-4 because the teleporter can only prove arrival near an existing portal block after ring/maze/portal-room generation is validated.
+
+**Checkpoint 2026-05-15 — portal support check:**
+`BlockEldritchPortal.neighborChanged(...)` now matches the original two-sided support rule: the portal removes itself when either the block above or the block below is no longer `ConfigBlocks.blockEldritch`. The previous port only checked the lower support block.
+
+Validation:
+- `./scripts/dev.sh compileJava` — passed.
+- `./scripts/dev.sh build` — passed.
+- `./scripts/dev.sh check-jar` — не дошел до jar inspection: отсутствует wrapper-ожидаемый MCP mapping cache `.gradle_home/caches/minecraft/de/oceanlabs/mcp/mcp_stable/39/1.12.2/srgs/mcp-srg.srg`.
+- `./scripts/dev.sh smoke-server` — timeout before ready state на уже задокументированном pre-Forge/log4j этапе; `run/crash-reports/` не существует, and the configured crash-marker scan found no matches.
+- `git diff --check` — passed.
+
+Remaining GAP-3 limits after this checkpoint: runtime portal support updates, traversal, and save/reload validation remain unavailable while smoke-server is blocked before ready state and manual scenarios are excluded.
 
 ### GAP-4: Outer Lands room templates are partial and contain TODO placeholders
 
