@@ -53,6 +53,8 @@ Branch: `codex/durable-goal-stage8-9`
 - Traveling Trunk client smoke/manual open/visual parity was skipped on 2026-05-15 because `DISPLAY=` and user-driven GUI/graphics validation is excluded by instruction.
 - Pech client smoke/manual open/trade visual parity was skipped on 2026-05-15 because `DISPLAY=` and user-driven GUI/graphics validation is excluded by instruction.
 - Golem client smoke/manual open/visual parity was skipped on 2026-05-15 because `DISPLAY=` and user-driven GUI/graphics validation is excluded by instruction.
+- Research Table client smoke/manual open/visual parity was skipped on 2026-05-15 because `DISPLAY=` and user-driven GUI/graphics validation is excluded by instruction.
+- Thaumonomicon/Research Browser client smoke/manual open/visual parity was skipped on 2026-05-15 because `DISPLAY=` and user-driven GUI/graphics validation is excluded by instruction.
 - Future GUI/client visual checks that require user-driven Minecraft control, screenshots, or unavailable X11/graphics stack will be recorded as: `SKIPPED by user instruction: GUI/graphics/user-interactive validation excluded`.
 
 ## Baseline Validation
@@ -64,6 +66,30 @@ Branch: `codex/durable-goal-stage8-9`
 - `./scripts/dev.sh validate --smoke` — passed on 2026-05-15, including compact server smoke validation.
 
 ## Checkpoint Log
+
+### 2026-05-15 — Stage 8-b Research Table and Thaumonomicon GUI baseline
+
+Scope:
+
+- Added baseline `GuiResearchTable` backed by `ContainerResearchTable`.
+- Added baseline `GuiResearchBrowser`, `GuiResearchRecipe`, and `GuiResearchPopup` screens.
+- Routed client GUI ID `10` (`GUI_RESEARCH_TABLE`) to tile-backed `GuiResearchTable` and GUI ID `12` (`GUI_THAUMONOMICON`) to `GuiResearchBrowser`.
+- Copied original research GUI textures used by these baseline screens: `guiresearchtable2.png`, `gui_research.png`, `gui_researchbook.png`, `gui_researchbook_overlay.png`.
+- Updated `docs/Stage8-b.md` with the implemented baselines and remaining research-GUI parity limits.
+
+Validation:
+
+- `./scripts/dev.sh compileJava` — passed.
+- `./scripts/dev.sh validate --smoke` — passed: status, compile, tests `10/10`, jar, check-jar summary `5380` MCP leak lines / `1057` unique leaks, and server smoke.
+- `run/smoke-server.log` evidence: `Registering entities`; `Forge Mod Loader has successfully loaded 6 mods`; `Done (1.198s)!`.
+- Crash report scan under `run/` returned no files.
+- `./scripts/dev.sh smoke-client` — skipped because `DISPLAY=` and GUI/graphics/user-interactive validation is excluded.
+
+Remaining limits:
+
+- Research Table note puzzle interactions, aspect/rune flows, and no-ink/copy states are not yet ported.
+- Thaumonomicon category/node/recipe/popup behavior is only baseline and not parity-complete.
+- Extended research GUI texture/lang coverage and manual visual parity remain open.
 
 ### 2026-05-15 — Stage 8-b Golem GUI baseline
 

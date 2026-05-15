@@ -65,7 +65,7 @@ Lightweight commands run during analysis:
 
 ## 4. Текущее состояние Stage 8-b
 
-Current state is not closeable. Server/common GUI IDs and containers exist for many screens, but client-side routing and client GUI classes are still incomplete. GUI IDs `0`, `1`, `2`, `3`, `5`, `8`, `9`, `13`, `15`, `16`, `17`, `18`, `19`, and `20` now have texture-backed Golem, Pech, Traveling Trunk, Thaumatorium, Focus Pouch, Deconstruction Table, Alchemy Furnace, Arcane Workbench, Arcane Bore, Hand Mirror, Hover Harness, Magic Box, Spa, and Focal Manipulator baselines, but full visual parity and manual client validation remain open.
+Current state is not closeable. Server/common GUI IDs and containers exist for many screens, but client-side routing and client GUI classes are still incomplete. GUI IDs `0`, `1`, `2`, `3`, `5`, `8`, `9`, `10`, `12`, `13`, `15`, `16`, `17`, `18`, `19`, and `20` now have texture-backed Golem, Pech, Traveling Trunk, Thaumatorium, Focus Pouch, Deconstruction Table, Alchemy Furnace, Research Table, Thaumonomicon Browser, Arcane Workbench, Arcane Bore, Hand Mirror, Hover Harness, Magic Box, Spa, and Focal Manipulator baselines, but full visual parity and manual client validation remain open.
 
 Concrete current findings:
 
@@ -73,12 +73,12 @@ Concrete current findings:
 - Server GUI routing exists for Golem, Pech, Traveling Trunk, Thaumatorium, Focus Pouch, Deconstruction Table, Alchemy Furnace, Research Table, Arcane Workbench, Arcane Bore, Hand Mirror, Hover Harness, Magic Box, Spa, and Focal Manipulator in `src/main/java/thaumcraft/common/CommonProxy.java:61-119`.
 - Thaumonomicon is intentionally server-null in `src/main/java/thaumcraft/common/CommonProxy.java:95`, matching the reference pattern that its GUI is client-only.
 - Base `CommonProxy.getClientGuiElement` returns null in `src/main/java/thaumcraft/common/CommonProxy.java:122-126`, as expected for common proxy.
-- `ClientProxy.getClientGuiElement` constructs `GuiFocusPouch`, `GuiHandMirror`, `GuiHoverHarness`, `GuiMagicBox`, `GuiSpa`, `GuiTravelingTrunk`, `GuiPech`, and `GuiGolem`, and now routes `GUI_THAUMATORIUM`, `GUI_DECONSTRUCTION_TABLE`, `GUI_ALCHEMY_FURNACE`, `GUI_ARCANE_WORKBENCH`, `GUI_ARCANE_BORE`, and `GUI_FOCAL_MANIPULATOR` to matching tile-backed screens; remaining Stage 8-b/current GUI IDs returning null are Research Table (`10`) and Thaumonomicon (`12`).
+- `ClientProxy.getClientGuiElement` now routes all active Stage 8-b/current GUI IDs to concrete client screens, including `GUI_RESEARCH_TABLE` (`GuiResearchTable`) and `GUI_THAUMONOMICON` (`GuiResearchBrowser`), with tile/entity type checks where required.
 - `GuiFocusPouch`, `GuiHandMirror`, and `GuiHoverHarness` now bind original textures instead of grey placeholder rectangles.
 - `src/main/resources/assets/thaumcraft/textures/gui/gui_thaumatorium.png`, `gui_arcaneworkbench.png`, `gui_arcanebore.png`, `gui_wandtable.png`, `gui_decontable.png`, `gui_alchemyfurnace.png`, `gui_spa.png`, `guitrunkbase.png`, `gui_focuspouch.png`, `guihandmirror.png`, and `guihoverharness.png` are copied byte-for-byte from `thaumcraft_src/assets/thaumcraft/textures/gui/`; the other reference GUI textures are still absent from current resources.
 - `src/main/resources/assets/thaumcraft/textures/aspects/**` now contains the original aspect icon set needed by Thaumatorium and later research/aspect GUI rendering.
 - Current English lang now includes item GUI labels plus focal/trunk/spa GUI keys used by implemented screens, but research-browser/table and other remaining Stage 8-b GUI key coverage is still incomplete.
-- Thaumonomicon right-click opens GUI ID `12` server-side in `src/main/java/thaumcraft/common/items/relics/ItemThaumonomicon.java:43-50`, but client ID `12` returns null in `src/main/java/thaumcraft/client/ClientProxy.java:78-84`.
+- Thaumonomicon right-click opens GUI ID `12` server-side in `src/main/java/thaumcraft/common/items/relics/ItemThaumonomicon.java:43-50`; client ID `12` now returns baseline `GuiResearchBrowser`.
 - Thaumometer currently performs server-side scanning in `src/main/java/thaumcraft/common/items/relics/ItemThaumometer.java:37-69`; no `GuiScreen`/overlay implementation was found under `src/main/java/thaumcraft/client/**`.
 
 ## 5. Gap list
@@ -416,17 +416,15 @@ Depends on current `EntityTravelingTrunk` and `ContainerTravelingTrunk` preservi
 
 ### GAP-8: Thaumonomicon / Research Browser GUI отсутствует
 
-**Статус:** отсутствует  
+**Статус:** частично реализовано  
 **Критичность:** blocker
 
 **Текущая реализация:**
 - `src/main/java/thaumcraft/common/items/relics/ItemThaumonomicon.java:43-50`
 - `src/main/java/thaumcraft/common/CommonProxy.java:95`
-- `src/main/java/thaumcraft/client/ClientProxy.java:78-84`
-- Отсутствует `src/main/java/thaumcraft/client/gui/GuiResearchBrowser.java`.
-- Отсутствует `src/main/java/thaumcraft/client/gui/GuiResearchRecipe.java`.
-- Отсутствует `src/main/java/thaumcraft/client/gui/GuiResearchPopup.java`.
-- Отсутствуют `src/main/resources/assets/thaumcraft/textures/gui/gui_research.png`, `gui_researchbook.png`, `gui_researchbook_overlay.png`, `gui_researchback.png`, `gui_researchbackeldritch.png`.
+- `src/main/java/thaumcraft/client/ClientProxy.java#getClientGuiElement` routes GUI ID `12` to `GuiResearchBrowser`.
+- `src/main/java/thaumcraft/client/gui/GuiResearchBrowser.java`, `GuiResearchRecipe.java`, and `GuiResearchPopup.java` exist as 1.12.2 baseline screens.
+- `src/main/resources/assets/thaumcraft/textures/gui/gui_research.png`, `gui_researchbook.png`, and `gui_researchbook_overlay.png` are copied from the original assets.
 
 **Референс:**
 - `Thaumcraft-1.7.10-4.2.3.5.jar!/thaumcraft/client/ClientProxy.class`, offsets `247-254` instantiate `GuiResearchBrowser` for GUI ID `12`.
@@ -437,39 +435,49 @@ Depends on current `EntityTravelingTrunk` and `ContainerTravelingTrunk` preservi
 - `thaumcraft_src/assets/thaumcraft/textures/gui/gui_research*.png` and research background textures.
 
 **Что не совпадает:**
-Thaumonomicon right-click can request GUI ID `12`, but the client returns null. The full research browser, category map, popups, recipe page display, unlock/purchase interactions, and supporting textures/lang are absent.
+Thaumonomicon right-click can now open a baseline browser screen for GUI ID `12`. Full research map/category logic, unlock/purchase interactions, recipe transitions, popup parity, and full texture/lang support are still incomplete.
 
 **Что нужно доделать:**
-Port Thaumonomicon research browser and recipe/popup screens sufficiently to browse current research categories, open recipe pages, and handle locked/forbidden states without crashes.
+Finish Thaumonomicon research-browser parity: category map, node interactions, recipe/popup flows, and locked/forbidden feedback.
 
 **Как доделать:**
-- Add `GuiResearchBrowser`, `GuiResearchRecipe`, `GuiResearchPopup` and needed inner helper structures under `src/main/java/thaumcraft/client/gui/`.
-- Route `GUI_THAUMONOMICON` case `12` to `new GuiResearchBrowser()` in `ClientProxy#getClientGuiElement` while keeping server element null.
-- Copy direct GUI textures from `thaumcraft_src/assets/thaumcraft/textures/gui/` and direct support textures from `textures/misc/**` / `textures/aspects/**`.
+- Done: add `GuiResearchBrowser`, `GuiResearchRecipe`, and `GuiResearchPopup` baseline screens.
+- Done: route `GUI_THAUMONOMICON` case `12` to `new GuiResearchBrowser()` in `ClientProxy#getClientGuiElement` while keeping server element null.
+- Done: copy direct baseline GUI textures used by these screens (`gui_research.png`, `gui_researchbook.png`, `gui_researchbook_overlay.png`).
+- Remaining: copy extended research textures (`gui_researchback*.png`, `hex*.png`) and direct support textures from `textures/misc/**` / `textures/aspects/**` required for full parity rendering.
 - Add required lang keys from reference `en_US.lang` into `src/main/resources/assets/thaumcraft/lang/en_us.lang` using 1.12 lowercase locale path.
 - Scenario: right-click Thaumonomicon, switch categories, click known and locked research entries, open recipe page.
 
 **Критерии приемки:**
-- [ ] GUI ID `12` opens a research browser client screen.
+- [x] GUI ID `12` opens a research browser client screen.
 - [ ] Browser displays categories and research nodes without missing texture crashes.
 - [ ] Clicking research opens recipe/detail screen or locked-state feedback matching reference behavior.
-- [ ] Required research lang keys and GUI textures are present.
+- [ ] Required research lang keys and full research GUI texture set are present.
+
+**Checkpoint 2026-05-15 — Thaumonomicon/Research Browser baseline:**
+- Added baseline `GuiResearchBrowser`, `GuiResearchRecipe`, and `GuiResearchPopup`.
+- Routed GUI ID `12` to `GuiResearchBrowser` in `ClientProxy`.
+- Copied baseline research browser textures: `gui_research.png`, `gui_researchbook.png`, and `gui_researchbook_overlay.png`.
+- Validation: `./scripts/dev.sh compileJava` passed; `./scripts/dev.sh validate --smoke` passed with tests `10/10`, jar/check-jar summary `5380` MCP leak lines / `1057` unique leaks, server smoke ready, and no crash reports under `run/`.
+- Client smoke/manual GUI checks were skipped because `DISPLAY=` and user-driven GUI/graphics validation is excluded for this run.
+- Remaining: full category/node/recipe flow parity and extended texture/lang coverage.
 
 **Риски / зависимости:**
 Dependency: actual research category/item population is Stage 9/content-sensitive. Stage 8-b acceptance can verify empty/partial data states, but full browsing parity needs registered research data.
 
 ### GAP-9: Research Table / Research Notes GUI отсутствует
 
-**Статус:** отсутствует  
+**Статус:** частично реализовано  
 **Критичность:** blocker
 
 **Текущая реализация:**
-- `src/main/java/thaumcraft/client/ClientProxy.java:77-84`
+- `src/main/java/thaumcraft/client/ClientProxy.java#getClientGuiElement` routes GUI ID `10` to `GuiResearchTable` when the tile is `TileResearchTable`.
 - `src/main/java/thaumcraft/common/CommonProxy.java:91-94`
 - `src/main/java/thaumcraft/common/blocks/BlockTable.java:161-170`
-- Отсутствует `src/main/java/thaumcraft/client/gui/GuiResearchTable.java`.
-- Отсутствуют `src/main/resources/assets/thaumcraft/textures/gui/guiresearchtable2.png`, `hex1.png`, `hex2.png`.
-- Current lang has no `tile.researchtable.noink.*` or `tc.research.copy` entries in `src/main/resources/assets/thaumcraft/lang/en_us.lang:1-118`.
+- `src/main/java/thaumcraft/client/gui/GuiResearchTable.java` exists as a 1.12.2 baseline `GuiContainer`.
+- `src/main/resources/assets/thaumcraft/textures/gui/guiresearchtable2.png` exists and matches the original asset.
+- `hex1.png` and `hex2.png` remain absent.
+- Current lang still has no `tile.researchtable.noink.*` or `tc.research.copy` entries.
 
 **Референс:**
 - `Thaumcraft-1.7.10-4.2.3.5.jar!/thaumcraft/client/ClientProxy.class`, offsets `225-246` instantiate `GuiResearchTable` for GUI ID `10`.
@@ -477,15 +485,16 @@ Dependency: actual research category/item population is Stage 9/content-sensitiv
 - Reference resource constants include `textures/gui/guiresearchtable2.png`, `textures/gui/hex1.png`, `textures/gui/hex2.png`, `textures/aspects/_back.png`, `textures/aspects/_unknown.png`, `textures/misc/parchment3.png`, `textures/misc/script.png`.
 
 **Что не совпадает:**
-Server/common can open `GUI_RESEARCH_TABLE`, including adjacent table lookup, but client returns null. Reference GUI implements research-note puzzle pages, aspect selection/combine/write/erase/scroll clicks, rune drawing, lines/highlights and no-ink messages. Current has no screen, textures, lang or client interaction layer.
+Server/common can open `GUI_RESEARCH_TABLE`, and client now opens a baseline research-table screen with reference background assets. Reference note-puzzle interactions, aspect/rune logic, and no-ink/copy states are still not implemented.
 
 **Что нужно доделать:**
-Port `GuiResearchTable` and direct support resources/lang.
+Finish `GuiResearchTable` parity: note puzzle surface, aspect/rune interactions, and no-ink/copy state behavior.
 
 **Как доделать:**
-- Add `src/main/java/thaumcraft/client/gui/GuiResearchTable.java` with helper inner classes.
-- Route `GUI_RESEARCH_TABLE` to `TileResearchTable`.
-- Copy `guiresearchtable2.png`, `hex1.png`, `hex2.png`, aspect back/unknown textures, `parchment3.png`, `script.png` and any directly used research GUI misc textures.
+- Done: add baseline `src/main/java/thaumcraft/client/gui/GuiResearchTable.java`.
+- Done: route `GUI_RESEARCH_TABLE` to `TileResearchTable`.
+- Done: copy `guiresearchtable2.png`.
+- Remaining: copy `hex1.png`, `hex2.png`, aspect back/unknown textures, `parchment3.png`, `script.png` and any directly used research GUI misc textures.
 - Add reference lang keys such as `tc.research.copy`, `tile.researchtable.noink.0`, `tile.researchtable.noink.1`.
 - Scenario: open research table with no note, with a note, with ink missing, and attempt aspect/rune interaction.
 
@@ -495,10 +504,18 @@ Port `GuiResearchTable` and direct support resources/lang.
 - [ ] Aspect interactions send expected container/button actions.
 - [ ] No missing lang key is visible for no-ink/copy states.
 
+**Checkpoint 2026-05-15 — Research Table GUI baseline:**
+- Added baseline `GuiResearchTable` bound to `ContainerResearchTable` and `TileResearchTable`.
+- Routed GUI ID `10` in `ClientProxy` to the tile-backed screen.
+- Copied original `guiresearchtable2.png`.
+- Validation: `./scripts/dev.sh compileJava` passed; `./scripts/dev.sh validate --smoke` passed with tests `10/10`, jar/check-jar summary `5380` MCP leak lines / `1057` unique leaks, server smoke ready, and no crash reports under `run/`.
+- Client smoke/manual GUI checks were skipped because `DISPLAY=` and user-driven GUI/graphics validation is excluded for this run.
+- Remaining: puzzle/aspect/rune logic parity, full research support textures, and lang key coverage.
+
 **Риски / зависимости:**
 Depends on current `ResearchNoteData`, aspect lists and `ContainerResearchTable` behavior. Full note-solving parity may require Stage 3/9 research data completion.
 
-### GAP-10: Additional current/common GUI IDs with reference screens return null
+### GAP-10: Additional current/common GUI IDs still need parity polish
 
 **Статус:** частично реализовано
 **Критичность:** high
@@ -629,7 +646,7 @@ Inventory-slot blocking is behavior-sensitive and can cause item loss/duplicatio
 **Критичность:** blocker
 
 **Текущая реализация:**
-- `src/main/resources/assets/thaumcraft/textures/gui/` now contains `gui_thaumatorium.png`, `gui_arcaneworkbench.png`, `gui_arcanebore.png`, `gui_wandtable.png`, `gui_decontable.png`, `gui_alchemyfurnace.png`, `gui_spa.png`, `guitrunkbase.png`, `guigolem.png`, `gui_pech.png`, `gui_focuspouch.png`, `guihandmirror.png`, and `guihoverharness.png`.
+- `src/main/resources/assets/thaumcraft/textures/gui/` now contains `gui_thaumatorium.png`, `gui_arcaneworkbench.png`, `gui_arcanebore.png`, `gui_wandtable.png`, `gui_decontable.png`, `gui_alchemyfurnace.png`, `gui_spa.png`, `guitrunkbase.png`, `guigolem.png`, `gui_pech.png`, `guiresearchtable2.png`, `gui_research.png`, `gui_researchbook.png`, `gui_researchbook_overlay.png`, `gui_focuspouch.png`, `guihandmirror.png`, and `guihoverharness.png`.
 - `src/main/resources/assets/thaumcraft/textures/misc/potions.png` is the only current `textures/misc` file found.
 - `src/main/resources/assets/thaumcraft/textures/aspects/**` now contains the original aspect icon set copied for Thaumatorium/aspect GUI rendering.
 
@@ -658,7 +675,7 @@ Inventory-slot blocking is behavior-sensitive and can cause item loss/duplicatio
 - Research support textures under `thaumcraft_src/assets/thaumcraft/textures/misc/**` and aspect icons under `thaumcraft_src/assets/thaumcraft/textures/aspects/**`.
 
 **Что не совпадает:**
-The texture resource tree now covers the newly ported Thaumatorium, Arcane Workbench, Arcane Bore, Focal Manipulator, Deconstruction Table, Alchemy Furnace, Golem, Pech, Traveling Trunk, Spa, Focus Pouch, Hand Mirror, Hover Harness, and aspect-icon paths, but most remaining Stage 8-b GUI textures and direct research misc support textures are still absent.
+The texture resource tree now covers the newly ported Thaumatorium, Arcane Workbench, Arcane Bore, Focal Manipulator, Deconstruction Table, Alchemy Furnace, Golem, Pech, Traveling Trunk, Research Table/Browser baselines, Spa, Focus Pouch, Hand Mirror, Hover Harness, and aspect-icon paths, but remaining advanced research GUI textures and direct research misc support textures are still absent.
 
 **Что нужно доделать:**
 Copy original GUI and directly used support textures from `thaumcraft_src/assets/` to `src/main/resources/assets/thaumcraft/`.
@@ -763,7 +780,7 @@ This is a dependency boundary with client item rendering/overlay work, not a blo
 - Reference jar contains complete client GUI routing/screens/resources listed in sections above.
 
 **Что не совпадает:**
-Current state has not been manually validated for Stage 8-b scenarios, and most screens cannot be opened because client routing returns null. Even after implementation, Stage 8-b cannot be claimed complete without runtime/manual smoke evidence.
+Current state still lacks manual/client validation evidence for Stage 8-b scenarios. Even with non-null client routing baselines in place, Stage 8-b cannot be claimed complete without runtime/manual smoke evidence.
 
 **Что нужно доделать:**
 After implementation, run build/resource checks and manual/client smoke for every Stage 8-b GUI scenario.

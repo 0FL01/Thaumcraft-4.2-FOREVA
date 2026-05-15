@@ -27,6 +27,8 @@ import thaumcraft.client.gui.GuiHandMirror;
 import thaumcraft.client.gui.GuiHoverHarness;
 import thaumcraft.client.gui.GuiMagicBox;
 import thaumcraft.client.gui.GuiPech;
+import thaumcraft.client.gui.GuiResearchBrowser;
+import thaumcraft.client.gui.GuiResearchTable;
 import thaumcraft.client.gui.GuiSpa;
 import thaumcraft.client.gui.GuiThaumatorium;
 import thaumcraft.client.gui.GuiTravelingTrunk;
@@ -42,6 +44,7 @@ import thaumcraft.common.tiles.TileArcaneBore;
 import thaumcraft.common.tiles.TileArcaneWorkbench;
 import thaumcraft.common.tiles.TileDeconstructionTable;
 import thaumcraft.common.tiles.TileFocalManipulator;
+import thaumcraft.common.tiles.TileResearchTable;
 import thaumcraft.common.tiles.TileSpa;
 import thaumcraft.common.tiles.TileThaumatorium;
 import thaumcraft.common.entities.golems.EntityGolemBase;
@@ -183,8 +186,14 @@ public class ClientProxy extends CommonProxy {
                         : null;
             }
             case GUI_RESEARCH_TABLE:
+            {
+                TileEntity tile = world.getTileEntity(new BlockPos(x, y, z));
+                return tile instanceof TileResearchTable
+                        ? new GuiResearchTable(player, (TileResearchTable) tile)
+                        : null;
+            }
             case GUI_THAUMONOMICON:
-                return null;
+                return new GuiResearchBrowser();
             case GUI_ARCANE_WORKBENCH:
             {
                 TileEntity tile = world.getTileEntity(new BlockPos(x, y, z));
