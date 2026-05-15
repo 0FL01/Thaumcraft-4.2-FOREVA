@@ -17,6 +17,7 @@ import net.minecraftforge.event.entity.player.ItemTooltipEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import thaumcraft.client.gui.GuiArcaneBore;
 import thaumcraft.client.gui.GuiArcaneWorkbench;
+import thaumcraft.client.gui.GuiFocalManipulator;
 import thaumcraft.client.gui.GuiFocusPouch;
 import thaumcraft.client.gui.GuiHandMirror;
 import thaumcraft.client.gui.GuiHoverHarness;
@@ -30,6 +31,7 @@ import thaumcraft.common.config.ConfigItems;
 import thaumcraft.common.lib.events.EventHandlerRunic;
 import thaumcraft.common.tiles.TileArcaneBore;
 import thaumcraft.common.tiles.TileArcaneWorkbench;
+import thaumcraft.common.tiles.TileFocalManipulator;
 import thaumcraft.common.tiles.TileThaumatorium;
 
 public class ClientProxy extends CommonProxy {
@@ -156,8 +158,14 @@ public class ClientProxy extends CommonProxy {
             }
             case GUI_MAGIC_BOX:
             case GUI_SPA:
-            case GUI_FOCAL_MANIPULATOR:
                 return null;
+            case GUI_FOCAL_MANIPULATOR:
+            {
+                TileEntity tile = world.getTileEntity(new BlockPos(x, y, z));
+                return tile instanceof TileFocalManipulator
+                        ? new GuiFocalManipulator(player.inventory, (TileFocalManipulator) tile)
+                        : null;
+            }
             default:
                 return null;
         }

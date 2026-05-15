@@ -65,7 +65,7 @@ Lightweight commands run during analysis:
 
 ## 4. Текущее состояние Stage 8-b
 
-Current state is not closeable. Server/common GUI IDs and containers exist for many screens, but client-side routing and client GUI classes are mostly absent. GUI IDs `3`, `13`, and `15` now have texture-backed Thaumatorium, Arcane Workbench, and Arcane Bore baselines, but full visual parity and manual client validation remain open.
+Current state is not closeable. Server/common GUI IDs and containers exist for many screens, but client-side routing and client GUI classes are mostly absent. GUI IDs `3`, `13`, `15`, and `20` now have texture-backed Thaumatorium, Arcane Workbench, Arcane Bore, and Focal Manipulator baselines, but full visual parity and manual client validation remain open.
 
 Concrete current findings:
 
@@ -73,9 +73,9 @@ Concrete current findings:
 - Server GUI routing exists for Golem, Pech, Traveling Trunk, Thaumatorium, Focus Pouch, Deconstruction Table, Alchemy Furnace, Research Table, Arcane Workbench, Arcane Bore, Hand Mirror, Hover Harness, Magic Box, Spa, and Focal Manipulator in `src/main/java/thaumcraft/common/CommonProxy.java:61-119`.
 - Thaumonomicon is intentionally server-null in `src/main/java/thaumcraft/common/CommonProxy.java:95`, matching the reference pattern that its GUI is client-only.
 - Base `CommonProxy.getClientGuiElement` returns null in `src/main/java/thaumcraft/common/CommonProxy.java:122-126`, as expected for common proxy.
-- `ClientProxy.getClientGuiElement` constructs `GuiFocusPouch`, `GuiHandMirror`, `GuiHoverHarness`, and now routes `GUI_THAUMATORIUM`, `GUI_ARCANE_WORKBENCH`, and `GUI_ARCANE_BORE` to matching tile-backed screens; the remaining Stage 8-b/current GUI IDs still return null.
+- `ClientProxy.getClientGuiElement` constructs `GuiFocusPouch`, `GuiHandMirror`, `GuiHoverHarness`, and now routes `GUI_THAUMATORIUM`, `GUI_ARCANE_WORKBENCH`, `GUI_ARCANE_BORE`, and `GUI_FOCAL_MANIPULATOR` to matching tile-backed screens; the remaining Stage 8-b/current GUI IDs still return null.
 - Existing GUI screens are placeholder-style grey rectangles and do not bind original textures: `GuiFocusPouch.java:23-35`, `GuiHandMirror.java:23-29`, `GuiHoverHarness.java:23-29`.
-- `src/main/resources/assets/thaumcraft/textures/gui/gui_thaumatorium.png`, `gui_arcaneworkbench.png`, and `gui_arcanebore.png` are copied byte-for-byte from `thaumcraft_src/assets/thaumcraft/textures/gui/`; the other reference GUI textures are still absent from current resources.
+- `src/main/resources/assets/thaumcraft/textures/gui/gui_thaumatorium.png`, `gui_arcaneworkbench.png`, `gui_arcanebore.png`, and `gui_wandtable.png` are copied byte-for-byte from `thaumcraft_src/assets/thaumcraft/textures/gui/`; the other reference GUI textures are still absent from current resources.
 - `src/main/resources/assets/thaumcraft/textures/aspects/**` now contains the original aspect icon set needed by Thaumatorium and later research/aspect GUI rendering.
 - Current English lang has only `container.focus_pouch`, `container.handmirror`, `container.hoverharness`, and `container.inventory` for implemented GUI labels in `src/main/resources/assets/thaumcraft/lang/en_us.lang:101-104`; research/golem/trunk/interaction GUI keys are absent.
 - Thaumonomicon right-click opens GUI ID `12` server-side in `src/main/java/thaumcraft/common/items/relics/ItemThaumonomicon.java:43-50`, but client ID `12` returns null in `src/main/java/thaumcraft/client/ClientProxy.java:78-84`.
@@ -223,16 +223,17 @@ Dependency: recipe availability may depend on Stage 9 content/recipe registratio
 
 ### GAP-4: Focal Manipulator GUI отсутствует на клиенте
 
-**Статус:** отсутствует  
+**Статус:** частично реализовано
 **Критичность:** blocker
 
 **Текущая реализация:**
-- `src/main/java/thaumcraft/client/ClientProxy.java:83-84`
+- `src/main/java/thaumcraft/client/ClientProxy.java#getClientGuiElement` routes GUI ID `20` to `GuiFocalManipulator` only when the client tile at the provided coordinates is `TileFocalManipulator`.
 - `src/main/java/thaumcraft/common/CommonProxy.java:114-117`
 - `src/main/java/thaumcraft/common/blocks/BlockStoneDevice.java:144-149`
-- Отсутствует `src/main/java/thaumcraft/client/gui/GuiFocalManipulator.java`.
-- Отсутствует `src/main/java/thaumcraft/client/gui/GuiFocalManipulator$Sparkle.java` equivalent inner implementation.
-- Отсутствует `src/main/resources/assets/thaumcraft/textures/gui/gui_wandtable.png`.
+- `src/main/java/thaumcraft/client/gui/GuiFocalManipulator.java` exists as a 1.12.2 `GuiContainer` baseline using `ContainerFocalManipulator`.
+- `src/main/java/thaumcraft/client/gui/GuiFocalManipulator$Sparkle.java` equivalent inner implementation remains absent/deferred.
+- `src/main/resources/assets/thaumcraft/textures/gui/gui_wandtable.png` exists and matches the original asset.
+- Focus upgrade localization keys and `wandtable.text1..3` exist in `src/main/resources/assets/thaumcraft/lang/en_us.lang`.
 
 **Референс:**
 - `Thaumcraft-1.7.10-4.2.3.5.jar!/thaumcraft/client/ClientProxy.class`, offsets `437-461` instantiate `GuiFocalManipulator` for GUI ID `20`.
@@ -241,22 +242,31 @@ Dependency: recipe availability may depend on Stage 9 content/recipe registratio
 - `thaumcraft_src/assets/thaumcraft/textures/gui/gui_wandtable.png`.
 
 **Что не совпадает:**
-Reference GUI computes possible upgrades, selected upgrade, rank, aspect/XP costs, sparkles, fixed hover text and click handling. Current client has no GUI class and returns null, so Focal Manipulator is inaccessible visually.
+Reference GUI computes possible upgrades, selected upgrade, rank, aspect/XP costs, sparkles, fixed hover text and click handling. Current client now computes possible upgrades from the focus, shows selected cost/progress, renders upgrade/aspect icons, shows hover text, and sends the selected upgrade id through the existing container path. Sparkle animation and exact fixed tooltip positioning are not ported.
 
 **Что нужно доделать:**
-Port full Focal Manipulator screen and route GUI ID `20`.
+Finish Focal Manipulator parity by porting/refining sparkle animation and exact tooltip/layout behavior, then manually validate opening, focus insertion, upgrade selection, and start behavior in a client runtime.
 
 **Как доделать:**
-- Add `src/main/java/thaumcraft/client/gui/GuiFocalManipulator.java` with inner `Sparkle` data.
-- Update `ClientProxy#getClientGuiElement` case `GUI_FOCAL_MANIPULATOR`.
-- Copy `gui_wandtable.png` and any directly referenced aspect/misc textures.
+- Done: add `src/main/java/thaumcraft/client/gui/GuiFocalManipulator.java` baseline.
+- Remaining: add/refine inner `Sparkle` data if visual parity requires it.
+- Done: update `ClientProxy#getClientGuiElement` case `GUI_FOCAL_MANIPULATOR`.
+- Done: copy `gui_wandtable.png`; required aspect/focus textures exist in current resources.
 - Scenario: open a placed Focal Manipulator through `BlockStoneDevice.java:145-147`, insert focus, inspect upgrade list and start button behavior.
 
 **Критерии приемки:**
-- [ ] GUI ID `20` opens and displays focus slot, upgrade options, costs and progress.
-- [ ] Upgrade selection and start interaction match reference container semantics.
+- [x] GUI ID `20` is routed to a tile-backed screen and displays focus slot, upgrade options, costs and progress from current tile/container data.
+- [x] Upgrade selection and start interaction use the existing container `enchantItem` semantics.
 - [ ] Sparkle/hover text rendering does not crash even if particle systems are otherwise deferred.
-- [ ] GUI uses original `gui_wandtable.png`.
+- [x] GUI uses original `gui_wandtable.png`.
+
+**Checkpoint 2026-05-15 — Focal Manipulator GUI baseline:**
+- Added `GuiFocalManipulator` with reference size `192x233`, `ContainerFocalManipulator`, possible-upgrade icon rendering, selected cost/progress display, hover text, and upgrade-id click routing through `sendEnchantPacket`.
+- Routed client GUI ID `20` to the screen with a `TileFocalManipulator` type check.
+- Copied original `gui_wandtable.png` and added focus upgrade/wandtable language keys needed by the screen.
+- Validation: `./scripts/dev.sh compileJava` passed; `./scripts/dev.sh validate --smoke` passed with tests `10/10`, jar/check-jar summary `5187` MCP leak lines / `1040` unique leaks, server ready at `Done (1.177s)!`, and no crash reports under `run/`.
+- Client smoke/manual GUI open was skipped because `DISPLAY=` and user-driven GUI/graphics validation is excluded for this run.
+- Remaining: manual open/focus insertion/start scenarios, exact visual layout comparison, and sparkle animation parity.
 
 **Риски / зависимости:**
 Depends on focus upgrade data and relay/CV tile data being populated. Stage 9/content gaps can reduce available upgrades but must not prevent GUI opening.
@@ -548,7 +558,7 @@ Inventory-slot blocking is behavior-sensitive and can cause item loss/duplicatio
 **Критичность:** blocker
 
 **Текущая реализация:**
-- `src/main/resources/assets/thaumcraft/textures/gui/` now contains `gui_thaumatorium.png`, `gui_arcaneworkbench.png`, and `gui_arcanebore.png`.
+- `src/main/resources/assets/thaumcraft/textures/gui/` now contains `gui_thaumatorium.png`, `gui_arcaneworkbench.png`, `gui_arcanebore.png`, and `gui_wandtable.png`.
 - `src/main/resources/assets/thaumcraft/textures/misc/potions.png` is the only current `textures/misc` file found.
 - `src/main/resources/assets/thaumcraft/textures/aspects/**` now contains the original aspect icon set copied for Thaumatorium/aspect GUI rendering.
 
@@ -577,7 +587,7 @@ Inventory-slot blocking is behavior-sensitive and can cause item loss/duplicatio
 - Research support textures under `thaumcraft_src/assets/thaumcraft/textures/misc/**` and aspect icons under `thaumcraft_src/assets/thaumcraft/textures/aspects/**`.
 
 **Что не совпадает:**
-The texture resource tree now covers the newly ported Thaumatorium, Arcane Workbench, Arcane Bore and aspect-icon paths, but most remaining Stage 8-b GUI textures and direct research misc support textures are still absent. Existing placeholder GUIs avoid binding resources, masking the remaining gap.
+The texture resource tree now covers the newly ported Thaumatorium, Arcane Workbench, Arcane Bore, Focal Manipulator, and aspect-icon paths, but most remaining Stage 8-b GUI textures and direct research misc support textures are still absent. Existing placeholder GUIs avoid binding resources, masking the remaining gap.
 
 **Что нужно доделать:**
 Copy original GUI and directly used support textures from `thaumcraft_src/assets/` to `src/main/resources/assets/thaumcraft/`.
@@ -603,7 +613,7 @@ Resource path case changed from 1.7 `en_US.lang` style to 1.12 lowercase languag
 **Критичность:** high
 
 **Текущая реализация:**
-- `src/main/resources/assets/thaumcraft/lang/en_us.lang:101-104` only contains `container.focus_pouch`, `container.handmirror`, `container.hoverharness`, `container.inventory` for GUI labels.
+- `src/main/resources/assets/thaumcraft/lang/en_us.lang` now contains the existing container labels plus focus upgrade names/descriptions and `wandtable.text1..3` for `GuiFocalManipulator`.
 - TrueType helper classes exist under `src/main/java/thaumcraft/truetyper/TrueTypeFont.java`, `Formatter.java`, `FontLoader.java`, `FontHelper.java`, but no Stage 8-b GUI currently uses them.
 - `src/main/java/thaumcraft/client/gui/**` has no research browser/table classes that would initialize the reference `galFontRenderer` fields.
 
