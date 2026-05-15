@@ -1188,6 +1188,59 @@ public class ConfigResearch {
                 .registerResearchItem();
         ThaumcraftApi.addWarpToResearch("FOCUSPRIMAL", 2);
         ThaumcraftApi.addWarpToItem(new ItemStack(ConfigItems.focusPrimal), 1);
+
+        new ResearchItem(
+                "SANITYCHECK",
+                "ELDRITCH",
+                new AspectList()
+                        .add(Aspect.MIND, 5)
+                        .add(Aspect.ELDRITCH, 3)
+                        .add(Aspect.SENSES, 5),
+                2,
+                2,
+                1,
+                new ItemStack(ConfigItems.itemSanityChecker))
+                .setPages(
+                        new ResearchPage("tc.research_page.SANITYCHECK.1"),
+                        new ResearchPage((InfusionRecipe) recipes.get("SanityCheck")))
+                .setParents("ELDRITCHMINOR")
+                .registerResearchItem();
+
+        new ResearchItem(
+                "ROD_primal_staff",
+                "ELDRITCH",
+                new AspectList()
+                        .add(Aspect.AIR, 9)
+                        .add(Aspect.EARTH, 9)
+                        .add(Aspect.FIRE, 9)
+                        .add(Aspect.WATER, 9)
+                        .add(Aspect.ORDER, 9)
+                        .add(Aspect.ENTROPY, 9)
+                        .add(Aspect.TOOL, 9)
+                        .add(Aspect.MAGIC, 12),
+                6,
+                2,
+                3,
+                new ItemStack(ConfigItems.itemWandRod, 1, 100))
+                .setPages(
+                        new ResearchPage("tc.research_page.ROD_primal_staff.1"),
+                        new ResearchPage((InfusionRecipe) recipes.get("WandRodPrimalStaff")))
+                .setHidden()
+                .setEntityTriggers("Thaumcraft.PrimalOrb")
+                .setItemTriggers(new ItemStack(ConfigItems.focusPrimal))
+                .setParents("FOCUSPRIMAL")
+                .setParentsHidden(
+                        "ROD_silverwood_staff",
+                        "ROD_bone_staff",
+                        "ROD_greatwood_staff",
+                        "ROD_blaze_staff",
+                        "ROD_reed_staff",
+                        "ROD_obsidian_staff",
+                        "ROD_quartz_staff",
+                        "ROD_ice_staff")
+                .registerResearchItem();
+        ThaumcraftApi.addWarpToResearch("ROD_primal_staff", 3);
+        ThaumcraftApi.addWarpToItem(new ItemStack(ConfigItems.itemWandRod, 1, 100), 1);
     }
 
     private static void initEldritchResearchTextOnlyBaseline() {
