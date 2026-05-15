@@ -1159,9 +1159,29 @@ Remaining limits:
 - Runtime validation of Greatwood support in mixed-tag biomes remains unavailable while smoke-server is blocked before ready state and user-driven manual scenarios are excluded.
 - `getBiomeAura(...)`, `getRandomBiomeTag(...)`, biome decorator/spawn behavior, and biome color/debug overlay behavior still need runtime/client evidence.
 
+### 2026-05-15 — Stage 6 golem upgrade retaliation
+
+Scope:
+
+- Restored the reference upgrade `5` thorns-style retaliation when a golem is damaged by another entity.
+- Retaliation damage scales as `upgradeCount * 2 + random.nextInt(2 * upgradeCount)` and plays the thorns hit sound on the attacker.
+
+Validation:
+
+- `./scripts/dev.sh compileJava` — passed.
+- `./scripts/dev.sh build` — passed.
+- `./scripts/dev.sh check-jar` — failed before jar inspection because the wrapper's expected MCP mapping cache file is still absent at `.gradle_home/caches/minecraft/de/oceanlabs/mcp/mcp_stable/39/1.12.2/srgs/mcp-srg.srg`.
+- `./scripts/dev.sh smoke-server` — failed by timeout before ready state; log again stopped after `Calling tweak class net.minecraftforge.fml.common.launcher.FMLServerTweaker`, with only Log4j console appender initialization errors. `run/crash-reports/` does not exist, and the configured crash-marker scan found no matches. This matches the clean `da3f307` baseline reproduction recorded above.
+- `git diff --check` — passed.
+
+Remaining limits:
+
+- Runtime confirmation of upgrade `5` retaliation damage/sound remains unavailable while smoke-server is blocked before ready state and user-driven manual scenarios are excluded.
+- Full per-core golem AI runtime scenarios remain open.
+
 ## Next Checkpoint Candidate
 
-After the golem carried-display, trunk transfer, death logging, fire-resistance, armor, water-pathing, no-drowning, melee-enchantment, biome policy, and Greatwood-support checkpoints, the next pre-Phase8 candidates are:
+After the golem carried-display, trunk transfer, death logging, fire-resistance, armor, water-pathing, no-drowning, melee-enchantment, upgrade-retaliation, biome policy, and Greatwood-support checkpoints, the next pre-Phase8 candidates are:
 
 - Remaining Stage 6 selected low-risk golem AI helper fixes, if they can be kept server-safe.
 - Remaining Stage 7 surface/worldgen runtime evidence and broader biome blacklist edge cases.

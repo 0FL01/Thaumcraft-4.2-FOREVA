@@ -709,6 +709,13 @@ public class EntityGolemBase extends net.minecraft.entity.monster.EntityGolem im
         if (source == net.minecraft.util.DamageSource.IN_WALL) return false;
         if (source.isFireDamage() && this.getGolemType().fireResist) return false;
         if (this.getGolemType() == EnumGolemType.THAUMIUM && source == net.minecraft.util.DamageSource.MAGIC) amount *= 0.5f;
+        net.minecraft.entity.Entity attacker = source.getTrueSource();
+        int thornUpgrades = this.getUpgradeAmount(5);
+        if (attacker != null && attacker.getEntityId() != this.getEntityId() && thornUpgrades > 0) {
+            attacker.attackEntityFrom(net.minecraft.util.DamageSource.causeThornsDamage(this),
+                    thornUpgrades * 2 + this.rand.nextInt(2 * thornUpgrades));
+            attacker.playSound(net.minecraft.init.SoundEvents.ENCHANT_THORNS_HIT, 0.5F, 1.0F);
+        }
         return super.attackEntityFrom(source, amount);
     }
 
