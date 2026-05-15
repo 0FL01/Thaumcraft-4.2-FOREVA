@@ -766,6 +766,33 @@ public class ConfigResearch {
                 .setConcealed()
                 .registerResearchItem();
 
+        if (Config.wardedStone) {
+            new ResearchItem(
+                    "WARDEDARCANA",
+                    "ARTIFICE",
+                    new AspectList()
+                            .add(Aspect.TOOL, 6)
+                            .add(Aspect.MIND, 3)
+                            .add(Aspect.MECHANISM, 3)
+                            .add(Aspect.ARMOR, 3),
+                    -5,
+                    -4,
+                    2,
+                    new ItemStack(ConfigItems.itemArcaneDoor))
+                    .setPages(
+                            new ResearchPage("tc.research_page.WARDEDARCANA.1"),
+                            new ResearchPage((IArcaneRecipe) recipes.get("ArcaneDoor")),
+                            new ResearchPage("tc.research_page.WARDEDARCANA.2"),
+                            new ResearchPage((IArcaneRecipe) recipes.get("IronKey")),
+                            new ResearchPage((IArcaneRecipe) recipes.get("GoldKey")),
+                            new ResearchPage("tc.research_page.WARDEDARCANA.3"),
+                            new ResearchPage((IArcaneRecipe) recipes.get("ArcanePressurePlate")),
+                            new ResearchPage("tc.research_page.WARDEDARCANA.4"),
+                            new ResearchPage((IArcaneRecipe) recipes.get("WardedGlass")))
+                    .setParents("THAUMIUM")
+                    .registerResearchItem();
+        }
+
         new ResearchItem(
                 "INFUSION",
                 "ARTIFICE",
