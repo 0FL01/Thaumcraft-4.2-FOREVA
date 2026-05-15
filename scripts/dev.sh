@@ -41,6 +41,76 @@ docker_gradle() {
     "$IMAGE" "$@"
 }
 
+write_smoke_log4j_config() {
+  cat > "$1" <<'EOF'
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="WARN">
+  <Appenders>
+    <Console name="Console" target="SYSTEM_OUT">
+      <PatternLayout pattern="[%d{HH:mm:ss}] [%t/%level]: %msg%n"/>
+    </Console>
+  </Appenders>
+  <Loggers>
+    <Root level="info">
+      <AppenderRef ref="Console"/>
+    </Root>
+  </Loggers>
+</Configuration>
+EOF
+}
+
+duration_to_seconds() {
+  local spec="$1"
+  case "$spec" in
+    *s) printf '%s\n' "${spec%s}" ;;
+    *m) printf '%s\n' "$(( ${spec%m} * 60 ))" ;;
+    *h) printf '%s\n' "$(( ${spec%h} * 3600 ))" ;;
+    *) printf '%s\n' "$spec" ;;
+  esac
+}
+
+file_is_fresh() {
+  local file="$1"
+  local since_file="$2"
+  [[ -f "$file" && "$file" -nt "$since_file" ]]
+}
+
+server_ready_reached() {
+  local since_file="$1"
+  shift
+  local file
+  for file in "$@"; do
+    if file_is_fresh "$file" "$since_file" && grep -Fq 'Done (' "$file"; then
+      return 0
+    fi
+  done
+  return 1
+}
+
+collect_log_markers() {
+  local since_file="$1"
+  shift
+  local file
+  local output=""
+  local markers
+  for file in "$@"; do
+    if ! file_is_fresh "$file" "$since_file"; then
+      continue
+    fi
+    markers="$(crash_markers "$file")"
+    if [[ -n "$markers" ]]; then
+      output+=$'\n'"$file"$'\n'"$markers"
+    fi
+  done
+  printf '%s' "${output#$'\n'}"
+}
+
+stop_container() {
+  local container_name="$1"
+  docker stop -t 5 "$container_name" >/dev/null 2>&1 || \
+    docker kill "$container_name" >/dev/null 2>&1 || true
+}
+
 crash_markers() {
   grep -nE 'LoaderException|LoaderExceptionModCrash|Game crashed|Caught exception|NoClassDefFoundError|ClassNotFoundException|NoSuchMethodError|NoSuchFieldError|ExceptionInInitializerError|Repair material has already been set|Encountered an unexpected exception|crash-reports|FATAL|fatal' "$1" || true
 }
@@ -195,10 +265,26 @@ PY
 
 smoke_server() {
   mkdir -p "$ROOT/run"
+  mkdir -p "$ROOT/run/logs"
   printf 'eula=true\n' > "$ROOT/run/eula.txt"
 
   local log="$ROOT/run/smoke-server.log"
+  local latest_log="$ROOT/run/logs/latest.log"
   rm -f "$log"
+
+  local since_file
+  since_file="$(mktemp "$ROOT/run/smoke-server.start.XXXXXX")"
+  local status_file
+  status_file="$(mktemp "$ROOT/run/smoke-server.status.XXXXXX")"
+  local log4j_config
+  log4j_config="$(mktemp "$ROOT/run/smoke-log4j2.XXXXXX.xml")"
+  local container_name="thaumcraft-smoke-server-$$-$RANDOM"
+  local log4j_arg="-Dlog4j.configurationFile=file:/workspace/thaumcraft/run/$(basename "$log4j_config")"
+  local timeout_seconds
+  timeout_seconds="$(duration_to_seconds "$SMOKE_TIMEOUT")"
+  local started_at
+  started_at="$(date +%s)"
+  write_smoke_log4j_config "$log4j_config"
 
   local prod_jar="$ROOT/build/libs/Thaumcraft-1.0.0-universal.jar"
   local jar_backup=""
@@ -210,14 +296,51 @@ smoke_server() {
   fi
 
   set +e
-  timeout "$SMOKE_TIMEOUT" docker run --rm \
-    -v "$ROOT:/workspace/thaumcraft" \
-    -v "$GRADLE_HOME_DIR:/home/ubuntu/.gradle" \
-    --user "$(id -u):$(id -g)" \
-    --entrypoint ./gradlew \
-    "$IMAGE" runServer -x getAssets --no-daemon 2>&1 | tee "$log"
-  local status="${PIPESTATUS[0]}"
+  (
+    docker run --rm --name "$container_name" \
+      -v "$ROOT:/workspace/thaumcraft" \
+      -v "$GRADLE_HOME_DIR:/home/ubuntu/.gradle" \
+      -e JAVA_TOOL_OPTIONS="$log4j_arg" \
+      --user "$(id -u):$(id -g)" \
+      --entrypoint ./gradlew \
+      "$IMAGE" runServer -x getAssets --no-daemon 2>&1 | tee "$log"
+    printf '%s' "${PIPESTATUS[0]}" > "$status_file"
+  ) &
+  local runner_pid="$!"
   set -e
+
+  local timed_out=0
+  local markers=""
+  local reports=""
+  while kill -0 "$runner_pid" 2>/dev/null; do
+    if server_ready_reached "$since_file" "$log" "$latest_log"; then
+      stop_container "$container_name"
+      break
+    fi
+
+    markers="$(collect_log_markers "$since_file" "$log" "$latest_log")"
+    if [[ -n "$markers" ]]; then
+      stop_container "$container_name"
+      break
+    fi
+
+    reports="$(new_crash_reports "$since_file")"
+    if [[ -n "$reports" ]]; then
+      stop_container "$container_name"
+      break
+    fi
+
+    if (( $(date +%s) - started_at >= timeout_seconds )); then
+      timed_out=1
+      stop_container "$container_name"
+      break
+    fi
+
+    sleep 1
+  done
+
+  wait "$runner_pid" || true
+  local status="$(cat "$status_file" 2>/dev/null || printf '1')"
 
   if [[ "$had_prod_jar" -eq 1 ]]; then
     cp -p "$jar_backup" "$prod_jar"
@@ -226,12 +349,18 @@ smoke_server() {
     rm -f "$prod_jar"
   fi
 
-  local markers
-  markers="$(crash_markers "$log")"
-  local reports
-  reports="$(new_crash_reports "$log")"
+  markers="$(collect_log_markers "$since_file" "$log" "$latest_log")"
+  reports="$(new_crash_reports "$since_file")"
+
+  local ready=0
+  if server_ready_reached "$since_file" "$log" "$latest_log"; then
+    ready=1
+  fi
+
+  rm -f "$since_file" "$status_file" "$log4j_config"
+
   if [[ -n "$markers" ]]; then
-    printf '\nSmoke server FAILED: crash markers found in %s\n' "$log" >&2
+    printf '\nSmoke server FAILED: crash markers found in %s or %s\n' "$log" "$latest_log" >&2
     printf '%s\n' "$markers" >&2
     return 1
   fi
@@ -242,22 +371,22 @@ smoke_server() {
     return 1
   fi
 
-  if grep -Fq 'Done (' "$log"; then
-    printf '\nSmoke server PASSED: server reached ready state. Log: %s\n' "$log"
+  if [[ "$ready" -eq 1 ]]; then
+    printf '\nSmoke server PASSED: server reached ready state. Logs: %s ; %s\n' "$log" "$latest_log"
     return 0
   fi
 
-  if [[ "$status" -eq 124 ]]; then
-    printf '\nSmoke server FAILED: timed out before ready state. Log: %s\n' "$log" >&2
+  if [[ "$timed_out" -eq 1 ]]; then
+    printf '\nSmoke server FAILED: timed out before ready state. Logs: %s ; %s\n' "$log" "$latest_log" >&2
     return 1
   fi
 
   if [[ "$status" -ne 0 ]]; then
-    printf '\nSmoke server FAILED: command exited with %s. Log: %s\n' "$status" "$log" >&2
+    printf '\nSmoke server FAILED: command exited with %s. Logs: %s ; %s\n' "$status" "$log" "$latest_log" >&2
     return "$status"
   fi
 
-  printf '\nSmoke server FAILED: ready marker `Done (` was not found. Log: %s\n' "$log" >&2
+  printf '\nSmoke server FAILED: ready marker `Done (` was not found. Logs: %s ; %s\n' "$log" "$latest_log" >&2
   return 1
 }
 
