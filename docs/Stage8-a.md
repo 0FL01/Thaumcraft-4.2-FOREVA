@@ -58,9 +58,9 @@ Current bootstrap exists but is only a minimal skeleton:
 - `@Mod(guiFactory = "thaumcraft.client.gui.GuiFactory")` points to a client GUI factory class: `src/main/java/thaumcraft/common/Thaumcraft.java:62-68`.
 - In `init`, current lifecycle calls `proxy.registerDisplayInformation()`, registers `NetworkRegistry` GUI handler, then calls `proxy.registerKeyBindings()` and `proxy.registerHandlers()`: `src/main/java/thaumcraft/common/Thaumcraft.java:164-172`.
 - `CommonProxy` implements `IGuiHandler`, owns GUI IDs, server GUI containers, client GUI null fallback, registration stubs and a small subset of FX stubs: `src/main/java/thaumcraft/common/CommonProxy.java:23-162`.
-- `ClientProxy.registerDisplayInformation()` registers one generic inventory model location for every item and every meta `0..63`: `src/main/java/thaumcraft/client/ClientProxy.java:24-34`.
+- `ClientProxy.registerDisplayInformation()` now delegates to explicit item, entity, block/model, and tile-renderer setup boundaries. The item boundary registers one generic inventory model location for every item and every meta `0..63`; the entity/block/tile boundaries exist for later Stage 8 renderer checkpoints but do not claim visual parity.
 - `ClientProxy.registerKeyBindings()` now registers a client-only `KeyHandler` for the reference `F`, `G`, and `H` bindings. The handler sends focus-remove, golem-bell reset, misc-wand toggle, and hover-toggle packets, and exposes client-only radial focus state for later render work: `src/main/java/thaumcraft/client/ClientProxy.java:36-39`, `src/main/java/thaumcraft/client/lib/KeyHandler.java:1-104`.
-- `ClientProxy.registerHandlers()` registers only an inner tooltip handler on `MinecraftForge.EVENT_BUS`: `src/main/java/thaumcraft/client/ClientProxy.java:41-59`.
+- `ClientProxy.registerHandlers()` registers client tick, render event, particle engine, and tooltip boundaries on `MinecraftForge.EVENT_BUS`. The new handler classes are client-only and intentionally defer HUD/render/particle behavior to later Stage 8 chunks.
 - `ClientProxy.getClientGuiElement()` opens only focus pouch, hand mirror, and hover harness; all other declared GUI IDs return `null`: `src/main/java/thaumcraft/client/ClientProxy.java:61-88`.
 - FX proxy overrides for sparkle/beam/bolt are explicit Phase 8 stubs: `src/main/java/thaumcraft/client/ClientProxy.java:90-105`.
 - Packet discriminator table mostly mirrors the reference ordering and validates `REFERENCE_PACKET_COUNT = 39`: `src/main/java/thaumcraft/common/lib/network/PacketHandler.java:48-107`.
@@ -74,7 +74,7 @@ Stage 8-a cannot be considered complete now: blocker/high gaps remain in client 
 
 ### GAP-1: `ClientProxy.registerDisplayInformation` не содержит renderer/model registration entry points
 
-**Статус:** реализовано, не валидировано в клиенте
+**Статус:** bootstrap boundary implemented; client smoke unvalidated
 **Критичность:** high
 
 **Текущая реализация:**
@@ -113,7 +113,7 @@ Dependency: concrete renderer/model/TESR class parity belongs to later Stage 8 c
 
 ### GAP-2: Отсутствует полноценный client event bootstrap
 
-**Статус:** частично реализовано
+**Статус:** bootstrap boundary implemented; client smoke unvalidated
 **Критичность:** blocker
 
 **Текущая реализация:**
@@ -153,6 +153,18 @@ Port or scaffold the reference client event handler boundaries in 1.12.2-compati
 **Риски / зависимости:**
 
 Dependency: detailed HUD, scan overlay, shader, and particle behavior belongs to later Stage 8 chunks. Risk: Forge 1.7.10 FML bus events must be carefully mapped to Forge 1.12.2 event classes; blind decompile copying will not compile.
+
+**Checkpoint 2026-05-15 — client bootstrap boundaries:**
+`ClientProxy.registerDisplayInformation()` now calls explicit `setupItemRenderers`, `setupEntityRenderers`, `setupBlockRenderers`, and `setupTileRenderers` boundaries. The existing generic item model/color registration moved into `setupItemRenderers`. `ClientProxy.registerHandlers()` now registers client-only `ClientTickEventsFML`, `RenderEventHandler`, `ParticleEngine.INSTANCE`, and the existing tooltip handler on the Forge event bus.
+
+Validation:
+- Original bootstrap behavior was inspected from `Thaumcraft-1.7.10-4.2.3.5.jar` with `javap` for `ClientProxy`, `ClientTickEventsFML`, `RenderEventHandler`, and `ParticleEngine`.
+- `./scripts/dev.sh compileJava` — passed.
+- `./scripts/dev.sh validate --smoke` — passed: compile, tests `10/10`, jar, compact MCP leak summary, and dedicated server smoke readiness.
+- `run/smoke-server.log` reached `Done (1.211s)!`; no crash reports were present under `run/`.
+- `./scripts/dev.sh smoke-client` — skipped because `DISPLAY` is unset and user-driven GUI/graphics validation is excluded by `docs/GOAL.md`.
+
+Remaining Stage 8-a limits after this checkpoint: the event classes are bootstrap boundaries only. Actual HUD/render/particle behavior, concrete entity/TESR registrations, GUI routing breadth, packet side-boundary audit, and client smoke remain open.
 
 ### GAP-3: Key binding registration and dispatch отсутствуют
 
@@ -433,16 +445,16 @@ Risk is low. This is mainly a smoke-validation item, not an implementation block
 
 ## 6. Итоговый checklist закрытия Stage 8-a
 
-- [ ] `ClientProxy.registerDisplayInformation()` has explicit Forge 1.12.2 registration entry points for item/model, entity renderer, and TESR/bootstrap boundaries.
-- [ ] `ClientProxy.registerHandlers()` registers client tick/render/particle/tooltip boundaries on correct Forge/FML buses.
-- [ ] Client event handler classes exist in client-only packages and do not load on dedicated server.
+- [x] `ClientProxy.registerDisplayInformation()` has explicit Forge 1.12.2 registration entry points for item/model, entity renderer, and TESR/bootstrap boundaries.
+- [x] `ClientProxy.registerHandlers()` registers client tick/render/particle/tooltip boundaries on correct Forge/FML buses.
+- [x] Client event handler classes exist in client-only packages and do not load on dedicated server.
 - [ ] Key bindings `F`, `G`, and `H` are registered and dispatch equivalent client-to-server actions.
 - [ ] GUI client routing covers every GUI ID declared by `CommonProxy`, with safe entity/tile lookup and explicit deferrals for missing concrete screens.
 - [ ] Packet side boundary audit is complete for every `Side.CLIENT` packet in `PacketHandler`.
 - [ ] FX packet classes have decode/dispatch boundaries or documented later visual implementation dependencies.
 - [ ] No TODO/Phase 8 stub comments remain inside Stage 8-a scope.
-- [ ] `compileJava` passes after implementation changes.
-- [ ] `smoke-server` passes or any failure is documented as pre-existing/environmental.
+- [x] `compileJava` passes after implementation changes.
+- [x] `smoke-server` passes or any failure is documented as pre-existing/environmental.
 - [ ] `smoke-client` passes where display/X11 is available, or remains explicitly unvalidated with concrete reason.
 - [ ] `docs/Stage8-a.md` is updated with final commands/results after code closure.
 

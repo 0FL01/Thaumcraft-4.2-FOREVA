@@ -16,7 +16,10 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import thaumcraft.client.gui.GuiFocusPouch;
 import thaumcraft.client.gui.GuiHandMirror;
 import thaumcraft.client.gui.GuiHoverHarness;
+import thaumcraft.client.fx.ParticleEngine;
+import thaumcraft.client.lib.ClientTickEventsFML;
 import thaumcraft.client.lib.KeyHandler;
+import thaumcraft.client.lib.RenderEventHandler;
 import thaumcraft.common.CommonProxy;
 import thaumcraft.common.config.ConfigItems;
 import thaumcraft.common.lib.events.EventHandlerRunic;
@@ -25,6 +28,13 @@ public class ClientProxy extends CommonProxy {
 
     @Override
     public void registerDisplayInformation() {
+        setupItemRenderers();
+        setupEntityRenderers();
+        setupBlockRenderers();
+        setupTileRenderers();
+    }
+
+    private void setupItemRenderers() {
         for (Item item : ConfigItems.getAllItems()) {
             ResourceLocation registryName = item.getRegistryName();
             if (registryName == null) continue;
@@ -59,6 +69,15 @@ public class ClientProxy extends CommonProxy {
         }
     }
 
+    private void setupEntityRenderers() {
+    }
+
+    private void setupBlockRenderers() {
+    }
+
+    private void setupTileRenderers() {
+    }
+
     @Override
     public void registerKeyBindings() {
         MinecraftForge.EVENT_BUS.register(new KeyHandler());
@@ -66,6 +85,9 @@ public class ClientProxy extends CommonProxy {
 
     @Override
     public void registerHandlers() {
+        MinecraftForge.EVENT_BUS.register(new ClientTickEventsFML());
+        MinecraftForge.EVENT_BUS.register(new RenderEventHandler());
+        MinecraftForge.EVENT_BUS.register(ParticleEngine.INSTANCE);
         MinecraftForge.EVENT_BUS.register(new ClientEventHandler());
     }
 

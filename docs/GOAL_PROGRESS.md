@@ -1760,6 +1760,27 @@ Remaining limits:
 - Full reference loot-pool distribution still depends on Stage 9 content/table population.
 - Manual loot-bag opening scenario evidence remains out of scope.
 
+### 2026-05-15 — Stage 8-a client bootstrap boundaries
+
+Scope:
+
+- Split `ClientProxy.registerDisplayInformation()` into explicit `setupItemRenderers`, `setupEntityRenderers`, `setupBlockRenderers`, and `setupTileRenderers` boundaries.
+- Kept existing generic item model/color registration under the item boundary.
+- Added client-only `ClientTickEventsFML`, `RenderEventHandler`, and `ParticleEngine` bootstrap classes and registered them from `ClientProxy.registerHandlers()` alongside the tooltip handler.
+
+Validation:
+
+- Original bootstrap behavior inspected from `Thaumcraft-1.7.10-4.2.3.5.jar` with `javap` for `ClientProxy`, `ClientTickEventsFML`, `RenderEventHandler`, and `ParticleEngine`.
+- `./scripts/dev.sh compileJava` — passed.
+- `./scripts/dev.sh validate --smoke` — passed: `compileJava`, tests `10/10`, jar, compact MCP leak summary `5130` lines / `1028` unique leaks, and dedicated server smoke readiness.
+- Server smoke evidence: `run/smoke-server.log` contained `Registering entities` at line `108`, `Forge Mod Loader has successfully loaded 6 mods` at line `126`, and `Done (1.211s)!` at line `138`; no crash reports were present under `run/`.
+- `./scripts/dev.sh smoke-client` — skipped because `DISPLAY` is unset and user-driven GUI/graphics validation is excluded by `docs/GOAL.md`.
+
+Remaining limits:
+
+- These are bootstrap boundaries only; concrete GUI/render/particle parity is still Stage 8-b/c/d/e work.
+- GUI routing breadth, client packet side-boundary audit, concrete renderer registrations, and client smoke remain open.
+
 ## Next Checkpoint Candidate
 
 After the golem carried-display, trunk transfer, death logging, fire-resistance, armor, water-pathing, no-drowning, melee-enchantment, upgrade-retaliation, target-range, animal-target-filter, butcher-acquisition, item-pickup-delay, essentia-jar-destination, liquid-target-tank, portal-support, outer-provider-spawn, outer-structure-query, outer-worldgen-ownership, Stage7-docs-refresh, hover-motion, biome policy, and Greatwood-support checkpoints, the next pre-Phase8 candidates are:
