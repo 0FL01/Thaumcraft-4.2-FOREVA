@@ -14,6 +14,7 @@ import thaumcraft.api.aspects.Aspect;
 import thaumcraft.api.aspects.AspectList;
 import thaumcraft.api.crafting.IArcaneRecipe;
 import thaumcraft.api.crafting.CrucibleRecipe;
+import thaumcraft.api.crafting.InfusionEnchantmentRecipe;
 import thaumcraft.api.crafting.InfusionRecipe;
 import thaumcraft.api.research.ResearchCategories;
 import thaumcraft.api.research.ResearchItem;
@@ -998,6 +999,51 @@ public class ConfigResearch {
                 .registerResearchItem();
         ThaumcraftApi.addWarpToResearch("JARBRAIN", 3);
         ThaumcraftApi.addWarpToItem(new ItemStack(ConfigBlocks.blockJar, 1, 1), 1);
+
+        new ResearchItem(
+                "INFUSIONENCHANTMENT",
+                "ARTIFICE",
+                new AspectList()
+                        .add(Aspect.MAGIC, 6)
+                        .add(Aspect.MIND, 3)
+                        .add(Aspect.WEAPON, 3)
+                        .add(Aspect.ARMOR, 3)
+                        .add(Aspect.TOOL, 3),
+                -6,
+                11,
+                3,
+                new ResourceLocation("thaumcraft", "textures/misc/r_enchant.png"))
+                .setPages(
+                        new ResearchPage("tc.research_page.INFUSIONENCHANTMENT.1"),
+                        new ResearchPage("tc.research_page.INFUSIONENCHANTMENT.2"),
+                        new ResearchPage("tc.research_page.INFUSIONENCHANTMENT.3"),
+                        new ResearchPage((InfusionEnchantmentRecipe) recipes.get("InfEnchRepair")),
+                        new ResearchPage((InfusionEnchantmentRecipe) recipes.get("InfEnchHaste")),
+                        new ResearchPage((InfusionEnchantmentRecipe) recipes.get("InfEnch0")),
+                        new ResearchPage((InfusionEnchantmentRecipe) recipes.get("InfEnch1")),
+                        new ResearchPage((InfusionEnchantmentRecipe) recipes.get("InfEnch2")),
+                        new ResearchPage((InfusionEnchantmentRecipe) recipes.get("InfEnch3")),
+                        new ResearchPage((InfusionEnchantmentRecipe) recipes.get("InfEnch4")),
+                        new ResearchPage((InfusionEnchantmentRecipe) recipes.get("InfEnch5")),
+                        new ResearchPage((InfusionEnchantmentRecipe) recipes.get("InfEnch6")),
+                        new ResearchPage((InfusionEnchantmentRecipe) recipes.get("InfEnch7")),
+                        new ResearchPage((InfusionEnchantmentRecipe) recipes.get("InfEnch8")),
+                        new ResearchPage((InfusionEnchantmentRecipe) recipes.get("InfEnch9")),
+                        new ResearchPage((InfusionEnchantmentRecipe) recipes.get("InfEnch10")),
+                        new ResearchPage((InfusionEnchantmentRecipe) recipes.get("InfEnch11")),
+                        new ResearchPage((InfusionEnchantmentRecipe) recipes.get("InfEnch12")),
+                        new ResearchPage((InfusionEnchantmentRecipe) recipes.get("InfEnch13")),
+                        new ResearchPage((InfusionEnchantmentRecipe) recipes.get("InfEnch14")),
+                        new ResearchPage((InfusionEnchantmentRecipe) recipes.get("InfEnch15")),
+                        new ResearchPage((InfusionEnchantmentRecipe) recipes.get("InfEnch16")),
+                        new ResearchPage((InfusionEnchantmentRecipe) recipes.get("InfEnch17")),
+                        new ResearchPage((InfusionEnchantmentRecipe) recipes.get("InfEnch18")),
+                        new ResearchPage((InfusionEnchantmentRecipe) recipes.get("InfEnch19")),
+                        new ResearchPage((InfusionEnchantmentRecipe) recipes.get("InfEnch20")),
+                        new ResearchPage((InfusionEnchantmentRecipe) recipes.get("InfEnch21")))
+                .setConcealed()
+                .setParents("JARBRAIN")
+                .registerResearchItem();
     }
 
     private static void initThaumaturgyResearchBaseline() {
