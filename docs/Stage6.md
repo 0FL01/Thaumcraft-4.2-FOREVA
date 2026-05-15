@@ -1577,7 +1577,7 @@ Mapping:
 
 | ID | Area | Scenario | Setup | Steps | Expected server-visible result | Evidence | Result | Blocker/limitation |
 |---|---|---|---|---|---|---|---|---|
-| S6-REG-01 | Registration | All Stage 6 entities load/register | Fresh dev run dir | Run `./scripts/dev.sh smoke-server` | Server reaches `Done (`; no crash markers, duplicate/missing entity registration failures, or new crash reports | `run/smoke-server.log` line references | TODO | |
+| S6-REG-01 | Registration | All Stage 6 entities load/register | Fresh dev run dir | Run `./scripts/dev.sh validate --smoke`; scan `run/smoke-server.log` | Server reaches `Done (`; no crash markers, duplicate/missing entity registration failures, or new crash reports | `run/smoke-server.log:108` registered entities, `run/smoke-server.log:126` loaded 6 mods, `run/smoke-server.log:138` reached `Done (1.117s)!`; no crash reports found | PASS | This is a load/registration smoke only; it does not exercise spawn eggs, combat, drops, AI, GUI, or save/reload scenarios. |
 | S6-PECH-01 | Pech | Spawn/type/combat variants | Dedicated/server test world | Spawn several Pechs and fight at melee/range | Melee, archer, and thaumaturge variants behave according to reference, or missing spawn setup is recorded | command/NBT/combat notes | TODO | |
 | S6-PECH-02 | Pech | Taming/pickup/trade | Valued items available | Drop valued items, tame, open GUI, insert valued input, take output | Pickup/taming/trade outputs work without dupe/loss | before/after inventory notes | TODO | |
 | S6-PECH-03 | Pech | Group anger | At least 3 nearby Pechs | Damage one Pech as player | Nearby Pechs aggro/reacquire same player for expected duration | combat notes/entity count | TODO | |
