@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
+import net.minecraft.nbt.NBTTagByte;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.util.ResourceLocation;
@@ -19,6 +20,7 @@ import thaumcraft.api.crafting.InfusionRecipe;
 import thaumcraft.api.research.ResearchCategories;
 import thaumcraft.api.research.ResearchItem;
 import thaumcraft.api.research.ResearchPage;
+import thaumcraft.common.lib.crafting.InfusionRunicAugmentRecipe;
 
 public class ConfigResearch {
     public static final Map<String, Object> recipes = new HashMap<>();
@@ -818,6 +820,34 @@ public class ConfigResearch {
                         new ResearchPage((InfusionRecipe) recipes.get("RunicAmuletEmergency")))
                 .setParents("RUNICARMOR")
                 .setSecondary()
+                .setConcealed()
+                .registerResearchItem();
+
+        ArrayList<InfusionRunicAugmentRecipe> runicAugmentRecipes = new ArrayList<>();
+        for (int a = 0; a <= 4; ++a) {
+            ItemStack runicChestplate = new ItemStack(ConfigItems.itemChestRobe);
+            if (a > 0) {
+                runicChestplate.setTagInfo("RS.HARDEN", new NBTTagByte((byte) a));
+            }
+            runicAugmentRecipes.add(new InfusionRunicAugmentRecipe(runicChestplate));
+        }
+        new ResearchItem(
+                "RUNICAUGMENTATION",
+                "ARTIFICE",
+                new AspectList()
+                        .add(Aspect.MAGIC, 3)
+                        .add(Aspect.ARMOR, 3)
+                        .add(Aspect.EXCHANGE, 4)
+                        .add(Aspect.GREED, 4),
+                6,
+                4,
+                1,
+                new ResourceLocation("thaumcraft", "textures/misc/r_runicupg.png"))
+                .setPages(
+                        new ResearchPage("tc.research_page.RUNICAUGMENTATION.1"),
+                        new ResearchPage(runicAugmentRecipes.toArray(new InfusionRecipe[0])),
+                        new ResearchPage("tc.research_page.RUNICAUGMENTATION.2"))
+                .setParents("RUNICARMOR")
                 .setConcealed()
                 .registerResearchItem();
 
