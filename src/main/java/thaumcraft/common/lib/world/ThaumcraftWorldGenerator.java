@@ -263,12 +263,9 @@ public class ThaumcraftWorldGenerator implements IWorldGenerator {
     public void worldGeneration(Random random, int chunkX, int chunkZ, World world, boolean newGen) {
         int dim = world.provider.getDimension();
 
-        // Outer Lands room generation is owned by ChunkProviderOuter.populate().
         if (dim == Config.dimensionOuterId) {
-            if (!newGen) {
-                MazeHandler.generateEldritch(world, random, chunkX, chunkZ);
-                markChunkDirty(world, chunkX, chunkZ);
-            }
+            MazeHandler.generateEldritch(world, random, chunkX, chunkZ);
+            markChunkDirty(world, chunkX, chunkZ);
             return;
         }
 

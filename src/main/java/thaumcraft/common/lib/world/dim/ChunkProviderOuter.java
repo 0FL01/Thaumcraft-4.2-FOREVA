@@ -40,7 +40,7 @@ public class ChunkProviderOuter implements IChunkGenerator {
     }
 
     public void setBlocksInChunk(int x, int z, ChunkPrimer primer) {
-        // Original Outer Lands chunks start empty; room generation fills maze cells during populate().
+        // Original Outer Lands chunks start empty; the registered world generator fills maze cells after populate().
     }
 
     public void buildSurfaces(int x, int z, ChunkPrimer primer) {
@@ -61,7 +61,6 @@ public class ChunkProviderOuter implements IChunkGenerator {
         boolean flag = false;
         ForgeEventFactory.onChunkPopulate(true, this, this.world, this.rand, x, z, flag);
         biome.decorate(this.world, this.rand, blockpos);
-        MazeHandler.generateEldritch(this.world, this.rand, x, z);
         ForgeEventFactory.onChunkPopulate(false, this, this.world, this.rand, x, z, flag);
         BlockFalling.fallInstantly = false;
     }

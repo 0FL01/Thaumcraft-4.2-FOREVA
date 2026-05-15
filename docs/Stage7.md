@@ -30,10 +30,10 @@ Stage 7 закрывает серверную часть генерации ми
 ## 4. Текущее состояние Stage 7
 
 - Baseline exists: world generator instance is registered at `src/main/java/thaumcraft/common/Thaumcraft.java:124-126`; biomes are initialized and registered at `src/main/java/thaumcraft/common/Thaumcraft.java:128-130` and `src/main/java/thaumcraft/common/Thaumcraft.java:291-298`; Outer Lands dimension type/dimension are registered at `src/main/java/thaumcraft/common/Thaumcraft.java:197-201`.
-- Outer Lands provider/chunk generator exists: provider uses a single Eldritch biome and returns `ChunkProviderOuter`: `src/main/java/thaumcraft/common/lib/world/dim/WorldProviderOuter.java:38-48`; chunk provider makes empty chunks and populates maze rooms through `MazeHandler.generateEldritch`: `src/main/java/thaumcraft/common/lib/world/dim/ChunkProviderOuter.java:27-39`, `src/main/java/thaumcraft/common/lib/world/dim/ChunkProviderOuter.java:50-67`.
+- Outer Lands provider/chunk generator exists: provider uses a single Eldritch biome and returns `ChunkProviderOuter`: `src/main/java/thaumcraft/common/lib/world/dim/WorldProviderOuter.java:38-48`; chunk provider makes empty chunks and runs biome decoration, while the registered `ThaumcraftWorldGenerator` owns `MazeHandler.generateEldritch(...)` through the Forge worldgen hook: `src/main/java/thaumcraft/common/lib/world/dim/ChunkProviderOuter.java:27-39`, `src/main/java/thaumcraft/common/lib/world/dim/ChunkProviderOuter.java:50-66`, `src/main/java/thaumcraft/common/lib/world/ThaumcraftWorldGenerator.java:263-269`.
 - Maze persistence exists and uses original file names/keys (`labyrinth.dat`, `labyrinth.dat_old`, `Data`, `cells`, `x`, `z`, `cell`): `src/main/java/thaumcraft/common/lib/world/dim/MazeHandler.java:43-116`; it is loaded/saved on Overworld world load/save: `src/main/java/thaumcraft/common/lib/events/EventHandlerWorld.java:45-57`.
 - Several current room/template classes remain partial even after the 2026-05-14 urn/crate/slab and `BlockEldritch` content checkpoints; full traversal/runtime validation is still missing.
-- Current surface generator is much narrower than the reference. It skips Outer Lands in the general world generator at `src/main/java/thaumcraft/common/lib/world/ThaumcraftWorldGenerator.java:257-258`; generates ores with modern `WorldGenMinable` at `src/main/java/thaumcraft/common/lib/world/ThaumcraftWorldGenerator.java:275-285`; only generates trees when the sampled biome equals Magical Forest at `src/main/java/thaumcraft/common/lib/world/ThaumcraftWorldGenerator.java:288-292`; only generates structures in dim 0 at `src/main/java/thaumcraft/common/lib/world/ThaumcraftWorldGenerator.java:294-297`; does not call any wild-aura-node generation path from `generate(...)` despite `Config.genAura`/`Config.regenAura` existing.
+- Current surface generator is much narrower than the reference. It handles Outer Lands through the early `Config.dimensionOuterId` branch at `src/main/java/thaumcraft/common/lib/world/ThaumcraftWorldGenerator.java:263-269`; generates ores with modern `WorldGenMinable` at `src/main/java/thaumcraft/common/lib/world/ThaumcraftWorldGenerator.java:275-285`; only generates trees when the sampled biome equals Magical Forest at `src/main/java/thaumcraft/common/lib/world/ThaumcraftWorldGenerator.java:288-292`; only generates structures in dim 0 at `src/main/java/thaumcraft/common/lib/world/ThaumcraftWorldGenerator.java:294-297`; does not call any wild-aura-node generation path from `generate(...)` despite `Config.genAura`/`Config.regenAura` existing.
 - Current Overworld structure/tree generators still contain gameplay placeholders in hilltop altar, mound/barrow, and spider Greatwood generation. `WorldGenEldritchRing` is no longer the old obsidian-plus-portal placeholder after the 2026-05-14 ring checkpoint, but it still needs runtime evidence and fuller altar lifecycle behavior.
 - Portal entry now uses the reference-like ticked `TileEldritchPortal` flow and the safer `TeleporterThaumcraft` search/cache placement. This remains a partial GAP-3 closure until manual traversal evidence proves arrival/return beside generated portal rooms.
 
@@ -294,7 +294,7 @@ Remaining GAP-4 limits after this checkpoint: key-room generation has not been o
 - `thaumcraft_src/thaumcraft/common/lib/world/dim/MazeHandler.class`
 
 **Что не совпадает:**
-Static comparison shows a plausible 1.12.2 adaptation, but no evidence that a new world reaches ready state, an Outer Lands dimension loads, chunks populate, or maze rooms generate without crashes. PRD explicitly lists this as a known risk: `docs/PRD.md:352-356`. Current `ChunkProviderOuter.populate` calls `biome.decorate` and then `MazeHandler.generateEldritch`: `src/main/java/thaumcraft/common/lib/world/dim/ChunkProviderOuter.java:61-65`, while the reference `ChunkProviderOuter` invokes biome decoration and Outer room generation via the original generator/hook pipeline. The 2026-05-15 provider spawn checkpoint restores the reference top-block spawn-coordinate test and average ground level `50`. This adaptation still needs runtime proof.
+Static comparison shows a plausible 1.12.2 adaptation, but no evidence that a new world reaches ready state, an Outer Lands dimension loads, chunks populate, or maze rooms generate without crashes. PRD explicitly lists this as a known risk: `docs/PRD.md:352-356`. The 2026-05-15 worldgen ownership checkpoint restores the reference ownership path: `ChunkProviderOuter.populate(...)` runs biome decoration, then Forge 1.12.2 `Chunk.populate(...)` calls `GameRegistry.generateWorld(...)`, and `ThaumcraftWorldGenerator.worldGeneration(...)` runs `MazeHandler.generateEldritch(...)` for `Config.dimensionOuterId`. The 2026-05-15 provider spawn checkpoint restores the reference top-block spawn-coordinate test and average ground level `50`. This adaptation still needs runtime proof.
 
 **Что нужно доделать:**
 Run and document dedicated runtime scenarios after code gaps are closed: server smoke, new world generation, entering Outer Lands, forced chunk population around a maze, save/reload, and portal return.
@@ -326,6 +326,18 @@ Validation:
 - `git diff --check` — passed.
 
 Remaining GAP-5 limits after this checkpoint: actual Outer Lands load, spawn fallback behavior, chunk population, save/reload, and traversal remain unavailable while smoke-server is blocked before ready state and manual scenarios are excluded.
+
+**Checkpoint 2026-05-15 — Outer Lands worldgen ownership:**
+`ChunkProviderOuter.populate(...)` no longer calls `MazeHandler.generateEldritch(...)` with provider-local population RNG. `ThaumcraftWorldGenerator.worldGeneration(...)` now always handles `Config.dimensionOuterId` chunks, including new chunks and retrogen, matching the reference path where the Forge worldgen hook owns Outer Lands room generation and marks the chunk dirty afterward.
+
+Validation:
+- `./scripts/dev.sh compileJava` — passed.
+- `./scripts/dev.sh build` — passed.
+- `./scripts/dev.sh check-jar` — не дошел до jar inspection: отсутствует wrapper-ожидаемый MCP mapping cache `.gradle_home/caches/minecraft/de/oceanlabs/mcp/mcp_stable/39/1.12.2/srgs/mcp-srg.srg`.
+- `./scripts/dev.sh smoke-server` — timeout before ready state на уже задокументированном pre-Forge/log4j этапе; `run/crash-reports/` не существует, and the configured crash-marker scan found no matches.
+- `git diff --check` — passed.
+
+Remaining GAP-5 limits after this checkpoint: room generation is statically back on the reference ownership path, but actual Outer Lands load, chunk population, save/reload, and traversal remain unavailable while smoke-server is blocked before ready state and manual scenarios are excluded.
 
 ### GAP-6: Maze persistence and async generation can race with save/load and teleport
 
