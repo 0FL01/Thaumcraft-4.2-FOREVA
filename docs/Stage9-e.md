@@ -60,7 +60,7 @@ The port does call `ConfigResearch.init()` during post-init after recipe and asp
 
 The low-level API containers for categories, items, and pages are mostly present and structurally close to the 1.7.10 reference (`src/main/java/thaumcraft/api/research/ResearchCategories.java:12`-`src/main/java/thaumcraft/api/research/ResearchCategories.java:67`, `src/main/java/thaumcraft/api/research/ResearchItem.java:13`-`src/main/java/thaumcraft/api/research/ResearchItem.java:256`, `src/main/java/thaumcraft/api/research/ResearchPage.java:15`-`src/main/java/thaumcraft/api/research/ResearchPage.java:128`). This is an API baseline, not content parity.
 
-The current lang file includes `tc.research_category.*` keys and runtime research-note status keys, but still lacks the full `tc.research_name.*`, `tc.research_text.*`, and `tc.research_page.*` corpus expected by fully ported `ConfigResearch`. The reference English lang has 713 research keys, beginning at `thaumcraft_src/assets/thaumcraft/lang/en_US.lang:865`.
+The current lang file now includes the reference `tc.research_category.*` set and full `tc.research_name.*`, `tc.research_text.*`, and `tc.research_page.*` corpus imported from `thaumcraft_src` for Stage 9-e baseline coverage. Runtime GUI/manual verification of page rendering remains pending because user-interactive client checks are excluded.
 
 The current resources now include Thaumonomicon/research GUI backgrounds and baseline research misc icons (`r_*.png`) with `research1..5` images under `src/main/resources/assets/thaumcraft/textures/misc/`. Additional image paths referenced by full research-page text still need validation once the full research text corpus is ported.
 
@@ -176,7 +176,7 @@ Dependency: this overlaps Stage 9 recipe chunks. Stage 9-e should only validate 
 
 **Что не совпадает:**
 
-Current `en_us.lang` has no `tc.research_category.*`, `tc.research_name.*`, `tc.research_text.*`, or `tc.research_page.*` keys. Reference English lang contains six research category keys and 713 research localization keys. Current `ResearchCategories.getCategoryName(...)`, `ResearchItem.getName()`, `ResearchItem.getText()`, and `ResearchPage.getTranslatedText()` all depend on these keys (`src/main/java/thaumcraft/api/research/ResearchCategories.java:19`-`src/main/java/thaumcraft/api/research/ResearchCategories.java:20`, `src/main/java/thaumcraft/api/research/ResearchItem.java:176`-`src/main/java/thaumcraft/api/research/ResearchItem.java:182`, `src/main/java/thaumcraft/api/research/ResearchPage.java:106`-`src/main/java/thaumcraft/api/research/ResearchPage.java:112`).
+Reference English lang contains six research category keys and 713 research localization keys. The port now carries this corpus in `en_us.lang`, but Stage 9-e still requires research graph/page registration and non-GUI runtime checks before localization coverage can be treated as progression-validated.
 
 **Что нужно доделать:**
 

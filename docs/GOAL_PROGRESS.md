@@ -67,6 +67,32 @@ Branch: `codex/durable-goal-stage8-9`
 
 ## Checkpoint Log
 
+### 2026-05-15 — Stage 9-e research localization corpus import baseline
+
+Scope:
+
+- Imported missing research localization corpus from `thaumcraft_src/assets/thaumcraft/lang/en_US.lang` into the port `en_us.lang` without overwriting existing keys:
+  - `tc.research_name.*`
+  - `tc.research_text.*`
+  - `tc.research_page.*`
+  - plus discovery/reveal helper strings: `item.discovery.name`, `item.researchnotes.unknown.1`, `item.researchnotes.unknown.2`
+- Resulting key coverage:
+  - `tc.research_(name|text|page).*` count now matches reference (`707`);
+  - with category keys, total research localization key surface now matches the reference baseline (`713`).
+- Updated `docs/Stage9-e.md` language status text to reflect corpus import completion with remaining runtime/manual validation limits.
+
+Validation:
+
+- `./scripts/dev.sh validate --smoke` — passed: status, compile, tests `10/10`, jar, check-jar summary `5662` MCP leak lines / `1114` unique leaks, and server smoke.
+- `run/smoke-server.log` evidence: server ready (`Done (...)`), no fatal markers.
+- Crash report scan under `run/` remained clean during smoke stage.
+- `./scripts/dev.sh smoke-client` — skipped because `DISPLAY=` and GUI/graphics/user-interactive validation is excluded.
+
+Remaining limits:
+
+- Research categories and localization are now in place, but `ConfigResearch` research-item/page graph registration remains largely unported.
+- Client/manual validation of Thaumonomicon page rendering is still excluded and remains documented as skipped.
+
 ### 2026-05-15 — Stage 9-e research category + icon/backdrop baseline
 
 Scope:
