@@ -67,6 +67,32 @@ Branch: `codex/durable-goal-stage8-9`
 
 ## Checkpoint Log
 
+### 2026-05-15 — Stage 9-b arcane remaining static subset and key audit
+
+Scope:
+
+- Expanded `ConfigRecipes.initializeArcaneRecipeBaseline()` with the remaining portable static arcane subset:
+  - `Banner_0..15`, `WardedGlass`, `FluxScrubber`, `ArcanePressurePlate` (conditional)
+  - `NodeStabilizer`, `NodeTransducer`, `NodeRelay`, `NodeChargeRelay`, `FocalManipulator`, `GolemFetter`
+  - `PaveTravel`, `ArcaneLamp`, `ArcaneSpa`, `PaveWard`, `ArcaneEar`
+  - `WandRodIceStaff`, `WandRodQuartzStaff`, `WandRodReedStaff`, `WandRodBlazeStaff`, `WandRodBoneStaff`
+  - `TinyHat`, `TinyFez`, `TinyBowtie`, `TinyGlasses`, `TinyDart`, `TinyVisor`, `TinyArmor`, `TinyHammer`
+- Added banner NBT color tagging (`color` byte) and persisted all new handles in `ConfigResearch.recipes`.
+- Ran reference-vs-current key audit for `initializeArcaneRecipes()`: unresolved keys reduced to 6 (`ArcaneDoor`, `HungryChest`, `Levitator`, `ArcaneStone2/3/4`) with concrete blockers documented in `docs/Stage9-b.md`.
+
+Validation:
+
+- `./scripts/dev.sh validate --smoke` — passed: status, compile, tests `10/10`, jar, check-jar summary `5516` MCP leak lines / `1085` unique leaks, and server smoke.
+- `run/smoke-server.log` evidence: `Registering entities`; `Forge Mod Loader has successfully loaded 6 mods`; `Done (1.221s)!`.
+- Crash report scan under `run/` returned no files.
+- `./scripts/dev.sh smoke-client` — skipped because `DISPLAY=` and GUI/graphics/user-interactive validation is excluded.
+
+Remaining limits:
+
+- Remaining unresolved keys are blocked by currently missing output objects (`itemArcaneDoor`, `blockChestHungry`, `blockLifter`) and non-arcane `GameRegistry` recipe path for `ArcaneStone2/3/4` (`ArcaneStone3` also depends on missing `blockStairsArcaneStone`).
+- Stage 9-d/e research content/category/page population is still required for full gate-key and recipe-key lookup parity.
+- Arcane Workbench manual/client scenario verification remains outside current non-GUI scope.
+
 ### 2026-05-15 — Stage 9-b arcane alchemy/tube static subset
 
 Scope:

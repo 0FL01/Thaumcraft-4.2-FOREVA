@@ -63,6 +63,11 @@ Reference calls `initializeArcaneRecipes()` from `ConfigRecipes.init()` and fill
 - added alchemy/tube/thaumatorium block (`Filter`, `AlchemyFurnace`, `Alembic`, `Bellows`, `Tube`, `Resonator`, `TubeValve`, `TubeFilter`, `TubeRestrict`, `TubeOneway`, `TubeBuffer`, `AlchemicalConstruct`, `AdvAlchemyConstruct`, `Centrifuge`, `EssentiaCrystalizer`, `MnemonicMatrix`).
 
 Full parity is still open: many of the 89 reference arcane adds are not yet ported.
+Current key audit leaves only six unresolved reference keys:
+- `ArcaneDoor` (`ConfigItems.itemArcaneDoor` missing in current source);
+- `HungryChest` (`ConfigBlocks.blockChestHungry` missing in current source);
+- `Levitator` (`ConfigBlocks.blockLifter` missing in current source);
+- `ArcaneStone2`, `ArcaneStone3`, `ArcaneStone4` (reference registers these via `GameRegistry.addShapedRecipe` non-arcane path; `ArcaneStone3` also depends on missing `ConfigBlocks.blockStairsArcaneStone`).
 
 **Что нужно доделать:**
 Port `initializeArcaneRecipes()` into Forge 1.12.2 source and register all original arcane recipe entries with matching research keys, outputs, ingredients, aspect costs and conditional ore-dictionary branches.
@@ -74,7 +79,7 @@ Port `initializeArcaneRecipes()` into Forge 1.12.2 source and register all origi
 - `src/main/java/thaumcraft/common/config/ConfigResearch.java`: expose/store the same recipe-key map used by research pages.
 
 **Критерии приемки:**
-- [ ] Focused audit shows every reference arcane key from `initializeArcaneRecipes()` exists in current registration or is documented with a concrete missing-content blocker.
+- [x] Focused audit shows every reference arcane key from `initializeArcaneRecipes()` exists in current registration or is documented with a concrete missing-content blocker.
 - [x] `ConfigRecipes.init()` now includes a concrete static arcane recipe initialization path and writes recipe handles to `ConfigResearch.recipes`.
 - [x] Aspect costs and research strings are ported for representative baseline keys: `PrimalCharm`, `ArcaneStone1`, `WandCapGold`, `WandRodGreatwood`, `FocusFire`, `Goggles`.
 
