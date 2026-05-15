@@ -1289,6 +1289,65 @@ public class ConfigResearch {
                 .registerResearchItem();
 
         new ResearchItem(
+                "MASKGRINNINGDEVIL",
+                "ARTIFICE",
+                new AspectList()
+                        .add(Aspect.HEAL, 5)
+                        .add(Aspect.MIND, 5)
+                        .add(Aspect.ARMOR, 3),
+                -10,
+                8,
+                2,
+                new ResourceLocation("thaumcraft", "textures/misc/r_mask0.png"))
+                .setPages(
+                        new ResearchPage("tc.research_page.MASKGRINNINGDEVIL.1"),
+                        new ResearchPage((InfusionRecipe) recipes.get("MaskGrinningDevil")))
+                .setParents("ARMORFORTRESS")
+                .setConcealed()
+                .setSecondary()
+                .registerResearchItem();
+
+        new ResearchItem(
+                "MASKANGRYGHOST",
+                "ARTIFICE",
+                new AspectList()
+                        .add(Aspect.ENTROPY, 5)
+                        .add(Aspect.DEATH, 5)
+                        .add(Aspect.ARMOR, 3),
+                -10,
+                9,
+                2,
+                new ResourceLocation("thaumcraft", "textures/misc/r_mask1.png"))
+                .setPages(
+                        new ResearchPage("tc.research_page.MASKANGRYGHOST.1"),
+                        new ResearchPage((InfusionRecipe) recipes.get("MaskAngryGhost")))
+                .setParents("ARMORFORTRESS")
+                .setConcealed()
+                .setSecondary()
+                .registerResearchItem();
+
+        new ResearchItem(
+                "MASKSIPPINGFIEND",
+                "ARTIFICE",
+                new AspectList()
+                        .add(Aspect.UNDEAD, 5)
+                        .add(Aspect.LIFE, 5)
+                        .add(Aspect.ARMOR, 3),
+                -10,
+                10,
+                2,
+                new ResourceLocation("thaumcraft", "textures/misc/r_mask2.png"))
+                .setPages(
+                        new ResearchPage("tc.research_page.MASKSIPPINGFIEND.1"),
+                        new ResearchPage((InfusionRecipe) recipes.get("MaskSippingFiend")))
+                .setParents("ARMORFORTRESS")
+                .setConcealed()
+                .setSecondary()
+                .registerResearchItem();
+        ThaumcraftApi.addWarpToResearch("MASKANGRYGHOST", 1);
+        ThaumcraftApi.addWarpToResearch("MASKSIPPINGFIEND", 1);
+
+        new ResearchItem(
                 "BOOTSTRAVELLER",
                 "ARTIFICE",
                 new AspectList()
