@@ -65,7 +65,7 @@ Lightweight commands run during analysis:
 
 ## 4. Текущее состояние Stage 8-b
 
-Current state is not closeable. Server/common GUI IDs and containers exist for many screens, but client-side routing and client GUI classes are still incomplete. GUI IDs `1`, `2`, `3`, `5`, `8`, `9`, `13`, `15`, `16`, `17`, `18`, `19`, and `20` now have texture-backed Pech, Traveling Trunk, Thaumatorium, Focus Pouch, Deconstruction Table, Alchemy Furnace, Arcane Workbench, Arcane Bore, Hand Mirror, Hover Harness, Magic Box, Spa, and Focal Manipulator baselines, but full visual parity and manual client validation remain open.
+Current state is not closeable. Server/common GUI IDs and containers exist for many screens, but client-side routing and client GUI classes are still incomplete. GUI IDs `0`, `1`, `2`, `3`, `5`, `8`, `9`, `13`, `15`, `16`, `17`, `18`, `19`, and `20` now have texture-backed Golem, Pech, Traveling Trunk, Thaumatorium, Focus Pouch, Deconstruction Table, Alchemy Furnace, Arcane Workbench, Arcane Bore, Hand Mirror, Hover Harness, Magic Box, Spa, and Focal Manipulator baselines, but full visual parity and manual client validation remain open.
 
 Concrete current findings:
 
@@ -73,7 +73,7 @@ Concrete current findings:
 - Server GUI routing exists for Golem, Pech, Traveling Trunk, Thaumatorium, Focus Pouch, Deconstruction Table, Alchemy Furnace, Research Table, Arcane Workbench, Arcane Bore, Hand Mirror, Hover Harness, Magic Box, Spa, and Focal Manipulator in `src/main/java/thaumcraft/common/CommonProxy.java:61-119`.
 - Thaumonomicon is intentionally server-null in `src/main/java/thaumcraft/common/CommonProxy.java:95`, matching the reference pattern that its GUI is client-only.
 - Base `CommonProxy.getClientGuiElement` returns null in `src/main/java/thaumcraft/common/CommonProxy.java:122-126`, as expected for common proxy.
-- `ClientProxy.getClientGuiElement` constructs `GuiFocusPouch`, `GuiHandMirror`, `GuiHoverHarness`, `GuiMagicBox`, `GuiSpa`, `GuiTravelingTrunk`, and `GuiPech`, and now routes `GUI_THAUMATORIUM`, `GUI_DECONSTRUCTION_TABLE`, `GUI_ALCHEMY_FURNACE`, `GUI_ARCANE_WORKBENCH`, `GUI_ARCANE_BORE`, and `GUI_FOCAL_MANIPULATOR` to matching tile-backed screens; remaining Stage 8-b/current GUI IDs returning null are Golem (`0`), Research Table (`10`), and Thaumonomicon (`12`).
+- `ClientProxy.getClientGuiElement` constructs `GuiFocusPouch`, `GuiHandMirror`, `GuiHoverHarness`, `GuiMagicBox`, `GuiSpa`, `GuiTravelingTrunk`, `GuiPech`, and `GuiGolem`, and now routes `GUI_THAUMATORIUM`, `GUI_DECONSTRUCTION_TABLE`, `GUI_ALCHEMY_FURNACE`, `GUI_ARCANE_WORKBENCH`, `GUI_ARCANE_BORE`, and `GUI_FOCAL_MANIPULATOR` to matching tile-backed screens; remaining Stage 8-b/current GUI IDs returning null are Research Table (`10`) and Thaumonomicon (`12`).
 - `GuiFocusPouch`, `GuiHandMirror`, and `GuiHoverHarness` now bind original textures instead of grey placeholder rectangles.
 - `src/main/resources/assets/thaumcraft/textures/gui/gui_thaumatorium.png`, `gui_arcaneworkbench.png`, `gui_arcanebore.png`, `gui_wandtable.png`, `gui_decontable.png`, `gui_alchemyfurnace.png`, `gui_spa.png`, `guitrunkbase.png`, `gui_focuspouch.png`, `guihandmirror.png`, and `guihoverharness.png` are copied byte-for-byte from `thaumcraft_src/assets/thaumcraft/textures/gui/`; the other reference GUI textures are still absent from current resources.
 - `src/main/resources/assets/thaumcraft/textures/aspects/**` now contains the original aspect icon set needed by Thaumatorium and later research/aspect GUI rendering.
@@ -273,15 +273,16 @@ Depends on focus upgrade data and relay/CV tile data being populated. Stage 9/co
 
 ### GAP-5: Golem GUI отсутствует на клиенте
 
-**Статус:** отсутствует  
+**Статус:** частично реализовано  
 **Критичность:** blocker
 
 **Текущая реализация:**
-- `src/main/java/thaumcraft/client/ClientProxy.java:71-84`
+- `src/main/java/thaumcraft/client/ClientProxy.java#getClientGuiElement` routes GUI ID `0` through `world.getEntityByID(x)` to `GuiGolem` when the entity is `EntityGolemBase`.
 - `src/main/java/thaumcraft/common/CommonProxy.java:66-69`
 - `src/main/java/thaumcraft/common/entities/golems/EntityGolemBase.java:346-353`
-- Отсутствует `src/main/java/thaumcraft/client/gui/GuiGolem.java`.
-- Отсутствует `src/main/resources/assets/thaumcraft/textures/gui/guigolem.png`.
+- `src/main/java/thaumcraft/client/gui/GuiGolem.java` exists as a 1.12.2 `GuiContainer` baseline using `ContainerGolem`.
+- `src/main/java/thaumcraft/common/entities/golems/ContainerGolem.java` now includes reference-style button handling for scroll/toggle/color controls and refreshable scrolled ghost-slot binding.
+- `src/main/resources/assets/thaumcraft/textures/gui/guigolem.png` exists and matches the original asset.
 
 **Референс:**
 - `Thaumcraft-1.7.10-4.2.3.5.jar!/thaumcraft/client/ClientProxy.class`, offsets `108-128` instantiate `GuiGolem` for GUI ID `0` using entity ID `x`.
@@ -289,23 +290,31 @@ Depends on focus upgrade data and relay/CV tile data being populated. Stage 9/co
 - `thaumcraft_src/assets/thaumcraft/textures/gui/guigolem.png`.
 
 **Что не совпадает:**
-Current entity opens server GUI for golem cores with GUI, but client returns null. Reference GUI includes golem model preview, threat setting, scrollable inventory/filter controls, slot tooltips and button click packets. Current Stage 8-b has none of this screen.
+Reference GUI includes golem model preview, threat text, scrollable inventory/filter controls, fluid-slot tooltips, and button click packets. Current client now opens a texture-backed baseline with core controls and container button paths, but model preview and full visual/runtime parity remain unverified.
 
 **Что нужно доделать:**
-Port Golem GUI enough to display core controls, inventory/filter slots and the original background, and route entity-based GUI ID `0`.
+Finish Golem GUI parity by manually validating core-specific controls, scroll/color interactions, and visual behavior against runtime golems.
 
 **Как доделать:**
-- Add `src/main/java/thaumcraft/client/gui/GuiGolem.java`.
-- Route `GUI_GOLEM` in `ClientProxy#getClientGuiElement` by fetching `world.getEntityByID(x)` and validating `EntityGolemBase`.
-- Copy `guigolem.png`.
-- Review current `ContainerGolem` for fields expected by reference (`currentScroll`, `maxScroll`, refresh behavior) before implementation.
+- Done: add `src/main/java/thaumcraft/client/gui/GuiGolem.java`.
+- Done: route `GUI_GOLEM` in `ClientProxy#getClientGuiElement` by fetching `world.getEntityByID(x)` and validating `EntityGolemBase`.
+- Done: copy `guigolem.png`.
+- Done: add `ContainerGolem` support for `currentScroll`, `maxScroll`, `refreshInventory`, and reference button ids (`50..57`, `66`, `67`) via `enchantItem`.
 - Scenario: interact with a golem core that `ItemGolemCore.hasGUI` accepts in `EntityGolemBase.java:347-350`.
 
 **Критерии приемки:**
 - [ ] GUI ID `0` opens for GUI-capable golems.
-- [ ] Core-specific controls and filter/inventory scroll interactions are visible and usable.
-- [ ] No client crash if entity ID is stale or invalid; invalid entity returns null safely.
-- [ ] Texture and labels match reference layout.
+- [x] Core-specific controls and filter/inventory scroll interactions have client click paths and server-side button handlers.
+- [x] No client crash if entity ID is stale or invalid; invalid entity returns null safely.
+- [x] Original golem GUI texture is present and bound by the client screen.
+
+**Checkpoint 2026-05-15 — Golem GUI baseline:**
+- Added `GuiGolem` with original `guigolem.png`, baseline inventory/filter slot rendering, core-toggle controls, sorting toggles, and color/scroll click paths mapped to reference button ids.
+- Routed client GUI ID `0` in `ClientProxy#getClientGuiElement` through `world.getEntityByID(x)` with `EntityGolemBase` type validation.
+- Updated `ContainerGolem` with reference-style `currentScroll`/`maxScroll` tracking, refreshable scrolled ghost-slot binding, and button-id handling in `enchantItem` for toggle/scroll/color behavior.
+- Validation: `./scripts/dev.sh compileJava` passed; `./scripts/dev.sh validate --smoke` passed with tests `10/10`, jar/check-jar summary `5349` MCP leak lines / `1052` unique leaks, server smoke ready, and no crash reports under `run/`.
+- Client smoke/manual GUI open was skipped because `DISPLAY=` and user-driven GUI/graphics validation is excluded for this run.
+- Remaining: manual golem-core open scenarios, model preview/fluid tooltip parity, and exact visual-layout comparison.
 
 **Риски / зависимости:**
 Golem AI/task parity is outside Stage 8-b, but the GUI depends on current `ContainerGolem` fields matching reference interaction IDs.
@@ -620,7 +629,7 @@ Inventory-slot blocking is behavior-sensitive and can cause item loss/duplicatio
 **Критичность:** blocker
 
 **Текущая реализация:**
-- `src/main/resources/assets/thaumcraft/textures/gui/` now contains `gui_thaumatorium.png`, `gui_arcaneworkbench.png`, `gui_arcanebore.png`, `gui_wandtable.png`, `gui_decontable.png`, `gui_alchemyfurnace.png`, `gui_spa.png`, `guitrunkbase.png`, `gui_pech.png`, `gui_focuspouch.png`, `guihandmirror.png`, and `guihoverharness.png`.
+- `src/main/resources/assets/thaumcraft/textures/gui/` now contains `gui_thaumatorium.png`, `gui_arcaneworkbench.png`, `gui_arcanebore.png`, `gui_wandtable.png`, `gui_decontable.png`, `gui_alchemyfurnace.png`, `gui_spa.png`, `guitrunkbase.png`, `guigolem.png`, `gui_pech.png`, `gui_focuspouch.png`, `guihandmirror.png`, and `guihoverharness.png`.
 - `src/main/resources/assets/thaumcraft/textures/misc/potions.png` is the only current `textures/misc` file found.
 - `src/main/resources/assets/thaumcraft/textures/aspects/**` now contains the original aspect icon set copied for Thaumatorium/aspect GUI rendering.
 
@@ -649,7 +658,7 @@ Inventory-slot blocking is behavior-sensitive and can cause item loss/duplicatio
 - Research support textures under `thaumcraft_src/assets/thaumcraft/textures/misc/**` and aspect icons under `thaumcraft_src/assets/thaumcraft/textures/aspects/**`.
 
 **Что не совпадает:**
-The texture resource tree now covers the newly ported Thaumatorium, Arcane Workbench, Arcane Bore, Focal Manipulator, Deconstruction Table, Alchemy Furnace, Pech, Traveling Trunk, Spa, Focus Pouch, Hand Mirror, Hover Harness, and aspect-icon paths, but most remaining Stage 8-b GUI textures and direct research misc support textures are still absent.
+The texture resource tree now covers the newly ported Thaumatorium, Arcane Workbench, Arcane Bore, Focal Manipulator, Deconstruction Table, Alchemy Furnace, Golem, Pech, Traveling Trunk, Spa, Focus Pouch, Hand Mirror, Hover Harness, and aspect-icon paths, but most remaining Stage 8-b GUI textures and direct research misc support textures are still absent.
 
 **Что нужно доделать:**
 Copy original GUI and directly used support textures from `thaumcraft_src/assets/` to `src/main/resources/assets/thaumcraft/`.

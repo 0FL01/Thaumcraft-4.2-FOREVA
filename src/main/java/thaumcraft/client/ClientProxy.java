@@ -22,6 +22,7 @@ import thaumcraft.client.gui.GuiAlchemyFurnace;
 import thaumcraft.client.gui.GuiDeconstructionTable;
 import thaumcraft.client.gui.GuiFocalManipulator;
 import thaumcraft.client.gui.GuiFocusPouch;
+import thaumcraft.client.gui.GuiGolem;
 import thaumcraft.client.gui.GuiHandMirror;
 import thaumcraft.client.gui.GuiHoverHarness;
 import thaumcraft.client.gui.GuiMagicBox;
@@ -43,6 +44,7 @@ import thaumcraft.common.tiles.TileDeconstructionTable;
 import thaumcraft.common.tiles.TileFocalManipulator;
 import thaumcraft.common.tiles.TileSpa;
 import thaumcraft.common.tiles.TileThaumatorium;
+import thaumcraft.common.entities.golems.EntityGolemBase;
 import thaumcraft.common.entities.golems.EntityTravelingTrunk;
 import thaumcraft.common.entities.monster.EntityPech;
 
@@ -139,7 +141,12 @@ public class ClientProxy extends CommonProxy {
             case GUI_HOVER_HARNESS:
                 return new GuiHoverHarness(player.inventory, world, x, y, z);
             case GUI_GOLEM:
-                return null;
+            {
+                net.minecraft.entity.Entity entity = world.getEntityByID(x);
+                return entity instanceof EntityGolemBase
+                        ? new GuiGolem(player, (EntityGolemBase) entity)
+                        : null;
+            }
             case GUI_PECH:
             {
                 net.minecraft.entity.Entity entity = world.getEntityByID(x);

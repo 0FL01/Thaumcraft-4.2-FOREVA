@@ -52,6 +52,7 @@ Branch: `codex/durable-goal-stage8-9`
 - Magic Box and Spa client smoke/manual open/visual parity was skipped on 2026-05-15 because `DISPLAY=` and user-driven GUI/graphics validation is excluded by instruction.
 - Traveling Trunk client smoke/manual open/visual parity was skipped on 2026-05-15 because `DISPLAY=` and user-driven GUI/graphics validation is excluded by instruction.
 - Pech client smoke/manual open/trade visual parity was skipped on 2026-05-15 because `DISPLAY=` and user-driven GUI/graphics validation is excluded by instruction.
+- Golem client smoke/manual open/visual parity was skipped on 2026-05-15 because `DISPLAY=` and user-driven GUI/graphics validation is excluded by instruction.
 - Future GUI/client visual checks that require user-driven Minecraft control, screenshots, or unavailable X11/graphics stack will be recorded as: `SKIPPED by user instruction: GUI/graphics/user-interactive validation excluded`.
 
 ## Baseline Validation
@@ -63,6 +64,31 @@ Branch: `codex/durable-goal-stage8-9`
 - `./scripts/dev.sh validate --smoke` — passed on 2026-05-15, including compact server smoke validation.
 
 ## Checkpoint Log
+
+### 2026-05-15 — Stage 8-b Golem GUI baseline
+
+Scope:
+
+- Added `GuiGolem` backed by `ContainerGolem`.
+- Ported a texture-backed Golem GUI baseline: original `guigolem.png`, inventory/filter panel rendering, core/sort toggle rendering, and color/scroll click handling mapped to the reference button-id scheme.
+- Routed client GUI ID `0` through `ClientProxy#getClientGuiElement` using entity id lookup and `EntityGolemBase` type validation.
+- Updated `ContainerGolem` with reference-style scroll state (`currentScroll`, `maxScroll`), refreshable scrolled ghost-slot binding, and `enchantItem` button handling for toggle/scroll/color interactions.
+- Copied original `guigolem.png`.
+- Updated `docs/Stage8-b.md` with the implemented baseline and remaining client/manual limits.
+
+Validation:
+
+- `./scripts/dev.sh compileJava` — passed.
+- `./scripts/dev.sh validate --smoke` — passed: status, compile, tests `10/10`, jar, check-jar summary `5349` MCP leak lines / `1052` unique leaks, and server smoke.
+- `run/smoke-server.log` evidence: `Registering entities`; `Forge Mod Loader has successfully loaded 6 mods`; `Done (1.205s)!`.
+- Crash report scan under `run/` returned no files.
+- `./scripts/dev.sh smoke-client` — skipped because `DISPLAY=` and GUI/graphics/user-interactive validation is excluded.
+
+Remaining limits:
+
+- Golem GUI open/toggle/scroll/color scenarios were not manually observed.
+- Exact visual parity for model preview and fluid-slot tooltip behavior remains open.
+- Full core-specific golem interaction matrix remains tied to manual runtime coverage.
 
 ### 2026-05-15 — Stage 8-b Pech GUI baseline
 
