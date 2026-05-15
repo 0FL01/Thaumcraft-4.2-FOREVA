@@ -51,6 +51,7 @@ public class ConfigBlocks {
     public static BlockCosmeticStoneSlab blockDoubleSlabStone;
     public static BlockLoot blockLootUrn;
     public static BlockLoot blockLootCrate;
+    public static BlockChestHungry blockChestHungry;
     public static BlockHole blockHole;
     public static BlockWarded blockWarded;
 
@@ -194,6 +195,10 @@ public class ConfigBlocks {
                 .setRegistryName("thaumcraft", legacyPath("blockLootCrate"))
                 .setTranslationKey("thaumcraft.loot_crate");
 
+        blockChestHungry = (BlockChestHungry) new BlockChestHungry()
+                .setRegistryName("thaumcraft", legacyPath("blockChestHungry"))
+                .setTranslationKey("thaumcraft.hungry_chest");
+
         blockHole = (BlockHole) new BlockHole()
                 .setRegistryName("thaumcraft", legacyPath("blockHole"))
                 .setTranslationKey("thaumcraft.hole");
@@ -270,6 +275,7 @@ public class ConfigBlocks {
                 blockDoubleSlabStone,
                 blockLootUrn,
                 blockLootCrate,
+                blockChestHungry,
                 blockHole,
                 blockWarded
         };
@@ -325,6 +331,8 @@ public class ConfigBlocks {
                 .setRegistryName(blockLootUrn.getRegistryName()));
         registry.register(new BlockLootItem(blockLootCrate)
                 .setRegistryName(blockLootCrate.getRegistryName()));
+        registry.register(new net.minecraft.item.ItemBlock(blockChestHungry)
+                .setRegistryName(blockChestHungry.getRegistryName()));
     }
 
     public static void registerTileEntities() {
@@ -438,7 +446,8 @@ public class ConfigBlocks {
             new TileRegistration(TileEldritchAltar.class, "TileEldritchAltar"),
             new TileRegistration(TileEldritchCap.class, "TileEldritchCap"),
             new TileRegistration(TileEldritchObelisk.class, "TileEldritchObelisk"),
-            new TileRegistration(TileEldritchTrap.class, "TileEldritchTrap")
+            new TileRegistration(TileEldritchTrap.class, "TileEldritchTrap"),
+            new TileRegistration(TileChestHungry.class, "TileChestHungry")
     };
 
     private static final class TileRegistration {

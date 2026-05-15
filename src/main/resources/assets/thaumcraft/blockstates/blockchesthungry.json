@@ -1,0 +1,8 @@
+{
+  "variants": {
+    "facing=north": { "model": "thaumcraft:blockchesthungry", "y": 180 },
+    "facing=south": { "model": "thaumcraft:blockchesthungry" },
+    "facing=west": { "model": "thaumcraft:blockchesthungry", "y": 90 },
+    "facing=east": { "model": "thaumcraft:blockchesthungry", "y": 270 }
+  }
+}

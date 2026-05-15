@@ -192,6 +192,13 @@ public class ConfigRecipes {
                 'B', new ItemStack(ConfigBlocks.blockCosmeticSolid, 1, 7),
                 'R', new ItemStack(Blocks.REDSTONE_BLOCK));
 
+        registerArcaneRecipe("HungryChest", "HUNGRYCHEST",
+                new ItemStack(ConfigBlocks.blockChestHungry),
+                new AspectList().add(Aspect.AIR, 5).add(Aspect.ORDER, 3).add(Aspect.ENTROPY, 3),
+                "WTW", "W W", "WWW",
+                'W', "plankWood",
+                'T', new ItemStack(Blocks.TRAPDOOR));
+
         registerArcaneRecipe("WardedJar", "DISTILESSENTIA",
                 new ItemStack(ConfigBlocks.blockJar, 1, 0),
                 new AspectList().add(Aspect.WATER, 1),
@@ -1436,6 +1443,16 @@ public class ConfigRecipes {
                 new ItemStack(ConfigItems.itemShard, 1, 0), new ItemStack(ConfigItems.itemShard, 1, 0),
                 new ItemStack(ConfigItems.itemResource, 1, 7), new ItemStack(ConfigItems.itemResource, 1, 7),
                 new ItemStack(Items.FEATHER), new ItemStack(Items.FISH, 1, OreDictionary.WILDCARD_VALUE));
+
+        registerInfusionRecipe("TravelTrunk", "TRAVELTRUNK",
+                new ItemStack(ConfigItems.itemTrunkSpawner),
+                3,
+                new AspectList().add(Aspect.MOTION, 4).add(Aspect.SOUL, 4).add(Aspect.TRAVEL, 4).add(Aspect.VOID, 16),
+                new ItemStack(ConfigBlocks.blockChestHungry),
+                new ItemStack(Items.IRON_INGOT),
+                new ItemStack(ConfigBlocks.blockWoodenDevice, 1, 6),
+                new ItemStack(ConfigItems.itemGolemPlacer, 1, 1),
+                new ItemStack(ConfigBlocks.blockWoodenDevice, 1, 6));
 
         registerInfusionRecipe("ThaumiumFortressHelm", "ARMORFORTRESS",
                 new ItemStack(ConfigItems.itemHelmFortress),

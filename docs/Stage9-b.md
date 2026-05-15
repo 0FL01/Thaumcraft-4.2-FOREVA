@@ -63,9 +63,8 @@ Reference calls `initializeArcaneRecipes()` from `ConfigRecipes.init()` and fill
 - added alchemy/tube/thaumatorium block (`Filter`, `AlchemyFurnace`, `Alembic`, `Bellows`, `Tube`, `Resonator`, `TubeValve`, `TubeFilter`, `TubeRestrict`, `TubeOneway`, `TubeBuffer`, `AlchemicalConstruct`, `AdvAlchemyConstruct`, `Centrifuge`, `EssentiaCrystalizer`, `MnemonicMatrix`).
 
 Full parity is still open: many of the 89 reference arcane adds are not yet ported.
-Current key audit leaves only six unresolved reference keys:
+Current key audit leaves only five unresolved reference keys:
 - `ArcaneDoor` (`ConfigItems.itemArcaneDoor` missing in current source);
-- `HungryChest` (`ConfigBlocks.blockChestHungry` missing in current source);
 - `Levitator` (`ConfigBlocks.blockLifter` missing in current source);
 - `ArcaneStone2`, `ArcaneStone3`, `ArcaneStone4` (reference registers these via `GameRegistry.addShapedRecipe` non-arcane path; `ArcaneStone3` also depends on missing `ConfigBlocks.blockStairsArcaneStone`).
 

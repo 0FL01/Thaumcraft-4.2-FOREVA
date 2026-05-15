@@ -67,6 +67,35 @@ Branch: `codex/durable-goal-stage8-9`
 
 ## Checkpoint Log
 
+### 2026-05-15 — Stage 9-b/9-c Hungry Chest + TravelTrunk unblock baseline
+
+Scope:
+
+- Ported reference Hungry Chest block/tile baseline from 1.7.10 into 1.12.2:
+  - added `BlockChestHungry` with inventory collision consume path, comparator output, activation inventory open, and bounded non-full-cube collision box;
+  - added `TileChestHungry` inventory persistence/ticking/lid open-close event behavior and tile registration.
+- Wired Hungry Chest into registry/resources:
+  - `ConfigBlocks` block field/init/itemblock/tile registration updated for `blockChestHungry` / `TileChestHungry`;
+  - added blockstate/model files and copied source textures (`woodplain.png`, `chesthungry.png`) from `thaumcraft_src/assets`.
+- Closed coupled recipe blockers:
+  - Stage 9-b arcane key `HungryChest` registered in `initializeArcaneRecipeBaseline()`;
+  - Stage 9-c infusion key `TravelTrunk` registered in `initializeInfusionEquipmentArmorRecipeBaseline()`.
+- Focused key audits:
+  - infusion keys: `63/63` reference keys registered (no missing);
+  - arcane recipe-key blocker list reduced to `5` unresolved (`ArcaneDoor`, `Levitator`, `ArcaneStone2/3/4`).
+
+Validation:
+
+- `./scripts/dev.sh validate --smoke` — passed: status, compile, tests `10/10`, jar, check-jar summary `5624` MCP leak lines / `1109` unique leaks, and server smoke.
+- `run/smoke-server.log` evidence: `Registering entities`; `Forge Mod Loader has successfully loaded 6 mods`; `Done (1.247s)!`.
+- Crash report scan under `run/` returned no files.
+- `./scripts/dev.sh smoke-client` — skipped because `DISPLAY=` and GUI/graphics/user-interactive validation is excluded.
+
+Remaining limits:
+
+- Stage 9-b still has explicit unresolved arcane blockers: `ArcaneDoor`, `Levitator`, and non-arcane-path `ArcaneStone2/3/4`.
+- Stage 9-c runtime/research-page/manual scenario matrix remains open.
+
 ### 2026-05-15 — Stage 9-c infusion equipment/armor/mask/utility baseline
 
 Scope:

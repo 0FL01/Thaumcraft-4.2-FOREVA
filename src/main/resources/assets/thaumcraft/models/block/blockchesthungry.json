@@ -1,0 +1,12 @@
+{
+  "parent": "block/cube",
+  "textures": {
+    "particle": "thaumcraft:blocks/woodplain",
+    "down": "thaumcraft:blocks/woodplain",
+    "up": "thaumcraft:blocks/woodplain",
+    "north": "thaumcraft:blocks/woodplain",
+    "south": "thaumcraft:blocks/woodplain",
+    "west": "thaumcraft:blocks/woodplain",
+    "east": "thaumcraft:blocks/woodplain"
+  }
+}

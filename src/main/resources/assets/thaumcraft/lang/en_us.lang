@@ -158,6 +158,7 @@ item.TrunkSpawner.text.1=This trunk holds items
 entity.trunk.guiname='s Trunk
 entity.trunk.move=The trunk will now follow you
 entity.trunk.stay=The trunk will stay where it is
+tile.thaumcraft.hungry_chest.name=Hungry Chest
 container.focus_pouch=Focus Pouch
 container.handmirror=Hand Mirror
 container.hoverharness=Hover Harness

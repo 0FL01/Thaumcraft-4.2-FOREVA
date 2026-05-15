@@ -71,9 +71,9 @@ Reference `ConfigRecipes.initializeArcaneRecipes()` регистрирует 63 
 - `AdvancedGolem`, `CoreAlchemy`, `CoreSorting`, `CoreLumber`, `CoreFishing`, `CoreUse`;
 - `ArcaneBore`, `LampGrowth`, `LampFertility`, `EssentiaReservoir`.
 
-These entries preserve reference keys/research/instability/aspect formulas and `ConfigResearch.recipes` handle writes. Current key audit is now `62/63` reference infusion crafting keys implemented, with a single unresolved key: `TravelTrunk`.
+These entries preserve reference keys/research/instability/aspect formulas and `ConfigResearch.recipes` handle writes. Current key audit is now `63/63` reference infusion crafting keys implemented.
 
-Reference set includes wand caps/rods, foci, mirror/device/golem families, runic/bauble/hover families, elemental tools, fortress/void robe/mask conversions, and utility outputs (`SanityCheck`, `SinStone`, `PrimalCrusher`, `EldritchEye`). The only still-unregistered reference key is `TravelTrunk`, blocked because its central input is `ConfigBlocks.blockChestHungry`, which is not present in the current 1.12.2 `ConfigBlocks` surface.
+Reference set includes wand caps/rods, foci, mirror/device/golem families, runic/bauble/hover families, elemental tools, fortress/void robe/mask conversions, and utility outputs (`SanityCheck`, `SinStone`, `PrimalCrusher`, `EldritchEye`), including `TravelTrunk` after Hungry Chest block/tile registration.
 
 **Что нужно доделать:**
 
@@ -88,8 +88,8 @@ Port the reference infusion crafting registration block into the 1.12.2 `ConfigR
 - Run a focused scan after implementation to verify current code contains all reference `ConfigResearch.recipes` keys and 63 `addInfusionCraftingRecipe` calls or intentionally documented 1.12-only substitutes.
 
 **Критерии приемки:**
-- [x] `ConfigRecipes.init()` now registers all feasible reference infusion crafting recipes and documents one blocked key (`TravelTrunk`) with concrete cause (`ConfigBlocks.blockChestHungry` missing).
-- [x] Focused key-audit reports `63` reference keys vs `62` registered keys, with only `TravelTrunk` missing and no unexpected extras.
+- [x] `ConfigRecipes.init()` now registers all 63 reference infusion crafting recipes.
+- [x] Focused key-audit reports `63` reference keys vs `63` registered keys, with no missing and no unexpected extras.
 - [x] Every registered recipe preserves reference `ConfigResearch.recipes` key, research gate, instability, AspectList costs, central input and components.
 - [ ] At least one representative recipe from each subgroup can be found via `ThaumcraftCraftingManager.findMatchingInfusionRecipe` in a focused test or manual scenario.
 
@@ -345,7 +345,7 @@ Dependency: Stage 8/client FX/render work may affect visual confirmation and cli
 
 ## 6. Итоговый checklist закрытия Stage 9-c
 
-- [ ] Port all 63 reference infusion crafting recipe registrations into `ConfigRecipes.init()` or a called helper, or close the final documented blocker (`TravelTrunk` / `blockChestHungry`).
+- [x] Port all 63 reference infusion crafting recipe registrations into `ConfigRecipes.init()` or a called helper.
 - [ ] Port all 24 reference infusion enchantment recipe registrations.
 - [ ] Preserve all reference `ConfigResearch.recipes` keys and research gates for infusion recipes.
 - [x] Add/restore dynamic `InfusionRunicAugmentRecipe` and register it.
