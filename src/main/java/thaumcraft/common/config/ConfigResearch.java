@@ -11,6 +11,7 @@ import thaumcraft.api.aspects.Aspect;
 import thaumcraft.api.aspects.AspectList;
 import thaumcraft.api.crafting.IArcaneRecipe;
 import thaumcraft.api.crafting.CrucibleRecipe;
+import thaumcraft.api.crafting.InfusionRecipe;
 import thaumcraft.api.research.ResearchCategories;
 import thaumcraft.api.research.ResearchItem;
 import thaumcraft.api.research.ResearchPage;
@@ -460,6 +461,29 @@ public class ConfigResearch {
                 .registerResearchItem();
 
         new ResearchItem(
+                "FOCUSHELLBAT",
+                "THAUMATURGY",
+                new AspectList()
+                        .add(Aspect.TRAVEL, 3)
+                        .add(Aspect.BEAST, 6)
+                        .add(Aspect.FIRE, 3)
+                        .add(Aspect.MAGIC, 3),
+                3,
+                -7,
+                2,
+                new ItemStack(ConfigItems.focusHellbat))
+                .setPages(
+                        new ResearchPage("tc.research_page.FOCUSHELLBAT.1"),
+                        new ResearchPage((InfusionRecipe) recipes.get("FocusHellbat")))
+                .setHidden()
+                .setEntityTriggers("Thaumcraft.Firebat")
+                .setAspectTriggers(Aspect.FIRE)
+                .setParentsHidden("FOCUSFIRE", "INFUSION")
+                .registerResearchItem();
+        ThaumcraftApi.addWarpToResearch("FOCUSHELLBAT", 2);
+        ThaumcraftApi.addWarpToItem(new ItemStack(ConfigItems.focusHellbat), 1);
+
+        new ResearchItem(
                 "FOCUSEXCAVATION",
                 "THAUMATURGY",
                 new AspectList()
@@ -476,6 +500,27 @@ public class ConfigResearch {
                 .setConcealed()
                 .setParents("FOCUSFIRE")
                 .registerResearchItem();
+
+        if (Config.wardedStone) {
+            new ResearchItem(
+                    "FOCUSWARDING",
+                    "THAUMATURGY",
+                    new AspectList()
+                            .add(Aspect.EARTH, 6)
+                            .add(Aspect.ARMOR, 3)
+                            .add(Aspect.ORDER, 3)
+                            .add(Aspect.MIND, 3),
+                    -2,
+                    -4,
+                    3,
+                    new ItemStack(ConfigItems.focusWarding))
+                    .setPages(
+                            new ResearchPage("tc.research_page.FOCUSWARDING.1"),
+                            new ResearchPage((InfusionRecipe) recipes.get("FocusWarding")))
+                    .setConcealed()
+                    .setParents("FOCUSEXCAVATION", "INFUSION")
+                    .registerResearchItem();
+        }
 
         new ResearchItem(
                 "FOCUSSHOCK",
@@ -512,6 +557,25 @@ public class ConfigResearch {
                         new ResearchPage((IArcaneRecipe) recipes.get("FocusTrade")))
                 .setConcealed()
                 .setParents("FOCUSFIRE")
+                .registerResearchItem();
+
+        new ResearchItem(
+                "FOCUSPORTABLEHOLE",
+                "THAUMATURGY",
+                new AspectList()
+                        .add(Aspect.TRAVEL, 3)
+                        .add(Aspect.ENTROPY, 3)
+                        .add(Aspect.ELDRITCH, 6)
+                        .add(Aspect.AIR, 3),
+                7,
+                -2,
+                2,
+                new ItemStack(ConfigItems.focusPortableHole))
+                .setPages(
+                        new ResearchPage("tc.research_page.FOCUSPORTABLEHOLE.1"),
+                        new ResearchPage((InfusionRecipe) recipes.get("FocusPortableHole")))
+                .setConcealed()
+                .setParents("FOCUSTRADE", "INFUSION")
                 .registerResearchItem();
 
         new ResearchItem(
