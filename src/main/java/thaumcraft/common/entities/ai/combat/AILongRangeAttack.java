@@ -24,6 +24,8 @@ public class AILongRangeAttack extends EntityAIAttackRanged {
      */
     @Override
     public boolean shouldExecute() {
+        if (!super.shouldExecute()) return false;
+
         EntityLivingBase target = this.wielder.getAttackTarget();
         if (target == null) return false;
         if (target.isDead) {
