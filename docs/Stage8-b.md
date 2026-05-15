@@ -65,7 +65,7 @@ Lightweight commands run during analysis:
 
 ## 4. Текущее состояние Stage 8-b
 
-Current state is not closeable. Server/common GUI IDs and containers exist for many screens, but client-side routing and client GUI classes are mostly absent. GUI IDs `3`, `5`, `13`, `15`, `16`, `17`, and `20` now have texture-backed Thaumatorium, Focus Pouch, Arcane Workbench, Arcane Bore, Hand Mirror, Hover Harness, and Focal Manipulator baselines, but full visual parity and manual client validation remain open.
+Current state is not closeable. Server/common GUI IDs and containers exist for many screens, but client-side routing and client GUI classes are still incomplete. GUI IDs `3`, `5`, `8`, `9`, `13`, `15`, `16`, `17`, and `20` now have texture-backed Thaumatorium, Focus Pouch, Deconstruction Table, Alchemy Furnace, Arcane Workbench, Arcane Bore, Hand Mirror, Hover Harness, and Focal Manipulator baselines, but full visual parity and manual client validation remain open.
 
 Concrete current findings:
 
@@ -73,9 +73,9 @@ Concrete current findings:
 - Server GUI routing exists for Golem, Pech, Traveling Trunk, Thaumatorium, Focus Pouch, Deconstruction Table, Alchemy Furnace, Research Table, Arcane Workbench, Arcane Bore, Hand Mirror, Hover Harness, Magic Box, Spa, and Focal Manipulator in `src/main/java/thaumcraft/common/CommonProxy.java:61-119`.
 - Thaumonomicon is intentionally server-null in `src/main/java/thaumcraft/common/CommonProxy.java:95`, matching the reference pattern that its GUI is client-only.
 - Base `CommonProxy.getClientGuiElement` returns null in `src/main/java/thaumcraft/common/CommonProxy.java:122-126`, as expected for common proxy.
-- `ClientProxy.getClientGuiElement` constructs `GuiFocusPouch`, `GuiHandMirror`, `GuiHoverHarness`, and now routes `GUI_THAUMATORIUM`, `GUI_ARCANE_WORKBENCH`, `GUI_ARCANE_BORE`, and `GUI_FOCAL_MANIPULATOR` to matching tile-backed screens; the remaining Stage 8-b/current GUI IDs still return null.
+- `ClientProxy.getClientGuiElement` constructs `GuiFocusPouch`, `GuiHandMirror`, `GuiHoverHarness`, and now routes `GUI_THAUMATORIUM`, `GUI_DECONSTRUCTION_TABLE`, `GUI_ALCHEMY_FURNACE`, `GUI_ARCANE_WORKBENCH`, `GUI_ARCANE_BORE`, and `GUI_FOCAL_MANIPULATOR` to matching tile-backed screens; the remaining Stage 8-b/current GUI IDs still return null.
 - `GuiFocusPouch`, `GuiHandMirror`, and `GuiHoverHarness` now bind original textures instead of grey placeholder rectangles.
-- `src/main/resources/assets/thaumcraft/textures/gui/gui_thaumatorium.png`, `gui_arcaneworkbench.png`, `gui_arcanebore.png`, `gui_wandtable.png`, `gui_focuspouch.png`, `guihandmirror.png`, and `guihoverharness.png` are copied byte-for-byte from `thaumcraft_src/assets/thaumcraft/textures/gui/`; the other reference GUI textures are still absent from current resources.
+- `src/main/resources/assets/thaumcraft/textures/gui/gui_thaumatorium.png`, `gui_arcaneworkbench.png`, `gui_arcanebore.png`, `gui_wandtable.png`, `gui_decontable.png`, `gui_alchemyfurnace.png`, `gui_focuspouch.png`, `guihandmirror.png`, and `guihoverharness.png` are copied byte-for-byte from `thaumcraft_src/assets/thaumcraft/textures/gui/`; the other reference GUI textures are still absent from current resources.
 - `src/main/resources/assets/thaumcraft/textures/aspects/**` now contains the original aspect icon set needed by Thaumatorium and later research/aspect GUI rendering.
 - Current English lang has only `container.focus_pouch`, `container.handmirror`, `container.hoverharness`, and `container.inventory` for implemented GUI labels in `src/main/resources/assets/thaumcraft/lang/en_us.lang:101-104`; research/golem/trunk/interaction GUI keys are absent.
 - Thaumonomicon right-click opens GUI ID `12` server-side in `src/main/java/thaumcraft/common/items/relics/ItemThaumonomicon.java:43-50`, but client ID `12` returns null in `src/main/java/thaumcraft/client/ClientProxy.java:78-84`.
@@ -473,11 +473,17 @@ Depends on current `ResearchNoteData`, aspect lists and `ContainerResearchTable`
 
 ### GAP-10: Additional current/common GUI IDs with reference screens return null
 
-**Статус:** отсутствует  
+**Статус:** частично реализовано
 **Критичность:** high
 
 **Текущая реализация:**
-- `src/main/java/thaumcraft/client/ClientProxy.java:75-84`
+- `src/main/java/thaumcraft/client/ClientProxy.java#getClientGuiElement` routes GUI ID `8` to `GuiDeconstructionTable` only when the client tile is `TileDeconstructionTable`.
+- `src/main/java/thaumcraft/client/ClientProxy.java#getClientGuiElement` routes GUI ID `9` to `GuiAlchemyFurnace` only when the client tile is `TileAlchemyFurnace`.
+- `src/main/java/thaumcraft/client/gui/GuiDeconstructionTable.java` exists as a 1.12.2 `GuiContainer` baseline using `ContainerDeconstructionTable`.
+- `src/main/java/thaumcraft/client/gui/GuiAlchemyFurnace.java` exists as a 1.12.2 `GuiContainer` baseline using `ContainerAlchemyFurnace`.
+- `src/main/java/thaumcraft/common/container/ContainerDeconstructionTable.java` now has the reference input/player slot layout, `breaktime` property sync, shift-click routing, and aspect-claim button handling.
+- `src/main/java/thaumcraft/common/container/SlotLimitedHasAspects.java` ports the original aspect-bearing item slot filter.
+- `src/main/resources/assets/thaumcraft/textures/gui/gui_decontable.png` and `gui_alchemyfurnace.png` exist and match the original assets.
 - `src/main/java/thaumcraft/common/CommonProxy.java:83-90`
 - `src/main/java/thaumcraft/common/CommonProxy.java:106-113`
 - `src/main/java/thaumcraft/common/blocks/BlockTable.java:157-159`
@@ -492,25 +498,37 @@ Depends on current `ResearchNoteData`, aspect lists and `ContainerResearchTable`
 - `thaumcraft_src/assets/thaumcraft/textures/gui/gui_decontable.png`, `gui_alchemyfurnace.png`, `gui_spa.png`; Magic Box uses vanilla/container-style chest texture behavior in reference class.
 
 **Что не совпадает:**
-The user scope says to include any current/common GUI IDs that reference client screens. Current common routing exposes these IDs and server containers, but client routing returns null. Even if not named in the core Stage 8-b list, they are active GUI IDs and will fail client opening.
+The user scope says to include any current/common GUI IDs that reference client screens. Deconstruction Table and Alchemy Furnace now have texture-backed client screens and non-null routing. Magic Box and Spa still have active server containers but client routing returns null. Deconstruction server-side item-breaking logic is still a later gameplay/content parity task; this checkpoint only restores the GUI/container surface needed by Stage 8-b.
 
 **Что нужно доделать:**
-Port or explicitly defer these current GUI screens. Because they are active IDs, silent null routing should not remain if Stage 8-b claims all current/common GUI IDs.
+Port or explicitly defer the remaining current GUI screens. Because they are active IDs, silent null routing should not remain if Stage 8-b claims all current/common GUI IDs.
 
 **Как доделать:**
-- Add `GuiDeconstructionTable`, `GuiAlchemyFurnace`, `GuiMagicBox`, `GuiSpa` under `src/main/java/thaumcraft/client/gui/`.
-- Route `GUI_DECONSTRUCTION_TABLE`, `GUI_ALCHEMY_FURNACE`, `GUI_MAGIC_BOX`, `GUI_SPA` in `ClientProxy#getClientGuiElement`.
-- Copy `gui_decontable.png`, `gui_alchemyfurnace.png`, `gui_spa.png`; confirm any fluid rendering resources used by Spa.
+- Done: add `GuiDeconstructionTable` and `GuiAlchemyFurnace` under `src/main/java/thaumcraft/client/gui/`.
+- Done: route `GUI_DECONSTRUCTION_TABLE` and `GUI_ALCHEMY_FURNACE` in `ClientProxy#getClientGuiElement`.
+- Done: copy `gui_decontable.png` and `gui_alchemyfurnace.png`.
+- Add `GuiMagicBox` and `GuiSpa` under `src/main/java/thaumcraft/client/gui/`.
+- Route `GUI_MAGIC_BOX` and `GUI_SPA` in `ClientProxy#getClientGuiElement`.
+- Copy `gui_spa.png`; confirm any fluid rendering resources used by Spa.
 - Scenarios: open Deconstruction Table, Alchemy Furnace, Magic Box tile, and Spa tile.
 
 **Критерии приемки:**
 - [ ] All current/common GUI IDs with server containers have non-null client screens or documented explicit deferral outside Stage 8-b.
 - [ ] Deconstruction Table and Alchemy Furnace open from their block activation paths.
 - [ ] Magic Box and Spa screens open when corresponding tiles are present.
-- [ ] Textures/resources for these screens are present and used.
+- [x] Deconstruction Table and Alchemy Furnace textures/resources are present and used by code.
+
+**Checkpoint 2026-05-15 — Deconstruction Table and Alchemy Furnace GUI baseline:**
+- Added `GuiDeconstructionTable` with the original `gui_decontable.png`, breaktime bar rendering, aspect icon/tooltip rendering, and aspect claim click through `sendEnchantPacket(windowId, 1)`.
+- Added `GuiAlchemyFurnace` with the original `gui_alchemyfurnace.png` and reference burn, cook-progress, vis-content, and overlay bars.
+- Routed client GUI IDs `8` and `9` to the matching tile-backed screens.
+- Restored the Deconstruction Table input/player slot layout, aspect-bearing slot filter, breaktime property sync, shift-click routing, and server aspect-claim handling in its container.
+- Validation: `./scripts/dev.sh compileJava` passed; `./scripts/dev.sh validate --smoke` passed with tests `10/10`, jar/check-jar summary `5224` MCP leak lines / `1042` unique leaks, server ready at `Done (1.208s)!`, and no crash reports under `run/`.
+- Client smoke/manual GUI open was skipped because `DISPLAY=` and user-driven GUI/graphics validation is excluded for this run.
+- Remaining: manual Deconstruction/Alchemy open checks, visual comparison, Magic Box and Spa screens, and full Deconstruction item-breaking gameplay parity.
 
 **Риски / зависимости:**
-Spa fluid rendering may touch rendering helpers beyond simple GUI blitting. Keep TESR/render-system analysis out of scope unless directly required for the GUI surface.
+Spa fluid rendering may touch rendering helpers beyond simple GUI blitting. Deconstruction item-breaking remains dependent on the tile update logic that is outside this GUI checkpoint. Keep TESR/render-system analysis out of scope unless directly required for the GUI surface.
 
 ### GAP-11: Existing Focus Pouch, Hand Mirror and Hover Harness GUIs are placeholder-like and not reference-parity
 
@@ -566,7 +584,7 @@ Inventory-slot blocking is behavior-sensitive and can cause item loss/duplicatio
 **Критичность:** blocker
 
 **Текущая реализация:**
-- `src/main/resources/assets/thaumcraft/textures/gui/` now contains `gui_thaumatorium.png`, `gui_arcaneworkbench.png`, `gui_arcanebore.png`, `gui_wandtable.png`, `gui_focuspouch.png`, `guihandmirror.png`, and `guihoverharness.png`.
+- `src/main/resources/assets/thaumcraft/textures/gui/` now contains `gui_thaumatorium.png`, `gui_arcaneworkbench.png`, `gui_arcanebore.png`, `gui_wandtable.png`, `gui_decontable.png`, `gui_alchemyfurnace.png`, `gui_focuspouch.png`, `guihandmirror.png`, and `guihoverharness.png`.
 - `src/main/resources/assets/thaumcraft/textures/misc/potions.png` is the only current `textures/misc` file found.
 - `src/main/resources/assets/thaumcraft/textures/aspects/**` now contains the original aspect icon set copied for Thaumatorium/aspect GUI rendering.
 
@@ -595,7 +613,7 @@ Inventory-slot blocking is behavior-sensitive and can cause item loss/duplicatio
 - Research support textures under `thaumcraft_src/assets/thaumcraft/textures/misc/**` and aspect icons under `thaumcraft_src/assets/thaumcraft/textures/aspects/**`.
 
 **Что не совпадает:**
-The texture resource tree now covers the newly ported Thaumatorium, Arcane Workbench, Arcane Bore, Focal Manipulator, Focus Pouch, Hand Mirror, Hover Harness, and aspect-icon paths, but most remaining Stage 8-b GUI textures and direct research misc support textures are still absent. Existing placeholder GUIs avoid binding resources, masking the remaining gap.
+The texture resource tree now covers the newly ported Thaumatorium, Arcane Workbench, Arcane Bore, Focal Manipulator, Deconstruction Table, Alchemy Furnace, Focus Pouch, Hand Mirror, Hover Harness, and aspect-icon paths, but most remaining Stage 8-b GUI textures and direct research misc support textures are still absent. Existing placeholder GUIs avoid binding resources, masking the remaining gap.
 
 **Что нужно доделать:**
 Copy original GUI and directly used support textures from `thaumcraft_src/assets/` to `src/main/resources/assets/thaumcraft/`.

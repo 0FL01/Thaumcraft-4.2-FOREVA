@@ -11,6 +11,7 @@ import net.minecraft.util.text.ITextComponent;
 import thaumcraft.api.TileThaumcraft;
 import thaumcraft.api.aspects.Aspect;
 import thaumcraft.api.aspects.AspectList;
+import thaumcraft.common.lib.crafting.ThaumcraftCraftingManager;
 
 public class TileDeconstructionTable
 extends TileThaumcraft
@@ -82,25 +83,38 @@ implements ISidedInventory, ITickable {
     public void closeInventory(EntityPlayer player) {}
 
     @Override
-    public boolean isItemValidForSlot(int index, ItemStack stack) { return true; }
+    public boolean isItemValidForSlot(int index, ItemStack stack) {
+        if (index != 0 || stack.isEmpty()) return false;
+        AspectList tags = ThaumcraftCraftingManager.getObjectTags(stack);
+        tags = ThaumcraftCraftingManager.getBonusTags(stack, tags);
+        return tags != null && tags.size() > 0;
+    }
 
     @Override
-    public int[] getSlotsForFace(EnumFacing side) { return sides; }
+    public int[] getSlotsForFace(EnumFacing side) {
+        return side == EnumFacing.UP ? new int[0] : sides;
+    }
 
     @Override
-    public boolean canInsertItem(int index, ItemStack stack, EnumFacing direction) { return true; }
+    public boolean canInsertItem(int index, ItemStack stack, EnumFacing direction) {
+        return direction != EnumFacing.UP && this.isItemValidForSlot(index, stack);
+    }
 
     @Override
     public boolean canExtractItem(int index, ItemStack stack, EnumFacing direction) { return true; }
 
     @Override
-    public int getField(int id) { return 0; }
+    public int getField(int id) { return id == 0 ? this.breaktime : 0; }
 
     @Override
-    public void setField(int id, int value) {}
+    public void setField(int id, int value) {
+        if (id == 0) {
+            this.breaktime = value;
+        }
+    }
 
     @Override
-    public int getFieldCount() { return 0; }
+    public int getFieldCount() { return 1; }
 
     @Override
     public void clear() { itemStacks[0] = ItemStack.EMPTY; }
@@ -149,5 +163,9 @@ implements ISidedInventory, ITickable {
     @Override
     public void update() {
         // Deconstruction logic will be added later
+    }
+
+    public int getBreakTimeScaled(int scale) {
+        return this.breaktime * scale / 40;
     }
 }

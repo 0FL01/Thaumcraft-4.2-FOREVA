@@ -17,6 +17,8 @@ import net.minecraftforge.event.entity.player.ItemTooltipEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import thaumcraft.client.gui.GuiArcaneBore;
 import thaumcraft.client.gui.GuiArcaneWorkbench;
+import thaumcraft.client.gui.GuiAlchemyFurnace;
+import thaumcraft.client.gui.GuiDeconstructionTable;
 import thaumcraft.client.gui.GuiFocalManipulator;
 import thaumcraft.client.gui.GuiFocusPouch;
 import thaumcraft.client.gui.GuiHandMirror;
@@ -29,8 +31,10 @@ import thaumcraft.client.lib.RenderEventHandler;
 import thaumcraft.common.CommonProxy;
 import thaumcraft.common.config.ConfigItems;
 import thaumcraft.common.lib.events.EventHandlerRunic;
+import thaumcraft.common.tiles.TileAlchemyFurnace;
 import thaumcraft.common.tiles.TileArcaneBore;
 import thaumcraft.common.tiles.TileArcaneWorkbench;
+import thaumcraft.common.tiles.TileDeconstructionTable;
 import thaumcraft.common.tiles.TileFocalManipulator;
 import thaumcraft.common.tiles.TileThaumatorium;
 
@@ -138,7 +142,19 @@ public class ClientProxy extends CommonProxy {
                         : null;
             }
             case GUI_DECONSTRUCTION_TABLE:
+            {
+                TileEntity tile = world.getTileEntity(new BlockPos(x, y, z));
+                return tile instanceof TileDeconstructionTable
+                        ? new GuiDeconstructionTable(player.inventory, (TileDeconstructionTable) tile)
+                        : null;
+            }
             case GUI_ALCHEMY_FURNACE:
+            {
+                TileEntity tile = world.getTileEntity(new BlockPos(x, y, z));
+                return tile instanceof TileAlchemyFurnace
+                        ? new GuiAlchemyFurnace(player.inventory, (TileAlchemyFurnace) tile)
+                        : null;
+            }
             case GUI_RESEARCH_TABLE:
             case GUI_THAUMONOMICON:
                 return null;

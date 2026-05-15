@@ -48,6 +48,7 @@ Branch: `codex/durable-goal-stage8-9`
 - Thaumatorium client smoke/manual open/visual parity was skipped on 2026-05-15 because `DISPLAY=` and user-driven GUI/graphics validation is excluded by instruction.
 - Focal Manipulator client smoke/manual open/visual parity was skipped on 2026-05-15 because `DISPLAY=` and user-driven GUI/graphics validation is excluded by instruction.
 - Focus Pouch, Hand Mirror, and Hover Harness client smoke/manual open/item movement parity was skipped on 2026-05-15 because `DISPLAY=` and user-driven GUI/graphics validation is excluded by instruction.
+- Deconstruction Table and Alchemy Furnace client smoke/manual open/visual parity was skipped on 2026-05-15 because `DISPLAY=` and user-driven GUI/graphics validation is excluded by instruction.
 - Future GUI/client visual checks that require user-driven Minecraft control, screenshots, or unavailable X11/graphics stack will be recorded as: `SKIPPED by user instruction: GUI/graphics/user-interactive validation excluded`.
 
 ## Baseline Validation
@@ -59,6 +60,34 @@ Branch: `codex/durable-goal-stage8-9`
 - `./scripts/dev.sh validate --smoke` — passed on 2026-05-15, including compact server smoke validation.
 
 ## Checkpoint Log
+
+### 2026-05-15 — Stage 8-b Deconstruction and Alchemy Furnace GUI baseline
+
+Scope:
+
+- Added `GuiDeconstructionTable` backed by `ContainerDeconstructionTable`.
+- Ported the original Deconstruction GUI baseline: `gui_decontable.png`, breaktime progress bar, aspect icon/tooltip, and aspect claim clicks sent through the existing container button path.
+- Added `GuiAlchemyFurnace` backed by `ContainerAlchemyFurnace`.
+- Ported the original Alchemy Furnace GUI baseline: `gui_alchemyfurnace.png`, burn, cook-progress, vis-content, and overlay bars.
+- Routed client GUI IDs `8` and `9` through `ClientProxy#getClientGuiElement` with matching tile type checks.
+- Restored the Deconstruction Table input/player slot layout, aspect-bearing input filter, `breaktime` property sync, shift-click behavior, and server aspect-claim handling.
+- Copied original `gui_decontable.png` and `gui_alchemyfurnace.png`.
+- Updated `docs/Stage8-b.md` with the implemented baseline and remaining client/manual/gameplay limits.
+
+Validation:
+
+- `./scripts/dev.sh compileJava` — passed.
+- `./scripts/dev.sh validate --smoke` — passed: status, compile, tests `10/10`, jar, check-jar summary `5224` MCP leak lines / `1042` unique leaks, and server smoke.
+- `run/smoke-server.log` evidence: `Registering entities`; `Forge Mod Loader has successfully loaded 6 mods`; `Done (1.208s)!`.
+- Crash report scan under `run/` returned no files.
+- `./scripts/dev.sh smoke-client` — skipped because `DISPLAY=` and GUI/graphics/user-interactive validation is excluded.
+
+Remaining limits:
+
+- Deconstruction Table and Alchemy Furnace block-open scenarios were not manually observed.
+- Exact visual layout and hover/click behavior still need client inspection.
+- Full Deconstruction item-breaking behavior remains outside this GUI checkpoint.
+- Magic Box and Spa GUI IDs are still open under Stage 8-b.
 
 ### 2026-05-15 — Stage 8-b item GUI texture baseline
 
