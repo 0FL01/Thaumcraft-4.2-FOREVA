@@ -1,6 +1,6 @@
 # Durable Goal Progress
 
-Last updated: 2026-05-14
+Last updated: 2026-05-15
 Branch: `codex/durable-goal-stage8-9`
 
 ## Contract Checklist
@@ -882,10 +882,35 @@ Remaining limits:
 - Runtime trunk upgrade, feeding, pickup, and inventory-drop evidence remains unavailable while smoke-server is blocked before ready state and user-driven manual scenarios are excluded.
 - Client lid/heart/smoke animation parity remains Phase 8 work.
 
+### 2026-05-15 — Stage 6 golem fluid NBT and ranged sound
+
+Scope:
+
+- Restored reference core `5` fluid-carried NBT persistence on the root golem entity tag.
+- Restored reference `toggles` byte persistence.
+- Restored carried item data-manager sync after NBT reload.
+- Replaced the ranged golem attack sound TODO with `TCSounds.GOLEMIRONSHOOT` and the reference pitch formula.
+
+Validation:
+
+- `./scripts/dev.sh compileJava` — passed.
+- `./scripts/dev.sh build` — passed.
+- `./scripts/dev.sh check-jar` — failed before jar inspection because the wrapper's expected MCP mapping cache file is still absent at `.gradle_home/caches/minecraft/de/oceanlabs/mcp/mcp_stable/39/1.12.2/srgs/mcp-srg.srg`.
+- `./scripts/dev.sh smoke-server` — failed by timeout before ready state; log again stopped after `Calling tweak class net.minecraftforge.fml.common.launcher.FMLServerTweaker`, with only Log4j console appender initialization errors. `run/crash-reports/` does not exist, and the configured crash-marker scan found no matches. This matches the clean `da3f307` baseline reproduction recorded above.
+- `git diff --check` — passed.
+
+Remaining limits:
+
+- Runtime save/load evidence for fluid, toggle, and carried item display sync remains unavailable while smoke-server is blocked before ready state and user-driven manual scenarios are excluded.
+- The inactive pedestal/cosmetic-block state, death logging/bootup client sound parity, and carried fluid/essentia display sync remain open.
+- Full per-core golem AI runtime scenarios remain open.
+
 ## Next Checkpoint Candidate
 
-After the portal trigger and ring bootstrap checkpoints, the next pre-Phase8 candidates are:
+After the golem fluid NBT and trunk baseline checkpoints, the next pre-Phase8 candidates are:
 
+- Remaining Stage 6 golem inactive-state/static parity and selected low-risk golem AI helper fixes.
+- Remaining Stage 6 traveling trunk upgrade `2` owner-target defense/combat and cross-dimension owner-follow transfer.
 - Remaining Stage 7 surface/worldgen runtime evidence and broader biome blacklist edge cases.
 - Remaining Stage 7 Outer Lands room/tile behavior, especially key/boss room traversal, boss-room runtime/save evidence, and maze save/load race validation.
 - Stage 9 loot/content registration, because `Utils.generateLoot(...)` now has a shared reward path but the full reference loot pool distribution still depends on populated content tables.

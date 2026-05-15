@@ -271,9 +271,13 @@ public class EntityGolemBase extends net.minecraft.entity.monster.EntityGolem im
         nbt.setByte("GolemType", (byte) this.golemType.ordinal());
         nbt.setByte("Core", this.getCore());
         nbt.setString("Decoration", this.decoration);
+        nbt.setByte("toggles", this.getTogglesValue());
         nbt.setBoolean("advanced", this.advanced);
         nbt.setByteArray("colors", this.colors);
         nbt.setByteArray("upgrades", this.upgrades);
+        if (this.getCore() == 5 && this.fluidCarried != null) {
+            this.fluidCarried.writeToNBT(nbt);
+        }
         if (this.getCore() == 6 && this.essentia != null && this.essentiaAmount > 0) {
             nbt.setString("essentia", this.essentia.getTag());
             nbt.setByte("essentiaAmount", (byte) this.essentiaAmount);
@@ -302,6 +306,9 @@ public class EntityGolemBase extends net.minecraft.entity.monster.EntityGolem im
         this.advanced = nbt.getBoolean("advanced");
         this.golemType = EnumGolemType.getType(nbt.getByte("GolemType"));
         this.setCore(nbt.getByte("Core"));
+        if (this.getCore() == 5) {
+            this.fluidCarried = net.minecraftforge.fluids.FluidStack.loadFluidStackFromNBT(nbt);
+        }
         if (this.getCore() == 6) {
             String s = nbt.getString("essentia");
             if (s != null && !s.isEmpty()) {
@@ -309,8 +316,10 @@ public class EntityGolemBase extends net.minecraft.entity.monster.EntityGolem im
                 if (this.essentia != null) this.essentiaAmount = nbt.getByte("essentiaAmount");
             }
         }
+        this.setTogglesValue(nbt.getByte("toggles"));
         net.minecraft.nbt.NBTTagCompound itemNBT = nbt.getCompoundTag("ItemCarried");
         this.itemCarried = new net.minecraft.item.ItemStack(itemNBT);
+        this.updateCarried();
         this.decoration = nbt.getString("Decoration");
         this.setGolemDecoration(this.decoration);
         String owner = nbt.getString("Owner");
@@ -674,7 +683,7 @@ public class EntityGolemBase extends net.minecraft.entity.monster.EntityGolem im
         dart.shoot(dx, dy, dz, speed, inaccuracy);
         double dmg = this.getEntityAttribute(net.minecraft.entity.SharedMonsterAttributes.ATTACK_DAMAGE).getAttributeValue();
         dart.setDamage(dmg * 0.4D);
-        // Sound: golemironshoot (requires ConfigSounds port)
+        this.playSound(TCSounds.GOLEMIRONSHOOT, 0.5F, 1.0F / (this.rand.nextFloat() * 0.4F + 0.6F));
         this.world.spawnEntity(dart);
         this.startLeftArmTimer();
     }
