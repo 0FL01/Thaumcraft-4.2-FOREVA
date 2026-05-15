@@ -436,6 +436,16 @@ public class ConfigRecipes {
                 'A', new ItemStack(ConfigItems.itemShard, 1, 1),
                 'B', new ItemStack(ConfigItems.itemShard, 1, 4));
 
+        registerArcaneRecipe("Levitator", "LEVITATOR",
+                new ItemStack(ConfigBlocks.blockLifter),
+                new AspectList().add(Aspect.AIR, 10).add(Aspect.EARTH, 5),
+                "WEW", "BNB", "WAW",
+                'W', new ItemStack(ConfigBlocks.blockWoodenDevice, 1, 6),
+                'E', new ItemStack(ConfigItems.itemShard, 1, 3),
+                'A', new ItemStack(ConfigItems.itemShard, 1, 0),
+                'N', new ItemStack(ConfigItems.itemResource, 1, 1),
+                'B', new ItemStack(Items.IRON_INGOT));
+
         registerArcaneRecipe("ArcaneEar", "ARCANEEAR",
                 new ItemStack(ConfigBlocks.blockWoodenDevice, 1, 1),
                 new AspectList().add(Aspect.AIR, 10).add(Aspect.ORDER, 10),

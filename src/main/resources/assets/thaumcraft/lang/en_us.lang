@@ -159,6 +159,7 @@ entity.trunk.guiname='s Trunk
 entity.trunk.move=The trunk will now follow you
 entity.trunk.stay=The trunk will stay where it is
 tile.thaumcraft.hungry_chest.name=Hungry Chest
+tile.thaumcraft.lifter.name=Levitator
 container.focus_pouch=Focus Pouch
 container.handmirror=Hand Mirror
 container.hoverharness=Hover Harness

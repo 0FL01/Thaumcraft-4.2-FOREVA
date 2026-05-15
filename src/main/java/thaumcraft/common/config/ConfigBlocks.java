@@ -52,6 +52,7 @@ public class ConfigBlocks {
     public static BlockLoot blockLootUrn;
     public static BlockLoot blockLootCrate;
     public static BlockChestHungry blockChestHungry;
+    public static BlockLifter blockLifter;
     public static BlockHole blockHole;
     public static BlockWarded blockWarded;
 
@@ -199,6 +200,10 @@ public class ConfigBlocks {
                 .setRegistryName("thaumcraft", legacyPath("blockChestHungry"))
                 .setTranslationKey("thaumcraft.hungry_chest");
 
+        blockLifter = (BlockLifter) new BlockLifter()
+                .setRegistryName("thaumcraft", legacyPath("blockLifter"))
+                .setTranslationKey("thaumcraft.lifter");
+
         blockHole = (BlockHole) new BlockHole()
                 .setRegistryName("thaumcraft", legacyPath("blockHole"))
                 .setTranslationKey("thaumcraft.hole");
@@ -276,6 +281,7 @@ public class ConfigBlocks {
                 blockLootUrn,
                 blockLootCrate,
                 blockChestHungry,
+                blockLifter,
                 blockHole,
                 blockWarded
         };
@@ -333,6 +339,8 @@ public class ConfigBlocks {
                 .setRegistryName(blockLootCrate.getRegistryName()));
         registry.register(new net.minecraft.item.ItemBlock(blockChestHungry)
                 .setRegistryName(blockChestHungry.getRegistryName()));
+        registry.register(new net.minecraft.item.ItemBlock(blockLifter)
+                .setRegistryName(blockLifter.getRegistryName()));
     }
 
     public static void registerTileEntities() {

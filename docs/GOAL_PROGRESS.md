@@ -67,6 +67,30 @@ Branch: `codex/durable-goal-stage8-9`
 
 ## Checkpoint Log
 
+### 2026-05-15 — Stage 9-b Levitator unblock baseline
+
+Scope:
+
+- Replaced `TileLifter` stub with reference-aligned lift behavior:
+  - vertical stack/range recomputation, redstone power gating, entity lift motion/fall-distance handling, and periodic update cadence.
+- Added missing `BlockLifter` implementation and wired neighbor/stack update hooks plus client sparkle hook.
+- Registered `blockLifter` in `ConfigBlocks` (`init`, `getAllBlocks`, `registerItemBlocks`) and added block resources/models/lang.
+- Added the missing arcane recipe registration key `Levitator` (`LEVITATOR`) in `initializeArcaneRecipeBaseline()`, preserving reference aspects/pattern/components.
+- Copied source textures for lifter assets from `thaumcraft_src` (`lifterside`, `liftertop`, `arcaneearbottom`, `animatedglow` + `.mcmeta`).
+- Focused arcane key audit now reports only one missing arcane API key (`ArcaneDoor`); non-arcane reference keys `ArcaneStone2/3/4` remain outside arcane API path.
+
+Validation:
+
+- `./scripts/dev.sh validate --smoke` — passed: status, compile, tests `10/10`, jar, check-jar summary `5642` MCP leak lines / `1111` unique leaks, and server smoke.
+- `run/smoke-server.log` evidence: `Registering entities`; `Forge Mod Loader has successfully loaded 6 mods`; `Done (1.158s)!`.
+- Crash report scan under `run/` returned no files.
+- `./scripts/dev.sh smoke-client` — skipped because `DISPLAY=` and GUI/graphics/user-interactive validation is excluded.
+
+Remaining limits:
+
+- Stage 9-b unresolved arcane blockers now are `ArcaneDoor` and non-arcane-path `ArcaneStone2/3/4`.
+- Stage 9-b still requires runtime/manual Arcane Workbench scenario validation and broader Stage 9-d/e research/content closure.
+
 ### 2026-05-15 — Stage 9-b/9-c Hungry Chest + TravelTrunk unblock baseline
 
 Scope:
