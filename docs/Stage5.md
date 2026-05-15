@@ -1009,3 +1009,20 @@ Validation evidence for this checkpoint:
 - `./scripts/dev.sh smoke-client` — skipped because `DISPLAY` is unset in the current environment.
 
 GAP-5 is advanced but not closed. Remaining Hover work includes anti-float counter reset parity if safely portable, client/manual H-key and sound validation, client/manual tooltip display validation, and manual in-world fuel/toggle/fall validation.
+
+### 8.17 2026-05-15 Hover Harness anti-float checkpoint
+
+Implemented in the current checkpoint:
+
+- Restored the reference-style `Utils.resetFloatCounter(EntityPlayerMP)` helper using Forge reflection against `NetHandlerPlayServer.floatingTickCount` / `field_147365_f`, with failures swallowed as in the original.
+- Called the helper from `Hover.handleHoverArmor` only on the logical server and only for `EntityPlayerMP` while hover is active, before resetting fall distance.
+
+Validation evidence for this checkpoint:
+
+- `./scripts/dev.sh compileJava` — passed.
+- `./scripts/dev.sh build` — passed.
+- `./scripts/dev.sh check-jar` — failed before jar inspection because the wrapper's expected MCP mapping cache file is still absent at `.gradle_home/caches/minecraft/de/oceanlabs/mcp/mcp_stable/39/1.12.2/srgs/mcp-srg.srg`.
+- `./scripts/dev.sh smoke-server` — failed by timeout before ready state; log again stopped after `Calling tweak class net.minecraftforge.fml.common.launcher.FMLServerTweaker`, with only Log4j console appender initialization errors. `run/crash-reports/` does not exist, and the configured crash-marker scan found no matches.
+- `./scripts/dev.sh smoke-client` — skipped because `DISPLAY` is unset in the current environment.
+
+GAP-5 is advanced but not closed. Remaining Hover work includes client/manual H-key and sound validation, client/manual tooltip display validation, and manual in-world fuel/toggle/fall/float validation.

@@ -1,15 +1,18 @@
 package thaumcraft.common.lib.utils;
 
 import net.minecraft.enchantment.EnchantmentHelper;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.network.NetHandlerPlayServer;
 import net.minecraft.util.WeightedRandom;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.storage.ExtendedBlockStorage;
+import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
 import thaumcraft.api.WorldCoordinates;
 import thaumcraft.api.internal.WeightedRandomLoot;
@@ -52,6 +55,13 @@ public class Utils {
     }
 
     public static void setPrivateFinalValue(Class<?> cls, Object instance, Object value, String... fieldNames) {
+    }
+
+    public static void resetFloatCounter(EntityPlayerMP player) {
+        try {
+            ObfuscationReflectionHelper.setPrivateValue(NetHandlerPlayServer.class, player.connection, 0,
+                    "floatingTickCount", "field_147365_f");
+        } catch (Exception ignored) {}
     }
 
     public static ItemStack generateLoot(int rarity, Random random) {

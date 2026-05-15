@@ -17,6 +17,7 @@ import thaumcraft.common.items.baubles.ItemGirdleHover;
 import thaumcraft.common.lib.TCSounds;
 import thaumcraft.common.lib.network.PacketHandler;
 import thaumcraft.common.lib.network.misc.PacketFlyToServer;
+import thaumcraft.common.lib.utils.Utils;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -94,6 +95,9 @@ public class Hover {
             player.capabilities.isFlying = false;
         }
         if (hover) {
+            if (!player.world.isRemote && player instanceof EntityPlayerMP) {
+                Utils.resetFloatCounter((EntityPlayerMP) player);
+            }
             player.fallDistance = 0.0F;
             applyClientHoverMotion(player, harness);
         } else if (player.fallDistance > 0.0F) {
