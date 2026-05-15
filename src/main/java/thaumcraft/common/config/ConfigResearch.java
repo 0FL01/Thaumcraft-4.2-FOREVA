@@ -539,6 +539,62 @@ public class ConfigResearch {
                 .registerResearchItem();
 
         new ResearchItem(
+                "GOGGLES",
+                "ARTIFICE",
+                new AspectList()
+                        .add(Aspect.SENSES, 3)
+                        .add(Aspect.AURA, 3)
+                        .add(Aspect.MAGIC, 3),
+                4,
+                1,
+                1,
+                new ItemStack(ConfigItems.itemGoggles))
+                .setPages(
+                        new ResearchPage("tc.research_page.GOGGLES.1"),
+                        new ResearchPage((IArcaneRecipe) recipes.get("Goggles")))
+                .setParents("THAUMOMETER")
+                .setConcealed()
+                .registerResearchItem();
+
+        new ResearchItem(
+                "ARCANEEAR",
+                "ARTIFICE",
+                new AspectList()
+                        .add(Aspect.SENSES, 3)
+                        .add(Aspect.ENERGY, 3)
+                        .add(Aspect.AIR, 3),
+                6,
+                0,
+                1,
+                new ItemStack(ConfigBlocks.blockWoodenDevice, 1, 1))
+                .setPages(
+                        new ResearchPage("tc.research_page.ARCANEEAR.1"),
+                        new ResearchPage((IArcaneRecipe) recipes.get("ArcaneEar")))
+                .setParents("GOGGLES")
+                .setConcealed()
+                .registerResearchItem();
+
+        new ResearchItem(
+                "SINSTONE",
+                "ARTIFICE",
+                new AspectList()
+                        .add(Aspect.SENSES, 3)
+                        .add(Aspect.DARKNESS, 3)
+                        .add(Aspect.ELDRITCH, 3)
+                        .add(Aspect.AURA, 3),
+                6,
+                2,
+                1,
+                new ItemStack(ConfigItems.itemCompassStone, 1, 1))
+                .setPages(
+                        new ResearchPage("tc.research_page.SINSTONE.1"),
+                        new ResearchPage((InfusionRecipe) recipes.get("SinStone")))
+                .setParents("GOGGLES")
+                .setConcealed()
+                .registerResearchItem();
+        ThaumcraftApi.addWarpToResearch("SINSTONE", 2);
+
+        new ResearchItem(
                 "INFUSION",
                 "ARTIFICE",
                 new AspectList()
