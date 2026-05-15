@@ -153,12 +153,14 @@ Depends on GAP-1/GAP-2 recipe data. The method signatures are internal current s
 
 ### GAP-4: Arcane Workbench container/output/vis consumption flow не реализован
 
-**Статус:** частично реализовано  
+**Статус:** частично закрыт (server container baseline implemented)
 **Критичность:** blocker
 
 **Текущая реализация:**
-- `src/main/java/thaumcraft/common/container/ContainerArcaneWorkbench.java:10-43`
-- `src/main/java/thaumcraft/common/tiles/TileMagicWorkbench.java:19-20`
+- `src/main/java/thaumcraft/common/container/ContainerArcaneWorkbench.java`
+- `src/main/java/thaumcraft/common/container/SlotCraftingArcaneWorkbench.java`
+- `src/main/java/thaumcraft/common/container/SlotLimitedByWand.java`
+- `src/main/java/thaumcraft/common/tiles/TileMagicWorkbench.java`
 - `src/main/java/thaumcraft/common/tiles/TileArcaneWorkbench.java:6-18`
 - `src/main/java/thaumcraft/common/items/wands/ItemWandCasting.java:240-247`
 
@@ -167,25 +169,30 @@ Depends on GAP-1/GAP-2 recipe data. The method signatures are internal current s
 - `thaumcraft_src/thaumcraft/common/container/SlotCraftingArcaneWorkbench.class`
 
 **Что не совпадает:**
-Reference container creates output slot 9, wand slot 10, 3x3 crafting input slots, player inventory/hotbar slots, updates output from vanilla crafting first, then arcane recipes if a wand can pay `findMatchingArcaneRecipeAspects(..., false)`. Reference `SlotCraftingArcaneWorkbench` consumes vis on craft, consumes input items, handles container items and fires crafting events. Current container has no slots and only validates interaction distance.
+Port now includes a server-side Arcane Workbench baseline aligned with reference flow:
+- container slot layout with output slot (`tile 9`), wand slot (`tile 10`), 3x3 grid (`tile 0..8`), and player inventory/hotbar;
+- `onCraftMatrixChanged` path that computes vanilla result first, then arcane result when a non-staff wand in slot 10 can pay `findMatchingArcaneRecipeAspects(..., false)`;
+- craft-result slot behavior that fires crafting event, consumes vis via `consumeAllVisCrafting(..., true)`, consumes ingredients and handles container items;
+- transfer/slot-click drag behavior ported to 1.12 container semantics;
+- `TileMagicWorkbench` null/EMPTY inventory hardening to avoid null-slot regressions in the new container path.
 
 **Что нужно доделать:**
-Implement the Arcane Workbench server container and craft-result slot for Forge 1.12.2.
+Keep this container baseline and validate representative runtime crafting scenarios once recipe data is populated.
 
 **Как доделать:**
-- Add or port `src/main/java/thaumcraft/common/container/SlotCraftingArcaneWorkbench.java`.
-- Add or port a wand-only slot equivalent to reference `SlotLimitedByWand` if not already present; current scan found no `SlotLimitedByWand` source.
-- Update `ContainerArcaneWorkbench` to add slots with reference-compatible indices: result slot `9`, wand slot `10`, grid slots `0..8`, player inventory and hotbar.
-- Implement `onCraftMatrixChanged` to compute vanilla crafting result first and arcane output second when a non-staff wand in slot 10 can pay the aspect cost.
-- Implement `transferStackInSlot` and click handling equivalent to reference behavior, adapted to Forge 1.12.2 names and `ItemStack.EMPTY`.
+- Keep `ContainerArcaneWorkbench`, `SlotCraftingArcaneWorkbench`, and `SlotLimitedByWand` wired as the server baseline.
+- Preserve reference slot index assumptions used by transfer logic (`0` output, `1` wand, `2..10` grid, `11..46` player inventory/hotbar).
+- Validate vis consumption and ingredient/container-item handling with populated Stage 9-b recipe data.
 
 **Критерии приемки:**
-- [ ] Opening the Arcane Workbench server container exposes 47 slots with the reference role layout.
-- [ ] Crafting a static arcane recipe consumes ingredients and the required vis from the wand.
-- [ ] Shift-click behavior moves crafted output to player inventory and routes wands into slot 10 without duplicating items.
+- [x] Arcane Workbench server container now exposes 47 slots with reference role layout.
+- [x] Server container update path now resolves vanilla and arcane outputs through the restored matcher methods and wand vis-check probe.
+- [x] Shift-click routing includes output-to-player flow and wand routing into slot 10.
+- [ ] Runtime scenario validates ingredient consumption + vis drain for representative static arcane recipes.
+- [ ] Runtime scenario validates dynamic recipe crafting path and container-item remainder handling.
 
 **Риски / зависимости:**
-Directly depends on GAP-3 and on client GUI availability for manual testing. Forge 1.12.2 `SlotCrafting` event names and container item handling differ from 1.7.10 and need careful porting.
+Still depends on GAP-1/GAP-2 recipe population for full end-to-end proof. Client GUI/manual checks remain out of scope for this non-GUI checkpoint.
 
 ### GAP-5: `ItemStack.EMPTY` compatibility breaks shaped/shapeless arcane matching
 

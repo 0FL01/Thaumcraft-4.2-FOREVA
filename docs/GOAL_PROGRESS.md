@@ -67,6 +67,35 @@ Branch: `codex/durable-goal-stage8-9`
 
 ## Checkpoint Log
 
+### 2026-05-15 — Stage 9-b Arcane Workbench server container baseline
+
+Scope:
+
+- Implemented Arcane Workbench server container flow in `ContainerArcaneWorkbench` with reference-compatible slot layout:
+  - output slot (`tile 9`),
+  - wand slot (`tile 10`),
+  - 3x3 crafting grid (`tile 0..8`),
+  - player inventory/hotbar slots.
+- Added `SlotLimitedByWand` to constrain wand slot inputs to non-staff `ItemWandCasting`.
+- Added `SlotCraftingArcaneWorkbench` to fire crafting events, consume vis costs via wand crafting path, consume grid ingredients, and apply container-item remainders.
+- Wired `onCraftMatrixChanged` to mirror reference order: vanilla crafting result first, then arcane result when wand vis cost probe succeeds.
+- Added `TileMagicWorkbench` null/`ItemStack.EMPTY` hardening for stack initialization, NBT read/write, and slot mutation paths to prevent null-slot regressions in the container flow.
+- Updated `docs/Stage9-b.md` GAP-4 status/evidence to reflect server baseline closure and remaining runtime scenario dependencies.
+
+Validation:
+
+- Initial `./scripts/dev.sh validate --smoke` run failed at `compileJava` due incorrect `SlotLimitedByWand#onTake` override return type (`void` vs `ItemStack`) on Forge 1.12.
+- Fixed slot class signature by removing the invalid override and reran validation.
+- Final `./scripts/dev.sh validate --smoke` — passed: status, compile, tests `10/10`, jar, check-jar summary `5468` MCP leak lines / `1069` unique leaks, and server smoke.
+- `run/smoke-server.log` evidence: `Registering entities`; `Forge Mod Loader has successfully loaded 6 mods`; `Done (1.187s)!`.
+- Crash report scan under `run/` returned no files.
+- `./scripts/dev.sh smoke-client` — skipped because `DISPLAY=` and GUI/graphics/user-interactive validation is excluded.
+
+Remaining limits:
+
+- This checkpoint implements server container logic only; end-to-end arcane crafting proof still depends on Stage 9-b recipe population and research gate registration (GAP-1/2/6/7).
+- Client/manual Arcane Workbench GUI interaction remains excluded from validation scope.
+
 ### 2026-05-15 — Stage 9-b arcane matcher method surface baseline
 
 Scope:
