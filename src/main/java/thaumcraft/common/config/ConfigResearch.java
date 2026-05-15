@@ -1,8 +1,10 @@
 package thaumcraft.common.config;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.util.ResourceLocation;
@@ -792,6 +794,54 @@ public class ConfigResearch {
                     .setParents("THAUMIUM")
                     .registerResearchItem();
         }
+
+        new ResearchItem(
+                "BONEBOW",
+                "ARTIFICE",
+                new AspectList()
+                        .add(Aspect.WEAPON, 3)
+                        .add(Aspect.AIR, 3)
+                        .add(Aspect.MOTION, 3),
+                -7,
+                1,
+                1,
+                new ItemStack(ConfigItems.itemBowBone))
+                .setPages(
+                        new ResearchPage("tc.research_page.BONEBOW.1"),
+                        new ResearchPage((IArcaneRecipe) recipes.get("BoneBow")))
+                .setHidden()
+                .setItemTriggers(
+                        new ItemStack(Items.BOW, 1, Short.MAX_VALUE),
+                        new ItemStack(Items.BONE))
+                .registerResearchItem();
+
+        ArrayList<IArcaneRecipe> primalArrowRecipes = new ArrayList<>();
+        for (int a = 0; a < 6; ++a) {
+            primalArrowRecipes.add((IArcaneRecipe) recipes.get("PrimalArrow_" + a));
+        }
+        new ResearchItem(
+                "PRIMALARROW",
+                "ARTIFICE",
+                new AspectList()
+                        .add(Aspect.WEAPON, 3)
+                        .add(Aspect.AIR, 3)
+                        .add(Aspect.FIRE, 3)
+                        .add(Aspect.WATER, 3)
+                        .add(Aspect.EARTH, 3)
+                        .add(Aspect.ORDER, 3)
+                        .add(Aspect.ENTROPY, 3),
+                -9,
+                0,
+                2,
+                new ItemStack(ConfigItems.itemPrimalArrow, 1, Short.MAX_VALUE))
+                .setPages(
+                        new ResearchPage("tc.research_page.PRIMALARROW.1"),
+                        new ResearchPage(primalArrowRecipes.toArray(new IArcaneRecipe[0])),
+                        new ResearchPage("tc.research_page.PRIMALARROW.2"),
+                        new ResearchPage("tc.research_page.PRIMALARROW.3"))
+                .setConcealed()
+                .setParents("BONEBOW")
+                .registerResearchItem();
 
         new ResearchItem(
                 "INFUSION",
