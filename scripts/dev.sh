@@ -13,6 +13,7 @@ Usage:
   ./scripts/dev.sh <gradle-task> [gradle-args...]
   ./scripts/dev.sh gradle <gradle-task> [gradle-args...]
   ./scripts/dev.sh check-jar [jar-path]
+  ./scripts/dev.sh validate [--smoke]
   ./scripts/dev.sh smoke-server
   ./scripts/dev.sh smoke-client
 
@@ -22,6 +23,7 @@ Examples:
   ./scripts/dev.sh compileJava
   ./scripts/dev.sh build
   ./scripts/dev.sh check-jar
+  ./scripts/dev.sh validate --smoke
   ./scripts/dev.sh apiJar devJar
   ./scripts/dev.sh smoke-server
 
@@ -122,6 +124,135 @@ new_crash_reports() {
     find "$crash_dir" -type f -newer "$since_file" -print
   fi
   return 0
+}
+
+mcp_leak_summary() {
+  local jar_path="${1:-$ROOT/build/libs/Thaumcraft-1.0.0-universal.jar}"
+  local mappings="$ROOT/.gradle_home/caches/minecraft/de/oceanlabs/mcp/mcp_stable/39/1.12.2/srgs/mcp-srg.srg"
+
+  if [[ ! -f "$jar_path" ]]; then
+    printf 'MCP leak summary FAILED: jar not found: %s\n' "$jar_path" >&2
+    return 1
+  fi
+  if [[ ! -f "$mappings" ]]; then
+    printf 'MCP leak summary FAILED: MCP mapping file not found: %s\n' "$mappings" >&2
+    return 1
+  fi
+
+  python3 - "$jar_path" "$mappings" <<'PY'
+import hashlib
+import struct
+import sys
+import zipfile
+
+jar_path, mappings_path = sys.argv[1:3]
+
+mapped_fields = {}
+mapped_methods = {}
+with open(mappings_path, 'r', encoding='utf-8') as fh:
+    for raw in fh:
+        parts = raw.strip().split()
+        if not parts:
+            continue
+        if parts[0] == 'FD:' and len(parts) >= 3:
+            src, dst = parts[1], parts[2]
+            src_owner, src_name = src.rsplit('/', 1)
+            _, dst_name = dst.rsplit('/', 1)
+            if src_owner.startswith('net/minecraft/') and src_name != dst_name:
+                mapped_fields[(src_owner, src_name)] = dst_name
+        elif parts[0] == 'MD:' and len(parts) >= 5:
+            src, src_desc, dst = parts[1], parts[2], parts[3]
+            src_owner, src_name = src.rsplit('/', 1)
+            _, dst_name = dst.rsplit('/', 1)
+            if src_owner.startswith('net/minecraft/') and src_name != dst_name:
+                mapped_methods[(src_owner, src_name, src_desc)] = dst_name
+
+def parse_class(data):
+    if data[:4] != b'\xca\xfe\xba\xbe':
+        return []
+    pos = 8
+    cp_count = struct.unpack_from('>H', data, pos)[0]
+    pos += 2
+    cp = [None] * cp_count
+    i = 1
+    while i < cp_count:
+        tag = data[pos]
+        pos += 1
+        if tag == 1:
+            length = struct.unpack_from('>H', data, pos)[0]
+            pos += 2
+            cp[i] = ('Utf8', data[pos:pos + length].decode('utf-8', 'replace'))
+            pos += length
+        elif tag in (3, 4):
+            pos += 4
+        elif tag in (5, 6):
+            pos += 8
+            i += 1
+        elif tag in (7, 8, 16):
+            cp[i] = ('Index', struct.unpack_from('>H', data, pos)[0])
+            pos += 2
+        elif tag in (9, 10, 11):
+            cp[i] = ('Ref', tag, struct.unpack_from('>H', data, pos)[0], struct.unpack_from('>H', data, pos + 2)[0])
+            pos += 4
+        elif tag == 12:
+            cp[i] = ('NameAndType', struct.unpack_from('>H', data, pos)[0], struct.unpack_from('>H', data, pos + 2)[0])
+            pos += 4
+        elif tag == 15:
+            pos += 3
+        elif tag == 18:
+            pos += 4
+        else:
+            raise ValueError('Unsupported constant-pool tag {}'.format(tag))
+        i += 1
+
+    def utf(index):
+        entry = cp[index]
+        return entry[1] if entry and entry[0] == 'Utf8' else None
+
+    def class_name(index):
+        entry = cp[index]
+        return utf(entry[1]) if entry and entry[0] == 'Index' else None
+
+    def name_and_type(index):
+        entry = cp[index]
+        if entry and entry[0] == 'NameAndType':
+            return utf(entry[1]), utf(entry[2])
+        return None, None
+
+    leaks = []
+    for entry in cp:
+        if not entry or entry[0] != 'Ref':
+            continue
+        _, tag, class_index, nat_index = entry
+        owner = class_name(class_index)
+        name, desc = name_and_type(nat_index)
+        if not owner or not name or not owner.startswith('net/minecraft/'):
+            continue
+        if tag == 9 and (owner, name) in mapped_fields:
+            leaks.append(('F', owner, name, ''))
+        elif tag in (10, 11) and (owner, name, desc) in mapped_methods:
+            leaks.append(('M', owner, name, desc))
+    return leaks
+
+findings = set()
+unique_leaks = set()
+with zipfile.ZipFile(jar_path) as jar:
+    for name in jar.namelist():
+        if not name.endswith('.class') or name.startswith('net/minecraft/'):
+            continue
+        try:
+            for leak in parse_class(jar.read(name)):
+                findings.add((name,) + leak)
+                unique_leaks.add(leak)
+        except Exception as exc:
+            print('MCP leak summary FAILED: could not inspect {}: {}'.format(name, exc), file=sys.stderr)
+            sys.exit(1)
+
+hash_data = sorted('{}:{}:{}:{}'.format(*leak) for leak in unique_leaks)
+hash_value = hashlib.sha256('\n'.join(hash_data).encode('utf-8')).hexdigest()
+print('Count: {} (unique leaks: {})'.format(len(findings), len(unique_leaks)))
+print('Hash: {}'.format(hash_value))
+PY
 }
 
 check_jar() {
@@ -459,6 +590,254 @@ smoke_client() {
   return 1
 }
 
+VALIDATE_TOTAL=0
+VALIDATE_PASSED=0
+VALIDATE_SKIPPED=0
+VALIDATE_LAST_LOG=""
+VALIDATE_VERBOSE=0
+
+relative_path() {
+  local path="$1"
+  printf '%s' "${path#$ROOT/}"
+}
+
+validate_gradle_log() {
+  local stage="$1"
+  shift
+  local log_dir="$ROOT/run/validate"
+  mkdir -p "$log_dir"
+  local log="$log_dir/$stage.log"
+  VALIDATE_LAST_LOG="$(relative_path "$log")"
+
+  set +e
+  docker_gradle --console=plain -q "$@" > "$log" 2>&1
+  local status="$?"
+  set -e
+  return "$status"
+}
+
+validate_git_status() {
+  if ! git -C "$ROOT" rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+    printf 'not a git repository'
+    return 2
+  fi
+
+  local count
+  count="$(git -C "$ROOT" status --short | wc -l | tr -d ' ')"
+  if [[ "$count" -eq 0 ]]; then
+    printf 'clean'
+  else
+    printf '%s dirty entries' "$count"
+  fi
+  return 0
+}
+
+validate_compile_java() {
+  if validate_gradle_log compileJava compileJava; then
+    printf 'ok; log: %s' "$VALIDATE_LAST_LOG"
+    return 0
+  fi
+
+  local status="$?"
+  printf 'exit %s; log: %s' "$status" "$VALIDATE_LAST_LOG"
+  return "$status"
+}
+
+validate_tests() {
+  if [[ ! -d "$ROOT/src/test/java" ]] || ! find "$ROOT/src/test/java" -name '*.java' -print -quit | grep -q .; then
+    printf 'no test sources'
+    return 2
+  fi
+
+  set +e
+  validate_gradle_log test test
+  local status="$?"
+  set -e
+  if [[ "$status" -ne 0 ]]; then
+    printf 'exit %s; log: %s' "$status" "$VALIDATE_LAST_LOG"
+    return "$status"
+  fi
+
+  local summary
+  summary="$(python3 - "$ROOT/build/test-results/test" <<'PY'
+import glob
+import os
+import sys
+import xml.etree.ElementTree as ET
+
+root = sys.argv[1]
+tests = failures = errors = skipped = 0
+for path in glob.glob(os.path.join(root, 'TEST-*.xml')):
+    tree = ET.parse(path)
+    suite = tree.getroot()
+    tests += int(suite.attrib.get('tests', 0))
+    failures += int(suite.attrib.get('failures', 0))
+    errors += int(suite.attrib.get('errors', 0))
+    skipped += int(suite.attrib.get('skipped', 0))
+
+if tests == 0:
+    print('ok; no JUnit XML summary')
+else:
+    passed = tests - failures - errors - skipped
+    print('{}/{} passed, {} skipped'.format(passed, tests, skipped))
+PY
+)"
+  printf '%s; log: %s' "$summary" "$VALIDATE_LAST_LOG"
+  return 0
+}
+
+validate_jar_task() {
+  set +e
+  validate_gradle_log jar jar
+  local status="$?"
+  set -e
+  if [[ "$status" -ne 0 ]]; then
+    printf 'exit %s; log: %s' "$status" "$VALIDATE_LAST_LOG"
+    return "$status"
+  fi
+
+  local jar_path="$ROOT/build/libs/Thaumcraft-1.0.0-universal.jar"
+  if [[ ! -f "$jar_path" ]]; then
+    printf 'jar missing: %s; log: %s' "$(relative_path "$jar_path")" "$VALIDATE_LAST_LOG"
+    return 1
+  fi
+
+  local size
+  size="$(du -h "$jar_path" | cut -f1)"
+  printf '%s; log: %s' "$size" "$VALIDATE_LAST_LOG"
+  return 0
+}
+
+validate_mcp_summary() {
+  local summary_file="$ROOT/run/validate/check-jar.summary"
+  mkdir -p "$(dirname "$summary_file")"
+  VALIDATE_LAST_LOG="$(relative_path "$summary_file")"
+
+  set +e
+  mcp_leak_summary > "$summary_file" 2>&1
+  local status="$?"
+  set -e
+  if [[ "$status" -ne 0 ]]; then
+    printf 'summary exit %s; log: %s' "$status" "$VALIDATE_LAST_LOG"
+    return "$status"
+  fi
+
+  local current_count current_hash
+  current_count="$(grep -F 'Count:' "$summary_file" | sed 's/^Count: //')"
+  current_hash="$(grep -F 'Hash:' "$summary_file" | awk '{print $2}')"
+  if [[ -z "$current_hash" ]]; then
+    printf 'missing current hash; log: %s' "$VALIDATE_LAST_LOG"
+    return 1
+  fi
+
+  if [[ "$current_count" == '0 (unique leaks: 0)' ]]; then
+    printf 'no MCP leaks; log: %s' "$VALIDATE_LAST_LOG"
+    return 0
+  fi
+
+  printf 'MCP leaks present; %s; log: %s' "$current_count" "$VALIDATE_LAST_LOG"
+  return 0
+}
+
+validate_smoke_server() {
+  VALIDATE_LAST_LOG="run/smoke-server.log"
+  local output status
+  set +e
+  output="$(smoke_server 2>&1)"
+  status="$?"
+  set -e
+
+  if [[ "$status" -eq 0 ]]; then
+    printf 'server ready; log: %s' "$VALIDATE_LAST_LOG"
+    return 0
+  fi
+
+  local line
+  line="$(printf '%s\n' "$output" | sed '/^[[:space:]]*$/d' | tail -1)"
+  printf '%s; log: %s' "${line:-exit $status}" "$VALIDATE_LAST_LOG"
+  return "$status"
+}
+
+validate_step() {
+  local name="$1"
+  shift
+  local output status label
+
+  VALIDATE_LAST_LOG=""
+  set +e
+  output="$("$@" 2>&1)"
+  status="$?"
+  set -e
+
+  case "$status" in
+    0)
+      label="PASS"
+      VALIDATE_TOTAL=$((VALIDATE_TOTAL + 1))
+      VALIDATE_PASSED=$((VALIDATE_PASSED + 1))
+      ;;
+    2)
+      label="SKIP"
+      VALIDATE_SKIPPED=$((VALIDATE_SKIPPED + 1))
+      ;;
+    *)
+      label="FAIL"
+      VALIDATE_TOTAL=$((VALIDATE_TOTAL + 1))
+      ;;
+  esac
+
+  printf '%-5s %-15s (%s)\n' "$label" "$name" "$output"
+
+  if [[ "$status" -ne 0 && "$status" -ne 2 ]]; then
+    if [[ "$VALIDATE_VERBOSE" -eq 1 && -n "$VALIDATE_LAST_LOG" && -f "$ROOT/$VALIDATE_LAST_LOG" ]]; then
+      printf -- '--- %s tail ---\n' "$VALIDATE_LAST_LOG"
+      tail -40 "$ROOT/$VALIDATE_LAST_LOG"
+    fi
+    printf '=== RESULT: FAIL (%s/%s, stopped at %s) ===\n' "$VALIDATE_PASSED" "$VALIDATE_TOTAL" "$name"
+    return 1
+  fi
+
+  return 0
+}
+
+validate() {
+  local run_smoke=0
+  VALIDATE_TOTAL=0
+  VALIDATE_PASSED=0
+  VALIDATE_SKIPPED=0
+  VALIDATE_VERBOSE=0
+
+  while [[ "$#" -gt 0 ]]; do
+    case "$1" in
+      --smoke)
+        run_smoke=1
+        ;;
+      --verbose)
+        VALIDATE_VERBOSE=1
+        ;;
+      -h|--help)
+        printf 'Usage: ./scripts/dev.sh validate [--smoke] [--verbose]\n'
+        return 0
+        ;;
+      *)
+        printf 'validate: unknown option: %s\n' "$1" >&2
+        return 2
+        ;;
+    esac
+    shift
+  done
+
+  printf '=== validate ===\n'
+  validate_step git-status validate_git_status || return 1
+  validate_step compileJava validate_compile_java || return 1
+  validate_step test validate_tests || return 1
+  validate_step jar validate_jar_task || return 1
+  validate_step check-jar validate_mcp_summary || return 1
+  if [[ "$run_smoke" -eq 1 ]]; then
+    validate_step smoke-server validate_smoke_server || return 1
+  fi
+  printf '=== RESULT: PASS (%s/%s, %s skipped) ===\n' "$VALIDATE_PASSED" "$VALIDATE_TOTAL" "$VALIDATE_SKIPPED"
+}
+
 cmd="${1:-help}"
 case "$cmd" in
   help|-h|--help)
@@ -474,6 +853,10 @@ case "$cmd" in
   check-jar)
     shift
     check_jar "$@"
+    ;;
+  validate)
+    shift
+    validate "$@"
     ;;
   smoke-server)
     smoke_server

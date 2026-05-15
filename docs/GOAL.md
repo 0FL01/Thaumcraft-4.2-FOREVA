@@ -68,6 +68,8 @@ If `./scripts/dev.sh smoke-client` runs unattended in the current environment wi
 `SKIPPED by user instruction: GUI/graphics/user-interactive validation excluded`.
 
 Do not stop solely because manual GUI validation cannot run. Use non-GUI validation instead:
+- `./scripts/dev.sh validate` for routine compile/test/jar/MCP summary
+- `./scripts/dev.sh validate --smoke` when server smoke validation is required
 - `compileJava`
 - `build`
 - `test` where available and non-GUI
@@ -87,7 +89,8 @@ Never claim “visually validated” when visual checks were skipped. Say “imp
 Read all source-of-truth docs. Inspect current diffs. Do not overwrite user changes. Build a concrete local checklist in `docs/GOAL_PROGRESS.md`.
 
 Run the smallest safe baseline validation first, usually:
-- `./scripts/dev.sh compileJava`
+- `./scripts/dev.sh validate`
+- or `./scripts/dev.sh compileJava` when isolating compile-only failures
 - or the equivalent Gradle command documented in the repo
 
 Record baseline failures before fixing them.
@@ -220,13 +223,20 @@ After gameplay/client/content systems are implemented:
 
 ## 4. Validation policy
 
-After each milestone, run the smallest meaningful validation. At the end, run the strongest non-GUI validation set available in this repo, normally:
+After each milestone, run the smallest meaningful validation. Prefer the compact wrapper first:
+
+- `./scripts/dev.sh validate`
+- `./scripts/dev.sh validate --smoke` when runtime/server smoke validation is required
+
+At the end, run the strongest non-GUI validation set available in this repo, normally through `validate --smoke` plus any targeted commands not covered by the wrapper:
 
 - `./scripts/dev.sh compileJava`
 - `./scripts/dev.sh build`
 - `./scripts/dev.sh test`
 - `./scripts/dev.sh check-jar`
 - `./scripts/dev.sh smoke-server`
+
+Use the individual commands above when debugging a failed `validate` stage, producing release artifacts such as `build`/`apiJar`/`devJar`, or when a full verbose `check-jar` leak listing is required.
 
 Also run targeted static scans, for example:
 - scan for `TODO`, `FIXME`, `stub`, `UnsupportedOperationException`, empty packet handlers, placeholder GUI/render/recipe/research registrations
@@ -271,4 +281,3 @@ At completion, report:
 - known limitations
 - remaining risk, if any
 - exact files/docs updated
-

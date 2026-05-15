@@ -139,6 +139,8 @@ Use Docker unless the local environment is already known to be Java 8 Forge-comp
 Use the project wrapper instead of repeating long Docker commands:
 
     ./scripts/dev.sh image
+    ./scripts/dev.sh validate
+    ./scripts/dev.sh validate --smoke
     ./scripts/dev.sh tasks
     ./scripts/dev.sh compileJava
     ./scripts/dev.sh build
@@ -146,11 +148,13 @@ Use the project wrapper instead of repeating long Docker commands:
     ./scripts/dev.sh apiJar devJar
     ./scripts/dev.sh test
 
+Prefer `./scripts/dev.sh validate` for routine checkpoint validation. It runs a compact stop-on-first-failure sequence: git status summary, `compileJava`, non-GUI tests, `jar`, and MCP jar leak summary. It writes detailed stage logs under `run/validate/` and prints one summary line per stage to reduce agent-output noise. Use `./scripts/dev.sh validate --smoke` when server/runtime smoke validation is required; this adds the dedicated server smoke stage while still keeping stdout compact. Run `./scripts/dev.sh check-jar` directly when a full verbose MCP leak listing is needed.
+
 Run arbitrary Gradle tasks through Docker with:
 
     ./scripts/dev.sh gradle <task> [args...]
 
-Run `./scripts/dev.sh check-jar` after building a jar meant for Prism/normal Forge. It scans the built jar for MCP-named Minecraft field/method references that dev `runServer` can miss but production Forge reports as `NoSuchFieldError` or `NoSuchMethodError`.
+Run `./scripts/dev.sh check-jar` after building a jar meant for Prism/normal Forge when verbose MCP leak details are needed. It scans the built jar for MCP-named Minecraft field/method references that dev `runServer` can miss but production Forge reports as `NoSuchFieldError` or `NoSuchMethodError`.
 
 ## Runtime smoke validation
 
@@ -160,7 +164,9 @@ Run runtime smoke validation whenever a change can affect mod loading, registrie
 
 For common/server-side changes, run the dedicated server smoke test first:
 
-    ./scripts/dev.sh smoke-server
+    ./scripts/dev.sh validate --smoke
+
+Use `./scripts/dev.sh smoke-server` directly only when isolating or debugging the server smoke stage.
 
 The smoke wrapper creates `run/eula.txt`, runs `runServer -x getAssets --no-daemon`, writes `run/smoke-server.log`, and fails on crash markers or new crash reports. `-x getAssets` avoids old ForgeGradle Mojang asset URL failures. The `run/` directory is generated/ignored and must not be staged.
 

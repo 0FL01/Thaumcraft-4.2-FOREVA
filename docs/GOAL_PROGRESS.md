@@ -22,7 +22,7 @@ Branch: `codex/durable-goal-stage8-9`
 - [ ] Implement Stage 9-d crucible/alchemy/thaumatorium content flow.
 - [ ] Implement Stage 9-e research/Thaumonomicon progression content.
 - [ ] Complete Phase 10 polish: localization, sounds, crash cleanup, performance sanity, docs/status cleanup.
-- [ ] Run final non-GUI validation: `compileJava`, `build`, `test`, `check-jar`, `smoke-server`, static scans, `git diff --check`.
+- [ ] Run final non-GUI validation: `./scripts/dev.sh validate --smoke`, targeted `build`/`check-jar`/static scans where needed, and `git diff --check`.
 - [ ] Record GUI/manual graphics checks as skipped by user instruction where they require user interaction or unavailable graphics.
 - [ ] End with clean `git status --short` after intended checkpoint commits, or document remaining diffs.
 
@@ -37,8 +37,9 @@ Branch: `codex/durable-goal-stage8-9`
 - `docs/Stage7.md` remains open. Worldgen pipeline, Eldritch ring/maze bootstrap, safe teleporter, Outer Lands room templates, BlockLoot/room block contracts, Greatwood structures, and runtime evidence remain active blockers.
 - Stage 8-a through Stage 8-e are documented as not complete.
 - Stage 9-a through Stage 9-e are documented as not complete.
-- `./scripts/dev.sh check-jar` — passes on current builds.
-- `./scripts/dev.sh smoke-server` — passes on current builds after the 2026-05-15 wrapper/logging fix.
+- `./scripts/dev.sh validate` — passes on current builds with compact MCP leak summary.
+- `./scripts/dev.sh validate --smoke` — passes on current builds after the 2026-05-15 wrapper/logging fix.
+- Direct `./scripts/dev.sh check-jar` remains the verbose MCP leak listing path.
 
 ## Skipped GUI/Manual Graphics Checks
 
@@ -50,6 +51,8 @@ Branch: `codex/durable-goal-stage8-9`
 - `./scripts/dev.sh compileJava` — passed on 2026-05-14 before gameplay/code changes.
 - `./scripts/dev.sh check-jar` — passed on 2026-05-15 after script repair (MCP mapping cache path resolved in `scripts/dev.sh`).
 - `./scripts/dev.sh smoke-server` — passed on 2026-05-15 after the smoke wrapper fix in `scripts/dev.sh` (temporary Log4j2 console config plus readiness fallback to `run/logs/latest.log`).
+- `./scripts/dev.sh validate` — passed on 2026-05-15 with compact MCP leak summary for `5114` MCP leak lines / `1028` unique leaks.
+- `./scripts/dev.sh validate --smoke` — passed on 2026-05-15, including compact server smoke validation.
 
 ## Checkpoint Log
 
@@ -1637,6 +1640,25 @@ Remaining limits:
 
 - Runtime scenarios for Crimson Rites research sync, primordial pearl node mutation/flux scatter, and obelisk placement remain unvalidated because manual in-world scenarios are out of scope.
 - Original tooltip text and item overlay/render parity remain Phase 8/client-resource work.
+
+### 2026-05-15 — Agent validation noise reduction
+
+Scope:
+
+- Added `./scripts/dev.sh validate` as a compact, stop-on-first-failure validation wrapper for git status summary, `compileJava`, non-GUI tests, `jar`, and MCP leak summary.
+- Added `./scripts/dev.sh validate --smoke` to include the dedicated server smoke stage while keeping stdout to one summary line per stage.
+- Wrote detailed stage logs under `run/validate/` and kept smoke details in `run/smoke-server.log`, so agents can report short summaries and inspect logs only on failure.
+- Updated `AGENTS.md` and `docs/GOAL.md` to prefer `validate`/`validate --smoke` for routine checkpoint validation and keep individual Gradle/check/smoke commands for debugging or release-artifact needs.
+
+Validation:
+
+- `bash -n scripts/dev.sh` — passed.
+- `./scripts/dev.sh validate` — passed with compact `check-jar` summary for `5114` MCP leak lines / `1028` unique leaks.
+- `./scripts/dev.sh validate --smoke` — passed, including server smoke readiness.
+
+Remaining limits:
+
+- `validate` does not replace `build`, `apiJar`, `devJar`, `smoke-client`, or targeted static scans when a checkpoint specifically requires them.
 
 ## Next Checkpoint Candidate
 
