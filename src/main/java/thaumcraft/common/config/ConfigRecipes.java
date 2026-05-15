@@ -40,6 +40,8 @@ public class ConfigRecipes {
     private static IRecipe recipeScribe2;
     private static IRecipe recipeScribe3;
     private static IRecipe recipeThaumometer;
+    private static IRecipe recipeWandCapIron;
+    private static IRecipe recipeWandBasic;
 
     public static void init() {
         ConfigResearch.recipes.clear();
@@ -87,6 +89,12 @@ public class ConfigRecipes {
         }
         if (recipeThaumometer != null) {
             ConfigResearch.recipes.put("Thaumometer", recipeThaumometer);
+        }
+        if (recipeWandCapIron != null) {
+            ConfigResearch.recipes.put("WandCapIron", recipeWandCapIron);
+        }
+        if (recipeWandBasic != null) {
+            ConfigResearch.recipes.put("WandBasic", recipeWandBasic);
         }
         ItemStack basicWand = new ItemStack(ConfigItems.itemWandCasting, 1, 0);
         ConfigResearch.recipes.put("Thaumonomicon",
@@ -1813,6 +1821,24 @@ public class ConfigRecipes {
                 '1', new ItemStack(ConfigItems.itemShard, 1, OreDictionary.WILDCARD_VALUE))
                 .setRegistryName("thaumcraft", "thaumometer");
         registry.register(recipeThaumometer);
+
+        recipeWandCapIron = new ShapedOreRecipe(null,
+                new ItemStack(ConfigItems.itemWandCap, 1, 0),
+                "NNN",
+                "N N",
+                'N', "nuggetIron")
+                .setRegistryName("thaumcraft", "wandcapiron");
+        registry.register(recipeWandCapIron);
+
+        recipeWandBasic = new ShapedOreRecipe(null,
+                new ItemStack(ConfigItems.itemWandCasting, 1, 0),
+                "  I",
+                " S ",
+                "I  ",
+                'I', new ItemStack(ConfigItems.itemWandCap, 1, 0),
+                'S', "stickWood")
+                .setRegistryName("thaumcraft", "wandbasic");
+        registry.register(recipeWandBasic);
         specialRecipesRegistered = true;
     }
 }

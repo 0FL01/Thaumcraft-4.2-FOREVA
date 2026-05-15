@@ -67,6 +67,30 @@ Branch: `codex/durable-goal-stage8-9`
 
 ## Checkpoint Log
 
+### 2026-05-15 — Stage 9-e BASICTHAUMATURGY onboarding baseline
+
+Scope:
+
+- Added Stage 9-e normal crafting recipe keys in `ConfigRecipes`:
+  - `WandCapIron`
+  - `WandBasic`
+- Added corresponding `ConfigResearch.recipes` baseline mapping for these keys.
+- Expanded `ConfigResearch` with THAUMATURGY entry:
+  - `BASICTHAUMATURGY` (text pages + recipe pages for `WandCapIron` and `WandBasic`)
+- Updated `docs/Stage9-e.md` status text for the new THAUMATURGY baseline coverage.
+
+Validation:
+
+- `./scripts/dev.sh validate --smoke` — passed: status, compile, tests, jar, check-jar summary, and server smoke.
+- `run/smoke-server.log` evidence: server ready (`Done (...)`), no fatal markers.
+- Crash report scan under `run/` remained clean during smoke stage.
+- `./scripts/dev.sh smoke-client` — skipped because `DISPLAY=` and GUI/graphics/user-interactive validation is excluded.
+
+Remaining limits:
+
+- Stage 9-e graph is still partial; most THAUMATURGY/ALCHEMY/ARTIFICE/GOLEMANCY/ELDRITCH chains remain unported.
+- GUI/manual Thaumonomicon validation remains skipped by instruction and headless environment limits.
+
 ### 2026-05-15 — Stage 9-e THAUMONOMICON/PLANTS baseline expansion
 
 Scope:

@@ -20,6 +20,7 @@ public class ConfigResearch {
         initCategories();
         initBasicResearchBaseline();
         initBasicResearchProgressionBaseline();
+        initThaumaturgyResearchBaseline();
         initBasicResearchTextOnlyExtended();
         initThaumaturgyResearchTextOnlyBaseline();
         initEldritchResearchTextOnlyBaseline();
@@ -260,6 +261,26 @@ public class ConfigResearch {
                 .setPages(new ResearchPage("tc.research_page.RESEARCHDUPE.1"))
                 .setRound()
                 .setParents("RESEARCHER2")
+                .registerResearchItem();
+    }
+
+    private static void initThaumaturgyResearchBaseline() {
+        new ResearchItem(
+                "BASICTHAUMATURGY",
+                "THAUMATURGY",
+                new AspectList(),
+                0,
+                0,
+                0,
+                new ItemStack(ConfigItems.itemWandCasting, 1, 0))
+                .setPages(
+                        new ResearchPage("tc.research_page.BASICTHAUMATURGY.1"),
+                        new ResearchPage("tc.research_page.BASICTHAUMATURGY.2"),
+                        new ResearchPage((IRecipe) recipes.get("WandCapIron")),
+                        new ResearchPage((IRecipe) recipes.get("WandBasic")))
+                .setAutoUnlock()
+                .setStub()
+                .setRound()
                 .registerResearchItem();
     }
 
