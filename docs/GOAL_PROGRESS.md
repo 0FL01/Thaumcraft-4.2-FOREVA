@@ -47,6 +47,7 @@ Branch: `codex/durable-goal-stage8-9`
 - Arcane Bore client smoke/manual open/visual parity was skipped on 2026-05-15 because `DISPLAY=` and user-driven GUI/graphics validation is excluded by instruction.
 - Thaumatorium client smoke/manual open/visual parity was skipped on 2026-05-15 because `DISPLAY=` and user-driven GUI/graphics validation is excluded by instruction.
 - Focal Manipulator client smoke/manual open/visual parity was skipped on 2026-05-15 because `DISPLAY=` and user-driven GUI/graphics validation is excluded by instruction.
+- Focus Pouch, Hand Mirror, and Hover Harness client smoke/manual open/item movement parity was skipped on 2026-05-15 because `DISPLAY=` and user-driven GUI/graphics validation is excluded by instruction.
 - Future GUI/client visual checks that require user-driven Minecraft control, screenshots, or unavailable X11/graphics stack will be recorded as: `SKIPPED by user instruction: GUI/graphics/user-interactive validation excluded`.
 
 ## Baseline Validation
@@ -58,6 +59,30 @@ Branch: `codex/durable-goal-stage8-9`
 - `./scripts/dev.sh validate --smoke` — passed on 2026-05-15, including compact server smoke validation.
 
 ## Checkpoint Log
+
+### 2026-05-15 — Stage 8-b item GUI texture baseline
+
+Scope:
+
+- Replaced Focus Pouch, Hand Mirror, and Hover Harness placeholder backgrounds with original texture-backed GUI rendering.
+- Moved Focus Pouch slot coordinates to the reference tall layout so the slots align with `gui_focuspouch.png`.
+- Disabled hotbar-key swaps in all three screens to preserve the reference `func_146983_a` behavior.
+- Copied original `gui_focuspouch.png`, `guihandmirror.png`, and `guihoverharness.png`.
+- Updated `docs/Stage8-b.md` with the implemented baseline and remaining item-movement validation limits.
+
+Validation:
+
+- `./scripts/dev.sh compileJava` — passed.
+- `./scripts/dev.sh validate --smoke` — passed: status, compile, tests `10/10`, jar, check-jar summary `5190` MCP leak lines / `1040` unique leaks, and server smoke.
+- `run/smoke-server.log` evidence: `Registering entities`; `Forge Mod Loader has successfully loaded 6 mods`; `Done (1.326s)!`.
+- Crash report scan under `run/` returned no files.
+- `./scripts/dev.sh smoke-client` — skipped because `DISPLAY=` and GUI/graphics/user-interactive validation is excluded.
+
+Remaining limits:
+
+- Manual open/close and item movement scenarios were not observed.
+- Backing-item/hotbar-key duplication checks still need client-runtime coverage.
+- Hand Mirror remote transport and Hover Harness jar persistence were not manually exercised.
 
 ### 2026-05-15 — Stage 8-b Focal Manipulator GUI baseline
 

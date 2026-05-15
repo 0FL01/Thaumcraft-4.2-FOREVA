@@ -65,7 +65,7 @@ Lightweight commands run during analysis:
 
 ## 4. Текущее состояние Stage 8-b
 
-Current state is not closeable. Server/common GUI IDs and containers exist for many screens, but client-side routing and client GUI classes are mostly absent. GUI IDs `3`, `13`, `15`, and `20` now have texture-backed Thaumatorium, Arcane Workbench, Arcane Bore, and Focal Manipulator baselines, but full visual parity and manual client validation remain open.
+Current state is not closeable. Server/common GUI IDs and containers exist for many screens, but client-side routing and client GUI classes are mostly absent. GUI IDs `3`, `5`, `13`, `15`, `16`, `17`, and `20` now have texture-backed Thaumatorium, Focus Pouch, Arcane Workbench, Arcane Bore, Hand Mirror, Hover Harness, and Focal Manipulator baselines, but full visual parity and manual client validation remain open.
 
 Concrete current findings:
 
@@ -74,8 +74,8 @@ Concrete current findings:
 - Thaumonomicon is intentionally server-null in `src/main/java/thaumcraft/common/CommonProxy.java:95`, matching the reference pattern that its GUI is client-only.
 - Base `CommonProxy.getClientGuiElement` returns null in `src/main/java/thaumcraft/common/CommonProxy.java:122-126`, as expected for common proxy.
 - `ClientProxy.getClientGuiElement` constructs `GuiFocusPouch`, `GuiHandMirror`, `GuiHoverHarness`, and now routes `GUI_THAUMATORIUM`, `GUI_ARCANE_WORKBENCH`, `GUI_ARCANE_BORE`, and `GUI_FOCAL_MANIPULATOR` to matching tile-backed screens; the remaining Stage 8-b/current GUI IDs still return null.
-- Existing GUI screens are placeholder-style grey rectangles and do not bind original textures: `GuiFocusPouch.java:23-35`, `GuiHandMirror.java:23-29`, `GuiHoverHarness.java:23-29`.
-- `src/main/resources/assets/thaumcraft/textures/gui/gui_thaumatorium.png`, `gui_arcaneworkbench.png`, `gui_arcanebore.png`, and `gui_wandtable.png` are copied byte-for-byte from `thaumcraft_src/assets/thaumcraft/textures/gui/`; the other reference GUI textures are still absent from current resources.
+- `GuiFocusPouch`, `GuiHandMirror`, and `GuiHoverHarness` now bind original textures instead of grey placeholder rectangles.
+- `src/main/resources/assets/thaumcraft/textures/gui/gui_thaumatorium.png`, `gui_arcaneworkbench.png`, `gui_arcanebore.png`, `gui_wandtable.png`, `gui_focuspouch.png`, `guihandmirror.png`, and `guihoverharness.png` are copied byte-for-byte from `thaumcraft_src/assets/thaumcraft/textures/gui/`; the other reference GUI textures are still absent from current resources.
 - `src/main/resources/assets/thaumcraft/textures/aspects/**` now contains the original aspect icon set needed by Thaumatorium and later research/aspect GUI rendering.
 - Current English lang has only `container.focus_pouch`, `container.handmirror`, `container.hoverharness`, and `container.inventory` for implemented GUI labels in `src/main/resources/assets/thaumcraft/lang/en_us.lang:101-104`; research/golem/trunk/interaction GUI keys are absent.
 - Thaumonomicon right-click opens GUI ID `12` server-side in `src/main/java/thaumcraft/common/items/relics/ItemThaumonomicon.java:43-50`, but client ID `12` returns null in `src/main/java/thaumcraft/client/ClientProxy.java:78-84`.
@@ -518,12 +518,12 @@ Spa fluid rendering may touch rendering helpers beyond simple GUI blitting. Keep
 **Критичность:** high
 
 **Текущая реализация:**
-- `src/main/java/thaumcraft/client/ClientProxy.java:65-70`
-- `src/main/java/thaumcraft/client/gui/GuiFocusPouch.java:17-35`
-- `src/main/java/thaumcraft/client/gui/GuiHandMirror.java:17-29`
-- `src/main/java/thaumcraft/client/gui/GuiHoverHarness.java:17-29`
-- `src/main/resources/assets/thaumcraft/lang/en_us.lang:101-104`
-- Отсутствуют `src/main/resources/assets/thaumcraft/textures/gui/gui_focuspouch.png`, `guihandmirror.png`, `guihoverharness.png`.
+- `src/main/java/thaumcraft/client/ClientProxy.java` routes GUI IDs `5`, `16`, and `17` to the three screens.
+- `src/main/java/thaumcraft/client/gui/GuiFocusPouch.java` binds `gui_focuspouch.png`, uses reference size `175x232`, and disables hotbar key swaps while open.
+- `src/main/java/thaumcraft/client/gui/GuiHandMirror.java` binds `guihandmirror.png` and disables hotbar key swaps while open.
+- `src/main/java/thaumcraft/client/gui/GuiHoverHarness.java` binds `guihoverharness.png` and disables hotbar key swaps while open.
+- `src/main/java/thaumcraft/common/container/ContainerFocusPouch.java` uses reference slot coordinates for the taller Focus Pouch texture.
+- `src/main/resources/assets/thaumcraft/textures/gui/gui_focuspouch.png`, `guihandmirror.png`, and `guihoverharness.png` exist and match the original assets.
 
 **Референс:**
 - `Thaumcraft-1.7.10-4.2.3.5.jar!/thaumcraft/client/gui/GuiFocusPouch.class` uses `textures/gui/gui_focuspouch.png`.
@@ -532,22 +532,30 @@ Spa fluid rendering may touch rendering helpers beyond simple GUI blitting. Keep
 - `thaumcraft_src/assets/thaumcraft/textures/gui/gui_focuspouch.png`, `guihandmirror.png`, `guihoverharness.png`.
 
 **Что не совпадает:**
-Current classes open, but draw grey `drawRect` placeholders and simple labels. Reference screens bind original textures, implement slot-blocking behavior (`func_146983_a` in reference Focus Pouch/Hover Harness/Hand Mirror), and use original layout. Current background rendering is not visually parity and can hide missing texture issues.
+Current classes now bind original textures and block hotbar key swaps like the reference. Focus Pouch slot coordinates were moved to the original taller layout. Manual item movement/duplication checks and visual comparison are still unverified.
 
 **Что нужно доделать:**
-Replace placeholder rectangle drawing with original texture-backed GUI rendering and port reference slot/key behavior.
+Finish item GUI parity by manually validating item movement, blocked backing-item slots, hotbar-key behavior, and visual alignment in a client runtime.
 
 **Как доделать:**
-- Update `GuiFocusPouch`, `GuiHandMirror`, `GuiHoverHarness` to bind `ResourceLocation` textures and draw reference backgrounds.
-- Copy `gui_focuspouch.png`, `guihandmirror.png`, `guihoverharness.png`.
-- Port `func_146983_a` semantics to 1.12.2 `checkHotbarKeys`/equivalent override if needed to prevent interacting with the backing item slot.
+- Done: update `GuiFocusPouch`, `GuiHandMirror`, `GuiHoverHarness` to bind `ResourceLocation` textures and draw reference backgrounds.
+- Done: copy `gui_focuspouch.png`, `guihandmirror.png`, `guihoverharness.png`.
+- Done: port `func_146983_a` semantics to 1.12.2 `checkHotbarKeys`.
 - Scenarios: open each item GUI, try hotbar key swaps, close/reopen while item is in different inventory slot.
 
 **Критерии приемки:**
-- [ ] Existing three GUIs use original textures, not grey rectangles.
-- [ ] Focus Pouch slot grid aligns with container slots and original texture.
-- [ ] Hand Mirror and Hover Harness block unsafe hotbar/item-slot actions per reference behavior.
+- [x] Existing three GUIs use original textures, not grey rectangles.
+- [x] Focus Pouch slot grid aligns with container slots and original texture coordinates.
+- [x] Hand Mirror and Hover Harness block hotbar-key swaps per reference behavior.
 - [ ] Manual open/close and item movement scenarios do not duplicate/delete items.
+
+**Checkpoint 2026-05-15 — Item GUI texture baseline:**
+- Replaced Focus Pouch, Hand Mirror, and Hover Harness placeholder backgrounds with original texture-backed backgrounds.
+- Moved Focus Pouch slot coordinates to the original tall layout and disabled hotbar key swaps in all three item GUIs.
+- Copied original `gui_focuspouch.png`, `guihandmirror.png`, and `guihoverharness.png`.
+- Validation: `./scripts/dev.sh compileJava` passed; `./scripts/dev.sh validate --smoke` passed with tests `10/10`, jar/check-jar summary `5190` MCP leak lines / `1040` unique leaks, server ready at `Done (1.326s)!`, and no crash reports under `run/`.
+- Client smoke/manual GUI open and item movement scenarios were skipped because `DISPLAY=` and user-driven GUI/graphics validation is excluded for this run.
+- Remaining: manual open/close, hotbar-key, and item movement/duplication checks.
 
 **Риски / зависимости:**
 Inventory-slot blocking is behavior-sensitive and can cause item loss/duplication if ported incorrectly.
@@ -558,7 +566,7 @@ Inventory-slot blocking is behavior-sensitive and can cause item loss/duplicatio
 **Критичность:** blocker
 
 **Текущая реализация:**
-- `src/main/resources/assets/thaumcraft/textures/gui/` now contains `gui_thaumatorium.png`, `gui_arcaneworkbench.png`, `gui_arcanebore.png`, and `gui_wandtable.png`.
+- `src/main/resources/assets/thaumcraft/textures/gui/` now contains `gui_thaumatorium.png`, `gui_arcaneworkbench.png`, `gui_arcanebore.png`, `gui_wandtable.png`, `gui_focuspouch.png`, `guihandmirror.png`, and `guihoverharness.png`.
 - `src/main/resources/assets/thaumcraft/textures/misc/potions.png` is the only current `textures/misc` file found.
 - `src/main/resources/assets/thaumcraft/textures/aspects/**` now contains the original aspect icon set copied for Thaumatorium/aspect GUI rendering.
 
@@ -587,7 +595,7 @@ Inventory-slot blocking is behavior-sensitive and can cause item loss/duplicatio
 - Research support textures under `thaumcraft_src/assets/thaumcraft/textures/misc/**` and aspect icons under `thaumcraft_src/assets/thaumcraft/textures/aspects/**`.
 
 **Что не совпадает:**
-The texture resource tree now covers the newly ported Thaumatorium, Arcane Workbench, Arcane Bore, Focal Manipulator, and aspect-icon paths, but most remaining Stage 8-b GUI textures and direct research misc support textures are still absent. Existing placeholder GUIs avoid binding resources, masking the remaining gap.
+The texture resource tree now covers the newly ported Thaumatorium, Arcane Workbench, Arcane Bore, Focal Manipulator, Focus Pouch, Hand Mirror, Hover Harness, and aspect-icon paths, but most remaining Stage 8-b GUI textures and direct research misc support textures are still absent. Existing placeholder GUIs avoid binding resources, masking the remaining gap.
 
 **Что нужно доделать:**
 Copy original GUI and directly used support textures from `thaumcraft_src/assets/` to `src/main/resources/assets/thaumcraft/`.

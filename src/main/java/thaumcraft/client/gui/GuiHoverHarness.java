@@ -1,12 +1,15 @@
 package thaumcraft.client.gui;
 
 import net.minecraft.client.gui.inventory.GuiContainer;
+import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.player.InventoryPlayer;
-import net.minecraft.util.text.translation.I18n;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 import thaumcraft.common.container.ContainerHoverHarness;
 
 public class GuiHoverHarness extends GuiContainer {
+
+    private static final ResourceLocation TEXTURE = new ResourceLocation("thaumcraft", "textures/gui/guihoverharness.png");
 
     public GuiHoverHarness(InventoryPlayer playerInventory, World world, int x, int y, int z) {
         super(new ContainerHoverHarness(playerInventory, world, x, y, z));
@@ -16,15 +19,17 @@ public class GuiHoverHarness extends GuiContainer {
 
     @Override
     protected void drawGuiContainerForegroundLayer(int mouseX, int mouseY) {
-        this.fontRenderer.drawString(I18n.translateToLocal("container.hoverharness"), 8, 6, 4210752);
-        this.fontRenderer.drawString(I18n.translateToLocal("container.inventory"), 8, this.ySize - 96 + 2, 4210752);
     }
 
     @Override
     protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY) {
-        this.drawDefaultBackground();
-        drawRect(this.guiLeft, this.guiTop, this.guiLeft + this.xSize, this.guiTop + this.ySize, 0xC0C6C6C6);
-        drawRect(this.guiLeft + 79, this.guiTop + 31, this.guiLeft + 98, this.guiTop + 50, 0xFF555555);
-        drawRect(this.guiLeft + 80, this.guiTop + 32, this.guiLeft + 97, this.guiTop + 49, 0xFF8B8B8B);
+        GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+        this.mc.getTextureManager().bindTexture(TEXTURE);
+        this.drawTexturedModalRect(this.guiLeft, this.guiTop, 0, 0, this.xSize, this.ySize);
+    }
+
+    @Override
+    protected boolean checkHotbarKeys(int keyCode) {
+        return false;
     }
 }

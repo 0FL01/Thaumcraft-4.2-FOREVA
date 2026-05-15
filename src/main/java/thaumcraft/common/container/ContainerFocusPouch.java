@@ -42,18 +42,18 @@ public class ContainerFocusPouch extends Container {
 
         for (int row = 0; row < 3; row++) {
             for (int col = 0; col < 6; col++) {
-                this.addSlotToContainer(new SlotLimitedByClass(ItemFocusBasic.class, this.pouchInventory, col + row * 6, 35 + col * 18, 18 + row * 18, 1));
+                this.addSlotToContainer(new SlotLimitedByClass(ItemFocusBasic.class, this.pouchInventory, col + row * 6, 37 + col * 18, 51 + row * 18, 1));
             }
         }
 
         if (playerInventory != null) {
             for (int row = 0; row < 3; row++) {
                 for (int col = 0; col < 9; col++) {
-                    this.addPlayerSlot(playerInventory, col + row * 9 + 9, 8 + col * 18, 84 + row * 18);
+                    this.addPlayerSlot(playerInventory, col + row * 9 + 9, 8 + col * 18, 151 + row * 18);
                 }
             }
             for (int col = 0; col < 9; col++) {
-                this.addPlayerSlot(playerInventory, col, 8 + col * 18, 142);
+                this.addPlayerSlot(playerInventory, col, 8 + col * 18, 209);
             }
         }
     }
