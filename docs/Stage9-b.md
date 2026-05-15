@@ -183,7 +183,7 @@ Directly depends on GAP-3 and on client GUI availability for manual testing. For
 
 ### GAP-5: `ItemStack.EMPTY` compatibility breaks shaped/shapeless arcane matching
 
-**Статус:** реализовано неправильно  
+**Статус:** частично закрыт (EMPTY/null matcher compatibility fixed)
 **Критичность:** blocker
 
 **Текущая реализация:**
@@ -198,21 +198,24 @@ Directly depends on GAP-3 and on client GUI availability for manual testing. For
 - `thaumcraft_src/thaumcraft/common/tiles/TileMagicWorkbench.class`
 
 **Что не совпадает:**
-Reference 1.7.10 inventories use `null` for empty slots. Current 1.12.2 `TileMagicWorkbench.getStackInSlot` returns `ItemStack.EMPTY`, but `ShapedArcaneRecipe.checkMatch` checks `slot == null` and `ShapelessArcaneRecipe.matches` only skips `slot == null`. Empty slots will be treated as real nonmatching items, making many shaped/shapeless recipes fail even after data is registered.
+Reference 1.7.10 inventories use `null` for empty slots. Port now normalizes both `null` and `ItemStack.EMPTY` in arcane matchers:
+- `ShapedArcaneRecipe.checkMatch` treats empty slot as empty when target cell is empty.
+- `ShapelessArcaneRecipe.matches` skips empty stacks, not only `null`.
+- `checkItemEquals` in both shaped and shapeless classes now handles `null`/`EMPTY` safely before item/meta/tag checks.
 
 **Что нужно доделать:**
-Make `IArcaneRecipe` implementations consistently use `ItemStack.isEmpty()` for Forge 1.12.2 while preserving public signatures.
+Keep 1.12.2-safe `ItemStack.EMPTY` handling in arcane matchers and verify runtime behavior once arcane recipe population is present.
 
 **Как доделать:**
-- `ShapedArcaneRecipe.checkMatch`: normalize `ItemStack.EMPTY` to empty and accept empty slot when target is `null`.
-- `ShapelessArcaneRecipe.matches`: skip empty stacks, not just `null`.
-- `checkItemEquals` in both classes: handle `null` and `.isEmpty()` safely before item/meta/tag checks.
-- `InternalMethodHandler.getStackInRowAndColumn`: returning `ItemStack.EMPTY` is fine if recipe code is fixed; do not reintroduce nulls globally.
+- Keep `ShapedArcaneRecipe.checkMatch` and `ShapelessArcaneRecipe.matches` on unified null/empty semantics.
+- Keep `checkItemEquals` in both classes null/empty safe.
+- Preserve `InternalMethodHandler.getStackInRowAndColumn` returning `ItemStack.EMPTY`; do not reintroduce nulls globally.
 
 **Критерии приемки:**
-- [ ] Static shaped arcane recipe with empty padding slots matches correctly.
-- [ ] Static shapeless arcane recipe ignores empty workbench slots correctly.
-- [ ] NBT-sensitive comparisons still preserve `areItemStackTagsEqualForCrafting` behavior.
+- [x] `ShapedArcaneRecipe` empty-slot checks now accept `null` and `ItemStack.EMPTY`.
+- [x] `ShapelessArcaneRecipe` now ignores `ItemStack.EMPTY` workbench slots.
+- [x] NBT-sensitive comparisons still preserve `areItemStackTagsEqualForCrafting` behavior.
+- [ ] Runtime scenario with registered arcane recipes verifies shaped and shapeless matching end-to-end.
 
 **Риски / зависимости:**
 This touches public API classes. Do not change method signatures. Existing addon-facing behavior should remain compatible except for required 1.12.2 empty-stack semantics.

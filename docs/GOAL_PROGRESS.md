@@ -67,6 +67,28 @@ Branch: `codex/durable-goal-stage8-9`
 
 ## Checkpoint Log
 
+### 2026-05-15 — Stage 9-b arcane matcher EMPTY/null compatibility baseline
+
+Scope:
+
+- Fixed Forge 1.12 empty-stack compatibility in `ShapedArcaneRecipe` and `ShapelessArcaneRecipe` without changing public API signatures.
+- `ShapedArcaneRecipe.checkMatch` now treats `ItemStack.EMPTY` like an empty slot for blank target cells.
+- `ShapelessArcaneRecipe.matches` now skips empty stacks (`null` or `isEmpty()`), not only `null`.
+- `checkItemEquals` in both classes now performs null/empty short-circuit checks before item/meta/tag comparisons.
+- Updated `docs/Stage9-b.md` GAP-5 status/acceptance notes to mark matcher fix coverage and keep end-to-end runtime crafting validation open.
+
+Validation:
+
+- `./scripts/dev.sh validate --smoke` — passed: status, compile, tests `10/10`, jar, check-jar summary `5437` MCP leak lines / `1063` unique leaks, and server smoke.
+- `run/smoke-server.log` evidence: `Registering entities`; `Forge Mod Loader has successfully loaded 6 mods`; `Done (1.183s)!`.
+- Crash report scan under `run/` returned no files.
+- `./scripts/dev.sh smoke-client` — skipped because `DISPLAY=` and GUI/graphics/user-interactive validation is excluded.
+
+Remaining limits:
+
+- This checkpoint fixes matcher semantics only; full runtime proof still depends on Stage 9-b arcane recipe registration and research gating population.
+- Arcane Workbench GUI/manual crafting paths remain outside current non-GUI validation scope.
+
 ### 2026-05-15 — Stage 9-c dynamic runic augment infusion baseline
 
 Scope:

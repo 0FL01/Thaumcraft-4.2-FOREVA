@@ -81,7 +81,7 @@ implements IArcaneRecipe {
         ArrayList required = new ArrayList(this.input);
         for (int x = 0; x < 9; ++x) {
             ItemStack slot = var1.getStackInSlot(x);
-            if (slot == null) continue;
+            if (slot == null || slot.isEmpty()) continue;
             boolean inRecipe = false;
             Iterator req = required.iterator();
             while (req.hasNext()) {
@@ -106,7 +106,12 @@ implements IArcaneRecipe {
     }
 
     private boolean checkItemEquals(ItemStack target, ItemStack input) {
-        if (input == null && target != null || input != null && target == null) {
+        boolean inputEmpty = input == null || input.isEmpty();
+        boolean targetEmpty = target == null || target.isEmpty();
+        if (inputEmpty && targetEmpty) {
+            return true;
+        }
+        if (inputEmpty || targetEmpty) {
             return false;
         }
         return !(target.getItem() != input.getItem() || target.hasTagCompound() && !ThaumcraftApiHelper.areItemStackTagsEqualForCrafting(input, target) || target.getMetadata() != Short.MAX_VALUE && target.getMetadata() != input.getMetadata());
@@ -131,4 +136,3 @@ implements IArcaneRecipe {
         return this.research;
     }
 }
-

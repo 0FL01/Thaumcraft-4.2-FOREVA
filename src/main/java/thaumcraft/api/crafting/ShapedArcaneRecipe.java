@@ -153,7 +153,7 @@ implements IArcaneRecipe {
                     if (matched) continue;
                     return false;
                 }
-                if (target != null || slot == null) continue;
+                if (target != null || slot == null || slot.isEmpty()) continue;
                 return false;
             }
         }
@@ -161,7 +161,12 @@ implements IArcaneRecipe {
     }
 
     private boolean checkItemEquals(ItemStack target, ItemStack input) {
-        if (input == null && target != null || input != null && target == null) {
+        boolean inputEmpty = input == null || input.isEmpty();
+        boolean targetEmpty = target == null || target.isEmpty();
+        if (inputEmpty && targetEmpty) {
+            return true;
+        }
+        if (inputEmpty || targetEmpty) {
             return false;
         }
         return !(target.getItem() != input.getItem() || target.hasTagCompound() && !ThaumcraftApiHelper.areItemStackTagsEqualForCrafting(input, target) || target.getMetadata() != Short.MAX_VALUE && target.getMetadata() != input.getMetadata());
@@ -191,4 +196,3 @@ implements IArcaneRecipe {
         return this.research;
     }
 }
-
