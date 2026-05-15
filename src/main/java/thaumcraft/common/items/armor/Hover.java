@@ -2,15 +2,19 @@ package thaumcraft.common.items.armor;
 
 import baubles.api.BaublesApi;
 import baubles.api.cap.IBaublesItemHandler;
+import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.SoundCategory;
 import net.minecraft.world.World;
 import thaumcraft.api.aspects.Aspect;
 import thaumcraft.api.aspects.AspectList;
 import thaumcraft.common.blocks.BlockJarItem;
+import thaumcraft.common.config.Config;
 import thaumcraft.common.items.baubles.ItemGirdleHover;
+import thaumcraft.common.lib.TCSounds;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -21,6 +25,7 @@ import java.util.Map;
 public class Hover {
 
     private static final Map<Integer, Boolean> HOVERING = new HashMap<>();
+    private static final Map<Integer, Long> TIMING = new HashMap<>();
 
     public static void doHover(ItemStack stack, EntityPlayer player, World world, int slot) {
         if (player.isSneaking()) return;
@@ -81,6 +86,7 @@ public class Hover {
         }
         if (hover) {
             player.fallDistance = 0.0F;
+            applyClientHoverMotion(player, harness);
         } else if (player.fallDistance > 0.0F) {
             player.fallDistance *= 0.75F;
         }
@@ -123,16 +129,43 @@ public class Hover {
         return true;
     }
 
+    private static void applyClientHoverMotion(EntityPlayer player, ItemStack harness) {
+        if (!player.world.isRemote) return;
+        long currentTime = System.currentTimeMillis();
+        Long time = TIMING.get(player.getEntityId());
+        if (time == null || time < currentTime) {
+            TIMING.put(player.getEntityId(), currentTime + 1200L);
+            player.world.playSound(player.posX, player.posY, player.posZ, TCSounds.JACOBS,
+                    SoundCategory.PLAYERS, 0.05F, 1.0F + player.world.rand.nextFloat() * 0.05F, false);
+        }
+        float motionModifier = getHoverMotionModifier(player, harness);
+        player.motionX *= motionModifier;
+        player.motionZ *= motionModifier;
+    }
+
+    private static float getHoverMotionModifier(EntityPlayer player, ItemStack harness) {
+        int haste = Config.enchHaste == null ? 0 : EnchantmentHelper.getEnchantmentLevel(Config.enchHaste, harness);
+        float modifier = 0.7F + 0.075F * (float) haste;
+        if (hasHoverGirdle(player)) {
+            modifier += 0.21F;
+        }
+        return Math.min(1.0F, modifier);
+    }
+
     private static float getEfficiency(EntityPlayer player) {
         if (player == null) return 1.0F;
+        return hasHoverGirdle(player) ? 0.8F : 1.0F;
+    }
+
+    private static boolean hasHoverGirdle(EntityPlayer player) {
         IBaublesItemHandler baubles = BaublesApi.getBaublesHandler(player);
-        if (baubles == null) return 1.0F;
+        if (baubles == null) return false;
         for (int slot = 0; slot < baubles.getSlots(); slot++) {
             ItemStack stack = baubles.getStackInSlot(slot);
             if (!stack.isEmpty() && stack.getItem() instanceof ItemGirdleHover) {
-                return 0.8F;
+                return true;
             }
         }
-        return 1.0F;
+        return false;
     }
 }

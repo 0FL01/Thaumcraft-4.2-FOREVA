@@ -848,7 +848,7 @@ Validation evidence for this checkpoint:
 - `./scripts/dev.sh smoke-server` passed and reached `Done (` with no crash markers.
 - `./scripts/dev.sh smoke-client` was attempted because `DISPLAY=:0`, but failed before mod initialization with the same environment/display failure: `java.lang.ArrayIndexOutOfBoundsException: 0` in `org.lwjgl.opengl.LinuxDisplay.getAvailableDisplayModes`. This remains environment-limited, not Stage 5 parity evidence.
 
-GAP-5 is advanced but not closed. Remaining Hover work includes the actual client H-key toggle path, reference on/off/periodic sounds, client horizontal motion damping with haste/girdle modifiers, anti-float counter reset parity if safely portable, tooltip parity for stored jar aspects/discounts, and manual in-world fuel/toggle/fall validation.
+GAP-5 is advanced but not closed. Remaining Hover work includes the actual client H-key toggle path, reference on/off sounds, anti-float counter reset parity if safely portable, tooltip parity for stored jar aspects/discounts, and manual in-world fuel/toggle/fall validation.
 
 ### 8.9 2026-05-14 static item resource checkpoint
 
@@ -954,3 +954,22 @@ Validation evidence for this checkpoint:
 - `./scripts/dev.sh smoke-client` was attempted because `DISPLAY=:0`, but failed before mod initialization with the known local LWJGL display failure: `java.lang.ExceptionInInitializerError` caused by `java.lang.ArrayIndexOutOfBoundsException: 0` in `org.lwjgl.opengl.LinuxDisplay.getAvailableDisplayModes`. This remains an environment/display blocker, not wand/focus parity evidence.
 
 GAP-1/2/3 are advanced but not closed. Remaining RECON findings include missing original wand trigger registrations/`IWandTriggerManager` transformation behavior in the current post-init recipe path, direct warded-door/warded-device removal paths that depend on unavailable current block parity, remaining Portable Hole/Warding client visual renderer parity deferred to Phase 8, 1.12-adapted `TileHole`/`TileWarded` stored-block NBT keys requiring an explicit compatibility decision before changing canonical writes, and missing in-world manual scenarios for focus costs, invalid targets, entity spawns, block mutation and focus cycling.
+
+### 8.14 2026-05-15 Hover Harness motion checkpoint
+
+Implemented in the current checkpoint:
+
+- Restored the reference client-side hover motion damping while hover is active: horizontal motion is multiplied by `0.7 + 0.075 * Haste`, capped at `1.0`, with the Hover Girdle adding the original `0.21` modifier.
+- Restored the periodic Jacob's ladder hover hum while active, using the reference 1.2-second cadence and pitch jitter.
+- Shared Hover Girdle detection between the existing fuel-efficiency path and the restored motion modifier path.
+
+Validation evidence for this checkpoint:
+
+- `./scripts/dev.sh compileJava` — passed.
+- `./scripts/dev.sh build` — passed.
+- `./scripts/dev.sh check-jar` — failed before jar inspection because the wrapper's expected MCP mapping cache file is absent at `.gradle_home/caches/minecraft/de/oceanlabs/mcp/mcp_stable/39/1.12.2/srgs/mcp-srg.srg`.
+- `./scripts/dev.sh smoke-server` — timed out before ready state at the known pre-Forge/log4j point; no crash reports and no configured crash markers were found.
+- `./scripts/dev.sh smoke-client` — not run because no display is available in the current environment.
+- `git diff --check` — passed.
+
+GAP-5 is advanced but not closed. Remaining Hover work includes the actual client H-key toggle path, reference on/off sounds, anti-float counter reset parity if safely portable, tooltip parity for stored jar aspects/discounts, and manual in-world fuel/toggle/fall validation.
