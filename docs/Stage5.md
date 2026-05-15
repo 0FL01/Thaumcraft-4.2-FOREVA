@@ -1181,3 +1181,20 @@ Validation evidence for this checkpoint:
 - Server smoke evidence: `run/smoke-server.log` reached `Done (1.353s)!`; no crash reports were present under `run/`.
 
 GAP-11 is advanced but not closed. Full research-note puzzle generation/solving, Research Table GUI flow, complete research content registration, and manual in-world note/discovery scenarios remain open Stage 3/Stage 8/Stage 9 dependencies.
+
+### 8.26 2026-05-15 Loot Bag shared reward path checkpoint
+
+Implemented in the current checkpoint:
+
+- Routed `ItemLootBag` right-click rolls through the shared `Utils.generateLoot(...)` helper.
+- Removed the duplicate private loot/gear/fallback generator from `ItemLootBag`; this keeps loot bags, Pech trades, and other shared reward callers on the same reference-like reward path.
+- Preserved the original server-visible loot-bag behavior: `8 + rand.nextInt(5)` rolls, item drops at the player position, coin sound, and one-bag consumption.
+
+Validation evidence for this checkpoint:
+
+- Original behavior was inspected from `Thaumcraft-1.7.10-4.2.3.5.jar` with `javap` for `ItemLootBag`.
+- `./scripts/dev.sh compileJava` — passed.
+- `./scripts/dev.sh validate --smoke` — passed: compile, tests `10/10`, jar, compact `check-jar` MCP leak summary, and server smoke readiness.
+- Server smoke evidence: `run/smoke-server.log` reached `Done (1.252s)!`; no crash reports were present under `run/`.
+
+GAP-11 is advanced but not closed. The full reference loot-pool distribution still depends on Stage 9 content/table population and manual loot-bag opening scenarios remain unvalidated.

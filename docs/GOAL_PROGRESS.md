@@ -1741,6 +1741,25 @@ Remaining limits:
 - Stage 7 manual scenarios remain open: fresh-world worldgen distribution, Eldritch ring/portal entry, Outer Lands chunk population, maze traversal, `labyrinth.dat` save/reload, and portal return.
 - This checkpoint does not close Stage 7 GAP-5 because the user-driven/manual worldgen and traversal scenarios remain outside the current automation scope.
 
+### 2026-05-15 — Stage 5 Loot Bag shared reward path
+
+Scope:
+
+- Routed `ItemLootBag` reward rolls through the shared `Utils.generateLoot(...)` helper.
+- Removed duplicate private loot/gear/fallback generation from the item while preserving the original roll count, drop position, coin sound, and stack consumption path.
+
+Validation:
+
+- Original behavior inspected from `Thaumcraft-1.7.10-4.2.3.5.jar` with `javap` for `ItemLootBag`.
+- `./scripts/dev.sh compileJava` — passed.
+- `./scripts/dev.sh validate --smoke` — passed: `compileJava`, tests `10/10`, jar, compact MCP leak summary `5130` lines / `1028` unique leaks, and server smoke readiness.
+- Server smoke evidence: `run/smoke-server.log` contained `Registering entities` at line `108`, `Forge Mod Loader has successfully loaded 6 mods` at line `126`, and `Done (1.252s)!` at line `138`; no crash reports were present under `run/`.
+
+Remaining limits:
+
+- Full reference loot-pool distribution still depends on Stage 9 content/table population.
+- Manual loot-bag opening scenario evidence remains out of scope.
+
 ## Next Checkpoint Candidate
 
 After the golem carried-display, trunk transfer, death logging, fire-resistance, armor, water-pathing, no-drowning, melee-enchantment, upgrade-retaliation, target-range, animal-target-filter, butcher-acquisition, item-pickup-delay, essentia-jar-destination, liquid-target-tank, portal-support, outer-provider-spawn, outer-structure-query, outer-worldgen-ownership, Stage7-docs-refresh, hover-motion, biome policy, and Greatwood-support checkpoints, the next pre-Phase8 candidates are:
