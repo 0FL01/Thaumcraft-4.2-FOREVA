@@ -344,7 +344,7 @@ Entity registry names changed between 1.7.10 and 1.12.2. Trigger strings must ei
 
 ### GAP-7: Research completion packet bypasses original progression rules
 
-**Статус:** реализовано неправильно  
+**Статус:** частично реализовано  
 **Критичность:** high
 
 **Текущая реализация:**
@@ -359,19 +359,18 @@ Entity registry names changed between 1.7.10 and 1.12.2. Trigger strings must ei
 
 **Что не совпадает:**
 
-Current packet completes any non-null research key for type `0`, without checking `doesPlayerHaveRequisites`, without distinguishing primary vs secondary research, without creating notes, and without charging paper/ink/aspects. Reference completion path creates notes for primary research and completed discoveries check prerequisites before granting. Current `ResearchManager.doesPlayerHaveRequisites` exists but is not used by the packet.
+Server packet flow now validates requisites, separates primary/secondary actions by packet `type` + `isSecondary()`, creates research notes for primary entries, charges aspect pools for secondary purchases, and keeps sibling grants behind prerequisite checks. Remaining mismatch is lack of runtime/manual validation of these branches with real research content data.
 
 **Что нужно доделать:**
 
-Restore original content progression semantics for Thaumonomicon clicks and direct completion requests.
+Verify the server-side progression paths with populated Stage 9 research content and live Thaumonomicon actions once that content is available.
 
 **Как доделать:**
-- Define packet `type` semantics to match the client research action: primary note creation, secondary direct purchase, creative/admin completion if needed.
-- Before any grant, call `ResearchManager.doesPlayerHaveRequisites(player.getName(), research.key)` and reject if false.
-- For primary/non-secondary research, call `ResearchManager.createResearchNoteForPlayer(...)` instead of `addResearch(...)`.
-- For secondary research, charge required aspect points according to original difficulty/content rules before calling `addResearch(...)`.
-- Preserve sibling completion only after the main research completion is valid.
-- Files/classes to change: `src/main/java/thaumcraft/common/lib/network/playerdata/PacketPlayerCompleteToServer.java`, `src/main/java/thaumcraft/common/lib/research/ResearchManager.java`, client Thaumonomicon action code when it exists.
+- Done: enforce prerequisite checks before any completion/note action in `PacketPlayerCompleteToServer`.
+- Done: treat `type=0` as secondary purchase path (aspect cost + completion) and `type=1` as primary note-creation path.
+- Done: add `ResearchManager.createResearchNoteForPlayer(...)`, `getResearchSlot(...)`, and `consumeInkFromPlayer(...)` server helpers.
+- Done: restrict sibling completion to prerequisite-valid siblings only.
+- Remaining: verify against populated Stage 9-e content and client click flows.
 
 **Критерии приемки:**
 - [ ] Packet cannot complete research if visible or hidden parents are missing.

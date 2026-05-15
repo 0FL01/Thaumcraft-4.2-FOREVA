@@ -67,6 +67,30 @@ Branch: `codex/durable-goal-stage8-9`
 
 ## Checkpoint Log
 
+### 2026-05-15 — Stage 9-e research completion packet progression guardrails
+
+Scope:
+
+- Hardened `PacketPlayerCompleteToServer` server semantics to match reference progression boundaries:
+  - prerequisite gate via `ResearchManager.doesPlayerHaveRequisites(...)`,
+  - `type=0` secondary-only completion path with aspect-pool costs,
+  - `type=1` primary note-creation path instead of direct completion.
+- Added `ResearchManager.createResearchNoteForPlayer(...)` plus `getResearchSlot(...)` and `consumeInkFromPlayer(...)` helpers for server-side note creation from paper + scribing tools.
+- Restricted sibling research grants to sibling entries that also pass prerequisite checks.
+- Updated `docs/Stage9-e.md` GAP-7 status/notes to reflect implemented server guardrails and remaining runtime coverage limits.
+
+Validation:
+
+- `./scripts/dev.sh validate --smoke` — passed: status, compile, tests `10/10`, jar, check-jar summary `5428` MCP leak lines / `1063` unique leaks, and server smoke.
+- `run/smoke-server.log` evidence: `Registering entities`; `Forge Mod Loader has successfully loaded 6 mods`; `Done (1.258s)!`.
+- Crash report scan under `run/` returned no files.
+- `./scripts/dev.sh smoke-client` — skipped because `DISPLAY=` and GUI/graphics/user-interactive validation is excluded.
+
+Remaining limits:
+
+- Client Thaumonomicon interaction code is still baseline-level, so live packet paths are not manually exercised.
+- Full Stage 9-e research content/category/page population is still open and required for end-to-end progression validation.
+
 ### 2026-05-15 — Stage 5 robe dye recipe registration baseline
 
 Scope:

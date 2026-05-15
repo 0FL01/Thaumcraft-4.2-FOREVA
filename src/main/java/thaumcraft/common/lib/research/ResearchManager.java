@@ -8,11 +8,13 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.item.ItemStack;
+import net.minecraft.init.Items;
 import net.minecraft.world.World;
 import net.minecraft.world.storage.ISaveHandler;
 import net.minecraft.world.storage.SaveHandler;
 import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.fml.common.FMLCommonHandler;
+import thaumcraft.api.IScribeTools;
 import thaumcraft.api.ThaumcraftApi;
 import thaumcraft.api.aspects.Aspect;
 import thaumcraft.api.aspects.AspectList;
@@ -21,6 +23,7 @@ import thaumcraft.api.research.ResearchCategoryList;
 import thaumcraft.api.research.ResearchItem;
 import thaumcraft.common.Thaumcraft;
 import thaumcraft.common.config.Config;
+import thaumcraft.common.config.ConfigItems;
 import thaumcraft.common.lib.events.EventHandlerEntity;
 import thaumcraft.common.lib.capabilities.IPlayerKnowledge;
 import thaumcraft.common.lib.capabilities.PlayerKnowledgeCapability;
@@ -295,6 +298,75 @@ public class ResearchManager {
             }
         }
         return true;
+    }
+
+    public static ItemStack createResearchNoteForPlayer(World world, EntityPlayer player, String key) {
+        if (world == null || player == null || key == null || key.isEmpty()) {
+            return ItemStack.EMPTY;
+        }
+        int existing = getResearchSlot(player, key);
+        if (existing >= 0) {
+            return player.inventory.getStackInSlot(existing);
+        }
+        if (!consumeInkFromPlayer(player, false)) {
+            return ItemStack.EMPTY;
+        }
+        if (!player.inventory.hasItemStack(new ItemStack(Items.PAPER))) {
+            return ItemStack.EMPTY;
+        }
+
+        consumeInkFromPlayer(player, true);
+        player.inventory.clearMatchingItems(Items.PAPER, -1, 1, null);
+
+        ItemStack note = createNote(new ItemStack(ConfigItems.itemResearchNotes), key, world);
+        if (note.isEmpty()) {
+            return ItemStack.EMPTY;
+        }
+        if (!player.inventory.addItemStackToInventory(note.copy())) {
+            player.dropItem(note.copy(), false);
+        }
+        player.inventoryContainer.detectAndSendChanges();
+        return note;
+    }
+
+    public static int getResearchSlot(EntityPlayer player, String key) {
+        if (player == null || key == null || key.isEmpty()) {
+            return -1;
+        }
+        for (int slot = 0; slot < player.inventory.mainInventory.size(); slot++) {
+            ItemStack stack = player.inventory.mainInventory.get(slot);
+            if (stack.isEmpty() || stack.getItem() != ConfigItems.itemResearchNotes) {
+                continue;
+            }
+            ResearchNoteData data = getData(stack);
+            if (data != null && key.equals(data.key)) {
+                return slot;
+            }
+        }
+        return -1;
+    }
+
+    public static boolean consumeInkFromPlayer(EntityPlayer player, boolean doit) {
+        if (player == null) {
+            return false;
+        }
+        for (int slot = 0; slot < player.inventory.mainInventory.size(); slot++) {
+            ItemStack stack = player.inventory.mainInventory.get(slot);
+            if (stack.isEmpty() || !(stack.getItem() instanceof IScribeTools)) {
+                continue;
+            }
+            if (stack.getItemDamage() >= stack.getMaxDamage()) {
+                continue;
+            }
+            if (doit) {
+                stack.damageItem(1, player);
+                if (stack.getCount() <= 0) {
+                    player.inventory.mainInventory.set(slot, ItemStack.EMPTY);
+                }
+            }
+            return true;
+        }
+        return false;
     }
 
     public static Aspect getCombinationResult(Aspect aspect1, Aspect aspect2) {
