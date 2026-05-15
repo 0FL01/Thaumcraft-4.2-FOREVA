@@ -13,6 +13,7 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import thaumcraft.common.blocks.BlockAiry;
 import thaumcraft.common.config.ConfigBlocks;
+import thaumcraft.common.lib.TCSounds;
 
 public class EntityShockOrb extends EntityThrowable {
     public int area = 4;
@@ -26,6 +27,9 @@ public class EntityShockOrb extends EntityThrowable {
     protected float getGravityVelocity() { return 0.05f; }
 
     @Override
+    public float getCollisionBorderSize() { return 0.1F; }
+
+    @Override
     public void onUpdate() {
         super.onUpdate();
         if (this.ticksExisted > 500) this.setDead();
@@ -37,7 +41,7 @@ public class EntityShockOrb extends EntityThrowable {
         if (!this.world.isRemote) {
             // AOE damage within 'area' blocks
             List<Entity> list = this.world.getEntitiesWithinAABBExcludingEntity(
-                this.getThrower(),
+                this,
                 this.getEntityBoundingBox().grow((double)this.area, (double)this.area, (double)this.area));
             for (Entity entity : list) {
                 if (!(entity instanceof EntityLivingBase)) continue;
@@ -63,21 +67,25 @@ public class EntityShockOrb extends EntityThrowable {
                 int xx = MathHelper.floor(this.posX) + this.rand.nextInt(this.area) - this.rand.nextInt(this.area);
                 int zz = MathHelper.floor(this.posZ) + this.rand.nextInt(this.area) - this.rand.nextInt(this.area);
                 int yy = MathHelper.floor(this.posY) + this.area;
-                while (yy > MathHelper.floor(this.posY) - this.area
-                    && !this.world.isAirBlock(new BlockPos(xx, yy - 1, zz))) {
+                while (yy > MathHelper.floor(this.posY) - this.area && this.world.isAirBlock(new BlockPos(xx, yy, zz))) {
                     --yy;
                 }
-                BlockPos bp = new BlockPos(xx, yy, zz);
-                if (this.world.isAirBlock(bp.up())
-                    || !this.world.getBlockState(bp).getBlock().isReplaceable(this.world, bp.up()))
+                BlockPos base = new BlockPos(xx, yy, zz);
+                BlockPos above = base.up();
+                if (!this.world.isAirBlock(above)
+                    || this.world.isAirBlock(base)
+                    || this.world.getBlockState(above).getBlock() == ConfigBlocks.blockAiry
+                    || this.world.rayTraceBlocks(
+                        new Vec3d(this.posX, this.posY, this.posZ),
+                        new Vec3d((double) xx + 0.5D, (double) yy + 1.5D, (double) zz + 0.5D),
+                        false, true, false) != null) {
                     continue;
-                this.world.setBlockState(bp.up(), ConfigBlocks.blockAiry.getDefaultState()
+                }
+                this.world.setBlockState(above, ConfigBlocks.blockAiry.getDefaultState()
                     .withProperty(BlockAiry.TYPE, 10), 3);
             }
         }
-        if (this.world.isRemote) {
-            this.world.playEvent(null, 2001, this.getPosition(), 0);
-        }
+        this.playSound(TCSounds.SHOCK, 1.0F, 1.0F + (this.rand.nextFloat() - this.rand.nextFloat()) * 0.2F);
         this.setDead();
     }
 
@@ -91,7 +99,7 @@ public class EntityShockOrb extends EntityThrowable {
                 this.motionX = look.x * 0.9;
                 this.motionY = look.y * 0.9;
                 this.motionZ = look.z * 0.9;
-                this.world.playEvent(null, 2001, this.getPosition(), 0);
+                this.playSound(TCSounds.ZAP, 1.0F, 1.0F + (this.rand.nextFloat() - this.rand.nextFloat()) * 0.2F);
             }
             return true;
         }

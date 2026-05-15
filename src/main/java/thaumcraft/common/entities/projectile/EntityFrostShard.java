@@ -36,6 +36,7 @@ public class EntityFrostShard extends EntityThrowable implements IEntityAddition
     public EntityFrostShard(World world) { super(world); }
     public EntityFrostShard(World world, EntityLivingBase shooter, float scatter) {
         super(world, shooter);
+        this.shoot(this.motionX, this.motionY, this.motionZ, 1.5F, scatter);
     }
 
     @Override

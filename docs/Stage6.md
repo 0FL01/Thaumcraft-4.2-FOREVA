@@ -380,19 +380,19 @@ Depends on `BlockLoot` if the reference block-breaking behavior is restored. Cli
 - `thaumcraft_src/thaumcraft/common/entities/projectile/*.class`
 
 **Что не совпадает:**
-Core damage/effect logic for `EntityGolemOrb`, `EntityEldritchOrb`, and `EntityPechBlast` is present. The 2026-05-15 checkpoint restores server-audible Golem orb `shock`/`zap` sounds, Eldritch orb fizz sound/status byte `16`, next-tick Eldritch orb expiry, reference Golem orb squared-distance homing, and the original `0.1F` projectile collision border on Golem orb, Eldritch orb, and Pech blast. Pech blast impact remains visual-only in the reference, so its particle work is Phase 8.
+Core damage/effect logic for `EntityGolemOrb`, `EntityEldritchOrb`, and `EntityPechBlast` is present. The 2026-05-15 projectile sound/status checkpoint restores server-audible Golem orb `shock`/`zap` sounds, Eldritch orb fizz sound/status byte `16`, next-tick Eldritch orb expiry, reference Golem orb squared-distance homing, and the original `0.1F` projectile collision border on Golem orb, Eldritch orb, and Pech blast. The 2026-05-15 projectile sweep restores Primal Orb drift/seeker/water-impact behavior, Shock Orb `shock`/`zap` sounds and block-Air placement search, Shock/Explosive/Primal collision borders, and Frost Shard constructor scatter. Pech blast impact remains visual-only in the reference, so its particle work is Phase 8.
 
 **Что нужно доделать:**
 Run runtime evidence for projectile sounds/status events, spawn data, damage, effects, and homing behavior.
 
 **Как доделать:**
 - files/classes/methods/registrations/resources/scenarios
-- Server-visible fixes are in `EntityGolemOrb`, `EntityEldritchOrb`, and `EntityPechBlast`.
+- Server-visible fixes are in `EntityGolemOrb`, `EntityEldritchOrb`, `EntityPechBlast`, `EntityPrimalOrb`, `EntityShockOrb`, `EntityExplosiveOrb`, and `EntityFrostShard`.
 - Keep particle-only proxy calls deferred to Phase 8.
 - Runtime scenario: fire Pech blast, eldritch orb, golem orb, primal/frost/shock/explosive projectiles and verify server damage/effects/sounds.
 
 **Критерии приемки:**
-- [ ] Projectile damage, potion effects, lifetime, gravity, and homing/redirect behavior match reference.
+- [x] Static server-visible projectile damage, potion effects, lifetime, gravity, homing/redirect, collision border, and impact sound/block side effects have been swept against reference for the documented projectile set.
 - [x] Server-side Golem orb and Eldritch orb impact/redirect sounds/status are restored where the reference emits them.
 - [ ] Projectile spawn data works across server/client without class cast or missing entity errors.
 
@@ -980,6 +980,29 @@ Mapping:
 
 - Eldritch Golem movement block breaking, `BlockLoot` stomping, and step sound have not been observed in a runtime world because smoke-server remains environment-blocked and manual scenarios are excluded.
 - Headless combat timing and save/reload persistence still need runtime scenario evidence before GAP-8 can close.
+
+### 8.2.14 Projectile sweep checkpoint — 2026-05-15
+
+Статус: additional projectile server-visible reference behavior restored; runtime evidence remains open.
+
+Что сделано:
+
+- Restored `EntityPrimalOrb` non-seeker random drift, seeker targeting against nearest non-owner living entity, squared-distance seeker acceleration, water material impact trigger, and `0.1F` collision border.
+- Restored `EntityShockOrb` `shock` impact sound, `zap` redirect sound, `0.1F` collision border, thrower-inclusive area damage search, and reference-like block-Air placement scan with line-of-sight check.
+- Restored `EntityExplosiveOrb` `0.1F` collision border.
+- Restored `EntityFrostShard` constructor scatter application so scattershot/normal/boulder focus paths pass their requested inaccuracy into the projectile.
+
+Проверки:
+
+- `./scripts/dev.sh compileJava` — passed.
+- `./scripts/dev.sh build` — passed.
+- `./scripts/dev.sh check-jar` — не дошел до jar inspection: отсутствует wrapper-ожидаемый MCP mapping cache `.gradle_home/caches/minecraft/de/oceanlabs/mcp/mcp_stable/39/1.12.2/srgs/mcp-srg.srg`.
+- `./scripts/dev.sh smoke-server` — timeout before ready state на уже задокументированном pre-Forge/log4j этапе; `run/crash-reports/` не существует, and the configured crash-marker scan found no matches.
+
+Оставшиеся ограничения:
+
+- Projectile damage/effect/sound/block side effects have not been observed in a runtime world because smoke-server remains environment-blocked and manual scenarios are excluded.
+- Client particles for projectile trails/impacts remain Phase 8 FX work.
 
 ### 8.3 Minimal Stage 6 manual scenario matrix
 

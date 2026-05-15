@@ -21,6 +21,9 @@ public class EntityExplosiveOrb extends EntityThrowable {
     protected float getGravityVelocity() { return 0.01f; }
 
     @Override
+    public float getCollisionBorderSize() { return 0.1F; }
+
+    @Override
     protected void onImpact(RayTraceResult result) {
         if (result == null) return;
         if (!this.world.isRemote) {

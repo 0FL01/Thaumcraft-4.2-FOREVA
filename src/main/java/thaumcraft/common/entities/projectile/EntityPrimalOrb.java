@@ -1,9 +1,12 @@
 package thaumcraft.common.entities.projectile;
 
 import io.netty.buffer.ByteBuf;
+import java.util.List;
+import java.util.Random;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.projectile.EntityThrowable;
+import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.RayTraceResult;
@@ -15,6 +18,7 @@ import thaumcraft.common.lib.utils.Utils;
 import thaumcraft.common.lib.world.ThaumcraftWorldGenerator;
 
 public class EntityPrimalOrb extends EntityThrowable implements IEntityAdditionalSpawnData {
+    private int count = 0;
     boolean seeker = false;
     int oi = 0; // owner entity ID
 
@@ -29,28 +33,62 @@ public class EntityPrimalOrb extends EntityThrowable implements IEntityAdditiona
     protected float getGravityVelocity() { return 0.001f; }
 
     @Override
+    public float getCollisionBorderSize() { return 0.1F; }
+
+    @Override
     public void onUpdate() {
-        super.onUpdate();
-        if (this.ticksExisted > 5000) { this.setDead(); return; }
-        // Homing
-        if (this.seeker && this.getThrower() != null && this.ticksExisted > 20) {
-            // Find nearest non-owner living entity within 16 blocks
-            EntityLivingBase target = this.world.getClosestPlayerToEntity(this, 16.0);
-            if (target != null && target != this.getThrower()) {
-                double dx = target.posX - this.posX;
-                double dy = target.getEntityBoundingBox().minY + (double)target.height * 0.5 - this.posY;
-                double dz = target.posZ - this.posZ;
-                double dist = MathHelper.sqrt(dx * dx + dy * dy + dz * dz);
-                if (dist > 0.01) {
-                    this.motionX += (dx / dist - this.motionX) * 0.1;
-                    this.motionY += (dy / dist - this.motionY) * 0.1;
-                    this.motionZ += (dz / dist - this.motionZ) * 0.1;
-                    this.motionX = MathHelper.clamp(this.motionX, -0.2, 0.2);
-                    this.motionY = MathHelper.clamp(this.motionY, -0.2, 0.2);
-                    this.motionZ = MathHelper.clamp(this.motionZ, -0.2, 0.2);
+        ++this.count;
+        if (this.isInsideOfMaterial(Material.WATER)) {
+            this.onImpact(new RayTraceResult(this));
+            if (this.isDead) {
+                return;
+            }
+        }
+        if (this.ticksExisted > 20) {
+            Random seeded = new Random(this.getEntityId() + this.count);
+            if (!this.seeker) {
+                this.motionX += (double) ((seeded.nextFloat() - seeded.nextFloat()) * 0.01F);
+                this.motionY += (double) ((seeded.nextFloat() - seeded.nextFloat()) * 0.01F);
+                this.motionZ += (double) ((seeded.nextFloat() - seeded.nextFloat()) * 0.01F);
+            } else {
+                EntityLivingBase target = this.findSeekerTarget();
+                if (target != null) {
+                    double d = this.getDistanceSq(target);
+                    if (d > 0.01D) {
+                        double dx = target.posX - this.posX;
+                        double dy = target.getEntityBoundingBox().minY + (double) target.height * 0.9D - this.posY;
+                        double dz = target.posZ - this.posZ;
+                        double accel = 0.2D;
+                        this.motionX += dx / d * accel;
+                        this.motionY += dy / d * accel;
+                        this.motionZ += dz / d * accel;
+                        this.motionX = MathHelper.clamp(this.motionX, -0.2D, 0.2D);
+                        this.motionY = MathHelper.clamp(this.motionY, -0.2D, 0.2D);
+                        this.motionZ = MathHelper.clamp(this.motionZ, -0.2D, 0.2D);
+                    }
                 }
             }
         }
+        super.onUpdate();
+        if (this.ticksExisted > 5000) { this.setDead(); }
+    }
+
+    private EntityLivingBase findSeekerTarget() {
+        EntityLivingBase target = null;
+        double closest = Double.MAX_VALUE;
+        AxisAlignedBB search = this.getEntityBoundingBox().grow(16.0D);
+        List<EntityLivingBase> entities = this.world.getEntitiesWithinAABB(EntityLivingBase.class, search);
+        for (EntityLivingBase entity : entities) {
+            if (entity.getEntityId() == this.oi || entity.isDead) {
+                continue;
+            }
+            double distance = this.getDistanceSq(entity);
+            if (distance < closest) {
+                closest = distance;
+                target = entity;
+            }
+        }
+        return target;
     }
 
     @Override
