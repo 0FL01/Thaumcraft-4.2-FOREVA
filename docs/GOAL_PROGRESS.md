@@ -67,6 +67,32 @@ Branch: `codex/durable-goal-stage8-9`
 
 ## Checkpoint Log
 
+### 2026-05-15 — Stage 9-b static arcane recipe baseline subset
+
+Scope:
+
+- Added a concrete static arcane recipe baseline in `ConfigRecipes.init()` via `initializeArcaneRecipeBaseline()`.
+- Ported a first reference-aligned subset of static arcane entries with `ConfigResearch.recipes` handles:
+  - `PrimalCharm`, `IronKey`/`GoldKey`, `ArcaneStone1`, `WardedJar`, `JarVoid`
+  - `WandCapGold`, `WandCapCopper` (conditional), `WandCapSilverInert` (conditional), `WandCapThaumiumInert`, `WandCapVoidInert`
+  - `WandRodGreatwood`, `WandRodGreatwoodStaff`, `WandRodObsidianStaff`, `WandRodSilverwoodStaff`
+  - `FocusFire`, `FocusFrost`, `RobeChest`, `RobeLegs`, `RobeBoots`, `Goggles`
+- Added safe wand cost helpers (`WandCap`/`WandRod`) used by cap/rod recipe aspect costs.
+- Updated `docs/Stage9-b.md` to mark GAP-1 and GAP-6 as partial closures and to reflect this baseline progress.
+
+Validation:
+
+- `./scripts/dev.sh validate --smoke` — passed: status, compile, tests `10/10`, jar, check-jar summary `5490` MCP leak lines / `1074` unique leaks, and server smoke.
+- `run/smoke-server.log` evidence: `Registering entities`; `Forge Mod Loader has successfully loaded 6 mods`; `Done (1.134s)!`.
+- Crash report scan under `run/` returned no files.
+- `./scripts/dev.sh smoke-client` — skipped because `DISPLAY=` and GUI/graphics/user-interactive validation is excluded.
+
+Remaining limits:
+
+- This checkpoint ports only a baseline subset of static arcane recipes; full reference `initializeArcaneRecipes()` coverage remains open.
+- Stage 9-d/e research content/category/page population is still required for full gate-key parity and recipe-key lookup behavior.
+- Arcane Workbench manual/client scenarios remain out of scope for current non-GUI validation.
+
 ### 2026-05-15 — Stage 9 lifecycle recipe-map reset ordering fix
 
 Scope:
