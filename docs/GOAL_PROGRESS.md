@@ -617,6 +617,27 @@ Remaining limits:
 - Projectile sound/status behavior has not been observed in a runtime world because smoke-server remains environment-blocked and user-driven manual scenarios are excluded.
 - Client burst/wisp particle rendering remains Phase 8/client work, and the broader projectile runtime sweep remains open under S6-PROJ-01.
 
+### 2026-05-15 — Stage 6 Cultist and Taint Swarm drops
+
+Scope:
+
+- Restored base Cultist common drops: knowledge fragment, void seed, and coin rolls now apply to Cultist Knight, Cultist Cleric, and the Cultist Leader `super.dropFewItems(...)` path.
+- Added a 1.12-compatible base Cultist rare eldritch-object drop through the existing `dropFewItems(...)` path.
+- Fixed Taint Swarm drops to the reference 50% taint-slime-only result by removing the non-reference guaranteed taint-tendril fallback.
+- Documented reference-confirmed silent sound slots for base Cultists and Taint Swarm ambient sound.
+
+Validation:
+
+- `./scripts/dev.sh compileJava` — initially failed because `dropRareDrop(int)` is not a 1.12 superclass hook; fixed by moving the rare drop into `dropFewItems(...)`, then passed.
+- `./scripts/dev.sh build` — passed.
+- `./scripts/dev.sh check-jar` — failed before jar inspection because the wrapper's expected MCP mapping cache file is still absent at `.gradle_home/caches/minecraft/de/oceanlabs/mcp/mcp_stable/39/1.12.2/srgs/mcp-srg.srg`.
+- `./scripts/dev.sh smoke-server` — failed by timeout before ready state; log again stopped after `Calling tweak class net.minecraftforge.fml.common.launcher.FMLServerTweaker`, with only Log4j console appender initialization errors. `run/crash-reports/` does not exist, and the configured crash-marker scan found no matches. This matches the clean `da3f307` baseline reproduction recorded above.
+
+Remaining limits:
+
+- Cultist and Taint Swarm drops/sounds have not been observed in a runtime world because smoke-server remains environment-blocked and user-driven manual scenarios are excluded.
+- The broader Stage 6 drop/sound table remains open for other mobs and bosses.
+
 ## Next Checkpoint Candidate
 
 After the portal trigger and ring bootstrap checkpoints, the next pre-Phase8 candidates are:

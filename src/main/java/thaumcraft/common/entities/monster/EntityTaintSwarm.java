@@ -22,8 +22,6 @@ public class EntityTaintSwarm extends net.minecraft.entity.monster.EntityMob imp
     protected void dropFewItems(boolean wasRecentlyHit, int looting) {
         if (this.world.rand.nextBoolean()) {
             this.entityDropItem(new net.minecraft.item.ItemStack(thaumcraft.common.config.ConfigItems.itemResource, 1, 11), this.height / 2.0f);
-        } else {
-            this.entityDropItem(new net.minecraft.item.ItemStack(thaumcraft.common.config.ConfigItems.itemResource, 1, 12), this.height / 2.0f);
         }
     }
 }

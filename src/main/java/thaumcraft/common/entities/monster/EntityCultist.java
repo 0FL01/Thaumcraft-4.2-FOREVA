@@ -1,5 +1,9 @@
 package thaumcraft.common.entities.monster;
 
+import net.minecraft.item.ItemStack;
+import thaumcraft.common.config.ConfigItems;
+import thaumcraft.common.items.ItemResource;
+
 public class EntityCultist extends net.minecraft.entity.monster.EntityMob {
     private int homeX, homeY, homeZ;
 
@@ -31,7 +35,18 @@ public class EntityCultist extends net.minecraft.entity.monster.EntityMob {
 
     @Override
     protected void dropFewItems(boolean wasRecentlyHit, int looting) {
-        // drops handled by subclass
+        int roll = this.rand.nextInt(10);
+        if (roll == 0) {
+            this.entityDropItem(new ItemStack(ConfigItems.itemResource, 1, ItemResource.META_KNOWLEDGE_FRAGMENT), 1.5F);
+        } else if (roll <= 1) {
+            this.entityDropItem(new ItemStack(ConfigItems.itemResource, 1, ItemResource.META_VOID_SEED), 1.5F);
+        } else if (roll <= 3 + looting) {
+            this.entityDropItem(new ItemStack(ConfigItems.itemResource, 1, ItemResource.META_COIN), 1.5F);
+        }
+        super.dropFewItems(wasRecentlyHit, looting);
+        if (wasRecentlyHit && this.rand.nextInt(200) - looting < 5) {
+            this.entityDropItem(new ItemStack(ConfigItems.itemEldritchObject, 1, 1), 1.0F);
+        }
     }
 
     @Override public net.minecraft.util.SoundEvent getAmbientSound() { return null; }

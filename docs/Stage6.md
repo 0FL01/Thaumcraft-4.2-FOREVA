@@ -329,7 +329,7 @@ Depends on block/content registration. This is a direct Stage 6 blocker because 
 
 ### GAP-8: Eldritch Golem special server behavior is incomplete and unvalidated
 
-**Статус:** частично реализовано / требует проверки  
+**Статус:** drop baseline improved; runtime evidence open
 **Критичность:** high
 
 **Текущая реализация:**
@@ -462,22 +462,22 @@ Client renderer/particles are Phase 8. Outer Lands location/portal setup is a St
 - `thaumcraft_src/assets/thaumcraft/sounds/**`
 
 **Что не совпадает:**
-Pech death loot has a baseline and uses mana beans/coins/knowledge fragments (`EntityPech.java:390-413`), but runtime drops are unverified. Cultist Leader drops a loot bag (`EntityCultistLeader.java:162-166`). Eldritch Guardian drops essences/equipment (`EntityEldritchGuardian.java:162-184`). Several mobs return null sounds, including `EntityCultist` ambient/hurt/death and `EntityTaintSwarm` ambient. Null may be intentional for some mobs, but Stage 6 scope includes sounds and the current state has no documented reference comparison or runtime verification.
+Pech death loot has a baseline and uses mana beans/coins/knowledge fragments (`EntityPech.java:390-413`), but runtime drops are unverified. Cultist Leader drops a loot bag (`EntityCultistLeader.java:162-166`). Eldritch Guardian drops essences/equipment (`EntityEldritchGuardian.java:162-184`). The 2026-05-15 checkpoint restores base Cultist common/rare drops and fixes Taint Swarm to the reference 50% taint-slime-only drop. Reference comparison also confirms base Cultist ambient/hurt/death silence and Taint Swarm ambient silence are intentional; runtime sound/drop evidence remains open.
 
 **Что нужно доделать:**
-Audit all Stage 6 drops/sounds against reference and run representative kill/combat scenarios.
+Continue the broader Stage 6 drop/sound audit and run representative kill/combat scenarios.
 
 **Как доделать:**
 - files/classes/methods/registrations/resources/scenarios
-- Build a table of each monster/boss `getAmbientSound`, `getHurtSound`, `getDeathSound`, `dropFewItems`, `dropEquipment`, and XP behavior.
-- Compare null sounds with reference before changing.
+- Build the remaining table of each monster/boss `getAmbientSound`, `getHurtSound`, `getDeathSound`, `dropFewItems`, `dropEquipment`, and XP behavior.
+- Keep reference-confirmed silent sounds documented instead of replacing them.
 - Verify all referenced `TCSounds` names exist in `sounds.json` and asset files under `src/main/resources/assets/thaumcraft/sounds/` or copied from `thaumcraft_src/assets/`.
 - Runtime scenario: kill representative Pech, cultists, eldritch mobs, taint mobs, golems/trunks, and bosses with/without looting.
 
 **Критерии приемки:**
 - [ ] Drop outputs match reference for representative mobs and bosses.
 - [ ] All non-null sound events resolve and play without missing sound warnings.
-- [ ] Any intentionally silent mob sound is documented with reference evidence.
+- [x] Base Cultist and Taint Swarm intentionally silent sound slots are documented with reference evidence.
 
 **Риски / зависимости:**
 Loot bag contents and broader content rewards may depend on Stage 9 content registration, but entity-side drop trigger and item ids are Stage 6.
@@ -805,6 +805,29 @@ Stage 6 считается ПОЛНОСТЬЮ завершенной тольк�
 - Projectile sound/status behavior has not been observed in a runtime world because smoke-server remains environment-blocked and manual scenarios are excluded.
 - Client burst/wisp particle rendering for Golem orb, Eldritch orb, and Pech blast remains Phase 8/client work.
 - Broader projectile sweep for primal/frost/shock/explosive projectiles remains open under S6-PROJ-01.
+
+### 8.2.8 Cultist and swarm drops checkpoint — 2026-05-15
+
+Статус: focused drop/silent-sound baseline improved; runtime evidence remains open.
+
+Что сделано:
+
+- Restored base `EntityCultist.dropFewItems(...)` common drops from the reference: knowledge fragment, void seed, and coin rolls shared by Cultist Knight, Cultist Cleric, and Cultist Leader's `super.dropFewItems(...)` path.
+- Added the 1.12-compatible equivalent of the reference base Cultist rare eldritch-object drop using the same recently-hit/looting rare-drop chance pattern already used elsewhere in the port.
+- Fixed `EntityTaintSwarm.dropFewItems(...)` to match the reference 50% taint-slime drop and removed the non-reference guaranteed taint-tendril fallback.
+- Documented reference-confirmed silent sound slots: base Cultist ambient/hurt/death have no reference override, and Taint Swarm ambient returns an empty sound string in 1.7.10.
+
+Проверки:
+
+- `./scripts/dev.sh compileJava` — initially failed because `dropRareDrop(int)` is not a 1.12 superclass hook; fixed by moving the rare drop into `dropFewItems(...)`, then passed.
+- `./scripts/dev.sh build` — passed.
+- `./scripts/dev.sh check-jar` — не дошел до jar inspection: отсутствует wrapper-ожидаемый MCP mapping cache `.gradle_home/caches/minecraft/de/oceanlabs/mcp/mcp_stable/39/1.12.2/srgs/mcp-srg.srg`.
+- `./scripts/dev.sh smoke-server` — timeout before ready state на уже задокументированном pre-Forge/log4j этапе; `run/crash-reports/` не существует, and the configured crash-marker scan found no matches.
+
+Оставшиеся ограничения:
+
+- Cultist and Taint Swarm drops/sounds have not been observed in a runtime world because smoke-server remains environment-blocked and manual scenarios are excluded.
+- The broader Stage 6 drop/sound table remains open for other mobs and bosses.
 
 ### 8.3 Minimal Stage 6 manual scenario matrix
 
