@@ -1660,6 +1660,29 @@ Remaining limits:
 
 - `validate` does not replace `build`, `apiJar`, `devJar`, `smoke-client`, or targeted static scans when a checkpoint specifically requires them.
 
+### 2026-05-15 — Stage 5 Pure Fluid and Bucket of Purity
+
+Scope:
+
+- Added `blockFluidPure` and `fluidPure` registration with the original legacy registry token and Forge fluid identity.
+- Ported the Pure Fluid source-block collision effect: players without Warp Ward receive `Config.potionWarpWard` for the reference duration scaled by permanent warp, then the source block is consumed.
+- Restored Bucket of Purity placement and fill behavior, including empty-bucket return outside creative mode and source-block pickup through `FillBucketEvent`.
+- Restored Sanity Soap's pure-fluid sticky-warp cleanse bonus now that `blockFluidPure` exists.
+- Copied the original `fluidpure` block texture and animation metadata from `thaumcraft_src/assets/thaumcraft/textures/blocks/`.
+
+Validation:
+
+- `./scripts/dev.sh compileJava` — passed.
+- `./scripts/dev.sh validate --smoke` — passed: git status summary, `compileJava`, tests `8/8`, `jar`, compact MCP leak summary, and server smoke readiness.
+- Server smoke evidence: `run/smoke-server.log` reached `Done (1.117s)!`; the configured crash-marker scan only found the ready-state line, and no crash reports were present.
+- `./scripts/dev.sh check-jar` — still fails with the existing project-wide MCP-named reference list; the compact validation summary recorded `5135` MCP leak lines / `1028` unique leaks. The visible verbose output did not identify the new pure-fluid/bucket classes specifically.
+- `./scripts/dev.sh smoke-client` — skipped because `DISPLAY` is unset in the current environment.
+
+Remaining limits:
+
+- Pure Fluid placement, pickup, Warp Ward collision, and Sanity Soap pure-fluid cleanse bonus still need in-world/manual scenario evidence; user-driven manual validation remains out of scope.
+- Pure Fluid client particles/sounds and full fluid visual parity remain Stage 8 client work.
+
 ## Next Checkpoint Candidate
 
 After the golem carried-display, trunk transfer, death logging, fire-resistance, armor, water-pathing, no-drowning, melee-enchantment, upgrade-retaliation, target-range, animal-target-filter, butcher-acquisition, item-pickup-delay, essentia-jar-destination, liquid-target-tank, portal-support, outer-provider-spawn, outer-structure-query, outer-worldgen-ownership, Stage7-docs-refresh, hover-motion, biome policy, and Greatwood-support checkpoints, the next pre-Phase8 candidates are:

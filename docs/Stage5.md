@@ -1140,3 +1140,24 @@ Validation evidence for this checkpoint:
 - `./scripts/dev.sh smoke-client` — skipped because `DISPLAY` is unset in the current environment.
 
 GAP-11 is advanced but not closed. Eldritch Object still needs runtime/manual scenario evidence for Crimson Rites research sync, primordial pearl node mutation/flux scatter, and creative obelisk placement. Tooltip text and item overlay/render parity remain Phase 8/client-resource work.
+
+### 8.24 2026-05-15 Pure Fluid and Bucket of Purity checkpoint
+
+Implemented in the current checkpoint:
+
+- Added `blockFluidPure` and `fluidPure` registration using the original legacy block token and fluid identity.
+- Ported the Pure Fluid source-block collision effect that grants Warp Ward to players without it, scales duration by permanent warp, and consumes the source block.
+- Restored Bucket of Purity placement and source pickup behavior, including empty-bucket return outside creative mode.
+- Added `FillBucketEvent` handling for Pure Fluid source blocks.
+- Restored Sanity Soap's pure-fluid sticky-warp cleanse bonus.
+- Copied the original `fluidpure.png` and `fluidpure.png.mcmeta` assets from `thaumcraft_src/assets/thaumcraft/textures/blocks/`.
+
+Validation evidence for this checkpoint:
+
+- `./scripts/dev.sh compileJava` — passed.
+- `./scripts/dev.sh validate --smoke` — passed: git status summary, `compileJava`, tests `8/8`, `jar`, compact MCP leak summary, and server smoke readiness.
+- `run/smoke-server.log` reached `Done (1.117s)!`; the configured crash-marker scan only found the ready-state line, and no crash reports were present.
+- `./scripts/dev.sh check-jar` — still fails with the existing project-wide MCP-named reference list; the compact validation summary recorded `5135` MCP leak lines / `1028` unique leaks. The visible verbose output did not identify the new pure-fluid/bucket classes specifically.
+- `./scripts/dev.sh smoke-client` — skipped because `DISPLAY` is unset in the current environment.
+
+GAP-11 is advanced but not closed. Pure Fluid placement, bucket pickup, Warp Ward collision, and Sanity Soap pure-fluid cleanse bonus still need runtime/manual scenario evidence. Pure Fluid particles/sounds and full fluid visual parity remain Phase 8 client work.

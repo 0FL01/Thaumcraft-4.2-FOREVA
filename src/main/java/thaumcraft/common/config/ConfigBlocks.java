@@ -16,6 +16,7 @@ import java.util.Locale;
 public class ConfigBlocks {
 
     // Fluid instances
+    public static Fluid FLUIDPURE;
     public static Fluid FLUIDDEATH;
 
     // Block instances
@@ -39,6 +40,7 @@ public class ConfigBlocks {
     public static BlockAiry blockAiry;
     public static BlockFluxGoo blockFluxGoo;
     public static BlockFluxGas blockFluxGas;
+    public static BlockFluidPure blockFluidPure;
     public static BlockFluidDeath blockFluidDeath;
     public static BlockManaPod blockManaPod;
     public static BlockEldritch blockEldritch;
@@ -148,6 +150,10 @@ public class ConfigBlocks {
                 .setRegistryName("thaumcraft", legacyPath("blockFluxGas"))
                 .setTranslationKey("thaumcraft.flux_gas");
 
+        blockFluidPure = (BlockFluidPure) new BlockFluidPure()
+                .setRegistryName("thaumcraft", legacyPath("blockFluidPure"))
+                .setTranslationKey("thaumcraft.fluid_pure");
+
         blockFluidDeath = (BlockFluidDeath) new BlockFluidDeath()
                 .setRegistryName("thaumcraft", legacyPath("blockFluidDeath"))
                 .setTranslationKey("thaumcraft.fluid_death");
@@ -253,6 +259,7 @@ public class ConfigBlocks {
                 blockAiry,
                 blockFluxGoo,
                 blockFluxGas,
+                blockFluidPure,
                 blockFluidDeath,
                 blockManaPod,
                 blockEldritch,
@@ -331,19 +338,33 @@ public class ConfigBlocks {
     }
 
     private static void initFluids() {
-        Fluid existing = FluidRegistry.getFluid("fluidDeath");
-        if (existing != null) {
-            FLUIDDEATH = existing;
-            return;
+        Fluid existingPure = FluidRegistry.getFluid("fluidPure");
+        if (existingPure != null) {
+            FLUIDPURE = existingPure;
+        } else {
+            FLUIDPURE = new Fluid("fluidPure",
+                    new ResourceLocation("thaumcraft", "blocks/fluidpure"),
+                    new ResourceLocation("thaumcraft", "blocks/fluidpure"))
+                    .setGaseous(false)
+                    .setLuminosity(8)
+                    .setViscosity(1500)
+                    .setRarity(EnumRarity.RARE);
+            FluidRegistry.registerFluid(FLUIDPURE);
         }
-        FLUIDDEATH = new Fluid("fluidDeath",
-                new ResourceLocation("thaumcraft", "blocks/fluiddeath"),
-                new ResourceLocation("thaumcraft", "blocks/fluiddeath"))
-                .setGaseous(false)
-                .setLuminosity(8)
-                .setViscosity(1500)
-                .setRarity(EnumRarity.RARE);
-        FluidRegistry.registerFluid(FLUIDDEATH);
+
+        Fluid existingDeath = FluidRegistry.getFluid("fluidDeath");
+        if (existingDeath != null) {
+            FLUIDDEATH = existingDeath;
+        } else {
+            FLUIDDEATH = new Fluid("fluidDeath",
+                    new ResourceLocation("thaumcraft", "blocks/fluiddeath"),
+                    new ResourceLocation("thaumcraft", "blocks/fluiddeath"))
+                    .setGaseous(false)
+                    .setLuminosity(8)
+                    .setViscosity(1500)
+                    .setRarity(EnumRarity.RARE);
+            FluidRegistry.registerFluid(FLUIDDEATH);
+        }
     }
 
     private static ResourceLocation legacyLocation(String legacyToken) {

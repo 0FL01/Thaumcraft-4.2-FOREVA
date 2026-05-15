@@ -9,9 +9,12 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumHand;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.NonNullList;
 import net.minecraft.world.World;
 import thaumcraft.common.Thaumcraft;
+import thaumcraft.common.config.ConfigBlocks;
 import thaumcraft.common.config.Config;
 import thaumcraft.common.lib.capabilities.IPlayerKnowledge;
 import thaumcraft.common.lib.capabilities.PlayerKnowledgeProvider;
@@ -62,6 +65,10 @@ public class ItemSanitySoap extends Item {
             if (knowledge != null) {
                 float chance = 0.33F;
                 if (Config.potionWarpWard != null && player.isPotionActive(Config.potionWarpWard)) {
+                    chance += 0.25F;
+                }
+                BlockPos pos = new BlockPos(MathHelper.floor(player.posX), MathHelper.floor(player.posY), MathHelper.floor(player.posZ));
+                if (world.getBlockState(pos).getBlock() == ConfigBlocks.blockFluidPure) {
                     chance += 0.25F;
                 }
                 if (knowledge.getWarpSticky() > 0 && world.rand.nextFloat() < chance) {
