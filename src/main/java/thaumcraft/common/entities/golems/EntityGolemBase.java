@@ -143,7 +143,7 @@ public class EntityGolemBase extends net.minecraft.entity.monster.EntityGolem im
             this.dataManager.set(GOLEM_TYPE, this.golemType.ordinal());
         }
 
-        if (this.getGolemType().fireResist) this.isImmuneToFire = true;
+        this.isImmuneToFire = this.getGolemType().fireResist;
 
         int bonus = this.decoration.contains("H") ? 5 : 0;
         this.getEntityAttribute(net.minecraft.entity.SharedMonsterAttributes.MAX_HEALTH).setBaseValue(this.getGolemType().health + bonus);
@@ -669,8 +669,16 @@ public class EntityGolemBase extends net.minecraft.entity.monster.EntityGolem im
     public boolean attackEntityFrom(net.minecraft.util.DamageSource source, float amount) {
         this.paused = false;
         if (source == net.minecraft.util.DamageSource.IN_WALL) return false;
+        if (source.isFireDamage() && this.getGolemType().fireResist) return false;
         if (this.getGolemType() == EnumGolemType.THAUMIUM && source == net.minecraft.util.DamageSource.MAGIC) amount *= 0.5f;
         return super.attackEntityFrom(source, amount);
+    }
+
+    @Override
+    public void setFire(int seconds) {
+        if (!this.getGolemType().fireResist) {
+            super.setFire(seconds);
+        }
     }
 
     @Override
