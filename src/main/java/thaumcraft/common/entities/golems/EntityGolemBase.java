@@ -348,7 +348,7 @@ public class EntityGolemBase extends net.minecraft.entity.monster.EntityGolem im
     public boolean processInteract(net.minecraft.entity.player.EntityPlayer player, net.minecraft.util.EnumHand hand) {
         if (player.isSneaking()) return false;
         net.minecraft.item.ItemStack stack = player.getHeldItem(hand);
-        if (stack.isEmpty()) return this.customInteraction(player);
+        if (stack.isEmpty()) return this.customInteraction(player, stack, hand);
         if (this.getCore() == -1 && stack.getItem() instanceof thaumcraft.common.entities.golems.ItemGolemCore && stack.getItemDamage() != 100) {
             this.setCore((byte) stack.getItemDamage());
             this.setupGolem();
@@ -356,6 +356,7 @@ public class EntityGolemBase extends net.minecraft.entity.monster.EntityGolem im
             stack.shrink(1);
             this.world.playSound(null, this.getPosition(), TCSounds.UPGRADE, net.minecraft.util.SoundCategory.NEUTRAL, 0.5f, 1.0f);
             player.swingArm(hand);
+            this.world.setEntityState(this, (byte) 7);
             return true;
         }
         if (stack.getItem() instanceof thaumcraft.common.entities.golems.ItemGolemUpgrade) {
@@ -363,6 +364,7 @@ public class EntityGolemBase extends net.minecraft.entity.monster.EntityGolem im
                 if (this.getUpgrade(a) != -1 || this.getUpgradeAmount(stack.getItemDamage()) >= 2) continue;
                 this.setUpgrade(a, (byte) stack.getItemDamage());
                 this.setupGolem();
+                this.setupGolemInventory();
                 stack.shrink(1);
                 this.world.playSound(null, this.getPosition(), TCSounds.UPGRADE, net.minecraft.util.SoundCategory.NEUTRAL, 0.5f, 1.0f);
                 player.swingArm(hand);
@@ -370,17 +372,66 @@ public class EntityGolemBase extends net.minecraft.entity.monster.EntityGolem im
             }
             return false;
         }
-        return this.customInteraction(player);
+        return this.customInteraction(player, stack, hand);
     }
 
-    public boolean customInteraction(net.minecraft.entity.player.EntityPlayer player) {
+    public boolean customInteraction(net.minecraft.entity.player.EntityPlayer player, net.minecraft.item.ItemStack stack,
+                                     net.minecraft.util.EnumHand hand) {
+        if (!stack.isEmpty() && stack.getItem() == thaumcraft.common.config.ConfigItems.itemGolemBell) {
+            return false;
+        }
+        if (!stack.isEmpty() && stack.getItem() == thaumcraft.common.config.ConfigItems.itemGolemDecoration) {
+            boolean added = this.addDecoration(ItemGolemDecoration.getDecoChar(stack.getItemDamage()), stack);
+            if (added) {
+                player.swingArm(hand);
+            }
+            return added;
+        }
+        if (!stack.isEmpty() && stack.getItem() == net.minecraft.init.Items.WHEAT) {
+            if (!this.world.isRemote) {
+                stack.shrink(1);
+                this.heal(5.0F);
+                this.world.setEntityState(this, (byte) 5);
+                this.world.playSound(null, this.getPosition(), net.minecraft.init.SoundEvents.ENTITY_GENERIC_EAT,
+                        net.minecraft.util.SoundCategory.NEUTRAL, 0.3F, 0.9F + this.rand.nextFloat() * 0.2F);
+            }
+            player.swingArm(hand);
+            return true;
+        }
         if (this.getCore() > -1 && thaumcraft.common.entities.golems.ItemGolemCore.hasGUI(this.getCore())) {
+            if (!stack.isEmpty() && stack.getItem() instanceof thaumcraft.common.items.wands.ItemWandCasting) {
+                return false;
+            }
             if (!this.world.isRemote) {
                 player.openGui(thaumcraft.common.Thaumcraft.instance, thaumcraft.common.CommonProxy.GUI_GOLEM, this.world, this.getEntityId(), 0, 0);
             }
             return true;
         }
         return false;
+    }
+
+    protected boolean addDecoration(String type, net.minecraft.item.ItemStack stack) {
+        if (type == null || type.isEmpty() || this.decoration.contains(type)) {
+            return false;
+        }
+        if (("F".equals(type) || "H".equals(type)) && (this.decoration.contains("F") || this.decoration.contains("H"))) {
+            return false;
+        }
+        if (("G".equals(type) || "V".equals(type)) && (this.decoration.contains("G") || this.decoration.contains("V"))) {
+            return false;
+        }
+        if (("B".equals(type) || "P".equals(type)) && (this.decoration.contains("B") || this.decoration.contains("P"))) {
+            return false;
+        }
+        this.decoration = this.decoration + type;
+        if (!this.world.isRemote) {
+            this.setGolemDecoration(this.decoration);
+            stack.shrink(1);
+            this.world.playSound(null, this.getPosition(), TCSounds.CAMERACLACK,
+                    net.minecraft.util.SoundCategory.NEUTRAL, 1.0F, 1.0F);
+        }
+        this.setupGolem();
+        return true;
     }
 
     // --- Data watcher accessors ---

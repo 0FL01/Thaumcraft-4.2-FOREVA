@@ -15,16 +15,22 @@ public class Marker extends java.lang.Object {
     public boolean equals(Object o) {
         if (!(o instanceof Marker)) return false;
         Marker m = (Marker) o;
-        return this.x == m.x && this.y == m.y && this.z == m.z && this.dim == m.dim;
+        return this.x == m.x && this.y == m.y && this.z == m.z && this.dim == m.dim
+            && this.side == m.side && this.color == m.color;
     }
 
     @Override
     public int hashCode() {
-        return (this.x * 31 + this.y) * 31 + this.z;
+        int result = (this.x * 31 + this.y) * 31 + this.z;
+        result = result * 31 + this.dim;
+        result = result * 31 + this.side;
+        result = result * 31 + this.color;
+        return result;
     }
 
     public boolean equalsFuzzy(Marker m) {
         return this.x == m.x && this.y == m.y && this.z == m.z
-            && this.dim == m.dim && this.side == m.side && this.color == m.color;
+            && this.dim == m.dim && this.side == m.side
+            && (this.color == m.color || this.color == -1);
     }
 }

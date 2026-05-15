@@ -83,7 +83,7 @@ Client-only renderer/particle TODOs are Phase 8 dependencies. They are not count
 - `thaumcraft_src/thaumcraft/common/entities/golems/EntityGolemBase.class`
 
 **Что не совпадает:**
-Checkpoints 8.2.15 and 8.2.16 add `ConfigItems` fields/registrations for `itemGolemBell`, `itemGolemCore`, `itemGolemPlacer`, `itemGolemUpgrade`, `itemGolemDecoration`, and `itemTrunkSpawner`, restore the original metadata/subitem surface, and port the server-side golem/trunk item spawn paths. Remaining workflow gaps are bell marker/linking behavior, decoration/healing/wheat interactions, full trunk upgrade behavior, and runtime/manual placement evidence. Reference golem interaction code expects registered `ConfigItems.itemGolemBell`, `ConfigItems.itemGolemCore`, and `ConfigItems.itemGolemUpgrade` when applying cores/upgrades and bell workflows.
+Checkpoints 8.2.15 and 8.2.16 add `ConfigItems` fields/registrations for `itemGolemBell`, `itemGolemCore`, `itemGolemPlacer`, `itemGolemUpgrade`, `itemGolemDecoration`, and `itemTrunkSpawner`, restore the original metadata/subitem surface, and port the server-side golem/trunk item spawn paths. Checkpoint 8.2.17 restores bell link/marker editing, marker side/color identity, decoration application, wheat healing, and upgrade inventory refresh. Remaining workflow gaps are bell left-click pickup/packing behavior, full trunk upgrade behavior, and runtime/manual placement evidence.
 
 **Что нужно доделать:**
 Register the golem/trunk items with stable Thaumcraft names and port their server behavior so players can obtain, place, configure, and link golems/trunks.
@@ -1057,6 +1057,35 @@ Mapping:
 - Bell marker editing/linking, decoration application/removal, golem healing/wheat interaction, and full trunk upgrade behavior remain open Stage 6 work.
 - Runtime placement was not observed in a world because smoke-server remains environment-blocked and manual scenarios are excluded.
 - Client models/rendering for the placed golems/trunks remain Phase 8 work.
+
+### 8.2.17 Golem bell and decoration interaction checkpoint — 2026-05-15
+
+Статус: core bell marker/linking and basic golem right-click interactions restored; bell pickup remains open.
+
+Что сделано:
+
+- Restored marker equality/fuzzy matching to include side and color like the reference, allowing side-specific and colored marker behavior.
+- Ported `ItemGolemBell` golem linking via entity interaction, including marker copy, golem id, home coordinates, and home-facing NBT.
+- Ported bell block marker editing with order-upgrade color cycling, shift-remove behavior, stale-link cleanup, golem marker synchronization, and orb feedback sound.
+- Restored empty-marker reset behavior to write an empty marker list and clear the linked golem markers.
+- Restored golem decoration application with reference conflict groups, camera-clack sound, server stack consumption, decoration data sync, and golem setup refresh.
+- Restored wheat healing interaction and prevented bell/wand-held interactions from opening the golem GUI.
+- Restored upgrade inventory resize after applying upgrades and bootup status after applying a core.
+
+Проверки:
+
+- `./scripts/dev.sh compileJava` — passed.
+- `./scripts/dev.sh build` — passed.
+- `./scripts/dev.sh check-jar` — не дошел до jar inspection: отсутствует wrapper-ожидаемый MCP mapping cache `.gradle_home/caches/minecraft/de/oceanlabs/mcp/mcp_stable/39/1.12.2/srgs/mcp-srg.srg`.
+- `./scripts/dev.sh smoke-server` — timeout before ready state на уже задокументированном pre-Forge/log4j этапе; `run/crash-reports/` не существует, and the configured crash-marker scan found no matches.
+- `git diff --check` — passed.
+
+Оставшиеся ограничения:
+
+- `ItemGolemBell.onLeftClickEntity(...)` pickup/packing behavior for golems and traveling trunks is still open.
+- Full traveling trunk upgrade behavior remains open beyond the minimal placement/persistence route.
+- Runtime marker/deco/healing scenarios have not been observed because smoke-server remains environment-blocked and manual scenarios are excluded.
+- Client marker visuals and golem/trunk rendering remain Phase 8 work.
 
 ### 8.3 Minimal Stage 6 manual scenario matrix
 

@@ -2,14 +2,19 @@ package thaumcraft.common.entities.golems;
 
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.SoundEvents;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
+import net.minecraft.util.EnumActionResult;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.EnumHand;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.SoundCategory;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import thaumcraft.common.lib.CreativeTabThaumcraft;
 
@@ -48,11 +53,126 @@ public class ItemGolemBell extends Item {
         int id = getGolemId(stack);
         Entity entity = id >= 0 ? world.getEntityByID(id) : null;
         if (entity instanceof EntityGolemBase) {
-            if (stack.hasTagCompound()) {
-                stack.getTagCompound().removeTag("markers");
-            }
+            getOrCreateTag(stack).setTag("markers", new NBTTagList());
             ((EntityGolemBase) entity).setMarkers(new ArrayList<Marker>());
             world.playSound(null, player.getPosition(), SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP, SoundCategory.PLAYERS, 0.7F, 1.0F + world.rand.nextFloat() * 0.1F);
         }
+    }
+
+    public static void changeMarkers(ItemStack stack, EntityPlayer player, World world, BlockPos pos, EnumFacing side) {
+        Entity linked = null;
+        ArrayList<Marker> markers = getMarkers(stack);
+        boolean markMultipleColors = false;
+        int id = getGolemId(stack);
+        if (id > -1) {
+            linked = world.getEntityByID(id);
+            if (linked instanceof EntityGolemBase && ((EntityGolemBase) linked).getUpgradeAmount(4) > 0) {
+                markMultipleColors = true;
+            }
+        }
+
+        int index = -1;
+        int color = 0;
+        byte dim = (byte) world.provider.getDimension();
+        byte sideIndex = (byte) side.getIndex();
+        if (!markMultipleColors) {
+            index = markers.indexOf(new Marker(pos.getX(), pos.getY(), pos.getZ(), dim, sideIndex, (byte) -1));
+        } else {
+            for (int testColor = -1; testColor < 16; testColor++) {
+                index = markers.indexOf(new Marker(pos.getX(), pos.getY(), pos.getZ(), dim, sideIndex, (byte) testColor));
+                color = testColor;
+                if (index != -1) break;
+            }
+        }
+
+        boolean changed = true;
+        if (index >= 0) {
+            markers.remove(index);
+            if (markMultipleColors && !player.isSneaking() && ++color <= 15) {
+                markers.add(new Marker(pos.getX(), pos.getY(), pos.getZ(), dim, sideIndex, (byte) color));
+            }
+        } else {
+            markers.add(new Marker(pos.getX(), pos.getY(), pos.getZ(), dim, sideIndex, (byte) -1));
+        }
+
+        if (changed) {
+            getOrCreateTag(stack).setTag("markers", writeMarkers(markers));
+            if (id > -1) {
+                if (linked instanceof EntityGolemBase) {
+                    ((EntityGolemBase) linked).setMarkers(markers);
+                } else {
+                    clearLinkedGolem(stack);
+                }
+            }
+        }
+        world.playSound(null, pos, SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP, SoundCategory.BLOCKS, 0.7F, 1.0F + world.rand.nextFloat() * 0.1F);
+    }
+
+    @Override
+    public EnumActionResult onItemUseFirst(EntityPlayer player, World world, BlockPos pos, EnumFacing side,
+                                           float hitX, float hitY, float hitZ, EnumHand hand) {
+        ItemStack stack = player.getHeldItem(hand);
+        if (!world.isRemote && side != null) {
+            changeMarkers(stack, player, world, pos, side);
+        }
+        return EnumActionResult.SUCCESS;
+    }
+
+    @Override
+    public boolean itemInteractionForEntity(ItemStack stack, EntityPlayer player, EntityLivingBase target, EnumHand hand) {
+        if (!(target instanceof EntityGolemBase)) {
+            return false;
+        }
+        if (!target.world.isRemote) {
+            EntityGolemBase golem = (EntityGolemBase) target;
+            NBTTagCompound tag = getOrCreateTag(stack);
+            clearLinkedGolem(stack);
+            tag.setTag("markers", writeMarkers(golem.getMarkers()));
+            tag.setInteger("golemid", target.getEntityId());
+            BlockPos home = golem.getHomePosition();
+            tag.setInteger("golemhomex", home.getX());
+            tag.setInteger("golemhomey", home.getY());
+            tag.setInteger("golemhomez", home.getZ());
+            tag.setInteger("golemhomeface", golem.homeFacing);
+            target.world.playSound(null, target.getPosition(), SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP,
+                    SoundCategory.NEUTRAL, 0.7F, 1.0F + target.world.rand.nextFloat() * 0.1F);
+        }
+        player.swingArm(hand);
+        return true;
+    }
+
+    private static NBTTagCompound getOrCreateTag(ItemStack stack) {
+        if (!stack.hasTagCompound()) {
+            stack.setTagCompound(new NBTTagCompound());
+        }
+        return stack.getTagCompound();
+    }
+
+    private static NBTTagList writeMarkers(ArrayList<Marker> markers) {
+        NBTTagList tagList = new NBTTagList();
+        for (Marker marker : markers) {
+            NBTTagCompound tag = new NBTTagCompound();
+            tag.setInteger("x", marker.x);
+            tag.setInteger("y", marker.y);
+            tag.setInteger("z", marker.z);
+            tag.setInteger("dim", marker.dim);
+            tag.setByte("side", marker.side);
+            tag.setByte("color", marker.color);
+            tagList.appendTag(tag);
+        }
+        return tagList;
+    }
+
+    private static void clearLinkedGolem(ItemStack stack) {
+        if (!stack.hasTagCompound()) {
+            return;
+        }
+        NBTTagCompound tag = stack.getTagCompound();
+        tag.removeTag("golemid");
+        tag.removeTag("markers");
+        tag.removeTag("golemhomex");
+        tag.removeTag("golemhomey");
+        tag.removeTag("golemhomez");
+        tag.removeTag("golemhomeface");
     }
 }
