@@ -10,6 +10,7 @@ import thaumcraft.api.ThaumcraftApi;
 import thaumcraft.api.aspects.Aspect;
 import thaumcraft.api.aspects.AspectList;
 import thaumcraft.api.crafting.IArcaneRecipe;
+import thaumcraft.api.crafting.CrucibleRecipe;
 import thaumcraft.api.research.ResearchCategories;
 import thaumcraft.api.research.ResearchItem;
 import thaumcraft.api.research.ResearchPage;
@@ -21,6 +22,8 @@ public class ConfigResearch {
         initCategories();
         initBasicResearchBaseline();
         initBasicResearchProgressionBaseline();
+        initAlchemyResearchBaseline();
+        initArtificeResearchBaseline();
         initThaumaturgyResearchBaseline();
         initBasicResearchTextOnlyExtended();
         initThaumaturgyResearchTextOnlyBaseline();
@@ -281,6 +284,123 @@ public class ConfigResearch {
                 .setPages(new ResearchPage("tc.research_page.RESEARCHDUPE.1"))
                 .setRound()
                 .setParents("RESEARCHER2")
+                .registerResearchItem();
+    }
+
+    private static void initAlchemyResearchBaseline() {
+        new ResearchItem(
+                "PHIAL",
+                "ALCHEMY",
+                new AspectList(),
+                0,
+                -2,
+                0,
+                new ItemStack(ConfigItems.itemEssence, 1, 0))
+                .setPages(
+                        new ResearchPage("tc.research_page.PHIAL.1"),
+                        new ResearchPage((IRecipe) recipes.get("Phial")))
+                .setStub()
+                .setRound()
+                .setAutoUnlock()
+                .registerResearchItem();
+
+        new ResearchItem(
+                "CRUCIBLE",
+                "ALCHEMY",
+                new AspectList(),
+                0,
+                0,
+                0,
+                new ItemStack(ConfigBlocks.blockMetalDevice, 1, 0))
+                .setPages(
+                        new ResearchPage("tc.research_page.CRUCIBLE.1"),
+                        new ResearchPage("tc.research_page.CRUCIBLE.2"),
+                        new ResearchPage("tc.research_page.CRUCIBLE.3"),
+                        new ResearchPage((List<?>) recipes.get("Crucible")),
+                        new ResearchPage("tc.research_page.CRUCIBLE.4"),
+                        new ResearchPage("tc.research_page.CRUCIBLE.5"),
+                        new ResearchPage(new ItemStack(ConfigItems.itemShard, 1, 6)))
+                .setStub()
+                .setAutoUnlock()
+                .registerResearchItem();
+
+        new ResearchItem(
+                "NITOR",
+                "ALCHEMY",
+                new AspectList()
+                        .add(Aspect.LIGHT, 3)
+                        .add(Aspect.FIRE, 1),
+                2,
+                -1,
+                1,
+                new ItemStack(ConfigItems.itemResource, 1, 1))
+                .setPages(
+                        new ResearchPage("tc.research_page.NITOR.1"),
+                        new ResearchPage((CrucibleRecipe) recipes.get("Nitor")))
+                .setParents("CRUCIBLE")
+                .registerResearchItem();
+
+        new ResearchItem(
+                "ALUMENTUM",
+                "ALCHEMY",
+                new AspectList()
+                        .add(Aspect.ENERGY, 3)
+                        .add(Aspect.FIRE, 1),
+                2,
+                1,
+                1,
+                new ItemStack(ConfigItems.itemResource, 1, 0))
+                .setPages(
+                        new ResearchPage("tc.research_page.ALUMENTUM.1"),
+                        new ResearchPage((CrucibleRecipe) recipes.get("Alumentum")))
+                .setParents("CRUCIBLE")
+                .registerResearchItem();
+
+        new ResearchItem(
+                "DISTILESSENTIA",
+                "ALCHEMY",
+                new AspectList()
+                        .add(Aspect.MAGIC, 3)
+                        .add(Aspect.WATER, 3)
+                        .add(Aspect.SLIME, 3),
+                5,
+                -1,
+                1,
+                new ItemStack(ConfigBlocks.blockMetalDevice, 1, 1))
+                .setPages(
+                        new ResearchPage("tc.research_page.DISTILESSENTIA.1"),
+                        new ResearchPage((IArcaneRecipe) recipes.get("AlchemyFurnace")),
+                        new ResearchPage("tc.research_page.DISTILESSENTIA.2"),
+                        new ResearchPage((IArcaneRecipe) recipes.get("Filter")),
+                        new ResearchPage((IArcaneRecipe) recipes.get("Alembic")),
+                        new ResearchPage((IArcaneRecipe) recipes.get("AlchemicalConstruct")))
+                .setSiblings("JARLABEL")
+                .setParents("NITOR", "ALUMENTUM")
+                .registerResearchItem();
+    }
+
+    private static void initArtificeResearchBaseline() {
+        new ResearchItem(
+                "INFUSION",
+                "ARTIFICE",
+                new AspectList()
+                        .add(Aspect.MAGIC, 6)
+                        .add(Aspect.MECHANISM, 3)
+                        .add(Aspect.CRAFT, 6),
+                -4,
+                5,
+                2,
+                new ItemStack(ConfigBlocks.blockStoneDevice, 1, 2))
+                .setPages(
+                        new ResearchPage("tc.research_page.INFUSION.1"),
+                        new ResearchPage((IArcaneRecipe) recipes.get("InfusionMatrix")),
+                        new ResearchPage((IArcaneRecipe) recipes.get("ArcanePedestal")),
+                        new ResearchPage("tc.research_page.INFUSION.2"),
+                        new ResearchPage("tc.research_page.INFUSION.3"),
+                        new ResearchPage("tc.research_page.INFUSION.4"),
+                        new ResearchPage("tc.research_page.INFUSION.5"))
+                .setParents("DISTILESSENTIA")
+                .setConcealed()
                 .registerResearchItem();
     }
 

@@ -17,6 +17,7 @@ import net.minecraftforge.registries.IForgeRegistry;
 import thaumcraft.api.ThaumcraftApi;
 import thaumcraft.api.aspects.Aspect;
 import thaumcraft.api.aspects.AspectList;
+import thaumcraft.api.crafting.CrucibleRecipe;
 import thaumcraft.api.wands.WandCap;
 import thaumcraft.api.wands.WandRod;
 import thaumcraft.common.lib.crafting.ArcaneSceptreRecipe;
@@ -42,6 +43,8 @@ public class ConfigRecipes {
     private static IRecipe recipeThaumometer;
     private static IRecipe recipeWandCapIron;
     private static IRecipe recipeWandBasic;
+    private static CrucibleRecipe recipeNitor;
+    private static CrucibleRecipe recipeAlumentum;
 
     public static void init() {
         ConfigResearch.recipes.clear();
@@ -51,6 +54,7 @@ public class ConfigRecipes {
         initializeInfusionFocusDeviceRecipeBaseline();
         initializeInfusionGolemDeviceRecipeBaseline();
         initializeInfusionEquipmentArmorRecipeBaseline();
+        initializeCrucibleRecipeBaseline();
         if (recipeArcaneStone2 != null) {
             ConfigResearch.recipes.put("ArcaneStone2", recipeArcaneStone2);
         }
@@ -96,6 +100,12 @@ public class ConfigRecipes {
         if (recipeWandBasic != null) {
             ConfigResearch.recipes.put("WandBasic", recipeWandBasic);
         }
+        if (recipeNitor != null) {
+            ConfigResearch.recipes.put("Nitor", recipeNitor);
+        }
+        if (recipeAlumentum != null) {
+            ConfigResearch.recipes.put("Alumentum", recipeAlumentum);
+        }
         ItemStack basicWand = new ItemStack(ConfigItems.itemWandCasting, 1, 0);
         ConfigResearch.recipes.put("Thaumonomicon",
                 Arrays.asList(new AspectList(), 1, 2, 1,
@@ -133,6 +143,20 @@ public class ConfigRecipes {
         if (!hasRunicAugment) {
             ThaumcraftApi.getCraftingRecipes().add(new InfusionRunicAugmentRecipe());
         }
+    }
+
+    private static void initializeCrucibleRecipeBaseline() {
+        recipeAlumentum = ThaumcraftApi.addCrucibleRecipe(
+                "ALUMENTUM",
+                new ItemStack(ConfigItems.itemResource, 1, 0),
+                new ItemStack(Items.COAL, 1, OreDictionary.WILDCARD_VALUE),
+                new AspectList().merge(Aspect.ENERGY, 3).merge(Aspect.FIRE, 3).merge(Aspect.ENTROPY, 3));
+
+        recipeNitor = ThaumcraftApi.addCrucibleRecipe(
+                "NITOR",
+                new ItemStack(ConfigItems.itemResource, 1, 1),
+                "dustGlowstone",
+                new AspectList().merge(Aspect.ENERGY, 3).merge(Aspect.FIRE, 3).merge(Aspect.LIGHT, 3));
     }
 
     private static void initializeArcaneRecipeBaseline() {
