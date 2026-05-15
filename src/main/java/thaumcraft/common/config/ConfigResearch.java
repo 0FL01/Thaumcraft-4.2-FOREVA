@@ -1086,6 +1086,66 @@ public class ConfigResearch {
                 .setConcealed()
                 .setSecondary()
                 .registerResearchItem();
+
+        new ResearchItem(
+                "BOOTSTRAVELLER",
+                "ARTIFICE",
+                new AspectList()
+                        .add(Aspect.TRAVEL, 3)
+                        .add(Aspect.EARTH, 3)
+                        .add(Aspect.FLIGHT, 3)
+                        .add(Aspect.WATER, 3),
+                -1,
+                5,
+                2,
+                new ItemStack(ConfigItems.itemBootsTraveller))
+                .setPages(
+                        new ResearchPage("tc.research_page.BOOTSTRAVELLER.1"),
+                        new ResearchPage((InfusionRecipe) recipes.get("BootsTraveller")))
+                .setParents("ENCHFABRIC", "INFUSION")
+                .setConcealed()
+                .registerResearchItem();
+
+        new ResearchItem(
+                "HOVERHARNESS",
+                "ARTIFICE",
+                new AspectList()
+                        .add(Aspect.FLIGHT, 6)
+                        .add(Aspect.TRAVEL, 6)
+                        .add(Aspect.AIR, 6)
+                        .add(Aspect.MECHANISM, 3),
+                1,
+                7,
+                3,
+                new ItemStack(ConfigItems.itemHoverHarness))
+                .setPages(
+                        new ResearchPage("tc.research_page.HOVERHARNESS.1"),
+                        new ResearchPage((InfusionRecipe) recipes.get("HoverHarness")),
+                        new ResearchPage("tc.research_page.HOVERHARNESS.2"))
+                .setParents("BOOTSTRAVELLER")
+                .setConcealed()
+                .registerResearchItem();
+
+        new ResearchItem(
+                "HOVERGIRDLE",
+                "ARTIFICE",
+                new AspectList()
+                        .add(Aspect.FLIGHT, 6)
+                        .add(Aspect.TRAVEL, 3)
+                        .add(Aspect.AIR, 3)
+                        .add(Aspect.MOTION, 6),
+                2,
+                7,
+                3,
+                new ItemStack(ConfigItems.itemGirdleHover))
+                .setPages(
+                        new ResearchPage("tc.research_page.HOVERGIRDLE.1"),
+                        new ResearchPage((InfusionRecipe) recipes.get("HoverGirdle")))
+                .setHidden()
+                .setAspectTriggers(Aspect.FLIGHT)
+                .setParents("HOVERHARNESS")
+                .setSecondary()
+                .registerResearchItem();
     }
 
     private static void initThaumaturgyResearchBaseline() {
