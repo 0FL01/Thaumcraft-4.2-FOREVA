@@ -845,6 +845,171 @@ public class ConfigResearch {
                         new ResearchPage((InfusionRecipe) recipes.get("WandRodSilverwood")))
                 .setParents("ROD_greatwood", "INFUSION")
                 .registerResearchItem();
+
+        new ResearchItem(
+                "ROD_greatwood_staff",
+                "THAUMATURGY",
+                new AspectList()
+                        .add(Aspect.TOOL, 3)
+                        .add(Aspect.TREE, 6)
+                        .add(Aspect.MAGIC, 3),
+                -1,
+                7,
+                1,
+                new ItemStack(ConfigItems.itemWandRod, 1, 50))
+                .setPages(
+                        new ResearchPage("tc.research_page.ROD_greatwood_staff.1"),
+                        new ResearchPage("tc.research_page.ROD_greatwood_staff.2"),
+                        new ResearchPage((IArcaneRecipe) recipes.get("WandRodGreatwoodStaff")))
+                .setParents("ROD_silverwood")
+                .registerResearchItem();
+
+        new ResearchItem(
+                "ROD_reed_staff",
+                "THAUMATURGY",
+                new AspectList()
+                        .add(Aspect.TOOL, 3)
+                        .add(Aspect.AIR, 6)
+                        .add(Aspect.PLANT, 3)
+                        .add(Aspect.MAGIC, 3),
+                -5,
+                -2,
+                2,
+                new ItemStack(ConfigItems.itemWandRod, 1, 55))
+                .setPages(
+                        new ResearchPage("tc.research_page.ROD_reed_staff.1"),
+                        new ResearchPage((IArcaneRecipe) recipes.get("WandRodReedStaff")))
+                .setSecondary()
+                .setConcealed()
+                .setParents("ROD_reed")
+                .setParentsHidden("ROD_greatwood_staff")
+                .registerResearchItem();
+
+        new ResearchItem(
+                "ROD_blaze_staff",
+                "THAUMATURGY",
+                new AspectList()
+                        .add(Aspect.TOOL, 3)
+                        .add(Aspect.FIRE, 6)
+                        .add(Aspect.ENERGY, 3)
+                        .add(Aspect.MAGIC, 3),
+                -8,
+                -1,
+                2,
+                new ItemStack(ConfigItems.itemWandRod, 1, 56))
+                .setPages(
+                        new ResearchPage("tc.research_page.ROD_blaze_staff.1"),
+                        new ResearchPage((IArcaneRecipe) recipes.get("WandRodBlazeStaff")))
+                .setSecondary()
+                .setConcealed()
+                .setParents("ROD_blaze")
+                .setParentsHidden("ROD_greatwood_staff")
+                .registerResearchItem();
+
+        new ResearchItem(
+                "ROD_obsidian_staff",
+                "THAUMATURGY",
+                new AspectList()
+                        .add(Aspect.TOOL, 3)
+                        .add(Aspect.EARTH, 6)
+                        .add(Aspect.FIRE, 3)
+                        .add(Aspect.MAGIC, 3),
+                -9,
+                2,
+                2,
+                new ItemStack(ConfigItems.itemWandRod, 1, 51))
+                .setPages(
+                        new ResearchPage("tc.research_page.ROD_obsidian_staff.1"),
+                        new ResearchPage((IArcaneRecipe) recipes.get("WandRodObsidianStaff")))
+                .setSecondary()
+                .setConcealed()
+                .setParents("ROD_obsidian")
+                .setParentsHidden("ROD_greatwood_staff")
+                .registerResearchItem();
+
+        new ResearchItem(
+                "ROD_ice_staff",
+                "THAUMATURGY",
+                new AspectList()
+                        .add(Aspect.TOOL, 3)
+                        .add(Aspect.COLD, 6)
+                        .add(Aspect.WATER, 3)
+                        .add(Aspect.MAGIC, 3),
+                -8,
+                5,
+                2,
+                new ItemStack(ConfigItems.itemWandRod, 1, 53))
+                .setPages(
+                        new ResearchPage("tc.research_page.ROD_ice_staff.1"),
+                        new ResearchPage((IArcaneRecipe) recipes.get("WandRodIceStaff")))
+                .setSecondary()
+                .setConcealed()
+                .setParents("ROD_ice")
+                .setParentsHidden("ROD_greatwood_staff")
+                .registerResearchItem();
+
+        new ResearchItem(
+                "ROD_quartz_staff",
+                "THAUMATURGY",
+                new AspectList()
+                        .add(Aspect.TOOL, 3)
+                        .add(Aspect.ORDER, 6)
+                        .add(Aspect.CRYSTAL, 3)
+                        .add(Aspect.MAGIC, 3),
+                -4,
+                6,
+                2,
+                new ItemStack(ConfigItems.itemWandRod, 1, 54))
+                .setPages(
+                        new ResearchPage("tc.research_page.ROD_quartz_staff.1"),
+                        new ResearchPage((IArcaneRecipe) recipes.get("WandRodQuartzStaff")))
+                .setSecondary()
+                .setConcealed()
+                .setParents("ROD_quartz")
+                .setParentsHidden("ROD_greatwood_staff")
+                .registerResearchItem();
+
+        new ResearchItem(
+                "ROD_bone_staff",
+                "THAUMATURGY",
+                new AspectList()
+                        .add(Aspect.TOOL, 3)
+                        .add(Aspect.ENTROPY, 6)
+                        .add(Aspect.UNDEAD, 3)
+                        .add(Aspect.MAGIC, 3),
+                -2,
+                -1,
+                2,
+                new ItemStack(ConfigItems.itemWandRod, 1, 57))
+                .setPages(
+                        new ResearchPage("tc.research_page.ROD_bone_staff.1"),
+                        new ResearchPage((IArcaneRecipe) recipes.get("WandRodBoneStaff")))
+                .setSecondary()
+                .setConcealed()
+                .setParents("ROD_bone")
+                .setParentsHidden("ROD_greatwood_staff")
+                .registerResearchItem();
+        ThaumcraftApi.addWarpToResearch("ROD_bone_staff", 1);
+
+        new ResearchItem(
+                "ROD_silverwood_staff",
+                "THAUMATURGY",
+                new AspectList()
+                        .add(Aspect.TOOL, 6)
+                        .add(Aspect.TREE, 6)
+                        .add(Aspect.MAGIC, 9),
+                -1,
+                5,
+                3,
+                new ItemStack(ConfigItems.itemWandRod, 1, 52))
+                .setPages(
+                        new ResearchPage("tc.research_page.ROD_silverwood_staff.1"),
+                        new ResearchPage((IArcaneRecipe) recipes.get("WandRodSilverwoodStaff")))
+                .setSecondary()
+                .setConcealed()
+                .setParents("ROD_silverwood")
+                .setParentsHidden("ROD_greatwood_staff")
+                .registerResearchItem();
     }
 
     private static void initBasicResearchTextOnlyExtended() {
