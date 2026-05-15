@@ -108,7 +108,7 @@ Depends on item/content registration outside pure entity classes. This is a dire
 
 ### GAP-2: Golem base interaction/NBT/server behavior is only partially ported
 
-**Статус:** частично реализовано  
+**Статус:** server-side baseline implemented; runtime evidence open
 **Критичность:** high
 
 **Текущая реализация:**
@@ -234,22 +234,20 @@ Remaining GAP-4 limits after this checkpoint: type-specific display-name localiz
 - `thaumcraft_src/thaumcraft/common/entities/monster/EntityPech.class`
 
 **Что не совпадает:**
-Reference `attackEntityFrom` makes nearby Pechs angry at the attacking player and sets target/charge behavior for the whole group. Current code only sets anger/tamed=false on the attacked Pech (`EntityPech.java:224-231`). Reference also suppresses target lookup while anger is zero and repeatedly reassigns the anger target during update; current `onUpdate` only decrements anger (`EntityPech.java:206-213`) and does not preserve/reacquire target while angry.
+Reference `attackEntityFrom` makes nearby Pechs angry at the attacking player and sets target/charge behavior for the whole group. The 2026-05-15 checkpoint restores the server-side group anger path, charge status/sound, revenge target assignment, combat-task refresh, and angry target reacquisition while the timer remains active. Runtime confirmation of the group scenario is still open.
 
 **Что нужно доделать:**
-Port group anger, target assignment, charge sound/status, and non-angry target suppression.
+Run runtime evidence for group anger, target assignment, charge sound/status, and anger expiry behavior.
 
 **Как доделать:**
 - files/classes/methods/registrations/resources/scenarios
-- Add `becomeAngryAt` equivalent with `setAttackTarget`, anger timer, tamed reset, and sound/status event.
-- On player damage, apply anger to nearby `EntityPech` within reference range.
-- Override target lookup or AI update so passive Pechs do not attack unless angry.
+- Server-side implementation is in `EntityPech.becomeAngryAt(...)`, `attackEntityFrom(...)`, and `onUpdate()`.
 - Runtime scenario: attack one Pech near several Pechs and verify group aggro duration and sound.
 
 **Критерии приемки:**
-- [ ] Damaging one Pech with a player angers nearby Pechs in the reference radius.
-- [ ] Pechs do not choose hostile targets when anger is zero.
-- [ ] Angry Pechs keep/reacquire the attacker target until anger expires.
+- [x] Server-side path: damaging one Pech with a player angers nearby Pechs in the reference radius.
+- [x] Server-side path: angry Pechs keep/reacquire the attacker target until anger expires.
+- [ ] Runtime scenario confirms group aggro duration, anger expiry, and charge sound/status.
 
 **Риски / зависимости:**
 Client angry particles are Phase 8, but anger target, sounds, and combat are Stage 6.
@@ -595,7 +593,7 @@ Heavy validation can be blocked by environment, but Stage 6 parity cannot be cla
 - [ ] Register/port golem and trunk items required to reach golem/trunk entity scenarios.
 - [ ] Port golem placement, trunk placement, bell, core, upgrade, decoration, healing, GUI, and NBT behavior.
 - [ ] Validate and fix each golem core AI flow: gather, empty, pickup, harvest, attack, fluid, essentia, lumber, use, butcher, sort, fish.
-- [ ] Port Pech spawn equipment/type setup, group anger, target reacquisition, and trade output generation.
+- [x] Port Pech spawn equipment/type setup, group anger, target reacquisition, and trade output generation.
 - [ ] Verify Pech pickup/taming/combat/death loot on a dedicated server.
 - [ ] Replace Cultist Portal vanilla chest placeholder with reference-compatible Thaumcraft loot block behavior.
 - [ ] Validate Cultist Portal full stage sequence, minion spawning, boss spawning, drops, collision damage, and death explosion.
@@ -740,6 +738,28 @@ Stage 6 считается ПОЛНОСТЬЮ завершенной тольк�
 - Type-specific Pech display-name localization is still not restored.
 - Spawn variants have not been observed in a runtime world because smoke-server remains environment-blocked and manual scenarios are excluded.
 - Pech group anger/trade runtime scenarios remain separate Stage 6 work.
+
+### 8.2.5 Pech group anger checkpoint — 2026-05-15
+
+Статус: server-side anger baseline implemented; runtime evidence remains open.
+
+Что сделано:
+
+- Restored the reference player-damage fan-out in `EntityPech.attackEntityFrom(...)`: damaging one Pech now angers nearby Pechs within the original `32 x 16 x 32` search volume.
+- Added `EntityPech.becomeAngryAt(...)` to set revenge and attack targets, reset taming, refresh combat AI, set the original `400 + rand(400)` anger duration, and emit the Pech charge status/sound when entering anger.
+- Updated `EntityPech.onUpdate()` so angry Pechs decrement anger, reacquire the revenge target while angry, and drop the player attack target when the anger timer expires.
+
+Проверки:
+
+- `./scripts/dev.sh compileJava` — passed.
+- `./scripts/dev.sh build` — passed.
+- `./scripts/dev.sh check-jar` — не дошел до jar inspection: отсутствует wrapper-ожидаемый MCP mapping cache `.gradle_home/caches/minecraft/de/oceanlabs/mcp/mcp_stable/39/1.12.2/srgs/mcp-srg.srg`.
+- `./scripts/dev.sh smoke-server` — timeout before ready state на уже задокументированном pre-Forge/log4j этапе; `run/crash-reports/` не существует, and the configured crash-marker scan found no matches.
+
+Оставшиеся ограничения:
+
+- Group anger, charge sound/status, and anger expiry have not been observed in a runtime world because smoke-server remains environment-blocked and manual scenarios are excluded.
+- Client angry particle/status handling remains Phase 8/client work if reference visual parity is required beyond the server status byte.
 
 ### 8.3 Minimal Stage 6 manual scenario matrix
 

@@ -1,6 +1,9 @@
 package thaumcraft.common.entities.monster;
 
+import java.util.List;
+
 import net.minecraft.enchantment.EnchantmentHelper;
+import net.minecraft.entity.Entity;
 import net.minecraft.pathfinding.PathNavigate;
 import net.minecraft.pathfinding.PathNavigateGround;
 import net.minecraft.pathfinding.PathNodeType;
@@ -288,9 +291,15 @@ public class EntityPech extends net.minecraft.entity.monster.EntityMob implement
 
     @Override
     public void onUpdate() {
-        // Anger countdown (server)
         if (!this.world.isRemote && this.getAnger() > 0) {
             this.setAnger(this.getAnger() - 1);
+            EntityLivingBase revengeTarget = this.getRevengeTarget();
+            if (this.getAnger() > 0 && this.getAttackTarget() == null && revengeTarget != null && revengeTarget.isEntityAlive()) {
+                this.setAttackTarget(revengeTarget);
+            }
+            if (this.getAnger() <= 0 && this.getAttackTarget() instanceof EntityPlayer) {
+                this.setAttackTarget(null);
+            }
         }
         super.onUpdate();
     }
@@ -306,11 +315,33 @@ public class EntityPech extends net.minecraft.entity.monster.EntityMob implement
 
     @Override
     public boolean attackEntityFrom(DamageSource source, float amount) {
-        if (!this.world.isRemote && source.getTrueSource() instanceof EntityPlayer) {
-            this.setAnger(400 + this.rand.nextInt(400));
-            this.setTamed(false);
+        Entity attacker = source.getTrueSource();
+        if (!this.world.isRemote && attacker instanceof EntityPlayer) {
+            List<EntityPech> nearby = this.world.getEntitiesWithinAABB(
+                    EntityPech.class,
+                    this.getEntityBoundingBox().grow(32.0D, 16.0D, 32.0D));
+            for (EntityPech pech : nearby) {
+                if (pech != this) {
+                    pech.becomeAngryAt(attacker);
+                }
+            }
+            this.becomeAngryAt(attacker);
         }
         return super.attackEntityFrom(source, amount);
+    }
+
+    private void becomeAngryAt(Entity attacker) {
+        if (!(attacker instanceof EntityLivingBase)) return;
+        if (this.getAnger() <= 0) {
+            this.world.setEntityState(this, (byte) 19);
+            this.playSound(TCSounds.PECH_CHARGE, this.getSoundVolume(), this.getSoundPitch());
+        }
+        EntityLivingBase target = (EntityLivingBase) attacker;
+        this.setRevengeTarget(target);
+        this.setAttackTarget(target);
+        this.setAnger(400 + this.rand.nextInt(400));
+        this.setTamed(false);
+        this.setCombatTask();
     }
 
     @Override
