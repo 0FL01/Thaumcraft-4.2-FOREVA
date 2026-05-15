@@ -294,10 +294,10 @@ Remaining GAP-4 limits after this checkpoint: key-room generation has not been o
 - `thaumcraft_src/thaumcraft/common/lib/world/dim/MazeHandler.class`
 
 **Что не совпадает:**
-Static comparison shows a plausible 1.12.2 adaptation, but no evidence that a new world reaches ready state, an Outer Lands dimension loads, chunks populate, or maze rooms generate without crashes. PRD explicitly lists this as a known risk: `docs/PRD.md:352-356`. The 2026-05-15 worldgen ownership checkpoint restores the reference ownership path: `ChunkProviderOuter.populate(...)` runs biome decoration, then Forge 1.12.2 `Chunk.populate(...)` calls `GameRegistry.generateWorld(...)`, and `ThaumcraftWorldGenerator.worldGeneration(...)` runs `MazeHandler.generateEldritch(...)` for `Config.dimensionOuterId`. The 2026-05-15 provider spawn checkpoint restores the reference top-block spawn-coordinate test and average ground level `50`. This adaptation still needs runtime proof.
+Static comparison shows a plausible 1.12.2 adaptation, and the 2026-05-15 server smoke evidence now proves the dedicated server reaches ready state with Stage 7 registration/worldgen code loaded. There is still no evidence that an Outer Lands dimension loads, chunks populate, or maze rooms generate without crashes. PRD explicitly lists this as a known risk: `docs/PRD.md:352-356`. The 2026-05-15 worldgen ownership checkpoint restores the reference ownership path: `ChunkProviderOuter.populate(...)` runs biome decoration, then Forge 1.12.2 `Chunk.populate(...)` calls `GameRegistry.generateWorld(...)`, and `ThaumcraftWorldGenerator.worldGeneration(...)` runs `MazeHandler.generateEldritch(...)` for `Config.dimensionOuterId`. The 2026-05-15 provider spawn checkpoint restores the reference top-block spawn-coordinate test and average ground level `50`. This adaptation still needs in-world runtime proof.
 
 **Что нужно доделать:**
-Run and document dedicated runtime scenarios after code gaps are closed: server smoke, new world generation, entering Outer Lands, forced chunk population around a maze, save/reload, and portal return.
+Run and document dedicated runtime scenarios after code gaps are closed: new world generation, entering Outer Lands, forced chunk population around a maze, save/reload, and portal return.
 
 **Как доделать:**
 - Run `./scripts/dev.sh compileJava` after implementation changes.
@@ -306,7 +306,7 @@ Run and document dedicated runtime scenarios after code gaps are closed: server 
 - Inspect `run/smoke-server.log` for crash markers listed in `AGENTS.md`.
 
 **Критерии приемки:**
-- [ ] Server smoke reaches `Done (` with no new crash report.
+- [x] Server smoke reaches `Done (` with no new crash report.
 - [ ] New world generates Thaumcraft ores/trees/structures without chunk population crash.
 - [ ] Outer Lands dimension loads and populates at least portal, passage, key/nest/library/boss room cell types.
 - [ ] Save/reload preserves maze cells and previously generated rooms.
@@ -325,7 +325,7 @@ Validation:
 - `./scripts/dev.sh smoke-server` — timeout before ready state на уже задокументированном pre-Forge/log4j этапе; `run/crash-reports/` не существует, and the configured crash-marker scan found no matches.
 - `git diff --check` — passed.
 
-Remaining GAP-5 limits after this checkpoint: actual Outer Lands load, spawn fallback behavior, chunk population, save/reload, and traversal remain unavailable while smoke-server is blocked before ready state and manual scenarios are excluded.
+Remaining GAP-5 limits after this checkpoint: actual Outer Lands load, spawn fallback behavior, chunk population, save/reload, and traversal remained unavailable; the later 2026-05-15 server smoke evidence below supersedes the old smoke-blocked status but does not cover manual scenarios.
 
 **Checkpoint 2026-05-15 — Outer Lands worldgen ownership:**
 `ChunkProviderOuter.populate(...)` no longer calls `MazeHandler.generateEldritch(...)` with provider-local population RNG. `ThaumcraftWorldGenerator.worldGeneration(...)` now always handles `Config.dimensionOuterId` chunks, including new chunks and retrogen, matching the reference path where the Forge worldgen hook owns Outer Lands room generation and marks the chunk dirty afterward.
@@ -337,7 +337,12 @@ Validation:
 - `./scripts/dev.sh smoke-server` — timeout before ready state на уже задокументированном pre-Forge/log4j этапе; `run/crash-reports/` не существует, and the configured crash-marker scan found no matches.
 - `git diff --check` — passed.
 
-Remaining GAP-5 limits after this checkpoint: room generation is statically back on the reference ownership path, but actual Outer Lands load, chunk population, save/reload, and traversal remain unavailable while smoke-server is blocked before ready state and manual scenarios are excluded.
+Remaining GAP-5 limits after this checkpoint: room generation is statically back on the reference ownership path, but actual Outer Lands load, chunk population, save/reload, and traversal remain unavailable; the later 2026-05-15 server smoke evidence below supersedes the old smoke-blocked status but does not cover manual scenarios.
+
+**Checkpoint 2026-05-15 — Stage 7 server smoke evidence:**
+The latest non-GUI validation now proves server-load readiness for the Stage 7 common/worldgen baseline. `./scripts/dev.sh validate --smoke` passed during the Pure Fluid checkpoint, and `run/smoke-server.log` contained `Registering entities` at line `108`, `Forge Mod Loader has successfully loaded 6 mods` at line `126`, and `Done (1.117s)!` at line `138`. The configured crash-marker scan found no crash markers, and `find run -maxdepth 2 ... crash reports ...` returned no files.
+
+Remaining GAP-5 limits after this evidence checkpoint: this only validates server load/ready state. Actual fresh-world worldgen distribution, Outer Lands dimension entry, chunk population around mazes, room traversal, `labyrinth.dat` save/reload behavior, and portal return remain open because user-driven/manual scenarios are excluded from the current automation scope.
 
 ### GAP-6: Maze persistence and async generation can race with save/load and teleport
 
@@ -632,7 +637,7 @@ Remaining GAP-11 limits after this checkpoint: the mound block shell is a compac
 - [ ] GAP-11 closed: hilltop altar and mound/barrow Overworld structures have reference-like validation, blocks, spawners, and populated loot.
 - [ ] `rg -n "TODO|TBD|placeholder|Replace with|return null|no-op" src/main/java/thaumcraft/common/lib/world src/main/java/thaumcraft/common/lib/world/dim src/main/java/thaumcraft/common/blocks/BlockEldritchPortal.java` reviewed with no unresolved Stage 7 gameplay stubs.
 - [ ] `./scripts/dev.sh compileJava` passes after implementation work.
-- [ ] `./scripts/dev.sh smoke-server` passes after implementation work.
+- [x] `./scripts/dev.sh validate --smoke` passes after implementation work, including server ready state.
 - [ ] Manual Stage 7 smoke notes include new world generation, Eldritch ring, hilltop altar, mound/barrow, normal/spider Greatwood, portal entry, maze traversal, save/reload, and portal return.
 
 ## 7. Definition of Done

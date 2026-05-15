@@ -1700,6 +1700,24 @@ Remaining limits:
 
 - This only validates mod load/entity-registration readiness. Stage 6 spawn, combat, AI, drops, GUI, and save/reload rows remain TODO because user-driven manual scenarios are out of scope.
 
+### 2026-05-15 — Stage 7 server smoke evidence
+
+Scope:
+
+- Recorded the latest non-GUI runtime evidence against Stage 7 GAP-5 now that `validate --smoke` reaches server readiness.
+- Marked only the server-load smoke acceptance item as satisfied, without closing Stage 7 worldgen, Outer Lands traversal, room generation, or save/reload parity.
+
+Validation:
+
+- Evidence source was the latest `./scripts/dev.sh validate --smoke` run from the Pure Fluid checkpoint.
+- `run/smoke-server.log` contained `Registering entities` at line `108`, `Forge Mod Loader has successfully loaded 6 mods` at line `126`, and `Done (1.117s)!` at line `138`.
+- The configured crash-marker scan found no crash markers and `find run -maxdepth 2 ... crash reports ...` returned no files.
+
+Remaining limits:
+
+- Stage 7 manual scenarios remain open: fresh-world worldgen distribution, Eldritch ring/portal entry, Outer Lands chunk population, maze traversal, `labyrinth.dat` save/reload, and portal return.
+- This checkpoint does not close Stage 7 GAP-5 because the user-driven/manual worldgen and traversal scenarios remain outside the current automation scope.
+
 ## Next Checkpoint Candidate
 
 After the golem carried-display, trunk transfer, death logging, fire-resistance, armor, water-pathing, no-drowning, melee-enchantment, upgrade-retaliation, target-range, animal-target-filter, butcher-acquisition, item-pickup-delay, essentia-jar-destination, liquid-target-tank, portal-support, outer-provider-spawn, outer-structure-query, outer-worldgen-ownership, Stage7-docs-refresh, hover-motion, biome policy, and Greatwood-support checkpoints, the next pre-Phase8 candidates are:
