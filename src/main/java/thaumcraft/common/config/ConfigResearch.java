@@ -7,6 +7,7 @@ import java.util.Map;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.nbt.NBTTagByte;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.util.ResourceLocation;
@@ -849,6 +850,32 @@ public class ConfigResearch {
                         new ResearchPage("tc.research_page.RUNICAUGMENTATION.2"))
                 .setParents("RUNICARMOR")
                 .setConcealed()
+                .registerResearchItem();
+
+        ArrayList<IArcaneRecipe> bannerRecipes = new ArrayList<>();
+        for (int a = 0; a < 16; ++a) {
+            bannerRecipes.add((IArcaneRecipe) recipes.get("Banner_" + a));
+        }
+        ItemStack bannerAnchor = new ItemStack(ConfigBlocks.blockWoodenDevice, 1, 8);
+        bannerAnchor.setTagCompound(new NBTTagCompound());
+        bannerAnchor.getTagCompound().setByte("color", (byte) 10);
+        new ResearchItem(
+                "BANNERS",
+                "ARTIFICE",
+                new AspectList()
+                        .add(Aspect.SENSES, 3)
+                        .add(Aspect.CLOTH, 3)
+                        .add(Aspect.MAGIC, 1),
+                4,
+                8,
+                1,
+                bannerAnchor)
+                .setPages(
+                        new ResearchPage("tc.research_page.BANNERS.1"),
+                        new ResearchPage(bannerRecipes.toArray(new IArcaneRecipe[0])))
+                .setHidden()
+                .setItemTriggers(new ItemStack(ConfigBlocks.blockWoodenDevice, 1, 8))
+                .setSecondary()
                 .registerResearchItem();
 
         new ResearchItem(
