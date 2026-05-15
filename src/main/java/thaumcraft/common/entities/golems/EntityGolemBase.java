@@ -646,6 +646,10 @@ public class EntityGolemBase extends net.minecraft.entity.monster.EntityGolem im
     public boolean isValidTarget(net.minecraft.entity.Entity target) {
         if (!target.isEntityAlive()) return false;
         if (target instanceof net.minecraft.entity.player.EntityPlayer && ((net.minecraft.entity.player.EntityPlayer)target).getName().equals(this.getOwnerName())) return false;
+        if (!this.isWithinHomeDistanceFromPosition(
+                net.minecraft.util.math.MathHelper.floor(target.posX),
+                net.minecraft.util.math.MathHelper.floor(target.posY),
+                net.minecraft.util.math.MathHelper.floor(target.posZ))) return false;
         if (this.getCore() == 9) {
             if ((target instanceof net.minecraft.entity.passive.EntityAnimal || target instanceof net.minecraft.entity.passive.IAnimals)
                 && !(target instanceof net.minecraft.entity.monster.IMob)) return true;

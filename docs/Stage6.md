@@ -122,7 +122,7 @@ Depends on item/content registration outside pure entity classes. This is a dire
 - `thaumcraft_src/thaumcraft/common/entities/golems/EntityGolemBase.class`
 
 **Что не совпадает:**
-Reference behavior includes inactive state from the pedestal/cosmetic block under the golem, bootup sounds/status, fire resistance override, armor calculation, material-dependent water pathing, no-drowning air handling, melee enchantment callbacks, upgrade retaliation, death logging, bell/deco/wheat interactions, fluid-carried NBT for fluid cores, GUI blocking while holding wand, setup inventory after upgrades, spawn data reconstruction, and item/bell constants through `ConfigItems`. Checkpoints 8.2.17, 8.2.20, 8.2.21, 8.2.24, 8.2.25, 8.2.26, 8.2.27, 8.2.28, 8.2.29, 8.2.30, and 8.2.31 restore the main bell/deco/wheat interaction branch, held-wand GUI exclusion, upgrade inventory refresh, fluid-carried/toggle NBT persistence, carried item sync after reload, ranged golem shot sound, the golem-stone inactive state, carried item/fluid/essentia display sync, server-side death logging, fire-resistance guards, reference armor calculation, material-dependent water pathing, no-drowning air handling, melee enchantment callbacks/knockback, and upgrade retaliation. Current remaining static gaps include bootup client sound parity and runtime/manual evidence for the full core matrix.
+Reference behavior includes inactive state from the pedestal/cosmetic block under the golem, bootup sounds/status, fire resistance override, armor calculation, material-dependent water pathing, no-drowning air handling, melee enchantment callbacks, upgrade retaliation, target range validation, death logging, bell/deco/wheat interactions, fluid-carried NBT for fluid cores, GUI blocking while holding wand, setup inventory after upgrades, spawn data reconstruction, and item/bell constants through `ConfigItems`. Checkpoints 8.2.17, 8.2.20, 8.2.21, 8.2.24, 8.2.25, 8.2.26, 8.2.27, 8.2.28, 8.2.29, 8.2.30, 8.2.31, and 8.2.32 restore the main bell/deco/wheat interaction branch, held-wand GUI exclusion, upgrade inventory refresh, fluid-carried/toggle NBT persistence, carried item sync after reload, ranged golem shot sound, the golem-stone inactive state, carried item/fluid/essentia display sync, server-side death logging, fire-resistance guards, reference armor calculation, material-dependent water pathing, no-drowning air handling, melee enchantment callbacks/knockback, upgrade retaliation, and target range validation. Current remaining static gaps include bootup client sound parity and runtime/manual evidence for the full core matrix.
 
 **Что нужно доделать:**
 Port the missing server-visible golem lifecycle and interaction details from reference, without moving renderer/FX work into Stage 6.
@@ -139,6 +139,7 @@ Port the missing server-visible golem lifecycle and interaction details from ref
 - Golems now preserve air supply while submerged; verify drowning immunity in runtime.
 - Golem melee now applies reference enchantment damage, knockback, fire, thorns, and arthropod callbacks; verify combat in runtime.
 - Upgrade `5` now retaliates against direct attackers with reference thorns damage and sound; verify in runtime combat.
+- Golem target validation now rejects entities outside the home/range check; verify target drop behavior in runtime combat.
 - Runtime scenarios: gather, empty, pickup, harvest, attack, fluid, essentia, lumber, use, butcher, sort, fish.
 
 **Критерии приемки:**
@@ -1426,6 +1427,28 @@ Mapping:
 Оставшиеся ограничения:
 
 - Runtime confirmation of upgrade `5` retaliation damage/sound remains unavailable while smoke-server is blocked before ready state and manual scenarios are excluded.
+- Full per-core golem AI runtime scenarios remain open.
+
+### 8.2.32 Golem target range checkpoint — 2026-05-15
+
+Статус: reference home/range target validation restored; runtime combat evidence remains open.
+
+Что сделано:
+
+- Restored the reference `isValidTarget(...)` home-distance check before core-specific target rules.
+- Ranged and melee golem AI now share the same range rejection when validating existing targets, not just when initially acquiring them.
+
+Проверки:
+
+- `./scripts/dev.sh compileJava` — passed.
+- `./scripts/dev.sh build` — passed.
+- `./scripts/dev.sh check-jar` — не дошел до jar inspection: отсутствует wrapper-ожидаемый MCP mapping cache `.gradle_home/caches/minecraft/de/oceanlabs/mcp/mcp_stable/39/1.12.2/srgs/mcp-srg.srg`.
+- `./scripts/dev.sh smoke-server` — timeout before ready state на уже задокументированном pre-Forge/log4j этапе; `run/crash-reports/` не существует, and the configured crash-marker scan found no matches.
+- `git diff --check` — passed.
+
+Оставшиеся ограничения:
+
+- Runtime confirmation of target drop behavior outside golem home/range remains unavailable while smoke-server is blocked before ready state and manual scenarios are excluded.
 - Full per-core golem AI runtime scenarios remain open.
 
 ### 8.3 Minimal Stage 6 manual scenario matrix
