@@ -44,6 +44,7 @@ Branch: `codex/durable-goal-stage8-9`
 ## Skipped GUI/Manual Graphics Checks
 
 - Arcane Workbench client smoke/manual open/visual parity was skipped on 2026-05-15 because `DISPLAY=` and user-driven GUI/graphics validation is excluded by instruction.
+- Arcane Bore client smoke/manual open/visual parity was skipped on 2026-05-15 because `DISPLAY=` and user-driven GUI/graphics validation is excluded by instruction.
 - Future GUI/client visual checks that require user-driven Minecraft control, screenshots, or unavailable X11/graphics stack will be recorded as: `SKIPPED by user instruction: GUI/graphics/user-interactive validation excluded`.
 
 ## Baseline Validation
@@ -55,6 +56,30 @@ Branch: `codex/durable-goal-stage8-9`
 - `./scripts/dev.sh validate --smoke` — passed on 2026-05-15, including compact server smoke validation.
 
 ## Checkpoint Log
+
+### 2026-05-15 — Stage 8-b Arcane Bore GUI baseline
+
+Scope:
+
+- Added `GuiArcaneBore` backed by `ContainerArcaneBore`.
+- Ported the original bore GUI baseline: `176x141` background, nearly-broken pickaxe overlay, and width/speed/property text from `TileArcaneBore` state.
+- Routed client GUI ID `15` through `ClientProxy#getClientGuiElement` with a `TileArcaneBore` type check.
+- Copied the original `gui_arcanebore.png` from `thaumcraft_src/assets/thaumcraft/textures/gui/` into the port resource tree.
+- Updated `docs/Stage8-b.md` with the implemented baseline and remaining client/manual validation limits.
+
+Validation:
+
+- `./scripts/dev.sh compileJava` — passed.
+- `./scripts/dev.sh validate --smoke` — passed: status, compile, tests `10/10`, jar, check-jar summary `5149` MCP leak lines / `1030` unique leaks, and server smoke.
+- `run/smoke-server.log` evidence: `Registering entities`; `Forge Mod Loader has successfully loaded 6 mods`; `Done (1.266s)!`.
+- Crash report scan under `run/` returned no files.
+- `./scripts/dev.sh smoke-client` — skipped because `DISPLAY=` and GUI/graphics/user-interactive validation is excluded.
+
+Remaining limits:
+
+- Arcane Bore right-click/open was not manually observed.
+- Visual parity of the slot layout and text overlay still needs client inspection.
+- Bore renderer/state animation parity remains outside this GUI checkpoint.
 
 ### 2026-05-15 — Stage 8-b Arcane Workbench GUI baseline
 

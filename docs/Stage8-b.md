@@ -65,7 +65,7 @@ Lightweight commands run during analysis:
 
 ## 4. Текущее состояние Stage 8-b
 
-Current state is not closeable. Server/common GUI IDs and containers exist for many screens, but client-side routing and client GUI classes are mostly absent. GUI ID `13` now has a minimal texture-backed Arcane Workbench baseline, but the full wand/aspect/crafting display and manual client validation remain open.
+Current state is not closeable. Server/common GUI IDs and containers exist for many screens, but client-side routing and client GUI classes are mostly absent. GUI IDs `13` and `15` now have texture-backed Arcane Workbench and Arcane Bore baselines, but full visual parity and manual client validation remain open.
 
 Concrete current findings:
 
@@ -73,9 +73,9 @@ Concrete current findings:
 - Server GUI routing exists for Golem, Pech, Traveling Trunk, Thaumatorium, Focus Pouch, Deconstruction Table, Alchemy Furnace, Research Table, Arcane Workbench, Arcane Bore, Hand Mirror, Hover Harness, Magic Box, Spa, and Focal Manipulator in `src/main/java/thaumcraft/common/CommonProxy.java:61-119`.
 - Thaumonomicon is intentionally server-null in `src/main/java/thaumcraft/common/CommonProxy.java:95`, matching the reference pattern that its GUI is client-only.
 - Base `CommonProxy.getClientGuiElement` returns null in `src/main/java/thaumcraft/common/CommonProxy.java:122-126`, as expected for common proxy.
-- `ClientProxy.getClientGuiElement` constructs `GuiFocusPouch`, `GuiHandMirror`, `GuiHoverHarness`, and now routes `GUI_ARCANE_WORKBENCH` to `GuiArcaneWorkbench` when the client tile is a `TileArcaneWorkbench`; the remaining Stage 8-b/current GUI IDs still return null.
+- `ClientProxy.getClientGuiElement` constructs `GuiFocusPouch`, `GuiHandMirror`, `GuiHoverHarness`, and now routes `GUI_ARCANE_WORKBENCH`/`GUI_ARCANE_BORE` to matching tile-backed screens; the remaining Stage 8-b/current GUI IDs still return null.
 - Existing GUI screens are placeholder-style grey rectangles and do not bind original textures: `GuiFocusPouch.java:23-35`, `GuiHandMirror.java:23-29`, `GuiHoverHarness.java:23-29`.
-- `src/main/resources/assets/thaumcraft/textures/gui/gui_arcaneworkbench.png` is copied byte-for-byte from `thaumcraft_src/assets/thaumcraft/textures/gui/gui_arcaneworkbench.png`; the other reference GUI textures are still absent from current resources.
+- `src/main/resources/assets/thaumcraft/textures/gui/gui_arcaneworkbench.png` and `gui_arcanebore.png` are copied byte-for-byte from `thaumcraft_src/assets/thaumcraft/textures/gui/`; the other reference GUI textures are still absent from current resources.
 - Current English lang has only `container.focus_pouch`, `container.handmirror`, `container.hoverharness`, and `container.inventory` for implemented GUI labels in `src/main/resources/assets/thaumcraft/lang/en_us.lang:101-104`; research/golem/trunk/interaction GUI keys are absent.
 - Thaumonomicon right-click opens GUI ID `12` server-side in `src/main/java/thaumcraft/common/items/relics/ItemThaumonomicon.java:43-50`, but client ID `12` returns null in `src/main/java/thaumcraft/client/ClientProxy.java:78-84`.
 - Thaumometer currently performs server-side scanning in `src/main/java/thaumcraft/common/items/relics/ItemThaumometer.java:37-69`; no `GuiScreen`/overlay implementation was found under `src/main/java/thaumcraft/client/**`.
@@ -130,15 +130,15 @@ Depends on current `ContainerArcaneWorkbench` and tile vis/wand data being behav
 
 ### GAP-2: Arcane Bore GUI отсутствует на клиенте
 
-**Статус:** отсутствует  
+**Статус:** частично реализовано
 **Критичность:** blocker
 
 **Текущая реализация:**
-- `src/main/java/thaumcraft/client/ClientProxy.java:80-84`
+- `src/main/java/thaumcraft/client/ClientProxy.java#getClientGuiElement` routes GUI ID `15` to `GuiArcaneBore` only when the client tile at the provided coordinates is `TileArcaneBore`.
 - `src/main/java/thaumcraft/common/CommonProxy.java:100-103`
 - `src/main/java/thaumcraft/common/blocks/BlockWoodenDevice.java:78-90`
-- Отсутствует `src/main/java/thaumcraft/client/gui/GuiArcaneBore.java`.
-- Отсутствует `src/main/resources/assets/thaumcraft/textures/gui/gui_arcanebore.png`.
+- `src/main/java/thaumcraft/client/gui/GuiArcaneBore.java` exists as a 1.12.2 `GuiContainer` baseline using `ContainerArcaneBore`.
+- `src/main/resources/assets/thaumcraft/textures/gui/gui_arcanebore.png` exists and matches the original asset.
 
 **Референс:**
 - `Thaumcraft-1.7.10-4.2.3.5.jar!/thaumcraft/client/ClientProxy.class`, offsets `305-329` instantiate `GuiArcaneBore` for GUI ID `15`.
@@ -146,22 +146,29 @@ Depends on current `ContainerArcaneWorkbench` and tile vis/wand data being behav
 - `thaumcraft_src/assets/thaumcraft/textures/gui/gui_arcanebore.png`.
 
 **Что не совпадает:**
-Current block activation reaches server container, but client returns null. The reference GUI has a dedicated bore field and background/foreground draw methods; current has no screen and no bore texture.
+Current block activation reaches the server container, and the client now returns a texture-backed `GuiArcaneBore` for the matching tile. Reference layout state such as inventory slots, damaged-pick overlay, width/speed/property text is ported as a baseline, but manual opening and visual parity are still unverified.
 
 **Что нужно доделать:**
-Port the bore GUI class and route GUI ID `15` to it.
+Finish Arcane Bore GUI parity by manually validating the open scenario and comparing slot/state/progress layout in a client runtime.
 
 **Как доделать:**
-- Add `src/main/java/thaumcraft/client/gui/GuiArcaneBore.java`.
-- Update `ClientProxy#getClientGuiElement` case `GUI_ARCANE_BORE` to fetch `TileArcaneBore`.
-- Copy `thaumcraft_src/assets/thaumcraft/textures/gui/gui_arcanebore.png`.
+- Done: add `src/main/java/thaumcraft/client/gui/GuiArcaneBore.java`.
+- Done: update `ClientProxy#getClientGuiElement` case `GUI_ARCANE_BORE` to fetch `TileArcaneBore`.
+- Done: copy `thaumcraft_src/assets/thaumcraft/textures/gui/gui_arcanebore.png`.
 - Scenario: activate Arcane Bore without wand through `BlockWoodenDevice.java:87-89` and verify GUI opens.
 
 **Критерии приемки:**
 - [ ] GUI ID `15` opens `GuiArcaneBore` on client.
-- [ ] Bore inventory slots and state/progress display match reference layout.
-- [ ] GUI uses the original bore texture.
+- [x] Bore inventory slots and basic state/property display are implemented from the reference layout.
+- [x] GUI uses the original bore texture.
 - [ ] Manual client check confirms no crash when opening a placed bore.
+
+**Checkpoint 2026-05-15 — Arcane Bore GUI baseline:**
+- Added `GuiArcaneBore` with reference size `176x141`, `ContainerArcaneBore`, damaged-pick overlay, width/speed/property text, and original `gui_arcanebore.png`.
+- Routed client GUI ID `15` to the screen with a `TileArcaneBore` type check.
+- Validation: `./scripts/dev.sh compileJava` passed; `./scripts/dev.sh validate --smoke` passed with tests `10/10`, jar/check-jar summary `5149` MCP leak lines / `1030` unique leaks, server ready at `Done (1.266s)!`, and no crash reports under `run/`.
+- Client smoke/manual GUI open was skipped because `DISPLAY=` and user-driven GUI/graphics validation is excluded for this run.
+- Remaining: manual open/no-crash validation, visual comparison in client, and any renderer-side bore state parity outside the GUI screen.
 
 **Риски / зависимости:**
 Depends on `TileArcaneBore` state fields and `ContainerArcaneBore` slot layout matching the original enough for GUI display.
