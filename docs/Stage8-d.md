@@ -2269,6 +2269,26 @@ Some entities may be hard to trigger naturally until recipes/research/spawn cont
 
 - Это no-op renderer baseline без ручной визуальной проверки; точные runtime визуальные ожидания для Pech blast остаются в общем Stage 8-d visual parity matrix.
 
+### Checkpoint 2026-05-17 — replace alumentum snowball fallback with dedicated no-op renderer baseline
+
+Статус: частично продвинут.
+
+Что сделано:
+
+- `EntityAlumentum` переведен с `RenderSnowball` на dedicated `RenderAlumentum`.
+- Добавлен `RenderAlumentum` с reference-shaped contract: intentional no-op draw path (как в original `RenderAlumentum`, где render body пустой).
+- `ClientProxyEntityRendererRegistrationStaticGuardTest` обновлен:
+  - registration contract `EntityAlumentum -> RenderAlumentum::new`;
+  - renderer contract checks на no-op semantics.
+
+Проверки:
+
+- `./scripts/dev.sh validate --smoke` — passed.
+
+Ограничения:
+
+- Это no-op renderer baseline без ручной визуальной проверки; точные runtime визуальные ожидания для Alumentum остаются в общем Stage 8-d visual parity matrix.
+
 - [ ] Add client-only entity renderer registration hook.
 - [ ] Register every entity from `ConfigEntities.ENTITIES` with a custom or vanilla-equivalent renderer.
 - [ ] Port item-like/transient/projectile renderers.

@@ -27,7 +27,7 @@ public class ClientProxyEntityRendererRegistrationStaticGuardTest {
                 source.contains("registerEntityRenderer(EntityDart.class, manager -> new RenderSnowball<>(manager, Items.ARROW, renderItem), registered);")
                         && source.contains("registerEntityRenderer(EntityPrimalArrow.class,")
                         && source.contains("registerEntityRenderer(EntityBottleTaint.class,")
-                        && source.contains("registerEntityRenderer(EntityAlumentum.class, manager -> new RenderSnowball<>(manager, Items.FIRE_CHARGE, renderItem), registered);")
+                        && source.contains("registerEntityRenderer(EntityAlumentum.class, RenderAlumentum::new, registered);")
                         && source.contains("registerEntityRenderer(EntityPrimalOrb.class, RenderPrimalOrb::new, registered);")
                         && source.contains("registerEntityRenderer(EntityFrostShard.class, manager -> new RenderSnowball<>(manager, Items.SNOWBALL, renderItem), registered);")
                         && source.contains("registerEntityRenderer(EntityPechBlast.class, RenderPechBlast::new, registered);")
@@ -157,6 +157,11 @@ public class ClientProxyEntityRendererRegistrationStaticGuardTest {
                 pechBlastRenderer.contains("extends Render<EntityPechBlast>")
                         && pechBlastRenderer.contains("intentional no-op draw path")
                         && pechBlastRenderer.contains("return null;"));
+        String alumentumRenderer = readFile("src/main/java/thaumcraft/client/renderers/entity/RenderAlumentum.java");
+        assertTrue("RenderAlumentum must provide intentional no-op renderer baseline",
+                alumentumRenderer.contains("extends Render<EntityAlumentum>")
+                        && alumentumRenderer.contains("intentional no-op draw path")
+                        && alumentumRenderer.contains("return null;"));
         String eldritchGuardianRenderer = readFile("src/main/java/thaumcraft/client/renderers/entity/RenderEldritchGuardian.java");
         assertTrue("RenderEldritchGuardian must provide dedicated guardian texture baseline",
                 eldritchGuardianRenderer.contains("extends RenderBiped<EntityEldritchGuardian>")
