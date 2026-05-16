@@ -817,6 +817,29 @@ Some entities may be hard to trigger naturally until recipes/research/spawn cont
 
 - Это renderer identity/texture/scale baseline; full reference parity для guardian/warden render behavior (alpha/blend distance behavior, spawn-lift visuals, custom model animation nuances) остаётся открытой по GAP-3/GAP-4/GAP-6.
 
+### Checkpoint 2026-05-16 — dedicated eldritch golem renderer baseline
+
+Статус: частично продвинут.
+
+Что сделано:
+
+- Добавлен выделенный renderer `RenderEldritchGolem` (`thaumcraft.client.renderers.entity.RenderEldritchGolem`) вместо общего biped fallback для `EntityEldritchGolem`.
+- Baseline behavior:
+  - dedicated texture path `textures/models/eldritch_golem.png`;
+  - reference-shaped size baseline через `GlStateManager.scale(2.15F, 2.15F, 2.15F)`.
+- `ClientProxy.setupEntityRenderers()` обновлен: `EntityEldritchGolem` теперь регистрируется через `RenderEldritchGolem::new`.
+- `ClientProxyEntityRendererRegistrationStaticGuardTest` расширен проверками:
+  - explicit `EntityEldritchGolem -> RenderEldritchGolem` registration path;
+  - наличие texture/scale contracts в `RenderEldritchGolem`.
+
+Проверки:
+
+- `./scripts/dev.sh validate --smoke` — passed.
+
+Ограничения:
+
+- Это texture/scale baseline; full reference parity для eldritch golem renderer behavior (custom golem model, boss bar/display path, additional render passes) остаётся открытой по GAP-3/GAP-4/GAP-6.
+
 - [ ] Add client-only entity renderer registration hook.
 - [ ] Register every entity from `ConfigEntities.ENTITIES` with a custom or vanilla-equivalent renderer.
 - [ ] Port item-like/transient/projectile renderers.

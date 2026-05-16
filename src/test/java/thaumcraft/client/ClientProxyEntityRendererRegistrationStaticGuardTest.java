@@ -62,7 +62,7 @@ public class ClientProxyEntityRendererRegistrationStaticGuardTest {
                         && source.contains("registerEntityRenderer(EntityPech.class, RenderPech::new, registered);")
                         && source.contains("registerEntityRenderer(EntityEldritchGuardian.class, RenderEldritchGuardian::new, registered);")
                         && source.contains("registerEntityRenderer(EntityEldritchWarden.class, RenderEldritchWarden::new, registered);")
-                        && source.contains("registerEntityRenderer(EntityEldritchGolem.class, manager -> new RenderFallbackBiped<>(")
+                        && source.contains("registerEntityRenderer(EntityEldritchGolem.class, RenderEldritchGolem::new, registered);")
                         && source.contains("registerEntityRenderer(EntityEldritchCrab.class, manager -> new RenderFallbackLiving<>(")
                         && source.contains("registerEntityRenderer(EntityThaumicSlime.class, manager -> new RenderFallbackBiped<>(")
                         && source.contains("registerEntityRenderer(EntityTaintSpore.class, manager -> new RenderFallbackBiped<>(")
@@ -110,6 +110,11 @@ public class ClientProxyEntityRendererRegistrationStaticGuardTest {
                 eldritchWardenRenderer.contains("extends RenderBiped<EntityEldritchWarden>")
                         && eldritchWardenRenderer.contains("textures/models/eldritch_warden.png")
                         && eldritchWardenRenderer.contains("GlStateManager.scale(1.5F, 1.5F, 1.5F)"));
+        String eldritchGolemRenderer = readFile("src/main/java/thaumcraft/client/renderers/entity/RenderEldritchGolem.java");
+        assertTrue("RenderEldritchGolem must provide dedicated golem texture and scale baseline",
+                eldritchGolemRenderer.contains("extends RenderBiped<EntityEldritchGolem>")
+                        && eldritchGolemRenderer.contains("textures/models/eldritch_golem.png")
+                        && eldritchGolemRenderer.contains("GlStateManager.scale(2.15F, 2.15F, 2.15F)"));
         String trunkRenderer = readFile("src/main/java/thaumcraft/client/renderers/entity/RenderTravelingTrunk.java");
         assertTrue("RenderTravelingTrunk must provide anger-based texture routing baseline",
                 trunkRenderer.contains("extends RenderLiving<EntityTravelingTrunk>")
