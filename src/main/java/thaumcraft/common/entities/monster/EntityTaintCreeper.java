@@ -83,18 +83,19 @@ public class EntityTaintCreeper extends net.minecraft.entity.monster.EntityMob i
             this.lastActiveTime = this.timeSinceIgnited;
 
             int state = this.getCreeperState();
-            if (state > 0 && this.timeSinceIgnited < this.fuseTime) {
-                this.timeSinceIgnited++;
-            } else if (state <= 0 && this.timeSinceIgnited > 0) {
-                this.timeSinceIgnited--;
+            if (state > 0 && this.timeSinceIgnited == 0) {
+                this.playSound(net.minecraft.init.SoundEvents.ENTITY_CREEPER_PRIMED, 1.0F, 0.5F);
+            }
+            this.timeSinceIgnited += state;
+
+            if (this.timeSinceIgnited < 0) {
+                this.timeSinceIgnited = 0;
             }
 
             if (this.timeSinceIgnited >= this.fuseTime) {
                 this.timeSinceIgnited = this.fuseTime;
                 if (!this.world.isRemote) {
-                    boolean powered = this.dataManager.get(POWERED);
-                    float power = powered ? 2.0F : 1.5F;
-                    this.world.createExplosion(this, this.posX, this.posY + (double)(this.height / 2.0F), this.posZ, power, false);
+                    this.world.createExplosion(this, this.posX, this.posY + (double)(this.height / 2.0F), this.posZ, 1.5F, false);
                     this.setDead();
                 }
             }

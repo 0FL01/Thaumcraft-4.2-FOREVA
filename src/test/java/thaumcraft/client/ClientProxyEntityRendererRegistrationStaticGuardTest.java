@@ -288,6 +288,11 @@ public class ClientProxyEntityRendererRegistrationStaticGuardTest {
                         && taintCreeperEntity.contains("nbt.hasKey(\"ExplosionRadius\", 99)")
                         && taintCreeperEntity.contains("nbt.hasKey(\"powered\", 1)")
                         && taintCreeperEntity.contains("nbt.getBoolean(\"powered\")"));
+        assertTrue("EntityTaintCreeper must keep reference-shaped fuse sound and state-driven ignite progression",
+                taintCreeperEntity.contains("SoundEvents.ENTITY_CREEPER_PRIMED")
+                        && taintCreeperEntity.contains("this.timeSinceIgnited += state;")
+                        && taintCreeperEntity.contains("if (this.timeSinceIgnited < 0)")
+                        && taintCreeperEntity.contains("createExplosion(this, this.posX, this.posY + (double)(this.height / 2.0F), this.posZ, 1.5F, false)"));
         String taintSheepEntity = readFile("src/main/java/thaumcraft/common/entities/monster/EntityTaintSheep.java");
         assertTrue("EntityTaintSheep must keep sheared-state data/NBT/shearing contracts for fur-layer renderer parity",
                 taintSheepEntity.contains("DataParameter<Byte>")

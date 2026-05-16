@@ -1423,6 +1423,26 @@ Some entities may be hard to trigger naturally until recipes/research/spawn cont
 
 - Это attack-contract baseline; полная parity taint creeper explosion-side gameplay logic остаётся в Stage 6 runtime scope.
 
+### Checkpoint 2026-05-16 — restore taint creeper fuse sound and state-driven ignition baseline
+
+Статус: частично продвинут.
+
+Что сделано:
+
+- `EntityTaintCreeper.onUpdate()` выровнен с reference-shaped ignite flow:
+  - добавлен primed sound trigger на старте (`SoundEvents.ENTITY_CREEPER_PRIMED`) when `state > 0 && timeSinceIgnited == 0`;
+  - ignite timer теперь обновляется через state accumulation (`timeSinceIgnited += state`) с нижней границей `0`;
+  - explosion power path выровнен к reference baseline `1.5F` (без boosted powered multiplier в этом baseline checkpoint).
+- `ClientProxyEntityRendererRegistrationStaticGuardTest` расширен проверками на fuse sound/state accumulation/1.5F explosion power contracts.
+
+Проверки:
+
+- `./scripts/dev.sh validate --smoke` — passed.
+
+Ограничения:
+
+- Это ignite-flow baseline; полная parity taint spread/potion side-effects после взрыва остаётся в Stage 6 runtime scope.
+
 ### Checkpoint 2026-05-16 — restore mind spider viewer-only render gating
 
 Статус: частично продвинут.
