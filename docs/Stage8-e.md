@@ -324,6 +324,32 @@ Depends on GAP-1, GAP-2, GAP-5, and GAP-6. Network-thread rendering is unsafe if
 
 - The broader Stage 8-e packet set (beam pulse/zap/shield/sonic/etc.) remains open.
 
+#### Checkpoint 2026-05-16 — Swapper drop and wand-sound paths restored
+
+Статус: `ServerTickEventsFML` block-swap drop handling and wand sound cue now match reference behavior shape.
+
+Что сделано:
+
+- Restored silk-touch drop route in `tickBlockSwap(...)`:
+  - uses `currentBlock.canSilkHarvest(world, pos, state, vs.player)` gate;
+  - uses `BlockUtils.createStackedBlock(...)` for silk result.
+- Restored non-silk drop route in `tickBlockSwap(...)`:
+  - uses `currentBlock.getDrops(drops, world, pos, state, fortune)` with focus fortune.
+- Restored queue-add wand sound cue in `addSwapper(...)`:
+  - `world.playSound(player, x, y, z, TCSounds.WAND, SoundCategory.PLAYERS, 0.25f, 1.0f)`.
+- Expanded static guard coverage in `ClientProxyFxStaticGuardTest`:
+  - enforces silk-harvest/fortune-drop code-path presence;
+  - enforces wand sound call-site presence.
+
+Проверки:
+
+- `./scripts/dev.sh test` — passed.
+- `./scripts/dev.sh validate --smoke` — passed.
+
+Ограничения:
+
+- This checkpoint restores block-swap drop/sound behavior only; deeper focus/block-chain parity remains outside this narrow scope.
+
 #### Checkpoint 2026-05-16 — GAP-3 shield packet and runic send paths restored
 
 Статус: `PacketFXShield` now has payload/handler baseline and runic shield code paths send it again.

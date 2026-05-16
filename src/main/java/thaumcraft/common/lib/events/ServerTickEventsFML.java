@@ -8,6 +8,8 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.NonNullList;
+import net.minecraft.util.SoundCategory;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
@@ -22,6 +24,7 @@ import thaumcraft.api.wands.FocusUpgradeType;
 import thaumcraft.api.wands.ItemFocusBasic;
 import thaumcraft.common.Thaumcraft;
 import thaumcraft.common.items.wands.ItemWandCasting;
+import thaumcraft.common.lib.TCSounds;
 import thaumcraft.common.lib.network.PacketHandler;
 import thaumcraft.common.lib.network.fx.PacketFXBlockSparkle;
 import thaumcraft.common.lib.utils.BlockUtils;
@@ -141,19 +144,19 @@ public class ServerTickEventsFML {
 
                 vs.player.inventory.decrStackSize(slot, 1);
 
-                ArrayList<ItemStack> drops = new ArrayList<>();
+                NonNullList<ItemStack> drops = NonNullList.create();
                 net.minecraft.util.math.BlockPos pos = new net.minecraft.util.math.BlockPos(vs.x, vs.y, vs.z);
+                net.minecraft.block.state.IBlockState state = world.getBlockState(pos);
 
                 if (silk) {
-                    // Phase 8: silk touch drop
-                    ItemStack silked = new ItemStack(currentBlock, 1, currentMeta);
-                    if (!silked.isEmpty()) {
-                        drops.add(silked);
+                    if (currentBlock.canSilkHarvest(world, pos, state, vs.player)) {
+                        ItemStack silked = BlockUtils.createStackedBlock(currentBlock, currentMeta);
+                        if (!silked.isEmpty()) {
+                            drops.add(silked);
+                        }
                     }
                 } else {
-                    // Phase 8: get actual drops with fortune
-                    // drops = (ArrayList<ItemStack>) currentBlock.getDrops(world, pos, world.getBlockState(pos), fortune);
-                    // For now, just pass through
+                    currentBlock.getDrops(drops, world, pos, state, fortune);
                 }
 
                 if (!drops.isEmpty()) {
@@ -227,7 +230,7 @@ public class ServerTickEventsFML {
         }
         queue.offer(new VirtualSwapper(x, y, z, bs, ms, target, life, player, wand));
 
-        // Phase 8: world.playSound(null, x, y, z, TCSounds.WAND, SoundCategory.PLAYERS, 0.25f, 1.0f);
+        world.playSound(player, x, y, z, TCSounds.WAND, SoundCategory.PLAYERS, 0.25f, 1.0f);
     }
 
     // ---- Inner classes ----
