@@ -7,6 +7,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 @SideOnly(Side.CLIENT)
 public class ClientTickEventsFML {
+    public static int warpVignette = 0;
 
     @SubscribeEvent
     public void playerTick(TickEvent.PlayerTickEvent event) {

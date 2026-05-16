@@ -11,6 +11,8 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 @SideOnly(Side.CLIENT)
 public class RenderEventHandler {
+    public static boolean fogFiddled = false;
+    public static int fogDuration = 0;
 
     @SubscribeEvent
     public void renderOverlay(RenderGameOverlayEvent event) {

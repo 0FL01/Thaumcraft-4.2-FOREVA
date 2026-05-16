@@ -47,6 +47,8 @@ public class ClientProxyFxStaticGuardTest {
         String sonic = readFile("src/main/java/thaumcraft/common/lib/network/fx/PacketFXSonic.java");
         String wispZap = readFile("src/main/java/thaumcraft/common/lib/network/fx/PacketFXWispZap.java");
         String zap = readFile("src/main/java/thaumcraft/common/lib/network/fx/PacketFXZap.java");
+        String miscEvent = readFile("src/main/java/thaumcraft/common/lib/network/misc/PacketMiscEvent.java");
+        String warpMessage = readFile("src/main/java/thaumcraft/common/lib/network/playerdata/PacketWarpMessage.java");
         String serverTick = readFile("src/main/java/thaumcraft/common/lib/events/ServerTickEventsFML.java");
         String runic = readFile("src/main/java/thaumcraft/common/lib/events/EventHandlerRunic.java");
         String eldritchGuardian = readFile("src/main/java/thaumcraft/common/entities/monster/EntityEldritchGuardian.java");
@@ -57,6 +59,7 @@ public class ClientProxyFxStaticGuardTest {
         String essentiaHandler = readFile("src/main/java/thaumcraft/common/lib/events/EssentiaHandler.java");
         String packetBoreDig = readFile("src/main/java/thaumcraft/common/lib/network/misc/PacketBoreDig.java");
         String arcaneBore = readFile("src/main/java/thaumcraft/common/tiles/TileArcaneBore.java");
+        String warpEvents = readFile("src/main/java/thaumcraft/common/lib/WarpEvents.java");
 
         assertTrue("PacketFXVisDrain must schedule client task and call proxy beam",
                 visDrain.contains("Minecraft.getMinecraft().addScheduledTask") && visDrain.contains("Thaumcraft.proxy.beam("));
@@ -83,6 +86,13 @@ public class ClientProxyFxStaticGuardTest {
         assertTrue("PacketFXInfusionSource must schedule client task and route through proxy beam",
                 infusionSource.contains("Minecraft.getMinecraft().addScheduledTask")
                         && infusionSource.contains("Thaumcraft.proxy.beam("));
+        assertTrue("PacketMiscEvent must schedule client task and update warp vignette/fog markers",
+                miscEvent.contains("Minecraft.getMinecraft().addScheduledTask")
+                        && miscEvent.contains("ClientTickEventsFML.warpVignette")
+                        && miscEvent.contains("RenderEventHandler.fogFiddled"));
+        assertTrue("PacketWarpMessage must schedule client task and show warp notifications",
+                warpMessage.contains("Minecraft.getMinecraft().addScheduledTask")
+                        && warpMessage.contains("TextComponentTranslation"));
         assertTrue("PacketBoreDig must schedule client task and route to TileArcaneBore.getDigEvent",
                 packetBoreDig.contains("Minecraft.getMinecraft().addScheduledTask")
                         && packetBoreDig.contains("getDigEvent"));
@@ -123,6 +133,10 @@ public class ClientProxyFxStaticGuardTest {
                 infusionMatrix.contains("new PacketFXInfusionSource("));
         assertTrue("Essentia drain path must send PacketFXEssentiaSource",
                 essentiaHandler.contains("new PacketFXEssentiaSource("));
+        assertTrue("WarpEvents must send PacketMiscEvent/PacketWarpMessage in active warp paths",
+                warpEvents.contains("new PacketMiscEvent((short) 0)")
+                        && warpEvents.contains("new PacketMiscEvent((short) 1)")
+                        && warpEvents.contains("new PacketWarpMessage(player, (byte) 1, -1)"));
         assertTrue("TileArcaneBore must send PacketBoreDig and process client dig FX path",
                 arcaneBore.contains("new PacketBoreDig(")
                         && arcaneBore.contains("public void getDigEvent(")

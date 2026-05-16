@@ -581,6 +581,39 @@ Depends on GAP-1, GAP-2, GAP-5, and GAP-6. Network-thread rendering is unsafe if
 
 - This remains fallback dig replay and does not yet port reference `boreDigFx` renderer classes.
 
+#### Checkpoint 2026-05-16 — Warp event client signal packets restored (`PacketMiscEvent` + `PacketWarpMessage`)
+
+Статус: warp-side client signal packets and `WarpEvents` send hooks are now wired again.
+
+Что сделано:
+
+- Implemented `PacketMiscEvent` payload/handler baseline:
+  - `type` serialization;
+  - client-scheduled handling for warp vignette marker (`WARP_EVENT`) and mist fog markers (`MIST_EVENT` / `MIST_EVENT_SHORT`).
+- Implemented `PacketWarpMessage` payload/handler baseline:
+  - `type` + `data` serialization;
+  - client-scheduled warp notification text via `TextComponentTranslation`;
+  - positive warp-change whisper cue via `TCSounds.WHISPERS`.
+- Restored `WarpEvents` server send-sites:
+  - warp trigger ping `PacketMiscEvent((short)0)`;
+  - mist event ping `PacketMiscEvent((short)1)`;
+  - sticky warp reduction notice `PacketWarpMessage(player, (byte)1, -1)`.
+- Added static client marker fields used by packet handlers:
+  - `ClientTickEventsFML.warpVignette`;
+  - `RenderEventHandler.fogFiddled` / `RenderEventHandler.fogDuration`.
+- Expanded tests:
+  - `PacketMiscWarpSerializationTest` for round-trip payload coverage;
+  - `ClientProxyFxStaticGuardTest` coverage for packet scheduling and `WarpEvents` send-site presence.
+
+Проверки:
+
+- `./scripts/dev.sh test` — passed.
+- `./scripts/dev.sh validate --smoke` — passed.
+
+Ограничения:
+
+- Full visual fog/vignette rendering behavior remains tied to broader Stage 8 client render handler parity.
+
 ### GAP-4: Beam, wand beam, bore beam, power beam, arc, and lightning bolt classes are absent
 
 **Статус:** отсутствует  

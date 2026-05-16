@@ -74,7 +74,7 @@ public final class WarpEvents {
                     eff -= 2 + player.world.rand.nextInt(4);
                 }
 
-                // Phase 8: PacketHandler.INSTANCE.sendTo(new PacketMiscEvent(0), (EntityPlayerMP)player);
+                PacketHandler.INSTANCE.sendTo(new PacketMiscEvent((short) 0), (EntityPlayerMP) player);
 
                 if (eff > 0) {
                     if (eff <= 4) {
@@ -129,7 +129,7 @@ public final class WarpEvents {
                             if (knowledge.getWarpSticky() > 0) {
                                 knowledge.addWarpSticky(-1);
                                 syncWarp(player);
-                                // Phase 8: PacketHandler.INSTANCE.sendTo(new PacketWarpMessage(player, 1, -1), (EntityPlayerMP)player);
+                                PacketHandler.INSTANCE.sendTo(new PacketWarpMessage(player, (byte) 1, -1), (EntityPlayerMP) player);
                             }
                             player.sendMessage(new TextComponentString("\u00a75\u00a7o" + net.minecraft.util.text.translation.I18n.translateToLocal("warp.text.14")));
                         } else if (eff <= 80) {
@@ -208,7 +208,7 @@ public final class WarpEvents {
     // ---- Private helpers ----
 
     private static void spawnMist(EntityPlayer player, int warp, int guardian) {
-        // Phase 8: PacketHandler.INSTANCE.sendTo(new PacketMiscEvent(1), (EntityPlayerMP)player);
+        PacketHandler.INSTANCE.sendTo(new PacketMiscEvent((short) 1), (EntityPlayerMP) player);
         if (guardian > 0) {
             guardian = Math.min(8, guardian);
             for (int a = 0; a < guardian; a++) {
