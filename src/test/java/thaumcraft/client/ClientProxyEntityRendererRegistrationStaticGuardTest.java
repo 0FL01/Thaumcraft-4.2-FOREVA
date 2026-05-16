@@ -49,7 +49,7 @@ public class ClientProxyEntityRendererRegistrationStaticGuardTest {
                 source.contains("registerEntityRenderer(EntityTaintChicken.class, RenderTaintChicken::new, registered);")
                         && source.contains("registerEntityRenderer(EntityTaintCow.class, RenderTaintCow::new, registered);")
                         && source.contains("registerEntityRenderer(EntityTaintPig.class, RenderTaintPig::new, registered);")
-                        && source.contains("registerEntityRenderer(EntityTaintSheep.class, manager -> new RenderTaintTextureLiving<>(")
+                        && source.contains("registerEntityRenderer(EntityTaintSheep.class, RenderTaintSheep::new, registered);")
                         && source.contains("registerEntityRenderer(EntityTaintVillager.class, RenderTaintVillager::new, registered);")
                         && source.contains("registerEntityRenderer(EntityTaintCreeper.class, RenderTaintCreeper::new, registered);"));
         assertTrue("ClientProxy must keep fallback RenderFallbackBiped registrations for cultist entities",
@@ -208,6 +208,14 @@ public class ClientProxyEntityRendererRegistrationStaticGuardTest {
         assertTrue("RenderTaintPig must provide pig texture baseline",
                 taintPigRenderer.contains("extends RenderLiving<EntityTaintPig>")
                         && taintPigRenderer.contains("textures/models/pig.png"));
+        String taintSheepRenderer = readFile("src/main/java/thaumcraft/client/renderers/entity/RenderTaintSheep.java");
+        assertTrue("RenderTaintSheep must provide sheep texture and fur-layer baseline",
+                taintSheepRenderer.contains("extends RenderLiving<EntityTaintSheep>")
+                        && taintSheepRenderer.contains("textures/models/sheep.png")
+                        && taintSheepRenderer.contains("textures/models/sheep_fur.png")
+                        && taintSheepRenderer.contains("class SheepFurLayer")
+                        && taintSheepRenderer.contains("this.addLayer(new SheepFurLayer(this))")
+                        && taintSheepRenderer.contains("entity.getSheared()"));
         String cultistRenderer = readFile("src/main/java/thaumcraft/client/renderers/entity/RenderCultist.java");
         assertTrue("RenderCultist must provide shared cultist texture baseline",
                 cultistRenderer.contains("extends RenderBiped<T>")
@@ -236,6 +244,9 @@ public class ClientProxyEntityRendererRegistrationStaticGuardTest {
         String taintCreeperEntity = readFile("src/main/java/thaumcraft/common/entities/monster/EntityTaintCreeper.java");
         assertTrue("EntityTaintCreeper must expose flash intensity accessor for renderer scale/color timing",
                 taintCreeperEntity.contains("public float getCreeperFlashIntensity(float partialTicks)"));
+        String taintSheepEntity = readFile("src/main/java/thaumcraft/common/entities/monster/EntityTaintSheep.java");
+        assertTrue("EntityTaintSheep must expose sheared accessor for fur-layer renderer path",
+                taintSheepEntity.contains("public boolean getSheared()"));
         assertTrue("ClientProxy must iterate ConfigEntities.ENTITIES for renderer registration coverage",
                 source.contains("for (net.minecraftforge.fml.common.registry.EntityEntry entry : ConfigEntities.ENTITIES)"));
         assertTrue("ClientProxy must keep fallback RenderNoop registrations for remaining entities",

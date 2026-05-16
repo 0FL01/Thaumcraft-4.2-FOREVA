@@ -1202,6 +1202,32 @@ Some entities may be hard to trigger naturally until recipes/research/spawn cont
 
 - Это baseline texture/model parity; full reference parity по taint pig visual stack (legacy render-pass и GL-state детали) остаётся открытой по GAP-3/GAP-6.
 
+### Checkpoint 2026-05-16 — dedicated taint sheep fur-layer renderer baseline
+
+Статус: частично продвинут.
+
+Что сделано:
+
+- Добавлен выделенный renderer `RenderTaintSheep` (`thaumcraft.client.renderers.entity.RenderTaintSheep`) вместо shared texture-only baseline для `EntityTaintSheep`.
+- Baseline behavior:
+  - dedicated base texture `textures/models/sheep.png`;
+  - dedicated fur-layer texture `textures/models/sheep_fur.png`;
+  - добавлен `SheepFurLayer` (layer renderer) и registration через `this.addLayer(new SheepFurLayer(this))`.
+- В `EntityTaintSheep` добавлен accessor `getSheared()` (текущий baseline возвращает `false`) для reference-shaped fur-layer gating.
+- `ClientProxy.setupEntityRenderers()` обновлен: `EntityTaintSheep` теперь регистрируется через `RenderTaintSheep::new`.
+- `ClientProxyEntityRendererRegistrationStaticGuardTest` расширен проверками:
+  - explicit registration path `EntityTaintSheep -> RenderTaintSheep`;
+  - texture + fur-layer contracts `RenderTaintSheep`;
+  - `EntityTaintSheep#getSheared` contract presence.
+
+Проверки:
+
+- `./scripts/dev.sh validate --smoke` — passed.
+
+Ограничения:
+
+- Это baseline texture/layer parity; full reference parity по taint sheep visual stack (полный shearing-state gameplay contract и legacy GL-pass нюансы) остаётся открытой по GAP-3/GAP-6.
+
 - [ ] Add client-only entity renderer registration hook.
 - [ ] Register every entity from `ConfigEntities.ENTITIES` with a custom or vanilla-equivalent renderer.
 - [ ] Port item-like/transient/projectile renderers.
