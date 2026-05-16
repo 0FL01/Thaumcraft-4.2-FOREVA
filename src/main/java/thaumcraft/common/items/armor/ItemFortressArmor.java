@@ -1,13 +1,21 @@
 package thaumcraft.common.items.armor;
 
 import net.minecraft.inventory.EntityEquipmentSlot;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.EnumRarity;
 import net.minecraft.item.ItemArmor;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.entity.EntityLivingBase;
+import net.minecraftforge.common.ISpecialArmor;
+import thaumcraft.api.IGoggles;
 import thaumcraft.api.IRepairable;
 import thaumcraft.api.IRunicArmor;
+import thaumcraft.api.nodes.IRevealer;
+import thaumcraft.common.config.ConfigItems;
 import thaumcraft.common.lib.CreativeTabThaumcraft;
 
-public class ItemFortressArmor extends ItemArmor implements IRepairable, IRunicArmor {
+public class ItemFortressArmor extends ItemArmor implements IRepairable, IRunicArmor, ISpecialArmor, IGoggles, IRevealer {
 
     public ItemFortressArmor(ArmorMaterial material, int renderIndex, EntityEquipmentSlot slot) {
         super(material, renderIndex, slot);
@@ -20,7 +28,74 @@ public class ItemFortressArmor extends ItemArmor implements IRepairable, IRunicA
     }
 
     @Override
+    public EnumRarity getRarity(ItemStack stack) {
+        return EnumRarity.RARE;
+    }
+
+    @Override
     public boolean getIsRepairable(ItemStack toRepair, ItemStack repair) {
-        return super.getIsRepairable(toRepair, repair);
+        ItemStack thaumiumIngot = new ItemStack(ConfigItems.itemResource, 1, 2);
+        return repair.isItemEqual(thaumiumIngot) || super.getIsRepairable(toRepair, repair);
+    }
+
+    @Override
+    public ISpecialArmor.ArmorProperties getProperties(EntityLivingBase player, ItemStack armor,
+                                                       net.minecraft.util.DamageSource source, double damage, int slot) {
+        int priority = 0;
+        double ratio = this.damageReduceAmount / 25.0;
+        if (source.isUnblockable()) {
+            priority = 1;
+            ratio = this.damageReduceAmount / 35.0;
+        } else if (source.isMagicDamage() || source.isDamageAbsolute()) {
+            priority = 1;
+            ratio = this.damageReduceAmount / 20.0;
+        } else if (source.isFireDamage()) {
+            priority = 0;
+            ratio = 0.0;
+        }
+        if (player instanceof EntityPlayer) {
+            double set = 0.875;
+            EntityPlayer entityPlayer = (EntityPlayer) player;
+            for (int a = 1; a < 4; a++) {
+                ItemStack piece = entityPlayer.inventory.armorInventory.get(a);
+                if (piece.isEmpty() || !(piece.getItem() instanceof ItemFortressArmor)) {
+                    continue;
+                }
+                set += 0.125;
+                if (!piece.hasTagCompound() || !piece.getTagCompound().hasKey("mask")) {
+                    continue;
+                }
+                set += 0.05;
+            }
+            ratio *= set;
+        }
+        return new ISpecialArmor.ArmorProperties(priority, ratio, armor.getMaxDamage() + 1 - armor.getItemDamage());
+    }
+
+    @Override
+    public int getArmorDisplay(net.minecraft.entity.player.EntityPlayer player, ItemStack armor, int slot) {
+        return this.damageReduceAmount;
+    }
+
+    @Override
+    public void damageArmor(EntityLivingBase entity, ItemStack stack, net.minecraft.util.DamageSource source, int damage, int slot) {
+        if (source != net.minecraft.util.DamageSource.FALL) {
+            stack.damageItem(damage, entity);
+        }
+    }
+
+    @Override
+    public boolean showNodes(ItemStack itemstack, EntityLivingBase player) {
+        return hasGogglesTag(itemstack);
+    }
+
+    @Override
+    public boolean showIngamePopups(ItemStack itemstack, EntityLivingBase player) {
+        return hasGogglesTag(itemstack);
+    }
+
+    private boolean hasGogglesTag(ItemStack stack) {
+        NBTTagCompound tag = stack.getTagCompound();
+        return tag != null && tag.hasKey("goggles");
     }
 }

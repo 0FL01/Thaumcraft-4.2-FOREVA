@@ -1602,6 +1602,27 @@ Depends on GAP-1 and GAP-3. Some infusion source scenarios may require Stage 9 c
 
 - Это contract baseline; расширенный hover-motion parity для Boots of the Traveller остаётся отдельным gameplay polish.
 
+#### Checkpoint 2026-05-17 — GAP-11 fortress-armor core contracts baseline
+
+Статус: частично продвинут.
+
+Что сделано:
+
+- `ItemFortressArmor` доведён до reference-shaped core contracts (без клиентских model/icon tooltip веток):
+  - сохранена расширенная interface surface: `ISpecialArmor` + `IGoggles` + `IRevealer`;
+  - rarity/repair baseline: `RARE` + thaumium repair key (`itemResource:2`);
+  - восстановлен set/mask armor-ratio bonus в `getProperties(...)` (`0.875` base + `0.125` за каждый fortress-piece слотов `1..3` + `0.05` за `mask` tag);
+  - revealer hooks `showNodes(...)`/`showIngamePopups(...)` закреплены на `goggles` NBT-gate.
+- Добавлен `ItemFortressArmorCoreContractsStaticGuardTest` для фиксации этих контрактов.
+
+Проверки:
+
+- `./scripts/dev.sh validate --smoke` — passed.
+
+Ограничения:
+
+- Это common/server contract baseline; полный client tooltip/model/icon parity для fortress armor остаётся отдельным Stage 8 client-render polish.
+
 ### GAP-12: FX registration exists, but send-site coverage and manual scenario validation are incomplete
 
 **Статус:** требует проверки  
