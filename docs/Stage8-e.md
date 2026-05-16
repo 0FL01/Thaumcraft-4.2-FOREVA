@@ -377,6 +377,29 @@ Depends on GAP-1, GAP-2, GAP-5, and GAP-6. Network-thread rendering is unsafe if
 
 - This checkpoint restores note-event buffering hooks only; full `TileSensor` runtime parity (tone/note/redstone trigger logic) remains outside this narrow scope.
 
+#### Checkpoint 2026-05-16 — EventHandlerWorld crafting-return hooks restored
+
+Статус: special crafting return paths in `EventHandlerWorld.onItemCrafted(...)` are now active again.
+
+Что сделано:
+
+- Restored alumentum-style essence return hook:
+  - `event.crafting == itemResource:13` with NBT gate;
+  - iterates craft matrix and returns consumed `ItemEssence` containers by `grow(1)`.
+- Restored arcane-bellows return hook:
+  - `event.crafting == blockMetalDevice:3`;
+  - returns center ingredient stack from craft slot `4` by `grow(1)`.
+- Added static guard `EventHandlerWorldCraftingReturnStaticGuardTest` to lock both return paths.
+
+Проверки:
+
+- `./scripts/dev.sh test` — passed.
+- `./scripts/dev.sh validate --smoke` — passed.
+
+Ограничения:
+
+- This checkpoint restores crafting-return hooks only; harvest-drop special mining replacement path remains outside this narrow scope.
+
 #### Checkpoint 2026-05-16 — GAP-3 shield packet and runic send paths restored
 
 Статус: `PacketFXShield` now has payload/handler baseline and runic shield code paths send it again.

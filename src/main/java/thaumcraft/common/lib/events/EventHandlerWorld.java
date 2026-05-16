@@ -27,6 +27,7 @@ import thaumcraft.common.config.Config;
 import thaumcraft.common.config.ConfigBlocks;
 import thaumcraft.common.config.ConfigItems;
 import thaumcraft.common.entities.monster.boss.EntityThaumcraftBoss;
+import thaumcraft.common.items.ItemEssence;
 import thaumcraft.common.lib.network.PacketHandler;
 import thaumcraft.common.lib.utils.EntityUtils;
 import thaumcraft.common.lib.world.ChunkLoc;
@@ -116,8 +117,25 @@ public class EventHandlerWorld {
             Thaumcraft.addStickyWarpToPlayer(event.player, warp);
         }
 
-        // Phase 8: special item handling (alumentum return, arcane bellows return)
-        // if (event.crafting.getItem() == ConfigItems.itemResource && event.crafting.getItemDamage() == 13 ...) { ... }
+        if (event.crafting.getItem() == ConfigItems.itemResource
+                && event.crafting.getItemDamage() == 13
+                && event.crafting.hasTagCompound()) {
+            for (int slot = 0; slot < event.craftMatrix.getSizeInventory(); ++slot) {
+                ItemStack stack = event.craftMatrix.getStackInSlot(slot);
+                if (stack.isEmpty() || !(stack.getItem() instanceof ItemEssence)) continue;
+                stack.grow(1);
+                event.craftMatrix.setInventorySlotContents(slot, stack);
+            }
+        }
+
+        if (event.crafting.getItem() == Item.getItemFromBlock(ConfigBlocks.blockMetalDevice)
+                && event.crafting.getItemDamage() == 3) {
+            ItemStack stack = event.craftMatrix.getStackInSlot(4);
+            if (!stack.isEmpty()) {
+                stack.grow(1);
+                event.craftMatrix.setInventorySlotContents(4, stack);
+            }
+        }
     }
 
     // ---- Harvest drops ----
