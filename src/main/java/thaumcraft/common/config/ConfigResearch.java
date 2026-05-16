@@ -3215,7 +3215,10 @@ public class ConfigResearch {
                 1,
                 0,
                 new ItemStack(ConfigItems.itemResource, 1, 15))
-                .setPages(new ResearchPage("tc.research_page.BASICARTIFACE.1"))
+                .setPages(
+                        new ResearchPage("tc.research_page.BASICARTIFACE.1"),
+                        new ResearchPage((IArcaneRecipe) recipes.get("PrimalCharm")),
+                        new ResearchPage((IArcaneRecipe) recipes.get("MirrorGlass")))
                 .setStub()
                 .setRound()
                 .setAutoUnlock()
@@ -3233,7 +3236,9 @@ public class ConfigResearch {
                 -3,
                 1,
                 new ItemStack(ConfigBlocks.blockStoneDevice, 1, 14))
-                .setPages(new ResearchPage("tc.research_page.FLUXSCRUB.1"))
+                .setPages(
+                        new ResearchPage("tc.research_page.FLUXSCRUB.1"),
+                        new ResearchPage((IArcaneRecipe) recipes.get("FluxScrubber")))
                 .setParentsHidden("INFUSION")
                 .setParents("VISPOWER", "BELLOWS", "TUBES")
                 .setSecondary()
