@@ -536,6 +536,28 @@ Depends on GAP-1, GAP-2, GAP-5, and GAP-6. Network-thread rendering is unsafe if
 
 - Dedicated server-side send-site restoration for these packet families remains open where corresponding gameplay paths are still stubbed.
 
+#### Checkpoint 2026-05-16 — Bore dig replay channel restored (`PacketBoreDig` + `TileArcaneBore`)
+
+Статус: arcane bore dig replay packet baseline is now wired end-to-end.
+
+Что сделано:
+
+- Implemented `PacketBoreDig` payload serialization (`x/y/z`, `digloc`) and client-scheduled handler.
+- Restored bore-side dig replay path in `TileArcaneBore`:
+  - sends `PacketBoreDig` around bore position on block mine events (64-block radius);
+  - decodes packed dig offsets via `getDigEvent(...)`;
+  - plays one-shot client fallback dig FX in `playClientDigFx(...)` with block crack particles and hit sound.
+- Added `PacketBoreDigSerializationTest` and expanded `ClientProxyFxStaticGuardTest` coverage for packet handler + bore send/consume paths.
+
+Проверки:
+
+- `./scripts/dev.sh test` — passed.
+- `./scripts/dev.sh validate --smoke` — passed.
+
+Ограничения:
+
+- This remains fallback dig replay and does not yet port reference `boreDigFx` renderer classes.
+
 ### GAP-4: Beam, wand beam, bore beam, power beam, arc, and lightning bolt classes are absent
 
 **Статус:** отсутствует  
@@ -894,6 +916,8 @@ Depends on GAP-3, GAP-4, GAP-6. Focus server behavior is Stage 5 dependency only
 **Текущая реализация:**
 - `src/main/java/thaumcraft/common/entities/monster/EntityEldritchGuardian.java:291-292`
 - `src/main/java/thaumcraft/common/lib/utils/Utils.java:39-41`
+- `src/main/java/thaumcraft/common/lib/network/misc/PacketBoreDig.java`
+- `src/main/java/thaumcraft/common/tiles/TileArcaneBore.java`
 - `src/main/java/thaumcraft/common/lib/network/fx/PacketFXSonic.java`
 - `src/main/java/thaumcraft/common/lib/network/fx/PacketFXVisDrain.java`
 - `src/main/java/thaumcraft/common/lib/network/fx/PacketFXEssentiaSource.java`
@@ -916,7 +940,7 @@ Depends on GAP-3, GAP-4, GAP-6. Focus server behavior is Stage 5 dependency only
 
 **Что не совпадает:**
 
-Several registered packet types represent non-wand FX channels used by mobs, aura/vis/essentia transfer, infusion, bore/block interactions, and bubbles. `PacketFXSonic`, `PacketFXVisDrain`, `PacketFXEssentiaSource`, `PacketFXInfusionSource`, `PacketFXBlockDig`, and `PacketFXBlockBubble` now have fallback handlers; remaining gaps are mostly renderer-parity depth and missing send-sites in still-stubbed gameplay paths.
+Several registered packet types represent non-wand FX channels used by mobs, aura/vis/essentia transfer, infusion, bore/block interactions, and bubbles. `PacketFXSonic`, `PacketFXVisDrain`, `PacketFXEssentiaSource`, `PacketFXInfusionSource`, `PacketFXBlockDig`, `PacketFXBlockBubble`, and bore replay `PacketBoreDig` now have fallback handlers; remaining gaps are mostly renderer-parity depth and missing send-sites in still-stubbed gameplay paths.
 
 **Что нужно доделать:**
 

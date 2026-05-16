@@ -9,6 +9,7 @@ import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Enchantments;
+import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemPickaxe;
@@ -21,6 +22,7 @@ import net.minecraft.util.EnumHand;
 import net.minecraft.util.ITickable;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.SoundCategory;
+import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
@@ -29,12 +31,15 @@ import net.minecraft.world.WorldServer;
 import net.minecraftforge.common.ForgeHooks;
 import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.common.util.FakePlayerFactory;
+import net.minecraftforge.fml.common.network.NetworkRegistry;
 import thaumcraft.api.TileThaumcraft;
 import thaumcraft.api.aspects.Aspect;
 import thaumcraft.api.visnet.VisNetHandler;
 import thaumcraft.api.wands.FocusUpgradeType;
 import thaumcraft.api.wands.IWandable;
 import thaumcraft.common.items.wands.foci.FocusExcavation;
+import thaumcraft.common.lib.network.PacketHandler;
+import thaumcraft.common.lib.network.misc.PacketBoreDig;
 import thaumcraft.common.lib.TCSounds;
 import thaumcraft.common.lib.utils.BlockUtils;
 import thaumcraft.common.lib.utils.InventoryUtils;
@@ -58,12 +63,21 @@ public class TileArcaneBore extends TileThaumcraft implements ITickable, IInvent
     private int scanIndex = 0;
     private FakePlayer fakePlayer = null;
     private float speedyTime = 0.0F;
+    private int digX;
+    private int digY;
+    private int digZ;
+    private boolean toDig = false;
+    private Block digBlock = Blocks.AIR;
+    private int digMd = 0;
 
     @Override
     public void update() {
-        if (this.world != null && this.world.isRemote && this.first) {
-            this.setOrientation(this.orientation, true);
-            this.first = false;
+        if (this.world != null && this.world.isRemote) {
+            if (this.first) {
+                this.setOrientation(this.orientation, true);
+                this.first = false;
+            }
+            this.playClientDigFx();
         }
         this.topRotation = (this.topRotation + (this.hasFocus && this.hasPickaxe ? 4 : 1)) % 360;
         if (this.world != null && !this.world.isRemote) {
@@ -390,6 +404,7 @@ public class TileArcaneBore extends TileThaumcraft implements ITickable, IInvent
         }
 
         this.collectExistingDrops(target, drops);
+        this.sendDigEvent(target);
         this.world.setBlockToAir(target);
         this.world.playEvent(2001, target, Block.getStateId(state));
         for (ItemStack drop : drops) {
@@ -397,6 +412,72 @@ public class TileArcaneBore extends TileThaumcraft implements ITickable, IInvent
         }
         this.damagePickaxe();
         return true;
+    }
+
+    public void getDigEvent(int packed) {
+        int x = ((packed >> 16) & 0xFF) - 64;
+        int y = ((packed >> 8) & 0xFF) - 64;
+        int z = (packed & 0xFF) - 64;
+        this.digX = this.pos.getX() + x;
+        this.digY = this.pos.getY() + y;
+        this.digZ = this.pos.getZ() + z;
+        this.toDig = true;
+        IBlockState state = this.world.getBlockState(new BlockPos(this.digX, this.digY, this.digZ));
+        this.digBlock = state.getBlock();
+        this.digMd = this.digBlock.getMetaFromState(state);
+    }
+
+    private void sendDigEvent(BlockPos target) {
+        int x = target.getX() - this.pos.getX() + 64;
+        int y = target.getY() - this.pos.getY() + 64;
+        int z = target.getZ() - this.pos.getZ() + 64;
+        int packed = ((x & 0xFF) << 16) | ((y & 0xFF) << 8) | (z & 0xFF);
+        PacketHandler.INSTANCE.sendToAllAround(
+                new PacketBoreDig(this.pos.getX(), this.pos.getY(), this.pos.getZ(), packed),
+                new NetworkRegistry.TargetPoint(
+                        this.world.provider.getDimension(),
+                        this.pos.getX(),
+                        this.pos.getY(),
+                        this.pos.getZ(),
+                        64.0));
+    }
+
+    private void playClientDigFx() {
+        if (!this.toDig || this.world == null || this.digBlock == null || this.digBlock == Blocks.AIR) return;
+        this.toDig = false;
+        IBlockState state;
+        try {
+            state = this.digBlock.getStateFromMeta(this.digMd);
+        } catch (Exception ignored) {
+            state = this.digBlock.getDefaultState();
+        }
+        int stateId = Block.getStateId(state);
+        int sx = this.pos.getX() + this.orientation.getXOffset();
+        int sy = this.pos.getY() + this.orientation.getYOffset();
+        int sz = this.pos.getZ() + this.orientation.getZOffset();
+        this.world.playSound(
+                sx + 0.5,
+                sy + 0.5,
+                sz + 0.5,
+                this.digBlock.getSoundType(state, this.world, new BlockPos(this.digX, this.digY, this.digZ), null).getHitSound(),
+                SoundCategory.BLOCKS,
+                0.45F,
+                0.85F,
+                false);
+        for (int i = 0; i < thaumcraft.common.Thaumcraft.proxy.particleCount(10); i++) {
+            double px = this.digX + this.world.rand.nextFloat();
+            double py = this.digY + this.world.rand.nextFloat();
+            double pz = this.digZ + this.world.rand.nextFloat();
+            this.world.spawnParticle(
+                    EnumParticleTypes.BLOCK_CRACK,
+                    px,
+                    py,
+                    pz,
+                    (sx + 0.5 - px) * 0.09,
+                    (sy + 0.5 - py) * 0.09,
+                    (sz + 0.5 - pz) * 0.09,
+                    stateId);
+        }
     }
 
     private void collectExistingDrops(BlockPos target, NonNullList<ItemStack> drops) {

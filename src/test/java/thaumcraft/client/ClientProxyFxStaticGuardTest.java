@@ -55,6 +55,8 @@ public class ClientProxyFxStaticGuardTest {
         String eldritchTrap = readFile("src/main/java/thaumcraft/common/tiles/TileEldritchTrap.java");
         String infusionMatrix = readFile("src/main/java/thaumcraft/common/tiles/TileInfusionMatrix.java");
         String essentiaHandler = readFile("src/main/java/thaumcraft/common/lib/events/EssentiaHandler.java");
+        String packetBoreDig = readFile("src/main/java/thaumcraft/common/lib/network/misc/PacketBoreDig.java");
+        String arcaneBore = readFile("src/main/java/thaumcraft/common/tiles/TileArcaneBore.java");
 
         assertTrue("PacketFXVisDrain must schedule client task and call proxy beam",
                 visDrain.contains("Minecraft.getMinecraft().addScheduledTask") && visDrain.contains("Thaumcraft.proxy.beam("));
@@ -81,6 +83,9 @@ public class ClientProxyFxStaticGuardTest {
         assertTrue("PacketFXInfusionSource must schedule client task and route through proxy beam",
                 infusionSource.contains("Minecraft.getMinecraft().addScheduledTask")
                         && infusionSource.contains("Thaumcraft.proxy.beam("));
+        assertTrue("PacketBoreDig must schedule client task and route to TileArcaneBore.getDigEvent",
+                packetBoreDig.contains("Minecraft.getMinecraft().addScheduledTask")
+                        && packetBoreDig.contains("getDigEvent"));
         assertTrue("PacketFXBlockSparkle must schedule client task and call proxy blockSparkle",
                 blockSparkle.contains("Minecraft.getMinecraft().addScheduledTask") && blockSparkle.contains("Thaumcraft.proxy.blockSparkle("));
         assertTrue("PacketFXShield must schedule client task and route through proxy burst/bolt",
@@ -115,6 +120,10 @@ public class ClientProxyFxStaticGuardTest {
                 infusionMatrix.contains("new PacketFXInfusionSource("));
         assertTrue("Essentia drain path must send PacketFXEssentiaSource",
                 essentiaHandler.contains("new PacketFXEssentiaSource("));
+        assertTrue("TileArcaneBore must send PacketBoreDig and process client dig FX path",
+                arcaneBore.contains("new PacketBoreDig(")
+                        && arcaneBore.contains("public void getDigEvent(")
+                        && arcaneBore.contains("playClientDigFx("));
     }
 
     private static String readFile(String path) throws IOException {
