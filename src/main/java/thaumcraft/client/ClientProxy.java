@@ -59,6 +59,7 @@ import thaumcraft.client.renderers.entity.RenderElectricOrb;
 import thaumcraft.client.renderers.entity.RenderExplosiveOrb;
 import thaumcraft.client.renderers.entity.RenderEmber;
 import thaumcraft.client.renderers.entity.RenderEldritchOrb;
+import thaumcraft.client.renderers.entity.RenderPrimalOrb;
 import thaumcraft.client.renderers.entity.RenderCultistPortal;
 import thaumcraft.client.renderers.entity.RenderBrainyZombie;
 import thaumcraft.client.renderers.entity.RenderInhabitedZombie;
@@ -212,7 +213,7 @@ public class ClientProxy extends CommonProxy {
         registerEntityRenderer(EntityBottleTaint.class,
                 manager -> new RenderSnowball<>(manager, itemOrFallback(ConfigItems.itemBottleTaint, Items.SPLASH_POTION), renderItem), registered);
         registerEntityRenderer(EntityAlumentum.class, manager -> new RenderSnowball<>(manager, Items.FIRE_CHARGE, renderItem), registered);
-        registerEntityRenderer(EntityPrimalOrb.class, manager -> new RenderSnowball<>(manager, Items.ENDER_EYE, renderItem), registered);
+        registerEntityRenderer(EntityPrimalOrb.class, RenderPrimalOrb::new, registered);
         registerEntityRenderer(EntityFrostShard.class, manager -> new RenderSnowball<>(manager, Items.SNOWBALL, renderItem), registered);
         registerEntityRenderer(EntityPechBlast.class, manager -> new RenderSnowball<>(manager, Items.BLAZE_POWDER, renderItem), registered);
         registerEntityRenderer(EntityEldritchOrb.class, RenderEldritchOrb::new, registered);

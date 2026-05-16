@@ -28,7 +28,7 @@ public class ClientProxyEntityRendererRegistrationStaticGuardTest {
                         && source.contains("registerEntityRenderer(EntityPrimalArrow.class,")
                         && source.contains("registerEntityRenderer(EntityBottleTaint.class,")
                         && source.contains("registerEntityRenderer(EntityAlumentum.class, manager -> new RenderSnowball<>(manager, Items.FIRE_CHARGE, renderItem), registered);")
-                        && source.contains("registerEntityRenderer(EntityPrimalOrb.class, manager -> new RenderSnowball<>(manager, Items.ENDER_EYE, renderItem), registered);")
+                        && source.contains("registerEntityRenderer(EntityPrimalOrb.class, RenderPrimalOrb::new, registered);")
                         && source.contains("registerEntityRenderer(EntityFrostShard.class, manager -> new RenderSnowball<>(manager, Items.SNOWBALL, renderItem), registered);")
                         && source.contains("registerEntityRenderer(EntityPechBlast.class, manager -> new RenderSnowball<>(manager, Items.BLAZE_POWDER, renderItem), registered);")
                         && source.contains("registerEntityRenderer(EntityEldritchOrb.class, RenderEldritchOrb::new, registered);")
@@ -143,6 +143,15 @@ public class ClientProxyEntityRendererRegistrationStaticGuardTest {
                         && eldritchOrbRenderer.contains("BlockCustomOreItem.colors[5]")
                         && eldritchOrbRenderer.contains("entity.ticksExisted % 13")
                         && eldritchOrbRenderer.contains("DefaultVertexFormats.POSITION_COLOR"));
+        String primalOrbRenderer = readFile("src/main/java/thaumcraft/client/renderers/entity/RenderPrimalOrb.java");
+        assertTrue("RenderPrimalOrb must provide primal-color spike-burst plus billboard baseline",
+                primalOrbRenderer.contains("extends Render<Entity>")
+                        && primalOrbRenderer.contains("textures/misc/particles.png")
+                        && primalOrbRenderer.contains("renderPrimalSpikes(")
+                        && primalOrbRenderer.contains("renderPrimalBillboard(")
+                        && primalOrbRenderer.contains("BlockCustomOreItem.colors[i / 2 + 1]")
+                        && primalOrbRenderer.contains("entity.ticksExisted % 13")
+                        && primalOrbRenderer.contains("GlStateManager.scale(0.5F, 0.5F, 0.5F)"));
         String eldritchGuardianRenderer = readFile("src/main/java/thaumcraft/client/renderers/entity/RenderEldritchGuardian.java");
         assertTrue("RenderEldritchGuardian must provide dedicated guardian texture baseline",
                 eldritchGuardianRenderer.contains("extends RenderBiped<EntityEldritchGuardian>")

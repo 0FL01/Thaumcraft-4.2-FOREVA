@@ -2225,6 +2225,30 @@ Some entities may be hard to trigger naturally until recipes/research/spawn cont
 
 - Это renderer baseline без ручной визуальной проверки; exact legacy timing/GL nuances остаются в общем Stage 8-d visual parity matrix.
 
+### Checkpoint 2026-05-17 — replace primal orb snowball fallback with dedicated renderer baseline
+
+Статус: частично продвинут.
+
+Что сделано:
+
+- `EntityPrimalOrb` переведен с `RenderSnowball` на dedicated `RenderPrimalOrb`.
+- Добавлен `RenderPrimalOrb` с reference-shaped contracts:
+  - multi-pass renderer: primal-colored spike-burst + billboard pass;
+  - spike-burst palette baseline `BlockCustomOreItem.colors[i / 2 + 1]`;
+  - particle atlas billboard (`textures/misc/particles.png`) с frame profile `ticksExisted % 13`;
+  - additive blend billboard и `0.5F` billboard scale baseline.
+- `ClientProxyEntityRendererRegistrationStaticGuardTest` обновлен:
+  - registration contract `EntityPrimalOrb -> RenderPrimalOrb::new`;
+  - renderer contract checks на primal spike/billboard/color/frame/scale surface.
+
+Проверки:
+
+- `./scripts/dev.sh validate --smoke` — passed.
+
+Ограничения:
+
+- Это renderer baseline без ручной визуальной проверки; exact legacy GL/lightmap nuances остаются в общем Stage 8-d visual parity matrix.
+
 - [ ] Add client-only entity renderer registration hook.
 - [ ] Register every entity from `ConfigEntities.ENTITIES` with a custom or vanilla-equivalent renderer.
 - [ ] Port item-like/transient/projectile renderers.
