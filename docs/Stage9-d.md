@@ -495,6 +495,24 @@ After data gaps are fixed, run focused manual or automated scenarios for crucibl
 
 Depends on GAP-1, GAP-2, GAP-3, and GAP-5. Client particle/sound TODOs in `TileCrucible.receiveClientEvent` are a Stage 8 dependency and should not block Stage 9-d data closure unless they cause server/common runtime crashes.
 
+#### Checkpoint 2026-05-16 — GAP-6 server smoke baseline refresh
+
+Статус: dedicated common/server smoke gate for current Stage 9-d delta is green.
+
+Что сделано:
+
+- Ran `./scripts/dev.sh smoke-server` after latest Stage 9-d recipe/gating/brainbox/aspect baseline updates.
+- Wrapper reached normal Forge ready state and reported no crash markers in smoke log sweep.
+
+Проверки:
+
+- `./scripts/dev.sh smoke-server` — passed (`Done (` ready state, no crash markers).
+
+Ограничения:
+
+- This checkpoint validates server load stability only.
+- Manual crucible/thaumatorium progression scenarios from GAP-6 acceptance criteria remain open.
+
 ## 6. Итоговый checklist закрытия Stage 9-d
 
 - [ ] Port reference `ConfigRecipes.initializeAlchemyRecipes()` crucible recipe data into current `ConfigRecipes.init()` flow.
