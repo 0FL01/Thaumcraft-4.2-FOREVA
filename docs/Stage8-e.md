@@ -1583,6 +1583,25 @@ Depends on GAP-1 and GAP-3. Some infusion source scenarios may require Stage 9 c
 
 - Это contract-level baseline; полный model/icon/tooltip parity для cultist armor остаётся на отдельный Stage 8 client-render polish.
 
+#### Checkpoint 2026-05-17 — GAP-11 robe/traveller armor rarity-repair baseline
+
+Статус: частично продвинут.
+
+Что сделано:
+
+- Восстановлены reference-shaped core contracts:
+  - `ItemRobeArmor`: `UNCOMMON` rarity + thaumic-cloth repair key (`itemResource:7`);
+  - `ItemBootsTraveller`: `RARE` rarity baseline.
+- Добавлен `ItemRobeTravellerArmorCoreContractsStaticGuardTest` для фиксации этих контрактов.
+
+Проверки:
+
+- `./scripts/dev.sh validate --smoke` — passed.
+
+Ограничения:
+
+- Это contract baseline; расширенный hover-motion parity для Boots of the Traveller остаётся отдельным gameplay polish.
+
 ### GAP-12: FX registration exists, but send-site coverage and manual scenario validation are incomplete
 
 **Статус:** требует проверки  

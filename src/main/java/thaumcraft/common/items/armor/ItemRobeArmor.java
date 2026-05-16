@@ -5,6 +5,7 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.inventory.EntityEquipmentSlot;
+import net.minecraft.item.EnumRarity;
 import net.minecraft.item.ItemArmor;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -17,6 +18,7 @@ import thaumcraft.api.IRepairable;
 import thaumcraft.api.IRunicArmor;
 import thaumcraft.api.IVisDiscountGear;
 import thaumcraft.api.aspects.Aspect;
+import thaumcraft.common.config.ConfigItems;
 import thaumcraft.common.lib.CreativeTabThaumcraft;
 
 public class ItemRobeArmor extends ItemArmor implements IRepairable, IRunicArmor, IVisDiscountGear {
@@ -34,8 +36,14 @@ public class ItemRobeArmor extends ItemArmor implements IRepairable, IRunicArmor
     }
 
     @Override
+    public EnumRarity getRarity(ItemStack stack) {
+        return EnumRarity.UNCOMMON;
+    }
+
+    @Override
     public boolean getIsRepairable(ItemStack toRepair, ItemStack repair) {
-        return super.getIsRepairable(toRepair, repair);
+        ItemStack thaumicCloth = new ItemStack(ConfigItems.itemResource, 1, 7);
+        return repair.isItemEqual(thaumicCloth) || super.getIsRepairable(toRepair, repair);
     }
 
     @Override

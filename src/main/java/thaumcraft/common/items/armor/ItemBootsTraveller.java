@@ -2,6 +2,7 @@ package thaumcraft.common.items.armor;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.EntityEquipmentSlot;
+import net.minecraft.item.EnumRarity;
 import net.minecraft.item.ItemArmor;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
@@ -20,6 +21,11 @@ public class ItemBootsTraveller extends ItemArmor implements IRepairable, IRunic
     @Override
     public int getRunicCharge(ItemStack itemstack) {
         return 0;
+    }
+
+    @Override
+    public EnumRarity getRarity(ItemStack stack) {
+        return EnumRarity.RARE;
     }
 
     @Override
