@@ -1546,6 +1546,28 @@ Some entities may be hard to trigger naturally until recipes/research/spawn cont
 
 - Это early-FX baseline; полная visual parity эффекта остаётся в non-GUI ограниченном client scope.
 
+### Checkpoint 2026-05-17 — restore taint chicken AI/fall/sound behavior baseline
+
+Статус: частично продвинут.
+
+Что сделано:
+
+- `EntityTaintChicken` выровнен с reference-shaped common behavior contracts:
+  - восстановлен constructor AI stack (swim, player/villager/animal attack tasks, leap, wander, watch, idle, target tasks);
+  - добавлены hooks `canBreatheUnderwater() -> true` и `canDespawn() -> false`;
+  - добавлен empty `fall(float, float)` override (no fall-side fuse/damage behavior);
+  - восстановлен early client taint FX loop в первые `5` ticks (`particleCount(10)` + `taintLandFX(this)`);
+  - death sound contract выровнен к hurt baseline (`SoundEvents.ENTITY_CHICKEN_HURT`), как в reference string-path behavior.
+- `ClientProxyEntityRendererRegistrationStaticGuardTest` расширен проверками на AI/fall/sound contracts `EntityTaintChicken`.
+
+Проверки:
+
+- `./scripts/dev.sh validate --smoke` — passed.
+
+Ограничения:
+
+- Это common behavior baseline; визуальная точность эффекта раннего FX ограничена non-GUI validation рамками.
+
 ### Checkpoint 2026-05-16 — restore mind spider viewer-only render gating
 
 Статус: частично продвинут.

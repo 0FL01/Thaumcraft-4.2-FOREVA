@@ -366,6 +366,26 @@ public class ClientProxyEntityRendererRegistrationStaticGuardTest {
                         && taintSpiderEntity.contains("public double getYOffset()")
                         && taintSpiderEntity.contains("return 0.1D;")
                         && taintSpiderEntity.contains("this.world.rand.nextInt(6) == 0"));
+        String taintChickenEntity = readFile("src/main/java/thaumcraft/common/entities/monster/EntityTaintChicken.java");
+        assertTrue("EntityTaintChicken must keep reference-shaped AI/fall/sound baseline contracts",
+                taintChickenEntity.contains("this.tasks.addTask(0, new EntityAISwimming(this));")
+                        && taintChickenEntity.contains("new AIAttackOnCollide(this, EntityPlayer.class, 1.0D, false)")
+                        && taintChickenEntity.contains("new EntityAILeapAtTarget(this, 0.3F)")
+                        && taintChickenEntity.contains("new AIAttackOnCollide(this, EntityVillager.class, 1.0D, true)")
+                        && taintChickenEntity.contains("new AIAttackOnCollide(this, EntityAnimal.class, 1.0D, true)")
+                        && taintChickenEntity.contains("new EntityAIWander(this, 1.0D)")
+                        && taintChickenEntity.contains("new EntityAIWatchClosest(this, EntityPlayer.class, 6.0F)")
+                        && taintChickenEntity.contains("new EntityAILookIdle(this)")
+                        && taintChickenEntity.contains("new EntityAIHurtByTarget(this, false)")
+                        && taintChickenEntity.contains("new EntityAINearestAttackableTarget(this, EntityPlayer.class, true)")
+                        && taintChickenEntity.contains("new EntityAINearestAttackableTarget(this, EntityVillager.class, false)")
+                        && taintChickenEntity.contains("new EntityAINearestAttackableTarget(this, EntityAnimal.class, false)")
+                        && taintChickenEntity.contains("public boolean canBreatheUnderwater()")
+                        && taintChickenEntity.contains("protected boolean canDespawn()")
+                        && taintChickenEntity.contains("public void fall(float distance, float damageMultiplier)")
+                        && taintChickenEntity.contains("this.world.isRemote && this.ticksExisted < 5")
+                        && taintChickenEntity.contains("Thaumcraft.proxy.taintLandFX(this)")
+                        && taintChickenEntity.contains("SoundEvents.ENTITY_CHICKEN_HURT"));
         assertTrue("ClientProxy must iterate ConfigEntities.ENTITIES for renderer registration coverage",
                 source.contains("for (net.minecraftforge.fml.common.registry.EntityEntry entry : ConfigEntities.ENTITIES)"));
         assertTrue("ClientProxy must keep fallback RenderNoop registrations for remaining entities",
