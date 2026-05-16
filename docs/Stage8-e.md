@@ -1623,6 +1623,29 @@ Depends on GAP-1 and GAP-3. Some infusion source scenarios may require Stage 9 c
 
 - Это common/server contract baseline; полный client tooltip/model/icon parity для fortress armor остаётся отдельным Stage 8 client-render polish.
 
+#### Checkpoint 2026-05-17 — GAP-11 fortress-armor tooltip/lang contracts baseline
+
+Статус: частично продвинут.
+
+Что сделано:
+
+- `ItemFortressArmor` получил reference-shaped tooltip contracts для helm upgrades:
+  - в `addInformation(...)` восстановлены `goggles`/`mask` NBT tooltip ветки;
+  - goggles tooltip использует `item.ItemGoggles.name`;
+  - mask tooltip использует `item.HelmetFortress.mask.<id>`.
+- В `en_us.lang` добавлены отсутствующие tooltip keys из reference baseline:
+  - `item.ItemGoggles.name`;
+  - `item.HelmetFortress.mask.0..2`.
+- `ItemFortressArmorCoreContractsStaticGuardTest` расширен проверками tooltip contracts и присутствия новых lang-ключей.
+
+Проверки:
+
+- `./scripts/dev.sh validate --smoke` — passed.
+
+Ограничения:
+
+- Это non-GUI tooltip/lang baseline; визуальная model/icon-equipped parity fortress armor остаётся в Stage 8 client-render scope.
+
 ### GAP-12: FX registration exists, but send-site coverage and manual scenario validation are incomplete
 
 **Статус:** требует проверки  

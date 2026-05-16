@@ -1,5 +1,8 @@
 package thaumcraft.common.items.armor;
 
+import java.util.List;
+import javax.annotation.Nullable;
+import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.EnumRarity;
@@ -7,7 +10,12 @@ import net.minecraft.item.ItemArmor;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.util.text.TextFormatting;
+import net.minecraft.util.text.translation.I18n;
+import net.minecraft.world.World;
 import net.minecraftforge.common.ISpecialArmor;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import thaumcraft.api.IGoggles;
 import thaumcraft.api.IRepairable;
 import thaumcraft.api.IRunicArmor;
@@ -82,6 +90,19 @@ public class ItemFortressArmor extends ItemArmor implements IRepairable, IRunicA
         if (source != net.minecraft.util.DamageSource.FALL) {
             stack.damageItem(damage, entity);
         }
+    }
+
+    @SideOnly(Side.CLIENT)
+    @Override
+    public void addInformation(ItemStack stack, @Nullable World worldIn, List<String> tooltip, ITooltipFlag flagIn) {
+        NBTTagCompound tag = stack.getTagCompound();
+        if (tag != null && tag.hasKey("goggles")) {
+            tooltip.add(TextFormatting.DARK_PURPLE + I18n.translateToLocal("item.ItemGoggles.name"));
+        }
+        if (tag != null && tag.hasKey("mask")) {
+            tooltip.add(TextFormatting.GOLD + I18n.translateToLocal("item.HelmetFortress.mask." + tag.getInteger("mask")));
+        }
+        super.addInformation(stack, worldIn, tooltip, flagIn);
     }
 
     @Override

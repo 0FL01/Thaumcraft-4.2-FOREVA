@@ -14,6 +14,7 @@ public class ItemFortressArmorCoreContractsStaticGuardTest {
     @Test
     public void fortressArmorKeepsReferenceRarityRepairMaskAndGogglesContracts() throws IOException {
         String source = readFile("src/main/java/thaumcraft/common/items/armor/ItemFortressArmor.java");
+        String lang = readFile("src/main/resources/assets/thaumcraft/lang/en_us.lang");
 
         assertTrue("ItemFortressArmor must keep fortress interface surface and rare rarity contract",
                 source.contains("implements IRepairable, IRunicArmor, ISpecialArmor, IGoggles, IRevealer")
@@ -31,6 +32,15 @@ public class ItemFortressArmorCoreContractsStaticGuardTest {
         assertTrue("ItemFortressArmor must keep goggles NBT gates for revealer hooks",
                 source.contains("return hasGogglesTag(itemstack);")
                         && source.contains("tag.hasKey(\"goggles\")"));
+        assertTrue("ItemFortressArmor must keep goggles/mask tooltip contracts",
+                source.contains("public void addInformation(ItemStack stack, @Nullable World worldIn, List<String> tooltip, ITooltipFlag flagIn)")
+                        && source.contains("I18n.translateToLocal(\"item.ItemGoggles.name\")")
+                        && source.contains("I18n.translateToLocal(\"item.HelmetFortress.mask.\" + tag.getInteger(\"mask\"))"));
+        assertTrue("Fortress tooltip localization keys must exist in en_us.lang",
+                lang.contains("item.ItemGoggles.name=Goggles of Revealing")
+                        && lang.contains("item.HelmetFortress.mask.0=Grinning Devil")
+                        && lang.contains("item.HelmetFortress.mask.1=Angry Ghost")
+                        && lang.contains("item.HelmetFortress.mask.2=Sipping Fiend"));
     }
 
     private static String readFile(String path) throws IOException {
