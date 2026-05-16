@@ -68,9 +68,9 @@ public class ClientProxyEntityRendererRegistrationStaticGuardTest {
                         && source.contains("registerEntityRenderer(EntityTaintSpore.class, RenderTaintSpore::new, registered);")
                         && source.contains("registerEntityRenderer(EntityTaintSporeSwarmer.class, RenderTaintSporeSwarmer::new, registered);")
                         && source.contains("registerEntityRenderer(EntityTaintSwarm.class, RenderTaintSwarm::new, registered);")
-                        && source.contains("registerEntityRenderer(EntityTaintacle.class, manager -> new RenderFallbackLiving<>(")
-                        && source.contains("registerEntityRenderer(EntityTaintacleSmall.class, manager -> new RenderFallbackLiving<>(")
-                        && source.contains("registerEntityRenderer(EntityTaintacleGiant.class, manager -> new RenderFallbackLiving<>("));
+                        && source.contains("registerEntityRenderer(EntityTaintacle.class, manager -> new RenderTaintacle<>(manager, 0.6F, 1.0F), registered);")
+                        && source.contains("registerEntityRenderer(EntityTaintacleSmall.class, manager -> new RenderTaintacle<>(manager, 0.45F, 0.85F), registered);")
+                        && source.contains("registerEntityRenderer(EntityTaintacleGiant.class, manager -> new RenderTaintacle<>(manager, 0.8F, 1.33F), registered);"));
         assertTrue("ClientProxy must keep fallback registrations for remaining special entities",
                 source.contains("registerEntityRenderer(EntityGolemBase.class, RenderGolemBase::new, registered);")
                         && source.contains("registerEntityRenderer(EntityTravelingTrunk.class, RenderTravelingTrunk::new, registered);")
@@ -148,6 +148,12 @@ public class ClientProxyEntityRendererRegistrationStaticGuardTest {
         String taintSwarmRenderer = readFile("src/main/java/thaumcraft/client/renderers/entity/RenderTaintSwarm.java");
         assertTrue("RenderTaintSwarm must stay as dedicated noop baseline renderer",
                 taintSwarmRenderer.contains("extends RenderNoop<EntityTaintSwarm>"));
+        String taintacleRenderer = readFile("src/main/java/thaumcraft/client/renderers/entity/RenderTaintacle.java");
+        assertTrue("RenderTaintacle must provide shared taintacle texture and scale baseline",
+                taintacleRenderer.contains("extends RenderLiving<T>")
+                        && taintacleRenderer.contains("textures/models/taintacle.png")
+                        && taintacleRenderer.contains("scaleMultiplier")
+                        && taintacleRenderer.contains("GlStateManager.scale(scaleMultiplier, scaleMultiplier, scaleMultiplier)"));
         String trunkRenderer = readFile("src/main/java/thaumcraft/client/renderers/entity/RenderTravelingTrunk.java");
         assertTrue("RenderTravelingTrunk must provide anger-based texture routing baseline",
                 trunkRenderer.contains("extends RenderLiving<EntityTravelingTrunk>")

@@ -70,6 +70,7 @@ import thaumcraft.client.renderers.entity.RenderPech;
 import thaumcraft.client.renderers.entity.RenderTaintSpore;
 import thaumcraft.client.renderers.entity.RenderTaintSporeSwarmer;
 import thaumcraft.client.renderers.entity.RenderTaintSwarm;
+import thaumcraft.client.renderers.entity.RenderTaintacle;
 import thaumcraft.client.renderers.entity.RenderTravelingTrunk;
 import thaumcraft.client.renderers.entity.RenderWisp;
 import thaumcraft.client.lib.ClientTickEventsFML;
@@ -248,12 +249,9 @@ public class ClientProxy extends CommonProxy {
         registerEntityRenderer(EntityTaintSpore.class, RenderTaintSpore::new, registered);
         registerEntityRenderer(EntityTaintSporeSwarmer.class, RenderTaintSporeSwarmer::new, registered);
         registerEntityRenderer(EntityTaintSwarm.class, RenderTaintSwarm::new, registered);
-        registerEntityRenderer(EntityTaintacle.class, manager -> new RenderFallbackLiving<>(
-                manager, new ModelSpider(), 0.6F, new ResourceLocation("thaumcraft", "textures/models/taintacle.png")), registered);
-        registerEntityRenderer(EntityTaintacleSmall.class, manager -> new RenderFallbackLiving<>(
-                manager, new ModelSpider(), 0.45F, new ResourceLocation("thaumcraft", "textures/models/taintacle.png")), registered);
-        registerEntityRenderer(EntityTaintacleGiant.class, manager -> new RenderFallbackLiving<>(
-                manager, new ModelSpider(), 0.8F, new ResourceLocation("thaumcraft", "textures/models/taintacle.png")), registered);
+        registerEntityRenderer(EntityTaintacle.class, manager -> new RenderTaintacle<>(manager, 0.6F, 1.0F), registered);
+        registerEntityRenderer(EntityTaintacleSmall.class, manager -> new RenderTaintacle<>(manager, 0.45F, 0.85F), registered);
+        registerEntityRenderer(EntityTaintacleGiant.class, manager -> new RenderTaintacle<>(manager, 0.8F, 1.33F), registered);
         registerEntityRenderer(EntityGolemBase.class, RenderGolemBase::new, registered);
         registerEntityRenderer(EntityTravelingTrunk.class, RenderTravelingTrunk::new, registered);
         registerEntityRenderer(EntityCultistPortal.class, RenderCultistPortal::new, registered);

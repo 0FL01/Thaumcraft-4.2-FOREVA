@@ -941,6 +941,34 @@ Some entities may be hard to trigger naturally until recipes/research/spawn cont
 
 - Это baseline по renderer identity/texture/scale; full reference parity для оригинальных custom model/render-pass деталей trio остаётся открытой по GAP-3/GAP-4/GAP-6.
 
+### Checkpoint 2026-05-16 — taintacle trio dedicated renderer baseline
+
+Статус: частично продвинут.
+
+Почему grouped в один commit:
+
+- `EntityTaintacle`, `EntityTaintacleSmall`, `EntityTaintacleGiant` используют общий texture contract и общий renderer pattern (различается только scale profile), поэтому это единый tightly-coupled rendering slice.
+
+Что сделано:
+
+- Добавлен shared dedicated renderer `RenderTaintacle<T extends EntityLiving>`.
+- `ClientProxy.setupEntityRenderers()` обновлен:
+  - `EntityTaintacle -> new RenderTaintacle<>(..., 0.6F, 1.0F)`;
+  - `EntityTaintacleSmall -> new RenderTaintacle<>(..., 0.45F, 0.85F)`;
+  - `EntityTaintacleGiant -> new RenderTaintacle<>(..., 0.8F, 1.33F)`.
+- Baseline behavior:
+  - shared texture `textures/models/taintacle.png`;
+  - per-registration size differentiation через `scaleMultiplier` (включая giant 1.33x baseline).
+- `ClientProxyEntityRendererRegistrationStaticGuardTest` расширен проверками trio registration paths и `RenderTaintacle` contracts.
+
+Проверки:
+
+- `./scripts/dev.sh validate --smoke` — passed.
+
+Ограничения:
+
+- Это baseline по texture/scale wiring; full reference parity для taintacle trio (custom model-driven animation nuances и giant boss display details) остаётся открытой по GAP-3/GAP-4/GAP-6.
+
 - [ ] Add client-only entity renderer registration hook.
 - [ ] Register every entity from `ConfigEntities.ENTITIES` with a custom or vanilla-equivalent renderer.
 - [ ] Port item-like/transient/projectile renderers.
