@@ -1,6 +1,7 @@
 package thaumcraft.common.lib.events;
 
 import net.minecraft.block.Block;
+import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
@@ -10,6 +11,8 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
+import net.minecraft.init.Enchantments;
+import net.minecraft.init.SoundEvents;
 import net.minecraftforge.event.entity.player.FillBucketEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.world.BlockEvent;
@@ -21,6 +24,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import thaumcraft.api.ThaumcraftApi;
+import thaumcraft.api.wands.FocusUpgradeType;
 import thaumcraft.api.visnet.VisNetHandler;
 import thaumcraft.common.Thaumcraft;
 import thaumcraft.common.config.Config;
@@ -28,8 +32,13 @@ import thaumcraft.common.config.ConfigBlocks;
 import thaumcraft.common.config.ConfigItems;
 import thaumcraft.common.entities.monster.boss.EntityThaumcraftBoss;
 import thaumcraft.common.items.ItemEssence;
+import thaumcraft.common.items.equipment.ItemElementalPickaxe;
+import thaumcraft.common.items.equipment.ItemPrimalCrusher;
+import thaumcraft.common.items.wands.ItemWandCasting;
+import thaumcraft.common.items.wands.foci.FocusExcavation;
 import thaumcraft.common.lib.network.PacketHandler;
 import thaumcraft.common.lib.utils.EntityUtils;
+import thaumcraft.common.lib.utils.Utils;
 import thaumcraft.common.lib.world.ChunkLoc;
 import thaumcraft.common.lib.world.dim.MazeHandler;
 import thaumcraft.common.tiles.TileSensor;
@@ -148,8 +157,40 @@ public class EventHandlerWorld {
         ItemStack held = player.getHeldItemMainhand();
         if (held.isEmpty()) return;
 
-        // Phase 8: Elemental Pickaxe / Primal Crusher / Excavation focus special mining results
-        // Future: Utils.findSpecialMiningResult(itemStack, chance, random) replacement
+        if (!(held.getItem() instanceof ItemElementalPickaxe)
+                && !(held.getItem() instanceof ItemPrimalCrusher)
+                && !(held.getItem() instanceof ItemWandCasting
+                && ((ItemWandCasting) held.getItem()).getFocus(held) != null
+                && ((ItemWandCasting) held.getItem()).getFocus(held).isUpgradedWith(
+                ((ItemWandCasting) held.getItem()).getFocusItem(held), FocusExcavation.dowsing))) {
+            return;
+        }
+
+        int fortune = EnchantmentHelper.getEnchantmentLevel(Enchantments.FORTUNE, held);
+        if (held.getItem() instanceof ItemWandCasting) {
+            ItemWandCasting wand = (ItemWandCasting) held.getItem();
+            if (wand.getFocus(held) != null) {
+                fortune = wand.getFocus(held).getUpgradeLevel(wand.getFocusItem(held), FocusUpgradeType.treasure);
+            }
+        }
+
+        float chance = 0.2f + (float) fortune * 0.075f;
+        for (int i = 0; i < event.getDrops().size(); ++i) {
+            ItemStack original = event.getDrops().get(i);
+            ItemStack replacement = Utils.findSpecialMiningResult(original, chance, event.getWorld().rand);
+            if (original.isItemEqual(replacement)) {
+                continue;
+            }
+            event.getDrops().set(i, replacement);
+            if (!event.getWorld().isRemote) {
+                event.getWorld().playSound(null,
+                        event.getPos(),
+                        SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP,
+                        net.minecraft.util.SoundCategory.BLOCKS,
+                        0.2f,
+                        0.7f + event.getWorld().rand.nextFloat() * 0.2f);
+            }
+        }
     }
 
     // ---- Block placement restrictions ----

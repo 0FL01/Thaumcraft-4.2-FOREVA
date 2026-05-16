@@ -21,6 +21,7 @@ import thaumcraft.common.items.ItemResource;
 import thaumcraft.common.lib.network.PacketHandler;
 import thaumcraft.common.lib.network.fx.PacketFXVisDrain;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -28,6 +29,8 @@ import java.util.Random;
 
 public class Utils {
 
+    public static final Map<List<Object>, ItemStack> specialMiningResult = new HashMap<>();
+    public static final Map<List<Object>, Float> specialMiningChance = new HashMap<>();
     private static final Map<WorldCoordinates, Long> effectBuffer = new HashMap<>();
 
     public static void generateVisEffect(World world, BlockPos from, BlockPos to, int color) {
@@ -55,6 +58,30 @@ public class Utils {
     }
 
     public static void setPrivateFinalValue(Class<?> cls, Object instance, Object value, String... fieldNames) {
+    }
+
+    public static void addSpecialMiningResult(ItemStack in, ItemStack out, float chance) {
+        if (in == null || in.isEmpty() || out == null || out.isEmpty()) {
+            return;
+        }
+        List<Object> key = Arrays.asList(in.getItem(), in.getItemDamage());
+        specialMiningResult.put(key, out.copy());
+        specialMiningChance.put(key, chance);
+    }
+
+    public static ItemStack findSpecialMiningResult(ItemStack is, float chance, Random rand) {
+        if (is == null || is.isEmpty()) {
+            return ItemStack.EMPTY;
+        }
+        ItemStack dropped = is.copy();
+        List<Object> key = Arrays.asList(is.getItem(), is.getItemDamage());
+        Float rate = specialMiningChance.get(key);
+        ItemStack replacement = specialMiningResult.get(key);
+        if (rate != null && replacement != null && rand.nextFloat() <= chance * rate) {
+            dropped = replacement.copy();
+            dropped.setCount(dropped.getCount() * is.getCount());
+        }
+        return dropped;
     }
 
     public static void resetFloatCounter(EntityPlayerMP player) {
