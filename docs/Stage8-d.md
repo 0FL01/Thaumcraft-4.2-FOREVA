@@ -546,6 +546,26 @@ Some entities may be hard to trigger naturally until recipes/research/spawn cont
 - Это fallback/bootstrapping слой, а не reference custom renderer parity.
 - Специализированные модели/passes/GL-эффекты projectile и mob/boss renderers по GAP-2..GAP-6 остаются открытыми.
 
+### Checkpoint 2026-05-16 — vanilla mob fallback slice
+
+Статус: частично продвинут.
+
+Что сделано:
+
+- `ClientProxy.setupEntityRenderers()` дополнен non-noop vanilla fallback registrations для совместимых сущностей:
+  `EntityBrainyZombie`, `EntityGiantBrainyZombie`, `EntityInhabitedZombie` -> `RenderZombie`;
+  `EntityMindSpider`, `EntityTaintSpider` -> `RenderSpider`.
+- `ClientProxyEntityRendererRegistrationStaticGuardTest` расширен проверками этой baseline-группы.
+
+Проверки:
+
+- `./scripts/dev.sh validate --smoke` — passed.
+
+Ограничения:
+
+- Это vanilla fallback слой для type-compatible zombie/spider классов; custom TC рендеры/текстуры/passes остаются открытыми.
+- Остальные entity группы по-прежнему проходят через fallback `RenderNoop`, пока не портированы специализированные renderers.
+
 - [ ] Add client-only entity renderer registration hook.
 - [ ] Register every entity from `ConfigEntities.ENTITIES` with a custom or vanilla-equivalent renderer.
 - [ ] Port item-like/transient/projectile renderers.

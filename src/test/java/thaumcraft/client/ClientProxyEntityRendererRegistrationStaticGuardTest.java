@@ -37,6 +37,12 @@ public class ClientProxyEntityRendererRegistrationStaticGuardTest {
                         && source.contains("registerEntityRenderer(EntityExplosiveOrb.class, manager -> new RenderSnowball<>(manager, Items.FIREWORK_CHARGE, renderItem), registered);")
                         && source.contains("registerEntityRenderer(EntityEmber.class, manager -> new RenderSnowball<>(manager, Items.BLAZE_POWDER, renderItem), registered);")
                         && source.contains("registerEntityRenderer(EntityGolemBobber.class, manager -> new RenderSnowball<>(manager, Items.FISHING_ROD, renderItem), registered);"));
+        assertTrue("ClientProxy must keep vanilla mob fallback renderer registrations for compatible zombie/spider groups",
+                source.contains("registerEntityRenderer(EntityBrainyZombie.class, RenderZombie::new, registered);")
+                        && source.contains("registerEntityRenderer(EntityGiantBrainyZombie.class, RenderZombie::new, registered);")
+                        && source.contains("registerEntityRenderer(EntityInhabitedZombie.class, RenderZombie::new, registered);")
+                        && source.contains("registerEntityRenderer(EntityMindSpider.class, RenderSpider::new, registered);")
+                        && source.contains("registerEntityRenderer(EntityTaintSpider.class, RenderSpider::new, registered);"));
         assertTrue("ClientProxy must iterate ConfigEntities.ENTITIES for renderer registration coverage",
                 source.contains("for (net.minecraftforge.fml.common.registry.EntityEntry entry : ConfigEntities.ENTITIES)"));
         assertTrue("ClientProxy must keep fallback RenderNoop registrations for remaining entities",

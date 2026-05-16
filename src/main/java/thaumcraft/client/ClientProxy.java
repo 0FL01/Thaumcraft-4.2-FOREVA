@@ -9,6 +9,8 @@ import net.minecraft.client.renderer.RenderItem;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.client.renderer.entity.RenderEntityItem;
 import net.minecraft.client.renderer.entity.RenderSnowball;
+import net.minecraft.client.renderer.entity.RenderSpider;
+import net.minecraft.client.renderer.entity.RenderZombie;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
@@ -58,6 +60,11 @@ import thaumcraft.common.entities.EntitySpecialItem;
 import thaumcraft.common.entities.golems.EntityGolemBobber;
 import thaumcraft.common.lib.TCSounds;
 import thaumcraft.common.lib.events.EventHandlerRunic;
+import thaumcraft.common.entities.monster.EntityBrainyZombie;
+import thaumcraft.common.entities.monster.EntityGiantBrainyZombie;
+import thaumcraft.common.entities.monster.EntityInhabitedZombie;
+import thaumcraft.common.entities.monster.EntityMindSpider;
+import thaumcraft.common.entities.monster.EntityTaintSpider;
 import thaumcraft.common.entities.projectile.EntityAlumentum;
 import thaumcraft.common.entities.projectile.EntityBottleTaint;
 import thaumcraft.common.entities.projectile.EntityDart;
@@ -152,6 +159,12 @@ public class ClientProxy extends CommonProxy {
         registerEntityRenderer(EntityExplosiveOrb.class, manager -> new RenderSnowball<>(manager, Items.FIREWORK_CHARGE, renderItem), registered);
         registerEntityRenderer(EntityEmber.class, manager -> new RenderSnowball<>(manager, Items.BLAZE_POWDER, renderItem), registered);
         registerEntityRenderer(EntityGolemBobber.class, manager -> new RenderSnowball<>(manager, Items.FISHING_ROD, renderItem), registered);
+
+        registerEntityRenderer(EntityBrainyZombie.class, RenderZombie::new, registered);
+        registerEntityRenderer(EntityGiantBrainyZombie.class, RenderZombie::new, registered);
+        registerEntityRenderer(EntityInhabitedZombie.class, RenderZombie::new, registered);
+        registerEntityRenderer(EntityMindSpider.class, RenderSpider::new, registered);
+        registerEntityRenderer(EntityTaintSpider.class, RenderSpider::new, registered);
 
         for (net.minecraftforge.fml.common.registry.EntityEntry entry : ConfigEntities.ENTITIES) {
             @SuppressWarnings("unchecked")
