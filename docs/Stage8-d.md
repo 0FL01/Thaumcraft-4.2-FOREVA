@@ -1773,6 +1773,31 @@ Some entities may be hard to trigger naturally until recipes/research/spawn cont
 
 - Это non-GUI parity baseline; точный legacy `swarmParticleFX` object-lifecycle остается частью Stage 8-e visual scope.
 
+### Checkpoint 2026-05-17 — restore taintacle small lifetime/attribute/no-drop baseline
+
+Статус: частично продвинут.
+
+Что сделано:
+
+- `EntityTaintacleSmall` выровнен с reference-shaped common behavior contracts:
+  - добавлен `lifetime` baseline (`200`);
+  - constructor baseline обновлён: `setSize(0.22F, 1.0F)`, `experienceValue = 0`;
+  - атрибуты выровнены: `MAX_HEALTH = 8.0D`, `ATTACK_DAMAGE = 2.0D`;
+  - восстановлен lifetime-expiry behavior: при исчерпании lifetime наносится self-damage `DamageSource.STARVE` (`10.0F`);
+  - spawn/drop contracts выровнены:
+    - `getCanSpawnHere() -> false`;
+    - `getDropItem() -> Item.getItemById(0)`;
+    - `dropFewItems(...)` no-op.
+- `ClientProxyEntityRendererRegistrationStaticGuardTest` расширен проверками на lifetime/attribute/no-drop contracts `EntityTaintacleSmall`.
+
+Проверки:
+
+- `./scripts/dev.sh validate --smoke` — passed.
+
+Ограничения:
+
+- Это common behavior baseline для small tentacle; полная parity по taintacle ecosystem visual/FX nuances остаётся в Stage 8-d/8-e scope.
+
 ### Checkpoint 2026-05-16 — restore mind spider viewer-only render gating
 
 Статус: частично продвинут.

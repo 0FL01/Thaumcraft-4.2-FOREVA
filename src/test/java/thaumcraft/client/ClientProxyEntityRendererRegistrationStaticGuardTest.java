@@ -439,6 +439,18 @@ public class ClientProxyEntityRendererRegistrationStaticGuardTest {
                         && taintSporeSwarmerEntity.contains("for (int i = 0; i <= 1; i++)")
                         && taintSporeSwarmerEntity.contains("itemResource, 1, 11")
                         && taintSporeSwarmerEntity.contains("itemResource, 1, 12"));
+        String taintacleSmallEntity = readFile("src/main/java/thaumcraft/common/entities/monster/EntityTaintacleSmall.java");
+        assertTrue("EntityTaintacleSmall must keep reference-shaped lifetime/attribute/no-drop contracts",
+                taintacleSmallEntity.contains("private int lifetime = 200;")
+                        && taintacleSmallEntity.contains("this.setSize(0.22F, 1.0F);")
+                        && taintacleSmallEntity.contains("this.experienceValue = 0;")
+                        && taintacleSmallEntity.contains("setBaseValue(8.0D)")
+                        && taintacleSmallEntity.contains("setBaseValue(2.0D)")
+                        && taintacleSmallEntity.contains("if (--this.lifetime <= 0)")
+                        && taintacleSmallEntity.contains("this.attackEntityFrom(DamageSource.STARVE, 10.0F);")
+                        && taintacleSmallEntity.contains("return false;")
+                        && taintacleSmallEntity.contains("return Item.getItemById(0);")
+                        && taintacleSmallEntity.contains("protected void dropFewItems(boolean wasRecentlyHit, int looting) {"));
         String mindSpiderEntity = readFile("src/main/java/thaumcraft/common/entities/monster/EntityMindSpider.java");
         assertTrue("EntityMindSpider must expose viewer accessor and synced harmless/viewer data contracts",
                 mindSpiderEntity.contains("public String getViewer()")
