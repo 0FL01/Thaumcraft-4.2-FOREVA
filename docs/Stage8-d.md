@@ -1568,6 +1568,31 @@ Some entities may be hard to trigger naturally until recipes/research/spawn cont
 
 - Это common behavior baseline; визуальная точность эффекта раннего FX ограничена non-GUI validation рамками.
 
+### Checkpoint 2026-05-17 — restore taint cow AI/attribute/sound behavior baseline
+
+Статус: частично продвинут.
+
+Что сделано:
+
+- `EntityTaintCow` выровнен с reference-shaped common behavior contracts:
+  - восстановлены constructor size/nav/AI baselines:
+    - `setSize(0.9F, 1.3F)`;
+    - `PathNavigateGround#setCanSwim(true)` when compatible;
+    - attack/wander/watch/idle/task priorities + target priorities для player/villager/animal.
+  - восстановлены атрибуты: `MAX_HEALTH = 40.0D`, `ATTACK_DAMAGE = 6.0D`, `MOVEMENT_SPEED = 0.27D`;
+  - добавлен `canBreatheUnderwater() -> true`;
+  - добавлен early client taint FX loop в первые `5` ticks (`particleCount(10)` + `taintLandFX(this)`);
+  - death sound contract выровнен к hurt baseline (`SoundEvents.ENTITY_COW_HURT`) как в reference string-path shape.
+- `ClientProxyEntityRendererRegistrationStaticGuardTest` расширен проверками на AI/attribute/sound contracts `EntityTaintCow`.
+
+Проверки:
+
+- `./scripts/dev.sh validate --smoke` — passed.
+
+Ограничения:
+
+- Это common behavior baseline; полная visual parity раннего FX и runtime боевых сценариев ограничена non-GUI validation рамками.
+
 ### Checkpoint 2026-05-16 — restore mind spider viewer-only render gating
 
 Статус: частично продвинут.
