@@ -68,6 +68,29 @@ public class EntityMindSpider extends net.minecraft.entity.monster.EntitySpider 
         return 0.3F;
     }
 
+    @Override
+    public double getYOffset() {
+        return this.isHarmless() ? 0.0D : 0.1D;
+    }
+
+    @Override
+    public boolean canBeCollidedWith() {
+        return true;
+    }
+
+    @Override
+    protected boolean canTriggerWalking() {
+        return false;
+    }
+
+    @Override
+    public boolean attackEntityAsMob(net.minecraft.entity.Entity entityIn) {
+        if (this.isHarmless()) {
+            return false;
+        }
+        return super.attackEntityAsMob(entityIn);
+    }
+
     @Override protected void dropFewItems(boolean wasRecentlyHit, int looting) {}
     @Override public int getMaxSpawnedInChunk() { return 200; }
 

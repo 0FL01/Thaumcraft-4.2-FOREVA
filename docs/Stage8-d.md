@@ -1413,6 +1413,27 @@ Some entities may be hard to trigger naturally until recipes/research/spawn cont
 
 - Это translucent base-pass baseline; полная parity по reference eye-brightness/lightmap нюансам и legacy multi-pass semantics остаётся открытой по GAP-3/GAP-6.
 
+### Checkpoint 2026-05-16 — restore mind spider harmless collision/attack contracts
+
+Статус: частично продвинут.
+
+Что сделано:
+
+- `EntityMindSpider` расширен reference-shaped harmless behavior hooks:
+  - добавлен `getYOffset()` contract (`0.0D` when harmless, `0.1D` otherwise);
+  - добавлен explicit `canBeCollidedWith() -> true`;
+  - добавлен `canTriggerWalking() -> false`;
+  - добавлен harmless attack-gate в `attackEntityAsMob(...)` (no attack when harmless, иначе `super` path).
+- `ClientProxyEntityRendererRegistrationStaticGuardTest` расширен контрактами на новые harmless/collision/attack hooks в `EntityMindSpider`.
+
+Проверки:
+
+- `./scripts/dev.sh validate --smoke` — passed.
+
+Ограничения:
+
+- Это harmless collision/attack baseline; точный legacy target-acquisition нюанс pre-1.8 (`findPlayerToAttack` path) напрямую не репродуцируется в 1.12 AI-task модели и остаётся в составе общей behavior parity валидации.
+
 - [ ] Add client-only entity renderer registration hook.
 - [ ] Register every entity from `ConfigEntities.ENTITIES` with a custom or vanilla-equivalent renderer.
 - [ ] Port item-like/transient/projectile renderers.

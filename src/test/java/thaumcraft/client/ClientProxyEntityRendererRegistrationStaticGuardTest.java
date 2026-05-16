@@ -300,6 +300,11 @@ public class ClientProxyEntityRendererRegistrationStaticGuardTest {
                         && mindSpiderEntity.contains("this.dataManager.register(VIEWER, \"\")")
                         && mindSpiderEntity.contains("public boolean isHarmless()")
                         && mindSpiderEntity.contains("public float spiderScaleAmount()")
+                        && mindSpiderEntity.contains("public double getYOffset()")
+                        && mindSpiderEntity.contains("public boolean canBeCollidedWith()")
+                        && mindSpiderEntity.contains("protected boolean canTriggerWalking()")
+                        && mindSpiderEntity.contains("public boolean attackEntityAsMob(")
+                        && mindSpiderEntity.contains("return super.attackEntityAsMob(entityIn);")
                         && mindSpiderEntity.contains("this.dataManager.set(HARMLESS, harmless ? (byte) 1 : (byte) 0)")
                         && mindSpiderEntity.contains("nbt.setByte(\"harmless\"")
                         && mindSpiderEntity.contains("nbt.setString(\"viewer\""));
