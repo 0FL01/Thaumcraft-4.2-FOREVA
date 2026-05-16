@@ -2381,6 +2381,29 @@ Some entities may be hard to trigger naturally until recipes/research/spawn cont
 
 - Это renderer baseline без ручной визуальной проверки; точные legacy визуальные нюансы block-shading/face culling остаются в общем Stage 8-d visual parity matrix.
 
+### Checkpoint 2026-05-17 — replace frost shard snowball fallback with dedicated shard renderer baseline
+
+Статус: частично продвинут.
+
+Что сделано:
+
+- `EntityFrostShard` переведен с `RenderSnowball` на dedicated `RenderFrostShard`.
+- Добавлен `RenderFrostShard` с reference-shaped baseline contracts:
+  - dedicated frost shard texture (`textures/blocks/frostshard.png`);
+  - entity-id-seeded random scaling surface (`new Random(entity.getEntityId())`) и damage-driven size baseline (`entity.getDamage() * 0.1F`);
+  - explicit blend/cull state setup и non-noop cross-quad shard draw path.
+- `ClientProxyEntityRendererRegistrationStaticGuardTest` обновлен:
+  - registration contract `EntityFrostShard -> RenderFrostShard::new`;
+  - renderer contract checks на texture/random-scaling/blend/cross-quad surface.
+
+Проверки:
+
+- `./scripts/dev.sh validate --smoke` — passed.
+
+Ограничения:
+
+- Это renderer baseline без ручной визуальной проверки; точные legacy OBJ-модель/mesh нюансы `RenderFrostShard` остаются в общем Stage 8-d visual parity matrix.
+
 - [ ] Add client-only entity renderer registration hook.
 - [ ] Register every entity from `ConfigEntities.ENTITIES` with a custom or vanilla-equivalent renderer.
 - [ ] Port item-like/transient/projectile renderers.

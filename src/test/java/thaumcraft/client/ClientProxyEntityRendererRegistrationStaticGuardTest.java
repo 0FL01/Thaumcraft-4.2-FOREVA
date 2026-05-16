@@ -29,7 +29,7 @@ public class ClientProxyEntityRendererRegistrationStaticGuardTest {
                         && source.contains("registerEntityRenderer(EntityBottleTaint.class,")
                         && source.contains("registerEntityRenderer(EntityAlumentum.class, RenderAlumentum::new, registered);")
                         && source.contains("registerEntityRenderer(EntityPrimalOrb.class, RenderPrimalOrb::new, registered);")
-                        && source.contains("registerEntityRenderer(EntityFrostShard.class, manager -> new RenderSnowball<>(manager, Items.SNOWBALL, renderItem), registered);")
+                        && source.contains("registerEntityRenderer(EntityFrostShard.class, RenderFrostShard::new, registered);")
                         && source.contains("registerEntityRenderer(EntityPechBlast.class, RenderPechBlast::new, registered);")
                         && source.contains("registerEntityRenderer(EntityEldritchOrb.class, RenderEldritchOrb::new, registered);")
                         && source.contains("registerEntityRenderer(EntityGolemOrb.class, RenderElectricOrb::new, registered);")
@@ -193,6 +193,16 @@ public class ClientProxyEntityRendererRegistrationStaticGuardTest {
                         && fallingTaintRenderer.contains("buffer.setTranslation(-blockPos.getX() - 0.5D")
                         && fallingTaintRenderer.contains("GlStateManager.disableLighting()")
                         && fallingTaintRenderer.contains("GlStateManager.enableLighting()"));
+        String frostShardRenderer = readFile("src/main/java/thaumcraft/client/renderers/entity/RenderFrostShard.java");
+        assertTrue("RenderFrostShard must provide dedicated frosty shard baseline",
+                frostShardRenderer.contains("extends Render<EntityFrostShard>")
+                        && frostShardRenderer.contains("new ResourceLocation(\"thaumcraft\", \"textures/blocks/frostshard.png\")")
+                        && frostShardRenderer.contains("new Random(entity.getEntityId())")
+                        && frostShardRenderer.contains("entity.getDamage() * 0.1F")
+                        && frostShardRenderer.contains("GlStateManager.enableBlend()")
+                        && frostShardRenderer.contains("GlStateManager.disableCull()")
+                        && frostShardRenderer.contains("renderCrossQuads()")
+                        && frostShardRenderer.contains("buffer.begin(7, DefaultVertexFormats.POSITION_TEX)"));
         String eldritchGuardianRenderer = readFile("src/main/java/thaumcraft/client/renderers/entity/RenderEldritchGuardian.java");
         assertTrue("RenderEldritchGuardian must provide dedicated guardian texture baseline",
                 eldritchGuardianRenderer.contains("extends RenderBiped<EntityEldritchGuardian>")
