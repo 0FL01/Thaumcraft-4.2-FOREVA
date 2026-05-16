@@ -6,15 +6,40 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.EntityDataManager;
+import net.minecraft.entity.ai.EntityAIHurtByTarget;
+import net.minecraft.entity.ai.EntityAILookIdle;
+import net.minecraft.entity.ai.EntityAINearestAttackableTarget;
+import net.minecraft.entity.ai.EntityAISwimming;
+import net.minecraft.entity.ai.EntityAIWander;
+import net.minecraft.entity.ai.EntityAIWatchClosest;
+import net.minecraft.entity.passive.EntityVillager;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.pathfinding.PathNavigateGround;
 import net.minecraft.util.math.MathHelper;
+import thaumcraft.common.entities.ai.combat.AIAttackOnCollide;
+import thaumcraft.common.entities.ai.misc.AIConvertGrass;
 
 public class EntityTaintSheep extends net.minecraft.entity.monster.EntityMob implements thaumcraft.api.entities.ITaintedMob, net.minecraftforge.common.IShearable {
     private static final DataParameter<Byte> SHEEP_FLAGS = EntityDataManager.createKey(EntityTaintSheep.class, DataSerializers.BYTE);
+    private final AIConvertGrass convertGrassAI = new AIConvertGrass(this);
     private int sheepTimer;
 
     public EntityTaintSheep(net.minecraft.world.World world) {
         super(world);
         this.setSize(0.9f, 1.3f);
+        if (this.getNavigator() instanceof PathNavigateGround) {
+            ((PathNavigateGround) this.getNavigator()).setCanSwim(true);
+        }
+        this.tasks.addTask(0, new EntityAISwimming(this));
+        this.tasks.addTask(2, this.convertGrassAI);
+        this.tasks.addTask(3, new AIAttackOnCollide(this, EntityPlayer.class, 1.0, false));
+        this.tasks.addTask(3, new AIAttackOnCollide(this, EntityVillager.class, 1.0, true));
+        this.tasks.addTask(6, new EntityAIWander(this, 1.0));
+        this.tasks.addTask(7, new EntityAIWatchClosest(this, EntityPlayer.class, 6.0f));
+        this.tasks.addTask(8, new EntityAILookIdle(this));
+        this.targetTasks.addTask(0, new EntityAIHurtByTarget(this, false));
+        this.targetTasks.addTask(3, new EntityAINearestAttackableTarget(this, EntityPlayer.class, true));
+        this.targetTasks.addTask(3, new EntityAINearestAttackableTarget(this, EntityVillager.class, false));
     }
 
     @Override
@@ -78,6 +103,12 @@ public class EntityTaintSheep extends net.minecraft.entity.monster.EntityMob imp
             this.sheepTimer = Math.max(0, this.sheepTimer - 1);
         }
         super.onLivingUpdate();
+    }
+
+    @Override
+    protected void updateAITasks() {
+        this.sheepTimer = this.convertGrassAI.getConvertTimer();
+        super.updateAITasks();
     }
 
     @Override

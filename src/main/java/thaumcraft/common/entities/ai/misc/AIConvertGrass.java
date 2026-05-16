@@ -78,4 +78,8 @@ public class AIConvertGrass extends EntityAIBase {
             }
         }
     }
+
+    public int getConvertTimer() {
+        return this.convertTimer;
+    }
 }

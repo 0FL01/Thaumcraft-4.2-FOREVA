@@ -262,6 +262,13 @@ public class ClientProxyEntityRendererRegistrationStaticGuardTest {
         assertTrue("EntityTaintSheep must keep sheared-state data/NBT/shearing contracts for fur-layer renderer parity",
                 taintSheepEntity.contains("DataParameter<Byte>")
                         && taintSheepEntity.contains("SHEEP_FLAGS")
+                        && taintSheepEntity.contains("AIConvertGrass")
+                        && taintSheepEntity.contains("convertGrassAI")
+                        && taintSheepEntity.contains("tasks.addTask(2, this.convertGrassAI)")
+                        && taintSheepEntity.contains("targetTasks.addTask(3, new EntityAINearestAttackableTarget(this, EntityPlayer.class, true))")
+                        && taintSheepEntity.contains("targetTasks.addTask(3, new EntityAINearestAttackableTarget(this, EntityVillager.class, false))")
+                        && taintSheepEntity.contains("protected void updateAITasks()")
+                        && taintSheepEntity.contains("this.sheepTimer = this.convertGrassAI.getConvertTimer();")
                         && taintSheepEntity.contains("sheepTimer")
                         && taintSheepEntity.contains("entityInit()")
                         && taintSheepEntity.contains("handleStatusUpdate(byte id)")

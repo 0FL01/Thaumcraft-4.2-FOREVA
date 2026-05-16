@@ -1299,6 +1299,30 @@ Some entities may be hard to trigger naturally until recipes/research/spawn cont
 
 - Это runtime-safety + animation baseline; полная parity по taint sheep AI/FX workflow (например grass-convert timer source) остаётся открытой по GAP-3/GAP-6.
 
+### Checkpoint 2026-05-16 — restore taint sheep AI/timer baseline for render sync
+
+Статус: частично продвинут.
+
+Что сделано:
+
+- `EntityTaintSheep` расширен reference-shaped AI baseline:
+  - добавлен `AIConvertGrass` task (`convertGrassAI`);
+  - восстановлены ключевые task/target-task registrations (swim, convert, player/villager collide attack, wander/watch/idle, hurt-by, nearest player/villager targets).
+- `EntityTaintSheep#updateAITasks()` теперь синхронизирует `sheepTimer` из `convertGrassAI.getConvertTimer()`, связывая head-animation hooks с реальным AI cycle.
+- В `AIConvertGrass` добавлен getter `getConvertTimer()` для entity-side timer sync.
+- `ClientProxyEntityRendererRegistrationStaticGuardTest` усилен проверками:
+  - наличие `convertGrassAI` wiring;
+  - task/target-task registration contracts;
+  - `updateAITasks()` timer sync contract.
+
+Проверки:
+
+- `./scripts/dev.sh validate --smoke` — passed.
+
+Ограничения:
+
+- Это baseline AI/timer sync; полная parity по taint sheep behaviour (включая возможные дополнительные 1.7 spawn/interaction nuances) остаётся открытой и закрывается отдельными checkpoint’ами.
+
 - [ ] Add client-only entity renderer registration hook.
 - [ ] Register every entity from `ConfigEntities.ENTITIES` with a custom or vanilla-equivalent renderer.
 - [ ] Port item-like/transient/projectile renderers.
