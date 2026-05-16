@@ -18,11 +18,14 @@ import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
+import net.minecraftforge.fml.common.network.NetworkRegistry;
 import thaumcraft.api.aspects.Aspect;
 import thaumcraft.common.Thaumcraft;
 import thaumcraft.common.config.ConfigItems;
 import thaumcraft.common.items.ItemWispEssence;
 import thaumcraft.common.lib.TCSounds;
+import thaumcraft.common.lib.network.PacketHandler;
+import thaumcraft.common.lib.network.fx.PacketFXWispZap;
 import thaumcraft.common.lib.world.ThaumcraftWorldGenerator;
 
 public class EntityWisp extends EntityFlying implements IMob {
@@ -159,6 +162,11 @@ public class EntityWisp extends EntityFlying implements IMob {
                 ++this.attackCounter;
                 if (this.attackCounter == 20) {
                     this.playSound(TCSounds.ZAP, 1.0f, 1.1f);
+                    if (!this.world.isRemote) {
+                        PacketHandler.INSTANCE.sendToAllAround(
+                                new PacketFXWispZap(this.getEntityId(), this.targetedEntity.getEntityId()),
+                                new NetworkRegistry.TargetPoint(this.world.provider.getDimension(), this.posX, this.posY, this.posZ, 32.0));
+                    }
                     float damage = (float)this.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).getAttributeValue();
                     if (Math.abs(this.targetedEntity.motionX) > 0.1
                         || Math.abs(this.targetedEntity.motionY) > 0.1

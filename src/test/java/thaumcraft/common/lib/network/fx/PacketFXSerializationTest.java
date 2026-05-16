@@ -14,6 +14,16 @@ import static org.junit.Assert.assertTrue;
 public class PacketFXSerializationTest {
 
     @Test
+    public void wispZapPacketRoundTripsPayload() {
+        PacketFXWispZap source = new PacketFXWispZap(14, 28);
+        PacketFXWispZap target = new PacketFXWispZap();
+        roundTrip(source, target);
+
+        assertEquals(14, (int) getField(target, "source"));
+        assertEquals(28, (int) getField(target, "target"));
+    }
+
+    @Test
     public void sonicPacketRoundTripsPayload() {
         PacketFXSonic source = new PacketFXSonic(77);
         PacketFXSonic target = new PacketFXSonic();

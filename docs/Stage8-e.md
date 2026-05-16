@@ -374,6 +374,28 @@ Depends on GAP-1, GAP-2, GAP-5, and GAP-6. Network-thread rendering is unsafe if
 
 - This remains fallback visual behavior and does not yet include reference `FXSonic` renderer class parity.
 
+#### Checkpoint 2026-05-16 — GAP-3 wisp-zap packet baseline restored
+
+Статус: `PacketFXWispZap` payload/handler and `EntityWisp` send-site are now wired.
+
+Что сделано:
+
+- Implemented `PacketFXWispZap` payload serialization (`source`, `target`) and client-scheduled handler.
+- Added fallback zap routing via `Thaumcraft.proxy.bolt(...)` between resolved source/target entities.
+- Restored `EntityWisp` attack packet send in the reference attack window (`attackCounter == 20`) with 32-block broadcast radius.
+- Expanded FX tests:
+  - `PacketFXSerializationTest` now includes `PacketFXWispZap` round-trip.
+  - `ClientProxyFxStaticGuardTest` now enforces wisp-zap handler scheduling/proxy routing and `EntityWisp` send-site presence.
+
+Проверки:
+
+- `./scripts/dev.sh test` — passed.
+- `./scripts/dev.sh validate --smoke` — passed.
+
+Ограничения:
+
+- This remains fallback visual behavior and does not yet port reference lightning renderer classes.
+
 ### GAP-4: Beam, wand beam, bore beam, power beam, arc, and lightning bolt classes are absent
 
 **Статус:** отсутствует  
