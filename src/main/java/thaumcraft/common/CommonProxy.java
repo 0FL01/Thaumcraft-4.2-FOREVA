@@ -190,4 +190,7 @@ public class CommonProxy implements IGuiHandler {
 
     public void crucibleBoil(World world, int x, int y, int z, TileCrucible crucible, int type) {
     }
+
+    public void startScan(Entity entity, BlockPos pos, long expireAtMs, int radius) {
+    }
 }

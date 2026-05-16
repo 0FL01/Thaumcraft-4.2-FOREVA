@@ -744,6 +744,11 @@ public class ClientProxy extends CommonProxy {
         }
     }
 
+    @Override
+    public void startScan(Entity entity, BlockPos pos, long expireAtMs, int radius) {
+        RenderEventHandler.startScan(entity, pos, expireAtMs, radius);
+    }
+
     private static Color decodeColor(int color) {
         if (color < 0 || color > 0xFFFFFF) {
             return new Color(0xCCCCFF);

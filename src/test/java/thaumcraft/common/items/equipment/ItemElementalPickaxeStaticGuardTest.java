@@ -25,9 +25,10 @@ public class ItemElementalPickaxeStaticGuardTest {
                 source.contains("public boolean onLeftClickEntity(")
                         && source.contains("!player.world.isRemote")
                         && source.contains("entity.setFire(2);"));
-        assertTrue("ItemElementalPickaxe must keep use durability and wandfail cue contract",
+        assertTrue("ItemElementalPickaxe must keep use durability and scan/wandfail cue contract",
                 source.contains("stack.damageItem(5, player);")
                         && source.contains("world.playSound(null, pos, TCSounds.WANDFAIL")
+                        && source.contains("Thaumcraft.proxy.startScan(player, pos, System.currentTimeMillis() + 5000L, 8);")
                         && source.contains("player.swingArm(hand);"));
     }
 

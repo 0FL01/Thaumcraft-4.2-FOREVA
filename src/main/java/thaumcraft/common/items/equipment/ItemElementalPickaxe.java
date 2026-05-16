@@ -13,6 +13,7 @@ import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import thaumcraft.api.IRepairable;
+import thaumcraft.common.Thaumcraft;
 import thaumcraft.common.config.ConfigItems;
 import thaumcraft.common.lib.CreativeTabThaumcraft;
 import thaumcraft.common.lib.TCSounds;
@@ -58,6 +59,7 @@ public class ItemElementalPickaxe extends ItemPickaxe implements IRepairable {
         if (!world.isRemote) {
             world.playSound(null, pos, TCSounds.WANDFAIL, SoundCategory.PLAYERS, 0.2F, 0.2F + world.rand.nextFloat() * 0.2F);
         } else {
+            Thaumcraft.proxy.startScan(player, pos, System.currentTimeMillis() + 5000L, 8);
             player.swingArm(hand);
         }
         return super.onItemUse(player, world, pos, hand, facing, hitX, hitY, hitZ);

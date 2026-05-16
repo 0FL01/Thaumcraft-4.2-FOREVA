@@ -1435,6 +1435,30 @@ Depends on GAP-1 and GAP-3. Some infusion source scenarios may require Stage 9 c
 
 - Burst-mining path сейчас использует `world.destroyBlock(..., true)` как 1.12-safe baseline вместо legacy `BlockUtils.harvestBlock(...)` семантики; детальный parity по enchant/harvest edge-cases остаётся для отдельного polish checkpoint.
 
+#### Checkpoint 2026-05-17 — GAP-11 elemental-pickaxe scan-hook baseline
+
+Статус: частично продвинут.
+
+Что сделано:
+
+- Для `ItemElementalPickaxe` восстановлен reference-shaped client scan trigger path:
+  - client branch `onItemUse(...)` теперь вызывает `Thaumcraft.proxy.startScan(player, pos, System.currentTimeMillis() + 5000L, 8)` перед `swingArm(...)`.
+- Добавлена side-safe proxy surface:
+  - `CommonProxy.startScan(Entity, BlockPos, long, int)` — server-safe no-op stub;
+  - `ClientProxy.startScan(...)` — client routing в `RenderEventHandler.startScan(...)`.
+- `RenderEventHandler` получил scan-state baseline (`scanEntityId`, `scanPos`, `scanExpireAtMs`, `scanRange`) и `startScan(...)` hook с базовым lifecycle cleanup в `livingTick`.
+- Статические проверки расширены:
+  - `ItemElementalPickaxeStaticGuardTest` now guards `startScan` call-site;
+  - `ClientProxyFxStaticGuardTest` now guards proxy surface + render handler scan-state baseline.
+
+Проверки:
+
+- `./scripts/dev.sh validate --smoke` — passed.
+
+Ограничения:
+
+- Это baseline-триггер scan lifecycle без полного HUD/overlay-рендера (`RenderEventHandler` рендер-пути всё ещё требуют отдельного Stage 8-e client polish).
+
 ### GAP-12: FX registration exists, but send-site coverage and manual scenario validation are incomplete
 
 **Статус:** требует проверки  

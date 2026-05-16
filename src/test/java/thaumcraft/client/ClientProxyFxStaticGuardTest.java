@@ -14,6 +14,8 @@ public class ClientProxyFxStaticGuardTest {
     @Test
     public void clientProxyFxMethodsAreImplemented() throws IOException {
         String source = readFile("src/main/java/thaumcraft/client/ClientProxy.java");
+        String commonProxy = readFile("src/main/java/thaumcraft/common/CommonProxy.java");
+        String renderHandler = readFile("src/main/java/thaumcraft/client/lib/RenderEventHandler.java");
         String particleEngine = readFile("src/main/java/thaumcraft/client/fx/ParticleEngine.java");
 
         assertTrue("ClientProxy blockSparkle must spawn client particles",
@@ -48,6 +50,15 @@ public class ClientProxyFxStaticGuardTest {
                 source.contains("public void crucibleBoilSound(")
                         && source.contains("public void crucibleBoil(")
                         && source.contains("TCSounds.BUBBLE"));
+        assertTrue("CommonProxy and ClientProxy must keep startScan proxy surface",
+                commonProxy.contains("public void startScan(Entity entity, BlockPos pos, long expireAtMs, int radius)")
+                        && source.contains("public void startScan(Entity entity, BlockPos pos, long expireAtMs, int radius)")
+                        && source.contains("RenderEventHandler.startScan(entity, pos, expireAtMs, radius);"));
+        assertTrue("RenderEventHandler must keep scan-state baseline and startScan hook",
+                renderHandler.contains("public static int scanEntityId = -1;")
+                        && renderHandler.contains("public static BlockPos scanPos = BlockPos.ORIGIN;")
+                        && renderHandler.contains("public static void startScan(Entity entity, BlockPos pos, long expireAtMs, int range)")
+                        && renderHandler.contains("scanExpireAtMs"));
         assertTrue("ParticleEngine must keep queued particle intake + tick drain + effectRenderer dispatch baseline",
                 particleEngine.contains("public static void addEffect(World world, Particle particle)")
                         && particleEngine.contains("pendingParticles")
