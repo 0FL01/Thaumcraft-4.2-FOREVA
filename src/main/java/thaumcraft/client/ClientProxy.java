@@ -62,6 +62,7 @@ import thaumcraft.client.renderers.entity.RenderGolemBase;
 import thaumcraft.client.renderers.entity.RenderEldritchGuardian;
 import thaumcraft.client.renderers.entity.RenderEldritchGolem;
 import thaumcraft.client.renderers.entity.RenderEldritchWarden;
+import thaumcraft.client.renderers.entity.RenderEldritchCrab;
 import thaumcraft.client.renderers.entity.RenderNoop;
 import thaumcraft.client.renderers.entity.RenderPech;
 import thaumcraft.client.renderers.entity.RenderTravelingTrunk;
@@ -237,8 +238,7 @@ public class ClientProxy extends CommonProxy {
         registerEntityRenderer(EntityEldritchGuardian.class, RenderEldritchGuardian::new, registered);
         registerEntityRenderer(EntityEldritchWarden.class, RenderEldritchWarden::new, registered);
         registerEntityRenderer(EntityEldritchGolem.class, RenderEldritchGolem::new, registered);
-        registerEntityRenderer(EntityEldritchCrab.class, manager -> new RenderFallbackLiving<>(
-                manager, new ModelSpider(), 0.5F, new ResourceLocation("thaumcraft", "textures/models/crab.png")), registered);
+        registerEntityRenderer(EntityEldritchCrab.class, RenderEldritchCrab::new, registered);
         registerEntityRenderer(EntityThaumicSlime.class, manager -> new RenderFallbackBiped<>(
                 manager, new ModelBiped(), 0.5F, new ResourceLocation("thaumcraft", "textures/models/tslime.png")), registered);
         registerEntityRenderer(EntityTaintSpore.class, manager -> new RenderFallbackBiped<>(

@@ -840,6 +840,29 @@ Some entities may be hard to trigger naturally until recipes/research/spawn cont
 
 - Это texture/scale baseline; full reference parity для eldritch golem renderer behavior (custom golem model, boss bar/display path, additional render passes) остаётся открытой по GAP-3/GAP-4/GAP-6.
 
+### Checkpoint 2026-05-16 — dedicated eldritch crab renderer baseline
+
+Статус: частично продвинут.
+
+Что сделано:
+
+- Добавлен выделенный renderer `RenderEldritchCrab` (`thaumcraft.client.renderers.entity.RenderEldritchCrab`) вместо общего living fallback для `EntityEldritchCrab`.
+- Baseline behavior:
+  - dedicated base texture `textures/models/crab.png`;
+  - добавлен overlay layer `CrabOverlayLayer` с `textures/models/craboverlay.png` и alpha-blend pass.
+- `ClientProxy.setupEntityRenderers()` обновлен: `EntityEldritchCrab` теперь регистрируется через `RenderEldritchCrab::new`.
+- `ClientProxyEntityRendererRegistrationStaticGuardTest` расширен проверками:
+  - explicit `EntityEldritchCrab -> RenderEldritchCrab` registration path;
+  - наличие base texture, overlay texture и overlay-layer wiring в `RenderEldritchCrab`.
+
+Проверки:
+
+- `./scripts/dev.sh validate --smoke` — passed.
+
+Ограничения:
+
+- Это texture/overlay baseline; full reference parity для eldritch crab renderer behavior (original custom crab model, overlay/lightmap specifics) остаётся открытой по GAP-3/GAP-4/GAP-6.
+
 - [ ] Add client-only entity renderer registration hook.
 - [ ] Register every entity from `ConfigEntities.ENTITIES` with a custom or vanilla-equivalent renderer.
 - [ ] Port item-like/transient/projectile renderers.

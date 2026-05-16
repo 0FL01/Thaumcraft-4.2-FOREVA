@@ -63,7 +63,7 @@ public class ClientProxyEntityRendererRegistrationStaticGuardTest {
                         && source.contains("registerEntityRenderer(EntityEldritchGuardian.class, RenderEldritchGuardian::new, registered);")
                         && source.contains("registerEntityRenderer(EntityEldritchWarden.class, RenderEldritchWarden::new, registered);")
                         && source.contains("registerEntityRenderer(EntityEldritchGolem.class, RenderEldritchGolem::new, registered);")
-                        && source.contains("registerEntityRenderer(EntityEldritchCrab.class, manager -> new RenderFallbackLiving<>(")
+                        && source.contains("registerEntityRenderer(EntityEldritchCrab.class, RenderEldritchCrab::new, registered);")
                         && source.contains("registerEntityRenderer(EntityThaumicSlime.class, manager -> new RenderFallbackBiped<>(")
                         && source.contains("registerEntityRenderer(EntityTaintSpore.class, manager -> new RenderFallbackBiped<>(")
                         && source.contains("registerEntityRenderer(EntityTaintSporeSwarmer.class, manager -> new RenderFallbackBiped<>(")
@@ -115,6 +115,13 @@ public class ClientProxyEntityRendererRegistrationStaticGuardTest {
                 eldritchGolemRenderer.contains("extends RenderBiped<EntityEldritchGolem>")
                         && eldritchGolemRenderer.contains("textures/models/eldritch_golem.png")
                         && eldritchGolemRenderer.contains("GlStateManager.scale(2.15F, 2.15F, 2.15F)"));
+        String eldritchCrabRenderer = readFile("src/main/java/thaumcraft/client/renderers/entity/RenderEldritchCrab.java");
+        assertTrue("RenderEldritchCrab must provide crab texture and overlay layer baseline",
+                eldritchCrabRenderer.contains("extends RenderLiving<EntityEldritchCrab>")
+                        && eldritchCrabRenderer.contains("textures/models/crab.png")
+                        && eldritchCrabRenderer.contains("textures/models/craboverlay.png")
+                        && eldritchCrabRenderer.contains("class CrabOverlayLayer")
+                        && eldritchCrabRenderer.contains("this.addLayer(new CrabOverlayLayer())"));
         String trunkRenderer = readFile("src/main/java/thaumcraft/client/renderers/entity/RenderTravelingTrunk.java");
         assertTrue("RenderTravelingTrunk must provide anger-based texture routing baseline",
                 trunkRenderer.contains("extends RenderLiving<EntityTravelingTrunk>")
