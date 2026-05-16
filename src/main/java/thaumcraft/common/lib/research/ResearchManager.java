@@ -31,6 +31,7 @@ import thaumcraft.common.lib.capabilities.PlayerKnowledgeProvider;
 import thaumcraft.common.lib.network.PacketHandler;
 import thaumcraft.common.lib.network.playerdata.PacketSyncWarp;
 import thaumcraft.common.lib.network.playerdata.PacketResearchComplete;
+import thaumcraft.common.lib.utils.HexUtils;
 import thaumcraft.common.lib.utils.InventoryUtils;
 
 import java.io.File;
@@ -370,6 +371,19 @@ public class ResearchManager {
         return false;
     }
 
+    public static boolean consumeInkFromTable(ItemStack stack, boolean doit) {
+        if (stack != null
+                && !stack.isEmpty()
+                && stack.getItem() instanceof IScribeTools
+                && stack.getItemDamage() < stack.getMaxDamage()) {
+            if (doit) {
+                stack.setItemDamage(stack.getItemDamage() + 1);
+            }
+            return true;
+        }
+        return false;
+    }
+
     public static Aspect getCombinationResult(Aspect aspect1, Aspect aspect2) {
         for (Aspect aspect : Aspect.aspects.values()) {
             Aspect[] components = aspect.getComponents();
@@ -486,7 +500,7 @@ public class ResearchManager {
         if (stack == null || stack.isEmpty() || key == null || key.isEmpty()) return ItemStack.EMPTY;
         ResearchItem research = ResearchCategories.getResearch(key);
         Aspect primary = getResearchPrimaryTag(research);
-        if (research == null || primary == null) return ItemStack.EMPTY;
+        if (research == null || research.tags == null || research.tags.size() <= 0 || primary == null || world == null) return ItemStack.EMPTY;
         if (!stack.hasTagCompound()) {
             stack.setTagCompound(new NBTTagCompound());
         }
@@ -496,17 +510,75 @@ public class ResearchManager {
         tag.setBoolean("complete", false);
         tag.setInteger("copies", 0);
 
+        int radius = 1 + Math.min(3, research.getComplexity());
+        HashMap<String, HexUtils.Hex> hexLocs = HexUtils.generateHexes(radius);
+        ArrayList<HexUtils.Hex> outerRing = HexUtils.distributeRingRandomly(radius, research.tags.size(), world.rand);
+        HashMap<String, HexEntry> hexEntries = new HashMap<>();
+        HashMap<String, HexUtils.Hex> hexes = new HashMap<>();
+        for (HexUtils.Hex hex : hexLocs.values()) {
+            hexes.put(hex.toString(), hex);
+            hexEntries.put(hex.toString(), new HexEntry(null, 0));
+        }
+        int count = 0;
+        Aspect[] researchAspects = research.tags.getAspects();
+        for (HexUtils.Hex hex : outerRing) {
+            hexes.put(hex.toString(), hex);
+            hexEntries.put(hex.toString(), new HexEntry(researchAspects[count], 1));
+            count++;
+        }
+        if (research.getComplexity() > 1) {
+            int blanks = research.getComplexity() * 2;
+            HexUtils.Hex[] temp = hexes.values().toArray(new HexUtils.Hex[0]);
+            while (blanks > 0) {
+                int index = world.rand.nextInt(temp.length);
+                HexUtils.Hex candidate = temp[index];
+                HexEntry candidateEntry = hexEntries.get(candidate.toString());
+                if (candidateEntry == null || candidateEntry.type != 0) {
+                    continue;
+                }
+                boolean valid = true;
+                for (int n = 0; n < 6; n++) {
+                    HexUtils.Hex neighbour = candidate.getNeighbour(n);
+                    HexEntry neighbourEntry = hexEntries.get(neighbour.toString());
+                    if (!hexes.containsKey(neighbour.toString()) || neighbourEntry == null || neighbourEntry.type != 1) {
+                        continue;
+                    }
+                    int neighbourCount = 0;
+                    for (int q = 0; q < 6; q++) {
+                        if (hexes.containsKey(hexes.get(neighbour.toString()).getNeighbour(q).toString())) {
+                            neighbourCount++;
+                        }
+                        if (neighbourCount >= 2) break;
+                    }
+                    if (neighbourCount < 2) {
+                        valid = false;
+                        break;
+                    }
+                }
+                if (!valid) {
+                    continue;
+                }
+                hexes.remove(candidate.toString());
+                hexEntries.remove(candidate.toString());
+                temp = hexes.values().toArray(new HexUtils.Hex[0]);
+                blanks--;
+            }
+        }
+
         NBTTagList hexGrid = new NBTTagList();
-        Aspect[] aspects = research.tags == null ? new Aspect[0] : research.tags.getAspects();
-        for (int i = 0; i < aspects.length; i++) {
-            Aspect aspect = aspects[i];
-            if (aspect == null) continue;
-            NBTTagCompound hex = new NBTTagCompound();
-            hex.setByte("hexq", (byte)i);
-            hex.setByte("hexr", (byte)0);
-            hex.setByte("type", (byte)1);
-            hex.setString("aspect", aspect.getTag());
-            hexGrid.appendTag(hex);
+        for (HexUtils.Hex hex : hexes.values()) {
+            HexEntry entry = hexEntries.get(hex.toString());
+            if (entry == null) {
+                continue;
+            }
+            NBTTagCompound hexTag = new NBTTagCompound();
+            hexTag.setByte("hexq", (byte) hex.q);
+            hexTag.setByte("hexr", (byte) hex.r);
+            hexTag.setByte("type", (byte) entry.type);
+            if (entry.aspect != null) {
+                hexTag.setString("aspect", entry.aspect.getTag());
+            }
+            hexGrid.appendTag(hexTag);
         }
         tag.setTag("hexgrid", hexGrid);
         return stack;
@@ -532,7 +604,7 @@ public class ResearchManager {
             int r = hexTag.getByte("hexr");
             int type = hexTag.getByte("type");
             Aspect aspect = Aspect.getAspect(hexTag.getString("aspect"));
-            ResearchNoteData.HexCoord hex = new ResearchNoteData.HexCoord(q, r);
+            HexUtils.Hex hex = new HexUtils.Hex(q, r);
             String hexKey = hex.toString();
             data.hexes.put(hexKey, hex);
             data.hexEntries.put(hexKey, new HexEntry(aspect, type));
@@ -556,7 +628,7 @@ public class ResearchManager {
         tag.setInteger("copies", data.copies);
 
         NBTTagList hexGrid = new NBTTagList();
-        for (ResearchNoteData.HexCoord hex : data.hexes.values()) {
+        for (HexUtils.Hex hex : data.hexes.values()) {
             String hexKey = hex.toString();
             HexEntry entry = data.hexEntries.get(hexKey);
             if (entry == null) continue;
@@ -570,6 +642,76 @@ public class ResearchManager {
             hexGrid.appendTag(hexTag);
         }
         tag.setTag("hexgrid", hexGrid);
+    }
+
+    public static boolean checkResearchCompletion(ItemStack contents, ResearchNoteData note, String username) {
+        if (contents == null || contents.isEmpty() || note == null || note.hexes == null || note.hexEntries == null) {
+            return false;
+        }
+        ArrayList<String> checked = new ArrayList<>();
+        ArrayList<String> main = new ArrayList<>();
+        ArrayList<String> remains = new ArrayList<>();
+        for (HexUtils.Hex hex : note.hexes.values()) {
+            HexEntry entry = note.hexEntries.get(hex.toString());
+            if (entry != null && entry.type == 1) {
+                main.add(hex.toString());
+            }
+        }
+        for (HexUtils.Hex hex : note.hexes.values()) {
+            HexEntry entry = note.hexEntries.get(hex.toString());
+            if (entry == null || entry.type != 1) continue;
+            main.remove(hex.toString());
+            checkConnections(note, hex, checked, main, remains, username);
+            break;
+        }
+        if (main.size() == 0) {
+            ArrayList<String> remove = new ArrayList<>();
+            for (HexUtils.Hex hex : note.hexes.values()) {
+                HexEntry entry = note.hexEntries.get(hex.toString());
+                if (entry == null || entry.type == 1 || remains.contains(hex.toString())) continue;
+                remove.add(hex.toString());
+            }
+            for (String s : remove) {
+                note.hexEntries.remove(s);
+                note.hexes.remove(s);
+            }
+            note.complete = true;
+            updateData(contents, note);
+            return true;
+        }
+        return false;
+    }
+
+    private static void checkConnections(ResearchNoteData note, HexUtils.Hex hex, ArrayList<String> checked, ArrayList<String> main, ArrayList<String> remains, String username) {
+        checked.add(hex.toString());
+        for (int a = 0; a < 6; ++a) {
+            HexUtils.Hex target = hex.getNeighbour(a);
+            String targetKey = target.toString();
+            if (checked.contains(targetKey) || !note.hexEntries.containsKey(targetKey)) continue;
+            HexEntry sourceEntry = note.hexEntries.get(hex.toString());
+            HexEntry targetEntry = note.hexEntries.get(targetKey);
+            if (sourceEntry == null || targetEntry == null || targetEntry.type < 1) continue;
+            Aspect aspect1 = sourceEntry.aspect;
+            Aspect aspect2 = targetEntry.aspect;
+            if (aspect1 == null || aspect2 == null) continue;
+            if (!playerHasDiscoveredAspect(username, aspect1) || !playerHasDiscoveredAspect(username, aspect2)) continue;
+            boolean linkedFrom1 = !aspect1.isPrimal() && aspect1.getComponents() != null
+                    && (aspect1.getComponents()[0] == aspect2 || aspect1.getComponents()[1] == aspect2);
+            boolean linkedFrom2 = !aspect2.isPrimal() && aspect2.getComponents() != null
+                    && (aspect2.getComponents()[0] == aspect1 || aspect2.getComponents()[1] == aspect1);
+            if (!linkedFrom1 && !linkedFrom2) continue;
+            remains.add(targetKey);
+            if (targetEntry.type == 1) {
+                main.remove(targetKey);
+            }
+            checkConnections(note, target, checked, main, remains, username);
+        }
+    }
+
+    private static boolean playerHasDiscoveredAspect(String username, Aspect aspect) {
+        if (username == null || aspect == null) return false;
+        IPlayerKnowledge knowledge = getResearchData(username);
+        return knowledge != null && knowledge.hasDiscoveredAspect(aspect);
     }
 
     private static boolean hasUsableResearchTags(ResearchItem research) {

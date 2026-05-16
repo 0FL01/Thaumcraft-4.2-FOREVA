@@ -66,7 +66,7 @@ public class PacketAspectPlaceToServer extends PacketBase {
             if (player.world.provider.getDimension() != this.dim) return;
             TileEntity tile = player.world.getTileEntity(new BlockPos(this.x, this.y, this.z));
             if (tile instanceof TileResearchTable) {
-                tile.markDirty();
+                ((TileResearchTable) tile).placeAspect(this.q, this.r, this.aspect, player);
             }
         });
         return null;

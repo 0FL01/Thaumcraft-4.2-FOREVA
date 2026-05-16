@@ -5,7 +5,7 @@ import net.minecraft.nbt.NBTTagList;
 import net.minecraftforge.common.util.Constants;
 import org.junit.Test;
 import thaumcraft.api.aspects.Aspect;
-import thaumcraft.common.lib.research.ResearchNoteData.HexCoord;
+import thaumcraft.common.lib.utils.HexUtils;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
@@ -21,7 +21,7 @@ public class ResearchNoteDataTest {
         data.color = 0x123456;
         data.complete = true;
         data.copies = 2;
-        HexCoord hex = new HexCoord(-1, 2);
+        HexUtils.Hex hex = new HexUtils.Hex(-1, 2);
         data.hexes.put(hex.toString(), hex);
         data.hexEntries.put(hex.toString(), new ResearchManager.HexEntry(Aspect.AIR, 1));
 

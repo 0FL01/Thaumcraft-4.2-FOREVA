@@ -256,15 +256,15 @@ Dependency: client GUI rendering is Stage 8, but Stage 9-e still owns content re
 
 ### GAP-5: Research note, discovery, and hex-grid content flow is missing
 
-**Статус:** отсутствует  
+**Статус:** частично реализовано  
 **Критичность:** blocker
 
 **Текущая реализация:**
-- `src/main/java/thaumcraft/common/items/ItemResearchNotes.java:17`-`src/main/java/thaumcraft/common/items/ItemResearchNotes.java:56`
-- `src/main/java/thaumcraft/common/lib/research/ResearchManager.java:38`-`src/main/java/thaumcraft/common/lib/research/ResearchManager.java:387`
-- `src/main/java/thaumcraft/common/lib/research/ResearchNoteData.java` is absent.
-- `src/main/java/thaumcraft/common/lib/utils/HexUtils.java` is absent.
-- `src/main/java/thaumcraft/common/container/ContainerResearchTable.java:10`-`src/main/java/thaumcraft/common/container/ContainerResearchTable.java:32`
+- `src/main/java/thaumcraft/common/lib/research/ResearchNoteData.java` now stores reference-style note state (`key`, `color`, `hexEntries`, `hexes`, `complete`, `copies`).
+- `src/main/java/thaumcraft/common/lib/utils/HexUtils.java` is now present with reference-style axial/cubic helpers, ring generation, and randomized distribution.
+- `src/main/java/thaumcraft/common/lib/research/ResearchManager.java` now includes `consumeInkFromTable`, reference-style hex-grid note creation (`createNote`), NBT read/write round-trip for note grids, and connectivity completion checks (`checkResearchCompletion`/`checkConnections`).
+- `src/main/java/thaumcraft/common/tiles/TileResearchTable.java` now implements server-side note processing baseline: periodic bonus recalculation, `placeAspect(...)` handling, ink consumption, aspect pool updates, and completion promotion to metadata `64`.
+- `src/main/java/thaumcraft/common/lib/network/playerdata/PacketAspectPlaceToServer.java` now routes to `TileResearchTable.placeAspect(...)` instead of only marking the tile dirty.
 
 **Референс:**
 - `.stage9e-ref/thaumcraft/common/lib/research/ResearchNoteData.java:10`-`.stage9e-ref/thaumcraft/common/lib/research/ResearchNoteData.java:21`
@@ -276,19 +276,18 @@ Dependency: client GUI rendering is Stage 8, but Stage 9-e still owns content re
 
 **Что не совпадает:**
 
-Original primary research requires creating a research note from a Thaumonomicon/research action, consuming scribing tools and paper, generating a hex-grid from the research aspects and complexity, completing the note in the research table, turning it into a discovery, and then using the discovery to grant research if prerequisites still pass. Current `ItemResearchNotes` is a simple right-click grant for any non-empty `key` tag, and the data model/methods for notes are absent.
+The server-side note data model and core hex-grid flow now exist, but full parity is still incomplete. Primary note creation from full Thaumonomicon interactions is still not runtime-validated, and client-side research-table interaction/UX parity remains part of Stage 8 GUI work. Discovery/right-click behavior is improved but still needs full end-to-end parity evidence against reference progression paths.
 
 **Что нужно доделать:**
 
-Port the research note data flow needed by original content progression or explicitly replace it only if an equivalent behavior is authorized. For parity, the original flow should be ported.
+Finish the remaining progression path and validate end-to-end behavior with the now-present server-side note/hex baseline.
 
 **Как доделать:**
-- Add `ResearchNoteData` with `key`, `color`, `hexEntries`, `hexes`, `complete`, `copies`, and `isComplete()`.
-- Add/port `HexUtils` and `ResearchManager.HexEntry` support required by note grid generation and connection checking.
-- Port `ResearchManager.createResearchNoteForPlayer`, `createNote`, `getData`, `updateData`, `checkResearchCompletion`, `checkConnections`, `consumeInkFromPlayer`, `consumeInkFromTable`, `getResearchSlot`, and research-note duplication helpers if required by original content.
-- Replace direct right-click grant in `ItemResearchNotes` with original note/discovery behavior: only completed discoveries grant research, incomplete notes do not, unknown fragments can reveal hidden research or fail into knowledge fragments.
-- Wire the research table container/tile flow so notes can be solved, not just stored.
-- Files/classes to change: `src/main/java/thaumcraft/common/lib/research/ResearchNoteData.java`, `src/main/java/thaumcraft/common/lib/research/ResearchManager.java`, `src/main/java/thaumcraft/common/lib/utils/HexUtils.java`, `src/main/java/thaumcraft/common/items/ItemResearchNotes.java`, `src/main/java/thaumcraft/common/container/ContainerResearchTable.java`, `src/main/java/thaumcraft/common/tiles/TileResearchTable.java`.
+- Keep `ResearchManager.createResearchNoteForPlayer(...)` and server-side note lifecycle aligned with populated Stage 9-e research content.
+- Validate that primary research actions produce notes before completion across available non-GUI harness points and server packet handlers.
+- Validate table-side note completion and discovery consumption flow with non-interactive tests/harnesses where possible.
+- Preserve note NBT key compatibility (`key`, `color`, `complete`, `copies`, `hexgrid`, `hexq`, `hexr`, `type`, `aspect`) for old/new note stacks in scope.
+- Files/classes to continue: `src/main/java/thaumcraft/common/lib/research/ResearchManager.java`, `src/main/java/thaumcraft/common/items/ItemResearchNotes.java`, `src/main/java/thaumcraft/common/tiles/TileResearchTable.java`, Stage 8 GUI-side research table/browser handlers.
 
 **Критерии приемки:**
 - [ ] Clicking a primary research in the Thaumonomicon creates a research note instead of immediately completing the research.

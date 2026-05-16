@@ -51,7 +51,7 @@ Branch: `codex/durable-goal-stage8-9`
 | Stage 5 | Hover Harness and utility item behavior are partially ported; client/manual checks remain open. |
 | Docs/validation | Smoke wrapper, validation wrapper, and status-refresh notes are done. |
 
-Latest Stage 9-e delta: `BASICARTIFACE` now includes recipe-backed `MundaneAmulet`/`MundaneRing`/`MundaneBelt` pages; `TALLOW` now includes a recipe-backed `Tallow` crucible page; and `GOLEMFLESH`/`GOLEMTALLOW` now include `BlockFlesh`/`BlockTallow` recipe pages.
+Latest Stage 9-e delta: server-side research-note hex flow baseline is now wired (`HexUtils`, `ResearchNoteData` hex maps, `ResearchManager` note-grid creation + completion checks, `TileResearchTable.placeAspect`, and `PacketAspectPlaceToServer` routing), while recipe-backed `BASICARTIFACE` (`MundaneAmulet`/`MundaneRing`/`MundaneBelt`), `TALLOW` (`Tallow` crucible), and `GOLEMFLESH`/`GOLEMTALLOW` (`BlockFlesh`/`BlockTallow`) pages remain in place.
 
 ## Archive
 

@@ -1,5 +1,9 @@
 package thaumcraft.common.tiles;
 
+import net.minecraft.block.Block;
+import net.minecraft.block.material.Material;
+import net.minecraft.block.state.IBlockState;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
 import net.minecraft.inventory.IInventory;
@@ -8,6 +12,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.util.ITickable;
 import net.minecraft.util.NonNullList;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextComponentString;
 import thaumcraft.api.IScribeTools;
@@ -17,10 +22,14 @@ import thaumcraft.api.aspects.AspectList;
 import thaumcraft.api.research.ResearchCategories;
 import thaumcraft.api.research.ResearchItem;
 import thaumcraft.common.CommonProxy;
+import thaumcraft.common.config.ConfigBlocks;
 import thaumcraft.common.items.ItemResearchNotes;
 import thaumcraft.common.lib.capabilities.IPlayerKnowledge;
+import thaumcraft.common.lib.network.PacketHandler;
+import thaumcraft.common.lib.network.playerdata.PacketAspectPool;
 import thaumcraft.common.lib.research.ResearchManager;
 import thaumcraft.common.lib.research.ResearchNoteData;
+import thaumcraft.common.lib.utils.HexUtils;
 import thaumcraft.common.lib.utils.InventoryUtils;
 
 public class TileResearchTable
@@ -29,6 +38,8 @@ implements IInventory, ITickable {
 
     private ItemStack[] stackList = new ItemStack[2];
     public AspectList bonusAspects = new AspectList();
+    private int nextRecalc = 0;
+    private ResearchNoteData data = null;
 
     public TileResearchTable() {
         for (int i = 0; i < stackList.length; i++) {
@@ -152,6 +163,7 @@ implements IInventory, ITickable {
                 this.bonusAspects.merge(aspect, tag.getInteger("amount"));
             }
         }
+        this.nextRecalc = compound.getInteger("nextRecalc");
     }
 
     @Override
@@ -178,11 +190,23 @@ implements IInventory, ITickable {
             bonus.appendTag(tag);
         }
         compound.setTag("bonusAspects", bonus);
+        compound.setInteger("nextRecalc", this.nextRecalc);
     }
 
     @Override
     public void update() {
-        // Research scanning logic will be added later
+        if (this.world != null && !this.world.isRemote && this.nextRecalc++ > 600) {
+            this.nextRecalc = 0;
+            this.recalculateBonus();
+            this.world.notifyBlockUpdate(this.pos, this.world.getBlockState(this.pos), this.world.getBlockState(this.pos), 3);
+            this.markDirty();
+        }
+    }
+
+    @Override
+    public void markDirty() {
+        super.markDirty();
+        gatherResults();
     }
 
     @Override
@@ -228,7 +252,11 @@ implements IInventory, ITickable {
         for (Aspect aspect : research.tags.getAspects()) {
             if (aspect == null) continue;
             int cost = research.tags.getAmount(aspect) + data.copies;
-            knowledge.addAspectPool(aspect, -cost);
+            if (knowledge.addAspectPool(aspect, -cost) && player instanceof EntityPlayerMP) {
+                PacketHandler.INSTANCE.sendTo(
+                        new PacketAspectPool(aspect.getTag(), (short) (-cost), knowledge.getAspectPoolFor(aspect)),
+                        (EntityPlayerMP) player);
+            }
         }
 
         InventoryUtils.consumeInventoryItem(player, Items.FEATHER, 0);
@@ -244,8 +272,182 @@ implements IInventory, ITickable {
             player.dropItem(duplicate, false);
         }
 
+        this.world.addBlockEvent(this.pos, ConfigBlocks.blockTable, 1, 1);
         markDirty();
         this.world.notifyBlockUpdate(this.pos, this.world.getBlockState(this.pos), this.world.getBlockState(this.pos), 3);
+    }
+
+    private void gatherResults() {
+        this.data = null;
+        ItemStack notesStack = getStackInSlot(1);
+        if (!notesStack.isEmpty() && notesStack.getItem() instanceof ItemResearchNotes) {
+            this.data = ResearchManager.getData(notesStack);
+        }
+    }
+
+    public void placeAspect(int q, int r, Aspect aspect, EntityPlayer player) {
+        if (player == null || this.world == null || this.world.isRemote) return;
+        if (this.data == null) {
+            gatherResults();
+        }
+        if (!ResearchManager.consumeInkFromTable(getStackInSlot(0), false)) {
+            return;
+        }
+        ItemStack notesStack = getStackInSlot(1);
+        if (notesStack.isEmpty()
+                || !(notesStack.getItem() instanceof ItemResearchNotes)
+                || this.data == null
+                || notesStack.getMetadata() >= 64) {
+            return;
+        }
+        IPlayerKnowledge knowledge = CommonProxy.getPlayerKnowledge(player);
+        if (knowledge == null) return;
+
+        boolean researcher1 = ResearchManager.isResearchComplete(player, "RESEARCHER1");
+        boolean researcher2 = ResearchManager.isResearchComplete(player, "RESEARCHER2");
+        HexUtils.Hex hex = new HexUtils.Hex(q, r);
+        String hexKey = hex.toString();
+        ResearchManager.HexEntry current = this.data.hexEntries.get(hexKey);
+        ResearchManager.HexEntry next;
+        if (aspect != null) {
+            next = new ResearchManager.HexEntry(aspect, 2);
+            boolean refundSkip = researcher2 && this.world.rand.nextFloat() < 0.1F;
+            if (!refundSkip) {
+                if (knowledge.getAspectPoolFor(aspect) <= 0) {
+                    this.bonusAspects.remove(aspect, 1);
+                    this.world.notifyBlockUpdate(this.pos, this.world.getBlockState(this.pos), this.world.getBlockState(this.pos), 3);
+                    this.markDirty();
+                } else if (knowledge.addAspectPool(aspect, -1) && player instanceof EntityPlayerMP) {
+                    PacketHandler.INSTANCE.sendTo(
+                            new PacketAspectPool(aspect.getTag(), (short) -1, knowledge.getAspectPoolFor(aspect)),
+                            (EntityPlayerMP) player);
+                }
+            }
+        } else {
+            float chance = this.world.rand.nextFloat();
+            if (current != null
+                    && current.aspect != null
+                    && ((researcher1 && chance < 0.25F) || (researcher2 && chance < 0.5F))
+                    && knowledge.addAspectPool(current.aspect, 1)
+                    && player instanceof EntityPlayerMP) {
+                PacketHandler.INSTANCE.sendTo(
+                        new PacketAspectPool(current.aspect.getTag(), (short) 1, knowledge.getAspectPoolFor(current.aspect)),
+                        (EntityPlayerMP) player);
+            }
+            next = new ResearchManager.HexEntry(null, 0);
+        }
+        this.data.hexEntries.put(hexKey, next);
+        this.data.hexes.put(hexKey, hex);
+        ResearchManager.updateData(notesStack, this.data);
+        ResearchManager.consumeInkFromTable(getStackInSlot(0), true);
+        if (ResearchManager.checkResearchCompletion(notesStack, this.data, player.getName())) {
+            notesStack.setItemDamage(64);
+            this.world.addBlockEvent(this.pos, ConfigBlocks.blockTable, 1, 1);
+        }
+        this.world.notifyBlockUpdate(this.pos, this.world.getBlockState(this.pos), this.world.getBlockState(this.pos), 3);
+        this.markDirty();
+    }
+
+    private void recalculateBonus() {
+        if (this.world == null) return;
+        if (!this.world.isDaytime()
+                && this.world.getLight(this.pos.up()) < 4
+                && !this.world.canSeeSky(this.pos.up())
+                && this.world.rand.nextInt(20) == 0) {
+            this.bonusAspects.merge(Aspect.ENTROPY, 1);
+        }
+        float worldHeight = (float) this.world.getHeight();
+        if ((float) this.pos.getY() > worldHeight * 0.5F && this.world.rand.nextInt(20) == 0) {
+            this.bonusAspects.merge(Aspect.AIR, 1);
+        }
+        if ((float) this.pos.getY() > worldHeight * 0.66F && this.world.rand.nextInt(20) == 0) {
+            this.bonusAspects.merge(Aspect.AIR, 1);
+        }
+        if ((float) this.pos.getY() > worldHeight * 0.75F && this.world.rand.nextInt(20) == 0) {
+            this.bonusAspects.merge(Aspect.AIR, 1);
+        }
+
+        for (int x = -8; x <= 8; ++x) {
+            for (int z = -8; z <= 8; ++z) {
+                for (int y = -8; y <= 8; ++y) {
+                    BlockPos scanPos = this.pos.add(x, y, z);
+                    if (scanPos.getY() <= 0 || scanPos.getY() >= this.world.getHeight()) continue;
+                    IBlockState state = this.world.getBlockState(scanPos);
+                    Block block = state.getBlock();
+                    int md = block.getMetaFromState(state);
+                    Material mat = state.getMaterial();
+
+                    if (block == ConfigBlocks.blockCustomOre && md == 1) {
+                        if (this.bonusAspects.getAmount(Aspect.AIR) < 1 && this.world.rand.nextInt(20) == 0) {
+                            this.bonusAspects.merge(Aspect.AIR, 1);
+                            return;
+                        }
+                    } else if (block == ConfigBlocks.blockCrystal && md == 0) {
+                        if (this.bonusAspects.getAmount(Aspect.AIR) < 1 && this.world.rand.nextInt(10) == 0) {
+                            this.bonusAspects.merge(Aspect.AIR, 1);
+                            return;
+                        }
+                    } else if (mat == Material.LAVA || mat == Material.FIRE || block == ConfigBlocks.blockCustomOre && md == 2) {
+                        if (this.bonusAspects.getAmount(Aspect.FIRE) < 1 && this.world.rand.nextInt(20) == 0) {
+                            this.bonusAspects.merge(Aspect.FIRE, 1);
+                            return;
+                        }
+                    } else if (block == ConfigBlocks.blockCrystal && md == 1) {
+                        if (this.bonusAspects.getAmount(Aspect.FIRE) < 1 && this.world.rand.nextInt(10) == 0) {
+                            this.bonusAspects.merge(Aspect.FIRE, 1);
+                            return;
+                        }
+                    } else if (mat == Material.ROCK || block == ConfigBlocks.blockCustomOre && md == 4) {
+                        if (this.bonusAspects.getAmount(Aspect.EARTH) < 1 && this.world.rand.nextInt(20) == 0) {
+                            this.bonusAspects.merge(Aspect.EARTH, 1);
+                            return;
+                        }
+                    } else if (block == ConfigBlocks.blockCrystal && md == 3) {
+                        if (this.bonusAspects.getAmount(Aspect.EARTH) < 1 && this.world.rand.nextInt(10) == 0) {
+                            this.bonusAspects.merge(Aspect.EARTH, 1);
+                            return;
+                        }
+                    } else if (mat == Material.WATER || block == ConfigBlocks.blockCustomOre && md == 3) {
+                        if (this.bonusAspects.getAmount(Aspect.WATER) < 1 && this.world.rand.nextInt(20) == 0) {
+                            this.bonusAspects.merge(Aspect.WATER, 1);
+                            return;
+                        }
+                    } else if (block == ConfigBlocks.blockCrystal && md == 2) {
+                        if (this.bonusAspects.getAmount(Aspect.WATER) < 1 && this.world.rand.nextInt(10) == 0) {
+                            this.bonusAspects.merge(Aspect.WATER, 1);
+                            return;
+                        }
+                    } else if (mat == Material.CIRCUITS || mat == Material.ICE || block == ConfigBlocks.blockCustomOre && md == 5) {
+                        if (this.bonusAspects.getAmount(Aspect.ORDER) < 1 && this.world.rand.nextInt(20) == 0) {
+                            this.bonusAspects.merge(Aspect.ORDER, 1);
+                            return;
+                        }
+                    } else if (block == ConfigBlocks.blockCrystal && md == 4) {
+                        if (this.bonusAspects.getAmount(Aspect.ORDER) < 1 && this.world.rand.nextInt(10) == 0) {
+                            this.bonusAspects.merge(Aspect.ORDER, 1);
+                            return;
+                        }
+                    } else if (block == ConfigBlocks.blockCustomOre && md == 6) {
+                        if (this.bonusAspects.getAmount(Aspect.ENTROPY) < 1 && this.world.rand.nextInt(20) == 0) {
+                            this.bonusAspects.merge(Aspect.ENTROPY, 1);
+                            return;
+                        }
+                    } else if (block == ConfigBlocks.blockCrystal && md == 5 && this.bonusAspects.getAmount(Aspect.ENTROPY) < 1 && this.world.rand.nextInt(10) == 0) {
+                        this.bonusAspects.merge(Aspect.ENTROPY, 1);
+                        return;
+                    }
+
+                    if ((block == net.minecraft.init.Blocks.BOOKSHELF && this.world.rand.nextInt(300) == 0)
+                            || (block == ConfigBlocks.blockJar && md == 1 && this.world.rand.nextInt(200) == 0)) {
+                        Aspect[] aspects = Aspect.aspects.values().toArray(new Aspect[0]);
+                        if (aspects.length > 0) {
+                            this.bonusAspects.merge(aspects[this.world.rand.nextInt(aspects.length)], 1);
+                            return;
+                        }
+                    }
+                }
+            }
+        }
     }
 
     private boolean playerHasItem(EntityPlayer player, net.minecraft.item.Item item) {
