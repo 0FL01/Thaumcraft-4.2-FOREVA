@@ -2853,6 +2853,26 @@ public class ConfigResearch {
                 .registerResearchItem();
 
         new ResearchItem(
+                "ESSENTIARESERVOIR",
+                "ELDRITCH",
+                new AspectList()
+                        .add(Aspect.WATER, 5)
+                        .add(Aspect.VOID, 3)
+                        .add(Aspect.EXCHANGE, 3)
+                        .add(Aspect.MAGIC, 5)
+                        .add(Aspect.VOID, 5),
+                4,
+                -3,
+                2,
+                new ItemStack(ConfigBlocks.blockEssentiaReservoir))
+                .setPages(
+                        new ResearchPage("tc.research_page.ESSENTIARESERVOIR.1"),
+                        new ResearchPage((InfusionRecipe) recipes.get("EssentiaReservoir")),
+                        new ResearchPage("tc.research_page.ESSENTIARESERVOIR.2"))
+                .setParents("VOIDMETAL", "CENTRIFUGE", "INFUSION")
+                .registerResearchItem();
+
+        new ResearchItem(
                 "CAP_void",
                 "ELDRITCH",
                 new AspectList()
