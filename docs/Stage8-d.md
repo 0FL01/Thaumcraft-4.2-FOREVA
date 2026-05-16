@@ -1383,6 +1383,28 @@ Some entities may be hard to trigger naturally until recipes/research/spawn cont
 
 - Это behavior-contract baseline; полная parity по taint creeper explosion-side effects/taint spread paths остаётся в Stage 6 common-runtime scope.
 
+### Checkpoint 2026-05-16 — restore taint creeper NBT persistence contracts
+
+Статус: частично продвинут.
+
+Что сделано:
+
+- `EntityTaintCreeper` NBT persistence выровнен с reference-shaped contract:
+  - `Fuse` теперь сохраняет/восстанавливает `fuseTime` (а не runtime ignite timer);
+  - добавлена сохранение/загрузка `ExplosionRadius`;
+  - powered-state write теперь использует reference key `"powered"`;
+  - read path сделан backward-compatible: поддерживает `"powered"` и legacy `"Powered"`.
+- Runtime ignite timer на load сбрасывается к baseline (`timeSinceIgnited = 0`) вместо неверного чтения из `Fuse`.
+- `ClientProxyEntityRendererRegistrationStaticGuardTest` расширен проверками на `"powered"`/`"Fuse"`/`"ExplosionRadius"` contracts.
+
+Проверки:
+
+- `./scripts/dev.sh validate --smoke` — passed.
+
+Ограничения:
+
+- Это NBT-contract baseline; полная parity explosion gameplay path (taint spread/potion side effects) остаётся в Stage 6 runtime scope.
+
 ### Checkpoint 2026-05-16 — restore mind spider viewer-only render gating
 
 Статус: частично продвинут.

@@ -279,6 +279,14 @@ public class ClientProxyEntityRendererRegistrationStaticGuardTest {
                         && taintCreeperEntity.contains("protected boolean canDespawn()")
                         && taintCreeperEntity.contains("return true;")
                         && taintCreeperEntity.contains("return false;"));
+        assertTrue("EntityTaintCreeper must keep reference-shaped NBT persistence contracts",
+                taintCreeperEntity.contains("nbt.setBoolean(\"powered\"")
+                        && taintCreeperEntity.contains("nbt.setShort(\"Fuse\"")
+                        && taintCreeperEntity.contains("nbt.setByte(\"ExplosionRadius\"")
+                        && taintCreeperEntity.contains("nbt.hasKey(\"Fuse\", 99)")
+                        && taintCreeperEntity.contains("nbt.hasKey(\"ExplosionRadius\", 99)")
+                        && taintCreeperEntity.contains("nbt.hasKey(\"powered\", 1)")
+                        && taintCreeperEntity.contains("nbt.getBoolean(\"powered\")"));
         String taintSheepEntity = readFile("src/main/java/thaumcraft/common/entities/monster/EntityTaintSheep.java");
         assertTrue("EntityTaintSheep must keep sheared-state data/NBT/shearing contracts for fur-layer renderer parity",
                 taintSheepEntity.contains("DataParameter<Byte>")

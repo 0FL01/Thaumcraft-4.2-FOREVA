@@ -100,18 +100,27 @@ public class EntityTaintCreeper extends net.minecraft.entity.monster.EntityMob i
     @Override
     public void readEntityFromNBT(net.minecraft.nbt.NBTTagCompound nbt) {
         super.readEntityFromNBT(nbt);
-        this.timeSinceIgnited = nbt.getShort("Fuse");
+        if (nbt.hasKey("Fuse", 99)) {
+            this.fuseTime = nbt.getShort("Fuse");
+        }
+        if (nbt.hasKey("ExplosionRadius", 99)) {
+            this.explosionRadius = nbt.getByte("ExplosionRadius");
+        }
+        boolean powered = nbt.hasKey("powered", 1) ? nbt.getBoolean("powered") : nbt.getBoolean("Powered");
+        this.dataManager.set(POWERED, powered);
+        this.timeSinceIgnited = 0;
         this.lastActiveTime = this.timeSinceIgnited;
         this.dataManager.set(CREEPER_STATE, (int)nbt.getByte("CreeperState"));
-        this.dataManager.set(POWERED, nbt.getBoolean("Powered"));
     }
 
     @Override
     public void writeEntityToNBT(net.minecraft.nbt.NBTTagCompound nbt) {
         super.writeEntityToNBT(nbt);
-        nbt.setShort("Fuse", (short)this.timeSinceIgnited);
-        nbt.setByte("CreeperState", (byte)this.getCreeperState());
+        nbt.setBoolean("powered", this.dataManager.get(POWERED));
+        nbt.setShort("Fuse", (short)this.fuseTime);
+        nbt.setByte("ExplosionRadius", (byte)this.explosionRadius);
         nbt.setBoolean("Powered", this.dataManager.get(POWERED));
+        nbt.setByte("CreeperState", (byte)this.getCreeperState());
     }
 
     @Override protected net.minecraft.util.SoundEvent getHurtSound(net.minecraft.util.DamageSource source) { return net.minecraft.init.SoundEvents.ENTITY_CREEPER_HURT; }
