@@ -36,7 +36,9 @@ public class ClientProxyFxStaticGuardTest {
         String visDrain = readFile("src/main/java/thaumcraft/common/lib/network/fx/PacketFXVisDrain.java");
         String blockArc = readFile("src/main/java/thaumcraft/common/lib/network/fx/PacketFXBlockArc.java");
         String blockSparkle = readFile("src/main/java/thaumcraft/common/lib/network/fx/PacketFXBlockSparkle.java");
+        String shield = readFile("src/main/java/thaumcraft/common/lib/network/fx/PacketFXShield.java");
         String serverTick = readFile("src/main/java/thaumcraft/common/lib/events/ServerTickEventsFML.java");
+        String runic = readFile("src/main/java/thaumcraft/common/lib/events/EventHandlerRunic.java");
 
         assertTrue("PacketFXVisDrain must schedule client task and call proxy beam",
                 visDrain.contains("Minecraft.getMinecraft().addScheduledTask") && visDrain.contains("Thaumcraft.proxy.beam("));
@@ -44,8 +46,15 @@ public class ClientProxyFxStaticGuardTest {
                 blockArc.contains("Minecraft.getMinecraft().addScheduledTask") && blockArc.contains("Thaumcraft.proxy.bolt("));
         assertTrue("PacketFXBlockSparkle must schedule client task and call proxy blockSparkle",
                 blockSparkle.contains("Minecraft.getMinecraft().addScheduledTask") && blockSparkle.contains("Thaumcraft.proxy.blockSparkle("));
+        assertTrue("PacketFXShield must schedule client task and route through proxy burst/bolt",
+                shield.contains("Minecraft.getMinecraft().addScheduledTask")
+                        && shield.contains("Thaumcraft.proxy.burst(")
+                        && shield.contains("Thaumcraft.proxy.bolt("));
         assertTrue("Server block-swap path must send PacketFXBlockSparkle around replaced block",
                 serverTick.contains("new PacketFXBlockSparkle(vs.x, vs.y, vs.z, 0xC0C0FF)"));
+        assertTrue("Runic shielding paths must send PacketFXShield for player and champion shield reactions",
+                runic.contains("new PacketFXShield(player.getEntityId(), target)")
+                        && runic.contains("new PacketFXShield(mob.getEntityId(), target)"));
     }
 
     private static String readFile(String path) throws IOException {

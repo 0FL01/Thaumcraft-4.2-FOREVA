@@ -205,9 +205,9 @@ public class EventHandlerRunic {
                     target = -3;
                 }
 
-                // Phase 8: PacketHandler.INSTANCE.sendToAllAround(
-                //     new PacketFXShield(player.getEntityId(), target),
-                //     new NetworkRegistry.TargetPoint(player.world.provider.getDimension(), player.posX, player.posY, player.posZ, 64.0));
+                PacketHandler.INSTANCE.sendToAllAround(
+                        new PacketFXShield(player.getEntityId(), target),
+                        new NetworkRegistry.TargetPoint(player.world.provider.getDimension(), player.posX, player.posY, player.posZ, 64.0));
 
                 int charge = this.runicCharge.get(player.getEntityId());
                 Integer[] info = this.runicInfo.get(player.getEntityId());
@@ -304,9 +304,9 @@ public class EventHandlerRunic {
             target = -3;
         }
 
-        // Phase 8: PacketHandler.INSTANCE.sendToAllAround(
-        //     new PacketFXShield(mob.getEntityId(), target),
-        //     new NetworkRegistry.TargetPoint(mob.world.provider.getDimension(), mob.posX, mob.posY, mob.posZ, 32.0));
+        PacketHandler.INSTANCE.sendToAllAround(
+                new PacketFXShield(mob.getEntityId(), target),
+                new NetworkRegistry.TargetPoint(mob.world.provider.getDimension(), mob.posX, mob.posY, mob.posZ, 32.0));
 
         // Phase 8: mob.world.playSound(null, mob.posX, mob.posY, mob.posZ, TCSounds.RUNICSHIELDEFFECT, ...);
     }

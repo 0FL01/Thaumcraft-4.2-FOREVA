@@ -14,6 +14,16 @@ import static org.junit.Assert.assertTrue;
 public class PacketFXSerializationTest {
 
     @Test
+    public void shieldPacketRoundTripsPayload() {
+        PacketFXShield source = new PacketFXShield(99, -2);
+        PacketFXShield target = new PacketFXShield();
+        roundTrip(source, target);
+
+        assertEquals(99, (int) getField(target, "source"));
+        assertEquals(-2, (int) getField(target, "target"));
+    }
+
+    @Test
     public void blockSparklePacketRoundTripsPayload() {
         PacketFXBlockSparkle source = new PacketFXBlockSparkle(8, 20, -3, 0xC0C0FF);
         PacketFXBlockSparkle target = new PacketFXBlockSparkle();

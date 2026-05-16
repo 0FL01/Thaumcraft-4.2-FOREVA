@@ -324,6 +324,33 @@ Depends on GAP-1, GAP-2, GAP-5, and GAP-6. Network-thread rendering is unsafe if
 
 - The broader Stage 8-e packet set (beam pulse/zap/shield/sonic/etc.) remains open.
 
+#### Checkpoint 2026-05-16 — GAP-3 shield packet and runic send paths restored
+
+Статус: `PacketFXShield` now has payload/handler baseline and runic shield code paths send it again.
+
+Что сделано:
+
+- Implemented `PacketFXShield` payload serialization (`source`, `target`) and client-scheduled handler.
+- Added client fallback routing for shield reactions:
+  - always emits local burst at shield source;
+  - emits bolt toward explicit attacker target when available;
+  - emits directional fallback bolts for `target == -1/-2/-3` special cases.
+- Restored packet sends in `EventHandlerRunic` for:
+  - player runic shield absorption path (`64` radius);
+  - champion shield path (`32` radius).
+- Expanded test coverage:
+  - `PacketFXSerializationTest` now includes `PacketFXShield` round-trip;
+  - `ClientProxyFxStaticGuardTest` now asserts shield handler scheduling/proxy routing and active `EventHandlerRunic` send-sites.
+
+Проверки:
+
+- `./scripts/dev.sh test` — passed.
+- `./scripts/dev.sh validate --smoke` — passed.
+
+Ограничения:
+
+- This is fallback FX routing and does not yet port reference rune-render particle classes.
+
 ### GAP-4: Beam, wand beam, bore beam, power beam, arc, and lightning bolt classes are absent
 
 **Статус:** отсутствует  
