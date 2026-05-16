@@ -587,6 +587,27 @@ Some entities may be hard to trigger naturally until recipes/research/spawn cont
 - Это всё ещё fallback baseline, а не reference custom renderer parity (модели/слои/анимации/passes TC4 остаются открытыми).
 - Часть entity групп Stage 8-d по-прежнему использует `RenderNoop` до портирования специализированных renderers.
 
+### Checkpoint 2026-05-16 — cultist biped fallback slice
+
+Статус: частично продвинут.
+
+Что сделано:
+
+- Добавлен `RenderFallbackBiped<T extends EntityLiving>` как лёгкий non-noop biped fallback renderer с явной `ResourceLocation` текстурой.
+- `ClientProxy.setupEntityRenderers()` дополнен fallback registrations для cultist-группы:
+  `EntityCultistKnight`, `EntityCultistCleric`, `EntityCultistLeader`.
+- Для этой группы использован `ModelBiped` + texture baseline `textures/models/cultist.png` из Stage 8-d asset corpus.
+- `ClientProxyEntityRendererRegistrationStaticGuardTest` расширен проверками registration paths и наличия `RenderFallbackBiped`.
+
+Проверки:
+
+- `./scripts/dev.sh validate --smoke` — passed.
+
+Ограничения:
+
+- Это fallback baseline; reference-specific cultist render passes/armor/model parity остаются открытыми.
+- Большая часть Stage 8-d entity групп всё ещё на `RenderNoop` до портирования специализированных renderer-классов.
+
 - [ ] Add client-only entity renderer registration hook.
 - [ ] Register every entity from `ConfigEntities.ENTITIES` with a custom or vanilla-equivalent renderer.
 - [ ] Port item-like/transient/projectile renderers.
