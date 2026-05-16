@@ -38,7 +38,7 @@ public class ClientProxyEntityRendererRegistrationStaticGuardTest {
                         && source.contains("registerEntityRenderer(EntityEmber.class, RenderEmber::new, registered);")
                         && source.contains("registerEntityRenderer(EntityGolemBobber.class, RenderGolemBobber::new, registered);")
                         && source.contains("registerEntityRenderer(EntityAspectOrb.class, RenderAspectOrb::new, registered);")
-                        && source.contains("registerEntityRenderer(EntityFallingTaint.class, manager -> new RenderSnowball<>(manager, Items.SLIME_BALL, renderItem), registered);"));
+                        && source.contains("registerEntityRenderer(EntityFallingTaint.class, RenderFallingTaint::new, registered);"));
         assertTrue("ClientProxy must keep vanilla mob fallback renderer registrations for compatible zombie/spider groups",
                 source.contains("registerEntityRenderer(EntityBrainyZombie.class, RenderBrainyZombie::new, registered);")
                         && source.contains("registerEntityRenderer(EntityGiantBrainyZombie.class, RenderBrainyZombie::new, registered);")
@@ -182,6 +182,17 @@ public class ClientProxyEntityRendererRegistrationStaticGuardTest {
                         && golemBobberRenderer.contains("buffer.begin(3, DefaultVertexFormats.POSITION_COLOR)")
                         && golemBobberRenderer.contains("GlStateManager.disableTexture2D()")
                         && golemBobberRenderer.contains("GlStateManager.enableTexture2D()"));
+        String fallingTaintRenderer = readFile("src/main/java/thaumcraft/client/renderers/entity/RenderFallingTaint.java");
+        assertTrue("RenderFallingTaint must provide block-model atlas render baseline",
+                fallingTaintRenderer.contains("extends Render<EntityFallingTaint>")
+                        && fallingTaintRenderer.contains("TextureMap.LOCATION_BLOCKS_TEXTURE")
+                        && fallingTaintRenderer.contains("block.getStateFromMeta(entity.metadata)")
+                        && fallingTaintRenderer.contains("world.getBlockState(blockPos)")
+                        && fallingTaintRenderer.contains("EnumBlockRenderType.MODEL")
+                        && fallingTaintRenderer.contains("dispatcher.getBlockModelRenderer().renderModel(")
+                        && fallingTaintRenderer.contains("buffer.setTranslation(-blockPos.getX() - 0.5D")
+                        && fallingTaintRenderer.contains("GlStateManager.disableLighting()")
+                        && fallingTaintRenderer.contains("GlStateManager.enableLighting()"));
         String eldritchGuardianRenderer = readFile("src/main/java/thaumcraft/client/renderers/entity/RenderEldritchGuardian.java");
         assertTrue("RenderEldritchGuardian must provide dedicated guardian texture baseline",
                 eldritchGuardianRenderer.contains("extends RenderBiped<EntityEldritchGuardian>")

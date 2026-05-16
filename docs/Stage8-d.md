@@ -2357,6 +2357,30 @@ Some entities may be hard to trigger naturally until recipes/research/spawn cont
 
 - Это renderer baseline без ручной визуальной проверки; точные legacy визуальные нюансы линии/анимации bobber остаются в общем Stage 8-d visual parity matrix.
 
+### Checkpoint 2026-05-17 — replace falling taint snowball fallback with dedicated block-model renderer baseline
+
+Статус: частично продвинут.
+
+Что сделано:
+
+- `EntityFallingTaint` переведен с `RenderSnowball` на dedicated `RenderFallingTaint`.
+- Добавлен `RenderFallingTaint` с reference-shaped baseline contracts:
+  - block atlas binding (`TextureMap.LOCATION_BLOCKS_TEXTURE`);
+  - metadata-driven imitated state (`block.getStateFromMeta(entity.metadata)`);
+  - world-state divergence gate (`world.getBlockState(blockPos)`), как в original render gate;
+  - model-only block render path через `BlockRendererDispatcher` + `renderModel(...)` с translation в local render space.
+- `ClientProxyEntityRendererRegistrationStaticGuardTest` обновлен:
+  - registration contract `EntityFallingTaint -> RenderFallingTaint::new`;
+  - renderer contract checks на atlas/state/renderModel/lighting baseline.
+
+Проверки:
+
+- `./scripts/dev.sh validate --smoke` — passed.
+
+Ограничения:
+
+- Это renderer baseline без ручной визуальной проверки; точные legacy визуальные нюансы block-shading/face culling остаются в общем Stage 8-d visual parity matrix.
+
 - [ ] Add client-only entity renderer registration hook.
 - [ ] Register every entity from `ConfigEntities.ENTITIES` with a custom or vanilla-equivalent renderer.
 - [ ] Port item-like/transient/projectile renderers.

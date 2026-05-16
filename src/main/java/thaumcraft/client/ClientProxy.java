@@ -65,6 +65,7 @@ import thaumcraft.client.renderers.entity.RenderPechBlast;
 import thaumcraft.client.renderers.entity.RenderAlumentum;
 import thaumcraft.client.renderers.entity.RenderDart;
 import thaumcraft.client.renderers.entity.RenderGolemBobber;
+import thaumcraft.client.renderers.entity.RenderFallingTaint;
 import thaumcraft.client.renderers.entity.RenderCultistPortal;
 import thaumcraft.client.renderers.entity.RenderBrainyZombie;
 import thaumcraft.client.renderers.entity.RenderInhabitedZombie;
@@ -227,7 +228,7 @@ public class ClientProxy extends CommonProxy {
         registerEntityRenderer(EntityEmber.class, RenderEmber::new, registered);
         registerEntityRenderer(EntityGolemBobber.class, RenderGolemBobber::new, registered);
         registerEntityRenderer(EntityAspectOrb.class, RenderAspectOrb::new, registered);
-        registerEntityRenderer(EntityFallingTaint.class, manager -> new RenderSnowball<>(manager, Items.SLIME_BALL, renderItem), registered);
+        registerEntityRenderer(EntityFallingTaint.class, RenderFallingTaint::new, registered);
 
         registerEntityRenderer(EntityBrainyZombie.class, RenderBrainyZombie::new, registered);
         registerEntityRenderer(EntityGiantBrainyZombie.class, RenderBrainyZombie::new, registered);
