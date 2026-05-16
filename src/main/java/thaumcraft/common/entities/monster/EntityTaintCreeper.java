@@ -150,6 +150,16 @@ public class EntityTaintCreeper extends net.minecraft.entity.monster.EntityMob i
     }
 
     @Override
+    public void onLivingUpdate() {
+        super.onLivingUpdate();
+        if (this.world.isRemote && this.ticksExisted < 5) {
+            for (int i = 0; i < thaumcraft.common.Thaumcraft.proxy.particleCount(10); i++) {
+                thaumcraft.common.Thaumcraft.proxy.taintLandFX(this);
+            }
+        }
+    }
+
+    @Override
     public void readEntityFromNBT(net.minecraft.nbt.NBTTagCompound nbt) {
         super.readEntityFromNBT(nbt);
         if (nbt.hasKey("Fuse", 99)) {

@@ -1525,6 +1525,27 @@ Some entities may be hard to trigger naturally until recipes/research/spawn cont
 
 - Это fall-fuse baseline; полная parity taint creeper movement/combat runtime behavior закрывается в общем Stage 6 scope.
 
+### Checkpoint 2026-05-17 — restore taint creeper early client taint FX baseline
+
+Статус: частично продвинут.
+
+Что сделано:
+
+- `EntityTaintCreeper` расширен early-lifecycle client FX hook:
+  - добавлен `onLivingUpdate()` override;
+  - в первые `5` ticks на клиенте эмитится taint FX loop через side-safe proxy hooks:
+    - `Thaumcraft.proxy.particleCount(10)`;
+    - `Thaumcraft.proxy.taintLandFX(this)`.
+- `ClientProxyEntityRendererRegistrationStaticGuardTest` расширен проверками на early client taint FX contracts.
+
+Проверки:
+
+- `./scripts/dev.sh validate --smoke` — passed.
+
+Ограничения:
+
+- Это early-FX baseline; полная visual parity эффекта остаётся в non-GUI ограниченном client scope.
+
 ### Checkpoint 2026-05-16 — restore mind spider viewer-only render gating
 
 Статус: частично продвинут.

@@ -295,6 +295,11 @@ public class ClientProxyEntityRendererRegistrationStaticGuardTest {
                         && taintCreeperEntity.contains("this.timeSinceIgnited += state;")
                         && taintCreeperEntity.contains("if (this.timeSinceIgnited < 0)")
                         && taintCreeperEntity.contains("createExplosion(this, this.posX, this.posY + (double)(this.height / 2.0F), this.posZ, 1.5F, false)"));
+        assertTrue("EntityTaintCreeper must keep early client taint FX baseline",
+                taintCreeperEntity.contains("public void onLivingUpdate()")
+                        && taintCreeperEntity.contains("this.world.isRemote && this.ticksExisted < 5")
+                        && taintCreeperEntity.contains("Thaumcraft.proxy.particleCount(10)")
+                        && taintCreeperEntity.contains("Thaumcraft.proxy.taintLandFX(this)"));
         assertTrue("EntityTaintCreeper must keep fall-accelerated fuse baseline",
                 taintCreeperEntity.contains("public void fall(float distance, float damageMultiplier)")
                         && taintCreeperEntity.contains("distance * 1.5F")
