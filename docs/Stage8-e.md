@@ -350,6 +350,33 @@ Depends on GAP-1, GAP-2, GAP-5, and GAP-6. Network-thread rendering is unsafe if
 
 - This checkpoint restores block-swap drop/sound behavior only; deeper focus/block-chain parity remains outside this narrow scope.
 
+#### Checkpoint 2026-05-16 — TileSensor note-event tracking hooks restored
+
+Статус: server-side note-event buffering hooks for `TileSensor` are now active again.
+
+Что сделано:
+
+- Restored `TileSensor.noteBlockEvents` baseline buffer:
+  - `WeakHashMap<WorldServer, ArrayList<Integer[]>>` field is now present in `TileSensor`.
+- Restored event capture in `EventHandlerWorld.onNoteBlockPlay(...)`:
+  - creates per-world list when missing;
+  - stores reference-shaped payload tuple
+    `(x, y, z, instrumentOrdinal, vanillaNoteId)`.
+- Restored world cleanup in `EventHandlerWorld.onWorldUnload(...)`:
+  - removes world entry from `TileSensor.noteBlockEvents` in a guarded `try/catch`.
+- Restored per-tick list cleanup in `ServerTickEventsFML.serverWorldTick(...)`:
+  - clears buffered note events for current `WorldServer`.
+- Added static guard `TileSensorNoteEventStaticGuardTest` to lock this hook set.
+
+Проверки:
+
+- `./scripts/dev.sh test` — passed.
+- `./scripts/dev.sh validate --smoke` — passed.
+
+Ограничения:
+
+- This checkpoint restores note-event buffering hooks only; full `TileSensor` runtime parity (tone/note/redstone trigger logic) remains outside this narrow scope.
+
 #### Checkpoint 2026-05-16 — GAP-3 shield packet and runic send paths restored
 
 Статус: `PacketFXShield` now has payload/handler baseline and runic shield code paths send it again.

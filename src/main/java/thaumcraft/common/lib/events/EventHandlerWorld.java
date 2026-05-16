@@ -61,12 +61,11 @@ public class EventHandlerWorld {
         if (event.getWorld().isRemote) return;
 
         VisNetHandler.sources.remove(event.getWorld().provider.getDimension());
-        // Phase 8: TileSensor cleanup
-        // try {
-        //     TileSensor.noteBlockEvents.remove((WorldServer)event.getWorld());
-        // } catch (Exception e) {
-        //     LOGGER.warn("[Thaumcraft] Error unloading noteblock event handlers.", e);
-        // }
+        try {
+            TileSensor.noteBlockEvents.remove((WorldServer) event.getWorld());
+        } catch (Exception e) {
+            LOGGER.warn("[Thaumcraft] Error unloading noteblock event handlers.", e);
+        }
     }
 
     // ---- Chunk data persistence for retrogen ----
@@ -156,13 +155,20 @@ public class EventHandlerWorld {
     @SubscribeEvent
     public void onNoteBlockPlay(NoteBlockEvent.Play event) {
         if (event.getWorld().isRemote) return;
-        // Phase 8: TileSensor note tracking
-        // if (!TileSensor.noteBlockEvents.containsKey(event.getWorld())) {
-        //     TileSensor.noteBlockEvents.put((WorldServer)event.getWorld(), new ArrayList<>());
-        // }
-        // TileSensor.noteBlockEvents.get(event.getWorld())
-        //         .add(new Integer[]{event.getPos().getX(), event.getPos().getY(), event.getPos().getZ(),
-        //               event.getInstrument().ordinal(), event.getVanillaNoteId()});
+        WorldServer world = (WorldServer) event.getWorld();
+        if (!TileSensor.noteBlockEvents.containsKey(world)) {
+            TileSensor.noteBlockEvents.put(world, new ArrayList<>());
+        }
+        ArrayList<Integer[]> list = TileSensor.noteBlockEvents.get(world);
+        if (list != null) {
+            list.add(new Integer[]{
+                    event.getPos().getX(),
+                    event.getPos().getY(),
+                    event.getPos().getZ(),
+                    event.getInstrument().ordinal(),
+                    event.getVanillaNoteId()
+            });
+        }
     }
 
     // ---- Bucket filling (custom fluid buckets) ----

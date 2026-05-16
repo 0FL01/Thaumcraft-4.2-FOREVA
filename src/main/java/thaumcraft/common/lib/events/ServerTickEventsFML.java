@@ -13,6 +13,7 @@ import net.minecraft.util.SoundCategory;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldServer;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
@@ -58,6 +59,12 @@ public class ServerTickEventsFML {
 
         tickChunkRegeneration(world);
         tickBlockSwap(world);
+        if (world instanceof WorldServer) {
+            ArrayList<Integer[]> events = TileSensor.noteBlockEvents.get((WorldServer) world);
+            if (events != null) {
+                events.clear();
+            }
+        }
     }
 
     /**
