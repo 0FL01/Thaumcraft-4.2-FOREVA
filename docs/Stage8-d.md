@@ -1643,6 +1643,37 @@ Some entities may be hard to trigger naturally until recipes/research/spawn cont
 
 - Это common behavior baseline; полная visual parity раннего FX и runtime боевых сценариев ограничена non-GUI validation рамками.
 
+### Checkpoint 2026-05-17 — restore taint villager AI/village/attribute/fx/drop behavior baseline
+
+Статус: частично продвинут.
+
+Что сделано:
+
+- `EntityTaintVillager` выровнен с reference-shaped common behavior contracts:
+  - восстановлен constructor AI baseline для hostile villager-профиля:
+    - path nav flags (`setBreakDoors(true)`, `setCanSwim(true)`),
+    - `EntityAIMoveIndoors`, `EntityAIRestrictOpenDoor`, `EntityAIOpenDoor`,
+    - `EntityAIMoveTowardsRestriction`, `EntityAIMoveThroughVillage`,
+    - `AIAttackOnCollide` по `EntityPlayer`,
+    - watch/wander stack и target stack (`EntityAIHurtByTarget`, nearest player target).
+  - атрибуты приведены к baseline: `MAX_HEALTH = 30.0D`, `ATTACK_DAMAGE = 4.0D`, `MOVEMENT_SPEED = 0.3D`;
+  - добавлены survivability hooks: `canBreatheUnderwater() -> true`, `canDespawn() -> false`;
+  - восстановлен village/home update hook в `updateAITasks()` (`addToVillagerPositionList`, `getNearestVillage`, `setHomePosAndDistance`, `detachHome`);
+  - восстановлен revenge-village aggro hook через `Village#addOrRenewAgressor(...)`;
+  - восстановлен early client FX hook для первых `5` ticks через `Thaumcraft.proxy.taintLandFX(this)`;
+  - drop contract выровнен к reference rarity/bonus shape:
+    - resource-11/12 branch только при `rand.nextInt(2) == 0`;
+    - отдельный bonus drop resource-18 при `rand.nextInt(13) < 1 + looting`.
+- `ClientProxyEntityRendererRegistrationStaticGuardTest` расширен проверками на AI/village/attribute/fx/drop contracts `EntityTaintVillager`.
+
+Проверки:
+
+- `./scripts/dev.sh validate --smoke` — passed.
+
+Ограничения:
+
+- Это common behavior baseline; полная parity для legacy villager-datawatcher деталей и runtime сценариев осад/деревень ограничена non-GUI validation рамками.
+
 ### Checkpoint 2026-05-16 — restore mind spider viewer-only render gating
 
 Статус: частично продвинут.

@@ -346,6 +346,33 @@ public class ClientProxyEntityRendererRegistrationStaticGuardTest {
                         && taintSheepEntity.contains("this.setSheared(true);")
                         && taintSheepEntity.contains("Blocks.WOOL")
                         && taintSheepEntity.contains("\"Sheared\""));
+        String taintVillagerEntity = readFile("src/main/java/thaumcraft/common/entities/monster/EntityTaintVillager.java");
+        assertTrue("EntityTaintVillager must keep reference-shaped AI/village/attribute/fx/drop baseline contracts",
+                taintVillagerEntity.contains("this(world, 0);")
+                        && taintVillagerEntity.contains("private int randomTickDivider;")
+                        && taintVillagerEntity.contains("PathNavigateGround")
+                        && taintVillagerEntity.contains("setBreakDoors(true)")
+                        && taintVillagerEntity.contains("setCanSwim(true)")
+                        && taintVillagerEntity.contains("new EntityAIMoveIndoors(this)")
+                        && taintVillagerEntity.contains("new AIAttackOnCollide(this, EntityPlayer.class, 1.0D, false)")
+                        && taintVillagerEntity.contains("new EntityAIMoveThroughVillage(this, 1.0D, false)")
+                        && taintVillagerEntity.contains("new EntityAIWatchClosest2(this, EntityVillager.class, 5.0F, 0.02F)")
+                        && taintVillagerEntity.contains("new EntityAINearestAttackableTarget(this, EntityPlayer.class, true)")
+                        && taintVillagerEntity.contains("setBaseValue(30.0D)")
+                        && taintVillagerEntity.contains("setBaseValue(4.0D)")
+                        && taintVillagerEntity.contains("setBaseValue(0.3D)")
+                        && taintVillagerEntity.contains("public boolean canBreatheUnderwater()")
+                        && taintVillagerEntity.contains("protected boolean canDespawn()")
+                        && taintVillagerEntity.contains("this.world.getVillageCollection().addToVillagerPositionList(pos)")
+                        && taintVillagerEntity.contains("this.villageObj = this.world.getVillageCollection().getNearestVillage(pos, 32)")
+                        && taintVillagerEntity.contains("this.villageObj.addOrRenewAgressor(livingBase)")
+                        && taintVillagerEntity.contains("Thaumcraft.proxy.taintLandFX(this)")
+                        && taintVillagerEntity.contains("SoundEvents.ENTITY_VILLAGER_AMBIENT")
+                        && taintVillagerEntity.contains("SoundEvents.ENTITY_VILLAGER_HURT")
+                        && taintVillagerEntity.contains("SoundEvents.ENTITY_VILLAGER_DEATH")
+                        && taintVillagerEntity.contains("this.world.rand.nextInt(2) == 0")
+                        && taintVillagerEntity.contains("this.world.rand.nextInt(13) < 1 + looting")
+                        && taintVillagerEntity.contains("itemResource, 1, 18"));
         String mindSpiderEntity = readFile("src/main/java/thaumcraft/common/entities/monster/EntityMindSpider.java");
         assertTrue("EntityMindSpider must expose viewer accessor and synced harmless/viewer data contracts",
                 mindSpiderEntity.contains("public String getViewer()")
