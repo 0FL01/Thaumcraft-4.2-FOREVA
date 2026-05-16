@@ -2656,6 +2656,27 @@ public class ConfigResearch {
         ThaumcraftApi.addWarpToResearch("PRIMNODE", 1);
 
         new ResearchItem(
+                "ADVALCHEMYFURNACE",
+                "ELDRITCH",
+                new AspectList()
+                        .add(Aspect.AURA, 1)
+                        .add(Aspect.MAGIC, 1)
+                        .add(Aspect.ORDER, 1)
+                        .add(Aspect.ENTROPY, 1),
+                -2,
+                6,
+                1,
+                new ItemStack(ConfigBlocks.blockMetalDevice, 1, 3))
+                .setPages(
+                        new ResearchPage("tc.research_page.ADVALCHEMYFURNACE.1"),
+                        new ResearchPage((IArcaneRecipe) recipes.get("AdvAlchemyConstruct")),
+                        new ResearchPage("tc.research_page.ADVALCHEMYFURNACE.2"),
+                        new ResearchPage((List<?>) recipes.get("AdvAlchemyFurnace")))
+                .setSecondary()
+                .setParents("PRIMPEARL", "DISTILESSENTIA", "VISPOWER")
+                .registerResearchItem();
+
+        new ResearchItem(
                 "PRIMALCRUSHER",
                 "ELDRITCH",
                 new AspectList()
