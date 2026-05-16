@@ -261,6 +261,7 @@ Dependency: client GUI rendering is Stage 8, but Stage 9-e still owns content re
 - `src/main/java/thaumcraft/common/lib/research/ResearchManager.java` now includes `consumeInkFromTable`, reference-style hex-grid note creation (`createNote`), NBT read/write round-trip for note grids, and connectivity completion checks (`checkResearchCompletion`/`checkConnections`).
 - `src/main/java/thaumcraft/common/tiles/TileResearchTable.java` now implements server-side note processing baseline: periodic bonus recalculation, `placeAspect(...)` handling, ink consumption, aspect pool updates, and completion promotion to metadata `64`.
 - `src/main/java/thaumcraft/common/lib/network/playerdata/PacketAspectPlaceToServer.java` now routes to `TileResearchTable.placeAspect(...)` instead of only marking the tile dirty.
+- `src/main/java/thaumcraft/common/lib/network/playerdata/PacketAspectCombinationToServer.java` now mirrors reference-side combination flow more closely: consumes player/bonus aspect pools, synchronizes `PacketAspectPool`, and calls `ScanManager.checkAndSyncAspectKnowledge(...)` for discovered combinations.
 
 **Референс:**
 - `.stage9e-ref/thaumcraft/common/lib/research/ResearchNoteData.java:10`-`.stage9e-ref/thaumcraft/common/lib/research/ResearchNoteData.java:21`

@@ -12,6 +12,8 @@ import thaumcraft.api.aspects.Aspect;
 import thaumcraft.common.lib.capabilities.IPlayerKnowledge;
 import thaumcraft.common.lib.network.PacketBase;
 import thaumcraft.common.lib.network.PacketHandler;
+import thaumcraft.common.lib.research.ResearchManager;
+import thaumcraft.common.lib.research.ScanManager;
 import thaumcraft.common.tiles.TileResearchTable;
 
 public class PacketAspectCombinationToServer extends PacketBase {
@@ -73,25 +75,43 @@ public class PacketAspectCombinationToServer extends PacketBase {
             if (this.aspect1 == null || this.aspect2 == null) return;
             TileEntity tile = player.world.getTileEntity(new BlockPos(this.x, this.y, this.z));
             if (!(tile instanceof TileResearchTable)) return;
-            Aspect result = getCombinationResult(this.aspect1, this.aspect2);
-            if (result == null) return;
             IPlayerKnowledge knowledge = thaumcraft.common.CommonProxy.getPlayerKnowledge(player);
-            if (knowledge != null && !knowledge.hasDiscoveredAspect(result)) {
-                knowledge.addDiscoveredAspect(result.getTag());
-                PacketHandler.INSTANCE.sendTo(new PacketSyncAspects(knowledge.getAspectsDiscovered()), player);
-            }
-        });
-        return null;
-    }
+            if (knowledge == null) return;
 
-    private static Aspect getCombinationResult(Aspect a, Aspect b) {
-        for (Aspect aspect : Aspect.getCompoundAspects()) {
-            Aspect[] components = aspect.getComponents();
-            if (components == null || components.length != 2) continue;
-            if ((components[0] == a && components[1] == b) || (components[0] == b && components[1] == a)) {
-                return aspect;
+            Aspect combo = ResearchManager.getCombinationResult(this.aspect1, this.aspect2);
+            boolean hasAspect1 = knowledge.getAspectPoolFor(this.aspect1) > 0 || this.ab1;
+            boolean hasAspect2 = knowledge.getAspectPoolFor(this.aspect2) > 0 || this.ab2;
+            if (!hasAspect1 || !hasAspect2) {
+                return;
             }
-        }
+
+            TileResearchTable researchTable = (TileResearchTable) tile;
+            if (knowledge.getAspectPoolFor(this.aspect1) <= 0 && this.ab1) {
+                researchTable.bonusAspects.remove(this.aspect1, 1);
+                player.world.notifyBlockUpdate(researchTable.getPos(), player.world.getBlockState(researchTable.getPos()), player.world.getBlockState(researchTable.getPos()), 3);
+                researchTable.markDirty();
+            } else if (knowledge.addAspectPool(this.aspect1, -1)) {
+                PacketHandler.INSTANCE.sendTo(
+                        new PacketAspectPool(this.aspect1.getTag(), (short) -1, knowledge.getAspectPoolFor(this.aspect1)),
+                        player);
+            }
+
+            if (knowledge.getAspectPoolFor(this.aspect2) <= 0 && this.ab2) {
+                researchTable.bonusAspects.remove(this.aspect2, 1);
+                player.world.notifyBlockUpdate(researchTable.getPos(), player.world.getBlockState(researchTable.getPos()), player.world.getBlockState(researchTable.getPos()), 3);
+                researchTable.markDirty();
+            } else if (knowledge.addAspectPool(this.aspect2, -1)) {
+                PacketHandler.INSTANCE.sendTo(
+                        new PacketAspectPool(this.aspect2.getTag(), (short) -1, knowledge.getAspectPoolFor(this.aspect2)),
+                        player);
+            }
+
+            if (combo != null) {
+                ScanManager.checkAndSyncAspectKnowledge(player, combo, 1);
+            }
+
+            ResearchManager.updateCache(player.getName(), knowledge);
+        });
         return null;
     }
 }
