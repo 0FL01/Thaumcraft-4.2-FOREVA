@@ -488,6 +488,24 @@ Some entities may be hard to trigger naturally until recipes/research/spawn cont
 - Все renderer-specific поведения (custom модели/текстуры/passes/overlays) остаются открытыми по GAP-2..GAP-7.
 - Ручная визуальная проверка по инструкции пользователя не выполнялась.
 
+### Checkpoint 2026-05-16 — Stage 8-d asset corpus bootstrap
+
+Статус: частично продвинут.
+
+Что сделано:
+
+- Скопирован отсутствующий reference corpus Stage 8-d ресурсов из `thaumcraft_src/assets/thaumcraft/` в `src/main/resources/assets/thaumcraft/` для категорий `textures/models`, `textures/entity`, `textures/misc` (включая `.obj`, `.mtl`, `.png`, `.mcmeta`).
+- Добавлен `EntityRendererAssetCoverageTest` с проверкой наличия критичного подмножества entity-renderer baseline ассетов (cultist/wisp/arrow, golem/taint/pech/trunk/eldritch textures, `bucket.obj`, `orb.obj`).
+
+Проверки:
+
+- `./scripts/dev.sh validate --smoke` — passed.
+
+Ограничения:
+
+- Это resource bootstrap; renderer/model Java parity по GAP-2..GAP-6 остается открытой.
+- Manual visual parity checks остаются пропущенными по инструкции.
+
 - [ ] Add client-only entity renderer registration hook.
 - [ ] Register every entity from `ConfigEntities.ENTITIES` with a custom or vanilla-equivalent renderer.
 - [ ] Port item-like/transient/projectile renderers.
