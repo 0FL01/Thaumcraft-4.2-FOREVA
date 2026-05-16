@@ -652,6 +652,26 @@ Some entities may be hard to trigger naturally until recipes/research/spawn cont
 - Это завершение fallback baseline, но не custom renderer parity Stage 8-d: reference-specific модели/слои/анимации/passes остаются открытыми.
 - Visual/manual parity checks по инструкции остаются skipped.
 
+### Checkpoint 2026-05-16 — renderer coverage guard by config
+
+Статус: quality/verification hardening.
+
+Что сделано:
+
+- Добавлен `ClientProxyEntityRendererCoverageByConfigTest`, который:
+  - читает `ConfigEntities.java` и извлекает все `makeEntry(Entity*.class)` entries;
+  - читает `ClientProxy.java` и извлекает все `registerEntityRenderer(Entity*.class, ...)` registrations;
+  - падает, если есть хотя бы один entity из `ConfigEntities`, не имеющий explicit renderer registration в `ClientProxy`.
+- Тест фиксирует текущий baseline и защищает от silent regressions, когда новый entity может попасть в `RenderNoop` fallback из-за пропущенной явной регистрации.
+
+Проверки:
+
+- `./scripts/dev.sh validate --smoke` — passed.
+
+Ограничения:
+
+- Тест проверяет coverage по регистрациям, но не доказывает visual parity reference renderers.
+
 - [ ] Add client-only entity renderer registration hook.
 - [ ] Register every entity from `ConfigEntities.ENTITIES` with a custom or vanilla-equivalent renderer.
 - [ ] Port item-like/transient/projectile renderers.
