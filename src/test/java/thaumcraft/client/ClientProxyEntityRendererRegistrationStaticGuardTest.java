@@ -34,7 +34,7 @@ public class ClientProxyEntityRendererRegistrationStaticGuardTest {
                         && source.contains("registerEntityRenderer(EntityEldritchOrb.class, manager -> new RenderSnowball<>(manager, Items.ENDER_PEARL, renderItem), registered);")
                         && source.contains("registerEntityRenderer(EntityGolemOrb.class, RenderElectricOrb::new, registered);")
                         && source.contains("registerEntityRenderer(EntityShockOrb.class, RenderElectricOrb::new, registered);")
-                        && source.contains("registerEntityRenderer(EntityExplosiveOrb.class, manager -> new RenderSnowball<>(manager, Items.FIREWORK_CHARGE, renderItem), registered);")
+                        && source.contains("registerEntityRenderer(EntityExplosiveOrb.class, RenderExplosiveOrb::new, registered);")
                         && source.contains("registerEntityRenderer(EntityEmber.class, manager -> new RenderSnowball<>(manager, Items.BLAZE_POWDER, renderItem), registered);")
                         && source.contains("registerEntityRenderer(EntityGolemBobber.class, manager -> new RenderSnowball<>(manager, Items.FISHING_ROD, renderItem), registered);")
                         && source.contains("registerEntityRenderer(EntityAspectOrb.class, RenderAspectOrb::new, registered);")
@@ -119,6 +119,13 @@ public class ClientProxyEntityRendererRegistrationStaticGuardTest {
                         && electricOrbRenderer.contains("((EntityGolemOrb) entity).red")
                         && electricOrbRenderer.contains("MathHelper.sin(entity.ticksExisted / 5.0F)")
                         && electricOrbRenderer.contains("DefaultVertexFormats.POSITION_TEX"));
+        String explosiveOrbRenderer = readFile("src/main/java/thaumcraft/client/renderers/entity/RenderExplosiveOrb.java");
+        assertTrue("RenderExplosiveOrb must provide dedicated particles2 billboard baseline",
+                explosiveOrbRenderer.contains("extends Render<Entity>")
+                        && explosiveOrbRenderer.contains("textures/misc/particles2.png")
+                        && explosiveOrbRenderer.contains("entity.ticksExisted % 4")
+                        && explosiveOrbRenderer.contains("GlStateManager.scale(0.7F, 0.7F, 0.7F)")
+                        && explosiveOrbRenderer.contains("DefaultVertexFormats.POSITION_TEX"));
         String eldritchGuardianRenderer = readFile("src/main/java/thaumcraft/client/renderers/entity/RenderEldritchGuardian.java");
         assertTrue("RenderEldritchGuardian must provide dedicated guardian texture baseline",
                 eldritchGuardianRenderer.contains("extends RenderBiped<EntityEldritchGuardian>")

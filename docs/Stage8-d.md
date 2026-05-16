@@ -2153,6 +2153,30 @@ Some entities may be hard to trigger naturally until recipes/research/spawn cont
 
 - Это renderer baseline без ручной визуальной проверки; точные legacy GL/lightmap nuances остаются в общем Stage 8-d visual parity matrix.
 
+### Checkpoint 2026-05-17 — replace explosive orb snowball fallback with dedicated renderer baseline
+
+Статус: частично продвинут.
+
+Что сделано:
+
+- `EntityExplosiveOrb` переведен с `RenderSnowball` на dedicated `RenderExplosiveOrb`.
+- Добавлен `RenderExplosiveOrb` с reference-shaped contracts:
+  - particles2 atlas binding (`textures/misc/particles2.png`);
+  - alpha blend billboard facing camera;
+  - frame animation via `ticksExisted % 4`;
+  - fixed projectile scale baseline `0.7F`.
+- `ClientProxyEntityRendererRegistrationStaticGuardTest` обновлен:
+  - registration contract `EntityExplosiveOrb -> RenderExplosiveOrb::new`;
+  - renderer contract checks на particles2/animation/scale surface.
+
+Проверки:
+
+- `./scripts/dev.sh validate --smoke` — passed.
+
+Ограничения:
+
+- Это renderer baseline без ручной визуальной проверки; exact legacy GL-state нюансы остаются в общем Stage 8-d visual parity matrix.
+
 - [ ] Add client-only entity renderer registration hook.
 - [ ] Register every entity from `ConfigEntities.ENTITIES` with a custom or vanilla-equivalent renderer.
 - [ ] Port item-like/transient/projectile renderers.
