@@ -3639,7 +3639,9 @@ public class ConfigResearch {
                 -5,
                 1,
                 new ItemStack(ConfigBlocks.blockStoneDevice, 1, 12))
-                .setPages(new ResearchPage("tc.research_page.ARCANESPA.1"))
+                .setPages(
+                        new ResearchPage("tc.research_page.ARCANESPA.1"),
+                        new ResearchPage((IArcaneRecipe) recipes.get("ArcaneSpa")))
                 .setSecondary()
                 .setParents("BATHSALTS")
                 .registerResearchItem();
@@ -3654,6 +3656,7 @@ public class ConfigResearch {
                 new ItemStack(ConfigBlocks.blockJar))
                 .setPages(
                         new ResearchPage("tc.research_page.JARLABEL.1"),
+                        new ResearchPage((IArcaneRecipe) recipes.get("WardedJar")),
                         new ResearchPage("tc.research_page.JARLABEL.2"),
                         new ResearchPage("tc.research_page.JARLABEL.3"))
                 .setParents("DISTILESSENTIA")
@@ -3669,7 +3672,9 @@ public class ConfigResearch {
                 -5,
                 1,
                 new ItemStack(ConfigBlocks.blockJar, 1, 3))
-                .setPages(new ResearchPage("tc.research_page.JARVOID.1"))
+                .setPages(
+                        new ResearchPage("tc.research_page.JARVOID.1"),
+                        new ResearchPage((IArcaneRecipe) recipes.get("JarVoid")))
                 .setParents("JARLABEL")
                 .setSecondary()
                 .setConcealed()
