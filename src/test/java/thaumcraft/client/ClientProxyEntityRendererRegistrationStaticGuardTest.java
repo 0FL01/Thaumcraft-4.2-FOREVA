@@ -36,7 +36,7 @@ public class ClientProxyEntityRendererRegistrationStaticGuardTest {
                         && source.contains("registerEntityRenderer(EntityShockOrb.class, RenderElectricOrb::new, registered);")
                         && source.contains("registerEntityRenderer(EntityExplosiveOrb.class, RenderExplosiveOrb::new, registered);")
                         && source.contains("registerEntityRenderer(EntityEmber.class, RenderEmber::new, registered);")
-                        && source.contains("registerEntityRenderer(EntityGolemBobber.class, manager -> new RenderSnowball<>(manager, Items.FISHING_ROD, renderItem), registered);")
+                        && source.contains("registerEntityRenderer(EntityGolemBobber.class, RenderGolemBobber::new, registered);")
                         && source.contains("registerEntityRenderer(EntityAspectOrb.class, RenderAspectOrb::new, registered);")
                         && source.contains("registerEntityRenderer(EntityFallingTaint.class, manager -> new RenderSnowball<>(manager, Items.SLIME_BALL, renderItem), registered);"));
         assertTrue("ClientProxy must keep vanilla mob fallback renderer registrations for compatible zombie/spider groups",
@@ -173,6 +173,15 @@ public class ClientProxyEntityRendererRegistrationStaticGuardTest {
                         && primalArrowRenderer.contains("entity.getArrowType()")
                         && primalArrowRenderer.contains("BlockCustomOreItem.colors")
                         && primalArrowRenderer.contains("GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F)"));
+        String golemBobberRenderer = readFile("src/main/java/thaumcraft/client/renderers/entity/RenderGolemBobber.java");
+        assertTrue("RenderGolemBobber must provide particles-atlas bobber quad plus fisher tether baseline",
+                golemBobberRenderer.contains("extends Render<EntityGolemBobber>")
+                        && golemBobberRenderer.contains("new ResourceLocation(\"textures/particle/particles.png\")")
+                        && golemBobberRenderer.contains("if (entity.fisher != null)")
+                        && golemBobberRenderer.contains("fisher.rightArm / 3.0F")
+                        && golemBobberRenderer.contains("buffer.begin(3, DefaultVertexFormats.POSITION_COLOR)")
+                        && golemBobberRenderer.contains("GlStateManager.disableTexture2D()")
+                        && golemBobberRenderer.contains("GlStateManager.enableTexture2D()"));
         String eldritchGuardianRenderer = readFile("src/main/java/thaumcraft/client/renderers/entity/RenderEldritchGuardian.java");
         assertTrue("RenderEldritchGuardian must provide dedicated guardian texture baseline",
                 eldritchGuardianRenderer.contains("extends RenderBiped<EntityEldritchGuardian>")

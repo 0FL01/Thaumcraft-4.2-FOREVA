@@ -2334,6 +2334,29 @@ Some entities may be hard to trigger naturally until recipes/research/spawn cont
 
 - Это renderer baseline без ручной визуальной проверки; точные legacy multi-pass/overlay нюансы `RenderPrimalArrow` остаются в общем Stage 8-d visual parity matrix.
 
+### Checkpoint 2026-05-17 — replace golem bobber snowball fallback with dedicated tethered renderer baseline
+
+Статус: частично продвинут.
+
+Что сделано:
+
+- `EntityGolemBobber` переведен с `RenderSnowball` на dedicated `RenderGolemBobber`.
+- Добавлен `RenderGolemBobber` с reference-shaped baseline contracts:
+  - particle-atlas bobber quad (`textures/particle/particles.png`) с camera-facing sprite transform;
+  - отдельный fisher tether line pass при `entity.fisher != null`;
+  - reference-driven tether math hooks (`fisher.rightArm / 3.0F`, body yaw interpolation, quadratic segment sag) и explicit GL texture/lighting toggles для линии.
+- `ClientProxyEntityRendererRegistrationStaticGuardTest` обновлен:
+  - registration contract `EntityGolemBobber -> RenderGolemBobber::new`;
+  - renderer contract checks на bobber atlas texture + tether render surface.
+
+Проверки:
+
+- `./scripts/dev.sh validate --smoke` — passed.
+
+Ограничения:
+
+- Это renderer baseline без ручной визуальной проверки; точные legacy визуальные нюансы линии/анимации bobber остаются в общем Stage 8-d visual parity matrix.
+
 - [ ] Add client-only entity renderer registration hook.
 - [ ] Register every entity from `ConfigEntities.ENTITIES` with a custom or vanilla-equivalent renderer.
 - [ ] Port item-like/transient/projectile renderers.
