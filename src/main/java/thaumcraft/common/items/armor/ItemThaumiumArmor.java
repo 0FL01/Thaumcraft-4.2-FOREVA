@@ -1,10 +1,12 @@
 package thaumcraft.common.items.armor;
 
 import net.minecraft.inventory.EntityEquipmentSlot;
+import net.minecraft.item.EnumRarity;
 import net.minecraft.item.ItemArmor;
 import net.minecraft.item.ItemStack;
 import thaumcraft.api.IRepairable;
 import thaumcraft.api.IRunicArmor;
+import thaumcraft.common.config.ConfigItems;
 import thaumcraft.common.lib.CreativeTabThaumcraft;
 
 public class ItemThaumiumArmor extends ItemArmor implements IRepairable, IRunicArmor {
@@ -20,7 +22,13 @@ public class ItemThaumiumArmor extends ItemArmor implements IRepairable, IRunicA
     }
 
     @Override
+    public EnumRarity getRarity(ItemStack stack) {
+        return EnumRarity.UNCOMMON;
+    }
+
+    @Override
     public boolean getIsRepairable(ItemStack toRepair, ItemStack repair) {
-        return super.getIsRepairable(toRepair, repair);
+        ItemStack thaumiumIngot = new ItemStack(ConfigItems.itemResource, 1, 2);
+        return repair.isItemEqual(thaumiumIngot) || super.getIsRepairable(toRepair, repair);
     }
 }

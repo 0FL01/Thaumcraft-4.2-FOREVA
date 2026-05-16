@@ -1543,6 +1543,25 @@ Depends on GAP-1 and GAP-3. Some infusion source scenarios may require Stage 9 c
 
 - Это server/common contract baseline без полного портирования legacy custom bow charge/arrow event internals; детальная projectile-feel parity остаётся на отдельный gameplay polish.
 
+#### Checkpoint 2026-05-17 — GAP-11 thaumium-armor/goggles repair+rarity baseline
+
+Статус: частично продвинут.
+
+Что сделано:
+
+- Восстановлены базовые reference-shaped контракты для двух armor-классов:
+  - `ItemThaumiumArmor`: `UNCOMMON` rarity + thaumium repair key (`itemResource:2`);
+  - `ItemGoggles`: `RARE` rarity + leather repair key (`Items.LEATHER`).
+- Добавлен `ItemArmorRepairRarityStaticGuardTest` для фиксации этих контрактов.
+
+Проверки:
+
+- `./scripts/dev.sh validate --smoke` — passed.
+
+Ограничения:
+
+- Это только repair/rarity baseline; дополнительные armor tooltip/icon paths остаются в общем Stage 8 client polish.
+
 ### GAP-12: FX registration exists, but send-site coverage and manual scenario validation are incomplete
 
 **Статус:** требует проверки  

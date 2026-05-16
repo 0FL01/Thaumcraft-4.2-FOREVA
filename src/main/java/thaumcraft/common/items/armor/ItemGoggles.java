@@ -3,6 +3,8 @@ package thaumcraft.common.items.armor;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.EntityEquipmentSlot;
+import net.minecraft.init.Items;
+import net.minecraft.item.EnumRarity;
 import net.minecraft.item.ItemArmor;
 import net.minecraft.item.ItemStack;
 import thaumcraft.api.IGoggles;
@@ -27,8 +29,13 @@ public class ItemGoggles extends ItemArmor implements IRepairable, IVisDiscountG
     }
 
     @Override
+    public EnumRarity getRarity(ItemStack stack) {
+        return EnumRarity.RARE;
+    }
+
+    @Override
     public boolean getIsRepairable(ItemStack toRepair, ItemStack repair) {
-        return super.getIsRepairable(toRepair, repair);
+        return !repair.isEmpty() && repair.getItem() == Items.LEATHER || super.getIsRepairable(toRepair, repair);
     }
 
     @Override
