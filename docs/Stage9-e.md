@@ -315,7 +315,10 @@ Dependency: client-side research table GUI/rendering is outside Stage 9-e, but t
 
 **Что не совпадает:**
 
-The port now includes `ResearchManager.createClue(World, EntityPlayer, Object, AspectList)` and `ScanManager.completeScan` now forwards scan clue objects plus awarded-aspect data to it after successful server-side scan completion. Clue grants are stored as `@KEY` via normal research completion path. Entity-trigger matching now accepts both legacy (`Thaumcraft.Firebat`) and namespaced (`thaumcraft:firebat`) forms to reduce 1.7.10→1.12 identifier drift. `ConfigAspects` now also registers a minimal 1.7.10-parity entity-aspect baseline for current trigger-bearing entities (`minecraft:enderman`, `thaumcraft:brainyzombie`, `thaumcraft:giantbrainyzombie`, `thaumcraft:firebat`, `thaumcraft:primalorb`), and a static test enforces that every `setEntityTriggers(...)` key in `ConfigResearch` has a matching `registerEntityTag(...)` entry in `ConfigAspects`. Remaining mismatch is runtime parity validation with populated content.
+The port now includes `ResearchManager.createClue(World, EntityPlayer, Object, AspectList)` and `ScanManager.completeScan` now forwards scan clue objects plus awarded-aspect data to it after successful server-side scan completion. Clue grants are stored as `@KEY` via normal research completion path. Entity-trigger matching now accepts both legacy (`Thaumcraft.Firebat`) and namespaced (`thaumcraft:firebat`) forms to reduce 1.7.10→1.12 identifier drift. `ConfigAspects` now also registers a minimal 1.7.10-parity entity-aspect baseline for current trigger-bearing entities (`minecraft:enderman`, `thaumcraft:brainyzombie`, `thaumcraft:giantbrainyzombie`, `thaumcraft:firebat`, `thaumcraft:primalorb`), and static tests enforce both:
+- every `setEntityTriggers(...)` key in `ConfigResearch` has a matching `registerEntityTag(...)` entry in `ConfigAspects`;
+- every `setAspectTriggers(...)` reference in `ConfigResearch` points to a declared `Aspect` API constant.
+Remaining mismatch is runtime parity validation with populated content.
 
 **Что нужно доделать:**
 
