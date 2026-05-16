@@ -608,6 +608,29 @@ Some entities may be hard to trigger naturally until recipes/research/spawn cont
 - Это fallback baseline; reference-specific cultist render passes/armor/model parity остаются открытыми.
 - Большая часть Stage 8-d entity групп всё ещё на `RenderNoop` до портирования специализированных renderer-классов.
 
+### Checkpoint 2026-05-16 — remaining monster fallback slice
+
+Статус: частично продвинут.
+
+Что сделано:
+
+- `ClientProxy.setupEntityRenderers()` расширен fallback registrations для оставшейся monster-группы:
+  `EntityFireBat`, `EntityWisp`, `EntityPech`, `EntityEldritchGuardian`, `EntityEldritchWarden`,
+  `EntityEldritchGolem`, `EntityEldritchCrab`, `EntityThaumicSlime`,
+  `EntityTaintSpore`, `EntityTaintSporeSwarmer`, `EntityTaintSwarm`,
+  `EntityTaintacle`, `EntityTaintacleSmall`, `EntityTaintacleGiant`.
+- Для группы использованы `RenderFallbackLiving`/`RenderFallbackBiped` с texture baseline из `textures/models/*` и `textures/misc/wispy.png`.
+- `ClientProxyEntityRendererRegistrationStaticGuardTest` расширен проверками этого baseline-регистрационного среза.
+
+Проверки:
+
+- `./scripts/dev.sh validate --smoke` — passed.
+
+Ограничения:
+
+- Это fallback слой; reference-specific TC renderer parity (model/passes/animation/GL behavior) остаётся открытой.
+- `RenderNoop` ещё остаётся для групп, не покрытых fallback slice (включая golem/trunk/cultist portal и иные special cases).
+
 - [ ] Add client-only entity renderer registration hook.
 - [ ] Register every entity from `ConfigEntities.ENTITIES` with a custom or vanilla-equivalent renderer.
 - [ ] Port item-like/transient/projectile renderers.

@@ -5,12 +5,14 @@ import java.util.HashSet;
 import java.util.Set;
 import javax.annotation.Nullable;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.model.ModelBat;
 import net.minecraft.client.model.ModelBiped;
 import net.minecraft.client.model.ModelChicken;
 import net.minecraft.client.model.ModelCow;
 import net.minecraft.client.model.ModelCreeper;
 import net.minecraft.client.model.ModelPig;
 import net.minecraft.client.model.ModelSheep2;
+import net.minecraft.client.model.ModelSpider;
 import net.minecraft.client.model.ModelVillager;
 import net.minecraft.client.renderer.RenderItem;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
@@ -75,14 +77,28 @@ import thaumcraft.common.entities.monster.EntityInhabitedZombie;
 import thaumcraft.common.entities.monster.EntityMindSpider;
 import thaumcraft.common.entities.monster.EntityCultistCleric;
 import thaumcraft.common.entities.monster.EntityCultistKnight;
+import thaumcraft.common.entities.monster.EntityEldritchCrab;
+import thaumcraft.common.entities.monster.EntityEldritchGuardian;
+import thaumcraft.common.entities.monster.EntityFireBat;
+import thaumcraft.common.entities.monster.EntityPech;
 import thaumcraft.common.entities.monster.EntityTaintChicken;
 import thaumcraft.common.entities.monster.EntityTaintCow;
 import thaumcraft.common.entities.monster.EntityTaintCreeper;
 import thaumcraft.common.entities.monster.EntityTaintPig;
 import thaumcraft.common.entities.monster.EntityTaintSheep;
+import thaumcraft.common.entities.monster.EntityTaintSpore;
+import thaumcraft.common.entities.monster.EntityTaintSporeSwarmer;
 import thaumcraft.common.entities.monster.EntityTaintSpider;
+import thaumcraft.common.entities.monster.EntityTaintSwarm;
+import thaumcraft.common.entities.monster.EntityTaintacle;
+import thaumcraft.common.entities.monster.EntityTaintacleSmall;
 import thaumcraft.common.entities.monster.EntityTaintVillager;
+import thaumcraft.common.entities.monster.EntityThaumicSlime;
+import thaumcraft.common.entities.monster.EntityWisp;
+import thaumcraft.common.entities.monster.boss.EntityEldritchGolem;
+import thaumcraft.common.entities.monster.boss.EntityEldritchWarden;
 import thaumcraft.common.entities.monster.boss.EntityCultistLeader;
+import thaumcraft.common.entities.monster.boss.EntityTaintacleGiant;
 import thaumcraft.common.entities.projectile.EntityAlumentum;
 import thaumcraft.common.entities.projectile.EntityBottleTaint;
 import thaumcraft.common.entities.projectile.EntityDart;
@@ -201,6 +217,34 @@ public class ClientProxy extends CommonProxy {
                 manager, new ModelBiped(), 0.5F, new ResourceLocation("thaumcraft", "textures/models/cultist.png")), registered);
         registerEntityRenderer(EntityCultistLeader.class, manager -> new RenderFallbackBiped<>(
                 manager, new ModelBiped(), 0.6F, new ResourceLocation("thaumcraft", "textures/models/cultist.png")), registered);
+        registerEntityRenderer(EntityFireBat.class, manager -> new RenderFallbackLiving<>(
+                manager, new ModelBat(), 0.3F, new ResourceLocation("thaumcraft", "textures/models/firebat.png")), registered);
+        registerEntityRenderer(EntityWisp.class, manager -> new RenderFallbackLiving<>(
+                manager, new ModelBat(), 0.2F, new ResourceLocation("thaumcraft", "textures/misc/wispy.png")), registered);
+        registerEntityRenderer(EntityPech.class, manager -> new RenderFallbackBiped<>(
+                manager, new ModelBiped(), 0.5F, new ResourceLocation("thaumcraft", "textures/models/pech_thaum.png")), registered);
+        registerEntityRenderer(EntityEldritchGuardian.class, manager -> new RenderFallbackBiped<>(
+                manager, new ModelBiped(), 0.6F, new ResourceLocation("thaumcraft", "textures/models/eldritch_guardian.png")), registered);
+        registerEntityRenderer(EntityEldritchWarden.class, manager -> new RenderFallbackBiped<>(
+                manager, new ModelBiped(), 0.8F, new ResourceLocation("thaumcraft", "textures/models/eldritch_warden.png")), registered);
+        registerEntityRenderer(EntityEldritchGolem.class, manager -> new RenderFallbackBiped<>(
+                manager, new ModelBiped(), 0.9F, new ResourceLocation("thaumcraft", "textures/models/eldritch_golem.png")), registered);
+        registerEntityRenderer(EntityEldritchCrab.class, manager -> new RenderFallbackLiving<>(
+                manager, new ModelSpider(), 0.5F, new ResourceLocation("thaumcraft", "textures/models/crab.png")), registered);
+        registerEntityRenderer(EntityThaumicSlime.class, manager -> new RenderFallbackBiped<>(
+                manager, new ModelBiped(), 0.5F, new ResourceLocation("thaumcraft", "textures/models/tslime.png")), registered);
+        registerEntityRenderer(EntityTaintSpore.class, manager -> new RenderFallbackBiped<>(
+                manager, new ModelBiped(), 0.4F, new ResourceLocation("thaumcraft", "textures/models/taint_spore.png")), registered);
+        registerEntityRenderer(EntityTaintSporeSwarmer.class, manager -> new RenderFallbackBiped<>(
+                manager, new ModelBiped(), 0.3F, new ResourceLocation("thaumcraft", "textures/models/taint_spore.png")), registered);
+        registerEntityRenderer(EntityTaintSwarm.class, manager -> new RenderFallbackBiped<>(
+                manager, new ModelBiped(), 0.3F, new ResourceLocation("thaumcraft", "textures/models/taint_spore.png")), registered);
+        registerEntityRenderer(EntityTaintacle.class, manager -> new RenderFallbackLiving<>(
+                manager, new ModelSpider(), 0.6F, new ResourceLocation("thaumcraft", "textures/models/taintacle.png")), registered);
+        registerEntityRenderer(EntityTaintacleSmall.class, manager -> new RenderFallbackLiving<>(
+                manager, new ModelSpider(), 0.45F, new ResourceLocation("thaumcraft", "textures/models/taintacle.png")), registered);
+        registerEntityRenderer(EntityTaintacleGiant.class, manager -> new RenderFallbackLiving<>(
+                manager, new ModelSpider(), 0.8F, new ResourceLocation("thaumcraft", "textures/models/taintacle.png")), registered);
 
         for (net.minecraftforge.fml.common.registry.EntityEntry entry : ConfigEntities.ENTITIES) {
             @SuppressWarnings("unchecked")
