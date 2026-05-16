@@ -473,7 +473,7 @@ Client renderer/particles are Phase 8. Outer Lands location/portal setup is a St
 - `thaumcraft_src/assets/thaumcraft/sounds/**`
 
 **Что не совпадает:**
-Pech death loot has a baseline and uses mana beans/coins/knowledge fragments (`EntityPech.java:390-413`), but runtime drops are unverified. Cultist Leader drops a loot bag (`EntityCultistLeader.java:162-166`). Eldritch Guardian drops essences/equipment (`EntityEldritchGuardian.java:162-184`). The 2026-05-15 checkpoint restores base Cultist common/rare drops and fixes Taint Swarm to the reference 50% taint-slime-only drop. Follow-up 2026-05-16 correction removes explicit `null` ambient/hurt/death overrides from `EntityCultist`: reference has no Cultist sound override, so the class should inherit hostile defaults from the base mob class; runtime sound/drop evidence remains open.
+Pech death loot has a baseline and uses mana beans/coins/knowledge fragments (`EntityPech.java:390-413`), but runtime drops are unverified. Cultist Leader drops a loot bag (`EntityCultistLeader.java:162-166`). Eldritch Guardian drops essences/equipment (`EntityEldritchGuardian.java:162-184`). The 2026-05-15 checkpoint restores base Cultist common/rare drops and fixes Taint Swarm to the reference 50% taint-slime-only drop. Follow-up 2026-05-16 correction removes explicit `null` ambient/hurt/death overrides from `EntityCultist`: reference has no Cultist sound override, so the class should inherit hostile defaults from the base mob class. A static coverage guard now also checks `TCSounds` registrations against `sounds.json` keys and bundled `.ogg` assets; runtime sound/drop evidence remains open.
 
 **Что нужно доделать:**
 Continue the broader Stage 6 drop/sound audit and run representative kill/combat scenarios.
@@ -1592,6 +1592,29 @@ Mapping:
 
 - Runtime combat/drop sound scenarios for Cultist variants, Pech, and bosses remain open in the Stage 6 matrix.
 - Taint Swarm ambient silence remains reference-consistent and unchanged.
+
+### 8.2.39 Stage 6 sound resource static coverage checkpoint — 2026-05-16
+
+Статус: non-GUI sound registration/resource baseline enforced; runtime playback evidence remains open.
+
+Что сделано:
+
+- Added `TCSoundsStaticCoverageTest` to statically compare:
+  - declared `sound(\"...\")` keys in `TCSounds`,
+  - top-level event keys in `assets/thaumcraft/sounds.json`,
+  - bundled `.ogg` files under `assets/thaumcraft/sounds/`.
+- The test fails if a sound key is missing in `sounds.json`, present only in `sounds.json` but not in code, or has no matching base/variant `.ogg` asset.
+
+Проверки:
+
+- `./scripts/dev.sh test` — passed (`21/21`).
+- `./scripts/dev.sh validate` — passed (`5/5`).
+- `git diff --check` — passed.
+
+Оставшиеся ограничения:
+
+- This is static coverage only; it does not prove in-world playback routing for every mob/boss/combat path.
+- Runtime drop/sound scenarios in the Stage 6 matrix remain open.
 
 ### 8.3 Minimal Stage 6 manual scenario matrix
 
