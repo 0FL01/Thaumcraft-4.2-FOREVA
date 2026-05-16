@@ -1105,6 +1105,20 @@ Validation evidence for this checkpoint:
 
 GAP-6 is advanced but not closed. Remaining Resonator limits are the original CCL sub-hit retrace for exact tube-face diagnostics and manual checks against jars, alembics, tubes, and buffers.
 
+### 8.21.1 2026-05-16 Resonator face-retrace parity checkpoint
+
+Implemented in the current checkpoint:
+
+- Restored the reference-shaped CCL retrace flow in `ItemResonator.onItemUseFirst(...)` by calling `RayTracer.retraceBlock(...)` and switching diagnostics face to `hit.subHit` when present (`0..5`).
+- Replaced the hardcoded `"Untyped"` suction fallback with the localized `tc.resonator3` path, preserving the reference translation contract.
+- Added `ItemResonatorStaticGuardTest` to lock both the retrace branch and localized untyped suction fallback against regressions.
+
+Validation evidence for this checkpoint:
+
+- `./scripts/dev.sh validate --smoke` — passed.
+
+GAP-6 is advanced but not closed. Remaining Resonator limits are runtime/manual checks against jars, alembics, tubes, and buffers.
+
 ### 8.22 2026-05-15 Taint Bottle projectile checkpoint
 
 Implemented in the current checkpoint:

@@ -93,6 +93,7 @@ Latest Stage 6 delta: `EntityCultist` no longer overrides ambient/hurt/death sou
 Incremental Stage 6 delta: `EntityCultist` now persists and restores home position with reference-style `HomeD/HomeX/HomeY/HomeZ` semantics and restores cultist faction targeting contracts (`isOnSameTeam` + `canAttackClass`), guarded by `EntityCultistBehaviorContractTest` with passing `test` + `validate --smoke`.
 Incremental Stage 6 delta: `EntityCultistPortalLootPlacementContractTest` now guards stage-0 reward placement against regressions to vanilla chest placeholders, and `Stage6 GAP-7` text is aligned with the current `BlockLoot`/`blockLootCrate` implementation baseline.
 Incremental Stage 6 delta: `MonsterSoundConstantCoverageTest` now statically scans `thaumcraft.common.entities.monster` for `TCSounds.*` references and enforces that each referenced sound constant is declared in `TCSounds`, hardening monster/boss sound-link integrity (`test` + `validate` passing).
+Incremental Stage 5 delta: `ItemResonator.onItemUseFirst(...)` now restores reference-style tube-face diagnostics via `RayTracer.retraceBlock(...)` + `subHit` face override and restores localized untyped suction fallback (`tc.resonator3`) instead of a hardcoded string, guarded by new `ItemResonatorStaticGuardTest` with passing `validate --smoke`.
 
 ## Archive
 

@@ -8,6 +8,7 @@ import net.minecraft.util.ActionResult;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
+import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextComponentTranslation;
@@ -17,6 +18,7 @@ import thaumcraft.api.aspects.Aspect;
 import thaumcraft.api.aspects.AspectList;
 import thaumcraft.api.aspects.IAspectContainer;
 import thaumcraft.api.aspects.IEssentiaTransport;
+import thaumcraft.codechicken.lib.raytracer.RayTracer;
 import thaumcraft.common.lib.CreativeTabThaumcraft;
 import thaumcraft.common.lib.TCSounds;
 import thaumcraft.common.tiles.TileTubeBuffer;
@@ -58,6 +60,10 @@ public class ItemResonator extends Item {
         if (!world.isRemote) {
             IEssentiaTransport transport = (IEssentiaTransport) tile;
             EnumFacing face = side == null ? EnumFacing.UP : side;
+            RayTraceResult hit = RayTracer.retraceBlock(world, player, pos.getX(), pos.getY(), pos.getZ());
+            if (hit != null && hit.subHit >= 0 && hit.subHit < 6) {
+                face = EnumFacing.byIndex(hit.subHit);
+            }
             if (tile instanceof TileTubeBuffer && tile instanceof IAspectContainer) {
                 AspectList aspects = ((IAspectContainer) tile).getAspects();
                 if (aspects != null && aspects.size() > 0) {
@@ -72,7 +78,10 @@ public class ItemResonator extends Item {
                 }
             }
             Aspect suction = transport.getSuctionType(face);
-            player.sendStatusMessage(new TextComponentTranslation("tc.resonator2", transport.getSuctionAmount(face), suction == null ? "Untyped" : suction.getName()), false);
+            String suctionName = suction == null
+                    ? new TextComponentTranslation("tc.resonator3").getFormattedText()
+                    : suction.getName();
+            player.sendStatusMessage(new TextComponentTranslation("tc.resonator2", transport.getSuctionAmount(face), suctionName), false);
             world.playSound(null, pos, TCSounds.ALEMBICKNOCK, SoundCategory.BLOCKS, 0.5F, 1.9F + world.rand.nextFloat() * 0.1F);
         }
         return EnumActionResult.SUCCESS;
