@@ -77,8 +77,8 @@ public class ClientProxyEntityRendererRegistrationStaticGuardTest {
                         && source.contains("registerEntityRenderer(EntityCultistPortal.class, RenderCultistPortal::new, registered);"));
         assertTrue("RenderFallbackLiving must exist as a non-noop typed texture renderer",
                 readFile("src/main/java/thaumcraft/client/renderers/entity/RenderFallbackLiving.java").contains("extends RenderLiving<T>"));
-        assertTrue("RenderTaintTextureLiving must exist as a dedicated taint texture renderer baseline",
-                readFile("src/main/java/thaumcraft/client/renderers/entity/RenderTaintTextureLiving.java").contains("extends RenderLiving<T>"));
+        assertTrue("ClientProxy should not retain obsolete RenderTaintTextureLiving references",
+                !source.contains("RenderTaintTextureLiving"));
         assertTrue("RenderFallbackBiped must exist as a non-noop typed texture renderer",
                 readFile("src/main/java/thaumcraft/client/renderers/entity/RenderFallbackBiped.java").contains("extends RenderBiped<T>"));
         String pechRenderer = readFile("src/main/java/thaumcraft/client/renderers/entity/RenderPech.java");

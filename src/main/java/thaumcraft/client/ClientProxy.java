@@ -73,7 +73,6 @@ import thaumcraft.client.renderers.entity.RenderTaintChicken;
 import thaumcraft.client.renderers.entity.RenderTaintCow;
 import thaumcraft.client.renderers.entity.RenderTaintPig;
 import thaumcraft.client.renderers.entity.RenderTaintSheep;
-import thaumcraft.client.renderers.entity.RenderTaintTextureLiving;
 import thaumcraft.client.renderers.entity.RenderTaintVillager;
 import thaumcraft.client.renderers.entity.RenderTravelingTrunk;
 import thaumcraft.client.renderers.entity.RenderWisp;
