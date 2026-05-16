@@ -30,7 +30,7 @@ public class ClientProxyEntityRendererRegistrationStaticGuardTest {
                         && source.contains("registerEntityRenderer(EntityAlumentum.class, manager -> new RenderSnowball<>(manager, Items.FIRE_CHARGE, renderItem), registered);")
                         && source.contains("registerEntityRenderer(EntityPrimalOrb.class, RenderPrimalOrb::new, registered);")
                         && source.contains("registerEntityRenderer(EntityFrostShard.class, manager -> new RenderSnowball<>(manager, Items.SNOWBALL, renderItem), registered);")
-                        && source.contains("registerEntityRenderer(EntityPechBlast.class, manager -> new RenderSnowball<>(manager, Items.BLAZE_POWDER, renderItem), registered);")
+                        && source.contains("registerEntityRenderer(EntityPechBlast.class, RenderPechBlast::new, registered);")
                         && source.contains("registerEntityRenderer(EntityEldritchOrb.class, RenderEldritchOrb::new, registered);")
                         && source.contains("registerEntityRenderer(EntityGolemOrb.class, RenderElectricOrb::new, registered);")
                         && source.contains("registerEntityRenderer(EntityShockOrb.class, RenderElectricOrb::new, registered);")
@@ -152,6 +152,11 @@ public class ClientProxyEntityRendererRegistrationStaticGuardTest {
                         && primalOrbRenderer.contains("BlockCustomOreItem.colors[i / 2 + 1]")
                         && primalOrbRenderer.contains("entity.ticksExisted % 13")
                         && primalOrbRenderer.contains("GlStateManager.scale(0.5F, 0.5F, 0.5F)"));
+        String pechBlastRenderer = readFile("src/main/java/thaumcraft/client/renderers/entity/RenderPechBlast.java");
+        assertTrue("RenderPechBlast must provide intentional no-op renderer baseline",
+                pechBlastRenderer.contains("extends Render<EntityPechBlast>")
+                        && pechBlastRenderer.contains("intentional no-op draw path")
+                        && pechBlastRenderer.contains("return null;"));
         String eldritchGuardianRenderer = readFile("src/main/java/thaumcraft/client/renderers/entity/RenderEldritchGuardian.java");
         assertTrue("RenderEldritchGuardian must provide dedicated guardian texture baseline",
                 eldritchGuardianRenderer.contains("extends RenderBiped<EntityEldritchGuardian>")
