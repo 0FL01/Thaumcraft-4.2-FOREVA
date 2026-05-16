@@ -513,6 +513,27 @@ Depends on GAP-1, GAP-2, GAP-3, and GAP-5. Client particle/sound TODOs in `TileC
 - This checkpoint validates server load stability only.
 - Manual crucible/thaumatorium progression scenarios from GAP-6 acceptance criteria remain open.
 
+#### Checkpoint 2026-05-16 — GAP-6 crucible smelt static guard
+
+Статус: key server-side `TileCrucible.attemptSmelt` contracts are now statically guarded.
+
+Что сделано:
+
+- Added `TileCrucibleSmeltContractStaticGuardTest` covering:
+  - thrower-name fallback from entity NBT (`"thrower"`) for research attribution path;
+  - crucible matcher invocation through `findMatchingCrucibleRecipe(username, this.aspects, item)`;
+  - fixed 50 mB water drain on successful recipe craft;
+  - no-aspect reject path using item-pickup pop sound and early return.
+
+Проверки:
+
+- `./scripts/dev.sh test` — passed.
+- `./scripts/dev.sh validate` — passed.
+
+Ограничения:
+
+- Guard is static and does not replace manual in-game progression scenarios.
+
 ## 6. Итоговый checklist закрытия Stage 9-d
 
 - [ ] Port reference `ConfigRecipes.initializeAlchemyRecipes()` crucible recipe data into current `ConfigRecipes.init()` flow.
