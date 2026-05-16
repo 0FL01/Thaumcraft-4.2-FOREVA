@@ -32,8 +32,8 @@ public class ClientProxyEntityRendererRegistrationStaticGuardTest {
                         && source.contains("registerEntityRenderer(EntityFrostShard.class, manager -> new RenderSnowball<>(manager, Items.SNOWBALL, renderItem), registered);")
                         && source.contains("registerEntityRenderer(EntityPechBlast.class, manager -> new RenderSnowball<>(manager, Items.BLAZE_POWDER, renderItem), registered);")
                         && source.contains("registerEntityRenderer(EntityEldritchOrb.class, manager -> new RenderSnowball<>(manager, Items.ENDER_PEARL, renderItem), registered);")
-                        && source.contains("registerEntityRenderer(EntityGolemOrb.class, manager -> new RenderSnowball<>(manager, Items.SLIME_BALL, renderItem), registered);")
-                        && source.contains("registerEntityRenderer(EntityShockOrb.class, manager -> new RenderSnowball<>(manager, Items.GLOWSTONE_DUST, renderItem), registered);")
+                        && source.contains("registerEntityRenderer(EntityGolemOrb.class, RenderElectricOrb::new, registered);")
+                        && source.contains("registerEntityRenderer(EntityShockOrb.class, RenderElectricOrb::new, registered);")
                         && source.contains("registerEntityRenderer(EntityExplosiveOrb.class, manager -> new RenderSnowball<>(manager, Items.FIREWORK_CHARGE, renderItem), registered);")
                         && source.contains("registerEntityRenderer(EntityEmber.class, manager -> new RenderSnowball<>(manager, Items.BLAZE_POWDER, renderItem), registered);")
                         && source.contains("registerEntityRenderer(EntityGolemBobber.class, manager -> new RenderSnowball<>(manager, Items.FISHING_ROD, renderItem), registered);")
@@ -111,6 +111,14 @@ public class ClientProxyEntityRendererRegistrationStaticGuardTest {
                         && aspectOrbRenderer.contains("orb.getAspect().getBlend()")
                         && aspectOrbRenderer.contains("orb.orbMaxAge - orb.orbAge")
                         && aspectOrbRenderer.contains("DefaultVertexFormats.POSITION_TEX_COLOR"));
+        String electricOrbRenderer = readFile("src/main/java/thaumcraft/client/renderers/entity/RenderElectricOrb.java");
+        assertTrue("RenderElectricOrb must provide shared golem/shock orb particle billboard baseline",
+                electricOrbRenderer.contains("extends Render<Entity>")
+                        && electricOrbRenderer.contains("textures/misc/particles.png")
+                        && electricOrbRenderer.contains("entity instanceof EntityGolemOrb")
+                        && electricOrbRenderer.contains("((EntityGolemOrb) entity).red")
+                        && electricOrbRenderer.contains("MathHelper.sin(entity.ticksExisted / 5.0F)")
+                        && electricOrbRenderer.contains("DefaultVertexFormats.POSITION_TEX"));
         String eldritchGuardianRenderer = readFile("src/main/java/thaumcraft/client/renderers/entity/RenderEldritchGuardian.java");
         assertTrue("RenderEldritchGuardian must provide dedicated guardian texture baseline",
                 eldritchGuardianRenderer.contains("extends RenderBiped<EntityEldritchGuardian>")

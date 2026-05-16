@@ -2129,6 +2129,30 @@ Some entities may be hard to trigger naturally until recipes/research/spawn cont
 
 - Это renderer behavior baseline без ручной визуальной валидации; итоговая visual parity (exact legacy GL state nuances) остаётся в общем Stage 8-d runtime/manual matrix.
 
+### Checkpoint 2026-05-17 — replace golem/shock orb snowball fallbacks with shared electric-orb renderer baseline
+
+Статус: частично продвинут.
+
+Что сделано:
+
+- Tightly-coupled projectile pair `EntityGolemOrb` + `EntityShockOrb` переведен с `RenderSnowball` на shared dedicated `RenderElectricOrb` (один checkpoint по общему reference renderer contract `RenderElectricOrb`).
+- Добавлен `RenderElectricOrb` с reference-shaped contracts:
+  - particle-atlas binding (`textures/misc/particles.png`);
+  - additive blend billboard facing camera;
+  - red-variant UV routing для `EntityGolemOrb#red`;
+  - sinusoidal bob/scale profile (`sin(ticksExisted / 5.0F)`).
+- `ClientProxyEntityRendererRegistrationStaticGuardTest` расширен:
+  - registration contracts `EntityGolemOrb -> RenderElectricOrb::new` и `EntityShockOrb -> RenderElectricOrb::new`;
+  - renderer contract checks на shared particle/red-branch/scale behavior.
+
+Проверки:
+
+- `./scripts/dev.sh validate --smoke` — passed.
+
+Ограничения:
+
+- Это renderer baseline без ручной визуальной проверки; точные legacy GL/lightmap nuances остаются в общем Stage 8-d visual parity matrix.
+
 - [ ] Add client-only entity renderer registration hook.
 - [ ] Register every entity from `ConfigEntities.ENTITIES` with a custom or vanilla-equivalent renderer.
 - [ ] Port item-like/transient/projectile renderers.
