@@ -1156,6 +1156,29 @@ Some entities may be hard to trigger naturally until recipes/research/spawn cont
 
 - Это baseline texture/wing parity; full reference parity по taint chicken visual stack (legacy render-pass и GL-state детали) остаётся открытой по GAP-3/GAP-6.
 
+### Checkpoint 2026-05-16 — dedicated taint cow renderer baseline
+
+Статус: частично продвинут.
+
+Что сделано:
+
+- Добавлен выделенный renderer `RenderTaintCow` (`thaumcraft.client.renderers.entity.RenderTaintCow`) вместо shared texture-only baseline для `EntityTaintCow`.
+- Baseline behavior:
+  - dedicated texture path `textures/models/cow.png`;
+  - dedicated model/shadow profile (`ModelCow`, `0.7f`) в renderer constructor.
+- `ClientProxy.setupEntityRenderers()` обновлен: `EntityTaintCow` теперь регистрируется через `RenderTaintCow::new`.
+- `ClientProxyEntityRendererRegistrationStaticGuardTest` расширен проверками:
+  - explicit registration path `EntityTaintCow -> RenderTaintCow`;
+  - `RenderTaintCow` texture contract.
+
+Проверки:
+
+- `./scripts/dev.sh validate --smoke` — passed.
+
+Ограничения:
+
+- Это baseline texture/model parity; full reference parity по taint cow visual stack (legacy render-pass и GL-state детали) остаётся открытой по GAP-3/GAP-6.
+
 - [ ] Add client-only entity renderer registration hook.
 - [ ] Register every entity from `ConfigEntities.ENTITIES` with a custom or vanilla-equivalent renderer.
 - [ ] Port item-like/transient/projectile renderers.

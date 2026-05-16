@@ -47,7 +47,7 @@ public class ClientProxyEntityRendererRegistrationStaticGuardTest {
                         && source.contains("registerEntityRenderer(EntityTaintSpider.class, RenderTaintSpider::new, registered);"));
         assertTrue("ClientProxy must keep dedicated taint animal-like renderer registrations",
                 source.contains("registerEntityRenderer(EntityTaintChicken.class, RenderTaintChicken::new, registered);")
-                        && source.contains("registerEntityRenderer(EntityTaintCow.class, manager -> new RenderTaintTextureLiving<>(")
+                        && source.contains("registerEntityRenderer(EntityTaintCow.class, RenderTaintCow::new, registered);")
                         && source.contains("registerEntityRenderer(EntityTaintPig.class, manager -> new RenderTaintTextureLiving<>(")
                         && source.contains("registerEntityRenderer(EntityTaintSheep.class, manager -> new RenderTaintTextureLiving<>(")
                         && source.contains("registerEntityRenderer(EntityTaintVillager.class, RenderTaintVillager::new, registered);")
@@ -200,6 +200,10 @@ public class ClientProxyEntityRendererRegistrationStaticGuardTest {
                         && taintChickenRenderer.contains("field_752_b")
                         && taintChickenRenderer.contains("destPos")
                         && taintChickenRenderer.contains("MathHelper.sin"));
+        String taintCowRenderer = readFile("src/main/java/thaumcraft/client/renderers/entity/RenderTaintCow.java");
+        assertTrue("RenderTaintCow must provide cow texture baseline",
+                taintCowRenderer.contains("extends RenderLiving<EntityTaintCow>")
+                        && taintCowRenderer.contains("textures/models/cow.png"));
         String cultistRenderer = readFile("src/main/java/thaumcraft/client/renderers/entity/RenderCultist.java");
         assertTrue("RenderCultist must provide shared cultist texture baseline",
                 cultistRenderer.contains("extends RenderBiped<T>")
