@@ -19,6 +19,7 @@ import net.minecraft.world.World;
 import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.player.ItemTooltipEvent;
+import net.minecraftforge.fml.client.registry.RenderingRegistry;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import thaumcraft.client.gui.GuiArcaneBore;
 import thaumcraft.client.gui.GuiArcaneWorkbench;
@@ -37,10 +38,12 @@ import thaumcraft.client.gui.GuiSpa;
 import thaumcraft.client.gui.GuiThaumatorium;
 import thaumcraft.client.gui.GuiTravelingTrunk;
 import thaumcraft.client.fx.ParticleEngine;
+import thaumcraft.client.renderers.entity.RenderNoop;
 import thaumcraft.client.lib.ClientTickEventsFML;
 import thaumcraft.client.lib.KeyHandler;
 import thaumcraft.client.lib.RenderEventHandler;
 import thaumcraft.common.CommonProxy;
+import thaumcraft.common.config.ConfigEntities;
 import thaumcraft.common.config.ConfigItems;
 import thaumcraft.common.lib.TCSounds;
 import thaumcraft.common.lib.events.EventHandlerRunic;
@@ -103,6 +106,11 @@ public class ClientProxy extends CommonProxy {
     }
 
     private void setupEntityRenderers() {
+        for (net.minecraftforge.fml.common.registry.EntityEntry entry : ConfigEntities.ENTITIES) {
+            @SuppressWarnings("unchecked")
+            Class<? extends Entity> entityClass = (Class<? extends Entity>) entry.getEntityClass();
+            RenderingRegistry.registerEntityRenderingHandler(entityClass, RenderNoop::new);
+        }
     }
 
     private void setupBlockRenderers() {

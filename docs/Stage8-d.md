@@ -468,6 +468,26 @@ Some entities may be hard to trigger naturally until recipes/research/spawn cont
 
 ## 6. Итоговый checklist закрытия Stage 8-d
 
+### Checkpoint 2026-05-16 — GAP-1 bootstrap coverage baseline
+
+Статус: частично продвинут.
+
+Что сделано:
+
+- `ClientProxy.setupEntityRenderers()` больше не пустой: добавлена client-only регистрация render handler'ов для всех записей `ConfigEntities.ENTITIES`.
+- Добавлен безопасный fallback renderer `RenderNoop` (`thaumcraft.client.renderers.entity.RenderNoop`) и временно назначен через `RenderingRegistry.registerEntityRenderingHandler(..., RenderNoop::new)` для полного coverage по registry scope.
+- Добавлен `ClientProxyEntityRendererRegistrationStaticGuardTest`, фиксирующий loop по `ConfigEntities.ENTITIES`, вызов `RenderingRegistry.registerEntityRenderingHandler(...)` и наличие `RenderNoop`.
+
+Проверки:
+
+- `./scripts/dev.sh validate --smoke` — passed.
+
+Ограничения:
+
+- Это bootstrap/non-crash baseline, а не визуальная parity реализация Stage 8-d.
+- Все renderer-specific поведения (custom модели/текстуры/passes/overlays) остаются открытыми по GAP-2..GAP-7.
+- Ручная визуальная проверка по инструкции пользователя не выполнялась.
+
 - [ ] Add client-only entity renderer registration hook.
 - [ ] Register every entity from `ConfigEntities.ENTITIES` with a custom or vanilla-equivalent renderer.
 - [ ] Port item-like/transient/projectile renderers.
