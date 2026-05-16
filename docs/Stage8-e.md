@@ -161,7 +161,7 @@ Forge 1.12.2 particle APIs differ significantly from 1.7.10 `EntityFX`; port mus
 
 ### GAP-2: FX helper surface in `ClientProxy` is incomplete and current overrides are no-op
 
-**Статус:** частично реализовано  
+**Статус:** частично реализовано
 **Критичность:** blocker
 
 **Текущая реализация:**
@@ -586,16 +586,16 @@ Rendering state bugs can affect the whole client frame. Requires GAP-9 resources
 
 ### GAP-5: Required particle, beam, ward, and overlay textures are missing from current resources
 
-**Статус:** отсутствует  
+**Статус:** частично реализовано
 **Критичность:** blocker
 
 **Текущая реализация:**
-- `src/main/resources/assets/thaumcraft/textures/misc/potions.png`
-- `src/main/resources/assets/thaumcraft/textures/misc/particles.png` absent.
-- `src/main/resources/assets/thaumcraft/textures/misc/particles2.png` absent.
-- `src/main/resources/assets/thaumcraft/textures/misc/beam.png` absent.
-- `src/main/resources/assets/thaumcraft/textures/misc/wisp.png` absent.
-- `src/main/resources/assets/thaumcraft/textures/misc/vortex.png` absent.
+- `src/main/resources/assets/thaumcraft/textures/misc/` now includes the Stage 8-e baseline FX atlases and overlays copied from `thaumcraft_src`, including:
+  - `particles.png`, `particles.png.mcmeta`, `particles2.png`, `particles2.png.mcmeta`
+  - `particlefield.png`, `particlefield.png.mcmeta`, `particlefield32.png`
+  - `beam.png`, `beam1.png`, `beam2.png`, `beam3.png`, `beamh.png`
+  - `wisp.png`, `wisp.png.mcmeta`, `wispy.png`, `wispy.png.mcmeta`
+  - `vortex.png`, `vortex.png.mcmeta`, `tunnel.png`, `vignette.png`, `vignette.png.mcmeta`
 
 **Референс:**
 - `thaumcraft_src/assets/thaumcraft/textures/misc/particles.png`
@@ -630,14 +630,33 @@ Copy required FX assets from the read-only reference asset tree into current res
 - After implementation, scan client log for missing texture/resource warnings in Stage 8-e scenarios.
 
 **Критерии приемки:**
-- [ ] Current resources contain `particles.png`, `particles2.png`, and their `.mcmeta` files.
-- [ ] Current resources contain all beam textures used by ported beam classes.
-- [ ] Current resources contain wisp/ward/overlay textures required by ported FX classes.
+- [x] Current resources contain `particles.png`, `particles2.png`, and their `.mcmeta` files.
+- [x] Current resources contain all beam textures used by ported beam classes.
+- [x] Current resources contain wisp/ward/overlay textures required by ported FX classes.
 - [ ] Client log has no missing-resource errors for Stage 8-e FX scenarios.
 
 **Риски / зависимости:**
 
 Low implementation risk because `AGENTS.md:14-17` explicitly allows copying assets from `thaumcraft_src/assets/` as source of truth. Acceptance still depends on client runtime validation.
+
+#### Checkpoint 2026-05-16 — GAP-5 misc FX texture baseline copied from reference assets
+
+Статус: critical Stage 8-e misc FX texture baseline is now present under `src/main/resources/assets/thaumcraft/textures/misc/`.
+
+Что сделано:
+
+- Copied missing FX atlases and overlays directly from `thaumcraft_src/assets/thaumcraft/textures/misc/` into the port resource tree.
+- Included animation metadata files (`.mcmeta`) for animated particle/overlay assets.
+- Added static resource coverage test `FxTextureAssetCoverageTest` to enforce the baseline file set in non-GUI validation runs.
+
+Проверки:
+
+- `./scripts/dev.sh test` — passed.
+- `./scripts/dev.sh validate --smoke` — passed.
+
+Ограничения:
+
+- Client-side runtime texture-binding/log validation remains open due GUI/manual validation exclusion.
 
 ### GAP-6: Portable Hole and Warding visual feedback is missing
 
