@@ -2713,7 +2713,8 @@ public class ConfigResearch {
                 new ItemStack(ConfigItems.itemGolemBell))
                 .setPages(
                         new ResearchPage("tc.research_page.GOLEMBELL.1"),
-                        new ResearchPage("tc.research_page.GOLEMBELL.2"))
+                        new ResearchPage("tc.research_page.GOLEMBELL.2"),
+                        new ResearchPage((IArcaneRecipe) recipes.get("GolemBell")))
                 .setParents("GOLEMSTRAW")
                 .setStub()
                 .registerResearchItem();
@@ -2852,7 +2853,9 @@ public class ConfigResearch {
                 8,
                 1,
                 new ItemStack(ConfigBlocks.blockCosmeticSolid, 1, 9))
-                .setPages(new ResearchPage("tc.research_page.GOLEMFETTER.1"))
+                .setPages(
+                        new ResearchPage("tc.research_page.GOLEMFETTER.1"),
+                        new ResearchPage((IArcaneRecipe) recipes.get("GolemFetter")))
                 .setParents("GOLEMSTONE")
                 .setSecondary()
                 .registerResearchItem();
@@ -2865,7 +2868,9 @@ public class ConfigResearch {
                 -3,
                 1,
                 new ItemStack(ConfigItems.itemGolemUpgrade, 1, 0))
-                .setPages(new ResearchPage("tc.research_page.UPGRADEAIR.1"))
+                .setPages(
+                        new ResearchPage("tc.research_page.UPGRADEAIR.1"),
+                        new ResearchPage((IArcaneRecipe) recipes.get("UpgradeAir")))
                 .setConcealed()
                 .setSecondary()
                 .setParents("GOLEMBELL")
@@ -2879,7 +2884,9 @@ public class ConfigResearch {
                 -2,
                 1,
                 new ItemStack(ConfigItems.itemGolemUpgrade, 1, 1))
-                .setPages(new ResearchPage("tc.research_page.UPGRADEEARTH.1"))
+                .setPages(
+                        new ResearchPage("tc.research_page.UPGRADEEARTH.1"),
+                        new ResearchPage((IArcaneRecipe) recipes.get("UpgradeEarth")))
                 .setConcealed()
                 .setSecondary()
                 .setParents("GOLEMBELL")
@@ -2893,7 +2900,9 @@ public class ConfigResearch {
                 -1,
                 1,
                 new ItemStack(ConfigItems.itemGolemUpgrade, 1, 2))
-                .setPages(new ResearchPage("tc.research_page.UPGRADEFIRE.1"))
+                .setPages(
+                        new ResearchPage("tc.research_page.UPGRADEFIRE.1"),
+                        new ResearchPage((IArcaneRecipe) recipes.get("UpgradeFire")))
                 .setConcealed()
                 .setSecondary()
                 .setParents("GOLEMBELL")
@@ -2907,7 +2916,9 @@ public class ConfigResearch {
                 1,
                 1,
                 new ItemStack(ConfigItems.itemGolemUpgrade, 1, 3))
-                .setPages(new ResearchPage("tc.research_page.UPGRADEWATER.1"))
+                .setPages(
+                        new ResearchPage("tc.research_page.UPGRADEWATER.1"),
+                        new ResearchPage((IArcaneRecipe) recipes.get("UpgradeWater")))
                 .setConcealed()
                 .setSecondary()
                 .setParents("GOLEMBELL")
@@ -2921,7 +2932,9 @@ public class ConfigResearch {
                 2,
                 1,
                 new ItemStack(ConfigItems.itemGolemUpgrade, 1, 4))
-                .setPages(new ResearchPage("tc.research_page.UPGRADEORDER.1"))
+                .setPages(
+                        new ResearchPage("tc.research_page.UPGRADEORDER.1"),
+                        new ResearchPage((IArcaneRecipe) recipes.get("UpgradeOrder")))
                 .setConcealed()
                 .setSecondary()
                 .setParents("GOLEMBELL")
@@ -2935,7 +2948,9 @@ public class ConfigResearch {
                 3,
                 1,
                 new ItemStack(ConfigItems.itemGolemUpgrade, 1, 5))
-                .setPages(new ResearchPage("tc.research_page.UPGRADEENTROPY.1"))
+                .setPages(
+                        new ResearchPage("tc.research_page.UPGRADEENTROPY.1"),
+                        new ResearchPage((IArcaneRecipe) recipes.get("UpgradeEntropy")))
                 .setConcealed()
                 .setSecondary()
                 .setParents("GOLEMBELL")
@@ -2955,6 +2970,7 @@ public class ConfigResearch {
                 new ItemStack(ConfigItems.itemTrunkSpawner))
                 .setPages(
                         new ResearchPage("tc.research_page.TRAVELTRUNK.1"),
+                        new ResearchPage((InfusionRecipe) recipes.get("TravelTrunk")),
                         new ResearchPage("tc.research_page.TRAVELTRUNK.2"),
                         new ResearchPage("UPGRADEAIR", "tc.research_page.TRAVELTRUNK.UAI"),
                         new ResearchPage("UPGRADEEARTH", "tc.research_page.TRAVELTRUNK.UEA"),
@@ -2976,6 +2992,7 @@ public class ConfigResearch {
                 new ItemStack(ConfigItems.itemGolemCore, 1, 2))
                 .setPages(
                         new ResearchPage("tc.research_page.COREGATHER.1"),
+                        new ResearchPage((IArcaneRecipe) recipes.get("CoreBlank")),
                         new ResearchPage("tc.research_page.COREGATHER.2"))
                 .setConcealed()
                 .setParents("GOLEMSTRAW")
@@ -3022,7 +3039,9 @@ public class ConfigResearch {
                 2,
                 2,
                 new ItemStack(ConfigItems.itemGolemCore, 1, 10))
-                .setPages(new ResearchPage("tc.research_page.CORESORTING.1"))
+                .setPages(
+                        new ResearchPage("tc.research_page.CORESORTING.1"),
+                        new ResearchPage((InfusionRecipe) recipes.get("CoreSorting")))
                 .setConcealed()
                 .setSecondary()
                 .setParents("COREEMPTY", "COREFILL", "INFUSION")
@@ -3043,6 +3062,7 @@ public class ConfigResearch {
                 .setPages(
                         new ResearchPage("tc.research_page.COREUSE.1"),
                         new ResearchPage("tc.research_page.COREUSE.2"),
+                        new ResearchPage((InfusionRecipe) recipes.get("CoreUse")),
                         new ResearchPage("UPGRADEAIR", "tc.research_page.COREUSE.3"))
                 .setConcealed()
                 .setParents("COREEMPTY", "INFUSION")
@@ -3080,6 +3100,7 @@ public class ConfigResearch {
                 new ItemStack(ConfigItems.itemGolemCore, 1, 11))
                 .setPages(
                         new ResearchPage("tc.research_page.COREFISHING.1"),
+                        new ResearchPage((InfusionRecipe) recipes.get("CoreFishing")),
                         new ResearchPage("UPGRADEAIR", "tc.research_page.COREFISHING.2"),
                         new ResearchPage("UPGRADEFIRE", "tc.research_page.COREFISHING.3"),
                         new ResearchPage("UPGRADEORDER", "tc.research_page.COREFISHING.4"),
@@ -3101,7 +3122,9 @@ public class ConfigResearch {
                 7,
                 2,
                 new ItemStack(ConfigItems.itemGolemCore, 1, 7))
-                .setPages(new ResearchPage("tc.research_page.CORELUMBER.1"))
+                .setPages(
+                        new ResearchPage("tc.research_page.CORELUMBER.1"),
+                        new ResearchPage((InfusionRecipe) recipes.get("CoreLumber")))
                 .setConcealed()
                 .setSecondary()
                 .setParents("COREHARVEST", "ELEMENTALAXE")
@@ -3175,6 +3198,7 @@ public class ConfigResearch {
                 new ItemStack(ConfigItems.itemGolemCore, 1, 6))
                 .setPages(
                         new ResearchPage("tc.research_page.COREALCHEMY.1"),
+                        new ResearchPage((InfusionRecipe) recipes.get("CoreAlchemy")),
                         new ResearchPage("tc.research_page.COREALCHEMY.2"))
                 .setConcealed()
                 .setSecondary()
@@ -3193,7 +3217,9 @@ public class ConfigResearch {
                 0,
                 2,
                 new ItemStack(ConfigItems.itemGolemPlacer, 1, 8))
-                .setPages(new ResearchPage("tc.research_page.ADVANCEDGOLEM.1"))
+                .setPages(
+                        new ResearchPage("tc.research_page.ADVANCEDGOLEM.1"),
+                        new ResearchPage((InfusionRecipe) recipes.get("AdvancedGolem")))
                 .setConcealed()
                 .setParents(
                         "INFUSION",
