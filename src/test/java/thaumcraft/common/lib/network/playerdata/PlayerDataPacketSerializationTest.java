@@ -135,6 +135,22 @@ public class PlayerDataPacketSerializationTest {
         assertEquals(false, (boolean) getField(decoded, "ab2"));
     }
 
+    @Test
+    public void playerCompletePacketRoundTripsResearchSelectionPayload() {
+        PacketPlayerCompleteToServer source = new PacketPlayerCompleteToServer();
+        setField(source, "key", "FOCUSPRIMAL");
+        setField(source, "dim", -1);
+        setField(source, "username", "tester");
+        setField(source, "type", (byte)1);
+
+        PacketPlayerCompleteToServer decoded = new PacketPlayerCompleteToServer();
+        roundTrip(source, decoded);
+        assertEquals("FOCUSPRIMAL", getField(decoded, "key"));
+        assertEquals(-1, (int) getField(decoded, "dim"));
+        assertEquals("tester", getField(decoded, "username"));
+        assertEquals((byte)1, (byte) getField(decoded, "type"));
+    }
+
     private void roundTrip(thaumcraft.common.lib.network.PacketBase source, thaumcraft.common.lib.network.PacketBase target) {
         ByteBuf buffer = Unpooled.buffer();
         source.toBytes(buffer);
