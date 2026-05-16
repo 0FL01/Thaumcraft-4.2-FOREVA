@@ -63,6 +63,8 @@ import thaumcraft.client.renderers.entity.RenderEldritchGuardian;
 import thaumcraft.client.renderers.entity.RenderEldritchGolem;
 import thaumcraft.client.renderers.entity.RenderEldritchWarden;
 import thaumcraft.client.renderers.entity.RenderCultistPortal;
+import thaumcraft.client.renderers.entity.RenderBrainyZombie;
+import thaumcraft.client.renderers.entity.RenderInhabitedZombie;
 import thaumcraft.client.renderers.entity.RenderThaumicSlime;
 import thaumcraft.client.renderers.entity.RenderEldritchCrab;
 import thaumcraft.client.renderers.entity.RenderNoop;
@@ -215,9 +217,9 @@ public class ClientProxy extends CommonProxy {
         registerEntityRenderer(EntityAspectOrb.class, manager -> new RenderSnowball<>(manager, Items.ENDER_EYE, renderItem), registered);
         registerEntityRenderer(EntityFallingTaint.class, manager -> new RenderSnowball<>(manager, Items.SLIME_BALL, renderItem), registered);
 
-        registerEntityRenderer(EntityBrainyZombie.class, RenderZombie::new, registered);
-        registerEntityRenderer(EntityGiantBrainyZombie.class, RenderZombie::new, registered);
-        registerEntityRenderer(EntityInhabitedZombie.class, RenderZombie::new, registered);
+        registerEntityRenderer(EntityBrainyZombie.class, RenderBrainyZombie::new, registered);
+        registerEntityRenderer(EntityGiantBrainyZombie.class, RenderBrainyZombie::new, registered);
+        registerEntityRenderer(EntityInhabitedZombie.class, RenderInhabitedZombie::new, registered);
         registerEntityRenderer(EntityMindSpider.class, RenderSpider::new, registered);
         registerEntityRenderer(EntityTaintSpider.class, RenderSpider::new, registered);
         registerEntityRenderer(EntityTaintChicken.class, manager -> new RenderFallbackLiving<>(

@@ -969,6 +969,33 @@ Some entities may be hard to trigger naturally until recipes/research/spawn cont
 
 - Это baseline по texture/scale wiring; full reference parity для taintacle trio (custom model-driven animation nuances и giant boss display details) остаётся открытой по GAP-3/GAP-4/GAP-6.
 
+### Checkpoint 2026-05-16 — brainy/inhabited zombie dedicated renderer baseline
+
+Статус: частично продвинут.
+
+Почему grouped в один commit:
+
+- `EntityBrainyZombie`, `EntityGiantBrainyZombie`, `EntityInhabitedZombie` составляют tightly-coupled zombie-rendering slice с общим базовым `RenderZombie` поведением и thaumcraft texture-set (`bzombie`/`czombie`), поэтому закрыты одним checkpoint.
+
+Что сделано:
+
+- Добавлены выделенные renderer-классы:
+  - `RenderBrainyZombie` (dedicated `textures/models/bzombie.png`);
+  - `RenderInhabitedZombie` (dedicated `textures/models/czombie.png`).
+- `ClientProxy.setupEntityRenderers()` обновлен:
+  - `EntityBrainyZombie -> RenderBrainyZombie::new`;
+  - `EntityGiantBrainyZombie -> RenderBrainyZombie::new`;
+  - `EntityInhabitedZombie -> RenderInhabitedZombie::new`.
+- `ClientProxyEntityRendererRegistrationStaticGuardTest` расширен проверками registration paths и texture contracts для обоих renderer-классов.
+
+Проверки:
+
+- `./scripts/dev.sh validate --smoke` — passed.
+
+Ограничения:
+
+- Это texture-identity baseline; full reference parity для brainy/inhabited zombie renderer behavior (villager-model switching path и giant-specific anger-based scaling semantics из 1.7.10) остаётся открытой по GAP-3/GAP-6.
+
 - [ ] Add client-only entity renderer registration hook.
 - [ ] Register every entity from `ConfigEntities.ENTITIES` with a custom or vanilla-equivalent renderer.
 - [ ] Port item-like/transient/projectile renderers.

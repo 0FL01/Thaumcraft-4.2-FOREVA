@@ -40,9 +40,9 @@ public class ClientProxyEntityRendererRegistrationStaticGuardTest {
                         && source.contains("registerEntityRenderer(EntityAspectOrb.class, manager -> new RenderSnowball<>(manager, Items.ENDER_EYE, renderItem), registered);")
                         && source.contains("registerEntityRenderer(EntityFallingTaint.class, manager -> new RenderSnowball<>(manager, Items.SLIME_BALL, renderItem), registered);"));
         assertTrue("ClientProxy must keep vanilla mob fallback renderer registrations for compatible zombie/spider groups",
-                source.contains("registerEntityRenderer(EntityBrainyZombie.class, RenderZombie::new, registered);")
-                        && source.contains("registerEntityRenderer(EntityGiantBrainyZombie.class, RenderZombie::new, registered);")
-                        && source.contains("registerEntityRenderer(EntityInhabitedZombie.class, RenderZombie::new, registered);")
+                source.contains("registerEntityRenderer(EntityBrainyZombie.class, RenderBrainyZombie::new, registered);")
+                        && source.contains("registerEntityRenderer(EntityGiantBrainyZombie.class, RenderBrainyZombie::new, registered);")
+                        && source.contains("registerEntityRenderer(EntityInhabitedZombie.class, RenderInhabitedZombie::new, registered);")
                         && source.contains("registerEntityRenderer(EntityMindSpider.class, RenderSpider::new, registered);")
                         && source.contains("registerEntityRenderer(EntityTaintSpider.class, RenderSpider::new, registered);"));
         assertTrue("ClientProxy must keep fallback RenderFallbackLiving registrations for taint animal-like entities",
@@ -154,6 +154,14 @@ public class ClientProxyEntityRendererRegistrationStaticGuardTest {
                         && taintacleRenderer.contains("textures/models/taintacle.png")
                         && taintacleRenderer.contains("scaleMultiplier")
                         && taintacleRenderer.contains("GlStateManager.scale(scaleMultiplier, scaleMultiplier, scaleMultiplier)"));
+        String brainyZombieRenderer = readFile("src/main/java/thaumcraft/client/renderers/entity/RenderBrainyZombie.java");
+        assertTrue("RenderBrainyZombie must provide dedicated brainy texture baseline",
+                brainyZombieRenderer.contains("extends RenderZombie")
+                        && brainyZombieRenderer.contains("textures/models/bzombie.png"));
+        String inhabitedZombieRenderer = readFile("src/main/java/thaumcraft/client/renderers/entity/RenderInhabitedZombie.java");
+        assertTrue("RenderInhabitedZombie must provide dedicated czombie texture baseline",
+                inhabitedZombieRenderer.contains("extends RenderZombie")
+                        && inhabitedZombieRenderer.contains("textures/models/czombie.png"));
         String trunkRenderer = readFile("src/main/java/thaumcraft/client/renderers/entity/RenderTravelingTrunk.java");
         assertTrue("RenderTravelingTrunk must provide anger-based texture routing baseline",
                 trunkRenderer.contains("extends RenderLiving<EntityTravelingTrunk>")
