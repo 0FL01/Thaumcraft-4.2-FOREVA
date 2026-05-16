@@ -482,6 +482,20 @@ Concrete Stage 8-a manual/smoke scenarios:
 
 ## 8. Открытые вопросы
 
-- Should the port place key handling in `thaumcraft.client.lib.KeyHandler` instead of preserving the reference package `thaumcraft.common.lib.events.KeyHandler` to strengthen dedicated-server side separation? Recommended answer: use a client package unless addon/public compatibility requires the old package, because this is not public API.
-- Should Stage 8-a introduce no-op client event handler classes before full HUD/render implementation, or should it wait until the first concrete Stage 8-b/e implementation? Recommended answer: introduce minimal, TODO-free boundaries now, but keep visual behavior deferred and explicitly documented.
-- Is a display-capable environment available for `./scripts/dev.sh smoke-client`? If not, Stage 8-a can be implementation-complete but must not be marked fully validated.
+### Q1: Где должен жить key handling?
+
+**Resolution:** в `thaumcraft.client.lib.KeyHandler`, не в `thaumcraft.common.lib.events.KeyHandler`, если нет жёсткого требования сохранить старый публичный FQN для addon-compat.
+
+Причина: keybinds, LWJGL input, client event bus и GUI/open-overlay логика — строго client-side. Класс в `common`-namespace опасен тем, что его легче случайно загрузить на dedicated server. Решение уже принято в коде: `KeyHandler` лежит в `thaumcraft.client.lib`. Документация закрепляет это как осознанное архитектурное решение.
+
+### Q2: Нужны ли no-op client event handler classes до полной HUD/render реализации?
+
+**Resolution:** да, но только как compile-safe, TODO-free boundaries. Это нормально для Stage 8-a: зарегистрировать минимальные клиентские handler-классы, чтобы bootstrap, event bus и side boundaries были на месте. Но они не должны притворяться готовой визуальной реализацией. Поведение HUD/render/FX, которое реально появится в Stage 8-b/c/d/e, надо явно отметить как deferred.
+
+Формулировка: "Minimal client event handler boundaries are acceptable in Stage 8-a as long as they are side-safe, compile-clean, and contain no open TODO/FIXME markers inside Stage 8-a scope. Visual behavior remains deferred to the relevant Stage 8 renderer/overlay/FX chunks."
+
+### Q3: Что делать, если нет display-capable env для smoke-client?
+
+**Resolution:** не считать client smoke полностью подтверждённым. Можно закрывать implementation work как "code-complete pending visual smoke", но нельзя писать "validated" без запуска клиента или хотя бы Xvfb/headless-совместимого smoke.
+
+Формулировка: "If no display-capable environment is available, Stage 8-a may be marked implementation-complete but not fully client-smoke validated. Dedicated-server safety and compile checks are still required; visual/client launch validation remains a documented blocker."
