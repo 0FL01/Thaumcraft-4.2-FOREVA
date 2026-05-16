@@ -6,6 +6,7 @@ import org.junit.Test;
 import thaumcraft.api.aspects.Aspect;
 import thaumcraft.api.aspects.AspectList;
 
+import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
@@ -63,6 +64,77 @@ public class PlayerDataPacketSerializationTest {
         assertEquals(8, runic.getMax());
     }
 
+    @Test
+    public void aspectPlacePacketRoundTripsNullAndNonNullAspect() {
+        PacketAspectPlaceToServer withAspect = new PacketAspectPlaceToServer();
+        setField(withAspect, "dim", 7);
+        setField(withAspect, "playerid", 11);
+        setField(withAspect, "x", 1);
+        setField(withAspect, "y", 2);
+        setField(withAspect, "z", 3);
+        setField(withAspect, "aspect", Aspect.ORDER);
+        setField(withAspect, "q", (byte)4);
+        setField(withAspect, "r", (byte)-5);
+
+        PacketAspectPlaceToServer decodedWithAspect = new PacketAspectPlaceToServer();
+        roundTrip(withAspect, decodedWithAspect);
+        assertEquals(7, (int) getField(decodedWithAspect, "dim"));
+        assertEquals(11, (int) getField(decodedWithAspect, "playerid"));
+        assertEquals(1, (int) getField(decodedWithAspect, "x"));
+        assertEquals(2, (int) getField(decodedWithAspect, "y"));
+        assertEquals(3, (int) getField(decodedWithAspect, "z"));
+        assertEquals(Aspect.ORDER, getField(decodedWithAspect, "aspect"));
+        assertEquals((byte)4, (byte) getField(decodedWithAspect, "q"));
+        assertEquals((byte)-5, (byte) getField(decodedWithAspect, "r"));
+
+        PacketAspectPlaceToServer nullAspect = new PacketAspectPlaceToServer();
+        setField(nullAspect, "dim", 9);
+        setField(nullAspect, "playerid", 13);
+        setField(nullAspect, "x", -10);
+        setField(nullAspect, "y", 64);
+        setField(nullAspect, "z", 25);
+        setField(nullAspect, "aspect", null);
+        setField(nullAspect, "q", (byte)0);
+        setField(nullAspect, "r", (byte)0);
+
+        PacketAspectPlaceToServer decodedNullAspect = new PacketAspectPlaceToServer();
+        roundTrip(nullAspect, decodedNullAspect);
+        assertEquals(9, (int) getField(decodedNullAspect, "dim"));
+        assertEquals(13, (int) getField(decodedNullAspect, "playerid"));
+        assertEquals(-10, (int) getField(decodedNullAspect, "x"));
+        assertEquals(64, (int) getField(decodedNullAspect, "y"));
+        assertEquals(25, (int) getField(decodedNullAspect, "z"));
+        assertEquals(null, getField(decodedNullAspect, "aspect"));
+        assertEquals((byte)0, (byte) getField(decodedNullAspect, "q"));
+        assertEquals((byte)0, (byte) getField(decodedNullAspect, "r"));
+    }
+
+    @Test
+    public void aspectCombinationPacketRoundTripsCombinationFlags() {
+        PacketAspectCombinationToServer source = new PacketAspectCombinationToServer();
+        setField(source, "dim", 2);
+        setField(source, "playerid", 42);
+        setField(source, "x", 100);
+        setField(source, "y", 45);
+        setField(source, "z", -12);
+        setField(source, "aspect1", Aspect.AIR);
+        setField(source, "aspect2", Aspect.FIRE);
+        setField(source, "ab1", true);
+        setField(source, "ab2", false);
+
+        PacketAspectCombinationToServer decoded = new PacketAspectCombinationToServer();
+        roundTrip(source, decoded);
+        assertEquals(2, (int) getField(decoded, "dim"));
+        assertEquals(42, (int) getField(decoded, "playerid"));
+        assertEquals(100, (int) getField(decoded, "x"));
+        assertEquals(45, (int) getField(decoded, "y"));
+        assertEquals(-12, (int) getField(decoded, "z"));
+        assertEquals(Aspect.AIR, getField(decoded, "aspect1"));
+        assertEquals(Aspect.FIRE, getField(decoded, "aspect2"));
+        assertEquals(true, (boolean) getField(decoded, "ab1"));
+        assertEquals(false, (boolean) getField(decoded, "ab2"));
+    }
+
     private void roundTrip(thaumcraft.common.lib.network.PacketBase source, thaumcraft.common.lib.network.PacketBase target) {
         ByteBuf buffer = Unpooled.buffer();
         source.toBytes(buffer);
@@ -96,5 +168,25 @@ public class PlayerDataPacketSerializationTest {
 
     private static Set<String> set(String... values) {
         return new HashSet<>(Arrays.asList(values));
+    }
+
+    private static void setField(Object target, String field, Object value) {
+        try {
+            Field declared = target.getClass().getDeclaredField(field);
+            declared.setAccessible(true);
+            declared.set(target, value);
+        } catch (Exception e) {
+            throw new AssertionError("Unable to set field " + field + " on " + target.getClass().getSimpleName(), e);
+        }
+    }
+
+    private static Object getField(Object target, String field) {
+        try {
+            Field declared = target.getClass().getDeclaredField(field);
+            declared.setAccessible(true);
+            return declared.get(target);
+        } catch (Exception e) {
+            throw new AssertionError("Unable to read field " + field + " on " + target.getClass().getSimpleName(), e);
+        }
     }
 }
