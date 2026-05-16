@@ -9,8 +9,11 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.common.network.NetworkRegistry;
 import thaumcraft.api.aspects.Aspect;
 import thaumcraft.api.aspects.IAspectSource;
+import thaumcraft.common.lib.network.PacketHandler;
+import thaumcraft.common.lib.network.fx.PacketFXEssentiaSource;
 
 public class EssentiaHandler {
     private static final int DELAY = 5000;
@@ -39,7 +42,23 @@ public class EssentiaHandler {
                 continue;
             }
             IAspectSource aspectSource = (IAspectSource) sourceTile;
-            if (aspectSource.takeFromContainer(aspect, 1)) return true;
+            if (!aspectSource.takeFromContainer(aspect, 1)) continue;
+            PacketHandler.INSTANCE.sendToAllAround(
+                    new PacketFXEssentiaSource(
+                            tile.getPos().getX(),
+                            tile.getPos().getY(),
+                            tile.getPos().getZ(),
+                            (byte) (tile.getPos().getX() - source.pos.getX()),
+                            (byte) (tile.getPos().getY() - source.pos.getY()),
+                            (byte) (tile.getPos().getZ() - source.pos.getZ()),
+                            aspect.getColor()),
+                    new NetworkRegistry.TargetPoint(
+                            tile.getWorld().provider.getDimension(),
+                            tile.getPos().getX(),
+                            tile.getPos().getY(),
+                            tile.getPos().getZ(),
+                            32.0));
+            return true;
         }
 
         SOURCES.remove(tileLoc);

@@ -91,6 +91,21 @@ public class PacketFXSerializationTest {
     }
 
     @Test
+    public void essentiaSourcePacketRoundTripsPayload() {
+        PacketFXEssentiaSource source = new PacketFXEssentiaSource(12, -7, 44, (byte) -3, (byte) 6, (byte) 1, 0xAA5500);
+        PacketFXEssentiaSource target = new PacketFXEssentiaSource();
+        roundTrip(source, target);
+
+        assertEquals(12, (int) getField(target, "x"));
+        assertEquals(-7, (int) getField(target, "y"));
+        assertEquals(44, (int) getField(target, "z"));
+        assertEquals((byte) -3, (byte) getField(target, "dx"));
+        assertEquals((byte) 6, (byte) getField(target, "dy"));
+        assertEquals((byte) 1, (byte) getField(target, "dz"));
+        assertEquals(0xAA5500, (int) getField(target, "color"));
+    }
+
+    @Test
     public void visDrainPacketRoundTripsPayload() {
         PacketFXVisDrain source = new PacketFXVisDrain(new BlockPos(1, 2, 3), new BlockPos(-4, 5, -6), 0x55AAFF);
         PacketFXVisDrain target = new PacketFXVisDrain();

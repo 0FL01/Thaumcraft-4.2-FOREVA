@@ -443,6 +443,29 @@ Depends on GAP-1, GAP-2, GAP-5, and GAP-6. Network-thread rendering is unsafe if
 
 - This remains fallback visual behavior and does not yet port reference node/lightning renderer classes.
 
+#### Checkpoint 2026-05-16 — GAP-3 essentia-source packet and drain send path restored
+
+Статус: `PacketFXEssentiaSource` payload/handler baseline and essentia drain send-site are now wired.
+
+Что сделано:
+
+- Implemented `PacketFXEssentiaSource` payload serialization (`x/y/z`, `dx/dy/dz`, `color`) and client-scheduled handler.
+- Added fallback essentia-source visual routing via `Thaumcraft.proxy.beam(...)` from sink to source offset.
+- Restored essentia drain broadcast in `EssentiaHandler.drainEssentia(...)`:
+  - sends `PacketFXEssentiaSource` on successful `takeFromContainer(...)` with 32-block target-point radius.
+- Expanded FX tests:
+  - `PacketFXSerializationTest` now includes `PacketFXEssentiaSource` round-trip.
+  - `ClientProxyFxStaticGuardTest` now enforces essentia-source handler scheduling/proxy routing and active drain send-site presence.
+
+Проверки:
+
+- `./scripts/dev.sh test` — passed.
+- `./scripts/dev.sh validate --smoke` — passed.
+
+Ограничения:
+
+- This remains fallback visual behavior and does not yet port reference `FXEssentiaTrail` particle classes.
+
 ### GAP-4: Beam, wand beam, bore beam, power beam, arc, and lightning bolt classes are absent
 
 **Статус:** отсутствует  
@@ -782,9 +805,9 @@ Depends on GAP-3, GAP-4, GAP-6. Focus server behavior is Stage 5 dependency only
 **Текущая реализация:**
 - `src/main/java/thaumcraft/common/entities/monster/EntityEldritchGuardian.java:291-292`
 - `src/main/java/thaumcraft/common/lib/utils/Utils.java:39-41`
-- `src/main/java/thaumcraft/common/lib/network/fx/PacketFXSonic.java:1-7`
-- `src/main/java/thaumcraft/common/lib/network/fx/PacketFXVisDrain.java:37-40`
-- `src/main/java/thaumcraft/common/lib/network/fx/PacketFXEssentiaSource.java:1-7`
+- `src/main/java/thaumcraft/common/lib/network/fx/PacketFXSonic.java`
+- `src/main/java/thaumcraft/common/lib/network/fx/PacketFXVisDrain.java`
+- `src/main/java/thaumcraft/common/lib/network/fx/PacketFXEssentiaSource.java`
 - `src/main/java/thaumcraft/common/lib/network/fx/PacketFXInfusionSource.java:1-7`
 - `src/main/java/thaumcraft/common/lib/network/fx/PacketFXBlockDig.java:1-7`
 - `src/main/java/thaumcraft/common/lib/network/fx/PacketFXBlockBubble.java:1-7`
@@ -804,7 +827,7 @@ Depends on GAP-3, GAP-4, GAP-6. Focus server behavior is Stage 5 dependency only
 
 **Что не совпадает:**
 
-Several registered packet types represent non-wand FX channels used by mobs, aura/vis/essentia transfer, infusion, bore/block interactions, and bubbles. Current classes are empty or explicitly no-op. `Utils.sendVisDrainFX` does broadcast `PacketFXVisDrain`, but the client packet handler discards it.
+Several registered packet types represent non-wand FX channels used by mobs, aura/vis/essentia transfer, infusion, bore/block interactions, and bubbles. `PacketFXSonic`, `PacketFXVisDrain`, and `PacketFXEssentiaSource` now have fallback handlers and active send paths, while infusion/bore/bubble families remain empty or no-op.
 
 **Что нужно доделать:**
 
@@ -813,7 +836,7 @@ Port these packet payloads and their particle/other FX classes, then re-enable s
 **Как доделать:**
 - Implement `PacketFXSonic` and port `FXSonic`; re-enable send at `EntityEldritchGuardian.java:291-292` after validating original behavior.
 - Implement `PacketFXVisDrain` client handler using reference vis/essentia trail visuals.
-- Implement `PacketFXEssentiaSource` and `PacketFXInfusionSource` payloads and client effects.
+- Implement `PacketFXInfusionSource` payloads and client effects.
 - Implement block dig/bubble packet payloads and helper particles.
 - Verify current server send sites exist for these packets; add reference-equivalent sends only where currently missing and directly in Stage 8-e scope.
 
