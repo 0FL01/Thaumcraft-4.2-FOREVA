@@ -490,6 +490,24 @@ public class ClientProxyEntityRendererRegistrationStaticGuardTest {
                         && taintacleGiantEntity.contains("protected int decreaseAirSupply(int air) { return air; }")
                         && taintacleGiantEntity.contains("if (!this.world.isRemote && amount > 35.0f)")
                         && !taintacleGiantEntity.contains("isEntityInvulnerable(DamageSource source) { return true; }"));
+        String giantBrainyZombieEntity = readFile("src/main/java/thaumcraft/common/entities/monster/EntityGiantBrainyZombie.java");
+        assertTrue("EntityGiantBrainyZombie must keep reference-shaped anger/scale/attribute/drop contracts",
+                giantBrainyZombieEntity.contains("DataParameter<Float> ANGER")
+                        && giantBrainyZombieEntity.contains("this.experienceValue = 15;")
+                        && giantBrainyZombieEntity.contains("1.2F + this.getAnger()")
+                        && giantBrainyZombieEntity.contains("this.tasks.addTask(2, new EntityAILeapAtTarget(this, 0.4F));")
+                        && giantBrainyZombieEntity.contains("this.dataManager.register(ANGER, 1.0F);")
+                        && giantBrainyZombieEntity.contains("public float getAnger()")
+                        && giantBrainyZombieEntity.contains("this.setAnger(this.getAnger() - 0.002F);")
+                        && giantBrainyZombieEntity.contains("this.setSize(0.6F * scale, 1.8F * scale);")
+                        && giantBrainyZombieEntity.contains("setBaseValue(7.0D + (double) ((this.getAnger() - 1.0F) * 5.0F))")
+                        && giantBrainyZombieEntity.contains("Math.min(2.0F, this.getAnger() + 0.1F)")
+                        && giantBrainyZombieEntity.contains("setBaseValue(60.0D)")
+                        && giantBrainyZombieEntity.contains("setBaseValue(7.0D)")
+                        && giantBrainyZombieEntity.contains("for (int i = 0; i < 6; i++)")
+                        && giantBrainyZombieEntity.contains("this.dropItem(net.minecraft.init.Items.ROTTEN_FLESH, 2);")
+                        && giantBrainyZombieEntity.contains("ConfigItems.itemZombieBrain")
+                        && giantBrainyZombieEntity.contains("nbt.setFloat(\"Anger\", this.getAnger());"));
         String mindSpiderEntity = readFile("src/main/java/thaumcraft/common/entities/monster/EntityMindSpider.java");
         assertTrue("EntityMindSpider must expose viewer accessor and synced harmless/viewer data contracts",
                 mindSpiderEntity.contains("public String getViewer()")

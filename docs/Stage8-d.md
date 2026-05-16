@@ -1859,6 +1859,38 @@ Some entities may be hard to trigger naturally until recipes/research/spawn cont
 
 - Это core behavior baseline; точная parity legacy client-only `tentacleAriseFX` visual pipeline остаётся в Stage 8-e visual scope.
 
+### Checkpoint 2026-05-17 — restore giant brainy zombie anger/scale/drop baseline
+
+Статус: частично продвинут.
+
+Что сделано:
+
+- `EntityGiantBrainyZombie` выровнен с reference-shaped common behavior contracts:
+  - восстановлены anger-state sync contracts (`DataParameter<Float> ANGER`, `getAnger`/`setAnger`);
+  - восстановлен constructor baseline:
+    - `experienceValue = 15`;
+    - initial scale boost (`1.2F + anger`) для размеров/step-height;
+    - leap AI hook (`EntityAILeapAtTarget`, priority `2`).
+  - восстановлена anger-driven runtime динамика:
+    - gradual anger decay (`-0.002F` per tick, floor `>1`);
+    - dynamic size re-scale (`0.6F/1.8F * (1.2F + anger)`);
+    - dynamic attack scaling (`7.0 + (anger - 1.0) * 5.0`).
+  - восстановлен anger-on-hit hook: `attackEntityFrom(...)` повышает anger до cap `2.0F`.
+  - attributes выровнены к baseline: `MAX_HEALTH = 60.0D`, `ATTACK_DAMAGE = 7.0D`.
+  - drop contracts восстановлены:
+    - doubled rotten-flesh wave loops (`6 + 6`, each roll drops `2` flesh on true);
+    - zombie-brain rare drop branch (`nextInt(10) - looting <= 4`).
+  - добавлены NBT contracts для anger persistence (`"Anger"` float).
+- `ClientProxyEntityRendererRegistrationStaticGuardTest` расширен проверками на anger/scale/attribute/drop contracts `EntityGiantBrainyZombie`.
+
+Проверки:
+
+- `./scripts/dev.sh validate --smoke` — passed.
+
+Ограничения:
+
+- Это common behavior baseline; точная visual parity anger-based giant scaling в runtime scene остаётся в non-GUI scope.
+
 ### Checkpoint 2026-05-16 — restore mind spider viewer-only render gating
 
 Статус: частично продвинут.
