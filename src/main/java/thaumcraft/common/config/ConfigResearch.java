@@ -18,10 +18,14 @@ import thaumcraft.api.crafting.IArcaneRecipe;
 import thaumcraft.api.crafting.CrucibleRecipe;
 import thaumcraft.api.crafting.InfusionEnchantmentRecipe;
 import thaumcraft.api.crafting.InfusionRecipe;
+import thaumcraft.api.crafting.ShapedArcaneRecipe;
 import thaumcraft.api.research.ResearchCategories;
 import thaumcraft.api.research.ResearchItem;
 import thaumcraft.api.research.ResearchPage;
+import thaumcraft.api.wands.WandCap;
+import thaumcraft.api.wands.WandRod;
 import thaumcraft.common.lib.crafting.InfusionRunicAugmentRecipe;
+import thaumcraft.common.items.wands.ItemWandCasting;
 
 public class ConfigResearch {
     public static final Map<String, Object> recipes = new HashMap<>();
@@ -1829,6 +1833,94 @@ public class ConfigResearch {
                         new ResearchPage("tc.research_page.ROD_silverwood.1"),
                         new ResearchPage((InfusionRecipe) recipes.get("WandRodSilverwood")))
                 .setParents("ROD_greatwood", "INFUSION")
+                .registerResearchItem();
+
+        ArrayList<ShapedArcaneRecipe> sceptreRecipes = new ArrayList<>();
+
+        WandCap wandCapIron = WandCap.caps.get("iron");
+        WandCap wandCapGold = WandCap.caps.get("gold");
+        WandCap wandCapThaumium = WandCap.caps.get("thaumium");
+        WandRod wandRodWood = WandRod.rods.get("wood");
+        WandRod wandRodGreatwood = WandRod.rods.get("greatwood");
+        WandRod wandRodSilverwood = WandRod.rods.get("silverwood");
+
+        int sceptreCost1 = (int) ((float) (wandCapIron.getCraftCost() * wandRodWood.getCraftCost()) * 1.5f);
+        AspectList sceptreCostVis1 = new AspectList();
+        for (Aspect primal : Aspect.getPrimalAspects()) {
+            sceptreCostVis1.add(primal, sceptreCost1);
+        }
+        ItemStack sceptre1 = new ItemStack(ConfigItems.itemWandCasting, 1, sceptreCost1);
+        ItemWandCasting.setCap(sceptre1, wandCapIron);
+        ItemWandCasting.setRod(sceptre1, wandRodWood);
+        sceptre1.setTagInfo("sceptre", new NBTTagByte((byte) 1));
+        sceptreRecipes.add(new ShapedArcaneRecipe(
+                "SCEPTRE",
+                sceptre1,
+                sceptreCostVis1,
+                " TF",
+                " RT",
+                "T  ",
+                'T', wandCapIron.getItem(),
+                'R', wandRodWood.getItem(),
+                'F', new ItemStack(ConfigItems.itemResource, 1, 15)));
+
+        int sceptreCost2 = (int) ((float) (wandCapGold.getCraftCost() * wandRodGreatwood.getCraftCost()) * 1.5f);
+        AspectList sceptreCostVis2 = new AspectList();
+        for (Aspect primal : Aspect.getPrimalAspects()) {
+            sceptreCostVis2.add(primal, sceptreCost2);
+        }
+        ItemStack sceptre2 = new ItemStack(ConfigItems.itemWandCasting, 1, sceptreCost2);
+        ItemWandCasting.setCap(sceptre2, wandCapGold);
+        ItemWandCasting.setRod(sceptre2, wandRodGreatwood);
+        sceptre2.setTagInfo("sceptre", new NBTTagByte((byte) 1));
+        sceptreRecipes.add(new ShapedArcaneRecipe(
+                "SCEPTRE",
+                sceptre2,
+                sceptreCostVis2,
+                " TF",
+                " RT",
+                "T  ",
+                'T', wandCapGold.getItem(),
+                'R', wandRodGreatwood.getItem(),
+                'F', new ItemStack(ConfigItems.itemResource, 1, 15)));
+
+        int sceptreCost3 = (int) ((float) (wandCapThaumium.getCraftCost() * wandRodSilverwood.getCraftCost()) * 1.5f);
+        AspectList sceptreCostVis3 = new AspectList();
+        for (Aspect primal : Aspect.getPrimalAspects()) {
+            sceptreCostVis3.add(primal, sceptreCost3);
+        }
+        ItemStack sceptre3 = new ItemStack(ConfigItems.itemWandCasting, 1, sceptreCost3);
+        ItemWandCasting.setCap(sceptre3, wandCapThaumium);
+        ItemWandCasting.setRod(sceptre3, wandRodSilverwood);
+        sceptre3.setTagInfo("sceptre", new NBTTagByte((byte) 1));
+        sceptreRecipes.add(new ShapedArcaneRecipe(
+                "SCEPTRE",
+                sceptre3,
+                sceptreCostVis3,
+                " TF",
+                " RT",
+                "T  ",
+                'T', wandCapThaumium.getItem(),
+                'R', wandRodSilverwood.getItem(),
+                'F', new ItemStack(ConfigItems.itemResource, 1, 15)));
+
+        new ResearchItem(
+                "SCEPTRE",
+                "THAUMATURGY",
+                new AspectList()
+                        .add(Aspect.TOOL, 6)
+                        .add(Aspect.CRAFT, 6)
+                        .add(Aspect.TREE, 6)
+                        .add(Aspect.MAGIC, 9),
+                0,
+                4,
+                3,
+                sceptre3)
+                .setPages(
+                        new ResearchPage("tc.research_page.SCEPTRE.1"),
+                        new ResearchPage(sceptreRecipes.toArray(new IArcaneRecipe[0])))
+                .setConcealed()
+                .setParents("ROD_silverwood")
                 .registerResearchItem();
 
         new ResearchItem(
