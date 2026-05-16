@@ -357,7 +357,7 @@ Entity registry names changed between 1.7.10 and 1.12.2. Trigger strings must ei
 
 **Что не совпадает:**
 
-Server packet flow now validates requisites, separates primary/secondary actions by packet `type` + `isSecondary()`, creates research notes for primary entries, charges aspect pools for secondary purchases, and keeps sibling grants behind prerequisite checks. Packet payload serialization coverage now also includes `PacketPlayerCompleteToServer` round-trip checks (key/dimension/username/type). Remaining mismatch is lack of runtime/manual validation of these branches with real research content data.
+Server packet flow now validates requisites, separates primary/secondary actions by packet `type` + `isSecondary()`, creates research notes for primary entries, charges aspect pools for secondary purchases, and keeps sibling grants behind prerequisite checks. Packet payload serialization coverage now also includes `PacketPlayerCompleteToServer` round-trip checks (key/dimension/username/type), and a static guard test now enforces presence of prerequisite/type/note-cost branching in the server handler source. Remaining mismatch is lack of runtime/manual validation of these branches with real research content data.
 
 **Что нужно доделать:**
 
