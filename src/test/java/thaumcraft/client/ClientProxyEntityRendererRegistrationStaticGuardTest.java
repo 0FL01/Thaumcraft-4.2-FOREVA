@@ -74,7 +74,7 @@ public class ClientProxyEntityRendererRegistrationStaticGuardTest {
         assertTrue("ClientProxy must keep fallback registrations for remaining special entities",
                 source.contains("registerEntityRenderer(EntityGolemBase.class, RenderGolemBase::new, registered);")
                         && source.contains("registerEntityRenderer(EntityTravelingTrunk.class, RenderTravelingTrunk::new, registered);")
-                        && source.contains("registerEntityRenderer(EntityCultistPortal.class, manager -> new RenderFallbackBiped<>("));
+                        && source.contains("registerEntityRenderer(EntityCultistPortal.class, RenderCultistPortal::new, registered);"));
         assertTrue("RenderFallbackLiving must exist as a non-noop typed texture renderer",
                 readFile("src/main/java/thaumcraft/client/renderers/entity/RenderFallbackLiving.java").contains("extends RenderLiving<T>"));
         assertTrue("RenderFallbackBiped must exist as a non-noop typed texture renderer",
@@ -122,6 +122,10 @@ public class ClientProxyEntityRendererRegistrationStaticGuardTest {
                         && eldritchCrabRenderer.contains("textures/models/craboverlay.png")
                         && eldritchCrabRenderer.contains("class CrabOverlayLayer")
                         && eldritchCrabRenderer.contains("this.addLayer(new CrabOverlayLayer())"));
+        String cultistPortalRenderer = readFile("src/main/java/thaumcraft/client/renderers/entity/RenderCultistPortal.java");
+        assertTrue("RenderCultistPortal must provide dedicated portal texture baseline",
+                cultistPortalRenderer.contains("extends RenderBiped<EntityCultistPortal>")
+                        && cultistPortalRenderer.contains("textures/misc/cultist_portal.png"));
         String trunkRenderer = readFile("src/main/java/thaumcraft/client/renderers/entity/RenderTravelingTrunk.java");
         assertTrue("RenderTravelingTrunk must provide anger-based texture routing baseline",
                 trunkRenderer.contains("extends RenderLiving<EntityTravelingTrunk>")

@@ -62,6 +62,7 @@ import thaumcraft.client.renderers.entity.RenderGolemBase;
 import thaumcraft.client.renderers.entity.RenderEldritchGuardian;
 import thaumcraft.client.renderers.entity.RenderEldritchGolem;
 import thaumcraft.client.renderers.entity.RenderEldritchWarden;
+import thaumcraft.client.renderers.entity.RenderCultistPortal;
 import thaumcraft.client.renderers.entity.RenderEldritchCrab;
 import thaumcraft.client.renderers.entity.RenderNoop;
 import thaumcraft.client.renderers.entity.RenderPech;
@@ -255,8 +256,7 @@ public class ClientProxy extends CommonProxy {
                 manager, new ModelSpider(), 0.8F, new ResourceLocation("thaumcraft", "textures/models/taintacle.png")), registered);
         registerEntityRenderer(EntityGolemBase.class, RenderGolemBase::new, registered);
         registerEntityRenderer(EntityTravelingTrunk.class, RenderTravelingTrunk::new, registered);
-        registerEntityRenderer(EntityCultistPortal.class, manager -> new RenderFallbackBiped<>(
-                manager, new ModelBiped(), 0.8F, new ResourceLocation("thaumcraft", "textures/misc/cultist_portal.png")), registered);
+        registerEntityRenderer(EntityCultistPortal.class, RenderCultistPortal::new, registered);
 
         for (net.minecraftforge.fml.common.registry.EntityEntry entry : ConfigEntities.ENTITIES) {
             @SuppressWarnings("unchecked")
