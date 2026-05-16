@@ -1453,6 +1453,28 @@ Some entities may be hard to trigger naturally until recipes/research/spawn cont
 
 - Это eyes-lightmap baseline; точные legacy multi-pass/lightmap restore нюансы за пределами текущего non-GUI checkpoint и закрываются общей client parity валидацией.
 
+### Checkpoint 2026-05-16 — restore taint spider scale/eyes lightmap baseline
+
+Статус: частично продвинут.
+
+Что сделано:
+
+- `EntityTaintSpider` расширен accessor `spiderScaleAmount()` (`0.4F`) для reference-shaped render scale contract.
+- `RenderTaintSpider` переведен на `entity.spiderScaleAmount()` в `preRenderCallback(...)` (с сохранением `Y * 1.25F` profile).
+- `RenderTaintSpider.SpiderEyesLayer` расширен fullbright lightmap hook:
+  - добавлен `int i = 61680` split (`j/k`) и `OpenGlHelper.setLightmapTextureCoords(...)`.
+- `ClientProxyEntityRendererRegistrationStaticGuardTest` расширен проверками:
+  - scale accessor + lightmap contracts в `RenderTaintSpider`;
+  - `EntityTaintSpider#spiderScaleAmount()` contract.
+
+Проверки:
+
+- `./scripts/dev.sh validate --smoke` — passed.
+
+Ограничения:
+
+- Это scale/eyes-lightmap baseline; remaining taint spider gameplay parity (entity attributes/size/drop-frequency nuances from Stage 6 scope) закрывается отдельным common-side checkpoint.
+
 - [ ] Add client-only entity renderer registration hook.
 - [ ] Register every entity from `ConfigEntities.ENTITIES` with a custom or vanilla-equivalent renderer.
 - [ ] Port item-like/transient/projectile renderers.

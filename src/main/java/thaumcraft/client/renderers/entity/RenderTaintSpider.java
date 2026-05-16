@@ -2,6 +2,7 @@ package thaumcraft.client.renderers.entity;
 
 import net.minecraft.client.model.ModelSpider;
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.entity.RenderLiving;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.client.renderer.entity.layers.LayerRenderer;
@@ -24,7 +25,7 @@ public class RenderTaintSpider extends RenderLiving<EntityTaintSpider> {
 
     @Override
     protected void preRenderCallback(EntityTaintSpider entity, float partialTickTime) {
-        float scale = Math.max(0.1F, entity.width / 1.4F);
+        float scale = entity.spiderScaleAmount();
         GlStateManager.scale(scale, scale * 1.25F, scale);
     }
 
@@ -44,6 +45,10 @@ public class RenderTaintSpider extends RenderLiving<EntityTaintSpider> {
             GlStateManager.disableAlpha();
             GlStateManager.blendFunc(GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ONE);
             GlStateManager.depthMask(!entity.isInvisible());
+            int i = 61680;
+            int j = i % 65536;
+            int k = i / 65536;
+            OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, (float) j, (float) k);
             GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
             getMainModel().render(entity, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch, scale);
             GlStateManager.disableBlend();

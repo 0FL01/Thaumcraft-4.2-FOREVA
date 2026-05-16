@@ -184,6 +184,9 @@ public class ClientProxyEntityRendererRegistrationStaticGuardTest {
                         && taintSpiderRenderer.contains("textures/models/taint_spider.png")
                         && taintSpiderRenderer.contains("textures/models/taint_spider_eyes.png")
                         && taintSpiderRenderer.contains("this.addLayer(new SpiderEyesLayer())")
+                        && taintSpiderRenderer.contains("entity.spiderScaleAmount()")
+                        && taintSpiderRenderer.contains("int i = 61680;")
+                        && taintSpiderRenderer.contains("OpenGlHelper.setLightmapTextureCoords(")
                         && taintSpiderRenderer.contains("scale * 1.25F"));
         String taintCreeperRenderer = readFile("src/main/java/thaumcraft/client/renderers/entity/RenderTaintCreeper.java");
         assertTrue("RenderTaintCreeper must provide creeper texture plus flash scale/color multiplier baseline",
@@ -310,6 +313,10 @@ public class ClientProxyEntityRendererRegistrationStaticGuardTest {
                         && mindSpiderEntity.contains("this.dataManager.set(HARMLESS, harmless ? (byte) 1 : (byte) 0)")
                         && mindSpiderEntity.contains("nbt.setByte(\"harmless\"")
                         && mindSpiderEntity.contains("nbt.setString(\"viewer\""));
+        String taintSpiderEntity = readFile("src/main/java/thaumcraft/common/entities/monster/EntityTaintSpider.java");
+        assertTrue("EntityTaintSpider must expose scale accessor baseline for dedicated renderer scale contract",
+                taintSpiderEntity.contains("public float spiderScaleAmount()")
+                        && taintSpiderEntity.contains("return 0.4F;"));
         assertTrue("ClientProxy must iterate ConfigEntities.ENTITIES for renderer registration coverage",
                 source.contains("for (net.minecraftforge.fml.common.registry.EntityEntry entry : ConfigEntities.ENTITIES)"));
         assertTrue("ClientProxy must keep fallback RenderNoop registrations for remaining entities",

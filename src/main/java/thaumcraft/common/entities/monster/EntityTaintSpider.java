@@ -16,6 +16,10 @@ public class EntityTaintSpider extends net.minecraft.entity.monster.EntitySpider
 
     @Override protected float getSoundPitch() { return 0.7f; }
 
+    public float spiderScaleAmount() {
+        return 0.4F;
+    }
+
     @Override
     protected void dropFewItems(boolean wasRecentlyHit, int looting) {
         if (this.world.rand.nextBoolean()) {
