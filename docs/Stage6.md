@@ -1682,6 +1682,26 @@ Mapping:
 - Static checks do not prove in-world drop/state parity or full stage progression.
 - `S6-BOSS-01` Cultist Portal runtime scenario remains TODO.
 
+### 8.2.43 Monster TCSounds constant coverage checkpoint — 2026-05-16
+
+Статус: static sound-reference integrity guard added for Stage 6 monster/boss code.
+
+Что сделано:
+
+- Added `MonsterSoundConstantCoverageTest` to scan `src/main/java/thaumcraft/common/entities/monster/**` for `TCSounds.*` references and verify every referenced constant exists in `TCSounds` declarations.
+- This complements the existing `TCSoundsStaticCoverageTest` (code ↔ `sounds.json` ↔ `.ogg`) and catches broken monster/boss sound references before runtime.
+
+Проверки:
+
+- `./scripts/dev.sh test` — passed (`28/28`).
+- `./scripts/dev.sh validate` — passed (`5/5`).
+- `git diff --check` — passed.
+
+Оставшиеся ограничения:
+
+- Static checks do not prove in-world playback timing/mix for each combat path.
+- Stage 6 runtime sound/drop scenario matrix remains open.
+
 ### 8.3 Minimal Stage 6 manual scenario matrix
 
 Утвержденный минимальный формат evidence: таблица в этом документе или checkpoint report, с обязательными полями:
