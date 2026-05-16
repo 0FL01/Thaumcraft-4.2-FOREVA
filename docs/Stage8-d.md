@@ -1707,6 +1707,45 @@ Some entities may be hard to trigger naturally until recipes/research/spawn cont
 
 - Это common/server behavior baseline; точная visual parity swarm particle FX pipeline остаётся в Stage 8-e visual scope и не подтверждается manual GUI checks по инструкции.
 
+### Checkpoint 2026-05-17 — restore taint spore swarmer spawn-counter/swarm-burst behavior baseline
+
+Статус: частично продвинут.
+
+Что сделано:
+
+- `EntityTaintSporeSwarmer` выровнен с reference-shaped common behavior contracts:
+  - восстановлен constructor baseline: `spawnCounter = 500`, `setSporeSize(10)`;
+  - восстановлен swarmer-size contract (`setSporeSize(...)` фиксирует hitbox `1.0F/1.0F`);
+  - восстановлены атрибуты: `MAX_HEALTH = 75.0D`, `ATTACK_DAMAGE = 1.0D`;
+  - восстановлен hurt-client hook (`sploosh(10)` на `attackEntityFrom(...)` client-side);
+  - восстановлен swarmer update loop:
+    - `pushOutOfBlocks(...)`;
+    - decrement `spawnCounter`;
+    - burst trigger при `spawnCounter <= 0` и nearby player (`16.0D`);
+    - forced burst on hurt-resistance edge (`hurtResistantTime == 1`);
+    - client swarm-particle buildup proportional to counter stage.
+  - восстановлен `swarmBurst(int)` server path:
+    - gore sound;
+    - spawn `EntityTaintSwarm`;
+    - status sync packet `world.setEntityState(this, (byte)6)`.
+  - восстановлен `handleStatusUpdate((byte)6)` client path:
+    - counter reset;
+    - `sploosh(25)`;
+    - local particle-list reset.
+  - ambient/drop contracts выровнены:
+    - ambient -> `TCSounds.ROOTS`;
+    - drop loop дважды (`0..1`) с meta `11/12` random branch.
+  - добавлены NBT hooks для `SpawnCounter` persistence.
+- `ClientProxyEntityRendererRegistrationStaticGuardTest` расширен проверками на spawn-counter/swarm-burst contracts `EntityTaintSporeSwarmer`.
+
+Проверки:
+
+- `./scripts/dev.sh validate --smoke` — passed.
+
+Ограничения:
+
+- Это common/server baseline; точная legacy visual parity swarmer particle-object lifecycle остаётся в Stage 8-e visual scope и не подтверждается manual GUI checks по инструкции.
+
 ### Checkpoint 2026-05-16 — restore mind spider viewer-only render gating
 
 Статус: частично продвинут.

@@ -399,6 +399,26 @@ public class ClientProxyEntityRendererRegistrationStaticGuardTest {
                         && taintSwarmEntity.contains("nbt.getByte(\"damBonus\")")
                         && taintSwarmEntity.contains("this.world.rand.nextBoolean()")
                         && taintSwarmEntity.contains("itemResource, 1, 11"));
+        String taintSporeSwarmerEntity = readFile("src/main/java/thaumcraft/common/entities/monster/EntityTaintSporeSwarmer.java");
+        assertTrue("EntityTaintSporeSwarmer must keep reference-shaped spawn-counter/swarm-burst behavior contracts",
+                taintSporeSwarmerEntity.contains("private int spawnCounter;")
+                        && taintSporeSwarmerEntity.contains("this.spawnCounter = 500;")
+                        && taintSporeSwarmerEntity.contains("this.setSporeSize(10);")
+                        && taintSporeSwarmerEntity.contains("this.setSize(1.0F, 1.0F);")
+                        && taintSporeSwarmerEntity.contains("setBaseValue(75.0D)")
+                        && taintSporeSwarmerEntity.contains("setBaseValue(1.0D)")
+                        && taintSporeSwarmerEntity.contains("this.sploosh(10);")
+                        && taintSporeSwarmerEntity.contains("this.pushOutOfBlocks(this.posX, this.posY, this.posZ);")
+                        && taintSporeSwarmerEntity.contains("this.world.getClosestPlayerToEntity(this, 16.0D)")
+                        && taintSporeSwarmerEntity.contains("this.swarmBurst(1);")
+                        && taintSporeSwarmerEntity.contains("this.world.setEntityState(this, (byte) 6);")
+                        && taintSporeSwarmerEntity.contains("if (id == 6)")
+                        && taintSporeSwarmerEntity.contains("this.spawnCounter = 500;")
+                        && taintSporeSwarmerEntity.contains("this.sploosh(25);")
+                        && taintSporeSwarmerEntity.contains("return thaumcraft.common.lib.TCSounds.ROOTS;")
+                        && taintSporeSwarmerEntity.contains("for (int i = 0; i <= 1; i++)")
+                        && taintSporeSwarmerEntity.contains("itemResource, 1, 11")
+                        && taintSporeSwarmerEntity.contains("itemResource, 1, 12"));
         String mindSpiderEntity = readFile("src/main/java/thaumcraft/common/entities/monster/EntityMindSpider.java");
         assertTrue("EntityMindSpider must expose viewer accessor and synced harmless/viewer data contracts",
                 mindSpiderEntity.contains("public String getViewer()")
