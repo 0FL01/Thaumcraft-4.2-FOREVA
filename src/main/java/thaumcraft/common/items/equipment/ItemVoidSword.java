@@ -3,6 +3,7 @@ package thaumcraft.common.items.equipment;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.EnumRarity;
 import net.minecraft.init.MobEffects;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemSword;
@@ -22,15 +23,18 @@ public class ItemVoidSword extends ItemSword implements IRepairable, IWarpingGea
     }
 
     @Override
+    public EnumRarity getRarity(ItemStack stack) {
+        return EnumRarity.UNCOMMON;
+    }
+
+    @Override
     public boolean getIsRepairable(ItemStack toRepair, ItemStack repair) {
         return isVoidToolRepair(repair) || super.getIsRepairable(toRepair, repair);
     }
 
     @Override
     public boolean hitEntity(ItemStack stack, EntityLivingBase target, EntityLivingBase attacker) {
-        if (!target.world.isRemote) {
-            target.addPotionEffect(new PotionEffect(MobEffects.WITHER, 80));
-        }
+        tryApplyVoidWither(target, attacker, 60);
         return super.hitEntity(stack, target, attacker);
     }
 
@@ -47,6 +51,25 @@ public class ItemVoidSword extends ItemSword implements IRepairable, IWarpingGea
 
     static boolean isVoidToolRepair(ItemStack repair) {
         return !repair.isEmpty() && repair.getItem() == ConfigItems.itemResource && repair.getMetadata() == ItemResource.META_CHARM;
+    }
+
+    static boolean canApplyVoidCombatDebuff(EntityLivingBase target, EntityLivingBase hitter) {
+        if (target == null || target.world == null || target.world.isRemote) {
+            return false;
+        }
+        if (target instanceof EntityPlayer && hitter instanceof EntityPlayer) {
+            net.minecraft.server.MinecraftServer server = target.world.getMinecraftServer();
+            if (server != null && !server.isPVPEnabled()) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    static void tryApplyVoidWither(EntityLivingBase target, EntityLivingBase hitter, int durationTicks) {
+        if (canApplyVoidCombatDebuff(target, hitter)) {
+            target.addPotionEffect(new PotionEffect(MobEffects.WITHER, durationTicks));
+        }
     }
 
     static void repairVoid(ItemStack stack, World world, Entity entity) {

@@ -1,7 +1,9 @@
 package thaumcraft.common.items.equipment;
 
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.EnumRarity;
 import net.minecraft.item.ItemHoe;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
@@ -17,8 +19,26 @@ public class ItemVoidHoe extends ItemHoe implements IRepairable, IWarpingGear {
     }
 
     @Override
+    public int getItemEnchantability() {
+        return 5;
+    }
+
+    @Override
+    public EnumRarity getRarity(ItemStack stack) {
+        return EnumRarity.UNCOMMON;
+    }
+
+    @Override
     public boolean getIsRepairable(ItemStack toRepair, ItemStack repair) {
         return ItemVoidSword.isVoidToolRepair(repair) || super.getIsRepairable(toRepair, repair);
+    }
+
+    @Override
+    public boolean onLeftClickEntity(ItemStack stack, EntityPlayer player, Entity entity) {
+        if (entity instanceof EntityLivingBase) {
+            ItemVoidSword.tryApplyVoidWither((EntityLivingBase) entity, player, 80);
+        }
+        return super.onLeftClickEntity(stack, player, entity);
     }
 
     @Override

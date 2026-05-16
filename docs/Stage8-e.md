@@ -1481,6 +1481,26 @@ Depends on GAP-1 and GAP-3. Some infusion source scenarios may require Stage 9 c
 
 - Это контрактный baseline без ручной gameplay проверки tool-balance; combat/efficiency runtime parity остаётся в общей Stage 5/6 manual зоне.
 
+#### Checkpoint 2026-05-17 — GAP-11 void/crimson equipment debuff+repair baseline
+
+Статус: частично продвинут.
+
+Что сделано:
+
+- Восстановлены reference-shaped core contracts для void/crimson equipment family:
+  - `ItemVoidSword`: `UNCOMMON` rarity + pvp-gated combat-debuff helper surface (`canApplyVoidCombatDebuff`, `tryApplyVoidWither`) + sword-hit wither baseline (`60` ticks);
+  - `ItemVoidAxe`/`ItemVoidPickaxe`/`ItemVoidShovel`/`ItemVoidHoe`: `UNCOMMON` rarity, toolClass contracts (`axe`/`pickaxe`/`shovel`), `VoidHoe` enchantability `5`, pvp-gated wither-on-hit baseline (`80` ticks), shared self-repair baseline (`repairVoid`) и shared void-charm repair key;
+  - `ItemCrimsonSword`: `IWarpingGear` surface, `RARE` rarity, void-charm repair key, pvp-gated dual-debuff hit baseline (`WITHER 60`, `WEAKNESS 120`), shared self-repair baseline, warp `2`.
+- Добавлен `ItemVoidCrimsonToolsStaticGuardTest` для фиксации family contracts.
+
+Проверки:
+
+- `./scripts/dev.sh validate --smoke` — passed.
+
+Ограничения:
+
+- Это gameplay-contract baseline; client tooltip/icon parity для void/crimson equipment остаётся отдельным Stage 8 renderer/UI polish.
+
 ### GAP-12: FX registration exists, but send-site coverage and manual scenario validation are incomplete
 
 **Статус:** требует проверки  

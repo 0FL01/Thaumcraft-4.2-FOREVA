@@ -1,15 +1,18 @@
 package thaumcraft.common.items.equipment;
 
+import com.google.common.collect.ImmutableSet;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.MobEffects;
+import net.minecraft.item.EnumRarity;
 import net.minecraft.item.ItemPickaxe;
 import net.minecraft.item.ItemStack;
-import net.minecraft.potion.PotionEffect;
 import net.minecraft.world.World;
 import thaumcraft.api.IRepairable;
 import thaumcraft.api.IWarpingGear;
 import thaumcraft.common.lib.CreativeTabThaumcraft;
+
+import java.util.Set;
 
 public class ItemVoidPickaxe extends ItemPickaxe implements IRepairable, IWarpingGear {
 
@@ -19,14 +22,24 @@ public class ItemVoidPickaxe extends ItemPickaxe implements IRepairable, IWarpin
     }
 
     @Override
+    public Set<String> getToolClasses(ItemStack stack) {
+        return ImmutableSet.of("pickaxe");
+    }
+
+    @Override
+    public EnumRarity getRarity(ItemStack stack) {
+        return EnumRarity.UNCOMMON;
+    }
+
+    @Override
     public boolean getIsRepairable(ItemStack toRepair, ItemStack repair) {
         return ItemVoidSword.isVoidToolRepair(repair) || super.getIsRepairable(toRepair, repair);
     }
 
     @Override
     public boolean onLeftClickEntity(ItemStack stack, EntityPlayer player, Entity entity) {
-        if (!player.world.isRemote && entity instanceof net.minecraft.entity.EntityLivingBase) {
-            ((net.minecraft.entity.EntityLivingBase) entity).addPotionEffect(new PotionEffect(MobEffects.WITHER, 80));
+        if (entity instanceof EntityLivingBase) {
+            ItemVoidSword.tryApplyVoidWither((EntityLivingBase) entity, player, 80);
         }
         return super.onLeftClickEntity(stack, player, entity);
     }
