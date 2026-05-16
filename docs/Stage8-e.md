@@ -1459,6 +1459,28 @@ Depends on GAP-1 and GAP-3. Some infusion source scenarios may require Stage 9 c
 
 - Это baseline-триггер scan lifecycle без полного HUD/overlay-рендера (`RenderEventHandler` рендер-пути всё ещё требуют отдельного Stage 8-e client polish).
 
+#### Checkpoint 2026-05-17 — GAP-11 thaumium-tools rarity/repair contract baseline
+
+Статус: частично продвинут.
+
+Что сделано:
+
+- Восстановлены reference-shaped базовые контракты для `ItemThaumium*` equipment:
+  - `ItemThaumiumSword`: `UNCOMMON` rarity + thaumium repair (`itemResource:2`);
+  - `ItemThaumiumAxe`: `axe` toolClass + `UNCOMMON` rarity + thaumium repair;
+  - `ItemThaumiumPickaxe`: `pickaxe` toolClass + `UNCOMMON` rarity + thaumium repair;
+  - `ItemThaumiumShovel`: `shovel` toolClass + `UNCOMMON` rarity + thaumium repair;
+  - `ItemThaumiumHoe`: enchantability `5` + `UNCOMMON` rarity + thaumium repair.
+- Добавлен `ItemThaumiumToolsStaticGuardTest` для фиксации этих family-contracts.
+
+Проверки:
+
+- `./scripts/dev.sh validate --smoke` — passed.
+
+Ограничения:
+
+- Это контрактный baseline без ручной gameplay проверки tool-balance; combat/efficiency runtime parity остаётся в общей Stage 5/6 manual зоне.
+
 ### GAP-12: FX registration exists, but send-site coverage and manual scenario validation are incomplete
 
 **Статус:** требует проверки  
