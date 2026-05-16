@@ -14,8 +14,10 @@ import net.minecraft.entity.ai.EntityAIWander;
 import net.minecraft.entity.ai.EntityAIWatchClosest;
 import net.minecraft.entity.passive.EntityVillager;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.SoundEvents;
 import net.minecraft.pathfinding.PathNavigateGround;
 import net.minecraft.util.math.MathHelper;
+import thaumcraft.common.Thaumcraft;
 import thaumcraft.common.entities.ai.combat.AIAttackOnCollide;
 import thaumcraft.common.entities.ai.misc.AIConvertGrass;
 
@@ -51,9 +53,24 @@ public class EntityTaintSheep extends net.minecraft.entity.monster.EntityMob imp
     @Override
     protected void applyEntityAttributes() {
         super.applyEntityAttributes();
-        this.getEntityAttribute(net.minecraft.entity.SharedMonsterAttributes.MAX_HEALTH).setBaseValue(10.0);
+        this.getEntityAttribute(net.minecraft.entity.SharedMonsterAttributes.MAX_HEALTH).setBaseValue(20.0D);
         this.getEntityAttribute(net.minecraft.entity.SharedMonsterAttributes.ATTACK_DAMAGE).setBaseValue(3.0);
-        this.getEntityAttribute(net.minecraft.entity.SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(0.23);
+        this.getEntityAttribute(net.minecraft.entity.SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(0.25D);
+    }
+
+    @Override
+    public boolean canBreatheUnderwater() {
+        return true;
+    }
+
+    @Override
+    protected boolean canDespawn() {
+        return false;
+    }
+
+    @Override
+    public int getTotalArmorValue() {
+        return 1;
     }
 
     @Override
@@ -103,6 +120,11 @@ public class EntityTaintSheep extends net.minecraft.entity.monster.EntityMob imp
             this.sheepTimer = Math.max(0, this.sheepTimer - 1);
         }
         super.onLivingUpdate();
+        if (this.world.isRemote && this.ticksExisted < 5) {
+            for (int i = 0; i < Thaumcraft.proxy.particleCount(10); i++) {
+                Thaumcraft.proxy.taintLandFX(this);
+            }
+        }
     }
 
     @Override
@@ -141,17 +163,19 @@ public class EntityTaintSheep extends net.minecraft.entity.monster.EntityMob imp
         return this.sheepTimer > 0 ? 0.62831855F : this.rotationPitch * 0.017453292F;
     }
 
-    @Override protected net.minecraft.util.SoundEvent getAmbientSound() { return net.minecraft.init.SoundEvents.ENTITY_SHEEP_AMBIENT; }
-    @Override protected net.minecraft.util.SoundEvent getHurtSound(net.minecraft.util.DamageSource src) { return net.minecraft.init.SoundEvents.ENTITY_SHEEP_HURT; }
-    @Override protected net.minecraft.util.SoundEvent getDeathSound() { return net.minecraft.init.SoundEvents.ENTITY_SHEEP_DEATH; }
+    @Override protected net.minecraft.util.SoundEvent getAmbientSound() { return SoundEvents.ENTITY_SHEEP_AMBIENT; }
+    @Override protected net.minecraft.util.SoundEvent getHurtSound(net.minecraft.util.DamageSource src) { return SoundEvents.ENTITY_SHEEP_AMBIENT; }
+    @Override protected net.minecraft.util.SoundEvent getDeathSound() { return SoundEvents.ENTITY_SHEEP_AMBIENT; }
     @Override protected float getSoundPitch() { return 0.7f; }
 
     @Override
     protected void dropFewItems(boolean wasRecentlyHit, int looting) {
-        if (this.world.rand.nextBoolean()) {
-            this.entityDropItem(new net.minecraft.item.ItemStack(thaumcraft.common.config.ConfigItems.itemResource, 1, 11), this.height / 2.0f);
-        } else {
-            this.entityDropItem(new net.minecraft.item.ItemStack(thaumcraft.common.config.ConfigItems.itemResource, 1, 12), this.height / 2.0f);
+        if (this.world.rand.nextInt(3) == 0) {
+            if (this.world.rand.nextBoolean()) {
+                this.entityDropItem(new net.minecraft.item.ItemStack(thaumcraft.common.config.ConfigItems.itemResource, 1, 11), this.height / 2.0f);
+            } else {
+                this.entityDropItem(new net.minecraft.item.ItemStack(thaumcraft.common.config.ConfigItems.itemResource, 1, 12), this.height / 2.0f);
+            }
         }
     }
 }

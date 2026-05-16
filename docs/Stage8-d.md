@@ -1621,6 +1621,28 @@ Some entities may be hard to trigger naturally until recipes/research/spawn cont
 
 - Это common behavior baseline; полная visual parity раннего FX и runtime боевых сценариев ограничена non-GUI validation рамками.
 
+### Checkpoint 2026-05-17 — restore taint sheep attribute/survivability/fx/sound/drop behavior baseline
+
+Статус: частично продвинут.
+
+Что сделано:
+
+- `EntityTaintSheep` выровнен с reference-shaped common behavior contracts:
+  - атрибуты приведены к baseline: `MAX_HEALTH = 20.0D`, `ATTACK_DAMAGE = 3.0D`, `MOVEMENT_SPEED = 0.25D`;
+  - добавлены survivability hooks: `canBreatheUnderwater() -> true`, `canDespawn() -> false`, `getTotalArmorValue() -> 1`;
+  - восстановлен early client FX hook для первых `5` ticks через `Thaumcraft.proxy.taintLandFX(this)`;
+  - sound contracts выровнены к sheep-say baseline (ambient/hurt/death -> `SoundEvents.ENTITY_SHEEP_AMBIENT`);
+  - drop contract выровнен к reference rarity: resource-11/12 branch выполняется только при `rand.nextInt(3) == 0`.
+- `ClientProxyEntityRendererRegistrationStaticGuardTest` расширен проверками на новые attribute/survivability/fx/sound/drop contracts `EntityTaintSheep`.
+
+Проверки:
+
+- `./scripts/dev.sh validate --smoke` — passed.
+
+Ограничения:
+
+- Это common behavior baseline; полная visual parity раннего FX и runtime боевых сценариев ограничена non-GUI validation рамками.
+
 ### Checkpoint 2026-05-16 — restore mind spider viewer-only render gating
 
 Статус: частично продвинут.
