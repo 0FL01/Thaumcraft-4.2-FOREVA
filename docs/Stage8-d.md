@@ -909,6 +909,38 @@ Some entities may be hard to trigger naturally until recipes/research/spawn cont
 
 - Это baseline по texture/scale/layer wiring; full reference parity для thaumic slime renderer behavior (оригинальная двухмодельная render-pass конфигурация и GL normalize/blend нюансы) остаётся открытой по GAP-3/GAP-4/GAP-6.
 
+### Checkpoint 2026-05-16 — taint spore trio dedicated renderer baseline
+
+Статус: частично продвинут.
+
+Почему grouped в один commit:
+
+- `EntityTaintSpore`, `EntityTaintSporeSwarmer`, `EntityTaintSwarm` образуют единый tightly-coupled taint-spore rendering cluster (общий texture contract и соседние registration paths в одном участке `ClientProxy.setupEntityRenderers()`), поэтому зафиксированы одним checkpoint.
+
+Что сделано:
+
+- Добавлены выделенные renderer-классы:
+  - `RenderTaintSpore`;
+  - `RenderTaintSporeSwarmer`;
+  - `RenderTaintSwarm` (dedicated noop baseline, как reference-shaped no-render class).
+- `ClientProxy.setupEntityRenderers()` обновлен:
+  - `EntityTaintSpore -> RenderTaintSpore::new`;
+  - `EntityTaintSporeSwarmer -> RenderTaintSporeSwarmer::new`;
+  - `EntityTaintSwarm -> RenderTaintSwarm::new`.
+- Baseline behavior:
+  - `RenderTaintSpore` использует `textures/models/taint_spore.png` и display-size scale callback (`displaySize`/`getSporeSize`);
+  - `RenderTaintSporeSwarmer` использует dedicated `taint_spore.png` texture baseline;
+  - `RenderTaintSwarm` выделен в dedicated noop renderer для explicit contract parity.
+- `ClientProxyEntityRendererRegistrationStaticGuardTest` расширен проверками explicit registration paths и renderer contracts для trio.
+
+Проверки:
+
+- `./scripts/dev.sh validate --smoke` — passed.
+
+Ограничения:
+
+- Это baseline по renderer identity/texture/scale; full reference parity для оригинальных custom model/render-pass деталей trio остаётся открытой по GAP-3/GAP-4/GAP-6.
+
 - [ ] Add client-only entity renderer registration hook.
 - [ ] Register every entity from `ConfigEntities.ENTITIES` with a custom or vanilla-equivalent renderer.
 - [ ] Port item-like/transient/projectile renderers.

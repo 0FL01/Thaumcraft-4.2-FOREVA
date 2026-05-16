@@ -67,6 +67,9 @@ import thaumcraft.client.renderers.entity.RenderThaumicSlime;
 import thaumcraft.client.renderers.entity.RenderEldritchCrab;
 import thaumcraft.client.renderers.entity.RenderNoop;
 import thaumcraft.client.renderers.entity.RenderPech;
+import thaumcraft.client.renderers.entity.RenderTaintSpore;
+import thaumcraft.client.renderers.entity.RenderTaintSporeSwarmer;
+import thaumcraft.client.renderers.entity.RenderTaintSwarm;
 import thaumcraft.client.renderers.entity.RenderTravelingTrunk;
 import thaumcraft.client.renderers.entity.RenderWisp;
 import thaumcraft.client.lib.ClientTickEventsFML;
@@ -242,12 +245,9 @@ public class ClientProxy extends CommonProxy {
         registerEntityRenderer(EntityEldritchGolem.class, RenderEldritchGolem::new, registered);
         registerEntityRenderer(EntityEldritchCrab.class, RenderEldritchCrab::new, registered);
         registerEntityRenderer(EntityThaumicSlime.class, RenderThaumicSlime::new, registered);
-        registerEntityRenderer(EntityTaintSpore.class, manager -> new RenderFallbackBiped<>(
-                manager, new ModelBiped(), 0.4F, new ResourceLocation("thaumcraft", "textures/models/taint_spore.png")), registered);
-        registerEntityRenderer(EntityTaintSporeSwarmer.class, manager -> new RenderFallbackBiped<>(
-                manager, new ModelBiped(), 0.3F, new ResourceLocation("thaumcraft", "textures/models/taint_spore.png")), registered);
-        registerEntityRenderer(EntityTaintSwarm.class, manager -> new RenderFallbackBiped<>(
-                manager, new ModelBiped(), 0.3F, new ResourceLocation("thaumcraft", "textures/models/taint_spore.png")), registered);
+        registerEntityRenderer(EntityTaintSpore.class, RenderTaintSpore::new, registered);
+        registerEntityRenderer(EntityTaintSporeSwarmer.class, RenderTaintSporeSwarmer::new, registered);
+        registerEntityRenderer(EntityTaintSwarm.class, RenderTaintSwarm::new, registered);
         registerEntityRenderer(EntityTaintacle.class, manager -> new RenderFallbackLiving<>(
                 manager, new ModelSpider(), 0.6F, new ResourceLocation("thaumcraft", "textures/models/taintacle.png")), registered);
         registerEntityRenderer(EntityTaintacleSmall.class, manager -> new RenderFallbackLiving<>(

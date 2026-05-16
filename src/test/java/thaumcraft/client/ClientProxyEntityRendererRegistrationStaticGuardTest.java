@@ -65,9 +65,9 @@ public class ClientProxyEntityRendererRegistrationStaticGuardTest {
                         && source.contains("registerEntityRenderer(EntityEldritchGolem.class, RenderEldritchGolem::new, registered);")
                         && source.contains("registerEntityRenderer(EntityEldritchCrab.class, RenderEldritchCrab::new, registered);")
                         && source.contains("registerEntityRenderer(EntityThaumicSlime.class, RenderThaumicSlime::new, registered);")
-                        && source.contains("registerEntityRenderer(EntityTaintSpore.class, manager -> new RenderFallbackBiped<>(")
-                        && source.contains("registerEntityRenderer(EntityTaintSporeSwarmer.class, manager -> new RenderFallbackBiped<>(")
-                        && source.contains("registerEntityRenderer(EntityTaintSwarm.class, manager -> new RenderFallbackBiped<>(")
+                        && source.contains("registerEntityRenderer(EntityTaintSpore.class, RenderTaintSpore::new, registered);")
+                        && source.contains("registerEntityRenderer(EntityTaintSporeSwarmer.class, RenderTaintSporeSwarmer::new, registered);")
+                        && source.contains("registerEntityRenderer(EntityTaintSwarm.class, RenderTaintSwarm::new, registered);")
                         && source.contains("registerEntityRenderer(EntityTaintacle.class, manager -> new RenderFallbackLiving<>(")
                         && source.contains("registerEntityRenderer(EntityTaintacleSmall.class, manager -> new RenderFallbackLiving<>(")
                         && source.contains("registerEntityRenderer(EntityTaintacleGiant.class, manager -> new RenderFallbackLiving<>("));
@@ -135,6 +135,19 @@ public class ClientProxyEntityRendererRegistrationStaticGuardTest {
                         && thaumicSlimeRenderer.contains("entity.field_70811_b")
                         && thaumicSlimeRenderer.contains("class SlimeGelLayer")
                         && thaumicSlimeRenderer.contains("this.addLayer(new SlimeGelLayer())"));
+        String taintSporeRenderer = readFile("src/main/java/thaumcraft/client/renderers/entity/RenderTaintSpore.java");
+        assertTrue("RenderTaintSpore must provide taint spore texture and display-size scale baseline",
+                taintSporeRenderer.contains("extends RenderLiving<EntityTaintSpore>")
+                        && taintSporeRenderer.contains("textures/models/taint_spore.png")
+                        && taintSporeRenderer.contains("entity.displaySize")
+                        && taintSporeRenderer.contains("entity.getSporeSize()"));
+        String taintSporeSwarmerRenderer = readFile("src/main/java/thaumcraft/client/renderers/entity/RenderTaintSporeSwarmer.java");
+        assertTrue("RenderTaintSporeSwarmer must provide dedicated taint spore texture baseline",
+                taintSporeSwarmerRenderer.contains("extends RenderLiving<EntityTaintSporeSwarmer>")
+                        && taintSporeSwarmerRenderer.contains("textures/models/taint_spore.png"));
+        String taintSwarmRenderer = readFile("src/main/java/thaumcraft/client/renderers/entity/RenderTaintSwarm.java");
+        assertTrue("RenderTaintSwarm must stay as dedicated noop baseline renderer",
+                taintSwarmRenderer.contains("extends RenderNoop<EntityTaintSwarm>"));
         String trunkRenderer = readFile("src/main/java/thaumcraft/client/renderers/entity/RenderTravelingTrunk.java");
         assertTrue("RenderTravelingTrunk must provide anger-based texture routing baseline",
                 trunkRenderer.contains("extends RenderLiving<EntityTravelingTrunk>")
