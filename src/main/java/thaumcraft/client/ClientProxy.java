@@ -77,6 +77,7 @@ import thaumcraft.client.renderers.entity.RenderTaintSwarm;
 import thaumcraft.client.renderers.entity.RenderTaintacle;
 import thaumcraft.client.renderers.entity.RenderTravelingTrunk;
 import thaumcraft.client.renderers.entity.RenderWisp;
+import thaumcraft.client.renderers.entity.RenderCultist;
 import thaumcraft.client.lib.ClientTickEventsFML;
 import thaumcraft.client.lib.KeyHandler;
 import thaumcraft.client.lib.RenderEventHandler;
@@ -236,12 +237,9 @@ public class ClientProxy extends CommonProxy {
                 manager, new ModelVillager(0.0F), 0.5F, new ResourceLocation("thaumcraft", "textures/models/villager.png")), registered);
         registerEntityRenderer(EntityTaintCreeper.class, manager -> new RenderFallbackLiving<>(
                 manager, new ModelCreeper(), 0.5F, new ResourceLocation("thaumcraft", "textures/models/creeper.png")), registered);
-        registerEntityRenderer(EntityCultistKnight.class, manager -> new RenderFallbackBiped<>(
-                manager, new ModelBiped(), 0.5F, new ResourceLocation("thaumcraft", "textures/models/cultist.png")), registered);
-        registerEntityRenderer(EntityCultistCleric.class, manager -> new RenderFallbackBiped<>(
-                manager, new ModelBiped(), 0.5F, new ResourceLocation("thaumcraft", "textures/models/cultist.png")), registered);
-        registerEntityRenderer(EntityCultistLeader.class, manager -> new RenderFallbackBiped<>(
-                manager, new ModelBiped(), 0.6F, new ResourceLocation("thaumcraft", "textures/models/cultist.png")), registered);
+        registerEntityRenderer(EntityCultistKnight.class, manager -> new RenderCultist<>(manager, 0.5F), registered);
+        registerEntityRenderer(EntityCultistCleric.class, manager -> new RenderCultist<>(manager, 0.5F), registered);
+        registerEntityRenderer(EntityCultistLeader.class, manager -> new RenderCultist<>(manager, 0.6F), registered);
         registerEntityRenderer(EntityFireBat.class, RenderFireBat::new, registered);
         registerEntityRenderer(EntityWisp.class, RenderWisp::new, registered);
         registerEntityRenderer(EntityPech.class, RenderPech::new, registered);

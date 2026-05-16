@@ -1026,6 +1026,34 @@ Some entities may be hard to trigger naturally until recipes/research/spawn cont
 
 - Это baseline по texture/eyes-layer/scale; full reference parity для spider-specific behavior (mind-spider viewer-only visibility semantics и точные reference GL/lightmap нюансы) остаётся открытой по GAP-3/GAP-6.
 
+### Checkpoint 2026-05-16 — cultist trio dedicated renderer baseline
+
+Статус: частично продвинут.
+
+Почему grouped в один commit:
+
+- `EntityCultistKnight`, `EntityCultistCleric`, `EntityCultistLeader` составляют tightly-coupled cultist-rendering group с общим texture contract (`cultist.png`) и одинаковой renderer base class, поэтому закрыты одним checkpoint.
+
+Что сделано:
+
+- Добавлен shared dedicated renderer `RenderCultist<T extends EntityLiving>`.
+- `ClientProxy.setupEntityRenderers()` обновлен:
+  - `EntityCultistKnight -> new RenderCultist<>(..., 0.5F)`;
+  - `EntityCultistCleric -> new RenderCultist<>(..., 0.5F)`;
+  - `EntityCultistLeader -> new RenderCultist<>(..., 0.6F)`.
+- Baseline behavior:
+  - shared texture `textures/models/cultist.png`;
+  - пер-entity shadow профили сохранены по предыдущему baseline.
+- `ClientProxyEntityRendererRegistrationStaticGuardTest` расширен проверками cultist registration paths и texture contract `RenderCultist`.
+
+Проверки:
+
+- `./scripts/dev.sh validate --smoke` — passed.
+
+Ограничения:
+
+- Это texture/identity baseline; full reference parity для cultist renderer behavior (leader/cleric specific visual nuances, potential special overlays/held-item pose details) остаётся открытой по GAP-3/GAP-6.
+
 - [ ] Add client-only entity renderer registration hook.
 - [ ] Register every entity from `ConfigEntities.ENTITIES` with a custom or vanilla-equivalent renderer.
 - [ ] Port item-like/transient/projectile renderers.

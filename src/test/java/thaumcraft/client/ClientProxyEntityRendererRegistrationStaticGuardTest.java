@@ -53,9 +53,9 @@ public class ClientProxyEntityRendererRegistrationStaticGuardTest {
                         && source.contains("registerEntityRenderer(EntityTaintVillager.class, manager -> new RenderFallbackLiving<>(")
                         && source.contains("registerEntityRenderer(EntityTaintCreeper.class, manager -> new RenderFallbackLiving<>("));
         assertTrue("ClientProxy must keep fallback RenderFallbackBiped registrations for cultist entities",
-                source.contains("registerEntityRenderer(EntityCultistKnight.class, manager -> new RenderFallbackBiped<>(")
-                        && source.contains("registerEntityRenderer(EntityCultistCleric.class, manager -> new RenderFallbackBiped<>(")
-                        && source.contains("registerEntityRenderer(EntityCultistLeader.class, manager -> new RenderFallbackBiped<>("));
+                source.contains("registerEntityRenderer(EntityCultistKnight.class, manager -> new RenderCultist<>(manager, 0.5F), registered);")
+                        && source.contains("registerEntityRenderer(EntityCultistCleric.class, manager -> new RenderCultist<>(manager, 0.5F), registered);")
+                        && source.contains("registerEntityRenderer(EntityCultistLeader.class, manager -> new RenderCultist<>(manager, 0.6F), registered);"));
         assertTrue("ClientProxy must keep extended fallback registrations for the remaining Stage 8-d monster baseline",
                 source.contains("registerEntityRenderer(EntityFireBat.class, RenderFireBat::new, registered);")
                         && source.contains("registerEntityRenderer(EntityWisp.class, RenderWisp::new, registered);")
@@ -176,6 +176,10 @@ public class ClientProxyEntityRendererRegistrationStaticGuardTest {
                         && taintSpiderRenderer.contains("textures/models/taint_spider_eyes.png")
                         && taintSpiderRenderer.contains("this.addLayer(new SpiderEyesLayer())")
                         && taintSpiderRenderer.contains("scale * 1.25F"));
+        String cultistRenderer = readFile("src/main/java/thaumcraft/client/renderers/entity/RenderCultist.java");
+        assertTrue("RenderCultist must provide shared cultist texture baseline",
+                cultistRenderer.contains("extends RenderBiped<T>")
+                        && cultistRenderer.contains("textures/models/cultist.png"));
         String trunkRenderer = readFile("src/main/java/thaumcraft/client/renderers/entity/RenderTravelingTrunk.java");
         assertTrue("RenderTravelingTrunk must provide anger-based texture routing baseline",
                 trunkRenderer.contains("extends RenderLiving<EntityTravelingTrunk>")
