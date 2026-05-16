@@ -59,6 +59,8 @@ import thaumcraft.client.renderers.entity.RenderFallbackBiped;
 import thaumcraft.client.renderers.entity.RenderFallbackLiving;
 import thaumcraft.client.renderers.entity.RenderFireBat;
 import thaumcraft.client.renderers.entity.RenderGolemBase;
+import thaumcraft.client.renderers.entity.RenderEldritchGuardian;
+import thaumcraft.client.renderers.entity.RenderEldritchWarden;
 import thaumcraft.client.renderers.entity.RenderNoop;
 import thaumcraft.client.renderers.entity.RenderPech;
 import thaumcraft.client.renderers.entity.RenderTravelingTrunk;
@@ -231,10 +233,8 @@ public class ClientProxy extends CommonProxy {
         registerEntityRenderer(EntityFireBat.class, RenderFireBat::new, registered);
         registerEntityRenderer(EntityWisp.class, RenderWisp::new, registered);
         registerEntityRenderer(EntityPech.class, RenderPech::new, registered);
-        registerEntityRenderer(EntityEldritchGuardian.class, manager -> new RenderFallbackBiped<>(
-                manager, new ModelBiped(), 0.6F, new ResourceLocation("thaumcraft", "textures/models/eldritch_guardian.png")), registered);
-        registerEntityRenderer(EntityEldritchWarden.class, manager -> new RenderFallbackBiped<>(
-                manager, new ModelBiped(), 0.8F, new ResourceLocation("thaumcraft", "textures/models/eldritch_warden.png")), registered);
+        registerEntityRenderer(EntityEldritchGuardian.class, RenderEldritchGuardian::new, registered);
+        registerEntityRenderer(EntityEldritchWarden.class, RenderEldritchWarden::new, registered);
         registerEntityRenderer(EntityEldritchGolem.class, manager -> new RenderFallbackBiped<>(
                 manager, new ModelBiped(), 0.9F, new ResourceLocation("thaumcraft", "textures/models/eldritch_golem.png")), registered);
         registerEntityRenderer(EntityEldritchCrab.class, manager -> new RenderFallbackLiving<>(

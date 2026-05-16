@@ -60,8 +60,8 @@ public class ClientProxyEntityRendererRegistrationStaticGuardTest {
                 source.contains("registerEntityRenderer(EntityFireBat.class, RenderFireBat::new, registered);")
                         && source.contains("registerEntityRenderer(EntityWisp.class, RenderWisp::new, registered);")
                         && source.contains("registerEntityRenderer(EntityPech.class, RenderPech::new, registered);")
-                        && source.contains("registerEntityRenderer(EntityEldritchGuardian.class, manager -> new RenderFallbackBiped<>(")
-                        && source.contains("registerEntityRenderer(EntityEldritchWarden.class, manager -> new RenderFallbackBiped<>(")
+                        && source.contains("registerEntityRenderer(EntityEldritchGuardian.class, RenderEldritchGuardian::new, registered);")
+                        && source.contains("registerEntityRenderer(EntityEldritchWarden.class, RenderEldritchWarden::new, registered);")
                         && source.contains("registerEntityRenderer(EntityEldritchGolem.class, manager -> new RenderFallbackBiped<>(")
                         && source.contains("registerEntityRenderer(EntityEldritchCrab.class, manager -> new RenderFallbackLiving<>(")
                         && source.contains("registerEntityRenderer(EntityThaumicSlime.class, manager -> new RenderFallbackBiped<>(")
@@ -101,6 +101,15 @@ public class ClientProxyEntityRendererRegistrationStaticGuardTest {
                         && wispRenderer.contains("Aspect.getAspect(entity.getWispType())")
                         && wispRenderer.contains("GlStateManager.color(red, green, blue, 1.0F)")
                         && wispRenderer.contains("GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F)"));
+        String eldritchGuardianRenderer = readFile("src/main/java/thaumcraft/client/renderers/entity/RenderEldritchGuardian.java");
+        assertTrue("RenderEldritchGuardian must provide dedicated guardian texture baseline",
+                eldritchGuardianRenderer.contains("extends RenderBiped<EntityEldritchGuardian>")
+                        && eldritchGuardianRenderer.contains("textures/models/eldritch_guardian.png"));
+        String eldritchWardenRenderer = readFile("src/main/java/thaumcraft/client/renderers/entity/RenderEldritchWarden.java");
+        assertTrue("RenderEldritchWarden must provide dedicated warden texture and scale baseline",
+                eldritchWardenRenderer.contains("extends RenderBiped<EntityEldritchWarden>")
+                        && eldritchWardenRenderer.contains("textures/models/eldritch_warden.png")
+                        && eldritchWardenRenderer.contains("GlStateManager.scale(1.5F, 1.5F, 1.5F)"));
         String trunkRenderer = readFile("src/main/java/thaumcraft/client/renderers/entity/RenderTravelingTrunk.java");
         assertTrue("RenderTravelingTrunk must provide anger-based texture routing baseline",
                 trunkRenderer.contains("extends RenderLiving<EntityTravelingTrunk>")

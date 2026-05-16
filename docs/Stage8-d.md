@@ -792,6 +792,31 @@ Some entities may be hard to trigger naturally until recipes/research/spawn cont
 
 - Это color/texture baseline; full reference parity для `RenderWisp` (custom sprite layers/additive passes/GL behavior) остаётся открытой по GAP-3/GAP-6.
 
+### Checkpoint 2026-05-16 — dedicated eldritch guardian/warden renderer baseline
+
+Статус: частично продвинут.
+
+Что сделано:
+
+- Добавлены выделенные renderer-классы:
+  - `RenderEldritchGuardian` (`thaumcraft.client.renderers.entity.RenderEldritchGuardian`);
+  - `RenderEldritchWarden` (`thaumcraft.client.renderers.entity.RenderEldritchWarden`).
+- `ClientProxy.setupEntityRenderers()` обновлен:
+  - `EntityEldritchGuardian` теперь регистрируется через `RenderEldritchGuardian::new`;
+  - `EntityEldritchWarden` теперь регистрируется через `RenderEldritchWarden::new`.
+- Baseline behavior:
+  - `RenderEldritchGuardian` использует dedicated texture `textures/models/eldritch_guardian.png`;
+  - `RenderEldritchWarden` использует dedicated texture `textures/models/eldritch_warden.png` и baseline масштаб `1.5x` (reference-shaped warden size differentiation).
+- `ClientProxyEntityRendererRegistrationStaticGuardTest` расширен проверками explicit registrations и renderer contracts для обоих классов.
+
+Проверки:
+
+- `./scripts/dev.sh validate --smoke` — passed.
+
+Ограничения:
+
+- Это renderer identity/texture/scale baseline; full reference parity для guardian/warden render behavior (alpha/blend distance behavior, spawn-lift visuals, custom model animation nuances) остаётся открытой по GAP-3/GAP-4/GAP-6.
+
 - [ ] Add client-only entity renderer registration hook.
 - [ ] Register every entity from `ConfigEntities.ENTITIES` with a custom or vanilla-equivalent renderer.
 - [ ] Port item-like/transient/projectile renderers.
