@@ -142,6 +142,26 @@ Dependency: Forge 1.12.2 rendering lifecycle must be used correctly. Some refere
 
 Current source tree has no `thaumcraft.client.renderers.tile`, no `thaumcraft.client.renderers.block`, and no TESR model classes. Reference Stage 8-c uses many renderer/model classes, including `TileJarRenderer`, `TileAlembicRenderer`, `TileCrucibleRenderer`, `TileRunicMatrixRenderer`, `TileArcaneBoreRenderer`, `TileThaumatoriumRenderer`, `TileFocalManipulatorRenderer`, `TileNodeRenderer`, `TileHoleRenderer`, `TileWardedRenderer`, `TileBannerRenderer`, plus model classes such as `ModelJar`, `ModelBrain`, `ModelBore`, `ModelBoreBase`, `ModelBoreEmit`, `ModelCube`, `ModelArcaneWorkbench`, `ModelBanner`.
 
+### Checkpoint 2026-05-16 — magical leaves model/render baseline
+
+Статус: частично продвинут.
+
+Что сделано:
+
+- Revalidated existing magical leaves baseline from commit `e210acd`:
+  - `BlockMagicalLeaves#getRenderLayer() -> CUTOUT_MIPPED`
+  - `BlockMagicalLeavesItem#getMetadata() -> damage & 1`
+  - presence of `blockmagicalleaves` blockstate/model files and greatwood/silverwood leaf textures.
+- Добавлен `BlockMagicalLeavesRenderContractTest`, фиксирующий эти render-layer/metadata contracts и наличие required asset paths для защиты от regressions.
+
+Проверки:
+
+- `./scripts/dev.sh validate --smoke` — passed.
+
+Ограничения:
+
+- Этот checkpoint добавляет coverage guard и не закрывает основной TESR backlog Stage 8-c (jar/crucible/alembic/infusion/nodes/etc.).
+
 **Что нужно доделать:**
 
 Port or reimplement the renderer/model classes required by Stage 8-c, preserving original visual behavior where feasible and adapting OpenGL/Tessellator/model APIs to 1.12.2.
