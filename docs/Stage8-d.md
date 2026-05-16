@@ -1323,6 +1323,29 @@ Some entities may be hard to trigger naturally until recipes/research/spawn cont
 
 - Это baseline AI/timer sync; полная parity по taint sheep behaviour (включая возможные дополнительные 1.7 spawn/interaction nuances) остаётся открытой и закрывается отдельными checkpoint’ами.
 
+### Checkpoint 2026-05-16 — taint creeper armor-charge layer baseline
+
+Статус: частично продвинут.
+
+Что сделано:
+
+- `RenderTaintCreeper` расширен charge/armor overlay pass baseline:
+  - добавлен `CreeperArmorLayer` с additive blend и texture-matrix scroll profile;
+  - добавлен armor texture path `textures/entity/creeper/creeper_armor.png` (vanilla overlay resource);
+  - renderer теперь добавляет layer через `this.addLayer(new CreeperArmorLayer(this))`.
+- `EntityTaintCreeper` расширен accessor `getPowered()` для layer-gating (`entity.getPowered()`).
+- `ClientProxyEntityRendererRegistrationStaticGuardTest` расширен проверками:
+  - armor texture + layer wiring contracts в `RenderTaintCreeper`;
+  - `EntityTaintCreeper#getPowered()` contract.
+
+Проверки:
+
+- `./scripts/dev.sh validate --smoke` — passed.
+
+Ограничения:
+
+- Это armor-layer baseline; полная parity по taint creeper visual stack (точные legacy lightmap/intensity нюансы и powered-state acquisition path) остаётся открытой по GAP-3/GAP-6.
+
 - [ ] Add client-only entity renderer registration hook.
 - [ ] Register every entity from `ConfigEntities.ENTITIES` with a custom or vanilla-equivalent renderer.
 - [ ] Port item-like/transient/projectile renderers.

@@ -182,9 +182,13 @@ public class ClientProxyEntityRendererRegistrationStaticGuardTest {
         assertTrue("RenderTaintCreeper must provide creeper texture plus flash scale/color multiplier baseline",
                 taintCreeperRenderer.contains("extends RenderLiving<EntityTaintCreeper>")
                         && taintCreeperRenderer.contains("textures/models/creeper.png")
+                        && taintCreeperRenderer.contains("textures/entity/creeper/creeper_armor.png")
                         && taintCreeperRenderer.contains("getCreeperFlashIntensity")
                         && taintCreeperRenderer.contains("preRenderCallback")
-                        && taintCreeperRenderer.contains("getColorMultiplier"));
+                        && taintCreeperRenderer.contains("getColorMultiplier")
+                        && taintCreeperRenderer.contains("class CreeperArmorLayer")
+                        && taintCreeperRenderer.contains("this.addLayer(new CreeperArmorLayer(this))")
+                        && taintCreeperRenderer.contains("entity.getPowered()"));
         String taintVillagerRenderer = readFile("src/main/java/thaumcraft/client/renderers/entity/RenderTaintVillager.java");
         assertTrue("RenderTaintVillager must provide villager texture and pre-render scale baseline",
                 taintVillagerRenderer.contains("extends RenderLiving<EntityTaintVillager>")
@@ -256,8 +260,10 @@ public class ClientProxyEntityRendererRegistrationStaticGuardTest {
         assertTrue("EntityTravelingTrunk must expose anger accessor for renderer texture routing",
                 travelingTrunkEntity.contains("public int getAnger()"));
         String taintCreeperEntity = readFile("src/main/java/thaumcraft/common/entities/monster/EntityTaintCreeper.java");
-        assertTrue("EntityTaintCreeper must expose flash intensity accessor for renderer scale/color timing",
+        assertTrue("EntityTaintCreeper must expose flash and powered accessors for renderer timing/layer paths",
                 taintCreeperEntity.contains("public float getCreeperFlashIntensity(float partialTicks)"));
+        assertTrue("EntityTaintCreeper must expose powered accessor for armor-layer rendering",
+                taintCreeperEntity.contains("public boolean getPowered()"));
         String taintSheepEntity = readFile("src/main/java/thaumcraft/common/entities/monster/EntityTaintSheep.java");
         assertTrue("EntityTaintSheep must keep sheared-state data/NBT/shearing contracts for fur-layer renderer parity",
                 taintSheepEntity.contains("DataParameter<Byte>")
