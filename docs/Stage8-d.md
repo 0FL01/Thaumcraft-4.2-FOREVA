@@ -1270,6 +1270,35 @@ Some entities may be hard to trigger naturally until recipes/research/spawn cont
 
 - Это sheared-state baseline; полная parity по taint sheep AI/animation/FX деталям остаётся открытой по GAP-3/GAP-6 и закрывается отдельными checkpoint’ами.
 
+### Checkpoint 2026-05-16 — harden taint sheep model safety (no vanilla sheep cast)
+
+Статус: частично продвинут.
+
+Что сделано:
+
+- Для `RenderTaintSheep` добавлены dedicated модели без vanilla-cast риска:
+  - `ModelTaintSheep1` (fur layer model);
+  - `ModelTaintSheep2` (base model).
+- `RenderTaintSheep` переведен с vanilla `ModelSheep1/ModelSheep2` на `ModelTaintSheep1/ModelTaintSheep2`.
+- Новые модели используют `instanceof EntityTaintSheep` + hooks `getHeadRotationPointY(...)`/`getHeadRotationAngleX(...)`, а не прямой cast к `EntitySheep`.
+- `EntityTaintSheep` расширен head-animation baseline:
+  - `sheepTimer`;
+  - `handleStatusUpdate((byte)10)` timer trigger;
+  - `onLivingUpdate` client-side timer decay;
+  - `getHeadRotationPointY(...)` / `getHeadRotationAngleX(...)` reference-shaped animation profile.
+- `ClientProxyEntityRendererRegistrationStaticGuardTest` расширен проверками:
+  - `RenderTaintSheep` model wiring;
+  - `ModelTaintSheep1/2` taint-hook contracts;
+  - `EntityTaintSheep` animation hook/timer contracts.
+
+Проверки:
+
+- `./scripts/dev.sh validate --smoke` — passed.
+
+Ограничения:
+
+- Это runtime-safety + animation baseline; полная parity по taint sheep AI/FX workflow (например grass-convert timer source) остаётся открытой по GAP-3/GAP-6.
+
 - [ ] Add client-only entity renderer registration hook.
 - [ ] Register every entity from `ConfigEntities.ENTITIES` with a custom or vanilla-equivalent renderer.
 - [ ] Port item-like/transient/projectile renderers.

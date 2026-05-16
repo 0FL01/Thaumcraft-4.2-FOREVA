@@ -215,7 +215,21 @@ public class ClientProxyEntityRendererRegistrationStaticGuardTest {
                         && taintSheepRenderer.contains("textures/models/sheep_fur.png")
                         && taintSheepRenderer.contains("class SheepFurLayer")
                         && taintSheepRenderer.contains("this.addLayer(new SheepFurLayer(this))")
-                        && taintSheepRenderer.contains("entity.getSheared()"));
+                        && taintSheepRenderer.contains("entity.getSheared()")
+                        && taintSheepRenderer.contains("ModelTaintSheep1")
+                        && taintSheepRenderer.contains("ModelTaintSheep2"));
+        String taintSheepModel1 = readFile("src/main/java/thaumcraft/client/renderers/models/entities/ModelTaintSheep1.java");
+        assertTrue("ModelTaintSheep1 must avoid vanilla EntitySheep cast and use taint sheep head animation hooks",
+                taintSheepModel1.contains("extends ModelQuadruped")
+                        && taintSheepModel1.contains("instanceof EntityTaintSheep")
+                        && taintSheepModel1.contains("getHeadRotationPointY")
+                        && taintSheepModel1.contains("getHeadRotationAngleX"));
+        String taintSheepModel2 = readFile("src/main/java/thaumcraft/client/renderers/models/entities/ModelTaintSheep2.java");
+        assertTrue("ModelTaintSheep2 must avoid vanilla EntitySheep cast and use taint sheep head animation hooks",
+                taintSheepModel2.contains("extends ModelQuadruped")
+                        && taintSheepModel2.contains("instanceof EntityTaintSheep")
+                        && taintSheepModel2.contains("getHeadRotationPointY")
+                        && taintSheepModel2.contains("getHeadRotationAngleX"));
         String cultistRenderer = readFile("src/main/java/thaumcraft/client/renderers/entity/RenderCultist.java");
         assertTrue("RenderCultist must provide shared cultist texture baseline",
                 cultistRenderer.contains("extends RenderBiped<T>")
@@ -248,7 +262,11 @@ public class ClientProxyEntityRendererRegistrationStaticGuardTest {
         assertTrue("EntityTaintSheep must keep sheared-state data/NBT/shearing contracts for fur-layer renderer parity",
                 taintSheepEntity.contains("DataParameter<Byte>")
                         && taintSheepEntity.contains("SHEEP_FLAGS")
+                        && taintSheepEntity.contains("sheepTimer")
                         && taintSheepEntity.contains("entityInit()")
+                        && taintSheepEntity.contains("handleStatusUpdate(byte id)")
+                        && taintSheepEntity.contains("getHeadRotationPointY(float partialTicks)")
+                        && taintSheepEntity.contains("getHeadRotationAngleX(float partialTicks)")
                         && taintSheepEntity.contains("public boolean getSheared()")
                         && taintSheepEntity.contains("public void setSheared(boolean sheared)")
                         && taintSheepEntity.contains("return !this.getSheared();")

@@ -6,9 +6,11 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.EntityDataManager;
+import net.minecraft.util.math.MathHelper;
 
 public class EntityTaintSheep extends net.minecraft.entity.monster.EntityMob implements thaumcraft.api.entities.ITaintedMob, net.minecraftforge.common.IShearable {
     private static final DataParameter<Byte> SHEEP_FLAGS = EntityDataManager.createKey(EntityTaintSheep.class, DataSerializers.BYTE);
+    private int sheepTimer;
 
     public EntityTaintSheep(net.minecraft.world.World world) {
         super(world);
@@ -68,6 +70,44 @@ public class EntityTaintSheep extends net.minecraft.entity.monster.EntityMob imp
     public void readEntityFromNBT(NBTTagCompound nbt) {
         super.readEntityFromNBT(nbt);
         this.setSheared(nbt.getBoolean("Sheared"));
+    }
+
+    @Override
+    public void onLivingUpdate() {
+        if (this.world.isRemote) {
+            this.sheepTimer = Math.max(0, this.sheepTimer - 1);
+        }
+        super.onLivingUpdate();
+    }
+
+    @Override
+    public void handleStatusUpdate(byte id) {
+        if (id == 10) {
+            this.sheepTimer = 40;
+            return;
+        }
+        super.handleStatusUpdate(id);
+    }
+
+    public float getHeadRotationPointY(float partialTicks) {
+        if (this.sheepTimer <= 0) {
+            return 0.0F;
+        }
+        if (this.sheepTimer >= 4 && this.sheepTimer <= 36) {
+            return 1.0F;
+        }
+        if (this.sheepTimer < 4) {
+            return ((float) this.sheepTimer - partialTicks) / 4.0F;
+        }
+        return -((float) (this.sheepTimer - 40) - partialTicks) / 4.0F;
+    }
+
+    public float getHeadRotationAngleX(float partialTicks) {
+        if (this.sheepTimer > 4 && this.sheepTimer <= 36) {
+            float phase = ((float) (this.sheepTimer - 4) - partialTicks) / 32.0F;
+            return 0.62831855F + 0.2199115F * MathHelper.sin(phase * 28.7F);
+        }
+        return this.sheepTimer > 0 ? 0.62831855F : this.rotationPitch * 0.017453292F;
     }
 
     @Override protected net.minecraft.util.SoundEvent getAmbientSound() { return net.minecraft.init.SoundEvents.ENTITY_SHEEP_AMBIENT; }
