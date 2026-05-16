@@ -106,7 +106,7 @@ public class BlockCustomPlant extends BlockBush {
         }
     }
 
-    private void growGreatTree(World world, BlockPos pos, Random rand) {
+    public void growGreatTree(World world, BlockPos pos, Random rand) {
         if (world == null || world.provider == null) return;
         if (world.isRemote) return;
         world.setBlockToAir(pos);
@@ -116,7 +116,7 @@ public class BlockCustomPlant extends BlockBush {
         }
     }
 
-    private void growSilverTree(World world, BlockPos pos, Random rand) {
+    public void growSilverTree(World world, BlockPos pos, Random rand) {
         if (world == null || world.provider == null) return;
         if (world.isRemote) return;
         world.setBlockToAir(pos);

@@ -1391,6 +1391,28 @@ Depends on GAP-1 and GAP-3. Some infusion source scenarios may require Stage 9 c
 
 - Это server/common baseline без ручной gameplay/client visual parity проверки; точная parity для legacy `smokeSpiral(...)` visual path и pre-1.9 melee internals остаётся открытой до отдельного client/manual checkpoint.
 
+#### Checkpoint 2026-05-17 — GAP-11 elemental-hoe till/bonemeal/tree-growth baseline
+
+Статус: частично продвинут.
+
+Что сделано:
+
+- `ItemElementalHoe` больше не stub:
+  - восстановлены enchantability/rarity/thaumium-repair контракты (`5`, `RARE`, `itemResource:2`);
+  - восстановлен reference-shaped non-sneak `3x3` till baseline через `super.onItemUse(...)` sweep и `Thaumcraft.proxy.blockSparkle(...)`;
+  - восстановлен fallback-путь bonemeal применения на target-pos с durability/sparkle/sound feedback;
+  - восстановлен custom-sapling growth baseline для `blockCustomPlant` meta `0/1` (`growGreatTree`/`growSilverTree`) с reference-shaped durability thresholds/costs.
+- `BlockCustomPlant.growGreatTree(...)` и `growSilverTree(...)` открыты как `public` для соответствия call-surface референса.
+- Добавлен `ItemElementalHoeStaticGuardTest` для фиксации этих контрактов.
+
+Проверки:
+
+- `./scripts/dev.sh validate --smoke` — passed.
+
+Ограничения:
+
+- Bonemeal path реализован через `ItemDye.applyBonemeal(...)` (1.12-совместимый baseline) вместо отсутствующего legacy `Utils.useBonemealAtLoc(...)`; manual gameplay parity всё ещё требует отдельной проверки.
+
 ### GAP-12: FX registration exists, but send-site coverage and manual scenario validation are incomplete
 
 **Статус:** требует проверки  
