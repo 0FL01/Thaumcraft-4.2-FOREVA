@@ -1593,6 +1593,34 @@ Some entities may be hard to trigger naturally until recipes/research/spawn cont
 
 - Это common behavior baseline; полная visual parity раннего FX и runtime боевых сценариев ограничена non-GUI validation рамками.
 
+### Checkpoint 2026-05-17 — restore taint pig AI/attribute/sound/drop behavior baseline
+
+Статус: частично продвинут.
+
+Что сделано:
+
+- `EntityTaintPig` выровнен с reference-shaped common behavior contracts:
+  - восстановлены constructor size/nav/AI baselines:
+    - `setSize(0.9F, 0.9F)`;
+    - `PathNavigateGround#setCanSwim(true)` when compatible;
+    - attack/wander/watch/idle/task priorities + target priorities для player/villager/animal.
+  - восстановлены атрибуты: `MAX_HEALTH = 20.0D`, `ATTACK_DAMAGE = 4.0D`, `MOVEMENT_SPEED = 0.275D`;
+  - добавлены hooks `canBreatheUnderwater() -> true`, `canDespawn() -> false`, `getMaxSpawnedInChunk() -> 2`;
+  - восстановлен early client taint FX loop в первые `5` ticks (`particleCount(10)` + `taintLandFX(this)`);
+  - sound/drop contracts выровнены:
+    - ambient/hurt -> `SoundEvents.ENTITY_PIG_AMBIENT`;
+    - death -> `SoundEvents.ENTITY_PIG_DEATH`;
+    - resource-11 drop chance через `rand.nextInt(3) == 0`.
+- `ClientProxyEntityRendererRegistrationStaticGuardTest` расширен проверками на AI/attribute/sound/drop contracts `EntityTaintPig`.
+
+Проверки:
+
+- `./scripts/dev.sh validate --smoke` — passed.
+
+Ограничения:
+
+- Это common behavior baseline; полная visual parity раннего FX и runtime боевых сценариев ограничена non-GUI validation рамками.
+
 ### Checkpoint 2026-05-16 — restore mind spider viewer-only render gating
 
 Статус: частично продвинут.

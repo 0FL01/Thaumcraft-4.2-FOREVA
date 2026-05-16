@@ -404,6 +404,27 @@ public class ClientProxyEntityRendererRegistrationStaticGuardTest {
                         && taintCowEntity.contains("this.world.isRemote && this.ticksExisted < 5")
                         && taintCowEntity.contains("Thaumcraft.proxy.taintLandFX(this)")
                         && taintCowEntity.contains("SoundEvents.ENTITY_COW_HURT"));
+        String taintPigEntity = readFile("src/main/java/thaumcraft/common/entities/monster/EntityTaintPig.java");
+        assertTrue("EntityTaintPig must keep reference-shaped AI/attribute/sound/drop baseline contracts",
+                taintPigEntity.contains("this.setSize(0.9F, 0.9F);")
+                        && taintPigEntity.contains("PathNavigateGround")
+                        && taintPigEntity.contains("setCanSwim(true)")
+                        && taintPigEntity.contains("new AIAttackOnCollide(this, EntityPlayer.class, 1.0D, false)")
+                        && taintPigEntity.contains("new AIAttackOnCollide(this, EntityVillager.class, 1.0D, true)")
+                        && taintPigEntity.contains("new AIAttackOnCollide(this, EntityAnimal.class, 1.0D, false)")
+                        && taintPigEntity.contains("new EntityAINearestAttackableTarget(this, EntityPlayer.class, true)")
+                        && taintPigEntity.contains("new EntityAINearestAttackableTarget(this, EntityVillager.class, false)")
+                        && taintPigEntity.contains("new EntityAINearestAttackableTarget(this, EntityAnimal.class, false)")
+                        && taintPigEntity.contains("setBaseValue(20.0D)")
+                        && taintPigEntity.contains("setBaseValue(4.0D)")
+                        && taintPigEntity.contains("setBaseValue(0.275D)")
+                        && taintPigEntity.contains("public boolean canBreatheUnderwater()")
+                        && taintPigEntity.contains("protected boolean canDespawn()")
+                        && taintPigEntity.contains("public int getMaxSpawnedInChunk()")
+                        && taintPigEntity.contains("this.world.isRemote && this.ticksExisted < 5")
+                        && taintPigEntity.contains("Thaumcraft.proxy.taintLandFX(this)")
+                        && taintPigEntity.contains("SoundEvents.ENTITY_PIG_AMBIENT")
+                        && taintPigEntity.contains("this.world.rand.nextInt(3) == 0"));
         assertTrue("ClientProxy must iterate ConfigEntities.ENTITIES for renderer registration coverage",
                 source.contains("for (net.minecraftforge.fml.common.registry.EntityEntry entry : ConfigEntities.ENTITIES)"));
         assertTrue("ClientProxy must keep fallback RenderNoop registrations for remaining entities",
