@@ -13,7 +13,7 @@ public class BlockMagicalLeavesItem extends ItemBlock {
 
     @Override
     public int getMetadata(int damage) {
-        return damage | 4;
+        return damage & 1;
     }
 
     @Override

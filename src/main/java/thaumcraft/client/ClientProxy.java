@@ -62,6 +62,7 @@ import thaumcraft.client.lib.ClientTickEventsFML;
 import thaumcraft.client.lib.KeyHandler;
 import thaumcraft.client.lib.RenderEventHandler;
 import thaumcraft.common.CommonProxy;
+import thaumcraft.common.config.ConfigBlocks;
 import thaumcraft.common.config.ConfigEntities;
 import thaumcraft.common.config.ConfigItems;
 import thaumcraft.common.entities.EntityAspectOrb;
@@ -280,6 +281,16 @@ public class ClientProxy extends CommonProxy {
     }
 
     private void setupBlockRenderers() {
+        registerBlockItemModel(ConfigBlocks.blockMagicalLeavesItem, 0, "type=0");
+        registerBlockItemModel(ConfigBlocks.blockMagicalLeavesItem, 1, "type=1");
+    }
+
+    private static void registerBlockItemModel(Item item, int meta, String variant) {
+        if (item == null || item.getRegistryName() == null) {
+            return;
+        }
+        ModelLoader.setCustomModelResourceLocation(item, meta,
+                new ModelResourceLocation(item.getRegistryName(), variant));
     }
 
     private void setupTileRenderers() {
