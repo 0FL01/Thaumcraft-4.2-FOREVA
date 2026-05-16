@@ -64,7 +64,7 @@ public class ClientProxyEntityRendererRegistrationStaticGuardTest {
                         && source.contains("registerEntityRenderer(EntityEldritchWarden.class, RenderEldritchWarden::new, registered);")
                         && source.contains("registerEntityRenderer(EntityEldritchGolem.class, RenderEldritchGolem::new, registered);")
                         && source.contains("registerEntityRenderer(EntityEldritchCrab.class, RenderEldritchCrab::new, registered);")
-                        && source.contains("registerEntityRenderer(EntityThaumicSlime.class, manager -> new RenderFallbackBiped<>(")
+                        && source.contains("registerEntityRenderer(EntityThaumicSlime.class, RenderThaumicSlime::new, registered);")
                         && source.contains("registerEntityRenderer(EntityTaintSpore.class, manager -> new RenderFallbackBiped<>(")
                         && source.contains("registerEntityRenderer(EntityTaintSporeSwarmer.class, manager -> new RenderFallbackBiped<>(")
                         && source.contains("registerEntityRenderer(EntityTaintSwarm.class, manager -> new RenderFallbackBiped<>(")
@@ -126,6 +126,15 @@ public class ClientProxyEntityRendererRegistrationStaticGuardTest {
         assertTrue("RenderCultistPortal must provide dedicated portal texture baseline",
                 cultistPortalRenderer.contains("extends RenderBiped<EntityCultistPortal>")
                         && cultistPortalRenderer.contains("textures/misc/cultist_portal.png"));
+        String thaumicSlimeRenderer = readFile("src/main/java/thaumcraft/client/renderers/entity/RenderThaumicSlime.java");
+        assertTrue("RenderThaumicSlime must provide texture, scale, and gel layer baselines",
+                thaumicSlimeRenderer.contains("extends RenderLiving<EntityThaumicSlime>")
+                        && thaumicSlimeRenderer.contains("textures/models/tslime.png")
+                        && thaumicSlimeRenderer.contains("entity.getSlimeSize()")
+                        && thaumicSlimeRenderer.contains("entity.field_70812_c")
+                        && thaumicSlimeRenderer.contains("entity.field_70811_b")
+                        && thaumicSlimeRenderer.contains("class SlimeGelLayer")
+                        && thaumicSlimeRenderer.contains("this.addLayer(new SlimeGelLayer())"));
         String trunkRenderer = readFile("src/main/java/thaumcraft/client/renderers/entity/RenderTravelingTrunk.java");
         assertTrue("RenderTravelingTrunk must provide anger-based texture routing baseline",
                 trunkRenderer.contains("extends RenderLiving<EntityTravelingTrunk>")

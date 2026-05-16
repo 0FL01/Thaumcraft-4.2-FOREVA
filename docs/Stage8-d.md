@@ -885,6 +885,30 @@ Some entities may be hard to trigger naturally until recipes/research/spawn cont
 
 - Это texture-only baseline; full reference parity для cultist portal renderer behavior (animated portal billboard, pulse/hurt-scale modulation, detailed GL pass behavior) остаётся открытой по GAP-3/GAP-6.
 
+### Checkpoint 2026-05-16 — dedicated thaumic slime renderer baseline
+
+Статус: частично продвинут.
+
+Что сделано:
+
+- Добавлен выделенный renderer `RenderThaumicSlime` (`thaumcraft.client.renderers.entity.RenderThaumicSlime`) вместо общего biped fallback для `EntityThaumicSlime`.
+- Baseline behavior:
+  - dedicated texture path `textures/models/tslime.png`;
+  - slime-size/squish-based scale callback использует `getSlimeSize()`, `field_70811_b`, `field_70812_c`;
+  - добавлен translucent gel layer `SlimeGelLayer` с тем же texture baseline.
+- `ClientProxy.setupEntityRenderers()` обновлен: `EntityThaumicSlime` теперь регистрируется через `RenderThaumicSlime::new`.
+- `ClientProxyEntityRendererRegistrationStaticGuardTest` расширен проверками:
+  - explicit `EntityThaumicSlime -> RenderThaumicSlime` registration path;
+  - наличие texture/scale/gel-layer contracts в `RenderThaumicSlime`.
+
+Проверки:
+
+- `./scripts/dev.sh validate --smoke` — passed.
+
+Ограничения:
+
+- Это baseline по texture/scale/layer wiring; full reference parity для thaumic slime renderer behavior (оригинальная двухмодельная render-pass конфигурация и GL normalize/blend нюансы) остаётся открытой по GAP-3/GAP-4/GAP-6.
+
 - [ ] Add client-only entity renderer registration hook.
 - [ ] Register every entity from `ConfigEntities.ENTITIES` with a custom or vanilla-equivalent renderer.
 - [ ] Port item-like/transient/projectile renderers.
