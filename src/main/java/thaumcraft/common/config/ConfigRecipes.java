@@ -251,6 +251,93 @@ public class ConfigRecipes {
                 new ItemStack(ConfigItems.itemResource, 1, 17),
                 new ItemStack(Items.ENDER_PEARL),
                 new AspectList().merge(Aspect.DARKNESS, 8).merge(Aspect.VOID, 8).merge(Aspect.ELDRITCH, 2));
+
+        ConfigResearch.recipes.put("GolemStraw",
+                ThaumcraftApi.addCrucibleRecipe(
+                        "GOLEMSTRAW",
+                        new ItemStack(ConfigItems.itemGolemPlacer, 1, 0),
+                        new ItemStack(Blocks.HAY_BLOCK),
+                        new AspectList().add(Aspect.MAN, 4).add(Aspect.MOTION, 4).add(Aspect.SOUL, 4)));
+        ConfigResearch.recipes.put("GolemWood",
+                ThaumcraftApi.addCrucibleRecipe(
+                        "GOLEMWOOD",
+                        new ItemStack(ConfigItems.itemGolemPlacer, 1, 1),
+                        new ItemStack(ConfigBlocks.blockMagicalLog, 1, 0),
+                        new AspectList().add(Aspect.MAN, 4).add(Aspect.MOTION, 4).add(Aspect.SOUL, 4)));
+        ConfigResearch.recipes.put("GolemTallow",
+                ThaumcraftApi.addCrucibleRecipe(
+                        "GOLEMTALLOW",
+                        new ItemStack(ConfigItems.itemGolemPlacer, 1, 2),
+                        new ItemStack(ConfigBlocks.blockCosmeticSolid, 1, 5),
+                        new AspectList().add(Aspect.MAN, 8).add(Aspect.MOTION, 8).add(Aspect.SOUL, 8)));
+        ConfigResearch.recipes.put("GolemClay",
+                ThaumcraftApi.addCrucibleRecipe(
+                        "GOLEMCLAY",
+                        new ItemStack(ConfigItems.itemGolemPlacer, 1, 3),
+                        new ItemStack(Blocks.CLAY),
+                        new AspectList().add(Aspect.MAN, 4).add(Aspect.MOTION, 4).add(Aspect.SOUL, 4)));
+        ConfigResearch.recipes.put("GolemFlesh",
+                ThaumcraftApi.addCrucibleRecipe(
+                        "GOLEMFLESH",
+                        new ItemStack(ConfigItems.itemGolemPlacer, 1, 4),
+                        new ItemStack(ConfigBlocks.blockTaint, 1, 2),
+                        new AspectList().add(Aspect.MAN, 8).add(Aspect.MOTION, 8).add(Aspect.SOUL, 8)));
+        ConfigResearch.recipes.put("GolemStone",
+                ThaumcraftApi.addCrucibleRecipe(
+                        "GOLEMSTONE",
+                        new ItemStack(ConfigItems.itemGolemPlacer, 1, 5),
+                        new ItemStack(Blocks.STONE),
+                        new AspectList().add(Aspect.MAN, 4).add(Aspect.MOTION, 4).add(Aspect.SOUL, 4)));
+        ConfigResearch.recipes.put("GolemIron",
+                ThaumcraftApi.addCrucibleRecipe(
+                        "GOLEMIRON",
+                        new ItemStack(ConfigItems.itemGolemPlacer, 1, 6),
+                        new ItemStack(Blocks.IRON_BLOCK),
+                        new AspectList().add(Aspect.MAN, 4).add(Aspect.MOTION, 4).add(Aspect.SOUL, 4)));
+        ConfigResearch.recipes.put("GolemThaumium",
+                ThaumcraftApi.addCrucibleRecipe(
+                        "GOLEMTHAUMIUM",
+                        new ItemStack(ConfigItems.itemGolemPlacer, 1, 7),
+                        new ItemStack(ConfigBlocks.blockCosmeticSolid, 1, 4),
+                        new AspectList().add(Aspect.MAN, 8).add(Aspect.MOTION, 8).add(Aspect.SOUL, 8)));
+
+        ItemStack coreBlank = new ItemStack(ConfigItems.itemGolemCore, 1, 100);
+        ConfigResearch.recipes.put("CoreFill",
+                ThaumcraftApi.addCrucibleRecipe(
+                        "COREFILL",
+                        new ItemStack(ConfigItems.itemGolemCore, 1, 0),
+                        coreBlank,
+                        new AspectList().add(Aspect.HUNGER, 5).add(Aspect.VOID, 5)));
+        ConfigResearch.recipes.put("CoreEmpty",
+                ThaumcraftApi.addCrucibleRecipe(
+                        "COREEMPTY",
+                        new ItemStack(ConfigItems.itemGolemCore, 1, 1),
+                        coreBlank,
+                        new AspectList().add(Aspect.GREED, 5).add(Aspect.VOID, 5)));
+        ConfigResearch.recipes.put("CoreHarvest",
+                ThaumcraftApi.addCrucibleRecipe(
+                        "COREHARVEST",
+                        new ItemStack(ConfigItems.itemGolemCore, 1, 3),
+                        coreBlank,
+                        new AspectList().add(Aspect.HARVEST, 5).add(Aspect.CROP, 5)));
+        ConfigResearch.recipes.put("CoreGuard",
+                ThaumcraftApi.addCrucibleRecipe(
+                        "COREGUARD",
+                        new ItemStack(ConfigItems.itemGolemCore, 1, 4),
+                        coreBlank,
+                        new AspectList().add(Aspect.WEAPON, 5).add(Aspect.TRAP, 5)));
+        ConfigResearch.recipes.put("CoreButcher",
+                ThaumcraftApi.addCrucibleRecipe(
+                        "COREBUTCHER",
+                        new ItemStack(ConfigItems.itemGolemCore, 1, 9),
+                        new ItemStack(ConfigItems.itemGolemCore, 1, 4),
+                        new AspectList().add(Aspect.FLESH, 5).add(Aspect.BEAST, 5)));
+        ConfigResearch.recipes.put("CoreLiquid",
+                ThaumcraftApi.addCrucibleRecipe(
+                        "CORELIQUID",
+                        new ItemStack(ConfigItems.itemGolemCore, 1, 5),
+                        coreBlank,
+                        new AspectList().add(Aspect.WATER, 5).add(Aspect.VOID, 5)));
     }
 
     private static void initializeArcaneRecipeBaseline() {

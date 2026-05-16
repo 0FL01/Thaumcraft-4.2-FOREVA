@@ -2699,6 +2699,7 @@ public class ConfigResearch {
                 .setPages(
                         new ResearchPage("tc.research_page.GOLEMSTRAW.1"),
                         new ResearchPage("tc.research_page.GOLEMSTRAW.2"),
+                        new ResearchPage((CrucibleRecipe) recipes.get("GolemStraw")),
                         new ResearchPage("tc.research_page.GOLEMSTRAW.3"))
                 .setParents("HUNGRYCHEST")
                 .registerResearchItem();
@@ -2731,7 +2732,9 @@ public class ConfigResearch {
                 4,
                 2,
                 new ItemStack(ConfigItems.itemGolemPlacer, 1, 1))
-                .setPages(new ResearchPage("tc.research_page.GOLEMWOOD.1"))
+                .setPages(
+                        new ResearchPage("tc.research_page.GOLEMWOOD.1"),
+                        new ResearchPage((CrucibleRecipe) recipes.get("GolemWood")))
                 .setSecondary()
                 .setParents("GOLEMSTRAW")
                 .registerResearchItem();
@@ -2748,7 +2751,9 @@ public class ConfigResearch {
                 6,
                 2,
                 new ItemStack(ConfigItems.itemGolemPlacer, 1, 3))
-                .setPages(new ResearchPage("tc.research_page.GOLEMCLAY.1"))
+                .setPages(
+                        new ResearchPage("tc.research_page.GOLEMCLAY.1"),
+                        new ResearchPage((CrucibleRecipe) recipes.get("GolemClay")))
                 .setSecondary()
                 .setConcealed()
                 .setParents("GOLEMWOOD")
@@ -2766,7 +2771,9 @@ public class ConfigResearch {
                 8,
                 2,
                 new ItemStack(ConfigItems.itemGolemPlacer, 1, 5))
-                .setPages(new ResearchPage("tc.research_page.GOLEMSTONE.1"))
+                .setPages(
+                        new ResearchPage("tc.research_page.GOLEMSTONE.1"),
+                        new ResearchPage((CrucibleRecipe) recipes.get("GolemStone")))
                 .setSecondary()
                 .setConcealed()
                 .setParents("GOLEMCLAY")
@@ -2784,7 +2791,9 @@ public class ConfigResearch {
                 10,
                 2,
                 new ItemStack(ConfigItems.itemGolemPlacer, 1, 6))
-                .setPages(new ResearchPage("tc.research_page.GOLEMIRON.1"))
+                .setPages(
+                        new ResearchPage("tc.research_page.GOLEMIRON.1"),
+                        new ResearchPage((CrucibleRecipe) recipes.get("GolemIron")))
                 .setSecondary()
                 .setConcealed()
                 .setParents("GOLEMSTONE")
@@ -2803,7 +2812,9 @@ public class ConfigResearch {
                 10,
                 2,
                 new ItemStack(ConfigItems.itemGolemPlacer, 1, 7))
-                .setPages(new ResearchPage("tc.research_page.GOLEMTHAUMIUM.1"))
+                .setPages(
+                        new ResearchPage("tc.research_page.GOLEMTHAUMIUM.1"),
+                        new ResearchPage((CrucibleRecipe) recipes.get("GolemThaumium")))
                 .setConcealed()
                 .setParents("GOLEMIRON", "THAUMIUM")
                 .registerResearchItem();
@@ -2820,7 +2831,9 @@ public class ConfigResearch {
                 4,
                 2,
                 new ItemStack(ConfigItems.itemGolemPlacer, 1, 4))
-                .setPages(new ResearchPage("tc.research_page.GOLEMFLESH.1"))
+                .setPages(
+                        new ResearchPage("tc.research_page.GOLEMFLESH.1"),
+                        new ResearchPage((CrucibleRecipe) recipes.get("GolemFlesh")))
                 .setConcealed()
                 .setParents("GOLEMWOOD")
                 .registerResearchItem();
@@ -2840,7 +2853,9 @@ public class ConfigResearch {
                 6,
                 2,
                 new ItemStack(ConfigItems.itemGolemPlacer, 1, 2))
-                .setPages(new ResearchPage("tc.research_page.GOLEMTALLOW.1"))
+                .setPages(
+                        new ResearchPage("tc.research_page.GOLEMTALLOW.1"),
+                        new ResearchPage((CrucibleRecipe) recipes.get("GolemTallow")))
                 .setConcealed()
                 .setParents("GOLEMCLAY", "TALLOW")
                 .registerResearchItem();
@@ -3007,7 +3022,9 @@ public class ConfigResearch {
                 3,
                 2,
                 new ItemStack(ConfigItems.itemGolemCore, 1, 0))
-                .setPages(new ResearchPage("tc.research_page.COREFILL.1"))
+                .setPages(
+                        new ResearchPage("tc.research_page.COREFILL.1"),
+                        new ResearchPage((CrucibleRecipe) recipes.get("CoreFill")))
                 .setConcealed()
                 .setSecondary()
                 .setParents("COREGATHER")
@@ -3021,7 +3038,9 @@ public class ConfigResearch {
                 1,
                 2,
                 new ItemStack(ConfigItems.itemGolemCore, 1, 1))
-                .setPages(new ResearchPage("tc.research_page.COREEMPTY.1"))
+                .setPages(
+                        new ResearchPage("tc.research_page.COREEMPTY.1"),
+                        new ResearchPage((CrucibleRecipe) recipes.get("CoreEmpty")))
                 .setConcealed()
                 .setSecondary()
                 .setParents("COREGATHER")
@@ -3081,6 +3100,7 @@ public class ConfigResearch {
                 new ItemStack(ConfigItems.itemGolemCore, 1, 3))
                 .setPages(
                         new ResearchPage("tc.research_page.COREHARVEST.1"),
+                        new ResearchPage((CrucibleRecipe) recipes.get("CoreHarvest")),
                         new ResearchPage("UPGRADEORDER", "tc.research_page.COREHARVEST.2"))
                 .setConcealed()
                 .setParents("COREGATHER")
@@ -3143,6 +3163,7 @@ public class ConfigResearch {
                 new ItemStack(ConfigItems.itemGolemCore, 1, 4))
                 .setPages(
                         new ResearchPage("tc.research_page.COREGUARD.1"),
+                        new ResearchPage((CrucibleRecipe) recipes.get("CoreGuard")),
                         new ResearchPage("UPGRADEORDER", "tc.research_page.COREGUARD.2"))
                 .setConcealed()
                 .setParents("COREGATHER")
@@ -3160,7 +3181,9 @@ public class ConfigResearch {
                 7,
                 2,
                 new ItemStack(ConfigItems.itemGolemCore, 1, 9))
-                .setPages(new ResearchPage("tc.research_page.COREBUTCHER.1"))
+                .setPages(
+                        new ResearchPage("tc.research_page.COREBUTCHER.1"),
+                        new ResearchPage((CrucibleRecipe) recipes.get("CoreButcher")))
                 .setConcealed()
                 .setSecondary()
                 .setParents("COREGUARD", "COREHARVEST")
@@ -3179,6 +3202,7 @@ public class ConfigResearch {
                 new ItemStack(ConfigItems.itemGolemCore, 1, 5))
                 .setPages(
                         new ResearchPage("tc.research_page.CORELIQUID.1"),
+                        new ResearchPage((CrucibleRecipe) recipes.get("CoreLiquid")),
                         new ResearchPage("UPGRADEENTROPY", "tc.research_page.CORELIQUID.2"))
                 .setConcealed()
                 .setParents("COREFILL")
