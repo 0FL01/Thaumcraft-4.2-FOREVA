@@ -121,6 +121,8 @@ public class ClientProxyFxStaticGuardTest {
                         && runic.contains("TCSounds.RUNICSHIELDCHARGE"));
         assertTrue("Eldritch guardian sonic attack path must send PacketFXSonic",
                 eldritchGuardian.contains("new PacketFXSonic(this.getEntityId())"));
+        assertTrue("Eldritch guardian periodic fog pulse must send PacketMiscEvent short mist signal",
+                eldritchGuardian.contains("new PacketMiscEvent((short) 2)"));
         assertTrue("Wisp ranged attack path must send PacketFXWispZap",
                 wisp.contains("new PacketFXWispZap(this.getEntityId(), this.targetedEntity.getEntityId())"));
         assertTrue("FocusShock chain lightning path must send PacketFXZap",

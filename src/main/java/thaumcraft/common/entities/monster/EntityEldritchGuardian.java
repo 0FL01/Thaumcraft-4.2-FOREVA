@@ -5,6 +5,7 @@ import net.minecraft.entity.ai.*;
 import net.minecraft.entity.ai.attributes.IAttributeInstance;
 import net.minecraft.entity.monster.EntityMob;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.SoundEvents;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -115,8 +116,8 @@ public class EntityEldritchGuardian extends EntityMob implements IRangedAttackMo
             for (EntityPlayer player : this.world.playerEntities) {
                 if (!player.isEntityAlive()) continue;
                 double dist = player.getDistanceSq(this.posX, this.posY, this.posZ);
-                if (dist < range) {
-                    // TODO: PacketMiscEvent(2) is a stub — implement in Phase 8
+                if (dist < range && player instanceof EntityPlayerMP) {
+                    PacketHandler.INSTANCE.sendTo(new PacketMiscEvent((short) 2), (EntityPlayerMP) player);
                 }
             }
         }

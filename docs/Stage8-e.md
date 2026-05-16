@@ -614,6 +614,26 @@ Depends on GAP-1, GAP-2, GAP-5, and GAP-6. Network-thread rendering is unsafe if
 
 - Full visual fog/vignette rendering behavior remains tied to broader Stage 8 client render handler parity.
 
+#### Checkpoint 2026-05-16 — Eldritch guardian short-mist signal send path restored
+
+Статус: guardian periodic short-mist packet broadcast is now active again.
+
+Что сделано:
+
+- Restored server-side send in `EntityEldritchGuardian.onUpdate()` for nearby players in non-Outer dimensions:
+  - `PacketHandler.INSTANCE.sendTo(new PacketMiscEvent((short) 2), (EntityPlayerMP) player)`.
+- Kept existing distance and difficulty gating logic intact; only reinstated the packet path where the Phase 8 placeholder existed.
+- Expanded static guard coverage to enforce presence of this send-site.
+
+Проверки:
+
+- `./scripts/dev.sh test` — passed.
+- `./scripts/dev.sh validate --smoke` — passed.
+
+Ограничения:
+
+- Visual effect depth still depends on broader Stage 8 render/fog parity work.
+
 ### GAP-4: Beam, wand beam, bore beam, power beam, arc, and lightning bolt classes are absent
 
 **Статус:** отсутствует  
