@@ -54,6 +54,10 @@ public class EntityTaintCreeper extends net.minecraft.entity.monster.EntityMob i
         this.dataManager.set(CREEPER_STATE, state);
     }
 
+    public float getCreeperFlashIntensity(float partialTicks) {
+        return ((float) this.lastActiveTime + (float) (this.timeSinceIgnited - this.lastActiveTime) * partialTicks) / 28.0F;
+    }
+
     @Override
     public void onUpdate() {
         if (this.isEntityAlive()) {

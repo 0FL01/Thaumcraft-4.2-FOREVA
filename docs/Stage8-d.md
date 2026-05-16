@@ -1084,6 +1084,32 @@ Some entities may be hard to trigger naturally until recipes/research/spawn cont
 
 - Это shared texture/model baseline; full reference parity для taint-animal render behavior остаётся открытой по GAP-3/GAP-4/GAP-6 (в частности sheep fur layer, villager scale nuance и creeper flash/armor render-pass semantics).
 
+### Checkpoint 2026-05-16 — dedicated taint creeper flash-scale renderer baseline
+
+Статус: частично продвинут.
+
+Что сделано:
+
+- Добавлен выделенный renderer `RenderTaintCreeper` (`thaumcraft.client.renderers.entity.RenderTaintCreeper`) вместо shared texture-only baseline для `EntityTaintCreeper`.
+- Baseline behavior портирован по reference renderer semantics:
+  - dedicated texture path `textures/models/creeper.png`;
+  - flash-intensity-driven pre-render scale wobble (`preRenderCallback`);
+  - flash-intensity-driven white overlay color multiplier (`getColorMultiplier`).
+- В `EntityTaintCreeper` добавлен accessor `getCreeperFlashIntensity(float partialTicks)` для reference-shaped render timing interpolation.
+- `ClientProxy.setupEntityRenderers()` обновлен: `EntityTaintCreeper` теперь регистрируется через `RenderTaintCreeper::new`.
+- `ClientProxyEntityRendererRegistrationStaticGuardTest` расширен проверками:
+  - explicit registration path `EntityTaintCreeper -> RenderTaintCreeper`;
+  - `RenderTaintCreeper` texture/flash/scale/color contracts;
+  - `EntityTaintCreeper#getCreeperFlashIntensity` contract presence.
+
+Проверки:
+
+- `./scripts/dev.sh validate --smoke` — passed.
+
+Ограничения:
+
+- Это baseline creeper flash/scale/color parity; full reference parity по taint creeper visual stack остаётся открытой (legacy armor-pass path и прочие GL-pass нюансы) по GAP-3/GAP-6.
+
 - [ ] Add client-only entity renderer registration hook.
 - [ ] Register every entity from `ConfigEntities.ENTITIES` with a custom or vanilla-equivalent renderer.
 - [ ] Port item-like/transient/projectile renderers.

@@ -9,7 +9,6 @@ import net.minecraft.client.model.ModelBat;
 import net.minecraft.client.model.ModelBiped;
 import net.minecraft.client.model.ModelChicken;
 import net.minecraft.client.model.ModelCow;
-import net.minecraft.client.model.ModelCreeper;
 import net.minecraft.client.model.ModelPig;
 import net.minecraft.client.model.ModelSheep2;
 import net.minecraft.client.model.ModelSpider;
@@ -74,6 +73,7 @@ import thaumcraft.client.renderers.entity.RenderTaintSporeSwarmer;
 import thaumcraft.client.renderers.entity.RenderTaintSpider;
 import thaumcraft.client.renderers.entity.RenderTaintSwarm;
 import thaumcraft.client.renderers.entity.RenderTaintacle;
+import thaumcraft.client.renderers.entity.RenderTaintCreeper;
 import thaumcraft.client.renderers.entity.RenderTaintTextureLiving;
 import thaumcraft.client.renderers.entity.RenderTravelingTrunk;
 import thaumcraft.client.renderers.entity.RenderWisp;
@@ -235,8 +235,7 @@ public class ClientProxy extends CommonProxy {
                 manager, new ModelSheep2(), 0.7F, new ResourceLocation("thaumcraft", "textures/models/sheep.png")), registered);
         registerEntityRenderer(EntityTaintVillager.class, manager -> new RenderTaintTextureLiving<>(
                 manager, new ModelVillager(0.0F), 0.5F, new ResourceLocation("thaumcraft", "textures/models/villager.png")), registered);
-        registerEntityRenderer(EntityTaintCreeper.class, manager -> new RenderTaintTextureLiving<>(
-                manager, new ModelCreeper(), 0.5F, new ResourceLocation("thaumcraft", "textures/models/creeper.png")), registered);
+        registerEntityRenderer(EntityTaintCreeper.class, RenderTaintCreeper::new, registered);
         registerEntityRenderer(EntityCultistKnight.class, manager -> new RenderCultist<>(manager, 0.5F), registered);
         registerEntityRenderer(EntityCultistCleric.class, manager -> new RenderCultist<>(manager, 0.5F), registered);
         registerEntityRenderer(EntityCultistLeader.class, manager -> new RenderCultist<>(manager, 0.6F), registered);

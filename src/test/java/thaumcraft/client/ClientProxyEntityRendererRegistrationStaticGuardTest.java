@@ -51,7 +51,7 @@ public class ClientProxyEntityRendererRegistrationStaticGuardTest {
                         && source.contains("registerEntityRenderer(EntityTaintPig.class, manager -> new RenderTaintTextureLiving<>(")
                         && source.contains("registerEntityRenderer(EntityTaintSheep.class, manager -> new RenderTaintTextureLiving<>(")
                         && source.contains("registerEntityRenderer(EntityTaintVillager.class, manager -> new RenderTaintTextureLiving<>(")
-                        && source.contains("registerEntityRenderer(EntityTaintCreeper.class, manager -> new RenderTaintTextureLiving<>("));
+                        && source.contains("registerEntityRenderer(EntityTaintCreeper.class, RenderTaintCreeper::new, registered);"));
         assertTrue("ClientProxy must keep fallback RenderFallbackBiped registrations for cultist entities",
                 source.contains("registerEntityRenderer(EntityCultistKnight.class, manager -> new RenderCultist<>(manager, 0.5F), registered);")
                         && source.contains("registerEntityRenderer(EntityCultistCleric.class, manager -> new RenderCultist<>(manager, 0.5F), registered);")
@@ -178,6 +178,13 @@ public class ClientProxyEntityRendererRegistrationStaticGuardTest {
                         && taintSpiderRenderer.contains("textures/models/taint_spider_eyes.png")
                         && taintSpiderRenderer.contains("this.addLayer(new SpiderEyesLayer())")
                         && taintSpiderRenderer.contains("scale * 1.25F"));
+        String taintCreeperRenderer = readFile("src/main/java/thaumcraft/client/renderers/entity/RenderTaintCreeper.java");
+        assertTrue("RenderTaintCreeper must provide creeper texture plus flash scale/color multiplier baseline",
+                taintCreeperRenderer.contains("extends RenderLiving<EntityTaintCreeper>")
+                        && taintCreeperRenderer.contains("textures/models/creeper.png")
+                        && taintCreeperRenderer.contains("getCreeperFlashIntensity")
+                        && taintCreeperRenderer.contains("preRenderCallback")
+                        && taintCreeperRenderer.contains("getColorMultiplier"));
         String cultistRenderer = readFile("src/main/java/thaumcraft/client/renderers/entity/RenderCultist.java");
         assertTrue("RenderCultist must provide shared cultist texture baseline",
                 cultistRenderer.contains("extends RenderBiped<T>")
@@ -203,6 +210,9 @@ public class ClientProxyEntityRendererRegistrationStaticGuardTest {
         String travelingTrunkEntity = readFile("src/main/java/thaumcraft/common/entities/golems/EntityTravelingTrunk.java");
         assertTrue("EntityTravelingTrunk must expose anger accessor for renderer texture routing",
                 travelingTrunkEntity.contains("public int getAnger()"));
+        String taintCreeperEntity = readFile("src/main/java/thaumcraft/common/entities/monster/EntityTaintCreeper.java");
+        assertTrue("EntityTaintCreeper must expose flash intensity accessor for renderer scale/color timing",
+                taintCreeperEntity.contains("public float getCreeperFlashIntensity(float partialTicks)"));
         assertTrue("ClientProxy must iterate ConfigEntities.ENTITIES for renderer registration coverage",
                 source.contains("for (net.minecraftforge.fml.common.registry.EntityEntry entry : ConfigEntities.ENTITIES)"));
         assertTrue("ClientProxy must keep fallback RenderNoop registrations for remaining entities",
