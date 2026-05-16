@@ -473,7 +473,7 @@ Client renderer/particles are Phase 8. Outer Lands location/portal setup is a St
 - `thaumcraft_src/assets/thaumcraft/sounds/**`
 
 **Что не совпадает:**
-Pech death loot has a baseline and uses mana beans/coins/knowledge fragments (`EntityPech.java:390-413`), but runtime drops are unverified. Cultist Leader drops a loot bag (`EntityCultistLeader.java:162-166`). Eldritch Guardian drops essences/equipment (`EntityEldritchGuardian.java:162-184`). The 2026-05-15 checkpoint restores base Cultist common/rare drops and fixes Taint Swarm to the reference 50% taint-slime-only drop. Follow-up 2026-05-16 correction removes explicit `null` ambient/hurt/death overrides from `EntityCultist`: reference has no Cultist sound override, so the class should inherit hostile defaults from the base mob class. A static coverage guard now also checks `TCSounds` registrations against `sounds.json` keys and bundled `.ogg` assets; runtime sound/drop evidence remains open.
+Pech death loot has a baseline and uses mana beans/coins/knowledge fragments (`EntityPech.java:390-413`), but runtime drops are unverified. Cultist Leader drops a loot bag (`EntityCultistLeader.java:162-166`). Eldritch Guardian drops essences/equipment (`EntityEldritchGuardian.java:162-184`). The 2026-05-15 checkpoint restores base Cultist common/rare drops and fixes Taint Swarm to the reference 50% taint-slime-only drop. Follow-up 2026-05-16 correction removes explicit `null` ambient/hurt/death overrides from `EntityCultist`: reference has no Cultist sound override, so the class should inherit hostile defaults from the base mob class. Static coverage guards now also check `TCSounds` registrations against `sounds.json` keys and bundled `.ogg` assets, and enforce an allowlist for monster/boss `null` sound overrides (currently only `EntityTaintSwarm#getAmbientSound`); runtime sound/drop evidence remains open.
 
 **Что нужно доделать:**
 Continue the broader Stage 6 drop/sound audit and run representative kill/combat scenarios.
@@ -1615,6 +1615,27 @@ Mapping:
 
 - This is static coverage only; it does not prove in-world playback routing for every mob/boss/combat path.
 - Runtime drop/sound scenarios in the Stage 6 matrix remain open.
+
+### 8.2.40 Monster null-sound override allowlist checkpoint — 2026-05-16
+
+Статус: static guard added against accidental null sound regressions in Stage 6 monsters/bosses.
+
+Что сделано:
+
+- Added `MonsterSoundNullOverrideAllowlistTest` to scan `src/main/java/thaumcraft/common/entities/monster/**` for `getAmbientSound/getHurtSound/getDeathSound` methods that explicitly `return null`.
+- Enforced an explicit allowlist with only one accepted reference-compatible case: `EntityTaintSwarm#getAmbientSound`.
+- This prevents regressions like the previous `EntityCultist` null-sound override from silently reappearing.
+
+Проверки:
+
+- `./scripts/dev.sh test` — passed (`23/23`).
+- `./scripts/dev.sh validate` — passed (`5/5`).
+- `git diff --check` — passed.
+
+Оставшиеся ограничения:
+
+- The allowlist guard is static and does not replace runtime combat/drop sound verification.
+- Stage 6 runtime sound matrix scenarios are still open.
 
 ### 8.3 Minimal Stage 6 manual scenario matrix
 
