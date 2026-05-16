@@ -56,7 +56,6 @@ import thaumcraft.client.gui.GuiThaumatorium;
 import thaumcraft.client.gui.GuiTravelingTrunk;
 import thaumcraft.client.fx.ParticleEngine;
 import thaumcraft.client.renderers.entity.RenderFallbackBiped;
-import thaumcraft.client.renderers.entity.RenderFallbackLiving;
 import thaumcraft.client.renderers.entity.RenderFireBat;
 import thaumcraft.client.renderers.entity.RenderGolemBase;
 import thaumcraft.client.renderers.entity.RenderEldritchGuardian;
@@ -75,6 +74,7 @@ import thaumcraft.client.renderers.entity.RenderTaintSporeSwarmer;
 import thaumcraft.client.renderers.entity.RenderTaintSpider;
 import thaumcraft.client.renderers.entity.RenderTaintSwarm;
 import thaumcraft.client.renderers.entity.RenderTaintacle;
+import thaumcraft.client.renderers.entity.RenderTaintTextureLiving;
 import thaumcraft.client.renderers.entity.RenderTravelingTrunk;
 import thaumcraft.client.renderers.entity.RenderWisp;
 import thaumcraft.client.renderers.entity.RenderCultist;
@@ -225,17 +225,17 @@ public class ClientProxy extends CommonProxy {
         registerEntityRenderer(EntityInhabitedZombie.class, RenderInhabitedZombie::new, registered);
         registerEntityRenderer(EntityMindSpider.class, RenderMindSpider::new, registered);
         registerEntityRenderer(EntityTaintSpider.class, RenderTaintSpider::new, registered);
-        registerEntityRenderer(EntityTaintChicken.class, manager -> new RenderFallbackLiving<>(
+        registerEntityRenderer(EntityTaintChicken.class, manager -> new RenderTaintTextureLiving<>(
                 manager, new ModelChicken(), 0.3F, new ResourceLocation("thaumcraft", "textures/models/chicken.png")), registered);
-        registerEntityRenderer(EntityTaintCow.class, manager -> new RenderFallbackLiving<>(
+        registerEntityRenderer(EntityTaintCow.class, manager -> new RenderTaintTextureLiving<>(
                 manager, new ModelCow(), 0.7F, new ResourceLocation("thaumcraft", "textures/models/cow.png")), registered);
-        registerEntityRenderer(EntityTaintPig.class, manager -> new RenderFallbackLiving<>(
+        registerEntityRenderer(EntityTaintPig.class, manager -> new RenderTaintTextureLiving<>(
                 manager, new ModelPig(), 0.5F, new ResourceLocation("thaumcraft", "textures/models/pig.png")), registered);
-        registerEntityRenderer(EntityTaintSheep.class, manager -> new RenderFallbackLiving<>(
+        registerEntityRenderer(EntityTaintSheep.class, manager -> new RenderTaintTextureLiving<>(
                 manager, new ModelSheep2(), 0.7F, new ResourceLocation("thaumcraft", "textures/models/sheep.png")), registered);
-        registerEntityRenderer(EntityTaintVillager.class, manager -> new RenderFallbackLiving<>(
+        registerEntityRenderer(EntityTaintVillager.class, manager -> new RenderTaintTextureLiving<>(
                 manager, new ModelVillager(0.0F), 0.5F, new ResourceLocation("thaumcraft", "textures/models/villager.png")), registered);
-        registerEntityRenderer(EntityTaintCreeper.class, manager -> new RenderFallbackLiving<>(
+        registerEntityRenderer(EntityTaintCreeper.class, manager -> new RenderTaintTextureLiving<>(
                 manager, new ModelCreeper(), 0.5F, new ResourceLocation("thaumcraft", "textures/models/creeper.png")), registered);
         registerEntityRenderer(EntityCultistKnight.class, manager -> new RenderCultist<>(manager, 0.5F), registered);
         registerEntityRenderer(EntityCultistCleric.class, manager -> new RenderCultist<>(manager, 0.5F), registered);

@@ -1054,6 +1054,36 @@ Some entities may be hard to trigger naturally until recipes/research/spawn cont
 
 - Это texture/identity baseline; full reference parity для cultist renderer behavior (leader/cleric specific visual nuances, potential special overlays/held-item pose details) остаётся открытой по GAP-3/GAP-6.
 
+### Checkpoint 2026-05-16 — taint animal-like dedicated shared texture renderer baseline
+
+Статус: частично продвинут.
+
+Почему grouped в один commit:
+
+- `EntityTaintChicken`, `EntityTaintCow`, `EntityTaintPig`, `EntityTaintSheep`, `EntityTaintVillager`, `EntityTaintCreeper` используют единый lightweight texture-only renderer pattern с разными model/texture bindings, поэтому вынесены в один shared renderer checkpoint.
+
+Что сделано:
+
+- Добавлен dedicated shared renderer `RenderTaintTextureLiving<T extends EntityLiving>`.
+- `ClientProxy.setupEntityRenderers()` обновлен:
+  - `EntityTaintChicken -> RenderTaintTextureLiving` (`ModelChicken`, `chicken.png`);
+  - `EntityTaintCow -> RenderTaintTextureLiving` (`ModelCow`, `cow.png`);
+  - `EntityTaintPig -> RenderTaintTextureLiving` (`ModelPig`, `pig.png`);
+  - `EntityTaintSheep -> RenderTaintTextureLiving` (`ModelSheep2`, `sheep.png`);
+  - `EntityTaintVillager -> RenderTaintTextureLiving` (`ModelVillager`, `villager.png`);
+  - `EntityTaintCreeper -> RenderTaintTextureLiving` (`ModelCreeper`, `creeper.png`).
+- `ClientProxyEntityRendererRegistrationStaticGuardTest` обновлен:
+  - taint animal-like registration checks теперь закрепляют `RenderTaintTextureLiving`;
+  - добавлен dedicated class-contract check для `RenderTaintTextureLiving`.
+
+Проверки:
+
+- `./scripts/dev.sh validate --smoke` — passed.
+
+Ограничения:
+
+- Это shared texture/model baseline; full reference parity для taint-animal render behavior остаётся открытой по GAP-3/GAP-4/GAP-6 (в частности sheep fur layer, villager scale nuance и creeper flash/armor render-pass semantics).
+
 - [ ] Add client-only entity renderer registration hook.
 - [ ] Register every entity from `ConfigEntities.ENTITIES` with a custom or vanilla-equivalent renderer.
 - [ ] Port item-like/transient/projectile renderers.

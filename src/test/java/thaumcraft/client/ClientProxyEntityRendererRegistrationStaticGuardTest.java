@@ -45,13 +45,13 @@ public class ClientProxyEntityRendererRegistrationStaticGuardTest {
                         && source.contains("registerEntityRenderer(EntityInhabitedZombie.class, RenderInhabitedZombie::new, registered);")
                         && source.contains("registerEntityRenderer(EntityMindSpider.class, RenderMindSpider::new, registered);")
                         && source.contains("registerEntityRenderer(EntityTaintSpider.class, RenderTaintSpider::new, registered);"));
-        assertTrue("ClientProxy must keep fallback RenderFallbackLiving registrations for taint animal-like entities",
-                source.contains("registerEntityRenderer(EntityTaintChicken.class, manager -> new RenderFallbackLiving<>(")
-                        && source.contains("registerEntityRenderer(EntityTaintCow.class, manager -> new RenderFallbackLiving<>(")
-                        && source.contains("registerEntityRenderer(EntityTaintPig.class, manager -> new RenderFallbackLiving<>(")
-                        && source.contains("registerEntityRenderer(EntityTaintSheep.class, manager -> new RenderFallbackLiving<>(")
-                        && source.contains("registerEntityRenderer(EntityTaintVillager.class, manager -> new RenderFallbackLiving<>(")
-                        && source.contains("registerEntityRenderer(EntityTaintCreeper.class, manager -> new RenderFallbackLiving<>("));
+        assertTrue("ClientProxy must keep dedicated RenderTaintTextureLiving registrations for taint animal-like entities",
+                source.contains("registerEntityRenderer(EntityTaintChicken.class, manager -> new RenderTaintTextureLiving<>(")
+                        && source.contains("registerEntityRenderer(EntityTaintCow.class, manager -> new RenderTaintTextureLiving<>(")
+                        && source.contains("registerEntityRenderer(EntityTaintPig.class, manager -> new RenderTaintTextureLiving<>(")
+                        && source.contains("registerEntityRenderer(EntityTaintSheep.class, manager -> new RenderTaintTextureLiving<>(")
+                        && source.contains("registerEntityRenderer(EntityTaintVillager.class, manager -> new RenderTaintTextureLiving<>(")
+                        && source.contains("registerEntityRenderer(EntityTaintCreeper.class, manager -> new RenderTaintTextureLiving<>("));
         assertTrue("ClientProxy must keep fallback RenderFallbackBiped registrations for cultist entities",
                 source.contains("registerEntityRenderer(EntityCultistKnight.class, manager -> new RenderCultist<>(manager, 0.5F), registered);")
                         && source.contains("registerEntityRenderer(EntityCultistCleric.class, manager -> new RenderCultist<>(manager, 0.5F), registered);")
@@ -77,6 +77,8 @@ public class ClientProxyEntityRendererRegistrationStaticGuardTest {
                         && source.contains("registerEntityRenderer(EntityCultistPortal.class, RenderCultistPortal::new, registered);"));
         assertTrue("RenderFallbackLiving must exist as a non-noop typed texture renderer",
                 readFile("src/main/java/thaumcraft/client/renderers/entity/RenderFallbackLiving.java").contains("extends RenderLiving<T>"));
+        assertTrue("RenderTaintTextureLiving must exist as a dedicated taint texture renderer baseline",
+                readFile("src/main/java/thaumcraft/client/renderers/entity/RenderTaintTextureLiving.java").contains("extends RenderLiving<T>"));
         assertTrue("RenderFallbackBiped must exist as a non-noop typed texture renderer",
                 readFile("src/main/java/thaumcraft/client/renderers/entity/RenderFallbackBiped.java").contains("extends RenderBiped<T>"));
         String pechRenderer = readFile("src/main/java/thaumcraft/client/renderers/entity/RenderPech.java");
