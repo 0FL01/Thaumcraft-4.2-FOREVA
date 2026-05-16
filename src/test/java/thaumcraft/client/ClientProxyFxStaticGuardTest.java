@@ -14,6 +14,7 @@ public class ClientProxyFxStaticGuardTest {
     @Test
     public void clientProxyFxMethodsAreImplemented() throws IOException {
         String source = readFile("src/main/java/thaumcraft/client/ClientProxy.java");
+        String particleEngine = readFile("src/main/java/thaumcraft/client/fx/ParticleEngine.java");
 
         assertTrue("ClientProxy blockSparkle must spawn client particles",
                 source.contains("public void blockSparkle(") && source.contains("world.spawnParticle(EnumParticleTypes.REDSTONE"));
@@ -47,6 +48,16 @@ public class ClientProxyFxStaticGuardTest {
                 source.contains("public void crucibleBoilSound(")
                         && source.contains("public void crucibleBoil(")
                         && source.contains("TCSounds.BUBBLE"));
+        assertTrue("ParticleEngine must keep queued particle intake + tick drain + effectRenderer dispatch baseline",
+                particleEngine.contains("public static void addEffect(World world, Particle particle)")
+                        && particleEngine.contains("pendingParticles")
+                        && particleEngine.contains("event.phase != TickEvent.Phase.END")
+                        && particleEngine.contains("mc.effectRenderer.addEffect(queued.particle)")
+                        && particleEngine.contains("MAX_PARTICLE_ADDITIONS_PER_TICK"));
+        assertTrue("ParticleEngine must keep render-world bookkeeping baseline",
+                particleEngine.contains("lastRenderWorldTime")
+                        && particleEngine.contains("lastRenderPartialTicks")
+                        && particleEngine.contains("event.getPartialTicks()"));
     }
 
     @Test

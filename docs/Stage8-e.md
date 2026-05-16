@@ -159,6 +159,27 @@ Port the reference particle engine and the particle classes needed by Stage 8-e 
 
 Forge 1.12.2 particle APIs differ significantly from 1.7.10 `EntityFX`; port must avoid server classloading of client-only classes. This is a blocker for almost every other Stage 8-e FX gap.
 
+#### Checkpoint 2026-05-17 — GAP-1 ParticleEngine dispatcher baseline
+
+Статус: частично продвинут.
+
+Что сделано:
+
+- `src/main/java/thaumcraft/client/fx/ParticleEngine.java` больше не пустой stub:
+  - добавлен client-safe queued intake (`addEffect(World, Particle)` + `pendingParticles`);
+  - добавлен tick-drain scheduler в `updateParticles(...)` с `TickEvent.Phase.END` guard и dispatch в `mc.effectRenderer.addEffect(...)`;
+  - добавлен dimension gate и per-tick cap (`MAX_PARTICLE_ADDITIONS_PER_TICK`);
+  - добавлен render-world bookkeeping (`lastRenderWorldTime`, `lastRenderPartialTicks`) в `onRenderWorldLast(...)`.
+- `ClientProxyFxStaticGuardTest` расширен проверками, фиксирующими non-stub surface `ParticleEngine`.
+
+Проверки:
+
+- `./scripts/dev.sh validate --smoke` — passed.
+
+Ограничения:
+
+- Это dispatcher baseline без полноценного port-а reference `thaumcraft.client.fx.particles/*` классов; визуальная parity в Stage 8-e остается частичной и требует дальнейших checkpoint-ов.
+
 ### GAP-2: FX helper surface in `ClientProxy` is incomplete and current overrides are no-op
 
 **Статус:** частично реализовано
