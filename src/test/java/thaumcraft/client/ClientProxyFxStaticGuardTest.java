@@ -106,6 +106,9 @@ public class ClientProxyFxStaticGuardTest {
         assertTrue("Runic shielding paths must send PacketFXShield for player and champion shield reactions",
                 runic.contains("new PacketFXShield(player.getEntityId(), target)")
                         && runic.contains("new PacketFXShield(mob.getEntityId(), target)"));
+        assertTrue("Runic shielding paths must play runic shield effect/charge sounds",
+                runic.contains("TCSounds.RUNICSHIELDEFFECT")
+                        && runic.contains("TCSounds.RUNICSHIELDCHARGE"));
         assertTrue("Eldritch guardian sonic attack path must send PacketFXSonic",
                 eldritchGuardian.contains("new PacketFXSonic(this.getEntityId())"));
         assertTrue("Wisp ranged attack path must send PacketFXWispZap",

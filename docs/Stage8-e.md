@@ -351,6 +351,29 @@ Depends on GAP-1, GAP-2, GAP-5, and GAP-6. Network-thread rendering is unsafe if
 
 - This is fallback FX routing and does not yet port reference rune-render particle classes.
 
+#### Checkpoint 2026-05-16 — GAP-8 runic shield sound cues restored
+
+Статус: runic shield effect/charge sound hooks are now active again in runic/champion paths.
+
+Что сделано:
+
+- Restored player runic shield break-heal cue:
+  - `TCSounds.RUNICSHIELDEFFECT` when healing upgrade triggers.
+- Restored player emergency recharge cue:
+  - `TCSounds.RUNICSHIELDCHARGE` when emergency upgrade refills charge.
+- Restored champion/eldritch shield hit cue:
+  - `TCSounds.RUNICSHIELDEFFECT` with reference-shaped hostile pitch variation.
+- Expanded static guard coverage in `ClientProxyFxStaticGuardTest` to enforce presence of runic shield sound hooks.
+
+Проверки:
+
+- `./scripts/dev.sh test` — passed.
+- `./scripts/dev.sh validate --smoke` — passed.
+
+Ограничения:
+
+- This restores sound-cue hooks only; full reference shield rune-render class parity remains open.
+
 #### Checkpoint 2026-05-16 — GAP-3 sonic packet baseline restored
 
 Статус: `PacketFXSonic` payload/handler and eldritch guardian send-site are now wired.

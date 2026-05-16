@@ -11,6 +11,7 @@ import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.potion.PotionEffect;
 import net.minecraft.util.DamageSource;
+import net.minecraft.util.SoundCategory;
 import net.minecraftforge.event.entity.living.LivingEvent;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -27,6 +28,7 @@ import thaumcraft.common.items.baubles.ItemAmuletRunic;
 import thaumcraft.common.items.baubles.ItemGirdleRunic;
 import thaumcraft.common.items.baubles.ItemRingRunic;
 import thaumcraft.common.items.wands.WandManager;
+import thaumcraft.common.lib.TCSounds;
 import thaumcraft.common.lib.capabilities.IPlayerKnowledge;
 import thaumcraft.common.lib.capabilities.PlayerKnowledgeProvider;
 import thaumcraft.common.lib.network.PacketHandler;
@@ -243,7 +245,8 @@ public class EventHandlerRunic {
                     } catch (Exception e) {
                         // silent
                     }
-                    // Phase 8: player.world.playSound(null, player.posX, player.posY, player.posZ, TCSounds.RUNICSHIELDEFFECT, ...);
+                    player.world.playSound(null, player.posX, player.posY, player.posZ,
+                            TCSounds.RUNICSHIELDEFFECT, SoundCategory.PLAYERS, 1.0f, 1.0f);
                 }
 
                 // Emergency charge (recharge when shield breaks)
@@ -254,7 +257,8 @@ public class EventHandlerRunic {
                     int t = 8 * emergencyLevel;
                     charge = Math.min(max, t);
                     this.isDirty = true;
-                    // Phase 8: player.world.playSound(null, player.posX, player.posY, player.posZ, TCSounds.RUNICSHIELDCHARGE, ...);
+                    player.world.playSound(null, player.posX, player.posY, player.posZ,
+                            TCSounds.RUNICSHIELDCHARGE, SoundCategory.PLAYERS, 1.0f, 1.0f);
                 }
 
                 if (charge <= 0) {
@@ -308,7 +312,8 @@ public class EventHandlerRunic {
                 new PacketFXShield(mob.getEntityId(), target),
                 new NetworkRegistry.TargetPoint(mob.world.provider.getDimension(), mob.posX, mob.posY, mob.posZ, 32.0));
 
-        // Phase 8: mob.world.playSound(null, mob.posX, mob.posY, mob.posZ, TCSounds.RUNICSHIELDEFFECT, ...);
+        mob.world.playSound(null, mob.posX, mob.posY, mob.posZ,
+                TCSounds.RUNICSHIELDEFFECT, SoundCategory.HOSTILE, 0.66f, 1.1f + mob.world.rand.nextFloat() * 0.1f);
     }
 
     private void setRunicCharge(EntityPlayer player, int charge, int max, boolean send) {
