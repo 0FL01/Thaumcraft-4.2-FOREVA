@@ -66,6 +66,14 @@ public class EntityTaintCreeper extends net.minecraft.entity.monster.EntityMob i
         return true;
     }
 
+    @Override
+    public int getMaxFallHeight() {
+        if (this.getAttackTarget() == null) {
+            return 3;
+        }
+        return 3 + (int)(this.getHealth() - 1.0F);
+    }
+
     public int getCreeperState() {
         return this.dataManager.get(CREEPER_STATE);
     }

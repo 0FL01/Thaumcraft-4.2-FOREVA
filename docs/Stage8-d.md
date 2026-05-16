@@ -1485,6 +1485,26 @@ Some entities may be hard to trigger naturally until recipes/research/spawn cont
 
 - Это biome/fibre spread baseline; deeper worldgen/taint propagation parity остаётся в общем Stage 6/7 runtime scope.
 
+### Checkpoint 2026-05-16 — restore taint creeper max-fall-height combat hook baseline
+
+Статус: частично продвинут.
+
+Что сделано:
+
+- `EntityTaintCreeper` расширен reference-shaped pathfinding/combat hook:
+  - добавлен override `getMaxFallHeight()` с поведением:
+    - `3` при отсутствии target;
+    - `3 + (int)(getHealth() - 1.0F)` при активном target.
+- `ClientProxyEntityRendererRegistrationStaticGuardTest` расширен проверками на `getMaxFallHeight()` contract и formula line.
+
+Проверки:
+
+- `./scripts/dev.sh validate --smoke` — passed.
+
+Ограничения:
+
+- Это pathfinding hook baseline; полная runtime parity taint creeper combat AI оценивается в общем Stage 6 behavior scope.
+
 ### Checkpoint 2026-05-16 — restore mind spider viewer-only render gating
 
 Статус: частично продвинут.
