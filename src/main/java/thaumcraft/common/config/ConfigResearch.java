@@ -2822,6 +2822,8 @@ public class ConfigResearch {
                 .setConcealed()
                 .setParents("GOLEMWOOD")
                 .registerResearchItem();
+        ThaumcraftApi.addWarpToResearch("GOLEMFLESH", 3);
+        ThaumcraftApi.addWarpToItem(new ItemStack(ConfigItems.itemGolemPlacer, 1, 4), 1);
 
         new ResearchItem(
                 "GOLEMTALLOW",
@@ -2936,6 +2938,270 @@ public class ConfigResearch {
                 .setConcealed()
                 .setSecondary()
                 .setParents("GOLEMBELL")
+                .registerResearchItem();
+
+        new ResearchItem(
+                "TRAVELTRUNK",
+                "GOLEMANCY",
+                new AspectList()
+                        .add(Aspect.SOUL, 3)
+                        .add(Aspect.TRAVEL, 3)
+                        .add(Aspect.TREE, 3)
+                        .add(Aspect.VOID, 3),
+                0,
+                4,
+                2,
+                new ItemStack(ConfigItems.itemTrunkSpawner))
+                .setPages(
+                        new ResearchPage("tc.research_page.TRAVELTRUNK.1"),
+                        new ResearchPage("tc.research_page.TRAVELTRUNK.2"),
+                        new ResearchPage("UPGRADEAIR", "tc.research_page.TRAVELTRUNK.UAI"),
+                        new ResearchPage("UPGRADEEARTH", "tc.research_page.TRAVELTRUNK.UEA"),
+                        new ResearchPage("UPGRADEFIRE", "tc.research_page.TRAVELTRUNK.UFI"),
+                        new ResearchPage("UPGRADEWATER", "tc.research_page.TRAVELTRUNK.UWA"),
+                        new ResearchPage("UPGRADEORDER", "tc.research_page.TRAVELTRUNK.UOR"),
+                        new ResearchPage("UPGRADEENTROPY", "tc.research_page.TRAVELTRUNK.UEN"))
+                .setConcealed()
+                .setParents("INFUSION", "GOLEMWOOD")
+                .registerResearchItem();
+
+        new ResearchItem(
+                "COREGATHER",
+                "GOLEMANCY",
+                new AspectList(),
+                -3,
+                3,
+                1,
+                new ItemStack(ConfigItems.itemGolemCore, 1, 2))
+                .setPages(
+                        new ResearchPage("tc.research_page.COREGATHER.1"),
+                        new ResearchPage("tc.research_page.COREGATHER.2"))
+                .setConcealed()
+                .setParents("GOLEMSTRAW")
+                .setStub()
+                .registerResearchItem();
+
+        new ResearchItem(
+                "COREFILL",
+                "GOLEMANCY",
+                new AspectList().add(Aspect.HUNGER, 3).add(Aspect.EXCHANGE, 3).add(Aspect.VOID, 3),
+                -5,
+                3,
+                2,
+                new ItemStack(ConfigItems.itemGolemCore, 1, 0))
+                .setPages(new ResearchPage("tc.research_page.COREFILL.1"))
+                .setConcealed()
+                .setSecondary()
+                .setParents("COREGATHER")
+                .registerResearchItem();
+
+        new ResearchItem(
+                "COREEMPTY",
+                "GOLEMANCY",
+                new AspectList().add(Aspect.VOID, 3).add(Aspect.EXCHANGE, 3).add(Aspect.GREED, 3),
+                -5,
+                1,
+                2,
+                new ItemStack(ConfigItems.itemGolemCore, 1, 1))
+                .setPages(new ResearchPage("tc.research_page.COREEMPTY.1"))
+                .setConcealed()
+                .setSecondary()
+                .setParents("COREGATHER")
+                .registerResearchItem();
+
+        new ResearchItem(
+                "CORESORTING",
+                "GOLEMANCY",
+                new AspectList()
+                        .add(Aspect.VOID, 3)
+                        .add(Aspect.EXCHANGE, 3)
+                        .add(Aspect.GREED, 3)
+                        .add(Aspect.HUNGER, 3),
+                -7,
+                2,
+                2,
+                new ItemStack(ConfigItems.itemGolemCore, 1, 10))
+                .setPages(new ResearchPage("tc.research_page.CORESORTING.1"))
+                .setConcealed()
+                .setSecondary()
+                .setParents("COREEMPTY", "COREFILL", "INFUSION")
+                .registerResearchItem();
+
+        new ResearchItem(
+                "COREUSE",
+                "GOLEMANCY",
+                new AspectList()
+                        .add(Aspect.TOOL, 3)
+                        .add(Aspect.EXCHANGE, 3)
+                        .add(Aspect.MECHANISM, 3)
+                        .add(Aspect.MAN, 3),
+                -7,
+                0,
+                3,
+                new ItemStack(ConfigItems.itemGolemCore, 1, 8))
+                .setPages(
+                        new ResearchPage("tc.research_page.COREUSE.1"),
+                        new ResearchPage("tc.research_page.COREUSE.2"),
+                        new ResearchPage("UPGRADEAIR", "tc.research_page.COREUSE.3"))
+                .setConcealed()
+                .setParents("COREEMPTY", "INFUSION")
+                .registerResearchItem();
+
+        new ResearchItem(
+                "COREHARVEST",
+                "GOLEMANCY",
+                new AspectList()
+                        .add(Aspect.HARVEST, 6)
+                        .add(Aspect.CROP, 3)
+                        .add(Aspect.TRAVEL, 3),
+                -2,
+                5,
+                2,
+                new ItemStack(ConfigItems.itemGolemCore, 1, 3))
+                .setPages(
+                        new ResearchPage("tc.research_page.COREHARVEST.1"),
+                        new ResearchPage("UPGRADEORDER", "tc.research_page.COREHARVEST.2"))
+                .setConcealed()
+                .setParents("COREGATHER")
+                .registerResearchItem();
+
+        new ResearchItem(
+                "COREFISHING",
+                "GOLEMANCY",
+                new AspectList()
+                        .add(Aspect.WATER, 3)
+                        .add(Aspect.HARVEST, 3)
+                        .add(Aspect.BEAST, 3)
+                        .add(Aspect.HUNGER, 3),
+                -2,
+                7,
+                2,
+                new ItemStack(ConfigItems.itemGolemCore, 1, 11))
+                .setPages(
+                        new ResearchPage("tc.research_page.COREFISHING.1"),
+                        new ResearchPage("UPGRADEAIR", "tc.research_page.COREFISHING.2"),
+                        new ResearchPage("UPGRADEFIRE", "tc.research_page.COREFISHING.3"),
+                        new ResearchPage("UPGRADEORDER", "tc.research_page.COREFISHING.4"),
+                        new ResearchPage("UPGRADEENTROPY", "tc.research_page.COREFISHING.5"))
+                .setConcealed()
+                .setSecondary()
+                .setParents("COREHARVEST", "INFUSION")
+                .registerResearchItem();
+
+        new ResearchItem(
+                "CORELUMBER",
+                "GOLEMANCY",
+                new AspectList()
+                        .add(Aspect.TREE, 6)
+                        .add(Aspect.HARVEST, 3)
+                        .add(Aspect.TOOL, 3)
+                        .add(Aspect.ENERGY, 3),
+                -1,
+                7,
+                2,
+                new ItemStack(ConfigItems.itemGolemCore, 1, 7))
+                .setPages(new ResearchPage("tc.research_page.CORELUMBER.1"))
+                .setConcealed()
+                .setSecondary()
+                .setParents("COREHARVEST", "ELEMENTALAXE")
+                .registerResearchItem();
+
+        new ResearchItem(
+                "COREGUARD",
+                "GOLEMANCY",
+                new AspectList()
+                        .add(Aspect.WEAPON, 3)
+                        .add(Aspect.TRAP, 3)
+                        .add(Aspect.SENSES, 3),
+                -4,
+                5,
+                2,
+                new ItemStack(ConfigItems.itemGolemCore, 1, 4))
+                .setPages(
+                        new ResearchPage("tc.research_page.COREGUARD.1"),
+                        new ResearchPage("UPGRADEORDER", "tc.research_page.COREGUARD.2"))
+                .setConcealed()
+                .setParents("COREGATHER")
+                .registerResearchItem();
+
+        new ResearchItem(
+                "COREBUTCHER",
+                "GOLEMANCY",
+                new AspectList()
+                        .add(Aspect.WEAPON, 3)
+                        .add(Aspect.BEAST, 3)
+                        .add(Aspect.SENSES, 3)
+                        .add(Aspect.HARVEST, 3),
+                -3,
+                7,
+                2,
+                new ItemStack(ConfigItems.itemGolemCore, 1, 9))
+                .setPages(new ResearchPage("tc.research_page.COREBUTCHER.1"))
+                .setConcealed()
+                .setSecondary()
+                .setParents("COREGUARD", "COREHARVEST")
+                .registerResearchItem();
+
+        new ResearchItem(
+                "CORELIQUID",
+                "GOLEMANCY",
+                new AspectList()
+                        .add(Aspect.WATER, 3)
+                        .add(Aspect.EXCHANGE, 3)
+                        .add(Aspect.TRAVEL, 3),
+                -7,
+                4,
+                2,
+                new ItemStack(ConfigItems.itemGolemCore, 1, 5))
+                .setPages(
+                        new ResearchPage("tc.research_page.CORELIQUID.1"),
+                        new ResearchPage("UPGRADEENTROPY", "tc.research_page.CORELIQUID.2"))
+                .setConcealed()
+                .setParents("COREFILL")
+                .registerResearchItem();
+
+        new ResearchItem(
+                "COREALCHEMY",
+                "GOLEMANCY",
+                new AspectList()
+                        .add(Aspect.WATER, 3)
+                        .add(Aspect.TRAVEL, 3)
+                        .add(Aspect.MAGIC, 3)
+                        .add(Aspect.ENERGY, 3),
+                -9,
+                3,
+                2,
+                new ItemStack(ConfigItems.itemGolemCore, 1, 6))
+                .setPages(
+                        new ResearchPage("tc.research_page.COREALCHEMY.1"),
+                        new ResearchPage("tc.research_page.COREALCHEMY.2"))
+                .setConcealed()
+                .setSecondary()
+                .setParents("CORELIQUID", "INFUSION")
+                .registerResearchItem();
+
+        new ResearchItem(
+                "ADVANCEDGOLEM",
+                "GOLEMANCY",
+                new AspectList()
+                        .add(Aspect.LIFE, 3)
+                        .add(Aspect.ENERGY, 3)
+                        .add(Aspect.MIND, 6)
+                        .add(Aspect.SENSES, 3),
+                8,
+                0,
+                2,
+                new ItemStack(ConfigItems.itemGolemPlacer, 1, 8))
+                .setPages(new ResearchPage("tc.research_page.ADVANCEDGOLEM.1"))
+                .setConcealed()
+                .setParents(
+                        "INFUSION",
+                        "UPGRADEAIR",
+                        "UPGRADEEARTH",
+                        "UPGRADEFIRE",
+                        "UPGRADEWATER",
+                        "UPGRADEORDER",
+                        "UPGRADEENTROPY")
                 .registerResearchItem();
     }
 
