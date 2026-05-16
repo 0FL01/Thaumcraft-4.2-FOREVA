@@ -121,6 +121,34 @@ public class PacketFXSerializationTest {
     }
 
     @Test
+    public void blockBubblePacketRoundTripsPayload() {
+        PacketFXBlockBubble source = new PacketFXBlockBubble(10, -3, 77, 0x3366CC);
+        PacketFXBlockBubble target = new PacketFXBlockBubble();
+        roundTrip(source, target);
+
+        assertEquals(10, (int) getField(target, "x"));
+        assertEquals(-3, (int) getField(target, "y"));
+        assertEquals(77, (int) getField(target, "z"));
+        assertEquals(0x3366CC, (int) getField(target, "color"));
+    }
+
+    @Test
+    public void blockDigPacketRoundTripsPayload() {
+        PacketFXBlockDig source = new PacketFXBlockDig(1, 2, 3, (byte) 4, (byte) 5, (byte) -6, 98, 7);
+        PacketFXBlockDig target = new PacketFXBlockDig();
+        roundTrip(source, target);
+
+        assertEquals(1, (int) getField(target, "x"));
+        assertEquals(2, (int) getField(target, "y"));
+        assertEquals(3, (int) getField(target, "z"));
+        assertEquals(98, (int) getField(target, "bi"));
+        assertEquals(7, (int) getField(target, "md"));
+        assertEquals((byte) 4, (byte) getField(target, "dx"));
+        assertEquals((byte) 5, (byte) getField(target, "dy"));
+        assertEquals((byte) -6, (byte) getField(target, "dz"));
+    }
+
+    @Test
     public void visDrainPacketRoundTripsPayload() {
         PacketFXVisDrain source = new PacketFXVisDrain(new BlockPos(1, 2, 3), new BlockPos(-4, 5, -6), 0x55AAFF);
         PacketFXVisDrain target = new PacketFXVisDrain();

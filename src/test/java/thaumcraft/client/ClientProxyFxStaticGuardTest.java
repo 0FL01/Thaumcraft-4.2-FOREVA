@@ -36,6 +36,8 @@ public class ClientProxyFxStaticGuardTest {
         String visDrain = readFile("src/main/java/thaumcraft/common/lib/network/fx/PacketFXVisDrain.java");
         String blockArc = readFile("src/main/java/thaumcraft/common/lib/network/fx/PacketFXBlockArc.java");
         String blockZap = readFile("src/main/java/thaumcraft/common/lib/network/fx/PacketFXBlockZap.java");
+        String blockDig = readFile("src/main/java/thaumcraft/common/lib/network/fx/PacketFXBlockDig.java");
+        String blockBubble = readFile("src/main/java/thaumcraft/common/lib/network/fx/PacketFXBlockBubble.java");
         String essentiaSource = readFile("src/main/java/thaumcraft/common/lib/network/fx/PacketFXEssentiaSource.java");
         String infusionSource = readFile("src/main/java/thaumcraft/common/lib/network/fx/PacketFXInfusionSource.java");
         String blockSparkle = readFile("src/main/java/thaumcraft/common/lib/network/fx/PacketFXBlockSparkle.java");
@@ -59,6 +61,12 @@ public class ClientProxyFxStaticGuardTest {
         assertTrue("PacketFXBlockZap must schedule client task and route through proxy bolt",
                 blockZap.contains("Minecraft.getMinecraft().addScheduledTask")
                         && blockZap.contains("Thaumcraft.proxy.bolt("));
+        assertTrue("PacketFXBlockDig must schedule client task and emit dig particles",
+                blockDig.contains("Minecraft.getMinecraft().addScheduledTask")
+                        && blockDig.contains("EnumParticleTypes.BLOCK_CRACK"));
+        assertTrue("PacketFXBlockBubble must schedule client task and emit bubble particles",
+                blockBubble.contains("Minecraft.getMinecraft().addScheduledTask")
+                        && blockBubble.contains("EnumParticleTypes.WATER_BUBBLE"));
         assertTrue("PacketFXEssentiaSource must schedule client task and route through proxy beam",
                 essentiaSource.contains("Minecraft.getMinecraft().addScheduledTask")
                         && essentiaSource.contains("Thaumcraft.proxy.beam("));

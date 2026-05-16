@@ -492,6 +492,29 @@ Depends on GAP-1, GAP-2, GAP-5, and GAP-6. Network-thread rendering is unsafe if
 
 - This remains fallback visual behavior and does not yet port reference matrix-side `sourceFX` stream lifecycle classes.
 
+#### Checkpoint 2026-05-16 — GAP-3 block-dig and block-bubble packet handler baseline restored
+
+Статус: `PacketFXBlockDig` and `PacketFXBlockBubble` now have payload serialization and client-scheduled fallback handlers.
+
+Что сделано:
+
+- Implemented `PacketFXBlockBubble` payload (`x/y/z/color`) and client-scheduled fallback bubble rendering.
+- Implemented `PacketFXBlockDig` payload (`x/y/z`, `bi/md`, `dx/dy/dz`) and client-scheduled fallback dig particle rendering:
+  - block-backed path emits `BLOCK_CRACK` particles plus block hit sound;
+  - item-backed path emits `ITEM_CRACK` particles.
+- Expanded FX tests:
+  - `PacketFXSerializationTest` now includes `PacketFXBlockBubble` and `PacketFXBlockDig` round-trips.
+  - `ClientProxyFxStaticGuardTest` now enforces client scheduling and particle emission markers for both handlers.
+
+Проверки:
+
+- `./scripts/dev.sh test` — passed.
+- `./scripts/dev.sh validate --smoke` — passed.
+
+Ограничения:
+
+- Dedicated send-site restoration for these packet families remains open where corresponding gameplay paths are still stubbed.
+
 ### GAP-4: Beam, wand beam, bore beam, power beam, arc, and lightning bolt classes are absent
 
 **Статус:** отсутствует  
@@ -835,8 +858,8 @@ Depends on GAP-3, GAP-4, GAP-6. Focus server behavior is Stage 5 dependency only
 - `src/main/java/thaumcraft/common/lib/network/fx/PacketFXVisDrain.java`
 - `src/main/java/thaumcraft/common/lib/network/fx/PacketFXEssentiaSource.java`
 - `src/main/java/thaumcraft/common/lib/network/fx/PacketFXInfusionSource.java`
-- `src/main/java/thaumcraft/common/lib/network/fx/PacketFXBlockDig.java:1-7`
-- `src/main/java/thaumcraft/common/lib/network/fx/PacketFXBlockBubble.java:1-7`
+- `src/main/java/thaumcraft/common/lib/network/fx/PacketFXBlockDig.java`
+- `src/main/java/thaumcraft/common/lib/network/fx/PacketFXBlockBubble.java`
 
 **Референс:**
 - `thaumcraft_src/thaumcraft/common/lib/network/fx/PacketFXSonic.class`
@@ -853,7 +876,7 @@ Depends on GAP-3, GAP-4, GAP-6. Focus server behavior is Stage 5 dependency only
 
 **Что не совпадает:**
 
-Several registered packet types represent non-wand FX channels used by mobs, aura/vis/essentia transfer, infusion, bore/block interactions, and bubbles. `PacketFXSonic`, `PacketFXVisDrain`, `PacketFXEssentiaSource`, and `PacketFXInfusionSource` now have fallback handlers and active send paths, while bore/bubble families remain empty or no-op.
+Several registered packet types represent non-wand FX channels used by mobs, aura/vis/essentia transfer, infusion, bore/block interactions, and bubbles. `PacketFXSonic`, `PacketFXVisDrain`, `PacketFXEssentiaSource`, `PacketFXInfusionSource`, `PacketFXBlockDig`, and `PacketFXBlockBubble` now have fallback handlers; remaining gaps are mostly renderer-parity depth and missing send-sites in still-stubbed gameplay paths.
 
 **Что нужно доделать:**
 
