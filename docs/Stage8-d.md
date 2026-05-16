@@ -2104,6 +2104,31 @@ Some entities may be hard to trigger naturally until recipes/research/spawn cont
 
 - В 1.12-порте отсутствуют отдельные `itemHelmetCultistPlate`/`itemChestCultistPlate`/`itemLegsCultistPlate` item-singletons из legacy surface; текущий baseline использует доступный `ConfigItems.itemCultistPlate` для эквивалентного armor-presence contract.
 
+### Checkpoint 2026-05-17 — replace aspect orb snowball fallback with dedicated renderer baseline
+
+Статус: частично продвинут.
+
+Что сделано:
+
+- `EntityAspectOrb` переведен с fallback `RenderSnowball` на dedicated `RenderAspectOrb`.
+- Добавлен новый `RenderAspectOrb` (billboard quad) с reference-shaped contracts:
+  - particle-atlas binding (`textures/misc/particles.png`);
+  - aspect tint + alpha baseline (`aspect.getColor()`, alpha `128`);
+  - dest blend-factor mapping из `aspect.getBlend()` в `GlStateManager.DestFactor`;
+  - age-driven render scale (`orbMaxAge - orbAge`);
+  - fullbright lightmap coords и camera-facing rotation.
+- `ClientProxyEntityRendererRegistrationStaticGuardTest` обновлен:
+  - registration contract: `EntityAspectOrb -> RenderAspectOrb::new`;
+  - renderer contract: texture/billboard/blend/scale vertex-format surface.
+
+Проверки:
+
+- `./scripts/dev.sh validate --smoke` — passed.
+
+Ограничения:
+
+- Это renderer behavior baseline без ручной визуальной валидации; итоговая visual parity (exact legacy GL state nuances) остаётся в общем Stage 8-d runtime/manual matrix.
+
 - [ ] Add client-only entity renderer registration hook.
 - [ ] Register every entity from `ConfigEntities.ENTITIES` with a custom or vanilla-equivalent renderer.
 - [ ] Port item-like/transient/projectile renderers.

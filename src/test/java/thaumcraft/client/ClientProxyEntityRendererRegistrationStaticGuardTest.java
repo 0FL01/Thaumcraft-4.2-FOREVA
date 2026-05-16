@@ -23,7 +23,7 @@ public class ClientProxyEntityRendererRegistrationStaticGuardTest {
                         && source.contains("registerEntityRenderer(EntityPermanentItem.class, manager -> new RenderEntityItem(manager, renderItem), registered);")
                         && source.contains("registerEntityRenderer(EntityFollowingItem.class, manager -> new RenderEntityItem(manager, renderItem), registered);")
                         && source.contains("registerEntityRenderer(EntityItemGrate.class, manager -> new RenderEntityItem(manager, renderItem), registered);"));
-        assertTrue("ClientProxy must keep non-noop projectile RenderSnowball baseline registrations",
+        assertTrue("ClientProxy must keep non-noop projectile baselines plus dedicated aspect-orb renderer",
                 source.contains("registerEntityRenderer(EntityDart.class, manager -> new RenderSnowball<>(manager, Items.ARROW, renderItem), registered);")
                         && source.contains("registerEntityRenderer(EntityPrimalArrow.class,")
                         && source.contains("registerEntityRenderer(EntityBottleTaint.class,")
@@ -37,7 +37,7 @@ public class ClientProxyEntityRendererRegistrationStaticGuardTest {
                         && source.contains("registerEntityRenderer(EntityExplosiveOrb.class, manager -> new RenderSnowball<>(manager, Items.FIREWORK_CHARGE, renderItem), registered);")
                         && source.contains("registerEntityRenderer(EntityEmber.class, manager -> new RenderSnowball<>(manager, Items.BLAZE_POWDER, renderItem), registered);")
                         && source.contains("registerEntityRenderer(EntityGolemBobber.class, manager -> new RenderSnowball<>(manager, Items.FISHING_ROD, renderItem), registered);")
-                        && source.contains("registerEntityRenderer(EntityAspectOrb.class, manager -> new RenderSnowball<>(manager, Items.ENDER_EYE, renderItem), registered);")
+                        && source.contains("registerEntityRenderer(EntityAspectOrb.class, RenderAspectOrb::new, registered);")
                         && source.contains("registerEntityRenderer(EntityFallingTaint.class, manager -> new RenderSnowball<>(manager, Items.SLIME_BALL, renderItem), registered);"));
         assertTrue("ClientProxy must keep vanilla mob fallback renderer registrations for compatible zombie/spider groups",
                 source.contains("registerEntityRenderer(EntityBrainyZombie.class, RenderBrainyZombie::new, registered);")
@@ -103,6 +103,14 @@ public class ClientProxyEntityRendererRegistrationStaticGuardTest {
                         && wispRenderer.contains("Aspect.getAspect(entity.getWispType())")
                         && wispRenderer.contains("GlStateManager.color(red, green, blue, 1.0F)")
                         && wispRenderer.contains("GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F)"));
+        String aspectOrbRenderer = readFile("src/main/java/thaumcraft/client/renderers/entity/RenderAspectOrb.java");
+        assertTrue("RenderAspectOrb must provide particle-texture billboard with aspect tint and blend-factor mapping baseline",
+                aspectOrbRenderer.contains("extends Render<EntityAspectOrb>")
+                        && aspectOrbRenderer.contains("textures/misc/particles.png")
+                        && aspectOrbRenderer.contains("mapDestBlendFactor")
+                        && aspectOrbRenderer.contains("orb.getAspect().getBlend()")
+                        && aspectOrbRenderer.contains("orb.orbMaxAge - orb.orbAge")
+                        && aspectOrbRenderer.contains("DefaultVertexFormats.POSITION_TEX_COLOR"));
         String eldritchGuardianRenderer = readFile("src/main/java/thaumcraft/client/renderers/entity/RenderEldritchGuardian.java");
         assertTrue("RenderEldritchGuardian must provide dedicated guardian texture baseline",
                 eldritchGuardianRenderer.contains("extends RenderBiped<EntityEldritchGuardian>")
