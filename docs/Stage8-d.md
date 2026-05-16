@@ -1133,6 +1133,29 @@ Some entities may be hard to trigger naturally until recipes/research/spawn cont
 
 - Это baseline texture/scale parity; full reference parity по taint villager visual stack (дополнительные legacy pass hooks и GL-state нюансы) остаётся открытой по GAP-3/GAP-6.
 
+### Checkpoint 2026-05-16 — dedicated taint chicken wing-rotation renderer baseline
+
+Статус: частично продвинут.
+
+Что сделано:
+
+- Добавлен выделенный renderer `RenderTaintChicken` (`thaumcraft.client.renderers.entity.RenderTaintChicken`) вместо shared texture-only baseline для `EntityTaintChicken`.
+- Baseline behavior:
+  - dedicated texture path `textures/models/chicken.png`;
+  - reference-shaped wing-rotation callback в `handleRotationFloat` с использованием `field_756_e`, `field_752_b`, `field_757_d`, `destPos` и `MathHelper.sin(...)`.
+- `ClientProxy.setupEntityRenderers()` обновлен: `EntityTaintChicken` теперь регистрируется через `RenderTaintChicken::new`.
+- `ClientProxyEntityRendererRegistrationStaticGuardTest` расширен проверками:
+  - explicit registration path `EntityTaintChicken -> RenderTaintChicken`;
+  - texture + wing-rotation callback contracts `RenderTaintChicken`.
+
+Проверки:
+
+- `./scripts/dev.sh validate --smoke` — passed.
+
+Ограничения:
+
+- Это baseline texture/wing parity; full reference parity по taint chicken visual stack (legacy render-pass и GL-state детали) остаётся открытой по GAP-3/GAP-6.
+
 - [ ] Add client-only entity renderer registration hook.
 - [ ] Register every entity from `ConfigEntities.ENTITIES` with a custom or vanilla-equivalent renderer.
 - [ ] Port item-like/transient/projectile renderers.

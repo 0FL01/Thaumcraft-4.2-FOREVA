@@ -7,7 +7,6 @@ import javax.annotation.Nullable;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.ModelBat;
 import net.minecraft.client.model.ModelBiped;
-import net.minecraft.client.model.ModelChicken;
 import net.minecraft.client.model.ModelCow;
 import net.minecraft.client.model.ModelPig;
 import net.minecraft.client.model.ModelSheep2;
@@ -73,6 +72,7 @@ import thaumcraft.client.renderers.entity.RenderTaintSpider;
 import thaumcraft.client.renderers.entity.RenderTaintSwarm;
 import thaumcraft.client.renderers.entity.RenderTaintacle;
 import thaumcraft.client.renderers.entity.RenderTaintCreeper;
+import thaumcraft.client.renderers.entity.RenderTaintChicken;
 import thaumcraft.client.renderers.entity.RenderTaintTextureLiving;
 import thaumcraft.client.renderers.entity.RenderTaintVillager;
 import thaumcraft.client.renderers.entity.RenderTravelingTrunk;
@@ -225,8 +225,7 @@ public class ClientProxy extends CommonProxy {
         registerEntityRenderer(EntityInhabitedZombie.class, RenderInhabitedZombie::new, registered);
         registerEntityRenderer(EntityMindSpider.class, RenderMindSpider::new, registered);
         registerEntityRenderer(EntityTaintSpider.class, RenderTaintSpider::new, registered);
-        registerEntityRenderer(EntityTaintChicken.class, manager -> new RenderTaintTextureLiving<>(
-                manager, new ModelChicken(), 0.3F, new ResourceLocation("thaumcraft", "textures/models/chicken.png")), registered);
+        registerEntityRenderer(EntityTaintChicken.class, RenderTaintChicken::new, registered);
         registerEntityRenderer(EntityTaintCow.class, manager -> new RenderTaintTextureLiving<>(
                 manager, new ModelCow(), 0.7F, new ResourceLocation("thaumcraft", "textures/models/cow.png")), registered);
         registerEntityRenderer(EntityTaintPig.class, manager -> new RenderTaintTextureLiving<>(

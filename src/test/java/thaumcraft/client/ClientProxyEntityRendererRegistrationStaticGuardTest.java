@@ -46,7 +46,7 @@ public class ClientProxyEntityRendererRegistrationStaticGuardTest {
                         && source.contains("registerEntityRenderer(EntityMindSpider.class, RenderMindSpider::new, registered);")
                         && source.contains("registerEntityRenderer(EntityTaintSpider.class, RenderTaintSpider::new, registered);"));
         assertTrue("ClientProxy must keep dedicated taint animal-like renderer registrations",
-                source.contains("registerEntityRenderer(EntityTaintChicken.class, manager -> new RenderTaintTextureLiving<>(")
+                source.contains("registerEntityRenderer(EntityTaintChicken.class, RenderTaintChicken::new, registered);")
                         && source.contains("registerEntityRenderer(EntityTaintCow.class, manager -> new RenderTaintTextureLiving<>(")
                         && source.contains("registerEntityRenderer(EntityTaintPig.class, manager -> new RenderTaintTextureLiving<>(")
                         && source.contains("registerEntityRenderer(EntityTaintSheep.class, manager -> new RenderTaintTextureLiving<>(")
@@ -191,6 +191,15 @@ public class ClientProxyEntityRendererRegistrationStaticGuardTest {
                         && taintVillagerRenderer.contains("textures/models/villager.png")
                         && taintVillagerRenderer.contains("GlStateManager.scale(scale, scale, scale)")
                         && taintVillagerRenderer.contains("0.9375F"));
+        String taintChickenRenderer = readFile("src/main/java/thaumcraft/client/renderers/entity/RenderTaintChicken.java");
+        assertTrue("RenderTaintChicken must provide chicken texture and wing rotation baseline",
+                taintChickenRenderer.contains("extends RenderLiving<EntityTaintChicken>")
+                        && taintChickenRenderer.contains("textures/models/chicken.png")
+                        && taintChickenRenderer.contains("handleRotationFloat")
+                        && taintChickenRenderer.contains("field_756_e")
+                        && taintChickenRenderer.contains("field_752_b")
+                        && taintChickenRenderer.contains("destPos")
+                        && taintChickenRenderer.contains("MathHelper.sin"));
         String cultistRenderer = readFile("src/main/java/thaumcraft/client/renderers/entity/RenderCultist.java");
         assertTrue("RenderCultist must provide shared cultist texture baseline",
                 cultistRenderer.contains("extends RenderBiped<T>")
