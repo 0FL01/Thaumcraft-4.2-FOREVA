@@ -37,6 +37,7 @@ public class ConfigResearch {
         initAlchemyResearchBaseline();
         initAlchemyResearchTextOnlyBaseline();
         initArtificeResearchBaseline();
+        initArtificeResearchTextOnlyBaseline();
         initGolemancyResearchBaseline();
         initGolemancyResearchTextOnlyBaseline();
         initThaumaturgyResearchBaseline();
@@ -3202,6 +3203,40 @@ public class ConfigResearch {
                         "UPGRADEWATER",
                         "UPGRADEORDER",
                         "UPGRADEENTROPY")
+                .registerResearchItem();
+    }
+
+    private static void initArtificeResearchTextOnlyBaseline() {
+        new ResearchItem(
+                "BASICARTIFACE",
+                "ARTIFICE",
+                new AspectList(),
+                0,
+                1,
+                0,
+                new ItemStack(ConfigItems.itemResource, 1, 15))
+                .setPages(new ResearchPage("tc.research_page.BASICARTIFACE.1"))
+                .setStub()
+                .setRound()
+                .setAutoUnlock()
+                .registerResearchItem();
+
+        new ResearchItem(
+                "FLUXSCRUB",
+                "ARTIFICE",
+                new AspectList()
+                        .add(Aspect.MAGIC, 3)
+                        .add(Aspect.TRAP, 3)
+                        .add(Aspect.AIR, 3)
+                        .add(Aspect.WATER, 3),
+                -8,
+                -3,
+                1,
+                new ItemStack(ConfigBlocks.blockStoneDevice, 1, 14))
+                .setPages(new ResearchPage("tc.research_page.FLUXSCRUB.1"))
+                .setParentsHidden("INFUSION")
+                .setParents("VISPOWER", "BELLOWS", "TUBES")
+                .setSecondary()
                 .registerResearchItem();
     }
 
