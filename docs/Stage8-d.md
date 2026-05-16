@@ -1475,6 +1475,27 @@ Some entities may be hard to trigger naturally until recipes/research/spawn cont
 
 - Это scale/eyes-lightmap baseline; remaining taint spider gameplay parity (entity attributes/size/drop-frequency nuances from Stage 6 scope) закрывается отдельным common-side checkpoint.
 
+### Checkpoint 2026-05-16 — restore taint spider common behavior baseline (size/attributes/loot)
+
+Статус: частично продвинут.
+
+Что сделано:
+
+- `EntityTaintSpider` приведен к reference-shaped baseline, критичному для entity/render parity:
+  - constructor size restored to `0.4F x 0.3F`, XP baseline restored to `2`;
+  - attributes restored to `MAX_HEALTH = 5.0D`, `ATTACK_DAMAGE = 2.0D`;
+  - `getYOffset()` restored to `0.1D`;
+  - loot drop gating restored to `1/6` chance, with existing resource 11/12 split preserved.
+- `ClientProxyEntityRendererRegistrationStaticGuardTest` расширен проверками на size/XP/attributes/y-offset/loot contracts для `EntityTaintSpider`.
+
+Проверки:
+
+- `./scripts/dev.sh validate --smoke` — passed.
+
+Ограничения:
+
+- Точный legacy pre-1.8 target-acquisition path (`findPlayerToAttack`) не переносится 1:1 в 1.12 AI-task model и остаётся в общем Stage 6 behavior parity scope.
+
 - [ ] Add client-only entity renderer registration hook.
 - [ ] Register every entity from `ConfigEntities.ENTITIES` with a custom or vanilla-equivalent renderer.
 - [ ] Port item-like/transient/projectile renderers.

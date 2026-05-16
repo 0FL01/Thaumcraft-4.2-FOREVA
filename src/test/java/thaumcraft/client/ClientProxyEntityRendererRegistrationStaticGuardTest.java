@@ -314,9 +314,16 @@ public class ClientProxyEntityRendererRegistrationStaticGuardTest {
                         && mindSpiderEntity.contains("nbt.setByte(\"harmless\"")
                         && mindSpiderEntity.contains("nbt.setString(\"viewer\""));
         String taintSpiderEntity = readFile("src/main/java/thaumcraft/common/entities/monster/EntityTaintSpider.java");
-        assertTrue("EntityTaintSpider must expose scale accessor baseline for dedicated renderer scale contract",
+        assertTrue("EntityTaintSpider must keep reference-shaped scale, size, attributes, and loot-drop contracts",
                 taintSpiderEntity.contains("public float spiderScaleAmount()")
-                        && taintSpiderEntity.contains("return 0.4F;"));
+                        && taintSpiderEntity.contains("return 0.4F;")
+                        && taintSpiderEntity.contains("this.setSize(0.4F, 0.3F);")
+                        && taintSpiderEntity.contains("this.experienceValue = 2;")
+                        && taintSpiderEntity.contains("setBaseValue(5.0D)")
+                        && taintSpiderEntity.contains("setBaseValue(2.0D)")
+                        && taintSpiderEntity.contains("public double getYOffset()")
+                        && taintSpiderEntity.contains("return 0.1D;")
+                        && taintSpiderEntity.contains("this.world.rand.nextInt(6) == 0"));
         assertTrue("ClientProxy must iterate ConfigEntities.ENTITIES for renderer registration coverage",
                 source.contains("for (net.minecraftforge.fml.common.registry.EntityEntry entry : ConfigEntities.ENTITIES)"));
         assertTrue("ClientProxy must keep fallback RenderNoop registrations for remaining entities",
