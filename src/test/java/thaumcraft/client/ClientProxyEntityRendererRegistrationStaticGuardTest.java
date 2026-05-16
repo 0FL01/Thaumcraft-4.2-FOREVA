@@ -298,6 +298,11 @@ public class ClientProxyEntityRendererRegistrationStaticGuardTest {
                         && taintCreeperEntity.contains("instanceof thaumcraft.api.entities.ITaintedMob")
                         && taintCreeperEntity.contains("Config.potionFluxTaint")
                         && taintCreeperEntity.contains("entity.addPotionEffect(new PotionEffect"));
+        assertTrue("EntityTaintCreeper must keep post-explosion taint biome/fibre spread baseline",
+                taintCreeperEntity.contains("for (int i = 0; i < 10; i++)")
+                        && taintCreeperEntity.contains("Utils.setBiomeAt(this.world, x, z, thaumcraft.common.lib.world.ThaumcraftWorldGenerator.biomeTaint)")
+                        && taintCreeperEntity.contains("ConfigBlocks.blockTaintFibres.getDefaultState()")
+                        && taintCreeperEntity.contains("this.world.isSideSolid(below, EnumFacing.UP, false)"));
         String taintSheepEntity = readFile("src/main/java/thaumcraft/common/entities/monster/EntityTaintSheep.java");
         assertTrue("EntityTaintSheep must keep sheared-state data/NBT/shearing contracts for fur-layer renderer parity",
                 taintSheepEntity.contains("DataParameter<Byte>")

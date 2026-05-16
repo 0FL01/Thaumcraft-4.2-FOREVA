@@ -1465,6 +1465,26 @@ Some entities may be hard to trigger naturally until recipes/research/spawn cont
 
 - Это detonation poison-splash baseline; reference taint biome/fibre spread side-effects после взрыва остаются в Stage 6 runtime scope.
 
+### Checkpoint 2026-05-16 — restore taint creeper detonation biome/fibre spread baseline
+
+Статус: частично продвинут.
+
+Что сделано:
+
+- `EntityTaintCreeper` post-explosion path расширен reference-shaped taint spread baseline:
+  - добавлен `10`-attempt random spread loop around blast center;
+  - при chance-path выполняется biome conversion через `Utils.setBiomeAt(..., ThaumcraftWorldGenerator.biomeTaint)`;
+  - добавлен fibre placement path на replaceable blocks с solid support below (`ConfigBlocks.blockTaintFibres`).
+- `ClientProxyEntityRendererRegistrationStaticGuardTest` расширен проверками на loop/biome conversion/fibre placement contracts.
+
+Проверки:
+
+- `./scripts/dev.sh validate --smoke` — passed.
+
+Ограничения:
+
+- Это biome/fibre spread baseline; deeper worldgen/taint propagation parity остаётся в общем Stage 6/7 runtime scope.
+
 ### Checkpoint 2026-05-16 — restore mind spider viewer-only render gating
 
 Статус: частично продвинут.

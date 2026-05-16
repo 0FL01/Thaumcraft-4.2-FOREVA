@@ -8,7 +8,9 @@ import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.EntityDataManager;
 import net.minecraft.potion.PotionEffect;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.util.math.BlockPos;
 import thaumcraft.common.entities.ai.combat.AIAttackOnCollide;
 import thaumcraft.common.entities.ai.combat.AICreeperSwell;
 
@@ -108,6 +110,20 @@ public class EntityTaintCreeper extends net.minecraft.entity.monster.EntityMob i
                             continue;
                         }
                         entity.addPotionEffect(new PotionEffect(thaumcraft.common.config.Config.potionFluxTaint, 100, 0, false, true));
+                    }
+                    int y = (int) this.posY;
+                    for (int i = 0; i < 10; i++) {
+                        int x = (int) (this.posX + (this.rand.nextFloat() - this.rand.nextFloat()) * 5.0F);
+                        int z = (int) (this.posZ + (this.rand.nextFloat() - this.rand.nextFloat()) * 5.0F);
+                        if (this.rand.nextBoolean() && this.world.getBiome(new BlockPos(x, 0, z)) != thaumcraft.common.lib.world.ThaumcraftWorldGenerator.biomeTaint) {
+                            thaumcraft.common.lib.utils.Utils.setBiomeAt(this.world, x, z, thaumcraft.common.lib.world.ThaumcraftWorldGenerator.biomeTaint);
+                        }
+                        BlockPos pos = new BlockPos(x, y, z);
+                        BlockPos below = pos.down();
+                        if (this.world.isSideSolid(below, EnumFacing.UP, false)
+                                && this.world.getBlockState(pos).getMaterial().isReplaceable()) {
+                            this.world.setBlockState(pos, thaumcraft.common.config.ConfigBlocks.blockTaintFibres.getDefaultState(), 3);
+                        }
                     }
                     this.setDead();
                 }
