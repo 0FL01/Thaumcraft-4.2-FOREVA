@@ -170,7 +170,9 @@ public class ClientProxyEntityRendererRegistrationStaticGuardTest {
                         && mindSpiderRenderer.contains("textures/models/taint_spider.png")
                         && mindSpiderRenderer.contains("textures/models/taint_spider_eyes.png")
                         && mindSpiderRenderer.contains("this.addLayer(new SpiderEyesLayer())")
-                        && mindSpiderRenderer.contains("entity.width / 1.4F"));
+                        && mindSpiderRenderer.contains("entity.width / 1.4F")
+                        && mindSpiderRenderer.contains("entity.getViewer()")
+                        && mindSpiderRenderer.contains("Minecraft.getMinecraft().player.getName()"));
         String taintSpiderRenderer = readFile("src/main/java/thaumcraft/client/renderers/entity/RenderTaintSpider.java");
         assertTrue("RenderTaintSpider must provide taint spider texture, eyes, and y-scale baseline",
                 taintSpiderRenderer.contains("extends RenderLiving<EntityTaintSpider>")
@@ -286,6 +288,9 @@ public class ClientProxyEntityRendererRegistrationStaticGuardTest {
                         && taintSheepEntity.contains("this.setSheared(true);")
                         && taintSheepEntity.contains("Blocks.WOOL")
                         && taintSheepEntity.contains("\"Sheared\""));
+        String mindSpiderEntity = readFile("src/main/java/thaumcraft/common/entities/monster/EntityMindSpider.java");
+        assertTrue("EntityMindSpider must expose viewer accessor for viewer-only render gating",
+                mindSpiderEntity.contains("public String getViewer()"));
         assertTrue("ClientProxy must iterate ConfigEntities.ENTITIES for renderer registration coverage",
                 source.contains("for (net.minecraftforge.fml.common.registry.EntityEntry entry : ConfigEntities.ENTITIES)"));
         assertTrue("ClientProxy must keep fallback RenderNoop registrations for remaining entities",

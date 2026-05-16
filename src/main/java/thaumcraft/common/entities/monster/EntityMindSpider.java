@@ -38,6 +38,10 @@ public class EntityMindSpider extends net.minecraft.entity.monster.EntitySpider 
         this.viewer = name;
     }
 
+    public String getViewer() {
+        return this.viewer == null ? "" : this.viewer;
+    }
+
     public void setHarmless(boolean harmless) {
         this.harmlessTicks = harmless ? 1200 : 0;
     }

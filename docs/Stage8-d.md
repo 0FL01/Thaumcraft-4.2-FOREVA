@@ -1346,6 +1346,28 @@ Some entities may be hard to trigger naturally until recipes/research/spawn cont
 
 - Это armor-layer baseline; полная parity по taint creeper visual stack (точные legacy lightmap/intensity нюансы и powered-state acquisition path) остаётся открытой по GAP-3/GAP-6.
 
+### Checkpoint 2026-05-16 — restore mind spider viewer-only render gating
+
+Статус: частично продвинут.
+
+Что сделано:
+
+- В `EntityMindSpider` добавлен accessor `getViewer()`.
+- `RenderMindSpider` расширен reference-shaped viewer-gating в `doRender(...)`:
+  - если `viewer` пустой — сущность рендерится как обычно;
+  - если `viewer` задан — сущность рендерится только для клиента с matching player name.
+- `ClientProxyEntityRendererRegistrationStaticGuardTest` расширен проверками:
+  - `RenderMindSpider` содержит `entity.getViewer()` + current-player name compare;
+  - `EntityMindSpider` содержит `getViewer()` contract.
+
+Проверки:
+
+- `./scripts/dev.sh validate --smoke` — passed.
+
+Ограничения:
+
+- Это viewer-gating baseline; полная parity по mind spider rendering (точная reference alpha-fade модель и legacy GL-pass нюансы) остаётся открытой по GAP-3/GAP-6.
+
 - [ ] Add client-only entity renderer registration hook.
 - [ ] Register every entity from `ConfigEntities.ENTITIES` with a custom or vanilla-equivalent renderer.
 - [ ] Port item-like/transient/projectile renderers.

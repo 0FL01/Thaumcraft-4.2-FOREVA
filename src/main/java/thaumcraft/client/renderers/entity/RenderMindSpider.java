@@ -1,5 +1,6 @@
 package thaumcraft.client.renderers.entity;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.ModelSpider;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.entity.RenderLiving;
@@ -21,6 +22,18 @@ public class RenderMindSpider extends RenderLiving<EntityMindSpider> {
     public RenderMindSpider(RenderManager renderManager) {
         super(renderManager, new ModelSpider(), 0.0F);
         this.addLayer(new SpiderEyesLayer());
+    }
+
+    @Override
+    public void doRender(EntityMindSpider entity, double x, double y, double z, float entityYaw, float partialTicks) {
+        String viewer = entity.getViewer();
+        if (viewer.length() == 0) {
+            super.doRender(entity, x, y, z, entityYaw, partialTicks);
+            return;
+        }
+        if (Minecraft.getMinecraft().player != null && viewer.equals(Minecraft.getMinecraft().player.getName())) {
+            super.doRender(entity, x, y, z, entityYaw, partialTicks);
+        }
     }
 
     @Override
