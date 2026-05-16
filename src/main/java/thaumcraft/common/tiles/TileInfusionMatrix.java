@@ -44,6 +44,7 @@ import thaumcraft.common.lib.crafting.ThaumcraftCraftingManager;
 import thaumcraft.common.lib.events.EssentiaHandler;
 import thaumcraft.common.lib.network.PacketHandler;
 import thaumcraft.common.lib.network.fx.PacketFXBlockZap;
+import thaumcraft.common.lib.network.fx.PacketFXInfusionSource;
 import thaumcraft.common.lib.utils.InventoryUtils;
 
 public class TileInfusionMatrix extends TileThaumcraft implements ITickable, IWandable, IAspectContainer {
@@ -306,6 +307,21 @@ public class TileInfusionMatrix extends TileThaumcraft implements ITickable, IWa
                 if (pedestalPos != null) {
                     if (this.itemCount == 0) {
                         this.itemCount = 5;
+                        PacketHandler.INSTANCE.sendToAllAround(
+                                new PacketFXInfusionSource(
+                                        this.pos.getX(),
+                                        this.pos.getY(),
+                                        this.pos.getZ(),
+                                        (byte) (this.pos.getX() - pedestalPos.getX()),
+                                        (byte) (this.pos.getY() - pedestalPos.getY()),
+                                        (byte) (this.pos.getZ() - pedestalPos.getZ()),
+                                        0),
+                                new NetworkRegistry.TargetPoint(
+                                        this.world.provider.getDimension(),
+                                        this.pos.getX(),
+                                        this.pos.getY(),
+                                        this.pos.getZ(),
+                                        32.0));
                         this.markDirtyAndSync();
                     } else if (--this.itemCount <= 0) {
                         this.consumePedestalIngredient(pedestalPos);
@@ -426,6 +442,21 @@ public class TileInfusionMatrix extends TileThaumcraft implements ITickable, IWa
             target.addExperienceLevel(-1);
             --this.recipeXP;
             target.attackEntityFrom(DamageSource.MAGIC, this.world.rand.nextInt(2));
+            PacketHandler.INSTANCE.sendToAllAround(
+                    new PacketFXInfusionSource(
+                            this.pos.getX(),
+                            this.pos.getY(),
+                            this.pos.getZ(),
+                            (byte) 0,
+                            (byte) 0,
+                            (byte) 0,
+                            target.getEntityId()),
+                    new NetworkRegistry.TargetPoint(
+                            this.world.provider.getDimension(),
+                            this.pos.getX(),
+                            this.pos.getY(),
+                            this.pos.getZ(),
+                            32.0));
             this.world.playSound(null, target.getPosition(), SoundEvents.BLOCK_FIRE_EXTINGUISH,
                     SoundCategory.PLAYERS, 1.0F, 2.0F + this.world.rand.nextFloat() * 0.4F);
             this.countDelay = 20;

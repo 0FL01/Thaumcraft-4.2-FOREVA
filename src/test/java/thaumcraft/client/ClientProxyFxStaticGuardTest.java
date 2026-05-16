@@ -37,6 +37,7 @@ public class ClientProxyFxStaticGuardTest {
         String blockArc = readFile("src/main/java/thaumcraft/common/lib/network/fx/PacketFXBlockArc.java");
         String blockZap = readFile("src/main/java/thaumcraft/common/lib/network/fx/PacketFXBlockZap.java");
         String essentiaSource = readFile("src/main/java/thaumcraft/common/lib/network/fx/PacketFXEssentiaSource.java");
+        String infusionSource = readFile("src/main/java/thaumcraft/common/lib/network/fx/PacketFXInfusionSource.java");
         String blockSparkle = readFile("src/main/java/thaumcraft/common/lib/network/fx/PacketFXBlockSparkle.java");
         String shield = readFile("src/main/java/thaumcraft/common/lib/network/fx/PacketFXShield.java");
         String sonic = readFile("src/main/java/thaumcraft/common/lib/network/fx/PacketFXSonic.java");
@@ -61,6 +62,9 @@ public class ClientProxyFxStaticGuardTest {
         assertTrue("PacketFXEssentiaSource must schedule client task and route through proxy beam",
                 essentiaSource.contains("Minecraft.getMinecraft().addScheduledTask")
                         && essentiaSource.contains("Thaumcraft.proxy.beam("));
+        assertTrue("PacketFXInfusionSource must schedule client task and route through proxy beam",
+                infusionSource.contains("Minecraft.getMinecraft().addScheduledTask")
+                        && infusionSource.contains("Thaumcraft.proxy.beam("));
         assertTrue("PacketFXBlockSparkle must schedule client task and call proxy blockSparkle",
                 blockSparkle.contains("Minecraft.getMinecraft().addScheduledTask") && blockSparkle.contains("Thaumcraft.proxy.blockSparkle("));
         assertTrue("PacketFXShield must schedule client task and route through proxy burst/bolt",
@@ -91,6 +95,8 @@ public class ClientProxyFxStaticGuardTest {
                 eldritchTrap.contains("new PacketFXBlockZap("));
         assertTrue("TileInfusionMatrix instability zap path must send PacketFXBlockZap",
                 infusionMatrix.contains("new PacketFXBlockZap("));
+        assertTrue("TileInfusionMatrix infusion paths must send PacketFXInfusionSource",
+                infusionMatrix.contains("new PacketFXInfusionSource("));
         assertTrue("Essentia drain path must send PacketFXEssentiaSource",
                 essentiaHandler.contains("new PacketFXEssentiaSource("));
     }

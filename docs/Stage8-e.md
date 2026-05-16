@@ -466,6 +466,32 @@ Depends on GAP-1, GAP-2, GAP-5, and GAP-6. Network-thread rendering is unsafe if
 
 - This remains fallback visual behavior and does not yet port reference `FXEssentiaTrail` particle classes.
 
+#### Checkpoint 2026-05-16 — GAP-3 infusion-source packet and matrix send paths restored
+
+Статус: `PacketFXInfusionSource` payload/handler baseline and active infusion matrix send-sites are now wired.
+
+Что сделано:
+
+- Implemented `PacketFXInfusionSource` payload serialization (`x/y/z`, `dx/dy/dz`, `color`) and client-scheduled handler.
+- Added fallback infusion-stream visual routing via `Thaumcraft.proxy.beam(...)`:
+  - entity-target mode when packet carries player entity id (`dx/dy/dz == 0`);
+  - pedestal-offset mode when packet carries source offset.
+- Restored packet sends in active `TileInfusionMatrix` paths:
+  - XP drain path (`drainRecipeXP`) now sends `PacketFXInfusionSource(..., 0,0,0, targetEntityId)`.
+  - Ingredient pull wind-up path (`itemCount == 0`) now sends offset-based `PacketFXInfusionSource(...)`.
+- Expanded FX tests:
+  - `PacketFXSerializationTest` now includes `PacketFXInfusionSource` round-trip.
+  - `ClientProxyFxStaticGuardTest` now enforces infusion-source handler scheduling/proxy routing and active matrix send-site presence.
+
+Проверки:
+
+- `./scripts/dev.sh test` — passed.
+- `./scripts/dev.sh validate --smoke` — passed.
+
+Ограничения:
+
+- This remains fallback visual behavior and does not yet port reference matrix-side `sourceFX` stream lifecycle classes.
+
 ### GAP-4: Beam, wand beam, bore beam, power beam, arc, and lightning bolt classes are absent
 
 **Статус:** отсутствует  
@@ -808,7 +834,7 @@ Depends on GAP-3, GAP-4, GAP-6. Focus server behavior is Stage 5 dependency only
 - `src/main/java/thaumcraft/common/lib/network/fx/PacketFXSonic.java`
 - `src/main/java/thaumcraft/common/lib/network/fx/PacketFXVisDrain.java`
 - `src/main/java/thaumcraft/common/lib/network/fx/PacketFXEssentiaSource.java`
-- `src/main/java/thaumcraft/common/lib/network/fx/PacketFXInfusionSource.java:1-7`
+- `src/main/java/thaumcraft/common/lib/network/fx/PacketFXInfusionSource.java`
 - `src/main/java/thaumcraft/common/lib/network/fx/PacketFXBlockDig.java:1-7`
 - `src/main/java/thaumcraft/common/lib/network/fx/PacketFXBlockBubble.java:1-7`
 
@@ -827,7 +853,7 @@ Depends on GAP-3, GAP-4, GAP-6. Focus server behavior is Stage 5 dependency only
 
 **Что не совпадает:**
 
-Several registered packet types represent non-wand FX channels used by mobs, aura/vis/essentia transfer, infusion, bore/block interactions, and bubbles. `PacketFXSonic`, `PacketFXVisDrain`, and `PacketFXEssentiaSource` now have fallback handlers and active send paths, while infusion/bore/bubble families remain empty or no-op.
+Several registered packet types represent non-wand FX channels used by mobs, aura/vis/essentia transfer, infusion, bore/block interactions, and bubbles. `PacketFXSonic`, `PacketFXVisDrain`, `PacketFXEssentiaSource`, and `PacketFXInfusionSource` now have fallback handlers and active send paths, while bore/bubble families remain empty or no-op.
 
 **Что нужно доделать:**
 
@@ -836,7 +862,6 @@ Port these packet payloads and their particle/other FX classes, then re-enable s
 **Как доделать:**
 - Implement `PacketFXSonic` and port `FXSonic`; re-enable send at `EntityEldritchGuardian.java:291-292` after validating original behavior.
 - Implement `PacketFXVisDrain` client handler using reference vis/essentia trail visuals.
-- Implement `PacketFXInfusionSource` payloads and client effects.
 - Implement block dig/bubble packet payloads and helper particles.
 - Verify current server send sites exist for these packets; add reference-equivalent sends only where currently missing and directly in Stage 8-e scope.
 
