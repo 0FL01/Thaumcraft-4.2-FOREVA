@@ -132,6 +132,70 @@ public class ConfigRecipes {
         ConfigResearch.recipes.put("Crucible",
                 Arrays.asList(new AspectList(), 1, 2, 1,
                         Arrays.asList(basicWand, new ItemStack(Items.CAULDRON))));
+        ConfigResearch.recipes.put("InfernalFurnace",
+                Arrays.asList(
+                        new AspectList().add(Aspect.FIRE, 50).add(Aspect.EARTH, 50),
+                        3,
+                        3,
+                        3,
+                        Arrays.asList(
+                                new ItemStack(Blocks.NETHERRACK), new ItemStack(Blocks.OBSIDIAN), new ItemStack(Blocks.NETHERRACK),
+                                new ItemStack(Blocks.OBSIDIAN), ItemStack.EMPTY, new ItemStack(Blocks.OBSIDIAN),
+                                new ItemStack(Blocks.NETHERRACK), new ItemStack(Blocks.OBSIDIAN), new ItemStack(Blocks.NETHERRACK),
+
+                                new ItemStack(Blocks.NETHERRACK), new ItemStack(Blocks.OBSIDIAN), new ItemStack(Blocks.NETHERRACK),
+                                new ItemStack(Blocks.OBSIDIAN), new ItemStack(Blocks.LAVA), new ItemStack(Blocks.NETHER_BRICK),
+                                new ItemStack(Blocks.NETHERRACK), new ItemStack(Blocks.OBSIDIAN), new ItemStack(Blocks.NETHERRACK),
+
+                                new ItemStack(Blocks.NETHERRACK), new ItemStack(Blocks.OBSIDIAN), new ItemStack(Blocks.NETHERRACK),
+                                new ItemStack(Blocks.OBSIDIAN), new ItemStack(Blocks.OBSIDIAN), new ItemStack(Blocks.OBSIDIAN),
+                                new ItemStack(Blocks.NETHERRACK), new ItemStack(Blocks.OBSIDIAN), new ItemStack(Blocks.NETHERRACK))));
+        ConfigResearch.recipes.put("Thaumatorium",
+                Arrays.asList(
+                        new AspectList().add(Aspect.FIRE, 15).add(Aspect.ORDER, 30).add(Aspect.WATER, 30),
+                        1,
+                        3,
+                        1,
+                        Arrays.asList(
+                                new ItemStack(ConfigBlocks.blockMetalDevice, 1, 9),
+                                new ItemStack(ConfigBlocks.blockMetalDevice, 1, 9),
+                                new ItemStack(ConfigBlocks.blockMetalDevice, 1, 0))));
+        ConfigResearch.recipes.put("AdvAlchemyFurnace",
+                Arrays.asList(
+                        new AspectList().add(Aspect.FIRE, 50).add(Aspect.WATER, 50).add(Aspect.ORDER, 50),
+                        3,
+                        2,
+                        3,
+                        Arrays.asList(
+                                new ItemStack(ConfigBlocks.blockMetalDevice, 1, 1), new ItemStack(ConfigBlocks.blockMetalDevice, 1, 9), new ItemStack(ConfigBlocks.blockMetalDevice, 1, 1),
+                                new ItemStack(ConfigBlocks.blockMetalDevice, 1, 9), ItemStack.EMPTY, new ItemStack(ConfigBlocks.blockMetalDevice, 1, 9),
+                                new ItemStack(ConfigBlocks.blockMetalDevice, 1, 1), new ItemStack(ConfigBlocks.blockMetalDevice, 1, 9), new ItemStack(ConfigBlocks.blockMetalDevice, 1, 1),
+
+                                new ItemStack(ConfigBlocks.blockMetalDevice, 1, 3), new ItemStack(ConfigBlocks.blockMetalDevice, 1, 3), new ItemStack(ConfigBlocks.blockMetalDevice, 1, 3),
+                                new ItemStack(ConfigBlocks.blockMetalDevice, 1, 3), new ItemStack(ConfigBlocks.blockStoneDevice, 1, 0), new ItemStack(ConfigBlocks.blockMetalDevice, 1, 3),
+                                new ItemStack(ConfigBlocks.blockMetalDevice, 1, 3), new ItemStack(ConfigBlocks.blockMetalDevice, 1, 3), new ItemStack(ConfigBlocks.blockMetalDevice, 1, 3))));
+        for (int a = 0; a < 6; a++) {
+            ConfigResearch.recipes.put("Clusters" + a,
+                    new ShapelessOreRecipe(
+                            null,
+                            new ItemStack(ConfigBlocks.blockCrystal, 1, a),
+                            new ItemStack(ConfigItems.itemShard, 1, a),
+                            new ItemStack(ConfigItems.itemShard, 1, a),
+                            new ItemStack(ConfigItems.itemShard, 1, a),
+                            new ItemStack(ConfigItems.itemShard, 1, a),
+                            new ItemStack(ConfigItems.itemShard, 1, a),
+                            new ItemStack(ConfigItems.itemShard, 1, a)));
+        }
+        ConfigResearch.recipes.put("Clusters6",
+                new ShapelessOreRecipe(
+                        null,
+                        new ItemStack(ConfigBlocks.blockCrystal, 1, 6),
+                        new ItemStack(ConfigItems.itemShard, 1, 0),
+                        new ItemStack(ConfigItems.itemShard, 1, 1),
+                        new ItemStack(ConfigItems.itemShard, 1, 2),
+                        new ItemStack(ConfigItems.itemShard, 1, 3),
+                        new ItemStack(ConfigItems.itemShard, 1, 4),
+                        new ItemStack(ConfigItems.itemShard, 1, 5)));
 
         boolean hasArcaneWand = false;
         boolean hasArcaneSceptre = false;
