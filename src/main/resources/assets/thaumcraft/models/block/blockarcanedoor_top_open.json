@@ -1,0 +1,7 @@
+{
+  "parent": "block/door_top_open",
+  "textures": {
+    "bottom": "thaumcraft:blocks/adoorbot",
+    "top": "thaumcraft:blocks/adoortop"
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "parent": "block/cube",
+  "textures": {
+    "particle": "thaumcraft:blocks/lamp_grow_side",
+    "down": "thaumcraft:blocks/metalbase",
+    "up": "thaumcraft:blocks/lamp_grow_top",
+    "north": "thaumcraft:blocks/lamp_grow_side",
+    "south": "thaumcraft:blocks/lamp_grow_side",
+    "west": "thaumcraft:blocks/lamp_grow_side",
+    "east": "thaumcraft:blocks/lamp_grow_side"
+  }
+}

@@ -1,0 +1,308 @@
+{
+  "variants": {
+    "facing=east,half=lower,hinge=left,open=true,powered=true": {
+      "model": "thaumcraft:blockarcanedoor_bottom_open"
+    },
+    "facing=east,half=lower,hinge=left,open=true,powered=false": {
+      "model": "thaumcraft:blockarcanedoor_bottom_open"
+    },
+    "facing=east,half=lower,hinge=left,open=false,powered=true": {
+      "model": "thaumcraft:blockarcanedoor_bottom"
+    },
+    "facing=east,half=lower,hinge=left,open=false,powered=false": {
+      "model": "thaumcraft:blockarcanedoor_bottom"
+    },
+    "facing=east,half=lower,hinge=right,open=true,powered=true": {
+      "model": "thaumcraft:blockarcanedoor_bottom_open_rh"
+    },
+    "facing=east,half=lower,hinge=right,open=true,powered=false": {
+      "model": "thaumcraft:blockarcanedoor_bottom_open_rh"
+    },
+    "facing=east,half=lower,hinge=right,open=false,powered=true": {
+      "model": "thaumcraft:blockarcanedoor_bottom_rh"
+    },
+    "facing=east,half=lower,hinge=right,open=false,powered=false": {
+      "model": "thaumcraft:blockarcanedoor_bottom_rh"
+    },
+    "facing=east,half=upper,hinge=left,open=true,powered=true": {
+      "model": "thaumcraft:blockarcanedoor_top_open",
+      "x": 180,
+      "uvlock": true
+    },
+    "facing=east,half=upper,hinge=left,open=true,powered=false": {
+      "model": "thaumcraft:blockarcanedoor_top_open",
+      "x": 180,
+      "uvlock": true
+    },
+    "facing=east,half=upper,hinge=left,open=false,powered=true": {
+      "model": "thaumcraft:blockarcanedoor_top",
+      "x": 180,
+      "uvlock": true
+    },
+    "facing=east,half=upper,hinge=left,open=false,powered=false": {
+      "model": "thaumcraft:blockarcanedoor_top",
+      "x": 180,
+      "uvlock": true
+    },
+    "facing=east,half=upper,hinge=right,open=true,powered=true": {
+      "model": "thaumcraft:blockarcanedoor_top_open_rh",
+      "x": 180,
+      "uvlock": true
+    },
+    "facing=east,half=upper,hinge=right,open=true,powered=false": {
+      "model": "thaumcraft:blockarcanedoor_top_open_rh",
+      "x": 180,
+      "uvlock": true
+    },
+    "facing=east,half=upper,hinge=right,open=false,powered=true": {
+      "model": "thaumcraft:blockarcanedoor_top_rh",
+      "x": 180,
+      "uvlock": true
+    },
+    "facing=east,half=upper,hinge=right,open=false,powered=false": {
+      "model": "thaumcraft:blockarcanedoor_top_rh",
+      "x": 180,
+      "uvlock": true
+    },
+    "facing=west,half=lower,hinge=left,open=true,powered=true": {
+      "model": "thaumcraft:blockarcanedoor_bottom_open",
+      "y": 270
+    },
+    "facing=west,half=lower,hinge=left,open=true,powered=false": {
+      "model": "thaumcraft:blockarcanedoor_bottom_open",
+      "y": 270
+    },
+    "facing=west,half=lower,hinge=left,open=false,powered=true": {
+      "model": "thaumcraft:blockarcanedoor_bottom",
+      "y": 270
+    },
+    "facing=west,half=lower,hinge=left,open=false,powered=false": {
+      "model": "thaumcraft:blockarcanedoor_bottom",
+      "y": 270
+    },
+    "facing=west,half=lower,hinge=right,open=true,powered=true": {
+      "model": "thaumcraft:blockarcanedoor_bottom_open_rh",
+      "y": 270
+    },
+    "facing=west,half=lower,hinge=right,open=true,powered=false": {
+      "model": "thaumcraft:blockarcanedoor_bottom_open_rh",
+      "y": 270
+    },
+    "facing=west,half=lower,hinge=right,open=false,powered=true": {
+      "model": "thaumcraft:blockarcanedoor_bottom_rh",
+      "y": 270
+    },
+    "facing=west,half=lower,hinge=right,open=false,powered=false": {
+      "model": "thaumcraft:blockarcanedoor_bottom_rh",
+      "y": 270
+    },
+    "facing=west,half=upper,hinge=left,open=true,powered=true": {
+      "model": "thaumcraft:blockarcanedoor_top_open",
+      "y": 270,
+      "x": 180,
+      "uvlock": true
+    },
+    "facing=west,half=upper,hinge=left,open=true,powered=false": {
+      "model": "thaumcraft:blockarcanedoor_top_open",
+      "y": 270,
+      "x": 180,
+      "uvlock": true
+    },
+    "facing=west,half=upper,hinge=left,open=false,powered=true": {
+      "model": "thaumcraft:blockarcanedoor_top",
+      "y": 270,
+      "x": 180,
+      "uvlock": true
+    },
+    "facing=west,half=upper,hinge=left,open=false,powered=false": {
+      "model": "thaumcraft:blockarcanedoor_top",
+      "y": 270,
+      "x": 180,
+      "uvlock": true
+    },
+    "facing=west,half=upper,hinge=right,open=true,powered=true": {
+      "model": "thaumcraft:blockarcanedoor_top_open_rh",
+      "y": 270,
+      "x": 180,
+      "uvlock": true
+    },
+    "facing=west,half=upper,hinge=right,open=true,powered=false": {
+      "model": "thaumcraft:blockarcanedoor_top_open_rh",
+      "y": 270,
+      "x": 180,
+      "uvlock": true
+    },
+    "facing=west,half=upper,hinge=right,open=false,powered=true": {
+      "model": "thaumcraft:blockarcanedoor_top_rh",
+      "y": 270,
+      "x": 180,
+      "uvlock": true
+    },
+    "facing=west,half=upper,hinge=right,open=false,powered=false": {
+      "model": "thaumcraft:blockarcanedoor_top_rh",
+      "y": 270,
+      "x": 180,
+      "uvlock": true
+    },
+    "facing=south,half=lower,hinge=left,open=true,powered=true": {
+      "model": "thaumcraft:blockarcanedoor_bottom_open",
+      "y": 180
+    },
+    "facing=south,half=lower,hinge=left,open=true,powered=false": {
+      "model": "thaumcraft:blockarcanedoor_bottom_open",
+      "y": 180
+    },
+    "facing=south,half=lower,hinge=left,open=false,powered=true": {
+      "model": "thaumcraft:blockarcanedoor_bottom",
+      "y": 180
+    },
+    "facing=south,half=lower,hinge=left,open=false,powered=false": {
+      "model": "thaumcraft:blockarcanedoor_bottom",
+      "y": 180
+    },
+    "facing=south,half=lower,hinge=right,open=true,powered=true": {
+      "model": "thaumcraft:blockarcanedoor_bottom_open_rh",
+      "y": 180
+    },
+    "facing=south,half=lower,hinge=right,open=true,powered=false": {
+      "model": "thaumcraft:blockarcanedoor_bottom_open_rh",
+      "y": 180
+    },
+    "facing=south,half=lower,hinge=right,open=false,powered=true": {
+      "model": "thaumcraft:blockarcanedoor_bottom_rh",
+      "y": 180
+    },
+    "facing=south,half=lower,hinge=right,open=false,powered=false": {
+      "model": "thaumcraft:blockarcanedoor_bottom_rh",
+      "y": 180
+    },
+    "facing=south,half=upper,hinge=left,open=true,powered=true": {
+      "model": "thaumcraft:blockarcanedoor_top_open",
+      "y": 180,
+      "x": 180,
+      "uvlock": true
+    },
+    "facing=south,half=upper,hinge=left,open=true,powered=false": {
+      "model": "thaumcraft:blockarcanedoor_top_open",
+      "y": 180,
+      "x": 180,
+      "uvlock": true
+    },
+    "facing=south,half=upper,hinge=left,open=false,powered=true": {
+      "model": "thaumcraft:blockarcanedoor_top",
+      "y": 180,
+      "x": 180,
+      "uvlock": true
+    },
+    "facing=south,half=upper,hinge=left,open=false,powered=false": {
+      "model": "thaumcraft:blockarcanedoor_top",
+      "y": 180,
+      "x": 180,
+      "uvlock": true
+    },
+    "facing=south,half=upper,hinge=right,open=true,powered=true": {
+      "model": "thaumcraft:blockarcanedoor_top_open_rh",
+      "y": 180,
+      "x": 180,
+      "uvlock": true
+    },
+    "facing=south,half=upper,hinge=right,open=true,powered=false": {
+      "model": "thaumcraft:blockarcanedoor_top_open_rh",
+      "y": 180,
+      "x": 180,
+      "uvlock": true
+    },
+    "facing=south,half=upper,hinge=right,open=false,powered=true": {
+      "model": "thaumcraft:blockarcanedoor_top_rh",
+      "y": 180,
+      "x": 180,
+      "uvlock": true
+    },
+    "facing=south,half=upper,hinge=right,open=false,powered=false": {
+      "model": "thaumcraft:blockarcanedoor_top_rh",
+      "y": 180,
+      "x": 180,
+      "uvlock": true
+    },
+    "facing=north,half=lower,hinge=left,open=true,powered=true": {
+      "model": "thaumcraft:blockarcanedoor_bottom_open",
+      "y": 90
+    },
+    "facing=north,half=lower,hinge=left,open=true,powered=false": {
+      "model": "thaumcraft:blockarcanedoor_bottom_open",
+      "y": 90
+    },
+    "facing=north,half=lower,hinge=left,open=false,powered=true": {
+      "model": "thaumcraft:blockarcanedoor_bottom",
+      "y": 90
+    },
+    "facing=north,half=lower,hinge=left,open=false,powered=false": {
+      "model": "thaumcraft:blockarcanedoor_bottom",
+      "y": 90
+    },
+    "facing=north,half=lower,hinge=right,open=true,powered=true": {
+      "model": "thaumcraft:blockarcanedoor_bottom_open_rh",
+      "y": 90
+    },
+    "facing=north,half=lower,hinge=right,open=true,powered=false": {
+      "model": "thaumcraft:blockarcanedoor_bottom_open_rh",
+      "y": 90
+    },
+    "facing=north,half=lower,hinge=right,open=false,powered=true": {
+      "model": "thaumcraft:blockarcanedoor_bottom_rh",
+      "y": 90
+    },
+    "facing=north,half=lower,hinge=right,open=false,powered=false": {
+      "model": "thaumcraft:blockarcanedoor_bottom_rh",
+      "y": 90
+    },
+    "facing=north,half=upper,hinge=left,open=true,powered=true": {
+      "model": "thaumcraft:blockarcanedoor_top_open",
+      "y": 90,
+      "x": 180,
+      "uvlock": true
+    },
+    "facing=north,half=upper,hinge=left,open=true,powered=false": {
+      "model": "thaumcraft:blockarcanedoor_top_open",
+      "y": 90,
+      "x": 180,
+      "uvlock": true
+    },
+    "facing=north,half=upper,hinge=left,open=false,powered=true": {
+      "model": "thaumcraft:blockarcanedoor_top",
+      "y": 90,
+      "x": 180,
+      "uvlock": true
+    },
+    "facing=north,half=upper,hinge=left,open=false,powered=false": {
+      "model": "thaumcraft:blockarcanedoor_top",
+      "y": 90,
+      "x": 180,
+      "uvlock": true
+    },
+    "facing=north,half=upper,hinge=right,open=true,powered=true": {
+      "model": "thaumcraft:blockarcanedoor_top_open_rh",
+      "y": 90,
+      "x": 180,
+      "uvlock": true
+    },
+    "facing=north,half=upper,hinge=right,open=true,powered=false": {
+      "model": "thaumcraft:blockarcanedoor_top_open_rh",
+      "y": 90,
+      "x": 180,
+      "uvlock": true
+    },
+    "facing=north,half=upper,hinge=right,open=false,powered=true": {
+      "model": "thaumcraft:blockarcanedoor_top_rh",
+      "y": 90,
+      "x": 180,
+      "uvlock": true
+    },
+    "facing=north,half=upper,hinge=right,open=false,powered=false": {
+      "model": "thaumcraft:blockarcanedoor_top_rh",
+      "y": 90,
+      "x": 180,
+      "uvlock": true
+    }
+  }
+}

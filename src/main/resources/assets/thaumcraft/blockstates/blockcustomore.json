@@ -1,0 +1,12 @@
+{
+  "variants": {
+    "type=0": { "model": "thaumcraft:blockcustomore_0" },
+    "type=1": { "model": "thaumcraft:blockcustomore_1" },
+    "type=2": { "model": "thaumcraft:blockcustomore_2" },
+    "type=3": { "model": "thaumcraft:blockcustomore_3" },
+    "type=4": { "model": "thaumcraft:blockcustomore_4" },
+    "type=5": { "model": "thaumcraft:blockcustomore_5" },
+    "type=6": { "model": "thaumcraft:blockcustomore_6" },
+    "type=7": { "model": "thaumcraft:blockcustomore_7" }
+  }
+}

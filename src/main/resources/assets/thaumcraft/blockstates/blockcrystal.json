@@ -1,0 +1,12 @@
+{
+  "variants": {
+    "type=0": { "model": "thaumcraft:blockcrystal_0" },
+    "type=1": { "model": "thaumcraft:blockcrystal_1" },
+    "type=2": { "model": "thaumcraft:blockcrystal_2" },
+    "type=3": { "model": "thaumcraft:blockcrystal_3" },
+    "type=4": { "model": "thaumcraft:blockcrystal_4" },
+    "type=5": { "model": "thaumcraft:blockcrystal_5" },
+    "type=6": { "model": "thaumcraft:blockcrystal_6" },
+    "type=7": { "model": "thaumcraft:blockcrystal_7" }
+  }
+}
