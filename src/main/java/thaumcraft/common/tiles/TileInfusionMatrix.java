@@ -25,6 +25,7 @@ import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.FMLCommonHandler;
+import net.minecraftforge.fml.common.network.NetworkRegistry;
 import thaumcraft.api.TileThaumcraft;
 import thaumcraft.api.aspects.Aspect;
 import thaumcraft.api.aspects.AspectList;
@@ -41,6 +42,8 @@ import thaumcraft.common.lib.crafting.InfusionRunicAugmentRecipe;
 import thaumcraft.common.lib.TCSounds;
 import thaumcraft.common.lib.crafting.ThaumcraftCraftingManager;
 import thaumcraft.common.lib.events.EssentiaHandler;
+import thaumcraft.common.lib.network.PacketHandler;
+import thaumcraft.common.lib.network.fx.PacketFXBlockZap;
 import thaumcraft.common.lib.utils.InventoryUtils;
 
 public class TileInfusionMatrix extends TileThaumcraft implements ITickable, IWandable, IAspectContainer {
@@ -527,6 +530,20 @@ public class TileInfusionMatrix extends TileThaumcraft implements ITickable, IWa
     private void inEvZap(boolean all) {
         List<EntityLivingBase> targets = this.world.getEntitiesWithinAABB(EntityLivingBase.class, this.getEffectBounds(10.0D));
         for (EntityLivingBase target : targets) {
+            PacketHandler.INSTANCE.sendToAllAround(
+                    new PacketFXBlockZap(
+                            this.pos.getX() + 0.5F,
+                            this.pos.getY() + 0.5F,
+                            this.pos.getZ() + 0.5F,
+                            (float) target.posX,
+                            (float) target.posY + target.height / 2.0F,
+                            (float) target.posZ),
+                    new NetworkRegistry.TargetPoint(
+                            this.world.provider.getDimension(),
+                            this.pos.getX(),
+                            this.pos.getY(),
+                            this.pos.getZ(),
+                            32.0));
             target.attackEntityFrom(DamageSource.MAGIC, 4.0F + this.world.rand.nextInt(4));
             if (!all) break;
         }

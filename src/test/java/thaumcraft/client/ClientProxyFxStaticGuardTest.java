@@ -35,6 +35,7 @@ public class ClientProxyFxStaticGuardTest {
     public void fxPacketsKeepClientSchedulingHandlers() throws IOException {
         String visDrain = readFile("src/main/java/thaumcraft/common/lib/network/fx/PacketFXVisDrain.java");
         String blockArc = readFile("src/main/java/thaumcraft/common/lib/network/fx/PacketFXBlockArc.java");
+        String blockZap = readFile("src/main/java/thaumcraft/common/lib/network/fx/PacketFXBlockZap.java");
         String blockSparkle = readFile("src/main/java/thaumcraft/common/lib/network/fx/PacketFXBlockSparkle.java");
         String shield = readFile("src/main/java/thaumcraft/common/lib/network/fx/PacketFXShield.java");
         String sonic = readFile("src/main/java/thaumcraft/common/lib/network/fx/PacketFXSonic.java");
@@ -45,11 +46,16 @@ public class ClientProxyFxStaticGuardTest {
         String eldritchGuardian = readFile("src/main/java/thaumcraft/common/entities/monster/EntityEldritchGuardian.java");
         String wisp = readFile("src/main/java/thaumcraft/common/entities/monster/EntityWisp.java");
         String focusShock = readFile("src/main/java/thaumcraft/common/items/wands/foci/FocusShock.java");
+        String eldritchTrap = readFile("src/main/java/thaumcraft/common/tiles/TileEldritchTrap.java");
+        String infusionMatrix = readFile("src/main/java/thaumcraft/common/tiles/TileInfusionMatrix.java");
 
         assertTrue("PacketFXVisDrain must schedule client task and call proxy beam",
                 visDrain.contains("Minecraft.getMinecraft().addScheduledTask") && visDrain.contains("Thaumcraft.proxy.beam("));
         assertTrue("PacketFXBlockArc must schedule client task and call proxy bolt",
                 blockArc.contains("Minecraft.getMinecraft().addScheduledTask") && blockArc.contains("Thaumcraft.proxy.bolt("));
+        assertTrue("PacketFXBlockZap must schedule client task and route through proxy bolt",
+                blockZap.contains("Minecraft.getMinecraft().addScheduledTask")
+                        && blockZap.contains("Thaumcraft.proxy.bolt("));
         assertTrue("PacketFXBlockSparkle must schedule client task and call proxy blockSparkle",
                 blockSparkle.contains("Minecraft.getMinecraft().addScheduledTask") && blockSparkle.contains("Thaumcraft.proxy.blockSparkle("));
         assertTrue("PacketFXShield must schedule client task and route through proxy burst/bolt",
@@ -76,6 +82,10 @@ public class ClientProxyFxStaticGuardTest {
                 wisp.contains("new PacketFXWispZap(this.getEntityId(), this.targetedEntity.getEntityId())"));
         assertTrue("FocusShock chain lightning path must send PacketFXZap",
                 focusShock.contains("new PacketFXZap(center.getEntityId(), closest.getEntityId())"));
+        assertTrue("TileEldritchTrap damage path must send PacketFXBlockZap",
+                eldritchTrap.contains("new PacketFXBlockZap("));
+        assertTrue("TileInfusionMatrix instability zap path must send PacketFXBlockZap",
+                infusionMatrix.contains("new PacketFXBlockZap("));
     }
 
     private static String readFile(String path) throws IOException {

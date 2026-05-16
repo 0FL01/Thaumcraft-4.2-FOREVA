@@ -77,6 +77,20 @@ public class PacketFXSerializationTest {
     }
 
     @Test
+    public void blockZapPacketRoundTripsPayload() {
+        PacketFXBlockZap source = new PacketFXBlockZap(1.25F, -4.5F, 11.0F, 6.75F, 9.5F, -3.25F);
+        PacketFXBlockZap target = new PacketFXBlockZap();
+        roundTrip(source, target);
+
+        assertEquals(1.25F, (float) getField(target, "x"), 0.0001F);
+        assertEquals(-4.5F, (float) getField(target, "y"), 0.0001F);
+        assertEquals(11.0F, (float) getField(target, "z"), 0.0001F);
+        assertEquals(6.75F, (float) getField(target, "dx"), 0.0001F);
+        assertEquals(9.5F, (float) getField(target, "dy"), 0.0001F);
+        assertEquals(-3.25F, (float) getField(target, "dz"), 0.0001F);
+    }
+
+    @Test
     public void visDrainPacketRoundTripsPayload() {
         PacketFXVisDrain source = new PacketFXVisDrain(new BlockPos(1, 2, 3), new BlockPos(-4, 5, -6), 0x55AAFF);
         PacketFXVisDrain target = new PacketFXVisDrain();

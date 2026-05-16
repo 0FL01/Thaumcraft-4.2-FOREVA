@@ -419,6 +419,30 @@ Depends on GAP-1, GAP-2, GAP-5, and GAP-6. Network-thread rendering is unsafe if
 
 - This remains fallback visual behavior and does not yet port reference `FXLightningBolt` renderer classes.
 
+#### Checkpoint 2026-05-16 — GAP-3 block-zap packet and tile send paths restored
+
+Статус: `PacketFXBlockZap` payload/handler baseline and active tile send-sites are now wired.
+
+Что сделано:
+
+- Implemented `PacketFXBlockZap` payload serialization (`x/y/z`, `dx/dy/dz`) and client-scheduled handler.
+- Added fallback block-zap routing via `Thaumcraft.proxy.bolt(...)` and restored local zap sound playback on client.
+- Restored packet sends in active tile paths:
+  - `TileEldritchTrap.update(...)` now emits `PacketFXBlockZap` on trap hit.
+  - `TileInfusionMatrix.inEvZap(...)` now emits `PacketFXBlockZap` for instability zap targets.
+- Expanded FX tests:
+  - `PacketFXSerializationTest` now includes `PacketFXBlockZap` round-trip.
+  - `ClientProxyFxStaticGuardTest` now enforces block-zap handler scheduling/proxy routing and both tile send-sites.
+
+Проверки:
+
+- `./scripts/dev.sh test` — passed.
+- `./scripts/dev.sh validate --smoke` — passed.
+
+Ограничения:
+
+- This remains fallback visual behavior and does not yet port reference node/lightning renderer classes.
+
 ### GAP-4: Beam, wand beam, bore beam, power beam, arc, and lightning bolt classes are absent
 
 **Статус:** отсутствует  
@@ -429,7 +453,7 @@ Depends on GAP-1, GAP-2, GAP-5, and GAP-6. Network-thread rendering is unsafe if
 - `src/main/java/thaumcraft/client/fx/bolt/**` absent.
 - `src/main/java/thaumcraft/client/ClientProxy.java:98-105` has no-op `beam` and `bolt`.
 - `src/main/java/thaumcraft/common/lib/network/fx/PacketFXBeamPulse.java:1-7` and `PacketFXBeamPulseGolemBoss.java:1-7` are empty shells.
-- `src/main/java/thaumcraft/common/lib/network/fx/PacketFXBlockZap.java:1-7` is still an empty shell and cannot create visuals.
+- `PacketFXZap`, `PacketFXWispZap`, and `PacketFXBlockZap` currently use fallback proxy bolt visuals; dedicated beam/lightning renderer classes are still absent.
 
 **Референс:**
 - `thaumcraft_src/thaumcraft/client/fx/beams/FXArc.class`
@@ -713,9 +737,9 @@ Depends on GAP-1 and GAP-2. Static review cannot confirm visual correctness; man
 - `src/main/java/thaumcraft/common/items/wands/foci/FocusShock.java:92-101`
 - `src/main/java/thaumcraft/common/items/wands/foci/FocusWarding.java:71-85`
 - `src/main/java/thaumcraft/common/items/wands/foci/FocusPortableHole.java:100-112`
-- `src/main/java/thaumcraft/common/lib/network/fx/PacketFXZap.java:1-7`
-- `src/main/java/thaumcraft/common/lib/network/fx/PacketFXWispZap.java:1-7`
-- `src/main/java/thaumcraft/common/lib/network/fx/PacketFXBlockZap.java:1-7`
+- `src/main/java/thaumcraft/common/lib/network/fx/PacketFXZap.java`
+- `src/main/java/thaumcraft/common/lib/network/fx/PacketFXWispZap.java`
+- `src/main/java/thaumcraft/common/lib/network/fx/PacketFXBlockZap.java`
 - `src/main/java/thaumcraft/client/ClientProxy.java:98-105`
 
 **Референс:**
@@ -728,7 +752,7 @@ Depends on GAP-1 and GAP-2. Static review cannot confirm visual correctness; man
 
 **Что не совпадает:**
 
-FocusShock applies damage and plays sound but does not send visible lightning/beam packets for the main target or chain jumps. Warding and Portable Hole play sounds but lack reference visual feedback. Current zap-related packets cannot carry entity/block target data. The reference creates `FXLightningBolt` for zap packets and continuous wand beam helpers for wand use cases.
+FocusShock, wisp-zap, and block-zap packet paths now send target-bearing packets and trigger fallback bolt visuals, but they still do not use reference `FXLightningBolt` renderer classes. Warding and Portable Hole play sounds but lack reference visual feedback. The reference creates `FXLightningBolt` for zap packets and continuous wand beam helpers for wand use cases.
 
 **Что нужно доделать:**
 
@@ -737,7 +761,6 @@ Restore visual packet sends/helpers for wand/focus effects where reference behav
 **Как доделать:**
 - Decompile/reference original `FocusShock`, `FocusWarding`, and `FocusPortableHole` before editing implementation.
 - Add packet sends for shock target and chain lightning only where original sends them.
-- Implement zap packet payloads and target resolution.
 - Use `FXBeamWand`/continuous beam helper if original focus behavior requires held-use beam visuals.
 - Keep server gameplay unchanged while adding client feedback.
 
