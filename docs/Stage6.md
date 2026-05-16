@@ -473,7 +473,7 @@ Client renderer/particles are Phase 8. Outer Lands location/portal setup is a St
 - `thaumcraft_src/assets/thaumcraft/sounds/**`
 
 **Что не совпадает:**
-Pech death loot has a baseline and uses mana beans/coins/knowledge fragments (`EntityPech.java:390-413`), but runtime drops are unverified. Cultist Leader drops a loot bag (`EntityCultistLeader.java:162-166`). Eldritch Guardian drops essences/equipment (`EntityEldritchGuardian.java:162-184`). The 2026-05-15 checkpoint restores base Cultist common/rare drops and fixes Taint Swarm to the reference 50% taint-slime-only drop. Reference comparison also confirms base Cultist ambient/hurt/death silence and Taint Swarm ambient silence are intentional; runtime sound/drop evidence remains open.
+Pech death loot has a baseline and uses mana beans/coins/knowledge fragments (`EntityPech.java:390-413`), but runtime drops are unverified. Cultist Leader drops a loot bag (`EntityCultistLeader.java:162-166`). Eldritch Guardian drops essences/equipment (`EntityEldritchGuardian.java:162-184`). The 2026-05-15 checkpoint restores base Cultist common/rare drops and fixes Taint Swarm to the reference 50% taint-slime-only drop. Follow-up 2026-05-16 correction removes explicit `null` ambient/hurt/death overrides from `EntityCultist`: reference has no Cultist sound override, so the class should inherit hostile defaults from the base mob class; runtime sound/drop evidence remains open.
 
 **Что нужно доделать:**
 Continue the broader Stage 6 drop/sound audit and run representative kill/combat scenarios.
@@ -488,7 +488,7 @@ Continue the broader Stage 6 drop/sound audit and run representative kill/combat
 **Критерии приемки:**
 - [ ] Drop outputs match reference for representative mobs and bosses.
 - [ ] All non-null sound events resolve and play without missing sound warnings.
-- [x] Base Cultist and Taint Swarm intentionally silent sound slots are documented with reference evidence.
+- [x] Base Cultist no longer overrides ambient/hurt/death with explicit `null`; Taint Swarm ambient silence remains documented from reference.
 
 **Риски / зависимости:**
 Loot bag contents and broader content rewards may depend on Stage 9 content registration, but entity-side drop trigger and item ids are Stage 6.
@@ -827,7 +827,7 @@ Stage 6 считается ПОЛНОСТЬЮ завершенной тольк�
 - Restored base `EntityCultist.dropFewItems(...)` common drops from the reference: knowledge fragment, void seed, and coin rolls shared by Cultist Knight, Cultist Cleric, and Cultist Leader's `super.dropFewItems(...)` path.
 - Added the 1.12-compatible equivalent of the reference base Cultist rare eldritch-object drop using the same recently-hit/looting rare-drop chance pattern already used elsewhere in the port.
 - Fixed `EntityTaintSwarm.dropFewItems(...)` to match the reference 50% taint-slime drop and removed the non-reference guaranteed taint-tendril fallback.
-- Documented reference-confirmed silent sound slots: base Cultist ambient/hurt/death have no reference override, and Taint Swarm ambient returns an empty sound string in 1.7.10.
+- Documented reference sound baselines: `EntityCultist` has no reference sound override (should inherit hostile defaults), and Taint Swarm ambient returns an empty sound string in 1.7.10.
 
 Проверки:
 
@@ -1570,6 +1570,28 @@ Mapping:
 
 - Runtime confirmation of liquid gather/empty behavior with Forge fluid handlers and filled-container filters remains unavailable while smoke-server is blocked before ready state and manual scenarios are excluded.
 - Full per-core golem AI runtime scenarios remain open.
+
+### 8.2.38 Cultist hostile sound inheritance checkpoint — 2026-05-16
+
+Статус: server-visible sound contract corrected; runtime combat sound evidence remains open.
+
+Что сделано:
+
+- Removed explicit `null` overrides for `EntityCultist.getAmbientSound()`, `getHurtSound(...)`, and `getDeathSound()`.
+- Restored base-class hostile sound inheritance for Cultist mobs, matching the reference shape where `EntityCultist` does not override these sound methods.
+- Added `EntityCultistSoundContractTest` to enforce that `EntityCultist` does not regress to explicit `null` sound overrides.
+- Corrected Stage 6 drop/sound notes that previously treated base Cultist silence as intentional.
+
+Проверки:
+
+- `./scripts/dev.sh test` — passed (`20/20`).
+- `./scripts/dev.sh validate --smoke` — passed (`6/6`), including `smoke-server` ready state.
+- `git diff --check` — passed.
+
+Оставшиеся ограничения:
+
+- Runtime combat/drop sound scenarios for Cultist variants, Pech, and bosses remain open in the Stage 6 matrix.
+- Taint Swarm ambient silence remains reference-consistent and unchanged.
 
 ### 8.3 Minimal Stage 6 manual scenario matrix
 

@@ -61,9 +61,5 @@ public class EntityCultist extends net.minecraft.entity.monster.EntityMob {
         }
     }
 
-    @Override public net.minecraft.util.SoundEvent getAmbientSound() { return null; }
-    @Override protected net.minecraft.util.SoundEvent getHurtSound(net.minecraft.util.DamageSource src) { return null; }
-    @Override protected net.minecraft.util.SoundEvent getDeathSound() { return null; }
-
     // CultistCleric gets ambient chant separately
 }
