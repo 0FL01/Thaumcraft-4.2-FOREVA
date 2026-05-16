@@ -51,7 +51,7 @@ Branch: `codex/durable-goal-stage8-9`
 | Stage 5 | Hover Harness and utility item behavior are partially ported; client/manual checks remain open. |
 | Docs/validation | Smoke wrapper, validation wrapper, and status-refresh notes are done. |
 
-Latest Stage 9-e delta: server-side research-note hex flow baseline is now wired (`HexUtils`, `ResearchNoteData` hex maps, `ResearchManager` note-grid creation + completion checks, `TileResearchTable.placeAspect`, and `PacketAspectPlaceToServer` routing), while recipe-backed `BASICARTIFACE` (`MundaneAmulet`/`MundaneRing`/`MundaneBelt`), `TALLOW` (`Tallow` crucible), and `GOLEMFLESH`/`GOLEMTALLOW` (`BlockFlesh`/`BlockTallow`) pages remain in place.
+Latest Stage 9-e delta: server-side research-note hex flow baseline is now wired (`HexUtils`, `ResearchNoteData` hex maps, `ResearchManager` note-grid creation + completion checks, `TileResearchTable.placeAspect`, and `PacketAspectPlaceToServer` routing), research asset coverage was tightened (`textures/blocks/alchemyblock.png`, `textures/misc/eldritchajor1.png`, `textures/misc/eldritchajor2.png` copied from `thaumcraft_src`), and static tests now enforce that `ConfigResearch` `ResourceLocation` paths plus `en_us.lang` `<IMG>` paths exist.
 
 ## Archive
 

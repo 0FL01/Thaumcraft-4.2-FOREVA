@@ -4,6 +4,7 @@ import org.junit.Test;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -24,7 +25,10 @@ public class ConfigResearchStaticGraphTest {
     private static final Pattern PARENTS_PATTERN = Pattern.compile("setParents\\(([^)]*)\\)");
     private static final Pattern PARENTS_HIDDEN_PATTERN = Pattern.compile("setParentsHidden\\(([^)]*)\\)");
     private static final Pattern PAGE_TEXT_PATTERN = Pattern.compile("new\\s+ResearchPage\\(\\s*\"([^\"]+)\"");
+    private static final Pattern RESOURCE_LOCATION_PATTERN = Pattern.compile("new\\s+ResourceLocation\\(\\s*\"thaumcraft\"\\s*,\\s*\"([^\"]+)\"\\s*\\)");
+    private static final Pattern LANG_IMG_PATTERN = Pattern.compile("<IMG>thaumcraft:([^:<]+)(?::[^<]*)?</IMG>");
     private static final Pattern QUOTED_STRING_PATTERN = Pattern.compile("\"([^\"]+)\"");
+    private static final String ASSET_ROOT = "src/main/resources/assets/thaumcraft";
 
     @Test
     public void configResearchRegisteredGraphHasValidStaticReferences() throws IOException {
@@ -79,6 +83,28 @@ public class ConfigResearchStaticGraphTest {
         assertTrue("Missing research localization keys in en_us.lang: " + missingLang, missingLang.isEmpty());
     }
 
+    @Test
+    public void researchResourceLocationsAndLangImagesResolveToAssets() throws IOException {
+        String source = readFile("src/main/java/thaumcraft/common/config/ConfigResearch.java");
+        String lang = readFile("src/main/resources/assets/thaumcraft/lang/en_us.lang");
+
+        Set<String> configResourcePaths = extractMatches(source, RESOURCE_LOCATION_PATTERN);
+        Set<String> imgResourcePaths = extractMatches(lang, LANG_IMG_PATTERN);
+
+        List<String> missingConfigResources = new ArrayList<>();
+        for (String path : configResourcePaths) {
+            assertAssetExists(path, missingConfigResources);
+        }
+
+        List<String> missingLangImages = new ArrayList<>();
+        for (String path : imgResourcePaths) {
+            assertAssetExists(path, missingLangImages);
+        }
+
+        assertTrue("Missing ConfigResearch ResourceLocation assets: " + missingConfigResources, missingConfigResources.isEmpty());
+        assertTrue("Missing <IMG> assets referenced by en_us.lang: " + missingLangImages, missingLangImages.isEmpty());
+    }
+
     private static List<ResearchStatement> parseStatements(String source) {
         List<ResearchStatement> out = new ArrayList<>();
         String[] chunks = source.split("\\.registerResearchItem\\(\\);");
@@ -128,9 +154,25 @@ public class ConfigResearchStaticGraphTest {
         return keys;
     }
 
+    private static Set<String> extractMatches(String source, Pattern pattern) {
+        Set<String> out = new HashSet<>();
+        Matcher matcher = pattern.matcher(source);
+        while (matcher.find()) {
+            out.add(matcher.group(1));
+        }
+        return out;
+    }
+
     private static void assertLangKey(Set<String> langKeys, String key, List<String> missing) {
         if (!langKeys.contains(key)) {
             missing.add(key);
+        }
+    }
+
+    private static void assertAssetExists(String assetPath, List<String> missing) {
+        Path resolved = Paths.get(ASSET_ROOT).resolve(assetPath);
+        if (!Files.exists(resolved)) {
+            missing.add(assetPath);
         }
     }
 

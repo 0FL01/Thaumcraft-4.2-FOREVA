@@ -203,17 +203,15 @@ The original file is `en_US.lang`; the port uses `en_us.lang`. File naming must 
 
 ### GAP-4: Thaumonomicon/research content assets are missing from current resources
 
-**Статус:** отсутствует  
+**Статус:** частично реализовано  
 **Критичность:** high
 
 **Текущая реализация:**
-- `src/main/resources/assets/thaumcraft/textures/items/researchnotes.png`
-- `src/main/resources/assets/thaumcraft/textures/items/researchnotesoverlay.png`
-- `src/main/resources/assets/thaumcraft/textures/items/thaumonomicon.png`
-- `src/main/resources/assets/thaumcraft/textures/items/thaumonomiconcheat.png`
-- `src/main/resources/assets/thaumcraft/textures/gui/` is absent.
-- `src/main/resources/assets/thaumcraft/textures/misc/r_*.png` is absent.
-- `src/main/resources/assets/thaumcraft/textures/misc/research*.png` is absent.
+- Research GUI and misc icon/page textures are present in port resources, including `textures/gui/gui_research*.png`, `textures/misc/r_*.png`, and `textures/misc/research1..5.png`.
+- Missing reference assets used by current content were copied from source assets: `textures/blocks/alchemyblock.png`, `textures/misc/eldritchajor1.png`, `textures/misc/eldritchajor2.png`.
+- Static validation now checks that:
+  - every `new ResourceLocation("thaumcraft", "...")` used in `ConfigResearch` resolves to an existing file under `assets/thaumcraft`;
+  - every `<IMG>thaumcraft:...` path in `en_us.lang` resolves to an existing file.
 
 **Референс:**
 - `thaumcraft_src/assets/thaumcraft/textures/gui/gui_researchback.png`
@@ -231,18 +229,16 @@ The original file is `en_US.lang`; the port uses `en_us.lang`. File naming must 
 
 **Что не совпадает:**
 
-Reference category icons, category backgrounds, research book textures, and image-page textures exist under original assets. Current port has only item textures for research notes and thaumonomicon. Even after data registration, categories and pages that use resource icons/images would point at missing resources.
+Static asset coverage for currently referenced research resources is now in place, but runtime visual parity in the Thaumonomicon UI is still not validated in this headless flow.
 
 **Что нужно доделать:**
 
-Copy original research/Thaumonomicon content assets from `thaumcraft_src/assets/thaumcraft/` into `src/main/resources/assets/thaumcraft/` without recreating or renaming them.
+Keep static coverage green as research content grows, and run visual/manual validation later when GUI interaction is in scope.
 
 **Как доделать:**
-- Copy `textures/gui/gui_research*.png` and `textures/gui/guiresearchtable2.png` if note/table pages need it.
-- Copy `textures/misc/r_*.png` icons used by `ConfigResearch`.
-- Copy `textures/misc/research1.png` through `research5.png` and any image referenced by `<IMG>` tags in research lang text.
-- Copy missing discovery item overlays if original note/discovery rendering is restored: `thaumcraft_src/assets/thaumcraft/textures/items/discovery.png` and `discoveryoverlay.png`, if present in source assets.
-- Files/resources to change: `src/main/resources/assets/thaumcraft/textures/gui/**`, `src/main/resources/assets/thaumcraft/textures/misc/**`, possibly `src/main/resources/assets/thaumcraft/textures/items/**`.
+- Maintain `ConfigResearchStaticGraphTest` resource assertions for both `ResourceLocation` and `<IMG>` links.
+- When adding new research pages/lang, copy required assets from `thaumcraft_src/assets/thaumcraft/` and keep names unchanged.
+- Defer visual missing-texture confirmation in live GUI to manual/client validation checkpoint.
 
 **Критерии приемки:**
 - [ ] All `ResourceLocation` paths used by research categories exist under `src/main/resources/assets/thaumcraft/`.
