@@ -1253,6 +1253,26 @@ Restore visual packet sends/helpers for wand/focus effects where reference behav
 
 Depends on GAP-3, GAP-4, GAP-6. Focus server behavior is Stage 5 dependency only if original target selection must be corrected to know where to render lightning.
 
+#### Checkpoint 2026-05-17 — GAP-10 warding/portable-hole sparkle send-path baseline
+
+Статус: частично продвинут.
+
+Что сделано:
+
+- `FocusWarding` теперь восстанавливает reference-shaped visual send-path:
+  - в обоих ветках (ward и unward) добавлен `PacketFXBlockSparkle` broadcast (`0xFC9A00`, radius `32.0D`) через `PacketHandler.INSTANCE.sendToAllAround(...)`.
+- `FocusPortableHole.createHole(...)` теперь восстанавливает block-sparkle cue:
+  - добавлен `PacketFXBlockSparkle` broadcast (`0x400040`, radius `32.0D`) после успешной постановки `blockHole`.
+- `ClientProxyFxStaticGuardTest` расширен статическими контрактами на оба focus send-path.
+
+Проверки:
+
+- `./scripts/dev.sh validate --smoke` — passed.
+
+Ограничения:
+
+- Это сетевой visual baseline без полноценного port-а reference `FXBlockWard`/`FXBeamWand`/`FXLightningBolt`; ручная визуальная parity проверка остаётся вне текущего non-GUI scope.
+
 ### GAP-11: Sonic, essentia/vis drain, infusion source, bore/block dig/bubble/source FX packets are not functional
 
 **Статус:** отсутствует / частично реализовано  

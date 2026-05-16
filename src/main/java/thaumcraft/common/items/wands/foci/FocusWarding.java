@@ -15,6 +15,7 @@ import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.common.network.NetworkRegistry;
 import thaumcraft.api.BlockCoordinates;
 import thaumcraft.api.IArchitect;
 import thaumcraft.api.aspects.Aspect;
@@ -25,6 +26,8 @@ import thaumcraft.common.config.ConfigBlocks;
 import thaumcraft.common.items.wands.ItemWandCasting;
 import thaumcraft.common.items.wands.WandManager;
 import thaumcraft.common.lib.TCSounds;
+import thaumcraft.common.lib.network.PacketHandler;
+import thaumcraft.common.lib.network.fx.PacketFXBlockSparkle;
 import thaumcraft.common.tiles.TileWarded;
 
 public class FocusWarding extends ItemFocusBasic implements IArchitect {
@@ -71,6 +74,8 @@ public class FocusWarding extends ItemFocusBasic implements IArchitect {
                 for (BlockCoordinates c : this.getArchitectBlocks(wandStack, world, pos.getX(), pos.getY(), pos.getZ(),
                         movingobjectposition.sideHit.getIndex(), player)) {
                     unwardBlock(world, new BlockPos(c.x, c.y, c.z), player);
+                    PacketHandler.INSTANCE.sendToAllAround(new PacketFXBlockSparkle(c.x, c.y, c.z, 0xFC9A00),
+                            new NetworkRegistry.TargetPoint(world.provider.getDimension(), c.x, c.y, c.z, 32.0D));
                 }
                 world.playSound(null, pos, TCSounds.ZAP, SoundCategory.PLAYERS, 0.25F, 1.0F);
             }
@@ -81,6 +86,8 @@ public class FocusWarding extends ItemFocusBasic implements IArchitect {
                     break;
                 }
                 wardBlock(world, new BlockPos(c.x, c.y, c.z), player);
+                PacketHandler.INSTANCE.sendToAllAround(new PacketFXBlockSparkle(c.x, c.y, c.z, 0xFC9A00),
+                        new NetworkRegistry.TargetPoint(world.provider.getDimension(), c.x, c.y, c.z, 32.0D));
             }
             world.playSound(null, pos, TCSounds.ZAP, SoundCategory.PLAYERS, 0.25F, 1.0F);
         }

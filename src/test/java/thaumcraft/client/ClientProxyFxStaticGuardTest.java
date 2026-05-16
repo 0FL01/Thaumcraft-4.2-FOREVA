@@ -83,6 +83,8 @@ public class ClientProxyFxStaticGuardTest {
         String eldritchGuardian = readFile("src/main/java/thaumcraft/common/entities/monster/EntityEldritchGuardian.java");
         String wisp = readFile("src/main/java/thaumcraft/common/entities/monster/EntityWisp.java");
         String focusShock = readFile("src/main/java/thaumcraft/common/items/wands/foci/FocusShock.java");
+        String focusWarding = readFile("src/main/java/thaumcraft/common/items/wands/foci/FocusWarding.java");
+        String focusPortableHole = readFile("src/main/java/thaumcraft/common/items/wands/foci/FocusPortableHole.java");
         String eldritchTrap = readFile("src/main/java/thaumcraft/common/tiles/TileEldritchTrap.java");
         String infusionMatrix = readFile("src/main/java/thaumcraft/common/tiles/TileInfusionMatrix.java");
         String essentiaHandler = readFile("src/main/java/thaumcraft/common/lib/events/EssentiaHandler.java");
@@ -166,6 +168,14 @@ public class ClientProxyFxStaticGuardTest {
                 fallingTaint.contains("Thaumcraft.proxy.taintLandFX(this);"));
         assertTrue("FocusShock chain lightning path must send PacketFXZap",
                 focusShock.contains("new PacketFXZap(center.getEntityId(), closest.getEntityId())"));
+        assertTrue("FocusWarding ward/unward paths must send PacketFXBlockSparkle around touched blocks",
+                focusWarding.contains("new PacketFXBlockSparkle(c.x, c.y, c.z, 0xFC9A00)")
+                        && focusWarding.contains("PacketHandler.INSTANCE.sendToAllAround(")
+                        && focusWarding.contains("new NetworkRegistry.TargetPoint(world.provider.getDimension(), c.x, c.y, c.z, 32.0D)"));
+        assertTrue("FocusPortableHole.createHole must send PacketFXBlockSparkle cue",
+                focusPortableHole.contains("new PacketFXBlockSparkle(x, y, z, 0x400040)")
+                        && focusPortableHole.contains("PacketHandler.INSTANCE.sendToAllAround(")
+                        && focusPortableHole.contains("new NetworkRegistry.TargetPoint(world.provider.getDimension(), x, y, z, 32.0D)"));
         assertTrue("TileEldritchTrap damage path must send PacketFXBlockZap",
                 eldritchTrap.contains("new PacketFXBlockZap("));
         assertTrue("TileInfusionMatrix instability zap path must send PacketFXBlockZap",

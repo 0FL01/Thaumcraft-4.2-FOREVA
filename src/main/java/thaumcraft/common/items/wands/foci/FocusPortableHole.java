@@ -13,6 +13,7 @@ import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.common.network.NetworkRegistry;
 import thaumcraft.api.ThaumcraftApi;
 import thaumcraft.api.aspects.Aspect;
 import thaumcraft.api.aspects.AspectList;
@@ -21,6 +22,8 @@ import thaumcraft.api.wands.ItemFocusBasic;
 import thaumcraft.common.config.Config;
 import thaumcraft.common.config.ConfigBlocks;
 import thaumcraft.common.items.wands.ItemWandCasting;
+import thaumcraft.common.lib.network.PacketHandler;
+import thaumcraft.common.lib.network.fx.PacketFXBlockSparkle;
 import thaumcraft.common.lib.TCSounds;
 import thaumcraft.common.tiles.TileHole;
 
@@ -63,6 +66,8 @@ public class FocusPortableHole extends ItemFocusBasic {
             world.setTileEntity(pos, hole);
         }
         world.notifyBlockUpdate(pos, Blocks.AIR.getDefaultState(), ConfigBlocks.blockHole.getDefaultState(), 3);
+        PacketHandler.INSTANCE.sendToAllAround(new PacketFXBlockSparkle(x, y, z, 0x400040),
+                new NetworkRegistry.TargetPoint(world.provider.getDimension(), x, y, z, 32.0D));
         return true;
     }
 
