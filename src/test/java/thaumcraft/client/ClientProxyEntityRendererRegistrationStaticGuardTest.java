@@ -58,7 +58,7 @@ public class ClientProxyEntityRendererRegistrationStaticGuardTest {
                         && source.contains("registerEntityRenderer(EntityCultistLeader.class, manager -> new RenderFallbackBiped<>("));
         assertTrue("ClientProxy must keep extended fallback registrations for the remaining Stage 8-d monster baseline",
                 source.contains("registerEntityRenderer(EntityFireBat.class, RenderFireBat::new, registered);")
-                        && source.contains("registerEntityRenderer(EntityWisp.class, manager -> new RenderFallbackLiving<>(")
+                        && source.contains("registerEntityRenderer(EntityWisp.class, RenderWisp::new, registered);")
                         && source.contains("registerEntityRenderer(EntityPech.class, RenderPech::new, registered);")
                         && source.contains("registerEntityRenderer(EntityEldritchGuardian.class, manager -> new RenderFallbackBiped<>(")
                         && source.contains("registerEntityRenderer(EntityEldritchWarden.class, manager -> new RenderFallbackBiped<>(")
@@ -94,6 +94,13 @@ public class ClientProxyEntityRendererRegistrationStaticGuardTest {
                         && fireBatRenderer.contains("entity.getIsVampire()")
                         && fireBatRenderer.contains("entity.getIsDevil()")
                         && fireBatRenderer.contains("entity.getIsBatHanging()"));
+        String wispRenderer = readFile("src/main/java/thaumcraft/client/renderers/entity/RenderWisp.java");
+        assertTrue("RenderWisp must provide aspect-tinted texture baseline",
+                wispRenderer.contains("extends RenderLiving<EntityWisp>")
+                        && wispRenderer.contains("textures/misc/wispy.png")
+                        && wispRenderer.contains("Aspect.getAspect(entity.getWispType())")
+                        && wispRenderer.contains("GlStateManager.color(red, green, blue, 1.0F)")
+                        && wispRenderer.contains("GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F)"));
         String trunkRenderer = readFile("src/main/java/thaumcraft/client/renderers/entity/RenderTravelingTrunk.java");
         assertTrue("RenderTravelingTrunk must provide anger-based texture routing baseline",
                 trunkRenderer.contains("extends RenderLiving<EntityTravelingTrunk>")

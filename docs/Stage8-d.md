@@ -768,6 +768,30 @@ Some entities may be hard to trigger naturally until recipes/research/spawn cont
 
 - Это texture-routing baseline; full reference parity для golem renderer behavior (custom golem model/accessory passes/carried-item rendering/damage overlay) остаётся открытой по GAP-3/GAP-4/GAP-6.
 
+### Checkpoint 2026-05-16 — dedicated wisp renderer color baseline
+
+Статус: частично продвинут.
+
+Что сделано:
+
+- Добавлен выделенный renderer `RenderWisp` (`thaumcraft.client.renderers.entity.RenderWisp`) вместо общего living fallback для `EntityWisp`.
+- `RenderWisp` реализует базовый reference-shaped визуальный контракт:
+  - использует `textures/misc/wispy.png`;
+  - окрашивает рендер по `Aspect.getAspect(entity.getWispType())`;
+  - после рендера сбрасывает цвет в белый для предотвращения bleed в последующие draw calls.
+- `ClientProxy.setupEntityRenderers()` обновлен: `EntityWisp` теперь регистрируется через `RenderWisp::new`.
+- `ClientProxyEntityRendererRegistrationStaticGuardTest` расширен проверками:
+  - explicit `EntityWisp -> RenderWisp` registration path;
+  - наличие aspect-tint color routing и color reset в `RenderWisp`.
+
+Проверки:
+
+- `./scripts/dev.sh validate --smoke` — passed.
+
+Ограничения:
+
+- Это color/texture baseline; full reference parity для `RenderWisp` (custom sprite layers/additive passes/GL behavior) остаётся открытой по GAP-3/GAP-6.
+
 - [ ] Add client-only entity renderer registration hook.
 - [ ] Register every entity from `ConfigEntities.ENTITIES` with a custom or vanilla-equivalent renderer.
 - [ ] Port item-like/transient/projectile renderers.
