@@ -451,6 +451,16 @@ public class ClientProxyEntityRendererRegistrationStaticGuardTest {
                         && taintacleSmallEntity.contains("return false;")
                         && taintacleSmallEntity.contains("return Item.getItemById(0);")
                         && taintacleSmallEntity.contains("protected void dropFewItems(boolean wasRecentlyHit, int looting) {"));
+        String taintacleGiantEntity = readFile("src/main/java/thaumcraft/common/entities/monster/boss/EntityTaintacleGiant.java");
+        assertTrue("EntityTaintacleGiant must keep damageable underwater/enrage survivability contracts",
+                taintacleGiantEntity.contains("setBaseValue(125.0)")
+                        && taintacleGiantEntity.contains("setBaseValue(9.0)")
+                        && taintacleGiantEntity.contains("public boolean getCanSpawnHere() { return false; }")
+                        && taintacleGiantEntity.contains("public boolean canDespawn() { return false; }")
+                        && taintacleGiantEntity.contains("public boolean canBreatheUnderwater() { return true; }")
+                        && taintacleGiantEntity.contains("protected int decreaseAirSupply(int air) { return air; }")
+                        && taintacleGiantEntity.contains("if (!this.world.isRemote && amount > 35.0f)")
+                        && !taintacleGiantEntity.contains("isEntityInvulnerable(DamageSource source) { return true; }"));
         String mindSpiderEntity = readFile("src/main/java/thaumcraft/common/entities/monster/EntityMindSpider.java");
         assertTrue("EntityMindSpider must expose viewer accessor and synced harmless/viewer data contracts",
                 mindSpiderEntity.contains("public String getViewer()")

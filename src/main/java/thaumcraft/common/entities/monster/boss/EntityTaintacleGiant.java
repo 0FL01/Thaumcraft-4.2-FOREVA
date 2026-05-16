@@ -123,7 +123,7 @@ public class EntityTaintacleGiant extends thaumcraft.common.entities.monster.Ent
     public boolean canDespawn() { return false; }
 
     @Override
-    public boolean isEntityInvulnerable(DamageSource source) { return true; }
+    public boolean canBreatheUnderwater() { return true; }
 
     @Override
     protected int decreaseAirSupply(int air) { return air; }

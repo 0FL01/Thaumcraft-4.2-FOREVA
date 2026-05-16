@@ -1798,6 +1798,28 @@ Some entities may be hard to trigger naturally until recipes/research/spawn cont
 
 - Это common behavior baseline для small tentacle; полная parity по taintacle ecosystem visual/FX nuances остаётся в Stage 8-d/8-e scope.
 
+### Checkpoint 2026-05-17 — restore taintacle giant damageable-underwater survivability baseline
+
+Статус: частично продвинут.
+
+Что сделано:
+
+- `EntityTaintacleGiant` выровнен с reference-shaped survivability contracts:
+  - удалён ошибочный always-invulnerable override (`isEntityInvulnerable(...) -> true`), который ломал damage/enrage flow;
+  - добавлен explicit underwater breathing contract `canBreatheUnderwater() -> true`;
+  - сохранён reference-shaped air handling hook `decreaseAirSupply(int air) -> air`.
+- `ClientProxyEntityRendererRegistrationStaticGuardTest` расширен проверками:
+  - presence giant spawn/despawn/underwater/air contracts;
+  - explicit absence regressions вида always-invulnerable override.
+
+Проверки:
+
+- `./scripts/dev.sh validate --smoke` — passed.
+
+Ограничения:
+
+- Это survivability/combat baseline; полная parity giant boss UX/visual behavior остаётся в общем Stage 8-d/8-e render scope.
+
 ### Checkpoint 2026-05-16 — restore mind spider viewer-only render gating
 
 Статус: частично продвинут.
