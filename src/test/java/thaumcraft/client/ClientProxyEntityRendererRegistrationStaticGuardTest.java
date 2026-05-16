@@ -36,7 +36,9 @@ public class ClientProxyEntityRendererRegistrationStaticGuardTest {
                         && source.contains("registerEntityRenderer(EntityShockOrb.class, manager -> new RenderSnowball<>(manager, Items.GLOWSTONE_DUST, renderItem), registered);")
                         && source.contains("registerEntityRenderer(EntityExplosiveOrb.class, manager -> new RenderSnowball<>(manager, Items.FIREWORK_CHARGE, renderItem), registered);")
                         && source.contains("registerEntityRenderer(EntityEmber.class, manager -> new RenderSnowball<>(manager, Items.BLAZE_POWDER, renderItem), registered);")
-                        && source.contains("registerEntityRenderer(EntityGolemBobber.class, manager -> new RenderSnowball<>(manager, Items.FISHING_ROD, renderItem), registered);"));
+                        && source.contains("registerEntityRenderer(EntityGolemBobber.class, manager -> new RenderSnowball<>(manager, Items.FISHING_ROD, renderItem), registered);")
+                        && source.contains("registerEntityRenderer(EntityAspectOrb.class, manager -> new RenderSnowball<>(manager, Items.ENDER_EYE, renderItem), registered);")
+                        && source.contains("registerEntityRenderer(EntityFallingTaint.class, manager -> new RenderSnowball<>(manager, Items.SLIME_BALL, renderItem), registered);"));
         assertTrue("ClientProxy must keep vanilla mob fallback renderer registrations for compatible zombie/spider groups",
                 source.contains("registerEntityRenderer(EntityBrainyZombie.class, RenderZombie::new, registered);")
                         && source.contains("registerEntityRenderer(EntityGiantBrainyZombie.class, RenderZombie::new, registered);")
@@ -69,6 +71,10 @@ public class ClientProxyEntityRendererRegistrationStaticGuardTest {
                         && source.contains("registerEntityRenderer(EntityTaintacle.class, manager -> new RenderFallbackLiving<>(")
                         && source.contains("registerEntityRenderer(EntityTaintacleSmall.class, manager -> new RenderFallbackLiving<>(")
                         && source.contains("registerEntityRenderer(EntityTaintacleGiant.class, manager -> new RenderFallbackLiving<>("));
+        assertTrue("ClientProxy must keep fallback registrations for remaining special entities",
+                source.contains("registerEntityRenderer(EntityGolemBase.class, manager -> new RenderFallbackBiped<>(")
+                        && source.contains("registerEntityRenderer(EntityTravelingTrunk.class, manager -> new RenderFallbackLiving<>(")
+                        && source.contains("registerEntityRenderer(EntityCultistPortal.class, manager -> new RenderFallbackBiped<>("));
         assertTrue("RenderFallbackLiving must exist as a non-noop typed texture renderer",
                 readFile("src/main/java/thaumcraft/client/renderers/entity/RenderFallbackLiving.java").contains("extends RenderLiving<T>"));
         assertTrue("RenderFallbackBiped must exist as a non-noop typed texture renderer",

@@ -64,7 +64,9 @@ import thaumcraft.client.lib.RenderEventHandler;
 import thaumcraft.common.CommonProxy;
 import thaumcraft.common.config.ConfigEntities;
 import thaumcraft.common.config.ConfigItems;
+import thaumcraft.common.entities.EntityAspectOrb;
 import thaumcraft.common.entities.EntityFollowingItem;
+import thaumcraft.common.entities.EntityFallingTaint;
 import thaumcraft.common.entities.EntityItemGrate;
 import thaumcraft.common.entities.EntityPermanentItem;
 import thaumcraft.common.entities.EntitySpecialItem;
@@ -98,6 +100,7 @@ import thaumcraft.common.entities.monster.EntityWisp;
 import thaumcraft.common.entities.monster.boss.EntityEldritchGolem;
 import thaumcraft.common.entities.monster.boss.EntityEldritchWarden;
 import thaumcraft.common.entities.monster.boss.EntityCultistLeader;
+import thaumcraft.common.entities.monster.boss.EntityCultistPortal;
 import thaumcraft.common.entities.monster.boss.EntityTaintacleGiant;
 import thaumcraft.common.entities.projectile.EntityAlumentum;
 import thaumcraft.common.entities.projectile.EntityBottleTaint;
@@ -193,6 +196,8 @@ public class ClientProxy extends CommonProxy {
         registerEntityRenderer(EntityExplosiveOrb.class, manager -> new RenderSnowball<>(manager, Items.FIREWORK_CHARGE, renderItem), registered);
         registerEntityRenderer(EntityEmber.class, manager -> new RenderSnowball<>(manager, Items.BLAZE_POWDER, renderItem), registered);
         registerEntityRenderer(EntityGolemBobber.class, manager -> new RenderSnowball<>(manager, Items.FISHING_ROD, renderItem), registered);
+        registerEntityRenderer(EntityAspectOrb.class, manager -> new RenderSnowball<>(manager, Items.ENDER_EYE, renderItem), registered);
+        registerEntityRenderer(EntityFallingTaint.class, manager -> new RenderSnowball<>(manager, Items.SLIME_BALL, renderItem), registered);
 
         registerEntityRenderer(EntityBrainyZombie.class, RenderZombie::new, registered);
         registerEntityRenderer(EntityGiantBrainyZombie.class, RenderZombie::new, registered);
@@ -245,6 +250,12 @@ public class ClientProxy extends CommonProxy {
                 manager, new ModelSpider(), 0.45F, new ResourceLocation("thaumcraft", "textures/models/taintacle.png")), registered);
         registerEntityRenderer(EntityTaintacleGiant.class, manager -> new RenderFallbackLiving<>(
                 manager, new ModelSpider(), 0.8F, new ResourceLocation("thaumcraft", "textures/models/taintacle.png")), registered);
+        registerEntityRenderer(EntityGolemBase.class, manager -> new RenderFallbackBiped<>(
+                manager, new ModelBiped(), 0.7F, new ResourceLocation("thaumcraft", "textures/models/golem_straw.png")), registered);
+        registerEntityRenderer(EntityTravelingTrunk.class, manager -> new RenderFallbackLiving<>(
+                manager, new ModelPig(), 0.6F, new ResourceLocation("thaumcraft", "textures/models/trunk.png")), registered);
+        registerEntityRenderer(EntityCultistPortal.class, manager -> new RenderFallbackBiped<>(
+                manager, new ModelBiped(), 0.8F, new ResourceLocation("thaumcraft", "textures/misc/cultist_portal.png")), registered);
 
         for (net.minecraftforge.fml.common.registry.EntityEntry entry : ConfigEntities.ENTITIES) {
             @SuppressWarnings("unchecked")

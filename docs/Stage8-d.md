@@ -631,6 +631,27 @@ Some entities may be hard to trigger naturally until recipes/research/spawn cont
 - Это fallback слой; reference-specific TC renderer parity (model/passes/animation/GL behavior) остаётся открытой.
 - `RenderNoop` ещё остаётся для групп, не покрытых fallback slice (включая golem/trunk/cultist portal и иные special cases).
 
+### Checkpoint 2026-05-16 — special entities fallback completion slice
+
+Статус: частично продвинут.
+
+Что сделано:
+
+- `ClientProxy.setupEntityRenderers()` дополнен non-noop fallback registrations для оставшихся special entity classes:
+  `EntityAspectOrb`, `EntityFallingTaint`, `EntityGolemBase`, `EntityTravelingTrunk`, `EntityCultistPortal`.
+- После этого среза весь текущий `ConfigEntities.ENTITIES` имеет explicit non-noop baseline registration path
+  (через `RenderEntityItem` / `RenderSnowball` / `RenderZombie` / `RenderSpider` / `RenderFallbackLiving` / `RenderFallbackBiped`).
+- `ClientProxyEntityRendererRegistrationStaticGuardTest` расширен проверками special-entity registration paths.
+
+Проверки:
+
+- `./scripts/dev.sh validate --smoke` — passed.
+
+Ограничения:
+
+- Это завершение fallback baseline, но не custom renderer parity Stage 8-d: reference-specific модели/слои/анимации/passes остаются открытыми.
+- Visual/manual parity checks по инструкции остаются skipped.
+
 - [ ] Add client-only entity renderer registration hook.
 - [ ] Register every entity from `ConfigEntities.ENTITIES` with a custom or vanilla-equivalent renderer.
 - [ ] Port item-like/transient/projectile renderers.
