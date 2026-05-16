@@ -1674,6 +1674,39 @@ Some entities may be hard to trigger naturally until recipes/research/spawn cont
 
 - Это common behavior baseline; полная parity для legacy villager-datawatcher деталей и runtime сценариев осад/деревень ограничена non-GUI validation рамками.
 
+### Checkpoint 2026-05-17 — restore taint swarm summoned/flight/attack behavior baseline
+
+Статус: частично продвинут.
+
+Что сделано:
+
+- `EntityTaintSwarm` выровнен с reference-shaped common behavior contracts:
+  - восстановлены state/flag hooks: `DataParameter<Byte> FLAGS`, summoned-bit (`FLAG_SUMMONED`), `getIsSummoned()`/`setIsSummoned(...)`, `damBonus` persistence;
+  - восстановлены size/attribute baselines: `setSize(2.0F, 2.0F)`, `MAX_HEALTH = 30.0D`, `ATTACK_DAMAGE = 2.0D + damBonus`;
+  - восстановлены survivability/light hooks: fullbright (`getBrightnessForRender=15728880`, `getBrightness=1.0F`), underwater breathing, no-despawn, light-threshold spawn gate;
+  - восстановлены flight/targeting contracts:
+    - summoned starvation self-damage (`DamageSource.STARVE`, `5.0F`);
+    - nearest-player acquisition (`12.0D`) when not summoned;
+    - taint-biome constrained flight target refresh/steering;
+    - creative-player target drop.
+  - восстановлен melee side-effect baseline:
+    - summoned hit marks target via `EntityUtils.setRecentlyHit(..., 100)`;
+    - nausea debuff (`MobEffects.NAUSEA`, `100` ticks) on successful hit;
+    - velocity restoration for attacked target после melee call.
+  - восстановлены NBT/drop contracts:
+    - `"Flags"`/`"damBonus"` read/write;
+    - drop branch: `rand.nextBoolean()` -> `itemResource` meta `11`.
+  - добавлен client-side particle baseline loop guard на `particleCount(25)` для swarm visual lifecycle without GUI coupling.
+- `ClientProxyEntityRendererRegistrationStaticGuardTest` расширен проверками на summoned/flight/attack/NBT/drop contracts `EntityTaintSwarm`.
+
+Проверки:
+
+- `./scripts/dev.sh validate --smoke` — passed.
+
+Ограничения:
+
+- Это common/server behavior baseline; точная visual parity swarm particle FX pipeline остаётся в Stage 8-e visual scope и не подтверждается manual GUI checks по инструкции.
+
 ### Checkpoint 2026-05-16 — restore mind spider viewer-only render gating
 
 Статус: частично продвинут.

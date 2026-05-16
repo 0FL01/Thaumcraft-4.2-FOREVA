@@ -373,6 +373,32 @@ public class ClientProxyEntityRendererRegistrationStaticGuardTest {
                         && taintVillagerEntity.contains("this.world.rand.nextInt(2) == 0")
                         && taintVillagerEntity.contains("this.world.rand.nextInt(13) < 1 + looting")
                         && taintVillagerEntity.contains("itemResource, 1, 18"));
+        String taintSwarmEntity = readFile("src/main/java/thaumcraft/common/entities/monster/EntityTaintSwarm.java");
+        assertTrue("EntityTaintSwarm must keep reference-shaped summoned/flight/attack/NBT/drop baseline contracts",
+                taintSwarmEntity.contains("private static final byte FLAG_SUMMONED = 2")
+                        && taintSwarmEntity.contains("DataParameter<Byte> FLAGS")
+                        && taintSwarmEntity.contains("private BlockPos currentFlightTarget;")
+                        && taintSwarmEntity.contains("public int damBonus = 0;")
+                        && taintSwarmEntity.contains("this.setSize(2.0F, 2.0F);")
+                        && taintSwarmEntity.contains("setBaseValue(30.0D)")
+                        && taintSwarmEntity.contains("setBaseValue(2.0D + this.damBonus)")
+                        && taintSwarmEntity.contains("public boolean getIsSummoned()")
+                        && taintSwarmEntity.contains("public void setIsSummoned(boolean summoned)")
+                        && taintSwarmEntity.contains("return 15728880;")
+                        && taintSwarmEntity.contains("return 1.0F;")
+                        && taintSwarmEntity.contains("this.motionY *= 0.6000000238418579D;")
+                        && taintSwarmEntity.contains("Thaumcraft.proxy.particleCount(25)")
+                        && taintSwarmEntity.contains("this.attackEntityFrom(DamageSource.STARVE, 5.0F);")
+                        && taintSwarmEntity.contains("this.world.getClosestPlayerToEntity(this, 12.0D)")
+                        && taintSwarmEntity.contains("this.world.getBiome(pos) == ThaumcraftWorldGenerator.biomeTaint")
+                        && taintSwarmEntity.contains("target.addPotionEffect(new PotionEffect(MobEffects.NAUSEA, 100, 0));")
+                        && taintSwarmEntity.contains("EntityUtils.setRecentlyHit(target, 100);")
+                        && taintSwarmEntity.contains("nbt.setByte(\"Flags\"")
+                        && taintSwarmEntity.contains("nbt.setByte(\"damBonus\"")
+                        && taintSwarmEntity.contains("nbt.getByte(\"Flags\")")
+                        && taintSwarmEntity.contains("nbt.getByte(\"damBonus\")")
+                        && taintSwarmEntity.contains("this.world.rand.nextBoolean()")
+                        && taintSwarmEntity.contains("itemResource, 1, 11"));
         String mindSpiderEntity = readFile("src/main/java/thaumcraft/common/entities/monster/EntityMindSpider.java");
         assertTrue("EntityMindSpider must expose viewer accessor and synced harmless/viewer data contracts",
                 mindSpiderEntity.contains("public String getViewer()")
