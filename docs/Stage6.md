@@ -303,40 +303,40 @@ Depends on content/item availability from earlier/later phases. Missing output i
 
 Remaining GAP-6 limits after this checkpoint: `GuiPech` is still absent because `ClientProxy` returns `null` for `GUI_PECH`, so player-driven GUI validation remains Phase 8/client work. Original potion metadata and candle outputs do not have direct current-port equivalents in this branch and remain documented content dependencies. Runtime trade interaction, output extraction, and save/reload scenarios are still unvalidated because smoke-server remains environment-blocked and user-driven manual scenarios are excluded.
 
-### GAP-7: Cultist Portal loot crate behavior uses a placeholder because BlockLoot is absent
+### GAP-7: Cultist Portal loot crate behavior and reward path still need parity/runtime evidence
 
-**Статус:** отсутствует / реализовано неправильно  
+**Статус:** частично реализовано / требует проверки
 **Критичность:** blocker
 
 **Текущая реализация:**
 - `src/main/java/thaumcraft/common/entities/monster/boss/EntityCultistPortal.java:112-150`
 - `src/main/java/thaumcraft/common/entities/monster/boss/EntityCultistPortal.java:197-229`
-- absent file: `src/main/java/thaumcraft/common/blocks/BlockLoot.java`
+- `src/main/java/thaumcraft/common/blocks/BlockLoot.java`
+- `src/main/java/thaumcraft/common/config/ConfigBlocks.java:197-203`
 
 **Референс:**
 - `thaumcraft_src/thaumcraft/common/entities/monster/boss/EntityCultistPortal.class`
 - `thaumcraft_src/thaumcraft/common/blocks/BlockLoot.class`
 
 **Что не совпадает:**
-Reference portal places Thaumcraft loot blocks/crates during the stage-0 setup. Current code explicitly uses vanilla chest as placeholder (`EntityCultistPortal.java:143-145`) because `BlockLoot` is not ported. This is server-visible boss reward behavior, not rendering. Banner facing is also a TODO (`EntityCultistPortal.java:124-127`), but the loot crate placeholder is the critical parity gap.
+Reference portal places Thaumcraft loot blocks/crates during the stage-0 setup. The port now places `ConfigBlocks.blockLootCrate` (with rarity metadata roll) and has `BlockLoot` registered, so the direct vanilla chest placeholder gap is closed. Remaining parity risk is runtime behavior evidence for stage progression, reward drops/state, and full boss-sequence side effects.
 
 **Что нужно доделать:**
-Port or provide the correct current equivalent of `BlockLoot` and update Cultist Portal setup to place it with correct metadata/state and loot behavior.
+Keep the `BlockLoot`/portal reward path parity-proven in static checks and move remaining work to runtime scenario evidence.
 
 **Как доделать:**
 - files/classes/methods/registrations/resources/scenarios
-- Add/port `BlockLoot` and any tile/drop logic it requires, or map to an existing ported loot block with identical behavior.
-- Register the block/item with stable names.
-- Replace vanilla chest placeholder in `EntityCultistPortal` with Thaumcraft loot block placement.
-- Verify portal stage setup places banners and loot crates at reference positions and rewards.
+- Keep `EntityCultistPortal` stage-0 reward placement bound to `ConfigBlocks.blockLootCrate` and prevent regressions back to vanilla chest placement.
+- Keep `BlockLoot` registration and block item registration intact in `ConfigBlocks`.
+- Verify portal stage setup places banners and loot crates at reference positions and rewards (runtime scenario).
 
 **Критерии приемки:**
-- [ ] Cultist Portal stage 0 places Thaumcraft loot blocks, not vanilla chest placeholders.
+- [x] Cultist Portal stage 0 places Thaumcraft loot blocks, not vanilla chest placeholders.
 - [ ] Loot crate metadata/state and drops match reference behavior.
 - [ ] Portal minion and boss spawn sequence still runs after loot placement.
 
 **Риски / зависимости:**
-Depends on block/content registration. This is a direct Stage 6 blocker because it changes boss server rewards.
+Runtime proof for reward progression remains a Stage 6 blocker; the direct placeholder/registration gap is closed.
 
 ### GAP-8: Eldritch Golem special server behavior is incomplete and unvalidated
 
@@ -1661,6 +1661,26 @@ Mapping:
 
 - Runtime combat matrix verification for all cultist/boss scenarios is still open in Stage 6.
 - This checkpoint does not close broader Stage 6 manual scenario requirements.
+
+### 8.2.42 Cultist Portal loot-placement static guard checkpoint — 2026-05-16
+
+Статус: direct placeholder regression guarded; runtime portal scenario evidence remains open.
+
+Что сделано:
+
+- Added `EntityCultistPortalLootPlacementContractTest` to enforce that stage-0 portal reward placement stays on Thaumcraft loot blocks (`ConfigBlocks.blockLootCrate`) and does not regress to vanilla chest placeholders.
+- Refreshed GAP-7 document text to match current code reality: `BlockLoot` and loot-crate placement are present; remaining blocker is runtime sequence/drop evidence.
+
+Проверки:
+
+- `./scripts/dev.sh test` — passed (`27/27`).
+- `./scripts/dev.sh validate` — passed (`5/5`).
+- `git diff --check` — passed.
+
+Оставшиеся ограничения:
+
+- Static checks do not prove in-world drop/state parity or full stage progression.
+- `S6-BOSS-01` Cultist Portal runtime scenario remains TODO.
 
 ### 8.3 Minimal Stage 6 manual scenario matrix
 
