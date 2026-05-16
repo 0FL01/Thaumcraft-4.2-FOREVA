@@ -12,6 +12,7 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.common.network.NetworkRegistry;
 import thaumcraft.api.aspects.Aspect;
 import thaumcraft.api.aspects.AspectList;
 import thaumcraft.api.wands.FocusUpgradeType;
@@ -20,6 +21,8 @@ import thaumcraft.common.entities.projectile.EntityShockOrb;
 import thaumcraft.common.items.wands.ItemWandCasting;
 import thaumcraft.common.items.wands.WandManager;
 import thaumcraft.common.lib.TCSounds;
+import thaumcraft.common.lib.network.PacketHandler;
+import thaumcraft.common.lib.network.fx.PacketFXZap;
 import thaumcraft.common.lib.utils.EntityUtils;
 
 public class FocusShock extends ItemFocusBasic {
@@ -124,6 +127,16 @@ public class FocusShock extends ItemFocusBasic {
                 }
             }
             if (closest == null) return;
+            if (!player.world.isRemote) {
+                PacketHandler.INSTANCE.sendToAllAround(
+                        new PacketFXZap(center.getEntityId(), closest.getEntityId()),
+                        new NetworkRegistry.TargetPoint(
+                                player.world.provider.getDimension(),
+                                center.posX,
+                                center.posY,
+                                center.posZ,
+                                64.0));
+            }
             closest.attackEntityFrom(DamageSource.causePlayerDamage(player), 4.0F + potency);
             hit.add(closest.getEntityId());
             center = closest;

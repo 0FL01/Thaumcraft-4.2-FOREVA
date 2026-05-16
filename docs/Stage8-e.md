@@ -396,6 +396,29 @@ Depends on GAP-1, GAP-2, GAP-5, and GAP-6. Network-thread rendering is unsafe if
 
 - This remains fallback visual behavior and does not yet port reference lightning renderer classes.
 
+#### Checkpoint 2026-05-16 — GAP-3 zap packet and FocusShock chain send path restored
+
+Статус: `PacketFXZap` payload/handler and `FocusShock` chain-lightning send-site are now wired.
+
+Что сделано:
+
+- Implemented `PacketFXZap` payload serialization (`source`, `target`) and client-scheduled handler.
+- Added fallback zap routing via `Thaumcraft.proxy.bolt(...)` between resolved source/target entities.
+- Restored `FocusShock.chainLightning(...)` packet send with reference-shaped target point:
+  - `PacketHandler.INSTANCE.sendToAllAround(new PacketFXZap(center.getEntityId(), closest.getEntityId()), TargetPoint(..., 64.0))`.
+- Expanded FX tests:
+  - `PacketFXSerializationTest` now includes `PacketFXZap` round-trip.
+  - `ClientProxyFxStaticGuardTest` now enforces zap handler scheduling/proxy routing and `FocusShock` send-site presence.
+
+Проверки:
+
+- `./scripts/dev.sh test` — passed.
+- `./scripts/dev.sh validate --smoke` — passed.
+
+Ограничения:
+
+- This remains fallback visual behavior and does not yet port reference `FXLightningBolt` renderer classes.
+
 ### GAP-4: Beam, wand beam, bore beam, power beam, arc, and lightning bolt classes are absent
 
 **Статус:** отсутствует  
@@ -406,7 +429,7 @@ Depends on GAP-1, GAP-2, GAP-5, and GAP-6. Network-thread rendering is unsafe if
 - `src/main/java/thaumcraft/client/fx/bolt/**` absent.
 - `src/main/java/thaumcraft/client/ClientProxy.java:98-105` has no-op `beam` and `bolt`.
 - `src/main/java/thaumcraft/common/lib/network/fx/PacketFXBeamPulse.java:1-7` and `PacketFXBeamPulseGolemBoss.java:1-7` are empty shells.
-- `src/main/java/thaumcraft/common/lib/network/fx/PacketFXZap.java:1-7`, `PacketFXWispZap.java:1-7`, `PacketFXBlockZap.java:1-7`, and `PacketFXBlockArc.java:24-39` cannot create visuals.
+- `src/main/java/thaumcraft/common/lib/network/fx/PacketFXBlockZap.java:1-7` is still an empty shell and cannot create visuals.
 
 **Референс:**
 - `thaumcraft_src/thaumcraft/client/fx/beams/FXArc.class`

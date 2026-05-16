@@ -39,10 +39,12 @@ public class ClientProxyFxStaticGuardTest {
         String shield = readFile("src/main/java/thaumcraft/common/lib/network/fx/PacketFXShield.java");
         String sonic = readFile("src/main/java/thaumcraft/common/lib/network/fx/PacketFXSonic.java");
         String wispZap = readFile("src/main/java/thaumcraft/common/lib/network/fx/PacketFXWispZap.java");
+        String zap = readFile("src/main/java/thaumcraft/common/lib/network/fx/PacketFXZap.java");
         String serverTick = readFile("src/main/java/thaumcraft/common/lib/events/ServerTickEventsFML.java");
         String runic = readFile("src/main/java/thaumcraft/common/lib/events/EventHandlerRunic.java");
         String eldritchGuardian = readFile("src/main/java/thaumcraft/common/entities/monster/EntityEldritchGuardian.java");
         String wisp = readFile("src/main/java/thaumcraft/common/entities/monster/EntityWisp.java");
+        String focusShock = readFile("src/main/java/thaumcraft/common/items/wands/foci/FocusShock.java");
 
         assertTrue("PacketFXVisDrain must schedule client task and call proxy beam",
                 visDrain.contains("Minecraft.getMinecraft().addScheduledTask") && visDrain.contains("Thaumcraft.proxy.beam("));
@@ -60,6 +62,9 @@ public class ClientProxyFxStaticGuardTest {
         assertTrue("PacketFXWispZap must schedule client task and route through proxy bolt",
                 wispZap.contains("Minecraft.getMinecraft().addScheduledTask")
                         && wispZap.contains("Thaumcraft.proxy.bolt("));
+        assertTrue("PacketFXZap must schedule client task and route through proxy bolt",
+                zap.contains("Minecraft.getMinecraft().addScheduledTask")
+                        && zap.contains("Thaumcraft.proxy.bolt("));
         assertTrue("Server block-swap path must send PacketFXBlockSparkle around replaced block",
                 serverTick.contains("new PacketFXBlockSparkle(vs.x, vs.y, vs.z, 0xC0C0FF)"));
         assertTrue("Runic shielding paths must send PacketFXShield for player and champion shield reactions",
@@ -69,6 +74,8 @@ public class ClientProxyFxStaticGuardTest {
                 eldritchGuardian.contains("new PacketFXSonic(this.getEntityId())"));
         assertTrue("Wisp ranged attack path must send PacketFXWispZap",
                 wisp.contains("new PacketFXWispZap(this.getEntityId(), this.targetedEntity.getEntityId())"));
+        assertTrue("FocusShock chain lightning path must send PacketFXZap",
+                focusShock.contains("new PacketFXZap(center.getEntityId(), closest.getEntityId())"));
     }
 
     private static String readFile(String path) throws IOException {
