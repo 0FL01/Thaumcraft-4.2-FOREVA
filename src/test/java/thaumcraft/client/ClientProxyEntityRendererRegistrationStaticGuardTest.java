@@ -245,8 +245,16 @@ public class ClientProxyEntityRendererRegistrationStaticGuardTest {
         assertTrue("EntityTaintCreeper must expose flash intensity accessor for renderer scale/color timing",
                 taintCreeperEntity.contains("public float getCreeperFlashIntensity(float partialTicks)"));
         String taintSheepEntity = readFile("src/main/java/thaumcraft/common/entities/monster/EntityTaintSheep.java");
-        assertTrue("EntityTaintSheep must expose sheared accessor for fur-layer renderer path",
-                taintSheepEntity.contains("public boolean getSheared()"));
+        assertTrue("EntityTaintSheep must keep sheared-state data/NBT/shearing contracts for fur-layer renderer parity",
+                taintSheepEntity.contains("DataParameter<Byte>")
+                        && taintSheepEntity.contains("SHEEP_FLAGS")
+                        && taintSheepEntity.contains("entityInit()")
+                        && taintSheepEntity.contains("public boolean getSheared()")
+                        && taintSheepEntity.contains("public void setSheared(boolean sheared)")
+                        && taintSheepEntity.contains("return !this.getSheared();")
+                        && taintSheepEntity.contains("this.setSheared(true);")
+                        && taintSheepEntity.contains("Blocks.WOOL")
+                        && taintSheepEntity.contains("\"Sheared\""));
         assertTrue("ClientProxy must iterate ConfigEntities.ENTITIES for renderer registration coverage",
                 source.contains("for (net.minecraftforge.fml.common.registry.EntityEntry entry : ConfigEntities.ENTITIES)"));
         assertTrue("ClientProxy must keep fallback RenderNoop registrations for remaining entities",

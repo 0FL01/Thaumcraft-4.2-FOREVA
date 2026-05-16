@@ -1248,6 +1248,28 @@ Some entities may be hard to trigger naturally until recipes/research/spawn cont
 
 - Это cleanup/consistency checkpoint; visual parity open-items по taint entity stack остаются прежними и закрываются отдельными behavior-ориентированными checkpoint’ами.
 
+### Checkpoint 2026-05-16 — restore taint sheep sheared-state contract baseline
+
+Статус: частично продвинут.
+
+Что сделано:
+
+- `EntityTaintSheep` обновлен до reference-shaped sheared-state baseline:
+  - добавлен data parameter `SHEEP_FLAGS` через `EntityDataManager`;
+  - добавлены `getSheared()` / `setSheared(boolean)` bit-flag accessors;
+  - восстановлены `isShearable(...)` и `onSheared(...)` (state flip + wool drops);
+  - восстановлена NBT-персистентность по ключу `"Sheared"` (`writeEntityToNBT` / `readEntityFromNBT`).
+- Это убирает renderer-gating заглушку (`getSheared() -> false`) и привязывает `RenderTaintSheep` fur-layer к реальному entity state.
+- `ClientProxyEntityRendererRegistrationStaticGuardTest` усилен проверками sheared-state contracts (`DataParameter`, `entityInit`, accessors, shear path, wool drops, NBT key).
+
+Проверки:
+
+- `./scripts/dev.sh validate --smoke` — passed.
+
+Ограничения:
+
+- Это sheared-state baseline; полная parity по taint sheep AI/animation/FX деталям остаётся открытой по GAP-3/GAP-6 и закрывается отдельными checkpoint’ами.
+
 - [ ] Add client-only entity renderer registration hook.
 - [ ] Register every entity from `ConfigEntities.ENTITIES` with a custom or vanilla-equivalent renderer.
 - [ ] Port item-like/transient/projectile renderers.

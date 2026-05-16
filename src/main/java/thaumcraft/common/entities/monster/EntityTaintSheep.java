@@ -1,9 +1,24 @@
 package thaumcraft.common.entities.monster;
 
+import net.minecraft.init.Blocks;
+import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.network.datasync.DataParameter;
+import net.minecraft.network.datasync.DataSerializers;
+import net.minecraft.network.datasync.EntityDataManager;
+
 public class EntityTaintSheep extends net.minecraft.entity.monster.EntityMob implements thaumcraft.api.entities.ITaintedMob, net.minecraftforge.common.IShearable {
+    private static final DataParameter<Byte> SHEEP_FLAGS = EntityDataManager.createKey(EntityTaintSheep.class, DataSerializers.BYTE);
+
     public EntityTaintSheep(net.minecraft.world.World world) {
         super(world);
         this.setSize(0.9f, 1.3f);
+    }
+
+    @Override
+    protected void entityInit() {
+        super.entityInit();
+        this.dataManager.register(SHEEP_FLAGS, (byte) 0);
     }
 
     @Override
@@ -14,9 +29,46 @@ public class EntityTaintSheep extends net.minecraft.entity.monster.EntityMob imp
         this.getEntityAttribute(net.minecraft.entity.SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(0.23);
     }
 
-    @Override public boolean isShearable(net.minecraft.item.ItemStack item, net.minecraft.world.IBlockAccess world, net.minecraft.util.math.BlockPos pos) { return false; }
-    @Override public java.util.List<net.minecraft.item.ItemStack> onSheared(net.minecraft.item.ItemStack item, net.minecraft.world.IBlockAccess world, net.minecraft.util.math.BlockPos pos, int fortune) { return new java.util.ArrayList<>(); }
-    public boolean getSheared() { return false; }
+    @Override
+    public boolean isShearable(net.minecraft.item.ItemStack item, net.minecraft.world.IBlockAccess world, net.minecraft.util.math.BlockPos pos) {
+        return !this.getSheared();
+    }
+
+    @Override
+    public java.util.List<net.minecraft.item.ItemStack> onSheared(net.minecraft.item.ItemStack item, net.minecraft.world.IBlockAccess world, net.minecraft.util.math.BlockPos pos, int fortune) {
+        java.util.ArrayList<net.minecraft.item.ItemStack> drops = new java.util.ArrayList<>();
+        this.setSheared(true);
+        int count = 1 + this.rand.nextInt(3);
+        for (int i = 0; i < count; i++) {
+            drops.add(new ItemStack(Blocks.WOOL, 1, 10));
+        }
+        return drops;
+    }
+
+    public boolean getSheared() {
+        return (this.dataManager.get(SHEEP_FLAGS) & 0x10) != 0;
+    }
+
+    public void setSheared(boolean sheared) {
+        byte flags = this.dataManager.get(SHEEP_FLAGS);
+        if (sheared) {
+            this.dataManager.set(SHEEP_FLAGS, (byte) (flags | 0x10));
+        } else {
+            this.dataManager.set(SHEEP_FLAGS, (byte) (flags & ~0x10));
+        }
+    }
+
+    @Override
+    public void writeEntityToNBT(NBTTagCompound nbt) {
+        super.writeEntityToNBT(nbt);
+        nbt.setBoolean("Sheared", this.getSheared());
+    }
+
+    @Override
+    public void readEntityFromNBT(NBTTagCompound nbt) {
+        super.readEntityFromNBT(nbt);
+        this.setSheared(nbt.getBoolean("Sheared"));
+    }
 
     @Override protected net.minecraft.util.SoundEvent getAmbientSound() { return net.minecraft.init.SoundEvents.ENTITY_SHEEP_AMBIENT; }
     @Override protected net.minecraft.util.SoundEvent getHurtSound(net.minecraft.util.DamageSource src) { return net.minecraft.init.SoundEvents.ENTITY_SHEEP_HURT; }
