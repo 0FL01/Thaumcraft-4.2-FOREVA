@@ -506,6 +506,25 @@ Some entities may be hard to trigger naturally until recipes/research/spawn cont
 - Это resource bootstrap; renderer/model Java parity по GAP-2..GAP-6 остается открытой.
 - Manual visual parity checks остаются пропущенными по инструкции.
 
+### Checkpoint 2026-05-16 — item-like renderer baseline
+
+Статус: частично продвинут.
+
+Что сделано:
+
+- `ClientProxy.setupEntityRenderers()` теперь регистрирует non-noop `RenderEntityItem` для item-like сущностей: `EntitySpecialItem`, `EntityPermanentItem`, `EntityFollowingItem`, `EntityItemGrate`.
+- Для остальных сущностей из `ConfigEntities.ENTITIES` сохранён fallback `RenderNoop` coverage path.
+- Обновлён `ClientProxyEntityRendererRegistrationStaticGuardTest`: зафиксированы item-like `RenderEntityItem` registrations и fallback branch по remaining entities.
+
+Проверки:
+
+- `./scripts/dev.sh validate --smoke` — passed.
+
+Ограничения:
+
+- Это только item-like slice; projectile/mob/boss/golem custom renderers по GAP-2..GAP-6 остаются открытыми.
+- Manual visual parity checks остаются пропущенными по инструкции.
+
 - [ ] Add client-only entity renderer registration hook.
 - [ ] Register every entity from `ConfigEntities.ENTITIES` with a custom or vanilla-equivalent renderer.
 - [ ] Port item-like/transient/projectile renderers.

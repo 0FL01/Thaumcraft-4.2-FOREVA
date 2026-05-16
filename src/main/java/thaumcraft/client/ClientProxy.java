@@ -1,9 +1,13 @@
 package thaumcraft.client;
 
 import java.awt.Color;
+import java.util.HashSet;
+import java.util.Set;
 import javax.annotation.Nullable;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.RenderItem;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
+import net.minecraft.client.renderer.entity.RenderEntityItem;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
@@ -45,6 +49,10 @@ import thaumcraft.client.lib.RenderEventHandler;
 import thaumcraft.common.CommonProxy;
 import thaumcraft.common.config.ConfigEntities;
 import thaumcraft.common.config.ConfigItems;
+import thaumcraft.common.entities.EntityFollowingItem;
+import thaumcraft.common.entities.EntityItemGrate;
+import thaumcraft.common.entities.EntityPermanentItem;
+import thaumcraft.common.entities.EntitySpecialItem;
 import thaumcraft.common.lib.TCSounds;
 import thaumcraft.common.lib.events.EventHandlerRunic;
 import thaumcraft.common.tiles.TileAlchemyFurnace;
@@ -106,11 +114,30 @@ public class ClientProxy extends CommonProxy {
     }
 
     private void setupEntityRenderers() {
+        RenderItem renderItem = Minecraft.getMinecraft().getRenderItem();
+        Set<Class<? extends Entity>> registered = new HashSet<>();
+
+        registerEntityRenderer(EntitySpecialItem.class, manager -> new RenderEntityItem(manager, renderItem), registered);
+        registerEntityRenderer(EntityPermanentItem.class, manager -> new RenderEntityItem(manager, renderItem), registered);
+        registerEntityRenderer(EntityFollowingItem.class, manager -> new RenderEntityItem(manager, renderItem), registered);
+        registerEntityRenderer(EntityItemGrate.class, manager -> new RenderEntityItem(manager, renderItem), registered);
+
         for (net.minecraftforge.fml.common.registry.EntityEntry entry : ConfigEntities.ENTITIES) {
             @SuppressWarnings("unchecked")
             Class<? extends Entity> entityClass = (Class<? extends Entity>) entry.getEntityClass();
+            if (registered.contains(entityClass)) {
+                continue;
+            }
             RenderingRegistry.registerEntityRenderingHandler(entityClass, RenderNoop::new);
         }
+    }
+
+    private static <T extends Entity> void registerEntityRenderer(
+            Class<T> entityClass,
+            net.minecraftforge.fml.client.registry.IRenderFactory<? super T> factory,
+            Set<Class<? extends Entity>> registered) {
+        RenderingRegistry.registerEntityRenderingHandler(entityClass, factory);
+        registered.add(entityClass);
     }
 
     private void setupBlockRenderers() {

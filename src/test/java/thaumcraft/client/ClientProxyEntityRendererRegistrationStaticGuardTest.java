@@ -18,10 +18,16 @@ public class ClientProxyEntityRendererRegistrationStaticGuardTest {
 
         assertTrue("ClientProxy must keep setupEntityRenderers entry-point",
                 source.contains("private void setupEntityRenderers()"));
+        assertTrue("ClientProxy must keep non-noop RenderEntityItem registrations for item-like entities",
+                source.contains("registerEntityRenderer(EntitySpecialItem.class, manager -> new RenderEntityItem(manager, renderItem), registered);")
+                        && source.contains("registerEntityRenderer(EntityPermanentItem.class, manager -> new RenderEntityItem(manager, renderItem), registered);")
+                        && source.contains("registerEntityRenderer(EntityFollowingItem.class, manager -> new RenderEntityItem(manager, renderItem), registered);")
+                        && source.contains("registerEntityRenderer(EntityItemGrate.class, manager -> new RenderEntityItem(manager, renderItem), registered);"));
         assertTrue("ClientProxy must iterate ConfigEntities.ENTITIES for renderer registration coverage",
                 source.contains("for (net.minecraftforge.fml.common.registry.EntityEntry entry : ConfigEntities.ENTITIES)"));
-        assertTrue("ClientProxy must register entity render handlers through RenderingRegistry",
-                source.contains("RenderingRegistry.registerEntityRenderingHandler(entityClass, RenderNoop::new);"));
+        assertTrue("ClientProxy must keep fallback RenderNoop registrations for remaining entities",
+                source.contains("if (registered.contains(entityClass))")
+                        && source.contains("RenderingRegistry.registerEntityRenderingHandler(entityClass, RenderNoop::new);"));
         assertTrue("RenderNoop must stay as a side-safe doRender baseline",
                 noopRenderer.contains("extends Render<T>")
                         && noopRenderer.contains("public void doRender(T entity, double x, double y, double z, float entityYaw, float partialTicks)"));
