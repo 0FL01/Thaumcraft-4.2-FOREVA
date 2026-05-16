@@ -303,6 +303,8 @@ public class ClientProxyEntityRendererRegistrationStaticGuardTest {
                         && mindSpiderEntity.contains("private static final DataParameter<String> VIEWER")
                         && mindSpiderEntity.contains("this.dataManager.register(HARMLESS, (byte) 0)")
                         && mindSpiderEntity.contains("this.dataManager.register(VIEWER, \"\")")
+                        && mindSpiderEntity.contains("SharedMonsterAttributes.ATTACK_DAMAGE")
+                        && !mindSpiderEntity.contains("SharedMonsterAttributes.MOVEMENT_SPEED")
                         && mindSpiderEntity.contains("public boolean isHarmless()")
                         && mindSpiderEntity.contains("public float spiderScaleAmount()")
                         && mindSpiderEntity.contains("public double getYOffset()")

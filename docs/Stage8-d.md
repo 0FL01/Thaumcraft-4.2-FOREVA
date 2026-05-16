@@ -1434,6 +1434,24 @@ Some entities may be hard to trigger naturally until recipes/research/spawn cont
 
 - Это harmless collision/attack baseline; точный legacy target-acquisition нюанс pre-1.8 (`findPlayerToAttack` path) напрямую не репродуцируется в 1.12 AI-task модели и остаётся в составе общей behavior parity валидации.
 
+### Checkpoint 2026-05-16 — fix mind spider attribute contract (attack damage vs movement speed)
+
+Статус: частично продвинут.
+
+Что сделано:
+
+- В `EntityMindSpider.applyEntityAttributes()` исправлен reference-shaped combat contract:
+  - второй baseline attribute переключен с `SharedMonsterAttributes.MOVEMENT_SPEED` на `SharedMonsterAttributes.ATTACK_DAMAGE` со значением `1.0D`.
+- `ClientProxyEntityRendererRegistrationStaticGuardTest` расширен check’ом, закрепляющим `ATTACK_DAMAGE` contract и отсутствие `MOVEMENT_SPEED` override в `EntityMindSpider`.
+
+Проверки:
+
+- `./scripts/dev.sh validate --smoke` — passed.
+
+Ограничения:
+
+- Это attribute-contract fix; дополнительные pre-1.8 AI-targeting нюансы остаются в общем behavior parity scope.
+
 ### Checkpoint 2026-05-16 — restore mind spider fullbright eyes lightmap baseline
 
 Статус: частично продвинут.
