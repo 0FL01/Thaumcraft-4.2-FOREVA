@@ -3,9 +3,12 @@ package thaumcraft.common.entities.monster;
 import net.minecraft.entity.ai.*;
 import net.minecraft.entity.passive.EntityOcelot;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.EntityDataManager;
+import net.minecraft.potion.PotionEffect;
+import net.minecraft.util.math.AxisAlignedBB;
 import thaumcraft.common.entities.ai.combat.AIAttackOnCollide;
 import thaumcraft.common.entities.ai.combat.AICreeperSwell;
 
@@ -96,6 +99,16 @@ public class EntityTaintCreeper extends net.minecraft.entity.monster.EntityMob i
                 this.timeSinceIgnited = this.fuseTime;
                 if (!this.world.isRemote) {
                     this.world.createExplosion(this, this.posX, this.posY + (double)(this.height / 2.0F), this.posZ, 1.5F, false);
+                    for (EntityLivingBase entity : this.world.getEntitiesWithinAABB(EntityLivingBase.class,
+                            new AxisAlignedBB(this.posX, this.posY, this.posZ, this.posX, this.posY, this.posZ).grow(6.0D, 6.0D, 6.0D))) {
+                        if (entity instanceof thaumcraft.api.entities.ITaintedMob) {
+                            continue;
+                        }
+                        if (thaumcraft.common.config.Config.potionFluxTaint == null || entity.isPotionActive(thaumcraft.common.config.Config.potionFluxTaint)) {
+                            continue;
+                        }
+                        entity.addPotionEffect(new PotionEffect(thaumcraft.common.config.Config.potionFluxTaint, 100, 0, false, true));
+                    }
                     this.setDead();
                 }
             }

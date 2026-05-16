@@ -1443,6 +1443,28 @@ Some entities may be hard to trigger naturally until recipes/research/spawn cont
 
 - Это ignite-flow baseline; полная parity taint spread/potion side-effects после взрыва остаётся в Stage 6 runtime scope.
 
+### Checkpoint 2026-05-16 — restore taint creeper detonation taint-poison splash baseline
+
+Статус: частично продвинут.
+
+Что сделано:
+
+- `EntityTaintCreeper` detonation path расширен reference-shaped side-effect baseline:
+  - после server-side взрыва добавлен поиск nearby `EntityLivingBase` в радиусе `6.0D`;
+  - non-tainted цели (`!ITaintedMob`) получают `Config.potionFluxTaint` (`100` ticks, amplifier `0`) при отсутствии активного эффекта.
+- `ClientProxyEntityRendererRegistrationStaticGuardTest` расширен проверками на contracts:
+  - nearby `EntityLivingBase` splash query;
+  - `ITaintedMob` исключение;
+  - использование `Config.potionFluxTaint` и `addPotionEffect(...)`.
+
+Проверки:
+
+- `./scripts/dev.sh validate --smoke` — passed.
+
+Ограничения:
+
+- Это detonation poison-splash baseline; reference taint biome/fibre spread side-effects после взрыва остаются в Stage 6 runtime scope.
+
 ### Checkpoint 2026-05-16 — restore mind spider viewer-only render gating
 
 Статус: частично продвинут.
