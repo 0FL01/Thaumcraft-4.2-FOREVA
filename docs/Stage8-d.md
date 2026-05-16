@@ -1110,6 +1110,29 @@ Some entities may be hard to trigger naturally until recipes/research/spawn cont
 
 - Это baseline creeper flash/scale/color parity; full reference parity по taint creeper visual stack остаётся открытой (legacy armor-pass path и прочие GL-pass нюансы) по GAP-3/GAP-6.
 
+### Checkpoint 2026-05-16 — dedicated taint villager renderer baseline
+
+Статус: частично продвинут.
+
+Что сделано:
+
+- Добавлен выделенный renderer `RenderTaintVillager` (`thaumcraft.client.renderers.entity.RenderTaintVillager`) вместо shared texture-only baseline для `EntityTaintVillager`.
+- Baseline behavior:
+  - dedicated texture path `textures/models/villager.png`;
+  - reference-shaped pre-render scale profile (`0.9375f`) с сохранением villager shadow size (`0.5f`).
+- `ClientProxy.setupEntityRenderers()` обновлен: `EntityTaintVillager` теперь регистрируется через `RenderTaintVillager::new`.
+- `ClientProxyEntityRendererRegistrationStaticGuardTest` расширен проверками:
+  - explicit registration path `EntityTaintVillager -> RenderTaintVillager`;
+  - texture + pre-render scale contracts `RenderTaintVillager`.
+
+Проверки:
+
+- `./scripts/dev.sh validate --smoke` — passed.
+
+Ограничения:
+
+- Это baseline texture/scale parity; full reference parity по taint villager visual stack (дополнительные legacy pass hooks и GL-state нюансы) остаётся открытой по GAP-3/GAP-6.
+
 - [ ] Add client-only entity renderer registration hook.
 - [ ] Register every entity from `ConfigEntities.ENTITIES` with a custom or vanilla-equivalent renderer.
 - [ ] Port item-like/transient/projectile renderers.

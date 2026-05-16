@@ -45,12 +45,12 @@ public class ClientProxyEntityRendererRegistrationStaticGuardTest {
                         && source.contains("registerEntityRenderer(EntityInhabitedZombie.class, RenderInhabitedZombie::new, registered);")
                         && source.contains("registerEntityRenderer(EntityMindSpider.class, RenderMindSpider::new, registered);")
                         && source.contains("registerEntityRenderer(EntityTaintSpider.class, RenderTaintSpider::new, registered);"));
-        assertTrue("ClientProxy must keep dedicated RenderTaintTextureLiving registrations for taint animal-like entities",
+        assertTrue("ClientProxy must keep dedicated taint animal-like renderer registrations",
                 source.contains("registerEntityRenderer(EntityTaintChicken.class, manager -> new RenderTaintTextureLiving<>(")
                         && source.contains("registerEntityRenderer(EntityTaintCow.class, manager -> new RenderTaintTextureLiving<>(")
                         && source.contains("registerEntityRenderer(EntityTaintPig.class, manager -> new RenderTaintTextureLiving<>(")
                         && source.contains("registerEntityRenderer(EntityTaintSheep.class, manager -> new RenderTaintTextureLiving<>(")
-                        && source.contains("registerEntityRenderer(EntityTaintVillager.class, manager -> new RenderTaintTextureLiving<>(")
+                        && source.contains("registerEntityRenderer(EntityTaintVillager.class, RenderTaintVillager::new, registered);")
                         && source.contains("registerEntityRenderer(EntityTaintCreeper.class, RenderTaintCreeper::new, registered);"));
         assertTrue("ClientProxy must keep fallback RenderFallbackBiped registrations for cultist entities",
                 source.contains("registerEntityRenderer(EntityCultistKnight.class, manager -> new RenderCultist<>(manager, 0.5F), registered);")
@@ -185,6 +185,12 @@ public class ClientProxyEntityRendererRegistrationStaticGuardTest {
                         && taintCreeperRenderer.contains("getCreeperFlashIntensity")
                         && taintCreeperRenderer.contains("preRenderCallback")
                         && taintCreeperRenderer.contains("getColorMultiplier"));
+        String taintVillagerRenderer = readFile("src/main/java/thaumcraft/client/renderers/entity/RenderTaintVillager.java");
+        assertTrue("RenderTaintVillager must provide villager texture and pre-render scale baseline",
+                taintVillagerRenderer.contains("extends RenderLiving<EntityTaintVillager>")
+                        && taintVillagerRenderer.contains("textures/models/villager.png")
+                        && taintVillagerRenderer.contains("GlStateManager.scale(scale, scale, scale)")
+                        && taintVillagerRenderer.contains("0.9375F"));
         String cultistRenderer = readFile("src/main/java/thaumcraft/client/renderers/entity/RenderCultist.java");
         assertTrue("RenderCultist must provide shared cultist texture baseline",
                 cultistRenderer.contains("extends RenderBiped<T>")
