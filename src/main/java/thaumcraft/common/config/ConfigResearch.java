@@ -35,6 +35,7 @@ public class ConfigResearch {
         initBasicResearchBaseline();
         initBasicResearchProgressionBaseline();
         initAlchemyResearchBaseline();
+        initAlchemyResearchTextOnlyBaseline();
         initArtificeResearchBaseline();
         initGolemancyResearchBaseline();
         initGolemancyResearchTextOnlyBaseline();
@@ -2717,6 +2718,143 @@ public class ConfigResearch {
                 .registerResearchItem();
 
         new ResearchItem(
+                "GOLEMWOOD",
+                "GOLEMANCY",
+                new AspectList()
+                        .add(Aspect.SOUL, 4)
+                        .add(Aspect.MOTION, 4)
+                        .add(Aspect.TREE, 3)
+                        .add(Aspect.EXCHANGE, 3),
+                2,
+                4,
+                2,
+                new ItemStack(ConfigItems.itemGolemPlacer, 1, 1))
+                .setPages(new ResearchPage("tc.research_page.GOLEMWOOD.1"))
+                .setSecondary()
+                .setParents("GOLEMSTRAW")
+                .registerResearchItem();
+
+        new ResearchItem(
+                "GOLEMCLAY",
+                "GOLEMANCY",
+                new AspectList()
+                        .add(Aspect.SOUL, 6)
+                        .add(Aspect.MOTION, 6)
+                        .add(Aspect.EARTH, 3)
+                        .add(Aspect.EXCHANGE, 3),
+                2,
+                6,
+                2,
+                new ItemStack(ConfigItems.itemGolemPlacer, 1, 3))
+                .setPages(new ResearchPage("tc.research_page.GOLEMCLAY.1"))
+                .setSecondary()
+                .setConcealed()
+                .setParents("GOLEMWOOD")
+                .registerResearchItem();
+
+        new ResearchItem(
+                "GOLEMSTONE",
+                "GOLEMANCY",
+                new AspectList()
+                        .add(Aspect.SOUL, 6)
+                        .add(Aspect.MOTION, 6)
+                        .add(Aspect.EARTH, 3)
+                        .add(Aspect.EXCHANGE, 3),
+                2,
+                8,
+                2,
+                new ItemStack(ConfigItems.itemGolemPlacer, 1, 5))
+                .setPages(new ResearchPage("tc.research_page.GOLEMSTONE.1"))
+                .setSecondary()
+                .setConcealed()
+                .setParents("GOLEMCLAY")
+                .registerResearchItem();
+
+        new ResearchItem(
+                "GOLEMIRON",
+                "GOLEMANCY",
+                new AspectList()
+                        .add(Aspect.SOUL, 9)
+                        .add(Aspect.MOTION, 9)
+                        .add(Aspect.METAL, 3)
+                        .add(Aspect.EXCHANGE, 3),
+                0,
+                10,
+                2,
+                new ItemStack(ConfigItems.itemGolemPlacer, 1, 6))
+                .setPages(new ResearchPage("tc.research_page.GOLEMIRON.1"))
+                .setSecondary()
+                .setConcealed()
+                .setParents("GOLEMSTONE")
+                .registerResearchItem();
+
+        new ResearchItem(
+                "GOLEMTHAUMIUM",
+                "GOLEMANCY",
+                new AspectList()
+                        .add(Aspect.SOUL, 10)
+                        .add(Aspect.MOTION, 10)
+                        .add(Aspect.METAL, 3)
+                        .add(Aspect.MAGIC, 3)
+                        .add(Aspect.EXCHANGE, 3),
+                2,
+                10,
+                2,
+                new ItemStack(ConfigItems.itemGolemPlacer, 1, 7))
+                .setPages(new ResearchPage("tc.research_page.GOLEMTHAUMIUM.1"))
+                .setConcealed()
+                .setParents("GOLEMIRON", "THAUMIUM")
+                .registerResearchItem();
+
+        new ResearchItem(
+                "GOLEMFLESH",
+                "GOLEMANCY",
+                new AspectList()
+                        .add(Aspect.SOUL, 7)
+                        .add(Aspect.MOTION, 7)
+                        .add(Aspect.FLESH, 6)
+                        .add(Aspect.EXCHANGE, 3),
+                4,
+                4,
+                2,
+                new ItemStack(ConfigItems.itemGolemPlacer, 1, 4))
+                .setPages(new ResearchPage("tc.research_page.GOLEMFLESH.1"))
+                .setConcealed()
+                .setParents("GOLEMWOOD")
+                .registerResearchItem();
+
+        new ResearchItem(
+                "GOLEMTALLOW",
+                "GOLEMANCY",
+                new AspectList()
+                        .add(Aspect.SOUL, 3)
+                        .add(Aspect.MOTION, 3)
+                        .add(Aspect.FLESH, 3)
+                        .add(Aspect.MAGIC, 3)
+                        .add(Aspect.EXCHANGE, 3),
+                4,
+                6,
+                2,
+                new ItemStack(ConfigItems.itemGolemPlacer, 1, 2))
+                .setPages(new ResearchPage("tc.research_page.GOLEMTALLOW.1"))
+                .setConcealed()
+                .setParents("GOLEMCLAY", "TALLOW")
+                .registerResearchItem();
+
+        new ResearchItem(
+                "GOLEMFETTER",
+                "GOLEMANCY",
+                new AspectList().add(Aspect.TRAP, 3).add(Aspect.MECHANISM, 3),
+                4,
+                8,
+                1,
+                new ItemStack(ConfigBlocks.blockCosmeticSolid, 1, 9))
+                .setPages(new ResearchPage("tc.research_page.GOLEMFETTER.1"))
+                .setParents("GOLEMSTONE")
+                .setSecondary()
+                .registerResearchItem();
+
+        new ResearchItem(
                 "UPGRADEAIR",
                 "GOLEMANCY",
                 new AspectList().add(Aspect.AIR, 6).add(Aspect.MOTION, 3),
@@ -2798,6 +2936,20 @@ public class ConfigResearch {
                 .setConcealed()
                 .setSecondary()
                 .setParents("GOLEMBELL")
+                .registerResearchItem();
+    }
+
+    private static void initAlchemyResearchTextOnlyBaseline() {
+        new ResearchItem(
+                "TALLOW",
+                "ALCHEMY",
+                new AspectList().add(Aspect.FLESH, 3).add(Aspect.MAGIC, 1),
+                -2,
+                0,
+                1,
+                new ItemStack(ConfigItems.itemResource, 1, 4))
+                .setPages(new ResearchPage("tc.research_page.TALLOW.1"))
+                .setParents("CRUCIBLE")
                 .registerResearchItem();
     }
 
