@@ -454,6 +454,7 @@ public class ConfigBlocks {
             new TileRegistration(TileAlembic.class, "TileSiphon"),
             new TileRegistration(TileArcaneLamp.class, "TileArcaneLamp"),
             new TileRegistration(TileArcaneLampGrowth.class, "TileArcaneLampGrowth"),
+            new TileRegistration(TileBrainbox.class, "TileBrainbox"),
             new TileRegistration(TileThaumatorium.class, "TileThaumatorium"),
             new TileRegistration(TileThaumatoriumTop.class, "TileThaumatoriumTop"),
             new TileRegistration(TileEtherealBloom.class, "TilePurifyTotem"),

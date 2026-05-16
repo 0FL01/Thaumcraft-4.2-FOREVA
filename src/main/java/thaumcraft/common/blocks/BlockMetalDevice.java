@@ -1,5 +1,6 @@
 package thaumcraft.common.blocks;
 
+import net.minecraft.block.Block;
 import net.minecraft.block.BlockContainer;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
@@ -63,6 +64,7 @@ public class BlockMetalDevice extends BlockContainer {
         if (meta == 8) return new TileArcaneLampGrowth();
         if (meta == 10) return new TileThaumatorium();
         if (meta == 11) return new TileThaumatoriumTop();
+        if (meta == 12) return new TileBrainbox();
         if (meta == 14) return new TileVisRelay();
         return new TilePedestal();
     }
@@ -83,6 +85,7 @@ public class BlockMetalDevice extends BlockContainer {
         list.add(new ItemStack(this, 1, 8)); // growth lamp
         list.add(new ItemStack(this, 1, 10)); // thaumatorium
         list.add(new ItemStack(this, 1, 11)); // thaumatorium top
+        list.add(new ItemStack(this, 1, 12)); // brainbox
         list.add(new ItemStack(this, 1, 14)); // vis relay
     }
 
@@ -168,6 +171,45 @@ public class BlockMetalDevice extends BlockContainer {
             }
         }
         super.breakBlock(worldIn, pos, state);
+    }
+
+    @Override
+    public void onBlockPlacedBy(World worldIn, BlockPos pos, IBlockState state, EntityLivingBase placer, ItemStack stack) {
+        super.onBlockPlacedBy(worldIn, pos, state, placer, stack);
+        if (worldIn.isRemote || state.getValue(TYPE) != 12) return;
+        TileEntity te = worldIn.getTileEntity(pos);
+        if (!(te instanceof TileBrainbox)) return;
+        TileBrainbox brainbox = (TileBrainbox) te;
+        EnumFacing target = findAdjacentThaumatorium(worldIn, pos);
+        if (target == null) {
+            target = placer == null ? EnumFacing.NORTH : placer.getHorizontalFacing().getOpposite();
+        }
+        brainbox.facing = target;
+        brainbox.markDirty();
+        worldIn.notifyBlockUpdate(pos, state, state, 3);
+    }
+
+    @Override
+    public void neighborChanged(IBlockState state, World worldIn, BlockPos pos, Block blockIn, BlockPos fromPos) {
+        super.neighborChanged(state, worldIn, pos, blockIn, fromPos);
+        if (worldIn.isRemote || state.getValue(TYPE) != 12) return;
+        TileEntity te = worldIn.getTileEntity(pos);
+        if (!(te instanceof TileBrainbox)) return;
+        EnumFacing target = findAdjacentThaumatorium(worldIn, pos);
+        if (target == null || ((TileBrainbox) te).facing == target) return;
+        ((TileBrainbox) te).facing = target;
+        te.markDirty();
+        worldIn.notifyBlockUpdate(pos, state, state, 3);
+    }
+
+    private EnumFacing findAdjacentThaumatorium(World worldIn, BlockPos pos) {
+        for (EnumFacing face : EnumFacing.values()) {
+            IBlockState adjacent = worldIn.getBlockState(pos.offset(face));
+            if (adjacent.getBlock() == this && (adjacent.getValue(TYPE) == 10 || adjacent.getValue(TYPE) == 11)) {
+                return face;
+            }
+        }
+        return null;
     }
 
     @Override

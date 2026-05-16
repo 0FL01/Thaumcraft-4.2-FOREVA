@@ -17,6 +17,7 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ITickable;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import thaumcraft.api.ThaumcraftApi;
@@ -27,6 +28,7 @@ import thaumcraft.api.aspects.AspectList;
 import thaumcraft.api.aspects.IAspectContainer;
 import thaumcraft.api.aspects.IEssentiaTransport;
 import thaumcraft.api.crafting.CrucibleRecipe;
+import thaumcraft.common.blocks.BlockMetalDevice;
 import thaumcraft.common.blocks.BlockAiry;
 import thaumcraft.common.config.ConfigBlocks;
 import thaumcraft.common.container.InventoryFake;
@@ -58,6 +60,7 @@ public class TileThaumatorium extends TileThaumcraft implements ITickable, IAspe
 
         if (this.counter == 0 || this.counter % 40 == 0) {
             this.heated = this.checkHeat();
+            this.getUpgrades();
         }
         ++this.counter;
 
@@ -491,6 +494,39 @@ public class TileThaumatorium extends TileThaumcraft implements ITickable, IAspe
         return this.world != null && (this.world.isBlockPowered(this.pos)
                 || this.world.isBlockPowered(this.pos.down())
                 || this.world.isBlockPowered(this.pos.up()));
+    }
+
+    public void getUpgrades() {
+        if (this.world == null) return;
+        int max = 1;
+        for (int y = 0; y <= 1; ++y) {
+            for (EnumFacing dir : EnumFacing.values()) {
+                if (dir == EnumFacing.DOWN || dir == this.facing) continue;
+                BlockPos check = this.pos.add(dir.getXOffset(), y + dir.getYOffset(), dir.getZOffset());
+                IBlockState state = this.world.getBlockState(check);
+                if (state.getBlock() != ConfigBlocks.blockMetalDevice || state.getValue(BlockMetalDevice.TYPE) != 12) continue;
+                TileEntity te = this.world.getTileEntity(check);
+                if (!(te instanceof TileBrainbox) || ((TileBrainbox) te).facing != dir.getOpposite()) continue;
+                max += 2;
+            }
+        }
+
+        if (max == this.maxRecipes) return;
+        this.maxRecipes = max;
+        while (this.recipeHash.size() > this.maxRecipes) {
+            int index = this.recipeHash.size() - 1;
+            this.recipeHash.remove(index);
+            if (index < this.recipeEssentia.size()) this.recipeEssentia.remove(index);
+            if (index < this.recipePlayer.size()) this.recipePlayer.remove(index);
+        }
+        while (this.recipeEssentia.size() > this.maxRecipes) this.recipeEssentia.remove(this.recipeEssentia.size() - 1);
+        while (this.recipePlayer.size() > this.maxRecipes) this.recipePlayer.remove(this.recipePlayer.size() - 1);
+        if (this.currentCraft >= this.recipeHash.size()) {
+            this.currentCraft = -1;
+            this.currentRecipe = null;
+            this.currentSuction = null;
+        }
+        this.markDirtyAndSync();
     }
 
     @Override
