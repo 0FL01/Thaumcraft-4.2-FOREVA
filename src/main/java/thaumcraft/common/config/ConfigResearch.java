@@ -432,6 +432,116 @@ public class ConfigResearch {
                 .setAspectTriggers(Aspect.METAL)
                 .setParents("CRUCIBLE")
                 .registerResearchItem();
+
+        new ResearchItem(
+                "TUBES",
+                "ALCHEMY",
+                new AspectList()
+                        .add(Aspect.WATER, 3)
+                        .add(Aspect.MAGIC, 3)
+                        .add(Aspect.EXCHANGE, 3),
+                7,
+                0,
+                1,
+                new ItemStack(ConfigBlocks.blockTube, 1, 0))
+                .setPages(
+                        new ResearchPage("tc.research_page.TUBES.1"),
+                        new ResearchPage((IArcaneRecipe) recipes.get("Tube")),
+                        new ResearchPage("tc.research_page.TUBES.2"),
+                        new ResearchPage((IArcaneRecipe) recipes.get("TubeValve")),
+                        new ResearchPage("tc.research_page.TUBES.3"),
+                        new ResearchPage((IArcaneRecipe) recipes.get("Resonator")),
+                        new ResearchPage("tc.research_page.TUBES.4"))
+                .setParents("DISTILESSENTIA")
+                .setSecondary()
+                .setConcealed()
+                .registerResearchItem();
+
+        new ResearchItem(
+                "TUBEFILTER",
+                "ALCHEMY",
+                new AspectList()
+                        .add(Aspect.WATER, 3)
+                        .add(Aspect.MAGIC, 3)
+                        .add(Aspect.EXCHANGE, 3)
+                        .add(Aspect.ORDER, 3),
+                9,
+                1,
+                2,
+                new ItemStack(ConfigBlocks.blockTube, 1, 3))
+                .setPages(
+                        new ResearchPage("tc.research_page.TUBEFILTER.1"),
+                        new ResearchPage((IArcaneRecipe) recipes.get("TubeFilter")),
+                        new ResearchPage("tc.research_page.TUBEFILTER.2"),
+                        new ResearchPage((IArcaneRecipe) recipes.get("TubeRestrict")),
+                        new ResearchPage((IArcaneRecipe) recipes.get("TubeOneway")))
+                .setParents("TUBES")
+                .setSecondary()
+                .setConcealed()
+                .registerResearchItem();
+
+        new ResearchItem(
+                "ESSENTIACRYSTAL",
+                "ALCHEMY",
+                new AspectList()
+                        .add(Aspect.WATER, 5)
+                        .add(Aspect.CRYSTAL, 5)
+                        .add(Aspect.EXCHANGE, 3)
+                        .add(Aspect.MAGIC, 5),
+                8,
+                -2,
+                1,
+                new ItemStack(ConfigBlocks.blockTube, 1, 7))
+                .setPages(
+                        new ResearchPage("tc.research_page.ESSENTIACRYSTAL.1"),
+                        new ResearchPage((IArcaneRecipe) recipes.get("EssentiaCrystalizer")))
+                .setConcealed()
+                .setParents("TUBES")
+                .registerResearchItem();
+
+        new ResearchItem(
+                "CENTRIFUGE",
+                "ALCHEMY",
+                new AspectList()
+                        .add(Aspect.ENTROPY, 3)
+                        .add(Aspect.MAGIC, 3)
+                        .add(Aspect.EXCHANGE, 3)
+                        .add(Aspect.CRAFT, 3),
+                10,
+                0,
+                2,
+                new ItemStack(ConfigBlocks.blockTube, 1, 2))
+                .setPages(
+                        new ResearchPage("tc.research_page.CENTRIFUGE.1"),
+                        new ResearchPage((IArcaneRecipe) recipes.get("Centrifuge")),
+                        new ResearchPage("tc.research_page.CENTRIFUGE.2"),
+                        new ResearchPage("tc.research_page.CENTRIFUGE.3"),
+                        new ResearchPage((IArcaneRecipe) recipes.get("TubeBuffer")))
+                .setParents("TUBEFILTER")
+                .setConcealed()
+                .registerResearchItem();
+
+        new ResearchItem(
+                "THAUMATORIUM",
+                "ALCHEMY",
+                new AspectList()
+                        .add(Aspect.WATER, 3)
+                        .add(Aspect.MAGIC, 6)
+                        .add(Aspect.EXCHANGE, 3)
+                        .add(Aspect.CRAFT, 3),
+                10,
+                -2,
+                3,
+                new ResourceLocation("thaumcraft", "textures/blocks/alchemyblock.png"))
+                .setPages(
+                        new ResearchPage("tc.research_page.THAUMATORIUM.1"),
+                        new ResearchPage((List<?>) recipes.get("Thaumatorium")),
+                        new ResearchPage("tc.research_page.THAUMATORIUM.2"),
+                        new ResearchPage("tc.research_page.THAUMATORIUM.3"),
+                        new ResearchPage((IArcaneRecipe) recipes.get("MnemonicMatrix")))
+                .setParents("CENTRIFUGE")
+                .setConcealed()
+                .registerResearchItem();
     }
 
     private static void initArtificeResearchBaseline() {
