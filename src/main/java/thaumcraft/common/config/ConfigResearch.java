@@ -2833,6 +2833,7 @@ public class ConfigResearch {
                 new ItemStack(ConfigItems.itemGolemPlacer, 1, 4))
                 .setPages(
                         new ResearchPage("tc.research_page.GOLEMFLESH.1"),
+                        new ResearchPage((IRecipe) recipes.get("BlockFlesh")),
                         new ResearchPage((CrucibleRecipe) recipes.get("GolemFlesh")))
                 .setConcealed()
                 .setParents("GOLEMWOOD")
@@ -2855,6 +2856,7 @@ public class ConfigResearch {
                 new ItemStack(ConfigItems.itemGolemPlacer, 1, 2))
                 .setPages(
                         new ResearchPage("tc.research_page.GOLEMTALLOW.1"),
+                        new ResearchPage((IRecipe) recipes.get("BlockTallow")),
                         new ResearchPage((CrucibleRecipe) recipes.get("GolemTallow")))
                 .setConcealed()
                 .setParents("GOLEMCLAY", "TALLOW")
@@ -3268,6 +3270,9 @@ public class ConfigResearch {
                 .setPages(
                         new ResearchPage("tc.research_page.BASICARTIFACE.1"),
                         new ResearchPage((IArcaneRecipe) recipes.get("PrimalCharm")),
+                        new ResearchPage((IRecipe) recipes.get("MundaneAmulet")),
+                        new ResearchPage((IRecipe) recipes.get("MundaneRing")),
+                        new ResearchPage((IRecipe) recipes.get("MundaneBelt")),
                         new ResearchPage((IArcaneRecipe) recipes.get("MirrorGlass")))
                 .setStub()
                 .setRound()
@@ -3304,7 +3309,9 @@ public class ConfigResearch {
                 0,
                 1,
                 new ItemStack(ConfigItems.itemResource, 1, 4))
-                .setPages(new ResearchPage("tc.research_page.TALLOW.1"))
+                .setPages(
+                        new ResearchPage("tc.research_page.TALLOW.1"),
+                        new ResearchPage((CrucibleRecipe) recipes.get("Tallow")))
                 .setParents("CRUCIBLE")
                 .registerResearchItem();
 

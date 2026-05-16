@@ -196,6 +196,53 @@ public class ConfigRecipes {
                         new ItemStack(ConfigItems.itemShard, 1, 3),
                         new ItemStack(ConfigItems.itemShard, 1, 4),
                         new ItemStack(ConfigItems.itemShard, 1, 5)));
+        ConfigResearch.recipes.put("MundaneAmulet",
+                oreDictRecipe(
+                        new ItemStack(ConfigItems.itemBaubleBlanks, 1, 0),
+                        new Object[]{
+                                " S ",
+                                "S S",
+                                " I ",
+                                'S', new ItemStack(Items.STRING),
+                                'I', new ItemStack(Items.IRON_INGOT)
+                        }));
+        ConfigResearch.recipes.put("MundaneRing",
+                oreDictRecipe(
+                        new ItemStack(ConfigItems.itemBaubleBlanks, 1, 1),
+                        new Object[]{
+                                " N ",
+                                "N N",
+                                " N ",
+                                'N', new ItemStack(Items.GOLD_NUGGET)
+                        }));
+        ConfigResearch.recipes.put("MundaneBelt",
+                oreDictRecipe(
+                        new ItemStack(ConfigItems.itemBaubleBlanks, 1, 2),
+                        new Object[]{
+                                " L ",
+                                "L L",
+                                " I ",
+                                'L', new ItemStack(Items.LEATHER),
+                                'I', new ItemStack(Items.IRON_INGOT)
+                        }));
+        ConfigResearch.recipes.put("BlockFlesh",
+                oreDictRecipe(
+                        new ItemStack(ConfigBlocks.blockTaint, 1, 2),
+                        new Object[]{
+                                "KKK",
+                                "KKK",
+                                "KKK",
+                                'K', new ItemStack(Items.ROTTEN_FLESH)
+                        }));
+        ConfigResearch.recipes.put("BlockTallow",
+                oreDictRecipe(
+                        new ItemStack(ConfigBlocks.blockCosmeticSolid, 1, 5),
+                        new Object[]{
+                                "KKK",
+                                "KKK",
+                                "KKK",
+                                'K', new ItemStack(ConfigItems.itemResource, 1, 4)
+                        }));
 
         boolean hasArcaneWand = false;
         boolean hasArcaneSceptre = false;
@@ -239,6 +286,12 @@ public class ConfigRecipes {
                 new ItemStack(ConfigItems.itemResource, 1, 2),
                 new ItemStack(Items.IRON_INGOT),
                 new AspectList().merge(Aspect.MAGIC, 4));
+        ConfigResearch.recipes.put("Tallow",
+                ThaumcraftApi.addCrucibleRecipe(
+                        "TALLOW",
+                        new ItemStack(ConfigItems.itemResource, 1, 4),
+                        new ItemStack(Items.ROTTEN_FLESH),
+                        new AspectList().merge(Aspect.MAGIC, 2)));
 
         recipeVoidMetal = ThaumcraftApi.addCrucibleRecipe(
                 "VOIDMETAL",
@@ -1910,8 +1963,16 @@ public class ConfigRecipes {
         return rod != null ? rod.getCraftCost() : 0;
     }
 
-    public static void oreDictRecipe(Object input, Object[] output) {
-        // Stage 9: ore dictionary recipe registration.
+    public static IRecipe oreDictRecipe(ItemStack output, Object[] recipe) {
+        return new ShapedOreRecipe(null, output, recipe);
+    }
+
+    public static IRecipe shapelessOreDictRecipe(ItemStack output, Object[] recipe) {
+        return new ShapelessOreRecipe(null, output, recipe);
+    }
+
+    public static IRecipe shapelessNBTOreRecipe(ItemStack output, Object[] recipe) {
+        return new ShapelessOreRecipe(null, output, recipe);
     }
 
     public static void registerSpecialRecipes(IForgeRegistry<IRecipe> registry) {
