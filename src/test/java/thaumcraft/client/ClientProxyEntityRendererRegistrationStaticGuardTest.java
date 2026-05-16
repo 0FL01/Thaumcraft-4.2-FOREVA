@@ -171,6 +171,9 @@ public class ClientProxyEntityRendererRegistrationStaticGuardTest {
                         && mindSpiderRenderer.contains("textures/models/taint_spider_eyes.png")
                         && mindSpiderRenderer.contains("this.addLayer(new SpiderEyesLayer())")
                         && mindSpiderRenderer.contains("entity.spiderScaleAmount()")
+                        && mindSpiderRenderer.contains("Math.min(0.1F, entity.ticksExisted / 100.0F)")
+                        && mindSpiderRenderer.contains("GlStateManager.alphaFunc(516, 0.003921569F)")
+                        && mindSpiderRenderer.contains("GlStateManager.depthMask(false)")
                         && mindSpiderRenderer.contains("entity.getViewer()")
                         && mindSpiderRenderer.contains("Minecraft.getMinecraft().player.getName()"));
         String taintSpiderRenderer = readFile("src/main/java/thaumcraft/client/renderers/entity/RenderTaintSpider.java");

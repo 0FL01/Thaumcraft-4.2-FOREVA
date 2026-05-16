@@ -42,6 +42,23 @@ public class RenderMindSpider extends RenderLiving<EntityMindSpider> {
         GlStateManager.scale(scale, scale, scale);
     }
 
+    @Override
+    protected void renderModel(EntityMindSpider entity, float limbSwing, float limbSwingAmount, float ageInTicks,
+                               float netHeadYaw, float headPitch, float scaleFactor) {
+        bindEntityTexture(entity);
+        GlStateManager.pushMatrix();
+        GlStateManager.color(1.0F, 1.0F, 1.0F, Math.min(0.1F, entity.ticksExisted / 100.0F));
+        GlStateManager.depthMask(false);
+        GlStateManager.enableBlend();
+        GlStateManager.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
+        GlStateManager.alphaFunc(516, 0.003921569F);
+        mainModel.render(entity, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch, scaleFactor);
+        GlStateManager.disableBlend();
+        GlStateManager.alphaFunc(516, 0.1F);
+        GlStateManager.popMatrix();
+        GlStateManager.depthMask(true);
+    }
+
     @Nullable
     @Override
     protected ResourceLocation getEntityTexture(EntityMindSpider entity) {

@@ -1392,6 +1392,27 @@ Some entities may be hard to trigger naturally until recipes/research/spawn cont
 
 - Это entity sync/persistence baseline; полная parity по reference render-pass/alpha/lightmap деталям для mind spider остаётся открытой по GAP-3/GAP-6.
 
+### Checkpoint 2026-05-16 — restore mind spider translucent base render pass baseline
+
+Статус: частично продвинут.
+
+Что сделано:
+
+- `RenderMindSpider` расширен reference-shaped translucent base pass в `renderModel(...)`:
+  - alpha profile `Math.min(0.1F, entity.ticksExisted / 100.0F)`;
+  - depth-mask disable/restore around model pass;
+  - blend profile `SRC_ALPHA/ONE_MINUS_SRC_ALPHA`;
+  - temporary alpha-threshold shift `0.003921569F` и restore к `0.1F`.
+- `ClientProxyEntityRendererRegistrationStaticGuardTest` расширен проверками на alpha/depth contracts в `RenderMindSpider`.
+
+Проверки:
+
+- `./scripts/dev.sh validate --smoke` — passed.
+
+Ограничения:
+
+- Это translucent base-pass baseline; полная parity по reference eye-brightness/lightmap нюансам и legacy multi-pass semantics остаётся открытой по GAP-3/GAP-6.
+
 - [ ] Add client-only entity renderer registration hook.
 - [ ] Register every entity from `ConfigEntities.ENTITIES` with a custom or vanilla-equivalent renderer.
 - [ ] Port item-like/transient/projectile renderers.
