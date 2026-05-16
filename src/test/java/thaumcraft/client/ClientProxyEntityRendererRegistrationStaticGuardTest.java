@@ -73,7 +73,7 @@ public class ClientProxyEntityRendererRegistrationStaticGuardTest {
                         && source.contains("registerEntityRenderer(EntityTaintacleGiant.class, manager -> new RenderFallbackLiving<>("));
         assertTrue("ClientProxy must keep fallback registrations for remaining special entities",
                 source.contains("registerEntityRenderer(EntityGolemBase.class, manager -> new RenderFallbackBiped<>(")
-                        && source.contains("registerEntityRenderer(EntityTravelingTrunk.class, manager -> new RenderFallbackLiving<>(")
+                        && source.contains("registerEntityRenderer(EntityTravelingTrunk.class, RenderTravelingTrunk::new, registered);")
                         && source.contains("registerEntityRenderer(EntityCultistPortal.class, manager -> new RenderFallbackBiped<>("));
         assertTrue("RenderFallbackLiving must exist as a non-noop typed texture renderer",
                 readFile("src/main/java/thaumcraft/client/renderers/entity/RenderFallbackLiving.java").contains("extends RenderLiving<T>"));
@@ -94,6 +94,15 @@ public class ClientProxyEntityRendererRegistrationStaticGuardTest {
                         && fireBatRenderer.contains("entity.getIsVampire()")
                         && fireBatRenderer.contains("entity.getIsDevil()")
                         && fireBatRenderer.contains("entity.getIsBatHanging()"));
+        String trunkRenderer = readFile("src/main/java/thaumcraft/client/renderers/entity/RenderTravelingTrunk.java");
+        assertTrue("RenderTravelingTrunk must provide anger-based texture routing baseline",
+                trunkRenderer.contains("extends RenderLiving<EntityTravelingTrunk>")
+                        && trunkRenderer.contains("textures/models/trunk.png")
+                        && trunkRenderer.contains("textures/models/trunkangry.png")
+                        && trunkRenderer.contains("entity.getAnger() > 0"));
+        String travelingTrunkEntity = readFile("src/main/java/thaumcraft/common/entities/golems/EntityTravelingTrunk.java");
+        assertTrue("EntityTravelingTrunk must expose anger accessor for renderer texture routing",
+                travelingTrunkEntity.contains("public int getAnger()"));
         assertTrue("ClientProxy must iterate ConfigEntities.ENTITIES for renderer registration coverage",
                 source.contains("for (net.minecraftforge.fml.common.registry.EntityEntry entry : ConfigEntities.ENTITIES)"));
         assertTrue("ClientProxy must keep fallback RenderNoop registrations for remaining entities",

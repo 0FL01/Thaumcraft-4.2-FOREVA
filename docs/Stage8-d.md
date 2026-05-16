@@ -720,6 +720,31 @@ Some entities may be hard to trigger naturally until recipes/research/spawn cont
 
 - Это baseline по texture/transform behavior; full reference parity для `RenderFireBat` (original `ModelFireBat`, точные animation/scale nuances) остаётся открытой по GAP-3/GAP-6.
 
+### Checkpoint 2026-05-16 — dedicated traveling trunk renderer baseline
+
+Статус: частично продвинут.
+
+Что сделано:
+
+- Добавлен выделенный renderer `RenderTravelingTrunk` (`thaumcraft.client.renderers.entity.RenderTravelingTrunk`) вместо общего living fallback для `EntityTravelingTrunk`.
+- `RenderTravelingTrunk` реализует базовый reference-shaped texture routing:
+  - `textures/models/trunk.png` для обычного состояния;
+  - `textures/models/trunkangry.png` при `entity.getAnger() > 0`.
+- В `EntityTravelingTrunk` добавлен accessor `getAnger()` для стабильного client renderer contract.
+- `ClientProxy.setupEntityRenderers()` обновлен: `EntityTravelingTrunk` теперь регистрируется через `RenderTravelingTrunk::new`.
+- `ClientProxyEntityRendererRegistrationStaticGuardTest` расширен проверками:
+  - explicit `EntityTravelingTrunk -> RenderTravelingTrunk` registration path;
+  - наличие anger-based texture routing в `RenderTravelingTrunk`;
+  - наличие `EntityTravelingTrunk#getAnger()`.
+
+Проверки:
+
+- `./scripts/dev.sh validate --smoke` — passed.
+
+Ограничения:
+
+- Это texture-routing baseline; full reference parity для traveling trunk renderer/model behavior (оригинальная `ModelTrunk` lid/scale transforms) остаётся открытой по GAP-3/GAP-4/GAP-6.
+
 - [ ] Add client-only entity renderer registration hook.
 - [ ] Register every entity from `ConfigEntities.ENTITIES` with a custom or vanilla-equivalent renderer.
 - [ ] Port item-like/transient/projectile renderers.

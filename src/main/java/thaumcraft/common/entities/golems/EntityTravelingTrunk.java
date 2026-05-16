@@ -210,6 +210,10 @@ public class EntityTravelingTrunk extends net.minecraft.entity.EntityLiving impl
         return this.stay;
     }
 
+    public int getAnger() {
+        return this.anger;
+    }
+
     @Override
     public net.minecraft.entity.IEntityLivingData onInitialSpawn(net.minecraft.world.DifficultyInstance difficulty,
                                                                  net.minecraft.entity.IEntityLivingData livingdata) {
