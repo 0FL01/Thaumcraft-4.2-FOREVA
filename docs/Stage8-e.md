@@ -1348,6 +1348,26 @@ Depends on GAP-1 and GAP-3. Some infusion source scenarios may require Stage 9 c
 
 - Это server/common + packet baseline без ручной gameplay/visual проверки; точная parity `BlockUtils.breakFurthestBlock` traversal-логики остаётся зависимой от дальнейшего Stage 5/6 polish.
 
+#### Checkpoint 2026-05-17 — GAP-11 elemental-pickaxe fire/use feedback baseline
+
+Статус: частично продвинут.
+
+Что сделано:
+
+- `ItemElementalPickaxe` больше не stub:
+  - восстановлены `toolClasses`/`rarity`/thaumium-repair contracts (`pickaxe`, `RARE`, `itemResource:2`);
+  - восстановлен reference-shaped fire-on-hit hook (`onLeftClickEntity` -> `entity.setFire(2)` server-side);
+  - восстановлен on-use feedback baseline (`stack.damageItem(5, player)` + `TCSounds.WANDFAIL` server cue + client `swingArm` fallback).
+- Добавлен `ItemElementalPickaxeStaticGuardTest` для фиксации этих контрактов.
+
+Проверки:
+
+- `./scripts/dev.sh validate --smoke` — passed.
+
+Ограничения:
+
+- Полноценный client scan-overlay path (`RenderEventHandler.startScan(...)` в оригинале) в текущем порте отсутствует и остаётся отдельным Stage 8-e renderer/overlay gap.
+
 ### GAP-12: FX registration exists, but send-site coverage and manual scenario validation are incomplete
 
 **Статус:** требует проверки  
