@@ -1646,6 +1646,26 @@ Depends on GAP-1 and GAP-3. Some infusion source scenarios may require Stage 9 c
 
 - Это non-GUI tooltip/lang baseline; визуальная model/icon-equipped parity fortress armor остаётся в Stage 8 client-render scope.
 
+#### Checkpoint 2026-05-17 — GAP-11 void-armor core contracts baseline
+
+Статус: частично продвинут.
+
+Что сделано:
+
+- Восстановлены reference-shaped core contracts для void armor family:
+  - `ItemVoidArmor`: `UNCOMMON` rarity baseline;
+  - `ItemVoidRobeArmor`: `EPIC` rarity, расширенная interface surface `IGoggles` + `IRevealer` + `ISpecialArmor`, vis-discount tooltip line, helmet-only revealer gates (`showNodes/showIngamePopups`), и special-armor mitigation hooks (`getProperties/getArmorDisplay/damageArmor`).
+- Сохранены существующие void-ingot repair/self-repair и warp/vis contracts.
+- Добавлен `ItemVoidArmorCoreContractsStaticGuardTest` для фиксации этих контрактов.
+
+Проверки:
+
+- `./scripts/dev.sh validate --smoke` — passed.
+
+Ограничения:
+
+- Это common/server+non-GUI tooltip baseline; полный client model/icon overlay parity для void robe остаётся в Stage 8 client-render scope.
+
 ### GAP-12: FX registration exists, but send-site coverage and manual scenario validation are incomplete
 
 **Статус:** требует проверки  

@@ -3,6 +3,7 @@ package thaumcraft.common.items.armor;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.EntityEquipmentSlot;
+import net.minecraft.item.EnumRarity;
 import net.minecraft.item.ItemArmor;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
@@ -23,6 +24,11 @@ public class ItemVoidArmor extends ItemArmor implements IRepairable, IRunicArmor
     @Override
     public int getRunicCharge(ItemStack itemstack) {
         return 0;
+    }
+
+    @Override
+    public EnumRarity getRarity(ItemStack stack) {
+        return EnumRarity.UNCOMMON;
     }
 
     @Override

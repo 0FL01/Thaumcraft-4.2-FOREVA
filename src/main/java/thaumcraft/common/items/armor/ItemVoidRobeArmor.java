@@ -1,26 +1,38 @@
 package thaumcraft.common.items.armor;
 
+import java.util.List;
+import javax.annotation.Nullable;
 import net.minecraft.block.BlockCauldron;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.inventory.EntityEquipmentSlot;
+import net.minecraft.item.EnumRarity;
 import net.minecraft.item.ItemArmor;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.text.TextFormatting;
+import net.minecraft.util.text.translation.I18n;
 import net.minecraft.world.World;
+import net.minecraftforge.common.ISpecialArmor;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
+import thaumcraft.api.IGoggles;
 import thaumcraft.api.IRepairable;
 import thaumcraft.api.IRunicArmor;
 import thaumcraft.api.IVisDiscountGear;
 import thaumcraft.api.IWarpingGear;
 import thaumcraft.api.aspects.Aspect;
+import thaumcraft.api.nodes.IRevealer;
 import thaumcraft.common.lib.CreativeTabThaumcraft;
 
-public class ItemVoidRobeArmor extends ItemArmor implements IRepairable, IRunicArmor, IVisDiscountGear, IWarpingGear {
+public class ItemVoidRobeArmor extends ItemArmor implements IRepairable, IRunicArmor, IVisDiscountGear, IGoggles, IRevealer, ISpecialArmor, IWarpingGear {
 
     public ItemVoidRobeArmor(ArmorMaterial material, int renderIndex, EntityEquipmentSlot slot) {
         super(material, renderIndex, slot);
@@ -30,6 +42,18 @@ public class ItemVoidRobeArmor extends ItemArmor implements IRepairable, IRunicA
     @Override
     public int getRunicCharge(ItemStack itemstack) {
         return 0;
+    }
+
+    @Override
+    public EnumRarity getRarity(ItemStack stack) {
+        return EnumRarity.EPIC;
+    }
+
+    @SideOnly(Side.CLIENT)
+    @Override
+    public void addInformation(ItemStack stack, @Nullable World worldIn, List<String> tooltip, ITooltipFlag flagIn) {
+        tooltip.add(TextFormatting.DARK_PURPLE + I18n.translateToLocal("tc.visdiscount") + ": " + this.getVisDiscount(stack, null, null) + "%");
+        super.addInformation(stack, worldIn, tooltip, flagIn);
     }
 
     @Override
@@ -51,6 +75,43 @@ public class ItemVoidRobeArmor extends ItemArmor implements IRepairable, IRunicA
     @Override
     public void onArmorTick(World world, EntityPlayer player, ItemStack stack) {
         ItemVoidArmor.repairVoidArmor(stack, world, player);
+    }
+
+    @Override
+    public boolean showNodes(ItemStack itemstack, EntityLivingBase player) {
+        return this.armorType == EntityEquipmentSlot.HEAD;
+    }
+
+    @Override
+    public boolean showIngamePopups(ItemStack itemstack, EntityLivingBase player) {
+        return this.armorType == EntityEquipmentSlot.HEAD;
+    }
+
+    @Override
+    public ISpecialArmor.ArmorProperties getProperties(EntityLivingBase player, ItemStack armor,
+                                                       net.minecraft.util.DamageSource source, double damage, int slot) {
+        int priority = 0;
+        double ratio = this.damageReduceAmount / 25.0;
+        if (source.isUnblockable()) {
+            priority = 1;
+            ratio = this.damageReduceAmount / 35.0;
+        } else if (source.isFireDamage()) {
+            priority = 0;
+            ratio = 0.0;
+        }
+        return new ISpecialArmor.ArmorProperties(priority, ratio, armor.getMaxDamage() + 1 - armor.getItemDamage());
+    }
+
+    @Override
+    public int getArmorDisplay(EntityPlayer player, ItemStack armor, int slot) {
+        return this.damageReduceAmount;
+    }
+
+    @Override
+    public void damageArmor(EntityLivingBase entity, ItemStack stack, net.minecraft.util.DamageSource source, int damage, int slot) {
+        if (source != net.minecraft.util.DamageSource.FALL) {
+            stack.damageItem(damage, entity);
+        }
     }
 
     @Override
