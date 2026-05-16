@@ -12,6 +12,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.registry.IEntityAdditionalSpawnData;
+import thaumcraft.common.Thaumcraft;
 import thaumcraft.common.blocks.BlockTaint;
 import thaumcraft.common.config.ConfigBlocks;
 import thaumcraft.common.lib.TCSounds;
@@ -164,7 +165,9 @@ public class EntityFallingTaint extends Entity implements IEntityAdditionalSpawn
         } else {
             // Client-side: falling particles
             if (this.onGround || this.fallTime == 1) {
-                // TODO: taintLandFX particles (Phase 8)
+                for (int q = 0; q < 10; ++q) {
+                    Thaumcraft.proxy.taintLandFX(this);
+                }
             }
         }
     }

@@ -689,6 +689,30 @@ Depends on GAP-1, GAP-2, GAP-5, and GAP-6. Network-thread rendering is unsafe if
 
 - This remains fallback wisp-trail behavior and does not yet port dedicated reference `FXWispEG`/`ParticleEngine` class parity.
 
+#### Checkpoint 2026-05-16 — Falling taint land FX hook restored (`taintLandFX`)
+
+Статус: `EntityFallingTaint` client landing particle hook is now wired again through proxy helpers.
+
+Что сделано:
+
+- Compared `EntityFallingTaint` client branch against 1.7.10 reference and restored the landing FX loop:
+  - client path (`onGround || fallTime == 1`) now emits 10 calls to `Thaumcraft.proxy.taintLandFX(this)`.
+- Expanded proxy helper surface:
+  - `CommonProxy` now exposes server-safe no-op `taintLandFX(Entity)`;
+  - `ClientProxy` now overrides `taintLandFX(Entity)` with fallback purple sparkle/smoke landing particles.
+- Expanded static guard coverage in `ClientProxyFxStaticGuardTest`:
+  - enforces `ClientProxy.taintLandFX(...)` override presence;
+  - enforces `EntityFallingTaint` call-site presence.
+
+Проверки:
+
+- `./scripts/dev.sh test` — passed.
+- `./scripts/dev.sh validate --smoke` — passed.
+
+Ограничения:
+
+- This remains fallback taint landing visuals and does not yet port dedicated reference particle classes (`FXBreaking`/`ParticleEngine`) parity.
+
 ### GAP-4: Beam, wand beam, bore beam, power beam, arc, and lightning bolt classes are absent
 
 **Статус:** отсутствует  

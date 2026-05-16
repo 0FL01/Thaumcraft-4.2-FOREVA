@@ -27,6 +27,8 @@ public class ClientProxyFxStaticGuardTest {
                 source.contains("public void wispFX3(") && source.contains("hasTarget"));
         assertTrue("ClientProxy must override wispFXEG for eldritch guardian trail FX",
                 source.contains("public void wispFXEG(") && source.contains("target.height * 0.22f"));
+        assertTrue("ClientProxy must override taintLandFX for falling taint landing FX",
+                source.contains("public void taintLandFX(") && source.contains("entity.getEntityBoundingBox()"));
         assertTrue("ClientProxy must override sparkle for firebat/lifter visuals",
                 source.contains("public void sparkle(") && source.contains("EnumParticleTypes.REDSTONE"));
         assertTrue("ClientProxy must override particleCount using client particle settings",
@@ -72,6 +74,7 @@ public class ClientProxyFxStaticGuardTest {
         String packetBoreDig = readFile("src/main/java/thaumcraft/common/lib/network/misc/PacketBoreDig.java");
         String arcaneBore = readFile("src/main/java/thaumcraft/common/tiles/TileArcaneBore.java");
         String warpEvents = readFile("src/main/java/thaumcraft/common/lib/WarpEvents.java");
+        String fallingTaint = readFile("src/main/java/thaumcraft/common/entities/EntityFallingTaint.java");
 
         assertTrue("PacketFXVisDrain must schedule client task and call proxy beam",
                 visDrain.contains("Minecraft.getMinecraft().addScheduledTask") && visDrain.contains("Thaumcraft.proxy.beam("));
@@ -139,6 +142,8 @@ public class ClientProxyFxStaticGuardTest {
                 eldritchGuardian.contains("Thaumcraft.proxy.wispFXEG("));
         assertTrue("Wisp ranged attack path must send PacketFXWispZap",
                 wisp.contains("new PacketFXWispZap(this.getEntityId(), this.targetedEntity.getEntityId())"));
+        assertTrue("EntityFallingTaint client update must emit taintLandFX landing loop",
+                fallingTaint.contains("Thaumcraft.proxy.taintLandFX(this);"));
         assertTrue("FocusShock chain lightning path must send PacketFXZap",
                 focusShock.contains("new PacketFXZap(center.getEntityId(), closest.getEntityId())"));
         assertTrue("TileEldritchTrap damage path must send PacketFXBlockZap",

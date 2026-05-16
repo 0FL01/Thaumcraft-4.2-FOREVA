@@ -374,6 +374,24 @@ public class ClientProxy extends CommonProxy {
     }
 
     @Override
+    public void taintLandFX(Entity entity) {
+        if (entity == null || entity.world == null || !entity.world.isRemote) return;
+        World world = entity.world;
+        int amount = particleCount(1);
+        if (amount <= 0) return;
+
+        for (int i = 0; i < amount; i++) {
+            float x = (float) (entity.posX + (world.rand.nextFloat() - world.rand.nextFloat()) * 0.5f);
+            float y = (float) ((entity.getEntityBoundingBox().minY + entity.getEntityBoundingBox().maxY) * 0.5);
+            float z = (float) (entity.posZ + (world.rand.nextFloat() - world.rand.nextFloat()) * 0.5f);
+            sparkle(x, y, z, 0.8f, 0x661166, -0.02f);
+            if (world.rand.nextBoolean()) {
+                world.spawnParticle(EnumParticleTypes.SMOKE_NORMAL, x, y, z, 0.0, 0.01, 0.0);
+            }
+        }
+    }
+
+    @Override
     public void sparkle(float x, float y, float z, float scale, int type, float speed) {
         Minecraft mc = Minecraft.getMinecraft();
         World world = mc == null ? null : mc.world;
