@@ -1746,6 +1746,33 @@ Some entities may be hard to trigger naturally until recipes/research/spawn cont
 
 - Это common/server baseline; точная legacy visual parity swarmer particle-object lifecycle остаётся в Stage 8-e visual scope и не подтверждается manual GUI checks по инструкции.
 
+### Checkpoint 2026-05-17 — restore taint spore fullbright/swarm-particle/burst behavior baseline
+
+Статус: частично продвинут.
+
+Что сделано:
+
+- `EntityTaintSpore` выровнен с reference-shaped common behavior contracts:
+  - добавлен `swarm` particle-lifecycle list для клиентского swarm-визуального цикла;
+  - восстановлены render hooks:
+    - `getYOffset() -> 0.0D`;
+    - `isInRangeToRenderDist(distance < 4096.0D)`;
+    - `getBrightnessForRender() -> 15728880`;
+    - `getBrightness() -> 1.0F`.
+  - восстановлен client swarm-particle buildup в `sporeOnUpdate()`:
+    - `displaySize` interpolation сохранён;
+    - particle list cleanup + `SPELL_MOB` spawn branch до `getSporeSize()/3`.
+  - восстановлен dedicated burst helper `sploosh(int)` и client burst path в `spiderBurst()` через `sploosh(50)`.
+- `ClientProxyEntityRendererRegistrationStaticGuardTest` расширен проверками на size/fullbright/swarm-particle/burst contracts `EntityTaintSpore`.
+
+Проверки:
+
+- `./scripts/dev.sh validate --smoke` — passed.
+
+Ограничения:
+
+- Это non-GUI parity baseline; точный legacy `swarmParticleFX` object-lifecycle остается частью Stage 8-e visual scope.
+
 ### Checkpoint 2026-05-16 — restore mind spider viewer-only render gating
 
 Статус: частично продвинут.

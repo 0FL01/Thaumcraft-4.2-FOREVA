@@ -108,7 +108,8 @@ public class EntityTaintSporeSwarmer extends EntityTaintSpore {
         super.handleStatusUpdate(id);
     }
 
-    private void sploosh(int amount) {
+    @Override
+    protected void sploosh(int amount) {
         for (int i = 0; i < amount; i++) {
             this.world.spawnParticle(EnumParticleTypes.SLIME,
                 this.posX + (this.rand.nextFloat() - this.rand.nextFloat()) * 0.35F,

@@ -1,6 +1,7 @@
 package thaumcraft.common.entities.monster;
 
 import io.netty.buffer.ByteBuf;
+import java.util.ArrayList;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.MoverType;
 import net.minecraft.entity.SharedMonsterAttributes;
@@ -26,6 +27,7 @@ import thaumcraft.common.lib.TCSounds;
 import thaumcraft.common.lib.world.ThaumcraftWorldGenerator;
 
 public class EntityTaintSpore extends EntityMob implements ITaintedMob, IEntityAdditionalSpawnData {
+    public final ArrayList<Integer> swarm = new ArrayList<>();
     protected int growth = 0;
     public float displaySize = 0.0f;
     private static final DataParameter<Integer> SPORE_SIZE =
@@ -52,6 +54,26 @@ public class EntityTaintSpore extends EntityMob implements ITaintedMob, IEntityA
 
     public int getSporeSize() {
         return this.dataManager.get(SPORE_SIZE);
+    }
+
+    @Override
+    public double getYOffset() {
+        return 0.0D;
+    }
+
+    @Override
+    public boolean isInRangeToRenderDist(double distance) {
+        return distance < 4096.0D;
+    }
+
+    @Override
+    public int getBrightnessForRender() {
+        return 15728880;
+    }
+
+    @Override
+    public float getBrightness() {
+        return 1.0F;
     }
 
     @Override
@@ -99,6 +121,19 @@ public class EntityTaintSpore extends EntityMob implements ITaintedMob, IEntityA
             if (this.displaySize < (float)this.getSporeSize()) {
                 this.displaySize += 0.02f;
             }
+            for (int i = this.swarm.size() - 1; i >= 0; i--) {
+                if (this.ticksExisted - this.swarm.get(i) > 10) {
+                    this.swarm.remove(i);
+                }
+            }
+            if (this.swarm.size() < this.getSporeSize() / 3) {
+                this.swarm.add(this.ticksExisted);
+                this.world.spawnParticle(EnumParticleTypes.SPELL_MOB,
+                    this.posX + (double)((this.rand.nextFloat() - this.rand.nextFloat()) * 0.1F),
+                    this.posY + (double)(this.height * 0.5F) + (double)((this.rand.nextFloat() - this.rand.nextFloat()) * 0.1F),
+                    this.posZ + (double)((this.rand.nextFloat() - this.rand.nextFloat()) * 0.1F),
+                    0.08D, 0.0D, 0.12D);
+            }
         }
         // Burst check
         BlockPos below = new BlockPos(MathHelper.floor(this.posX), MathHelper.floor(this.getEntityBoundingBox().minY) - 1, MathHelper.floor(this.posZ));
@@ -138,16 +173,19 @@ public class EntityTaintSpore extends EntityMob implements ITaintedMob, IEntityA
             }
             this.setDead();
         } else {
-            // Client burst
-            for (int a = 0; a < 50; ++a) {
-                this.world.spawnParticle(EnumParticleTypes.SLIME,
-                    this.posX + (double)((this.rand.nextFloat() - this.rand.nextFloat()) * this.width),
-                    this.posY + (double)(this.rand.nextFloat() * this.height),
-                    this.posZ + (double)(this.rand.nextFloat() - this.rand.nextFloat()) * this.width,
-                    (this.rand.nextFloat() - this.rand.nextFloat()) * 0.5,
-                    this.rand.nextFloat() * 0.5,
-                    (this.rand.nextFloat() - this.rand.nextFloat()) * 0.5);
-            }
+            this.sploosh(50);
+        }
+    }
+
+    protected void sploosh(int amount) {
+        for (int i = 0; i < amount; i++) {
+            this.world.spawnParticle(EnumParticleTypes.SLIME,
+                this.posX + (double)((this.rand.nextFloat() - this.rand.nextFloat()) * this.width),
+                this.posY + (double)(this.rand.nextFloat() * this.height),
+                this.posZ + (double)(this.rand.nextFloat() - this.rand.nextFloat()) * this.width,
+                (this.rand.nextFloat() - this.rand.nextFloat()) * 0.5D,
+                this.rand.nextFloat() * 0.5D,
+                (this.rand.nextFloat() - this.rand.nextFloat()) * 0.5D);
         }
     }
 

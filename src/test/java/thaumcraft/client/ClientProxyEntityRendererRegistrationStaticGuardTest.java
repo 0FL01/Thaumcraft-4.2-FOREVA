@@ -399,6 +399,26 @@ public class ClientProxyEntityRendererRegistrationStaticGuardTest {
                         && taintSwarmEntity.contains("nbt.getByte(\"damBonus\")")
                         && taintSwarmEntity.contains("this.world.rand.nextBoolean()")
                         && taintSwarmEntity.contains("itemResource, 1, 11"));
+        String taintSporeEntity = readFile("src/main/java/thaumcraft/common/entities/monster/EntityTaintSpore.java");
+        assertTrue("EntityTaintSpore must keep reference-shaped size/fullbright/swarm-particle/burst baseline contracts",
+                taintSporeEntity.contains("public final ArrayList<Integer> swarm = new ArrayList<>();")
+                        && taintSporeEntity.contains("this.setSporeSize(2);")
+                        && taintSporeEntity.contains("this.dataManager.register(SPORE_SIZE, 1);")
+                        && taintSporeEntity.contains("return 0.0D;")
+                        && taintSporeEntity.contains("return distance < 4096.0D;")
+                        && taintSporeEntity.contains("return 15728880;")
+                        && taintSporeEntity.contains("return 1.0F;")
+                        && taintSporeEntity.contains("this.world.getBiome(this.getPosition()) != ThaumcraftWorldGenerator.biomeTaint")
+                        && taintSporeEntity.contains("this.attackEntityFrom(DamageSource.DROWN, 1.0f);")
+                        && taintSporeEntity.contains("this.swarm.size() < this.getSporeSize() / 3")
+                        && taintSporeEntity.contains("EnumParticleTypes.SPELL_MOB")
+                        && taintSporeEntity.contains("this.sploosh(50);")
+                        && taintSporeEntity.contains("protected void sploosh(int amount)")
+                        && taintSporeEntity.contains("nbt.setInteger(\"Size\", this.getSporeSize() - 1)")
+                        && taintSporeEntity.contains("this.setSporeSize(nbt.getInteger(\"Size\") + 1)")
+                        && taintSporeEntity.contains("this.world.rand.nextBoolean()")
+                        && taintSporeEntity.contains("itemResource, 1, 11")
+                        && taintSporeEntity.contains("itemResource, 1, 12"));
         String taintSporeSwarmerEntity = readFile("src/main/java/thaumcraft/common/entities/monster/EntityTaintSporeSwarmer.java");
         assertTrue("EntityTaintSporeSwarmer must keep reference-shaped spawn-counter/swarm-burst behavior contracts",
                 taintSporeSwarmerEntity.contains("private int spawnCounter;")
