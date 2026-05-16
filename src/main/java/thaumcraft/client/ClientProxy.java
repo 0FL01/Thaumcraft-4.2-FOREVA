@@ -8,8 +8,10 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.RenderItem;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.client.renderer.entity.RenderEntityItem;
+import net.minecraft.client.renderer.entity.RenderSnowball;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Items;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.Item;
 import net.minecraft.tileentity.TileEntity;
@@ -53,8 +55,21 @@ import thaumcraft.common.entities.EntityFollowingItem;
 import thaumcraft.common.entities.EntityItemGrate;
 import thaumcraft.common.entities.EntityPermanentItem;
 import thaumcraft.common.entities.EntitySpecialItem;
+import thaumcraft.common.entities.golems.EntityGolemBobber;
 import thaumcraft.common.lib.TCSounds;
 import thaumcraft.common.lib.events.EventHandlerRunic;
+import thaumcraft.common.entities.projectile.EntityAlumentum;
+import thaumcraft.common.entities.projectile.EntityBottleTaint;
+import thaumcraft.common.entities.projectile.EntityDart;
+import thaumcraft.common.entities.projectile.EntityEldritchOrb;
+import thaumcraft.common.entities.projectile.EntityEmber;
+import thaumcraft.common.entities.projectile.EntityExplosiveOrb;
+import thaumcraft.common.entities.projectile.EntityFrostShard;
+import thaumcraft.common.entities.projectile.EntityGolemOrb;
+import thaumcraft.common.entities.projectile.EntityPechBlast;
+import thaumcraft.common.entities.projectile.EntityPrimalArrow;
+import thaumcraft.common.entities.projectile.EntityPrimalOrb;
+import thaumcraft.common.entities.projectile.EntityShockOrb;
 import thaumcraft.common.tiles.TileAlchemyFurnace;
 import thaumcraft.common.tiles.TileArcaneBore;
 import thaumcraft.common.tiles.TileArcaneWorkbench;
@@ -122,6 +137,22 @@ public class ClientProxy extends CommonProxy {
         registerEntityRenderer(EntityFollowingItem.class, manager -> new RenderEntityItem(manager, renderItem), registered);
         registerEntityRenderer(EntityItemGrate.class, manager -> new RenderEntityItem(manager, renderItem), registered);
 
+        registerEntityRenderer(EntityDart.class, manager -> new RenderSnowball<>(manager, Items.ARROW, renderItem), registered);
+        registerEntityRenderer(EntityPrimalArrow.class,
+                manager -> new RenderSnowball<>(manager, itemOrFallback(ConfigItems.itemPrimalArrow, Items.ARROW), renderItem), registered);
+        registerEntityRenderer(EntityBottleTaint.class,
+                manager -> new RenderSnowball<>(manager, itemOrFallback(ConfigItems.itemBottleTaint, Items.SPLASH_POTION), renderItem), registered);
+        registerEntityRenderer(EntityAlumentum.class, manager -> new RenderSnowball<>(manager, Items.FIRE_CHARGE, renderItem), registered);
+        registerEntityRenderer(EntityPrimalOrb.class, manager -> new RenderSnowball<>(manager, Items.ENDER_EYE, renderItem), registered);
+        registerEntityRenderer(EntityFrostShard.class, manager -> new RenderSnowball<>(manager, Items.SNOWBALL, renderItem), registered);
+        registerEntityRenderer(EntityPechBlast.class, manager -> new RenderSnowball<>(manager, Items.BLAZE_POWDER, renderItem), registered);
+        registerEntityRenderer(EntityEldritchOrb.class, manager -> new RenderSnowball<>(manager, Items.ENDER_PEARL, renderItem), registered);
+        registerEntityRenderer(EntityGolemOrb.class, manager -> new RenderSnowball<>(manager, Items.SLIME_BALL, renderItem), registered);
+        registerEntityRenderer(EntityShockOrb.class, manager -> new RenderSnowball<>(manager, Items.GLOWSTONE_DUST, renderItem), registered);
+        registerEntityRenderer(EntityExplosiveOrb.class, manager -> new RenderSnowball<>(manager, Items.FIREWORK_CHARGE, renderItem), registered);
+        registerEntityRenderer(EntityEmber.class, manager -> new RenderSnowball<>(manager, Items.BLAZE_POWDER, renderItem), registered);
+        registerEntityRenderer(EntityGolemBobber.class, manager -> new RenderSnowball<>(manager, Items.FISHING_ROD, renderItem), registered);
+
         for (net.minecraftforge.fml.common.registry.EntityEntry entry : ConfigEntities.ENTITIES) {
             @SuppressWarnings("unchecked")
             Class<? extends Entity> entityClass = (Class<? extends Entity>) entry.getEntityClass();
@@ -138,6 +169,10 @@ public class ClientProxy extends CommonProxy {
             Set<Class<? extends Entity>> registered) {
         RenderingRegistry.registerEntityRenderingHandler(entityClass, factory);
         registered.add(entityClass);
+    }
+
+    private static Item itemOrFallback(@Nullable Item preferred, Item fallback) {
+        return preferred != null ? preferred : fallback;
     }
 
     private void setupBlockRenderers() {

@@ -525,6 +525,27 @@ Some entities may be hard to trigger naturally until recipes/research/spawn cont
 - Это только item-like slice; projectile/mob/boss/golem custom renderers по GAP-2..GAP-6 остаются открытыми.
 - Manual visual parity checks остаются пропущенными по инструкции.
 
+### Checkpoint 2026-05-16 — projectile fallback renderer baseline
+
+Статус: частично продвинут.
+
+Что сделано:
+
+- `ClientProxy.setupEntityRenderers()` теперь регистрирует non-noop `RenderSnowball` baseline для projectile группы:
+  `EntityDart`, `EntityPrimalArrow`, `EntityBottleTaint`, `EntityAlumentum`, `EntityPrimalOrb`, `EntityFrostShard`,
+  `EntityPechBlast`, `EntityEldritchOrb`, `EntityGolemOrb`, `EntityShockOrb`, `EntityExplosiveOrb`, `EntityEmber`, `EntityGolemBobber`.
+- Для `EntityPrimalArrow` и `EntityBottleTaint` добавлен `ConfigItems`-aware item binding с fallback (`itemOrFallback(...)`).
+- `ClientProxyEntityRendererRegistrationStaticGuardTest` расширен проверками projectile baseline registrations.
+
+Проверки:
+
+- `./scripts/dev.sh validate --smoke` — passed.
+
+Ограничения:
+
+- Это fallback/bootstrapping слой, а не reference custom renderer parity.
+- Специализированные модели/passes/GL-эффекты projectile и mob/boss renderers по GAP-2..GAP-6 остаются открытыми.
+
 - [ ] Add client-only entity renderer registration hook.
 - [ ] Register every entity from `ConfigEntities.ENTITIES` with a custom or vanilla-equivalent renderer.
 - [ ] Port item-like/transient/projectile renderers.
