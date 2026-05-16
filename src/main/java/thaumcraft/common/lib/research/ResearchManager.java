@@ -473,7 +473,7 @@ public class ResearchManager {
                     String[] triggers = research.getEntityTriggers();
                     if (triggers != null && triggers.length > 0) {
                         for (String trigger : triggers) {
-                            if (!clue.equals(trigger)) continue;
+                            if (!entityTriggerMatches(trigger, (String) clue)) continue;
                             keys.add(research.key);
                             continue clueCheck;
                         }
@@ -712,6 +712,41 @@ public class ResearchManager {
         if (username == null || aspect == null) return false;
         IPlayerKnowledge knowledge = getResearchData(username);
         return knowledge != null && knowledge.hasDiscoveredAspect(aspect);
+    }
+
+    static boolean entityTriggerMatches(String trigger, String clueEntityKey) {
+        if (trigger == null || trigger.trim().isEmpty() || clueEntityKey == null || clueEntityKey.trim().isEmpty()) {
+            return false;
+        }
+        Set<String> triggerForms = expandEntityTriggerForms(trigger);
+        Set<String> clueForms = expandEntityTriggerForms(clueEntityKey);
+        for (String form : triggerForms) {
+            if (clueForms.contains(form)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private static Set<String> expandEntityTriggerForms(String input) {
+        Set<String> forms = new HashSet<>();
+        String base = input.trim().toLowerCase(Locale.ROOT);
+        forms.add(base);
+
+        int colon = base.indexOf(':');
+        int dot = base.indexOf('.');
+        if (colon >= 0 && colon < base.length() - 1) {
+            forms.add(base.substring(colon + 1));
+        }
+        if (dot >= 0 && dot < base.length() - 1) {
+            String namespaced = base.substring(0, dot) + ":" + base.substring(dot + 1);
+            forms.add(namespaced);
+            forms.add(base.substring(dot + 1));
+        }
+        if (colon < 0 && dot < 0) {
+            forms.add("minecraft:" + base);
+        }
+        return forms;
     }
 
     private static boolean hasUsableResearchTags(ResearchItem research) {

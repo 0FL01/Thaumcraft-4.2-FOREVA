@@ -315,7 +315,7 @@ Dependency: client-side research table GUI/rendering is outside Stage 9-e, but t
 
 **Что не совпадает:**
 
-The port now includes `ResearchManager.createClue(World, EntityPlayer, Object, AspectList)` and `ScanManager.completeScan` now forwards scan clue objects plus awarded-aspect data to it after successful server-side scan completion. Clue grants are stored as `@KEY` via normal research completion path. Remaining mismatch is runtime parity validation and possible entity-trigger identifier drift (`Thaumcraft.*` legacy names vs 1.12 registry IDs).
+The port now includes `ResearchManager.createClue(World, EntityPlayer, Object, AspectList)` and `ScanManager.completeScan` now forwards scan clue objects plus awarded-aspect data to it after successful server-side scan completion. Clue grants are stored as `@KEY` via normal research completion path. Entity-trigger matching now accepts both legacy (`Thaumcraft.Firebat`) and namespaced (`thaumcraft:firebat`) forms to reduce 1.7.10→1.12 identifier drift. Remaining mismatch is runtime parity validation with populated content.
 
 **Что нужно доделать:**
 
@@ -326,7 +326,7 @@ Finish parity validation of hidden/lost clue unlocks with populated trigger-bear
 - Add/port `ResearchManager.findHiddenResearch(EntityPlayer)` for knowledge-fragment behavior.
 - In `ScanManager.completeScan`, preserve the scanned clue object (`ItemStack` or entity ID string) and pass awarded aspects to `ResearchManager.createClue(...)` after successful scan.
 - Ensure clue grants use `@`-prefixed research keys and do not mark the full research complete prematurely.
-- Verify trigger strings remain original-compatible, especially entity IDs such as `Thaumcraft.Firebat`, `Thaumcraft.BrainyZombie`, and vanilla IDs used in reference entries.
+- Keep trigger string normalization compatibility for legacy and namespaced entity IDs (`Thaumcraft.*`, `minecraft:*`, `thaumcraft:*`) and validate with runtime scenarios.
 - Files/classes to change: `src/main/java/thaumcraft/common/lib/research/ResearchManager.java`, `src/main/java/thaumcraft/common/lib/research/ScanManager.java`, `src/main/java/thaumcraft/common/config/ConfigResearch.java`.
 
 **Критерии приемки:**
