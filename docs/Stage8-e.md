@@ -1522,6 +1522,27 @@ Depends on GAP-1 and GAP-3. Some infusion source scenarios may require Stage 9 c
 
 - Это metadata-availability baseline; визуальная икон-парити primal arrow variants остаётся в client-render/manual зоне.
 
+#### Checkpoint 2026-05-17 — GAP-11 bone-bow core draw contracts baseline
+
+Статус: частично продвинут.
+
+Что сделано:
+
+- `ItemBowBone` приведён к reference-shaped core contracts:
+  - durability baseline `setMaxDamage(512)` (вместо `500`);
+  - enchantability baseline `3` (вместо `15`);
+  - сохранён bone repair contract (`Items.BONE`);
+  - добавлен early-release draw hook в `onUsingTick(...)` (`ticks > 18 -> stopActiveHand()`).
+- Добавлен `ItemBowBoneStaticGuardTest` для фиксации этих контрактов.
+
+Проверки:
+
+- `./scripts/dev.sh validate --smoke` — passed.
+
+Ограничения:
+
+- Это server/common contract baseline без полного портирования legacy custom bow charge/arrow event internals; детальная projectile-feel parity остаётся на отдельный gameplay polish.
+
 ### GAP-12: FX registration exists, but send-site coverage and manual scenario validation are incomplete
 
 **Статус:** требует проверки  
