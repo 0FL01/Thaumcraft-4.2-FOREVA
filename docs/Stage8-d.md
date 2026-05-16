@@ -690,11 +690,35 @@ Some entities may be hard to trigger naturally until recipes/research/spawn cont
 
 Проверки:
 
-- `./scripts/dev.sh validate --smoke` — pending (run required for this checkpoint).
+- `./scripts/dev.sh validate --smoke` — passed.
 
 Ограничения:
 
 - Это baseline по texture routing; full reference parity для `RenderPech` (custom model/held item/overlay behavior) остаётся открытой по GAP-3/GAP-6.
+
+### Checkpoint 2026-05-16 — dedicated firebat renderer baseline
+
+Статус: частично продвинут.
+
+Что сделано:
+
+- Добавлен выделенный renderer `RenderFireBat` (`thaumcraft.client.renderers.entity.RenderFireBat`) вместо общего living fallback для `EntityFireBat`.
+- `RenderFireBat` реализует базовый reference-shaped behavior:
+  - texture routing: `firebat.png` / `vampirebat.png` через `entity.getIsVampire()`;
+  - pre-render scale baseline: enlarged для `entity.getIsDevil() || entity.getIsVampire()`, reduced для остальных;
+  - hanging/flying vertical transform baseline через `entity.getIsBatHanging()`.
+- `ClientProxy.setupEntityRenderers()` обновлен: `EntityFireBat` теперь регистрируется через `RenderFireBat::new`.
+- `ClientProxyEntityRendererRegistrationStaticGuardTest` расширен проверками:
+  - explicit `EntityFireBat -> RenderFireBat` registration path;
+  - наличие в `RenderFireBat` vampire texture routing и hanging/scale guards.
+
+Проверки:
+
+- `./scripts/dev.sh validate --smoke` — passed.
+
+Ограничения:
+
+- Это baseline по texture/transform behavior; full reference parity для `RenderFireBat` (original `ModelFireBat`, точные animation/scale nuances) остаётся открытой по GAP-3/GAP-6.
 
 - [ ] Add client-only entity renderer registration hook.
 - [ ] Register every entity from `ConfigEntities.ENTITIES` with a custom or vanilla-equivalent renderer.

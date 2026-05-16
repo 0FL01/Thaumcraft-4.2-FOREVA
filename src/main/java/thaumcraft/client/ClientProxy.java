@@ -57,6 +57,7 @@ import thaumcraft.client.gui.GuiTravelingTrunk;
 import thaumcraft.client.fx.ParticleEngine;
 import thaumcraft.client.renderers.entity.RenderFallbackBiped;
 import thaumcraft.client.renderers.entity.RenderFallbackLiving;
+import thaumcraft.client.renderers.entity.RenderFireBat;
 import thaumcraft.client.renderers.entity.RenderNoop;
 import thaumcraft.client.renderers.entity.RenderPech;
 import thaumcraft.client.lib.ClientTickEventsFML;
@@ -224,8 +225,7 @@ public class ClientProxy extends CommonProxy {
                 manager, new ModelBiped(), 0.5F, new ResourceLocation("thaumcraft", "textures/models/cultist.png")), registered);
         registerEntityRenderer(EntityCultistLeader.class, manager -> new RenderFallbackBiped<>(
                 manager, new ModelBiped(), 0.6F, new ResourceLocation("thaumcraft", "textures/models/cultist.png")), registered);
-        registerEntityRenderer(EntityFireBat.class, manager -> new RenderFallbackLiving<>(
-                manager, new ModelBat(), 0.3F, new ResourceLocation("thaumcraft", "textures/models/firebat.png")), registered);
+        registerEntityRenderer(EntityFireBat.class, RenderFireBat::new, registered);
         registerEntityRenderer(EntityWisp.class, manager -> new RenderFallbackLiving<>(
                 manager, new ModelBat(), 0.2F, new ResourceLocation("thaumcraft", "textures/misc/wispy.png")), registered);
         registerEntityRenderer(EntityPech.class, RenderPech::new, registered);

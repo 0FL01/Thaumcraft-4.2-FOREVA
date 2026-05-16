@@ -57,7 +57,7 @@ public class ClientProxyEntityRendererRegistrationStaticGuardTest {
                         && source.contains("registerEntityRenderer(EntityCultistCleric.class, manager -> new RenderFallbackBiped<>(")
                         && source.contains("registerEntityRenderer(EntityCultistLeader.class, manager -> new RenderFallbackBiped<>("));
         assertTrue("ClientProxy must keep extended fallback registrations for the remaining Stage 8-d monster baseline",
-                source.contains("registerEntityRenderer(EntityFireBat.class, manager -> new RenderFallbackLiving<>(")
+                source.contains("registerEntityRenderer(EntityFireBat.class, RenderFireBat::new, registered);")
                         && source.contains("registerEntityRenderer(EntityWisp.class, manager -> new RenderFallbackLiving<>(")
                         && source.contains("registerEntityRenderer(EntityPech.class, RenderPech::new, registered);")
                         && source.contains("registerEntityRenderer(EntityEldritchGuardian.class, manager -> new RenderFallbackBiped<>(")
@@ -86,6 +86,14 @@ public class ClientProxyEntityRendererRegistrationStaticGuardTest {
                         && pechRenderer.contains("textures/models/pech_thaum.png")
                         && pechRenderer.contains("textures/models/pech_stalker.png")
                         && pechRenderer.contains("entity.getPechType()"));
+        String fireBatRenderer = readFile("src/main/java/thaumcraft/client/renderers/entity/RenderFireBat.java");
+        assertTrue("RenderFireBat must provide vampire texture, scaling, and hanging transform baselines",
+                fireBatRenderer.contains("extends RenderLiving<EntityFireBat>")
+                        && fireBatRenderer.contains("textures/models/firebat.png")
+                        && fireBatRenderer.contains("textures/models/vampirebat.png")
+                        && fireBatRenderer.contains("entity.getIsVampire()")
+                        && fireBatRenderer.contains("entity.getIsDevil()")
+                        && fireBatRenderer.contains("entity.getIsBatHanging()"));
         assertTrue("ClientProxy must iterate ConfigEntities.ENTITIES for renderer registration coverage",
                 source.contains("for (net.minecraftforge.fml.common.registry.EntityEntry entry : ConfigEntities.ENTITIES)"));
         assertTrue("ClientProxy must keep fallback RenderNoop registrations for remaining entities",
