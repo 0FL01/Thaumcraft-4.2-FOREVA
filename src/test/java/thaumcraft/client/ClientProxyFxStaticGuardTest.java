@@ -38,6 +38,8 @@ public class ClientProxyFxStaticGuardTest {
         String blockZap = readFile("src/main/java/thaumcraft/common/lib/network/fx/PacketFXBlockZap.java");
         String blockDig = readFile("src/main/java/thaumcraft/common/lib/network/fx/PacketFXBlockDig.java");
         String blockBubble = readFile("src/main/java/thaumcraft/common/lib/network/fx/PacketFXBlockBubble.java");
+        String beamPulse = readFile("src/main/java/thaumcraft/common/lib/network/fx/PacketFXBeamPulse.java");
+        String beamPulseGolemBoss = readFile("src/main/java/thaumcraft/common/lib/network/fx/PacketFXBeamPulseGolemBoss.java");
         String essentiaSource = readFile("src/main/java/thaumcraft/common/lib/network/fx/PacketFXEssentiaSource.java");
         String infusionSource = readFile("src/main/java/thaumcraft/common/lib/network/fx/PacketFXInfusionSource.java");
         String blockSparkle = readFile("src/main/java/thaumcraft/common/lib/network/fx/PacketFXBlockSparkle.java");
@@ -67,6 +69,12 @@ public class ClientProxyFxStaticGuardTest {
         assertTrue("PacketFXBlockBubble must schedule client task and emit bubble particles",
                 blockBubble.contains("Minecraft.getMinecraft().addScheduledTask")
                         && blockBubble.contains("EnumParticleTypes.WATER_BUBBLE"));
+        assertTrue("PacketFXBeamPulse must schedule client task and route through proxy beam",
+                beamPulse.contains("Minecraft.getMinecraft().addScheduledTask")
+                        && beamPulse.contains("Thaumcraft.proxy.beam("));
+        assertTrue("PacketFXBeamPulseGolemBoss must schedule client task and route through proxy beam",
+                beamPulseGolemBoss.contains("Minecraft.getMinecraft().addScheduledTask")
+                        && beamPulseGolemBoss.contains("Thaumcraft.proxy.beam("));
         assertTrue("PacketFXEssentiaSource must schedule client task and route through proxy beam",
                 essentiaSource.contains("Minecraft.getMinecraft().addScheduledTask")
                         && essentiaSource.contains("Thaumcraft.proxy.beam("));

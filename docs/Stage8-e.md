@@ -515,6 +515,27 @@ Depends on GAP-1, GAP-2, GAP-5, and GAP-6. Network-thread rendering is unsafe if
 
 - Dedicated send-site restoration for these packet families remains open where corresponding gameplay paths are still stubbed.
 
+#### Checkpoint 2026-05-16 — GAP-3 beam-pulse packet handler baseline restored
+
+Статус: `PacketFXBeamPulse` and `PacketFXBeamPulseGolemBoss` now have payload serialization and client-scheduled fallback handlers.
+
+Что сделано:
+
+- Implemented `PacketFXBeamPulse` payload (`source`, `target`, `color`) and client-scheduled fallback beam routing through `Thaumcraft.proxy.beam(...)`.
+- Implemented `PacketFXBeamPulseGolemBoss` payload (`source`, `target`) and client-scheduled dual-beam fallback routing for boss pulse visuals.
+- Expanded FX tests:
+  - `PacketFXSerializationTest` now includes round-trips for both beam-pulse packet types.
+  - `ClientProxyFxStaticGuardTest` now enforces client scheduling and proxy beam routing markers for both handlers.
+
+Проверки:
+
+- `./scripts/dev.sh test` — passed.
+- `./scripts/dev.sh validate --smoke` — passed.
+
+Ограничения:
+
+- Dedicated server-side send-site restoration for these packet families remains open where corresponding gameplay paths are still stubbed.
+
 ### GAP-4: Beam, wand beam, bore beam, power beam, arc, and lightning bolt classes are absent
 
 **Статус:** отсутствует  
@@ -524,7 +545,7 @@ Depends on GAP-1, GAP-2, GAP-5, and GAP-6. Network-thread rendering is unsafe if
 - `src/main/java/thaumcraft/client/fx/beams/**` absent.
 - `src/main/java/thaumcraft/client/fx/bolt/**` absent.
 - `src/main/java/thaumcraft/client/ClientProxy.java:98-105` has no-op `beam` and `bolt`.
-- `src/main/java/thaumcraft/common/lib/network/fx/PacketFXBeamPulse.java:1-7` and `PacketFXBeamPulseGolemBoss.java:1-7` are empty shells.
+- `PacketFXBeamPulse` and `PacketFXBeamPulseGolemBoss` now use fallback proxy beam visuals; dedicated beam renderer classes are still absent.
 - `PacketFXZap`, `PacketFXWispZap`, and `PacketFXBlockZap` currently use fallback proxy bolt visuals; dedicated beam/lightning renderer classes are still absent.
 
 **Референс:**

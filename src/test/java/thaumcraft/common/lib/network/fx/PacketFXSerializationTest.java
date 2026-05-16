@@ -149,6 +149,27 @@ public class PacketFXSerializationTest {
     }
 
     @Test
+    public void beamPulsePacketRoundTripsPayload() {
+        PacketFXBeamPulse source = new PacketFXBeamPulse(31, 62, 0xAA22CC);
+        PacketFXBeamPulse target = new PacketFXBeamPulse();
+        roundTrip(source, target);
+
+        assertEquals(31, (int) getField(target, "source"));
+        assertEquals(62, (int) getField(target, "target"));
+        assertEquals(0xAA22CC, (int) getField(target, "color"));
+    }
+
+    @Test
+    public void beamPulseGolemBossPacketRoundTripsPayload() {
+        PacketFXBeamPulseGolemBoss source = new PacketFXBeamPulseGolemBoss(7, 9);
+        PacketFXBeamPulseGolemBoss target = new PacketFXBeamPulseGolemBoss();
+        roundTrip(source, target);
+
+        assertEquals(7, (int) getField(target, "source"));
+        assertEquals(9, (int) getField(target, "target"));
+    }
+
+    @Test
     public void visDrainPacketRoundTripsPayload() {
         PacketFXVisDrain source = new PacketFXVisDrain(new BlockPos(1, 2, 3), new BlockPos(-4, 5, -6), 0x55AAFF);
         PacketFXVisDrain target = new PacketFXVisDrain();
