@@ -745,6 +745,29 @@ Some entities may be hard to trigger naturally until recipes/research/spawn cont
 
 - Это texture-routing baseline; full reference parity для traveling trunk renderer/model behavior (оригинальная `ModelTrunk` lid/scale transforms) остаётся открытой по GAP-3/GAP-4/GAP-6.
 
+### Checkpoint 2026-05-16 — dedicated golem base renderer texture baseline
+
+Статус: частично продвинут.
+
+Что сделано:
+
+- Добавлен выделенный renderer `RenderGolemBase` (`thaumcraft.client.renderers.entity.RenderGolemBase`) вместо общего biped fallback для `EntityGolemBase`.
+- `RenderGolemBase` реализует базовый reference-shaped texture routing по `entity.getGolemType()`:
+  - `golem_straw.png`, `golem_wood.png`, `golem_tallow.png`, `golem_clay.png`,
+    `golem_flesh.png`, `golem_stone.png`, `golem_iron.png`, `golem_thaumium.png`.
+- `ClientProxy.setupEntityRenderers()` обновлен: `EntityGolemBase` теперь регистрируется через `RenderGolemBase::new`.
+- `ClientProxyEntityRendererRegistrationStaticGuardTest` расширен проверками:
+  - explicit `EntityGolemBase -> RenderGolemBase` registration path;
+  - наличие type-based texture routing и полного texture set в `RenderGolemBase`.
+
+Проверки:
+
+- `./scripts/dev.sh validate --smoke` — passed.
+
+Ограничения:
+
+- Это texture-routing baseline; full reference parity для golem renderer behavior (custom golem model/accessory passes/carried-item rendering/damage overlay) остаётся открытой по GAP-3/GAP-4/GAP-6.
+
 - [ ] Add client-only entity renderer registration hook.
 - [ ] Register every entity from `ConfigEntities.ENTITIES` with a custom or vanilla-equivalent renderer.
 - [ ] Port item-like/transient/projectile renderers.

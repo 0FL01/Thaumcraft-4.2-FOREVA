@@ -72,7 +72,7 @@ public class ClientProxyEntityRendererRegistrationStaticGuardTest {
                         && source.contains("registerEntityRenderer(EntityTaintacleSmall.class, manager -> new RenderFallbackLiving<>(")
                         && source.contains("registerEntityRenderer(EntityTaintacleGiant.class, manager -> new RenderFallbackLiving<>("));
         assertTrue("ClientProxy must keep fallback registrations for remaining special entities",
-                source.contains("registerEntityRenderer(EntityGolemBase.class, manager -> new RenderFallbackBiped<>(")
+                source.contains("registerEntityRenderer(EntityGolemBase.class, RenderGolemBase::new, registered);")
                         && source.contains("registerEntityRenderer(EntityTravelingTrunk.class, RenderTravelingTrunk::new, registered);")
                         && source.contains("registerEntityRenderer(EntityCultistPortal.class, manager -> new RenderFallbackBiped<>("));
         assertTrue("RenderFallbackLiving must exist as a non-noop typed texture renderer",
@@ -100,6 +100,18 @@ public class ClientProxyEntityRendererRegistrationStaticGuardTest {
                         && trunkRenderer.contains("textures/models/trunk.png")
                         && trunkRenderer.contains("textures/models/trunkangry.png")
                         && trunkRenderer.contains("entity.getAnger() > 0"));
+        String golemRenderer = readFile("src/main/java/thaumcraft/client/renderers/entity/RenderGolemBase.java");
+        assertTrue("RenderGolemBase must provide golem-type texture routing baseline",
+                golemRenderer.contains("extends RenderBiped<EntityGolemBase>")
+                        && golemRenderer.contains("entity.getGolemType()")
+                        && golemRenderer.contains("golem_straw.png")
+                        && golemRenderer.contains("golem_wood.png")
+                        && golemRenderer.contains("golem_tallow.png")
+                        && golemRenderer.contains("golem_clay.png")
+                        && golemRenderer.contains("golem_flesh.png")
+                        && golemRenderer.contains("golem_stone.png")
+                        && golemRenderer.contains("golem_iron.png")
+                        && golemRenderer.contains("golem_thaumium.png"));
         String travelingTrunkEntity = readFile("src/main/java/thaumcraft/common/entities/golems/EntityTravelingTrunk.java");
         assertTrue("EntityTravelingTrunk must expose anger accessor for renderer texture routing",
                 travelingTrunkEntity.contains("public int getAnger()"));
