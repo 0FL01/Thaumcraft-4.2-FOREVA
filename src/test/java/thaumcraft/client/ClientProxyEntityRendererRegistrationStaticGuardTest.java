@@ -508,6 +508,16 @@ public class ClientProxyEntityRendererRegistrationStaticGuardTest {
                         && giantBrainyZombieEntity.contains("this.dropItem(net.minecraft.init.Items.ROTTEN_FLESH, 2);")
                         && giantBrainyZombieEntity.contains("ConfigItems.itemZombieBrain")
                         && giantBrainyZombieEntity.contains("nbt.setFloat(\"Anger\", this.getAnger());"));
+        String brainyZombieEntity = readFile("src/main/java/thaumcraft/common/entities/monster/EntityBrainyZombie.java");
+        assertTrue("EntityBrainyZombie must keep reference-shaped target/reinforcement/drop contracts",
+                brainyZombieEntity.contains("this.targetTasks.addTask(1, new EntityAIHurtByTarget(this, false));")
+                        && brainyZombieEntity.contains("setBaseValue(25.0D)")
+                        && brainyZombieEntity.contains("setBaseValue(5.0D)")
+                        && brainyZombieEntity.contains("EntityZombie.SPAWN_REINFORCEMENTS_CHANCE")
+                        && brainyZombieEntity.contains("setBaseValue(0.0D)")
+                        && brainyZombieEntity.contains("for (int i = 0; i < 3; ++i)")
+                        && brainyZombieEntity.contains("Items.ROTTEN_FLESH")
+                        && brainyZombieEntity.contains("ConfigItems.itemZombieBrain"));
         String mindSpiderEntity = readFile("src/main/java/thaumcraft/common/entities/monster/EntityMindSpider.java");
         assertTrue("EntityMindSpider must expose viewer accessor and synced harmless/viewer data contracts",
                 mindSpiderEntity.contains("public String getViewer()")

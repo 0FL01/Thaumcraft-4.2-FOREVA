@@ -1891,6 +1891,29 @@ Some entities may be hard to trigger naturally until recipes/research/spawn cont
 
 - Это common behavior baseline; точная visual parity anger-based giant scaling в runtime scene остаётся в non-GUI scope.
 
+### Checkpoint 2026-05-17 — restore brainy zombie target/reinforcement/drop baseline
+
+Статус: частично продвинут.
+
+Что сделано:
+
+- `EntityBrainyZombie` выровнен с reference-shaped common behavior contracts:
+  - восстановлен target behavior hook в constructor (`EntityAIHurtByTarget`, priority `1`);
+  - attributes уточнены к reference shape:
+    - `MAX_HEALTH = 25.0D`;
+    - `ATTACK_DAMAGE = 5.0D`;
+    - zombie reinforcement chance attribute принудительно обнулён (`EntityZombie.SPAWN_REINFORCEMENTS_CHANCE = 0.0D`);
+  - drop loop сохранён в reference pattern (`3` boolean rolls на rotten flesh + zombie brain rare roll).
+- `ClientProxyEntityRendererRegistrationStaticGuardTest` расширен проверками на target/reinforcement/drop contracts `EntityBrainyZombie`.
+
+Проверки:
+
+- `./scripts/dev.sh validate --smoke` — passed.
+
+Ограничения:
+
+- Это common behavior baseline; полная parity brainy-zombie runtime combat scenarios остаётся в общих non-GUI runtime рамках.
+
 ### Checkpoint 2026-05-16 — restore mind spider viewer-only render gating
 
 Статус: частично продвинут.
