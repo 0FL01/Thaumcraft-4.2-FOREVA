@@ -3,16 +3,23 @@ package thaumcraft.common.entities.monster;
 import java.util.List;
 
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.IEntityLivingData;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.EntityAIHurtByTarget;
 import net.minecraft.entity.ai.EntityAINearestAttackableTarget;
 import net.minecraft.entity.item.EntityXPOrb;
 import net.minecraft.entity.monster.EntityZombie;
+import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.init.SoundEvents;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.SoundEvent;
 import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.world.DifficultyInstance;
+import net.minecraft.world.EnumDifficulty;
+import thaumcraft.common.config.ConfigItems;
 import thaumcraft.common.lib.TCSounds;
 
 public class EntityInhabitedZombie extends net.minecraft.entity.monster.EntityZombie {
@@ -31,13 +38,31 @@ public class EntityInhabitedZombie extends net.minecraft.entity.monster.EntityZo
     }
 
     @Override
+    public IEntityLivingData onInitialSpawn(DifficultyInstance difficulty, IEntityLivingData livingData) {
+        float armorChance = this.world.getDifficulty() == EnumDifficulty.HARD ? 0.9F : 0.6F;
+        this.setItemStackToSlot(EntityEquipmentSlot.HEAD, new ItemStack(ConfigItems.itemCultistPlate));
+        if (this.rand.nextFloat() <= armorChance) {
+            this.setItemStackToSlot(EntityEquipmentSlot.CHEST, new ItemStack(ConfigItems.itemCultistPlate));
+        }
+        if (this.rand.nextFloat() <= armorChance) {
+            this.setItemStackToSlot(EntityEquipmentSlot.LEGS, new ItemStack(ConfigItems.itemCultistPlate));
+        }
+        return livingData;
+    }
+
+    @Override
+    protected Item getDropItem() {
+        return Item.getItemById(0);
+    }
+
+    @Override
     public void onDeathUpdate() {
         if (!this.world.isRemote) {
             EntityEldritchCrab crab = new EntityEldritchCrab(this.world);
             crab.setLocationAndAngles(this.posX, this.posY + (double) this.getEyeHeight(), this.posZ, this.rotationYaw, this.rotationPitch);
             crab.setHelm(true);
             this.world.spawnEntity(crab);
-            if ((this.recentlyHit > 0 || this.isPlayer()) && this.world.getGameRules().getBoolean("doMobLoot")) {
+            if ((this.recentlyHit > 0 || this.isPlayer()) && this.canDropLoot() && this.world.getGameRules().getBoolean("doMobLoot")) {
                 int xp = this.getExperiencePoints(this.attackingPlayer);
                 while (xp > 0) {
                     int split = EntityXPOrb.getXPSplit(xp);
@@ -56,6 +81,10 @@ public class EntityInhabitedZombie extends net.minecraft.entity.monster.EntityZo
                     this.rand.nextGaussian() * 0.02D);
         }
         this.setDead();
+    }
+
+    @Override
+    public void onDeath(DamageSource cause) {
     }
 
     @Override protected void dropFewItems(boolean wasRecentlyHit, int looting) {}

@@ -2082,6 +2082,28 @@ Some entities may be hard to trigger naturally until recipes/research/spawn cont
 
 - Точный legacy pre-1.8 target-acquisition path (`findPlayerToAttack`) не переносится 1:1 в 1.12 AI-task model и остаётся в общем Stage 6 behavior parity scope.
 
+### Checkpoint 2026-05-17 — restore inhabited zombie armor/spawn/no-drop behavior baseline
+
+Статус: частично продвинут.
+
+Что сделано:
+
+- `EntityInhabitedZombie` доведен до reference-shaped common contracts:
+  - восстановлен `onInitialSpawn(...)` armor-setup baseline: `HEAD` всегда + `CHEST`/`LEGS` c шансом `0.9F` на `HARD` и `0.6F` на остальных сложностях;
+  - добавлен explicit no-drop contract через `getDropItem() -> Item.getItemById(0)`;
+  - добавлен пустой `onDeath(DamageSource)` override для сохранения reference death-path suppression;
+  - в `onDeathUpdate()` XP-spawn gate дополнен `canDropLoot()` как в reference-shaped flow;
+  - сохранены crab-spawn path (`EntityEldritchCrab#setHelm(true)`), explosion particle burst, anti-cluster spawn gate и `CRABTALK` ambient/hurt contracts.
+- `ClientProxyEntityRendererRegistrationStaticGuardTest` расширен проверками на новые `EntityInhabitedZombie` contracts (`onInitialSpawn` armor chance, no-drop hook, crab spawn, death suppression).
+
+Проверки:
+
+- `./scripts/dev.sh validate --smoke` — passed.
+
+Ограничения:
+
+- В 1.12-порте отсутствуют отдельные `itemHelmetCultistPlate`/`itemChestCultistPlate`/`itemLegsCultistPlate` item-singletons из legacy surface; текущий baseline использует доступный `ConfigItems.itemCultistPlate` для эквивалентного armor-presence contract.
+
 - [ ] Add client-only entity renderer registration hook.
 - [ ] Register every entity from `ConfigEntities.ENTITIES` with a custom or vanilla-equivalent renderer.
 - [ ] Port item-like/transient/projectile renderers.

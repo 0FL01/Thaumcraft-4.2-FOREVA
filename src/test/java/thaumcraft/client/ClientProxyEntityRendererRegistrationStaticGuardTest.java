@@ -518,6 +518,28 @@ public class ClientProxyEntityRendererRegistrationStaticGuardTest {
                         && brainyZombieEntity.contains("for (int i = 0; i < 3; ++i)")
                         && brainyZombieEntity.contains("Items.ROTTEN_FLESH")
                         && brainyZombieEntity.contains("ConfigItems.itemZombieBrain"));
+        String inhabitedZombieEntity = readFile("src/main/java/thaumcraft/common/entities/monster/EntityInhabitedZombie.java");
+        assertTrue("EntityInhabitedZombie must keep reference-shaped armor/crab-spawn/no-drop contracts",
+                inhabitedZombieEntity.contains("this.targetTasks.addTask(1, new EntityAIHurtByTarget(this, true));")
+                        && inhabitedZombieEntity.contains("this.targetTasks.addTask(3, new EntityAINearestAttackableTarget<>(this, EntityCultist.class, true));")
+                        && inhabitedZombieEntity.contains("setBaseValue(30.0)")
+                        && inhabitedZombieEntity.contains("setBaseValue(5.0)")
+                        && inhabitedZombieEntity.contains("EntityZombie.SPAWN_REINFORCEMENTS_CHANCE")
+                        && inhabitedZombieEntity.contains("public IEntityLivingData onInitialSpawn(DifficultyInstance difficulty, IEntityLivingData livingData)")
+                        && inhabitedZombieEntity.contains("this.world.getDifficulty() == EnumDifficulty.HARD ? 0.9F : 0.6F")
+                        && inhabitedZombieEntity.contains("EntityEquipmentSlot.HEAD")
+                        && inhabitedZombieEntity.contains("EntityEquipmentSlot.CHEST")
+                        && inhabitedZombieEntity.contains("EntityEquipmentSlot.LEGS")
+                        && inhabitedZombieEntity.contains("ConfigItems.itemCultistPlate")
+                        && inhabitedZombieEntity.contains("protected Item getDropItem()")
+                        && inhabitedZombieEntity.contains("return Item.getItemById(0);")
+                        && inhabitedZombieEntity.contains("EntityEldritchCrab crab = new EntityEldritchCrab(this.world);")
+                        && inhabitedZombieEntity.contains("crab.setHelm(true);")
+                        && inhabitedZombieEntity.contains("this.canDropLoot()")
+                        && inhabitedZombieEntity.contains("public void onDeath(DamageSource cause)")
+                        && inhabitedZombieEntity.contains("protected SoundEvent getAmbientSound()")
+                        && inhabitedZombieEntity.contains("TCSounds.CRABTALK")
+                        && inhabitedZombieEntity.contains("SoundEvents.ENTITY_HOSTILE_HURT"));
         String mindSpiderEntity = readFile("src/main/java/thaumcraft/common/entities/monster/EntityMindSpider.java");
         assertTrue("EntityMindSpider must expose viewer accessor and synced harmless/viewer data contracts",
                 mindSpiderEntity.contains("public String getViewer()")
