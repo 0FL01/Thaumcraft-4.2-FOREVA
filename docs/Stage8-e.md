@@ -1368,6 +1368,29 @@ Depends on GAP-1 and GAP-3. Some infusion source scenarios may require Stage 9 c
 
 - Полноценный client scan-overlay path (`RenderEventHandler.startScan(...)` в оригинале) в текущем порте отсутствует и остаётся отдельным Stage 8-e renderer/overlay gap.
 
+#### Checkpoint 2026-05-17 — GAP-11 elemental-sword lift/chain-hit baseline
+
+Статус: частично продвинут.
+
+Что сделано:
+
+- `ItemElementalSword` больше не stub:
+  - восстановлены `RARE` rarity и thaumium repair contracts (`itemResource:2`);
+  - восстановлен active-use контракт (`setActiveHand`, `72000` use duration, `EnumAction.BLOCK`);
+  - восстановлен reference-shaped lift/fall-control baseline в `onUsingTick(...)` (`motionY` control + `Utils.resetFloatCounter(...)`);
+  - восстановлен nearby-entity push baseline во время active-use;
+  - восстановлен chain-hit AoE baseline в `onLeftClickEntity(...)` через secondary-target sweep и `player.attackTargetEntityWithCurrentItem(...)`;
+  - восстановлены sound/particle feedback cues (`TCSounds.WIND`, `TCSounds.SWING`, `SMOKE_NORMAL`).
+- Добавлен `ItemElementalSwordStaticGuardTest` для фиксации core behavior/surface contracts.
+
+Проверки:
+
+- `./scripts/dev.sh validate --smoke` — passed.
+
+Ограничения:
+
+- Это server/common baseline без ручной gameplay/client visual parity проверки; точная parity для legacy `smokeSpiral(...)` visual path и pre-1.9 melee internals остаётся открытой до отдельного client/manual checkpoint.
+
 ### GAP-12: FX registration exists, but send-site coverage and manual scenario validation are incomplete
 
 **Статус:** требует проверки  
