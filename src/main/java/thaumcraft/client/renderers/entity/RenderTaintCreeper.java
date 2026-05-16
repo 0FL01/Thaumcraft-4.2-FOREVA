@@ -15,7 +15,8 @@ import javax.annotation.Nullable;
 public class RenderTaintCreeper extends RenderLiving<EntityTaintCreeper> {
 
     private static final ResourceLocation TEXTURE = new ResourceLocation("thaumcraft", "textures/models/creeper.png");
-    private static final ResourceLocation ARMOR_TEXTURE = new ResourceLocation("textures/entity/creeper/creeper_armor.png");
+    private static final ResourceLocation ARMOR_TEXTURE =
+            new ResourceLocation("thaumcraft", "textures/entity/creeper/creeper_armor.png");
 
     public RenderTaintCreeper(RenderManager renderManager) {
         super(renderManager, new ModelCreeper(), 0.5F);

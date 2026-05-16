@@ -192,7 +192,7 @@ public class ClientProxyEntityRendererRegistrationStaticGuardTest {
         assertTrue("RenderTaintCreeper must provide creeper texture plus flash scale/color multiplier baseline",
                 taintCreeperRenderer.contains("extends RenderLiving<EntityTaintCreeper>")
                         && taintCreeperRenderer.contains("textures/models/creeper.png")
-                        && taintCreeperRenderer.contains("textures/entity/creeper/creeper_armor.png")
+                        && taintCreeperRenderer.contains("new ResourceLocation(\"thaumcraft\", \"textures/entity/creeper/creeper_armor.png\")")
                         && taintCreeperRenderer.contains("getCreeperFlashIntensity")
                         && taintCreeperRenderer.contains("preRenderCallback")
                         && taintCreeperRenderer.contains("getColorMultiplier")

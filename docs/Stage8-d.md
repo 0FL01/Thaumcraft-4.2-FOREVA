@@ -1346,6 +1346,24 @@ Some entities may be hard to trigger naturally until recipes/research/spawn cont
 
 - Это armor-layer baseline; полная parity по taint creeper visual stack (точные legacy lightmap/intensity нюансы и powered-state acquisition path) остаётся открытой по GAP-3/GAP-6.
 
+### Checkpoint 2026-05-16 — fix taint creeper armor texture namespace contract
+
+Статус: частично продвинут.
+
+Что сделано:
+
+- `RenderTaintCreeper` исправлен на reference-shaped armor texture namespace:
+  - `ARMOR_TEXTURE` переведён на `new ResourceLocation("thaumcraft", "textures/entity/creeper/creeper_armor.png")`.
+- `ClientProxyEntityRendererRegistrationStaticGuardTest` закрепляет explicit `thaumcraft` namespace contract для armor texture path.
+
+Проверки:
+
+- `./scripts/dev.sh validate --smoke` — passed.
+
+Ограничения:
+
+- Это namespace contract fix; remaining visual нюансы taint creeper armor pass (legacy GL-state/lightmap specifics) остаются в общем client parity scope.
+
 ### Checkpoint 2026-05-16 — restore mind spider viewer-only render gating
 
 Статус: частично продвинут.
