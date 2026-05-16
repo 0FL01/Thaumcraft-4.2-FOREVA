@@ -353,6 +353,32 @@ Port the reference aspect tags that directly affect Stage 9-d crucible/alchemy r
 
 Depends on current metadata constants for `ItemResource`, `ItemShard`, `ItemNugget`, block item metas, and ore dictionary registration. Broader aspect parity belongs outside this chunk unless a tag directly affects Stage 9-d recipe flow.
 
+#### Checkpoint 2026-05-16 — GAP-5 alchemy aspect baseline expanded
+
+Статус: Stage 9-d alchemy-critical Thaumcraft object-tag baseline expanded for crucible decomposition and recipe-generated tag stability; full parity sweep remains open.
+
+Что сделано:
+
+- Added `registerThaumcraftAlchemyBaseline()` in `ConfigAspects` and wired it into `ConfigAspects.init()`.
+- Ported reference-style alchemy-critical tags for:
+  - `itemShard` primal metas `0..5` + balanced-shard component baseline (`itemResource:14`);
+  - `itemNugget` quicksilver/thaumium and native cluster metas (`16`, `31`, `21`, etc.) plus edible nugget baseline;
+  - `blockCustomOre` metas `0..7`;
+  - `blockCosmeticSolid` (base + `6/7`) and `blockMetalDevice`;
+  - `blockCustomPlant` alchemy-relevant metas (`0/1/2/3/5`);
+  - `itemEssence` metas `0/1` and key alchemy resources (`itemResource` metas `3/6/9/11/12/18`) plus `itemZombieBrain`.
+- Added static guard `ConfigAspectsAlchemyTagCoverageTest`.
+
+Проверки:
+
+- `./scripts/dev.sh test` — passed.
+- `./scripts/dev.sh validate --smoke` — passed (including `smoke-server` ready state).
+
+Ограничения:
+
+- This checkpoint does not yet prove complete reference parity for every Thaumcraft object tag outside Stage 9-d alchemy flow.
+- Full manual/runtime crucible/thaumatorium scenario evidence remains open under GAP-6.
+
 ### GAP-6: Crucible and thaumatorium scenarios are not runtime-verified
 
 **Статус:** требует проверки  
