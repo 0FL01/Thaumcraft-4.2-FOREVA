@@ -1820,6 +1820,45 @@ Some entities may be hard to trigger naturally until recipes/research/spawn cont
 
 - Это survivability/combat baseline; полная parity giant boss UX/visual behavior остаётся в общем Stage 8-d/8-e render scope.
 
+### Checkpoint 2026-05-17 — restore taintacle core spawn/target/combat baseline
+
+Статус: частично продвинут.
+
+Что сделано:
+
+- `EntityTaintacle` выровнен с reference-shaped core behavior contracts:
+  - восстановлен spawn-gating baseline:
+    - proximity gate (no nearby taintacles in local radius);
+    - substrate gate (`blockTaintFibres` type `0` or `blockTaint` type `1`) + taint biome;
+    - `getYOffset() -> 0.25D`.
+  - восстановлены movement/interaction hooks:
+    - rooted move (X/Z clamp, no upward motion);
+    - `canTriggerWalking() -> false`.
+  - восстановлен target/combat lifecycle:
+    - nearest non-tainted living target acquisition (`findNearestTarget`);
+    - agitation gate (`getAgitationState`);
+    - manual yaw tracking (`faceEntity` + `updateRotation`);
+    - melee/range split in `attackTentacle(...)` with cooldown.
+  - `attackEntityAsMob(...)` расширен до reference-shaped damage path:
+    - tentacle damage source;
+    - enchantment creature bonus/knockback/fire-aspect integration;
+    - thorn/arthropod enchantment side-effects.
+  - восстановлен `spawnTentacles(...)` behavior:
+    - spawn `EntityTaintacleSmall` near attacker;
+    - taint conversion hook for eldritch biome path (`Utils.setBiomeAt` + taint fibres placement);
+    - cooldown/sound contracts.
+  - `attackEntityFrom(...)` восстановлен: при дальнем атакере (`>16`) триггерит secondary tentacle spawn (non-small, server-side).
+  - sound contracts дополнены reference pitch profile: `getSoundPitch() -> 1.3F - height/10.0F`.
+- `ClientProxyEntityRendererRegistrationStaticGuardTest` расширен проверками на spawn/target/combat/tentacle-spawn contracts `EntityTaintacle`.
+
+Проверки:
+
+- `./scripts/dev.sh validate --smoke` — passed.
+
+Ограничения:
+
+- Это core behavior baseline; точная parity legacy client-only `tentacleAriseFX` visual pipeline остаётся в Stage 8-e visual scope.
+
 ### Checkpoint 2026-05-16 — restore mind spider viewer-only render gating
 
 Статус: частично продвинут.

@@ -451,6 +451,35 @@ public class ClientProxyEntityRendererRegistrationStaticGuardTest {
                         && taintacleSmallEntity.contains("return false;")
                         && taintacleSmallEntity.contains("return Item.getItemById(0);")
                         && taintacleSmallEntity.contains("protected void dropFewItems(boolean wasRecentlyHit, int looting) {"));
+        String taintacleEntity = readFile("src/main/java/thaumcraft/common/entities/monster/EntityTaintacle.java");
+        assertTrue("EntityTaintacle must keep reference-shaped spawn/target/combat/tentacle-spawn baseline contracts",
+                taintacleEntity.contains("this.setSize(0.66f, 3.0f);")
+                        && taintacleEntity.contains("this.experienceValue = 10;")
+                        && taintacleEntity.contains("setBaseValue(50.0)")
+                        && taintacleEntity.contains("setBaseValue(7.0)")
+                        && taintacleEntity.contains("new AxisAlignedBB(this.posX, this.posY, this.posZ, this.posX, this.posY, this.posZ).grow(24.0D, 8.0D, 24.0D)")
+                        && taintacleEntity.contains("ConfigBlocks.blockTaintFibres")
+                        && taintacleEntity.contains("ConfigBlocks.blockTaint")
+                        && taintacleEntity.contains("return nearby.isEmpty() && validTaintGround && super.getCanSpawnHere();")
+                        && taintacleEntity.contains("return 0.25D;")
+                        && taintacleEntity.contains("return false;")
+                        && taintacleEntity.contains("this.attackTentacle(this.getAttackTarget(), dist);")
+                        && taintacleEntity.contains("this.setAttackTarget(this.findNearestTarget());")
+                        && taintacleEntity.contains("protected void attackTentacle(Entity entity, float distance)")
+                        && taintacleEntity.contains("DamageSourceThaumcraft.causeTentacleDamage(this)")
+                        && taintacleEntity.contains("EnchantmentHelper.getModifierForCreature")
+                        && taintacleEntity.contains("EnchantmentHelper.getKnockbackModifier(this)")
+                        && taintacleEntity.contains("EnchantmentHelper.getFireAspectModifier(this)")
+                        && taintacleEntity.contains("EnchantmentHelper.applyThornEnchantments")
+                        && taintacleEntity.contains("EnchantmentHelper.applyArthropodEnchantments")
+                        && taintacleEntity.contains("protected void spawnTentacles(Entity entity)")
+                        && taintacleEntity.contains("new EntityTaintacleSmall(this.world)")
+                        && taintacleEntity.contains("Utils.setBiomeAt(this.world, x, z, ThaumcraftWorldGenerator.biomeTaint)")
+                        && taintacleEntity.contains("this.spawnTentacles(source.getTrueSource());")
+                        && taintacleEntity.contains("public boolean getAgitationState()")
+                        && taintacleEntity.contains("protected float updateRotation(float current, float intended, float maxChange)")
+                        && taintacleEntity.contains("return 1.3F - this.height / 10.0F;")
+                        && taintacleEntity.contains("return this.height / 8.0f;"));
         String taintacleGiantEntity = readFile("src/main/java/thaumcraft/common/entities/monster/boss/EntityTaintacleGiant.java");
         assertTrue("EntityTaintacleGiant must keep damageable underwater/enrage survivability contracts",
                 taintacleGiantEntity.contains("setBaseValue(125.0)")
