@@ -164,6 +164,7 @@ Incremental Stage 6 delta: `EntityCultist` now persists and restores home positi
 Incremental Stage 6 delta: `EntityCultistPortalLootPlacementContractTest` now guards stage-0 reward placement against regressions to vanilla chest placeholders, and `Stage6 GAP-7` text is aligned with the current `BlockLoot`/`blockLootCrate` implementation baseline.
 Incremental Stage 6 delta: `MonsterSoundConstantCoverageTest` now statically scans `thaumcraft.common.entities.monster` for `TCSounds.*` references and enforces that each referenced sound constant is declared in `TCSounds`, hardening monster/boss sound-link integrity (`test` + `validate` passing).
 Incremental Stage 5 delta: `ItemResonator.onItemUseFirst(...)` now restores reference-style tube-face diagnostics via `RayTracer.retraceBlock(...)` + `subHit` face override and restores localized untyped suction fallback (`tc.resonator3`) instead of a hardcoded string, guarded by new `ItemResonatorStaticGuardTest` with passing `validate --smoke`.
+Incremental Stage 5 delta: `ItemSanitySoap` now restores reference-shaped completed-use consumption semantics by removing the creative-mode bypass (soap is consumed after successful >195 tick cleanse in all modes), guarded by new `ItemSanitySoapStaticGuardTest` with passing `validate --smoke`.
 
 ## Archive
 

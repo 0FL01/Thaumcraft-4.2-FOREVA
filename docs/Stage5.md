@@ -1213,3 +1213,18 @@ Validation evidence for this checkpoint:
 - Server smoke evidence: `run/smoke-server.log` reached `Done (1.252s)!`; no crash reports were present under `run/`.
 
 GAP-11 is advanced but not closed. The full reference loot-pool distribution still depends on Stage 9 content/table population and manual loot-bag opening scenarios remain unvalidated.
+
+### 8.27 2026-05-17 Sanity Soap creative-consumption parity checkpoint
+
+Implemented in the current checkpoint:
+
+- Restored the reference item-consumption contract for completed Sanity Soap use by removing the creative-mode bypass; successful completion now consumes one soap stack entry in all modes, matching the 1.7.10 path (`--stack`).
+- Added `ItemSanitySoapStaticGuardTest` to lock the completed-use auto-stop gate (`>195` ticks), sticky/temp warp cleanse branch, and unconditional completion-time stack consumption against regressions.
+
+Validation evidence for this checkpoint:
+
+- `./scripts/dev.sh validate --smoke` — passed: compile, tests `70/70`, jar, compact `check-jar` MCP summary, and server smoke readiness.
+- Server smoke evidence: `run/smoke-server.log` reached `Done (...)`; no crash reports were present under `run/`.
+- `./scripts/dev.sh smoke-client` — skipped by user instruction: GUI/graphics/user-interactive validation excluded.
+
+GAP-11 is advanced but not closed. Sanity Soap client roots/craftstart sounds and bubble FX remain Stage 8 visual/audio work, and manual in-world cleanse scenarios remain unvalidated.

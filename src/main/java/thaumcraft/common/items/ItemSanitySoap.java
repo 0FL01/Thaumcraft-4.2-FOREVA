@@ -78,9 +78,7 @@ public class ItemSanitySoap extends Item {
                     Thaumcraft.addWarpToPlayer(player, -knowledge.getWarpTemp(), true);
                 }
             }
-            if (!player.capabilities.isCreativeMode) {
-                stack.shrink(1);
-            }
+            stack.shrink(1);
         }
     }
 }
