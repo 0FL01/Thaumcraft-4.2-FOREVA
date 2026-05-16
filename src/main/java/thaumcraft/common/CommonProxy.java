@@ -154,6 +154,9 @@ public class CommonProxy implements IGuiHandler {
     public void wispFX3(World world, double x, double y, double z, double tx, double ty, double tz, float size, int count, boolean flag, float speed) {
     }
 
+    public void wispFXEG(World world, double x, double y, double z, Entity target) {
+    }
+
     public void sparkle(float x, float y, float z, float scale, int type, float speed) {
     }
 

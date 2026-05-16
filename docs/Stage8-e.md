@@ -663,6 +663,32 @@ Depends on GAP-1, GAP-2, GAP-5, and GAP-6. Network-thread rendering is unsafe if
 
 - This remains fallback particle/sound behavior; dedicated legacy crucible FX renderer parity is still part of broader Stage 8 visual-depth work.
 
+#### Checkpoint 2026-05-16 — Eldritch guardian ambient wisp trail hook restored (`wispFXEG`)
+
+Статус: guardian client ambient wisp trail path is now wired again through proxy helpers.
+
+Что сделано:
+
+- Compared `EntityEldritchGuardian` client update path against 1.7.10 reference (`Thaumcraft.proxy.wispFXEG(...)` call inside client tick branch).
+- Restored client-side guardian ambient FX send in `EntityEldritchGuardian.onUpdate()`:
+  - computes reference-shaped jittered local x/z coordinates;
+  - calls `Thaumcraft.proxy.wispFXEG(world, x, posY + 0.22*height, z, this)`.
+- Expanded proxy helper surface:
+  - `CommonProxy` now exposes server-safe no-op `wispFXEG(...)`;
+  - `ClientProxy` now overrides `wispFXEG(...)` with a fallback particle trail routed via existing `wispFX3(...)`.
+- Expanded static guard coverage in `ClientProxyFxStaticGuardTest`:
+  - enforces `ClientProxy.wispFXEG(...)` override presence;
+  - enforces guardian call-site presence in `EntityEldritchGuardian`.
+
+Проверки:
+
+- `./scripts/dev.sh test` — passed.
+- `./scripts/dev.sh validate --smoke` — passed.
+
+Ограничения:
+
+- This remains fallback wisp-trail behavior and does not yet port dedicated reference `FXWispEG`/`ParticleEngine` class parity.
+
 ### GAP-4: Beam, wand beam, bore beam, power beam, arc, and lightning bolt classes are absent
 
 **Статус:** отсутствует  

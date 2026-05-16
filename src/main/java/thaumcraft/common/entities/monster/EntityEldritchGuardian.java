@@ -107,7 +107,9 @@ public class EntityEldritchGuardian extends EntityMob implements IRangedAttackMo
             // Client-side: arm animation decay
             if (this.armLiftL > 0.0F) this.armLiftL -= 0.05F;
             if (this.armLiftR > 0.0F) this.armLiftR -= 0.05F;
-            // Wisp particles (Phase 8: proxy call)
+            float x = (float) (this.posX + (this.rand.nextFloat() - this.rand.nextFloat()) * 0.2F);
+            float z = (float) (this.posZ + (this.rand.nextFloat() - this.rand.nextFloat()) * 0.2F);
+            Thaumcraft.proxy.wispFXEG(this.world, x, this.posY + 0.22D * this.height, z, this);
         } else if (this.world.provider.getDimension() != Config.dimensionOuterId
                 && (this.ticksExisted == 0 || this.ticksExisted % 100 == 0)
                 && this.world.getDifficulty() != EnumDifficulty.PEACEFUL) {

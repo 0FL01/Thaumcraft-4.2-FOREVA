@@ -25,6 +25,8 @@ public class ClientProxyFxStaticGuardTest {
                 source.contains("public void burst(") && source.contains("EnumParticleTypes.EXPLOSION_NORMAL"));
         assertTrue("ClientProxy must override wispFX3 for wisp ambient FX",
                 source.contains("public void wispFX3(") && source.contains("hasTarget"));
+        assertTrue("ClientProxy must override wispFXEG for eldritch guardian trail FX",
+                source.contains("public void wispFXEG(") && source.contains("target.height * 0.22f"));
         assertTrue("ClientProxy must override sparkle for firebat/lifter visuals",
                 source.contains("public void sparkle(") && source.contains("EnumParticleTypes.REDSTONE"));
         assertTrue("ClientProxy must override particleCount using client particle settings",
@@ -133,6 +135,8 @@ public class ClientProxyFxStaticGuardTest {
                 eldritchGuardian.contains("new PacketFXSonic(this.getEntityId())"));
         assertTrue("Eldritch guardian periodic fog pulse must send PacketMiscEvent short mist signal",
                 eldritchGuardian.contains("new PacketMiscEvent((short) 2)"));
+        assertTrue("Eldritch guardian client update must emit wispFXEG trail",
+                eldritchGuardian.contains("Thaumcraft.proxy.wispFXEG("));
         assertTrue("Wisp ranged attack path must send PacketFXWispZap",
                 wisp.contains("new PacketFXWispZap(this.getEntityId(), this.targetedEntity.getEntityId())"));
         assertTrue("FocusShock chain lightning path must send PacketFXZap",

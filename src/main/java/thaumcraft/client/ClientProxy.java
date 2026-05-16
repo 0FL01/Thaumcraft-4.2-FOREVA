@@ -4,6 +4,7 @@ import java.awt.Color;
 import javax.annotation.Nullable;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.Item;
@@ -355,6 +356,20 @@ public class ClientProxy extends CommonProxy {
                 pz = z + (world.rand.nextFloat() - 0.5f) * 0.55f;
             }
             world.spawnParticle(EnumParticleTypes.REDSTONE, px, py, pz, red, green, blue);
+        }
+    }
+
+    @Override
+    public void wispFXEG(World world, double x, double y, double z, Entity target) {
+        if (world == null || !world.isRemote || target == null) return;
+        int amount = particleCount(1);
+        if (amount <= 0) return;
+
+        for (int i = 0; i < amount; i++) {
+            double tx = target.posX + (world.rand.nextFloat() - world.rand.nextFloat()) * 0.2f;
+            double ty = target.posY + target.height * 0.22f + (world.rand.nextFloat() - 0.5f) * 0.1f;
+            double tz = target.posZ + (world.rand.nextFloat() - world.rand.nextFloat()) * 0.2f;
+            wispFX3(world, x, y, z, tx, ty, tz, 0.45f, 0x66AAFF, true, 0.02f);
         }
     }
 
