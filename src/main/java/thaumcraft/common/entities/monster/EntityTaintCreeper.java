@@ -74,6 +74,15 @@ public class EntityTaintCreeper extends net.minecraft.entity.monster.EntityMob i
         return 3 + (int)(this.getHealth() - 1.0F);
     }
 
+    @Override
+    public void fall(float distance, float damageMultiplier) {
+        super.fall(distance, damageMultiplier);
+        this.timeSinceIgnited = (int)(this.timeSinceIgnited + distance * 1.5F);
+        if (this.timeSinceIgnited > this.fuseTime - 5) {
+            this.timeSinceIgnited = this.fuseTime - 5;
+        }
+    }
+
     public int getCreeperState() {
         return this.dataManager.get(CREEPER_STATE);
     }

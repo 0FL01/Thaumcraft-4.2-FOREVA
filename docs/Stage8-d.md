@@ -1505,6 +1505,26 @@ Some entities may be hard to trigger naturally until recipes/research/spawn cont
 
 - Это pathfinding hook baseline; полная runtime parity taint creeper combat AI оценивается в общем Stage 6 behavior scope.
 
+### Checkpoint 2026-05-17 — restore taint creeper fall-accelerated fuse baseline
+
+Статус: частично продвинут.
+
+Что сделано:
+
+- `EntityTaintCreeper` расширен reference-shaped fall hook:
+  - добавлен override `fall(float distance, float damageMultiplier)`;
+  - после `super.fall(...)` ignite timer ускоряется по формуле `timeSinceIgnited += distance * 1.5F`;
+  - добавлен cap `timeSinceIgnited <= fuseTime - 5`.
+- `ClientProxyEntityRendererRegistrationStaticGuardTest` расширен проверками на fall-accelerated fuse contracts.
+
+Проверки:
+
+- `./scripts/dev.sh validate --smoke` — passed.
+
+Ограничения:
+
+- Это fall-fuse baseline; полная parity taint creeper movement/combat runtime behavior закрывается в общем Stage 6 scope.
+
 ### Checkpoint 2026-05-16 — restore mind spider viewer-only render gating
 
 Статус: частично продвинут.

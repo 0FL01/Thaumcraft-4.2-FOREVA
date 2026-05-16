@@ -295,6 +295,10 @@ public class ClientProxyEntityRendererRegistrationStaticGuardTest {
                         && taintCreeperEntity.contains("this.timeSinceIgnited += state;")
                         && taintCreeperEntity.contains("if (this.timeSinceIgnited < 0)")
                         && taintCreeperEntity.contains("createExplosion(this, this.posX, this.posY + (double)(this.height / 2.0F), this.posZ, 1.5F, false)"));
+        assertTrue("EntityTaintCreeper must keep fall-accelerated fuse baseline",
+                taintCreeperEntity.contains("public void fall(float distance, float damageMultiplier)")
+                        && taintCreeperEntity.contains("distance * 1.5F")
+                        && taintCreeperEntity.contains("this.timeSinceIgnited > this.fuseTime - 5"));
         assertTrue("EntityTaintCreeper must keep post-explosion taint-poison splash baseline for nearby non-tainted living entities",
                 taintCreeperEntity.contains("getEntitiesWithinAABB(EntityLivingBase.class")
                         && taintCreeperEntity.contains("instanceof thaumcraft.api.entities.ITaintedMob")
