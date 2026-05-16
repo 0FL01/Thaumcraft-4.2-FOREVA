@@ -996,6 +996,36 @@ Some entities may be hard to trigger naturally until recipes/research/spawn cont
 
 - Это texture-identity baseline; full reference parity для brainy/inhabited zombie renderer behavior (villager-model switching path и giant-specific anger-based scaling semantics из 1.7.10) остаётся открытой по GAP-3/GAP-6.
 
+### Checkpoint 2026-05-16 — mind/taint spider dedicated renderer baseline
+
+Статус: частично продвинут.
+
+Почему grouped в один commit:
+
+- `EntityMindSpider` и `EntityTaintSpider` составляют tightly-coupled spider-rendering pair с общими texture/eyes-layer contracts (`taint_spider` / `taint_spider_eyes`), поэтому закрыты одним checkpoint.
+
+Что сделано:
+
+- Добавлены выделенные renderer-классы:
+  - `RenderMindSpider`;
+  - `RenderTaintSpider`.
+- `ClientProxy.setupEntityRenderers()` обновлен:
+  - `EntityMindSpider -> RenderMindSpider::new`;
+  - `EntityTaintSpider -> RenderTaintSpider::new`.
+- Baseline behavior:
+  - оба renderer используют `textures/models/taint_spider.png` как base texture;
+  - добавлен dedicated eyes layer (`textures/models/taint_spider_eyes.png`) с additive blend;
+  - baseline scale callbacks привязаны к текущему `entity.width` (для taint spider сохранен 1.25x Y-profile).
+- `ClientProxyEntityRendererRegistrationStaticGuardTest` расширен проверками registration paths и spider texture/layer contracts.
+
+Проверки:
+
+- `./scripts/dev.sh validate --smoke` — passed.
+
+Ограничения:
+
+- Это baseline по texture/eyes-layer/scale; full reference parity для spider-specific behavior (mind-spider viewer-only visibility semantics и точные reference GL/lightmap нюансы) остаётся открытой по GAP-3/GAP-6.
+
 - [ ] Add client-only entity renderer registration hook.
 - [ ] Register every entity from `ConfigEntities.ENTITIES` with a custom or vanilla-equivalent renderer.
 - [ ] Port item-like/transient/projectile renderers.

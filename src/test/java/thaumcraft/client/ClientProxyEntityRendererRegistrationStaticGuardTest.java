@@ -43,8 +43,8 @@ public class ClientProxyEntityRendererRegistrationStaticGuardTest {
                 source.contains("registerEntityRenderer(EntityBrainyZombie.class, RenderBrainyZombie::new, registered);")
                         && source.contains("registerEntityRenderer(EntityGiantBrainyZombie.class, RenderBrainyZombie::new, registered);")
                         && source.contains("registerEntityRenderer(EntityInhabitedZombie.class, RenderInhabitedZombie::new, registered);")
-                        && source.contains("registerEntityRenderer(EntityMindSpider.class, RenderSpider::new, registered);")
-                        && source.contains("registerEntityRenderer(EntityTaintSpider.class, RenderSpider::new, registered);"));
+                        && source.contains("registerEntityRenderer(EntityMindSpider.class, RenderMindSpider::new, registered);")
+                        && source.contains("registerEntityRenderer(EntityTaintSpider.class, RenderTaintSpider::new, registered);"));
         assertTrue("ClientProxy must keep fallback RenderFallbackLiving registrations for taint animal-like entities",
                 source.contains("registerEntityRenderer(EntityTaintChicken.class, manager -> new RenderFallbackLiving<>(")
                         && source.contains("registerEntityRenderer(EntityTaintCow.class, manager -> new RenderFallbackLiving<>(")
@@ -162,6 +162,20 @@ public class ClientProxyEntityRendererRegistrationStaticGuardTest {
         assertTrue("RenderInhabitedZombie must provide dedicated czombie texture baseline",
                 inhabitedZombieRenderer.contains("extends RenderZombie")
                         && inhabitedZombieRenderer.contains("textures/models/czombie.png"));
+        String mindSpiderRenderer = readFile("src/main/java/thaumcraft/client/renderers/entity/RenderMindSpider.java");
+        assertTrue("RenderMindSpider must provide taint spider texture and eyes layer baseline",
+                mindSpiderRenderer.contains("extends RenderLiving<EntityMindSpider>")
+                        && mindSpiderRenderer.contains("textures/models/taint_spider.png")
+                        && mindSpiderRenderer.contains("textures/models/taint_spider_eyes.png")
+                        && mindSpiderRenderer.contains("this.addLayer(new SpiderEyesLayer())")
+                        && mindSpiderRenderer.contains("entity.width / 1.4F"));
+        String taintSpiderRenderer = readFile("src/main/java/thaumcraft/client/renderers/entity/RenderTaintSpider.java");
+        assertTrue("RenderTaintSpider must provide taint spider texture, eyes, and y-scale baseline",
+                taintSpiderRenderer.contains("extends RenderLiving<EntityTaintSpider>")
+                        && taintSpiderRenderer.contains("textures/models/taint_spider.png")
+                        && taintSpiderRenderer.contains("textures/models/taint_spider_eyes.png")
+                        && taintSpiderRenderer.contains("this.addLayer(new SpiderEyesLayer())")
+                        && taintSpiderRenderer.contains("scale * 1.25F"));
         String trunkRenderer = readFile("src/main/java/thaumcraft/client/renderers/entity/RenderTravelingTrunk.java");
         assertTrue("RenderTravelingTrunk must provide anger-based texture routing baseline",
                 trunkRenderer.contains("extends RenderLiving<EntityTravelingTrunk>")

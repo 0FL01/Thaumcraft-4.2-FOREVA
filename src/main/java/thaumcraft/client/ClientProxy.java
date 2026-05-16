@@ -69,8 +69,10 @@ import thaumcraft.client.renderers.entity.RenderThaumicSlime;
 import thaumcraft.client.renderers.entity.RenderEldritchCrab;
 import thaumcraft.client.renderers.entity.RenderNoop;
 import thaumcraft.client.renderers.entity.RenderPech;
+import thaumcraft.client.renderers.entity.RenderMindSpider;
 import thaumcraft.client.renderers.entity.RenderTaintSpore;
 import thaumcraft.client.renderers.entity.RenderTaintSporeSwarmer;
+import thaumcraft.client.renderers.entity.RenderTaintSpider;
 import thaumcraft.client.renderers.entity.RenderTaintSwarm;
 import thaumcraft.client.renderers.entity.RenderTaintacle;
 import thaumcraft.client.renderers.entity.RenderTravelingTrunk;
@@ -220,8 +222,8 @@ public class ClientProxy extends CommonProxy {
         registerEntityRenderer(EntityBrainyZombie.class, RenderBrainyZombie::new, registered);
         registerEntityRenderer(EntityGiantBrainyZombie.class, RenderBrainyZombie::new, registered);
         registerEntityRenderer(EntityInhabitedZombie.class, RenderInhabitedZombie::new, registered);
-        registerEntityRenderer(EntityMindSpider.class, RenderSpider::new, registered);
-        registerEntityRenderer(EntityTaintSpider.class, RenderSpider::new, registered);
+        registerEntityRenderer(EntityMindSpider.class, RenderMindSpider::new, registered);
+        registerEntityRenderer(EntityTaintSpider.class, RenderTaintSpider::new, registered);
         registerEntityRenderer(EntityTaintChicken.class, manager -> new RenderFallbackLiving<>(
                 manager, new ModelChicken(), 0.3F, new ResourceLocation("thaumcraft", "textures/models/chicken.png")), registered);
         registerEntityRenderer(EntityTaintCow.class, manager -> new RenderFallbackLiving<>(
