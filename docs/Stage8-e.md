@@ -1413,6 +1413,28 @@ Depends on GAP-1 and GAP-3. Some infusion source scenarios may require Stage 9 c
 
 - Bonemeal path реализован через `ItemDye.applyBonemeal(...)` (1.12-совместимый baseline) вместо отсутствующего legacy `Utils.useBonemealAtLoc(...)`; manual gameplay parity всё ещё требует отдельной проверки.
 
+#### Checkpoint 2026-05-17 — GAP-11 elemental-shovel architect/burst baseline
+
+Статус: частично продвинут.
+
+Что сделано:
+
+- `ItemElementalShovel` больше не stub и теперь реализует reference-shaped surface:
+  - восстановлены `IArchitect` + `toolClasses`/`rarity`/thaumium-repair контракты (`shovel`, `RARE`, `itemResource:2`);
+  - восстановлен `onItemUse(...)` placement-copy baseline с `3x3` sweep, orientation-aware plane offsets, inventory consume path и sparkle feedback;
+  - восстановлен `onBlockStartBreak(...)` side-capture baseline (raytrace side index);
+  - восстановлен `onBlockDestroyed(...)` burst-mining baseline (`3x3` plane harvest path при non-sneak и effective block gate);
+  - сохранены/нормализованы orientation NBT helpers (`or`, `o % 3`) и architect preview list (`getArchitectBlocks(...)` + `showAxis(...)`).
+- Добавлен `ItemElementalShovelStaticGuardTest` для фиксации этих контрактов.
+
+Проверки:
+
+- `./scripts/dev.sh validate --smoke` — passed.
+
+Ограничения:
+
+- Burst-mining path сейчас использует `world.destroyBlock(..., true)` как 1.12-safe baseline вместо legacy `BlockUtils.harvestBlock(...)` семантики; детальный parity по enchant/harvest edge-cases остаётся для отдельного polish checkpoint.
+
 ### GAP-12: FX registration exists, but send-site coverage and manual scenario validation are incomplete
 
 **Статус:** требует проверки  
