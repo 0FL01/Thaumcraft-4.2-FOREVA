@@ -634,6 +634,35 @@ Depends on GAP-1, GAP-2, GAP-5, and GAP-6. Network-thread rendering is unsafe if
 
 - Visual effect depth still depends on broader Stage 8 render/fog parity work.
 
+#### Checkpoint 2026-05-16 — Crucible client FX hooks restored (`drawEffects` + block events)
+
+Статус: `TileCrucible` client FX hooks are now wired again with proxy fallback visuals/sound.
+
+Что сделано:
+
+- Restored `TileCrucible.drawEffects()` and client update tick routing:
+  - boiling froth via `Thaumcraft.proxy.crucibleFroth(...)`;
+  - overflow edge froth via `Thaumcraft.proxy.crucibleFrothDown(...)`;
+  - aspect-tinted bubble path via `Thaumcraft.proxy.crucibleBubble(...)`.
+- Restored crucible client block-event handling in `receiveClientEvent(...)`:
+  - id `1` now dispatches `Thaumcraft.proxy.blockSparkle(...)`;
+  - id `2` now dispatches `Thaumcraft.proxy.crucibleBoilSound(...)` plus repeated `crucibleBoil(...)` particle calls.
+- Added fallback proxy API surface for crucible FX:
+  - `CommonProxy`: stubs for `crucibleFroth`, `crucibleFrothDown`, `crucibleBubble`, `crucibleBoilSound`, `crucibleBoil`;
+  - `ClientProxy`: client particle/sound fallback implementations for all five methods.
+- Expanded static guard coverage:
+  - `TileCrucibleSmeltContractStaticGuardTest` now enforces crucible FX hook presence and removal of the old Phase 8 placeholders;
+  - `ClientProxyFxStaticGuardTest` now enforces crucible proxy override presence.
+
+Проверки:
+
+- `./scripts/dev.sh test` — passed.
+- `./scripts/dev.sh validate --smoke` — passed.
+
+Ограничения:
+
+- This remains fallback particle/sound behavior; dedicated legacy crucible FX renderer parity is still part of broader Stage 8 visual-depth work.
+
 ### GAP-4: Beam, wand beam, bore beam, power beam, arc, and lightning bolt classes are absent
 
 **Статус:** отсутствует  

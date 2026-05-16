@@ -10,6 +10,7 @@ import net.minecraft.item.Item;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.translation.I18n;
@@ -40,10 +41,12 @@ import thaumcraft.client.lib.KeyHandler;
 import thaumcraft.client.lib.RenderEventHandler;
 import thaumcraft.common.CommonProxy;
 import thaumcraft.common.config.ConfigItems;
+import thaumcraft.common.lib.TCSounds;
 import thaumcraft.common.lib.events.EventHandlerRunic;
 import thaumcraft.common.tiles.TileAlchemyFurnace;
 import thaumcraft.common.tiles.TileArcaneBore;
 import thaumcraft.common.tiles.TileArcaneWorkbench;
+import thaumcraft.common.tiles.TileCrucible;
 import thaumcraft.common.tiles.TileDeconstructionTable;
 import thaumcraft.common.tiles.TileFocalManipulator;
 import thaumcraft.common.tiles.TileResearchTable;
@@ -398,6 +401,85 @@ public class ClientProxy extends CommonProxy {
             return Math.max(1, base);
         }
         return Math.max(1, base * 2);
+    }
+
+    @Override
+    public void crucibleFroth(World world, float x, float y, float z) {
+        if (world == null || !world.isRemote) return;
+        int amount = particleCount(1);
+        if (amount <= 0) return;
+
+        for (int i = 0; i < amount; i++) {
+            world.spawnParticle(EnumParticleTypes.WATER_BUBBLE, x, y, z,
+                    (world.rand.nextFloat() - 0.5f) * 0.01f,
+                    0.02f + world.rand.nextFloat() * 0.01f,
+                    (world.rand.nextFloat() - 0.5f) * 0.01f);
+            if (world.rand.nextInt(4) == 0) {
+                world.spawnParticle(EnumParticleTypes.SMOKE_NORMAL, x, y + 0.03f, z, 0.0, 0.01, 0.0);
+            }
+        }
+    }
+
+    @Override
+    public void crucibleFrothDown(World world, float x, float y, float z) {
+        if (world == null || !world.isRemote) return;
+        int amount = particleCount(1);
+        if (amount <= 0) return;
+
+        for (int i = 0; i < amount; i++) {
+            world.spawnParticle(EnumParticleTypes.WATER_SPLASH, x, y, z,
+                    (world.rand.nextFloat() - 0.5f) * 0.01f,
+                    -0.02f - world.rand.nextFloat() * 0.02f,
+                    (world.rand.nextFloat() - 0.5f) * 0.01f);
+        }
+    }
+
+    @Override
+    public void crucibleBubble(World world, float x, float y, float z, float red, float green, float blue) {
+        if (world == null || !world.isRemote) return;
+        int amount = particleCount(1);
+        if (amount <= 0) return;
+
+        for (int i = 0; i < amount; i++) {
+            world.spawnParticle(EnumParticleTypes.REDSTONE, x, y, z, red, green, blue);
+            world.spawnParticle(EnumParticleTypes.WATER_BUBBLE, x, y, z,
+                    (world.rand.nextFloat() - 0.5f) * 0.01f,
+                    0.015f + world.rand.nextFloat() * 0.01f,
+                    (world.rand.nextFloat() - 0.5f) * 0.01f);
+        }
+    }
+
+    @Override
+    public void crucibleBoilSound(World world, int x, int y, int z) {
+        if (world == null) return;
+        world.playSound(
+                x + 0.5, y + 0.5, z + 0.5,
+                TCSounds.BUBBLE,
+                SoundCategory.BLOCKS,
+                0.2f,
+                1.0f + world.rand.nextFloat() * 0.4f,
+                false
+        );
+    }
+
+    @Override
+    public void crucibleBoil(World world, int x, int y, int z, TileCrucible crucible, int type) {
+        if (world == null || !world.isRemote || crucible == null) return;
+        int amount = particleCount(type >= 5 ? 3 : 2);
+        if (amount <= 0) return;
+
+        float surface = y + 0.05f + crucible.getFluidHeight();
+        for (int i = 0; i < amount; i++) {
+            float px = x + 0.2f + world.rand.nextFloat() * 0.6f;
+            float pz = z + 0.2f + world.rand.nextFloat() * 0.6f;
+            world.spawnParticle(EnumParticleTypes.WATER_BUBBLE, px, surface, pz,
+                    (world.rand.nextFloat() - 0.5f) * 0.01f,
+                    0.02f + world.rand.nextFloat() * 0.02f,
+                    (world.rand.nextFloat() - 0.5f) * 0.01f);
+            if (type >= 5 || world.rand.nextBoolean()) {
+                world.spawnParticle(EnumParticleTypes.CRIT_MAGIC, px, surface + 0.05f, pz, 0.0, 0.02, 0.0);
+            }
+        }
     }
 
     private static Color decodeColor(int color) {

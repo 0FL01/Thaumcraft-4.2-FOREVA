@@ -1,5 +1,6 @@
 package thaumcraft.common.tiles;
 
+import java.awt.Color;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
@@ -25,6 +26,7 @@ import thaumcraft.api.aspects.AspectList;
 import thaumcraft.api.aspects.IAspectContainer;
 import thaumcraft.api.crafting.CrucibleRecipe;
 import thaumcraft.api.wands.IWandable;
+import thaumcraft.common.Thaumcraft;
 import thaumcraft.common.blocks.BlockAiry;
 import thaumcraft.common.config.ConfigBlocks;
 import thaumcraft.common.container.InventoryFake;
@@ -195,14 +197,60 @@ public class TileCrucible extends TileThaumcraft implements ITickable, IWandable
         } else {
             // Client-side effects
             if (this.tank.getFluidAmount() > 0) {
-                // Phase 8: drawEffects()
-                // Thaumcraft.proxy.crucibleFroth, crucibleBubble, etc.
+                this.drawEffects();
             }
         }
 
         // Client heat smoothing
         if (this.world.isRemote && prevheat < 151 && this.heat >= 151) {
             this.heat = (short) (this.heat + 1);
+        }
+    }
+
+    private void drawEffects() {
+        if (this.heat > 150) {
+            Thaumcraft.proxy.crucibleFroth(this.world,
+                    this.pos.getX() + 0.2f + this.world.rand.nextFloat() * 0.6f,
+                    this.pos.getY() + this.getFluidHeight(),
+                    this.pos.getZ() + 0.2f + this.world.rand.nextFloat() * 0.6f);
+            if (this.tagAmount() > this.maxTags) {
+                for (int a = 0; a < 2; ++a) {
+                    Thaumcraft.proxy.crucibleFrothDown(this.world,
+                            this.pos.getX(),
+                            this.pos.getY() + 1.0f,
+                            this.pos.getZ() + this.world.rand.nextFloat());
+                    Thaumcraft.proxy.crucibleFrothDown(this.world,
+                            this.pos.getX() + 1.0f,
+                            this.pos.getY() + 1.0f,
+                            this.pos.getZ() + this.world.rand.nextFloat());
+                    Thaumcraft.proxy.crucibleFrothDown(this.world,
+                            this.pos.getX() + this.world.rand.nextFloat(),
+                            this.pos.getY() + 1.0f,
+                            this.pos.getZ());
+                    Thaumcraft.proxy.crucibleFrothDown(this.world,
+                            this.pos.getX() + this.world.rand.nextFloat(),
+                            this.pos.getY() + 1.0f,
+                            this.pos.getZ() + 1.0f);
+                }
+            }
+        }
+        if (this.world.rand.nextInt(6) == 0 && this.aspects.size() > 0) {
+            int color = this.aspects.getAspects()[this.world.rand.nextInt(this.aspects.size())].getColor() - 16777216;
+            int x = 5 + this.world.rand.nextInt(22);
+            int y = 5 + this.world.rand.nextInt(22);
+            this.delay = this.world.rand.nextInt(10);
+            this.prevcolor = color;
+            this.prevx = x;
+            this.prevy = y;
+            Color c = new Color(color);
+            float red = c.getRed() / 255.0f;
+            float green = c.getGreen() / 255.0f;
+            float blue = c.getBlue() / 255.0f;
+            Thaumcraft.proxy.crucibleBubble(this.world,
+                    this.pos.getX() + x / 32.0f + 0.015625f,
+                    this.pos.getY() + 0.05f + this.getFluidHeight(),
+                    this.pos.getZ() + y / 32.0f + 0.015625f,
+                    red, green, blue);
         }
     }
 
@@ -510,11 +558,18 @@ public class TileCrucible extends TileThaumcraft implements ITickable, IWandable
     @Override
     public boolean receiveClientEvent(int id, int type) {
         if (id == 1) {
-            // Phase 8: Thaumcraft.proxy.blockSparkle(...)
+            if (this.world.isRemote) {
+                Thaumcraft.proxy.blockSparkle(this.world, this.pos.getX(), this.pos.getY(), this.pos.getZ(), -9999, 5);
+            }
             return true;
         }
         if (id == 2) {
-            // Phase 8: Thaumcraft.proxy.crucibleBoilSound(...) + crucibleBoil(...)
+            Thaumcraft.proxy.crucibleBoilSound(this.world, this.pos.getX(), this.pos.getY(), this.pos.getZ());
+            if (this.world.isRemote) {
+                for (int q = 0; q < 10; ++q) {
+                    Thaumcraft.proxy.crucibleBoil(this.world, this.pos.getX(), this.pos.getY(), this.pos.getZ(), this, type);
+                }
+            }
             return true;
         }
         return super.receiveClientEvent(id, type);

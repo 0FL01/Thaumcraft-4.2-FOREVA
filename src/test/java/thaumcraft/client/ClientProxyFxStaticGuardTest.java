@@ -29,6 +29,16 @@ public class ClientProxyFxStaticGuardTest {
                 source.contains("public void sparkle(") && source.contains("EnumParticleTypes.REDSTONE"));
         assertTrue("ClientProxy must override particleCount using client particle settings",
                 source.contains("public int particleCount(") && source.contains("mc.gameSettings.particleSetting"));
+        assertTrue("ClientProxy must override crucibleFroth and crucibleFrothDown",
+                source.contains("public void crucibleFroth(")
+                        && source.contains("public void crucibleFrothDown("));
+        assertTrue("ClientProxy must override crucibleBubble with colored bubble path",
+                source.contains("public void crucibleBubble(")
+                        && source.contains("EnumParticleTypes.WATER_BUBBLE"));
+        assertTrue("ClientProxy must override crucibleBoilSound and crucibleBoil",
+                source.contains("public void crucibleBoilSound(")
+                        && source.contains("public void crucibleBoil(")
+                        && source.contains("TCSounds.BUBBLE"));
     }
 
     @Test

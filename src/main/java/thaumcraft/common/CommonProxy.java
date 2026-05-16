@@ -160,4 +160,19 @@ public class CommonProxy implements IGuiHandler {
     public int particleCount(int def) {
         return def;
     }
+
+    public void crucibleFroth(World world, float x, float y, float z) {
+    }
+
+    public void crucibleFrothDown(World world, float x, float y, float z) {
+    }
+
+    public void crucibleBubble(World world, float x, float y, float z, float red, float green, float blue) {
+    }
+
+    public void crucibleBoilSound(World world, int x, int y, int z) {
+    }
+
+    public void crucibleBoil(World world, int x, int y, int z, TileCrucible crucible, int type) {
+    }
 }
