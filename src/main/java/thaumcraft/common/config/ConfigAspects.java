@@ -13,6 +13,7 @@ public class ConfigAspects {
         registerVanillaBlocks();
         registerVanillaItems();
         registerOreDictionary();
+        registerEntityAspects();
     }
 
     private static void registerVanillaBlocks() {
@@ -187,5 +188,24 @@ public class ConfigAspects {
         ThaumcraftApi.registerObjectTag("blockGlass", new AspectList().add(Aspect.CRYSTAL, 2));
         ThaumcraftApi.registerObjectTag("paneGlass", new AspectList().add(Aspect.CRYSTAL, 1));
         ThaumcraftApi.registerObjectTag("blockWool", new AspectList().add(Aspect.PLANT, 2).add(Aspect.TOOL, 1));
+    }
+
+    private static void registerEntityAspects() {
+        // Minimal 1.7.10 parity baseline for research entity triggers in ConfigResearch.
+        ThaumcraftApi.registerEntityTag("minecraft:enderman",
+                new AspectList().add(Aspect.ELDRITCH, 4).add(Aspect.TRAVEL, 2).add(Aspect.AIR, 2),
+                new ThaumcraftApi.EntityTagsNBT[0]);
+        ThaumcraftApi.registerEntityTag("thaumcraft:brainyzombie",
+                new AspectList().add(Aspect.UNDEAD, 3).add(Aspect.MAN, 1).add(Aspect.MIND, 1).add(Aspect.EARTH, 1),
+                new ThaumcraftApi.EntityTagsNBT[0]);
+        ThaumcraftApi.registerEntityTag("thaumcraft:giantbrainyzombie",
+                new AspectList().add(Aspect.UNDEAD, 4).add(Aspect.MAN, 2).add(Aspect.MIND, 1).add(Aspect.EARTH, 2),
+                new ThaumcraftApi.EntityTagsNBT[0]);
+        ThaumcraftApi.registerEntityTag("thaumcraft:firebat",
+                new AspectList().add(Aspect.BEAST, 2).add(Aspect.FLIGHT, 1).add(Aspect.FIRE, 2),
+                new ThaumcraftApi.EntityTagsNBT[0]);
+        ThaumcraftApi.registerEntityTag("thaumcraft:primalorb",
+                new AspectList().add(Aspect.AIR, 5).add(Aspect.ENTROPY, 10).add(Aspect.MAGIC, 10).add(Aspect.ENERGY, 10),
+                new ThaumcraftApi.EntityTagsNBT[0]);
     }
 }

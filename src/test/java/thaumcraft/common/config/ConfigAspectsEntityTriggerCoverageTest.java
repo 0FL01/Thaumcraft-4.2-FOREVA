@@ -1,0 +1,88 @@
+package thaumcraft.common.config;
+
+import org.junit.Test;
+
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.HashSet;
+import java.util.Locale;
+import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
+public class ConfigAspectsEntityTriggerCoverageTest {
+
+    private static final Pattern ENTITY_TRIGGER_PATTERN = Pattern.compile("setEntityTriggers\\(([^)]*)\\)");
+    private static final Pattern REGISTER_ENTITY_TAG_PATTERN = Pattern.compile("registerEntityTag\\(\\s*\"([^\"]+)\"");
+    private static final Pattern QUOTED_STRING_PATTERN = Pattern.compile("\"([^\"]+)\"");
+
+    @Test
+    public void configResearchEntityTriggersHaveAspectsRegistration() throws IOException {
+        String configResearch = readFile("src/main/java/thaumcraft/common/config/ConfigResearch.java");
+        String configAspects = readFile("src/main/java/thaumcraft/common/config/ConfigAspects.java");
+
+        Set<String> triggerEntityKeys = extractTriggerEntityKeys(configResearch);
+        Set<String> registeredEntityKeys = extractRegisteredEntityKeys(configAspects);
+
+        Set<String> missing = new HashSet<>();
+        for (String entityKey : triggerEntityKeys) {
+            if (!registeredEntityKeys.contains(entityKey)) {
+                missing.add(entityKey);
+            }
+        }
+
+        assertFalse("ConfigResearch setEntityTriggers(...) has no entries", triggerEntityKeys.isEmpty());
+        assertTrue("Missing entity tag registrations in ConfigAspects: " + missing, missing.isEmpty());
+    }
+
+    private static Set<String> extractTriggerEntityKeys(String source) {
+        Set<String> out = new HashSet<>();
+        Matcher triggerCalls = ENTITY_TRIGGER_PATTERN.matcher(source);
+        while (triggerCalls.find()) {
+            Matcher quoted = QUOTED_STRING_PATTERN.matcher(triggerCalls.group(1));
+            while (quoted.find()) {
+                String trigger = quoted.group(1);
+                String normalized = normalizeTriggerToEntityKey(trigger);
+                if (normalized != null) {
+                    out.add(normalized);
+                }
+            }
+        }
+        return out;
+    }
+
+    private static Set<String> extractRegisteredEntityKeys(String source) {
+        Set<String> out = new HashSet<>();
+        Matcher matcher = REGISTER_ENTITY_TAG_PATTERN.matcher(source);
+        while (matcher.find()) {
+            out.add(matcher.group(1).toLowerCase(Locale.ROOT));
+        }
+        return out;
+    }
+
+    private static String normalizeTriggerToEntityKey(String trigger) {
+        if (trigger == null) {
+            return null;
+        }
+        String cleaned = trigger.trim();
+        if (cleaned.isEmpty()) {
+            return null;
+        }
+        if (cleaned.indexOf(':') >= 0) {
+            return cleaned.toLowerCase(Locale.ROOT);
+        }
+        if (cleaned.startsWith("Thaumcraft.") && cleaned.length() > "Thaumcraft.".length()) {
+            return "thaumcraft:" + cleaned.substring("Thaumcraft.".length()).toLowerCase(Locale.ROOT);
+        }
+        return "minecraft:" + cleaned.toLowerCase(Locale.ROOT);
+    }
+
+    private static String readFile(String path) throws IOException {
+        return new String(Files.readAllBytes(Paths.get(path)), StandardCharsets.UTF_8);
+    }
+}
