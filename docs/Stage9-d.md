@@ -286,6 +286,28 @@ Port only the reference alchemical smelting bonus registrations that are tied to
 
 Depends on current item metadata parity for `itemNugget`, edible nuggets, and cinnabar/native cluster outputs. This should not expand into full Stage 9-a smelting recipe parity.
 
+#### Checkpoint 2026-05-16 — GAP-4 smelting bonus baseline restored
+
+Статус: reference-like alchemical smelting bonus registrations added for non-GUI verification; full progression/manual gameplay validation remains open.
+
+Что сделано:
+
+- Added `initializeSmeltingBonusBaseline()` in `ConfigRecipes` and wired it into `ConfigRecipes.init()`.
+- Restored ore-dictionary smelting bonus mappings: `oreGold`, `oreIron`, `oreCinnabar`, `oreCopper`, `oreTin`, `oreSilver`, `oreLead`.
+- Restored native cluster smelting bonus mappings for nugget metas `31`, `16`, `21`, `17`, `18`, `19`, `20`.
+- Restored meat/fish smelting bonus baseline using current 1.12.2 item surface (`Items.CHICKEN`, `Items.BEEF`, `Items.PORKCHOP`, wildcard `Items.FISH`) mapped to `itemNuggetEdible`.
+- Added static guard `ConfigRecipesSmeltingBonusCoverageTest` for baseline call presence and mapping coverage.
+
+Проверки:
+
+- `./scripts/dev.sh test` — passed.
+- `./scripts/dev.sh validate --smoke` — passed (including `smoke-server` ready state).
+
+Ограничения:
+
+- Static/server smoke validation does not confirm exact in-world arcane furnace output rates across every ore-provider mod pack.
+- Stage 9-d still has open GAP-5 and runtime/manual scenario evidence requirements.
+
 ### GAP-5: Thaumcraft alchemy item/block aspect tags are incomplete
 
 **Статус:** частично реализовано  

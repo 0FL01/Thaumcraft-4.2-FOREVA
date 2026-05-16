@@ -58,6 +58,7 @@ public class ConfigRecipes {
         initializeInfusionGolemDeviceRecipeBaseline();
         initializeInfusionEquipmentArmorRecipeBaseline();
         initializeCrucibleRecipeBaseline();
+        initializeSmeltingBonusBaseline();
         if (recipeArcaneStone2 != null) {
             ConfigResearch.recipes.put("ArcaneStone2", recipeArcaneStone2);
         }
@@ -391,6 +392,30 @@ public class ConfigRecipes {
                         new ItemStack(ConfigItems.itemGolemCore, 1, 5),
                         coreBlank,
                         new AspectList().add(Aspect.WATER, 5).add(Aspect.VOID, 5)));
+    }
+
+    private static void initializeSmeltingBonusBaseline() {
+        ThaumcraftApi.addSmeltingBonus("oreGold", new ItemStack(Items.GOLD_NUGGET));
+        ThaumcraftApi.addSmeltingBonus("oreIron", new ItemStack(ConfigItems.itemNugget, 1, 0));
+        ThaumcraftApi.addSmeltingBonus("oreCinnabar", new ItemStack(ConfigItems.itemNugget, 1, 5));
+        ThaumcraftApi.addSmeltingBonus("oreCopper", new ItemStack(ConfigItems.itemNugget, 1, 1));
+        ThaumcraftApi.addSmeltingBonus("oreTin", new ItemStack(ConfigItems.itemNugget, 1, 2));
+        ThaumcraftApi.addSmeltingBonus("oreSilver", new ItemStack(ConfigItems.itemNugget, 1, 3));
+        ThaumcraftApi.addSmeltingBonus("oreLead", new ItemStack(ConfigItems.itemNugget, 1, 4));
+
+        ThaumcraftApi.addSmeltingBonus(new ItemStack(ConfigItems.itemNugget, 1, 31), new ItemStack(Items.GOLD_NUGGET));
+        ThaumcraftApi.addSmeltingBonus(new ItemStack(ConfigItems.itemNugget, 1, 16), new ItemStack(ConfigItems.itemNugget, 1, 0));
+        ThaumcraftApi.addSmeltingBonus(new ItemStack(ConfigItems.itemNugget, 1, 21), new ItemStack(ConfigItems.itemNugget, 1, 5));
+        ThaumcraftApi.addSmeltingBonus(new ItemStack(ConfigItems.itemNugget, 1, 17), new ItemStack(ConfigItems.itemNugget, 1, 1));
+        ThaumcraftApi.addSmeltingBonus(new ItemStack(ConfigItems.itemNugget, 1, 18), new ItemStack(ConfigItems.itemNugget, 1, 2));
+        ThaumcraftApi.addSmeltingBonus(new ItemStack(ConfigItems.itemNugget, 1, 19), new ItemStack(ConfigItems.itemNugget, 1, 3));
+        ThaumcraftApi.addSmeltingBonus(new ItemStack(ConfigItems.itemNugget, 1, 20), new ItemStack(ConfigItems.itemNugget, 1, 4));
+
+        ItemStack edibleNugget = new ItemStack(ConfigItems.itemNuggetEdible);
+        ThaumcraftApi.addSmeltingBonus(new ItemStack(Items.CHICKEN), edibleNugget);
+        ThaumcraftApi.addSmeltingBonus(new ItemStack(Items.BEEF), edibleNugget);
+        ThaumcraftApi.addSmeltingBonus(new ItemStack(Items.PORKCHOP), edibleNugget);
+        ThaumcraftApi.addSmeltingBonus(new ItemStack(Items.FISH, 1, OreDictionary.WILDCARD_VALUE), edibleNugget);
     }
 
     private static void initializeArcaneRecipeBaseline() {
