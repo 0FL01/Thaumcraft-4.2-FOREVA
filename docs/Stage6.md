@@ -1637,6 +1637,31 @@ Mapping:
 - The allowlist guard is static and does not replace runtime combat/drop sound verification.
 - Stage 6 runtime sound matrix scenarios are still open.
 
+### 8.2.41 Cultist home/faction contract checkpoint — 2026-05-16
+
+Статус: server-visible `EntityCultist` home/faction baseline aligned with reference semantics.
+
+Что сделано:
+
+- Replaced ad-hoc `homeX/homeY/homeZ` fields with reference-style home persistence keys:
+  - read: `HomeD/HomeX/HomeY/HomeZ` with `setHomePosAndDistance(...)`
+  - write: `HomeD/HomeX/HomeY/HomeZ` only when a home is set.
+- Restored base cultist faction behavior:
+  - `isOnSameTeam(...)` now treats `EntityCultist` and `EntityCultistLeader` as allies.
+  - `canAttackClass(...)` now refuses cultist subclasses (`EntityCultistCleric`, `EntityCultistKnight`, `EntityCultistLeader`).
+- Added `EntityCultistBehaviorContractTest` static guard for these contracts.
+
+Проверки:
+
+- `./scripts/dev.sh test` — passed (`25/25`).
+- `./scripts/dev.sh validate --smoke` — passed (`6/6`), including `smoke-server` ready state.
+- `git diff --check` — passed.
+
+Оставшиеся ограничения:
+
+- Runtime combat matrix verification for all cultist/boss scenarios is still open in Stage 6.
+- This checkpoint does not close broader Stage 6 manual scenario requirements.
+
 ### 8.3 Minimal Stage 6 manual scenario matrix
 
 Утвержденный минимальный формат evidence: таблица в этом документе или checkpoint report, с обязательными полями:

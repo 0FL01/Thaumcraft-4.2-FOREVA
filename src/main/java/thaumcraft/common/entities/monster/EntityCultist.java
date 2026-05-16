@@ -1,13 +1,17 @@
 package thaumcraft.common.entities.monster;
 
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.pathfinding.PathNavigate;
 import net.minecraft.pathfinding.PathNavigateGround;
+import net.minecraft.util.math.BlockPos;
 import thaumcraft.common.config.ConfigItems;
+import thaumcraft.common.entities.monster.boss.EntityCultistLeader;
 import thaumcraft.common.items.ItemResource;
 
 public class EntityCultist extends net.minecraft.entity.monster.EntityMob {
-    private int homeX, homeY, homeZ;
 
     public EntityCultist(net.minecraft.world.World world) {
         super(world);
@@ -30,19 +34,25 @@ public class EntityCultist extends net.minecraft.entity.monster.EntityMob {
     }
 
     @Override
-    public void readEntityFromNBT(net.minecraft.nbt.NBTTagCompound nbt) {
+    public void readEntityFromNBT(NBTTagCompound nbt) {
         super.readEntityFromNBT(nbt);
-        this.homeX = nbt.getInteger("homeX");
-        this.homeY = nbt.getInteger("homeY");
-        this.homeZ = nbt.getInteger("homeZ");
+        if (nbt.hasKey("HomeD")) {
+            this.setHomePosAndDistance(
+                    new BlockPos(nbt.getInteger("HomeX"), nbt.getInteger("HomeY"), nbt.getInteger("HomeZ")),
+                    nbt.getInteger("HomeD"));
+        }
     }
 
     @Override
-    public void writeEntityToNBT(net.minecraft.nbt.NBTTagCompound nbt) {
+    public void writeEntityToNBT(NBTTagCompound nbt) {
         super.writeEntityToNBT(nbt);
-        nbt.setInteger("homeX", this.homeX);
-        nbt.setInteger("homeY", this.homeY);
-        nbt.setInteger("homeZ", this.homeZ);
+        if (this.hasHome() && this.getMaximumHomeDistance() > 0.0F) {
+            BlockPos home = this.getHomePosition();
+            nbt.setInteger("HomeD", (int)this.getMaximumHomeDistance());
+            nbt.setInteger("HomeX", home.getX());
+            nbt.setInteger("HomeY", home.getY());
+            nbt.setInteger("HomeZ", home.getZ());
+        }
     }
 
     @Override
@@ -59,6 +69,19 @@ public class EntityCultist extends net.minecraft.entity.monster.EntityMob {
         if (wasRecentlyHit && this.rand.nextInt(200) - looting < 5) {
             this.entityDropItem(new ItemStack(ConfigItems.itemEldritchObject, 1, 1), 1.0F);
         }
+    }
+
+    @Override
+    public boolean isOnSameTeam(Entity entityIn) {
+        return entityIn instanceof EntityCultist || entityIn instanceof EntityCultistLeader || super.isOnSameTeam(entityIn);
+    }
+
+    @Override
+    public boolean canAttackClass(Class<? extends EntityLivingBase> cls) {
+        if (cls == EntityCultistCleric.class || cls == EntityCultistLeader.class || cls == EntityCultistKnight.class) {
+            return false;
+        }
+        return super.canAttackClass(cls);
     }
 
     // CultistCleric gets ambient chant separately

@@ -55,6 +55,7 @@ Latest Stage 9-e delta: server-side research-note hex flow baseline is now wired
 Incremental Stage 9-e delta: packet serialization coverage now also includes `PacketPlayerCompleteToServer` round-trip fields (`key`, `dim`, `username`, `type`) to guard primary/secondary research-action payload integrity, and `PacketPlayerCompleteToServerStaticGuardTest` now enforces prerequisite/type-gating + primary-note path presence in the handler source.
 
 Latest Stage 6 delta: `EntityCultist` no longer overrides ambient/hurt/death sounds with explicit `null` (restoring base hostile sound inheritance consistent with reference class shape), `EntityCultistSoundContractTest` now guards this contract, `TCSoundsStaticCoverageTest` enforces static key/resource consistency across `TCSounds`, `sounds.json`, and bundled `.ogg` assets, and `MonsterSoundNullOverrideAllowlistTest` now prevents new non-allowlisted `null` sound overrides in Stage 6 monster/boss classes (`test` + `validate` passing).
+Incremental Stage 6 delta: `EntityCultist` now persists and restores home position with reference-style `HomeD/HomeX/HomeY/HomeZ` semantics and restores cultist faction targeting contracts (`isOnSameTeam` + `canAttackClass`), guarded by `EntityCultistBehaviorContractTest` with passing `test` + `validate --smoke`.
 
 ## Archive
 
