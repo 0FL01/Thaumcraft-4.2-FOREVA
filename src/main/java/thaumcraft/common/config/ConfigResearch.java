@@ -37,6 +37,7 @@ public class ConfigResearch {
         initAlchemyResearchBaseline();
         initArtificeResearchBaseline();
         initGolemancyResearchBaseline();
+        initGolemancyResearchTextOnlyBaseline();
         initThaumaturgyResearchBaseline();
         initBasicResearchTextOnlyExtended();
         initThaumaturgyResearchTextOnlyBaseline();
@@ -2645,6 +2646,25 @@ public class ConfigResearch {
                 .registerResearchItem();
 
         new ResearchItem(
+                "NODEJAR",
+                "BASICS",
+                new AspectList()
+                        .add(Aspect.AURA, 6)
+                        .add(Aspect.GREED, 3)
+                        .add(Aspect.EXCHANGE, 3)
+                        .add(Aspect.MOTION, 3),
+                -7,
+                4,
+                3,
+                new ItemStack(ConfigBlocks.blockJar, 1, 0))
+                .setPages(
+                        new ResearchPage("tc.research_page.NODEJAR.1"),
+                        new ResearchPage("tc.research_page.NODEJAR.2"))
+                .setParents("NODEPRESERVE")
+                .setConcealed()
+                .registerResearchItem();
+
+        new ResearchItem(
                 "CRIMSON",
                 "BASICS",
                 new AspectList(),
@@ -2659,6 +2679,126 @@ public class ConfigResearch {
                 .setSpecial()
                 .registerResearchItem();
         ThaumcraftApi.addWarpToResearch("CRIMSON", 3);
+    }
+
+    private static void initGolemancyResearchTextOnlyBaseline() {
+        new ResearchItem(
+                "GOLEMSTRAW",
+                "GOLEMANCY",
+                new AspectList()
+                        .add(Aspect.SOUL, 3)
+                        .add(Aspect.MOTION, 3)
+                        .add(Aspect.CROP, 3)
+                        .add(Aspect.EXCHANGE, 3),
+                0,
+                2,
+                2,
+                new ItemStack(ConfigItems.itemGolemPlacer, 1, 0))
+                .setPages(
+                        new ResearchPage("tc.research_page.GOLEMSTRAW.1"),
+                        new ResearchPage("tc.research_page.GOLEMSTRAW.2"),
+                        new ResearchPage("tc.research_page.GOLEMSTRAW.3"))
+                .setParents("HUNGRYCHEST")
+                .registerResearchItem();
+
+        new ResearchItem(
+                "GOLEMBELL",
+                "GOLEMANCY",
+                new AspectList(),
+                3,
+                0,
+                0,
+                new ItemStack(ConfigItems.itemGolemBell))
+                .setPages(
+                        new ResearchPage("tc.research_page.GOLEMBELL.1"),
+                        new ResearchPage("tc.research_page.GOLEMBELL.2"))
+                .setParents("GOLEMSTRAW")
+                .setStub()
+                .registerResearchItem();
+
+        new ResearchItem(
+                "UPGRADEAIR",
+                "GOLEMANCY",
+                new AspectList().add(Aspect.AIR, 6).add(Aspect.MOTION, 3),
+                7,
+                -3,
+                1,
+                new ItemStack(ConfigItems.itemGolemUpgrade, 1, 0))
+                .setPages(new ResearchPage("tc.research_page.UPGRADEAIR.1"))
+                .setConcealed()
+                .setSecondary()
+                .setParents("GOLEMBELL")
+                .registerResearchItem();
+
+        new ResearchItem(
+                "UPGRADEEARTH",
+                "GOLEMANCY",
+                new AspectList().add(Aspect.EARTH, 6).add(Aspect.LIFE, 3),
+                6,
+                -2,
+                1,
+                new ItemStack(ConfigItems.itemGolemUpgrade, 1, 1))
+                .setPages(new ResearchPage("tc.research_page.UPGRADEEARTH.1"))
+                .setConcealed()
+                .setSecondary()
+                .setParents("GOLEMBELL")
+                .registerResearchItem();
+
+        new ResearchItem(
+                "UPGRADEFIRE",
+                "GOLEMANCY",
+                new AspectList().add(Aspect.FIRE, 6).add(Aspect.ENERGY, 3),
+                5,
+                -1,
+                1,
+                new ItemStack(ConfigItems.itemGolemUpgrade, 1, 2))
+                .setPages(new ResearchPage("tc.research_page.UPGRADEFIRE.1"))
+                .setConcealed()
+                .setSecondary()
+                .setParents("GOLEMBELL")
+                .registerResearchItem();
+
+        new ResearchItem(
+                "UPGRADEWATER",
+                "GOLEMANCY",
+                new AspectList().add(Aspect.WATER, 6).add(Aspect.SENSES, 3),
+                5,
+                1,
+                1,
+                new ItemStack(ConfigItems.itemGolemUpgrade, 1, 3))
+                .setPages(new ResearchPage("tc.research_page.UPGRADEWATER.1"))
+                .setConcealed()
+                .setSecondary()
+                .setParents("GOLEMBELL")
+                .registerResearchItem();
+
+        new ResearchItem(
+                "UPGRADEORDER",
+                "GOLEMANCY",
+                new AspectList().add(Aspect.ORDER, 6).add(Aspect.MIND, 3),
+                6,
+                2,
+                1,
+                new ItemStack(ConfigItems.itemGolemUpgrade, 1, 4))
+                .setPages(new ResearchPage("tc.research_page.UPGRADEORDER.1"))
+                .setConcealed()
+                .setSecondary()
+                .setParents("GOLEMBELL")
+                .registerResearchItem();
+
+        new ResearchItem(
+                "UPGRADEENTROPY",
+                "GOLEMANCY",
+                new AspectList().add(Aspect.ENTROPY, 6).add(Aspect.MIND, 3),
+                7,
+                3,
+                1,
+                new ItemStack(ConfigItems.itemGolemUpgrade, 1, 5))
+                .setPages(new ResearchPage("tc.research_page.UPGRADEENTROPY.1"))
+                .setConcealed()
+                .setSecondary()
+                .setParents("GOLEMBELL")
+                .registerResearchItem();
     }
 
     private static void initThaumaturgyResearchTextOnlyBaseline() {
