@@ -139,6 +139,32 @@ Port the reference `initializeAlchemyRecipes()` data into the 1.12.2 `ConfigReci
 
 Depends on GAP-2 because reference recipes are also stored in `ConfigResearch.recipes`. Depends on GAP-5 because missing object/aspect tags can make catalysts and generated aspect data wrong even after recipe registration. Runtime smoke/manual checks are required because recipe data can compile but be unusable.
 
+#### Checkpoint 2026-05-16 — GAP-1 crucible alchemy corpus expanded
+
+Статус: major reference-aligned crucible registration slice restored for Stage 9-d; full closure still depends on remaining gating/runtime evidence.
+
+Что сделано:
+
+- Expanded `initializeCrucibleRecipeBaseline()` with the missing reference-style alchemy corpus:
+  - `BalancedShard_0..5`;
+  - duplication/manufacture/entropic alternates: `AltGunpowder`, `AltSlime`, `AltClay`, `AltGlowstone`, `AltInk`, `AltWeb`, `AltMossyCobble`, `AltIce`, `AltCrackedBrick`, `AltBonemeal`;
+  - ore purification/transmutation chain: `PureIron`, `PureGold`, conditional `PureCopper/Tin/Silver/Lead`, plus `TransIron`, `TransGold`, conditional `TransCopper/Tin/Silver/Lead`;
+  - alchemy progression entries: `EtherealBloom`, `LiquidDeath`, `BottleTaint`;
+  - golem core missing entry `CoreGather`;
+  - utility alchemy entries `BathSalts` and `SaneSoap`.
+- Added taint-essence catalyst initialization for `BottleTaint` via `IEssentiaContainerItem` aspect payload, matching reference-shaped catalyst semantics.
+- Added static guard `ConfigRecipesCrucibleAlchemyCoverageTest` to lock this key registration baseline.
+
+Проверки:
+
+- `./scripts/dev.sh test` — passed.
+- `./scripts/dev.sh validate --smoke` — passed (including `smoke-server` ready state).
+
+Ограничения:
+
+- This checkpoint restores registration data but does not yet provide full manual progression evidence for every crucible/thaumatorium scenario in GAP-6.
+- Stage 9-d completion still depends on end-to-end runtime behavior evidence and remaining research-gate validation slices.
+
 ### GAP-2: Research recipe map and crucible recipe gates are absent
 
 **Статус:** отсутствует  
