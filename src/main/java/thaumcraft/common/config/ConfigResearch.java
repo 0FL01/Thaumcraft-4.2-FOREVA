@@ -206,6 +206,29 @@ public class ConfigResearch {
                 .setParents("RESEARCH")
                 .registerResearchItem();
 
+        ArrayList<IRecipe> clusterRecipes = new ArrayList<>();
+        for (int a = 0; a <= 6; ++a) {
+            clusterRecipes.add((IRecipe) recipes.get("Clusters" + a));
+        }
+        new ResearchItem(
+                "ORE",
+                "BASICS",
+                new AspectList(),
+                -2,
+                -2,
+                0,
+                new ItemStack(ConfigBlocks.blockCustomOre, 1, Short.MAX_VALUE))
+                .setPages(
+                        new ResearchPage("tc.research_page.ORE.1"),
+                        new ResearchPage("tc.research_page.ORE.2"),
+                        new ResearchPage(clusterRecipes.toArray(new IRecipe[0])),
+                        new ResearchPage("tc.research_page.ORE.3"),
+                        new ResearchPage("tc.research_page.ORE.4"))
+                .setStub()
+                .setRound()
+                .setAutoUnlock()
+                .registerResearchItem();
+
         new ResearchItem(
                 "PLANTS",
                 "BASICS",
