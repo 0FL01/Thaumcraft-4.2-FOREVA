@@ -14,6 +14,7 @@ import net.minecraft.init.Items;
 import net.minecraft.init.MobEffects;
 import net.minecraft.item.ItemFood;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.event.entity.item.ItemExpireEvent;
@@ -34,6 +35,7 @@ import thaumcraft.api.wands.ItemFocusBasic;
 import thaumcraft.common.Thaumcraft;
 import thaumcraft.common.config.Config;
 import thaumcraft.common.config.ConfigItems;
+import thaumcraft.common.entities.golems.EntityGolemBase;
 import thaumcraft.common.entities.golems.EntityTravelingTrunk;
 import thaumcraft.common.entities.monster.EntityBrainyZombie;
 import thaumcraft.common.entities.monster.EntityGiantBrainyZombie;
@@ -266,9 +268,14 @@ public class EventHandlerEntity {
      */
     @SubscribeEvent
     public void onEntityInteract(PlayerInteractEvent.EntityInteract event) {
-        if (event.getWorld().isRemote) return;
-        // Phase 8: Pech trade and other entity interactions
-        // Future: if (target instanceof EntityPech) { open trade GUI }
+        if (event.getTarget() instanceof EntityGolemBase
+                && ((EntityGolemBase) event.getTarget()).getOwnerName().length() > 0
+                && !((EntityGolemBase) event.getTarget()).getOwnerName().equals(event.getEntityPlayer().getName())) {
+            if (!event.getWorld().isRemote) {
+                event.getEntityPlayer().sendMessage(new TextComponentTranslation("You are not my Master!"));
+            }
+            event.setCanceled(true);
+        }
     }
 
     /**
