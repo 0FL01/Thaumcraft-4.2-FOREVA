@@ -38,7 +38,7 @@ public class RenderMindSpider extends RenderLiving<EntityMindSpider> {
 
     @Override
     protected void preRenderCallback(EntityMindSpider entity, float partialTickTime) {
-        float scale = Math.max(0.1F, entity.width / 1.4F);
+        float scale = entity.spiderScaleAmount();
         GlStateManager.scale(scale, scale, scale);
     }
 

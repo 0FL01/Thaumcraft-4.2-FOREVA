@@ -1368,6 +1368,30 @@ Some entities may be hard to trigger naturally until recipes/research/spawn cont
 
 - Это viewer-gating baseline; полная parity по mind spider rendering (точная reference alpha-fade модель и legacy GL-pass нюансы) остаётся открытой по GAP-3/GAP-6.
 
+### Checkpoint 2026-05-16 — restore mind spider synced harmless/viewer entity contracts
+
+Статус: частично продвинут.
+
+Что сделано:
+
+- `EntityMindSpider` переведен на reference-shaped synced state contracts:
+  - добавлены `DataParameter<Byte> HARMLESS` и `DataParameter<String> VIEWER` + `entityInit()` registration;
+  - `isHarmless()`/`setHarmless(...)` теперь работают через `dataManager`, с `lifeSpan = 1200` при harmless-mode;
+  - добавлены NBT read/write contracts для `"harmless"` и `"viewer"`;
+  - добавлен `spiderScaleAmount()` accessor (`0.3F`) и `getExperiencePoints(...)` gating при harmless-state.
+- `RenderMindSpider` scale callback переведен на `entity.spiderScaleAmount()` вместо fallback масштаба через width.
+- `ClientProxyEntityRendererRegistrationStaticGuardTest` расширен проверками:
+  - `RenderMindSpider` содержит `entity.spiderScaleAmount()` contract;
+  - `EntityMindSpider` содержит `HARMLESS`/`VIEWER` data-manager contracts, `isHarmless`, `spiderScaleAmount`, и NBT keys.
+
+Проверки:
+
+- `./scripts/dev.sh validate --smoke` — passed.
+
+Ограничения:
+
+- Это entity sync/persistence baseline; полная parity по reference render-pass/alpha/lightmap деталям для mind spider остаётся открытой по GAP-3/GAP-6.
+
 - [ ] Add client-only entity renderer registration hook.
 - [ ] Register every entity from `ConfigEntities.ENTITIES` with a custom or vanilla-equivalent renderer.
 - [ ] Port item-like/transient/projectile renderers.

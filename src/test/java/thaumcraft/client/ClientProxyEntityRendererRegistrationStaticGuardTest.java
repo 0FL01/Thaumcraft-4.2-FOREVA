@@ -170,7 +170,7 @@ public class ClientProxyEntityRendererRegistrationStaticGuardTest {
                         && mindSpiderRenderer.contains("textures/models/taint_spider.png")
                         && mindSpiderRenderer.contains("textures/models/taint_spider_eyes.png")
                         && mindSpiderRenderer.contains("this.addLayer(new SpiderEyesLayer())")
-                        && mindSpiderRenderer.contains("entity.width / 1.4F")
+                        && mindSpiderRenderer.contains("entity.spiderScaleAmount()")
                         && mindSpiderRenderer.contains("entity.getViewer()")
                         && mindSpiderRenderer.contains("Minecraft.getMinecraft().player.getName()"));
         String taintSpiderRenderer = readFile("src/main/java/thaumcraft/client/renderers/entity/RenderTaintSpider.java");
@@ -289,8 +289,17 @@ public class ClientProxyEntityRendererRegistrationStaticGuardTest {
                         && taintSheepEntity.contains("Blocks.WOOL")
                         && taintSheepEntity.contains("\"Sheared\""));
         String mindSpiderEntity = readFile("src/main/java/thaumcraft/common/entities/monster/EntityMindSpider.java");
-        assertTrue("EntityMindSpider must expose viewer accessor for viewer-only render gating",
-                mindSpiderEntity.contains("public String getViewer()"));
+        assertTrue("EntityMindSpider must expose viewer accessor and synced harmless/viewer data contracts",
+                mindSpiderEntity.contains("public String getViewer()")
+                        && mindSpiderEntity.contains("private static final DataParameter<Byte> HARMLESS")
+                        && mindSpiderEntity.contains("private static final DataParameter<String> VIEWER")
+                        && mindSpiderEntity.contains("this.dataManager.register(HARMLESS, (byte) 0)")
+                        && mindSpiderEntity.contains("this.dataManager.register(VIEWER, \"\")")
+                        && mindSpiderEntity.contains("public boolean isHarmless()")
+                        && mindSpiderEntity.contains("public float spiderScaleAmount()")
+                        && mindSpiderEntity.contains("this.dataManager.set(HARMLESS, harmless ? (byte) 1 : (byte) 0)")
+                        && mindSpiderEntity.contains("nbt.setByte(\"harmless\"")
+                        && mindSpiderEntity.contains("nbt.setString(\"viewer\""));
         assertTrue("ClientProxy must iterate ConfigEntities.ENTITIES for renderer registration coverage",
                 source.contains("for (net.minecraftforge.fml.common.registry.EntityEntry entry : ConfigEntities.ENTITIES)"));
         assertTrue("ClientProxy must keep fallback RenderNoop registrations for remaining entities",
