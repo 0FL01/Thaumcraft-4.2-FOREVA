@@ -24,7 +24,7 @@ public class ClientProxyEntityRendererRegistrationStaticGuardTest {
                         && source.contains("registerEntityRenderer(EntityFollowingItem.class, manager -> new RenderEntityItem(manager, renderItem), registered);")
                         && source.contains("registerEntityRenderer(EntityItemGrate.class, manager -> new RenderEntityItem(manager, renderItem), registered);"));
         assertTrue("ClientProxy must keep non-noop projectile baselines plus dedicated aspect-orb renderer",
-                source.contains("registerEntityRenderer(EntityDart.class, manager -> new RenderSnowball<>(manager, Items.ARROW, renderItem), registered);")
+                source.contains("registerEntityRenderer(EntityDart.class, RenderDart::new, registered);")
                         && source.contains("registerEntityRenderer(EntityPrimalArrow.class,")
                         && source.contains("registerEntityRenderer(EntityBottleTaint.class,")
                         && source.contains("registerEntityRenderer(EntityAlumentum.class, RenderAlumentum::new, registered);")
@@ -162,6 +162,10 @@ public class ClientProxyEntityRendererRegistrationStaticGuardTest {
                 alumentumRenderer.contains("extends Render<EntityAlumentum>")
                         && alumentumRenderer.contains("intentional no-op draw path")
                         && alumentumRenderer.contains("return null;"));
+        String dartRenderer = readFile("src/main/java/thaumcraft/client/renderers/entity/RenderDart.java");
+        assertTrue("RenderDart must provide dedicated arrow renderer baseline",
+                dartRenderer.contains("extends RenderArrow<EntityDart>")
+                        && dartRenderer.contains("new ResourceLocation(\"textures/entity/arrow.png\")"));
         String eldritchGuardianRenderer = readFile("src/main/java/thaumcraft/client/renderers/entity/RenderEldritchGuardian.java");
         assertTrue("RenderEldritchGuardian must provide dedicated guardian texture baseline",
                 eldritchGuardianRenderer.contains("extends RenderBiped<EntityEldritchGuardian>")

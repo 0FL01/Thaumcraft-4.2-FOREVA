@@ -2289,6 +2289,28 @@ Some entities may be hard to trigger naturally until recipes/research/spawn cont
 
 - Это no-op renderer baseline без ручной визуальной проверки; точные runtime визуальные ожидания для Alumentum остаются в общем Stage 8-d visual parity matrix.
 
+### Checkpoint 2026-05-17 — replace dart snowball fallback with dedicated arrow renderer baseline
+
+Статус: частично продвинут.
+
+Что сделано:
+
+- `EntityDart` переведен с `RenderSnowball` на dedicated `RenderDart`.
+- Добавлен `RenderDart` с reference-shaped baseline contract:
+  - dedicated arrow texture path (`textures/entity/arrow.png`);
+  - explicit `RenderArrow<EntityDart>` renderer type вместо snowball fallback.
+- `ClientProxyEntityRendererRegistrationStaticGuardTest` обновлен:
+  - registration contract `EntityDart -> RenderDart::new`;
+  - renderer contract checks на `RenderArrow` + arrow texture binding.
+
+Проверки:
+
+- `./scripts/dev.sh validate --smoke` — passed.
+
+Ограничения:
+
+- Это renderer baseline без ручной визуальной проверки; точные runtime анимационные/GL нюансы legacy `RenderDart` остаются в общем Stage 8-d visual parity matrix.
+
 - [ ] Add client-only entity renderer registration hook.
 - [ ] Register every entity from `ConfigEntities.ENTITIES` with a custom or vanilla-equivalent renderer.
 - [ ] Port item-like/transient/projectile renderers.
