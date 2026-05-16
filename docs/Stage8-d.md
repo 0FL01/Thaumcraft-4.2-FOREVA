@@ -2177,6 +2177,30 @@ Some entities may be hard to trigger naturally until recipes/research/spawn cont
 
 - Это renderer baseline без ручной визуальной проверки; exact legacy GL-state нюансы остаются в общем Stage 8-d visual parity matrix.
 
+### Checkpoint 2026-05-17 — replace ember snowball fallback with dedicated renderer baseline
+
+Статус: частично продвинут.
+
+Что сделано:
+
+- `EntityEmber` переведен с `RenderSnowball` на dedicated `RenderEmber`.
+- Добавлен `RenderEmber` с reference-shaped contracts:
+  - particle atlas binding (`textures/misc/particles.png`);
+  - additive billboard facing camera;
+  - duration-driven frame/scale profile (`ticksExisted / duration`, `0.25F + lifeFraction`);
+  - alpha/tint and lightmap baseline for projectile FX sprite.
+- `ClientProxyEntityRendererRegistrationStaticGuardTest` обновлен:
+  - registration contract `EntityEmber -> RenderEmber::new`;
+  - renderer contract checks на duration/scale/frame-surface behavior.
+
+Проверки:
+
+- `./scripts/dev.sh validate --smoke` — passed.
+
+Ограничения:
+
+- Это renderer baseline без ручной визуальной проверки; точные legacy GL nuances остаются в общем Stage 8-d visual parity matrix.
+
 - [ ] Add client-only entity renderer registration hook.
 - [ ] Register every entity from `ConfigEntities.ENTITIES` with a custom or vanilla-equivalent renderer.
 - [ ] Port item-like/transient/projectile renderers.

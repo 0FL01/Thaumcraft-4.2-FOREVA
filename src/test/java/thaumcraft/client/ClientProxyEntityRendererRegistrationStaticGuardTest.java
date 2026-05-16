@@ -35,7 +35,7 @@ public class ClientProxyEntityRendererRegistrationStaticGuardTest {
                         && source.contains("registerEntityRenderer(EntityGolemOrb.class, RenderElectricOrb::new, registered);")
                         && source.contains("registerEntityRenderer(EntityShockOrb.class, RenderElectricOrb::new, registered);")
                         && source.contains("registerEntityRenderer(EntityExplosiveOrb.class, RenderExplosiveOrb::new, registered);")
-                        && source.contains("registerEntityRenderer(EntityEmber.class, manager -> new RenderSnowball<>(manager, Items.BLAZE_POWDER, renderItem), registered);")
+                        && source.contains("registerEntityRenderer(EntityEmber.class, RenderEmber::new, registered);")
                         && source.contains("registerEntityRenderer(EntityGolemBobber.class, manager -> new RenderSnowball<>(manager, Items.FISHING_ROD, renderItem), registered);")
                         && source.contains("registerEntityRenderer(EntityAspectOrb.class, RenderAspectOrb::new, registered);")
                         && source.contains("registerEntityRenderer(EntityFallingTaint.class, manager -> new RenderSnowball<>(manager, Items.SLIME_BALL, renderItem), registered);"));
@@ -126,6 +126,14 @@ public class ClientProxyEntityRendererRegistrationStaticGuardTest {
                         && explosiveOrbRenderer.contains("entity.ticksExisted % 4")
                         && explosiveOrbRenderer.contains("GlStateManager.scale(0.7F, 0.7F, 0.7F)")
                         && explosiveOrbRenderer.contains("DefaultVertexFormats.POSITION_TEX"));
+        String emberRenderer = readFile("src/main/java/thaumcraft/client/renderers/entity/RenderEmber.java");
+        assertTrue("RenderEmber must provide duration-driven particles billboard baseline",
+                emberRenderer.contains("extends Render<EntityEmber>")
+                        && emberRenderer.contains("textures/misc/particles.png")
+                        && emberRenderer.contains("entity.duration")
+                        && emberRenderer.contains("8.0F * ((float) entity.ticksExisted / (float) entity.duration)")
+                        && emberRenderer.contains("0.25F + lifeFraction")
+                        && emberRenderer.contains("DefaultVertexFormats.POSITION_TEX_COLOR"));
         String eldritchGuardianRenderer = readFile("src/main/java/thaumcraft/client/renderers/entity/RenderEldritchGuardian.java");
         assertTrue("RenderEldritchGuardian must provide dedicated guardian texture baseline",
                 eldritchGuardianRenderer.contains("extends RenderBiped<EntityEldritchGuardian>")
