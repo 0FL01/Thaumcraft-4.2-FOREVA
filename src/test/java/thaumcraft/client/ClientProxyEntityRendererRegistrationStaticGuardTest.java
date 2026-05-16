@@ -25,7 +25,7 @@ public class ClientProxyEntityRendererRegistrationStaticGuardTest {
                         && source.contains("registerEntityRenderer(EntityItemGrate.class, manager -> new RenderEntityItem(manager, renderItem), registered);"));
         assertTrue("ClientProxy must keep non-noop projectile baselines plus dedicated aspect-orb renderer",
                 source.contains("registerEntityRenderer(EntityDart.class, RenderDart::new, registered);")
-                        && source.contains("registerEntityRenderer(EntityPrimalArrow.class,")
+                        && source.contains("registerEntityRenderer(EntityPrimalArrow.class, RenderPrimalArrow::new, registered);")
                         && source.contains("registerEntityRenderer(EntityBottleTaint.class,")
                         && source.contains("registerEntityRenderer(EntityAlumentum.class, RenderAlumentum::new, registered);")
                         && source.contains("registerEntityRenderer(EntityPrimalOrb.class, RenderPrimalOrb::new, registered);")
@@ -166,6 +166,13 @@ public class ClientProxyEntityRendererRegistrationStaticGuardTest {
         assertTrue("RenderDart must provide dedicated arrow renderer baseline",
                 dartRenderer.contains("extends RenderArrow<EntityDart>")
                         && dartRenderer.contains("new ResourceLocation(\"textures/entity/arrow.png\")"));
+        String primalArrowRenderer = readFile("src/main/java/thaumcraft/client/renderers/entity/RenderPrimalArrow.java");
+        assertTrue("RenderPrimalArrow must provide dedicated typed arrow renderer baseline",
+                primalArrowRenderer.contains("extends RenderArrow<EntityPrimalArrow>")
+                        && primalArrowRenderer.contains("new ResourceLocation(\"textures/entity/arrow.png\")")
+                        && primalArrowRenderer.contains("entity.getArrowType()")
+                        && primalArrowRenderer.contains("BlockCustomOreItem.colors")
+                        && primalArrowRenderer.contains("GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F)"));
         String eldritchGuardianRenderer = readFile("src/main/java/thaumcraft/client/renderers/entity/RenderEldritchGuardian.java");
         assertTrue("RenderEldritchGuardian must provide dedicated guardian texture baseline",
                 eldritchGuardianRenderer.contains("extends RenderBiped<EntityEldritchGuardian>")

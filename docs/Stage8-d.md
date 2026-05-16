@@ -2311,6 +2311,29 @@ Some entities may be hard to trigger naturally until recipes/research/spawn cont
 
 - Это renderer baseline без ручной визуальной проверки; точные runtime анимационные/GL нюансы legacy `RenderDart` остаются в общем Stage 8-d visual parity matrix.
 
+### Checkpoint 2026-05-17 — replace primal arrow snowball fallback with dedicated typed arrow renderer baseline
+
+Статус: частично продвинут.
+
+Что сделано:
+
+- `EntityPrimalArrow` переведен с `RenderSnowball` на dedicated `RenderPrimalArrow`.
+- Добавлен `RenderPrimalArrow` с reference-shaped baseline contracts:
+  - dedicated arrow texture path (`textures/entity/arrow.png`);
+  - explicit `RenderArrow<EntityPrimalArrow>` renderer type;
+  - базовый type-driven tint hook через `BlockCustomOreItem.colors` и `entity.getArrowType()` с обязательным reset GL color.
+- `ClientProxyEntityRendererRegistrationStaticGuardTest` обновлен:
+  - registration contract `EntityPrimalArrow -> RenderPrimalArrow::new`;
+  - renderer contract checks на typed arrow, texture, type-driven tint surface и color reset.
+
+Проверки:
+
+- `./scripts/dev.sh validate --smoke` — passed.
+
+Ограничения:
+
+- Это renderer baseline без ручной визуальной проверки; точные legacy multi-pass/overlay нюансы `RenderPrimalArrow` остаются в общем Stage 8-d visual parity matrix.
+
 - [ ] Add client-only entity renderer registration hook.
 - [ ] Register every entity from `ConfigEntities.ENTITIES` with a custom or vanilla-equivalent renderer.
 - [ ] Port item-like/transient/projectile renderers.
