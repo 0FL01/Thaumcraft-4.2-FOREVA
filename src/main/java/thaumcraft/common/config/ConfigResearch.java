@@ -2951,6 +2951,397 @@ public class ConfigResearch {
                 .setPages(new ResearchPage("tc.research_page.TALLOW.1"))
                 .setParents("CRUCIBLE")
                 .registerResearchItem();
+
+        new ResearchItem(
+                "ALCHEMICALDUPLICATION",
+                "ALCHEMY",
+                new AspectList()
+                        .add(Aspect.MAGIC, 3)
+                        .add(Aspect.GREED, 3)
+                        .add(Aspect.CRAFT, 3),
+                -4,
+                0,
+                1,
+                new ResourceLocation("thaumcraft", "textures/misc/r_alchmult.png"))
+                .setPages(new ResearchPage("tc.research_page.ALCHEMICALDUPLICATION.1"))
+                .setConcealed()
+                .setSecondary()
+                .setParents("TALLOW")
+                .registerResearchItem();
+
+        new ResearchItem(
+                "ALCHEMICALMANUFACTURE",
+                "ALCHEMY",
+                new AspectList()
+                        .add(Aspect.MAGIC, 3)
+                        .add(Aspect.EXCHANGE, 3)
+                        .add(Aspect.CRAFT, 3),
+                -5,
+                -2,
+                1,
+                new ResourceLocation("thaumcraft", "textures/misc/r_alchman.png"))
+                .setPages(new ResearchPage("tc.research_page.ALCHEMICALMANUFACTURE.1"))
+                .setConcealed()
+                .setSecondary()
+                .setParents("ALCHEMICALDUPLICATION")
+                .registerResearchItem();
+
+        new ResearchItem(
+                "ENTROPICPROCESSING",
+                "ALCHEMY",
+                new AspectList()
+                        .add(Aspect.MAGIC, 1)
+                        .add(Aspect.ENTROPY, 3)
+                        .add(Aspect.CRAFT, 1),
+                -6,
+                1,
+                1,
+                new ResourceLocation("thaumcraft", "textures/misc/r_alchent.png"))
+                .setPages(new ResearchPage("tc.research_page.ENTROPICPROCESSING.1"))
+                .setConcealed()
+                .setSecondary()
+                .setParents("ALCHEMICALDUPLICATION")
+                .registerResearchItem();
+
+        new ResearchItem(
+                "LIQUIDDEATH",
+                "ALCHEMY",
+                new AspectList()
+                        .add(Aspect.DEATH, 3)
+                        .add(Aspect.POISON, 3)
+                        .add(Aspect.ENTROPY, 1)
+                        .add(Aspect.WATER, 1),
+                -7,
+                3,
+                2,
+                new ItemStack(ConfigItems.itemBucketDeath))
+                .setPages(new ResearchPage("tc.research_page.LIQUIDDEATH.1"))
+                .setHidden()
+                .setAspectTriggers(Aspect.DEATH, Aspect.POISON)
+                .setParents("ENTROPICPROCESSING")
+                .registerResearchItem();
+        ThaumcraftApi.addWarpToResearch("LIQUIDDEATH", 3);
+        ThaumcraftApi.addWarpToItem(new ItemStack(ConfigItems.itemBucketDeath), 1);
+
+        new ResearchItem(
+                "BOTTLETAINT",
+                "ALCHEMY",
+                new AspectList()
+                        .add(Aspect.TAINT, 5)
+                        .add(Aspect.MAGIC, 3)
+                        .add(Aspect.ENTROPY, 1)
+                        .add(Aspect.WATER, 1),
+                -8,
+                1,
+                2,
+                new ItemStack(ConfigItems.itemBottleTaint))
+                .setPages(new ResearchPage("tc.research_page.BOTTLETAINT.1"))
+                .setHidden()
+                .setAspectTriggers(Aspect.TAINT)
+                .setParents("ENTROPICPROCESSING")
+                .registerResearchItem();
+        ThaumcraftApi.addWarpToResearch("BOTTLETAINT", 2);
+        ThaumcraftApi.addWarpToItem(new ItemStack(ConfigItems.itemBottleTaint), 1);
+
+        new ResearchItem(
+                "PUREIRON",
+                "ALCHEMY",
+                new AspectList().add(Aspect.METAL, 3).add(Aspect.ORDER, 3),
+                -2,
+                5,
+                1,
+                new ItemStack(ConfigItems.itemNugget, 1, 16))
+                .setPages(new ResearchPage("tc.research_page.PUREIRON.1"))
+                .setConcealed()
+                .setParents("THAUMIUM")
+                .registerResearchItem();
+
+        new ResearchItem(
+                "PUREGOLD",
+                "ALCHEMY",
+                new AspectList().add(Aspect.METAL, 3).add(Aspect.ORDER, 2).add(Aspect.GREED, 1),
+                -4,
+                3,
+                1,
+                new ItemStack(ConfigItems.itemNugget, 1, 31))
+                .setPages(new ResearchPage("tc.research_page.PUREGOLD.1"))
+                .setConcealed()
+                .setSecondary()
+                .setParents("PUREIRON")
+                .registerResearchItem();
+
+        if (Config.foundCopperOre && Config.foundCopperIngot) {
+            new ResearchItem(
+                    "PURECOPPER",
+                    "ALCHEMY",
+                    new AspectList()
+                            .add(Aspect.METAL, 3)
+                            .add(Aspect.ORDER, 2)
+                            .add(Aspect.EXCHANGE, 1),
+                    -4,
+                    5,
+                    1,
+                    new ItemStack(ConfigItems.itemNugget, 1, 17))
+                    .setPages(new ResearchPage("tc.research_page.PURECOPPER.1"))
+                    .setConcealed()
+                    .setSecondary()
+                    .setParents("PUREIRON")
+                    .registerResearchItem();
+        }
+
+        if (Config.foundTinOre && Config.foundTinIngot) {
+            new ResearchItem(
+                    "PURETIN",
+                    "ALCHEMY",
+                    new AspectList()
+                            .add(Aspect.METAL, 3)
+                            .add(Aspect.ORDER, 2)
+                            .add(Aspect.CRYSTAL, 1),
+                    -4,
+                    7,
+                    1,
+                    new ItemStack(ConfigItems.itemNugget, 1, 18))
+                    .setPages(new ResearchPage("tc.research_page.PURETIN.1"))
+                    .setConcealed()
+                    .setSecondary()
+                    .setParents("PUREIRON")
+                    .registerResearchItem();
+        }
+
+        if (Config.foundSilverOre && Config.foundSilverIngot) {
+            new ResearchItem(
+                    "PURESILVER",
+                    "ALCHEMY",
+                    new AspectList()
+                            .add(Aspect.METAL, 3)
+                            .add(Aspect.ORDER, 2)
+                            .add(Aspect.GREED, 1),
+                    -3,
+                    8,
+                    1,
+                    new ItemStack(ConfigItems.itemNugget, 1, 19))
+                    .setPages(new ResearchPage("tc.research_page.PURESILVER.1"))
+                    .setConcealed()
+                    .setSecondary()
+                    .setParents("PUREIRON")
+                    .registerResearchItem();
+        }
+
+        if (Config.foundLeadOre && Config.foundLeadIngot) {
+            new ResearchItem(
+                    "PURELEAD",
+                    "ALCHEMY",
+                    new AspectList().add(Aspect.METAL, 3).add(Aspect.ORDER, 3),
+                    -2,
+                    9,
+                    1,
+                    new ItemStack(ConfigItems.itemNugget, 1, 20))
+                    .setPages(new ResearchPage("tc.research_page.PURELEAD.1"))
+                    .setConcealed()
+                    .setSecondary()
+                    .setParents("PUREIRON")
+                    .registerResearchItem();
+        }
+
+        new ResearchItem(
+                "TRANSIRON",
+                "ALCHEMY",
+                new AspectList().add(Aspect.METAL, 3).add(Aspect.EXCHANGE, 3),
+                0,
+                5,
+                1,
+                new ItemStack(ConfigItems.itemNugget, 1, 0))
+                .setPages(new ResearchPage("tc.research_page.TRANSIRON.1"))
+                .setConcealed()
+                .setParents("THAUMIUM")
+                .registerResearchItem();
+
+        new ResearchItem(
+                "TRANSGOLD",
+                "ALCHEMY",
+                new AspectList().add(Aspect.METAL, 3).add(Aspect.EXCHANGE, 3),
+                2,
+                3,
+                1,
+                new ItemStack(Items.GOLD_NUGGET))
+                .setPages(new ResearchPage("tc.research_page.TRANSGOLD.1"))
+                .setConcealed()
+                .setSecondary()
+                .setParents("TRANSIRON")
+                .registerResearchItem();
+
+        if (Config.foundCopperIngot) {
+            new ResearchItem(
+                    "TRANSCOPPER",
+                    "ALCHEMY",
+                    new AspectList().add(Aspect.METAL, 3).add(Aspect.EXCHANGE, 3),
+                    2,
+                    5,
+                    1,
+                    new ItemStack(ConfigItems.itemNugget, 1, 1))
+                    .setPages(new ResearchPage("tc.research_page.TRANSCOPPER.1"))
+                    .setConcealed()
+                    .setSecondary()
+                    .setParents("TRANSIRON")
+                    .registerResearchItem();
+        }
+
+        if (Config.foundTinIngot) {
+            new ResearchItem(
+                    "TRANSTIN",
+                    "ALCHEMY",
+                    new AspectList()
+                            .add(Aspect.METAL, 3)
+                            .add(Aspect.EXCHANGE, 2)
+                            .add(Aspect.CRYSTAL, 1),
+                    2,
+                    7,
+                    1,
+                    new ItemStack(ConfigItems.itemNugget, 1, 2))
+                    .setPages(new ResearchPage("tc.research_page.TRANSTIN.1"))
+                    .setConcealed()
+                    .setSecondary()
+                    .setParents("TRANSIRON")
+                    .registerResearchItem();
+        }
+
+        if (Config.foundSilverIngot) {
+            new ResearchItem(
+                    "TRANSSILVER",
+                    "ALCHEMY",
+                    new AspectList()
+                            .add(Aspect.METAL, 3)
+                            .add(Aspect.EXCHANGE, 2)
+                            .add(Aspect.GREED, 1),
+                    1,
+                    8,
+                    1,
+                    new ItemStack(ConfigItems.itemNugget, 1, 3))
+                    .setPages(new ResearchPage("tc.research_page.TRANSSILVER.1"))
+                    .setConcealed()
+                    .setSecondary()
+                    .setParents("TRANSIRON")
+                    .registerResearchItem();
+        }
+
+        if (Config.foundLeadIngot) {
+            new ResearchItem(
+                    "TRANSLEAD",
+                    "ALCHEMY",
+                    new AspectList()
+                            .add(Aspect.METAL, 3)
+                            .add(Aspect.EXCHANGE, 2)
+                            .add(Aspect.ORDER, 1),
+                    0,
+                    9,
+                    1,
+                    new ItemStack(ConfigItems.itemNugget, 1, 4))
+                    .setPages(new ResearchPage("tc.research_page.TRANSLEAD.1"))
+                    .setConcealed()
+                    .setSecondary()
+                    .setParents("TRANSIRON")
+                    .registerResearchItem();
+        }
+
+        new ResearchItem(
+                "ETHEREALBLOOM",
+                "ALCHEMY",
+                new AspectList()
+                        .add(Aspect.MAGIC, 1)
+                        .add(Aspect.PLANT, 6)
+                        .add(Aspect.HEAL, 3)
+                        .add(Aspect.TAINT, 6),
+                -2,
+                -3,
+                2,
+                new ItemStack(ConfigBlocks.blockCustomPlant, 1, 4))
+                .setPages(
+                        new ResearchPage("tc.research_page.ETHEREALBLOOM.1"),
+                        new ResearchPage("tc.research_page.ETHEREALBLOOM.2"))
+                .setHidden()
+                .setAspectTriggers(Aspect.TAINT)
+                .setConcealed()
+                .setParents("CRUCIBLE")
+                .registerResearchItem();
+
+        new ResearchItem(
+                "BATHSALTS",
+                "ALCHEMY",
+                new AspectList()
+                        .add(Aspect.MIND, 3)
+                        .add(Aspect.AURA, 3)
+                        .add(Aspect.ORDER, 3)
+                        .add(Aspect.HEAL, 3),
+                -4,
+                -4,
+                2,
+                new ItemStack(ConfigItems.itemBathSalts))
+                .setPages(new ResearchPage("tc.research_page.BATHSALTS.1"))
+                .setHidden()
+                .registerResearchItem();
+
+        new ResearchItem(
+                "SANESOAP",
+                "ALCHEMY",
+                new AspectList()
+                        .add(Aspect.MIND, 5)
+                        .add(Aspect.ORDER, 5)
+                        .add(Aspect.HEAL, 5)
+                        .add(Aspect.ELDRITCH, 5),
+                -3,
+                -6,
+                1,
+                new ItemStack(ConfigItems.itemSanitySoap))
+                .setPages(new ResearchPage("tc.research_page.SANESOAP.1"))
+                .setParents("BATHSALTS")
+                .registerResearchItem();
+
+        new ResearchItem(
+                "ARCANESPA",
+                "ALCHEMY",
+                new AspectList()
+                        .add(Aspect.WATER, 3)
+                        .add(Aspect.MECHANISM, 3)
+                        .add(Aspect.ORDER, 3),
+                -6,
+                -5,
+                1,
+                new ItemStack(ConfigBlocks.blockStoneDevice, 1, 12))
+                .setPages(new ResearchPage("tc.research_page.ARCANESPA.1"))
+                .setSecondary()
+                .setParents("BATHSALTS")
+                .registerResearchItem();
+
+        new ResearchItem(
+                "JARLABEL",
+                "ALCHEMY",
+                new AspectList(),
+                4,
+                -3,
+                0,
+                new ItemStack(ConfigBlocks.blockJar))
+                .setPages(
+                        new ResearchPage("tc.research_page.JARLABEL.1"),
+                        new ResearchPage("tc.research_page.JARLABEL.2"),
+                        new ResearchPage("tc.research_page.JARLABEL.3"))
+                .setParents("DISTILESSENTIA")
+                .setStub()
+                .setRound()
+                .registerResearchItem();
+
+        new ResearchItem(
+                "JARVOID",
+                "ALCHEMY",
+                new AspectList().add(Aspect.WATER, 3).add(Aspect.ENTROPY, 3).add(Aspect.VOID, 6),
+                5,
+                -5,
+                1,
+                new ItemStack(ConfigBlocks.blockJar, 1, 3))
+                .setPages(new ResearchPage("tc.research_page.JARVOID.1"))
+                .setParents("JARLABEL")
+                .setSecondary()
+                .setConcealed()
+                .registerResearchItem();
     }
 
     private static void initThaumaturgyResearchTextOnlyBaseline() {
