@@ -35,11 +35,17 @@ public class ClientProxyFxStaticGuardTest {
     public void fxPacketsKeepClientSchedulingHandlers() throws IOException {
         String visDrain = readFile("src/main/java/thaumcraft/common/lib/network/fx/PacketFXVisDrain.java");
         String blockArc = readFile("src/main/java/thaumcraft/common/lib/network/fx/PacketFXBlockArc.java");
+        String blockSparkle = readFile("src/main/java/thaumcraft/common/lib/network/fx/PacketFXBlockSparkle.java");
+        String serverTick = readFile("src/main/java/thaumcraft/common/lib/events/ServerTickEventsFML.java");
 
         assertTrue("PacketFXVisDrain must schedule client task and call proxy beam",
                 visDrain.contains("Minecraft.getMinecraft().addScheduledTask") && visDrain.contains("Thaumcraft.proxy.beam("));
         assertTrue("PacketFXBlockArc must schedule client task and call proxy bolt",
                 blockArc.contains("Minecraft.getMinecraft().addScheduledTask") && blockArc.contains("Thaumcraft.proxy.bolt("));
+        assertTrue("PacketFXBlockSparkle must schedule client task and call proxy blockSparkle",
+                blockSparkle.contains("Minecraft.getMinecraft().addScheduledTask") && blockSparkle.contains("Thaumcraft.proxy.blockSparkle("));
+        assertTrue("Server block-swap path must send PacketFXBlockSparkle around replaced block",
+                serverTick.contains("new PacketFXBlockSparkle(vs.x, vs.y, vs.z, 0xC0C0FF)"));
     }
 
     private static String readFile(String path) throws IOException {

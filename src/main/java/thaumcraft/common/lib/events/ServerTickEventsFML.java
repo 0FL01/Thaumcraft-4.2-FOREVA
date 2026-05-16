@@ -14,6 +14,7 @@ import net.minecraft.world.World;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
+import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -176,9 +177,9 @@ public class ServerTickEventsFML {
             targetBlock.onBlockPlacedBy(world, new net.minecraft.util.math.BlockPos(vs.x, vs.y, vs.z),
                     targetBlock.getStateFromMeta(targetMeta), (EntityLivingBase) vs.player, vs.target);
 
-            // Phase 8: PacketHandler.INSTANCE.sendToAllAround(
-            //     new PacketFXBlockSparkle(vs.x, vs.y, vs.z, 0xC0C0FF),
-            //     new NetworkRegistry.TargetPoint(world.provider.getDimension(), vs.x, vs.y, vs.z, 32.0));
+            PacketHandler.INSTANCE.sendToAllAround(
+                    new PacketFXBlockSparkle(vs.x, vs.y, vs.z, 0xC0C0FF),
+                    new NetworkRegistry.TargetPoint(world.provider.getDimension(), vs.x, vs.y, vs.z, 32.0));
 
             world.playEvent(2001, new net.minecraft.util.math.BlockPos(vs.x, vs.y, vs.z),
                     Block.getIdFromBlock(vs.bSource) + (vs.mSource << 12));

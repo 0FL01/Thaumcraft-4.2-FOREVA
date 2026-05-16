@@ -303,6 +303,27 @@ Depends on GAP-1, GAP-2, GAP-5, and GAP-6. Network-thread rendering is unsafe if
 
 - Remaining FX packet families are still open in this stage and require further porting.
 
+#### Checkpoint 2026-05-16 — GAP-3 block sparkle packet path restored
+
+Статус: `PacketFXBlockSparkle` payload/handler and server send-site are now wired.
+
+Что сделано:
+
+- Implemented `PacketFXBlockSparkle` payload (`x/y/z/color`) serialization and client-scheduled `onMessage` routing into `Thaumcraft.proxy.blockSparkle(...)`.
+- Restored server-side send in `ServerTickEventsFML.tickBlockSwap(...)` for block replacement sparkle (`sendToAllAround` with 32-block radius).
+- Expanded FX tests:
+  - `PacketFXSerializationTest` now includes `PacketFXBlockSparkle` round-trip.
+  - `ClientProxyFxStaticGuardTest` now enforces packet handler scheduling + server send-site presence.
+
+Проверки:
+
+- `./scripts/dev.sh test` — passed.
+- `./scripts/dev.sh validate --smoke` — passed.
+
+Ограничения:
+
+- The broader Stage 8-e packet set (beam pulse/zap/shield/sonic/etc.) remains open.
+
 ### GAP-4: Beam, wand beam, bore beam, power beam, arc, and lightning bolt classes are absent
 
 **Статус:** отсутствует  
