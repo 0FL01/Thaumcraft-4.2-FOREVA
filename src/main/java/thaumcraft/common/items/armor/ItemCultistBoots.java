@@ -1,13 +1,18 @@
 package thaumcraft.common.items.armor;
 
 import net.minecraft.inventory.EntityEquipmentSlot;
+import net.minecraft.init.Items;
+import net.minecraft.item.EnumRarity;
 import net.minecraft.item.ItemArmor;
 import net.minecraft.item.ItemStack;
 import thaumcraft.api.IRepairable;
 import thaumcraft.api.IRunicArmor;
+import thaumcraft.api.IVisDiscountGear;
+import thaumcraft.api.IWarpingGear;
+import thaumcraft.api.aspects.Aspect;
 import thaumcraft.common.lib.CreativeTabThaumcraft;
 
-public class ItemCultistBoots extends ItemArmor implements IRepairable, IRunicArmor {
+public class ItemCultistBoots extends ItemArmor implements IRepairable, IRunicArmor, IWarpingGear, IVisDiscountGear {
 
     public ItemCultistBoots(ArmorMaterial material, int renderIndex, EntityEquipmentSlot slot) {
         super(material, renderIndex, slot);
@@ -20,7 +25,22 @@ public class ItemCultistBoots extends ItemArmor implements IRepairable, IRunicAr
     }
 
     @Override
+    public EnumRarity getRarity(ItemStack stack) {
+        return EnumRarity.UNCOMMON;
+    }
+
+    @Override
     public boolean getIsRepairable(ItemStack toRepair, ItemStack repair) {
-        return super.getIsRepairable(toRepair, repair);
+        return !repair.isEmpty() && repair.getItem() == Items.LEATHER || super.getIsRepairable(toRepair, repair);
+    }
+
+    @Override
+    public int getWarp(ItemStack itemstack, net.minecraft.entity.player.EntityPlayer player) {
+        return 1;
+    }
+
+    @Override
+    public int getVisDiscount(ItemStack stack, net.minecraft.entity.player.EntityPlayer player, Aspect aspect) {
+        return 1;
     }
 }

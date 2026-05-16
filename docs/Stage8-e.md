@@ -1562,6 +1562,27 @@ Depends on GAP-1 and GAP-3. Some infusion source scenarios may require Stage 9 c
 
 - Это только repair/rarity baseline; дополнительные armor tooltip/icon paths остаются в общем Stage 8 client polish.
 
+#### Checkpoint 2026-05-17 — GAP-11 cultist-armor core contracts baseline
+
+Статус: частично продвинут.
+
+Что сделано:
+
+- Восстановлены reference-shaped core contracts для cultist armor family:
+  - `ItemCultistRobeArmor`: `UNCOMMON` rarity + leather repair + `IVisDiscountGear`/`IWarpingGear` surface (`1%`/`warp 1`);
+  - `ItemCultistPlateArmor`: `UNCOMMON` rarity + leather repair;
+  - `ItemCultistLeaderArmor`: `RARE` rarity + leather repair;
+  - `ItemCultistBoots`: `UNCOMMON` rarity + leather repair + `IWarpingGear`/`IVisDiscountGear` surface (`warp 1`/`1%`).
+- Добавлен `ItemCultistArmorCoreContractsStaticGuardTest` для фиксации этих family contracts.
+
+Проверки:
+
+- `./scripts/dev.sh validate --smoke` — passed.
+
+Ограничения:
+
+- Это contract-level baseline; полный model/icon/tooltip parity для cultist armor остаётся на отдельный Stage 8 client-render polish.
+
 ### GAP-12: FX registration exists, but send-site coverage and manual scenario validation are incomplete
 
 **Статус:** требует проверки  
