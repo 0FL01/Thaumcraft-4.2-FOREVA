@@ -43,6 +43,15 @@ public class ClientProxyEntityRendererRegistrationStaticGuardTest {
                         && source.contains("registerEntityRenderer(EntityInhabitedZombie.class, RenderZombie::new, registered);")
                         && source.contains("registerEntityRenderer(EntityMindSpider.class, RenderSpider::new, registered);")
                         && source.contains("registerEntityRenderer(EntityTaintSpider.class, RenderSpider::new, registered);"));
+        assertTrue("ClientProxy must keep fallback RenderFallbackLiving registrations for taint animal-like entities",
+                source.contains("registerEntityRenderer(EntityTaintChicken.class, manager -> new RenderFallbackLiving<>(")
+                        && source.contains("registerEntityRenderer(EntityTaintCow.class, manager -> new RenderFallbackLiving<>(")
+                        && source.contains("registerEntityRenderer(EntityTaintPig.class, manager -> new RenderFallbackLiving<>(")
+                        && source.contains("registerEntityRenderer(EntityTaintSheep.class, manager -> new RenderFallbackLiving<>(")
+                        && source.contains("registerEntityRenderer(EntityTaintVillager.class, manager -> new RenderFallbackLiving<>(")
+                        && source.contains("registerEntityRenderer(EntityTaintCreeper.class, manager -> new RenderFallbackLiving<>("));
+        assertTrue("RenderFallbackLiving must exist as a non-noop typed texture renderer",
+                readFile("src/main/java/thaumcraft/client/renderers/entity/RenderFallbackLiving.java").contains("extends RenderLiving<T>"));
         assertTrue("ClientProxy must iterate ConfigEntities.ENTITIES for renderer registration coverage",
                 source.contains("for (net.minecraftforge.fml.common.registry.EntityEntry entry : ConfigEntities.ENTITIES)"));
         assertTrue("ClientProxy must keep fallback RenderNoop registrations for remaining entities",

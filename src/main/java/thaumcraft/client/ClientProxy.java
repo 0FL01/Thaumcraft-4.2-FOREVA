@@ -5,6 +5,12 @@ import java.util.HashSet;
 import java.util.Set;
 import javax.annotation.Nullable;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.model.ModelChicken;
+import net.minecraft.client.model.ModelCow;
+import net.minecraft.client.model.ModelCreeper;
+import net.minecraft.client.model.ModelPig;
+import net.minecraft.client.model.ModelSheep2;
+import net.minecraft.client.model.ModelVillager;
 import net.minecraft.client.renderer.RenderItem;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.client.renderer.entity.RenderEntityItem;
@@ -46,6 +52,7 @@ import thaumcraft.client.gui.GuiSpa;
 import thaumcraft.client.gui.GuiThaumatorium;
 import thaumcraft.client.gui.GuiTravelingTrunk;
 import thaumcraft.client.fx.ParticleEngine;
+import thaumcraft.client.renderers.entity.RenderFallbackLiving;
 import thaumcraft.client.renderers.entity.RenderNoop;
 import thaumcraft.client.lib.ClientTickEventsFML;
 import thaumcraft.client.lib.KeyHandler;
@@ -64,7 +71,13 @@ import thaumcraft.common.entities.monster.EntityBrainyZombie;
 import thaumcraft.common.entities.monster.EntityGiantBrainyZombie;
 import thaumcraft.common.entities.monster.EntityInhabitedZombie;
 import thaumcraft.common.entities.monster.EntityMindSpider;
+import thaumcraft.common.entities.monster.EntityTaintChicken;
+import thaumcraft.common.entities.monster.EntityTaintCow;
+import thaumcraft.common.entities.monster.EntityTaintCreeper;
+import thaumcraft.common.entities.monster.EntityTaintPig;
+import thaumcraft.common.entities.monster.EntityTaintSheep;
 import thaumcraft.common.entities.monster.EntityTaintSpider;
+import thaumcraft.common.entities.monster.EntityTaintVillager;
 import thaumcraft.common.entities.projectile.EntityAlumentum;
 import thaumcraft.common.entities.projectile.EntityBottleTaint;
 import thaumcraft.common.entities.projectile.EntityDart;
@@ -165,6 +178,18 @@ public class ClientProxy extends CommonProxy {
         registerEntityRenderer(EntityInhabitedZombie.class, RenderZombie::new, registered);
         registerEntityRenderer(EntityMindSpider.class, RenderSpider::new, registered);
         registerEntityRenderer(EntityTaintSpider.class, RenderSpider::new, registered);
+        registerEntityRenderer(EntityTaintChicken.class, manager -> new RenderFallbackLiving<>(
+                manager, new ModelChicken(), 0.3F, new ResourceLocation("thaumcraft", "textures/models/chicken.png")), registered);
+        registerEntityRenderer(EntityTaintCow.class, manager -> new RenderFallbackLiving<>(
+                manager, new ModelCow(), 0.7F, new ResourceLocation("thaumcraft", "textures/models/cow.png")), registered);
+        registerEntityRenderer(EntityTaintPig.class, manager -> new RenderFallbackLiving<>(
+                manager, new ModelPig(), 0.5F, new ResourceLocation("thaumcraft", "textures/models/pig.png")), registered);
+        registerEntityRenderer(EntityTaintSheep.class, manager -> new RenderFallbackLiving<>(
+                manager, new ModelSheep2(), 0.7F, new ResourceLocation("thaumcraft", "textures/models/sheep.png")), registered);
+        registerEntityRenderer(EntityTaintVillager.class, manager -> new RenderFallbackLiving<>(
+                manager, new ModelVillager(0.0F), 0.5F, new ResourceLocation("thaumcraft", "textures/models/villager.png")), registered);
+        registerEntityRenderer(EntityTaintCreeper.class, manager -> new RenderFallbackLiving<>(
+                manager, new ModelCreeper(), 0.5F, new ResourceLocation("thaumcraft", "textures/models/creeper.png")), registered);
 
         for (net.minecraftforge.fml.common.registry.EntityEntry entry : ConfigEntities.ENTITIES) {
             @SuppressWarnings("unchecked")

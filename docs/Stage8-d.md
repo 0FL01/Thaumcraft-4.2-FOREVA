@@ -566,6 +566,27 @@ Some entities may be hard to trigger naturally until recipes/research/spawn cont
 - Это vanilla fallback слой для type-compatible zombie/spider классов; custom TC рендеры/текстуры/passes остаются открытыми.
 - Остальные entity группы по-прежнему проходят через fallback `RenderNoop`, пока не портированы специализированные renderers.
 
+### Checkpoint 2026-05-16 — taint animal fallback slice
+
+Статус: частично продвинут.
+
+Что сделано:
+
+- Добавлен `RenderFallbackLiving<T extends EntityLiving>` как лёгкий non-noop fallback renderer с явной `ResourceLocation` текстурой.
+- `ClientProxy.setupEntityRenderers()` дополнен fallback registrations для taint animal-like группы:
+  `EntityTaintChicken`, `EntityTaintCow`, `EntityTaintPig`, `EntityTaintSheep`, `EntityTaintVillager`, `EntityTaintCreeper`.
+- Текстуры берутся из уже импортированного Stage 8-d asset corpus (`textures/models/chicken.png`, `cow.png`, `pig.png`, `sheep.png`, `villager.png`, `creeper.png`).
+- `ClientProxyEntityRendererRegistrationStaticGuardTest` расширен проверками этих registration paths и наличия `RenderFallbackLiving`.
+
+Проверки:
+
+- `./scripts/dev.sh validate --smoke` — passed.
+
+Ограничения:
+
+- Это всё ещё fallback baseline, а не reference custom renderer parity (модели/слои/анимации/passes TC4 остаются открытыми).
+- Часть entity групп Stage 8-d по-прежнему использует `RenderNoop` до портирования специализированных renderers.
+
 - [ ] Add client-only entity renderer registration hook.
 - [ ] Register every entity from `ConfigEntities.ENTITIES` with a custom or vanilla-equivalent renderer.
 - [ ] Port item-like/transient/projectile renderers.
