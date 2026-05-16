@@ -36,6 +36,7 @@ public class WorldGenGreatwoodTrees extends WorldGenAbstractTree {
     int heightLimitLimit = 11;
     int leafDistanceLimit = 4;
     int[][] leafNodes;
+    private static final IBlockState GREATWOOD_LEAVES = ConfigBlocks.blockMagicalLeaves.getStateFromMeta(0);
 
     public WorldGenGreatwoodTrees(boolean notify) {
         super(notify);
@@ -109,7 +110,6 @@ public class WorldGenGreatwoodTrees extends WorldGenAbstractTree {
         byte var9 = otherCoordPairs[par5 + 3];
         int[] var10 = new int[]{par1, par2, par3};
         int[] var11 = new int[]{0, 0, 0};
-        IBlockState leafState = ConfigBlocks.blockMagicalLeaves.getStateFromMeta(0);
 
         for (int var12 = -var7; var12 <= var7; ++var12) {
             var11[var8] = var10[var8] + var12;
@@ -120,16 +120,28 @@ public class WorldGenGreatwoodTrees extends WorldGenAbstractTree {
                 try {
                     var11[var9] = var10[var9] + var13;
                     BlockPos pos = new BlockPos(var11[0], var11[1], var11[2]);
-                    Block block = this.worldObj.getBlockState(pos).getBlock();
-                    if (block.isAir(this.worldObj.getBlockState(pos), this.worldObj, pos)
-                            || block == ConfigBlocks.blockMagicalLeaves
-                            || block.isLeaves(this.worldObj.getBlockState(pos), this.worldObj, pos)
-                            || block.canBeReplacedByLeaves(this.worldObj.getBlockState(pos), this.worldObj, pos)) {
-                        this.setBlockAndNotifyAdequately(this.worldObj, pos, leafState);
-                    }
+                    this.placeGreatwoodLeaf(pos);
                 } catch (Exception ignored) {
                 }
             }
+        }
+    }
+
+    private boolean canReplaceForLeaves(BlockPos pos) {
+        if (pos.getY() < 0 || pos.getY() >= this.worldObj.getHeight()) {
+            return false;
+        }
+        IBlockState state = this.worldObj.getBlockState(pos);
+        Block block = state.getBlock();
+        return block.isAir(state, this.worldObj, pos)
+                || block.isLeaves(state, this.worldObj, pos)
+                || block.canBeReplacedByLeaves(state, this.worldObj, pos)
+                || state.getMaterial().isReplaceable();
+    }
+
+    private void placeGreatwoodLeaf(BlockPos pos) {
+        if (canReplaceForLeaves(pos)) {
+            this.setBlockAndNotifyAdequately(this.worldObj, pos, GREATWOOD_LEAVES);
         }
     }
 
