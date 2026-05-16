@@ -227,6 +227,27 @@ This is a blocker because current runtime matching already depends on research c
 
 - Guard is static and does not replace full runtime/manual progression scenarios in GAP-6.
 
+#### Checkpoint 2026-05-16 — GAP-2 API recipe-key static guard
+
+Статус: `ThaumcraftApi.getCraftingRecipeKey(...)` crucible-page lookup branch is now statically guarded.
+
+Что сделано:
+
+- Added `ThaumcraftApiCrucibleRecipeKeyStaticGuardTest` covering:
+  - presence of the `ResearchPage.recipe instanceof CrucibleRecipe[]` branch;
+  - crucible recipe iteration and output-stack match path;
+  - key-cache write of `ri.key` + page index for crucible matches;
+  - research-completion gate before returning crucible recipe key metadata.
+
+Проверки:
+
+- `./scripts/dev.sh test` — passed.
+- `./scripts/dev.sh validate` — passed.
+
+Ограничения:
+
+- Guard is static and does not replace full runtime progression/manual thaumonomicon unlock verification in GAP-6.
+
 ### GAP-3: Thaumatorium brainbox recipe-capacity upgrades are missing
 
 **Статус:** частично реализовано  
