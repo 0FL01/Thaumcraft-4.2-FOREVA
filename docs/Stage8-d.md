@@ -1364,6 +1364,25 @@ Some entities may be hard to trigger naturally until recipes/research/spawn cont
 
 - Это namespace contract fix; remaining visual нюансы taint creeper armor pass (legacy GL-state/lightmap specifics) остаются в общем client parity scope.
 
+### Checkpoint 2026-05-16 — restore taint creeper underwater/no-despawn behavior contracts
+
+Статус: частично продвинут.
+
+Что сделано:
+
+- `EntityTaintCreeper` расширен reference-shaped behavior hooks:
+  - добавлен `canBreatheUnderwater() -> true`;
+  - добавлен `canDespawn() -> false`.
+- `ClientProxyEntityRendererRegistrationStaticGuardTest` расширен проверками на presence этих контрактов в `EntityTaintCreeper`.
+
+Проверки:
+
+- `./scripts/dev.sh validate --smoke` — passed.
+
+Ограничения:
+
+- Это behavior-contract baseline; полная parity по taint creeper explosion-side effects/taint spread paths остаётся в Stage 6 common-runtime scope.
+
 ### Checkpoint 2026-05-16 — restore mind spider viewer-only render gating
 
 Статус: частично продвинут.

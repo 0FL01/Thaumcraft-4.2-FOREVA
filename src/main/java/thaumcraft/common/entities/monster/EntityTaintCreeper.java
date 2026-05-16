@@ -46,6 +46,16 @@ public class EntityTaintCreeper extends net.minecraft.entity.monster.EntityMob i
         this.getEntityAttribute(net.minecraft.entity.SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(0.25);
     }
 
+    @Override
+    public boolean canBreatheUnderwater() {
+        return true;
+    }
+
+    @Override
+    protected boolean canDespawn() {
+        return false;
+    }
+
     public int getCreeperState() {
         return this.dataManager.get(CREEPER_STATE);
     }

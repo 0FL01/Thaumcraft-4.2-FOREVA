@@ -274,6 +274,11 @@ public class ClientProxyEntityRendererRegistrationStaticGuardTest {
                 taintCreeperEntity.contains("public float getCreeperFlashIntensity(float partialTicks)"));
         assertTrue("EntityTaintCreeper must expose powered accessor for armor-layer rendering",
                 taintCreeperEntity.contains("public boolean getPowered()"));
+        assertTrue("EntityTaintCreeper must keep underwater/no-despawn baseline contracts",
+                taintCreeperEntity.contains("public boolean canBreatheUnderwater()")
+                        && taintCreeperEntity.contains("protected boolean canDespawn()")
+                        && taintCreeperEntity.contains("return true;")
+                        && taintCreeperEntity.contains("return false;"));
         String taintSheepEntity = readFile("src/main/java/thaumcraft/common/entities/monster/EntityTaintSheep.java");
         assertTrue("EntityTaintSheep must keep sheared-state data/NBT/shearing contracts for fur-layer renderer parity",
                 taintSheepEntity.contains("DataParameter<Byte>")
