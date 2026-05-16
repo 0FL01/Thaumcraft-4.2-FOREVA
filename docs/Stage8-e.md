@@ -1327,6 +1327,27 @@ Port these packet payloads and their particle/other FX classes, then re-enable s
 
 Depends on GAP-1 and GAP-3. Some infusion source scenarios may require Stage 9 content/recipe progression to reach naturally; direct test hooks or controlled world setup may be needed for validation.
 
+#### Checkpoint 2026-05-17 — GAP-11 elemental-axe bubble packet send-site baseline
+
+Статус: частично продвинут.
+
+Что сделано:
+
+- `ItemElementalAxe` больше не stub:
+  - восстановлен right-click use contract (`setActiveHand`, `EnumAction.BOW`, `72000` use duration);
+  - восстановлен thaumium repair contract (`itemResource:2`);
+  - восстановлен item-magnet `onUsingTick(...)` baseline с pull-clamp и `Thaumcraft.proxy.crucibleBubble(...)` trail;
+  - восстановлен wood-log break FX send-path (`PacketFXBlockBubble` + `TargetPoint` radius `32.0D`) и bubble sound cue.
+- Добавлен `ItemElementalAxeStaticGuardTest` для фиксации core behavior/surface contracts.
+
+Проверки:
+
+- `./scripts/dev.sh validate --smoke` — passed.
+
+Ограничения:
+
+- Это server/common + packet baseline без ручной gameplay/visual проверки; точная parity `BlockUtils.breakFurthestBlock` traversal-логики остаётся зависимой от дальнейшего Stage 5/6 polish.
+
 ### GAP-12: FX registration exists, but send-site coverage and manual scenario validation are incomplete
 
 **Статус:** требует проверки  
