@@ -207,6 +207,26 @@ Restore the reference recipe-handle map and direct crucible recipe research gate
 
 This is a blocker because current runtime matching already depends on research completion. It depends on Stage 9 research baseline outside this chunk only to the extent that the relevant research keys can be granted and queried. If broader research pages remain incomplete, Stage 9-d can still close only if direct recipe gates and unlock scenarios are manually verified.
 
+#### Checkpoint 2026-05-16 — GAP-2 research-gate static guard
+
+Статус: server-side research gating contracts are now statically guarded for crucible matching and thaumatorium programming paths.
+
+Что сделано:
+
+- Added `CrucibleResearchGateStaticGuardTest` covering:
+  - `ThaumcraftCraftingManager.findMatchingCrucibleRecipe(...)` still enforces `ResearchManager.isResearchComplete(username, recipe.key)`;
+  - crucible selection still retains aspect-count specificity ordering (`recipe.aspects.size()` tie-break path);
+  - `ContainerThaumatorium` programming path still enforces `ResearchManager.isResearchComplete(this.player, recipe.key)`.
+
+Проверки:
+
+- `./scripts/dev.sh test` — passed.
+- `./scripts/dev.sh validate` — passed.
+
+Ограничения:
+
+- Guard is static and does not replace full runtime/manual progression scenarios in GAP-6.
+
 ### GAP-3: Thaumatorium brainbox recipe-capacity upgrades are missing
 
 **Статус:** частично реализовано  
