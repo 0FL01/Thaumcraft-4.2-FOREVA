@@ -289,7 +289,9 @@ public class EntityEldritchGuardian extends EntityMob implements IRangedAttackMo
             this.world.spawnEntity(blast);
         } else if (this.canEntityBeSeen(target)) {
             // 10%: sonic screech
-            // TODO: PacketFXSonic(this.getEntityId()) — PacketFXSonic is a stub (Phase 8)
+            PacketHandler.INSTANCE.sendToAllAround(
+                    new PacketFXSonic(this.getEntityId()),
+                    new NetworkRegistry.TargetPoint(this.world.provider.getDimension(), this.posX, this.posY, this.posZ, 32.0));
 
             target.addPotionEffect(new PotionEffect(
                 net.minecraft.init.MobEffects.BLINDNESS, 400, 0));

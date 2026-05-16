@@ -351,6 +351,29 @@ Depends on GAP-1, GAP-2, GAP-5, and GAP-6. Network-thread rendering is unsafe if
 
 - This is fallback FX routing and does not yet port reference rune-render particle classes.
 
+#### Checkpoint 2026-05-16 — GAP-3 sonic packet baseline restored
+
+Статус: `PacketFXSonic` payload/handler and eldritch guardian send-site are now wired.
+
+Что сделано:
+
+- Implemented `PacketFXSonic` payload serialization (`source` entity id) and client-scheduled handler.
+- Added fallback sonic reaction routing via `Thaumcraft.proxy.burst(...)` at source entity center.
+- Restored `EntityEldritchGuardian` sonic branch packet send:
+  - `PacketHandler.INSTANCE.sendToAllAround(new PacketFXSonic(this.getEntityId()), TargetPoint(..., 32.0))`.
+- Expanded FX tests:
+  - `PacketFXSerializationTest` now includes `PacketFXSonic` round-trip.
+  - `ClientProxyFxStaticGuardTest` now enforces sonic handler scheduling and guardian send-site presence.
+
+Проверки:
+
+- `./scripts/dev.sh test` — passed.
+- `./scripts/dev.sh validate --smoke` — passed.
+
+Ограничения:
+
+- This remains fallback visual behavior and does not yet include reference `FXSonic` renderer class parity.
+
 ### GAP-4: Beam, wand beam, bore beam, power beam, arc, and lightning bolt classes are absent
 
 **Статус:** отсутствует  

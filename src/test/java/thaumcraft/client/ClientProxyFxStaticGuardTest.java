@@ -37,8 +37,10 @@ public class ClientProxyFxStaticGuardTest {
         String blockArc = readFile("src/main/java/thaumcraft/common/lib/network/fx/PacketFXBlockArc.java");
         String blockSparkle = readFile("src/main/java/thaumcraft/common/lib/network/fx/PacketFXBlockSparkle.java");
         String shield = readFile("src/main/java/thaumcraft/common/lib/network/fx/PacketFXShield.java");
+        String sonic = readFile("src/main/java/thaumcraft/common/lib/network/fx/PacketFXSonic.java");
         String serverTick = readFile("src/main/java/thaumcraft/common/lib/events/ServerTickEventsFML.java");
         String runic = readFile("src/main/java/thaumcraft/common/lib/events/EventHandlerRunic.java");
+        String eldritchGuardian = readFile("src/main/java/thaumcraft/common/entities/monster/EntityEldritchGuardian.java");
 
         assertTrue("PacketFXVisDrain must schedule client task and call proxy beam",
                 visDrain.contains("Minecraft.getMinecraft().addScheduledTask") && visDrain.contains("Thaumcraft.proxy.beam("));
@@ -50,11 +52,16 @@ public class ClientProxyFxStaticGuardTest {
                 shield.contains("Minecraft.getMinecraft().addScheduledTask")
                         && shield.contains("Thaumcraft.proxy.burst(")
                         && shield.contains("Thaumcraft.proxy.bolt("));
+        assertTrue("PacketFXSonic must schedule client task and route through proxy burst",
+                sonic.contains("Minecraft.getMinecraft().addScheduledTask")
+                        && sonic.contains("Thaumcraft.proxy.burst("));
         assertTrue("Server block-swap path must send PacketFXBlockSparkle around replaced block",
                 serverTick.contains("new PacketFXBlockSparkle(vs.x, vs.y, vs.z, 0xC0C0FF)"));
         assertTrue("Runic shielding paths must send PacketFXShield for player and champion shield reactions",
                 runic.contains("new PacketFXShield(player.getEntityId(), target)")
                         && runic.contains("new PacketFXShield(mob.getEntityId(), target)"));
+        assertTrue("Eldritch guardian sonic attack path must send PacketFXSonic",
+                eldritchGuardian.contains("new PacketFXSonic(this.getEntityId())"));
     }
 
     private static String readFile(String path) throws IOException {
