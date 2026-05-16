@@ -672,6 +672,30 @@ Some entities may be hard to trigger naturally until recipes/research/spawn cont
 
 - Тест проверяет coverage по регистрациям, но не доказывает visual parity reference renderers.
 
+### Checkpoint 2026-05-16 — dedicated pech renderer baseline
+
+Статус: частично продвинут.
+
+Что сделано:
+
+- Добавлен выделенный renderer `RenderPech` (`thaumcraft.client.renderers.entity.RenderPech`) вместо общего biped fallback для `EntityPech`.
+- `RenderPech` реализует базовый reference-shaped texture routing по `entity.getPechType()` с TC4 texture set:
+  - `textures/models/pech_forage.png`
+  - `textures/models/pech_thaum.png`
+  - `textures/models/pech_stalker.png`
+- `ClientProxy.setupEntityRenderers()` обновлен: `EntityPech` теперь регистрируется через `RenderPech::new`.
+- `ClientProxyEntityRendererRegistrationStaticGuardTest` расширен проверками:
+  - explicit `EntityPech -> RenderPech` registration path;
+  - наличие `RenderPech` с type-based texture routing и всеми тремя texture paths.
+
+Проверки:
+
+- `./scripts/dev.sh validate --smoke` — pending (run required for this checkpoint).
+
+Ограничения:
+
+- Это baseline по texture routing; full reference parity для `RenderPech` (custom model/held item/overlay behavior) остаётся открытой по GAP-3/GAP-6.
+
 - [ ] Add client-only entity renderer registration hook.
 - [ ] Register every entity from `ConfigEntities.ENTITIES` with a custom or vanilla-equivalent renderer.
 - [ ] Port item-like/transient/projectile renderers.

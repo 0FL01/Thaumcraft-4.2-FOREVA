@@ -59,7 +59,7 @@ public class ClientProxyEntityRendererRegistrationStaticGuardTest {
         assertTrue("ClientProxy must keep extended fallback registrations for the remaining Stage 8-d monster baseline",
                 source.contains("registerEntityRenderer(EntityFireBat.class, manager -> new RenderFallbackLiving<>(")
                         && source.contains("registerEntityRenderer(EntityWisp.class, manager -> new RenderFallbackLiving<>(")
-                        && source.contains("registerEntityRenderer(EntityPech.class, manager -> new RenderFallbackBiped<>(")
+                        && source.contains("registerEntityRenderer(EntityPech.class, RenderPech::new, registered);")
                         && source.contains("registerEntityRenderer(EntityEldritchGuardian.class, manager -> new RenderFallbackBiped<>(")
                         && source.contains("registerEntityRenderer(EntityEldritchWarden.class, manager -> new RenderFallbackBiped<>(")
                         && source.contains("registerEntityRenderer(EntityEldritchGolem.class, manager -> new RenderFallbackBiped<>(")
@@ -79,6 +79,13 @@ public class ClientProxyEntityRendererRegistrationStaticGuardTest {
                 readFile("src/main/java/thaumcraft/client/renderers/entity/RenderFallbackLiving.java").contains("extends RenderLiving<T>"));
         assertTrue("RenderFallbackBiped must exist as a non-noop typed texture renderer",
                 readFile("src/main/java/thaumcraft/client/renderers/entity/RenderFallbackBiped.java").contains("extends RenderBiped<T>"));
+        String pechRenderer = readFile("src/main/java/thaumcraft/client/renderers/entity/RenderPech.java");
+        assertTrue("RenderPech must provide pech-type texture routing baseline",
+                pechRenderer.contains("extends RenderBiped<EntityPech>")
+                        && pechRenderer.contains("textures/models/pech_forage.png")
+                        && pechRenderer.contains("textures/models/pech_thaum.png")
+                        && pechRenderer.contains("textures/models/pech_stalker.png")
+                        && pechRenderer.contains("entity.getPechType()"));
         assertTrue("ClientProxy must iterate ConfigEntities.ENTITIES for renderer registration coverage",
                 source.contains("for (net.minecraftforge.fml.common.registry.EntityEntry entry : ConfigEntities.ENTITIES)"));
         assertTrue("ClientProxy must keep fallback RenderNoop registrations for remaining entities",
