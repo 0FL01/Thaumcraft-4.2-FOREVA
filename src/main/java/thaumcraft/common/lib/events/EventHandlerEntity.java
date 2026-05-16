@@ -286,7 +286,9 @@ public class EventHandlerEntity {
     @SubscribeEvent
     public void onItemPickup(EntityItemPickupEvent event) {
         if (event.getEntity().world.isRemote) return;
-        // Phase 8: discovery research when picking up items
+        if (event.getEntityPlayer().getName().startsWith("FakeThaumcraft")) {
+            event.setCanceled(true);
+        }
     }
 
     @SubscribeEvent

@@ -400,6 +400,25 @@ Depends on GAP-1, GAP-2, GAP-5, and GAP-6. Network-thread rendering is unsafe if
 
 - This checkpoint restores crafting-return hooks only; harvest-drop special mining replacement path remains outside this narrow scope.
 
+#### Checkpoint 2026-05-16 — EventHandlerEntity fake-pickup guard restored
+
+Статус: `EventHandlerEntity.onItemPickup(...)` now restores the reference fake-player pickup cancel guard.
+
+Что сделано:
+
+- Restored server-side pickup cancellation for fake Thaumcraft actors:
+  - `if (event.getEntityPlayer().getName().startsWith("FakeThaumcraft")) event.setCanceled(true);`
+- Added static guard `EventHandlerEntityPickupStaticGuardTest` to lock this guard path.
+
+Проверки:
+
+- `./scripts/dev.sh test` — passed.
+- `./scripts/dev.sh validate --smoke` — passed.
+
+Ограничения:
+
+- This checkpoint restores only the fake-player pickup guard; broader research-discovery pickup parity remains out of scope.
+
 #### Checkpoint 2026-05-16 — GAP-3 shield packet and runic send paths restored
 
 Статус: `PacketFXShield` now has payload/handler baseline and runic shield code paths send it again.
