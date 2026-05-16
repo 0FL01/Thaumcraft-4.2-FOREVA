@@ -392,6 +392,45 @@ public class ClientProxy extends CommonProxy {
     }
 
     @Override
+    public void slimeJumpFX(Entity entity, int size) {
+        if (entity == null || entity.world == null || !entity.world.isRemote) return;
+        World world = entity.world;
+        int amount = particleCount(Math.max(1, size + 1));
+        if (amount <= 0) return;
+
+        for (int i = 0; i < amount; i++) {
+            float x = (float) (entity.posX + (world.rand.nextFloat() - world.rand.nextFloat()) * 0.4f);
+            float y = (float) ((entity.getEntityBoundingBox().minY + entity.getEntityBoundingBox().maxY) * 0.5);
+            float z = (float) (entity.posZ + (world.rand.nextFloat() - world.rand.nextFloat()) * 0.4f);
+            sparkle(x, y, z, 0.7f, 0xAA22FF, 0.03f);
+        }
+    }
+
+    @Override
+    public void drawGenericParticles(World world, double x, double y, double z,
+                                     double mx, double my, double mz,
+                                     float red, float green, float blue, float alpha,
+                                     boolean loop, int start, int num, int inc, int age, int delay, float scale) {
+        if (world == null || !world.isRemote) return;
+        int amount = particleCount(Math.max(1, num / 2 + 1));
+        if (amount <= 0) return;
+
+        for (int i = 0; i < amount; i++) {
+            double px = x + (world.rand.nextFloat() - 0.5f) * 0.15f;
+            double py = y + (world.rand.nextFloat() - 0.5f) * 0.15f;
+            double pz = z + (world.rand.nextFloat() - 0.5f) * 0.15f;
+            world.spawnParticle(EnumParticleTypes.REDSTONE, px, py, pz, red, green, blue);
+            if (alpha >= 0.6f || loop || world.rand.nextBoolean()) {
+                world.spawnParticle(EnumParticleTypes.CRIT_MAGIC,
+                        px, py, pz,
+                        mx + (world.rand.nextFloat() - 0.5f) * 0.01f,
+                        my + (world.rand.nextFloat() - 0.5f) * 0.01f,
+                        mz + (world.rand.nextFloat() - 0.5f) * 0.01f);
+            }
+        }
+    }
+
+    @Override
     public void sparkle(float x, float y, float z, float scale, int type, float speed) {
         Minecraft mc = Minecraft.getMinecraft();
         World world = mc == null ? null : mc.world;

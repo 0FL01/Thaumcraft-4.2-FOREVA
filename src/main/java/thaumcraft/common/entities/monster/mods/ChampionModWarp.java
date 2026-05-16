@@ -17,6 +17,18 @@ public class ChampionModWarp extends java.lang.Object implements IChampionModifi
 
     @Override
     public void showFX(EntityLivingBase boss) {
-        // TODO: client FX
+        if (boss.world.rand.nextBoolean()) return;
+        float w = boss.world.rand.nextFloat() * boss.width;
+        float d = boss.world.rand.nextFloat() * boss.width;
+        float h = boss.world.rand.nextFloat() * boss.height;
+        Thaumcraft.proxy.drawGenericParticles(
+                boss.world,
+                boss.getEntityBoundingBox().minX + w,
+                boss.getEntityBoundingBox().minY + h,
+                boss.getEntityBoundingBox().minZ + d,
+                0.0, 0.0, 0.0,
+                0.8f + boss.world.rand.nextFloat() * 0.2f, 0.0f, 0.9f + boss.world.rand.nextFloat() * 0.1f,
+                0.7f, true, 72, 8, 1, 10 + boss.world.rand.nextInt(4), 0, 0.6f + boss.world.rand.nextFloat() * 0.4f
+        );
     }
 }

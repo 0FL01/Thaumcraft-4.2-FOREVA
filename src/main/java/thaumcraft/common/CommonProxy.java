@@ -160,6 +160,15 @@ public class CommonProxy implements IGuiHandler {
     public void taintLandFX(Entity entity) {
     }
 
+    public void slimeJumpFX(Entity entity, int size) {
+    }
+
+    public void drawGenericParticles(World world, double x, double y, double z,
+                                     double mx, double my, double mz,
+                                     float red, float green, float blue, float alpha,
+                                     boolean loop, int start, int num, int inc, int age, int delay, float scale) {
+    }
+
     public void sparkle(float x, float y, float z, float scale, int type, float speed) {
     }
 

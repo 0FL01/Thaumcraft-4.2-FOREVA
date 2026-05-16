@@ -2,6 +2,7 @@ package thaumcraft.common.entities.monster.mods;
 
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.util.DamageSource;
+import thaumcraft.common.Thaumcraft;
 import thaumcraft.common.entities.monster.EntityTaintSpider;
 
 public class ChampionModInfested extends java.lang.Object implements IChampionModifierEffect {
@@ -21,6 +22,8 @@ public class ChampionModInfested extends java.lang.Object implements IChampionMo
 
     @Override
     public void showFX(EntityLivingBase boss) {
-        // TODO: client FX (Phase 8)
+        if (boss.world.rand.nextBoolean()) {
+            Thaumcraft.proxy.slimeJumpFX(boss, 0);
+        }
     }
 }

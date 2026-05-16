@@ -29,6 +29,10 @@ public class ClientProxyFxStaticGuardTest {
                 source.contains("public void wispFXEG(") && source.contains("target.height * 0.22f"));
         assertTrue("ClientProxy must override taintLandFX for falling taint landing FX",
                 source.contains("public void taintLandFX(") && source.contains("entity.getEntityBoundingBox()"));
+        assertTrue("ClientProxy must override slimeJumpFX for infested champion fallback",
+                source.contains("public void slimeJumpFX(") && source.contains("sparkle(x, y, z, 0.7f, 0xAA22FF"));
+        assertTrue("ClientProxy must override drawGenericParticles for champion modifier fallback",
+                source.contains("public void drawGenericParticles(") && source.contains("EnumParticleTypes.REDSTONE"));
         assertTrue("ClientProxy must override sparkle for firebat/lifter visuals",
                 source.contains("public void sparkle(") && source.contains("EnumParticleTypes.REDSTONE"));
         assertTrue("ClientProxy must override particleCount using client particle settings",

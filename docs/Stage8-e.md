@@ -467,6 +467,32 @@ Depends on GAP-1, GAP-2, GAP-5, and GAP-6. Network-thread rendering is unsafe if
 
 - This checkpoint restores only the owner-interact guard path; Pech trade UX/flows remain outside this narrow scope.
 
+#### Checkpoint 2026-05-16 — Champion modifier client FX hooks restored (fallback surface)
+
+Статус: `ChampionMod*::showFX` placeholder cluster is now wired to client proxy fallback FX paths.
+
+Что сделано:
+
+- Restored `showFX(...)` implementations across champion modifier classes:
+  - `ChampionModArmored`, `ChampionModBold`, `ChampionModFire`, `ChampionModGrim`,
+    `ChampionModInfested`, `ChampionModMighty`, `ChampionModPoison`, `ChampionModSickly`,
+    `ChampionModSpined`, `ChampionModUndying`, `ChampionModVampire`, `ChampionModWarded`, `ChampionModWarp`.
+- Added/used proxy fallback surface for these hooks:
+  - `CommonProxy`/`ClientProxy`: `drawGenericParticles(...)` and `slimeJumpFX(...)`;
+  - champion hooks now route through `Thaumcraft.proxy.*` paths instead of TODO no-op bodies.
+- Added static guard coverage:
+  - `ChampionModFxStaticGuardTest` enforces showFX proxy routing and absence of placeholder TODO text;
+  - `ClientProxyFxStaticGuardTest` now enforces `slimeJumpFX(...)` and `drawGenericParticles(...)` overrides.
+
+Проверки:
+
+- `./scripts/dev.sh test` — passed.
+- `./scripts/dev.sh validate --smoke` — passed.
+
+Ограничения:
+
+- This is fallback particle parity through proxy helpers; dedicated reference particle classes (`FXSpark`/`ParticleEngine`-backed champion visuals) remain outside this narrow checkpoint.
+
 #### Checkpoint 2026-05-16 — GAP-3 shield packet and runic send paths restored
 
 Статус: `PacketFXShield` now has payload/handler baseline and runic shield code paths send it again.
