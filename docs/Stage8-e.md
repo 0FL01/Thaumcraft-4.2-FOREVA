@@ -1501,6 +1501,27 @@ Depends on GAP-1 and GAP-3. Some infusion source scenarios may require Stage 9 c
 
 - Это gameplay-contract baseline; client tooltip/icon parity для void/crimson equipment остаётся отдельным Stage 8 renderer/UI polish.
 
+#### Checkpoint 2026-05-17 — GAP-11 primal-arrow subtype registry baseline
+
+Статус: частично продвинут.
+
+Что сделано:
+
+- `ItemPrimalArrow.getSubItems(...)` восстановлен до reference-shaped subtype coverage:
+  - creative listing теперь добавляет все primal variants `meta 0..5` (вместо только `0`).
+- Добавлен `ItemPrimalArrowStaticGuardTest`, фиксирующий:
+  - subtype/max-stack init surface;
+  - translation-key metadata suffix;
+  - `meta 0..5` creative-variant contract.
+
+Проверки:
+
+- `./scripts/dev.sh validate --smoke` — passed.
+
+Ограничения:
+
+- Это metadata-availability baseline; визуальная икон-парити primal arrow variants остаётся в client-render/manual зоне.
+
 ### GAP-12: FX registration exists, but send-site coverage and manual scenario validation are incomplete
 
 **Статус:** требует проверки  

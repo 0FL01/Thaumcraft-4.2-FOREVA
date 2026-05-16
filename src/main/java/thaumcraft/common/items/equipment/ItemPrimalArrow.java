@@ -23,7 +23,9 @@ public class ItemPrimalArrow extends Item {
     @Override
     public void getSubItems(CreativeTabs tab, NonNullList<ItemStack> items) {
         if (this.isInCreativeTab(tab)) {
-            items.add(new ItemStack(this, 1, 0));
+            for (int meta = 0; meta <= 5; meta++) {
+                items.add(new ItemStack(this, 1, meta));
+            }
         }
     }
 }
