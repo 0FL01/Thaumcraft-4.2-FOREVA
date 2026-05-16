@@ -199,6 +199,33 @@ Define and implement the Stage 8-e subset of proxy helpers required by current p
 
 Depends on GAP-1 and GAP-5. Expanding proxy APIs too broadly can create unnecessary classloading risk; keep the implementation scoped to packet handlers and current callers.
 
+#### Checkpoint 2026-05-16 — GAP-2 client FX fallback baseline
+
+Статус: ключевые proxy FX helpers for current non-GUI call sites are no longer client no-op.
+
+Что сделано:
+
+- Implemented client fallback effects in `ClientProxy` for:
+  - `blockSparkle(...)`
+  - `beam(...)`
+  - `bolt(...)`
+  - `burst(...)`
+  - `wispFX3(...)`
+  - `sparkle(...)`
+  - `particleCount(...)` with `Minecraft.gameSettings.particleSetting` scaling.
+- Kept `CommonProxy` methods server-safe no-op; only client overrides execute particle spawning.
+- Added static guard test `ClientProxyFxStaticGuardTest` to lock non-no-op proxy surface for these methods.
+
+Проверки:
+
+- `./scripts/dev.sh test` — passed.
+- `./scripts/dev.sh validate --smoke` — passed.
+
+Ограничения:
+
+- This checkpoint provides fallback particle/beam/lightning visuals, not full reference `EntityFX`/beam/bolt class parity.
+- Manual visual comparison remains skipped by instruction.
+
 ### GAP-3: FX packet classes are mostly empty or handlerless
 
 **Статус:** отсутствует / частично реализовано  
@@ -255,6 +282,26 @@ Port all 14 FX packet payloads and client handlers, using Forge 1.12.2 main-thre
 **Риски / зависимости:**
 
 Depends on GAP-1, GAP-2, GAP-5, and GAP-6. Network-thread rendering is unsafe if not scheduled correctly in 1.12.2.
+
+#### Checkpoint 2026-05-16 — GAP-3 FX handler wiring for active channels
+
+Статус: active FX channels `PacketFXVisDrain` and `PacketFXBlockArc` now have client scheduling handlers.
+
+Что сделано:
+
+- `PacketFXVisDrain` now schedules client work and routes to `Thaumcraft.proxy.beam(...)` instead of returning no-op.
+- `PacketFXBlockArc` now schedules client work, resolves source entity by id, and routes to `Thaumcraft.proxy.bolt(...)` with source-type color fallback.
+- Added `PacketFXSerializationTest` to lock binary round-trip payloads for both packets.
+- Added static handler guard coverage in `ClientProxyFxStaticGuardTest`.
+
+Проверки:
+
+- `./scripts/dev.sh test` — passed.
+- `./scripts/dev.sh validate --smoke` — passed.
+
+Ограничения:
+
+- Remaining FX packet families are still open in this stage and require further porting.
 
 ### GAP-4: Beam, wand beam, bore beam, power beam, arc, and lightning bolt classes are absent
 

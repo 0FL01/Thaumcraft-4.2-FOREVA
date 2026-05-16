@@ -1,5 +1,6 @@
 package thaumcraft.client;
 
+import java.awt.Color;
 import javax.annotation.Nullable;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
@@ -7,6 +8,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.Item;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextFormatting;
@@ -238,16 +240,175 @@ public class ClientProxy extends CommonProxy {
 
     @Override
     public void blockSparkle(World world, int x, int y, int z, int color, int count) {
-        // Phase 8: particle FX
+        if (world == null || !world.isRemote) return;
+        int amount = particleCount(Math.max(1, count));
+        if (amount <= 0) return;
+
+        Color tint = decodeColor(color);
+        float red = normalizeColor(tint.getRed());
+        float green = normalizeColor(tint.getGreen());
+        float blue = normalizeColor(tint.getBlue());
+        for (int i = 0; i < amount; i++) {
+            double px = x + world.rand.nextFloat();
+            double py = y + world.rand.nextFloat();
+            double pz = z + world.rand.nextFloat();
+            world.spawnParticle(EnumParticleTypes.REDSTONE, px, py, pz, red, green, blue);
+        }
     }
 
     @Override
     public void beam(World world, double x, double y, double z, double tx, double ty, double tz, int color, boolean flicker, int ticks) {
-        // Phase 8: beam FX
+        if (world == null || !world.isRemote) return;
+        int amount = particleCount(Math.max(4, ticks / 2));
+        if (amount <= 0) return;
+
+        Color tint = decodeColor(color);
+        float red = normalizeColor(tint.getRed());
+        float green = normalizeColor(tint.getGreen());
+        float blue = normalizeColor(tint.getBlue());
+
+        double dx = tx - x;
+        double dy = ty - y;
+        double dz = tz - z;
+        for (int i = 0; i <= amount; i++) {
+            double t = amount == 0 ? 0.0 : (double) i / (double) amount;
+            double px = x + dx * t + (world.rand.nextFloat() - 0.5f) * 0.08f;
+            double py = y + dy * t + (world.rand.nextFloat() - 0.5f) * 0.08f;
+            double pz = z + dz * t + (world.rand.nextFloat() - 0.5f) * 0.08f;
+            if (flicker) {
+                world.spawnParticle(EnumParticleTypes.CRIT_MAGIC, px, py, pz, 0.0, 0.0, 0.0);
+            } else {
+                world.spawnParticle(EnumParticleTypes.REDSTONE, px, py, pz, red, green, blue);
+            }
+        }
     }
 
     @Override
     public void bolt(World world, double x, double y, double z, double tx, double ty, double tz, int color, int speed) {
-        // Phase 8: lightning bolt FX
+        if (world == null || !world.isRemote) return;
+        int amount = particleCount(Math.max(6, speed * 2));
+        if (amount <= 0) return;
+
+        Color tint = decodeColor(color);
+        float red = normalizeColor(tint.getRed());
+        float green = normalizeColor(tint.getGreen());
+        float blue = normalizeColor(tint.getBlue());
+
+        double dx = tx - x;
+        double dy = ty - y;
+        double dz = tz - z;
+        for (int i = 0; i <= amount; i++) {
+            double t = amount == 0 ? 0.0 : (double) i / (double) amount;
+            double noise = 0.18f;
+            double px = x + dx * t + (world.rand.nextFloat() - 0.5f) * noise;
+            double py = y + dy * t + (world.rand.nextFloat() - 0.5f) * noise;
+            double pz = z + dz * t + (world.rand.nextFloat() - 0.5f) * noise;
+            world.spawnParticle(EnumParticleTypes.REDSTONE, px, py, pz, red, green, blue);
+            if (world.rand.nextBoolean()) {
+                world.spawnParticle(EnumParticleTypes.CRIT_MAGIC, px, py, pz, 0.0, 0.0, 0.0);
+            }
+        }
+    }
+
+    @Override
+    public void burst(World world, double x, double y, double z, float scale) {
+        if (world == null || !world.isRemote) return;
+        int amount = particleCount(Math.max(6, (int) (scale * 12.0f)));
+        if (amount <= 0) return;
+
+        for (int i = 0; i < amount; i++) {
+            double mx = (world.rand.nextFloat() - 0.5f) * 0.2f;
+            double my = (world.rand.nextFloat() - 0.5f) * 0.2f;
+            double mz = (world.rand.nextFloat() - 0.5f) * 0.2f;
+            world.spawnParticle(EnumParticleTypes.EXPLOSION_NORMAL, x, y, z, mx, my, mz);
+        }
+    }
+
+    @Override
+    public void wispFX3(World world, double x, double y, double z, double tx, double ty, double tz, float size, int count, boolean flag, float speed) {
+        if (world == null || !world.isRemote) return;
+        int amount = particleCount(Math.max(2, (int) (size * 18.0f)));
+        if (amount <= 0) return;
+
+        float red = speed;
+        if (red < 0.0f) red = 0.0f;
+        if (red > 1.0f) red = 1.0f;
+        float green = flag ? 0.8f : 0.4f;
+        float blue = 1.0f - red * 0.5f;
+
+        boolean hasTarget = tx != 0.0 || ty != 0.0 || tz != 0.0;
+        for (int i = 0; i < amount; i++) {
+            double px;
+            double py;
+            double pz;
+            if (hasTarget) {
+                double t = (double) i / (double) amount;
+                px = x + (tx - x) * t + (world.rand.nextFloat() - 0.5f) * 0.12f;
+                py = y + (ty - y) * t + (world.rand.nextFloat() - 0.5f) * 0.12f;
+                pz = z + (tz - z) * t + (world.rand.nextFloat() - 0.5f) * 0.12f;
+            } else {
+                px = x + (world.rand.nextFloat() - 0.5f) * 0.55f;
+                py = y + (world.rand.nextFloat() - 0.5f) * 0.55f;
+                pz = z + (world.rand.nextFloat() - 0.5f) * 0.55f;
+            }
+            world.spawnParticle(EnumParticleTypes.REDSTONE, px, py, pz, red, green, blue);
+        }
+    }
+
+    @Override
+    public void sparkle(float x, float y, float z, float scale, int type, float speed) {
+        Minecraft mc = Minecraft.getMinecraft();
+        World world = mc == null ? null : mc.world;
+        if (world == null || !world.isRemote) return;
+        int amount = particleCount(Math.max(1, (int) (scale * 4.0f)));
+        if (amount <= 0) return;
+
+        float red = ((type & 0xFF) / 255.0f);
+        float green = ((type >> 8) & 0xFF) / 255.0f;
+        float blue = ((type >> 16) & 0xFF) / 255.0f;
+        if (red == 0.0f && green == 0.0f && blue == 0.0f) {
+            red = 0.8f;
+            green = 0.8f;
+            blue = 1.0f;
+        }
+        for (int i = 0; i < amount; i++) {
+            double mx = (world.rand.nextFloat() - 0.5f) * 0.02f;
+            double my = Math.max(-0.2f, Math.min(0.2f, speed * 0.05f));
+            double mz = (world.rand.nextFloat() - 0.5f) * 0.02f;
+            world.spawnParticle(EnumParticleTypes.REDSTONE,
+                    x + (world.rand.nextFloat() - 0.5f) * 0.2f,
+                    y + (world.rand.nextFloat() - 0.5f) * 0.2f,
+                    z + (world.rand.nextFloat() - 0.5f) * 0.2f,
+                    red, green, blue);
+            world.spawnParticle(EnumParticleTypes.CRIT_MAGIC, x, y, z, mx, my, mz);
+        }
+    }
+
+    @Override
+    public int particleCount(int base) {
+        Minecraft mc = Minecraft.getMinecraft();
+        if (mc == null || mc.gameSettings == null) {
+            return Math.max(1, base);
+        }
+        int setting = mc.gameSettings.particleSetting;
+        if (setting >= 2) {
+            return 0;
+        }
+        if (setting == 1) {
+            return Math.max(1, base);
+        }
+        return Math.max(1, base * 2);
+    }
+
+    private static Color decodeColor(int color) {
+        if (color < 0 || color > 0xFFFFFF) {
+            return new Color(0xCCCCFF);
+        }
+        return new Color(color);
+    }
+
+    private static float normalizeColor(int channel) {
+        float c = channel / 255.0f;
+        return c <= 0.01f ? 0.02f : c;
     }
 }

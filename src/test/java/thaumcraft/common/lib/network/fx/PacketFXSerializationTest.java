@@ -1,0 +1,55 @@
+package thaumcraft.common.lib.network.fx;
+
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
+import net.minecraft.util.math.BlockPos;
+import org.junit.Test;
+import thaumcraft.common.lib.network.PacketBase;
+
+import java.lang.reflect.Field;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
+public class PacketFXSerializationTest {
+
+    @Test
+    public void blockArcPacketRoundTripsPayload() {
+        PacketFXBlockArc source = new PacketFXBlockArc(13, 64, -7, 101);
+        PacketFXBlockArc target = new PacketFXBlockArc();
+        roundTrip(source, target);
+
+        assertEquals(13, (int) getField(target, "x"));
+        assertEquals(64, (int) getField(target, "y"));
+        assertEquals(-7, (int) getField(target, "z"));
+        assertEquals(101, (int) getField(target, "entityId"));
+    }
+
+    @Test
+    public void visDrainPacketRoundTripsPayload() {
+        PacketFXVisDrain source = new PacketFXVisDrain(new BlockPos(1, 2, 3), new BlockPos(-4, 5, -6), 0x55AAFF);
+        PacketFXVisDrain target = new PacketFXVisDrain();
+        roundTrip(source, target);
+
+        assertEquals(new BlockPos(1, 2, 3), getField(target, "from"));
+        assertEquals(new BlockPos(-4, 5, -6), getField(target, "to"));
+        assertEquals(0x55AAFF, (int) getField(target, "color"));
+    }
+
+    private static void roundTrip(PacketBase source, PacketBase target) {
+        ByteBuf buffer = Unpooled.buffer();
+        source.toBytes(buffer);
+        target.fromBytes(buffer);
+        assertTrue(buffer.readableBytes() == 0);
+    }
+
+    private static Object getField(Object target, String name) {
+        try {
+            Field declared = target.getClass().getDeclaredField(name);
+            declared.setAccessible(true);
+            return declared.get(target);
+        } catch (Exception e) {
+            throw new AssertionError("Unable to read field " + name + " on " + target.getClass().getSimpleName(), e);
+        }
+    }
+}
