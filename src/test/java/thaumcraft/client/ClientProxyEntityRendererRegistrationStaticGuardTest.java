@@ -277,6 +277,7 @@ public class ClientProxyEntityRendererRegistrationStaticGuardTest {
         assertTrue("EntityTaintCreeper must keep underwater/no-despawn baseline contracts",
                 taintCreeperEntity.contains("public boolean canBreatheUnderwater()")
                         && taintCreeperEntity.contains("protected boolean canDespawn()")
+                        && taintCreeperEntity.contains("public boolean attackEntityAsMob(net.minecraft.entity.Entity entityIn)")
                         && taintCreeperEntity.contains("return true;")
                         && taintCreeperEntity.contains("return false;"));
         assertTrue("EntityTaintCreeper must keep reference-shaped NBT persistence contracts",

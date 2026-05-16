@@ -56,6 +56,11 @@ public class EntityTaintCreeper extends net.minecraft.entity.monster.EntityMob i
         return false;
     }
 
+    @Override
+    public boolean attackEntityAsMob(net.minecraft.entity.Entity entityIn) {
+        return true;
+    }
+
     public int getCreeperState() {
         return this.dataManager.get(CREEPER_STATE);
     }

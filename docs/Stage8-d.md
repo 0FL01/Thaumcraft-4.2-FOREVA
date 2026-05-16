@@ -1405,6 +1405,24 @@ Some entities may be hard to trigger naturally until recipes/research/spawn cont
 
 - Это NBT-contract baseline; полная parity explosion gameplay path (taint spread/potion side effects) остаётся в Stage 6 runtime scope.
 
+### Checkpoint 2026-05-16 — restore taint creeper no-melee-hit attack contract
+
+Статус: частично продвинут.
+
+Что сделано:
+
+- `EntityTaintCreeper` расширен reference-shaped attack contract:
+  - добавлен override `attackEntityAsMob(Entity)` с `return true;` без стандартного `EntityMob` melee damage path.
+- `ClientProxyEntityRendererRegistrationStaticGuardTest` закрепляет presence no-melee-hit attack hook в `EntityTaintCreeper`.
+
+Проверки:
+
+- `./scripts/dev.sh validate --smoke` — passed.
+
+Ограничения:
+
+- Это attack-contract baseline; полная parity taint creeper explosion-side gameplay logic остаётся в Stage 6 runtime scope.
+
 ### Checkpoint 2026-05-16 — restore mind spider viewer-only render gating
 
 Статус: частично продвинут.
