@@ -22,6 +22,9 @@ public class ItemBucketDeathStaticGuardTest {
         assertTrue("Bucket of Death must keep creative bypass and survival empty-bucket return",
                 source.contains("if (player.capabilities.isCreativeMode)")
                         && source.contains("new ItemStack(Items.BUCKET)"));
+        assertTrue("Bucket of Death no-op branches must return PASS rather than hard FAIL",
+                source.contains("return new ActionResult<>(EnumActionResult.PASS, stack);")
+                        && !source.contains("new ActionResult<>(EnumActionResult.FAIL, stack)"));
     }
 
     private static String readFile(String path) throws IOException {

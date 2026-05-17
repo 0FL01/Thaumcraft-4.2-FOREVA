@@ -41,7 +41,7 @@ public class ItemBucketDeath extends Item {
         BlockPos target = mop.getBlockPos().offset(mop.sideHit == null ? EnumFacing.UP : mop.sideHit);
         EnumFacing side = mop.sideHit == null ? EnumFacing.UP : mop.sideHit;
         if (!player.canPlayerEdit(target, side, stack)) {
-            return new ActionResult<>(EnumActionResult.FAIL, stack);
+            return new ActionResult<>(EnumActionResult.PASS, stack);
         }
 
         if (tryPlaceContainedLiquid(world, target)) {
@@ -50,7 +50,7 @@ public class ItemBucketDeath extends Item {
             }
             return new ActionResult<>(EnumActionResult.SUCCESS, new ItemStack(Items.BUCKET));
         }
-        return new ActionResult<>(EnumActionResult.FAIL, stack);
+        return new ActionResult<>(EnumActionResult.PASS, stack);
     }
 
     public boolean tryPlaceContainedLiquid(World world, BlockPos pos) {
