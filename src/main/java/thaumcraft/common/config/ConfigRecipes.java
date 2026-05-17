@@ -21,8 +21,10 @@ import thaumcraft.api.aspects.Aspect;
 import thaumcraft.api.aspects.AspectList;
 import thaumcraft.api.aspects.IEssentiaContainerItem;
 import thaumcraft.api.crafting.CrucibleRecipe;
+import thaumcraft.api.wands.WandTriggerRegistry;
 import thaumcraft.api.wands.WandCap;
 import thaumcraft.api.wands.WandRod;
+import thaumcraft.common.Thaumcraft;
 import thaumcraft.common.lib.crafting.ArcaneSceptreRecipe;
 import thaumcraft.common.lib.crafting.ArcaneWandRecipe;
 import thaumcraft.common.lib.crafting.ShapelessNBTOreRecipe;
@@ -186,6 +188,19 @@ public class ConfigRecipes {
                                 new ItemStack(ConfigBlocks.blockMetalDevice, 1, 3), new ItemStack(ConfigBlocks.blockMetalDevice, 1, 3), new ItemStack(ConfigBlocks.blockMetalDevice, 1, 3),
                                 new ItemStack(ConfigBlocks.blockMetalDevice, 1, 3), new ItemStack(ConfigBlocks.blockStoneDevice, 1, 0), new ItemStack(ConfigBlocks.blockMetalDevice, 1, 3),
                                 new ItemStack(ConfigBlocks.blockMetalDevice, 1, 3), new ItemStack(ConfigBlocks.blockMetalDevice, 1, 3), new ItemStack(ConfigBlocks.blockMetalDevice, 1, 3))));
+        if (Thaumcraft.proxy != null && Thaumcraft.proxy.wandManager != null) {
+            WandTriggerRegistry.registerWandBlockTrigger(Thaumcraft.proxy.wandManager, 0, Blocks.BOOKSHELF, 0, "Thaumcraft");
+            WandTriggerRegistry.registerWandBlockTrigger(Thaumcraft.proxy.wandManager, 1, Blocks.CAULDRON, -1, "Thaumcraft");
+            WandTriggerRegistry.registerWandBlockTrigger(Thaumcraft.proxy.wandManager, 2, Blocks.OBSIDIAN, -1, "Thaumcraft");
+            WandTriggerRegistry.registerWandBlockTrigger(Thaumcraft.proxy.wandManager, 2, Blocks.NETHERRACK, -1, "Thaumcraft");
+            WandTriggerRegistry.registerWandBlockTrigger(Thaumcraft.proxy.wandManager, 2, Blocks.NETHER_BRICK_FENCE, -1, "Thaumcraft");
+            WandTriggerRegistry.registerWandBlockTrigger(Thaumcraft.proxy.wandManager, 3, ConfigBlocks.blockStoneDevice, 2, "Thaumcraft");
+            WandTriggerRegistry.registerWandBlockTrigger(Thaumcraft.proxy.wandManager, 4, Blocks.GLASS, -1, "Thaumcraft");
+            WandTriggerRegistry.registerWandBlockTrigger(Thaumcraft.proxy.wandManager, 5, ConfigBlocks.blockMetalDevice, 9, "Thaumcraft");
+            WandTriggerRegistry.registerWandBlockTrigger(Thaumcraft.proxy.wandManager, 6, ConfigBlocks.blockEldritch, 0, "Thaumcraft");
+            WandTriggerRegistry.registerWandBlockTrigger(Thaumcraft.proxy.wandManager, 7, ConfigBlocks.blockMetalDevice, 3, "Thaumcraft");
+            WandTriggerRegistry.registerWandBlockTrigger(Thaumcraft.proxy.wandManager, 7, ConfigBlocks.blockMetalDevice, 9, "Thaumcraft_2");
+        }
         for (int a = 0; a < 6; a++) {
             if (recipeClusters[a] != null) {
                 ConfigResearch.recipes.put("Clusters" + a, recipeClusters[a]);

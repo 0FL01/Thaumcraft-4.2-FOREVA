@@ -15,6 +15,7 @@ import thaumcraft.common.entities.golems.EntityGolemBase;
 import thaumcraft.common.entities.golems.EntityTravelingTrunk;
 import thaumcraft.common.entities.golems.ContainerTravelingTrunk;
 import thaumcraft.common.entities.monster.EntityPech;
+import thaumcraft.common.items.wands.WandManager;
 import thaumcraft.common.lib.capabilities.IPlayerKnowledge;
 import thaumcraft.common.lib.capabilities.PlayerKnowledgeProvider;
 import thaumcraft.common.lib.research.PlayerKnowledge;
@@ -39,6 +40,7 @@ public class CommonProxy implements IGuiHandler {
     public static final int GUI_MAGIC_BOX = 18;
     public static final int GUI_SPA = 19;
     public static final int GUI_FOCAL_MANIPULATOR = 20;
+    public final WandManager wandManager = new WandManager();
 
     // Capability-based player data accessors
 

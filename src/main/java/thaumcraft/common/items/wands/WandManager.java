@@ -2,27 +2,40 @@ package thaumcraft.common.items.wands;
 
 import baubles.api.BaublesApi;
 import baubles.api.cap.IBaublesItemHandler;
+import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.potion.PotionEffect;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.SoundCategory;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.common.network.NetworkRegistry;
 import thaumcraft.api.IArchitect;
 import thaumcraft.api.IVisDiscountGear;
 import thaumcraft.api.aspects.Aspect;
 import thaumcraft.api.aspects.AspectList;
 import thaumcraft.api.wands.FocusUpgradeType;
+import thaumcraft.api.wands.IWandTriggerManager;
 import thaumcraft.api.wands.ItemFocusBasic;
 import thaumcraft.common.config.Config;
+import thaumcraft.common.config.ConfigBlocks;
+import thaumcraft.common.config.ConfigItems;
+import thaumcraft.common.entities.EntitySpecialItem;
 import thaumcraft.common.items.baubles.ItemAmuletVis;
 import thaumcraft.common.lib.TCSounds;
+import thaumcraft.common.lib.network.PacketHandler;
+import thaumcraft.common.lib.network.fx.PacketFXBlockSparkle;
+import thaumcraft.common.lib.research.ResearchManager;
+import thaumcraft.common.tiles.TileThaumatorium;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
 
-public class WandManager {
+public class WandManager implements IWandTriggerManager {
 
     private static final Map<Integer, Long> cooldownClient = new HashMap<>();
     private static final Map<Integer, Long> cooldownServer = new HashMap<>();
@@ -348,6 +361,131 @@ public class WandManager {
         }
         Map<Integer, Long> map = entityLiving.world.isRemote ? cooldownClient : cooldownServer;
         map.put(entityLiving.getEntityId(), System.currentTimeMillis() + (long) cooldown);
+    }
+
+    @Override
+    public boolean performTrigger(World world, ItemStack wand, EntityPlayer player, int x, int y, int z, int side, int event) {
+        switch (event) {
+            case 0:
+                return createThaumonomicon(wand, player, world, x, y, z);
+            case 1:
+                return createCrucible(wand, player, world, x, y, z);
+            case 2:
+                if (!ResearchManager.isResearchComplete(player, "INFERNALFURNACE")) break;
+                return createArcaneFurnace(wand, player, world, x, y, z);
+            case 3:
+                if (!ResearchManager.isResearchComplete(player, "INFUSION")) break;
+                return createInfusionAltar(wand, player, world, x, y, z);
+            case 4:
+                if (!ResearchManager.isResearchComplete(player, "NODEJAR")) break;
+                return createNodeJar(wand, player, world, x, y, z);
+            case 5:
+                if (!ResearchManager.isResearchComplete(player, "THAUMATORIUM")) break;
+                return createThaumatorium(wand, player, world, x, y, z, side);
+            case 6:
+                if (!ResearchManager.isResearchComplete(player, "OCULUS")) break;
+                return createOculus(wand, player, world, x, y, z, side);
+            case 7:
+                if (!ResearchManager.isResearchComplete(player, "ADVALCHEMYFURNACE")) break;
+                return createAdvancedAlchemicalFurnace(wand, player, world, x, y, z, side);
+            default:
+                break;
+        }
+        return false;
+    }
+
+    public static boolean createCrucible(ItemStack wandStack, EntityPlayer player, World world, int x, int y, int z) {
+        if (world.isRemote || wandStack.isEmpty() || !(wandStack.getItem() instanceof ItemWandCasting)) return false;
+        world.playSound(null, new BlockPos(x, y, z), TCSounds.WAND, SoundCategory.PLAYERS, 1.0F, 1.0F);
+        world.setBlockToAir(new BlockPos(x, y, z));
+        world.setBlockState(new BlockPos(x, y, z), ConfigBlocks.blockMetalDevice.getDefaultState().withProperty(thaumcraft.common.blocks.BlockMetalDevice.TYPE, 0), 3);
+        return true;
+    }
+
+    public static boolean createThaumonomicon(ItemStack wandStack, EntityPlayer player, World world, int x, int y, int z) {
+        if (world.isRemote || wandStack.isEmpty() || !(wandStack.getItem() instanceof ItemWandCasting)) return false;
+        ItemWandCasting wand = (ItemWandCasting) wandStack.getItem();
+        if (wand.getFocus(wandStack) != null) return false;
+
+        BlockPos pos = new BlockPos(x, y, z);
+        world.setBlockToAir(pos);
+
+        EntityItem entityItem = new EntitySpecialItem(world, x + 0.5, y + 0.3, z + 0.5, new ItemStack(ConfigItems.itemThaumonomicon));
+        entityItem.motionY = 0.0;
+        entityItem.motionX = 0.0;
+        entityItem.motionZ = 0.0;
+        world.spawnEntity(entityItem);
+
+        PacketHandler.INSTANCE.sendToAllAround(
+                new PacketFXBlockSparkle(x, y, z, -9999),
+                new NetworkRegistry.TargetPoint(world.provider.getDimension(), x, y, z, 32.0));
+        world.playSound(null, pos, TCSounds.WAND, SoundCategory.PLAYERS, 1.0F, 1.0F);
+        return true;
+    }
+
+    public static boolean createThaumatorium(ItemStack wandStack, EntityPlayer player, World world, int x, int y, int z, int side) {
+        if (wandStack.isEmpty() || !(wandStack.getItem() instanceof ItemWandCasting)) return false;
+        ItemWandCasting wand = (ItemWandCasting) wandStack.getItem();
+        BlockPos center = new BlockPos(x, y, z);
+        if (world.getBlockState(center.up()).getBlock() != ConfigBlocks.blockMetalDevice
+                || world.getBlockState(center.up()).getValue(thaumcraft.common.blocks.BlockMetalDevice.TYPE) != 9
+                || world.getBlockState(center.down()).getBlock() != ConfigBlocks.blockMetalDevice
+                || world.getBlockState(center.down()).getValue(thaumcraft.common.blocks.BlockMetalDevice.TYPE) != 0) {
+            if (world.getBlockState(center.down()).getBlock() == ConfigBlocks.blockMetalDevice
+                    && world.getBlockState(center.down()).getValue(thaumcraft.common.blocks.BlockMetalDevice.TYPE) == 9
+                    && world.getBlockState(center.down(2)).getBlock() == ConfigBlocks.blockMetalDevice
+                    && world.getBlockState(center.down(2)).getValue(thaumcraft.common.blocks.BlockMetalDevice.TYPE) == 0) {
+                center = center.down();
+            } else {
+                return false;
+            }
+        }
+        if (!wand.consumeAllVisCrafting(wandStack, player,
+                new AspectList().add(Aspect.FIRE, 15).add(Aspect.ORDER, 30).add(Aspect.WATER, 30), true)) {
+            return false;
+        }
+        if (world.isRemote) {
+            return false;
+        }
+
+        world.setBlockState(center, ConfigBlocks.blockMetalDevice.getDefaultState().withProperty(thaumcraft.common.blocks.BlockMetalDevice.TYPE, 10), 3);
+        world.setBlockState(center.up(), ConfigBlocks.blockMetalDevice.getDefaultState().withProperty(thaumcraft.common.blocks.BlockMetalDevice.TYPE, 11), 3);
+        TileEntity tile = world.getTileEntity(center);
+        if (tile instanceof TileThaumatorium) {
+            ((TileThaumatorium) tile).facing = EnumFacing.byIndex(side);
+            tile.markDirty();
+        }
+        world.notifyBlockUpdate(center, world.getBlockState(center), world.getBlockState(center), 3);
+        world.notifyBlockUpdate(center.up(), world.getBlockState(center.up()), world.getBlockState(center.up()), 3);
+
+        PacketHandler.INSTANCE.sendToAllAround(
+                new PacketFXBlockSparkle(center.getX(), center.getY(), center.getZ(), -9999),
+                new NetworkRegistry.TargetPoint(world.provider.getDimension(), center.getX(), center.getY(), center.getZ(), 32.0));
+        PacketHandler.INSTANCE.sendToAllAround(
+                new PacketFXBlockSparkle(center.getX(), center.getY() + 1, center.getZ(), -9999),
+                new NetworkRegistry.TargetPoint(world.provider.getDimension(), center.getX(), center.getY(), center.getZ(), 32.0));
+        world.playSound(null, center, TCSounds.WAND, SoundCategory.PLAYERS, 1.0F, 1.0F);
+        return true;
+    }
+
+    private static boolean createArcaneFurnace(ItemStack wandStack, EntityPlayer player, World world, int x, int y, int z) {
+        return false;
+    }
+
+    private static boolean createInfusionAltar(ItemStack wandStack, EntityPlayer player, World world, int x, int y, int z) {
+        return false;
+    }
+
+    private static boolean createNodeJar(ItemStack wandStack, EntityPlayer player, World world, int x, int y, int z) {
+        return false;
+    }
+
+    private static boolean createOculus(ItemStack wandStack, EntityPlayer player, World world, int x, int y, int z, int side) {
+        return false;
+    }
+
+    private static boolean createAdvancedAlchemicalFurnace(ItemStack wandStack, EntityPlayer player, World world, int x, int y, int z, int side) {
+        return false;
     }
 
     private static final class PouchLocation {
