@@ -595,6 +595,8 @@ VALIDATE_PASSED=0
 VALIDATE_SKIPPED=0
 VALIDATE_LAST_LOG=""
 VALIDATE_VERBOSE=0
+VALIDATE_PASSED_STEPS=()
+VALIDATE_SKIPPED_STEPS=()
 
 relative_path() {
   local path="$1"
@@ -647,6 +649,52 @@ validate_compile_java() {
   return "$status"
 }
 
+append_junit_failures() {
+  local results_dir="$1"
+  local log_file="$2"
+  python3 - "$results_dir" "$log_file" <<'PY'
+import glob
+import os
+import sys
+import xml.etree.ElementTree as ET
+
+results_dir, log_file = sys.argv[1:3]
+failures = []
+for path in sorted(glob.glob(os.path.join(results_dir, 'TEST-*.xml'))):
+    try:
+        suite = ET.parse(path).getroot()
+    except ET.ParseError as exc:
+        failures.append((os.path.basename(path), '<xml-parse>', 'could not parse XML: {}'.format(exc), ''))
+        continue
+    suite_name = suite.attrib.get('name', os.path.basename(path))
+    for case in suite.findall('testcase'):
+        case_name = case.attrib.get('name', '<unknown>')
+        class_name = case.attrib.get('classname', suite_name)
+        for node_name in ('failure', 'error'):
+            node = case.find(node_name)
+            if node is not None:
+                message = node.attrib.get('message') or (node.text or '').split('\n', 1)[0]
+                trace = node.text or ''
+                failures.append((class_name, case_name, message, trace))
+
+if not failures:
+    sys.exit(0)
+
+with open(log_file, 'a', encoding='utf-8') as fh:
+    fh.write('\n--- JUnit failure summary ---\n')
+    for index, (class_name, case_name, message, trace) in enumerate(failures, 1):
+        fh.write('{}. {}#{}: {}\n'.format(index, class_name, case_name, message))
+        first_project_frame = ''
+        for line in trace.splitlines():
+            stripped = line.strip()
+            if stripped.startswith('at thaumcraft.'):
+                first_project_frame = stripped
+                break
+        if first_project_frame:
+            fh.write('   {}\n'.format(first_project_frame))
+PY
+}
+
 validate_tests() {
   if [[ ! -d "$ROOT/src/test/java" ]] || ! find "$ROOT/src/test/java" -name '*.java' -print -quit | grep -q .; then
     printf 'no test sources'
@@ -658,6 +706,7 @@ validate_tests() {
   local status="$?"
   set -e
   if [[ "$status" -ne 0 ]]; then
+    append_junit_failures "$ROOT/build/test-results/test" "$ROOT/$VALIDATE_LAST_LOG"
     printf 'exit %s; log: %s' "$status" "$VALIDATE_LAST_LOG"
     return "$status"
   fi
@@ -765,7 +814,7 @@ validate_smoke_server() {
 validate_step() {
   local name="$1"
   shift
-  local output status label
+  local output status
 
   VALIDATE_LAST_LOG=""
   set +e
@@ -775,28 +824,29 @@ validate_step() {
 
   case "$status" in
     0)
-      label="PASS"
       VALIDATE_TOTAL=$((VALIDATE_TOTAL + 1))
       VALIDATE_PASSED=$((VALIDATE_PASSED + 1))
+      VALIDATE_PASSED_STEPS+=("$name")
       ;;
     2)
-      label="SKIP"
       VALIDATE_SKIPPED=$((VALIDATE_SKIPPED + 1))
+      VALIDATE_SKIPPED_STEPS+=("$name")
       ;;
     *)
-      label="FAIL"
       VALIDATE_TOTAL=$((VALIDATE_TOTAL + 1))
       ;;
   esac
 
-  printf '%-5s %-15s (%s)\n' "$label" "$name" "$output"
-
   if [[ "$status" -ne 0 && "$status" -ne 2 ]]; then
+    printf 'FAIL validate: %s\n' "$name"
+    printf 'reason: %s\n' "${output:-exit $status}"
+    if [[ -n "$VALIDATE_LAST_LOG" ]]; then
+      printf 'log: %s\n' "$VALIDATE_LAST_LOG"
+    fi
     if [[ "$VALIDATE_VERBOSE" -eq 1 && -n "$VALIDATE_LAST_LOG" && -f "$ROOT/$VALIDATE_LAST_LOG" ]]; then
       printf -- '--- %s tail ---\n' "$VALIDATE_LAST_LOG"
       tail -40 "$ROOT/$VALIDATE_LAST_LOG"
     fi
-    printf '=== RESULT: FAIL (%s/%s, stopped at %s) ===\n' "$VALIDATE_PASSED" "$VALIDATE_TOTAL" "$name"
     return 1
   fi
 
@@ -809,6 +859,8 @@ validate() {
   VALIDATE_PASSED=0
   VALIDATE_SKIPPED=0
   VALIDATE_VERBOSE=0
+  VALIDATE_PASSED_STEPS=()
+  VALIDATE_SKIPPED_STEPS=()
 
   while [[ "$#" -gt 0 ]]; do
     case "$1" in
@@ -830,7 +882,6 @@ validate() {
     shift
   done
 
-  printf '=== validate ===\n'
   validate_step git-status validate_git_status || return 1
   validate_step compileJava validate_compile_java || return 1
   validate_step test validate_tests || return 1
@@ -839,7 +890,15 @@ validate() {
   if [[ "$run_smoke" -eq 1 ]]; then
     validate_step smoke-server validate_smoke_server || return 1
   fi
-  printf '=== RESULT: PASS (%s/%s, %s skipped) ===\n' "$VALIDATE_PASSED" "$VALIDATE_TOTAL" "$VALIDATE_SKIPPED"
+  printf 'PASS validate: %s\n' "${VALIDATE_PASSED_STEPS[*]}"
+  if [[ "$VALIDATE_SKIPPED" -gt 0 ]]; then
+    printf 'SKIP validate: %s\n' "${VALIDATE_SKIPPED_STEPS[*]}"
+  fi
+  if [[ "$run_smoke" -eq 1 ]]; then
+    printf 'logs: run/validate/, run/smoke-server.log\n'
+  else
+    printf 'logs: run/validate/\n'
+  fi
 }
 
 cmd="${1:-help}"

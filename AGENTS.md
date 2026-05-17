@@ -52,8 +52,6 @@ Asset origin: assets (textures, sounds, models, lang, shaders, etc.) for the por
 
 ## Current status guard
 
-As of the 2026-05-13 documentation cleanup, Phases 3, 4, 5, 6, and 7 are not closed or parity-validated. They have important common/server baselines, but still need runtime/manual validation and documented deferrals before any phase can be claimed complete.
-
 Use the phase guidance in `docs/PRD.md` and the explicit deferrals below as the active pre-Phase8 mine list. Do not convert prior `compileJava`/`build` success into parity closure. Current explicit deferrals include Portable Hole/Warding visual renderers, Phase 8 client GUI/render/FX/shader work, Phase 9 recipe/research/content registration, Hover Harness flight behavior, and Outer Lands runtime/portal parity validation. The active target is fresh worlds; old 1.7.10/WIP saves and external player-data imports are out of scope.
 
 ## Commit policy
@@ -136,25 +134,22 @@ Each final report must include:
 
 Use Docker unless the local environment is already known to be Java 8 Forge-compatible.
 
-Use the project wrapper instead of repeating long Docker commands:
+Use the project wrapper instead of repeating long Docker commands. For routine validation, use one quiet entrypoint:
 
     ./scripts/dev.sh image
     ./scripts/dev.sh validate
     ./scripts/dev.sh validate --smoke
-    ./scripts/dev.sh tasks
-    ./scripts/dev.sh compileJava
     ./scripts/dev.sh build
-    ./scripts/dev.sh check-jar
-    ./scripts/dev.sh apiJar devJar
-    ./scripts/dev.sh test
 
-Prefer `./scripts/dev.sh validate` for routine checkpoint validation. It runs a compact stop-on-first-failure sequence: git status summary, `compileJava`, non-GUI tests, `jar`, and MCP jar leak summary. It writes detailed stage logs under `run/validate/` and prints one summary line per stage to reduce agent-output noise. Use `./scripts/dev.sh validate --smoke` when server/runtime smoke validation is required; this adds the dedicated server smoke stage while still keeping stdout compact. Run `./scripts/dev.sh check-jar` directly when a full verbose MCP leak listing is needed.
+`./scripts/dev.sh validate` runs a stop-on-first-failure sequence: git status summary, `compileJava`, non-GUI tests, `jar`, and MCP jar leak summary. It keeps stdout quiet on success and writes detailed logs under `run/validate/`. On failure, it prints the failed stage and log path. Use `./scripts/dev.sh validate --verbose` only when the failure tail is needed in stdout.
+
+Use `./scripts/dev.sh validate --smoke` when server/runtime smoke validation is required; this adds the dedicated server smoke stage while keeping stdout compact.
 
 Run arbitrary Gradle tasks through Docker with:
 
     ./scripts/dev.sh gradle <task> [args...]
 
-Run `./scripts/dev.sh check-jar` after building a jar meant for Prism/normal Forge when verbose MCP leak details are needed. It scans the built jar for MCP-named Minecraft field/method references that dev `runServer` can miss but production Forge reports as `NoSuchFieldError` or `NoSuchMethodError`.
+Use direct Gradle tasks only for focused debugging. Run `./scripts/dev.sh check-jar` directly only when verbose MCP leak details are needed.
 
 ## Runtime smoke validation
 
@@ -167,8 +162,6 @@ For common/server-side changes, run the dedicated server smoke test first:
     ./scripts/dev.sh validate --smoke
 
 Use `./scripts/dev.sh smoke-server` directly only when isolating or debugging the server smoke stage.
-
-The smoke wrapper creates `run/eula.txt`, runs `runServer -x getAssets --no-daemon`, writes `run/smoke-server.log`, and fails on crash markers or new crash reports. `-x getAssets` avoids old ForgeGradle Mojang asset URL failures. The `run/` directory is generated/ignored and must not be staged.
 
 A server smoke test passes only when Forge reaches normal ready state, for example a log line containing `Done (`, and no crash markers are present.
 
