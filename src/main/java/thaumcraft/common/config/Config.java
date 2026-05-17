@@ -1,20 +1,28 @@
 package thaumcraft.common.config;
 
 import java.io.File;
+import java.util.Arrays;
 import java.util.ArrayList;
+import java.util.List;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.MapColor;
 import net.minecraft.block.material.Material;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.init.Blocks;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.common.config.Property;
 import net.minecraftforge.fml.common.registry.ForgeRegistries;
+import net.minecraftforge.oredict.OreDictionary;
 import thaumcraft.api.ThaumcraftApi;
 import thaumcraft.api.aspects.Aspect;
+import thaumcraft.api.aspects.AspectList;
 import thaumcraft.api.potions.PotionFluxTaint;
 import thaumcraft.api.potions.PotionVisExhaust;
+import thaumcraft.common.items.equipment.ItemElementalAxe;
+import thaumcraft.common.lib.utils.Utils;
 import thaumcraft.common.lib.world.ThaumcraftWorldGenerator;
 import thaumcraft.common.lib.enchantment.EnchantmentFrugal;
 import thaumcraft.common.lib.enchantment.EnchantmentHaste;
@@ -354,7 +362,112 @@ public class Config {
     }
 
     public static void initModCompatibility() {
-        // Phase 4: ore dict compatibility
+        foundCopperIngot = false;
+        foundTinIngot = false;
+        foundSilverIngot = false;
+        foundLeadIngot = false;
+        foundCopperOre = false;
+        foundTinOre = false;
+        foundSilverOre = false;
+        foundLeadOre = false;
+        ItemElementalAxe.oreDictLogs.clear();
+
+        for (String ore : OreDictionary.getOreNames()) {
+            if (ore == null) {
+                continue;
+            }
+            List<ItemStack> entries = OreDictionary.getOres(ore);
+            if (entries == null || entries.isEmpty()) {
+                continue;
+            }
+            if ("oreCopper".equals(ore)) {
+                foundCopperOre = true;
+                for (ItemStack is : entries) {
+                    Utils.addSpecialMiningResult(is, new ItemStack(ConfigItems.itemNugget, 1, 17), 1.0F);
+                }
+                continue;
+            }
+            if ("oreTin".equals(ore)) {
+                foundTinOre = true;
+                for (ItemStack is : entries) {
+                    Utils.addSpecialMiningResult(is, new ItemStack(ConfigItems.itemNugget, 1, 18), 1.0F);
+                }
+                continue;
+            }
+            if ("oreSilver".equals(ore)) {
+                foundSilverOre = true;
+                for (ItemStack is : entries) {
+                    Utils.addSpecialMiningResult(is, new ItemStack(ConfigItems.itemNugget, 1, 19), 1.0F);
+                }
+                continue;
+            }
+            if ("oreLead".equals(ore)) {
+                foundLeadOre = true;
+                for (ItemStack is : entries) {
+                    Utils.addSpecialMiningResult(is, new ItemStack(ConfigItems.itemNugget, 1, 20), 1.0F);
+                }
+                continue;
+            }
+            if ("ingotCopper".equals(ore)) {
+                foundCopperIngot = true;
+                continue;
+            }
+            if ("ingotTin".equals(ore)) {
+                foundTinIngot = true;
+                continue;
+            }
+            if ("ingotSilver".equals(ore)) {
+                foundSilverIngot = true;
+                continue;
+            }
+            if ("ingotLead".equals(ore)) {
+                foundLeadIngot = true;
+                continue;
+            }
+            if ("oreUranium".equals(ore) || "itemDropUranium".equals(ore) || "ingotUranium".equals(ore)) {
+                registerCompatTag(entries, new AspectList().add(Aspect.METAL, 2).add(Aspect.POISON, 2).add(Aspect.ENERGY, 2));
+                continue;
+            }
+            if ("ingotBrass".equals(ore) || "ingotBronze".equals(ore)) {
+                registerCompatTag(entries, new AspectList().add(Aspect.METAL, 3).add(Aspect.TOOL, 1));
+                continue;
+            }
+            if ("dustBrass".equals(ore) || "dustBronze".equals(ore)) {
+                registerCompatTag(entries, new AspectList().add(Aspect.METAL, 2).add(Aspect.ENTROPY, 1).add(Aspect.TOOL, 1));
+                continue;
+            }
+            if ("gemRuby".equals(ore) || "gemGreenSapphire".equals(ore) || "gemSapphire".equals(ore)) {
+                registerCompatTag(entries, new AspectList().add(Aspect.CRYSTAL, 2).add(Aspect.GREED, 2));
+                continue;
+            }
+            if ("woodRubber".equals(ore)) {
+                registerCompatTag(entries, new AspectList().add(Aspect.TREE, 3).add(Aspect.TOOL, 1));
+                continue;
+            }
+            if ("itemRubber".equals(ore)) {
+                registerCompatTag(entries, new AspectList().add(Aspect.MOTION, 2).add(Aspect.TOOL, 2));
+                continue;
+            }
+            if ("ingotSteel".equals(ore)) {
+                registerCompatTag(entries, new AspectList().add(Aspect.METAL, 3).add(Aspect.ORDER, 1));
+                continue;
+            }
+            if ("crystalQuartz".equals(ore)) {
+                registerCompatTag(entries, new AspectList().add(Aspect.CRYSTAL, 1).add(Aspect.ENERGY, 1));
+                continue;
+            }
+            if ("woodLog".equals(ore)) {
+                for (ItemStack is : entries) {
+                    ItemElementalAxe.oreDictLogs.add(Arrays.<Object>asList(Item.getIdFromItem(is.getItem()), is.getItemDamage()));
+                }
+            }
+        }
+    }
+
+    private static void registerCompatTag(List<ItemStack> stacks, AspectList aspects) {
+        for (ItemStack stack : stacks) {
+            ThaumcraftApi.registerObjectTag(stack, aspects);
+        }
     }
 
     public static void registerBiomes() {

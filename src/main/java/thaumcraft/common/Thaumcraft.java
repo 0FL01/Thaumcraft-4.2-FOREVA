@@ -186,10 +186,11 @@ public class Thaumcraft {
 
     @Mod.EventHandler
     public void postInit(FMLPostInitializationEvent event) {
+        Config.initModCompatibility();
+        initWandComponents();
         ConfigRecipes.init();
         ConfigAspects.init();
         ConfigResearch.init();
-        Config.initModCompatibility();
         ConfigEntities.initEntitySpawns();
     }
 
