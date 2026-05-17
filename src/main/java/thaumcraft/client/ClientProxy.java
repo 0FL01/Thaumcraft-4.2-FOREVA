@@ -35,6 +35,7 @@ import net.minecraftforge.event.entity.player.ItemTooltipEvent;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.client.registry.RenderingRegistry;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import thaumcraft.api.aspects.Aspect;
 import thaumcraft.client.gui.GuiArcaneBore;
 import thaumcraft.client.gui.GuiArcaneWorkbench;
 import thaumcraft.client.gui.GuiAlchemyFurnace;
@@ -948,20 +949,30 @@ public class ClientProxy extends CommonProxy {
     @Override
     public void crucibleBoil(World world, int x, int y, int z, TileCrucible crucible, int type) {
         if (world == null || !world.isRemote || crucible == null) return;
-        int amount = particleCount(type >= 5 ? 3 : 2);
+        int amount = particleCount(1);
         if (amount <= 0) return;
 
-        float surface = y + 0.05f + crucible.getFluidHeight();
         for (int i = 0; i < amount; i++) {
-            float px = x + 0.2f + world.rand.nextFloat() * 0.6f;
-            float pz = z + 0.2f + world.rand.nextFloat() * 0.6f;
-            world.spawnParticle(EnumParticleTypes.WATER_BUBBLE, px, surface, pz,
-                    (world.rand.nextFloat() - 0.5f) * 0.01f,
-                    0.02f + world.rand.nextFloat() * 0.02f,
-                    (world.rand.nextFloat() - 0.5f) * 0.01f);
-            if (type >= 5 || world.rand.nextBoolean()) {
-                world.spawnParticle(EnumParticleTypes.CRIT_MAGIC, px, surface + 0.05f, pz, 0.0, 0.02, 0.0);
+            FXBubble bubble = new FXBubble(
+                    world,
+                    x + 0.2f + world.rand.nextFloat() * 0.6f,
+                    y + 0.1f + crucible.getFluidHeight(),
+                    z + 0.2f + world.rand.nextFloat() * 0.6f,
+                    0.0,
+                    0.0,
+                    0.0,
+                    3);
+            if (crucible.aspects == null || crucible.aspects.size() <= 0) {
+                bubble.setRGB(1.0f, 1.0f, 1.0f);
+            } else {
+                Aspect[] aspects = crucible.aspects.getAspects();
+                if (aspects != null && aspects.length > 0) {
+                    Color tint = new Color(aspects[world.rand.nextInt(aspects.length)].getColor());
+                    bubble.setRGB(normalizeColor(tint.getRed()), normalizeColor(tint.getGreen()), normalizeColor(tint.getBlue()));
+                }
             }
+            bubble.setBubbleSpeed(0.003D * type);
+            ParticleEngine.addEffect(world, bubble);
         }
     }
 

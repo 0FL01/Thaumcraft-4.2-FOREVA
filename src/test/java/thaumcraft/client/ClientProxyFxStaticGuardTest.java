@@ -40,8 +40,8 @@ public class ClientProxyFxStaticGuardTest {
         assertTrue("ClientProxy blockSparkle must route ward/portable-hole colors through dedicated FXBlockWard",
                 source.contains("color == 0xFC9A00 || color == 0x400040")
                         && source.contains("new FXBlockWard(world, x, y, z, color, amount)"));
-        assertTrue("ClientProxy beam must contain non-noop beam particle path",
-                source.contains("public void beam(") && source.contains("EnumParticleTypes.CRIT_MAGIC"));
+        assertTrue("ClientProxy beam must contain dedicated FXBeam particle path",
+                source.contains("public void beam(") && source.contains("new FXBeam("));
         assertTrue("ClientProxy bolt must contain non-noop bolt particle path",
                 source.contains("public void bolt(") && source.contains("speed * 2"));
         assertTrue("ClientProxy must override burst for direct entity FX call sites",
@@ -82,7 +82,9 @@ public class ClientProxyFxStaticGuardTest {
         assertTrue("ClientProxy must override crucibleBoilSound and crucibleBoil",
                 source.contains("public void crucibleBoilSound(")
                         && source.contains("public void crucibleBoil(")
-                        && source.contains("TCSounds.BUBBLE"));
+                        && source.contains("TCSounds.BUBBLE")
+                        && source.contains("new FXBubble(")
+                        && source.contains("bubble.setBubbleSpeed(0.003D * type)"));
         assertTrue("CommonProxy and ClientProxy must keep startScan proxy surface",
                 commonProxy.contains("public void startScan(Entity entity, BlockPos pos, long expireAtMs, int radius)")
                         && source.contains("public void startScan(Entity entity, BlockPos pos, long expireAtMs, int radius)")
@@ -129,6 +131,7 @@ public class ClientProxyFxStaticGuardTest {
                 bubbleFx.contains("class FXBubble extends Particle")
                         && bubbleFx.contains("setFroth()")
                         && bubbleFx.contains("setFroth2()")
+                        && bubbleFx.contains("setBubbleSpeed(double bubbleSpeed)")
                         && bubbleFx.contains("EnumParticleTypes.WATER_BUBBLE"));
         assertTrue("Dedicated FXBubbleAlt particle must keep colored crucible bubble emission baseline",
                 bubbleAltFx.contains("class FXBubbleAlt extends Particle")

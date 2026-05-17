@@ -51,6 +51,10 @@ public class FXBubble extends Particle {
         this.tintEnabled = true;
     }
 
+    public void setBubbleSpeed(double bubbleSpeed) {
+        this.bubbleSpeed = bubbleSpeed;
+    }
+
     @Override
     public void onUpdate() {
         this.prevPosX = this.posX;
