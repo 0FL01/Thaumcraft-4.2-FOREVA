@@ -13,16 +13,21 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 import net.minecraftforge.common.DimensionManager;
+import net.minecraft.client.util.ITooltipFlag;
 import thaumcraft.common.CommonProxy;
 import thaumcraft.common.Thaumcraft;
 import thaumcraft.common.config.ConfigBlocks;
 import thaumcraft.common.lib.TCSounds;
 import thaumcraft.common.lib.CreativeTabThaumcraft;
 import thaumcraft.common.tiles.TileMirror;
+
+import javax.annotation.Nullable;
+import java.util.List;
 
 public class ItemHandMirror extends Item {
 
@@ -53,9 +58,33 @@ public class ItemHandMirror extends Item {
                 clearInvalidLink(stack, player, world);
                 return new ActionResult<>(EnumActionResult.FAIL, stack);
             }
-            player.openGui(Thaumcraft.instance, CommonProxy.GUI_HAND_MIRROR, world, (int) player.posX, (int) player.posY, (int) player.posZ);
+            player.openGui(Thaumcraft.instance, CommonProxy.GUI_HAND_MIRROR, world,
+                    MathHelper.floor(player.posX), MathHelper.floor(player.posY), MathHelper.floor(player.posZ));
         }
         return new ActionResult<>(EnumActionResult.SUCCESS, stack);
+    }
+
+    @Override
+    public boolean hasEffect(ItemStack stack) {
+        return stack.hasTagCompound();
+    }
+
+    @Override
+    public void addInformation(ItemStack stack, @Nullable World worldIn, List<String> tooltip, ITooltipFlag flagIn) {
+        if (stack.hasTagCompound()
+                && stack.getTagCompound().hasKey("linkX")
+                && stack.getTagCompound().hasKey("linkY")
+                && stack.getTagCompound().hasKey("linkZ")
+                && stack.getTagCompound().hasKey("linkDim")
+                && stack.getTagCompound().hasKey("dimname")) {
+            int x = stack.getTagCompound().getInteger("linkX");
+            int y = stack.getTagCompound().getInteger("linkY");
+            int z = stack.getTagCompound().getInteger("linkZ");
+            String dimName = stack.getTagCompound().getString("dimname");
+            tooltip.add(new TextComponentTranslation("tc.handmirrorlinkedto").getFormattedText()
+                    + " " + x + "," + y + "," + z + " in " + dimName);
+        }
+        super.addInformation(stack, worldIn, tooltip, flagIn);
     }
 
     @Override
