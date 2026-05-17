@@ -301,6 +301,7 @@ Incremental Stage 6 delta: `EventHandlerEntity.onLivingDrops` now restores refer
 Incremental Stage 5 delta: `EventHandlerEntity` item event hooks now restore reference contracts by writing tossed-item thrower NBT (`"thrower"`) in `onItemToss`, and by converting source water to `blockFluidPure` when `ItemBathSalts` expires in-world; guarded by new `EventHandlerEntityItemEventStaticGuardTest`; `validate --smoke` passing.
 Incremental Stage 5 delta: `EventHandlerEntity.onEntityJoinWorld` now restores warded-protection behavior for ender pearls by scanning nearby tiles for `TileOwned`, cancelling the pearl when found, and notifying the thrower with the original warning text; guarded by new `EventHandlerEntityEnderPearlStaticGuardTest`; `validate --smoke` passing.
 Incremental Stage 5 delta: `EventHandlerEntity.onPlayerBreakSpeed` now restores reference-shaped hover mining contract by applying `originalSpeed * 5.0F` only when the player is airborne and hover mode is active, replacing the prior focus-based slow-speed fallback; guarded by new `EventHandlerEntityBreakSpeedStaticGuardTest`; `validate --smoke` passing.
+Incremental Stage 5 delta: `EventHandlerEntity.onItemUseFinish` now restores `Unnatural Hunger` cure/feedback behavior (rotten-flesh or zombie-brain downgrade/removal path with reduced potion reapply and normal-food warning path), while keeping warp-add behavior for warped foods; added missing `warp.text.hunger.1/2` keys to `en_us.lang`; guarded by new `EventHandlerEntityUnhungerStaticGuardTest`; `validate --smoke` passing.
 
 ## Archive
 

@@ -22,9 +22,12 @@ import net.minecraft.init.Items;
 import net.minecraft.init.MobEffects;
 import net.minecraft.item.ItemFood;
 import net.minecraft.item.ItemStack;
+import net.minecraft.potion.Potion;
+import net.minecraft.potion.PotionEffect;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextComponentTranslation;
+import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.EnumDifficulty;
@@ -493,8 +496,33 @@ public class EventHandlerEntity {
 
         EntityPlayer player = (EntityPlayer) event.getEntityLiving();
         ItemStack used = event.getItem();
+        Potion unHunger = Potion.getPotionById(Config.potionUnHungerID);
 
         if (used.isEmpty() || !(used.getItem() instanceof ItemFood)) return;
+
+        if (unHunger != null && player.isPotionActive(unHunger)) {
+            if (used.getItem() == Items.ROTTEN_FLESH || used.getItem() == ConfigItems.itemZombieBrain) {
+                PotionEffect effect = player.getActivePotionEffect(unHunger);
+                if (effect != null) {
+                    int amplifier = effect.getAmplifier() - 1;
+                    int duration = effect.getDuration() - 600;
+                    player.removePotionEffect(unHunger);
+                    if (duration > 0 && amplifier >= 0) {
+                        PotionEffect reduced = new PotionEffect(unHunger, duration, amplifier, true, true);
+                        reduced.getCurativeItems().clear();
+                        reduced.getCurativeItems().add(new ItemStack(Items.ROTTEN_FLESH));
+                        player.addPotionEffect(reduced);
+                    }
+                }
+                TextComponentTranslation msg = new TextComponentTranslation("warp.text.hunger.2");
+                msg.getStyle().setItalic(true).setColor(TextFormatting.DARK_GREEN);
+                player.sendMessage(msg);
+            } else {
+                TextComponentTranslation msg = new TextComponentTranslation("warp.text.hunger.1");
+                msg.getStyle().setItalic(true).setColor(TextFormatting.DARK_RED);
+                player.sendMessage(msg);
+            }
+        }
 
         int warp = ThaumcraftApi.getWarp(used);
         if (warp > 0) {
