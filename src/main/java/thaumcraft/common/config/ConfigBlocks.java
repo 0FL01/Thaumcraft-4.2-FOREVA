@@ -58,6 +58,7 @@ public class ConfigBlocks {
     public static BlockLifter blockLifter;
     public static BlockHole blockHole;
     public static BlockWarded blockWarded;
+    public static BlockCandle blockCandle;
 
     // ItemBlock instances
     public static BlockMagicalLeavesItem blockMagicalLeavesItem;
@@ -227,6 +228,10 @@ public class ConfigBlocks {
                 .setRegistryName("thaumcraft", legacyPath("blockWarded"))
                 .setTranslationKey("thaumcraft.warded");
 
+        blockCandle = (BlockCandle) new BlockCandle()
+                .setRegistryName("thaumcraft", legacyPath("blockCandle"))
+                .setTranslationKey("blockCandle");
+
         // ItemBlock instances (cast needed because setRegistryName returns Item)
         blockMagicalLeavesItem = (BlockMagicalLeavesItem) new BlockMagicalLeavesItem(blockMagicalLeaves)
                 .setRegistryName(blockMagicalLeaves.getRegistryName());
@@ -301,7 +306,8 @@ public class ConfigBlocks {
                 blockArcaneDoor,
                 blockLifter,
                 blockHole,
-                blockWarded
+                blockWarded,
+                blockCandle
         };
     }
 
@@ -343,6 +349,8 @@ public class ConfigBlocks {
                 .setRegistryName(blockHole.getRegistryName()));
         registry.register(new net.minecraft.item.ItemBlock(blockWarded)
                 .setRegistryName(blockWarded.getRegistryName()));
+        registry.register(new BlockMetadataItem(blockCandle)
+                .setRegistryName(blockCandle.getRegistryName()));
         registry.register(new BlockEldritchItem(blockEldritch)
                 .setRegistryName(blockEldritch.getRegistryName()));
         registry.register(new net.minecraft.item.ItemBlock(blockEldritchNothing)

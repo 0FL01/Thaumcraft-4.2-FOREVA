@@ -108,6 +108,7 @@ import thaumcraft.client.lib.ClientTickEventsFML;
 import thaumcraft.client.lib.KeyHandler;
 import thaumcraft.client.lib.RenderEventHandler;
 import thaumcraft.common.CommonProxy;
+import thaumcraft.common.blocks.BlockCandle;
 import thaumcraft.common.config.ConfigBlocks;
 import thaumcraft.common.config.ConfigEntities;
 import thaumcraft.common.config.ConfigItems;
@@ -225,6 +226,16 @@ public class ClientProxy extends CommonProxy {
                     ConfigItems.itemWispEssence
             );
         }
+        if (ConfigBlocks.blockCandle != null) {
+            Minecraft.getMinecraft().getItemColors().registerItemColorHandler(
+                    (stack, tintIndex) -> tintIndex == 0 ? BlockCandle.getCandleColor(stack.getItemDamage()) : -1,
+                    Item.getItemFromBlock(ConfigBlocks.blockCandle)
+            );
+            Minecraft.getMinecraft().getBlockColors().registerBlockColorHandler(
+                    (state, world, pos, tintIndex) -> tintIndex == 0 ? BlockCandle.getCandleColor(state.getValue(BlockCandle.TYPE)) : -1,
+                    ConfigBlocks.blockCandle
+            );
+        }
     }
 
     private void setupEntityRenderers() {
@@ -310,6 +321,10 @@ public class ClientProxy extends CommonProxy {
     private void setupBlockRenderers() {
         registerBlockItemModel(ConfigBlocks.blockMagicalLeavesItem, 0, "type=0");
         registerBlockItemModel(ConfigBlocks.blockMagicalLeavesItem, 1, "type=1");
+        Item candleItem = Item.getItemFromBlock(ConfigBlocks.blockCandle);
+        for (int meta = 0; meta < 16; meta++) {
+            registerBlockItemModel(candleItem, meta, "type=" + meta);
+        }
     }
 
     private static void registerBlockItemModel(Item item, int meta, String variant) {

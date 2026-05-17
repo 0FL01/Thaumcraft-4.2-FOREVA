@@ -39,7 +39,8 @@ public class ConfigRecipesResearchHandleParityStaticGuardTest {
                 "VoidPick",
                 "VoidAxe",
                 "VoidHoe",
-                "VoidSword"
+                "VoidSword",
+                "TallowCandle"
         );
 
         for (String key : requiredKeys) {

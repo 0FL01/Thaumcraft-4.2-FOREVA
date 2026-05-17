@@ -1,0 +1,35 @@
+{
+  "parent": "block/block",
+  "ambientocclusion": false,
+  "textures": {
+    "particle": "thaumcraft:blocks/candle",
+    "candle": "thaumcraft:blocks/candle",
+    "stub": "thaumcraft:blocks/candlestub"
+  },
+  "elements": [
+    {
+      "from": [6, 0, 6],
+      "to": [10, 8, 10],
+      "faces": {
+        "down": { "texture": "#candle", "tintindex": 0 },
+        "up": { "texture": "#candle", "tintindex": 0 },
+        "north": { "texture": "#candle", "tintindex": 0 },
+        "south": { "texture": "#candle", "tintindex": 0 },
+        "west": { "texture": "#candle", "tintindex": 0 },
+        "east": { "texture": "#candle", "tintindex": 0 }
+      }
+    },
+    {
+      "from": [7, 8, 7],
+      "to": [9, 10, 9],
+      "faces": {
+        "down": { "texture": "#stub" },
+        "up": { "texture": "#stub" },
+        "north": { "texture": "#stub" },
+        "south": { "texture": "#stub" },
+        "west": { "texture": "#stub" },
+        "east": { "texture": "#stub" }
+      }
+    }
+  ]
+}

@@ -37,6 +37,12 @@ import thaumcraft.common.items.armor.RecipesVoidRobeArmorDyes;
 
 public class ConfigRecipes {
     private static boolean specialRecipesRegistered = false;
+    private static final String[] DYES = new String[]{
+            "dyeBlack", "dyeRed", "dyeGreen", "dyeBrown",
+            "dyeBlue", "dyePurple", "dyeCyan", "dyeLightGray",
+            "dyeGray", "dyePink", "dyeLime", "dyeYellow",
+            "dyeLightBlue", "dyeMagenta", "dyeOrange", "dyeWhite"
+    };
     private static final Map<String, IRecipe> specialResearchRecipeHandles = new LinkedHashMap<String, IRecipe>();
     private static final List<IRecipe> recipeJarLabelAspects = new ArrayList<IRecipe>();
     private static IRecipe recipeArcaneStone2;
@@ -355,6 +361,11 @@ public class ConfigRecipes {
             if (recipe != null) {
                 ConfigResearch.recipes.put("JarLabel" + i, recipe);
             }
+        }
+        // Fallback safety: keep the reference key present even if the concrete
+        // special recipe failed to register for any reason.
+        if (!ConfigResearch.recipes.containsKey("TallowCandle")) {
+            ConfigResearch.recipes.put("TallowCandle", null);
         }
 
         boolean hasArcaneWand = false;
@@ -2542,6 +2553,34 @@ public class ConfigRecipes {
                 'K', new ItemStack(ConfigBlocks.blockCosmeticSolid, 1, 5))
                 .setRegistryName("thaumcraft", "blocktallow_decompose");
         registry.register(recipeBlockTallowDecompose);
+
+        IRecipe recipeTallowCandle = new ShapedOreRecipe(
+                null,
+                new ItemStack(ConfigBlocks.blockCandle, 3, 0),
+                " S ",
+                " T ",
+                " T ",
+                'S', new ItemStack(Items.STRING),
+                'T', new ItemStack(ConfigItems.itemResource, 1, 4))
+                .setRegistryName("thaumcraft", "tallowcandle");
+        registry.register(recipeTallowCandle);
+        specialResearchRecipeHandles.put("TallowCandle", recipeTallowCandle);
+        for (int a = 1; a < 16; a++) {
+            IRecipe recipeTallowCandleDye = new ShapelessOreRecipe(
+                    null,
+                    new ItemStack(ConfigBlocks.blockCandle, 1, a),
+                    DYES[15 - a],
+                    new ItemStack(ConfigBlocks.blockCandle, 1, 0))
+                    .setRegistryName("thaumcraft", "tallowcandle_dye_" + a);
+            registry.register(recipeTallowCandleDye);
+        }
+        IRecipe recipeTallowCandleReset = new ShapelessOreRecipe(
+                null,
+                new ItemStack(ConfigBlocks.blockCandle, 1, 0),
+                new ItemStack(Items.DYE, 1, 15),
+                new ItemStack(ConfigBlocks.blockCandle, 1, OreDictionary.WILDCARD_VALUE))
+                .setRegistryName("thaumcraft", "tallowcandle_reset");
+        registry.register(recipeTallowCandleReset);
 
         IRecipe recipeJarLabel = new ShapelessOreRecipe(
                 null,

@@ -1,0 +1,20 @@
+{
+  "variants": {
+    "type=0": { "model": "thaumcraft:blockcandle" },
+    "type=1": { "model": "thaumcraft:blockcandle" },
+    "type=2": { "model": "thaumcraft:blockcandle" },
+    "type=3": { "model": "thaumcraft:blockcandle" },
+    "type=4": { "model": "thaumcraft:blockcandle" },
+    "type=5": { "model": "thaumcraft:blockcandle" },
+    "type=6": { "model": "thaumcraft:blockcandle" },
+    "type=7": { "model": "thaumcraft:blockcandle" },
+    "type=8": { "model": "thaumcraft:blockcandle" },
+    "type=9": { "model": "thaumcraft:blockcandle" },
+    "type=10": { "model": "thaumcraft:blockcandle" },
+    "type=11": { "model": "thaumcraft:blockcandle" },
+    "type=12": { "model": "thaumcraft:blockcandle" },
+    "type=13": { "model": "thaumcraft:blockcandle" },
+    "type=14": { "model": "thaumcraft:blockcandle" },
+    "type=15": { "model": "thaumcraft:blockcandle" }
+  }
+}
