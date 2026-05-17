@@ -486,7 +486,16 @@ public class ConfigResearch {
                 new ItemStack(ConfigItems.itemResource, 1, 2))
                 .setPages(
                         new ResearchPage("tc.research_page.THAUMIUM.1"),
-                        new ResearchPage(recipeCrucible("Thaumium")))
+                        new ResearchPage(recipeCrucible("Thaumium")),
+                        new ResearchPage(recipeI("ThaumiumAxe")),
+                        new ResearchPage(recipeI("ThaumiumSword")),
+                        new ResearchPage(recipeI("ThaumiumPick")),
+                        new ResearchPage(recipeI("ThaumiumShovel")),
+                        new ResearchPage(recipeI("ThaumiumHoe")),
+                        new ResearchPage(recipeI("ThaumiumHelm")),
+                        new ResearchPage(recipeI("ThaumiumChest")),
+                        new ResearchPage(recipeI("ThaumiumLegs")),
+                        new ResearchPage(recipeI("ThaumiumBoots")))
                 .setHidden()
                 .setAspectTriggers(Aspect.METAL)
                 .setParents("CRUCIBLE")
@@ -1258,6 +1267,7 @@ public class ConfigResearch {
                         new ResearchPage(recipeArcane("InfusionMatrix")),
                         new ResearchPage(recipeArcane("ArcanePedestal")),
                         new ResearchPage("tc.research_page.INFUSION.2"),
+                        new ResearchPage(recipeList("InfusionAltar")),
                         new ResearchPage("tc.research_page.INFUSION.3"),
                         new ResearchPage("tc.research_page.INFUSION.4"),
                         new ResearchPage("tc.research_page.INFUSION.5"))
@@ -2717,6 +2727,7 @@ public class ConfigResearch {
                 new ItemStack(ConfigBlocks.blockJar, 1, 0))
                 .setPages(
                         new ResearchPage("tc.research_page.NODEJAR.1"),
+                        new ResearchPage(recipeList("NodeJar")),
                         new ResearchPage("tc.research_page.NODEJAR.2"))
                 .setParents("NODEPRESERVE")
                 .setConcealed()
@@ -2870,6 +2881,7 @@ public class ConfigResearch {
                 new ItemStack(ConfigItems.itemGolemPlacer, 1, 7))
                 .setPages(
                         new ResearchPage("tc.research_page.GOLEMTHAUMIUM.1"),
+                        new ResearchPage(recipeI("BlockThaumium")),
                         new ResearchPage(recipeCrucible("GolemThaumium")))
                 .setConcealed()
                 .setParents("GOLEMIRON", "THAUMIUM")
@@ -3066,7 +3078,8 @@ public class ConfigResearch {
                 .setPages(
                         new ResearchPage("tc.research_page.COREGATHER.1"),
                         new ResearchPage(recipeArcane("CoreBlank")),
-                        new ResearchPage("tc.research_page.COREGATHER.2"))
+                        new ResearchPage("tc.research_page.COREGATHER.2"),
+                        new ResearchPage(recipeCrucible("CoreGather")))
                 .setConcealed()
                 .setParents("GOLEMSTRAW")
                 .setStub()
@@ -3367,7 +3380,8 @@ public class ConfigResearch {
                 new ItemStack(ConfigItems.itemResource, 1, 4))
                 .setPages(
                         new ResearchPage("tc.research_page.TALLOW.1"),
-                        new ResearchPage(recipeCrucible("Tallow")))
+                        new ResearchPage(recipeCrucible("Tallow")),
+                        new ResearchPage(recipeI("TallowCandle")))
                 .setParents("CRUCIBLE")
                 .registerResearchItem();
 
@@ -3382,7 +3396,13 @@ public class ConfigResearch {
                 0,
                 1,
                 new ResourceLocation("thaumcraft", "textures/misc/r_alchmult.png"))
-                .setPages(new ResearchPage("tc.research_page.ALCHEMICALDUPLICATION.1"))
+                .setPages(
+                        new ResearchPage("tc.research_page.ALCHEMICALDUPLICATION.1"),
+                        new ResearchPage(recipeCrucible("AltGunpowder")),
+                        new ResearchPage(recipeCrucible("AltSlime")),
+                        new ResearchPage(recipeCrucible("AltClay")),
+                        new ResearchPage(recipeCrucible("AltGlowstone")),
+                        new ResearchPage(recipeCrucible("AltInk")))
                 .setConcealed()
                 .setSecondary()
                 .setParents("TALLOW")
@@ -3399,7 +3419,11 @@ public class ConfigResearch {
                 -2,
                 1,
                 new ResourceLocation("thaumcraft", "textures/misc/r_alchman.png"))
-                .setPages(new ResearchPage("tc.research_page.ALCHEMICALMANUFACTURE.1"))
+                .setPages(
+                        new ResearchPage("tc.research_page.ALCHEMICALMANUFACTURE.1"),
+                        new ResearchPage(recipeCrucible("AltWeb")),
+                        new ResearchPage(recipeCrucible("AltMossyCobble")),
+                        new ResearchPage(recipeCrucible("AltIce")))
                 .setConcealed()
                 .setSecondary()
                 .setParents("ALCHEMICALDUPLICATION")
@@ -3416,7 +3440,10 @@ public class ConfigResearch {
                 1,
                 1,
                 new ResourceLocation("thaumcraft", "textures/misc/r_alchent.png"))
-                .setPages(new ResearchPage("tc.research_page.ENTROPICPROCESSING.1"))
+                .setPages(
+                        new ResearchPage("tc.research_page.ENTROPICPROCESSING.1"),
+                        new ResearchPage(recipeCrucible("AltCrackedBrick")),
+                        new ResearchPage(recipeCrucible("AltBonemeal")))
                 .setConcealed()
                 .setSecondary()
                 .setParents("ALCHEMICALDUPLICATION")
@@ -3434,7 +3461,9 @@ public class ConfigResearch {
                 3,
                 2,
                 new ItemStack(ConfigItems.itemBucketDeath))
-                .setPages(new ResearchPage("tc.research_page.LIQUIDDEATH.1"))
+                .setPages(
+                        new ResearchPage("tc.research_page.LIQUIDDEATH.1"),
+                        new ResearchPage(recipeCrucible("LiquidDeath")))
                 .setHidden()
                 .setAspectTriggers(Aspect.DEATH, Aspect.POISON)
                 .setParents("ENTROPICPROCESSING")
@@ -3454,7 +3483,9 @@ public class ConfigResearch {
                 1,
                 2,
                 new ItemStack(ConfigItems.itemBottleTaint))
-                .setPages(new ResearchPage("tc.research_page.BOTTLETAINT.1"))
+                .setPages(
+                        new ResearchPage("tc.research_page.BOTTLETAINT.1"),
+                        new ResearchPage(recipeCrucible("BottleTaint")))
                 .setHidden()
                 .setAspectTriggers(Aspect.TAINT)
                 .setParents("ENTROPICPROCESSING")
@@ -3470,7 +3501,9 @@ public class ConfigResearch {
                 5,
                 1,
                 new ItemStack(ConfigItems.itemNugget, 1, 16))
-                .setPages(new ResearchPage("tc.research_page.PUREIRON.1"))
+                .setPages(
+                        new ResearchPage("tc.research_page.PUREIRON.1"),
+                        new ResearchPage(recipeCrucible("PureIron")))
                 .setConcealed()
                 .setParents("THAUMIUM")
                 .registerResearchItem();
@@ -3483,7 +3516,9 @@ public class ConfigResearch {
                 3,
                 1,
                 new ItemStack(ConfigItems.itemNugget, 1, 31))
-                .setPages(new ResearchPage("tc.research_page.PUREGOLD.1"))
+                .setPages(
+                        new ResearchPage("tc.research_page.PUREGOLD.1"),
+                        new ResearchPage(recipeCrucible("PureGold")))
                 .setConcealed()
                 .setSecondary()
                 .setParents("PUREIRON")
@@ -3501,7 +3536,9 @@ public class ConfigResearch {
                     5,
                     1,
                     new ItemStack(ConfigItems.itemNugget, 1, 17))
-                    .setPages(new ResearchPage("tc.research_page.PURECOPPER.1"))
+                    .setPages(
+                            new ResearchPage("tc.research_page.PURECOPPER.1"),
+                            new ResearchPage(recipeCrucible("PureCopper")))
                     .setConcealed()
                     .setSecondary()
                     .setParents("PUREIRON")
@@ -3520,7 +3557,9 @@ public class ConfigResearch {
                     7,
                     1,
                     new ItemStack(ConfigItems.itemNugget, 1, 18))
-                    .setPages(new ResearchPage("tc.research_page.PURETIN.1"))
+                    .setPages(
+                            new ResearchPage("tc.research_page.PURETIN.1"),
+                            new ResearchPage(recipeCrucible("PureTin")))
                     .setConcealed()
                     .setSecondary()
                     .setParents("PUREIRON")
@@ -3539,7 +3578,9 @@ public class ConfigResearch {
                     8,
                     1,
                     new ItemStack(ConfigItems.itemNugget, 1, 19))
-                    .setPages(new ResearchPage("tc.research_page.PURESILVER.1"))
+                    .setPages(
+                            new ResearchPage("tc.research_page.PURESILVER.1"),
+                            new ResearchPage(recipeCrucible("PureSilver")))
                     .setConcealed()
                     .setSecondary()
                     .setParents("PUREIRON")
@@ -3555,7 +3596,9 @@ public class ConfigResearch {
                     9,
                     1,
                     new ItemStack(ConfigItems.itemNugget, 1, 20))
-                    .setPages(new ResearchPage("tc.research_page.PURELEAD.1"))
+                    .setPages(
+                            new ResearchPage("tc.research_page.PURELEAD.1"),
+                            new ResearchPage(recipeCrucible("PureLead")))
                     .setConcealed()
                     .setSecondary()
                     .setParents("PUREIRON")
@@ -3570,7 +3613,9 @@ public class ConfigResearch {
                 5,
                 1,
                 new ItemStack(ConfigItems.itemNugget, 1, 0))
-                .setPages(new ResearchPage("tc.research_page.TRANSIRON.1"))
+                .setPages(
+                        new ResearchPage("tc.research_page.TRANSIRON.1"),
+                        new ResearchPage(recipeCrucible("TransIron")))
                 .setConcealed()
                 .setParents("THAUMIUM")
                 .registerResearchItem();
@@ -3583,7 +3628,9 @@ public class ConfigResearch {
                 3,
                 1,
                 new ItemStack(Items.GOLD_NUGGET))
-                .setPages(new ResearchPage("tc.research_page.TRANSGOLD.1"))
+                .setPages(
+                        new ResearchPage("tc.research_page.TRANSGOLD.1"),
+                        new ResearchPage(recipeCrucible("TransGold")))
                 .setConcealed()
                 .setSecondary()
                 .setParents("TRANSIRON")
@@ -3598,7 +3645,9 @@ public class ConfigResearch {
                     5,
                     1,
                     new ItemStack(ConfigItems.itemNugget, 1, 1))
-                    .setPages(new ResearchPage("tc.research_page.TRANSCOPPER.1"))
+                    .setPages(
+                            new ResearchPage("tc.research_page.TRANSCOPPER.1"),
+                            new ResearchPage(recipeCrucible("TransCopper")))
                     .setConcealed()
                     .setSecondary()
                     .setParents("TRANSIRON")
@@ -3617,7 +3666,9 @@ public class ConfigResearch {
                     7,
                     1,
                     new ItemStack(ConfigItems.itemNugget, 1, 2))
-                    .setPages(new ResearchPage("tc.research_page.TRANSTIN.1"))
+                    .setPages(
+                            new ResearchPage("tc.research_page.TRANSTIN.1"),
+                            new ResearchPage(recipeCrucible("TransTin")))
                     .setConcealed()
                     .setSecondary()
                     .setParents("TRANSIRON")
@@ -3636,7 +3687,9 @@ public class ConfigResearch {
                     8,
                     1,
                     new ItemStack(ConfigItems.itemNugget, 1, 3))
-                    .setPages(new ResearchPage("tc.research_page.TRANSSILVER.1"))
+                    .setPages(
+                            new ResearchPage("tc.research_page.TRANSSILVER.1"),
+                            new ResearchPage(recipeCrucible("TransSilver")))
                     .setConcealed()
                     .setSecondary()
                     .setParents("TRANSIRON")
@@ -3655,7 +3708,9 @@ public class ConfigResearch {
                     9,
                     1,
                     new ItemStack(ConfigItems.itemNugget, 1, 4))
-                    .setPages(new ResearchPage("tc.research_page.TRANSLEAD.1"))
+                    .setPages(
+                            new ResearchPage("tc.research_page.TRANSLEAD.1"),
+                            new ResearchPage(recipeCrucible("TransLead")))
                     .setConcealed()
                     .setSecondary()
                     .setParents("TRANSIRON")
@@ -3676,6 +3731,7 @@ public class ConfigResearch {
                 new ItemStack(ConfigBlocks.blockCustomPlant, 1, 4))
                 .setPages(
                         new ResearchPage("tc.research_page.ETHEREALBLOOM.1"),
+                        new ResearchPage(recipeCrucible("EtherealBloom")),
                         new ResearchPage("tc.research_page.ETHEREALBLOOM.2"))
                 .setHidden()
                 .setAspectTriggers(Aspect.TAINT)
@@ -3695,7 +3751,9 @@ public class ConfigResearch {
                 -4,
                 2,
                 new ItemStack(ConfigItems.itemBathSalts))
-                .setPages(new ResearchPage("tc.research_page.BATHSALTS.1"))
+                .setPages(
+                        new ResearchPage("tc.research_page.BATHSALTS.1"),
+                        new ResearchPage(recipeCrucible("BathSalts")))
                 .setHidden()
                 .registerResearchItem();
 
@@ -3711,7 +3769,9 @@ public class ConfigResearch {
                 -6,
                 1,
                 new ItemStack(ConfigItems.itemSanitySoap))
-                .setPages(new ResearchPage("tc.research_page.SANESOAP.1"))
+                .setPages(
+                        new ResearchPage("tc.research_page.SANESOAP.1"),
+                        new ResearchPage(recipeCrucible("SaneSoap")))
                 .setParents("BATHSALTS")
                 .registerResearchItem();
 
@@ -3745,7 +3805,10 @@ public class ConfigResearch {
                         new ResearchPage("tc.research_page.JARLABEL.1"),
                         new ResearchPage(recipeArcane("WardedJar")),
                         new ResearchPage("tc.research_page.JARLABEL.2"),
-                        new ResearchPage("tc.research_page.JARLABEL.3"))
+                        new ResearchPage(recipeI("JarLabel")),
+                        new ResearchPage("tc.research_page.JARLABEL.3"),
+                        new ResearchPage(buildJarLabelAspectPages()),
+                        new ResearchPage(recipeI("JarLabelNull")))
                 .setParents("DISTILESSENTIA")
                 .setStub()
                 .setRound()
@@ -3766,6 +3829,14 @@ public class ConfigResearch {
                 .setSecondary()
                 .setConcealed()
                 .registerResearchItem();
+    }
+
+    private static IRecipe[] buildJarLabelAspectPages() {
+        ArrayList<IRecipe> pages = new ArrayList<>();
+        for (int index = 0; recipes.containsKey("JarLabel" + index); index++) {
+            pages.add(recipeI("JarLabel" + index));
+        }
+        return pages.toArray(new IRecipe[0]);
     }
 
     private static void initThaumaturgyResearchTextOnlyBaseline() {
@@ -3955,7 +4026,16 @@ public class ConfigResearch {
                 .setPages(
                         new ResearchPage("tc.research_page.VOIDMETAL.1"),
                         new ResearchPage(recipeCrucible("VoidMetal")),
-                        new ResearchPage("tc.research_page.VOIDMETAL.2"))
+                        new ResearchPage("tc.research_page.VOIDMETAL.2"),
+                        new ResearchPage(recipeI("VoidAxe")),
+                        new ResearchPage(recipeI("VoidSword")),
+                        new ResearchPage(recipeI("VoidPick")),
+                        new ResearchPage(recipeI("VoidShovel")),
+                        new ResearchPage(recipeI("VoidHoe")),
+                        new ResearchPage(recipeI("VoidHelm")),
+                        new ResearchPage(recipeI("VoidChest")),
+                        new ResearchPage(recipeI("VoidLegs")),
+                        new ResearchPage(recipeI("VoidBoots")))
                 .setParents("THAUMIUM", "ELDRITCHMINOR")
                 .registerResearchItem();
 

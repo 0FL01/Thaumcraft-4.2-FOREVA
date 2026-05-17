@@ -20,6 +20,7 @@ public class ConfigResearchRecipeKeyCoverageTest {
     private static final Pattern RECIPE_GET_PATTERN = Pattern.compile(
             "(?:recipes\\.get|recipeI|recipeArcane|recipeCrucible|recipeInfusion|recipeInfusionEnchantment|recipeList)\\(\"([^\"]+)\"\\)");
     private static final Pattern RECIPE_PUT_PATTERN = Pattern.compile("recipes\\.put\\(\"([^\"]+)\"");
+    private static final Pattern SPECIAL_RECIPE_HANDLE_PATTERN = Pattern.compile("specialResearchRecipeHandles\\.put\\(\"([^\"]+)\"");
     private static final Pattern ARCANE_PATTERN = Pattern.compile("registerArcaneRecipe\\(\"([^\"]+)\"");
     private static final Pattern SHAPELESS_ARCANE_PATTERN = Pattern.compile("registerShapelessArcaneRecipe\\(\"([^\"]+)\"");
     private static final Pattern INFUSION_PATTERN = Pattern.compile("registerInfusionRecipe\\(\"([^\"]+)\"");
@@ -33,6 +34,7 @@ public class ConfigResearchRecipeKeyCoverageTest {
         Set<String> lookedUpKeys = extract(researchSource, RECIPE_GET_PATTERN);
         Set<String> availableKeys = new TreeSet<>();
         availableKeys.addAll(extract(recipesSource, RECIPE_PUT_PATTERN));
+        availableKeys.addAll(extract(recipesSource, SPECIAL_RECIPE_HANDLE_PATTERN));
         availableKeys.addAll(extract(recipesSource, ARCANE_PATTERN));
         availableKeys.addAll(extract(recipesSource, SHAPELESS_ARCANE_PATTERN));
         availableKeys.addAll(extract(recipesSource, INFUSION_PATTERN));
@@ -45,6 +47,8 @@ public class ConfigResearchRecipeKeyCoverageTest {
             }
         }
 
+        assertTrue("ConfigResearch should keep reference-sized recipe lookup coverage (>=272 unique keys), actual: " + lookedUpKeys.size(),
+                lookedUpKeys.size() >= 272);
         assertTrue("Missing ConfigRecipes registrations for ConfigResearch recipes.get keys: " + missing, missing.isEmpty());
     }
 
