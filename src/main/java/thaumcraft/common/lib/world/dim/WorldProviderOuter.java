@@ -1,6 +1,7 @@
 package thaumcraft.common.lib.world.dim;
 
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.DimensionType;
 import net.minecraft.world.WorldProvider;
@@ -60,7 +61,16 @@ public class WorldProviderOuter extends WorldProvider {
     @Override
     @SideOnly(Side.CLIENT)
     public Vec3d getFogColor(float p_76562_1_, float p_76562_2_) {
-        return new Vec3d(0.0, 0.0, 0.0);
+        int color = 0xA080A0;
+        float brightness = MathHelper.cos(p_76562_1_ * (float) Math.PI * 2.0F) * 2.0F + 0.5F;
+        brightness = MathHelper.clamp(brightness, 0.0F, 1.0F);
+        float red = (float) (color >> 16 & 0xFF) / 255.0F;
+        float green = (float) (color >> 8 & 0xFF) / 255.0F;
+        float blue = (float) (color & 0xFF) / 255.0F;
+        red *= 0.15F;
+        green *= 0.15F;
+        blue *= 0.15F;
+        return new Vec3d(red, green, blue);
     }
 
     @Override
@@ -75,7 +85,7 @@ public class WorldProviderOuter extends WorldProvider {
 
     @Override
     public boolean doesWaterVaporize() {
-        return true;
+        return false;
     }
 
     @Override
