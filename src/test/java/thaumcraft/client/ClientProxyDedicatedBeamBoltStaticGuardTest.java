@@ -7,6 +7,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 public class ClientProxyDedicatedBeamBoltStaticGuardTest {
@@ -21,6 +22,10 @@ public class ClientProxyDedicatedBeamBoltStaticGuardTest {
                 clientProxy.contains("new FXBeam(") && clientProxy.contains("ParticleEngine.addEffect(world"));
         assertTrue("ClientProxy bolt path should enqueue dedicated FXLightningBolt via ParticleEngine",
                 clientProxy.contains("new FXLightningBolt(") && clientProxy.contains("ParticleEngine.addEffect(world"));
+        assertFalse("ClientProxy beam path should not keep legacy inline beam fallback loops",
+                clientProxy.contains("double dx = tx - x;"));
+        assertFalse("ClientProxy bolt path should not keep legacy inline bolt fallback loops",
+                clientProxy.contains("double noise = 0.18f;"));
         assertTrue("FXBeam should keep beam-line emission logic",
                 beamClass.contains("class FXBeam extends Particle")
                         && beamClass.contains("EnumParticleTypes.REDSTONE")

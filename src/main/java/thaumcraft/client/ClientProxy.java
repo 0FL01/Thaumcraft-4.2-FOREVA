@@ -680,21 +680,6 @@ public class ClientProxy extends CommonProxy {
         float blue = normalizeColor(tint.getBlue());
         ParticleEngine.addEffect(world,
                 new FXBeam(world, x, y, z, tx, ty, tz, red, green, blue, Math.max(6, ticks), flicker, amount));
-
-        double dx = tx - x;
-        double dy = ty - y;
-        double dz = tz - z;
-        for (int i = 0; i <= amount; i++) {
-            double t = amount == 0 ? 0.0 : (double) i / (double) amount;
-            double px = x + dx * t + (world.rand.nextFloat() - 0.5f) * 0.08f;
-            double py = y + dy * t + (world.rand.nextFloat() - 0.5f) * 0.08f;
-            double pz = z + dz * t + (world.rand.nextFloat() - 0.5f) * 0.08f;
-            if (flicker) {
-                world.spawnParticle(EnumParticleTypes.CRIT_MAGIC, px, py, pz, 0.0, 0.0, 0.0);
-            } else {
-                world.spawnParticle(EnumParticleTypes.REDSTONE, px, py, pz, red, green, blue);
-            }
-        }
     }
 
     @Override
@@ -709,21 +694,6 @@ public class ClientProxy extends CommonProxy {
         float blue = normalizeColor(tint.getBlue());
         ParticleEngine.addEffect(world,
                 new FXLightningBolt(world, x, y, z, tx, ty, tz, red, green, blue, Math.max(4, speed), amount));
-
-        double dx = tx - x;
-        double dy = ty - y;
-        double dz = tz - z;
-        for (int i = 0; i <= amount; i++) {
-            double t = amount == 0 ? 0.0 : (double) i / (double) amount;
-            double noise = 0.18f;
-            double px = x + dx * t + (world.rand.nextFloat() - 0.5f) * noise;
-            double py = y + dy * t + (world.rand.nextFloat() - 0.5f) * noise;
-            double pz = z + dz * t + (world.rand.nextFloat() - 0.5f) * noise;
-            world.spawnParticle(EnumParticleTypes.REDSTONE, px, py, pz, red, green, blue);
-            if (world.rand.nextBoolean()) {
-                world.spawnParticle(EnumParticleTypes.CRIT_MAGIC, px, py, pz, 0.0, 0.0, 0.0);
-            }
-        }
     }
 
     @Override
