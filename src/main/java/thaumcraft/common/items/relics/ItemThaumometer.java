@@ -79,6 +79,7 @@ public class ItemThaumometer extends Item {
         if (this.startScan != null && current != null && current.equals(this.startScan)) {
             if (count <= 5) {
                 this.startScan = null;
+                player.stopActiveHand();
                 if (ScanManager.completeScan(player, current, "@")) {
                     PacketHandler.INSTANCE.sendToServer(new PacketScannedToServer(current, player, "@"));
                 }

@@ -27,6 +27,7 @@ public class ItemThaumometerStaticGuardTest {
                 source.contains("if (this.startScan != null && current != null && current.equals(this.startScan))")
                         && 
                 source.contains("if (count <= 5)")
+                        && source.contains("player.stopActiveHand();")
                         && source.contains("ScanManager.completeScan(player, current, \"@\")")
                         && source.contains("PacketHandler.INSTANCE.sendToServer(new PacketScannedToServer(current, player, \"@\"))"));
         assertTrue("Thaumometer block scan must keep protected pick-block path with fallback stack creation",
