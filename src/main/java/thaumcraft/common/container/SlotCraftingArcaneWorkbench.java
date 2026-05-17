@@ -4,6 +4,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
+import net.minecraftforge.common.ForgeHooks;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import thaumcraft.api.aspects.AspectList;
 import thaumcraft.common.items.wands.ItemWandCasting;
@@ -12,6 +13,7 @@ import thaumcraft.common.lib.crafting.ThaumcraftCraftingManager;
 public class SlotCraftingArcaneWorkbench extends Slot {
     private final EntityPlayer thePlayer;
     private final IInventory craftMatrix;
+    private int amountCrafted;
 
     public SlotCraftingArcaneWorkbench(EntityPlayer player, IInventory craftMatrix, IInventory resultInventory, int index, int x, int y) {
         super(resultInventory, index, x, y);
@@ -25,8 +27,36 @@ public class SlotCraftingArcaneWorkbench extends Slot {
     }
 
     @Override
+    public ItemStack decrStackSize(int amount) {
+        if (this.getHasStack()) {
+            this.amountCrafted += Math.min(amount, this.getStack().getCount());
+        }
+        return super.decrStackSize(amount);
+    }
+
+    @Override
+    protected void onSwapCraft(int numItemsCrafted) {
+        this.amountCrafted += numItemsCrafted;
+    }
+
+    @Override
+    protected void onCrafting(ItemStack stack, int amount) {
+        this.amountCrafted += amount;
+        this.onCrafting(stack);
+    }
+
+    @Override
+    protected void onCrafting(ItemStack stack) {
+        if (this.amountCrafted > 0) {
+            stack.onCrafting(this.thePlayer.world, this.thePlayer, this.amountCrafted);
+            FMLCommonHandler.instance().firePlayerCraftingEvent(this.thePlayer, stack, this.craftMatrix);
+        }
+        this.amountCrafted = 0;
+    }
+
+    @Override
     public ItemStack onTake(EntityPlayer player, ItemStack stack) {
-        FMLCommonHandler.instance().firePlayerCraftingEvent(this.thePlayer, stack, this.craftMatrix);
+        this.onCrafting(stack);
 
         AspectList cost = ThaumcraftCraftingManager.findMatchingArcaneRecipeAspects(this.craftMatrix, this.thePlayer);
         ItemStack wandStack = this.craftMatrix.getStackInSlot(10);
@@ -39,7 +69,7 @@ public class SlotCraftingArcaneWorkbench extends Slot {
             ItemStack input = this.craftMatrix.getStackInSlot(i);
             if (input.isEmpty()) continue;
             this.craftMatrix.decrStackSize(i, 1);
-            ItemStack remainder = input.getItem().hasContainerItem(input) ? input.getItem().getContainerItem(input) : ItemStack.EMPTY;
+            ItemStack remainder = ForgeHooks.getContainerItem(input);
             if (remainder.isEmpty()) continue;
 
             if (this.craftMatrix.getStackInSlot(i).isEmpty()) {
