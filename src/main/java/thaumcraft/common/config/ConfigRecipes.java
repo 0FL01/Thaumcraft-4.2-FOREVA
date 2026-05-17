@@ -2502,6 +2502,210 @@ public class ConfigRecipes {
                 .setRegistryName("thaumcraft", "jarlabelnull");
         registry.register(recipeJarLabelNull);
 
+        IRecipe recipeBlockThaumium = new ShapedOreRecipe(
+                null,
+                new ItemStack(ConfigBlocks.blockCosmeticSolid, 1, 4),
+                "KKK",
+                "KKK",
+                "KKK",
+                'K', "ingotThaumium")
+                .setRegistryName("thaumcraft", "blockthaumium");
+        registry.register(recipeBlockThaumium);
+
+        IRecipe recipeBlockThaumiumDecompose = new ShapedOreRecipe(
+                null,
+                new ItemStack(ConfigItems.itemResource, 9, 2),
+                "K",
+                'K', new ItemStack(ConfigBlocks.blockCosmeticSolid, 1, 4))
+                .setRegistryName("thaumcraft", "blockthaumium_decompose");
+        registry.register(recipeBlockThaumiumDecompose);
+
+        IRecipe recipeThaumiumHelm = new ShapedOreRecipe(
+                null,
+                new ItemStack(ConfigItems.itemHelmThaumium, 1),
+                "III",
+                "I I",
+                'I', "ingotThaumium")
+                .setRegistryName("thaumcraft", "thaumiumhelm");
+        registry.register(recipeThaumiumHelm);
+
+        IRecipe recipeThaumiumChest = new ShapedOreRecipe(
+                null,
+                new ItemStack(ConfigItems.itemChestThaumium, 1),
+                "I I",
+                "III",
+                "III",
+                'I', "ingotThaumium")
+                .setRegistryName("thaumcraft", "thaumiumchest");
+        registry.register(recipeThaumiumChest);
+
+        IRecipe recipeThaumiumLegs = new ShapedOreRecipe(
+                null,
+                new ItemStack(ConfigItems.itemLegsThaumium, 1),
+                "III",
+                "I I",
+                "I I",
+                'I', "ingotThaumium")
+                .setRegistryName("thaumcraft", "thaumiumlegs");
+        registry.register(recipeThaumiumLegs);
+
+        IRecipe recipeThaumiumBoots = new ShapedOreRecipe(
+                null,
+                new ItemStack(ConfigItems.itemBootsThaumium, 1),
+                "I I",
+                "I I",
+                'I', "ingotThaumium")
+                .setRegistryName("thaumcraft", "thaumiumboots");
+        registry.register(recipeThaumiumBoots);
+
+        IRecipe recipeThaumiumShovel = new ShapedOreRecipe(
+                null,
+                new ItemStack(ConfigItems.itemShovelThaumium, 1),
+                "I",
+                "S",
+                "S",
+                'I', "ingotThaumium",
+                'S', "stickWood")
+                .setRegistryName("thaumcraft", "thaumiumshovel");
+        registry.register(recipeThaumiumShovel);
+
+        IRecipe recipeThaumiumPick = new ShapedOreRecipe(
+                null,
+                new ItemStack(ConfigItems.itemPickThaumium, 1),
+                "III",
+                " S ",
+                " S ",
+                'I', "ingotThaumium",
+                'S', "stickWood")
+                .setRegistryName("thaumcraft", "thaumiumpick");
+        registry.register(recipeThaumiumPick);
+
+        IRecipe recipeThaumiumAxe = new ShapedOreRecipe(
+                null,
+                new ItemStack(ConfigItems.itemAxeThaumium, 1),
+                "II",
+                "SI",
+                "S ",
+                'I', "ingotThaumium",
+                'S', "stickWood")
+                .setRegistryName("thaumcraft", "thaumiumaxe");
+        registry.register(recipeThaumiumAxe);
+
+        IRecipe recipeThaumiumHoe = new ShapedOreRecipe(
+                null,
+                new ItemStack(ConfigItems.itemHoeThaumium, 1),
+                "II",
+                "S ",
+                "S ",
+                'I', "ingotThaumium",
+                'S', "stickWood")
+                .setRegistryName("thaumcraft", "thaumiumhoe");
+        registry.register(recipeThaumiumHoe);
+
+        IRecipe recipeThaumiumSword = new ShapedOreRecipe(
+                null,
+                new ItemStack(ConfigItems.itemSwordThaumium, 1),
+                "I",
+                "I",
+                "S",
+                'I', "ingotThaumium",
+                'S', "stickWood")
+                .setRegistryName("thaumcraft", "thaumiumsword");
+        registry.register(recipeThaumiumSword);
+
+        IRecipe recipeVoidHelm = new ShapedOreRecipe(
+                null,
+                new ItemStack(ConfigItems.itemHelmVoid, 1),
+                "III",
+                "I I",
+                'I', "ingotVoid")
+                .setRegistryName("thaumcraft", "voidhelm");
+        registry.register(recipeVoidHelm);
+
+        IRecipe recipeVoidChest = new ShapedOreRecipe(
+                null,
+                new ItemStack(ConfigItems.itemChestVoid, 1),
+                "I I",
+                "III",
+                "III",
+                'I', "ingotVoid")
+                .setRegistryName("thaumcraft", "voidchest");
+        registry.register(recipeVoidChest);
+
+        IRecipe recipeVoidLegs = new ShapedOreRecipe(
+                null,
+                new ItemStack(ConfigItems.itemLegsVoid, 1),
+                "III",
+                "I I",
+                "I I",
+                'I', "ingotVoid")
+                .setRegistryName("thaumcraft", "voidlegs");
+        registry.register(recipeVoidLegs);
+
+        IRecipe recipeVoidBoots = new ShapedOreRecipe(
+                null,
+                new ItemStack(ConfigItems.itemBootsVoid, 1),
+                "I I",
+                "I I",
+                'I', "ingotVoid")
+                .setRegistryName("thaumcraft", "voidboots");
+        registry.register(recipeVoidBoots);
+
+        IRecipe recipeVoidShovel = new ShapedOreRecipe(
+                null,
+                new ItemStack(ConfigItems.itemShovelVoid, 1),
+                "I",
+                "S",
+                "S",
+                'I', "ingotVoid",
+                'S', "stickWood")
+                .setRegistryName("thaumcraft", "voidshovel");
+        registry.register(recipeVoidShovel);
+
+        IRecipe recipeVoidPick = new ShapedOreRecipe(
+                null,
+                new ItemStack(ConfigItems.itemPickVoid, 1),
+                "III",
+                " S ",
+                " S ",
+                'I', "ingotVoid",
+                'S', "stickWood")
+                .setRegistryName("thaumcraft", "voidpick");
+        registry.register(recipeVoidPick);
+
+        IRecipe recipeVoidAxe = new ShapedOreRecipe(
+                null,
+                new ItemStack(ConfigItems.itemAxeVoid, 1),
+                "II",
+                "SI",
+                "S ",
+                'I', "ingotVoid",
+                'S', "stickWood")
+                .setRegistryName("thaumcraft", "voidaxe");
+        registry.register(recipeVoidAxe);
+
+        IRecipe recipeVoidHoe = new ShapedOreRecipe(
+                null,
+                new ItemStack(ConfigItems.itemHoeVoid, 1),
+                "II",
+                "S ",
+                "S ",
+                'I', "ingotVoid",
+                'S', "stickWood")
+                .setRegistryName("thaumcraft", "voidhoe");
+        registry.register(recipeVoidHoe);
+
+        IRecipe recipeVoidSword = new ShapedOreRecipe(
+                null,
+                new ItemStack(ConfigItems.itemSwordVoid, 1),
+                "I",
+                "I",
+                "S",
+                'I', "ingotVoid",
+                'S', "stickWood")
+                .setRegistryName("thaumcraft", "voidsword");
+        registry.register(recipeVoidSword);
+
         for (int a = 0; a < 6; a++) {
             recipeClusters[a] = new ShapelessOreRecipe(
                     null,
