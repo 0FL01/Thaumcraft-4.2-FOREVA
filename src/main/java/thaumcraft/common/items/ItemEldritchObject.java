@@ -1,6 +1,8 @@
 package thaumcraft.common.items;
 
+import java.util.List;
 import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.EnumRarity;
 import net.minecraft.item.Item;
@@ -13,7 +15,11 @@ import net.minecraft.util.EnumHand;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.SoundCategory;
+import net.minecraft.util.text.TextFormatting;
+import net.minecraft.util.text.translation.I18n;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import thaumcraft.api.aspects.Aspect;
 import thaumcraft.api.nodes.NodeModifier;
 import thaumcraft.common.blocks.BlockEldritch;
@@ -67,6 +73,33 @@ public class ItemEldritchObject extends Item {
                 return EnumRarity.EPIC;
             default:
                 return EnumRarity.UNCOMMON;
+        }
+    }
+
+    @SideOnly(Side.CLIENT)
+    @Override
+    public void addInformation(ItemStack stack, World worldIn, List<String> tooltip, ITooltipFlag flagIn) {
+        super.addInformation(stack, worldIn, tooltip, flagIn);
+        switch (stack.getItemDamage()) {
+            case META_ELDRITCH_OBJECT:
+                tooltip.add(TextFormatting.DARK_PURPLE + I18n.translateToLocal("item.ItemEldritchObject.text.1"));
+                break;
+            case META_CRIMSON_RITES:
+                tooltip.add(TextFormatting.DARK_PURPLE + I18n.translateToLocal("item.ItemEldritchObject.text.2"));
+                tooltip.add(TextFormatting.DARK_BLUE + I18n.translateToLocal("item.ItemEldritchObject.text.3"));
+                break;
+            case META_ELDRITCH_OBJECT_2:
+                tooltip.add(TextFormatting.DARK_PURPLE + I18n.translateToLocal("item.ItemEldritchObject.text.4"));
+                break;
+            case META_ELDRITCH_OBJECT_3:
+                tooltip.add(TextFormatting.DARK_PURPLE + I18n.translateToLocal("item.ItemEldritchObject.text.5"));
+                tooltip.add(TextFormatting.DARK_PURPLE + I18n.translateToLocal("item.ItemEldritchObject.text.6"));
+                break;
+            case META_OB_PLACER:
+                tooltip.add(TextFormatting.ITALIC + "Creative Mode Only");
+                break;
+            default:
+                break;
         }
     }
 

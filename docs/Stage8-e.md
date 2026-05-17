@@ -1759,6 +1759,30 @@ Depends on GAP-1 and GAP-3. Some infusion source scenarios may require Stage 9 c
 
 - Это common/server+non-GUI baseline; полная research-note gameplay/GUI/manual parity (table interaction/hex puzzle flow) остаётся зависимостью Stage 3/8/9 runtime/manual сценариев.
 
+#### Checkpoint 2026-05-17 — GAP-11 eldritch-object tooltip/lang contracts baseline
+
+Статус: частично продвинут.
+
+Что сделано:
+
+- `ItemEldritchObject` получил reference-shaped metadata tooltip branches в `addInformation(...)`:
+  - восстановлены текстовые ветки для `meta 0..3`;
+  - для `meta 4` восстановлен tooltip `Creative Mode Only`.
+- В `en_us.lang` добавлены отсутствующие reference keys:
+  - `item.ItemEldritchObject.text.1..6`.
+- Добавлен `ItemEldritchObjectCoreContractsStaticGuardTest`, фиксирующий:
+  - subtype/rarity split (`UNCOMMON/RARE/EPIC`);
+  - `CRIMSON` unlock right-click path;
+  - tooltip branch presence + lang key presence.
+
+Проверки:
+
+- `./scripts/dev.sh validate --smoke` — passed.
+
+Ограничения:
+
+- Это non-GUI tooltip/lang baseline; manual runtime parity для primordial pearl node mutation/flux scatter и creative obelisk placement остаётся отдельной Stage 5/6 runtime задачей.
+
 ### GAP-12: FX registration exists, but send-site coverage and manual scenario validation are incomplete
 
 **Статус:** требует проверки  
