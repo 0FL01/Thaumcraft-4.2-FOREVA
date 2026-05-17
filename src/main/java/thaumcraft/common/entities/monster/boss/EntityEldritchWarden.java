@@ -20,6 +20,7 @@ import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.living.EnderTeleportEvent;
+import net.minecraftforge.fml.common.network.NetworkRegistry;
 import thaumcraft.common.Thaumcraft;
 import thaumcraft.common.blocks.BlockAiry;
 import thaumcraft.common.config.ConfigBlocks;
@@ -29,6 +30,10 @@ import thaumcraft.common.entities.monster.EntityCultist;
 import thaumcraft.common.entities.monster.EntityEldritchGuardian;
 import thaumcraft.common.entities.projectile.EntityEldritchOrb;
 import thaumcraft.common.lib.TCSounds;
+import thaumcraft.common.lib.network.PacketHandler;
+import thaumcraft.common.lib.network.fx.PacketFXBlockArc;
+import thaumcraft.common.lib.network.fx.PacketFXBlockSparkle;
+import thaumcraft.common.lib.network.fx.PacketFXSonic;
 
 public class EntityEldritchWarden extends EntityThaumcraftBoss implements net.minecraft.entity.IRangedAttackMob, thaumcraft.api.entities.IEldritchMob {
     public static final String[] TITLES = {"Aphoom-Zhah", "Basatan", "Chaugnar Faugn", "Mnomquah", "Nyogtha", "Oorn", "Shaikorth", "Rhan-Tegoth", "Rhogog", "Shudde M'ell", "Vulthoom", "Yag-Kosha", "Yibb-Tstll", "Zathog", "Zushakon"};
@@ -143,6 +148,9 @@ public class EntityEldritchWarden extends EntityThaumcraftBoss implements net.mi
                 this.world.spawnEntity(blast);
             }
         } else if (this.canEntityBeSeen(target)) {
+            PacketHandler.INSTANCE.sendToAllAround(
+                    new PacketFXSonic(this.getEntityId()),
+                    new NetworkRegistry.TargetPoint(this.world.provider.getDimension(), this.posX, this.posY, this.posZ, 32.0));
             target.addVelocity(-MathHelper.sin(this.rotationYaw * (float) Math.PI / 180.0F) * 1.5F, 0.1D, MathHelper.cos(this.rotationYaw * (float) Math.PI / 180.0F) * 1.5F);
             target.addPotionEffect(new PotionEffect(MobEffects.WITHER, 400, 0));
             target.addPotionEffect(new PotionEffect(MobEffects.WEAKNESS, 400, 0));
@@ -217,6 +225,15 @@ public class EntityEldritchWarden extends EntityThaumcraftBoss implements net.mi
                 }
                 this.world.setBlockState(pos, ConfigBlocks.blockAiry.getDefaultState().withProperty(BlockAiry.TYPE, 11), 3);
                 this.world.scheduleUpdate(pos, ConfigBlocks.blockAiry, 250 + this.rand.nextInt(150));
+                if (this.rand.nextFloat() < 0.3F) {
+                    PacketHandler.INSTANCE.sendToAllAround(
+                            new PacketFXBlockArc(pos.getX(), pos.getY(), pos.getZ(), this.getEntityId()),
+                            new NetworkRegistry.TargetPoint(this.world.provider.getDimension(), pos.getX(), pos.getY(), pos.getZ(), 32.0));
+                } else {
+                    PacketHandler.INSTANCE.sendToAllAround(
+                            new PacketFXBlockSparkle(pos.getX(), pos.getY(), pos.getZ(), 0x800080),
+                            new NetworkRegistry.TargetPoint(this.world.provider.getDimension(), pos.getX(), pos.getY(), pos.getZ(), 32.0));
+                }
             }
             this.world.playSound(null, this.posX, this.posY, this.posZ, TCSounds.ZAP, SoundCategory.HOSTILE, 1.0F, 0.9F + this.rand.nextFloat() * 0.1F);
         }

@@ -20,6 +20,12 @@ public class EntityEldritchWardenStaticGuardTest {
         assertTrue(source.contains("((PathNavigateGround) this.getNavigator()).setCanSwim(true);"));
         assertTrue(source.contains("if (this.getSpawnTimer() == 150) {"));
         assertFalse(source.contains("if (!this.world.isRemote && this.getSpawnTimer() == 150) {"));
+        assertTrue("Warden sonic attack branch must keep PacketFXSonic broadcast baseline",
+                source.contains("new PacketFXSonic(this.getEntityId())")
+                        && source.contains("new NetworkRegistry.TargetPoint(this.world.provider.getDimension(), this.posX, this.posY, this.posZ, 32.0)"));
+        assertTrue("Warden field frenzy must keep block-arc/sparkle FX broadcasts",
+                source.contains("new PacketFXBlockArc(pos.getX(), pos.getY(), pos.getZ(), this.getEntityId())")
+                        && source.contains("new PacketFXBlockSparkle(pos.getX(), pos.getY(), pos.getZ(), 0x800080)"));
     }
 
     private static String readFile(String path) throws IOException {

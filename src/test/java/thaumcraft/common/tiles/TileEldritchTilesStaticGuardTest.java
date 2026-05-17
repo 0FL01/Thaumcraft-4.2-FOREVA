@@ -42,6 +42,16 @@ public class TileEldritchTilesStaticGuardTest {
         assertTrue(source.contains("return 9216.0;"));
     }
 
+    @Test
+    public void eldritchLockShouldKeepAiryCleanupSparkleBroadcastContract() throws IOException {
+        String source = readFile("src/main/java/thaumcraft/common/tiles/TileEldritchLock.java");
+
+        assertTrue(source.contains("private void clearNearbyAiryBlocks()"));
+        assertTrue(source.contains("if (this.world.getBlockState(target).getBlock() == ConfigBlocks.blockAiry)"));
+        assertTrue(source.contains("new PacketFXBlockSparkle(target.getX(), target.getY(), target.getZ(), 0x400040)"));
+        assertTrue(source.contains("new NetworkRegistry.TargetPoint(this.world.provider.getDimension(), target.getX(), target.getY(), target.getZ(), 32.0)"));
+    }
+
     private static String readFile(String path) throws IOException {
         return new String(Files.readAllBytes(Paths.get(path)), StandardCharsets.UTF_8);
     }

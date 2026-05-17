@@ -11,6 +11,7 @@ import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.world.EnumDifficulty;
+import net.minecraftforge.fml.common.network.NetworkRegistry;
 import thaumcraft.api.TileThaumcraft;
 import thaumcraft.common.config.ConfigBlocks;
 import thaumcraft.common.entities.monster.EntityTaintacle;
@@ -19,6 +20,8 @@ import thaumcraft.common.entities.monster.boss.EntityEldritchGolem;
 import thaumcraft.common.entities.monster.boss.EntityEldritchWarden;
 import thaumcraft.common.entities.monster.boss.EntityTaintacleGiant;
 import thaumcraft.common.lib.TCSounds;
+import thaumcraft.common.lib.network.PacketHandler;
+import thaumcraft.common.lib.network.fx.PacketFXBlockSparkle;
 import thaumcraft.common.lib.utils.BlockUtils;
 import thaumcraft.common.lib.utils.EntityUtils;
 import thaumcraft.common.lib.utils.Utils;
@@ -328,6 +331,9 @@ public class TileEldritchLock extends TileThaumcraft implements ITickable {
     private void clearNearbyAiryBlocks() {
         for (BlockPos target : BlockPos.getAllInBox(this.pos.add(-2, -2, -2), this.pos.add(2, 2, 2))) {
             if (this.world.getBlockState(target).getBlock() == ConfigBlocks.blockAiry) {
+                PacketHandler.INSTANCE.sendToAllAround(
+                        new PacketFXBlockSparkle(target.getX(), target.getY(), target.getZ(), 0x400040),
+                        new NetworkRegistry.TargetPoint(this.world.provider.getDimension(), target.getX(), target.getY(), target.getZ(), 32.0));
                 this.world.setBlockToAir(target);
             }
         }
