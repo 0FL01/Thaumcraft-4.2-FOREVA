@@ -64,6 +64,7 @@ import thaumcraft.client.fx.particles.FXBubbleAlt;
 import thaumcraft.client.fx.particles.FXGeneric;
 import thaumcraft.client.fx.particles.FXSparkle;
 import thaumcraft.client.fx.particles.FXVent;
+import thaumcraft.client.fx.particles.FXVisSparkle;
 import thaumcraft.client.fx.particles.FXWisp;
 import thaumcraft.client.fx.particles.FXWispEG;
 import thaumcraft.client.renderers.entity.RenderFallbackBiped;
@@ -664,12 +665,7 @@ public class ClientProxy extends CommonProxy {
         float red = normalizeColor(tint.getRed());
         float green = normalizeColor(tint.getGreen());
         float blue = normalizeColor(tint.getBlue());
-        for (int i = 0; i < amount; i++) {
-            double px = x + world.rand.nextFloat();
-            double py = y + world.rand.nextFloat();
-            double pz = z + world.rand.nextFloat();
-            world.spawnParticle(EnumParticleTypes.REDSTONE, px, py, pz, red, green, blue);
-        }
+        ParticleEngine.addEffect(world, new FXVisSparkle(world, x, y, z, red, green, blue, amount));
     }
 
     @Override

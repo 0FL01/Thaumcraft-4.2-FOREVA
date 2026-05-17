@@ -25,13 +25,15 @@ public class ClientProxyFxStaticGuardTest {
         String genericFx = readFile("src/main/java/thaumcraft/client/fx/particles/FXGeneric.java");
         String sparkleFx = readFile("src/main/java/thaumcraft/client/fx/particles/FXSparkle.java");
         String ventFx = readFile("src/main/java/thaumcraft/client/fx/particles/FXVent.java");
+        String visSparkleFx = readFile("src/main/java/thaumcraft/client/fx/particles/FXVisSparkle.java");
         String wispFx = readFile("src/main/java/thaumcraft/client/fx/particles/FXWisp.java");
         String wispEgFx = readFile("src/main/java/thaumcraft/client/fx/particles/FXWispEG.java");
         String sonicFx = readFile("src/main/java/thaumcraft/client/fx/other/FXSonic.java");
         String shieldRunesFx = readFile("src/main/java/thaumcraft/client/fx/other/FXShieldRunes.java");
 
-        assertTrue("ClientProxy blockSparkle must spawn client particles",
-                source.contains("public void blockSparkle(") && source.contains("world.spawnParticle(EnumParticleTypes.REDSTONE"));
+        assertTrue("ClientProxy blockSparkle must route generic colors through dedicated FXVisSparkle",
+                source.contains("public void blockSparkle(")
+                        && source.contains("new FXVisSparkle(world, x, y, z, red, green, blue, amount)"));
         assertTrue("ClientProxy blockSparkle must route ward/portable-hole colors through dedicated FXBlockWard",
                 source.contains("color == 0xFC9A00 || color == 0x400040")
                         && source.contains("new FXBlockWard(world, x, y, z, color, amount)"));
@@ -141,6 +143,10 @@ public class ClientProxyFxStaticGuardTest {
                 ventFx.contains("class FXVent extends Particle")
                         && ventFx.contains("EnumParticleTypes.REDSTONE")
                         && ventFx.contains("EnumParticleTypes.CRIT_MAGIC"));
+        assertTrue("Dedicated FXVisSparkle particle must keep block-centered sparkle emission baseline",
+                visSparkleFx.contains("class FXVisSparkle extends Particle")
+                        && visSparkleFx.contains("baseX")
+                        && visSparkleFx.contains("EnumParticleTypes.REDSTONE"));
         assertTrue("Dedicated FXWisp particle must keep target-aware wisp trail baseline",
                 wispFx.contains("class FXWisp extends Particle")
                         && wispFx.contains("hasTarget")
