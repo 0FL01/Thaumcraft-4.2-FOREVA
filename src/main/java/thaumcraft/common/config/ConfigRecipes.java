@@ -50,6 +50,7 @@ public class ConfigRecipes {
     private static IRecipe recipeMundaneBelt;
     private static IRecipe recipeBlockFlesh;
     private static IRecipe recipeBlockTallow;
+    private static final IRecipe[] recipeClusters = new IRecipe[7];
     private static CrucibleRecipe recipeNitor;
     private static CrucibleRecipe recipeAlumentum;
     private static CrucibleRecipe recipeThaumium;
@@ -184,27 +185,35 @@ public class ConfigRecipes {
                                 new ItemStack(ConfigBlocks.blockMetalDevice, 1, 3), new ItemStack(ConfigBlocks.blockStoneDevice, 1, 0), new ItemStack(ConfigBlocks.blockMetalDevice, 1, 3),
                                 new ItemStack(ConfigBlocks.blockMetalDevice, 1, 3), new ItemStack(ConfigBlocks.blockMetalDevice, 1, 3), new ItemStack(ConfigBlocks.blockMetalDevice, 1, 3))));
         for (int a = 0; a < 6; a++) {
-            ConfigResearch.recipes.put("Clusters" + a,
+            if (recipeClusters[a] != null) {
+                ConfigResearch.recipes.put("Clusters" + a, recipeClusters[a]);
+            } else {
+                ConfigResearch.recipes.put("Clusters" + a,
+                        new ShapelessOreRecipe(
+                                null,
+                                new ItemStack(ConfigBlocks.blockCrystal, 1, a),
+                                new ItemStack(ConfigItems.itemShard, 1, a),
+                                new ItemStack(ConfigItems.itemShard, 1, a),
+                                new ItemStack(ConfigItems.itemShard, 1, a),
+                                new ItemStack(ConfigItems.itemShard, 1, a),
+                                new ItemStack(ConfigItems.itemShard, 1, a),
+                                new ItemStack(ConfigItems.itemShard, 1, a)));
+            }
+        }
+        if (recipeClusters[6] != null) {
+            ConfigResearch.recipes.put("Clusters6", recipeClusters[6]);
+        } else {
+            ConfigResearch.recipes.put("Clusters6",
                     new ShapelessOreRecipe(
                             null,
-                            new ItemStack(ConfigBlocks.blockCrystal, 1, a),
-                            new ItemStack(ConfigItems.itemShard, 1, a),
-                            new ItemStack(ConfigItems.itemShard, 1, a),
-                            new ItemStack(ConfigItems.itemShard, 1, a),
-                            new ItemStack(ConfigItems.itemShard, 1, a),
-                            new ItemStack(ConfigItems.itemShard, 1, a),
-                            new ItemStack(ConfigItems.itemShard, 1, a)));
+                            new ItemStack(ConfigBlocks.blockCrystal, 1, 6),
+                            new ItemStack(ConfigItems.itemShard, 1, 0),
+                            new ItemStack(ConfigItems.itemShard, 1, 1),
+                            new ItemStack(ConfigItems.itemShard, 1, 2),
+                            new ItemStack(ConfigItems.itemShard, 1, 3),
+                            new ItemStack(ConfigItems.itemShard, 1, 4),
+                            new ItemStack(ConfigItems.itemShard, 1, 5)));
         }
-        ConfigResearch.recipes.put("Clusters6",
-                new ShapelessOreRecipe(
-                        null,
-                        new ItemStack(ConfigBlocks.blockCrystal, 1, 6),
-                        new ItemStack(ConfigItems.itemShard, 1, 0),
-                        new ItemStack(ConfigItems.itemShard, 1, 1),
-                        new ItemStack(ConfigItems.itemShard, 1, 2),
-                        new ItemStack(ConfigItems.itemShard, 1, 3),
-                        new ItemStack(ConfigItems.itemShard, 1, 4),
-                        new ItemStack(ConfigItems.itemShard, 1, 5)));
         if (recipeMundaneAmulet != null) {
             ConfigResearch.recipes.put("MundaneAmulet", recipeMundaneAmulet);
         } else {
@@ -2448,6 +2457,31 @@ public class ConfigRecipes {
                 'K', new ItemStack(ConfigItems.itemResource, 1, 4))
                 .setRegistryName("thaumcraft", "blocktallow");
         registry.register(recipeBlockTallow);
+
+        for (int a = 0; a < 6; a++) {
+            recipeClusters[a] = new ShapelessOreRecipe(
+                    null,
+                    new ItemStack(ConfigBlocks.blockCrystal, 1, a),
+                    new ItemStack(ConfigItems.itemShard, 1, a),
+                    new ItemStack(ConfigItems.itemShard, 1, a),
+                    new ItemStack(ConfigItems.itemShard, 1, a),
+                    new ItemStack(ConfigItems.itemShard, 1, a),
+                    new ItemStack(ConfigItems.itemShard, 1, a),
+                    new ItemStack(ConfigItems.itemShard, 1, a))
+                    .setRegistryName("thaumcraft", "clusters" + a);
+            registry.register(recipeClusters[a]);
+        }
+        recipeClusters[6] = new ShapelessOreRecipe(
+                null,
+                new ItemStack(ConfigBlocks.blockCrystal, 1, 6),
+                new ItemStack(ConfigItems.itemShard, 1, 0),
+                new ItemStack(ConfigItems.itemShard, 1, 1),
+                new ItemStack(ConfigItems.itemShard, 1, 2),
+                new ItemStack(ConfigItems.itemShard, 1, 3),
+                new ItemStack(ConfigItems.itemShard, 1, 4),
+                new ItemStack(ConfigItems.itemShard, 1, 5))
+                .setRegistryName("thaumcraft", "clusters6");
+        registry.register(recipeClusters[6]);
 
         specialRecipesRegistered = true;
     }
