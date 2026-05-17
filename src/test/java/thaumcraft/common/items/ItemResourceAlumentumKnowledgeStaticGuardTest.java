@@ -21,6 +21,7 @@ public class ItemResourceAlumentumKnowledgeStaticGuardTest {
         assertTrue(source.contains("projectile.shoot(player, player.rotationPitch, player.rotationYaw, 0.0F, 0.75F, 1.0F);"));
         assertTrue(source.contains("world.playSound(null, player.posX, player.posY, player.posZ"));
         assertTrue(source.contains("SoundEvents.ENTITY_ARROW_SHOOT"));
+        assertTrue(source.contains("if (i == META_BRAIN)"));
         assertTrue(source.contains("else if (stack.getItemDamage() == META_KNOWLEDGE_FRAGMENT)"));
         assertTrue(source.contains("for (Aspect aspect : Aspect.getPrimalAspects())"));
         assertTrue(source.contains("short amount = (short) (world.rand.nextInt(2) + 1);"));

@@ -92,6 +92,9 @@ public class ItemResource extends Item implements IEssentiaContainerItem {
     public void getSubItems(CreativeTabs tab, NonNullList<ItemStack> items) {
         if (this.isInCreativeTab(tab)) {
             for (int i = 0; i < NAMES.length; i++) {
+                if (i == META_BRAIN) {
+                    continue;
+                }
                 items.add(new ItemStack(this, 1, i));
             }
         }
