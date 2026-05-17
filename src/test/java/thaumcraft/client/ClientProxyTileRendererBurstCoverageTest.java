@@ -21,6 +21,10 @@ public class ClientProxyTileRendererBurstCoverageTest {
         assertTrue(source.contains("ClientRegistry.bindTileEntitySpecialRenderer(TileJarBrain.class, jarRenderer);"));
         assertTrue(source.contains("ClientRegistry.bindTileEntitySpecialRenderer(TileJarNode.class, jarRenderer);"));
         assertTrue(source.contains("ClientRegistry.bindTileEntitySpecialRenderer(TileNode.class, nodeRenderer);"));
+        assertTrue(source.contains("ClientRegistry.bindTileEntitySpecialRenderer(TileNodeEnergized.class, nodeRenderer);"));
+        assertTrue(source.contains("ClientRegistry.bindTileEntitySpecialRenderer(TileNodeStabilizer.class, new TileNodeStabilizerRenderer());"));
+        assertTrue(source.contains("ClientRegistry.bindTileEntitySpecialRenderer(TileNodeConverter.class, new TileNodeConverterRenderer());"));
+        assertTrue(source.contains("ClientRegistry.bindTileEntitySpecialRenderer(TileVisRelay.class, new TileVisRelayRenderer());"));
         assertTrue(source.contains("ClientRegistry.bindTileEntitySpecialRenderer(TileCrucible.class, new TileCrucibleRenderer());"));
         assertTrue(source.contains("ClientRegistry.bindTileEntitySpecialRenderer(thaumcraft.common.tiles.TileAlembic.class, new TileAlembicRenderer());"));
         assertTrue(source.contains("ClientRegistry.bindTileEntitySpecialRenderer(TilePedestal.class, new TilePedestalRenderer());"));
