@@ -130,15 +130,15 @@ public class ClientProxyFxStaticGuardTest {
         assertTrue("PacketFXInfusionSource must schedule client task and route through proxy beam",
                 infusionSource.contains("Minecraft.getMinecraft().addScheduledTask")
                         && infusionSource.contains("Thaumcraft.proxy.beam("));
-        assertTrue("PacketMiscEvent must schedule client task and update warp vignette/fog markers",
-                miscEvent.contains("Minecraft.getMinecraft().addScheduledTask")
+        assertTrue("PacketMiscEvent must schedule client task via proxy boundary and update warp vignette/fog markers",
+                miscEvent.contains("Thaumcraft.proxy.scheduleClientTask(")
                         && miscEvent.contains("ClientTickEventsFML.warpVignette")
                         && miscEvent.contains("RenderEventHandler.fogFiddled"));
         assertTrue("PacketWarpMessage must schedule client task via proxy boundary and show warp notifications",
                 warpMessage.contains("Thaumcraft.proxy.scheduleClientTask(")
                         && warpMessage.contains("TextComponentTranslation"));
-        assertTrue("PacketBoreDig must schedule client task and route to TileArcaneBore.getDigEvent",
-                packetBoreDig.contains("Minecraft.getMinecraft().addScheduledTask")
+        assertTrue("PacketBoreDig must schedule client task via proxy boundary and route to TileArcaneBore.getDigEvent",
+                packetBoreDig.contains("Thaumcraft.proxy.scheduleClientTask(")
                         && packetBoreDig.contains("getDigEvent"));
         assertTrue("PacketFXBlockSparkle must schedule client task and call proxy blockSparkle",
                 blockSparkle.contains("Minecraft.getMinecraft().addScheduledTask") && blockSparkle.contains("Thaumcraft.proxy.blockSparkle("));

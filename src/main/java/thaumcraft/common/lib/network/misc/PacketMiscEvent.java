@@ -1,14 +1,16 @@
 package thaumcraft.common.lib.network.misc;
 
 import io.netty.buffer.ByteBuf;
-import net.minecraft.client.Minecraft;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.SoundCategory;
+import net.minecraft.world.World;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import thaumcraft.client.lib.ClientTickEventsFML;
 import thaumcraft.client.lib.RenderEventHandler;
+import thaumcraft.common.Thaumcraft;
 import thaumcraft.common.lib.TCSounds;
 import thaumcraft.common.lib.network.PacketBase;
 
@@ -38,16 +40,18 @@ public class PacketMiscEvent extends PacketBase {
     @Override
     @SideOnly(Side.CLIENT)
     public IMessage onMessage(MessageContext ctx) {
-        Minecraft.getMinecraft().addScheduledTask(() -> {
-            if (Minecraft.getMinecraft().player == null || Minecraft.getMinecraft().world == null) return;
+        Thaumcraft.proxy.scheduleClientTask(() -> {
+            EntityPlayer player = Thaumcraft.proxy.getClientPlayer();
+            World world = Thaumcraft.proxy.getClientWorld();
+            if (player == null || world == null) return;
             switch (this.type) {
                 case WARP_EVENT:
                     ClientTickEventsFML.warpVignette = 100;
-                    Minecraft.getMinecraft().world.playSound(
-                            Minecraft.getMinecraft().player,
-                            Minecraft.getMinecraft().player.posX,
-                            Minecraft.getMinecraft().player.posY,
-                            Minecraft.getMinecraft().player.posZ,
+                    world.playSound(
+                            player,
+                            player.posX,
+                            player.posY,
+                            player.posZ,
                             TCSounds.HEARTBEAT,
                             SoundCategory.PLAYERS,
                             1.0f,

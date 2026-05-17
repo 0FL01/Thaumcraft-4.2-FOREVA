@@ -1,10 +1,10 @@
 package thaumcraft.common.lib.network.misc;
 
 import io.netty.buffer.ByteBuf;
-import net.minecraft.client.Minecraft;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityNote;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
@@ -12,6 +12,7 @@ import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import thaumcraft.common.Thaumcraft;
 import thaumcraft.common.lib.network.PacketBase;
 import thaumcraft.common.lib.network.PacketHandler;
 import thaumcraft.common.tiles.TileSensor;
@@ -87,11 +88,12 @@ public class PacketNote extends PacketBase {
 
     @SideOnly(Side.CLIENT)
     private void handleClient() {
-        Minecraft.getMinecraft().addScheduledTask(() -> {
-            if (this.note < 0 || Minecraft.getMinecraft().world == null) {
+        Thaumcraft.proxy.scheduleClientTask(() -> {
+            World world = Thaumcraft.proxy.getClientWorld();
+            if (this.note < 0 || world == null) {
                 return;
             }
-            TileEntity tile = Minecraft.getMinecraft().world.getTileEntity(new BlockPos(this.x, this.y, this.z));
+            TileEntity tile = world.getTileEntity(new BlockPos(this.x, this.y, this.z));
             if (tile instanceof TileEntityNote) {
                 ((TileEntityNote) tile).note = this.note;
             } else if (tile instanceof TileSensor) {
