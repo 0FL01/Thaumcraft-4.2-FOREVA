@@ -13,7 +13,7 @@ public class ConfigRecipesCustomRecipeIdStaticGuardTest {
 
     @Test
     public void configRecipesKeepsThaumcraftNamespaceForCustomRecipeIds() throws IOException {
-        String source = readFile("src/main/java/thaumcraft/common/config/ConfigRecipes.java");
+        String source = ConfigRecipesSourceReader.readMergedSource();
 
         assertTrue("Custom robe dye recipes must register under thaumcraft namespace",
                 source.contains("new RecipesRobeArmorDyes().setRegistryName(\"thaumcraft\", \"robearmordye\")")

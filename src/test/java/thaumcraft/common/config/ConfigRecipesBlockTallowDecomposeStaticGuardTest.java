@@ -13,7 +13,7 @@ public class ConfigRecipesBlockTallowDecomposeStaticGuardTest {
 
     @Test
     public void configRecipesRegistersBlockTallowDecomposeBaselineRecipe() throws IOException {
-        String source = readFile("src/main/java/thaumcraft/common/config/ConfigRecipes.java");
+        String source = ConfigRecipesSourceReader.readMergedSource();
 
         assertTrue("ConfigRecipes should keep block tallow reverse recipe baseline",
                 source.contains("new ItemStack(ConfigItems.itemResource, 9, 4)")

@@ -22,7 +22,7 @@ public class ConfigRecipesArcaneRegistrationAuditStaticGuardTest {
 
     @Test
     public void configRecipesArcaneRegistrationCorpusShouldStayUniqueAndSized() throws IOException {
-        String source = readFile("src/main/java/thaumcraft/common/config/ConfigRecipes.java");
+        String source = ConfigRecipesSourceReader.readMergedSource();
 
         List<String> keys = new ArrayList<>();
         keys.addAll(extract(source, ARCANE_PATTERN));
@@ -44,7 +44,7 @@ public class ConfigRecipesArcaneRegistrationAuditStaticGuardTest {
 
     @Test
     public void configRecipesArcaneRegistrationCorpusShouldKeepRepresentativeKeyFamilies() throws IOException {
-        String source = readFile("src/main/java/thaumcraft/common/config/ConfigRecipes.java");
+        String source = ConfigRecipesSourceReader.readMergedSource();
 
         assertTrue("Arcane corpus should retain representative progression keys",
                 source.contains("registerArcaneRecipe(\"PrimalCharm\"")

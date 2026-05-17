@@ -62,6 +62,19 @@ Lightweight analysis commands run:
 > - `ConfigResearchEldritch.java` — `initEldritchResearchBaseline()`, `initEldritchResearchTextOnlyBaseline()`.
 > Behavior, registry names, research keys, recipe keys, and `init()` call order are unchanged. References below that point to `ConfigResearch.java` category blocks now refer to the corresponding slice file.
 
+> **Note — ConfigRecipes file split:** `ConfigRecipes.java` content has been refactored per recipe family into 8 files (hub + 7 slice files), all under `thaumcraft.common.config` and `thaumcraft.common.config.recipes`:
+> - `ConfigRecipes.java` — hub: `init()`, `oreDictRecipe(...)`, `shapelessNBTOreRecipe(...)`, `registerSpecialRecipes(...)`, `SpecialRecipesBridge`.
+> - `ConfigRecipesArcaneSlice.java` — `initializeArcaneRecipeBaseline()`.
+> - `ConfigRecipesCrucibleSlice.java` — `initializeCrucibleRecipeBaseline()`.
+> - `ConfigRecipesInfusionSlice.java` — infusion wand/device/golem/enchantment/equipment baseline methods.
+> - `ConfigRecipesSmeltingSlice.java` — `initializeSmeltingBaseline()`, `initializeSmeltingBonusBaseline()`.
+> - `ConfigRecipesSpecialSlice.java` — `registerSpecialRecipes(...)` for normal-crafting entries.
+> - `ConfigRecipesInfusionDeviceSlice.java`, `ConfigRecipesInfusionEquipmentSlice.java` — separated infusion device/equipment data.
+> 
+> Behavior, registry names, recipe keys, and `init()` call order are unchanged. References that point to `ConfigRecipes` methods now refer to the corresponding slice or hub method, reachable via static delegation.
+> 
+> **Test adaptation:** Static guard tests under `src/test/java/thaumcraft/common/config/` now use `ConfigRecipesSourceReader.readMergedSource()`, which concatenates `ConfigRecipes.java` + all `recipes/` slice files (sorted alphabetically) into a single virtual source for regex-based contract analysis (`src/test/java/thaumcraft/common/config/ConfigRecipesSourceReader.java`).
+
 ## 4. Текущее состояние Stage 9-e
 
 Current implementation is not Stage 9-e complete.

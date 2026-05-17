@@ -24,6 +24,7 @@ public class ConfigResearchRecipeKeyCoverageTest {
             "(?:recipes\\.get|recipeI|recipeArcane|recipeCrucible|recipeInfusion|recipeInfusionEnchantment|recipeList)\\(\"([^\"]+)\"\\)");
     private static final Pattern RECIPE_PUT_PATTERN = Pattern.compile("recipes\\.put\\(\"([^\"]+)\"");
     private static final Pattern SPECIAL_RECIPE_HANDLE_PATTERN = Pattern.compile("specialResearchRecipeHandles\\.put\\(\"([^\"]+)\"");
+    private static final Pattern SPECIAL_RECIPE_HANDLE_BRIDGE_PATTERN = Pattern.compile("addSpecialResearchRecipeHandle\\(\"([^\"]+)\"");
     private static final Pattern ARCANE_PATTERN = Pattern.compile("registerArcaneRecipe\\(\"([^\"]+)\"");
     private static final Pattern SHAPELESS_ARCANE_PATTERN = Pattern.compile("registerShapelessArcaneRecipe\\(\"([^\"]+)\"");
     private static final Pattern INFUSION_PATTERN = Pattern.compile("registerInfusionRecipe\\(\"([^\"]+)\"");
@@ -32,12 +33,13 @@ public class ConfigResearchRecipeKeyCoverageTest {
     @Test
     public void everyDirectRecipeLookupInConfigResearchHasRegistrationKeyInConfigRecipes() throws IOException {
         String researchSource = readConfigResearchFamily();
-        String recipesSource = readFile("src/main/java/thaumcraft/common/config/ConfigRecipes.java");
+        String recipesSource = ConfigRecipesSourceReader.readMergedSource();
 
         Set<String> lookedUpKeys = extract(researchSource, RECIPE_GET_PATTERN);
         Set<String> availableKeys = new TreeSet<>();
         availableKeys.addAll(extract(recipesSource, RECIPE_PUT_PATTERN));
         availableKeys.addAll(extract(recipesSource, SPECIAL_RECIPE_HANDLE_PATTERN));
+        availableKeys.addAll(extract(recipesSource, SPECIAL_RECIPE_HANDLE_BRIDGE_PATTERN));
         availableKeys.addAll(extract(recipesSource, ARCANE_PATTERN));
         availableKeys.addAll(extract(recipesSource, SHAPELESS_ARCANE_PATTERN));
         availableKeys.addAll(extract(recipesSource, INFUSION_PATTERN));

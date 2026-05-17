@@ -13,7 +13,7 @@ public class ConfigRecipesSmeltingBonusCoverageTest {
 
     @Test
     public void configRecipesIncludesReferenceSmeltingBonusBaseline() throws IOException {
-        String source = readFile("src/main/java/thaumcraft/common/config/ConfigRecipes.java");
+        String source = ConfigRecipesSourceReader.readMergedSource();
 
         assertTrue("ConfigRecipes init must call smelting bonus baseline",
                 source.contains("initializeSmeltingBonusBaseline();"));

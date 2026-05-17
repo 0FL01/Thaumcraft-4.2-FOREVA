@@ -13,7 +13,7 @@ public class ConfigRecipesDynamicArcaneRegistrationStaticGuardTest {
 
     @Test
     public void configRecipesInitShouldKeepDynamicArcaneAndRunicRecipeRegistrationGuards() throws IOException {
-        String source = readFile("src/main/java/thaumcraft/common/config/ConfigRecipes.java");
+        String source = ConfigRecipesSourceReader.readMergedSource();
 
         assertTrue("ConfigRecipes should keep dynamic recipe presence flags",
                 source.contains("boolean hasArcaneWand = false;")

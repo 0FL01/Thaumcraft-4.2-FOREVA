@@ -13,7 +13,7 @@ public class ConfigRecipesTripleMeatTreatRegistryStaticGuardTest {
 
     @Test
     public void configRecipesRegistersTripleMeatTreatSecretRecipeBaseline() throws IOException {
-        String source = readFile("src/main/java/thaumcraft/common/config/ConfigRecipes.java");
+        String source = ConfigRecipesSourceReader.readMergedSource();
 
         assertTrue("ConfigRecipes should register triple meat treat shapeless recipe with stable thaumcraft id",
                 source.contains("new ItemStack(ConfigItems.itemTripleMeatTreat)")

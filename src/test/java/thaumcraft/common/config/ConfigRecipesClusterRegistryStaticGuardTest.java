@@ -13,15 +13,17 @@ public class ConfigRecipesClusterRegistryStaticGuardTest {
 
     @Test
     public void configRecipesRegistersClusterRecipesAndReusesHandlesInResearchMap() throws IOException {
-        String source = readFile("src/main/java/thaumcraft/common/config/ConfigRecipes.java");
+        String source = ConfigRecipesSourceReader.readMergedSource();
 
         assertTrue("ConfigRecipes must keep cluster recipe handle storage",
                 source.contains("private static final IRecipe[] recipeClusters = new IRecipe[7];"));
         assertTrue("ConfigRecipes must register cluster recipes under thaumcraft ids",
                 source.contains("setRegistryName(\"thaumcraft\", \"clusters\" + a)")
                         && source.contains("setRegistryName(\"thaumcraft\", \"clusters6\")")
-                        && source.contains("registry.register(recipeClusters[a]);")
-                        && source.contains("registry.register(recipeClusters[6]);"));
+                        && source.contains("bridge.setRecipeCluster(a, recipeCluster);")
+                        && source.contains("registry.register(recipeCluster);")
+                        && source.contains("bridge.setRecipeCluster(6, recipeCluster6);")
+                        && source.contains("registry.register(recipeCluster6);"));
         assertTrue("ConfigResearch map should consume registered cluster handles when present",
                 source.contains("if (recipeClusters[a] != null)")
                         && source.contains("ConfigResearch.recipes.put(\"Clusters\" + a, recipeClusters[a]);")

@@ -13,7 +13,7 @@ public class ConfigRecipesCosmeticPlantRegistryStaticGuardTest {
 
     @Test
     public void configRecipesRegistersCosmeticAndPlantBaselineRecipes() throws IOException {
-        String source = readFile("src/main/java/thaumcraft/common/config/ConfigRecipes.java");
+        String source = ConfigRecipesSourceReader.readMergedSource();
 
         assertTrue("ConfigRecipes should register custom-plant quicksilver and sugar conversions",
                 source.contains("setRegistryName(\"thaumcraft\", \"quicksilverplant\")")

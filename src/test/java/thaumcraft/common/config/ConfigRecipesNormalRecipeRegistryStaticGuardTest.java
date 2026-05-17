@@ -13,7 +13,7 @@ public class ConfigRecipesNormalRecipeRegistryStaticGuardTest {
 
     @Test
     public void configRecipesRegistersBaselineMundaneAndBlockRecipes() throws IOException {
-        String source = readFile("src/main/java/thaumcraft/common/config/ConfigRecipes.java");
+        String source = ConfigRecipesSourceReader.readMergedSource();
 
         assertTrue("ConfigRecipes must register mundane bauble recipes in Forge registry",
                 source.contains("recipeMundaneAmulet = new ShapedOreRecipe")

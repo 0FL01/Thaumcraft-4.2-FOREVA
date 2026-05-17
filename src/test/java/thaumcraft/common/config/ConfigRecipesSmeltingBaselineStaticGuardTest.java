@@ -13,7 +13,7 @@ public class ConfigRecipesSmeltingBaselineStaticGuardTest {
 
     @Test
     public void configRecipesKeepsReferenceSmeltingOutputBaseline() throws IOException {
-        String source = readFile("src/main/java/thaumcraft/common/config/ConfigRecipes.java");
+        String source = ConfigRecipesSourceReader.readMergedSource();
 
         assertTrue("ConfigRecipes init must execute smelting baseline before smelting bonuses",
                 source.contains("initializeSmeltingBaseline();")

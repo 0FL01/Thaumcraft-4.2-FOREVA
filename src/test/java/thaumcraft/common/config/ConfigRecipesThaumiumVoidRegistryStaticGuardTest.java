@@ -13,7 +13,7 @@ public class ConfigRecipesThaumiumVoidRegistryStaticGuardTest {
 
     @Test
     public void configRecipesRegistersThaumiumVoidAndBlockThaumiumBaselineRecipes() throws IOException {
-        String source = readFile("src/main/java/thaumcraft/common/config/ConfigRecipes.java");
+        String source = ConfigRecipesSourceReader.readMergedSource();
 
         assertTrue("ConfigRecipes should register thaumium block compression and decompression baseline",
                 source.contains("setRegistryName(\"thaumcraft\", \"blockthaumium\")")

@@ -13,7 +13,7 @@ public class ConfigRecipesCompatMetalRegistryStaticGuardTest {
 
     @Test
     public void configRecipesRegistersCompatNuggetRecipesAndNativeSmeltingFallbacks() throws IOException {
-        String source = readFile("src/main/java/thaumcraft/common/config/ConfigRecipes.java");
+        String source = ConfigRecipesSourceReader.readMergedSource();
 
         assertTrue("ConfigRecipes should invoke compat nugget registration for copper/tin/silver/lead",
                 source.contains("registerCompatNuggetRecipes(registry, \"copper\", \"ingotCopper\", 1, 17);")

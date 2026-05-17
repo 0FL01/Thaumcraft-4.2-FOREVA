@@ -13,7 +13,7 @@ public class ConfigRecipesNbtShapelessStaticGuardTest {
 
     @Test
     public void shapelessNbtOreRecipeFactoryUsesDedicatedNbtRecipeClass() throws IOException {
-        String source = readFile("src/main/java/thaumcraft/common/config/ConfigRecipes.java");
+        String source = ConfigRecipesSourceReader.readMergedSource();
 
         assertTrue("ConfigRecipes should import dedicated NBT-aware shapeless recipe implementation",
                 source.contains("import thaumcraft.common.lib.crafting.ShapelessNBTOreRecipe;"));

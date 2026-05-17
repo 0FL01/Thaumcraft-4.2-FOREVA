@@ -15,7 +15,7 @@ public class ConfigRecipesResearchHandleParityStaticGuardTest {
 
     @Test
     public void configRecipesIncludesStage9ReferenceResearchHandlesForSpecialRecipes() throws IOException {
-        String source = readFile("src/main/java/thaumcraft/common/config/ConfigRecipes.java");
+        String source = ConfigRecipesSourceReader.readMergedSource();
         List<String> requiredKeys = Arrays.asList(
                 "InfusionAltar",
                 "NodeJar",
@@ -46,7 +46,8 @@ public class ConfigRecipesResearchHandleParityStaticGuardTest {
         for (String key : requiredKeys) {
             assertTrue("Missing research recipe-handle key in ConfigRecipes: " + key,
                     source.contains("ConfigResearch.recipes.put(\"" + key + "\"")
-                            || source.contains("specialResearchRecipeHandles.put(\"" + key + "\""));
+                            || source.contains("specialResearchRecipeHandles.put(\"" + key + "\"")
+                            || source.contains("bridge.addSpecialResearchRecipeHandle(\"" + key + "\""));
         }
 
         assertTrue("Missing JarLabel aspect-handle list capture baseline",

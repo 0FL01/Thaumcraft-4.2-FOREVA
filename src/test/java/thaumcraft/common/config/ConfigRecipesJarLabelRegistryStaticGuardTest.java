@@ -13,7 +13,7 @@ public class ConfigRecipesJarLabelRegistryStaticGuardTest {
 
     @Test
     public void configRecipesRegistersJarLabelBaselineAndNbtLabelVariants() throws IOException {
-        String source = readFile("src/main/java/thaumcraft/common/config/ConfigRecipes.java");
+        String source = ConfigRecipesSourceReader.readMergedSource();
 
         assertTrue("ConfigRecipes should register baseline jar label paper/slime recipe",
                 source.contains("new ItemStack(ConfigItems.itemResource, 4, 13)")

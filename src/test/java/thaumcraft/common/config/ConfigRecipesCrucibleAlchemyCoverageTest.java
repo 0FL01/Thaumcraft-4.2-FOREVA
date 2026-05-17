@@ -13,7 +13,7 @@ public class ConfigRecipesCrucibleAlchemyCoverageTest {
 
     @Test
     public void configRecipesContainsExtendedCrucibleAlchemyBaseline() throws IOException {
-        String source = readFile("src/main/java/thaumcraft/common/config/ConfigRecipes.java");
+        String source = ConfigRecipesSourceReader.readMergedSource();
 
         assertTrue("Missing balanced shard registration baseline", source.contains("BalancedShard_\" + a"));
         assertTrue("Missing AltGunpowder crucible baseline", source.contains("ConfigResearch.recipes.put(\"AltGunpowder\""));

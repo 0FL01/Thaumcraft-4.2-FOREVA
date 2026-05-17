@@ -22,7 +22,7 @@ public class ConfigRecipesRegistryIdAuditStaticGuardTest {
 
     @Test
     public void configRecipesRegistryNamesStayUniqueAndThaumcraftScoped() throws IOException {
-        String source = readFile("src/main/java/thaumcraft/common/config/ConfigRecipes.java");
+        String source = ConfigRecipesSourceReader.readMergedSource();
 
         Matcher matcher = REGISTRY_NAME_PATTERN.matcher(source);
         Set<String> unique = new HashSet<>();

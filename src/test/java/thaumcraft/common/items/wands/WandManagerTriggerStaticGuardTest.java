@@ -1,6 +1,7 @@
 package thaumcraft.common.items.wands;
 
 import org.junit.Test;
+import thaumcraft.common.config.ConfigRecipesSourceReader;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -14,7 +15,7 @@ public class WandManagerTriggerStaticGuardTest {
     @Test
     public void commonProxyAndConfigRecipesShouldKeepWandTriggerRegistrationContract() throws IOException {
         String proxy = readFile("src/main/java/thaumcraft/common/CommonProxy.java");
-        String recipes = readFile("src/main/java/thaumcraft/common/config/ConfigRecipes.java");
+        String recipes = ConfigRecipesSourceReader.readMergedSource();
 
         assertTrue(proxy.contains("public final WandManager wandManager = new WandManager();"));
         assertTrue(recipes.contains("WandTriggerRegistry.registerWandBlockTrigger(Thaumcraft.proxy.wandManager, 0, Blocks.BOOKSHELF, 0, \"Thaumcraft\");"));
