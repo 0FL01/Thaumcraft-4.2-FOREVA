@@ -1849,6 +1849,30 @@ Depends on GAP-1 and GAP-3. Some infusion source scenarios may require Stage 9 c
 
 - Это common/server+non-GUI baseline; full mana-pod growth/harvest gameplay parity и client visual parity остаются в runtime/manual Stage 5/8 зоне.
 
+#### Checkpoint 2026-05-17 — GAP-11 essence-phial client result contracts baseline
+
+Статус: частично продвинут.
+
+Что сделано:
+
+- `ItemEssence` выровнен по reference-shaped client result semantics для fill/empty preview path:
+  - в `fillPhialFromContainer(...)` client-side swing ветка теперь возвращает `PASS` (вместо `SUCCESS`);
+  - в `emptyPhialIntoJar(...)` client-side swing ветка теперь возвращает `PASS` (вместо `SUCCESS`).
+- Server-side логика transfer/shrink/drop/sound/containersync не менялась.
+- Добавлен `ItemEssenceCoreContractsStaticGuardTest`, фиксирующий:
+  - phial amount/subtype baseline (`PHIAL_AMOUNT=8`, `meta 0/1`);
+  - fill/empty transfer path contracts;
+  - client preview `swing + PASS` contracts;
+  - tooltip/lang baseline keys.
+
+Проверки:
+
+- `./scripts/dev.sh validate --smoke` — passed.
+
+Ограничения:
+
+- Это common/server+non-GUI baseline; полная in-world/manual parity по alembic/jar fill/empty сценариям остаётся отдельной runtime/manual задачей Stage 5.
+
 ### GAP-12: FX registration exists, but send-site coverage and manual scenario validation are incomplete
 
 **Статус:** требует проверки  

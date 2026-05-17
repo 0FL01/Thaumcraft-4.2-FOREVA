@@ -139,7 +139,7 @@ public class ItemEssence extends Item implements IEssentiaContainerItem {
 
         if (world.isRemote) {
             player.swingArm(hand);
-            return EnumActionResult.SUCCESS;
+            return EnumActionResult.PASS;
         }
 
         ItemStack phial = new ItemStack(this, 1, 1);
@@ -162,7 +162,7 @@ public class ItemEssence extends Item implements IEssentiaContainerItem {
 
         if (world.isRemote) {
             player.swingArm(hand);
-            return EnumActionResult.SUCCESS;
+            return EnumActionResult.PASS;
         }
 
         if (jar.addToContainer(aspect, PHIAL_AMOUNT) == 0) {
