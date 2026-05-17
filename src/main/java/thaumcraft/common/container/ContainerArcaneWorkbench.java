@@ -131,10 +131,10 @@ public class ContainerArcaneWorkbench extends Container {
 
     @Override
     public ItemStack slotClick(int slotId, int dragType, ClickType clickTypeIn, EntityPlayer player) {
-        if (clickTypeIn == ClickType.SWAP && (slotId == 0 || slotId == 1)) {
-            dragType = 0;
+        if (isThrowClick(clickTypeIn)) {
+            return super.slotClick(slotId, 1, clickTypeIn, player);
         }
-        return super.slotClick(slotId, dragType, clickTypeIn, player);
+        return super.slotClick(slotId, normalizeDragType(slotId, dragType), clickTypeIn, player);
     }
 
     @Override
@@ -144,6 +144,17 @@ public class ContainerArcaneWorkbench extends Container {
 
     private static boolean isValidWorkbenchWand(ItemStack stack) {
         return !stack.isEmpty() && stack.getItem() instanceof ItemWandCasting && !((ItemWandCasting) stack.getItem()).isStaff(stack);
+    }
+
+    static boolean isThrowClick(ClickType clickTypeIn) {
+        return clickTypeIn == ClickType.THROW;
+    }
+
+    static int normalizeDragType(int slotId, int dragType) {
+        if ((slotId == 0 || slotId == 1) && dragType > 0) {
+            return 0;
+        }
+        return dragType;
     }
 
     private static boolean isUsableTile(EntityPlayer player, TileEntity tile) {
