@@ -150,11 +150,11 @@ public class ItemHandMirror extends Item {
         }
 
         int meta = linked.getBlockState(pos).getBlock().getMetaFromState(linked.getBlockState(pos));
-        EnumFacing facing = EnumFacing.byIndex(meta % 6).getOpposite();
+        EnumFacing facing = EnumFacing.byIndex(meta % 6);
         EntityItem entityItem = new EntityItem(linked,
-                (double) pos.getX() + 0.5D + (double) facing.getXOffset() * 0.3D,
-                (double) pos.getY() + 0.5D + (double) facing.getYOffset() * 0.3D,
-                (double) pos.getZ() + 0.5D + (double) facing.getZOffset() * 0.3D,
+                (double) pos.getX() + 0.5D - (double) facing.getXOffset() * 0.3D,
+                (double) pos.getY() + 0.5D - (double) facing.getYOffset() * 0.3D,
+                (double) pos.getZ() + 0.5D - (double) facing.getZOffset() * 0.3D,
                 items.copy());
         entityItem.motionX = (double) facing.getXOffset() * 0.15D;
         entityItem.motionY = (double) facing.getYOffset() * 0.15D;

@@ -26,6 +26,15 @@ public class ItemHandMirrorStaticGuardTest {
                 source.contains("new TextComponentTranslation(\"tc.handmirrorlinkedto\").getFormattedText()")
                         && source.contains("&& stack.getTagCompound().hasKey(\"dimname\")")
                         && source.contains("\" in \" + dimName"));
+        assertTrue("Hand mirror transport must keep reference-facing spawn/motion direction contracts",
+                source.contains("EnumFacing.byIndex(meta % 6)")
+                        && !source.contains("EnumFacing.byIndex(meta % 6).getOpposite()")
+                        && source.contains("+ 0.5D - (double) facing.getXOffset() * 0.3D")
+                        && source.contains("+ 0.5D - (double) facing.getYOffset() * 0.3D")
+                        && source.contains("+ 0.5D - (double) facing.getZOffset() * 0.3D")
+                        && source.contains("entityItem.motionX = (double) facing.getXOffset() * 0.15D;")
+                        && source.contains("entityItem.motionY = (double) facing.getYOffset() * 0.15D;")
+                        && source.contains("entityItem.motionZ = (double) facing.getZOffset() * 0.15D;"));
     }
 
     private static String readFile(String path) throws IOException {
