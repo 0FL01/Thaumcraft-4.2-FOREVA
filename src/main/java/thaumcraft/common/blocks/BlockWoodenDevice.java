@@ -1,6 +1,7 @@
 package thaumcraft.common.blocks;
 
 import net.minecraft.block.BlockContainer;
+import net.minecraft.block.Block;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.PropertyInteger;
@@ -17,9 +18,13 @@ import net.minecraft.util.EnumBlockRenderType;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.NonNullList;
+import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.world.World;
+import net.minecraft.world.IBlockAccess;
+import net.minecraft.init.SoundEvents;
 import thaumcraft.common.Thaumcraft;
 import thaumcraft.common.CommonProxy;
 import thaumcraft.common.items.wands.ItemWandCasting;
@@ -78,6 +83,14 @@ public class BlockWoodenDevice extends BlockContainer {
     public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn,
                                     EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
         TileEntity te = worldIn.getTileEntity(pos);
+        if (te instanceof TileSensor) {
+            if (!worldIn.isRemote) {
+                TileSensor sensor = (TileSensor) te;
+                sensor.changePitch();
+                sensor.triggerNote(worldIn, pos.getX(), pos.getY(), pos.getZ(), true);
+            }
+            return true;
+        }
         if (te instanceof TileArcaneBore) {
             ItemStack held = playerIn.getHeldItem(hand);
             if (!held.isEmpty() && held.getItem() instanceof ItemWandCasting) {
@@ -117,6 +130,109 @@ public class BlockWoodenDevice extends BlockContainer {
             }
         }
         super.breakBlock(worldIn, pos, state);
+    }
+
+    @Override
+    public void onBlockAdded(World worldIn, BlockPos pos, IBlockState state) {
+        TileEntity te = worldIn.getTileEntity(pos);
+        if (te instanceof TileSensor) {
+            ((TileSensor) te).updateTone();
+            te.markDirty();
+        }
+        super.onBlockAdded(worldIn, pos, state);
+    }
+
+    @Override
+    public void neighborChanged(IBlockState state, World worldIn, BlockPos pos, Block blockIn, BlockPos fromPos) {
+        if (state.getValue(TYPE) == 1) {
+            TileEntity te = worldIn.getTileEntity(pos);
+            if (te instanceof TileSensor) {
+                ((TileSensor) te).updateTone();
+            }
+        }
+        super.neighborChanged(state, worldIn, pos, blockIn, fromPos);
+    }
+
+    @Override
+    public boolean canProvidePower(IBlockState state) {
+        return true;
+    }
+
+    @Override
+    public boolean canConnectRedstone(IBlockState state, IBlockAccess world, BlockPos pos, @javax.annotation.Nullable EnumFacing side) {
+        int meta = getMetaFromState(state);
+        if (meta == 0) {
+            return false;
+        }
+        if (meta == 1 || meta == 2 || meta == 3 || meta == 4 || meta == 5) {
+            return true;
+        }
+        return super.canConnectRedstone(state, world, pos, side);
+    }
+
+    @Override
+    public int getWeakPower(IBlockState state, IBlockAccess world, BlockPos pos, EnumFacing side) {
+        int meta = getMetaFromState(state);
+        if (meta == 1) {
+            TileEntity tile = world.getTileEntity(pos);
+            if (tile instanceof TileSensor) {
+                return ((TileSensor) tile).redstoneSignal > 0 ? 15 : 0;
+            }
+        } else if (meta == 2) {
+            return 0;
+        } else if (meta == 3) {
+            return side == EnumFacing.UP ? 15 : 0;
+        }
+        return super.getWeakPower(state, world, pos, side);
+    }
+
+    @Override
+    public int getStrongPower(IBlockState state, IBlockAccess world, BlockPos pos, EnumFacing side) {
+        int meta = getMetaFromState(state);
+        if (meta == 1) {
+            TileEntity tile = world.getTileEntity(pos);
+            if (tile instanceof TileSensor) {
+                return ((TileSensor) tile).redstoneSignal > 0 ? 15 : 0;
+            }
+        } else if (meta == 3) {
+            return 15;
+        }
+        return super.getStrongPower(state, world, pos, side);
+    }
+
+    @Override
+    public boolean eventReceived(IBlockState state, World worldIn, BlockPos pos, int id, int param) {
+        if (id <= 4) {
+            float pitch = (float) Math.pow(2.0D, (param - 12) / 12.0D);
+            if (id >= 0) {
+                switch (id) {
+                    case 1:
+                        worldIn.playSound(null, pos, SoundEvents.BLOCK_NOTE_BASEDRUM, SoundCategory.BLOCKS, 3.0F, pitch);
+                        break;
+                    case 2:
+                        worldIn.playSound(null, pos, SoundEvents.BLOCK_NOTE_SNARE, SoundCategory.BLOCKS, 3.0F, pitch);
+                        break;
+                    case 3:
+                        worldIn.playSound(null, pos, SoundEvents.BLOCK_NOTE_HAT, SoundCategory.BLOCKS, 3.0F, pitch);
+                        break;
+                    case 4:
+                        worldIn.playSound(null, pos, SoundEvents.BLOCK_NOTE_BASS, SoundCategory.BLOCKS, 3.0F, pitch);
+                        break;
+                    default:
+                        worldIn.playSound(null, pos, SoundEvents.BLOCK_NOTE_HARP, SoundCategory.BLOCKS, 3.0F, pitch);
+                        break;
+                }
+            }
+            worldIn.spawnParticle(EnumParticleTypes.NOTE,
+                    pos.getX() + 0.5D,
+                    pos.getY() + 1.2D,
+                    pos.getZ() + 0.5D,
+                    (double) param / 24.0D,
+                    0.0D,
+                    0.0D);
+            return true;
+        }
+        return super.eventReceived(state, worldIn, pos, id, param);
     }
 
     @Override
