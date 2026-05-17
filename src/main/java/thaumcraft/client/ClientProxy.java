@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.Set;
 import javax.annotation.Nullable;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.client.model.ModelBat;
 import net.minecraft.client.model.ModelBiped;
 import net.minecraft.client.model.ModelSpider;
@@ -332,6 +333,9 @@ public class ClientProxy extends CommonProxy {
     @Override
     @Nullable
     public Object getClientGuiElement(int ID, EntityPlayer player, World world, int x, int y, int z) {
+        if (!(world instanceof WorldClient)) {
+            return null;
+        }
         switch (ID) {
             case GUI_FOCUS_POUCH:
                 return new GuiFocusPouch(player.inventory, world, x, y, z);

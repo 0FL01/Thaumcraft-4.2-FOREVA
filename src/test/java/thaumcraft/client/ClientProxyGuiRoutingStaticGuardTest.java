@@ -23,6 +23,9 @@ public class ClientProxyGuiRoutingStaticGuardTest {
         assertTrue("ClientProxy should route TileArcaneWorkbench to GuiArcaneWorkbench",
                 clientProxySource.contains("tile instanceof TileArcaneWorkbench")
                         && clientProxySource.contains("new GuiArcaneWorkbench(player.inventory, (TileArcaneWorkbench) tile)"));
+        assertTrue("ClientProxy should keep WorldClient guard around GUI routing",
+                clientProxySource.contains("if (!(world instanceof WorldClient)) {")
+                        && clientProxySource.contains("return null;"));
     }
 
     @Test
