@@ -152,7 +152,10 @@ public class EventHandlerEntity {
         EntityPlayer original = event.getOriginal();
         EntityPlayer clone = event.getEntityPlayer();
 
-        IPlayerKnowledge oldCap = original.getCapability(PlayerKnowledgeProvider.PLAYER_KNOWLEDGE, null);
+        IPlayerKnowledge oldCap = original == null ? null : original.getCapability(PlayerKnowledgeProvider.PLAYER_KNOWLEDGE, null);
+        if (oldCap == null && original != null) {
+            oldCap = ResearchManager.getResearchData(original.getName());
+        }
         IPlayerKnowledge newCap = clone.getCapability(PlayerKnowledgeProvider.PLAYER_KNOWLEDGE, null);
 
         if (oldCap != null && newCap != null) {
