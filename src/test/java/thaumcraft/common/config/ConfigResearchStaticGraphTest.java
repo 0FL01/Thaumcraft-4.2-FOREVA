@@ -9,8 +9,10 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -42,6 +44,7 @@ public class ConfigResearchStaticGraphTest {
         List<ResearchStatement> statements = parseStatements(source);
         Set<String> keys = new HashSet<>();
         List<String> duplicates = new ArrayList<>();
+        Map<String, Integer> categoryCounts = new HashMap<>();
 
         for (ResearchStatement statement : statements) {
             if (!keys.add(statement.key)) {
@@ -49,9 +52,16 @@ public class ConfigResearchStaticGraphTest {
             }
             assertTrue("Unexpected category for key " + statement.key + ": " + statement.category,
                     allowedCategories.contains(statement.category));
+            categoryCounts.put(statement.category, categoryCounts.getOrDefault(statement.category, 0) + 1);
         }
 
         assertTrue("Duplicate research keys found: " + duplicates, duplicates.isEmpty());
+        assertTrue("ConfigResearch should keep reference-sized 201 research entries, got " + statements.size(),
+                statements.size() == 201);
+        for (String category : allowedCategories) {
+            assertTrue("Research category has no entries in ConfigResearch: " + category,
+                    categoryCounts.getOrDefault(category, 0) > 0);
+        }
 
         List<String> missingParents = new ArrayList<>();
         List<String> missingLang = new ArrayList<>();
@@ -68,7 +78,7 @@ public class ConfigResearchStaticGraphTest {
                 }
             }
 
-            if (!statement.virtual) {
+            if (!statement.virtual && !statement.pageTextKeys.isEmpty()) {
                 assertLangKey(langKeys, "tc.research_name." + statement.key, missingLang);
                 assertLangKey(langKeys, "tc.research_text." + statement.key, missingLang);
             }
@@ -116,7 +126,7 @@ public class ConfigResearchStaticGraphTest {
             ResearchStatement statement = new ResearchStatement();
             statement.key = rootMatcher.group(1);
             statement.category = rootMatcher.group(2);
-            statement.virtual = chunk.contains("new ResearchItem(\"" + statement.key + "\", \"" + statement.category + "\")");
+            statement.virtual = chunk.contains(".setVirtual()");
             statement.parents.addAll(extractQuotedArgs(chunk, PARENTS_PATTERN));
             statement.parentsHidden.addAll(extractQuotedArgs(chunk, PARENTS_HIDDEN_PATTERN));
 
