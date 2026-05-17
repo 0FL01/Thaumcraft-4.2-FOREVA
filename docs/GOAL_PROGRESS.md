@@ -252,6 +252,7 @@ Incremental Stage 6 delta: `EntityCultistPortalLootPlacementContractTest` now gu
 Incremental Stage 6 delta: `MonsterSoundConstantCoverageTest` now statically scans `thaumcraft.common.entities.monster` for `TCSounds.*` references and enforces that each referenced sound constant is declared in `TCSounds`, hardening monster/boss sound-link integrity (`test` + `validate` passing).
 Incremental Stage 5 delta: `ItemResonator.onItemUseFirst(...)` now restores reference-style tube-face diagnostics via `RayTracer.retraceBlock(...)` + `subHit` face override and restores localized untyped suction fallback (`tc.resonator3`) instead of a hardcoded string, guarded by new `ItemResonatorStaticGuardTest` with passing `validate --smoke`.
 Incremental Stage 5 delta: `ItemSanitySoap` now restores reference-shaped completed-use consumption semantics by removing the creative-mode bypass (soap is consumed after successful >195 tick cleanse in all modes), guarded by new `ItemSanitySoapStaticGuardTest` with passing `validate --smoke`.
+Incremental Stage 8/9 boundary delta: server GUI routing contracts are now explicitly guarded by `CommonProxyServerGuiRoutingStaticGuardTest`, pinning `GUI_ARCANE_WORKBENCH`/`GUI_THAUMONOMICON`/`GUI_FOCAL_MANIPULATOR` id continuity and `CommonProxy.getServerGuiElement(...)` routes for `ContainerArcaneWorkbench`, `ContainerFocalManipulator`, and the Thaumonomicon null branch; `validate --smoke` passing.
 
 ## Archive
 
