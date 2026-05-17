@@ -92,7 +92,7 @@ public class ItemElementalHoe extends ItemHoe implements IRepairable {
             }
         }
 
-        return did ? EnumActionResult.SUCCESS : EnumActionResult.FAIL;
+        return did ? EnumActionResult.SUCCESS : EnumActionResult.PASS;
     }
 
     private static boolean applyBonemealAtLoc(World world, EntityPlayer player, BlockPos pos) {

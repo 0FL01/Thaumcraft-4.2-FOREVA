@@ -32,7 +32,8 @@ public class ItemElementalHoeStaticGuardTest {
                         && source.contains("((BlockCustomPlant) block).growSilverTree(world, pos, world.rand);")
                         && source.contains("stack.damageItem(5, player);")
                         && source.contains("stack.damageItem(25, player);")
-                        && source.contains("TCSounds.WAND"));
+                        && source.contains("TCSounds.WAND")
+                        && source.contains("return did ? EnumActionResult.SUCCESS : EnumActionResult.PASS;"));
         assertTrue("BlockCustomPlant tree-grow helpers must remain callable from ItemElementalHoe",
                 plantSource.contains("public void growGreatTree(World world, BlockPos pos, Random rand)")
                         && plantSource.contains("public void growSilverTree(World world, BlockPos pos, Random rand)"));
