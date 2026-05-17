@@ -53,6 +53,7 @@ import thaumcraft.client.gui.GuiTravelingTrunk;
 import thaumcraft.client.fx.ParticleEngine;
 import thaumcraft.client.fx.beams.FXBeam;
 import thaumcraft.client.fx.bolt.FXLightningBolt;
+import thaumcraft.client.fx.other.FXBlockWard;
 import thaumcraft.client.fx.other.FXShieldRunes;
 import thaumcraft.client.fx.other.FXSonic;
 import thaumcraft.client.renderers.entity.RenderFallbackBiped;
@@ -644,6 +645,10 @@ public class ClientProxy extends CommonProxy {
         if (world == null || !world.isRemote) return;
         int amount = particleCount(Math.max(1, count));
         if (amount <= 0) return;
+        if (color == 0xFC9A00 || color == 0x400040) {
+            ParticleEngine.addEffect(world, new FXBlockWard(world, x, y, z, color, amount));
+            return;
+        }
 
         Color tint = decodeColor(color);
         float red = normalizeColor(tint.getRed());

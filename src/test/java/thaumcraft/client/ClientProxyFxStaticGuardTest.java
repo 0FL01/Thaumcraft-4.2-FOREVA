@@ -17,11 +17,15 @@ public class ClientProxyFxStaticGuardTest {
         String commonProxy = readFile("src/main/java/thaumcraft/common/CommonProxy.java");
         String renderHandler = readFile("src/main/java/thaumcraft/client/lib/RenderEventHandler.java");
         String particleEngine = readFile("src/main/java/thaumcraft/client/fx/ParticleEngine.java");
+        String blockWardFx = readFile("src/main/java/thaumcraft/client/fx/other/FXBlockWard.java");
         String sonicFx = readFile("src/main/java/thaumcraft/client/fx/other/FXSonic.java");
         String shieldRunesFx = readFile("src/main/java/thaumcraft/client/fx/other/FXShieldRunes.java");
 
         assertTrue("ClientProxy blockSparkle must spawn client particles",
                 source.contains("public void blockSparkle(") && source.contains("world.spawnParticle(EnumParticleTypes.REDSTONE"));
+        assertTrue("ClientProxy blockSparkle must route ward/portable-hole colors through dedicated FXBlockWard",
+                source.contains("color == 0xFC9A00 || color == 0x400040")
+                        && source.contains("new FXBlockWard(world, x, y, z, color, amount)"));
         assertTrue("ClientProxy beam must contain non-noop beam particle path",
                 source.contains("public void beam(") && source.contains("EnumParticleTypes.CRIT_MAGIC"));
         assertTrue("ClientProxy bolt must contain non-noop bolt particle path",
@@ -88,6 +92,10 @@ public class ClientProxyFxStaticGuardTest {
                 shieldRunesFx.contains("class FXShieldRunes extends Particle")
                         && shieldRunesFx.contains("this.target")
                         && shieldRunesFx.contains("EnumParticleTypes.CRIT_MAGIC"));
+        assertTrue("Dedicated FXBlockWard particle must keep block-centered ward emission baseline",
+                blockWardFx.contains("class FXBlockWard extends Particle")
+                        && blockWardFx.contains("EnumFacing.random(this.rand)")
+                        && blockWardFx.contains("EnumParticleTypes.REDSTONE"));
     }
 
     @Test
