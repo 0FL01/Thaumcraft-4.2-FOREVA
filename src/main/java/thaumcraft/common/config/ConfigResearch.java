@@ -28,24 +28,46 @@ import thaumcraft.common.lib.crafting.InfusionRunicAugmentRecipe;
 import thaumcraft.common.items.wands.ItemWandCasting;
 
 public class ConfigResearch {
-    public static final Map<String, Object> recipes = new HashMap<>();
+    private static boolean strictRecipeLookups = false;
+    public static final Map<String, Object> recipes = new ResearchRecipeHandleMap();
 
     public static void init() {
         initCategories();
-        initBasicResearchBaseline();
-        initBasicResearchProgressionBaseline();
-        initAlchemyResearchBaseline();
-        initAlchemyResearchTextOnlyBaseline();
-        initArtificeResearchBaseline();
-        initArtificeResearchTextOnlyBaseline();
-        initGolemancyResearchBaseline();
-        initGolemancyResearchTextOnlyBaseline();
-        initThaumaturgyResearchBaseline();
-        initBasicResearchTextOnlyExtended();
-        initThaumaturgyResearchTextOnlyBaseline();
-        initEldritchResearchTextOnlyBaseline();
-        initEldritchResearchBaseline();
-        // Stage 9-e research item/page graph registration remains in progress.
+        strictRecipeLookups = true;
+        try {
+            initBasicResearchBaseline();
+            initBasicResearchProgressionBaseline();
+            initAlchemyResearchBaseline();
+            initAlchemyResearchTextOnlyBaseline();
+            initArtificeResearchBaseline();
+            initArtificeResearchTextOnlyBaseline();
+            initGolemancyResearchBaseline();
+            initGolemancyResearchTextOnlyBaseline();
+            initThaumaturgyResearchBaseline();
+            initBasicResearchTextOnlyExtended();
+            initThaumaturgyResearchTextOnlyBaseline();
+            initEldritchResearchTextOnlyBaseline();
+            initEldritchResearchBaseline();
+        } finally {
+            strictRecipeLookups = false;
+        }
+    }
+
+    private static final class ResearchRecipeHandleMap extends HashMap<String, Object> {
+        @Override
+        public Object get(Object key) {
+            if (strictRecipeLookups && key instanceof String) {
+                if (!containsKey(key)) {
+                    throw new IllegalStateException("Missing ConfigResearch recipe handle: " + key);
+                }
+                Object value = super.get(key);
+                if (value == null) {
+                    throw new IllegalStateException("Null ConfigResearch recipe handle: " + key);
+                }
+                return value;
+            }
+            return super.get(key);
+        }
     }
 
     private static void initCategories() {
