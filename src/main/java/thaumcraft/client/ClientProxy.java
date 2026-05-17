@@ -51,6 +51,8 @@ import thaumcraft.client.gui.GuiSpa;
 import thaumcraft.client.gui.GuiThaumatorium;
 import thaumcraft.client.gui.GuiTravelingTrunk;
 import thaumcraft.client.fx.ParticleEngine;
+import thaumcraft.client.fx.beams.FXBeam;
+import thaumcraft.client.fx.bolt.FXLightningBolt;
 import thaumcraft.client.renderers.entity.RenderFallbackBiped;
 import thaumcraft.client.renderers.entity.RenderFireBat;
 import thaumcraft.client.renderers.entity.RenderGolemBase;
@@ -520,6 +522,8 @@ public class ClientProxy extends CommonProxy {
         float red = normalizeColor(tint.getRed());
         float green = normalizeColor(tint.getGreen());
         float blue = normalizeColor(tint.getBlue());
+        ParticleEngine.addEffect(world,
+                new FXBeam(world, x, y, z, tx, ty, tz, red, green, blue, Math.max(6, ticks), flicker, amount));
 
         double dx = tx - x;
         double dy = ty - y;
@@ -547,6 +551,8 @@ public class ClientProxy extends CommonProxy {
         float red = normalizeColor(tint.getRed());
         float green = normalizeColor(tint.getGreen());
         float blue = normalizeColor(tint.getBlue());
+        ParticleEngine.addEffect(world,
+                new FXLightningBolt(world, x, y, z, tx, ty, tz, red, green, blue, Math.max(4, speed), amount));
 
         double dx = tx - x;
         double dy = ty - y;
