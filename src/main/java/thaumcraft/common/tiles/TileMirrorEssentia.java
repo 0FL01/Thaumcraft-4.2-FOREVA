@@ -81,6 +81,7 @@ public class TileMirrorEssentia extends TileThaumcraft implements ITickable, IAs
             TileMirrorEssentia target = (TileMirrorEssentia) tile;
             target.linked = false;
             target.linkedFacing = null;
+            this.markDirtyAndSync();
             target.markDirtyAndSync();
         }
     }
@@ -134,7 +135,7 @@ public class TileMirrorEssentia extends TileThaumcraft implements ITickable, IAs
     public boolean doesContainerAccept(Aspect tag) { return false; }
 
     @Override
-    public int addToContainer(Aspect tag, int amount) { return amount; }
+    public int addToContainer(Aspect tag, int amount) { return 0; }
 
     @Override
     public boolean takeFromContainer(Aspect tag, int amount) {
