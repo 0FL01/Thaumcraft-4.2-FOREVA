@@ -1,18 +1,24 @@
 package thaumcraft.common.items;
 
+import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.EnumRarity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.text.TextComponentTranslation;
+import net.minecraft.util.text.translation.I18n;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
+import thaumcraft.api.ThaumcraftApi;
 import thaumcraft.api.research.ResearchCategories;
 import thaumcraft.api.research.ResearchItem;
 import thaumcraft.common.config.ConfigItems;
@@ -20,6 +26,8 @@ import thaumcraft.common.lib.CreativeTabThaumcraft;
 import thaumcraft.common.lib.TCSounds;
 import thaumcraft.common.lib.research.ResearchManager;
 import thaumcraft.common.lib.research.ResearchNoteData;
+
+import java.util.List;
 
 public class ItemResearchNotes extends Item {
 
@@ -39,6 +47,15 @@ public class ItemResearchNotes extends Item {
     }
 
     @Override
+    public String getItemStackDisplayName(ItemStack stack) {
+        if (stack.getItemDamage() >= META_DISCOVERY_START) {
+            return I18n.translateToLocal("item.discovery.name");
+        }
+        String translated = I18n.translateToLocal("item.researchnotes.name");
+        return "item.researchnotes.name".equals(translated) ? super.getItemStackDisplayName(stack) : translated;
+    }
+
+    @Override
     public void getSubItems(CreativeTabs tab, NonNullList<ItemStack> items) {
         if (this.isInCreativeTab(tab)) {
             items.add(new ItemStack(this, 1, 0));
@@ -48,6 +65,34 @@ public class ItemResearchNotes extends Item {
     @Override
     public EnumRarity getRarity(ItemStack stack) {
         return stack.getItemDamage() >= META_DISCOVERY_START ? EnumRarity.EPIC : EnumRarity.RARE;
+    }
+
+    @Override
+    public boolean hasEffect(ItemStack stack) {
+        return true;
+    }
+
+    @SideOnly(Side.CLIENT)
+    @Override
+    public void addInformation(ItemStack stack, World worldIn, List<String> tooltip, ITooltipFlag flagIn) {
+        if (stack.getItemDamage() == META_UNKNOWN_DISCOVERY || stack.getItemDamage() == META_UNKNOWN_DISCOVERY_ALT) {
+            tooltip.add(TextFormatting.GOLD + I18n.translateToLocal("item.researchnotes.unknown.1"));
+            tooltip.add(TextFormatting.BLUE + I18n.translateToLocal("item.researchnotes.unknown.2"));
+        }
+        ResearchNoteData data = ResearchManager.getData(stack);
+        if (data != null && data.key != null && ResearchCategories.getResearch(data.key) != null) {
+            ResearchItem research = ResearchCategories.getResearch(data.key);
+            tooltip.add(TextFormatting.GOLD + research.getName());
+            tooltip.add(TextFormatting.ITALIC + research.getText());
+            int warp = ThaumcraftApi.getWarp(data.key);
+            if (warp > 0) {
+                warp = Math.min(warp, 5);
+                String ws = I18n.translateToLocal("tc.forbidden");
+                String wr = I18n.translateToLocal("tc.forbidden.level." + warp);
+                tooltip.add(TextFormatting.DARK_PURPLE + ws.replace("%n", wr));
+            }
+        }
+        super.addInformation(stack, worldIn, tooltip, flagIn);
     }
 
     @Override

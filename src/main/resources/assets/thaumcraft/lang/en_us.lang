@@ -289,6 +289,7 @@ tc.key10=arcane door at
 tc.key11=arcane pressure plate at
 item.researchnotes.unknown.1=Unknown Knowledge
 item.researchnotes.unknown.2=<Right click to reveal> 
+item.researchnotes.name=Research Notes
 item.discovery.name=Discovery
 tc.research_name.RESEARCH=Research
 tc.research_text.RESEARCH=How you discover things
