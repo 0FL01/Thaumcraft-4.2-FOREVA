@@ -8,6 +8,7 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.EntityList;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.attributes.IAttributeInstance;
+import net.minecraft.entity.item.EntityEnderPearl;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.item.EntityXPOrb;
 import net.minecraft.entity.monster.EntityCreeper;
@@ -22,12 +23,14 @@ import net.minecraft.init.MobEffects;
 import net.minecraft.item.ItemFood;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.EnumDifficulty;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.common.BiomeDictionary;
 import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
@@ -76,6 +79,7 @@ import thaumcraft.common.lib.utils.EntityUtils;
 import thaumcraft.common.lib.world.dim.Cell;
 import thaumcraft.common.lib.world.dim.CellLoc;
 import thaumcraft.common.lib.world.dim.MazeHandler;
+import thaumcraft.common.tiles.TileOwned;
 
 import java.io.File;
 import java.lang.ref.WeakReference;
@@ -109,6 +113,29 @@ public class EventHandlerEntity {
     public void onEntityJoinWorld(EntityJoinWorldEvent event) {
         if (event.getWorld().isRemote) {
             return;
+        }
+
+        if (event.getEntity() instanceof EntityEnderPearl) {
+            EntityEnderPearl pearl = (EntityEnderPearl) event.getEntity();
+            int x = MathHelper.floor(pearl.posX);
+            int y = MathHelper.floor(pearl.posY);
+            int z = MathHelper.floor(pearl.posZ);
+            for (int xx = -5; xx <= 5; xx++) {
+                for (int yy = -5; yy <= 5; yy++) {
+                    for (int zz = -5; zz <= 5; zz++) {
+                        TileEntity tile = event.getWorld().getTileEntity(new BlockPos(x + xx, y + yy, z + zz));
+                        if (!(tile instanceof TileOwned)) {
+                            continue;
+                        }
+                        if (pearl.getThrower() instanceof EntityPlayer) {
+                            ((EntityPlayer) pearl.getThrower()).sendMessage(
+                                    new TextComponentString("\u00a75\u00a7oThe magic of a nearby warded object destroys the ender pearl."));
+                        }
+                        pearl.setDead();
+                        return;
+                    }
+                }
+            }
         }
 
         if (event.getEntity() instanceof EntityPlayer) {
