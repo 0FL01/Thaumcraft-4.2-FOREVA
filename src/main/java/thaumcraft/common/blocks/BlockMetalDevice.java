@@ -157,6 +157,8 @@ public class BlockMetalDevice extends BlockContainer {
         TileEntity te = worldIn.getTileEntity(pos);
         if (te instanceof TileCrucible) {
             ((TileCrucible) te).spillRemnants();
+        } else if (te instanceof TileArcaneLamp) {
+            ((TileArcaneLamp) te).removeLights();
         } else if (te instanceof IInventory) {
             IInventory inventory = (IInventory) te;
             for (int i = 0; i < inventory.getSizeInventory(); ++i) {
@@ -192,7 +194,18 @@ public class BlockMetalDevice extends BlockContainer {
     @Override
     public void neighborChanged(IBlockState state, World worldIn, BlockPos pos, Block blockIn, BlockPos fromPos) {
         super.neighborChanged(state, worldIn, pos, blockIn, fromPos);
-        if (worldIn.isRemote || state.getValue(TYPE) != 12) return;
+        if (worldIn.isRemote) return;
+        if (state.getValue(TYPE) == 7) {
+            TileEntity te = worldIn.getTileEntity(pos);
+            if (te instanceof TileArcaneLamp) {
+                TileArcaneLamp lamp = (TileArcaneLamp) te;
+                if (worldIn.isAirBlock(pos.offset(lamp.facing))) {
+                    worldIn.destroyBlock(pos, true);
+                }
+            }
+            return;
+        }
+        if (state.getValue(TYPE) != 12) return;
         TileEntity te = worldIn.getTileEntity(pos);
         if (!(te instanceof TileBrainbox)) return;
         EnumFacing target = findAdjacentThaumatorium(worldIn, pos);
