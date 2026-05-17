@@ -18,13 +18,18 @@ import net.minecraft.entity.passive.EntityVillager;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Blocks;
+import net.minecraft.init.Enchantments;
 import net.minecraft.init.Items;
 import net.minecraft.init.MobEffects;
 import net.minecraft.item.ItemFood;
 import net.minecraft.item.ItemStack;
 import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionEffect;
+import net.minecraft.init.SoundEvents;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.ActionResult;
+import net.minecraft.util.EnumActionResult;
+import net.minecraft.util.SoundCategory;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.util.text.TextFormatting;
@@ -63,8 +68,10 @@ import thaumcraft.common.entities.golems.EntityTravelingTrunk;
 import thaumcraft.common.entities.monster.EntityBrainyZombie;
 import thaumcraft.common.entities.monster.boss.EntityThaumcraftBoss;
 import thaumcraft.common.entities.monster.mods.ChampionModifier;
+import thaumcraft.common.entities.projectile.EntityPrimalArrow;
 import thaumcraft.common.items.ItemBathSalts;
 import thaumcraft.common.items.armor.Hover;
+import thaumcraft.common.items.equipment.ItemBowBone;
 import thaumcraft.common.lib.WarpEvents;
 import thaumcraft.common.lib.capabilities.IPlayerKnowledge;
 import thaumcraft.common.lib.capabilities.PlayerKnowledgeProvider;
@@ -79,6 +86,7 @@ import thaumcraft.common.lib.network.playerdata.PacketSyncWipe;
 import thaumcraft.common.lib.network.playerdata.PacketRunicCharge;
 import thaumcraft.common.lib.research.ResearchManager;
 import thaumcraft.common.lib.utils.EntityUtils;
+import thaumcraft.common.lib.utils.InventoryUtils;
 import thaumcraft.common.lib.world.dim.Cell;
 import thaumcraft.common.lib.world.dim.CellLoc;
 import thaumcraft.common.lib.world.dim.MazeHandler;
@@ -433,11 +441,68 @@ public class EventHandlerEntity {
      */
     @SubscribeEvent
     public void onArrowLoose(ArrowLooseEvent event) {
-        if (event.getEntityLiving().world.isRemote) return;
         EntityPlayer player = event.getEntityPlayer();
-        ItemStack held = player.getHeldItemMainhand();
+        ItemStack bow = event.getBow();
+        int primalType = findPrimalArrowType(player);
+        if (primalType >= 0 && !bow.isEmpty()) {
+            float velocityFactor;
+            float velocityMultiplier = 2.0F;
+            if (bow.getItem() instanceof ItemBowBone) {
+                velocityFactor = event.getCharge() / 10.0F;
+                velocityMultiplier = 2.5F;
+            } else {
+                velocityFactor = event.getCharge() / 20.0F;
+            }
+            velocityFactor = (velocityFactor * velocityFactor + velocityFactor * 2.0F) / 3.0F;
+            if (velocityFactor < 0.1F) {
+                return;
+            }
+            if (velocityFactor > 1.0F) {
+                velocityFactor = 1.0F;
+            }
 
-        if (!held.isEmpty() && held.getItem() instanceof ItemFocusBasic) {
+            EntityPrimalArrow arrow = new EntityPrimalArrow(player.world, player, velocityFactor * velocityMultiplier, primalType);
+            if (bow.getItem() instanceof ItemBowBone) {
+                arrow.setDamage(arrow.getDamage() + 0.5D);
+            } else if (velocityFactor == 1.0F) {
+                arrow.setIsCritical(true);
+            }
+
+            int power = EnchantmentHelper.getEnchantmentLevel(Enchantments.POWER, bow);
+            if (power > 0) {
+                arrow.setDamage(arrow.getDamage() + power * 0.5D + 0.5D);
+            }
+            int punch = EnchantmentHelper.getEnchantmentLevel(Enchantments.PUNCH, bow);
+            if (primalType == 3) {
+                punch++;
+            }
+            if (punch > 0) {
+                arrow.setKnockbackStrength(punch);
+            }
+            int flame = EnchantmentHelper.getEnchantmentLevel(Enchantments.FLAME, bow);
+            if (flame > 0) {
+                arrow.setFire(100);
+            }
+
+            bow.damageItem(1, player);
+            player.world.playSound(null, player.posX, player.posY, player.posZ,
+                    SoundEvents.ENTITY_ARROW_SHOOT, SoundCategory.PLAYERS,
+                    1.0F, 1.0F / (player.world.rand.nextFloat() * 0.4F + 1.2F) + velocityFactor * 0.5F);
+
+            boolean preserveArrow = EnchantmentHelper.getEnchantmentLevel(Enchantments.INFINITY, bow) > 0
+                    && player.world.rand.nextFloat() < 0.33F;
+            if (!player.capabilities.isCreativeMode || !preserveArrow) {
+                InventoryUtils.consumeInventoryItem(player, ConfigItems.itemPrimalArrow, primalType);
+            }
+            if (!player.world.isRemote) {
+                player.world.spawnEntity(arrow);
+            }
+            event.setCanceled(true);
+            return;
+        }
+
+        ItemStack held = player.getHeldItemMainhand();
+        if (!player.world.isRemote && !held.isEmpty() && held.getItem() instanceof ItemFocusBasic) {
             event.setCharge(0);
         }
     }
@@ -449,6 +514,14 @@ public class EventHandlerEntity {
     @SubscribeEvent
     public void onArrowNock(ArrowNockEvent event) {
         EntityPlayer player = event.getEntityPlayer();
+        ItemStack bow = event.getBow();
+        if (!bow.isEmpty() && findPrimalArrowType(player) >= 0) {
+            player.setActiveHand(event.getHand());
+            event.setAction(new ActionResult<>(EnumActionResult.SUCCESS, bow));
+            event.setCanceled(true);
+            return;
+        }
+
         ItemStack held = player.getHeldItemMainhand();
 
         if (!held.isEmpty() && held.getItem() instanceof ItemFocusBasic) {
@@ -685,5 +758,17 @@ public class EventHandlerEntity {
         }
         Cell cell = MazeHandler.getFromHashMap(new CellLoc(x >> 4, z >> 4));
         return cell != null && (cell.feature == 6 || cell.feature == 8);
+    }
+
+    private int findPrimalArrowType(EntityPlayer player) {
+        if (player == null) {
+            return -1;
+        }
+        for (ItemStack stack : player.inventory.mainInventory) {
+            if (!stack.isEmpty() && stack.getItem() == ConfigItems.itemPrimalArrow) {
+                return stack.getItemDamage();
+            }
+        }
+        return -1;
     }
 }
