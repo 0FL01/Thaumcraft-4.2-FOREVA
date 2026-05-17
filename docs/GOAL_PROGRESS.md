@@ -300,6 +300,7 @@ Incremental Stage 5 delta: `EventHandlerEntity.onLivingUpdate` now also restores
 Incremental Stage 6 delta: `EventHandlerEntity.onLivingDrops` now restores reference-shaped zombie/villager brain-drop contracts (normal zombies only with `recentlyHit` + looting-gated `rand.nextInt(10)-looting<1`, and villager looting-gated brain-fragment drop `itemResource` meta `18`), while removing the prior over-generous fallback path; guarded by new `EventHandlerEntityDropContractStaticGuardTest`; `validate --smoke` passing.
 Incremental Stage 5 delta: `EventHandlerEntity` item event hooks now restore reference contracts by writing tossed-item thrower NBT (`"thrower"`) in `onItemToss`, and by converting source water to `blockFluidPure` when `ItemBathSalts` expires in-world; guarded by new `EventHandlerEntityItemEventStaticGuardTest`; `validate --smoke` passing.
 Incremental Stage 5 delta: `EventHandlerEntity.onEntityJoinWorld` now restores warded-protection behavior for ender pearls by scanning nearby tiles for `TileOwned`, cancelling the pearl when found, and notifying the thrower with the original warning text; guarded by new `EventHandlerEntityEnderPearlStaticGuardTest`; `validate --smoke` passing.
+Incremental Stage 5 delta: `EventHandlerEntity.onPlayerBreakSpeed` now restores reference-shaped hover mining contract by applying `originalSpeed * 5.0F` only when the player is airborne and hover mode is active, replacing the prior focus-based slow-speed fallback; guarded by new `EventHandlerEntityBreakSpeedStaticGuardTest`; `validate --smoke` passing.
 
 ## Archive
 

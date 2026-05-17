@@ -454,15 +454,12 @@ public class EventHandlerEntity {
     }
 
     /**
-     * Break speed modifier: reduce mining speed when holding a focus.
+     * Break speed modifier: boost aerial mining while hover flight is active.
      */
     @SubscribeEvent
     public void onPlayerBreakSpeed(PlayerEvent.BreakSpeed event) {
-        EntityPlayer player = event.getEntityPlayer();
-        ItemStack held = player.getHeldItemMainhand();
-
-        if (!held.isEmpty() && held.getItem() instanceof ItemFocusBasic) {
-            event.setNewSpeed(0.3f);
+        if (!event.getEntityPlayer().onGround && Hover.getHover(event.getEntityPlayer().getEntityId())) {
+            event.setNewSpeed(event.getOriginalSpeed() * 5.0F);
         }
     }
 
