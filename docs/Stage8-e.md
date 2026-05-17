@@ -1735,6 +1735,30 @@ Depends on GAP-1 and GAP-3. Some infusion source scenarios may require Stage 9 c
 
 - Это common/server+non-GUI baseline; runtime/manual сценарии с pickup/collision/WarpWard всё ещё остаются в Stage 5 manual зоне.
 
+#### Checkpoint 2026-05-17 — GAP-11 research-notes core consumption contracts baseline
+
+Статус: частично продвинут.
+
+Что сделано:
+
+- `ItemResearchNotes` приведён к reference-shaped consumption/result contracts:
+  - при отсутствии requisites completion path теперь возвращает нейтральный `PASS` (вместо `FAIL`);
+  - расход note (`stack.shrink(1)`) восстановлен как unconditional в двух reference-flow ветках:
+    - успешный completion note;
+    - unknown discovery path с `findHiddenResearch == "FAIL"` и выдачей fragments.
+- Добавлен `ItemResearchNotesCoreContractsStaticGuardTest`, фиксирующий:
+  - meta/rarity split (`24/42/64`, `RARE/EPIC`);
+  - requisites-miss `PASS` contract;
+  - mandatory note-consumption и hidden-fragment fallback contract.
+
+Проверки:
+
+- `./scripts/dev.sh validate --smoke` — passed.
+
+Ограничения:
+
+- Это common/server+non-GUI baseline; полная research-note gameplay/GUI/manual parity (table interaction/hex puzzle flow) остаётся зависимостью Stage 3/8/9 runtime/manual сценариев.
+
 ### GAP-12: FX registration exists, but send-site coverage and manual scenario validation are incomplete
 
 **Статус:** требует проверки  

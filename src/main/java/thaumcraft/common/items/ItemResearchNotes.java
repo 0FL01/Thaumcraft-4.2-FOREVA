@@ -72,7 +72,7 @@ public class ItemResearchNotes extends Item {
         }
         if (!ResearchManager.doesPlayerHaveRequisites(player.getName(), data.key)) {
             player.sendMessage(new TextComponentTranslation("tc.researcherror"));
-            return new ActionResult<>(EnumActionResult.FAIL, stack);
+            return new ActionResult<>(EnumActionResult.PASS, stack);
         }
 
         ResearchManager.addResearch(player, data.key);
@@ -85,9 +85,7 @@ public class ItemResearchNotes extends Item {
                 }
             }
         }
-        if (!player.capabilities.isCreativeMode) {
-            stack.shrink(1);
-        }
+        stack.shrink(1);
         play(world, player, TCSounds.LEARN);
         return new ActionResult<>(EnumActionResult.SUCCESS, stack);
     }
@@ -95,9 +93,7 @@ public class ItemResearchNotes extends Item {
     private ActionResult<ItemStack> revealDiscovery(World world, EntityPlayer player, ItemStack stack) {
         String key = ResearchManager.findHiddenResearch(player);
         if ("FAIL".equals(key)) {
-            if (!player.capabilities.isCreativeMode) {
-                stack.shrink(1);
-            }
+            stack.shrink(1);
             ItemStack fragments = new ItemStack(ConfigItems.itemResource, 7 + world.rand.nextInt(3), ItemResource.META_KNOWLEDGE_FRAGMENT);
             EntityItem entity = new EntityItem(world, player.posX, player.posY + player.getEyeHeight() / 2.0D, player.posZ, fragments);
             world.spawnEntity(entity);
