@@ -48,20 +48,21 @@ public class ItemHandMirror extends Item {
         ItemStack stack = player.getHeldItem(hand);
         if (!world.isRemote) {
             if (!hasMirrorLink(stack)) {
-                return new ActionResult<>(EnumActionResult.FAIL, stack);
+                return new ActionResult<>(EnumActionResult.PASS, stack);
             }
             World linkedWorld = getLinkedWorld(stack);
             if (linkedWorld == null) {
-                return new ActionResult<>(EnumActionResult.FAIL, stack);
+                return new ActionResult<>(EnumActionResult.PASS, stack);
             }
             if (!isLinkedMirrorValid(linkedWorld, stack)) {
                 clearInvalidLink(stack, player, world);
-                return new ActionResult<>(EnumActionResult.FAIL, stack);
+                return new ActionResult<>(EnumActionResult.PASS, stack);
             }
             player.openGui(Thaumcraft.instance, CommonProxy.GUI_HAND_MIRROR, world,
                     MathHelper.floor(player.posX), MathHelper.floor(player.posY), MathHelper.floor(player.posZ));
+            return new ActionResult<>(EnumActionResult.SUCCESS, stack);
         }
-        return new ActionResult<>(EnumActionResult.SUCCESS, stack);
+        return new ActionResult<>(EnumActionResult.PASS, stack);
     }
 
     @Override
@@ -94,6 +95,10 @@ public class ItemHandMirror extends Item {
         if (world.getBlockState(pos).getBlock() != ConfigBlocks.blockMirror || !(world.getTileEntity(pos) instanceof TileMirror)) {
             return EnumActionResult.PASS;
         }
+        if (world.isRemote) {
+            player.swingArm(hand);
+            return EnumActionResult.PASS;
+        }
         if (!world.isRemote) {
             NBTTagCompound tag = stack.hasTagCompound() ? stack.getTagCompound() : new NBTTagCompound();
             tag.setInteger("linkX", pos.getX());
@@ -102,8 +107,8 @@ public class ItemHandMirror extends Item {
             tag.setInteger("linkDim", world.provider.getDimension());
             tag.setString("dimname", world.provider.getDimensionType().getName());
             stack.setTagCompound(tag);
-            world.playSound(null, pos, TCSounds.JAR, SoundCategory.BLOCKS, 0.4F, 1.0F);
-            player.sendStatusMessage(new TextComponentTranslation("tc.handmirrorlinked"), true);
+            world.playSound(null, pos, TCSounds.JAR, SoundCategory.BLOCKS, 1.0F, 2.0F);
+            player.sendStatusMessage(new TextComponentTranslation("tc.handmirrorlinked"), false);
         }
         return EnumActionResult.SUCCESS;
     }
@@ -130,8 +135,8 @@ public class ItemHandMirror extends Item {
 
     private static void clearInvalidLink(ItemStack mirror, EntityPlayer player, World world) {
         mirror.setTagCompound(null);
-        world.playSound(null, player.posX, player.posY, player.posZ, TCSounds.ZAP, SoundCategory.PLAYERS, 0.4F, 1.0F);
-        player.sendStatusMessage(new TextComponentTranslation("tc.handmirrorerror"), true);
+        world.playSound(null, player.posX, player.posY, player.posZ, TCSounds.ZAP, SoundCategory.PLAYERS, 1.0F, 0.8F);
+        player.sendStatusMessage(new TextComponentTranslation("tc.handmirrorerror"), false);
     }
 
     public static boolean transport(ItemStack mirror, ItemStack items, EntityPlayer player, World worldObj) {
