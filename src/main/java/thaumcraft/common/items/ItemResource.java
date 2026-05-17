@@ -223,16 +223,16 @@ public class ItemResource extends Item implements IEssentiaContainerItem {
         }
 
         if (stack.isEmpty()) {
-            return EnumActionResult.FAIL;
+            return EnumActionResult.PASS;
         }
         if (!player.canPlayerEdit(pos, facing, stack)) {
-            return EnumActionResult.FAIL;
+            return EnumActionResult.PASS;
         }
         if (!world.mayPlace(ConfigBlocks.blockAiry, pos, false, facing, player)) {
-            return EnumActionResult.FAIL;
+            return EnumActionResult.PASS;
         }
         if (!placeBlockAt(stack, player, world, pos, facing, hitX, hitY, hitZ, ConfigBlocks.blockAiry, META_NITOR)) {
-            return EnumActionResult.FAIL;
+            return EnumActionResult.PASS;
         }
 
         SoundType sound = ConfigBlocks.blockAiry.getSoundType(world.getBlockState(pos), world, pos, player);

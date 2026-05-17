@@ -29,6 +29,7 @@ public class ItemResourceAlumentumKnowledgeStaticGuardTest {
         assertTrue(source.contains("ResearchManager.updateCache(player);"));
         assertTrue(source.contains("if (stack.getItemDamage() != META_NITOR)"));
         assertTrue(source.contains("!block.isReplaceable(world, pos)"));
+        assertTrue(source.contains("return EnumActionResult.PASS;"));
         assertTrue(source.contains("world.mayPlace(ConfigBlocks.blockAiry, pos, false, facing, player)"));
         assertTrue(source.contains("placeBlockAt(stack, player, world, pos, facing, hitX, hitY, hitZ, ConfigBlocks.blockAiry, META_NITOR)"));
         assertTrue(source.contains("return stack.getItemDamage() == META_CHARM ? 1 : super.getItemStackLimit(stack);"));
