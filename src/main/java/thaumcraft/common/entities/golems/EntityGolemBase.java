@@ -137,6 +137,15 @@ public class EntityGolemBase extends net.minecraft.entity.monster.EntityGolem im
                     }
                 }
             }
+        } else if (this.bootup > 0.0f && this.getCore() > -1) {
+            this.bootup *= this.bootup / 33.1f;
+            this.world.playSound(
+                    this.posX, this.posY, this.posZ,
+                    TCSounds.CAMERATICKS,
+                    net.minecraft.util.SoundCategory.NEUTRAL,
+                    this.bootup * 0.2f,
+                    this.bootup,
+                    false);
         }
     }
 
