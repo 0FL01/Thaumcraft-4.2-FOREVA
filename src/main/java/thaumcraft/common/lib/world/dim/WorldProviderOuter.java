@@ -111,6 +111,12 @@ public class WorldProviderOuter extends WorldProvider {
     }
 
     @Override
+    @SideOnly(Side.CLIENT)
+    public boolean isSkyColored() {
+        return false;
+    }
+
+    @Override
     public boolean shouldMapSpin(String entity, double x, double y, double z) {
         return true;
     }

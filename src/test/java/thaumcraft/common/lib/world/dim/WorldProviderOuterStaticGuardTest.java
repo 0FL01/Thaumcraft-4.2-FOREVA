@@ -29,6 +29,9 @@ public class WorldProviderOuterStaticGuardTest {
                         && source.contains("return 1.0f;"));
         assertTrue("WorldProviderOuter must keep reference chunk-provider constructor flag contract",
                 source.contains("return new ChunkProviderOuter(this.world, this.world.getSeed(), true);"));
+        assertTrue("WorldProviderOuter must keep reference non-sky-colored contract",
+                source.contains("public boolean isSkyColored()")
+                        && source.contains("return false;"));
     }
 
     private static String readFile(String path) throws IOException {
