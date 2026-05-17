@@ -112,7 +112,7 @@ public class EntityEldritchGuardian extends EntityMob implements IRangedAttackMo
             Thaumcraft.proxy.wispFXEG(this.world, x, this.posY + 0.22D * this.height, z, this);
         } else if (this.world.provider.getDimension() != Config.dimensionOuterId
                 && (this.ticksExisted == 0 || this.ticksExisted % 100 == 0)
-                && this.world.getDifficulty() != EnumDifficulty.PEACEFUL) {
+                && this.world.getDifficulty() != EnumDifficulty.EASY) {
             // Pulse fog effect to nearby players
             double range = this.world.getDifficulty() == EnumDifficulty.HARD ? 576.0 : 256.0;
             for (EntityPlayer player : this.world.playerEntities) {
@@ -129,8 +129,11 @@ public class EntityEldritchGuardian extends EntityMob implements IRangedAttackMo
     public boolean attackEntityAsMob(Entity entityIn) {
         boolean flag = super.attackEntityAsMob(entityIn);
         if (flag && entityIn instanceof EntityLivingBase) {
-            if (this.rand.nextFloat() < 0.3F) {
-                entityIn.setFire(4);
+            int difficulty = this.world.getDifficulty().getId();
+            if (this.getHeldItemMainhand().isEmpty()
+                    && this.isBurning()
+                    && this.rand.nextFloat() < (float) difficulty * 0.3F) {
+                entityIn.setFire(2 * difficulty);
             }
         }
         return flag;
