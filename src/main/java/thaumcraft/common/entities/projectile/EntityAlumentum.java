@@ -16,4 +16,9 @@ public class EntityAlumentum extends net.minecraft.entity.projectile.EntityThrow
             this.setDead();
         }
     }
+
+    @Override
+    public float getEyeHeight() {
+        return 0.1F;
+    }
 }
