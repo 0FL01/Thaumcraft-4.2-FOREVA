@@ -36,6 +36,7 @@ public class WandManagerTriggerStaticGuardTest {
         assertTrue(source.contains("case 4:"));
         assertTrue(source.contains("case 5:"));
         assertTrue(source.contains("case 6:"));
+        assertTrue(source.contains("case 7:"));
         assertTrue(source.contains("return createThaumonomicon(wand, player, world, x, y, z);"));
         assertTrue(source.contains("return createCrucible(wand, player, world, x, y, z);"));
         assertTrue(source.contains("return createArcaneFurnace(wand, player, world, x, y, z);"));
@@ -43,6 +44,7 @@ public class WandManagerTriggerStaticGuardTest {
         assertTrue(source.contains("return createNodeJar(wand, player, world, x, y, z);"));
         assertTrue(source.contains("return createThaumatorium(wand, player, world, x, y, z, side);"));
         assertTrue(source.contains("return createOculus(wand, player, world, x, y, z, side);"));
+        assertTrue(source.contains("return createAdvancedAlchemicalFurnace(wand, player, world, x, y, z, side);"));
         assertTrue(source.contains("public static boolean createThaumonomicon("));
         assertTrue(source.contains("public static boolean createCrucible("));
         assertTrue(source.contains("public static boolean createThaumatorium("));
@@ -58,6 +60,13 @@ public class WandManagerTriggerStaticGuardTest {
         assertTrue(source.contains("jar.setId(nodeId);"));
         assertTrue(source.contains("private static boolean createOculus("));
         assertTrue(source.contains("return ((TileEldritchAltar) tile).onWandRightClick(world, wandStack, player, x, y, z, side, meta) == 1;"));
+        assertTrue(source.contains("private static boolean createAdvancedAlchemicalFurnace("));
+        assertTrue(source.contains("new AspectList().add(Aspect.FIRE, 50).add(Aspect.WATER, 50).add(Aspect.ORDER, 50)"));
+        assertTrue(source.contains("return matchesAdvancedAlchemyInput(world, center, 1) ? 1 : (matchesAdvancedAlchemyInput(world, center, -1) ? -1 : 0);"));
+        assertTrue(source.contains("world.getBlockState(basePos).getValue(thaumcraft.common.blocks.BlockMetalDevice.TYPE)"));
+        assertTrue(source.contains("world.setBlockState(basePos, ConfigBlocks.blockMetalDevice.getDefaultState()"));
+        assertTrue(source.contains("world.setBlockState(ringPos, ConfigBlocks.blockMetalDevice.getDefaultState()"));
+        assertTrue(source.contains("new PacketFXBlockSparkle(center.getX(), center.getY(), center.getZ(), -9999)"));
         assertTrue(source.contains("Blocks.NETHER_BRICK_FENCE"));
         assertTrue(source.contains("ConfigBlocks.blockArcaneFurnace.getDefaultState().withProperty(BlockArcaneFurnace.TYPE, meta)"));
         assertTrue(source.contains("ConfigBlocks.blockStoneDevice.getDefaultState().withProperty(thaumcraft.common.blocks.BlockStoneDevice.TYPE, 3)"));

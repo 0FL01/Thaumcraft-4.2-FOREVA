@@ -886,7 +886,108 @@ public class WandManager implements IWandTriggerManager {
     }
 
     private static boolean createAdvancedAlchemicalFurnace(ItemStack wandStack, EntityPlayer player, World world, int x, int y, int z, int side) {
+        if (world.isRemote || wandStack.isEmpty() || !(wandStack.getItem() instanceof ItemWandCasting)) {
+            return false;
+        }
+        ItemWandCasting wand = (ItemWandCasting) wandStack.getItem();
+        for (int xx = x - 1; xx <= x + 1; xx++) {
+            for (int yy = y - 1; yy <= y + 1; yy++) {
+                for (int zz = z - 1; zz <= z + 1; zz++) {
+                    BlockPos center = new BlockPos(xx, yy, zz);
+                    if (!isAlchemyFurnaceCore(world, center)) {
+                        continue;
+                    }
+                    int ringOffset = findAdvancedAlchemyInputRingOffset(world, center);
+                    if (ringOffset == 0) {
+                        continue;
+                    }
+                    if (!wand.consumeAllVisCrafting(wandStack, player,
+                            new AspectList().add(Aspect.FIRE, 50).add(Aspect.WATER, 50).add(Aspect.ORDER, 50), true)) {
+                        return false;
+                    }
+                    applyAdvancedAlchemyActivation(world, center, ringOffset);
+                    playAdvancedAlchemyActivationFx(world, center, ringOffset);
+                    return true;
+                }
+            }
+        }
         return false;
+    }
+
+    private static boolean isAlchemyFurnaceCore(World world, BlockPos center) {
+        if (world.getBlockState(center).getBlock() != ConfigBlocks.blockStoneDevice) {
+            return false;
+        }
+        return world.getBlockState(center).getValue(thaumcraft.common.blocks.BlockStoneDevice.TYPE) == 0;
+    }
+
+    private static int findAdvancedAlchemyInputRingOffset(World world, BlockPos center) {
+        return matchesAdvancedAlchemyInput(world, center, 1) ? 1 : (matchesAdvancedAlchemyInput(world, center, -1) ? -1 : 0);
+    }
+
+    private static boolean matchesAdvancedAlchemyInput(World world, BlockPos center, int ringOffset) {
+        BlockPos ringCenter = center.up(ringOffset);
+        if (!world.isAirBlock(ringCenter)) {
+            return false;
+        }
+        for (int dx = -1; dx <= 1; dx++) {
+            for (int dz = -1; dz <= 1; dz++) {
+                if (dx == 0 && dz == 0) {
+                    continue;
+                }
+                BlockPos basePos = center.add(dx, 0, dz);
+                if (world.getBlockState(basePos).getBlock() != ConfigBlocks.blockMetalDevice) {
+                    return false;
+                }
+                int baseMeta = world.getBlockState(basePos).getValue(thaumcraft.common.blocks.BlockMetalDevice.TYPE);
+                boolean corner = Math.abs(dx) == 1 && Math.abs(dz) == 1;
+                if ((corner && baseMeta != 1) || (!corner && baseMeta != 9)) {
+                    return false;
+                }
+
+                BlockPos ringPos = ringCenter.add(dx, 0, dz);
+                if (world.getBlockState(ringPos).getBlock() != ConfigBlocks.blockMetalDevice
+                        || world.getBlockState(ringPos).getValue(thaumcraft.common.blocks.BlockMetalDevice.TYPE) != 3) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    private static void applyAdvancedAlchemyActivation(World world, BlockPos center, int ringOffset) {
+        BlockPos ringCenter = center.up(ringOffset);
+        for (int dx = -1; dx <= 1; dx++) {
+            for (int dz = -1; dz <= 1; dz++) {
+                if (dx == 0 && dz == 0) {
+                    continue;
+                }
+                boolean corner = Math.abs(dx) == 1 && Math.abs(dz) == 1;
+                BlockPos basePos = center.add(dx, 0, dz);
+                world.setBlockState(basePos, ConfigBlocks.blockMetalDevice.getDefaultState()
+                        .withProperty(thaumcraft.common.blocks.BlockMetalDevice.TYPE, 3), 3);
+                world.notifyNeighborsOfStateChange(basePos, ConfigBlocks.blockMetalDevice, false);
+
+                BlockPos ringPos = ringCenter.add(dx, 0, dz);
+                int ringMeta = corner ? 1 : 9;
+                world.setBlockState(ringPos, ConfigBlocks.blockMetalDevice.getDefaultState()
+                        .withProperty(thaumcraft.common.blocks.BlockMetalDevice.TYPE, ringMeta), 3);
+                world.notifyNeighborsOfStateChange(ringPos, ConfigBlocks.blockMetalDevice, false);
+            }
+        }
+        world.notifyBlockUpdate(center, world.getBlockState(center), world.getBlockState(center), 3);
+        world.markBlockRangeForRenderUpdate(center, ringCenter);
+    }
+
+    private static void playAdvancedAlchemyActivationFx(World world, BlockPos center, int ringOffset) {
+        BlockPos ringCenter = center.up(ringOffset);
+        PacketHandler.INSTANCE.sendToAllAround(
+                new PacketFXBlockSparkle(center.getX(), center.getY(), center.getZ(), -9999),
+                new NetworkRegistry.TargetPoint(world.provider.getDimension(), center.getX(), center.getY(), center.getZ(), 32.0));
+        PacketHandler.INSTANCE.sendToAllAround(
+                new PacketFXBlockSparkle(ringCenter.getX(), ringCenter.getY(), ringCenter.getZ(), -9999),
+                new NetworkRegistry.TargetPoint(world.provider.getDimension(), center.getX(), center.getY(), center.getZ(), 32.0));
+        world.playSound(null, center, TCSounds.WAND, SoundCategory.PLAYERS, 1.0F, 1.0F);
     }
 
     private static final class PouchLocation {
