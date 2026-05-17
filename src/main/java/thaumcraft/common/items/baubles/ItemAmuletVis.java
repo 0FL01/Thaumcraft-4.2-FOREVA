@@ -2,6 +2,7 @@ package thaumcraft.common.items.baubles;
 
 import baubles.api.BaubleType;
 import baubles.api.IBauble;
+import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
@@ -10,6 +11,9 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.NonNullList;
+import net.minecraft.util.text.TextFormatting;
+import net.minecraft.util.text.translation.I18n;
+import net.minecraft.world.World;
 import thaumcraft.api.IRunicArmor;
 import thaumcraft.api.aspects.Aspect;
 import thaumcraft.api.aspects.AspectList;
@@ -19,9 +23,12 @@ import thaumcraft.common.lib.CreativeTabThaumcraft;
 import thaumcraft.common.lib.research.ResearchManager;
 import thaumcraft.common.tiles.TileVisRelay;
 
+import java.text.DecimalFormat;
 import java.lang.ref.WeakReference;
+import java.util.List;
 
 public class ItemAmuletVis extends Item implements IBauble, IEssentiaContainerItem, IRunicArmor {
+    private static final DecimalFormat VIS_FORMAT = new DecimalFormat("#######.##");
 
     public ItemAmuletVis() {
         this.setMaxStackSize(1);
@@ -117,6 +124,20 @@ public class ItemAmuletVis extends Item implements IBauble, IEssentiaContainerIt
             }
         }
         return true;
+    }
+
+    @Override
+    public void addInformation(ItemStack stack, World worldIn, List<String> tooltip, ITooltipFlag flagIn) {
+        if (stack.getItemDamage() == 0) {
+            tooltip.add(TextFormatting.AQUA + I18n.translateToLocal("item.ItemAmuletVis.text"));
+        }
+        tooltip.add(TextFormatting.GOLD + I18n.translateToLocal("item.capacity.text") + " " + (this.getMaxVis(stack) / 100));
+        if (!stack.hasTagCompound()) return;
+        for (Aspect aspect : Aspect.getPrimalAspects()) {
+            if (!stack.getTagCompound().hasKey(aspect.getTag())) continue;
+            String amount = VIS_FORMAT.format((float) stack.getTagCompound().getInteger(aspect.getTag()) / 100.0F);
+            tooltip.add(" \u00a7" + aspect.getChatcolor() + aspect.getName() + "\u00a7r x " + amount);
+        }
     }
 
     @Override
