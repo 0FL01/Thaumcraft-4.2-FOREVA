@@ -8,6 +8,7 @@ import net.minecraft.block.properties.PropertyInteger;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
@@ -21,6 +22,7 @@ import net.minecraft.util.NonNullList;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.world.World;
 import net.minecraft.world.IBlockAccess;
@@ -29,6 +31,10 @@ import thaumcraft.common.Thaumcraft;
 import thaumcraft.common.CommonProxy;
 import thaumcraft.common.items.wands.ItemWandCasting;
 import thaumcraft.common.tiles.*;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 
 public class BlockWoodenDevice extends BlockContainer {
 
@@ -41,6 +47,7 @@ public class BlockWoodenDevice extends BlockContainer {
         this.setCreativeTab(Thaumcraft.tabTC);
         this.setDefaultState(this.blockState.getBaseState().withProperty(TYPE, 0));
         this.setHarvestLevel("axe", 0);
+        this.setTickRandomly(true);
     }
 
     @Override
@@ -88,6 +95,16 @@ public class BlockWoodenDevice extends BlockContainer {
                 TileSensor sensor = (TileSensor) te;
                 sensor.changePitch();
                 sensor.triggerNote(worldIn, pos.getX(), pos.getY(), pos.getZ(), true);
+            }
+            return true;
+        }
+        if (te instanceof TileArcanePressurePlate) {
+            if (!worldIn.isRemote && canEditPressurePlate((TileArcanePressurePlate) te, playerIn)) {
+                TileArcanePressurePlate plate = (TileArcanePressurePlate) te;
+                plate.setting = (byte) ((plate.setting + 1) % 3);
+                worldIn.playSound(null, pos, SoundEvents.UI_BUTTON_CLICK, SoundCategory.BLOCKS, 0.1F, 0.9F);
+                worldIn.notifyBlockUpdate(pos, state, state, 3);
+                plate.markDirty();
             }
             return true;
         }
@@ -144,13 +161,48 @@ public class BlockWoodenDevice extends BlockContainer {
 
     @Override
     public void neighborChanged(IBlockState state, World worldIn, BlockPos pos, Block blockIn, BlockPos fromPos) {
-        if (state.getValue(TYPE) == 1) {
+        int meta = state.getValue(TYPE);
+        if (meta == 1) {
             TileEntity te = worldIn.getTileEntity(pos);
             if (te instanceof TileSensor) {
                 ((TileSensor) te).updateTone();
             }
+        } else if (meta == 5) {
+            TileEntity te = worldIn.getTileEntity(pos);
+            if (te instanceof TileArcaneBore) {
+                TileArcaneBore bore = (TileArcaneBore) te;
+                EnumFacing base = bore.baseOrientation;
+                if (base != null) {
+                    BlockPos supportPos = pos.offset(base.getOpposite());
+                    IBlockState supportState = worldIn.getBlockState(supportPos);
+                    if (supportState.getBlock() != this || !supportState.isSideSolid(worldIn, supportPos, base)) {
+                        worldIn.destroyBlock(pos, true);
+                    }
+                }
+            }
         }
         super.neighborChanged(state, worldIn, pos, blockIn, fromPos);
+    }
+
+    @Override
+    public int tickRate(World worldIn) {
+        return 20;
+    }
+
+    @Override
+    public void updateTick(World worldIn, BlockPos pos, IBlockState state, Random rand) {
+        if (!worldIn.isRemote && state.getValue(TYPE) == 3) {
+            setStateIfMobInteractsWithPlate(worldIn, pos);
+        }
+        super.updateTick(worldIn, pos, state, rand);
+    }
+
+    @Override
+    public void onEntityCollision(World worldIn, BlockPos pos, IBlockState state, Entity entityIn) {
+        if (!worldIn.isRemote && state.getValue(TYPE) == 2) {
+            setStateIfMobInteractsWithPlate(worldIn, pos);
+        }
+        super.onEntityCollision(worldIn, pos, state, entityIn);
     }
 
     @Override
@@ -233,6 +285,90 @@ public class BlockWoodenDevice extends BlockContainer {
             return true;
         }
         return super.eventReceived(state, worldIn, pos, id, param);
+    }
+
+    private boolean canEditPressurePlate(TileArcanePressurePlate plate, EntityPlayer player) {
+        if (player == null || plate == null) {
+            return false;
+        }
+        String username = player.getName();
+        return username.equals(plate.owner) || plate.accessList.contains("1" + username);
+    }
+
+    private void setStateIfMobInteractsWithPlate(World world, BlockPos pos) {
+        IBlockState current = world.getBlockState(pos);
+        int meta = current.getValue(TYPE);
+        boolean pressed = meta == 3;
+        boolean shouldPress = false;
+
+        TileEntity tile = world.getTileEntity(pos);
+        byte setting = 0;
+        String owner = "";
+        ArrayList<String> accessList = new ArrayList<>();
+        if (tile instanceof TileArcanePressurePlate) {
+            TileArcanePressurePlate plate = (TileArcanePressurePlate) tile;
+            setting = plate.setting;
+            owner = plate.owner;
+            accessList = plate.accessList;
+        }
+
+        float inset = 0.125F;
+        AxisAlignedBB box = new AxisAlignedBB(
+                pos.getX() + inset,
+                pos.getY(),
+                pos.getZ() + inset,
+                pos.getX() + 1.0F - inset,
+                pos.getY() + 0.25D,
+                pos.getZ() + 1.0F - inset);
+
+        List<? extends Entity> entities = null;
+        if (setting == 0) {
+            entities = world.getEntitiesWithinAABBExcludingEntity(null, box);
+        } else if (setting == 1) {
+            entities = world.getEntitiesWithinAABB(Entity.class, box);
+        } else if (setting == 2) {
+            entities = world.getEntitiesWithinAABB(EntityPlayer.class, box);
+        }
+
+        if (entities != null && !entities.isEmpty()) {
+            for (Entity entity : entities) {
+                if (entity.doesEntityNotTriggerPressurePlate()) {
+                    continue;
+                }
+                if (setting == 1 && entity instanceof EntityPlayer) {
+                    String name = ((EntityPlayer) entity).getName();
+                    if (name.equals(owner) || accessList.contains("0" + name) || accessList.contains("1" + name)) {
+                        continue;
+                    }
+                }
+                if (setting == 2 && entity instanceof EntityPlayer) {
+                    String name = ((EntityPlayer) entity).getName();
+                    if (!name.equals(owner) && !accessList.contains("0" + name) && !accessList.contains("1" + name)) {
+                        continue;
+                    }
+                }
+                shouldPress = true;
+                break;
+            }
+        }
+
+        if (shouldPress && !pressed) {
+            world.setBlockState(pos, current.withProperty(TYPE, 3), 2);
+            world.notifyNeighborsOfStateChange(pos, this, false);
+            world.notifyNeighborsOfStateChange(pos.down(), this, false);
+            world.markBlockRangeForRenderUpdate(pos, pos);
+            world.playSound(null, pos, SoundEvents.UI_BUTTON_CLICK, SoundCategory.BLOCKS, 0.2F, 0.6F);
+        }
+        if (!shouldPress && pressed) {
+            world.setBlockState(pos, current.withProperty(TYPE, 2), 2);
+            world.notifyNeighborsOfStateChange(pos, this, false);
+            world.notifyNeighborsOfStateChange(pos.down(), this, false);
+            world.markBlockRangeForRenderUpdate(pos, pos);
+            world.playSound(null, pos, SoundEvents.UI_BUTTON_CLICK, SoundCategory.BLOCKS, 0.2F, 0.5F);
+        }
+        if (shouldPress) {
+            world.scheduleUpdate(pos, this, tickRate(world));
+        }
     }
 
     @Override

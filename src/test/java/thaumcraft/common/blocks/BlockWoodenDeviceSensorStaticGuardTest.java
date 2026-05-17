@@ -18,7 +18,12 @@ public class BlockWoodenDeviceSensorStaticGuardTest {
         assertTrue(source.contains("if (te instanceof TileSensor)"));
         assertTrue(source.contains("sensor.changePitch();"));
         assertTrue(source.contains("sensor.triggerNote(worldIn, pos.getX(), pos.getY(), pos.getZ(), true);"));
-        assertTrue(source.contains("if (state.getValue(TYPE) == 1)"));
+        assertTrue(source.contains("if (te instanceof TileArcanePressurePlate)"));
+        assertTrue(source.contains("plate.setting = (byte) ((plate.setting + 1) % 3);"));
+        assertTrue(source.contains("if (!worldIn.isRemote && state.getValue(TYPE) == 3)"));
+        assertTrue(source.contains("if (!worldIn.isRemote && state.getValue(TYPE) == 2)"));
+        assertTrue(source.contains("setStateIfMobInteractsWithPlate(worldIn, pos);"));
+        assertTrue(source.contains("if (meta == 1)"));
         assertTrue(source.contains("((TileSensor) te).updateTone();"));
     }
 
@@ -33,6 +38,9 @@ public class BlockWoodenDeviceSensorStaticGuardTest {
         assertTrue(source.contains("if (meta == 3)"));
         assertTrue(source.contains("return side == EnumFacing.UP ? 15 : 0;"));
         assertTrue(source.contains("return 15;"));
+        assertTrue(source.contains("world.scheduleUpdate(pos, this, tickRate(world));"));
+        assertTrue(source.contains("if (shouldPress && !pressed)"));
+        assertTrue(source.contains("if (!shouldPress && pressed)"));
     }
 
     @Test
