@@ -30,6 +30,11 @@ public class ConfigResearchStrictRecipeLookupStaticGuardTest {
         assertTrue("Strict recipe lookup map should fail fast when a handle key resolves to null during init",
                 source.contains("if (value == null)")
                         && source.contains("throw new IllegalStateException(\"Null ConfigResearch recipe handle: \" + key);"));
+        assertTrue("ConfigResearch should route typed page handles through a shared validator",
+                source.contains("private static <T> T requireRecipeHandle(String key, Class<T> expectedType)"));
+        assertTrue("Typed recipe-handle validator should fail fast on wrong runtime type",
+                source.contains("if (!expectedType.isInstance(value))")
+                        && source.contains("throw new IllegalStateException(\"Invalid ConfigResearch recipe handle type for key \" + key"));
     }
 
     private static String readFile(String path) throws IOException {

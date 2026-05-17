@@ -17,7 +17,8 @@ import static org.junit.Assert.assertTrue;
 
 public class ConfigResearchRecipeKeyCoverageTest {
 
-    private static final Pattern RECIPE_GET_PATTERN = Pattern.compile("recipes\\.get\\(\"([^\"]+)\"\\)");
+    private static final Pattern RECIPE_GET_PATTERN = Pattern.compile(
+            "(?:recipes\\.get|recipeI|recipeArcane|recipeCrucible|recipeInfusion|recipeInfusionEnchantment|recipeList)\\(\"([^\"]+)\"\\)");
     private static final Pattern RECIPE_PUT_PATTERN = Pattern.compile("recipes\\.put\\(\"([^\"]+)\"");
     private static final Pattern ARCANE_PATTERN = Pattern.compile("registerArcaneRecipe\\(\"([^\"]+)\"");
     private static final Pattern SHAPELESS_ARCANE_PATTERN = Pattern.compile("registerShapelessArcaneRecipe\\(\"([^\"]+)\"");

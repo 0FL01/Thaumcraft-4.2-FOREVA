@@ -31,6 +31,40 @@ public class ConfigResearch {
     private static boolean strictRecipeLookups = false;
     public static final Map<String, Object> recipes = new ResearchRecipeHandleMap();
 
+    private static IRecipe recipeI(String key) {
+        return requireRecipeHandle(key, IRecipe.class);
+    }
+
+    private static IArcaneRecipe recipeArcane(String key) {
+        return requireRecipeHandle(key, IArcaneRecipe.class);
+    }
+
+    private static CrucibleRecipe recipeCrucible(String key) {
+        return requireRecipeHandle(key, CrucibleRecipe.class);
+    }
+
+    private static InfusionRecipe recipeInfusion(String key) {
+        return requireRecipeHandle(key, InfusionRecipe.class);
+    }
+
+    private static InfusionEnchantmentRecipe recipeInfusionEnchantment(String key) {
+        return requireRecipeHandle(key, InfusionEnchantmentRecipe.class);
+    }
+
+    private static List<?> recipeList(String key) {
+        return requireRecipeHandle(key, List.class);
+    }
+
+    private static <T> T requireRecipeHandle(String key, Class<T> expectedType) {
+        Object value = recipes.get(key);
+        if (!expectedType.isInstance(value)) {
+            String actual = value == null ? "null" : value.getClass().getName();
+            throw new IllegalStateException("Invalid ConfigResearch recipe handle type for key " + key
+                    + ": expected " + expectedType.getName() + ", got " + actual);
+        }
+        return expectedType.cast(value);
+    }
+
     public static void init() {
         initCategories();
         strictRecipeLookups = true;
@@ -178,12 +212,12 @@ public class ConfigResearch {
                 .setPages(
                         new ResearchPage("tc.research_page.RESEARCH.1"),
                         new ResearchPage("tc.research_page.RESEARCH.2"),
-                        new ResearchPage((IRecipe) recipes.get("Thaumometer")),
+                        new ResearchPage(recipeI("Thaumometer")),
                         new ResearchPage("tc.research_page.RESEARCH.3"),
                         new ResearchPage("tc.research_page.RESEARCH.4"),
-                        new ResearchPage((IRecipe) recipes.get("Scribe1")),
-                        new ResearchPage((IRecipe) recipes.get("Scribe2")),
-                        new ResearchPage((IRecipe) recipes.get("Scribe3")),
+                        new ResearchPage(recipeI("Scribe1")),
+                        new ResearchPage(recipeI("Scribe2")),
+                        new ResearchPage(recipeI("Scribe3")),
                         new ResearchPage("tc.research_page.RESEARCH.5"),
                         new ResearchPage("tc.research_page.RESEARCH.6"),
                         new ResearchPage("tc.research_page.RESEARCH.7"),
@@ -207,7 +241,7 @@ public class ConfigResearch {
                 new ItemStack(ConfigItems.itemResource, 1, 9))
                 .setPages(
                         new ResearchPage("tc.research_page.KNOWFRAG.1"),
-                        new ResearchPage((IRecipe) recipes.get("KnowFrag")))
+                        new ResearchPage(recipeI("KnowFrag")))
                 .setStub()
                 .setRound()
                 .setAutoUnlock()
@@ -224,7 +258,7 @@ public class ConfigResearch {
                 new ItemStack(ConfigItems.itemThaumonomicon))
                 .setPages(
                         new ResearchPage("tc.research_page.THAUMONOMICON.1"),
-                        new ResearchPage((List<?>) recipes.get("Thaumonomicon")))
+                        new ResearchPage(recipeList("Thaumonomicon")))
                 .setAutoUnlock()
                 .setStub()
                 .setRound()
@@ -233,7 +267,7 @@ public class ConfigResearch {
 
         ArrayList<IRecipe> clusterRecipes = new ArrayList<>();
         for (int a = 0; a <= 6; ++a) {
-            clusterRecipes.add((IRecipe) recipes.get("Clusters" + a));
+            clusterRecipes.add(recipeI("Clusters" + a));
         }
         new ResearchItem(
                 "ORE",
@@ -264,9 +298,9 @@ public class ConfigResearch {
                 new ItemStack(ConfigBlocks.blockCustomPlant, 1, 0))
                 .setPages(
                         new ResearchPage("tc.research_page.PLANTS.1"),
-                        new ResearchPage((IRecipe) recipes.get("PlankGreatwood")),
+                        new ResearchPage(recipeI("PlankGreatwood")),
                         new ResearchPage("tc.research_page.PLANTS.2"),
-                        new ResearchPage((IRecipe) recipes.get("PlankSilverwood")),
+                        new ResearchPage(recipeI("PlankSilverwood")),
                         new ResearchPage("tc.research_page.PLANTS.3"),
                         new ResearchPage("tc.research_page.PLANTS.4"),
                         new ResearchPage("tc.research_page.PLANTS.5"),
@@ -305,7 +339,7 @@ public class ConfigResearch {
                 new ItemStack(ConfigBlocks.blockTable, 1, 14))
                 .setPages(
                         new ResearchPage("tc.research_page.DECONSTRUCTOR.1"),
-                        new ResearchPage((IArcaneRecipe) recipes.get("Deconstructor")),
+                        new ResearchPage(recipeArcane("Deconstructor")),
                         new ResearchPage("tc.research_page.DECONSTRUCTOR.2"))
                 .setRound()
                 .setParents("RESEARCHER1")
@@ -360,7 +394,7 @@ public class ConfigResearch {
                 new ItemStack(ConfigItems.itemEssence, 1, 0))
                 .setPages(
                         new ResearchPage("tc.research_page.PHIAL.1"),
-                        new ResearchPage((IRecipe) recipes.get("Phial")))
+                        new ResearchPage(recipeI("Phial")))
                 .setStub()
                 .setRound()
                 .setAutoUnlock()
@@ -378,7 +412,7 @@ public class ConfigResearch {
                         new ResearchPage("tc.research_page.CRUCIBLE.1"),
                         new ResearchPage("tc.research_page.CRUCIBLE.2"),
                         new ResearchPage("tc.research_page.CRUCIBLE.3"),
-                        new ResearchPage((List<?>) recipes.get("Crucible")),
+                        new ResearchPage(recipeList("Crucible")),
                         new ResearchPage("tc.research_page.CRUCIBLE.4"),
                         new ResearchPage("tc.research_page.CRUCIBLE.5"),
                         new ResearchPage(new ItemStack(ConfigItems.itemShard, 1, 6)))
@@ -398,7 +432,7 @@ public class ConfigResearch {
                 new ItemStack(ConfigItems.itemResource, 1, 1))
                 .setPages(
                         new ResearchPage("tc.research_page.NITOR.1"),
-                        new ResearchPage((CrucibleRecipe) recipes.get("Nitor")))
+                        new ResearchPage(recipeCrucible("Nitor")))
                 .setParents("CRUCIBLE")
                 .registerResearchItem();
 
@@ -414,7 +448,7 @@ public class ConfigResearch {
                 new ItemStack(ConfigItems.itemResource, 1, 0))
                 .setPages(
                         new ResearchPage("tc.research_page.ALUMENTUM.1"),
-                        new ResearchPage((CrucibleRecipe) recipes.get("Alumentum")))
+                        new ResearchPage(recipeCrucible("Alumentum")))
                 .setParents("CRUCIBLE")
                 .registerResearchItem();
 
@@ -431,11 +465,11 @@ public class ConfigResearch {
                 new ItemStack(ConfigBlocks.blockMetalDevice, 1, 1))
                 .setPages(
                         new ResearchPage("tc.research_page.DISTILESSENTIA.1"),
-                        new ResearchPage((IArcaneRecipe) recipes.get("AlchemyFurnace")),
+                        new ResearchPage(recipeArcane("AlchemyFurnace")),
                         new ResearchPage("tc.research_page.DISTILESSENTIA.2"),
-                        new ResearchPage((IArcaneRecipe) recipes.get("Filter")),
-                        new ResearchPage((IArcaneRecipe) recipes.get("Alembic")),
-                        new ResearchPage((IArcaneRecipe) recipes.get("AlchemicalConstruct")))
+                        new ResearchPage(recipeArcane("Filter")),
+                        new ResearchPage(recipeArcane("Alembic")),
+                        new ResearchPage(recipeArcane("AlchemicalConstruct")))
                 .setSiblings("JARLABEL")
                 .setParents("NITOR", "ALUMENTUM")
                 .registerResearchItem();
@@ -452,7 +486,7 @@ public class ConfigResearch {
                 new ItemStack(ConfigItems.itemResource, 1, 2))
                 .setPages(
                         new ResearchPage("tc.research_page.THAUMIUM.1"),
-                        new ResearchPage((CrucibleRecipe) recipes.get("Thaumium")))
+                        new ResearchPage(recipeCrucible("Thaumium")))
                 .setHidden()
                 .setAspectTriggers(Aspect.METAL)
                 .setParents("CRUCIBLE")
@@ -471,11 +505,11 @@ public class ConfigResearch {
                 new ItemStack(ConfigBlocks.blockTube, 1, 0))
                 .setPages(
                         new ResearchPage("tc.research_page.TUBES.1"),
-                        new ResearchPage((IArcaneRecipe) recipes.get("Tube")),
+                        new ResearchPage(recipeArcane("Tube")),
                         new ResearchPage("tc.research_page.TUBES.2"),
-                        new ResearchPage((IArcaneRecipe) recipes.get("TubeValve")),
+                        new ResearchPage(recipeArcane("TubeValve")),
                         new ResearchPage("tc.research_page.TUBES.3"),
-                        new ResearchPage((IArcaneRecipe) recipes.get("Resonator")),
+                        new ResearchPage(recipeArcane("Resonator")),
                         new ResearchPage("tc.research_page.TUBES.4"))
                 .setParents("DISTILESSENTIA")
                 .setSecondary()
@@ -496,10 +530,10 @@ public class ConfigResearch {
                 new ItemStack(ConfigBlocks.blockTube, 1, 3))
                 .setPages(
                         new ResearchPage("tc.research_page.TUBEFILTER.1"),
-                        new ResearchPage((IArcaneRecipe) recipes.get("TubeFilter")),
+                        new ResearchPage(recipeArcane("TubeFilter")),
                         new ResearchPage("tc.research_page.TUBEFILTER.2"),
-                        new ResearchPage((IArcaneRecipe) recipes.get("TubeRestrict")),
-                        new ResearchPage((IArcaneRecipe) recipes.get("TubeOneway")))
+                        new ResearchPage(recipeArcane("TubeRestrict")),
+                        new ResearchPage(recipeArcane("TubeOneway")))
                 .setParents("TUBES")
                 .setSecondary()
                 .setConcealed()
@@ -519,7 +553,7 @@ public class ConfigResearch {
                 new ItemStack(ConfigBlocks.blockTube, 1, 7))
                 .setPages(
                         new ResearchPage("tc.research_page.ESSENTIACRYSTAL.1"),
-                        new ResearchPage((IArcaneRecipe) recipes.get("EssentiaCrystalizer")))
+                        new ResearchPage(recipeArcane("EssentiaCrystalizer")))
                 .setConcealed()
                 .setParents("TUBES")
                 .registerResearchItem();
@@ -538,10 +572,10 @@ public class ConfigResearch {
                 new ItemStack(ConfigBlocks.blockTube, 1, 2))
                 .setPages(
                         new ResearchPage("tc.research_page.CENTRIFUGE.1"),
-                        new ResearchPage((IArcaneRecipe) recipes.get("Centrifuge")),
+                        new ResearchPage(recipeArcane("Centrifuge")),
                         new ResearchPage("tc.research_page.CENTRIFUGE.2"),
                         new ResearchPage("tc.research_page.CENTRIFUGE.3"),
-                        new ResearchPage((IArcaneRecipe) recipes.get("TubeBuffer")))
+                        new ResearchPage(recipeArcane("TubeBuffer")))
                 .setParents("TUBEFILTER")
                 .setConcealed()
                 .registerResearchItem();
@@ -560,10 +594,10 @@ public class ConfigResearch {
                 new ResourceLocation("thaumcraft", "textures/blocks/alchemyblock.png"))
                 .setPages(
                         new ResearchPage("tc.research_page.THAUMATORIUM.1"),
-                        new ResearchPage((List<?>) recipes.get("Thaumatorium")),
+                        new ResearchPage(recipeList("Thaumatorium")),
                         new ResearchPage("tc.research_page.THAUMATORIUM.2"),
                         new ResearchPage("tc.research_page.THAUMATORIUM.3"),
-                        new ResearchPage((IArcaneRecipe) recipes.get("MnemonicMatrix")))
+                        new ResearchPage(recipeArcane("MnemonicMatrix")))
                 .setParents("CENTRIFUGE")
                 .setConcealed()
                 .registerResearchItem();
@@ -580,10 +614,10 @@ public class ConfigResearch {
                 new ItemStack(ConfigBlocks.blockCosmeticSolid, 1, 6))
                 .setPages(
                         new ResearchPage("tc.research_page.ARCANESTONE.1"),
-                        new ResearchPage((IArcaneRecipe) recipes.get("ArcaneStone1")),
-                        new ResearchPage((IRecipe) recipes.get("ArcaneStone2")),
-                        new ResearchPage((IRecipe) recipes.get("ArcaneStone3")),
-                        new ResearchPage((IRecipe) recipes.get("ArcaneStone4")))
+                        new ResearchPage(recipeArcane("ArcaneStone1")),
+                        new ResearchPage(recipeI("ArcaneStone2")),
+                        new ResearchPage(recipeI("ArcaneStone3")),
+                        new ResearchPage(recipeI("ArcaneStone4")))
                 .setStub()
                 .setAutoUnlock()
                 .setRound()
@@ -599,7 +633,7 @@ public class ConfigResearch {
                 new ItemStack(ConfigBlocks.blockMetalDevice, 1, 5))
                 .setPages(
                         new ResearchPage("tc.research_page.GRATE.1"),
-                        new ResearchPage((IRecipe) recipes.get("Grate")))
+                        new ResearchPage(recipeI("Grate")))
                 .setStub()
                 .setAutoUnlock()
                 .setRound()
@@ -615,7 +649,7 @@ public class ConfigResearch {
                 new ItemStack(ConfigBlocks.blockTable))
                 .setPages(
                         new ResearchPage("tc.research_page.TABLE.1"),
-                        new ResearchPage((IRecipe) recipes.get("Table")))
+                        new ResearchPage(recipeI("Table")))
                 .setStub()
                 .setAutoUnlock()
                 .setRound()
@@ -631,7 +665,7 @@ public class ConfigResearch {
                 new ItemStack(ConfigBlocks.blockTable, 1, 15))
                 .setPages(
                         new ResearchPage("tc.research_page.ARCTABLE.1"),
-                        new ResearchPage((List<?>) recipes.get("ArcTable")))
+                        new ResearchPage(recipeList("ArcTable")))
                 .setStub()
                 .setAutoUnlock()
                 .setRound()
@@ -648,7 +682,7 @@ public class ConfigResearch {
                 new ItemStack(ConfigBlocks.blockTable, 1, 1))
                 .setPages(
                         new ResearchPage("tc.research_page.RESTABLE.1"),
-                        new ResearchPage((List<?>) recipes.get("ResTable")))
+                        new ResearchPage(recipeList("ResTable")))
                 .setStub()
                 .setAutoUnlock()
                 .setRound()
@@ -665,7 +699,7 @@ public class ConfigResearch {
                 new ItemStack(ConfigItems.itemThaumometer))
                 .setPages(
                         new ResearchPage("tc.research_page.THAUMOMETER.1"),
-                        new ResearchPage((IRecipe) recipes.get("Thaumometer")))
+                        new ResearchPage(recipeI("Thaumometer")))
                 .setStub()
                 .setAutoUnlock()
                 .setRound()
@@ -684,7 +718,7 @@ public class ConfigResearch {
                 new ItemStack(ConfigBlocks.blockCosmeticSolid, 1, 2))
                 .setPages(
                         new ResearchPage("tc.research_page.PAVETRAVEL.1"),
-                        new ResearchPage((IArcaneRecipe) recipes.get("PaveTravel")))
+                        new ResearchPage(recipeArcane("PaveTravel")))
                 .setParents("ARCANESTONE")
                 .setSecondary()
                 .registerResearchItem();
@@ -702,7 +736,7 @@ public class ConfigResearch {
                 new ItemStack(ConfigBlocks.blockCosmeticSolid, 1, 3))
                 .setPages(
                         new ResearchPage("tc.research_page.PAVEWARD.1"),
-                        new ResearchPage((IArcaneRecipe) recipes.get("PaveWard")),
+                        new ResearchPage(recipeArcane("PaveWard")),
                         new ResearchPage("tc.research_page.PAVEWARD.2"))
                 .setParents("ARCANESTONE")
                 .setSecondary()
@@ -721,7 +755,7 @@ public class ConfigResearch {
                 new ItemStack(ConfigItems.itemGoggles))
                 .setPages(
                         new ResearchPage("tc.research_page.GOGGLES.1"),
-                        new ResearchPage((IArcaneRecipe) recipes.get("Goggles")))
+                        new ResearchPage(recipeArcane("Goggles")))
                 .setParents("THAUMOMETER")
                 .setConcealed()
                 .registerResearchItem();
@@ -739,7 +773,7 @@ public class ConfigResearch {
                 new ItemStack(ConfigBlocks.blockWoodenDevice, 1, 1))
                 .setPages(
                         new ResearchPage("tc.research_page.ARCANEEAR.1"),
-                        new ResearchPage((IArcaneRecipe) recipes.get("ArcaneEar")))
+                        new ResearchPage(recipeArcane("ArcaneEar")))
                 .setParents("GOGGLES")
                 .setConcealed()
                 .registerResearchItem();
@@ -758,7 +792,7 @@ public class ConfigResearch {
                 new ItemStack(ConfigItems.itemCompassStone, 1, 1))
                 .setPages(
                         new ResearchPage("tc.research_page.SINSTONE.1"),
-                        new ResearchPage((InfusionRecipe) recipes.get("SinStone")))
+                        new ResearchPage(recipeInfusion("SinStone")))
                 .setParents("GOGGLES")
                 .setConcealed()
                 .registerResearchItem();
@@ -777,7 +811,7 @@ public class ConfigResearch {
                 new ItemStack(ConfigBlocks.blockLifter))
                 .setPages(
                         new ResearchPage("tc.research_page.LEVITATOR.1"),
-                        new ResearchPage((IArcaneRecipe) recipes.get("Levitator")))
+                        new ResearchPage(recipeArcane("Levitator")))
                 .setConcealed()
                 .setParents("NITOR")
                 .registerResearchItem();
@@ -796,7 +830,7 @@ public class ConfigResearch {
                 new ResourceLocation("thaumcraft", "textures/misc/r_infernalfurnace.png"))
                 .setPages(
                         new ResearchPage("tc.research_page.INFERNALFURNACE.1"),
-                        new ResearchPage((List<?>) recipes.get("InfernalFurnace")),
+                        new ResearchPage(recipeList("InfernalFurnace")),
                         new ResearchPage("tc.research_page.INFERNALFURNACE.2"))
                 .setParents("NITOR", "ALUMENTUM")
                 .setConcealed()
@@ -816,7 +850,7 @@ public class ConfigResearch {
                 new ItemStack(ConfigBlocks.blockWoodenDevice, 1, 0))
                 .setPages(
                         new ResearchPage("tc.research_page.BELLOWS.1"),
-                        new ResearchPage((IArcaneRecipe) recipes.get("Bellows")),
+                        new ResearchPage(recipeArcane("Bellows")),
                         new ResearchPage("tc.research_page.BELLOWS.2"))
                 .setParents("INFERNALFURNACE")
                 .setSecondary()
@@ -837,9 +871,9 @@ public class ConfigResearch {
                 new ItemStack(ConfigBlocks.blockWoodenDevice, 1, 5))
                 .setPages(
                         new ResearchPage("tc.research_page.ARCANEBORE.1"),
-                        new ResearchPage((InfusionRecipe) recipes.get("ArcaneBore")),
+                        new ResearchPage(recipeInfusion("ArcaneBore")),
                         new ResearchPage("tc.research_page.ARCANEBORE.2"),
-                        new ResearchPage((IArcaneRecipe) recipes.get("ArcaneBoreBase")),
+                        new ResearchPage(recipeArcane("ArcaneBoreBase")),
                         new ResearchPage("tc.research_page.ARCANEBORE.3"))
                 .setConcealed()
                 .setParents("FOCUSEXCAVATION", "INFUSION")
@@ -858,7 +892,7 @@ public class ConfigResearch {
                 new ItemStack(ConfigBlocks.blockMetalDevice, 1, 7))
                 .setPages(
                         new ResearchPage("tc.research_page.ARCANELAMP.1"),
-                        new ResearchPage((IArcaneRecipe) recipes.get("ArcaneLamp")),
+                        new ResearchPage(recipeArcane("ArcaneLamp")),
                         new ResearchPage("ARCANEBORE", "tc.research_page.ARCANELAMP.2"))
                 .setSecondary()
                 .setParents("NITOR")
@@ -876,11 +910,11 @@ public class ConfigResearch {
                 new ItemStack(ConfigItems.itemResource, 1, 7))
                 .setPages(
                         new ResearchPage("tc.research_page.ENCHFABRIC.1"),
-                        new ResearchPage((IArcaneRecipe) recipes.get("EnchantedFabric")),
+                        new ResearchPage(recipeArcane("EnchantedFabric")),
                         new ResearchPage("tc.research_page.ENCHFABRIC.2"),
-                        new ResearchPage((IArcaneRecipe) recipes.get("RobeChest")),
-                        new ResearchPage((IArcaneRecipe) recipes.get("RobeLegs")),
-                        new ResearchPage((IArcaneRecipe) recipes.get("RobeBoots")))
+                        new ResearchPage(recipeArcane("RobeChest")),
+                        new ResearchPage(recipeArcane("RobeLegs")),
+                        new ResearchPage(recipeArcane("RobeBoots")))
                 .setSecondary()
                 .registerResearchItem();
 
@@ -900,9 +934,9 @@ public class ConfigResearch {
                 .setPages(
                         new ResearchPage("tc.research_page.RUNICARMOR.1"),
                         new ResearchPage("tc.research_page.RUNICARMOR.2"),
-                        new ResearchPage((InfusionRecipe) recipes.get("RunicRing")),
-                        new ResearchPage((InfusionRecipe) recipes.get("RunicAmulet")),
-                        new ResearchPage((InfusionRecipe) recipes.get("RunicGirdle")))
+                        new ResearchPage(recipeInfusion("RunicRing")),
+                        new ResearchPage(recipeInfusion("RunicAmulet")),
+                        new ResearchPage(recipeInfusion("RunicGirdle")))
                 .setParentsHidden("INFUSION")
                 .setParents("ENCHFABRIC")
                 .setConcealed()
@@ -921,7 +955,7 @@ public class ConfigResearch {
                 new ItemStack(ConfigItems.itemRingRunic, 1, 2))
                 .setPages(
                         new ResearchPage("tc.research_page.RUNICCHARGED.1"),
-                        new ResearchPage((InfusionRecipe) recipes.get("RunicRingCharged")))
+                        new ResearchPage(recipeInfusion("RunicRingCharged")))
                 .setParents("RUNICARMOR")
                 .setSecondary()
                 .setConcealed()
@@ -941,7 +975,7 @@ public class ConfigResearch {
                 new ItemStack(ConfigItems.itemRingRunic, 1, 3))
                 .setPages(
                         new ResearchPage("tc.research_page.RUNICHEALING.1"),
-                        new ResearchPage((InfusionRecipe) recipes.get("RunicRingHealing")))
+                        new ResearchPage(recipeInfusion("RunicRingHealing")))
                 .setParents("RUNICARMOR")
                 .setSecondary()
                 .setConcealed()
@@ -960,7 +994,7 @@ public class ConfigResearch {
                 new ItemStack(ConfigItems.itemGirdleRunic, 1, 1))
                 .setPages(
                         new ResearchPage("tc.research_page.RUNICKINETIC.1"),
-                        new ResearchPage((InfusionRecipe) recipes.get("RunicGirdleKinetic")))
+                        new ResearchPage(recipeInfusion("RunicGirdleKinetic")))
                 .setParents("RUNICARMOR")
                 .setSecondary()
                 .setConcealed()
@@ -980,7 +1014,7 @@ public class ConfigResearch {
                 new ItemStack(ConfigItems.itemAmuletRunic, 1, 1))
                 .setPages(
                         new ResearchPage("tc.research_page.RUNICEMERGENCY.1"),
-                        new ResearchPage((InfusionRecipe) recipes.get("RunicAmuletEmergency")))
+                        new ResearchPage(recipeInfusion("RunicAmuletEmergency")))
                 .setParents("RUNICARMOR")
                 .setSecondary()
                 .setConcealed()
@@ -1016,7 +1050,7 @@ public class ConfigResearch {
 
         ArrayList<IArcaneRecipe> bannerRecipes = new ArrayList<>();
         for (int a = 0; a < 16; ++a) {
-            bannerRecipes.add((IArcaneRecipe) recipes.get("Banner_" + a));
+            bannerRecipes.add(recipeArcane("Banner_" + a));
         }
         ItemStack bannerAnchor = new ItemStack(ConfigBlocks.blockWoodenDevice, 1, 8);
         bannerAnchor.setTagCompound(new NBTTagCompound());
@@ -1053,7 +1087,7 @@ public class ConfigResearch {
                 new ItemStack(ConfigItems.itemAxeElemental))
                 .setPages(
                         new ResearchPage("tc.research_page.ELEMENTALAXE.1"),
-                        new ResearchPage((InfusionRecipe) recipes.get("ElementalAxe")),
+                        new ResearchPage(recipeInfusion("ElementalAxe")),
                         new ResearchPage("tc.research_page.ELEMENTALAXE.2"))
                 .setParents("THAUMIUM", "INFUSION")
                 .setConcealed()
@@ -1072,7 +1106,7 @@ public class ConfigResearch {
                 new ItemStack(ConfigItems.itemPickElemental))
                 .setPages(
                         new ResearchPage("tc.research_page.ELEMENTALPICK.1"),
-                        new ResearchPage((InfusionRecipe) recipes.get("ElementalPick")),
+                        new ResearchPage(recipeInfusion("ElementalPick")),
                         new ResearchPage("tc.research_page.ELEMENTALPICK.2"))
                 .setParents("THAUMIUM", "INFUSION")
                 .setConcealed()
@@ -1091,7 +1125,7 @@ public class ConfigResearch {
                 new ItemStack(ConfigItems.itemSwordElemental))
                 .setPages(
                         new ResearchPage("tc.research_page.ELEMENTALSWORD.1"),
-                        new ResearchPage((InfusionRecipe) recipes.get("ElementalSword")))
+                        new ResearchPage(recipeInfusion("ElementalSword")))
                 .setParents("THAUMIUM", "INFUSION")
                 .setConcealed()
                 .registerResearchItem();
@@ -1109,7 +1143,7 @@ public class ConfigResearch {
                 new ItemStack(ConfigItems.itemShovelElemental))
                 .setPages(
                         new ResearchPage("tc.research_page.ELEMENTALSHOVEL.1"),
-                        new ResearchPage((InfusionRecipe) recipes.get("ElementalShovel")),
+                        new ResearchPage(recipeInfusion("ElementalShovel")),
                         new ResearchPage("tc.research_page.ELEMENTALSHOVEL.2"))
                 .setParents("THAUMIUM", "INFUSION")
                 .setConcealed()
@@ -1128,7 +1162,7 @@ public class ConfigResearch {
                 new ItemStack(ConfigItems.itemHoeElemental))
                 .setPages(
                         new ResearchPage("tc.research_page.ELEMENTALHOE.1"),
-                        new ResearchPage((InfusionRecipe) recipes.get("ElementalHoe")))
+                        new ResearchPage(recipeInfusion("ElementalHoe")))
                 .setParents("THAUMIUM", "INFUSION")
                 .setConcealed()
                 .registerResearchItem();
@@ -1148,14 +1182,14 @@ public class ConfigResearch {
                     new ItemStack(ConfigItems.itemArcaneDoor))
                     .setPages(
                             new ResearchPage("tc.research_page.WARDEDARCANA.1"),
-                            new ResearchPage((IArcaneRecipe) recipes.get("ArcaneDoor")),
+                            new ResearchPage(recipeArcane("ArcaneDoor")),
                             new ResearchPage("tc.research_page.WARDEDARCANA.2"),
-                            new ResearchPage((IArcaneRecipe) recipes.get("IronKey")),
-                            new ResearchPage((IArcaneRecipe) recipes.get("GoldKey")),
+                            new ResearchPage(recipeArcane("IronKey")),
+                            new ResearchPage(recipeArcane("GoldKey")),
                             new ResearchPage("tc.research_page.WARDEDARCANA.3"),
-                            new ResearchPage((IArcaneRecipe) recipes.get("ArcanePressurePlate")),
+                            new ResearchPage(recipeArcane("ArcanePressurePlate")),
                             new ResearchPage("tc.research_page.WARDEDARCANA.4"),
-                            new ResearchPage((IArcaneRecipe) recipes.get("WardedGlass")))
+                            new ResearchPage(recipeArcane("WardedGlass")))
                     .setParents("THAUMIUM")
                     .registerResearchItem();
         }
@@ -1173,7 +1207,7 @@ public class ConfigResearch {
                 new ItemStack(ConfigItems.itemBowBone))
                 .setPages(
                         new ResearchPage("tc.research_page.BONEBOW.1"),
-                        new ResearchPage((IArcaneRecipe) recipes.get("BoneBow")))
+                        new ResearchPage(recipeArcane("BoneBow")))
                 .setHidden()
                 .setItemTriggers(
                         new ItemStack(Items.BOW, 1, Short.MAX_VALUE),
@@ -1182,7 +1216,7 @@ public class ConfigResearch {
 
         ArrayList<IArcaneRecipe> primalArrowRecipes = new ArrayList<>();
         for (int a = 0; a < 6; ++a) {
-            primalArrowRecipes.add((IArcaneRecipe) recipes.get("PrimalArrow_" + a));
+            primalArrowRecipes.add(recipeArcane("PrimalArrow_" + a));
         }
         new ResearchItem(
                 "PRIMALARROW",
@@ -1221,8 +1255,8 @@ public class ConfigResearch {
                 new ItemStack(ConfigBlocks.blockStoneDevice, 1, 2))
                 .setPages(
                         new ResearchPage("tc.research_page.INFUSION.1"),
-                        new ResearchPage((IArcaneRecipe) recipes.get("InfusionMatrix")),
-                        new ResearchPage((IArcaneRecipe) recipes.get("ArcanePedestal")),
+                        new ResearchPage(recipeArcane("InfusionMatrix")),
+                        new ResearchPage(recipeArcane("ArcanePedestal")),
                         new ResearchPage("tc.research_page.INFUSION.2"),
                         new ResearchPage("tc.research_page.INFUSION.3"),
                         new ResearchPage("tc.research_page.INFUSION.4"),
@@ -1245,7 +1279,7 @@ public class ConfigResearch {
                 new ItemStack(ConfigBlocks.blockMetalDevice, 1, 8))
                 .setPages(
                         new ResearchPage("tc.research_page.LAMPGROWTH.1"),
-                        new ResearchPage((InfusionRecipe) recipes.get("LampGrowth")))
+                        new ResearchPage(recipeInfusion("LampGrowth")))
                 .setHidden()
                 .setAspectTriggers(Aspect.LIGHT, Aspect.CROP)
                 .setParents("ARCANELAMP", "INFUSION")
@@ -1264,7 +1298,7 @@ public class ConfigResearch {
                 new ItemStack(ConfigBlocks.blockMetalDevice, 1, 13))
                 .setPages(
                         new ResearchPage("tc.research_page.LAMPFERTILITY.1"),
-                        new ResearchPage((InfusionRecipe) recipes.get("LampFertility")))
+                        new ResearchPage(recipeInfusion("LampFertility")))
                 .setHidden()
                 .setAspectTriggers(Aspect.LIGHT, Aspect.LIFE)
                 .setParents("ARCANELAMP", "INFUSION")
@@ -1286,7 +1320,7 @@ public class ConfigResearch {
                     .setPages(
                             new ResearchPage("tc.research_page.MIRROR.1"),
                             new ResearchPage("tc.research_page.MIRROR.2"),
-                            new ResearchPage((InfusionRecipe) recipes.get("Mirror")),
+                            new ResearchPage(recipeInfusion("Mirror")),
                             new ResearchPage("tc.research_page.MIRROR.3"))
                     .setHidden()
                     .setEntityTriggers("Enderman")
@@ -1312,7 +1346,7 @@ public class ConfigResearch {
                     new ItemStack(ConfigItems.itemHandMirror))
                     .setPages(
                             new ResearchPage("tc.research_page.MIRRORHAND.1"),
-                            new ResearchPage((InfusionRecipe) recipes.get("MirrorHand")))
+                            new ResearchPage(recipeInfusion("MirrorHand")))
                     .setConcealed()
                     .setSecondary()
                     .setParents("MIRROR")
@@ -1332,7 +1366,7 @@ public class ConfigResearch {
                     new ItemStack(ConfigBlocks.blockMirror, 1, 6))
                     .setPages(
                             new ResearchPage("tc.research_page.MIRRORESSENTIA.1"),
-                            new ResearchPage((InfusionRecipe) recipes.get("MirrorEssentia")),
+                            new ResearchPage(recipeInfusion("MirrorEssentia")),
                             new ResearchPage("tc.research_page.MIRRORESSENTIA.2"))
                     .setSecondary()
                     .setConcealed()
@@ -1354,7 +1388,7 @@ public class ConfigResearch {
                 new ItemStack(ConfigBlocks.blockJar, 1, 1))
                 .setPages(
                         new ResearchPage("tc.research_page.JARBRAIN.1"),
-                        new ResearchPage((InfusionRecipe) recipes.get("JarBrain")))
+                        new ResearchPage(recipeInfusion("JarBrain")))
                 .setParents("INFUSION")
                 .setHidden()
                 .setItemTriggers(new ItemStack(ConfigItems.itemResource, 1, 3))
@@ -1380,30 +1414,30 @@ public class ConfigResearch {
                         new ResearchPage("tc.research_page.INFUSIONENCHANTMENT.1"),
                         new ResearchPage("tc.research_page.INFUSIONENCHANTMENT.2"),
                         new ResearchPage("tc.research_page.INFUSIONENCHANTMENT.3"),
-                        new ResearchPage((InfusionEnchantmentRecipe) recipes.get("InfEnchRepair")),
-                        new ResearchPage((InfusionEnchantmentRecipe) recipes.get("InfEnchHaste")),
-                        new ResearchPage((InfusionEnchantmentRecipe) recipes.get("InfEnch0")),
-                        new ResearchPage((InfusionEnchantmentRecipe) recipes.get("InfEnch1")),
-                        new ResearchPage((InfusionEnchantmentRecipe) recipes.get("InfEnch2")),
-                        new ResearchPage((InfusionEnchantmentRecipe) recipes.get("InfEnch3")),
-                        new ResearchPage((InfusionEnchantmentRecipe) recipes.get("InfEnch4")),
-                        new ResearchPage((InfusionEnchantmentRecipe) recipes.get("InfEnch5")),
-                        new ResearchPage((InfusionEnchantmentRecipe) recipes.get("InfEnch6")),
-                        new ResearchPage((InfusionEnchantmentRecipe) recipes.get("InfEnch7")),
-                        new ResearchPage((InfusionEnchantmentRecipe) recipes.get("InfEnch8")),
-                        new ResearchPage((InfusionEnchantmentRecipe) recipes.get("InfEnch9")),
-                        new ResearchPage((InfusionEnchantmentRecipe) recipes.get("InfEnch10")),
-                        new ResearchPage((InfusionEnchantmentRecipe) recipes.get("InfEnch11")),
-                        new ResearchPage((InfusionEnchantmentRecipe) recipes.get("InfEnch12")),
-                        new ResearchPage((InfusionEnchantmentRecipe) recipes.get("InfEnch13")),
-                        new ResearchPage((InfusionEnchantmentRecipe) recipes.get("InfEnch14")),
-                        new ResearchPage((InfusionEnchantmentRecipe) recipes.get("InfEnch15")),
-                        new ResearchPage((InfusionEnchantmentRecipe) recipes.get("InfEnch16")),
-                        new ResearchPage((InfusionEnchantmentRecipe) recipes.get("InfEnch17")),
-                        new ResearchPage((InfusionEnchantmentRecipe) recipes.get("InfEnch18")),
-                        new ResearchPage((InfusionEnchantmentRecipe) recipes.get("InfEnch19")),
-                        new ResearchPage((InfusionEnchantmentRecipe) recipes.get("InfEnch20")),
-                        new ResearchPage((InfusionEnchantmentRecipe) recipes.get("InfEnch21")))
+                        new ResearchPage(recipeInfusionEnchantment("InfEnchRepair")),
+                        new ResearchPage(recipeInfusionEnchantment("InfEnchHaste")),
+                        new ResearchPage(recipeInfusionEnchantment("InfEnch0")),
+                        new ResearchPage(recipeInfusionEnchantment("InfEnch1")),
+                        new ResearchPage(recipeInfusionEnchantment("InfEnch2")),
+                        new ResearchPage(recipeInfusionEnchantment("InfEnch3")),
+                        new ResearchPage(recipeInfusionEnchantment("InfEnch4")),
+                        new ResearchPage(recipeInfusionEnchantment("InfEnch5")),
+                        new ResearchPage(recipeInfusionEnchantment("InfEnch6")),
+                        new ResearchPage(recipeInfusionEnchantment("InfEnch7")),
+                        new ResearchPage(recipeInfusionEnchantment("InfEnch8")),
+                        new ResearchPage(recipeInfusionEnchantment("InfEnch9")),
+                        new ResearchPage(recipeInfusionEnchantment("InfEnch10")),
+                        new ResearchPage(recipeInfusionEnchantment("InfEnch11")),
+                        new ResearchPage(recipeInfusionEnchantment("InfEnch12")),
+                        new ResearchPage(recipeInfusionEnchantment("InfEnch13")),
+                        new ResearchPage(recipeInfusionEnchantment("InfEnch14")),
+                        new ResearchPage(recipeInfusionEnchantment("InfEnch15")),
+                        new ResearchPage(recipeInfusionEnchantment("InfEnch16")),
+                        new ResearchPage(recipeInfusionEnchantment("InfEnch17")),
+                        new ResearchPage(recipeInfusionEnchantment("InfEnch18")),
+                        new ResearchPage(recipeInfusionEnchantment("InfEnch19")),
+                        new ResearchPage(recipeInfusionEnchantment("InfEnch20")),
+                        new ResearchPage(recipeInfusionEnchantment("InfEnch21")))
                 .setConcealed()
                 .setParents("JARBRAIN")
                 .registerResearchItem();
@@ -1422,9 +1456,9 @@ public class ConfigResearch {
                 .setPages(
                         new ResearchPage("tc.research_page.ARMORFORTRESS.1"),
                         new ResearchPage("tc.research_page.ARMORFORTRESS.2"),
-                        new ResearchPage((InfusionRecipe) recipes.get("ThaumiumFortressHelm")),
-                        new ResearchPage((InfusionRecipe) recipes.get("ThaumiumFortressChest")),
-                        new ResearchPage((InfusionRecipe) recipes.get("ThaumiumFortressLegs")))
+                        new ResearchPage(recipeInfusion("ThaumiumFortressHelm")),
+                        new ResearchPage(recipeInfusion("ThaumiumFortressChest")),
+                        new ResearchPage(recipeInfusion("ThaumiumFortressLegs")))
                 .setParents("THAUMIUM", "INFUSIONENCHANTMENT")
                 .setHidden()
                 .setAspectTriggers(Aspect.ARMOR)
@@ -1443,7 +1477,7 @@ public class ConfigResearch {
                 new ItemStack(ConfigItems.itemGoggles))
                 .setPages(
                         new ResearchPage("tc.research_page.HELMGOGGLES.1"),
-                        new ResearchPage((InfusionRecipe) recipes.get("HelmGoggles")))
+                        new ResearchPage(recipeInfusion("HelmGoggles")))
                 .setParentsHidden("GOGGLES")
                 .setParents("ARMORFORTRESS")
                 .setConcealed()
@@ -1463,7 +1497,7 @@ public class ConfigResearch {
                 new ResourceLocation("thaumcraft", "textures/misc/r_mask0.png"))
                 .setPages(
                         new ResearchPage("tc.research_page.MASKGRINNINGDEVIL.1"),
-                        new ResearchPage((InfusionRecipe) recipes.get("MaskGrinningDevil")))
+                        new ResearchPage(recipeInfusion("MaskGrinningDevil")))
                 .setParents("ARMORFORTRESS")
                 .setConcealed()
                 .setSecondary()
@@ -1482,7 +1516,7 @@ public class ConfigResearch {
                 new ResourceLocation("thaumcraft", "textures/misc/r_mask1.png"))
                 .setPages(
                         new ResearchPage("tc.research_page.MASKANGRYGHOST.1"),
-                        new ResearchPage((InfusionRecipe) recipes.get("MaskAngryGhost")))
+                        new ResearchPage(recipeInfusion("MaskAngryGhost")))
                 .setParents("ARMORFORTRESS")
                 .setConcealed()
                 .setSecondary()
@@ -1501,7 +1535,7 @@ public class ConfigResearch {
                 new ResourceLocation("thaumcraft", "textures/misc/r_mask2.png"))
                 .setPages(
                         new ResearchPage("tc.research_page.MASKSIPPINGFIEND.1"),
-                        new ResearchPage((InfusionRecipe) recipes.get("MaskSippingFiend")))
+                        new ResearchPage(recipeInfusion("MaskSippingFiend")))
                 .setParents("ARMORFORTRESS")
                 .setConcealed()
                 .setSecondary()
@@ -1523,7 +1557,7 @@ public class ConfigResearch {
                 new ItemStack(ConfigItems.itemBootsTraveller))
                 .setPages(
                         new ResearchPage("tc.research_page.BOOTSTRAVELLER.1"),
-                        new ResearchPage((InfusionRecipe) recipes.get("BootsTraveller")))
+                        new ResearchPage(recipeInfusion("BootsTraveller")))
                 .setParents("ENCHFABRIC", "INFUSION")
                 .setConcealed()
                 .registerResearchItem();
@@ -1542,7 +1576,7 @@ public class ConfigResearch {
                 new ItemStack(ConfigItems.itemHoverHarness))
                 .setPages(
                         new ResearchPage("tc.research_page.HOVERHARNESS.1"),
-                        new ResearchPage((InfusionRecipe) recipes.get("HoverHarness")),
+                        new ResearchPage(recipeInfusion("HoverHarness")),
                         new ResearchPage("tc.research_page.HOVERHARNESS.2"))
                 .setParents("BOOTSTRAVELLER")
                 .setConcealed()
@@ -1562,7 +1596,7 @@ public class ConfigResearch {
                 new ItemStack(ConfigItems.itemGirdleHover))
                 .setPages(
                         new ResearchPage("tc.research_page.HOVERGIRDLE.1"),
-                        new ResearchPage((InfusionRecipe) recipes.get("HoverGirdle")))
+                        new ResearchPage(recipeInfusion("HoverGirdle")))
                 .setHidden()
                 .setAspectTriggers(Aspect.FLIGHT)
                 .setParents("HOVERHARNESS")
@@ -1582,8 +1616,8 @@ public class ConfigResearch {
                 .setPages(
                         new ResearchPage("tc.research_page.BASICTHAUMATURGY.1"),
                         new ResearchPage("tc.research_page.BASICTHAUMATURGY.2"),
-                        new ResearchPage((IRecipe) recipes.get("WandCapIron")),
-                        new ResearchPage((IRecipe) recipes.get("WandBasic")))
+                        new ResearchPage(recipeI("WandCapIron")),
+                        new ResearchPage(recipeI("WandBasic")))
                 .setAutoUnlock()
                 .setStub()
                 .setRound()
@@ -1602,7 +1636,7 @@ public class ConfigResearch {
                 .setPages(
                         new ResearchPage("tc.research_page.FOCUSFIRE.1"),
                         new ResearchPage("tc.research_page.FOCUSFIRE.2"),
-                        new ResearchPage((IArcaneRecipe) recipes.get("FocusFire")))
+                        new ResearchPage(recipeArcane("FocusFire")))
                 .setParents("BASICTHAUMATURGY")
                 .registerResearchItem();
 
@@ -1619,7 +1653,7 @@ public class ConfigResearch {
                 new ItemStack(ConfigItems.focusFrost))
                 .setPages(
                         new ResearchPage("tc.research_page.FOCUSFROST.1"),
-                        new ResearchPage((IArcaneRecipe) recipes.get("FocusFrost")))
+                        new ResearchPage(recipeArcane("FocusFrost")))
                 .setConcealed()
                 .setSecondary()
                 .setParents("FOCUSFIRE")
@@ -1639,7 +1673,7 @@ public class ConfigResearch {
                 new ItemStack(ConfigItems.focusHellbat))
                 .setPages(
                         new ResearchPage("tc.research_page.FOCUSHELLBAT.1"),
-                        new ResearchPage((InfusionRecipe) recipes.get("FocusHellbat")))
+                        new ResearchPage(recipeInfusion("FocusHellbat")))
                 .setHidden()
                 .setEntityTriggers("Thaumcraft.Firebat")
                 .setAspectTriggers(Aspect.FIRE)
@@ -1661,7 +1695,7 @@ public class ConfigResearch {
                 new ItemStack(ConfigItems.focusExcavation))
                 .setPages(
                         new ResearchPage("tc.research_page.FOCUSEXCAVATION.1"),
-                        new ResearchPage((IArcaneRecipe) recipes.get("FocusExcavation")))
+                        new ResearchPage(recipeArcane("FocusExcavation")))
                 .setConcealed()
                 .setParents("FOCUSFIRE")
                 .registerResearchItem();
@@ -1681,7 +1715,7 @@ public class ConfigResearch {
                     new ItemStack(ConfigItems.focusWarding))
                     .setPages(
                             new ResearchPage("tc.research_page.FOCUSWARDING.1"),
-                            new ResearchPage((InfusionRecipe) recipes.get("FocusWarding")))
+                            new ResearchPage(recipeInfusion("FocusWarding")))
                     .setConcealed()
                     .setParents("FOCUSEXCAVATION", "INFUSION")
                     .registerResearchItem();
@@ -1700,7 +1734,7 @@ public class ConfigResearch {
                 new ItemStack(ConfigItems.focusShock))
                 .setPages(
                         new ResearchPage("tc.research_page.FOCUSSHOCK.1"),
-                        new ResearchPage((IArcaneRecipe) recipes.get("FocusShock")))
+                        new ResearchPage(recipeArcane("FocusShock")))
                 .setConcealed()
                 .setSecondary()
                 .setParents("FOCUSFIRE")
@@ -1719,7 +1753,7 @@ public class ConfigResearch {
                 new ItemStack(ConfigItems.focusTrade))
                 .setPages(
                         new ResearchPage("tc.research_page.FOCUSTRADE.1"),
-                        new ResearchPage((IArcaneRecipe) recipes.get("FocusTrade")))
+                        new ResearchPage(recipeArcane("FocusTrade")))
                 .setConcealed()
                 .setParents("FOCUSFIRE")
                 .registerResearchItem();
@@ -1738,7 +1772,7 @@ public class ConfigResearch {
                 new ItemStack(ConfigItems.focusPortableHole))
                 .setPages(
                         new ResearchPage("tc.research_page.FOCUSPORTABLEHOLE.1"),
-                        new ResearchPage((InfusionRecipe) recipes.get("FocusPortableHole")))
+                        new ResearchPage(recipeInfusion("FocusPortableHole")))
                 .setConcealed()
                 .setParents("FOCUSTRADE", "INFUSION")
                 .registerResearchItem();
@@ -1756,7 +1790,7 @@ public class ConfigResearch {
                 new ItemStack(ConfigItems.itemFocusPouch))
                 .setPages(
                         new ResearchPage("tc.research_page.FOCUSPOUCH.1"),
-                        new ResearchPage((IArcaneRecipe) recipes.get("FocusPouch")))
+                        new ResearchPage(recipeArcane("FocusPouch")))
                 .setParents("FOCUSFIRE")
                 .setSecondary()
                 .registerResearchItem();
@@ -1774,7 +1808,7 @@ public class ConfigResearch {
                 new ItemStack(ConfigItems.itemWandCap, 1, 1))
                 .setPages(
                         new ResearchPage("tc.research_page.CAP_gold.1"),
-                        new ResearchPage((IArcaneRecipe) recipes.get("WandCapGold")))
+                        new ResearchPage(recipeArcane("WandCapGold")))
                 .setParents("BASICTHAUMATURGY")
                 .registerResearchItem();
 
@@ -1792,7 +1826,7 @@ public class ConfigResearch {
                     new ItemStack(ConfigItems.itemWandCap, 1, 3))
                     .setPages(
                             new ResearchPage("tc.research_page.CAP_copper.1"),
-                            new ResearchPage((IArcaneRecipe) recipes.get("WandCapCopper")))
+                            new ResearchPage(recipeArcane("WandCapCopper")))
                     .setParents("BASICTHAUMATURGY")
                     .registerResearchItem();
         }
@@ -1811,8 +1845,8 @@ public class ConfigResearch {
                 new ItemStack(ConfigItems.itemWandCap, 1, 2))
                 .setPages(
                         new ResearchPage("tc.research_page.CAP_thaumium.1"),
-                        new ResearchPage((IArcaneRecipe) recipes.get("WandCapThaumiumInert")),
-                        new ResearchPage((InfusionRecipe) recipes.get("WandCapThaumium")))
+                        new ResearchPage(recipeArcane("WandCapThaumiumInert")),
+                        new ResearchPage(recipeInfusion("WandCapThaumium")))
                 .setParents("CAP_gold", "THAUMIUM", "INFUSION")
                 .registerResearchItem();
 
@@ -1831,8 +1865,8 @@ public class ConfigResearch {
                     new ItemStack(ConfigItems.itemWandCap, 1, 4))
                     .setPages(
                             new ResearchPage("tc.research_page.CAP_silver.1"),
-                            new ResearchPage((IArcaneRecipe) recipes.get("WandCapSilverInert")),
-                            new ResearchPage((InfusionRecipe) recipes.get("WandCapSilver")))
+                            new ResearchPage(recipeArcane("WandCapSilverInert")),
+                            new ResearchPage(recipeInfusion("WandCapSilver")))
                     .setConcealed()
                     .setParents("CAP_gold", "INFUSION")
                     .registerResearchItem();
@@ -1851,7 +1885,7 @@ public class ConfigResearch {
                 new ItemStack(ConfigItems.itemWandRod, 1, 0))
                 .setPages(
                         new ResearchPage("tc.research_page.ROD_greatwood.1"),
-                        new ResearchPage((IArcaneRecipe) recipes.get("WandRodGreatwood")))
+                        new ResearchPage(recipeArcane("WandRodGreatwood")))
                 .setParents("BASICTHAUMATURGY")
                 .registerResearchItem();
 
@@ -1869,7 +1903,7 @@ public class ConfigResearch {
                 new ItemStack(ConfigItems.itemWandRod, 1, 5))
                 .setPages(
                         new ResearchPage("tc.research_page.ROD_reed.1"),
-                        new ResearchPage((InfusionRecipe) recipes.get("WandRodReed")))
+                        new ResearchPage(recipeInfusion("WandRodReed")))
                 .setSecondary()
                 .setConcealed()
                 .setParents("ROD_greatwood", "INFUSION")
@@ -1889,7 +1923,7 @@ public class ConfigResearch {
                 new ItemStack(ConfigItems.itemWandRod, 1, 6))
                 .setPages(
                         new ResearchPage("tc.research_page.ROD_blaze.1"),
-                        new ResearchPage((InfusionRecipe) recipes.get("WandRodBlaze")))
+                        new ResearchPage(recipeInfusion("WandRodBlaze")))
                 .setSecondary()
                 .setConcealed()
                 .setParents("ROD_greatwood", "INFUSION")
@@ -1909,7 +1943,7 @@ public class ConfigResearch {
                 new ItemStack(ConfigItems.itemWandRod, 1, 1))
                 .setPages(
                         new ResearchPage("tc.research_page.ROD_obsidian.1"),
-                        new ResearchPage((InfusionRecipe) recipes.get("WandRodObsidian")))
+                        new ResearchPage(recipeInfusion("WandRodObsidian")))
                 .setSecondary()
                 .setConcealed()
                 .setParents("ROD_greatwood", "INFUSION")
@@ -1929,7 +1963,7 @@ public class ConfigResearch {
                 new ItemStack(ConfigItems.itemWandRod, 1, 3))
                 .setPages(
                         new ResearchPage("tc.research_page.ROD_ice.1"),
-                        new ResearchPage((InfusionRecipe) recipes.get("WandRodIce")))
+                        new ResearchPage(recipeInfusion("WandRodIce")))
                 .setSecondary()
                 .setConcealed()
                 .setParents("ROD_greatwood", "INFUSION")
@@ -1949,7 +1983,7 @@ public class ConfigResearch {
                 new ItemStack(ConfigItems.itemWandRod, 1, 4))
                 .setPages(
                         new ResearchPage("tc.research_page.ROD_quartz.1"),
-                        new ResearchPage((InfusionRecipe) recipes.get("WandRodQuartz")))
+                        new ResearchPage(recipeInfusion("WandRodQuartz")))
                 .setSecondary()
                 .setConcealed()
                 .setParents("ROD_greatwood", "INFUSION")
@@ -1969,7 +2003,7 @@ public class ConfigResearch {
                 new ItemStack(ConfigItems.itemWandRod, 1, 7))
                 .setPages(
                         new ResearchPage("tc.research_page.ROD_bone.1"),
-                        new ResearchPage((InfusionRecipe) recipes.get("WandRodBone")))
+                        new ResearchPage(recipeInfusion("WandRodBone")))
                 .setSecondary()
                 .setConcealed()
                 .setParents("ROD_greatwood", "INFUSION")
@@ -1989,7 +2023,7 @@ public class ConfigResearch {
                 new ItemStack(ConfigItems.itemWandRod, 1, 2))
                 .setPages(
                         new ResearchPage("tc.research_page.ROD_silverwood.1"),
-                        new ResearchPage((InfusionRecipe) recipes.get("WandRodSilverwood")))
+                        new ResearchPage(recipeInfusion("WandRodSilverwood")))
                 .setParents("ROD_greatwood", "INFUSION")
                 .registerResearchItem();
 
@@ -2095,7 +2129,7 @@ public class ConfigResearch {
                 .setPages(
                         new ResearchPage("tc.research_page.ROD_greatwood_staff.1"),
                         new ResearchPage("tc.research_page.ROD_greatwood_staff.2"),
-                        new ResearchPage((IArcaneRecipe) recipes.get("WandRodGreatwoodStaff")))
+                        new ResearchPage(recipeArcane("WandRodGreatwoodStaff")))
                 .setParents("ROD_silverwood")
                 .registerResearchItem();
 
@@ -2113,7 +2147,7 @@ public class ConfigResearch {
                 new ItemStack(ConfigItems.itemWandRod, 1, 55))
                 .setPages(
                         new ResearchPage("tc.research_page.ROD_reed_staff.1"),
-                        new ResearchPage((IArcaneRecipe) recipes.get("WandRodReedStaff")))
+                        new ResearchPage(recipeArcane("WandRodReedStaff")))
                 .setSecondary()
                 .setConcealed()
                 .setParents("ROD_reed")
@@ -2134,7 +2168,7 @@ public class ConfigResearch {
                 new ItemStack(ConfigItems.itemWandRod, 1, 56))
                 .setPages(
                         new ResearchPage("tc.research_page.ROD_blaze_staff.1"),
-                        new ResearchPage((IArcaneRecipe) recipes.get("WandRodBlazeStaff")))
+                        new ResearchPage(recipeArcane("WandRodBlazeStaff")))
                 .setSecondary()
                 .setConcealed()
                 .setParents("ROD_blaze")
@@ -2155,7 +2189,7 @@ public class ConfigResearch {
                 new ItemStack(ConfigItems.itemWandRod, 1, 51))
                 .setPages(
                         new ResearchPage("tc.research_page.ROD_obsidian_staff.1"),
-                        new ResearchPage((IArcaneRecipe) recipes.get("WandRodObsidianStaff")))
+                        new ResearchPage(recipeArcane("WandRodObsidianStaff")))
                 .setSecondary()
                 .setConcealed()
                 .setParents("ROD_obsidian")
@@ -2176,7 +2210,7 @@ public class ConfigResearch {
                 new ItemStack(ConfigItems.itemWandRod, 1, 53))
                 .setPages(
                         new ResearchPage("tc.research_page.ROD_ice_staff.1"),
-                        new ResearchPage((IArcaneRecipe) recipes.get("WandRodIceStaff")))
+                        new ResearchPage(recipeArcane("WandRodIceStaff")))
                 .setSecondary()
                 .setConcealed()
                 .setParents("ROD_ice")
@@ -2197,7 +2231,7 @@ public class ConfigResearch {
                 new ItemStack(ConfigItems.itemWandRod, 1, 54))
                 .setPages(
                         new ResearchPage("tc.research_page.ROD_quartz_staff.1"),
-                        new ResearchPage((IArcaneRecipe) recipes.get("WandRodQuartzStaff")))
+                        new ResearchPage(recipeArcane("WandRodQuartzStaff")))
                 .setSecondary()
                 .setConcealed()
                 .setParents("ROD_quartz")
@@ -2218,7 +2252,7 @@ public class ConfigResearch {
                 new ItemStack(ConfigItems.itemWandRod, 1, 57))
                 .setPages(
                         new ResearchPage("tc.research_page.ROD_bone_staff.1"),
-                        new ResearchPage((IArcaneRecipe) recipes.get("WandRodBoneStaff")))
+                        new ResearchPage(recipeArcane("WandRodBoneStaff")))
                 .setSecondary()
                 .setConcealed()
                 .setParents("ROD_bone")
@@ -2239,7 +2273,7 @@ public class ConfigResearch {
                 new ItemStack(ConfigItems.itemWandRod, 1, 52))
                 .setPages(
                         new ResearchPage("tc.research_page.ROD_silverwood_staff.1"),
-                        new ResearchPage((IArcaneRecipe) recipes.get("WandRodSilverwoodStaff")))
+                        new ResearchPage(recipeArcane("WandRodSilverwoodStaff")))
                 .setSecondary()
                 .setConcealed()
                 .setParents("ROD_silverwood")
@@ -2259,7 +2293,7 @@ public class ConfigResearch {
                 new ItemStack(ConfigBlocks.blockStoneDevice, 1, 9))
                 .setPages(
                         new ResearchPage("tc.research_page.NODESTABILIZER.1"),
-                        new ResearchPage((IArcaneRecipe) recipes.get("NodeStabilizer")),
+                        new ResearchPage(recipeArcane("NodeStabilizer")),
                         new ResearchPage("tc.research_page.NODESTABILIZER.2"))
                 .setParents("NODEPRESERVE")
                 .registerResearchItem();
@@ -2278,7 +2312,7 @@ public class ConfigResearch {
                 new ItemStack(ConfigBlocks.blockStoneDevice, 1, 9))
                 .setPages(
                         new ResearchPage("tc.research_page.NODESTABILIZERADV.1"),
-                        new ResearchPage((InfusionRecipe) recipes.get("NodeStabilizerAdv")))
+                        new ResearchPage(recipeInfusion("NodeStabilizerAdv")))
                 .setSecondary()
                 .setConcealed()
                 .setParents("NODESTABILIZER")
@@ -2297,10 +2331,10 @@ public class ConfigResearch {
                 new ItemStack(ConfigBlocks.blockStoneDevice, 1, 11))
                 .setPages(
                         new ResearchPage("tc.research_page.VISPOWER.1"),
-                        new ResearchPage((IArcaneRecipe) recipes.get("NodeTransducer")),
+                        new ResearchPage(recipeArcane("NodeTransducer")),
                         new ResearchPage("tc.research_page.VISPOWER.2"),
                         new ResearchPage("tc.research_page.VISPOWER.3"),
-                        new ResearchPage((IArcaneRecipe) recipes.get("NodeRelay")),
+                        new ResearchPage(recipeArcane("NodeRelay")),
                         new ResearchPage("tc.research_page.VISPOWER.4"),
                         new ResearchPage("tc.research_page.VISPOWER.5"))
                 .setParents("NODESTABILIZER")
@@ -2322,7 +2356,7 @@ public class ConfigResearch {
                 new ItemStack(ConfigBlocks.blockStoneDevice, 1, 13))
                 .setPages(
                         new ResearchPage("tc.research_page.FOCALMANIPULATION.1"),
-                        new ResearchPage((IArcaneRecipe) recipes.get("FocalManipulator")),
+                        new ResearchPage(recipeArcane("FocalManipulator")),
                         new ResearchPage("tc.research_page.FOCALMANIPULATION.2"))
                 .setParentsHidden("INFUSION", "FOCUSFIRE")
                 .setParents("VISPOWER")
@@ -2359,7 +2393,7 @@ public class ConfigResearch {
                 new ItemStack(ConfigBlocks.blockStoneDevice, 1, 5))
                 .setPages(
                         new ResearchPage("tc.research_page.WANDPED.1"),
-                        new ResearchPage((InfusionRecipe) recipes.get("WandPed")))
+                        new ResearchPage(recipeInfusion("WandPed")))
                 .setConcealed()
                 .setParents("INFUSION", "NODEPRESERVE", "NODESTABILIZER")
                 .registerResearchItem();
@@ -2378,7 +2412,7 @@ public class ConfigResearch {
                 new ItemStack(ConfigItems.itemAmuletVis, 1, 1))
                 .setPages(
                         new ResearchPage("tc.research_page.VISAMULET.1"),
-                        new ResearchPage((InfusionRecipe) recipes.get("VisAmulet")),
+                        new ResearchPage(recipeInfusion("VisAmulet")),
                         new ResearchPage("tc.research_page.VISAMULET.2"))
                 .setConcealed()
                 .setParents("WANDPED")
@@ -2399,7 +2433,7 @@ public class ConfigResearch {
                 new ItemStack(ConfigBlocks.blockStoneDevice, 1, 8))
                 .setPages(
                         new ResearchPage("tc.research_page.WANDPEDFOC.1"),
-                        new ResearchPage((InfusionRecipe) recipes.get("WandPedFocus")))
+                        new ResearchPage(recipeInfusion("WandPedFocus")))
                 .setSecondary()
                 .setConcealed()
                 .setParents("WANDPED")
@@ -2419,7 +2453,7 @@ public class ConfigResearch {
                 new ItemStack(ConfigBlocks.blockMetalDevice, 1, 2))
                 .setPages(
                         new ResearchPage("tc.research_page.VISCHARGERELAY.1"),
-                        new ResearchPage((IArcaneRecipe) recipes.get("NodeChargeRelay")))
+                        new ResearchPage(recipeArcane("NodeChargeRelay")))
                 .setParents("VISPOWER", "WANDPED")
                 .setParentsHidden("ROD_greatwood")
                 .setSecondary()
@@ -2440,7 +2474,7 @@ public class ConfigResearch {
                 new ItemStack(ConfigBlocks.blockChestHungry))
                 .setPages(
                         new ResearchPage("tc.research_page.HUNGRYCHEST.1"),
-                        new ResearchPage((IArcaneRecipe) recipes.get("HungryChest")))
+                        new ResearchPage(recipeArcane("HungryChest")))
                 .setSecondary()
                 .registerResearchItem();
 
@@ -2457,7 +2491,7 @@ public class ConfigResearch {
                 new ItemStack(ConfigItems.itemGolemDecoration, 1, 0))
                 .setPages(
                         new ResearchPage("tc.research_page.TINYHAT.1"),
-                        new ResearchPage((IArcaneRecipe) recipes.get("TinyHat")))
+                        new ResearchPage(recipeArcane("TinyHat")))
                 .setHidden()
                 .setSecondary()
                 .setItemTriggers(new ItemStack(Blocks.WOOL, 1, Short.MAX_VALUE))
@@ -2477,7 +2511,7 @@ public class ConfigResearch {
                 new ItemStack(ConfigItems.itemGolemDecoration, 1, 1))
                 .setPages(
                         new ResearchPage("tc.research_page.TINYGLASSES.1"),
-                        new ResearchPage((IArcaneRecipe) recipes.get("TinyGlasses")))
+                        new ResearchPage(recipeArcane("TinyGlasses")))
                 .setHidden()
                 .setSecondary()
                 .setItemTriggers(new ItemStack(Blocks.WOOL, 1, Short.MAX_VALUE))
@@ -2497,7 +2531,7 @@ public class ConfigResearch {
                 new ItemStack(ConfigItems.itemGolemDecoration, 1, 2))
                 .setPages(
                         new ResearchPage("tc.research_page.TINYBOWTIE.1"),
-                        new ResearchPage((IArcaneRecipe) recipes.get("TinyBowtie")))
+                        new ResearchPage(recipeArcane("TinyBowtie")))
                 .setHidden()
                 .setSecondary()
                 .setItemTriggers(new ItemStack(Blocks.WOOL, 1, Short.MAX_VALUE))
@@ -2517,7 +2551,7 @@ public class ConfigResearch {
                 new ItemStack(ConfigItems.itemGolemDecoration, 1, 3))
                 .setPages(
                         new ResearchPage("tc.research_page.TINYFEZ.1"),
-                        new ResearchPage((IArcaneRecipe) recipes.get("TinyFez")))
+                        new ResearchPage(recipeArcane("TinyFez")))
                 .setHidden()
                 .setSecondary()
                 .setItemTriggers(new ItemStack(Blocks.WOOL, 1, Short.MAX_VALUE))
@@ -2537,7 +2571,7 @@ public class ConfigResearch {
                 new ItemStack(ConfigItems.itemGolemDecoration, 1, 4))
                 .setPages(
                         new ResearchPage("tc.research_page.TINYDART.1"),
-                        new ResearchPage((IArcaneRecipe) recipes.get("TinyDart")))
+                        new ResearchPage(recipeArcane("TinyDart")))
                 .setHidden()
                 .setSecondary()
                 .setAspectTriggers(Aspect.WEAPON)
@@ -2556,7 +2590,7 @@ public class ConfigResearch {
                 new ItemStack(ConfigItems.itemGolemDecoration, 1, 5))
                 .setPages(
                         new ResearchPage("tc.research_page.TINYVISOR.1"),
-                        new ResearchPage((IArcaneRecipe) recipes.get("TinyVisor")))
+                        new ResearchPage(recipeArcane("TinyVisor")))
                 .setHidden()
                 .setSecondary()
                 .setAspectTriggers(Aspect.ARMOR)
@@ -2575,7 +2609,7 @@ public class ConfigResearch {
                 new ItemStack(ConfigItems.itemGolemDecoration, 1, 6))
                 .setPages(
                         new ResearchPage("tc.research_page.TINYARMOR.1"),
-                        new ResearchPage((IArcaneRecipe) recipes.get("TinyArmor")))
+                        new ResearchPage(recipeArcane("TinyArmor")))
                 .setHidden()
                 .setSecondary()
                 .setAspectTriggers(Aspect.ARMOR)
@@ -2594,7 +2628,7 @@ public class ConfigResearch {
                 new ItemStack(ConfigItems.itemGolemDecoration, 1, 7))
                 .setPages(
                         new ResearchPage("tc.research_page.TINYHAMMER.1"),
-                        new ResearchPage((IArcaneRecipe) recipes.get("TinyHammer")))
+                        new ResearchPage(recipeArcane("TinyHammer")))
                 .setHidden()
                 .setSecondary()
                 .setAspectTriggers(Aspect.WEAPON)
@@ -2721,7 +2755,7 @@ public class ConfigResearch {
                 .setPages(
                         new ResearchPage("tc.research_page.GOLEMSTRAW.1"),
                         new ResearchPage("tc.research_page.GOLEMSTRAW.2"),
-                        new ResearchPage((CrucibleRecipe) recipes.get("GolemStraw")),
+                        new ResearchPage(recipeCrucible("GolemStraw")),
                         new ResearchPage("tc.research_page.GOLEMSTRAW.3"))
                 .setParents("HUNGRYCHEST")
                 .registerResearchItem();
@@ -2737,7 +2771,7 @@ public class ConfigResearch {
                 .setPages(
                         new ResearchPage("tc.research_page.GOLEMBELL.1"),
                         new ResearchPage("tc.research_page.GOLEMBELL.2"),
-                        new ResearchPage((IArcaneRecipe) recipes.get("GolemBell")))
+                        new ResearchPage(recipeArcane("GolemBell")))
                 .setParents("GOLEMSTRAW")
                 .setStub()
                 .registerResearchItem();
@@ -2756,7 +2790,7 @@ public class ConfigResearch {
                 new ItemStack(ConfigItems.itemGolemPlacer, 1, 1))
                 .setPages(
                         new ResearchPage("tc.research_page.GOLEMWOOD.1"),
-                        new ResearchPage((CrucibleRecipe) recipes.get("GolemWood")))
+                        new ResearchPage(recipeCrucible("GolemWood")))
                 .setSecondary()
                 .setParents("GOLEMSTRAW")
                 .registerResearchItem();
@@ -2775,7 +2809,7 @@ public class ConfigResearch {
                 new ItemStack(ConfigItems.itemGolemPlacer, 1, 3))
                 .setPages(
                         new ResearchPage("tc.research_page.GOLEMCLAY.1"),
-                        new ResearchPage((CrucibleRecipe) recipes.get("GolemClay")))
+                        new ResearchPage(recipeCrucible("GolemClay")))
                 .setSecondary()
                 .setConcealed()
                 .setParents("GOLEMWOOD")
@@ -2795,7 +2829,7 @@ public class ConfigResearch {
                 new ItemStack(ConfigItems.itemGolemPlacer, 1, 5))
                 .setPages(
                         new ResearchPage("tc.research_page.GOLEMSTONE.1"),
-                        new ResearchPage((CrucibleRecipe) recipes.get("GolemStone")))
+                        new ResearchPage(recipeCrucible("GolemStone")))
                 .setSecondary()
                 .setConcealed()
                 .setParents("GOLEMCLAY")
@@ -2815,7 +2849,7 @@ public class ConfigResearch {
                 new ItemStack(ConfigItems.itemGolemPlacer, 1, 6))
                 .setPages(
                         new ResearchPage("tc.research_page.GOLEMIRON.1"),
-                        new ResearchPage((CrucibleRecipe) recipes.get("GolemIron")))
+                        new ResearchPage(recipeCrucible("GolemIron")))
                 .setSecondary()
                 .setConcealed()
                 .setParents("GOLEMSTONE")
@@ -2836,7 +2870,7 @@ public class ConfigResearch {
                 new ItemStack(ConfigItems.itemGolemPlacer, 1, 7))
                 .setPages(
                         new ResearchPage("tc.research_page.GOLEMTHAUMIUM.1"),
-                        new ResearchPage((CrucibleRecipe) recipes.get("GolemThaumium")))
+                        new ResearchPage(recipeCrucible("GolemThaumium")))
                 .setConcealed()
                 .setParents("GOLEMIRON", "THAUMIUM")
                 .registerResearchItem();
@@ -2855,8 +2889,8 @@ public class ConfigResearch {
                 new ItemStack(ConfigItems.itemGolemPlacer, 1, 4))
                 .setPages(
                         new ResearchPage("tc.research_page.GOLEMFLESH.1"),
-                        new ResearchPage((IRecipe) recipes.get("BlockFlesh")),
-                        new ResearchPage((CrucibleRecipe) recipes.get("GolemFlesh")))
+                        new ResearchPage(recipeI("BlockFlesh")),
+                        new ResearchPage(recipeCrucible("GolemFlesh")))
                 .setConcealed()
                 .setParents("GOLEMWOOD")
                 .registerResearchItem();
@@ -2878,8 +2912,8 @@ public class ConfigResearch {
                 new ItemStack(ConfigItems.itemGolemPlacer, 1, 2))
                 .setPages(
                         new ResearchPage("tc.research_page.GOLEMTALLOW.1"),
-                        new ResearchPage((IRecipe) recipes.get("BlockTallow")),
-                        new ResearchPage((CrucibleRecipe) recipes.get("GolemTallow")))
+                        new ResearchPage(recipeI("BlockTallow")),
+                        new ResearchPage(recipeCrucible("GolemTallow")))
                 .setConcealed()
                 .setParents("GOLEMCLAY", "TALLOW")
                 .registerResearchItem();
@@ -2894,7 +2928,7 @@ public class ConfigResearch {
                 new ItemStack(ConfigBlocks.blockCosmeticSolid, 1, 9))
                 .setPages(
                         new ResearchPage("tc.research_page.GOLEMFETTER.1"),
-                        new ResearchPage((IArcaneRecipe) recipes.get("GolemFetter")))
+                        new ResearchPage(recipeArcane("GolemFetter")))
                 .setParents("GOLEMSTONE")
                 .setSecondary()
                 .registerResearchItem();
@@ -2909,7 +2943,7 @@ public class ConfigResearch {
                 new ItemStack(ConfigItems.itemGolemUpgrade, 1, 0))
                 .setPages(
                         new ResearchPage("tc.research_page.UPGRADEAIR.1"),
-                        new ResearchPage((IArcaneRecipe) recipes.get("UpgradeAir")))
+                        new ResearchPage(recipeArcane("UpgradeAir")))
                 .setConcealed()
                 .setSecondary()
                 .setParents("GOLEMBELL")
@@ -2925,7 +2959,7 @@ public class ConfigResearch {
                 new ItemStack(ConfigItems.itemGolemUpgrade, 1, 1))
                 .setPages(
                         new ResearchPage("tc.research_page.UPGRADEEARTH.1"),
-                        new ResearchPage((IArcaneRecipe) recipes.get("UpgradeEarth")))
+                        new ResearchPage(recipeArcane("UpgradeEarth")))
                 .setConcealed()
                 .setSecondary()
                 .setParents("GOLEMBELL")
@@ -2941,7 +2975,7 @@ public class ConfigResearch {
                 new ItemStack(ConfigItems.itemGolemUpgrade, 1, 2))
                 .setPages(
                         new ResearchPage("tc.research_page.UPGRADEFIRE.1"),
-                        new ResearchPage((IArcaneRecipe) recipes.get("UpgradeFire")))
+                        new ResearchPage(recipeArcane("UpgradeFire")))
                 .setConcealed()
                 .setSecondary()
                 .setParents("GOLEMBELL")
@@ -2957,7 +2991,7 @@ public class ConfigResearch {
                 new ItemStack(ConfigItems.itemGolemUpgrade, 1, 3))
                 .setPages(
                         new ResearchPage("tc.research_page.UPGRADEWATER.1"),
-                        new ResearchPage((IArcaneRecipe) recipes.get("UpgradeWater")))
+                        new ResearchPage(recipeArcane("UpgradeWater")))
                 .setConcealed()
                 .setSecondary()
                 .setParents("GOLEMBELL")
@@ -2973,7 +3007,7 @@ public class ConfigResearch {
                 new ItemStack(ConfigItems.itemGolemUpgrade, 1, 4))
                 .setPages(
                         new ResearchPage("tc.research_page.UPGRADEORDER.1"),
-                        new ResearchPage((IArcaneRecipe) recipes.get("UpgradeOrder")))
+                        new ResearchPage(recipeArcane("UpgradeOrder")))
                 .setConcealed()
                 .setSecondary()
                 .setParents("GOLEMBELL")
@@ -2989,7 +3023,7 @@ public class ConfigResearch {
                 new ItemStack(ConfigItems.itemGolemUpgrade, 1, 5))
                 .setPages(
                         new ResearchPage("tc.research_page.UPGRADEENTROPY.1"),
-                        new ResearchPage((IArcaneRecipe) recipes.get("UpgradeEntropy")))
+                        new ResearchPage(recipeArcane("UpgradeEntropy")))
                 .setConcealed()
                 .setSecondary()
                 .setParents("GOLEMBELL")
@@ -3009,7 +3043,7 @@ public class ConfigResearch {
                 new ItemStack(ConfigItems.itemTrunkSpawner))
                 .setPages(
                         new ResearchPage("tc.research_page.TRAVELTRUNK.1"),
-                        new ResearchPage((InfusionRecipe) recipes.get("TravelTrunk")),
+                        new ResearchPage(recipeInfusion("TravelTrunk")),
                         new ResearchPage("tc.research_page.TRAVELTRUNK.2"),
                         new ResearchPage("UPGRADEAIR", "tc.research_page.TRAVELTRUNK.UAI"),
                         new ResearchPage("UPGRADEEARTH", "tc.research_page.TRAVELTRUNK.UEA"),
@@ -3031,7 +3065,7 @@ public class ConfigResearch {
                 new ItemStack(ConfigItems.itemGolemCore, 1, 2))
                 .setPages(
                         new ResearchPage("tc.research_page.COREGATHER.1"),
-                        new ResearchPage((IArcaneRecipe) recipes.get("CoreBlank")),
+                        new ResearchPage(recipeArcane("CoreBlank")),
                         new ResearchPage("tc.research_page.COREGATHER.2"))
                 .setConcealed()
                 .setParents("GOLEMSTRAW")
@@ -3048,7 +3082,7 @@ public class ConfigResearch {
                 new ItemStack(ConfigItems.itemGolemCore, 1, 0))
                 .setPages(
                         new ResearchPage("tc.research_page.COREFILL.1"),
-                        new ResearchPage((CrucibleRecipe) recipes.get("CoreFill")))
+                        new ResearchPage(recipeCrucible("CoreFill")))
                 .setConcealed()
                 .setSecondary()
                 .setParents("COREGATHER")
@@ -3064,7 +3098,7 @@ public class ConfigResearch {
                 new ItemStack(ConfigItems.itemGolemCore, 1, 1))
                 .setPages(
                         new ResearchPage("tc.research_page.COREEMPTY.1"),
-                        new ResearchPage((CrucibleRecipe) recipes.get("CoreEmpty")))
+                        new ResearchPage(recipeCrucible("CoreEmpty")))
                 .setConcealed()
                 .setSecondary()
                 .setParents("COREGATHER")
@@ -3084,7 +3118,7 @@ public class ConfigResearch {
                 new ItemStack(ConfigItems.itemGolemCore, 1, 10))
                 .setPages(
                         new ResearchPage("tc.research_page.CORESORTING.1"),
-                        new ResearchPage((InfusionRecipe) recipes.get("CoreSorting")))
+                        new ResearchPage(recipeInfusion("CoreSorting")))
                 .setConcealed()
                 .setSecondary()
                 .setParents("COREEMPTY", "COREFILL", "INFUSION")
@@ -3105,7 +3139,7 @@ public class ConfigResearch {
                 .setPages(
                         new ResearchPage("tc.research_page.COREUSE.1"),
                         new ResearchPage("tc.research_page.COREUSE.2"),
-                        new ResearchPage((InfusionRecipe) recipes.get("CoreUse")),
+                        new ResearchPage(recipeInfusion("CoreUse")),
                         new ResearchPage("UPGRADEAIR", "tc.research_page.COREUSE.3"))
                 .setConcealed()
                 .setParents("COREEMPTY", "INFUSION")
@@ -3124,7 +3158,7 @@ public class ConfigResearch {
                 new ItemStack(ConfigItems.itemGolemCore, 1, 3))
                 .setPages(
                         new ResearchPage("tc.research_page.COREHARVEST.1"),
-                        new ResearchPage((CrucibleRecipe) recipes.get("CoreHarvest")),
+                        new ResearchPage(recipeCrucible("CoreHarvest")),
                         new ResearchPage("UPGRADEORDER", "tc.research_page.COREHARVEST.2"))
                 .setConcealed()
                 .setParents("COREGATHER")
@@ -3144,7 +3178,7 @@ public class ConfigResearch {
                 new ItemStack(ConfigItems.itemGolemCore, 1, 11))
                 .setPages(
                         new ResearchPage("tc.research_page.COREFISHING.1"),
-                        new ResearchPage((InfusionRecipe) recipes.get("CoreFishing")),
+                        new ResearchPage(recipeInfusion("CoreFishing")),
                         new ResearchPage("UPGRADEAIR", "tc.research_page.COREFISHING.2"),
                         new ResearchPage("UPGRADEFIRE", "tc.research_page.COREFISHING.3"),
                         new ResearchPage("UPGRADEORDER", "tc.research_page.COREFISHING.4"),
@@ -3168,7 +3202,7 @@ public class ConfigResearch {
                 new ItemStack(ConfigItems.itemGolemCore, 1, 7))
                 .setPages(
                         new ResearchPage("tc.research_page.CORELUMBER.1"),
-                        new ResearchPage((InfusionRecipe) recipes.get("CoreLumber")))
+                        new ResearchPage(recipeInfusion("CoreLumber")))
                 .setConcealed()
                 .setSecondary()
                 .setParents("COREHARVEST", "ELEMENTALAXE")
@@ -3187,7 +3221,7 @@ public class ConfigResearch {
                 new ItemStack(ConfigItems.itemGolemCore, 1, 4))
                 .setPages(
                         new ResearchPage("tc.research_page.COREGUARD.1"),
-                        new ResearchPage((CrucibleRecipe) recipes.get("CoreGuard")),
+                        new ResearchPage(recipeCrucible("CoreGuard")),
                         new ResearchPage("UPGRADEORDER", "tc.research_page.COREGUARD.2"))
                 .setConcealed()
                 .setParents("COREGATHER")
@@ -3207,7 +3241,7 @@ public class ConfigResearch {
                 new ItemStack(ConfigItems.itemGolemCore, 1, 9))
                 .setPages(
                         new ResearchPage("tc.research_page.COREBUTCHER.1"),
-                        new ResearchPage((CrucibleRecipe) recipes.get("CoreButcher")))
+                        new ResearchPage(recipeCrucible("CoreButcher")))
                 .setConcealed()
                 .setSecondary()
                 .setParents("COREGUARD", "COREHARVEST")
@@ -3226,7 +3260,7 @@ public class ConfigResearch {
                 new ItemStack(ConfigItems.itemGolemCore, 1, 5))
                 .setPages(
                         new ResearchPage("tc.research_page.CORELIQUID.1"),
-                        new ResearchPage((CrucibleRecipe) recipes.get("CoreLiquid")),
+                        new ResearchPage(recipeCrucible("CoreLiquid")),
                         new ResearchPage("UPGRADEENTROPY", "tc.research_page.CORELIQUID.2"))
                 .setConcealed()
                 .setParents("COREFILL")
@@ -3246,7 +3280,7 @@ public class ConfigResearch {
                 new ItemStack(ConfigItems.itemGolemCore, 1, 6))
                 .setPages(
                         new ResearchPage("tc.research_page.COREALCHEMY.1"),
-                        new ResearchPage((InfusionRecipe) recipes.get("CoreAlchemy")),
+                        new ResearchPage(recipeInfusion("CoreAlchemy")),
                         new ResearchPage("tc.research_page.COREALCHEMY.2"))
                 .setConcealed()
                 .setSecondary()
@@ -3267,7 +3301,7 @@ public class ConfigResearch {
                 new ItemStack(ConfigItems.itemGolemPlacer, 1, 8))
                 .setPages(
                         new ResearchPage("tc.research_page.ADVANCEDGOLEM.1"),
-                        new ResearchPage((InfusionRecipe) recipes.get("AdvancedGolem")))
+                        new ResearchPage(recipeInfusion("AdvancedGolem")))
                 .setConcealed()
                 .setParents(
                         "INFUSION",
@@ -3291,11 +3325,11 @@ public class ConfigResearch {
                 new ItemStack(ConfigItems.itemResource, 1, 15))
                 .setPages(
                         new ResearchPage("tc.research_page.BASICARTIFACE.1"),
-                        new ResearchPage((IArcaneRecipe) recipes.get("PrimalCharm")),
-                        new ResearchPage((IRecipe) recipes.get("MundaneAmulet")),
-                        new ResearchPage((IRecipe) recipes.get("MundaneRing")),
-                        new ResearchPage((IRecipe) recipes.get("MundaneBelt")),
-                        new ResearchPage((IArcaneRecipe) recipes.get("MirrorGlass")))
+                        new ResearchPage(recipeArcane("PrimalCharm")),
+                        new ResearchPage(recipeI("MundaneAmulet")),
+                        new ResearchPage(recipeI("MundaneRing")),
+                        new ResearchPage(recipeI("MundaneBelt")),
+                        new ResearchPage(recipeArcane("MirrorGlass")))
                 .setStub()
                 .setRound()
                 .setAutoUnlock()
@@ -3315,7 +3349,7 @@ public class ConfigResearch {
                 new ItemStack(ConfigBlocks.blockStoneDevice, 1, 14))
                 .setPages(
                         new ResearchPage("tc.research_page.FLUXSCRUB.1"),
-                        new ResearchPage((IArcaneRecipe) recipes.get("FluxScrubber")))
+                        new ResearchPage(recipeArcane("FluxScrubber")))
                 .setParentsHidden("INFUSION")
                 .setParents("VISPOWER", "BELLOWS", "TUBES")
                 .setSecondary()
@@ -3333,7 +3367,7 @@ public class ConfigResearch {
                 new ItemStack(ConfigItems.itemResource, 1, 4))
                 .setPages(
                         new ResearchPage("tc.research_page.TALLOW.1"),
-                        new ResearchPage((CrucibleRecipe) recipes.get("Tallow")))
+                        new ResearchPage(recipeCrucible("Tallow")))
                 .setParents("CRUCIBLE")
                 .registerResearchItem();
 
@@ -3694,7 +3728,7 @@ public class ConfigResearch {
                 new ItemStack(ConfigBlocks.blockStoneDevice, 1, 12))
                 .setPages(
                         new ResearchPage("tc.research_page.ARCANESPA.1"),
-                        new ResearchPage((IArcaneRecipe) recipes.get("ArcaneSpa")))
+                        new ResearchPage(recipeArcane("ArcaneSpa")))
                 .setSecondary()
                 .setParents("BATHSALTS")
                 .registerResearchItem();
@@ -3709,7 +3743,7 @@ public class ConfigResearch {
                 new ItemStack(ConfigBlocks.blockJar))
                 .setPages(
                         new ResearchPage("tc.research_page.JARLABEL.1"),
-                        new ResearchPage((IArcaneRecipe) recipes.get("WardedJar")),
+                        new ResearchPage(recipeArcane("WardedJar")),
                         new ResearchPage("tc.research_page.JARLABEL.2"),
                         new ResearchPage("tc.research_page.JARLABEL.3"))
                 .setParents("DISTILESSENTIA")
@@ -3727,7 +3761,7 @@ public class ConfigResearch {
                 new ItemStack(ConfigBlocks.blockJar, 1, 3))
                 .setPages(
                         new ResearchPage("tc.research_page.JARVOID.1"),
-                        new ResearchPage((IArcaneRecipe) recipes.get("JarVoid")))
+                        new ResearchPage(recipeArcane("JarVoid")))
                 .setParents("JARLABEL")
                 .setSecondary()
                 .setConcealed()
@@ -3754,7 +3788,7 @@ public class ConfigResearch {
                 new ResourceLocation("thaumcraft", "textures/misc/r_eldritchminor.png"))
                 .setPages(
                         new ResearchPage("tc.research_page.ELDRITCHMINOR.1"),
-                        new ResearchPage((CrucibleRecipe) recipes.get("VoidSeed")))
+                        new ResearchPage(recipeCrucible("VoidSeed")))
                 .setHidden()
                 .setRound()
                 .setSpecial()
@@ -3775,7 +3809,7 @@ public class ConfigResearch {
                 new ItemStack(ConfigItems.itemEldritchObject, 1, 0))
                 .setPages(
                         new ResearchPage("tc.research_page.OCULUS.1"),
-                        new ResearchPage((InfusionRecipe) recipes.get("EldritchEye")),
+                        new ResearchPage(recipeInfusion("EldritchEye")),
                         new ResearchPage("tc.research_page.OCULUS.2"))
                 .setRound()
                 .setConcealed()
@@ -3875,9 +3909,9 @@ public class ConfigResearch {
                 new ItemStack(ConfigBlocks.blockMetalDevice, 1, 3))
                 .setPages(
                         new ResearchPage("tc.research_page.ADVALCHEMYFURNACE.1"),
-                        new ResearchPage((IArcaneRecipe) recipes.get("AdvAlchemyConstruct")),
+                        new ResearchPage(recipeArcane("AdvAlchemyConstruct")),
                         new ResearchPage("tc.research_page.ADVALCHEMYFURNACE.2"),
-                        new ResearchPage((List<?>) recipes.get("AdvAlchemyFurnace")))
+                        new ResearchPage(recipeList("AdvAlchemyFurnace")))
                 .setSecondary()
                 .setParents("PRIMPEARL", "DISTILESSENTIA", "VISPOWER")
                 .registerResearchItem();
@@ -3899,7 +3933,7 @@ public class ConfigResearch {
                 new ItemStack(ConfigItems.itemPrimalCrusher))
                 .setPages(
                         new ResearchPage("tc.research_page.PRIMALCRUSHER.1"),
-                        new ResearchPage((InfusionRecipe) recipes.get("PrimalCrusher")),
+                        new ResearchPage(recipeInfusion("PrimalCrusher")),
                         new ResearchPage("tc.research_page.PRIMALCRUSHER.2"))
                 .setConcealed()
                 .setParents("PRIMPEARL")
@@ -3920,7 +3954,7 @@ public class ConfigResearch {
                 new ItemStack(ConfigItems.itemResource, 1, 16))
                 .setPages(
                         new ResearchPage("tc.research_page.VOIDMETAL.1"),
-                        new ResearchPage((CrucibleRecipe) recipes.get("VoidMetal")),
+                        new ResearchPage(recipeCrucible("VoidMetal")),
                         new ResearchPage("tc.research_page.VOIDMETAL.2"))
                 .setParents("THAUMIUM", "ELDRITCHMINOR")
                 .registerResearchItem();
@@ -3940,7 +3974,7 @@ public class ConfigResearch {
                 new ItemStack(ConfigBlocks.blockEssentiaReservoir))
                 .setPages(
                         new ResearchPage("tc.research_page.ESSENTIARESERVOIR.1"),
-                        new ResearchPage((InfusionRecipe) recipes.get("EssentiaReservoir")),
+                        new ResearchPage(recipeInfusion("EssentiaReservoir")),
                         new ResearchPage("tc.research_page.ESSENTIARESERVOIR.2"))
                 .setParents("VOIDMETAL", "CENTRIFUGE", "INFUSION")
                 .registerResearchItem();
@@ -3960,8 +3994,8 @@ public class ConfigResearch {
                 new ItemStack(ConfigItems.itemWandCap, 1, 7))
                 .setPages(
                         new ResearchPage("tc.research_page.CAP_void.1"),
-                        new ResearchPage((IArcaneRecipe) recipes.get("WandCapVoidInert")),
-                        new ResearchPage((InfusionRecipe) recipes.get("WandCapVoid")))
+                        new ResearchPage(recipeArcane("WandCapVoidInert")),
+                        new ResearchPage(recipeInfusion("WandCapVoid")))
                 .setConcealed()
                 .setParents("CAP_thaumium", "VOIDMETAL")
                 .registerResearchItem();
@@ -3982,9 +4016,9 @@ public class ConfigResearch {
                 new ItemStack(ConfigItems.itemHelmVoidRobe))
                 .setPages(
                         new ResearchPage("tc.research_page.ARMORVOIDFORTRESS.1"),
-                        new ResearchPage((InfusionRecipe) recipes.get("VoidRobeHelm")),
-                        new ResearchPage((InfusionRecipe) recipes.get("VoidRobeChest")),
-                        new ResearchPage((InfusionRecipe) recipes.get("VoidRobeLegs")))
+                        new ResearchPage(recipeInfusion("VoidRobeHelm")),
+                        new ResearchPage(recipeInfusion("VoidRobeChest")),
+                        new ResearchPage(recipeInfusion("VoidRobeLegs")))
                 .setParents("VOIDMETAL", "ENCHFABRIC", "ELDRITCHMAJOR")
                 .setConcealed()
                 .setSecondary()
@@ -4007,7 +4041,7 @@ public class ConfigResearch {
                 new ItemStack(ConfigItems.focusPrimal))
                 .setPages(
                         new ResearchPage("tc.research_page.FOCUSPRIMAL.1"),
-                        new ResearchPage((IArcaneRecipe) recipes.get("FocusPrimal")))
+                        new ResearchPage(recipeArcane("FocusPrimal")))
                 .setConcealed()
                 .setParents("ELDRITCHMINOR")
                 .registerResearchItem();
@@ -4027,7 +4061,7 @@ public class ConfigResearch {
                 new ItemStack(ConfigItems.itemSanityChecker))
                 .setPages(
                         new ResearchPage("tc.research_page.SANITYCHECK.1"),
-                        new ResearchPage((InfusionRecipe) recipes.get("SanityCheck")))
+                        new ResearchPage(recipeInfusion("SanityCheck")))
                 .setParents("ELDRITCHMINOR")
                 .registerResearchItem();
 
@@ -4049,7 +4083,7 @@ public class ConfigResearch {
                 new ItemStack(ConfigItems.itemWandRod, 1, 100))
                 .setPages(
                         new ResearchPage("tc.research_page.ROD_primal_staff.1"),
-                        new ResearchPage((InfusionRecipe) recipes.get("WandRodPrimalStaff")))
+                        new ResearchPage(recipeInfusion("WandRodPrimalStaff")))
                 .setHidden()
                 .setEntityTriggers("Thaumcraft.PrimalOrb")
                 .setItemTriggers(new ItemStack(ConfigItems.focusPrimal))
