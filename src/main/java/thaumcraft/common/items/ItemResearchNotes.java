@@ -155,7 +155,7 @@ public class ItemResearchNotes extends Item {
         }
 
         player.sendStatusMessage(new TextComponentTranslation("tc.researchnotes.invalid"), true);
-        return new ActionResult<>(EnumActionResult.FAIL, stack);
+        return new ActionResult<>(EnumActionResult.PASS, stack);
     }
 
     private static void play(World world, EntityPlayer player, net.minecraft.util.SoundEvent sound) {

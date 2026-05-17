@@ -36,6 +36,9 @@ public class ItemResearchNotesCoreContractsStaticGuardTest {
         assertTrue("ItemResearchNotes must keep PASS result when requisites are missing",
                 source.contains("new TextComponentTranslation(\"tc.researcherror\")")
                         && source.contains("return new ActionResult<>(EnumActionResult.PASS, stack);"));
+        assertTrue("ItemResearchNotes must keep PASS result on invalid hidden-discovery note fallback",
+                source.contains("new TextComponentTranslation(\"tc.researchnotes.invalid\")")
+                        && source.contains("return new ActionResult<>(EnumActionResult.PASS, stack);"));
         assertTrue("ItemResearchNotes must consume note stack on successful completion/discovery-fail flows",
                 source.contains("stack.shrink(1);")
                         && source.contains("play(world, player, TCSounds.LEARN);")
