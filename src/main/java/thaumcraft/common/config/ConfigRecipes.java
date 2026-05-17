@@ -1,7 +1,10 @@
 package thaumcraft.common.config;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Enchantments;
 import net.minecraft.init.Items;
@@ -34,6 +37,8 @@ import thaumcraft.common.items.armor.RecipesVoidRobeArmorDyes;
 
 public class ConfigRecipes {
     private static boolean specialRecipesRegistered = false;
+    private static final Map<String, IRecipe> specialResearchRecipeHandles = new LinkedHashMap<String, IRecipe>();
+    private static final List<IRecipe> recipeJarLabelAspects = new ArrayList<IRecipe>();
     private static IRecipe recipeArcaneStone2;
     private static IRecipe recipeArcaneStone3;
     private static IRecipe recipeArcaneStone4;
@@ -164,6 +169,48 @@ public class ConfigRecipes {
                                 new ItemStack(Blocks.NETHERRACK), new ItemStack(Blocks.OBSIDIAN), new ItemStack(Blocks.NETHERRACK),
                                 new ItemStack(Blocks.OBSIDIAN), new ItemStack(Blocks.OBSIDIAN), new ItemStack(Blocks.OBSIDIAN),
                                 new ItemStack(Blocks.NETHERRACK), new ItemStack(Blocks.OBSIDIAN), new ItemStack(Blocks.NETHERRACK))));
+        ConfigResearch.recipes.put("InfusionAltar",
+                Arrays.asList(
+                        new AspectList().add(Aspect.FIRE, 25).add(Aspect.EARTH, 25).add(Aspect.ORDER, 25)
+                                .add(Aspect.AIR, 25).add(Aspect.ENTROPY, 25).add(Aspect.WATER, 25),
+                        3,
+                        3,
+                        3,
+                        Arrays.asList(
+                                ItemStack.EMPTY, null, ItemStack.EMPTY,
+                                null, new ItemStack(ConfigBlocks.blockStoneDevice, 1, 2), null,
+                                ItemStack.EMPTY, null, ItemStack.EMPTY,
+
+                                new ItemStack(ConfigBlocks.blockCosmeticSolid, 1, 6), null, new ItemStack(ConfigBlocks.blockCosmeticSolid, 1, 6),
+                                null, null, null,
+                                new ItemStack(ConfigBlocks.blockCosmeticSolid, 1, 6), null, new ItemStack(ConfigBlocks.blockCosmeticSolid, 1, 6),
+
+                                new ItemStack(ConfigBlocks.blockCosmeticSolid, 1, 7), null, new ItemStack(ConfigBlocks.blockCosmeticSolid, 1, 7),
+                                null, new ItemStack(ConfigBlocks.blockStoneDevice, 1, 1), null,
+                                new ItemStack(ConfigBlocks.blockCosmeticSolid, 1, 7), null, new ItemStack(ConfigBlocks.blockCosmeticSolid, 1, 7))));
+        ConfigResearch.recipes.put("NodeJar",
+                Arrays.asList(
+                        new AspectList().add(Aspect.FIRE, 70).add(Aspect.EARTH, 70).add(Aspect.AIR, 70)
+                                .add(Aspect.WATER, 70).add(Aspect.ORDER, 70).add(Aspect.ENTROPY, 70),
+                        3,
+                        4,
+                        3,
+                        Arrays.asList(
+                                "slabWood", "slabWood", "slabWood",
+                                "slabWood", "slabWood", "slabWood",
+                                "slabWood", "slabWood", "slabWood",
+
+                                new ItemStack(Blocks.GLASS), new ItemStack(Blocks.GLASS), new ItemStack(Blocks.GLASS),
+                                new ItemStack(Blocks.GLASS), new ItemStack(Blocks.GLASS), new ItemStack(Blocks.GLASS),
+                                new ItemStack(Blocks.GLASS), new ItemStack(Blocks.GLASS), new ItemStack(Blocks.GLASS),
+
+                                new ItemStack(Blocks.GLASS), new ItemStack(Blocks.GLASS), new ItemStack(Blocks.GLASS),
+                                new ItemStack(Blocks.GLASS), new ItemStack(ConfigBlocks.blockAiry, 1, 5), new ItemStack(Blocks.GLASS),
+                                new ItemStack(Blocks.GLASS), new ItemStack(Blocks.GLASS), new ItemStack(Blocks.GLASS),
+
+                                new ItemStack(Blocks.GLASS), new ItemStack(Blocks.GLASS), new ItemStack(Blocks.GLASS),
+                                new ItemStack(Blocks.GLASS), new ItemStack(Blocks.GLASS), new ItemStack(Blocks.GLASS),
+                                new ItemStack(Blocks.GLASS), new ItemStack(Blocks.GLASS), new ItemStack(Blocks.GLASS))));
         ConfigResearch.recipes.put("Thaumatorium",
                 Arrays.asList(
                         new AspectList().add(Aspect.FIRE, 15).add(Aspect.ORDER, 30).add(Aspect.WATER, 30),
@@ -297,6 +344,17 @@ public class ConfigRecipes {
                                     "KKK",
                                     'K', new ItemStack(ConfigItems.itemResource, 1, 4)
                             }));
+        }
+        for (Map.Entry<String, IRecipe> entry : specialResearchRecipeHandles.entrySet()) {
+            if (entry.getValue() != null) {
+                ConfigResearch.recipes.put(entry.getKey(), entry.getValue());
+            }
+        }
+        for (int i = 0; i < recipeJarLabelAspects.size(); i++) {
+            IRecipe recipe = recipeJarLabelAspects.get(i);
+            if (recipe != null) {
+                ConfigResearch.recipes.put("JarLabel" + i, recipe);
+            }
         }
 
         boolean hasArcaneWand = false;
@@ -2301,6 +2359,8 @@ public class ConfigRecipes {
         if (specialRecipesRegistered) {
             return;
         }
+        specialResearchRecipeHandles.clear();
+        recipeJarLabelAspects.clear();
         registry.register(new RecipesRobeArmorDyes().setRegistryName("thaumcraft", "robearmordye"));
         registry.register(new RecipesVoidRobeArmorDyes().setRegistryName("thaumcraft", "voidrobearmordye"));
         recipeArcaneStone2 = new ShapedOreRecipe(null,
@@ -2494,6 +2554,7 @@ public class ConfigRecipes {
                 Items.PAPER)
                 .setRegistryName("thaumcraft", "jarlabel");
         registry.register(recipeJarLabel);
+        specialResearchRecipeHandles.put("JarLabel", recipeJarLabel);
 
         for (Aspect aspect : Aspect.aspects.values()) {
             if (aspect == null) {
@@ -2513,6 +2574,7 @@ public class ConfigRecipes {
                     essence)
                     .setRegistryName("thaumcraft", "jarlabel_" + aspect.getTag().toLowerCase());
             registry.register(recipeJarLabelAspect);
+            recipeJarLabelAspects.add(recipeJarLabelAspect);
         }
 
         ItemStack recipeJarLabelNullInput = new ItemStack(ConfigItems.itemResource, 1, 13);
@@ -2525,6 +2587,7 @@ public class ConfigRecipes {
                 recipeJarLabelNullInput)
                 .setRegistryName("thaumcraft", "jarlabelnull");
         registry.register(recipeJarLabelNull);
+        specialResearchRecipeHandles.put("JarLabelNull", recipeJarLabelNull);
 
         IRecipe recipeBlockThaumium = new ShapedOreRecipe(
                 null,
@@ -2535,6 +2598,7 @@ public class ConfigRecipes {
                 'K', "ingotThaumium")
                 .setRegistryName("thaumcraft", "blockthaumium");
         registry.register(recipeBlockThaumium);
+        specialResearchRecipeHandles.put("BlockThaumium", recipeBlockThaumium);
 
         IRecipe recipeBlockThaumiumDecompose = new ShapedOreRecipe(
                 null,
@@ -2552,6 +2616,7 @@ public class ConfigRecipes {
                 'I', "ingotThaumium")
                 .setRegistryName("thaumcraft", "thaumiumhelm");
         registry.register(recipeThaumiumHelm);
+        specialResearchRecipeHandles.put("ThaumiumHelm", recipeThaumiumHelm);
 
         IRecipe recipeThaumiumChest = new ShapedOreRecipe(
                 null,
@@ -2562,6 +2627,7 @@ public class ConfigRecipes {
                 'I', "ingotThaumium")
                 .setRegistryName("thaumcraft", "thaumiumchest");
         registry.register(recipeThaumiumChest);
+        specialResearchRecipeHandles.put("ThaumiumChest", recipeThaumiumChest);
 
         IRecipe recipeThaumiumLegs = new ShapedOreRecipe(
                 null,
@@ -2572,6 +2638,7 @@ public class ConfigRecipes {
                 'I', "ingotThaumium")
                 .setRegistryName("thaumcraft", "thaumiumlegs");
         registry.register(recipeThaumiumLegs);
+        specialResearchRecipeHandles.put("ThaumiumLegs", recipeThaumiumLegs);
 
         IRecipe recipeThaumiumBoots = new ShapedOreRecipe(
                 null,
@@ -2581,6 +2648,7 @@ public class ConfigRecipes {
                 'I', "ingotThaumium")
                 .setRegistryName("thaumcraft", "thaumiumboots");
         registry.register(recipeThaumiumBoots);
+        specialResearchRecipeHandles.put("ThaumiumBoots", recipeThaumiumBoots);
 
         IRecipe recipeThaumiumShovel = new ShapedOreRecipe(
                 null,
@@ -2592,6 +2660,7 @@ public class ConfigRecipes {
                 'S', "stickWood")
                 .setRegistryName("thaumcraft", "thaumiumshovel");
         registry.register(recipeThaumiumShovel);
+        specialResearchRecipeHandles.put("ThaumiumShovel", recipeThaumiumShovel);
 
         IRecipe recipeThaumiumPick = new ShapedOreRecipe(
                 null,
@@ -2603,6 +2672,7 @@ public class ConfigRecipes {
                 'S', "stickWood")
                 .setRegistryName("thaumcraft", "thaumiumpick");
         registry.register(recipeThaumiumPick);
+        specialResearchRecipeHandles.put("ThaumiumPick", recipeThaumiumPick);
 
         IRecipe recipeThaumiumAxe = new ShapedOreRecipe(
                 null,
@@ -2614,6 +2684,7 @@ public class ConfigRecipes {
                 'S', "stickWood")
                 .setRegistryName("thaumcraft", "thaumiumaxe");
         registry.register(recipeThaumiumAxe);
+        specialResearchRecipeHandles.put("ThaumiumAxe", recipeThaumiumAxe);
 
         IRecipe recipeThaumiumHoe = new ShapedOreRecipe(
                 null,
@@ -2625,6 +2696,7 @@ public class ConfigRecipes {
                 'S', "stickWood")
                 .setRegistryName("thaumcraft", "thaumiumhoe");
         registry.register(recipeThaumiumHoe);
+        specialResearchRecipeHandles.put("ThaumiumHoe", recipeThaumiumHoe);
 
         IRecipe recipeThaumiumSword = new ShapedOreRecipe(
                 null,
@@ -2636,6 +2708,7 @@ public class ConfigRecipes {
                 'S', "stickWood")
                 .setRegistryName("thaumcraft", "thaumiumsword");
         registry.register(recipeThaumiumSword);
+        specialResearchRecipeHandles.put("ThaumiumSword", recipeThaumiumSword);
 
         IRecipe recipeVoidHelm = new ShapedOreRecipe(
                 null,
@@ -2645,6 +2718,7 @@ public class ConfigRecipes {
                 'I', "ingotVoid")
                 .setRegistryName("thaumcraft", "voidhelm");
         registry.register(recipeVoidHelm);
+        specialResearchRecipeHandles.put("VoidHelm", recipeVoidHelm);
 
         IRecipe recipeVoidChest = new ShapedOreRecipe(
                 null,
@@ -2655,6 +2729,7 @@ public class ConfigRecipes {
                 'I', "ingotVoid")
                 .setRegistryName("thaumcraft", "voidchest");
         registry.register(recipeVoidChest);
+        specialResearchRecipeHandles.put("VoidChest", recipeVoidChest);
 
         IRecipe recipeVoidLegs = new ShapedOreRecipe(
                 null,
@@ -2665,6 +2740,7 @@ public class ConfigRecipes {
                 'I', "ingotVoid")
                 .setRegistryName("thaumcraft", "voidlegs");
         registry.register(recipeVoidLegs);
+        specialResearchRecipeHandles.put("VoidLegs", recipeVoidLegs);
 
         IRecipe recipeVoidBoots = new ShapedOreRecipe(
                 null,
@@ -2674,6 +2750,7 @@ public class ConfigRecipes {
                 'I', "ingotVoid")
                 .setRegistryName("thaumcraft", "voidboots");
         registry.register(recipeVoidBoots);
+        specialResearchRecipeHandles.put("VoidBoots", recipeVoidBoots);
 
         IRecipe recipeVoidShovel = new ShapedOreRecipe(
                 null,
@@ -2685,6 +2762,7 @@ public class ConfigRecipes {
                 'S', "stickWood")
                 .setRegistryName("thaumcraft", "voidshovel");
         registry.register(recipeVoidShovel);
+        specialResearchRecipeHandles.put("VoidShovel", recipeVoidShovel);
 
         IRecipe recipeVoidPick = new ShapedOreRecipe(
                 null,
@@ -2696,6 +2774,7 @@ public class ConfigRecipes {
                 'S', "stickWood")
                 .setRegistryName("thaumcraft", "voidpick");
         registry.register(recipeVoidPick);
+        specialResearchRecipeHandles.put("VoidPick", recipeVoidPick);
 
         IRecipe recipeVoidAxe = new ShapedOreRecipe(
                 null,
@@ -2707,6 +2786,7 @@ public class ConfigRecipes {
                 'S', "stickWood")
                 .setRegistryName("thaumcraft", "voidaxe");
         registry.register(recipeVoidAxe);
+        specialResearchRecipeHandles.put("VoidAxe", recipeVoidAxe);
 
         IRecipe recipeVoidHoe = new ShapedOreRecipe(
                 null,
@@ -2718,6 +2798,7 @@ public class ConfigRecipes {
                 'S', "stickWood")
                 .setRegistryName("thaumcraft", "voidhoe");
         registry.register(recipeVoidHoe);
+        specialResearchRecipeHandles.put("VoidHoe", recipeVoidHoe);
 
         IRecipe recipeVoidSword = new ShapedOreRecipe(
                 null,
@@ -2729,6 +2810,7 @@ public class ConfigRecipes {
                 'S', "stickWood")
                 .setRegistryName("thaumcraft", "voidsword");
         registry.register(recipeVoidSword);
+        specialResearchRecipeHandles.put("VoidSword", recipeVoidSword);
 
         IRecipe recipeQuicksilverFromPlant = new ShapedOreRecipe(
                 null,
