@@ -22,6 +22,9 @@ import thaumcraft.api.aspects.AspectList;
 import thaumcraft.api.wands.FocusUpgradeType;
 import thaumcraft.api.wands.IWandTriggerManager;
 import thaumcraft.api.wands.ItemFocusBasic;
+import thaumcraft.api.nodes.INode;
+import thaumcraft.api.nodes.NodeModifier;
+import thaumcraft.api.nodes.NodeType;
 import thaumcraft.common.config.Config;
 import thaumcraft.common.config.ConfigBlocks;
 import thaumcraft.common.config.ConfigItems;
@@ -34,10 +37,13 @@ import thaumcraft.common.lib.network.fx.PacketFXBlockSparkle;
 import thaumcraft.common.lib.research.ResearchManager;
 import thaumcraft.common.tiles.TileInfusionMatrix;
 import thaumcraft.common.tiles.TileInfusionPillar;
+import thaumcraft.common.tiles.TileJarNode;
 import thaumcraft.common.tiles.TilePedestal;
 import thaumcraft.common.tiles.TileThaumatorium;
+import net.minecraftforge.oredict.OreDictionary;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -698,7 +704,166 @@ public class WandManager implements IWandTriggerManager {
     }
 
     private static boolean createNodeJar(ItemStack wandStack, EntityPlayer player, World world, int x, int y, int z) {
+        if (wandStack.isEmpty() || !(wandStack.getItem() instanceof ItemWandCasting)) return false;
+        ItemWandCasting wand = (ItemWandCasting) wandStack.getItem();
+        for (int xx = x - 2; xx <= x; xx++) {
+            for (int yy = y - 3; yy <= y; yy++) {
+                for (int zz = z - 2; zz <= z; zz++) {
+                    if (!fitNodeJar(world, xx, yy, zz)
+                            || !wand.consumeAllVisCrafting(wandStack, player,
+                            new AspectList()
+                                    .add(Aspect.FIRE, 70)
+                                    .add(Aspect.EARTH, 70)
+                                    .add(Aspect.ORDER, 70)
+                                    .add(Aspect.AIR, 70)
+                                    .add(Aspect.ENTROPY, 70)
+                                    .add(Aspect.WATER, 70), true)) {
+                        continue;
+                    }
+                    if (!world.isRemote) {
+                        replaceNodeJar(world, xx, yy, zz);
+                        return true;
+                    }
+                    return false;
+                }
+            }
+        }
         return false;
+    }
+
+    private static boolean containsMatch(boolean strict, List<ItemStack> inputs, ItemStack... targets) {
+        for (ItemStack input : inputs) {
+            for (ItemStack target : targets) {
+                if (OreDictionary.itemMatches(input, target, strict)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    private static boolean fitNodeJar(World world, int x, int y, int z) {
+        int[][][] blueprint = new int[][][]{
+                {
+                        {1, 1, 1},
+                        {1, 1, 1},
+                        {1, 1, 1}
+                },
+                {
+                        {2, 2, 2},
+                        {2, 2, 2},
+                        {2, 2, 2}
+                },
+                {
+                        {2, 2, 2},
+                        {2, 3, 2},
+                        {2, 2, 2}
+                },
+                {
+                        {2, 2, 2},
+                        {2, 2, 2},
+                        {2, 2, 2}
+                }
+        };
+        for (int yy = 0; yy < 4; yy++) {
+            for (int xx = 0; xx < 3; xx++) {
+                for (int zz = 0; zz < 3; zz++) {
+                    BlockPos target = new BlockPos(x + xx, y - yy + 2, z + zz);
+                    Block block = world.getBlockState(target).getBlock();
+                    int meta = block.getMetaFromState(world.getBlockState(target));
+                    if (blueprint[yy][xx][zz] == 1
+                            && !containsMatch(false, OreDictionary.getOres("slabWood"), new ItemStack(block, 1, meta))) {
+                        return false;
+                    }
+                    if (blueprint[yy][xx][zz] == 2 && block != Blocks.GLASS) {
+                        return false;
+                    }
+                    if (blueprint[yy][xx][zz] == 3) {
+                        TileEntity tile = world.getTileEntity(target);
+                        if (!(tile instanceof INode) || tile instanceof TileJarNode) {
+                            return false;
+                        }
+                    }
+                }
+            }
+        }
+        return true;
+    }
+
+    private static void replaceNodeJar(World world, int x, int y, int z) {
+        if (world.isRemote) {
+            return;
+        }
+        int[][][] blueprint = new int[][][]{
+                {
+                        {1, 1, 1},
+                        {1, 1, 1},
+                        {1, 1, 1}
+                },
+                {
+                        {2, 2, 2},
+                        {2, 2, 2},
+                        {2, 2, 2}
+                },
+                {
+                        {2, 2, 2},
+                        {2, 3, 2},
+                        {2, 2, 2}
+                },
+                {
+                        {2, 2, 2},
+                        {2, 2, 2},
+                        {2, 2, 2}
+                }
+        };
+        for (int yy = 0; yy < 4; yy++) {
+            for (int xx = 0; xx < 3; xx++) {
+                for (int zz = 0; zz < 3; zz++) {
+                    BlockPos target = new BlockPos(x + xx, y - yy + 2, z + zz);
+                    if (blueprint[yy][xx][zz] == 3) {
+                        TileEntity tile = world.getTileEntity(target);
+                        if (!(tile instanceof INode)) {
+                            continue;
+                        }
+                        INode node = (INode) tile;
+                        AspectList aspects = node.getAspects() != null ? node.getAspects().copy() : new AspectList();
+                        int nodeType = node.getNodeType().ordinal();
+                        int nodeMod = -1;
+                        if (node.getNodeModifier() != null) {
+                            nodeMod = node.getNodeModifier().ordinal();
+                        }
+                        if (world.rand.nextFloat() < 0.75F) {
+                            if (node.getNodeModifier() == null) {
+                                nodeMod = NodeModifier.PALE.ordinal();
+                            } else if (node.getNodeModifier() == NodeModifier.BRIGHT) {
+                                nodeMod = -1;
+                            } else if (node.getNodeModifier() == NodeModifier.PALE) {
+                                nodeMod = NodeModifier.FADING.ordinal();
+                            }
+                        }
+                        String nodeId = node.getId();
+                        node.setAspects(new AspectList());
+                        world.removeTileEntity(target);
+                        world.setBlockState(target, ConfigBlocks.blockJar.getDefaultState().withProperty(thaumcraft.common.blocks.BlockJar.TYPE, 2), 3);
+                        TileEntity newTile = world.getTileEntity(target);
+                        if (newTile instanceof TileJarNode) {
+                            TileJarNode jar = (TileJarNode) newTile;
+                            jar.setAspects(aspects);
+                            if (nodeMod >= 0) {
+                                jar.setNodeModifier(NodeModifier.values()[nodeMod]);
+                            }
+                            jar.setNodeType(NodeType.values()[nodeType]);
+                            jar.setId(nodeId);
+                            jar.markDirty();
+                        }
+                        world.notifyNeighborsOfStateChange(target, ConfigBlocks.blockJar, false);
+                    } else {
+                        world.setBlockToAir(target);
+                    }
+                }
+            }
+        }
+        world.playSound(null, new BlockPos(x, y, z), TCSounds.WAND, SoundCategory.PLAYERS, 1.0F, 1.0F);
     }
 
     private static boolean createOculus(ItemStack wandStack, EntityPlayer player, World world, int x, int y, int z, int side) {

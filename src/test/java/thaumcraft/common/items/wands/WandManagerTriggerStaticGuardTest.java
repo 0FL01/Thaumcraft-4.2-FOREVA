@@ -33,11 +33,13 @@ public class WandManagerTriggerStaticGuardTest {
         assertTrue(source.contains("case 1:"));
         assertTrue(source.contains("case 2:"));
         assertTrue(source.contains("case 3:"));
+        assertTrue(source.contains("case 4:"));
         assertTrue(source.contains("case 5:"));
         assertTrue(source.contains("return createThaumonomicon(wand, player, world, x, y, z);"));
         assertTrue(source.contains("return createCrucible(wand, player, world, x, y, z);"));
         assertTrue(source.contains("return createArcaneFurnace(wand, player, world, x, y, z);"));
         assertTrue(source.contains("return createInfusionAltar(wand, player, world, x, y, z);"));
+        assertTrue(source.contains("return createNodeJar(wand, player, world, x, y, z);"));
         assertTrue(source.contains("return createThaumatorium(wand, player, world, x, y, z, side);"));
         assertTrue(source.contains("public static boolean createThaumonomicon("));
         assertTrue(source.contains("public static boolean createCrucible("));
@@ -46,6 +48,12 @@ public class WandManagerTriggerStaticGuardTest {
         assertTrue(source.contains("private static boolean replaceArcaneFurnace("));
         assertTrue(source.contains("private static boolean fitInfusionAltar("));
         assertTrue(source.contains("private static void replaceInfusionAltar("));
+        assertTrue(source.contains("private static boolean fitNodeJar("));
+        assertTrue(source.contains("private static void replaceNodeJar("));
+        assertTrue(source.contains("private static boolean containsMatch("));
+        assertTrue(source.contains("ConfigBlocks.blockJar.getDefaultState().withProperty(thaumcraft.common.blocks.BlockJar.TYPE, 2)"));
+        assertTrue(source.contains("jar.setNodeType(NodeType.values()[nodeType]);"));
+        assertTrue(source.contains("jar.setId(nodeId);"));
         assertTrue(source.contains("Blocks.NETHER_BRICK_FENCE"));
         assertTrue(source.contains("ConfigBlocks.blockArcaneFurnace.getDefaultState().withProperty(BlockArcaneFurnace.TYPE, meta)"));
         assertTrue(source.contains("ConfigBlocks.blockStoneDevice.getDefaultState().withProperty(thaumcraft.common.blocks.BlockStoneDevice.TYPE, 3)"));
