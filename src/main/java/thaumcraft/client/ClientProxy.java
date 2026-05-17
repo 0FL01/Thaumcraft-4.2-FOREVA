@@ -58,8 +58,12 @@ import thaumcraft.client.fx.other.FXBlockWard;
 import thaumcraft.client.fx.other.FXShieldRunes;
 import thaumcraft.client.fx.other.FXSonic;
 import thaumcraft.client.fx.particles.FXBoreParticles;
+import thaumcraft.client.fx.particles.FXBurst;
 import thaumcraft.client.fx.particles.FXBubble;
 import thaumcraft.client.fx.particles.FXBubbleAlt;
+import thaumcraft.client.fx.particles.FXSparkle;
+import thaumcraft.client.fx.particles.FXWisp;
+import thaumcraft.client.fx.particles.FXWispEG;
 import thaumcraft.client.renderers.entity.RenderFallbackBiped;
 import thaumcraft.client.renderers.entity.RenderFireBat;
 import thaumcraft.client.renderers.entity.RenderGolemBase;
@@ -729,13 +733,7 @@ public class ClientProxy extends CommonProxy {
         if (world == null || !world.isRemote) return;
         int amount = particleCount(Math.max(6, (int) (scale * 12.0f)));
         if (amount <= 0) return;
-
-        for (int i = 0; i < amount; i++) {
-            double mx = (world.rand.nextFloat() - 0.5f) * 0.2f;
-            double my = (world.rand.nextFloat() - 0.5f) * 0.2f;
-            double mz = (world.rand.nextFloat() - 0.5f) * 0.2f;
-            world.spawnParticle(EnumParticleTypes.EXPLOSION_NORMAL, x, y, z, mx, my, mz);
-        }
+        ParticleEngine.addEffect(world, new FXBurst(world, x, y, z, scale, amount));
     }
 
     @Override
@@ -755,29 +753,11 @@ public class ClientProxy extends CommonProxy {
         if (world == null || !world.isRemote) return;
         int amount = particleCount(Math.max(2, (int) (size * 18.0f)));
         if (amount <= 0) return;
-
-        float red = speed;
-        if (red < 0.0f) red = 0.0f;
-        if (red > 1.0f) red = 1.0f;
-        float green = flag ? 0.8f : 0.4f;
-        float blue = 1.0f - red * 0.5f;
-
-        boolean hasTarget = tx != 0.0 || ty != 0.0 || tz != 0.0;
         for (int i = 0; i < amount; i++) {
-            double px;
-            double py;
-            double pz;
-            if (hasTarget) {
-                double t = (double) i / (double) amount;
-                px = x + (tx - x) * t + (world.rand.nextFloat() - 0.5f) * 0.12f;
-                py = y + (ty - y) * t + (world.rand.nextFloat() - 0.5f) * 0.12f;
-                pz = z + (tz - z) * t + (world.rand.nextFloat() - 0.5f) * 0.12f;
-            } else {
-                px = x + (world.rand.nextFloat() - 0.5f) * 0.55f;
-                py = y + (world.rand.nextFloat() - 0.5f) * 0.55f;
-                pz = z + (world.rand.nextFloat() - 0.5f) * 0.55f;
-            }
-            world.spawnParticle(EnumParticleTypes.REDSTONE, px, py, pz, red, green, blue);
+            double px = x + (world.rand.nextFloat() - 0.5f) * 0.25f;
+            double py = y + (world.rand.nextFloat() - 0.5f) * 0.25f;
+            double pz = z + (world.rand.nextFloat() - 0.5f) * 0.25f;
+            ParticleEngine.addEffect(world, new FXWisp(world, px, py, pz, tx, ty, tz, size, flag, speed));
         }
     }
 
@@ -786,12 +766,8 @@ public class ClientProxy extends CommonProxy {
         if (world == null || !world.isRemote || target == null) return;
         int amount = particleCount(1);
         if (amount <= 0) return;
-
         for (int i = 0; i < amount; i++) {
-            double tx = target.posX + (world.rand.nextFloat() - world.rand.nextFloat()) * 0.2f;
-            double ty = target.posY + target.height * 0.22f + (world.rand.nextFloat() - 0.5f) * 0.1f;
-            double tz = target.posZ + (world.rand.nextFloat() - world.rand.nextFloat()) * 0.2f;
-            wispFX3(world, x, y, z, tx, ty, tz, 0.45f, 0x66AAFF, true, 0.02f);
+            ParticleEngine.addEffect(world, new FXWispEG(world, x, y, z, target));
         }
     }
 
@@ -899,25 +875,8 @@ public class ClientProxy extends CommonProxy {
         if (world == null || !world.isRemote) return;
         int amount = particleCount(Math.max(1, (int) (scale * 4.0f)));
         if (amount <= 0) return;
-
-        float red = ((type & 0xFF) / 255.0f);
-        float green = ((type >> 8) & 0xFF) / 255.0f;
-        float blue = ((type >> 16) & 0xFF) / 255.0f;
-        if (red == 0.0f && green == 0.0f && blue == 0.0f) {
-            red = 0.8f;
-            green = 0.8f;
-            blue = 1.0f;
-        }
         for (int i = 0; i < amount; i++) {
-            double mx = (world.rand.nextFloat() - 0.5f) * 0.02f;
-            double my = Math.max(-0.2f, Math.min(0.2f, speed * 0.05f));
-            double mz = (world.rand.nextFloat() - 0.5f) * 0.02f;
-            world.spawnParticle(EnumParticleTypes.REDSTONE,
-                    x + (world.rand.nextFloat() - 0.5f) * 0.2f,
-                    y + (world.rand.nextFloat() - 0.5f) * 0.2f,
-                    z + (world.rand.nextFloat() - 0.5f) * 0.2f,
-                    red, green, blue);
-            world.spawnParticle(EnumParticleTypes.CRIT_MAGIC, x, y, z, mx, my, mz);
+            ParticleEngine.addEffect(world, new FXSparkle(world, x, y, z, scale, type, speed));
         }
     }
 

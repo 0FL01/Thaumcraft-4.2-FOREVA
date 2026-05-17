@@ -19,8 +19,12 @@ public class ClientProxyFxStaticGuardTest {
         String particleEngine = readFile("src/main/java/thaumcraft/client/fx/ParticleEngine.java");
         String blockWardFx = readFile("src/main/java/thaumcraft/client/fx/other/FXBlockWard.java");
         String boreFx = readFile("src/main/java/thaumcraft/client/fx/particles/FXBoreParticles.java");
+        String burstFx = readFile("src/main/java/thaumcraft/client/fx/particles/FXBurst.java");
         String bubbleFx = readFile("src/main/java/thaumcraft/client/fx/particles/FXBubble.java");
         String bubbleAltFx = readFile("src/main/java/thaumcraft/client/fx/particles/FXBubbleAlt.java");
+        String sparkleFx = readFile("src/main/java/thaumcraft/client/fx/particles/FXSparkle.java");
+        String wispFx = readFile("src/main/java/thaumcraft/client/fx/particles/FXWisp.java");
+        String wispEgFx = readFile("src/main/java/thaumcraft/client/fx/particles/FXWispEG.java");
         String sonicFx = readFile("src/main/java/thaumcraft/client/fx/other/FXSonic.java");
         String shieldRunesFx = readFile("src/main/java/thaumcraft/client/fx/other/FXShieldRunes.java");
 
@@ -34,7 +38,7 @@ public class ClientProxyFxStaticGuardTest {
         assertTrue("ClientProxy bolt must contain non-noop bolt particle path",
                 source.contains("public void bolt(") && source.contains("speed * 2"));
         assertTrue("ClientProxy must override burst for direct entity FX call sites",
-                source.contains("public void burst(") && source.contains("EnumParticleTypes.EXPLOSION_NORMAL"));
+                source.contains("public void burst(") && source.contains("new FXBurst("));
         assertTrue("ClientProxy must expose dedicated sonicFX path through ParticleEngine",
                 source.contains("public void sonicFX(")
                         && source.contains("new FXSonic("));
@@ -42,9 +46,9 @@ public class ClientProxyFxStaticGuardTest {
                 source.contains("public void shieldRunesFX(")
                         && source.contains("new FXShieldRunes("));
         assertTrue("ClientProxy must override wispFX3 for wisp ambient FX",
-                source.contains("public void wispFX3(") && source.contains("hasTarget"));
+                source.contains("public void wispFX3(") && source.contains("new FXWisp("));
         assertTrue("ClientProxy must override wispFXEG for eldritch guardian trail FX",
-                source.contains("public void wispFXEG(") && source.contains("target.height * 0.22f"));
+                source.contains("public void wispFXEG(") && source.contains("new FXWispEG("));
         assertTrue("ClientProxy must override taintLandFX for falling taint landing FX",
                 source.contains("public void taintLandFX(") && source.contains("entity.getEntityBoundingBox()"));
         assertTrue("ClientProxy must override slimeJumpFX for infested champion fallback",
@@ -56,7 +60,7 @@ public class ClientProxyFxStaticGuardTest {
                         && source.contains("public void boreDigFx(World world,")
                         && source.contains("new FXBoreParticles("));
         assertTrue("ClientProxy must override sparkle for firebat/lifter visuals",
-                source.contains("public void sparkle(") && source.contains("EnumParticleTypes.REDSTONE"));
+                source.contains("public void sparkle(") && source.contains("new FXSparkle("));
         assertTrue("ClientProxy must override particleCount using client particle settings",
                 source.contains("public int particleCount(") && source.contains("mc.gameSettings.particleSetting"));
         assertTrue("ClientProxy must override crucibleFroth and crucibleFrothDown",
@@ -109,6 +113,9 @@ public class ClientProxyFxStaticGuardTest {
                         && boreFx.contains("targetX")
                         && boreFx.contains("EnumParticleTypes.BLOCK_CRACK")
                         && boreFx.contains("EnumParticleTypes.ITEM_CRACK"));
+        assertTrue("Dedicated FXBurst particle must keep burst emission baseline",
+                burstFx.contains("class FXBurst extends Particle")
+                        && burstFx.contains("EnumParticleTypes.EXPLOSION_NORMAL"));
         assertTrue("Dedicated FXBubble particle must keep froth controls and water-bubble emission baseline",
                 bubbleFx.contains("class FXBubble extends Particle")
                         && bubbleFx.contains("setFroth()")
@@ -118,6 +125,18 @@ public class ClientProxyFxStaticGuardTest {
                 bubbleAltFx.contains("class FXBubbleAlt extends Particle")
                         && bubbleAltFx.contains("setRGB(float r, float g, float b)")
                         && bubbleAltFx.contains("EnumParticleTypes.REDSTONE"));
+        assertTrue("Dedicated FXSparkle particle must keep colored sparkle emission baseline",
+                sparkleFx.contains("class FXSparkle extends Particle")
+                        && sparkleFx.contains("EnumParticleTypes.REDSTONE")
+                        && sparkleFx.contains("EnumParticleTypes.CRIT_MAGIC"));
+        assertTrue("Dedicated FXWisp particle must keep target-aware wisp trail baseline",
+                wispFx.contains("class FXWisp extends Particle")
+                        && wispFx.contains("hasTarget")
+                        && wispFx.contains("EnumParticleTypes.REDSTONE"));
+        assertTrue("Dedicated FXWispEG particle must keep target-following elder trail baseline",
+                wispEgFx.contains("class FXWispEG extends Particle")
+                        && wispEgFx.contains("this.target")
+                        && wispEgFx.contains("target.height * 0.22F"));
     }
 
     @Test
