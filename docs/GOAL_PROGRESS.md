@@ -10,7 +10,6 @@ Branch: `codex/durable-goal-stage8-9`
 - [x] Read source-of-truth files: `AGENTS.md`, `docs/PRD.md`, `docs/GOAL.md`, `build.gradle`, `Dockerfile`.
 - [x] Read active stage plans: `docs/Stage3.md` through `docs/Stage9-e.md`.
 - [x] Start from `git status --short`: clean at recon start.
-- [x] Work on a dedicated branch instead of `master`/`main`.
 - [x] Establish baseline non-GUI validation.
 - [ ] Close or classify the remaining Stage 3-7 blockers before any Stage 8/9 parity claim.
 - [ ] Finish Stage 8 client bootstrap, GUI, render, FX, and keybinding work.

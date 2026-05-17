@@ -22,12 +22,6 @@ The repository is a Java Minecraft Forge mod.
 
 The build uses:
 
-- Java 8.
-- Gradle wrapper.
-- ForgeGradle 2.3.
-- Minecraft Forge `1.12.2-14.23.5.2847`.
-- MCP mappings `stable_39`.
-- Baubles as a hard dependency through CurseMaven.
 - `apiJar` for `thaumcraft/api/**`.
 - `devJar` for development/debugging.
 
@@ -256,10 +250,7 @@ Goal:
 
 - Aspects, aura/vis, wands, research, scan state, warp, potions, enchantments, and player capabilities work.
 
-Current baseline:
-
-- Aura/wand centi-vis units, wand discounts, online capability-backed research lookup, server potion effects, Vis Amulet integration, Thaumometer scan hook, and Frugal focus applicability have implementation baselines.
-- Phase 3 is not closed or validated; build-only evidence is insufficient.
+> **Current status tracked in `docs/GOAL_PROGRESS.md`.**
 
 Known risk areas:
 
@@ -283,10 +274,7 @@ Goal:
 
 - Blocks and tile entities are placeable, persistent, interactive, and server-functional.
 
-Current baseline:
-
-- Crucible, Infusion Matrix lifecycle, Arcane Bore mining-loop, Portable Hole wrapper, and Warding wrapper server baselines exist.
-- Phase 4 is not closed or validated; GUI/content-dependent machines and runtime scenarios remain open.
+> **Current status tracked in `docs/GOAL_PROGRESS.md`.**
 
 Known risk areas:
 
@@ -314,11 +302,7 @@ Goal:
 
 - Items and equipment preserve original gameplay behavior.
 
-Current baseline:
-
-- Focus server actions for Pech, Hellbat, Trade, Excavation, Portable Hole, and Warding have common/server baselines.
-- Vis Amulet, Thaumometer, Frugal, targeted repairability, and Primal Crusher baselines exist.
-- Phase 5 is not closed or validated; manual scenarios and remaining item mechanics are still required.
+> **Current status tracked in `docs/GOAL_PROGRESS.md`.**
 
 Known risk areas:
 
@@ -346,10 +330,7 @@ Goal:
 
 - Entities, AI, projectiles, bosses, golems, drops, sounds, and special behaviors are ported.
 
-Current baseline:
-
-- Cultist Leader, Eldritch Golem, Eldritch Warden, Inhabited Zombie crab spawn, Pech death loot, major projectile, and main AI source baselines exist.
-- Phase 6 is not closed or validated; runtime/manual spawn and combat checks remain required.
+> **Current status tracked in `docs/GOAL_PROGRESS.md`.**
 
 Known risk areas:
 
@@ -374,10 +355,7 @@ Goal:
 
 - Biomes, trees, structures, dimensions, maze generation, portals, persistence, and world data behave correctly.
 
-Current baseline:
-
-- Outer Lands registration/runtime-hook baseline exists.
-- Phase 7 is not closed or validated; generation, portal safety, and persistence need runtime evidence.
+> **Current status tracked in `docs/GOAL_PROGRESS.md`.**
 
 Known risk areas:
 
@@ -407,10 +385,7 @@ Goal:
 
 - All core GUIs open and behave, all critical tile/entity renders work, particle/beam/bolt/shader systems are ported enough for visual parity.
 
-Current expectation:
-
-- This phase is not complete.
-- Client work must begin only after pre-Phase8 server blockers are fixed or explicitly deferred.
+> **Current status tracked in `docs/GOAL_PROGRESS.md`.**
 
 Deliverables:
 
@@ -486,77 +461,7 @@ Forbidden before parity:
 
 ## 10. Validation strategy
 
-Primary commands:
-
-    docker build -t thaumcraft-dev .
-
-    docker run --rm \
-      -v "$(pwd):/workspace/thaumcraft" \
-      -v "$(pwd)/.gradle_home:/home/ubuntu/.gradle" \
-      --user "$(id -u):$(id -g)" \
-      --entrypoint ./gradlew \
-      thaumcraft-dev tasks
-
-    docker run --rm \
-      -v "$(pwd):/workspace/thaumcraft" \
-      -v "$(pwd)/.gradle_home:/home/ubuntu/.gradle" \
-      --user "$(id -u):$(id -g)" \
-      --entrypoint ./gradlew \
-      thaumcraft-dev compileJava
-                                # Equivalent: ./scripts/dev.sh compileJava (quiet, logs to run/validate/)
-
-    docker run --rm \
-      -v "$(pwd):/workspace/thaumcraft" \
-      -v "$(pwd)/.gradle_home:/home/ubuntu/.gradle" \
-      --user "$(id -u):$(id -g)" \
-      --entrypoint ./gradlew \
-      thaumcraft-dev build
-
-    docker run --rm \
-      -v "$(pwd):/workspace/thaumcraft" \
-      -v "$(pwd)/.gradle_home:/home/ubuntu/.gradle" \
-      --user "$(id -u):$(id -g)" \
-      --entrypoint ./gradlew \
-      thaumcraft-dev apiJar devJar
-
-Run `test` if available:
-
-    docker run --rm \
-      -v "$(pwd):/workspace/thaumcraft" \
-      -v "$(pwd)/.gradle_home:/home/ubuntu/.gradle" \
-      --user "$(id -u):$(id -g)" \
-      --entrypoint ./gradlew \
-      thaumcraft-dev test
-
-Client smoke test when display is available:
-
-    docker run --rm -it \
-      -v "$(pwd):/workspace/thaumcraft" \
-      -v "$(pwd)/.gradle_home:/home/ubuntu/.gradle" \
-      -e DISPLAY="$DISPLAY" \
-      -v /tmp/.X11-unix:/tmp/.X11-unix \
-      --user "$(id -u):$(id -g)" \
-      --entrypoint ./gradlew \
-      thaumcraft-dev runClient
-
-Server smoke test if task/environment supports it:
-
-    docker run --rm \
-      -v "$(pwd):/workspace/thaumcraft" \
-      -v "$(pwd)/.gradle_home:/home/ubuntu/.gradle" \
-      --user "$(id -u):$(id -g)" \
-      --entrypoint ./gradlew \
-      thaumcraft-dev runServer
-
-Project-specific scans:
-
-    rg -n "TODO|TBD|placeholder|Phase 8:|return false|return null|no-op" src/main/java/thaumcraft docs
-
-    git status --short
-
-    git diff --stat
-
-    git diff --name-only
+Use `./scripts/dev.sh validate` and related shortcuts. See `AGENTS.md` lines 133-160 for all supported commands and their semantics.
 
 ## 11. Runtime smoke checklist
 

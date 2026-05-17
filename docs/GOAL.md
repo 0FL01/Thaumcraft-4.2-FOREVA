@@ -251,31 +251,6 @@ After gameplay/client/content systems are implemented:
 - run final validations
 - prepare final report
 
-## 4. Validation policy
-
-After each milestone, run the smallest meaningful validation. Prefer the compact wrapper first:
-
-- `./scripts/dev.sh validate`
-- `./scripts/dev.sh validate --smoke` when runtime/server smoke validation is required
-
-At the end, run the strongest non-GUI validation set available in this repo, normally through `validate --smoke` plus any targeted commands not covered by the wrapper:
-
-- `./scripts/dev.sh compileJava`
-- `./scripts/dev.sh build`
-- `./scripts/dev.sh test`
-- `./scripts/dev.sh check-jar`
-- `./scripts/dev.sh smoke-server`
-
-Use the individual commands above when debugging a failed `validate` stage, producing release artifacts such as `build`/`apiJar`/`devJar`, or when a full verbose `check-jar` leak listing is required.
-
-Also run targeted static scans, for example:
-- scan for `TODO`, `FIXME`, `stub`, `UnsupportedOperationException`, empty packet handlers, placeholder GUI/render/recipe/research registrations
-- scan for client-only imports reachable from common/server code
-- scan for missing textures/lang/resource references introduced by the changes
-- inspect `git diff --check`
-
-If a command is missing or environment-specific, use the nearest documented Gradle/script equivalent and record the substitution.
-
 ## 5. Stop conditions
 
 Stop with SUCCESS only when:
@@ -301,13 +276,4 @@ When blocked, leave:
 - current diff/commit state
 - validation output summary
 
-## 6. Final response expected from Codex
 
-At completion, report:
-- commits made
-- milestones completed
-- validations run and results
-- GUI/manual graphics validations skipped by instruction
-- known limitations
-- remaining risk, if any
-- exact files/docs updated

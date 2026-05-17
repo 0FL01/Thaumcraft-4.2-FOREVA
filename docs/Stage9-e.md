@@ -23,18 +23,18 @@ Stage 9-e закрывает research content и Thaumonomicon progression дл�
 - `docs/PRD.md:395`-`docs/PRD.md:416` — Stage 9 scope and risks.
 - `src/main/java/thaumcraft/common/Thaumcraft.java:186`-`src/main/java/thaumcraft/common/Thaumcraft.java:191` — current lifecycle calls `ConfigRecipes.init()`, `ConfigAspects.init()`, `ConfigResearch.init()` in post-init.
 - `src/main/java/thaumcraft/common/config/research/ConfigResearch.java:1`-`src/main/java/thaumcraft/common/config/research/ConfigResearch.java:13` — current research registration placeholder with a baseline `recipes` map scaffold.
-- `.stage9e-ref/thaumcraft/common/config/ConfigResearch.java:50`-`.stage9e-ref/thaumcraft/common/config/ConfigResearch.java:65` — original `ConfigResearch.init()` flow.
-- `.stage9e-ref/thaumcraft/common/config/ConfigResearch.java:67`-`.stage9e-ref/thaumcraft/common/config/ConfigResearch.java:73` — original category registration.
-- `.stage9e-ref/thaumcraft/common/config/ConfigResearch.java:76`-`.stage9e-ref/thaumcraft/common/config/ConfigResearch.java:417` — original research entries across all six categories (port splits these per category into 6 slice files; see note above).
-- `src/main/java/thaumcraft/api/research/ResearchCategories.java:12`-`src/main/java/thaumcraft/api/research/ResearchCategories.java:67` and `.stage9e-ref/thaumcraft/api/research/ResearchCategories.java:21`-`.stage9e-ref/thaumcraft/api/research/ResearchCategories.java:76` — category container API, structurally ported.
-- `src/main/java/thaumcraft/api/research/ResearchItem.java:13`-`src/main/java/thaumcraft/api/research/ResearchItem.java:256` and `.stage9e-ref/thaumcraft/api/research/ResearchItem.java:19`-`.stage9e-ref/thaumcraft/api/research/ResearchItem.java:256` — research item API, structurally ported with one current extra callback field.
+- `thaumcraft_src/thaumcraft/common/config/ConfigResearch.java` — original `ConfigResearch.init()` flow.
+- `thaumcraft_src/thaumcraft/common/config/ConfigResearch.java` — original category registration.
+- `thaumcraft_src/thaumcraft/common/config/ConfigResearch.java` — original research entries across all six categories (port splits these per category into 6 slice files; see note above).
+- `src/main/java/thaumcraft/api/research/ResearchCategories.java:12`-`src/main/java/thaumcraft/api/research/ResearchCategories.java:67` and `thaumcraft_src/thaumcraft/api/research/ResearchCategories.java` — category container API, structurally ported.
+- `src/main/java/thaumcraft/api/research/ResearchItem.java:13`-`src/main/java/thaumcraft/api/research/ResearchItem.java:256` and `thaumcraft_src/thaumcraft/api/research/ResearchItem.java` — research item API, structurally ported with one current extra callback field.
 - `src/main/java/thaumcraft/api/research/ResearchPage.java:15`-`src/main/java/thaumcraft/api/research/ResearchPage.java:128` — current page model and page types.
-- `.stage9e-ref/thaumcraft/common/lib/research/ResearchManager.java:84`-`.stage9e-ref/thaumcraft/common/lib/research/ResearchManager.java:160` — original clue, note creation entry points, hidden research selection.
-- `.stage9e-ref/thaumcraft/common/lib/research/ResearchManager.java:268`-`.stage9e-ref/thaumcraft/common/lib/research/ResearchManager.java:387` — original research note NBT/hex-grid serialization.
-- `.stage9e-ref/thaumcraft/common/lib/research/ResearchManager.java:428`-`.stage9e-ref/thaumcraft/common/lib/research/ResearchManager.java:455` — original parent/hidden-parent requisite checks.
-- `.stage9e-ref/thaumcraft/common/lib/research/ResearchNoteData.java:10`-`.stage9e-ref/thaumcraft/common/lib/research/ResearchNoteData.java:21` — original note data model.
-- `.stage9e-ref/thaumcraft/common/items/ItemResearchNotes.java:87`-`.stage9e-ref/thaumcraft/common/items/ItemResearchNotes.java:119` — original note/discovery use behavior.
-- `.stage9e-ref/thaumcraft/common/lib/research/ScanManager.java:351`-`.stage9e-ref/thaumcraft/common/lib/research/ScanManager.java:418` — original scan completion clue unlock hook.
+- `thaumcraft_src/thaumcraft/common/lib/research/ResearchManager.java` — original clue, note creation entry points, hidden research selection.
+- `thaumcraft_src/thaumcraft/common/lib/research/ResearchManager.java` — original research note NBT/hex-grid serialization.
+- `thaumcraft_src/thaumcraft/common/lib/research/ResearchManager.java` — original parent/hidden-parent requisite checks.
+- `thaumcraft_src/thaumcraft/common/lib/research/ResearchNoteData.java` — original note data model.
+- `thaumcraft_src/thaumcraft/common/items/ItemResearchNotes.java` — original note/discovery use behavior.
+- `thaumcraft_src/thaumcraft/common/lib/research/ScanManager.java` — original scan completion clue unlock hook.
 - `thaumcraft_src/assets/thaumcraft/lang/en_US.lang:865`-`thaumcraft_src/assets/thaumcraft/lang/en_US.lang:870` — original category lang keys.
 - `thaumcraft_src/assets/thaumcraft/lang/en_US.lang:888`-`thaumcraft_src/assets/thaumcraft/lang/en_US.lang:1003` and following research section through the same file — original research name/text/page keys.
 - `src/main/resources/assets/thaumcraft/lang/en_us.lang:1`-`src/main/resources/assets/thaumcraft/lang/en_us.lang:118` — current lang file with item/static GUI keys only.
@@ -46,10 +46,6 @@ Lightweight analysis commands run:
 
 - `git status --short` — showed only pre-existing untracked Stage 8/9 docs before this document was created.
 - `jar tf Thaumcraft-1.7.10-4.2.3.5.jar | rg 'Research|ConfigResearch|Thaumonomicon|research|lang/en_US|textures/gui/gui_research|researchback'` — confirmed reference class/resource locations.
-- `cfr --silent true --outputdir .stage9e-ref Thaumcraft-1.7.10-4.2.3.5.jar ...` — temporary decompile for reference analysis.
-- `rg -o 'new ResearchItem\("[^"]+' .stage9e-ref/thaumcraft/common/config/ConfigResearch.java | sed 's/.*("//' | sort > .stage9e-ref/ref_research_keys.txt && wc -l .stage9e-ref/ref_research_keys.txt` — counted 201 original research entries.
-- `rg -o 'recipes\.get\("[^"]+' .stage9e-ref/thaumcraft/common/config/ConfigResearch.java | sed 's/.*("//' | sort -u | wc -l` — counted 276 unique original recipe references used by research pages.
-- `rg -o 'tc\.research_page\.[A-Za-z0-9_]+\.[0-9]+' .stage9e-ref/thaumcraft/common/config/ConfigResearch.java | sort -u | wc -l` — counted 302 explicit original research page text references from `ConfigResearch`.
 - `rg -c '^tc\.research_' thaumcraft_src/assets/thaumcraft/lang/en_US.lang` — counted 713 original research localization keys.
 
 > **Note — ConfigResearch file split:** `ConfigResearch.java` content has been refactored per category into 7 files (kernel + 6 category slices), all in `thaumcraft.common.config`:
@@ -89,11 +85,11 @@ The current lang file now includes the reference `tc.research_category.*` set an
 
 The current resources now include Thaumonomicon/research GUI backgrounds and baseline research misc icons (`r_*.png`) with `research1..5` images under `src/main/resources/assets/thaumcraft/textures/misc/`. Additional image paths referenced by full research-page text still need validation once the full research text corpus is ported.
 
-The current research note flow is incomplete. `ItemResearchNotes` directly grants the `key` NBT value on right click and consumes the stack (`src/main/java/thaumcraft/common/items/ItemResearchNotes.java:43`-`src/main/java/thaumcraft/common/items/ItemResearchNotes.java:54`), while the reference distinguishes incomplete notes, completed discoveries, knowledge fragments, prerequisite errors, sounds, tooltips, rarity, colors, and hidden-research conversion (`.stage9e-ref/thaumcraft/common/items/ItemResearchNotes.java:87`-`.stage9e-ref/thaumcraft/common/items/ItemResearchNotes.java:174`). The reference `ResearchNoteData` class has no current port file.
+The current research note flow is incomplete. `ItemResearchNotes` directly grants the `key` NBT value on right click and consumes the stack (`src/main/java/thaumcraft/common/items/ItemResearchNotes.java:43`-`src/main/java/thaumcraft/common/items/ItemResearchNotes.java:54`), while the reference distinguishes incomplete notes, completed discoveries, knowledge fragments, prerequisite errors, sounds, tooltips, rarity, colors, and hidden-research conversion (`thaumcraft_src/thaumcraft/common/items/ItemResearchNotes.java`). The reference `ResearchNoteData` class has no current port file.
 
-The current scan flow records scans and awards aspects, but does not call the original clue creation logic after a successful scan (`src/main/java/thaumcraft/common/lib/research/ScanManager.java:175`-`src/main/java/thaumcraft/common/lib/research/ScanManager.java:220`). The reference calls `ResearchManager.createClue(...)` after successful scan aspect awards (`.stage9e-ref/thaumcraft/common/lib/research/ScanManager.java:398`-`.stage9e-ref/thaumcraft/common/lib/research/ScanManager.java:414`).
+The current scan flow records scans and awards aspects, but does not call the original clue creation logic after a successful scan (`src/main/java/thaumcraft/common/lib/research/ScanManager.java:175`-`src/main/java/thaumcraft/common/lib/research/ScanManager.java:220`). The reference calls `ResearchManager.createClue(...)` after successful scan aspect awards (`thaumcraft_src/thaumcraft/common/lib/research/ScanManager.java`).
 
-The current direct completion packet grants research without checking prerequisites or research cost, except for null research lookup and duplicate completion (`src/main/java/thaumcraft/common/lib/network/playerdata/PacketPlayerCompleteToServer.java:45`-`src/main/java/thaumcraft/common/lib/network/playerdata/PacketPlayerCompleteToServer.java:69`). Original primary research normally creates a note first and completed discoveries check prerequisites before granting (`.stage9e-ref/thaumcraft/common/lib/research/ResearchManager.java:120`-`.stage9e-ref/thaumcraft/common/lib/research/ResearchManager.java:134`, `.stage9e-ref/thaumcraft/common/items/ItemResearchNotes.java:87`-`.stage9e-ref/thaumcraft/common/items/ItemResearchNotes.java:104`).
+The current direct completion packet grants research without checking prerequisites or research cost, except for null research lookup and duplicate completion (`src/main/java/thaumcraft/common/lib/network/playerdata/PacketPlayerCompleteToServer.java:45`-`src/main/java/thaumcraft/common/lib/network/playerdata/PacketPlayerCompleteToServer.java:69`). Original primary research normally creates a note first and completed discoveries check prerequisites before granting (`thaumcraft_src/thaumcraft/common/lib/research/ResearchManager.java`, `thaumcraft_src/thaumcraft/common/items/ItemResearchNotes.java`).
 
 ## 5. Gap list
 
@@ -107,9 +103,9 @@ The current direct completion packet grants research without checking prerequisi
 - `src/main/java/thaumcraft/common/Thaumcraft.java:186`-`src/main/java/thaumcraft/common/Thaumcraft.java:191`
 
 **Референс:**
-- `.stage9e-ref/thaumcraft/common/config/ConfigResearch.java:50`-`.stage9e-ref/thaumcraft/common/config/ConfigResearch.java:65`
-- `.stage9e-ref/thaumcraft/common/config/ConfigResearch.java:67`-`.stage9e-ref/thaumcraft/common/config/ConfigResearch.java:73`
-- `.stage9e-ref/thaumcraft/common/config/ConfigResearch.java:76`-`.stage9e-ref/thaumcraft/common/config/ConfigResearch.java:417`
+- `thaumcraft_src/thaumcraft/common/config/ConfigResearch.java`
+- `thaumcraft_src/thaumcraft/common/config/ConfigResearch.java`
+- `thaumcraft_src/thaumcraft/common/config/ConfigResearch.java`
 
 **Что не совпадает:**
 
@@ -159,8 +155,8 @@ Dependency: Stage 9 recipe registration must provide recipe objects for page ref
 - `src/main/java/thaumcraft/api/research/ResearchPage.java:35`-`src/main/java/thaumcraft/api/research/ResearchPage.java:93`
 
 **Референс:**
-- `.stage9e-ref/thaumcraft/common/config/ConfigResearch.java:51`-`.stage9e-ref/thaumcraft/common/config/ConfigResearch.java:52`
-- `.stage9e-ref/thaumcraft/common/config/ConfigResearch.java:77`-`.stage9e-ref/thaumcraft/common/config/ConfigResearch.java:417`
+- `thaumcraft_src/thaumcraft/common/config/ConfigResearch.java`
+- `thaumcraft_src/thaumcraft/common/config/ConfigResearch.java`
 
 **Что не совпадает:**
 
@@ -287,12 +283,12 @@ Dependency: client GUI rendering is Stage 8, but Stage 9-e still owns content re
 - `src/main/java/thaumcraft/common/lib/network/playerdata/PacketAspectCombinationToServer.java` now mirrors reference-side combination flow more closely: consumes player/bonus aspect pools, synchronizes `PacketAspectPool`, and calls `ScanManager.checkAndSyncAspectKnowledge(...)` for discovered combinations.
 
 **Референс:**
-- `.stage9e-ref/thaumcraft/common/lib/research/ResearchNoteData.java:10`-`.stage9e-ref/thaumcraft/common/lib/research/ResearchNoteData.java:21`
-- `.stage9e-ref/thaumcraft/common/lib/research/ResearchManager.java:120`-`.stage9e-ref/thaumcraft/common/lib/research/ResearchManager.java:134`
-- `.stage9e-ref/thaumcraft/common/lib/research/ResearchManager.java:199`-`.stage9e-ref/thaumcraft/common/lib/research/ResearchManager.java:219`
-- `.stage9e-ref/thaumcraft/common/lib/research/ResearchManager.java:221`-`.stage9e-ref/thaumcraft/common/lib/research/ResearchManager.java:266`
-- `.stage9e-ref/thaumcraft/common/lib/research/ResearchManager.java:268`-`.stage9e-ref/thaumcraft/common/lib/research/ResearchManager.java:387`
-- `.stage9e-ref/thaumcraft/common/items/ItemResearchNotes.java:87`-`.stage9e-ref/thaumcraft/common/items/ItemResearchNotes.java:174`
+- `thaumcraft_src/thaumcraft/common/lib/research/ResearchNoteData.java`
+- `thaumcraft_src/thaumcraft/common/lib/research/ResearchManager.java`
+- `thaumcraft_src/thaumcraft/common/lib/research/ResearchManager.java`
+- `thaumcraft_src/thaumcraft/common/lib/research/ResearchManager.java`
+- `thaumcraft_src/thaumcraft/common/lib/research/ResearchManager.java`
+- `thaumcraft_src/thaumcraft/common/items/ItemResearchNotes.java`
 
 **Что не совпадает:**
 
@@ -331,10 +327,10 @@ Dependency: client-side research table GUI/rendering is outside Stage 9-e, but t
 - `src/main/java/thaumcraft/api/research/ResearchItem.java:144`-`src/main/java/thaumcraft/api/research/ResearchItem.java:169`
 
 **Референс:**
-- `.stage9e-ref/thaumcraft/common/lib/research/ResearchManager.java:84`-`.stage9e-ref/thaumcraft/common/lib/research/ResearchManager.java:118`
-- `.stage9e-ref/thaumcraft/common/lib/research/ResearchManager.java:137`-`.stage9e-ref/thaumcraft/common/lib/research/ResearchManager.java:160`
-- `.stage9e-ref/thaumcraft/common/lib/research/ScanManager.java:351`-`.stage9e-ref/thaumcraft/common/lib/research/ScanManager.java:418`
-- `.stage9e-ref/thaumcraft/common/config/ConfigResearch.java:80`, `.stage9e-ref/thaumcraft/common/config/ConfigResearch.java:199`, `.stage9e-ref/thaumcraft/common/config/ConfigResearch.java:211`, `.stage9e-ref/thaumcraft/common/config/ConfigResearch.java:213`, `.stage9e-ref/thaumcraft/common/config/ConfigResearch.java:219`-`.stage9e-ref/thaumcraft/common/config/ConfigResearch.java:221`, `.stage9e-ref/thaumcraft/common/config/ConfigResearch.java:235`, `.stage9e-ref/thaumcraft/common/config/ConfigResearch.java:393`-`.stage9e-ref/thaumcraft/common/config/ConfigResearch.java:417`
+- `thaumcraft_src/thaumcraft/common/lib/research/ResearchManager.java`
+- `thaumcraft_src/thaumcraft/common/lib/research/ResearchManager.java`
+- `thaumcraft_src/thaumcraft/common/lib/research/ScanManager.java`
+- `thaumcraft_src/thaumcraft/common/config/ConfigResearch.java`
 
 **Что не совпадает:**
 
@@ -377,9 +373,9 @@ Entity registry names changed between 1.7.10 and 1.12.2. Trigger strings must ei
 - `src/main/java/thaumcraft/common/lib/research/ResearchManager.java:66`-`src/main/java/thaumcraft/common/lib/research/ResearchManager.java:97`
 
 **Референс:**
-- `.stage9e-ref/thaumcraft/common/lib/research/ResearchManager.java:120`-`.stage9e-ref/thaumcraft/common/lib/research/ResearchManager.java:134`
-- `.stage9e-ref/thaumcraft/common/items/ItemResearchNotes.java:87`-`.stage9e-ref/thaumcraft/common/items/ItemResearchNotes.java:104`
-- `.stage9e-ref/thaumcraft/common/lib/research/ResearchManager.java:428`-`.stage9e-ref/thaumcraft/common/lib/research/ResearchManager.java:455`
+- `thaumcraft_src/thaumcraft/common/lib/research/ResearchManager.java`
+- `thaumcraft_src/thaumcraft/common/items/ItemResearchNotes.java`
+- `thaumcraft_src/thaumcraft/common/lib/research/ResearchManager.java`
 
 **Что не совпадает:**
 

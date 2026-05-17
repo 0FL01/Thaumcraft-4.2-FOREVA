@@ -29,7 +29,7 @@ Stage 9-a сейчас нельзя считать завершенной: ес�
 - Current recipe consumers/generation: `src/main/java/thaumcraft/common/lib/crafting/ThaumcraftCraftingManager.java:262-333`, `src/main/java/thaumcraft/api/ThaumcraftApi.java:67-88`, `src/main/java/thaumcraft/api/ThaumcraftApi.java:219-272`.
 - Current custom recipes: `src/main/java/thaumcraft/common/items/armor/RecipesRobeArmorDyes.java:13-110`, `src/main/java/thaumcraft/common/items/armor/RecipesVoidRobeArmorDyes.java:5-10`.
 - Reference class files: `thaumcraft_src/thaumcraft/common/config/ConfigRecipes.class`, `thaumcraft_src/thaumcraft/common/config/ConfigAspects.class`, `thaumcraft_src/thaumcraft/common/config/Config.class`, `thaumcraft_src/thaumcraft/common/Thaumcraft.class`, `thaumcraft_src/thaumcraft/api/ThaumcraftApi.class`.
-- Decompiled reference lines captured during analysis: `/home/stfu/.local/share/opencode/tool-output/tool_e27f2d61a001uI7XLw1VyBGdph:63-79`, `/home/stfu/.local/share/opencode/tool-output/tool_e27f2d61a001uI7XLw1VyBGdph:413-530`, `/home/stfu/.local/share/opencode/tool-output/tool_e27f30df9001wfBWATRSNLbBpT:30-37`, `/home/stfu/.local/share/opencode/tool-output/tool_e27f30df9001wfBWATRSNLbBpT:81-461`.
+- Decompiled reference lines captured during analysis: `thaumcraft_src/`.
 - Commands run: `git status --short`; `cfr --silent true thaumcraft_src/thaumcraft/common/config/ConfigRecipes.class`; `cfr --silent true thaumcraft_src/thaumcraft/common/config/ConfigAspects.class`; `cfr --silent true thaumcraft_src/thaumcraft/common/config/Config.class | rg -n "foundCopper|OreDictionary|getOres|registerOre|initModCompatibility"`; `cfr --silent true thaumcraft_src/thaumcraft/common/Thaumcraft.class | rg -n "initModCompatibility|ConfigRecipes|ConfigAspects|preInit|postInit|init\\("`; focused `rg`/glob scans for recipes, smelting, ore dictionary and TODO/stub markers.
 
 > **Note — `ConfigRecipes` structure:** `ConfigRecipes.java` has been refactored into a hub with 7 recipe-family slice classes under `thaumcraft.common.config.recipes/`. See the congruent note in `docs/Stage9-e.md` for the full file list and test-reader adaptation. References in this document that point to `ConfigRecipes.java` lines written before this refactor may no longer correspond to the monolithic layout.
@@ -38,11 +38,11 @@ Stage 9-a сейчас нельзя считать завершенной: ес�
 
 - `docs/Stage9-a.md` отсутствовал до этого анализа; создан заново.
 - `ConfigRecipes.init()` существует, но является заглушкой с комментарием `Phase 9: register all recipes`; `oreDictRecipe(Object input, Object[] output)` также заглушка и имеет неправильную форму API для реального 1.12.2 recipe registration (`src/main/java/thaumcraft/common/config/ConfigRecipes.java:7-13`).
-- `Thaumcraft.postInit()` вызывает `ConfigRecipes.init()`, затем `ConfigAspects.init()`, затем `ConfigResearch.init()`, затем `Config.initModCompatibility()` (`src/main/java/thaumcraft/common/Thaumcraft.java:186-192`). В референсе порядок другой: `Config.initModCompatibility()`, `ConfigItems.postInit()`, `ConfigRecipes.init()`, `ConfigAspects.init()`, `ConfigResearch.init()` (`thaumcraft_src/thaumcraft/common/Thaumcraft.class`; decompiled `/home/stfu/.local/share/opencode/tool-output/tool_e27f2d61a001uI7XLw1VyBGdph` не содержит lifecycle, команда показала reference lines 210-217).
+- `Thaumcraft.postInit()` вызывает `ConfigRecipes.init()`, затем `ConfigAspects.init()`, затем `ConfigResearch.init()`, затем `Config.initModCompatibility()` (`src/main/java/thaumcraft/common/Thaumcraft.java:186-192`). В референсе порядок другой: `Config.initModCompatibility()`, `ConfigItems.postInit()`, `ConfigRecipes.init()`, `ConfigAspects.init()`, `ConfigResearch.init()` (`thaumcraft_src/thaumcraft/common/Thaumcraft.class`; decompiled `thaumcraft_src/` не содержит lifecycle, команда показала reference lines 210-217).
 - Нет `RegistryEvent.Register<IRecipe>` handler для custom recipes (`src/main/java/thaumcraft/common/Thaumcraft.java:215-281` содержит blocks/items/entities/potions/enchantments/biomes/villagers only).
 - Нет Forge 1.12.2 JSON recipes: `src/main/resources/assets/thaumcraft/recipes/` отсутствует; `src/main/resources/data/` отсутствует.
 - Smelting registration отсутствует в текущем `ConfigRecipes`; `ThaumcraftApi.addSmeltingBonus` API есть (`src/main/java/thaumcraft/api/ThaumcraftApi.java:67-88`), но текущий код не регистрирует bonuses.
-- `ConfigAspects` регистрирует только малую hand-written часть vanilla/object/ore tags (`src/main/java/thaumcraft/common/config/ConfigAspects.java:12-190`), тогда как reference `ConfigAspects` содержит entity tags, много vanilla tags, ore dictionary tags, mod item/block tags и complex tags (`thaumcraft_src/thaumcraft/common/config/ConfigAspects.class`; decompiled `/home/stfu/.local/share/opencode/tool-output/tool_e27f30df9001wfBWATRSNLbBpT:30-37`, `/home/stfu/.local/share/opencode/tool-output/tool_e27f30df9001wfBWATRSNLbBpT:81-461`).
+- `ConfigAspects` регистрирует только малую hand-written часть vanilla/object/ore tags (`src/main/java/thaumcraft/common/config/ConfigAspects.java:12-190`), тогда как reference `ConfigAspects` содержит entity tags, много vanilla tags, ore dictionary tags, mod item/block tags и complex tags (`thaumcraft_src/thaumcraft/common/config/ConfigAspects.class`; decompiled `thaumcraft_src/`).
 - Ore dictionary flags объявлены, но не заполняются (`src/main/java/thaumcraft/common/config/Config.java:165-173`), а `Config.initModCompatibility()` является Phase 4 stub (`src/main/java/thaumcraft/common/config/Config.java:356-358`).
 - Existing robe dye custom recipe classes implement `IRecipe`, but are never registered and have no registry names in current Stage 9-a infrastructure (`src/main/java/thaumcraft/common/items/armor/RecipesRobeArmorDyes.java:13-110`, `src/main/java/thaumcraft/common/items/armor/RecipesVoidRobeArmorDyes.java:5-10`).
 - Recipe id/naming audit foundation is absent: no `ResourceLocation` naming strategy, no duplicate/missing recipe scan, no current file list to compare against reference recipe keys.
@@ -60,7 +60,6 @@ Stage 9-a сейчас нельзя считать завершенной: ес�
 
 **Референс:**
 - `thaumcraft_src/thaumcraft/common/config/ConfigRecipes.class`
-- `/home/stfu/.local/share/opencode/tool-output/tool_e27f2d61a001uI7XLw1VyBGdph:63-79`
 
 **Что не совпадает:**
 
@@ -97,7 +96,6 @@ Dependency: Stage 9-b/c/d/e will depend on the same `ConfigRecipes` foundation, 
 
 **Референс:**
 - `thaumcraft_src/thaumcraft/common/config/ConfigRecipes.class`
-- `/home/stfu/.local/share/opencode/tool-output/tool_e27f2d61a001uI7XLw1VyBGdph:413-481`
 
 **Что не совпадает:**
 
@@ -110,7 +108,7 @@ Create the Stage 9-a vanilla/Forge JSON recipe corpus for ordinary shaped/shapel
 **Как доделать:**
 - Add `src/main/resources/assets/thaumcraft/recipes/*.json` for simple vanilla/Forge recipes.
 - Keep custom/NBT/dynamic recipes in Java via an `IRecipe` registry event.
-- Map reference normal recipe outputs from `/home/stfu/.local/share/opencode/tool-output/tool_e27f2d61a001uI7XLw1VyBGdph:413-481` to 1.12.2 item/block registry names from `ConfigItems` and `ConfigBlocks`.
+- Map reference normal recipe outputs from `thaumcraft_src/` to 1.12.2 item/block registry names from `ConfigItems` and `ConfigBlocks`.
 - Add an audit list that records which reference recipe keys are JSON, which are code recipes, and which are deferred to Stage 9-b/c/d/e because they are arcane/infusion/crucible/research-page dependent.
 
 **Критерии приемки:**
@@ -134,7 +132,6 @@ Forge 1.12.2 recipe JSON cannot represent all reference behaviors. NBT/capabilit
 
 **Референс:**
 - `thaumcraft_src/thaumcraft/common/config/ConfigRecipes.class`
-- `/home/stfu/.local/share/opencode/tool-output/tool_e27f2d61a001uI7XLw1VyBGdph:413-481`
 
 **Что не совпадает:**
 
@@ -171,7 +168,6 @@ Some reference recipes target items/blocks that may not be fully ported or may h
 
 **Референс:**
 - `thaumcraft_src/thaumcraft/common/config/ConfigRecipes.class`
-- `/home/stfu/.local/share/opencode/tool-output/tool_e27f2d61a001uI7XLw1VyBGdph:484-510`
 
 **Что не совпадает:**
 
@@ -249,8 +245,6 @@ Lifecycle is sensitive: Forge 1.12.2 item/block registry must be complete before
 
 **Референс:**
 - `thaumcraft_src/thaumcraft/common/config/ConfigAspects.class`
-- `/home/stfu/.local/share/opencode/tool-output/tool_e27f30df9001wfBWATRSNLbBpT:30-37`
-- `/home/stfu/.local/share/opencode/tool-output/tool_e27f30df9001wfBWATRSNLbBpT:81-461`
 
 **Что не совпадает:**
 
@@ -290,8 +284,6 @@ Some reference fields point to content not yet ported or renamed in current code
 - `thaumcraft_src/thaumcraft/common/config/ConfigRecipes.class`
 - `thaumcraft_src/thaumcraft/common/items/armor/RecipesRobeArmorDyes.class`
 - `thaumcraft_src/thaumcraft/common/items/armor/RecipesVoidRobeArmorDyes.class`
-- `/home/stfu/.local/share/opencode/tool-output/tool_e27f2d61a001uI7XLw1VyBGdph:76-78`
-- `/home/stfu/.local/share/opencode/tool-output/tool_e27f2d61a001uI7XLw1VyBGdph:477-481`
 
 **Что не совпадает:**
 
@@ -329,7 +321,6 @@ Forge 1.12.2 rejects registry entries without registry names. A compile-only che
 
 **Референс:**
 - `thaumcraft_src/thaumcraft/common/config/ConfigRecipes.class`
-- `/home/stfu/.local/share/opencode/tool-output/tool_e27f2d61a001uI7XLw1VyBGdph:413-481`
 
 **Что не совпадает:**
 

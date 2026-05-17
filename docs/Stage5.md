@@ -887,7 +887,7 @@ Validation evidence for this checkpoint:
 
 - `./scripts/dev.sh compileJava` passed.
 - `./scripts/dev.sh build` passed.
-- `./scripts/dev.sh check-jar` passed with `Jar check PASSED: no MCP-named Minecraft field/method references found in /home/stfu/ai/dont/thaumcraft/build/libs/Thaumcraft-1.0.0-universal.jar`.
+- `./scripts/dev.sh check-jar` passed with `Jar check PASSED.`.
 - `./scripts/dev.sh smoke-server` passed and reached `Done (` with no crash markers in `run/smoke-server.log`.
 - `./scripts/dev.sh smoke-client` was attempted because this checkpoint touches item lang/tooltips, but failed before mod initialization with the known local LWJGL display failure: `java.lang.ExceptionInInitializerError` caused by `java.lang.ArrayIndexOutOfBoundsException: 0` in `org.lwjgl.opengl.LinuxDisplay.getAvailableDisplayModes`. This is an environment/display blocker, not Stage 5 parity evidence.
 
@@ -908,7 +908,7 @@ Validation evidence for this checkpoint:
 - `./scripts/dev.sh compileJava` passed after the Compass Stone/TileNode changes.
 - Local item-model texture consistency check found 97 item model JSON files and `0` missing texture references.
 - `./scripts/dev.sh build` passed.
-- `./scripts/dev.sh check-jar` passed with `Jar check PASSED: no MCP-named Minecraft field/method references found in /home/stfu/ai/dont/thaumcraft/build/libs/Thaumcraft-1.0.0-universal.jar`.
+- `./scripts/dev.sh check-jar` passed with `Jar check PASSED.`.
 - `./scripts/dev.sh smoke-server` passed and reached `Done (` with no crash markers in `run/smoke-server.log`.
 - `./scripts/dev.sh smoke-client` was attempted because this checkpoint touches client item-model/property behavior, but failed before mod initialization with the known local LWJGL display failure: `java.lang.ExceptionInInitializerError` caused by `java.lang.ArrayIndexOutOfBoundsException: 0` in `org.lwjgl.opengl.LinuxDisplay.getAvailableDisplayModes`. This remains an environment/display blocker, not Compass Stone parity evidence.
 
@@ -927,7 +927,7 @@ Validation evidence for this checkpoint:
 - `./scripts/dev.sh compileJava` passed after the Loot Bag changes.
 - Local item-model texture consistency check found 99 item model JSON files and `0` missing texture references.
 - `./scripts/dev.sh build` passed.
-- `./scripts/dev.sh check-jar` passed with `Jar check PASSED: no MCP-named Minecraft field/method references found in /home/stfu/ai/dont/thaumcraft/build/libs/Thaumcraft-1.0.0-universal.jar`.
+- `./scripts/dev.sh check-jar` passed with `Jar check PASSED.`.
 - `./scripts/dev.sh smoke-server` reached `Done (` with no crash markers in `run/smoke-server.log`; the wrapper command was manually aborted after ready-state logging.
 - `./scripts/dev.sh smoke-client` was not rerun for this checkpoint because the same local LWJGL display blocker was already reproduced immediately before this checkpoint (`ArrayIndexOutOfBoundsException` in `LinuxDisplay.getAvailableDisplayModes`). Client model override validation remains environment-blocked.
 
@@ -950,7 +950,7 @@ Validation evidence for this checkpoint:
 
 - `./scripts/dev.sh compileJava` passed after the wand/focus changes.
 - `./scripts/dev.sh build` passed.
-- `./scripts/dev.sh check-jar` passed with `Jar check PASSED: no MCP-named Minecraft field/method references found in /home/stfu/ai/dont/thaumcraft/build/libs/Thaumcraft-1.0.0-universal.jar`.
+- `./scripts/dev.sh check-jar` passed with `Jar check PASSED.`.
 - `./scripts/dev.sh smoke-server` passed and reached `Done (` with no crash markers in `run/smoke-server.log`.
 - `./scripts/dev.sh smoke-client` was attempted because `DISPLAY=:0`, but failed before mod initialization with the known local LWJGL display failure: `java.lang.ExceptionInInitializerError` caused by `java.lang.ArrayIndexOutOfBoundsException: 0` in `org.lwjgl.opengl.LinuxDisplay.getAvailableDisplayModes`. This remains an environment/display blocker, not wand/focus parity evidence.
 
