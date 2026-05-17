@@ -71,8 +71,8 @@ public class MazeHandler {
         clearHashMap();
         File file1 = new File(world.getSaveHandler().getWorldDirectory(), "labyrinth.dat");
         if (file1.exists()) {
-            try {
-                NBTTagCompound nbttagcompound = CompressedStreamTools.readCompressed(new FileInputStream(file1));
+            try (FileInputStream stream = new FileInputStream(file1)) {
+                NBTTagCompound nbttagcompound = CompressedStreamTools.readCompressed(stream);
                 NBTTagCompound nbttagcompound1 = nbttagcompound.getCompoundTag("Data");
                 readNBT(nbttagcompound1);
                 return;
@@ -83,8 +83,8 @@ public class MazeHandler {
         // Try backup
         File file2 = new File(world.getSaveHandler().getWorldDirectory(), "labyrinth.dat_old");
         if (file2.exists()) {
-            try {
-                NBTTagCompound nbttagcompound = CompressedStreamTools.readCompressed(new FileInputStream(file2));
+            try (FileInputStream stream = new FileInputStream(file2)) {
+                NBTTagCompound nbttagcompound = CompressedStreamTools.readCompressed(stream);
                 NBTTagCompound nbttagcompound1 = nbttagcompound.getCompoundTag("Data");
                 readNBT(nbttagcompound1);
             } catch (Exception e) {
@@ -103,13 +103,21 @@ public class MazeHandler {
             File fileOld = new File(dir, "labyrinth.dat_old");
             File fileCur = new File(dir, "labyrinth.dat");
 
-            CompressedStreamTools.writeCompressed(wrapper, new FileOutputStream(fileNew));
+            try (FileOutputStream stream = new FileOutputStream(fileNew)) {
+                CompressedStreamTools.writeCompressed(wrapper, stream);
+            }
 
             if (fileOld.exists()) fileOld.delete();
             if (fileCur.exists()) fileCur.renameTo(fileOld);
             if (fileCur.exists()) fileCur.delete();
-            fileNew.renameTo(fileCur);
-            if (fileNew.exists()) fileNew.delete();
+            if (!fileNew.renameTo(fileCur)) {
+                try (FileOutputStream stream = new FileOutputStream(fileCur)) {
+                    CompressedStreamTools.writeCompressed(wrapper, stream);
+                }
+                if (fileNew.exists()) {
+                    fileNew.delete();
+                }
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
