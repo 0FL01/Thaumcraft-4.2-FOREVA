@@ -6,6 +6,7 @@ import net.minecraft.init.Enchantments;
 import net.minecraft.init.Items;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.crafting.FurnaceRecipes;
 import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.nbt.NBTTagByte;
 import net.minecraft.nbt.NBTTagCompound;
@@ -59,6 +60,7 @@ public class ConfigRecipes {
         initializeInfusionGolemDeviceRecipeBaseline();
         initializeInfusionEquipmentArmorRecipeBaseline();
         initializeCrucibleRecipeBaseline();
+        initializeSmeltingBaseline();
         initializeSmeltingBonusBaseline();
         if (recipeArcaneStone2 != null) {
             ConfigResearch.recipes.put("ArcaneStone2", recipeArcaneStone2);
@@ -625,6 +627,41 @@ public class ConfigRecipes {
         ThaumcraftApi.addSmeltingBonus(new ItemStack(Items.BEEF), edibleNugget);
         ThaumcraftApi.addSmeltingBonus(new ItemStack(Items.PORKCHOP), edibleNugget);
         ThaumcraftApi.addSmeltingBonus(new ItemStack(Items.FISH, 1, OreDictionary.WILDCARD_VALUE), edibleNugget);
+    }
+
+    private static void initializeSmeltingBaseline() {
+        FurnaceRecipes.instance().addSmeltingRecipe(
+                new ItemStack(ConfigBlocks.blockCustomOre, 1, 0),
+                new ItemStack(ConfigItems.itemResource, 1, 3),
+                1.0F);
+        FurnaceRecipes.instance().addSmeltingRecipe(
+                new ItemStack(ConfigBlocks.blockCustomOre, 1, 7),
+                new ItemStack(ConfigItems.itemResource, 1, 6),
+                1.0F);
+        FurnaceRecipes.instance().addSmeltingRecipeForBlock(
+                ConfigBlocks.blockMagicalLog,
+                new ItemStack(Items.COAL, 1, 1),
+                0.5F);
+        FurnaceRecipes.instance().addSmeltingRecipe(
+                new ItemStack(ConfigItems.itemNugget, 1, 16),
+                new ItemStack(Items.IRON_INGOT, 2, 0),
+                1.0F);
+        FurnaceRecipes.instance().addSmeltingRecipe(
+                new ItemStack(ConfigItems.itemNugget, 1, 21),
+                new ItemStack(ConfigItems.itemResource, 2, 3),
+                1.0F);
+        FurnaceRecipes.instance().addSmeltingRecipe(
+                new ItemStack(ConfigItems.itemNugget, 1, 31),
+                new ItemStack(Items.GOLD_INGOT, 2, 0),
+                1.0F);
+        FurnaceRecipes.instance().addSmeltingRecipe(
+                new ItemStack(ConfigItems.itemShard, 1, 6),
+                new ItemStack(ConfigItems.itemResource, 1, 14),
+                1.0F);
+        FurnaceRecipes.instance().addSmeltingRecipe(
+                new ItemStack(ConfigItems.itemResource, 1, 18),
+                new ItemStack(Items.GOLD_NUGGET),
+                0.0F);
     }
 
     private static void initializeArcaneRecipeBaseline() {
