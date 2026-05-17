@@ -84,7 +84,7 @@ public class ItemKey extends Item {
         byte type = 1;
 
         if (!stack.hasTagCompound() || !stack.getTagCompound().hasKey("location")) {
-            if (world.isRemote) return EnumActionResult.SUCCESS;
+            if (world.isRemote) return EnumActionResult.PASS;
             if (playerName.equals(owned.owner) || (stack.getItemDamage() == META_IRON && owned.accessList.contains(META_GOLD + playerName))) {
                 ItemStack linked = new ItemStack(this, 1, stack.getItemDamage());
                 NBTTagCompound tag = new NBTTagCompound();
@@ -107,7 +107,7 @@ public class ItemKey extends Item {
         String exactAccess = stack.getItemDamage() + playerName;
         String goldAccess = META_GOLD + playerName;
         if (sameLocation && !playerName.equals(owned.owner) && !owned.accessList.contains(exactAccess) && !owned.accessList.contains(goldAccess)) {
-            if (world.isRemote) return EnumActionResult.SUCCESS;
+            if (world.isRemote) return EnumActionResult.PASS;
             owned.accessList.add(exactAccess);
             tile.markDirty();
             world.notifyBlockUpdate(pos, state, state, 3);
@@ -118,7 +118,7 @@ public class ItemKey extends Item {
         } else if (!world.isRemote) {
             sendKeyMessage(player, sameLocation ? "tc.key8" : "tc.key7");
         }
-        return EnumActionResult.SUCCESS;
+        return world.isRemote ? EnumActionResult.PASS : EnumActionResult.SUCCESS;
     }
 
     @Override
