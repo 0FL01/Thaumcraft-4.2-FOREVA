@@ -462,7 +462,15 @@ public class EventHandlerEntity {
      */
     @SubscribeEvent
     public void onLivingJump(LivingEvent.LivingJumpEvent event) {
-        // Future: modify jump based on thaumcraft potion effects
+        if (!(event.getEntityLiving() instanceof EntityPlayer)) {
+            return;
+        }
+        EntityPlayer player = (EntityPlayer) event.getEntityLiving();
+        ItemStack boots = player.inventory.armorInventory.get(0);
+        if (boots.isEmpty() || boots.getItem() != ConfigItems.itemBootsTraveller) {
+            return;
+        }
+        player.motionY += 0.275D;
     }
 
     private void handleChampionSpawn(EntityJoinWorldEvent event, EntityMob mob) {
