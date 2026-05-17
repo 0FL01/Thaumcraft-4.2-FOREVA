@@ -32,6 +32,9 @@ import thaumcraft.common.lib.TCSounds;
 import thaumcraft.common.lib.network.PacketHandler;
 import thaumcraft.common.lib.network.fx.PacketFXBlockSparkle;
 import thaumcraft.common.lib.research.ResearchManager;
+import thaumcraft.common.tiles.TileInfusionMatrix;
+import thaumcraft.common.tiles.TileInfusionPillar;
+import thaumcraft.common.tiles.TilePedestal;
 import thaumcraft.common.tiles.TileThaumatorium;
 
 import java.util.HashMap;
@@ -569,7 +572,129 @@ public class WandManager implements IWandTriggerManager {
     }
 
     private static boolean createInfusionAltar(ItemStack wandStack, EntityPlayer player, World world, int x, int y, int z) {
+        if (wandStack.isEmpty() || !(wandStack.getItem() instanceof ItemWandCasting)) return false;
+        ItemWandCasting wand = (ItemWandCasting) wandStack.getItem();
+        for (int xx = x - 2; xx <= x; xx++) {
+            for (int yy = y - 2; yy <= y; yy++) {
+                for (int zz = z - 2; zz <= z; zz++) {
+                    if (!fitInfusionAltar(world, xx, yy, zz)
+                            || !wand.consumeAllVisCrafting(wandStack, player,
+                            new AspectList()
+                                    .add(Aspect.FIRE, 25)
+                                    .add(Aspect.EARTH, 25)
+                                    .add(Aspect.ORDER, 25)
+                                    .add(Aspect.AIR, 25)
+                                    .add(Aspect.ENTROPY, 25)
+                                    .add(Aspect.WATER, 25), true)) {
+                        continue;
+                    }
+                    if (!world.isRemote) {
+                        replaceInfusionAltar(world, xx, yy, zz);
+                        return true;
+                    }
+                    return false;
+                }
+            }
+        }
         return false;
+    }
+
+    private static boolean fitInfusionAltar(World world, int x, int y, int z) {
+        ItemStack br1 = new ItemStack(ConfigBlocks.blockCosmeticSolid, 1, 6);
+        ItemStack br2 = new ItemStack(ConfigBlocks.blockCosmeticSolid, 1, 7);
+        ItemStack bs = new ItemStack(ConfigBlocks.blockStoneDevice, 1, 2);
+        ItemStack[][][] blueprint = new ItemStack[][][]{
+                {
+                        {null, null, null},
+                        {null, bs, null},
+                        {null, null, null}
+                },
+                {
+                        {br1, null, br1},
+                        {null, null, null},
+                        {br1, null, br1}
+                },
+                {
+                        {br2, null, br2},
+                        {null, null, null},
+                        {br2, null, br2}
+                }
+        };
+        for (int yy = 0; yy < 3; yy++) {
+            for (int xx = 0; xx < 3; xx++) {
+                for (int zz = 0; zz < 3; zz++) {
+                    BlockPos target = new BlockPos(x + xx, y - yy + 2, z + zz);
+                    ItemStack expected = blueprint[yy][xx][zz];
+                    if (expected == null) {
+                        if (xx == 1 && zz == 1 && yy == 2) {
+                            TileEntity tile = world.getTileEntity(target);
+                            if (tile instanceof TilePedestal) {
+                                continue;
+                            }
+                            return false;
+                        }
+                        if (world.isAirBlock(target)) continue;
+                        return false;
+                    }
+                    ItemStack found = new ItemStack(world.getBlockState(target).getBlock(), 1, world.getBlockState(target).getBlock().getMetaFromState(world.getBlockState(target)));
+                    if (found.isItemEqual(expected)) continue;
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    private static void replaceInfusionAltar(World world, int x, int y, int z) {
+        int[][][] blueprint = new int[][][]{
+                {
+                        {0, 0, 0},
+                        {0, 9, 0},
+                        {0, 0, 0}
+                },
+                {
+                        {1, 0, 1},
+                        {0, 0, 0},
+                        {1, 0, 1}
+                },
+                {
+                        {2, 0, 3},
+                        {0, 0, 0},
+                        {4, 0, 5}
+                }
+        };
+        for (int yy = 0; yy < 3; yy++) {
+            for (int xx = 0; xx < 3; xx++) {
+                for (int zz = 0; zz < 3; zz++) {
+                    int code = blueprint[yy][xx][zz];
+                    if (code == 0) continue;
+                    BlockPos target = new BlockPos(x + xx, y - yy + 2, z + zz);
+                    if (code == 1) {
+                        world.setBlockState(target, ConfigBlocks.blockStoneDevice.getDefaultState().withProperty(thaumcraft.common.blocks.BlockStoneDevice.TYPE, 4), 3);
+                        world.notifyNeighborsOfStateChange(target, ConfigBlocks.blockStoneDevice, false);
+                        continue;
+                    }
+                    if (code > 1 && code < 9) {
+                        world.setBlockState(target, ConfigBlocks.blockStoneDevice.getDefaultState().withProperty(thaumcraft.common.blocks.BlockStoneDevice.TYPE, 3), 3);
+                        TileEntity tile = world.getTileEntity(target);
+                        if (tile instanceof TileInfusionPillar) {
+                            ((TileInfusionPillar) tile).orientation = (byte) code;
+                            tile.markDirty();
+                        }
+                        world.notifyBlockUpdate(target, world.getBlockState(target), world.getBlockState(target), 3);
+                        world.notifyNeighborsOfStateChange(target, ConfigBlocks.blockStoneDevice, false);
+                        continue;
+                    }
+                    TileEntity tile = world.getTileEntity(target);
+                    if (tile instanceof TileInfusionMatrix) {
+                        ((TileInfusionMatrix) tile).active = true;
+                        tile.markDirty();
+                    }
+                    world.notifyBlockUpdate(target, world.getBlockState(target), world.getBlockState(target), 3);
+                }
+            }
+        }
+        world.playSound(null, new BlockPos(x, y, z), TCSounds.WAND, SoundCategory.PLAYERS, 1.0F, 1.0F);
     }
 
     private static boolean createNodeJar(ItemStack wandStack, EntityPlayer player, World world, int x, int y, int z) {

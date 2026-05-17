@@ -32,18 +32,24 @@ public class WandManagerTriggerStaticGuardTest {
         assertTrue(source.contains("case 0:"));
         assertTrue(source.contains("case 1:"));
         assertTrue(source.contains("case 2:"));
+        assertTrue(source.contains("case 3:"));
         assertTrue(source.contains("case 5:"));
         assertTrue(source.contains("return createThaumonomicon(wand, player, world, x, y, z);"));
         assertTrue(source.contains("return createCrucible(wand, player, world, x, y, z);"));
         assertTrue(source.contains("return createArcaneFurnace(wand, player, world, x, y, z);"));
+        assertTrue(source.contains("return createInfusionAltar(wand, player, world, x, y, z);"));
         assertTrue(source.contains("return createThaumatorium(wand, player, world, x, y, z, side);"));
         assertTrue(source.contains("public static boolean createThaumonomicon("));
         assertTrue(source.contains("public static boolean createCrucible("));
         assertTrue(source.contains("public static boolean createThaumatorium("));
         assertTrue(source.contains("private static boolean fitArcaneFurnace("));
         assertTrue(source.contains("private static boolean replaceArcaneFurnace("));
+        assertTrue(source.contains("private static boolean fitInfusionAltar("));
+        assertTrue(source.contains("private static void replaceInfusionAltar("));
         assertTrue(source.contains("Blocks.NETHER_BRICK_FENCE"));
         assertTrue(source.contains("ConfigBlocks.blockArcaneFurnace.getDefaultState().withProperty(BlockArcaneFurnace.TYPE, meta)"));
+        assertTrue(source.contains("ConfigBlocks.blockStoneDevice.getDefaultState().withProperty(thaumcraft.common.blocks.BlockStoneDevice.TYPE, 3)"));
+        assertTrue(source.contains("((TileInfusionMatrix) tile).active = true;"));
         assertTrue(source.contains("new PacketFXBlockSparkle(center.getX(), center.getY(), center.getZ(), -9999)"));
     }
 
