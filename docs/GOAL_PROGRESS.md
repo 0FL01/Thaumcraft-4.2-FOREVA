@@ -254,6 +254,7 @@ Incremental Stage 5 delta: `ItemResonator.onItemUseFirst(...)` now restores refe
 Incremental Stage 5 delta: `ItemSanitySoap` now restores reference-shaped completed-use consumption semantics by removing the creative-mode bypass (soap is consumed after successful >195 tick cleanse in all modes), guarded by new `ItemSanitySoapStaticGuardTest` with passing `validate --smoke`.
 Incremental Stage 8/9 boundary delta: server GUI routing contracts are now explicitly guarded by `CommonProxyServerGuiRoutingStaticGuardTest`, pinning `GUI_ARCANE_WORKBENCH`/`GUI_THAUMONOMICON`/`GUI_FOCAL_MANIPULATOR` id continuity and `CommonProxy.getServerGuiElement(...)` routes for `ContainerArcaneWorkbench`, `ContainerFocalManipulator`, and the Thaumonomicon null branch; `validate --smoke` passing.
 Incremental Stage 8/9 boundary delta: `ClientProxy.getClientGuiElement(...)` now restores the reference-shaped `WorldClient` gate before switch routing, guarded by expanded `ClientProxyGuiRoutingStaticGuardTest`; `validate --smoke` passing.
+Incremental Stage 8/9 boundary delta: utility GUI routing contracts are now explicitly guarded by `ProxyUtilityGuiRoutingStaticGuardTest`, pinning focus-pouch/hand-mirror/hover-harness direct routes plus `magic box` (`IInventory`) and `spa` tile routes across both `CommonProxy.getServerGuiElement(...)` and `ClientProxy.getClientGuiElement(...)`; `validate --smoke` passing.
 
 ## Archive
 
