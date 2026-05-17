@@ -79,8 +79,7 @@ public class TileAlembic extends TileThaumcraft implements IAspectContainer, IEs
 
     @Override
     public boolean doesContainerAccept(Aspect tag) {
-        return tag != null && (this.aspectFilter == null || this.aspectFilter == tag)
-                && this.amount < this.maxAmount && (this.aspect == null || this.aspect.equals(tag));
+        return true;
     }
 
     @Override

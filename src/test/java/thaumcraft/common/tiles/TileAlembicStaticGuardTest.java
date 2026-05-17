@@ -31,6 +31,10 @@ public class TileAlembicStaticGuardTest {
     public void tileAlembicShouldKeepEssentiaOutputContractAndFacingRules() throws IOException {
         String source = readFile("src/main/java/thaumcraft/common/tiles/TileAlembic.java");
 
+        assertTrue(source.contains("public boolean doesContainerAccept(Aspect tag)"));
+        assertTrue(source.contains("return true;"));
+        assertTrue(source.contains("if (!this.doesContainerAccept(tag)) return requested;"));
+        assertTrue(source.contains("int add = Math.min(requested, this.maxAmount - this.amount);"));
         assertTrue(source.contains("return face != EnumFacing.byIndex(this.facing) && face != EnumFacing.DOWN;"));
         assertTrue(source.contains("public boolean canInputFrom(EnumFacing face)"));
         assertTrue(source.contains("return false;"));
