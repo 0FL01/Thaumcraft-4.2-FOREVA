@@ -45,6 +45,11 @@ public class ConfigRecipes {
     private static IRecipe recipeThaumometer;
     private static IRecipe recipeWandCapIron;
     private static IRecipe recipeWandBasic;
+    private static IRecipe recipeMundaneAmulet;
+    private static IRecipe recipeMundaneRing;
+    private static IRecipe recipeMundaneBelt;
+    private static IRecipe recipeBlockFlesh;
+    private static IRecipe recipeBlockTallow;
     private static CrucibleRecipe recipeNitor;
     private static CrucibleRecipe recipeAlumentum;
     private static CrucibleRecipe recipeThaumium;
@@ -200,53 +205,73 @@ public class ConfigRecipes {
                         new ItemStack(ConfigItems.itemShard, 1, 3),
                         new ItemStack(ConfigItems.itemShard, 1, 4),
                         new ItemStack(ConfigItems.itemShard, 1, 5)));
-        ConfigResearch.recipes.put("MundaneAmulet",
-                oreDictRecipe(
-                        new ItemStack(ConfigItems.itemBaubleBlanks, 1, 0),
-                        new Object[]{
-                                " S ",
-                                "S S",
-                                " I ",
-                                'S', new ItemStack(Items.STRING),
-                                'I', new ItemStack(Items.IRON_INGOT)
-                        }));
-        ConfigResearch.recipes.put("MundaneRing",
-                oreDictRecipe(
-                        new ItemStack(ConfigItems.itemBaubleBlanks, 1, 1),
-                        new Object[]{
-                                " N ",
-                                "N N",
-                                " N ",
-                                'N', new ItemStack(Items.GOLD_NUGGET)
-                        }));
-        ConfigResearch.recipes.put("MundaneBelt",
-                oreDictRecipe(
-                        new ItemStack(ConfigItems.itemBaubleBlanks, 1, 2),
-                        new Object[]{
-                                " L ",
-                                "L L",
-                                " I ",
-                                'L', new ItemStack(Items.LEATHER),
-                                'I', new ItemStack(Items.IRON_INGOT)
-                        }));
-        ConfigResearch.recipes.put("BlockFlesh",
-                oreDictRecipe(
-                        new ItemStack(ConfigBlocks.blockTaint, 1, 2),
-                        new Object[]{
-                                "KKK",
-                                "KKK",
-                                "KKK",
-                                'K', new ItemStack(Items.ROTTEN_FLESH)
-                        }));
-        ConfigResearch.recipes.put("BlockTallow",
-                oreDictRecipe(
-                        new ItemStack(ConfigBlocks.blockCosmeticSolid, 1, 5),
-                        new Object[]{
-                                "KKK",
-                                "KKK",
-                                "KKK",
-                                'K', new ItemStack(ConfigItems.itemResource, 1, 4)
-                        }));
+        if (recipeMundaneAmulet != null) {
+            ConfigResearch.recipes.put("MundaneAmulet", recipeMundaneAmulet);
+        } else {
+            ConfigResearch.recipes.put("MundaneAmulet",
+                    oreDictRecipe(
+                            new ItemStack(ConfigItems.itemBaubleBlanks, 1, 0),
+                            new Object[]{
+                                    " S ",
+                                    "S S",
+                                    " I ",
+                                    'S', new ItemStack(Items.STRING),
+                                    'I', new ItemStack(Items.IRON_INGOT)
+                            }));
+        }
+        if (recipeMundaneRing != null) {
+            ConfigResearch.recipes.put("MundaneRing", recipeMundaneRing);
+        } else {
+            ConfigResearch.recipes.put("MundaneRing",
+                    oreDictRecipe(
+                            new ItemStack(ConfigItems.itemBaubleBlanks, 1, 1),
+                            new Object[]{
+                                    " N ",
+                                    "N N",
+                                    " N ",
+                                    'N', new ItemStack(Items.GOLD_NUGGET)
+                            }));
+        }
+        if (recipeMundaneBelt != null) {
+            ConfigResearch.recipes.put("MundaneBelt", recipeMundaneBelt);
+        } else {
+            ConfigResearch.recipes.put("MundaneBelt",
+                    oreDictRecipe(
+                            new ItemStack(ConfigItems.itemBaubleBlanks, 1, 2),
+                            new Object[]{
+                                    " L ",
+                                    "L L",
+                                    " I ",
+                                    'L', new ItemStack(Items.LEATHER),
+                                    'I', new ItemStack(Items.IRON_INGOT)
+                            }));
+        }
+        if (recipeBlockFlesh != null) {
+            ConfigResearch.recipes.put("BlockFlesh", recipeBlockFlesh);
+        } else {
+            ConfigResearch.recipes.put("BlockFlesh",
+                    oreDictRecipe(
+                            new ItemStack(ConfigBlocks.blockTaint, 1, 2),
+                            new Object[]{
+                                    "KKK",
+                                    "KKK",
+                                    "KKK",
+                                    'K', new ItemStack(Items.ROTTEN_FLESH)
+                            }));
+        }
+        if (recipeBlockTallow != null) {
+            ConfigResearch.recipes.put("BlockTallow", recipeBlockTallow);
+        } else {
+            ConfigResearch.recipes.put("BlockTallow",
+                    oreDictRecipe(
+                            new ItemStack(ConfigBlocks.blockCosmeticSolid, 1, 5),
+                            new Object[]{
+                                    "KKK",
+                                    "KKK",
+                                    "KKK",
+                                    'K', new ItemStack(ConfigItems.itemResource, 1, 4)
+                            }));
+        }
 
         boolean hasArcaneWand = false;
         boolean hasArcaneSceptre = false;
@@ -2376,6 +2401,54 @@ public class ConfigRecipes {
                 'S', "stickWood")
                 .setRegistryName("thaumcraft", "wandbasic");
         registry.register(recipeWandBasic);
+
+        recipeMundaneAmulet = new ShapedOreRecipe(null,
+                new ItemStack(ConfigItems.itemBaubleBlanks, 1, 0),
+                " S ",
+                "S S",
+                " I ",
+                'S', new ItemStack(Items.STRING),
+                'I', new ItemStack(Items.IRON_INGOT))
+                .setRegistryName("thaumcraft", "mundaneamulet");
+        registry.register(recipeMundaneAmulet);
+
+        recipeMundaneRing = new ShapedOreRecipe(null,
+                new ItemStack(ConfigItems.itemBaubleBlanks, 1, 1),
+                " N ",
+                "N N",
+                " N ",
+                'N', new ItemStack(Items.GOLD_NUGGET))
+                .setRegistryName("thaumcraft", "mundanering");
+        registry.register(recipeMundaneRing);
+
+        recipeMundaneBelt = new ShapedOreRecipe(null,
+                new ItemStack(ConfigItems.itemBaubleBlanks, 1, 2),
+                " L ",
+                "L L",
+                " I ",
+                'L', new ItemStack(Items.LEATHER),
+                'I', new ItemStack(Items.IRON_INGOT))
+                .setRegistryName("thaumcraft", "mundanebelt");
+        registry.register(recipeMundaneBelt);
+
+        recipeBlockFlesh = new ShapedOreRecipe(null,
+                new ItemStack(ConfigBlocks.blockTaint, 1, 2),
+                "KKK",
+                "KKK",
+                "KKK",
+                'K', new ItemStack(Items.ROTTEN_FLESH))
+                .setRegistryName("thaumcraft", "blockflesh");
+        registry.register(recipeBlockFlesh);
+
+        recipeBlockTallow = new ShapedOreRecipe(null,
+                new ItemStack(ConfigBlocks.blockCosmeticSolid, 1, 5),
+                "KKK",
+                "KKK",
+                "KKK",
+                'K', new ItemStack(ConfigItems.itemResource, 1, 4))
+                .setRegistryName("thaumcraft", "blocktallow");
+        registry.register(recipeBlockTallow);
+
         specialRecipesRegistered = true;
     }
 }
