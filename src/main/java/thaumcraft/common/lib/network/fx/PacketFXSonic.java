@@ -36,6 +36,7 @@ public class PacketFXSonic extends PacketBase {
             if (Minecraft.getMinecraft().world == null) return;
             Entity sourceEntity = Minecraft.getMinecraft().world.getEntityByID(this.source);
             if (sourceEntity == null) return;
+            Thaumcraft.proxy.sonicFX(Minecraft.getMinecraft().world, sourceEntity, 14);
             Thaumcraft.proxy.burst(
                     Minecraft.getMinecraft().world,
                     sourceEntity.posX,

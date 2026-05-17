@@ -53,6 +53,8 @@ import thaumcraft.client.gui.GuiTravelingTrunk;
 import thaumcraft.client.fx.ParticleEngine;
 import thaumcraft.client.fx.beams.FXBeam;
 import thaumcraft.client.fx.bolt.FXLightningBolt;
+import thaumcraft.client.fx.other.FXShieldRunes;
+import thaumcraft.client.fx.other.FXSonic;
 import thaumcraft.client.renderers.entity.RenderFallbackBiped;
 import thaumcraft.client.renderers.entity.RenderFireBat;
 import thaumcraft.client.renderers.entity.RenderGolemBase;
@@ -597,6 +599,18 @@ public class ClientProxy extends CommonProxy {
             double mz = (world.rand.nextFloat() - 0.5f) * 0.2f;
             world.spawnParticle(EnumParticleTypes.EXPLOSION_NORMAL, x, y, z, mx, my, mz);
         }
+    }
+
+    @Override
+    public void sonicFX(World world, Entity source, int age) {
+        if (world == null || !world.isRemote || source == null) return;
+        ParticleEngine.addEffect(world, new FXSonic(world, source, Math.max(8, age)));
+    }
+
+    @Override
+    public void shieldRunesFX(World world, Entity source, int age, float yaw, float pitch) {
+        if (world == null || !world.isRemote || source == null) return;
+        ParticleEngine.addEffect(world, new FXShieldRunes(world, source, Math.max(8, age), yaw, pitch));
     }
 
     @Override

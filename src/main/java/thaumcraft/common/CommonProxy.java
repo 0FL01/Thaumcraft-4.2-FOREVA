@@ -166,6 +166,12 @@ public class CommonProxy implements IGuiHandler {
     public void burst(World world, double x, double y, double z, float scale) {
     }
 
+    public void sonicFX(World world, Entity source, int age) {
+    }
+
+    public void shieldRunesFX(World world, Entity source, int age, float yaw, float pitch) {
+    }
+
     public void wispFX3(World world, double x, double y, double z, double tx, double ty, double tz, float size, int count, boolean flag, float speed) {
     }
 

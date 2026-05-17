@@ -44,6 +44,12 @@ public class PacketFXShield extends PacketBase {
             double sx = sourceEntity.posX;
             double sy = sourceEntity.getEntityBoundingBox().minY + sourceEntity.height * 0.5;
             double sz = sourceEntity.posZ;
+            Thaumcraft.proxy.shieldRunesFX(
+                    Minecraft.getMinecraft().world,
+                    sourceEntity,
+                    12,
+                    sourceEntity.rotationYaw,
+                    sourceEntity.rotationPitch);
             Thaumcraft.proxy.burst(Minecraft.getMinecraft().world, sx, sy, sz, 1.0f);
 
             if (this.target >= 0) {
