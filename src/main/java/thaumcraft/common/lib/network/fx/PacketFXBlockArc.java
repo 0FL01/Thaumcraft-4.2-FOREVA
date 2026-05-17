@@ -7,7 +7,8 @@ import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import thaumcraft.common.Thaumcraft;
+import thaumcraft.client.fx.ParticleEngine;
+import thaumcraft.client.fx.beams.FXArc;
 import thaumcraft.common.entities.monster.boss.EntityCultistPortal;
 import thaumcraft.common.lib.network.PacketBase;
 
@@ -50,17 +51,24 @@ public class PacketFXBlockArc extends PacketBase {
             if (Minecraft.getMinecraft().world == null) return;
             Entity source = Minecraft.getMinecraft().world.getEntityByID(this.entityId);
             if (source == null) return;
-            int color = source instanceof EntityCultistPortal ? 0xCC3300 : 0x6633CC;
-            Thaumcraft.proxy.bolt(
-                    Minecraft.getMinecraft().world,
-                    source.posX,
-                    source.getEntityBoundingBox().minY + source.height * 0.5,
-                    source.posZ,
-                    this.x + 0.5,
-                    this.y + 1.0,
-                    this.z + 0.5,
-                    color,
-                    4);
+            float red = 0.3F - Minecraft.getMinecraft().world.rand.nextFloat() * 0.1F;
+            float green = 0.0F;
+            float blue = 0.5F + Minecraft.getMinecraft().world.rand.nextFloat() * 0.2F;
+            if (source instanceof EntityCultistPortal) {
+                red = 0.5F + Minecraft.getMinecraft().world.rand.nextFloat() * 0.2F;
+                green = 0.0F;
+                blue = 0.0F;
+            }
+            ParticleEngine.addEffect(Minecraft.getMinecraft().world,
+                    new FXArc(
+                            Minecraft.getMinecraft().world,
+                            source.posX,
+                            source.getEntityBoundingBox().minY + source.height * 0.5,
+                            source.posZ,
+                            this.x + 0.5,
+                            this.y + 1.0,
+                            this.z + 0.5,
+                            red, green, blue, 0.5D));
         });
         return null;
     }

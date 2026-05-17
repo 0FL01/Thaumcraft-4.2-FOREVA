@@ -126,8 +126,10 @@ public class ClientProxyFxStaticGuardTest {
 
         assertTrue("PacketFXVisDrain must schedule client task and call proxy beam",
                 visDrain.contains("Minecraft.getMinecraft().addScheduledTask") && visDrain.contains("Thaumcraft.proxy.beam("));
-        assertTrue("PacketFXBlockArc must schedule client task and call proxy bolt",
-                blockArc.contains("Minecraft.getMinecraft().addScheduledTask") && blockArc.contains("Thaumcraft.proxy.bolt("));
+        assertTrue("PacketFXBlockArc must schedule client task and route through dedicated FXArc",
+                blockArc.contains("Minecraft.getMinecraft().addScheduledTask")
+                        && blockArc.contains("new FXArc(")
+                        && blockArc.contains("ParticleEngine.addEffect("));
         assertTrue("PacketFXBlockZap must schedule client task and route through proxy bolt",
                 blockZap.contains("Minecraft.getMinecraft().addScheduledTask")
                         && blockZap.contains("Thaumcraft.proxy.bolt("));
@@ -137,12 +139,14 @@ public class ClientProxyFxStaticGuardTest {
         assertTrue("PacketFXBlockBubble must schedule client task and emit bubble particles",
                 blockBubble.contains("Minecraft.getMinecraft().addScheduledTask")
                         && blockBubble.contains("EnumParticleTypes.WATER_BUBBLE"));
-        assertTrue("PacketFXBeamPulse must schedule client task and route through proxy beam",
+        assertTrue("PacketFXBeamPulse must schedule client task and route through dedicated FXBeam",
                 beamPulse.contains("Minecraft.getMinecraft().addScheduledTask")
-                        && beamPulse.contains("Thaumcraft.proxy.beam("));
-        assertTrue("PacketFXBeamPulseGolemBoss must schedule client task and route through proxy beam",
+                        && beamPulse.contains("new FXBeam(")
+                        && beamPulse.contains("ParticleEngine.addEffect("));
+        assertTrue("PacketFXBeamPulseGolemBoss must schedule client task and route through dedicated FXBeamGolemBoss",
                 beamPulseGolemBoss.contains("Minecraft.getMinecraft().addScheduledTask")
-                        && beamPulseGolemBoss.contains("Thaumcraft.proxy.beam("));
+                        && beamPulseGolemBoss.contains("new FXBeamGolemBoss(")
+                        && beamPulseGolemBoss.contains("ParticleEngine.addEffect("));
         assertTrue("PacketFXEssentiaSource must schedule client task and route through proxy beam",
                 essentiaSource.contains("Minecraft.getMinecraft().addScheduledTask")
                         && essentiaSource.contains("Thaumcraft.proxy.beam("));

@@ -3,11 +3,13 @@ package thaumcraft.common.lib.network.fx;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import thaumcraft.common.Thaumcraft;
+import thaumcraft.client.fx.ParticleEngine;
+import thaumcraft.client.fx.beams.FXBeamGolemBoss;
 import thaumcraft.common.lib.network.PacketBase;
 
 public class PacketFXBeamPulseGolemBoss extends PacketBase {
@@ -40,29 +42,27 @@ public class PacketFXBeamPulseGolemBoss extends PacketBase {
             if (Minecraft.getMinecraft().world == null) return;
             Entity sourceEntity = Minecraft.getMinecraft().world.getEntityByID(this.source);
             Entity targetEntity = Minecraft.getMinecraft().world.getEntityByID(this.target);
-            if (sourceEntity == null || targetEntity == null) return;
-            Thaumcraft.proxy.beam(
+            if (!(sourceEntity instanceof EntityLivingBase) || targetEntity == null) return;
+
+            FXBeamGolemBoss beamA = new FXBeamGolemBoss(
                     Minecraft.getMinecraft().world,
-                    sourceEntity.posX,
-                    sourceEntity.posY + sourceEntity.getEyeHeight(),
-                    sourceEntity.posZ,
-                    targetEntity.posX,
-                    targetEntity.posY + targetEntity.height * 0.5,
-                    targetEntity.posZ,
-                    0x12A87A,
-                    true,
+                    (EntityLivingBase) sourceEntity,
+                    targetEntity,
+                    0.07F, 0.376F, 0.325F,
                     20);
-            Thaumcraft.proxy.beam(
+            beamA.setType(2);
+            beamA.setPulse(true);
+            ParticleEngine.addEffect(Minecraft.getMinecraft().world, beamA);
+
+            FXBeamGolemBoss beamB = new FXBeamGolemBoss(
                     Minecraft.getMinecraft().world,
-                    sourceEntity.posX,
-                    sourceEntity.posY + sourceEntity.getEyeHeight(),
-                    sourceEntity.posZ,
-                    targetEntity.posX,
-                    targetEntity.posY + targetEntity.height * 0.5,
-                    targetEntity.posZ,
-                    0xFF8080,
-                    true,
-                    12);
+                    (EntityLivingBase) sourceEntity,
+                    targetEntity,
+                    1.0F, 0.5F, 0.5F,
+                    20);
+            beamB.setType(1);
+            beamB.setPulse(true);
+            ParticleEngine.addEffect(Minecraft.getMinecraft().world, beamB);
         });
         return null;
     }
