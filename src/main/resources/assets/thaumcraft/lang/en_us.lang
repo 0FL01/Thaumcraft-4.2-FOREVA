@@ -1,5 +1,7 @@
 # Thaumcraft Stage 5 item/static GUI language entries
 # Generated from ConfigItems translation keys; original 1.7 strings remain source reference.
+enchantment.special.sapless=Lesser Sapping
+enchantment.special.sapgreat=Greater Sapping
 item.thaumcraft.wand_casting.name=Casting Wand
 item.thaumcraft.wand_rod.name=Wand Rod
 item.thaumcraft.wand_cap.name=Wand Cap

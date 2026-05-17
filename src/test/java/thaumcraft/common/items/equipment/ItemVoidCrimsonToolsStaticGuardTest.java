@@ -19,12 +19,14 @@ public class ItemVoidCrimsonToolsStaticGuardTest {
         String voidShovel = readFile("src/main/java/thaumcraft/common/items/equipment/ItemVoidShovel.java");
         String voidHoe = readFile("src/main/java/thaumcraft/common/items/equipment/ItemVoidHoe.java");
         String crimsonSword = readFile("src/main/java/thaumcraft/common/items/equipment/ItemCrimsonSword.java");
+        String lang = readFile("src/main/resources/assets/thaumcraft/lang/en_us.lang");
 
         assertTrue("ItemVoidSword must keep uncommon rarity, charm repair and pvp-gated wither helper contracts",
                 voidSword.contains("return EnumRarity.UNCOMMON;")
                         && voidSword.contains("return !repair.isEmpty() && repair.getItem() == ConfigItems.itemResource && repair.getMetadata() == ItemResource.META_CHARM;")
                         && voidSword.contains("canApplyVoidCombatDebuff(")
-                        && voidSword.contains("target.addPotionEffect(new PotionEffect(MobEffects.WITHER, durationTicks));"));
+                        && voidSword.contains("target.addPotionEffect(new PotionEffect(MobEffects.WITHER, durationTicks));")
+                        && voidSword.contains("I18n.translateToLocal(\"enchantment.special.sapless\")"));
         assertTrue("Void tools must keep uncommon rarity and toolclass contracts where applicable",
                 voidAxe.contains("ImmutableSet.of(\"axe\")")
                         && voidPickaxe.contains("ImmutableSet.of(\"pickaxe\")")
@@ -49,8 +51,12 @@ public class ItemVoidCrimsonToolsStaticGuardTest {
                         && crimsonSword.contains("return ItemVoidSword.isVoidToolRepair(repair) || super.getIsRepairable(toRepair, repair);")
                         && crimsonSword.contains("target.addPotionEffect(new PotionEffect(MobEffects.WITHER, 60));")
                         && crimsonSword.contains("target.addPotionEffect(new PotionEffect(MobEffects.WEAKNESS, 120));")
+                        && crimsonSword.contains("I18n.translateToLocal(\"enchantment.special.sapgreat\")")
                         && crimsonSword.contains("ItemVoidSword.repairVoid(stack, world, entityIn);")
                         && crimsonSword.contains("return 2;"));
+        assertTrue("Void/crimson sword sapping tooltip localization keys must exist in en_us",
+                lang.contains("enchantment.special.sapless=Lesser Sapping")
+                        && lang.contains("enchantment.special.sapgreat=Greater Sapping"));
     }
 
     private static String readFile(String path) throws IOException {
