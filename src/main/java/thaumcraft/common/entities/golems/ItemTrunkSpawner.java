@@ -4,6 +4,7 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockFence;
 import net.minecraft.block.BlockWall;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.IEntityLivingData;
 import net.minecraft.entity.player.EntityPlayer;
@@ -17,8 +18,11 @@ import net.minecraft.util.EnumHand;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.text.translation.I18n;
 import net.minecraft.world.World;
 import thaumcraft.common.lib.CreativeTabThaumcraft;
+
+import java.util.List;
 
 public class ItemTrunkSpawner extends Item {
     public ItemTrunkSpawner() {
@@ -32,6 +36,23 @@ public class ItemTrunkSpawner extends Item {
     public void getSubItems(CreativeTabs tab, NonNullList<ItemStack> items) {
         if (this.isInCreativeTab(tab)) {
             items.add(new ItemStack(this, 1, 0));
+        }
+    }
+
+    @Override
+    public void addInformation(ItemStack stack, World worldIn, List<String> tooltip, ITooltipFlag flagIn) {
+        if (!stack.hasTagCompound()) return;
+        NBTTagCompound tag = stack.getTagCompound();
+        if (tag.hasKey("upgrade")) {
+            byte upgrade = tag.getByte("upgrade");
+            String text = "\u00a79";
+            if (upgrade > -1) {
+                text = text + I18n.translateToLocal("item.ItemGolemUpgrade." + upgrade + ".name") + " ";
+            }
+            tooltip.add(text);
+        }
+        if (tag.hasKey("inventory")) {
+            tooltip.add(I18n.translateToLocal("item.TrunkSpawner.text.1"));
         }
     }
 
@@ -67,10 +88,13 @@ public class ItemTrunkSpawner extends Item {
 
         trunk.onInitialSpawn(world.getDifficultyForLocation(new BlockPos(trunk)), (IEntityLivingData) null);
         boolean spawned = world.spawnEntity(trunk);
+        if (spawned) {
+            trunk.playLivingSound();
+        }
         if (spawned && !player.capabilities.isCreativeMode) {
             stack.shrink(1);
         }
-        return spawned ? EnumActionResult.SUCCESS : EnumActionResult.FAIL;
+        return EnumActionResult.SUCCESS;
     }
 
     private static double getPlacementYOffset(IBlockState state, EnumFacing side) {
