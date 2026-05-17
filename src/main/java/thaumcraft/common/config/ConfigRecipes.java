@@ -362,12 +362,6 @@ public class ConfigRecipes {
                 ConfigResearch.recipes.put("JarLabel" + i, recipe);
             }
         }
-        // Fallback safety: keep the reference key present even if the concrete
-        // special recipe failed to register for any reason.
-        if (!ConfigResearch.recipes.containsKey("TallowCandle")) {
-            ConfigResearch.recipes.put("TallowCandle", null);
-        }
-
         boolean hasArcaneWand = false;
         boolean hasArcaneSceptre = false;
         boolean hasRunicAugment = false;
