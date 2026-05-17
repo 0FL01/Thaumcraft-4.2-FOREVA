@@ -7,7 +7,8 @@ import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import thaumcraft.common.Thaumcraft;
+import thaumcraft.client.fx.ParticleEngine;
+import thaumcraft.client.fx.beams.FXBeam;
 import thaumcraft.common.lib.network.PacketBase;
 
 public class PacketFXVisDrain extends PacketBase {
@@ -42,14 +43,22 @@ public class PacketFXVisDrain extends PacketBase {
     @SideOnly(Side.CLIENT)
     public IMessage onMessage(MessageContext ctx) {
         Minecraft.getMinecraft().addScheduledTask(() -> {
-            if (Minecraft.getMinecraft().world == null) return;
-            double sx = this.to.getX() + 0.4 + Minecraft.getMinecraft().world.rand.nextFloat() * 0.2f;
-            double sy = this.to.getY() + 0.4 + Minecraft.getMinecraft().world.rand.nextFloat() * 0.2f;
-            double sz = this.to.getZ() + 0.4 + Minecraft.getMinecraft().world.rand.nextFloat() * 0.2f;
-            double tx = this.from.getX() + Minecraft.getMinecraft().world.rand.nextFloat();
-            double ty = this.from.getY() + Minecraft.getMinecraft().world.rand.nextFloat();
-            double tz = this.from.getZ() + Minecraft.getMinecraft().world.rand.nextFloat();
-            Thaumcraft.proxy.beam(Minecraft.getMinecraft().world, sx, sy, sz, tx, ty, tz, this.color, false, 12);
+            Minecraft mc = Minecraft.getMinecraft();
+            if (mc.world == null) return;
+            float red = ((this.color >> 16) & 0xFF) / 255.0F;
+            float green = ((this.color >> 8) & 0xFF) / 255.0F;
+            float blue = (this.color & 0xFF) / 255.0F;
+            double sx = this.to.getX() + 0.4D + mc.world.rand.nextFloat() * 0.2F;
+            double sy = this.to.getY() + 0.4D + mc.world.rand.nextFloat() * 0.2F;
+            double sz = this.to.getZ() + 0.4D + mc.world.rand.nextFloat() * 0.2F;
+            double tx = this.from.getX() + mc.world.rand.nextFloat();
+            double ty = this.from.getY() + mc.world.rand.nextFloat();
+            double tz = this.from.getZ() + mc.world.rand.nextFloat();
+            FXBeam beam = new FXBeam(mc.world, sx, sy, sz, tx, ty, tz, red, green, blue, 12, false, 14);
+            beam.setType(2);
+            beam.setReverse(true);
+            beam.setPulse(true);
+            ParticleEngine.addEffect(mc.world, beam);
         });
         return null;
     }

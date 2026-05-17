@@ -7,7 +7,8 @@ import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import thaumcraft.common.Thaumcraft;
+import thaumcraft.client.fx.ParticleEngine;
+import thaumcraft.client.fx.bolt.FXLightningBolt;
 import thaumcraft.common.lib.network.PacketBase;
 
 public class PacketFXZap extends PacketBase {
@@ -37,12 +38,28 @@ public class PacketFXZap extends PacketBase {
     @SideOnly(Side.CLIENT)
     public IMessage onMessage(MessageContext ctx) {
         Minecraft.getMinecraft().addScheduledTask(() -> {
-            if (Minecraft.getMinecraft().world == null) return;
-            Entity sourceEntity = Minecraft.getMinecraft().world.getEntityByID(this.source);
-            Entity targetEntity = Minecraft.getMinecraft().world.getEntityByID(this.target);
+            Minecraft mc = Minecraft.getMinecraft();
+            if (mc.world == null) return;
+            Entity sourceEntity = mc.world.getEntityByID(this.source);
+            Entity targetEntity = mc.world.getEntityByID(this.target);
             if (sourceEntity == null || targetEntity == null) return;
-            Thaumcraft.proxy.bolt(
-                    Minecraft.getMinecraft().world,
+            ParticleEngine.addEffect(mc.world,
+                    new FXLightningBolt(
+                            mc.world,
+                            sourceEntity.posX,
+                            sourceEntity.getEntityBoundingBox().minY + sourceEntity.height * 0.5,
+                            sourceEntity.posZ,
+                            targetEntity.posX,
+                            targetEntity.getEntityBoundingBox().minY + targetEntity.height * 0.5,
+                            targetEntity.posZ,
+                            0.4F, 0.8F, 1.0F,
+                            5,
+                            8));
+            mc.world.playEvent(2005, sourceEntity.getPosition(), 0);
+            mc.world.playEvent(2005, targetEntity.getPosition(), 0);
+            /* Keep a thin proxy fallback sparkline alongside dedicated bolt for parity softness. */
+            thaumcraft.common.Thaumcraft.proxy.bolt(
+                    mc.world,
                     sourceEntity.posX,
                     sourceEntity.getEntityBoundingBox().minY + sourceEntity.height * 0.5,
                     sourceEntity.posZ,
@@ -50,7 +67,7 @@ public class PacketFXZap extends PacketBase {
                     targetEntity.getEntityBoundingBox().minY + targetEntity.height * 0.5,
                     targetEntity.posZ,
                     0x66CCFF,
-                    5);
+                    2);
         });
         return null;
     }

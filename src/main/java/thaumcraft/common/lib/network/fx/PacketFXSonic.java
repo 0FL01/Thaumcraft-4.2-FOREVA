@@ -7,7 +7,8 @@ import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import thaumcraft.common.Thaumcraft;
+import thaumcraft.client.fx.ParticleEngine;
+import thaumcraft.client.fx.other.FXSonic;
 import thaumcraft.common.lib.network.PacketBase;
 
 public class PacketFXSonic extends PacketBase {
@@ -33,12 +34,14 @@ public class PacketFXSonic extends PacketBase {
     @SideOnly(Side.CLIENT)
     public IMessage onMessage(MessageContext ctx) {
         Minecraft.getMinecraft().addScheduledTask(() -> {
-            if (Minecraft.getMinecraft().world == null) return;
-            Entity sourceEntity = Minecraft.getMinecraft().world.getEntityByID(this.source);
+            Minecraft mc = Minecraft.getMinecraft();
+            if (mc.world == null) return;
+            Entity sourceEntity = mc.world.getEntityByID(this.source);
             if (sourceEntity == null) return;
-            Thaumcraft.proxy.sonicFX(Minecraft.getMinecraft().world, sourceEntity, 14);
-            Thaumcraft.proxy.burst(
-                    Minecraft.getMinecraft().world,
+            ParticleEngine.addEffect(mc.world, new FXSonic(mc.world, sourceEntity, 14));
+            thaumcraft.common.Thaumcraft.proxy.sonicFX(mc.world, sourceEntity, 14);
+            thaumcraft.common.Thaumcraft.proxy.burst(
+                    mc.world,
                     sourceEntity.posX,
                     sourceEntity.posY + sourceEntity.height * 0.5,
                     sourceEntity.posZ,

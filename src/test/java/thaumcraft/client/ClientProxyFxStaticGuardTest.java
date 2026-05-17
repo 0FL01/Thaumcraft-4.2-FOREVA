@@ -124,8 +124,10 @@ public class ClientProxyFxStaticGuardTest {
         String warpEvents = readFile("src/main/java/thaumcraft/common/lib/WarpEvents.java");
         String fallingTaint = readFile("src/main/java/thaumcraft/common/entities/EntityFallingTaint.java");
 
-        assertTrue("PacketFXVisDrain must schedule client task and call proxy beam",
-                visDrain.contains("Minecraft.getMinecraft().addScheduledTask") && visDrain.contains("Thaumcraft.proxy.beam("));
+        assertTrue("PacketFXVisDrain must schedule client task and route through dedicated FXBeam",
+                visDrain.contains("Minecraft.getMinecraft().addScheduledTask")
+                        && visDrain.contains("new FXBeam(")
+                        && visDrain.contains("ParticleEngine.addEffect("));
         assertTrue("PacketFXBlockArc must schedule client task and route through dedicated FXArc",
                 blockArc.contains("Minecraft.getMinecraft().addScheduledTask")
                         && blockArc.contains("new FXArc(")
@@ -147,12 +149,14 @@ public class ClientProxyFxStaticGuardTest {
                 beamPulseGolemBoss.contains("Minecraft.getMinecraft().addScheduledTask")
                         && beamPulseGolemBoss.contains("new FXBeamGolemBoss(")
                         && beamPulseGolemBoss.contains("ParticleEngine.addEffect("));
-        assertTrue("PacketFXEssentiaSource must schedule client task and route through proxy beam",
+        assertTrue("PacketFXEssentiaSource must schedule client task and route through dedicated FXBeam",
                 essentiaSource.contains("Minecraft.getMinecraft().addScheduledTask")
-                        && essentiaSource.contains("Thaumcraft.proxy.beam("));
-        assertTrue("PacketFXInfusionSource must schedule client task and route through proxy beam",
+                        && essentiaSource.contains("new FXBeam(")
+                        && essentiaSource.contains("ParticleEngine.addEffect("));
+        assertTrue("PacketFXInfusionSource must schedule client task and route through dedicated FXBeam",
                 infusionSource.contains("Minecraft.getMinecraft().addScheduledTask")
-                        && infusionSource.contains("Thaumcraft.proxy.beam("));
+                        && infusionSource.contains("new FXBeam(")
+                        && infusionSource.contains("ParticleEngine.addEffect("));
         assertTrue("PacketMiscEvent must schedule client task via proxy boundary and update warp vignette/fog markers",
                 miscEvent.contains("Thaumcraft.proxy.scheduleClientTask(")
                         && miscEvent.contains("ClientTickEventsFML.warpVignette")
@@ -165,21 +169,27 @@ public class ClientProxyFxStaticGuardTest {
                         && packetBoreDig.contains("getDigEvent"));
         assertTrue("PacketFXBlockSparkle must schedule client task and call proxy blockSparkle",
                 blockSparkle.contains("Minecraft.getMinecraft().addScheduledTask") && blockSparkle.contains("Thaumcraft.proxy.blockSparkle("));
-        assertTrue("PacketFXShield must schedule client task and route through proxy burst/bolt",
+        assertTrue("PacketFXShield must schedule client task and route through dedicated shield/bolt FX",
                 shield.contains("Minecraft.getMinecraft().addScheduledTask")
                         && shield.contains("Thaumcraft.proxy.shieldRunesFX(")
+                        && shield.contains("new FXShieldRunes(")
+                        && shield.contains("new FXLightningBolt(")
                         && shield.contains("Thaumcraft.proxy.burst(")
-                        && shield.contains("Thaumcraft.proxy.bolt("));
-        assertTrue("PacketFXSonic must schedule client task and route through proxy burst",
+                        && shield.contains("ParticleEngine.addEffect("));
+        assertTrue("PacketFXSonic must schedule client task and route through dedicated sonic FX",
                 sonic.contains("Minecraft.getMinecraft().addScheduledTask")
+                        && sonic.contains("new FXSonic(")
+                        && sonic.contains("ParticleEngine.addEffect(")
                         && sonic.contains("Thaumcraft.proxy.sonicFX(")
                         && sonic.contains("Thaumcraft.proxy.burst("));
-        assertTrue("PacketFXWispZap must schedule client task and route through proxy bolt",
+        assertTrue("PacketFXWispZap must schedule client task and route through dedicated lightning bolt FX",
                 wispZap.contains("Minecraft.getMinecraft().addScheduledTask")
-                        && wispZap.contains("Thaumcraft.proxy.bolt("));
-        assertTrue("PacketFXZap must schedule client task and route through proxy bolt",
+                        && wispZap.contains("new FXLightningBolt(")
+                        && wispZap.contains("ParticleEngine.addEffect("));
+        assertTrue("PacketFXZap must schedule client task and route through dedicated lightning bolt FX",
                 zap.contains("Minecraft.getMinecraft().addScheduledTask")
-                        && zap.contains("Thaumcraft.proxy.bolt("));
+                        && zap.contains("new FXLightningBolt(")
+                        && zap.contains("ParticleEngine.addEffect("));
         assertTrue("Server block-swap path must send PacketFXBlockSparkle around replaced block",
                 serverTick.contains("new PacketFXBlockSparkle(vs.x, vs.y, vs.z, 0xC0C0FF)"));
         assertTrue("Server block-swap path must keep silk-harvest and fortune drop routing",
