@@ -2706,6 +2706,65 @@ public class ConfigRecipes {
                 .setRegistryName("thaumcraft", "voidsword");
         registry.register(recipeVoidSword);
 
+        IRecipe recipeQuicksilverFromPlant = new ShapedOreRecipe(
+                null,
+                new ItemStack(ConfigItems.itemResource, 1, 3),
+                "#",
+                '#', new ItemStack(ConfigBlocks.blockCustomPlant, 1, 2))
+                .setRegistryName("thaumcraft", "quicksilverplant");
+        registry.register(recipeQuicksilverFromPlant);
+
+        IRecipe recipeSugarFromPlant = new ShapedOreRecipe(
+                null,
+                new ItemStack(Items.SUGAR),
+                "#",
+                '#', new ItemStack(ConfigBlocks.blockCustomPlant, 1, 3))
+                .setRegistryName("thaumcraft", "sugarplant");
+        registry.register(recipeSugarFromPlant);
+
+        IRecipe recipeCosmeticOpaque0 = new ShapedOreRecipe(
+                null,
+                new ItemStack(ConfigBlocks.blockCosmeticOpaque, 1, 0),
+                "##",
+                "##",
+                '#', new ItemStack(ConfigItems.itemResource, 1, 6))
+                .setRegistryName("thaumcraft", "cosmeticopaque0");
+        registry.register(recipeCosmeticOpaque0);
+
+        IRecipe recipeCosmeticOpaque1 = new ShapedOreRecipe(
+                null,
+                new ItemStack(ConfigBlocks.blockCosmeticOpaque, 4, 1),
+                "##",
+                "##",
+                '#', new ItemStack(ConfigBlocks.blockCosmeticOpaque, 1, 0))
+                .setRegistryName("thaumcraft", "cosmeticopaque1");
+        registry.register(recipeCosmeticOpaque1);
+
+        IRecipe recipeCosmeticSolid1 = new ShapedOreRecipe(
+                null,
+                new ItemStack(ConfigBlocks.blockCosmeticSolid, 4, 1),
+                "##",
+                "##",
+                '#', new ItemStack(Blocks.MOSSY_COBBLESTONE))
+                .setRegistryName("thaumcraft", "cosmeticsolid1");
+        registry.register(recipeCosmeticSolid1);
+
+        IRecipe recipeResource6FromOpaque0 = new ShapedOreRecipe(
+                null,
+                new ItemStack(ConfigItems.itemResource, 4, 6),
+                "#",
+                '#', new ItemStack(ConfigBlocks.blockCosmeticOpaque, 1, 0))
+                .setRegistryName("thaumcraft", "resource6fromopaque0");
+        registry.register(recipeResource6FromOpaque0);
+
+        IRecipe recipeResource6FromOpaque1 = new ShapedOreRecipe(
+                null,
+                new ItemStack(ConfigItems.itemResource, 4, 6),
+                "#",
+                '#', new ItemStack(ConfigBlocks.blockCosmeticOpaque, 1, 1))
+                .setRegistryName("thaumcraft", "resource6fromopaque1");
+        registry.register(recipeResource6FromOpaque1);
+
         for (int a = 0; a < 6; a++) {
             recipeClusters[a] = new ShapelessOreRecipe(
                     null,
