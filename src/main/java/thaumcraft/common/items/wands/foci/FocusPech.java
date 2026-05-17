@@ -48,6 +48,7 @@ public class FocusPech extends ItemFocusBasic {
                     this.getUpgradeLevel(focusStack, FocusUpgradeType.potency),
                     this.getUpgradeLevel(focusStack, FocusUpgradeType.extend),
                     this.isUpgradedWith(focusStack, nightshade));
+            blast.shoot(player, player.rotationPitch, player.rotationYaw, 0.0F, 1.5F, 1.0F);
             world.spawnEntity(blast);
             blast.playSound(TCSounds.ICE, 0.4F, 1.0F + world.rand.nextFloat() * 0.1F);
         }

@@ -25,6 +25,12 @@ public class EntityPechBlast extends EntityThrowable {
         this.duration = duration;
         this.nightshade = nightshade;
     }
+    public EntityPechBlast(World world, double x, double y, double z, int strength, int duration, boolean nightshade) {
+        super(world, x, y, z);
+        this.strength = strength;
+        this.duration = duration;
+        this.nightshade = nightshade;
+    }
 
     @Override
     protected float getGravityVelocity() { return 0.025f; }
