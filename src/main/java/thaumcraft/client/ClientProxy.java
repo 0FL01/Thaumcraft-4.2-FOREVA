@@ -660,6 +660,10 @@ public class ClientProxy extends CommonProxy {
             ParticleEngine.addEffect(world, new FXBlockWard(world, x, y, z, color, amount));
             return;
         }
+        if (color == -9999) {
+            ParticleEngine.addEffect(world, new FXVisSparkle(world, x, y, z, 0.0f, 0.0f, 0.0f, amount, true));
+            return;
+        }
 
         Color tint = decodeColor(color);
         float red = normalizeColor(tint.getRed());

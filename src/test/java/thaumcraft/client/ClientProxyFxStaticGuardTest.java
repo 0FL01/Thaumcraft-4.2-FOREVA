@@ -34,6 +34,9 @@ public class ClientProxyFxStaticGuardTest {
         assertTrue("ClientProxy blockSparkle must route generic colors through dedicated FXVisSparkle",
                 source.contains("public void blockSparkle(")
                         && source.contains("new FXVisSparkle(world, x, y, z, red, green, blue, amount)"));
+        assertTrue("ClientProxy blockSparkle must preserve random-color sentinel routing for -9999",
+                source.contains("color == -9999")
+                        && source.contains("new FXVisSparkle(world, x, y, z, 0.0f, 0.0f, 0.0f, amount, true)"));
         assertTrue("ClientProxy blockSparkle must route ward/portable-hole colors through dedicated FXBlockWard",
                 source.contains("color == 0xFC9A00 || color == 0x400040")
                         && source.contains("new FXBlockWard(world, x, y, z, color, amount)"));
@@ -146,7 +149,9 @@ public class ClientProxyFxStaticGuardTest {
         assertTrue("Dedicated FXVisSparkle particle must keep block-centered sparkle emission baseline",
                 visSparkleFx.contains("class FXVisSparkle extends Particle")
                         && visSparkleFx.contains("baseX")
-                        && visSparkleFx.contains("EnumParticleTypes.REDSTONE"));
+                        && visSparkleFx.contains("EnumParticleTypes.REDSTONE")
+                        && visSparkleFx.contains("randomizeColor")
+                        && visSparkleFx.contains("0.33f + this.rand.nextFloat() * 0.67f"));
         assertTrue("Dedicated FXWisp particle must keep target-aware wisp trail baseline",
                 wispFx.contains("class FXWisp extends Particle")
                         && wispFx.contains("hasTarget")
