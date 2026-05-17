@@ -31,7 +31,7 @@ Out of scope:
 - `docs/PRD.md:3-18`, `docs/PRD.md:57-69`, `docs/PRD.md:160-171`, `docs/PRD.md:173-185`, `docs/PRD.md:526-526` define parity goals, stable contracts, methodology, status model, and crucible smoke expectation.
 - `build.gradle:24-29` confirms Java 8 / Forge 1.12.2 / stable_39 target.
 - `Dockerfile:61-69` provides CFR for reference class inspection.
-- `src/main/java/thaumcraft/common/config/ConfigRecipes.java:7-13` is the current recipe registration stub.
+- `src/main/java/thaumcraft/common/config/ConfigRecipes.java` hub delegates to slice files under `thaumcraft/common/config/recipes/`. See `docs/Stage9-e.md` for the full file list.
 - `src/main/java/thaumcraft/common/config/research/ConfigResearch.java` current baseline: `ConfigResearch.init()` registers research across 6 category slices (see Stage9-e.md).
 - `src/main/java/thaumcraft/common/config/ConfigAspects.java:12-16` initializes only current aspect groups.
 - `src/main/java/thaumcraft/common/Thaumcraft.java:188-190` invokes `ConfigRecipes.init()`, `ConfigAspects.init()`, and `ConfigResearch.init()`.
@@ -79,7 +79,7 @@ API/runtime baseline exists but content data is not registered.
 - `TileCrucible.attemptSmelt` follows the reference recipe/output loop closely: reads thrower, finds recipe, fires crafting event, removes aspects, drains 50 mB water, ejects output, otherwise decomposes item aspects at `src/main/java/thaumcraft/common/tiles/TileCrucible.java:328-402`.
 - `TileThaumatorium` has a functional baseline for stored crucible recipe hashes, required essentia, input catalyst, output inventory insertion, essentia suction, and completion at `src/main/java/thaumcraft/common/tiles/TileThaumatorium.java:56-159`.
 - `ContainerThaumatorium` lists/programs `CrucibleRecipe` entries by research completion, catalyst match, and recipe hash at `src/main/java/thaumcraft/common/container/ContainerThaumatorium.java:72-119`.
-- `ConfigRecipes.init()` is a stub and does not register any recipes at `src/main/java/thaumcraft/common/config/ConfigRecipes.java:7-9`.
+- `ConfigRecipes.init()` (hub) calls slice methods including `ConfigRecipesCrucibleSlice.initializeCrucibleRecipeBaseline()`, `ConfigRecipesSmeltingSlice.initializeSmeltingBaseline()`, and `initializeSmeltingBonusBaseline()`.
 - `ConfigResearch.init()` is the current research registration baseline (see Stage9-e.md). `ConfigResearch.recipes` map exists and is populated by `ConfigRecipes.init()`.
 - `ConfigAspects` registers a limited vanilla/ore-dictionary set, but no Thaumcraft item/block aspect tags needed by the reference alchemy chain appear in `src/main/java/thaumcraft/common/config/ConfigAspects.java:12-191`.
 
@@ -93,7 +93,8 @@ Result: Stage 9-d cannot be considered complete. The crucible machinery can comp
 **Критичность:** blocker
 
 **Текущая реализация:**
-- `src/main/java/thaumcraft/common/config/ConfigRecipes.java:7-9`
+- `src/main/java/thaumcraft/common/config/recipes/ConfigRecipesCrucibleSlice.java` — `initializeCrucibleRecipeBaseline()`
+- `src/main/java/thaumcraft/common/config/ConfigRecipes.java` hub
 - `src/main/java/thaumcraft/common/Thaumcraft.java:188-190`
 
 **Референс:**
@@ -102,7 +103,7 @@ Result: Stage 9-d cannot be considered complete. The crucible machinery can comp
 
 **Что не совпадает:**
 
-Current `ConfigRecipes.init()` contains only `// Phase 9: register all recipes`, so `ThaumcraftApi.getCraftingRecipes()` receives no Stage 9-d `CrucibleRecipe` entries from the port. The reference registers roughly 54 alchemy/crucible entries including conditional ore-mod recipes:
+Current `ConfigRecipes.init()` calls `ConfigRecipesCrucibleSlice.initializeCrucibleRecipeBaseline()`, which now registers a reference-style crucible corpus. The reference registers roughly 54 alchemy/crucible entries including conditional ore-mod recipes:
 
 - `BalancedShard_0..5` under research `CRUCIBLE`.
 - `Alumentum`, `Nitor`, `Thaumium`, `VoidMetal`, `VoidSeed`, `Tallow`.
@@ -118,11 +119,11 @@ Without these registrations, `ThaumcraftCraftingManager.findMatchingCrucibleReci
 
 **Что нужно доделать:**
 
-Port the reference `initializeAlchemyRecipes()` data into the 1.12.2 `ConfigRecipes.init()` flow, adapting item/block constants to the current 1.12.2 classes while preserving research keys, map keys, catalysts, outputs, aspect costs, and conditional ore-mod gates.
+Port the reference `initializeAlchemyRecipes()` data into the 1.12.2 crucible slice flow, adapting item/block constants to the current 1.12.2 classes while preserving research keys, map keys, catalysts, outputs, aspect costs, and conditional ore-mod gates.
 
 **Как доделать:**
-- Add a private `initializeAlchemyRecipes()` or equivalent in `src/main/java/thaumcraft/common/config/ConfigRecipes.java`.
-- Call it from `ConfigRecipes.init()` before research pages consume recipe handles.
+- Expand `initializeCrucibleRecipeBaseline()` in `src/main/java/thaumcraft/common/config/recipes/ConfigRecipesCrucibleSlice.java`.
+- It is already called from hub `ConfigRecipes.init()` before research pages consume recipe handles.
 - Use `ThaumcraftApi.addCrucibleRecipe(String key, ItemStack result, Object catalyst, AspectList tags)` exactly as current API provides at `src/main/java/thaumcraft/api/ThaumcraftApi.java:129-132`.
 - Store each returned recipe under the original recipe ID/name in the research recipe map once GAP-2 provides it.
 - Preserve ore dictionary catalysts such as `dustGlowstone`, `oreIron`, `oreGold`, `oreCopper`, `nuggetCopper`, etc.
@@ -130,7 +131,7 @@ Port the reference `initializeAlchemyRecipes()` data into the 1.12.2 `ConfigReci
 - Use current output/catalyst classes from `src/main/java/thaumcraft/common/config/ConfigItems.java:68`, `src/main/java/thaumcraft/common/config/ConfigItems.java:145-163`, and `src/main/java/thaumcraft/common/config/ConfigBlocks.java:25-38`.
 
 **Критерии приемки:**
-- [ ] `ConfigRecipes.init()` registers every reference Stage 9-d crucible recipe and no longer contains the Phase 9 stub for this scope.
+- [ ] `ConfigRecipesCrucibleSlice.initializeCrucibleRecipeBaseline()` registers every reference Stage 9-d crucible recipe (called from hub `ConfigRecipes.init()`).
 - [ ] `ThaumcraftApi.getCraftingRecipes()` contains all expected `CrucibleRecipe` entries after common init in a fresh game load.
 - [ ] Every reference recipe key/name, research gate, catalyst, output, and aspect cost has a current 1.12.2 equivalent documented in code or tests.
 - [ ] Optional copper/tin/silver/lead recipes are gated by the same ore-detection config semantics as the reference.
@@ -172,7 +173,7 @@ Depends on GAP-2 because reference recipes are also stored in `ConfigResearch.re
 
 **Текущая реализация:**
 - `src/main/java/thaumcraft/common/config/research/ConfigResearch.java:5-7`
-- `src/main/java/thaumcraft/common/config/ConfigRecipes.java:7-9`
+- `src/main/java/thaumcraft/common/config/recipes/ConfigRecipesCrucibleSlice.java` — `initializeCrucibleRecipeBaseline()` registers handles
 - `src/main/java/thaumcraft/common/container/ContainerThaumatorium.java:88-90`
 - `src/main/java/thaumcraft/common/lib/crafting/ThaumcraftCraftingManager.java:481-485`
 
@@ -322,7 +323,8 @@ Requires current blockstate/meta mapping for `blockMetalDevice` meta 12 and `Til
 **Критичность:** high
 
 **Текущая реализация:**
-- `src/main/java/thaumcraft/common/config/ConfigRecipes.java:7-13`
+- `src/main/java/thaumcraft/common/config/recipes/ConfigRecipesSmeltingSlice.java` — `initializeSmeltingBonusBaseline()`
+- `src/main/java/thaumcraft/common/config/ConfigRecipes.java` hub
 - `src/main/java/thaumcraft/api/ThaumcraftApi.java:67-87`
 
 **Референс:**
@@ -331,7 +333,7 @@ Requires current blockstate/meta mapping for `blockMetalDevice` meta 12 and `Til
 
 **Что не совпадает:**
 
-The current API supports smelting bonuses at `src/main/java/thaumcraft/api/ThaumcraftApi.java:67-87`, but current `ConfigRecipes.init()` never registers the reference alchemical smelting bonus data. The reference treats these as alchemy content data, not generic furnace recipes only: ore bonuses point to Thaumcraft native nuggets/clusters and meat/fish nugget outputs, which are part of alchemy furnace/progression rewards.
+The current API supports smelting bonuses at `src/main/java/thaumcraft/api/ThaumcraftApi.java:67-87`, and `ConfigRecipes.init()` now calls `ConfigRecipesSmeltingSlice.initializeSmeltingBonusBaseline()` which registers the reference-style alchemical smelting bonus data. The reference treats these as alchemy content data, not generic furnace recipes only: ore bonuses point to Thaumcraft native nuggets/clusters and meat/fish nugget outputs, which are part of alchemy furnace/progression rewards.
 
 **Что нужно доделать:**
 
@@ -536,7 +538,7 @@ Depends on GAP-1, GAP-2, GAP-3, and GAP-5. Client particle/sound TODOs in `TileC
 
 ## 6. Итоговый checklist закрытия Stage 9-d
 
-- [ ] Port reference `ConfigRecipes.initializeAlchemyRecipes()` crucible recipe data into current `ConfigRecipes.init()` flow.
+- [x] Port reference `ConfigRecipes.initializeAlchemyRecipes()` crucible recipe data into `ConfigRecipesCrucibleSlice.initializeCrucibleRecipeBaseline()`, called from hub `ConfigRecipes.init()`.
 - [ ] Preserve every Stage 9-d recipe ID/name, research key, catalyst, output, aspect cost, and optional ore-mod gate.
 - [ ] Ensure direct recipe-handle storage in `ConfigResearch.recipes` for Stage 9-d recipe entries.
 - [ ] Ensure research completion gates work for both `TileCrucible` matching and `ContainerThaumatorium` programming.
