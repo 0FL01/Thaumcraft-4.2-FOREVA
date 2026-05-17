@@ -14,6 +14,7 @@ public class EntityAlumentumCoreContractsStaticGuardTest {
     @Test
     public void alumentumKeepsReferenceExplosionAndEyeHeightContracts() throws IOException {
         String source = readFile("src/main/java/thaumcraft/common/entities/projectile/EntityAlumentum.java");
+        String item = readFile("src/main/java/thaumcraft/common/items/ItemResource.java");
 
         assertTrue("EntityAlumentum must keep mobGriefing-gated impact explosion with 1.66F power",
                 source.contains("boolean griefing = this.world.getGameRules().getBoolean(\"mobGriefing\");")
@@ -21,8 +22,9 @@ public class EntityAlumentumCoreContractsStaticGuardTest {
         assertTrue("EntityAlumentum must keep reference low eye-height contract",
                 source.contains("public float getEyeHeight()")
                         && source.contains("return 0.1F;"));
-        assertTrue("EntityAlumentum must keep reference launch velocity baseline",
-                source.contains("protected float getGravityVelocity() { return 0.75f; }"));
+        assertTrue("EntityAlumentum must keep reference gravity baseline while launch speed is driven by ItemResource",
+                source.contains("protected float getGravityVelocity() { return 0.03f; }")
+                        && item.contains("projectile.shoot(player, player.rotationPitch, player.rotationYaw, 0.0F, 0.75F, 1.0F);"));
     }
 
     private static String readFile(String path) throws IOException {

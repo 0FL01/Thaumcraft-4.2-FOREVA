@@ -6,7 +6,7 @@ public class EntityAlumentum extends net.minecraft.entity.projectile.EntityThrow
     public EntityAlumentum(net.minecraft.world.World world, double x, double y, double z) { super(world, x, y, z); }
 
     @Override
-    protected float getGravityVelocity() { return 0.75f; }
+    protected float getGravityVelocity() { return 0.03f; }
 
     @Override
     protected void onImpact(net.minecraft.util.math.RayTraceResult result) {

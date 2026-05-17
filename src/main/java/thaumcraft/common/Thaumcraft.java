@@ -4,6 +4,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.init.Items;
 
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockDispenser;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.item.Item;
 import net.minecraft.item.crafting.IRecipe;
@@ -56,6 +57,7 @@ import thaumcraft.common.lib.world.ComponentWizardTower;
 import thaumcraft.common.lib.world.VillageBankerManager;
 import thaumcraft.common.lib.world.VillageWizardManager;
 import thaumcraft.common.lib.world.ThaumcraftWorldGenerator;
+import thaumcraft.common.items.BehaviorDispenseAlumetum;
 import thaumcraft.common.items.wands.WandRodPrimalOnUpdate;
 
 import java.util.Arrays;
@@ -174,6 +176,9 @@ public class Thaumcraft {
         Config.registerBiomes();
         Config.initLoot();
         Config.initMisc();
+        if (ConfigItems.itemResource != null) {
+            BlockDispenser.DISPENSE_BEHAVIOR_REGISTRY.putObject(ConfigItems.itemResource, new BehaviorDispenseAlumetum());
+        }
 
         // Register village components with MapGenStructureIO
         MapGenStructureIO.registerStructureComponent(ComponentWizardTower.class, "TCWizTower");
