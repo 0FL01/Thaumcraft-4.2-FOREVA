@@ -1,21 +1,28 @@
 package thaumcraft.common.items;
 
 import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.block.Block;
+import net.minecraft.block.SoundType;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.init.Blocks;
 import net.minecraft.init.SoundEvents;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.EnumActionResult;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.SoundCategory;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import thaumcraft.api.aspects.Aspect;
 import thaumcraft.api.aspects.AspectList;
 import thaumcraft.api.aspects.IEssentiaContainerItem;
 import thaumcraft.common.entities.projectile.EntityAlumentum;
+import thaumcraft.common.config.ConfigBlocks;
 import thaumcraft.common.lib.CreativeTabThaumcraft;
 import thaumcraft.common.lib.capabilities.IPlayerKnowledge;
 import thaumcraft.common.lib.capabilities.PlayerKnowledgeProvider;
@@ -115,6 +122,55 @@ public class ItemResource extends Item implements IEssentiaContainerItem {
     }
 
     @Override
+    public EnumActionResult onItemUse(EntityPlayer player, World world, BlockPos pos, EnumHand hand,
+                                      EnumFacing facing, float hitX, float hitY, float hitZ) {
+        ItemStack stack = player.getHeldItem(hand);
+        if (stack.getItemDamage() != META_NITOR) {
+            return super.onItemUse(player, world, pos, hand, facing, hitX, hitY, hitZ);
+        }
+
+        IBlockState state = world.getBlockState(pos);
+        Block block = state.getBlock();
+        if (!block.isReplaceable(world, pos)
+                && block != Blocks.VINE
+                && block != Blocks.TALLGRASS
+                && block != Blocks.DEADBUSH) {
+            pos = pos.offset(facing);
+        }
+
+        if (stack.isEmpty()) {
+            return EnumActionResult.FAIL;
+        }
+        if (!player.canPlayerEdit(pos, facing, stack)) {
+            return EnumActionResult.FAIL;
+        }
+        if (!world.mayPlace(ConfigBlocks.blockAiry, pos, false, facing, player)) {
+            return EnumActionResult.FAIL;
+        }
+        if (!placeBlockAt(stack, player, world, pos, facing, hitX, hitY, hitZ, ConfigBlocks.blockAiry, META_NITOR)) {
+            return EnumActionResult.FAIL;
+        }
+
+        SoundType sound = ConfigBlocks.blockAiry.getSoundType(world.getBlockState(pos), world, pos, player);
+        world.playSound(player, pos, sound.getPlaceSound(), SoundCategory.BLOCKS,
+                (sound.getVolume() + 1.0F) / 2.0F, sound.getPitch() * 0.8F);
+        stack.shrink(1);
+        return EnumActionResult.SUCCESS;
+    }
+
+    private boolean placeBlockAt(ItemStack stack, EntityPlayer player, World world, BlockPos pos, EnumFacing side,
+                                 float hitX, float hitY, float hitZ, Block block, int meta) {
+        if (!world.setBlockState(pos, block.getStateFromMeta(meta), 3)) {
+            return false;
+        }
+        if (world.getBlockState(pos).getBlock() == block) {
+            block.onBlockPlacedBy(world, pos, world.getBlockState(pos), player, stack);
+            block.onBlockAdded(world, pos, world.getBlockState(pos));
+        }
+        return true;
+    }
+
+    @Override
     public AspectList getAspects(ItemStack itemstack) {
         if (itemstack.hasTagCompound()) {
             AspectList aspects = new AspectList();
@@ -130,5 +186,10 @@ public class ItemResource extends Item implements IEssentiaContainerItem {
             itemstack.setTagCompound(new net.minecraft.nbt.NBTTagCompound());
         }
         aspects.writeToNBT(itemstack.getTagCompound());
+    }
+
+    @Override
+    public int getItemStackLimit(ItemStack stack) {
+        return stack.getItemDamage() == META_CHARM ? 1 : super.getItemStackLimit(stack);
     }
 }

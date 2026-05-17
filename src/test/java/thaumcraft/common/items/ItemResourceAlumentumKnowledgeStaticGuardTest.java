@@ -25,6 +25,11 @@ public class ItemResourceAlumentumKnowledgeStaticGuardTest {
         assertTrue(source.contains("short amount = (short) (world.rand.nextInt(2) + 1);"));
         assertTrue(source.contains("new PacketAspectPool(aspect.getTag(), amount, knowledge.getAspectPoolFor(aspect))"));
         assertTrue(source.contains("ResearchManager.updateCache(player);"));
+        assertTrue(source.contains("if (stack.getItemDamage() != META_NITOR)"));
+        assertTrue(source.contains("!block.isReplaceable(world, pos)"));
+        assertTrue(source.contains("world.mayPlace(ConfigBlocks.blockAiry, pos, false, facing, player)"));
+        assertTrue(source.contains("placeBlockAt(stack, player, world, pos, facing, hitX, hitY, hitZ, ConfigBlocks.blockAiry, META_NITOR)"));
+        assertTrue(source.contains("return stack.getItemDamage() == META_CHARM ? 1 : super.getItemStackLimit(stack);"));
     }
 
     @Test
