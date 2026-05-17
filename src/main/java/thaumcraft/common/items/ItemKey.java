@@ -1,6 +1,7 @@
 package thaumcraft.common.items;
 
 import java.util.List;
+import net.minecraft.block.Block;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.creativetab.CreativeTabs;
@@ -20,6 +21,7 @@ import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
+import thaumcraft.common.blocks.BlockArcaneDoor;
 import thaumcraft.common.blocks.BlockWoodenDevice;
 import thaumcraft.common.config.ConfigBlocks;
 import thaumcraft.common.lib.CreativeTabThaumcraft;
@@ -72,16 +74,32 @@ public class ItemKey extends Item {
                                            float hitX, float hitY, float hitZ, EnumHand hand) {
         ItemStack stack = player.getHeldItem(hand);
         IBlockState state = world.getBlockState(pos);
-        if (state.getBlock() != ConfigBlocks.blockWoodenDevice) return EnumActionResult.PASS;
-        int meta = state.getValue(BlockWoodenDevice.TYPE);
-        if (meta != 2 && meta != 3) return EnumActionResult.PASS;
-        TileEntity tile = world.getTileEntity(pos);
+        Block block = state.getBlock();
+        BlockPos basePos = pos;
+        BlockPos linkedPos = null;
+        byte type = 0;
+        if (block == ConfigBlocks.blockArcaneDoor) {
+            int fullMeta = block.getMetaFromState(state);
+            if ((fullMeta & 8) != 0) {
+                basePos = pos.down();
+                linkedPos = pos;
+            } else {
+                linkedPos = pos.up();
+            }
+        } else if (block == ConfigBlocks.blockWoodenDevice) {
+            int meta = state.getValue(BlockWoodenDevice.TYPE);
+            if (meta != 2 && meta != 3) return EnumActionResult.PASS;
+            type = 1;
+        } else {
+            return EnumActionResult.PASS;
+        }
+
+        TileEntity tile = world.getTileEntity(basePos);
         if (!(tile instanceof TileOwned)) return EnumActionResult.PASS;
         TileOwned owned = (TileOwned) tile;
         if (owned.accessList == null) owned.accessList = new java.util.ArrayList<>();
         String playerName = player.getName();
-        String location = pos.getX() + "," + pos.getY() + "," + pos.getZ();
-        byte type = 1;
+        String location = basePos.getX() + "," + basePos.getY() + "," + basePos.getZ();
 
         if (!stack.hasTagCompound() || !stack.getTagCompound().hasKey("location")) {
             if (world.isRemote) return EnumActionResult.PASS;
@@ -95,8 +113,8 @@ public class ItemKey extends Item {
                     player.dropItem(linked, false);
                 }
                 if (!player.capabilities.isCreativeMode) stack.shrink(1);
-                sendKeyMessage(player, "tc.key2");
-                world.playSound(null, pos, TCSounds.KEY, SoundCategory.PLAYERS, 1.0F, 0.9F);
+                sendKeyMessage(player, type == 0 ? "tc.key1" : "tc.key2");
+                world.playSound(null, basePos, TCSounds.KEY, SoundCategory.PLAYERS, 1.0F, 0.9F);
                 player.swingArm(hand);
             }
             return EnumActionResult.SUCCESS;
@@ -110,9 +128,23 @@ public class ItemKey extends Item {
             if (world.isRemote) return EnumActionResult.PASS;
             owned.accessList.add(exactAccess);
             tile.markDirty();
-            world.notifyBlockUpdate(pos, state, state, 3);
-            sendKeyMessage(player, "tc.key5", stack.getItemDamage() == META_IRON ? "" : "tc.key6");
-            world.playSound(null, pos, TCSounds.KEY, SoundCategory.PLAYERS, 1.0F, 1.1F);
+            IBlockState baseState = world.getBlockState(basePos);
+            world.notifyBlockUpdate(basePos, baseState, baseState, 3);
+            if (type == 0 && linkedPos != null) {
+                TileEntity linkedTile = world.getTileEntity(linkedPos);
+                if (linkedTile instanceof TileOwned) {
+                    TileOwned linkedOwned = (TileOwned) linkedTile;
+                    if (linkedOwned.accessList == null) linkedOwned.accessList = new java.util.ArrayList<>();
+                    linkedOwned.accessList.add(exactAccess);
+                    linkedTile.markDirty();
+                }
+                IBlockState linkedState = world.getBlockState(linkedPos);
+                world.notifyBlockUpdate(linkedPos, linkedState, linkedState, 3);
+            }
+            sendKeyMessage(player,
+                    type == 0 ? "tc.key3" : "tc.key5",
+                    stack.getItemDamage() == META_IRON ? "" : (type == 0 ? "tc.key4" : "tc.key6"));
+            world.playSound(null, basePos, TCSounds.KEY, SoundCategory.PLAYERS, 1.0F, 1.1F);
             if (!player.capabilities.isCreativeMode) stack.shrink(1);
             player.swingArm(hand);
         } else if (!world.isRemote) {
