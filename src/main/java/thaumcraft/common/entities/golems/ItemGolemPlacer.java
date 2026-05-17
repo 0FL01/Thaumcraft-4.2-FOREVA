@@ -1,22 +1,26 @@
 package thaumcraft.common.entities.golems;
 
 import java.util.Arrays;
+import java.util.List;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockFence;
 import net.minecraft.block.BlockWall;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
+import net.minecraft.util.text.translation.I18n;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import thaumcraft.common.lib.CreativeTabThaumcraft;
 
@@ -34,11 +38,58 @@ public class ItemGolemPlacer extends Item {
     }
 
     @Override
+    public boolean hasEffect(ItemStack stack) {
+        return true;
+    }
+
+    @Override
     public void getSubItems(CreativeTabs tab, NonNullList<ItemStack> items) {
         if (this.isInCreativeTab(tab)) {
             for (int meta = 0; meta <= 7; meta++) {
                 items.add(new ItemStack(this, 1, meta));
             }
+        }
+    }
+
+    @Override
+    public boolean doesSneakBypassUse(ItemStack stack, IBlockAccess world, BlockPos pos, EntityPlayer player) {
+        return true;
+    }
+
+    @Override
+    public void addInformation(ItemStack stack, World worldIn, List<String> tooltip, ITooltipFlag flagIn) {
+        if (!stack.hasTagCompound()) return;
+        NBTTagCompound tag = stack.getTagCompound();
+        if (tag.hasKey("core")) {
+            tooltip.add(I18n.translateToLocal("item.ItemGolemCore.name") + ": \u00a76"
+                    + I18n.translateToLocal("item.ItemGolemCore." + tag.getByte("core") + ".name"));
+        }
+        if (tag.hasKey("advanced")) {
+            tooltip.add(I18n.translateToLocal("tc.adv"));
+        }
+        if (tag.hasKey("upgrades")) {
+            String text = "\u00a79";
+            for (byte b : tag.getByteArray("upgrades")) {
+                if (b <= -1) continue;
+                text = text + I18n.translateToLocal("item.ItemGolemUpgrade." + b + ".name") + " ";
+            }
+            tooltip.add(text);
+        }
+        if (tag.hasKey("markers")) {
+            NBTTagList markers = tag.getTagList("markers", 10);
+            tooltip.add("\u00a75" + markers.tagCount() + " " + I18n.translateToLocal("tc.markedloc"));
+        }
+        if (tag.hasKey("deco")) {
+            String decoDesc = "\u00a72";
+            String deco = tag.getString("deco");
+            if (deco.contains("H")) decoDesc = decoDesc + I18n.translateToLocal("item.ItemGolemDecoration.0.name") + " ";
+            if (deco.contains("G")) decoDesc = decoDesc + I18n.translateToLocal("item.ItemGolemDecoration.1.name") + " ";
+            if (deco.contains("B")) decoDesc = decoDesc + I18n.translateToLocal("item.ItemGolemDecoration.2.name") + " ";
+            if (deco.contains("F")) decoDesc = decoDesc + I18n.translateToLocal("item.ItemGolemDecoration.3.name") + " ";
+            if (deco.contains("R")) decoDesc = decoDesc + I18n.translateToLocal("item.ItemGolemDecoration.4.name") + " ";
+            if (deco.contains("V")) decoDesc = decoDesc + I18n.translateToLocal("item.ItemGolemDecoration.5.name") + " ";
+            if (deco.contains("P")) decoDesc = decoDesc + I18n.translateToLocal("item.ItemGolemDecoration.6.name") + " ";
+            tooltip.add(decoDesc);
         }
     }
 
@@ -56,7 +107,7 @@ public class ItemGolemPlacer extends Item {
         if (spawned && !player.capabilities.isCreativeMode) {
             stack.shrink(1);
         }
-        return spawned ? EnumActionResult.SUCCESS : EnumActionResult.FAIL;
+        return EnumActionResult.SUCCESS;
     }
 
     public boolean spawnCreature(World world, double x, double y, double z, int side, ItemStack stack, EntityPlayer player) {
