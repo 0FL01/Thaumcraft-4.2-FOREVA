@@ -28,6 +28,7 @@ Branch: `codex/durable-goal-stage8-9`
 - GUI/manual graphics checks remain excluded by instruction and headless environment limits.
 
 Incremental Stage 4 node-conversion delta: restored reference-shaped node conversion server/common baseline by porting `TileNodeConverter` state machine (`status`/`count`, powered progression, node-drain countdown, Node↔Energized conversion payload transfer, `checkStatus` failure path, client event burst/sound hook), restored `TileNodeStabilizer` client tick/count/lock/render-bounds baseline, added `BlockAiry.explodify(...)` flux-scatter failure helper, and wired `BlockStoneDevice.neighborChanged(...)` converter status refresh hook; guarded by new `TileNodeConversionStaticGuardTest`, with passing `./scripts/dev.sh validate --smoke` (`compileJava`, `test` `177/177`, `jar`, `check-jar` summary, `smoke-server` ready-state pass).
+Incremental Stage 7 obelisk/cap tile delta: restored non-stub Eldritch tile baselines by porting `TileEldritchObelisk` server buff loop and client FX hook (`EntityUtils` radius scan for `IEldritchMob`, regeneration+resistance pulse, and proxy wisp trail), plus render-distance/bounds contracts for `TileEldritchObelisk`, `TileEldritchCap`, and `TileEldritchNothing`; guarded by new `TileEldritchTilesStaticGuardTest`, with passing `./scripts/dev.sh validate --smoke` (`compileJava`, `test` `179/179`, `jar`, `check-jar` summary, `smoke-server` ready-state pass).
 
 ## Skipped GUI/Manual Graphics Checks
 
