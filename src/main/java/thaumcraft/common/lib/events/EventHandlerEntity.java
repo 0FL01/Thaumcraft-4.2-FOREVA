@@ -53,7 +53,6 @@ import net.minecraftforge.event.entity.player.ArrowNockEvent;
 import net.minecraftforge.event.entity.player.EntityItemPickupEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
-import net.minecraftforge.event.entity.player.AttackEntityEvent;
 import net.minecraftforge.event.entity.living.LivingEntityUseItemEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import thaumcraft.api.ThaumcraftApi;
@@ -389,15 +388,6 @@ public class EventHandlerEntity {
             }
             event.setCanceled(true);
         }
-    }
-
-    /**
-     * Left-click / attack on entities: used for Pech trade detection.
-     */
-    @SubscribeEvent
-    public void onAttackEntity(AttackEntityEvent event) {
-        if (event.getEntity().world.isRemote) return;
-        // Future: Pech left-click trade detection
     }
 
     /**
