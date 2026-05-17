@@ -102,6 +102,7 @@ import thaumcraft.client.renderers.tile.TileArcaneBoreRenderer;
 import thaumcraft.client.renderers.tile.TileBannerRenderer;
 import thaumcraft.client.renderers.tile.TileCrucibleRenderer;
 import thaumcraft.client.renderers.tile.TileFocalManipulatorRenderer;
+import thaumcraft.client.renderers.tile.TileHoleRenderer;
 import thaumcraft.client.renderers.tile.TileJarRenderer;
 import thaumcraft.client.renderers.tile.TileNodeConverterRenderer;
 import thaumcraft.client.renderers.tile.TileNodeRenderer;
@@ -110,6 +111,7 @@ import thaumcraft.client.renderers.tile.TilePedestalRenderer;
 import thaumcraft.client.renderers.tile.TileRunicMatrixRenderer;
 import thaumcraft.client.renderers.tile.TileThaumatoriumRenderer;
 import thaumcraft.client.renderers.tile.TileVisRelayRenderer;
+import thaumcraft.client.renderers.tile.TileWardedRenderer;
 import thaumcraft.client.lib.ClientTickEventsFML;
 import thaumcraft.client.lib.KeyHandler;
 import thaumcraft.client.lib.RenderEventHandler;
@@ -175,6 +177,7 @@ import thaumcraft.common.tiles.TileBanner;
 import thaumcraft.common.tiles.TileCrucible;
 import thaumcraft.common.tiles.TileDeconstructionTable;
 import thaumcraft.common.tiles.TileFocalManipulator;
+import thaumcraft.common.tiles.TileHole;
 import thaumcraft.common.tiles.TileInfusionMatrix;
 import thaumcraft.common.tiles.TileJarBrain;
 import thaumcraft.common.tiles.TileJarFillable;
@@ -190,6 +193,7 @@ import thaumcraft.common.tiles.TileSpa;
 import thaumcraft.common.tiles.TileThaumatorium;
 import thaumcraft.common.tiles.TileVisRelay;
 import thaumcraft.common.tiles.TileWandPedestal;
+import thaumcraft.common.tiles.TileWarded;
 import thaumcraft.common.entities.golems.EntityGolemBase;
 import thaumcraft.common.entities.golems.EntityTravelingTrunk;
 import thaumcraft.common.entities.monster.EntityPech;
@@ -387,6 +391,8 @@ public class ClientProxy extends CommonProxy {
         ClientRegistry.bindTileEntitySpecialRenderer(thaumcraft.common.tiles.TileArcaneBoreBase.class, new TileArcaneBoreBaseRenderer());
         ClientRegistry.bindTileEntitySpecialRenderer(TileFocalManipulator.class, new TileFocalManipulatorRenderer());
         ClientRegistry.bindTileEntitySpecialRenderer(TileBanner.class, new TileBannerRenderer());
+        ClientRegistry.bindTileEntitySpecialRenderer(TileHole.class, new TileHoleRenderer());
+        ClientRegistry.bindTileEntitySpecialRenderer(TileWarded.class, new TileWardedRenderer());
     }
 
     @Override

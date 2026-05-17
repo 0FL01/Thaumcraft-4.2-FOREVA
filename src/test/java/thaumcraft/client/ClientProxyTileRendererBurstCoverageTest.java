@@ -35,6 +35,8 @@ public class ClientProxyTileRendererBurstCoverageTest {
         assertTrue(source.contains("ClientRegistry.bindTileEntitySpecialRenderer(thaumcraft.common.tiles.TileArcaneBoreBase.class, new TileArcaneBoreBaseRenderer());"));
         assertTrue(source.contains("ClientRegistry.bindTileEntitySpecialRenderer(TileFocalManipulator.class, new TileFocalManipulatorRenderer());"));
         assertTrue(source.contains("ClientRegistry.bindTileEntitySpecialRenderer(TileBanner.class, new TileBannerRenderer());"));
+        assertTrue(source.contains("ClientRegistry.bindTileEntitySpecialRenderer(TileHole.class, new TileHoleRenderer());"));
+        assertTrue(source.contains("ClientRegistry.bindTileEntitySpecialRenderer(TileWarded.class, new TileWardedRenderer());"));
     }
 
     private static String read(String path) throws IOException {
