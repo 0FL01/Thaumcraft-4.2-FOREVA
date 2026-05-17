@@ -2460,6 +2460,14 @@ public class ConfigRecipes {
                 .setRegistryName("thaumcraft", "blocktallow");
         registry.register(recipeBlockTallow);
 
+        IRecipe recipeBlockTallowDecompose = new ShapedOreRecipe(
+                null,
+                new ItemStack(ConfigItems.itemResource, 9, 4),
+                "K",
+                'K', new ItemStack(ConfigBlocks.blockCosmeticSolid, 1, 5))
+                .setRegistryName("thaumcraft", "blocktallow_decompose");
+        registry.register(recipeBlockTallowDecompose);
+
         IRecipe recipeJarLabel = new ShapelessOreRecipe(
                 null,
                 new ItemStack(ConfigItems.itemResource, 4, 13),
