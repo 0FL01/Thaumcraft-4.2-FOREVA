@@ -75,7 +75,7 @@ public class ItemThaumometer extends Item {
         }
 
         ScanResult current = doScan(stack, world, player);
-        if (current != null && current.equals(this.startScan)) {
+        if (this.startScan != null && current != null && current.equals(this.startScan)) {
             if (count <= 5) {
                 this.startScan = null;
                 if (ScanManager.completeScan(player, current, "@")) {

@@ -24,6 +24,8 @@ public class ItemThaumometerStaticGuardTest {
                 source.contains("this.startScan = doScan(stack, world, player);")
                         && source.contains("player.setActiveHand(hand);"));
         assertTrue("Thaumometer must keep client completion and packet send path",
+                source.contains("if (this.startScan != null && current != null && current.equals(this.startScan))")
+                        && 
                 source.contains("if (count <= 5)")
                         && source.contains("ScanManager.completeScan(player, current, \"@\")")
                         && source.contains("PacketHandler.INSTANCE.sendToServer(new PacketScannedToServer(current, player, \"@\"))"));
