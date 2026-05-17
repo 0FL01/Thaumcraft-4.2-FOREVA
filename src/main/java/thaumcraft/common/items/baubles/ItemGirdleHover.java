@@ -15,7 +15,7 @@ public class ItemGirdleHover extends Item implements IBauble, IRunicArmor {
         this.setMaxStackSize(1);
         this.setMaxDamage(0);
         this.setNoRepair();
-        this.setHasSubtypes(false);
+        this.setHasSubtypes(true);
         this.setCreativeTab(CreativeTabThaumcraft.tabThaumcraft);
     }
 
@@ -37,7 +37,7 @@ public class ItemGirdleHover extends Item implements IBauble, IRunicArmor {
     @Override
     public void onWornTick(ItemStack itemstack, EntityLivingBase player) {
         if (player.fallDistance > 0.0F) {
-            player.fallDistance = Math.max(0.0F, player.fallDistance - 0.33F);
+            player.fallDistance -= 0.33F;
         }
     }
 

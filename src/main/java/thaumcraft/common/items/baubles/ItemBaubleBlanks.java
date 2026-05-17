@@ -2,16 +2,22 @@ package thaumcraft.common.items.baubles;
 
 import baubles.api.BaubleType;
 import baubles.api.IBauble;
+import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.NonNullList;
+import net.minecraft.util.text.TextFormatting;
+import net.minecraft.util.text.translation.I18n;
+import net.minecraft.world.World;
 import thaumcraft.api.IRunicArmor;
 import thaumcraft.api.IVisDiscountGear;
 import thaumcraft.api.aspects.Aspect;
 import thaumcraft.common.lib.CreativeTabThaumcraft;
+
+import java.util.List;
 
 public class ItemBaubleBlanks extends Item implements IBauble, IVisDiscountGear, IRunicArmor {
 
@@ -36,6 +42,25 @@ public class ItemBaubleBlanks extends Item implements IBauble, IVisDiscountGear,
     @Override
     public String getTranslationKey(ItemStack stack) {
         return super.getTranslationKey() + "." + stack.getItemDamage();
+    }
+
+    @Override
+    public String getItemStackDisplayName(ItemStack stack) {
+        int meta = stack.getItemDamage();
+        if (meta >= META_RING && meta <= META_ICHOR) {
+            Aspect aspect = Aspect.getPrimalAspects().get(meta - META_RING);
+            return I18n.translateToLocal("item.ItemBaubleBlanks.3.name").replace("%TYPE", aspect.getName());
+        }
+        return super.getItemStackDisplayName(stack);
+    }
+
+    @Override
+    public void addInformation(ItemStack stack, World worldIn, List<String> tooltip, ITooltipFlag flagIn) {
+        int meta = stack.getItemDamage();
+        if (meta >= META_RING && meta <= META_ICHOR) {
+            Aspect aspect = Aspect.getPrimalAspects().get(meta - META_RING);
+            tooltip.add(TextFormatting.DARK_PURPLE + aspect.getName() + " " + I18n.translateToLocal("tc.discount") + ": 1%");
+        }
     }
 
     @Override
