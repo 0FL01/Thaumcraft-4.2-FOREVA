@@ -2459,6 +2459,49 @@ public class ConfigRecipes {
                 .setRegistryName("thaumcraft", "blocktallow");
         registry.register(recipeBlockTallow);
 
+        IRecipe recipeJarLabel = new ShapelessOreRecipe(
+                null,
+                new ItemStack(ConfigItems.itemResource, 4, 13),
+                "dyeBlack",
+                Items.SLIME_BALL,
+                Items.PAPER,
+                Items.PAPER,
+                Items.PAPER,
+                Items.PAPER)
+                .setRegistryName("thaumcraft", "jarlabel");
+        registry.register(recipeJarLabel);
+
+        for (Aspect aspect : Aspect.aspects.values()) {
+            if (aspect == null) {
+                continue;
+            }
+            ItemStack essence = new ItemStack(ConfigItems.itemEssence, 1, 1);
+            if (essence.getItem() instanceof IEssentiaContainerItem) {
+                ((IEssentiaContainerItem) essence.getItem()).setAspects(essence, new AspectList().add(aspect, 8));
+            }
+            ItemStack output = new ItemStack(ConfigItems.itemResource, 1, 13);
+            if (output.getItem() instanceof IEssentiaContainerItem) {
+                ((IEssentiaContainerItem) output.getItem()).setAspects(output, new AspectList().add(aspect, 0));
+            }
+            IRecipe recipeJarLabelAspect = new ShapelessNBTOreRecipe(
+                    output,
+                    new ItemStack(ConfigItems.itemResource, 1, 13),
+                    essence)
+                    .setRegistryName("thaumcraft", "jarlabel_" + aspect.getTag().toLowerCase());
+            registry.register(recipeJarLabelAspect);
+        }
+
+        ItemStack recipeJarLabelNullInput = new ItemStack(ConfigItems.itemResource, 1, 13);
+        if (recipeJarLabelNullInput.getItem() instanceof IEssentiaContainerItem) {
+            ((IEssentiaContainerItem) recipeJarLabelNullInput.getItem()).setAspects(recipeJarLabelNullInput, new AspectList().add(Aspect.WATER, 1));
+        }
+        IRecipe recipeJarLabelNull = new ShapelessOreRecipe(
+                null,
+                new ItemStack(ConfigItems.itemResource, 1, 13),
+                recipeJarLabelNullInput)
+                .setRegistryName("thaumcraft", "jarlabelnull");
+        registry.register(recipeJarLabelNull);
+
         for (int a = 0; a < 6; a++) {
             recipeClusters[a] = new ShapelessOreRecipe(
                     null,
