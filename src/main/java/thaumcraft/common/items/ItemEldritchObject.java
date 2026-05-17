@@ -37,10 +37,7 @@ public class ItemEldritchObject extends Item {
     public static final int META_ELDRITCH_OBJECT_3 = 3;
     public static final int META_OB_PLACER = 4;
 
-    public static final String[] NAMES = {
-            "eldritch_object", "crimson_rites", "eldritch_object_2",
-            "eldritch_object_3", "ob_placer"
-    };
+    private static final int META_COUNT = 5;
 
     public ItemEldritchObject() {
         this.setMaxStackSize(1);
@@ -51,14 +48,13 @@ public class ItemEldritchObject extends Item {
 
     @Override
     public String getTranslationKey(ItemStack stack) {
-        int d = Math.min(stack.getItemDamage(), NAMES.length - 1);
-        return super.getTranslationKey() + "." + NAMES[d];
+        return super.getTranslationKey() + "." + stack.getItemDamage();
     }
 
     @Override
     public void getSubItems(CreativeTabs tab, NonNullList<ItemStack> items) {
         if (this.isInCreativeTab(tab)) {
-            for (int i = 0; i < NAMES.length; i++) {
+            for (int i = 0; i < META_COUNT; i++) {
                 items.add(new ItemStack(this, 1, i));
             }
         }
