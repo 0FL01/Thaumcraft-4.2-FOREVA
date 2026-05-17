@@ -24,6 +24,9 @@ public class ItemElementalPickaxeStaticGuardTest {
         assertTrue("ItemElementalPickaxe must keep fire-on-hit contract",
                 source.contains("public boolean onLeftClickEntity(")
                         && source.contains("!player.world.isRemote")
+                        && source.contains("!(entity instanceof EntityPlayer)")
+                        && source.contains("player.getServer() == null")
+                        && source.contains("player.getServer().isPVPEnabled()")
                         && source.contains("entity.setFire(2);"));
         assertTrue("ItemElementalPickaxe must keep use durability and scan/wandfail cue contract",
                 source.contains("stack.damageItem(5, player);")

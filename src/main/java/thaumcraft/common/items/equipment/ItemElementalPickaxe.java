@@ -45,7 +45,10 @@ public class ItemElementalPickaxe extends ItemPickaxe implements IRepairable {
 
     @Override
     public boolean onLeftClickEntity(ItemStack stack, EntityPlayer player, Entity entity) {
-        if (!player.world.isRemote) {
+        if (!player.world.isRemote
+                && (!(entity instanceof EntityPlayer)
+                || player.getServer() == null
+                || player.getServer().isPVPEnabled())) {
             entity.setFire(2);
         }
         return super.onLeftClickEntity(stack, player, entity);
