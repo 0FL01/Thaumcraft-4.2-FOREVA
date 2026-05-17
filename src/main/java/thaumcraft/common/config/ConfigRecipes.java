@@ -2731,6 +2731,16 @@ public class ConfigRecipes {
                 .setRegistryName("thaumcraft", "sugarplant");
         registry.register(recipeSugarFromPlant);
 
+        IRecipe recipeTripleMeatTreat = new ShapelessOreRecipe(
+                null,
+                new ItemStack(ConfigItems.itemTripleMeatTreat),
+                new ItemStack(Items.SUGAR),
+                new ItemStack(ConfigItems.itemNuggetEdible),
+                new ItemStack(ConfigItems.itemNuggetEdible),
+                new ItemStack(ConfigItems.itemNuggetEdible))
+                .setRegistryName("thaumcraft", "triplemeattreat");
+        registry.register(recipeTripleMeatTreat);
+
         IRecipe recipeCosmeticOpaque0 = new ShapedOreRecipe(
                 null,
                 new ItemStack(ConfigBlocks.blockCosmeticOpaque, 1, 0),
