@@ -32,6 +32,11 @@ public class WorldProviderOuterStaticGuardTest {
         assertTrue("WorldProviderOuter must keep reference non-sky-colored contract",
                 source.contains("public boolean isSkyColored()")
                         && source.contains("return false;"));
+        assertTrue("WorldProviderOuter must keep reference null spawn-coordinate contract",
+                source.contains("public BlockPos getSpawnCoordinate()")
+                        && source.contains("return null;"));
+        assertTrue("WorldProviderOuter should not override world spawn-point directly",
+                !source.contains("public BlockPos getSpawnPoint()"));
     }
 
     private static String readFile(String path) throws IOException {

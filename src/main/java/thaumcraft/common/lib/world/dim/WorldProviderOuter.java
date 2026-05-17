@@ -95,8 +95,8 @@ public class WorldProviderOuter extends WorldProvider {
     }
 
     @Override
-    public BlockPos getSpawnPoint() {
-        return new BlockPos(0, 60, 0);
+    public BlockPos getSpawnCoordinate() {
+        return null;
     }
 
     @Override
