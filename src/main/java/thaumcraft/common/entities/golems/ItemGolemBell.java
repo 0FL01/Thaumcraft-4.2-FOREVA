@@ -37,6 +37,22 @@ public class ItemGolemBell extends Item {
         return -1;
     }
 
+    public static int getGolemHomeFace(ItemStack stack) {
+        if (stack != null && stack.hasTagCompound() && stack.getTagCompound().hasKey("golemhomeface")) {
+            return stack.getTagCompound().getInteger("golemhomeface");
+        }
+        return -1;
+    }
+
+    public static BlockPos getGolemHomeCoords(ItemStack stack) {
+        if (stack != null && stack.hasTagCompound() && stack.getTagCompound().hasKey("golemhomex")) {
+            return new BlockPos(stack.getTagCompound().getInteger("golemhomex"),
+                    stack.getTagCompound().getInteger("golemhomey"),
+                    stack.getTagCompound().getInteger("golemhomez"));
+        }
+        return null;
+    }
+
     public static ArrayList<Marker> getMarkers(ItemStack stack) {
         ArrayList<Marker> markers = new ArrayList<>();
         if (stack != null && stack.hasTagCompound() && stack.getTagCompound().hasKey("markers")) {
@@ -111,13 +127,18 @@ public class ItemGolemBell extends Item {
     }
 
     @Override
+    public boolean hasEffect(ItemStack stack) {
+        return true;
+    }
+
+    @Override
     public EnumActionResult onItemUseFirst(EntityPlayer player, World world, BlockPos pos, EnumFacing side,
                                            float hitX, float hitY, float hitZ, EnumHand hand) {
         ItemStack stack = player.getHeldItem(hand);
         if (!world.isRemote && side != null) {
             changeMarkers(stack, player, world, pos, side);
         }
-        return EnumActionResult.SUCCESS;
+        return world.isRemote ? EnumActionResult.PASS : EnumActionResult.SUCCESS;
     }
 
     @Override
@@ -138,6 +159,9 @@ public class ItemGolemBell extends Item {
             tag.setInteger("golemhomeface", golem.homeFacing);
             target.world.playSound(null, target.getPosition(), SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP,
                     SoundCategory.NEUTRAL, 0.7F, 1.0F + target.world.rand.nextFloat() * 0.1F);
+            if (player.capabilities.isCreativeMode) {
+                player.setHeldItem(hand, stack.copy());
+            }
         }
         player.swingArm(hand);
         return true;
