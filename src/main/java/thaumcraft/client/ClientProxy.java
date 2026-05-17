@@ -31,6 +31,7 @@ import net.minecraft.world.World;
 import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.player.ItemTooltipEvent;
+import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.client.registry.RenderingRegistry;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import thaumcraft.client.gui.GuiArcaneBore;
@@ -91,6 +92,16 @@ import thaumcraft.client.renderers.entity.RenderTaintVillager;
 import thaumcraft.client.renderers.entity.RenderTravelingTrunk;
 import thaumcraft.client.renderers.entity.RenderWisp;
 import thaumcraft.client.renderers.entity.RenderCultist;
+import thaumcraft.client.renderers.tile.TileAlembicRenderer;
+import thaumcraft.client.renderers.tile.TileArcaneBoreBaseRenderer;
+import thaumcraft.client.renderers.tile.TileArcaneBoreRenderer;
+import thaumcraft.client.renderers.tile.TileCrucibleRenderer;
+import thaumcraft.client.renderers.tile.TileFocalManipulatorRenderer;
+import thaumcraft.client.renderers.tile.TileJarRenderer;
+import thaumcraft.client.renderers.tile.TileNodeRenderer;
+import thaumcraft.client.renderers.tile.TilePedestalRenderer;
+import thaumcraft.client.renderers.tile.TileRunicMatrixRenderer;
+import thaumcraft.client.renderers.tile.TileThaumatoriumRenderer;
 import thaumcraft.client.lib.ClientTickEventsFML;
 import thaumcraft.client.lib.KeyHandler;
 import thaumcraft.client.lib.RenderEventHandler;
@@ -154,9 +165,17 @@ import thaumcraft.common.tiles.TileArcaneWorkbench;
 import thaumcraft.common.tiles.TileCrucible;
 import thaumcraft.common.tiles.TileDeconstructionTable;
 import thaumcraft.common.tiles.TileFocalManipulator;
+import thaumcraft.common.tiles.TileInfusionMatrix;
+import thaumcraft.common.tiles.TileJarBrain;
+import thaumcraft.common.tiles.TileJarFillable;
+import thaumcraft.common.tiles.TileJarFillableVoid;
+import thaumcraft.common.tiles.TileJarNode;
+import thaumcraft.common.tiles.TileNode;
+import thaumcraft.common.tiles.TilePedestal;
 import thaumcraft.common.tiles.TileResearchTable;
 import thaumcraft.common.tiles.TileSpa;
 import thaumcraft.common.tiles.TileThaumatorium;
+import thaumcraft.common.tiles.TileWandPedestal;
 import thaumcraft.common.entities.golems.EntityGolemBase;
 import thaumcraft.common.entities.golems.EntityTravelingTrunk;
 import thaumcraft.common.entities.monster.EntityPech;
@@ -300,6 +319,24 @@ public class ClientProxy extends CommonProxy {
     }
 
     private void setupTileRenderers() {
+        TileJarRenderer jarRenderer = new TileJarRenderer();
+        ClientRegistry.bindTileEntitySpecialRenderer(TileJarFillable.class, jarRenderer);
+        ClientRegistry.bindTileEntitySpecialRenderer(TileJarFillableVoid.class, jarRenderer);
+        ClientRegistry.bindTileEntitySpecialRenderer(TileJarBrain.class, jarRenderer);
+        ClientRegistry.bindTileEntitySpecialRenderer(TileJarNode.class, jarRenderer);
+
+        TileNodeRenderer nodeRenderer = new TileNodeRenderer();
+        ClientRegistry.bindTileEntitySpecialRenderer(TileNode.class, nodeRenderer);
+
+        ClientRegistry.bindTileEntitySpecialRenderer(TileCrucible.class, new TileCrucibleRenderer());
+        ClientRegistry.bindTileEntitySpecialRenderer(thaumcraft.common.tiles.TileAlembic.class, new TileAlembicRenderer());
+        ClientRegistry.bindTileEntitySpecialRenderer(TilePedestal.class, new TilePedestalRenderer());
+        ClientRegistry.bindTileEntitySpecialRenderer(TileWandPedestal.class, new TilePedestalRenderer());
+        ClientRegistry.bindTileEntitySpecialRenderer(TileInfusionMatrix.class, new TileRunicMatrixRenderer());
+        ClientRegistry.bindTileEntitySpecialRenderer(TileThaumatorium.class, new TileThaumatoriumRenderer());
+        ClientRegistry.bindTileEntitySpecialRenderer(TileArcaneBore.class, new TileArcaneBoreRenderer());
+        ClientRegistry.bindTileEntitySpecialRenderer(thaumcraft.common.tiles.TileArcaneBoreBase.class, new TileArcaneBoreBaseRenderer());
+        ClientRegistry.bindTileEntitySpecialRenderer(TileFocalManipulator.class, new TileFocalManipulatorRenderer());
     }
 
     @Override
