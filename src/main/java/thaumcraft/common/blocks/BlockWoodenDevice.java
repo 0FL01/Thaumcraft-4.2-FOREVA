@@ -80,7 +80,18 @@ public class BlockWoodenDevice extends BlockContainer {
         list.add(new ItemStack(this, 1, 3)); // pressure plate
         list.add(new ItemStack(this, 1, 4)); // bore base
         list.add(new ItemStack(this, 1, 5)); // bore
+        list.add(new ItemStack(this, 1, 6)); // greatwood plank
+        list.add(new ItemStack(this, 1, 7)); // silverwood plank
         list.add(new ItemStack(this, 1, 8)); // banner
+    }
+
+    @Override
+    public boolean isSideSolid(IBlockState state, IBlockAccess world, BlockPos pos, EnumFacing side) {
+        int meta = state.getValue(TYPE);
+        if (meta == 4 || meta == 6 || meta == 7) {
+            return true;
+        }
+        return super.isSideSolid(state, world, pos, side);
     }
 
     @Override

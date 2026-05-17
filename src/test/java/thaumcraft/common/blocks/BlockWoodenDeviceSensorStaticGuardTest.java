@@ -38,6 +38,9 @@ public class BlockWoodenDeviceSensorStaticGuardTest {
         assertTrue(source.contains("if (meta == 3)"));
         assertTrue(source.contains("return side == EnumFacing.UP ? 15 : 0;"));
         assertTrue(source.contains("return 15;"));
+        assertTrue(source.contains("if (meta == 4 || meta == 6 || meta == 7)"));
+        assertTrue(source.contains("list.add(new ItemStack(this, 1, 6));"));
+        assertTrue(source.contains("list.add(new ItemStack(this, 1, 7));"));
         assertTrue(source.contains("world.scheduleUpdate(pos, this, tickRate(world));"));
         assertTrue(source.contains("if (shouldPress && !pressed)"));
         assertTrue(source.contains("if (!shouldPress && pressed)"));
