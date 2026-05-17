@@ -2,10 +2,12 @@ package thaumcraft.common.items.wands;
 
 import baubles.api.BaublesApi;
 import baubles.api.cap.IBaublesItemHandler;
+import net.minecraft.block.Block;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.potion.PotionEffect;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
@@ -23,6 +25,7 @@ import thaumcraft.api.wands.ItemFocusBasic;
 import thaumcraft.common.config.Config;
 import thaumcraft.common.config.ConfigBlocks;
 import thaumcraft.common.config.ConfigItems;
+import thaumcraft.common.blocks.BlockArcaneFurnace;
 import thaumcraft.common.entities.EntitySpecialItem;
 import thaumcraft.common.items.baubles.ItemAmuletVis;
 import thaumcraft.common.lib.TCSounds;
@@ -469,7 +472,100 @@ public class WandManager implements IWandTriggerManager {
     }
 
     private static boolean createArcaneFurnace(ItemStack wandStack, EntityPlayer player, World world, int x, int y, int z) {
+        if (wandStack.isEmpty() || !(wandStack.getItem() instanceof ItemWandCasting)) return false;
+        ItemWandCasting wand = (ItemWandCasting) wandStack.getItem();
+        for (int xx = x - 2; xx <= x; xx++) {
+            for (int yy = y - 2; yy <= y; yy++) {
+                for (int zz = z - 2; zz <= z; zz++) {
+                    if (!fitArcaneFurnace(world, xx, yy, zz)
+                            || !wand.consumeAllVisCrafting(wandStack, player, new AspectList().add(Aspect.FIRE, 50).add(Aspect.EARTH, 50), true)) {
+                        continue;
+                    }
+                    if (!world.isRemote) {
+                        return replaceArcaneFurnace(world, xx, yy, zz);
+                    }
+                    return false;
+                }
+            }
+        }
         return false;
+    }
+
+    private static boolean fitArcaneFurnace(World world, int x, int y, int z) {
+        Block obsidian = Blocks.OBSIDIAN;
+        Block netherrack = Blocks.NETHERRACK;
+        Block fence = Blocks.NETHER_BRICK_FENCE;
+        Block lava = Blocks.LAVA;
+        Block[][][] blueprint = new Block[][][]{
+                {
+                        {netherrack, obsidian, netherrack},
+                        {obsidian, Blocks.AIR, obsidian},
+                        {netherrack, obsidian, netherrack}
+                },
+                {
+                        {netherrack, obsidian, netherrack},
+                        {obsidian, lava, obsidian},
+                        {netherrack, obsidian, netherrack}
+                },
+                {
+                        {netherrack, obsidian, netherrack},
+                        {obsidian, obsidian, obsidian},
+                        {netherrack, obsidian, netherrack}
+                }
+        };
+
+        boolean fenceFound = false;
+        for (int yy = 0; yy < 3; yy++) {
+            for (int xx = 0; xx < 3; xx++) {
+                for (int zz = 0; zz < 3; zz++) {
+                    BlockPos target = new BlockPos(x + xx, y - yy + 2, z + zz);
+                    Block found = world.isAirBlock(target) ? Blocks.AIR : world.getBlockState(target).getBlock();
+                    if (found == blueprint[yy][xx][zz]) continue;
+
+                    boolean crossSlot = (xx == 1 || zz == 1) && xx != zz;
+                    if (yy == 1 && !fenceFound && found == fence && crossSlot) {
+                        fenceFound = true;
+                        continue;
+                    }
+                    return false;
+                }
+            }
+        }
+        return fenceFound;
+    }
+
+    private static boolean replaceArcaneFurnace(World world, int x, int y, int z) {
+        for (int yy = 0; yy < 3; yy++) {
+            int step = 1;
+            for (int zz = 0; zz < 3; zz++) {
+                for (int xx = 0; xx < 3; xx++) {
+                    BlockPos target = new BlockPos(x + xx, y + yy, z + zz);
+                    int meta = step;
+                    Block found = world.getBlockState(target).getBlock();
+                    if (found == Blocks.LAVA || found == Blocks.FIRE) {
+                        meta = 0;
+                    } else if (found == Blocks.NETHER_BRICK_FENCE) {
+                        meta = 10;
+                    }
+                    if (!world.isAirBlock(target)) {
+                        world.setBlockState(target, ConfigBlocks.blockArcaneFurnace.getDefaultState().withProperty(BlockArcaneFurnace.TYPE, meta), 3);
+                        world.notifyNeighborsOfStateChange(target, ConfigBlocks.blockArcaneFurnace, false);
+                    }
+                    step++;
+                }
+            }
+        }
+
+        for (int yy = 0; yy < 3; yy++) {
+            for (int zz = 0; zz < 3; zz++) {
+                for (int xx = 0; xx < 3; xx++) {
+                    BlockPos target = new BlockPos(x + xx, y + yy, z + zz);
+                    world.notifyBlockUpdate(target, world.getBlockState(target), world.getBlockState(target), 3);
+                }
+            }
+        }
+        world.playSound(null, new BlockPos(x, y, z), TCSounds.WAND, SoundCategory.PLAYERS, 1.0F, 1.0F);
+        return true;
     }
 
     private static boolean createInfusionAltar(ItemStack wandStack, EntityPlayer player, World world, int x, int y, int z) {
