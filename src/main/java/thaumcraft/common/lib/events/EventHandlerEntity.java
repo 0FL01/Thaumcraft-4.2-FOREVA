@@ -238,6 +238,7 @@ public class EventHandlerEntity {
         if (event.getEntityLiving() instanceof EntityPlayer) {
             EntityPlayer player = (EntityPlayer) event.getEntityLiving();
             WarpEvents.checkWarpEvent(player);
+            applyTravellerHasteMovement(player);
         }
 
         if (event.getEntityLiving() instanceof EntityMob && !event.getEntityLiving().isDead) {
@@ -471,6 +472,30 @@ public class EventHandlerEntity {
             return;
         }
         player.motionY += 0.275D;
+    }
+
+    private void applyTravellerHasteMovement(EntityPlayer player) {
+        if (player.capabilities.isFlying) {
+            return;
+        }
+        ItemStack boots = player.inventory.armorInventory.get(0);
+        if (boots.isEmpty() || boots.getItem() != ConfigItems.itemBootsTraveller || player.moveForward <= 0.0F) {
+            return;
+        }
+
+        int haste = Config.enchHaste == null ? 0 : EnchantmentHelper.getEnchantmentLevel(Config.enchHaste, boots);
+        if (haste <= 0) {
+            return;
+        }
+
+        float bonus = haste * 0.015F;
+        if (player.onGround) {
+            bonus /= 2.0F;
+        }
+        if (player.isInWater()) {
+            bonus /= 2.0F;
+        }
+        player.moveRelative(0.0F, 0.0F, 1.0F, bonus);
     }
 
     private void handleChampionSpawn(EntityJoinWorldEvent event, EntityMob mob) {
