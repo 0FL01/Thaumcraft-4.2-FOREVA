@@ -155,15 +155,23 @@ public class ConfigAspects {
         // Ore dictionary entries
         if (thaumcraft.common.config.Config.foundCopperIngot) {
             ThaumcraftApi.registerObjectTag("ingotCopper", new AspectList().add(Aspect.METAL, 3));
+            ThaumcraftApi.registerObjectTag("nuggetCopper", new AspectList().add(Aspect.METAL, 1));
+            ThaumcraftApi.registerObjectTag("dustCopper", new AspectList().add(Aspect.METAL, 2).add(Aspect.ENTROPY, 1));
         }
         if (thaumcraft.common.config.Config.foundTinIngot) {
             ThaumcraftApi.registerObjectTag("ingotTin", new AspectList().add(Aspect.METAL, 3));
+            ThaumcraftApi.registerObjectTag("nuggetTin", new AspectList().add(Aspect.METAL, 1));
+            ThaumcraftApi.registerObjectTag("dustTin", new AspectList().add(Aspect.METAL, 2).add(Aspect.ENTROPY, 1));
         }
         if (thaumcraft.common.config.Config.foundSilverIngot) {
             ThaumcraftApi.registerObjectTag("ingotSilver", new AspectList().add(Aspect.METAL, 4));
+            ThaumcraftApi.registerObjectTag("nuggetSilver", new AspectList().add(Aspect.METAL, 1));
+            ThaumcraftApi.registerObjectTag("dustSilver", new AspectList().add(Aspect.METAL, 2).add(Aspect.ENTROPY, 1));
         }
         if (thaumcraft.common.config.Config.foundLeadIngot) {
             ThaumcraftApi.registerObjectTag("ingotLead", new AspectList().add(Aspect.METAL, 3));
+            ThaumcraftApi.registerObjectTag("nuggetLead", new AspectList().add(Aspect.METAL, 1));
+            ThaumcraftApi.registerObjectTag("dustLead", new AspectList().add(Aspect.METAL, 2).add(Aspect.ENTROPY, 1));
         }
 
         if (thaumcraft.common.config.Config.foundCopperOre) {
