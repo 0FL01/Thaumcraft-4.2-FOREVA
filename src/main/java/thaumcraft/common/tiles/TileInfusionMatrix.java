@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import net.minecraft.block.Block;
-import net.minecraft.block.state.IBlockState;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.EntityLivingBase;
@@ -279,8 +278,9 @@ public class TileInfusionMatrix extends TileThaumcraft implements ITickable, IWa
         }
 
         if (this.recipeType == 1 && this.recipeXP > 0) {
-            if (this.drainRecipeXP()) return;
-            this.addMissingIngredientInstability();
+            int xpDrainState = this.drainRecipeXP();
+            if (xpDrainState > 0) return;
+            if (xpDrainState < 0) this.addMissingIngredientInstability(3);
             return;
         }
         if (this.recipeType == 1 && this.recipeXP == 0) this.countDelay = 10;
@@ -331,7 +331,7 @@ public class TileInfusionMatrix extends TileThaumcraft implements ITickable, IWa
                     }
                     return;
                 }
-                this.addMissingIngredientInstability();
+                this.addMissingIngredientInstability(1 + i);
             }
             return;
         }
@@ -435,8 +435,9 @@ public class TileInfusionMatrix extends TileThaumcraft implements ITickable, IWa
         return InventoryUtils.areItemStacksEqualForCrafting(compare, this.recipeInput, true, true, false);
     }
 
-    private boolean drainRecipeXP() {
+    private int drainRecipeXP() {
         List<EntityPlayer> targets = this.world.getEntitiesWithinAABB(EntityPlayer.class, this.getEffectBounds(10.0D));
+        boolean hadTargets = !targets.isEmpty();
         for (EntityPlayer target : targets) {
             if (target.experienceLevel <= 0) continue;
             target.addExperienceLevel(-1);
@@ -461,9 +462,9 @@ public class TileInfusionMatrix extends TileThaumcraft implements ITickable, IWa
                     SoundCategory.PLAYERS, 1.0F, 2.0F + this.world.rand.nextFloat() * 0.4F);
             this.countDelay = 20;
             this.markDirtyAndSync();
-            return true;
+            return 1;
         }
-        return false;
+        return hadTargets ? -1 : 0;
     }
 
     private BlockPos findPedestalWith(ItemStack ingredient) {
@@ -488,12 +489,11 @@ public class TileInfusionMatrix extends TileThaumcraft implements ITickable, IWa
         this.world.addBlockEvent(pedestalPos, this.world.getBlockState(pedestalPos).getBlock(), 11, 0);
     }
 
-    private void addMissingIngredientInstability() {
+    private void addMissingIngredientInstability(int aspectChanceBound) {
         Aspect[] aspects = this.recipeEssentia.getAspects();
-        if (aspects != null && aspects.length > 0 && this.world.rand.nextInt(3) == 0) {
-            Aspect aspect = aspects[this.world.rand.nextInt(aspects.length)];
-            if (aspect != null) this.recipeEssentia.add(aspect, 1);
-        }
+        if (aspects == null || aspects.length == 0 || this.world.rand.nextInt(Math.max(1, aspectChanceBound)) != 0) return;
+        Aspect aspect = aspects[this.world.rand.nextInt(aspects.length)];
+        if (aspect != null) this.recipeEssentia.add(aspect, 1);
         this.increaseInstabilityRandom(Math.max(1, 50 - this.recipeInstability * 2));
         this.markDirtyAndSync();
     }
@@ -616,22 +616,33 @@ public class TileInfusionMatrix extends TileThaumcraft implements ITickable, IWa
             }
 
             BlockPos above = pedestalPos.up();
-            if ((type == 1 || type == 3) && ConfigBlocks.blockFluxGoo != null && this.canPlaceFlux(above)) {
+            if ((type == 1 || type == 3) && ConfigBlocks.blockFluxGoo != null) {
                 this.world.setBlockState(above, ConfigBlocks.blockFluxGoo.getStateFromMeta(7), 3);
-            } else if ((type == 2 || type == 4) && ConfigBlocks.blockFluxGas != null && this.canPlaceFlux(above)) {
+                this.world.playSound(null, pedestalPos, SoundEvents.ENTITY_GENERIC_SWIM, SoundCategory.BLOCKS, 0.3F, 1.0F);
+            } else if ((type == 2 || type == 4) && ConfigBlocks.blockFluxGas != null) {
                 this.world.setBlockState(above, ConfigBlocks.blockFluxGas.getStateFromMeta(7), 3);
+                this.world.playSound(null, pedestalPos, SoundEvents.BLOCK_FIRE_EXTINGUISH, SoundCategory.BLOCKS, 0.3F, 1.0F);
             } else if (type == 5) {
                 this.world.createExplosion(null, pedestalPos.getX() + 0.5D, pedestalPos.getY() + 0.5D, pedestalPos.getZ() + 0.5D, 1.0F, false);
             }
 
             this.world.addBlockEvent(pedestalPos, this.world.getBlockState(pedestalPos).getBlock(), 11, 0);
+            PacketHandler.INSTANCE.sendToAllAround(
+                    new PacketFXBlockZap(
+                            this.pos.getX() + 0.5F,
+                            this.pos.getY() + 0.5F,
+                            this.pos.getZ() + 0.5F,
+                            pedestalPos.getX() + 0.5F,
+                            pedestalPos.getY() + 1.5F,
+                            pedestalPos.getZ() + 0.5F),
+                    new NetworkRegistry.TargetPoint(
+                            this.world.provider.getDimension(),
+                            this.pos.getX(),
+                            this.pos.getY(),
+                            this.pos.getZ(),
+                            32.0));
             return;
         }
-    }
-
-    private boolean canPlaceFlux(BlockPos pos) {
-        IBlockState state = this.world.getBlockState(pos);
-        return this.world.isAirBlock(pos) || state.getBlock().isReplaceable(this.world, pos);
     }
 
     private AxisAlignedBB getEffectBounds(double range) {
