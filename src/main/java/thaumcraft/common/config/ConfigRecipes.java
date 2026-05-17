@@ -24,6 +24,7 @@ import thaumcraft.api.wands.WandCap;
 import thaumcraft.api.wands.WandRod;
 import thaumcraft.common.lib.crafting.ArcaneSceptreRecipe;
 import thaumcraft.common.lib.crafting.ArcaneWandRecipe;
+import thaumcraft.common.lib.crafting.ShapelessNBTOreRecipe;
 import thaumcraft.common.items.armor.RecipesRobeArmorDyes;
 import thaumcraft.common.lib.crafting.InfusionRunicAugmentRecipe;
 import thaumcraft.common.items.armor.RecipesVoidRobeArmorDyes;
@@ -2277,7 +2278,7 @@ public class ConfigRecipes {
     }
 
     public static IRecipe shapelessNBTOreRecipe(ItemStack output, Object[] recipe) {
-        return new ShapelessOreRecipe(null, output, recipe);
+        return new ShapelessNBTOreRecipe(output, recipe);
     }
 
     public static void registerSpecialRecipes(IForgeRegistry<IRecipe> registry) {
