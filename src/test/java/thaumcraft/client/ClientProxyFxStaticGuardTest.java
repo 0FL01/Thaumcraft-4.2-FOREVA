@@ -18,6 +18,8 @@ public class ClientProxyFxStaticGuardTest {
         String renderHandler = readFile("src/main/java/thaumcraft/client/lib/RenderEventHandler.java");
         String particleEngine = readFile("src/main/java/thaumcraft/client/fx/ParticleEngine.java");
         String blockWardFx = readFile("src/main/java/thaumcraft/client/fx/other/FXBlockWard.java");
+        String bubbleFx = readFile("src/main/java/thaumcraft/client/fx/particles/FXBubble.java");
+        String bubbleAltFx = readFile("src/main/java/thaumcraft/client/fx/particles/FXBubbleAlt.java");
         String sonicFx = readFile("src/main/java/thaumcraft/client/fx/other/FXSonic.java");
         String shieldRunesFx = readFile("src/main/java/thaumcraft/client/fx/other/FXShieldRunes.java");
 
@@ -57,7 +59,8 @@ public class ClientProxyFxStaticGuardTest {
                         && source.contains("public void crucibleFrothDown("));
         assertTrue("ClientProxy must override crucibleBubble with colored bubble path",
                 source.contains("public void crucibleBubble(")
-                        && source.contains("EnumParticleTypes.WATER_BUBBLE"));
+                        && source.contains("new FXBubbleAlt(")
+                        && source.contains("ParticleEngine.addEffect(world, bubble)"));
         assertTrue("ClientProxy must override crucibleBoilSound and crucibleBoil",
                 source.contains("public void crucibleBoilSound(")
                         && source.contains("public void crucibleBoil(")
@@ -96,6 +99,15 @@ public class ClientProxyFxStaticGuardTest {
                 blockWardFx.contains("class FXBlockWard extends Particle")
                         && blockWardFx.contains("EnumFacing.random(this.rand)")
                         && blockWardFx.contains("EnumParticleTypes.REDSTONE"));
+        assertTrue("Dedicated FXBubble particle must keep froth controls and water-bubble emission baseline",
+                bubbleFx.contains("class FXBubble extends Particle")
+                        && bubbleFx.contains("setFroth()")
+                        && bubbleFx.contains("setFroth2()")
+                        && bubbleFx.contains("EnumParticleTypes.WATER_BUBBLE"));
+        assertTrue("Dedicated FXBubbleAlt particle must keep colored crucible bubble emission baseline",
+                bubbleAltFx.contains("class FXBubbleAlt extends Particle")
+                        && bubbleAltFx.contains("setRGB(float r, float g, float b)")
+                        && bubbleAltFx.contains("EnumParticleTypes.REDSTONE"));
     }
 
     @Test
@@ -146,9 +158,9 @@ public class ClientProxyFxStaticGuardTest {
         assertTrue("PacketFXBlockDig must schedule client task and emit dig particles",
                 blockDig.contains("Minecraft.getMinecraft().addScheduledTask")
                         && blockDig.contains("EnumParticleTypes.BLOCK_CRACK"));
-        assertTrue("PacketFXBlockBubble must schedule client task and emit bubble particles",
+        assertTrue("PacketFXBlockBubble must schedule client task and route through proxy crucibleBubble surface",
                 blockBubble.contains("Minecraft.getMinecraft().addScheduledTask")
-                        && blockBubble.contains("EnumParticleTypes.WATER_BUBBLE"));
+                        && blockBubble.contains("Thaumcraft.proxy.crucibleBubble("));
         assertTrue("PacketFXBeamPulse must schedule client task and route through dedicated FXBeam",
                 beamPulse.contains("Minecraft.getMinecraft().addScheduledTask")
                         && beamPulse.contains("new FXBeam(")

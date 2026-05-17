@@ -56,6 +56,8 @@ import thaumcraft.client.fx.bolt.FXLightningBolt;
 import thaumcraft.client.fx.other.FXBlockWard;
 import thaumcraft.client.fx.other.FXShieldRunes;
 import thaumcraft.client.fx.other.FXSonic;
+import thaumcraft.client.fx.particles.FXBubble;
+import thaumcraft.client.fx.particles.FXBubbleAlt;
 import thaumcraft.client.renderers.entity.RenderFallbackBiped;
 import thaumcraft.client.renderers.entity.RenderFireBat;
 import thaumcraft.client.renderers.entity.RenderGolemBase;
@@ -925,10 +927,17 @@ public class ClientProxy extends CommonProxy {
         if (amount <= 0) return;
 
         for (int i = 0; i < amount; i++) {
-            world.spawnParticle(EnumParticleTypes.WATER_BUBBLE, x, y, z,
+            FXBubble bubble = new FXBubble(
+                    world,
+                    x,
+                    y,
+                    z,
                     (world.rand.nextFloat() - 0.5f) * 0.01f,
                     0.02f + world.rand.nextFloat() * 0.01f,
-                    (world.rand.nextFloat() - 0.5f) * 0.01f);
+                    (world.rand.nextFloat() - 0.5f) * 0.01f,
+                    8);
+            bubble.setFroth();
+            ParticleEngine.addEffect(world, bubble);
             if (world.rand.nextInt(4) == 0) {
                 world.spawnParticle(EnumParticleTypes.SMOKE_NORMAL, x, y + 0.03f, z, 0.0, 0.01, 0.0);
             }
@@ -942,10 +951,17 @@ public class ClientProxy extends CommonProxy {
         if (amount <= 0) return;
 
         for (int i = 0; i < amount; i++) {
-            world.spawnParticle(EnumParticleTypes.WATER_SPLASH, x, y, z,
+            FXBubble bubble = new FXBubble(
+                    world,
+                    x,
+                    y,
+                    z,
                     (world.rand.nextFloat() - 0.5f) * 0.01f,
                     -0.02f - world.rand.nextFloat() * 0.02f,
-                    (world.rand.nextFloat() - 0.5f) * 0.01f);
+                    (world.rand.nextFloat() - 0.5f) * 0.01f,
+                    14);
+            bubble.setFroth2();
+            ParticleEngine.addEffect(world, bubble);
         }
     }
 
@@ -956,11 +972,17 @@ public class ClientProxy extends CommonProxy {
         if (amount <= 0) return;
 
         for (int i = 0; i < amount; i++) {
-            world.spawnParticle(EnumParticleTypes.REDSTONE, x, y, z, red, green, blue);
-            world.spawnParticle(EnumParticleTypes.WATER_BUBBLE, x, y, z,
+            FXBubbleAlt bubble = new FXBubbleAlt(
+                    world,
+                    x,
+                    y,
+                    z,
                     (world.rand.nextFloat() - 0.5f) * 0.01f,
                     0.015f + world.rand.nextFloat() * 0.01f,
-                    (world.rand.nextFloat() - 0.5f) * 0.01f);
+                    (world.rand.nextFloat() - 0.5f) * 0.01f,
+                    10);
+            bubble.setRGB(red, green, blue);
+            ParticleEngine.addEffect(world, bubble);
         }
     }
 
