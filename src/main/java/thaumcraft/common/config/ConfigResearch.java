@@ -3833,7 +3833,7 @@ public class ConfigResearch {
 
     private static IRecipe[] buildJarLabelAspectPages() {
         ArrayList<IRecipe> pages = new ArrayList<>();
-        for (int index = 0; recipes.containsKey("JarLabel" + index); index++) {
+        for (int index = 0; index < Aspect.aspects.values().size(); index++) {
             pages.add(recipeI("JarLabel" + index));
         }
         return pages.toArray(new IRecipe[0]);
