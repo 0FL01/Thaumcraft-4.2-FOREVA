@@ -138,7 +138,7 @@ public class ArcaneWandRecipe implements IArcaneRecipe {
         if (targetEmpty && inputEmpty) return true;
         if (targetEmpty || inputEmpty) return false;
         return target.getItem() == input.getItem()
-                && (!target.hasTagCompound() || ThaumcraftApiHelper.areItemStackTagsEqualForCrafting(input, target))
+                && (!target.hasTagCompound() || ItemStack.areItemStackTagsEqual(target, input))
                 && (target.getMetadata() == Short.MAX_VALUE || target.getMetadata() == input.getMetadata());
     }
 
