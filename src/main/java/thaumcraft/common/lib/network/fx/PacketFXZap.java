@@ -55,19 +55,6 @@ public class PacketFXZap extends PacketBase {
                             0.4F, 0.8F, 1.0F,
                             5,
                             8));
-            mc.world.playEvent(2005, sourceEntity.getPosition(), 0);
-            mc.world.playEvent(2005, targetEntity.getPosition(), 0);
-            /* Keep a thin proxy fallback sparkline alongside dedicated bolt for parity softness. */
-            thaumcraft.common.Thaumcraft.proxy.bolt(
-                    mc.world,
-                    sourceEntity.posX,
-                    sourceEntity.getEntityBoundingBox().minY + sourceEntity.height * 0.5,
-                    sourceEntity.posZ,
-                    targetEntity.posX,
-                    targetEntity.getEntityBoundingBox().minY + targetEntity.height * 0.5,
-                    targetEntity.posZ,
-                    0x66CCFF,
-                    2);
         });
         return null;
     }

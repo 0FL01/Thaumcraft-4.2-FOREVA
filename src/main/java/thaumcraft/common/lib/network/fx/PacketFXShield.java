@@ -8,7 +8,6 @@ import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import thaumcraft.client.fx.ParticleEngine;
-import thaumcraft.client.fx.bolt.FXLightningBolt;
 import thaumcraft.client.fx.other.FXShieldRunes;
 import thaumcraft.common.lib.network.PacketBase;
 
@@ -44,58 +43,36 @@ public class PacketFXShield extends PacketBase {
             Entity sourceEntity = mc.world.getEntityByID(this.source);
             if (sourceEntity == null) return;
 
-            double sx = sourceEntity.posX;
-            double sy = sourceEntity.getEntityBoundingBox().minY + sourceEntity.height * 0.5;
-            double sz = sourceEntity.posZ;
-            spawnRunes(mc, sourceEntity, sourceEntity.rotationYaw, sourceEntity.rotationPitch);
-            thaumcraft.common.Thaumcraft.proxy.burst(mc.world, sx, sy, sz, 1.0f);
+            float pitch = 0.0f;
+            float yaw = 0.0f;
 
             if (this.target >= 0) {
                 Entity targetEntity = mc.world.getEntityByID(this.target);
                 if (targetEntity != null) {
-                    double tx = targetEntity.posX;
-                    double ty = targetEntity.getEntityBoundingBox().minY + targetEntity.height * 0.5;
-                    double tz = targetEntity.posZ;
-                    float[] orientation = facingAngles(sx, sy, sz, tx, ty, tz);
-                    spawnRunes(mc, sourceEntity, orientation[0], orientation[1]);
-                    ParticleEngine.addEffect(mc.world,
-                            new FXLightningBolt(mc.world, sx, sy, sz, tx, ty, tz, 0.4F, 0.8F, 1.0F, 4, 7));
+                    double d0 = sourceEntity.posX - targetEntity.posX;
+                    double d1 = (sourceEntity.getEntityBoundingBox().minY + sourceEntity.getEntityBoundingBox().maxY) * 0.5D
+                            - (targetEntity.getEntityBoundingBox().minY + targetEntity.getEntityBoundingBox().maxY) * 0.5D;
+                    double d2 = sourceEntity.posZ - targetEntity.posZ;
+                    double d3 = Math.sqrt(d0 * d0 + d2 * d2);
+                    yaw = (float) (Math.atan2(d2, d0) * 180.0D / Math.PI) - 90.0F;
+                    pitch = (float) (-(Math.atan2(d1, d3) * 180.0D / Math.PI));
+                } else {
+                    pitch = 90.0f;
+                    yaw = 0.0f;
                 }
+                ParticleEngine.addEffect(mc.world, new FXShieldRunes(mc.world, sourceEntity, 8, yaw, pitch));
                 return;
             }
 
             if (this.target == -1) {
-                spawnRunes(mc, sourceEntity, 0.0F, 90.0F);
-                spawnRunes(mc, sourceEntity, 0.0F, 270.0F);
-                ParticleEngine.addEffect(mc.world,
-                        new FXLightningBolt(mc.world, sx, sy, sz, sx, sy + 1.0D, sz, 0.4F, 0.8F, 1.0F, 3, 6));
-                ParticleEngine.addEffect(mc.world,
-                        new FXLightningBolt(mc.world, sx, sy, sz, sx, sy - 1.0D, sz, 0.4F, 0.8F, 1.0F, 3, 6));
+                ParticleEngine.addEffect(mc.world, new FXShieldRunes(mc.world, sourceEntity, 8, 0.0f, 90.0f));
+                ParticleEngine.addEffect(mc.world, new FXShieldRunes(mc.world, sourceEntity, 8, 0.0f, 270.0f));
             } else if (this.target == -2) {
-                spawnRunes(mc, sourceEntity, 0.0F, 270.0F);
-                ParticleEngine.addEffect(mc.world,
-                        new FXLightningBolt(mc.world, sx, sy, sz, sx, sy - 1.0D, sz, 0.4F, 0.8F, 1.0F, 3, 6));
+                ParticleEngine.addEffect(mc.world, new FXShieldRunes(mc.world, sourceEntity, 8, 0.0f, 270.0f));
             } else if (this.target == -3) {
-                spawnRunes(mc, sourceEntity, 0.0F, 90.0F);
-                ParticleEngine.addEffect(mc.world,
-                        new FXLightningBolt(mc.world, sx, sy, sz, sx, sy + 1.0D, sz, 0.4F, 0.8F, 1.0F, 3, 6));
+                ParticleEngine.addEffect(mc.world, new FXShieldRunes(mc.world, sourceEntity, 8, 0.0f, 90.0f));
             }
         });
         return null;
-    }
-
-    private static void spawnRunes(Minecraft mc, Entity source, float yaw, float pitch) {
-        thaumcraft.common.Thaumcraft.proxy.shieldRunesFX(mc.world, source, 12, yaw, pitch);
-        ParticleEngine.addEffect(mc.world, new FXShieldRunes(mc.world, source, 8, yaw, pitch));
-    }
-
-    private static float[] facingAngles(double sx, double sy, double sz, double tx, double ty, double tz) {
-        double dx = sx - tx;
-        double dy = sy - ty;
-        double dz = sz - tz;
-        double flat = Math.sqrt(dx * dx + dz * dz);
-        float yaw = (float) (Math.atan2(dz, dx) * 180.0D / Math.PI) - 90.0F;
-        float pitch = (float) (-(Math.atan2(dy, flat) * 180.0D / Math.PI));
-        return new float[]{yaw, pitch};
     }
 }

@@ -38,14 +38,7 @@ public class PacketFXSonic extends PacketBase {
             if (mc.world == null) return;
             Entity sourceEntity = mc.world.getEntityByID(this.source);
             if (sourceEntity == null) return;
-            ParticleEngine.addEffect(mc.world, new FXSonic(mc.world, sourceEntity, 14));
-            thaumcraft.common.Thaumcraft.proxy.sonicFX(mc.world, sourceEntity, 14);
-            thaumcraft.common.Thaumcraft.proxy.burst(
-                    mc.world,
-                    sourceEntity.posX,
-                    sourceEntity.posY + sourceEntity.height * 0.5,
-                    sourceEntity.posZ,
-                    1.4f);
+            ParticleEngine.addEffect(mc.world, new FXSonic(mc.world, sourceEntity, 10));
         });
         return null;
     }

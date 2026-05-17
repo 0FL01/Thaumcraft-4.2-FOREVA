@@ -252,27 +252,30 @@ public class ClientProxyFxStaticGuardTest {
                         && packetBoreDig.contains("getDigEvent"));
         assertTrue("PacketFXBlockSparkle must schedule client task and call proxy blockSparkle",
                 blockSparkle.contains("Minecraft.getMinecraft().addScheduledTask") && blockSparkle.contains("Thaumcraft.proxy.blockSparkle("));
-        assertTrue("PacketFXShield must schedule client task and route through dedicated shield/bolt FX",
+        assertTrue("PacketFXShield must schedule client task and emit only dedicated shield rune FX",
                 shield.contains("Minecraft.getMinecraft().addScheduledTask")
-                        && shield.contains("Thaumcraft.proxy.shieldRunesFX(")
                         && shield.contains("new FXShieldRunes(")
-                        && shield.contains("new FXLightningBolt(")
-                        && shield.contains("Thaumcraft.proxy.burst(")
-                        && shield.contains("ParticleEngine.addEffect("));
-        assertTrue("PacketFXSonic must schedule client task and route through dedicated sonic FX",
+                        && shield.contains("ParticleEngine.addEffect(")
+                        && !shield.contains("Thaumcraft.proxy.shieldRunesFX(")
+                        && !shield.contains("new FXLightningBolt(")
+                        && !shield.contains("Thaumcraft.proxy.burst("));
+        assertTrue("PacketFXSonic must schedule client task and emit only dedicated sonic FX",
                 sonic.contains("Minecraft.getMinecraft().addScheduledTask")
                         && sonic.contains("new FXSonic(")
                         && sonic.contains("ParticleEngine.addEffect(")
-                        && sonic.contains("Thaumcraft.proxy.sonicFX(")
-                        && sonic.contains("Thaumcraft.proxy.burst("));
-        assertTrue("PacketFXWispZap must schedule client task and route through dedicated lightning bolt FX",
+                        && !sonic.contains("Thaumcraft.proxy.sonicFX(")
+                        && !sonic.contains("Thaumcraft.proxy.burst("));
+        assertTrue("PacketFXWispZap must schedule client task and route through single proxy bolt path",
                 wispZap.contains("Minecraft.getMinecraft().addScheduledTask")
-                        && wispZap.contains("new FXLightningBolt(")
-                        && wispZap.contains("ParticleEngine.addEffect("));
-        assertTrue("PacketFXZap must schedule client task and route through dedicated lightning bolt FX",
+                        && wispZap.contains("Thaumcraft.proxy.bolt(")
+                        && !wispZap.contains("new FXLightningBolt(")
+                        && !wispZap.contains("ParticleEngine.addEffect("));
+        assertTrue("PacketFXZap must schedule client task and route through dedicated lightning bolt FX only",
                 zap.contains("Minecraft.getMinecraft().addScheduledTask")
                         && zap.contains("new FXLightningBolt(")
-                        && zap.contains("ParticleEngine.addEffect("));
+                        && zap.contains("ParticleEngine.addEffect(")
+                        && !zap.contains("Thaumcraft.proxy.bolt(")
+                        && !zap.contains("playEvent(2005"));
         assertTrue("Server block-swap path must send PacketFXBlockSparkle around replaced block",
                 serverTick.contains("new PacketFXBlockSparkle(vs.x, vs.y, vs.z, 0xC0C0FF)"));
         assertTrue("Server block-swap path must keep silk-harvest and fortune drop routing",
