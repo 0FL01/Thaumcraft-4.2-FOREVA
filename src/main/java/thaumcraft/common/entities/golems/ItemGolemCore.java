@@ -4,8 +4,13 @@ import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.EnumRarity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.util.NonNullList;
+import net.minecraft.util.text.translation.I18n;
+import net.minecraft.world.World;
 import thaumcraft.common.lib.CreativeTabThaumcraft;
+
+import java.util.List;
 
 public class ItemGolemCore extends Item {
     public ItemGolemCore() {
@@ -33,6 +38,11 @@ public class ItemGolemCore extends Item {
     @Override
     public EnumRarity getRarity(ItemStack stack) {
         return stack.getItemDamage() == 100 ? EnumRarity.COMMON : EnumRarity.UNCOMMON;
+    }
+
+    @Override
+    public void addInformation(ItemStack stack, World worldIn, List<String> tooltip, ITooltipFlag flagIn) {
+        tooltip.add(I18n.translateToLocal("item.ItemGolemCore." + stack.getItemDamage() + ".name"));
     }
 
     public static boolean hasGUI(int core) {
