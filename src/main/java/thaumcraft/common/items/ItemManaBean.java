@@ -138,15 +138,15 @@ public class ItemManaBean extends ItemFood implements IEssentiaContainerItem {
                                       float hitX, float hitY, float hitZ) {
         ItemStack stack = player.getHeldItem(hand);
         if (!player.canPlayerEdit(pos, facing, stack) || facing != EnumFacing.DOWN || ConfigBlocks.blockManaPod == null) {
-            return EnumActionResult.FAIL;
+            return EnumActionResult.PASS;
         }
         if (!BiomeDictionary.hasType(world.getBiome(pos), BiomeDictionary.Type.MAGICAL) || !isValidManaPodSupport(world, pos)) {
-            return EnumActionResult.FAIL;
+            return EnumActionResult.PASS;
         }
 
         BlockPos place = pos.down();
         if (!world.isAirBlock(place)) {
-            return EnumActionResult.FAIL;
+            return EnumActionResult.SUCCESS;
         }
 
         if (!world.isRemote) {

@@ -1825,6 +1825,30 @@ Depends on GAP-1 and GAP-3. Some infusion source scenarios may require Stage 9 c
 
 - Это common/server+non-GUI baseline; полный loot-table distribution parity и runtime/manual opening scenarios остаются зависимостью Stage 9 content + manual validation.
 
+#### Checkpoint 2026-05-17 — GAP-11 mana-bean use-result contracts baseline
+
+Статус: частично продвинут.
+
+Что сделано:
+
+- `ItemManaBean.onItemUse(...)` выровнен по reference-shaped interaction semantics:
+  - invalid/no-op gates (`cannot edit`, `wrong side`, `non-magical biome`, invalid support) теперь возвращают `PASS` вместо `FAIL`;
+  - при валидной точке роста и занятой нижней клетке результат теперь `SUCCESS` (action-consumed contract как в reference boolean-path).
+- Существующая server-side логика установки `blockManaPod`, переноса аспекта в `TileManaPod` и расхода stack сохранена.
+- Добавлен `ItemManaBeanCoreContractsStaticGuardTest`, фиксирующий:
+  - `IEssentiaContainerItem`/aspect container baseline;
+  - use-result semantics (PASS gates + SUCCESS occupied-place path);
+  - magical-biome/support gating;
+  - наличие tooltip/lang baseline (`tc.aspect.unknown`, `mana_bean`).
+
+Проверки:
+
+- `./scripts/dev.sh validate --smoke` — passed.
+
+Ограничения:
+
+- Это common/server+non-GUI baseline; full mana-pod growth/harvest gameplay parity и client visual parity остаются в runtime/manual Stage 5/8 зоне.
+
 ### GAP-12: FX registration exists, but send-site coverage and manual scenario validation are incomplete
 
 **Статус:** требует проверки  
