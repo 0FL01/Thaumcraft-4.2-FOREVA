@@ -99,6 +99,7 @@ import thaumcraft.client.renderers.entity.RenderCultist;
 import thaumcraft.client.renderers.tile.TileAlembicRenderer;
 import thaumcraft.client.renderers.tile.TileArcaneBoreBaseRenderer;
 import thaumcraft.client.renderers.tile.TileArcaneBoreRenderer;
+import thaumcraft.client.renderers.tile.TileBannerRenderer;
 import thaumcraft.client.renderers.tile.TileCrucibleRenderer;
 import thaumcraft.client.renderers.tile.TileFocalManipulatorRenderer;
 import thaumcraft.client.renderers.tile.TileJarRenderer;
@@ -170,6 +171,7 @@ import thaumcraft.common.entities.projectile.EntityShockOrb;
 import thaumcraft.common.tiles.TileAlchemyFurnace;
 import thaumcraft.common.tiles.TileArcaneBore;
 import thaumcraft.common.tiles.TileArcaneWorkbench;
+import thaumcraft.common.tiles.TileBanner;
 import thaumcraft.common.tiles.TileCrucible;
 import thaumcraft.common.tiles.TileDeconstructionTable;
 import thaumcraft.common.tiles.TileFocalManipulator;
@@ -384,6 +386,7 @@ public class ClientProxy extends CommonProxy {
         ClientRegistry.bindTileEntitySpecialRenderer(TileArcaneBore.class, new TileArcaneBoreRenderer());
         ClientRegistry.bindTileEntitySpecialRenderer(thaumcraft.common.tiles.TileArcaneBoreBase.class, new TileArcaneBoreBaseRenderer());
         ClientRegistry.bindTileEntitySpecialRenderer(TileFocalManipulator.class, new TileFocalManipulatorRenderer());
+        ClientRegistry.bindTileEntitySpecialRenderer(TileBanner.class, new TileBannerRenderer());
     }
 
     @Override

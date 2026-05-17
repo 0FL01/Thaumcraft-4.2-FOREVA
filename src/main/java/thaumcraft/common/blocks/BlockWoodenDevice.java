@@ -14,6 +14,7 @@ import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumBlockRenderType;
 import net.minecraft.util.EnumFacing;
@@ -27,8 +28,12 @@ import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.world.World;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.init.SoundEvents;
+import thaumcraft.api.aspects.Aspect;
+import thaumcraft.api.aspects.AspectList;
+import thaumcraft.api.aspects.IEssentiaContainerItem;
 import thaumcraft.common.Thaumcraft;
 import thaumcraft.common.CommonProxy;
+import thaumcraft.common.items.ItemEssence;
 import thaumcraft.common.items.wands.ItemWandCasting;
 import thaumcraft.common.tiles.*;
 
@@ -83,6 +88,13 @@ public class BlockWoodenDevice extends BlockContainer {
         list.add(new ItemStack(this, 1, 6)); // greatwood plank
         list.add(new ItemStack(this, 1, 7)); // silverwood plank
         list.add(new ItemStack(this, 1, 8)); // banner
+        for (int color = 0; color < 16; color++) {
+            ItemStack banner = new ItemStack(this, 1, 8);
+            NBTTagCompound tag = new NBTTagCompound();
+            tag.setByte("color", (byte) color);
+            banner.setTagCompound(tag);
+            list.add(banner);
+        }
     }
 
     @Override
@@ -138,7 +150,60 @@ public class BlockWoodenDevice extends BlockContainer {
             }
             return true;
         }
+        if (te instanceof TileBanner && state.getValue(TYPE) == 8) {
+            TileBanner banner = (TileBanner) te;
+            if (banner.getColor() >= 0) {
+                ItemStack held = playerIn.getHeldItem(hand);
+                boolean sneaking = playerIn.isSneaking();
+                boolean holdingEssence = !held.isEmpty() && held.getItem() instanceof ItemEssence
+                        && held.getItem() instanceof IEssentiaContainerItem;
+
+                if (sneaking || holdingEssence) {
+                    if (!worldIn.isRemote) {
+                        if (sneaking) {
+                            banner.setAspect(null);
+                        } else {
+                            AspectList aspects = ((IEssentiaContainerItem) held.getItem()).getAspects(held);
+                            if (aspects != null && aspects.getAspects().length > 0) {
+                                Aspect aspect = aspects.getAspects()[0];
+                                if (aspect != null) {
+                                    banner.setAspect(aspect);
+                                    held.shrink(1);
+                                }
+                            }
+                        }
+                        worldIn.notifyBlockUpdate(pos, state, state, 3);
+                        banner.markDirty();
+                        worldIn.playSound(null, pos, SoundType.CLOTH.getStepSound(), SoundCategory.BLOCKS, 1.0F, 1.0F);
+                    }
+                }
+            }
+            return true;
+        }
         return false;
+    }
+
+    @Override
+    public List<ItemStack> getDrops(IBlockAccess world, BlockPos pos, IBlockState state, int fortune) {
+        if (state.getValue(TYPE) == 8) {
+            ArrayList<ItemStack> drops = new ArrayList<>();
+            TileEntity te = world.getTileEntity(pos);
+            if (te instanceof TileBanner) {
+                TileBanner banner = (TileBanner) te;
+                ItemStack drop = new ItemStack(this, 1, 8);
+                if (banner.getColor() >= 0 || banner.getAspect() != null) {
+                    NBTTagCompound tag = new NBTTagCompound();
+                    if (banner.getAspect() != null) {
+                        tag.setString("aspect", banner.getAspect().getTag());
+                    }
+                    tag.setByte("color", banner.getColor());
+                    drop.setTagCompound(tag);
+                }
+                drops.add(drop);
+            }
+            return drops;
+        }
+        return super.getDrops(world, pos, state, fortune);
     }
 
     @Override
