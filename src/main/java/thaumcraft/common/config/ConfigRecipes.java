@@ -2250,8 +2250,8 @@ public class ConfigRecipes {
         if (specialRecipesRegistered) {
             return;
         }
-        registry.register(new RecipesRobeArmorDyes().setRegistryName("forge", "robearmordye"));
-        registry.register(new RecipesVoidRobeArmorDyes().setRegistryName("forge", "voidrobearmordye"));
+        registry.register(new RecipesRobeArmorDyes().setRegistryName("thaumcraft", "robearmordye"));
+        registry.register(new RecipesVoidRobeArmorDyes().setRegistryName("thaumcraft", "voidrobearmordye"));
         recipeArcaneStone2 = new ShapedOreRecipe(null,
                 new ItemStack(ConfigBlocks.blockCosmeticSolid, 4, 7),
                 "SS",
