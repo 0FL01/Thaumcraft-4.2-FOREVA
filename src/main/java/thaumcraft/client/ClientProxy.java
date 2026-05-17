@@ -804,6 +804,31 @@ public class ClientProxy extends CommonProxy {
     }
 
     @Override
+    public void drawVentParticles(World world, double x, double y, double z,
+                                  double mx, double my, double mz, int color) {
+        if (world == null || !world.isRemote) return;
+        int amount = particleCount(1);
+        if (amount <= 0) return;
+
+        Color tint = decodeColor(color);
+        float red = normalizeColor(tint.getRed());
+        float green = normalizeColor(tint.getGreen());
+        float blue = normalizeColor(tint.getBlue());
+        for (int i = 0; i < amount; i++) {
+            world.spawnParticle(EnumParticleTypes.REDSTONE,
+                    x + (world.rand.nextFloat() - 0.5f) * 0.05f,
+                    y + (world.rand.nextFloat() - 0.5f) * 0.05f,
+                    z + (world.rand.nextFloat() - 0.5f) * 0.05f,
+                    red, green, blue);
+            world.spawnParticle(EnumParticleTypes.CRIT_MAGIC,
+                    x, y, z,
+                    mx + (world.rand.nextFloat() - 0.5f) * 0.01f,
+                    my + (world.rand.nextFloat() - 0.5f) * 0.01f,
+                    mz + (world.rand.nextFloat() - 0.5f) * 0.01f);
+        }
+    }
+
+    @Override
     public void sparkle(float x, float y, float z, float scale, int type, float speed) {
         Minecraft mc = Minecraft.getMinecraft();
         World world = mc == null ? null : mc.world;

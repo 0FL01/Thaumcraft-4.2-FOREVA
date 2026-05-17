@@ -28,6 +28,7 @@ import thaumcraft.api.aspects.AspectList;
 import thaumcraft.api.aspects.IAspectContainer;
 import thaumcraft.api.aspects.IEssentiaTransport;
 import thaumcraft.api.crafting.CrucibleRecipe;
+import thaumcraft.common.Thaumcraft;
 import thaumcraft.common.blocks.BlockMetalDevice;
 import thaumcraft.common.blocks.BlockAiry;
 import thaumcraft.common.config.ConfigBlocks;
@@ -56,7 +57,28 @@ public class TileThaumatorium extends TileThaumcraft implements ITickable, IAspe
 
     @Override
     public void update() {
-        if (this.world == null || this.world.isRemote) return;
+        if (this.world == null) return;
+        if (this.world.isRemote) {
+            if (this.venting > 0) {
+                --this.venting;
+                float fx = 0.1f - this.world.rand.nextFloat() * 0.2f;
+                float fz = 0.1f - this.world.rand.nextFloat() * 0.2f;
+                float fy = 0.1f - this.world.rand.nextFloat() * 0.2f;
+                float fx2 = 0.1f - this.world.rand.nextFloat() * 0.2f;
+                float fz2 = 0.1f - this.world.rand.nextFloat() * 0.2f;
+                float fy2 = 0.1f - this.world.rand.nextFloat() * 0.2f;
+                Thaumcraft.proxy.drawVentParticles(
+                        this.world,
+                        this.pos.getX() + 0.5f + fx + this.facing.getXOffset() / 2.0f,
+                        this.pos.getY() + 0.5f + fy,
+                        this.pos.getZ() + 0.5f + fz + this.facing.getZOffset() / 2.0f,
+                        this.facing.getXOffset() / 4.0f + fx2,
+                        fy2,
+                        this.facing.getZOffset() / 4.0f + fz2,
+                        0xFFFFFF);
+            }
+            return;
+        }
 
         if (this.counter == 0 || this.counter % 40 == 0) {
             this.heated = this.checkHeat();
@@ -153,6 +175,7 @@ public class TileThaumatorium extends TileThaumcraft implements ITickable, IAspe
             entity.motionY = 0.025F;
             entity.motionZ = 0.075F * (float) this.facing.getZOffset();
             this.world.spawnEntity(entity);
+            this.world.addBlockEvent(this.pos, this.getBlockType(), 0, 0);
         }
 
         this.world.playSound(null, this.pos, TCSounds.BUBBLE, SoundCategory.BLOCKS, 0.25F, 1.0F);

@@ -31,6 +31,11 @@ public class ThaumatoriumBrainboxUpgradeContractTest {
                 source.contains("this.recipeEssentia.remove(index);"));
         assertTrue("TileThaumatorium getUpgrades must prune recipePlayer when capacity shrinks",
                 source.contains("this.recipePlayer.remove(index);"));
+        assertTrue("TileThaumatorium completeRecipe must trigger block event for vent FX burst",
+                source.contains("this.world.addBlockEvent(this.pos, this.getBlockType(), 0, 0);"));
+        assertTrue("TileThaumatorium client update path must emit vent particles through proxy",
+                source.contains("Thaumcraft.proxy.drawVentParticles(")
+                        && source.contains("if (this.world.isRemote)"));
     }
 
     private static String readFile(String path) throws IOException {

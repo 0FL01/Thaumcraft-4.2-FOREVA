@@ -190,6 +190,10 @@ public class CommonProxy implements IGuiHandler {
                                      boolean loop, int start, int num, int inc, int age, int delay, float scale) {
     }
 
+    public void drawVentParticles(World world, double x, double y, double z,
+                                  double mx, double my, double mz, int color) {
+    }
+
     public void sparkle(float x, float y, float z, float scale, int type, float speed) {
     }
 
