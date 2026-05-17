@@ -4,6 +4,7 @@ import baubles.api.BaublesApi;
 import baubles.api.cap.IBaublesItemHandler;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.ai.attributes.IAttributeInstance;
 import net.minecraft.entity.monster.EntityMob;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -269,34 +270,40 @@ public class EventHandlerRunic {
             }
         }
 
-        // Champion mob shielding (non-player entities with champion modifiers)
         if (event.getEntity() instanceof EntityMob) {
             EntityMob mob = (EntityMob) event.getEntity();
-            int t = -1;
-
-            // Check if this mob has a champion modifier attribute
-            // The port does not have EntityUtils.CHAMPION_MOD attribute,
-            // so we use a simplified check: look for IEldritchMob or known champion properties
-            if (mob instanceof IEldritchMob) {
-                // Eldritch mobs have inherent shielding (type 5 in original, here we hardcode)
-                if (mob.getMaxHealth() > 0.0f) {
-                    handleChampionShield(event, mob, -1);
-                }
+            int t = getChampionModType(mob);
+            if ((t == 5 || mob instanceof IEldritchMob) && mob.getHealth() > 0.0F) {
+                handleChampionShield(event, mob);
+            } else if (t >= 0
+                    && t < ChampionModifier.mods.length
+                    && ChampionModifier.mods[t].type == 2
+                    && event.getSource().getTrueSource() instanceof EntityLivingBase) {
+                EntityLivingBase attacker = (EntityLivingBase) event.getSource().getTrueSource();
+                event.setAmount(ChampionModifier.mods[t].effect.performEffect(mob, attacker, event.getSource(), event.getAmount()));
             }
         }
 
-        // Champion mob offensive effects (attacker side)
         if (event.getAmount() > 0.0f && event.getSource().getTrueSource() != null
                 && event.getEntity() instanceof EntityLivingBase
                 && event.getSource().getTrueSource() instanceof EntityMob) {
-            // Champion mob attack effects - skip for now (no CHAMPION_MOD attribute)
+            EntityMob mob = (EntityMob) event.getSource().getTrueSource();
+            int t = getChampionModType(mob);
+            if (t >= 0 && t < ChampionModifier.mods.length && ChampionModifier.mods[t].type == 1) {
+                event.setAmount(ChampionModifier.mods[t].effect.performEffect(mob, (EntityLivingBase) event.getEntity(), event.getSource(), event.getAmount()));
+            }
         }
     }
 
-    /**
-     * Apply shielding FX for champion/eldritch mobs.
-     */
-    private void handleChampionShield(LivingHurtEvent event, EntityMob mob, int dummyTarget) {
+    private int getChampionModType(EntityMob mob) {
+        IAttributeInstance mod = mob.getEntityAttribute(EntityUtils.CHAMPION_MOD);
+        if (mod == null) {
+            return -2;
+        }
+        return (int) mod.getAttributeValue();
+    }
+
+    private void handleChampionShield(LivingHurtEvent event, EntityMob mob) {
         int target = -1;
         if (event.getSource().getImmediateSource() != null) {
             target = event.getSource().getImmediateSource().getEntityId();
