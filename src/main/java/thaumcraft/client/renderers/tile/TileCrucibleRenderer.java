@@ -1,6 +1,7 @@
 package thaumcraft.client.renderers.tile;
 
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import thaumcraft.common.tiles.TileCrucible;
 
@@ -16,25 +17,27 @@ public class TileCrucibleRenderer extends TileEntitySpecialRenderer<TileCrucible
             return;
         }
 
-        float recolor = TileRenderHelper.clamp01((float) tile.tagAmount() / 100.0F);
+        float raw = TileRenderHelper.clamp01((float) tile.tagAmount() / 100.0F);
+        float recolor = raw > 0.0F ? 0.5F + raw / 2.0F : 0.0F;
         float r = 1.0F;
         float g = 1.0F - recolor / 3.0F;
         float b = 1.0F - recolor;
-        int color = ((int) (0.88F * 255.0F) << 24)
+        float a = 1.0F - recolor / 2.0F;
+        int color = ((int) (a * 255.0F) << 24)
                 | ((int) (r * 255.0F) << 16)
                 | ((int) (g * 255.0F) << 8)
                 | (int) (b * 255.0F);
 
         GlStateManager.pushMatrix();
         GlStateManager.translate(x + 0.5D, y + fluidHeight, z + 0.5D);
-        GlStateManager.disableTexture2D();
+        GlStateManager.rotate(90.0F, -1.0F, 0.0F, 0.0F);
+        bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
         GlStateManager.disableLighting();
         GlStateManager.enableBlend();
         GlStateManager.blendFunc(770, 771);
-        TileRenderHelper.drawSolidHorizontalQuad(0.33F, color);
+        TileRenderHelper.drawTexturedQuad(0.33F, color, 0.0F, 1.0F, 0.0F, 1.0F);
         GlStateManager.disableBlend();
         GlStateManager.enableLighting();
-        GlStateManager.enableTexture2D();
         GlStateManager.popMatrix();
     }
 }
