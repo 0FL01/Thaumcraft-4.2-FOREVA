@@ -249,6 +249,7 @@ tc.handmirrorerror=Mirror link is broken
 tc.handmirrorlinkedto=Linked to
 tc.sanity=Current Warp: %s
 tc.sanity.detail=Permanent: %1$s  Sticky: %2$s  Temporary: %3$s
+tc.break.fly=Something disrupts your ability to fly.
 tc.taint_item_poison=A dissolving %s has infected you with Taint
 tc.lootbag=Click to open or keep to trade
 tc.visdiscount=Vis discount

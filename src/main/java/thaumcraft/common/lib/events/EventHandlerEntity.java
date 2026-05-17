@@ -54,6 +54,7 @@ import thaumcraft.common.entities.monster.EntityBrainyZombie;
 import thaumcraft.common.entities.monster.EntityGiantBrainyZombie;
 import thaumcraft.common.entities.monster.boss.EntityThaumcraftBoss;
 import thaumcraft.common.entities.monster.mods.ChampionModifier;
+import thaumcraft.common.items.armor.Hover;
 import thaumcraft.common.lib.WarpEvents;
 import thaumcraft.common.lib.capabilities.IPlayerKnowledge;
 import thaumcraft.common.lib.capabilities.PlayerKnowledgeProvider;
@@ -239,6 +240,7 @@ public class EventHandlerEntity {
             EntityPlayer player = (EntityPlayer) event.getEntityLiving();
             WarpEvents.checkWarpEvent(player);
             applyTravellerHasteMovement(player);
+            enforceHoverFlightBounds(player);
         }
 
         if (event.getEntityLiving() instanceof EntityMob && !event.getEntityLiving().isDead) {
@@ -496,6 +498,26 @@ public class EventHandlerEntity {
             bonus /= 2.0F;
         }
         player.moveRelative(0.0F, 0.0F, 1.0F, bonus);
+    }
+
+    private void enforceHoverFlightBounds(EntityPlayer player) {
+        if (player.world.provider.getDimension() == Config.dimensionOuterId
+                && !player.capabilities.isCreativeMode
+                && player.ticksExisted > 0
+                && player.ticksExisted % 20 == 0
+                && (player.capabilities.isFlying || Hover.getHover(player.getEntityId()))) {
+            player.capabilities.isFlying = false;
+            Hover.setHover(player.getEntityId(), false);
+            player.sendMessage(new TextComponentTranslation("tc.break.fly"));
+        }
+
+        if (Hover.getHover(player.getEntityId())) {
+            ItemStack chest = player.inventory.armorInventory.get(2);
+            if (chest.isEmpty() || chest.getItem() != ConfigItems.itemHoverHarness) {
+                Hover.setHover(player.getEntityId(), false);
+                player.capabilities.isFlying = false;
+            }
+        }
     }
 
     private void handleChampionSpawn(EntityJoinWorldEvent event, EntityMob mob) {
