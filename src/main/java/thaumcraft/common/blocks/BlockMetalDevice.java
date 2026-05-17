@@ -205,6 +205,16 @@ public class BlockMetalDevice extends BlockContainer {
             }
             return;
         }
+        if (state.getValue(TYPE) == 8) {
+            TileEntity te = worldIn.getTileEntity(pos);
+            if (te instanceof TileArcaneLampGrowth) {
+                TileArcaneLampGrowth lamp = (TileArcaneLampGrowth) te;
+                if (worldIn.isAirBlock(pos.offset(lamp.facing))) {
+                    worldIn.destroyBlock(pos, true);
+                }
+            }
+            return;
+        }
         if (state.getValue(TYPE) != 12) return;
         TileEntity te = worldIn.getTileEntity(pos);
         if (!(te instanceof TileBrainbox)) return;

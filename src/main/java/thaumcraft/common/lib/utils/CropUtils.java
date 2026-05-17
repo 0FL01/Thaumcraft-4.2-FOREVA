@@ -14,6 +14,7 @@ public class CropUtils {
     public static ArrayList<String> standardCrops = new ArrayList<>();
     public static ArrayList<String> clickableCrops = new ArrayList<>();
     public static ArrayList<String> stackedCrops = new ArrayList<>();
+    public static ArrayList<String> lampBlacklist = new ArrayList<>();
 
     public static void addStandardCrop(ItemStack seed, int maxMeta) {
         Block block = Block.getBlockFromItem(seed.getItem());
@@ -37,6 +38,18 @@ public class CropUtils {
             stackedCrops.add(block.getTranslationKey() + maxMeta);
         }
         if (block instanceof BlockCrops && maxMeta != 7) stackedCrops.add(block.getTranslationKey() + "7");
+    }
+
+    public static void blacklistLamp(ItemStack stack, int meta) {
+        Block block = Block.getBlockFromItem(stack.getItem());
+        if (block == null) return;
+        if (meta == Short.MAX_VALUE) {
+            for (int a = 0; a < 16; ++a) {
+                lampBlacklist.add(block.getTranslationKey() + a);
+            }
+        } else {
+            lampBlacklist.add(block.getTranslationKey() + meta);
+        }
     }
 
     public static boolean isGrownCrop(World world, BlockPos pos) {
@@ -64,5 +77,13 @@ public class CropUtils {
         // Check registered crops
         String key = block.getTranslationKey() + meta;
         return standardCrops.contains(key) || clickableCrops.contains(key) || stackedCrops.contains(key);
+    }
+
+    public static boolean doesLampGrow(World world, BlockPos pos) {
+        if (world.isAirBlock(pos)) return false;
+        IBlockState state = world.getBlockState(pos);
+        Block block = state.getBlock();
+        int meta = block.getMetaFromState(state);
+        return !lampBlacklist.contains(block.getTranslationKey() + meta);
     }
 }
