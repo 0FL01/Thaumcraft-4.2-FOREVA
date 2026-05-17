@@ -4,6 +4,7 @@ import baubles.api.BaubleType;
 import baubles.api.IBauble;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.item.EnumRarity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.NonNullList;
 import thaumcraft.api.ItemRunic;
@@ -28,6 +29,11 @@ public class ItemAmuletRunic extends ItemRunic implements IBauble, IRunicArmor {
     @Override
     public String getTranslationKey(ItemStack stack) {
         return super.getTranslationKey() + "." + stack.getItemDamage();
+    }
+
+    @Override
+    public EnumRarity getRarity(ItemStack stack) {
+        return EnumRarity.RARE;
     }
 
     @Override
