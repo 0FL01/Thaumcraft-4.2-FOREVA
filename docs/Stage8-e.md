@@ -1666,6 +1666,31 @@ Depends on GAP-1 and GAP-3. Some infusion source scenarios may require Stage 9 c
 
 - Это common/server+non-GUI tooltip baseline; полный client model/icon overlay parity для void robe остаётся в Stage 8 client-render scope.
 
+#### Checkpoint 2026-05-17 — GAP-11 traveller-boots hover core contracts baseline
+
+Статус: частично продвинут.
+
+Что сделано:
+
+- `Hover.doHover(...)` приведён к reference-shaped core movement contracts для `ItemBootsTraveller`:
+  - creative+forward gate;
+  - client-side step-height boost (`1.0F`) с восстановлением предыдущего значения;
+  - on-ground bonus thrust (`moveRelative(..., bonus)` с water penalty);
+  - airborne movement factor branch (`0.03F/0.05F` через hover state);
+  - gradual fall-distance dampening (`-0.25F` с нижней границей `0`).
+- `Hover.resetHover(...)` теперь использует сохранённый previous-step restore path вместо жёсткого reset.
+- Расширен `ItemRobeTravellerArmorCoreContractsStaticGuardTest`:
+  - фиксирует связь `ItemBootsTraveller.onArmorTick -> Hover.doHover(...)`;
+  - фиксирует ключевые movement contracts в `Hover`.
+
+Проверки:
+
+- `./scripts/dev.sh validate --smoke` — passed.
+
+Ограничения:
+
+- Это common/server+non-GUI contract baseline; client/manual movement-feel parity boots в реальной игре остаётся в manual runtime зоне Stage 5.
+
 ### GAP-12: FX registration exists, but send-site coverage and manual scenario validation are incomplete
 
 **Статус:** требует проверки  

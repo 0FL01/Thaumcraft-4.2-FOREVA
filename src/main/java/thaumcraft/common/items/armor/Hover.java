@@ -29,17 +29,53 @@ public class Hover {
 
     private static final Map<Integer, Boolean> HOVERING = new HashMap<>();
     private static final Map<Integer, Long> TIMING = new HashMap<>();
+    private static final Map<Integer, Float> PREV_STEP = new HashMap<>();
 
     public static void doHover(ItemStack stack, EntityPlayer player, World world, int slot) {
-        if (player.isSneaking()) return;
-        // Provides step assist (auto step-up) and slight jump boost
-        if (player.onGround && !player.isInWater()) {
-            player.stepHeight = 1.0f;
+        if (player == null || world == null) {
+            return;
+        }
+        int playerId = player.getEntityId();
+        if (!player.capabilities.isCreativeMode && player.moveForward > 0.0F) {
+            if (world.isRemote && !player.isSneaking()) {
+                if (!PREV_STEP.containsKey(playerId)) {
+                    PREV_STEP.put(playerId, player.stepHeight);
+                }
+                player.stepHeight = 1.0F;
+            } else if (world.isRemote) {
+                restoreStepHeight(playerId, player);
+            }
+            if (player.onGround) {
+                float bonus = 0.055F;
+                if (player.isInWater()) {
+                    bonus /= 4.0F;
+                }
+                player.moveRelative(0.0F, 0.0F, 1.0F, bonus);
+            } else {
+                player.jumpMovementFactor = getHover(playerId) ? 0.03F : 0.05F;
+            }
+        } else if (world.isRemote) {
+            restoreStepHeight(playerId, player);
+        }
+        if (player.fallDistance > 0.0F) {
+            player.fallDistance = Math.max(0.0F, player.fallDistance - 0.25F);
         }
     }
 
     public static void resetHover(EntityPlayer player) {
-        player.stepHeight = 0.5f;
+        if (player == null) {
+            return;
+        }
+        restoreStepHeight(player.getEntityId(), player);
+    }
+
+    private static void restoreStepHeight(int playerId, EntityPlayer player) {
+        Float prevStep = PREV_STEP.remove(playerId);
+        if (prevStep != null) {
+            player.stepHeight = prevStep;
+        } else if (player.stepHeight > 0.5F) {
+            player.stepHeight = 0.5F;
+        }
     }
 
     public static void setHover(int playerId, boolean hover) {
