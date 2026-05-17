@@ -192,7 +192,7 @@ Port the Stage 3 research-state backend enough for original research notes, clue
 
 **Риски / зависимости:**
 
-Dependency: actual research content registration is noted as later content work (`ConfigResearch.init()` is a Phase 9 placeholder at `src/main/java/thaumcraft/common/config/ConfigResearch.java:5-7`). Stage 3 can still close the backend, but full gameplay coverage depends on registered research entries.
+Dependency: actual research content registration is noted as content work (`ConfigResearch.init()` is now a working research registration baseline (201 entries across 6 categories; see Stage9-e.md)). Stage 3 can still close the backend, but full gameplay coverage depends on registered research entries.
 
 ### GAP-4: Offline username lookup is cache-only and loses reference behavior
 
@@ -690,7 +690,7 @@ Client icon rendering is Phase 8 dependency; server behavior remains Stage 3.
 
 **Что не совпадает:**
 
-`ConfigResearch.init()` is a placeholder with `// Phase 9: register research entries` (`src/main/java/thaumcraft/common/config/ConfigResearch.java:5-7`), but Stage 3 research backend cannot be fully validated without at least enough research entries to exercise completion, requisites, warp grants, hidden/lost research and scan triggers. This is labeled as dependency because full content registration belongs to a later content phase, but it directly blocks Stage 3 acceptance scenarios around research sync timing and completion behavior.
+`ConfigResearch.init()` is a working research registration baseline (not a placeholder), but Stage 3 research backend cannot be fully validated without at least enough research entries to exercise completion, requisites, warp grants, hidden/lost research and scan triggers. This is labeled as dependency because full content registration belongs to a later content phase, but it directly blocks Stage 3 acceptance scenarios around research sync timing and completion behavior.
 
 **Что нужно доделать:**
 
@@ -700,7 +700,7 @@ Provide a minimal Stage 3 validation fixture or defer full content registration 
 - Do not broaden Stage 3 into full content registration.
 - Add or identify minimal research entries required to test backend if acceptable, or document exact manual test dependency on Phase 9.
 - Ensure backend code does not crash with empty categories and works once entries are registered.
-- Files/classes: `ConfigResearch`, `ResearchCategories`, `ResearchItem`, `ResearchManager`.
+- Files/classes: `ConfigResearch` (now split per category: ConfigResearchBasics, ConfigResearchAlchemy, etc.; see Stage9-e.md), `ResearchCategories`, `ResearchItem`, `ResearchManager`.
 
 **Критерии приемки:**
 - [ ] Stage 3 backend can complete and sync a registered research item.
@@ -723,7 +723,7 @@ Dependency on later content/research registration work. Because this blocks full
 - Save path должен писать authoritative capability state with documented NBT keys.
 - `warpCounter` должен входить в authoritative Stage 3 sync, а не оставаться неявным server-only полем.
 - Champion mob runic shielding не блокирует Stage 3: Stage 3 закрывает player runic shielding, а champion-specific behavior остается dependency на entity/champion systems.
-- Полный `ConfigResearch` content registration остается Phase 9 scope. Для Stage 3 допустим minimal gated validation fixture или явно задокументированная Phase 9 dependency, но backend должен уметь complete/sync зарегистрированный research item без API changes.
+- Research content registration is a working baseline (201 entries), but full backend validation (sync, warp, unlock flows) may still require additional Phase 3 acceptance scenarios.
 
 Практичный порядок checkpoint'ов:
 
@@ -748,7 +748,7 @@ Dependency on later content/research registration work. Because this blocks full
 - [ ] GAP-13 closed or explicitly validated: aura/vis network links, drains, reloads and recharges correctly.
 - [ ] GAP-14 closed or explicitly separated: Thaumometer server scan flow records correct state.
 - [ ] GAP-15 closed: potions/enchantments behavior is compared and manually/runtime validated.
-- [ ] GAP-16 resolved as dependency or minimal validation fixture: research backend can be tested with registered entries.
+- [ ] GAP-16 partially resolved: research entries registered. Backend sync/completion validation remains in Phase 3 scope.
 - [ ] `./scripts/dev.sh compileJava` passes after implementation changes.
 - [ ] `./scripts/dev.sh smoke-server` passes for Stage 3 server/common behavior.
 - [ ] Manual Stage 3 scenarios are recorded: scan item/entity/node, complete research, relog/restart, consume wand/amulet vis, runic shield recharge/damage, warp event, potion/enchantment use.
@@ -821,5 +821,5 @@ Validation evidence for this checkpoint:
 Remaining limits:
 
 - This does not port the full reference hex-grid generation/solving algorithm, clue creation, Research Table GUI flow, or full research content registration.
-- Current `ConfigResearch.init()` remains Phase 9 content scope, so hidden-discovery reveal depends on later registered hidden research entries.
+- Current `ConfigResearch.init()` is a working baseline research registration (201 entries, 6 categories).
 - Manual research-note completion, discovery reveal, and Research Table gameplay scenarios remain unvalidated because user-driven/manual validation is excluded.

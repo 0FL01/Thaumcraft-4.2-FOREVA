@@ -17,6 +17,8 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -35,7 +37,7 @@ public class ConfigResearchStaticGraphTest {
 
     @Test
     public void configResearchRegisteredGraphHasValidStaticReferences() throws IOException {
-        String source = readFile("src/main/java/thaumcraft/common/config/ConfigResearch.java");
+        String source = readConfigResearchFamily();
         String lang = readFile("src/main/resources/assets/thaumcraft/lang/en_us.lang");
 
         Set<String> allowedCategories = new HashSet<>(Arrays.asList(
@@ -97,7 +99,7 @@ public class ConfigResearchStaticGraphTest {
 
     @Test
     public void researchResourceLocationsAndLangImagesResolveToAssets() throws IOException {
-        String source = readFile("src/main/java/thaumcraft/common/config/ConfigResearch.java");
+        String source = readConfigResearchFamily();
         String lang = readFile("src/main/resources/assets/thaumcraft/lang/en_us.lang");
 
         Set<String> configResourcePaths = extractMatches(source, RESOURCE_LOCATION_PATTERN);
@@ -190,6 +192,32 @@ public class ConfigResearchStaticGraphTest {
 
     private static String readFile(String path) throws IOException {
         return new String(Files.readAllBytes(Paths.get(path)), StandardCharsets.UTF_8);
+    }
+
+    private static String readConfigResearchFamily() throws IOException {
+        Path configDir = Paths.get("src/main/java/thaumcraft/common/config");
+        try (Stream<Path> stream = Files.list(configDir)) {
+            return stream
+                    .filter(Files::isRegularFile)
+                    .filter(path -> {
+                        String name = path.getFileName().toString();
+                        return name.startsWith("ConfigResearch") && name.endsWith(".java");
+                    })
+                    .sorted()
+                    .map(path -> {
+                        try {
+                            return new String(Files.readAllBytes(path), StandardCharsets.UTF_8);
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
+                        }
+                    })
+                    .collect(Collectors.joining("\n"));
+        } catch (RuntimeException e) {
+            if (e.getCause() instanceof IOException) {
+                throw (IOException) e.getCause();
+            }
+            throw e;
+        }
     }
 
     private static List<String> findParentCycles(List<ResearchStatement> statements) {

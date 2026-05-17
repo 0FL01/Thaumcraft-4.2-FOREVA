@@ -4,12 +4,15 @@ import org.junit.Test;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -22,7 +25,7 @@ public class ConfigResearchAspectTriggerCoverageTest {
 
     @Test
     public void configResearchAspectTriggersReferenceDeclaredAspects() throws IOException {
-        String configResearch = readFile("src/main/java/thaumcraft/common/config/ConfigResearch.java");
+        String configResearch = readConfigResearchFamily();
         String aspectApi = readFile("src/main/java/thaumcraft/api/aspects/Aspect.java");
 
         Set<String> triggers = extractAspectTriggerNames(configResearch);
@@ -62,5 +65,31 @@ public class ConfigResearchAspectTriggerCoverageTest {
 
     private static String readFile(String path) throws IOException {
         return new String(Files.readAllBytes(Paths.get(path)), StandardCharsets.UTF_8);
+    }
+
+    private static String readConfigResearchFamily() throws IOException {
+        Path configDir = Paths.get("src/main/java/thaumcraft/common/config");
+        try (Stream<Path> stream = Files.list(configDir)) {
+            return stream
+                    .filter(Files::isRegularFile)
+                    .filter(path -> {
+                        String name = path.getFileName().toString();
+                        return name.startsWith("ConfigResearch") && name.endsWith(".java");
+                    })
+                    .sorted()
+                    .map(path -> {
+                        try {
+                            return new String(Files.readAllBytes(path), StandardCharsets.UTF_8);
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
+                        }
+                    })
+                    .collect(Collectors.joining("\n"));
+        } catch (RuntimeException e) {
+            if (e.getCause() instanceof IOException) {
+                throw (IOException) e.getCause();
+            }
+            throw e;
+        }
     }
 }

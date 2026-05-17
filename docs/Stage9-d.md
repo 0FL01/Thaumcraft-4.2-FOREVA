@@ -32,7 +32,7 @@ Out of scope:
 - `build.gradle:24-29` confirms Java 8 / Forge 1.12.2 / stable_39 target.
 - `Dockerfile:61-69` provides CFR for reference class inspection.
 - `src/main/java/thaumcraft/common/config/ConfigRecipes.java:7-13` is the current recipe registration stub.
-- `src/main/java/thaumcraft/common/config/ConfigResearch.java:5-7` is the current research registration stub.
+- `src/main/java/thaumcraft/common/config/ConfigResearch.java` current baseline: `ConfigResearch.init()` registers research across 6 category slices (see Stage9-e.md).
 - `src/main/java/thaumcraft/common/config/ConfigAspects.java:12-16` initializes only current aspect groups.
 - `src/main/java/thaumcraft/common/Thaumcraft.java:188-190` invokes `ConfigRecipes.init()`, `ConfigAspects.init()`, and `ConfigResearch.init()`.
 - `src/main/java/thaumcraft/api/crafting/CrucibleRecipe.java:17-78` implements recipe data, catalyst matching, aspect matching/removal, and output access.
@@ -80,7 +80,7 @@ API/runtime baseline exists but content data is not registered.
 - `TileThaumatorium` has a functional baseline for stored crucible recipe hashes, required essentia, input catalyst, output inventory insertion, essentia suction, and completion at `src/main/java/thaumcraft/common/tiles/TileThaumatorium.java:56-159`.
 - `ContainerThaumatorium` lists/programs `CrucibleRecipe` entries by research completion, catalyst match, and recipe hash at `src/main/java/thaumcraft/common/container/ContainerThaumatorium.java:72-119`.
 - `ConfigRecipes.init()` is a stub and does not register any recipes at `src/main/java/thaumcraft/common/config/ConfigRecipes.java:7-9`.
-- `ConfigResearch.init()` is a stub and there is no current `ConfigResearch.recipes` map equivalent visible in source at `src/main/java/thaumcraft/common/config/ConfigResearch.java:5-7`.
+- `ConfigResearch.init()` is the current research registration baseline (see Stage9-e.md). `ConfigResearch.recipes` map exists and is populated by `ConfigRecipes.init()`.
 - `ConfigAspects` registers a limited vanilla/ore-dictionary set, but no Thaumcraft item/block aspect tags needed by the reference alchemy chain appear in `src/main/java/thaumcraft/common/config/ConfigAspects.java:12-191`.
 
 Result: Stage 9-d cannot be considered complete. The crucible machinery can compile and has partial behavior, but the actual alchemy recipe graph, research recipe IDs, and several alchemy data dependencies are absent or unverified.
@@ -184,14 +184,14 @@ Depends on GAP-2 because reference recipes are also stored in `ConfigResearch.re
 
 **Что не совпадает:**
 
-Current `ConfigResearch.init()` is empty and there is no visible current `ConfigResearch.recipes` map. Current matching code already enforces research completion at `src/main/java/thaumcraft/common/lib/crafting/ThaumcraftCraftingManager.java:481-485`, and thaumatorium programming enforces it at `src/main/java/thaumcraft/common/container/ContainerThaumatorium.java:88-90`. Therefore, even after GAP-1 registers recipes, missing research entries/gates/pages can leave recipes undiscoverable, unprogrammable, or permanently locked.
+Current `ConfigResearch.init()` is the current research registration baseline (see Stage9-e.md) and `ConfigResearch.recipes` map exists and is populated (see Q2 resolution). Current matching code already enforces research completion at `src/main/java/thaumcraft/common/lib/crafting/ThaumcraftCraftingManager.java:481-485`, and thaumatorium programming enforces it at `src/main/java/thaumcraft/common/container/ContainerThaumatorium.java:88-90`. Therefore, even after GAP-1 registers recipes, missing research entries/gates/pages can leave recipes undiscoverable, unprogrammable, or permanently locked.
 
 **Что нужно доделать:**
 
-Restore the reference recipe-handle map and direct crucible recipe research gates needed by Stage 9-d, without deep-porting unrelated research page content beyond what is needed to expose and unlock crucible/alchemy recipes.
+Ensure the `ConfigResearch.recipes` map contains all Stage 9-d recipe handles and direct crucible recipe research gates needed by Stage 9-d, without deep-porting unrelated research page content beyond what is needed to expose and unlock crucible/alchemy recipes.
 
 **Как доделать:**
-- Add the current equivalent of `ConfigResearch.recipes` in `src/main/java/thaumcraft/common/config/ConfigResearch.java` if absent.
+- Ensure `ConfigResearch.recipes` contains Stage 9-d crucible/alchemy recipe handles.
 - Store each Stage 9-d recipe handle from `ConfigRecipes.initializeAlchemyRecipes()` under the exact reference map key, for example `BalancedShard_0`, `Alumentum`, `Nitor`, `Thaumium`, `VoidMetal`, `VoidSeed`, `Tallow`, `PureIron`, `TransIron`, `EtherealBloom`, `LiquidDeath`, `BottleTaint`, `CoreGather`, `BathSalts`, `SaneSoap`.
 - Ensure `ResearchManager.isResearchComplete(...)` receives the original research keys used by each `CrucibleRecipe.key`.
 - Ensure research pages that directly display crucible recipes can resolve the stored recipe handles; `ThaumcraftApi.getCraftingRecipeKey()` already scans `ResearchPage.recipe` arrays for `CrucibleRecipe[]` at `src/main/java/thaumcraft/api/ThaumcraftApi.java:167-174`.
@@ -538,7 +538,7 @@ Depends on GAP-1, GAP-2, GAP-3, and GAP-5. Client particle/sound TODOs in `TileC
 
 - [ ] Port reference `ConfigRecipes.initializeAlchemyRecipes()` crucible recipe data into current `ConfigRecipes.init()` flow.
 - [ ] Preserve every Stage 9-d recipe ID/name, research key, catalyst, output, aspect cost, and optional ore-mod gate.
-- [ ] Restore direct recipe-handle storage equivalent to `ConfigResearch.recipes` for Stage 9-d recipe entries.
+- [ ] Ensure direct recipe-handle storage in `ConfigResearch.recipes` for Stage 9-d recipe entries.
 - [ ] Ensure research completion gates work for both `TileCrucible` matching and `ContainerThaumatorium` programming.
 - [ ] Port Stage 9-d alchemical smelting bonus registrations only where tied to alchemy furnace/content flow.
 - [ ] Add/verify aspect tags for all Stage 9-d catalysts, outputs, and generated-tag dependencies.
