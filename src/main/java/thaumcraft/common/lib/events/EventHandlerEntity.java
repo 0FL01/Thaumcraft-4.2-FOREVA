@@ -3,9 +3,13 @@ package thaumcraft.common.lib.events;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.EntityList;
+import net.minecraft.entity.SharedMonsterAttributes;
+import net.minecraft.entity.ai.attributes.IAttributeInstance;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.item.EntityXPOrb;
 import net.minecraft.entity.monster.EntityCreeper;
+import net.minecraft.entity.monster.EntityMob;
 import net.minecraft.entity.monster.EntityZombie;
 import net.minecraft.entity.passive.EntityVillager;
 import net.minecraft.entity.player.EntityPlayer;
@@ -14,7 +18,15 @@ import net.minecraft.init.Items;
 import net.minecraft.init.MobEffects;
 import net.minecraft.item.ItemFood;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.TextComponentTranslation;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.MathHelper;
+import net.minecraft.world.EnumDifficulty;
+import net.minecraft.world.World;
+import net.minecraft.world.biome.Biome;
+import net.minecraftforge.common.BiomeDictionary;
+import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.event.entity.item.ItemExpireEvent;
@@ -34,11 +46,14 @@ import thaumcraft.api.ThaumcraftApi;
 import thaumcraft.api.wands.ItemFocusBasic;
 import thaumcraft.common.Thaumcraft;
 import thaumcraft.common.config.Config;
+import thaumcraft.common.config.ConfigEntities;
 import thaumcraft.common.config.ConfigItems;
 import thaumcraft.common.entities.golems.EntityGolemBase;
 import thaumcraft.common.entities.golems.EntityTravelingTrunk;
 import thaumcraft.common.entities.monster.EntityBrainyZombie;
 import thaumcraft.common.entities.monster.EntityGiantBrainyZombie;
+import thaumcraft.common.entities.monster.boss.EntityThaumcraftBoss;
+import thaumcraft.common.entities.monster.mods.ChampionModifier;
 import thaumcraft.common.lib.WarpEvents;
 import thaumcraft.common.lib.capabilities.IPlayerKnowledge;
 import thaumcraft.common.lib.capabilities.PlayerKnowledgeProvider;
@@ -52,6 +67,10 @@ import thaumcraft.common.lib.network.playerdata.PacketSyncWarp;
 import thaumcraft.common.lib.network.playerdata.PacketSyncWipe;
 import thaumcraft.common.lib.network.playerdata.PacketRunicCharge;
 import thaumcraft.common.lib.research.ResearchManager;
+import thaumcraft.common.lib.utils.EntityUtils;
+import thaumcraft.common.lib.world.dim.Cell;
+import thaumcraft.common.lib.world.dim.CellLoc;
+import thaumcraft.common.lib.world.dim.MazeHandler;
 
 import java.io.File;
 import java.lang.ref.WeakReference;
@@ -83,7 +102,11 @@ public class EventHandlerEntity {
 
     @SubscribeEvent
     public void onEntityJoinWorld(EntityJoinWorldEvent event) {
-        if (!event.getWorld().isRemote && event.getEntity() instanceof EntityPlayer) {
+        if (event.getWorld().isRemote) {
+            return;
+        }
+
+        if (event.getEntity() instanceof EntityPlayer) {
             EntityPlayer player = (EntityPlayer) event.getEntity();
             if (player instanceof EntityPlayerMP) {
                 moveLinkedTravelingTrunks((EntityPlayerMP) player);
@@ -99,6 +122,11 @@ public class EventHandlerEntity {
                 ResearchManager.updateCache(player.getName(), knowledge);
             }
             syncAllData(player);
+            return;
+        }
+
+        if (event.getEntity() instanceof EntityMob) {
+            handleChampionSpawn(event, (EntityMob) event.getEntity());
         }
     }
 
@@ -203,11 +231,25 @@ public class EventHandlerEntity {
      */
     @SubscribeEvent
     public void onLivingUpdate(LivingEvent.LivingUpdateEvent event) {
-        if (event.getEntityLiving().world.isRemote) return;
-        if (!(event.getEntityLiving() instanceof EntityPlayer)) return;
+        if (event.getEntityLiving().world.isRemote) {
+            return;
+        }
 
-        EntityPlayer player = (EntityPlayer) event.getEntityLiving();
-        WarpEvents.checkWarpEvent(player);
+        if (event.getEntityLiving() instanceof EntityPlayer) {
+            EntityPlayer player = (EntityPlayer) event.getEntityLiving();
+            WarpEvents.checkWarpEvent(player);
+        }
+
+        if (event.getEntityLiving() instanceof EntityMob && !event.getEntityLiving().isDead) {
+            EntityMob mob = (EntityMob) event.getEntityLiving();
+            IAttributeInstance mod = mob.getEntityAttribute(EntityUtils.CHAMPION_MOD);
+            if (mod != null) {
+                int type = (int) mod.getAttributeValue();
+                if (type >= 0 && type < ChampionModifier.mods.length && ChampionModifier.mods[type].type == 0) {
+                    ChampionModifier.mods[type].effect.performEffect(mob, null, null, 0.0F);
+                }
+            }
+        }
     }
 
     /**
@@ -240,6 +282,29 @@ public class EventHandlerEntity {
     @SubscribeEvent
     public void onLivingDrops(LivingDropsEvent event) {
         if (event.getEntityLiving().world.isRemote) return;
+
+        if (event.isRecentlyHit()
+                && !(event.getSource().getTrueSource() instanceof FakePlayer)
+                && event.getEntity() instanceof EntityMob
+                && !(event.getEntity() instanceof EntityThaumcraftBoss)) {
+            EntityMob mob = (EntityMob) event.getEntity();
+            IAttributeInstance mod = mob.getEntityAttribute(EntityUtils.CHAMPION_MOD);
+            if (mod != null && mod.getAttributeValue() >= 0.0D) {
+                for (int i = 5 + mob.world.rand.nextInt(3); i > 0; ) {
+                    int split = EntityXPOrb.getXPSplit(i);
+                    i -= split;
+                    mob.world.spawnEntity(new EntityXPOrb(mob.world, mob.posX, mob.posY, mob.posZ, split));
+                }
+                int lb = Math.min(2, MathHelper.floor((float) (mob.world.rand.nextInt(9) + event.getLootingLevel()) / 5.0F));
+                event.getDrops().add(new EntityItem(
+                        mob.world,
+                        mob.posX,
+                        mob.posY + mob.getEyeHeight(),
+                        mob.posZ,
+                        new ItemStack(ConfigItems.itemLootBag, 1, lb)
+                ));
+            }
+        }
 
         if (event.getEntityLiving() instanceof EntityZombie && !(event.getEntityLiving() instanceof EntityBrainyZombie)) {
             float chance = 0.5f + EnchantmentHelper.getLootingModifier(event.getEntityLiving()) * 0.05f;
@@ -398,5 +463,102 @@ public class EventHandlerEntity {
     @SubscribeEvent
     public void onLivingJump(LivingEvent.LivingJumpEvent event) {
         // Future: modify jump based on thaumcraft potion effects
+    }
+
+    private void handleChampionSpawn(EntityJoinWorldEvent event, EntityMob mob) {
+        IAttributeInstance mod = ensureChampionAttribute(mob);
+        if (mod == null || mod.getAttributeValue() >= -1.0D) {
+            return;
+        }
+
+        int c = mob.world.rand.nextInt(100);
+        if (mob.world.getDifficulty() == EnumDifficulty.EASY || !Config.championMobs) {
+            c += 2;
+        }
+        if (mob.world.getDifficulty() == EnumDifficulty.HARD) {
+            c -= Config.championMobs ? 2 : 0;
+        }
+        if (mob.world.provider.getDimension() == Config.dimensionOuterId) {
+            c -= 3;
+        }
+
+        Biome biome = mob.world.getBiome(new BlockPos(MathHelper.floor(mob.posX), MathHelper.floor(mob.posY), MathHelper.floor(mob.posZ)));
+        if (BiomeDictionary.hasType(biome, BiomeDictionary.Type.SPOOKY)
+                || BiomeDictionary.hasType(biome, BiomeDictionary.Type.NETHER)
+                || BiomeDictionary.hasType(biome, BiomeDictionary.Type.END)) {
+            c -= Config.championMobs ? 2 : 1;
+        }
+
+        if (isDangerousLocation(mob.world, MathHelper.floor(mob.posX), MathHelper.floor(mob.posY), MathHelper.floor(mob.posZ))) {
+            c -= Config.championMobs ? 10 : 3;
+        }
+
+        int whitelistTier = getChampionWhitelistTier(event.getEntity());
+        if (whitelistTier >= 0) {
+            if (Config.championMobs || event.getEntity() instanceof EntityThaumcraftBoss) {
+                c -= Math.max(0, whitelistTier - 1);
+            }
+        }
+
+        if (whitelistTier >= 0
+                && c <= 0
+                && mob.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH) != null
+                && mob.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).getBaseValue() >= 10.0D) {
+            EntityUtils.makeChampion(mob, false);
+        } else {
+            mod.removeModifier(ChampionModifier.ATTRIBUTE_MOD_NONE);
+            mod.applyModifier(ChampionModifier.ATTRIBUTE_MOD_NONE);
+        }
+    }
+
+    private IAttributeInstance ensureChampionAttribute(EntityMob mob) {
+        IAttributeInstance mod = mob.getEntityAttribute(EntityUtils.CHAMPION_MOD);
+        if (mod != null) {
+            if (mod.getBaseValue() > -2.0D) {
+                mod.setBaseValue(-2.0D);
+            }
+            return mod;
+        }
+        try {
+            mod = mob.getAttributeMap().registerAttribute(EntityUtils.CHAMPION_MOD);
+            mod.setBaseValue(-2.0D);
+            return mod;
+        } catch (IllegalArgumentException ignored) {
+            mod = mob.getEntityAttribute(EntityUtils.CHAMPION_MOD);
+            if (mod != null && mod.getBaseValue() > -2.0D) {
+                mod.setBaseValue(-2.0D);
+            }
+            return mod;
+        }
+    }
+
+    private int getChampionWhitelistTier(Entity entity) {
+        ResourceLocation entityKey = EntityList.getKey(entity);
+        String className = entity.getClass().getName();
+        String legacyClassKey = className.replace("thaumcraft.common.entities.", "Thaumcraft.");
+        String simpleClassKey = entity.getClass().getSimpleName();
+        int tier = -1;
+        for (Map.Entry<String, Integer> entry : ConfigEntities.CHAMPION_WHITELIST.entrySet()) {
+            String key = entry.getKey();
+            if (key == null || key.isEmpty()) {
+                continue;
+            }
+            boolean matches = key.equals(className)
+                    || key.equals(legacyClassKey)
+                    || key.equals(simpleClassKey)
+                    || (entityKey != null && key.equals(entityKey.toString()));
+            if (matches) {
+                tier = Math.max(tier, entry.getValue() == null ? 0 : entry.getValue());
+            }
+        }
+        return tier;
+    }
+
+    private boolean isDangerousLocation(World world, int x, int y, int z) {
+        if (world.provider.getDimension() != Config.dimensionOuterId) {
+            return false;
+        }
+        Cell cell = MazeHandler.getFromHashMap(new CellLoc(x >> 4, z >> 4));
+        return cell != null && (cell.feature == 6 || cell.feature == 8);
     }
 }
