@@ -4,10 +4,12 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.util.SoundCategory;
 import net.minecraft.world.World;
 import thaumcraft.api.aspects.Aspect;
 import thaumcraft.api.visnet.TileVisNode;
 import thaumcraft.api.wands.IWandable;
+import thaumcraft.common.lib.TCSounds;
 
 import java.lang.ref.WeakReference;
 import java.util.HashMap;
@@ -16,7 +18,7 @@ import java.util.List;
 public class TileVisRelay extends TileVisNode implements IWandable {
     public static final HashMap<Integer, WeakReference<TileVisRelay>> nearbyPlayers = new HashMap<>();
 
-    public byte orientation = 0;
+    public byte orientation = 1;
     public byte color = -1;
 
     @Override
@@ -83,10 +85,7 @@ public class TileVisRelay extends TileVisNode implements IWandable {
 
     @Override
     public ItemStack onWandRightClick(World world, ItemStack wandstack, EntityPlayer player) {
-        if (world != null && !world.isRemote) {
-            cycleColor();
-        }
-        return wandstack;
+        return null;
     }
 
     @Override
@@ -99,12 +98,13 @@ public class TileVisRelay extends TileVisNode implements IWandable {
 
     private void cycleColor() {
         if (this.world == null) return;
-        this.removeThisNode();
         this.color++;
         if (this.color > 5) this.color = -1;
+        this.removeThisNode();
         this.attunement = this.color;
         this.nodeRefresh = true;
         this.markDirty();
         this.world.notifyBlockUpdate(this.pos, this.world.getBlockState(this.pos), this.world.getBlockState(this.pos), 3);
+        this.world.playSound(null, this.pos, TCSounds.CRYSTAL, SoundCategory.BLOCKS, 0.2F, 1.0F);
     }
 }
