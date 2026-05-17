@@ -1,6 +1,7 @@
 package thaumcraft.common.config;
 
 import java.util.Arrays;
+import java.util.List;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Enchantments;
 import net.minecraft.init.Items;
@@ -2765,6 +2766,11 @@ public class ConfigRecipes {
                 .setRegistryName("thaumcraft", "resource6fromopaque1");
         registry.register(recipeResource6FromOpaque1);
 
+        registerCompatNuggetRecipes(registry, "copper", "ingotCopper", 1, 17);
+        registerCompatNuggetRecipes(registry, "tin", "ingotTin", 2, 18);
+        registerCompatNuggetRecipes(registry, "silver", "ingotSilver", 3, 19);
+        registerCompatNuggetRecipes(registry, "lead", "ingotLead", 4, 20);
+
         for (int a = 0; a < 6; a++) {
             recipeClusters[a] = new ShapelessOreRecipe(
                     null,
@@ -2791,5 +2797,52 @@ public class ConfigRecipes {
         registry.register(recipeClusters[6]);
 
         specialRecipesRegistered = true;
+    }
+
+    private static void registerCompatNuggetRecipes(IForgeRegistry<IRecipe> registry, String metalName, String ingotOreDictName,
+                                                    int compatNuggetMeta, int nativeNuggetMeta) {
+        List<ItemStack> entries = OreDictionary.getOres(ingotOreDictName);
+        if (entries == null || entries.isEmpty()) {
+            return;
+        }
+
+        ItemStack firstIngot = ItemStack.EMPTY;
+        for (int index = 0; index < entries.size(); index++) {
+            ItemStack ingot = entries.get(index);
+            if (ingot.isEmpty()) {
+                continue;
+            }
+            ItemStack ingotSingle = ingot.copy();
+            ingotSingle.setCount(1);
+            if (firstIngot.isEmpty()) {
+                firstIngot = ingotSingle.copy();
+            }
+            IRecipe recipeIngotToCompatNuggets = new ShapedOreRecipe(
+                    null,
+                    new ItemStack(ConfigItems.itemNugget, 9, compatNuggetMeta),
+                    "#",
+                    '#', ingotSingle)
+                    .setRegistryName("thaumcraft", "compat_" + metalName + "_nuggets_" + index);
+            registry.register(recipeIngotToCompatNuggets);
+        }
+
+        if (!firstIngot.isEmpty()) {
+            IRecipe recipeCompatNuggetsToIngot = new ShapedOreRecipe(
+                    null,
+                    firstIngot.copy(),
+                    "###",
+                    "###",
+                    "###",
+                    '#', new ItemStack(ConfigItems.itemNugget, 1, compatNuggetMeta))
+                    .setRegistryName("thaumcraft", "compat_" + metalName + "_ingot");
+            registry.register(recipeCompatNuggetsToIngot);
+
+            ItemStack smeltingOutput = firstIngot.copy();
+            smeltingOutput.setCount(2);
+            FurnaceRecipes.instance().addSmeltingRecipe(
+                    new ItemStack(ConfigItems.itemNugget, 1, nativeNuggetMeta),
+                    smeltingOutput,
+                    1.0F);
+        }
     }
 }
