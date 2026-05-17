@@ -55,16 +55,15 @@ public class ItemInkwell extends Item implements IScribeTools {
             }
         }
         if (partner == null) return EnumActionResult.PASS;
-        if (!world.isRemote) {
-            world.setBlockState(pos, ConfigBlocks.blockTable.getDefaultState().withProperty(BlockTable.TYPE, 2), 3);
-            world.setBlockState(partner, ConfigBlocks.blockTable.getDefaultState().withProperty(BlockTable.TYPE, 3), 3);
-            if (world.getTileEntity(pos) instanceof TileResearchTable) {
-                ItemStack copy = stack.copy();
-                copy.setCount(1);
-                ((TileResearchTable) world.getTileEntity(pos)).setInventorySlotContents(0, copy);
-            }
-            if (!player.capabilities.isCreativeMode) stack.shrink(1);
+        if (world.isRemote) return EnumActionResult.PASS;
+        world.setBlockState(pos, ConfigBlocks.blockTable.getDefaultState().withProperty(BlockTable.TYPE, 2), 3);
+        world.setBlockState(partner, ConfigBlocks.blockTable.getDefaultState().withProperty(BlockTable.TYPE, 3), 3);
+        if (world.getTileEntity(pos) instanceof TileResearchTable) {
+            ItemStack copy = stack.copy();
+            copy.setCount(1);
+            ((TileResearchTable) world.getTileEntity(pos)).setInventorySlotContents(0, copy);
         }
+        if (!player.capabilities.isCreativeMode) stack.shrink(1);
         return EnumActionResult.SUCCESS;
     }
 }
