@@ -13,6 +13,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -91,6 +92,7 @@ public class ConfigResearchStaticGraphTest {
 
         assertTrue("Missing parent references in ConfigResearch: " + missingParents, missingParents.isEmpty());
         assertTrue("Missing research localization keys in en_us.lang: " + missingLang, missingLang.isEmpty());
+        assertTrue("Parent cycle(s) found in ConfigResearch: " + findParentCycles(statements), findParentCycles(statements).isEmpty());
     }
 
     @Test
@@ -188,6 +190,67 @@ public class ConfigResearchStaticGraphTest {
 
     private static String readFile(String path) throws IOException {
         return new String(Files.readAllBytes(Paths.get(path)), StandardCharsets.UTF_8);
+    }
+
+    private static List<String> findParentCycles(List<ResearchStatement> statements) {
+        Map<String, Set<String>> graph = new HashMap<>();
+        for (ResearchStatement statement : statements) {
+            Set<String> edges = graph.computeIfAbsent(statement.key, k -> new HashSet<>());
+            edges.addAll(statement.parents);
+            edges.addAll(statement.parentsHidden);
+        }
+
+        Set<String> visited = new HashSet<>();
+        Set<String> stack = new HashSet<>();
+        LinkedHashSet<String> trace = new LinkedHashSet<>();
+        List<String> cycles = new ArrayList<>();
+
+        for (String node : graph.keySet()) {
+            if (!visited.contains(node)) {
+                dfsCycles(node, graph, visited, stack, trace, cycles);
+            }
+        }
+        return cycles;
+    }
+
+    private static void dfsCycles(
+            String node,
+            Map<String, Set<String>> graph,
+            Set<String> visited,
+            Set<String> stack,
+            LinkedHashSet<String> trace,
+            List<String> cycles) {
+        visited.add(node);
+        stack.add(node);
+        trace.add(node);
+
+        for (String next : graph.getOrDefault(node, java.util.Collections.emptySet())) {
+            if (!graph.containsKey(next)) {
+                continue;
+            }
+            if (!visited.contains(next)) {
+                dfsCycles(next, graph, visited, stack, trace, cycles);
+            } else if (stack.contains(next)) {
+                StringBuilder sb = new StringBuilder();
+                boolean inCycle = false;
+                for (String n : trace) {
+                    if (n.equals(next)) {
+                        inCycle = true;
+                    }
+                    if (inCycle) {
+                        if (sb.length() > 0) sb.append(" -> ");
+                        sb.append(n);
+                    }
+                }
+                if (sb.length() > 0) {
+                    sb.append(" -> ").append(next);
+                    cycles.add(sb.toString());
+                }
+            }
+        }
+
+        stack.remove(node);
+        trace.remove(node);
     }
 
     private static class ResearchStatement {
