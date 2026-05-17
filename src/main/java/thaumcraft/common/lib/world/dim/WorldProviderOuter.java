@@ -137,6 +137,6 @@ public class WorldProviderOuter extends WorldProvider {
 
     @Override
     public float getCloudHeight() {
-        return -999.0f;
+        return 1.0f;
     }
 }

@@ -24,6 +24,9 @@ public class WorldProviderOuterStaticGuardTest {
         assertTrue("WorldProviderOuter must keep non-hell water-vaporization contract",
                 source.contains("public boolean doesWaterVaporize()")
                         && source.contains("return false;"));
+        assertTrue("WorldProviderOuter must keep reference cloud-height baseline",
+                source.contains("public float getCloudHeight()")
+                        && source.contains("return 1.0f;"));
     }
 
     private static String readFile(String path) throws IOException {
