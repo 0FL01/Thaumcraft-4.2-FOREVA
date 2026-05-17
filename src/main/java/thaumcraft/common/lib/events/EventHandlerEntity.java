@@ -1,6 +1,8 @@
 package thaumcraft.common.lib.events;
 
 import net.minecraft.enchantment.EnchantmentHelper;
+import net.minecraft.block.BlockLiquid;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.EntityList;
@@ -14,6 +16,7 @@ import net.minecraft.entity.monster.EntityZombie;
 import net.minecraft.entity.passive.EntityVillager;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.init.MobEffects;
 import net.minecraft.item.ItemFood;
@@ -46,6 +49,7 @@ import thaumcraft.api.ThaumcraftApi;
 import thaumcraft.api.wands.ItemFocusBasic;
 import thaumcraft.common.Thaumcraft;
 import thaumcraft.common.config.Config;
+import thaumcraft.common.config.ConfigBlocks;
 import thaumcraft.common.config.ConfigEntities;
 import thaumcraft.common.config.ConfigItems;
 import thaumcraft.common.entities.golems.EntityGolemBase;
@@ -53,6 +57,7 @@ import thaumcraft.common.entities.golems.EntityTravelingTrunk;
 import thaumcraft.common.entities.monster.EntityBrainyZombie;
 import thaumcraft.common.entities.monster.boss.EntityThaumcraftBoss;
 import thaumcraft.common.entities.monster.mods.ChampionModifier;
+import thaumcraft.common.items.ItemBathSalts;
 import thaumcraft.common.items.armor.Hover;
 import thaumcraft.common.lib.WarpEvents;
 import thaumcraft.common.lib.capabilities.IPlayerKnowledge;
@@ -370,12 +375,26 @@ public class EventHandlerEntity {
 
     @SubscribeEvent
     public void onItemToss(ItemTossEvent event) {
-        // Can remain empty — no original behaviour
+        if (event.getEntityItem() == null || event.getPlayer() == null) {
+            return;
+        }
+        event.getEntityItem().getEntityData().setString("thrower", event.getPlayer().getName());
     }
 
     @SubscribeEvent
     public void onItemExpire(ItemExpireEvent event) {
-        // Can remain empty — no original behaviour
+        if (event.getEntityItem() == null || event.getEntityItem().world.isRemote) {
+            return;
+        }
+        ItemStack expired = event.getEntityItem().getItem();
+        if (expired.isEmpty() || !(expired.getItem() instanceof ItemBathSalts)) {
+            return;
+        }
+        BlockPos pos = new BlockPos(event.getEntityItem());
+        IBlockState state = event.getEntityItem().world.getBlockState(pos);
+        if (state.getBlock() == Blocks.WATER && state.getValue(BlockLiquid.LEVEL) == 0) {
+            event.getEntityItem().world.setBlockState(pos, ConfigBlocks.blockFluidPure.getDefaultState(), 3);
+        }
     }
 
     /**
