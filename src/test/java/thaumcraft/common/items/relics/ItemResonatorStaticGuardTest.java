@@ -22,6 +22,10 @@ public class ItemResonatorStaticGuardTest {
         assertTrue("ItemResonator must keep tc.resonator3 untyped suction fallback",
                 source.contains("new TextComponentTranslation(\"tc.resonator3\").getFormattedText()")
                         && source.contains("new TextComponentTranslation(\"tc.resonator2\", transport.getSuctionAmount(face), suctionName)"));
+        assertTrue("ItemResonator client-side use path must swing and return PASS (reference-shaped super fallback)",
+                source.contains("if (world.isRemote) {")
+                        && source.contains("player.swingArm(hand);")
+                        && source.contains("return EnumActionResult.PASS;"));
     }
 
     private static String readFile(String path) throws IOException {

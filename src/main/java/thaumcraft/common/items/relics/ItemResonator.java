@@ -55,35 +55,33 @@ public class ItemResonator extends Item {
         if (!(tile instanceof IEssentiaTransport)) return EnumActionResult.PASS;
         if (world.isRemote) {
             player.swingArm(hand);
-            return EnumActionResult.SUCCESS;
+            return EnumActionResult.PASS;
         }
-        if (!world.isRemote) {
-            IEssentiaTransport transport = (IEssentiaTransport) tile;
-            EnumFacing face = side == null ? EnumFacing.UP : side;
-            RayTraceResult hit = RayTracer.retraceBlock(world, player, pos.getX(), pos.getY(), pos.getZ());
-            if (hit != null && hit.subHit >= 0 && hit.subHit < 6) {
-                face = EnumFacing.byIndex(hit.subHit);
-            }
-            if (tile instanceof TileTubeBuffer && tile instanceof IAspectContainer) {
-                AspectList aspects = ((IAspectContainer) tile).getAspects();
-                if (aspects != null && aspects.size() > 0) {
-                    for (Aspect aspect : aspects.getAspectsSorted()) {
-                        player.sendStatusMessage(new TextComponentTranslation("tc.resonator1", aspects.getAmount(aspect), aspect.getName()), false);
-                    }
-                }
-            } else {
-                Aspect essentia = transport.getEssentiaType(face);
-                if (essentia != null) {
-                    player.sendStatusMessage(new TextComponentTranslation("tc.resonator1", transport.getEssentiaAmount(face), essentia.getName()), false);
+        IEssentiaTransport transport = (IEssentiaTransport) tile;
+        EnumFacing face = side == null ? EnumFacing.UP : side;
+        RayTraceResult hit = RayTracer.retraceBlock(world, player, pos.getX(), pos.getY(), pos.getZ());
+        if (hit != null && hit.subHit >= 0 && hit.subHit < 6) {
+            face = EnumFacing.byIndex(hit.subHit);
+        }
+        if (tile instanceof TileTubeBuffer && tile instanceof IAspectContainer) {
+            AspectList aspects = ((IAspectContainer) tile).getAspects();
+            if (aspects != null && aspects.size() > 0) {
+                for (Aspect aspect : aspects.getAspectsSorted()) {
+                    player.sendStatusMessage(new TextComponentTranslation("tc.resonator1", aspects.getAmount(aspect), aspect.getName()), false);
                 }
             }
-            Aspect suction = transport.getSuctionType(face);
-            String suctionName = suction == null
-                    ? new TextComponentTranslation("tc.resonator3").getFormattedText()
-                    : suction.getName();
-            player.sendStatusMessage(new TextComponentTranslation("tc.resonator2", transport.getSuctionAmount(face), suctionName), false);
-            world.playSound(null, pos, TCSounds.ALEMBICKNOCK, SoundCategory.BLOCKS, 0.5F, 1.9F + world.rand.nextFloat() * 0.1F);
+        } else {
+            Aspect essentia = transport.getEssentiaType(face);
+            if (essentia != null) {
+                player.sendStatusMessage(new TextComponentTranslation("tc.resonator1", transport.getEssentiaAmount(face), essentia.getName()), false);
+            }
         }
+        Aspect suction = transport.getSuctionType(face);
+        String suctionName = suction == null
+                ? new TextComponentTranslation("tc.resonator3").getFormattedText()
+                : suction.getName();
+        player.sendStatusMessage(new TextComponentTranslation("tc.resonator2", transport.getSuctionAmount(face), suctionName), false);
+        world.playSound(null, pos, TCSounds.ALEMBICKNOCK, SoundCategory.BLOCKS, 0.5F, 1.9F + world.rand.nextFloat() * 0.1F);
         return EnumActionResult.SUCCESS;
     }
 }
