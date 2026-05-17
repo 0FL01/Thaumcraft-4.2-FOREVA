@@ -12,6 +12,7 @@ import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.EntityDataManager;
 import net.minecraft.potion.PotionEffect;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.pathfinding.PathNavigateGround;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
@@ -40,6 +41,9 @@ public class EntityEldritchWarden extends EntityThaumcraftBoss implements net.mi
 
     public EntityEldritchWarden(net.minecraft.world.World world) {
         super(world);
+        if (this.getNavigator() instanceof PathNavigateGround) {
+            ((PathNavigateGround) this.getNavigator()).setCanSwim(true);
+        }
         this.setSize(1.5F, 3.5F);
         this.tasks.addTask(0, new EntityAISwimming(this));
         this.tasks.addTask(2, new AILongRangeAttack(this, 3.0, 1.0, 20, 40, 24.0f));
@@ -157,7 +161,7 @@ public class EntityEldritchWarden extends EntityThaumcraftBoss implements net.mi
 
     @Override
     public void onUpdate() {
-        if (!this.world.isRemote && this.getSpawnTimer() == 150) {
+        if (this.getSpawnTimer() == 150) {
             this.world.setEntityState(this, (byte) 18);
         }
         super.onUpdate();

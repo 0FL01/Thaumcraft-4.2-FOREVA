@@ -6,6 +6,7 @@ import net.minecraft.entity.ai.attributes.IAttributeInstance;
 import net.minecraft.entity.monster.EntityMob;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.pathfinding.PathNavigateGround;
 import net.minecraft.init.SoundEvents;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -43,6 +44,9 @@ public class EntityEldritchGuardian extends EntityMob implements IRangedAttackMo
 
     public EntityEldritchGuardian(World world) {
         super(world);
+        if (this.getNavigator() instanceof PathNavigateGround) {
+            ((PathNavigateGround) this.getNavigator()).setCanSwim(true);
+        }
         this.setSize(0.8F, 2.25F);
         this.experienceValue = 20;
         // AI tasks
