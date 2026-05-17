@@ -92,6 +92,7 @@ public class ClientProxyFxStaticGuardTest {
         String serverTick = readFile("src/main/java/thaumcraft/common/lib/events/ServerTickEventsFML.java");
         String runic = readFile("src/main/java/thaumcraft/common/lib/events/EventHandlerRunic.java");
         String eldritchGuardian = readFile("src/main/java/thaumcraft/common/entities/monster/EntityEldritchGuardian.java");
+        String eldritchWarden = readFile("src/main/java/thaumcraft/common/entities/monster/boss/EntityEldritchWarden.java");
         String wisp = readFile("src/main/java/thaumcraft/common/entities/monster/EntityWisp.java");
         String focusShock = readFile("src/main/java/thaumcraft/common/items/wands/foci/FocusShock.java");
         String focusWarding = readFile("src/main/java/thaumcraft/common/items/wands/foci/FocusWarding.java");
@@ -173,6 +174,8 @@ public class ClientProxyFxStaticGuardTest {
                 eldritchGuardian.contains("new PacketMiscEvent((short) 2)"));
         assertTrue("Eldritch guardian client update must emit wispFXEG trail",
                 eldritchGuardian.contains("Thaumcraft.proxy.wispFXEG("));
+        assertTrue("Eldritch warden client update must emit wispFXEG trail",
+                eldritchWarden.contains("Thaumcraft.proxy.wispFXEG("));
         assertTrue("Wisp ranged attack path must send PacketFXWispZap",
                 wisp.contains("new PacketFXWispZap(this.getEntityId(), this.targetedEntity.getEntityId())"));
         assertTrue("EntityFallingTaint client update must emit taintLandFX landing loop",

@@ -168,6 +168,9 @@ public class EntityEldritchWarden extends EntityThaumcraftBoss implements net.mi
             if (this.armLiftR > 0.0F) {
                 this.armLiftR -= 0.05F;
             }
+            double x = this.posX + (double) ((this.rand.nextFloat() - this.rand.nextFloat()) * 0.2F);
+            double z = this.posZ + (double) ((this.rand.nextFloat() - this.rand.nextFloat()) * 0.2F);
+            Thaumcraft.proxy.wispFXEG(this.world, x, this.posY + 0.25D * (double) this.height, z, this);
             return;
         }
         this.fillEldritchField();
