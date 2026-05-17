@@ -1713,6 +1713,28 @@ Depends on GAP-1 and GAP-3. Some infusion source scenarios may require Stage 9 c
 
 - Это common/server+non-GUI contract baseline; полноценная client/manual hover toggle/sound/tooltip visual parity остаётся в Stage 5/8 manual зоне.
 
+#### Checkpoint 2026-05-17 — GAP-11 bucket-pure use-result contracts baseline
+
+Статус: частично продвинут.
+
+Что сделано:
+
+- `ItemBucketPure.onItemRightClick(...)` приведён к reference-shaped use-result semantics:
+  - ветки без фактического действия (no-hit / no-edit / no-place) теперь возвращают `PASS` вместо `FAIL`;
+  - успешный place сохраняет существующий split: creative — исходный stack, survival — `Items.BUCKET`.
+- Добавлен `ItemBucketPureCoreContractsStaticGuardTest`, фиксирующий:
+  - raytrace/no-op return contracts;
+  - creative/survival result split;
+  - pure-fluid source-state placement contract (`BlockFluidPure.SOURCE_LEVEL`).
+
+Проверки:
+
+- `./scripts/dev.sh validate --smoke` — passed.
+
+Ограничения:
+
+- Это common/server+non-GUI baseline; runtime/manual сценарии с pickup/collision/WarpWard всё ещё остаются в Stage 5 manual зоне.
+
 ### GAP-12: FX registration exists, but send-site coverage and manual scenario validation are incomplete
 
 **Статус:** требует проверки  

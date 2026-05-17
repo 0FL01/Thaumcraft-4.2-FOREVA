@@ -38,7 +38,7 @@ public class ItemBucketPure extends Item {
         EnumFacing side = mop.sideHit == null ? EnumFacing.UP : mop.sideHit;
         BlockPos target = mop.getBlockPos().offset(side);
         if (!player.canPlayerEdit(target, side, stack)) {
-            return new ActionResult<>(EnumActionResult.FAIL, stack);
+            return new ActionResult<>(EnumActionResult.PASS, stack);
         }
 
         if (tryPlaceContainedLiquid(world, target)) {
@@ -47,7 +47,7 @@ public class ItemBucketPure extends Item {
             }
             return new ActionResult<>(EnumActionResult.SUCCESS, new ItemStack(Items.BUCKET));
         }
-        return new ActionResult<>(EnumActionResult.FAIL, stack);
+        return new ActionResult<>(EnumActionResult.PASS, stack);
     }
 
     public boolean tryPlaceContainedLiquid(World world, BlockPos pos) {
