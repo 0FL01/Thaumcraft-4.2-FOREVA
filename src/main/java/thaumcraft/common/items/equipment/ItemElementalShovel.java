@@ -76,7 +76,7 @@ public class ItemElementalShovel extends ItemSpade implements IRepairable, IArch
             return EnumActionResult.PASS;
         }
         if (world.isRemote) {
-            return EnumActionResult.SUCCESS;
+            return EnumActionResult.PASS;
         }
 
         BlockPos normal = pos.offset(facing);

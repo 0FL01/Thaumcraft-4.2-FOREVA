@@ -24,6 +24,8 @@ public class ItemElementalShovelStaticGuardTest {
         assertTrue("ItemElementalShovel must keep placement-copy sweep contracts",
                 source.contains("for (int aa = -1; aa <= 1; aa++)")
                         && source.contains("for (int bb = -1; bb <= 1; bb++)")
+                        && source.contains("if (world.isRemote) {")
+                        && source.contains("return EnumActionResult.PASS;")
                         && source.contains("getPlaneOffset(aa, bb, facing.getIndex(), getOrientation(stack), player)")
                         && source.contains("InventoryUtils.consumeInventoryItem(player, source, meta)")
                         && source.contains("Thaumcraft.proxy.blockSparkle(world, target.getX(), target.getY(), target.getZ(), 8401408, 4);"));
