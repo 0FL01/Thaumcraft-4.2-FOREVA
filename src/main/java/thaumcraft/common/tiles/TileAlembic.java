@@ -3,9 +3,11 @@ package thaumcraft.common.tiles;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.network.NetworkManager;
+import net.minecraft.network.play.server.SPacketUpdateTileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
-import net.minecraft.util.ITickable;
+import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.world.World;
 import thaumcraft.api.TileThaumcraft;
 import thaumcraft.api.aspects.Aspect;
@@ -14,7 +16,7 @@ import thaumcraft.api.aspects.IAspectContainer;
 import thaumcraft.api.aspects.IEssentiaTransport;
 import thaumcraft.api.wands.IWandable;
 
-public class TileAlembic extends TileThaumcraft implements ITickable, IAspectContainer, IEssentiaTransport, IWandable {
+public class TileAlembic extends TileThaumcraft implements IAspectContainer, IEssentiaTransport, IWandable {
     public Aspect aspect = null;
     public Aspect aspectFilter = null;
     public int amount = 0;
@@ -22,9 +24,6 @@ public class TileAlembic extends TileThaumcraft implements ITickable, IAspectCon
     public int facing = 2;
     public boolean aboveAlembic = false;
     public boolean aboveFurnace = false;
-
-    @Override
-    public void update() {}
 
     // --- NBT ---
 
@@ -207,6 +206,19 @@ public class TileAlembic extends TileThaumcraft implements ITickable, IAspectCon
                 && thaumcraft.common.config.ConfigBlocks.blockMetalDevice.getMetaFromState(this.world.getBlockState(this.pos.down())) == 1) {
             this.aboveAlembic = true;
         }
+    }
+
+    @Override
+    public AxisAlignedBB getRenderBoundingBox() {
+        return new AxisAlignedBB(
+                this.pos.getX() - 1, this.pos.getY(), this.pos.getZ() - 1,
+                this.pos.getX() + 2, this.pos.getY() + 1, this.pos.getZ() + 2);
+    }
+
+    @Override
+    public void onDataPacket(NetworkManager net, SPacketUpdateTileEntity pkt) {
+        super.onDataPacket(net, pkt);
+        this.getAppearance();
     }
 
     @Override
