@@ -22,7 +22,6 @@ import net.minecraft.init.Items;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.Item;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.BlockPos;
@@ -63,6 +62,7 @@ import thaumcraft.client.fx.particles.FXBurst;
 import thaumcraft.client.fx.particles.FXBubble;
 import thaumcraft.client.fx.particles.FXBubbleAlt;
 import thaumcraft.client.fx.particles.FXGeneric;
+import thaumcraft.client.fx.particles.FXSmokeDrift;
 import thaumcraft.client.fx.particles.FXSparkle;
 import thaumcraft.client.fx.particles.FXVent;
 import thaumcraft.client.fx.particles.FXVisSparkle;
@@ -757,7 +757,15 @@ public class ClientProxy extends CommonProxy {
             float z = (float) (entity.posZ + (world.rand.nextFloat() - world.rand.nextFloat()) * 0.5f);
             sparkle(x, y, z, 0.8f, 0x661166, -0.02f);
             if (world.rand.nextBoolean()) {
-                world.spawnParticle(EnumParticleTypes.SMOKE_NORMAL, x, y, z, 0.0, 0.01, 0.0);
+                ParticleEngine.addEffect(world, new FXSmokeDrift(
+                        world,
+                        x,
+                        y,
+                        z,
+                        (world.rand.nextFloat() - 0.5f) * 0.004f,
+                        0.003f + world.rand.nextFloat() * 0.002f,
+                        (world.rand.nextFloat() - 0.5f) * 0.004f,
+                        8));
             }
         }
     }
@@ -886,7 +894,15 @@ public class ClientProxy extends CommonProxy {
             bubble.setFroth();
             ParticleEngine.addEffect(world, bubble);
             if (world.rand.nextInt(4) == 0) {
-                world.spawnParticle(EnumParticleTypes.SMOKE_NORMAL, x, y + 0.03f, z, 0.0, 0.01, 0.0);
+                ParticleEngine.addEffect(world, new FXSmokeDrift(
+                        world,
+                        x,
+                        y + 0.03f,
+                        z,
+                        (world.rand.nextFloat() - 0.5f) * 0.002f,
+                        0.004f + world.rand.nextFloat() * 0.003f,
+                        (world.rand.nextFloat() - 0.5f) * 0.002f,
+                        7));
             }
         }
     }

@@ -23,6 +23,7 @@ public class ClientProxyFxStaticGuardTest {
         String bubbleFx = readFile("src/main/java/thaumcraft/client/fx/particles/FXBubble.java");
         String bubbleAltFx = readFile("src/main/java/thaumcraft/client/fx/particles/FXBubbleAlt.java");
         String genericFx = readFile("src/main/java/thaumcraft/client/fx/particles/FXGeneric.java");
+        String smokeDriftFx = readFile("src/main/java/thaumcraft/client/fx/particles/FXSmokeDrift.java");
         String sparkleFx = readFile("src/main/java/thaumcraft/client/fx/particles/FXSparkle.java");
         String ventFx = readFile("src/main/java/thaumcraft/client/fx/particles/FXVent.java");
         String visSparkleFx = readFile("src/main/java/thaumcraft/client/fx/particles/FXVisSparkle.java");
@@ -57,7 +58,9 @@ public class ClientProxyFxStaticGuardTest {
         assertTrue("ClientProxy must override wispFXEG for eldritch guardian trail FX",
                 source.contains("public void wispFXEG(") && source.contains("new FXWispEG("));
         assertTrue("ClientProxy must override taintLandFX for falling taint landing FX",
-                source.contains("public void taintLandFX(") && source.contains("entity.getEntityBoundingBox()"));
+                source.contains("public void taintLandFX(")
+                        && source.contains("entity.getEntityBoundingBox()")
+                        && source.contains("new FXSmokeDrift("));
         assertTrue("ClientProxy must override slimeJumpFX for infested champion fallback",
                 source.contains("public void slimeJumpFX(") && source.contains("sparkle(x, y, z, 0.7f, 0xAA22FF"));
         assertTrue("ClientProxy must override drawGenericParticles for champion modifier fallback",
@@ -74,7 +77,8 @@ public class ClientProxyFxStaticGuardTest {
                 source.contains("public int particleCount(") && source.contains("mc.gameSettings.particleSetting"));
         assertTrue("ClientProxy must override crucibleFroth and crucibleFrothDown",
                 source.contains("public void crucibleFroth(")
-                        && source.contains("public void crucibleFrothDown("));
+                        && source.contains("public void crucibleFrothDown(")
+                        && source.contains("new FXSmokeDrift("));
         assertTrue("ClientProxy must override crucibleBubble with colored bubble path",
                 source.contains("public void crucibleBubble(")
                         && source.contains("new FXBubbleAlt(")
@@ -141,6 +145,10 @@ public class ClientProxyFxStaticGuardTest {
                 genericFx.contains("class FXGeneric extends Particle")
                         && genericFx.contains("loop")
                         && genericFx.contains("EnumParticleTypes.REDSTONE"));
+        assertTrue("Dedicated FXSmokeDrift particle must keep smoke drift emission baseline",
+                smokeDriftFx.contains("class FXSmokeDrift extends Particle")
+                        && smokeDriftFx.contains("EnumParticleTypes.SMOKE_NORMAL")
+                        && smokeDriftFx.contains("this.motionY *= 0.92D"));
         assertTrue("Dedicated FXSparkle particle must keep colored sparkle emission baseline",
                 sparkleFx.contains("class FXSparkle extends Particle")
                         && sparkleFx.contains("EnumParticleTypes.REDSTONE")
