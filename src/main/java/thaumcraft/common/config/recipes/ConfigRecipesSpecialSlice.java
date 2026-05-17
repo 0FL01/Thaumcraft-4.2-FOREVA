@@ -59,6 +59,38 @@ public class ConfigRecipesSpecialSlice {
         registry.register(recipeArcaneStone4);
         bridge.setRecipeArcaneStone4(recipeArcaneStone4);
 
+        IRecipe recipeStairsGreatwood = new ShapedOreRecipe(null,
+                new ItemStack(ConfigBlocks.blockStairsGreatwood, 4, 0),
+                "K  ",
+                "KK ",
+                "KKK",
+                'K', new ItemStack(ConfigBlocks.blockWoodenDevice, 1, 6))
+                .setRegistryName("thaumcraft", "blockstairsgreatwood");
+        registry.register(recipeStairsGreatwood);
+
+        IRecipe recipeStairsSilverwood = new ShapedOreRecipe(null,
+                new ItemStack(ConfigBlocks.blockStairsSilverwood, 4, 0),
+                "K  ",
+                "KK ",
+                "KKK",
+                'K', new ItemStack(ConfigBlocks.blockWoodenDevice, 1, 7))
+                .setRegistryName("thaumcraft", "blockstairssilverwood");
+        registry.register(recipeStairsSilverwood);
+
+        IRecipe recipeSlabGreatwood = new ShapedOreRecipe(null,
+                new ItemStack(ConfigBlocks.blockSlabWood, 6, 0),
+                "KKK",
+                'K', new ItemStack(ConfigBlocks.blockWoodenDevice, 1, 6))
+                .setRegistryName("thaumcraft", "blockslabgreatwood");
+        registry.register(recipeSlabGreatwood);
+
+        IRecipe recipeSlabSilverwood = new ShapedOreRecipe(null,
+                new ItemStack(ConfigBlocks.blockSlabWood, 6, 1),
+                "KKK",
+                'K', new ItemStack(ConfigBlocks.blockWoodenDevice, 1, 7))
+                .setRegistryName("thaumcraft", "blockslabsilverwood");
+        registry.register(recipeSlabSilverwood);
+
         IRecipe recipeKnowFrag = new ShapedOreRecipe(null,
                 new ItemStack(ConfigItems.itemResearchNotes, 1, 42),
                 "KKK",

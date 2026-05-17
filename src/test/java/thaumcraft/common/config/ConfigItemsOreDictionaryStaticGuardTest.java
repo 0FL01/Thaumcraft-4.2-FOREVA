@@ -32,6 +32,8 @@ public class ConfigItemsOreDictionaryStaticGuardTest {
                         && source.contains("OreDictionary.registerOre(\"shardAir\", new ItemStack(itemShard, 1, 0));")
                         && source.contains("OreDictionary.registerOre(\"shardEntropy\", new ItemStack(itemShard, 1, 5));")
                         && source.contains("OreDictionary.registerOre(\"logWood\", new ItemStack(ConfigBlocks.blockMagicalLog, 1, 0));")
+                        && source.contains("OreDictionary.registerOre(\"slabWood\", new ItemStack(ConfigBlocks.blockSlabWood, 1, 0));")
+                        && source.contains("OreDictionary.registerOre(\"slabWood\", new ItemStack(ConfigBlocks.blockSlabWood, 1, 1));")
                         && source.contains("OreDictionary.registerOre(\"treeSapling\", new ItemStack(ConfigBlocks.blockCustomPlant, 1, 1));"));
     }
 

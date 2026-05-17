@@ -919,6 +919,8 @@ public class ConfigItems {
         OreDictionary.registerOre("logWood", new ItemStack(ConfigBlocks.blockMagicalLog, 1, 1));
         OreDictionary.registerOre("plankWood", new ItemStack(ConfigBlocks.blockWoodenDevice, 1, 6));
         OreDictionary.registerOre("plankWood", new ItemStack(ConfigBlocks.blockWoodenDevice, 1, 7));
+        OreDictionary.registerOre("slabWood", new ItemStack(ConfigBlocks.blockSlabWood, 1, 0));
+        OreDictionary.registerOre("slabWood", new ItemStack(ConfigBlocks.blockSlabWood, 1, 1));
         OreDictionary.registerOre("treeSapling", new ItemStack(ConfigBlocks.blockCustomPlant, 1, 0));
         OreDictionary.registerOre("treeSapling", new ItemStack(ConfigBlocks.blockCustomPlant, 1, 1));
     }

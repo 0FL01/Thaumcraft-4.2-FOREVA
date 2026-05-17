@@ -48,7 +48,11 @@ public class ConfigBlocks {
     public static BlockEldritchNothing blockEldritchNothing;
     public static BlockEldritchPortal blockEldritchPortal;
     public static BlockStairsArcaneStone blockStairsArcaneStone;
+    public static BlockStairsGreatwood blockStairsGreatwood;
+    public static BlockStairsSilverwood blockStairsSilverwood;
     public static BlockStairsEldritch blockStairsEldritch;
+    public static BlockCosmeticWoodSlab blockSlabWood;
+    public static BlockCosmeticWoodSlab blockDoubleSlabWood;
     public static BlockCosmeticStoneSlab blockSlabStone;
     public static BlockCosmeticStoneSlab blockDoubleSlabStone;
     public static BlockLoot blockLootUrn;
@@ -188,9 +192,25 @@ public class ConfigBlocks {
                 .setRegistryName("thaumcraft", legacyPath("blockStairsArcaneStone"))
                 .setTranslationKey("thaumcraft.stairs_arcane");
 
+        blockStairsGreatwood = (BlockStairsGreatwood) new BlockStairsGreatwood()
+                .setRegistryName("thaumcraft", legacyPath("blockStairsGreatwood"))
+                .setTranslationKey("thaumcraft.stairs_greatwood");
+
+        blockStairsSilverwood = (BlockStairsSilverwood) new BlockStairsSilverwood()
+                .setRegistryName("thaumcraft", legacyPath("blockStairsSilverwood"))
+                .setTranslationKey("thaumcraft.stairs_silverwood");
+
         blockStairsEldritch = (BlockStairsEldritch) new BlockStairsEldritch()
                 .setRegistryName("thaumcraft", legacyPath("blockStairsEldritch"))
                 .setTranslationKey("thaumcraft.stairs_eldritch");
+
+        blockSlabWood = (BlockCosmeticWoodSlab) new BlockCosmeticWoodSlab.Half()
+                .setRegistryName("thaumcraft", legacyPath("blockCosmeticSlabWood"))
+                .setTranslationKey("blockCosmeticSlabWood");
+
+        blockDoubleSlabWood = (BlockCosmeticWoodSlab) new BlockCosmeticWoodSlab.Double()
+                .setRegistryName("thaumcraft", legacyPath("blockCosmeticDoubleSlabWood"))
+                .setTranslationKey("blockCosmeticSlabWood");
 
         blockSlabStone = (BlockCosmeticStoneSlab) new BlockCosmeticStoneSlab.Half()
                 .setRegistryName("thaumcraft", legacyPath("blockCosmeticSlabStone"))
@@ -297,7 +317,11 @@ public class ConfigBlocks {
                 blockEldritchNothing,
                 blockEldritchPortal,
                 blockStairsArcaneStone,
+                blockStairsGreatwood,
+                blockStairsSilverwood,
                 blockStairsEldritch,
+                blockSlabWood,
+                blockDoubleSlabWood,
                 blockSlabStone,
                 blockDoubleSlabStone,
                 blockLootUrn,
@@ -359,8 +383,14 @@ public class ConfigBlocks {
                 .setRegistryName(blockEldritchPortal.getRegistryName()));
         registry.register(new net.minecraft.item.ItemBlock(blockStairsArcaneStone)
                 .setRegistryName(blockStairsArcaneStone.getRegistryName()));
+        registry.register(new net.minecraft.item.ItemBlock(blockStairsGreatwood)
+                .setRegistryName(blockStairsGreatwood.getRegistryName()));
+        registry.register(new net.minecraft.item.ItemBlock(blockStairsSilverwood)
+                .setRegistryName(blockStairsSilverwood.getRegistryName()));
         registry.register(new net.minecraft.item.ItemBlock(blockStairsEldritch)
                 .setRegistryName(blockStairsEldritch.getRegistryName()));
+        registry.register(new BlockCosmeticWoodSlabItem(blockSlabWood)
+                .setRegistryName(blockSlabWood.getRegistryName()));
         registry.register(new BlockCosmeticStoneSlabItem(blockSlabStone)
                 .setRegistryName(blockSlabStone.getRegistryName()));
         registry.register(new BlockLootItem(blockLootUrn)

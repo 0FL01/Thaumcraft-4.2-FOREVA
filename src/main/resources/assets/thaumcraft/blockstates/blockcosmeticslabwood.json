@@ -1,0 +1,8 @@
+{
+  "variants": {
+    "half=bottom,variant=greatwood": { "model": "thaumcraft:blockcosmeticslabwood_greatwood_bottom" },
+    "half=top,variant=greatwood": { "model": "thaumcraft:blockcosmeticslabwood_greatwood_top" },
+    "half=bottom,variant=silverwood": { "model": "thaumcraft:blockcosmeticslabwood_silverwood_bottom" },
+    "half=top,variant=silverwood": { "model": "thaumcraft:blockcosmeticslabwood_silverwood_top" }
+  }
+}

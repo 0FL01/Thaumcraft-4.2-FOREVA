@@ -1,0 +1,8 @@
+{
+  "parent": "block/inner_stairs",
+  "textures": {
+    "bottom": "thaumcraft:blocks/planks_silverwood",
+    "top": "thaumcraft:blocks/planks_silverwood",
+    "side": "thaumcraft:blocks/planks_silverwood"
+  }
+}

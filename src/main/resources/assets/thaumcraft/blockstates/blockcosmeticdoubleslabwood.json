@@ -1,0 +1,8 @@
+{
+  "variants": {
+    "seamless=false,variant=greatwood": { "model": "thaumcraft:blockcosmeticslabwood_greatwood_double" },
+    "seamless=true,variant=greatwood": { "model": "thaumcraft:blockcosmeticslabwood_greatwood_double" },
+    "seamless=false,variant=silverwood": { "model": "thaumcraft:blockcosmeticslabwood_silverwood_double" },
+    "seamless=true,variant=silverwood": { "model": "thaumcraft:blockcosmeticslabwood_silverwood_double" }
+  }
+}
