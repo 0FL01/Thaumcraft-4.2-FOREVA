@@ -6,11 +6,15 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
 import thaumcraft.api.ThaumcraftApiHelper;
+import thaumcraft.client.renderers.models.ModelTubeValve;
 import thaumcraft.common.tiles.TileTubeBuffer;
 
 public class TileTubeBufferRenderer extends TileEntitySpecialRenderer<TileTubeBuffer> {
     private static final ResourceLocation VALVE_TEXTURE =
             new ResourceLocation("thaumcraft", "textures/models/valve.png");
+    private static final float MODEL_SCALE = 0.0625F;
+
+    private final ModelTubeValve model = new ModelTubeValve();
 
     @Override
     public void render(TileTubeBuffer tile, double x, double y, double z, float partialTicks, int destroyStage, float alpha) {
@@ -28,26 +32,26 @@ public class TileTubeBufferRenderer extends TileEntitySpecialRenderer<TileTubeBu
             if (neighbour == null) {
                 continue;
             }
-            int color = tile.chokedSides[idx] == 2 ? 0xE6FF5555 : 0xE65577FF;
-            renderValveDisc(x, y, z, face, color, 0.42F, 1.22F);
+            renderValve(x, y, z, face, tile.chokedSides[idx] == 2);
         }
     }
 
-    private void renderValveDisc(double x, double y, double z, EnumFacing face, int color, float depth, float scale) {
+    private void renderValve(double x, double y, double z, EnumFacing face, boolean hardChoked) {
         GlStateManager.pushMatrix();
         GlStateManager.translate(
-                x + 0.5D + face.getXOffset() * depth,
-                y + 0.5D + face.getYOffset() * depth,
-                z + 0.5D + face.getZOffset() * depth);
+                x + 0.5D + face.getXOffset() * 0.42D,
+                y + 0.5D + face.getYOffset() * 0.42D,
+                z + 0.5D + face.getZOffset() * 0.42D);
         orientByFace(face);
-        GlStateManager.scale(scale, scale, scale);
-        GlStateManager.disableLighting();
-        GlStateManager.enableBlend();
-        GlStateManager.blendFunc(770, 771);
-        TileRenderHelper.drawTexturedQuad(0.17F, color, 0.0F, 1.0F, 0.0F, 1.0F);
-        TileRenderHelper.drawTexturedQuad(0.09F, 0xD0FFFFFF, 0.0F, 1.0F, 0.0F, 1.0F);
-        GlStateManager.disableBlend();
-        GlStateManager.enableLighting();
+        GlStateManager.scale(1.2F, 1.0F, 1.2F);
+        GlStateManager.translate(0.0D, -0.5D, 0.0D);
+        if (hardChoked) {
+            GlStateManager.color(1.0F, 0.3F, 0.3F, 1.0F);
+        } else {
+            GlStateManager.color(0.3F, 0.3F, 1.0F, 1.0F);
+        }
+        model.render(MODEL_SCALE);
+        GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
         GlStateManager.popMatrix();
     }
 
