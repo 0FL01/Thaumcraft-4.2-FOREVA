@@ -29,6 +29,7 @@ public class ConfigBlocks {
     public static BlockTube blockTube;
     public static BlockMirror blockMirror;
     public static BlockEssentiaReservoir blockEssentiaReservoir;
+    public static BlockArcaneFurnace blockArcaneFurnace;
     public static BlockMagicalLog blockMagicalLog;
     public static BlockMagicalLeaves blockMagicalLeaves;
     public static BlockCustomOre blockCustomOre;
@@ -109,6 +110,10 @@ public class ConfigBlocks {
         blockEssentiaReservoir = (BlockEssentiaReservoir) new BlockEssentiaReservoir()
                 .setRegistryName("thaumcraft", legacyPath("blockEssentiaReservoir"))
                 .setTranslationKey("thaumcraft.essentia_reservoir");
+
+        blockArcaneFurnace = (BlockArcaneFurnace) new BlockArcaneFurnace()
+                .setRegistryName("thaumcraft", legacyPath("blockArcaneFurnace"))
+                .setTranslationKey("thaumcraft.arcane_furnace");
 
         blockMagicalLog = (BlockMagicalLog) new BlockMagicalLog()
                 .setRegistryName("thaumcraft", legacyPath("blockMagicalLog"))
@@ -268,6 +273,7 @@ public class ConfigBlocks {
                 blockTube,
                 blockMirror,
                 blockEssentiaReservoir,
+                blockArcaneFurnace,
                 blockMagicalLog,
                 blockMagicalLeaves,
                 blockCustomOre,
@@ -327,6 +333,8 @@ public class ConfigBlocks {
                 .setRegistryName(blockMirror.getRegistryName()));
         registry.register(new BlockEssentiaReservoirItem(blockEssentiaReservoir)
                 .setRegistryName(blockEssentiaReservoir.getRegistryName()));
+        registry.register(new BlockMetadataItem(blockArcaneFurnace)
+                .setRegistryName(blockArcaneFurnace.getRegistryName()));
         registry.register(new BlockMetadataItem(blockMagicalLog)
                 .setRegistryName(blockMagicalLog.getRegistryName()));
         registry.register(new net.minecraft.item.ItemBlock(blockManaPod)
