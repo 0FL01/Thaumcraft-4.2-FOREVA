@@ -256,6 +256,7 @@ Incremental Stage 8/9 boundary delta: server GUI routing contracts are now expli
 Incremental Stage 8/9 boundary delta: `ClientProxy.getClientGuiElement(...)` now restores the reference-shaped `WorldClient` gate before switch routing, guarded by expanded `ClientProxyGuiRoutingStaticGuardTest`; `validate --smoke` passing.
 Incremental Stage 8/9 boundary delta: utility GUI routing contracts are now explicitly guarded by `ProxyUtilityGuiRoutingStaticGuardTest`, pinning focus-pouch/hand-mirror/hover-harness direct routes plus `magic box` (`IInventory`) and `spa` tile routes across both `CommonProxy.getServerGuiElement(...)` and `ClientProxy.getClientGuiElement(...)`; `validate --smoke` passing.
 Incremental Stage 8/9 boundary delta: core GUI routing contracts are now explicitly guarded by `ProxyCoreGuiRoutingStaticGuardTest`, pinning golem/pech/traveling-trunk entity routes and thaumatorium/deconstruction-table/alchemy-furnace/research-table/arcane-bore tile routes across both server containers and client GUI screens; `validate --smoke` passing.
+Incremental Stage 8-a / Stage 3 sync-contract delta: packet discriminator-table contracts are now explicitly guarded by `PacketHandlerRegistrationStaticGuardTest`, pinning lowercase channel identity, `REFERENCE_PACKET_COUNT` mismatch guard, and the full reference registration order/sides for all 39 packet entries (including dual-side `PacketNote` and FX tail ordering); `validate --smoke` passing.
 
 ## Archive
 
