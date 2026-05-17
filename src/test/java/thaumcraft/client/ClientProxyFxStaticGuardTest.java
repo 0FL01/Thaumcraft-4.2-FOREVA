@@ -22,7 +22,9 @@ public class ClientProxyFxStaticGuardTest {
         String burstFx = readFile("src/main/java/thaumcraft/client/fx/particles/FXBurst.java");
         String bubbleFx = readFile("src/main/java/thaumcraft/client/fx/particles/FXBubble.java");
         String bubbleAltFx = readFile("src/main/java/thaumcraft/client/fx/particles/FXBubbleAlt.java");
+        String genericFx = readFile("src/main/java/thaumcraft/client/fx/particles/FXGeneric.java");
         String sparkleFx = readFile("src/main/java/thaumcraft/client/fx/particles/FXSparkle.java");
+        String ventFx = readFile("src/main/java/thaumcraft/client/fx/particles/FXVent.java");
         String wispFx = readFile("src/main/java/thaumcraft/client/fx/particles/FXWisp.java");
         String wispEgFx = readFile("src/main/java/thaumcraft/client/fx/particles/FXWispEG.java");
         String sonicFx = readFile("src/main/java/thaumcraft/client/fx/other/FXSonic.java");
@@ -54,7 +56,9 @@ public class ClientProxyFxStaticGuardTest {
         assertTrue("ClientProxy must override slimeJumpFX for infested champion fallback",
                 source.contains("public void slimeJumpFX(") && source.contains("sparkle(x, y, z, 0.7f, 0xAA22FF"));
         assertTrue("ClientProxy must override drawGenericParticles for champion modifier fallback",
-                source.contains("public void drawGenericParticles(") && source.contains("EnumParticleTypes.REDSTONE"));
+                source.contains("public void drawGenericParticles(") && source.contains("new FXGeneric("));
+        assertTrue("ClientProxy must override drawVentParticles for thaumatorium vent routing",
+                source.contains("public void drawVentParticles(") && source.contains("new FXVent("));
         assertTrue("CommonProxy and ClientProxy must keep boreDigFx proxy surface with dedicated client FX routing",
                 commonProxy.contains("public void boreDigFx(World world,")
                         && source.contains("public void boreDigFx(World world,")
@@ -125,10 +129,18 @@ public class ClientProxyFxStaticGuardTest {
                 bubbleAltFx.contains("class FXBubbleAlt extends Particle")
                         && bubbleAltFx.contains("setRGB(float r, float g, float b)")
                         && bubbleAltFx.contains("EnumParticleTypes.REDSTONE"));
+        assertTrue("Dedicated FXGeneric particle must keep configurable generic particle baseline",
+                genericFx.contains("class FXGeneric extends Particle")
+                        && genericFx.contains("loop")
+                        && genericFx.contains("EnumParticleTypes.REDSTONE"));
         assertTrue("Dedicated FXSparkle particle must keep colored sparkle emission baseline",
                 sparkleFx.contains("class FXSparkle extends Particle")
                         && sparkleFx.contains("EnumParticleTypes.REDSTONE")
                         && sparkleFx.contains("EnumParticleTypes.CRIT_MAGIC"));
+        assertTrue("Dedicated FXVent particle must keep vent trail emission baseline",
+                ventFx.contains("class FXVent extends Particle")
+                        && ventFx.contains("EnumParticleTypes.REDSTONE")
+                        && ventFx.contains("EnumParticleTypes.CRIT_MAGIC"));
         assertTrue("Dedicated FXWisp particle must keep target-aware wisp trail baseline",
                 wispFx.contains("class FXWisp extends Particle")
                         && wispFx.contains("hasTarget")

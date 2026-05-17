@@ -61,7 +61,9 @@ import thaumcraft.client.fx.particles.FXBoreParticles;
 import thaumcraft.client.fx.particles.FXBurst;
 import thaumcraft.client.fx.particles.FXBubble;
 import thaumcraft.client.fx.particles.FXBubbleAlt;
+import thaumcraft.client.fx.particles.FXGeneric;
 import thaumcraft.client.fx.particles.FXSparkle;
+import thaumcraft.client.fx.particles.FXVent;
 import thaumcraft.client.fx.particles.FXWisp;
 import thaumcraft.client.fx.particles.FXWispEG;
 import thaumcraft.client.renderers.entity.RenderFallbackBiped;
@@ -810,21 +812,20 @@ public class ClientProxy extends CommonProxy {
                                      float red, float green, float blue, float alpha,
                                      boolean loop, int start, int num, int inc, int age, int delay, float scale) {
         if (world == null || !world.isRemote) return;
-        int amount = particleCount(Math.max(1, num / 2 + 1));
+        int amount = particleCount(Math.max(1, num / Math.max(1, inc)));
         if (amount <= 0) return;
 
         for (int i = 0; i < amount; i++) {
-            double px = x + (world.rand.nextFloat() - 0.5f) * 0.15f;
-            double py = y + (world.rand.nextFloat() - 0.5f) * 0.15f;
-            double pz = z + (world.rand.nextFloat() - 0.5f) * 0.15f;
-            world.spawnParticle(EnumParticleTypes.REDSTONE, px, py, pz, red, green, blue);
-            if (alpha >= 0.6f || loop || world.rand.nextBoolean()) {
-                world.spawnParticle(EnumParticleTypes.CRIT_MAGIC,
-                        px, py, pz,
-                        mx + (world.rand.nextFloat() - 0.5f) * 0.01f,
-                        my + (world.rand.nextFloat() - 0.5f) * 0.01f,
-                        mz + (world.rand.nextFloat() - 0.5f) * 0.01f);
-            }
+            ParticleEngine.addEffect(world, new FXGeneric(
+                    world,
+                    x + (world.rand.nextFloat() - 0.5f) * 0.15f,
+                    y + (world.rand.nextFloat() - 0.5f) * 0.15f,
+                    z + (world.rand.nextFloat() - 0.5f) * 0.15f,
+                    mx + (world.rand.nextFloat() - 0.5f) * 0.01f,
+                    my + (world.rand.nextFloat() - 0.5f) * 0.01f,
+                    mz + (world.rand.nextFloat() - 0.5f) * 0.01f,
+                    red, green, blue, alpha,
+                    loop, num, inc, age, delay, scale));
         }
     }
 
@@ -855,16 +856,15 @@ public class ClientProxy extends CommonProxy {
         float green = normalizeColor(tint.getGreen());
         float blue = normalizeColor(tint.getBlue());
         for (int i = 0; i < amount; i++) {
-            world.spawnParticle(EnumParticleTypes.REDSTONE,
+            ParticleEngine.addEffect(world, new FXVent(
+                    world,
                     x + (world.rand.nextFloat() - 0.5f) * 0.05f,
                     y + (world.rand.nextFloat() - 0.5f) * 0.05f,
                     z + (world.rand.nextFloat() - 0.5f) * 0.05f,
-                    red, green, blue);
-            world.spawnParticle(EnumParticleTypes.CRIT_MAGIC,
-                    x, y, z,
                     mx + (world.rand.nextFloat() - 0.5f) * 0.01f,
                     my + (world.rand.nextFloat() - 0.5f) * 0.01f,
-                    mz + (world.rand.nextFloat() - 0.5f) * 0.01f);
+                    mz + (world.rand.nextFloat() - 0.5f) * 0.01f,
+                    red, green, blue));
         }
     }
 
