@@ -4,6 +4,7 @@ import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.NonNullList;
+import net.minecraft.util.text.translation.I18n;
 import thaumcraft.common.lib.CreativeTabThaumcraft;
 
 public class ItemGolemDecoration extends Item {
@@ -17,6 +18,11 @@ public class ItemGolemDecoration extends Item {
     @Override
     public String getTranslationKey(ItemStack stack) {
         return super.getTranslationKey() + "." + stack.getItemDamage();
+    }
+
+    @Override
+    public String getItemStackDisplayName(ItemStack stack) {
+        return I18n.translateToLocal("item.ItemGolemDecoration.name") + ": " + super.getItemStackDisplayName(stack);
     }
 
     @Override
