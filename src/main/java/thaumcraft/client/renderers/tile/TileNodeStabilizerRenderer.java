@@ -3,6 +3,7 @@ package thaumcraft.client.renderers.tile;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.util.ResourceLocation;
+import thaumcraft.client.renderers.models.ModelNodeStabilizer;
 import thaumcraft.common.tiles.TileNodeStabilizer;
 
 public class TileNodeStabilizerRenderer extends TileEntitySpecialRenderer<TileNodeStabilizer> {
@@ -13,6 +14,9 @@ public class TileNodeStabilizerRenderer extends TileEntitySpecialRenderer<TileNo
             new ResourceLocation("thaumcraft", "textures/models/node_stabilizer_over.png");
     private static final ResourceLocation BUBBLE_TEXTURE =
             new ResourceLocation("thaumcraft", "textures/misc/node_bubble.png");
+    private static final float MODEL_SCALE = 0.0625F;
+
+    private final ModelNodeStabilizer model = new ModelNodeStabilizer();
 
     @Override
     public void render(TileNodeStabilizer tile, double x, double y, double z, float partialTicks, int destroyStage, float alpha) {
@@ -22,49 +26,65 @@ public class TileNodeStabilizerRenderer extends TileEntitySpecialRenderer<TileNo
 
         float ticks = TileRenderHelper.ticks(tile, partialTicks);
         float progress = TileRenderHelper.clamp01(tile.count / 37.0F);
-        boolean locked = tile.lock == 2;
-        int overlayColor = locked ? 0xAAFF4444 : 0xAAFFFFFF;
+        int lock = resolveLock(tile);
+        boolean locked = lock == 2;
 
         GlStateManager.pushMatrix();
-        GlStateManager.translate(x + 0.5D, y + 0.75D, z + 0.5D);
+        GlStateManager.translate(x + 0.5D, y + 0.55D, z + 0.5D);
+        GlStateManager.rotate(90.0F, -1.0F, 0.0F, 0.0F);
         GlStateManager.disableLighting();
         GlStateManager.enableBlend();
         GlStateManager.blendFunc(770, 771);
+        GlStateManager.disableCull();
+
+        bindTexture(BASE_TEXTURE);
+        model.renderLock(MODEL_SCALE);
 
         for (int i = 0; i < 4; i++) {
             GlStateManager.pushMatrix();
-            GlStateManager.rotate(i * 90.0F, 0.0F, 1.0F, 0.0F);
-            GlStateManager.translate(0.16D, 0.06D + progress * 0.18D, 0.0D);
-            GlStateManager.rotate((ticks * (2.0F + i * 0.25F)) % 360.0F, 1.0F, 0.0F, 0.0F);
-            TileRenderHelper.orientBillboardToPlayer();
+            GlStateManager.rotate(i * 90.0F, 0.0F, 0.0F, 1.0F);
+            GlStateManager.rotate(45.0F, 0.0F, 1.0F, 0.0F);
+            GlStateManager.rotate((ticks * (1.5F + i * 0.2F)) % 360.0F, 0.0F, 1.0F, 0.0F);
+            GlStateManager.translate(0.0D, 0.0D, 0.12D + progress * 0.11D);
 
             bindTexture(BASE_TEXTURE);
-            TileRenderHelper.drawTexturedQuad(0.15F, 0xD8FFFFFF, 0.0F, 1.0F, 0.0F, 1.0F);
+            model.renderPiston(MODEL_SCALE);
+
             bindTexture(OVER_TEXTURE);
-            TileRenderHelper.drawTexturedQuad(0.15F, overlayColor, 0.0F, 1.0F, 0.0F, 1.0F);
+            float pulse = 0.85F + (float) Math.sin((ticks + i * 5.0F) / 3.0F) * 0.1F;
+            if (locked) {
+                GlStateManager.color(1.0F * pulse, 0.2F * pulse, 0.2F * pulse, 1.0F);
+            } else {
+                GlStateManager.color(pulse, pulse, pulse, 1.0F);
+            }
+            model.renderPiston(MODEL_SCALE);
+            GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
             GlStateManager.popMatrix();
         }
-
-        GlStateManager.pushMatrix();
-        GlStateManager.translate(0.0D, -0.16D, 0.0D);
-        TileRenderHelper.orientBillboardToPlayer();
-        bindTexture(BASE_TEXTURE);
-        TileRenderHelper.drawTexturedQuad(0.21F, 0xE6FFFFFF, 0.0F, 1.0F, 0.0F, 1.0F);
-        GlStateManager.popMatrix();
 
         if (tile.count > 0) {
             float bubblePulse = 0.5F + (float) Math.sin(ticks / 8.0F) * 0.1F;
             int bubbleColor = locked ? 0xCCFF4444 : 0xCCFFFFFF;
             GlStateManager.pushMatrix();
-            GlStateManager.translate(0.0D, 0.65D, 0.0D);
+            GlStateManager.translate(0.0D, -0.9D, 0.0D);
+            GlStateManager.rotate(90.0F, 1.0F, 0.0F, 0.0F);
             TileRenderHelper.orientBillboardToPlayer();
             bindTexture(BUBBLE_TEXTURE);
             TileRenderHelper.drawTexturedQuad(0.18F * progress * bubblePulse, bubbleColor, 0.0F, 1.0F, 0.0F, 1.0F);
             GlStateManager.popMatrix();
         }
 
+        GlStateManager.enableCull();
         GlStateManager.disableBlend();
         GlStateManager.enableLighting();
         GlStateManager.popMatrix();
+    }
+
+    private static int resolveLock(TileNodeStabilizer tile) {
+        if (tile.lock > 0) {
+            return tile.lock;
+        }
+        int meta = tile.getBlockType().getMetaFromState(tile.getWorld().getBlockState(tile.getPos()));
+        return meta == 9 ? 1 : 2;
     }
 }
