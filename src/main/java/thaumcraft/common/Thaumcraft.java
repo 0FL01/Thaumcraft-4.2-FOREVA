@@ -49,6 +49,7 @@ import thaumcraft.common.lib.events.EventHandlerEntity;
 import thaumcraft.common.lib.events.EventHandlerRunic;
 import thaumcraft.common.lib.events.EventHandlerWorld;
 import thaumcraft.common.lib.events.ServerTickEventsFML;
+import thaumcraft.common.lib.events.CommandThaumcraft;
 import thaumcraft.common.lib.network.PacketHandler;
 import thaumcraft.common.lib.research.ScanManager;
 import thaumcraft.common.blocks.BlockJarItem;
@@ -201,7 +202,7 @@ public class Thaumcraft {
 
     @Mod.EventHandler
     public void serverLoad(FMLServerStartingEvent event) {
-        log.info("Thaumcraft server command registration deferred until CommandThaumcraft is ported");
+        event.registerServerCommand(new CommandThaumcraft());
     }
 
     @Mod.EventHandler
