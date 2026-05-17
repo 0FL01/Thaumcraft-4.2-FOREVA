@@ -255,6 +255,7 @@ Incremental Stage 5 delta: `ItemSanitySoap` now restores reference-shaped comple
 Incremental Stage 8/9 boundary delta: server GUI routing contracts are now explicitly guarded by `CommonProxyServerGuiRoutingStaticGuardTest`, pinning `GUI_ARCANE_WORKBENCH`/`GUI_THAUMONOMICON`/`GUI_FOCAL_MANIPULATOR` id continuity and `CommonProxy.getServerGuiElement(...)` routes for `ContainerArcaneWorkbench`, `ContainerFocalManipulator`, and the Thaumonomicon null branch; `validate --smoke` passing.
 Incremental Stage 8/9 boundary delta: `ClientProxy.getClientGuiElement(...)` now restores the reference-shaped `WorldClient` gate before switch routing, guarded by expanded `ClientProxyGuiRoutingStaticGuardTest`; `validate --smoke` passing.
 Incremental Stage 8/9 boundary delta: utility GUI routing contracts are now explicitly guarded by `ProxyUtilityGuiRoutingStaticGuardTest`, pinning focus-pouch/hand-mirror/hover-harness direct routes plus `magic box` (`IInventory`) and `spa` tile routes across both `CommonProxy.getServerGuiElement(...)` and `ClientProxy.getClientGuiElement(...)`; `validate --smoke` passing.
+Incremental Stage 8/9 boundary delta: core GUI routing contracts are now explicitly guarded by `ProxyCoreGuiRoutingStaticGuardTest`, pinning golem/pech/traveling-trunk entity routes and thaumatorium/deconstruction-table/alchemy-furnace/research-table/arcane-bore tile routes across both server containers and client GUI screens; `validate --smoke` passing.
 
 ## Archive
 
