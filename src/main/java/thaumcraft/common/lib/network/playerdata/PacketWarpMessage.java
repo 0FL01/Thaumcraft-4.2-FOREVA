@@ -1,14 +1,15 @@
 package thaumcraft.common.lib.network.playerdata;
 
 import io.netty.buffer.ByteBuf;
-import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.text.TextComponentTranslation;
+import net.minecraft.world.World;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import thaumcraft.common.Thaumcraft;
 import thaumcraft.common.lib.TCSounds;
 import thaumcraft.common.lib.network.PacketBase;
 
@@ -43,8 +44,10 @@ public class PacketWarpMessage extends PacketBase {
     @Override
     @SideOnly(Side.CLIENT)
     public IMessage onMessage(MessageContext ctx) {
-        Minecraft.getMinecraft().addScheduledTask(() -> {
-            if (Minecraft.getMinecraft().player == null) return;
+        Thaumcraft.proxy.scheduleClientTask(() -> {
+            EntityPlayer player = Thaumcraft.proxy.getClientPlayer();
+            World world = Thaumcraft.proxy.getClientWorld();
+            if (player == null || world == null) return;
             if (this.data == 0) return;
 
             String key;
@@ -59,13 +62,13 @@ public class PacketWarpMessage extends PacketBase {
                     key = this.data < 0 ? "tc.removewarptemp" : "tc.addwarptemp";
                     break;
             }
-            Minecraft.getMinecraft().player.sendMessage(new TextComponentTranslation(key));
+            player.sendMessage(new TextComponentTranslation(key));
             if (this.data > 0) {
-                Minecraft.getMinecraft().world.playSound(
-                        Minecraft.getMinecraft().player,
-                        Minecraft.getMinecraft().player.posX,
-                        Minecraft.getMinecraft().player.posY,
-                        Minecraft.getMinecraft().player.posZ,
+                world.playSound(
+                        player,
+                        player.posX,
+                        player.posY,
+                        player.posZ,
                         TCSounds.WHISPERS,
                         SoundCategory.PLAYERS,
                         0.5f,

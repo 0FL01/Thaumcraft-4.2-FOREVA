@@ -1,7 +1,6 @@
 package thaumcraft.common.lib.network.playerdata;
 
 import io.netty.buffer.ByteBuf;
-import net.minecraft.client.Minecraft;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 import net.minecraftforge.fml.relauncher.Side;
@@ -43,7 +42,7 @@ public class PacketRunicCharge extends PacketBase {
     @Override
     @SideOnly(Side.CLIENT)
     public IMessage onMessage(MessageContext ctx) {
-        Minecraft.getMinecraft().addScheduledTask(() -> {
+        Thaumcraft.proxy.scheduleClientTask(() -> {
             if (Thaumcraft.instance != null && Thaumcraft.instance.runicEventHandler != null) {
                 Thaumcraft.instance.runicEventHandler.runicCharge.put(entityId, charge);
                 Thaumcraft.instance.runicEventHandler.runicInfo.put(entityId, new Integer[]{max, 0, 0, 0, 0});

@@ -1,7 +1,6 @@
 package thaumcraft.common.lib.network.playerdata;
 
 import io.netty.buffer.ByteBuf;
-import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraftforge.fml.common.network.ByteBufUtils;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
@@ -9,6 +8,7 @@ import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import thaumcraft.api.aspects.Aspect;
+import thaumcraft.common.Thaumcraft;
 import thaumcraft.common.lib.capabilities.IPlayerKnowledge;
 import thaumcraft.common.lib.capabilities.PlayerKnowledgeProvider;
 import thaumcraft.common.lib.network.PacketBase;
@@ -39,8 +39,8 @@ public class PacketAspectDiscovery extends PacketBase {
     @Override
     @SideOnly(Side.CLIENT)
     public IMessage onMessage(MessageContext ctx) {
-        Minecraft.getMinecraft().addScheduledTask(() -> {
-            EntityPlayer player = Minecraft.getMinecraft().player;
+        Thaumcraft.proxy.scheduleClientTask(() -> {
+            EntityPlayer player = Thaumcraft.proxy.getClientPlayer();
             Aspect aspect = Aspect.getAspect(aspectTag);
             if (player != null && aspect != null) {
                 IPlayerKnowledge knowledge = player.getCapability(PlayerKnowledgeProvider.PLAYER_KNOWLEDGE, null);

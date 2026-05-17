@@ -315,6 +315,25 @@ public class ClientProxy extends CommonProxy {
         MinecraftForge.EVENT_BUS.register(new ClientEventHandler());
     }
 
+    @Override
+    public void scheduleClientTask(Runnable task) {
+        if (task != null) {
+            Minecraft.getMinecraft().addScheduledTask(task);
+        }
+    }
+
+    @Nullable
+    @Override
+    public EntityPlayer getClientPlayer() {
+        return Minecraft.getMinecraft().player;
+    }
+
+    @Nullable
+    @Override
+    public World getClientWorld() {
+        return Minecraft.getMinecraft().world;
+    }
+
     private static final class ClientEventHandler {
         @SubscribeEvent
         public void onItemTooltip(ItemTooltipEvent event) {

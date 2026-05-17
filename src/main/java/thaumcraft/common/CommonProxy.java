@@ -139,6 +139,19 @@ public class CommonProxy implements IGuiHandler {
     public void registerHandlers() {
     }
 
+    public void scheduleClientTask(Runnable task) {
+    }
+
+    @Nullable
+    public EntityPlayer getClientPlayer() {
+        return null;
+    }
+
+    @Nullable
+    public World getClientWorld() {
+        return null;
+    }
+
     // ---- FX stubs (ClientProxy overrides with actual GL calls) ----
 
     public void blockSparkle(World world, int x, int y, int z, int color, int count) {
