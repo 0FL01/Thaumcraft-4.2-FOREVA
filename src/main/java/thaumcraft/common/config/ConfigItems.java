@@ -6,6 +6,7 @@ import net.minecraft.item.Item.ToolMaterial;
 import net.minecraft.item.ItemArmor.ArmorMaterial;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.common.util.EnumHelper;
+import net.minecraftforge.oredict.OreDictionary;
 import thaumcraft.common.entities.golems.ItemGolemBell;
 import thaumcraft.common.entities.golems.ItemGolemCore;
 import thaumcraft.common.entities.golems.ItemGolemDecoration;
@@ -820,6 +821,8 @@ public class ConfigItems {
                 .setTranslationKey("ItemGolemDecoration")
                 .setCreativeTab(tab);
         allItems.add(itemGolemDecoration);
+
+        registerOreDictionary();
     }
 
     public static Item[] getAllItems() {
@@ -870,5 +873,53 @@ public class ConfigItems {
         if (!ItemStack.areItemsEqual(current, repairItem)) {
             throw new IllegalStateException("Conflicting repair item for armor material " + material + ": " + current + " vs " + repairItem);
         }
+    }
+
+    private static void registerOreDictionary() {
+        OreDictionary.registerOre("oreCinnabar", new ItemStack(ConfigBlocks.blockCustomOre, 1, 0));
+        OreDictionary.registerOre("oreInfusedAir", new ItemStack(ConfigBlocks.blockCustomOre, 1, 1));
+        OreDictionary.registerOre("oreInfusedFire", new ItemStack(ConfigBlocks.blockCustomOre, 1, 2));
+        OreDictionary.registerOre("oreInfusedWater", new ItemStack(ConfigBlocks.blockCustomOre, 1, 3));
+        OreDictionary.registerOre("oreInfusedEarth", new ItemStack(ConfigBlocks.blockCustomOre, 1, 4));
+        OreDictionary.registerOre("oreInfusedOrder", new ItemStack(ConfigBlocks.blockCustomOre, 1, 5));
+        OreDictionary.registerOre("oreInfusedEntropy", new ItemStack(ConfigBlocks.blockCustomOre, 1, 6));
+        OreDictionary.registerOre("oreAmber", new ItemStack(ConfigBlocks.blockCustomOre, 1, 7));
+
+        OreDictionary.registerOre("shardAir", new ItemStack(itemShard, 1, 0));
+        OreDictionary.registerOre("shardFire", new ItemStack(itemShard, 1, 1));
+        OreDictionary.registerOre("shardWater", new ItemStack(itemShard, 1, 2));
+        OreDictionary.registerOre("shardEarth", new ItemStack(itemShard, 1, 3));
+        OreDictionary.registerOre("shardOrder", new ItemStack(itemShard, 1, 4));
+        OreDictionary.registerOre("shardEntropy", new ItemStack(itemShard, 1, 5));
+
+        OreDictionary.registerOre("quicksilver", new ItemStack(itemResource, 1, 3));
+        OreDictionary.registerOre("gemAmber", new ItemStack(itemResource, 1, 6));
+        OreDictionary.registerOre("nuggetQuicksilver", new ItemStack(itemResource, 1, 3));
+        OreDictionary.registerOre("nuggetGold", new ItemStack(itemResource, 1, 18));
+        OreDictionary.registerOre("ingotThaumium", new ItemStack(itemResource, 1, 2));
+        OreDictionary.registerOre("ingotVoid", new ItemStack(itemResource, 1, 16));
+
+        OreDictionary.registerOre("nuggetIron", new ItemStack(itemNugget, 1, 0));
+        OreDictionary.registerOre("nuggetCopper", new ItemStack(itemNugget, 1, 1));
+        OreDictionary.registerOre("nuggetTin", new ItemStack(itemNugget, 1, 2));
+        OreDictionary.registerOre("nuggetSilver", new ItemStack(itemNugget, 1, 3));
+        OreDictionary.registerOre("nuggetLead", new ItemStack(itemNugget, 1, 4));
+        OreDictionary.registerOre("nuggetThaumium", new ItemStack(itemNugget, 1, 6));
+        OreDictionary.registerOre("nuggetVoid", new ItemStack(itemNugget, 1, 7));
+
+        OreDictionary.registerOre("clusterIron", new ItemStack(itemNugget, 1, 16));
+        OreDictionary.registerOre("clusterCopper", new ItemStack(itemNugget, 1, 17));
+        OreDictionary.registerOre("clusterTin", new ItemStack(itemNugget, 1, 18));
+        OreDictionary.registerOre("clusterSilver", new ItemStack(itemNugget, 1, 19));
+        OreDictionary.registerOre("clusterLead", new ItemStack(itemNugget, 1, 20));
+        OreDictionary.registerOre("clusterCinnabar", new ItemStack(itemNugget, 1, 21));
+        OreDictionary.registerOre("clusterGold", new ItemStack(itemNugget, 1, 31));
+
+        OreDictionary.registerOre("logWood", new ItemStack(ConfigBlocks.blockMagicalLog, 1, 0));
+        OreDictionary.registerOre("logWood", new ItemStack(ConfigBlocks.blockMagicalLog, 1, 1));
+        OreDictionary.registerOre("plankWood", new ItemStack(ConfigBlocks.blockWoodenDevice, 1, 6));
+        OreDictionary.registerOre("plankWood", new ItemStack(ConfigBlocks.blockWoodenDevice, 1, 7));
+        OreDictionary.registerOre("treeSapling", new ItemStack(ConfigBlocks.blockCustomPlant, 1, 0));
+        OreDictionary.registerOre("treeSapling", new ItemStack(ConfigBlocks.blockCustomPlant, 1, 1));
     }
 }
