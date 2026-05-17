@@ -35,12 +35,14 @@ public class WandManagerTriggerStaticGuardTest {
         assertTrue(source.contains("case 3:"));
         assertTrue(source.contains("case 4:"));
         assertTrue(source.contains("case 5:"));
+        assertTrue(source.contains("case 6:"));
         assertTrue(source.contains("return createThaumonomicon(wand, player, world, x, y, z);"));
         assertTrue(source.contains("return createCrucible(wand, player, world, x, y, z);"));
         assertTrue(source.contains("return createArcaneFurnace(wand, player, world, x, y, z);"));
         assertTrue(source.contains("return createInfusionAltar(wand, player, world, x, y, z);"));
         assertTrue(source.contains("return createNodeJar(wand, player, world, x, y, z);"));
         assertTrue(source.contains("return createThaumatorium(wand, player, world, x, y, z, side);"));
+        assertTrue(source.contains("return createOculus(wand, player, world, x, y, z, side);"));
         assertTrue(source.contains("public static boolean createThaumonomicon("));
         assertTrue(source.contains("public static boolean createCrucible("));
         assertTrue(source.contains("public static boolean createThaumatorium("));
@@ -54,6 +56,8 @@ public class WandManagerTriggerStaticGuardTest {
         assertTrue(source.contains("ConfigBlocks.blockJar.getDefaultState().withProperty(thaumcraft.common.blocks.BlockJar.TYPE, 2)"));
         assertTrue(source.contains("jar.setNodeType(NodeType.values()[nodeType]);"));
         assertTrue(source.contains("jar.setId(nodeId);"));
+        assertTrue(source.contains("private static boolean createOculus("));
+        assertTrue(source.contains("return ((TileEldritchAltar) tile).onWandRightClick(world, wandStack, player, x, y, z, side, meta) == 1;"));
         assertTrue(source.contains("Blocks.NETHER_BRICK_FENCE"));
         assertTrue(source.contains("ConfigBlocks.blockArcaneFurnace.getDefaultState().withProperty(BlockArcaneFurnace.TYPE, meta)"));
         assertTrue(source.contains("ConfigBlocks.blockStoneDevice.getDefaultState().withProperty(thaumcraft.common.blocks.BlockStoneDevice.TYPE, 3)"));

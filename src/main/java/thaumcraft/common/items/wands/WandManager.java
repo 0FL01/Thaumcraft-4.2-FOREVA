@@ -38,7 +38,9 @@ import thaumcraft.common.lib.research.ResearchManager;
 import thaumcraft.common.tiles.TileInfusionMatrix;
 import thaumcraft.common.tiles.TileInfusionPillar;
 import thaumcraft.common.tiles.TileJarNode;
+import thaumcraft.common.tiles.TileEldritchAltar;
 import thaumcraft.common.tiles.TilePedestal;
+import thaumcraft.common.tiles.TileNode;
 import thaumcraft.common.tiles.TileThaumatorium;
 import net.minecraftforge.oredict.OreDictionary;
 
@@ -867,7 +869,20 @@ public class WandManager implements IWandTriggerManager {
     }
 
     private static boolean createOculus(ItemStack wandStack, EntityPlayer player, World world, int x, int y, int z, int side) {
-        return false;
+        if (world.isRemote || wandStack.isEmpty() || !(wandStack.getItem() instanceof ItemWandCasting)) {
+            return false;
+        }
+        BlockPos pos = new BlockPos(x, y, z);
+        TileEntity tile = world.getTileEntity(pos);
+        TileEntity node = world.getTileEntity(pos.up());
+        if (!(tile instanceof TileEldritchAltar) || !(node instanceof TileNode)) {
+            return false;
+        }
+        if (((TileNode) node).getNodeType() != NodeType.DARK) {
+            return false;
+        }
+        int meta = world.getBlockState(pos).getBlock().getMetaFromState(world.getBlockState(pos));
+        return ((TileEldritchAltar) tile).onWandRightClick(world, wandStack, player, x, y, z, side, meta) == 1;
     }
 
     private static boolean createAdvancedAlchemicalFurnace(ItemStack wandStack, EntityPlayer player, World world, int x, int y, int z, int side) {
