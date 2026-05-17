@@ -1803,6 +1803,28 @@ Depends on GAP-1 and GAP-3. Some infusion source scenarios may require Stage 9 c
 
 - Это non-GUI side-result baseline; manual runtime parity для полного node-mutation/scatter и obelisk placement scenarios остаётся отдельной Stage 5/6 runtime задачей.
 
+#### Checkpoint 2026-05-17 — GAP-11 loot-bag consumption contracts baseline
+
+Статус: частично продвинут.
+
+Что сделано:
+
+- `ItemLootBag.onItemRightClick(...)` приведён к reference-shaped consumption timing:
+  - расход stack (`stack.shrink(1)`) вынесен из server-only блока и теперь выполняется всегда после использования.
+- Добавлен `ItemLootBagCoreContractsStaticGuardTest`, фиксирующий:
+  - subtype/rarity split (`common/uncommon/rare`);
+  - loot-roll baseline (`8 + rand.nextInt(5)`) и `Utils.generateLoot(...)` dispatch;
+  - post-use consumption placement outside `if (!world.isRemote)` branch;
+  - наличие loot-bag lang/tooltip keys.
+
+Проверки:
+
+- `./scripts/dev.sh validate --smoke` — passed.
+
+Ограничения:
+
+- Это common/server+non-GUI baseline; полный loot-table distribution parity и runtime/manual opening scenarios остаются зависимостью Stage 9 content + manual validation.
+
 ### GAP-12: FX registration exists, but send-site coverage and manual scenario validation are incomplete
 
 **Статус:** требует проверки  

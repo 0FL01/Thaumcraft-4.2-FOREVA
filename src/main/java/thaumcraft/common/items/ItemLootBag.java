@@ -79,8 +79,8 @@ public class ItemLootBag extends Item {
                 }
             }
             world.playSound(null, player.posX, player.posY, player.posZ, TCSounds.COINS, SoundCategory.PLAYERS, 0.75F, 1.0F);
-            stack.shrink(1);
         }
+        stack.shrink(1);
         return new ActionResult<>(EnumActionResult.SUCCESS, stack);
     }
 }
