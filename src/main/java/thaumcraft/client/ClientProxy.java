@@ -199,10 +199,27 @@ public class ClientProxy extends CommonProxy {
         for (Item item : ConfigItems.getAllItems()) {
             ResourceLocation registryName = item.getRegistryName();
             if (registryName == null) continue;
+            if (item == ConfigItems.itemResearchNotes) {
+                ModelResourceLocation noteModel = new ModelResourceLocation(registryName, "inventory");
+                ModelResourceLocation discoveryModel = new ModelResourceLocation(new ResourceLocation("thaumcraft", "discovery"), "inventory");
+                for (int meta = 0; meta < 64; meta++) {
+                    ModelLoader.setCustomModelResourceLocation(item, meta, noteModel);
+                }
+                for (int meta = 64; meta < 128; meta++) {
+                    ModelLoader.setCustomModelResourceLocation(item, meta, discoveryModel);
+                }
+                continue;
+            }
             ModelResourceLocation model = new ModelResourceLocation(registryName, "inventory");
             for (int meta = 0; meta < 64; meta++) {
                 ModelLoader.setCustomModelResourceLocation(item, meta, model);
             }
+        }
+        if (ConfigItems.itemResearchNotes != null) {
+            Minecraft.getMinecraft().getItemColors().registerItemColorHandler(
+                    (stack, tintIndex) -> ConfigItems.itemResearchNotes.getColorFromItemStack(stack, tintIndex),
+                    ConfigItems.itemResearchNotes
+            );
         }
         if (ConfigItems.itemManaBean != null) {
             Minecraft.getMinecraft().getItemColors().registerItemColorHandler(

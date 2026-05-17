@@ -27,6 +27,11 @@ public class ItemResearchNotesCoreContractsStaticGuardTest {
                         && source.contains("I18n.translateToLocal(\"item.researchnotes.name\")")
                         && source.contains("public boolean hasEffect(ItemStack stack)")
                         && source.contains("return true;"));
+        assertTrue("ItemResearchNotes must keep overlay tint contract for note/discovery render passes",
+                source.contains("public int getColorFromItemStack(ItemStack stack, int tintIndex)")
+                        && source.contains("if (tintIndex == 1)")
+                        && source.contains("int color = 0x999999;")
+                        && source.contains("return -1;"));
         assertTrue("ItemResearchNotes must keep reference tooltip contracts for unknown and forbidden warp clues",
                 source.contains("item.researchnotes.unknown.1")
                         && source.contains("item.researchnotes.unknown.2")

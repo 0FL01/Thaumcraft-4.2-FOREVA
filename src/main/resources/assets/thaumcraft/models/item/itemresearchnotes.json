@@ -1,6 +1,7 @@
 {
   "parent": "item/generated",
   "textures": {
-    "layer0": "thaumcraft:items/researchnotes"
+    "layer0": "thaumcraft:items/researchnotes",
+    "layer1": "thaumcraft:items/researchnotesoverlay"
   }
 }

@@ -73,6 +73,19 @@ public class ItemResearchNotes extends Item {
     }
 
     @SideOnly(Side.CLIENT)
+    public int getColorFromItemStack(ItemStack stack, int tintIndex) {
+        if (tintIndex == 1) {
+            int color = 0x999999;
+            ResearchNoteData data = ResearchManager.getData(stack);
+            if (data != null) {
+                color = data.color;
+            }
+            return color;
+        }
+        return -1;
+    }
+
+    @SideOnly(Side.CLIENT)
     @Override
     public void addInformation(ItemStack stack, World worldIn, List<String> tooltip, ITooltipFlag flagIn) {
         if (stack.getItemDamage() == META_UNKNOWN_DISCOVERY || stack.getItemDamage() == META_UNKNOWN_DISCOVERY_ALT) {
