@@ -27,6 +27,8 @@ Branch: `codex/durable-goal-stage8-9`
 - `./scripts/dev.sh validate` and `./scripts/dev.sh validate --smoke` pass on current builds.
 - GUI/manual graphics checks remain excluded by instruction and headless environment limits.
 
+Incremental Stage 4 node-conversion delta: restored reference-shaped node conversion server/common baseline by porting `TileNodeConverter` state machine (`status`/`count`, powered progression, node-drain countdown, Node↔Energized conversion payload transfer, `checkStatus` failure path, client event burst/sound hook), restored `TileNodeStabilizer` client tick/count/lock/render-bounds baseline, added `BlockAiry.explodify(...)` flux-scatter failure helper, and wired `BlockStoneDevice.neighborChanged(...)` converter status refresh hook; guarded by new `TileNodeConversionStaticGuardTest`, with passing `./scripts/dev.sh validate --smoke` (`compileJava`, `test` `177/177`, `jar`, `check-jar` summary, `smoke-server` ready-state pass).
+
 ## Skipped GUI/Manual Graphics Checks
 
 - Interactive GUI, renderer, screenshot, and manual playthrough checks remain skipped until a real client session is available; record future ones as `SKIPPED by user instruction: GUI/graphics/user-interactive validation excluded`.

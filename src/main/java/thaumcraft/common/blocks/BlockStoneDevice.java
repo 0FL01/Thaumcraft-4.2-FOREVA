@@ -1,6 +1,7 @@
 package thaumcraft.common.blocks;
 
 import net.minecraft.block.BlockContainer;
+import net.minecraft.block.Block;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.PropertyInteger;
@@ -119,6 +120,17 @@ extends BlockContainer {
             }
         }
         super.breakBlock(worldIn, pos, state);
+    }
+
+    @Override
+    public void neighborChanged(IBlockState state, World worldIn, BlockPos pos, Block blockIn, BlockPos fromPos) {
+        TileEntity te = worldIn.getTileEntity(pos);
+        if (te instanceof TileAlchemyFurnace) {
+            ((TileAlchemyFurnace) te).getBellows();
+        } else if (te instanceof TileNodeConverter) {
+            ((TileNodeConverter) te).checkStatus();
+        }
+        super.neighborChanged(state, worldIn, pos, blockIn, fromPos);
     }
 
     @Override

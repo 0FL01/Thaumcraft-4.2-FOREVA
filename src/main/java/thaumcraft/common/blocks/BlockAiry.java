@@ -22,6 +22,7 @@ import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import thaumcraft.common.Thaumcraft;
 import thaumcraft.api.entities.IEldritchMob;
+import thaumcraft.common.config.ConfigBlocks;
 import thaumcraft.common.tiles.TileNode;
 import thaumcraft.common.tiles.TileNodeEnergized;
 import thaumcraft.common.tiles.TileNitor;
@@ -127,6 +128,29 @@ public class BlockAiry extends BlockContainer {
             }
             if (entityIn instanceof EntityLivingBase) {
                 ((EntityLivingBase) entityIn).addPotionEffect(new PotionEffect(MobEffects.WEAKNESS, 100, 1, true, false));
+            }
+        }
+    }
+
+    public static void explodify(World world, int x, int y, int z) {
+        if (world == null || world.isRemote) {
+            return;
+        }
+        BlockPos origin = new BlockPos(x, y, z);
+        world.setBlockToAir(origin);
+        world.createExplosion(null, x + 0.5D, y + 0.5D, z + 0.5D, 3.0F, false);
+        for (int a = 0; a < 50; ++a) {
+            int xx = x + world.rand.nextInt(8) - world.rand.nextInt(8);
+            int yy = y + world.rand.nextInt(8) - world.rand.nextInt(8);
+            int zz = z + world.rand.nextInt(8) - world.rand.nextInt(8);
+            BlockPos randomPos = new BlockPos(xx, yy, zz);
+            if (!world.isAirBlock(randomPos)) {
+                continue;
+            }
+            if (yy < y) {
+                world.setBlockState(randomPos, ConfigBlocks.blockFluxGoo.getStateFromMeta(8), 3);
+            } else {
+                world.setBlockState(randomPos, ConfigBlocks.blockFluxGas.getStateFromMeta(8), 3);
             }
         }
     }
