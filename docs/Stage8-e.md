@@ -1691,6 +1691,28 @@ Depends on GAP-1 and GAP-3. Some infusion source scenarios may require Stage 9 c
 
 - Это common/server+non-GUI contract baseline; client/manual movement-feel parity boots в реальной игре остаётся в manual runtime зоне Stage 5.
 
+#### Checkpoint 2026-05-17 — GAP-11 hover-harness core contracts baseline
+
+Статус: частично продвинут.
+
+Что сделано:
+
+- `ItemHoverHarness` доведён до reference-shaped server/common contract в right-click GUI path:
+  - координаты открытия GUI теперь вычисляются через `MathHelper.floor(...)` вместо `(int)` cast, что сохраняет correct floor-behavior на отрицательных координатах.
+- Добавлен `ItemHoverHarnessCoreContractsStaticGuardTest` для фиксации core contracts:
+  - `EPIC` rarity + iron-ingot repair key;
+  - vis-discount baseline (`Aer=5`, иначе `2`);
+  - creative gate + `Hover.handleHoverArmor(...)` dispatch;
+  - server-side `GUI_HOVER_HARNESS` open path с `MathHelper.floor(...)`.
+
+Проверки:
+
+- `./scripts/dev.sh validate --smoke` — passed.
+
+Ограничения:
+
+- Это common/server+non-GUI contract baseline; полноценная client/manual hover toggle/sound/tooltip visual parity остаётся в Stage 5/8 manual зоне.
+
 ### GAP-12: FX registration exists, but send-site coverage and manual scenario validation are incomplete
 
 **Статус:** требует проверки  

@@ -11,6 +11,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumHand;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
@@ -61,7 +62,8 @@ public class ItemHoverHarness extends ItemArmor implements IRepairable, IRunicAr
     public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer player, EnumHand hand) {
         ItemStack stack = player.getHeldItem(hand);
         if (!world.isRemote) {
-            player.openGui(Thaumcraft.instance, CommonProxy.GUI_HOVER_HARNESS, world, (int) player.posX, (int) player.posY, (int) player.posZ);
+            player.openGui(Thaumcraft.instance, CommonProxy.GUI_HOVER_HARNESS, world,
+                    MathHelper.floor(player.posX), MathHelper.floor(player.posY), MathHelper.floor(player.posZ));
         }
         return new ActionResult<>(EnumActionResult.SUCCESS, stack);
     }
