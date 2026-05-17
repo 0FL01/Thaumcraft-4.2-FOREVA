@@ -25,6 +25,36 @@ Maintain `docs/GOAL_PROGRESS.md` during the run. After every major checkpoint, a
 - skipped GUI/manual checks
 - remaining blockers
 
+## 0.1 Quota-saving override — implementation burst mode
+
+This section supersedes any earlier instruction that can be interpreted as one-line gap commits, exhaustive Stage 3–7 micro-polish, or per-gap static guard/test loops.
+
+Quota is limited. Prioritize implementation throughput over microscopic parity polishing.
+
+Stop Stage 3–7 micro-polish unless the gap directly blocks Stage 8/9 implementation, dedicated-server load safety, registry/API/NBT/packet compatibility, or final non-GUI validation. Non-blocking Stage 3–7 residuals must be documented in `docs/GOAL_PROGRESS.md` and deferred.
+
+Do not treat every one-line parity tweak as a standalone gap. A checkpoint gap now means a coherent subsystem bundle. Work in implementation bursts.
+
+Next priority order:
+1. Real Stage 8-c TESR/block/tile renderer implementation.
+2. Stage 8-e dedicated beams/bolts/FX implementation.
+3. Stage 9 recipe/content systems.
+4. Stage 9 research/progression only after recipe handles and crafting systems are substantially present.
+
+Avoid one-line parity commits with per-line static guards. Do not add a new static guard test for every microscopic source tweak. Use aggregate guards only for fragile API, registry, NBT, packet, research, recipe, lifecycle, and client/server boundary contracts.
+
+Validation cadence:
+- During a burst, use `./scripts/dev.sh compileJava` or focused tests.
+- Before a checkpoint commit, run `./scripts/dev.sh validate`.
+- Run `./scripts/dev.sh validate --smoke` only at runtime-risk bundle boundaries or final validation.
+- Runtime-risk bundle means changes to registries, lifecycle, dimensions, networking, proxy boundaries, GUI registration, renderers/models/assets, recipes/content loading, or server startup behavior.
+
+Commit cadence:
+- Commit grouped coherent gaps, not individual tiny gaps.
+- Use explicit path staging only.
+- Commit after each coherent subsystem bundle that reaches a safe checkpoint.
+- Document grouped gaps, validation, skipped GUI checks, and commit hash in `docs/GOAL_PROGRESS.md`.
+
 ## 1. Global end state
 
 Complete the port as far as can be proven without user-driven GUI/graphics testing:
