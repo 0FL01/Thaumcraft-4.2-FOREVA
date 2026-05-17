@@ -127,8 +127,9 @@ public class ItemEldritchObject extends Item {
                 if (!world.isRemote) {
                     stack.shrink(1);
                     transformNode(world, pos, (TileNode) tile, player);
+                    return EnumActionResult.SUCCESS;
                 }
-                return EnumActionResult.SUCCESS;
+                return EnumActionResult.PASS;
             }
             return EnumActionResult.PASS;
         }
@@ -140,8 +141,9 @@ public class ItemEldritchObject extends Item {
             }
             if (!world.isRemote) {
                 placeObelisk(world, pos);
+                return EnumActionResult.SUCCESS;
             }
-            return EnumActionResult.SUCCESS;
+            return EnumActionResult.PASS;
         }
 
         return super.onItemUseFirst(player, world, pos, side, hitX, hitY, hitZ, hand);

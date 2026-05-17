@@ -1783,6 +1783,26 @@ Depends on GAP-1 and GAP-3. Some infusion source scenarios may require Stage 9 c
 
 - Это non-GUI tooltip/lang baseline; manual runtime parity для primordial pearl node mutation/flux scatter и creative obelisk placement остаётся отдельной Stage 5/6 runtime задачей.
 
+#### Checkpoint 2026-05-17 — GAP-11 eldritch-object use-first side-result contracts baseline
+
+Статус: частично продвинут.
+
+Что сделано:
+
+- `ItemEldritchObject.onItemUseFirst(...)` выровнен по reference side-result semantics:
+  - для `META_ELDRITCH_OBJECT_3` (primordial pearl/node path): server branch возвращает `SUCCESS`, client branch — `PASS`;
+  - для `META_OB_PLACER` (creative obelisk path): server branch возвращает `SUCCESS`, client branch — `PASS`.
+- Логика mutate/place оставлена server-only как ранее, изменения касаются только result-contract согласования между сторонами.
+- `ItemEldritchObjectCoreContractsStaticGuardTest` расширен проверками этих side-result контрактов.
+
+Проверки:
+
+- `./scripts/dev.sh validate --smoke` — passed.
+
+Ограничения:
+
+- Это non-GUI side-result baseline; manual runtime parity для полного node-mutation/scatter и obelisk placement scenarios остаётся отдельной Stage 5/6 runtime задачей.
+
 ### GAP-12: FX registration exists, but send-site coverage and manual scenario validation are incomplete
 
 **Статус:** требует проверки  

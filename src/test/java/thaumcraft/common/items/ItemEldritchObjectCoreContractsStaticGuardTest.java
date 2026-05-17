@@ -28,6 +28,14 @@ public class ItemEldritchObjectCoreContractsStaticGuardTest {
                 source.contains("stack.getItemDamage() == META_CRIMSON_RITES")
                         && source.contains("ResearchManager.addResearch(player, \"CRIMSON\")")
                         && source.contains("TCSounds.LEARN"));
+        assertTrue("ItemEldritchObject must keep server-success/client-pass use-first side result contracts",
+                source.contains("if (stack.getItemDamage() == META_ELDRITCH_OBJECT_3)")
+                        && source.contains("if (!world.isRemote) {")
+                        && source.contains("transformNode(world, pos, (TileNode) tile, player);")
+                        && source.contains("return EnumActionResult.SUCCESS;")
+                        && source.contains("return EnumActionResult.PASS;")
+                        && source.contains("if (side == EnumFacing.UP && stack.getItemDamage() == META_OB_PLACER)")
+                        && source.contains("placeObelisk(world, pos);"));
         assertTrue("ItemEldritchObject must keep metadata tooltip branches",
                 source.contains("item.ItemEldritchObject.text.1")
                         && source.contains("item.ItemEldritchObject.text.2")
