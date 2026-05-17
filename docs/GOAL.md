@@ -100,9 +100,9 @@ If `./scripts/dev.sh smoke-client` runs unattended in the current environment wi
 Do not stop solely because manual GUI validation cannot run. Use non-GUI validation instead:
 - `./scripts/dev.sh validate` for routine compile/test/jar/MCP summary
 - `./scripts/dev.sh validate --smoke` when server smoke validation is required
-- `compileJava`
-- `build`
-- `test` where available and non-GUI
+- `./scripts/dev.sh compileJava`
+- `./scripts/dev.sh build`
+- `./scripts/dev.sh test` where available and non-GUI
 - `check-jar`
 - `smoke-server`
 - static scans for missing classes/resources/stubs

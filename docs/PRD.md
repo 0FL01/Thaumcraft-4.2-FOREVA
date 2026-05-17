@@ -503,6 +503,7 @@ Primary commands:
       --user "$(id -u):$(id -g)" \
       --entrypoint ./gradlew \
       thaumcraft-dev compileJava
+                                # Equivalent: ./scripts/dev.sh compileJava (quiet, logs to run/validate/)
 
     docker run --rm \
       -v "$(pwd):/workspace/thaumcraft" \

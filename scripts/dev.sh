@@ -10,12 +10,12 @@ usage() {
   cat <<'EOF'
 Usage:
   ./scripts/dev.sh image
-  ./scripts/dev.sh <gradle-task> [gradle-args...]
-  ./scripts/dev.sh gradle <gradle-task> [gradle-args...]
+  ./scripts/dev.sh compileJava          # quiet compile-only check (logs to run/validate/)
+  ./scripts/dev.sh validate [--smoke]   # multi-step pipeline
   ./scripts/dev.sh check-jar [jar-path]
-  ./scripts/dev.sh validate [--smoke]
   ./scripts/dev.sh smoke-server
   ./scripts/dev.sh smoke-client
+  ./scripts/dev.sh gradle <task>        # advanced: passthrough Gradle task
 
 Examples:
   ./scripts/dev.sh image
@@ -25,7 +25,7 @@ Examples:
   ./scripts/dev.sh check-jar
   ./scripts/dev.sh validate --smoke
   ./scripts/dev.sh apiJar devJar
-  ./scripts/dev.sh smoke-server
+  ./scripts/dev.sh smoke-client
 
 Environment:
   THAUMCRAFT_DOCKER_IMAGE   Docker image name, default: thaumcraft-dev
@@ -911,6 +911,24 @@ case "$cmd" in
     ;;
   gradle)
     shift
+    if [[ "$1" == "compileJava" && $# -eq 1 ]]; then
+      # redirect to quiet handler (same as `dev.sh compileJava`)
+      if validate_gradle_log compileJava compileJava; then
+        printf 'compileJava ok; log: %s\n' "$VALIDATE_LAST_LOG"
+        printf 'EXIT_CODE=0\n'
+        exit 0
+      else
+        status=$?
+        printf 'compileJava FAILED (exit %s); log: %s\n' "$status" "$VALIDATE_LAST_LOG" >&2
+        log_path="$ROOT/$VALIDATE_LAST_LOG"
+        if [[ -f "$log_path" ]]; then
+          printf -- '--- %s tail (last 30 lines) ---\n' "$VALIDATE_LAST_LOG" >&2
+          tail -30 "$log_path" >&2
+        fi
+        printf 'EXIT_CODE=%s\n' "$status" >&2
+        exit "$status"
+      fi
+    fi
     docker_gradle "$@"
     ;;
   check-jar)

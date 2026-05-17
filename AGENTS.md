@@ -145,11 +145,19 @@ Use the project wrapper instead of repeating long Docker commands. For routine v
 
 Use `./scripts/dev.sh validate --smoke` when server/runtime smoke validation is required; this adds the dedicated server smoke stage while keeping stdout compact.
 
-Run arbitrary Gradle tasks through Docker with:
+Common tasks have dedicated shortcuts (quiet, logs to `run/validate/`):
+
+    ./scripts/dev.sh compileJava        # quiet compile-only check
+    ./scripts/dev.sh build
+    ./scripts/dev.sh test
+    ./scripts/dev.sh check-jar
+    ./scripts/dev.sh validate [--smoke] # multi-step pipeline
+
+For arbitrary Gradle tasks (passthrough, verbose):
 
     ./scripts/dev.sh gradle <task> [args...]
 
-Use direct Gradle tasks only for focused debugging. Run `./scripts/dev.sh check-jar` directly only when verbose MCP leak details are needed.
+Use the passthrough only when a dedicated shortcut above does not exist or when verbose Gradle output is needed for debugging.
 
 ## Runtime smoke validation
 
