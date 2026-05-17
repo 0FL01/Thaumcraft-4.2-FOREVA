@@ -22,7 +22,6 @@ import net.minecraft.util.EnumHand;
 import net.minecraft.util.ITickable;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.SoundCategory;
-import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
@@ -451,7 +450,6 @@ public class TileArcaneBore extends TileThaumcraft implements ITickable, IInvent
         } catch (Exception ignored) {
             state = this.digBlock.getDefaultState();
         }
-        int stateId = Block.getStateId(state);
         int sx = this.pos.getX() + this.orientation.getXOffset();
         int sy = this.pos.getY() + this.orientation.getYOffset();
         int sz = this.pos.getZ() + this.orientation.getZOffset();
@@ -468,15 +466,17 @@ public class TileArcaneBore extends TileThaumcraft implements ITickable, IInvent
             double px = this.digX + this.world.rand.nextFloat();
             double py = this.digY + this.world.rand.nextFloat();
             double pz = this.digZ + this.world.rand.nextFloat();
-            this.world.spawnParticle(
-                    EnumParticleTypes.BLOCK_CRACK,
+            thaumcraft.common.Thaumcraft.proxy.boreDigFx(
+                    this.world,
                     px,
                     py,
                     pz,
-                    (sx + 0.5 - px) * 0.09,
-                    (sy + 0.5 - py) * 0.09,
-                    (sz + 0.5 - pz) * 0.09,
-                    stateId);
+                    sx + 0.5,
+                    sy + 0.5,
+                    sz + 0.5,
+                    state,
+                    null,
+                    0);
         }
     }
 

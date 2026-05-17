@@ -18,6 +18,7 @@ public class ClientProxyFxStaticGuardTest {
         String renderHandler = readFile("src/main/java/thaumcraft/client/lib/RenderEventHandler.java");
         String particleEngine = readFile("src/main/java/thaumcraft/client/fx/ParticleEngine.java");
         String blockWardFx = readFile("src/main/java/thaumcraft/client/fx/other/FXBlockWard.java");
+        String boreFx = readFile("src/main/java/thaumcraft/client/fx/particles/FXBoreParticles.java");
         String bubbleFx = readFile("src/main/java/thaumcraft/client/fx/particles/FXBubble.java");
         String bubbleAltFx = readFile("src/main/java/thaumcraft/client/fx/particles/FXBubbleAlt.java");
         String sonicFx = readFile("src/main/java/thaumcraft/client/fx/other/FXSonic.java");
@@ -50,6 +51,10 @@ public class ClientProxyFxStaticGuardTest {
                 source.contains("public void slimeJumpFX(") && source.contains("sparkle(x, y, z, 0.7f, 0xAA22FF"));
         assertTrue("ClientProxy must override drawGenericParticles for champion modifier fallback",
                 source.contains("public void drawGenericParticles(") && source.contains("EnumParticleTypes.REDSTONE"));
+        assertTrue("CommonProxy and ClientProxy must keep boreDigFx proxy surface with dedicated client FX routing",
+                commonProxy.contains("public void boreDigFx(World world,")
+                        && source.contains("public void boreDigFx(World world,")
+                        && source.contains("new FXBoreParticles("));
         assertTrue("ClientProxy must override sparkle for firebat/lifter visuals",
                 source.contains("public void sparkle(") && source.contains("EnumParticleTypes.REDSTONE"));
         assertTrue("ClientProxy must override particleCount using client particle settings",
@@ -99,6 +104,11 @@ public class ClientProxyFxStaticGuardTest {
                 blockWardFx.contains("class FXBlockWard extends Particle")
                         && blockWardFx.contains("EnumFacing.random(this.rand)")
                         && blockWardFx.contains("EnumParticleTypes.REDSTONE"));
+        assertTrue("Dedicated FXBoreParticles must keep target-driven bore dig emission baseline",
+                boreFx.contains("class FXBoreParticles extends Particle")
+                        && boreFx.contains("targetX")
+                        && boreFx.contains("EnumParticleTypes.BLOCK_CRACK")
+                        && boreFx.contains("EnumParticleTypes.ITEM_CRACK"));
         assertTrue("Dedicated FXBubble particle must keep froth controls and water-bubble emission baseline",
                 bubbleFx.contains("class FXBubble extends Particle")
                         && bubbleFx.contains("setFroth()")
@@ -155,9 +165,9 @@ public class ClientProxyFxStaticGuardTest {
         assertTrue("PacketFXBlockZap must schedule client task and route through proxy bolt",
                 blockZap.contains("Minecraft.getMinecraft().addScheduledTask")
                         && blockZap.contains("Thaumcraft.proxy.bolt("));
-        assertTrue("PacketFXBlockDig must schedule client task and emit dig particles",
+        assertTrue("PacketFXBlockDig must schedule client task and route dig particles through proxy boreDigFx",
                 blockDig.contains("Minecraft.getMinecraft().addScheduledTask")
-                        && blockDig.contains("EnumParticleTypes.BLOCK_CRACK"));
+                        && blockDig.contains("Thaumcraft.proxy.boreDigFx("));
         assertTrue("PacketFXBlockBubble must schedule client task and route through proxy crucibleBubble surface",
                 blockBubble.contains("Minecraft.getMinecraft().addScheduledTask")
                         && blockBubble.contains("Thaumcraft.proxy.crucibleBubble("));

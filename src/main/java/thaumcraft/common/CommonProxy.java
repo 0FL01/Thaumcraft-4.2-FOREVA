@@ -4,6 +4,8 @@ import javax.annotation.Nullable;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
+import net.minecraft.block.state.IBlockState;
+import net.minecraft.item.Item;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -188,6 +190,14 @@ public class CommonProxy implements IGuiHandler {
                                      double mx, double my, double mz,
                                      float red, float green, float blue, float alpha,
                                      boolean loop, int start, int num, int inc, int age, int delay, float scale) {
+    }
+
+    public void boreDigFx(World world,
+                          double x, double y, double z,
+                          double tx, double ty, double tz,
+                          IBlockState state,
+                          @Nullable Item item,
+                          int meta) {
     }
 
     public void drawVentParticles(World world, double x, double y, double z,

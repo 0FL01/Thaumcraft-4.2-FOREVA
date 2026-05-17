@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.util.HashSet;
 import java.util.Set;
 import javax.annotation.Nullable;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.client.model.ModelBat;
@@ -56,6 +57,7 @@ import thaumcraft.client.fx.bolt.FXLightningBolt;
 import thaumcraft.client.fx.other.FXBlockWard;
 import thaumcraft.client.fx.other.FXShieldRunes;
 import thaumcraft.client.fx.other.FXSonic;
+import thaumcraft.client.fx.particles.FXBoreParticles;
 import thaumcraft.client.fx.particles.FXBubble;
 import thaumcraft.client.fx.particles.FXBubbleAlt;
 import thaumcraft.client.renderers.entity.RenderFallbackBiped;
@@ -847,6 +849,21 @@ public class ClientProxy extends CommonProxy {
                         my + (world.rand.nextFloat() - 0.5f) * 0.01f,
                         mz + (world.rand.nextFloat() - 0.5f) * 0.01f);
             }
+        }
+    }
+
+    @Override
+    public void boreDigFx(World world,
+                          double x, double y, double z,
+                          double tx, double ty, double tz,
+                          IBlockState state,
+                          @Nullable Item item,
+                          int meta) {
+        if (world == null || !world.isRemote) return;
+        if (state != null) {
+            ParticleEngine.addEffect(world, new FXBoreParticles(world, x, y, z, tx, ty, tz, state));
+        } else if (item != null) {
+            ParticleEngine.addEffect(world, new FXBoreParticles(world, x, y, z, tx, ty, tz, item, meta));
         }
     }
 

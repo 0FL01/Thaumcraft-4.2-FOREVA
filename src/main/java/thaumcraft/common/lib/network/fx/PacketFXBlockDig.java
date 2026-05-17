@@ -7,7 +7,6 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
-import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
@@ -83,20 +82,21 @@ public class PacketFXBlockDig extends PacketBase {
                 } catch (Exception ignored) {
                     state = block.getDefaultState();
                 }
-                int stateId = Block.getStateId(state);
                 for (int i = 0; i < amount; i++) {
                     double sx = this.dx + Minecraft.getMinecraft().world.rand.nextFloat();
                     double sy = this.dy + Minecraft.getMinecraft().world.rand.nextFloat();
                     double sz = this.dz + Minecraft.getMinecraft().world.rand.nextFloat();
-                    Minecraft.getMinecraft().world.spawnParticle(
-                            EnumParticleTypes.BLOCK_CRACK,
+                    Thaumcraft.proxy.boreDigFx(
+                            Minecraft.getMinecraft().world,
                             sx,
                             sy,
                             sz,
-                            (tx - sx) * 0.08,
-                            (ty - sy) * 0.08,
-                            (tz - sz) * 0.08,
-                            stateId);
+                            tx,
+                            ty,
+                            tz,
+                            state,
+                            null,
+                            0);
                 }
                 SoundType sound = state.getBlock().getSoundType(state, Minecraft.getMinecraft().world, new BlockPos(this.x, this.y, this.z), null);
                 Minecraft.getMinecraft().world.playSound(
@@ -116,15 +116,16 @@ public class PacketFXBlockDig extends PacketBase {
                 double sx = this.dx + Minecraft.getMinecraft().world.rand.nextFloat();
                 double sy = this.dy + Minecraft.getMinecraft().world.rand.nextFloat();
                 double sz = this.dz + Minecraft.getMinecraft().world.rand.nextFloat();
-                Minecraft.getMinecraft().world.spawnParticle(
-                        EnumParticleTypes.ITEM_CRACK,
+                Thaumcraft.proxy.boreDigFx(
+                        Minecraft.getMinecraft().world,
                         sx,
                         sy,
                         sz,
-                        (tx - sx) * 0.08,
-                        (ty - sy) * 0.08,
-                        (tz - sz) * 0.08,
-                        Item.getIdFromItem(item),
+                        tx,
+                        ty,
+                        tz,
+                        null,
+                        item,
                         this.md);
             }
         });
