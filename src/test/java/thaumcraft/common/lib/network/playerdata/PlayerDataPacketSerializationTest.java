@@ -62,6 +62,10 @@ public class PlayerDataPacketSerializationTest {
         assertEquals(11, runic.getEntityId());
         assertEquals(3, runic.getCharge());
         assertEquals(8, runic.getMax());
+
+        ByteBuf runicWire = Unpooled.buffer();
+        new PacketRunicCharge(11, 3, 8).toBytes(runicWire);
+        assertEquals(8, runicWire.readableBytes());
     }
 
     @Test

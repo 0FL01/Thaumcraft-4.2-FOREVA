@@ -25,15 +25,15 @@ public class PacketRunicCharge extends PacketBase {
     @Override
     public void fromBytes(ByteBuf buf) {
         entityId = buf.readInt();
-        charge = buf.readInt();
-        max = buf.readInt();
+        charge = buf.readShort();
+        max = buf.readShort();
     }
 
     @Override
     public void toBytes(ByteBuf buf) {
         buf.writeInt(entityId);
-        buf.writeInt(charge);
-        buf.writeInt(max);
+        buf.writeShort(charge);
+        buf.writeShort(max);
     }
 
     public int getEntityId() { return entityId; }
@@ -45,8 +45,8 @@ public class PacketRunicCharge extends PacketBase {
     public IMessage onMessage(MessageContext ctx) {
         Minecraft.getMinecraft().addScheduledTask(() -> {
             if (Thaumcraft.instance != null && Thaumcraft.instance.runicEventHandler != null) {
-                Thaumcraft.instance.runicEventHandler.runicCharge.put(entityId, Math.max(0, charge));
-                Thaumcraft.instance.runicEventHandler.runicInfo.put(entityId, new Integer[]{Math.max(0, max), 0, 0, 0, 0});
+                Thaumcraft.instance.runicEventHandler.runicCharge.put(entityId, charge);
+                Thaumcraft.instance.runicEventHandler.runicInfo.put(entityId, new Integer[]{max, 0, 0, 0, 0});
             }
         });
         return null;
