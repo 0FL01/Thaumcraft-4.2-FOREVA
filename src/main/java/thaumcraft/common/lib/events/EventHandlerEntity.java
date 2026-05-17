@@ -51,7 +51,6 @@ import thaumcraft.common.config.ConfigItems;
 import thaumcraft.common.entities.golems.EntityGolemBase;
 import thaumcraft.common.entities.golems.EntityTravelingTrunk;
 import thaumcraft.common.entities.monster.EntityBrainyZombie;
-import thaumcraft.common.entities.monster.EntityGiantBrainyZombie;
 import thaumcraft.common.entities.monster.boss.EntityThaumcraftBoss;
 import thaumcraft.common.entities.monster.mods.ChampionModifier;
 import thaumcraft.common.items.armor.Hover;
@@ -309,28 +308,28 @@ public class EventHandlerEntity {
             }
         }
 
-        if (event.getEntityLiving() instanceof EntityZombie && !(event.getEntityLiving() instanceof EntityBrainyZombie)) {
-            float chance = 0.5f + EnchantmentHelper.getLootingModifier(event.getEntityLiving()) * 0.05f;
-            if (event.getEntityLiving().world.rand.nextFloat() < chance) {
-                event.getDrops().add(new EntityItem(
-                        event.getEntityLiving().world,
-                        event.getEntityLiving().posX,
-                        event.getEntityLiving().posY,
-                        event.getEntityLiving().posZ,
-                        new ItemStack(ConfigItems.itemZombieBrain)
-                ));
-            }
-        }
-
-        if (event.getEntityLiving() instanceof EntityBrainyZombie || event.getEntityLiving() instanceof EntityGiantBrainyZombie) {
-            int count = event.getEntityLiving() instanceof EntityGiantBrainyZombie ? 2 : 1;
+        if (event.getEntityLiving() instanceof EntityZombie
+                && !(event.getEntityLiving() instanceof EntityBrainyZombie)
+                && event.isRecentlyHit()
+                && event.getEntityLiving().world.rand.nextInt(10) - event.getLootingLevel() < 1) {
             event.getDrops().add(new EntityItem(
                     event.getEntityLiving().world,
                     event.getEntityLiving().posX,
-                    event.getEntityLiving().posY,
+                    event.getEntityLiving().posY + event.getEntityLiving().getEyeHeight(),
                     event.getEntityLiving().posZ,
-                    new ItemStack(ConfigItems.itemZombieBrain, count)
+                    new ItemStack(ConfigItems.itemZombieBrain)
             ));
+        }
+
+        if (event.getEntityLiving() instanceof EntityVillager
+                && event.getEntityLiving().world.rand.nextInt(10) - event.getLootingLevel() < 1) {
+                event.getDrops().add(new EntityItem(
+                        event.getEntityLiving().world,
+                        event.getEntityLiving().posX,
+                        event.getEntityLiving().posY + event.getEntityLiving().getEyeHeight(),
+                        event.getEntityLiving().posZ,
+                        new ItemStack(ConfigItems.itemResource, 1, 18)
+                ));
         }
     }
 
