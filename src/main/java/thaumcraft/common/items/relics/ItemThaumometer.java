@@ -1,5 +1,6 @@
 package thaumcraft.common.items.relics;
 
+import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
@@ -118,9 +119,15 @@ public class ItemThaumometer extends Item {
             }
 
             IBlockState state = world.getBlockState(pos);
-            ItemStack target = state.getBlock().getPickBlock(state, hit, world, pos, player);
+            Block block = state.getBlock();
+            int meta = block.getMetaFromState(state);
+            ItemStack target = ItemStack.EMPTY;
+            try {
+                target = block.getPickBlock(state, hit, world, pos, player);
+            } catch (Exception ignored) {
+            }
             if (target == null || target.isEmpty()) {
-                target = BlockUtils.createStackedBlock(state.getBlock(), state.getBlock().getMetaFromState(state));
+                target = BlockUtils.createStackedBlock(block, meta);
             }
             if (!target.isEmpty()) {
                 ScanResult result = new ScanResult((byte)1, Item.getIdFromItem(target.getItem()), target.getMetadata(), null, "");

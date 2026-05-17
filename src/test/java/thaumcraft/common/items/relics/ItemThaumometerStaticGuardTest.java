@@ -29,6 +29,11 @@ public class ItemThaumometerStaticGuardTest {
                 source.contains("if (count <= 5)")
                         && source.contains("ScanManager.completeScan(player, current, \"@\")")
                         && source.contains("PacketHandler.INSTANCE.sendToServer(new PacketScannedToServer(current, player, \"@\"))"));
+        assertTrue("Thaumometer block scan must keep protected pick-block path with fallback stack creation",
+                source.contains("try {")
+                        && source.contains("target = block.getPickBlock(state, hit, world, pos, player);")
+                        && source.contains("} catch (Exception ignored)")
+                        && source.contains("target = BlockUtils.createStackedBlock(block, meta);"));
     }
 
     private static String readFile(String path) throws IOException {
