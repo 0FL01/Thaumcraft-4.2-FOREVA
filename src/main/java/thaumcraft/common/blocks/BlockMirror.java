@@ -8,8 +8,11 @@ import net.minecraft.block.properties.PropertyInteger;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumBlockRenderType;
 import net.minecraft.util.EnumFacing;
@@ -67,10 +70,99 @@ public class BlockMirror extends BlockContainer {
     @Override
     public void breakBlock(World worldIn, BlockPos pos, IBlockState state) {
         TileEntity tile = worldIn.getTileEntity(pos);
-        if (tile instanceof TileMirrorEssentia) {
+        if (tile instanceof TileMirror) {
+            ((TileMirror) tile).invalidateLink();
+        } else if (tile instanceof TileMirrorEssentia) {
             ((TileMirrorEssentia) tile).invalidateLink();
         }
         super.breakBlock(worldIn, pos, state);
+    }
+
+    @Override
+    public void getDrops(NonNullList<ItemStack> drops, IBlockAccess world, BlockPos pos, IBlockState state, int fortune) {
+        int meta = this.getMetaFromState(state);
+        if (meta < 6) {
+            TileEntity tile = world.getTileEntity(pos);
+            ItemStack drop = new ItemStack(this, 1, 0);
+            if (tile instanceof TileMirror) {
+                TileMirror mirror = (TileMirror) tile;
+                if (mirror.linked) {
+                    NBTTagCompound tag = drop.hasTagCompound() ? drop.getTagCompound() : new NBTTagCompound();
+                    tag.setInteger("linkX", mirror.linkX);
+                    tag.setInteger("linkY", mirror.linkY);
+                    tag.setInteger("linkZ", mirror.linkZ);
+                    tag.setInteger("linkDim", mirror.linkDim);
+                    if (world instanceof World) {
+                        tag.setString("dimname", ((World) world).provider.getDimensionType().getName());
+                    }
+                    drop.setTagCompound(tag);
+                    drop.setItemDamage(1);
+                    mirror.invalidateLink();
+                }
+            }
+            drops.add(drop);
+            return;
+        }
+        TileEntity tile = world.getTileEntity(pos);
+        ItemStack drop = new ItemStack(this, 1, 6);
+        if (tile instanceof TileMirrorEssentia) {
+            TileMirrorEssentia mirror = (TileMirrorEssentia) tile;
+            if (mirror.linked) {
+                NBTTagCompound tag = drop.hasTagCompound() ? drop.getTagCompound() : new NBTTagCompound();
+                tag.setInteger("linkX", mirror.linkX);
+                tag.setInteger("linkY", mirror.linkY);
+                tag.setInteger("linkZ", mirror.linkZ);
+                tag.setInteger("linkDim", mirror.linkDim);
+                if (world instanceof World) {
+                    tag.setString("dimname", ((World) world).provider.getDimensionType().getName());
+                }
+                drop.setTagCompound(tag);
+                drop.setItemDamage(7);
+                mirror.invalidateLink();
+            }
+        }
+        drops.add(drop);
+    }
+
+    @Override
+    public void onEntityCollision(World worldIn, BlockPos pos, IBlockState state, Entity entityIn) {
+        if (worldIn.isRemote) {
+            return;
+        }
+        if (state.getValue(TYPE) < 6 && entityIn instanceof EntityItem && !entityIn.isDead && !((EntityItem) entityIn).cannotPickup()) {
+            TileEntity tile = worldIn.getTileEntity(pos);
+            if (tile instanceof TileMirror) {
+                ((TileMirror) tile).transport((EntityItem) entityIn);
+            }
+        }
+    }
+
+    @Override
+    public void neighborChanged(IBlockState state, World worldIn, BlockPos pos, net.minecraft.block.Block blockIn, BlockPos fromPos) {
+        super.neighborChanged(state, worldIn, pos, blockIn, fromPos);
+        if (worldIn.isRemote) {
+            return;
+        }
+        int meta = state.getValue(TYPE);
+        if (!this.isAttachedToSolid(worldIn, pos, meta)) {
+            this.dropBlockAsItem(worldIn, pos, state, 0);
+            worldIn.setBlockToAir(pos);
+        }
+    }
+
+    @Override
+    public boolean canPlaceBlockOnSide(World worldIn, BlockPos pos, EnumFacing side) {
+        return worldIn.isSideSolid(pos.offset(side.getOpposite()), side, false);
+    }
+
+    @Override
+    public boolean canPlaceBlockAt(World worldIn, BlockPos pos) {
+        for (EnumFacing face : EnumFacing.values()) {
+            if (worldIn.isSideSolid(pos.offset(face.getOpposite()), face, false)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     @Nullable
@@ -107,5 +199,14 @@ public class BlockMirror extends BlockContainer {
                                             float hitZ, int meta, EntityLivingBase placer, EnumHand hand) {
         int base = meta >= 6 ? 6 : 0;
         return this.getDefaultState().withProperty(TYPE, base + facing.getIndex());
+    }
+
+    private boolean isAttachedToSolid(World world, BlockPos pos, int meta) {
+        EnumFacing facing = EnumFacing.byIndex(meta % 6);
+        if (facing == null) {
+            return false;
+        }
+        BlockPos support = pos.offset(facing.getOpposite());
+        return world.isSideSolid(support, facing, false);
     }
 }
