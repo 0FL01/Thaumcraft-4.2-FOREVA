@@ -4,6 +4,7 @@ import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.item.EnumAction;
@@ -39,6 +40,10 @@ import thaumcraft.api.wands.StaffRod;
 import thaumcraft.api.wands.WandCap;
 import thaumcraft.api.wands.WandRod;
 import thaumcraft.api.wands.WandTriggerRegistry;
+import thaumcraft.common.config.Config;
+import thaumcraft.common.config.ConfigBlocks;
+import thaumcraft.common.config.ConfigItems;
+import thaumcraft.common.tiles.TileOwned;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -451,6 +456,51 @@ public class ItemWandCasting extends Item implements IArchitect {
 
         if (WandTriggerRegistry.hasTrigger(block, meta)
                 && WandTriggerRegistry.performTrigger(world, stack, player, pos.getX(), pos.getY(), pos.getZ(), sideIndex, block, meta)) {
+            return EnumActionResult.SUCCESS;
+        }
+
+        if (((block == ConfigBlocks.blockWoodenDevice && meta == 2)
+                || (block == ConfigBlocks.blockCosmeticOpaque && meta == 2))
+                && (!Config.wardedStone || (tile instanceof TileOwned && player.getName().equals(((TileOwned) tile).owner)))) {
+            if (!world.isRemote) {
+                if (tile instanceof TileOwned) {
+                    ((TileOwned) tile).safeToRemove = true;
+                }
+                world.spawnEntity(new EntityItem(world,
+                        pos.getX() + 0.5D,
+                        pos.getY() + 0.5D,
+                        pos.getZ() + 0.5D,
+                        new ItemStack(block, 1, meta)));
+                world.playEvent(2001, pos, Block.getStateId(state));
+                world.setBlockToAir(pos);
+            } else {
+                player.swingArm(hand);
+            }
+            return EnumActionResult.SUCCESS;
+        }
+
+        if (block == ConfigBlocks.blockArcaneDoor
+                && (!Config.wardedStone || (tile instanceof TileOwned && player.getName().equals(((TileOwned) tile).owner)))) {
+            if (!world.isRemote) {
+                if (tile instanceof TileOwned) {
+                    ((TileOwned) tile).safeToRemove = true;
+                }
+                TileEntity upperLower = (meta & 8) == 0 ? world.getTileEntity(pos.up()) : world.getTileEntity(pos.down());
+                if (upperLower instanceof TileOwned) {
+                    ((TileOwned) upperLower).safeToRemove = true;
+                }
+                if (Config.wardedStone || (meta & 8) == 0) {
+                    world.spawnEntity(new EntityItem(world,
+                            pos.getX() + 0.5D,
+                            pos.getY() + 0.5D,
+                            pos.getZ() + 0.5D,
+                            new ItemStack(ConfigItems.itemArcaneDoor)));
+                }
+                world.playEvent(2001, pos, Block.getStateId(state));
+                world.setBlockToAir(pos);
+            } else {
+                player.swingArm(hand);
+            }
             return EnumActionResult.SUCCESS;
         }
 
