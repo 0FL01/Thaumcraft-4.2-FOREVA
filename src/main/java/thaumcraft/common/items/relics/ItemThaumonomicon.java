@@ -2,6 +2,7 @@ package thaumcraft.common.items.relics;
 
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.EnumRarity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -19,10 +20,12 @@ import thaumcraft.common.CommonProxy;
 import thaumcraft.common.Thaumcraft;
 import thaumcraft.common.config.Config;
 import thaumcraft.common.lib.CreativeTabThaumcraft;
+import thaumcraft.common.lib.network.PacketHandler;
+import thaumcraft.common.lib.network.playerdata.PacketSyncAspects;
+import thaumcraft.common.lib.network.playerdata.PacketSyncResearch;
 import thaumcraft.common.lib.TCSounds;
 import thaumcraft.common.lib.capabilities.IPlayerKnowledge;
 import thaumcraft.common.lib.capabilities.PlayerKnowledgeProvider;
-import thaumcraft.common.lib.events.EventHandlerEntity;
 import thaumcraft.common.lib.research.ResearchManager;
 
 import javax.annotation.Nullable;
@@ -91,7 +94,7 @@ public class ItemThaumonomicon extends Item {
         } else {
             unlockCompletedResearchSiblings(player);
         }
-        EventHandlerEntity.syncAllData(player);
+        syncResearchAndAspects(player);
     }
 
     private static void unlockAllResearch(EntityPlayer player) {
@@ -129,5 +132,18 @@ public class ItemThaumonomicon extends Item {
             }
             manager.completeAspect(player, aspect, (short) 50);
         }
+    }
+
+    private static void syncResearchAndAspects(EntityPlayer player) {
+        if (!(player instanceof EntityPlayerMP)) {
+            return;
+        }
+        IPlayerKnowledge knowledge = player.getCapability(PlayerKnowledgeProvider.PLAYER_KNOWLEDGE, null);
+        if (knowledge == null) {
+            return;
+        }
+        PacketHandler.INSTANCE.sendTo(new PacketSyncResearch(knowledge.getResearchComplete()), (EntityPlayerMP) player);
+        PacketHandler.INSTANCE.sendTo(new PacketSyncAspects(knowledge.getAspectsDiscovered()), (EntityPlayerMP) player);
+        ResearchManager.updateCache(player.getName(), knowledge);
     }
 }

@@ -25,11 +25,14 @@ public class ItemThaumonomiconStaticGuardTest {
                         && source.contains("unlockAllResearch(player);")
                         && source.contains("unlockAllAspects(player);")
                         && source.contains("unlockCompletedResearchSiblings(player);"));
-        assertTrue("Thaumonomicon must keep sibling completion and full player-data resync",
+        assertTrue("Thaumonomicon must keep sibling completion and targeted research/aspect resync",
+                source.contains("PacketHandler.INSTANCE.sendTo(new PacketSyncResearch(knowledge.getResearchComplete()), (EntityPlayerMP) player);")
+                        && source.contains("PacketHandler.INSTANCE.sendTo(new PacketSyncAspects(knowledge.getAspectsDiscovered()), (EntityPlayerMP) player);")
+                        && source.contains("ResearchManager.updateCache(player.getName(), knowledge);")
+                        &&
                 source.contains("research.siblings == null")
                         && source.contains("ResearchCategories.getResearch(sibling) != null")
-                        && source.contains("ResearchManager.addResearch(player, sibling)")
-                        && source.contains("EventHandlerEntity.syncAllData(player);"));
+                        && source.contains("ResearchManager.addResearch(player, sibling)"));
     }
 
     private static String readFile(String path) throws IOException {
