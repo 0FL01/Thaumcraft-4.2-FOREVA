@@ -20,7 +20,7 @@ public class TileWandPedestalRenderer extends TileEntitySpecialRenderer<TileWand
         ItemStack stack = tile.getStackInSlot(0);
         if (!stack.isEmpty()) {
             float ticks = TileRenderHelper.ticks(tile, partialTicks);
-            float scale = stack.getItem() instanceof ItemBlock ? 1.0F : 0.75F;
+            float scale = stack.getItem() instanceof ItemBlock ? 2.0F : 1.0F;
             GlStateManager.pushMatrix();
             GlStateManager.translate(x + 0.5D, y + 1.15D, z + 0.5D);
             TileRenderHelper.renderFloatingItem(stack.copy(), ticks, 0.0F, scale);
