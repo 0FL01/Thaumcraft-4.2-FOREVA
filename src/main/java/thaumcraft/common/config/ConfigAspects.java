@@ -236,6 +236,35 @@ public class ConfigAspects {
         ThaumcraftApi.registerObjectTag(new ItemStack(ConfigItems.itemResource, 1, 12), new AspectList().add(Aspect.TAINT, 2).add(Aspect.GREED, 1).add(Aspect.HUNGER, 1));
         ThaumcraftApi.registerObjectTag(new ItemStack(ConfigItems.itemResource, 1, 18), new AspectList().add(Aspect.GREED, 1));
         ThaumcraftApi.registerObjectTag(new ItemStack(ConfigItems.itemZombieBrain), new AspectList().add(Aspect.FLESH, 2).add(Aspect.MIND, 4).add(Aspect.UNDEAD, 2));
+
+        ThaumcraftApi.registerObjectTag(new ItemStack(ConfigBlocks.blockTable), new AspectList().add(Aspect.TREE, 4).add(Aspect.CRAFT, 2));
+        ThaumcraftApi.registerObjectTag(new ItemStack(ConfigItems.itemInkwell), new AspectList().add(Aspect.WATER, 1).add(Aspect.DARKNESS, 1).add(Aspect.TOOL, 1));
+        ThaumcraftApi.registerObjectTag(new ItemStack(ConfigItems.itemThaumometer), new AspectList().add(Aspect.SENSES, 3).add(Aspect.METAL, 2).add(Aspect.CRYSTAL, 1).add(Aspect.MAGIC, 1));
+        ThaumcraftApi.registerObjectTag(new ItemStack(ConfigItems.itemBaubleBlanks, 1, 0), new AspectList().add(Aspect.MAGIC, 2).add(Aspect.METAL, 1));
+        ThaumcraftApi.registerObjectTag(new ItemStack(ConfigItems.itemBaubleBlanks, 1, 1), new AspectList().add(Aspect.MAGIC, 2).add(Aspect.GREED, 1));
+        ThaumcraftApi.registerObjectTag(new ItemStack(ConfigItems.itemBaubleBlanks, 1, 2), new AspectList().add(Aspect.MAGIC, 2).add(Aspect.MAN, 1));
+        ThaumcraftApi.registerObjectTag(new ItemStack(ConfigBlocks.blockCosmeticSolid, 1, 4), new AspectList().add(Aspect.METAL, 8).add(Aspect.MAGIC, 2));
+        ThaumcraftApi.registerObjectTag(new ItemStack(ConfigBlocks.blockCosmeticSolid, 1, 5), new AspectList().add(Aspect.FLESH, 4).add(Aspect.LIGHT, 1).add(Aspect.MAGIC, 1));
+
+        ThaumcraftApi.registerObjectTag(new ItemStack(ConfigItems.itemHelmThaumium), new AspectList().add(Aspect.METAL, 10).add(Aspect.ARMOR, 6).add(Aspect.MAGIC, 2));
+        ThaumcraftApi.registerObjectTag(new ItemStack(ConfigItems.itemChestThaumium), new AspectList().add(Aspect.METAL, 14).add(Aspect.ARMOR, 8).add(Aspect.MAGIC, 2));
+        ThaumcraftApi.registerObjectTag(new ItemStack(ConfigItems.itemLegsThaumium), new AspectList().add(Aspect.METAL, 12).add(Aspect.ARMOR, 7).add(Aspect.MAGIC, 2));
+        ThaumcraftApi.registerObjectTag(new ItemStack(ConfigItems.itemBootsThaumium), new AspectList().add(Aspect.METAL, 8).add(Aspect.ARMOR, 5).add(Aspect.MAGIC, 2));
+        ThaumcraftApi.registerObjectTag(new ItemStack(ConfigItems.itemSwordThaumium), new AspectList().add(Aspect.METAL, 8).add(Aspect.WEAPON, 5).add(Aspect.MAGIC, 2));
+        ThaumcraftApi.registerObjectTag(new ItemStack(ConfigItems.itemPickThaumium), new AspectList().add(Aspect.METAL, 8).add(Aspect.TOOL, 5).add(Aspect.MAGIC, 2));
+        ThaumcraftApi.registerObjectTag(new ItemStack(ConfigItems.itemAxeThaumium), new AspectList().add(Aspect.METAL, 8).add(Aspect.TOOL, 5).add(Aspect.MAGIC, 2));
+        ThaumcraftApi.registerObjectTag(new ItemStack(ConfigItems.itemShovelThaumium), new AspectList().add(Aspect.METAL, 6).add(Aspect.TOOL, 4).add(Aspect.MAGIC, 2));
+        ThaumcraftApi.registerObjectTag(new ItemStack(ConfigItems.itemHoeThaumium), new AspectList().add(Aspect.METAL, 6).add(Aspect.TOOL, 4).add(Aspect.MAGIC, 2));
+
+        ThaumcraftApi.registerObjectTag(new ItemStack(ConfigItems.itemHelmVoid), new AspectList().add(Aspect.METAL, 10).add(Aspect.ARMOR, 6).add(Aspect.VOID, 3).add(Aspect.MAGIC, 2));
+        ThaumcraftApi.registerObjectTag(new ItemStack(ConfigItems.itemChestVoid), new AspectList().add(Aspect.METAL, 14).add(Aspect.ARMOR, 8).add(Aspect.VOID, 4).add(Aspect.MAGIC, 2));
+        ThaumcraftApi.registerObjectTag(new ItemStack(ConfigItems.itemLegsVoid), new AspectList().add(Aspect.METAL, 12).add(Aspect.ARMOR, 7).add(Aspect.VOID, 3).add(Aspect.MAGIC, 2));
+        ThaumcraftApi.registerObjectTag(new ItemStack(ConfigItems.itemBootsVoid), new AspectList().add(Aspect.METAL, 8).add(Aspect.ARMOR, 5).add(Aspect.VOID, 2).add(Aspect.MAGIC, 2));
+        ThaumcraftApi.registerObjectTag(new ItemStack(ConfigItems.itemSwordVoid), new AspectList().add(Aspect.METAL, 8).add(Aspect.WEAPON, 5).add(Aspect.VOID, 2).add(Aspect.MAGIC, 2));
+        ThaumcraftApi.registerObjectTag(new ItemStack(ConfigItems.itemPickVoid), new AspectList().add(Aspect.METAL, 8).add(Aspect.TOOL, 5).add(Aspect.VOID, 2).add(Aspect.MAGIC, 2));
+        ThaumcraftApi.registerObjectTag(new ItemStack(ConfigItems.itemAxeVoid), new AspectList().add(Aspect.METAL, 8).add(Aspect.TOOL, 5).add(Aspect.VOID, 2).add(Aspect.MAGIC, 2));
+        ThaumcraftApi.registerObjectTag(new ItemStack(ConfigItems.itemShovelVoid), new AspectList().add(Aspect.METAL, 6).add(Aspect.TOOL, 4).add(Aspect.VOID, 1).add(Aspect.MAGIC, 2));
+        ThaumcraftApi.registerObjectTag(new ItemStack(ConfigItems.itemHoeVoid), new AspectList().add(Aspect.METAL, 6).add(Aspect.TOOL, 4).add(Aspect.VOID, 1).add(Aspect.MAGIC, 2));
     }
 
     private static void registerEntityAspects() {
