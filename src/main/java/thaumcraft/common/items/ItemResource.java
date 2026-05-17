@@ -1,15 +1,21 @@
 package thaumcraft.common.items;
 
+import java.util.List;
+import java.util.Random;
+import javax.annotation.Nullable;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.block.Block;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.SoundEvents;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.potion.PotionEffect;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumFacing;
@@ -17,18 +23,28 @@ import net.minecraft.util.EnumHand;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.text.TextComponentString;
+import net.minecraft.util.text.TextFormatting;
+import net.minecraft.util.text.translation.I18n;
 import net.minecraft.world.World;
+import net.minecraft.client.util.ITooltipFlag;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import thaumcraft.api.aspects.Aspect;
 import thaumcraft.api.aspects.AspectList;
 import thaumcraft.api.aspects.IEssentiaContainerItem;
+import thaumcraft.common.CommonProxy;
+import thaumcraft.common.config.Config;
 import thaumcraft.common.entities.projectile.EntityAlumentum;
 import thaumcraft.common.config.ConfigBlocks;
+import thaumcraft.common.entities.EntityAspectOrb;
 import thaumcraft.common.lib.CreativeTabThaumcraft;
 import thaumcraft.common.lib.capabilities.IPlayerKnowledge;
 import thaumcraft.common.lib.capabilities.PlayerKnowledgeProvider;
 import thaumcraft.common.lib.network.PacketHandler;
 import thaumcraft.common.lib.network.playerdata.PacketAspectPool;
 import thaumcraft.common.lib.research.ResearchManager;
+import thaumcraft.common.lib.utils.InventoryUtils;
 
 public class ItemResource extends Item implements IEssentiaContainerItem {
 
@@ -77,6 +93,71 @@ public class ItemResource extends Item implements IEssentiaContainerItem {
         if (this.isInCreativeTab(tab)) {
             for (int i = 0; i < NAMES.length; i++) {
                 items.add(new ItemStack(this, 1, i));
+            }
+        }
+    }
+
+    @Override
+    public void onUpdate(ItemStack stack, World world, Entity entity, int slot, boolean selected) {
+        super.onUpdate(stack, world, entity, slot, selected);
+
+        if (!world.isRemote && (stack.getItemDamage() == META_TAINT_SLIME || stack.getItemDamage() == META_TAINT_TENDRIL)
+                && entity instanceof EntityLivingBase) {
+            EntityLivingBase living = (EntityLivingBase) entity;
+            if (!living.isEntityUndead()
+                    && Config.potionFluxTaint != null
+                    && !living.isPotionActive(Config.potionFluxTaint)
+                    && world.rand.nextInt(4321) <= stack.getCount()) {
+                living.addPotionEffect(new PotionEffect(Config.potionFluxTaint, 120, 0, false, true));
+                if (entity instanceof EntityPlayer) {
+                    EntityPlayer player = (EntityPlayer) entity;
+                    String text = I18n.translateToLocal("tc.taint_item_poison")
+                            .replace("%s", TextFormatting.DARK_PURPLE + "" + TextFormatting.ITALIC + stack.getDisplayName() + TextFormatting.RESET);
+                    player.sendMessage(new TextComponentString(text));
+                    InventoryUtils.consumeInventoryItem(player, stack.getItem(), stack.getItemDamage());
+                }
+            }
+        } else if (!world.isRemote && stack.getItemDamage() == META_CHARM) {
+            int r = world.rand.nextInt(20000);
+            if (stack.hasTagCompound() && stack.getTagCompound().hasKey("blurb")) {
+                stack.getTagCompound().removeTag("blurb");
+            }
+            if (r < 20) {
+                Aspect aspect = null;
+                switch (world.rand.nextInt(6)) {
+                    case 0:
+                        aspect = Aspect.AIR;
+                        break;
+                    case 1:
+                        aspect = Aspect.EARTH;
+                        break;
+                    case 2:
+                        aspect = Aspect.FIRE;
+                        break;
+                    case 3:
+                        aspect = Aspect.WATER;
+                        break;
+                    case 4:
+                        aspect = Aspect.ORDER;
+                        break;
+                    case 5:
+                        aspect = Aspect.ENTROPY;
+                        break;
+                    default:
+                        break;
+                }
+                if (aspect != null) {
+                    EntityAspectOrb orb = new EntityAspectOrb(world, entity.posX, entity.posY, entity.posZ, aspect, 1);
+                    world.spawnEntity(orb);
+                }
+            } else if (r == 42 && entity instanceof EntityPlayer) {
+                EntityPlayer player = (EntityPlayer) entity;
+                if (!ResearchManager.isResearchComplete(player, "FOCUSPRIMAL")
+                        && !ResearchManager.isResearchComplete(player, "@FOCUSPRIMAL")) {
+                    player.sendMessage(new TextComponentString(
+                            TextFormatting.DARK_PURPLE + "" + TextFormatting.ITALIC + I18n.translateToLocal("tc.primalcharm.trigger")));
+                    ResearchManager.addResearch(player, "@FOCUSPRIMAL");
+                }
             }
         }
     }
@@ -175,7 +256,7 @@ public class ItemResource extends Item implements IEssentiaContainerItem {
         if (itemstack.hasTagCompound()) {
             AspectList aspects = new AspectList();
             aspects.readFromNBT(itemstack.getTagCompound());
-            return aspects;
+            return aspects.size() > 0 ? aspects : null;
         }
         return null;
     }
@@ -191,5 +272,32 @@ public class ItemResource extends Item implements IEssentiaContainerItem {
     @Override
     public int getItemStackLimit(ItemStack stack) {
         return stack.getItemDamage() == META_CHARM ? 1 : super.getItemStackLimit(stack);
+    }
+
+    @SideOnly(Side.CLIENT)
+    @Override
+    public void addInformation(ItemStack stack, @Nullable World worldIn, List<String> tooltip, ITooltipFlag flagIn) {
+        AspectList aspects = this.getAspects(stack);
+        EntityPlayer player = net.minecraft.client.Minecraft.getMinecraft().player;
+        IPlayerKnowledge knowledge = CommonProxy.getPlayerKnowledge(player);
+        if (aspects != null && aspects.size() > 0) {
+            for (Aspect aspect : aspects.getAspectsSorted()) {
+                if (aspect == null) continue;
+                if (knowledge != null && knowledge.hasDiscoveredAspect(aspect)) {
+                    tooltip.add(aspect.getName());
+                } else {
+                    tooltip.add(I18n.translateToLocal("tc.aspect.unknown"));
+                }
+            }
+        }
+
+        if (stack.getItemDamage() == META_CHARM && player != null) {
+            Random rand = new Random(stack.hashCode() + player.ticksExisted / 120);
+            int r = rand.nextInt(200);
+            if (r < 25) {
+                tooltip.add(TextFormatting.GOLD + I18n.translateToLocal("tc.primalcharm." + rand.nextInt(5)));
+            }
+        }
+        super.addInformation(stack, worldIn, tooltip, flagIn);
     }
 }

@@ -14,6 +14,7 @@ public class ItemResourceAlumentumKnowledgeStaticGuardTest {
     @Test
     public void itemResourceShouldKeepAlumentumThrowAndKnowledgeFragmentUseContracts() throws IOException {
         String source = readFile("src/main/java/thaumcraft/common/items/ItemResource.java");
+        String lang = readFile("src/main/resources/assets/thaumcraft/lang/en_us.lang");
 
         assertTrue(source.contains("if (stack.getItemDamage() == META_ALUMENTUM)"));
         assertTrue(source.contains("new EntityAlumentum(world, player)"));
@@ -30,6 +31,22 @@ public class ItemResourceAlumentumKnowledgeStaticGuardTest {
         assertTrue(source.contains("world.mayPlace(ConfigBlocks.blockAiry, pos, false, facing, player)"));
         assertTrue(source.contains("placeBlockAt(stack, player, world, pos, facing, hitX, hitY, hitZ, ConfigBlocks.blockAiry, META_NITOR)"));
         assertTrue(source.contains("return stack.getItemDamage() == META_CHARM ? 1 : super.getItemStackLimit(stack);"));
+        assertTrue(source.contains("stack.getItemDamage() == META_TAINT_SLIME || stack.getItemDamage() == META_TAINT_TENDRIL"));
+        assertTrue(source.contains("new PotionEffect(Config.potionFluxTaint, 120, 0, false, true)"));
+        assertTrue(source.contains("InventoryUtils.consumeInventoryItem(player, stack.getItem(), stack.getItemDamage())"));
+        assertTrue(source.contains("stack.getTagCompound().removeTag(\"blurb\")"));
+        assertTrue(source.contains("new EntityAspectOrb(world, entity.posX, entity.posY, entity.posZ, aspect, 1)"));
+        assertTrue(source.contains("ResearchManager.addResearch(player, \"@FOCUSPRIMAL\")"));
+        assertTrue(source.contains("I18n.translateToLocal(\"tc.primalcharm.trigger\")"));
+        assertTrue(source.contains("I18n.translateToLocal(\"tc.primalcharm.\" + rand.nextInt(5))"));
+        assertTrue(source.contains("return aspects.size() > 0 ? aspects : null;"));
+        assertTrue(lang.contains("tc.taint_item_poison=A dissolving %s has infected you with Taint"));
+        assertTrue(lang.contains("tc.primalcharm.0=It seems to be leaking"));
+        assertTrue(lang.contains("tc.primalcharm.1=You think you hear whispering"));
+        assertTrue(lang.contains("tc.primalcharm.2=It is vibrating violently"));
+        assertTrue(lang.contains("tc.primalcharm.3=It's humming is quite soothing"));
+        assertTrue(lang.contains("tc.primalcharm.4=Wait, did it just flash a seventh color?"));
+        assertTrue(lang.contains("tc.primalcharm.trigger=For a moment strange energies surround the primal charm. They dissipate quickly, but you are left strangely inspired..."));
     }
 
     @Test
