@@ -28,6 +28,7 @@ import thaumcraft.api.wands.WandTriggerRegistry;
 import thaumcraft.api.wands.WandCap;
 import thaumcraft.api.wands.WandRod;
 import thaumcraft.common.Thaumcraft;
+import thaumcraft.common.config.research.ConfigResearch;
 import thaumcraft.common.lib.crafting.ArcaneSceptreRecipe;
 import thaumcraft.common.lib.crafting.ArcaneWandRecipe;
 import thaumcraft.common.lib.crafting.ShapelessNBTOreRecipe;

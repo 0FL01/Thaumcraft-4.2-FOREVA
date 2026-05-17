@@ -1,4 +1,4 @@
-package thaumcraft.common.config;
+package thaumcraft.common.config.research;
 
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
@@ -8,6 +8,8 @@ import thaumcraft.api.aspects.Aspect;
 import thaumcraft.api.aspects.AspectList;
 import thaumcraft.api.research.ResearchItem;
 import thaumcraft.api.research.ResearchPage;
+import thaumcraft.common.config.ConfigBlocks;
+import thaumcraft.common.config.ConfigItems;
 
 final class ConfigResearchGolemancy {
     private ConfigResearchGolemancy() {}

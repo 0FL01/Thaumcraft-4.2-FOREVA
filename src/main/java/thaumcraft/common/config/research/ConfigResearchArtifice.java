@@ -1,4 +1,4 @@
-package thaumcraft.common.config;
+package thaumcraft.common.config.research;
 
 import java.util.ArrayList;
 import net.minecraft.init.Blocks;
@@ -14,6 +14,9 @@ import thaumcraft.api.crafting.IArcaneRecipe;
 import thaumcraft.api.crafting.InfusionRecipe;
 import thaumcraft.api.research.ResearchItem;
 import thaumcraft.api.research.ResearchPage;
+import thaumcraft.common.config.Config;
+import thaumcraft.common.config.ConfigBlocks;
+import thaumcraft.common.config.ConfigItems;
 import thaumcraft.common.lib.crafting.InfusionRunicAugmentRecipe;
 
 final class ConfigResearchArtifice {

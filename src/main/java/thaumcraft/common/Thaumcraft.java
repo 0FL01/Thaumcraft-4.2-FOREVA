@@ -41,7 +41,7 @@ import thaumcraft.common.config.ConfigBlocks;
 import thaumcraft.common.config.ConfigEntities;
 import thaumcraft.common.config.ConfigItems;
 import thaumcraft.common.config.ConfigRecipes;
-import thaumcraft.common.config.ConfigResearch;
+import thaumcraft.common.config.research.ConfigResearch;
 import thaumcraft.common.lib.InternalMethodHandler;
 import thaumcraft.common.lib.capabilities.IPlayerKnowledge;
 import thaumcraft.common.lib.capabilities.PlayerKnowledgeProvider;

@@ -24,7 +24,7 @@ Stage 9-c закрывает только infusion-срез Stage 9: API/кла�
 - PRD и phase acceptance: `docs/PRD.md:5`, `docs/PRD.md:17`, `docs/PRD.md:540`, `docs/PRD.md:545`, `docs/PRD.md:551`.
 - Текущий lifecycle вызывает recipe/research init в post-init: `src/main/java/thaumcraft/common/Thaumcraft.java:186`, `src/main/java/thaumcraft/common/Thaumcraft.java:188`, `src/main/java/thaumcraft/common/Thaumcraft.java:190`.
 - Текущая registration-заглушка: `src/main/java/thaumcraft/common/config/ConfigRecipes.java:5`, `src/main/java/thaumcraft/common/config/ConfigRecipes.java:7`, `src/main/java/thaumcraft/common/config/ConfigRecipes.java:8`.
-- Current research registration baseline with 196+ entries (see Stage9-e.md), напрямую влияющая на recipe gates/pages: `src/main/java/thaumcraft/common/config/ConfigResearch.java:3`, `src/main/java/thaumcraft/common/config/ConfigResearch.java:5`, `src/main/java/thaumcraft/common/config/ConfigResearch.java:6`.
+- Current research registration baseline with 196+ entries (see Stage9-e.md), напрямую влияющая на recipe gates/pages: `src/main/java/thaumcraft/common/config/research/ConfigResearch.java:3`, `src/main/java/thaumcraft/common/config/research/ConfigResearch.java:5`, `src/main/java/thaumcraft/common/config/research/ConfigResearch.java:6`.
 - Текущий API регистрации infusion recipes: `src/main/java/thaumcraft/api/ThaumcraftApi.java:90`, `src/main/java/thaumcraft/api/ThaumcraftApi.java:106`, `src/main/java/thaumcraft/api/ThaumcraftApi.java:115`, `src/main/java/thaumcraft/api/ThaumcraftApi.java:121`, `src/main/java/thaumcraft/api/ThaumcraftApi.java:318`, `src/main/java/thaumcraft/api/ThaumcraftApi.java:323`.
 - Текущие recipe classes: `src/main/java/thaumcraft/api/crafting/InfusionRecipe.java:11`, `src/main/java/thaumcraft/api/crafting/InfusionRecipe.java:28`, `src/main/java/thaumcraft/api/crafting/InfusionRecipe.java:64`, `src/main/java/thaumcraft/api/crafting/InfusionEnchantmentRecipe.java:14`, `src/main/java/thaumcraft/api/crafting/InfusionEnchantmentRecipe.java:31`, `src/main/java/thaumcraft/api/crafting/InfusionEnchantmentRecipe.java:107`.
 - Текущий crafting manager lookup: `src/main/java/thaumcraft/common/lib/crafting/ThaumcraftCraftingManager.java:302`, `src/main/java/thaumcraft/common/lib/crafting/ThaumcraftCraftingManager.java:442`, `src/main/java/thaumcraft/common/lib/crafting/ThaumcraftCraftingManager.java:452`.
@@ -190,9 +190,9 @@ This depends on the current runic armor implementation and hardening/final-charg
 **Критичность:** high
 
 **Текущая реализация:**
-- `src/main/java/thaumcraft/common/config/ConfigResearch.java:3`
-- `src/main/java/thaumcraft/common/config/ConfigResearch.java:5`
-- `src/main/java/thaumcraft/common/config/ConfigResearch.java:6`
+- `src/main/java/thaumcraft/common/config/research/ConfigResearch.java:3`
+- `src/main/java/thaumcraft/common/config/research/ConfigResearch.java:5`
+- `src/main/java/thaumcraft/common/config/research/ConfigResearch.java:6`
 - `src/main/java/thaumcraft/api/research/ResearchPage.java:84`
 - `src/main/java/thaumcraft/api/research/ResearchPage.java:90`
 

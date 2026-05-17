@@ -1,4 +1,4 @@
-package thaumcraft.common.config;
+package thaumcraft.common.config.research;
 
 import java.util.ArrayList;
 import net.minecraft.nbt.NBTTagByte;
@@ -13,6 +13,9 @@ import thaumcraft.api.research.ResearchItem;
 import thaumcraft.api.research.ResearchPage;
 import thaumcraft.api.wands.WandCap;
 import thaumcraft.api.wands.WandRod;
+import thaumcraft.common.config.Config;
+import thaumcraft.common.config.ConfigBlocks;
+import thaumcraft.common.config.ConfigItems;
 import thaumcraft.common.items.wands.ItemWandCasting;
 
 final class ConfigResearchThaumaturgy {

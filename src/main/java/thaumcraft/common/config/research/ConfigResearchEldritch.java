@@ -1,4 +1,4 @@
-package thaumcraft.common.config;
+package thaumcraft.common.config.research;
 
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
@@ -7,6 +7,8 @@ import thaumcraft.api.aspects.Aspect;
 import thaumcraft.api.aspects.AspectList;
 import thaumcraft.api.research.ResearchItem;
 import thaumcraft.api.research.ResearchPage;
+import thaumcraft.common.config.ConfigBlocks;
+import thaumcraft.common.config.ConfigItems;
 
 final class ConfigResearchEldritch {
     private ConfigResearchEldritch() {}

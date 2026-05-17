@@ -68,7 +68,7 @@ public class ConfigResearchAspectTriggerCoverageTest {
     }
 
     private static String readConfigResearchFamily() throws IOException {
-        Path configDir = Paths.get("src/main/java/thaumcraft/common/config");
+        Path configDir = Paths.get("src/main/java/thaumcraft/common/config/research");
         try (Stream<Path> stream = Files.list(configDir)) {
             return stream
                     .filter(Files::isRegularFile)

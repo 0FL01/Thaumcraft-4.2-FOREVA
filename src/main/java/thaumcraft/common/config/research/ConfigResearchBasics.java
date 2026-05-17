@@ -1,8 +1,8 @@
-package thaumcraft.common.config;
+package thaumcraft.common.config.research;
 
-import static thaumcraft.common.config.ConfigResearch.recipeArcane;
-import static thaumcraft.common.config.ConfigResearch.recipeI;
-import static thaumcraft.common.config.ConfigResearch.recipeList;
+import static thaumcraft.common.config.research.ConfigResearch.recipeArcane;
+import static thaumcraft.common.config.research.ConfigResearch.recipeI;
+import static thaumcraft.common.config.research.ConfigResearch.recipeList;
 
 import java.util.ArrayList;
 import net.minecraft.item.ItemStack;
@@ -13,6 +13,8 @@ import thaumcraft.api.aspects.Aspect;
 import thaumcraft.api.aspects.AspectList;
 import thaumcraft.api.research.ResearchItem;
 import thaumcraft.api.research.ResearchPage;
+import thaumcraft.common.config.ConfigBlocks;
+import thaumcraft.common.config.ConfigItems;
 
 final class ConfigResearchBasics {
     private ConfigResearchBasics() {}

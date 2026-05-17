@@ -13,7 +13,7 @@ public class ConfigResearchStrictRecipeLookupStaticGuardTest {
 
     @Test
     public void configResearchInitShouldEnableStrictRecipeHandleLookups() throws IOException {
-        String source = readFile("src/main/java/thaumcraft/common/config/ConfigResearch.java");
+        String source = readFile("src/main/java/thaumcraft/common/config/research/ConfigResearch.java");
 
         assertTrue("ConfigResearch should keep strict recipe lookup gate state",
                 source.contains("private static boolean strictRecipeLookups = false;"));

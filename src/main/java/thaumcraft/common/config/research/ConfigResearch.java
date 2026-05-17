@@ -1,4 +1,4 @@
-package thaumcraft.common.config;
+package thaumcraft.common.config.research;
 
 import java.util.HashMap;
 import java.util.List;
