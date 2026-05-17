@@ -32,8 +32,12 @@ public class ItemSanityChecker extends Item {
         ItemStack stack = player.getHeldItem(hand);
         if (!world.isRemote) {
             IPlayerKnowledge knowledge = player.getCapability(PlayerKnowledgeProvider.PLAYER_KNOWLEDGE, null);
-            int warp = knowledge == null ? 0 : knowledge.getTotalWarp();
-            player.sendStatusMessage(new TextComponentTranslation("tc.sanity", warp), true);
+            int perm = knowledge == null ? 0 : knowledge.getWarpPerm();
+            int sticky = knowledge == null ? 0 : knowledge.getWarpSticky();
+            int temp = knowledge == null ? 0 : knowledge.getWarpTemp();
+            int total = perm + sticky + temp;
+            player.sendStatusMessage(new TextComponentTranslation("tc.sanity", total), true);
+            player.sendStatusMessage(new TextComponentTranslation("tc.sanity.detail", perm, sticky, temp), true);
         }
         return new ActionResult<>(EnumActionResult.SUCCESS, stack);
     }
