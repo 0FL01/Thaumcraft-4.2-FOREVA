@@ -44,7 +44,7 @@ public class WorldProviderOuter extends WorldProvider {
 
     @Override
     public IChunkGenerator createChunkGenerator() {
-        return new ChunkProviderOuter(this.world, this.world.getSeed(), false);
+        return new ChunkProviderOuter(this.world, this.world.getSeed(), true);
     }
 
     @Override

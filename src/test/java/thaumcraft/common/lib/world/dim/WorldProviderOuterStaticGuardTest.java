@@ -27,6 +27,8 @@ public class WorldProviderOuterStaticGuardTest {
         assertTrue("WorldProviderOuter must keep reference cloud-height baseline",
                 source.contains("public float getCloudHeight()")
                         && source.contains("return 1.0f;"));
+        assertTrue("WorldProviderOuter must keep reference chunk-provider constructor flag contract",
+                source.contains("return new ChunkProviderOuter(this.world, this.world.getSeed(), true);"));
     }
 
     private static String readFile(String path) throws IOException {
