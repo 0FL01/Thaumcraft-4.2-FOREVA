@@ -200,6 +200,13 @@ public class ConfigAspects {
                     new AspectList().add(Aspect.ORDER, 1).add(Aspect.METAL, 5).add(Aspect.EARTH, 1).add(Aspect.ORDER, 2));
         }
 
+        ThaumcraftApi.registerObjectTag("nuggetIron", new AspectList().add(Aspect.METAL, 1));
+        ThaumcraftApi.registerObjectTag("oreIron", new AspectList().add(Aspect.EARTH, 1).add(Aspect.METAL, 3));
+        ThaumcraftApi.registerObjectTag("dustIron", new AspectList().add(Aspect.METAL, 3).add(Aspect.ENTROPY, 1));
+        ThaumcraftApi.registerObjectTag("oreGold", new AspectList().add(Aspect.EARTH, 1).add(Aspect.METAL, 2).add(Aspect.GREED, 1));
+        ThaumcraftApi.registerObjectTag("dustGold", new AspectList().add(Aspect.METAL, 2).add(Aspect.ENTROPY, 1).add(Aspect.GREED, 1));
+        ThaumcraftApi.registerObjectTag("dustGlowstone", new AspectList().add(Aspect.SENSES, 1).add(Aspect.LIGHT, 2));
+
         // Generic ore dictionary registrations
         ThaumcraftApi.registerObjectTag("treeSapling", new AspectList().add(Aspect.PLANT, 2).add(Aspect.TREE, 1));
         ThaumcraftApi.registerObjectTag("treeLeaves", new AspectList().add(Aspect.PLANT, 2).add(Aspect.AIR, 1));
@@ -243,10 +250,25 @@ public class ConfigAspects {
         ThaumcraftApi.registerObjectTag(new ItemStack(ConfigBlocks.blockCustomOre, 1, 6), new AspectList().add(Aspect.EARTH, 1).add(Aspect.ENTROPY, 3).add(Aspect.CRYSTAL, 2));
         ThaumcraftApi.registerObjectTag(new ItemStack(ConfigBlocks.blockCustomOre, 1, 7), new AspectList().add(Aspect.EARTH, 1).add(Aspect.TRAP, 3).add(Aspect.CRYSTAL, 2));
 
+        ThaumcraftApi.registerObjectTag(new ItemStack(ConfigBlocks.blockTaint, 1, 0), new AspectList().add(Aspect.TREE, 1).add(Aspect.TAINT, 3));
+        ThaumcraftApi.registerObjectTag(new ItemStack(ConfigBlocks.blockTaint, 1, 1), new AspectList().add(Aspect.EARTH, 1).add(Aspect.TAINT, 3));
+        ThaumcraftApi.registerObjectTag(new ItemStack(ConfigBlocks.blockTaintFibres, 1, 0), new AspectList().add(Aspect.LIFE, 1).add(Aspect.TAINT, 2));
+        ThaumcraftApi.registerObjectTag(new ItemStack(ConfigBlocks.blockTaintFibres, 1, 1), new AspectList().add(Aspect.PLANT, 1).add(Aspect.TAINT, 1));
+        ThaumcraftApi.registerObjectTag(new ItemStack(ConfigBlocks.blockTaintFibres, 1, 2), new AspectList().add(Aspect.PLANT, 1).add(Aspect.TAINT, 1));
+        ThaumcraftApi.registerObjectTag(new ItemStack(ConfigBlocks.blockTaintFibres, 1, 3), new AspectList().add(Aspect.BEAST, 1).add(Aspect.PLANT, 1).add(Aspect.TAINT, 2));
+        ThaumcraftApi.registerObjectTag(new ItemStack(ConfigBlocks.blockTaintFibres, 1, 4), new AspectList().add(Aspect.BEAST, 1).add(Aspect.PLANT, 1).add(Aspect.TAINT, 2));
         ThaumcraftApi.registerObjectTag(new ItemStack(ConfigBlocks.blockCosmeticSolid), new AspectList().add(Aspect.EARTH, 4).add(Aspect.DARKNESS, 2).add(Aspect.ELDRITCH, 2));
+        ThaumcraftApi.registerObjectTag(new ItemStack(ConfigBlocks.blockMagicalLog, 1, 0), new AspectList().add(Aspect.TREE, 3).add(Aspect.MAGIC, 1));
+        ThaumcraftApi.registerObjectTag(new ItemStack(ConfigBlocks.blockMagicalLog, 1, 1), new AspectList().add(Aspect.TREE, 3).add(Aspect.MAGIC, 1).add(Aspect.ORDER, 1));
+        ThaumcraftApi.registerObjectTag(new ItemStack(ConfigBlocks.blockMagicalLeaves, 1, 0), new AspectList().add(Aspect.PLANT, 1));
+        ThaumcraftApi.registerObjectTag(new ItemStack(ConfigBlocks.blockMagicalLeaves, 1, 1), new AspectList().add(Aspect.PLANT, 1));
         ThaumcraftApi.registerObjectTag(new ItemStack(ConfigBlocks.blockCosmeticSolid, 1, 6), new AspectList().add(Aspect.EARTH, 1).add(Aspect.MAGIC, 1));
         ThaumcraftApi.registerObjectTag(new ItemStack(ConfigBlocks.blockCosmeticSolid, 1, 7), new AspectList().add(Aspect.EARTH, 1).add(Aspect.MAGIC, 1));
         ThaumcraftApi.registerObjectTag(new ItemStack(ConfigBlocks.blockMetalDevice), new AspectList().add(Aspect.METAL, 4).add(Aspect.CRAFT, 4).add(Aspect.MAGIC, 4));
+        ThaumcraftApi.registerObjectTag(new ItemStack(ConfigBlocks.blockCandle), new AspectList().add(Aspect.LIGHT, 2).add(Aspect.FLESH, 1).add(Aspect.MAGIC, 1));
+        ThaumcraftApi.registerObjectTag(new ItemStack(ConfigBlocks.blockAiry, 1, 2), new AspectList().add(Aspect.LIGHT, 1));
+        ThaumcraftApi.registerObjectTag(new ItemStack(ConfigBlocks.blockAiry, 1, 3), new AspectList().add(Aspect.LIGHT, 1));
+        ThaumcraftApi.registerObjectTag(new ItemStack(ConfigBlocks.blockArcaneFurnace, 1, OreDictionary.WILDCARD_VALUE), new AspectList().add(Aspect.MAGIC, 8).add(Aspect.WATER, 8).add(Aspect.CRAFT, 8));
 
         ThaumcraftApi.registerObjectTag(new ItemStack(ConfigBlocks.blockCustomPlant, 1, 0), new AspectList().add(Aspect.PLANT, 2).add(Aspect.TREE, 1).add(Aspect.MAGIC, 1));
         ThaumcraftApi.registerObjectTag(new ItemStack(ConfigBlocks.blockCustomPlant, 1, 1), new AspectList().add(Aspect.PLANT, 2).add(Aspect.TREE, 1).add(Aspect.MAGIC, 1));
@@ -256,6 +278,10 @@ public class ConfigAspects {
 
         ThaumcraftApi.registerObjectTag(new ItemStack(ConfigItems.itemEssence, 1, 0), new AspectList().add(Aspect.VOID, 1));
         ThaumcraftApi.registerObjectTag(new ItemStack(ConfigItems.itemEssence, 1, 1), new AspectList());
+        ThaumcraftApi.registerObjectTag(new ItemStack(ConfigItems.itemWispEssence, 1, 0), new AspectList().add(Aspect.AURA, 2));
+        ThaumcraftApi.registerObjectTag(new ItemStack(ConfigItems.itemCrystalEssence, 1, 0), new AspectList());
+        ThaumcraftApi.registerObjectTag(new ItemStack(ConfigItems.itemThaumonomicon, 1, OreDictionary.WILDCARD_VALUE),
+                new AspectList().add(Aspect.TREE, 2).add(Aspect.MIND, 4).add(Aspect.MAGIC, 2));
         ThaumcraftApi.registerObjectTag(new ItemStack(ConfigItems.itemResource, 1, 3), new AspectList().add(Aspect.METAL, 3).add(Aspect.POISON, 1).add(Aspect.EXCHANGE, 2));
         ThaumcraftApi.registerObjectTag(new ItemStack(ConfigItems.itemResource, 1, 6), new AspectList().add(Aspect.TRAP, 2).add(Aspect.CRYSTAL, 2));
         ThaumcraftApi.registerObjectTag(new ItemStack(ConfigItems.itemResource, 1, 9), new AspectList().add(Aspect.MIND, 8));

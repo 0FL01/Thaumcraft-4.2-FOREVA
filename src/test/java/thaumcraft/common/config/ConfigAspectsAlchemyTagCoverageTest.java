@@ -27,6 +27,22 @@ public class ConfigAspectsAlchemyTagCoverageTest {
         assertTrue("Missing custom plant alchemy baseline", source.contains("new ItemStack(ConfigBlocks.blockCustomPlant, 1, 2)"));
         assertTrue("Missing essentia baseline", source.contains("new ItemStack(ConfigItems.itemEssence, 1, 0)"));
         assertTrue("Missing zombie brain aspect baseline", source.contains("new ItemStack(ConfigItems.itemZombieBrain)"));
+        assertTrue("Missing candle/arcane furnace alchemy baseline tags",
+                source.contains("new ItemStack(ConfigBlocks.blockCandle)")
+                        && source.contains("new ItemStack(ConfigBlocks.blockArcaneFurnace, 1, OreDictionary.WILDCARD_VALUE)"));
+        assertTrue("Missing taint fibres/magical wood alchemy baseline tags",
+                source.contains("new ItemStack(ConfigBlocks.blockTaintFibres, 1, 0)")
+                        && source.contains("new ItemStack(ConfigBlocks.blockMagicalLog, 1, 0)")
+                        && source.contains("new ItemStack(ConfigBlocks.blockMagicalLeaves, 1, 0)"));
+        assertTrue("Missing alchemy ore-dictionary dust/nugget baselines",
+                source.contains("registerObjectTag(\"dustGlowstone\"")
+                        && source.contains("registerObjectTag(\"nuggetIron\"")
+                        && source.contains("registerObjectTag(\"oreIron\"")
+                        && source.contains("registerObjectTag(\"oreGold\""));
+        assertTrue("Missing thaumic essentia/thaumonomicon support baselines",
+                source.contains("new ItemStack(ConfigItems.itemWispEssence, 1, 0)")
+                        && source.contains("new ItemStack(ConfigItems.itemCrystalEssence, 1, 0)")
+                        && source.contains("new ItemStack(ConfigItems.itemThaumonomicon, 1, OreDictionary.WILDCARD_VALUE)"));
     }
 
     private static String readFile(String path) throws IOException {
