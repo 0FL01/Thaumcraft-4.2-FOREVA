@@ -366,28 +366,31 @@ public class ConfigRecipes {
                 ConfigResearch.recipes.put("JarLabel" + i, recipe);
             }
         }
-        boolean hasArcaneWand = false;
-        boolean hasArcaneSceptre = false;
-        boolean hasRunicAugment = false;
-        for (Object recipe : ThaumcraftApi.getCraftingRecipes()) {
-            if (recipe instanceof ArcaneWandRecipe) {
-                hasArcaneWand = true;
-            } else if (recipe instanceof ArcaneSceptreRecipe) {
-                hasArcaneSceptre = true;
-            }
-            if (recipe instanceof InfusionRunicAugmentRecipe) {
-                hasRunicAugment = true;
-            }
-        }
-        if (!hasArcaneWand) {
+        if (pruneAndCountDynamicRecipe(ArcaneWandRecipe.class) == 0) {
             ThaumcraftApi.getCraftingRecipes().add(new ArcaneWandRecipe());
         }
-        if (!hasArcaneSceptre) {
+        if (pruneAndCountDynamicRecipe(ArcaneSceptreRecipe.class) == 0) {
             ThaumcraftApi.getCraftingRecipes().add(new ArcaneSceptreRecipe());
         }
-        if (!hasRunicAugment) {
+        if (pruneAndCountDynamicRecipe(InfusionRunicAugmentRecipe.class) == 0) {
             ThaumcraftApi.getCraftingRecipes().add(new InfusionRunicAugmentRecipe());
         }
+    }
+
+    private static int pruneAndCountDynamicRecipe(Class<?> recipeClass) {
+        int count = 0;
+        List recipes = ThaumcraftApi.getCraftingRecipes();
+        for (int i = recipes.size() - 1; i >= 0; --i) {
+            Object recipe = recipes.get(i);
+            if (!recipeClass.isInstance(recipe)) {
+                continue;
+            }
+            ++count;
+            if (count > 1) {
+                recipes.remove(i);
+            }
+        }
+        return count;
     }
 
     private static void initializeCrucibleRecipeBaseline() {
