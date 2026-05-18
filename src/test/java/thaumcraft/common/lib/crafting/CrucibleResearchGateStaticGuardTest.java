@@ -21,7 +21,7 @@ public class CrucibleResearchGateStaticGuardTest {
         assertTrue("Crucible matching must keep aspect-count specificity tie-break",
                 managerSource.contains("int result = recipe.aspects.size();"));
         assertTrue("Thaumatorium programming must enforce research completion",
-                containerSource.contains("ResearchManager.isResearchComplete(this.player, recipe.key)"));
+                containerSource.contains("ResearchManager.isResearchComplete(this.player.getName(), recipe.key)"));
     }
 
     private static String readFile(String path) throws IOException {

@@ -75,7 +75,8 @@ public class ContainerThaumatorium extends Container {
         for (Object recipeObject : ThaumcraftApi.getCraftingRecipes()) {
             if (!(recipeObject instanceof CrucibleRecipe)) continue;
             CrucibleRecipe recipe = (CrucibleRecipe) recipeObject;
-            if (this.canProgram(recipe) && recipe.catalystMatches(this.thaumatorium.inputStack)) {
+            if (ResearchManager.isResearchComplete(this.player.getName(), recipe.key)
+                    && recipe.catalystMatches(this.thaumatorium.inputStack)) {
                 this.recipes.add(recipe);
                 continue;
             }
@@ -83,10 +84,6 @@ public class ContainerThaumatorium extends Container {
                 this.recipes.add(recipe);
             }
         }
-    }
-
-    private boolean canProgram(CrucibleRecipe recipe) {
-        return recipe.key == null || recipe.key.isEmpty() || ResearchManager.isResearchComplete(this.player, recipe.key);
     }
 
     @Override
@@ -103,7 +100,7 @@ public class ContainerThaumatorium extends Container {
             found = true;
             break;
         }
-        if (!found && this.thaumatorium.recipeHash.size() < this.thaumatorium.maxRecipes) {
+        if (!found) {
             this.thaumatorium.recipeEssentia.add(recipe.aspects.copy());
             this.thaumatorium.recipePlayer.add(playerIn.getName());
             this.thaumatorium.recipeHash.add(recipe.hash);
