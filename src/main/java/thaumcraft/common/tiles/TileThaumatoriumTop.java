@@ -143,7 +143,7 @@ public class TileThaumatoriumTop extends TileThaumcraft implements ITickable, IA
     public void clear() { if (this.resolveBottom() != null) this.resolveBottom().clear(); }
 
     @Override
-    public String getName() { return this.resolveBottom() == null ? "container.thaumatorium" : this.resolveBottom().getName(); }
+    public String getName() { return this.resolveBottom() == null ? "container.alchemyfurnace" : this.resolveBottom().getName(); }
 
     @Override
     public boolean hasCustomName() { return this.resolveBottom() != null && this.resolveBottom().hasCustomName(); }

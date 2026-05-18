@@ -435,7 +435,7 @@ public class TileThaumatorium extends TileThaumcraft implements ITickable, IAspe
 
     @Override
     public String getName() {
-        return "container.thaumatorium";
+        return "container.alchemyfurnace";
     }
 
     @Override
