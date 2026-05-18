@@ -1,0 +1,23 @@
+{
+  "variants": {
+    "log_axis=y,type=0": { "model": "thaumcraft:blockmagicallog_greatwood" },
+    "log_axis=x,type=0": { "model": "thaumcraft:blockmagicallog_greatwood", "x": 90, "y": 90 },
+    "log_axis=z,type=0": { "model": "thaumcraft:blockmagicallog_greatwood", "x": 90 },
+    "log_axis=none,type=0": { "model": "thaumcraft:blockmagicallog_greatwood_bark" },
+
+    "log_axis=y,type=1": { "model": "thaumcraft:blockmagicallog_greatwood" },
+    "log_axis=x,type=1": { "model": "thaumcraft:blockmagicallog_greatwood", "x": 90, "y": 90 },
+    "log_axis=z,type=1": { "model": "thaumcraft:blockmagicallog_greatwood", "x": 90 },
+    "log_axis=none,type=1": { "model": "thaumcraft:blockmagicallog_greatwood_bark" },
+
+    "log_axis=y,type=2": { "model": "thaumcraft:blockmagicallog_silverwood_knot" },
+    "log_axis=x,type=2": { "model": "thaumcraft:blockmagicallog_silverwood_knot", "x": 90, "y": 90 },
+    "log_axis=z,type=2": { "model": "thaumcraft:blockmagicallog_silverwood_knot", "x": 90 },
+    "log_axis=none,type=2": { "model": "thaumcraft:blockmagicallog_silverwood_knot_bark" },
+
+    "log_axis=y,type=3": { "model": "thaumcraft:blockmagicallog_silverwood" },
+    "log_axis=x,type=3": { "model": "thaumcraft:blockmagicallog_silverwood", "x": 90, "y": 90 },
+    "log_axis=z,type=3": { "model": "thaumcraft:blockmagicallog_silverwood", "x": 90 },
+    "log_axis=none,type=3": { "model": "thaumcraft:blockmagicallog_silverwood_bark" }
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "variants": {
+    "type=0": { "model": "thaumcraft:blocktaintfibres_0" },
+    "type=1": { "model": "thaumcraft:blocktaintfibres_1" },
+    "type=2": { "model": "thaumcraft:blocktaintfibres_2" },
+    "type=3": { "model": "thaumcraft:blocktaintfibres_3" },
+    "type=4": { "model": "thaumcraft:blocktaintfibres_4" }
+  }
+}

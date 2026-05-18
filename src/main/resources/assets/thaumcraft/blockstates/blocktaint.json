@@ -1,0 +1,7 @@
+{
+  "variants": {
+    "type=0": { "model": "thaumcraft:blocktaint_0" },
+    "type=1": { "model": "thaumcraft:blocktaint_1" },
+    "type=2": { "model": "thaumcraft:blocktaint_2" }
+  }
+}

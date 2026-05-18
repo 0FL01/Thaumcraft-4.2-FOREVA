@@ -1,0 +1,8 @@
+{
+  "parent": "block/cube_bottom_top",
+  "textures": {
+    "side": "thaumcraft:blocks/amberblock",
+    "bottom": "thaumcraft:blocks/amberblock_top",
+    "top": "thaumcraft:blocks/amberblock_top"
+  }
+}

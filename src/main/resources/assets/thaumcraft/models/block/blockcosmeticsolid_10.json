@@ -1,0 +1,7 @@
+{
+  "parent": "block/cube_column",
+  "textures": {
+    "side": "thaumcraft:blocks/golem_stone_side",
+    "end": "thaumcraft:blocks/golem_stone_top_active"
+  }
+}

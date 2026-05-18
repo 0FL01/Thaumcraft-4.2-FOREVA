@@ -1,0 +1,6 @@
+{
+  "parent": "block/cross",
+  "textures": {
+    "cross": "thaumcraft:blocks/manapod_stem_2"
+  }
+}

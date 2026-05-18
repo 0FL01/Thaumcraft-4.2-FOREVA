@@ -1,0 +1,17 @@
+{
+  "variants": {
+    "type=0": { "model": "thaumcraft:blockairy" },
+    "type=1": { "model": "thaumcraft:blockairy" },
+    "type=2": { "model": "thaumcraft:blockairy" },
+    "type=3": { "model": "thaumcraft:blockairy" },
+    "type=4": { "model": "thaumcraft:blockairy" },
+    "type=5": { "model": "thaumcraft:blockairy" },
+    "type=6": { "model": "thaumcraft:blockairy" },
+    "type=7": { "model": "thaumcraft:blockairy" },
+    "type=8": { "model": "thaumcraft:blockairy" },
+    "type=9": { "model": "thaumcraft:blockairy" },
+    "type=10": { "model": "thaumcraft:blockairy" },
+    "type=11": { "model": "thaumcraft:blockairy" },
+    "type=12": { "model": "thaumcraft:blockairy" }
+  }
+}

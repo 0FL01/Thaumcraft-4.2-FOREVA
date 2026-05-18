@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "type=0": { "model": "thaumcraft:blockcustomplant_0" },
+    "type=1": { "model": "thaumcraft:blockcustomplant_1" },
+    "type=2": { "model": "thaumcraft:blockcustomplant_2" },
+    "type=3": { "model": "thaumcraft:blockcustomplant_3" },
+    "type=4": { "model": "thaumcraft:blockcustomplant_4" },
+    "type=5": { "model": "thaumcraft:blockcustomplant_5" }
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "variants": {
+    "type=0": { "model": "thaumcraft:blockcosmeticopaque_0" },
+    "type=1": { "model": "thaumcraft:blockcosmeticopaque_1" },
+    "type=2": { "model": "thaumcraft:blockcosmeticopaque_2" },
+    "type=3": { "model": "thaumcraft:blockcosmeticopaque_3" },
+    "type=4": { "model": "thaumcraft:blockcosmeticopaque_4" }
+  }
+}

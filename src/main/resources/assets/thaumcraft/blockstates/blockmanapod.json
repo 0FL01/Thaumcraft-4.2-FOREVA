@@ -1,0 +1,12 @@
+{
+  "variants": {
+    "type=0": { "model": "thaumcraft:blockmanapod_0" },
+    "type=1": { "model": "thaumcraft:blockmanapod_0" },
+    "type=2": { "model": "thaumcraft:blockmanapod_1" },
+    "type=3": { "model": "thaumcraft:blockmanapod_1" },
+    "type=4": { "model": "thaumcraft:blockmanapod_2" },
+    "type=5": { "model": "thaumcraft:blockmanapod_2" },
+    "type=6": { "model": "thaumcraft:blockmanapod_2" },
+    "type=7": { "model": "thaumcraft:blockmanapod_2" }
+  }
+}
