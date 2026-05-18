@@ -31,7 +31,7 @@ public class TileHoleRenderer extends TileEntitySpecialRenderer<TileHole> {
 
         Entity viewer = Minecraft.getMinecraft().getRenderViewEntity();
         boolean inRange = viewer != null && tile.getPos().distanceSq(viewer.posX, viewer.posY, viewer.posZ) < 512.0D;
-        float time = (tile.getWorld().getTotalWorldTime() + partialTicks) / 20.0F;
+        float time = (float) (System.currentTimeMillis() % 700000L) / 250000.0F;
 
         GlStateManager.pushMatrix();
         GlStateManager.translate(x, y, z);
@@ -74,26 +74,37 @@ public class TileHoleRenderer extends TileEntitySpecialRenderer<TileHole> {
         for (int i = 0; i < 16; i++) {
             float layer = 16.0F - i;
             float brightnessScale = 1.0F / (layer + 1.0F);
-            float uvScale = i == 0 ? 0.125F : (i == 1 ? 0.5F : 0.0625F);
-            float uvShift = (time / (i == 0 ? 2.5F : 1.25F)) + i * 0.11F;
+            float uvScale = 0.0625F;
+            float shade = brightnessScale;
+            float uvShift = time + (float) (i * i * 4321 + i * 9) * 2.0F / 360.0F;
             float offset = face.getAxisDirection() == EnumFacing.AxisDirection.POSITIVE
                     ? OFFSET_FAR - i * 0.00035F
                     : OFFSET_NEAR + i * 0.00035F;
 
             if (i == 0) {
                 bindTexture(TUNNEL);
+                uvScale = 0.125F;
+                shade = 0.1F;
                 GlStateManager.enableBlend();
                 GlStateManager.blendFunc(770, 771);
+            } else if (i == 1) {
+                bindTexture(PARTICLE_FIELD);
+                uvScale = 0.5F;
+                GlStateManager.enableBlend();
+                GlStateManager.blendFunc(1, 1);
             } else {
                 bindTexture(PARTICLE_FIELD);
                 GlStateManager.enableBlend();
-                GlStateManager.blendFunc(1, 1);
+                GlStateManager.blendFunc(770, 771);
             }
 
-            float r = i == 0 ? 1.0F : (random.nextFloat() * 0.5F + 0.1F) * brightnessScale;
-            float g = i == 0 ? 1.0F : (random.nextFloat() * 0.5F + 0.4F) * brightnessScale;
-            float b = i == 0 ? 1.0F : (random.nextFloat() * 0.5F + 0.5F) * brightnessScale;
+            float r = i == 0 ? 1.0F : (random.nextFloat() * 0.5F + 0.1F);
+            float g = i == 0 ? 1.0F : (random.nextFloat() * 0.5F + 0.4F);
+            float b = i == 0 ? 1.0F : (random.nextFloat() * 0.5F + 0.5F);
             float a = i == 0 ? 0.9F : 0.35F;
+            r *= shade;
+            g *= shade;
+            b *= shade;
 
             drawFace(face, offset, r, g, b, a, uvShift, uvShift, uvScale, uvScale);
         }

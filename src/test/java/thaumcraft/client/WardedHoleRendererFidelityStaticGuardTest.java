@@ -18,6 +18,8 @@ public class WardedHoleRendererFidelityStaticGuardTest {
 
         assertTrue("TileWardedRenderer should keep warded connected-texture matrix routing",
                 warded.contains("CONNECTED_TEXTURE_REF_BY_ID")
+                        && warded.contains("ICON_CACHE")
+                        && warded.contains("(worldTime + side) % 10L != 0L")
                         && warded.contains("warded_glass_")
                         && warded.contains("face.getOpposite().getIndex()")
                         && warded.contains("isConnectedBlock(")

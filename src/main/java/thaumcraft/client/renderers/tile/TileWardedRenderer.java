@@ -1,5 +1,8 @@
 package thaumcraft.client.renderers.tile;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BufferBuilder;
@@ -26,6 +29,7 @@ public class TileWardedRenderer extends TileEntitySpecialRenderer<TileWarded> {
     private static final float Y_MIN = -0.001F;
     private static final float Y_MAX = 1.001F;
     private static final ResourceLocation[] WARDED_GLASS = new ResourceLocation[47];
+    private static final Map<CacheKey, ResourceLocation> ICON_CACHE = new HashMap<>();
     private static final int[] CONNECTED_TEXTURE_REF_BY_ID = new int[]{
             0, 0, 6, 6, 0, 0, 6, 6, 3, 3, 19, 15, 3, 3, 19, 15, 1, 1, 18, 18, 1, 1, 13, 13, 2, 2, 23, 31, 2, 2, 27, 14,
             0, 0, 6, 6, 0, 0, 6, 6, 3, 3, 19, 15, 3, 3, 19, 15, 1, 1, 18, 18, 1, 1, 13, 13, 2, 2, 23, 31, 2, 2, 27, 14,
@@ -71,7 +75,11 @@ public class TileWardedRenderer extends TileEntitySpecialRenderer<TileWarded> {
         Tessellator tess = Tessellator.getInstance();
         for (EnumFacing face : EnumFacing.VALUES) {
             if (shouldRenderFace(tile, face)) {
-                ResourceLocation texture = getTextureOnSide(tile.getPos(), face.getOpposite().getIndex(), tile.owner);
+                ResourceLocation texture = getTextureOnSide(
+                        tile.getPos(),
+                        face.getOpposite().getIndex(),
+                        tile.owner,
+                        tile.getWorld().getTotalWorldTime());
                 bindTexture(texture);
 
                 BufferBuilder buf = tess.getBuffer();
@@ -117,7 +125,13 @@ public class TileWardedRenderer extends TileEntitySpecialRenderer<TileWarded> {
         return true;
     }
 
-    private ResourceLocation getTextureOnSide(BlockPos pos, int side, int owner) {
+    private ResourceLocation getTextureOnSide(BlockPos pos, int side, int owner, long worldTime) {
+        CacheKey key = new CacheKey(pos.getX(), pos.getY(), pos.getZ(), side, owner);
+        ResourceLocation cached = ICON_CACHE.get(key);
+        if (cached != null && (worldTime + side) % 10L != 0L) {
+            return cached;
+        }
+
         boolean[] bitMatrix = new boolean[8];
         int x = pos.getX();
         int y = pos.getY();
@@ -159,14 +173,18 @@ public class TileWardedRenderer extends TileEntitySpecialRenderer<TileWarded> {
             }
         }
         if (idBuilder < 0 || idBuilder >= CONNECTED_TEXTURE_REF_BY_ID.length) {
+            ICON_CACHE.put(key, WARDED_GLASS[0]);
             return WARDED_GLASS[0];
         }
 
         int textureIndex = CONNECTED_TEXTURE_REF_BY_ID[idBuilder];
         if (textureIndex < 0 || textureIndex >= WARDED_GLASS.length) {
+            ICON_CACHE.put(key, WARDED_GLASS[0]);
             return WARDED_GLASS[0];
         }
-        return WARDED_GLASS[textureIndex];
+        ResourceLocation resolved = WARDED_GLASS[textureIndex];
+        ICON_CACHE.put(key, resolved);
+        return resolved;
     }
 
     private boolean isConnectedBlock(int x, int y, int z, int owner) {
@@ -229,5 +247,42 @@ public class TileWardedRenderer extends TileEntitySpecialRenderer<TileWarded> {
     private static void v(BufferBuilder buf, float x, float y, float z,
                           float u, float v, float r, float g, float b, float a) {
         buf.pos(x, y, z).tex(u, v).color(r, g, b, a).endVertex();
+    }
+
+    private static final class CacheKey {
+        private final int x;
+        private final int y;
+        private final int z;
+        private final int side;
+        private final int owner;
+
+        private CacheKey(int x, int y, int z, int side, int owner) {
+            this.x = x;
+            this.y = y;
+            this.z = z;
+            this.side = side;
+            this.owner = owner;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) {
+                return true;
+            }
+            if (!(o instanceof CacheKey)) {
+                return false;
+            }
+            CacheKey cacheKey = (CacheKey) o;
+            return x == cacheKey.x
+                    && y == cacheKey.y
+                    && z == cacheKey.z
+                    && side == cacheKey.side
+                    && owner == cacheKey.owner;
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(x, y, z, side, owner);
+        }
     }
 }
