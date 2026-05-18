@@ -3,8 +3,8 @@ package thaumcraft.common.blocks;
 import org.junit.Test;
 
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
 
 import static org.junit.Assert.assertTrue;
@@ -15,6 +15,8 @@ public class BlockMetalDeviceBrainboxContractTest {
     public void blockMetalDeviceAndConfigBlocksWireBrainboxMetadataAndTileRegistration() throws IOException {
         String metalDevice = readFile("src/main/java/thaumcraft/common/blocks/BlockMetalDevice.java");
         String configBlocks = readFile("src/main/java/thaumcraft/common/config/ConfigBlocks.java");
+        String metalDeviceBlockstate = readFile("src/main/resources/assets/thaumcraft/blockstates/blockmetaldevice.json");
+        String metalDeviceBrainboxModel = readFile("src/main/resources/assets/thaumcraft/models/block/blockmetaldevice_12.json");
 
         assertTrue("BlockMetalDevice must create TileBrainbox for metadata 12",
                 metalDevice.contains("if (meta == 12) return new TileBrainbox();"));
@@ -24,6 +26,13 @@ public class BlockMetalDeviceBrainboxContractTest {
                 metalDevice.contains("if (worldIn.isRemote || state.getValue(TYPE) != 12) return;"));
         assertTrue("ConfigBlocks must register TileBrainbox tile entity",
                 configBlocks.contains("new TileRegistration(TileBrainbox.class, \"TileBrainbox\")"));
+        assertTrue("blockmetaldevice blockstate must map metadata 12 to dedicated brainbox model",
+                metalDeviceBlockstate.contains("\"type=12\": { \"model\": \"thaumcraft:blockmetaldevice_12\" }"));
+        assertTrue("Dedicated brainbox model must point to the brainbox texture",
+                metalDeviceBrainboxModel.contains("\"parent\": \"block/cube_all\"")
+                        && metalDeviceBrainboxModel.contains("\"all\": \"thaumcraft:blocks/brainbox\""));
+        assertTrue("Brainbox texture asset must exist in the port resource tree",
+                Files.exists(Paths.get("src/main/resources/assets/thaumcraft/textures/blocks/brainbox.png")));
     }
 
     private static String readFile(String path) throws IOException {

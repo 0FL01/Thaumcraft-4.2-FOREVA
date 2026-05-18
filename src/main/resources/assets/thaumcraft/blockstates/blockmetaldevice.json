@@ -13,7 +13,7 @@
     "type=3": { "model": "thaumcraft:blockmetaldevice_pedestal" },
     "type=4": { "model": "thaumcraft:blockmetaldevice_pedestal" },
     "type=9": { "model": "thaumcraft:blockmetaldevice_pedestal" },
-    "type=12": { "model": "thaumcraft:blockmetaldevice_pedestal" },
+    "type=12": { "model": "thaumcraft:blockmetaldevice_12" },
     "type=13": { "model": "thaumcraft:blockmetaldevice_pedestal" }
   }
 }
