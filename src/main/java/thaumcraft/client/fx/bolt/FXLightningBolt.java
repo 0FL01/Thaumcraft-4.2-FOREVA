@@ -1,5 +1,6 @@
 package thaumcraft.client.fx.bolt;
 
+import java.util.List;
 import java.util.Random;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.particle.Particle;
@@ -13,6 +14,7 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import thaumcraft.client.fx.WRVector3;
 import org.lwjgl.opengl.GL11;
 
 @SideOnly(Side.CLIENT)
@@ -20,17 +22,21 @@ public class FXLightningBolt extends Particle {
     private static final ResourceLocation LARGE = new ResourceLocation("thaumcraft", "textures/misc/p_large.png");
     private static final ResourceLocation SMALL = new ResourceLocation("thaumcraft", "textures/misc/p_small.png");
 
-    private final double sourceX;
-    private final double sourceY;
-    private final double sourceZ;
-    private final double targetX;
-    private final double targetY;
-    private final double targetZ;
-    private final float red;
-    private final float green;
-    private final float blue;
-    private final int segmentCount;
+    private double sourceX;
+    private double sourceY;
+    private double sourceZ;
+    private double targetX;
+    private double targetY;
+    private double targetZ;
+    private float red;
+    private float green;
+    private float blue;
+    private int segmentCount;
     private final long seed;
+    private FXLightningBoltCommon main;
+    private int type = -1;
+    private boolean useCommonBoltSegments = false;
+    private boolean boltFinalized = false;
     private float width = 0.03F;
 
     public FXLightningBolt(World world, double x, double y, double z,
@@ -53,11 +59,80 @@ public class FXLightningBolt extends Particle {
         this.canCollide = false;
     }
 
+    public FXLightningBolt(World world, double x1, double y1, double z1,
+                           double x2, double y2, double z2,
+                           long seed, int duration, float multi, int speed) {
+        super(world, x1, y1, z1, 0.0D, 0.0D, 0.0D);
+        this.main = new FXLightningBoltCommon(world, x1, y1, z1, x2, y2, z2, seed, duration, multi, speed);
+        this.sourceX = x1;
+        this.sourceY = y1;
+        this.sourceZ = z1;
+        this.targetX = x2;
+        this.targetY = y2;
+        this.targetZ = z2;
+        this.seed = seed;
+        this.segmentCount = Math.max(8, this.main.numsegments0);
+        this.particleMaxAge = Math.max(3, this.main.particleMaxAge);
+        this.red = 1.0F;
+        this.green = 1.0F;
+        this.blue = 1.0F;
+        this.canCollide = false;
+        this.useCommonBoltSegments = true;
+    }
+
+    public void defaultFractal() {
+        if (this.main != null) {
+            this.main.defaultFractal();
+            this.segmentCount = Math.max(8, this.main.numsegments0);
+        }
+    }
+
+    public void fractal(int splits, float amount, float splitchance, float splitlength, float splitangle) {
+        if (this.main != null) {
+            this.main.fractal(splits, amount, splitchance, splitlength, splitangle);
+            this.segmentCount = Math.max(8, this.main.numsegments0);
+        }
+    }
+
+    public void finalizeBolt() {
+        if (this.main != null) {
+            this.main.finalizeBolt();
+            this.boltFinalized = true;
+        }
+    }
+
+    public void setType(int type) {
+        this.type = type;
+        applyTypeColor(type);
+        if (this.main != null) {
+            this.main.type = type;
+        }
+    }
+
+    public void setWidth(float width) {
+        this.width = Math.max(0.005F, width);
+    }
+
+    public void setMultiplier(float multiplier) {
+        if (this.main != null) {
+            this.main.setMultiplier(multiplier);
+        }
+    }
+
     @Override
     public void onUpdate() {
         this.prevPosX = this.posX;
         this.prevPosY = this.posY;
         this.prevPosZ = this.posZ;
+        if (this.main != null && this.useCommonBoltSegments) {
+            this.main.onUpdate();
+            this.particleAge = this.main.particleAge;
+            this.particleMaxAge = Math.max(1, this.main.particleMaxAge);
+            if (this.main.particleAge >= this.main.particleMaxAge) {
+                this.setExpired();
+            }
+            return;
+        }
         if (++this.particleAge >= this.particleMaxAge) {
             this.setExpired();
         }
@@ -70,9 +145,19 @@ public class FXLightningBolt extends Particle {
         float ageNorm = this.particleMaxAge <= 0 ? 1.0F : (this.particleAge + partialTicks) / (float) this.particleMaxAge;
         float alphaMain = Math.max(0.05F, (1.0F - ageNorm) * 0.5F);
 
+        if (this.main != null && this.useCommonBoltSegments && this.boltFinalized) {
+            renderCommonBolt(alphaMain);
+            return;
+        }
+
         Vec3d[] points = buildPath(this.seed + this.particleAge * 31L + (long) this.typeSalt());
         renderPass(points, LARGE, this.width * 1.25F, alphaMain, 1.0F, 1.0F, 1.0F, false);
         renderPass(points, SMALL, this.width, alphaMain, this.red, this.green, this.blue, true);
+    }
+
+    private void renderCommonBolt(float alphaMain) {
+        renderSegmentPass(this.main.segments, LARGE, this.width * 1.25F, alphaMain, 1.0F, 1.0F, 1.0F, false);
+        renderSegmentPass(this.main.segments, SMALL, this.width, alphaMain, this.red, this.green, this.blue, true);
     }
 
     private int typeSalt() {
@@ -152,6 +237,105 @@ public class FXLightningBolt extends Particle {
         GlStateManager.depthMask(true);
         GlStateManager.enableCull();
         GlStateManager.popMatrix();
+    }
+
+    private void renderSegmentPass(List<FXLightningBoltCommon.Segment> segments, ResourceLocation texture, float baseWidth, float alpha,
+                                   float r, float g, float b, boolean additive) {
+        if (segments == null || segments.isEmpty()) return;
+        Tessellator tess = Tessellator.getInstance();
+        BufferBuilder buf = tess.getBuffer();
+        Minecraft.getMinecraft().renderEngine.bindTexture(texture);
+
+        GlStateManager.pushMatrix();
+        GlStateManager.disableCull();
+        GlStateManager.depthMask(false);
+        GlStateManager.enableBlend();
+        GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, additive ? GL11.GL_ONE : GL11.GL_ONE_MINUS_SRC_ALPHA);
+
+        buf.begin(GL11.GL_QUADS, DefaultVertexFormats.PARTICLE_POSITION_TEX_COLOR_LMAP);
+        Vec3d view = Particle.cameraViewDir == null ? new Vec3d(0.0D, 1.0D, 0.0D) : Particle.cameraViewDir;
+
+        for (FXLightningBoltCommon.Segment segment : segments) {
+            WRVector3 start = segment.startpoint.point;
+            WRVector3 end = segment.endpoint.point;
+            Vec3d p1 = new Vec3d(start.x, start.y, start.z);
+            Vec3d p2 = new Vec3d(end.x, end.y, end.z);
+            Vec3d seg = p2.subtract(p1);
+            if (seg.lengthSquared() < 1.0E-6D) {
+                continue;
+            }
+
+            Vec3d n1 = seg.crossProduct(view);
+            if (n1.lengthSquared() < 1.0E-6D) {
+                n1 = seg.crossProduct(new Vec3d(0.0D, 1.0D, 0.0D));
+                if (n1.lengthSquared() < 1.0E-6D) {
+                    n1 = new Vec3d(1.0D, 0.0D, 0.0D);
+                }
+            }
+            n1 = n1.normalize();
+
+            double widthScale = Math.max(0.4D, segment.light);
+            Vec3d offset = n1.scale(baseWidth * widthScale);
+
+            Vec3d a = p1.subtract(offset);
+            Vec3d b0 = p1.add(offset);
+            Vec3d c = p2.add(offset);
+            Vec3d d = p2.subtract(offset);
+
+            float segAlpha = Math.max(0.05F, alpha * segment.light);
+            addVertex(buf, a, 0.0D, 1.0D, r, g, b, segAlpha);
+            addVertex(buf, b0, 0.0D, 0.0D, r, g, b, segAlpha);
+            addVertex(buf, c, 1.0D, 0.0D, r, g, b, segAlpha);
+            addVertex(buf, d, 1.0D, 1.0D, r, g, b, segAlpha);
+        }
+
+        tess.draw();
+        GlStateManager.disableBlend();
+        GlStateManager.depthMask(true);
+        GlStateManager.enableCull();
+        GlStateManager.popMatrix();
+    }
+
+    private void applyTypeColor(int type) {
+        switch (type) {
+            case 0:
+                this.red = 1.0F;
+                this.green = 0.6F;
+                this.blue = 1.0F;
+                break;
+            case 1:
+                this.red = 1.0F;
+                this.green = 1.0F;
+                this.blue = 0.1F;
+                break;
+            case 2:
+                this.red = 0.1F;
+                this.green = 0.1F;
+                this.blue = 1.0F;
+                break;
+            case 3:
+                this.red = 0.1F;
+                this.green = 0.6F;
+                this.blue = 0.1F;
+                break;
+            case 4:
+                this.red = 1.0F;
+                this.green = 0.1F;
+                this.blue = 0.1F;
+                break;
+            case 5:
+                this.red = 0.6F;
+                this.green = 0.2F;
+                this.blue = 0.6F;
+                break;
+            case 6:
+                this.red = 0.75F;
+                this.green = 1.0F;
+                this.blue = 1.0F;
+                break;
+            default:
+                break;
+        }
     }
 
     private static void addVertex(BufferBuilder buf, Vec3d worldPos, double u, double v,
