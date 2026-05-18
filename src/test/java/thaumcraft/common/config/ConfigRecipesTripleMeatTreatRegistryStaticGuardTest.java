@@ -15,11 +15,16 @@ public class ConfigRecipesTripleMeatTreatRegistryStaticGuardTest {
     public void configRecipesRegistersTripleMeatTreatSecretRecipeBaseline() throws IOException {
         String source = ConfigRecipesSourceReader.readMergedSource();
 
-        assertTrue("ConfigRecipes should register triple meat treat shapeless recipe with stable thaumcraft id",
-                source.contains("new ItemStack(ConfigItems.itemTripleMeatTreat)")
-                        && source.contains("new ItemStack(Items.SUGAR)")
-                        && source.contains("new ItemStack(ConfigItems.itemNuggetEdible)")
-                        && source.contains("setRegistryName(\"thaumcraft\", \"triplemeattreat\")"));
+        assertTrue("ConfigRecipes should register all reference triple-meat combination recipes",
+                source.contains("setRegistryName(\"thaumcraft\", \"triplemeattreat_chicken_beef_pork\")")
+                        && source.contains("setRegistryName(\"thaumcraft\", \"triplemeattreat_chicken_beef_fish\")")
+                        && source.contains("setRegistryName(\"thaumcraft\", \"triplemeattreat_chicken_pork_fish\")")
+                        && source.contains("setRegistryName(\"thaumcraft\", \"triplemeattreat_beef_pork_fish\")"));
+        assertTrue("ConfigRecipes triple-meat recipes should consume edible nuggets by type meta",
+                source.contains("new ItemStack(ConfigItems.itemNuggetEdible, 1, 0)")
+                        && source.contains("new ItemStack(ConfigItems.itemNuggetEdible, 1, 1)")
+                        && source.contains("new ItemStack(ConfigItems.itemNuggetEdible, 1, 2)")
+                        && source.contains("new ItemStack(ConfigItems.itemNuggetEdible, 1, 3)"));
     }
 
     private static String readFile(String path) throws IOException {

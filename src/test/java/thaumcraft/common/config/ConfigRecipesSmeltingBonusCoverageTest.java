@@ -38,7 +38,14 @@ public class ConfigRecipesSmeltingBonusCoverageTest {
         assertTrue("Missing raw beef smelting bonus mapping", source.contains("new ItemStack(Items.BEEF)"));
         assertTrue("Missing raw porkchop smelting bonus mapping", source.contains("new ItemStack(Items.PORKCHOP)"));
         assertTrue("Missing raw fish smelting bonus mapping", source.contains("new ItemStack(Items.FISH, 1, OreDictionary.WILDCARD_VALUE)"));
-        assertTrue("Missing edible nugget output baseline mapping", source.contains("new ItemStack(ConfigItems.itemNuggetEdible)"));
+        assertTrue("Missing chicken edible nugget smelting bonus output mapping",
+                source.contains("new ItemStack(ConfigItems.itemNuggetEdible, 1, 0)"));
+        assertTrue("Missing beef edible nugget smelting bonus output mapping",
+                source.contains("new ItemStack(ConfigItems.itemNuggetEdible, 1, 1)"));
+        assertTrue("Missing pork edible nugget smelting bonus output mapping",
+                source.contains("new ItemStack(ConfigItems.itemNuggetEdible, 1, 2)"));
+        assertTrue("Missing fish edible nugget smelting bonus output mapping",
+                source.contains("new ItemStack(ConfigItems.itemNuggetEdible, 1, 3)"));
     }
 
     private static String readFile(String path) throws IOException {

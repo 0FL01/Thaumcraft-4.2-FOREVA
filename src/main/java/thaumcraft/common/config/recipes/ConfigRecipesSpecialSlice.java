@@ -651,15 +651,45 @@ public class ConfigRecipesSpecialSlice {
                 .setRegistryName("thaumcraft", "sugarplant");
         registry.register(recipeSugarFromPlant);
 
-        IRecipe recipeTripleMeatTreat = new ShapelessOreRecipe(
+        IRecipe recipeTripleMeatTreat0 = new ShapelessOreRecipe(
                 null,
                 new ItemStack(ConfigItems.itemTripleMeatTreat),
                 new ItemStack(Items.SUGAR),
-                new ItemStack(ConfigItems.itemNuggetEdible),
-                new ItemStack(ConfigItems.itemNuggetEdible),
-                new ItemStack(ConfigItems.itemNuggetEdible))
-                .setRegistryName("thaumcraft", "triplemeattreat");
-        registry.register(recipeTripleMeatTreat);
+                new ItemStack(ConfigItems.itemNuggetEdible, 1, 0),
+                new ItemStack(ConfigItems.itemNuggetEdible, 1, 1),
+                new ItemStack(ConfigItems.itemNuggetEdible, 1, 2))
+                .setRegistryName("thaumcraft", "triplemeattreat_chicken_beef_pork");
+        registry.register(recipeTripleMeatTreat0);
+
+        IRecipe recipeTripleMeatTreat1 = new ShapelessOreRecipe(
+                null,
+                new ItemStack(ConfigItems.itemTripleMeatTreat),
+                new ItemStack(Items.SUGAR),
+                new ItemStack(ConfigItems.itemNuggetEdible, 1, 0),
+                new ItemStack(ConfigItems.itemNuggetEdible, 1, 1),
+                new ItemStack(ConfigItems.itemNuggetEdible, 1, 3))
+                .setRegistryName("thaumcraft", "triplemeattreat_chicken_beef_fish");
+        registry.register(recipeTripleMeatTreat1);
+
+        IRecipe recipeTripleMeatTreat2 = new ShapelessOreRecipe(
+                null,
+                new ItemStack(ConfigItems.itemTripleMeatTreat),
+                new ItemStack(Items.SUGAR),
+                new ItemStack(ConfigItems.itemNuggetEdible, 1, 0),
+                new ItemStack(ConfigItems.itemNuggetEdible, 1, 2),
+                new ItemStack(ConfigItems.itemNuggetEdible, 1, 3))
+                .setRegistryName("thaumcraft", "triplemeattreat_chicken_pork_fish");
+        registry.register(recipeTripleMeatTreat2);
+
+        IRecipe recipeTripleMeatTreat3 = new ShapelessOreRecipe(
+                null,
+                new ItemStack(ConfigItems.itemTripleMeatTreat),
+                new ItemStack(Items.SUGAR),
+                new ItemStack(ConfigItems.itemNuggetEdible, 1, 1),
+                new ItemStack(ConfigItems.itemNuggetEdible, 1, 2),
+                new ItemStack(ConfigItems.itemNuggetEdible, 1, 3))
+                .setRegistryName("thaumcraft", "triplemeattreat_beef_pork_fish");
+        registry.register(recipeTripleMeatTreat3);
 
         IRecipe recipeCosmeticOpaque0 = new ShapedOreRecipe(
                 null,

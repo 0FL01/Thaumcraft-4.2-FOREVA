@@ -213,7 +213,10 @@ public class ConfigAspects {
         ThaumcraftApi.registerObjectTag(new ItemStack(ConfigItems.itemNugget, 1, 16), new AspectList().add(Aspect.ORDER, 1).add(Aspect.METAL, 6).add(Aspect.EARTH, 1));
         ThaumcraftApi.registerObjectTag(new ItemStack(ConfigItems.itemNugget, 1, 31), new AspectList().add(Aspect.ORDER, 1).add(Aspect.METAL, 4).add(Aspect.EARTH, 1).add(Aspect.GREED, 2));
         ThaumcraftApi.registerObjectTag(new ItemStack(ConfigItems.itemNugget, 1, 21), new AspectList().add(Aspect.ORDER, 1).add(Aspect.METAL, 4).add(Aspect.EARTH, 1).add(Aspect.EXCHANGE, 4).add(Aspect.POISON, 2));
-        ThaumcraftApi.registerObjectTag(new ItemStack(ConfigItems.itemNuggetEdible), new AspectList().add(Aspect.HUNGER, 1));
+        ThaumcraftApi.registerObjectTag(new ItemStack(ConfigItems.itemNuggetEdible, 1, 0), new AspectList().add(Aspect.HUNGER, 1));
+        ThaumcraftApi.registerObjectTag(new ItemStack(ConfigItems.itemNuggetEdible, 1, 1), new AspectList().add(Aspect.HUNGER, 1));
+        ThaumcraftApi.registerObjectTag(new ItemStack(ConfigItems.itemNuggetEdible, 1, 2), new AspectList().add(Aspect.HUNGER, 1));
+        ThaumcraftApi.registerObjectTag(new ItemStack(ConfigItems.itemNuggetEdible, 1, 3), new AspectList().add(Aspect.HUNGER, 1));
 
         ThaumcraftApi.registerObjectTag(new ItemStack(ConfigBlocks.blockCustomOre, 1, 0), new AspectList().add(Aspect.EARTH, 1).add(Aspect.METAL, 2).add(Aspect.EXCHANGE, 2).add(Aspect.POISON, 1));
         ThaumcraftApi.registerObjectTag(new ItemStack(ConfigBlocks.blockCustomOre, 1, 1), new AspectList().add(Aspect.EARTH, 1).add(Aspect.AIR, 3).add(Aspect.CRYSTAL, 2));

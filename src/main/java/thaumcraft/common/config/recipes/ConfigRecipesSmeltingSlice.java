@@ -29,11 +29,12 @@ public final class ConfigRecipesSmeltingSlice {
         ThaumcraftApi.addSmeltingBonus(new ItemStack(ConfigItems.itemNugget, 1, 19), new ItemStack(ConfigItems.itemNugget, 1, 3));
         ThaumcraftApi.addSmeltingBonus(new ItemStack(ConfigItems.itemNugget, 1, 20), new ItemStack(ConfigItems.itemNugget, 1, 4));
 
-        ItemStack edibleNugget = new ItemStack(ConfigItems.itemNuggetEdible);
-        ThaumcraftApi.addSmeltingBonus(new ItemStack(Items.CHICKEN), edibleNugget);
-        ThaumcraftApi.addSmeltingBonus(new ItemStack(Items.BEEF), edibleNugget);
-        ThaumcraftApi.addSmeltingBonus(new ItemStack(Items.PORKCHOP), edibleNugget);
-        ThaumcraftApi.addSmeltingBonus(new ItemStack(Items.FISH, 1, OreDictionary.WILDCARD_VALUE), edibleNugget);
+        ThaumcraftApi.addSmeltingBonus(new ItemStack(Items.CHICKEN), new ItemStack(ConfigItems.itemNuggetEdible, 1, 0));
+        ThaumcraftApi.addSmeltingBonus(new ItemStack(Items.BEEF), new ItemStack(ConfigItems.itemNuggetEdible, 1, 1));
+        ThaumcraftApi.addSmeltingBonus(new ItemStack(Items.PORKCHOP), new ItemStack(ConfigItems.itemNuggetEdible, 1, 2));
+        ThaumcraftApi.addSmeltingBonus(
+                new ItemStack(Items.FISH, 1, OreDictionary.WILDCARD_VALUE),
+                new ItemStack(ConfigItems.itemNuggetEdible, 1, 3));
     }
 
     public static void initializeSmeltingBaseline() {
