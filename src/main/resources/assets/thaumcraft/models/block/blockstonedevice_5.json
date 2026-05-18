@@ -1,0 +1,8 @@
+{
+  "parent": "block/cube_bottom_top",
+  "textures": {
+    "top": "thaumcraft:blocks/wandpedestal_top",
+    "bottom": "thaumcraft:blocks/pedestal_top",
+    "side": "thaumcraft:blocks/wandpedestal_side"
+  }
+}
