@@ -309,10 +309,10 @@ public class ClientProxyFxStaticGuardTest {
                 visDrain.contains("Minecraft.getMinecraft().addScheduledTask")
                         && visDrain.contains("new FXBeam(")
                         && visDrain.contains("ParticleEngine.addEffect("));
-        assertTrue("PacketFXBlockArc must schedule client task and route through dedicated FXArc",
+        assertTrue("PacketFXBlockArc must schedule client task and route through proxy arcLightning",
                 blockArc.contains("Minecraft.getMinecraft().addScheduledTask")
-                        && blockArc.contains("new FXArc(")
-                        && blockArc.contains("ParticleEngine.addEffect("));
+                        && blockArc.contains("Thaumcraft.proxy.arcLightning(")
+                        && blockArc.contains("EntityCultistPortal"));
         assertTrue("PacketFXBlockZap must schedule client task and route through proxy nodeBolt",
                 blockZap.contains("Minecraft.getMinecraft().addScheduledTask")
                         && blockZap.contains("Thaumcraft.proxy.nodeBolt("));

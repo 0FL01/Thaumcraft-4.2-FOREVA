@@ -897,8 +897,6 @@ public class ClientProxy extends CommonProxy {
                              float red, float green, float blue,
                              float height) {
         if (world == null || !world.isRemote) return;
-        sparkle((float) tx, (float) ty, (float) tz, 0.8F,
-                new Color(clampColor(red), clampColor(green), clampColor(blue)).getRGB(), 0.0F);
         ParticleEngine.addEffect(world, new FXArc(world, x, y, z, tx, ty, tz, red, green, blue, height));
     }
 

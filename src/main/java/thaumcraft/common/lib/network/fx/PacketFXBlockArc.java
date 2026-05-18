@@ -7,8 +7,7 @@ import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import thaumcraft.client.fx.ParticleEngine;
-import thaumcraft.client.fx.beams.FXArc;
+import thaumcraft.common.Thaumcraft;
 import thaumcraft.common.entities.monster.boss.EntityCultistPortal;
 import thaumcraft.common.lib.network.PacketBase;
 
@@ -59,16 +58,15 @@ public class PacketFXBlockArc extends PacketBase {
                 green = 0.0F;
                 blue = 0.0F;
             }
-            ParticleEngine.addEffect(Minecraft.getMinecraft().world,
-                    new FXArc(
-                            Minecraft.getMinecraft().world,
-                            source.posX,
-                            source.getEntityBoundingBox().minY + source.height * 0.5,
-                            source.posZ,
-                            this.x + 0.5,
-                            this.y + 1.0,
-                            this.z + 0.5,
-                            red, green, blue, 0.5D));
+            Thaumcraft.proxy.arcLightning(
+                    Minecraft.getMinecraft().world,
+                    source.posX,
+                    source.getEntityBoundingBox().minY + source.height * 0.5,
+                    source.posZ,
+                    this.x + 0.5,
+                    this.y + 1.0,
+                    this.z + 0.5,
+                    red, green, blue, 0.5F);
         });
         return null;
     }
