@@ -4,7 +4,6 @@ import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.client.renderer.block.model.ItemCameraTransforms;
-import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.MathHelper;
 import thaumcraft.common.tiles.TileWandPedestal;
@@ -20,12 +19,10 @@ public class TileWandPedestalRenderer extends TileEntitySpecialRenderer<TileWand
         if (!stack.isEmpty()) {
             float ticks = TileRenderHelper.ticks(tile, partialTicks);
             float bob = MathHelper.sin((ticks % 32767.0F) / 16.0F) * 0.05F;
-            float scale = stack.getItem() instanceof ItemBlock ? 2.0F : 1.0F;
 
             GlStateManager.pushMatrix();
             GlStateManager.translate(x + 0.5D, y + 1.15D + bob, z + 0.5D);
             GlStateManager.rotate(ticks % 360.0F, 0.0F, 1.0F, 0.0F);
-            GlStateManager.scale(scale, scale, scale);
             RenderHelper.enableStandardItemLighting();
             net.minecraft.client.Minecraft.getMinecraft().getRenderItem().renderItem(stack.copy(), ItemCameraTransforms.TransformType.GROUND);
             RenderHelper.disableStandardItemLighting();
