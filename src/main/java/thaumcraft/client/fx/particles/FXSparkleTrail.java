@@ -5,7 +5,6 @@ import net.minecraft.client.particle.Particle;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
@@ -38,6 +37,7 @@ public class FXSparkleTrail extends Particle {
         this.motionY = (this.rand.nextFloat() - this.rand.nextFloat()) * randomSpeed;
         this.motionZ = (this.rand.nextFloat() - this.rand.nextFloat()) * randomSpeed;
         this.particleGravity = 0.2f;
+        this.setParticleTextureIndex(this.particle);
 
         EntityLivingBase renderEntity = Minecraft.getMinecraft().player;
         int visibleDistance = Minecraft.getMinecraft().gameSettings.fancyGraphics ? 64 : 32;
@@ -84,14 +84,17 @@ public class FXSparkleTrail extends Particle {
         this.motionX = MathHelper.clamp(this.motionX, -0.35, 0.35);
         this.motionY = MathHelper.clamp(this.motionY, -0.35, 0.35);
         this.motionZ = MathHelper.clamp(this.motionZ, -0.35, 0.35);
-
-        this.world.spawnParticle(EnumParticleTypes.CRIT_MAGIC, this.posX, this.posY, this.posZ, 0.0, 0.0, 0.0);
-        this.world.spawnParticle(EnumParticleTypes.REDSTONE, this.posX, this.posY, this.posZ, this.particleRed, this.particleGreen, this.particleBlue);
+        this.setParticleTextureIndex(this.particle + (this.particleAge % 16));
     }
 
     @Override
     public void renderParticle(BufferBuilder buffer, Entity entityIn, float partialTicks,
                                float rotationX, float rotationZ, float rotationYZ, float rotationXY, float rotationXZ) {
-        // Emission-style particle: visuals are spawned in onUpdate.
+        super.renderParticle(buffer, entityIn, partialTicks, rotationX, rotationZ, rotationYZ, rotationXY, rotationXZ);
+    }
+
+    @Override
+    public int getBrightnessForRender(float partialTicks) {
+        return 0xF000F0;
     }
 }

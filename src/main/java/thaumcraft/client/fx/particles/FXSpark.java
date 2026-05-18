@@ -3,7 +3,6 @@ package thaumcraft.client.fx.particles;
 import net.minecraft.client.particle.Particle;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.entity.Entity;
-import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -24,6 +23,7 @@ public class FXSpark extends Particle {
         this.setSize(0.01f, 0.01f);
         this.particle = world.rand.nextInt(3) * 8;
         this.flip = world.rand.nextBoolean();
+        this.setParticleTextureIndex(this.particle);
     }
 
     @Override
@@ -41,16 +41,16 @@ public class FXSpark extends Particle {
             this.setExpired();
             return;
         }
-
-        this.world.spawnParticle(EnumParticleTypes.CRIT_MAGIC, this.posX, this.posY, this.posZ, 0.0, 0.0, 0.0);
+        int part = this.particle + (int) ((float) this.particleAge / (float) this.particleMaxAge * 7.0F);
         if (this.flip) {
-            this.world.spawnParticle(EnumParticleTypes.REDSTONE, this.posX, this.posY, this.posZ, 0.8, 0.8, 1.0);
+            part = this.particle + Math.max(0, 7 - (int) ((float) this.particleAge / (float) this.particleMaxAge * 7.0F));
         }
+        this.setParticleTextureIndex(part);
     }
 
     @Override
     public void renderParticle(BufferBuilder buffer, Entity entityIn, float partialTicks,
                                float rotationX, float rotationZ, float rotationYZ, float rotationXY, float rotationXZ) {
-        // Emission-style particle: visuals are spawned in onUpdate.
+        super.renderParticle(buffer, entityIn, partialTicks, rotationX, rotationZ, rotationYZ, rotationXY, rotationXZ);
     }
 }
