@@ -1,16 +1,15 @@
 package thaumcraft.client.renderers.tile;
 
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
+import net.minecraft.client.renderer.block.model.ItemCameraTransforms;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.MathHelper;
 import thaumcraft.common.tiles.TileWandPedestal;
 
 public class TileWandPedestalRenderer extends TileEntitySpecialRenderer<TileWandPedestal> {
-    private static final ResourceLocation WISPY =
-            new ResourceLocation("thaumcraft", "textures/misc/wispy.png");
-
     @Override
     public void render(TileWandPedestal tile, double x, double y, double z, float partialTicks, int destroyStage, float alpha) {
         if (tile == null || tile.getWorld() == null) {
@@ -20,32 +19,34 @@ public class TileWandPedestalRenderer extends TileEntitySpecialRenderer<TileWand
         ItemStack stack = tile.getStackInSlot(0);
         if (!stack.isEmpty()) {
             float ticks = TileRenderHelper.ticks(tile, partialTicks);
+            float bob = MathHelper.sin((ticks % 32767.0F) / 16.0F) * 0.05F;
             float scale = stack.getItem() instanceof ItemBlock ? 2.0F : 1.0F;
+
             GlStateManager.pushMatrix();
-            GlStateManager.translate(x + 0.5D, y + 1.15D, z + 0.5D);
-            TileRenderHelper.renderFloatingItem(stack.copy(), ticks, 0.0F, scale);
+            GlStateManager.translate(x + 0.5D, y + 1.15D + bob, z + 0.5D);
+            GlStateManager.rotate(ticks % 360.0F, 0.0F, 1.0F, 0.0F);
+            GlStateManager.scale(scale, scale, scale);
+            RenderHelper.enableStandardItemLighting();
+            net.minecraft.client.Minecraft.getMinecraft().getRenderItem().renderItem(stack.copy(), ItemCameraTransforms.TransformType.GROUND);
+            RenderHelper.disableStandardItemLighting();
             GlStateManager.popMatrix();
         }
 
-        if (!tile.focus.isEmpty()) {
+        if (!stack.isEmpty() && tile.draining) {
             float ticks = TileRenderHelper.ticks(tile, partialTicks);
-            GlStateManager.pushMatrix();
-            GlStateManager.translate(x + 0.5D, y + 1.40D, z + 0.5D);
-            TileRenderHelper.renderFloatingItem(tile.focus.copy(), ticks + 23.0F, 0.0F, 0.5F);
-            GlStateManager.popMatrix();
-        }
+            float bob = MathHelper.sin((ticks % 32767.0F) / 16.0F) * 0.05F;
+            double sx = x + 0.5D;
+            double sy = y + 1.65D - bob * 2.0F;
+            double sz = z + 0.5D;
+            double ex = x + 0.5D + (tile.drainX - tile.getPos().getX());
+            double ey = y + 0.5D + (tile.drainY - tile.getPos().getY());
+            double ez = z + 0.5D + (tile.drainZ - tile.getPos().getZ());
 
-        if (!stack.isEmpty() && !tile.focus.isEmpty()) {
-            float ticks = TileRenderHelper.ticks(tile, partialTicks);
             GlStateManager.pushMatrix();
-            GlStateManager.translate(x + 0.5D, y + 1.26D, z + 0.5D);
             GlStateManager.disableLighting();
             GlStateManager.enableBlend();
             GlStateManager.blendFunc(770, 1);
-            bindTexture(WISPY);
-            TileRenderHelper.orientBillboardToPlayer();
-            float scale = 0.16F + (float) Math.sin(ticks / 7.0F) * 0.02F;
-            TileRenderHelper.drawTexturedQuad(scale, 0xA0B89DFF, 0.0F, 1.0F, 0.0F, 1.0F);
+            TileRenderHelper.drawAdditiveLine(sx, sy, sz, ex, ey, ez, tile.drainColor, 0.9F, 0.1F, 2.0F);
             GlStateManager.disableBlend();
             GlStateManager.enableLighting();
             GlStateManager.popMatrix();

@@ -82,6 +82,23 @@ final class TileRenderHelper {
         return new Vec3d(r, g, b);
     }
 
+    static void drawAdditiveLine(double sx, double sy, double sz,
+                                 double ex, double ey, double ez,
+                                 int color, float alphaStart, float alphaEnd, float width) {
+        float r = ((color >> 16) & 0xFF) / 255.0F;
+        float g = ((color >> 8) & 0xFF) / 255.0F;
+        float b = (color & 0xFF) / 255.0F;
+
+        GlStateManager.glLineWidth(Math.max(1.0F, width));
+        Tessellator tess = Tessellator.getInstance();
+        BufferBuilder buf = tess.getBuffer();
+        buf.begin(GL11.GL_LINE_STRIP, DefaultVertexFormats.POSITION_COLOR);
+        buf.pos(sx, sy, sz).color(r, g, b, alphaStart).endVertex();
+        buf.pos(ex, ey, ez).color(r, g, b, alphaEnd).endVertex();
+        tess.draw();
+        GlStateManager.glLineWidth(1.0F);
+    }
+
     static float clamp01(float value) {
         return MathHelper.clamp(value, 0.0F, 1.0F);
     }
