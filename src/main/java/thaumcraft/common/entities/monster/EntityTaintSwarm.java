@@ -15,7 +15,6 @@ import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.EntityDataManager;
 import net.minecraft.potion.PotionEffect;
 import net.minecraft.util.DamageSource;
-import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.SoundEvent;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
@@ -125,11 +124,7 @@ public class EntityTaintSwarm extends EntityMob implements ITaintedMob {
             int maxParticles = Math.max(10, Thaumcraft.proxy.particleCount(25));
             if (this.swarm.size() < maxParticles) {
                 this.swarm.add(this.ticksExisted);
-                this.world.spawnParticle(EnumParticleTypes.SPELL_MOB,
-                    this.posX + (this.rand.nextFloat() - this.rand.nextFloat()) * 0.22F,
-                    this.posY + this.height * 0.5F + (this.rand.nextFloat() - this.rand.nextFloat()) * 0.15F,
-                    this.posZ + (this.rand.nextFloat() - this.rand.nextFloat()) * 0.22F,
-                    0.08D, 0.0D, 0.12D);
+                Thaumcraft.proxy.swarmParticleFX(this.world, this, 0.22F, 15.0F, 0.08F);
             }
         }
     }

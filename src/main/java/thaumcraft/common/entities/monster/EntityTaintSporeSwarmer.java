@@ -7,7 +7,6 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.DamageSource;
-import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.SoundEvent;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
@@ -68,11 +67,7 @@ public class EntityTaintSporeSwarmer extends EntityTaintSpore {
             int maxSwarmParticles = (500 - this.spawnCounter) / 25;
             if (this.swarm.size() < maxSwarmParticles) {
                 this.swarm.add(this.ticksExisted);
-                this.world.spawnParticle(EnumParticleTypes.SPELL_MOB,
-                    this.posX + (this.rand.nextFloat() - this.rand.nextFloat()) * 0.1F,
-                    this.posY + this.height * 0.5F + (this.rand.nextFloat() - this.rand.nextFloat()) * 0.1F,
-                    this.posZ + (this.rand.nextFloat() - this.rand.nextFloat()) * 0.1F,
-                    0.08D, 0.0D, 0.12D);
+                thaumcraft.common.Thaumcraft.proxy.swarmParticleFX(this.world, this, 0.1F, 10.0F, 0.0F);
             }
         }
 
@@ -111,13 +106,7 @@ public class EntityTaintSporeSwarmer extends EntityTaintSpore {
     @Override
     protected void sploosh(int amount) {
         for (int i = 0; i < amount; i++) {
-            this.world.spawnParticle(EnumParticleTypes.SLIME,
-                this.posX + (this.rand.nextFloat() - this.rand.nextFloat()) * 0.35F,
-                this.posY + this.rand.nextFloat() * this.height,
-                this.posZ + (this.rand.nextFloat() - this.rand.nextFloat()) * 0.35F,
-                (this.rand.nextFloat() - this.rand.nextFloat()) * 0.03F,
-                this.rand.nextFloat() * 0.03F,
-                (this.rand.nextFloat() - this.rand.nextFloat()) * 0.03F);
+            thaumcraft.common.Thaumcraft.proxy.splooshFX(this);
         }
     }
 

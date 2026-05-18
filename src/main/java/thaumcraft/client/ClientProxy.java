@@ -74,6 +74,7 @@ import thaumcraft.client.fx.particles.FXEssentiaTrail;
 import thaumcraft.client.fx.particles.FXGeneric;
 import thaumcraft.client.fx.particles.FXSmokeDrift;
 import thaumcraft.client.fx.particles.FXSparkle;
+import thaumcraft.client.fx.particles.FXSwarm;
 import thaumcraft.client.fx.particles.FXVent;
 import thaumcraft.client.fx.particles.FXVisSparkle;
 import thaumcraft.client.fx.particles.FXWispArcing;
@@ -1016,6 +1017,57 @@ public class ClientProxy extends CommonProxy {
             fx.setParticleMaxAge((int) (66.0F / (world.rand.nextFloat() * 0.9F + 0.1F)));
             ParticleEngine.addEffect(world, fx);
         }
+    }
+
+    @Override
+    public Object swarmParticleFX(World world, Entity targetedEntity, float speed, float turnSpeed, float particleGravity) {
+        if (world == null || !world.isRemote || targetedEntity == null) return null;
+        int amount = particleCount(1);
+        if (amount <= 0) return null;
+
+        FXSwarm swarm = null;
+        for (int i = 0; i < amount; i++) {
+            swarm = new FXSwarm(
+                    world,
+                    targetedEntity.posX + (world.rand.nextFloat() - world.rand.nextFloat()) * 2.0F,
+                    targetedEntity.posY + (world.rand.nextFloat() - world.rand.nextFloat()) * 2.0F,
+                    targetedEntity.posZ + (world.rand.nextFloat() - world.rand.nextFloat()) * 2.0F,
+                    targetedEntity,
+                    0.8F + world.rand.nextFloat() * 0.2F,
+                    world.rand.nextFloat() * 0.4F,
+                    1.0F - world.rand.nextFloat() * 0.2F,
+                    speed,
+                    turnSpeed,
+                    particleGravity);
+            ParticleEngine.addEffect(world, swarm);
+        }
+        return swarm;
+    }
+
+    @Override
+    public void splooshFX(Entity entity) {
+        if (entity == null || entity.world == null || !entity.world.isRemote) return;
+        World world = entity.world;
+        float angle = world.rand.nextFloat() * ((float) Math.PI * 2.0F);
+        float radius = world.rand.nextFloat() * 0.5F + 0.5F;
+        float offsetX = MathHelper.sin(angle) * 1.0F * radius;
+        float offsetZ = MathHelper.cos(angle) * 1.0F * radius;
+
+        FXBreaking fx = new FXBreaking(
+                world,
+                entity.posX + offsetX,
+                entity.posY + world.rand.nextFloat() * entity.height,
+                entity.posZ + offsetZ,
+                Items.SNOWBALL);
+        if (world.rand.nextBoolean()) {
+            fx.setRBGColorF(0.6F, 0.0F, 0.3F);
+            fx.setAlphaF(0.4F);
+        } else {
+            fx.setRBGColorF(0.3F, 0.0F, 0.3F);
+            fx.setAlphaF(0.6F);
+        }
+        fx.setParticleMaxAge((int) (66.0F / (world.rand.nextFloat() * 0.9F + 0.1F)));
+        ParticleEngine.addEffect(world, fx);
     }
 
     @Override

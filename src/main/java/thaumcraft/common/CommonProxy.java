@@ -255,6 +255,13 @@ public class CommonProxy implements IGuiHandler {
     public void slimeJumpFX(Entity entity, int size) {
     }
 
+    public Object swarmParticleFX(World world, Entity targetedEntity, float speed, float turnSpeed, float particleGravity) {
+        return null;
+    }
+
+    public void splooshFX(Entity entity) {
+    }
+
     public void drawGenericParticles(World world, double x, double y, double z,
                                      double mx, double my, double mz,
                                      float red, float green, float blue, float alpha,

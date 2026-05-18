@@ -29,6 +29,7 @@ public class ClientProxyFxStaticGuardTest {
         String genericFx = readFile("src/main/java/thaumcraft/client/fx/particles/FXGeneric.java");
         String smokeDriftFx = readFile("src/main/java/thaumcraft/client/fx/particles/FXSmokeDrift.java");
         String sparkleFx = readFile("src/main/java/thaumcraft/client/fx/particles/FXSparkle.java");
+        String swarmFx = readFile("src/main/java/thaumcraft/client/fx/particles/FXSwarm.java");
         String ventFx = readFile("src/main/java/thaumcraft/client/fx/particles/FXVent.java");
         String visSparkleFx = readFile("src/main/java/thaumcraft/client/fx/particles/FXVisSparkle.java");
         String wispArcingFx = readFile("src/main/java/thaumcraft/client/fx/particles/FXWispArcing.java");
@@ -74,6 +75,12 @@ public class ClientProxyFxStaticGuardTest {
                 source.contains("public void slimeJumpFX(")
                         && source.contains("new FXBreaking(")
                         && source.contains("fx.setRBGColorF(0.7F, 0.0F, 1.0F)"));
+        assertTrue("ClientProxy must expose dedicated swarmParticleFX/splooshFX routes for taint swarm-family visuals",
+                source.contains("public Object swarmParticleFX(")
+                        && source.contains("new FXSwarm(")
+                        && source.contains("public void splooshFX(Entity entity)")
+                        && source.contains("new FXBreaking(")
+                        && source.contains("Items.SNOWBALL"));
         assertTrue("ClientProxy must override drawGenericParticles for champion modifier fallback",
                 source.contains("public void drawGenericParticles(") && source.contains("new FXGeneric("));
         assertTrue("ClientProxy must override drawVentParticles for thaumatorium vent routing",
@@ -224,6 +231,12 @@ public class ClientProxyFxStaticGuardTest {
                 sparkleFx.contains("class FXSparkle extends Particle")
                         && sparkleFx.contains("EnumParticleTypes.REDSTONE")
                         && sparkleFx.contains("EnumParticleTypes.CRIT_MAGIC"));
+        assertTrue("Dedicated FXSwarm particle must keep target-tracking swarm baseline",
+                swarmFx.contains("class FXSwarm extends Particle")
+                        && swarmFx.contains("private final Entity target;")
+                        && swarmFx.contains("steerTowardsTarget()")
+                        && swarmFx.contains("EnumParticleTypes.REDSTONE")
+                        && swarmFx.contains("EnumParticleTypes.CRIT_MAGIC"));
         assertTrue("Dedicated FXVent particle must keep vent trail emission baseline",
                 ventFx.contains("class FXVent extends Particle")
                         && ventFx.contains("EnumParticleTypes.REDSTONE")
@@ -278,6 +291,9 @@ public class ClientProxyFxStaticGuardTest {
         String eldritchGuardian = readFile("src/main/java/thaumcraft/common/entities/monster/EntityEldritchGuardian.java");
         String eldritchWarden = readFile("src/main/java/thaumcraft/common/entities/monster/boss/EntityEldritchWarden.java");
         String wisp = readFile("src/main/java/thaumcraft/common/entities/monster/EntityWisp.java");
+        String taintSwarm = readFile("src/main/java/thaumcraft/common/entities/monster/EntityTaintSwarm.java");
+        String taintSpore = readFile("src/main/java/thaumcraft/common/entities/monster/EntityTaintSpore.java");
+        String taintSporeSwarmer = readFile("src/main/java/thaumcraft/common/entities/monster/EntityTaintSporeSwarmer.java");
         String focusShock = readFile("src/main/java/thaumcraft/common/items/wands/foci/FocusShock.java");
         String focusWarding = readFile("src/main/java/thaumcraft/common/items/wands/foci/FocusWarding.java");
         String focusPortableHole = readFile("src/main/java/thaumcraft/common/items/wands/foci/FocusPortableHole.java");
@@ -381,6 +397,12 @@ public class ClientProxyFxStaticGuardTest {
                 eldritchWarden.contains("Thaumcraft.proxy.wispFXEG("));
         assertTrue("Wisp ranged attack path must send PacketFXWispZap",
                 wisp.contains("new PacketFXWispZap(this.getEntityId(), this.targetedEntity.getEntityId())"));
+        assertTrue("Taint swarm-family client loops must route through proxy swarmParticleFX/splooshFX",
+                taintSwarm.contains("Thaumcraft.proxy.swarmParticleFX(this.world, this, 0.22F, 15.0F, 0.08F)")
+                        && taintSpore.contains("Thaumcraft.proxy.swarmParticleFX(this.world, this, 0.1F, 10.0F, 0.0F)")
+                        && taintSpore.contains("Thaumcraft.proxy.splooshFX(this);")
+                        && taintSporeSwarmer.contains("Thaumcraft.proxy.swarmParticleFX(this.world, this, 0.1F, 10.0F, 0.0F)")
+                        && taintSporeSwarmer.contains("Thaumcraft.proxy.splooshFX(this);"));
         assertTrue("EntityFallingTaint client update must emit taintLandFX landing loop",
                 fallingTaint.contains("Thaumcraft.proxy.taintLandFX(this);"));
         assertTrue("FocusShock chain lightning path must send PacketFXZap",

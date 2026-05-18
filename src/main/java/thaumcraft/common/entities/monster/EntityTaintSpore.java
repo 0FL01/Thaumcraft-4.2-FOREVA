@@ -13,7 +13,6 @@ import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.EntityDataManager;
 import net.minecraft.util.DamageSource;
-import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.SoundEvent;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
@@ -128,11 +127,7 @@ public class EntityTaintSpore extends EntityMob implements ITaintedMob, IEntityA
             }
             if (this.swarm.size() < this.getSporeSize() / 3) {
                 this.swarm.add(this.ticksExisted);
-                this.world.spawnParticle(EnumParticleTypes.SPELL_MOB,
-                    this.posX + (double)((this.rand.nextFloat() - this.rand.nextFloat()) * 0.1F),
-                    this.posY + (double)(this.height * 0.5F) + (double)((this.rand.nextFloat() - this.rand.nextFloat()) * 0.1F),
-                    this.posZ + (double)((this.rand.nextFloat() - this.rand.nextFloat()) * 0.1F),
-                    0.08D, 0.0D, 0.12D);
+                thaumcraft.common.Thaumcraft.proxy.swarmParticleFX(this.world, this, 0.1F, 10.0F, 0.0F);
             }
         }
         // Burst check
@@ -179,13 +174,7 @@ public class EntityTaintSpore extends EntityMob implements ITaintedMob, IEntityA
 
     protected void sploosh(int amount) {
         for (int i = 0; i < amount; i++) {
-            this.world.spawnParticle(EnumParticleTypes.SLIME,
-                this.posX + (double)((this.rand.nextFloat() - this.rand.nextFloat()) * this.width),
-                this.posY + (double)(this.rand.nextFloat() * this.height),
-                this.posZ + (double)(this.rand.nextFloat() - this.rand.nextFloat()) * this.width,
-                (this.rand.nextFloat() - this.rand.nextFloat()) * 0.5D,
-                this.rand.nextFloat() * 0.5D,
-                (this.rand.nextFloat() - this.rand.nextFloat()) * 0.5D);
+            thaumcraft.common.Thaumcraft.proxy.splooshFX(this);
         }
     }
 
