@@ -26,14 +26,17 @@ public class ClientProxyDedicatedBeamBoltStaticGuardTest {
                 clientProxy.contains("double dx = tx - x;"));
         assertFalse("ClientProxy bolt path should not keep legacy inline bolt fallback loops",
                 clientProxy.contains("double noise = 0.18f;"));
-        assertTrue("FXBeam should keep beam-line emission logic",
+        assertTrue("FXBeam should keep dedicated custom render-path beam logic",
                 beamClass.contains("class FXBeam extends Particle")
-                        && beamClass.contains("EnumParticleTypes.REDSTONE")
-                        && beamClass.contains("EnumParticleTypes.CRIT_MAGIC"));
-        assertTrue("FXLightningBolt should keep jittered segment emission logic",
+                        && beamClass.contains("renderImpact(")
+                        && beamClass.contains("getBeamTexture()")
+                        && beamClass.contains("return 3;"));
+        assertTrue("FXLightningBolt should keep jittered segment custom render logic",
                 boltClass.contains("class FXLightningBolt extends Particle")
-                        && boltClass.contains("new Random(this.seed + this.particleAge * 31L)")
-                        && boltClass.contains("EnumParticleTypes.CRIT_MAGIC"));
+                        && boltClass.contains("buildPath(this.seed + this.particleAge * 31L")
+                        && boltClass.contains("new Random(jitterSeed)")
+                        && boltClass.contains("buildPath(")
+                        && boltClass.contains("return 3;"));
     }
 
     private static String readFile(String path) throws IOException {
