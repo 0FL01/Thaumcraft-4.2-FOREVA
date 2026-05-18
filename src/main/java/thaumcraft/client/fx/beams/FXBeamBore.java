@@ -20,4 +20,20 @@ public class FXBeamBore extends FXBeam {
     public void updateBeam(double tx, double ty, double tz) {
         super.updateBeam(this.posX, this.posY, this.posZ, tx, ty, tz);
     }
+
+    @Override
+    public void onUpdate() {
+        super.onUpdate();
+        if (this.impact > 0) {
+            --this.impact;
+        }
+    }
+
+    @Override
+    protected void renderImpact(float partialTicks, float rotationX, float rotationZ, float rotationYZ, float rotationXY, float rotationXZ) {
+        if (this.impact <= 0) {
+            return;
+        }
+        super.renderImpact(partialTicks, rotationX, rotationZ, rotationYZ, rotationXY, rotationXZ);
+    }
 }

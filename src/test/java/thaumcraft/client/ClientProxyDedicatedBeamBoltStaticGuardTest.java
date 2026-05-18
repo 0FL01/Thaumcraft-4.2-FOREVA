@@ -16,6 +16,10 @@ public class ClientProxyDedicatedBeamBoltStaticGuardTest {
     public void clientProxyUsesDedicatedBeamAndBoltFxClasses() throws IOException {
         String clientProxy = readFile("src/main/java/thaumcraft/client/ClientProxy.java");
         String beamClass = readFile("src/main/java/thaumcraft/client/fx/beams/FXBeam.java");
+        String beamBoreClass = readFile("src/main/java/thaumcraft/client/fx/beams/FXBeamBore.java");
+        String beamWandClass = readFile("src/main/java/thaumcraft/client/fx/beams/FXBeamWand.java");
+        String beamPowerClass = readFile("src/main/java/thaumcraft/client/fx/beams/FXBeamPower.java");
+        String beamGolemBossClass = readFile("src/main/java/thaumcraft/client/fx/beams/FXBeamGolemBoss.java");
         String boltClass = readFile("src/main/java/thaumcraft/client/fx/bolt/FXLightningBolt.java");
 
         assertTrue("ClientProxy beam path should enqueue dedicated FXBeam via ParticleEngine",
@@ -31,6 +35,24 @@ public class ClientProxyDedicatedBeamBoltStaticGuardTest {
                         && beamClass.contains("renderImpact(")
                         && beamClass.contains("getBeamTexture()")
                         && beamClass.contains("return 3;"));
+        assertTrue("FXBeamBore should keep impact-gated overlay contract for bore beams",
+                beamBoreClass.contains("public int impact;")
+                        && beamBoreClass.contains("if (this.impact <= 0)")
+                        && beamBoreClass.contains("super.renderImpact("));
+        assertTrue("FXBeamWand should keep player-sourced endpoint tracking and impact-gated overlay",
+                beamWandClass.contains("sourcePos(")
+                        && beamWandClass.contains("this.sourceYOffset")
+                        && beamWandClass.contains("if (this.impact <= 0)")
+                        && beamWandClass.contains("super.updateBeam("));
+        assertTrue("FXBeamPower should keep pulse-opacity flare overlay contract",
+                beamPowerClass.contains("private float opacity = 0.3F;")
+                        && beamPowerClass.contains(".lightmap(240, 240)")
+                        && beamPowerClass.contains("addFlareVertex(")
+                        && beamPowerClass.contains("this.opacity = 0.8F"));
+        assertTrue("FXBeamGolemBoss should keep boss-facing source vector and target-anchored endpoint updates",
+                beamGolemBossClass.contains("this.boss.renderYawOffset")
+                        && beamGolemBossClass.contains("this.target.prevPosX")
+                        && beamGolemBossClass.contains("updateEndpointsFromEntities()"));
         assertTrue("FXLightningBolt should keep jittered segment custom render logic",
                 boltClass.contains("class FXLightningBolt extends Particle")
                         && boltClass.contains("buildPath(this.seed + this.particleAge * 31L")
