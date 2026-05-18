@@ -28,6 +28,12 @@ public class ClientFxEventLayerStaticGuardTest {
         assertTrue(renderSource.contains("event.getType() == RenderGameOverlayEvent.ElementType.PORTAL"));
         assertTrue(renderSource.contains("renderVignette(targetBrightness"));
         assertTrue(renderSource.contains("GL11.glFogf(GL11.GL_FOG_DENSITY, fogTarget);"));
+        assertTrue(renderSource.contains("public static void startScan(Entity entity, BlockPos pos, long expireAtMs, int range)"));
+        assertTrue(renderSource.contains("scanRange = MathHelper.clamp(range, 0, SCAN_GRID_RADIUS);"));
+        assertTrue(renderSource.contains("classifyScannedBlock(world, scanPos.add(xx, yy, zz))"));
+        assertTrue(renderSource.contains("private static final ResourceLocation NODE_SCAN_TEX"));
+        assertTrue(renderSource.contains("renderScannedBlocks(event.getPartialTicks(), player, now);"));
+        assertTrue(renderSource.contains("drawScannedNodePulse(wx + 0.5D, wy + 0.5D, wz + 0.5D, alpha, frame, size);"));
     }
 
     private static String read(String path) throws IOException {
