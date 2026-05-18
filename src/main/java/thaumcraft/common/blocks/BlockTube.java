@@ -30,7 +30,7 @@ import thaumcraft.common.items.wands.ItemWandCasting;
 import thaumcraft.common.tiles.*;
 
 public class BlockTube extends BlockContainer {
-    public static final PropertyInteger TYPE = PropertyInteger.create("type", 0, 6);
+    public static final PropertyInteger TYPE = PropertyInteger.create("type", 0, 7);
     private static final AxisAlignedBB TUBE_AABB = new AxisAlignedBB(0.25D, 0.25D, 0.25D, 0.75D, 0.75D, 0.75D);
 
     public BlockTube() {
@@ -63,6 +63,7 @@ public class BlockTube extends BlockContainer {
             case 4: return new TileTubeBuffer();
             case 5: return new TileTubeRestrict();
             case 6: return new TileTubeOneway();
+            case 7: return new TileEssentiaCrystalizer();
             default: return new TileTube();
         }
     }
@@ -74,7 +75,7 @@ public class BlockTube extends BlockContainer {
 
     @Override
     public void getSubBlocks(CreativeTabs tab, NonNullList<ItemStack> list) {
-        for (int meta = 0; meta <= 6; ++meta) {
+        for (int meta = 0; meta <= 7; ++meta) {
             list.add(new ItemStack(this, 1, meta));
         }
     }
@@ -145,18 +146,22 @@ public class BlockTube extends BlockContainer {
     }
 
     @Override
-    public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess source, BlockPos pos) { return TUBE_AABB; }
+    public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess source, BlockPos pos) {
+        return this.getMetaFromState(state) == 7 ? FULL_BLOCK_AABB : TUBE_AABB;
+    }
 
     @Nullable
     @Override
-    public AxisAlignedBB getCollisionBoundingBox(IBlockState blockState, IBlockAccess worldIn, BlockPos pos) { return TUBE_AABB; }
+    public AxisAlignedBB getCollisionBoundingBox(IBlockState blockState, IBlockAccess worldIn, BlockPos pos) {
+        return this.getMetaFromState(blockState) == 7 ? FULL_BLOCK_AABB : TUBE_AABB;
+    }
 
     @Override
     protected BlockStateContainer createBlockState() { return new BlockStateContainer(this, TYPE); }
 
     @Override
     public IBlockState getStateFromMeta(int meta) {
-        return this.getDefaultState().withProperty(TYPE, MathHelper.clamp(meta, 0, 6));
+        return this.getDefaultState().withProperty(TYPE, MathHelper.clamp(meta, 0, 7));
     }
 
     @Override

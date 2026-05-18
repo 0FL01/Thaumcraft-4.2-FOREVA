@@ -8,6 +8,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import thaumcraft.common.tiles.TileEssentiaCrystalizer;
 import thaumcraft.common.tiles.TileTube;
 
 public class BlockTubeItem extends BlockMetadataItem {
@@ -23,6 +24,10 @@ public class BlockTubeItem extends BlockMetadataItem {
             TileEntity tile = world.getTileEntity(pos);
             if (tile instanceof TileTube) {
                 ((TileTube) tile).facing = side;
+                tile.markDirty();
+                world.notifyBlockUpdate(pos, world.getBlockState(pos), world.getBlockState(pos), 3);
+            } else if (tile instanceof TileEssentiaCrystalizer) {
+                ((TileEssentiaCrystalizer) tile).facing = side;
                 tile.markDirty();
                 world.notifyBlockUpdate(pos, world.getBlockState(pos), world.getBlockState(pos), 3);
             }

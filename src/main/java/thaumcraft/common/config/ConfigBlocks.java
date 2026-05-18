@@ -483,6 +483,7 @@ public class ConfigBlocks {
             new TileRegistration(TileTubeBuffer.class, "TileTubeBuffer"),
             new TileRegistration(TileTubeRestrict.class, "TileTubeRestrict"),
             new TileRegistration(TileTubeOneway.class, "TileTubeOneway"),
+            new TileRegistration(TileEssentiaCrystalizer.class, "TileEssentiaCrystalizer"),
             new TileRegistration(TileCentrifuge.class, "TileCentrifuge"),
             new TileRegistration(TileEssentiaReservoir.class, "TileEssentiaReservoir"),
             new TileRegistration(TileMirror.class, "TileMirror"),
