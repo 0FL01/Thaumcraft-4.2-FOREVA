@@ -25,7 +25,7 @@ public class TileNodeRenderer extends TileEntitySpecialRenderer<TileEntity> {
         renderNodeAt((INode) tile, x + 0.5D, y + 0.5D, z + 0.5D, partialTicks, size);
     }
 
-    static void renderNodeAt(INode node, double x, double y, double z, float partialTicks, float size) {
+    public static void renderNodeAt(INode node, double x, double y, double z, float partialTicks, float size) {
         Aspect[] aspects = node.getAspects() == null ? null : node.getAspects().getAspects();
         float ticks = (net.minecraft.client.Minecraft.getMinecraft().player == null
                 ? 0.0F

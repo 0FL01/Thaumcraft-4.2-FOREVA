@@ -111,6 +111,7 @@ import thaumcraft.client.renderers.entity.RenderTravelingTrunk;
 import thaumcraft.client.renderers.entity.RenderWisp;
 import thaumcraft.client.renderers.entity.RenderCultist;
 import thaumcraft.client.renderers.item.ItemJarRenderer;
+import thaumcraft.client.renderers.item.ItemNodeRenderer;
 import thaumcraft.client.renderers.tile.TileAlembicRenderer;
 import thaumcraft.client.renderers.tile.TileAlchemyFurnaceAdvancedRenderer;
 import thaumcraft.client.renderers.tile.TileArcaneLampRenderer;
@@ -343,11 +344,14 @@ public class ClientProxy extends CommonProxy {
 
     private void setupTileLinkedItemRenderers() {
         Item jarItem = Item.getItemFromBlock(ConfigBlocks.blockJar);
-        if (jarItem == null) {
-            return;
+        if (jarItem != null) {
+            TileEntityItemStackRenderer renderer = new ItemJarRenderer();
+            jarItem.setTileEntityItemStackRenderer(renderer);
         }
-        TileEntityItemStackRenderer renderer = new ItemJarRenderer();
-        jarItem.setTileEntityItemStackRenderer(renderer);
+        Item airyItem = Item.getItemFromBlock(ConfigBlocks.blockAiry);
+        if (airyItem != null) {
+            airyItem.setTileEntityItemStackRenderer(new ItemNodeRenderer());
+        }
     }
 
     private void setupEntityRenderers() {

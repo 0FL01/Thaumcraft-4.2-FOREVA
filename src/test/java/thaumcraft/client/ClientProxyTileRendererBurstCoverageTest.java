@@ -61,6 +61,11 @@ public class ClientProxyTileRendererBurstCoverageTest {
         assertTrue(source.contains("ClientRegistry.bindTileEntitySpecialRenderer(TileFluxScrubber.class, new TileFluxScrubberRenderer());"));
         assertTrue(source.contains("ClientRegistry.bindTileEntitySpecialRenderer(TileManaPod.class, new TileManaPodRenderer());"));
         assertTrue(source.contains("ClientRegistry.bindTileEntitySpecialRenderer(TileMagicWorkbenchCharger.class, new TileMagicWorkbenchChargerRenderer());"));
+        assertTrue(source.contains("private void setupTileLinkedItemRenderers()"));
+        assertTrue(source.contains("Item jarItem = Item.getItemFromBlock(ConfigBlocks.blockJar);"));
+        assertTrue(source.contains("jarItem.setTileEntityItemStackRenderer(renderer);"));
+        assertTrue(source.contains("Item airyItem = Item.getItemFromBlock(ConfigBlocks.blockAiry);"));
+        assertTrue(source.contains("airyItem.setTileEntityItemStackRenderer(new ItemNodeRenderer());"));
     }
 
     private static String read(String path) throws IOException {
