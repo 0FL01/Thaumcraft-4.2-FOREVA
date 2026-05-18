@@ -1,8 +1,12 @@
 package thaumcraft.client.renderers.tile;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.util.EnumFacing;
@@ -39,74 +43,76 @@ public class TileEssentiaReservoirRenderer extends TileEntitySpecialRenderer<Til
         if (tile.essentia == null || tile.essentia.visSize() <= 0) {
             return;
         }
+        TextureAtlasSprite liquid = Minecraft.getMinecraft().getTextureMapBlocks()
+                .getAtlasSprite("thaumcraft:blocks/animatedglow");
+        if (liquid == null) {
+            return;
+        }
 
         float fill = (float) tile.essentia.visSize() / (float) Math.max(1, tile.maxAmount);
         fill = TileRenderHelper.clamp01(fill);
-        float minX = (float) x + 0.25F;
-        float maxX = (float) x + 0.75F;
-        float minZ = (float) z + 0.25F;
-        float maxZ = (float) z + 0.75F;
-        float minY = (float) y + 0.10F;
-        float maxY = minY + 0.45F * fill;
+        float minX = (float) x + 3.0F / 16.0F;
+        float maxX = (float) x + 13.0F / 16.0F;
+        float minZ = (float) z + 3.0F / 16.0F;
+        float maxZ = (float) z + 13.0F / 16.0F;
+        float minY = (float) y + 3.0F / 16.0F;
+        float maxY = minY + (10.0F / 16.0F) * fill;
 
         int color = colorFromReservoir(tile);
         float r = ((color >> 16) & 0xFF) / 255.0F;
         float g = ((color >> 8) & 0xFF) / 255.0F;
         float b = (color & 0xFF) / 255.0F;
         float a = ((color >> 24) & 0xFF) / 255.0F;
+        float prevLightX = OpenGlHelper.lastBrightnessX;
+        float prevLightY = OpenGlHelper.lastBrightnessY;
 
         GlStateManager.pushMatrix();
         GlStateManager.disableLighting();
         GlStateManager.enableBlend();
         GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
         GlStateManager.disableCull();
+        bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
+        OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, 200.0F, 200.0F);
 
         Tessellator tess = Tessellator.getInstance();
         BufferBuilder buf = tess.getBuffer();
-        buf.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_COLOR);
-
-        // Top
-        addVertex(buf, minX, maxY, minZ, r, g, b, a);
-        addVertex(buf, minX, maxY, maxZ, r, g, b, a);
-        addVertex(buf, maxX, maxY, maxZ, r, g, b, a);
-        addVertex(buf, maxX, maxY, minZ, r, g, b, a);
-
-        // Bottom
-        addVertex(buf, maxX, minY, minZ, r, g, b, a * 0.9F);
-        addVertex(buf, maxX, minY, maxZ, r, g, b, a * 0.9F);
-        addVertex(buf, minX, minY, maxZ, r, g, b, a * 0.9F);
-        addVertex(buf, minX, minY, minZ, r, g, b, a * 0.9F);
-
-        // Sides
-        addVertex(buf, minX, minY, minZ, r, g, b, a);
-        addVertex(buf, minX, maxY, minZ, r, g, b, a);
-        addVertex(buf, maxX, maxY, minZ, r, g, b, a);
-        addVertex(buf, maxX, minY, minZ, r, g, b, a);
-
-        addVertex(buf, maxX, minY, maxZ, r, g, b, a);
-        addVertex(buf, maxX, maxY, maxZ, r, g, b, a);
-        addVertex(buf, minX, maxY, maxZ, r, g, b, a);
-        addVertex(buf, minX, minY, maxZ, r, g, b, a);
-
-        addVertex(buf, minX, minY, maxZ, r, g, b, a);
-        addVertex(buf, minX, maxY, maxZ, r, g, b, a);
-        addVertex(buf, minX, maxY, minZ, r, g, b, a);
-        addVertex(buf, minX, minY, minZ, r, g, b, a);
-
-        addVertex(buf, maxX, minY, minZ, r, g, b, a);
-        addVertex(buf, maxX, maxY, minZ, r, g, b, a);
-        addVertex(buf, maxX, maxY, maxZ, r, g, b, a);
-        addVertex(buf, maxX, minY, maxZ, r, g, b, a);
+        buf.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX_COLOR);
+        drawTexturedCuboid(buf, minX, minY, minZ, maxX, maxY, maxZ,
+                liquid.getMinU(), liquid.getMaxU(), liquid.getMinV(), liquid.getMaxV(),
+                r, g, b, a);
 
         tess.draw();
+        OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, prevLightX, prevLightY);
         GlStateManager.enableCull();
         GlStateManager.disableBlend();
         GlStateManager.enableLighting();
         GlStateManager.popMatrix();
     }
 
-    private static void addVertex(BufferBuilder buf, float x, float y, float z, float r, float g, float b, float a) {
-        buf.pos(x, y, z).color(r, g, b, a).endVertex();
+    private static void drawTexturedCuboid(BufferBuilder buf,
+                                           float minX, float minY, float minZ,
+                                           float maxX, float maxY, float maxZ,
+                                           float u0, float u1, float v0, float v1,
+                                           float r, float g, float b, float a) {
+        face(buf, minX, maxY, maxZ, minX, minY, maxZ, maxX, minY, maxZ, maxX, maxY, maxZ, u0, u1, v0, v1, r, g, b, a);
+        face(buf, maxX, maxY, minZ, maxX, minY, minZ, minX, minY, minZ, minX, maxY, minZ, u0, u1, v0, v1, r, g, b, a);
+        face(buf, minX, maxY, minZ, minX, minY, minZ, minX, minY, maxZ, minX, maxY, maxZ, u0, u1, v0, v1, r, g, b, a);
+        face(buf, maxX, maxY, maxZ, maxX, minY, maxZ, maxX, minY, minZ, maxX, maxY, minZ, u0, u1, v0, v1, r, g, b, a);
+        face(buf, minX, maxY, minZ, minX, maxY, maxZ, maxX, maxY, maxZ, maxX, maxY, minZ, u0, u1, v0, v1, r, g, b, a);
+        face(buf, minX, minY, maxZ, minX, minY, minZ, maxX, minY, minZ, maxX, minY, maxZ, u0, u1, v0, v1, r, g, b, a * 0.9F);
+    }
+
+    private static void face(BufferBuilder buf,
+                             float x1, float y1, float z1,
+                             float x2, float y2, float z2,
+                             float x3, float y3, float z3,
+                             float x4, float y4, float z4,
+                             float u0, float u1, float v0, float v1,
+                             float r, float g, float b, float a) {
+        buf.pos(x1, y1, z1).tex(u0, v0).color(r, g, b, a).endVertex();
+        buf.pos(x2, y2, z2).tex(u0, v1).color(r, g, b, a).endVertex();
+        buf.pos(x3, y3, z3).tex(u1, v1).color(r, g, b, a).endVertex();
+        buf.pos(x4, y4, z4).tex(u1, v0).color(r, g, b, a).endVertex();
     }
 
     private static int colorFromReservoir(TileEssentiaReservoir tile) {

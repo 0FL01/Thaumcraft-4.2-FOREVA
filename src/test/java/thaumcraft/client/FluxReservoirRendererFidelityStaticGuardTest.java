@@ -33,14 +33,17 @@ public class FluxReservoirRendererFidelityStaticGuardTest {
                         && fluxModel.contains("renderCap(float scale)")
                         && fluxModel.contains("renderTip(float scale)"));
 
-        assertTrue("Reservoir renderer should use model shell plus explicit 3D liquid volume rendering",
+        assertTrue("Reservoir renderer should use model shell plus textured 3D liquid volume rendering",
                 reservoirRenderer.contains("new ModelEssentiaReservoir()")
                         && reservoirRenderer.contains("model.renderAll(MODEL_SCALE)")
                         && reservoirRenderer.contains("renderLiquid(tile, x, y, z)")
                         && reservoirRenderer.contains("BufferBuilder")
-                        && reservoirRenderer.contains("DefaultVertexFormats.POSITION_COLOR")
+                        && reservoirRenderer.contains("DefaultVertexFormats.POSITION_TEX_COLOR")
+                        && reservoirRenderer.contains("thaumcraft:blocks/animatedglow")
+                        && reservoirRenderer.contains("TextureMap.LOCATION_BLOCKS_TEXTURE")
+                        && reservoirRenderer.contains("OpenGlHelper.setLightmapTextureCoords")
                         && reservoirRenderer.contains("computeLiquidAlpha(")
-                        && !reservoirRenderer.contains("TileRenderHelper.drawTexturedQuad("));
+                        && reservoirRenderer.contains("drawTexturedCuboid("));
 
         assertTrue("ModelEssentiaReservoir should define base/walls/top ring geometry",
                 reservoirModel.contains("class ModelEssentiaReservoir extends ModelBase")
