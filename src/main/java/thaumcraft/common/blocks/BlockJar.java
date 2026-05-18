@@ -31,6 +31,8 @@ import net.minecraft.world.World;
 import thaumcraft.api.aspects.AspectList;
 import thaumcraft.api.aspects.IEssentiaContainerItem;
 import thaumcraft.api.aspects.Aspect;
+import thaumcraft.api.nodes.NodeModifier;
+import thaumcraft.api.nodes.NodeType;
 import thaumcraft.common.Thaumcraft;
 import thaumcraft.common.tiles.TileJarBrain;
 import thaumcraft.common.tiles.TileJarFillable;
@@ -152,6 +154,14 @@ extends BlockContainer {
                 if (drop.getItem() instanceof IEssentiaContainerItem) {
                     ((IEssentiaContainerItem) drop.getItem()).setAspects(drop, ((TileJarNode) te).getAspects().copy());
                 }
+                if (drop.getItem() instanceof BlockJarItem) {
+                    TileJarNode node = (TileJarNode) te;
+                    ((BlockJarItem) drop.getItem()).setNodeAttributes(
+                            drop,
+                            node.getNodeType(),
+                            node.getNodeModifier(),
+                            node.getId());
+                }
                 drops.add(drop);
             }
             return;
@@ -180,6 +190,28 @@ extends BlockContainer {
     public void onBlockPlacedBy(World worldIn, BlockPos pos, IBlockState state, EntityLivingBase placer, ItemStack stack) {
         int l = MathHelper.floor((placer.rotationYaw * 4.0F / 360.0F) + 0.5D) & 3;
         TileEntity tile = worldIn.getTileEntity(pos);
+        if (tile instanceof TileJarNode && stack != null && !stack.isEmpty()) {
+            TileJarNode node = (TileJarNode) tile;
+            if (stack.getItem() instanceof IEssentiaContainerItem) {
+                AspectList aspects = ((IEssentiaContainerItem) stack.getItem()).getAspects(stack);
+                if (aspects != null && aspects.size() > 0) {
+                    node.setAspects(aspects.copy());
+                }
+            }
+            if (stack.getItem() instanceof BlockJarItem) {
+                BlockJarItem item = (BlockJarItem) stack.getItem();
+                NodeType type = item.getNodeType(stack);
+                if (type != null) {
+                    node.setNodeType(type);
+                }
+                NodeModifier modifier = item.getNodeModifier(stack);
+                node.setNodeModifier(modifier);
+                node.setId(item.getNodeId(stack));
+            }
+            node.markDirty();
+            worldIn.notifyBlockUpdate(pos, state, state, 3);
+            return;
+        }
         if (tile instanceof TileJarFillable) {
             TileJarFillable jar = (TileJarFillable) tile;
             if (l == 0) jar.facing = 2;

@@ -7,7 +7,10 @@ import net.minecraft.nbt.NBTTagCompound;
 import thaumcraft.api.aspects.Aspect;
 import thaumcraft.api.aspects.AspectList;
 import thaumcraft.api.aspects.IEssentiaContainerItem;
+import thaumcraft.api.nodes.NodeModifier;
+import thaumcraft.api.nodes.NodeType;
 import thaumcraft.client.renderers.tile.TileJarRenderer;
+import thaumcraft.common.blocks.BlockJarItem;
 import thaumcraft.common.tiles.TileJar;
 import thaumcraft.common.tiles.TileJarBrain;
 import thaumcraft.common.tiles.TileJarFillable;
@@ -95,6 +98,45 @@ public class ItemJarRenderer extends TileEntityItemStackRenderer {
             aspects = DEFAULT_NODE_ASPECTS.copy();
         }
         jarNode.setAspects(aspects);
+        jarNode.setNodeType(NodeType.NORMAL);
+        jarNode.setNodeModifier(null);
         jarNode.setId("item");
+        if (stack.getItem() instanceof BlockJarItem) {
+            BlockJarItem item = (BlockJarItem) stack.getItem();
+            NodeType type = item.getNodeType(stack);
+            if (type != null) {
+                jarNode.setNodeType(type);
+            }
+            NodeModifier modifier = item.getNodeModifier(stack);
+            jarNode.setNodeModifier(modifier);
+            String id = item.getNodeId(stack);
+            if (id != null && !id.isEmpty()) {
+                jarNode.setId(id);
+            }
+        } else if (stack.hasTagCompound()) {
+            NBTTagCompound nbt = stack.getTagCompound();
+            if (nbt != null) {
+                if (nbt.hasKey("nodetype")) {
+                    int ordinal = nbt.getInteger("nodetype");
+                    NodeType[] values = NodeType.values();
+                    if (ordinal >= 0 && ordinal < values.length) {
+                        jarNode.setNodeType(values[ordinal]);
+                    }
+                }
+                if (nbt.hasKey("nodemod")) {
+                    int ordinal = nbt.getInteger("nodemod");
+                    NodeModifier[] values = NodeModifier.values();
+                    if (ordinal >= 0 && ordinal < values.length) {
+                        jarNode.setNodeModifier(values[ordinal]);
+                    }
+                }
+                if (nbt.hasKey("nodeid")) {
+                    String id = nbt.getString("nodeid");
+                    if (id != null && !id.isEmpty()) {
+                        jarNode.setId(id);
+                    }
+                }
+            }
+        }
     }
 }
