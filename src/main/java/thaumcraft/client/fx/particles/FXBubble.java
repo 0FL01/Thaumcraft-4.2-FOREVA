@@ -3,27 +3,26 @@ package thaumcraft.client.fx.particles;
 import net.minecraft.client.particle.Particle;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.entity.Entity;
-import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 @SideOnly(Side.CLIENT)
 public class FXBubble extends Particle {
-    private float red = 1.0F;
-    private float green = 0.0F;
-    private float blue = 0.5F;
+    public int particle = 16;
     private double bubbleSpeed = 0.002D;
-    private boolean tintEnabled = false;
 
     public FXBubble(World world, double x, double y, double z, double mx, double my, double mz, int age) {
         super(world, x, y, z, mx, my, mz);
+        this.setRBGColorF(1.0F, 0.0F, 0.5F);
+        this.setSize(0.02F, 0.02F);
         this.particleScale *= this.rand.nextFloat() * 0.3F + 0.2F;
         this.motionX = mx * 0.2D + (this.rand.nextFloat() * 2.0F - 1.0F) * 0.02F;
         this.motionY = my * 0.2D + this.rand.nextFloat() * 0.02F;
         this.motionZ = mz * 0.2D + (this.rand.nextFloat() * 2.0F - 1.0F) * 0.02F;
-        this.particleMaxAge = Math.max(2, age) + this.rand.nextInt(10);
+        this.particleMaxAge = (int) ((age + 2) + 8.0D / (this.rand.nextDouble() * 0.8D + 0.2D));
         this.canCollide = false;
+        this.setParticleTextureIndex(this.particle);
     }
 
     public void setFroth() {
@@ -45,10 +44,7 @@ public class FXBubble extends Particle {
     }
 
     public void setRGB(float r, float g, float b) {
-        this.red = r;
-        this.green = g;
-        this.blue = b;
-        this.tintEnabled = true;
+        this.setRBGColorF(r, g, b);
     }
 
     public void setBubbleSpeed(double bubbleSpeed) {
@@ -78,23 +74,25 @@ public class FXBubble extends Particle {
         this.motionY *= 0.85D;
         this.motionZ *= 0.85D;
 
-        if (this.tintEnabled) {
-            this.world.spawnParticle(EnumParticleTypes.REDSTONE, this.posX, this.posY, this.posZ, this.red, this.green, this.blue);
-        } else {
-            this.world.spawnParticle(EnumParticleTypes.WATER_BUBBLE,
-                    this.posX, this.posY, this.posZ,
-                    this.motionX * 0.1D, this.motionY * 0.1D, this.motionZ * 0.1D);
-        }
-
-        if (++this.particleAge >= this.particleMaxAge) {
+        if (this.particleMaxAge-- <= 0) {
             this.setExpired();
+            return;
         }
+        if (this.particleMaxAge <= 2) {
+            this.particle++;
+        }
+        this.setParticleTextureIndex(this.particle);
     }
 
     @Override
     public void renderParticle(BufferBuilder buffer, Entity entityIn, float partialTicks,
                                float rotationX, float rotationZ, float rotationYZ,
                                float rotationXY, float rotationXZ) {
-        // Emission-style particle: visuals are spawned in onUpdate.
+        super.renderParticle(buffer, entityIn, partialTicks, rotationX, rotationZ, rotationYZ, rotationXY, rotationXZ);
+    }
+
+    @Override
+    public int getBrightnessForRender(float partialTicks) {
+        return 0xF000F0;
     }
 }

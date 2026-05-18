@@ -223,11 +223,15 @@ public class ClientProxyFxStaticGuardTest {
                         && bubbleFx.contains("setFroth()")
                         && bubbleFx.contains("setFroth2()")
                         && bubbleFx.contains("setBubbleSpeed(double bubbleSpeed)")
-                        && bubbleFx.contains("EnumParticleTypes.WATER_BUBBLE"));
+                        && bubbleFx.contains("this.motionY += this.bubbleSpeed")
+                        && bubbleFx.contains("if (this.particleMaxAge-- <= 0)")
+                        && bubbleFx.contains("setParticleTextureIndex(this.particle)"));
         assertTrue("Dedicated FXBubbleAlt particle must keep colored crucible bubble emission baseline",
                 bubbleAltFx.contains("class FXBubbleAlt extends Particle")
                         && bubbleAltFx.contains("setRGB(float r, float g, float b)")
-                        && bubbleAltFx.contains("EnumParticleTypes.REDSTONE"));
+                        && bubbleAltFx.contains("particle = 25")
+                        && bubbleAltFx.contains("this.particleAge == this.particleMaxAge - 2")
+                        && bubbleAltFx.contains("setParticleTextureIndex(this.particle)"));
         assertTrue("Dedicated FXBlockRunes particle must keep rune-around-block emission baseline",
                 blockRunesFx.contains("class FXBlockRunes extends Particle")
                         && blockRunesFx.contains("EnumFacing.random(this.rand)")
