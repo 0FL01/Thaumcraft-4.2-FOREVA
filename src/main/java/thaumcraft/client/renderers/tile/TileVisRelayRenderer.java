@@ -1,6 +1,9 @@
 package thaumcraft.client.renderers.tile;
 
+import java.awt.Color;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
@@ -12,7 +15,7 @@ public class TileVisRelayRenderer extends TileEntitySpecialRenderer<TileVisRelay
 
     private static final ResourceLocation RELAY_TEXTURE =
             new ResourceLocation("thaumcraft", "textures/models/vis_relay.png");
-
+    private static final float MODEL_SCALE = 0.0625F;
     private static final int[] RELAY_COLORS = {
             0xFFFF7E,
             0xFF8844,
@@ -21,7 +24,6 @@ public class TileVisRelayRenderer extends TileEntitySpecialRenderer<TileVisRelay
             0xCC99FF,
             0xAAAAAA
     };
-    private static final float MODEL_SCALE = 0.0625F;
 
     private final ModelVisRelay model = new ModelVisRelay();
 
@@ -31,14 +33,15 @@ public class TileVisRelayRenderer extends TileEntitySpecialRenderer<TileVisRelay
             return;
         }
 
-        float ticks = TileRenderHelper.ticks(tile, partialTicks);
+        float ticks = 0.0F;
+        if (Minecraft.getMinecraft().player != null) {
+            ticks = Minecraft.getMinecraft().player.ticksExisted + partialTicks;
+        }
         EnumFacing facing = EnumFacing.byIndex(tile.orientation);
-        float pulse = 0.95F + (float) Math.sin(ticks / 2.0F) * 0.05F;
-        int coreColor = relayColor(tile.color & 0xFF);
-        float[] crystalColor = unpackRgb(coreColor, 1.0F / 200.0F);
-        boolean parentValid = VisNetHandler.isNodeValid(tile.getParent());
-        float glow = (parentValid ? 0.8F : 0.35F) + (float) Math.sin(ticks / 3.0F) * 0.08F;
-        glow = Math.max(0.2F, glow);
+        float scale = (float) Math.sin(ticks / 2.0F) * 0.05F + 0.95F;
+        int light = (VisNetHandler.isNodeValid(tile.getParent()) ? 50 : 0) + (int) (150.0F * scale);
+        int low = light % 65536;
+        int high = light / 65536;
 
         GlStateManager.pushMatrix();
         GlStateManager.translate(x + 0.5D, y + 0.5D, z + 0.5D);
@@ -56,22 +59,15 @@ public class TileVisRelayRenderer extends TileEntitySpecialRenderer<TileVisRelay
         GlStateManager.translate(0.0F, 0.0F, -0.16F);
         model.renderRingBase(MODEL_SCALE);
         GlStateManager.popMatrix();
-
-        GlStateManager.pushMatrix();
-        GlStateManager.rotate((ticks * 1.5F) % 360.0F, 0.0F, 1.0F, 0.0F);
         model.renderRingFloat(MODEL_SCALE);
-        GlStateManager.popMatrix();
 
-        GlStateManager.pushMatrix();
-        GlStateManager.scale(pulse, pulse, pulse);
-        GlStateManager.color(
-                Math.min(1.0F, crystalColor[0] * glow),
-                Math.min(1.0F, crystalColor[1] * glow),
-                Math.min(1.0F, crystalColor[2] * glow),
-                1.0F);
+        if (tile.color >= 0 && tile.color < RELAY_COLORS.length) {
+            Color tint = new Color(RELAY_COLORS[tile.color]);
+            GlStateManager.color(tint.getRed() / 200.0F, tint.getGreen() / 200.0F, tint.getBlue() / 200.0F, 1.0F);
+        }
+        OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, low, high);
         model.renderCrystal(MODEL_SCALE);
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
-        GlStateManager.popMatrix();
 
         GlStateManager.enableCull();
         GlStateManager.disableBlend();
@@ -106,14 +102,4 @@ public class TileVisRelayRenderer extends TileEntitySpecialRenderer<TileVisRelay
         }
     }
 
-    private static int relayColor(int colorIndex) {
-        return colorIndex >= 0 && colorIndex < RELAY_COLORS.length ? RELAY_COLORS[colorIndex] : 0xFFFFFF;
-    }
-
-    private static float[] unpackRgb(int color, float normalizeScale) {
-        float r = ((color >> 16) & 0xFF) * normalizeScale;
-        float g = ((color >> 8) & 0xFF) * normalizeScale;
-        float b = (color & 0xFF) * normalizeScale;
-        return new float[]{r, g, b};
-    }
 }

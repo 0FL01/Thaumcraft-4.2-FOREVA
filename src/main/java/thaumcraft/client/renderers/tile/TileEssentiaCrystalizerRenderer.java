@@ -1,6 +1,8 @@
 package thaumcraft.client.renderers.tile;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
@@ -23,7 +25,10 @@ public class TileEssentiaCrystalizerRenderer extends TileEntitySpecialRenderer<T
             return;
         }
 
-        float ticks = TileRenderHelper.ticks(tile, partialTicks);
+        float ticks = 0.0F;
+        if (Minecraft.getMinecraft().player != null) {
+            ticks = Minecraft.getMinecraft().player.ticksExisted + partialTicks;
+        }
         GlStateManager.pushMatrix();
         orientByFace(x, y, z, tile.facing);
 
@@ -42,7 +47,10 @@ public class TileEssentiaCrystalizerRenderer extends TileEntitySpecialRenderer<T
             GlStateManager.pushMatrix();
             GlStateManager.scale(0.75F, 0.75F, 0.75F);
             float glow = MathHelper.sin((ticks + i * 10.0F) / 2.0F) * 0.05F + 0.95F;
-            GlStateManager.color(tile.cr * glow, tile.cg * glow, tile.cb * glow, 1.0F);
+            int light = 50 + (int) (150.0F * glow);
+            int low = light % 65536;
+            int high = light / 65536;
+            OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, low, high);
             GlStateManager.rotate(90.0F * i, 0.0F, 0.0F, 1.0F);
             GlStateManager.translate(0.34F, 0.0F, 1.2125F);
             GlStateManager.rotate(tile.spin + tile.spinInc * partialTicks, 0.0F, 0.0F, 1.0F);

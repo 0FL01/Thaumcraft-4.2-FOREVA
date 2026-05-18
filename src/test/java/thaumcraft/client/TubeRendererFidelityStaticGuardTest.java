@@ -28,6 +28,8 @@ public class TubeRendererFidelityStaticGuardTest {
         assertTrue("TileTubeValveRenderer should consume tile.rotation and orient by facing-axis rotation chain",
                 valveRenderer.contains("tile.rotation")
                         && valveRenderer.contains("face.getYOffset() == 0")
+                        && valveRenderer.contains("textures/blocks/pipe_valve.png")
+                        && valveRenderer.contains("renderValveOverlay()")
                         && valveRenderer.contains("GlStateManager.rotate(90.0F, face.getXOffset(), face.getYOffset(), face.getZOffset())"));
 
         assertTrue("TileTubeBufferRenderer should render center-anchored chokes using opposite-facing orientation",

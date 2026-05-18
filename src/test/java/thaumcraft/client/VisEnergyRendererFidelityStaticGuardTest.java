@@ -15,6 +15,8 @@ public class VisEnergyRendererFidelityStaticGuardTest {
     public void energizedNodeAndWorkbenchChargerRenderersUseReferenceShapedPaths() throws IOException {
         String nodeRenderer = read("src/main/java/thaumcraft/client/renderers/tile/TileNodeEnergizedRenderer.java");
         String chargerRenderer = read("src/main/java/thaumcraft/client/renderers/tile/TileMagicWorkbenchChargerRenderer.java");
+        String relayRenderer = read("src/main/java/thaumcraft/client/renderers/tile/TileVisRelayRenderer.java");
+        String crystalizerRenderer = read("src/main/java/thaumcraft/client/renderers/tile/TileEssentiaCrystalizerRenderer.java");
         String chargerModel = read("src/main/java/thaumcraft/client/renderers/models/ModelMagicWorkbenchCharger.java");
 
         assertTrue("TileNodeEnergizedRenderer should keep node-core rendering and animated lightning-ring overlay",
@@ -31,7 +33,22 @@ public class VisEnergyRendererFidelityStaticGuardTest {
                         && chargerRenderer.contains("model.renderRingFloat(MODEL_SCALE)")
                         && chargerRenderer.contains("model.renderSupport(MODEL_SCALE)")
                         && chargerRenderer.contains("model.renderCrystal(MODEL_SCALE)")
+                        && chargerRenderer.contains("OpenGlHelper.setLightmapTextureCoords(")
+                        && chargerRenderer.contains("VisNetHandler.isNodeValid(tile.getParent())")
                         && !chargerRenderer.contains("TileRenderHelper.drawTexturedQuad("));
+
+        assertTrue("TileVisRelayRenderer should keep ring/crystal model path with lightmap pulse contract",
+                relayRenderer.contains("model.renderRingBase(MODEL_SCALE)")
+                        && relayRenderer.contains("model.renderRingFloat(MODEL_SCALE)")
+                        && relayRenderer.contains("model.renderCrystal(MODEL_SCALE)")
+                        && relayRenderer.contains("OpenGlHelper.setLightmapTextureCoords(")
+                        && relayRenderer.contains("VisNetHandler.isNodeValid(tile.getParent())"));
+
+        assertTrue("TileEssentiaCrystalizerRenderer should keep crystal loop and lightmap-driven glow contract",
+                crystalizerRenderer.contains("model.renderRingBase(MODEL_SCALE)")
+                        && crystalizerRenderer.contains("model.renderCrystal(MODEL_SCALE)")
+                        && crystalizerRenderer.contains("for (int i = 0; i < 4; i++)")
+                        && crystalizerRenderer.contains("OpenGlHelper.setLightmapTextureCoords("));
 
         assertTrue("ModelMagicWorkbenchCharger should expose ring/support/crystal model parts",
                 chargerModel.contains("class ModelMagicWorkbenchCharger extends ModelBase")

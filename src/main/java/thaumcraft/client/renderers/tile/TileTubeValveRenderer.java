@@ -10,6 +10,8 @@ import thaumcraft.common.tiles.TileTubeValve;
 public class TileTubeValveRenderer extends TileEntitySpecialRenderer<TileTubeValve> {
     private static final ResourceLocation VALVE_TEXTURE =
             new ResourceLocation("thaumcraft", "textures/models/valve.png");
+    private static final ResourceLocation PIPE_VALVE_TEXTURE =
+            new ResourceLocation("thaumcraft", "textures/blocks/pipe_valve.png");
     private static final float MODEL_SCALE = 0.0625F;
 
     private final ModelTubeValve model = new ModelTubeValve();
@@ -33,7 +35,18 @@ public class TileTubeValveRenderer extends TileEntitySpecialRenderer<TileTubeVal
             GlStateManager.color(1.0F, 0.4F, 0.4F, 1.0F);
         }
         model.render(MODEL_SCALE);
+        renderValveOverlay();
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+        GlStateManager.popMatrix();
+    }
+
+    private void renderValveOverlay() {
+        GlStateManager.pushMatrix();
+        GlStateManager.rotate(90.0F, 1.0F, 0.0F, 0.0F);
+        GlStateManager.translate(-0.25F, -0.25F, -0.25F);
+        GlStateManager.scale(0.5F, 0.5F, 0.5F);
+        bindTexture(PIPE_VALVE_TEXTURE);
+        TileRenderHelper.drawTexturedQuad(0.25F, 0xFFFFFFFF, 0.0F, 1.0F, 0.0F, 1.0F);
         GlStateManager.popMatrix();
     }
 
