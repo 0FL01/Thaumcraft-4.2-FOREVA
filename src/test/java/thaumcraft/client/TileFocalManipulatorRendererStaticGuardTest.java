@@ -14,11 +14,19 @@ public class TileFocalManipulatorRendererStaticGuardTest {
     @Test
     public void focalManipulatorRendererKeepsReferenceModelAndFocusContract() throws IOException {
         String source = read("src/main/java/thaumcraft/client/renderers/tile/TileFocalManipulatorRenderer.java");
+        String thaumatorium = read("src/main/java/thaumcraft/client/renderers/tile/TileThaumatoriumRenderer.java");
 
         assertTrue(source.contains("textures/models/wandtable.png"));
         assertTrue(source.contains("new ModelArcaneWorkbench()"));
         assertTrue(source.contains("focus.getItem() instanceof ItemFocusBasic"));
         assertTrue(source.contains("tableModel.renderAll(MODEL_SCALE);"));
+        assertTrue(source.contains("MathHelper.sin(ticks / 14.0F) * 0.2F + 0.2F"));
+        assertTrue(source.contains("renderItem(focus.copy(), ItemCameraTransforms.TransformType.GROUND)"));
+
+        assertTrue(thaumatorium.contains("textures/models/thaumatorium.png"));
+        assertTrue(thaumatorium.contains("model.renderAll();"));
+        assertTrue(thaumatorium.contains("renderItem(output.copy(), ItemCameraTransforms.TransformType.GROUND)"));
+        assertTrue(thaumatorium.contains("GlStateManager.scale(0.75F, 0.75F, 0.75F);"));
     }
 
     private static String read(String path) throws IOException {

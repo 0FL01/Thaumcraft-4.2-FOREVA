@@ -1,6 +1,8 @@
 package thaumcraft.client.renderers.tile;
 
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.renderer.RenderHelper;
+import net.minecraft.client.renderer.block.model.ItemCameraTransforms;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
@@ -60,7 +62,11 @@ public class TileThaumatoriumRenderer extends TileEntitySpecialRenderer<TileThau
         GlStateManager.pushMatrix();
         GlStateManager.translate(ix, iy, iz);
         rotateItemByFacing(facing);
-        TileRenderHelper.renderFloatingItem(output.copy(), TileRenderHelper.ticks(tile, partialTicks), 0.0F, 0.75F);
+        GlStateManager.scale(0.75F, 0.75F, 0.75F);
+        RenderHelper.enableStandardItemLighting();
+        net.minecraft.client.Minecraft.getMinecraft().getRenderItem()
+                .renderItem(output.copy(), ItemCameraTransforms.TransformType.GROUND);
+        RenderHelper.disableStandardItemLighting();
         GlStateManager.popMatrix();
     }
 
