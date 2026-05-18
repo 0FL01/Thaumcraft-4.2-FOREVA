@@ -470,6 +470,10 @@ public class ClientProxy extends CommonProxy {
     private void setupBlockRenderers() {
         registerBlockItemModel(ConfigBlocks.blockMagicalLeavesItem, 0, "type=0");
         registerBlockItemModel(ConfigBlocks.blockMagicalLeavesItem, 1, "type=1");
+        Item woodenDeviceItem = Item.getItemFromBlock(ConfigBlocks.blockWoodenDevice);
+        for (int meta = 0; meta <= 8; meta++) {
+            registerBlockItemModel(woodenDeviceItem, meta, "type=" + meta);
+        }
         Item candleItem = Item.getItemFromBlock(ConfigBlocks.blockCandle);
         for (int meta = 0; meta < 16; meta++) {
             registerBlockItemModel(candleItem, meta, "type=" + meta);
