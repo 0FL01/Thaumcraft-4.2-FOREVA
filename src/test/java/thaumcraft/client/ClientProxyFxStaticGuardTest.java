@@ -174,9 +174,11 @@ public class ClientProxyFxStaticGuardTest {
         assertTrue("ParticleEngine must keep queued particle intake + tick drain + effectRenderer dispatch baseline",
                 particleEngine.contains("public static void addEffect(World world, Particle particle)")
                         && particleEngine.contains("pendingParticles")
-                        && particleEngine.contains("event.phase != TickEvent.Phase.END")
+                        && particleEngine.contains("event.phase != TickEvent.Phase.START")
                         && particleEngine.contains("mc.effectRenderer.addEffect(queued.particle)")
-                        && particleEngine.contains("MAX_PARTICLE_ADDITIONS_PER_TICK"));
+                        && particleEngine.contains("MAX_PARTICLE_ADDITIONS_PER_TICK")
+                        && particleEngine.contains("MAX_PENDING_PARTICLES_PER_LAYER")
+                        && particleEngine.contains("dropOldestPendingFromBucket"));
         assertTrue("ParticleEngine must keep render-world bookkeeping baseline",
                 particleEngine.contains("lastRenderWorldTime")
                         && particleEngine.contains("lastRenderPartialTicks")
