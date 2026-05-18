@@ -213,6 +213,9 @@ public class CommonProxy implements IGuiHandler {
     public void essentiaTrailFx(World world, int x, int y, int z, int tx, int ty, int tz, int count, int color, float scale) {
     }
 
+    public void visDrainFx(World world, BlockPos from, BlockPos to, int color) {
+    }
+
     public void blockRunes(World world, double x, double y, double z, float red, float green, float blue, int duration, float gravity) {
     }
 

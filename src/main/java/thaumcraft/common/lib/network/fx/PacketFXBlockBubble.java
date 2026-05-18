@@ -2,7 +2,7 @@ package thaumcraft.common.lib.network.fx;
 
 import io.netty.buffer.ByteBuf;
 import java.awt.Color;
-import net.minecraft.client.Minecraft;
+import net.minecraft.world.World;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 import net.minecraftforge.fml.relauncher.Side;
@@ -44,36 +44,37 @@ public class PacketFXBlockBubble extends PacketBase {
     @Override
     @SideOnly(Side.CLIENT)
     public IMessage onMessage(MessageContext ctx) {
-        Minecraft.getMinecraft().addScheduledTask(() -> {
-            if (Minecraft.getMinecraft().world == null) return;
+        Thaumcraft.proxy.scheduleClientTask(() -> {
+            World world = Thaumcraft.proxy.getClientWorld();
+            if (world == null) return;
             Color c = new Color(this.color);
             float red = c.getRed() / 255.0F;
             float green = c.getGreen() / 255.0F;
             float blue = c.getBlue() / 255.0F;
             int amount = Thaumcraft.proxy.particleCount(1);
             for (int i = 0; i < amount; i++) {
-                double py = this.y + Minecraft.getMinecraft().world.rand.nextFloat();
+                double py = this.y + world.rand.nextFloat();
                 Thaumcraft.proxy.crucibleBubble(
-                        Minecraft.getMinecraft().world,
+                        world,
                         this.x,
                         (float) py,
-                        this.z + Minecraft.getMinecraft().world.rand.nextFloat(),
+                        this.z + world.rand.nextFloat(),
                         red, green, blue);
                 Thaumcraft.proxy.crucibleBubble(
-                        Minecraft.getMinecraft().world,
+                        world,
                         this.x + 1,
                         (float) py,
-                        this.z + Minecraft.getMinecraft().world.rand.nextFloat(),
+                        this.z + world.rand.nextFloat(),
                         red, green, blue);
                 Thaumcraft.proxy.crucibleBubble(
-                        Minecraft.getMinecraft().world,
-                        this.x + Minecraft.getMinecraft().world.rand.nextFloat(),
+                        world,
+                        this.x + world.rand.nextFloat(),
                         (float) py,
                         this.z,
                         red, green, blue);
                 Thaumcraft.proxy.crucibleBubble(
-                        Minecraft.getMinecraft().world,
-                        this.x + Minecraft.getMinecraft().world.rand.nextFloat(),
+                        world,
+                        this.x + world.rand.nextFloat(),
                         (float) py,
                         this.z + 1,
                         red, green, blue);

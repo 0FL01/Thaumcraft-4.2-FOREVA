@@ -1,8 +1,9 @@
 package thaumcraft.common.lib.network.fx;
 
 import io.netty.buffer.ByteBuf;
-import net.minecraft.client.Minecraft;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.SoundCategory;
+import net.minecraft.world.World;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 import net.minecraftforge.fml.relauncher.Side;
@@ -53,25 +54,27 @@ public class PacketFXBlockZap extends PacketBase {
     @Override
     @SideOnly(Side.CLIENT)
     public IMessage onMessage(MessageContext ctx) {
-        Minecraft.getMinecraft().addScheduledTask(() -> {
-            if (Minecraft.getMinecraft().world == null) return;
+        Thaumcraft.proxy.scheduleClientTask(() -> {
+            World world = Thaumcraft.proxy.getClientWorld();
+            if (world == null) return;
+            EntityPlayer player = Thaumcraft.proxy.getClientPlayer();
             Thaumcraft.proxy.nodeBolt(
-                    Minecraft.getMinecraft().world,
+                    world,
                     this.x,
                     this.y,
                     this.z,
                     this.dx,
                     this.dy,
                     this.dz);
-            Minecraft.getMinecraft().world.playSound(
-                    Minecraft.getMinecraft().player,
+            world.playSound(
+                    player,
                     this.x,
                     this.y,
                     this.z,
                     TCSounds.ZAP,
                     SoundCategory.BLOCKS,
                     0.1F,
-                    1.0F + Minecraft.getMinecraft().world.rand.nextFloat() * 0.2F);
+                    1.0F + world.rand.nextFloat() * 0.2F);
         });
         return null;
     }

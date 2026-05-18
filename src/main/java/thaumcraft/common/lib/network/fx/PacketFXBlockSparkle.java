@@ -1,7 +1,7 @@
 package thaumcraft.common.lib.network.fx;
 
 import io.netty.buffer.ByteBuf;
-import net.minecraft.client.Minecraft;
+import net.minecraft.world.World;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 import net.minecraftforge.fml.relauncher.Side;
@@ -43,9 +43,10 @@ public class PacketFXBlockSparkle extends PacketBase {
     @Override
     @SideOnly(Side.CLIENT)
     public IMessage onMessage(MessageContext ctx) {
-        Minecraft.getMinecraft().addScheduledTask(() -> {
-            if (Minecraft.getMinecraft().world == null) return;
-            Thaumcraft.proxy.blockSparkle(Minecraft.getMinecraft().world, this.x, this.y, this.z, this.color, 7);
+        Thaumcraft.proxy.scheduleClientTask(() -> {
+            World world = Thaumcraft.proxy.getClientWorld();
+            if (world == null) return;
+            Thaumcraft.proxy.blockSparkle(world, this.x, this.y, this.z, this.color, 7);
         });
         return null;
     }

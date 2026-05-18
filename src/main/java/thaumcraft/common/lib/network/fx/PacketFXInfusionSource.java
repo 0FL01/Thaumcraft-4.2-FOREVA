@@ -1,13 +1,14 @@
 package thaumcraft.common.lib.network.fx;
 
 import io.netty.buffer.ByteBuf;
-import net.minecraft.client.Minecraft;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import thaumcraft.common.Thaumcraft;
 import thaumcraft.common.lib.network.PacketBase;
 import thaumcraft.common.tiles.TileInfusionMatrix;
 import thaumcraft.common.tiles.TilePedestal;
@@ -58,20 +59,20 @@ public class PacketFXInfusionSource extends PacketBase {
     @Override
     @SideOnly(Side.CLIENT)
     public IMessage onMessage(MessageContext ctx) {
-        Minecraft.getMinecraft().addScheduledTask(() -> {
-            Minecraft mc = Minecraft.getMinecraft();
-            if (mc.world == null) return;
+        Thaumcraft.proxy.scheduleClientTask(() -> {
+            World world = Thaumcraft.proxy.getClientWorld();
+            if (world == null) return;
             int sx = this.x - this.dx;
             int sy = this.y - this.dy;
             int sz = this.z - this.dz;
             String fxKey = sx + ":" + sy + ":" + sz + ":" + this.color;
 
-            TileEntity matrixTile = mc.world.getTileEntity(new BlockPos(this.x, this.y, this.z));
+            TileEntity matrixTile = world.getTileEntity(new BlockPos(this.x, this.y, this.z));
             if (!(matrixTile instanceof TileInfusionMatrix)) return;
             TileInfusionMatrix matrix = (TileInfusionMatrix) matrixTile;
 
             int ticks = 15;
-            TileEntity sourceTile = mc.world.getTileEntity(new BlockPos(sx, sy, sz));
+            TileEntity sourceTile = world.getTileEntity(new BlockPos(sx, sy, sz));
             if (sourceTile instanceof TilePedestal) {
                 ticks = 60;
             }

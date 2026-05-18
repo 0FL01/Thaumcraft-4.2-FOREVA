@@ -924,6 +924,23 @@ public class ClientProxy extends CommonProxy {
     }
 
     @Override
+    public void visDrainFx(World world, BlockPos from, BlockPos to, int color) {
+        if (world == null || !world.isRemote || from == null || to == null) return;
+        float red = ((color >> 16) & 0xFF) / 255.0F;
+        float green = ((color >> 8) & 0xFF) / 255.0F;
+        float blue = (color & 0xFF) / 255.0F;
+        double sx = to.getX() + 0.4D + world.rand.nextFloat() * 0.2F;
+        double sy = to.getY() + 0.4D + world.rand.nextFloat() * 0.2F;
+        double sz = to.getZ() + 0.4D + world.rand.nextFloat() * 0.2F;
+        double tx = from.getX() + world.rand.nextFloat();
+        double ty = from.getY() + world.rand.nextFloat();
+        double tz = from.getZ() + world.rand.nextFloat();
+        FXVisSparkle sparkle = new FXVisSparkle(world, sx, sy, sz, tx, ty, tz);
+        sparkle.setRBGColorF(red, green, blue);
+        ParticleEngine.addEffect(world, sparkle);
+    }
+
+    @Override
     public void blockRunes(World world, double x, double y, double z, float red, float green, float blue, int duration, float gravity) {
         if (world == null || !world.isRemote) return;
         FXBlockRunes runes = new FXBlockRunes(world, x, y, z, red, green, blue, duration);

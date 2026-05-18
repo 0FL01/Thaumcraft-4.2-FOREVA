@@ -1,8 +1,8 @@
 package thaumcraft.common.lib.network.fx;
 
 import io.netty.buffer.ByteBuf;
-import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
+import net.minecraft.world.World;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 import net.minecraftforge.fml.relauncher.Side;
@@ -32,12 +32,12 @@ public class PacketFXSonic extends PacketBase {
     @Override
     @SideOnly(Side.CLIENT)
     public IMessage onMessage(MessageContext ctx) {
-        Minecraft.getMinecraft().addScheduledTask(() -> {
-            Minecraft mc = Minecraft.getMinecraft();
-            if (mc.world == null) return;
-            Entity sourceEntity = mc.world.getEntityByID(this.source);
+        Thaumcraft.proxy.scheduleClientTask(() -> {
+            World world = Thaumcraft.proxy.getClientWorld();
+            if (world == null) return;
+            Entity sourceEntity = world.getEntityByID(this.source);
             if (sourceEntity == null) return;
-            Thaumcraft.proxy.sonicFX(mc.world, sourceEntity, 10);
+            Thaumcraft.proxy.sonicFX(world, sourceEntity, 10);
         });
         return null;
     }

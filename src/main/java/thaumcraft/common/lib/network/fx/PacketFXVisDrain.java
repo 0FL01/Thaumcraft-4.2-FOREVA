@@ -1,14 +1,12 @@
 package thaumcraft.common.lib.network.fx;
 
 import io.netty.buffer.ByteBuf;
-import net.minecraft.client.Minecraft;
 import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import thaumcraft.client.fx.ParticleEngine;
-import thaumcraft.client.fx.particles.FXVisSparkle;
+import thaumcraft.common.Thaumcraft;
 import thaumcraft.common.lib.network.PacketBase;
 
 public class PacketFXVisDrain extends PacketBase {
@@ -42,21 +40,8 @@ public class PacketFXVisDrain extends PacketBase {
     @Override
     @SideOnly(Side.CLIENT)
     public IMessage onMessage(MessageContext ctx) {
-        Minecraft.getMinecraft().addScheduledTask(() -> {
-            Minecraft mc = Minecraft.getMinecraft();
-            if (mc.world == null) return;
-            float red = ((this.color >> 16) & 0xFF) / 255.0F;
-            float green = ((this.color >> 8) & 0xFF) / 255.0F;
-            float blue = (this.color & 0xFF) / 255.0F;
-            double sx = this.to.getX() + 0.4D + mc.world.rand.nextFloat() * 0.2F;
-            double sy = this.to.getY() + 0.4D + mc.world.rand.nextFloat() * 0.2F;
-            double sz = this.to.getZ() + 0.4D + mc.world.rand.nextFloat() * 0.2F;
-            double tx = this.from.getX() + mc.world.rand.nextFloat();
-            double ty = this.from.getY() + mc.world.rand.nextFloat();
-            double tz = this.from.getZ() + mc.world.rand.nextFloat();
-            FXVisSparkle sparkle = new FXVisSparkle(mc.world, sx, sy, sz, tx, ty, tz);
-            sparkle.setRBGColorF(red, green, blue);
-            ParticleEngine.addEffect(mc.world, sparkle);
+        Thaumcraft.proxy.scheduleClientTask(() -> {
+            Thaumcraft.proxy.visDrainFx(Thaumcraft.proxy.getClientWorld(), this.from, this.to, this.color);
         });
         return null;
     }

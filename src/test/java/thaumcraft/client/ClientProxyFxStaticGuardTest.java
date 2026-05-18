@@ -317,39 +317,49 @@ public class ClientProxyFxStaticGuardTest {
         String warpEvents = readFile("src/main/java/thaumcraft/common/lib/WarpEvents.java");
         String fallingTaint = readFile("src/main/java/thaumcraft/common/entities/EntityFallingTaint.java");
 
-        assertTrue("PacketFXVisDrain must schedule client task and route through FXVisSparkle trail",
-                visDrain.contains("Minecraft.getMinecraft().addScheduledTask")
-                        && visDrain.contains("new FXVisSparkle(")
-                        && visDrain.contains("ParticleEngine.addEffect("));
+        assertTrue("PacketFXVisDrain must schedule client task and route through proxy visDrainFx boundary",
+                visDrain.contains("Thaumcraft.proxy.scheduleClientTask(")
+                        && visDrain.contains("Thaumcraft.proxy.visDrainFx(")
+                        && !visDrain.contains("Minecraft.getMinecraft()")
+                        && !visDrain.contains("new FXVisSparkle(")
+                        && !visDrain.contains("ParticleEngine.addEffect("));
         assertTrue("PacketFXBlockArc must schedule client task and route through proxy arcLightning",
-                blockArc.contains("Minecraft.getMinecraft().addScheduledTask")
+                blockArc.contains("Thaumcraft.proxy.scheduleClientTask(")
                         && blockArc.contains("Thaumcraft.proxy.arcLightning(")
+                        && !blockArc.contains("Minecraft.getMinecraft()")
                         && blockArc.contains("EntityCultistPortal"));
         assertTrue("PacketFXBlockZap must schedule client task and route through proxy nodeBolt",
-                blockZap.contains("Minecraft.getMinecraft().addScheduledTask")
+                blockZap.contains("Thaumcraft.proxy.scheduleClientTask(")
+                        && !blockZap.contains("Minecraft.getMinecraft()")
                         && blockZap.contains("Thaumcraft.proxy.nodeBolt("));
         assertTrue("PacketFXBlockDig must schedule client task and route dig particles through proxy boreDigFx",
-                blockDig.contains("Minecraft.getMinecraft().addScheduledTask")
+                blockDig.contains("Thaumcraft.proxy.scheduleClientTask(")
+                        && !blockDig.contains("Minecraft.getMinecraft()")
                         && blockDig.contains("Thaumcraft.proxy.boreDigFx("));
         assertTrue("PacketFXBlockBubble must schedule client task and route through proxy crucibleBubble surface",
-                blockBubble.contains("Minecraft.getMinecraft().addScheduledTask")
+                blockBubble.contains("Thaumcraft.proxy.scheduleClientTask(")
+                        && !blockBubble.contains("Minecraft.getMinecraft()")
                         && blockBubble.contains("Thaumcraft.proxy.crucibleBubble("));
         assertTrue("PacketFXBeamPulse must schedule client task and route beam pulse trigger through proxy boundary",
-                beamPulse.contains("Minecraft.getMinecraft().addScheduledTask")
+                beamPulse.contains("Thaumcraft.proxy.scheduleClientTask(")
                         && beamPulse.contains("Thaumcraft.proxy.beamPulseFX(")
+                        && !beamPulse.contains("Minecraft.getMinecraft()")
                         && !beamPulse.contains("new FXBeam(")
                         && !beamPulse.contains("ParticleEngine.addEffect("));
         assertTrue("PacketFXBeamPulseGolemBoss must schedule client task and route golem-boss pulse trigger through proxy boundary",
-                beamPulseGolemBoss.contains("Minecraft.getMinecraft().addScheduledTask")
+                beamPulseGolemBoss.contains("Thaumcraft.proxy.scheduleClientTask(")
                         && beamPulseGolemBoss.contains("Thaumcraft.proxy.beamPulseGolemBossFX(")
+                        && !beamPulseGolemBoss.contains("Minecraft.getMinecraft()")
                         && !beamPulseGolemBoss.contains("new FXBeamGolemBoss(")
                         && !beamPulseGolemBoss.contains("ParticleEngine.addEffect("));
         assertTrue("PacketFXEssentiaSource must schedule client task and update EssentiaHandler sourceFX queue",
-                essentiaSource.contains("Minecraft.getMinecraft().addScheduledTask")
+                essentiaSource.contains("Thaumcraft.proxy.scheduleClientTask(")
+                        && !essentiaSource.contains("Minecraft.getMinecraft()")
                         && essentiaSource.contains("EssentiaHandler.sourceFX")
                         && essentiaSource.contains("new EssentiaHandler.EssentiaSourceFX("));
         assertTrue("PacketFXInfusionSource must schedule client task and update TileInfusionMatrix sourceFX state",
-                infusionSource.contains("Minecraft.getMinecraft().addScheduledTask")
+                infusionSource.contains("Thaumcraft.proxy.scheduleClientTask(")
+                        && !infusionSource.contains("Minecraft.getMinecraft()")
                         && infusionSource.contains("matrix.sourceFX")
                         && infusionSource.contains("new TileInfusionMatrix.SourceFX("));
         assertTrue("PacketMiscEvent must schedule client task via proxy boundary and update warp vignette/fog markers",
@@ -363,28 +373,34 @@ public class ClientProxyFxStaticGuardTest {
                 packetBoreDig.contains("Thaumcraft.proxy.scheduleClientTask(")
                         && packetBoreDig.contains("getDigEvent"));
         assertTrue("PacketFXBlockSparkle must schedule client task and call proxy blockSparkle",
-                blockSparkle.contains("Minecraft.getMinecraft().addScheduledTask") && blockSparkle.contains("Thaumcraft.proxy.blockSparkle("));
+                blockSparkle.contains("Thaumcraft.proxy.scheduleClientTask(")
+                        && !blockSparkle.contains("Minecraft.getMinecraft()")
+                        && blockSparkle.contains("Thaumcraft.proxy.blockSparkle("));
         assertTrue("PacketFXShield must schedule client task and route shield rune triggers through proxy boundary",
-                shield.contains("Minecraft.getMinecraft().addScheduledTask")
+                shield.contains("Thaumcraft.proxy.scheduleClientTask(")
                         && shield.contains("Thaumcraft.proxy.shieldRunesFX(")
+                        && !shield.contains("Minecraft.getMinecraft()")
                         && !shield.contains("new FXShieldRunes(")
                         && !shield.contains("ParticleEngine.addEffect(")
                         && !shield.contains("new FXLightningBolt(")
                         && !shield.contains("Thaumcraft.proxy.burst("));
         assertTrue("PacketFXSonic must schedule client task and route sonic trigger through proxy boundary",
-                sonic.contains("Minecraft.getMinecraft().addScheduledTask")
+                sonic.contains("Thaumcraft.proxy.scheduleClientTask(")
                         && sonic.contains("Thaumcraft.proxy.sonicFX(")
+                        && !sonic.contains("Minecraft.getMinecraft()")
                         && !sonic.contains("new FXSonic(")
                         && !sonic.contains("ParticleEngine.addEffect(")
                         && !sonic.contains("Thaumcraft.proxy.burst("));
         assertTrue("PacketFXWispZap must schedule client task and route through single proxy bolt path",
-                wispZap.contains("Minecraft.getMinecraft().addScheduledTask")
-                        && wispZap.contains("Thaumcraft.proxy.bolt(mc.world, sourceEntity, targetEntity)")
+                wispZap.contains("Thaumcraft.proxy.scheduleClientTask(")
+                        && wispZap.contains("Thaumcraft.proxy.bolt(world, sourceEntity, targetEntity)")
+                        && !wispZap.contains("Minecraft.getMinecraft()")
                         && !wispZap.contains("new FXLightningBolt(")
                         && !wispZap.contains("ParticleEngine.addEffect("));
         assertTrue("PacketFXZap must schedule client task and route zap trigger through proxy boundary",
-                zap.contains("Minecraft.getMinecraft().addScheduledTask")
-                        && zap.contains("Thaumcraft.proxy.zapFX(mc.world, sourceEntity, targetEntity);")
+                zap.contains("Thaumcraft.proxy.scheduleClientTask(")
+                        && zap.contains("Thaumcraft.proxy.zapFX(world, sourceEntity, targetEntity);")
+                        && !zap.contains("Minecraft.getMinecraft()")
                         && !zap.contains("new FXLightningBolt(")
                         && !zap.contains("bolt.finalizeBolt();")
                         && !zap.contains("ParticleEngine.addEffect(")

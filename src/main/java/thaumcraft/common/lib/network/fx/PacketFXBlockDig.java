@@ -4,11 +4,12 @@ import io.netty.buffer.ByteBuf;
 import net.minecraft.block.Block;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.client.Minecraft;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 import net.minecraftforge.fml.relauncher.Side;
@@ -66,8 +67,10 @@ public class PacketFXBlockDig extends PacketBase {
     @Override
     @SideOnly(Side.CLIENT)
     public IMessage onMessage(MessageContext ctx) {
-        Minecraft.getMinecraft().addScheduledTask(() -> {
-            if (Minecraft.getMinecraft().world == null) return;
+        Thaumcraft.proxy.scheduleClientTask(() -> {
+            World world = Thaumcraft.proxy.getClientWorld();
+            if (world == null) return;
+            EntityPlayer player = Thaumcraft.proxy.getClientPlayer();
             Item item = Item.getItemById(this.bi);
             int amount = Thaumcraft.proxy.particleCount(20);
             double tx = this.x + 0.5;
@@ -83,11 +86,11 @@ public class PacketFXBlockDig extends PacketBase {
                     state = block.getDefaultState();
                 }
                 for (int i = 0; i < amount; i++) {
-                    double sx = this.dx + Minecraft.getMinecraft().world.rand.nextFloat();
-                    double sy = this.dy + Minecraft.getMinecraft().world.rand.nextFloat();
-                    double sz = this.dz + Minecraft.getMinecraft().world.rand.nextFloat();
+                    double sx = this.dx + world.rand.nextFloat();
+                    double sy = this.dy + world.rand.nextFloat();
+                    double sz = this.dz + world.rand.nextFloat();
                     Thaumcraft.proxy.boreDigFx(
-                            Minecraft.getMinecraft().world,
+                            world,
                             sx,
                             sy,
                             sz,
@@ -98,9 +101,9 @@ public class PacketFXBlockDig extends PacketBase {
                             null,
                             0);
                 }
-                SoundType sound = state.getBlock().getSoundType(state, Minecraft.getMinecraft().world, new BlockPos(this.x, this.y, this.z), null);
-                Minecraft.getMinecraft().world.playSound(
-                        Minecraft.getMinecraft().player,
+                SoundType sound = state.getBlock().getSoundType(state, world, new BlockPos(this.x, this.y, this.z), null);
+                world.playSound(
+                        player,
                         this.dx + 0.5,
                         this.dy + 0.5,
                         this.dz + 0.5,
@@ -113,11 +116,11 @@ public class PacketFXBlockDig extends PacketBase {
 
             if (item == null) return;
             for (int i = 0; i < amount; i++) {
-                double sx = this.dx + Minecraft.getMinecraft().world.rand.nextFloat();
-                double sy = this.dy + Minecraft.getMinecraft().world.rand.nextFloat();
-                double sz = this.dz + Minecraft.getMinecraft().world.rand.nextFloat();
+                double sx = this.dx + world.rand.nextFloat();
+                double sy = this.dy + world.rand.nextFloat();
+                double sz = this.dz + world.rand.nextFloat();
                 Thaumcraft.proxy.boreDigFx(
-                        Minecraft.getMinecraft().world,
+                        world,
                         sx,
                         sy,
                         sz,

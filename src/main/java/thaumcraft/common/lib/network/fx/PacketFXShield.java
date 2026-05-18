@@ -1,8 +1,8 @@
 package thaumcraft.common.lib.network.fx;
 
 import io.netty.buffer.ByteBuf;
-import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
+import net.minecraft.world.World;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 import net.minecraftforge.fml.relauncher.Side;
@@ -36,17 +36,17 @@ public class PacketFXShield extends PacketBase {
     @Override
     @SideOnly(Side.CLIENT)
     public IMessage onMessage(MessageContext ctx) {
-        Minecraft.getMinecraft().addScheduledTask(() -> {
-            Minecraft mc = Minecraft.getMinecraft();
-            if (mc.world == null) return;
-            Entity sourceEntity = mc.world.getEntityByID(this.source);
+        Thaumcraft.proxy.scheduleClientTask(() -> {
+            World world = Thaumcraft.proxy.getClientWorld();
+            if (world == null) return;
+            Entity sourceEntity = world.getEntityByID(this.source);
             if (sourceEntity == null) return;
 
             float pitch = 0.0f;
             float yaw = 0.0f;
 
             if (this.target >= 0) {
-                Entity targetEntity = mc.world.getEntityByID(this.target);
+                Entity targetEntity = world.getEntityByID(this.target);
                 if (targetEntity != null) {
                     double d0 = sourceEntity.posX - targetEntity.posX;
                     double d1 = (sourceEntity.getEntityBoundingBox().minY + sourceEntity.getEntityBoundingBox().maxY) * 0.5D
@@ -59,17 +59,17 @@ public class PacketFXShield extends PacketBase {
                     pitch = 90.0f;
                     yaw = 0.0f;
                 }
-                Thaumcraft.proxy.shieldRunesFX(mc.world, sourceEntity, 8, yaw, pitch);
+                Thaumcraft.proxy.shieldRunesFX(world, sourceEntity, 8, yaw, pitch);
                 return;
             }
 
             if (this.target == -1) {
-                Thaumcraft.proxy.shieldRunesFX(mc.world, sourceEntity, 8, 0.0f, 90.0f);
-                Thaumcraft.proxy.shieldRunesFX(mc.world, sourceEntity, 8, 0.0f, 270.0f);
+                Thaumcraft.proxy.shieldRunesFX(world, sourceEntity, 8, 0.0f, 90.0f);
+                Thaumcraft.proxy.shieldRunesFX(world, sourceEntity, 8, 0.0f, 270.0f);
             } else if (this.target == -2) {
-                Thaumcraft.proxy.shieldRunesFX(mc.world, sourceEntity, 8, 0.0f, 270.0f);
+                Thaumcraft.proxy.shieldRunesFX(world, sourceEntity, 8, 0.0f, 270.0f);
             } else if (this.target == -3) {
-                Thaumcraft.proxy.shieldRunesFX(mc.world, sourceEntity, 8, 0.0f, 90.0f);
+                Thaumcraft.proxy.shieldRunesFX(world, sourceEntity, 8, 0.0f, 90.0f);
             }
         });
         return null;

@@ -1,9 +1,9 @@
 package thaumcraft.common.lib.network.fx;
 
 import io.netty.buffer.ByteBuf;
-import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.world.World;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 import net.minecraftforge.fml.relauncher.Side;
@@ -37,13 +37,13 @@ public class PacketFXBeamPulseGolemBoss extends PacketBase {
     @Override
     @SideOnly(Side.CLIENT)
     public IMessage onMessage(MessageContext ctx) {
-        Minecraft.getMinecraft().addScheduledTask(() -> {
-            Minecraft mc = Minecraft.getMinecraft();
-            if (mc.world == null) return;
-            Entity sourceEntity = mc.world.getEntityByID(this.source);
-            Entity targetEntity = mc.world.getEntityByID(this.target);
+        Thaumcraft.proxy.scheduleClientTask(() -> {
+            World world = Thaumcraft.proxy.getClientWorld();
+            if (world == null) return;
+            Entity sourceEntity = world.getEntityByID(this.source);
+            Entity targetEntity = world.getEntityByID(this.target);
             if (!(sourceEntity instanceof EntityLivingBase) || targetEntity == null) return;
-            Thaumcraft.proxy.beamPulseGolemBossFX(mc.world, (EntityLivingBase) sourceEntity, targetEntity);
+            Thaumcraft.proxy.beamPulseGolemBossFX(world, (EntityLivingBase) sourceEntity, targetEntity);
         });
         return null;
     }
