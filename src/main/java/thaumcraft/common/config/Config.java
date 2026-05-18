@@ -12,6 +12,7 @@ import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.world.biome.Biome;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.common.config.Property;
 import net.minecraftforge.fml.common.registry.ForgeRegistries;
@@ -471,6 +472,9 @@ public class Config {
     }
 
     public static void registerBiomes() {
+        net.minecraftforge.common.BiomeDictionary.Type frozenType =
+                net.minecraftforge.common.BiomeDictionary.Type.getType("FROZEN", net.minecraftforge.common.BiomeDictionary.Type.SNOWY);
+
         // Register BiomeDictionary types for Thaumcraft biomes
         if (ThaumcraftWorldGenerator.biomeMagicalForest != null) {
             net.minecraftforge.common.BiomeDictionary.addTypes(ThaumcraftWorldGenerator.biomeMagicalForest,
@@ -492,6 +496,13 @@ public class Config {
                     net.minecraftforge.common.BiomeDictionary.Type.MAGICAL,
                     net.minecraftforge.common.BiomeDictionary.Type.SPOOKY,
                     net.minecraftforge.common.BiomeDictionary.Type.END);
+        }
+        for (Biome biome : ForgeRegistries.BIOMES.getValuesCollection()) {
+            if (biome != null
+                    && net.minecraftforge.common.BiomeDictionary.hasType(biome, net.minecraftforge.common.BiomeDictionary.Type.SNOWY)
+                    && biome.getDefaultTemperature() <= 0.0f) {
+                net.minecraftforge.common.BiomeDictionary.addTypes(biome, frozenType);
+            }
         }
 
         // Register biome info for aura/aspect/greatwood support
@@ -518,7 +529,7 @@ public class Config {
         thaumcraft.common.lib.world.biomes.BiomeHandler.registerBiomeInfo(
                 net.minecraftforge.common.BiomeDictionary.Type.COLD, 80, Aspect.ORDER, false, 0.0f);
         thaumcraft.common.lib.world.biomes.BiomeHandler.registerBiomeInfo(
-                net.minecraftforge.common.BiomeDictionary.Type.SNOWY, 100, Aspect.ORDER, false, 0.0f);
+                frozenType, 100, Aspect.ORDER, false, 0.0f);
         thaumcraft.common.lib.world.biomes.BiomeHandler.registerBiomeInfo(
                 net.minecraftforge.common.BiomeDictionary.Type.MUSHROOM, 140, Aspect.ORDER, false, 0.0f);
         thaumcraft.common.lib.world.biomes.BiomeHandler.registerBiomeInfo(
