@@ -307,6 +307,24 @@ public class ClientProxy extends CommonProxy {
                 }
                 continue;
             }
+            if (item == ConfigItems.itemNuggetEdible) {
+                ModelResourceLocation chickenModel = new ModelResourceLocation(
+                        new ResourceLocation("thaumcraft", "itemnuggetedible_chicken"), "inventory");
+                ModelResourceLocation beefModel = new ModelResourceLocation(
+                        new ResourceLocation("thaumcraft", "itemnuggetedible_beef"), "inventory");
+                ModelResourceLocation porkModel = new ModelResourceLocation(
+                        new ResourceLocation("thaumcraft", "itemnuggetedible_pork"), "inventory");
+                ModelResourceLocation fishModel = new ModelResourceLocation(
+                        new ResourceLocation("thaumcraft", "itemnuggetedible_fish"), "inventory");
+                ModelLoader.setCustomModelResourceLocation(item, 0, chickenModel);
+                ModelLoader.setCustomModelResourceLocation(item, 1, beefModel);
+                ModelLoader.setCustomModelResourceLocation(item, 2, porkModel);
+                ModelLoader.setCustomModelResourceLocation(item, 3, fishModel);
+                for (int meta = 4; meta < 64; meta++) {
+                    ModelLoader.setCustomModelResourceLocation(item, meta, chickenModel);
+                }
+                continue;
+            }
             ModelResourceLocation model = new ModelResourceLocation(registryName, "inventory");
             for (int meta = 0; meta < 64; meta++) {
                 ModelLoader.setCustomModelResourceLocation(item, meta, model);
