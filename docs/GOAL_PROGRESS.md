@@ -22,6 +22,7 @@ Branch: `codex/durable-goal-stage8-9`
 
 - `git status --short` was clean at recon start.
 - Active branch: `codex/durable-goal-stage8-9`.
+- Incremental Stage 9-a/9-e recipe-key corpus guard delta: added aggregate static guard `ConfigRecipesReferenceKeyCorpusStaticGuardTest` to lock the full reference-shaped literal `ConfigResearch.recipes` key corpus in `ConfigRecipes` + Stage 9 recipe slices (278 unique literal keys extracted from 1.7.10 `ConfigRecipes`, including dynamic-prefix keys such as `Banner_`, `PrimalArrow_`, and `BalancedShard_`). Focused validation passed via `./scripts/dev.sh gradle test --tests thaumcraft.common.config.ConfigRecipesReferenceKeyCorpusStaticGuardTest --tests thaumcraft.common.config.ConfigResearchRecipeKeyCoverageTest --tests thaumcraft.common.config.ConfigRecipesResearchHandleParityStaticGuardTest`.
 - Stage 3/4 server/common baselines are documented as partial; Stage 5-7 remain open in targeted areas.
 - `./scripts/dev.sh validate` and `./scripts/dev.sh validate --smoke` pass on current builds.
 - GUI/manual graphics checks remain excluded by instruction and headless environment limits.
