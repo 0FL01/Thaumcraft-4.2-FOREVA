@@ -2,14 +2,17 @@ package thaumcraft.client.renderers.tile;
 
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
+import thaumcraft.client.renderers.models.ModelFluxScrubber;
 import thaumcraft.common.tiles.TileFluxScrubber;
 
 public class TileFluxScrubberRenderer extends TileEntitySpecialRenderer<TileFluxScrubber> {
     private static final ResourceLocation SCRUBBER =
             new ResourceLocation("thaumcraft", "textures/models/fluxscrubber.png");
-    private static final ResourceLocation WISPY =
-            new ResourceLocation("thaumcraft", "textures/misc/wispy.png");
+    private static final float MODEL_SCALE = 0.0625F;
+
+    private final ModelFluxScrubber model = new ModelFluxScrubber();
 
     @Override
     public void render(TileFluxScrubber tile, double x, double y, double z, float partialTicks, int destroyStage, float alpha) {
@@ -18,29 +21,38 @@ public class TileFluxScrubberRenderer extends TileEntitySpecialRenderer<TileFlux
         }
 
         float ticks = TileRenderHelper.ticks(tile, partialTicks);
-        float powerScale = Math.min(1.0F, tile.power / 25.0F);
-        float chargeScale = Math.min(1.0F, tile.charges / 16.0F);
-        float essentiaScale = Math.min(1.0F, tile.essentia / 4.0F);
+        float bob = (float) Math.sin((ticks + tile.count) / 8.0F) * 0.075F + 0.075F;
 
         GlStateManager.pushMatrix();
-        GlStateManager.translate(x + 0.5D, y + 0.65D, z + 0.5D);
+        translateFromOrientation(x, y, z, tile.facing);
         GlStateManager.disableLighting();
-        GlStateManager.enableBlend();
-        GlStateManager.blendFunc(770, 1);
-
+        GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
         bindTexture(SCRUBBER);
-        TileRenderHelper.orientBillboardToPlayer();
-        float base = 0.27F + powerScale * 0.07F;
-        TileRenderHelper.drawTexturedQuad(base, (0x80 << 24) | 0x00CCAAFF, 0.0F, 1.0F, 0.0F, 1.0F);
+        model.renderCap(MODEL_SCALE);
 
-        bindTexture(WISPY);
-        GlStateManager.rotate((ticks * (2.0F + chargeScale * 5.0F)) % 360.0F, 0.0F, 0.0F, 1.0F);
-        TileRenderHelper.drawTexturedQuad(base * 1.35F, (0x66 << 24) | 0x00FF66CC, 0.0F, 1.0F, 0.0F, 1.0F);
-        GlStateManager.rotate((ticks * (-3.0F - essentiaScale * 6.0F)) % 360.0F, 0.0F, 0.0F, 1.0F);
-        TileRenderHelper.drawTexturedQuad(base * 0.7F, (0x99 << 24) | 0x00AA88FF, 0.0F, 1.0F, 0.0F, 1.0F);
+        GlStateManager.pushMatrix();
+        GlStateManager.translate(0.0D, 0.0D, -bob);
+        model.renderTip(MODEL_SCALE);
+        GlStateManager.popMatrix();
 
-        GlStateManager.disableBlend();
         GlStateManager.enableLighting();
         GlStateManager.popMatrix();
+    }
+
+    private static void translateFromOrientation(double x, double y, double z, EnumFacing facing) {
+        GlStateManager.translate(x + 0.5D, y + 0.5D, z + 0.5D);
+        int orientation = facing == null ? EnumFacing.DOWN.ordinal() : facing.ordinal();
+        if (orientation == 0) {
+            GlStateManager.rotate(-90.0F, 1.0F, 0.0F, 0.0F);
+        } else if (orientation == 1) {
+            GlStateManager.rotate(90.0F, 1.0F, 0.0F, 0.0F);
+        } else if (orientation == 3) {
+            GlStateManager.rotate(180.0F, 0.0F, 1.0F, 0.0F);
+        } else if (orientation == 4) {
+            GlStateManager.rotate(90.0F, 0.0F, 1.0F, 0.0F);
+        } else if (orientation == 5) {
+            GlStateManager.rotate(-90.0F, 0.0F, 1.0F, 0.0F);
+        }
+        GlStateManager.translate(0.0D, 0.0D, -0.5D);
     }
 }
