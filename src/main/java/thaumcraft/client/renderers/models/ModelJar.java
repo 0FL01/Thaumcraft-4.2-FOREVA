@@ -34,4 +34,17 @@ public class ModelJar extends ModelBase {
     public void renderCore(float scale) {
         core.render(scale);
     }
+
+    public void renderBrine(float scale) {
+        brine.render(scale);
+    }
+
+    public void renderLid(float scale) {
+        lid.render(scale);
+    }
+
+    public void renderAll(float scale) {
+        renderCore(scale);
+        renderLid(scale);
+    }
 }

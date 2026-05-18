@@ -16,6 +16,7 @@ import net.minecraft.client.renderer.entity.RenderEntityItem;
 import net.minecraft.client.renderer.entity.RenderSnowball;
 import net.minecraft.client.renderer.entity.RenderSpider;
 import net.minecraft.client.renderer.entity.RenderZombie;
+import net.minecraft.client.renderer.tileentity.TileEntityItemStackRenderer;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
@@ -109,6 +110,7 @@ import thaumcraft.client.renderers.entity.RenderTaintVillager;
 import thaumcraft.client.renderers.entity.RenderTravelingTrunk;
 import thaumcraft.client.renderers.entity.RenderWisp;
 import thaumcraft.client.renderers.entity.RenderCultist;
+import thaumcraft.client.renderers.item.ItemJarRenderer;
 import thaumcraft.client.renderers.tile.TileAlembicRenderer;
 import thaumcraft.client.renderers.tile.TileAlchemyFurnaceAdvancedRenderer;
 import thaumcraft.client.renderers.tile.TileArcaneLampRenderer;
@@ -336,6 +338,16 @@ public class ClientProxy extends CommonProxy {
                     ConfigBlocks.blockCandle
             );
         }
+        setupTileLinkedItemRenderers();
+    }
+
+    private void setupTileLinkedItemRenderers() {
+        Item jarItem = Item.getItemFromBlock(ConfigBlocks.blockJar);
+        if (jarItem == null) {
+            return;
+        }
+        TileEntityItemStackRenderer renderer = new ItemJarRenderer();
+        jarItem.setTileEntityItemStackRenderer(renderer);
     }
 
     private void setupEntityRenderers() {
