@@ -3,11 +3,15 @@ package thaumcraft.client.renderers.tile;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.util.ResourceLocation;
+import thaumcraft.client.renderers.models.ModelTable;
 import thaumcraft.common.tiles.TileTable;
 
 public class TileTableRenderer extends TileEntitySpecialRenderer<TileTable> {
     private static final ResourceLocation TABLE =
             new ResourceLocation("thaumcraft", "textures/models/table.png");
+    private static final float MODEL_SCALE = 0.0625F;
+
+    private final ModelTable tableModel = new ModelTable();
 
     @Override
     public void render(TileTable tile, double x, double y, double z, float partialTicks, int destroyStage, float alpha) {
@@ -15,19 +19,20 @@ public class TileTableRenderer extends TileEntitySpecialRenderer<TileTable> {
             return;
         }
 
-        float ticks = TileRenderHelper.ticks(tile, partialTicks);
-        float pulse = 0.14F + (float) Math.sin(ticks / 20.0F) * 0.02F;
+        int md = tile.getBlockMetadata();
+        if (md >= 6) {
+            return;
+        }
 
         GlStateManager.pushMatrix();
-        GlStateManager.translate(x + 0.5D, y + 1.01D, z + 0.5D);
-        GlStateManager.disableLighting();
-        GlStateManager.enableBlend();
-        GlStateManager.blendFunc(770, 771);
+        GlStateManager.translate(x + 0.5D, y + 1.0D, z + 0.5D);
+        GlStateManager.rotate(180.0F, 1.0F, 0.0F, 0.0F);
+        if (md == 1) {
+            GlStateManager.rotate(90.0F, 0.0F, 1.0F, 0.0F);
+        }
+        GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
         bindTexture(TABLE);
-        TileRenderHelper.orientBillboardToPlayer();
-        TileRenderHelper.drawTexturedQuad(pulse, 0x66FFFFFF, 0.0F, 1.0F, 0.0F, 1.0F);
-        GlStateManager.disableBlend();
-        GlStateManager.enableLighting();
+        tableModel.renderAll(MODEL_SCALE);
         GlStateManager.popMatrix();
     }
 }
