@@ -1,8 +1,12 @@
 package thaumcraft.client.renderers.tile;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.renderer.OpenGlHelper;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
+import net.minecraft.init.Blocks;
 import thaumcraft.common.tiles.TileCrucible;
 
 public class TileCrucibleRenderer extends TileEntitySpecialRenderer<TileCrucible> {
@@ -16,6 +20,12 @@ public class TileCrucibleRenderer extends TileEntitySpecialRenderer<TileCrucible
         if (fluidHeight <= 0.3001F) {
             return;
         }
+        TextureAtlasSprite water = Minecraft.getMinecraft().getBlockRendererDispatcher()
+                .getBlockModelShapes()
+                .getTexture(Blocks.WATER.getDefaultState());
+        if (water == null) {
+            return;
+        }
 
         float raw = TileRenderHelper.clamp01((float) tile.tagAmount() / 100.0F);
         float recolor = raw > 0.0F ? 0.5F + raw / 2.0F : 0.0F;
@@ -27,17 +37,22 @@ public class TileCrucibleRenderer extends TileEntitySpecialRenderer<TileCrucible
                 | ((int) (r * 255.0F) << 16)
                 | ((int) (g * 255.0F) << 8)
                 | (int) (b * 255.0F);
+        int packedLight = tile.getWorld().getCombinedLight(tile.getPos(), 0);
+        float prevLightX = OpenGlHelper.lastBrightnessX;
+        float prevLightY = OpenGlHelper.lastBrightnessY;
+        float lightX = packedLight & 0xFFFF;
+        float lightY = (packedLight >> 16) & 0xFFFF;
 
         GlStateManager.pushMatrix();
         GlStateManager.translate(x + 0.5D, y + fluidHeight, z + 0.5D);
         GlStateManager.rotate(90.0F, -1.0F, 0.0F, 0.0F);
         bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
-        GlStateManager.disableLighting();
         GlStateManager.enableBlend();
         GlStateManager.blendFunc(770, 771);
-        TileRenderHelper.drawTexturedQuad(0.33F, color, 0.0F, 1.0F, 0.0F, 1.0F);
+        OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, lightX, lightY);
+        TileRenderHelper.drawTexturedQuad(0.33F, color, water.getMinU(), water.getMaxU(), water.getMinV(), water.getMaxV());
+        OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, prevLightX, prevLightY);
         GlStateManager.disableBlend();
-        GlStateManager.enableLighting();
         GlStateManager.popMatrix();
     }
 }
