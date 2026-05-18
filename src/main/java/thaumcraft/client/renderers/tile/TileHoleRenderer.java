@@ -1,6 +1,7 @@
 package thaumcraft.client.renderers.tile;
 
 import java.util.Random;
+import net.minecraft.client.renderer.ActiveRenderInfo;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BufferBuilder;
@@ -32,6 +33,14 @@ public class TileHoleRenderer extends TileEntitySpecialRenderer<TileHole> {
         Entity viewer = Minecraft.getMinecraft().getRenderViewEntity();
         boolean inRange = viewer != null && tile.getPos().distanceSq(viewer.posX, viewer.posY, viewer.posZ) < 512.0D;
         float time = (float) (System.currentTimeMillis() % 700000L) / 250000.0F;
+        double viewX = 0.0D;
+        double viewY = 0.0D;
+        double viewZ = 0.0D;
+        if (viewer != null) {
+            viewX = viewer.lastTickPosX + (viewer.posX - viewer.lastTickPosX) * partialTicks;
+            viewY = viewer.lastTickPosY + (viewer.posY - viewer.lastTickPosY) * partialTicks;
+            viewZ = viewer.lastTickPosZ + (viewer.posZ - viewer.lastTickPosZ) * partialTicks;
+        }
 
         GlStateManager.pushMatrix();
         GlStateManager.translate(x, y, z);
@@ -42,7 +51,7 @@ public class TileHoleRenderer extends TileEntitySpecialRenderer<TileHole> {
 
         for (EnumFacing face : EnumFacing.VALUES) {
             if (shouldRenderFace(tile.getPos(), face)) {
-                renderFace(face, time, inRange);
+                renderFace(face, time, inRange, viewX, viewY, viewZ);
             }
         }
 
@@ -59,12 +68,13 @@ public class TileHoleRenderer extends TileEntitySpecialRenderer<TileHole> {
         return adjState.isOpaqueCube() && adjState.getBlock() != ConfigBlocks.blockHole;
     }
 
-    private void renderFace(EnumFacing face, float time, boolean inRange) {
+    private void renderFace(EnumFacing face, float time, boolean inRange, double viewX, double viewY, double viewZ) {
+        float axisOffset = face.getAxisDirection() == EnumFacing.AxisDirection.POSITIVE ? OFFSET_FAR : OFFSET_NEAR;
         if (!inRange) {
             bindTexture(PARTICLE_FIELD_FALLBACK);
             GlStateManager.enableBlend();
             GlStateManager.blendFunc(770, 771);
-            drawFace(face, face.getAxisDirection() == EnumFacing.AxisDirection.POSITIVE ? OFFSET_FAR : OFFSET_NEAR,
+            drawFace(face, axisOffset,
                     0.5F, 0.5F, 0.5F, 1.0F, 0.0F, 0.0F, 1.0F, 1.0F);
             GlStateManager.disableBlend();
             return;
@@ -72,17 +82,14 @@ public class TileHoleRenderer extends TileEntitySpecialRenderer<TileHole> {
 
         Random random = new Random(31100L + face.getIndex() * 17L);
         for (int i = 0; i < 16; i++) {
-            float layer = 16.0F - i;
-            float brightnessScale = 1.0F / (layer + 1.0F);
+            float layerDepth = 16.0F - i;
+            float shade = 1.0F / (layerDepth + 1.0F);
             float uvScale = 0.0625F;
-            float shade = brightnessScale;
-            float uvShift = time + (float) (i * i * 4321 + i * 9) * 2.0F / 360.0F;
-            float offset = face.getAxisDirection() == EnumFacing.AxisDirection.POSITIVE
-                    ? OFFSET_FAR - i * 0.00035F
-                    : OFFSET_NEAR + i * 0.00035F;
+            float uvShift = time;
 
             if (i == 0) {
                 bindTexture(TUNNEL);
+                layerDepth = 65.0F;
                 uvScale = 0.125F;
                 shade = 0.1F;
                 GlStateManager.enableBlend();
@@ -95,21 +102,58 @@ public class TileHoleRenderer extends TileEntitySpecialRenderer<TileHole> {
             } else {
                 bindTexture(PARTICLE_FIELD);
                 GlStateManager.enableBlend();
-                GlStateManager.blendFunc(770, 771);
+                GlStateManager.blendFunc(1, 1);
             }
+
+            uvShift += (float) (i * i * 4321 + i * 9) * 2.0F;
+            float parallaxScale = uvScale * (0.75F + layerDepth * 0.015625F);
+            float[] parallax = parallaxOffsets(face, viewX, viewY, viewZ, parallaxScale);
+            float uShift = uvShift * uvScale + parallax[0];
+            float vShift = uvShift * uvScale + parallax[1];
 
             float r = i == 0 ? 1.0F : (random.nextFloat() * 0.5F + 0.1F);
             float g = i == 0 ? 1.0F : (random.nextFloat() * 0.5F + 0.4F);
             float b = i == 0 ? 1.0F : (random.nextFloat() * 0.5F + 0.5F);
-            float a = i == 0 ? 0.9F : 0.35F;
             r *= shade;
             g *= shade;
             b *= shade;
 
-            drawFace(face, offset, r, g, b, a, uvShift, uvShift, uvScale, uvScale);
+            drawFace(face, axisOffset, r, g, b, 1.0F, uShift, vShift, uvScale, uvScale);
         }
 
         GlStateManager.disableBlend();
+    }
+
+    private static float[] parallaxOffsets(EnumFacing face, double viewX, double viewY, double viewZ, float scale) {
+        float rotX = ActiveRenderInfo.getRotationX();
+        float rotZ = ActiveRenderInfo.getRotationZ();
+        float rotYZ = ActiveRenderInfo.getRotationYZ();
+        float rotXY = ActiveRenderInfo.getRotationXY();
+        float rotXZ = ActiveRenderInfo.getRotationXZ();
+
+        float u;
+        float v;
+        switch (face) {
+            case UP:
+            case DOWN:
+                u = (float) (viewX * rotX + viewZ * rotYZ);
+                v = (float) (viewX * rotZ + viewZ * rotXY);
+                break;
+            case NORTH:
+            case SOUTH:
+                u = (float) (viewX * rotX + viewY * rotXZ);
+                v = (float) (viewX * rotZ + viewY * rotXY);
+                break;
+            case WEST:
+            case EAST:
+                u = (float) (viewZ * rotYZ + viewY * rotXZ);
+                v = (float) (viewZ * rotXY + viewY * rotX);
+                break;
+            default:
+                u = 0.0F;
+                v = 0.0F;
+        }
+        return new float[]{u * scale, v * scale};
     }
 
     private void drawFace(EnumFacing face, float axisOffset, float r, float g, float b, float a,
