@@ -1,21 +1,39 @@
 package thaumcraft.common.tiles;
 
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.SoundCategory;
 import thaumcraft.api.aspects.Aspect;
+import thaumcraft.common.lib.TCSounds;
 
 public class TileTubeValve extends TileTube {
     public boolean allowFlow = true;
     private boolean wasPoweredLastTick = false;
+    public float rotation = 0.0F;
 
     @Override
     public void update() {
         if (this.world != null && !this.world.isRemote && this.count % 5 == 0) {
             boolean powered = this.world.isBlockPowered(this.pos);
-            if (powered != this.wasPoweredLastTick) {
-                this.allowFlow = !powered;
+            if (this.wasPoweredLastTick && !powered && !this.allowFlow) {
+                this.allowFlow = true;
+                this.world.playSound(null, this.pos, TCSounds.SQUEEK, SoundCategory.BLOCKS,
+                        0.7F, 0.9F + this.world.rand.nextFloat() * 0.2F);
+                this.markDirtyAndSync();
+            }
+            if (!this.wasPoweredLastTick && powered && this.allowFlow) {
+                this.allowFlow = false;
+                this.world.playSound(null, this.pos, TCSounds.SQUEEK, SoundCategory.BLOCKS,
+                        0.7F, 0.9F + this.world.rand.nextFloat() * 0.2F);
                 this.markDirtyAndSync();
             }
             this.wasPoweredLastTick = powered;
+        }
+        if (this.world != null && this.world.isRemote) {
+            if (!this.allowFlow && this.rotation < 360.0F) {
+                this.rotation += 20.0F;
+            } else if (this.allowFlow && this.rotation > 0.0F) {
+                this.rotation -= 20.0F;
+            }
         }
         super.update();
     }
