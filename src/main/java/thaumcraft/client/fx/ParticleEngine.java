@@ -4,6 +4,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.particle.Particle;
 import net.minecraft.world.World;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
+import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.minecraftforge.fml.relauncher.Side;
@@ -46,6 +47,9 @@ public final class ParticleEngine {
 
     @SubscribeEvent
     public void updateParticles(TickEvent.ClientTickEvent event) {
+        if (event.side != Side.CLIENT) {
+            return;
+        }
         if (event.phase != TickEvent.Phase.START) {
             return;
         }
@@ -85,6 +89,14 @@ public final class ParticleEngine {
         }
         lastRenderWorldTime = mc.world.getTotalWorldTime();
         lastRenderPartialTicks = event.getPartialTicks();
+    }
+
+    @SubscribeEvent
+    public void onWorldUnload(WorldEvent.Unload event) {
+        if (event.getWorld() == null || !event.getWorld().isRemote) {
+            return;
+        }
+        clearPendingParticles();
     }
 
     public long getLastRenderWorldTime() {
