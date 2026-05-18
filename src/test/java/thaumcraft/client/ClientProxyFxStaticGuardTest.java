@@ -200,16 +200,18 @@ public class ClientProxyFxStaticGuardTest {
                 blockWardFx.contains("class FXBlockWard extends Particle")
                         && blockWardFx.contains("EnumFacing.random(this.rand)")
                         && blockWardFx.contains("EnumParticleTypes.REDSTONE"));
-        assertTrue("Dedicated FXBoreParticles must keep target-driven bore dig emission baseline",
+        assertTrue("Dedicated FXBoreParticles must keep target-driven bore dig textured baseline",
                 boreFx.contains("class FXBoreParticles extends Particle")
                         && boreFx.contains("targetX")
-                        && boreFx.contains("EnumParticleTypes.BLOCK_CRACK")
-                        && boreFx.contains("EnumParticleTypes.ITEM_CRACK"));
-        assertTrue("Dedicated FXBoreSparkle particle must keep target-chasing sparkle baseline",
+                        && boreFx.contains("setParticleTexture(")
+                        && boreFx.contains("pushOutOfBlocks(")
+                        && boreFx.contains("getFXLayer()"));
+        assertTrue("Dedicated FXBoreSparkle particle must keep target-chasing textured sparkle baseline",
                 boreSparkleFx.contains("class FXBoreSparkle extends Particle")
                         && boreSparkleFx.contains("targetX")
-                        && boreSparkleFx.contains("EnumParticleTypes.REDSTONE")
-                        && boreSparkleFx.contains("EnumParticleTypes.CRIT_MAGIC"));
+                        && boreSparkleFx.contains("particle = 24")
+                        && boreSparkleFx.contains("setParticleTextureIndex(this.particle + this.particleAge % 4)")
+                        && boreSparkleFx.contains("getBrightnessForRender("));
         assertTrue("Dedicated FXBreaking particle must keep item-crack + tint baseline",
                 breakingFx.contains("class FXBreaking extends Particle")
                         && breakingFx.contains("setParticleMaxAge(int particleMaxAge)")
