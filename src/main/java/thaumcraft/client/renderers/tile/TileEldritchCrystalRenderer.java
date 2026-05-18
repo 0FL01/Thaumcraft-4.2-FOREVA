@@ -1,10 +1,14 @@
 package thaumcraft.client.renderers.tile;
 
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
-import thaumcraft.common.tiles.TileCrystal;
+import net.minecraft.util.math.MathHelper;
+import thaumcraft.client.renderers.models.ModelCrystal;
 import thaumcraft.common.tiles.TileEldritchCrystal;
 
 public class TileEldritchCrystalRenderer extends TileEntitySpecialRenderer<TileEldritchCrystal> {
@@ -12,6 +16,9 @@ public class TileEldritchCrystalRenderer extends TileEntitySpecialRenderer<TileE
             new ResourceLocation("thaumcraft", "textures/blocks/crust.png");
     private static final ResourceLocation CRYSTAL_TEXTURE =
             new ResourceLocation("thaumcraft", "textures/models/vcrystal.png");
+    private static final float MODEL_SCALE = 0.4F;
+
+    private final ModelCrystal model = new ModelCrystal();
 
     @Override
     public void render(TileEldritchCrystal tile, double x, double y, double z, float partialTicks, int destroyStage, float alpha) {
@@ -20,7 +27,6 @@ public class TileEldritchCrystalRenderer extends TileEntitySpecialRenderer<TileE
         }
 
         int rotationStep = Math.floorMod(tile.hashCode(), 4);
-        float pulse = 0.92F + (float) Math.sin(TileRenderHelper.ticks(tile, partialTicks) / 6.0F) * 0.08F;
 
         GlStateManager.pushMatrix();
         GlStateManager.translate(x + 0.5D, y + 0.5D, z + 0.5D);
@@ -34,12 +40,26 @@ public class TileEldritchCrystalRenderer extends TileEntitySpecialRenderer<TileE
         GlStateManager.rotate(90.0F, 0.0F, 1.0F, 0.0F);
         TileRenderHelper.drawTexturedQuad(0.32F, 0xCCFFFFFF, 0.0F, 1.0F, 0.0F, 1.0F);
 
+        EntityPlayerSP player = Minecraft.getMinecraft().player;
+        float ticks = player == null ? TileRenderHelper.ticks(tile, partialTicks) : player.ticksExisted + partialTicks;
+        float glow = MathHelper.sin(ticks / 6.0F) * 0.075F + 0.925F;
+        int light = (int) (210.0F * glow);
+        int low = light % 65536;
+        int high = light / 65536;
+        float previousX = OpenGlHelper.lastBrightnessX;
+        float previousY = OpenGlHelper.lastBrightnessY;
+        OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, low, high);
+
         bindTexture(CRYSTAL_TEXTURE);
-        int alphaPulse = Math.min(255, Math.max(0, (int) (220.0F * pulse)));
-        int color = (alphaPulse << 24) | 0x00FFFFFF;
-        TileRenderHelper.drawTexturedQuad(0.26F, color, 0.0F, 1.0F, 0.0F, 1.0F);
-        GlStateManager.rotate(90.0F, 0.0F, 1.0F, 0.0F);
-        TileRenderHelper.drawTexturedQuad(0.26F, color, 0.0F, 1.0F, 0.0F, 1.0F);
+        GlStateManager.pushMatrix();
+        GlStateManager.enableRescaleNormal();
+        GlStateManager.scale(MODEL_SCALE, MODEL_SCALE, MODEL_SCALE);
+        GlStateManager.color(1.0F, 1.0F, 1.0F, 0.7F);
+        model.render();
+        GlStateManager.disableRescaleNormal();
+        GlStateManager.popMatrix();
+        GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+        OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, previousX, previousY);
 
         GlStateManager.disableBlend();
         GlStateManager.enableLighting();

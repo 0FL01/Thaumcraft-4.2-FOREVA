@@ -17,6 +17,8 @@ public class TableEldritchRendererFidelityStaticGuardTest {
         String research = read("src/main/java/thaumcraft/client/renderers/tile/TileResearchTableRenderer.java");
         String cap = read("src/main/java/thaumcraft/client/renderers/tile/TileEldritchCapRenderer.java");
         String lock = read("src/main/java/thaumcraft/client/renderers/tile/TileEldritchLockRenderer.java");
+        String eldritchCrystal = read("src/main/java/thaumcraft/client/renderers/tile/TileEldritchCrystalRenderer.java");
+        String crabSpawner = read("src/main/java/thaumcraft/client/renderers/tile/TileEldritchCrabSpawnerRenderer.java");
 
         assertTrue(research.contains("textures/misc/quill.png"));
         assertTrue(research.contains("TileRenderHelper.drawTexturedQuad(0.5F"));
@@ -30,6 +32,16 @@ public class TableEldritchRendererFidelityStaticGuardTest {
 
         assertTrue(lock.contains("renderItem(key, ItemCameraTransforms.TransformType.GROUND)"));
         assertFalse(lock.contains("TileRenderHelper.renderFloatingItem(key"));
+
+        assertTrue(eldritchCrystal.contains("new ModelCrystal()"));
+        assertTrue(eldritchCrystal.contains("OpenGlHelper.setLightmapTextureCoords"));
+        assertTrue(eldritchCrystal.contains("model.render();"));
+        assertFalse(eldritchCrystal.contains("TileRenderHelper.drawTexturedQuad(0.26F"));
+
+        assertTrue(crabSpawner.contains("renderVentGeometry()"));
+        assertTrue(crabSpawner.contains("drawTexturedCuboid("));
+        assertTrue(crabSpawner.contains("DefaultVertexFormats.POSITION_TEX_NORMAL"));
+        assertFalse(crabSpawner.contains("drawCross("));
     }
 
     private static String read(String path) throws IOException {
