@@ -1,21 +1,22 @@
 package thaumcraft.client.fx.particles;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.particle.Particle;
 import net.minecraft.client.renderer.BufferBuilder;
-import net.minecraft.util.EnumParticleTypes;
-import net.minecraft.util.math.MathHelper;
+import net.minecraft.entity.Entity;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 @SideOnly(Side.CLIENT)
 public class FXWispArcing extends Particle {
-    private final double targetX;
-    private final double targetY;
-    private final double targetZ;
-    private final float red;
-    private final float green;
-    private final float blue;
+    private final double anchorX;
+    private final double anchorY;
+    private final double anchorZ;
+    private final float moteParticleScale;
+    private final int moteHalfLife;
+    public boolean tinkle = false;
+    public int blendmode = 1;
 
     public FXWispArcing(World world,
                         double x, double y, double z,
@@ -23,15 +24,31 @@ public class FXWispArcing extends Particle {
                         float scale,
                         float red, float green, float blue) {
         super(world, x, y, z, 0.0D, 0.0D, 0.0D);
-        this.targetX = tx;
-        this.targetY = ty;
-        this.targetZ = tz;
-        this.red = red;
-        this.green = green;
-        this.blue = blue;
-        this.particleScale = Math.max(0.1F, scale);
-        this.particleMaxAge = 20;
-        this.canCollide = false;
+        this.anchorX = x;
+        this.anchorY = y;
+        this.anchorZ = z;
+        this.particleRed = red == 0.0F ? 1.0F : red;
+        this.particleGreen = green;
+        this.particleBlue = blue;
+        this.particleGravity = 0.0F;
+        this.particleScale *= Math.max(0.1F, scale);
+        this.moteParticleScale = this.particleScale;
+        this.particleMaxAge = (int) (36.0D / (Math.random() * 0.3D + 0.7D));
+        this.moteHalfLife = Math.max(1, this.particleMaxAge / 2);
+        this.canCollide = true;
+        this.setSize(0.01F, 0.01F);
+
+        Minecraft mc = Minecraft.getMinecraft();
+        Entity player = mc.player;
+        int visibleDistance = mc.gameSettings.fancyGraphics ? 50 : 25;
+        if (player != null && player.getDistance(this.posX, this.posY, this.posZ) > visibleDistance) {
+            this.particleMaxAge = 0;
+        }
+
+        this.motionX = tx - x;
+        this.motionY = ty - y;
+        this.motionZ = tz - z;
+        this.setPosition(tx, ty, tz);
     }
 
     @Override
@@ -40,43 +57,52 @@ public class FXWispArcing extends Particle {
         this.prevPosY = this.posY;
         this.prevPosZ = this.posZ;
         if (this.world == null || !this.world.isRemote) {
-            setExpired();
+            this.setExpired();
             return;
         }
         if (this.particleAge++ >= this.particleMaxAge) {
-            setExpired();
+            this.setExpired();
             return;
         }
 
-        double dx = this.targetX - this.posX;
-        double dy = this.targetY - this.posY;
-        double dz = this.targetZ - this.posZ;
-        double dist = Math.sqrt(dx * dx + dy * dy + dz * dz);
-        if (dist < 0.12D) {
-            setExpired();
-            return;
-        }
-
-        double accel = 0.12D;
-        this.motionX = MathHelper.clamp(this.motionX + dx / dist * accel, -0.25D, 0.25D);
-        this.motionY = MathHelper.clamp(this.motionY + dy / dist * accel, -0.25D, 0.25D);
-        this.motionZ = MathHelper.clamp(this.motionZ + dz / dist * accel, -0.25D, 0.25D);
-        this.posX += this.motionX;
-        this.posY += this.motionY;
-        this.posZ += this.motionZ;
-        this.motionX *= 0.9D;
-        this.motionY *= 0.9D;
-        this.motionZ *= 0.9D;
-
-        this.world.spawnParticle(EnumParticleTypes.REDSTONE, this.posX, this.posY, this.posZ, this.red, this.green, this.blue);
-        if (this.rand.nextInt(3) == 0) {
-            this.world.spawnParticle(EnumParticleTypes.CRIT_MAGIC, this.posX, this.posY, this.posZ, 0.0D, 0.0D, 0.0D);
-        }
+        float progress = this.particleAge / (float) this.particleMaxAge;
+        float curve = this.particleAge / (this.particleMaxAge / 2.0F);
+        progress = 1.0F - progress;
+        curve = 1.0F - curve;
+        curve *= curve;
+        this.posX = this.anchorX + this.motionX * progress;
+        this.posY = this.anchorY + this.motionY * progress - curve + 1.0D;
+        this.posZ = this.anchorZ + this.motionZ * progress;
     }
 
     @Override
-    public void renderParticle(BufferBuilder buffer, net.minecraft.entity.Entity entityIn, float partialTicks,
+    public int getFXLayer() {
+        return this.blendmode == 1 ? 0 : 1;
+    }
+
+    @Override
+    public int getBrightnessForRender(float partialTicks) {
+        return 0xF000F0;
+    }
+
+    @Override
+    public void renderParticle(BufferBuilder buffer, Entity entityIn, float partialTicks,
                                float rotationX, float rotationZ, float rotationYZ, float rotationXY, float rotationXZ) {
-        // Emission particle rendered via world.spawnParticle in onUpdate.
+        float ageScale = this.particleAge / (float) this.moteHalfLife;
+        if (ageScale > 1.0F) {
+            ageScale = 2.0F - ageScale;
+        }
+        float scale = this.particleScale;
+        float alpha = this.particleAlpha;
+        this.particleScale = this.moteParticleScale * ageScale;
+        this.particleAlpha = 0.5F;
+        this.setParticleTextureIndex(240 + (this.particleAge % 2));
+        super.renderParticle(buffer, entityIn, partialTicks, rotationX, rotationZ, rotationYZ, rotationXY, rotationXZ);
+        this.particleScale = scale;
+        this.particleAlpha = alpha;
+    }
+
+    public void setGravity(float value) {
+        this.particleGravity = value;
     }
 }

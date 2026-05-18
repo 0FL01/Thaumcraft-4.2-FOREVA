@@ -1,9 +1,12 @@
 package thaumcraft.client.fx.particles;
 
 import java.awt.Color;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.particle.Particle;
 import net.minecraft.client.renderer.BufferBuilder;
-import net.minecraft.util.EnumParticleTypes;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
@@ -14,10 +17,8 @@ public class FXEssentiaTrail extends Particle {
     private final double targetX;
     private final double targetY;
     private final double targetZ;
-    private final float red;
-    private final float green;
-    private final float blue;
-    private final float scale;
+    private final int count;
+    public int particle = 24;
 
     public FXEssentiaTrail(World world,
                            double x, double y, double z,
@@ -27,14 +28,41 @@ public class FXEssentiaTrail extends Particle {
         this.targetX = tx;
         this.targetY = ty;
         this.targetZ = tz;
-        Color tint = color < 0 || color > 0xFFFFFF ? new Color(0xCCCCFF) : new Color(color);
-        this.red = Math.max(0.02F, tint.getRed() / 255.0F);
-        this.green = Math.max(0.02F, tint.getGreen() / 255.0F);
-        this.blue = Math.max(0.02F, tint.getBlue() / 255.0F);
-        this.scale = Math.max(0.15F, scale);
-        this.particleScale = this.scale;
-        this.particleMaxAge = Math.max(8, count);
-        this.canCollide = false;
+        this.count = count;
+        this.particleScale = (MathHelper.sin(count / 2.0F) * 0.1F + 1.0F) * Math.max(0.15F, scale);
+
+        double dx = tx - this.posX;
+        double dy = ty - this.posY;
+        double dz = tz - this.posZ;
+        int base = (int) (Math.sqrt(dx * dx + dy * dy + dz * dz) * 30.0F);
+        if (base < 1) {
+            base = 1;
+        }
+        this.particleMaxAge = base / 2 + this.rand.nextInt(base);
+        this.motionX = MathHelper.sin(count / 4.0F) * 0.015F + this.rand.nextGaussian() * 0.002D;
+        this.motionY = 0.1F + MathHelper.sin(count / 3.0F) * 0.01F;
+        this.motionZ = MathHelper.sin(count / 2.0F) * 0.015F + this.rand.nextGaussian() * 0.002D;
+
+        Color tint = new Color(color);
+        float redVar = tint.getRed() / 255.0F * 0.2F;
+        float greenVar = tint.getGreen() / 255.0F * 0.2F;
+        float blueVar = tint.getBlue() / 255.0F * 0.2F;
+        this.particleRed = tint.getRed() / 255.0F - redVar + this.rand.nextFloat() * redVar;
+        this.particleGreen = tint.getGreen() / 255.0F - greenVar + this.rand.nextFloat() * greenVar;
+        this.particleBlue = tint.getBlue() / 255.0F - blueVar + this.rand.nextFloat() * blueVar;
+
+        this.particleGravity = 0.2F;
+        this.canCollide = true;
+
+        try {
+            Minecraft mc = Minecraft.getMinecraft();
+            EntityLivingBase player = mc.player;
+            int visibleDistance = mc.gameSettings.fancyGraphics ? 64 : 32;
+            if (player != null && player.getDistance(this.posX, this.posY, this.posZ) > visibleDistance) {
+                this.particleMaxAge = 0;
+            }
+        } catch (Exception ignored) {
+        }
     }
 
     @Override
@@ -43,43 +71,146 @@ public class FXEssentiaTrail extends Particle {
         this.prevPosY = this.posY;
         this.prevPosZ = this.posZ;
         if (this.world == null || !this.world.isRemote) {
-            setExpired();
+            this.setExpired();
             return;
         }
         if (this.particleAge++ >= this.particleMaxAge) {
-            setExpired();
+            this.setExpired();
             return;
         }
+
+        this.motionY += 0.01D * this.particleGravity;
+        if (this.canCollide) {
+            pushOutOfBlocks(this.posX, this.posY, this.posZ);
+        }
+        this.move(this.motionX, this.motionY, this.motionZ);
+        this.motionX *= 0.985D;
+        this.motionY *= 0.985D;
+        this.motionZ *= 0.985D;
+        this.motionX = MathHelper.clamp(this.motionX, -0.05D, 0.05D);
+        this.motionY = MathHelper.clamp(this.motionY, -0.05D, 0.05D);
+        this.motionZ = MathHelper.clamp(this.motionZ, -0.05D, 0.05D);
 
         double dx = this.targetX - this.posX;
         double dy = this.targetY - this.posY;
         double dz = this.targetZ - this.posZ;
         double dist = Math.sqrt(dx * dx + dy * dy + dz * dz);
-        if (dist < 0.2D) {
-            setExpired();
+        if (dist < 2.0D) {
+            this.particleScale *= 0.98F;
+        }
+        if (this.particleScale < 0.2F) {
+            this.setExpired();
             return;
         }
-
-        double accel = 0.08D;
-        this.motionX = MathHelper.clamp(this.motionX + dx / dist * accel, -0.22D, 0.22D);
-        this.motionY = MathHelper.clamp(this.motionY + dy / dist * accel, -0.22D, 0.22D);
-        this.motionZ = MathHelper.clamp(this.motionZ + dz / dist * accel, -0.22D, 0.22D);
-        this.posX += this.motionX;
-        this.posY += this.motionY;
-        this.posZ += this.motionZ;
-        this.motionX *= 0.92D;
-        this.motionY *= 0.92D;
-        this.motionZ *= 0.92D;
-
-        this.world.spawnParticle(EnumParticleTypes.REDSTONE, this.posX, this.posY, this.posZ, this.red, this.green, this.blue);
-        if (this.rand.nextInt(4) == 0) {
-            this.world.spawnParticle(EnumParticleTypes.CRIT_MAGIC, this.posX, this.posY, this.posZ, this.scale * 0.02D, 0.0D, 0.0D);
+        if (dist > 1.0E-6D) {
+            double accel = 0.01D / Math.min(1.0D, dist);
+            this.motionX += (dx / dist) * accel;
+            this.motionY += (dy / dist) * accel;
+            this.motionZ += (dz / dist) * accel;
         }
+        this.setParticleTextureIndex(this.particle + (this.particleAge % 16));
+    }
+
+    public void setGravity(float value) {
+        this.particleGravity = value;
+    }
+
+    protected boolean pushOutOfBlocks(double x, double y, double z) {
+        BlockPos pos = new BlockPos(x, y, z);
+        double localX = x - pos.getX();
+        double localY = y - pos.getY();
+        double localZ = z - pos.getZ();
+        if (isOpenBlockSpace(pos) || this.world.collidesWithAnyBlock(this.getBoundingBox())) {
+            return false;
+        }
+
+        boolean westOpen = isOpenBlockSpace(pos.west());
+        boolean eastOpen = isOpenBlockSpace(pos.east());
+        boolean downOpen = isOpenBlockSpace(pos.down());
+        boolean upOpen = isOpenBlockSpace(pos.up());
+        boolean northOpen = isOpenBlockSpace(pos.north());
+        boolean southOpen = isOpenBlockSpace(pos.south());
+
+        int face = -1;
+        double best = 9999.0D;
+        if (westOpen && localX < best) {
+            best = localX;
+            face = 0;
+        }
+        if (eastOpen && 1.0D - localX < best) {
+            best = 1.0D - localX;
+            face = 1;
+        }
+        if (downOpen && localY < best) {
+            best = localY;
+            face = 2;
+        }
+        if (upOpen && 1.0D - localY < best) {
+            best = 1.0D - localY;
+            face = 3;
+        }
+        if (northOpen && localZ < best) {
+            best = localZ;
+            face = 4;
+        }
+        if (southOpen && 1.0D - localZ < best) {
+            face = 5;
+        }
+
+        float speed = this.rand.nextFloat() * 0.05F + 0.025F;
+        float jitter = (this.rand.nextFloat() - this.rand.nextFloat()) * 0.1F;
+        if (face == 0) {
+            this.motionX = -speed;
+            this.motionY = jitter;
+            this.motionZ = jitter;
+        } else if (face == 1) {
+            this.motionX = speed;
+            this.motionY = jitter;
+            this.motionZ = jitter;
+        } else if (face == 2) {
+            this.motionY = -speed;
+            this.motionX = jitter;
+            this.motionZ = jitter;
+        } else if (face == 3) {
+            this.motionY = speed;
+            this.motionX = jitter;
+            this.motionZ = jitter;
+        } else if (face == 4) {
+            this.motionZ = -speed;
+            this.motionX = jitter;
+            this.motionY = jitter;
+        } else if (face == 5) {
+            this.motionZ = speed;
+            this.motionX = jitter;
+            this.motionY = jitter;
+        }
+        return true;
+    }
+
+    private boolean isOpenBlockSpace(BlockPos pos) {
+        return this.world.isAirBlock(pos) || !this.world.getBlockState(pos).getMaterial().blocksMovement();
     }
 
     @Override
-    public void renderParticle(BufferBuilder buffer, net.minecraft.entity.Entity entityIn, float partialTicks,
+    public int getFXLayer() {
+        return 1;
+    }
+
+    @Override
+    public int getBrightnessForRender(float partialTicks) {
+        return 0xF000F0;
+    }
+
+    @Override
+    public void renderParticle(BufferBuilder buffer, Entity entityIn, float partialTicks,
                                float rotationX, float rotationZ, float rotationYZ, float rotationXY, float rotationXZ) {
-        // Emission particle rendered via world.spawnParticle in onUpdate.
+        float bob = MathHelper.sin((this.particleAge - this.count) / 5.0F) * 0.25F + 1.0F;
+        float scale = this.particleScale;
+        float alpha = this.particleAlpha;
+        this.particleScale = scale * bob;
+        this.particleAlpha = 0.5F;
+        super.renderParticle(buffer, entityIn, partialTicks, rotationX, rotationZ, rotationYZ, rotationXY, rotationXZ);
+        this.particleScale = scale;
+        this.particleAlpha = alpha;
     }
 }

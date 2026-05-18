@@ -239,11 +239,13 @@ public class ClientProxyFxStaticGuardTest {
                         && blockRunesFx.contains("EnumFacing.random(this.rand)")
                         && blockRunesFx.contains("setGravity(float gravity)")
                         && blockRunesFx.contains("EnumParticleTypes.CRIT_MAGIC"));
-        assertTrue("Dedicated FXEssentiaTrail particle must keep colorized target-chasing trail baseline",
+        assertTrue("Dedicated FXEssentiaTrail particle must keep colorized target-chasing textured trail baseline",
                 essentiaTrailFx.contains("class FXEssentiaTrail extends Particle")
                         && essentiaTrailFx.contains("targetX")
                         && essentiaTrailFx.contains("new Color(")
-                        && essentiaTrailFx.contains("EnumParticleTypes.REDSTONE"));
+                        && essentiaTrailFx.contains("setParticleTextureIndex(this.particle + (this.particleAge % 16))")
+                        && essentiaTrailFx.contains("public int getFXLayer()")
+                        && !essentiaTrailFx.contains("EnumParticleTypes.REDSTONE"));
         assertTrue("Dedicated FXGeneric particle must keep configurable generic particle baseline",
                 genericFx.contains("class FXGeneric extends Particle")
                         && genericFx.contains("setParticles(int startParticle, int numParticles, int particleInc)")
@@ -270,24 +272,32 @@ public class ClientProxyFxStaticGuardTest {
                         && ventFx.contains("setParticleTextureIndex(part)")
                         && ventFx.contains("public int getFXLayer()")
                         && ventFx.contains("return 1;"));
-        assertTrue("Dedicated FXVisSparkle particle must keep block-centered sparkle emission baseline",
+        assertTrue("Dedicated FXVisSparkle particle must keep block-centered + vis-drain trail textured baseline",
                 visSparkleFx.contains("class FXVisSparkle extends Particle")
                         && visSparkleFx.contains("baseX")
-                        && visSparkleFx.contains("EnumParticleTypes.REDSTONE")
+                        && visSparkleFx.contains("trailMode")
                         && visSparkleFx.contains("randomizeColor")
-                        && visSparkleFx.contains("0.33f + this.rand.nextFloat() * 0.67f"));
-        assertTrue("Dedicated FXWisp particle must keep target-aware wisp trail baseline",
+                        && visSparkleFx.contains("0.33f + this.rand.nextFloat() * 0.67f")
+                        && visSparkleFx.contains("setParticleTextureIndex(32 + (this.particleAge % 16))")
+                        && visSparkleFx.contains("setParticleTextureIndex(112 + (this.particleAge % 8))")
+                        && !visSparkleFx.contains("EnumParticleTypes.REDSTONE"));
+        assertTrue("Dedicated FXWisp particle must keep target-aware textured wisp baseline",
                 wispFx.contains("class FXWisp extends Particle")
                         && wispFx.contains("hasTarget")
-                        && wispFx.contains("EnumParticleTypes.REDSTONE"));
-        assertTrue("Dedicated FXWispArcing particle must keep source-target arcing trail baseline",
+                        && wispFx.contains("moteParticleScale")
+                        && wispFx.contains("setParticleTextureIndex(240 + (this.particleAge % 2))")
+                        && !wispFx.contains("EnumParticleTypes.REDSTONE"));
+        assertTrue("Dedicated FXWispArcing particle must keep source-target arcing textured baseline",
                 wispArcingFx.contains("class FXWispArcing extends Particle")
-                        && wispArcingFx.contains("targetX")
-                        && wispArcingFx.contains("EnumParticleTypes.CRIT_MAGIC"));
-        assertTrue("Dedicated FXWispEG particle must keep target-following elder trail baseline",
+                        && wispArcingFx.contains("anchorX")
+                        && wispArcingFx.contains("setParticleTextureIndex(240 + (this.particleAge % 2))")
+                        && !wispArcingFx.contains("EnumParticleTypes.CRIT_MAGIC"));
+        assertTrue("Dedicated FXWispEG particle must keep target-following elder textured baseline",
                 wispEgFx.contains("class FXWispEG extends Particle")
                         && wispEgFx.contains("this.target")
-                        && wispEgFx.contains("target.height * 0.22F"));
+                        && wispEgFx.contains("setParticleTextureIndex(48 + (this.particleAge % 13))")
+                        && wispEgFx.contains("public int getFXLayer()")
+                        && !wispEgFx.contains("EnumParticleTypes.REDSTONE"));
         assertTrue("Dedicated FXBeamWand/FXBeamBore/FXBeamPower classes must keep extended beam control surface",
                 beamWandFx.contains("class FXBeamWand extends FXBeam")
                         && beamWandFx.contains("updateBeam(double tx, double ty, double tz)")
