@@ -9,6 +9,7 @@ import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.Entity;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
@@ -64,14 +65,66 @@ public class FXLightningBolt extends Particle {
                            long seed, int duration, float multi, int speed) {
         super(world, x1, y1, z1, 0.0D, 0.0D, 0.0D);
         this.main = new FXLightningBoltCommon(world, x1, y1, z1, x2, y2, z2, seed, duration, multi, speed);
-        this.sourceX = x1;
-        this.sourceY = y1;
-        this.sourceZ = z1;
-        this.targetX = x2;
-        this.targetY = y2;
-        this.targetZ = z2;
         this.seed = seed;
+        setupFromMain();
+    }
+
+    public FXLightningBolt(World world, WRVector3 source, WRVector3 target, long seed) {
+        super(world, source.x, source.y, source.z, 0.0D, 0.0D, 0.0D);
+        this.main = new FXLightningBoltCommon(world, source, target, seed);
+        this.seed = seed;
+        setupFromMain();
+    }
+
+    public FXLightningBolt(World world, Entity source, Entity target, long seed) {
+        super(world, source.posX, source.posY, source.posZ, 0.0D, 0.0D, 0.0D);
+        this.main = new FXLightningBoltCommon(world, source, target, seed);
+        this.seed = seed;
+        setupFromMain();
+    }
+
+    public FXLightningBolt(World world, Entity source, Entity target, long seed, int speed) {
+        super(world, source.posX, source.posY, source.posZ, 0.0D, 0.0D, 0.0D);
+        this.main = new FXLightningBoltCommon(world, source, target, seed, speed);
+        this.seed = seed;
+        setupFromMain();
+    }
+
+    public FXLightningBolt(World world, TileEntity source, Entity target, long seed) {
+        super(world, source.getPos().getX() + 0.5D, source.getPos().getY() + 0.5D, source.getPos().getZ() + 0.5D, 0.0D, 0.0D, 0.0D);
+        this.main = new FXLightningBoltCommon(world, source, target, seed);
+        this.seed = seed;
+        setupFromMain();
+    }
+
+    public FXLightningBolt(World world, TileEntity source, double x, double y, double z, long seed) {
+        super(world, source.getPos().getX() + 0.5D, source.getPos().getY() + 0.5D, source.getPos().getZ() + 0.5D, 0.0D, 0.0D, 0.0D);
+        this.main = new FXLightningBoltCommon(world, source, x, y, z, seed);
+        this.seed = seed;
+        setupFromMain();
+    }
+
+    public FXLightningBolt(World world, double x1, double y1, double z1,
+                           double x2, double y2, double z2,
+                           long seed, int duration, float multi) {
+        this(world, x1, y1, z1, x2, y2, z2, seed, duration, multi, 1);
+    }
+
+    public FXLightningBolt(World world, double x1, double y1, double z1,
+                           double x2, double y2, double z2,
+                           long seed, int duration) {
+        this(world, x1, y1, z1, x2, y2, z2, seed, duration, 1.0F, 1);
+    }
+
+    private void setupFromMain() {
+        this.sourceX = this.main.start.x;
+        this.sourceY = this.main.start.y;
+        this.sourceZ = this.main.start.z;
+        this.targetX = this.main.end.x;
+        this.targetY = this.main.end.y;
+        this.targetZ = this.main.end.z;
         this.segmentCount = Math.max(8, this.main.numsegments0);
+        this.particleAge = this.main.particleAge;
         this.particleMaxAge = Math.max(3, this.main.particleMaxAge);
         this.red = 1.0F;
         this.green = 1.0F;

@@ -819,38 +819,31 @@ public class ClientProxy extends CommonProxy {
     @Override
     public void bolt(World world, Entity sourceEntity, Entity targetedEntity) {
         if (world == null || !world.isRemote || sourceEntity == null || targetedEntity == null) return;
-        bolt(
-                world,
-                sourceEntity.posX,
-                sourceEntity.getEntityBoundingBox().minY + sourceEntity.height * 0.5D,
-                sourceEntity.posZ,
-                targetedEntity.posX,
-                targetedEntity.getEntityBoundingBox().minY + targetedEntity.height * 0.5D,
-                targetedEntity.posZ,
-                0x99CCFF,
-                4);
+        FXLightningBolt bolt = new FXLightningBolt(world, sourceEntity, targetedEntity, world.rand.nextLong(), 4);
+        bolt.defaultFractal();
+        bolt.setType(0);
+        bolt.finalizeBolt();
+        ParticleEngine.addEffect(world, bolt);
     }
 
     @Override
     public void nodeBolt(World world, float x, float y, float z, Entity target) {
         if (world == null || !world.isRemote || target == null) return;
-        ParticleEngine.addEffect(world, new FXLightningBolt(
-                world,
-                x, y, z,
-                target.posX, target.posY + target.height * 0.5D, target.posZ,
-                0.70F, 0.45F, 1.00F,
-                6, 12));
+        FXLightningBolt bolt = new FXLightningBolt(world, x, y, z, target.posX, target.posY, target.posZ, world.rand.nextLong(), 10, 4.0F, 5);
+        bolt.defaultFractal();
+        bolt.setType(3);
+        bolt.finalizeBolt();
+        ParticleEngine.addEffect(world, bolt);
     }
 
     @Override
     public void nodeBolt(World world, float x, float y, float z, float tx, float ty, float tz) {
         if (world == null || !world.isRemote) return;
-        ParticleEngine.addEffect(world, new FXLightningBolt(
-                world,
-                x, y, z,
-                tx, ty, tz,
-                0.60F, 0.42F, 1.00F,
-                6, 12));
+        FXLightningBolt bolt = new FXLightningBolt(world, x, y, z, tx, ty, tz, world.rand.nextLong(), 10, 4.0F, 5);
+        bolt.defaultFractal();
+        bolt.setType(0);
+        bolt.finalizeBolt();
+        ParticleEngine.addEffect(world, bolt);
     }
 
     @Override
