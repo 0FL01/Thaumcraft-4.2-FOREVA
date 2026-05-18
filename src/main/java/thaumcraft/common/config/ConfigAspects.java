@@ -3,6 +3,7 @@ package thaumcraft.common.config;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
+import net.minecraftforge.oredict.OreDictionary;
 import thaumcraft.api.ThaumcraftApi;
 import thaumcraft.api.aspects.Aspect;
 import thaumcraft.api.aspects.AspectList;
@@ -176,15 +177,27 @@ public class ConfigAspects {
 
         if (thaumcraft.common.config.Config.foundCopperOre) {
             ThaumcraftApi.registerObjectTag("oreCopper", new AspectList().add(Aspect.EARTH, 2).add(Aspect.METAL, 3));
+            ThaumcraftApi.registerObjectTag(
+                    new ItemStack(ConfigItems.itemNugget, 1, 17),
+                    new AspectList().add(Aspect.ORDER, 1).add(Aspect.METAL, 5).add(Aspect.EARTH, 1).add(Aspect.EXCHANGE, 2));
         }
         if (thaumcraft.common.config.Config.foundTinOre) {
             ThaumcraftApi.registerObjectTag("oreTin", new AspectList().add(Aspect.EARTH, 2).add(Aspect.METAL, 3));
+            ThaumcraftApi.registerObjectTag(
+                    new ItemStack(ConfigItems.itemNugget, 1, 18),
+                    new AspectList().add(Aspect.ORDER, 1).add(Aspect.METAL, 5).add(Aspect.EARTH, 1).add(Aspect.CRYSTAL, 2));
         }
         if (thaumcraft.common.config.Config.foundSilverOre) {
             ThaumcraftApi.registerObjectTag("oreSilver", new AspectList().add(Aspect.EARTH, 2).add(Aspect.METAL, 4));
+            ThaumcraftApi.registerObjectTag(
+                    new ItemStack(ConfigItems.itemNugget, 1, 19),
+                    new AspectList().add(Aspect.ORDER, 1).add(Aspect.METAL, 5).add(Aspect.EARTH, 1).add(Aspect.GREED, 2));
         }
         if (thaumcraft.common.config.Config.foundLeadOre) {
             ThaumcraftApi.registerObjectTag("oreLead", new AspectList().add(Aspect.EARTH, 2).add(Aspect.METAL, 3));
+            ThaumcraftApi.registerObjectTag(
+                    new ItemStack(ConfigItems.itemNugget, 1, 20),
+                    new AspectList().add(Aspect.ORDER, 1).add(Aspect.METAL, 5).add(Aspect.EARTH, 1).add(Aspect.ORDER, 2));
         }
 
         // Generic ore dictionary registrations
@@ -217,6 +230,9 @@ public class ConfigAspects {
         ThaumcraftApi.registerObjectTag(new ItemStack(ConfigItems.itemNuggetEdible, 1, 1), new AspectList().add(Aspect.HUNGER, 1));
         ThaumcraftApi.registerObjectTag(new ItemStack(ConfigItems.itemNuggetEdible, 1, 2), new AspectList().add(Aspect.HUNGER, 1));
         ThaumcraftApi.registerObjectTag(new ItemStack(ConfigItems.itemNuggetEdible, 1, 3), new AspectList().add(Aspect.HUNGER, 1));
+        ThaumcraftApi.registerComplexObjectTag(
+                new ItemStack(ConfigItems.itemTripleMeatTreat, 1, OreDictionary.WILDCARD_VALUE),
+                new AspectList().add(Aspect.HEAL, 1).remove(Aspect.HUNGER, 1));
 
         ThaumcraftApi.registerObjectTag(new ItemStack(ConfigBlocks.blockCustomOre, 1, 0), new AspectList().add(Aspect.EARTH, 1).add(Aspect.METAL, 2).add(Aspect.EXCHANGE, 2).add(Aspect.POISON, 1));
         ThaumcraftApi.registerObjectTag(new ItemStack(ConfigBlocks.blockCustomOre, 1, 1), new AspectList().add(Aspect.EARTH, 1).add(Aspect.AIR, 3).add(Aspect.CRYSTAL, 2));
