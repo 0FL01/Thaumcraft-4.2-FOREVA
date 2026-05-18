@@ -5,6 +5,7 @@ import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
 import thaumcraft.api.aspects.Aspect;
+import thaumcraft.api.aspects.AspectList;
 import thaumcraft.api.nodes.INode;
 import thaumcraft.api.nodes.NodeModifier;
 import thaumcraft.api.nodes.NodeType;
@@ -26,20 +27,30 @@ public class TileNodeRenderer extends TileEntitySpecialRenderer<TileEntity> {
     }
 
     public static void renderNodeAt(INode node, double x, double y, double z, float partialTicks, float size) {
-        Aspect[] aspects = node.getAspects() == null ? null : node.getAspects().getAspects();
+        renderNodeAt(node.getAspects(), node.getId(), node.getNodeType(), node.getNodeModifier(), x, y, z, partialTicks, size);
+    }
+
+    public static void renderNodeAt(AspectList aspectsList,
+                                    String nodeId,
+                                    NodeType nodeType,
+                                    NodeModifier nodeModifier,
+                                    double x, double y, double z,
+                                    float partialTicks,
+                                    float size) {
+        Aspect[] aspects = aspectsList == null ? null : aspectsList.getAspects();
         float ticks = (net.minecraft.client.Minecraft.getMinecraft().player == null
                 ? 0.0F
                 : net.minecraft.client.Minecraft.getMinecraft().player.ticksExisted)
                 + partialTicks
-                + (node.getId() == null ? 0 : node.getId().hashCode() & 0xFF);
+                + (nodeId == null ? 0 : nodeId.hashCode() & 0xFF);
 
         float modifierScale = 1.0F;
-        NodeModifier modifier = node.getNodeModifier();
+        NodeModifier modifier = nodeModifier;
         if (modifier == NodeModifier.BRIGHT) modifierScale = 1.2F;
         if (modifier == NodeModifier.PALE) modifierScale = 0.8F;
         if (modifier == NodeModifier.FADING) modifierScale = 0.65F;
 
-        int baseColor = colorByType(node.getNodeType());
+        int baseColor = colorByType(nodeType);
         float baseAlpha = 0.45F * modifierScale;
         float half = 0.18F * size * modifierScale;
 
