@@ -19,7 +19,7 @@ public class TileCentrifugeRenderer extends TileEntitySpecialRenderer<TileCentri
             return;
         }
 
-        float spin = tile.rotation + partialTicks * 4.0F;
+        float spin = tile.rotation;
         bindTexture(CENTRIFUGE_TEXTURE);
 
         GlStateManager.pushMatrix();

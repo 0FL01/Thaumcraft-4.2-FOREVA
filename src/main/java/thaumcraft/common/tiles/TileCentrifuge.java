@@ -4,6 +4,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ITickable;
+import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.AxisAlignedBB;
 import thaumcraft.api.ThaumcraftApiHelper;
 import thaumcraft.api.TileThaumcraft;
@@ -11,6 +12,7 @@ import thaumcraft.api.aspects.Aspect;
 import thaumcraft.api.aspects.AspectList;
 import thaumcraft.api.aspects.IAspectContainer;
 import thaumcraft.api.aspects.IEssentiaTransport;
+import thaumcraft.common.lib.TCSounds;
 
 public class TileCentrifuge extends TileThaumcraft implements ITickable, IAspectContainer, IEssentiaTransport {
     public Aspect aspectOut = null;
@@ -59,7 +61,12 @@ public class TileCentrifuge extends TileThaumcraft implements ITickable, IAspect
             if ((this.aspectIn == null || this.gettingPower()) && this.rotationSpeed > 0.0F) {
                 this.rotationSpeed -= 0.5F;
             }
+            int previous = (int) this.rotation;
             this.rotation += this.rotationSpeed;
+            if (this.rotation % 180.0F <= 20.0F && previous % 180 >= 160 && this.rotationSpeed > 0.0F) {
+                this.world.playSound(this.pos.getX() + 0.5D, this.pos.getY() + 0.5D, this.pos.getZ() + 0.5D,
+                        TCSounds.PUMP, SoundCategory.BLOCKS, 1.0F, 1.0F, false);
+            }
         }
     }
 
@@ -109,8 +116,6 @@ public class TileCentrifuge extends TileThaumcraft implements ITickable, IAspect
 
     @Override
     public void setAspects(AspectList aspects) {
-        this.aspectOut = aspects != null && aspects.size() > 0 ? aspects.getAspects()[0] : null;
-        this.markDirtyAndSync();
     }
 
     @Override
@@ -232,7 +237,7 @@ public class TileCentrifuge extends TileThaumcraft implements ITickable, IAspect
 
     @Override
     public AxisAlignedBB getRenderBoundingBox() {
-        return new AxisAlignedBB(this.pos.add(-1, -1, -1), this.pos.add(2, 2, 2));
+        return new AxisAlignedBB(this.pos.add(-1, -1, -1), this.pos.add(1, 1, 1));
     }
 
     private void markDirtyAndSync() {
