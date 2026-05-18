@@ -1,18 +1,15 @@
 package thaumcraft.client.renderers.tile;
 
-import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
-import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
-import org.lwjgl.opengl.GL11;
 import thaumcraft.api.ThaumcraftApiHelper;
 import thaumcraft.api.aspects.Aspect;
 import thaumcraft.api.aspects.IEssentiaTransport;
 import thaumcraft.client.renderers.models.ModelAlembic;
+import thaumcraft.client.renderers.models.ModelBoreBase;
 import thaumcraft.common.tiles.TileAlembic;
 import thaumcraft.common.tiles.TileTube;
 
@@ -24,8 +21,10 @@ public class TileAlembicRenderer extends TileEntitySpecialRenderer<TileAlembic> 
             new ResourceLocation("thaumcraft", "textures/models/label.png");
     private static final ResourceLocation BORE_TEXTURE =
             new ResourceLocation("thaumcraft", "textures/models/Bore.png");
+    private static final float MODEL_SCALE = 0.0625F;
 
     private final ModelAlembic model = new ModelAlembic();
+    private final ModelBoreBase modelBore = new ModelBoreBase();
 
     @Override
     public void render(TileAlembic tile, double x, double y, double z, float partialTicks, int destroyStage, float alpha) {
@@ -83,15 +82,7 @@ public class TileAlembicRenderer extends TileEntitySpecialRenderer<TileAlembic> 
         GlStateManager.pushMatrix();
         GlStateManager.translate(x + 0.5D, y, z + 0.5D);
         orientNozzle(dir);
-        GlStateManager.disableLighting();
-        GlStateManager.enableBlend();
-        GlStateManager.blendFunc(770, 771);
-
-        drawPrism(0.125F, -0.1F, 0.1F, 0.08F, 0.08F);
-        drawPrism(0.2F, -0.06F, 0.06F, 0.10F, 0.10F);
-
-        GlStateManager.disableBlend();
-        GlStateManager.enableLighting();
+        modelBore.renderNozzle(MODEL_SCALE);
         GlStateManager.popMatrix();
     }
 
@@ -118,44 +109,6 @@ public class TileAlembicRenderer extends TileEntitySpecialRenderer<TileAlembic> 
             default:
                 break;
         }
-    }
-
-    private static void drawPrism(float x0, float y0, float y1, float h0, float h1) {
-        float minX = x0;
-        float maxX = x0 + 0.12F;
-        float minY = y0;
-        float maxY = y1;
-        float minZ = h0;
-        float maxZ = h1;
-        drawTexturedCuboid(minX, minY, minZ, maxX, maxY, maxZ);
-    }
-
-    private static void drawTexturedCuboid(float minX, float minY, float minZ, float maxX, float maxY, float maxZ) {
-        Tessellator tess = Tessellator.getInstance();
-        BufferBuilder buf = tess.getBuffer();
-        buf.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX_NORMAL);
-
-        face(buf, minX, maxY, maxZ, minX, minY, maxZ, maxX, minY, maxZ, maxX, maxY, maxZ, 0.0F, 1.0F, 0.0F, 1.0F, 0, 0, 1);
-        face(buf, maxX, maxY, minZ, maxX, minY, minZ, minX, minY, minZ, minX, maxY, minZ, 0.0F, 1.0F, 0.0F, 1.0F, 0, 0, -1);
-        face(buf, minX, maxY, minZ, minX, minY, minZ, minX, minY, maxZ, minX, maxY, maxZ, 0.0F, 1.0F, 0.0F, 1.0F, -1, 0, 0);
-        face(buf, maxX, maxY, maxZ, maxX, minY, maxZ, maxX, minY, minZ, maxX, maxY, minZ, 0.0F, 1.0F, 0.0F, 1.0F, 1, 0, 0);
-        face(buf, minX, maxY, minZ, minX, maxY, maxZ, maxX, maxY, maxZ, maxX, maxY, minZ, 0.0F, 1.0F, 0.0F, 1.0F, 0, 1, 0);
-        face(buf, minX, minY, maxZ, minX, minY, minZ, maxX, minY, minZ, maxX, minY, maxZ, 0.0F, 1.0F, 0.0F, 1.0F, 0, -1, 0);
-
-        tess.draw();
-    }
-
-    private static void face(BufferBuilder buf,
-                             float x1, float y1, float z1,
-                             float x2, float y2, float z2,
-                             float x3, float y3, float z3,
-                             float x4, float y4, float z4,
-                             float u0, float u1, float v0, float v1,
-                             float nx, float ny, float nz) {
-        buf.pos(x1, y1, z1).tex(u0, v0).normal(nx, ny, nz).endVertex();
-        buf.pos(x2, y2, z2).tex(u0, v1).normal(nx, ny, nz).endVertex();
-        buf.pos(x3, y3, z3).tex(u1, v1).normal(nx, ny, nz).endVertex();
-        buf.pos(x4, y4, z4).tex(u1, v0).normal(nx, ny, nz).endVertex();
     }
 
     private void renderEssentiaColumn(TileAlembic tile, double x, double y, double z) {

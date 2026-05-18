@@ -15,6 +15,7 @@ public class AlchemyFurnaceAdvancedRendererFidelityStaticGuardTest {
     public void alchemyFurnaceAdvancedRendererUsesModelDrivenBaseTankAndGlowPaths() throws IOException {
         String model = read("src/main/java/thaumcraft/client/renderers/models/ModelAlchemyFurnaceAdvanced.java");
         String renderer = read("src/main/java/thaumcraft/client/renderers/tile/TileAlchemyFurnaceAdvancedRenderer.java");
+        String alembic = read("src/main/java/thaumcraft/client/renderers/tile/TileAlembicRenderer.java");
 
         assertTrue("ModelAlchemyFurnaceAdvanced should define base/tank/lava panels",
                 model.contains("class ModelAlchemyFurnaceAdvanced extends ModelBase")
@@ -34,6 +35,13 @@ public class AlchemyFurnaceAdvancedRendererFidelityStaticGuardTest {
                         && renderer.contains("drawFurnaceGlowQuad(")
                         && !renderer.contains("TileRenderHelper.orientBillboardToPlayer()")
                         && !renderer.contains("TileRenderHelper.drawTexturedQuad("));
+
+        assertTrue("TileAlembicRenderer should use model-driven bore nozzle path instead of ad-hoc cuboid fallback",
+                alembic.contains("new ModelBoreBase()")
+                        && alembic.contains("modelBore.renderNozzle(MODEL_SCALE)")
+                        && alembic.contains("renderOutputNozzles(")
+                        && !alembic.contains("drawPrism(")
+                        && !alembic.contains("drawTexturedCuboid("));
     }
 
     private static String read(String path) throws IOException {
