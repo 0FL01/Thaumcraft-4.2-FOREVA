@@ -26,6 +26,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.translation.I18n;
 import net.minecraft.world.World;
@@ -63,7 +64,9 @@ import thaumcraft.client.fx.other.FXBlockWard;
 import thaumcraft.client.fx.other.FXShieldRunes;
 import thaumcraft.client.fx.other.FXSonic;
 import thaumcraft.client.fx.particles.FXBoreParticles;
+import thaumcraft.client.fx.particles.FXBoreSparkle;
 import thaumcraft.client.fx.particles.FXBlockRunes;
+import thaumcraft.client.fx.particles.FXBreaking;
 import thaumcraft.client.fx.particles.FXBurst;
 import thaumcraft.client.fx.particles.FXBubble;
 import thaumcraft.client.fx.particles.FXBubbleAlt;
@@ -915,13 +918,17 @@ public class ClientProxy extends CommonProxy {
     @Override
     public void drawInfusionParticles3(World world, double x, double y, double z, int tx, int ty, int tz) {
         if (world == null || !world.isRemote) return;
-        ParticleEngine.addEffect(world, new FXWispArcing(world, x, y, z, tx + 0.5D, ty - 0.5D, tz + 0.5D, 0.12F, 0.55F, 0.25F, 0.85F));
+        FXBoreSparkle sparkle = new FXBoreSparkle(world, x, y, z, tx + 0.5D, ty - 0.5D, tz + 0.5D);
+        sparkle.setRBGColorF(0.4F + world.rand.nextFloat() * 0.2F, 0.2F, 0.6F + world.rand.nextFloat() * 0.3F);
+        ParticleEngine.addEffect(world, sparkle);
     }
 
     @Override
     public void drawInfusionParticles4(World world, double x, double y, double z, int tx, int ty, int tz) {
         if (world == null || !world.isRemote) return;
-        ParticleEngine.addEffect(world, new FXWispArcing(world, x, y, z, tx + 0.5D, ty - 0.5D, tz + 0.5D, 0.12F, 0.30F, 0.85F, 0.40F));
+        FXBoreSparkle sparkle = new FXBoreSparkle(world, x, y, z, tx + 0.5D, ty - 0.5D, tz + 0.5D);
+        sparkle.setRBGColorF(0.2F, 0.6F + world.rand.nextFloat() * 0.3F, 0.3F);
+        ParticleEngine.addEffect(world, sparkle);
     }
 
     @Override
@@ -975,21 +982,17 @@ public class ClientProxy extends CommonProxy {
         if (amount <= 0) return;
 
         for (int i = 0; i < amount; i++) {
-            float x = (float) (entity.posX + (world.rand.nextFloat() - world.rand.nextFloat()) * 0.5f);
-            float y = (float) ((entity.getEntityBoundingBox().minY + entity.getEntityBoundingBox().maxY) * 0.5);
-            float z = (float) (entity.posZ + (world.rand.nextFloat() - world.rand.nextFloat()) * 0.5f);
-            sparkle(x, y, z, 0.8f, 0x661166, -0.02f);
-            if (world.rand.nextBoolean()) {
-                ParticleEngine.addEffect(world, new FXSmokeDrift(
-                        world,
-                        x,
-                        y,
-                        z,
-                        (world.rand.nextFloat() - 0.5f) * 0.004f,
-                        0.003f + world.rand.nextFloat() * 0.002f,
-                        (world.rand.nextFloat() - 0.5f) * 0.004f,
-                        8));
-            }
+            float angle = world.rand.nextFloat() * ((float) Math.PI * 2.0F);
+            float radius = world.rand.nextFloat() * 0.5F + 0.5F;
+            float offsetX = MathHelper.sin(angle) * 0.5F * radius;
+            float offsetZ = MathHelper.cos(angle) * 0.5F * radius;
+            double y = (entity.getEntityBoundingBox().minY + entity.getEntityBoundingBox().maxY) * 0.5D;
+
+            FXBreaking fx = new FXBreaking(world, entity.posX + offsetX, y, entity.posZ + offsetZ, Items.SNOWBALL);
+            fx.setRBGColorF(0.1F, 0.0F, 0.1F);
+            fx.setAlphaF(0.4F);
+            fx.setParticleMaxAge((int) (66.0F / (world.rand.nextFloat() * 0.9F + 0.1F)));
+            ParticleEngine.addEffect(world, fx);
         }
     }
 
@@ -1001,10 +1004,17 @@ public class ClientProxy extends CommonProxy {
         if (amount <= 0) return;
 
         for (int i = 0; i < amount; i++) {
-            float x = (float) (entity.posX + (world.rand.nextFloat() - world.rand.nextFloat()) * 0.4f);
-            float y = (float) ((entity.getEntityBoundingBox().minY + entity.getEntityBoundingBox().maxY) * 0.5);
-            float z = (float) (entity.posZ + (world.rand.nextFloat() - world.rand.nextFloat()) * 0.4f);
-            sparkle(x, y, z, 0.7f, 0xAA22FF, 0.03f);
+            float angle = world.rand.nextFloat() * ((float) Math.PI * 2.0F);
+            float radius = world.rand.nextFloat() * 0.5F + 0.5F;
+            float offsetX = MathHelper.sin(angle) * size * 0.5F * radius;
+            float offsetZ = MathHelper.cos(angle) * size * 0.5F * radius;
+            double y = (entity.getEntityBoundingBox().minY + entity.getEntityBoundingBox().maxY) * 0.5D;
+
+            FXBreaking fx = new FXBreaking(world, entity.posX + offsetX, y, entity.posZ + offsetZ, Items.SNOWBALL);
+            fx.setRBGColorF(0.7F, 0.0F, 1.0F);
+            fx.setAlphaF(0.4F);
+            fx.setParticleMaxAge((int) (66.0F / (world.rand.nextFloat() * 0.9F + 0.1F)));
+            ParticleEngine.addEffect(world, fx);
         }
     }
 

@@ -19,6 +19,8 @@ public class ClientProxyFxStaticGuardTest {
         String particleEngine = readFile("src/main/java/thaumcraft/client/fx/ParticleEngine.java");
         String blockWardFx = readFile("src/main/java/thaumcraft/client/fx/other/FXBlockWard.java");
         String boreFx = readFile("src/main/java/thaumcraft/client/fx/particles/FXBoreParticles.java");
+        String boreSparkleFx = readFile("src/main/java/thaumcraft/client/fx/particles/FXBoreSparkle.java");
+        String breakingFx = readFile("src/main/java/thaumcraft/client/fx/particles/FXBreaking.java");
         String burstFx = readFile("src/main/java/thaumcraft/client/fx/particles/FXBurst.java");
         String bubbleFx = readFile("src/main/java/thaumcraft/client/fx/particles/FXBubble.java");
         String bubbleAltFx = readFile("src/main/java/thaumcraft/client/fx/particles/FXBubbleAlt.java");
@@ -66,9 +68,12 @@ public class ClientProxyFxStaticGuardTest {
         assertTrue("ClientProxy must override taintLandFX for falling taint landing FX",
                 source.contains("public void taintLandFX(")
                         && source.contains("entity.getEntityBoundingBox()")
-                        && source.contains("new FXSmokeDrift("));
+                        && source.contains("new FXBreaking(")
+                        && source.contains("Items.SNOWBALL"));
         assertTrue("ClientProxy must override slimeJumpFX for infested champion fallback",
-                source.contains("public void slimeJumpFX(") && source.contains("sparkle(x, y, z, 0.7f, 0xAA22FF"));
+                source.contains("public void slimeJumpFX(")
+                        && source.contains("new FXBreaking(")
+                        && source.contains("fx.setRBGColorF(0.7F, 0.0F, 1.0F)"));
         assertTrue("ClientProxy must override drawGenericParticles for champion modifier fallback",
                 source.contains("public void drawGenericParticles(") && source.contains("new FXGeneric("));
         assertTrue("ClientProxy must override drawVentParticles for thaumatorium vent routing",
@@ -111,6 +116,8 @@ public class ClientProxyFxStaticGuardTest {
                         && source.contains("public void drawInfusionParticles2(")
                         && source.contains("public void drawInfusionParticles3(")
                         && source.contains("public void drawInfusionParticles4("));
+        assertTrue("ClientProxy infusion particle helper should use dedicated FXBoreSparkle for phases 3/4",
+                source.contains("new FXBoreSparkle(world, x, y, z, tx + 0.5D, ty - 0.5D, tz + 0.5D)"));
         assertTrue("CommonProxy and ClientProxy must keep boreDigFx proxy surface with dedicated client FX routing",
                 commonProxy.contains("public void boreDigFx(World world,")
                         && source.contains("public void boreDigFx(World world,")
@@ -172,6 +179,16 @@ public class ClientProxyFxStaticGuardTest {
                         && boreFx.contains("targetX")
                         && boreFx.contains("EnumParticleTypes.BLOCK_CRACK")
                         && boreFx.contains("EnumParticleTypes.ITEM_CRACK"));
+        assertTrue("Dedicated FXBoreSparkle particle must keep target-chasing sparkle baseline",
+                boreSparkleFx.contains("class FXBoreSparkle extends Particle")
+                        && boreSparkleFx.contains("targetX")
+                        && boreSparkleFx.contains("EnumParticleTypes.REDSTONE")
+                        && boreSparkleFx.contains("EnumParticleTypes.CRIT_MAGIC"));
+        assertTrue("Dedicated FXBreaking particle must keep item-crack + tint baseline",
+                breakingFx.contains("class FXBreaking extends Particle")
+                        && breakingFx.contains("setParticleMaxAge(int particleMaxAge)")
+                        && breakingFx.contains("EnumParticleTypes.ITEM_CRACK")
+                        && breakingFx.contains("EnumParticleTypes.REDSTONE"));
         assertTrue("Dedicated FXBurst particle must keep burst emission baseline",
                 burstFx.contains("class FXBurst extends Particle")
                         && burstFx.contains("EnumParticleTypes.EXPLOSION_NORMAL"));
