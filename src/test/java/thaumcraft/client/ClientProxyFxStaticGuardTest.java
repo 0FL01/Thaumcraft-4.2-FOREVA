@@ -278,9 +278,9 @@ public class ClientProxyFxStaticGuardTest {
                 blockArc.contains("Minecraft.getMinecraft().addScheduledTask")
                         && blockArc.contains("new FXArc(")
                         && blockArc.contains("ParticleEngine.addEffect("));
-        assertTrue("PacketFXBlockZap must schedule client task and route through proxy bolt",
+        assertTrue("PacketFXBlockZap must schedule client task and route through proxy nodeBolt",
                 blockZap.contains("Minecraft.getMinecraft().addScheduledTask")
-                        && blockZap.contains("Thaumcraft.proxy.bolt("));
+                        && blockZap.contains("Thaumcraft.proxy.nodeBolt("));
         assertTrue("PacketFXBlockDig must schedule client task and route dig particles through proxy boreDigFx",
                 blockDig.contains("Minecraft.getMinecraft().addScheduledTask")
                         && blockDig.contains("Thaumcraft.proxy.boreDigFx("));

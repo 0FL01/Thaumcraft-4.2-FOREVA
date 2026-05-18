@@ -55,16 +55,14 @@ public class PacketFXBlockZap extends PacketBase {
     public IMessage onMessage(MessageContext ctx) {
         Minecraft.getMinecraft().addScheduledTask(() -> {
             if (Minecraft.getMinecraft().world == null) return;
-            Thaumcraft.proxy.bolt(
+            Thaumcraft.proxy.nodeBolt(
                     Minecraft.getMinecraft().world,
                     this.x,
                     this.y,
                     this.z,
                     this.dx,
                     this.dy,
-                    this.dz,
-                    0x66CCFF,
-                    4);
+                    this.dz);
             Minecraft.getMinecraft().world.playSound(
                     Minecraft.getMinecraft().player,
                     this.x,
