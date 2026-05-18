@@ -15,6 +15,7 @@ public class TileFocalManipulatorRendererStaticGuardTest {
     public void focalManipulatorRendererKeepsReferenceModelAndFocusContract() throws IOException {
         String source = read("src/main/java/thaumcraft/client/renderers/tile/TileFocalManipulatorRenderer.java");
         String thaumatorium = read("src/main/java/thaumcraft/client/renderers/tile/TileThaumatoriumRenderer.java");
+        String arcaneWorkbench = read("src/main/java/thaumcraft/client/renderers/tile/TileArcaneWorkbenchRenderer.java");
 
         assertTrue(source.contains("textures/models/wandtable.png"));
         assertTrue(source.contains("new ModelArcaneWorkbench()"));
@@ -27,6 +28,11 @@ public class TileFocalManipulatorRendererStaticGuardTest {
         assertTrue(thaumatorium.contains("model.renderAll();"));
         assertTrue(thaumatorium.contains("renderItem(output.copy(), ItemCameraTransforms.TransformType.GROUND)"));
         assertTrue(thaumatorium.contains("GlStateManager.scale(0.75F, 0.75F, 0.75F);"));
+
+        assertTrue(arcaneWorkbench.contains("textures/models/worktable.png"));
+        assertTrue(arcaneWorkbench.contains("wand.getItem() instanceof ItemWandCasting"));
+        assertTrue(arcaneWorkbench.contains("renderItem(wand.copy(), ItemCameraTransforms.TransformType.GROUND)"));
+        assertTrue(arcaneWorkbench.contains("GlStateManager.scale(0.60F, 0.60F, 0.60F);"));
     }
 
     private static String read(String path) throws IOException {

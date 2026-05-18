@@ -1,6 +1,8 @@
 package thaumcraft.client.renderers.tile;
 
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.renderer.RenderHelper;
+import net.minecraft.client.renderer.block.model.ItemCameraTransforms;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
@@ -21,7 +23,6 @@ public class TileArcaneWorkbenchRenderer extends TileEntitySpecialRenderer<TileA
             return;
         }
 
-        float ticks = TileRenderHelper.ticks(tile, partialTicks);
         renderTableModel(x, y, z);
 
         ItemStack wand = tile.getStackInSlot(10);
@@ -30,7 +31,11 @@ public class TileArcaneWorkbenchRenderer extends TileEntitySpecialRenderer<TileA
             GlStateManager.translate(x + 0.65D, y + 1.0625D, z + 0.25D);
             GlStateManager.rotate(90.0F, 1.0F, 0.0F, 0.0F);
             GlStateManager.rotate(20.0F, 0.0F, 0.0F, 1.0F);
-            TileRenderHelper.renderFloatingItem(wand.copy(), ticks, 0.0F, 0.60F);
+            GlStateManager.scale(0.60F, 0.60F, 0.60F);
+            RenderHelper.enableStandardItemLighting();
+            net.minecraft.client.Minecraft.getMinecraft().getRenderItem()
+                    .renderItem(wand.copy(), ItemCameraTransforms.TransformType.GROUND);
+            RenderHelper.disableStandardItemLighting();
             GlStateManager.popMatrix();
         }
     }
