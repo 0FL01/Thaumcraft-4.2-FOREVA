@@ -7,8 +7,7 @@ import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import thaumcraft.client.fx.ParticleEngine;
-import thaumcraft.client.fx.other.FXShieldRunes;
+import thaumcraft.common.Thaumcraft;
 import thaumcraft.common.lib.network.PacketBase;
 
 public class PacketFXShield extends PacketBase {
@@ -60,17 +59,17 @@ public class PacketFXShield extends PacketBase {
                     pitch = 90.0f;
                     yaw = 0.0f;
                 }
-                ParticleEngine.addEffect(mc.world, new FXShieldRunes(mc.world, sourceEntity, 8, yaw, pitch));
+                Thaumcraft.proxy.shieldRunesFX(mc.world, sourceEntity, 8, yaw, pitch);
                 return;
             }
 
             if (this.target == -1) {
-                ParticleEngine.addEffect(mc.world, new FXShieldRunes(mc.world, sourceEntity, 8, 0.0f, 90.0f));
-                ParticleEngine.addEffect(mc.world, new FXShieldRunes(mc.world, sourceEntity, 8, 0.0f, 270.0f));
+                Thaumcraft.proxy.shieldRunesFX(mc.world, sourceEntity, 8, 0.0f, 90.0f);
+                Thaumcraft.proxy.shieldRunesFX(mc.world, sourceEntity, 8, 0.0f, 270.0f);
             } else if (this.target == -2) {
-                ParticleEngine.addEffect(mc.world, new FXShieldRunes(mc.world, sourceEntity, 8, 0.0f, 270.0f));
+                Thaumcraft.proxy.shieldRunesFX(mc.world, sourceEntity, 8, 0.0f, 270.0f);
             } else if (this.target == -3) {
-                ParticleEngine.addEffect(mc.world, new FXShieldRunes(mc.world, sourceEntity, 8, 0.0f, 90.0f));
+                Thaumcraft.proxy.shieldRunesFX(mc.world, sourceEntity, 8, 0.0f, 90.0f);
             }
         });
         return null;

@@ -243,6 +243,9 @@ public class CommonProxy implements IGuiHandler {
     public void shieldRunesFX(World world, Entity source, int age, float yaw, float pitch) {
     }
 
+    public void zapFX(World world, Entity source, Entity target) {
+    }
+
     public void wispFX3(World world, double x, double y, double z, double tx, double ty, double tz, float size, int count, boolean flag, float speed) {
     }
 

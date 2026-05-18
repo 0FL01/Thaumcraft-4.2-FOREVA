@@ -963,6 +963,27 @@ public class ClientProxy extends CommonProxy {
     }
 
     @Override
+    public void zapFX(World world, Entity source, Entity target) {
+        if (world == null || !world.isRemote || source == null || target == null) return;
+        FXLightningBolt bolt = new FXLightningBolt(
+                world,
+                source.posX,
+                source.getEntityBoundingBox().minY + source.height * 0.5D,
+                source.posZ,
+                target.posX,
+                target.getEntityBoundingBox().minY + target.height * 0.5D,
+                target.posZ,
+                world.rand.nextLong(),
+                6,
+                0.5F,
+                8);
+        bolt.defaultFractal();
+        bolt.setType(2);
+        bolt.setWidth(0.125F);
+        bolt.finalizeBolt();
+    }
+
+    @Override
     public void wispFX3(World world, double x, double y, double z, double tx, double ty, double tz, float size, int count, boolean flag, float speed) {
         if (world == null || !world.isRemote) return;
         int amount = particleCount(Math.max(2, (int) (size * 18.0f)));

@@ -7,8 +7,7 @@ import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import thaumcraft.client.fx.ParticleEngine;
-import thaumcraft.client.fx.other.FXSonic;
+import thaumcraft.common.Thaumcraft;
 import thaumcraft.common.lib.network.PacketBase;
 
 public class PacketFXSonic extends PacketBase {
@@ -38,7 +37,7 @@ public class PacketFXSonic extends PacketBase {
             if (mc.world == null) return;
             Entity sourceEntity = mc.world.getEntityByID(this.source);
             if (sourceEntity == null) return;
-            ParticleEngine.addEffect(mc.world, new FXSonic(mc.world, sourceEntity, 10));
+            Thaumcraft.proxy.sonicFX(mc.world, sourceEntity, 10);
         });
         return null;
     }

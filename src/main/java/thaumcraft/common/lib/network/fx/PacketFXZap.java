@@ -7,7 +7,7 @@ import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import thaumcraft.client.fx.bolt.FXLightningBolt;
+import thaumcraft.common.Thaumcraft;
 import thaumcraft.common.lib.network.PacketBase;
 
 public class PacketFXZap extends PacketBase {
@@ -42,22 +42,7 @@ public class PacketFXZap extends PacketBase {
             Entity sourceEntity = mc.world.getEntityByID(this.source);
             Entity targetEntity = mc.world.getEntityByID(this.target);
             if (sourceEntity == null || targetEntity == null) return;
-            FXLightningBolt bolt = new FXLightningBolt(
-                    mc.world,
-                    sourceEntity.posX,
-                    sourceEntity.getEntityBoundingBox().minY + sourceEntity.height * 0.5D,
-                    sourceEntity.posZ,
-                    targetEntity.posX,
-                    targetEntity.getEntityBoundingBox().minY + targetEntity.height * 0.5D,
-                    targetEntity.posZ,
-                    mc.world.rand.nextLong(),
-                    6,
-                    0.5F,
-                    8);
-            bolt.defaultFractal();
-            bolt.setType(2);
-            bolt.setWidth(0.125F);
-            bolt.finalizeBolt();
+            Thaumcraft.proxy.zapFX(mc.world, sourceEntity, targetEntity);
         });
         return null;
     }

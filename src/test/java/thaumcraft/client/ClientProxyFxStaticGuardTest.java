@@ -62,6 +62,11 @@ public class ClientProxyFxStaticGuardTest {
         assertTrue("ClientProxy must expose dedicated shieldRunesFX path through ParticleEngine",
                 source.contains("public void shieldRunesFX(")
                         && source.contains("new FXShieldRunes("));
+        assertTrue("ClientProxy must expose dedicated zapFX path through FXLightningBolt",
+                source.contains("public void zapFX(")
+                        && source.contains("bolt.setType(2);")
+                        && source.contains("bolt.setWidth(0.125F);")
+                        && source.contains("bolt.finalizeBolt();"));
         assertTrue("ClientProxy must override wispFX3 for wisp ambient FX",
                 source.contains("public void wispFX3(") && source.contains("new FXWisp("));
         assertTrue("ClientProxy must override wispFXEG for eldritch guardian trail FX",
@@ -151,9 +156,10 @@ public class ClientProxyFxStaticGuardTest {
                 commonProxy.contains("public void startScan(Entity entity, BlockPos pos, long expireAtMs, int radius)")
                         && source.contains("public void startScan(Entity entity, BlockPos pos, long expireAtMs, int radius)")
                         && source.contains("RenderEventHandler.startScan(entity, pos, expireAtMs, radius);"));
-        assertTrue("CommonProxy must keep no-op side-safe stubs for dedicated sonic/shield rune fx",
+        assertTrue("CommonProxy must keep no-op side-safe stubs for dedicated sonic/shield rune/zap fx",
                 commonProxy.contains("public void sonicFX(World world, Entity source, int age)")
-                        && commonProxy.contains("public void shieldRunesFX(World world, Entity source, int age, float yaw, float pitch)"));
+                        && commonProxy.contains("public void shieldRunesFX(World world, Entity source, int age, float yaw, float pitch)")
+                        && commonProxy.contains("public void zapFX(World world, Entity source, Entity target)"));
         assertTrue("RenderEventHandler must keep scan-state baseline and startScan hook",
                 renderHandler.contains("public static int scanEntityId = -1;")
                         && renderHandler.contains("public static BlockPos scanPos = BlockPos.ORIGIN;")
@@ -350,28 +356,29 @@ public class ClientProxyFxStaticGuardTest {
                         && packetBoreDig.contains("getDigEvent"));
         assertTrue("PacketFXBlockSparkle must schedule client task and call proxy blockSparkle",
                 blockSparkle.contains("Minecraft.getMinecraft().addScheduledTask") && blockSparkle.contains("Thaumcraft.proxy.blockSparkle("));
-        assertTrue("PacketFXShield must schedule client task and emit only dedicated shield rune FX",
+        assertTrue("PacketFXShield must schedule client task and route shield rune triggers through proxy boundary",
                 shield.contains("Minecraft.getMinecraft().addScheduledTask")
-                        && shield.contains("new FXShieldRunes(")
-                        && shield.contains("ParticleEngine.addEffect(")
-                        && !shield.contains("Thaumcraft.proxy.shieldRunesFX(")
+                        && shield.contains("Thaumcraft.proxy.shieldRunesFX(")
+                        && !shield.contains("new FXShieldRunes(")
+                        && !shield.contains("ParticleEngine.addEffect(")
                         && !shield.contains("new FXLightningBolt(")
                         && !shield.contains("Thaumcraft.proxy.burst("));
-        assertTrue("PacketFXSonic must schedule client task and emit only dedicated sonic FX",
+        assertTrue("PacketFXSonic must schedule client task and route sonic trigger through proxy boundary",
                 sonic.contains("Minecraft.getMinecraft().addScheduledTask")
-                        && sonic.contains("new FXSonic(")
-                        && sonic.contains("ParticleEngine.addEffect(")
-                        && !sonic.contains("Thaumcraft.proxy.sonicFX(")
+                        && sonic.contains("Thaumcraft.proxy.sonicFX(")
+                        && !sonic.contains("new FXSonic(")
+                        && !sonic.contains("ParticleEngine.addEffect(")
                         && !sonic.contains("Thaumcraft.proxy.burst("));
         assertTrue("PacketFXWispZap must schedule client task and route through single proxy bolt path",
                 wispZap.contains("Minecraft.getMinecraft().addScheduledTask")
                         && wispZap.contains("Thaumcraft.proxy.bolt(mc.world, sourceEntity, targetEntity)")
                         && !wispZap.contains("new FXLightningBolt(")
                         && !wispZap.contains("ParticleEngine.addEffect("));
-        assertTrue("PacketFXZap must schedule client task and route through dedicated lightning bolt FX only",
+        assertTrue("PacketFXZap must schedule client task and route zap trigger through proxy boundary",
                 zap.contains("Minecraft.getMinecraft().addScheduledTask")
-                        && zap.contains("new FXLightningBolt(")
-                        && zap.contains("bolt.finalizeBolt();")
+                        && zap.contains("Thaumcraft.proxy.zapFX(mc.world, sourceEntity, targetEntity);")
+                        && !zap.contains("new FXLightningBolt(")
+                        && !zap.contains("bolt.finalizeBolt();")
                         && !zap.contains("ParticleEngine.addEffect(")
                         && !zap.contains("Thaumcraft.proxy.bolt(")
                         && !zap.contains("playEvent(2005"));
