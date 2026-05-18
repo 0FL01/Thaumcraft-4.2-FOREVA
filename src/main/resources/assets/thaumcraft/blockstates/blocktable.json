@@ -1,0 +1,20 @@
+{
+  "variants": {
+    "type=0": { "model": "thaumcraft:blocktable_0" },
+    "type=1": { "model": "thaumcraft:blocktable_0" },
+    "type=2": { "model": "thaumcraft:blocktable_0" },
+    "type=3": { "model": "thaumcraft:blocktable_0" },
+    "type=4": { "model": "thaumcraft:blocktable_0" },
+    "type=5": { "model": "thaumcraft:blocktable_0" },
+    "type=6": { "model": "thaumcraft:blocktable_0" },
+    "type=7": { "model": "thaumcraft:blocktable_0" },
+    "type=8": { "model": "thaumcraft:blocktable_0" },
+    "type=9": { "model": "thaumcraft:blocktable_0" },
+    "type=10": { "model": "thaumcraft:blocktable_0" },
+    "type=11": { "model": "thaumcraft:blocktable_0" },
+    "type=12": { "model": "thaumcraft:blocktable_0" },
+    "type=13": { "model": "thaumcraft:blocktable_0" },
+    "type=14": { "model": "thaumcraft:blocktable_14" },
+    "type=15": { "model": "thaumcraft:blocktable_15" }
+  }
+}

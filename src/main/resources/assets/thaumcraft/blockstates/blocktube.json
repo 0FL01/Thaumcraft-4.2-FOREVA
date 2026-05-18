@@ -1,0 +1,12 @@
+{
+  "variants": {
+    "type=0": { "model": "thaumcraft:blocktube_0" },
+    "type=1": { "model": "thaumcraft:blocktube_1" },
+    "type=2": { "model": "thaumcraft:blocktube_2" },
+    "type=3": { "model": "thaumcraft:blocktube_3" },
+    "type=4": { "model": "thaumcraft:blocktube_4" },
+    "type=5": { "model": "thaumcraft:blocktube_5" },
+    "type=6": { "model": "thaumcraft:blocktube_6" },
+    "type=7": { "model": "thaumcraft:blocktube_7" }
+  }
+}

@@ -478,6 +478,23 @@ public class ClientProxy extends CommonProxy {
         for (int meta = 0; meta <= 8; meta++) {
             registerBlockItemModel(woodenDeviceItem, meta, "type=" + meta);
         }
+        Item tubeItem = Item.getItemFromBlock(ConfigBlocks.blockTube);
+        for (int meta = 0; meta <= 7; meta++) {
+            registerBlockItemModel(tubeItem, meta, "type=" + meta);
+        }
+        Item tableItem = Item.getItemFromBlock(ConfigBlocks.blockTable);
+        for (int meta = 0; meta <= 15; meta++) {
+            registerBlockItemModel(tableItem, meta, "type=" + meta);
+        }
+        Item mirrorItem = Item.getItemFromBlock(ConfigBlocks.blockMirror);
+        for (int meta = 0; meta <= 11; meta++) {
+            registerBlockItemModel(mirrorItem, meta, "type=" + meta);
+        }
+        Item arcaneFurnaceItem = Item.getItemFromBlock(ConfigBlocks.blockArcaneFurnace);
+        for (int meta = 0; meta <= 10; meta++) {
+            registerBlockItemModel(arcaneFurnaceItem, meta, "type=" + meta);
+        }
+        registerBlockItemModel(Item.getItemFromBlock(ConfigBlocks.blockEssentiaReservoir), 0, "normal");
         Item candleItem = Item.getItemFromBlock(ConfigBlocks.blockCandle);
         for (int meta = 0; meta < 16; meta++) {
             registerBlockItemModel(candleItem, meta, "type=" + meta);
