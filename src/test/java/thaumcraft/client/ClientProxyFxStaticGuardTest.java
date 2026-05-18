@@ -181,14 +181,16 @@ public class ClientProxyFxStaticGuardTest {
                 particleEngine.contains("lastRenderWorldTime")
                         && particleEngine.contains("lastRenderPartialTicks")
                         && particleEngine.contains("event.getPartialTicks()"));
-        assertTrue("Dedicated FXSonic particle must keep target-following emission baseline",
+        assertTrue("Dedicated FXSonic particle must keep target-following textured overlay baseline",
                 sonicFx.contains("class FXSonic extends Particle")
                         && sonicFx.contains("this.target")
-                        && sonicFx.contains("EnumParticleTypes.REDSTONE"));
-        assertTrue("Dedicated FXShieldRunes particle must keep target-following emission baseline",
+                        && sonicFx.contains("\"textures/models/ripple\"")
+                        && sonicFx.contains("GlStateManager.rotate(-this.yaw"));
+        assertTrue("Dedicated FXShieldRunes particle must keep target-following textured overlay baseline",
                 shieldRunesFx.contains("class FXShieldRunes extends Particle")
                         && shieldRunesFx.contains("this.target")
-                        && shieldRunesFx.contains("EnumParticleTypes.CRIT_MAGIC"));
+                        && shieldRunesFx.contains("\"textures/models/\" + (useRipple ? \"ripple\" : \"hemis\")")
+                        && shieldRunesFx.contains("GlStateManager.rotate(180.0F - this.yaw"));
         assertTrue("Dedicated FXBlockWard particle must keep block-centered ward emission baseline",
                 blockWardFx.contains("class FXBlockWard extends Particle")
                         && blockWardFx.contains("EnumFacing.random(this.rand)")
