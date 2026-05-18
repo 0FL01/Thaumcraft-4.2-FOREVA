@@ -1,11 +1,15 @@
 package thaumcraft.client.renderers.tile;
 
+import java.awt.Color;
 import java.util.Random;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.MathHelper;
+import thaumcraft.client.renderers.models.ModelCrystal;
 import thaumcraft.common.items.ItemShard;
 import thaumcraft.common.tiles.TileCrystal;
 
@@ -13,79 +17,99 @@ public class TileCrystalRenderer extends TileEntitySpecialRenderer<TileCrystal> 
     private static final ResourceLocation CRYSTAL_TEXTURE =
             new ResourceLocation("thaumcraft", "textures/models/crystal.png");
 
+    private final ModelCrystal model = new ModelCrystal();
+
     @Override
     public void render(TileCrystal tile, double x, double y, double z, float partialTicks, int destroyStage, float alpha) {
-        if (tile == null || tile.getWorld() == null) {
+        if (tile == null) {
             return;
         }
+
+        GlStateManager.pushMatrix();
 
         int md = tile.getBlockMetadata();
-        int baseColor = md == 6 ? ItemShard.colors[1 + (int) (tile.getWorld().getTotalWorldTime() % 6L)] : colorForMeta(md);
-        Random rand = new Random(tile.getPos().toLong() ^ 0x5B96A5D1L);
-
+        int color = ItemShard.colors[5];
+        if (md != 6) {
+            color = ItemShard.colors[MathHelper.clamp(md + 1, 1, 6)];
+        }
         bindTexture(CRYSTAL_TEXTURE);
+        Random rand = new Random(tile.getBlockMetadata()
+                + tile.getPos().getX()
+                + tile.getPos().getY() * tile.getPos().getZ());
+        drawCrystal(tile.orientation, x, y, z,
+                (rand.nextFloat() - rand.nextFloat()) * 5.0F,
+                (rand.nextFloat() - rand.nextFloat()) * 5.0F,
+                rand, color, 1.1F);
+        for (int i = 1; i < 6; i++) {
+            if (md == 6) {
+                color = ItemShard.colors[i == 5 ? 6 : i];
+            }
+            int angle1 = rand.nextInt(36) + 72 * i;
+            int angle2 = 15 + rand.nextInt(15);
+            drawCrystal(tile.orientation, x, y, z, angle1, angle2, rand, color, 0.8F);
+        }
+
+        GlStateManager.popMatrix();
+        GlStateManager.disableBlend();
+    }
+
+    private void drawCrystal(short orientation, double x, double y, double z, float yaw, float pitch, Random rand, int color, float size) {
+        EntityPlayerSP player = Minecraft.getMinecraft().player;
+        float ticks = player == null ? 0.0F : player.ticksExisted;
+        float shade = MathHelper.sin((ticks + rand.nextInt(10)) / (5.0F + rand.nextFloat())) * 0.075F + 0.925F;
+        Color tint = new Color(color);
+        float r = tint.getRed() / 220.0F;
+        float g = tint.getGreen() / 220.0F;
+        float b = tint.getBlue() / 220.0F;
+
         GlStateManager.pushMatrix();
-        GlStateManager.translate(x + 0.5D, y + 0.5D, z + 0.5D);
-        orientByAttachment(tile.orientation);
-        GlStateManager.disableLighting();
+        GlStateManager.enableRescaleNormal();
         GlStateManager.enableBlend();
         GlStateManager.blendFunc(770, 771);
-
-        renderShard(rand, baseColor, 1.1F, 0.0F, 0.0F);
-        for (int i = 1; i < 6; i++) {
-            int color = md == 6 ? ItemShard.colors[i == 5 ? 6 : i] : baseColor;
-            renderShard(rand, color, 0.8F, i * 72.0F + rand.nextInt(36), 14.0F + rand.nextInt(16));
-        }
-
-        GlStateManager.disableBlend();
-        GlStateManager.enableLighting();
-        GlStateManager.popMatrix();
-    }
-
-    private void renderShard(Random rand, int color, float size, float yaw, float pitch) {
-        GlStateManager.pushMatrix();
+        translateFromOrientation((float) x, (float) y, (float) z, orientation);
         GlStateManager.rotate(yaw, 0.0F, 1.0F, 0.0F);
         GlStateManager.rotate(pitch, 1.0F, 0.0F, 0.0F);
+
         float sx = (0.15F + rand.nextFloat() * 0.075F) * size;
-        float sy = (0.50F + rand.nextFloat() * 0.10F) * size;
+        float sy = (0.5F + rand.nextFloat() * 0.1F) * size;
         float sz = (0.15F + rand.nextFloat() * 0.05F) * size;
         GlStateManager.scale(sx, sy, sz);
-        TileRenderHelper.drawTexturedQuad(0.5F, 0xFF000000 | (color & 0x00FFFFFF), 0.0F, 1.0F, 0.0F, 1.0F);
-        GlStateManager.rotate(90.0F, 0.0F, 1.0F, 0.0F);
-        TileRenderHelper.drawTexturedQuad(0.5F, 0xFF000000 | (color & 0x00FFFFFF), 0.0F, 1.0F, 0.0F, 1.0F);
+
+        float prevX = OpenGlHelper.lastBrightnessX;
+        float prevY = OpenGlHelper.lastBrightnessY;
+        int glow = (int) (210.0F * shade);
+        int lightU = glow % 65536;
+        int lightV = glow / 65536;
+        OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, lightU, lightV);
+
+        GlStateManager.color(r, g, b, 1.0F);
+        model.render();
+        OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, prevX, prevY);
+
+        GlStateManager.disableRescaleNormal();
+        GlStateManager.disableBlend();
+        GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
         GlStateManager.popMatrix();
     }
 
-    private static int colorForMeta(int md) {
-        int idx = Math.max(0, Math.min(6, md + 1));
-        return ItemShard.colors[idx];
-    }
-
-    private static void orientByAttachment(short orientation) {
-        EnumFacing face = EnumFacing.byIndex(orientation);
-        if (face == null) {
-            return;
-        }
-        switch (face) {
-            case DOWN:
-                GlStateManager.rotate(90.0F, 1.0F, 0.0F, 0.0F);
-                break;
-            case UP:
-                GlStateManager.rotate(-90.0F, 1.0F, 0.0F, 0.0F);
-                break;
-            case NORTH:
-                GlStateManager.rotate(180.0F, 0.0F, 1.0F, 0.0F);
-                break;
-            case SOUTH:
-                break;
-            case WEST:
-                GlStateManager.rotate(90.0F, 0.0F, 1.0F, 0.0F);
-                break;
-            case EAST:
-                GlStateManager.rotate(-90.0F, 0.0F, 1.0F, 0.0F);
-                break;
-            default:
-                break;
+    private static void translateFromOrientation(float x, float y, float z, int orientation) {
+        if (orientation == 0) {
+            GlStateManager.translate(x + 0.5F, y + 1.3F, z + 0.5F);
+            GlStateManager.rotate(180.0F, 1.0F, 0.0F, 0.0F);
+        } else if (orientation == 1) {
+            GlStateManager.translate(x + 0.5F, y - 0.3F, z + 0.5F);
+        } else if (orientation == 2) {
+            GlStateManager.translate(x + 0.5F, y + 0.5F, z + 1.3F);
+            GlStateManager.rotate(-90.0F, 1.0F, 0.0F, 0.0F);
+        } else if (orientation == 3) {
+            GlStateManager.translate(x + 0.5F, y + 0.5F, z - 0.3F);
+            GlStateManager.rotate(90.0F, 1.0F, 0.0F, 0.0F);
+        } else if (orientation == 4) {
+            GlStateManager.translate(x + 1.3F, y + 0.5F, z + 0.5F);
+            GlStateManager.rotate(90.0F, 0.0F, 0.0F, 1.0F);
+        } else if (orientation == 5) {
+            GlStateManager.translate(x - 0.3F, y + 0.5F, z + 0.5F);
+            GlStateManager.rotate(-90.0F, 0.0F, 0.0F, 1.0F);
         }
     }
 }

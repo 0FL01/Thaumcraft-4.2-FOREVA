@@ -6,7 +6,10 @@ import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import thaumcraft.api.IScribeTools;
+import thaumcraft.client.renderers.models.ModelResearchTable;
 import thaumcraft.common.config.ConfigItems;
+import thaumcraft.common.lib.research.ResearchManager;
+import thaumcraft.common.lib.research.ResearchNoteData;
 import thaumcraft.common.tiles.TileResearchTable;
 
 public class TileResearchTableRenderer extends TileEntitySpecialRenderer<TileResearchTable> {
@@ -16,76 +19,70 @@ public class TileResearchTableRenderer extends TileEntitySpecialRenderer<TileRes
             new ResourceLocation("thaumcraft", "textures/models/restable2.png");
     private static final ResourceLocation PARCHMENT_TEXTURE =
             new ResourceLocation("thaumcraft", "textures/misc/parchment.png");
+    private static final float MODEL_SCALE = 0.0625F;
+
+    private final ModelResearchTable tableModel = new ModelResearchTable();
 
     @Override
     public void render(TileResearchTable tile, double x, double y, double z, float partialTicks, int destroyStage, float alpha) {
-        if (tile == null || tile.getWorld() == null) {
+        if (tile == null) {
             return;
         }
 
-        float ticks = TileRenderHelper.ticks(tile, partialTicks);
-        renderBasePlate(x, y, z);
-        renderParchments(x, y, z);
+        int md = tile.getWorld() == null ? 0 : tile.getBlockMetadata();
+
+        GlStateManager.pushMatrix();
+        bindTexture(TABLE_TEXTURE);
+        GlStateManager.translate(x + 0.5F, y + 1.0F, z + 0.5F);
+        GlStateManager.rotate(180.0F, 1.0F, 0.0F, 0.0F);
+        if (md == 2) {
+            GlStateManager.rotate(270.0F, 0.0F, 1.0F, 0.0F);
+        } else if (md == 3) {
+            GlStateManager.rotate(90.0F, 0.0F, 1.0F, 0.0F);
+        } else if (md == 4) {
+            GlStateManager.rotate(180.0F, 0.0F, 1.0F, 0.0F);
+        }
+
+        tableModel.renderAll(MODEL_SCALE);
 
         ItemStack tools = tile.getStackInSlot(0);
         if (!tools.isEmpty() && tools.getItem() instanceof IScribeTools) {
+            tableModel.renderInkwell(MODEL_SCALE);
             GlStateManager.pushMatrix();
-            GlStateManager.translate(x + 0.62D, y + 1.04D, z + 0.36D);
-            GlStateManager.rotate(145.0F, 0.0F, 1.0F, 0.0F);
-            TileRenderHelper.renderFloatingItem(new ItemStack(Items.FEATHER), ticks + 16.0F, 0.0F, 0.45F);
+            GlStateManager.rotate(-90.0F, 0.0F, 1.0F, 0.0F);
+            GlStateManager.rotate(180.0F, 1.0F, 0.0F, 0.0F);
+            GlStateManager.translate(-0.17F, 0.1F, -0.15F);
+            GlStateManager.rotate(15.0F, 0.0F, 1.0F, 0.0F);
+            TileRenderHelper.renderFloatingItem(new ItemStack(Items.FEATHER), 0.0F, 0.0F, 0.5F);
+            GlStateManager.popMatrix();
+        }
+
+        bindTexture(PARCHMENT_TEXTURE);
+        for (int a = 0; a < 6; ++a) {
+            GlStateManager.pushMatrix();
+            GlStateManager.translate(0.1F, -0.01F - a * 0.015F, 0.35F);
+            GlStateManager.rotate(90.0F, -1.0F, 0.0F, 0.0F);
+            GlStateManager.rotate(15.0F + (a % 3) * 2.0F, 0.0F, 0.0F, 1.0F);
+            GlStateManager.scale(0.5F, 0.6F, 0.6F);
+            GlStateManager.disableLighting();
+            GlStateManager.enableBlend();
+            GlStateManager.blendFunc(770, 771);
+            TileRenderHelper.drawTexturedQuad(0.5F, 0xFFFFFFFF, 0.0F, 1.0F, 0.0F, 1.0F);
+            GlStateManager.disableBlend();
+            GlStateManager.enableLighting();
             GlStateManager.popMatrix();
         }
 
         ItemStack notes = tile.getStackInSlot(1);
         if (!notes.isEmpty() && notes.getItem() == ConfigItems.itemResearchNotes) {
-            GlStateManager.pushMatrix();
-            GlStateManager.translate(x + 0.38D, y + 1.02D, z + 0.58D);
-            GlStateManager.rotate(90.0F, 1.0F, 0.0F, 0.0F);
-            GlStateManager.disableLighting();
-            GlStateManager.enableBlend();
-            GlStateManager.blendFunc(770, 771);
             bindTexture(NOTES_TEXTURE);
-            TileRenderHelper.drawTexturedQuad(0.22F, 0xCCFFFFFF, 0.0F, 1.0F, 0.0F, 1.0F);
-            GlStateManager.disableBlend();
-            GlStateManager.enableLighting();
-            GlStateManager.popMatrix();
-
+            ResearchNoteData data = ResearchManager.getData(notes);
+            int color = data != null ? data.color : 0x999999;
             GlStateManager.pushMatrix();
-            GlStateManager.translate(x + 0.38D, y + 1.06D, z + 0.58D);
-            TileRenderHelper.renderFloatingItem(notes.copy(), ticks + 6.0F, 0.0F, 0.45F);
+            tableModel.renderScroll(MODEL_SCALE, color);
             GlStateManager.popMatrix();
         }
-    }
 
-    private void renderBasePlate(double x, double y, double z) {
-        GlStateManager.pushMatrix();
-        GlStateManager.translate(x + 0.5D, y + 1.001D, z + 0.5D);
-        GlStateManager.rotate(90.0F, 1.0F, 0.0F, 0.0F);
-        GlStateManager.disableLighting();
-        GlStateManager.enableBlend();
-        GlStateManager.blendFunc(770, 771);
-        bindTexture(TABLE_TEXTURE);
-        TileRenderHelper.drawTexturedQuad(0.32F, 0xCCFFFFFF, 0.0F, 1.0F, 0.0F, 1.0F);
-        GlStateManager.disableBlend();
-        GlStateManager.enableLighting();
         GlStateManager.popMatrix();
-    }
-
-    private void renderParchments(double x, double y, double z) {
-        bindTexture(PARCHMENT_TEXTURE);
-        for (int i = 0; i < 6; i++) {
-            GlStateManager.pushMatrix();
-            GlStateManager.translate(x + 0.60D, y + 1.003D - i * 0.005D, z + 0.32D);
-            GlStateManager.rotate(90.0F, 1.0F, 0.0F, 0.0F);
-            GlStateManager.rotate(15.0F + (i % 3) * 2.0F, 0.0F, 0.0F, 1.0F);
-            GlStateManager.scale(0.40F, 0.48F, 0.48F);
-            GlStateManager.disableLighting();
-            GlStateManager.enableBlend();
-            GlStateManager.blendFunc(770, 771);
-            TileRenderHelper.drawTexturedQuad(0.25F, 0xCCFFFFFF, 0.0F, 1.0F, 0.0F, 1.0F);
-            GlStateManager.disableBlend();
-            GlStateManager.enableLighting();
-            GlStateManager.popMatrix();
-        }
     }
 }

@@ -1,6 +1,6 @@
 # Durable Goal Progress
 
-Last updated: 2026-05-17
+Last updated: 2026-05-18
 Branch: `codex/durable-goal-stage8-9`
 
 > Condensed with user approval. The verbose checkpoint prose was produced by another agent and moved to `docs/GOAL_PROGRESS.archive.md`.
@@ -25,6 +25,7 @@ Branch: `codex/durable-goal-stage8-9`
 - Stage 3/4 server/common baselines are documented as partial; Stage 5-7 remain open in targeted areas.
 - `./scripts/dev.sh validate` and `./scripts/dev.sh validate --smoke` pass on current builds.
 - GUI/manual graphics checks remain excluded by instruction and headless environment limits.
+- Incremental Stage 8-c TESR fidelity burst delta: restored model-based visual baselines for bellows/research table/mana pod/crystal by adding `ModelManaPod` + `ModelCrystal` and porting reference-shaped transforms/animation/color paths in `TileBellowsRenderer`, `TileResearchTableRenderer`, `TileManaPodRenderer`, and `TileCrystalRenderer` (including orientation mapping, research-scroll tinting from `ResearchManager.getData(...)`, and lightmap-driven glow passes), validated with `./scripts/dev.sh compileJava`, `./scripts/dev.sh gradle test --tests thaumcraft.client.ClientProxyTileRendererBurstCoverageTest`, `./scripts/dev.sh validate`, and `./scripts/dev.sh validate --smoke` (server smoke pass).
 - Stage 5 wand on-use warding baseline now includes reference-shaped owner-gated wand removal flow for warded pressure-plate/cosmetic blocks and arcane doors (`ItemWandCasting.onItemUseFirst`), with `TileOwned.safeToRemove` toggles and arcane-door drop parity guards.
 - Stage 5 wand trigger baseline for `ADVALCHEMYFURNACE` now includes non-stub server activation flow in `WandManager` (research-gated vis consume + multiblock validation around `blockStoneDevice` core + activation block-state swap + sparkle/sound FX), replacing the previous dead branch.
 

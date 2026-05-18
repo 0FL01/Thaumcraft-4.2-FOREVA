@@ -1,84 +1,91 @@
 package thaumcraft.client.renderers.tile;
 
-import net.minecraft.client.renderer.BufferBuilder;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
-import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
-import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
-import org.lwjgl.opengl.GL11;
+import net.minecraft.util.math.MathHelper;
+import thaumcraft.client.renderers.models.ModelBellows;
 import thaumcraft.common.tiles.TileBellows;
 
 public class TileBellowsRenderer extends TileEntitySpecialRenderer<TileBellows> {
     private static final ResourceLocation BELLOWS =
             new ResourceLocation("thaumcraft", "textures/models/bellows.png");
+    private static final float MODEL_SCALE = 0.0625F;
+
+    private final ModelBellows model = new ModelBellows();
 
     @Override
-    public void render(TileBellows tile, double x, double y, double z, float partialTicks, int destroyStage, float alpha) {
-        if (tile == null || tile.getWorld() == null) {
+    public void render(TileBellows bellows, double x, double y, double z, float partialTicks, int destroyStage, float alpha) {
+        if (bellows == null) {
             return;
         }
 
-        float inflate = Math.max(0.35F, Math.min(1.0F, tile.inflation));
-        float front = 0.22F + inflate * 0.32F;
-        float back = -0.22F - inflate * 0.08F;
+        float inflate;
+        int orientation;
+        if (bellows.getWorld() == null) {
+            EntityPlayerSP player = Minecraft.getMinecraft().player;
+            float ticks = player == null ? 0.0F : player.ticksExisted + partialTicks;
+            inflate = MathHelper.sin(ticks / 8.0F) * 0.3F + 0.7F;
+            orientation = 2;
+        } else {
+            inflate = bellows.inflation;
+            orientation = bellows.orientation;
+        }
 
-        GlStateManager.pushMatrix();
-        GlStateManager.translate(x + 0.5D, y + 0.5D, z + 0.5D);
-        rotateFacing(EnumFacing.byIndex(tile.orientation));
-        GlStateManager.disableLighting();
-        GlStateManager.enableBlend();
-        GlStateManager.blendFunc(770, 771);
+        float tscale = 0.125F + inflate * 0.875F;
         bindTexture(BELLOWS);
 
-        drawBellows(front, back);
+        GlStateManager.pushMatrix();
+        GlStateManager.enableRescaleNormal();
+        GlStateManager.enableBlend();
+        GlStateManager.blendFunc(770, 771);
+        GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
 
+        translateFromOrientation(x, y, z, orientation);
+        GlStateManager.translate(0.0F, 1.0F, 0.0F);
+
+        GlStateManager.pushMatrix();
+        GlStateManager.scale(0.5F, (inflate + 0.1F) / 2.0F, 0.5F);
+        model.bag.setRotationPoint(0.0F, 0.5F, 0.0F);
+        model.bag.render(MODEL_SCALE);
+        GlStateManager.popMatrix();
+
+        GlStateManager.translate(0.0F, -1.0F, 0.0F);
+
+        GlStateManager.pushMatrix();
+        GlStateManager.translate(0.0F, -tscale / 2.0F + 0.5F, 0.0F);
+        model.topPlank.render(MODEL_SCALE);
+        GlStateManager.popMatrix();
+
+        GlStateManager.pushMatrix();
+        GlStateManager.translate(0.0F, tscale / 2.0F - 0.5F, 0.0F);
+        model.bottomPlank.render(MODEL_SCALE);
+        GlStateManager.popMatrix();
+
+        model.render();
+
+        GlStateManager.disableRescaleNormal();
         GlStateManager.disableBlend();
-        GlStateManager.enableLighting();
+        GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
         GlStateManager.popMatrix();
     }
 
-    private static void rotateFacing(EnumFacing face) {
-        if (face == null) return;
-        switch (face) {
-            case DOWN:
-                GlStateManager.rotate(90.0F, 1.0F, 0.0F, 0.0F);
-                break;
-            case UP:
-                GlStateManager.rotate(-90.0F, 1.0F, 0.0F, 0.0F);
-                break;
-            case NORTH:
-                GlStateManager.rotate(180.0F, 0.0F, 1.0F, 0.0F);
-                break;
-            case WEST:
-                GlStateManager.rotate(-90.0F, 0.0F, 1.0F, 0.0F);
-                break;
-            case EAST:
-                GlStateManager.rotate(90.0F, 0.0F, 1.0F, 0.0F);
-                break;
-            case SOUTH:
-            default:
-                break;
+    private static void translateFromOrientation(double x, double y, double z, int orientation) {
+        GlStateManager.translate((float) x + 0.5F, (float) y - 0.5F, (float) z + 0.5F);
+        if (orientation == 0) {
+            GlStateManager.translate(0.0F, 1.0F, -1.0F);
+            GlStateManager.rotate(90.0F, 1.0F, 0.0F, 0.0F);
+        } else if (orientation == 1) {
+            GlStateManager.translate(0.0F, 1.0F, 1.0F);
+            GlStateManager.rotate(270.0F, 1.0F, 0.0F, 0.0F);
+        } else if (orientation == 2) {
+            GlStateManager.rotate(180.0F, 0.0F, 1.0F, 0.0F);
+        } else if (orientation == 4) {
+            GlStateManager.rotate(270.0F, 0.0F, 1.0F, 0.0F);
+        } else if (orientation == 5) {
+            GlStateManager.rotate(90.0F, 0.0F, 1.0F, 0.0F);
         }
-    }
-
-    private static void drawBellows(float front, float back) {
-        Tessellator tess = Tessellator.getInstance();
-        BufferBuilder buf = tess.getBuffer();
-        float half = 0.36F;
-        float height = 0.34F;
-
-        buf.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX_COLOR);
-        quad(buf, -half, -height, back, half, height, front);
-        quad(buf, -half, -height, front, half, height, back);
-        tess.draw();
-    }
-
-    private static void quad(BufferBuilder buf, float x0, float y0, float z0, float x1, float y1, float z1) {
-        buf.pos(x0, y1, z0).tex(0.0D, 0.0D).color(1.0F, 1.0F, 1.0F, 1.0F).endVertex();
-        buf.pos(x0, y0, z0).tex(0.0D, 1.0D).color(1.0F, 1.0F, 1.0F, 1.0F).endVertex();
-        buf.pos(x1, y0, z1).tex(1.0D, 1.0D).color(1.0F, 1.0F, 1.0F, 1.0F).endVertex();
-        buf.pos(x1, y1, z1).tex(1.0D, 0.0D).color(1.0F, 1.0F, 1.0F, 1.0F).endVertex();
     }
 }
