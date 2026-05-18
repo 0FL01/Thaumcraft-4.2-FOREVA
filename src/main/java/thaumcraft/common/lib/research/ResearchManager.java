@@ -50,6 +50,7 @@ public class ResearchManager {
     // Cache of player research data (server-side)
     private static final Map<String, IPlayerKnowledge> playerDataCache = new HashMap<>();
     private static List<ResearchItem> allHiddenResearch;
+    private static List<ResearchItem> allValidResearch;
 
     public static class HexEntry {
         public Aspect aspect;
@@ -444,6 +445,32 @@ public class ResearchManager {
         if (candidates.isEmpty()) return "FAIL";
         int pick = new java.util.Random(player.world.getTotalWorldTime() / 50L).nextInt(candidates.size());
         return candidates.get(pick);
+    }
+
+    public static String findMatchingResearch(EntityPlayer player, Aspect aspect) {
+        if (player == null || player.world == null || aspect == null) return null;
+        if (allValidResearch == null) {
+            allValidResearch = new ArrayList<>();
+            for (ResearchCategoryList category : ResearchCategories.researchCategories.values()) {
+                for (ResearchItem research : category.research.values()) {
+                    boolean secondary = research.isSecondary() && (Config.researchDifficulty == 0 || Config.researchDifficulty == -1);
+                    if (secondary || research.isHidden() || research.isLost() || research.isAutoUnlock()
+                            || research.isVirtual() || research.isStub()) {
+                        continue;
+                    }
+                    allValidResearch.add(research);
+                }
+            }
+        }
+        ArrayList<String> keys = new ArrayList<>();
+        for (ResearchItem research : allValidResearch) {
+            if (isResearchComplete(player.getName(), research.key)) continue;
+            if (!doesPlayerHaveRequisites(player.getName(), research.key)) continue;
+            if (research.tags.getAmount(aspect) <= 0) continue;
+            keys.add(research.key);
+        }
+        if (keys.isEmpty()) return null;
+        return keys.get(player.world.rand.nextInt(keys.size()));
     }
 
     /**
