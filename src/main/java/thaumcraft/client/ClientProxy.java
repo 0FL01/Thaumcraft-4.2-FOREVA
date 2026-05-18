@@ -18,6 +18,7 @@ import net.minecraft.client.renderer.entity.RenderSpider;
 import net.minecraft.client.renderer.entity.RenderZombie;
 import net.minecraft.client.renderer.tileentity.TileEntityItemStackRenderer;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
 import net.minecraft.inventory.IInventory;
@@ -57,6 +58,7 @@ import thaumcraft.client.fx.ParticleEngine;
 import thaumcraft.client.fx.beams.FXArc;
 import thaumcraft.client.fx.beams.FXBeam;
 import thaumcraft.client.fx.beams.FXBeamBore;
+import thaumcraft.client.fx.beams.FXBeamGolemBoss;
 import thaumcraft.client.fx.beams.FXBeamPower;
 import thaumcraft.client.fx.beams.FXBeamWand;
 import thaumcraft.client.fx.bolt.FXLightningBolt;
@@ -734,6 +736,45 @@ public class ClientProxy extends CommonProxy {
         float blue = normalizeColor(tint.getBlue());
         ParticleEngine.addEffect(world,
                 new FXBeam(world, x, y, z, tx, ty, tz, red, green, blue, Math.max(6, ticks), flicker, amount));
+    }
+
+    @Override
+    public void beamPulseFX(World world, Entity source, Entity target, int color) {
+        if (world == null || !world.isRemote || source == null || target == null) return;
+        Color tint = decodeColor(color);
+        FXBeam beam = new FXBeam(
+                world,
+                source.posX,
+                source.posY + source.getEyeHeight(),
+                source.posZ,
+                target.posX,
+                target.posY + target.height * 0.5,
+                target.posZ,
+                normalizeColor(tint.getRed()),
+                normalizeColor(tint.getGreen()),
+                normalizeColor(tint.getBlue()),
+                20,
+                true,
+                20);
+        beam.setType(1);
+        beam.setReverse(true);
+        beam.setPulse(true);
+        ParticleEngine.addEffect(world, beam);
+    }
+
+    @Override
+    public void beamPulseGolemBossFX(World world, EntityLivingBase source, Entity target) {
+        if (world == null || !world.isRemote || source == null || target == null) return;
+
+        FXBeamGolemBoss beamA = new FXBeamGolemBoss(world, source, target, 0.07F, 0.376F, 0.325F, 20);
+        beamA.setType(2);
+        beamA.setPulse(true);
+        ParticleEngine.addEffect(world, beamA);
+
+        FXBeamGolemBoss beamB = new FXBeamGolemBoss(world, source, target, 1.0F, 0.5F, 0.5F, 20);
+        beamB.setType(1);
+        beamB.setPulse(true);
+        ParticleEngine.addEffect(world, beamB);
     }
 
     @Override

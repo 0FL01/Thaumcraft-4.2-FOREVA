@@ -2,6 +2,7 @@ package thaumcraft.common;
 
 import javax.annotation.Nullable;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.block.state.IBlockState;
@@ -160,6 +161,12 @@ public class CommonProxy implements IGuiHandler {
     }
 
     public void beam(World world, double x, double y, double z, double tx, double ty, double tz, int color, boolean flicker, int ticks) {
+    }
+
+    public void beamPulseFX(World world, Entity source, Entity target, int color) {
+    }
+
+    public void beamPulseGolemBossFX(World world, EntityLivingBase source, Entity target) {
     }
 
     public Object beamCont(World world,

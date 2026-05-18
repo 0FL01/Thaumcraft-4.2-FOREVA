@@ -52,6 +52,10 @@ public class ClientProxyFxStaticGuardTest {
                         && source.contains("new FXBlockWard(world, x, y, z, color, amount)"));
         assertTrue("ClientProxy beam must contain dedicated FXBeam particle path",
                 source.contains("public void beam(") && source.contains("new FXBeam("));
+        assertTrue("ClientProxy must expose dedicated beamPulseFX and beamPulseGolemBossFX paths",
+                source.contains("public void beamPulseFX(")
+                        && source.contains("public void beamPulseGolemBossFX(")
+                        && source.contains("new FXBeamGolemBoss("));
         assertTrue("ClientProxy bolt must contain non-noop bolt particle path",
                 source.contains("public void bolt(") && source.contains("speed * 2"));
         assertTrue("ClientProxy must override burst for direct entity FX call sites",
@@ -94,6 +98,8 @@ public class ClientProxyFxStaticGuardTest {
                 commonProxy.contains("public Object beamCont(")
                         && commonProxy.contains("public Object beamBore(")
                         && commonProxy.contains("public Object beamPower(")
+                        && commonProxy.contains("public void beamPulseFX(World world, Entity source, Entity target, int color)")
+                        && commonProxy.contains("public void beamPulseGolemBossFX(World world, EntityLivingBase source, Entity target)")
                         && source.contains("public Object beamCont(")
                         && source.contains("new FXBeamWand(")
                         && source.contains("public Object beamBore(")
@@ -328,14 +334,16 @@ public class ClientProxyFxStaticGuardTest {
         assertTrue("PacketFXBlockBubble must schedule client task and route through proxy crucibleBubble surface",
                 blockBubble.contains("Minecraft.getMinecraft().addScheduledTask")
                         && blockBubble.contains("Thaumcraft.proxy.crucibleBubble("));
-        assertTrue("PacketFXBeamPulse must schedule client task and route through dedicated FXBeam",
+        assertTrue("PacketFXBeamPulse must schedule client task and route beam pulse trigger through proxy boundary",
                 beamPulse.contains("Minecraft.getMinecraft().addScheduledTask")
-                        && beamPulse.contains("new FXBeam(")
-                        && beamPulse.contains("ParticleEngine.addEffect("));
-        assertTrue("PacketFXBeamPulseGolemBoss must schedule client task and route through dedicated FXBeamGolemBoss",
+                        && beamPulse.contains("Thaumcraft.proxy.beamPulseFX(")
+                        && !beamPulse.contains("new FXBeam(")
+                        && !beamPulse.contains("ParticleEngine.addEffect("));
+        assertTrue("PacketFXBeamPulseGolemBoss must schedule client task and route golem-boss pulse trigger through proxy boundary",
                 beamPulseGolemBoss.contains("Minecraft.getMinecraft().addScheduledTask")
-                        && beamPulseGolemBoss.contains("new FXBeamGolemBoss(")
-                        && beamPulseGolemBoss.contains("ParticleEngine.addEffect("));
+                        && beamPulseGolemBoss.contains("Thaumcraft.proxy.beamPulseGolemBossFX(")
+                        && !beamPulseGolemBoss.contains("new FXBeamGolemBoss(")
+                        && !beamPulseGolemBoss.contains("ParticleEngine.addEffect("));
         assertTrue("PacketFXEssentiaSource must schedule client task and update EssentiaHandler sourceFX queue",
                 essentiaSource.contains("Minecraft.getMinecraft().addScheduledTask")
                         && essentiaSource.contains("EssentiaHandler.sourceFX")
