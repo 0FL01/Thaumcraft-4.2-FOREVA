@@ -240,8 +240,9 @@ public class ClientProxyFxStaticGuardTest {
                         && essentiaTrailFx.contains("EnumParticleTypes.REDSTONE"));
         assertTrue("Dedicated FXGeneric particle must keep configurable generic particle baseline",
                 genericFx.contains("class FXGeneric extends Particle")
-                        && genericFx.contains("loop")
-                        && genericFx.contains("EnumParticleTypes.REDSTONE"));
+                        && genericFx.contains("setParticles(int startParticle, int numParticles, int particleInc)")
+                        && genericFx.contains("setMaxAge(int max, int delay)")
+                        && genericFx.contains("if (this.particleAge < this.delay)"));
         assertTrue("Dedicated FXSmokeDrift particle must keep smoke drift emission baseline",
                 smokeDriftFx.contains("class FXSmokeDrift extends Particle")
                         && smokeDriftFx.contains("EnumParticleTypes.SMOKE_NORMAL")
@@ -258,8 +259,10 @@ public class ClientProxyFxStaticGuardTest {
                         && swarmFx.contains("EnumParticleTypes.CRIT_MAGIC"));
         assertTrue("Dedicated FXVent particle must keep vent trail emission baseline",
                 ventFx.contains("class FXVent extends Particle")
-                        && ventFx.contains("EnumParticleTypes.REDSTONE")
-                        && ventFx.contains("EnumParticleTypes.CRIT_MAGIC"));
+                        && ventFx.contains("setHeading(double x, double y, double z, float speed, float spread)")
+                        && ventFx.contains("setParticleTextureIndex(part)")
+                        && ventFx.contains("public int getFXLayer()")
+                        && ventFx.contains("return 1;"));
         assertTrue("Dedicated FXVisSparkle particle must keep block-centered sparkle emission baseline",
                 visSparkleFx.contains("class FXVisSparkle extends Particle")
                         && visSparkleFx.contains("baseX")

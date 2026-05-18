@@ -1178,7 +1178,7 @@ public class ClientProxy extends CommonProxy {
                     my + (world.rand.nextFloat() - 0.5f) * 0.01f,
                     mz + (world.rand.nextFloat() - 0.5f) * 0.01f,
                     red, green, blue, alpha,
-                    loop, num, inc, age, delay, scale));
+                    loop, start, num, inc, age, delay, scale));
         }
     }
 
