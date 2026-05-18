@@ -3,7 +3,9 @@ package thaumcraft.client.renderers.tile;
 import java.util.Random;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.block.model.ItemCameraTransforms;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.item.ItemStack;
@@ -90,7 +92,10 @@ public class TileEldritchLockRenderer extends TileEntitySpecialRenderer<TileEldr
                 y + 0.285D,
                 z + 0.5D + facing.getZOffset() * 0.525D);
         GlStateManager.rotate(-facing.getHorizontalAngle(), 0.0F, 1.0F, 0.0F);
-        TileRenderHelper.renderFloatingItem(key, ticks, 0.0F, 0.6F);
+        RenderHelper.enableStandardItemLighting();
+        net.minecraft.client.Minecraft.getMinecraft().getRenderItem()
+                .renderItem(key, ItemCameraTransforms.TransformType.GROUND);
+        RenderHelper.disableStandardItemLighting();
         GlStateManager.popMatrix();
     }
 

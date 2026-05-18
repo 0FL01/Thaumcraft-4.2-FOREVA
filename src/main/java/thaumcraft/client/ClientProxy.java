@@ -511,9 +511,10 @@ public class ClientProxy extends CommonProxy {
         ClientRegistry.bindTileEntitySpecialRenderer(TileChestHungry.class, new TileChestHungryRenderer());
         ClientRegistry.bindTileEntitySpecialRenderer(TileCrystal.class, new TileCrystalRenderer());
         ClientRegistry.bindTileEntitySpecialRenderer(TileEldritchCrystal.class, new TileEldritchCrystalRenderer());
-        TileEldritchCapRenderer eldritchCapRenderer = new TileEldritchCapRenderer();
-        ClientRegistry.bindTileEntitySpecialRenderer(TileEldritchCap.class, eldritchCapRenderer);
-        ClientRegistry.bindTileEntitySpecialRenderer(TileEldritchAltar.class, eldritchCapRenderer);
+        ClientRegistry.bindTileEntitySpecialRenderer(TileEldritchCap.class, new TileEldritchCapRenderer());
+        ClientRegistry.bindTileEntitySpecialRenderer(
+                TileEldritchAltar.class,
+                new TileEldritchCapRenderer(TileEldritchCapRenderer.altarTexture()));
         ClientRegistry.bindTileEntitySpecialRenderer(TileEldritchObelisk.class, new TileEldritchObeliskRenderer());
         ClientRegistry.bindTileEntitySpecialRenderer(TileEldritchCrabSpawner.class, new TileEldritchCrabSpawnerRenderer());
         ClientRegistry.bindTileEntitySpecialRenderer(TileEldritchPortal.class, new TileEldritchPortalRenderer());

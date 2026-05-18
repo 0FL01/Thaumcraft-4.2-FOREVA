@@ -1,6 +1,5 @@
 package thaumcraft.client.renderers.tile;
 
-import net.minecraft.init.Items;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.item.ItemStack;
@@ -19,6 +18,8 @@ public class TileResearchTableRenderer extends TileEntitySpecialRenderer<TileRes
             new ResourceLocation("thaumcraft", "textures/models/restable2.png");
     private static final ResourceLocation PARCHMENT_TEXTURE =
             new ResourceLocation("thaumcraft", "textures/misc/parchment.png");
+    private static final ResourceLocation QUILL_TEXTURE =
+            new ResourceLocation("thaumcraft", "textures/misc/quill.png");
     private static final float MODEL_SCALE = 0.0625F;
 
     private final ModelResearchTable tableModel = new ModelResearchTable();
@@ -53,7 +54,14 @@ public class TileResearchTableRenderer extends TileEntitySpecialRenderer<TileRes
             GlStateManager.rotate(180.0F, 1.0F, 0.0F, 0.0F);
             GlStateManager.translate(-0.17F, 0.1F, -0.15F);
             GlStateManager.rotate(15.0F, 0.0F, 1.0F, 0.0F);
-            TileRenderHelper.renderFloatingItem(new ItemStack(Items.FEATHER), 0.0F, 0.0F, 0.5F);
+            bindTexture(QUILL_TEXTURE);
+            GlStateManager.scale(0.5F, 0.5F, 0.5F);
+            GlStateManager.disableLighting();
+            GlStateManager.enableBlend();
+            GlStateManager.blendFunc(770, 771);
+            TileRenderHelper.drawTexturedQuad(0.5F, 0xFFFFFFFF, 0.0F, 1.0F, 0.0F, 1.0F);
+            GlStateManager.disableBlend();
+            GlStateManager.enableLighting();
             GlStateManager.popMatrix();
         }
 

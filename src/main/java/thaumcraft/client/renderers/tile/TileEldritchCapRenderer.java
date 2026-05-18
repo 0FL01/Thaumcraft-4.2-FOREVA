@@ -1,6 +1,8 @@
 package thaumcraft.client.renderers.tile;
 
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.renderer.RenderHelper;
+import net.minecraft.client.renderer.block.model.ItemCameraTransforms;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
@@ -12,8 +14,19 @@ import thaumcraft.common.tiles.TileEldritchAltar;
 public class TileEldritchCapRenderer extends TileEntitySpecialRenderer<TileEntity> {
     private static final ResourceLocation CAP_TEXTURE =
             new ResourceLocation("thaumcraft", "textures/models/obelisk_cap.png");
+    private static final ResourceLocation CAP_TEXTURE_ALTAR =
+            new ResourceLocation("thaumcraft", "textures/models/obelisk_cap_altar.png");
     private static final ResourceLocation CAP_TEXTURE_OUTER =
             new ResourceLocation("thaumcraft", "textures/models/obelisk_cap_2.png");
+    private final ResourceLocation capTexture;
+
+    public TileEldritchCapRenderer() {
+        this(CAP_TEXTURE);
+    }
+
+    public TileEldritchCapRenderer(ResourceLocation capTexture) {
+        this.capTexture = capTexture == null ? CAP_TEXTURE : capTexture;
+    }
 
     @Override
     public void render(TileEntity tile, double x, double y, double z, float partialTicks, int destroyStage, float alpha) {
@@ -23,10 +36,10 @@ public class TileEldritchCapRenderer extends TileEntitySpecialRenderer<TileEntit
 
         ResourceLocation texture = tile.getWorld().provider.getDimension() == Config.dimensionOuterId
                 ? CAP_TEXTURE_OUTER
-                : CAP_TEXTURE;
+                : capTexture;
 
         GlStateManager.pushMatrix();
-        GlStateManager.translate(x + 0.5D, y + 0.08D, z + 0.5D);
+        GlStateManager.translate(x + 0.5D, y, z + 0.5D);
         GlStateManager.disableLighting();
         GlStateManager.enableBlend();
         GlStateManager.blendFunc(770, 771);
@@ -41,11 +54,11 @@ public class TileEldritchCapRenderer extends TileEntitySpecialRenderer<TileEntit
         GlStateManager.popMatrix();
 
         if (tile instanceof TileEldritchAltar) {
-            renderAltarEyes((TileEldritchAltar) tile, x, y, z, partialTicks);
+            renderAltarEyes((TileEldritchAltar) tile, x, y, z);
         }
     }
 
-    private static void renderAltarEyes(TileEldritchAltar altar, double x, double y, double z, float partialTicks) {
+    private static void renderAltarEyes(TileEldritchAltar altar, double x, double y, double z) {
         if (ConfigItems.itemEldritchObject == null) {
             return;
         }
@@ -54,19 +67,24 @@ public class TileEldritchCapRenderer extends TileEntitySpecialRenderer<TileEntit
             return;
         }
         ItemStack eye = new ItemStack(ConfigItems.itemEldritchObject, 1, 0);
-        float ticks = TileRenderHelper.ticks(altar, partialTicks);
-
         GlStateManager.pushMatrix();
-        GlStateManager.translate(x + 0.5D, y + 0.18D, z + 0.5D);
+        GlStateManager.translate(x + 0.5D, y, z + 0.5D);
         for (int i = 0; i < eyes; i++) {
             GlStateManager.pushMatrix();
             GlStateManager.rotate(i * 90.0F, 0.0F, 1.0F, 0.0F);
-            GlStateManager.translate(0.42D, 0.0D, 0.0D);
+            GlStateManager.translate(0.46D, 0.2D, 0.0D);
             GlStateManager.rotate(90.0F, 0.0F, 1.0F, 0.0F);
             GlStateManager.rotate(18.0F, -1.0F, 0.0F, 0.0F);
-            TileRenderHelper.renderFloatingItem(eye.copy(), ticks + i * 9.0F, 0.0F, 0.35F);
+            RenderHelper.enableStandardItemLighting();
+            net.minecraft.client.Minecraft.getMinecraft().getRenderItem()
+                    .renderItem(eye.copy(), ItemCameraTransforms.TransformType.GROUND);
+            RenderHelper.disableStandardItemLighting();
             GlStateManager.popMatrix();
         }
         GlStateManager.popMatrix();
+    }
+
+    public static ResourceLocation altarTexture() {
+        return CAP_TEXTURE_ALTAR;
     }
 }
