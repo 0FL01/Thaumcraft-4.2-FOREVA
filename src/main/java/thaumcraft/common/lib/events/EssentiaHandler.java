@@ -19,6 +19,7 @@ public class EssentiaHandler {
     private static final int DELAY = 5000;
     private static final Map<SourceKey, ArrayList<SourceKey>> SOURCES = new HashMap<SourceKey, ArrayList<SourceKey>>();
     private static final Map<SourceKey, Long> SOURCES_DELAY = new HashMap<SourceKey, Long>();
+    public static final Map<String, EssentiaSourceFX> sourceFX = new HashMap<String, EssentiaSourceFX>();
 
     public static boolean drainEssentia(TileEntity tile, Aspect aspect, EnumFacing direction, int range) {
         return drainEssentia(tile, aspect, direction, range, false);
@@ -172,6 +173,20 @@ public class EssentiaHandler {
         @Override
         public int hashCode() {
             return 31 * this.pos.hashCode() + this.dim;
+        }
+    }
+
+    public static final class EssentiaSourceFX {
+        public final BlockPos start;
+        public final BlockPos end;
+        public int ticks;
+        public final int color;
+
+        public EssentiaSourceFX(BlockPos start, BlockPos end, int ticks, int color) {
+            this.start = start.toImmutable();
+            this.end = end.toImmutable();
+            this.ticks = ticks;
+            this.color = color;
         }
     }
 }

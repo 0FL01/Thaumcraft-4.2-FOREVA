@@ -2,12 +2,12 @@ package thaumcraft.common.lib.network.fx;
 
 import io.netty.buffer.ByteBuf;
 import net.minecraft.client.Minecraft;
+import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import thaumcraft.client.fx.ParticleEngine;
-import thaumcraft.client.fx.beams.FXBeam;
+import thaumcraft.common.lib.events.EssentiaHandler;
 import thaumcraft.common.lib.network.PacketBase;
 
 public class PacketFXEssentiaSource extends PacketBase {
@@ -57,21 +57,24 @@ public class PacketFXEssentiaSource extends PacketBase {
     @SideOnly(Side.CLIENT)
     public IMessage onMessage(MessageContext ctx) {
         Minecraft.getMinecraft().addScheduledTask(() -> {
-            Minecraft mc = Minecraft.getMinecraft();
-            if (mc.world == null) return;
-            float red = ((this.color >> 16) & 0xFF) / 255.0F;
-            float green = ((this.color >> 8) & 0xFF) / 255.0F;
-            float blue = (this.color & 0xFF) / 255.0F;
-            double tx = this.x - this.dx + mc.world.rand.nextFloat() * 0.6F + 0.2F;
-            double ty = this.y - this.dy + mc.world.rand.nextFloat() * 0.6F + 0.2F;
-            double tz = this.z - this.dz + mc.world.rand.nextFloat() * 0.6F + 0.2F;
-            double sx = this.x + mc.world.rand.nextFloat() * 0.6F + 0.2F;
-            double sy = this.y + mc.world.rand.nextFloat() * 0.6F + 0.2F;
-            double sz = this.z + mc.world.rand.nextFloat() * 0.6F + 0.2F;
-            FXBeam beam = new FXBeam(mc.world, sx, sy, sz, tx, ty, tz, red, green, blue, 6, true, 10);
-            beam.setType(1);
-            beam.setPulse(true);
-            ParticleEngine.addEffect(mc.world, beam);
+            if (Minecraft.getMinecraft().world == null) return;
+            int tx = this.x - this.dx;
+            int ty = this.y - this.dy;
+            int tz = this.z - this.dz;
+            String key = this.x + ":" + this.y + ":" + this.z + ":" + tx + ":" + ty + ":" + tz + ":" + this.color;
+            EssentiaHandler.EssentiaSourceFX sourceFx = EssentiaHandler.sourceFX.get(key);
+            if (sourceFx != null) {
+                sourceFx.ticks = 15;
+                EssentiaHandler.sourceFX.put(key, sourceFx);
+            } else {
+                EssentiaHandler.sourceFX.put(
+                        key,
+                        new EssentiaHandler.EssentiaSourceFX(
+                                new BlockPos(this.x, this.y, this.z),
+                                new BlockPos(tx, ty, tz),
+                                15,
+                                this.color));
+            }
         });
         return null;
     }
