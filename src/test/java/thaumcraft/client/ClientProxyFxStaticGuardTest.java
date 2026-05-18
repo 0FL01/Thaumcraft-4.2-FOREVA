@@ -249,8 +249,9 @@ public class ClientProxyFxStaticGuardTest {
                         && smokeDriftFx.contains("this.motionY *= 0.92D"));
         assertTrue("Dedicated FXSparkle particle must keep colored sparkle emission baseline",
                 sparkleFx.contains("class FXSparkle extends Particle")
-                        && sparkleFx.contains("EnumParticleTypes.REDSTONE")
-                        && sparkleFx.contains("EnumParticleTypes.CRIT_MAGIC"));
+                        && sparkleFx.contains("setParticleTextureIndex(part)")
+                        && sparkleFx.contains("this.blendmode == 1 ? 0 : 1")
+                        && sparkleFx.contains("leyLineEffect"));
         assertTrue("Dedicated FXSwarm particle must keep target-tracking swarm baseline",
                 swarmFx.contains("class FXSwarm extends Particle")
                         && swarmFx.contains("private final Entity target;")

@@ -3,37 +3,82 @@ package thaumcraft.client.fx.particles;
 import net.minecraft.client.particle.Particle;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.entity.Entity;
-import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import thaumcraft.client.fx.ParticleEngine;
 
 @SideOnly(Side.CLIENT)
 public class FXSparkle extends Particle {
-    private final float red;
-    private final float green;
-    private final float blue;
-    private final float spread;
-    private final float speed;
+    public boolean leyLineEffect = false;
+    public int multiplier = 2;
+    public boolean shrink = true;
+    public int particle = 16;
+    public boolean tinkle = false;
+    public int blendmode = 1;
+    public boolean slowdown = true;
+    public int currentColor = 0;
+    private final float initialScale;
 
     public FXSparkle(World world, double x, double y, double z, float scale, int type, float speed) {
         super(world, x, y, z, 0.0D, 0.0D, 0.0D);
-        this.spread = Math.max(0.05F, scale * 0.2F);
-        this.speed = Math.max(-0.2F, Math.min(0.2F, speed * 0.05F));
-        this.particleMaxAge = 6 + this.rand.nextInt(6);
+        this.particleGravity = 0.0F;
+        this.motionX = (this.rand.nextFloat() - this.rand.nextFloat()) * 0.01F * Math.max(0.5F, Math.abs(speed));
+        this.motionY = (this.rand.nextFloat() - this.rand.nextFloat()) * 0.01F * Math.max(0.5F, Math.abs(speed));
+        this.motionZ = (this.rand.nextFloat() - this.rand.nextFloat()) * 0.01F * Math.max(0.5F, Math.abs(speed));
+        this.particleScale *= scale;
+        this.initialScale = this.particleScale;
+        this.multiplier = Math.max(1, Math.round(Math.max(1.0F, Math.abs(speed) * 6.0F)));
+        this.particleMaxAge = 3 * this.multiplier;
+        this.setSize(0.01F, 0.01F);
         this.canCollide = false;
+        this.currentColor = type;
+        applyColorByType(world, type);
+        this.setParticleTextureIndex(this.particle);
+    }
 
-        float r = (type & 0xFF) / 255.0F;
-        float g = ((type >> 8) & 0xFF) / 255.0F;
-        float b = ((type >> 16) & 0xFF) / 255.0F;
-        if (r == 0.0F && g == 0.0F && b == 0.0F) {
-            r = 0.8F;
-            g = 0.8F;
-            b = 1.0F;
+    private void applyColorByType(World world, int type) {
+        switch (type) {
+            case 0:
+                this.setRBGColorF(0.75F + world.rand.nextFloat() * 0.25F, 0.25F + world.rand.nextFloat() * 0.25F, 0.75F + world.rand.nextFloat() * 0.25F);
+                return;
+            case 1:
+                this.setRBGColorF(0.5F + world.rand.nextFloat() * 0.3F, 0.5F + world.rand.nextFloat() * 0.3F, 0.2F);
+                return;
+            case 2:
+                this.setRBGColorF(0.2F, 0.2F, 0.7F + world.rand.nextFloat() * 0.3F);
+                return;
+            case 3:
+                this.setRBGColorF(0.2F, 0.7F + world.rand.nextFloat() * 0.3F, 0.2F);
+                return;
+            case 4:
+                this.setRBGColorF(0.7F + world.rand.nextFloat() * 0.3F, 0.2F, 0.2F);
+                return;
+            case 5:
+                this.blendmode = 771;
+                this.setRBGColorF(world.rand.nextFloat() * 0.1F, world.rand.nextFloat() * 0.1F, world.rand.nextFloat() * 0.1F);
+                return;
+            case 6:
+                this.setRBGColorF(0.8F + world.rand.nextFloat() * 0.2F, 0.8F + world.rand.nextFloat() * 0.2F, 0.8F + world.rand.nextFloat() * 0.2F);
+                return;
+            case 7:
+                this.setRBGColorF(0.2F, 0.5F + world.rand.nextFloat() * 0.3F, 0.6F + world.rand.nextFloat() * 0.3F);
+                return;
+            default:
+                float r = (type & 0xFF) / 255.0F;
+                float g = ((type >> 8) & 0xFF) / 255.0F;
+                float b = ((type >> 16) & 0xFF) / 255.0F;
+                if (r == 0.0F && g == 0.0F && b == 0.0F) {
+                    r = 0.8F;
+                    g = 0.8F;
+                    b = 1.0F;
+                }
+                this.setRBGColorF(r, g, b);
         }
-        this.red = r;
-        this.green = g;
-        this.blue = b;
+    }
+
+    public void setGravity(float value) {
+        this.particleGravity = value;
     }
 
     @Override
@@ -41,24 +86,42 @@ public class FXSparkle extends Particle {
         this.prevPosX = this.posX;
         this.prevPosY = this.posY;
         this.prevPosZ = this.posZ;
-
-        if (this.world == null || !this.world.isRemote) {
+        if (this.world == null || !this.world.isRemote || this.particleAge++ >= this.particleMaxAge) {
             this.setExpired();
             return;
         }
-
-        double px = this.posX + (this.rand.nextFloat() - 0.5F) * this.spread;
-        double py = this.posY + (this.rand.nextFloat() - 0.5F) * this.spread;
-        double pz = this.posZ + (this.rand.nextFloat() - 0.5F) * this.spread;
-        this.world.spawnParticle(EnumParticleTypes.REDSTONE, px, py, pz, this.red, this.green, this.blue);
-        this.world.spawnParticle(EnumParticleTypes.CRIT_MAGIC,
-                this.posX, this.posY, this.posZ,
-                (this.rand.nextFloat() - 0.5F) * 0.02F,
-                this.speed,
-                (this.rand.nextFloat() - 0.5F) * 0.02F);
-
-        if (++this.particleAge >= this.particleMaxAge) {
-            this.setExpired();
+        if (this.particleAge == 1 && this.tinkle && this.rand.nextInt(10) == 0) {
+            this.world.playSound(this.posX, this.posY, this.posZ, net.minecraft.init.SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP,
+                    net.minecraft.util.SoundCategory.AMBIENT, 0.02F,
+                    0.7F * ((this.rand.nextFloat() - this.rand.nextFloat()) * 0.6F + 2.0F), false);
+        }
+        this.motionY -= 0.04D * this.particleGravity;
+        this.move(this.motionX, this.motionY, this.motionZ);
+        if (this.slowdown) {
+            this.motionX *= 0.9080000019073486D;
+            this.motionY *= 0.9080000019073486D;
+            this.motionZ *= 0.9080000019073486D;
+            if (this.onGround) {
+                this.motionX *= 0.7D;
+                this.motionZ *= 0.7D;
+            }
+        }
+        int part = this.particle + this.particleAge / this.multiplier;
+        this.setParticleTextureIndex(part);
+        if (this.shrink && this.particleMaxAge > 0) {
+            this.particleScale = this.initialScale * (this.particleMaxAge - this.particleAge + 1) / (float) this.particleMaxAge;
+        }
+        if (this.leyLineEffect && this.world.rand.nextBoolean()) {
+            FXSparkle fx = new FXSparkle(
+                    this.world,
+                    this.prevPosX + (this.rand.nextFloat() - this.rand.nextFloat()) * 0.1F,
+                    this.prevPosY + (this.rand.nextFloat() - this.rand.nextFloat()) * 0.1F,
+                    this.prevPosZ + (this.rand.nextFloat() - this.rand.nextFloat()) * 0.1F,
+                    1.0F,
+                    this.currentColor,
+                    0.5F);
+            fx.canCollide = false;
+            ParticleEngine.addEffect(this.world, fx);
         }
     }
 
@@ -66,6 +129,16 @@ public class FXSparkle extends Particle {
     public void renderParticle(BufferBuilder buffer, Entity entityIn, float partialTicks,
                                float rotationX, float rotationZ, float rotationYZ,
                                float rotationXY, float rotationXZ) {
-        // Emission-style particle: visuals are spawned in onUpdate.
+        super.renderParticle(buffer, entityIn, partialTicks, rotationX, rotationZ, rotationYZ, rotationXY, rotationXZ);
+    }
+
+    @Override
+    public int getBrightnessForRender(float partialTicks) {
+        return 0xF000F0;
+    }
+
+    @Override
+    public int getFXLayer() {
+        return this.blendmode == 1 ? 0 : 1;
     }
 }
