@@ -8,7 +8,7 @@ import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import thaumcraft.client.fx.ParticleEngine;
-import thaumcraft.client.fx.beams.FXBeam;
+import thaumcraft.client.fx.particles.FXVisSparkle;
 import thaumcraft.common.lib.network.PacketBase;
 
 public class PacketFXVisDrain extends PacketBase {
@@ -54,11 +54,9 @@ public class PacketFXVisDrain extends PacketBase {
             double tx = this.from.getX() + mc.world.rand.nextFloat();
             double ty = this.from.getY() + mc.world.rand.nextFloat();
             double tz = this.from.getZ() + mc.world.rand.nextFloat();
-            FXBeam beam = new FXBeam(mc.world, sx, sy, sz, tx, ty, tz, red, green, blue, 12, false, 14);
-            beam.setType(2);
-            beam.setReverse(true);
-            beam.setPulse(true);
-            ParticleEngine.addEffect(mc.world, beam);
+            FXVisSparkle sparkle = new FXVisSparkle(mc.world, sx, sy, sz, tx, ty, tz);
+            sparkle.setRBGColorF(red, green, blue);
+            ParticleEngine.addEffect(mc.world, sparkle);
         });
         return null;
     }

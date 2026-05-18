@@ -305,9 +305,9 @@ public class ClientProxyFxStaticGuardTest {
         String warpEvents = readFile("src/main/java/thaumcraft/common/lib/WarpEvents.java");
         String fallingTaint = readFile("src/main/java/thaumcraft/common/entities/EntityFallingTaint.java");
 
-        assertTrue("PacketFXVisDrain must schedule client task and route through dedicated FXBeam",
+        assertTrue("PacketFXVisDrain must schedule client task and route through FXVisSparkle trail",
                 visDrain.contains("Minecraft.getMinecraft().addScheduledTask")
-                        && visDrain.contains("new FXBeam(")
+                        && visDrain.contains("new FXVisSparkle(")
                         && visDrain.contains("ParticleEngine.addEffect("));
         assertTrue("PacketFXBlockArc must schedule client task and route through proxy arcLightning",
                 blockArc.contains("Minecraft.getMinecraft().addScheduledTask")
