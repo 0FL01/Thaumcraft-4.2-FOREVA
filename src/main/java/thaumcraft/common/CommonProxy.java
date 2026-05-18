@@ -162,7 +162,73 @@ public class CommonProxy implements IGuiHandler {
     public void beam(World world, double x, double y, double z, double tx, double ty, double tz, int color, boolean flicker, int ticks) {
     }
 
+    public Object beamCont(World world,
+                           EntityPlayer player,
+                           double tx, double ty, double tz,
+                           int type, int color,
+                           boolean reverse, float endmod,
+                           Object input, int impact) {
+        return null;
+    }
+
+    public Object beamBore(World world,
+                           double px, double py, double pz,
+                           double tx, double ty, double tz,
+                           int type, int color,
+                           boolean reverse, float endmod,
+                           Object input, int impact) {
+        return null;
+    }
+
+    public Object beamPower(World world,
+                            double px, double py, double pz,
+                            double tx, double ty, double tz,
+                            float red, float green, float blue,
+                            boolean pulse, Object input) {
+        return null;
+    }
+
     public void bolt(World world, double x, double y, double z, double tx, double ty, double tz, int color, int speed) {
+    }
+
+    public void nodeBolt(World world, float x, float y, float z, Entity target) {
+    }
+
+    public void nodeBolt(World world, float x, float y, float z, float tx, float ty, float tz) {
+    }
+
+    public void sourceStreamFX(World world, double sx, double sy, double sz, float tx, float ty, float tz, int color) {
+    }
+
+    public void essentiaTrailFx(World world, int x, int y, int z, int tx, int ty, int tz, int count, int color, float scale) {
+    }
+
+    public void blockRunes(World world, double x, double y, double z, float red, float green, float blue, int duration, float gravity) {
+    }
+
+    public void arcLightning(World world,
+                             double x, double y, double z,
+                             double tx, double ty, double tz,
+                             float red, float green, float blue,
+                             float height) {
+    }
+
+    public void drawInfusionParticles1(World world,
+                                       double x, double y, double z,
+                                       int tx, int ty, int tz,
+                                       Item item, int meta) {
+    }
+
+    public void drawInfusionParticles2(World world,
+                                       double x, double y, double z,
+                                       int tx, int ty, int tz,
+                                       IBlockState state) {
+    }
+
+    public void drawInfusionParticles3(World world, double x, double y, double z, int tx, int ty, int tz) {
+    }
+
+    public void drawInfusionParticles4(World world, double x, double y, double z, int tx, int ty, int tz) {
     }
 
     public void burst(World world, double x, double y, double z, float scale) {

@@ -53,20 +53,27 @@ import thaumcraft.client.gui.GuiSpa;
 import thaumcraft.client.gui.GuiThaumatorium;
 import thaumcraft.client.gui.GuiTravelingTrunk;
 import thaumcraft.client.fx.ParticleEngine;
+import thaumcraft.client.fx.beams.FXArc;
 import thaumcraft.client.fx.beams.FXBeam;
+import thaumcraft.client.fx.beams.FXBeamBore;
+import thaumcraft.client.fx.beams.FXBeamPower;
+import thaumcraft.client.fx.beams.FXBeamWand;
 import thaumcraft.client.fx.bolt.FXLightningBolt;
 import thaumcraft.client.fx.other.FXBlockWard;
 import thaumcraft.client.fx.other.FXShieldRunes;
 import thaumcraft.client.fx.other.FXSonic;
 import thaumcraft.client.fx.particles.FXBoreParticles;
+import thaumcraft.client.fx.particles.FXBlockRunes;
 import thaumcraft.client.fx.particles.FXBurst;
 import thaumcraft.client.fx.particles.FXBubble;
 import thaumcraft.client.fx.particles.FXBubbleAlt;
+import thaumcraft.client.fx.particles.FXEssentiaTrail;
 import thaumcraft.client.fx.particles.FXGeneric;
 import thaumcraft.client.fx.particles.FXSmokeDrift;
 import thaumcraft.client.fx.particles.FXSparkle;
 import thaumcraft.client.fx.particles.FXVent;
 import thaumcraft.client.fx.particles.FXVisSparkle;
+import thaumcraft.client.fx.particles.FXWispArcing;
 import thaumcraft.client.fx.particles.FXWisp;
 import thaumcraft.client.fx.particles.FXWispEG;
 import thaumcraft.client.renderers.entity.RenderFallbackBiped;
@@ -704,6 +711,90 @@ public class ClientProxy extends CommonProxy {
     }
 
     @Override
+    public Object beamCont(World world,
+                           EntityPlayer player,
+                           double tx, double ty, double tz,
+                           int type, int color,
+                           boolean reverse, float endmod,
+                           Object input, int impact) {
+        if (world == null || !world.isRemote || player == null) return null;
+        int amount = particleCount(8);
+        if (amount <= 0) return null;
+
+        Color tint = decodeColor(color);
+        float red = normalizeColor(tint.getRed());
+        float green = normalizeColor(tint.getGreen());
+        float blue = normalizeColor(tint.getBlue());
+        FXBeamWand beam = input instanceof FXBeamWand ? (FXBeamWand) input : null;
+        if (beam == null || !beam.isAlive()) {
+            beam = new FXBeamWand(world, player, tx, ty, tz, red, green, blue, 8, false, amount);
+            beam.setType(type);
+            beam.setEndMod(endmod);
+            beam.setReverse(reverse);
+            beam.setPulse(false);
+            ParticleEngine.addEffect(world, beam);
+        } else {
+            beam.updateBeam(tx, ty, tz);
+            beam.setEndMod(endmod);
+        }
+        beam.impact = impact;
+        return beam;
+    }
+
+    @Override
+    public Object beamBore(World world,
+                           double px, double py, double pz,
+                           double tx, double ty, double tz,
+                           int type, int color,
+                           boolean reverse, float endmod,
+                           Object input, int impact) {
+        if (world == null || !world.isRemote) return null;
+        int amount = particleCount(8);
+        if (amount <= 0) return null;
+
+        Color tint = decodeColor(color);
+        float red = normalizeColor(tint.getRed());
+        float green = normalizeColor(tint.getGreen());
+        float blue = normalizeColor(tint.getBlue());
+        FXBeamBore beam = input instanceof FXBeamBore ? (FXBeamBore) input : null;
+        if (beam == null || !beam.isAlive()) {
+            beam = new FXBeamBore(world, px, py, pz, tx, ty, tz, red, green, blue, 8, false, amount);
+            beam.setType(type);
+            beam.setEndMod(endmod);
+            beam.setReverse(reverse);
+            beam.setPulse(false);
+            ParticleEngine.addEffect(world, beam);
+        } else {
+            beam.updateBeam(tx, ty, tz);
+            beam.setEndMod(endmod);
+        }
+        beam.impact = impact;
+        return beam;
+    }
+
+    @Override
+    public Object beamPower(World world,
+                            double px, double py, double pz,
+                            double tx, double ty, double tz,
+                            float red, float green, float blue,
+                            boolean pulse, Object input) {
+        if (world == null || !world.isRemote) return null;
+        int amount = particleCount(8);
+        if (amount <= 0) return null;
+
+        FXBeamPower beam = input instanceof FXBeamPower ? (FXBeamPower) input : null;
+        if (beam == null || !beam.isAlive()) {
+            beam = new FXBeamPower(world, px, py, pz, tx, ty, tz, red, green, blue, 8, false, amount);
+            beam.setPulse(pulse, red, green, blue);
+            ParticleEngine.addEffect(world, beam);
+        } else {
+            beam.updateBeam(px, py, pz, tx, ty, tz);
+            beam.setPulse(pulse, red, green, blue);
+        }
+        return beam;
+    }
+
+    @Override
     public void bolt(World world, double x, double y, double z, double tx, double ty, double tz, int color, int speed) {
         if (world == null || !world.isRemote) return;
         int amount = particleCount(Math.max(6, speed * 2));
@@ -715,6 +806,107 @@ public class ClientProxy extends CommonProxy {
         float blue = normalizeColor(tint.getBlue());
         ParticleEngine.addEffect(world,
                 new FXLightningBolt(world, x, y, z, tx, ty, tz, red, green, blue, Math.max(4, speed), amount));
+    }
+
+    @Override
+    public void nodeBolt(World world, float x, float y, float z, Entity target) {
+        if (world == null || !world.isRemote || target == null) return;
+        ParticleEngine.addEffect(world, new FXLightningBolt(
+                world,
+                x, y, z,
+                target.posX, target.posY + target.height * 0.5D, target.posZ,
+                0.70F, 0.45F, 1.00F,
+                6, 12));
+    }
+
+    @Override
+    public void nodeBolt(World world, float x, float y, float z, float tx, float ty, float tz) {
+        if (world == null || !world.isRemote) return;
+        ParticleEngine.addEffect(world, new FXLightningBolt(
+                world,
+                x, y, z,
+                tx, ty, tz,
+                0.60F, 0.42F, 1.00F,
+                6, 12));
+    }
+
+    @Override
+    public void sourceStreamFX(World world, double sx, double sy, double sz, float tx, float ty, float tz, int color) {
+        if (world == null || !world.isRemote) return;
+        Color tint = decodeColor(color);
+        float red = normalizeColor(tint.getRed());
+        float green = normalizeColor(tint.getGreen());
+        float blue = normalizeColor(tint.getBlue());
+        FXWispArcing fx = new FXWispArcing(world, tx, ty, tz, sx, sy, sz, 0.1F, red, green, blue);
+        ParticleEngine.addEffect(world, fx);
+    }
+
+    @Override
+    public void essentiaTrailFx(World world, int x, int y, int z, int tx, int ty, int tz, int count, int color, float scale) {
+        if (world == null || !world.isRemote) return;
+        ParticleEngine.addEffect(world, new FXEssentiaTrail(
+                world,
+                x + 0.5D, y + 0.5D, z + 0.5D,
+                tx + 0.5D, ty + 0.5D, tz + 0.5D,
+                count, color, scale));
+    }
+
+    @Override
+    public void blockRunes(World world, double x, double y, double z, float red, float green, float blue, int duration, float gravity) {
+        if (world == null || !world.isRemote) return;
+        FXBlockRunes runes = new FXBlockRunes(world, x, y, z, red, green, blue, duration);
+        runes.setGravity(gravity);
+        ParticleEngine.addEffect(world, runes);
+    }
+
+    @Override
+    public void arcLightning(World world,
+                             double x, double y, double z,
+                             double tx, double ty, double tz,
+                             float red, float green, float blue,
+                             float height) {
+        if (world == null || !world.isRemote) return;
+        sparkle((float) tx, (float) ty, (float) tz, 0.8F,
+                new Color(clampColor(red), clampColor(green), clampColor(blue)).getRGB(), 0.0F);
+        ParticleEngine.addEffect(world, new FXArc(world, x, y, z, tx, ty, tz, red, green, blue, height));
+    }
+
+    @Override
+    public void drawInfusionParticles1(World world,
+                                       double x, double y, double z,
+                                       int tx, int ty, int tz,
+                                       Item item, int meta) {
+        if (world == null || !world.isRemote || item == null) return;
+        ParticleEngine.addEffect(world, new FXBoreParticles(
+                world,
+                x, y, z,
+                tx + 0.5D, ty - 0.5D, tz + 0.5D,
+                item, meta));
+    }
+
+    @Override
+    public void drawInfusionParticles2(World world,
+                                       double x, double y, double z,
+                                       int tx, int ty, int tz,
+                                       IBlockState state) {
+        if (world == null || !world.isRemote || state == null) return;
+        ParticleEngine.addEffect(world, new FXBoreParticles(
+                world,
+                x, y, z,
+                tx + 0.5D, ty - 0.5D, tz + 0.5D,
+                state));
+    }
+
+    @Override
+    public void drawInfusionParticles3(World world, double x, double y, double z, int tx, int ty, int tz) {
+        if (world == null || !world.isRemote) return;
+        ParticleEngine.addEffect(world, new FXWispArcing(world, x, y, z, tx + 0.5D, ty - 0.5D, tz + 0.5D, 0.12F, 0.55F, 0.25F, 0.85F));
+    }
+
+    @Override
+    public void drawInfusionParticles4(World world, double x, double y, double z, int tx, int ty, int tz) {
+        if (world == null || !world.isRemote) return;
+        ParticleEngine.addEffect(world, new FXWispArcing(world, x, y, z, tx + 0.5D, ty - 0.5D, tz + 0.5D, 0.12F, 0.30F, 0.85F, 0.40F));
     }
 
     @Override
@@ -1023,5 +1215,11 @@ public class ClientProxy extends CommonProxy {
     private static float normalizeColor(int channel) {
         float c = channel / 255.0f;
         return c <= 0.01f ? 0.02f : c;
+    }
+
+    private static int clampColor(float value) {
+        if (value <= 0.0F) return 0;
+        if (value >= 1.0F) return 255;
+        return (int) (value * 255.0F);
     }
 }

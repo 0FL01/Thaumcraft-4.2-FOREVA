@@ -22,15 +22,21 @@ public class ClientProxyFxStaticGuardTest {
         String burstFx = readFile("src/main/java/thaumcraft/client/fx/particles/FXBurst.java");
         String bubbleFx = readFile("src/main/java/thaumcraft/client/fx/particles/FXBubble.java");
         String bubbleAltFx = readFile("src/main/java/thaumcraft/client/fx/particles/FXBubbleAlt.java");
+        String blockRunesFx = readFile("src/main/java/thaumcraft/client/fx/particles/FXBlockRunes.java");
+        String essentiaTrailFx = readFile("src/main/java/thaumcraft/client/fx/particles/FXEssentiaTrail.java");
         String genericFx = readFile("src/main/java/thaumcraft/client/fx/particles/FXGeneric.java");
         String smokeDriftFx = readFile("src/main/java/thaumcraft/client/fx/particles/FXSmokeDrift.java");
         String sparkleFx = readFile("src/main/java/thaumcraft/client/fx/particles/FXSparkle.java");
         String ventFx = readFile("src/main/java/thaumcraft/client/fx/particles/FXVent.java");
         String visSparkleFx = readFile("src/main/java/thaumcraft/client/fx/particles/FXVisSparkle.java");
+        String wispArcingFx = readFile("src/main/java/thaumcraft/client/fx/particles/FXWispArcing.java");
         String wispFx = readFile("src/main/java/thaumcraft/client/fx/particles/FXWisp.java");
         String wispEgFx = readFile("src/main/java/thaumcraft/client/fx/particles/FXWispEG.java");
         String sonicFx = readFile("src/main/java/thaumcraft/client/fx/other/FXSonic.java");
         String shieldRunesFx = readFile("src/main/java/thaumcraft/client/fx/other/FXShieldRunes.java");
+        String beamWandFx = readFile("src/main/java/thaumcraft/client/fx/beams/FXBeamWand.java");
+        String beamBoreFx = readFile("src/main/java/thaumcraft/client/fx/beams/FXBeamBore.java");
+        String beamPowerFx = readFile("src/main/java/thaumcraft/client/fx/beams/FXBeamPower.java");
 
         assertTrue("ClientProxy blockSparkle must route generic colors through dedicated FXVisSparkle",
                 source.contains("public void blockSparkle(")
@@ -67,6 +73,42 @@ public class ClientProxyFxStaticGuardTest {
                 source.contains("public void drawGenericParticles(") && source.contains("new FXGeneric("));
         assertTrue("ClientProxy must override drawVentParticles for thaumatorium vent routing",
                 source.contains("public void drawVentParticles(") && source.contains("new FXVent("));
+        assertTrue("CommonProxy/ClientProxy must keep extended beam helpers for wand/bore/power routes",
+                commonProxy.contains("public Object beamCont(")
+                        && commonProxy.contains("public Object beamBore(")
+                        && commonProxy.contains("public Object beamPower(")
+                        && source.contains("public Object beamCont(")
+                        && source.contains("new FXBeamWand(")
+                        && source.contains("public Object beamBore(")
+                        && source.contains("new FXBeamBore(")
+                        && source.contains("public Object beamPower(")
+                        && source.contains("new FXBeamPower("));
+        assertTrue("CommonProxy/ClientProxy must keep extended node/source/trail/rune/arc FX surfaces",
+                commonProxy.contains("public void sourceStreamFX(")
+                        && commonProxy.contains("public void essentiaTrailFx(")
+                        && commonProxy.contains("public void blockRunes(")
+                        && commonProxy.contains("public void arcLightning(")
+                        && commonProxy.contains("public void nodeBolt(World world, float x, float y, float z, Entity target)")
+                        && commonProxy.contains("public void nodeBolt(World world, float x, float y, float z, float tx, float ty, float tz)")
+                        && source.contains("public void sourceStreamFX(")
+                        && source.contains("new FXWispArcing(")
+                        && source.contains("public void essentiaTrailFx(")
+                        && source.contains("new FXEssentiaTrail(")
+                        && source.contains("public void blockRunes(")
+                        && source.contains("new FXBlockRunes(")
+                        && source.contains("public void arcLightning(")
+                        && source.contains("new FXArc(")
+                        && source.contains("public void nodeBolt(World world, float x, float y, float z, Entity target)")
+                        && source.contains("public void nodeBolt(World world, float x, float y, float z, float tx, float ty, float tz)"));
+        assertTrue("CommonProxy/ClientProxy must keep infusion helper surfaces",
+                commonProxy.contains("public void drawInfusionParticles1(")
+                        && commonProxy.contains("public void drawInfusionParticles2(")
+                        && commonProxy.contains("public void drawInfusionParticles3(")
+                        && commonProxy.contains("public void drawInfusionParticles4(")
+                        && source.contains("public void drawInfusionParticles1(")
+                        && source.contains("public void drawInfusionParticles2(")
+                        && source.contains("public void drawInfusionParticles3(")
+                        && source.contains("public void drawInfusionParticles4("));
         assertTrue("CommonProxy and ClientProxy must keep boreDigFx proxy surface with dedicated client FX routing",
                 commonProxy.contains("public void boreDigFx(World world,")
                         && source.contains("public void boreDigFx(World world,")
@@ -141,6 +183,16 @@ public class ClientProxyFxStaticGuardTest {
                 bubbleAltFx.contains("class FXBubbleAlt extends Particle")
                         && bubbleAltFx.contains("setRGB(float r, float g, float b)")
                         && bubbleAltFx.contains("EnumParticleTypes.REDSTONE"));
+        assertTrue("Dedicated FXBlockRunes particle must keep rune-around-block emission baseline",
+                blockRunesFx.contains("class FXBlockRunes extends Particle")
+                        && blockRunesFx.contains("EnumFacing.random(this.rand)")
+                        && blockRunesFx.contains("setGravity(float gravity)")
+                        && blockRunesFx.contains("EnumParticleTypes.CRIT_MAGIC"));
+        assertTrue("Dedicated FXEssentiaTrail particle must keep colorized target-chasing trail baseline",
+                essentiaTrailFx.contains("class FXEssentiaTrail extends Particle")
+                        && essentiaTrailFx.contains("targetX")
+                        && essentiaTrailFx.contains("new Color(")
+                        && essentiaTrailFx.contains("EnumParticleTypes.REDSTONE"));
         assertTrue("Dedicated FXGeneric particle must keep configurable generic particle baseline",
                 genericFx.contains("class FXGeneric extends Particle")
                         && genericFx.contains("loop")
@@ -167,10 +219,21 @@ public class ClientProxyFxStaticGuardTest {
                 wispFx.contains("class FXWisp extends Particle")
                         && wispFx.contains("hasTarget")
                         && wispFx.contains("EnumParticleTypes.REDSTONE"));
+        assertTrue("Dedicated FXWispArcing particle must keep source-target arcing trail baseline",
+                wispArcingFx.contains("class FXWispArcing extends Particle")
+                        && wispArcingFx.contains("targetX")
+                        && wispArcingFx.contains("EnumParticleTypes.CRIT_MAGIC"));
         assertTrue("Dedicated FXWispEG particle must keep target-following elder trail baseline",
                 wispEgFx.contains("class FXWispEG extends Particle")
                         && wispEgFx.contains("this.target")
                         && wispEgFx.contains("target.height * 0.22F"));
+        assertTrue("Dedicated FXBeamWand/FXBeamBore/FXBeamPower classes must keep extended beam control surface",
+                beamWandFx.contains("class FXBeamWand extends FXBeam")
+                        && beamWandFx.contains("updateBeam(double tx, double ty, double tz)")
+                        && beamBoreFx.contains("class FXBeamBore extends FXBeam")
+                        && beamBoreFx.contains("public int impact;")
+                        && beamPowerFx.contains("class FXBeamPower extends FXBeam")
+                        && beamPowerFx.contains("setPulse(boolean pulse, float red, float green, float blue)"));
     }
 
     @Test
