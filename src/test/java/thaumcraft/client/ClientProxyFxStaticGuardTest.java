@@ -88,6 +88,7 @@ public class ClientProxyFxStaticGuardTest {
                         && commonProxy.contains("public void essentiaTrailFx(")
                         && commonProxy.contains("public void blockRunes(")
                         && commonProxy.contains("public void arcLightning(")
+                        && commonProxy.contains("public void bolt(World world, Entity sourceEntity, Entity targetedEntity)")
                         && commonProxy.contains("public void nodeBolt(World world, float x, float y, float z, Entity target)")
                         && commonProxy.contains("public void nodeBolt(World world, float x, float y, float z, float tx, float ty, float tz)")
                         && source.contains("public void sourceStreamFX(")
@@ -98,6 +99,7 @@ public class ClientProxyFxStaticGuardTest {
                         && source.contains("new FXBlockRunes(")
                         && source.contains("public void arcLightning(")
                         && source.contains("new FXArc(")
+                        && source.contains("public void bolt(World world, Entity sourceEntity, Entity targetedEntity)")
                         && source.contains("public void nodeBolt(World world, float x, float y, float z, Entity target)")
                         && source.contains("public void nodeBolt(World world, float x, float y, float z, float tx, float ty, float tz)"));
         assertTrue("CommonProxy/ClientProxy must keep infusion helper surfaces",
@@ -330,7 +332,7 @@ public class ClientProxyFxStaticGuardTest {
                         && !sonic.contains("Thaumcraft.proxy.burst("));
         assertTrue("PacketFXWispZap must schedule client task and route through single proxy bolt path",
                 wispZap.contains("Minecraft.getMinecraft().addScheduledTask")
-                        && wispZap.contains("Thaumcraft.proxy.bolt(")
+                        && wispZap.contains("Thaumcraft.proxy.bolt(mc.world, sourceEntity, targetEntity)")
                         && !wispZap.contains("new FXLightningBolt(")
                         && !wispZap.contains("ParticleEngine.addEffect("));
         assertTrue("PacketFXZap must schedule client task and route through dedicated lightning bolt FX only",

@@ -809,6 +809,21 @@ public class ClientProxy extends CommonProxy {
     }
 
     @Override
+    public void bolt(World world, Entity sourceEntity, Entity targetedEntity) {
+        if (world == null || !world.isRemote || sourceEntity == null || targetedEntity == null) return;
+        bolt(
+                world,
+                sourceEntity.posX,
+                sourceEntity.getEntityBoundingBox().minY + sourceEntity.height * 0.5D,
+                sourceEntity.posZ,
+                targetedEntity.posX,
+                targetedEntity.getEntityBoundingBox().minY + targetedEntity.height * 0.5D,
+                targetedEntity.posZ,
+                0x99CCFF,
+                4);
+    }
+
+    @Override
     public void nodeBolt(World world, float x, float y, float z, Entity target) {
         if (world == null || !world.isRemote || target == null) return;
         ParticleEngine.addEffect(world, new FXLightningBolt(

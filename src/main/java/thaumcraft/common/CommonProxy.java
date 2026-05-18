@@ -191,6 +191,9 @@ public class CommonProxy implements IGuiHandler {
     public void bolt(World world, double x, double y, double z, double tx, double ty, double tz, int color, int speed) {
     }
 
+    public void bolt(World world, Entity sourceEntity, Entity targetedEntity) {
+    }
+
     public void nodeBolt(World world, float x, float y, float z, Entity target) {
     }
 

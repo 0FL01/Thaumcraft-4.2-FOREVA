@@ -41,16 +41,7 @@ public class PacketFXWispZap extends PacketBase {
             Entity sourceEntity = mc.world.getEntityByID(this.source);
             Entity targetEntity = mc.world.getEntityByID(this.target);
             if (sourceEntity == null || targetEntity == null) return;
-            thaumcraft.common.Thaumcraft.proxy.bolt(
-                    mc.world,
-                    sourceEntity.posX,
-                    sourceEntity.getEntityBoundingBox().minY + sourceEntity.height * 0.5,
-                    sourceEntity.posZ,
-                    targetEntity.posX,
-                    targetEntity.getEntityBoundingBox().minY + targetEntity.height * 0.5,
-                    targetEntity.posZ,
-                    0x99CCFF,
-                    2);
+            thaumcraft.common.Thaumcraft.proxy.bolt(mc.world, sourceEntity, targetEntity);
         });
         return null;
     }
