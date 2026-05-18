@@ -266,6 +266,78 @@ public class ConfigRecipesSpecialSlice {
                 .setRegistryName("thaumcraft", "blocktallow_decompose");
         registry.register(recipeBlockTallowDecompose);
 
+        IRecipe recipeNuggetsIron = new ShapedOreRecipe(
+                null,
+                new ItemStack(ConfigItems.itemNugget, 9, 0),
+                "#",
+                '#', Items.IRON_INGOT)
+                .setRegistryName("thaumcraft", "nuggets_iron");
+        registry.register(recipeNuggetsIron);
+
+        IRecipe recipeNuggetsThaumium = new ShapedOreRecipe(
+                null,
+                new ItemStack(ConfigItems.itemNugget, 9, 6),
+                "#",
+                '#', new ItemStack(ConfigItems.itemResource, 1, 2))
+                .setRegistryName("thaumcraft", "nuggets_thaumium");
+        registry.register(recipeNuggetsThaumium);
+
+        IRecipe recipeNuggetsVoid = new ShapedOreRecipe(
+                null,
+                new ItemStack(ConfigItems.itemNugget, 9, 7),
+                "#",
+                '#', new ItemStack(ConfigItems.itemResource, 1, 16))
+                .setRegistryName("thaumcraft", "nuggets_void");
+        registry.register(recipeNuggetsVoid);
+
+        IRecipe recipeIronFromNuggets = new ShapedOreRecipe(
+                null,
+                new ItemStack(Items.IRON_INGOT),
+                "###",
+                "###",
+                "###",
+                '#', new ItemStack(ConfigItems.itemNugget, 1, 0))
+                .setRegistryName("thaumcraft", "iron_from_nuggets");
+        registry.register(recipeIronFromNuggets);
+
+        IRecipe recipeThaumiumFromNuggets = new ShapedOreRecipe(
+                null,
+                new ItemStack(ConfigItems.itemResource, 1, 2),
+                "###",
+                "###",
+                "###",
+                '#', new ItemStack(ConfigItems.itemNugget, 1, 6))
+                .setRegistryName("thaumcraft", "thaumium_from_nuggets");
+        registry.register(recipeThaumiumFromNuggets);
+
+        IRecipe recipeNuggetsQuicksilver = new ShapedOreRecipe(
+                null,
+                new ItemStack(ConfigItems.itemNugget, 9, 5),
+                "#",
+                '#', new ItemStack(ConfigItems.itemResource, 1, 3))
+                .setRegistryName("thaumcraft", "nuggets_quicksilver");
+        registry.register(recipeNuggetsQuicksilver);
+
+        IRecipe recipeQuicksilverFromNuggets = new ShapedOreRecipe(
+                null,
+                new ItemStack(ConfigItems.itemResource, 1, 3),
+                "###",
+                "###",
+                "###",
+                '#', new ItemStack(ConfigItems.itemNugget, 1, 5))
+                .setRegistryName("thaumcraft", "quicksilver_from_nuggets");
+        registry.register(recipeQuicksilverFromNuggets);
+
+        IRecipe recipeVoidFromNuggets = new ShapedOreRecipe(
+                null,
+                new ItemStack(ConfigItems.itemResource, 1, 16),
+                "###",
+                "###",
+                "###",
+                '#', new ItemStack(ConfigItems.itemNugget, 1, 7))
+                .setRegistryName("thaumcraft", "void_from_nuggets");
+        registry.register(recipeVoidFromNuggets);
+
         IRecipe recipeTallowCandle = new ShapedOreRecipe(
                 null,
                 new ItemStack(ConfigBlocks.blockCandle, 3, 0),
