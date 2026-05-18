@@ -7,7 +7,6 @@ import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import thaumcraft.client.fx.ParticleEngine;
 import thaumcraft.client.fx.bolt.FXLightningBolt;
 import thaumcraft.common.lib.network.PacketBase;
 
@@ -59,7 +58,6 @@ public class PacketFXZap extends PacketBase {
             bolt.setType(2);
             bolt.setWidth(0.125F);
             bolt.finalizeBolt();
-            ParticleEngine.addEffect(mc.world, bolt);
         });
         return null;
     }

@@ -15,6 +15,7 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import thaumcraft.client.fx.ParticleEngine;
 import thaumcraft.client.fx.WRVector3;
 import org.lwjgl.opengl.GL11;
 
@@ -38,6 +39,7 @@ public class FXLightningBolt extends Particle {
     private int type = -1;
     private boolean useCommonBoltSegments = false;
     private boolean boltFinalized = false;
+    private boolean queuedAfterFinalize = false;
     private float width = 0.03F;
 
     public FXLightningBolt(World world, double x, double y, double z,
@@ -151,6 +153,10 @@ public class FXLightningBolt extends Particle {
         if (this.main != null) {
             this.main.finalizeBolt();
             this.boltFinalized = true;
+            if (!this.queuedAfterFinalize && this.world != null && this.world.isRemote) {
+                this.queuedAfterFinalize = true;
+                ParticleEngine.addEffect(this.world, this);
+            }
         }
     }
 
@@ -199,7 +205,7 @@ public class FXLightningBolt extends Particle {
         float alphaMain = Math.max(0.05F, (1.0F - ageNorm) * 0.5F);
 
         if (this.main != null && this.useCommonBoltSegments && this.boltFinalized) {
-            renderCommonBolt(alphaMain);
+            renderCommonBolt(partialTicks);
             return;
         }
 
@@ -208,9 +214,26 @@ public class FXLightningBolt extends Particle {
         renderPass(points, SMALL, this.width, alphaMain, this.red, this.green, this.blue, true);
     }
 
-    private void renderCommonBolt(float alphaMain) {
-        renderSegmentPass(this.main.segments, LARGE, this.width * 1.25F, alphaMain, 1.0F, 1.0F, 1.0F, false);
-        renderSegmentPass(this.main.segments, SMALL, this.width, alphaMain, this.red, this.green, this.blue, true);
+    private void renderCommonBolt(float partialTicks) {
+        float boltAge = this.main.particleMaxAge <= 0 ? 1.0F : Math.max(0.0F, (float) this.main.particleAge / (float) this.main.particleMaxAge);
+        float alphaLarge = Math.max(0.05F, (1.0F - boltAge) * 0.4F);
+        float alphaSmall = Math.max(0.05F, 1.0F - boltAge * 0.5F);
+        int maxSegment = computeVisibleSegmentMax(partialTicks);
+        renderSegmentPass(this.main.segments, maxSegment, LARGE, this.width * 1.25F, alphaLarge, 1.0F, 1.0F, 1.0F, false);
+        renderSegmentPass(this.main.segments, maxSegment, SMALL, this.width, alphaSmall, this.red, this.green, this.blue, true);
+    }
+
+    private int computeVisibleSegmentMax(float partialTicks) {
+        if (this.main == null) {
+            return Integer.MAX_VALUE;
+        }
+        int travelWindow = Math.max(1, (int) (this.main.length * 3.0F));
+        float progress = ((float) this.main.particleAge + partialTicks + (float) travelWindow) / (float) travelWindow;
+        int maxSegment = (int) (progress * (float) this.main.numsegments0);
+        if (maxSegment < 0) {
+            return 0;
+        }
+        return maxSegment;
     }
 
     private int typeSalt() {
@@ -292,7 +315,7 @@ public class FXLightningBolt extends Particle {
         GlStateManager.popMatrix();
     }
 
-    private void renderSegmentPass(List<FXLightningBoltCommon.Segment> segments, ResourceLocation texture, float baseWidth, float alpha,
+    private void renderSegmentPass(List<FXLightningBoltCommon.Segment> segments, int maxSegmentNo, ResourceLocation texture, float baseWidth, float alpha,
                                    float r, float g, float b, boolean additive) {
         if (segments == null || segments.isEmpty()) return;
         Tessellator tess = Tessellator.getInstance();
@@ -309,6 +332,9 @@ public class FXLightningBolt extends Particle {
         Vec3d view = Particle.cameraViewDir == null ? new Vec3d(0.0D, 1.0D, 0.0D) : Particle.cameraViewDir;
 
         for (FXLightningBoltCommon.Segment segment : segments) {
+            if (segment.segmentno > maxSegmentNo) {
+                continue;
+            }
             WRVector3 start = segment.startpoint.point;
             WRVector3 end = segment.endpoint.point;
             Vec3d p1 = new Vec3d(start.x, start.y, start.z);

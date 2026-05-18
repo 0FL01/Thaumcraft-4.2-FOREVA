@@ -823,7 +823,6 @@ public class ClientProxy extends CommonProxy {
         bolt.defaultFractal();
         bolt.setType(0);
         bolt.finalizeBolt();
-        ParticleEngine.addEffect(world, bolt);
     }
 
     @Override
@@ -833,7 +832,6 @@ public class ClientProxy extends CommonProxy {
         bolt.defaultFractal();
         bolt.setType(3);
         bolt.finalizeBolt();
-        ParticleEngine.addEffect(world, bolt);
     }
 
     @Override
@@ -843,7 +841,6 @@ public class ClientProxy extends CommonProxy {
         bolt.defaultFractal();
         bolt.setType(0);
         bolt.finalizeBolt();
-        ParticleEngine.addEffect(world, bolt);
     }
 
     @Override

@@ -371,7 +371,8 @@ public class ClientProxyFxStaticGuardTest {
         assertTrue("PacketFXZap must schedule client task and route through dedicated lightning bolt FX only",
                 zap.contains("Minecraft.getMinecraft().addScheduledTask")
                         && zap.contains("new FXLightningBolt(")
-                        && zap.contains("ParticleEngine.addEffect(")
+                        && zap.contains("bolt.finalizeBolt();")
+                        && !zap.contains("ParticleEngine.addEffect(")
                         && !zap.contains("Thaumcraft.proxy.bolt(")
                         && !zap.contains("playEvent(2005"));
         assertTrue("Server block-swap path must send PacketFXBlockSparkle around replaced block",
