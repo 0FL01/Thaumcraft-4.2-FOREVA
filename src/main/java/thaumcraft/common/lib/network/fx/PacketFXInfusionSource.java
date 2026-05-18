@@ -2,14 +2,15 @@ package thaumcraft.common.lib.network.fx;
 
 import io.netty.buffer.ByteBuf;
 import net.minecraft.client.Minecraft;
-import net.minecraft.entity.Entity;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import thaumcraft.client.fx.ParticleEngine;
-import thaumcraft.client.fx.beams.FXBeam;
 import thaumcraft.common.lib.network.PacketBase;
+import thaumcraft.common.tiles.TileInfusionMatrix;
+import thaumcraft.common.tiles.TilePedestal;
 
 public class PacketFXInfusionSource extends PacketBase {
     private int x;
@@ -60,44 +61,28 @@ public class PacketFXInfusionSource extends PacketBase {
         Minecraft.getMinecraft().addScheduledTask(() -> {
             Minecraft mc = Minecraft.getMinecraft();
             if (mc.world == null) return;
-            double sx = this.x + mc.world.rand.nextFloat() * 0.5F + 0.25F;
-            double sy = this.y + mc.world.rand.nextFloat() * 0.5F + 0.25F;
-            double sz = this.z + mc.world.rand.nextFloat() * 0.5F + 0.25F;
-            float red = 0.6F;
-            float green = 0.8F;
-            float blue = 1.0F;
+            int sx = this.x - this.dx;
+            int sy = this.y - this.dy;
+            int sz = this.z - this.dz;
+            String fxKey = sx + ":" + sy + ":" + sz + ":" + this.color;
 
-            if (this.dx == 0 && this.dy == 0 && this.dz == 0 && this.color > 0) {
-                Entity target = mc.world.getEntityByID(this.color);
-                if (target == null) return;
-                FXBeam beam = new FXBeam(
-                        mc.world,
-                        target.posX,
-                        target.getEntityBoundingBox().minY + target.height * 0.5,
-                        target.posZ,
-                        sx,
-                        sy,
-                        sz,
-                        0.8F,
-                        0.4F,
-                        1.0F,
-                        8,
-                        true,
-                        8);
-                beam.setType(1);
-                beam.setReverse(true);
-                beam.setPulse(true);
-                ParticleEngine.addEffect(mc.world, beam);
-                return;
+            TileEntity matrixTile = mc.world.getTileEntity(new BlockPos(this.x, this.y, this.z));
+            if (!(matrixTile instanceof TileInfusionMatrix)) return;
+            TileInfusionMatrix matrix = (TileInfusionMatrix) matrixTile;
+
+            int ticks = 15;
+            TileEntity sourceTile = mc.world.getTileEntity(new BlockPos(sx, sy, sz));
+            if (sourceTile instanceof TilePedestal) {
+                ticks = 60;
             }
 
-            double tx = this.x - this.dx + mc.world.rand.nextFloat() * 0.6F + 0.2F;
-            double ty = this.y - this.dy + mc.world.rand.nextFloat() * 0.6F + 0.2F;
-            double tz = this.z - this.dz + mc.world.rand.nextFloat() * 0.6F + 0.2F;
-            FXBeam beam = new FXBeam(mc.world, tx, ty, tz, sx, sy, sz, red, green, blue, 8, true, 12);
-            beam.setType(1);
-            beam.setPulse(true);
-            ParticleEngine.addEffect(mc.world, beam);
+            TileInfusionMatrix.SourceFX sourceFx = matrix.sourceFX.get(fxKey);
+            if (sourceFx != null) {
+                sourceFx.ticks = ticks;
+                matrix.sourceFX.put(fxKey, sourceFx);
+            } else {
+                matrix.sourceFX.put(fxKey, new TileInfusionMatrix.SourceFX(new BlockPos(sx, sy, sz), ticks, this.color));
+            }
         });
         return null;
     }

@@ -1,11 +1,13 @@
 package thaumcraft.common.tiles;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import net.minecraft.block.Block;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
@@ -69,6 +71,7 @@ public class TileInfusionMatrix extends TileThaumcraft implements ITickable, IWa
     private int recipeType = 0;
     private int countDelay = 10;
     private int itemCount = 0;
+    public final HashMap<String, SourceFX> sourceFX = new HashMap<String, SourceFX>();
 
     @Override
     public void update() {
@@ -78,6 +81,11 @@ public class TileInfusionMatrix extends TileThaumcraft implements ITickable, IWa
         if (this.checkSurroundings) {
             this.checkSurroundings = false;
             this.getSurroundings();
+        }
+
+        if (this.world.isRemote) {
+            this.doEffects();
+            return;
         }
 
         if (!this.world.isRemote) {
@@ -92,9 +100,6 @@ public class TileInfusionMatrix extends TileThaumcraft implements ITickable, IWa
                 this.craftCycle();
                 this.markDirty();
             }
-        } else if (this.startUp > 0.0F) {
-            this.startUp -= this.startUp / 10.0F;
-            if (this.startUp < 0.001F) this.startUp = 0.0F;
         }
     }
 
@@ -740,6 +745,110 @@ public class TileInfusionMatrix extends TileThaumcraft implements ITickable, IWa
     public void onWandStoppedUsing(ItemStack wandstack, World world, EntityPlayer player, int count) {
     }
 
+    private void doEffects() {
+        if (this.crafting) {
+            if (this.craftCount == 0) {
+                this.world.playSound(
+                        this.pos.getX(),
+                        this.pos.getY(),
+                        this.pos.getZ(),
+                        TCSounds.INFUSERSTART,
+                        SoundCategory.BLOCKS,
+                        0.5F,
+                        1.0F,
+                        false);
+            } else if (this.craftCount % 65 == 0) {
+                this.world.playSound(
+                        this.pos.getX(),
+                        this.pos.getY(),
+                        this.pos.getZ(),
+                        TCSounds.INFUSER,
+                        SoundCategory.BLOCKS,
+                        0.5F,
+                        1.0F,
+                        false);
+            }
+            ++this.craftCount;
+        } else if (this.craftCount > 0) {
+            this.craftCount -= 2;
+            if (this.craftCount < 0) this.craftCount = 0;
+            if (this.craftCount > 50) this.craftCount = 50;
+        }
+
+        if (this.active && this.startUp < 1.0F) {
+            this.startUp += Math.max(this.startUp / 10.0F, 0.001F);
+            if (this.startUp > 0.999F) this.startUp = 1.0F;
+        }
+        if (!this.active && this.startUp > 0.0F) {
+            this.startUp -= this.startUp / 10.0F;
+            if (this.startUp < 0.001F) this.startUp = 0.0F;
+        }
+
+        for (String fxKey : new ArrayList<String>(this.sourceFX.keySet())) {
+            SourceFX fx = this.sourceFX.get(fxKey);
+            if (fx == null || fx.ticks <= 0) {
+                this.sourceFX.remove(fxKey);
+                continue;
+            }
+
+            if (this.pos.equals(fx.loc)) {
+                Entity target = this.world.getEntityByID(fx.color);
+                if (target != null) {
+                    for (int i = 0; i < Thaumcraft.proxy.particleCount(2); ++i) {
+                        Thaumcraft.proxy.beam(
+                                this.world,
+                                target.posX + (this.world.rand.nextFloat() - this.world.rand.nextFloat()) * target.width,
+                                target.getEntityBoundingBox().minY + this.world.rand.nextFloat() * target.height,
+                                target.posZ + (this.world.rand.nextFloat() - this.world.rand.nextFloat()) * target.width,
+                                this.pos.getX() + 0.5D,
+                                this.pos.getY() + 0.5D,
+                                this.pos.getZ() + 0.5D,
+                                0xCC88FF,
+                                true,
+                                8);
+                    }
+                }
+            } else {
+                TileEntity tile = this.world.getTileEntity(fx.loc);
+                if (tile instanceof TilePedestal) {
+                    ItemStack stack = ((TilePedestal) tile).getStackInSlot(0);
+                    if (!stack.isEmpty() && this.world.rand.nextInt(3) == 0) {
+                        int color = fx.color > 0 ? fx.color : 0x99CCFF;
+                        Thaumcraft.proxy.beam(
+                                this.world,
+                                fx.loc.getX() + 0.4D + this.world.rand.nextFloat() * 0.2D,
+                                fx.loc.getY() + 1.23D + this.world.rand.nextFloat() * 0.2D,
+                                fx.loc.getZ() + 0.4D + this.world.rand.nextFloat() * 0.2D,
+                                this.pos.getX() + 0.5D,
+                                this.pos.getY() + 0.5D,
+                                this.pos.getZ() + 0.5D,
+                                color,
+                                true,
+                                10);
+                    }
+                } else {
+                    fx.ticks = 0;
+                }
+            }
+
+            --fx.ticks;
+            this.sourceFX.put(fxKey, fx);
+        }
+
+        if (this.crafting && this.instability > 0 && this.world.rand.nextInt(200) <= this.instability) {
+            Thaumcraft.proxy.bolt(
+                    this.world,
+                    this.pos.getX() + 0.5D,
+                    this.pos.getY() + 0.5D,
+                    this.pos.getZ() + 0.5D,
+                    this.pos.getX() + 0.5D + (this.world.rand.nextFloat() - this.world.rand.nextFloat()) * 2.0D,
+                    this.pos.getY() + 0.5D + (this.world.rand.nextFloat() - this.world.rand.nextFloat()) * 2.0D,
+                    this.pos.getZ() + 0.5D + (this.world.rand.nextFloat() - this.world.rand.nextFloat()) * 2.0D,
+                    0x9966FF,
+                    4);
+        }
+    }
+
     @Override
     public AspectList getAspects() {
         return this.recipeEssentia;
@@ -799,6 +908,19 @@ public class TileInfusionMatrix extends TileThaumcraft implements ITickable, IWa
     @Override
     public boolean doesContainerAccept(Aspect tag) {
         return tag != null;
+    }
+
+    public static class SourceFX {
+        public final BlockPos loc;
+        public int ticks;
+        public final int color;
+        public int entity;
+
+        public SourceFX(BlockPos loc, int ticks, int color) {
+            this.loc = loc;
+            this.ticks = ticks;
+            this.color = color;
+        }
     }
 
     @Override

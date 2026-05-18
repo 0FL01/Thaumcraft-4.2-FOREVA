@@ -236,10 +236,10 @@ public class ClientProxyFxStaticGuardTest {
                 essentiaSource.contains("Minecraft.getMinecraft().addScheduledTask")
                         && essentiaSource.contains("new FXBeam(")
                         && essentiaSource.contains("ParticleEngine.addEffect("));
-        assertTrue("PacketFXInfusionSource must schedule client task and route through dedicated FXBeam",
+        assertTrue("PacketFXInfusionSource must schedule client task and update TileInfusionMatrix sourceFX state",
                 infusionSource.contains("Minecraft.getMinecraft().addScheduledTask")
-                        && infusionSource.contains("new FXBeam(")
-                        && infusionSource.contains("ParticleEngine.addEffect("));
+                        && infusionSource.contains("matrix.sourceFX")
+                        && infusionSource.contains("new TileInfusionMatrix.SourceFX("));
         assertTrue("PacketMiscEvent must schedule client task via proxy boundary and update warp vignette/fog markers",
                 miscEvent.contains("Thaumcraft.proxy.scheduleClientTask(")
                         && miscEvent.contains("ClientTickEventsFML.warpVignette")
