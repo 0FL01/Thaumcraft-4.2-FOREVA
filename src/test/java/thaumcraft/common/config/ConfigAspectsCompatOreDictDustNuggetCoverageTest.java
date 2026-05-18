@@ -31,6 +31,22 @@ public class ConfigAspectsCompatOreDictDustNuggetCoverageTest {
                 source.contains("registerObjectTag(\"ingotLead\"")
                         && source.contains("registerObjectTag(\"nuggetLead\"")
                         && source.contains("registerObjectTag(\"dustLead\""));
+        assertTrue("ConfigAspects should keep Stage 9 ore-dictionary baseline tags for stone/wood and key ore families",
+                source.contains("registerObjectTag(\"stone\"")
+                        && source.contains("registerObjectTag(\"cobblestone\"")
+                        && source.contains("registerObjectTag(\"stairWood\"")
+                        && source.contains("registerObjectTag(\"oreLapis\"")
+                        && source.contains("registerObjectTag(\"oreDiamond\"")
+                        && source.contains("registerObjectTag(\"gemDiamond\"")
+                        && source.contains("registerObjectTag(\"oreRedstone\"")
+                        && source.contains("registerObjectTag(\"dustRedstone\"")
+                        && source.contains("registerObjectTag(\"oreEmerald\"")
+                        && source.contains("registerObjectTag(\"gemEmerald\"")
+                        && source.contains("registerObjectTag(\"oreQuartz\""));
+        assertTrue("ConfigAspects should preserve ore-dictionary dye aspect baseline",
+                source.contains("private static final String[] DYES")
+                        && source.contains("for (String dye : DYES)")
+                        && source.contains("registerObjectTag(dye, new AspectList().add(Aspect.SENSES, 1));"));
     }
 
     private static String readFile(String path) throws IOException {

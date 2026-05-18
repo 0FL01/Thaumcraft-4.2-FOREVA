@@ -9,6 +9,12 @@ import thaumcraft.api.aspects.Aspect;
 import thaumcraft.api.aspects.AspectList;
 
 public class ConfigAspects {
+    private static final String[] DYES = new String[]{
+            "dyeBlack", "dyeRed", "dyeGreen", "dyeBrown",
+            "dyeBlue", "dyePurple", "dyeCyan", "dyeLightGray",
+            "dyeGray", "dyePink", "dyeLime", "dyeYellow",
+            "dyeLightBlue", "dyeMagenta", "dyeOrange", "dyeWhite"
+    };
 
     public static void init() {
         registerVanillaBlocks();
@@ -200,11 +206,21 @@ public class ConfigAspects {
                     new AspectList().add(Aspect.ORDER, 1).add(Aspect.METAL, 5).add(Aspect.EARTH, 1).add(Aspect.ORDER, 2));
         }
 
+        ThaumcraftApi.registerObjectTag("stone", new AspectList().add(Aspect.EARTH, 2));
+        ThaumcraftApi.registerObjectTag("cobblestone", new AspectList().add(Aspect.EARTH, 1).add(Aspect.ENTROPY, 1));
         ThaumcraftApi.registerObjectTag("nuggetIron", new AspectList().add(Aspect.METAL, 1));
         ThaumcraftApi.registerObjectTag("oreIron", new AspectList().add(Aspect.EARTH, 1).add(Aspect.METAL, 3));
         ThaumcraftApi.registerObjectTag("dustIron", new AspectList().add(Aspect.METAL, 3).add(Aspect.ENTROPY, 1));
         ThaumcraftApi.registerObjectTag("oreGold", new AspectList().add(Aspect.EARTH, 1).add(Aspect.METAL, 2).add(Aspect.GREED, 1));
         ThaumcraftApi.registerObjectTag("dustGold", new AspectList().add(Aspect.METAL, 2).add(Aspect.ENTROPY, 1).add(Aspect.GREED, 1));
+        ThaumcraftApi.registerObjectTag("oreLapis", new AspectList().add(Aspect.EARTH, 1).add(Aspect.SENSES, 3));
+        ThaumcraftApi.registerObjectTag("oreDiamond", new AspectList().add(Aspect.EARTH, 1).add(Aspect.GREED, 3).add(Aspect.CRYSTAL, 3));
+        ThaumcraftApi.registerObjectTag("gemDiamond", new AspectList().add(Aspect.CRYSTAL, 4).add(Aspect.GREED, 4));
+        ThaumcraftApi.registerObjectTag("oreRedstone", new AspectList().add(Aspect.EARTH, 1).add(Aspect.ENERGY, 2).add(Aspect.MECHANISM, 2));
+        ThaumcraftApi.registerObjectTag("oreEmerald", new AspectList().add(Aspect.EARTH, 1).add(Aspect.GREED, 4).add(Aspect.CRYSTAL, 3));
+        ThaumcraftApi.registerObjectTag("gemEmerald", new AspectList().add(Aspect.CRYSTAL, 4).add(Aspect.GREED, 5));
+        ThaumcraftApi.registerObjectTag("oreQuartz", new AspectList().add(Aspect.EARTH, 1).add(Aspect.CRYSTAL, 3));
+        ThaumcraftApi.registerObjectTag("dustRedstone", new AspectList().add(Aspect.ENERGY, 2).add(Aspect.MECHANISM, 1));
         ThaumcraftApi.registerObjectTag("dustGlowstone", new AspectList().add(Aspect.SENSES, 1).add(Aspect.LIGHT, 2));
 
         // Generic ore dictionary registrations
@@ -213,10 +229,15 @@ public class ConfigAspects {
         ThaumcraftApi.registerObjectTag("logWood", new AspectList().add(Aspect.TREE, 4));
         ThaumcraftApi.registerObjectTag("plankWood", new AspectList().add(Aspect.TREE, 2));
         ThaumcraftApi.registerObjectTag("slabWood", new AspectList().add(Aspect.TREE, 1));
+        ThaumcraftApi.registerObjectTag("stairWood", new AspectList().add(Aspect.TREE, 1));
         ThaumcraftApi.registerObjectTag("stickWood", new AspectList().add(Aspect.TREE, 1));
         ThaumcraftApi.registerObjectTag("blockGlass", new AspectList().add(Aspect.CRYSTAL, 2));
         ThaumcraftApi.registerObjectTag("paneGlass", new AspectList().add(Aspect.CRYSTAL, 1));
         ThaumcraftApi.registerObjectTag("blockWool", new AspectList().add(Aspect.PLANT, 2).add(Aspect.TOOL, 1));
+
+        for (String dye : DYES) {
+            ThaumcraftApi.registerObjectTag(dye, new AspectList().add(Aspect.SENSES, 1));
+        }
     }
 
     private static void registerThaumcraftAlchemyBaseline() {
