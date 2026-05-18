@@ -23,6 +23,8 @@ public class TileEldritchNothingRenderer extends TileEntitySpecialRenderer<TileE
             new ResourceLocation("thaumcraft", "textures/misc/particlefield.png");
     private static final ResourceLocation PARTICLE_FALLBACK =
             new ResourceLocation("thaumcraft", "textures/misc/particlefield32.png");
+    private static final float FACE_MIN = 0.0F;
+    private static final float FACE_MAX = 1.0F;
 
     @Override
     public void render(TileEldritchNothing tile, double x, double y, double z, float partialTicks, int destroyStage, float alpha) {
@@ -32,7 +34,7 @@ public class TileEldritchNothingRenderer extends TileEntitySpecialRenderer<TileE
 
         Entity viewer = Minecraft.getMinecraft().getRenderViewEntity();
         boolean inRange = viewer != null && tile.getPos().distanceSq(viewer.posX, viewer.posY, viewer.posZ) < 512.0D;
-        float time = (tile.getWorld().getTotalWorldTime() + partialTicks) / 20.0F;
+        float time = (float) (System.currentTimeMillis() % 700000L) / 250000.0F;
 
         GlStateManager.pushMatrix();
         GlStateManager.translate(x, y, z);
@@ -60,12 +62,12 @@ public class TileEldritchNothingRenderer extends TileEntitySpecialRenderer<TileE
     }
 
     private void renderFace(EnumFacing face, float time, boolean inRange) {
+        float axisOffset = faceAxisOffset(face);
         if (!inRange) {
             bindTexture(PARTICLE_FALLBACK);
             GlStateManager.enableBlend();
             GlStateManager.blendFunc(770, 771);
-            drawFace(face, face.getAxisDirection() == EnumFacing.AxisDirection.POSITIVE ? 0.999F : 0.001F,
-                    0.6F, 0.6F, 0.6F, 1.0F, 0.0F, 0.0F, 1.0F, 1.0F);
+            drawFace(face, axisOffset, 1.0F, 1.0F, 1.0F, 1.0F, 0.0F, 0.0F, 1.0F, 1.0F);
             GlStateManager.disableBlend();
             return;
         }
@@ -75,10 +77,8 @@ public class TileEldritchNothingRenderer extends TileEntitySpecialRenderer<TileE
             float layer = 16.0F - i;
             float bright = 1.0F / (layer + 1.0F);
             float uvScale = i == 0 ? 0.125F : (i == 1 ? 0.5F : 0.0625F);
-            float uvShift = (time / (i == 0 ? 2.5F : 1.25F)) + i * 0.11F;
-            float offset = face.getAxisDirection() == EnumFacing.AxisDirection.POSITIVE
-                    ? 0.999F - i * 0.00035F
-                    : 0.001F + i * 0.00035F;
+            float uvShift = (time / (i == 0 ? 1.0F : 2.0F)) + i * 0.11F;
+            float offset = axisOffset;
 
             if (i == 0) {
                 bindTexture(TUNNEL);
@@ -93,12 +93,25 @@ public class TileEldritchNothingRenderer extends TileEntitySpecialRenderer<TileE
             float r = i == 0 ? 1.0F : (random.nextFloat() * 0.5F + 0.1F) * bright;
             float g = i == 0 ? 1.0F : (random.nextFloat() * 0.5F + 0.4F) * bright;
             float b = i == 0 ? 1.0F : (random.nextFloat() * 0.5F + 0.5F) * bright;
-            float a = i == 0 ? 0.9F : 0.35F;
-
-            drawFace(face, offset, r, g, b, a, uvShift, uvShift, uvScale, uvScale);
+            drawFace(face, offset, r, g, b, 1.0F, uvShift, uvShift, uvScale, uvScale);
         }
 
         GlStateManager.disableBlend();
+    }
+
+    private static float faceAxisOffset(EnumFacing face) {
+        switch (face) {
+            case DOWN:
+            case NORTH:
+            case WEST:
+                return FACE_MIN;
+            case UP:
+            case SOUTH:
+            case EAST:
+                return FACE_MAX;
+            default:
+                return FACE_MIN;
+        }
     }
 
     private void drawFace(EnumFacing face, float axisOffset, float r, float g, float b, float a,
@@ -114,40 +127,40 @@ public class TileEldritchNothingRenderer extends TileEntitySpecialRenderer<TileE
 
         switch (face) {
             case UP:
-                v(buf, 0.0F, axisOffset, 1.0F, u1, v1, r, g, b, a);
-                v(buf, 0.0F, axisOffset, 0.0F, u1, v0, r, g, b, a);
-                v(buf, 1.0F, axisOffset, 0.0F, u0, v0, r, g, b, a);
-                v(buf, 1.0F, axisOffset, 1.0F, u0, v1, r, g, b, a);
-                break;
-            case DOWN:
                 v(buf, 0.0F, axisOffset, 0.0F, u1, v1, r, g, b, a);
                 v(buf, 0.0F, axisOffset, 1.0F, u1, v0, r, g, b, a);
                 v(buf, 1.0F, axisOffset, 1.0F, u0, v0, r, g, b, a);
                 v(buf, 1.0F, axisOffset, 0.0F, u0, v1, r, g, b, a);
                 break;
-            case NORTH:
-                v(buf, 0.0F, 1.0F, axisOffset, u1, v1, r, g, b, a);
-                v(buf, 0.0F, 0.0F, axisOffset, u1, v0, r, g, b, a);
-                v(buf, 1.0F, 0.0F, axisOffset, u0, v0, r, g, b, a);
-                v(buf, 1.0F, 1.0F, axisOffset, u0, v1, r, g, b, a);
+            case DOWN:
+                v(buf, 0.0F, axisOffset, 1.0F, u1, v1, r, g, b, a);
+                v(buf, 0.0F, axisOffset, 0.0F, u1, v0, r, g, b, a);
+                v(buf, 1.0F, axisOffset, 0.0F, u0, v0, r, g, b, a);
+                v(buf, 1.0F, axisOffset, 1.0F, u0, v1, r, g, b, a);
                 break;
-            case SOUTH:
+            case NORTH:
                 v(buf, 0.0F, 0.0F, axisOffset, u1, v1, r, g, b, a);
                 v(buf, 0.0F, 1.0F, axisOffset, u1, v0, r, g, b, a);
                 v(buf, 1.0F, 1.0F, axisOffset, u0, v0, r, g, b, a);
                 v(buf, 1.0F, 0.0F, axisOffset, u0, v1, r, g, b, a);
                 break;
-            case WEST:
-                v(buf, axisOffset, 1.0F, 0.0F, u1, v1, r, g, b, a);
-                v(buf, axisOffset, 1.0F, 1.0F, u1, v0, r, g, b, a);
-                v(buf, axisOffset, 0.0F, 1.0F, u0, v0, r, g, b, a);
-                v(buf, axisOffset, 0.0F, 0.0F, u0, v1, r, g, b, a);
+            case SOUTH:
+                v(buf, 0.0F, 1.0F, axisOffset, u1, v1, r, g, b, a);
+                v(buf, 0.0F, 0.0F, axisOffset, u1, v0, r, g, b, a);
+                v(buf, 1.0F, 0.0F, axisOffset, u0, v0, r, g, b, a);
+                v(buf, 1.0F, 1.0F, axisOffset, u0, v1, r, g, b, a);
                 break;
-            case EAST:
+            case WEST:
                 v(buf, axisOffset, 0.0F, 0.0F, u1, v1, r, g, b, a);
                 v(buf, axisOffset, 0.0F, 1.0F, u1, v0, r, g, b, a);
                 v(buf, axisOffset, 1.0F, 1.0F, u0, v0, r, g, b, a);
                 v(buf, axisOffset, 1.0F, 0.0F, u0, v1, r, g, b, a);
+                break;
+            case EAST:
+                v(buf, axisOffset, 1.0F, 0.0F, u1, v1, r, g, b, a);
+                v(buf, axisOffset, 1.0F, 1.0F, u1, v0, r, g, b, a);
+                v(buf, axisOffset, 0.0F, 1.0F, u0, v0, r, g, b, a);
+                v(buf, axisOffset, 0.0F, 0.0F, u0, v1, r, g, b, a);
                 break;
             default:
                 break;
