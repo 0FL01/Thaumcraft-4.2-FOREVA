@@ -247,7 +247,10 @@ public class ConfigAspects {
         ThaumcraftApi.registerObjectTag(new ItemStack(ConfigItems.itemShard, 1, 3), new AspectList().add(Aspect.MAGIC, 1).add(Aspect.EARTH, 2).add(Aspect.CRYSTAL, 1));
         ThaumcraftApi.registerObjectTag(new ItemStack(ConfigItems.itemShard, 1, 4), new AspectList().add(Aspect.MAGIC, 1).add(Aspect.ORDER, 2).add(Aspect.CRYSTAL, 1));
         ThaumcraftApi.registerObjectTag(new ItemStack(ConfigItems.itemShard, 1, 5), new AspectList().add(Aspect.MAGIC, 1).add(Aspect.ENTROPY, 2).add(Aspect.CRYSTAL, 1));
-        ThaumcraftApi.registerObjectTag(new ItemStack(ConfigItems.itemResource, 1, 14), new AspectList().add(Aspect.MAGIC, 2).add(Aspect.AIR, 2).add(Aspect.FIRE, 2).add(Aspect.WATER, 2).add(Aspect.EARTH, 2).add(Aspect.ORDER, 2).add(Aspect.ENTROPY, 2));
+        ThaumcraftApi.registerObjectTag(new ItemStack(ConfigItems.itemShard, 1, 6),
+                new AspectList().add(Aspect.AIR, 2).add(Aspect.FIRE, 2).add(Aspect.WATER, 2).add(Aspect.EARTH, 2).add(Aspect.ORDER, 2).add(Aspect.ENTROPY, 2).add(Aspect.CRYSTAL, 1));
+        ThaumcraftApi.registerObjectTag(new ItemStack(ConfigItems.itemResource, 1, 14),
+                new AspectList(new ItemStack(ConfigItems.itemShard, 1, 6)).add(Aspect.MAGIC, 2).remove(Aspect.CRYSTAL));
 
         ThaumcraftApi.registerObjectTag(new ItemStack(ConfigItems.itemNugget, 1, 5), new AspectList().add(Aspect.METAL, 1));
         ThaumcraftApi.registerObjectTag(new ItemStack(ConfigItems.itemNugget, 1, 6), new AspectList().add(Aspect.METAL, 1));

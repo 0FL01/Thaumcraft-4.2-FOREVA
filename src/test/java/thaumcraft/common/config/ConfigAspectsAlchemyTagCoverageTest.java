@@ -18,7 +18,9 @@ public class ConfigAspectsAlchemyTagCoverageTest {
         assertTrue("ConfigAspects init must call thaumcraft alchemy baseline tags",
                 source.contains("registerThaumcraftAlchemyBaseline();"));
         assertTrue("Missing shard aspect baseline", source.contains("new ItemStack(ConfigItems.itemShard, 1, 0)"));
-        assertTrue("Missing balanced shard component baseline", source.contains("new ItemStack(ConfigItems.itemResource, 1, 14)"));
+        assertTrue("Missing balanced shard aspect baseline", source.contains("new ItemStack(ConfigItems.itemShard, 1, 6)"));
+        assertTrue("Missing balanced shard component derivation baseline",
+                source.contains("new AspectList(new ItemStack(ConfigItems.itemShard, 1, 6)).add(Aspect.MAGIC, 2).remove(Aspect.CRYSTAL)"));
         assertTrue("Missing native cluster iron baseline", source.contains("new ItemStack(ConfigItems.itemNugget, 1, 16)"));
         assertTrue("Missing native cluster gold baseline", source.contains("new ItemStack(ConfigItems.itemNugget, 1, 31)"));
         assertTrue("Missing custom ore cinnabar baseline", source.contains("new ItemStack(ConfigBlocks.blockCustomOre, 1, 0)"));
