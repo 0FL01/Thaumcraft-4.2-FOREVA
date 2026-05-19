@@ -1,8 +1,134 @@
 {
-  "parent": "block/cube_bottom_top",
+  "parent": "block/block",
+  "ambientocclusion": false,
   "textures": {
+    "particle": "thaumcraft:blocks/arcaneearsideoff",
     "top": "thaumcraft:blocks/arcaneeartopoff",
     "bottom": "thaumcraft:blocks/arcaneearbottom",
-    "side": "thaumcraft:blocks/arcaneearsideoff"
-  }
+    "side": "thaumcraft:blocks/arcaneearsideoff",
+    "belltop": "thaumcraft:blocks/arcaneearbelltop",
+    "bellside": "thaumcraft:blocks/arcaneearbellside"
+  },
+  "elements": [
+    {
+      "from": [0, 0, 0],
+      "to": [16, 3, 16],
+      "faces": {
+        "down": { "texture": "#bottom" },
+        "up": { "texture": "#top" },
+        "north": { "texture": "#side" },
+        "south": { "texture": "#side" },
+        "west": { "texture": "#side" },
+        "east": { "texture": "#side" }
+      }
+    },
+    {
+      "from": [4, 3, 4],
+      "to": [12, 16, 12],
+      "faces": {
+        "down": { "texture": "#bottom" },
+        "up": { "texture": "#top" },
+        "north": { "texture": "#side" },
+        "south": { "texture": "#side" },
+        "west": { "texture": "#side" },
+        "east": { "texture": "#side" }
+      }
+    },
+    {
+      "from": [4, 8, 1],
+      "to": [12, 16, 3],
+      "faces": {
+        "down": { "texture": "#belltop" },
+        "up": { "texture": "#belltop" },
+        "north": { "texture": "#bellside" },
+        "south": { "texture": "#bellside" },
+        "west": { "texture": "#bellside" },
+        "east": { "texture": "#bellside" }
+      }
+    },
+    {
+      "from": [5, 8, 3],
+      "to": [11, 15, 4],
+      "faces": {
+        "down": { "texture": "#belltop" },
+        "up": { "texture": "#belltop" },
+        "north": { "texture": "#bellside" },
+        "south": { "texture": "#bellside" },
+        "west": { "texture": "#bellside" },
+        "east": { "texture": "#bellside" }
+      }
+    },
+    {
+      "from": [1, 8, 4],
+      "to": [3, 16, 12],
+      "faces": {
+        "down": { "texture": "#belltop" },
+        "up": { "texture": "#belltop" },
+        "north": { "texture": "#bellside" },
+        "south": { "texture": "#bellside" },
+        "west": { "texture": "#bellside" },
+        "east": { "texture": "#bellside" }
+      }
+    },
+    {
+      "from": [3, 8, 5],
+      "to": [4, 15, 11],
+      "faces": {
+        "down": { "texture": "#belltop" },
+        "up": { "texture": "#belltop" },
+        "north": { "texture": "#bellside" },
+        "south": { "texture": "#bellside" },
+        "west": { "texture": "#bellside" },
+        "east": { "texture": "#bellside" }
+      }
+    },
+    {
+      "from": [4, 8, 13],
+      "to": [12, 16, 15],
+      "faces": {
+        "down": { "texture": "#belltop" },
+        "up": { "texture": "#belltop" },
+        "north": { "texture": "#bellside" },
+        "south": { "texture": "#bellside" },
+        "west": { "texture": "#bellside" },
+        "east": { "texture": "#bellside" }
+      }
+    },
+    {
+      "from": [5, 8, 12],
+      "to": [11, 15, 13],
+      "faces": {
+        "down": { "texture": "#belltop" },
+        "up": { "texture": "#belltop" },
+        "north": { "texture": "#bellside" },
+        "south": { "texture": "#bellside" },
+        "west": { "texture": "#bellside" },
+        "east": { "texture": "#bellside" }
+      }
+    },
+    {
+      "from": [13, 8, 4],
+      "to": [15, 16, 12],
+      "faces": {
+        "down": { "texture": "#belltop" },
+        "up": { "texture": "#belltop" },
+        "north": { "texture": "#bellside" },
+        "south": { "texture": "#bellside" },
+        "west": { "texture": "#bellside" },
+        "east": { "texture": "#bellside" }
+      }
+    },
+    {
+      "from": [12, 8, 5],
+      "to": [13, 15, 11],
+      "faces": {
+        "down": { "texture": "#belltop" },
+        "up": { "texture": "#belltop" },
+        "north": { "texture": "#bellside" },
+        "south": { "texture": "#bellside" },
+        "west": { "texture": "#bellside" },
+        "east": { "texture": "#bellside" }
+      }
+    }
+  ]
 }

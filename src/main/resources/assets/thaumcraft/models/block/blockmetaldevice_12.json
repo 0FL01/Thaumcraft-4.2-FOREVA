@@ -1,6 +1,21 @@
 {
-  "parent": "block/cube_all",
+  "parent": "block/block",
   "textures": {
-    "all": "thaumcraft:blocks/brainbox"
-  }
+    "particle": "thaumcraft:blocks/brainbox",
+    "brainbox": "thaumcraft:blocks/brainbox"
+  },
+  "elements": [
+    {
+      "from": [3, 3, 3],
+      "to": [13, 13, 13],
+      "faces": {
+        "down": { "texture": "#brainbox" },
+        "up": { "texture": "#brainbox" },
+        "north": { "texture": "#brainbox" },
+        "south": { "texture": "#brainbox" },
+        "west": { "texture": "#brainbox" },
+        "east": { "texture": "#brainbox" }
+      }
+    }
+  ]
 }

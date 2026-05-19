@@ -7,6 +7,7 @@ import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.block.model.ItemCameraTransforms;
 import net.minecraft.client.renderer.entity.RenderManager;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
@@ -73,6 +74,53 @@ final class TileRenderHelper {
         buf.pos(half, 0.0D, half).color(r, g, b, a).endVertex();
         buf.pos(half, 0.0D, -half).color(r, g, b, a).endVertex();
         tess.draw();
+    }
+
+    static void drawTexturedCuboid(BufferBuilder buf,
+                                   float minX, float minY, float minZ,
+                                   float maxX, float maxY, float maxZ,
+                                   TextureAtlasSprite sprite, int argb) {
+        drawTexturedCuboid(buf, minX, minY, minZ, maxX, maxY, maxZ,
+                sprite, sprite, sprite, sprite, sprite, sprite, argb);
+    }
+
+    static void drawTexturedCuboid(BufferBuilder buf,
+                                   float minX, float minY, float minZ,
+                                   float maxX, float maxY, float maxZ,
+                                   TextureAtlasSprite down,
+                                   TextureAtlasSprite up,
+                                   TextureAtlasSprite north,
+                                   TextureAtlasSprite south,
+                                   TextureAtlasSprite west,
+                                   TextureAtlasSprite east,
+                                   int argb) {
+        addTexturedFace(buf, minX, minY, maxZ, minX, minY, minZ, maxX, minY, minZ, maxX, minY, maxZ, down, argb);
+        addTexturedFace(buf, minX, maxY, minZ, minX, maxY, maxZ, maxX, maxY, maxZ, maxX, maxY, minZ, up, argb);
+        addTexturedFace(buf, minX, maxY, minZ, maxX, maxY, minZ, maxX, minY, minZ, minX, minY, minZ, north, argb);
+        addTexturedFace(buf, minX, maxY, maxZ, minX, minY, maxZ, maxX, minY, maxZ, maxX, maxY, maxZ, south, argb);
+        addTexturedFace(buf, minX, maxY, maxZ, minX, maxY, minZ, minX, minY, minZ, minX, minY, maxZ, west, argb);
+        addTexturedFace(buf, maxX, maxY, minZ, maxX, maxY, maxZ, maxX, minY, maxZ, maxX, minY, minZ, east, argb);
+    }
+
+    static void addTexturedFace(BufferBuilder buf,
+                                float x1, float y1, float z1,
+                                float x2, float y2, float z2,
+                                float x3, float y3, float z3,
+                                float x4, float y4, float z4,
+                                TextureAtlasSprite sprite, int argb) {
+        float a = ((argb >> 24) & 0xFF) / 255.0F;
+        float r = ((argb >> 16) & 0xFF) / 255.0F;
+        float g = ((argb >> 8) & 0xFF) / 255.0F;
+        float b = (argb & 0xFF) / 255.0F;
+        float u0 = sprite.getMinU();
+        float u1 = sprite.getMaxU();
+        float v0 = sprite.getMinV();
+        float v1 = sprite.getMaxV();
+
+        buf.pos(x1, y1, z1).tex(u0, v0).color(r, g, b, a).endVertex();
+        buf.pos(x2, y2, z2).tex(u0, v1).color(r, g, b, a).endVertex();
+        buf.pos(x3, y3, z3).tex(u1, v1).color(r, g, b, a).endVertex();
+        buf.pos(x4, y4, z4).tex(u1, v0).color(r, g, b, a).endVertex();
     }
 
     static Vec3d rgb(int color) {

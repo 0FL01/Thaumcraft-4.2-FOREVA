@@ -26,6 +26,7 @@ Branch: `codex/durable-goal-stage8-9`
 - Latest Stage 8-e burst restored `smokeSpiral` proxy coverage for Elemental Sword and Eldritch Warden, and converted `FXSmokeDrift`/`FXSmokeSpiral` off vanilla smoke emitters with `validate` and `validate --smoke` passing afterward.
 - Latest Stage 9-e verification burst added a typed `ConfigResearch` recipe-handle audit so `recipeI/recipeArcane/recipeCrucible/recipeInfusion/recipeInfusionEnchantment/recipeList` lookups stay aligned with matching registration families, with `validate` passing afterward.
 - Latest Stage 9-d follow-up restored the balanced shard (`itemShard:6`) aspect baseline and switched `itemResource:14` back to reference-shaped derivation from it, with `validate` and `validate --smoke` passing afterward.
+- Latest Stage 8-c burst added dynamic brainbox/sensor/lifter renderer coverage plus reference-shaped brainbox/sensor model geometry, with `validate` and `validate --smoke` passing afterward.
 - Stage 3-7 residual blockers stay documented and non-blocking for current burst planning.
 - GUI/manual parity checks remain skipped by instruction.
 

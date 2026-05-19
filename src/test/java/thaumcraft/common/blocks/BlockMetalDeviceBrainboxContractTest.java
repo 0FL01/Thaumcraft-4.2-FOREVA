@@ -28,9 +28,10 @@ public class BlockMetalDeviceBrainboxContractTest {
                 configBlocks.contains("new TileRegistration(TileBrainbox.class, \"TileBrainbox\")"));
         assertTrue("blockmetaldevice blockstate must map metadata 12 to dedicated brainbox model",
                 metalDeviceBlockstate.contains("\"type=12\": { \"model\": \"thaumcraft:blockmetaldevice_12\" }"));
-        assertTrue("Dedicated brainbox model must point to the brainbox texture",
-                metalDeviceBrainboxModel.contains("\"parent\": \"block/cube_all\"")
-                        && metalDeviceBrainboxModel.contains("\"all\": \"thaumcraft:blocks/brainbox\""));
+        assertTrue("Dedicated brainbox model must preserve the reference-sized center core instead of a full cube",
+                metalDeviceBrainboxModel.contains("\"from\": [3, 3, 3]")
+                        && metalDeviceBrainboxModel.contains("\"to\": [13, 13, 13]")
+                        && metalDeviceBrainboxModel.contains("\"brainbox\": \"thaumcraft:blocks/brainbox\""));
         assertTrue("Brainbox texture asset must exist in the port resource tree",
                 Files.exists(Paths.get("src/main/resources/assets/thaumcraft/textures/blocks/brainbox.png")));
     }
