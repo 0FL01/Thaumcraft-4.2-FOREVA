@@ -23,10 +23,6 @@ public class ConfigRecipesInfusionResearchCoverageStaticGuardTest {
     private static final Pattern INFUSION_PAGE_PATTERN = Pattern.compile("recipeInfusion\\(\"([^\"]+)\"\\)");
     private static final Pattern INFUSION_ENCHANT_PAGE_PATTERN = Pattern.compile("recipeInfusionEnchantment\\(\"([^\"]+)\"\\)");
 
-    private static final Set<String> INFUSION_PAGE_ALLOWLIST_MISSING = new HashSet<>(Arrays.asList(
-            "RunicGirdleKinetic_2"
-    ));
-
     @Test
     public void infusionRegistrationCorpusShouldStayReferenceSizedAndUnique() throws IOException {
         String recipeSource = readMergedRecipeSource();
@@ -51,8 +47,6 @@ public class ConfigRecipesInfusionResearchCoverageStaticGuardTest {
 
         Set<String> missingInfusionPages = new HashSet<>(infusionRegistered);
         missingInfusionPages.removeAll(infusionPages);
-        missingInfusionPages.removeAll(INFUSION_PAGE_ALLOWLIST_MISSING);
-
         Set<String> danglingInfusionPages = new HashSet<>(infusionPages);
         danglingInfusionPages.removeAll(infusionRegistered);
 
@@ -62,7 +56,7 @@ public class ConfigRecipesInfusionResearchCoverageStaticGuardTest {
         Set<String> danglingInfusionEnchantPages = new HashSet<>(infusionEnchantPages);
         danglingInfusionEnchantPages.removeAll(infusionEnchantRegistered);
 
-        assertTrue("Every registered infusion recipe key should be wired into research pages (allowlist excluded), missing: "
+        assertTrue("Every registered infusion recipe key should be wired into research pages, missing: "
                         + sorted(missingInfusionPages),
                 missingInfusionPages.isEmpty());
         assertTrue("Every infusion recipe page key should resolve to a registered infusion recipe, dangling: "

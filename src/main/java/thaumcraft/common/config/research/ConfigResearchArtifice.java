@@ -413,7 +413,8 @@ final class ConfigResearchArtifice {
                 new ItemStack(ConfigItems.itemGirdleRunic, 1, 1))
                 .setPages(
                         new ResearchPage("tc.research_page.RUNICKINETIC.1"),
-                        new ResearchPage(ConfigResearch.recipeInfusion("RunicGirdleKinetic")))
+                        new ResearchPage(ConfigResearch.recipeInfusion("RunicGirdleKinetic")),
+                        new ResearchPage(ConfigResearch.recipeInfusion("RunicGirdleKinetic_2")))
                 .setParents("RUNICARMOR")
                 .setSecondary()
                 .setConcealed()
