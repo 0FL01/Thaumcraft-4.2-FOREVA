@@ -15,6 +15,7 @@ public class WardedHoleRendererFidelityStaticGuardTest {
     public void wardedAndHoleRenderersKeepConnectedAndLayeredContracts() throws IOException {
         String warded = read("src/main/java/thaumcraft/client/renderers/tile/TileWardedRenderer.java");
         String hole = read("src/main/java/thaumcraft/client/renderers/tile/TileHoleRenderer.java");
+        String nothing = read("src/main/java/thaumcraft/client/renderers/tile/TileEldritchNothingRenderer.java");
 
         assertTrue("TileWardedRenderer should keep warded connected-texture matrix routing",
                 warded.contains("CONNECTED_TEXTURE_REF_BY_ID")
@@ -34,7 +35,18 @@ public class WardedHoleRendererFidelityStaticGuardTest {
                         && hole.contains("textures/misc/particlefield.png")
                         && hole.contains("textures/misc/particlefield32.png")
                         && hole.contains("for (int i = 0; i < 16; i++)")
+                        && hole.contains("ActiveRenderInfo")
+                        && hole.contains("parallaxOffsets(")
                         && hole.contains("shouldRenderFace(tile.getPos(), face)"));
+
+        assertTrue("TileEldritchNothingRenderer should keep layered tunnel field + camera-parallax contracts",
+                nothing.contains("textures/misc/tunnel.png")
+                        && nothing.contains("textures/misc/particlefield.png")
+                        && nothing.contains("textures/misc/particlefield32.png")
+                        && nothing.contains("for (int i = 0; i < 16; i++)")
+                        && nothing.contains("ActiveRenderInfo")
+                        && nothing.contains("parallaxOffsets(")
+                        && nothing.contains("return !adjacent.isOpaqueCube();"));
     }
 
     private static String read(String path) throws IOException {
