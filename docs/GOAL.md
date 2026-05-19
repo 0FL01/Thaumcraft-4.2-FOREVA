@@ -64,12 +64,26 @@ Checkpoint prose accumulates and must be rotated to keep docs readable.
   update the Archive Index in GOAL_PROGRESS.md.
 - Keep each `docs/Stage*.md` ≤ 600 lines. When verbose checkpoint logs
   (e.g. `## Итоговый checklist`) exceed this, move the full log body
-  into `docs/GOAL_PROGRESS-archive/<stage>-checkpoints.md`, replace with
-  a breadcrumb digest + archive link, and add an entry to the Archive Index.
-- Archive Index lives in `docs/GOAL_PROGRESS.md` (§Archive). The agent
-  checks it before digging through raw archive files.
+  into `docs/GOAL_PROGRESS-archive/`, split into thematic batch files
+  (≤20 checkpoints each), replace with a breadcrumb digest + archive link.
+- Archive structure uses per-source subdirectories:
+  ```
+  docs/GOAL_PROGRESS-archive/
+  ├── INDEX.md              # master index → subdirectories
+  ├── goal-progress/        # batches from GOAL_PROGRESS.md
+  │   ├── INDEX.md
+  │   └── batch-N-*.md
+  ├── stage8-d/             # batches from Stage8-d.md
+  │   ├── INDEX.md
+  │   └── batch-N-*.md
+  └── ...                   # future sources
+  ```
+- Each subdirectory has its own `INDEX.md` listing batch files with
+  checkpoint ranges and content descriptions. The agent checks the
+  relevant INDEX.md before digging into raw batch files.
 - Archive commits touch only docs, need no runtime smoke, use commit
   message prefix `docs(...):`.
+- Push to remote after each archive commit so the index stays current.
 
 ## 1. Global end state
 

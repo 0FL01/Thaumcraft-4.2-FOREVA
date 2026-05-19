@@ -50,15 +50,15 @@ Branch: `codex/durable-goal-stage8-9`
 
 ## Archive Index
 
-| File | Source | Content |
+Archives live in `docs/GOAL_PROGRESS-archive/` with per-source subdirectories.
+Each subdirectory has its own `INDEX.md` for detailed batch listings.
+
+| Source | Directory | Content |
 |---|---|---|
-| `old-GOAL_PROGRESS.archive.md` | GOAL_PROGRESS.md | Original snapshot before batch split |
-| `batch-01-stage3-5.md` | GOAL_PROGRESS.md | Stage 3–5 checkpoint prose |
-| `batch-02-stage6-7.md` | GOAL_PROGRESS.md | Stage 6–7 checkpoint prose |
-| `batch-03-stage8-c.md` | GOAL_PROGRESS.md | Stage 8-c checkpoint prose |
-| `batch-04-stage8-d-e.md` | GOAL_PROGRESS.md | Stage 8-d/e checkpoint prose |
-| `batch-05-stage9.md` | GOAL_PROGRESS.md | Stage 9 checkpoint prose |
-| `stage8-d-checkpoints.md` | Stage8-d.md §6 | 42 entity-renderer checkpoint logs |
+| `docs/GOAL_PROGRESS.md` | `goal-progress/` | Checkpoint summaries and old snapshot |
+| `docs/Stage8-d.md §6` | `stage8-d/` | 82 entity-renderer checkpoint logs (7 batches) |
+
+See `docs/GOAL_PROGRESS-archive/INDEX.md` for the master index.
 
 ## Next Checkpoint Candidate
 
