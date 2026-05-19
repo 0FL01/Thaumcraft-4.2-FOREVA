@@ -16,6 +16,7 @@ public class WardedHoleRendererFidelityStaticGuardTest {
         String warded = read("src/main/java/thaumcraft/client/renderers/tile/TileWardedRenderer.java");
         String hole = read("src/main/java/thaumcraft/client/renderers/tile/TileHoleRenderer.java");
         String nothing = read("src/main/java/thaumcraft/client/renderers/tile/TileEldritchNothingRenderer.java");
+        String obelisk = read("src/main/java/thaumcraft/client/renderers/tile/TileEldritchObeliskRenderer.java");
 
         assertTrue("TileWardedRenderer should keep warded connected-texture matrix routing",
                 warded.contains("CONNECTED_TEXTURE_REF_BY_ID")
@@ -47,6 +48,15 @@ public class WardedHoleRendererFidelityStaticGuardTest {
                         && nothing.contains("ActiveRenderInfo")
                         && nothing.contains("parallaxOffsets(")
                         && nothing.contains("return !adjacent.isOpaqueCube();"));
+
+        assertTrue("TileEldritchObeliskRenderer should keep layered side fields with camera-parallax contracts",
+                obelisk.contains("textures/misc/tunnel.png")
+                        && obelisk.contains("textures/misc/particlefield.png")
+                        && obelisk.contains("textures/misc/particlefield32.png")
+                        && obelisk.contains("for (int i = 0; i < 16; i++)")
+                        && obelisk.contains("ActiveRenderInfo")
+                        && obelisk.contains("parallaxOffsets(")
+                        && obelisk.contains("for (EnumFacing facing : EnumFacing.HORIZONTALS)"));
     }
 
     private static String read(String path) throws IOException {
