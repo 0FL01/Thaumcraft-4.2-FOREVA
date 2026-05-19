@@ -15,14 +15,16 @@ public class FluxReservoirRendererFidelityStaticGuardTest {
     public void fluxScrubberAndReservoirRenderersUseModelDrivenDevicePaths() throws IOException {
         String fluxRenderer = read("src/main/java/thaumcraft/client/renderers/tile/TileFluxScrubberRenderer.java");
         String fluxModel = read("src/main/java/thaumcraft/client/renderers/models/ModelFluxScrubber.java");
+        String stoneDeviceBlockstate = read("src/main/resources/assets/thaumcraft/blockstates/blockstonedevice.json");
+        String fluxBlockModel = read("src/main/resources/assets/thaumcraft/models/block/blockstonedevice_14.json");
         String reservoirRenderer = read("src/main/java/thaumcraft/client/renderers/tile/TileEssentiaReservoirRenderer.java");
         String reservoirModel = read("src/main/resources/assets/thaumcraft/models/block/blockessentiareservoir.json");
 
-        assertTrue("Flux scrubber renderer should use model cap/tip orientation path instead of billboard quads",
+        assertTrue("Flux scrubber renderer should keep the orientation path and animated tip while the static cap lives in the block model",
                 fluxRenderer.contains("new ModelFluxScrubber()")
                         && fluxRenderer.contains("translateFromOrientation(")
-                        && fluxRenderer.contains("model.renderCap(MODEL_SCALE)")
                         && fluxRenderer.contains("model.renderTip(MODEL_SCALE)")
+                        && !fluxRenderer.contains("model.renderCap(MODEL_SCALE)")
                         && !fluxRenderer.contains("TileRenderHelper.orientBillboardToPlayer()")
                         && !fluxRenderer.contains("TileRenderHelper.drawTexturedQuad("));
 
@@ -32,6 +34,15 @@ public class FluxReservoirRendererFidelityStaticGuardTest {
                         && fluxModel.contains("tip")
                         && fluxModel.contains("renderCap(float scale)")
                         && fluxModel.contains("renderTip(float scale)"));
+
+        assertTrue("Stone-device blockstate should route focal manipulator and flux scrubber away from the old arcane-stone placeholder",
+                stoneDeviceBlockstate.contains("\"type=13\": { \"model\": \"thaumcraft:blockstonedevice_13\" }")
+                        && stoneDeviceBlockstate.contains("\"type=14\": { \"model\": \"thaumcraft:blockstonedevice_14\" }"));
+        assertTrue("Flux scrubber block model should now carry the static cap shell instead of the old full-cube placeholder",
+                fluxBlockModel.contains("\"ambientocclusion\": false")
+                        && fluxBlockModel.contains("\"surface\": \"thaumcraft:models/fluxscrubber\"")
+                        && fluxBlockModel.contains("\"from\": [4, 7, 4]")
+                        && fluxBlockModel.contains("\"to\": [12, 9, 12]"));
 
         assertTrue("Reservoir renderer should keep only the textured 3D liquid volume while the static shell lives in the block model",
                 reservoirRenderer.contains("renderLiquid(tile, x, y, z)")

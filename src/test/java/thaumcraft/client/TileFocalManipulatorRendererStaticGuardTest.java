@@ -16,13 +16,22 @@ public class TileFocalManipulatorRendererStaticGuardTest {
         String source = read("src/main/java/thaumcraft/client/renderers/tile/TileFocalManipulatorRenderer.java");
         String thaumatorium = read("src/main/java/thaumcraft/client/renderers/tile/TileThaumatoriumRenderer.java");
         String arcaneWorkbench = read("src/main/java/thaumcraft/client/renderers/tile/TileArcaneWorkbenchRenderer.java");
+        String blockstate = read("src/main/resources/assets/thaumcraft/blockstates/blockstonedevice.json");
+        String blockModel = read("src/main/resources/assets/thaumcraft/models/block/blockstonedevice_13.json");
 
-        assertTrue(source.contains("textures/models/wandtable.png"));
-        assertTrue(source.contains("new ModelArcaneWorkbench()"));
+        assertTrue(source.contains("TileRenderHelper.ticks(tile, partialTicks)"));
         assertTrue(source.contains("focus.getItem() instanceof ItemFocusBasic"));
-        assertTrue(source.contains("tableModel.renderAll(MODEL_SCALE);"));
         assertTrue(source.contains("MathHelper.sin(ticks / 14.0F) * 0.2F + 0.2F"));
         assertTrue(source.contains("renderItem(focus.copy(), ItemCameraTransforms.TransformType.GROUND)"));
+        assertTrue(!source.contains("textures/models/wandtable.png"));
+        assertTrue(!source.contains("new ModelArcaneWorkbench()"));
+        assertTrue(!source.contains("tableModel.renderAll(MODEL_SCALE);"));
+
+        assertTrue(blockstate.contains("\"type=13\": { \"model\": \"thaumcraft:blockstonedevice_13\" }"));
+        assertTrue(blockModel.contains("\"surface\": \"thaumcraft:models/wandtable\""));
+        assertTrue(blockModel.contains("\"from\": [0, 8, 0]"));
+        assertTrue(blockModel.contains("\"from\": [0, 0, 0]"));
+        assertTrue(blockModel.contains("\"from\": [9, 4, 11]"));
 
         assertTrue(thaumatorium.contains("textures/models/thaumatorium.png"));
         assertTrue(thaumatorium.contains("model.renderAll();"));

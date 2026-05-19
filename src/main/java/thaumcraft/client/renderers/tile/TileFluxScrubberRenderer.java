@@ -28,7 +28,6 @@ public class TileFluxScrubberRenderer extends TileEntitySpecialRenderer<TileFlux
         GlStateManager.disableLighting();
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
         bindTexture(SCRUBBER);
-        model.renderCap(MODEL_SCALE);
 
         GlStateManager.pushMatrix();
         GlStateManager.translate(0.0D, 0.0D, -bob);
