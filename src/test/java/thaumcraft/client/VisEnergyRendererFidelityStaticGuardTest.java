@@ -14,11 +14,16 @@ public class VisEnergyRendererFidelityStaticGuardTest {
     @Test
     public void energizedNodeAndWorkbenchChargerRenderersUseReferenceShapedPaths() throws IOException {
         String nodeRenderer = read("src/main/java/thaumcraft/client/renderers/tile/TileNodeEnergizedRenderer.java");
+        String stabilizerRenderer = read("src/main/java/thaumcraft/client/renderers/tile/TileNodeStabilizerRenderer.java");
+        String converterRenderer = read("src/main/java/thaumcraft/client/renderers/tile/TileNodeConverterRenderer.java");
         String chargerRenderer = read("src/main/java/thaumcraft/client/renderers/tile/TileMagicWorkbenchChargerRenderer.java");
         String relayRenderer = read("src/main/java/thaumcraft/client/renderers/tile/TileVisRelayRenderer.java");
         String crystalizerRenderer = read("src/main/java/thaumcraft/client/renderers/tile/TileEssentiaCrystalizerRenderer.java");
         String chargerModel = read("src/main/java/thaumcraft/client/renderers/models/ModelMagicWorkbenchCharger.java");
         String chargerBlockModel = read("src/main/resources/assets/thaumcraft/models/block/blockmetaldevice_2.json");
+        String stoneDeviceBlockstate = read("src/main/resources/assets/thaumcraft/blockstates/blockstonedevice.json");
+        String stabilizerBlockModel = read("src/main/resources/assets/thaumcraft/models/block/blockstonedevice_9.json");
+        String converterBlockModel = read("src/main/resources/assets/thaumcraft/models/block/blockstonedevice_11.json");
 
         assertTrue("TileNodeEnergizedRenderer should keep node-core rendering and animated lightning-ring overlay",
                 nodeRenderer.contains("TileNodeRenderer.renderNodeAt(")
@@ -28,6 +33,20 @@ public class VisEnergyRendererFidelityStaticGuardTest {
                         && nodeRenderer.contains("RING_FRAMES = 16")
                         && nodeRenderer.contains("drawTexturedQuad(0.33F, u0, u1, v0, v1)")
                         && !nodeRenderer.contains("textures/misc/node_bubble.png"));
+
+        assertTrue("TileNodeStabilizerRenderer should keep only the animated pistons and bubble overlay after the static lock shell moved into the block model",
+                stabilizerRenderer.contains("new ModelNodeStabilizer()")
+                        && stabilizerRenderer.contains("bindTexture(BASE_TEXTURE);")
+                        && stabilizerRenderer.contains("model.renderPiston(MODEL_SCALE);")
+                        && stabilizerRenderer.contains("textures/misc/node_bubble.png")
+                        && !stabilizerRenderer.contains("model.renderLock(MODEL_SCALE);"));
+
+        assertTrue("TileNodeConverterRenderer should keep the colored overlay lock and animated pistons after the static base shell moved into the block model",
+                converterRenderer.contains("new ModelNodeStabilizer()")
+                        && converterRenderer.contains("bindTexture(OVER_TEXTURE);")
+                        && converterRenderer.contains("model.renderLock(MODEL_SCALE);")
+                        && converterRenderer.contains("model.renderPiston(MODEL_SCALE);")
+                        && !converterRenderer.contains("bindTexture(BASE_TEXTURE);\n        model.renderLock(MODEL_SCALE);"));
 
         assertTrue("TileMagicWorkbenchChargerRenderer should keep the dynamic crystal/lightmap path after the static shell moved into the block model",
                 chargerRenderer.contains("new ModelMagicWorkbenchCharger()")
@@ -66,6 +85,21 @@ public class VisEnergyRendererFidelityStaticGuardTest {
                         && chargerBlockModel.contains("\"from\": [5, 10, 5]")
                         && chargerBlockModel.contains("\"from\": [7.5, 7, 4]")
                         && chargerBlockModel.contains("\"to\": [12, 8, 8.5]"));
+
+        assertTrue("Stone-device blockstate should route node stabilizer and converter metas away from the old shared arcane-stone placeholder",
+                stoneDeviceBlockstate.contains("\"type=9\": { \"model\": \"thaumcraft:blockstonedevice_9\" }")
+                        && stoneDeviceBlockstate.contains("\"type=10\": { \"model\": \"thaumcraft:blockstonedevice_9\" }")
+                        && stoneDeviceBlockstate.contains("\"type=11\": { \"model\": \"thaumcraft:blockstonedevice_11\" }"));
+
+        assertTrue("Node stabilizer and converter block models should now carry the static lock shell geometry instead of the old full cube placeholder",
+                stabilizerBlockModel.contains("\"ambientocclusion\": false")
+                        && stabilizerBlockModel.contains("\"surface\": \"thaumcraft:models/node_stabilizer\"")
+                        && stabilizerBlockModel.contains("\"from\": [4, 4, 7]")
+                        && stabilizerBlockModel.contains("\"to\": [12, 12, 9]")
+                        && stabilizerBlockModel.contains("\"from\": [6.5, 3.5, 6.5]")
+                        && converterBlockModel.contains("\"surface\": \"thaumcraft:models/node_converter\"")
+                        && converterBlockModel.contains("\"from\": [4, 4, 7]")
+                        && converterBlockModel.contains("\"to\": [9.5, 8.5, 9.5]"));
     }
 
     private static String read(String path) throws IOException {

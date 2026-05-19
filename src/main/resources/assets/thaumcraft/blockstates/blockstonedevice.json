@@ -9,9 +9,9 @@
     "type=6": { "model": "thaumcraft:blockstonedevice_arcane" },
     "type=7": { "model": "thaumcraft:blockstonedevice_arcane" },
     "type=8": { "model": "thaumcraft:blockstonedevice_8" },
-    "type=9": { "model": "thaumcraft:blockstonedevice_arcane" },
-    "type=10": { "model": "thaumcraft:blockstonedevice_arcane" },
-    "type=11": { "model": "thaumcraft:blockstonedevice_arcane" },
+    "type=9": { "model": "thaumcraft:blockstonedevice_9" },
+    "type=10": { "model": "thaumcraft:blockstonedevice_9" },
+    "type=11": { "model": "thaumcraft:blockstonedevice_11" },
     "type=12": { "model": "thaumcraft:blockstonedevice_12" },
     "type=13": { "model": "thaumcraft:blockstonedevice_13" },
     "type=14": { "model": "thaumcraft:blockstonedevice_14" }

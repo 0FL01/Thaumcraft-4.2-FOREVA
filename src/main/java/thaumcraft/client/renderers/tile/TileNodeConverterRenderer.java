@@ -36,9 +36,6 @@ public class TileNodeConverterRenderer extends TileEntitySpecialRenderer<TileNod
         GlStateManager.blendFunc(770, 771);
         GlStateManager.disableCull();
 
-        bindTexture(BASE_TEXTURE);
-        model.renderLock(MODEL_SCALE);
-
         bindTexture(OVER_TEXTURE);
         GlStateManager.color(color[0], color[1], color[2], 1.0F);
         model.renderLock(MODEL_SCALE);

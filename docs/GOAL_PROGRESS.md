@@ -31,6 +31,7 @@ Branch: `codex/durable-goal-stage8-9`
 - Latest common/research follow-up restored the `BlockTable` conversion contract: inkwells now form master/partner research tables with reference-shaped metadata, wand use recreates the arcane workbench block/tile path, and `TileResearchTable` again exposes expanded render bounds plus the client learn-event sound; `validate` and `validate --smoke` passed afterward.
 - Latest Stage 8-c stone-device follow-up moved the focal manipulator shell into `blockstonedevice_13` and the flux scrubber cap into `blockstonedevice_14`, leaving TESR responsible only for the floating focus and animated scrubber tip; checkpoint validation is in progress.
 - Latest Stage 8-c jar follow-up moves normal/brain/node and void jar shells into shaped `blockjar_0`/`blockjar_1` models, switches `BlockJar` world rendering back to `MODEL`, keeps TESR shell only for item renders and node-jar animation pulses, and corrects the hidden brain/void shell routing in `blockjar.json`; checkpoint validation is in progress.
+- Latest Stage 8-c node-device follow-up moves the static lock shells for node stabilizer / advanced stabilizer / node converter into dedicated `blockstonedevice_9` and `blockstonedevice_11` models, leaving TESR responsible only for animated pistons, colored overlays, and bubble FX; checkpoint validation is in progress.
 - Stage 3-7 residual blockers stay documented and non-blocking for current burst planning.
 - GUI/manual parity checks remain skipped by instruction.
 

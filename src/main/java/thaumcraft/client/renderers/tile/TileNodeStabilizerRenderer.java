@@ -37,9 +37,6 @@ public class TileNodeStabilizerRenderer extends TileEntitySpecialRenderer<TileNo
         GlStateManager.blendFunc(770, 771);
         GlStateManager.disableCull();
 
-        bindTexture(BASE_TEXTURE);
-        model.renderLock(MODEL_SCALE);
-
         for (int i = 0; i < 4; i++) {
             GlStateManager.pushMatrix();
             GlStateManager.rotate(i * 90.0F, 0.0F, 0.0F, 1.0F);

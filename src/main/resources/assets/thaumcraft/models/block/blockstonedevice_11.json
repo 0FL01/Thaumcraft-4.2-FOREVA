@@ -1,0 +1,32 @@
+{
+  "ambientocclusion": false,
+  "textures": {
+    "surface": "thaumcraft:models/node_converter"
+  },
+  "elements": [
+    {
+      "from": [4, 4, 7],
+      "to": [12, 12, 9],
+      "faces": {
+        "down": { "texture": "#surface" },
+        "up": { "texture": "#surface" },
+        "north": { "texture": "#surface" },
+        "south": { "texture": "#surface" },
+        "west": { "texture": "#surface" },
+        "east": { "texture": "#surface" }
+      }
+    },
+    {
+      "from": [6.5, 3.5, 6.5],
+      "to": [9.5, 8.5, 9.5],
+      "faces": {
+        "down": { "texture": "#surface" },
+        "up": { "texture": "#surface" },
+        "north": { "texture": "#surface" },
+        "south": { "texture": "#surface" },
+        "west": { "texture": "#surface" },
+        "east": { "texture": "#surface" }
+      }
+    }
+  ]
+}
