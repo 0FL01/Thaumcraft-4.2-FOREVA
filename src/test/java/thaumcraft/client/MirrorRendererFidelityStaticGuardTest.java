@@ -32,6 +32,11 @@ public class MirrorRendererFidelityStaticGuardTest {
                         && source.contains("blocks/mirrorframe")
                         && source.contains("blocks/mirrorframe2")
                         && source.contains("transformFromOrientation("));
+
+        assertTrue("TileMirrorRenderer should keep camera-relative parallax sampling for portal layers",
+                source.contains("parallaxOffsets(")
+                        && source.contains("ActiveRenderInfo.getRotationX()")
+                        && source.contains("view.lastTickPosX + (view.posX - view.lastTickPosX) * partialTicks"));
     }
 
     private static String read(String path) throws IOException {

@@ -2,6 +2,7 @@ package thaumcraft.client.renderers.tile;
 
 import java.util.Random;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.ActiveRenderInfo;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
@@ -52,26 +53,37 @@ public class TileMirrorRenderer extends TileEntitySpecialRenderer<TileEntity> {
 
         long now = System.currentTimeMillis();
         Random random = new Random(31100L);
+        double viewX = view.lastTickPosX + (view.posX - view.lastTickPosX) * partialTicks;
+        double viewY = view.lastTickPosY + (view.posY - view.lastTickPosY) * partialTicks;
+        double viewZ = view.lastTickPosZ + (view.posZ - view.lastTickPosZ) * partialTicks;
+
         GlStateManager.pushMatrix();
+        GlStateManager.disableFog();
         GlStateManager.disableLighting();
+        GlStateManager.disableCull();
+        GlStateManager.depthMask(false);
 
         for (int i = 0; i < 16; ++i) {
             float depth = 16 - i;
-            float scale = 0.0625F;
-            float colorScale = 1.0F / (depth + 1.0F);
+            float uvScale = 0.0625F;
+            float shade = 1.0F / (depth + 1.0F);
 
             if (i == 0) {
                 bindTexture(TUNNEL);
-                colorScale = 0.1F;
                 depth = 65.0F;
-                scale = 0.125F;
+                uvScale = 0.125F;
+                shade = 0.1F;
                 GlStateManager.enableBlend();
                 GlStateManager.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
             } else if (i == 1) {
                 bindTexture(PARTICLE);
                 GlStateManager.enableBlend();
                 GlStateManager.blendFunc(GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ONE);
-                scale = 0.5F;
+                uvScale = 0.5F;
+            } else {
+                bindTexture(PARTICLE);
+                GlStateManager.enableBlend();
+                GlStateManager.blendFunc(GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ONE);
             }
 
             float r = random.nextFloat() * 0.5F + 0.1F;
@@ -80,34 +92,43 @@ public class TileMirrorRenderer extends TileEntitySpecialRenderer<TileEntity> {
             if (i == 0) {
                 r = g = b = 1.0F;
             }
+            r *= shade;
+            g *= shade;
+            b *= shade;
 
-            float scroll = ((now % 700000L) / 250000.0F) + i * 0.13F;
-            float rotation = (i * i * 4321 + i * 9) * 2.0F;
-            float u0 = scroll;
-            float v0 = scroll;
-            float u1 = scroll + scale;
-            float v1 = scroll + scale;
+            float shiftBase = ((now % 700000L) / 250000.0F) + i * 0.13F;
+            shiftBase += (i * i * 4321 + i * 9) * 2.0F * uvScale;
+            float parallaxScale = uvScale * (0.75F + depth * 0.015625F);
+            float[] parallax = parallaxOffsets(facing, viewX, viewY, viewZ, parallaxScale);
 
-            drawPortalFace(facing, x, y, z, r * colorScale, g * colorScale, b * colorScale, 1.0F, u0, v0, u1, v1);
-            GlStateManager.pushMatrix();
-            GlStateManager.translate(x + 0.5D, y + 0.5D, z + 0.5D);
-            GlStateManager.rotate(rotation, 0.0F, 0.0F, 1.0F);
-            GlStateManager.popMatrix();
+            drawPortalFace(
+                    facing, x, y, z,
+                    r, g, b, 1.0F,
+                    shiftBase + parallax[0],
+                    shiftBase + parallax[1],
+                    uvScale, uvScale);
         }
 
         GlStateManager.disableBlend();
+        GlStateManager.depthMask(true);
+        GlStateManager.enableCull();
         GlStateManager.enableLighting();
+        GlStateManager.enableFog();
         GlStateManager.popMatrix();
     }
 
     private void drawPortalFace(EnumFacing face, double x, double y, double z,
                                 float r, float g, float b, float a,
-                                float u0, float v0, float u1, float v1) {
+                                float uShift, float vShift, float uScale, float vScale) {
         float min = INSET;
         float max = 1.0F - INSET;
         float near = 0.01F;
         float far = 0.99F;
         float axisOffset = face.getAxisDirection() == EnumFacing.AxisDirection.POSITIVE ? far : near;
+        float u0 = uShift;
+        float v0 = vShift;
+        float u1 = uShift + uScale;
+        float v1 = vShift + vScale;
 
         Tessellator tess = Tessellator.getInstance();
         BufferBuilder buf = tess.getBuffer();
@@ -154,6 +175,38 @@ public class TileMirrorRenderer extends TileEntitySpecialRenderer<TileEntity> {
                 break;
         }
         tess.draw();
+    }
+
+    private static float[] parallaxOffsets(EnumFacing face, double viewX, double viewY, double viewZ, float scale) {
+        float rotX = ActiveRenderInfo.getRotationX();
+        float rotZ = ActiveRenderInfo.getRotationZ();
+        float rotYZ = ActiveRenderInfo.getRotationYZ();
+        float rotXY = ActiveRenderInfo.getRotationXY();
+        float rotXZ = ActiveRenderInfo.getRotationXZ();
+        float u;
+        float v;
+        switch (face) {
+            case UP:
+            case DOWN:
+                u = (float) (viewX * rotX + viewZ * rotYZ);
+                v = (float) (viewX * rotZ + viewZ * rotXY);
+                break;
+            case NORTH:
+            case SOUTH:
+                u = (float) (viewX * rotX + viewY * rotXZ);
+                v = (float) (viewX * rotZ + viewY * rotXY);
+                break;
+            case WEST:
+            case EAST:
+                u = (float) (viewZ * rotYZ + viewY * rotXZ);
+                v = (float) (viewZ * rotXY + viewY * rotX);
+                break;
+            default:
+                u = 0.0F;
+                v = 0.0F;
+                break;
+        }
+        return new float[]{u * scale, v * scale};
     }
 
     private void renderPane(EnumFacing facing, double x, double y, double z, ResourceLocation tex, float offset) {
