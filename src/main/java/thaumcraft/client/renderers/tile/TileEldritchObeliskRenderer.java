@@ -12,6 +12,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
 import org.lwjgl.opengl.GL11;
+import thaumcraft.client.renderers.models.ModelEldritchCap;
 import thaumcraft.common.config.Config;
 import thaumcraft.common.tiles.TileEldritchObelisk;
 
@@ -30,6 +31,7 @@ public class TileEldritchObeliskRenderer extends TileEntitySpecialRenderer<TileE
             new ResourceLocation("thaumcraft", "textures/misc/particlefield.png");
     private static final ResourceLocation FIELD_TEXTURE_FALLBACK =
             new ResourceLocation("thaumcraft", "textures/misc/particlefield32.png");
+    private static final ModelEldritchCap CAP_MODEL = new ModelEldritchCap();
 
     @Override
     public void render(TileEldritchObelisk tile, double x, double y, double z, float partialTicks, int destroyStage, float alpha) {
@@ -66,10 +68,7 @@ public class TileEldritchObeliskRenderer extends TileEntitySpecialRenderer<TileE
         renderSides(0.48F, 3.0F);
 
         bindTexture(capTexture);
-        TileRenderHelper.drawTexturedQuad(0.52F, 0xFFFFFFFF, 0.0F, 1.0F, 0.0F, 1.0F);
-        GlStateManager.translate(0.0D, 3.0D, 0.0D);
-        TileRenderHelper.drawTexturedQuad(0.52F, 0xFFFFFFFF, 0.0F, 1.0F, 0.0F, 1.0F);
-        GlStateManager.translate(0.0D, -3.0D, 0.0D);
+        renderObeliskCapPair();
 
         renderSideFields(inRange, time, outer, viewX, viewY, viewZ);
 
@@ -77,6 +76,19 @@ public class TileEldritchObeliskRenderer extends TileEntitySpecialRenderer<TileE
         GlStateManager.depthMask(true);
         GlStateManager.enableCull();
         GlStateManager.enableLighting();
+        GlStateManager.popMatrix();
+    }
+
+    private static void renderObeliskCapPair() {
+        GlStateManager.pushMatrix();
+        GlStateManager.rotate(90.0F, 1.0F, 0.0F, 0.0F);
+        CAP_MODEL.renderCap();
+        GlStateManager.popMatrix();
+
+        GlStateManager.pushMatrix();
+        GlStateManager.translate(0.0D, 3.0D, 0.0D);
+        GlStateManager.rotate(90.0F, -1.0F, 0.0F, 0.0F);
+        CAP_MODEL.renderCap();
         GlStateManager.popMatrix();
     }
 

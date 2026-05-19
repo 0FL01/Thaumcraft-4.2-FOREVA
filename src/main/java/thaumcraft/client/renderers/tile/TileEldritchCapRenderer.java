@@ -7,6 +7,7 @@ import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
+import thaumcraft.client.renderers.models.ModelEldritchCap;
 import thaumcraft.common.config.Config;
 import thaumcraft.common.config.ConfigItems;
 import thaumcraft.common.tiles.TileEldritchAltar;
@@ -18,6 +19,7 @@ public class TileEldritchCapRenderer extends TileEntitySpecialRenderer<TileEntit
             new ResourceLocation("thaumcraft", "textures/models/obelisk_cap_altar.png");
     private static final ResourceLocation CAP_TEXTURE_OUTER =
             new ResourceLocation("thaumcraft", "textures/models/obelisk_cap_2.png");
+    private static final ModelEldritchCap MODEL = new ModelEldritchCap();
     private final ResourceLocation capTexture;
 
     public TileEldritchCapRenderer() {
@@ -44,10 +46,8 @@ public class TileEldritchCapRenderer extends TileEntitySpecialRenderer<TileEntit
         GlStateManager.enableBlend();
         GlStateManager.blendFunc(770, 771);
         bindTexture(texture);
-
-        TileRenderHelper.drawTexturedQuad(0.52F, 0xFFFFFFFF, 0.0F, 1.0F, 0.0F, 1.0F);
-        GlStateManager.rotate(90.0F, 0.0F, 1.0F, 0.0F);
-        TileRenderHelper.drawTexturedQuad(0.52F, 0xFFFFFFFF, 0.0F, 1.0F, 0.0F, 1.0F);
+        GlStateManager.rotate(90.0F, -1.0F, 0.0F, 0.0F);
+        MODEL.renderCap();
 
         GlStateManager.disableBlend();
         GlStateManager.enableLighting();
