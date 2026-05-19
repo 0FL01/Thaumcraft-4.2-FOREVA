@@ -35,7 +35,9 @@ public class TileChestHungryRenderer extends TileEntitySpecialRenderer<TileChest
         GlStateManager.rotate(-yaw, 0.0F, 1.0F, 0.0F);
         GlStateManager.translate(-0.5F, -0.5F, -0.5F);
         this.model.chestLid.rotateAngleX = -(lid * ((float) Math.PI / 2.0F));
-        this.model.renderAll();
+        this.model.chestKnob.rotateAngleX = this.model.chestLid.rotateAngleX;
+        this.model.chestLid.render(0.0625F);
+        this.model.chestKnob.render(0.0625F);
         GlStateManager.disableRescaleNormal();
         GlStateManager.popMatrix();
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);

@@ -1,12 +1,20 @@
 {
-  "parent": "block/cube",
+  "ambientocclusion": false,
   "textures": {
-    "particle": "thaumcraft:blocks/woodplain",
-    "down": "thaumcraft:blocks/woodplain",
-    "up": "thaumcraft:blocks/woodplain",
-    "north": "thaumcraft:blocks/woodplain",
-    "south": "thaumcraft:blocks/woodplain",
-    "west": "thaumcraft:blocks/woodplain",
-    "east": "thaumcraft:blocks/woodplain"
-  }
+    "shell": "thaumcraft:models/chesthungry"
+  },
+  "elements": [
+    {
+      "from": [1, 0, 1],
+      "to": [15, 10, 15],
+      "faces": {
+        "down": { "texture": "#shell", "uv": [28, 19, 42, 33] },
+        "up": { "texture": "#shell", "uv": [14, 19, 28, 33] },
+        "north": { "texture": "#shell", "uv": [14, 33, 28, 43] },
+        "south": { "texture": "#shell", "uv": [42, 33, 56, 43] },
+        "west": { "texture": "#shell", "uv": [0, 33, 14, 43] },
+        "east": { "texture": "#shell", "uv": [28, 33, 42, 43] }
+      }
+    }
+  ]
 }
