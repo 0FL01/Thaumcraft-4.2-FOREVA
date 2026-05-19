@@ -13,7 +13,6 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumBlockRenderType;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
-import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
@@ -133,7 +132,11 @@ implements IInfusionStabiliser {
                 float r = (color >> 16 & 255) / 255.0f;
                 float g = (color >> 8 & 255) / 255.0f;
                 float b = (color & 255) / 255.0f;
-                worldIn.spawnParticle(EnumParticleTypes.SPELL_MOB, x, y, z, r, g, b);
+                Thaumcraft.proxy.drawGenericParticles(worldIn,
+                        x, y, z,
+                        0.0D, 0.004D, 0.0D,
+                        r, g, b, 0.75F,
+                        false, 128, 8, -1, 8, 0, 0.45F, 1);
             }
         }
     }

@@ -28,7 +28,8 @@ public class ItemElementalSwordStaticGuardTest {
         assertTrue("ItemElementalSword must keep wind and smoke feedback contracts",
                 source.contains("TCSounds.WIND")
                         && source.contains("Thaumcraft.proxy.smokeSpiral(")
-                        && source.contains("EnumParticleTypes.SMOKE_NORMAL"));
+                        && source.contains("Thaumcraft.proxy.drawGenericParticles(player.world")
+                        && source.contains("false, 0, 8, -1, 8, 0, 0.8F, 1"));
         assertTrue("ItemElementalSword must keep chain-hit sweep contract",
                 source.contains("entity.getEntityBoundingBox().grow(1.2D, 1.1D, 1.2D)")
                         && source.contains("player.attackTargetEntityWithCurrentItem(candidate);")

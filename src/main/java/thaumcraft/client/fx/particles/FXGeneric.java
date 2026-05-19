@@ -40,13 +40,18 @@ public class FXGeneric extends Particle {
         if (!this.isAlive()) {
             return;
         }
+        int step = Math.max(1, Math.abs(this.particleInc));
+        int frame;
         if (this.loop) {
-            this.setParticleTextureIndex(this.startParticle + this.particleAge / this.particleInc % this.numParticles);
+            frame = this.particleAge / step % this.numParticles;
         } else {
             float fs = this.particleMaxAge <= 0 ? 1.0F : (float) this.particleAge / (float) this.particleMaxAge;
-            int frame = (int) (this.startParticle + Math.min(this.numParticles * fs, (float) (this.numParticles - 1)));
-            this.setParticleTextureIndex(frame);
+            frame = (int) Math.min(this.numParticles * fs, (float) (this.numParticles - 1));
         }
+        if (this.particleInc < 0) {
+            frame = this.numParticles - 1 - frame;
+        }
+        this.setParticleTextureIndex(this.startParticle + frame);
     }
 
     public void setLoop(boolean loop) {
@@ -65,7 +70,7 @@ public class FXGeneric extends Particle {
     public void setParticles(int startParticle, int numParticles, int particleInc) {
         this.startParticle = startParticle;
         this.numParticles = Math.max(1, numParticles);
-        this.particleInc = Math.max(1, particleInc);
+        this.particleInc = particleInc == 0 ? 1 : particleInc;
         this.setParticleTextureIndex(startParticle);
     }
 

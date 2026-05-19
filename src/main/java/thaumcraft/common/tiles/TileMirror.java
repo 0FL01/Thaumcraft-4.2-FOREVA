@@ -8,7 +8,6 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.ITickable;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
@@ -259,8 +258,14 @@ public class TileMirror extends TileThaumcraft implements ITickable, IInventory 
                     double xx = this.pos.getX() + 0.33D + this.world.rand.nextFloat() * 0.33F - face.getXOffset() / 2.0D;
                     double yy = this.pos.getY() + 0.33D + this.world.rand.nextFloat() * 0.33F - face.getYOffset() / 2.0D;
                     double zz = this.pos.getZ() + 0.33D + this.world.rand.nextFloat() * 0.33F - face.getZOffset() / 2.0D;
-                    this.world.spawnParticle(EnumParticleTypes.SPELL_MOB, xx, yy, zz,
-                            face.getXOffset() * 0.05D, face.getYOffset() * 0.05D, face.getZOffset() * 0.05D);
+                    Thaumcraft.proxy.drawGenericParticles(this.world,
+                            xx, yy, zz,
+                            0.0D, 0.004D, 0.0D,
+                            0.15F + Math.abs(face.getXOffset()) * 0.35F,
+                            0.15F + Math.abs(face.getYOffset()) * 0.35F,
+                            0.15F + Math.abs(face.getZOffset()) * 0.35F,
+                            0.75F,
+                            false, 128, 8, -1, 8, 0, 0.5F, 1);
                 }
             }
             return true;

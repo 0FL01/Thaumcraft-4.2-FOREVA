@@ -59,13 +59,15 @@ public class EntityDart extends net.minecraft.entity.projectile.EntityArrow impl
         if (this.first && this.world.isRemote) {
             this.first = false;
             for (int i = 0; i < 5; ++i) {
-                this.world.spawnParticle(net.minecraft.util.EnumParticleTypes.SMOKE_NORMAL,
+                thaumcraft.common.Thaumcraft.proxy.drawGenericParticles(this.world,
                         this.posX - this.motionX / 1.5D,
                         this.posY - this.motionY / 1.5D,
                         this.posZ - this.motionZ / 1.5D,
                         this.motionX / 9.0D + this.rand.nextGaussian() * 0.01D,
                         this.motionY / 9.0D + this.rand.nextGaussian() * 0.01D,
-                        this.motionZ / 9.0D + this.rand.nextGaussian() * 0.01D);
+                        this.motionZ / 9.0D + this.rand.nextGaussian() * 0.01D,
+                        0.25F, 0.25F, 0.25F, 0.75F,
+                        false, 0, 8, -1, 8, 0, 0.65F, 1);
             }
         }
         super.onUpdate();

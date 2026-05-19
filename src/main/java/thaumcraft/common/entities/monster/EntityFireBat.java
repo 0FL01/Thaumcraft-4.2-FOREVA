@@ -15,7 +15,6 @@ import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.EntityDataManager;
 import net.minecraft.potion.PotionEffect;
 import net.minecraft.util.DamageSource;
-import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.SoundEvent;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
@@ -214,16 +213,22 @@ public class EntityFireBat extends EntityMob {
         }
 
         if (this.world.isRemote && !this.getIsVampire()) {
-            this.world.spawnParticle(EnumParticleTypes.SMOKE_NORMAL,
+            Thaumcraft.proxy.drawGenericParticles(
+                this.world,
                 this.lastTickPosX + (double)((this.rand.nextFloat() - this.rand.nextFloat()) * 0.2f),
                 this.lastTickPosY + (double)(this.height / 2.0f) + (double)((this.rand.nextFloat() - this.rand.nextFloat()) * 0.2f),
                 this.lastTickPosZ + (double)((this.rand.nextFloat() - this.rand.nextFloat()) * 0.2f),
-                0.0, 0.0, 0.0);
-            this.world.spawnParticle(EnumParticleTypes.FLAME,
+                0.0, 0.0, 0.0,
+                0.25F, 0.25F, 0.25F, 0.65F,
+                false, 0, 8, -1, 8, 0, 0.5F, 1);
+            Thaumcraft.proxy.drawGenericParticles(
+                this.world,
                 this.lastTickPosX + (double)((this.rand.nextFloat() - this.rand.nextFloat()) * 0.2f),
                 this.lastTickPosY + (double)(this.height / 2.0f) + (double)((this.rand.nextFloat() - this.rand.nextFloat()) * 0.2f),
                 this.lastTickPosZ + (double)((this.rand.nextFloat() - this.rand.nextFloat()) * 0.2f),
-                0.0, 0.0, 0.0);
+                0.0, 0.0, 0.0,
+                1.0F, 1.0F, 1.0F, 0.85F,
+                false, 48, 1, 1, 12, 0, 0.35F, 1);
         }
 
         // Explosive timeout

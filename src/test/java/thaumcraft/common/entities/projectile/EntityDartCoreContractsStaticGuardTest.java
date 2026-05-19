@@ -29,7 +29,8 @@ public class EntityDartCoreContractsStaticGuardTest {
                         && source.contains("this.shoot(dx, dy + (double) lead, dz, velocity, inaccuracy);"));
         assertTrue("EntityDart must keep one-shot client smoke burst on first update tick",
                 source.contains("if (this.first && this.world.isRemote)")
-                        && source.contains("net.minecraft.util.EnumParticleTypes.SMOKE_NORMAL")
+                        && source.contains("Thaumcraft.proxy.drawGenericParticles(this.world")
+                        && source.contains("false, 0, 8, -1, 8, 0, 0.65F, 1")
                         && source.contains("this.first = false;"));
     }
 

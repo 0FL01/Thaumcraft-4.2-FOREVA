@@ -1208,11 +1208,22 @@ public class ClientProxy extends CommonProxy {
                                      double mx, double my, double mz,
                                      float red, float green, float blue, float alpha,
                                      boolean loop, int start, int num, int inc, int age, int delay, float scale) {
-        if (world == null || !world.isRemote) return;
-        int amount = particleCount(Math.max(1, num / Math.max(1, inc)));
-        if (amount <= 0) return;
+        int step = Math.max(1, Math.abs(inc));
+        int amount = particleCount(Math.max(1, num / step));
+        drawGenericParticles(world, x, y, z, mx, my, mz, red, green, blue, alpha,
+                loop, start, num, inc, age, delay, scale, amount);
+    }
 
-        for (int i = 0; i < amount; i++) {
+    @Override
+    public void drawGenericParticles(World world, double x, double y, double z,
+                                     double mx, double my, double mz,
+                                     float red, float green, float blue, float alpha,
+                                     boolean loop, int start, int num, int inc, int age, int delay, float scale,
+                                     int count) {
+        if (world == null || !world.isRemote) return;
+        if (count <= 0) return;
+
+        for (int i = 0; i < count; i++) {
             ParticleEngine.addEffect(world, new FXGeneric(
                     world,
                     x + (world.rand.nextFloat() - 0.5f) * 0.15f,
