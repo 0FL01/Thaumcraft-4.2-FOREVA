@@ -14,11 +14,11 @@ import net.minecraft.init.SoundEvents;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.DamageSource;
-import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.SoundEvent;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.EnumDifficulty;
+import thaumcraft.common.Thaumcraft;
 import thaumcraft.common.config.ConfigItems;
 import thaumcraft.common.lib.TCSounds;
 
@@ -72,13 +72,15 @@ public class EntityInhabitedZombie extends net.minecraft.entity.monster.EntityZo
             }
         }
         for (int i = 0; i < 20; ++i) {
-            this.world.spawnParticle(EnumParticleTypes.EXPLOSION_NORMAL,
+            Thaumcraft.proxy.drawGenericParticles(this.world,
                     this.posX + (double) (this.rand.nextFloat() * this.width * 2.0F) - (double) this.width,
                     this.posY + (double) (this.rand.nextFloat() * this.height),
                     this.posZ + (double) (this.rand.nextFloat() * this.width * 2.0F) - (double) this.width,
                     this.rand.nextGaussian() * 0.02D,
                     this.rand.nextGaussian() * 0.02D,
-                    this.rand.nextGaussian() * 0.02D);
+                    this.rand.nextGaussian() * 0.02D,
+                    0.8F, 0.8F, 0.8F, 0.8F,
+                    false, 0, 8, -1, 18, 0, 0.65F, 1);
         }
         this.setDead();
     }

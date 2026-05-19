@@ -24,7 +24,6 @@ import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.AxisAlignedBB;
-import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.world.World;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.init.SoundEvents;
@@ -351,13 +350,17 @@ public class BlockWoodenDevice extends BlockContainer {
                         break;
                 }
             }
-            worldIn.spawnParticle(EnumParticleTypes.NOTE,
+            float note = (float) param / 24.0F;
+            float red = MathHelper.sin((note + 0.0F) * ((float) Math.PI * 2F)) * 0.65F + 0.35F;
+            float green = MathHelper.sin((note + 0.33333334F) * ((float) Math.PI * 2F)) * 0.65F + 0.35F;
+            float blue = MathHelper.sin((note + 0.6666667F) * ((float) Math.PI * 2F)) * 0.65F + 0.35F;
+            Thaumcraft.proxy.drawGenericParticles(worldIn,
                     pos.getX() + 0.5D,
                     pos.getY() + 1.2D,
                     pos.getZ() + 0.5D,
-                    (double) param / 24.0D,
-                    0.0D,
-                    0.0D);
+                    0.0D, 0.2D, 0.0D,
+                    red, green, blue, 0.9F,
+                    false, 64, 1, 1, 6, 0, 0.75F, 1);
             return true;
         }
         return super.eventReceived(state, worldIn, pos, id, param);

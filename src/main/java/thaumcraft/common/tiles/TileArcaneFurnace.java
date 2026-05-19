@@ -8,13 +8,13 @@ import net.minecraft.item.crafting.FurnaceRecipes;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.ITickable;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraftforge.common.util.Constants;
 import thaumcraft.api.ThaumcraftApi;
+import thaumcraft.common.Thaumcraft;
 import thaumcraft.api.TileThaumcraft;
 import thaumcraft.api.aspects.Aspect;
 import thaumcraft.api.visnet.VisNetHandler;
@@ -220,11 +220,13 @@ public class TileArcaneFurnace extends TileThaumcraft implements ITickable {
         if (this.world != null) {
             this.world.playSound(null, this.pos, SoundEvents.BLOCK_FIRE_EXTINGUISH, SoundCategory.BLOCKS, 0.3F,
                     2.6F + (this.world.rand.nextFloat() - this.world.rand.nextFloat()) * 0.8F);
-            this.world.spawnParticle(EnumParticleTypes.LAVA,
+            Thaumcraft.proxy.drawGenericParticles(this.world,
                     this.pos.getX() + this.world.rand.nextFloat(),
                     this.pos.getY() + 1.0D,
                     this.pos.getZ() + this.world.rand.nextFloat(),
-                    0.0D, 0.0D, 0.0D);
+                    0.0D, 0.08D, 0.0D,
+                    1.0F, 1.0F, 1.0F, 0.95F,
+                    false, 49, 1, 1, 12, 0, 0.5F, 1);
         }
     }
 
@@ -316,11 +318,13 @@ public class TileArcaneFurnace extends TileThaumcraft implements ITickable {
         if (id == 3) {
             if (this.world != null && this.world.isRemote && this.pos != null) {
                 for (int i = 0; i < 5; ++i) {
-                    this.world.spawnParticle(EnumParticleTypes.LAVA,
+                    Thaumcraft.proxy.drawGenericParticles(this.world,
                             this.pos.getX() + 0.5D + (this.world.rand.nextFloat() - 0.5F) * 0.4F,
                             this.pos.getY() + 0.5D + this.world.rand.nextFloat() * 0.2F,
                             this.pos.getZ() + 0.5D + (this.world.rand.nextFloat() - 0.5F) * 0.4F,
-                            this.facingX * 0.02D, 0.02D, this.facingZ * 0.02D);
+                            this.facingX * 0.02D, 0.02D, this.facingZ * 0.02D,
+                            1.0F, 1.0F, 1.0F, 0.95F,
+                            false, 49, 1, 1, 12, 0, 0.5F, 1);
                     this.world.playSound(this.pos.getX() + 0.5D, this.pos.getY() + 0.5D, this.pos.getZ() + 0.5D,
                             SoundEvents.BLOCK_LAVA_POP, SoundCategory.BLOCKS,
                             0.1F + this.world.rand.nextFloat() * 0.1F,

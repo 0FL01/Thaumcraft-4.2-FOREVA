@@ -331,7 +331,11 @@ extends BlockContainer {
             double xx = pos.getX() + 0.3 + rand.nextFloat() * 0.4;
             double yy = pos.getY() + 0.9;
             double zz = pos.getZ() + 0.3 + rand.nextFloat() * 0.4;
-            worldIn.spawnParticle(net.minecraft.util.EnumParticleTypes.SPELL_MOB, xx, yy, zz, 0.0, 0.0, 0.0);
+            Thaumcraft.proxy.drawGenericParticles(worldIn,
+                    xx, yy, zz,
+                    0.0D, 0.004D, 0.0D,
+                    0.85F, 0.15F, 0.95F, 0.8F,
+                    false, 128, 8, -1, 8, 0, 0.45F, 1);
         }
     }
 

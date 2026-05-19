@@ -95,8 +95,16 @@ public class BlockCandle extends Block implements IInfusionStabiliser {
         double x = pos.getX() + 0.5D;
         double y = pos.getY() + 0.7D;
         double z = pos.getZ() + 0.5D;
-        worldIn.spawnParticle(net.minecraft.util.EnumParticleTypes.SMOKE_NORMAL, x, y, z, 0.0D, 0.0D, 0.0D);
-        worldIn.spawnParticle(net.minecraft.util.EnumParticleTypes.FLAME, x, y, z, 0.0D, 0.0D, 0.0D);
+        Thaumcraft.proxy.drawGenericParticles(worldIn,
+                x, y, z,
+                0.0D, 0.0D, 0.0D,
+                0.25F, 0.25F, 0.25F, 0.7F,
+                false, 0, 8, -1, 8, 0, 0.45F, 1);
+        Thaumcraft.proxy.drawGenericParticles(worldIn,
+                x, y, z,
+                0.0D, 0.0D, 0.0D,
+                1.0F, 1.0F, 1.0F, 0.9F,
+                false, 48, 1, 1, 12, 0, 0.3F, 1);
     }
 
     @Override

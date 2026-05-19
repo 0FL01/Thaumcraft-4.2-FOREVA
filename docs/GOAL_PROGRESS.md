@@ -29,6 +29,7 @@ Branch: `codex/durable-goal-stage8-9`
 - Latest Stage 8-c burst added dynamic brainbox/sensor/lifter renderer coverage plus reference-shaped brainbox/sensor model geometry, with `validate` and `validate --smoke` passing afterward.
 - Latest Stage 8-c burst restored dynamic tube conduit coverage for `TileTube/Valve/Filter/Buffer/Restrict/Oneway` and replaced the remaining `cube_all` tube placeholders with reference-shaped core models, with `validate` and `validate --smoke` passing afterward.
 - Latest Stage 8-e burst migrated client-only smoke/flame/spell fallback emissions in `ItemElementalSword`, `BlockCrystal`, `TileMirror`, `EntityDart`, and `EntityFireBat` onto dedicated generic sheet FX routing, with `validate` and `validate --smoke` passing afterward.
+- Latest Stage 8-e burst migrated ambient candle/jar/sensor/arcane-furnace/explosion particle fallbacks onto the same dedicated generic sheet FX routing, with `validate` and `validate --smoke` passing afterward.
 - Stage 3-7 residual blockers stay documented and non-blocking for current burst planning.
 - GUI/manual parity checks remain skipped by instruction.
 

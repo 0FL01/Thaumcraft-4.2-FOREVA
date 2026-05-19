@@ -58,7 +58,8 @@ public class BlockWoodenDeviceSensorStaticGuardTest {
         assertTrue(source.contains("SoundEvents.BLOCK_NOTE_SNARE"));
         assertTrue(source.contains("SoundEvents.BLOCK_NOTE_HAT"));
         assertTrue(source.contains("SoundEvents.BLOCK_NOTE_BASS"));
-        assertTrue(source.contains("EnumParticleTypes.NOTE"));
+        assertTrue(source.contains("Thaumcraft.proxy.drawGenericParticles(worldIn"));
+        assertTrue(source.contains("false, 64, 1, 1, 6, 0, 0.75F, 1"));
     }
 
     private static String readFile(String path) throws IOException {

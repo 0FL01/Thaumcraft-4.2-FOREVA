@@ -18,9 +18,14 @@ public class ClientSheetParticleBurstContractTest {
         String genericFx = read("src/main/java/thaumcraft/client/fx/particles/FXGeneric.java");
         String elementalSword = read("src/main/java/thaumcraft/common/items/equipment/ItemElementalSword.java");
         String blockCrystal = read("src/main/java/thaumcraft/common/blocks/BlockCrystal.java");
+        String blockCandle = read("src/main/java/thaumcraft/common/blocks/BlockCandle.java");
+        String blockJar = read("src/main/java/thaumcraft/common/blocks/BlockJar.java");
+        String blockWoodenDevice = read("src/main/java/thaumcraft/common/blocks/BlockWoodenDevice.java");
         String tileMirror = read("src/main/java/thaumcraft/common/tiles/TileMirror.java");
+        String tileArcaneFurnace = read("src/main/java/thaumcraft/common/tiles/TileArcaneFurnace.java");
         String entityDart = read("src/main/java/thaumcraft/common/entities/projectile/EntityDart.java");
         String fireBat = read("src/main/java/thaumcraft/common/entities/monster/EntityFireBat.java");
+        String inhabitedZombie = read("src/main/java/thaumcraft/common/entities/monster/EntityInhabitedZombie.java");
 
         assertTrue("CommonProxy and ClientProxy must expose the explicit-count generic sheet particle overload",
                 commonProxy.contains("float red, float green, float blue, float alpha,")
@@ -31,18 +36,29 @@ public class ClientSheetParticleBurstContractTest {
                 genericFx.contains("Math.abs(this.particleInc)")
                         && genericFx.contains("if (this.particleInc < 0)")
                         && genericFx.contains("this.numParticles - 1 - frame"));
-        assertTrue("Elemental Sword, BlockCrystal, TileMirror, Dart, and FireBat must route their client-only fallback particles through proxy generic sheet FX",
+        assertTrue("Elemental Sword, Crystal, Candle, Jar, WoodenDevice sensor, Mirror, ArcaneFurnace, Dart, FireBat, and InhabitedZombie must route their client-only fallback particles through proxy generic sheet FX",
                 elementalSword.contains("Thaumcraft.proxy.drawGenericParticles(player.world")
                         && !elementalSword.contains("EnumParticleTypes.SMOKE_NORMAL")
                         && blockCrystal.contains("Thaumcraft.proxy.drawGenericParticles(worldIn")
                         && !blockCrystal.contains("EnumParticleTypes.SPELL_MOB")
+                        && blockCandle.contains("Thaumcraft.proxy.drawGenericParticles(worldIn")
+                        && !blockCandle.contains("EnumParticleTypes.SMOKE_NORMAL")
+                        && !blockCandle.contains("EnumParticleTypes.FLAME")
+                        && blockJar.contains("Thaumcraft.proxy.drawGenericParticles(worldIn")
+                        && !blockJar.contains("EnumParticleTypes.SPELL_MOB")
+                        && blockWoodenDevice.contains("Thaumcraft.proxy.drawGenericParticles(worldIn")
+                        && !blockWoodenDevice.contains("EnumParticleTypes.NOTE")
                         && tileMirror.contains("Thaumcraft.proxy.drawGenericParticles(this.world")
                         && !tileMirror.contains("EnumParticleTypes.SPELL_MOB")
+                        && tileArcaneFurnace.contains("Thaumcraft.proxy.drawGenericParticles(this.world")
+                        && !tileArcaneFurnace.contains("EnumParticleTypes.LAVA")
                         && entityDart.contains("Thaumcraft.proxy.drawGenericParticles(this.world")
                         && !entityDart.contains("EnumParticleTypes.SMOKE_NORMAL")
                         && fireBat.contains("Thaumcraft.proxy.drawGenericParticles(")
                         && !fireBat.contains("EnumParticleTypes.SMOKE_NORMAL")
-                        && !fireBat.contains("EnumParticleTypes.FLAME"));
+                        && !fireBat.contains("EnumParticleTypes.FLAME")
+                        && inhabitedZombie.contains("Thaumcraft.proxy.drawGenericParticles(this.world")
+                        && !inhabitedZombie.contains("EnumParticleTypes.EXPLOSION_NORMAL"));
     }
 
     private static String read(String path) throws IOException {
