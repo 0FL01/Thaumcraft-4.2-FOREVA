@@ -217,8 +217,10 @@ public class ClientProxyFxStaticGuardTest {
         assertTrue("Dedicated FXBreaking particle must keep item-crack + tint baseline",
                 breakingFx.contains("class FXBreaking extends Particle")
                         && breakingFx.contains("setParticleMaxAge(int particleMaxAge)")
-                        && breakingFx.contains("EnumParticleTypes.ITEM_CRACK")
-                        && breakingFx.contains("EnumParticleTypes.REDSTONE"));
+                        && breakingFx.contains("TextureMap.LOCATION_BLOCKS_TEXTURE")
+                        && breakingFx.contains("this.textureJitterX = this.rand.nextInt(4)")
+                        && !breakingFx.contains("EnumParticleTypes.ITEM_CRACK")
+                        && !breakingFx.contains("EnumParticleTypes.REDSTONE"));
         assertTrue("Dedicated FXBurst particle must keep burst emission baseline",
                 burstFx.contains("class FXBurst extends Particle")
                         && burstFx.contains("TileNodeRenderer.NODES_TEXTURE")
@@ -269,8 +271,10 @@ public class ClientProxyFxStaticGuardTest {
                 swarmFx.contains("class FXSwarm extends Particle")
                         && swarmFx.contains("private final Entity target;")
                         && swarmFx.contains("steerTowardsTarget()")
-                        && swarmFx.contains("EnumParticleTypes.REDSTONE")
-                        && swarmFx.contains("EnumParticleTypes.CRIT_MAGIC"));
+                        && swarmFx.contains("pushOutOfBlocks(this.posX, this.posY, this.posZ);")
+                        && swarmFx.contains("TCSounds.FLY")
+                        && !swarmFx.contains("EnumParticleTypes.REDSTONE")
+                        && !swarmFx.contains("EnumParticleTypes.CRIT_MAGIC"));
         assertTrue("Dedicated FXVent particle must keep vent trail emission baseline",
                 ventFx.contains("class FXVent extends Particle")
                         && ventFx.contains("setHeading(double x, double y, double z, float speed, float spread)")

@@ -1,24 +1,40 @@
 package thaumcraft.client.fx.particles;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.particle.Particle;
 import net.minecraft.client.renderer.BufferBuilder;
+import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.util.EnumParticleTypes;
+import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.SoundCategory;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import org.lwjgl.opengl.GL11;
+import thaumcraft.common.config.ConfigBlocks;
+import thaumcraft.common.lib.TCSounds;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @SideOnly(Side.CLIENT)
 public class FXSwarm extends Particle {
+    private static final ResourceLocation PARTICLE_TEXTURE = new ResourceLocation("textures/particle/particles.png");
     private static final float MAX_SPEED = 0.35F;
+    private static final int LIGHTMAP_FULLBRIGHT = 0x00F000F0;
+    private static final List<Long> buzzcount = new ArrayList<>();
 
     private final Entity target;
     private float turnSpeed = 10.0F;
     private float speed = 0.2F;
     private int deathTimer = 0;
     private float pitch = 0.0F;
+    public int particle = 40;
 
     public FXSwarm(World world, double x, double y, double z, Entity target, float red, float green, float blue) {
         super(world, x, y, z, 0.0D, 0.0D, 0.0D);
@@ -35,6 +51,13 @@ public class FXSwarm extends Particle {
         this.motionX = (this.rand.nextFloat() - this.rand.nextFloat()) * spread;
         this.motionY = (this.rand.nextFloat() - this.rand.nextFloat()) * spread;
         this.motionZ = (this.rand.nextFloat() - this.rand.nextFloat()) * spread;
+
+        Minecraft mc = Minecraft.getMinecraft();
+        EntityLivingBase player = mc.player;
+        int visibleDistance = mc.gameSettings.fancyGraphics ? 64 : 32;
+        if (player != null && player.getDistance(this.posX, this.posY, this.posZ) > visibleDistance) {
+            this.particleMaxAge = 0;
+        }
     }
 
     public FXSwarm(World world,
@@ -80,21 +103,22 @@ public class FXSwarm extends Particle {
             steerTowardsTarget();
         }
 
+        pushOutOfBlocks(this.posX, this.posY, this.posZ);
         this.move(this.motionX, this.motionY, this.motionZ);
         this.motionX *= 0.985D;
         this.motionY *= 0.985D;
         this.motionZ *= 0.985D;
 
-        float fade = 1.0F - (this.deathTimer / 50.0F);
-        this.world.spawnParticle(
-                EnumParticleTypes.REDSTONE,
-                this.posX, this.posY, this.posZ,
-                this.particleRed * fade, this.particleGreen * fade, this.particleBlue * fade);
-        if (this.rand.nextInt(3) == 0) {
-            this.world.spawnParticle(
-                    EnumParticleTypes.CRIT_MAGIC,
-                    this.posX, this.posY, this.posZ,
-                    this.motionX * 0.06D, this.motionY * 0.06D, this.motionZ * 0.06D);
+        if (this.world.rand.nextInt(50) == 0) {
+            EntityLivingBase player = Minecraft.getMinecraft().player;
+            if (player != null && player.getDistance(this.posX, this.posY, this.posZ) < 8.0D && buzzcount.size() < 3) {
+                this.world.playSound(this.posX, this.posY, this.posZ, TCSounds.FLY, SoundCategory.AMBIENT,
+                        0.03F, 0.5F + this.rand.nextFloat() * 0.4F, false);
+                buzzcount.add(System.nanoTime() + 1_500_000L);
+            }
+        }
+        if (buzzcount.size() >= 3 && buzzcount.get(0) < System.nanoTime()) {
+            buzzcount.remove(0);
         }
     }
 
@@ -157,9 +181,141 @@ public class FXSwarm extends Particle {
     }
 
     @Override
-    public void renderParticle(BufferBuilder buffer, Entity entityIn, float partialTicks,
+    public void renderParticle(BufferBuilder ignored, Entity entityIn, float partialTicks,
                                float rotationX, float rotationZ, float rotationYZ,
                                float rotationXY, float rotationXZ) {
-        // Emission-style particle: visuals are spawned in onUpdate.
+        Tessellator tessellator = Tessellator.getInstance();
+        BufferBuilder buffer = tessellator.getBuffer();
+        tessellator.draw();
+
+        float bob = MathHelper.sin(this.particleAge / 3.0F) * 0.25F + 1.0F;
+        int frame = 7 + this.particleAge % 8;
+        float u0 = frame / 16.0F;
+        float u1 = u0 + 0.0624375F;
+        float v0 = 0.25F;
+        float v1 = v0 + 0.0624375F;
+        float size = 0.1F * this.particleScale * bob;
+        float px = (float) (this.prevPosX + (this.posX - this.prevPosX) * partialTicks - Particle.interpPosX);
+        float py = (float) (this.prevPosY + (this.posY - this.prevPosY) * partialTicks - Particle.interpPosY);
+        float pz = (float) (this.prevPosZ + (this.posZ - this.prevPosZ) * partialTicks - Particle.interpPosZ);
+        float alpha = (50.0F - this.deathTimer) / 50.0F;
+        float red = this.particleRed;
+        float green = this.particleGreen;
+        float blue = this.particleBlue;
+        if (this.target instanceof EntityLivingBase && ((EntityLivingBase) this.target).hurtTime > 0) {
+            green *= 0.5F;
+            blue *= 0.5F;
+        }
+
+        Minecraft.getMinecraft().renderEngine.bindTexture(PARTICLE_TEXTURE);
+        GlStateManager.enableBlend();
+        GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+        buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.PARTICLE_POSITION_TEX_COLOR_LMAP);
+        addLitVertex(buffer, px - rotationX * size - rotationXY * size, py - rotationZ * size, pz - rotationYZ * size - rotationXZ * size, u1, v1, red, green, blue, alpha);
+        addLitVertex(buffer, px - rotationX * size + rotationXY * size, py + rotationZ * size, pz - rotationYZ * size + rotationXZ * size, u1, v0, red, green, blue, alpha);
+        addLitVertex(buffer, px + rotationX * size + rotationXY * size, py + rotationZ * size, pz + rotationYZ * size + rotationXZ * size, u0, v0, red, green, blue, alpha);
+        addLitVertex(buffer, px + rotationX * size - rotationXY * size, py - rotationZ * size, pz + rotationYZ * size - rotationXZ * size, u0, v1, red, green, blue, alpha);
+        tessellator.draw();
+
+        buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.PARTICLE_POSITION_TEX_COLOR_LMAP);
+    }
+
+    @Override
+    public int getFXLayer() {
+        return 3;
+    }
+
+    protected boolean pushOutOfBlocks(double x, double y, double z) {
+        BlockPos pos = new BlockPos(x, y, z);
+        double localX = x - pos.getX();
+        double localY = y - pos.getY();
+        double localZ = z - pos.getZ();
+        if (this.world.getBlockState(pos).getBlock() == ConfigBlocks.blockTaintFibres
+                || this.world.isAirBlock(pos)
+                || this.world.collidesWithAnyBlock(this.getBoundingBox())) {
+            return false;
+        }
+
+        boolean westOpen = isOpenBlockSpace(pos.west());
+        boolean eastOpen = isOpenBlockSpace(pos.east());
+        boolean downOpen = isOpenBlockSpace(pos.down());
+        boolean upOpen = isOpenBlockSpace(pos.up());
+        boolean northOpen = isOpenBlockSpace(pos.north());
+        boolean southOpen = isOpenBlockSpace(pos.south());
+
+        int face = -1;
+        double best = 9999.0D;
+        if (westOpen && localX < best) {
+            best = localX;
+            face = 0;
+        }
+        if (eastOpen && 1.0D - localX < best) {
+            best = 1.0D - localX;
+            face = 1;
+        }
+        if (downOpen && localY < best) {
+            best = localY;
+            face = 2;
+        }
+        if (upOpen && 1.0D - localY < best) {
+            best = 1.0D - localY;
+            face = 3;
+        }
+        if (northOpen && localZ < best) {
+            best = localZ;
+            face = 4;
+        }
+        if (southOpen && 1.0D - localZ < best) {
+            face = 5;
+        }
+
+        float speed = this.rand.nextFloat() * 0.05F + 0.025F;
+        float jitter = (this.rand.nextFloat() - this.rand.nextFloat()) * 0.1F;
+        if (face == 0) {
+            this.motionX = -speed;
+            this.motionY = jitter;
+            this.motionZ = jitter;
+        } else if (face == 1) {
+            this.motionX = speed;
+            this.motionY = jitter;
+            this.motionZ = jitter;
+        } else if (face == 2) {
+            this.motionY = -speed;
+            this.motionX = jitter;
+            this.motionZ = jitter;
+        } else if (face == 3) {
+            this.motionY = speed;
+            this.motionX = jitter;
+            this.motionZ = jitter;
+        } else if (face == 4) {
+            this.motionZ = -speed;
+            this.motionX = jitter;
+            this.motionY = jitter;
+        } else if (face == 5) {
+            this.motionZ = speed;
+            this.motionX = jitter;
+            this.motionY = jitter;
+        }
+        return true;
+    }
+
+    private boolean isOpenBlockSpace(BlockPos pos) {
+        return this.world.isAirBlock(pos) || !this.world.getBlockState(pos).getMaterial().blocksMovement();
+    }
+
+    @Override
+    public int getBrightnessForRender(float partialTicks) {
+        return LIGHTMAP_FULLBRIGHT;
+    }
+
+    private void addLitVertex(BufferBuilder buffer, double x, double y, double z, double u, double v,
+                              float red, float green, float blue, float alpha) {
+        int lightU = LIGHTMAP_FULLBRIGHT & 0xFFFF;
+        int lightV = LIGHTMAP_FULLBRIGHT >> 16 & 0xFFFF;
+        buffer.pos(x, y, z)
+                .tex(u, v)
+                .color(red, green, blue, alpha)
+                .lightmap(lightU, lightV)
+                .endVertex();
     }
 }

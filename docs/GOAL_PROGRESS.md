@@ -22,6 +22,7 @@ Branch: `codex/durable-goal-stage8-9`
 
 - Live checkpoint prose moved into `docs/GOAL_PROGRESS-archive/` batch files.
 - Recent validated work remains concentrated in Stage 8-c/8-d/8-e renderer, entity, and FX bursts plus Stage 9 recipe/content/research bursts.
+- Latest Stage 8-e burst converted `FXBreaking` and `FXSwarm` from `spawnParticle(...)` fallbacks to dedicated render paths, with `validate` and `validate --smoke` passing afterward.
 - Stage 3-7 residual blockers stay documented and non-blocking for current burst planning.
 - GUI/manual parity checks remain skipped by instruction.
 
