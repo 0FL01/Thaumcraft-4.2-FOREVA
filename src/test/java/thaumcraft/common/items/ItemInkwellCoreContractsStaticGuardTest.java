@@ -19,10 +19,11 @@ public class ItemInkwellCoreContractsStaticGuardTest {
                 source.contains("if (world.isRemote) return EnumActionResult.PASS;"));
         assertTrue("ItemInkwell must keep server SUCCESS terminal result for completed research-table conversion",
                 source.contains("return EnumActionResult.SUCCESS;"));
-        assertTrue("ItemInkwell must keep reference-shaped paired-table conversion and inkwell slot fill",
-                source.contains("world.setBlockState(pos, ConfigBlocks.blockTable.getDefaultState().withProperty(BlockTable.TYPE, 2), 3);")
-                        && source.contains("world.setBlockState(partner, ConfigBlocks.blockTable.getDefaultState().withProperty(BlockTable.TYPE, 3), 3);")
-                        && source.contains("((TileResearchTable) world.getTileEntity(pos)).setInventorySlotContents(0, copy);"));
+        assertTrue("ItemInkwell must keep reference-shaped master/partner metadata conversion and inkwell slot fill",
+                source.contains("world.removeTileEntity(pos);")
+                        && source.contains("withProperty(BlockTable.TYPE, facing.getIndex())")
+                        && source.contains("withProperty(BlockTable.TYPE, facing.getOpposite().getIndex() + 4)")
+                        && source.contains("((TileResearchTable) researchTile).setInventorySlotContents(0, copy);"));
     }
 
     private static String readFile(String path) throws IOException {

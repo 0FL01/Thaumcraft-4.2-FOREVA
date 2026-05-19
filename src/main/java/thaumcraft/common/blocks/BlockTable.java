@@ -23,8 +23,12 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
+import thaumcraft.api.wands.IWandable;
 import thaumcraft.common.Thaumcraft;
 import thaumcraft.common.CommonProxy;
+import thaumcraft.common.config.ConfigBlocks;
+import thaumcraft.common.items.wands.ItemWandCasting;
+import thaumcraft.common.lib.utils.InventoryUtils;
 import thaumcraft.common.tiles.TileArcaneWorkbench;
 import thaumcraft.common.tiles.TileDeconstructionTable;
 import thaumcraft.common.tiles.TileResearchTable;
@@ -33,7 +37,8 @@ import thaumcraft.common.tiles.TileTable;
 import javax.annotation.Nullable;
 
 public class BlockTable
-extends BlockContainer {
+extends BlockContainer
+implements IWandable {
 
     public static final PropertyInteger TYPE = PropertyInteger.create("type", 0, 15);
 
@@ -141,6 +146,28 @@ extends BlockContainer {
     }
 
     @Override
+    public void neighborChanged(IBlockState state, World worldIn, BlockPos pos, net.minecraft.block.Block blockIn, BlockPos fromPos) {
+        int md = state.getValue(TYPE);
+        TileEntity tile = worldIn.getTileEntity(pos);
+        if (tile instanceof TileResearchTable && md >= 2 && md <= 5) {
+            EnumFacing facing = EnumFacing.byIndex(md);
+            IBlockState partnerState = worldIn.getBlockState(pos.offset(facing));
+            if (partnerState.getBlock() != this || partnerState.getValue(TYPE) < 6) {
+                InventoryUtils.dropItems(worldIn, pos.getX(), pos.getY(), pos.getZ());
+                worldIn.removeTileEntity(pos);
+                worldIn.setBlockState(pos, this.getDefaultState().withProperty(TYPE, 0), 3);
+            }
+        } else if (md >= 6 && md <= 9) {
+            EnumFacing facing = EnumFacing.byIndex(md - 4);
+            TileEntity master = worldIn.getTileEntity(pos.offset(facing));
+            if (!(master instanceof TileResearchTable)) {
+                worldIn.setBlockState(pos, this.getDefaultState().withProperty(TYPE, 0), 3);
+            }
+        }
+        super.neighborChanged(state, worldIn, pos, blockIn, fromPos);
+    }
+
+    @Override
     public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
         TileEntity tileEntity = worldIn.getTileEntity(pos);
         int md = this.getMetaFromState(state);
@@ -215,5 +242,45 @@ extends BlockContainer {
     @Override
     public IBlockState getStateForPlacement(World worldIn, BlockPos pos, EnumFacing facing, float hitX, float hitY, float hitZ, int meta, EntityLivingBase placer, EnumHand hand) {
         return this.getDefaultState().withProperty(TYPE, MathHelper.clamp(meta, 0, 15));
+    }
+
+    @Override
+    public int onWandRightClick(World world, ItemStack wandstack, EntityPlayer player, int x, int y, int z, int side, int md) {
+        if (md <= 1) {
+            if (!world.isRemote) {
+                ItemWandCasting wand = (ItemWandCasting) wandstack.getItem();
+                BlockPos pos = new BlockPos(x, y, z);
+                world.removeTileEntity(pos);
+                world.setBlockState(pos, ConfigBlocks.blockTable.getDefaultState().withProperty(TYPE, 15), 3);
+                TileEntity tile = world.getTileEntity(pos);
+                if (tile instanceof TileArcaneWorkbench) {
+                    TileArcaneWorkbench tawb = (TileArcaneWorkbench) tile;
+                    if (!wand.isStaff(wandstack)) {
+                        tawb.setInventorySlotContents(10, wandstack.copy());
+                        player.inventory.setInventorySlotContents(player.inventory.currentItem, ItemStack.EMPTY);
+                    }
+                    tawb.markDirty();
+                }
+                world.notifyBlockUpdate(pos, world.getBlockState(pos), world.getBlockState(pos), 3);
+                world.playSound(null, x + 0.5D, y + 0.1D, z + 0.5D,
+                        net.minecraft.init.SoundEvents.UI_BUTTON_CLICK, net.minecraft.util.SoundCategory.BLOCKS,
+                        0.15F, 0.5F);
+            }
+            return 0;
+        }
+        return -1;
+    }
+
+    @Override
+    public ItemStack onWandRightClick(World world, ItemStack wandstack, EntityPlayer player) {
+        return null;
+    }
+
+    @Override
+    public void onUsingWandTick(ItemStack wandstack, EntityPlayer player, int count) {
+    }
+
+    @Override
+    public void onWandStoppedUsing(ItemStack wandstack, World world, EntityPlayer player, int count) {
     }
 }

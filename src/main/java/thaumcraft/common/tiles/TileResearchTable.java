@@ -10,8 +10,12 @@ import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
+import net.minecraft.network.NetworkManager;
+import net.minecraft.network.play.server.SPacketUpdateTileEntity;
 import net.minecraft.util.ITickable;
 import net.minecraft.util.NonNullList;
+import net.minecraft.util.SoundCategory;
+import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextComponentString;
@@ -23,6 +27,7 @@ import thaumcraft.api.research.ResearchCategories;
 import thaumcraft.api.research.ResearchItem;
 import thaumcraft.common.CommonProxy;
 import thaumcraft.common.config.ConfigBlocks;
+import thaumcraft.common.lib.TCSounds;
 import thaumcraft.common.items.ItemResearchNotes;
 import thaumcraft.common.lib.capabilities.IPlayerKnowledge;
 import thaumcraft.common.lib.network.PacketHandler;
@@ -456,5 +461,30 @@ implements IInventory, ITickable {
             if (!stack.isEmpty() && stack.getItem() == item) return true;
         }
         return false;
+    }
+
+    @Override
+    public AxisAlignedBB getRenderBoundingBox() {
+        return new AxisAlignedBB(this.pos.add(-1, 0, -1), this.pos.add(2, 2, 2));
+    }
+
+    @Override
+    public void onDataPacket(NetworkManager net, SPacketUpdateTileEntity pkt) {
+        super.onDataPacket(net, pkt);
+        if (this.world != null && this.world.isRemote) {
+            this.world.notifyBlockUpdate(this.pos, this.world.getBlockState(this.pos), this.world.getBlockState(this.pos), 3);
+        }
+    }
+
+    @Override
+    public boolean receiveClientEvent(int id, int type) {
+        if (id == 1) {
+            if (this.world != null && this.world.isRemote) {
+                this.world.playSound(this.pos.getX(), this.pos.getY(), this.pos.getZ(),
+                        TCSounds.LEARN, SoundCategory.BLOCKS, 1.0F, 1.0F, false);
+            }
+            return true;
+        }
+        return super.receiveClientEvent(id, type);
     }
 }

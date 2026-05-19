@@ -27,6 +27,7 @@ Branch: `codex/durable-goal-stage8-9`
 - Recent Stage 8-c bursts covered dynamic brainbox/sensor/lifter and tube conduit shells; the latest follow-up moved mirror and essentia-reservoir static shells into block models, leaving TESR for portal/liquid layers and splitting normal vs essentia mirror inventory models, with `validate` and `validate --smoke` passing afterward.
 - Latest Stage 8-c follow-up moved the static charger and centrifuge shells into block models (`blockmetaldevice_2`, `blocktube_2`), leaving TESR responsible only for the workbench-charger crystal pulse and centrifuge rotary core; `validate` and `validate --smoke` passed afterward.
 - Latest Stage 8-c follow-up moved the static arcane-workbench and deconstruction-table shells into `blocktable_15` and `blocktable_14`, leaving TESR responsible only for wand/thaumometer/item/aspect overlays; `validate` and `validate --smoke` passed afterward.
+- Latest common/research follow-up restored the `BlockTable` conversion contract: inkwells now form master/partner research tables with reference-shaped metadata, wand use recreates the arcane workbench block/tile path, and `TileResearchTable` again exposes expanded render bounds plus the client learn-event sound; `validate` and `validate --smoke` passed afterward.
 - Stage 3-7 residual blockers stay documented and non-blocking for current burst planning.
 - GUI/manual parity checks remain skipped by instruction.
 

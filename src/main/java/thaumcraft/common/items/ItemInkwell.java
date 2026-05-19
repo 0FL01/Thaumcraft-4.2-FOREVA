@@ -4,6 +4,7 @@ import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
@@ -43,27 +44,33 @@ public class ItemInkwell extends Item implements IScribeTools {
                                            float hitX, float hitY, float hitZ, EnumHand hand) {
         ItemStack stack = player.getHeldItem(hand);
         if (world.getBlockState(pos).getBlock() != ConfigBlocks.blockTable) return EnumActionResult.PASS;
+        TileEntity tile = world.getTileEntity(pos);
         int meta = world.getBlockState(pos).getValue(BlockTable.TYPE);
-        if (meta > 1) return EnumActionResult.PASS;
-        BlockPos partner = null;
+        if (!(tile instanceof thaumcraft.common.tiles.TileTable) || meta == 6) return EnumActionResult.PASS;
         for (EnumFacing facing : EnumFacing.HORIZONTALS) {
             BlockPos candidate = pos.offset(facing);
-            if (world.getBlockState(candidate).getBlock() == ConfigBlocks.blockTable
-                    && world.getBlockState(candidate).getValue(BlockTable.TYPE) <= 1) {
-                partner = candidate;
-                break;
+            TileEntity partnerTile = world.getTileEntity(candidate);
+            int partnerMeta = world.getBlockState(candidate).getValue(BlockTable.TYPE);
+            if (!(partnerTile instanceof thaumcraft.common.tiles.TileTable) || partnerMeta >= 6) continue;
+            if (world.isRemote) return EnumActionResult.PASS;
+
+            world.removeTileEntity(pos);
+            world.setBlockState(pos,
+                    ConfigBlocks.blockTable.getDefaultState().withProperty(BlockTable.TYPE, facing.getIndex()), 3);
+            world.setBlockState(candidate,
+                    ConfigBlocks.blockTable.getDefaultState().withProperty(BlockTable.TYPE, facing.getOpposite().getIndex() + 4), 3);
+
+            TileEntity researchTile = world.getTileEntity(pos);
+            if (researchTile instanceof TileResearchTable) {
+                ItemStack copy = stack.copy();
+                copy.setCount(1);
+                ((TileResearchTable) researchTile).setInventorySlotContents(0, copy);
+                if (!player.capabilities.isCreativeMode) stack.shrink(1);
+                researchTile.markDirty();
+                world.notifyBlockUpdate(pos, world.getBlockState(pos), world.getBlockState(pos), 3);
             }
+            return EnumActionResult.SUCCESS;
         }
-        if (partner == null) return EnumActionResult.PASS;
-        if (world.isRemote) return EnumActionResult.PASS;
-        world.setBlockState(pos, ConfigBlocks.blockTable.getDefaultState().withProperty(BlockTable.TYPE, 2), 3);
-        world.setBlockState(partner, ConfigBlocks.blockTable.getDefaultState().withProperty(BlockTable.TYPE, 3), 3);
-        if (world.getTileEntity(pos) instanceof TileResearchTable) {
-            ItemStack copy = stack.copy();
-            copy.setCount(1);
-            ((TileResearchTable) world.getTileEntity(pos)).setInventorySlotContents(0, copy);
-        }
-        if (!player.capabilities.isCreativeMode) stack.shrink(1);
-        return EnumActionResult.SUCCESS;
+        return EnumActionResult.PASS;
     }
 }
