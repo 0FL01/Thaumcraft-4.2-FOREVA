@@ -33,7 +33,6 @@ public class TileResearchTableRenderer extends TileEntitySpecialRenderer<TileRes
         int md = tile.getWorld() == null ? 0 : tile.getBlockMetadata();
 
         GlStateManager.pushMatrix();
-        bindTexture(TABLE_TEXTURE);
         GlStateManager.translate(x + 0.5F, y + 1.0F, z + 0.5F);
         GlStateManager.rotate(180.0F, 1.0F, 0.0F, 0.0F);
         if (md == 2) {
@@ -44,10 +43,9 @@ public class TileResearchTableRenderer extends TileEntitySpecialRenderer<TileRes
             GlStateManager.rotate(180.0F, 0.0F, 1.0F, 0.0F);
         }
 
-        tableModel.renderAll(MODEL_SCALE);
-
         ItemStack tools = tile.getStackInSlot(0);
         if (!tools.isEmpty() && tools.getItem() instanceof IScribeTools) {
+            bindTexture(TABLE_TEXTURE);
             tableModel.renderInkwell(MODEL_SCALE);
             GlStateManager.pushMatrix();
             GlStateManager.rotate(-90.0F, 0.0F, 1.0F, 0.0F);

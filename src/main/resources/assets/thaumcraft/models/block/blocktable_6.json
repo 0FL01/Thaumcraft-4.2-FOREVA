@@ -1,7 +1,7 @@
 {
   "ambientocclusion": false,
   "textures": {
-    "surface": "thaumcraft:models/table"
+    "surface": "thaumcraft:models/restable"
   },
   "elements": [
     {
@@ -17,8 +17,8 @@
       }
     },
     {
-      "from": [10, 4, 6],
-      "to": [14, 12, 10],
+      "from": [10, 0, 2],
+      "to": [14, 12, 6],
       "faces": {
         "down": { "texture": "#surface" },
         "up": { "texture": "#surface" },
@@ -29,8 +29,8 @@
       }
     },
     {
-      "from": [2, 4, 6],
-      "to": [6, 12, 10],
+      "from": [10, 0, 10],
+      "to": [14, 12, 14],
       "faces": {
         "down": { "texture": "#surface" },
         "up": { "texture": "#surface" },
@@ -41,8 +41,8 @@
       }
     },
     {
-      "from": [0, 0, 4],
-      "to": [16, 4, 12],
+      "from": [0, 2, 6],
+      "to": [12, 6, 10],
       "faces": {
         "down": { "texture": "#surface" },
         "up": { "texture": "#surface" },
