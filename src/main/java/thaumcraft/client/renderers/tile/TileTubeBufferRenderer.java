@@ -21,6 +21,7 @@ public class TileTubeBufferRenderer extends TileEntitySpecialRenderer<TileTubeBu
         if (tile == null || tile.getWorld() == null) {
             return;
         }
+        TubeConduitRenderHelper.renderConduit(tile, tile, tile.openSides, "thaumcraft:blocks/pipe_buffer", null, x, y, z);
         bindTexture(VALVE_TEXTURE);
         for (EnumFacing face : EnumFacing.VALUES) {
             int idx = face.getIndex();

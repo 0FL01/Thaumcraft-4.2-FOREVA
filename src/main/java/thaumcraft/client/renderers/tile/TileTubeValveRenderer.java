@@ -21,6 +21,7 @@ public class TileTubeValveRenderer extends TileEntitySpecialRenderer<TileTubeVal
         if (tile == null || tile.getWorld() == null) {
             return;
         }
+        TubeConduitRenderHelper.renderConduit(tile, tile, tile.openSides, "thaumcraft:blocks/pipe_1", null, x, y, z);
 
         bindTexture(VALVE_TEXTURE);
 

@@ -1,6 +1,35 @@
 {
-  "parent": "block/cube_all",
+  "parent": "block/block",
+  "ambientocclusion": false,
   "textures": {
-    "all": "thaumcraft:blocks/pipe_oneway"
-  }
+    "particle": "thaumcraft:blocks/pipe_oneway",
+    "tube": "thaumcraft:blocks/pipe_1",
+    "core": "thaumcraft:blocks/pipe_oneway"
+  },
+  "elements": [
+    {
+      "from": [7, 0, 7],
+      "to": [9, 16, 9],
+      "faces": {
+        "down": { "texture": "#tube" },
+        "up": { "texture": "#tube" },
+        "north": { "texture": "#tube" },
+        "south": { "texture": "#tube" },
+        "west": { "texture": "#tube" },
+        "east": { "texture": "#tube" }
+      }
+    },
+    {
+      "from": [6.9, 2, 6.9],
+      "to": [9.1, 14, 9.1],
+      "faces": {
+        "down": { "texture": "#core" },
+        "up": { "texture": "#core" },
+        "north": { "texture": "#core" },
+        "south": { "texture": "#core" },
+        "west": { "texture": "#core" },
+        "east": { "texture": "#core" }
+      }
+    }
+  ]
 }

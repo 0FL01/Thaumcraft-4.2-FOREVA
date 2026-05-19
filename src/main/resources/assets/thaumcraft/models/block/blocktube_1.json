@@ -1,6 +1,22 @@
 {
-  "parent": "block/cube_all",
+  "parent": "block/block",
+  "ambientocclusion": false,
   "textures": {
-    "all": "thaumcraft:blocks/pipe_valve"
-  }
+    "particle": "thaumcraft:blocks/pipe_valve",
+    "tube": "thaumcraft:blocks/pipe_valve"
+  },
+  "elements": [
+    {
+      "from": [6, 6, 6],
+      "to": [10, 10, 10],
+      "faces": {
+        "down": { "texture": "#tube" },
+        "up": { "texture": "#tube" },
+        "north": { "texture": "#tube" },
+        "south": { "texture": "#tube" },
+        "west": { "texture": "#tube" },
+        "east": { "texture": "#tube" }
+      }
+    }
+  ]
 }

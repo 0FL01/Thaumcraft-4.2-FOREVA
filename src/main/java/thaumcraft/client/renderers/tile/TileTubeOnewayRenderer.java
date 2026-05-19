@@ -21,6 +21,7 @@ public class TileTubeOnewayRenderer extends TileEntitySpecialRenderer<TileTubeOn
         if (tile == null || tile.getWorld() == null) {
             return;
         }
+        TubeConduitRenderHelper.renderConduit(tile, tile, tile.openSides, "thaumcraft:blocks/pipe_1", null, x, y, z);
         if (ThaumcraftApiHelper.getConnectableTile(
                 tile.getWorld(), tile.getPos().getX(), tile.getPos().getY(), tile.getPos().getZ(),
                 tile.facing.getOpposite()) == null) {

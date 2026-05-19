@@ -1,6 +1,34 @@
 {
-  "parent": "block/cube_all",
+  "parent": "block/block",
+  "ambientocclusion": false,
   "textures": {
-    "all": "thaumcraft:blocks/pipe_restrict"
-  }
+    "particle": "thaumcraft:blocks/pipe_restrict",
+    "tube": "thaumcraft:blocks/pipe_restrict"
+  },
+  "elements": [
+    {
+      "from": [7, 0, 7],
+      "to": [9, 16, 9],
+      "faces": {
+        "down": { "texture": "#tube" },
+        "up": { "texture": "#tube" },
+        "north": { "texture": "#tube" },
+        "south": { "texture": "#tube" },
+        "west": { "texture": "#tube" },
+        "east": { "texture": "#tube" }
+      }
+    },
+    {
+      "from": [6.5, 6.5, 6.5],
+      "to": [9.5, 9.5, 9.5],
+      "faces": {
+        "down": { "texture": "#tube" },
+        "up": { "texture": "#tube" },
+        "north": { "texture": "#tube" },
+        "south": { "texture": "#tube" },
+        "west": { "texture": "#tube" },
+        "east": { "texture": "#tube" }
+      }
+    }
+  ]
 }
