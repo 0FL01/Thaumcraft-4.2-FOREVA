@@ -199,7 +199,9 @@ public class ClientProxyFxStaticGuardTest {
         assertTrue("Dedicated FXBlockWard particle must keep block-centered ward emission baseline",
                 blockWardFx.contains("class FXBlockWard extends Particle")
                         && blockWardFx.contains("EnumFacing.random(this.rand)")
-                        && blockWardFx.contains("EnumParticleTypes.REDSTONE"));
+                        && blockWardFx.contains("\"textures/models/hemis\"")
+                        && blockWardFx.contains("GlStateManager.rotate(90.0F")
+                        && !blockWardFx.contains("EnumParticleTypes.REDSTONE"));
         assertTrue("Dedicated FXBoreParticles must keep target-driven bore dig textured baseline",
                 boreFx.contains("class FXBoreParticles extends Particle")
                         && boreFx.contains("targetX")
@@ -236,9 +238,10 @@ public class ClientProxyFxStaticGuardTest {
                         && bubbleAltFx.contains("setParticleTextureIndex(this.particle)"));
         assertTrue("Dedicated FXBlockRunes particle must keep rune-around-block emission baseline",
                 blockRunesFx.contains("class FXBlockRunes extends Particle")
-                        && blockRunesFx.contains("EnumFacing.random(this.rand)")
                         && blockRunesFx.contains("setGravity(float gravity)")
-                        && blockRunesFx.contains("EnumParticleTypes.CRIT_MAGIC"));
+                        && blockRunesFx.contains("this.runeIndex = 224 + this.rand.nextInt(16)")
+                        && blockRunesFx.contains("GlStateManager.rotate(90.0F, 0.0F, 0.0F, 1.0F)")
+                        && !blockRunesFx.contains("EnumParticleTypes.CRIT_MAGIC"));
         assertTrue("Dedicated FXEssentiaTrail particle must keep colorized target-chasing textured trail baseline",
                 essentiaTrailFx.contains("class FXEssentiaTrail extends Particle")
                         && essentiaTrailFx.contains("targetX")
