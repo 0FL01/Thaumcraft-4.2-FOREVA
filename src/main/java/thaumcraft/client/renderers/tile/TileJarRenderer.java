@@ -31,6 +31,19 @@ public class TileJarRenderer extends TileEntitySpecialRenderer<TileJar> {
             return;
         }
 
+        boolean renderShell = tile.getWorld() == null;
+        float shellScale = 1.0F;
+        if (tile instanceof TileJarNode) {
+            TileJarNode node = (TileJarNode) tile;
+            long now = System.currentTimeMillis();
+            if (node.animate > now) {
+                renderShell = true;
+                shellScale = 1.0F + 2.0F * (float) (node.animate - now) / 1000.0F;
+            } else if (node.animate > 0L) {
+                node.animate = 0L;
+            }
+        }
+
         if (tile instanceof TileJarNode) {
             TileNodeRenderer.renderNodeAt((TileJarNode) tile, x + 0.5D, y + 0.4D, z + 0.5D, partialTicks, 0.7F);
         }
@@ -41,10 +54,12 @@ public class TileJarRenderer extends TileEntitySpecialRenderer<TileJar> {
             renderFillable((TileJarFillable) tile, x, y, z);
         }
 
-        renderJarShell(tile, x, y, z);
+        if (renderShell) {
+            renderJarShell(tile, x, y, z, shellScale);
+        }
     }
 
-    private void renderJarShell(TileJar tile, double x, double y, double z) {
+    private void renderJarShell(TileJar tile, double x, double y, double z, float scale) {
         GlStateManager.pushMatrix();
         GlStateManager.disableCull();
         GlStateManager.translate(x + 0.5D, y + 0.01D, z + 0.5D);
@@ -55,15 +70,8 @@ public class TileJarRenderer extends TileEntitySpecialRenderer<TileJar> {
         } else {
             bindTexture(tile.getTexture());
         }
-        if (tile instanceof TileJarNode) {
-            TileJarNode node = (TileJarNode) tile;
-            long now = System.currentTimeMillis();
-            if (node.animate > now) {
-                float size = 1.0F + 2.0F * (float) (node.animate - now) / 1000.0F;
-                GlStateManager.scale(size, size, size);
-            } else if (node.animate > 0L) {
-                node.animate = 0L;
-            }
+        if (scale != 1.0F) {
+            GlStateManager.scale(scale, scale, scale);
         }
         model.renderAll(MODEL_SCALE);
         GlStateManager.enableCull();

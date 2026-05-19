@@ -1,8 +1,8 @@
 {
   "variants": {
     "type=0": { "model": "thaumcraft:blockjar_0" },
-    "type=1": { "model": "thaumcraft:blockjar_1" },
+    "type=1": { "model": "thaumcraft:blockjar_0" },
     "type=2": { "model": "thaumcraft:blockjar_0" },
-    "type=3": { "model": "thaumcraft:blockjar_0" }
+    "type=3": { "model": "thaumcraft:blockjar_1" }
   }
 }
