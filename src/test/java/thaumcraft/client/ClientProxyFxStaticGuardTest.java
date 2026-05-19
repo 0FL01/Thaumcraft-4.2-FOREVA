@@ -221,7 +221,9 @@ public class ClientProxyFxStaticGuardTest {
                         && breakingFx.contains("EnumParticleTypes.REDSTONE"));
         assertTrue("Dedicated FXBurst particle must keep burst emission baseline",
                 burstFx.contains("class FXBurst extends Particle")
-                        && burstFx.contains("EnumParticleTypes.EXPLOSION_NORMAL"));
+                        && burstFx.contains("TileNodeRenderer.NODES_TEXTURE")
+                        && burstFx.contains("this.particleMaxAge = 31")
+                        && !burstFx.contains("EnumParticleTypes.EXPLOSION_NORMAL"));
         assertTrue("Dedicated FXBubble particle must keep froth controls and water-bubble emission baseline",
                 bubbleFx.contains("class FXBubble extends Particle")
                         && bubbleFx.contains("setFroth()")

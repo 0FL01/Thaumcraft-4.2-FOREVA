@@ -1,24 +1,36 @@
 package thaumcraft.client.fx.particles;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.particle.Particle;
 import net.minecraft.client.renderer.BufferBuilder;
+import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.Entity;
-import net.minecraft.util.EnumParticleTypes;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import org.lwjgl.opengl.GL11;
+import thaumcraft.client.renderers.tile.TileNodeRenderer;
 
 @SideOnly(Side.CLIENT)
 public class FXBurst extends Particle {
+    private static final ResourceLocation PARTICLE_TEXTURE = new ResourceLocation("textures/particle/particles.png");
+    private static final int LIGHTMAP_FULLBRIGHT = 0x00F000F0;
+
     private final float scale;
-    private final int density;
 
     public FXBurst(World world, double x, double y, double z, float scale, int density) {
         super(world, x, y, z, 0.0D, 0.0D, 0.0D);
-        this.scale = Math.max(0.2F, scale);
-        this.density = Math.max(2, density);
-        this.particleMaxAge = 3 + this.rand.nextInt(3);
+        this.scale = Math.max(0.2F, scale) * (0.9F + Math.min(1.1F, Math.max(1, density) * 0.04F));
+        this.particleRed = 1.0F;
+        this.particleGreen = 1.0F;
+        this.particleBlue = 1.0F;
+        this.particleGravity = 0.0F;
+        this.particleMaxAge = 31;
         this.canCollide = false;
+        this.setSize(0.01F, 0.01F);
     }
 
     @Override
@@ -31,28 +43,62 @@ public class FXBurst extends Particle {
             this.setExpired();
             return;
         }
-
-        float life = this.particleMaxAge <= 0 ? 1.0F : (float) this.particleAge / (float) this.particleMaxAge;
-        float spread = this.scale * (0.2F + life * 0.35F);
-        for (int i = 0; i < this.density; i++) {
-            double mx = (this.rand.nextFloat() - 0.5F) * spread;
-            double my = (this.rand.nextFloat() - 0.5F) * spread;
-            double mz = (this.rand.nextFloat() - 0.5F) * spread;
-            this.world.spawnParticle(EnumParticleTypes.EXPLOSION_NORMAL, this.posX, this.posY, this.posZ, mx, my, mz);
-            if (this.rand.nextBoolean()) {
-                this.world.spawnParticle(EnumParticleTypes.CRIT_MAGIC, this.posX, this.posY, this.posZ, mx * 0.25D, my * 0.25D, mz * 0.25D);
-            }
-        }
-
         if (++this.particleAge >= this.particleMaxAge) {
             this.setExpired();
         }
     }
 
     @Override
-    public void renderParticle(BufferBuilder buffer, Entity entityIn, float partialTicks,
+    public void renderParticle(BufferBuilder ignored, Entity entityIn, float partialTicks,
                                float rotationX, float rotationZ, float rotationYZ,
                                float rotationXY, float rotationXZ) {
-        // Emission-style particle: visuals are spawned in onUpdate.
+        Tessellator tessellator = Tessellator.getInstance();
+        BufferBuilder buffer = tessellator.getBuffer();
+        tessellator.draw();
+
+        float u0 = (this.particleAge % 32) / 32.0F;
+        float u1 = u0 + 0.03125F;
+        float v0 = 0.96875F;
+        float v1 = 1.0F;
+        float size = this.scale;
+        float px = (float) (this.prevPosX + (this.posX - this.prevPosX) * partialTicks - Particle.interpPosX);
+        float py = (float) (this.prevPosY + (this.posY - this.prevPosY) * partialTicks - Particle.interpPosY);
+        float pz = (float) (this.prevPosZ + (this.posZ - this.prevPosZ) * partialTicks - Particle.interpPosZ);
+
+        Minecraft.getMinecraft().renderEngine.bindTexture(TileNodeRenderer.NODES_TEXTURE);
+        GlStateManager.disableCull();
+        GlStateManager.enableBlend();
+        GlStateManager.depthMask(false);
+        GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE);
+
+        buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.PARTICLE_POSITION_TEX_COLOR_LMAP);
+        addLitVertex(buffer, px - rotationX * size - rotationXY * size, py - rotationZ * size, pz - rotationYZ * size - rotationXZ * size, u1, v1);
+        addLitVertex(buffer, px - rotationX * size + rotationXY * size, py + rotationZ * size, pz - rotationYZ * size + rotationXZ * size, u1, v0);
+        addLitVertex(buffer, px + rotationX * size + rotationXY * size, py + rotationZ * size, pz + rotationYZ * size + rotationXZ * size, u0, v0);
+        addLitVertex(buffer, px + rotationX * size - rotationXY * size, py - rotationZ * size, pz + rotationYZ * size - rotationXZ * size, u0, v1);
+        tessellator.draw();
+
+        GlStateManager.disableBlend();
+        GlStateManager.enableCull();
+        GlStateManager.depthMask(true);
+        GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+
+        Minecraft.getMinecraft().renderEngine.bindTexture(PARTICLE_TEXTURE);
+        buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.PARTICLE_POSITION_TEX_COLOR_LMAP);
+    }
+
+    private void addLitVertex(BufferBuilder buffer, double x, double y, double z, double u, double v) {
+        int lightU = LIGHTMAP_FULLBRIGHT & 0xFFFF;
+        int lightV = LIGHTMAP_FULLBRIGHT >> 16 & 0xFFFF;
+        buffer.pos(x, y, z)
+                .tex(u, v)
+                .color(1.0F, 1.0F, 1.0F, 0.75F)
+                .lightmap(lightU, lightV)
+                .endVertex();
+    }
+
+    @Override
+    public int getFXLayer() {
+        return 3;
     }
 }
