@@ -183,6 +183,13 @@ public class EntityEldritchWarden extends EntityThaumcraftBoss implements net.mi
             double x = this.posX + (double) ((this.rand.nextFloat() - this.rand.nextFloat()) * 0.2F);
             double z = this.posZ + (double) ((this.rand.nextFloat() - this.rand.nextFloat()) * 0.2F);
             Thaumcraft.proxy.wispFXEG(this.world, x, this.posY + 0.25D * (double) this.height, z, this);
+            if (this.getSpawnTimer() > 0) {
+                float he = Math.max(1.0F, this.height * ((150 - this.getSpawnTimer()) / 150.0F));
+                for (int i = 0; i < 33; i++) {
+                    Thaumcraft.proxy.smokeSpiral(this.world, this.posX, this.getEntityBoundingBox().minY + he / 2.0F, this.posZ,
+                            he, this.rand.nextInt(360), MathHelper.floor(this.getEntityBoundingBox().minY) - 1, 0x22112F);
+                }
+            }
             return;
         }
         this.fillEldritchField();

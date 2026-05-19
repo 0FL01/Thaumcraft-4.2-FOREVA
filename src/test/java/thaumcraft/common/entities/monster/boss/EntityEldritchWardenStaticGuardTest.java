@@ -20,6 +20,9 @@ public class EntityEldritchWardenStaticGuardTest {
         assertTrue(source.contains("((PathNavigateGround) this.getNavigator()).setCanSwim(true);"));
         assertTrue(source.contains("if (this.getSpawnTimer() == 150) {"));
         assertFalse(source.contains("if (!this.world.isRemote && this.getSpawnTimer() == 150) {"));
+        assertTrue("Warden spawn visuals must keep smoke spiral client path during spawn timer",
+                source.contains("if (this.getSpawnTimer() > 0) {")
+                        && source.contains("Thaumcraft.proxy.smokeSpiral(this.world, this.posX"));
         assertTrue("Warden sonic attack branch must keep PacketFXSonic broadcast baseline",
                 source.contains("new PacketFXSonic(this.getEntityId())")
                         && source.contains("new NetworkRegistry.TargetPoint(this.world.provider.getDimension(), this.posX, this.posY, this.posZ, 32.0)"));

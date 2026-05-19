@@ -1,6 +1,6 @@
 # Durable Goal Progress
 
-Last updated: 2026-05-19
+Last updated: 2026-05-20
 Branch: `codex/durable-goal-stage8-9`
 
 > Condensed with user approval. Historical checkpoint prose is split into batch archives under `docs/GOAL_PROGRESS-archive/`.
@@ -23,6 +23,7 @@ Branch: `codex/durable-goal-stage8-9`
 - Live checkpoint prose moved into `docs/GOAL_PROGRESS-archive/` batch files.
 - Recent validated work remains concentrated in Stage 8-c/8-d/8-e renderer, entity, and FX bursts plus Stage 9 recipe/content/research bursts.
 - Latest Stage 8-e burst converted `FXBreaking` and `FXSwarm` from `spawnParticle(...)` fallbacks to dedicated render paths, with `validate` and `validate --smoke` passing afterward.
+- Latest Stage 8-e burst restored `smokeSpiral` proxy coverage for Elemental Sword and Eldritch Warden, and converted `FXSmokeDrift`/`FXSmokeSpiral` off vanilla smoke emitters with `validate` and `validate --smoke` passing afterward.
 - Stage 3-7 residual blockers stay documented and non-blocking for current burst planning.
 - GUI/manual parity checks remain skipped by instruction.
 

@@ -75,6 +75,7 @@ import thaumcraft.client.fx.particles.FXBubbleAlt;
 import thaumcraft.client.fx.particles.FXEssentiaTrail;
 import thaumcraft.client.fx.particles.FXGeneric;
 import thaumcraft.client.fx.particles.FXSmokeDrift;
+import thaumcraft.client.fx.particles.FXSmokeSpiral;
 import thaumcraft.client.fx.particles.FXSparkle;
 import thaumcraft.client.fx.particles.FXSwarm;
 import thaumcraft.client.fx.particles.FXVent;
@@ -1256,6 +1257,15 @@ public class ClientProxy extends CommonProxy {
         for (int i = 0; i < amount; i++) {
             ParticleEngine.addEffect(world, new FXSparkle(world, x, y, z, scale, type, speed));
         }
+    }
+
+    @Override
+    public void smokeSpiral(World world, double x, double y, double z, float radius, int start, int miny, int color) {
+        if (world == null || !world.isRemote) return;
+        FXSmokeSpiral fx = new FXSmokeSpiral(world, x, y, z, radius, start, miny);
+        Color tint = new Color(color);
+        fx.setRBGColorF(normalizeColor(tint.getRed()), normalizeColor(tint.getGreen()), normalizeColor(tint.getBlue()));
+        ParticleEngine.addEffect(world, fx);
     }
 
     @Override

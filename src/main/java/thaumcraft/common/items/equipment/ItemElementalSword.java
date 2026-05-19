@@ -16,6 +16,7 @@ import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
+import thaumcraft.common.Thaumcraft;
 import thaumcraft.api.IRepairable;
 import thaumcraft.common.config.ConfigItems;
 import thaumcraft.common.entities.golems.EntityGolemBase;
@@ -101,12 +102,19 @@ public class ItemElementalSword extends ItemSword implements IRepairable {
         }
 
         if (player.world.isRemote) {
+            int miny = (int) (player.getEntityBoundingBox().minY - 2.0D);
+            if (player.onGround) {
+                miny = MathHelper.floor(player.getEntityBoundingBox().minY);
+            }
             for (int i = 0; i < 5; i++) {
-                double px = player.posX + (player.world.rand.nextFloat() - player.world.rand.nextFloat()) * 0.4D;
-                double py = player.getEntityBoundingBox().minY + player.height * 0.5D;
-                double pz = player.posZ + (player.world.rand.nextFloat() - player.world.rand.nextFloat()) * 0.4D;
-                double vy = player.onGround ? 0.0D : 0.03D;
-                player.world.spawnParticle(EnumParticleTypes.SMOKE_NORMAL, px, py, pz, 0.0D, vy, 0.0D);
+                Thaumcraft.proxy.smokeSpiral(player.world,
+                        player.posX,
+                        player.getEntityBoundingBox().minY + player.height / 2.0F,
+                        player.posZ,
+                        1.5F,
+                        player.world.rand.nextInt(360),
+                        miny,
+                        0xDDDDDD);
             }
             if (player.onGround) {
                 float yaw = player.world.rand.nextFloat() * 360.0F;

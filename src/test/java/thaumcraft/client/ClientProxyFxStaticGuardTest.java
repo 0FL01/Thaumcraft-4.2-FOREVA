@@ -28,6 +28,7 @@ public class ClientProxyFxStaticGuardTest {
         String essentiaTrailFx = readFile("src/main/java/thaumcraft/client/fx/particles/FXEssentiaTrail.java");
         String genericFx = readFile("src/main/java/thaumcraft/client/fx/particles/FXGeneric.java");
         String smokeDriftFx = readFile("src/main/java/thaumcraft/client/fx/particles/FXSmokeDrift.java");
+        String smokeSpiralFx = readFile("src/main/java/thaumcraft/client/fx/particles/FXSmokeSpiral.java");
         String sparkleFx = readFile("src/main/java/thaumcraft/client/fx/particles/FXSparkle.java");
         String swarmFx = readFile("src/main/java/thaumcraft/client/fx/particles/FXSwarm.java");
         String ventFx = readFile("src/main/java/thaumcraft/client/fx/particles/FXVent.java");
@@ -110,6 +111,7 @@ public class ClientProxyFxStaticGuardTest {
                 commonProxy.contains("public void sourceStreamFX(")
                         && commonProxy.contains("public void essentiaTrailFx(")
                         && commonProxy.contains("public void blockRunes(")
+                        && commonProxy.contains("public void smokeSpiral(World world, double x, double y, double z, float radius, int start, int miny, int color)")
                         && commonProxy.contains("public void arcLightning(")
                         && commonProxy.contains("public void bolt(World world, Entity sourceEntity, Entity targetedEntity)")
                         && commonProxy.contains("public void nodeBolt(World world, float x, float y, float z, Entity target)")
@@ -120,6 +122,8 @@ public class ClientProxyFxStaticGuardTest {
                         && source.contains("new FXEssentiaTrail(")
                         && source.contains("public void blockRunes(")
                         && source.contains("new FXBlockRunes(")
+                        && source.contains("public void smokeSpiral(World world, double x, double y, double z, float radius, int start, int miny, int color)")
+                        && source.contains("new FXSmokeSpiral(world, x, y, z, radius, start, miny)")
                         && source.contains("public void arcLightning(")
                         && source.contains("new FXArc(")
                         && source.contains("public void bolt(World world, Entity sourceEntity, Entity targetedEntity)")
@@ -260,8 +264,15 @@ public class ClientProxyFxStaticGuardTest {
                         && genericFx.contains("if (this.particleAge < this.delay)"));
         assertTrue("Dedicated FXSmokeDrift particle must keep smoke drift emission baseline",
                 smokeDriftFx.contains("class FXSmokeDrift extends Particle")
-                        && smokeDriftFx.contains("EnumParticleTypes.SMOKE_NORMAL")
-                        && smokeDriftFx.contains("this.motionY *= 0.92D"));
+                        && smokeDriftFx.contains("setParticleTextureIndex(1 + Math.min(4")
+                        && smokeDriftFx.contains("this.motionY *= 0.92D")
+                        && !smokeDriftFx.contains("EnumParticleTypes.SMOKE_NORMAL"));
+        assertTrue("Dedicated FXSmokeSpiral particle must keep spiral smoke billboard baseline",
+                smokeSpiralFx.contains("class FXSmokeSpiral extends Particle")
+                        && smokeSpiralFx.contains("public int getFXLayer()")
+                        && smokeSpiralFx.contains("particle = 1 + (int) (this.particleAge / (float) this.particleMaxAge * 4.0F)")
+                        && smokeSpiralFx.contains("Math.max(this.posY + mY, this.miny + 0.1F)")
+                        && !smokeSpiralFx.contains("EnumParticleTypes.SMOKE_NORMAL"));
         assertTrue("Dedicated FXSparkle particle must keep colored sparkle emission baseline",
                 sparkleFx.contains("class FXSparkle extends Particle")
                         && sparkleFx.contains("setParticleTextureIndex(part)")

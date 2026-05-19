@@ -296,6 +296,9 @@ public class CommonProxy implements IGuiHandler {
     public void sparkle(float x, float y, float z, float scale, int type, float speed) {
     }
 
+    public void smokeSpiral(World world, double x, double y, double z, float radius, int start, int miny, int color) {
+    }
+
     public int particleCount(int def) {
         return def;
     }
