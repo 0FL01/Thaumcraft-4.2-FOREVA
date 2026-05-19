@@ -26,6 +26,7 @@ public class TileEldritchNothingRenderer extends TileEntitySpecialRenderer<TileE
             new ResourceLocation("thaumcraft", "textures/misc/particlefield32.png");
     private static final float FACE_MIN = 0.0F;
     private static final float FACE_MAX = 1.0F;
+    private static final long FIELD_COLOR_SEED = 31100L;
 
     @Override
     public void render(TileEldritchNothing tile, double x, double y, double z, float partialTicks, int destroyStage, float alpha) {
@@ -81,7 +82,7 @@ public class TileEldritchNothingRenderer extends TileEntitySpecialRenderer<TileE
             return;
         }
 
-        Random random = new Random(31100L + face.getIndex() * 17L);
+        Random random = new Random(FIELD_COLOR_SEED);
         for (int i = 0; i < 16; i++) {
             float layerDepth = 16.0F - i;
             float bright = 1.0F / (layerDepth + 1.0F);
@@ -106,7 +107,7 @@ public class TileEldritchNothingRenderer extends TileEntitySpecialRenderer<TileE
 
             uvShift += (float) (i * i * 4321 + i * 9) * 2.0F;
             float parallaxScale = uvScale * (0.75F + layerDepth * 0.015625F);
-            float[] parallax = parallaxOffsets(face, viewX, viewY, viewZ, parallaxScale);
+            float[] parallax = parallaxOffsets(face, viewX, viewY, viewZ, parallaxScale, faceParallaxSign(face));
             float uShift = uvShift * uvScale + parallax[0];
             float vShift = uvShift * uvScale + parallax[1];
 
@@ -119,7 +120,8 @@ public class TileEldritchNothingRenderer extends TileEntitySpecialRenderer<TileE
         GlStateManager.disableBlend();
     }
 
-    private static float[] parallaxOffsets(EnumFacing face, double viewX, double viewY, double viewZ, float scale) {
+    private static float[] parallaxOffsets(
+            EnumFacing face, double viewX, double viewY, double viewZ, float scale, float sign) {
         float rotX = ActiveRenderInfo.getRotationX();
         float rotZ = ActiveRenderInfo.getRotationZ();
         float rotYZ = ActiveRenderInfo.getRotationYZ();
@@ -148,7 +150,11 @@ public class TileEldritchNothingRenderer extends TileEntitySpecialRenderer<TileE
                 u = 0.0F;
                 v = 0.0F;
         }
-        return new float[]{u * scale, v * scale};
+        return new float[]{u * scale * sign, v * scale * sign};
+    }
+
+    private static float faceParallaxSign(EnumFacing face) {
+        return face.getAxisDirection() == EnumFacing.AxisDirection.POSITIVE ? -1.0F : 1.0F;
     }
 
     private static float faceAxisOffset(EnumFacing face) {

@@ -32,7 +32,9 @@ public class EldritchNothingRendererFidelityStaticGuardTest {
                 source.contains("for (int i = 0; i < 16; i++)")
                         && source.contains("blendFunc(770, 771)")
                         && source.contains("blendFunc(1, 1)")
-                        && source.contains("drawFace(face, offset"));
+                        && source.contains("drawFace(face, offset")
+                        && source.contains("FIELD_COLOR_SEED = 31100L")
+                        && source.contains("faceParallaxSign(face)"));
     }
 
     private static String read(String path) throws IOException {
