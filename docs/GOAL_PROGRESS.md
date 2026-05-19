@@ -31,6 +31,7 @@ Branch: `codex/durable-goal-stage8-9`
 - Latest Stage 8-e burst migrated client-only smoke/flame/spell fallback emissions in `ItemElementalSword`, `BlockCrystal`, `TileMirror`, `EntityDart`, and `EntityFireBat` onto dedicated generic sheet FX routing, with `validate` and `validate --smoke` passing afterward.
 - Latest Stage 8-e burst migrated ambient candle/jar/sensor/arcane-furnace/explosion particle fallbacks onto the same dedicated generic sheet FX routing, with `validate` and `validate --smoke` passing afterward.
 - Latest Stage 8-e burst migrated remaining entity/projectile `BLOCK_CRACK`/`SLIME`/`WATER_BUBBLE`/`VILLAGER_ANGRY` fallbacks in Frost Shard, Watcher, Thaumic Slime, Taintacle Giant, Eldritch Golem, and Thaumcraft Boss onto dedicated proxy FX paths, and restored the slime-ball sprite baseline for taint/slime breaking helpers.
+- Latest Stage 8-e burst restored Eldritch Golem headless beam-charge client FX parity (`spark`, scaled vent plume, Jacob's arc target cadence) by reintroducing the missing proxy helper surface and status-`19` arcing branch.
 - Stage 3-7 residual blockers stay documented and non-blocking for current burst planning.
 - GUI/manual parity checks remain skipped by instruction.
 

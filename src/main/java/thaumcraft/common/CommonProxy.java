@@ -275,6 +275,9 @@ public class CommonProxy implements IGuiHandler {
     public void splooshFX(Entity entity) {
     }
 
+    public void spark(float x, float y, float z, float size, float red, float green, float blue, float alpha) {
+    }
+
     public void drawGenericParticles(World world, double x, double y, double z,
                                      double mx, double my, double mz,
                                      float red, float green, float blue, float alpha,
@@ -298,6 +301,10 @@ public class CommonProxy implements IGuiHandler {
 
     public void drawVentParticles(World world, double x, double y, double z,
                                   double mx, double my, double mz, int color) {
+    }
+
+    public void drawVentParticles(World world, double x, double y, double z,
+                                  double mx, double my, double mz, int color, float scale) {
     }
 
     public void sparkle(float x, float y, float z, float scale, int type, float speed) {

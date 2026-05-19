@@ -13,6 +13,7 @@ import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.EntityDataManager;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
@@ -28,6 +29,10 @@ public class EntityEldritchGolem extends EntityThaumcraftBoss implements thaumcr
     private static final DataParameter<Boolean> HEADLESS = EntityDataManager.createKey(EntityEldritchGolem.class, DataSerializers.BOOLEAN);
     private int beamCharge = 0;
     private boolean chargingBeam = false;
+    private int arcing = 0;
+    private int ax = 0;
+    private int ay = 0;
+    private int az = 0;
     private boolean headlessAttackAdded = false;
     private int attackTimer = 0;
 
@@ -217,7 +222,54 @@ public class EntityEldritchGolem extends EntityThaumcraftBoss implements thaumcr
             this.heal(2.0F);
         }
         super.onUpdate();
-        if (!this.world.isRemote) {
+        if (this.world.isRemote) {
+            if (this.isHeadless()) {
+                this.rotationPitch = 0.0F;
+                float f1 = MathHelper.cos((-this.renderYawOffset * ((float) Math.PI / 180.0F)) - (float) Math.PI);
+                float f2 = MathHelper.sin((-this.renderYawOffset * ((float) Math.PI / 180.0F)) - (float) Math.PI);
+                float f3 = -MathHelper.cos((-this.rotationPitch * ((float) Math.PI / 180.0F)));
+                float f4 = MathHelper.sin((-this.rotationPitch * ((float) Math.PI / 180.0F)));
+                Vec3d v = new Vec3d(f2 * f3, f4, f1 * f3);
+                if (this.rand.nextInt(20) == 0) {
+                    float a = (this.rand.nextFloat() - this.rand.nextFloat()) / 2.0F;
+                    float b = (this.rand.nextFloat() - this.rand.nextFloat()) / 2.0F;
+                    Thaumcraft.proxy.spark(
+                            (float) (this.posX + v.x + (double) a),
+                            (float) this.posY + this.getEyeHeight() - 0.25F,
+                            (float) (this.posZ + v.z + (double) b),
+                            0.3F,
+                            0.65F + this.rand.nextFloat() * 0.1F,
+                            1.0F,
+                            1.0F,
+                            0.8F);
+                }
+                Thaumcraft.proxy.drawVentParticles(
+                        this.world,
+                        this.posX + v.x * 0.66D,
+                        (double) ((float) this.posY + this.getEyeHeight() - 0.75F),
+                        this.posZ + v.z * 0.66D,
+                        0.0D,
+                        0.001D,
+                        0.0D,
+                        0x555555,
+                        4.0F);
+                if (this.arcing > 0) {
+                    Thaumcraft.proxy.arcLightning(
+                            this.world,
+                            this.posX,
+                            this.posY + (double) (this.height / 2.0F),
+                            this.posZ,
+                            this.ax + 0.5D,
+                            this.ay + 1.0D,
+                            this.az + 0.5D,
+                            0.65F + this.rand.nextFloat() * 0.1F,
+                            1.0F,
+                            1.0F,
+                            1.0F - (float) this.arcing / 10.0F);
+                    --this.arcing;
+                }
+            }
+        } else {
             if (this.isHeadless() && this.beamCharge <= 0) {
                 this.chargingBeam = true;
             }
@@ -236,6 +288,36 @@ public class EntityEldritchGolem extends EntityThaumcraftBoss implements thaumcr
         if (id == 4) {
             this.attackTimer = 10;
             this.playSound(net.minecraft.init.SoundEvents.ENTITY_IRONGOLEM_ATTACK, 1.0F, 1.0F);
+        } else if (id == 19) {
+            if (this.arcing == 0) {
+                float radius = 2.0F + this.rand.nextFloat() * 2.0F;
+                double radians = Math.toRadians(this.rand.nextInt(360));
+                double deltaX = radius * Math.cos(radians);
+                double deltaZ = radius * Math.sin(radians);
+                int bx = MathHelper.floor(this.posX + deltaX);
+                int by = MathHelper.floor(this.posY);
+                int bz = MathHelper.floor(this.posZ + deltaZ);
+                int c = 0;
+                while (c < 5 && this.world.isAirBlock(new BlockPos(bx, by, bz))) {
+                    ++c;
+                    --by;
+                }
+                if (this.world.isAirBlock(new BlockPos(bx, by + 1, bz)) && !this.world.isAirBlock(new BlockPos(bx, by, bz))) {
+                    this.ax = bx;
+                    this.ay = by;
+                    this.az = bz;
+                    this.arcing = 8 + this.rand.nextInt(5);
+                    this.world.playSound(
+                            this.posX,
+                            this.posY,
+                            this.posZ,
+                            TCSounds.JACOBS,
+                            SoundCategory.HOSTILE,
+                            0.8F,
+                            1.0F + (this.rand.nextFloat() - this.rand.nextFloat()) * 0.05F,
+                            false);
+                }
+            }
         } else {
             super.handleStatusUpdate(id);
         }

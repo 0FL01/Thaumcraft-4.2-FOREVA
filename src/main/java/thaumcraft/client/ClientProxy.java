@@ -76,6 +76,7 @@ import thaumcraft.client.fx.particles.FXEssentiaTrail;
 import thaumcraft.client.fx.particles.FXGeneric;
 import thaumcraft.client.fx.particles.FXSmokeDrift;
 import thaumcraft.client.fx.particles.FXSmokeSpiral;
+import thaumcraft.client.fx.particles.FXSpark;
 import thaumcraft.client.fx.particles.FXSparkle;
 import thaumcraft.client.fx.particles.FXSwarm;
 import thaumcraft.client.fx.particles.FXVent;
@@ -1204,6 +1205,21 @@ public class ClientProxy extends CommonProxy {
     }
 
     @Override
+    public void spark(float x, float y, float z, float size, float red, float green, float blue, float alpha) {
+        Minecraft mc = Minecraft.getMinecraft();
+        World world = mc == null ? null : mc.world;
+        if (world == null || !world.isRemote) return;
+        int amount = particleCount(1);
+        if (amount <= 0) return;
+        for (int i = 0; i < amount; i++) {
+            FXSpark fx = new FXSpark(world, x, y, z, size);
+            fx.setRBGColorF(red, green, blue);
+            fx.setAlphaF(alpha);
+            ParticleEngine.addEffect(world, fx);
+        }
+    }
+
+    @Override
     public void drawGenericParticles(World world, double x, double y, double z,
                                      double mx, double my, double mz,
                                      float red, float green, float blue, float alpha,
@@ -1255,6 +1271,12 @@ public class ClientProxy extends CommonProxy {
     @Override
     public void drawVentParticles(World world, double x, double y, double z,
                                   double mx, double my, double mz, int color) {
+        drawVentParticles(world, x, y, z, mx, my, mz, color, 1.0F);
+    }
+
+    @Override
+    public void drawVentParticles(World world, double x, double y, double z,
+                                  double mx, double my, double mz, int color, float scale) {
         if (world == null || !world.isRemote) return;
         int amount = particleCount(1);
         if (amount <= 0) return;
@@ -1264,7 +1286,7 @@ public class ClientProxy extends CommonProxy {
         float green = normalizeColor(tint.getGreen());
         float blue = normalizeColor(tint.getBlue());
         for (int i = 0; i < amount; i++) {
-            ParticleEngine.addEffect(world, new FXVent(
+            FXVent fx = new FXVent(
                     world,
                     x + (world.rand.nextFloat() - 0.5f) * 0.05f,
                     y + (world.rand.nextFloat() - 0.5f) * 0.05f,
@@ -1272,7 +1294,10 @@ public class ClientProxy extends CommonProxy {
                     mx + (world.rand.nextFloat() - 0.5f) * 0.01f,
                     my + (world.rand.nextFloat() - 0.5f) * 0.01f,
                     mz + (world.rand.nextFloat() - 0.5f) * 0.01f,
-                    red, green, blue));
+                    red, green, blue);
+            fx.setAlphaF(0.4F);
+            fx.setScale(scale);
+            ParticleEngine.addEffect(world, fx);
         }
     }
 
