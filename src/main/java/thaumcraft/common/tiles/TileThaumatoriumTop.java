@@ -3,8 +3,10 @@ package thaumcraft.common.tiles;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.ISidedInventory;
 import net.minecraft.item.ItemStack;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ITickable;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
 import thaumcraft.api.TileThaumcraft;
@@ -12,6 +14,8 @@ import thaumcraft.api.aspects.Aspect;
 import thaumcraft.api.aspects.AspectList;
 import thaumcraft.api.aspects.IAspectContainer;
 import thaumcraft.api.aspects.IEssentiaTransport;
+import thaumcraft.common.blocks.BlockMetalDevice;
+import thaumcraft.common.config.ConfigBlocks;
 
 public class TileThaumatoriumTop extends TileThaumcraft implements ITickable, IAspectContainer, IEssentiaTransport, ISidedInventory {
     private TileThaumatorium bottom;
@@ -25,10 +29,21 @@ public class TileThaumatoriumTop extends TileThaumcraft implements ITickable, IA
         if (this.world == null) return null;
         if (this.bottom == null || this.bottom.isInvalid() || this.bottom.getWorld() != this.world
                 || !this.bottom.getPos().equals(this.pos.down())) {
-            if (this.world.getTileEntity(this.pos.down()) instanceof TileThaumatorium) {
-                this.bottom = (TileThaumatorium) this.world.getTileEntity(this.pos.down());
+            TileEntity tile = this.world.getTileEntity(this.pos.down());
+            if (tile instanceof TileThaumatorium) {
+                this.bottom = (TileThaumatorium) tile;
+                IBlockState state = this.world.getBlockState(this.pos);
+                this.world.notifyBlockUpdate(this.pos, state, state, 3);
+                this.markDirty();
             } else {
                 this.bottom = null;
+                if (!this.world.isRemote) {
+                    IBlockState state = this.world.getBlockState(this.pos);
+                    if (state.getBlock() == ConfigBlocks.blockMetalDevice
+                            && state.getValue(BlockMetalDevice.TYPE) == 11) {
+                        this.world.setBlockState(this.pos, state.withProperty(BlockMetalDevice.TYPE, 9), 3);
+                    }
+                }
             }
         }
         return this.bottom;

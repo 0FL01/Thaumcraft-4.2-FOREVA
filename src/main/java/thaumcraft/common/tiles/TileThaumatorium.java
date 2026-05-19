@@ -5,6 +5,7 @@ import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.SoundEvents;
 import net.minecraft.inventory.Container;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.ISidedInventory;
@@ -33,7 +34,6 @@ import thaumcraft.common.blocks.BlockMetalDevice;
 import thaumcraft.common.blocks.BlockAiry;
 import thaumcraft.common.config.ConfigBlocks;
 import thaumcraft.common.container.InventoryFake;
-import thaumcraft.common.lib.TCSounds;
 import thaumcraft.common.lib.utils.InventoryUtils;
 
 public class TileThaumatorium extends TileThaumcraft implements ITickable, IAspectContainer, IEssentiaTransport, ISidedInventory {
@@ -168,7 +168,7 @@ public class TileThaumatorium extends TileThaumcraft implements ITickable, IAspe
         if (!output.isEmpty()) {
             EntityItem entity = new EntityItem(this.world,
                     (double) this.pos.getX() + 0.5D + (double) this.facing.getXOffset() * 0.66D,
-                    (double) this.pos.getY() + 0.33D,
+                    (double) this.pos.getY() + 0.33D + (double) this.facing.getOpposite().getYOffset(),
                     (double) this.pos.getZ() + 0.5D + (double) this.facing.getZOffset() * 0.66D,
                     output.copy());
             entity.motionX = 0.075F * (float) this.facing.getXOffset();
@@ -178,7 +178,14 @@ public class TileThaumatorium extends TileThaumcraft implements ITickable, IAspe
             this.world.addBlockEvent(this.pos, this.getBlockType(), 0, 0);
         }
 
-        this.world.playSound(null, this.pos, TCSounds.BUBBLE, SoundCategory.BLOCKS, 0.25F, 1.0F);
+        this.world.playSound(null,
+                (double) this.pos.getX() + 0.5D,
+                (double) this.pos.getY() + 0.5D,
+                (double) this.pos.getZ() + 0.5D,
+                SoundEvents.BLOCK_FIRE_EXTINGUISH,
+                SoundCategory.BLOCKS,
+                0.25F,
+                2.6F + (this.world.rand.nextFloat() - this.world.rand.nextFloat()) * 0.8F);
         this.currentCraft = -1;
         this.currentRecipe = null;
         this.markDirtyAndSync();

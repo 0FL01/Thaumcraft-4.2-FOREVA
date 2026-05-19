@@ -33,6 +33,11 @@ public class ThaumatoriumBrainboxUpgradeContractTest {
                 source.contains("this.recipePlayer.remove(index);"));
         assertTrue("TileThaumatorium completeRecipe must trigger block event for vent FX burst",
                 source.contains("this.world.addBlockEvent(this.pos, this.getBlockType(), 0, 0);"));
+        assertTrue("TileThaumatorium completeRecipe must keep reference fizz sound behavior",
+                source.contains("SoundEvents.BLOCK_FIRE_EXTINGUISH")
+                        && source.contains("2.6F + (this.world.rand.nextFloat() - this.world.rand.nextFloat()) * 0.8F"));
+        assertTrue("TileThaumatorium completeRecipe output spawn must preserve facing vertical offset",
+                source.contains("this.facing.getOpposite().getYOffset()"));
         assertTrue("TileThaumatorium client update path must emit vent particles through proxy",
                 source.contains("Thaumcraft.proxy.drawVentParticles(")
                         && source.contains("if (this.world.isRemote)"));
