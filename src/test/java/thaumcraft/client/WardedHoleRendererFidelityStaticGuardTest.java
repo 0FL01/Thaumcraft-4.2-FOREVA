@@ -36,8 +36,10 @@ public class WardedHoleRendererFidelityStaticGuardTest {
                         && hole.contains("textures/misc/particlefield.png")
                         && hole.contains("textures/misc/particlefield32.png")
                         && hole.contains("for (int i = 0; i < 16; i++)")
+                        && hole.contains("FIELD_COLOR_SEED = 31100L")
                         && hole.contains("ActiveRenderInfo")
                         && hole.contains("parallaxOffsets(")
+                        && hole.contains("faceParallaxSign(face)")
                         && hole.contains("shouldRenderFace(tile.getPos(), face)"));
 
         assertTrue("TileEldritchNothingRenderer should keep layered tunnel field + camera-parallax contracts",

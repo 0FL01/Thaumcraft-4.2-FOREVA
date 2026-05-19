@@ -35,6 +35,8 @@ public class MirrorRendererFidelityStaticGuardTest {
 
         assertTrue("TileMirrorRenderer should keep camera-relative parallax sampling for portal layers",
                 source.contains("parallaxOffsets(")
+                        && source.contains("FIELD_COLOR_SEED = 31100L")
+                        && source.contains("faceParallaxSign(facing)")
                         && source.contains("ActiveRenderInfo.getRotationX()")
                         && source.contains("view.lastTickPosX + (view.posX - view.lastTickPosX) * partialTicks"));
     }

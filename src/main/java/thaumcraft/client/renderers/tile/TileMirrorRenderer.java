@@ -28,6 +28,7 @@ public class TileMirrorRenderer extends TileEntitySpecialRenderer<TileEntity> {
     private static final ResourceLocation MIRROR_FRAME_ESS = new ResourceLocation("thaumcraft", "blocks/mirrorframe2");
 
     private static final float INSET = 0.1875F;
+    private static final long FIELD_COLOR_SEED = 31100L;
 
     @Override
     public void render(TileEntity tile, double x, double y, double z, float partialTicks, int destroyStage, float alpha) {
@@ -52,7 +53,7 @@ public class TileMirrorRenderer extends TileEntitySpecialRenderer<TileEntity> {
         if (view == null) return;
 
         long now = System.currentTimeMillis();
-        Random random = new Random(31100L);
+        Random random = new Random(FIELD_COLOR_SEED);
         double viewX = view.lastTickPosX + (view.posX - view.lastTickPosX) * partialTicks;
         double viewY = view.lastTickPosY + (view.posY - view.lastTickPosY) * partialTicks;
         double viewZ = view.lastTickPosZ + (view.posZ - view.lastTickPosZ) * partialTicks;
@@ -99,7 +100,7 @@ public class TileMirrorRenderer extends TileEntitySpecialRenderer<TileEntity> {
             float shiftBase = ((now % 700000L) / 250000.0F) + i * 0.13F;
             shiftBase += (i * i * 4321 + i * 9) * 2.0F * uvScale;
             float parallaxScale = uvScale * (0.75F + depth * 0.015625F);
-            float[] parallax = parallaxOffsets(facing, viewX, viewY, viewZ, parallaxScale);
+            float[] parallax = parallaxOffsets(facing, viewX, viewY, viewZ, parallaxScale, faceParallaxSign(facing));
 
             drawPortalFace(
                     facing, x, y, z,
@@ -177,7 +178,8 @@ public class TileMirrorRenderer extends TileEntitySpecialRenderer<TileEntity> {
         tess.draw();
     }
 
-    private static float[] parallaxOffsets(EnumFacing face, double viewX, double viewY, double viewZ, float scale) {
+    private static float[] parallaxOffsets(
+            EnumFacing face, double viewX, double viewY, double viewZ, float scale, float sign) {
         float rotX = ActiveRenderInfo.getRotationX();
         float rotZ = ActiveRenderInfo.getRotationZ();
         float rotYZ = ActiveRenderInfo.getRotationYZ();
@@ -206,7 +208,11 @@ public class TileMirrorRenderer extends TileEntitySpecialRenderer<TileEntity> {
                 v = 0.0F;
                 break;
         }
-        return new float[]{u * scale, v * scale};
+        return new float[]{u * scale * sign, v * scale * sign};
+    }
+
+    private static float faceParallaxSign(EnumFacing face) {
+        return face.getAxisDirection() == EnumFacing.AxisDirection.POSITIVE ? -1.0F : 1.0F;
     }
 
     private void renderPane(EnumFacing facing, double x, double y, double z, ResourceLocation tex, float offset) {
