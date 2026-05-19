@@ -45,7 +45,6 @@ public class TileMirrorRenderer extends TileEntitySpecialRenderer<TileEntity> {
         } else {
             renderPane(facing, x, y, z, MIRROR_PANE, 0.02F + instability);
         }
-        renderFrame(facing, x, y, z, tile.getBlockMetadata() >= 6, instability);
     }
 
     private void renderPortalLayers(EnumFacing facing, double x, double y, double z, float partialTicks) {

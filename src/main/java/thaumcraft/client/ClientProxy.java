@@ -341,6 +341,19 @@ public class ClientProxy extends CommonProxy {
                 }
                 continue;
             }
+            if (ConfigBlocks.blockMirror != null && item == Item.getItemFromBlock(ConfigBlocks.blockMirror)) {
+                ModelResourceLocation normalMirrorModel = new ModelResourceLocation(
+                        new ResourceLocation("thaumcraft", "blockmirror"), "inventory");
+                ModelResourceLocation essentiaMirrorModel = new ModelResourceLocation(
+                        new ResourceLocation("thaumcraft", "blockmirror_essentia"), "inventory");
+                for (int meta = 0; meta < 64; meta++) {
+                    ModelLoader.setCustomModelResourceLocation(item, meta, normalMirrorModel);
+                }
+                for (int meta = 6; meta < 12; meta++) {
+                    ModelLoader.setCustomModelResourceLocation(item, meta, essentiaMirrorModel);
+                }
+                continue;
+            }
             ModelResourceLocation model = new ModelResourceLocation(registryName, "inventory");
             for (int meta = 0; meta < 64; meta++) {
                 ModelLoader.setCustomModelResourceLocation(item, meta, model);

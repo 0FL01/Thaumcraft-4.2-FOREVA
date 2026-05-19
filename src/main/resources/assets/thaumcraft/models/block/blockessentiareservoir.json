@@ -1,6 +1,80 @@
 {
-  "parent": "block/cube_all",
+  "ambientocclusion": false,
   "textures": {
-    "all": "thaumcraft:blocks/essentiareservoir"
-  }
+    "reservoir": "thaumcraft:blocks/essentiareservoir"
+  },
+  "elements": [
+    {
+      "from": [2, 7, 2],
+      "to": [14, 9, 14],
+      "faces": {
+        "down": { "texture": "#reservoir" },
+        "up": { "texture": "#reservoir" },
+        "north": { "texture": "#reservoir" },
+        "south": { "texture": "#reservoir" },
+        "west": { "texture": "#reservoir" },
+        "east": { "texture": "#reservoir" }
+      }
+    },
+    {
+      "from": [2, 2, 2],
+      "to": [14, 7, 3],
+      "faces": {
+        "down": { "texture": "#reservoir" },
+        "up": { "texture": "#reservoir" },
+        "north": { "texture": "#reservoir" },
+        "south": { "texture": "#reservoir" },
+        "west": { "texture": "#reservoir" },
+        "east": { "texture": "#reservoir" }
+      }
+    },
+    {
+      "from": [2, 2, 13],
+      "to": [14, 7, 14],
+      "faces": {
+        "down": { "texture": "#reservoir" },
+        "up": { "texture": "#reservoir" },
+        "north": { "texture": "#reservoir" },
+        "south": { "texture": "#reservoir" },
+        "west": { "texture": "#reservoir" },
+        "east": { "texture": "#reservoir" }
+      }
+    },
+    {
+      "from": [2, 2, 3],
+      "to": [3, 7, 13],
+      "faces": {
+        "down": { "texture": "#reservoir" },
+        "up": { "texture": "#reservoir" },
+        "north": { "texture": "#reservoir" },
+        "south": { "texture": "#reservoir" },
+        "west": { "texture": "#reservoir" },
+        "east": { "texture": "#reservoir" }
+      }
+    },
+    {
+      "from": [13, 2, 3],
+      "to": [14, 7, 13],
+      "faces": {
+        "down": { "texture": "#reservoir" },
+        "up": { "texture": "#reservoir" },
+        "north": { "texture": "#reservoir" },
+        "south": { "texture": "#reservoir" },
+        "west": { "texture": "#reservoir" },
+        "east": { "texture": "#reservoir" }
+      }
+    },
+    {
+      "from": [2, 1, 2],
+      "to": [14, 2, 14],
+      "faces": {
+        "down": { "texture": "#reservoir" },
+        "up": { "texture": "#reservoir" },
+        "north": { "texture": "#reservoir" },
+        "south": { "texture": "#reservoir" },
+        "west": { "texture": "#reservoir" },
+        "east": { "texture": "#reservoir" }
+      }
+    }
+  ]
 }

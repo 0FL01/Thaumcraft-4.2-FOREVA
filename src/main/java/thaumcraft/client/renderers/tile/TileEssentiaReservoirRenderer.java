@@ -10,31 +10,16 @@ import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.util.ResourceLocation;
 import org.lwjgl.opengl.GL11;
 import thaumcraft.api.aspects.Aspect;
-import thaumcraft.client.renderers.models.ModelEssentiaReservoir;
 import thaumcraft.common.tiles.TileEssentiaReservoir;
 
 public class TileEssentiaReservoirRenderer extends TileEntitySpecialRenderer<TileEssentiaReservoir> {
-    private static final ResourceLocation RESERVOIR_TEXTURE =
-            new ResourceLocation("thaumcraft", "textures/models/reservoir.png");
-    private static final float MODEL_SCALE = 0.0625F;
-
-    private final ModelEssentiaReservoir model = new ModelEssentiaReservoir();
-
     @Override
     public void render(TileEssentiaReservoir tile, double x, double y, double z, float partialTicks, int destroyStage, float alpha) {
         if (tile == null || tile.getWorld() == null) {
             return;
         }
-
-        GlStateManager.pushMatrix();
-        GlStateManager.translate(x + 0.5D, y + 0.5D, z + 0.5D);
-        orientByFace(tile.facing);
-        bindTexture(RESERVOIR_TEXTURE);
-        model.renderAll(MODEL_SCALE);
-        GlStateManager.popMatrix();
 
         renderLiquid(tile, x, y, z);
     }

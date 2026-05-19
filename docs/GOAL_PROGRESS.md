@@ -22,16 +22,9 @@ Branch: `codex/durable-goal-stage8-9`
 
 - Live checkpoint prose moved into `docs/GOAL_PROGRESS-archive/` batch files.
 - Recent validated work remains concentrated in Stage 8-c/8-d/8-e renderer, entity, and FX bursts plus Stage 9 recipe/content/research bursts.
-- Latest Stage 8-e burst converted `FXBreaking` and `FXSwarm` from `spawnParticle(...)` fallbacks to dedicated render paths, with `validate` and `validate --smoke` passing afterward.
-- Latest Stage 8-e burst restored `smokeSpiral` proxy coverage for Elemental Sword and Eldritch Warden, and converted `FXSmokeDrift`/`FXSmokeSpiral` off vanilla smoke emitters with `validate` and `validate --smoke` passing afterward.
-- Latest Stage 9-e verification burst added a typed `ConfigResearch` recipe-handle audit so `recipeI/recipeArcane/recipeCrucible/recipeInfusion/recipeInfusionEnchantment/recipeList` lookups stay aligned with matching registration families, with `validate` passing afterward.
-- Latest Stage 9-d follow-up restored the balanced shard (`itemShard:6`) aspect baseline and switched `itemResource:14` back to reference-shaped derivation from it, with `validate` and `validate --smoke` passing afterward.
-- Latest Stage 8-c burst added dynamic brainbox/sensor/lifter renderer coverage plus reference-shaped brainbox/sensor model geometry, with `validate` and `validate --smoke` passing afterward.
-- Latest Stage 8-c burst restored dynamic tube conduit coverage for `TileTube/Valve/Filter/Buffer/Restrict/Oneway` and replaced the remaining `cube_all` tube placeholders with reference-shaped core models, with `validate` and `validate --smoke` passing afterward.
-- Latest Stage 8-e burst migrated client-only smoke/flame/spell fallback emissions in `ItemElementalSword`, `BlockCrystal`, `TileMirror`, `EntityDart`, and `EntityFireBat` onto dedicated generic sheet FX routing, with `validate` and `validate --smoke` passing afterward.
-- Latest Stage 8-e burst migrated ambient candle/jar/sensor/arcane-furnace/explosion particle fallbacks onto the same dedicated generic sheet FX routing, with `validate` and `validate --smoke` passing afterward.
-- Latest Stage 8-e burst migrated remaining entity/projectile `BLOCK_CRACK`/`SLIME`/`WATER_BUBBLE`/`VILLAGER_ANGRY` fallbacks in Frost Shard, Watcher, Thaumic Slime, Taintacle Giant, Eldritch Golem, and Thaumcraft Boss onto dedicated proxy FX paths, and restored the slime-ball sprite baseline for taint/slime breaking helpers.
-- Latest Stage 8-e burst restored Eldritch Golem headless beam-charge client FX parity (`spark`, scaled vent plume, Jacob's arc target cadence) by reintroducing the missing proxy helper surface and status-`19` arcing branch.
+- Recent Stage 8-e bursts converted the remaining fallback particle families (`FXBreaking`/`FXSwarm`, smoke spiral/drift, sheet smoke/flame/spell emissions, and entity `BLOCK_CRACK`/`SLIME`/`WATER_BUBBLE`/`VILLAGER_ANGRY` branches) onto dedicated proxy or particle-engine paths, and restored Eldritch Golem beam-charge FX parity; each burst passed `validate`, and runtime-risk bursts also passed `validate --smoke`.
+- Recent Stage 9 bursts added typed `ConfigResearch` recipe-handle audits and restored the balanced shard (`itemShard:6`) / `itemResource:14` aspect derivation baseline; validation passed, with smoke run where common config registration paths changed.
+- Recent Stage 8-c bursts covered dynamic brainbox/sensor/lifter and tube conduit shells; the latest follow-up moved mirror and essentia-reservoir static shells into block models, leaving TESR for portal/liquid layers and splitting normal vs essentia mirror inventory models, with `validate` and `validate --smoke` passing afterward.
 - Stage 3-7 residual blockers stay documented and non-blocking for current burst planning.
 - GUI/manual parity checks remain skipped by instruction.
 

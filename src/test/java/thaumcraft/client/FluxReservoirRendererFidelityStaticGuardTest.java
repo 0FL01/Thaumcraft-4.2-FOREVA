@@ -16,7 +16,7 @@ public class FluxReservoirRendererFidelityStaticGuardTest {
         String fluxRenderer = read("src/main/java/thaumcraft/client/renderers/tile/TileFluxScrubberRenderer.java");
         String fluxModel = read("src/main/java/thaumcraft/client/renderers/models/ModelFluxScrubber.java");
         String reservoirRenderer = read("src/main/java/thaumcraft/client/renderers/tile/TileEssentiaReservoirRenderer.java");
-        String reservoirModel = read("src/main/java/thaumcraft/client/renderers/models/ModelEssentiaReservoir.java");
+        String reservoirModel = read("src/main/resources/assets/thaumcraft/models/block/blockessentiareservoir.json");
 
         assertTrue("Flux scrubber renderer should use model cap/tip orientation path instead of billboard quads",
                 fluxRenderer.contains("new ModelFluxScrubber()")
@@ -33,27 +33,24 @@ public class FluxReservoirRendererFidelityStaticGuardTest {
                         && fluxModel.contains("renderCap(float scale)")
                         && fluxModel.contains("renderTip(float scale)"));
 
-        assertTrue("Reservoir renderer should use model shell plus textured 3D liquid volume rendering",
-                reservoirRenderer.contains("new ModelEssentiaReservoir()")
-                        && reservoirRenderer.contains("model.renderAll(MODEL_SCALE)")
-                        && reservoirRenderer.contains("renderLiquid(tile, x, y, z)")
+        assertTrue("Reservoir renderer should keep only the textured 3D liquid volume while the static shell lives in the block model",
+                reservoirRenderer.contains("renderLiquid(tile, x, y, z)")
                         && reservoirRenderer.contains("BufferBuilder")
                         && reservoirRenderer.contains("DefaultVertexFormats.POSITION_TEX_COLOR")
                         && reservoirRenderer.contains("thaumcraft:blocks/animatedglow")
                         && reservoirRenderer.contains("TextureMap.LOCATION_BLOCKS_TEXTURE")
                         && reservoirRenderer.contains("OpenGlHelper.setLightmapTextureCoords")
                         && reservoirRenderer.contains("computeLiquidAlpha(")
-                        && reservoirRenderer.contains("drawTexturedCuboid("));
+                        && reservoirRenderer.contains("drawTexturedCuboid(")
+                        && !reservoirRenderer.contains("new ModelEssentiaReservoir()")
+                        && !reservoirRenderer.contains("model.renderAll(MODEL_SCALE)"));
 
-        assertTrue("ModelEssentiaReservoir should define base/walls/top ring geometry",
-                reservoirModel.contains("class ModelEssentiaReservoir extends ModelBase")
-                        && reservoirModel.contains("base")
-                        && reservoirModel.contains("wallNorth")
-                        && reservoirModel.contains("wallSouth")
-                        && reservoirModel.contains("wallWest")
-                        && reservoirModel.contains("wallEast")
-                        && reservoirModel.contains("ringTop")
-                        && reservoirModel.contains("renderAll(float scale)"));
+        assertTrue("Reservoir block model should define the basin shell geometry after the shell moved out of TESR",
+                reservoirModel.contains("\"ambientocclusion\": false")
+                        && reservoirModel.contains("\"from\": [2, 7, 2]")
+                        && reservoirModel.contains("\"from\": [2, 2, 13]")
+                        && reservoirModel.contains("\"from\": [13, 2, 3]")
+                        && reservoirModel.contains("\"from\": [2, 1, 2]"));
     }
 
     private static String read(String path) throws IOException {
