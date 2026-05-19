@@ -48,10 +48,17 @@ Branch: `codex/durable-goal-stage8-9`
 | Stage 9-a..e | Recipe/content/crafting/research systems are substantially ported and guarded. |
 | Docs/validation | Progress history is archived into batches; live file stays concise. |
 
-## Archive
+## Archive Index
 
-- Old snapshot: `docs/GOAL_PROGRESS-archive/old-GOAL_PROGRESS.archive.md`
-- Batch archives: `docs/GOAL_PROGRESS-archive/batch-01-stage3-5.md`, `docs/GOAL_PROGRESS-archive/batch-02-stage6-7.md`, `docs/GOAL_PROGRESS-archive/batch-03-stage8-c.md`, `docs/GOAL_PROGRESS-archive/batch-04-stage8-d-e.md`, `docs/GOAL_PROGRESS-archive/batch-05-stage9.md`
+| File | Source | Content |
+|---|---|---|
+| `old-GOAL_PROGRESS.archive.md` | GOAL_PROGRESS.md | Original snapshot before batch split |
+| `batch-01-stage3-5.md` | GOAL_PROGRESS.md | Stage 3–5 checkpoint prose |
+| `batch-02-stage6-7.md` | GOAL_PROGRESS.md | Stage 6–7 checkpoint prose |
+| `batch-03-stage8-c.md` | GOAL_PROGRESS.md | Stage 8-c checkpoint prose |
+| `batch-04-stage8-d-e.md` | GOAL_PROGRESS.md | Stage 8-d/e checkpoint prose |
+| `batch-05-stage9.md` | GOAL_PROGRESS.md | Stage 9 checkpoint prose |
+| `stage8-d-checkpoints.md` | Stage8-d.md §6 | 42 entity-renderer checkpoint logs |
 
 ## Next Checkpoint Candidate
 

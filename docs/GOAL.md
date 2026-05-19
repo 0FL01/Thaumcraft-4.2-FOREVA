@@ -55,6 +55,22 @@ Commit cadence:
 - Commit after each coherent subsystem bundle that reaches a safe checkpoint.
 - Document grouped gaps, validation, skipped GUI checks, and commit hash in `docs/GOAL_PROGRESS.md`.
 
+## 0.2 Doc housekeeping — archive rotation
+
+Checkpoint prose accumulates and must be rotated to keep docs readable.
+
+- Keep `docs/GOAL_PROGRESS.md` ≤ 80 lines. When a new entry would exceed
+  this, batch the oldest entries into `docs/GOAL_PROGRESS-archive/` and
+  update the Archive Index in GOAL_PROGRESS.md.
+- Keep each `docs/Stage*.md` ≤ 600 lines. When verbose checkpoint logs
+  (e.g. `## Итоговый checklist`) exceed this, move the full log body
+  into `docs/GOAL_PROGRESS-archive/<stage>-checkpoints.md`, replace with
+  a breadcrumb digest + archive link, and add an entry to the Archive Index.
+- Archive Index lives in `docs/GOAL_PROGRESS.md` (§Archive). The agent
+  checks it before digging through raw archive files.
+- Archive commits touch only docs, need no runtime smoke, use commit
+  message prefix `docs(...):`.
+
 ## 1. Global end state
 
 Complete the port as far as can be proven without user-driven GUI/graphics testing:
