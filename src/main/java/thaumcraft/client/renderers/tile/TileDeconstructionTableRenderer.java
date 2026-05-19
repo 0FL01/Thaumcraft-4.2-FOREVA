@@ -25,7 +25,6 @@ public class TileDeconstructionTableRenderer extends TileEntitySpecialRenderer<T
         }
 
         float ticks = TileRenderHelper.ticks(tile, partialTicks);
-        renderTableModel(x, y, z);
         renderThaumometer(x, y, z);
 
         ItemStack input = tile.getStackInSlot(0);
@@ -58,16 +57,6 @@ public class TileDeconstructionTableRenderer extends TileEntitySpecialRenderer<T
             GlStateManager.enableLighting();
             GlStateManager.popMatrix();
         }
-    }
-
-    private void renderTableModel(double x, double y, double z) {
-        GlStateManager.pushMatrix();
-        GlStateManager.translate(x + 0.5D, y + 1.0D, z + 0.5D);
-        GlStateManager.rotate(180.0F, 1.0F, 0.0F, 0.0F);
-        GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
-        bindTexture(TABLE_TEXTURE);
-        tableModel.renderAll(MODEL_SCALE);
-        GlStateManager.popMatrix();
     }
 
     private void renderThaumometer(double x, double y, double z) {

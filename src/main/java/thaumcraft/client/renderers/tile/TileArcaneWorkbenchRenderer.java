@@ -23,8 +23,6 @@ public class TileArcaneWorkbenchRenderer extends TileEntitySpecialRenderer<TileA
             return;
         }
 
-        renderTableModel(x, y, z);
-
         ItemStack wand = tile.getStackInSlot(10);
         if (!wand.isEmpty() && wand.getItem() instanceof ItemWandCasting) {
             GlStateManager.pushMatrix();
@@ -38,15 +36,5 @@ public class TileArcaneWorkbenchRenderer extends TileEntitySpecialRenderer<TileA
             RenderHelper.disableStandardItemLighting();
             GlStateManager.popMatrix();
         }
-    }
-
-    private void renderTableModel(double x, double y, double z) {
-        GlStateManager.pushMatrix();
-        GlStateManager.translate(x + 0.5D, y + 1.0D, z + 0.5D);
-        GlStateManager.rotate(180.0F, 1.0F, 0.0F, 0.0F);
-        GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
-        bindTexture(TABLE_TEXTURE);
-        tableModel.renderAll(MODEL_SCALE);
-        GlStateManager.popMatrix();
     }
 }
