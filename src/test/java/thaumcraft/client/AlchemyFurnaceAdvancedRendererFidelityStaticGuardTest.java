@@ -16,6 +16,7 @@ public class AlchemyFurnaceAdvancedRendererFidelityStaticGuardTest {
         String model = read("src/main/java/thaumcraft/client/renderers/models/ModelAlchemyFurnaceAdvanced.java");
         String renderer = read("src/main/java/thaumcraft/client/renderers/tile/TileAlchemyFurnaceAdvancedRenderer.java");
         String alembic = read("src/main/java/thaumcraft/client/renderers/tile/TileAlembicRenderer.java");
+        String furnaceBlockModel = read("src/main/resources/assets/thaumcraft/models/block/blockstonedevice_0.json");
 
         assertTrue("ModelAlchemyFurnaceAdvanced should define base/tank/lava panels",
                 model.contains("class ModelAlchemyFurnaceAdvanced extends ModelBase")
@@ -26,13 +27,14 @@ public class AlchemyFurnaceAdvancedRendererFidelityStaticGuardTest {
                         && model.contains("renderTankPanel(float scale)")
                         && model.contains("renderLavaPanel(float scale)"));
 
-        assertTrue("TileAlchemyFurnaceAdvancedRenderer should use model-driven render path with side tank loops and heat glow",
+        assertTrue("TileAlchemyFurnaceAdvancedRenderer should keep only dynamic lava-panel and heat-glow paths after the static shell moved into the block model",
                 renderer.contains("new ModelAlchemyFurnaceAdvanced()")
-                        && renderer.contains("model.renderBase(MODEL_SCALE)")
                         && renderer.contains("for (int side = 0; side < 4; side++)")
-                        && renderer.contains("model.renderTankPanel(MODEL_SCALE)")
                         && renderer.contains("model.renderLavaPanel(MODEL_SCALE)")
+                        && renderer.contains("bindTexture(burning ? TANK_ON : TANK);")
                         && renderer.contains("drawFurnaceGlowQuad(")
+                        && !renderer.contains("model.renderBase(MODEL_SCALE)")
+                        && !renderer.contains("model.renderTankPanel(MODEL_SCALE)")
                         && !renderer.contains("TileRenderHelper.orientBillboardToPlayer()")
                         && !renderer.contains("TileRenderHelper.drawTexturedQuad("));
 
@@ -42,6 +44,15 @@ public class AlchemyFurnaceAdvancedRendererFidelityStaticGuardTest {
                         && alembic.contains("renderOutputNozzles(")
                         && !alembic.contains("drawPrism(")
                         && !alembic.contains("drawTexturedCuboid("));
+
+        assertTrue("Alchemy furnace block model should now carry the static base and tank-panel shell instead of the old full-cube placeholder",
+                furnaceBlockModel.contains("\"ambientocclusion\": false")
+                        && furnaceBlockModel.contains("\"front\": \"thaumcraft:blocks/al_furnace_front_off\"")
+                        && furnaceBlockModel.contains("\"tank\": \"thaumcraft:models/alch_furnace_tank\"")
+                        && furnaceBlockModel.contains("\"from\": [0, 0, 0]")
+                        && furnaceBlockModel.contains("\"to\": [16, 14, 16]")
+                        && furnaceBlockModel.contains("\"from\": [4.5, 5, 0]")
+                        && furnaceBlockModel.contains("\"from\": [15, 5, 4.5]"));
     }
 
     private static String read(String path) throws IOException {

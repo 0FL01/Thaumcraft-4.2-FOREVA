@@ -37,18 +37,8 @@ public class TileAlchemyFurnaceAdvancedRenderer extends TileEntitySpecialRendere
         GlStateManager.disableLighting();
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
 
-        bindTexture(burning ? FURNACE_ON : FURNACE);
-        model.renderBase(MODEL_SCALE);
-
-        bindTexture(burning ? TANK_ON : TANK);
-        for (int side = 0; side < 4; side++) {
-            GlStateManager.pushMatrix();
-            GlStateManager.rotate(side * 90.0F, 0.0F, 0.0F, 1.0F);
-            model.renderTankPanel(MODEL_SCALE);
-            GlStateManager.popMatrix();
-        }
-
         if (content > 0.0F) {
+            bindTexture(burning ? TANK_ON : TANK);
             int alphaChannel = Math.max(50, (int) (255.0F * content * pulse));
             float alphaFactor = alphaChannel / 255.0F;
             for (int side = 0; side < 4; side++) {
