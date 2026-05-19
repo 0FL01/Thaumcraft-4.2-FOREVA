@@ -20,13 +20,13 @@ import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.EntityDataManager;
 import net.minecraft.util.DamageSource;
-import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.SoundEvent;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.EnumDifficulty;
 import net.minecraft.world.World;
+import thaumcraft.common.Thaumcraft;
 import thaumcraft.common.entities.ai.misc.AIWander;
 
 /**
@@ -245,13 +245,14 @@ public class EntityWatcher extends EntityMob {
             if (this.isGazing()) {
                 Vec3d lookVec = this.getLook(0.0F);
                 for (int i = 0; i < 2; i++) {
-                    this.world.spawnParticle(
-                        EnumParticleTypes.WATER_BUBBLE,
-                        this.posX + (this.rand.nextDouble() - 0.5) * (double) this.width - lookVec.x * 1.5,
-                        this.posY + this.rand.nextDouble() * (double) this.height - lookVec.y * 1.5,
-                        this.posZ + (this.rand.nextDouble() - 0.5) * (double) this.width - lookVec.z * 1.5,
-                        0.0, 0.0, 0.0
-                    );
+                    Thaumcraft.proxy.drawGenericParticles(
+                            this.world,
+                            this.posX + (this.rand.nextDouble() - 0.5) * (double) this.width - lookVec.x * 1.5,
+                            this.posY + this.rand.nextDouble() * (double) this.height - lookVec.y * 1.5,
+                            this.posZ + (this.rand.nextDouble() - 0.5) * (double) this.width - lookVec.z * 1.5,
+                            0.0, 0.02, 0.0,
+                            1.0F, 1.0F, 1.0F, 1.0F,
+                            false, 32, 1, 1, 8, 0, 0.2F, 1);
                 }
             }
 
@@ -275,13 +276,14 @@ public class EntityWatcher extends EntityMob {
                     double d = this.rand.nextDouble();
                     while (d < dist) {
                         d += 1.8D - progress + this.rand.nextDouble() * (1.7D - progress);
-                        this.world.spawnParticle(
-                            EnumParticleTypes.WATER_BUBBLE,
-                            this.posX + dx * d,
-                            this.posY + dy * d + (double) this.getEyeHeight(),
-                            this.posZ + dz * d,
-                            0.0, 0.0, 0.0
-                        );
+                        Thaumcraft.proxy.drawGenericParticles(
+                                this.world,
+                                this.posX + dx * d,
+                                this.posY + dy * d + (double) this.getEyeHeight(),
+                                this.posZ + dz * d,
+                                0.0, 0.02, 0.0,
+                                1.0F, 1.0F, 1.0F, 1.0F,
+                                false, 32, 1, 1, 8, 0, 0.2F, 1);
                     }
                 }
             }

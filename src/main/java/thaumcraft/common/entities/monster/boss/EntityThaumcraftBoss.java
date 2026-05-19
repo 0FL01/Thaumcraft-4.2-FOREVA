@@ -21,7 +21,6 @@ import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.potion.PotionEffect;
 import net.minecraft.util.DamageSource;
-import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextComponentTranslation;
@@ -29,6 +28,7 @@ import net.minecraft.world.BossInfo;
 import net.minecraft.world.BossInfoServer;
 import net.minecraft.world.DifficultyInstance;
 import thaumcraft.api.entities.IEldritchMob;
+import thaumcraft.common.Thaumcraft;
 import thaumcraft.common.config.ConfigItems;
 import thaumcraft.common.lib.utils.EntityUtils;
 
@@ -168,11 +168,14 @@ public class EntityThaumcraftBoss extends EntityMob {
                 double d0 = this.rand.nextGaussian() * 0.02D;
                 double d1 = this.rand.nextGaussian() * 0.02D;
                 double d2 = this.rand.nextGaussian() * 0.02D;
-                this.world.spawnParticle(EnumParticleTypes.VILLAGER_ANGRY,
+                Thaumcraft.proxy.drawGenericParticles(
+                        this.world,
                         this.posX + (double) (this.rand.nextFloat() * this.width) - (double) this.width / 2.0D,
                         this.getEntityBoundingBox().minY + (double) this.height + (double) this.rand.nextFloat() * 0.5D,
                         this.posZ + (double) (this.rand.nextFloat() * this.width) - (double) this.width / 2.0D,
-                        d0, d1, d2);
+                        d0, d1, d2,
+                        1.0F, 1.0F, 1.0F, 1.0F,
+                        false, 81, 1, 1, 16, 0, 1.5F, 1);
             }
         } else {
             if (this.ticksExisted % 30 == 0) {

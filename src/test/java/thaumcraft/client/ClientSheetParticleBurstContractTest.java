@@ -24,8 +24,14 @@ public class ClientSheetParticleBurstContractTest {
         String tileMirror = read("src/main/java/thaumcraft/common/tiles/TileMirror.java");
         String tileArcaneFurnace = read("src/main/java/thaumcraft/common/tiles/TileArcaneFurnace.java");
         String entityDart = read("src/main/java/thaumcraft/common/entities/projectile/EntityDart.java");
+        String frostShard = read("src/main/java/thaumcraft/common/entities/projectile/EntityFrostShard.java");
         String fireBat = read("src/main/java/thaumcraft/common/entities/monster/EntityFireBat.java");
         String inhabitedZombie = read("src/main/java/thaumcraft/common/entities/monster/EntityInhabitedZombie.java");
+        String watcher = read("src/main/java/thaumcraft/common/entities/monster/EntityWatcher.java");
+        String thaumicSlime = read("src/main/java/thaumcraft/common/entities/monster/EntityThaumicSlime.java");
+        String taintacleGiant = read("src/main/java/thaumcraft/common/entities/monster/boss/EntityTaintacleGiant.java");
+        String eldritchGolem = read("src/main/java/thaumcraft/common/entities/monster/boss/EntityEldritchGolem.java");
+        String thaumcraftBoss = read("src/main/java/thaumcraft/common/entities/monster/boss/EntityThaumcraftBoss.java");
 
         assertTrue("CommonProxy and ClientProxy must expose the explicit-count generic sheet particle overload",
                 commonProxy.contains("float red, float green, float blue, float alpha,")
@@ -36,6 +42,9 @@ public class ClientSheetParticleBurstContractTest {
                 genericFx.contains("Math.abs(this.particleInc)")
                         && genericFx.contains("if (this.particleInc < 0)")
                         && genericFx.contains("this.numParticles - 1 - frame"));
+        assertTrue("ClientProxy taint/slime breaking helpers must use the slime-ball reference sprite baseline",
+                clientProxy.contains("Items.SLIME_BALL")
+                        && !clientProxy.contains("Items.SNOWBALL"));
         assertTrue("Elemental Sword, Crystal, Candle, Jar, WoodenDevice sensor, Mirror, ArcaneFurnace, Dart, FireBat, and InhabitedZombie must route their client-only fallback particles through proxy generic sheet FX",
                 elementalSword.contains("Thaumcraft.proxy.drawGenericParticles(player.world")
                         && !elementalSword.contains("EnumParticleTypes.SMOKE_NORMAL")
@@ -59,6 +68,20 @@ public class ClientSheetParticleBurstContractTest {
                         && !fireBat.contains("EnumParticleTypes.FLAME")
                         && inhabitedZombie.contains("Thaumcraft.proxy.drawGenericParticles(this.world")
                         && !inhabitedZombie.contains("EnumParticleTypes.EXPLOSION_NORMAL"));
+        assertTrue("FrostShard, Watcher, ThaumicSlime, TaintacleGiant, EldritchGolem, and ThaumcraftBoss must route their remaining client-only fallback particles through dedicated proxy FX paths",
+                frostShard.contains("Thaumcraft.proxy.sparkle(")
+                        && frostShard.contains("Thaumcraft.proxy.boreDigFx(")
+                        && !frostShard.contains("EnumParticleTypes.BLOCK_CRACK")
+                        && watcher.contains("Thaumcraft.proxy.drawGenericParticles(")
+                        && !watcher.contains("EnumParticleTypes.WATER_BUBBLE")
+                        && thaumicSlime.contains("Thaumcraft.proxy.slimeJumpFX(this, sizeSqrt)")
+                        && !thaumicSlime.contains("EnumParticleTypes.SLIME")
+                        && taintacleGiant.contains("Thaumcraft.proxy.drawGenericParticles(")
+                        && !taintacleGiant.contains("EnumParticleTypes.VILLAGER_ANGRY")
+                        && eldritchGolem.contains("Thaumcraft.proxy.boreDigFx(")
+                        && !eldritchGolem.contains("EnumParticleTypes.BLOCK_CRACK")
+                        && thaumcraftBoss.contains("Thaumcraft.proxy.drawGenericParticles(")
+                        && !thaumcraftBoss.contains("EnumParticleTypes.VILLAGER_ANGRY"));
     }
 
     private static String read(String path) throws IOException {

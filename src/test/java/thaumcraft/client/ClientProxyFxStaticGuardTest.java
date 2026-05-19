@@ -80,7 +80,7 @@ public class ClientProxyFxStaticGuardTest {
                 source.contains("public void taintLandFX(")
                         && source.contains("entity.getEntityBoundingBox()")
                         && source.contains("new FXBreaking(")
-                        && source.contains("Items.SNOWBALL"));
+                        && source.contains("Items.SLIME_BALL"));
         assertTrue("ClientProxy must override slimeJumpFX for infested champion fallback",
                 source.contains("public void slimeJumpFX(")
                         && source.contains("new FXBreaking(")
@@ -90,7 +90,7 @@ public class ClientProxyFxStaticGuardTest {
                         && source.contains("new FXSwarm(")
                         && source.contains("public void splooshFX(Entity entity)")
                         && source.contains("new FXBreaking(")
-                        && source.contains("Items.SNOWBALL"));
+                        && source.contains("Items.SLIME_BALL"));
         assertTrue("ClientProxy must override drawGenericParticles for champion modifier fallback",
                 source.contains("public void drawGenericParticles(") && source.contains("new FXGeneric("));
         assertTrue("ClientProxy must override drawVentParticles for thaumatorium vent routing",

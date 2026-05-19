@@ -2,6 +2,7 @@ package thaumcraft.common.entities.projectile;
 
 import io.netty.buffer.ByteBuf;
 import net.minecraft.block.Block;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.projectile.EntityThrowable;
@@ -14,7 +15,6 @@ import net.minecraft.network.datasync.EntityDataManager;
 import net.minecraft.potion.PotionEffect;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundEvent;
 import net.minecraft.util.math.BlockPos;
@@ -22,6 +22,7 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.registry.IEntityAdditionalSpawnData;
+import thaumcraft.common.Thaumcraft;
 
 public class EntityFrostShard extends EntityThrowable implements IEntityAdditionalSpawnData {
     public double bounce = 0.5;
@@ -68,12 +69,13 @@ public class EntityFrostShard extends EntityThrowable implements IEntityAddition
         if (this.world.isRemote && this.getFrosty() > 0) {
             float s = this.getDamage() / 10.0f;
             for (int a = 0; a < this.getFrosty(); ++a) {
-                this.world.spawnParticle(EnumParticleTypes.BLOCK_CRACK,
-                    this.posX - (double)s + (double)(this.rand.nextFloat() * s * 2.0f),
-                    this.posY - (double)s + (double)(this.rand.nextFloat() * s * 2.0f),
-                    this.posZ - (double)s + (double)(this.rand.nextFloat() * s * 2.0f),
-                    0.0, 0.0, 0.0,
-                    Block.getIdFromBlock(Blocks.PACKED_ICE));
+                Thaumcraft.proxy.sparkle(
+                        (float) this.posX - s + this.rand.nextFloat() * (s * 2.0f),
+                        (float) this.posY - s + this.rand.nextFloat() * (s * 2.0f),
+                        (float) this.posZ - s + this.rand.nextFloat() * (s * 2.0f),
+                        0.4f,
+                        6,
+                        0.005f);
             }
         }
     }
@@ -144,12 +146,22 @@ public class EntityFrostShard extends EntityThrowable implements IEntityAddition
             if (iceBreak == null) iceBreak = SoundEvent.REGISTRY.getObject(new ResourceLocation("block.stone.break"));
             if (iceBreak != null) this.playSound(iceBreak, 0.3f, 1.2f / (this.rand.nextFloat() * 0.2f + 0.9f));
             if (this.world.isRemote) {
+                IBlockState fragmentState = Blocks.PACKED_ICE.getDefaultState();
+                if (result.typeOfHit == RayTraceResult.Type.BLOCK && result.getBlockPos() != null) {
+                    fragmentState = this.world.getBlockState(result.getBlockPos());
+                }
                 for (int a = 0; (float)a < 8.0f * this.getDamage(); ++a) {
-                    this.world.spawnParticle(EnumParticleTypes.BLOCK_CRACK,
-                        this.posX, this.posY, this.posZ,
-                        4.0 * ((double)this.rand.nextFloat() - 0.5), 0.5,
-                        ((double)this.rand.nextFloat() - 0.5) * 4.0,
-                        Block.getIdFromBlock(Blocks.PACKED_ICE));
+                    Thaumcraft.proxy.boreDigFx(
+                            this.world,
+                            this.posX,
+                            this.posY,
+                            this.posZ,
+                            this.posX + 4.0 * (this.rand.nextDouble() - 0.5),
+                            this.posY + 0.5,
+                            this.posZ + (this.rand.nextDouble() - 0.5) * 4.0,
+                            fragmentState,
+                            null,
+                            0);
                 }
             }
         }

@@ -1122,7 +1122,7 @@ public class ClientProxy extends CommonProxy {
             float offsetZ = MathHelper.cos(angle) * 0.5F * radius;
             double y = (entity.getEntityBoundingBox().minY + entity.getEntityBoundingBox().maxY) * 0.5D;
 
-            FXBreaking fx = new FXBreaking(world, entity.posX + offsetX, y, entity.posZ + offsetZ, Items.SNOWBALL);
+            FXBreaking fx = new FXBreaking(world, entity.posX + offsetX, y, entity.posZ + offsetZ, Items.SLIME_BALL);
             fx.setRBGColorF(0.1F, 0.0F, 0.1F);
             fx.setAlphaF(0.4F);
             fx.setParticleMaxAge((int) (66.0F / (world.rand.nextFloat() * 0.9F + 0.1F)));
@@ -1144,7 +1144,7 @@ public class ClientProxy extends CommonProxy {
             float offsetZ = MathHelper.cos(angle) * size * 0.5F * radius;
             double y = (entity.getEntityBoundingBox().minY + entity.getEntityBoundingBox().maxY) * 0.5D;
 
-            FXBreaking fx = new FXBreaking(world, entity.posX + offsetX, y, entity.posZ + offsetZ, Items.SNOWBALL);
+            FXBreaking fx = new FXBreaking(world, entity.posX + offsetX, y, entity.posZ + offsetZ, Items.SLIME_BALL);
             fx.setRBGColorF(0.7F, 0.0F, 1.0F);
             fx.setAlphaF(0.4F);
             fx.setParticleMaxAge((int) (66.0F / (world.rand.nextFloat() * 0.9F + 0.1F)));
@@ -1191,7 +1191,7 @@ public class ClientProxy extends CommonProxy {
                 entity.posX + offsetX,
                 entity.posY + world.rand.nextFloat() * entity.height,
                 entity.posZ + offsetZ,
-                Items.SNOWBALL);
+                Items.SLIME_BALL);
         if (world.rand.nextBoolean()) {
             fx.setRBGColorF(0.6F, 0.0F, 0.3F);
             fx.setAlphaF(0.4F);

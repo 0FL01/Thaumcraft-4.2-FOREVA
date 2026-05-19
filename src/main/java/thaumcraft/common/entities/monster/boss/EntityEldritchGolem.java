@@ -13,11 +13,11 @@ import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.EntityDataManager;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.DifficultyInstance;
+import thaumcraft.common.Thaumcraft;
 import thaumcraft.common.blocks.BlockLoot;
 import thaumcraft.common.entities.ai.combat.AIAttackOnCollide;
 import thaumcraft.common.entities.ai.combat.AILongRangeAttack;
@@ -182,14 +182,17 @@ public class EntityEldritchGolem extends EntityThaumcraftBoss implements thaumcr
                     MathHelper.floor(this.posZ));
             IBlockState footState = this.world.getBlockState(foot);
             if (footState.getMaterial() != Material.AIR) {
-                this.world.spawnParticle(EnumParticleTypes.BLOCK_CRACK,
+                Thaumcraft.proxy.boreDigFx(
+                        this.world,
                         this.posX + ((double) this.rand.nextFloat() - 0.5D) * (double) this.width,
                         this.getEntityBoundingBox().minY + 0.1D,
                         this.posZ + ((double) this.rand.nextFloat() - 0.5D) * (double) this.width,
-                        4.0D * ((double) this.rand.nextFloat() - 0.5D),
-                        0.5D,
-                        ((double) this.rand.nextFloat() - 0.5D) * 4.0D,
-                        Block.getStateId(footState));
+                        this.posX + 4.0D * ((double) this.rand.nextFloat() - 0.5D),
+                        this.getEntityBoundingBox().minY + 0.6D,
+                        this.posZ + ((double) this.rand.nextFloat() - 0.5D) * 4.0D,
+                        footState,
+                        null,
+                        0);
             }
             if (!this.world.isRemote && footState.getBlock() instanceof BlockLoot) {
                 this.world.destroyBlock(foot, true);

@@ -8,12 +8,12 @@ import net.minecraft.init.MobEffects;
 import net.minecraft.item.ItemStack;
 import net.minecraft.potion.PotionEffect;
 import net.minecraft.util.DamageSource;
-import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.world.BossInfo;
 import net.minecraft.world.BossInfoServer;
 import net.minecraft.world.World;
+import thaumcraft.common.Thaumcraft;
 import thaumcraft.common.config.ConfigItems;
 import thaumcraft.common.lib.utils.EntityUtils;
 
@@ -68,11 +68,14 @@ public class EntityTaintacleGiant extends thaumcraft.common.entities.monster.Ent
                 double d0 = this.rand.nextGaussian() * 0.02;
                 double d1 = this.rand.nextGaussian() * 0.02;
                 double d2 = this.rand.nextGaussian() * 0.02;
-                this.world.spawnParticle(EnumParticleTypes.VILLAGER_ANGRY,
-                    this.posX + (double)(this.rand.nextFloat() * this.width) - (double)this.width / 2.0,
-                    this.getEntityBoundingBox().minY + (double)this.height + (double)this.rand.nextFloat() * 0.5,
-                    this.posZ + (double)(this.rand.nextFloat() * this.width) - (double)this.width / 2.0,
-                    d0, d1, d2);
+                Thaumcraft.proxy.drawGenericParticles(
+                        this.world,
+                        this.posX + (double) (this.rand.nextFloat() * this.width) - (double) this.width / 2.0,
+                        this.getEntityBoundingBox().minY + (double) this.height + (double) this.rand.nextFloat() * 0.5,
+                        this.posZ + (double) (this.rand.nextFloat() * this.width) - (double) this.width / 2.0,
+                        d0, d1, d2,
+                        1.0F, 1.0F, 1.0F, 1.0F,
+                        false, 81, 1, 1, 16, 0, 1.5F, 1);
             }
         }
     }

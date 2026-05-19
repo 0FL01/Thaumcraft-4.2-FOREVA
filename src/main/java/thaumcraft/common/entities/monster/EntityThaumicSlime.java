@@ -14,12 +14,12 @@ import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.EntityDataManager;
 import net.minecraft.util.DamageSource;
-import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundEvent;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 import thaumcraft.api.entities.ITaintedMob;
+import thaumcraft.common.Thaumcraft;
 import thaumcraft.common.config.ConfigItems;
 
 public class EntityThaumicSlime extends EntityMob implements IMob, ITaintedMob {
@@ -177,22 +177,14 @@ public class EntityThaumicSlime extends EntityMob implements IMob, ITaintedMob {
             --this.launched;
             if (this.world.isRemote) {
                 for (int j = 0; j < sizeSqrt * (this.launched + 1); ++j) {
-                    this.world.spawnParticle(EnumParticleTypes.SLIME,
-                        this.posX + (double)((this.rand.nextFloat() - this.rand.nextFloat()) * (float)sizeSqrt),
-                        this.posY + (double)this.rand.nextFloat() * this.height,
-                        this.posZ + (double)((this.rand.nextFloat() - this.rand.nextFloat()) * (float)sizeSqrt),
-                        0.0, 0.0, 0.0);
+                    Thaumcraft.proxy.slimeJumpFX(this, sizeSqrt);
                 }
             }
         }
         if (this.onGround && !wasOnGround) {
             if (this.world.isRemote) {
                 for (int j = 0; j < sizeSqrt * 8; ++j) {
-                    this.world.spawnParticle(EnumParticleTypes.SLIME,
-                        this.posX + (double)((this.rand.nextFloat() - this.rand.nextFloat()) * (float)sizeSqrt),
-                        this.posY + (double)this.rand.nextFloat() * this.height,
-                        this.posZ + (double)((this.rand.nextFloat() - this.rand.nextFloat()) * (float)sizeSqrt),
-                        0.0, 0.0, 0.0);
+                    Thaumcraft.proxy.slimeJumpFX(this, sizeSqrt);
                 }
             }
             if (this.makesSoundOnLand()) {
