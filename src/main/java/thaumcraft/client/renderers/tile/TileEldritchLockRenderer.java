@@ -1,6 +1,8 @@
 package thaumcraft.client.renderers.tile;
 
 import java.util.Random;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.ActiveRenderInfo;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderHelper;
@@ -8,6 +10,7 @@ import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.block.model.ItemCameraTransforms;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
+import net.minecraft.entity.Entity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
@@ -25,6 +28,8 @@ public class TileEldritchLockRenderer extends TileEntitySpecialRenderer<TileEldr
             new ResourceLocation("thaumcraft", "textures/misc/particlefield.png");
     private static final ResourceLocation PARTICLE_FALLBACK =
             new ResourceLocation("thaumcraft", "textures/misc/particlefield32.png");
+    private static final float FIELD_MIN = -2.0F;
+    private static final float FIELD_MAX = 3.0F;
     private final ModelCube cubeModel = new ModelCube(0);
 
     @Override
@@ -35,10 +40,21 @@ public class TileEldritchLockRenderer extends TileEntitySpecialRenderer<TileEldr
 
         float ticks = TileRenderHelper.ticks(tile, partialTicks);
         EnumFacing facing = EnumFacing.byIndex(tile.getFacing());
+        Entity viewer = Minecraft.getMinecraft().getRenderViewEntity();
+        boolean inRange = viewer != null && tile.getPos().distanceSq(viewer.posX, viewer.posY, viewer.posZ) < 512.0D;
+        float time = (float) (System.currentTimeMillis() % 700000L) / 250000.0F;
+        double viewX = 0.0D;
+        double viewY = 0.0D;
+        double viewZ = 0.0D;
+        if (viewer != null) {
+            viewX = viewer.lastTickPosX + (viewer.posX - viewer.lastTickPosX) * partialTicks;
+            viewY = viewer.lastTickPosY + (viewer.posY - viewer.lastTickPosY) * partialTicks;
+            viewZ = viewer.lastTickPosZ + (viewer.posZ - viewer.lastTickPosZ) * partialTicks;
+        }
 
         renderLockRings(tile, x, y, z, ticks);
         renderInsertKey(tile, x, y, z, ticks, facing);
-        renderLockField(tile, x, y, z, ticks, facing);
+        renderLockField(x, y, z, facing, inRange, time, viewX, viewY, viewZ);
     }
 
     private void renderLockRings(TileEldritchLock tile, double x, double y, double z, float ticks) {
@@ -99,73 +115,104 @@ public class TileEldritchLockRenderer extends TileEntitySpecialRenderer<TileEldr
         GlStateManager.popMatrix();
     }
 
-    private void renderLockField(TileEldritchLock tile, double x, double y, double z, float ticks, EnumFacing facing) {
+    private void renderLockField(double x, double y, double z, EnumFacing facing, boolean inRange,
+                                 float time, double viewX, double viewY, double viewZ) {
         if (facing == null || facing.getAxis().isVertical()) {
             return;
         }
 
-        boolean inRange = this.rendererDispatcher != null
-                && this.rendererDispatcher.entity != null
-                && this.rendererDispatcher.entity.getDistanceSq(tile.getPos()) < 512.0D;
-
         GlStateManager.pushMatrix();
         GlStateManager.translate(x, y, z);
+        GlStateManager.disableFog();
         GlStateManager.disableLighting();
         GlStateManager.disableCull();
         GlStateManager.depthMask(false);
         GlStateManager.enableBlend();
 
-        renderFieldLayers(facing, inRange, ticks);
+        renderFieldLayers(facing, inRange, time, viewX, viewY, viewZ);
         GlStateManager.disableBlend();
         GlStateManager.depthMask(true);
         GlStateManager.enableCull();
         GlStateManager.enableLighting();
+        GlStateManager.enableFog();
         GlStateManager.popMatrix();
     }
 
-    private void renderFieldLayers(EnumFacing facing, boolean inRange, float ticks) {
+    private void renderFieldLayers(
+            EnumFacing facing, boolean inRange, float time, double viewX, double viewY, double viewZ) {
         final float offset = 0.5F;
-        final float min = -2.0F;
-        final float max = 3.0F;
 
         if (!inRange) {
             bindTexture(PARTICLE_FALLBACK);
             GlStateManager.blendFunc(770, 771);
-            drawFieldQuad(facing, offset, min, max, 0.0F, 1.0F, 0.5F, 0.5F, 0.5F, 1.0F);
+            drawFieldQuad(facing, offset, 0.0F, 0.0F, 1.0F, 1.0F, 0.5F, 0.5F, 0.5F, 1.0F);
             return;
         }
 
-        Random random = new Random(31100L + facing.getIndex() * 37L);
-        float time = ticks / 20.0F;
+        Random random = new Random(31100L);
         for (int i = 0; i < 16; i++) {
-            float layer = 16.0F - i;
-            float bright = 1.0F / (layer + 1.0F);
-            float uvScale = i == 0 ? 0.125F : (i == 1 ? 0.5F : 0.0625F);
-            float uvShift = time + i * 0.125F;
-            float alpha = i == 0 ? 1.0F : 0.9F;
+            float layerDepth = 16.0F - i;
+            float bright = 1.0F / (layerDepth + 1.0F);
+            float uvScale = 0.0625F;
 
             if (i == 0) {
                 bindTexture(TUNNEL);
                 GlStateManager.blendFunc(770, 771);
                 bright = 0.1F;
+                layerDepth = 65.0F;
+                uvScale = 0.125F;
             } else {
                 bindTexture(PARTICLE);
                 GlStateManager.blendFunc(1, 1);
+                if (i == 1) {
+                    uvScale = 0.5F;
+                }
             }
 
+            float uvShift = time + (float) (i * i * 4321 + i * 9) * 2.0F;
+            float parallaxScale = uvScale * (0.75F + layerDepth * 0.015625F);
+            float[] parallax = parallaxOffsets(facing, viewX, viewY, viewZ, parallaxScale);
+            float uShift = uvShift * uvScale + parallax[0];
+            float vShift = uvShift * uvScale + parallax[1];
             float r = i == 0 ? 1.0F : (random.nextFloat() * 0.5F + 0.1F) * bright;
             float g = i == 0 ? 1.0F : (random.nextFloat() * 0.5F + 0.4F) * bright;
             float b = i == 0 ? 1.0F : (random.nextFloat() * 0.5F + 0.5F) * bright;
-            drawFieldQuad(facing, offset, min, max, uvShift, uvScale, r, g, b, alpha);
+            drawFieldQuad(facing, offset, uShift, vShift, uvScale, uvScale, r, g, b, 1.0F);
         }
     }
 
-    private static void drawFieldQuad(EnumFacing facing, float offset, float min, float max,
-                                      float uvShift, float uvScale, float r, float g, float b, float a) {
-        float u0 = uvShift;
-        float v0 = uvShift;
-        float u1 = uvShift + uvScale;
-        float v1 = uvShift + uvScale;
+    private static float[] parallaxOffsets(EnumFacing facing, double viewX, double viewY, double viewZ, float scale) {
+        float rotX = ActiveRenderInfo.getRotationX();
+        float rotZ = ActiveRenderInfo.getRotationZ();
+        float rotYZ = ActiveRenderInfo.getRotationYZ();
+        float rotXY = ActiveRenderInfo.getRotationXY();
+        float rotXZ = ActiveRenderInfo.getRotationXZ();
+        float u;
+        float v;
+        switch (facing) {
+            case NORTH:
+            case SOUTH:
+                u = (float) (viewX * rotX + viewY * rotXZ);
+                v = (float) (viewX * rotZ + viewY * rotXY);
+                break;
+            case WEST:
+            case EAST:
+                u = (float) (viewZ * rotYZ + viewY * rotXZ);
+                v = (float) (viewZ * rotXY + viewY * rotX);
+                break;
+            default:
+                u = 0.0F;
+                v = 0.0F;
+        }
+        return new float[]{u * scale, v * scale};
+    }
+
+    private static void drawFieldQuad(EnumFacing facing, float offset, float uShift, float vShift,
+                                      float uScale, float vScale, float r, float g, float b, float a) {
+        float u0 = uShift;
+        float v0 = vShift;
+        float u1 = uShift + uScale;
+        float v1 = vShift + vScale;
 
         Tessellator tess = Tessellator.getInstance();
         BufferBuilder buf = tess.getBuffer();
@@ -173,28 +220,28 @@ public class TileEldritchLockRenderer extends TileEntitySpecialRenderer<TileEldr
 
         switch (facing) {
             case NORTH:
-                v(buf, min, max, offset, u1, v1, r, g, b, a);
-                v(buf, min, min, offset, u1, v0, r, g, b, a);
-                v(buf, max, min, offset, u0, v0, r, g, b, a);
-                v(buf, max, max, offset, u0, v1, r, g, b, a);
+                v(buf, FIELD_MIN, FIELD_MIN, offset, u1, v1, r, g, b, a);
+                v(buf, FIELD_MIN, FIELD_MAX, offset, u1, v0, r, g, b, a);
+                v(buf, FIELD_MAX, FIELD_MAX, offset, u0, v0, r, g, b, a);
+                v(buf, FIELD_MAX, FIELD_MIN, offset, u0, v1, r, g, b, a);
                 break;
             case SOUTH:
-                v(buf, min, min, offset, u1, v1, r, g, b, a);
-                v(buf, min, max, offset, u1, v0, r, g, b, a);
-                v(buf, max, max, offset, u0, v0, r, g, b, a);
-                v(buf, max, min, offset, u0, v1, r, g, b, a);
+                v(buf, FIELD_MIN, FIELD_MAX, offset, u1, v1, r, g, b, a);
+                v(buf, FIELD_MIN, FIELD_MIN, offset, u1, v0, r, g, b, a);
+                v(buf, FIELD_MAX, FIELD_MIN, offset, u0, v0, r, g, b, a);
+                v(buf, FIELD_MAX, FIELD_MAX, offset, u0, v1, r, g, b, a);
                 break;
             case WEST:
-                v(buf, offset, max, min, u1, v1, r, g, b, a);
-                v(buf, offset, max, max, u1, v0, r, g, b, a);
-                v(buf, offset, min, max, u0, v0, r, g, b, a);
-                v(buf, offset, min, min, u0, v1, r, g, b, a);
+                v(buf, offset, FIELD_MIN, FIELD_MIN, u1, v1, r, g, b, a);
+                v(buf, offset, FIELD_MIN, FIELD_MAX, u1, v0, r, g, b, a);
+                v(buf, offset, FIELD_MAX, FIELD_MAX, u0, v0, r, g, b, a);
+                v(buf, offset, FIELD_MAX, FIELD_MIN, u0, v1, r, g, b, a);
                 break;
             case EAST:
-                v(buf, offset, min, min, u1, v1, r, g, b, a);
-                v(buf, offset, min, max, u1, v0, r, g, b, a);
-                v(buf, offset, max, max, u0, v0, r, g, b, a);
-                v(buf, offset, max, min, u0, v1, r, g, b, a);
+                v(buf, offset, FIELD_MAX, FIELD_MIN, u1, v1, r, g, b, a);
+                v(buf, offset, FIELD_MAX, FIELD_MAX, u1, v0, r, g, b, a);
+                v(buf, offset, FIELD_MIN, FIELD_MAX, u0, v0, r, g, b, a);
+                v(buf, offset, FIELD_MIN, FIELD_MIN, u0, v1, r, g, b, a);
                 break;
             default:
                 break;

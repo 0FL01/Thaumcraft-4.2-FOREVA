@@ -44,6 +44,9 @@ public class TableEldritchRendererFidelityStaticGuardTest {
         assertTrue(capModel.contains("private static final int[][] TRIANGLES"));
 
         assertTrue(lock.contains("renderItem(key, ItemCameraTransforms.TransformType.GROUND)"));
+        assertTrue(lock.contains("ActiveRenderInfo.getRotationX()"));
+        assertTrue(lock.contains("private static final float FIELD_MIN = -2.0F;"));
+        assertTrue(lock.contains("private static final float FIELD_MAX = 3.0F;"));
         assertFalse(lock.contains("TileRenderHelper.renderFloatingItem(key"));
 
         assertTrue(eldritchCrystal.contains("new ModelCrystal()"));
