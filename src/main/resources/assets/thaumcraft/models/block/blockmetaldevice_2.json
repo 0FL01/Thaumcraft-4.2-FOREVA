@@ -1,6 +1,80 @@
 {
-  "parent": "block/cube_all",
+  "ambientocclusion": false,
   "textures": {
-    "all": "thaumcraft:blocks/metalbase"
-  }
+    "shell": "thaumcraft:models/vis_relay"
+  },
+  "elements": [
+    {
+      "from": [5, 10, 5],
+      "to": [11, 11, 6],
+      "faces": {
+        "down": { "texture": "#shell" },
+        "up": { "texture": "#shell" },
+        "north": { "texture": "#shell" },
+        "south": { "texture": "#shell" },
+        "west": { "texture": "#shell" },
+        "east": { "texture": "#shell" }
+      }
+    },
+    {
+      "from": [5, 10, 10],
+      "to": [11, 11, 11],
+      "faces": {
+        "down": { "texture": "#shell" },
+        "up": { "texture": "#shell" },
+        "north": { "texture": "#shell" },
+        "south": { "texture": "#shell" },
+        "west": { "texture": "#shell" },
+        "east": { "texture": "#shell" }
+      }
+    },
+    {
+      "from": [5, 10, 6],
+      "to": [6, 11, 10],
+      "faces": {
+        "down": { "texture": "#shell" },
+        "up": { "texture": "#shell" },
+        "north": { "texture": "#shell" },
+        "south": { "texture": "#shell" },
+        "west": { "texture": "#shell" },
+        "east": { "texture": "#shell" }
+      }
+    },
+    {
+      "from": [10, 10, 6],
+      "to": [11, 11, 10],
+      "faces": {
+        "down": { "texture": "#shell" },
+        "up": { "texture": "#shell" },
+        "north": { "texture": "#shell" },
+        "south": { "texture": "#shell" },
+        "west": { "texture": "#shell" },
+        "east": { "texture": "#shell" }
+      }
+    },
+    {
+      "from": [7.5, 7, 4],
+      "to": [8.5, 8, 12],
+      "faces": {
+        "down": { "texture": "#shell" },
+        "up": { "texture": "#shell" },
+        "north": { "texture": "#shell" },
+        "south": { "texture": "#shell" },
+        "west": { "texture": "#shell" },
+        "east": { "texture": "#shell" }
+      }
+    },
+    {
+      "from": [4, 7, 7.5],
+      "to": [12, 8, 8.5],
+      "faces": {
+        "down": { "texture": "#shell" },
+        "up": { "texture": "#shell" },
+        "north": { "texture": "#shell" },
+        "south": { "texture": "#shell" },
+        "west": { "texture": "#shell" },
+        "east": { "texture": "#shell" }
+      }
+    }
+  ]
 }

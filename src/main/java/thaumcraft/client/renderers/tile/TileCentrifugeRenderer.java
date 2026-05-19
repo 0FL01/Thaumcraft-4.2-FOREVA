@@ -24,7 +24,6 @@ public class TileCentrifugeRenderer extends TileEntitySpecialRenderer<TileCentri
 
         GlStateManager.pushMatrix();
         GlStateManager.translate(x + 0.5D, y + 0.5D, z + 0.5D);
-        model.renderBoxes(MODEL_SCALE);
         GlStateManager.rotate(spin, 0.0F, 1.0F, 0.0F);
         model.renderSpinnyBit(MODEL_SCALE);
         GlStateManager.popMatrix();

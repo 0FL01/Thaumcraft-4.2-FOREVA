@@ -1,6 +1,32 @@
 {
-  "parent": "block/cube_all",
+  "ambientocclusion": false,
   "textures": {
-    "all": "thaumcraft:blocks/pipe_2"
-  }
+    "shell": "thaumcraft:models/centrifuge"
+  },
+  "elements": [
+    {
+      "from": [4, 0, 4],
+      "to": [12, 4, 12],
+      "faces": {
+        "down": { "texture": "#shell" },
+        "up": { "texture": "#shell" },
+        "north": { "texture": "#shell" },
+        "south": { "texture": "#shell" },
+        "west": { "texture": "#shell" },
+        "east": { "texture": "#shell" }
+      }
+    },
+    {
+      "from": [4, 12, 4],
+      "to": [12, 16, 12],
+      "faces": {
+        "down": { "texture": "#shell" },
+        "up": { "texture": "#shell" },
+        "north": { "texture": "#shell" },
+        "south": { "texture": "#shell" },
+        "west": { "texture": "#shell" },
+        "east": { "texture": "#shell" }
+      }
+    }
+  ]
 }
