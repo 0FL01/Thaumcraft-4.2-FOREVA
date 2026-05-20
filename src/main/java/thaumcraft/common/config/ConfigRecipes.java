@@ -461,6 +461,178 @@ public class ConfigRecipes {
 
     public static void registerSpecialRecipes(IForgeRegistry<IRecipe> registry) {
         ConfigRecipesSpecialSlice.registerSpecialRecipes(registry, new SpecialRecipesBridge());
+        refreshLateBoundResearchRecipeHandles();
+    }
+
+    private static void refreshLateBoundResearchRecipeHandles() {
+        if (recipeArcaneStone2 != null) {
+            ConfigResearch.recipes.put("ArcaneStone2", recipeArcaneStone2);
+        }
+        if (recipeArcaneStone3 != null) {
+            ConfigResearch.recipes.put("ArcaneStone3", recipeArcaneStone3);
+        }
+        if (recipeArcaneStone4 != null) {
+            ConfigResearch.recipes.put("ArcaneStone4", recipeArcaneStone4);
+        }
+        if (recipeKnowFrag != null) {
+            ConfigResearch.recipes.put("KnowFrag", recipeKnowFrag);
+        }
+        if (recipePlankGreatwood != null) {
+            ConfigResearch.recipes.put("PlankGreatwood", recipePlankGreatwood);
+        }
+        if (recipePlankSilverwood != null) {
+            ConfigResearch.recipes.put("PlankSilverwood", recipePlankSilverwood);
+        }
+        if (recipeGrate != null) {
+            ConfigResearch.recipes.put("Grate", recipeGrate);
+        }
+        if (recipePhial != null) {
+            ConfigResearch.recipes.put("Phial", recipePhial);
+        }
+        if (recipeTable != null) {
+            ConfigResearch.recipes.put("Table", recipeTable);
+        }
+        if (recipeScribe1 != null) {
+            ConfigResearch.recipes.put("Scribe1", recipeScribe1);
+        }
+        if (recipeScribe2 != null) {
+            ConfigResearch.recipes.put("Scribe2", recipeScribe2);
+        }
+        if (recipeScribe3 != null) {
+            ConfigResearch.recipes.put("Scribe3", recipeScribe3);
+        }
+        if (recipeThaumometer != null) {
+            ConfigResearch.recipes.put("Thaumometer", recipeThaumometer);
+        }
+        if (recipeWandCapIron != null) {
+            ConfigResearch.recipes.put("WandCapIron", recipeWandCapIron);
+        }
+        if (recipeWandBasic != null) {
+            ConfigResearch.recipes.put("WandBasic", recipeWandBasic);
+        }
+        if (recipeNitor != null) {
+            ConfigResearch.recipes.put("Nitor", recipeNitor);
+        }
+        if (recipeAlumentum != null) {
+            ConfigResearch.recipes.put("Alumentum", recipeAlumentum);
+        }
+        if (recipeThaumium != null) {
+            ConfigResearch.recipes.put("Thaumium", recipeThaumium);
+        }
+        if (recipeVoidMetal != null) {
+            ConfigResearch.recipes.put("VoidMetal", recipeVoidMetal);
+        }
+        if (recipeVoidSeed != null) {
+            ConfigResearch.recipes.put("VoidSeed", recipeVoidSeed);
+        }
+        for (int a = 0; a < 6; a++) {
+            if (recipeClusters[a] != null) {
+                ConfigResearch.recipes.put("Clusters" + a, recipeClusters[a]);
+            } else {
+                ConfigResearch.recipes.put("Clusters" + a,
+                        new ShapelessOreRecipe(
+                                null,
+                                new ItemStack(ConfigBlocks.blockCrystal, 1, a),
+                                new ItemStack(ConfigItems.itemShard, 1, a),
+                                new ItemStack(ConfigItems.itemShard, 1, a),
+                                new ItemStack(ConfigItems.itemShard, 1, a),
+                                new ItemStack(ConfigItems.itemShard, 1, a),
+                                new ItemStack(ConfigItems.itemShard, 1, a),
+                                new ItemStack(ConfigItems.itemShard, 1, a)));
+            }
+        }
+        if (recipeClusters[6] != null) {
+            ConfigResearch.recipes.put("Clusters6", recipeClusters[6]);
+        } else {
+            ConfigResearch.recipes.put("Clusters6",
+                    new ShapelessOreRecipe(
+                            null,
+                            new ItemStack(ConfigBlocks.blockCrystal, 1, 6),
+                            new ItemStack(ConfigItems.itemShard, 1, 0),
+                            new ItemStack(ConfigItems.itemShard, 1, 1),
+                            new ItemStack(ConfigItems.itemShard, 1, 2),
+                            new ItemStack(ConfigItems.itemShard, 1, 3),
+                            new ItemStack(ConfigItems.itemShard, 1, 4),
+                            new ItemStack(ConfigItems.itemShard, 1, 5)));
+        }
+        if (recipeMundaneAmulet != null) {
+            ConfigResearch.recipes.put("MundaneAmulet", recipeMundaneAmulet);
+        } else {
+            ConfigResearch.recipes.put("MundaneAmulet",
+                    oreDictRecipe(
+                            new ItemStack(ConfigItems.itemBaubleBlanks, 1, 0),
+                            new Object[]{
+                                    " S ",
+                                    "S S",
+                                    " I ",
+                                    'S', new ItemStack(Items.STRING),
+                                    'I', new ItemStack(Items.IRON_INGOT)
+                            }));
+        }
+        if (recipeMundaneRing != null) {
+            ConfigResearch.recipes.put("MundaneRing", recipeMundaneRing);
+        } else {
+            ConfigResearch.recipes.put("MundaneRing",
+                    oreDictRecipe(
+                            new ItemStack(ConfigItems.itemBaubleBlanks, 1, 1),
+                            new Object[]{
+                                    " N ",
+                                    "N N",
+                                    " N ",
+                                    'N', new ItemStack(Items.GOLD_NUGGET)
+                            }));
+        }
+        if (recipeMundaneBelt != null) {
+            ConfigResearch.recipes.put("MundaneBelt", recipeMundaneBelt);
+        } else {
+            ConfigResearch.recipes.put("MundaneBelt",
+                    oreDictRecipe(
+                            new ItemStack(ConfigItems.itemBaubleBlanks, 1, 2),
+                            new Object[]{
+                                    " L ",
+                                    "L L",
+                                    " I ",
+                                    'L', new ItemStack(Items.LEATHER),
+                                    'I', new ItemStack(Items.IRON_INGOT)
+                            }));
+        }
+        if (recipeBlockFlesh != null) {
+            ConfigResearch.recipes.put("BlockFlesh", recipeBlockFlesh);
+        } else {
+            ConfigResearch.recipes.put("BlockFlesh",
+                    oreDictRecipe(
+                            new ItemStack(ConfigBlocks.blockTaint, 1, 2),
+                            new Object[]{
+                                    "KKK",
+                                    "KKK",
+                                    "KKK",
+                                    'K', new ItemStack(Items.ROTTEN_FLESH)
+                            }));
+        }
+        if (recipeBlockTallow != null) {
+            ConfigResearch.recipes.put("BlockTallow", recipeBlockTallow);
+        } else {
+            ConfigResearch.recipes.put("BlockTallow",
+                    oreDictRecipe(
+                            new ItemStack(ConfigBlocks.blockCosmeticSolid, 1, 5),
+                            new Object[]{
+                                    "KKK",
+                                    "KKK",
+                                    "KKK",
+                                    'K', new ItemStack(ConfigItems.itemResource, 1, 4)
+                            }));
+        }
+        for (Map.Entry<String, IRecipe> entry : specialResearchRecipeHandles.entrySet()) {
+            if (entry.getValue() != null) {
+                ConfigResearch.recipes.put(entry.getKey(), entry.getValue());
+            }
+        }
+        for (int i = 0; i < recipeJarLabelAspects.size(); i++) {
+            IRecipe recipe = recipeJarLabelAspects.get(i);
+            if (recipe != null) {
+                ConfigResearch.recipes.put("JarLabel" + i, recipe);
+            }
+        }
     }
 
     public static final class SpecialRecipesBridge {
