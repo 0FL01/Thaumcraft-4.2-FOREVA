@@ -19,6 +19,8 @@ public class VisEnergyRendererFidelityStaticGuardTest {
         String chargerRenderer = read("src/main/java/thaumcraft/client/renderers/tile/TileMagicWorkbenchChargerRenderer.java");
         String relayRenderer = read("src/main/java/thaumcraft/client/renderers/tile/TileVisRelayRenderer.java");
         String crystalizerRenderer = read("src/main/java/thaumcraft/client/renderers/tile/TileEssentiaCrystalizerRenderer.java");
+        String relayModel = read("src/main/java/thaumcraft/client/renderers/models/ModelVisRelay.java");
+        String stabilizerModel = read("src/main/java/thaumcraft/client/renderers/models/ModelNodeStabilizer.java");
         String chargerModel = read("src/main/java/thaumcraft/client/renderers/models/ModelMagicWorkbenchCharger.java");
         String chargerBlockModel = read("src/main/resources/assets/thaumcraft/models/block/blockmetaldevice_2.json");
         String stoneDeviceBlockstate = read("src/main/resources/assets/thaumcraft/blockstates/blockstonedevice.json");
@@ -69,6 +71,27 @@ public class VisEnergyRendererFidelityStaticGuardTest {
                         && crystalizerRenderer.contains("model.renderCrystal(MODEL_SCALE)")
                         && crystalizerRenderer.contains("for (int i = 0; i < 4; i++)")
                         && crystalizerRenderer.contains("OpenGlHelper.setLightmapTextureCoords("));
+
+        assertTrue("ModelVisRelay should keep grouped vis_relay.obj surfaces instead of the old ModelRenderer cuboids",
+                relayModel.contains("Wavefront vis_relay.obj groups")
+                        && relayModel.contains("CRYSTAL_TRIANGLES")
+                        && relayModel.contains("RING_FLOAT_TRIANGLES")
+                        && relayModel.contains("RING_BASE_TRIANGLES")
+                        && relayModel.contains("SUPPORT_TRIANGLES")
+                        && relayModel.contains("renderSupport(float scale)")
+                        && relayModel.contains("DefaultVertexFormats.POSITION_TEX_NORMAL")
+                        && !relayModel.contains("extends ModelBase")
+                        && !relayModel.contains("new ModelRenderer("));
+
+        assertTrue("ModelNodeStabilizer should keep grouped node_stabilizer.obj surfaces instead of the old ModelRenderer cuboids",
+                stabilizerModel.contains("Wavefront node_stabilizer.obj groups")
+                        && stabilizerModel.contains("LOCK_TRIANGLES")
+                        && stabilizerModel.contains("PISTON_TRIANGLES")
+                        && stabilizerModel.contains("renderLock(float scale)")
+                        && stabilizerModel.contains("renderPiston(float scale)")
+                        && stabilizerModel.contains("DefaultVertexFormats.POSITION_TEX_NORMAL")
+                        && !stabilizerModel.contains("extends ModelBase")
+                        && !stabilizerModel.contains("new ModelRenderer("));
 
         assertTrue("ModelMagicWorkbenchCharger should expose ring/support/crystal model parts",
                 chargerModel.contains("class ModelMagicWorkbenchCharger extends ModelBase")
