@@ -36,13 +36,13 @@ public class BlockMagicalLog extends BlockLog {
     @Override
     public void getSubBlocks(CreativeTabs tab, NonNullList<ItemStack> list) {
         list.add(new ItemStack(this, 1, 0)); // greatwood
-        list.add(new ItemStack(this, 1, 2)); // silverwood
+        list.add(new ItemStack(this, 1, 1)); // silverwood
     }
 
     @Override
     public int damageDropped(IBlockState state) {
         int type = state.getValue(TYPE);
-        if (type == 2 || type == 3) return 2; // silverwood knot -> silverwood
+        if (type == 2 || type == 3) return 1; // silverwood knot/legacy alias -> silverwood
         return type;
     }
 
@@ -57,6 +57,12 @@ public class BlockMagicalLog extends BlockLog {
             return new TileNode();
         }
         return null;
+    }
+
+    @Override
+    public int getLightValue(IBlockState state, IBlockAccess world, BlockPos pos) {
+        int type = state.getValue(TYPE);
+        return (type == 1 || type == 2) ? 7 : super.getLightValue(state, world, pos);
     }
 
     @Override
