@@ -5,8 +5,12 @@ import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ITickable;
 import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.util.SoundCategory;
 import net.minecraft.world.WorldServer;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import thaumcraft.common.config.Config;
+import thaumcraft.common.lib.TCSounds;
 import thaumcraft.common.lib.research.ResearchManager;
 import thaumcraft.common.lib.world.dim.TeleporterThaumcraft;
 
@@ -22,6 +26,10 @@ public class TileEldritchPortal extends TileEntity implements ITickable {
         this.count++;
 
         if (this.world.isRemote) {
+            if (this.count % 250 == 0 || this.count == 0) {
+                this.world.playSound(this.pos.getX() + 0.5D, this.pos.getY() + 0.5D, this.pos.getZ() + 0.5D,
+                        TCSounds.EVILPORTAL, SoundCategory.BLOCKS, 1.0F, 1.0F, false);
+            }
             if (this.opencount < 30) {
                 this.opencount++;
             }
@@ -42,6 +50,12 @@ public class TileEldritchPortal extends TileEntity implements ITickable {
         return 9216.0;
     }
 
+    @SideOnly(Side.CLIENT)
+    @Override
+    public AxisAlignedBB getRenderBoundingBox() {
+        return new AxisAlignedBB(this.pos.add(-1, -1, -1), this.pos.add(2, 2, 2));
+    }
+
     private void transferPlayer(EntityPlayerMP player) {
         if (player.getRidingEntity() != null || player.isBeingRidden()) return;
         if (player.timeUntilPortal > 0) {
@@ -55,7 +69,7 @@ public class TileEldritchPortal extends TileEntity implements ITickable {
         if (targetWorld == null) return;
 
         player.timeUntilPortal = 100;
-        player.changeDimension(targetDim, new TeleporterThaumcraft(targetWorld));
+        player.getServer().getPlayerList().transferPlayerToDimension(player, targetDim, new TeleporterThaumcraft(targetWorld));
         if (targetDim == Config.dimensionOuterId && !ResearchManager.isResearchComplete(player, "ENTEROUTER")) {
             ResearchManager.addResearch(player, "ENTEROUTER");
         }

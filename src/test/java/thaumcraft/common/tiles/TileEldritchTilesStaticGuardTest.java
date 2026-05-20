@@ -52,6 +52,20 @@ public class TileEldritchTilesStaticGuardTest {
         assertTrue(source.contains("new NetworkRegistry.TargetPoint(this.world.provider.getDimension(), target.getX(), target.getY(), target.getZ(), 32.0)"));
     }
 
+    @Test
+    public void eldritchPortalShouldKeepAmbientBoundsAndTransferContracts() throws IOException {
+        String source = readFile("src/main/java/thaumcraft/common/tiles/TileEldritchPortal.java");
+
+        assertTrue(source.contains("this.count % 250 == 0"));
+        assertTrue(source.contains("TCSounds.EVILPORTAL"));
+        assertTrue(source.contains("this.opencount < 30"));
+        assertTrue(source.contains("public AxisAlignedBB getRenderBoundingBox()"));
+        assertTrue(source.contains("this.pos.add(-1, -1, -1)"));
+        assertTrue(source.contains("this.pos.add(2, 2, 2)"));
+        assertTrue(source.contains("transferPlayerToDimension(player, targetDim, new TeleporterThaumcraft(targetWorld))"));
+        assertTrue(source.contains("ResearchManager.addResearch(player, \"ENTEROUTER\")"));
+    }
+
     private static String readFile(String path) throws IOException {
         return new String(Files.readAllBytes(Paths.get(path)), StandardCharsets.UTF_8);
     }
