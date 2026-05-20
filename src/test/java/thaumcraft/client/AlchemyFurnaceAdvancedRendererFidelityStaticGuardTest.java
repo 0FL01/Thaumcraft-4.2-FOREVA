@@ -28,16 +28,21 @@ public class AlchemyFurnaceAdvancedRendererFidelityStaticGuardTest {
                         && model.contains("renderTankPanel(float scale)")
                         && model.contains("renderLavaPanel(float scale)"));
 
-        assertTrue("TileAlchemyFurnaceAdvancedRenderer should keep only dynamic lava-panel and heat-glow paths after the static shell moved into the block model",
+        assertTrue("TileAlchemyFurnaceAdvancedRenderer should keep the dedicated tank-frame path plus reference-shaped vis/lava atlas overlays after the static shell moved into the block model",
                 renderer.contains("new ModelAlchemyFurnaceAdvanced()")
+                        && renderer.contains("model.renderTankPanel(MODEL_SCALE)")
+                        && renderer.contains("new ResourceLocation(\"thaumcraft\", \"blocks/al_furnace_top_filled\")")
+                        && renderer.contains("TextureMap.LOCATION_BLOCKS_TEXTURE")
+                        && renderer.contains("Blocks.LAVA.getDefaultState()")
+                        && renderer.contains("renderVisPanels(")
+                        && renderer.contains("renderHeatPanels(")
+                        && renderer.contains("drawAtlasQuad(")
+                        && renderer.contains("bindTexture(content > 0.0F ? TANK_ON : TANK);")
                         && renderer.contains("for (int side = 0; side < 4; side++)")
-                        && renderer.contains("model.renderLavaPanel(MODEL_SCALE)")
-                        && renderer.contains("bindTexture(burning ? TANK_ON : TANK);")
-                        && renderer.contains("drawFurnaceGlowQuad(")
+                        && renderer.contains("OpenGlHelper.setLightmapTextureCoords(")
                         && !renderer.contains("model.renderBase(MODEL_SCALE)")
-                        && !renderer.contains("model.renderTankPanel(MODEL_SCALE)")
                         && !renderer.contains("TileRenderHelper.orientBillboardToPlayer()")
-                        && !renderer.contains("TileRenderHelper.drawTexturedQuad("));
+                        && !renderer.contains("drawFurnaceGlowQuad("));
 
         assertTrue("TileAlembicRenderer should use model-driven bore nozzle path instead of ad-hoc cuboid fallback",
                 alembic.contains("new ModelBoreBase()")
