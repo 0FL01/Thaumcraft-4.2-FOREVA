@@ -577,7 +577,7 @@ Risk: current common tiles may not yet expose all visual state that reference re
 
 **Что не совпадает:**
 
-Current resources cannot support Stage 8-c parity: no blockstates, no block models, no block textures, and almost no model textures. Reference assets include hundreds of block/model textures and OBJ/MTL files. Current generic item model registration in `ClientProxy.java:24-34` points item metas to model resource names, but many matching item JSON files are missing for blocks and cannot represent dynamic TESR states anyway.
+Current resources still cannot support full Stage 8-c parity: the port still lacks broad TESR/OBJ/manual validation evidence and many model-texture consumers remain runtime-unverified. However, a later checkpoint closed the most obvious baked-resource baseline holes by mirroring the original `textures/blocks/**` corpus into runtime resources and moving item/block `ModelLoader` registration onto a dedicated `ModelRegistryEvent` path. The remaining gap is no longer "no block textures exist", but rather "full block/tile visual parity is still not proven."
 
 **Что нужно доделать:**
 
@@ -599,6 +599,9 @@ Copy original required assets and add 1.12.2 blockstates/model JSONs or custom m
 **Риски / зависимости:**
 
 Risk: Forge 1.12 OBJ loading requires model loader setup and `.obj` path conventions that differ from the 1.7.10 `AdvancedModelLoader` path. This should be solved per renderer/model, not by changing dependency versions.
+
+**Checkpoint 2026-05-20 — block texture corpus baseline:**
+The runtime tree now mirrors the original `thaumcraft_src/assets/thaumcraft/textures/blocks/**` file set, and the previously broken baked-model references to `alchemyblockadv` and `taint_fibres` are no longer missing from port resources. This improves inventory/block-item and some world-surface fallback coverage, but it is still not evidence of full Stage 8-c renderer parity or client-smoke cleanliness.
 
 ## 6. Итоговый checklist закрытия Stage 8-c
 

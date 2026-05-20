@@ -322,10 +322,15 @@ public class ClientProxy extends CommonProxy {
 
     @Override
     public void registerDisplayInformation() {
-        setupItemRenderers();
+        registerItemColorHandlers();
         setupEntityRenderers();
-        setupBlockRenderers();
         setupTileRenderers();
+    }
+
+    @Override
+    public void registerModelLocations() {
+        setupItemRenderers();
+        setupBlockRenderers();
     }
 
     private void setupItemRenderers() {
@@ -403,6 +408,9 @@ public class ClientProxy extends CommonProxy {
                 ModelLoader.setCustomModelResourceLocation(item, meta, model);
             }
         }
+    }
+
+    private void registerItemColorHandlers() {
         if (ConfigItems.itemResearchNotes != null) {
             Minecraft.getMinecraft().getItemColors().registerItemColorHandler(
                     (stack, tintIndex) -> ConfigItems.itemResearchNotes.getColorFromItemStack(stack, tintIndex),

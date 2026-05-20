@@ -345,7 +345,7 @@ Dependency: full FX proxy parity belongs to later Stage 8 FX work. Risk: over-ex
 
 Reference lifecycle calls `proxy.registerHandlers()` during `preInit` after constructing event handler instances and network setup, while `proxy.registerDisplayInformation()` and `proxy.registerKeyBindings()` are called during `init`. Current code calls both `proxy.registerKeyBindings()` and `proxy.registerHandlers()` during `init` after GUI handler registration.
 
-Forge 1.12.2 lifecycle does not require identical timing for every event, but client tick/render/particle handlers and model registration can be timing-sensitive. Since current handler bootstrap is incomplete and no client smoke was run for this chunk, readiness cannot be confirmed statically.
+Forge 1.12.2 lifecycle does not require identical timing for every event, but client tick/render/particle handlers and model registration can be timing-sensitive. A later checkpoint moved baked item/block `ModelLoader` registration off `init` and onto a dedicated client `ModelRegistryEvent` bridge (`ClientModelRegistry -> Thaumcraft.proxy.registerModelLocations()`), which closes the most obvious missing-model timing hazard without claiming full client bootstrap parity. Handler/bootstrap readiness beyond model timing still cannot be confirmed statically.
 
 **Что нужно доделать:**
 
@@ -366,6 +366,9 @@ Decide and validate the Forge 1.12.2 lifecycle placement for client handler, key
 **Риски / зависимости:**
 
 Risk: moving registration earlier can expose uninitialized config/block/item classes; moving it later can miss model or event registration windows.
+
+**Checkpoint 2026-05-20 — model registry timing split:**
+Item/block baked-model location registration now happens through a dedicated `ModelRegistryEvent` subscriber in `thaumcraft.client.ClientModelRegistry`, which delegates to `Thaumcraft.proxy.registerModelLocations()`. `ClientProxy.registerDisplayInformation()` remains in `init`, but now only handles late-safe color handler, entity renderer, and TESR bootstrap work. This is a Forge 1.12.2 lifecycle correction, not a full client smoke or visual-parity claim.
 
 ### GAP-8: Client smoke readiness has not been proven
 
