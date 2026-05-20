@@ -21,6 +21,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
+import net.minecraft.init.SoundEvents;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.Item;
 import net.minecraft.tileentity.TileEntity;
@@ -1142,6 +1143,16 @@ public class ClientProxy extends CommonProxy {
     }
 
     @Override
+    public void wispFX2(World world, double x, double y, double z, float size, int type, boolean shrink, boolean clip, float gravity) {
+        if (world == null || !world.isRemote) return;
+        FXWisp fx = new FXWisp(world, x, y, z, size, type);
+        fx.setGravity(gravity);
+        fx.shrink = shrink;
+        fx.setNoClip(clip);
+        ParticleEngine.addEffect(world, fx);
+    }
+
+    @Override
     public void wispFXEG(World world, double x, double y, double z, Entity target) {
         if (world == null || !world.isRemote || target == null) return;
         int amount = particleCount(1);
@@ -1247,6 +1258,40 @@ public class ClientProxy extends CommonProxy {
     }
 
     @Override
+    public void taintsplosionFX(Entity entity) {
+        if (entity == null || entity.world == null || !entity.world.isRemote) return;
+        World world = entity.world;
+        double motionX = Math.random() * 2.0D - 1.0D;
+        double motionY = Math.random() * 2.0D - 1.0D;
+        double motionZ = Math.random() * 2.0D - 1.0D;
+        double speed = (Math.random() + Math.random() + 1.0D) * 0.15D;
+        double length = Math.sqrt(motionX * motionX + motionY * motionY + motionZ * motionZ);
+        if (length > 1.0E-6D) {
+            motionX = motionX / length * speed;
+            motionY = motionY / length * speed;
+            motionZ = motionZ / length * speed;
+        }
+        FXBreaking fx = new FXBreaking(
+                world,
+                entity.posX,
+                entity.posY + world.rand.nextFloat() * entity.height,
+                entity.posZ,
+                motionX,
+                motionY,
+                motionZ,
+                Items.SLIME_BALL);
+        if (world.rand.nextBoolean()) {
+            fx.setRBGColorF(0.6F, 0.0F, 0.3F);
+            fx.setAlphaF(0.4F);
+        } else {
+            fx.setRBGColorF(0.3F, 0.0F, 0.3F);
+            fx.setAlphaF(0.6F);
+        }
+        fx.setParticleMaxAge((int) (66.0F / (world.rand.nextFloat() * 0.9F + 0.1F)));
+        ParticleEngine.addEffect(world, fx);
+    }
+
+    @Override
     public void golemFishingSplashFX(Entity entity, int kind) {
         if (entity == null || entity.world == null || !entity.world.isRemote) return;
         World world = entity.world;
@@ -1270,6 +1315,24 @@ public class ClientProxy extends CommonProxy {
             bubble.setBubbleSpeed(0.003D + (kind == 2 ? 0.002D : 0.001D));
             ParticleEngine.addEffect(world, bubble);
         }
+    }
+
+    @Override
+    public void bottleTaintBreak(World world, double x, double y, double z) {
+        if (world == null || !world.isRemote) return;
+        Item bottle = ConfigItems.itemBottleTaint != null ? ConfigItems.itemBottleTaint : Items.SPLASH_POTION;
+        for (int i = 0; i < 8; i++) {
+            ParticleEngine.addEffect(world, new FXBreaking(
+                    world,
+                    x,
+                    y,
+                    z,
+                    world.rand.nextGaussian() * 0.15D,
+                    world.rand.nextDouble() * 0.2D,
+                    world.rand.nextGaussian() * 0.15D,
+                    bottle));
+        }
+        world.playSound(x, y, z, SoundEvents.ENTITY_SPLASH_POTION_BREAK, SoundCategory.NEUTRAL, 1.0F, 0.9F + world.rand.nextFloat() * 0.1F, false);
     }
 
     @Override
@@ -1379,6 +1442,17 @@ public class ClientProxy extends CommonProxy {
         for (int i = 0; i < amount; i++) {
             ParticleEngine.addEffect(world, new FXSparkle(world, x, y, z, scale, type, speed));
         }
+    }
+
+    @Override
+    public void sparkle(float x, float y, float z, int color) {
+        Minecraft mc = Minecraft.getMinecraft();
+        World world = mc == null ? null : mc.world;
+        if (world == null || !world.isRemote) return;
+        int amount = particleCount(2);
+        if (amount <= 0 || world.rand.nextInt(6) >= amount) return;
+        FXSparkle fx = new FXSparkle(world, x, y, z, 1.5F, color, 6.0F);
+        ParticleEngine.addEffect(world, fx);
     }
 
     @Override

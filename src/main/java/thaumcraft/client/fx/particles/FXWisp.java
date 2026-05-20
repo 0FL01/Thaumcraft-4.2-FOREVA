@@ -50,6 +50,11 @@ public class FXWisp extends Particle {
         }
     }
 
+    public FXWisp(World world, double x, double y, double z, float size, int type) {
+        this(world, x, y, z, 0.0D, 0.0D, 0.0D, size, false, 0.0F);
+        applyTypedColor(world, type);
+    }
+
     @Override
     public void onUpdate() {
         this.prevPosX = this.posX;
@@ -176,6 +181,42 @@ public class FXWisp extends Particle {
 
     public void setGravity(float value) {
         this.particleGravity = value;
+    }
+
+    public void setNoClip(boolean noClip) {
+        this.canCollide = !noClip;
+    }
+
+    private void applyTypedColor(World world, int type) {
+        switch (type) {
+            case 0:
+                this.setRBGColorF(0.75F + world.rand.nextFloat() * 0.25F, 0.25F + world.rand.nextFloat() * 0.25F, 0.75F + world.rand.nextFloat() * 0.25F);
+                return;
+            case 1:
+                this.setRBGColorF(0.5F + world.rand.nextFloat() * 0.3F, 0.5F + world.rand.nextFloat() * 0.3F, 0.2F);
+                return;
+            case 2:
+                this.setRBGColorF(0.2F, 0.2F, 0.7F + world.rand.nextFloat() * 0.3F);
+                return;
+            case 3:
+                this.setRBGColorF(0.2F, 0.7F + world.rand.nextFloat() * 0.3F, 0.2F);
+                return;
+            case 4:
+                this.setRBGColorF(0.7F + world.rand.nextFloat() * 0.3F, 0.2F, 0.2F);
+                return;
+            case 5:
+                this.blendmode = 771;
+                this.setRBGColorF(world.rand.nextFloat() * 0.1F, world.rand.nextFloat() * 0.1F, world.rand.nextFloat() * 0.1F);
+                return;
+            case 6:
+                this.setRBGColorF(0.8F + world.rand.nextFloat() * 0.2F, 0.8F + world.rand.nextFloat() * 0.2F, 0.8F + world.rand.nextFloat() * 0.2F);
+                return;
+            case 7:
+                this.setRBGColorF(0.2F, 0.5F + world.rand.nextFloat() * 0.3F, 0.6F + world.rand.nextFloat() * 0.3F);
+                return;
+            default:
+                this.setRBGColorF(1.0F, 1.0F, 1.0F);
+        }
     }
 
     @Override

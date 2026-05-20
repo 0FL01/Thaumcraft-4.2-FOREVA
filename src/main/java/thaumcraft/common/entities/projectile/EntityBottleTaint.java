@@ -9,6 +9,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.World;
 import thaumcraft.api.entities.ITaintedMob;
+import thaumcraft.common.Thaumcraft;
 import thaumcraft.common.config.Config;
 import thaumcraft.common.config.ConfigBlocks;
 import thaumcraft.common.lib.utils.Utils;
@@ -51,6 +52,11 @@ public class EntityBottleTaint extends EntityThrowable {
                 this.world.setBlockState(bp, ConfigBlocks.blockTaintFibres.getDefaultState()
                     .withProperty(thaumcraft.common.blocks.BlockTaintFibres.TYPE, 0), 3);
             }
+        } else {
+            for (int i = 0; i < Thaumcraft.proxy.particleCount(100); i++) {
+                Thaumcraft.proxy.taintsplosionFX(this);
+            }
+            Thaumcraft.proxy.bottleTaintBreak(this.world, this.posX, this.posY, this.posZ);
         }
         this.setDead();
     }

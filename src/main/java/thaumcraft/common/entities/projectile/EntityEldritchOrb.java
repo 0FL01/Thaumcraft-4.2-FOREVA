@@ -12,6 +12,7 @@ import net.minecraft.util.DamageSource;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.World;
+import thaumcraft.common.Thaumcraft;
 
 public class EntityEldritchOrb extends EntityThrowable {
     public EntityEldritchOrb(World world) { super(world); }
@@ -61,6 +62,25 @@ public class EntityEldritchOrb extends EntityThrowable {
     @Override
     public void handleStatusUpdate(byte id) {
         if (id == 16) {
+            if (this.world.isRemote) {
+                for (int i = 0; i < 30; i++) {
+                    float offsetX = (this.world.rand.nextFloat() - this.world.rand.nextFloat()) * 0.3F;
+                    float offsetY = (this.world.rand.nextFloat() - this.world.rand.nextFloat()) * 0.3F;
+                    float offsetZ = (this.world.rand.nextFloat() - this.world.rand.nextFloat()) * 0.3F;
+                    Thaumcraft.proxy.wispFX3(
+                            this.world,
+                            this.posX + offsetX,
+                            this.posY + offsetY,
+                            this.posZ + offsetZ,
+                            this.posX + offsetX * 8.0F,
+                            this.posY + offsetY * 8.0F,
+                            this.posZ + offsetZ * 8.0F,
+                            0.3F,
+                            5,
+                            true,
+                            0.02F);
+                }
+            }
             return;
         }
         super.handleStatusUpdate(id);

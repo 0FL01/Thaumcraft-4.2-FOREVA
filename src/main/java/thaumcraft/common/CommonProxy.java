@@ -259,6 +259,9 @@ public class CommonProxy implements IGuiHandler {
     public void wispFX3(World world, double x, double y, double z, double tx, double ty, double tz, float size, int count, boolean flag, float speed) {
     }
 
+    public void wispFX2(World world, double x, double y, double z, float size, int type, boolean shrink, boolean clip, float gravity) {
+    }
+
     public void wispFXEG(World world, double x, double y, double z, Entity target) {
     }
 
@@ -275,10 +278,16 @@ public class CommonProxy implements IGuiHandler {
     public void splooshFX(Entity entity) {
     }
 
+    public void taintsplosionFX(Entity entity) {
+    }
+
     public void golemFishingSplashFX(Entity entity, int kind) {
     }
 
     public void spark(float x, float y, float z, float size, float red, float green, float blue, float alpha) {
+    }
+
+    public void bottleTaintBreak(World world, double x, double y, double z) {
     }
 
     public void drawGenericParticles(World world, double x, double y, double z,
@@ -311,6 +320,9 @@ public class CommonProxy implements IGuiHandler {
     }
 
     public void sparkle(float x, float y, float z, float scale, int type, float speed) {
+    }
+
+    public void sparkle(float x, float y, float z, int color) {
     }
 
     public void smokeSpiral(World world, double x, double y, double z, float radius, int start, int miny, int color) {
