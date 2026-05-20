@@ -6,6 +6,7 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
+import net.minecraft.init.SoundEvents;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -106,7 +107,13 @@ implements IInventory, ITickable {
     public int getInventoryStackLimit() { return 64; }
 
     @Override
-    public boolean isUsableByPlayer(EntityPlayer player) { return true; }
+    public boolean isUsableByPlayer(EntityPlayer player) {
+        return this.world.getTileEntity(this.pos) == this
+                && player.getDistanceSq(
+                (double) this.pos.getX() + 0.5D,
+                (double) this.pos.getY() + 0.5D,
+                (double) this.pos.getZ() + 0.5D) <= 64.0D;
+    }
 
     @Override
     public void openInventory(EntityPlayer player) {}
@@ -165,7 +172,7 @@ implements IInventory, ITickable {
             NBTTagCompound tag = bonus.getCompoundTagAt(i);
             Aspect aspect = Aspect.getAspect(tag.getString("tag"));
             if (aspect != null) {
-                this.bonusAspects.merge(aspect, tag.getInteger("amount"));
+                this.bonusAspects.merge(aspect, 1);
             }
         }
         this.nextRecalc = compound.getInteger("nextRecalc");
@@ -191,7 +198,6 @@ implements IInventory, ITickable {
             if (amount <= 0) continue;
             NBTTagCompound tag = new NBTTagCompound();
             tag.setString("tag", aspect.getTag());
-            tag.setInteger("amount", amount);
             bonus.appendTag(tag);
         }
         compound.setTag("bonusAspects", bonus);
@@ -317,7 +323,10 @@ implements IInventory, ITickable {
         if (aspect != null) {
             next = new ResearchManager.HexEntry(aspect, 2);
             boolean refundSkip = researcher2 && this.world.rand.nextFloat() < 0.1F;
-            if (!refundSkip) {
+            if (refundSkip) {
+                this.world.playSound(null, this.pos, SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP,
+                        SoundCategory.BLOCKS, 0.2F, 0.9F + player.world.rand.nextFloat() * 0.2F);
+            } else {
                 if (knowledge.getAspectPoolFor(aspect) <= 0) {
                     this.bonusAspects.remove(aspect, 1);
                     this.world.notifyBlockUpdate(this.pos, this.world.getBlockState(this.pos), this.world.getBlockState(this.pos), 3);
@@ -332,12 +341,14 @@ implements IInventory, ITickable {
             float chance = this.world.rand.nextFloat();
             if (current != null
                     && current.aspect != null
-                    && ((researcher1 && chance < 0.25F) || (researcher2 && chance < 0.5F))
-                    && knowledge.addAspectPool(current.aspect, 1)
-                    && player instanceof EntityPlayerMP) {
-                PacketHandler.INSTANCE.sendTo(
-                        new PacketAspectPool(current.aspect.getTag(), (short) 1, knowledge.getAspectPoolFor(current.aspect)),
-                        (EntityPlayerMP) player);
+                    && ((researcher1 && chance < 0.25F) || (researcher2 && chance < 0.5F))) {
+                this.world.playSound(null, this.pos, SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP,
+                        SoundCategory.BLOCKS, 0.2F, 0.9F + player.world.rand.nextFloat() * 0.2F);
+                if (knowledge.addAspectPool(current.aspect, 1) && player instanceof EntityPlayerMP) {
+                    PacketHandler.INSTANCE.sendTo(
+                            new PacketAspectPool(current.aspect.getTag(), (short) 1, knowledge.getAspectPoolFor(current.aspect)),
+                            (EntityPlayerMP) player);
+                }
             }
             next = new ResearchManager.HexEntry(null, 0);
         }
