@@ -30,11 +30,10 @@ public class TileArcaneBoreRenderer extends TileEntitySpecialRenderer<TileArcane
         }
 
         float ticks = TileRenderHelper.ticks(tile, partialTicks);
-        EnumFacing facing = tile.orientation == null ? EnumFacing.NORTH : tile.orientation;
 
         GlStateManager.pushMatrix();
         GlStateManager.translate(x + 0.5D, y + 0.5D, z + 0.5D);
-        applyFacingRotation(facing);
+        GlStateManager.rotate((float) tile.rotX - tile.vRadX + partialTicks * (float) tile.speedX, 0.0F, 1.0F, 0.0F);
         if (tile.baseOrientation == EnumFacing.DOWN) {
             GlStateManager.rotate(180.0F, 0.0F, 0.0F, 1.0F);
         }
@@ -45,6 +44,7 @@ public class TileArcaneBoreRenderer extends TileEntitySpecialRenderer<TileArcane
         boreModel.renderBase(MODEL_SCALE);
         GlStateManager.popMatrix();
 
+        GlStateManager.rotate((float) tile.rotZ - tile.vRadZ + partialTicks * (float) tile.speedZ, 0.0F, 0.0F, 1.0F);
         GlStateManager.pushMatrix();
         GlStateManager.rotate(90.0F, 0.0F, 0.0F, 1.0F);
         GlStateManager.translate(0.0F, -0.5F, 0.0F);
@@ -96,26 +96,4 @@ public class TileArcaneBoreRenderer extends TileEntitySpecialRenderer<TileArcane
         GlStateManager.popMatrix();
     }
 
-    private static void applyFacingRotation(EnumFacing facing) {
-        switch (facing) {
-            case NORTH:
-                GlStateManager.rotate(90.0F, 0.0F, 1.0F, 0.0F);
-                break;
-            case SOUTH:
-                GlStateManager.rotate(270.0F, 0.0F, 1.0F, 0.0F);
-                break;
-            case WEST:
-                GlStateManager.rotate(180.0F, 0.0F, 1.0F, 0.0F);
-                break;
-            case UP:
-                GlStateManager.rotate(90.0F, 0.0F, 0.0F, 1.0F);
-                break;
-            case DOWN:
-                GlStateManager.rotate(-90.0F, 0.0F, 0.0F, 1.0F);
-                break;
-            case EAST:
-            default:
-                break;
-        }
-    }
 }

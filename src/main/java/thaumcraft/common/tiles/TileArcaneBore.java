@@ -24,6 +24,7 @@ import net.minecraft.util.NonNullList;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
@@ -47,8 +48,20 @@ public class TileArcaneBore extends TileThaumcraft implements ITickable, IInvent
     public int spiral = 0;
     public float currentRadius = 0.0F;
     public int maxRadius = 2;
+    public float vRadX = 0.0F;
+    public float vRadZ = 0.0F;
+    public float tRadX = 0.0F;
+    public float tRadZ = 0.0F;
+    public float mRadX = 0.0F;
+    public float mRadZ = 0.0F;
     public int topRotation = 0;
     public ItemStack[] contents = new ItemStack[]{ItemStack.EMPTY, ItemStack.EMPTY};
+    public int rotX = 0;
+    public int rotZ = 0;
+    public int tarX = 0;
+    public int tarZ = 0;
+    public int speedX = 0;
+    public int speedZ = 0;
     public EnumFacing orientation = EnumFacing.UP;
     public EnumFacing baseOrientation = EnumFacing.UP;
     public boolean hasFocus = false;
@@ -78,7 +91,13 @@ public class TileArcaneBore extends TileThaumcraft implements ITickable, IInvent
             }
             this.playClientDigFx();
         }
+        this.updateOrientationRotation();
         this.topRotation = (this.topRotation + (this.hasFocus && this.hasPickaxe ? 4 : 1)) % 360;
+        if (this.world != null && this.isPowered() && this.hasFocus && this.hasPickaxe && this.canUsePickaxe()) {
+            this.updateAimPreview();
+        } else if (this.world != null && this.world.isRemote) {
+            this.relaxAimState();
+        }
         if (this.world != null && !this.world.isRemote) {
             this.rechargeSpeedyTime();
             this.updateMining();
@@ -102,9 +121,47 @@ public class TileArcaneBore extends TileThaumcraft implements ITickable, IInvent
 
     public void setOrientation(EnumFacing orientation, boolean initial) {
         this.orientation = orientation == null ? EnumFacing.UP : orientation;
-        if (initial) {
-            this.baseOrientation = this.orientation;
+        switch (this.orientation) {
+            case DOWN:
+                this.tarZ = 180;
+                this.tarX = 0;
+                break;
+            case UP:
+                this.tarZ = 0;
+                this.tarX = 0;
+                break;
+            case NORTH:
+                this.tarZ = 90;
+                this.tarX = 270;
+                break;
+            case SOUTH:
+                this.tarZ = 90;
+                this.tarX = 90;
+                break;
+            case WEST:
+                this.tarZ = 90;
+                this.tarX = 0;
+                break;
+            case EAST:
+            default:
+                this.tarZ = 90;
+                this.tarX = 180;
+                break;
         }
+        if (initial) {
+            this.rotX = this.tarX;
+            this.rotZ = this.tarZ;
+        }
+        this.speedX = 0;
+        this.speedZ = 0;
+        this.toDig = false;
+        this.tRadX = 0.0F;
+        this.tRadZ = 0.0F;
+        this.mRadX = 0.0F;
+        this.mRadZ = 0.0F;
+        this.digX = 0;
+        this.digY = 0;
+        this.digZ = 0;
         this.markDirty();
         if (this.world != null && !this.world.isRemote) {
             this.world.notifyBlockUpdate(this.pos, this.world.getBlockState(this.pos), this.world.getBlockState(this.pos), 3);
@@ -152,6 +209,7 @@ public class TileArcaneBore extends TileThaumcraft implements ITickable, IInvent
             }
         }
         this.markDirty();
+        this.setOrientation(this.orientation, true);
     }
 
     @Override
@@ -327,6 +385,7 @@ public class TileArcaneBore extends TileThaumcraft implements ITickable, IInvent
             this.digCooldown = 20;
             return;
         }
+        this.updateAimRotation(target);
 
         IBlockState state = this.world.getBlockState(target);
         float hardness = state.getBlockHardness(this.world, target);
@@ -348,6 +407,86 @@ public class TileArcaneBore extends TileThaumcraft implements ITickable, IInvent
     private boolean isPowered() {
         if (this.world.isBlockPowered(this.pos)) return true;
         return this.world.isBlockPowered(this.pos.offset(this.baseOrientation.getOpposite()));
+    }
+
+    private void updateOrientationRotation() {
+        if (this.rotX < this.tarX) {
+            this.rotX += this.speedX;
+            this.speedX = this.rotX < this.tarX ? this.speedX + 1 : (int) ((float) this.speedX / 3.0F);
+        } else if (this.rotX > this.tarX) {
+            this.rotX += this.speedX;
+            this.speedX = this.rotX > this.tarX ? this.speedX - 1 : (int) ((float) this.speedX / 3.0F);
+        } else {
+            this.speedX = 0;
+        }
+        if (this.rotZ < this.tarZ) {
+            this.rotZ += this.speedZ;
+            this.speedZ = this.rotZ < this.tarZ ? this.speedZ + 1 : (int) ((float) this.speedZ / 3.0F);
+        } else if (this.rotZ > this.tarZ) {
+            this.rotZ += this.speedZ;
+            this.speedZ = this.rotZ > this.tarZ ? this.speedZ - 1 : (int) ((float) this.speedZ / 3.0F);
+        } else {
+            this.speedZ = 0;
+        }
+    }
+
+    private void updateAimPreview() {
+        BlockPos target = this.findNextBlockToDig();
+        if (target != null) {
+            this.updateAimRotation(target);
+        } else if (this.world.isRemote) {
+            this.relaxAimState();
+        }
+    }
+
+    private void updateAimRotation(BlockPos target) {
+        double xd = (double) target.getX() + 0.5D - ((double) this.pos.getX() + 0.5D);
+        double yd = (double) target.getY() + 0.5D - ((double) this.pos.getY() + 0.5D);
+        double zd = (double) target.getZ() + 0.5D - ((double) this.pos.getZ() + 0.5D);
+        double horizontal = Math.sqrt(xd * xd + zd * zd);
+        float rx = (float) (Math.atan2(zd, xd) * 180.0D / Math.PI);
+        float rz = (float) (-(Math.atan2(yd, horizontal) * 180.0D / Math.PI)) + 90.0F;
+        this.tRadX = MathHelper.wrapDegrees((float) this.rotX) + rx;
+        if (this.orientation == EnumFacing.EAST) {
+            if (this.tRadX > 180.0F) {
+                this.tRadX -= 360.0F;
+            }
+            if (this.tRadX < -180.0F) {
+                this.tRadX += 360.0F;
+            }
+        }
+        this.tRadZ = rz - (float) this.rotZ;
+        if (this.orientation.getIndex() <= 1) {
+            this.tRadZ += 180.0F;
+            if (this.vRadX - this.tRadX >= 180.0F) {
+                this.vRadX -= 360.0F;
+            }
+            if (this.vRadX - this.tRadX <= -180.0F) {
+                this.vRadX += 360.0F;
+            }
+        }
+        this.mRadX = Math.abs((this.vRadX - this.tRadX) / 6.0F);
+        this.mRadZ = Math.abs((this.vRadZ - this.tRadZ) / 6.0F);
+        if (this.vRadX < this.tRadX) {
+            this.vRadX += this.mRadX;
+        } else if (this.vRadX > this.tRadX) {
+            this.vRadX -= this.mRadX;
+        }
+        if (this.vRadZ < this.tRadZ) {
+            this.vRadZ += this.mRadZ;
+        } else if (this.vRadZ > this.tRadZ) {
+            this.vRadZ -= this.mRadZ;
+        }
+        this.mRadX *= 0.9F;
+        this.mRadZ *= 0.9F;
+    }
+
+    private void relaxAimState() {
+        if (this.topRotation % 90 != 0) {
+            this.topRotation += Math.min(10, 90 - this.topRotation % 90);
+        }
+        this.vRadX *= 0.9F;
+        this.vRadZ *= 0.9F;
     }
 
     private BlockPos findNextBlockToDig() {
