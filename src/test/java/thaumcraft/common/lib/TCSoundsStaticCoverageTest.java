@@ -1,5 +1,9 @@
 package thaumcraft.common.lib;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -25,6 +29,7 @@ public class TCSoundsStaticCoverageTest {
     public void tcSoundsDeclarationsMatchSoundsJsonAndAssets() throws IOException {
         String tcSoundsSource = readFile("src/main/java/thaumcraft/common/lib/TCSounds.java");
         String soundsJson = readFile("src/main/resources/assets/thaumcraft/sounds.json");
+        JsonObject soundsRoot = new JsonParser().parse(soundsJson).getAsJsonObject();
 
         Set<String> declaredKeys = extract(tcSoundsSource, SOUND_CALL_PATTERN);
         Set<String> jsonKeys = extract(soundsJson, SOUND_JSON_KEY_PATTERN);
@@ -38,13 +43,26 @@ public class TCSoundsStaticCoverageTest {
         undeclaredInCode.removeAll(declaredKeys);
         assertTrue("sounds.json keys missing in TCSounds declarations: " + undeclaredInCode, undeclaredInCode.isEmpty());
 
+        Set<String> unnamespacedEntries = new HashSet<>();
         Set<String> missingAssets = new HashSet<>();
         for (String key : jsonKeys) {
-            boolean hasBaseOrVariant = soundFileBases.contains(key) || hasVariant(soundFileBases, key);
-            if (!hasBaseOrVariant) {
-                missingAssets.add(key);
+            JsonObject event = soundsRoot.getAsJsonObject(key);
+            JsonArray sounds = event.getAsJsonArray("sounds");
+            for (JsonElement sound : sounds) {
+                String entryName = sound.isJsonObject()
+                        ? sound.getAsJsonObject().get("name").getAsString()
+                        : sound.getAsString();
+                if (!entryName.startsWith("thaumcraft:")) {
+                    unnamespacedEntries.add(key + " -> " + entryName);
+                }
+                String baseName = entryName.contains(":") ? entryName.substring(entryName.indexOf(':') + 1) : entryName;
+                boolean hasBaseOrVariant = soundFileBases.contains(baseName) || hasVariant(soundFileBases, baseName);
+                if (!hasBaseOrVariant) {
+                    missingAssets.add(key + " -> " + entryName);
+                }
             }
         }
+        assertTrue("sounds.json entries without explicit thaumcraft namespace: " + unnamespacedEntries, unnamespacedEntries.isEmpty());
         assertTrue("sounds.json keys without matching .ogg assets: " + missingAssets, missingAssets.isEmpty());
     }
 

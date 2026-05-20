@@ -71,7 +71,7 @@ Do not claim backend substantially complete until these are resolved or scoped o
 
 ## Latest Checkpoint
 
-- Client render stability burst fixed a CCL pipeline regression that could crash inventory/HWYLA item rendering through `ItemThaumometerRenderer`: `CCModel.render()` no longer injects `null` vertex-op placeholders, and `CCRenderPipeline` now skips accidental `null` ops defensively.
-- Added a focused static guard for the restored CCL contract so future renderer work cannot silently reintroduce the `CCRenderPipeline.rebuild()` null-op crash path.
-- Validated this burst with `./scripts/dev.sh gradle test --rerun-tasks --tests thaumcraft.client.CCModelNullOperationRenderStaticGuardTest` and `./scripts/dev.sh validate --smoke`.
-- Still unverified and not claimed from this checkpoint: live client reproduction clearance for the reported `thaumcraft:chant` warning and full unattended client render smoke, because `DISPLAY` is unavailable in the current environment.
+- Sound asset burst fixed the `Unable to play empty soundEvent: thaumcraft:chant` class of warnings by making every `sounds.json` entry explicitly target the `thaumcraft:` namespace instead of implicit `minecraft:` resolution.
+- Extended `TCSoundsStaticCoverageTest` so each declared sound entry must keep explicit `thaumcraft:` namespacing and still resolve to a matching `.ogg` asset.
+- Validated this burst with `./scripts/dev.sh gradle test --rerun-tasks --tests thaumcraft.common.lib.TCSoundsStaticCoverageTest` and `./scripts/dev.sh validate --smoke`.
+- The earlier CCL thaumometer render crash remains fixed in commit `fd26281`; this checkpoint only addresses the remaining sound-event warning from the same log bundle.
