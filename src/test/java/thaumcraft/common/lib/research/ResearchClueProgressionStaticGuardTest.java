@@ -55,10 +55,11 @@ public class ResearchClueProgressionStaticGuardTest {
                         && notes.contains("ItemStack note = ResearchManager.createNote(stack, key, world);")
                         && notes.contains("stack.setItemDamage(0);"));
         assertTrue("PacketPlayerCompleteToServer must keep primary note-creation and secondary direct-completion split",
-                completePacket.contains("if (this.type == 0 && research.isSecondary())")
-                        && completePacket.contains("completed = consumeResearchCost(player, research) && completeResearch(player, research);")
-                        && completePacket.contains("} else if (this.type == 1 && !research.isSecondary())")
-                        && completePacket.contains("completed = !ResearchManager.createResearchNoteForPlayer(player.world, player, this.key).isEmpty();"));
+                completePacket.contains("if (type == 0 && research.isSecondary())")
+                        && completePacket.contains("return consumeResearchCost(player, research) && completeResearch(player, research);")
+                        && completePacket.contains("if (type == 1 && !research.isSecondary())")
+                        && completePacket.contains("return !ResearchManager.createResearchNoteForPlayer(player.world, player, key).isEmpty();")
+                        && completePacket.contains("if (!ResearchManager.doesPlayerHaveRequisites(player, key))"));
     }
 
     private static String readFile(String path) throws IOException {

@@ -52,27 +52,31 @@ public class PacketPlayerCompleteToServer extends PacketBase {
     @Override
     public IMessage onMessage(MessageContext ctx) {
         this.scheduleServer(ctx, player -> {
-            if (this.key == null || this.key.isEmpty()) return;
-            if (player.world.provider.getDimension() != this.dim) return;
-            if (this.username != null && !this.username.isEmpty() && !player.getName().equals(this.username)) return;
-            if (ResearchManager.isResearchComplete(player, this.key)) return;
-            ResearchItem research = ResearchCategories.getResearch(this.key);
-            if (research == null) return;
-            if (!ResearchManager.doesPlayerHaveRequisites(player.getName(), this.key)) {
-                player.sendMessage(new TextComponentTranslation("tc.researcherror"));
-                return;
-            }
-            boolean completed = false;
-            if (this.type == 0 && research.isSecondary()) {
-                completed = consumeResearchCost(player, research) && completeResearch(player, research);
-            } else if (this.type == 1 && !research.isSecondary()) {
-                completed = !ResearchManager.createResearchNoteForPlayer(player.world, player, this.key).isEmpty();
-            }
-            if (completed) {
+            if (processRequest(player, this.key, this.dim, this.username, this.type)) {
                 player.world.playSound(null, player.posX, player.posY, player.posZ, TCSounds.LEARN, SoundCategory.PLAYERS, 0.75F, 1.0F);
             }
         });
         return null;
+    }
+
+    static boolean processRequest(EntityPlayer player, String key, int dim, String username, byte type) {
+        if (player == null || key == null || key.isEmpty()) return false;
+        if (player.world.provider.getDimension() != dim) return false;
+        if (username != null && !username.isEmpty() && !player.getName().equals(username)) return false;
+        if (ResearchManager.isResearchComplete(player, key)) return false;
+        ResearchItem research = ResearchCategories.getResearch(key);
+        if (research == null) return false;
+        if (!ResearchManager.doesPlayerHaveRequisites(player, key)) {
+            player.sendMessage(new TextComponentTranslation("tc.researcherror"));
+            return false;
+        }
+        if (type == 0 && research.isSecondary()) {
+            return consumeResearchCost(player, research) && completeResearch(player, research);
+        }
+        if (type == 1 && !research.isSecondary()) {
+            return !ResearchManager.createResearchNoteForPlayer(player.world, player, key).isEmpty();
+        }
+        return false;
     }
 
     private static boolean completeResearch(EntityPlayer player, ResearchItem research) {
@@ -84,7 +88,7 @@ public class PacketPlayerCompleteToServer extends PacketBase {
             for (String sibling : research.siblings) {
                 if (ResearchCategories.getResearch(sibling) != null
                         && !ResearchManager.isResearchComplete(player, sibling)
-                        && ResearchManager.doesPlayerHaveRequisites(player.getName(), sibling)) {
+                        && ResearchManager.doesPlayerHaveRequisites(player, sibling)) {
                     ResearchManager.addResearch(player, sibling);
                 }
             }

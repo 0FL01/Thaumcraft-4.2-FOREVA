@@ -290,6 +290,21 @@ public class ResearchManager {
         ResearchItem item = ResearchCategories.getResearch(key);
         if (item == null) return false;
         Set<String> completed = new HashSet<>(getResearchForPlayer(username));
+        return doesPlayerHaveRequisites(completed, item);
+    }
+
+    public static boolean doesPlayerHaveRequisites(EntityPlayer player, String key) {
+        if (player == null) return false;
+        IPlayerKnowledge knowledge = getResearchData(player);
+        if (knowledge == null) return false;
+        ResearchItem item = ResearchCategories.getResearch(key);
+        if (item == null) return false;
+        Set<String> completed = new HashSet<>(knowledge.getResearchComplete());
+        return doesPlayerHaveRequisites(completed, item);
+    }
+
+    private static boolean doesPlayerHaveRequisites(Set<String> completed, ResearchItem item) {
+        if (completed == null || item == null) return false;
         if (item.parents != null) {
             for (String parent : item.parents) {
                 if (!completed.contains(parent)) return false;

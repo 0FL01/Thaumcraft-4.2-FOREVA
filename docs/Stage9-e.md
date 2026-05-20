@@ -43,6 +43,7 @@ Current implementation present:
 - `ResearchNoteData`, note NBT read/write, note generation, note updates, and completion checks exist.
 - `ResearchManager.createClue(...)` and `ScanManager.completeScan(...)` forward scan clue data after successful scans.
 - `PacketPlayerCompleteToServer` now checks research existence, requisites, duplicate completion, type, note creation, aspect costs, and sibling gating.
+- Targeted non-GUI runtime tests now cover `PacketPlayerCompleteToServer` primary note creation, prerequisite rejection, secondary aspect-cost completion, sibling grant gating, and wrong-type/insufficient-cost rejection.
 
 Current blockers:
 
@@ -141,20 +142,25 @@ What remains open for this gap is proof around the live client route and broader
 - validate knowledge-fragment behavior against eligible hidden research;
 - add runtime tests or manual scenarios with populated trigger-bearing content.
 
-### GAP-7: Research completion packet has server checks; live route and adversarial tests remain open
+### GAP-7: Research completion packet hardening is implemented; live route/e2e validation remains open
 
-**Статус:** partial implementation; runtime/adversarial validation open
+**Статус:** implementation hardened; targeted non-GUI runtime tests passed; live route/e2e validation open
 **Критичность:** high
 
 Do not describe `PacketPlayerCompleteToServer` as a direct-complete bypass anymore. It now checks research existence, duplicate completion, dimension/user, requisites, primary vs secondary action type, note creation, aspect cost, and sibling gating.
 
+Targeted runtime coverage now proves:
+
+- primary requests create a research note and do not grant the research key directly;
+- missing prerequisites reject the request without consuming paper/ink or mutating progression;
+- valid secondary requests consume aspect costs and unlock eligible siblings only after completion;
+- wrong-type and insufficient-cost requests are rejected without mutation.
+
 Remaining work:
 
 - verify normal Thaumonomicon client actions actually send this packet with correct type semantics;
-- add tests that invalid packets cannot create notes or complete research without prerequisites/costs;
-- validate secondary research aspect cost consumption with populated research data;
-- validate primary note creation consumes paper/ink and does not add the research key directly;
-- validate sibling grants only after valid completion.
+- validate the live packet-dispatch path, not only direct `processRequest(...)` runtime calls;
+- confirm representative real research registrations behave the same way under the actual GUI/browser route before calling progression complete.
 
 ### GAP-9: Scan packet hardening is implemented; broader scan/progression validation remains open
 
