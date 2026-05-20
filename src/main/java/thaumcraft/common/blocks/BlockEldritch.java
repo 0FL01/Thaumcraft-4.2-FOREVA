@@ -53,7 +53,7 @@ public class BlockEldritch extends Block {
     
     @Override
     public void getSubBlocks(CreativeTabs tab, NonNullList<ItemStack> list) {
-        for (int i = 0; i < 5; i++) list.add(new ItemStack(this, 1, i));
+        list.add(new ItemStack(this, 1, 4));
     }
     
     @Override

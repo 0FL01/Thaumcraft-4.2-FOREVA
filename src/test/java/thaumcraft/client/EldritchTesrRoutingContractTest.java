@@ -22,11 +22,16 @@ public class EldritchTesrRoutingContractTest {
         String lockRenderer = read("src/main/java/thaumcraft/client/renderers/tile/TileEldritchLockRenderer.java");
         String crabSpawnerRenderer = read("src/main/java/thaumcraft/client/renderers/tile/TileEldritchCrabSpawnerRenderer.java");
         String itemModel = read("src/main/resources/assets/thaumcraft/models/item/blockeldritch_tesr.json");
+        String shell4 = read("src/main/resources/assets/thaumcraft/models/block/blockeldritch_4.json");
+        String shell5 = read("src/main/resources/assets/thaumcraft/models/block/blockeldritch_5.json");
+        String shell6 = read("src/main/resources/assets/thaumcraft/models/block/blockeldritch_6.json");
 
         assertTrue("BlockEldritch should route altar/obelisk/capstone/lock/crab-spawner metas through TESR-first world rendering instead of baked cube placeholders",
                 block.contains("return meta == 0 || meta == 1 || meta == 3 || meta == 8 || meta == 9")
                         && block.contains("? EnumBlockRenderType.INVISIBLE")
                         && block.contains(": EnumBlockRenderType.MODEL;"));
+        assertTrue("BlockEldritch should keep the original creative exposure for the static eldritch shell family instead of surfacing the tile-backed metas directly",
+                block.contains("list.add(new ItemStack(this, 1, 4));"));
 
         assertTrue("ClientProxy should keep ordinary blockstate variants for the full eldritch family, but override TESR-backed metas onto a builtin/entity item model and install ItemEldritchRenderer",
                 clientProxy.contains("Item eldritchItem = Item.getItemFromBlock(ConfigBlocks.blockEldritch);")
@@ -77,6 +82,10 @@ public class EldritchTesrRoutingContractTest {
 
         assertTrue("The eldritch TEISR model stub must stay builtin/entity so Forge dispatches the custom renderer",
                 itemModel.contains("\"parent\": \"builtin/entity\""));
+        assertTrue("The static eldritch shell metas 4/5/6 should use the original inset 12x12x12 shell instead of full-cube placeholders",
+                shell4.contains("\"from\": [2, 2, 2]") && shell4.contains("\"to\": [14, 14, 14]")
+                        && shell5.contains("\"from\": [2, 2, 2]") && shell5.contains("\"to\": [14, 14, 14]")
+                        && shell6.contains("\"from\": [2, 2, 2]") && shell6.contains("\"to\": [14, 14, 14]"));
     }
 
     private static String read(String path) throws IOException {
