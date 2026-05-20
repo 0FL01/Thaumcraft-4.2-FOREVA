@@ -381,9 +381,16 @@ public class ClientProxyEntityRendererRegistrationStaticGuardTest {
                         && taintSheepModel2.contains("getHeadRotationPointY")
                         && taintSheepModel2.contains("getHeadRotationAngleX"));
         String cultistRenderer = readFile("src/main/java/thaumcraft/client/renderers/entity/RenderCultist.java");
-        assertTrue("RenderCultist must provide shared cultist texture baseline",
+        assertTrue("RenderCultist must provide shared cultist texture plus ritualist beam and leader-scale baselines",
                 cultistRenderer.contains("extends RenderBiped<T>")
-                        && cultistRenderer.contains("textures/models/cultist.png"));
+                        && cultistRenderer.contains("textures/models/cultist.png")
+                        && cultistRenderer.contains("textures/misc/wispy.png")
+                        && cultistRenderer.contains("entity instanceof EntityCultistCleric")
+                        && cultistRenderer.contains("getIsRitualist()")
+                        && cultistRenderer.contains("drawFloatyLine(")
+                        && cultistRenderer.contains("entity instanceof EntityCultistLeader")
+                        && cultistRenderer.contains("GlStateManager.scale(1.25F, 1.25F, 1.25F)")
+                        && cultistRenderer.contains("Config.golemLinkQuality"));
         String trunkRenderer = readFile("src/main/java/thaumcraft/client/renderers/entity/RenderTravelingTrunk.java");
         assertTrue("RenderTravelingTrunk must provide anger-based texture routing baseline",
                 trunkRenderer.contains("extends RenderLiving<EntityTravelingTrunk>")
