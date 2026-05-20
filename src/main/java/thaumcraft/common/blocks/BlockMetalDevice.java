@@ -21,8 +21,10 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.SoundCategory;
+import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraft.init.SoundEvents;
 import net.minecraftforge.fluids.FluidUtil;
@@ -32,9 +34,12 @@ import thaumcraft.common.entities.EntitySpecialItem;
 import thaumcraft.common.items.wands.ItemWandCasting;
 import thaumcraft.common.tiles.*;
 
+import javax.annotation.Nullable;
+
 public class BlockMetalDevice extends BlockContainer {
 
     public static final PropertyInteger TYPE = PropertyInteger.create("type", 0, 14);
+    private static final AxisAlignedBB GRATE_AABB = new AxisAlignedBB(0.0D, 0.8125D, 0.0D, 1.0D, 1.0D, 1.0D);
 
     private int delay = 0;
 
@@ -80,7 +85,6 @@ public class BlockMetalDevice extends BlockContainer {
         list.add(new ItemStack(this, 1, 1)); // alembic
         list.add(new ItemStack(this, 1, 2)); // magic workbench charger
         list.add(new ItemStack(this, 1, 5)); // grate
-        list.add(new ItemStack(this, 1, 6)); // grate
         list.add(new ItemStack(this, 1, 7)); // lamp
         list.add(new ItemStack(this, 1, 8)); // growth lamp
         list.add(new ItemStack(this, 1, 10)); // thaumatorium
@@ -90,7 +94,10 @@ public class BlockMetalDevice extends BlockContainer {
     }
 
     @Override
-    public int damageDropped(IBlockState state) { return getMetaFromState(state); }
+    public int damageDropped(IBlockState state) {
+        int meta = getMetaFromState(state);
+        return meta == 6 ? 5 : meta;
+    }
 
     @Override
     public void onEntityCollision(World worldIn, BlockPos pos, IBlockState state, Entity entityIn) {
@@ -130,6 +137,14 @@ public class BlockMetalDevice extends BlockContainer {
                 return ((TileAlembic) tileEntity).onWandRightClick(worldIn, held, playerIn,
                         pos.getX(), pos.getY(), pos.getZ(), facing.getIndex(), state.getValue(TYPE)) >= 0;
             }
+        }
+        if (state.getValue(TYPE) == 5) {
+            toggleGrate(worldIn, pos, state, 6, playerIn);
+            return true;
+        }
+        if (state.getValue(TYPE) == 6) {
+            toggleGrate(worldIn, pos, state, 5, playerIn);
+            return true;
         }
         if (state.getValue(TYPE) == 10) {
             TileEntity te = tileEntity;
@@ -195,6 +210,8 @@ public class BlockMetalDevice extends BlockContainer {
     public void neighborChanged(IBlockState state, World worldIn, BlockPos pos, Block blockIn, BlockPos fromPos) {
         super.neighborChanged(state, worldIn, pos, blockIn, fromPos);
         if (worldIn.isRemote) return;
+        boolean powered = worldIn.isBlockPowered(pos);
+        onPoweredBlockChange(worldIn, pos, powered);
         if (state.getValue(TYPE) == 7) {
             TileEntity te = worldIn.getTileEntity(pos);
             if (te instanceof TileArcaneLamp) {
@@ -225,6 +242,26 @@ public class BlockMetalDevice extends BlockContainer {
         worldIn.notifyBlockUpdate(pos, state, state, 3);
     }
 
+    private void toggleGrate(World worldIn, BlockPos pos, IBlockState state, int targetMeta, @Nullable EntityPlayer player) {
+        if (worldIn.isRemote) {
+            return;
+        }
+        worldIn.setBlockState(pos, state.withProperty(TYPE, targetMeta), 2);
+        worldIn.playEvent(player, 1003, pos, 0);
+    }
+
+    private void onPoweredBlockChange(World worldIn, BlockPos pos, boolean powered) {
+        IBlockState state = worldIn.getBlockState(pos);
+        int meta = state.getValue(TYPE);
+        if (meta == 5 && powered) {
+            worldIn.setBlockState(pos, state.withProperty(TYPE, 6), 2);
+            worldIn.playEvent(null, 1003, pos, 0);
+        } else if (meta == 6 && !powered) {
+            worldIn.setBlockState(pos, state.withProperty(TYPE, 5), 2);
+            worldIn.playEvent(null, 1003, pos, 0);
+        }
+    }
+
     private EnumFacing findAdjacentThaumatorium(World worldIn, BlockPos pos) {
         for (EnumFacing face : EnumFacing.values()) {
             IBlockState adjacent = worldIn.getBlockState(pos.offset(face));
@@ -248,6 +285,29 @@ public class BlockMetalDevice extends BlockContainer {
     @Override
     public int getMetaFromState(IBlockState state) {
         return state.getValue(TYPE);
+    }
+
+    @Override
+    public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess source, BlockPos pos) {
+        int meta = getMetaFromState(state);
+        return (meta == 5 || meta == 6) ? GRATE_AABB : FULL_BLOCK_AABB;
+    }
+
+    @Override
+    public void addCollisionBoxToList(IBlockState state, World worldIn, BlockPos pos, AxisAlignedBB entityBox,
+                                      java.util.List<AxisAlignedBB> collidingBoxes, @Nullable Entity entityIn, boolean isActualState) {
+        int meta = getMetaFromState(state);
+        if (meta == 5) {
+            if (!(entityIn instanceof EntityItem)) {
+                addCollisionBoxToList(pos, entityBox, collidingBoxes, GRATE_AABB);
+            }
+            return;
+        }
+        if (meta == 6) {
+            addCollisionBoxToList(pos, entityBox, collidingBoxes, GRATE_AABB);
+            return;
+        }
+        super.addCollisionBoxToList(state, worldIn, pos, entityBox, collidingBoxes, entityIn, isActualState);
     }
 
     @Override

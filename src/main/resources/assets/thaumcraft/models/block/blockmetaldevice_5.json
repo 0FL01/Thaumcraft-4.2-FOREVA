@@ -1,6 +1,21 @@
 {
-  "parent": "block/cube_all",
+  "ambientocclusion": false,
   "textures": {
-    "all": "thaumcraft:blocks/grate"
-  }
+    "surface": "thaumcraft:blocks/grate",
+    "side": "thaumcraft:blocks/metalbase"
+  },
+  "elements": [
+    {
+      "from": [0, 13, 0],
+      "to": [16, 16, 16],
+      "faces": {
+        "down": { "texture": "#surface" },
+        "up": { "texture": "#surface" },
+        "north": { "texture": "#side" },
+        "south": { "texture": "#side" },
+        "west": { "texture": "#side" },
+        "east": { "texture": "#side" }
+      }
+    }
+  ]
 }
