@@ -71,7 +71,7 @@ Do not claim backend substantially complete until these are resolved or scoped o
 
 ## Latest Checkpoint
 
-- Stage 8 texture/model bootstrap burst moved baked item/block model registration onto a dedicated client `ModelRegistryEvent` bridge (`ClientModelRegistry -> Thaumcraft.proxy.registerModelLocations()`), leaving later `registerDisplayInformation()` for colors, entity renderers, and TESRs.
-- `ClientProxy` now splits early `ModelLoader` work from late client display bootstrap, closing the obvious 1.12.2 timing mismatch that could leave inventory/block-item models on missing-model cubes even when JSON/resources existed.
-- Port resources now mirror the original `thaumcraft_src/assets/thaumcraft/textures/blocks/**` corpus; the previously broken `alchemyblockadv` and `taint_fibres` model texture references are no longer missing, and a new static asset-coverage test guards the copy baseline.
-- Validation for this burst will remain non-GUI only; manual visual parity and unattended client smoke stay explicitly unproven unless a later checkpoint records real client evidence.
+- Client render stability burst fixed a CCL pipeline regression that could crash inventory/HWYLA item rendering through `ItemThaumometerRenderer`: `CCModel.render()` no longer injects `null` vertex-op placeholders, and `CCRenderPipeline` now skips accidental `null` ops defensively.
+- Added a focused static guard for the restored CCL contract so future renderer work cannot silently reintroduce the `CCRenderPipeline.rebuild()` null-op crash path.
+- Validated this burst with `./scripts/dev.sh gradle test --rerun-tasks --tests thaumcraft.client.CCModelNullOperationRenderStaticGuardTest` and `./scripts/dev.sh validate --smoke`.
+- Still unverified and not claimed from this checkpoint: live client reproduction clearance for the reported `thaumcraft:chant` warning and full unattended client render smoke, because `DISPLAY` is unavailable in the current environment.

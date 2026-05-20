@@ -603,6 +603,9 @@ Risk: Forge 1.12 OBJ loading requires model loader setup and `.obj` path convent
 **Checkpoint 2026-05-20 — block texture corpus baseline:**
 The runtime tree now mirrors the original `thaumcraft_src/assets/thaumcraft/textures/blocks/**` file set, and the previously broken baked-model references to `alchemyblockadv` and `taint_fibres` are no longer missing from port resources. This improves inventory/block-item and some world-surface fallback coverage, but it is still not evidence of full Stage 8-c renderer parity or client-smoke cleanliness.
 
+**Checkpoint 2026-05-20 — CCL item-render crash guard:**
+A later client-render checkpoint restored the no-arg `CCModel.render()` contract so it no longer feeds `null` vertex operations into `CCRenderPipeline.rebuild()`. This specifically protects TESR-style item renderers such as the thaumometer from inventory/HWYLA crash paths that previously ended in `CCRenderPipeline.rebuild()` NPEs. The fix is non-GUI validated only; a real client smoke or manual reproduction-clear run is still required before claiming the broader render surface clean.
+
 ## 6. Итоговый checklist закрытия Stage 8-c
 
 - [ ] Add a Stage 8-c client registration path for TESR and required tile/block item visuals.

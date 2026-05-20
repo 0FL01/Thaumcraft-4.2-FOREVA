@@ -13,8 +13,14 @@ public class CCRenderPipeline {
 
     public void setPipeline(CCRenderState.IVertexOperation ... ops) {
         this.ops.clear();
+        if (ops == null) {
+            this.rebuild();
+            return;
+        }
         for (int i = 0; i < ops.length; ++i) {
-            this.ops.add(ops[i]);
+            if (ops[i] != null) {
+                this.ops.add(ops[i]);
+            }
         }
         this.rebuild();
     }
@@ -51,6 +57,9 @@ public class CCRenderPipeline {
         }
         for (i = 0; i < this.ops.size(); ++i) {
             CCRenderState.IVertexOperation op = this.ops.get(i);
+            if (op == null) {
+                continue;
+            }
             this.loading = this.nodes.get(op.operationID());
             boolean loaded = op.load();
             if (loaded) {
@@ -138,4 +147,3 @@ public class CCRenderPipeline {
         }
     }
 }
-

@@ -339,7 +339,7 @@ Copyable<CCModel> {
     }
 
     public void render() {
-        this.render(0, this.verts.length, null, null, null);
+        this.render(0, this.verts.length, new CCRenderState.IVertexOperation[0]);
     }
 
     public void render(double x, double y, double z, double u, double v) {
@@ -863,4 +863,3 @@ Copyable<CCModel> {
         }
     }
 }
-
