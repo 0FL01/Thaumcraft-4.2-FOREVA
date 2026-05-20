@@ -28,7 +28,7 @@ public class TileAlembicRenderer extends TileEntitySpecialRenderer<TileAlembic> 
 
     @Override
     public void render(TileAlembic tile, double x, double y, double z, float partialTicks, int destroyStage, float alpha) {
-        if (tile == null || tile.getWorld() == null) {
+        if (tile == null) {
             return;
         }
 
@@ -38,7 +38,9 @@ public class TileAlembicRenderer extends TileEntitySpecialRenderer<TileAlembic> 
         if (tile.aspectFilter != null) {
             renderAspectLabel(tile, x, y, z, tile.aspectFilter);
         }
-        renderOutputNozzles(tile, x, y, z);
+        if (tile.getWorld() != null) {
+            renderOutputNozzles(tile, x, y, z);
+        }
     }
 
     private void renderAlembicModel(TileAlembic tile, double x, double y, double z) {

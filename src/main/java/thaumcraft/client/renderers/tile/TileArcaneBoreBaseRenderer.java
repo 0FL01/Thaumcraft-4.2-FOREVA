@@ -16,7 +16,7 @@ public class TileArcaneBoreBaseRenderer extends TileEntitySpecialRenderer<TileAr
 
     @Override
     public void render(TileArcaneBoreBase tile, double x, double y, double z, float partialTicks, int destroyStage, float alpha) {
-        if (tile == null || tile.getWorld() == null) {
+        if (tile == null) {
             return;
         }
 

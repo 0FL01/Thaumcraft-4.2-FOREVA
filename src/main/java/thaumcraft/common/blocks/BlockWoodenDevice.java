@@ -39,10 +39,19 @@ import thaumcraft.common.tiles.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import javax.annotation.Nullable;
 
 public class BlockWoodenDevice extends BlockContainer {
 
     public static final PropertyInteger TYPE = PropertyInteger.create("type", 0, 8);
+    private static final AxisAlignedBB BELLOWS_AABB = new AxisAlignedBB(0.1D, 0.0D, 0.1D, 0.9D, 1.0D, 0.9D);
+    private static final AxisAlignedBB PRESSURE_PLATE_AABB = new AxisAlignedBB(0.0625D, 0.0D, 0.0625D, 0.9375D, 0.0625D, 0.9375D);
+    private static final AxisAlignedBB PRESSED_PLATE_AABB = new AxisAlignedBB(0.0625D, 0.0D, 0.0625D, 0.9375D, 0.03125D, 0.9375D);
+    private static final AxisAlignedBB BANNER_STANDING_AABB = new AxisAlignedBB(0.33D, 0.0D, 0.33D, 0.66D, 2.0D, 0.66D);
+    private static final AxisAlignedBB BANNER_WALL_NORTH_AABB = new AxisAlignedBB(0.0D, 0.0D, 0.0D, 1.0D, 2.0D, 0.25D);
+    private static final AxisAlignedBB BANNER_WALL_SOUTH_AABB = new AxisAlignedBB(0.0D, 0.0D, 0.75D, 1.0D, 2.0D, 1.0D);
+    private static final AxisAlignedBB BANNER_WALL_WEST_AABB = new AxisAlignedBB(0.75D, 0.0D, 0.0D, 1.0D, 2.0D, 1.0D);
+    private static final AxisAlignedBB BANNER_WALL_EAST_AABB = new AxisAlignedBB(0.0D, 0.0D, 0.0D, 0.25D, 2.0D, 1.0D);
 
     public BlockWoodenDevice() {
         super(Material.WOOD);
@@ -57,7 +66,13 @@ public class BlockWoodenDevice extends BlockContainer {
     @Override
     public boolean isOpaqueCube(IBlockState state) { return false; }
     @Override public boolean isFullCube(IBlockState state) { return false; }
-    @Override public EnumBlockRenderType getRenderType(IBlockState state) { return EnumBlockRenderType.MODEL; }
+    @Override
+    public EnumBlockRenderType getRenderType(IBlockState state) {
+        int meta = state.getValue(TYPE);
+        return meta == 0 || meta == 4 || meta == 5 || meta == 8
+                ? EnumBlockRenderType.INVISIBLE
+                : EnumBlockRenderType.MODEL;
+    }
     @Override public boolean hasTileEntity(IBlockState state) { return true; }
 
     @Override
@@ -103,6 +118,54 @@ public class BlockWoodenDevice extends BlockContainer {
             return true;
         }
         return super.isSideSolid(state, world, pos, side);
+    }
+
+    @Override
+    public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess source, BlockPos pos) {
+        int meta = getMetaFromState(state);
+        if (meta == 0) {
+            return BELLOWS_AABB;
+        }
+        if (meta == 2) {
+            return PRESSURE_PLATE_AABB;
+        }
+        if (meta == 3) {
+            return PRESSED_PLATE_AABB;
+        }
+        if (meta == 5) {
+            TileEntity tile = source.getTileEntity(pos);
+            if (tile instanceof TileArcaneBore) {
+                return getBoreBounds(((TileArcaneBore) tile).orientation);
+            }
+        }
+        if (meta == 8) {
+            TileEntity tile = source.getTileEntity(pos);
+            if (tile instanceof TileBanner) {
+                return getBannerBounds((TileBanner) tile);
+            }
+        }
+        return FULL_BLOCK_AABB;
+    }
+
+    @Override
+    public void addCollisionBoxToList(IBlockState state, World worldIn, BlockPos pos, AxisAlignedBB entityBox,
+                                      List<AxisAlignedBB> collidingBoxes, @Nullable Entity entityIn, boolean isActualState) {
+        int meta = getMetaFromState(state);
+        if (meta == 0) {
+            addCollisionBoxToList(pos, entityBox, collidingBoxes, BELLOWS_AABB);
+            return;
+        }
+        if (meta == 2 || meta == 3 || meta == 8) {
+            return;
+        }
+        if (meta == 5) {
+            TileEntity tile = worldIn.getTileEntity(pos);
+            if (tile instanceof TileArcaneBore) {
+                addCollisionBoxToList(pos, entityBox, collidingBoxes, getBoreBounds(((TileArcaneBore) tile).orientation));
+                return;
+            }
+        }
+        super.addCollisionBoxToList(state, worldIn, pos, entityBox, collidingBoxes, entityIn, isActualState);
     }
 
     @Override
@@ -468,5 +531,35 @@ public class BlockWoodenDevice extends BlockContainer {
     @Override
     public IBlockState getStateForPlacement(World worldIn, BlockPos pos, EnumFacing facing, float hitX, float hitY, float hitZ, int meta, EntityLivingBase placer, EnumHand hand) {
         return this.getDefaultState().withProperty(TYPE, MathHelper.clamp(meta, 0, 8));
+    }
+
+    private static AxisAlignedBB getBoreBounds(EnumFacing facing) {
+        EnumFacing dir = facing == null ? EnumFacing.NORTH : facing;
+        return new AxisAlignedBB(
+                dir.getXOffset() < 0 ? -1.0D : 0.0D,
+                dir.getYOffset() < 0 ? -1.0D : 0.0D,
+                dir.getZOffset() < 0 ? -1.0D : 0.0D,
+                dir.getXOffset() > 0 ? 2.0D : 1.0D,
+                dir.getYOffset() > 0 ? 2.0D : 1.0D,
+                dir.getZOffset() > 0 ? 2.0D : 1.0D
+        );
+    }
+
+    private static AxisAlignedBB getBannerBounds(TileBanner banner) {
+        if (!banner.getWall()) {
+            return BANNER_STANDING_AABB;
+        }
+        switch (banner.getFacing()) {
+            case 0:
+                return BANNER_WALL_NORTH_AABB;
+            case 8:
+                return BANNER_WALL_SOUTH_AABB;
+            case 12:
+                return BANNER_WALL_EAST_AABB;
+            case 4:
+                return BANNER_WALL_WEST_AABB;
+            default:
+                return FULL_BLOCK_AABB;
+        }
     }
 }

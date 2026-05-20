@@ -126,7 +126,9 @@ import thaumcraft.client.renderers.entity.RenderTravelingTrunk;
 import thaumcraft.client.renderers.entity.RenderWisp;
 import thaumcraft.client.renderers.entity.RenderCultist;
 import thaumcraft.client.renderers.item.ItemJarRenderer;
+import thaumcraft.client.renderers.item.ItemMetalDeviceRenderer;
 import thaumcraft.client.renderers.item.ItemNodeRenderer;
+import thaumcraft.client.renderers.item.ItemWoodenDeviceRenderer;
 import thaumcraft.client.renderers.tile.TileAlembicRenderer;
 import thaumcraft.client.renderers.tile.TileAlchemyFurnaceAdvancedRenderer;
 import thaumcraft.client.renderers.tile.TileArcaneLampRenderer;
@@ -412,6 +414,14 @@ public class ClientProxy extends CommonProxy {
         if (airyItem != null) {
             airyItem.setTileEntityItemStackRenderer(new ItemNodeRenderer());
         }
+        Item woodenDeviceItem = Item.getItemFromBlock(ConfigBlocks.blockWoodenDevice);
+        if (woodenDeviceItem != null) {
+            woodenDeviceItem.setTileEntityItemStackRenderer(new ItemWoodenDeviceRenderer());
+        }
+        Item metalDeviceItem = Item.getItemFromBlock(ConfigBlocks.blockMetalDevice);
+        if (metalDeviceItem != null) {
+            metalDeviceItem.setTileEntityItemStackRenderer(new ItemMetalDeviceRenderer());
+        }
     }
 
     private void setupEntityRenderers() {
@@ -501,10 +511,19 @@ public class ClientProxy extends CommonProxy {
         for (int meta = 0; meta <= 14; meta++) {
             registerBlockItemModel(stoneDeviceItem, meta, "type=" + meta);
         }
+        Item metalDeviceItem = Item.getItemFromBlock(ConfigBlocks.blockMetalDevice);
+        for (int meta = 0; meta <= 14; meta++) {
+            registerBlockItemModel(metalDeviceItem, meta, "type=" + meta);
+        }
         Item woodenDeviceItem = Item.getItemFromBlock(ConfigBlocks.blockWoodenDevice);
         for (int meta = 0; meta <= 8; meta++) {
             registerBlockItemModel(woodenDeviceItem, meta, "type=" + meta);
         }
+        registerBuiltinItemModel(woodenDeviceItem, 0, "blockwoodendevice_tesr");
+        registerBuiltinItemModel(woodenDeviceItem, 4, "blockwoodendevice_tesr");
+        registerBuiltinItemModel(woodenDeviceItem, 5, "blockwoodendevice_tesr");
+        registerBuiltinItemModel(woodenDeviceItem, 8, "blockwoodendevice_tesr");
+        registerBuiltinItemModel(metalDeviceItem, 1, "blockmetaldevice_tesr");
         Item tubeItem = Item.getItemFromBlock(ConfigBlocks.blockTube);
         for (int meta = 0; meta <= 7; meta++) {
             registerBlockItemModel(tubeItem, meta, "type=" + meta);
@@ -534,6 +553,14 @@ public class ClientProxy extends CommonProxy {
         }
         ModelLoader.setCustomModelResourceLocation(item, meta,
                 new ModelResourceLocation(item.getRegistryName(), variant));
+    }
+
+    private static void registerBuiltinItemModel(Item item, int meta, String modelPath) {
+        if (item == null) {
+            return;
+        }
+        ModelLoader.setCustomModelResourceLocation(item, meta,
+                new ModelResourceLocation(new ResourceLocation("thaumcraft", modelPath), "inventory"));
     }
 
     private void setupTileRenderers() {
