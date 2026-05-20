@@ -35,6 +35,7 @@ Branch: `codex/durable-goal-stage8-9`
 - Latest common/client follow-up restored `TileJarBrain` client-side rotation/sigh behavior used by `TileJarRenderer`, brought back `EntityPech.handleStatusUpdate(...)` tame/anger feedback via the generic particle path, recovered item-grate open/closed parity in `BlockMetalDevice` with hand/redstone toggles, thin collision, open-item drops, and shaped `blockmetaldevice_5/_6` models, and then restored tile-oriented wooden/metal device routing by pushing bellows / bore base / bore / banner / alembic / charger / vis relay back onto TESR or item-side `builtin/entity` + TEISR paths with reference-shaped `BlockWoodenDevice` bounds; `validate` and `validate --smoke` passed afterward.
 - Latest thaumatorium follow-up routed `blockMetalDevice` metas `10/11` back through TESR-first world/item paths, made `TileThaumatoriumRenderer` item-safe for worldless TEISR shell renders, and replaced the stale `metalbase` fallback textures for `blockmetaldevice_10/_11` with `alchemyblock`; both `validate` and `validate --smoke` passed afterward.
 - Latest crystalizer follow-up routed `blockTube` meta `7` back through TESR-first world/item paths, added `ItemTubeRenderer` + `blocktube_tesr` for inventory rendering, and made `TileEssentiaCrystalizerRenderer` worldless-safe so the dedicated crystalizer shell no longer depends on the old baked `cube_all` placeholder; both `validate` and `validate --smoke` passed afterward.
+- Latest `BlockAiry` follow-up restored node-family TESR/TEISR routing for metas `0/5`, recovered the original airy bounds/collision/drop contract (including node essence harvest drops and nitor-only item drops), and passed `compileJava`, focused node-routing tests, `validate`, and `validate --smoke`.
 - Stage 3-7 residual blockers stay documented and non-blocking for current burst planning, and GUI/manual parity checks remain skipped by instruction.
 
 ## Skipped GUI/Manual Graphics Checks
@@ -73,8 +74,7 @@ See `docs/GOAL_PROGRESS-archive/INDEX.md` for the master index.
 
 ## Next Checkpoint Candidate
 
-- Continue grouped Stage 8/9 bursts only where runtime-safe non-GUI validation is available.
-- Keep remaining Stage 3-7 blockers documented until they block a later burst.
+- Continue grouped Stage 8/9 bursts only where runtime-safe non-GUI validation is available, while keeping remaining Stage 3-7 blockers documented until they block a later burst.
 - Preserve the GUI/manual exclusion marker for any future visual checks.
 
 Do not mark Stage 6 or Stage 7 complete from this checkpoint alone.

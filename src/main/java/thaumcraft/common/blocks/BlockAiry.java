@@ -1,39 +1,51 @@
 package thaumcraft.common.blocks;
 
+import java.util.List;
+import java.util.Random;
+import javax.annotation.Nullable;
 import net.minecraft.block.BlockContainer;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
+import net.minecraft.block.properties.PropertyInteger;
+import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Items;
 import net.minecraft.init.MobEffects;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.potion.PotionEffect;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.DamageSource;
+import net.minecraft.util.EnumBlockRenderType;
 import net.minecraft.util.NonNullList;
-import net.minecraft.block.properties.PropertyInteger;
-import net.minecraft.block.state.BlockStateContainer;
+import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
-import thaumcraft.common.Thaumcraft;
+import thaumcraft.api.aspects.Aspect;
+import thaumcraft.api.aspects.AspectList;
 import thaumcraft.api.entities.IEldritchMob;
+import thaumcraft.api.nodes.INode;
+import thaumcraft.common.Thaumcraft;
 import thaumcraft.common.config.ConfigBlocks;
+import thaumcraft.common.config.ConfigItems;
+import thaumcraft.common.items.ItemWispEssence;
 import thaumcraft.common.tiles.TileNode;
 import thaumcraft.common.tiles.TileNodeEnergized;
 import thaumcraft.common.tiles.TileNitor;
 import thaumcraft.common.tiles.TileWardingStoneFence;
 
-import java.util.Random;
-
 public class BlockAiry extends BlockContainer {
 
     public static final String[] airyTypes = {"node", "nitor", "leavesFiller1", "leavesFiller2", "wardingFence", "energizedNode", null, null, null, null, "fire", "eerie", "barrier"};
     public static final PropertyInteger TYPE = PropertyInteger.create("type", 0, 12);
+    private static final AxisAlignedBB AIRY_AABB = new AxisAlignedBB(0.3D, 0.3D, 0.3D, 0.7D, 0.7D, 0.7D);
 
     public BlockAiry() {
         super(Material.AIR);
@@ -72,6 +84,12 @@ public class BlockAiry extends BlockContainer {
     }
 
     @Override
+    public EnumBlockRenderType getRenderType(IBlockState state) {
+        int meta = this.getMetaFromState(state);
+        return meta == 0 || meta == 5 ? EnumBlockRenderType.INVISIBLE : EnumBlockRenderType.MODEL;
+    }
+
+    @Override
     public int getLightValue(IBlockState state) {
         int meta = this.getMetaFromState(state);
         if (meta == 0 || meta == 5 || meta == 10 || meta == 11) return 8;
@@ -83,8 +101,17 @@ public class BlockAiry extends BlockContainer {
     @Override
     public float getBlockHardness(IBlockState state, World world, BlockPos pos) {
         int meta = this.getMetaFromState(world.getBlockState(pos));
+        if (meta == 10 || meta == 11) return 100.0f;
         if (meta == 12) return -1.0f;
         return 2.0f;
+    }
+
+    public float getExplosionResistance(World world, BlockPos pos, Entity exploder) {
+        int meta = this.getMetaFromState(world.getBlockState(pos));
+        if (meta == 0 || meta == 5) return 200.0f;
+        if (meta == 10 || meta == 11) return 50.0f;
+        if (meta == 12) return Float.MAX_VALUE;
+        return super.getExplosionResistance(exploder);
     }
 
     @Override
@@ -162,6 +189,103 @@ public class BlockAiry extends BlockContainer {
         if (!worldIn.isRemote && (meta == 10 || meta == 11)) {
             worldIn.setBlockToAir(pos);
         }
+    }
+
+    @Override
+    public boolean canBeReplacedByLeaves(IBlockState state, IBlockAccess world, BlockPos pos) {
+        int meta = this.getMetaFromState(state);
+        return meta == 2 || meta == 3 || meta == 4;
+    }
+
+    @Override
+    public boolean isLeaves(IBlockState state, IBlockAccess world, BlockPos pos) {
+        int meta = this.getMetaFromState(state);
+        return meta == 2 || meta == 3;
+    }
+
+    @Override
+    public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess source, BlockPos pos) {
+        int meta = this.getMetaFromState(state);
+        return meta == 3 || meta == 4 || meta == 10 || meta == 11 || meta == 12 ? NULL_AABB : AIRY_AABB;
+    }
+
+    @Nullable
+    @Override
+    public AxisAlignedBB getCollisionBoundingBox(IBlockState state, IBlockAccess world, BlockPos pos) {
+        int meta = this.getMetaFromState(state);
+        if (meta == 0 || meta == 2 || meta == 3 || meta == 4 || meta == 5 || meta == 10 || meta == 11 || meta == 12) {
+            return NULL_AABB;
+        }
+        return super.getCollisionBoundingBox(state, world, pos);
+    }
+
+    @Override
+    public void addCollisionBoxToList(IBlockState state, World world, BlockPos pos, AxisAlignedBB entityBox,
+                                      List<AxisAlignedBB> collidingBoxes, @Nullable Entity entity, boolean isActualState) {
+        int meta = this.getMetaFromState(state);
+        if (meta == 4 && entity instanceof EntityLivingBase && !(entity instanceof EntityPlayer)) {
+            int offset = 1;
+            while (offset < 3 && world.getBlockState(pos.down(offset)).getBlock() != ConfigBlocks.blockCosmeticSolid) {
+                ++offset;
+            }
+            if (!world.isAirBlock(pos.down(offset))) {
+                addCollisionBoxToList(pos, entityBox, collidingBoxes, FULL_BLOCK_AABB);
+            }
+            return;
+        }
+        if (meta == 12) {
+            addCollisionBoxToList(pos, entityBox, collidingBoxes, FULL_BLOCK_AABB);
+            return;
+        }
+        super.addCollisionBoxToList(state, world, pos, entityBox, collidingBoxes, entity, isActualState);
+    }
+
+    @Override
+    public AxisAlignedBB getSelectedBoundingBox(IBlockState state, World world, BlockPos pos) {
+        int meta = this.getMetaFromState(state);
+        return meta == 4 || meta == 12 ? super.getSelectedBoundingBox(state, world, pos) : NULL_AABB;
+    }
+
+    @Override
+    public boolean isSideSolid(IBlockState state, IBlockAccess world, BlockPos pos, net.minecraft.util.EnumFacing side) {
+        return false;
+    }
+
+    @Override
+    public int damageDropped(IBlockState state) {
+        return this.getMetaFromState(state);
+    }
+
+    @Override
+    public Item getItemDropped(IBlockState state, Random rand, int fortune) {
+        return this.getMetaFromState(state) == 1 && ConfigItems.itemResource != null ? ConfigItems.itemResource : Items.AIR;
+    }
+
+    @Override
+    public ItemStack getPickBlock(IBlockState state, RayTraceResult target, World world, BlockPos pos, EntityPlayer player) {
+        return this.getMetaFromState(state) == 1 && ConfigItems.itemResource != null
+                ? new ItemStack(ConfigItems.itemResource, 1, 1)
+                : ItemStack.EMPTY;
+    }
+
+    @Override
+    public void harvestBlock(World worldIn, EntityPlayer player, BlockPos pos, IBlockState state, @Nullable TileEntity te, ItemStack stack) {
+        if (this.getMetaFromState(state) == 0 && !worldIn.isRemote && te instanceof INode && ConfigItems.itemWispEssence != null) {
+            AspectList aspects = ((INode) te).getAspects();
+            if (aspects != null && aspects.size() > 0) {
+                for (Aspect aspect : aspects.getAspects()) {
+                    if (aspect == null || aspects.getAmount(aspect) < 5) {
+                        continue;
+                    }
+                    for (int a = 0; a < aspects.getAmount(aspect) / 10; ++a) {
+                        ItemStack itemstack = new ItemStack(ConfigItems.itemWispEssence);
+                        ((ItemWispEssence) itemstack.getItem()).setAspects(itemstack, new AspectList().add(aspect, 2));
+                        spawnAsEntity(worldIn, pos, itemstack);
+                    }
+                }
+            }
+        }
+        super.harvestBlock(worldIn, player, pos, state, te, stack);
     }
 
     @Override
