@@ -14,6 +14,7 @@ public class CrucibleRendererFidelityStaticGuardTest {
     @Test
     public void tileCrucibleRendererUsesWaterAtlasUvAndCombinedLight() throws IOException {
         String source = read("src/main/java/thaumcraft/client/renderers/tile/TileCrucibleRenderer.java");
+        String blockModel = read("src/main/resources/assets/thaumcraft/models/block/blockmetaldevice_0.json");
 
         assertTrue("Crucible renderer should resolve water atlas sprite for the surface quad",
                 source.contains("Blocks.WATER.getDefaultState()"));
@@ -26,6 +27,16 @@ public class CrucibleRendererFidelityStaticGuardTest {
                         && source.contains("water.getMaxU()")
                         && source.contains("water.getMinV()")
                         && source.contains("water.getMaxV()"));
+        assertTrue("Crucible block model should now carry a shaped basin shell instead of the old full cube placeholder",
+                blockModel.contains("\"ambientocclusion\": false")
+                        && blockModel.contains("\"particle\": \"thaumcraft:blocks/crucible3\"")
+                        && blockModel.contains("\"inner\": \"thaumcraft:blocks/crucible1\"")
+                        && blockModel.contains("\"bottom\": \"thaumcraft:blocks/crucible2\"")
+                        && blockModel.contains("\"from\": [1, 0, 1]")
+                        && blockModel.contains("\"to\": [15, 2, 15]")
+                        && blockModel.contains("\"from\": [1, 2, 1]")
+                        && blockModel.contains("\"to\": [15, 11, 3]")
+                        && !blockModel.contains("\"parent\": \"block/cube_all\""));
     }
 
     private static String read(String path) throws IOException {

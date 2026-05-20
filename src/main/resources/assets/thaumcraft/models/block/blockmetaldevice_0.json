@@ -1,6 +1,71 @@
 {
-  "parent": "block/cube_all",
+  "ambientocclusion": false,
   "textures": {
-    "all": "thaumcraft:blocks/metalbase"
-  }
+    "particle": "thaumcraft:blocks/crucible3",
+    "inner": "thaumcraft:blocks/crucible1",
+    "bottom": "thaumcraft:blocks/crucible2",
+    "outer": "thaumcraft:blocks/crucible3"
+  },
+  "elements": [
+    {
+      "from": [1, 0, 1],
+      "to": [15, 2, 15],
+      "faces": {
+        "down": { "texture": "#bottom" },
+        "up": { "texture": "#inner" },
+        "north": { "texture": "#outer" },
+        "south": { "texture": "#outer" },
+        "west": { "texture": "#outer" },
+        "east": { "texture": "#outer" }
+      }
+    },
+    {
+      "from": [1, 2, 1],
+      "to": [15, 11, 3],
+      "faces": {
+        "down": { "texture": "#inner" },
+        "up": { "texture": "#inner" },
+        "north": { "texture": "#outer" },
+        "south": { "texture": "#inner" },
+        "west": { "texture": "#outer" },
+        "east": { "texture": "#outer" }
+      }
+    },
+    {
+      "from": [1, 2, 13],
+      "to": [15, 11, 15],
+      "faces": {
+        "down": { "texture": "#inner" },
+        "up": { "texture": "#inner" },
+        "north": { "texture": "#inner" },
+        "south": { "texture": "#outer" },
+        "west": { "texture": "#outer" },
+        "east": { "texture": "#outer" }
+      }
+    },
+    {
+      "from": [1, 2, 3],
+      "to": [3, 11, 13],
+      "faces": {
+        "down": { "texture": "#inner" },
+        "up": { "texture": "#inner" },
+        "north": { "texture": "#outer" },
+        "south": { "texture": "#outer" },
+        "west": { "texture": "#outer" },
+        "east": { "texture": "#inner" }
+      }
+    },
+    {
+      "from": [13, 2, 3],
+      "to": [15, 11, 13],
+      "faces": {
+        "down": { "texture": "#inner" },
+        "up": { "texture": "#inner" },
+        "north": { "texture": "#outer" },
+        "south": { "texture": "#outer" },
+        "west": { "texture": "#inner" },
+        "east": { "texture": "#outer" }
+      }
+    }
+  ]
 }
