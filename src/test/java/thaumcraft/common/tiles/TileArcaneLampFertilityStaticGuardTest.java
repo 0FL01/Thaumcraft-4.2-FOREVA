@@ -41,12 +41,16 @@ public class TileArcaneLampFertilityStaticGuardTest {
         assertTrue(source.contains("if (meta == 13)"));
         assertTrue(source.contains("TileArcaneLampFertility lamp = (TileArcaneLampFertility) te;"));
         assertTrue(source.contains("meta == 7 || meta == 8 || meta == 13"));
+        assertTrue(source.contains("meta == 1 || meta == 2 || meta == 7 || meta == 8 || meta == 10 || meta == 11 || meta == 13 || meta == 14"));
         assertTrue(source.contains("((TileArcaneLampFertility) te).charges > 0 ? 15 : 8"));
         assertTrue(source.contains("VisNetHandler.isNodeValid(((TileVisRelay) te).getParent()) ? 10 : 2"));
         assertTrue(configBlocks.contains("new TileRegistration(TileArcaneLampFertility.class, \"TileArcaneLampFertility\")"));
         assertTrue(blockstate.contains("\"type=13\": { \"model\": \"thaumcraft:blockmetaldevice_13\" }"));
         assertTrue(model.contains("\"thaumcraft:blocks/lamp_fert_side\""));
         assertTrue(model.contains("\"thaumcraft:blocks/lamp_fert_top\""));
+        assertTrue(model.contains("\"from\": [4, 2, 4]"));
+        assertTrue(model.contains("\"to\": [12, 14, 12]"));
+        assertTrue(model.contains("\"down\": { \"texture\": \"#top\" }"));
     }
 
     private static String readFile(String path) throws IOException {

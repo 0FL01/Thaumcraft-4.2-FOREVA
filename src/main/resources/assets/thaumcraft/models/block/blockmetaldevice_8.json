@@ -1,12 +1,22 @@
 {
-  "parent": "block/cube",
+  "ambientocclusion": false,
   "textures": {
     "particle": "thaumcraft:blocks/lamp_grow_side",
-    "down": "thaumcraft:blocks/metalbase",
-    "up": "thaumcraft:blocks/lamp_grow_top",
-    "north": "thaumcraft:blocks/lamp_grow_side",
-    "south": "thaumcraft:blocks/lamp_grow_side",
-    "west": "thaumcraft:blocks/lamp_grow_side",
-    "east": "thaumcraft:blocks/lamp_grow_side"
-  }
+    "top": "thaumcraft:blocks/lamp_grow_top",
+    "side": "thaumcraft:blocks/lamp_grow_side"
+  },
+  "elements": [
+    {
+      "from": [4, 2, 4],
+      "to": [12, 14, 12],
+      "faces": {
+        "down": { "texture": "#top" },
+        "up": { "texture": "#top" },
+        "north": { "texture": "#side" },
+        "south": { "texture": "#side" },
+        "west": { "texture": "#side" },
+        "east": { "texture": "#side" }
+      }
+    }
+  ]
 }

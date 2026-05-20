@@ -1,10 +1,18 @@
 package thaumcraft.client.renderers.tile;
 
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.renderer.OpenGlHelper;
+import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
+import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
+import org.lwjgl.opengl.GL11;
 import thaumcraft.client.renderers.models.ModelBoreBase;
 import thaumcraft.common.tiles.TileArcaneBoreBase;
 import thaumcraft.common.tiles.TileArcaneLamp;
@@ -25,6 +33,7 @@ public class TileArcaneLampRenderer extends TileEntitySpecialRenderer<TileEntity
         }
 
         EnumFacing facing = facingFor(tile);
+        renderLampShell(tile, x, y, z);
         bindTexture(BORE_TEXTURE);
 
         // Lamp nozzle at local block orientation.
@@ -45,6 +54,66 @@ public class TileArcaneLampRenderer extends TileEntitySpecialRenderer<TileEntity
             model.renderNozzle(MODEL_SCALE);
             GlStateManager.popMatrix();
         }
+    }
+
+    private void renderLampShell(TileEntity tile, double x, double y, double z) {
+        TextureAtlasSprite top = topSprite(tile);
+        TextureAtlasSprite side = sideSprite(tile);
+        if (top == null || side == null) {
+            return;
+        }
+
+        float prevLightX = OpenGlHelper.lastBrightnessX;
+        float prevLightY = OpenGlHelper.lastBrightnessY;
+        int packedLight = tile.getWorld().getCombinedLight(tile.getPos(), 0);
+
+        GlStateManager.pushMatrix();
+        GlStateManager.translate(x, y, z);
+        bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
+        GlStateManager.disableCull();
+        OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit,
+                packedLight & 0xFFFF, (packedLight >> 16) & 0xFFFF);
+
+        Tessellator tess = Tessellator.getInstance();
+        BufferBuilder buf = tess.getBuffer();
+        buf.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX_COLOR);
+        TileRenderHelper.drawTexturedCuboid(buf,
+                4.0F / 16.0F, 2.0F / 16.0F, 4.0F / 16.0F,
+                12.0F / 16.0F, 14.0F / 16.0F, 12.0F / 16.0F,
+                top, top, side, side, side, side, 0xFFFFFFFF);
+        tess.draw();
+
+        OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, prevLightX, prevLightY);
+        GlStateManager.enableCull();
+        GlStateManager.popMatrix();
+    }
+
+    private static TextureAtlasSprite topSprite(TileEntity tile) {
+        String path = "thaumcraft:blocks/lamp_top";
+        if (tile instanceof TileArcaneLampGrowth) {
+            path = ((TileArcaneLampGrowth) tile).charges > 0
+                    ? "thaumcraft:blocks/lamp_grow_top"
+                    : "thaumcraft:blocks/lamp_grow_top_off";
+        } else if (tile instanceof TileArcaneLampFertility) {
+            path = ((TileArcaneLampFertility) tile).charges > 0
+                    ? "thaumcraft:blocks/lamp_fert_top"
+                    : "thaumcraft:blocks/lamp_fert_top_off";
+        }
+        return Minecraft.getMinecraft().getTextureMapBlocks().getAtlasSprite(path);
+    }
+
+    private static TextureAtlasSprite sideSprite(TileEntity tile) {
+        String path = "thaumcraft:blocks/lamp_side";
+        if (tile instanceof TileArcaneLampGrowth) {
+            path = ((TileArcaneLampGrowth) tile).charges > 0
+                    ? "thaumcraft:blocks/lamp_grow_side"
+                    : "thaumcraft:blocks/lamp_grow_side_off";
+        } else if (tile instanceof TileArcaneLampFertility) {
+            path = ((TileArcaneLampFertility) tile).charges > 0
+                    ? "thaumcraft:blocks/lamp_fert_side"
+                    : "thaumcraft:blocks/lamp_fert_side_off";
+        }
+        return Minecraft.getMinecraft().getTextureMapBlocks().getAtlasSprite(path);
     }
 
     private static EnumFacing facingFor(TileEntity tile) {

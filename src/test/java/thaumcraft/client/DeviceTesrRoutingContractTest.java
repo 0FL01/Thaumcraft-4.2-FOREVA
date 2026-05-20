@@ -41,8 +41,8 @@ public class DeviceTesrRoutingContractTest {
                         && woodenBlock.contains("if (meta == 2 || meta == 3 || meta == 8) {")
                         && woodenBlock.contains("return;"));
 
-        assertTrue("BlockMetalDevice should route alembic, charger, vis relay, and thaumatorium halves through TESR-only world rendering",
-                metalBlock.contains("return meta == 1 || meta == 2 || meta == 10 || meta == 11 || meta == 14")
+        assertTrue("BlockMetalDevice should route alembic, charger, lamp family, vis relay, and thaumatorium halves through TESR-only world rendering",
+                metalBlock.contains("return meta == 1 || meta == 2 || meta == 7 || meta == 8 || meta == 10 || meta == 11 || meta == 13 || meta == 14")
                         && metalBlock.contains("? EnumBlockRenderType.INVISIBLE")
                         && metalBlock.contains(": EnumBlockRenderType.MODEL;"));
 
