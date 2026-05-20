@@ -17,7 +17,6 @@ import thaumcraft.common.entities.monster.EntityCultist;
 
 @SideOnly(Side.CLIENT)
 public class FXShieldRunes extends Particle {
-    private static final ResourceLocation PARTICLE_TEXTURE = new ResourceLocation("textures/particle/particles.png");
     private static final int LIGHTMAP_FULLBRIGHT = 0x00F000F0;
 
     private final Entity target;
@@ -65,7 +64,6 @@ public class FXShieldRunes extends Particle {
 
         Tessellator tessellator = Tessellator.getInstance();
         BufferBuilder buffer = tessellator.getBuffer();
-        tessellator.draw();
 
         float progress = (this.particleAge + partialTicks) / (float) this.particleMaxAge;
         int frame = Math.min(15, (int) (14.0F * progress) + 1);
@@ -104,9 +102,6 @@ public class FXShieldRunes extends Particle {
         GlStateManager.depthMask(true);
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
         GlStateManager.popMatrix();
-
-        Minecraft.getMinecraft().renderEngine.bindTexture(PARTICLE_TEXTURE);
-        buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.PARTICLE_POSITION_TEX_COLOR_LMAP);
     }
 
     private void addLitVertex(BufferBuilder buffer, double x, double y, double z,
