@@ -130,6 +130,7 @@ import thaumcraft.client.renderers.item.ItemJarRenderer;
 import thaumcraft.client.renderers.item.ItemMetalDeviceRenderer;
 import thaumcraft.client.renderers.item.ItemNodeRenderer;
 import thaumcraft.client.renderers.item.ItemWoodenDeviceRenderer;
+import thaumcraft.client.renderers.item.ItemCrystalRenderer;
 import thaumcraft.client.renderers.tile.TileAlembicRenderer;
 import thaumcraft.client.renderers.tile.TileAlchemyFurnaceAdvancedRenderer;
 import thaumcraft.client.renderers.tile.TileArcaneLampRenderer;
@@ -416,6 +417,10 @@ public class ClientProxy extends CommonProxy {
         if (airyItem != null) {
             airyItem.setTileEntityItemStackRenderer(new ItemNodeRenderer());
         }
+        Item crystalItem = Item.getItemFromBlock(ConfigBlocks.blockCrystal);
+        if (crystalItem != null) {
+            crystalItem.setTileEntityItemStackRenderer(new ItemCrystalRenderer());
+        }
         Item woodenDeviceItem = Item.getItemFromBlock(ConfigBlocks.blockWoodenDevice);
         if (woodenDeviceItem != null) {
             woodenDeviceItem.setTileEntityItemStackRenderer(new ItemWoodenDeviceRenderer());
@@ -509,6 +514,10 @@ public class ClientProxy extends CommonProxy {
     private void setupBlockRenderers() {
         registerBlockItemModel(ConfigBlocks.blockMagicalLeavesItem, 0, "type=0");
         registerBlockItemModel(ConfigBlocks.blockMagicalLeavesItem, 1, "type=1");
+        Item crystalItem = Item.getItemFromBlock(ConfigBlocks.blockCrystal);
+        for (int meta = 0; meta <= 7; meta++) {
+            registerBuiltinItemModel(crystalItem, meta, "blockcrystal_tesr");
+        }
         Item stoneDeviceItem = Item.getItemFromBlock(ConfigBlocks.blockStoneDevice);
         for (int meta = 0; meta <= 14; meta++) {
             registerBlockItemModel(stoneDeviceItem, meta, "type=" + meta);

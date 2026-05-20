@@ -20,6 +20,7 @@ public class TableEldritchRendererFidelityStaticGuardTest {
         String capModel = read("src/main/java/thaumcraft/client/renderers/models/ModelEldritchCap.java");
         String lock = read("src/main/java/thaumcraft/client/renderers/tile/TileEldritchLockRenderer.java");
         String eldritchCrystal = read("src/main/java/thaumcraft/client/renderers/tile/TileEldritchCrystalRenderer.java");
+        String eldritchCrystalModel = read("src/main/java/thaumcraft/client/renderers/models/ModelEldritchCrystal.java");
         String crabSpawner = read("src/main/java/thaumcraft/client/renderers/tile/TileEldritchCrabSpawnerRenderer.java");
         String crabVentModel = read("src/main/java/thaumcraft/client/renderers/models/ModelCrabVent.java");
 
@@ -50,10 +51,21 @@ public class TableEldritchRendererFidelityStaticGuardTest {
         assertTrue(lock.contains("private static final float FIELD_MAX = 3.0F;"));
         assertFalse(lock.contains("TileRenderHelper.renderFloatingItem(key"));
 
-        assertTrue(eldritchCrystal.contains("new ModelCrystal()"));
+        assertTrue(eldritchCrystal.contains("new ModelEldritchCrystal()"));
         assertTrue(eldritchCrystal.contains("OpenGlHelper.setLightmapTextureCoords"));
-        assertTrue(eldritchCrystal.contains("model.render();"));
-        assertFalse(eldritchCrystal.contains("TileRenderHelper.drawTexturedQuad(0.26F"));
+        assertTrue(eldritchCrystal.contains("model.renderBase();"));
+        assertTrue(eldritchCrystal.contains("model.renderCrystal();"));
+        assertTrue(eldritchCrystal.contains("tile.getWorld() == null ? 0 : Math.floorMod(tile.hashCode(), 4)"));
+        assertFalse(eldritchCrystal.contains("new ModelCrystal()"));
+        assertFalse(eldritchCrystal.contains("TileRenderHelper.drawTexturedQuad("));
+        assertFalse(eldritchCrystal.contains("EnumFacing.byIndex"));
+
+        assertTrue(eldritchCrystalModel.contains("Wavefront vcrystal.obj groups from the original 1.7.10 renderer asset."));
+        assertTrue(eldritchCrystalModel.contains("CRYSTAL_TRIANGLES"));
+        assertTrue(eldritchCrystalModel.contains("BASE_TRIANGLES"));
+        assertTrue(eldritchCrystalModel.contains("renderCrystal()"));
+        assertTrue(eldritchCrystalModel.contains("renderBase()"));
+        assertTrue(eldritchCrystalModel.contains("DefaultVertexFormats.POSITION_TEX_NORMAL"));
 
         assertTrue(crabSpawner.contains("new ModelCrabVent()"));
         assertTrue(crabSpawner.contains("model.renderAll();"));

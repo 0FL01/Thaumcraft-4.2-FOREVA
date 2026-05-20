@@ -76,6 +76,8 @@ public class ClientProxyTileRendererBurstCoverageTest {
         assertTrue(source.contains("jarItem.setTileEntityItemStackRenderer(renderer);"));
         assertTrue(source.contains("Item airyItem = Item.getItemFromBlock(ConfigBlocks.blockAiry);"));
         assertTrue(source.contains("airyItem.setTileEntityItemStackRenderer(new ItemNodeRenderer());"));
+        assertTrue(source.contains("Item crystalItem = Item.getItemFromBlock(ConfigBlocks.blockCrystal);"));
+        assertTrue(source.contains("crystalItem.setTileEntityItemStackRenderer(new ItemCrystalRenderer());"));
         assertTrue(source.contains("Item woodenDeviceItem = Item.getItemFromBlock(ConfigBlocks.blockWoodenDevice);"));
         assertTrue(source.contains("woodenDeviceItem.setTileEntityItemStackRenderer(new ItemWoodenDeviceRenderer());"));
         assertTrue(source.contains("Item metalDeviceItem = Item.getItemFromBlock(ConfigBlocks.blockMetalDevice);"));
