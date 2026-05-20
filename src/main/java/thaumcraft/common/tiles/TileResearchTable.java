@@ -413,7 +413,7 @@ implements IInventory, ITickable {
                             this.bonusAspects.merge(Aspect.FIRE, 1);
                             return;
                         }
-                    } else if (mat == Material.ROCK || block == ConfigBlocks.blockCustomOre && md == 4) {
+                    } else if (mat == Material.GROUND || block == ConfigBlocks.blockCustomOre && md == 4) {
                         if (this.bonusAspects.getAmount(Aspect.EARTH) < 1 && this.world.rand.nextInt(20) == 0) {
                             this.bonusAspects.merge(Aspect.EARTH, 1);
                             return;
@@ -423,7 +423,12 @@ implements IInventory, ITickable {
                             this.bonusAspects.merge(Aspect.EARTH, 1);
                             return;
                         }
-                    } else if (mat == Material.WATER || block == ConfigBlocks.blockCustomOre && md == 3) {
+                    } else if (mat == Material.WATER) {
+                        if (this.bonusAspects.getAmount(Aspect.WATER) < 1 && this.world.rand.nextInt(15) == 0) {
+                            this.bonusAspects.merge(Aspect.WATER, 1);
+                            return;
+                        }
+                    } else if (block == ConfigBlocks.blockCustomOre && md == 3) {
                         if (this.bonusAspects.getAmount(Aspect.WATER) < 1 && this.world.rand.nextInt(20) == 0) {
                             this.bonusAspects.merge(Aspect.WATER, 1);
                             return;

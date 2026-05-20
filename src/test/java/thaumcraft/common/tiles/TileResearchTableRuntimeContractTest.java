@@ -28,6 +28,13 @@ public class TileResearchTableRuntimeContractTest {
                 source.contains("SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP")
                         && source.contains("boolean refundSkip = researcher2 && this.world.rand.nextFloat() < 0.1F;")
                         && source.contains("((researcher1 && chance < 0.25F) || (researcher2 && chance < 0.5F))"));
+
+        assertTrue("TileResearchTable bonus recalc should match reference earth/water environment cues",
+                source.contains("mat == Material.GROUND || block == ConfigBlocks.blockCustomOre && md == 4")
+                        && source.contains("} else if (mat == Material.WATER) {")
+                        && source.contains("this.world.rand.nextInt(15) == 0")
+                        && source.contains("} else if (block == ConfigBlocks.blockCustomOre && md == 3) {")
+                        && source.contains("this.world.rand.nextInt(20) == 0"));
     }
 
     private static String read(String path) throws IOException {
