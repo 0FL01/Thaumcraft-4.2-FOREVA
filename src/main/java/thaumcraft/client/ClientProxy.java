@@ -133,11 +133,13 @@ import thaumcraft.client.renderers.entity.RenderCultist;
 import thaumcraft.client.renderers.entity.RenderSpecialItem;
 import thaumcraft.client.renderers.item.ItemEldritchRenderer;
 import thaumcraft.client.renderers.item.ItemJarRenderer;
+import thaumcraft.client.renderers.item.ItemTrunkSpawnerRenderer;
 import thaumcraft.client.renderers.item.ItemMetalDeviceRenderer;
 import thaumcraft.client.renderers.item.ItemNodeRenderer;
 import thaumcraft.client.renderers.item.ItemCrystalRenderer;
 import thaumcraft.client.renderers.item.ItemStoneDeviceRenderer;
 import thaumcraft.client.renderers.item.ItemTubeRenderer;
+import thaumcraft.client.renderers.item.ItemWandRenderer;
 import thaumcraft.client.renderers.item.ItemWoodenDeviceRenderer;
 import thaumcraft.client.renderers.tile.TileAlembicRenderer;
 import thaumcraft.client.renderers.tile.TileAlchemyFurnaceAdvancedRenderer;
@@ -368,6 +370,18 @@ public class ClientProxy extends CommonProxy {
                 }
                 continue;
             }
+            if (item == ConfigItems.itemWandCasting) {
+                for (int meta = 0; meta < 64; meta++) {
+                    registerBuiltinItemModel(item, meta, "wandcasting_tesr");
+                }
+                continue;
+            }
+            if (item == ConfigItems.itemTrunkSpawner) {
+                for (int meta = 0; meta < 64; meta++) {
+                    registerBuiltinItemModel(item, meta, "trunkspawner_tesr");
+                }
+                continue;
+            }
             ModelResourceLocation model = new ModelResourceLocation(registryName, "inventory");
             for (int meta = 0; meta < 64; meta++) {
                 ModelLoader.setCustomModelResourceLocation(item, meta, model);
@@ -449,6 +463,12 @@ public class ClientProxy extends CommonProxy {
         Item tubeItem = Item.getItemFromBlock(ConfigBlocks.blockTube);
         if (tubeItem != null) {
             tubeItem.setTileEntityItemStackRenderer(new ItemTubeRenderer());
+        }
+        if (ConfigItems.itemWandCasting != null) {
+            ConfigItems.itemWandCasting.setTileEntityItemStackRenderer(new ItemWandRenderer());
+        }
+        if (ConfigItems.itemTrunkSpawner != null) {
+            ConfigItems.itemTrunkSpawner.setTileEntityItemStackRenderer(new ItemTrunkSpawnerRenderer());
         }
     }
 
