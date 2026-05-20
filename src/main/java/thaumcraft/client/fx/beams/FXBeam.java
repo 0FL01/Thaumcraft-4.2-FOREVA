@@ -108,6 +108,14 @@ public class FXBeam extends Particle {
         this.type = type;
     }
 
+    public void setBlendMode(int blendmode) {
+        this.blendmode = blendmode;
+    }
+
+    public void setBeamWidth(float width) {
+        this.particleScale = Math.max(0.1F, width);
+    }
+
     public void setEndMod(float endMod) {
         this.endMod = endMod;
     }

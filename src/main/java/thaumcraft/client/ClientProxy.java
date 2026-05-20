@@ -40,6 +40,7 @@ import net.minecraftforge.event.entity.player.ItemTooltipEvent;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.client.registry.RenderingRegistry;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import org.lwjgl.opengl.GL11;
 import thaumcraft.api.aspects.Aspect;
 import thaumcraft.client.gui.GuiArcaneBore;
 import thaumcraft.client.gui.GuiArcaneWorkbench;
@@ -943,6 +944,8 @@ public class ClientProxy extends CommonProxy {
                 20,
                 true,
                 20);
+        beam.setBlendMode(GL11.GL_ONE_MINUS_SRC_ALPHA);
+        beam.setBeamWidth(2.5F);
         beam.setType(1);
         beam.setReverse(true);
         beam.setPulse(true);
@@ -954,12 +957,18 @@ public class ClientProxy extends CommonProxy {
         if (world == null || !world.isRemote || source == null || target == null) return;
 
         FXBeamGolemBoss beamA = new FXBeamGolemBoss(world, source, target, 0.07F, 0.376F, 0.325F, 20);
+        beamA.setBlendMode(GL11.GL_ONE);
+        beamA.setBeamWidth(3.0F);
         beamA.setType(2);
+        beamA.setReverse(false);
         beamA.setPulse(true);
         ParticleEngine.addEffect(world, beamA);
 
         FXBeamGolemBoss beamB = new FXBeamGolemBoss(world, source, target, 1.0F, 0.5F, 0.5F, 20);
+        beamB.setBlendMode(GL11.GL_ONE);
+        beamB.setBeamWidth(1.5F);
         beamB.setType(1);
+        beamB.setReverse(false);
         beamB.setPulse(true);
         ParticleEngine.addEffect(world, beamB);
     }

@@ -26,6 +26,16 @@ public class ClientProxyDedicatedBeamBoltStaticGuardTest {
                 clientProxy.contains("new FXBeam(") && clientProxy.contains("ParticleEngine.addEffect(world"));
         assertTrue("ClientProxy bolt path should enqueue dedicated FXLightningBolt via ParticleEngine",
                 clientProxy.contains("new FXLightningBolt(") && clientProxy.contains("ParticleEngine.addEffect(world"));
+        assertTrue("Beam pulse packet-driven proxy paths should keep the reference width/blend/reverse shaping for ordinary and golem-boss pulses",
+                clientProxy.contains("beam.setBlendMode(GL11.GL_ONE_MINUS_SRC_ALPHA);")
+                        && clientProxy.contains("beam.setBeamWidth(2.5F);")
+                        && clientProxy.contains("beam.setReverse(true);")
+                        && clientProxy.contains("beamA.setBlendMode(GL11.GL_ONE);")
+                        && clientProxy.contains("beamA.setBeamWidth(3.0F);")
+                        && clientProxy.contains("beamA.setReverse(false);")
+                        && clientProxy.contains("beamB.setBlendMode(GL11.GL_ONE);")
+                        && clientProxy.contains("beamB.setBeamWidth(1.5F);")
+                        && clientProxy.contains("beamB.setReverse(false);"));
         assertFalse("ClientProxy beam path should not keep legacy inline beam fallback loops",
                 clientProxy.contains("double dx = tx - x;"));
         assertFalse("ClientProxy bolt path should not keep legacy inline bolt fallback loops",
@@ -33,6 +43,8 @@ public class ClientProxyDedicatedBeamBoltStaticGuardTest {
         assertTrue("FXBeam should keep dedicated custom render-path beam logic",
                 beamClass.contains("class FXBeam extends Particle")
                         && beamClass.contains("renderImpact(")
+                        && beamClass.contains("public void setBlendMode(int blendmode)")
+                        && beamClass.contains("public void setBeamWidth(float width)")
                         && beamClass.contains("getBeamTexture()")
                         && beamClass.contains("return 3;"));
         assertTrue("FXBeamBore should keep impact-gated overlay contract for bore beams",
