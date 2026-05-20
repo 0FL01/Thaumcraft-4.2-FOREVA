@@ -13,6 +13,7 @@ public class VisEnergyRendererFidelityStaticGuardTest {
 
     @Test
     public void energizedNodeAndWorkbenchChargerRenderersUseReferenceShapedPaths() throws IOException {
+        String nodeCoreRenderer = read("src/main/java/thaumcraft/client/renderers/tile/TileNodeRenderer.java");
         String nodeRenderer = read("src/main/java/thaumcraft/client/renderers/tile/TileNodeEnergizedRenderer.java");
         String stabilizerRenderer = read("src/main/java/thaumcraft/client/renderers/tile/TileNodeStabilizerRenderer.java");
         String converterRenderer = read("src/main/java/thaumcraft/client/renderers/tile/TileNodeConverterRenderer.java");
@@ -27,10 +28,25 @@ public class VisEnergyRendererFidelityStaticGuardTest {
         String stabilizerBlockModel = read("src/main/resources/assets/thaumcraft/models/block/blockstonedevice_9.json");
         String converterBlockModel = read("src/main/resources/assets/thaumcraft/models/block/blockstonedevice_11.json");
 
+        assertTrue("TileNodeRenderer should keep the original node-type strip/blend mapping for NORMAL/UNSTABLE/DARK/TAINTED/PURE/HUNGRY",
+                nodeCoreRenderer.contains("case UNSTABLE:")
+                        && nodeCoreRenderer.contains("strip = 6;")
+                        && nodeCoreRenderer.contains("case DARK:")
+                        && nodeCoreRenderer.contains("strip = 2;")
+                        && nodeCoreRenderer.contains("case TAINTED:")
+                        && nodeCoreRenderer.contains("strip = 5;")
+                        && nodeCoreRenderer.contains("case PURE:")
+                        && nodeCoreRenderer.contains("strip = 4;")
+                        && nodeCoreRenderer.contains("case HUNGRY:")
+                        && nodeCoreRenderer.contains("centerScale *= 0.75F;")
+                        && nodeCoreRenderer.contains("renderNodeSeeded("));
+
         assertTrue("TileNodeEnergizedRenderer should keep node-core rendering and animated lightning-ring overlay",
-                nodeRenderer.contains("TileNodeRenderer.renderNodeAt(")
+                nodeRenderer.contains("TileNodeRenderer.renderNode(")
+                        && nodeRenderer.contains("tile.getAuraBase()")
                         && nodeRenderer.contains("tile.getNodeType()")
                         && nodeRenderer.contains("tile.getNodeModifier()")
+                        && nodeRenderer.contains("tile.getPos().getX()")
                         && nodeRenderer.contains("textures/items/lightningringv.png")
                         && nodeRenderer.contains("RING_FRAMES = 16")
                         && nodeRenderer.contains("drawTexturedQuad(0.33F, u0, u1, v0, v1)")

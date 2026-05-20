@@ -1,10 +1,12 @@
 package thaumcraft.client.renderers.tile;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.util.ResourceLocation;
 import org.lwjgl.opengl.GL11;
 import thaumcraft.common.tiles.TileNodeEnergized;
@@ -20,21 +22,27 @@ public class TileNodeEnergizedRenderer extends TileEntitySpecialRenderer<TileNod
             return;
         }
 
-        String nodeId = tile.getPos() == null ? "energized" : "energized:" + tile.getPos().toLong();
-        TileNodeRenderer.renderNodeAt(
-                tile.getAspects(),
-                nodeId,
-                tile.getNodeType(),
-                tile.getNodeModifier(),
+        EntityLivingBase viewer = Minecraft.getMinecraft().player;
+        int seed = tile.getPos() == null ? 0 : tile.getPos().getX();
+        TileNodeRenderer.renderNode(
+                viewer,
+                64.0D,
+                true,
+                false,
+                1.0F,
                 x + 0.5D, y + 0.5D, z + 0.5D,
                 partialTicks,
-                1.0F);
+                tile.getAuraBase(),
+                tile.getNodeType(),
+                tile.getNodeModifier(),
+                seed);
         renderAnimatedRing(tile, x, y, z, partialTicks);
     }
 
     private void renderAnimatedRing(TileNodeEnergized tile, double x, double y, double z, float partialTicks) {
         int frames = Math.max(1, RING_FRAMES);
-        int frame = (int) (((System.nanoTime() / 40_000_000L) + x) % frames);
+        int phase = tile.getPos() == null ? 0 : tile.getPos().getX();
+        int frame = (int) (((System.nanoTime() / 40_000_000L) + phase) % frames);
         float u0 = frame / (float) frames;
         float u1 = (frame + 1) / (float) frames;
         float v0 = 0.0F;

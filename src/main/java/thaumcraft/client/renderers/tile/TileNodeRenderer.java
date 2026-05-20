@@ -91,20 +91,34 @@ public class TileNodeRenderer extends TileEntitySpecialRenderer<TileEntity> {
                                   AspectList aspects,
                                   NodeType type,
                                   NodeModifier modifier) {
-        renderNode(viewer, viewDistance, visible, depthIgnore, size, x, y, z, partialTicks, aspects, type, modifier, 0);
+        renderNodeSeeded(viewer, viewDistance, visible, depthIgnore, size, x, y, z, partialTicks, aspects, type, modifier, 0);
     }
 
-    private static void renderNode(EntityLivingBase viewer,
-                                   double viewDistance,
-                                   boolean visible,
-                                   boolean depthIgnore,
-                                   float size,
-                                   double x, double y, double z,
-                                   float partialTicks,
-                                   AspectList aspects,
-                                   NodeType type,
-                                   NodeModifier modifier,
-                                   int seed) {
+    public static void renderNode(EntityLivingBase viewer,
+                                  double viewDistance,
+                                  boolean visible,
+                                  boolean depthIgnore,
+                                  float size,
+                                  double x, double y, double z,
+                                  float partialTicks,
+                                  AspectList aspects,
+                                  NodeType type,
+                                  NodeModifier modifier,
+                                  int seed) {
+        renderNodeSeeded(viewer, viewDistance, visible, depthIgnore, size, x, y, z, partialTicks, aspects, type, modifier, seed);
+    }
+
+    private static void renderNodeSeeded(EntityLivingBase viewer,
+                                         double viewDistance,
+                                         boolean visible,
+                                         boolean depthIgnore,
+                                         float size,
+                                         double x, double y, double z,
+                                         float partialTicks,
+                                         AspectList aspects,
+                                         NodeType type,
+                                         NodeModifier modifier,
+                                         int seed) {
         Minecraft.getMinecraft().getTextureManager().bindTexture(NODES_TEXTURE);
         long nano = System.nanoTime();
         int frame = (int) ((nano / 40000000L + seed) % FRAMES);
@@ -159,23 +173,23 @@ public class TileNodeRenderer extends TileEntitySpecialRenderer<TileEntity> {
                     case NORMAL:
                         GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE);
                         break;
-                    case HUNGRY:
+                    case UNSTABLE:
                         GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE);
                         strip = 6;
                         break;
-                    case UNSTABLE:
+                    case DARK:
                         GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
                         strip = 2;
                         break;
-                    case DARK:
+                    case TAINTED:
                         GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
                         strip = 5;
                         break;
-                    case TAINTED:
+                    case PURE:
                         GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE);
                         strip = 4;
                         break;
-                    case PURE:
+                    case HUNGRY:
                         centerScale *= 0.75F;
                         GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE);
                         strip = 3;
