@@ -108,7 +108,7 @@ public class TileEldritchLockRenderer extends TileEntitySpecialRenderer<TileEldr
                 y + 0.285D,
                 z + 0.5D + facing.getZOffset() * 0.525D);
         GlStateManager.rotate(-facing.getHorizontalAngle(), 0.0F, 1.0F, 0.0F);
-        TileRenderHelper.renderEntityItem(tile.getWorld(), key, 0.0F);
+        TileRenderHelper.renderEntityItem(tile, key, 0.0F);
         GlStateManager.popMatrix();
     }
 

@@ -73,7 +73,7 @@ public class TileEldritchCapRenderer extends TileEntitySpecialRenderer<TileEntit
             GlStateManager.translate(0.46D, 0.2D, 0.0D);
             GlStateManager.rotate(90.0F, 0.0F, 1.0F, 0.0F);
             GlStateManager.rotate(18.0F, -1.0F, 0.0F, 0.0F);
-            TileRenderHelper.renderEntityItem(altar.getWorld(), eye, 0.0F);
+            TileRenderHelper.renderEntityItem(altar, eye, 0.0F);
             GlStateManager.popMatrix();
         }
         GlStateManager.popMatrix();

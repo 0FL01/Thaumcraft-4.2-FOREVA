@@ -18,6 +18,7 @@ public class TableRendererFidelityStaticGuardTest {
         String deconRenderer = read("src/main/java/thaumcraft/client/renderers/tile/TileDeconstructionTableRenderer.java");
         String arcaneWorkbenchRenderer = read("src/main/java/thaumcraft/client/renderers/tile/TileArcaneWorkbenchRenderer.java");
         String researchRenderer = read("src/main/java/thaumcraft/client/renderers/tile/TileResearchTableRenderer.java");
+        String helper = read("src/main/java/thaumcraft/client/renderers/tile/TileRenderHelper.java");
         String blockstate = read("src/main/resources/assets/thaumcraft/blockstates/blocktable.json");
         String plainTableModel = read("src/main/resources/assets/thaumcraft/models/block/blocktable_0.json");
         String researchMasterModel = read("src/main/resources/assets/thaumcraft/models/block/blocktable_2.json");
@@ -42,16 +43,23 @@ public class TableRendererFidelityStaticGuardTest {
                 deconRenderer.contains("renderThaumometer")
                         && deconRenderer.contains("renderItemGround")
                         && deconRenderer.contains("tile.aspect.getImage()")
-                        && deconRenderer.contains("TileRenderHelper.renderEntityItem(")
+                        && deconRenderer.contains("TileRenderHelper.renderEntityItem(tile, thaumometer, 0.0F);")
+                        && deconRenderer.contains("TileRenderHelper.renderEntityItem(tile, stack, 0.0F);")
                         && !deconRenderer.contains("renderTableModel")
                         && !deconRenderer.contains("tableModel.renderAll(MODEL_SCALE);")
                         && !deconRenderer.contains("renderPlate("));
 
         assertTrue("TileArcaneWorkbenchRenderer should keep only the wand overlay after the static shell moved into the block model",
                 arcaneWorkbenchRenderer.contains("wand.getItem() instanceof ItemWandCasting")
-                        && arcaneWorkbenchRenderer.contains("TileRenderHelper.renderEntityItem(tile.getWorld(), wand, 0.0F);")
+                        && arcaneWorkbenchRenderer.contains("TileRenderHelper.renderEntityItem(tile, wand, 0.0F);")
                         && !arcaneWorkbenchRenderer.contains("renderTableModel")
                         && !arcaneWorkbenchRenderer.contains("tableModel.renderAll(MODEL_SCALE);"));
+
+        assertTrue("TileRenderHelper should keep the shared TESR entity-item path worldless-safe for display-item renderers",
+                helper.contains("static void renderEntityItem(TileEntity tile, ItemStack stack, float hoverStart)")
+                        && helper.contains("renderEntityItem(tile == null ? null : tile.getWorld(), stack, hoverStart);")
+                        && helper.contains("return world != null ? world : Minecraft.getMinecraft().world;")
+                        && helper.contains("renderStack.setCount(1);"));
 
         assertTrue("TileResearchTableRenderer should keep only inkwell/quill/parchment/notes overlays after the static shell moved into block models",
                 researchRenderer.contains("tableModel.renderInkwell(MODEL_SCALE);")

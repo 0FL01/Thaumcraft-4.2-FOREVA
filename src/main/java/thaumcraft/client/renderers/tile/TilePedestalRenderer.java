@@ -12,7 +12,7 @@ public class TilePedestalRenderer extends TileEntitySpecialRenderer<TilePedestal
 
     @Override
     public void render(TilePedestal tile, double x, double y, double z, float partialTicks, int destroyStage, float alpha) {
-        if (tile == null || tile.getWorld() == null) {
+        if (tile == null) {
             return;
         }
         ItemStack stack = tile.getStackInSlot(0);
@@ -28,10 +28,10 @@ public class TilePedestalRenderer extends TileEntitySpecialRenderer<TilePedestal
         GlStateManager.translate(x + 0.5D, y + 1.15D + bob, z + 0.5D);
         GlStateManager.rotate(ticks % 360.0F, 0.0F, 1.0F, 0.0F);
         GlStateManager.scale(scale, scale, scale);
-        TileRenderHelper.renderEntityItem(tile.getWorld(), stack, 0.0F);
+        TileRenderHelper.renderEntityItem(tile, stack, 0.0F);
         if (!Minecraft.isFancyGraphicsEnabled()) {
             GlStateManager.rotate(180.0F, 0.0F, 1.0F, 0.0F);
-            TileRenderHelper.renderEntityItem(tile.getWorld(), stack, 0.0F);
+            TileRenderHelper.renderEntityItem(tile, stack, 0.0F);
         }
         GlStateManager.popMatrix();
     }

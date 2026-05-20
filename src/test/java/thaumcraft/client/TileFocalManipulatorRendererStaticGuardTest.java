@@ -23,7 +23,7 @@ public class TileFocalManipulatorRendererStaticGuardTest {
         assertTrue(source.contains("TileRenderHelper.ticks(tile, partialTicks)"));
         assertTrue(source.contains("focus.getItem() instanceof ItemFocusBasic"));
         assertTrue(source.contains("MathHelper.sin(ticks / 14.0F) * 0.2F + 0.2F"));
-        assertTrue(source.contains("TileRenderHelper.renderEntityItem(tile.getWorld(), focus, hover);"));
+        assertTrue(source.contains("TileRenderHelper.renderEntityItem(tile, focus, hover);"));
         assertTrue(!source.contains("textures/models/wandtable.png"));
         assertTrue(!source.contains("new ModelArcaneWorkbench()"));
         assertTrue(!source.contains("tableModel.renderAll(MODEL_SCALE);"));
@@ -36,7 +36,7 @@ public class TileFocalManipulatorRendererStaticGuardTest {
 
         assertTrue(thaumatorium.contains("textures/models/thaumatorium.png"));
         assertTrue(thaumatorium.contains("model.renderAll();"));
-        assertTrue(thaumatorium.contains("TileRenderHelper.renderEntityItem(tile.getWorld(), output, 0.0F);"));
+        assertTrue(thaumatorium.contains("TileRenderHelper.renderEntityItem(tile, output, 0.0F);"));
         assertTrue(thaumatorium.contains("GlStateManager.scale(0.75F, 0.75F, 0.75F);"));
         assertTrue(thaumatoriumModel.contains("Wavefront thaumatorium.obj triangles"));
         assertTrue(thaumatoriumModel.contains("private static final float[][] VERTICES"));
@@ -48,7 +48,7 @@ public class TileFocalManipulatorRendererStaticGuardTest {
         assertTrue(!thaumatoriumModel.contains("new ModelRenderer("));
 
         assertTrue(arcaneWorkbench.contains("wand.getItem() instanceof ItemWandCasting"));
-        assertTrue(arcaneWorkbench.contains("TileRenderHelper.renderEntityItem(tile.getWorld(), wand, 0.0F);"));
+        assertTrue(arcaneWorkbench.contains("TileRenderHelper.renderEntityItem(tile, wand, 0.0F);"));
         assertTrue(arcaneWorkbench.contains("GlStateManager.scale(0.60F, 0.60F, 0.60F);"));
         assertTrue(!arcaneWorkbench.contains("tableModel.renderAll(MODEL_SCALE);"));
     }

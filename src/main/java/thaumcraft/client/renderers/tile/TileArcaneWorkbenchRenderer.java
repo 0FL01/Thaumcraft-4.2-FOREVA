@@ -9,7 +9,7 @@ import thaumcraft.common.tiles.TileArcaneWorkbench;
 public class TileArcaneWorkbenchRenderer extends TileEntitySpecialRenderer<TileArcaneWorkbench> {
     @Override
     public void render(TileArcaneWorkbench tile, double x, double y, double z, float partialTicks, int destroyStage, float alpha) {
-        if (tile == null || tile.getWorld() == null) {
+        if (tile == null) {
             return;
         }
 
@@ -20,7 +20,7 @@ public class TileArcaneWorkbenchRenderer extends TileEntitySpecialRenderer<TileA
             GlStateManager.rotate(90.0F, 1.0F, 0.0F, 0.0F);
             GlStateManager.rotate(20.0F, 0.0F, 0.0F, 1.0F);
             GlStateManager.scale(0.60F, 0.60F, 0.60F);
-            TileRenderHelper.renderEntityItem(tile.getWorld(), wand, 0.0F);
+            TileRenderHelper.renderEntityItem(tile, wand, 0.0F);
             GlStateManager.popMatrix();
         }
     }

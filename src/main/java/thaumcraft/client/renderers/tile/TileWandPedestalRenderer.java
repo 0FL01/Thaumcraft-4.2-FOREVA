@@ -9,7 +9,7 @@ import thaumcraft.common.tiles.TileWandPedestal;
 public class TileWandPedestalRenderer extends TileEntitySpecialRenderer<TileWandPedestal> {
     @Override
     public void render(TileWandPedestal tile, double x, double y, double z, float partialTicks, int destroyStage, float alpha) {
-        if (tile == null || tile.getWorld() == null) {
+        if (tile == null) {
             return;
         }
 
@@ -21,7 +21,7 @@ public class TileWandPedestalRenderer extends TileEntitySpecialRenderer<TileWand
             GlStateManager.pushMatrix();
             GlStateManager.translate(x + 0.5D, y + 1.15D + bob, z + 0.5D);
             GlStateManager.rotate(ticks % 360.0F, 0.0F, 1.0F, 0.0F);
-            TileRenderHelper.renderEntityItem(tile.getWorld(), stack, 0.0F);
+            TileRenderHelper.renderEntityItem(tile, stack, 0.0F);
             GlStateManager.popMatrix();
         }
 

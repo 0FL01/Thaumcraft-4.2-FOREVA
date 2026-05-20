@@ -64,7 +64,7 @@ public class TileThaumatoriumRenderer extends TileEntitySpecialRenderer<TileThau
         GlStateManager.translate(ix, iy, iz);
         rotateItemByFacing(facing);
         GlStateManager.scale(0.75F, 0.75F, 0.75F);
-        TileRenderHelper.renderEntityItem(tile.getWorld(), output, 0.0F);
+        TileRenderHelper.renderEntityItem(tile, output, 0.0F);
         GlStateManager.popMatrix();
     }
 

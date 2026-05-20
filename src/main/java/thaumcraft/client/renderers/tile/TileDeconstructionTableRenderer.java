@@ -10,12 +10,12 @@ import thaumcraft.common.tiles.TileDeconstructionTable;
 public class TileDeconstructionTableRenderer extends TileEntitySpecialRenderer<TileDeconstructionTable> {
     @Override
     public void render(TileDeconstructionTable tile, double x, double y, double z, float partialTicks, int destroyStage, float alpha) {
-        if (tile == null || tile.getWorld() == null) {
+        if (tile == null) {
             return;
         }
 
         float ticks = TileRenderHelper.ticks(tile, partialTicks);
-        renderThaumometer(x, y, z);
+        renderThaumometer(tile, x, y, z);
 
         ItemStack input = tile.getStackInSlot(0);
         if (!input.isEmpty()) {
@@ -26,7 +26,7 @@ public class TileDeconstructionTableRenderer extends TileEntitySpecialRenderer<T
             GlStateManager.blendFunc(770, 1);
             GlStateManager.color(1.0F, 1.0F, 1.0F, 0.75F);
             GlStateManager.translate(0.0F, MathHelper.sin(ticks / 14.0F) * 0.2F + 0.2F, 0.0F);
-            renderItemGround(input.copy(), 0.65F);
+            renderItemGround(tile, input.copy(), 0.65F);
             GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
             GlStateManager.disableBlend();
             GlStateManager.popMatrix();
@@ -49,7 +49,7 @@ public class TileDeconstructionTableRenderer extends TileEntitySpecialRenderer<T
         }
     }
 
-    private void renderThaumometer(double x, double y, double z) {
+    private void renderThaumometer(TileDeconstructionTable tile, double x, double y, double z) {
         if (ConfigItems.itemThaumometer == null) {
             return;
         }
@@ -58,17 +58,17 @@ public class TileDeconstructionTableRenderer extends TileEntitySpecialRenderer<T
         GlStateManager.pushMatrix();
         GlStateManager.translate(x + 0.5D, y + 0.92D, z + 0.5D);
         GlStateManager.scale(0.8F, 0.8F, 0.8F);
-        TileRenderHelper.renderEntityItem(this.getWorld(), thaumometer, 0.0F);
+        TileRenderHelper.renderEntityItem(tile, thaumometer, 0.0F);
         GlStateManager.popMatrix();
     }
 
-    private void renderItemGround(ItemStack stack, float scale) {
+    private void renderItemGround(TileDeconstructionTable tile, ItemStack stack, float scale) {
         if (stack.isEmpty()) {
             return;
         }
         GlStateManager.pushMatrix();
         GlStateManager.scale(scale, scale, scale);
-        TileRenderHelper.renderEntityItem(this.getWorld(), stack, 0.0F);
+        TileRenderHelper.renderEntityItem(tile, stack, 0.0F);
         GlStateManager.popMatrix();
     }
 }

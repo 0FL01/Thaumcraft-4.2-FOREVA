@@ -44,8 +44,13 @@ final class TileRenderHelper {
         GlStateManager.popMatrix();
     }
 
+    static void renderEntityItem(TileEntity tile, ItemStack stack, float hoverStart) {
+        renderEntityItem(tile == null ? null : tile.getWorld(), stack, hoverStart);
+    }
+
     static void renderEntityItem(World world, ItemStack stack, float hoverStart) {
-        if (world == null || stack == null || stack.isEmpty()) {
+        World renderWorld = resolveRenderWorld(world);
+        if (renderWorld == null || stack == null || stack.isEmpty()) {
             return;
         }
         RenderManager renderManager = Minecraft.getMinecraft().getRenderManager();
@@ -55,9 +60,13 @@ final class TileRenderHelper {
 
         ItemStack renderStack = stack.copy();
         renderStack.setCount(1);
-        EntityItem entity = new EntityItem(world, 0.0D, 0.0D, 0.0D, renderStack);
+        EntityItem entity = new EntityItem(renderWorld, 0.0D, 0.0D, 0.0D, renderStack);
         entity.hoverStart = hoverStart;
         renderManager.renderEntity(entity, 0.0D, 0.0D, 0.0D, 0.0F, 0.0F, false);
+    }
+
+    private static World resolveRenderWorld(World world) {
+        return world != null ? world : Minecraft.getMinecraft().world;
     }
 
     static void orientBillboardToPlayer() {

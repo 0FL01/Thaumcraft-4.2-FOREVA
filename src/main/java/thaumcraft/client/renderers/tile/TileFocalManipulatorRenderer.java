@@ -10,7 +10,7 @@ import thaumcraft.common.tiles.TileFocalManipulator;
 public class TileFocalManipulatorRenderer extends TileEntitySpecialRenderer<TileFocalManipulator> {
     @Override
     public void render(TileFocalManipulator tile, double x, double y, double z, float partialTicks, int destroyStage, float alpha) {
-        if (tile == null || tile.getWorld() == null) {
+        if (tile == null) {
             return;
         }
 
@@ -21,7 +21,7 @@ public class TileFocalManipulatorRenderer extends TileEntitySpecialRenderer<Tile
             GlStateManager.pushMatrix();
             GlStateManager.translate(x + 0.5D, y + 1.0D, z + 0.5D);
             GlStateManager.rotate(ticks % 360.0F, 0.0F, 1.0F, 0.0F);
-            TileRenderHelper.renderEntityItem(tile.getWorld(), focus, hover);
+            TileRenderHelper.renderEntityItem(tile, focus, hover);
             GlStateManager.popMatrix();
         }
     }
