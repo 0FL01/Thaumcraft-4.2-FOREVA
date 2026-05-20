@@ -34,11 +34,15 @@ public class ArcaneWorkbenchStage9bRuntimeSurfaceStaticGuardTest {
                         && container.contains("CraftingManager.findMatchingResult(this.craftMatrix, this.tileEntity.getWorld())")
                         && container.contains("AspectList cost = ThaumcraftCraftingManager.findMatchingArcaneRecipeAspects(this.tileEntity, this.playerInventory.player);")
                         && container.contains("wand.consumeAllVisCrafting(wandStack, this.playerInventory.player, cost, false)")
-                        && container.contains("ThaumcraftCraftingManager.findMatchingArcaneRecipe(this.tileEntity, this.playerInventory.player)"));
-        assertTrue("SlotCraftingArcaneWorkbench should keep real vis consumption plus container-item remainder handling",
+                        && container.contains("ThaumcraftCraftingManager.findMatchingArcaneRecipe(this.tileEntity, this.playerInventory.player)")
+                        && !container.contains("wand.isStaff(wandStack)"));
+        assertTrue("SlotCraftingArcaneWorkbench should keep real vis consumption plus reference-shaped container-item remainder handling",
                 slot.contains("AspectList cost = ThaumcraftCraftingManager.findMatchingArcaneRecipeAspects(this.craftMatrix, this.thePlayer);")
                         && slot.contains("wand.consumeAllVisCrafting(wandStack, player, cost, true);")
-                        && slot.contains("ItemStack remainder = ForgeHooks.getContainerItem(input);")
+                        && slot.contains("input.getItem().hasContainerItem(input)")
+                        && slot.contains("ItemStack remainder = input.getItem().getContainerItem(input);")
+                        && slot.contains("MinecraftForge.EVENT_BUS.post(new PlayerDestroyItemEvent(this.thePlayer, remainder, EnumHand.MAIN_HAND));")
+                        && slot.contains("this.thePlayer.inventory.addItemStackToInventory(remainder.copy())")
                         && slot.contains("this.craftMatrix.setInventorySlotContents(i, remainder);")
                         && slot.contains("this.thePlayer.dropItem(remainder, false);"));
         assertTrue("ThaumcraftCraftingManager should keep public arcane matcher methods used by the workbench path",

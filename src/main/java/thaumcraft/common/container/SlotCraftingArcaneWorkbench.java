@@ -4,7 +4,9 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
-import net.minecraftforge.common.ForgeHooks;
+import net.minecraft.util.EnumHand;
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.entity.player.PlayerDestroyItemEvent;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import thaumcraft.api.aspects.AspectList;
 import thaumcraft.common.items.wands.ItemWandCasting;
@@ -69,12 +71,21 @@ public class SlotCraftingArcaneWorkbench extends Slot {
             ItemStack input = this.craftMatrix.getStackInSlot(i);
             if (input.isEmpty()) continue;
             this.craftMatrix.decrStackSize(i, 1);
-            ItemStack remainder = ForgeHooks.getContainerItem(input);
-            if (remainder.isEmpty()) continue;
+            if (!input.getItem().hasContainerItem(input)) continue;
 
+            ItemStack remainder = input.getItem().getContainerItem(input);
+            if (remainder.isEmpty()) continue;
+            if (remainder.isItemStackDamageable() && remainder.getItemDamage() > remainder.getMaxDamage()) {
+                MinecraftForge.EVENT_BUS.post(new PlayerDestroyItemEvent(this.thePlayer, remainder, EnumHand.MAIN_HAND));
+                continue;
+            }
+
+            if (input.getItem().hasContainerItem(input) && this.thePlayer.inventory.addItemStackToInventory(remainder.copy())) {
+                continue;
+            }
             if (this.craftMatrix.getStackInSlot(i).isEmpty()) {
                 this.craftMatrix.setInventorySlotContents(i, remainder);
-            } else if (!this.thePlayer.inventory.addItemStackToInventory(remainder.copy())) {
+            } else {
                 this.thePlayer.dropItem(remainder, false);
             }
         }

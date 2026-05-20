@@ -76,8 +76,6 @@ public class ContainerArcaneWorkbench extends Container {
         if (!output.isEmpty() || wandStack.isEmpty() || !(wandStack.getItem() instanceof ItemWandCasting)) return;
 
         ItemWandCasting wand = (ItemWandCasting) wandStack.getItem();
-        if (wand.isStaff(wandStack)) return;
-
         AspectList cost = ThaumcraftCraftingManager.findMatchingArcaneRecipeAspects(this.tileEntity, this.playerInventory.player);
         if (cost.size() <= 0 || !wand.consumeAllVisCrafting(wandStack, this.playerInventory.player, cost, false)) return;
 
