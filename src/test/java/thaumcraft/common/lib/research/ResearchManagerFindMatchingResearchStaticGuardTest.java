@@ -24,7 +24,7 @@ public class ResearchManagerFindMatchingResearchStaticGuardTest {
                         && source.contains("research.isVirtual()")
                         && source.contains("research.isStub()"));
         assertTrue("findMatchingResearch should keep prerequisite and aspect-tag gating before random key pick",
-                source.contains("doesPlayerHaveRequisites(player.getName(), research.key)")
+                source.contains("doesPlayerHaveRequisites(player, research.key)")
                         && source.contains("research.tags.getAmount(aspect) <= 0")
                         && source.contains("return keys.get(player.world.rand.nextInt(keys.size()));"));
     }

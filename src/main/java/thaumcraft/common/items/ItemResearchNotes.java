@@ -128,7 +128,7 @@ public class ItemResearchNotes extends Item {
         if (ResearchManager.isResearchComplete(player, data.key)) {
             return new ActionResult<>(EnumActionResult.PASS, stack);
         }
-        if (!ResearchManager.doesPlayerHaveRequisites(player.getName(), data.key)) {
+        if (!ResearchManager.doesPlayerHaveRequisites(player, data.key)) {
             player.sendMessage(new TextComponentTranslation("tc.researcherror"));
             return new ActionResult<>(EnumActionResult.PASS, stack);
         }
@@ -138,7 +138,7 @@ public class ItemResearchNotes extends Item {
         if (research != null && research.siblings != null) {
             for (String sibling : research.siblings) {
                 if (!ResearchManager.isResearchComplete(player, sibling)
-                        && ResearchManager.doesPlayerHaveRequisites(player.getName(), sibling)) {
+                        && ResearchManager.doesPlayerHaveRequisites(player, sibling)) {
                     ResearchManager.addResearch(player, sibling);
                 }
             }

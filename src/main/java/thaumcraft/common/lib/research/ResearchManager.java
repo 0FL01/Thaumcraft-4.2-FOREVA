@@ -450,8 +450,8 @@ public class ResearchManager {
         ArrayList<String> candidates = new ArrayList<>();
         for (ResearchItem research : allHiddenResearch) {
             if (research == null) continue;
-            if (isResearchComplete(player.getName(), research.key)) continue;
-            if (!doesPlayerHaveRequisites(player.getName(), research.key)) continue;
+            if (isResearchComplete(player, research.key)) continue;
+            if (!doesPlayerHaveRequisites(player, research.key)) continue;
             if (research.getItemTriggers() == null && research.getEntityTriggers() == null && research.getAspectTriggers() == null) {
                 continue;
             }
@@ -479,8 +479,8 @@ public class ResearchManager {
         }
         ArrayList<String> keys = new ArrayList<>();
         for (ResearchItem research : allValidResearch) {
-            if (isResearchComplete(player.getName(), research.key)) continue;
-            if (!doesPlayerHaveRequisites(player.getName(), research.key)) continue;
+            if (isResearchComplete(player, research.key)) continue;
+            if (!doesPlayerHaveRequisites(player, research.key)) continue;
             if (research.tags.getAmount(aspect) <= 0) continue;
             keys.add(research.key);
         }
@@ -499,8 +499,8 @@ public class ResearchManager {
             for (ResearchItem research : category.research.values()) {
                 if (research == null || research.tags == null || research.tags.size() <= 0) continue;
                 if (!research.isHidden() && !research.isLost()) continue;
-                if (isResearchComplete(player.getName(), research.key)) continue;
-                if (isResearchComplete(player.getName(), "@" + research.key)) continue;
+                if (isResearchComplete(player, research.key)) continue;
+                if (isResearchComplete(player, "@" + research.key)) continue;
 
                 if (clue instanceof ItemStack) {
                     ItemStack[] triggers = research.getItemTriggers();

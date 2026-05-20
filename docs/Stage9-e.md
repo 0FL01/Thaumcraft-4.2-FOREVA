@@ -96,10 +96,16 @@ Do not let asset completeness block backend progression unless it prevents openi
 
 ### GAP-5A: Research note data flow exists, but end-to-end note gameplay is not validated
 
-**Статус:** partial implementation; runtime validation open
+**Статус:** partial implementation; targeted non-GUI runtime tests passed; end-to-end validation open
 **Критичность:** high
 
-Current code has `ResearchNoteData`, note creation/update/read/write, and completion checks. Remaining work is to execute the normal gameplay route:
+Current code has `ResearchNoteData`, note creation/update/read/write, and completion checks. Targeted non-GUI runtime coverage now proves:
+
+- hidden discovery notes reveal into a real research note when an eligible hidden research exists;
+- completed notes require prerequisites at completion time and then grant the research key plus eligible siblings;
+- the live-player note/discovery path no longer depends on username/cache lookups when a real `EntityPlayer` is already available.
+
+Remaining work is to execute the normal gameplay route:
 
 - primary research click creates a note rather than directly completing research;
 - note has reference-compatible NBT keys and hex grid;
@@ -131,16 +137,21 @@ What remains open for this gap is proof around the live client route and broader
 
 ### GAP-6: Hidden/lost scan clues are wired, but prerequisite/runtime behavior needs verification
 
-**Статус:** wired; verification open
+**Статус:** implementation aligned with reference; targeted non-GUI runtime tests passed; broader trigger/e2e validation open
 **Критичность:** high
 
-`ResearchManager.createClue(...)` exists and `ScanManager.completeScan(...)` forwards clue data after successful scans. Remaining work:
+`ResearchManager.createClue(...)` exists and `ScanManager.completeScan(...)` forwards clue data after successful scans. Current targeted runtime coverage now proves:
 
-- verify hidden/lost clues do not bypass parent or hidden-parent prerequisites;
+- scan/discovery clue helpers grant only `@KEY` clue state and do not directly complete the full research;
+- hidden discovery note reveal respects prerequisite-gated `findHiddenResearch(...)` selection when a live player already has the required parent knowledge;
+- `findMatchingResearch(...)` and hidden discovery selection now read the live player capability directly instead of stale username/cache state.
+
+Remaining work:
+
 - verify item/entity/aspect triggers match original behavior with 1.12 entity ids;
 - verify `@KEY` clue state does not accidentally complete full research;
-- validate knowledge-fragment behavior against eligible hidden research;
-- add runtime tests or manual scenarios with populated trigger-bearing content.
+- validate knowledge-fragment fallback behavior against eligible hidden research absence;
+- expand runtime scenarios beyond the current focused harness into representative trigger-bearing content and full scan-to-clue progression.
 
 ### GAP-7: Research completion packet hardening is implemented; live route/e2e validation remains open
 
