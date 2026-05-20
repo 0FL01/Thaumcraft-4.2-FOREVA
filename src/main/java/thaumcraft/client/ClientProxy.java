@@ -132,6 +132,7 @@ import thaumcraft.client.renderers.entity.RenderWisp;
 import thaumcraft.client.renderers.entity.RenderCultist;
 import thaumcraft.client.renderers.entity.RenderSpecialItem;
 import thaumcraft.client.renderers.item.ItemEldritchRenderer;
+import thaumcraft.client.renderers.item.ItemEssentiaReservoirRenderer;
 import thaumcraft.client.renderers.item.ItemJarRenderer;
 import thaumcraft.client.renderers.item.ItemTrunkSpawnerRenderer;
 import thaumcraft.client.renderers.item.ItemMetalDeviceRenderer;
@@ -478,6 +479,10 @@ public class ClientProxy extends CommonProxy {
         if (tubeItem != null) {
             tubeItem.setTileEntityItemStackRenderer(new ItemTubeRenderer());
         }
+        Item reservoirItem = Item.getItemFromBlock(ConfigBlocks.blockEssentiaReservoir);
+        if (reservoirItem != null) {
+            reservoirItem.setTileEntityItemStackRenderer(new ItemEssentiaReservoirRenderer());
+        }
         if (ConfigItems.itemWandCasting != null) {
             ConfigItems.itemWandCasting.setTileEntityItemStackRenderer(new ItemWandRenderer());
         }
@@ -634,7 +639,7 @@ public class ClientProxy extends CommonProxy {
         for (int meta = 0; meta <= 10; meta++) {
             registerBlockItemModel(arcaneFurnaceItem, meta, "type=" + meta + ",facing=north");
         }
-        registerBlockItemModel(Item.getItemFromBlock(ConfigBlocks.blockEssentiaReservoir), 0, "normal");
+        registerBuiltinItemModel(Item.getItemFromBlock(ConfigBlocks.blockEssentiaReservoir), 0, "blockessentiareservoir_tesr");
         Item candleItem = Item.getItemFromBlock(ConfigBlocks.blockCandle);
         for (int meta = 0; meta < 16; meta++) {
             registerBlockItemModel(candleItem, meta, "type=" + meta);

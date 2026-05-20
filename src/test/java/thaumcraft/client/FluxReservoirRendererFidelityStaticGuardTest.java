@@ -18,6 +18,7 @@ public class FluxReservoirRendererFidelityStaticGuardTest {
         String stoneDeviceBlockstate = read("src/main/resources/assets/thaumcraft/blockstates/blockstonedevice.json");
         String fluxBlockModel = read("src/main/resources/assets/thaumcraft/models/block/blockstonedevice_14.json");
         String reservoirRenderer = read("src/main/java/thaumcraft/client/renderers/tile/TileEssentiaReservoirRenderer.java");
+        String reservoirItemRenderer = read("src/main/java/thaumcraft/client/renderers/item/ItemEssentiaReservoirRenderer.java");
         String reservoirModel = read("src/main/resources/assets/thaumcraft/models/block/blockessentiareservoir.json");
 
         assertTrue("Flux scrubber renderer should keep the orientation path and animated tip while the static cap lives in the block model",
@@ -53,8 +54,17 @@ public class FluxReservoirRendererFidelityStaticGuardTest {
                         && reservoirRenderer.contains("OpenGlHelper.setLightmapTextureCoords")
                         && reservoirRenderer.contains("computeLiquidAlpha(")
                         && reservoirRenderer.contains("drawTexturedCuboid(")
+                        && !reservoirRenderer.contains("tile.getWorld() == null")
                         && !reservoirRenderer.contains("new ModelEssentiaReservoir()")
                         && !reservoirRenderer.contains("model.renderAll(MODEL_SCALE)"));
+
+        assertTrue("Reservoir item renderer should reuse the block-model shell plus the worldless TESR liquid path instead of falling back to a static normal item model",
+                reservoirItemRenderer.contains("extends TileEntityItemStackRenderer")
+                        && reservoirItemRenderer.contains("new ModelResourceLocation(\"thaumcraft:blockessentiareservoir\", \"inventory\")")
+                        && reservoirItemRenderer.contains("new TileEssentiaReservoirRenderer()")
+                        && reservoirItemRenderer.contains("mc.getRenderItem().renderItem(stack, model);")
+                        && reservoirItemRenderer.contains("GlStateManager.translate(-0.5F, -0.5F, -0.5F);")
+                        && reservoirItemRenderer.contains("essentia.readFromNBT(tag);"));
 
         assertTrue("Reservoir block model should define the basin shell geometry after the shell moved out of TESR",
                 reservoirModel.contains("\"ambientocclusion\": false")

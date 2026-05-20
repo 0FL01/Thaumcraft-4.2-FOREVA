@@ -17,7 +17,7 @@ import thaumcraft.common.tiles.TileEssentiaReservoir;
 public class TileEssentiaReservoirRenderer extends TileEntitySpecialRenderer<TileEssentiaReservoir> {
     @Override
     public void render(TileEssentiaReservoir tile, double x, double y, double z, float partialTicks, int destroyStage, float alpha) {
-        if (tile == null || tile.getWorld() == null) {
+        if (tile == null) {
             return;
         }
 

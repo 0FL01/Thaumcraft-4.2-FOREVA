@@ -15,6 +15,7 @@ public class TransportVisualShellContractTest {
     @Test
     public void mirrorAndReservoirShellsStayOnBlockModelsWhileTesrKeepsOnlyDynamicLayers() throws IOException {
         String clientProxy = read("src/main/java/thaumcraft/client/ClientProxy.java");
+        String reservoirItemRenderer = read("src/main/java/thaumcraft/client/renderers/item/ItemEssentiaReservoirRenderer.java");
         String mirrorRenderer = read("src/main/java/thaumcraft/client/renderers/tile/TileMirrorRenderer.java");
         String reservoirRenderer = read("src/main/java/thaumcraft/client/renderers/tile/TileEssentiaReservoirRenderer.java");
         String mirrorBlockstate = read("src/main/resources/assets/thaumcraft/blockstates/blockmirror.json");
@@ -23,6 +24,7 @@ public class TransportVisualShellContractTest {
         String mirrorCeiling = read("src/main/resources/assets/thaumcraft/models/block/blockmirror_down_0.json");
         String mirrorFloor = read("src/main/resources/assets/thaumcraft/models/block/blockmirror_up_0.json");
         String reservoirModel = read("src/main/resources/assets/thaumcraft/models/block/blockessentiareservoir.json");
+        String reservoirItemModel = read("src/main/resources/assets/thaumcraft/models/item/blockessentiareservoir_tesr.json");
         String essentiaMirrorItem = read("src/main/resources/assets/thaumcraft/models/item/blockmirror_essentia.json");
 
         assertTrue("Mirror blockstate must route ceiling/floor variants explicitly and rotate the wall frame for side metas",
@@ -58,6 +60,11 @@ public class TransportVisualShellContractTest {
                 reservoirRenderer.contains("renderLiquid(tile, x, y, z);"));
         assertFalse("Reservoir TESR must not keep rendering the duplicate static shell model",
                 reservoirRenderer.contains("model.renderAll(") || reservoirRenderer.contains("RESERVOIR_TEXTURE"));
+        assertTrue("Reservoir inventory path must now use builtin/entity plus a dedicated item renderer so the basin shell and worldless liquid both render in item contexts",
+                clientProxy.contains("reservoirItem.setTileEntityItemStackRenderer(new ItemEssentiaReservoirRenderer());")
+                        && clientProxy.contains("registerBuiltinItemModel(Item.getItemFromBlock(ConfigBlocks.blockEssentiaReservoir), 0, \"blockessentiareservoir_tesr\");")
+                        && reservoirItemModel.contains("\"parent\": \"builtin/entity\"")
+                        && reservoirItemRenderer.contains("new TileEssentiaReservoirRenderer()"));
         assertTrue("ClientProxy must split normal and essentia mirror inventory models by meta range",
                 clientProxy.contains("new ResourceLocation(\"thaumcraft\", \"blockmirror_essentia\")")
                         && clientProxy.contains("for (int meta = 6; meta < 12; meta++) {"));
