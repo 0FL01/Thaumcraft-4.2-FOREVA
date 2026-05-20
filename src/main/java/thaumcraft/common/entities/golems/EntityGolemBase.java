@@ -629,6 +629,10 @@ public class EntityGolemBase extends net.minecraft.entity.monster.EntityGolem im
         if (!this.world.isRemote) this.dataManager.set(HEALTH_PERCENT, (byte) this.getHealth());
     }
 
+    public float getHealthPercentage() {
+        return (float) this.dataManager.get(HEALTH_PERCENT) / this.getMaxHealth();
+    }
+
     @Override
     public void handleStatusUpdate(byte id) {
         if (id == 4) this.action = 6;
@@ -637,6 +641,10 @@ public class EntityGolemBase extends net.minecraft.entity.monster.EntityGolem im
         else if (id == 8) this.rightArm = 5;
         else if (id == 7) this.bootup = 33.0f;
         else super.handleStatusUpdate(id);
+    }
+
+    public int getActionTimer() {
+        return 3 - Math.abs(this.action - 3);
     }
 
     // --- Target validation ---

@@ -253,8 +253,14 @@ public class ClientProxyEntityRendererRegistrationStaticGuardTest {
                         && eldritchCrabRenderer.contains("this.addLayer(new CrabOverlayLayer())"));
         String cultistPortalRenderer = readFile("src/main/java/thaumcraft/client/renderers/entity/RenderCultistPortal.java");
         assertTrue("RenderCultistPortal must provide dedicated portal texture baseline",
-                cultistPortalRenderer.contains("extends RenderBiped<EntityCultistPortal>")
-                        && cultistPortalRenderer.contains("textures/misc/cultist_portal.png"));
+                cultistPortalRenderer.contains("extends Render<EntityCultistPortal>")
+                        && cultistPortalRenderer.contains("textures/misc/cultist_portal.png")
+                        && cultistPortalRenderer.contains("renderPortal(")
+                        && cultistPortalRenderer.contains("portal.hurtTime")
+                        && cultistPortalRenderer.contains("portal.pulse")
+                        && cultistPortalRenderer.contains("this.renderManager.playerViewY")
+                        && cultistPortalRenderer.contains("this.renderManager.playerViewX")
+                        && cultistPortalRenderer.contains("DefaultVertexFormats.POSITION_TEX_COLOR"));
         String thaumicSlimeRenderer = readFile("src/main/java/thaumcraft/client/renderers/entity/RenderThaumicSlime.java");
         assertTrue("RenderThaumicSlime must provide texture, scale, and gel layer baselines",
                 thaumicSlimeRenderer.contains("extends RenderLiving<EntityThaumicSlime>")
@@ -383,7 +389,13 @@ public class ClientProxyEntityRendererRegistrationStaticGuardTest {
                         && trunkRenderer.contains("entity.getAnger() > 0"));
         String golemRenderer = readFile("src/main/java/thaumcraft/client/renderers/entity/RenderGolemBase.java");
         assertTrue("RenderGolemBase must provide golem-type texture routing baseline",
-                golemRenderer.contains("extends RenderBiped<EntityGolemBase>")
+                golemRenderer.contains("extends RenderLiving<EntityGolemBase>")
+                        && golemRenderer.contains("new ModelGolem(false)")
+                        && golemRenderer.contains("new GolemAccessoriesLayer(this)")
+                        && golemRenderer.contains("new GolemDamageLayer(this)")
+                        && golemRenderer.contains("ModelGolemAccessories")
+                        && golemRenderer.contains("golem_damage.png")
+                        && golemRenderer.contains("golem_decoration.png")
                         && golemRenderer.contains("entity.getGolemType()")
                         && golemRenderer.contains("golem_straw.png")
                         && golemRenderer.contains("golem_wood.png")
@@ -393,6 +405,30 @@ public class ClientProxyEntityRendererRegistrationStaticGuardTest {
                         && golemRenderer.contains("golem_stone.png")
                         && golemRenderer.contains("golem_iron.png")
                         && golemRenderer.contains("golem_thaumium.png"));
+        String golemModel = readFile("src/main/java/thaumcraft/client/renderers/models/entities/ModelGolem.java");
+        assertTrue("ModelGolem must provide dedicated golem body, animation, and damage-pass baseline",
+                golemModel.contains("class ModelGolem")
+                        && golemModel.contains("public final ModelRenderer golemHead;")
+                        && golemModel.contains("public final ModelRenderer golemBody;")
+                        && golemModel.contains("public final ModelRenderer golemRightArm;")
+                        && golemModel.contains("public int pass = 0;")
+                        && golemModel.contains("entity instanceof EntityGolemBase")
+                        && golemModel.contains("golem.healing > 0")
+                        && golemModel.contains("golem.getActionTimer()")
+                        && golemModel.contains("golem.getCarryLimit()"));
+        String golemAccessoriesModel = readFile("src/main/java/thaumcraft/client/renderers/models/entities/ModelGolemAccessories.java");
+        assertTrue("ModelGolemAccessories must provide dedicated decoration and advanced-head baseline",
+                golemAccessoriesModel.contains("class ModelGolemAccessories")
+                        && golemAccessoriesModel.contains("golemHeadFez")
+                        && golemAccessoriesModel.contains("golemHeadGlasses")
+                        && golemAccessoriesModel.contains("golemHeadJar")
+                        && golemAccessoriesModel.contains("golemEvilHead")
+                        && golemAccessoriesModel.contains("golem.getGolemDecoration()")
+                        && golemAccessoriesModel.contains("golem.advanced"));
+        String golemEntity = readFile("src/main/java/thaumcraft/common/entities/golems/EntityGolemBase.java");
+        assertTrue("EntityGolemBase must expose renderer-facing action and health-percentage accessors",
+                golemEntity.contains("public float getHealthPercentage()")
+                        && golemEntity.contains("public int getActionTimer()"));
         String travelingTrunkEntity = readFile("src/main/java/thaumcraft/common/entities/golems/EntityTravelingTrunk.java");
         assertTrue("EntityTravelingTrunk must expose anger accessor for renderer texture routing",
                 travelingTrunkEntity.contains("public int getAnger()"));
