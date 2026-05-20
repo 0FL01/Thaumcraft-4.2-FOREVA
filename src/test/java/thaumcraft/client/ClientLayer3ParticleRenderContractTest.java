@@ -27,6 +27,7 @@ public class ClientLayer3ParticleRenderContractTest {
     private static void assertLayer3SelfContained(String path) throws IOException {
         String source = read(path);
         assertTrue(path + " must stay on layer 3 custom rendering", source.contains("return 3;"));
+        assertTrue(path + " must not call Particle.setParticleTexture() from a custom layer-3 renderer", !source.contains("setParticleTexture("));
         assertEquals(path + " must open exactly one custom quad pass", 1,
                 countOccurrences(source, "buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.PARTICLE_POSITION_TEX_COLOR_LMAP);"));
         assertEquals(path + " must close exactly one custom quad pass", 1,

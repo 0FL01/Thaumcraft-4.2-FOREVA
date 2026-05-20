@@ -525,6 +525,9 @@ Dependency: some `PacketMiscEvent` behavior may overlap with broader client over
 - `thaumcraft_src/thaumcraft/client/fx/particles/FXWisp.class`
 - `thaumcraft_src/thaumcraft/client/fx/particles/FXSparkle.class`
 - `thaumcraft_src/thaumcraft/client/fx/particles/FXBreaking.class`
+
+**Checkpoint 2026-05-20 — FXBreaking layer-3 contract fix:**
+After champion client FX routing was restored, a concrete 1.12 particle API crash surfaced in the infested modifier path: `FXBreaking` already performs fully custom layer-3 rendering, but the port still called `Particle.setParticleTexture(...)` in its constructor, which Forge 1.12 rejects for that render route. Removing that call restores the original self-rendered item-crack behavior without falling back to vanilla `ITEM_CRACK`, and static guards now explicitly protect the "layer 3 custom renderer must not call setParticleTexture" contract.
 - `thaumcraft_src/thaumcraft/client/fx/particles/FXSmokeTrail.class`
 - `thaumcraft_src/thaumcraft/client/fx/particles/FXSwarm.class`
 - `thaumcraft_src/thaumcraft/client/ClientProxy.class`

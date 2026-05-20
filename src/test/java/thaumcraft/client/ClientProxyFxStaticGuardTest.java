@@ -257,6 +257,7 @@ public class ClientProxyFxStaticGuardTest {
                         && breakingFx.contains("setParticleMaxAge(int particleMaxAge)")
                         && breakingFx.contains("TextureMap.LOCATION_BLOCKS_TEXTURE")
                         && breakingFx.contains("this.textureJitterX = this.rand.nextInt(4)")
+                        && !breakingFx.contains("setParticleTexture(")
                         && !breakingFx.contains("EnumParticleTypes.ITEM_CRACK")
                         && !breakingFx.contains("EnumParticleTypes.REDSTONE"));
         assertTrue("Dedicated FXBurst particle must keep burst emission baseline",

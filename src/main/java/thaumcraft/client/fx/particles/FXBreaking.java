@@ -42,9 +42,6 @@ public class FXBreaking extends Particle {
         this.particleSprite = item == null ? null : Minecraft.getMinecraft().getRenderItem().getItemModelMesher().getParticleIcon(item, meta);
         this.textureJitterX = this.rand.nextInt(4);
         this.textureJitterY = this.rand.nextInt(4);
-        if (this.particleSprite != null) {
-            this.setParticleTexture(this.particleSprite);
-        }
         this.particleRed = 1.0F;
         this.particleGreen = 1.0F;
         this.particleBlue = 1.0F;
