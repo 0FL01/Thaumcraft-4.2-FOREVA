@@ -45,7 +45,7 @@ public class TileArcaneLampStaticGuardTest {
 
         assertTrue(source.contains("else if (te instanceof TileArcaneLamp)"));
         assertTrue(source.contains("((TileArcaneLamp) te).removeLights();"));
-        assertTrue(source.contains("if (state.getValue(TYPE) == 7)"));
+        assertTrue(source.contains("if (meta == 7)"));
         assertTrue(source.contains("TileArcaneLamp lamp = (TileArcaneLamp) te;"));
         assertTrue(source.contains("worldIn.isAirBlock(pos.offset(lamp.facing))"));
         assertTrue(source.contains("worldIn.destroyBlock(pos, true);"));

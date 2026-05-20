@@ -16,7 +16,7 @@ public class BlockMetalDeviceGrateContractTest {
         String source = read("src/main/java/thaumcraft/common/blocks/BlockMetalDevice.java");
 
         assertTrue("Closed grate should drop the open grate item and the creative tab should expose only meta 5",
-                source.contains("return meta == 6 ? 5 : meta;")
+                source.contains("if (meta == 6) return 5;")
                         && source.contains("list.add(new ItemStack(this, 1, 5)); // grate")
                         && !source.contains("list.add(new ItemStack(this, 1, 6)); // grate"));
 

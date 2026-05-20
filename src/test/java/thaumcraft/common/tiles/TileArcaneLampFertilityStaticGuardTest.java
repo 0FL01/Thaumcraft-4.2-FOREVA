@@ -38,7 +38,7 @@ public class TileArcaneLampFertilityStaticGuardTest {
 
         assertTrue(source.contains("if (meta == 13) return new TileArcaneLampFertility();"));
         assertTrue(source.contains("list.add(new ItemStack(this, 1, 13)); // fertility lamp"));
-        assertTrue(source.contains("if (state.getValue(TYPE) == 13)"));
+        assertTrue(source.contains("if (meta == 13)"));
         assertTrue(source.contains("TileArcaneLampFertility lamp = (TileArcaneLampFertility) te;"));
         assertTrue(source.contains("meta == 7 || meta == 8 || meta == 13"));
         assertTrue(source.contains("((TileArcaneLampFertility) te).charges > 0 ? 15 : 8"));

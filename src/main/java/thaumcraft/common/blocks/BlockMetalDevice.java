@@ -12,6 +12,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.inventory.Container;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
@@ -32,6 +33,7 @@ import thaumcraft.api.visnet.VisNetHandler;
 import thaumcraft.common.Thaumcraft;
 import thaumcraft.common.CommonProxy;
 import thaumcraft.common.entities.EntitySpecialItem;
+import thaumcraft.common.lib.utils.InventoryUtils;
 import thaumcraft.common.items.wands.ItemWandCasting;
 import thaumcraft.common.tiles.*;
 
@@ -42,6 +44,16 @@ public class BlockMetalDevice extends BlockContainer {
     public static final PropertyInteger TYPE = PropertyInteger.create("type", 0, 14);
     private static final AxisAlignedBB GRATE_AABB = new AxisAlignedBB(0.0D, 0.8125D, 0.0D, 1.0D, 1.0D, 1.0D);
     private static final AxisAlignedBB ARCANE_LAMP_AABB = new AxisAlignedBB(0.25D, 0.125D, 0.25D, 0.75D, 0.875D, 0.75D);
+    private static final AxisAlignedBB CHARGER_AABB = new AxisAlignedBB(0.3125D, 0.5D, 0.3125D, 0.6875D, 1.0D, 0.6875D);
+    private static final AxisAlignedBB THAUMATORIUM_BASE_AABB = new AxisAlignedBB(0.0D, 0.0D, 0.0D, 1.0D, 2.0D, 1.0D);
+    private static final AxisAlignedBB THAUMATORIUM_TOP_AABB = new AxisAlignedBB(0.0D, -1.0D, 0.0D, 1.0D, 1.0D, 1.0D);
+    private static final AxisAlignedBB BRAINBOX_AABB = new AxisAlignedBB(0.1875D, 0.1875D, 0.1875D, 0.8125D, 0.8125D, 0.8125D);
+    private static final AxisAlignedBB VIS_RELAY_UP_AABB = new AxisAlignedBB(0.3125D, 0.5D, 0.3125D, 0.6875D, 1.0D, 0.6875D);
+    private static final AxisAlignedBB VIS_RELAY_DOWN_AABB = new AxisAlignedBB(0.3125D, 0.0D, 0.3125D, 0.6875D, 0.5D, 0.6875D);
+    private static final AxisAlignedBB VIS_RELAY_EAST_AABB = new AxisAlignedBB(0.5D, 0.3125D, 0.3125D, 1.0D, 0.6875D, 0.6875D);
+    private static final AxisAlignedBB VIS_RELAY_WEST_AABB = new AxisAlignedBB(0.0D, 0.3125D, 0.3125D, 0.5D, 0.6875D, 0.6875D);
+    private static final AxisAlignedBB VIS_RELAY_SOUTH_AABB = new AxisAlignedBB(0.3125D, 0.3125D, 0.5D, 0.6875D, 0.6875D, 1.0D);
+    private static final AxisAlignedBB VIS_RELAY_NORTH_AABB = new AxisAlignedBB(0.3125D, 0.3125D, 0.0D, 0.6875D, 0.6875D, 0.5D);
 
     private int delay = 0;
 
@@ -63,7 +75,13 @@ public class BlockMetalDevice extends BlockContainer {
         int meta = state.getValue(TYPE);
         return meta == 1 || meta == 10 || meta == 11 ? EnumBlockRenderType.INVISIBLE : EnumBlockRenderType.MODEL;
     }
-    @Override public boolean hasTileEntity(IBlockState state) { return true; }
+    @Override
+    public boolean hasTileEntity(IBlockState state) {
+        int meta = getMetaFromState(state);
+        return meta == 0 || meta == 1 || meta == 2 || meta == 5 || meta == 6
+                || meta == 7 || meta == 8 || meta == 10 || meta == 11 || meta == 12
+                || meta == 13 || meta == 14;
+    }
 
     @Override
     public TileEntity createNewTileEntity(World worldIn, int meta) {
@@ -78,7 +96,7 @@ public class BlockMetalDevice extends BlockContainer {
         if (meta == 12) return new TileBrainbox();
         if (meta == 13) return new TileArcaneLampFertility();
         if (meta == 14) return new TileVisRelay();
-        return new TilePedestal();
+        return null;
     }
 
     @Override
@@ -90,21 +108,23 @@ public class BlockMetalDevice extends BlockContainer {
     public void getSubBlocks(CreativeTabs tab, NonNullList<ItemStack> list) {
         list.add(new ItemStack(this, 1, 0)); // crucible
         list.add(new ItemStack(this, 1, 1)); // alembic
-        list.add(new ItemStack(this, 1, 2)); // magic workbench charger
         list.add(new ItemStack(this, 1, 5)); // grate
         list.add(new ItemStack(this, 1, 7)); // lamp
         list.add(new ItemStack(this, 1, 8)); // growth lamp
-        list.add(new ItemStack(this, 1, 10)); // thaumatorium
-        list.add(new ItemStack(this, 1, 11)); // thaumatorium top
-        list.add(new ItemStack(this, 1, 12)); // brainbox
         list.add(new ItemStack(this, 1, 13)); // fertility lamp
+        list.add(new ItemStack(this, 1, 9)); // alchemical construct
+        list.add(new ItemStack(this, 1, 3)); // advanced alchemical construct
+        list.add(new ItemStack(this, 1, 12)); // brainbox
         list.add(new ItemStack(this, 1, 14)); // vis relay
+        list.add(new ItemStack(this, 1, 2)); // magic workbench charger
     }
 
     @Override
     public int damageDropped(IBlockState state) {
         int meta = getMetaFromState(state);
-        return meta == 6 ? 5 : meta;
+        if (meta == 6) return 5;
+        if (meta == 10 || meta == 11) return 9;
+        return meta;
     }
 
     @Override
@@ -201,6 +221,14 @@ public class BlockMetalDevice extends BlockContainer {
     @Override
     public void onBlockPlacedBy(World worldIn, BlockPos pos, IBlockState state, EntityLivingBase placer, ItemStack stack) {
         super.onBlockPlacedBy(worldIn, pos, state, placer, stack);
+        if (state.getValue(TYPE) == 1) {
+            TileEntity te = worldIn.getTileEntity(pos);
+            if (te instanceof TileAlembic && placer != null) {
+                ((TileAlembic) te).facing = placer.getHorizontalFacing().getOpposite().getIndex();
+                te.markDirty();
+                worldIn.notifyBlockUpdate(pos, state, state, 3);
+            }
+        }
         if (worldIn.isRemote || state.getValue(TYPE) != 12) return;
         TileEntity te = worldIn.getTileEntity(pos);
         if (!(te instanceof TileBrainbox)) return;
@@ -218,9 +246,39 @@ public class BlockMetalDevice extends BlockContainer {
     public void neighborChanged(IBlockState state, World worldIn, BlockPos pos, Block blockIn, BlockPos fromPos) {
         super.neighborChanged(state, worldIn, pos, blockIn, fromPos);
         if (worldIn.isRemote) return;
+        int meta = state.getValue(TYPE);
         boolean powered = worldIn.isBlockPowered(pos);
         onPoweredBlockChange(worldIn, pos, powered);
-        if (state.getValue(TYPE) == 7) {
+        if (meta == 10) {
+            IBlockState above = worldIn.getBlockState(pos.up());
+            IBlockState below = worldIn.getBlockState(pos.down());
+            if (above.getBlock() != this || above.getValue(TYPE) != 11
+                    || below.getBlock() != this || below.getValue(TYPE) != 0) {
+                InventoryUtils.dropItems(worldIn, pos.getX(), pos.getY(), pos.getZ());
+                worldIn.removeTileEntity(pos);
+                worldIn.setBlockState(pos, state.withProperty(TYPE, 9), 3);
+                return;
+            }
+            TileEntity te = worldIn.getTileEntity(pos);
+            if (te instanceof TileThaumatorium) {
+                ((TileThaumatorium) te).getUpgrades();
+            }
+            return;
+        }
+        if (meta == 11) {
+            IBlockState below = worldIn.getBlockState(pos.down());
+            if (below.getBlock() != this || below.getValue(TYPE) != 10) {
+                worldIn.removeTileEntity(pos);
+                worldIn.setBlockState(pos, state.withProperty(TYPE, 9), 3);
+                return;
+            }
+            TileEntity te = worldIn.getTileEntity(pos.down());
+            if (te instanceof TileThaumatorium) {
+                ((TileThaumatorium) te).getUpgrades();
+            }
+            return;
+        }
+        if (meta == 7) {
             TileEntity te = worldIn.getTileEntity(pos);
             if (te instanceof TileArcaneLamp) {
                 TileArcaneLamp lamp = (TileArcaneLamp) te;
@@ -250,7 +308,7 @@ public class BlockMetalDevice extends BlockContainer {
             }
             return;
         }
-        if (state.getValue(TYPE) != 12) return;
+        if (meta != 12) return;
         TileEntity te = worldIn.getTileEntity(pos);
         if (!(te instanceof TileBrainbox)) return;
         EnumFacing target = findAdjacentThaumatorium(worldIn, pos);
@@ -311,6 +369,21 @@ public class BlockMetalDevice extends BlockContainer {
         if (meta == 7 || meta == 8 || meta == 13) {
             return ARCANE_LAMP_AABB;
         }
+        if (meta == 2) {
+            return CHARGER_AABB;
+        }
+        if (meta == 10) {
+            return THAUMATORIUM_BASE_AABB;
+        }
+        if (meta == 11) {
+            return THAUMATORIUM_TOP_AABB;
+        }
+        if (meta == 12) {
+            return BRAINBOX_AABB;
+        }
+        if (meta == 14) {
+            return getVisRelayBounds(source, pos);
+        }
         return (meta == 5 || meta == 6) ? GRATE_AABB : FULL_BLOCK_AABB;
     }
 
@@ -332,12 +405,35 @@ public class BlockMetalDevice extends BlockContainer {
             addCollisionBoxToList(pos, entityBox, collidingBoxes, ARCANE_LAMP_AABB);
             return;
         }
+        if (meta == 2) {
+            addCollisionBoxToList(pos, entityBox, collidingBoxes, CHARGER_AABB);
+            return;
+        }
+        if (meta == 10) {
+            addCollisionBoxToList(pos, entityBox, collidingBoxes, THAUMATORIUM_BASE_AABB);
+            return;
+        }
+        if (meta == 11) {
+            addCollisionBoxToList(pos, entityBox, collidingBoxes, THAUMATORIUM_TOP_AABB);
+            return;
+        }
+        if (meta == 12) {
+            addCollisionBoxToList(pos, entityBox, collidingBoxes, BRAINBOX_AABB);
+            return;
+        }
+        if (meta == 14) {
+            addCollisionBoxToList(pos, entityBox, collidingBoxes, getVisRelayBounds(worldIn, pos));
+            return;
+        }
         super.addCollisionBoxToList(state, worldIn, pos, entityBox, collidingBoxes, entityIn, isActualState);
     }
 
     @Override
     public int getLightValue(IBlockState state, IBlockAccess world, BlockPos pos) {
         int meta = state.getValue(TYPE);
+        if (meta == 3) {
+            return 11;
+        }
         if (meta == 7) {
             return 15;
         }
@@ -363,7 +459,51 @@ public class BlockMetalDevice extends BlockContainer {
     }
 
     @Override
+    public boolean hasComparatorInputOverride(IBlockState state) {
+        return true;
+    }
+
+    @Override
+    public int getComparatorInputOverride(IBlockState state, World worldIn, BlockPos pos) {
+        TileEntity te = worldIn.getTileEntity(pos);
+        if (te instanceof TileThaumatorium) {
+            return Container.calcRedstoneFromInventory((IInventory) te);
+        }
+        if (te instanceof TileAlembic) {
+            float fill = (float) ((TileAlembic) te).amount / (float) ((TileAlembic) te).maxAmount;
+            return MathHelper.floor(fill * 14.0F) + (((TileAlembic) te).amount > 0 ? 1 : 0);
+        }
+        if (te instanceof TileCrucible) {
+            float fill = ((TileCrucible) te).aspects.visSize() / 100.0F;
+            return MathHelper.floor(fill * 14.0F) + (((TileCrucible) te).aspects.visSize() > 0 ? 1 : 0);
+        }
+        return 0;
+    }
+
+    @Override
     public IBlockState getStateForPlacement(World worldIn, BlockPos pos, EnumFacing facing, float hitX, float hitY, float hitZ, int meta, EntityLivingBase placer, EnumHand hand) {
         return this.getDefaultState().withProperty(TYPE, MathHelper.clamp(meta, 0, 14));
+    }
+
+    private AxisAlignedBB getVisRelayBounds(IBlockAccess source, BlockPos pos) {
+        TileEntity te = source.getTileEntity(pos);
+        if (!(te instanceof TileVisRelay)) {
+            return VIS_RELAY_UP_AABB;
+        }
+        switch (EnumFacing.byIndex(((TileVisRelay) te).orientation).getOpposite()) {
+            case DOWN:
+                return VIS_RELAY_DOWN_AABB;
+            case EAST:
+                return VIS_RELAY_EAST_AABB;
+            case WEST:
+                return VIS_RELAY_WEST_AABB;
+            case SOUTH:
+                return VIS_RELAY_SOUTH_AABB;
+            case NORTH:
+                return VIS_RELAY_NORTH_AABB;
+            case UP:
+            default:
+                return VIS_RELAY_UP_AABB;
+        }
     }
 }

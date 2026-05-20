@@ -49,7 +49,7 @@ public class TileArcaneLampGrowthStaticGuardTest {
     public void blockMetalDeviceShouldKeepArcaneLampGrowthSupportCheck() throws IOException {
         String source = readFile("src/main/java/thaumcraft/common/blocks/BlockMetalDevice.java");
 
-        assertTrue(source.contains("if (state.getValue(TYPE) == 8)"));
+        assertTrue(source.contains("if (meta == 8)"));
         assertTrue(source.contains("te instanceof TileArcaneLampGrowth"));
         assertTrue(source.contains("TileArcaneLampGrowth lamp = (TileArcaneLampGrowth) te;"));
         assertTrue(source.contains("worldIn.isAirBlock(pos.offset(lamp.facing))"));
