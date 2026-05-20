@@ -14,12 +14,11 @@ public class EldritchNothingRendererFidelityStaticGuardTest {
     @Test
     public void eldritchNothingRendererKeepsPerFaceOffsetAndLayerContracts() throws IOException {
         String source = read("src/main/java/thaumcraft/client/renderers/tile/TileEldritchNothingRenderer.java");
+        String helper = read("src/main/java/thaumcraft/client/renderers/tile/LayeredFieldPlaneHelper.java");
 
-        assertTrue("TileEldritchNothingRenderer should keep reference texture set and live-time UV flow",
-                source.contains("textures/misc/tunnel.png")
-                        && source.contains("textures/misc/particlefield.png")
-                        && source.contains("textures/misc/particlefield32.png")
-                        && source.contains("System.currentTimeMillis() % 700000L"));
+        assertTrue("TileEldritchNothingRenderer should route through the shared layered tunnel helper",
+                source.contains("LayeredFieldPlaneHelper.renderLayeredFace(")
+                        && source.contains("float offset = faceAxisOffset(face);"));
 
         assertTrue("TileEldritchNothingRenderer should keep explicit per-face plane offsets",
                 source.contains("case DOWN:")
@@ -28,13 +27,21 @@ public class EldritchNothingRendererFidelityStaticGuardTest {
                         && source.contains("return FACE_MIN;")
                         && source.contains("return FACE_MAX;"));
 
-        assertTrue("TileEldritchNothingRenderer should keep 16-layer tunnel+particle pass with additive blend",
-                source.contains("for (int i = 0; i < 16; i++)")
-                        && source.contains("blendFunc(770, 771)")
-                        && source.contains("blendFunc(1, 1)")
-                        && source.contains("drawFace(face, offset")
-                        && source.contains("FIELD_COLOR_SEED = 31100L")
-                        && source.contains("faceParallaxSign(face)"));
+        assertTrue("LayeredFieldPlaneHelper should keep reference texture set and live-time texture-matrix flow",
+                helper.contains("textures/misc/tunnel.png")
+                        && helper.contains("textures/misc/particlefield.png")
+                        && helper.contains("textures/misc/particlefield32.png")
+                        && helper.contains("System.currentTimeMillis() % 700000L")
+                        && helper.contains("GlStateManager.matrixMode(5890)")
+                        && helper.contains("GL11.glTexGeni"));
+
+        assertTrue("LayeredFieldPlaneHelper should keep 16-layer tunnel+particle pass with additive blend and texgen planes",
+                helper.contains("for (int i = 0; i < 16; i++)")
+                        && helper.contains("GlStateManager.blendFunc(770, 771)")
+                        && helper.contains("GlStateManager.blendFunc(1, 1)")
+                        && helper.contains("FIELD_COLOR_SEED = 31100L")
+                        && helper.contains("GL11.GL_TEXTURE_GEN_S")
+                        && helper.contains("ActiveRenderInfo.getRotationX()"));
     }
 
     private static String read(String path) throws IOException {
