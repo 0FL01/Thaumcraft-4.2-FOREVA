@@ -337,9 +337,12 @@ public class ClientProxyEntityRendererRegistrationStaticGuardTest {
                         && taintacleModelRenderer.contains("OpenGlHelper.setLightmapTextureCoords")
                         && taintacleModelRenderer.contains("childModels"));
         String brainyZombieRenderer = readFile("src/main/java/thaumcraft/client/renderers/entity/RenderBrainyZombie.java");
-        assertTrue("RenderBrainyZombie must provide dedicated brainy texture baseline",
+        assertTrue("RenderBrainyZombie must provide dedicated brainy texture plus giant-anger scale baseline",
                 brainyZombieRenderer.contains("extends RenderZombie")
-                        && brainyZombieRenderer.contains("textures/models/bzombie.png"));
+                        && brainyZombieRenderer.contains("textures/models/bzombie.png")
+                        && brainyZombieRenderer.contains("entity instanceof EntityGiantBrainyZombie")
+                        && brainyZombieRenderer.contains("((EntityGiantBrainyZombie) entity).getAnger()")
+                        && brainyZombieRenderer.contains("GlStateManager.scale(scale, scale, scale)"));
         String inhabitedZombieRenderer = readFile("src/main/java/thaumcraft/client/renderers/entity/RenderInhabitedZombie.java");
         assertTrue("RenderInhabitedZombie must provide dedicated czombie texture baseline",
                 inhabitedZombieRenderer.contains("extends RenderZombie")
