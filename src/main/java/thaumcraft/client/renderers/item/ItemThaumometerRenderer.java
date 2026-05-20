@@ -40,6 +40,7 @@ public class ItemThaumometerRenderer extends TileEntityItemStackRenderer {
             new ResourceLocation("thaumcraft", "textures/models/scanner.png");
     private static final ResourceLocation SCANSCREEN_TEXTURE =
             new ResourceLocation("thaumcraft", "textures/models/scanscreen.png");
+    private static final float SCANNER_VERTICAL_CENTER = -0.1F;
 
     private final CCModel scannerModel = loadScannerModel();
 
@@ -53,6 +54,8 @@ public class ItemThaumometerRenderer extends TileEntityItemStackRenderer {
         EntityPlayer player = mc.player;
 
         GlStateManager.pushMatrix();
+        GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+        GlStateManager.translate(0.0F, SCANNER_VERTICAL_CENTER, 0.0F);
         GlStateManager.scale(0.5F, 0.5F, 0.5F);
         renderScannerModel(mc);
         renderScannerScreen(mc, player);
