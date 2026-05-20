@@ -181,6 +181,19 @@ A class can be:
 
 Only “validated” should be considered closed for parity claims.
 
+### Progress wording policy
+
+Use these labels consistently in progress docs:
+
+- `implemented` — code exists and is wired into the expected lifecycle/consumer path.
+- `static guarded only` — source-shape or corpus tests exist; behavior is not proven.
+- `runtime smoke passed` — build/load/server-start stability only.
+- `runtime validated` — the behavior itself was exercised by test or manual scenario.
+- `parity candidate` — implementation plus runtime validation match the scoped reference behavior.
+- `complete` — blocker/high gaps for the scoped stage are closed and evidence is listed.
+
+Do not use `complete` for a stage because compile, static guards, or smoke passed.
+
 ## 9. Phase overview
 
 ### Phase 0: Tooling and build foundation

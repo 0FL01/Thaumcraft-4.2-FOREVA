@@ -13,6 +13,12 @@ Follow `AGENTS.md` first. Source of truth order:
 
 Do not modify `thaumcraft_src` or the original jar. Preserve public API, registry names, NBT/save semantics, packet semantics, research/crafting/worldgen behavior, and compatibility expectations unless a deviation is unavoidable and documented.
 
+Current backend status caveat:
+
+- the target remains original Thaumcraft 4.2.3.5 behavior on Forge 1.12.2;
+- current progress must not be described as backend parity;
+- treat implementation presence, static guards, runtime smoke, and runtime validation as separate evidence levels.
+
 Do not ask the user to approve each phase. Work autonomously across all stages until success, hard blocker, or context/budget exhaustion.
 
 Do not use broad staging commands such as `git add .` or `git add -A`. Stage explicit paths only. Prefer checkpoint commits when a coherent milestone passes validation. Keep changes scoped and reversible.
@@ -25,6 +31,19 @@ Maintain `docs/GOAL_PROGRESS.md` during the run. After every major checkpoint, a
 - skipped GUI/manual checks
 - remaining blockers
 
+## 0.0 Progress vocabulary
+
+Use these terms consistently in goal and progress docs:
+
+- `data corpus present` — entries, keys, recipes, lang, or assets exist.
+- `registered` — a Forge/API/lifecycle registration path exists and is wired.
+- `partially wired` — some path exists, but normal gameplay or all consumers are not proven.
+- `static guarded` — source/corpus/ID tests protect regressions only.
+- `runtime smoke passed` — build/load/server-start stability only.
+- `runtime validated` — the behavior itself was exercised by test or manual scenario.
+- `parity candidate` — implementation plus runtime validation match the scoped reference behavior.
+- `complete` — blocker/high gaps in the scoped stage are closed and evidence is listed.
+
 ## 0.1 Quota-saving override — implementation burst mode
 
 This section supersedes any earlier instruction that can be interpreted as one-line gap commits, exhaustive Stage 3–7 micro-polish, or per-gap static guard/test loops.
@@ -36,10 +55,13 @@ Stop Stage 3–7 micro-polish unless the gap directly blocks Stage 8/9 implement
 Do not treat every one-line parity tweak as a standalone gap. A checkpoint gap now means a coherent subsystem bundle. Work in implementation bursts.
 
 Next priority order:
-1. Real Stage 8-c TESR/block/tile renderer implementation.
-2. Stage 8-e dedicated beams/bolts/FX implementation.
-3. Stage 9 recipe/content systems.
-4. Stage 9 research/progression only after recipe handles and crafting systems are substantially present.
+1. Server-authoritative research/progression packets and table logic.
+2. Scan authority and server-side target validation.
+3. End-to-end research note lifecycle: Thaumonomicon action -> note creation -> research table solve -> note completion -> unlock/sibling behavior.
+4. Runtime validation of arcane/recipe handle paths where static guards currently stand in for behavior.
+5. Crucible/thaumatorium/infusion scenario validation with NBT reload checks.
+6. Outer Lands portal/maze/safe-spawn/persistence validation.
+7. Stage 8 GUI/visual polish only where it is required to exercise backend progression.
 
 Avoid one-line parity commits with per-line static guards. Do not add a new static guard test for every microscopic source tweak. Use aggregate guards only for fragile API, registry, NBT, packet, research, recipe, lifecycle, and client/server boundary contracts.
 
@@ -243,7 +265,7 @@ Implement recipe/content registration foundation:
 
 ### Milestone I — Stage 9-b/c/d crafting systems
 
-Implement parity for:
+Populate and validate crafting systems:
 - arcane crafting
 - wand/sceptre/staff/focus dynamic recipes
 - research-gated crafting
@@ -254,11 +276,13 @@ Implement parity for:
 - thaumatorium programming/consumption
 - alchemy flow
 
+Do not mark this milestone complete from recipe corpus, research-page handles, static guards, or server smoke alone. Completion requires representative runtime scenarios that craft, reject invalid crafts, consume correct inputs/aspects/vis/essentia, and survive save/load where the system has persistent state.
+
 Use reference behavior. Preserve existing public manager APIs where possible.
 
 ### Milestone J — Stage 9-e research/progression
 
-Implement research content and Thaumonomicon progression:
+Populate and validate research/progression:
 - research categories
 - research entries
 - pages
@@ -269,7 +293,7 @@ Implement research content and Thaumonomicon progression:
 - packet validation
 - progression persistence
 
-Do not complete research purely client-side if server rules require gating.
+Do not complete research purely client-side. Do not call Stage 9-e complete until the normal gameplay route is server-authoritative and validated end-to-end.
 
 ### Milestone K — Phase 10 final polish
 
@@ -305,5 +329,3 @@ When blocked, leave:
 - safest next action
 - current diff/commit state
 - validation output summary
-
-
