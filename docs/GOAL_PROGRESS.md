@@ -71,6 +71,6 @@ Do not claim backend substantially complete until these are resolved or scoped o
 
 ## Latest Checkpoint
 
-- Restored the original champion attribute lifecycle for `tc.mobmod`: [EventHandlerEntity.java](/home/opencode/ai/Thaumcraft-4.2-FOREVA/src/main/java/thaumcraft/common/lib/events/EventHandlerEntity.java) now registers `EntityUtils.CHAMPION_MOD` on `EntityEvent.EntityConstructing` for every `EntityMob`, instead of waiting until join/spawn logic.
-- Consolidated champion-attribute registration through [EntityUtils.java](/home/opencode/ai/Thaumcraft-4.2-FOREVA/src/main/java/thaumcraft/common/lib/utils/EntityUtils.java), keeping the base `-2.0D` contract and removing the load-order gap that produced `SharedMonsterAttributes: Ignoring unknown attribute 'tc.mobmod'`.
-- Added runtime evidence in `ChampionAttributePersistenceRuntimeTest`: once the early hook runs, `SharedMonsterAttributes.setAttributeModifiers(...)` can apply saved `tc.mobmod` NBT modifiers instead of dropping them as unknown.
+- Champion display-name parity issue `champion.mod.warp Skeleton` was traced to missing `champion.mod.*` entries in the ported `en_us.lang`, not to broken champion runtime logic.
+- Restored the original English champion modifier localization corpus in [en_us.lang](/home/opencode/ai/Thaumcraft-4.2-FOREVA/src/main/resources/assets/thaumcraft/lang/en_us.lang), so champion mobs once again render names like `Warped Skeleton` instead of raw translation keys.
+- Added `ChampionModifierLocalizationStaticGuardTest` so the `ChampionModifier.getModNameLocalized()` path cannot silently regress back to unresolved `champion.mod.*` keys.
