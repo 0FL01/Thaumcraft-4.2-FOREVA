@@ -384,10 +384,30 @@ public class EntityTravelingTrunk extends net.minecraft.entity.EntityLiving impl
 
     @Override
     public void handleStatusUpdate(byte id) {
-        if (id == 17 || id == 18) {
+        if (id == 17) {
             this.lidrot = 0.15F;
+        } else if (id == 18) {
+            this.lidrot = 0.15F;
+            this.showHeartsOrSmokeFX(true);
         } else {
             super.handleStatusUpdate(id);
+        }
+    }
+
+    private void showHeartsOrSmokeFX(boolean positive) {
+        net.minecraft.util.EnumParticleTypes particle = positive
+                ? net.minecraft.util.EnumParticleTypes.HEART
+                : net.minecraft.util.EnumParticleTypes.SMOKE_NORMAL;
+        for (int i = 0; i < 7; ++i) {
+            double mx = this.rand.nextGaussian() * 0.02D;
+            double my = this.rand.nextGaussian() * 0.02D;
+            double mz = this.rand.nextGaussian() * 0.02D;
+            this.world.spawnParticle(
+                    particle,
+                    this.posX + (this.rand.nextFloat() * this.width * 2.0F) - this.width,
+                    this.posY + 0.5D + this.rand.nextFloat() * this.height,
+                    this.posZ + (this.rand.nextFloat() * this.width * 2.0F) - this.width,
+                    mx, my, mz);
         }
     }
 

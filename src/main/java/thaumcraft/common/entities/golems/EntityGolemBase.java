@@ -636,11 +636,20 @@ public class EntityGolemBase extends net.minecraft.entity.monster.EntityGolem im
     @Override
     public void handleStatusUpdate(byte id) {
         if (id == 4) this.action = 6;
-        else if (id == 5) this.healing = 5;
+        else if (id == 5) {
+            this.healing = 5;
+            this.refreshClientHealingState();
+        }
         else if (id == 6) this.leftArm = 5;
         else if (id == 8) this.rightArm = 5;
         else if (id == 7) this.bootup = 33.0f;
         else super.handleStatusUpdate(id);
+    }
+
+    private void refreshClientHealingState() {
+        int bonus = this.getGolemDecoration().contains("H") ? 5 : 0;
+        this.getEntityAttribute(net.minecraft.entity.SharedMonsterAttributes.MAX_HEALTH)
+                .setBaseValue(this.getGolemType().health + bonus);
     }
 
     public int getActionTimer() {
