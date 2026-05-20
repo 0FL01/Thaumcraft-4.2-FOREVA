@@ -16,6 +16,7 @@ public class AlchemyFurnaceAdvancedRendererFidelityStaticGuardTest {
         String model = read("src/main/java/thaumcraft/client/renderers/models/ModelAlchemyFurnaceAdvanced.java");
         String renderer = read("src/main/java/thaumcraft/client/renderers/tile/TileAlchemyFurnaceAdvancedRenderer.java");
         String alembic = read("src/main/java/thaumcraft/client/renderers/tile/TileAlembicRenderer.java");
+        String alembicModel = read("src/main/java/thaumcraft/client/renderers/models/ModelAlembic.java");
         String furnaceBlockModel = read("src/main/resources/assets/thaumcraft/models/block/blockstonedevice_0.json");
 
         assertTrue("ModelAlchemyFurnaceAdvanced should define base/tank/lava panels",
@@ -40,10 +41,25 @@ public class AlchemyFurnaceAdvancedRendererFidelityStaticGuardTest {
 
         assertTrue("TileAlembicRenderer should use model-driven bore nozzle path instead of ad-hoc cuboid fallback",
                 alembic.contains("new ModelBoreBase()")
+                        && alembic.contains("new ModelAlembic()")
                         && alembic.contains("modelBore.renderNozzle(MODEL_SCALE)")
                         && alembic.contains("renderOutputNozzles(")
                         && !alembic.contains("drawPrism(")
                         && !alembic.contains("drawTexturedCuboid("));
+
+        assertTrue("ModelAlembic should preserve the original alembic.obj grouped geometry surface instead of the old ModelRenderer box fallback",
+                alembicModel.contains("Wavefront alembic.obj groups")
+                        && alembicModel.contains("private static final float[][] VERTICES")
+                        && alembicModel.contains("private static final float[][] UVS")
+                        && alembicModel.contains("private static final float[][] NORMALS")
+                        && alembicModel.contains("private static final int[][] POT_TRIANGLES")
+                        && alembicModel.contains("private static final int[][] LEGS_TRIANGLES")
+                        && alembicModel.contains("private static final int[][] TUBE_MAIN_TRIANGLES")
+                        && alembicModel.contains("private static final int[][] TUBE_SMALL_TRIANGLES")
+                        && alembicModel.contains("private static final int[][] PANEL_TRIANGLES")
+                        && alembicModel.contains("DefaultVertexFormats.POSITION_TEX_NORMAL")
+                        && !alembicModel.contains("extends ModelBase")
+                        && !alembicModel.contains("new ModelRenderer("));
 
         assertTrue("Alchemy furnace block model should now carry the static base and tank-panel shell instead of the old full-cube placeholder",
                 furnaceBlockModel.contains("\"ambientocclusion\": false")
