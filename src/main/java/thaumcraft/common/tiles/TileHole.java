@@ -11,6 +11,8 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.registry.ForgeRegistries;
 import thaumcraft.api.TileThaumcraft;
+import thaumcraft.common.Thaumcraft;
+import thaumcraft.common.config.ConfigBlocks;
 import thaumcraft.common.items.wands.foci.FocusPortableHole;
 
 public class TileHole extends TileThaumcraft implements net.minecraft.util.ITickable {
@@ -52,9 +54,13 @@ public class TileHole extends TileThaumcraft implements net.minecraft.util.ITick
 
     @Override
     public void update() {
-        if (this.world == null || this.world.isRemote) return;
+        if (this.world == null) return;
 
-        if (this.countdown == 0 && this.count > 1 && this.direction != -1) {
+        if (this.world.isRemote) {
+            this.surroundwithsparkles();
+        }
+
+        if (!this.world.isRemote && this.countdown == 0 && this.count > 1 && this.direction != -1) {
             this.createOpeningPlane();
             BlockPos next = this.pos.offset(net.minecraft.util.EnumFacing.byIndex(this.direction).getOpposite());
             if (!FocusPortableHole.createHole(this.world, next.getX(), next.getY(), next.getZ(),
@@ -63,10 +69,71 @@ public class TileHole extends TileThaumcraft implements net.minecraft.util.ITick
             }
         }
 
-        this.countdown++;
+        this.countdown = (short) (this.countdown + 1);
         if (this.countdown >= this.countdownmax) {
-            this.restoreBlock();
+            if (this.world.isRemote) {
+                Thaumcraft.proxy.blockSparkle(this.world, this.pos.getX(), this.pos.getY(), this.pos.getZ(), 0x400040, 1);
+            } else {
+                this.restoreBlock();
+            }
         }
+    }
+
+    private void surroundwithsparkles() {
+        IBlockState up = this.world.getBlockState(this.pos.up());
+        IBlockState down = this.world.getBlockState(this.pos.down());
+        IBlockState north = this.world.getBlockState(this.pos.north());
+        IBlockState south = this.world.getBlockState(this.pos.south());
+        IBlockState west = this.world.getBlockState(this.pos.west());
+        IBlockState east = this.world.getBlockState(this.pos.east());
+
+        boolean yp = up.isOpaqueCube();
+        boolean xp = east.isOpaqueCube();
+        boolean zp = south.isOpaqueCube();
+        boolean yn = down.isOpaqueCube();
+        boolean xn = west.isOpaqueCube();
+        boolean zn = north.isOpaqueCube();
+
+        boolean b1 = up.getBlock() != ConfigBlocks.blockHole;
+        boolean b2 = down.getBlock() != ConfigBlocks.blockHole;
+        boolean b3 = north.getBlock() != ConfigBlocks.blockHole;
+        boolean b4 = south.getBlock() != ConfigBlocks.blockHole;
+        boolean b5 = west.getBlock() != ConfigBlocks.blockHole;
+        boolean b6 = east.getBlock() != ConfigBlocks.blockHole;
+
+        if (!xp && yp && b6) sparkle(this.pos.getX() + 1.0F, this.pos.getY() + 1.0F, this.pos.getZ() + this.world.rand.nextFloat());
+        if (!xn && yp && b5) sparkle(this.pos.getX(), this.pos.getY() + 1.0F, this.pos.getZ() + this.world.rand.nextFloat());
+        if (!zp && yp && b4) sparkle(this.pos.getX() + this.world.rand.nextFloat(), this.pos.getY() + 1.0F, this.pos.getZ() + 1.0F);
+        if (!zn && yp && b3) sparkle(this.pos.getX() + this.world.rand.nextFloat(), this.pos.getY() + 1.0F, this.pos.getZ());
+
+        if (!xp && yn && b6) sparkle(this.pos.getX() + 1.0F, this.pos.getY(), this.pos.getZ() + this.world.rand.nextFloat());
+        if (!xn && yn && b5) sparkle(this.pos.getX(), this.pos.getY(), this.pos.getZ() + this.world.rand.nextFloat());
+        if (!zp && yn && b4) sparkle(this.pos.getX() + this.world.rand.nextFloat(), this.pos.getY(), this.pos.getZ() + 1.0F);
+        if (!zn && yn && b3) sparkle(this.pos.getX() + this.world.rand.nextFloat(), this.pos.getY(), this.pos.getZ());
+
+        if (!yp && xp && b1) sparkle(this.pos.getX() + 1.0F, this.pos.getY() + 1.0F, this.pos.getZ() + this.world.rand.nextFloat());
+        if (!yn && xp && b2) sparkle(this.pos.getX() + 1.0F, this.pos.getY(), this.pos.getZ() + this.world.rand.nextFloat());
+        if (!zp && xp && b4) sparkle(this.pos.getX() + 1.0F, this.pos.getY() + this.world.rand.nextFloat(), this.pos.getZ() + 1.0F);
+        if (!zn && xp && b3) sparkle(this.pos.getX() + 1.0F, this.pos.getY() + this.world.rand.nextFloat(), this.pos.getZ());
+
+        if (!yp && xn && b1) sparkle(this.pos.getX(), this.pos.getY() + 1.0F, this.pos.getZ() + this.world.rand.nextFloat());
+        if (!yn && xn && b2) sparkle(this.pos.getX(), this.pos.getY(), this.pos.getZ() + this.world.rand.nextFloat());
+        if (!zp && xn && b4) sparkle(this.pos.getX(), this.pos.getY() + this.world.rand.nextFloat(), this.pos.getZ() + 1.0F);
+        if (!zn && xn && b3) sparkle(this.pos.getX(), this.pos.getY() + this.world.rand.nextFloat(), this.pos.getZ());
+
+        if (!xp && zp && b6) sparkle(this.pos.getX() + 1.0F, this.pos.getY() + this.world.rand.nextFloat(), this.pos.getZ() + 1.0F);
+        if (!xn && zp && b5) sparkle(this.pos.getX(), this.pos.getY() + this.world.rand.nextFloat(), this.pos.getZ() + 1.0F);
+        if (!yp && zp && b1) sparkle(this.pos.getX() + this.world.rand.nextFloat(), this.pos.getY() + 1.0F, this.pos.getZ() + 1.0F);
+        if (!yn && zp && b2) sparkle(this.pos.getX() + this.world.rand.nextFloat(), this.pos.getY(), this.pos.getZ() + 1.0F);
+
+        if (!xp && zn && b6) sparkle(this.pos.getX() + 1.0F, this.pos.getY() + this.world.rand.nextFloat(), this.pos.getZ());
+        if (!xn && zn && b5) sparkle(this.pos.getX(), this.pos.getY() + this.world.rand.nextFloat(), this.pos.getZ());
+        if (!yp && zn && b1) sparkle(this.pos.getX() + this.world.rand.nextFloat(), this.pos.getY() + 1.0F, this.pos.getZ());
+        if (!yn && zn && b2) sparkle(this.pos.getX() + this.world.rand.nextFloat(), this.pos.getY(), this.pos.getZ());
+    }
+
+    private void sparkle(float x, float y, float z) {
+        Thaumcraft.proxy.sparkle(x, y, z, 2);
     }
 
     private void createOpeningPlane() {
