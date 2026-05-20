@@ -51,12 +51,11 @@ public class WardedHoleRendererFidelityStaticGuardTest {
                         && helper.contains("GlStateManager.matrixMode(5890)"));
 
         assertTrue("TileEldritchObeliskRenderer should keep layered side fields with camera-parallax contracts",
-                obelisk.contains("textures/misc/tunnel.png")
-                        && obelisk.contains("textures/misc/particlefield.png")
-                        && obelisk.contains("textures/misc/particlefield32.png")
-                        && obelisk.contains("for (int i = 0; i < 16; i++)")
-                        && obelisk.contains("ActiveRenderInfo")
-                        && obelisk.contains("parallaxOffsets(")
+                obelisk.contains("LayeredFieldPlaneHelper.renderLayeredFaceRect(")
+                        && obelisk.contains("-0.5F,")
+                        && obelisk.contains("0.5F,")
+                        && obelisk.contains("0.0F,")
+                        && obelisk.contains("3.0F")
                         && obelisk.contains("for (EnumFacing facing : EnumFacing.HORIZONTALS)"));
     }
 

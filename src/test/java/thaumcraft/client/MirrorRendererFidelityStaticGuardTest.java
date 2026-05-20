@@ -14,11 +14,10 @@ public class MirrorRendererFidelityStaticGuardTest {
     @Test
     public void tileMirrorRendererKeepsLayeredPortalPaneAndFrameContracts() throws IOException {
         String source = read("src/main/java/thaumcraft/client/renderers/tile/TileMirrorRenderer.java");
+        String helper = read("src/main/java/thaumcraft/client/renderers/tile/LayeredFieldPlaneHelper.java");
 
         assertTrue("TileMirrorRenderer should keep mirror portal textures and pane overlays",
-                source.contains("textures/misc/tunnel.png")
-                        && source.contains("textures/misc/particlefield.png")
-                        && source.contains("textures/blocks/mirrorpane.png")
+                source.contains("textures/blocks/mirrorpane.png")
                         && source.contains("textures/blocks/mirrorpanetrans.png"));
 
         assertTrue("TileMirrorRenderer should keep linked-vs-unlinked pane flow",
@@ -33,12 +32,17 @@ public class MirrorRendererFidelityStaticGuardTest {
                         && source.contains("blocks/mirrorframe2")
                         && source.contains("transformFromOrientation("));
 
-        assertTrue("TileMirrorRenderer should keep camera-relative parallax sampling for portal layers",
-                source.contains("parallaxOffsets(")
-                        && source.contains("FIELD_COLOR_SEED = 31100L")
-                        && source.contains("faceParallaxSign(facing)")
-                        && source.contains("ActiveRenderInfo.getRotationX()")
+        assertTrue("TileMirrorRenderer should route linked portal fields through the shared layered-field helper with inset bounds",
+                source.contains("LayeredFieldPlaneHelper.renderLayeredFaceRect(")
+                        && source.contains("INSET, 1.0F - INSET, INSET, 1.0F - INSET")
                         && source.contains("view.lastTickPosX + (view.posX - view.lastTickPosX) * partialTicks"));
+
+        assertTrue("LayeredFieldPlaneHelper should keep the tunnel/particle texgen and matrix flow used by mirror portals",
+                helper.contains("textures/misc/tunnel.png")
+                        && helper.contains("textures/misc/particlefield.png")
+                        && helper.contains("FIELD_COLOR_SEED = 31100L")
+                        && helper.contains("GL11.glTexGeni")
+                        && helper.contains("GlStateManager.matrixMode(5890)"));
     }
 
     private static String read(String path) throws IOException {

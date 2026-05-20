@@ -36,11 +36,30 @@ final class LayeredFieldPlaneHelper {
             double cameraX,
             double cameraY,
             double cameraZ) {
+        renderLayeredFaceRect(face, x, y, z, offset, inRange, fallbackShade, cameraX, cameraY, cameraZ,
+                0.0F, 1.0F, 0.0F, 1.0F);
+    }
+
+    static void renderLayeredFaceRect(
+            EnumFacing face,
+            double x,
+            double y,
+            double z,
+            float offset,
+            boolean inRange,
+            float fallbackShade,
+            double cameraX,
+            double cameraY,
+            double cameraZ,
+            float minA,
+            float maxA,
+            float minB,
+            float maxB) {
         if (!inRange) {
             Minecraft.getMinecraft().renderEngine.bindTexture(FIELD_TEXTURE_FALLBACK);
             GlStateManager.enableBlend();
             GlStateManager.blendFunc(770, 771);
-            drawFallbackFace(face, x, y, z, offset, fallbackShade);
+            drawFallbackFace(face, x, y, z, offset, minA, maxA, minB, maxB, fallbackShade);
             GlStateManager.disableBlend();
             return;
         }
@@ -77,7 +96,7 @@ final class LayeredFieldPlaneHelper {
                 g = 1.0F;
                 b = 1.0F;
             }
-            drawGeneratedFace(face, x, y, z, offset, r * shade, g * shade, b * shade);
+            drawGeneratedFace(face, x, y, z, offset, minA, maxA, minB, maxB, r * shade, g * shade, b * shade);
 
             GlStateManager.matrixMode(5890);
             GlStateManager.popMatrix();
@@ -253,19 +272,24 @@ final class LayeredFieldPlaneHelper {
         return buffer;
     }
 
-    private static void drawGeneratedFace(EnumFacing face, double x, double y, double z, float offset, float r, float g, float b) {
+    private static void drawGeneratedFace(
+            EnumFacing face, double x, double y, double z, float offset,
+            float minA, float maxA, float minB, float maxB,
+            float r, float g, float b) {
         Tessellator tess = Tessellator.getInstance();
         BufferBuilder buf = tess.getBuffer();
         buf.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_COLOR);
-        addFaceVertices(buf, face, x, y, z, offset, r, g, b, 1.0F, false);
+        addFaceVertices(buf, face, x, y, z, offset, minA, maxA, minB, maxB, r, g, b, 1.0F, false);
         tess.draw();
     }
 
-    private static void drawFallbackFace(EnumFacing face, double x, double y, double z, float offset, float shade) {
+    private static void drawFallbackFace(
+            EnumFacing face, double x, double y, double z, float offset,
+            float minA, float maxA, float minB, float maxB, float shade) {
         Tessellator tess = Tessellator.getInstance();
         BufferBuilder buf = tess.getBuffer();
         buf.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX_COLOR);
-        addFaceVertices(buf, face, x, y, z, offset, shade, shade, shade, 1.0F, true);
+        addFaceVertices(buf, face, x, y, z, offset, minA, maxA, minB, maxB, shade, shade, shade, 1.0F, true);
         tess.draw();
     }
 
@@ -276,6 +300,10 @@ final class LayeredFieldPlaneHelper {
             double y,
             double z,
             float offset,
+            float minA,
+            float maxA,
+            float minB,
+            float maxB,
             float r,
             float g,
             float b,
@@ -283,40 +311,40 @@ final class LayeredFieldPlaneHelper {
             boolean textured) {
         switch (face) {
             case UP:
-                vertex(buf, x, y + offset, z + 1.0D, 1.0F, 1.0F, r, g, b, a, textured);
-                vertex(buf, x, y + offset, z, 1.0F, 0.0F, r, g, b, a, textured);
-                vertex(buf, x + 1.0D, y + offset, z, 0.0F, 0.0F, r, g, b, a, textured);
-                vertex(buf, x + 1.0D, y + offset, z + 1.0D, 0.0F, 1.0F, r, g, b, a, textured);
+                vertex(buf, x + minA, y + offset, z + maxB, 1.0F, 1.0F, r, g, b, a, textured);
+                vertex(buf, x + minA, y + offset, z + minB, 1.0F, 0.0F, r, g, b, a, textured);
+                vertex(buf, x + maxA, y + offset, z + minB, 0.0F, 0.0F, r, g, b, a, textured);
+                vertex(buf, x + maxA, y + offset, z + maxB, 0.0F, 1.0F, r, g, b, a, textured);
                 break;
             case DOWN:
-                vertex(buf, x, y + offset, z, 1.0F, 1.0F, r, g, b, a, textured);
-                vertex(buf, x, y + offset, z + 1.0D, 1.0F, 0.0F, r, g, b, a, textured);
-                vertex(buf, x + 1.0D, y + offset, z + 1.0D, 0.0F, 0.0F, r, g, b, a, textured);
-                vertex(buf, x + 1.0D, y + offset, z, 0.0F, 1.0F, r, g, b, a, textured);
+                vertex(buf, x + minA, y + offset, z + minB, 1.0F, 1.0F, r, g, b, a, textured);
+                vertex(buf, x + minA, y + offset, z + maxB, 1.0F, 0.0F, r, g, b, a, textured);
+                vertex(buf, x + maxA, y + offset, z + maxB, 0.0F, 0.0F, r, g, b, a, textured);
+                vertex(buf, x + maxA, y + offset, z + minB, 0.0F, 1.0F, r, g, b, a, textured);
                 break;
             case NORTH:
-                vertex(buf, x, y + 1.0D, z + offset, 1.0F, 1.0F, r, g, b, a, textured);
-                vertex(buf, x, y, z + offset, 1.0F, 0.0F, r, g, b, a, textured);
-                vertex(buf, x + 1.0D, y, z + offset, 0.0F, 0.0F, r, g, b, a, textured);
-                vertex(buf, x + 1.0D, y + 1.0D, z + offset, 0.0F, 1.0F, r, g, b, a, textured);
+                vertex(buf, x + minA, y + maxB, z + offset, 1.0F, 1.0F, r, g, b, a, textured);
+                vertex(buf, x + minA, y + minB, z + offset, 1.0F, 0.0F, r, g, b, a, textured);
+                vertex(buf, x + maxA, y + minB, z + offset, 0.0F, 0.0F, r, g, b, a, textured);
+                vertex(buf, x + maxA, y + maxB, z + offset, 0.0F, 1.0F, r, g, b, a, textured);
                 break;
             case SOUTH:
-                vertex(buf, x, y, z + offset, 1.0F, 1.0F, r, g, b, a, textured);
-                vertex(buf, x, y + 1.0D, z + offset, 1.0F, 0.0F, r, g, b, a, textured);
-                vertex(buf, x + 1.0D, y + 1.0D, z + offset, 0.0F, 0.0F, r, g, b, a, textured);
-                vertex(buf, x + 1.0D, y, z + offset, 0.0F, 1.0F, r, g, b, a, textured);
+                vertex(buf, x + minA, y + minB, z + offset, 1.0F, 1.0F, r, g, b, a, textured);
+                vertex(buf, x + minA, y + maxB, z + offset, 1.0F, 0.0F, r, g, b, a, textured);
+                vertex(buf, x + maxA, y + maxB, z + offset, 0.0F, 0.0F, r, g, b, a, textured);
+                vertex(buf, x + maxA, y + minB, z + offset, 0.0F, 1.0F, r, g, b, a, textured);
                 break;
             case WEST:
-                vertex(buf, x + offset, y + 1.0D, z, 1.0F, 1.0F, r, g, b, a, textured);
-                vertex(buf, x + offset, y + 1.0D, z + 1.0D, 1.0F, 0.0F, r, g, b, a, textured);
-                vertex(buf, x + offset, y, z + 1.0D, 0.0F, 0.0F, r, g, b, a, textured);
-                vertex(buf, x + offset, y, z, 0.0F, 1.0F, r, g, b, a, textured);
+                vertex(buf, x + offset, y + maxB, z + minA, 1.0F, 1.0F, r, g, b, a, textured);
+                vertex(buf, x + offset, y + maxB, z + maxA, 1.0F, 0.0F, r, g, b, a, textured);
+                vertex(buf, x + offset, y + minB, z + maxA, 0.0F, 0.0F, r, g, b, a, textured);
+                vertex(buf, x + offset, y + minB, z + minA, 0.0F, 1.0F, r, g, b, a, textured);
                 break;
             case EAST:
-                vertex(buf, x + offset, y, z, 1.0F, 1.0F, r, g, b, a, textured);
-                vertex(buf, x + offset, y, z + 1.0D, 1.0F, 0.0F, r, g, b, a, textured);
-                vertex(buf, x + offset, y + 1.0D, z + 1.0D, 0.0F, 0.0F, r, g, b, a, textured);
-                vertex(buf, x + offset, y + 1.0D, z, 0.0F, 1.0F, r, g, b, a, textured);
+                vertex(buf, x + offset, y + minB, z + minA, 1.0F, 1.0F, r, g, b, a, textured);
+                vertex(buf, x + offset, y + minB, z + maxA, 1.0F, 0.0F, r, g, b, a, textured);
+                vertex(buf, x + offset, y + maxB, z + maxA, 0.0F, 0.0F, r, g, b, a, textured);
+                vertex(buf, x + offset, y + maxB, z + minA, 0.0F, 1.0F, r, g, b, a, textured);
                 break;
             default:
                 break;
