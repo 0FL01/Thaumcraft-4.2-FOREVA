@@ -5,7 +5,9 @@ import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.MathHelper;
 import thaumcraft.api.aspects.Aspect;
+import thaumcraft.client.renderers.models.ModelBrain;
 import thaumcraft.client.renderers.models.ModelJar;
 import thaumcraft.common.tiles.TileJar;
 import thaumcraft.common.tiles.TileJarBrain;
@@ -24,6 +26,7 @@ public class TileJarRenderer extends TileEntitySpecialRenderer<TileJar> {
             new ResourceLocation("thaumcraft", "textures/models/jarbrine.png");
     private static final float MODEL_SCALE = 0.0625F;
     private final ModelJar model = new ModelJar();
+    private final ModelBrain brain = new ModelBrain();
 
     @Override
     public void render(TileJar tile, double x, double y, double z, float partialTicks, int destroyStage, float alpha) {
@@ -132,20 +135,23 @@ public class TileJarRenderer extends TileEntitySpecialRenderer<TileJar> {
 
     private void renderBrain(TileJarBrain tile, double x, double y, double z, float partialTicks) {
         float ticks = TileRenderHelper.ticks(tile, partialTicks);
-        float bob = (float) Math.sin(ticks / 14.0F) * 0.03F + 0.03F;
-        float scale = 0.4F;
+        float bob = MathHelper.sin(ticks / 14.0F) * 0.03F + 0.03F;
+        float delta = tile.rota - tile.rotb;
+        while (delta >= (float) Math.PI) {
+            delta -= (float) (Math.PI * 2.0D);
+        }
+        while (delta < (float) -Math.PI) {
+            delta += (float) (Math.PI * 2.0D);
+        }
+        float rot = tile.rotb + delta * partialTicks;
 
         GlStateManager.pushMatrix();
-        GlStateManager.translate(x + 0.5D, y + 0.21D + bob, z + 0.5D);
-        float rot = tile.rotb + (tile.rota - tile.rotb) * partialTicks;
-        GlStateManager.rotate((float) Math.toDegrees(rot) - 90.0F, 0.0F, 1.0F, 0.0F);
-        GlStateManager.disableLighting();
-        GlStateManager.enableBlend();
-        GlStateManager.blendFunc(770, 771);
+        GlStateManager.translate(x + 0.5D, y - 0.79D + bob, z + 0.5D);
+        GlStateManager.rotate(rot * 180.0F / (float) Math.PI, 0.0F, 1.0F, 0.0F);
+        GlStateManager.rotate(-90.0F, 0.0F, 1.0F, 0.0F);
         bindTexture(BRAIN_TEXTURE);
-        TileRenderHelper.drawTexturedQuad(scale, 0xFFFFFFFF, 0.0F, 1.0F, 0.0F, 1.0F);
-        GlStateManager.disableBlend();
-        GlStateManager.enableLighting();
+        GlStateManager.scale(0.4F, 0.4F, 0.4F);
+        brain.render(MODEL_SCALE);
         GlStateManager.popMatrix();
 
         GlStateManager.pushMatrix();

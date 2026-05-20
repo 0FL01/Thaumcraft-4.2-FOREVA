@@ -16,6 +16,7 @@ public class JarVisualShellContractTest {
         String blockJar = read("src/main/java/thaumcraft/common/blocks/BlockJar.java");
         String jarRenderer = read("src/main/java/thaumcraft/client/renderers/tile/TileJarRenderer.java");
         String itemRenderer = read("src/main/java/thaumcraft/client/renderers/item/ItemJarRenderer.java");
+        String brainModel = read("src/main/java/thaumcraft/client/renderers/models/ModelBrain.java");
         String blockstate = read("src/main/resources/assets/thaumcraft/blockstates/blockjar.json");
         String normalModel = read("src/main/resources/assets/thaumcraft/models/block/blockjar_0.json");
         String voidModel = read("src/main/resources/assets/thaumcraft/models/block/blockjar_1.json");
@@ -26,13 +27,23 @@ public class JarVisualShellContractTest {
         assertTrue("TileJarRenderer should keep node, liquid, label, brain, and brine overlays while rendering the shell only for TEISR items or node-jar animation pulses",
                 jarRenderer.contains("TileNodeRenderer.renderNodeAt((TileJarNode) tile")
                         && jarRenderer.contains("renderBrain((TileJarBrain) tile, x, y, z, partialTicks);")
+                        && jarRenderer.contains("private final ModelBrain brain = new ModelBrain();")
                         && jarRenderer.contains("renderFillable((TileJarFillable) tile, x, y, z);")
                         && jarRenderer.contains("boolean renderShell = tile.getWorld() == null;")
                         && jarRenderer.contains("float shellScale = 1.0F;")
                         && jarRenderer.contains("if (renderShell) {")
                         && jarRenderer.contains("renderJarShell(tile, x, y, z, shellScale);")
                         && jarRenderer.contains("bindTexture(BRINE_TEXTURE);")
+                        && jarRenderer.contains("float delta = tile.rota - tile.rotb;")
+                        && jarRenderer.contains("brain.render(MODEL_SCALE);")
                         && !jarRenderer.contains("renderJarShell(tile, x, y, z);"));
+
+        assertTrue("ModelBrain should exist so the brain jar uses model-driven geometry instead of a textured quad fallback",
+                brainModel.contains("class ModelBrain extends ModelBase")
+                        && brainModel.contains("shape1.addBox(0.0F, 0.0F, 0.0F, 12, 10, 16);")
+                        && brainModel.contains("shape2.addBox(0.0F, 0.0F, 0.0F, 8, 3, 7);")
+                        && brainModel.contains("shape3.addBox(0.0F, 0.0F, 0.0F, 2, 6, 2);")
+                        && brainModel.contains("shape3.setRotationPoint(-1.0F, 18.0F, -2.0F);"));
 
         assertTrue("ItemJarRenderer should keep delegating to TileJarRenderer so filled jars, node jars, and brain jars retain dynamic item visuals",
                 itemRenderer.contains("private final TileJarRenderer renderer = new TileJarRenderer();")
