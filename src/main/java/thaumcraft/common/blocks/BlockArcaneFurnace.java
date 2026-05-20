@@ -9,9 +9,13 @@ import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.monster.EntityBlaze;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.item.EntityItem;
+import net.minecraft.init.Blocks;
+import net.minecraft.init.MobEffects;
 import net.minecraft.item.ItemStack;
+import net.minecraft.potion.PotionEffect;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumBlockRenderType;
 import net.minecraft.util.EnumFacing;
@@ -103,6 +107,14 @@ public class BlockArcaneFurnace extends BlockContainer {
     }
 
     @Override
+    public void getDrops(NonNullList<ItemStack> drops, IBlockAccess world, BlockPos pos, IBlockState state, int fortune) {
+        IBlockState restoredState = this.getRestoredState(this.getMetaFromState(state));
+        if (restoredState.getBlock() != Blocks.AIR) {
+            drops.add(new ItemStack(restoredState.getBlock(), 1, restoredState.getBlock().damageDropped(restoredState)));
+        }
+    }
+
+    @Override
     public int getLightValue(IBlockState state, IBlockAccess world, BlockPos pos) {
         int meta = this.getMetaFromState(state);
         if (meta == 0 || meta == 10) {
@@ -173,6 +185,38 @@ public class BlockArcaneFurnace extends BlockContainer {
     }
 
     @Override
+    public void onBlockHarvested(World worldIn, BlockPos pos, IBlockState state, net.minecraft.entity.player.EntityPlayer player) {
+        if (this.getMetaFromState(state) == 0 && !worldIn.isRemote) {
+            TileEntity tile = worldIn.getTileEntity(pos);
+            if (tile instanceof TileArcaneFurnace) {
+                EntityBlaze blaze = new EntityBlaze(worldIn);
+                blaze.setPositionAndRotation(pos.getX() + 0.5D, pos.getY() + 1.0D, pos.getZ() + 0.5D, 0.0F, 0.0F);
+                blaze.addPotionEffect(new PotionEffect(MobEffects.RESISTANCE, 6000, 2, false, true));
+                blaze.addPotionEffect(new PotionEffect(MobEffects.FIRE_RESISTANCE, 12000, 0, false, true));
+                worldIn.spawnEntity(blaze);
+            }
+        }
+        super.onBlockHarvested(worldIn, pos, state, player);
+    }
+
+    @Override
+    public void breakBlock(World worldIn, BlockPos pos, IBlockState state) {
+        if (!worldIn.isRemote && this.getMetaFromState(state) == 0) {
+            this.restoreBlocks(worldIn, pos);
+        }
+        super.breakBlock(worldIn, pos, state);
+    }
+
+    @Override
+    public void neighborChanged(IBlockState state, World worldIn, BlockPos pos, net.minecraft.block.Block blockIn, BlockPos fromPos) {
+        if (!worldIn.isRemote && this.getMetaFromState(state) == 0 && this.isArcaneFurnaceBroken(worldIn, pos)) {
+            this.restoreBlocks(worldIn, pos);
+            return;
+        }
+        super.neighborChanged(state, worldIn, pos, blockIn, fromPos);
+    }
+
+    @Override
     protected BlockStateContainer createBlockState() {
         return new BlockStateContainer(this, TYPE, FACING);
     }
@@ -222,5 +266,51 @@ public class BlockArcaneFurnace extends BlockContainer {
             default:
                 return NOZZLE_SOUTH_AABB;
         }
+    }
+
+    private void restoreBlocks(World worldIn, BlockPos pos) {
+        for (int yy = -1; yy <= 1; ++yy) {
+            for (int xx = -1; xx <= 1; ++xx) {
+                for (int zz = -1; zz <= 1; ++zz) {
+                    BlockPos target = pos.add(xx, yy, zz);
+                    IBlockState targetState = worldIn.getBlockState(target);
+                    if (targetState.getBlock() != this) {
+                        continue;
+                    }
+                    worldIn.setBlockState(target, this.getRestoredState(this.getMetaFromState(targetState)), 3);
+                    worldIn.notifyBlockUpdate(target, targetState, worldIn.getBlockState(target), 3);
+                    worldIn.notifyNeighborsOfStateChange(target, worldIn.getBlockState(target).getBlock(), false);
+                }
+            }
+        }
+    }
+
+    private boolean isArcaneFurnaceBroken(World worldIn, BlockPos pos) {
+        for (int yy = -1; yy <= 1; ++yy) {
+            for (int xx = -1; xx <= 1; ++xx) {
+                for (int zz = -1; zz <= 1; ++zz) {
+                    if ((yy == 0 && xx == 0 && zz == 0) || (yy == 1 && xx == 0 && zz == 0)) {
+                        continue;
+                    }
+                    if (worldIn.getBlockState(pos.add(xx, yy, zz)).getBlock() != this) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    private IBlockState getRestoredState(int meta) {
+        if (meta == 0) {
+            return Blocks.AIR.getDefaultState();
+        }
+        if (meta == 10) {
+            return Blocks.NETHER_BRICK_FENCE.getDefaultState();
+        }
+        if (meta % 2 == 0 || meta == 5) {
+            return Blocks.OBSIDIAN.getDefaultState();
+        }
+        return Blocks.NETHERRACK.getDefaultState();
     }
 }

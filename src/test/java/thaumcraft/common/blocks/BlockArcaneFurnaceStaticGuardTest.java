@@ -43,6 +43,30 @@ public class BlockArcaneFurnaceStaticGuardTest {
     }
 
     @Test
+    public void blockArcaneFurnaceShouldKeepRestoreDropAndBlazeContracts() throws IOException {
+        String source = readFile("src/main/java/thaumcraft/common/blocks/BlockArcaneFurnace.java");
+
+        assertTrue(source.contains("public void getDrops(NonNullList<ItemStack> drops, IBlockAccess world, BlockPos pos, IBlockState state, int fortune)"));
+        assertTrue(source.contains("IBlockState restoredState = this.getRestoredState(this.getMetaFromState(state));"));
+        assertTrue(source.contains("if (restoredState.getBlock() != Blocks.AIR) {"));
+        assertTrue(source.contains("restoredState.getBlock().damageDropped(restoredState)"));
+        assertTrue(source.contains("public void onBlockHarvested(World worldIn, BlockPos pos, IBlockState state, net.minecraft.entity.player.EntityPlayer player)"));
+        assertTrue(source.contains("new EntityBlaze(worldIn);"));
+        assertTrue(source.contains("new PotionEffect(MobEffects.RESISTANCE, 6000, 2, false, true)"));
+        assertTrue(source.contains("new PotionEffect(MobEffects.FIRE_RESISTANCE, 12000, 0, false, true)"));
+        assertTrue(source.contains("public void breakBlock(World worldIn, BlockPos pos, IBlockState state)"));
+        assertTrue(source.contains("if (!worldIn.isRemote && this.getMetaFromState(state) == 0) {"));
+        assertTrue(source.contains("public void neighborChanged(IBlockState state, World worldIn, BlockPos pos, net.minecraft.block.Block blockIn, BlockPos fromPos)"));
+        assertTrue(source.contains("this.isArcaneFurnaceBroken(worldIn, pos)"));
+        assertTrue(source.contains("private void restoreBlocks(World worldIn, BlockPos pos)"));
+        assertTrue(source.contains("if ((yy == 0 && xx == 0 && zz == 0) || (yy == 1 && xx == 0 && zz == 0)) {"));
+        assertTrue(source.contains("Blocks.AIR.getDefaultState()"));
+        assertTrue(source.contains("Blocks.NETHER_BRICK_FENCE.getDefaultState()"));
+        assertTrue(source.contains("Blocks.OBSIDIAN.getDefaultState()"));
+        assertTrue(source.contains("Blocks.NETHERRACK.getDefaultState()"));
+    }
+
+    @Test
     public void configBlocksShouldRegisterBlockArcaneFurnaceAndItem() throws IOException {
         String source = readFile("src/main/java/thaumcraft/common/config/ConfigBlocks.java");
 
