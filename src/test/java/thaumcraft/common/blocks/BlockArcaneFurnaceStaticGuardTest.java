@@ -16,14 +16,26 @@ public class BlockArcaneFurnaceStaticGuardTest {
         String source = readFile("src/main/java/thaumcraft/common/blocks/BlockArcaneFurnace.java");
 
         assertTrue(source.contains("public static final PropertyInteger TYPE = PropertyInteger.create(\"type\", 0, 10);"));
+        assertTrue(source.contains("public static final PropertyDirection FACING = PropertyDirection.create(\"facing\", EnumFacing.Plane.HORIZONTAL);"));
         assertTrue(source.contains("return meta == 0 || meta == 2 || meta == 4 || meta == 5 || meta == 6 || meta == 8;"));
         assertTrue(source.contains("if (meta == 0) {"));
         assertTrue(source.contains("return new TileArcaneFurnace();"));
         assertTrue(source.contains("return new TileArcaneFurnaceNozzle();"));
+        assertTrue(source.contains("if (this.getMetaFromState(state) != 10) {"));
+        assertTrue(source.contains("return state.withProperty(FACING, EnumFacing.NORTH);"));
+        assertTrue(source.contains("return state.withProperty(FACING, this.getNozzleFacing(worldIn, pos));"));
         assertTrue(source.contains("if (meta == 0 || meta == 10) {"));
         assertTrue(source.contains("return 13;"));
-        assertTrue(source.contains("if (meta == 0) {"));
-        assertTrue(source.contains("pos.getY() + 0.25D"));
+        assertTrue(source.contains("return CORE_AABB;"));
+        assertTrue(source.contains("if (meta == 10) {"));
+        assertTrue(source.contains("return this.getNozzleBounds(this.getNozzleFacing(worldIn, pos));"));
+        assertTrue(source.contains("return this.getBoundingBox(state, worldIn, pos).offset(pos);"));
+        assertTrue(source.contains("return new BlockStateContainer(this, TYPE, FACING);"));
+        assertTrue(source.contains("withProperty(FACING, EnumFacing.NORTH);"));
+        assertTrue(source.contains("this.getMetaFromState(world.getBlockState(pos.west())) == 0"));
+        assertTrue(source.contains("this.getMetaFromState(world.getBlockState(pos.east())) == 0"));
+        assertTrue(source.contains("this.getMetaFromState(world.getBlockState(pos.north())) == 0"));
+        assertTrue(source.contains("return EnumFacing.SOUTH;"));
         assertTrue(source.contains("entityIn instanceof EntityItem"));
         assertTrue(source.contains("((TileArcaneFurnace) tile).addItemsToInventory(stack.copy())"));
         assertTrue(source.contains("entityIn.attackEntityFrom(net.minecraft.util.DamageSource.HOT_FLOOR, 3.0F);"));

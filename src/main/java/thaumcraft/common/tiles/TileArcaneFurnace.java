@@ -15,6 +15,7 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraftforge.common.util.Constants;
 import thaumcraft.api.ThaumcraftApi;
 import thaumcraft.common.Thaumcraft;
+import thaumcraft.common.config.ConfigBlocks;
 import thaumcraft.api.TileThaumcraft;
 import thaumcraft.api.aspects.Aspect;
 import thaumcraft.api.visnet.VisNetHandler;
@@ -233,12 +234,15 @@ public class TileArcaneFurnace extends TileThaumcraft implements ITickable {
     private void getFacing() {
         this.facingX = 0;
         this.facingZ = 0;
-        if (this.world.getTileEntity(this.pos.west()) instanceof TileArcaneFurnaceNozzle) {
+        if (this.world.getBlockState(this.pos.west()).getBlock() == ConfigBlocks.blockArcaneFurnace
+                && ConfigBlocks.blockArcaneFurnace.getMetaFromState(this.world.getBlockState(this.pos.west())) == 10) {
             this.facingX = -1;
-        } else if (this.world.getTileEntity(this.pos.east()) instanceof TileArcaneFurnaceNozzle) {
+        } else if (this.world.getBlockState(this.pos.east()).getBlock() == ConfigBlocks.blockArcaneFurnace
+                && ConfigBlocks.blockArcaneFurnace.getMetaFromState(this.world.getBlockState(this.pos.east())) == 10) {
             this.facingX = 1;
         } else {
-            this.facingZ = this.world.getTileEntity(this.pos.north()) instanceof TileArcaneFurnaceNozzle ? -1 : 1;
+            this.facingZ = this.world.getBlockState(this.pos.north()).getBlock() == ConfigBlocks.blockArcaneFurnace
+                    && ConfigBlocks.blockArcaneFurnace.getMetaFromState(this.world.getBlockState(this.pos.north())) == 10 ? -1 : 1;
         }
     }
 

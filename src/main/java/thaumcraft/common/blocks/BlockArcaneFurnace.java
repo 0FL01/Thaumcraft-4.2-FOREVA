@@ -3,6 +3,7 @@ package thaumcraft.common.blocks;
 import net.minecraft.block.BlockContainer;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
+import net.minecraft.block.properties.PropertyDirection;
 import net.minecraft.block.properties.PropertyInteger;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
@@ -13,6 +14,7 @@ import net.minecraft.entity.item.EntityItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumBlockRenderType;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
@@ -25,6 +27,12 @@ import thaumcraft.common.tiles.TileArcaneFurnaceNozzle;
 
 public class BlockArcaneFurnace extends BlockContainer {
     public static final PropertyInteger TYPE = PropertyInteger.create("type", 0, 10);
+    public static final PropertyDirection FACING = PropertyDirection.create("facing", EnumFacing.Plane.HORIZONTAL);
+    private static final AxisAlignedBB CORE_AABB = new AxisAlignedBB(0.0D, 0.0D, 0.0D, 1.0D, 0.25D, 1.0D);
+    private static final AxisAlignedBB NOZZLE_WEST_AABB = new AxisAlignedBB(0.0D, 0.0D, 0.0D, 0.5D, 1.0D, 1.0D);
+    private static final AxisAlignedBB NOZZLE_EAST_AABB = new AxisAlignedBB(0.5D, 0.0D, 0.0D, 1.0D, 1.0D, 1.0D);
+    private static final AxisAlignedBB NOZZLE_NORTH_AABB = new AxisAlignedBB(0.0D, 0.0D, 0.0D, 1.0D, 1.0D, 0.5D);
+    private static final AxisAlignedBB NOZZLE_SOUTH_AABB = new AxisAlignedBB(0.0D, 0.0D, 0.5D, 1.0D, 1.0D, 1.0D);
 
     public BlockArcaneFurnace() {
         super(Material.ROCK);
@@ -33,7 +41,7 @@ public class BlockArcaneFurnace extends BlockContainer {
         this.setLightLevel(0.2F);
         this.setSoundType(SoundType.STONE);
         this.setCreativeTab(Thaumcraft.tabTC);
-        this.setDefaultState(this.blockState.getBaseState().withProperty(TYPE, 0));
+        this.setDefaultState(this.blockState.getBaseState().withProperty(TYPE, 0).withProperty(FACING, EnumFacing.NORTH));
         this.setHarvestLevel("pickaxe", 2);
     }
 
@@ -50,6 +58,14 @@ public class BlockArcaneFurnace extends BlockContainer {
     @Override
     public EnumBlockRenderType getRenderType(IBlockState state) {
         return EnumBlockRenderType.MODEL;
+    }
+
+    @Override
+    public IBlockState getActualState(IBlockState state, IBlockAccess worldIn, BlockPos pos) {
+        if (this.getMetaFromState(state) != 10) {
+            return state.withProperty(FACING, EnumFacing.NORTH);
+        }
+        return state.withProperty(FACING, this.getNozzleFacing(worldIn, pos));
     }
 
     @Override
@@ -96,14 +112,20 @@ public class BlockArcaneFurnace extends BlockContainer {
     }
 
     @Override
-    public AxisAlignedBB getCollisionBoundingBox(IBlockState state, IBlockAccess worldIn, BlockPos pos) {
+    public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess worldIn, BlockPos pos) {
         int meta = this.getMetaFromState(state);
         if (meta == 0) {
-            return new AxisAlignedBB(
-                    pos.getX(), pos.getY(), pos.getZ(),
-                    pos.getX() + 1.0D, pos.getY() + 0.25D, pos.getZ() + 1.0D);
+            return CORE_AABB;
         }
-        return FULL_BLOCK_AABB.offset(pos);
+        if (meta == 10) {
+            return this.getNozzleBounds(this.getNozzleFacing(worldIn, pos));
+        }
+        return FULL_BLOCK_AABB;
+    }
+
+    @Override
+    public AxisAlignedBB getCollisionBoundingBox(IBlockState state, IBlockAccess worldIn, BlockPos pos) {
+        return this.getBoundingBox(state, worldIn, pos).offset(pos);
     }
 
     @Override
@@ -152,12 +174,14 @@ public class BlockArcaneFurnace extends BlockContainer {
 
     @Override
     protected BlockStateContainer createBlockState() {
-        return new BlockStateContainer(this, TYPE);
+        return new BlockStateContainer(this, TYPE, FACING);
     }
 
     @Override
     public IBlockState getStateFromMeta(int meta) {
-        return this.getDefaultState().withProperty(TYPE, MathHelper.clamp(meta, 0, 10));
+        return this.getDefaultState()
+                .withProperty(TYPE, MathHelper.clamp(meta, 0, 10))
+                .withProperty(FACING, EnumFacing.NORTH);
     }
 
     @Override
@@ -169,6 +193,34 @@ public class BlockArcaneFurnace extends BlockContainer {
     public IBlockState getStateForPlacement(World worldIn, BlockPos pos, net.minecraft.util.EnumFacing facing,
                                             float hitX, float hitY, float hitZ, int meta,
                                             EntityLivingBase placer, net.minecraft.util.EnumHand hand) {
-        return this.getDefaultState().withProperty(TYPE, MathHelper.clamp(meta, 0, 10));
+        return this.getDefaultState()
+                .withProperty(TYPE, MathHelper.clamp(meta, 0, 10))
+                .withProperty(FACING, EnumFacing.NORTH);
+    }
+
+    private EnumFacing getNozzleFacing(IBlockAccess world, BlockPos pos) {
+        if (world.getBlockState(pos.west()).getBlock() == this && this.getMetaFromState(world.getBlockState(pos.west())) == 0) {
+            return EnumFacing.WEST;
+        }
+        if (world.getBlockState(pos.east()).getBlock() == this && this.getMetaFromState(world.getBlockState(pos.east())) == 0) {
+            return EnumFacing.EAST;
+        }
+        if (world.getBlockState(pos.north()).getBlock() == this && this.getMetaFromState(world.getBlockState(pos.north())) == 0) {
+            return EnumFacing.NORTH;
+        }
+        return EnumFacing.SOUTH;
+    }
+
+    private AxisAlignedBB getNozzleBounds(EnumFacing facing) {
+        switch (facing) {
+            case WEST:
+                return NOZZLE_WEST_AABB;
+            case EAST:
+                return NOZZLE_EAST_AABB;
+            case NORTH:
+                return NOZZLE_NORTH_AABB;
+            default:
+                return NOZZLE_SOUTH_AABB;
+        }
     }
 }

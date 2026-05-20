@@ -565,7 +565,7 @@ public class ClientProxy extends CommonProxy {
         }
         Item arcaneFurnaceItem = Item.getItemFromBlock(ConfigBlocks.blockArcaneFurnace);
         for (int meta = 0; meta <= 10; meta++) {
-            registerBlockItemModel(arcaneFurnaceItem, meta, "type=" + meta);
+            registerBlockItemModel(arcaneFurnaceItem, meta, "type=" + meta + ",facing=north");
         }
         registerBlockItemModel(Item.getItemFromBlock(ConfigBlocks.blockEssentiaReservoir), 0, "normal");
         Item candleItem = Item.getItemFromBlock(ConfigBlocks.blockCandle);

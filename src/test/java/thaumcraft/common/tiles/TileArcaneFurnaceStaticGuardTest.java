@@ -35,9 +35,12 @@ public class TileArcaneFurnaceStaticGuardTest {
     public void tileArcaneFurnaceShouldKeepNozzleFacingAndNbtContracts() throws IOException {
         String source = readFile("src/main/java/thaumcraft/common/tiles/TileArcaneFurnace.java");
 
-        assertTrue(source.contains("this.world.getTileEntity(this.pos.west()) instanceof TileArcaneFurnaceNozzle"));
-        assertTrue(source.contains("this.world.getTileEntity(this.pos.east()) instanceof TileArcaneFurnaceNozzle"));
-        assertTrue(source.contains("this.facingZ = this.world.getTileEntity(this.pos.north()) instanceof TileArcaneFurnaceNozzle ? -1 : 1;"));
+        assertTrue(source.contains("this.world.getBlockState(this.pos.west()).getBlock() == ConfigBlocks.blockArcaneFurnace"));
+        assertTrue(source.contains("ConfigBlocks.blockArcaneFurnace.getMetaFromState(this.world.getBlockState(this.pos.west())) == 10"));
+        assertTrue(source.contains("this.world.getBlockState(this.pos.east()).getBlock() == ConfigBlocks.blockArcaneFurnace"));
+        assertTrue(source.contains("ConfigBlocks.blockArcaneFurnace.getMetaFromState(this.world.getBlockState(this.pos.east())) == 10"));
+        assertTrue(source.contains("this.world.getBlockState(this.pos.north()).getBlock() == ConfigBlocks.blockArcaneFurnace"));
+        assertTrue(source.contains("ConfigBlocks.blockArcaneFurnace.getMetaFromState(this.world.getBlockState(this.pos.north())) == 10 ? -1 : 1;"));
         assertTrue(source.contains("NBTTagList list = nbt.getTagList(\"Items\", Constants.NBT.TAG_COMPOUND);"));
         assertTrue(source.contains("nbt.setShort(\"CookTime\", (short) this.furnaceCookTime);"));
         assertTrue(source.contains("nbt.setShort(\"SpeedyTime\", (short) this.speedyTime);"));
