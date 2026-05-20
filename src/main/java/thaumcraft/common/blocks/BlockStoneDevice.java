@@ -12,6 +12,7 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.SoundEvents;
+import net.minecraft.inventory.Container;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
@@ -28,6 +29,7 @@ import net.minecraft.world.World;
 import thaumcraft.common.Thaumcraft;
 import thaumcraft.common.CommonProxy;
 import thaumcraft.common.items.wands.ItemWandCasting;
+import thaumcraft.common.lib.utils.InventoryUtils;
 import thaumcraft.common.tiles.*;
 
 import javax.annotation.Nullable;
@@ -64,7 +66,9 @@ extends BlockContainer {
 
     @Override
     public boolean hasTileEntity(IBlockState state) {
-        return true;
+        int meta = getMetaFromState(state);
+        return meta == 0 || meta == 1 || meta == 2 || meta == 3 || meta == 5
+                || meta == 9 || meta == 10 || meta == 11 || meta == 12 || meta == 13 || meta == 14;
     }
 
     @Override
@@ -79,7 +83,7 @@ extends BlockContainer {
         if (meta == 12) return new TileSpa();
         if (meta == 13) return new TileFocalManipulator();
         if (meta == 14) return new TileFluxScrubber();
-        return new TilePedestal();
+        return null;
     }
 
     @Override
@@ -92,8 +96,8 @@ extends BlockContainer {
         list.add(new ItemStack(this, 1, 0)); // alchemy furnace
         list.add(new ItemStack(this, 1, 1)); // pedestal
         list.add(new ItemStack(this, 1, 2)); // infusion matrix
-        list.add(new ItemStack(this, 1, 3)); // infusion pillar
         list.add(new ItemStack(this, 1, 5)); // wand pedestal
+        list.add(new ItemStack(this, 1, 8)); // wand pedestal focus
         list.add(new ItemStack(this, 1, 9)); // node stabilizer
         list.add(new ItemStack(this, 1, 10)); // advanced node stabilizer
         list.add(new ItemStack(this, 1, 11)); // node converter
@@ -104,7 +108,10 @@ extends BlockContainer {
 
     @Override
     public int damageDropped(IBlockState state) {
-        return this.getMetaFromState(state);
+        int meta = getMetaFromState(state);
+        if (meta == 3) return 7;
+        if (meta == 4) return 6;
+        return meta;
     }
 
     @Override
@@ -119,6 +126,9 @@ extends BlockContainer {
                 }
             }
         }
+        if (te instanceof TileInfusionMatrix && ((TileInfusionMatrix) te).crafting) {
+            worldIn.createExplosion(null, pos.getX() + 0.5D, pos.getY() + 0.5D, pos.getZ() + 0.5D, 2.0F, true);
+        }
         super.breakBlock(worldIn, pos, state);
     }
 
@@ -129,6 +139,32 @@ extends BlockContainer {
             ((TileAlchemyFurnace) te).getBellows();
         } else if (te instanceof TileNodeConverter) {
             ((TileNodeConverter) te).checkStatus();
+        }
+        int type = state.getValue(TYPE);
+        if (type == 1) {
+            if (!worldIn.isAirBlock(pos.up())) {
+                InventoryUtils.dropItems(worldIn, pos.getX(), pos.getY(), pos.getZ());
+            }
+        } else if (type == 5) {
+            IBlockState above = worldIn.getBlockState(pos.up());
+            if (!worldIn.isAirBlock(pos.up())
+                    && (above.getBlock() != this || above.getValue(TYPE) != 8)) {
+                InventoryUtils.dropItems(worldIn, pos.getX(), pos.getY(), pos.getZ());
+            }
+        } else if (type == 3) {
+            IBlockState above = worldIn.getBlockState(pos.up());
+            if (above.getBlock() != this || above.getValue(TYPE) != 4) {
+                this.dropBlockAsItem(worldIn, pos, state, 0);
+                worldIn.setBlockToAir(pos);
+                return;
+            }
+        } else if (type == 4) {
+            IBlockState below = worldIn.getBlockState(pos.down());
+            if (below.getBlock() != this || below.getValue(TYPE) != 3) {
+                this.dropBlockAsItem(worldIn, pos, state, 0);
+                worldIn.setBlockToAir(pos);
+                return;
+            }
         }
         super.neighborChanged(state, worldIn, pos, blockIn, fromPos);
     }
@@ -208,6 +244,43 @@ extends BlockContainer {
     @Override
     public AxisAlignedBB getCollisionBoundingBox(IBlockState blockState, IBlockAccess worldIn, BlockPos pos) {
         return FULL_BLOCK_AABB;
+    }
+
+    @Override
+    public boolean hasComparatorInputOverride(IBlockState state) {
+        return true;
+    }
+
+    @Override
+    public int getComparatorInputOverride(IBlockState state, World worldIn, BlockPos pos) {
+        TileEntity te = worldIn.getTileEntity(pos);
+        if (te instanceof TilePedestal || te instanceof TileAlchemyFurnace) {
+            return Container.calcRedstoneFromInventory((IInventory) te);
+        }
+        if (te instanceof TileWandPedestal) {
+            TileWandPedestal pedestal = (TileWandPedestal) te;
+            ItemStack stack = pedestal.getStackInSlot(0);
+            if (!stack.isEmpty() && stack.getItem() instanceof ItemWandCasting) {
+                ItemWandCasting wand = (ItemWandCasting) stack.getItem();
+                float fill = (float) wand.getAllVis(stack).visSize() / (float) ItemWandCasting.getMaxVis(stack) * 6.0F;
+                return MathHelper.floor(fill * 14.0F) + 1;
+            }
+        }
+        return 0;
+    }
+
+    @Override
+    public int getLightValue(IBlockState state, IBlockAccess world, BlockPos pos) {
+        int meta = state.getValue(TYPE);
+        if (meta == 0) {
+            TileEntity te = world.getTileEntity(pos);
+            if (te instanceof TileAlchemyFurnace && ((TileAlchemyFurnace) te).isBurning()) {
+                return 12;
+            }
+        } else if (meta == 2) {
+            return 10;
+        }
+        return super.getLightValue(state, world, pos);
     }
 
     @Override
