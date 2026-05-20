@@ -139,6 +139,62 @@ public class ResearchTableAuthorityRuntimeTest {
         assertEquals(0, table.bonusAspects.getAmount(Aspect.ORDER));
     }
 
+    @Test
+    public void placePacketDispatchRequiresMatchingPlayerDimensionAndTableRoute() throws Exception {
+        ResearchWorld world = new ResearchWorld();
+        TileResearchTable table = new TestResearchTable();
+        world.attachTable(table, BlockPos.ORIGIN);
+        TestPlayer player = new TestPlayer(world, "stage9e_place_dispatch");
+        player.setPosition(0.5D, 0.5D, 0.5D);
+        player.openContainer = new ContainerResearchTable(player.inventory, table);
+        player.knowledge().addDiscoveredAspect(Aspect.FIRE.getTag());
+        player.knowledge().setAspectPool(Aspect.FIRE, 1);
+        seedTableInventory(table, createNoteStack(), new ItemStack(new TestScribeTools()));
+
+        assertTrue(PacketAspectPlaceToServer.dispatch(
+                player, player.getEntityId(), world.provider.getDimension(), 0, 0, 0, Aspect.FIRE, (byte) 1, (byte) 0));
+        ResearchNoteData placed = ResearchManager.getData(table.getStackInSlot(1));
+        assertSame(Aspect.FIRE, placed.hexEntries.get("1:0").aspect);
+
+        int beforePool = player.knowledge().getAspectPoolFor(Aspect.FIRE);
+        assertFalse(PacketAspectPlaceToServer.dispatch(
+                player, player.getEntityId() + 1, world.provider.getDimension(), 0, 0, 0, Aspect.FIRE, (byte) 1, (byte) 0));
+        assertFalse(PacketAspectPlaceToServer.dispatch(
+                player, player.getEntityId(), world.provider.getDimension() + 1, 0, 0, 0, Aspect.FIRE, (byte) 1, (byte) 0));
+        assertFalse(PacketAspectPlaceToServer.dispatch(
+                player, player.getEntityId(), world.provider.getDimension(), 1, 0, 0, Aspect.FIRE, (byte) 1, (byte) 0));
+        assertEquals(beforePool, player.knowledge().getAspectPoolFor(Aspect.FIRE));
+    }
+
+    @Test
+    public void combinationPacketDispatchRequiresMatchingPlayerDimensionAndTableRoute() {
+        ResearchWorld world = new ResearchWorld();
+        TileResearchTable table = new TestResearchTable();
+        world.attachTable(table, BlockPos.ORIGIN);
+        TestPlayer player = new TestPlayer(world, "stage9e_combo_dispatch");
+        player.setPosition(0.5D, 0.5D, 0.5D);
+        player.openContainer = new ContainerResearchTable(player.inventory, table);
+        player.knowledge().addDiscoveredAspect(Aspect.AIR.getTag());
+        player.knowledge().addDiscoveredAspect(Aspect.ORDER.getTag());
+        Aspect combo = ResearchManager.getCombinationResult(Aspect.AIR, Aspect.ORDER);
+        player.knowledge().setAspectPool(Aspect.AIR, 1);
+        table.bonusAspects.add(Aspect.ORDER, 1);
+
+        assertTrue(PacketAspectCombinationToServer.dispatch(
+                player, player.getEntityId(), world.provider.getDimension(), 0, 0, 0, Aspect.AIR, Aspect.ORDER, false, true));
+        assertTrue(player.knowledge().hasDiscoveredAspect(combo));
+        assertEquals(0, table.bonusAspects.getAmount(Aspect.ORDER));
+
+        int beforePool = player.knowledge().getAspectPoolFor(Aspect.AIR);
+        assertFalse(PacketAspectCombinationToServer.dispatch(
+                player, player.getEntityId() + 1, world.provider.getDimension(), 0, 0, 0, Aspect.AIR, Aspect.ORDER, false, true));
+        assertFalse(PacketAspectCombinationToServer.dispatch(
+                player, player.getEntityId(), world.provider.getDimension() + 1, 0, 0, 0, Aspect.AIR, Aspect.ORDER, false, true));
+        assertFalse(PacketAspectCombinationToServer.dispatch(
+                player, player.getEntityId(), world.provider.getDimension(), 1, 0, 0, Aspect.AIR, Aspect.ORDER, false, true));
+        assertEquals(beforePool, player.knowledge().getAspectPoolFor(Aspect.AIR));
+    }
+
     private static ItemStack createNoteStack() {
         ItemStack stack = new ItemStack(new ItemResearchNotes(), 1, 0);
         ResearchNoteData data = new ResearchNoteData();

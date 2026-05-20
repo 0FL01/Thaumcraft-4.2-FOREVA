@@ -63,13 +63,26 @@ public class PacketAspectPlaceToServer extends PacketBase {
     @Override
     public IMessage onMessage(MessageContext ctx) {
         this.scheduleServer(ctx, player -> {
-            if (player.getEntityId() != this.playerid) return;
-            if (player.world.provider.getDimension() != this.dim) return;
-            TileResearchTable researchTable = resolveResearchTable(player, new BlockPos(this.x, this.y, this.z));
-            if (researchTable == null) return;
-            researchTable.placeAspect(this.q, this.r, this.aspect, player);
+            dispatch(player, this.playerid, this.dim, this.x, this.y, this.z, this.aspect, this.q, this.r);
         });
         return null;
+    }
+
+    static boolean dispatch(EntityPlayer player,
+                            int playerid,
+                            int dim,
+                            int x,
+                            int y,
+                            int z,
+                            Aspect aspect,
+                            byte q,
+                            byte r) {
+        if (player == null || player.getEntityId() != playerid) return false;
+        if (player.world.provider.getDimension() != dim) return false;
+        TileResearchTable researchTable = resolveResearchTable(player, new BlockPos(x, y, z));
+        if (researchTable == null) return false;
+        researchTable.placeAspect(q, r, aspect, player);
+        return true;
     }
 
     static TileResearchTable resolveResearchTable(EntityPlayer player, BlockPos pos) {

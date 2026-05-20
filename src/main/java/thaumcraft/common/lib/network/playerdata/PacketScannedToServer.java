@@ -66,16 +66,31 @@ public class PacketScannedToServer extends PacketBase {
     @Override
     public IMessage onMessage(MessageContext ctx) {
         this.scheduleServer(ctx, player -> {
-            if (player.getEntityId() != this.playerid) return;
-            if (player.world.provider.getDimension() != this.dim) return;
-            String normalizedPrefix = normalizePrefix(this.prefix);
-            ScanResult result = findAuthoritativeMatchingScan(
-                    player, this.type, this.id, this.md, this.entityid, this.phenomena, normalizedPrefix);
-            if (result != null && ScanManager.completeScan(player, result, normalizedPrefix)) {
-                syncKnowledge(player);
-            }
+            dispatch(player, this.playerid, this.dim, this.type, this.id, this.md, this.entityid, this.phenomena, this.prefix);
         });
         return null;
+    }
+
+    static boolean dispatch(EntityPlayer player,
+                            int playerid,
+                            int dim,
+                            byte type,
+                            int id,
+                            int md,
+                            int entityid,
+                            String phenomena,
+                            String prefix) {
+        if (player == null || player.getEntityId() != playerid) return false;
+        if (player.world.provider.getDimension() != dim) return false;
+        String normalizedPrefix = normalizePrefix(prefix);
+        ScanResult result = findAuthoritativeMatchingScan(player, type, id, md, entityid, phenomena, normalizedPrefix);
+        if (result == null || !ScanManager.completeScan(player, result, normalizedPrefix)) {
+            return false;
+        }
+        if (player instanceof EntityPlayerMP) {
+            syncKnowledge((EntityPlayerMP) player);
+        }
+        return true;
     }
 
     static ScanResult findAuthoritativeMatchingScan(EntityPlayer player,

@@ -25,6 +25,7 @@ import net.minecraft.world.storage.WorldInfo;
 import net.minecraftforge.common.capabilities.Capability;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import thaumcraft.api.ThaumcraftApi;
 import thaumcraft.api.aspects.Aspect;
 import thaumcraft.api.aspects.AspectList;
 import thaumcraft.api.nodes.INode;
@@ -40,6 +41,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
@@ -137,6 +139,30 @@ public class PacketScannedAuthorityRuntimeTest {
                 player, (byte) 1, net.minecraft.item.Item.getIdFromItem(net.minecraft.item.Item.getItemFromBlock(Blocks.STONE)), 0, 0, "", "#"));
 
         assertFalse(PacketScannedToServer.matchesPayload(null, (byte) 1, 1, 0, 0, ""));
+    }
+
+    @Test
+    public void dispatchMustApplyAuthoritativeScanOnlyForMatchingPlayerAndDimension() {
+        ScanWorld world = new ScanWorld();
+        BlockPos pos = new BlockPos(0, 1, 4);
+        ThaumcraftApi.registerObjectTag(new ItemStack(net.minecraft.item.Item.getItemFromBlock(Blocks.STONE)), new AspectList().add(Aspect.EARTH, 1));
+        world.setBlock(pos, Blocks.STONE.getDefaultState());
+        world.setHit(new RayTraceResult(new Vec3d(0.5D, 1.0D, 4.5D), EnumFacing.UP, pos));
+        ScanPlayer player = new ScanPlayer(world, "scan_dispatch");
+        player.setPosition(0.0D, 0.0D, 0.0D);
+        player.rotationYaw = 0.0F;
+        player.rotationPitch = 0.0F;
+        player.inventory.mainInventory.set(player.inventory.currentItem, new ItemStack(new ItemThaumometer()));
+
+        int stoneId = net.minecraft.item.Item.getIdFromItem(net.minecraft.item.Item.getItemFromBlock(Blocks.STONE));
+        assertTrue(PacketScannedToServer.dispatch(player, player.getEntityId(), world.provider.getDimension(), (byte) 1, stoneId, 0, 0, "", "@"));
+        assertTrue(player.knowledge.hasScannedItem("@" + thaumcraft.common.lib.research.ScanManager.generateItemHash(
+                net.minecraft.item.Item.getItemFromBlock(Blocks.STONE), 0)));
+
+        int before = player.knowledge.getScannedItems().size();
+        assertFalse(PacketScannedToServer.dispatch(player, player.getEntityId() + 1, world.provider.getDimension(), (byte) 1, stoneId, 0, 0, "", "@"));
+        assertFalse(PacketScannedToServer.dispatch(player, player.getEntityId(), world.provider.getDimension() + 1, (byte) 1, stoneId, 0, 0, "", "@"));
+        assertEquals(before, player.knowledge.getScannedItems().size());
     }
 
     private static class ScanPlayer extends EntityPlayer {

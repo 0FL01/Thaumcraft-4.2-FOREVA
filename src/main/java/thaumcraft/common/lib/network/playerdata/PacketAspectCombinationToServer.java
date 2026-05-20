@@ -72,19 +72,33 @@ public class PacketAspectCombinationToServer extends PacketBase {
     @Override
     public IMessage onMessage(MessageContext ctx) {
         this.scheduleServer(ctx, player -> {
-            if (player.getEntityId() != this.playerid) return;
-            if (player.world.provider.getDimension() != this.dim) return;
-            if (this.aspect1 == null || this.aspect2 == null) return;
-            TileResearchTable researchTable = PacketAspectPlaceToServer.resolveResearchTable(player, new BlockPos(this.x, this.y, this.z));
-            if (researchTable == null) return;
-            IPlayerKnowledge knowledge = thaumcraft.common.CommonProxy.getPlayerKnowledge(player);
-            if (knowledge == null) return;
-            Aspect combo = consumeCombinationInputs(player, researchTable, knowledge, this.aspect1, this.aspect2, this.ab1, this.ab2);
-            if (combo == null) return;
-            ScanManager.checkAndSyncAspectKnowledge(player, combo, 1);
-            ResearchManager.updateCache(player.getName(), knowledge);
+            dispatch(player, this.playerid, this.dim, this.x, this.y, this.z, this.aspect1, this.aspect2, this.ab1, this.ab2);
         });
         return null;
+    }
+
+    static boolean dispatch(EntityPlayer player,
+                            int playerid,
+                            int dim,
+                            int x,
+                            int y,
+                            int z,
+                            Aspect aspect1,
+                            Aspect aspect2,
+                            boolean useBonus1,
+                            boolean useBonus2) {
+        if (player == null || player.getEntityId() != playerid) return false;
+        if (player.world.provider.getDimension() != dim) return false;
+        if (aspect1 == null || aspect2 == null) return false;
+        TileResearchTable researchTable = PacketAspectPlaceToServer.resolveResearchTable(player, new BlockPos(x, y, z));
+        if (researchTable == null) return false;
+        IPlayerKnowledge knowledge = thaumcraft.common.CommonProxy.getPlayerKnowledge(player);
+        if (knowledge == null) return false;
+        Aspect combo = consumeCombinationInputs(player, researchTable, knowledge, aspect1, aspect2, useBonus1, useBonus2);
+        if (combo == null) return false;
+        ScanManager.checkAndSyncAspectKnowledge(player, combo, 1);
+        ResearchManager.updateCache(player.getName(), knowledge);
+        return true;
     }
 
     static Aspect consumeCombinationInputs(EntityPlayer player,

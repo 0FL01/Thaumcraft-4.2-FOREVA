@@ -23,13 +23,16 @@ public class ResearchClueProgressionStaticGuardTest {
                         && scanManager.contains("ResearchManager.updateCache(player.getName(), knowledge);"));
         assertTrue("PacketScannedToServer must require an authoritative held-thaumometer match before routing scans through ScanManager.completeScan",
                 packet.contains("if (player == null || !\"@\".equals(normalizePrefix(prefix)))")
+                        && packet.contains("if (player == null || player.getEntityId() != playerid) return false;")
+                        && packet.contains("if (player.world.provider.getDimension() != dim) return false;")
                         && packet.contains("getHeldThaumometerScan(player, player.getHeldItemMainhand()")
                         && packet.contains("getHeldThaumometerScan(player, player.getHeldItemOffhand()")
                         && packet.contains("ItemThaumometer thaumometer = (ItemThaumometer) held.getItem();")
                         && packet.contains("ScanResult authoritative = thaumometer.findScanTarget(held, player.world, player);")
                         && packet.contains("return matchesPayload(authoritative, type, id, md, entityid, phenomena) ? authoritative : null;")
-                        && packet.contains("if (result != null && ScanManager.completeScan(player, result, normalizedPrefix))")
-                        && packet.contains("syncKnowledge(player);"));
+                        && packet.contains("if (result == null || !ScanManager.completeScan(player, result, normalizedPrefix))")
+                        && packet.contains("if (player instanceof EntityPlayerMP)")
+                        && packet.contains("syncKnowledge((EntityPlayerMP) player);"));
     }
 
     @Test

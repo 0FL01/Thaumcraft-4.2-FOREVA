@@ -129,11 +129,12 @@ Remaining work is to execute the normal gameplay route:
 - aspect pool / bonus / ink costs are consumed atomically after validation;
 - invalid packets cannot mutate note NBT.
 - `TileResearchTable` bonus aspects are now explicitly presence-only at runtime, matching the original one-bit save/load contract, and targeted runtime tests cover both repeated recalc clamping and save/load round-trip symmetry.
+- packet field-routing is now runtime-covered as well: matching `playerid`/`dim`/`coords` routes through the actual packet dispatch surface, while mismatched player/dimension/table coordinates are rejected before table mutation.
 
 What remains open for this gap is proof around the live client route and broader adversarial coverage:
 
-- validate the real GUI/research-table click path rather than helper-level/runtime-harness calls only;
-- extend malicious-payload coverage to true packet dispatch contexts, not only extracted server-side logic;
+- validate the real GUI/research-table click path rather than packet field-routing/runtime-harness calls only;
+- extend malicious-payload coverage beyond current player/dimension/coords dispatch guards into broader real client packet contexts;
 - confirm the full note-solve/table-completion route under normal gameplay, not only isolated table placement/combination/persistence harnesses.
 
 ### GAP-6: Hidden/lost scan clues are wired, but prerequisite/runtime behavior needs verification
@@ -186,11 +187,11 @@ Remaining work:
 - only `@` prefix is accepted through the current thaumometer route;
 - the server reruns the thaumometer target lookup and only accepts packet payloads that match the current server-observed block/entity/node scan;
 - arbitrary item id/meta, entity id, or node-phenomena strings are rejected unless they match the authoritative server target;
-- targeted non-GUI runtime tests cover valid block/entity/node matches, forged payload rejection, representative `ScanManager.completeScan(...)` item/entity/node execution, and awarded-aspect/clue progression side effects.
+- targeted non-GUI runtime tests cover valid block/entity/node matches, forged payload rejection, representative `ScanManager.completeScan(...)` item/entity/node execution, packet field-routing `playerid`/`dim` gates, and awarded-aspect/clue progression side effects.
 
 What remains open for this gap:
 
-- validate the live packet-dispatch path, not just extracted authority helpers;
+- validate the real GUI/client packet origin path, not just packet field-routing and extracted authority helpers;
 - validate broader runtime scans end-to-end with awarded aspects and hidden/lost clue behavior;
 - verify additional edge cases such as rapid aim changes, multi-hand thaumometer states, and any future non-thaumometer scan routes before calling the system complete.
 
