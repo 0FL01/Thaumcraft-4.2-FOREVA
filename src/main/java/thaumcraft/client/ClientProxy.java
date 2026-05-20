@@ -1050,6 +1050,7 @@ public class ClientProxy extends CommonProxy {
         float green = normalizeColor(tint.getGreen());
         float blue = normalizeColor(tint.getBlue());
         FXWispArcing fx = new FXWispArcing(world, tx, ty, tz, sx, sy, sz, 0.1F, red, green, blue);
+        fx.setGravity(0.0F);
         ParticleEngine.addEffect(world, fx);
     }
 
@@ -1095,6 +1096,10 @@ public class ClientProxy extends CommonProxy {
                              float red, float green, float blue,
                              float height) {
         if (world == null || !world.isRemote) return;
+        FXSparkle sparkle = new FXSparkle(world, tx, ty, tz, 3.0F, 6, 2);
+        sparkle.setGravity(0.0F);
+        sparkle.setRBGColorF(red, green, blue);
+        ParticleEngine.addEffect(world, sparkle);
         ParticleEngine.addEffect(world, new FXArc(world, x, y, z, tx, ty, tz, red, green, blue, height));
     }
 
