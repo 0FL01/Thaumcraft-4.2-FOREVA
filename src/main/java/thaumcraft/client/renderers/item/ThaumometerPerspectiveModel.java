@@ -10,7 +10,6 @@ import net.minecraft.client.renderer.block.model.ItemCameraTransforms;
 import net.minecraft.client.renderer.block.model.ItemOverrideList;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.util.EnumFacing;
-import net.minecraftforge.common.model.TRSRTransformation;
 import org.apache.commons.lang3.tuple.Pair;
 
 public final class ThaumometerPerspectiveModel implements IBakedModel {
@@ -59,6 +58,11 @@ public final class ThaumometerPerspectiveModel implements IBakedModel {
     @Override
     public Pair<? extends IBakedModel, Matrix4f> handlePerspective(ItemCameraTransforms.TransformType cameraTransformType) {
         ItemThaumometerRenderer.setTransformType(cameraTransformType);
-        return Pair.of(this, TRSRTransformation.identity().getMatrix());
+        if (cameraTransformType == ItemCameraTransforms.TransformType.FIRST_PERSON_LEFT_HAND
+                || cameraTransformType == ItemCameraTransforms.TransformType.FIRST_PERSON_RIGHT_HAND) {
+            return Pair.of(this, null);
+        }
+        Pair<? extends IBakedModel, Matrix4f> delegatePerspective = delegate.handlePerspective(cameraTransformType);
+        return Pair.of(this, delegatePerspective.getRight());
     }
 }

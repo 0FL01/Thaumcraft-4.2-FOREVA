@@ -91,20 +91,6 @@ public class ItemThaumometerRenderer extends TileEntityItemStackRenderer {
                                        ItemCameraTransforms.TransformType transformType) {
         if (isFirstPerson(transformType) && player != null && mc.gameSettings.thirdPersonView == 0) {
             renderFirstPersonSetup(mc, player, partialTicks, transformType == ItemCameraTransforms.TransformType.FIRST_PERSON_LEFT_HAND);
-            return;
-        }
-
-        GlStateManager.scale(0.5F, 0.5F, 0.5F);
-        if (transformType == ItemCameraTransforms.TransformType.GUI) {
-            GlStateManager.rotate(60.0F, 1.0F, 0.0F, 0.0F);
-            GlStateManager.rotate(30.0F, 0.0F, 0.0F, -1.0F);
-            GlStateManager.rotate(248.0F, 0.0F, -1.0F, 0.0F);
-        } else if (transformType == ItemCameraTransforms.TransformType.THIRD_PERSON_RIGHT_HAND
-                || transformType == ItemCameraTransforms.TransformType.THIRD_PERSON_LEFT_HAND) {
-            float handedness = transformType == ItemCameraTransforms.TransformType.THIRD_PERSON_LEFT_HAND ? -1.0F : 1.0F;
-            GlStateManager.translate(1.6F * handedness, 0.3F, 2.0F);
-            GlStateManager.rotate(90.0F, -1.0F, 0.0F, 0.0F);
-            GlStateManager.rotate(30.0F * handedness, 0.0F, 0.0F, -1.0F);
         }
     }
 

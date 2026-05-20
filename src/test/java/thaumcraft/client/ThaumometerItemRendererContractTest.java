@@ -33,9 +33,12 @@ public class ThaumometerItemRendererContractTest {
                 perspectiveModel.contains("implements IBakedModel")
                         && perspectiveModel.contains("handlePerspective")
                         && perspectiveModel.contains("ItemThaumometerRenderer.setTransformType(cameraTransformType);")
-                        && perspectiveModel.contains("TRSRTransformation.identity().getMatrix()"));
+                        && perspectiveModel.contains("FIRST_PERSON_LEFT_HAND")
+                        && perspectiveModel.contains("return Pair.of(this, null);")
+                        && perspectiveModel.contains("delegate.handlePerspective(cameraTransformType)")
+                        && perspectiveModel.contains("delegatePerspective.getRight()"));
 
-        assertTrue("ItemThaumometerRenderer should restore the scanner OBJ render path with transform-aware GUI/ground/third-person/first-person branches",
+        assertTrue("ItemThaumometerRenderer should restore the scanner OBJ render path with a custom first-person branch while allowing Forge display transforms to drive GUI/ground/third-person contexts",
                 renderer.contains("extends TileEntityItemStackRenderer")
                         && renderer.contains("textures/models/scanner.obj")
                         && renderer.contains("textures/models/scanner.png")
@@ -44,8 +47,6 @@ public class ThaumometerItemRendererContractTest {
                         && renderer.contains("applyContextTransform")
                         && renderer.contains("renderFirstPersonSetup")
                         && renderer.contains("renderFirstPersonHands")
-                        && renderer.contains("ItemCameraTransforms.TransformType.GUI")
-                        && renderer.contains("ItemCameraTransforms.TransformType.THIRD_PERSON_RIGHT_HAND")
                         && renderer.contains("ItemCameraTransforms.TransformType.FIRST_PERSON_RIGHT_HAND")
                         && renderer.contains("CCModel.parseObjModels")
                         && renderer.contains("player.isHandActive()")
