@@ -243,6 +243,7 @@ import thaumcraft.common.entities.projectile.EntityShockOrb;
 import thaumcraft.common.tiles.TileAlchemyFurnace;
 import thaumcraft.common.tiles.TileArcaneBore;
 import thaumcraft.common.tiles.TileArcaneLamp;
+import thaumcraft.common.tiles.TileArcaneLampFertility;
 import thaumcraft.common.tiles.TileArcaneLampGrowth;
 import thaumcraft.common.tiles.TileArcaneWorkbench;
 import thaumcraft.common.tiles.TileBanner;
@@ -600,6 +601,7 @@ public class ClientProxy extends CommonProxy {
         TileArcaneLampRenderer lampRenderer = new TileArcaneLampRenderer();
         ClientRegistry.bindTileEntitySpecialRenderer(TileArcaneLamp.class, lampRenderer);
         ClientRegistry.bindTileEntitySpecialRenderer(TileArcaneLampGrowth.class, lampRenderer);
+        ClientRegistry.bindTileEntitySpecialRenderer(TileArcaneLampFertility.class, lampRenderer);
         ClientRegistry.bindTileEntitySpecialRenderer(TileArcaneWorkbench.class, new TileArcaneWorkbenchRenderer());
         ClientRegistry.bindTileEntitySpecialRenderer(TileDeconstructionTable.class, new TileDeconstructionTableRenderer());
         ClientRegistry.bindTileEntitySpecialRenderer(TileResearchTable.class, new TileResearchTableRenderer());

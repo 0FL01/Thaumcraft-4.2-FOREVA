@@ -22,6 +22,7 @@ public class TileArcaneLampRendererFidelityStaticGuardTest {
                         && source.contains("facing.getOpposite()")
                         && source.contains("orientNozzleByFace(")
                         && source.contains("TileArcaneLampGrowth")
+                        && source.contains("TileArcaneLampFertility")
                         && !source.contains("TileRenderHelper.drawTexturedQuad("));
     }
 

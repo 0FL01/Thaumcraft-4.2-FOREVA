@@ -8,6 +8,7 @@ import net.minecraft.util.ResourceLocation;
 import thaumcraft.client.renderers.models.ModelBoreBase;
 import thaumcraft.common.tiles.TileArcaneBoreBase;
 import thaumcraft.common.tiles.TileArcaneLamp;
+import thaumcraft.common.tiles.TileArcaneLampFertility;
 import thaumcraft.common.tiles.TileArcaneLampGrowth;
 
 public class TileArcaneLampRenderer extends TileEntitySpecialRenderer<TileEntity> {
@@ -52,6 +53,9 @@ public class TileArcaneLampRenderer extends TileEntitySpecialRenderer<TileEntity
         }
         if (tile instanceof TileArcaneLampGrowth) {
             return ((TileArcaneLampGrowth) tile).facing;
+        }
+        if (tile instanceof TileArcaneLampFertility) {
+            return ((TileArcaneLampFertility) tile).facing;
         }
         return EnumFacing.DOWN;
     }

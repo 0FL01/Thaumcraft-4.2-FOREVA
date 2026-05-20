@@ -28,6 +28,7 @@ import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraft.init.SoundEvents;
 import net.minecraftforge.fluids.FluidUtil;
+import thaumcraft.api.visnet.VisNetHandler;
 import thaumcraft.common.Thaumcraft;
 import thaumcraft.common.CommonProxy;
 import thaumcraft.common.entities.EntitySpecialItem;
@@ -40,6 +41,7 @@ public class BlockMetalDevice extends BlockContainer {
 
     public static final PropertyInteger TYPE = PropertyInteger.create("type", 0, 14);
     private static final AxisAlignedBB GRATE_AABB = new AxisAlignedBB(0.0D, 0.8125D, 0.0D, 1.0D, 1.0D, 1.0D);
+    private static final AxisAlignedBB ARCANE_LAMP_AABB = new AxisAlignedBB(0.25D, 0.125D, 0.25D, 0.75D, 0.875D, 0.75D);
 
     private int delay = 0;
 
@@ -73,6 +75,7 @@ public class BlockMetalDevice extends BlockContainer {
         if (meta == 10) return new TileThaumatorium();
         if (meta == 11) return new TileThaumatoriumTop();
         if (meta == 12) return new TileBrainbox();
+        if (meta == 13) return new TileArcaneLampFertility();
         if (meta == 14) return new TileVisRelay();
         return new TilePedestal();
     }
@@ -93,6 +96,7 @@ public class BlockMetalDevice extends BlockContainer {
         list.add(new ItemStack(this, 1, 10)); // thaumatorium
         list.add(new ItemStack(this, 1, 11)); // thaumatorium top
         list.add(new ItemStack(this, 1, 12)); // brainbox
+        list.add(new ItemStack(this, 1, 13)); // fertility lamp
         list.add(new ItemStack(this, 1, 14)); // vis relay
     }
 
@@ -235,6 +239,16 @@ public class BlockMetalDevice extends BlockContainer {
             }
             return;
         }
+        if (state.getValue(TYPE) == 13) {
+            TileEntity te = worldIn.getTileEntity(pos);
+            if (te instanceof TileArcaneLampFertility) {
+                TileArcaneLampFertility lamp = (TileArcaneLampFertility) te;
+                if (worldIn.isAirBlock(pos.offset(lamp.facing))) {
+                    worldIn.destroyBlock(pos, true);
+                }
+            }
+            return;
+        }
         if (state.getValue(TYPE) != 12) return;
         TileEntity te = worldIn.getTileEntity(pos);
         if (!(te instanceof TileBrainbox)) return;
@@ -293,6 +307,9 @@ public class BlockMetalDevice extends BlockContainer {
     @Override
     public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess source, BlockPos pos) {
         int meta = getMetaFromState(state);
+        if (meta == 7 || meta == 8 || meta == 13) {
+            return ARCANE_LAMP_AABB;
+        }
         return (meta == 5 || meta == 6) ? GRATE_AABB : FULL_BLOCK_AABB;
     }
 
@@ -310,7 +327,38 @@ public class BlockMetalDevice extends BlockContainer {
             addCollisionBoxToList(pos, entityBox, collidingBoxes, GRATE_AABB);
             return;
         }
+        if (meta == 7 || meta == 8 || meta == 13) {
+            addCollisionBoxToList(pos, entityBox, collidingBoxes, ARCANE_LAMP_AABB);
+            return;
+        }
         super.addCollisionBoxToList(state, worldIn, pos, entityBox, collidingBoxes, entityIn, isActualState);
+    }
+
+    @Override
+    public int getLightValue(IBlockState state, IBlockAccess world, BlockPos pos) {
+        int meta = state.getValue(TYPE);
+        if (meta == 7) {
+            return 15;
+        }
+        if (meta == 8) {
+            TileEntity te = world.getTileEntity(pos);
+            if (te instanceof TileArcaneLampGrowth) {
+                return ((TileArcaneLampGrowth) te).charges > 0 ? 15 : 8;
+            }
+        }
+        if (meta == 13) {
+            TileEntity te = world.getTileEntity(pos);
+            if (te instanceof TileArcaneLampFertility) {
+                return ((TileArcaneLampFertility) te).charges > 0 ? 15 : 8;
+            }
+        }
+        if (meta == 14) {
+            TileEntity te = world.getTileEntity(pos);
+            if (te instanceof TileVisRelay) {
+                return VisNetHandler.isNodeValid(((TileVisRelay) te).getParent()) ? 10 : 2;
+            }
+        }
+        return super.getLightValue(state, world, pos);
     }
 
     @Override
