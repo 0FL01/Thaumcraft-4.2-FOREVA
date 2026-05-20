@@ -102,6 +102,7 @@ Do not let asset completeness block backend progression unless it prevents openi
 Current code has `ResearchNoteData`, note creation/update/read/write, and completion checks. Targeted non-GUI runtime coverage now proves:
 
 - hidden discovery notes reveal into a real research note when an eligible hidden research exists;
+- hidden discovery notes fall back to 7-9 knowledge fragments and consume the note when no eligible hidden research exists;
 - completed notes require prerequisites at completion time and then grant the research key plus eligible siblings;
 - the live-player note/discovery path no longer depends on username/cache lookups when a real `EntityPlayer` is already available.
 
@@ -145,13 +146,14 @@ What remains open for this gap is proof around the live client route and broader
 - scan/discovery clue helpers grant only `@KEY` clue state and do not directly complete the full research;
 - hidden discovery note reveal respects prerequisite-gated `findHiddenResearch(...)` selection when a live player already has the required parent knowledge;
 - `findMatchingResearch(...)` and hidden discovery selection now read the live player capability directly instead of stale username/cache state.
+- representative item-scan aspect triggers and legacy-name entity triggers now unlock hidden clue state through the real `ScanManager.completeScan(...)` path;
+- knowledge-fragment fallback on discovery notes is runtime-covered when no hidden research is eligible.
 
 Remaining work:
 
-- verify item/entity/aspect triggers match original behavior with 1.12 entity ids;
 - verify `@KEY` clue state does not accidentally complete full research;
-- validate knowledge-fragment fallback behavior against eligible hidden research absence;
-- expand runtime scenarios beyond the current focused harness into representative trigger-bearing content and full scan-to-clue progression.
+- expand runtime scenarios beyond the current focused harness into broader trigger-bearing content and full scan-to-clue progression;
+- validate more real-content trigger cases beyond the current representative item/entity/aspect coverage.
 
 ### GAP-7: Research completion packet hardening is implemented; live route/e2e validation remains open
 
@@ -184,12 +186,12 @@ Remaining work:
 - only `@` prefix is accepted through the current thaumometer route;
 - the server reruns the thaumometer target lookup and only accepts packet payloads that match the current server-observed block/entity/node scan;
 - arbitrary item id/meta, entity id, or node-phenomena strings are rejected unless they match the authoritative server target;
-- targeted non-GUI runtime tests cover valid block/entity/node matches and forged payload rejection.
+- targeted non-GUI runtime tests cover valid block/entity/node matches, forged payload rejection, representative `ScanManager.completeScan(...)` item/entity/node execution, and awarded-aspect/clue progression side effects.
 
 What remains open for this gap:
 
 - validate the live packet-dispatch path, not just extracted authority helpers;
-- validate representative runtime scans end-to-end with awarded aspects and hidden/lost clue behavior;
+- validate broader runtime scans end-to-end with awarded aspects and hidden/lost clue behavior;
 - verify additional edge cases such as rapid aim changes, multi-hand thaumometer states, and any future non-thaumometer scan routes before calling the system complete.
 
 ### GAP-8: Manual/runtime validation for research content is not yet complete
