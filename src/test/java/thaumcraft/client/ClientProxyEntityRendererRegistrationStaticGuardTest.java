@@ -59,6 +59,7 @@ public class ClientProxyEntityRendererRegistrationStaticGuardTest {
         assertTrue("ClientProxy must keep extended fallback registrations for the remaining Stage 8-d monster baseline",
                 source.contains("registerEntityRenderer(EntityFireBat.class, RenderFireBat::new, registered);")
                         && source.contains("registerEntityRenderer(EntityWisp.class, RenderWisp::new, registered);")
+                        && source.contains("registerEntityRenderer(EntityWatcher.class, RenderWatcher::new, registered);")
                         && source.contains("registerEntityRenderer(EntityPech.class, RenderPech::new, registered);")
                         && source.contains("registerEntityRenderer(EntityEldritchGuardian.class, RenderEldritchGuardian::new, registered);")
                         && source.contains("registerEntityRenderer(EntityEldritchWarden.class, RenderEldritchWarden::new, registered);")
@@ -120,6 +121,22 @@ public class ClientProxyEntityRendererRegistrationStaticGuardTest {
                         && wispRenderer.contains("renderHalo(entity, partialTicks)")
                         && wispRenderer.contains("OpenGlHelper.setLightmapTextureCoords")
                         && wispRenderer.contains("DefaultVertexFormats.POSITION_TEX_COLOR"));
+        String watcherRenderer = readFile("src/main/java/thaumcraft/client/renderers/entity/RenderWatcher.java");
+        String watcherModel = readFile("src/main/java/thaumcraft/client/renderers/models/entities/ModelWatcher.java");
+        assertTrue("RenderWatcher must provide dedicated watcher model, beam texture, frustum check, and target-beam baseline",
+                watcherRenderer.contains("extends RenderLiving<EntityWatcher>")
+                        && watcherRenderer.contains("new ModelWatcher()")
+                        && watcherRenderer.contains("textures/models/watcher.png")
+                        && watcherRenderer.contains("textures/models/watcher_beam.png")
+                        && watcherRenderer.contains("shouldRender(EntityWatcher livingEntity, ICamera camera, double camX, double camY, double camZ)")
+                        && watcherRenderer.contains("entity.getGazeProgress(partialTicks)")
+                        && watcherRenderer.contains("camera.isBoundingBoxInFrustum")
+                        && watcherRenderer.contains("DefaultVertexFormats.POSITION_TEX_COLOR")
+                        && watcherModel.contains("class ModelWatcher extends ModelBase")
+                        && watcherModel.contains("watcherSpines = new ModelRenderer[12]")
+                        && watcherModel.contains("watcher.hasTargetedEntity()")
+                        && watcherModel.contains("watcher.getTailAngle(partialTicks)")
+                        && watcherModel.contains("watcher.getFinAngle(partialTicks)"));
         String aspectOrbRenderer = readFile("src/main/java/thaumcraft/client/renderers/entity/RenderAspectOrb.java");
         assertTrue("RenderAspectOrb must provide particle-texture billboard with aspect tint and blend-factor mapping baseline",
                 aspectOrbRenderer.contains("extends Render<EntityAspectOrb>")
