@@ -49,6 +49,8 @@ public class AlchemyFurnaceAdvancedRendererFidelityStaticGuardTest {
                         && alembic.contains("new ModelAlembic()")
                         && alembic.contains("modelBore.renderNozzle(MODEL_SCALE)")
                         && alembic.contains("renderOutputNozzles(")
+                        && alembic.contains("if (tile.getWorld() != null)")
+                        && alembic.contains("GlStateManager.translate(0.0F, 0.0F, -0.4F);")
                         && !alembic.contains("drawPrism(")
                         && !alembic.contains("drawTexturedCuboid("));
 

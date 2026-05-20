@@ -221,6 +221,18 @@ public class TileAlembic extends TileThaumcraft implements IAspectContainer, IEs
     }
 
     @Override
+    public void handleUpdateTag(NBTTagCompound tag) {
+        super.handleUpdateTag(tag);
+        this.getAppearance();
+    }
+
+    @Override
+    public void onLoad() {
+        super.onLoad();
+        this.getAppearance();
+    }
+
+    @Override
     public int onWandRightClick(World world, ItemStack wandstack, EntityPlayer player, int x, int y, int z, int side, int md) {
         if (side <= 1) return 0;
         this.facing = side;

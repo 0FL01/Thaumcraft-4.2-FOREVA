@@ -46,18 +46,23 @@ public class TileAlembicRenderer extends TileEntitySpecialRenderer<TileAlembic> 
     private void renderAlembicModel(TileAlembic tile, double x, double y, double z) {
         GlStateManager.pushMatrix();
         GlStateManager.translate(x + 0.5D, y, z + 0.5D);
-        GlStateManager.rotate(90.0F, -1.0F, 0.0F, 0.0F);
-        rotateByFacing(tile.facing);
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
         bindTexture(ALEMBIC_TEXTURE);
+        GlStateManager.rotate(90.0F, -1.0F, 0.0F, 0.0F);
 
-        if (tile.aboveFurnace) {
-            model.renderTubeMain();
-            model.renderLegs();
-        } else if (tile.aboveAlembic) {
-            model.renderTubeMain();
-            model.renderTubeSmall();
+        if (tile.getWorld() != null) {
+            rotateByFacing(tile.facing);
+            if (tile.aboveFurnace) {
+                model.renderTubeMain();
+                model.renderLegs();
+            } else if (tile.aboveAlembic) {
+                model.renderTubeMain();
+                model.renderTubeSmall();
+            } else {
+                model.renderLegs();
+            }
         } else {
+            GlStateManager.translate(0.0F, 0.0F, -0.4F);
             model.renderLegs();
         }
         model.renderPot();

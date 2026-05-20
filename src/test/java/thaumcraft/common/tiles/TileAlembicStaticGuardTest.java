@@ -25,6 +25,8 @@ public class TileAlembicStaticGuardTest {
         assertTrue(source.contains("this.pos.getX() + 2"));
         assertTrue(source.contains("public void onDataPacket(NetworkManager net, SPacketUpdateTileEntity pkt)"));
         assertTrue(source.contains("this.getAppearance();"));
+        assertTrue(source.contains("public void handleUpdateTag(NBTTagCompound tag)"));
+        assertTrue(source.contains("public void onLoad()"));
     }
 
     @Test
