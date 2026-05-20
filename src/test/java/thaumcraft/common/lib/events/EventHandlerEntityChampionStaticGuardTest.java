@@ -21,7 +21,11 @@ public class EventHandlerEntityChampionStaticGuardTest {
         assertTrue(source.contains("EntityUtils.ensureChampionModAttribute((EntityMob) event.getEntity())"));
         assertTrue(source.contains("ensureChampionAttribute(EntityMob mob)"));
         assertTrue(source.contains("return EntityUtils.ensureChampionModAttribute(mob);"));
+        assertTrue(source.contains("mod.getAttributeValue() > -1.0D"));
+        assertTrue(source.contains("EntityUtils.repairChampionName(mob);"));
         assertTrue(entityUtils.contains("public static IAttributeInstance ensureChampionModAttribute(EntityLivingBase entity)"));
+        assertTrue(entityUtils.contains("public static void repairChampionName(EntityLivingBase entity)"));
+        assertTrue(entityUtils.contains("public static int getChampionModifierType(EntityLivingBase entity)"));
         assertTrue(entityUtils.contains("registerAttribute(CHAMPION_MOD)"));
         assertTrue(entityUtils.contains("instance.setBaseValue(-2.0D);"));
         assertTrue(source.contains("ChampionModifier.mods[type].type == 0"));

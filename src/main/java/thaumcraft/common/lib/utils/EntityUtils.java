@@ -147,6 +147,51 @@ public class EntityUtils {
         }
     }
 
+    public static int getChampionModifierType(EntityLivingBase entity) {
+        IAttributeInstance instance = ensureChampionModAttribute(entity);
+        if (instance == null) {
+            return -1;
+        }
+        for (ChampionModifier modifier : ChampionModifier.mods) {
+            if (instance.getModifier(modifier.attributeMod.getID()) != null) {
+                return modifier.id;
+            }
+        }
+        return -1;
+    }
+
+    public static void repairChampionName(EntityLivingBase entity) {
+        if (!(entity instanceof EntityMob) || entity instanceof EntityThaumcraftBoss) {
+            return;
+        }
+        EntityMob mob = (EntityMob) entity;
+        String current = mob.getCustomNameTag();
+        if (!current.isEmpty() && !current.startsWith("champion.mod.")) {
+            return;
+        }
+
+        int type = getChampionModifierType(mob);
+        if (type < 0) {
+            return;
+        }
+        mob.setCustomNameTag(buildChampionDisplayName(mob, type));
+    }
+
+    private static String buildChampionDisplayName(EntityMob mob, int type) {
+        return ChampionModifier.mods[type].getModNameLocalized() + " " + getChampionBaseName(mob);
+    }
+
+    private static String getChampionBaseName(EntityMob mob) {
+        String current = mob.getCustomNameTag();
+        if (current.startsWith("champion.mod.")) {
+            int split = current.indexOf(' ');
+            if (split >= 0 && split + 1 < current.length()) {
+                return current.substring(split + 1);
+            }
+        }
+        return mob.getName();
+    }
+
     public static void makeChampion(EntityLivingBase entity, boolean persist) {
         if (!(entity instanceof EntityMob)) {
             return;
@@ -176,7 +221,7 @@ public class EntityUtils {
                 attack.applyModifier(CHAMPION_DAMAGE);
             }
             mob.heal(25.0F);
-            mob.setCustomNameTag(ChampionModifier.mods[type].getModNameLocalized() + " " + mob.getName());
+            mob.setCustomNameTag(buildChampionDisplayName(mob, type));
         } else {
             ((EntityThaumcraftBoss) mob).generateName();
         }

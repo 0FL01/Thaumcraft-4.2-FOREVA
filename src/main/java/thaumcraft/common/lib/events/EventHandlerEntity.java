@@ -663,6 +663,9 @@ public class EventHandlerEntity {
 
     private void handleChampionSpawn(EntityJoinWorldEvent event, EntityMob mob) {
         IAttributeInstance mod = ensureChampionAttribute(mob);
+        if (mod != null && mod.getAttributeValue() > -1.0D) {
+            EntityUtils.repairChampionName(mob);
+        }
         if (mod == null || mod.getAttributeValue() >= -1.0D) {
             return;
         }

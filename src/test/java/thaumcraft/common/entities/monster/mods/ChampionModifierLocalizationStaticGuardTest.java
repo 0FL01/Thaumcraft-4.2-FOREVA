@@ -14,9 +14,14 @@ public class ChampionModifierLocalizationStaticGuardTest {
     @Test
     public void championModifierDisplayNamesShouldExistInEnglishLang() throws IOException {
         String source = readFile("src/main/java/thaumcraft/common/entities/monster/mods/ChampionModifier.java");
+        String entityUtils = readFile("src/main/java/thaumcraft/common/lib/utils/EntityUtils.java");
         String lang = readFile("src/main/resources/assets/thaumcraft/lang/en_us.lang");
 
-        assertTrue(source.contains("I18n.translateToLocal(\"champion.mod.\" + this.name)"));
+        assertTrue(source.contains("String key = \"champion.mod.\" + this.name;"));
+        assertTrue(source.contains("return key.equals(translated) ? this.displayName : translated;"));
+        assertTrue(source.contains("new ChampionModifier(6, \"warp\", \"Warped\", 1"));
+        assertTrue(entityUtils.contains("mob.setCustomNameTag(buildChampionDisplayName(mob, type));"));
+        assertTrue(entityUtils.contains("current.startsWith(\"champion.mod.\")"));
 
         assertTrue(lang.contains("champion.mod.bold=Bold"));
         assertTrue(lang.contains("champion.mod.spine=Spined"));

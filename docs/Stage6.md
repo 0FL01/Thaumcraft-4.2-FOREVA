@@ -49,6 +49,8 @@ Scenarios that should work before closure:
 
 Current implementation has broad class coverage: a class-name comparison between non-inner reference `.class` files under `thaumcraft_src/thaumcraft/common/entities` and current `.java` files under `src/main/java/thaumcraft/common/entities` found only one absent current top-level entity-support class: `thaumcraft/common/entities/ItemSpawnerEgg`. Core entity classes, boss classes, projectile classes, AI classes, champion modifier classes, golem classes, containers, and inventories mostly exist.
 
+Champion mob persistence/name routing has an extra 1.12-specific caveat: custom champion names are saved as plain strings on the server, so parity requires a server-safe modifier label path and a migration path for any worlds that already persisted raw `champion.mod.*` prefixes. The current port now treats that as a Stage 6 server-visible contract, not just a lang-asset concern.
+
 Entity registrations exist in `src/main/java/thaumcraft/common/config/ConfigEntities.java:55-129`: base entities, projectiles, golems, zombies, wisps/bats, Pech, eldritch mobs, cultists, bosses, thaumic slime, taint mobs, and item grate are registered. Forge registration is wired through `src/main/java/thaumcraft/common/Thaumcraft.java:257-259`.
 
 However, class presence is not parity. Several server-visible flows are absent or partially ported:
