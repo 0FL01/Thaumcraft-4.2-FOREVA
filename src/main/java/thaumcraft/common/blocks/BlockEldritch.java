@@ -1,5 +1,6 @@
 package thaumcraft.common.blocks;
 
+import java.util.Random;
 import net.minecraft.block.Block;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
@@ -24,6 +25,8 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.Explosion;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import thaumcraft.common.Thaumcraft;
 import thaumcraft.common.config.ConfigItems;
 import thaumcraft.common.items.ItemEldritchObject;
@@ -267,6 +270,50 @@ public class BlockEldritch extends Block {
         return meta == 0 || meta == 1 || meta == 3 || meta == 8 || meta == 9
                 ? EnumBlockRenderType.INVISIBLE
                 : EnumBlockRenderType.MODEL;
+    }
+
+    @Override
+    @SideOnly(Side.CLIENT)
+    public void randomDisplayTick(IBlockState state, World world, BlockPos pos, Random rand) {
+        int meta = this.getMetaFromState(state);
+        if (meta == 8) {
+            TileEntity tile = world.getTileEntity(pos);
+            if (tile instanceof TileEldritchLock && ((TileEldritchLock) tile).count >= 0) {
+                Thaumcraft.proxy.spark(
+                        pos.getX() + rand.nextFloat(),
+                        pos.getY() + rand.nextFloat(),
+                        pos.getZ() + rand.nextFloat(),
+                        0.5F,
+                        0.65F + rand.nextFloat() * 0.1F,
+                        1.0F,
+                        1.0F,
+                        0.8F);
+            }
+            return;
+        }
+
+        if (meta != 10) {
+            return;
+        }
+
+        BlockPos sparkPos = pos.add(
+                rand.nextInt(2) - rand.nextInt(2),
+                rand.nextInt(2) - rand.nextInt(2),
+                rand.nextInt(2) - rand.nextInt(2));
+        if (!world.isAirBlock(sparkPos)) {
+            return;
+        }
+
+        Thaumcraft.proxy.blockRunes(
+                world,
+                sparkPos.getX() + rand.nextFloat(),
+                sparkPos.getY() + rand.nextFloat(),
+                sparkPos.getZ() + rand.nextFloat(),
+                0.5F + rand.nextFloat() * 0.5F,
+                rand.nextFloat() * 0.3F,
+                0.9F + rand.nextFloat() * 0.1F,
+                16 + rand.nextInt(4),
+                0.0F);
     }
 
     @Override
