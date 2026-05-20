@@ -16,7 +16,7 @@ public class TileFluxScrubberRenderer extends TileEntitySpecialRenderer<TileFlux
 
     @Override
     public void render(TileFluxScrubber tile, double x, double y, double z, float partialTicks, int destroyStage, float alpha) {
-        if (tile == null || tile.getWorld() == null) {
+        if (tile == null) {
             return;
         }
 
@@ -28,6 +28,8 @@ public class TileFluxScrubberRenderer extends TileEntitySpecialRenderer<TileFlux
         GlStateManager.disableLighting();
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
         bindTexture(SCRUBBER);
+
+        model.renderCap(MODEL_SCALE);
 
         GlStateManager.pushMatrix();
         GlStateManager.translate(0.0D, 0.0D, -bob);

@@ -21,11 +21,11 @@ public class FluxReservoirRendererFidelityStaticGuardTest {
         String reservoirItemRenderer = read("src/main/java/thaumcraft/client/renderers/item/ItemEssentiaReservoirRenderer.java");
         String reservoirModel = read("src/main/resources/assets/thaumcraft/models/block/blockessentiareservoir.json");
 
-        assertTrue("Flux scrubber renderer should keep the orientation path and animated tip while the static cap lives in the block model",
+        assertTrue("Flux scrubber renderer should keep the orientation path and render the full reference cap-plus-tip model through TESR",
                 fluxRenderer.contains("new ModelFluxScrubber()")
                         && fluxRenderer.contains("translateFromOrientation(")
+                        && fluxRenderer.contains("model.renderCap(MODEL_SCALE)")
                         && fluxRenderer.contains("model.renderTip(MODEL_SCALE)")
-                        && !fluxRenderer.contains("model.renderCap(MODEL_SCALE)")
                         && !fluxRenderer.contains("TileRenderHelper.orientBillboardToPlayer()")
                         && !fluxRenderer.contains("TileRenderHelper.drawTexturedQuad("));
 

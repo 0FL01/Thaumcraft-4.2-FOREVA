@@ -20,13 +20,14 @@ public class TileFocalManipulatorRendererStaticGuardTest {
         String blockstate = read("src/main/resources/assets/thaumcraft/blockstates/blockstonedevice.json");
         String blockModel = read("src/main/resources/assets/thaumcraft/models/block/blockstonedevice_13.json");
 
+        assertTrue(source.contains("renderManipulatorShell(x, y, z);"));
+        assertTrue(source.contains("textures/models/wandtable.png"));
+        assertTrue(source.contains("new ModelArcaneWorkbench()"));
+        assertTrue(source.contains("tableModel.renderAll(MODEL_SCALE);"));
         assertTrue(source.contains("TileRenderHelper.ticks(tile, partialTicks)"));
         assertTrue(source.contains("focus.getItem() instanceof ItemFocusBasic"));
         assertTrue(source.contains("MathHelper.sin(ticks / 14.0F) * 0.2F + 0.2F"));
         assertTrue(source.contains("TileRenderHelper.renderEntityItem(tile, focus, hover);"));
-        assertTrue(!source.contains("textures/models/wandtable.png"));
-        assertTrue(!source.contains("new ModelArcaneWorkbench()"));
-        assertTrue(!source.contains("tableModel.renderAll(MODEL_SCALE);"));
 
         assertTrue(blockstate.contains("\"type=13\": { \"model\": \"thaumcraft:blockstonedevice_13\" }"));
         assertTrue(blockModel.contains("\"surface\": \"thaumcraft:models/wandtable\""));

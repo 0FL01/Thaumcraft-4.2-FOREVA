@@ -606,6 +606,11 @@ public class ClientProxy extends CommonProxy {
             registerBlockItemModel(stoneDeviceItem, meta, "type=" + meta);
         }
         registerBuiltinItemModel(stoneDeviceItem, 2, "blockstonedevice_tesr");
+        registerBuiltinItemModel(stoneDeviceItem, 9, "blockstonedevice_tesr");
+        registerBuiltinItemModel(stoneDeviceItem, 10, "blockstonedevice_tesr");
+        registerBuiltinItemModel(stoneDeviceItem, 11, "blockstonedevice_tesr");
+        registerBuiltinItemModel(stoneDeviceItem, 13, "blockstonedevice_tesr");
+        registerBuiltinItemModel(stoneDeviceItem, 14, "blockstonedevice_tesr");
         Item metalDeviceItem = Item.getItemFromBlock(ConfigBlocks.blockMetalDevice);
         for (int meta = 0; meta <= 14; meta++) {
             registerBlockItemModel(metalDeviceItem, meta, "type=" + meta);
