@@ -44,6 +44,11 @@ public class RenderMindSpider extends RenderLiving<EntityMindSpider> {
     }
 
     @Override
+    protected float getDeathMaxRotation(EntityMindSpider entity) {
+        return 180.0F;
+    }
+
+    @Override
     protected void renderModel(EntityMindSpider entity, float limbSwing, float limbSwingAmount, float ageInTicks,
                                float netHeadYaw, float headPitch, float scaleFactor) {
         bindEntityTexture(entity);

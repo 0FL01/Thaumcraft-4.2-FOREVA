@@ -354,6 +354,8 @@ public class ClientProxyEntityRendererRegistrationStaticGuardTest {
                         && mindSpiderRenderer.contains("textures/models/taint_spider_eyes.png")
                         && mindSpiderRenderer.contains("this.addLayer(new SpiderEyesLayer())")
                         && mindSpiderRenderer.contains("entity.spiderScaleAmount()")
+                        && mindSpiderRenderer.contains("getDeathMaxRotation(EntityMindSpider entity)")
+                        && mindSpiderRenderer.contains("return 180.0F;")
                         && mindSpiderRenderer.contains("Math.min(0.1F, entity.ticksExisted / 100.0F)")
                         && mindSpiderRenderer.contains("GlStateManager.alphaFunc(516, 0.003921569F)")
                         && mindSpiderRenderer.contains("GlStateManager.depthMask(false)")
@@ -368,6 +370,8 @@ public class ClientProxyEntityRendererRegistrationStaticGuardTest {
                         && taintSpiderRenderer.contains("textures/models/taint_spider_eyes.png")
                         && taintSpiderRenderer.contains("this.addLayer(new SpiderEyesLayer())")
                         && taintSpiderRenderer.contains("entity.spiderScaleAmount()")
+                        && taintSpiderRenderer.contains("getDeathMaxRotation(EntityTaintSpider entity)")
+                        && taintSpiderRenderer.contains("return 180.0F;")
                         && taintSpiderRenderer.contains("int i = 61680;")
                         && taintSpiderRenderer.contains("OpenGlHelper.setLightmapTextureCoords(")
                         && taintSpiderRenderer.contains("scale * 1.25F"));

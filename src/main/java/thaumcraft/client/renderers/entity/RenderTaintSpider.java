@@ -29,6 +29,11 @@ public class RenderTaintSpider extends RenderLiving<EntityTaintSpider> {
         GlStateManager.scale(scale, scale * 1.25F, scale);
     }
 
+    @Override
+    protected float getDeathMaxRotation(EntityTaintSpider entity) {
+        return 180.0F;
+    }
+
     @Nullable
     @Override
     protected ResourceLocation getEntityTexture(EntityTaintSpider entity) {
