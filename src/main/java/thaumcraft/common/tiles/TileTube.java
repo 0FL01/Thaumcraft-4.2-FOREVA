@@ -1,5 +1,7 @@
 package thaumcraft.common.tiles;
 
+import java.util.Random;
+import net.minecraft.init.SoundEvents;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -8,12 +10,15 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.ITickable;
 import net.minecraft.util.SoundCategory;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 import thaumcraft.api.ThaumcraftApiHelper;
 import thaumcraft.api.TileThaumcraft;
 import thaumcraft.api.aspects.Aspect;
 import thaumcraft.api.aspects.IEssentiaTransport;
 import thaumcraft.api.wands.IWandable;
+import thaumcraft.common.Thaumcraft;
+import thaumcraft.common.config.Config;
 import thaumcraft.common.lib.TCSounds;
 
 public class TileTube extends TileThaumcraft implements ITickable, IEssentiaTransport, IWandable {
@@ -23,21 +28,48 @@ public class TileTube extends TileThaumcraft implements ITickable, IEssentiaTran
     protected int essentiaAmount = 0;
     protected Aspect suctionType = null;
     protected int suction = 0;
+    protected int venting = 0;
     protected int count = 0;
+    protected int ventColor = 0;
 
     @Override
     public void update() {
-        if (this.world == null || this.world.isRemote) return;
-        if (++this.count % 2 == 0) {
-            this.calculateSuction(null, false, false);
-            this.checkVenting();
-            if (this.essentiaAmount <= 0) {
-                this.essentiaAmount = 0;
-                this.essentiaType = null;
-            }
+        if (this.world == null) return;
+        if (this.venting > 0) {
+            --this.venting;
         }
-        if (this.count % 5 == 0 && this.suction > 0) {
-            this.equalizeWithNeighbours(false);
+        if (this.count == 0) {
+            this.count = this.world.rand.nextInt(10);
+        }
+        if (!this.world.isRemote) {
+            if (this.venting <= 0) {
+                if (++this.count % 2 == 0) {
+                    this.calculateSuction(null, false, false);
+                    this.checkVenting();
+                    if (this.essentiaType != null && this.essentiaAmount == 0) {
+                        this.essentiaType = null;
+                    }
+                }
+                if (this.count % 5 == 0 && this.suction > 0) {
+                    this.equalizeWithNeighbours(false);
+                }
+            }
+        } else if (this.venting > 0) {
+            Random random = new Random(this.hashCode() * 4L);
+            float rp = random.nextFloat() * 360.0F;
+            float ry = random.nextFloat() * 360.0F;
+            double fx = -MathHelper.sin(ry / 180.0F * (float) Math.PI) * MathHelper.cos(rp / 180.0F * (float) Math.PI);
+            double fz = MathHelper.cos(ry / 180.0F * (float) Math.PI) * MathHelper.cos(rp / 180.0F * (float) Math.PI);
+            double fy = -MathHelper.sin(rp / 180.0F * (float) Math.PI);
+            Thaumcraft.proxy.drawVentParticles(
+                    this.world,
+                    this.pos.getX() + 0.5D,
+                    this.pos.getY() + 0.5D,
+                    this.pos.getZ() + 0.5D,
+                    fx / 5.0D,
+                    fy / 5.0D,
+                    fz / 5.0D,
+                    this.ventColor);
         }
     }
 
@@ -102,7 +134,12 @@ public class TileTube extends TileThaumcraft implements ITickable, IEssentiaTran
                 int remoteSuction = transport.getSuctionAmount(dir.getOpposite());
                 if (this.suction > 0 && (remoteSuction == this.suction || remoteSuction == this.suction - 1)
                         && this.suctionType != transport.getSuctionType(dir.getOpposite())) {
-                    this.world.addBlockEvent(this.pos, this.world.getBlockState(this.pos).getBlock(), 1, 0);
+                    int c = -1;
+                    if (this.suctionType != null) {
+                        c = Config.aspectOrder.indexOf(this.suctionType);
+                    }
+                    this.world.addBlockEvent(this.pos, this.world.getBlockState(this.pos).getBlock(), 1, c);
+                    this.venting = 40;
                     return;
                 }
             } catch (RuntimeException ignored) {
@@ -131,6 +168,9 @@ public class TileTube extends TileThaumcraft implements ITickable, IEssentiaTran
                 if (aspect == null) continue;
                 int taken = transport.takeEssentia(aspect, 1, remote);
                 if (taken > 0 && this.addEssentia(aspect, taken, dir) > 0) {
+                    if (this.world.rand.nextInt(100) == 0) {
+                        this.world.addBlockEvent(this.pos, this.world.getBlockState(this.pos).getBlock(), 0, 0);
+                    }
                     this.markDirtyAndSync();
                     return;
                 }
@@ -197,7 +237,41 @@ public class TileTube extends TileThaumcraft implements ITickable, IEssentiaTran
     public boolean renderExtendedTube() { return false; }
 
     @Override
-    public boolean receiveClientEvent(int id, int type) { return id == 0 || id == 1 || super.receiveClientEvent(id, type); }
+    public boolean receiveClientEvent(int id, int type) {
+        if (id == 0) {
+            if (this.world != null && this.world.isRemote) {
+                this.world.playSound(
+                        this.pos.getX() + 0.5D,
+                        this.pos.getY() + 0.5D,
+                        this.pos.getZ() + 0.5D,
+                        TCSounds.CREAK,
+                        SoundCategory.BLOCKS,
+                        1.0F,
+                        1.3F + this.world.rand.nextFloat() * 0.2F,
+                        false);
+            }
+            return true;
+        }
+        if (id == 1) {
+            if (this.world != null && this.world.isRemote) {
+                if (this.venting <= 0) {
+                    this.world.playSound(
+                            this.pos.getX() + 0.5D,
+                            this.pos.getY() + 0.5D,
+                            this.pos.getZ() + 0.5D,
+                            SoundEvents.BLOCK_FIRE_EXTINGUISH,
+                            SoundCategory.BLOCKS,
+                            0.1F,
+                            1.0F + this.world.rand.nextFloat() * 0.1F,
+                            false);
+                }
+                this.venting = 50;
+                this.ventColor = type == -1 || type >= Config.aspectOrder.size() ? 0xAAAAAA : Config.aspectOrder.get(type).getColor();
+            }
+            return true;
+        }
+        return super.receiveClientEvent(id, type);
+    }
 
     @Override
     public int onWandRightClick(World world, ItemStack wandstack, EntityPlayer player, int x, int y, int z, int side, int md) {
