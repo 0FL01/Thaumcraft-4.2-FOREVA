@@ -65,14 +65,13 @@ Do not claim backend substantially complete until these are resolved or scoped o
 1. Normal research progression route.
 2. Research table live-route/adversarial validation.
 3. Scan authority live-route/adversarial validation.
-4. Research table NBT symmetry.
-5. Alchemy/thaumatorium/infusion runtime validation.
-6. Outer Lands runtime validation.
-7. Static guard overconfidence.
+4. Alchemy/thaumatorium/infusion runtime validation.
+5. Outer Lands runtime validation.
+6. Static guard overconfidence.
 
 ## Latest Checkpoint
 
-- Stage 9-e burst added `ScanProgressionRuntimeTest` to exercise the real `ScanManager.completeScan(...)` path for representative item/entity/node scans plus discovery-note FAIL fallback into knowledge fragments.
-- Runtime coverage now proves representative aspect-trigger and legacy-name entity-trigger clue grants, node phenomena aspect awards, `@KEY` clue-only behavior under scan execution, and knowledge-fragment fallback when no hidden research is eligible.
-- Validated this burst with `./scripts/dev.sh gradle test --rerun-tasks --tests thaumcraft.common.lib.research.ScanProgressionRuntimeTest`. Runtime smoke was skipped because this checkpoint changed only tests/docs and did not change runtime-affecting production code.
-- Still unverified and still forbidden to claim: normal Thaumonomicon/research-browser packet dispatch, full note solve/research-table completion e2e, full live packet-dispatch scan parity, broader real-content scan trigger matrix, scan/research-table live-route parity, and `bonusAspects` save/load parity. Do not call Stage 9-e complete or server-authoritative progression complete from this checkpoint.
+- Stage 9-e burst resolved the `TileResearchTable.bonusAspects` persistence ambiguity by enforcing presence-only bonus semantics at runtime, matching the original one-bit save/load contract instead of allowing unsaved duplicate counts.
+- Added `TileResearchTablePersistenceRuntimeTest` for repeated recalc clamping and save/load round-trip symmetry; kept `ResearchTableAuthorityRuntimeTest` and the aggregate table contract guard aligned with the new presence-only helper path.
+- Validated this burst with `./scripts/dev.sh gradle test --rerun-tasks --tests thaumcraft.common.tiles.TileResearchTablePersistenceRuntimeTest --tests thaumcraft.common.tiles.TileResearchTableRuntimeContractTest --tests thaumcraft.common.lib.network.playerdata.ResearchTableAuthorityRuntimeTest` and `./scripts/dev.sh validate --smoke`.
+- Still unverified and still forbidden to claim: normal Thaumonomicon/research-browser packet dispatch, full note solve/research-table completion e2e, full live packet-dispatch scan parity, broader real-content scan trigger matrix, and scan/research-table live-route parity. Do not call Stage 9-e complete or server-authoritative progression complete from this checkpoint.

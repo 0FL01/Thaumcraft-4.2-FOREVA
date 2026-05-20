@@ -50,7 +50,6 @@ Current blockers:
 - Normal Thaumonomicon/research-browser click flow is not proven to send validated progression packets.
 - Research table packet hardening now exists, but live GUI-route and broader adversarial/e2e validation remain open.
 - `PacketScannedToServer` hardening now exists, but live packet-route and broader scan/runtime validation remain open.
-- `TileResearchTable` `bonusAspects` persistence is ambiguous.
 - Hidden/lost clue grants need runtime verification against reference behavior.
 - End-to-end progression runtime validation is still missing.
 
@@ -129,12 +128,13 @@ Remaining work is to execute the normal gameplay route:
 - bonus aspect consumption verifies current `bonusAspects` amount;
 - aspect pool / bonus / ink costs are consumed atomically after validation;
 - invalid packets cannot mutate note NBT.
+- `TileResearchTable` bonus aspects are now explicitly presence-only at runtime, matching the original one-bit save/load contract, and targeted runtime tests cover both repeated recalc clamping and save/load round-trip symmetry.
 
 What remains open for this gap is proof around the live client route and broader adversarial coverage:
 
 - validate the real GUI/research-table click path rather than helper-level/runtime-harness calls only;
 - extend malicious-payload coverage to true packet dispatch contexts, not only extracted server-side logic;
-- keep `bonusAspects` save/load semantics under GAP-5/TileResearchTable persistence, not as solved by the packet hardening itself.
+- confirm the full note-solve/table-completion route under normal gameplay, not only isolated table placement/combination/persistence harnesses.
 
 ### GAP-6: Hidden/lost scan clues are wired, but prerequisite/runtime behavior needs verification
 
@@ -212,7 +212,7 @@ Current static validation covers the research corpus and asset references, but P
 - [x] Harden scan completion packet with held-thaumometer checks, server-observed target matching, and forged payload rejection coverage.
 - [ ] Wire and validate normal Thaumonomicon/research-browser action flow.
 - [ ] Validate end-to-end progression: scan -> clue/aspect -> note creation -> research table solve -> note completion -> unlock.
-- [ ] Fix or document/enforce `TileResearchTable.bonusAspects` persistence semantics.
+- [x] Fix and runtime-validate `TileResearchTable.bonusAspects` persistence semantics.
 - [ ] Run runtime/manual validation for representative Thaumonomicon content and progression scenarios.
 
 ## 7. Definition of Done

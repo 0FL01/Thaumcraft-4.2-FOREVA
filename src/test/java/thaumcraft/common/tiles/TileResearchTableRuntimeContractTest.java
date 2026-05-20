@@ -21,7 +21,9 @@ public class TileResearchTableRuntimeContractTest {
                         && source.contains("<= 64.0D;"));
 
         assertTrue("TileResearchTable bonus aspect persistence should stay one-bit per aspect like the original note table save path",
-                source.contains("this.bonusAspects.merge(aspect, 1);")
+                source.contains("private void grantBonusAspect(Aspect aspect)")
+                        && source.contains("if (aspect == null || this.bonusAspects.getAmount(aspect) > 0)")
+                        && source.contains("this.bonusAspects.merge(aspect, 1);")
                         && !source.contains("tag.setInteger(\"amount\", amount);"));
 
         assertTrue("TileResearchTable should restore orb feedback on free placement and aspect refund branches for RESEARCHER1/2",

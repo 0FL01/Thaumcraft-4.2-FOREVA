@@ -384,17 +384,17 @@ implements IInventory, ITickable {
                 && this.world.getLight(this.pos.up()) < 4
                 && !this.world.canSeeSky(this.pos.up())
                 && this.world.rand.nextInt(20) == 0) {
-            this.bonusAspects.merge(Aspect.ENTROPY, 1);
+            grantBonusAspect(Aspect.ENTROPY);
         }
         float worldHeight = (float) this.world.getHeight();
         if ((float) this.pos.getY() > worldHeight * 0.5F && this.world.rand.nextInt(20) == 0) {
-            this.bonusAspects.merge(Aspect.AIR, 1);
+            grantBonusAspect(Aspect.AIR);
         }
         if ((float) this.pos.getY() > worldHeight * 0.66F && this.world.rand.nextInt(20) == 0) {
-            this.bonusAspects.merge(Aspect.AIR, 1);
+            grantBonusAspect(Aspect.AIR);
         }
         if ((float) this.pos.getY() > worldHeight * 0.75F && this.world.rand.nextInt(20) == 0) {
-            this.bonusAspects.merge(Aspect.AIR, 1);
+            grantBonusAspect(Aspect.AIR);
         }
 
         for (int x = -8; x <= 8; ++x) {
@@ -409,66 +409,66 @@ implements IInventory, ITickable {
 
                     if (block == ConfigBlocks.blockCustomOre && md == 1) {
                         if (this.bonusAspects.getAmount(Aspect.AIR) < 1 && this.world.rand.nextInt(20) == 0) {
-                            this.bonusAspects.merge(Aspect.AIR, 1);
+                            grantBonusAspect(Aspect.AIR);
                             return;
                         }
                     } else if (block == ConfigBlocks.blockCrystal && md == 0) {
                         if (this.bonusAspects.getAmount(Aspect.AIR) < 1 && this.world.rand.nextInt(10) == 0) {
-                            this.bonusAspects.merge(Aspect.AIR, 1);
+                            grantBonusAspect(Aspect.AIR);
                             return;
                         }
                     } else if (mat == Material.LAVA || mat == Material.FIRE || block == ConfigBlocks.blockCustomOre && md == 2) {
                         if (this.bonusAspects.getAmount(Aspect.FIRE) < 1 && this.world.rand.nextInt(20) == 0) {
-                            this.bonusAspects.merge(Aspect.FIRE, 1);
+                            grantBonusAspect(Aspect.FIRE);
                             return;
                         }
                     } else if (block == ConfigBlocks.blockCrystal && md == 1) {
                         if (this.bonusAspects.getAmount(Aspect.FIRE) < 1 && this.world.rand.nextInt(10) == 0) {
-                            this.bonusAspects.merge(Aspect.FIRE, 1);
+                            grantBonusAspect(Aspect.FIRE);
                             return;
                         }
                     } else if (mat == Material.GROUND || block == ConfigBlocks.blockCustomOre && md == 4) {
                         if (this.bonusAspects.getAmount(Aspect.EARTH) < 1 && this.world.rand.nextInt(20) == 0) {
-                            this.bonusAspects.merge(Aspect.EARTH, 1);
+                            grantBonusAspect(Aspect.EARTH);
                             return;
                         }
                     } else if (block == ConfigBlocks.blockCrystal && md == 3) {
                         if (this.bonusAspects.getAmount(Aspect.EARTH) < 1 && this.world.rand.nextInt(10) == 0) {
-                            this.bonusAspects.merge(Aspect.EARTH, 1);
+                            grantBonusAspect(Aspect.EARTH);
                             return;
                         }
                     } else if (mat == Material.WATER) {
                         if (this.bonusAspects.getAmount(Aspect.WATER) < 1 && this.world.rand.nextInt(15) == 0) {
-                            this.bonusAspects.merge(Aspect.WATER, 1);
+                            grantBonusAspect(Aspect.WATER);
                             return;
                         }
                     } else if (block == ConfigBlocks.blockCustomOre && md == 3) {
                         if (this.bonusAspects.getAmount(Aspect.WATER) < 1 && this.world.rand.nextInt(20) == 0) {
-                            this.bonusAspects.merge(Aspect.WATER, 1);
+                            grantBonusAspect(Aspect.WATER);
                             return;
                         }
                     } else if (block == ConfigBlocks.blockCrystal && md == 2) {
                         if (this.bonusAspects.getAmount(Aspect.WATER) < 1 && this.world.rand.nextInt(10) == 0) {
-                            this.bonusAspects.merge(Aspect.WATER, 1);
+                            grantBonusAspect(Aspect.WATER);
                             return;
                         }
                     } else if (mat == Material.CIRCUITS || mat == Material.ICE || block == ConfigBlocks.blockCustomOre && md == 5) {
                         if (this.bonusAspects.getAmount(Aspect.ORDER) < 1 && this.world.rand.nextInt(20) == 0) {
-                            this.bonusAspects.merge(Aspect.ORDER, 1);
+                            grantBonusAspect(Aspect.ORDER);
                             return;
                         }
                     } else if (block == ConfigBlocks.blockCrystal && md == 4) {
                         if (this.bonusAspects.getAmount(Aspect.ORDER) < 1 && this.world.rand.nextInt(10) == 0) {
-                            this.bonusAspects.merge(Aspect.ORDER, 1);
+                            grantBonusAspect(Aspect.ORDER);
                             return;
                         }
                     } else if (block == ConfigBlocks.blockCustomOre && md == 6) {
                         if (this.bonusAspects.getAmount(Aspect.ENTROPY) < 1 && this.world.rand.nextInt(20) == 0) {
-                            this.bonusAspects.merge(Aspect.ENTROPY, 1);
+                            grantBonusAspect(Aspect.ENTROPY);
                             return;
                         }
                     } else if (block == ConfigBlocks.blockCrystal && md == 5 && this.bonusAspects.getAmount(Aspect.ENTROPY) < 1 && this.world.rand.nextInt(10) == 0) {
-                        this.bonusAspects.merge(Aspect.ENTROPY, 1);
+                        grantBonusAspect(Aspect.ENTROPY);
                         return;
                     }
 
@@ -476,13 +476,20 @@ implements IInventory, ITickable {
                             || (block == ConfigBlocks.blockJar && md == 1 && this.world.rand.nextInt(200) == 0)) {
                         Aspect[] aspects = Aspect.aspects.values().toArray(new Aspect[0]);
                         if (aspects.length > 0) {
-                            this.bonusAspects.merge(aspects[this.world.rand.nextInt(aspects.length)], 1);
+                            grantBonusAspect(aspects[this.world.rand.nextInt(aspects.length)]);
                             return;
                         }
                     }
                 }
             }
         }
+    }
+
+    private void grantBonusAspect(Aspect aspect) {
+        if (aspect == null || this.bonusAspects.getAmount(aspect) > 0) {
+            return;
+        }
+        this.bonusAspects.merge(aspect, 1);
     }
 
     private boolean playerHasItem(EntityPlayer player, net.minecraft.item.Item item) {
