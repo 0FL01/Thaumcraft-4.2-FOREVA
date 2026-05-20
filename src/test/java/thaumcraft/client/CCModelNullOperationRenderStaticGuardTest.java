@@ -15,6 +15,7 @@ public class CCModelNullOperationRenderStaticGuardTest {
     public void ccModelAndPipelineShouldRejectNullVertexOpsOnNoArgRenderPath() throws IOException {
         String model = readFile("src/main/java/thaumcraft/codechicken/lib/render/CCModel.java");
         String pipeline = readFile("src/main/java/thaumcraft/codechicken/lib/render/CCRenderPipeline.java");
+        String renderState = readFile("src/main/java/thaumcraft/codechicken/lib/render/CCRenderState.java");
 
         assertTrue("CCModel.render() must use an empty vertex-op array instead of null placeholders",
                 model.contains("this.render(0, this.verts.length, new CCRenderState.IVertexOperation[0]);"));
@@ -22,6 +23,14 @@ public class CCModelNullOperationRenderStaticGuardTest {
                 pipeline.contains("if (ops == null)")
                         && pipeline.contains("if (ops[i] != null)")
                         && pipeline.contains("if (op == null)"));
+        assertTrue("CCRenderState must write vertices by walking the active VertexFormat instead of pushing COLOR/UV/NORMAL fields in a hard-coded 1.7.10 order",
+                renderState.contains("currentVertexFormat")
+                        && renderState.contains("for (int i = 0; i < format.getElementCount(); ++i)")
+                        && renderState.contains("case POSITION:")
+                        && renderState.contains("case COLOR:")
+                        && renderState.contains("case UV:")
+                        && renderState.contains("case NORMAL:")
+                        && renderState.contains("startDrawing(int mode, VertexFormat format)"));
     }
 
     private static String readFile(String path) throws IOException {

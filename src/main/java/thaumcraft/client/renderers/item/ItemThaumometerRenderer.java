@@ -173,8 +173,8 @@ public class ItemThaumometerRenderer extends TileEntityItemStackRenderer {
         GlStateManager.enableRescaleNormal();
         GlStateManager.disableCull();
         CCRenderState.reset();
-        CCRenderState.startDrawing();
-        scannerModel.render();
+        CCRenderState.startDrawing(GL11.GL_QUADS, DefaultVertexFormats.OLDMODEL_POSITION_TEX_NORMAL);
+        scannerModel.render(CCRenderState.normalAttrib);
         CCRenderState.draw();
         GlStateManager.enableCull();
         GlStateManager.disableRescaleNormal();

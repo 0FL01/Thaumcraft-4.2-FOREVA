@@ -7,6 +7,8 @@ import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
+import net.minecraft.client.renderer.vertex.VertexFormat;
+import net.minecraft.client.renderer.vertex.VertexFormatElement;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
@@ -46,6 +48,7 @@ public class CCRenderState {
     public static int brightness;
     public static int side;
     public static LC lc;
+    private static VertexFormat currentVertexFormat;
 
     public static int registerOperation() {
         return nextOperationIndex++;
@@ -90,6 +93,7 @@ public class CCRenderState {
         hasNormal = false;
         alphaOverride = -1;
         baseColour = -1;
+        currentVertexFormat = null;
     }
 
     public static void setPipeline(IVertexOperation ... ops) {
@@ -140,16 +144,38 @@ public class CCRenderState {
 
     public static void writeVert() {
         BufferBuilder buffer = Tessellator.getInstance().getBuffer();
-        if (hasNormal) {
-            buffer.normal((float)CCRenderState.normal.x, (float)CCRenderState.normal.y, (float)CCRenderState.normal.z);
+        VertexFormat format = currentVertexFormat != null ? currentVertexFormat : DefaultVertexFormats.BLOCK;
+        for (int i = 0; i < format.getElementCount(); ++i) {
+            VertexFormatElement element = format.getElement(i);
+            switch (element.getUsage()) {
+                case POSITION:
+                    buffer.pos(CCRenderState.vert.vec.x, CCRenderState.vert.vec.y, CCRenderState.vert.vec.z);
+                    break;
+                case COLOR:
+                    int rgba = hasColour ? colour : -1;
+                    buffer.color(rgba >>> 24, rgba >> 16 & 0xFF, rgba >> 8 & 0xFF,
+                            alphaOverride >= 0 ? alphaOverride : rgba & 0xFF);
+                    break;
+                case UV:
+                    if (element.getIndex() == 0) {
+                        buffer.tex(CCRenderState.vert.uv.u, CCRenderState.vert.uv.v);
+                    } else if (element.getIndex() == 1) {
+                        int packedBrightness = hasBrightness ? brightness : 0;
+                        buffer.lightmap(packedBrightness >> 16 & 65535, packedBrightness & 65535);
+                    }
+                    break;
+                case NORMAL:
+                    if (hasNormal) {
+                        buffer.normal((float)CCRenderState.normal.x, (float)CCRenderState.normal.y, (float)CCRenderState.normal.z);
+                    } else {
+                        buffer.normal(0.0F, 1.0F, 0.0F);
+                    }
+                    break;
+                default:
+                    break;
+            }
         }
-        if (hasColour) {
-            buffer.color(colour >>> 24, colour >> 16 & 0xFF, colour >> 8 & 0xFF, alphaOverride >= 0 ? alphaOverride : colour & 0xFF);
-        }
-        if (hasBrightness) {
-            buffer.lightmap(brightness >> 16 & 65535, brightness & 65535);
-        }
-        buffer.pos(CCRenderState.vert.vec.x, CCRenderState.vert.vec.y, CCRenderState.vert.vec.z).tex(CCRenderState.vert.uv.u, CCRenderState.vert.uv.v).endVertex();
+        buffer.endVertex();
     }
 
     public static void setNormal(double x, double y, double z) {
@@ -195,13 +221,12 @@ public class CCRenderState {
     }
 
     private static void startDrawing(int mode) {
-        Tessellator.getInstance().getBuffer().begin(mode, DefaultVertexFormats.BLOCK);
-        if (hasColour) {
-            Tessellator.getInstance().getBuffer().color(colour >>> 24, colour >> 16 & 0xFF, colour >> 8 & 0xFF, alphaOverride >= 0 ? alphaOverride : colour & 0xFF);
-        }
-        if (hasBrightness) {
-            Tessellator.getInstance().getBuffer().lightmap(brightness >> 16 & 65535, brightness & 65535);
-        }
+        CCRenderState.startDrawing(mode, DefaultVertexFormats.BLOCK);
+    }
+
+    public static void startDrawing(int mode, VertexFormat format) {
+        currentVertexFormat = format;
+        Tessellator.getInstance().getBuffer().begin(mode, format);
     }
 
     public static void draw() {
