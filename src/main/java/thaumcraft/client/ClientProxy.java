@@ -1005,13 +1005,12 @@ public class ClientProxy extends CommonProxy {
             beam.setType(type);
             beam.setEndMod(endmod);
             beam.setReverse(reverse);
-            beam.setPulse(false);
             ParticleEngine.addEffect(world, beam);
         } else {
             beam.updateBeam(tx, ty, tz);
             beam.setEndMod(endmod);
+            beam.impact = impact;
         }
-        beam.impact = impact;
         return beam;
     }
 
@@ -1036,13 +1035,12 @@ public class ClientProxy extends CommonProxy {
             beam.setType(type);
             beam.setEndMod(endmod);
             beam.setReverse(reverse);
-            beam.setPulse(false);
             ParticleEngine.addEffect(world, beam);
         } else {
             beam.updateBeam(tx, ty, tz);
             beam.setEndMod(endmod);
+            beam.impact = impact;
         }
-        beam.impact = impact;
         return beam;
     }
 
@@ -1059,7 +1057,6 @@ public class ClientProxy extends CommonProxy {
         FXBeamPower beam = input instanceof FXBeamPower ? (FXBeamPower) input : null;
         if (beam == null || !beam.isAlive()) {
             beam = new FXBeamPower(world, px, py, pz, tx, ty, tz, red, green, blue, 8, false, amount);
-            beam.setPulse(pulse, red, green, blue);
             ParticleEngine.addEffect(world, beam);
         } else {
             beam.updateBeam(px, py, pz, tx, ty, tz);

@@ -36,6 +36,33 @@ public class ClientProxyDedicatedBeamBoltStaticGuardTest {
                         && clientProxy.contains("beamB.setBlendMode(GL11.GL_ONE);")
                         && clientProxy.contains("beamB.setBeamWidth(1.5F);")
                         && clientProxy.contains("beamB.setReverse(false);"));
+        assertTrue("beamCont should keep reference spawn/reuse lifecycle: spawn sets type/endmod/reverse only, reuse updates beam/endmod/impact",
+                clientProxy.contains("beam = new FXBeamWand(world, player, tx, ty, tz, red, green, blue, 8, false, amount);\n"
+                        + "            beam.setType(type);\n"
+                        + "            beam.setEndMod(endmod);\n"
+                        + "            beam.setReverse(reverse);\n"
+                        + "            ParticleEngine.addEffect(world, beam);\n"
+                        + "        } else {\n"
+                        + "            beam.updateBeam(tx, ty, tz);\n"
+                        + "            beam.setEndMod(endmod);\n"
+                        + "            beam.impact = impact;")
+                        && !clientProxy.contains("beam.setPulse(false);"));
+        assertTrue("beamBore should keep reference spawn/reuse lifecycle: spawn sets type/endmod/reverse only, reuse updates beam/endmod/impact",
+                clientProxy.contains("beam = new FXBeamBore(world, px, py, pz, tx, ty, tz, red, green, blue, 8, false, amount);\n"
+                        + "            beam.setType(type);\n"
+                        + "            beam.setEndMod(endmod);\n"
+                        + "            beam.setReverse(reverse);\n"
+                        + "            ParticleEngine.addEffect(world, beam);\n"
+                        + "        } else {\n"
+                        + "            beam.updateBeam(tx, ty, tz);\n"
+                        + "            beam.setEndMod(endmod);\n"
+                        + "            beam.impact = impact;"));
+        assertTrue("beamPower should only pulse-update on reuse, not on initial spawn",
+                clientProxy.contains("beam = new FXBeamPower(world, px, py, pz, tx, ty, tz, red, green, blue, 8, false, amount);\n"
+                        + "            ParticleEngine.addEffect(world, beam);\n"
+                        + "        } else {\n"
+                        + "            beam.updateBeam(px, py, pz, tx, ty, tz);\n"
+                        + "            beam.setPulse(pulse, red, green, blue);"));
         assertFalse("ClientProxy beam path should not keep legacy inline beam fallback loops",
                 clientProxy.contains("double dx = tx - x;"));
         assertFalse("ClientProxy bolt path should not keep legacy inline bolt fallback loops",
