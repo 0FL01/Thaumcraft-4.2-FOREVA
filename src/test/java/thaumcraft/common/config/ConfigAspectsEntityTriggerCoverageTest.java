@@ -8,6 +8,7 @@ import java.nio.file.Path;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.HashSet;
+import java.util.Arrays;
 import java.util.Locale;
 import java.util.Set;
 import java.util.regex.Matcher;
@@ -22,6 +23,7 @@ public class ConfigAspectsEntityTriggerCoverageTest {
 
     private static final Pattern ENTITY_TRIGGER_PATTERN = Pattern.compile("setEntityTriggers\\(([^)]*)\\)");
     private static final Pattern REGISTER_ENTITY_TAG_PATTERN = Pattern.compile("registerEntityTag\\(\\s*\"([^\"]+)\"");
+    private static final Pattern REGISTER_TC_ENTITY_TAG_PATTERN = Pattern.compile("registerEntityTag\\(\\s*tcEntity\\(\"([^\"]+)\"\\)");
     private static final Pattern QUOTED_STRING_PATTERN = Pattern.compile("\"([^\"]+)\"");
 
     @Test
@@ -41,6 +43,40 @@ public class ConfigAspectsEntityTriggerCoverageTest {
 
         assertFalse("ConfigResearch setEntityTriggers(...) has no entries", triggerEntityKeys.isEmpty());
         assertTrue("Missing entity tag registrations in ConfigAspects: " + missing, missing.isEmpty());
+    }
+
+    @Test
+    public void configAspectsKeepsReferenceShapedEntityScanCorpus() throws IOException {
+        String configAspects = readFile("src/main/java/thaumcraft/common/config/ConfigAspects.java");
+        Set<String> registeredEntityKeys = extractRegisteredEntityKeys(configAspects);
+
+        assertTrue("ConfigAspects should keep broad entity scan coverage close to reference, actual: "
+                        + registeredEntityKeys.size(),
+                registeredEntityKeys.size() >= 45);
+
+        for (String key : Arrays.asList(
+                "minecraft:zombie",
+                "minecraft:wither_skeleton",
+                "minecraft:creeper",
+                "minecraft:horse",
+                "minecraft:xp_orb",
+                "minecraft:ender_dragon",
+                "minecraft:spawner_minecart",
+                "thaumcraft:pech",
+                "thaumcraft:thaumslime",
+                "thaumcraft:taintswarm",
+                "thaumcraft:cultistknight",
+                "thaumcraft:wisp",
+                "thaumcraft:golem")) {
+            assertTrue("Missing reference-shaped entity scan tag: " + key, registeredEntityKeys.contains(key));
+        }
+
+        assertTrue("ConfigAspects should keep pech, powered creeper, and wisp type discriminators",
+                configAspects.contains("new ThaumcraftApi.EntityTagsNBT(\"PechType\", (byte)0)")
+                        && configAspects.contains("new ThaumcraftApi.EntityTagsNBT(\"PechType\", (byte)1)")
+                        && configAspects.contains("new ThaumcraftApi.EntityTagsNBT(\"PechType\", (byte)2)")
+                        && configAspects.contains("new ThaumcraftApi.EntityTagsNBT(\"powered\", (byte)1)")
+                        && configAspects.contains("new ThaumcraftApi.EntityTagsNBT(\"Type\", tag.getTag())"));
     }
 
     private static Set<String> extractTriggerEntityKeys(String source) {
@@ -64,6 +100,10 @@ public class ConfigAspectsEntityTriggerCoverageTest {
         Matcher matcher = REGISTER_ENTITY_TAG_PATTERN.matcher(source);
         while (matcher.find()) {
             out.add(matcher.group(1).toLowerCase(Locale.ROOT));
+        }
+        Matcher tcMatcher = REGISTER_TC_ENTITY_TAG_PATTERN.matcher(source);
+        while (tcMatcher.find()) {
+            out.add(("thaumcraft:" + tcMatcher.group(1)).toLowerCase(Locale.ROOT));
         }
         return out;
     }

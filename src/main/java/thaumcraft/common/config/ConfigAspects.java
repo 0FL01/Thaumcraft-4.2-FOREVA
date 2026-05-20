@@ -386,21 +386,161 @@ public class ConfigAspects {
     }
 
     private static void registerEntityAspects() {
-        // Minimal 1.7.10 parity baseline for research entity triggers in ConfigResearch.
-        ThaumcraftApi.registerEntityTag("minecraft:enderman",
-                new AspectList().add(Aspect.ELDRITCH, 4).add(Aspect.TRAVEL, 2).add(Aspect.AIR, 2),
-                new ThaumcraftApi.EntityTagsNBT[0]);
-        ThaumcraftApi.registerEntityTag("thaumcraft:brainyzombie",
-                new AspectList().add(Aspect.UNDEAD, 3).add(Aspect.MAN, 1).add(Aspect.MIND, 1).add(Aspect.EARTH, 1),
-                new ThaumcraftApi.EntityTagsNBT[0]);
-        ThaumcraftApi.registerEntityTag("thaumcraft:giantbrainyzombie",
-                new AspectList().add(Aspect.UNDEAD, 4).add(Aspect.MAN, 2).add(Aspect.MIND, 1).add(Aspect.EARTH, 2),
-                new ThaumcraftApi.EntityTagsNBT[0]);
-        ThaumcraftApi.registerEntityTag("thaumcraft:firebat",
-                new AspectList().add(Aspect.BEAST, 2).add(Aspect.FLIGHT, 1).add(Aspect.FIRE, 2),
-                new ThaumcraftApi.EntityTagsNBT[0]);
-        ThaumcraftApi.registerEntityTag("thaumcraft:primalorb",
-                new AspectList().add(Aspect.AIR, 5).add(Aspect.ENTROPY, 10).add(Aspect.MAGIC, 10).add(Aspect.ENERGY, 10),
-                new ThaumcraftApi.EntityTagsNBT[0]);
+        registerEntityTag("minecraft:zombie",
+                new AspectList().add(Aspect.UNDEAD, 2).add(Aspect.MAN, 1).add(Aspect.EARTH, 1));
+        registerEntityTag("minecraft:giant",
+                new AspectList().add(Aspect.UNDEAD, 4).add(Aspect.MAN, 3).add(Aspect.EARTH, 3));
+        registerEntityTag("minecraft:skeleton",
+                new AspectList().add(Aspect.UNDEAD, 3).add(Aspect.MAN, 1).add(Aspect.EARTH, 1));
+        registerEntityTag("minecraft:wither_skeleton",
+                new AspectList().add(Aspect.UNDEAD, 4).add(Aspect.MAN, 1).add(Aspect.FIRE, 2));
+        registerEntityTag("minecraft:creeper",
+                new AspectList().add(Aspect.PLANT, 2).add(Aspect.FIRE, 2));
+        registerEntityTag("minecraft:creeper",
+                new AspectList().add(Aspect.PLANT, 3).add(Aspect.FIRE, 3).add(Aspect.ENERGY, 3),
+                new ThaumcraftApi.EntityTagsNBT("powered", (byte)1));
+        registerEntityTag("minecraft:horse",
+                new AspectList().add(Aspect.BEAST, 4).add(Aspect.EARTH, 1).add(Aspect.AIR, 1));
+        registerEntityTag("minecraft:pig",
+                new AspectList().add(Aspect.BEAST, 2).add(Aspect.EARTH, 2));
+        registerEntityTag("minecraft:xp_orb",
+                new AspectList().add(Aspect.MIND, 5));
+        registerEntityTag("minecraft:sheep",
+                new AspectList().add(Aspect.BEAST, 2).add(Aspect.EARTH, 2));
+        registerEntityTag("minecraft:cow",
+                new AspectList().add(Aspect.BEAST, 3).add(Aspect.EARTH, 3));
+        registerEntityTag("minecraft:mooshroom",
+                new AspectList().add(Aspect.BEAST, 3).add(Aspect.PLANT, 1).add(Aspect.EARTH, 2));
+        registerEntityTag("minecraft:snowman",
+                new AspectList().add(Aspect.COLD, 3).add(Aspect.WATER, 1));
+        registerEntityTag("minecraft:ocelot",
+                new AspectList().add(Aspect.BEAST, 3).add(Aspect.ENTROPY, 3));
+        registerEntityTag("minecraft:chicken",
+                new AspectList().add(Aspect.BEAST, 2).add(Aspect.FLIGHT, 2).add(Aspect.AIR, 1));
+        registerEntityTag("minecraft:squid",
+                new AspectList().add(Aspect.BEAST, 2).add(Aspect.WATER, 2));
+        registerEntityTag("minecraft:wolf",
+                new AspectList().add(Aspect.BEAST, 3).add(Aspect.EARTH, 3));
+        registerEntityTag("minecraft:bat",
+                new AspectList().add(Aspect.BEAST, 1).add(Aspect.FLIGHT, 1).add(Aspect.AIR, 1));
+        registerEntityTag("minecraft:boat",
+                new AspectList().add(Aspect.MECHANISM, 2).add(Aspect.WATER, 2));
+        registerEntityTag("minecraft:spider",
+                new AspectList().add(Aspect.BEAST, 3).add(Aspect.ENTROPY, 2));
+        registerEntityTag("minecraft:slime",
+                new AspectList().add(Aspect.SLIME, 2).add(Aspect.WATER, 2));
+        registerEntityTag("minecraft:ghast",
+                new AspectList().add(Aspect.UNDEAD, 3).add(Aspect.FIRE, 2));
+        registerEntityTag("minecraft:zombie_pigman",
+                new AspectList().add(Aspect.UNDEAD, 4).add(Aspect.FIRE, 2));
+        registerEntityTag("minecraft:enderman",
+                new AspectList().add(Aspect.ELDRITCH, 4).add(Aspect.TRAVEL, 2).add(Aspect.AIR, 2));
+        registerEntityTag("minecraft:cave_spider",
+                new AspectList().add(Aspect.BEAST, 2).add(Aspect.POISON, 2).add(Aspect.EARTH, 1));
+        registerEntityTag("minecraft:silverfish",
+                new AspectList().add(Aspect.BEAST, 1).add(Aspect.EARTH, 1));
+        registerEntityTag("minecraft:blaze",
+                new AspectList().add(Aspect.ELDRITCH, 4).add(Aspect.FIRE, 1));
+        registerEntityTag("minecraft:magma_cube",
+                new AspectList().add(Aspect.SLIME, 3).add(Aspect.FIRE, 2));
+        registerEntityTag("minecraft:ender_dragon",
+                new AspectList().add(Aspect.ELDRITCH, 20).add(Aspect.BEAST, 20).add(Aspect.ENTROPY, 20));
+        registerEntityTag("minecraft:wither",
+                new AspectList().add(Aspect.UNDEAD, 20).add(Aspect.ENTROPY, 20).add(Aspect.FIRE, 15));
+        registerEntityTag("minecraft:witch",
+                new AspectList().add(Aspect.MAN, 3).add(Aspect.MAGIC, 2).add(Aspect.FIRE, 1));
+        registerEntityTag("minecraft:villager",
+                new AspectList().add(Aspect.MAN, 3).add(Aspect.AIR, 2));
+        registerEntityTag("minecraft:villager_golem",
+                new AspectList().add(Aspect.METAL, 4).add(Aspect.EARTH, 3));
+        registerEntityTag("minecraft:minecart",
+                new AspectList().add(Aspect.MECHANISM, 3).add(Aspect.AIR, 2));
+        registerEntityTag("minecraft:chest_minecart",
+                new AspectList().add(Aspect.MECHANISM, 3).add(Aspect.AIR, 1).add(Aspect.VOID, 1));
+        registerEntityTag("minecraft:furnace_minecart",
+                new AspectList().add(Aspect.MECHANISM, 3).add(Aspect.AIR, 1).add(Aspect.FIRE, 1));
+        registerEntityTag("minecraft:tnt_minecart",
+                new AspectList().add(Aspect.MECHANISM, 3).add(Aspect.AIR, 1).add(Aspect.FIRE, 1));
+        registerEntityTag("minecraft:hopper_minecart",
+                new AspectList().add(Aspect.MECHANISM, 3).add(Aspect.AIR, 1).add(Aspect.EXCHANGE, 1));
+        registerEntityTag("minecraft:spawner_minecart",
+                new AspectList().add(Aspect.MECHANISM, 3).add(Aspect.AIR, 1).add(Aspect.MAGIC, 1));
+        registerEntityTag("minecraft:ender_crystal",
+                new AspectList().add(Aspect.ELDRITCH, 3).add(Aspect.MAGIC, 3).add(Aspect.HEAL, 3));
+        registerEntityTag("minecraft:item_frame",
+                new AspectList().add(Aspect.SENSES, 3).add(Aspect.CLOTH, 1));
+        registerEntityTag("minecraft:painting",
+                new AspectList().add(Aspect.SENSES, 5).add(Aspect.CLOTH, 3));
+
+        registerEntityTag(tcEntity("PrimalOrb"),
+                new AspectList().add(Aspect.AIR, 5).add(Aspect.ENTROPY, 10).add(Aspect.MAGIC, 10).add(Aspect.ENERGY, 10));
+        registerEntityTag(tcEntity("Firebat"),
+                new AspectList().add(Aspect.BEAST, 2).add(Aspect.FLIGHT, 1).add(Aspect.FIRE, 2));
+        registerEntityTag(tcEntity("Pech"),
+                new AspectList().add(Aspect.MAN, 2).add(Aspect.MAGIC, 2).add(Aspect.EXCHANGE, 2).add(Aspect.GREED, 2),
+                new ThaumcraftApi.EntityTagsNBT("PechType", (byte)0));
+        registerEntityTag(tcEntity("Pech"),
+                new AspectList().add(Aspect.MAN, 2).add(Aspect.MAGIC, 2).add(Aspect.EXCHANGE, 2).add(Aspect.WEAPON, 2),
+                new ThaumcraftApi.EntityTagsNBT("PechType", (byte)1));
+        registerEntityTag(tcEntity("Pech"),
+                new AspectList().add(Aspect.MAN, 2).add(Aspect.MAGIC, 4).add(Aspect.EXCHANGE, 2),
+                new ThaumcraftApi.EntityTagsNBT("PechType", (byte)2));
+        registerEntityTag(tcEntity("ThaumSlime"),
+                new AspectList().add(Aspect.SLIME, 2).add(Aspect.MAGIC, 1).add(Aspect.WATER, 1));
+        registerEntityTag(tcEntity("BrainyZombie"),
+                new AspectList().add(Aspect.UNDEAD, 3).add(Aspect.MAN, 1).add(Aspect.MIND, 1).add(Aspect.EARTH, 1));
+        registerEntityTag(tcEntity("GiantBrainyZombie"),
+                new AspectList().add(Aspect.UNDEAD, 4).add(Aspect.MAN, 2).add(Aspect.MIND, 1).add(Aspect.EARTH, 2));
+        registerEntityTag(tcEntity("Taintacle"),
+                new AspectList().add(Aspect.TAINT, 3).add(Aspect.WATER, 2));
+        registerEntityTag(tcEntity("TaintacleTiny"),
+                new AspectList().add(Aspect.TAINT, 1).add(Aspect.WATER, 1));
+        registerEntityTag(tcEntity("TaintSpider"),
+                new AspectList().add(Aspect.TAINT, 1).add(Aspect.EARTH, 1));
+        registerEntityTag(tcEntity("TaintSpore"),
+                new AspectList().add(Aspect.TAINT, 2).add(Aspect.AIR, 2));
+        registerEntityTag(tcEntity("TaintSwarmer"),
+                new AspectList().add(Aspect.TAINT, 2).add(Aspect.AIR, 2));
+        registerEntityTag(tcEntity("TaintSwarm"),
+                new AspectList().add(Aspect.TAINT, 3).add(Aspect.AIR, 3));
+        registerEntityTag(tcEntity("TaintedPig"),
+                new AspectList().add(Aspect.TAINT, 2).add(Aspect.EARTH, 2));
+        registerEntityTag(tcEntity("TaintedSheep"),
+                new AspectList().add(Aspect.TAINT, 2).add(Aspect.EARTH, 2));
+        registerEntityTag(tcEntity("TaintedCow"),
+                new AspectList().add(Aspect.TAINT, 3).add(Aspect.EARTH, 3));
+        registerEntityTag(tcEntity("TaintedChicken"),
+                new AspectList().add(Aspect.TAINT, 2).add(Aspect.FLIGHT, 2).add(Aspect.AIR, 1));
+        registerEntityTag(tcEntity("TaintedVillager"),
+                new AspectList().add(Aspect.TAINT, 3).add(Aspect.AIR, 2));
+        registerEntityTag(tcEntity("TaintedCreeper"),
+                new AspectList().add(Aspect.TAINT, 2).add(Aspect.FIRE, 2));
+        registerEntityTag(tcEntity("MindSpider"),
+                new AspectList().add(Aspect.TAINT, 2).add(Aspect.FIRE, 2));
+        registerEntityTag(tcEntity("EldritchGuardian"),
+                new AspectList().add(Aspect.ELDRITCH, 4).add(Aspect.DEATH, 2).add(Aspect.UNDEAD, 4));
+        registerEntityTag(tcEntity("EldritchOrb"),
+                new AspectList().add(Aspect.ELDRITCH, 2).add(Aspect.DEATH, 2));
+        registerEntityTag(tcEntity("CultistKnight"),
+                new AspectList().add(Aspect.ELDRITCH, 1).add(Aspect.MAN, 2).add(Aspect.ENTROPY, 1));
+        registerEntityTag(tcEntity("CultistCleric"),
+                new AspectList().add(Aspect.ELDRITCH, 1).add(Aspect.MAN, 2).add(Aspect.ENTROPY, 1));
+        for (Aspect tag : Aspect.aspects.values()) {
+            if (tag != null) {
+                registerEntityTag(tcEntity("Wisp"),
+                        new AspectList().add(tag, 2).add(Aspect.MAGIC, 1).add(Aspect.AIR, 1),
+                        new ThaumcraftApi.EntityTagsNBT("Type", tag.getTag()));
+            }
+        }
+        registerEntityTag(tcEntity("Golem"),
+                new AspectList().add(Aspect.AIR, 2).add(Aspect.EARTH, 2).add(Aspect.MAGIC, 2));
+    }
+
+    private static void registerEntityTag(String key, AspectList aspects, ThaumcraftApi.EntityTagsNBT... nbt) {
+        ThaumcraftApi.registerEntityTag(key, aspects, nbt);
+    }
+
+    private static String tcEntity(String legacyToken) {
+        return "thaumcraft:" + ConfigBlocks.legacyPath(legacyToken);
     }
 }
