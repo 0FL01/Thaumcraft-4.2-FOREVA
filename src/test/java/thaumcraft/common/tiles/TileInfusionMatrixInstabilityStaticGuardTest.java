@@ -25,6 +25,13 @@ public class TileInfusionMatrixInstabilityStaticGuardTest {
         assertTrue(source.contains("new PacketFXBlockZap("));
         assertTrue(source.contains("SoundEvents.ENTITY_GENERIC_SWIM"));
         assertTrue(source.contains("SoundEvents.BLOCK_FIRE_EXTINGUISH"));
+        assertTrue(source.contains("Thaumcraft.proxy.drawInfusionParticles1("));
+        assertTrue(source.contains("Thaumcraft.proxy.drawInfusionParticles2("));
+        assertTrue(source.contains("Thaumcraft.proxy.drawInfusionParticles3("));
+        assertTrue(source.contains("Thaumcraft.proxy.drawInfusionParticles4("));
+        assertTrue(source.contains("Thaumcraft.proxy.nodeBolt("));
+        assertFalse(source.contains("Thaumcraft.proxy.beam("));
+        assertFalse(source.contains("Thaumcraft.proxy.bolt("));
         assertFalse(source.contains("canPlaceFlux("));
     }
 

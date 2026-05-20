@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import net.minecraft.block.Block;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.Entity;
@@ -12,6 +13,8 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.SoundEvents;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagCompound;
@@ -795,36 +798,62 @@ public class TileInfusionMatrix extends TileThaumcraft implements ITickable, IWa
                 Entity target = this.world.getEntityByID(fx.color);
                 if (target != null) {
                     for (int i = 0; i < Thaumcraft.proxy.particleCount(2); ++i) {
-                        Thaumcraft.proxy.beam(
+                        Thaumcraft.proxy.drawInfusionParticles4(
                                 this.world,
                                 target.posX + (this.world.rand.nextFloat() - this.world.rand.nextFloat()) * target.width,
                                 target.getEntityBoundingBox().minY + this.world.rand.nextFloat() * target.height,
                                 target.posZ + (this.world.rand.nextFloat() - this.world.rand.nextFloat()) * target.width,
-                                this.pos.getX() + 0.5D,
-                                this.pos.getY() + 0.5D,
-                                this.pos.getZ() + 0.5D,
-                                0xCC88FF,
-                                true,
-                                8);
+                                this.pos.getX(),
+                                this.pos.getY(),
+                                this.pos.getZ());
                     }
                 }
             } else {
                 TileEntity tile = this.world.getTileEntity(fx.loc);
                 if (tile instanceof TilePedestal) {
                     ItemStack stack = ((TilePedestal) tile).getStackInSlot(0);
-                    if (!stack.isEmpty() && this.world.rand.nextInt(3) == 0) {
-                        int color = fx.color > 0 ? fx.color : 0x99CCFF;
-                        Thaumcraft.proxy.beam(
-                                this.world,
-                                fx.loc.getX() + 0.4D + this.world.rand.nextFloat() * 0.2D,
-                                fx.loc.getY() + 1.23D + this.world.rand.nextFloat() * 0.2D,
-                                fx.loc.getZ() + 0.4D + this.world.rand.nextFloat() * 0.2D,
-                                this.pos.getX() + 0.5D,
-                                this.pos.getY() + 0.5D,
-                                this.pos.getZ() + 0.5D,
-                                color,
-                                true,
-                                10);
+                    if (!stack.isEmpty()) {
+                        if (this.world.rand.nextInt(3) == 0) {
+                            Thaumcraft.proxy.drawInfusionParticles3(
+                                    this.world,
+                                    fx.loc.getX() + this.world.rand.nextFloat(),
+                                    fx.loc.getY() + this.world.rand.nextFloat() + 1.0D,
+                                    fx.loc.getZ() + this.world.rand.nextFloat(),
+                                    this.pos.getX(),
+                                    this.pos.getY(),
+                                    this.pos.getZ());
+                        } else {
+                            Item item = stack.getItem();
+                            int meta = stack.getItemDamage();
+                            if (meta == 0 && item instanceof ItemBlock) {
+                                Block block = Block.getBlockFromItem(item);
+                                IBlockState state = block.getStateFromMeta(meta);
+                                for (int i = 0; i < Thaumcraft.proxy.particleCount(2); ++i) {
+                                    Thaumcraft.proxy.drawInfusionParticles2(
+                                            this.world,
+                                            fx.loc.getX() + this.world.rand.nextFloat(),
+                                            fx.loc.getY() + this.world.rand.nextFloat() + 1.0D,
+                                            fx.loc.getZ() + this.world.rand.nextFloat(),
+                                            this.pos.getX(),
+                                            this.pos.getY(),
+                                            this.pos.getZ(),
+                                            state);
+                                }
+                            } else {
+                                for (int i = 0; i < Thaumcraft.proxy.particleCount(2); ++i) {
+                                    Thaumcraft.proxy.drawInfusionParticles1(
+                                            this.world,
+                                            fx.loc.getX() + 0.4D + this.world.rand.nextFloat() * 0.2D,
+                                            fx.loc.getY() + 1.23D + this.world.rand.nextFloat() * 0.2D,
+                                            fx.loc.getZ() + 0.4D + this.world.rand.nextFloat() * 0.2D,
+                                            this.pos.getX(),
+                                            this.pos.getY(),
+                                            this.pos.getZ(),
+                                            item,
+                                            meta);
+                                }
+                            }
+                        }
                     }
                 } else {
                     fx.ticks = 0;
@@ -836,16 +865,14 @@ public class TileInfusionMatrix extends TileThaumcraft implements ITickable, IWa
         }
 
         if (this.crafting && this.instability > 0 && this.world.rand.nextInt(200) <= this.instability) {
-            Thaumcraft.proxy.bolt(
+            Thaumcraft.proxy.nodeBolt(
                     this.world,
-                    this.pos.getX() + 0.5D,
-                    this.pos.getY() + 0.5D,
-                    this.pos.getZ() + 0.5D,
-                    this.pos.getX() + 0.5D + (this.world.rand.nextFloat() - this.world.rand.nextFloat()) * 2.0D,
-                    this.pos.getY() + 0.5D + (this.world.rand.nextFloat() - this.world.rand.nextFloat()) * 2.0D,
-                    this.pos.getZ() + 0.5D + (this.world.rand.nextFloat() - this.world.rand.nextFloat()) * 2.0D,
-                    0x9966FF,
-                    4);
+                    this.pos.getX() + 0.5F,
+                    this.pos.getY() + 0.5F,
+                    this.pos.getZ() + 0.5F,
+                    this.pos.getX() + 0.5F + (this.world.rand.nextFloat() - this.world.rand.nextFloat()) * 2.0F,
+                    this.pos.getY() + 0.5F + (this.world.rand.nextFloat() - this.world.rand.nextFloat()) * 2.0F,
+                    this.pos.getZ() + 0.5F + (this.world.rand.nextFloat() - this.world.rand.nextFloat()) * 2.0F);
         }
     }
 
