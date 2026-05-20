@@ -6,6 +6,12 @@ Stage 6 покрывает серверно-видимое поведение с
 
 По PRD Stage 6 не закрыта: `docs/PRD.md:317-339` задает цель, baseline и acceptance, а `docs/PRD.md:325-333` прямо перечисляет незакрытые риски: boss special attacks, Pech trade/taming/pickup/combat, golem AI/interactions, drops/sounds runtime scenarios.
 
+### Current backend interpretation note
+
+Stage 6 has many entity/golem/mob implementations and static guard checkpoints, but it must not be marked complete from class presence, registration, or source-shape tests.
+
+Do not claim Stage 6 complete until representative dedicated-server scenarios pass for golem placement/core behavior/upgrades/inventory/combat/liquid/essentia/save-load, traveling trunk placement/inventory/defense/dimension transfer/save-load, Pech anger/trade/spawn variants, cultist portal reward path, boss special attacks and phase flows, and projectile effects/status behavior where server-visible.
+
 ## 2. Scope фазы
 
 - Entity classes: `src/main/java/thaumcraft/common/entities/**` и reference `thaumcraft_src/thaumcraft/common/entities/**`.

@@ -6,6 +6,16 @@ Stage 7 закрывает серверную часть генерации ми
 
 Фаза не может считаться завершенной сейчас: ниже остаются blocker/high gaps, а PRD требует, чтобы runtime generation работал в новом мире и косметические deferrals были документированы: `docs/PRD.md:361-364`.
 
+### Current Outer Lands interpretation note
+
+Outer Lands is partially wired, not parity-complete.
+
+Present: `WorldProviderOuter`, `ChunkProviderOuter`, and the Eldritch maze generation hook exist; `MazeHandler.generateEldritch(...)` still owns maze-cell routing.
+
+Still open: fresh-world runtime proof that ring generation creates and persists non-empty maze cells; portal activation and teleport entry/return validation; safe spawn/destination behavior in void-like terrain; async `MazeThread` save/load race behavior; `TeleporterThaumcraft.makePortal(...)` semantics.
+
+Do not claim "Outer Lands baseline restored" without runtime evidence for ring -> maze -> portal -> dimension -> return path.
+
 ## 2. Scope фазы
 
 - Биомы Stage 7: `src/main/java/thaumcraft/common/lib/world/biomes/BiomeMagicalForest.java`, `src/main/java/thaumcraft/common/lib/world/biomes/BiomeTaint.java`, `src/main/java/thaumcraft/common/lib/world/biomes/BiomeEerie.java`, `src/main/java/thaumcraft/common/lib/world/biomes/BiomeEldritch.java`, `src/main/java/thaumcraft/common/lib/world/biomes/BiomeHandler.java`.

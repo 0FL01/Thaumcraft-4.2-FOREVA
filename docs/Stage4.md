@@ -8,6 +8,13 @@ Stage 4 закрывает серверную и common-часть блоков 
 
 Stage 4 fresh-world server/common closure реализован в checkpoint `port: close Stage 4 block tile parity`. Исторический gap list ниже сохранен как audit trail; актуальные closure notes, validation и deferrals находятся в разделе 9.
 
+### Current interpretation note
+
+Do not read the early gap titles as current truth without checking the closure notes and production code.
+Current backend state: many Stage 4 systems are materially implemented, including Crucible, Infusion Matrix, Arcane Bore, Thaumatorium, Focal Manipulator, Portable Hole, and Warding. Remaining risk is mainly runtime behavior and save/load validation, not absence of all server code.
+
+Still open for backend confidence: Crucible recipe scenarios are Phase 9/content-dependent; Thaumatorium exact/extra essentia, output blocking, top/bottom transport, and NBT reload need validation; Infusion Matrix instability, pedestal geometry, essentia drain, enchantment cost scaling, and mid-craft reload need validation.
+
 Принятое прагматичное решение для закрытия Stage 4: Stage 4 делится на `core closure` и `transport closure`. `core closure` закрывает серверную работоспособность уже существующих Stage 4 устройств и разблокирует Phase 8; `transport closure` добавляет минимальную server-only essentia-сеть, без которой нельзя валидировать машины. Reference-блоки, не требующиеся для этих двух closure-наборов, не блокируют pre-Phase8 переход при условии явного deferral в этом документе.
 
 ## 2. Scope фазы
