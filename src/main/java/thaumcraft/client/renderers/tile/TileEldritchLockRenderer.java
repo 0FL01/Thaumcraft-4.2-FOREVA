@@ -5,9 +5,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.ActiveRenderInfo;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.block.model.ItemCameraTransforms;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.Entity;
@@ -110,10 +108,7 @@ public class TileEldritchLockRenderer extends TileEntitySpecialRenderer<TileEldr
                 y + 0.285D,
                 z + 0.5D + facing.getZOffset() * 0.525D);
         GlStateManager.rotate(-facing.getHorizontalAngle(), 0.0F, 1.0F, 0.0F);
-        RenderHelper.enableStandardItemLighting();
-        net.minecraft.client.Minecraft.getMinecraft().getRenderItem()
-                .renderItem(key, ItemCameraTransforms.TransformType.GROUND);
-        RenderHelper.disableStandardItemLighting();
+        TileRenderHelper.renderEntityItem(tile.getWorld(), key, 0.0F);
         GlStateManager.popMatrix();
     }
 

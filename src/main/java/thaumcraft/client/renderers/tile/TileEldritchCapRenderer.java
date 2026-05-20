@@ -1,8 +1,6 @@
 package thaumcraft.client.renderers.tile;
 
 import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.RenderHelper;
-import net.minecraft.client.renderer.block.model.ItemCameraTransforms;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
@@ -75,10 +73,7 @@ public class TileEldritchCapRenderer extends TileEntitySpecialRenderer<TileEntit
             GlStateManager.translate(0.46D, 0.2D, 0.0D);
             GlStateManager.rotate(90.0F, 0.0F, 1.0F, 0.0F);
             GlStateManager.rotate(18.0F, -1.0F, 0.0F, 0.0F);
-            RenderHelper.enableStandardItemLighting();
-            net.minecraft.client.Minecraft.getMinecraft().getRenderItem()
-                    .renderItem(eye.copy(), ItemCameraTransforms.TransformType.GROUND);
-            RenderHelper.disableStandardItemLighting();
+            TileRenderHelper.renderEntityItem(altar.getWorld(), eye, 0.0F);
             GlStateManager.popMatrix();
         }
         GlStateManager.popMatrix();

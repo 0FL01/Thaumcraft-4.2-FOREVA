@@ -1,8 +1,6 @@
 package thaumcraft.client.renderers.tile;
 
 import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.RenderHelper;
-import net.minecraft.client.renderer.block.model.ItemCameraTransforms;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.MathHelper;
@@ -23,11 +21,7 @@ public class TileFocalManipulatorRenderer extends TileEntitySpecialRenderer<Tile
             GlStateManager.pushMatrix();
             GlStateManager.translate(x + 0.5D, y + 1.0D, z + 0.5D);
             GlStateManager.rotate(ticks % 360.0F, 0.0F, 1.0F, 0.0F);
-            GlStateManager.translate(0.0F, hover, 0.0F);
-            RenderHelper.enableStandardItemLighting();
-            net.minecraft.client.Minecraft.getMinecraft().getRenderItem()
-                    .renderItem(focus.copy(), ItemCameraTransforms.TransformType.GROUND);
-            RenderHelper.disableStandardItemLighting();
+            TileRenderHelper.renderEntityItem(tile.getWorld(), focus, hover);
             GlStateManager.popMatrix();
         }
     }

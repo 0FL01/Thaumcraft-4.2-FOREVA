@@ -33,7 +33,7 @@ public class TableEldritchRendererFidelityStaticGuardTest {
         assertTrue(cap.contains("tile.getWorld().provider.getDimension() == Config.dimensionOuterId"));
         assertTrue(cap.contains("new ModelEldritchCap()"));
         assertTrue(cap.contains("MODEL.renderCap();"));
-        assertTrue(cap.contains("renderItem(eye.copy(), ItemCameraTransforms.TransformType.GROUND)"));
+        assertTrue(cap.contains("TileRenderHelper.renderEntityItem(altar.getWorld(), eye, 0.0F);"));
         assertFalse(cap.contains("TileRenderHelper.renderFloatingItem("));
 
         assertTrue(obelisk.contains("new ModelEldritchCap()"));
@@ -45,7 +45,7 @@ public class TableEldritchRendererFidelityStaticGuardTest {
         assertTrue(capModel.contains("buf.begin(GL11.GL_TRIANGLES, DefaultVertexFormats.POSITION_TEX_NORMAL)"));
         assertTrue(capModel.contains("private static final int[][] TRIANGLES"));
 
-        assertTrue(lock.contains("renderItem(key, ItemCameraTransforms.TransformType.GROUND)"));
+        assertTrue(lock.contains("TileRenderHelper.renderEntityItem(tile.getWorld(), key, 0.0F);"));
         assertTrue(lock.contains("ActiveRenderInfo.getRotationX()"));
         assertTrue(lock.contains("private static final float FIELD_MIN = -2.0F;"));
         assertTrue(lock.contains("private static final float FIELD_MAX = 3.0F;"));
