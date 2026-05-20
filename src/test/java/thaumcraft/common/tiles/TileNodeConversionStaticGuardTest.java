@@ -69,6 +69,27 @@ public class TileNodeConversionStaticGuardTest {
         assertTrue(stoneDevice.contains("((TileNodeConverter) te).checkStatus();"));
     }
 
+    @Test
+    public void tileNodeShouldKeepDischargeLockAndRechargeDelayContracts() throws IOException {
+        String source = readFile("src/main/java/thaumcraft/common/tiles/TileNode.java");
+
+        assertTrue(source.contains("private int wait = 0;"));
+        assertTrue(source.contains("private byte nodeLock = 0;"));
+        assertTrue(source.contains("public byte getLock()"));
+        assertTrue(source.contains("checkLock();"));
+        assertTrue(source.contains("changed |= handleDischarge();"));
+        assertTrue(source.contains("this.regeneration > 0 && this.wait == 0 && this.count % this.regeneration == 0"));
+        assertTrue(source.contains("private void checkLock()"));
+        assertTrue(source.contains("this.world.getBlockState(this.pos.down()).getBlock() == ConfigBlocks.blockStoneDevice"));
+        assertTrue(source.contains("if (meta == 9)"));
+        assertTrue(source.contains("} else if (meta == 10)"));
+        assertTrue(source.contains("private boolean handleDischarge()"));
+        assertTrue(source.contains("this.world.getBlockState(this.pos).getBlock() != ConfigBlocks.blockAiry || this.getLock() == 1"));
+        assertTrue(source.contains("targetNode.wait = targetNode.regeneration / 2;"));
+        assertTrue(source.contains("new PacketFXBlockZap("));
+        assertTrue(source.contains("new NetworkRegistry.TargetPoint("));
+    }
+
     private static String readFile(String path) throws IOException {
         return new String(Files.readAllBytes(Paths.get(path)), StandardCharsets.UTF_8);
     }

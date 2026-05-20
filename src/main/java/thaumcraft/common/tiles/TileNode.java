@@ -1,8 +1,10 @@
 package thaumcraft.common.tiles;
 
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.util.ITickable;
+import net.minecraftforge.fml.common.network.NetworkRegistry;
 import thaumcraft.api.TileThaumcraft;
 import thaumcraft.api.aspects.Aspect;
 import thaumcraft.api.aspects.AspectList;
@@ -11,7 +13,10 @@ import thaumcraft.api.nodes.INode;
 import thaumcraft.api.nodes.NodeModifier;
 import thaumcraft.api.nodes.NodeType;
 import thaumcraft.api.WorldCoordinates;
+import thaumcraft.common.config.ConfigBlocks;
 import thaumcraft.common.items.ItemCompassStone;
+import thaumcraft.common.lib.network.PacketHandler;
+import thaumcraft.common.lib.network.fx.PacketFXBlockZap;
 
 public class TileNode
 extends TileThaumcraft
@@ -26,6 +31,8 @@ implements ITickable, INode, IAspectContainer {
     private long lastActive = 0L;
     private int count = 0;
     private int regeneration = -1;
+    private int wait = 0;
+    private byte nodeLock = 0;
     private boolean catchUp = false;
     public long fuel = 0;
     public boolean balanced = false;
@@ -154,6 +161,7 @@ implements ITickable, INode, IAspectContainer {
             }
             return;
         }
+        checkLock();
         if (this.regeneration < 0) {
             this.regeneration = getRegenerationInterval();
         }
@@ -162,7 +170,11 @@ implements ITickable, INode, IAspectContainer {
         if (this.catchUp) {
             changed = handleCatchUpRecharge();
         }
-        if (this.regeneration > 0 && this.count % this.regeneration == 0) {
+        changed |= handleDischarge();
+        if (this.wait > 0) {
+            --this.wait;
+        }
+        if (this.regeneration > 0 && this.wait == 0 && this.count % this.regeneration == 0) {
             this.lastActive = System.currentTimeMillis();
             changed |= rechargeOneMissingAspect();
         }
@@ -177,10 +189,22 @@ implements ITickable, INode, IAspectContainer {
     }
 
     private int getRegenerationInterval() {
-        if (this.nodeModifier == NodeModifier.BRIGHT) return 400;
-        if (this.nodeModifier == NodeModifier.PALE) return 900;
-        if (this.nodeModifier == NodeModifier.FADING) return 0;
-        return 600;
+        int interval = 600;
+        if (this.nodeModifier == NodeModifier.BRIGHT) {
+            interval = 400;
+        } else if (this.nodeModifier == NodeModifier.PALE) {
+            interval = 900;
+        } else if (this.nodeModifier == NodeModifier.FADING) {
+            interval = 0;
+        }
+        if (interval > 0) {
+            if (this.getLock() == 1) {
+                interval *= 2;
+            } else if (this.getLock() == 2) {
+                interval *= 20;
+            }
+        }
+        return interval;
     }
 
     private boolean handleCatchUpRecharge() {
@@ -208,7 +232,123 @@ implements ITickable, INode, IAspectContainer {
     }
 
     private void nodeChange() {
+        this.regeneration = -1;
         this.markDirty();
         this.world.notifyBlockUpdate(this.pos, this.world.getBlockState(this.pos), this.world.getBlockState(this.pos), 3);
+    }
+
+    public byte getLock() {
+        return this.nodeLock;
+    }
+
+    private void checkLock() {
+        if ((this.count <= 1 || this.count % 50 == 0)
+                && this.pos.getY() > 0
+                && this.world.getBlockState(this.pos).getBlock() == ConfigBlocks.blockAiry) {
+            byte oldLock = this.nodeLock;
+            this.nodeLock = 0;
+            if (!this.world.isAirBlock(this.pos.down())
+                    && this.world.getBlockState(this.pos.down()).getBlock() == ConfigBlocks.blockStoneDevice) {
+                int meta = this.world.getBlockState(this.pos.down()).getBlock()
+                        .getMetaFromState(this.world.getBlockState(this.pos.down()));
+                if (meta == 9) {
+                    this.nodeLock = 1;
+                } else if (meta == 10) {
+                    this.nodeLock = 2;
+                }
+            }
+            if (oldLock != this.nodeLock) {
+                this.regeneration = -1;
+            }
+        }
+    }
+
+    private boolean handleDischarge() {
+        if (this.world.getBlockState(this.pos).getBlock() != ConfigBlocks.blockAiry || this.getLock() == 1) {
+            return false;
+        }
+        if (this.getNodeModifier() == NodeModifier.FADING) {
+            return false;
+        }
+
+        boolean shiny = this.getNodeType() == NodeType.HUNGRY || this.getNodeModifier() == NodeModifier.BRIGHT;
+        int interval = this.getNodeModifier() == null ? 2 : (shiny ? 1 : (this.getNodeModifier() == NodeModifier.PALE ? 3 : 2));
+        if (this.count % interval != 0) {
+            return false;
+        }
+        if (this.getNodeModifier() == NodeModifier.PALE && this.world.rand.nextBoolean()) {
+            return false;
+        }
+
+        int x = this.world.rand.nextInt(5) - this.world.rand.nextInt(5);
+        int y = this.world.rand.nextInt(5) - this.world.rand.nextInt(5);
+        int z = this.world.rand.nextInt(5) - this.world.rand.nextInt(5);
+        if (x == 0 && y == 0 && z == 0) {
+            return false;
+        }
+
+        TileEntity te = this.world.getTileEntity(this.pos.add(x, y, z));
+        if (!(te instanceof INode) || this.world.getBlockState(this.pos.add(x, y, z)).getBlock() != ConfigBlocks.blockAiry) {
+            return false;
+        }
+        if (te instanceof TileNode && ((TileNode) te).getLock() > 0) {
+            return false;
+        }
+
+        INode node = (INode) te;
+        int targetAverage = (node.getAspects().visSize() + node.getAspectsBase().visSize()) / 2;
+        int thisAverage = (this.getAspects().visSize() + this.getAspectsBase().visSize()) / 2;
+        if (targetAverage >= thisAverage || node.getAspects().size() <= 0) {
+            return false;
+        }
+
+        Aspect aspect = node.getAspects().getAspects()[this.world.rand.nextInt(node.getAspects().size())];
+        boolean updated = false;
+        if (this.getAspects().getAmount(aspect) < this.getNodeVisBase(aspect) && node.takeFromContainer(aspect, 1)) {
+            this.addToContainer(aspect, 1);
+            updated = true;
+        } else if (node.takeFromContainer(aspect, 1)) {
+            int bound = 1 + (int) ((double) this.getNodeVisBase(aspect) / (shiny ? 1.5D : 1.0D));
+            if (this.world.rand.nextInt(Math.max(1, bound)) == 0) {
+                this.aspectsBase.add(aspect, 1);
+                if (this.getNodeModifier() == NodeModifier.PALE && this.world.rand.nextInt(100) == 0) {
+                    this.setNodeModifier(null);
+                }
+                if (this.world.rand.nextInt(3) == 0) {
+                    node.setNodeVisBase(aspect, (short) (node.getNodeVisBase(aspect) - 1));
+                }
+            }
+            updated = true;
+        }
+
+        if (!updated) {
+            return false;
+        }
+
+        if (te instanceof TileNode) {
+            TileNode targetNode = (TileNode) te;
+            if (targetNode.regeneration < 0) {
+                targetNode.regeneration = targetNode.getRegenerationInterval();
+            }
+            targetNode.wait = targetNode.regeneration / 2;
+            te.markDirty();
+            this.world.notifyBlockUpdate(te.getPos(), this.world.getBlockState(te.getPos()), this.world.getBlockState(te.getPos()), 3);
+        }
+
+        PacketHandler.INSTANCE.sendToAllAround(
+                new PacketFXBlockZap(
+                        (float) (this.pos.getX() + x) + 0.5F,
+                        (float) (this.pos.getY() + y) + 0.5F,
+                        (float) (this.pos.getZ() + z) + 0.5F,
+                        (float) this.pos.getX() + 0.5F,
+                        (float) this.pos.getY() + 0.5F,
+                        (float) this.pos.getZ() + 0.5F),
+                new NetworkRegistry.TargetPoint(
+                        this.world.provider.getDimension(),
+                        this.pos.getX(),
+                        this.pos.getY(),
+                        this.pos.getZ(),
+                        32.0));
+        return true;
     }
 }
