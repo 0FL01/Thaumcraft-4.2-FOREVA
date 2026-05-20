@@ -7,6 +7,7 @@ import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.MathHelper;
+import thaumcraft.client.renderers.models.ModelCrystalizer;
 import thaumcraft.client.renderers.models.ModelVisRelay;
 import thaumcraft.common.tiles.TileEssentiaCrystalizer;
 
@@ -17,6 +18,7 @@ public class TileEssentiaCrystalizerRenderer extends TileEntitySpecialRenderer<T
             new ResourceLocation("thaumcraft", "textures/models/vis_relay.png");
     private static final float MODEL_SCALE = 0.0625F;
 
+    private final ModelCrystalizer baseModel = new ModelCrystalizer();
     private final ModelVisRelay model = new ModelVisRelay();
 
     @Override
@@ -34,10 +36,8 @@ public class TileEssentiaCrystalizerRenderer extends TileEntitySpecialRenderer<T
 
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
         bindTexture(BASE_TEXTURE);
-        GlStateManager.pushMatrix();
-        GlStateManager.scale(0.95F, 0.6F, 0.95F);
-        model.renderRingBase(MODEL_SCALE);
-        GlStateManager.popMatrix();
+        baseModel.renderBase();
+        baseModel.renderTop();
 
         GlStateManager.enableBlend();
         GlStateManager.blendFunc(770, 771);

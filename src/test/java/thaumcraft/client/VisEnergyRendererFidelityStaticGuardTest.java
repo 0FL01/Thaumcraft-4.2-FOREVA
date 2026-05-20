@@ -19,6 +19,7 @@ public class VisEnergyRendererFidelityStaticGuardTest {
         String chargerRenderer = read("src/main/java/thaumcraft/client/renderers/tile/TileMagicWorkbenchChargerRenderer.java");
         String relayRenderer = read("src/main/java/thaumcraft/client/renderers/tile/TileVisRelayRenderer.java");
         String crystalizerRenderer = read("src/main/java/thaumcraft/client/renderers/tile/TileEssentiaCrystalizerRenderer.java");
+        String crystalizerModel = read("src/main/java/thaumcraft/client/renderers/models/ModelCrystalizer.java");
         String relayModel = read("src/main/java/thaumcraft/client/renderers/models/ModelVisRelay.java");
         String stabilizerModel = read("src/main/java/thaumcraft/client/renderers/models/ModelNodeStabilizer.java");
         String chargerModel = read("src/main/java/thaumcraft/client/renderers/models/ModelMagicWorkbenchCharger.java");
@@ -66,11 +67,21 @@ public class VisEnergyRendererFidelityStaticGuardTest {
                         && relayRenderer.contains("OpenGlHelper.setLightmapTextureCoords(")
                         && relayRenderer.contains("VisNetHandler.isNodeValid(tile.getParent())"));
 
-        assertTrue("TileEssentiaCrystalizerRenderer should keep crystal loop and lightmap-driven glow contract",
-                crystalizerRenderer.contains("model.renderRingBase(MODEL_SCALE)")
+        assertTrue("TileEssentiaCrystalizerRenderer should keep the crystalizer.obj shell plus crystal loop and lightmap-driven glow contract",
+                crystalizerRenderer.contains("new ModelCrystalizer()")
+                        && crystalizerRenderer.contains("baseModel.renderBase();")
+                        && crystalizerRenderer.contains("baseModel.renderTop();")
                         && crystalizerRenderer.contains("model.renderCrystal(MODEL_SCALE)")
                         && crystalizerRenderer.contains("for (int i = 0; i < 4; i++)")
                         && crystalizerRenderer.contains("OpenGlHelper.setLightmapTextureCoords("));
+
+        assertTrue("ModelCrystalizer should keep grouped crystalizer.obj surfaces instead of the old vis-relay ring fallback",
+                crystalizerModel.contains("Wavefront crystalizer.obj groups")
+                        && crystalizerModel.contains("BASE_TRIANGLES")
+                        && crystalizerModel.contains("TOP_TRIANGLES")
+                        && crystalizerModel.contains("renderBase()")
+                        && crystalizerModel.contains("renderTop()")
+                        && crystalizerModel.contains("DefaultVertexFormats.POSITION_TEX_NORMAL"));
 
         assertTrue("ModelVisRelay should keep grouped vis_relay.obj surfaces instead of the old ModelRenderer cuboids",
                 relayModel.contains("Wavefront vis_relay.obj groups")
