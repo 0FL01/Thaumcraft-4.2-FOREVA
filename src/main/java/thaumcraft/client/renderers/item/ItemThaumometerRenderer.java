@@ -3,11 +3,18 @@ package thaumcraft.client.renderers.item;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.entity.AbstractClientPlayer;
+import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.renderer.ItemRenderer;
 import net.minecraft.client.renderer.OpenGlHelper;
+import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.block.model.ItemCameraTransforms;
+import net.minecraft.client.renderer.entity.Render;
+import net.minecraft.client.renderer.entity.RenderPlayer;
 import net.minecraft.client.renderer.tileentity.TileEntityItemStackRenderer;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.Entity;
@@ -16,6 +23,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.World;
@@ -31,6 +39,7 @@ import thaumcraft.common.lib.utils.BlockUtils;
 import thaumcraft.common.lib.utils.EntityUtils;
 
 import java.util.Map;
+import java.lang.reflect.Field;
 
 public class ItemThaumometerRenderer extends TileEntityItemStackRenderer {
 
@@ -40,9 +49,16 @@ public class ItemThaumometerRenderer extends TileEntityItemStackRenderer {
             new ResourceLocation("thaumcraft", "textures/models/scanner.png");
     private static final ResourceLocation SCANSCREEN_TEXTURE =
             new ResourceLocation("thaumcraft", "textures/models/scanscreen.png");
-    private static final float SCANNER_VERTICAL_CENTER = -0.1F;
+    private static final ThreadLocal<ItemCameraTransforms.TransformType> CURRENT_TRANSFORM =
+            ThreadLocal.withInitial(() -> ItemCameraTransforms.TransformType.NONE);
+    private static final Field EQUIPPED_PROGRESS_MAINHAND = findField("equippedProgressMainHand");
+    private static final Field PREV_EQUIPPED_PROGRESS_MAINHAND = findField("prevEquippedProgressMainHand");
 
     private final CCModel scannerModel = loadScannerModel();
+
+    public static void setTransformType(ItemCameraTransforms.TransformType transformType) {
+        CURRENT_TRANSFORM.set(transformType == null ? ItemCameraTransforms.TransformType.NONE : transformType);
+    }
 
     @Override
     public void renderByItem(ItemStack stack, float partialTicks) {
@@ -51,17 +67,102 @@ public class ItemThaumometerRenderer extends TileEntityItemStackRenderer {
         }
 
         Minecraft mc = Minecraft.getMinecraft();
-        EntityPlayer player = mc.player;
+        EntityPlayerSP player = mc.player;
+        ItemCameraTransforms.TransformType transformType = CURRENT_TRANSFORM.get();
 
         GlStateManager.pushMatrix();
-        GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
-        GlStateManager.translate(0.0F, SCANNER_VERTICAL_CENTER, 0.0F);
+        try {
+            GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+            applyContextTransform(mc, player, partialTicks, transformType);
+            renderScannerModel(mc);
+            renderScannerScreen(mc, player);
+            if (isFirstPerson(transformType) && player != null && player.isHandActive()
+                    && ItemStack.areItemStacksEqual(player.getActiveItemStack(), stack)
+                    && mc.gameSettings.thirdPersonView == 0) {
+                renderScanReadout(mc, stack, player);
+            }
+        } finally {
+            setTransformType(ItemCameraTransforms.TransformType.NONE);
+            GlStateManager.popMatrix();
+        }
+    }
+
+    private void applyContextTransform(Minecraft mc, EntityPlayerSP player, float partialTicks,
+                                       ItemCameraTransforms.TransformType transformType) {
+        if (isFirstPerson(transformType) && player != null && mc.gameSettings.thirdPersonView == 0) {
+            renderFirstPersonSetup(mc, player, partialTicks, transformType == ItemCameraTransforms.TransformType.FIRST_PERSON_LEFT_HAND);
+            return;
+        }
+
         GlStateManager.scale(0.5F, 0.5F, 0.5F);
-        renderScannerModel(mc);
-        renderScannerScreen(mc, player);
-        if (player != null && player.isHandActive() && ItemStack.areItemStacksEqual(player.getActiveItemStack(), stack)
-                && mc.gameSettings.thirdPersonView == 0) {
-            renderScanReadout(mc, stack, player);
+        if (transformType == ItemCameraTransforms.TransformType.GUI) {
+            GlStateManager.rotate(60.0F, 1.0F, 0.0F, 0.0F);
+            GlStateManager.rotate(30.0F, 0.0F, 0.0F, -1.0F);
+            GlStateManager.rotate(248.0F, 0.0F, -1.0F, 0.0F);
+        } else if (transformType == ItemCameraTransforms.TransformType.THIRD_PERSON_RIGHT_HAND
+                || transformType == ItemCameraTransforms.TransformType.THIRD_PERSON_LEFT_HAND) {
+            float handedness = transformType == ItemCameraTransforms.TransformType.THIRD_PERSON_LEFT_HAND ? -1.0F : 1.0F;
+            GlStateManager.translate(1.6F * handedness, 0.3F, 2.0F);
+            GlStateManager.rotate(90.0F, -1.0F, 0.0F, 0.0F);
+            GlStateManager.rotate(30.0F * handedness, 0.0F, 0.0F, -1.0F);
+        }
+    }
+
+    private void renderFirstPersonSetup(Minecraft mc, EntityPlayerSP player, float partialTicks, boolean leftHanded) {
+        float handedness = leftHanded ? -1.0F : 1.0F;
+        float scale = 0.8F;
+
+        GlStateManager.translate(handedness, 0.75F, -1.0F);
+        GlStateManager.rotate(135.0F * handedness, 0.0F, -1.0F, 0.0F);
+
+        float prevArmPitch = player.prevRenderArmPitch + (player.renderArmPitch - player.prevRenderArmPitch) * partialTicks;
+        float prevArmYaw = player.prevRenderArmYaw + (player.renderArmYaw - player.prevRenderArmYaw) * partialTicks;
+        GlStateManager.rotate((player.rotationPitch - prevArmPitch) * 0.1F, 1.0F, 0.0F, 0.0F);
+        GlStateManager.rotate((player.rotationYaw - prevArmYaw) * 0.1F, 0.0F, 1.0F, 0.0F);
+
+        float equippedProgress = getPrevEquippedProgress(mc.getItemRenderer())
+                + (getEquippedProgress(mc.getItemRenderer()) - getPrevEquippedProgress(mc.getItemRenderer())) * partialTicks;
+        GlStateManager.translate(-0.7F * scale * handedness, 0.65F * scale + (1.0F - equippedProgress) * 1.5F, 0.9F * scale);
+        GlStateManager.rotate(90.0F, 0.0F, 1.0F, 0.0F);
+        GlStateManager.translate(0.0F, 0.0F, -0.9F * scale);
+        GlStateManager.rotate(90.0F, 0.0F, 1.0F, 0.0F);
+        GlStateManager.enableRescaleNormal();
+
+        renderFirstPersonHands(mc, player, leftHanded);
+
+        GlStateManager.rotate(90.0F * handedness, 0.0F, 0.0F, 1.0F);
+        GlStateManager.translate(0.4F * handedness, -0.4F, 0.0F);
+        GlStateManager.scale(2.0F, 2.0F, 2.0F);
+    }
+
+    private void renderFirstPersonHands(Minecraft mc, EntityPlayerSP player, boolean leftHanded) {
+        if (!(player instanceof AbstractClientPlayer)) {
+            return;
+        }
+        Render<?> render = mc.getRenderManager().getEntityRenderObject(player);
+        if (!(render instanceof RenderPlayer)) {
+            return;
+        }
+        RenderPlayer renderPlayer = (RenderPlayer) render;
+
+        mc.getTextureManager().bindTexture(((AbstractClientPlayer) player).getLocationSkin());
+        GlStateManager.pushMatrix();
+        GlStateManager.scale(5.0F, 5.0F, 5.0F);
+        for (int armIndex = 0; armIndex < 2; armIndex++) {
+            int direction = armIndex * 2 - 1;
+            float armHandedness = leftHanded ? -direction : direction;
+            GlStateManager.pushMatrix();
+            GlStateManager.translate(0.0F, -0.6F, 1.1F * armHandedness);
+            GlStateManager.rotate(-45.0F * armHandedness, 1.0F, 0.0F, 0.0F);
+            GlStateManager.rotate(-90.0F, 0.0F, 0.0F, 1.0F);
+            GlStateManager.rotate(59.0F, 0.0F, 0.0F, 1.0F);
+            GlStateManager.rotate(-65.0F * armHandedness, 0.0F, 1.0F, 0.0F);
+            if (armHandedness > 0.0F) {
+                renderPlayer.renderRightArm((AbstractClientPlayer) player);
+            } else {
+                renderPlayer.renderLeftArm((AbstractClientPlayer) player);
+            }
+            GlStateManager.popMatrix();
         }
         GlStateManager.popMatrix();
     }
@@ -82,10 +183,8 @@ public class ItemThaumometerRenderer extends TileEntityItemStackRenderer {
 
     private void renderScannerScreen(Minecraft mc, EntityPlayer player) {
         mc.getTextureManager().bindTexture(SCANSCREEN_TEXTURE);
-        int packed = player != null ? player.getBrightnessForRender() : 200;
-        int sky = packed % 65536;
-        int block = packed / 65536;
-        OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, sky, block);
+        int packed = getScannerGlow(player instanceof EntityPlayerSP ? (EntityPlayerSP) player : null, 0);
+        OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, packed % 65536, packed / 65536);
 
         GlStateManager.pushMatrix();
         GlStateManager.translate(0.0F, 0.11F, 0.0F);
@@ -126,6 +225,9 @@ public class ItemThaumometerRenderer extends TileEntityItemStackRenderer {
         }
 
         GlStateManager.pushMatrix();
+        RenderHelper.enableStandardItemLighting();
+        int packed = getScannerGlow(player instanceof EntityPlayerSP ? (EntityPlayerSP) player : null, 0);
+        OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, packed % 65536, packed / 65536);
         GlStateManager.translate(0.0F, 0.12F, -0.01F);
         GlStateManager.rotate(90.0F, 1.0F, 0.0F, 0.0F);
         GlStateManager.rotate(90.0F, 0.0F, 0.0F, 1.0F);
@@ -178,6 +280,47 @@ public class ItemThaumometerRenderer extends TileEntityItemStackRenderer {
         } catch (Exception ignored) {
         }
         return "?";
+    }
+
+    private static boolean isFirstPerson(ItemCameraTransforms.TransformType transformType) {
+        return transformType == ItemCameraTransforms.TransformType.FIRST_PERSON_LEFT_HAND
+                || transformType == ItemCameraTransforms.TransformType.FIRST_PERSON_RIGHT_HAND;
+    }
+
+    private static int getScannerGlow(EntityPlayerSP player, int offset) {
+        if (player == null || player.world == null) {
+            return 200;
+        }
+        return (int) (190.0F + MathHelper.sin((float) (player.ticksExisted + offset - player.world.rand.nextInt(2))) * 10.0F + 10.0F);
+    }
+
+    private static Field findField(String name) {
+        try {
+            Field field = ItemRenderer.class.getDeclaredField(name);
+            field.setAccessible(true);
+            return field;
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    private static float getEquippedProgress(ItemRenderer itemRenderer) {
+        return getFloatField(EQUIPPED_PROGRESS_MAINHAND, itemRenderer, 1.0F);
+    }
+
+    private static float getPrevEquippedProgress(ItemRenderer itemRenderer) {
+        return getFloatField(PREV_EQUIPPED_PROGRESS_MAINHAND, itemRenderer, 1.0F);
+    }
+
+    private static float getFloatField(Field field, Object target, float fallback) {
+        if (field == null || target == null) {
+            return fallback;
+        }
+        try {
+            return field.getFloat(target);
+        } catch (Exception e) {
+            return fallback;
+        }
     }
 
     private static ScanResult doScan(ItemStack stack, EntityPlayer player) {
