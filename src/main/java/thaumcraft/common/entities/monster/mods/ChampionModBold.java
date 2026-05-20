@@ -8,7 +8,7 @@ public class ChampionModBold extends java.lang.Object implements IChampionModifi
 
     @Override
     public float performEffect(EntityLivingBase mob, EntityLivingBase target, DamageSource source, float amount) {
-        return amount * 1.5f;
+        return 0.0F;
     }
 
     @Override

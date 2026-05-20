@@ -1,6 +1,7 @@
 package thaumcraft.common.entities.monster.mods;
 
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.init.SoundEvents;
 import net.minecraft.util.DamageSource;
 import thaumcraft.common.Thaumcraft;
 
@@ -8,9 +9,11 @@ public class ChampionModSpined extends java.lang.Object implements IChampionModi
 
     @Override
     public float performEffect(EntityLivingBase mob, EntityLivingBase target, DamageSource source, float amount) {
-        if (source.getTrueSource() instanceof EntityLivingBase && mob.getRNG().nextFloat() < 0.5f) {
-            source.getTrueSource().attackEntityFrom(DamageSource.causeThornsDamage(mob), 2.0f);
+        if (target == null || source == null || "thorns".equalsIgnoreCase(source.getDamageType())) {
+            return amount;
         }
+        target.attackEntityFrom(DamageSource.causeThornsDamage(mob), 1 + mob.world.rand.nextInt(3));
+        target.playSound(SoundEvents.ENCHANT_THORNS_HIT, 0.5f, 1.0f);
         return amount;
     }
 

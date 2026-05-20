@@ -8,8 +8,8 @@ public class ChampionModGrim extends java.lang.Object implements IChampionModifi
 
     @Override
     public float performEffect(EntityLivingBase mob, EntityLivingBase target, DamageSource source, float amount) {
-        if (target != null) {
-            target.addPotionEffect(new net.minecraft.potion.PotionEffect(net.minecraft.init.MobEffects.WEAKNESS, 100, 0));
+        if (target != null && mob.getRNG().nextFloat() < 0.4f) {
+            target.addPotionEffect(new net.minecraft.potion.PotionEffect(net.minecraft.init.MobEffects.WEAKNESS, 200));
         }
         return amount;
     }

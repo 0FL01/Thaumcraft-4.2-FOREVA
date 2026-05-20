@@ -1,6 +1,7 @@
 package thaumcraft.common.entities.monster.mods;
 
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.util.DamageSource;
 import thaumcraft.common.Thaumcraft;
 
@@ -8,8 +9,13 @@ public class ChampionModWarded extends java.lang.Object implements IChampionModi
 
     @Override
     public float performEffect(EntityLivingBase mob, EntityLivingBase target, DamageSource source, float amount) {
-        float f1 = amount * 17.0f;
-        return f1 / 20.0f;
+        if (mob.hurtResistantTime <= 0 && mob.ticksExisted % 25 == 0) {
+            int bh = (int) mob.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).getBaseValue() / 2;
+            if (mob.getHealth() < (float) bh) {
+                mob.setHealth(Math.min((float) bh, mob.getHealth() + 1.0f));
+            }
+        }
+        return amount;
     }
 
     @Override
