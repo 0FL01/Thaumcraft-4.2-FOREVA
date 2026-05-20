@@ -82,20 +82,34 @@ public class ClientProxyEntityRendererRegistrationStaticGuardTest {
         assertTrue("RenderFallbackBiped must exist as a non-noop typed texture renderer",
                 readFile("src/main/java/thaumcraft/client/renderers/entity/RenderFallbackBiped.java").contains("extends RenderBiped<T>"));
         String pechRenderer = readFile("src/main/java/thaumcraft/client/renderers/entity/RenderPech.java");
-        assertTrue("RenderPech must provide pech-type texture routing baseline",
-                pechRenderer.contains("extends RenderBiped<EntityPech>")
+        String pechModel = readFile("src/main/java/thaumcraft/client/renderers/models/entities/ModelPech.java");
+        assertTrue("RenderPech must provide dedicated pech-model, held-item layer, and texture routing baseline",
+                pechRenderer.contains("extends RenderLiving<EntityPech>")
+                        && pechRenderer.contains("new ModelPech()")
+                        && pechRenderer.contains("PechHeldItemLayer")
+                        && pechRenderer.contains("renderItemSide(")
                         && pechRenderer.contains("textures/models/pech_forage.png")
                         && pechRenderer.contains("textures/models/pech_thaum.png")
                         && pechRenderer.contains("textures/models/pech_stalker.png")
-                        && pechRenderer.contains("entity.getPechType()"));
+                        && pechRenderer.contains("entity.getPechType()")
+                        && pechModel.contains("class ModelPech")
+                        && pechModel.contains("mumble")
+                        && pechModel.contains("rightArm")
+                        && pechModel.contains("upperPack"));
         String fireBatRenderer = readFile("src/main/java/thaumcraft/client/renderers/entity/RenderFireBat.java");
-        assertTrue("RenderFireBat must provide vampire texture, scaling, and hanging transform baselines",
+        String fireBatModel = readFile("src/main/java/thaumcraft/client/renderers/models/entities/ModelFireBat.java");
+        assertTrue("RenderFireBat must provide dedicated firebat model plus vampire texture, scaling, and hanging transform baselines",
                 fireBatRenderer.contains("extends RenderLiving<EntityFireBat>")
+                        && fireBatRenderer.contains("new ModelFireBat()")
                         && fireBatRenderer.contains("textures/models/firebat.png")
                         && fireBatRenderer.contains("textures/models/vampirebat.png")
                         && fireBatRenderer.contains("entity.getIsVampire()")
                         && fireBatRenderer.contains("entity.getIsDevil()")
-                        && fireBatRenderer.contains("entity.getIsBatHanging()"));
+                        && fireBatRenderer.contains("entity.getIsBatHanging()")
+                        && fireBatModel.contains("class ModelFireBat")
+                        && fireBatModel.contains("getBatSize()")
+                        && fireBatModel.contains("batOuterRightWing")
+                        && fireBatModel.contains("getIsBatHanging()"));
         String wispRenderer = readFile("src/main/java/thaumcraft/client/renderers/entity/RenderWisp.java");
         assertTrue("RenderWisp must provide aspect-tinted texture baseline",
                 wispRenderer.contains("extends RenderLiving<EntityWisp>")
