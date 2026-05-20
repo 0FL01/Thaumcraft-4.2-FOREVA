@@ -14,6 +14,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.EnumBlockRenderType;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.NonNullList;
@@ -258,6 +259,14 @@ public class BlockEldritch extends Block {
     @Override
     public boolean isFullCube(IBlockState state) {
         return false;
+    }
+
+    @Override
+    public EnumBlockRenderType getRenderType(IBlockState state) {
+        int meta = this.getMetaFromState(state);
+        return meta == 0 || meta == 1 || meta == 3 || meta == 8 || meta == 9
+                ? EnumBlockRenderType.INVISIBLE
+                : EnumBlockRenderType.MODEL;
     }
 
     @Override

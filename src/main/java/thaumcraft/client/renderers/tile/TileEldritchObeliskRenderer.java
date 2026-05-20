@@ -35,17 +35,19 @@ public class TileEldritchObeliskRenderer extends TileEntitySpecialRenderer<TileE
 
     @Override
     public void render(TileEldritchObelisk tile, double x, double y, double z, float partialTicks, int destroyStage, float alpha) {
-        if (tile == null || tile.getWorld() == null) {
+        if (tile == null) {
             return;
         }
 
-        boolean outer = tile.getWorld().provider.getDimension() == Config.dimensionOuterId;
+        boolean outer = tile.getWorld() != null && tile.getWorld().provider.getDimension() == Config.dimensionOuterId;
         ResourceLocation sideTexture = outer ? SIDE_TEXTURE_OUTER : SIDE_TEXTURE;
         ResourceLocation capTexture = outer ? CAP_TEXTURE_OUTER : CAP_TEXTURE;
         float ticks = TileRenderHelper.ticks(tile, partialTicks);
         float bob = (float) Math.sin(ticks / 10.0F) * 0.1F + 0.1F;
         Entity viewer = Minecraft.getMinecraft().getRenderViewEntity();
-        boolean inRange = viewer != null && tile.getPos().distanceSq(viewer.posX, viewer.posY, viewer.posZ) < 512.0D;
+        boolean inRange = tile.getWorld() != null
+                && viewer != null
+                && tile.getPos().distanceSq(viewer.posX, viewer.posY, viewer.posZ) < 512.0D;
         float time = (float) (System.currentTimeMillis() % 700000L) / 250000.0F;
         double viewX = 0.0D;
         double viewY = 0.0D;

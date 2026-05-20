@@ -20,7 +20,7 @@ Branch: `codex/durable-goal-stage8-9`
 
 ## Current Evidence
 
-- Live checkpoint prose moved into `docs/GOAL_PROGRESS-archive/` batch files; recent validated work remains concentrated in Stage 8-c/8-d/8-e renderer, entity, and FX bursts plus Stage 9 recipe/content/research bursts.
+- Live checkpoint prose moved into `docs/GOAL_PROGRESS-archive/` batch files; the latest validated Stage 8-c burst returned the tile-backed `BlockEldritch` family (`0/1/3/8/9`) to TESR/TEISR-first routing, added `ItemEldritchRenderer` + `blockeldritch_tesr`, and made the cap/obelisk/lock/crab-spawner renderers worldless-safe for inventory rendering.
 - Recent Stage 8-e bursts converted the remaining fallback particle families (`FXBreaking`/`FXSwarm`, smoke spiral/drift, sheet smoke/flame/spell emissions, entity `BLOCK_CRACK`/`SLIME`/`WATER_BUBBLE`/`VILLAGER_ANGRY` branches, and now `TileNitor` ambient airy wisps) onto dedicated proxy or particle-engine paths, and restored Eldritch Golem beam-charge FX parity; each burst passed `validate`, and runtime-risk bursts also passed `validate --smoke`.
 - Latest Stage 8/9 device-content follow-ups restored the missing `LampFertility` bundle end-to-end, then moved the crystal family back onto TESR/TEISR-first routing and replaced the eldritch crystal fallback with a grouped `vcrystal.obj` renderer path; both bursts passed `validate`, and the runtime-risk device/render work also passed `validate --smoke`.
 - Recent Stage 9 bursts added typed `ConfigResearch` recipe-handle audits and restored the balanced shard (`itemShard:6`) / `itemResource:14` aspect derivation baseline; validation passed, with smoke run where common config registration paths changed.

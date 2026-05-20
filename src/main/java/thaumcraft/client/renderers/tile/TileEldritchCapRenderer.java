@@ -32,11 +32,11 @@ public class TileEldritchCapRenderer extends TileEntitySpecialRenderer<TileEntit
 
     @Override
     public void render(TileEntity tile, double x, double y, double z, float partialTicks, int destroyStage, float alpha) {
-        if (tile == null || tile.getWorld() == null) {
+        if (tile == null) {
             return;
         }
 
-        ResourceLocation texture = tile.getWorld().provider.getDimension() == Config.dimensionOuterId
+        ResourceLocation texture = tile.getWorld() != null && tile.getWorld().provider.getDimension() == Config.dimensionOuterId
                 ? CAP_TEXTURE_OUTER
                 : capTexture;
 

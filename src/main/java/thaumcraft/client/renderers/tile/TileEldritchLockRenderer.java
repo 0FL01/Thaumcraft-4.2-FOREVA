@@ -34,14 +34,16 @@ public class TileEldritchLockRenderer extends TileEntitySpecialRenderer<TileEldr
 
     @Override
     public void render(TileEldritchLock tile, double x, double y, double z, float partialTicks, int destroyStage, float alpha) {
-        if (tile == null || tile.getWorld() == null) {
+        if (tile == null) {
             return;
         }
 
         float ticks = TileRenderHelper.ticks(tile, partialTicks);
         EnumFacing facing = EnumFacing.byIndex(tile.getFacing());
         Entity viewer = Minecraft.getMinecraft().getRenderViewEntity();
-        boolean inRange = viewer != null && tile.getPos().distanceSq(viewer.posX, viewer.posY, viewer.posZ) < 512.0D;
+        boolean inRange = tile.getWorld() != null
+                && viewer != null
+                && tile.getPos().distanceSq(viewer.posX, viewer.posY, viewer.posZ) < 512.0D;
         float time = (float) (System.currentTimeMillis() % 700000L) / 250000.0F;
         double viewX = 0.0D;
         double viewY = 0.0D;

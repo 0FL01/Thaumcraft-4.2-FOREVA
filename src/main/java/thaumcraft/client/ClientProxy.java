@@ -127,6 +127,7 @@ import thaumcraft.client.renderers.entity.RenderTaintVillager;
 import thaumcraft.client.renderers.entity.RenderTravelingTrunk;
 import thaumcraft.client.renderers.entity.RenderWisp;
 import thaumcraft.client.renderers.entity.RenderCultist;
+import thaumcraft.client.renderers.item.ItemEldritchRenderer;
 import thaumcraft.client.renderers.item.ItemJarRenderer;
 import thaumcraft.client.renderers.item.ItemMetalDeviceRenderer;
 import thaumcraft.client.renderers.item.ItemNodeRenderer;
@@ -424,6 +425,10 @@ public class ClientProxy extends CommonProxy {
         if (crystalItem != null) {
             crystalItem.setTileEntityItemStackRenderer(new ItemCrystalRenderer());
         }
+        Item eldritchItem = Item.getItemFromBlock(ConfigBlocks.blockEldritch);
+        if (eldritchItem != null) {
+            eldritchItem.setTileEntityItemStackRenderer(new ItemEldritchRenderer());
+        }
         Item stoneDeviceItem = Item.getItemFromBlock(ConfigBlocks.blockStoneDevice);
         if (stoneDeviceItem != null) {
             stoneDeviceItem.setTileEntityItemStackRenderer(new ItemStoneDeviceRenderer());
@@ -535,6 +540,15 @@ public class ClientProxy extends CommonProxy {
         for (int meta = 0; meta <= 7; meta++) {
             registerBuiltinItemModel(crystalItem, meta, "blockcrystal_tesr");
         }
+        Item eldritchItem = Item.getItemFromBlock(ConfigBlocks.blockEldritch);
+        for (int meta = 0; meta <= 10; meta++) {
+            registerBlockItemModel(eldritchItem, meta, "type=" + meta);
+        }
+        registerBuiltinItemModel(eldritchItem, 0, "blockeldritch_tesr");
+        registerBuiltinItemModel(eldritchItem, 1, "blockeldritch_tesr");
+        registerBuiltinItemModel(eldritchItem, 3, "blockeldritch_tesr");
+        registerBuiltinItemModel(eldritchItem, 8, "blockeldritch_tesr");
+        registerBuiltinItemModel(eldritchItem, 9, "blockeldritch_tesr");
         Item stoneDeviceItem = Item.getItemFromBlock(ConfigBlocks.blockStoneDevice);
         for (int meta = 0; meta <= 14; meta++) {
             registerBlockItemModel(stoneDeviceItem, meta, "type=" + meta);
