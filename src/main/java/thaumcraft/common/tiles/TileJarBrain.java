@@ -1,14 +1,13 @@
 package thaumcraft.common.tiles;
 
+import java.util.List;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityXPOrb;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.ITickable;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.AxisAlignedBB;
-import thaumcraft.common.tiles.TileJar;
-
-import java.util.List;
+import thaumcraft.common.lib.TCSounds;
 
 public class TileJarBrain
 extends TileJar implements ITickable {
@@ -39,24 +38,70 @@ extends TileJar implements ITickable {
     @Override
     public void update() {
         List<?> ents;
+        Entity entity = null;
         if (this.xp > this.xpMax) {
             this.xp = this.xpMax;
         }
         if (this.xp < this.xpMax) {
-            EntityXPOrb entity = this.getClosestXPOrb();
+            entity = this.getClosestXPOrb();
             if (entity != null && this.eatDelay == 0) {
-                double dx = (pos.getX() + 0.5 - entity.posX) / 7.0;
-                double dy = (pos.getY() + 0.5 - entity.posY) / 7.0;
-                double dz = (pos.getZ() + 0.5 - entity.posZ) / 7.0;
+                double dx = ((double) pos.getX() + 0.5D - entity.posX) / 7.0D;
+                double dy = ((double) pos.getY() + 0.5D - entity.posY) / 7.0D;
+                double dz = ((double) pos.getZ() + 0.5D - entity.posZ) / 7.0D;
                 double dist = Math.sqrt(dx * dx + dy * dy + dz * dz);
                 double strength = 1.0 - dist;
-                if (strength > 0.0) {
+                if (strength > 0.0D && dist > 0.0D) {
                     strength *= strength;
                     entity.motionX += dx / dist * strength * 0.15;
                     entity.motionY += dy / dist * strength * 0.33;
                     entity.motionZ += dz / dist * strength * 0.15;
                 }
             }
+        }
+        if (this.world.isRemote) {
+            this.rotb = this.rota;
+            if (entity == null) {
+                entity = this.world.getClosestPlayer((double) pos.getX() + 0.5D, (double) pos.getY() + 0.5D, (double) pos.getZ() + 0.5D, 6.0D, false);
+            }
+            if (entity != null && this.lastsigh < System.currentTimeMillis()) {
+                this.world.playSound((double) pos.getX() + 0.5D, (double) pos.getY() + 0.5D, (double) pos.getZ() + 0.5D,
+                        TCSounds.BRAIN, SoundCategory.BLOCKS, 0.15F, 0.8F + this.world.rand.nextFloat() * 0.4F, false);
+                this.lastsigh = System.currentTimeMillis() + 5000L + this.world.rand.nextInt(25000);
+            }
+            if (entity != null) {
+                double d = entity.posX - ((double) pos.getX() + 0.5D);
+                double d1 = entity.posZ - ((double) pos.getZ() + 0.5D);
+                this.field_40066_q = (float) Math.atan2(d1, d);
+                this.field_40059_f += 0.1F;
+                if (this.field_40059_f < 0.5F || this.world.rand.nextInt(40) == 0) {
+                    float f3 = this.field_40061_d;
+                    do {
+                        this.field_40061_d += (float) (this.world.rand.nextInt(4) - this.world.rand.nextInt(4));
+                    } while (f3 == this.field_40061_d);
+                }
+            } else {
+                this.field_40066_q += 0.01F;
+            }
+            while (this.rota >= (float) Math.PI) {
+                this.rota -= (float) (Math.PI * 2.0D);
+            }
+            while (this.rota < (float) -Math.PI) {
+                this.rota += (float) (Math.PI * 2.0D);
+            }
+            while (this.field_40066_q >= (float) Math.PI) {
+                this.field_40066_q -= (float) (Math.PI * 2.0D);
+            }
+            while (this.field_40066_q < (float) -Math.PI) {
+                this.field_40066_q += (float) (Math.PI * 2.0D);
+            }
+            float f = this.field_40066_q - this.rota;
+            while (f >= (float) Math.PI) {
+                f -= (float) (Math.PI * 2.0D);
+            }
+            while (f < (float) -Math.PI) {
+                f += (float) (Math.PI * 2.0D);
+            }
+            this.rota += f * 0.04F;
         }
         if (this.eatDelay > 0) {
             --this.eatDelay;

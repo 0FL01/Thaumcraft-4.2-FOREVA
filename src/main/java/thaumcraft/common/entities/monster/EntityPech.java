@@ -37,12 +37,14 @@ import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.EntityDataManager;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.EnumHand;
-import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.SoundEvent;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.text.translation.I18n;
 import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
+import thaumcraft.common.Thaumcraft;
 import thaumcraft.api.aspects.Aspect;
 import thaumcraft.api.aspects.AspectList;
 import thaumcraft.common.config.ConfigItems;
@@ -67,6 +69,7 @@ public class EntityPech extends net.minecraft.entity.monster.EntityMob implement
     // Loot inventory (9 slots, persisted in NBT)
     public ItemStack[] loot = new ItemStack[9];
     public boolean trading = false;
+    public float mumble = 0.0F;
 
     private final AIAttackOnCollide aiMeleeAttack = new AIAttackOnCollide(this, EntityLivingBase.class, 0.6, false);
     private final EntityAIAttackRanged aiRangedAttack = new EntityAIAttackRanged(this, 0.6, 20, 50, 15.0f);
@@ -409,6 +412,40 @@ public class EntityPech extends net.minecraft.entity.monster.EntityMob implement
 
     @Override
     public void setSwingingArms(boolean swinging) {}
+
+    @Override
+    @SideOnly(Side.CLIENT)
+    public void handleStatusUpdate(byte id) {
+        if (id == 16) {
+            this.mumble = (float) Math.PI;
+        } else if (id == 17) {
+            this.mumble = (float) Math.PI * 2.0F;
+        } else if (id == 18) {
+            spawnReactionParticles(80);
+        } else if (id == 19) {
+            spawnReactionParticles(81);
+            this.mumble = (float) Math.PI * 2.0F;
+        } else {
+            super.handleStatusUpdate(id);
+        }
+    }
+
+    @SideOnly(Side.CLIENT)
+    private void spawnReactionParticles(int start) {
+        for (int i = 0; i < 5; ++i) {
+            double d0 = this.rand.nextGaussian() * 0.02D;
+            double d1 = this.rand.nextGaussian() * 0.02D;
+            double d2 = this.rand.nextGaussian() * 0.02D;
+            Thaumcraft.proxy.drawGenericParticles(
+                    this.world,
+                    this.posX + (double) (this.rand.nextFloat() * this.width * 2.0F) - (double) this.width,
+                    this.posY + 0.5D + (double) (this.rand.nextFloat() * this.height),
+                    this.posZ + (double) (this.rand.nextFloat() * this.width * 2.0F) - (double) this.width,
+                    d0, d1, d2,
+                    1.0F, 1.0F, 1.0F, 1.0F,
+                    false, start, 1, 1, 16, 0, 1.5F, 1);
+        }
+    }
 
     @Override
     public boolean processInteract(EntityPlayer player, net.minecraft.util.EnumHand hand) {
