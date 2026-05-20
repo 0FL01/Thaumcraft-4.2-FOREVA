@@ -71,7 +71,7 @@ Do not claim backend substantially complete until these are resolved or scoped o
 
 ## Latest Checkpoint
 
-- Sound asset burst fixed the `Unable to play empty soundEvent: thaumcraft:chant` class of warnings by making every `sounds.json` entry explicitly target the `thaumcraft:` namespace instead of implicit `minecraft:` resolution.
-- Extended `TCSoundsStaticCoverageTest` so each declared sound entry must keep explicit `thaumcraft:` namespacing and still resolve to a matching `.ogg` asset.
-- Validated this burst with `./scripts/dev.sh gradle test --rerun-tasks --tests thaumcraft.common.lib.TCSoundsStaticCoverageTest` and `./scripts/dev.sh validate --smoke`.
-- The earlier CCL thaumometer render crash remains fixed in commit `fd26281`; this checkpoint only addresses the remaining sound-event warning from the same log bundle.
+- Client asset/render burst fixed the next reproduced load/crash routes: 1.7.10-style `door_*_open` parents now target valid 1.12 vanilla door parents, missing `blockfluid*`/`blockflux*` blockstates were added, and `blockarcanefurnace.json` now covers Forge's canonical `facing=...,type=...` variant order for every permutation.
+- `ItemCrystalRenderer` now seeds its TESR path with `TileEntityRendererDispatcher.instance` and origin positions, while `TileCrystalRenderer` also tolerates `null` positions defensively; this closes the crystal-item inventory crash route from the latest client report.
+- `ContainerArcaneWorkbench` now keeps a detached preview `InventoryCrafting(new ContainerDummy(), 3, 3)` snapshot instead of recursively wiring slot-9 preview recomputation back into the container callback path; this closes the reproduced integrated-server `StackOverflowError`.
+- Coverage/runtime evidence for this burst lives in `ModelErrorBurstAssetCoverageTest`, the updated `CrystalTesrRoutingContractTest`, `ContainerArcaneWorkbenchArcaneFlowStaticGuardTest`, and `ArcaneWorkbenchRuntimeIntegrationTest`.

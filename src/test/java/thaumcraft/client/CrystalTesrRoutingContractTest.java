@@ -32,6 +32,8 @@ public class CrystalTesrRoutingContractTest {
                         && itemRenderer.contains("new TileEldritchCrystalRenderer()")
                         && itemRenderer.contains("meta <= 6")
                         && itemRenderer.contains("meta == 7")
+                        && itemRenderer.contains("TileEntityRendererDispatcher.instance")
+                        && itemRenderer.contains("BlockPos.ORIGIN")
                         && itemRenderer.contains("GlStateManager.rotate(90.0F, 0.0F, 1.0F, 0.0F);")
                         && itemRenderer.contains("GlStateManager.translate(-0.5F, -0.5F, -0.5F);")
                         && itemRenderer.contains("private static final class InventoryTileCrystal extends TileCrystal")

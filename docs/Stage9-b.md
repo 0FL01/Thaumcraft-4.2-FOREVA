@@ -198,6 +198,7 @@ Keep this container baseline and validate representative runtime crafting scenar
 - [x] Arcane Workbench server container now exposes 47 slots with reference role layout.
 - [x] Server container update path now resolves vanilla and arcane outputs through the restored matcher methods and wand vis-check probe.
 - [x] Shift-click routing includes output-to-player flow and wand routing into slot 10.
+- [x] Preview recomputation no longer recurses through `InventoryCrafting(this, ...)`; the container now keeps a detached craft-matrix snapshot and has runtime coverage for the reproduced stack-overflow path.
 - [ ] Runtime scenario validates ingredient consumption + vis drain for representative static arcane recipes.
 - [ ] Runtime scenario validates dynamic recipe crafting path and container-item remainder handling.
 

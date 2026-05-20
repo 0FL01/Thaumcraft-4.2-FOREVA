@@ -21,6 +21,9 @@ public class ContainerArcaneWorkbenchArcaneFlowStaticGuardTest {
                 source.contains("wand.consumeAllVisCrafting(wandStack, this.playerInventory.player, cost, false)"));
         assertTrue("Container should set output slot from ThaumcraftCraftingManager.findMatchingArcaneRecipe",
                 source.contains("ThaumcraftCraftingManager.findMatchingArcaneRecipe(this.tileEntity, this.playerInventory.player)"));
+        assertTrue("Container should keep a detached preview craft matrix so recomputing slot 9 does not recurse back through InventoryCrafting callbacks",
+                source.contains("new InventoryCrafting(new ContainerDummy(), 3, 3)")
+                        && source.contains("private static final class ContainerDummy extends Container"));
         assertTrue("Container should not add an extra staff-only preview gate beyond the reference wand-slot contract",
                 !source.contains("wand.isStaff(wandStack)"));
     }

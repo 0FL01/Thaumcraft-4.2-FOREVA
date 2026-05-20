@@ -606,6 +606,9 @@ The runtime tree now mirrors the original `thaumcraft_src/assets/thaumcraft/text
 **Checkpoint 2026-05-20 — CCL item-render crash guard:**
 A later client-render checkpoint restored the no-arg `CCModel.render()` contract so it no longer feeds `null` vertex operations into `CCRenderPipeline.rebuild()`. This specifically protects TESR-style item renderers such as the thaumometer from inventory/HWYLA crash paths that previously ended in `CCRenderPipeline.rebuild()` NPEs. The fix is non-GUI validated only; a real client smoke or manual reproduction-clear run is still required before claiming the broader render surface clean.
 
+**Checkpoint 2026-05-20 — client asset/model load burst:**
+Another follow-up checkpoint closed the next reproduced client log cluster without claiming full render parity: arcane door "open" models no longer reference nonexistent 1.12 `door_*_open` vanilla parents, missing `blockfluidpure`/`blockfluiddeath`/`blockfluxgoo`/`blockfluxgas` blockstates were added, and `blockarcanefurnace.json` now exposes every `facing=...,type=...` permutation that Forge's model loader enumerates. The same burst hardened the crystal TEISR item path by injecting a real `TileEntityRendererDispatcher` and origin `BlockPos` for inventory-only tiles, plus a null-safe `TileCrystalRenderer` seed fallback. This removes a concrete class of startup/inventory crashes and model-loader errors, but a real client smoke/manual pass is still required before declaring the Stage 8-c surface clean.
+
 ## 6. Итоговый checklist закрытия Stage 8-c
 
 - [ ] Add a Stage 8-c client registration path for TESR and required tile/block item visuals.

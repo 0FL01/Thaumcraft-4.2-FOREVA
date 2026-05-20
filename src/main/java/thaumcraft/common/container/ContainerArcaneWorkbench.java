@@ -19,7 +19,7 @@ import thaumcraft.common.tiles.TileArcaneWorkbench;
 public class ContainerArcaneWorkbench extends Container {
     private final TileArcaneWorkbench tileEntity;
     private final InventoryPlayer playerInventory;
-    private final InventoryCrafting craftMatrix = new InventoryCrafting(this, 3, 3);
+    private final InventoryCrafting craftMatrix = new InventoryCrafting(new ContainerDummy(), 3, 3);
 
     public ContainerArcaneWorkbench() {
         this(null, null);
@@ -160,5 +160,12 @@ public class ContainerArcaneWorkbench extends Container {
         BlockPos pos = tile.getPos();
         return tile.getWorld().getTileEntity(pos) == tile
                 && player.getDistanceSq((double) pos.getX() + 0.5D, (double) pos.getY() + 0.5D, (double) pos.getZ() + 0.5D) <= 64.0D;
+    }
+
+    private static final class ContainerDummy extends Container {
+        @Override
+        public boolean canInteractWith(EntityPlayer playerIn) {
+            return false;
+        }
     }
 }

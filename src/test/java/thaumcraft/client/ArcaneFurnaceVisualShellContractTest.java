@@ -20,14 +20,14 @@ public class ArcaneFurnaceVisualShellContractTest {
         assertTrue("Arcane Furnace item metadata should resolve through the new facing-aware blockstate variant keys",
                 clientProxy.contains("registerBlockItemModel(arcaneFurnaceItem, meta, \"type=\" + meta + \",facing=north\");"));
 
-        assertTrue("Arcane Furnace blockstate should keep north-facing baked variants for ordinary metas and explicit nozzle rotations for meta 10",
-                blockstate.contains("\"type=0,facing=north\"")
-                        && blockstate.contains("\"type=1,facing=north\"")
-                        && blockstate.contains("\"type=8,facing=north\": { \"model\": \"thaumcraft:blockarcanefurnace_7\" }")
-                        && blockstate.contains("\"type=10,facing=north\"")
-                        && blockstate.contains("\"type=10,facing=east\"")
-                        && blockstate.contains("\"type=10,facing=south\"")
-                        && blockstate.contains("\"type=10,facing=west\"")
+        assertTrue("Arcane Furnace blockstate should provide every facing/type permutation in Forge's canonical key order and keep explicit nozzle rotations for meta 10",
+                blockstate.contains("\"facing=north,type=0\"")
+                        && blockstate.contains("\"facing=east,type=0\"")
+                        && blockstate.contains("\"facing=west,type=8\": {\n      \"model\": \"thaumcraft:blockarcanefurnace_7\"")
+                        && blockstate.contains("\"facing=north,type=10\"")
+                        && blockstate.contains("\"facing=east,type=10\"")
+                        && blockstate.contains("\"facing=south,type=10\"")
+                        && blockstate.contains("\"facing=west,type=10\"")
                         && blockstate.contains("\"y\": 90")
                         && blockstate.contains("\"y\": 180")
                         && blockstate.contains("\"y\": 270"));

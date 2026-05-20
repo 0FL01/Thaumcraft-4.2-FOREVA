@@ -1,0 +1,24 @@
+{
+  "forge_marker": 1,
+  "defaults": {
+    "model": "minecraft:block/cube_all",
+    "textures": {
+      "all": "thaumcraft:blocks/fluxgas"
+    }
+  },
+  "variants": {
+    "inventory": [
+      {}
+    ],
+    "level": {
+      "0": {},
+      "1": {},
+      "2": {},
+      "3": {},
+      "4": {},
+      "5": {},
+      "6": {},
+      "7": {}
+    }
+  }
+}

@@ -3,6 +3,7 @@ package thaumcraft.common.container;
 import com.mojang.authlib.GameProfile;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Bootstrap;
+import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.profiler.Profiler;
@@ -240,6 +241,17 @@ public class ArcaneWorkbenchRuntimeIntegrationTest {
         assertEquals(1, wandItem.consumeCalls);
         assertTrue(tile.getStackInSlot(slot(0, 0)).isEmpty());
         assertTrue(this.player.inventory.hasItemStack(inputItem.containerStack()));
+    }
+
+    @Test
+    public void containerPreviewRebuildShouldUseDetachedCraftMatrixSnapshot() {
+        TileArcaneWorkbench tile = newWorkbench();
+        tile.setInventorySlotContentsSoftly(slot(0, 0), new ItemStack(Items.STICK));
+
+        ContainerArcaneWorkbench container = new ContainerArcaneWorkbench(this.player.inventory, tile);
+        container.onCraftMatrixChanged(tile);
+
+        assertEquals(47, container.inventorySlots.size());
     }
 
     private TestArcaneWorkbench newWorkbench() {

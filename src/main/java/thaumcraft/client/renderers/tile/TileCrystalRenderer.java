@@ -7,6 +7,7 @@ import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.MathHelper;
 import thaumcraft.client.renderers.models.ModelCrystal;
@@ -33,9 +34,10 @@ public class TileCrystalRenderer extends TileEntitySpecialRenderer<TileCrystal> 
             color = ItemShard.colors[MathHelper.clamp(md + 1, 1, 6)];
         }
         bindTexture(CRYSTAL_TEXTURE);
+        BlockPos pos = tile.getPos() == null ? BlockPos.ORIGIN : tile.getPos();
         Random rand = new Random(tile.getBlockMetadata()
-                + tile.getPos().getX()
-                + tile.getPos().getY() * tile.getPos().getZ());
+                + pos.getX()
+                + pos.getY() * pos.getZ());
         drawCrystal(tile.orientation, x, y, z,
                 (rand.nextFloat() - rand.nextFloat()) * 5.0F,
                 (rand.nextFloat() - rand.nextFloat()) * 5.0F,
