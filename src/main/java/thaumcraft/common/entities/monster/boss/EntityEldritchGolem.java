@@ -216,6 +216,10 @@ public class EntityEldritchGolem extends EntityThaumcraftBoss implements thaumcr
         }
     }
 
+    public int getAttackTimer() {
+        return this.attackTimer;
+    }
+
     @Override
     public void onUpdate() {
         if (this.getSpawnTimer() > 0) {

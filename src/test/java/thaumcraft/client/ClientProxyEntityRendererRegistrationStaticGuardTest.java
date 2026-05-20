@@ -218,19 +218,32 @@ public class ClientProxyEntityRendererRegistrationStaticGuardTest {
                         && frostShardRenderer.contains("renderCrossQuads()")
                         && frostShardRenderer.contains("buffer.begin(7, DefaultVertexFormats.POSITION_TEX)"));
         String eldritchGuardianRenderer = readFile("src/main/java/thaumcraft/client/renderers/entity/RenderEldritchGuardian.java");
+        String eldritchGuardianModel = readFile("src/main/java/thaumcraft/client/renderers/models/entities/ModelEldritchGuardian.java");
         assertTrue("RenderEldritchGuardian must provide dedicated guardian texture baseline",
-                eldritchGuardianRenderer.contains("extends RenderBiped<EntityEldritchGuardian>")
-                        && eldritchGuardianRenderer.contains("textures/models/eldritch_guardian.png"));
+                eldritchGuardianRenderer.contains("extends RenderLiving<EntityEldritchGuardian>")
+                        && eldritchGuardianRenderer.contains("new ModelEldritchGuardian()")
+                        && eldritchGuardianRenderer.contains("textures/models/eldritch_guardian.png")
+                        && eldritchGuardianRenderer.contains("getDistanceFadeAlpha(")
+                        && eldritchGuardianModel.contains("class ModelEldritchGuardian")
+                        && eldritchGuardianModel.contains("HoodEye")
+                        && eldritchGuardianModel.contains("OpenGlHelper.setLightmapTextureCoords"));
         String eldritchWardenRenderer = readFile("src/main/java/thaumcraft/client/renderers/entity/RenderEldritchWarden.java");
         assertTrue("RenderEldritchWarden must provide dedicated warden texture and scale baseline",
-                eldritchWardenRenderer.contains("extends RenderBiped<EntityEldritchWarden>")
+                eldritchWardenRenderer.contains("extends RenderLiving<EntityEldritchWarden>")
+                        && eldritchWardenRenderer.contains("new ModelEldritchGuardian()")
                         && eldritchWardenRenderer.contains("textures/models/eldritch_warden.png")
+                        && eldritchWardenRenderer.contains("entity.getSpawnTimer()")
                         && eldritchWardenRenderer.contains("GlStateManager.scale(1.5F, 1.5F, 1.5F)"));
         String eldritchGolemRenderer = readFile("src/main/java/thaumcraft/client/renderers/entity/RenderEldritchGolem.java");
+        String eldritchGolemModel = readFile("src/main/java/thaumcraft/client/renderers/models/entities/ModelEldritchGolem.java");
         assertTrue("RenderEldritchGolem must provide dedicated golem texture and scale baseline",
-                eldritchGolemRenderer.contains("extends RenderBiped<EntityEldritchGolem>")
+                eldritchGolemRenderer.contains("extends RenderLiving<EntityEldritchGolem>")
+                        && eldritchGolemRenderer.contains("new ModelEldritchGolem()")
                         && eldritchGolemRenderer.contains("textures/models/eldritch_golem.png")
-                        && eldritchGolemRenderer.contains("GlStateManager.scale(2.15F, 2.15F, 2.15F)"));
+                        && eldritchGolemRenderer.contains("GlStateManager.scale(2.15F, 2.15F, 2.15F)")
+                        && eldritchGolemModel.contains("class ModelEldritchGolem")
+                        && eldritchGolemModel.contains("Frontcloth0")
+                        && eldritchGolemModel.contains("getAttackTimer()"));
         String eldritchCrabRenderer = readFile("src/main/java/thaumcraft/client/renderers/entity/RenderEldritchCrab.java");
         assertTrue("RenderEldritchCrab must provide crab texture and overlay layer baseline",
                 eldritchCrabRenderer.contains("extends RenderLiving<EntityEldritchCrab>")
