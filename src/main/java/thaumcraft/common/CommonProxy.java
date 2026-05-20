@@ -275,6 +275,9 @@ public class CommonProxy implements IGuiHandler {
     public void splooshFX(Entity entity) {
     }
 
+    public void golemFishingSplashFX(Entity entity, int kind) {
+    }
+
     public void spark(float x, float y, float z, float size, float red, float green, float blue, float alpha) {
     }
 

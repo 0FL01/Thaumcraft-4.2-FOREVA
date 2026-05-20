@@ -1218,6 +1218,32 @@ public class ClientProxy extends CommonProxy {
     }
 
     @Override
+    public void golemFishingSplashFX(Entity entity, int kind) {
+        if (entity == null || entity.world == null || !entity.world.isRemote) return;
+        World world = entity.world;
+        int amount = particleCount(kind == 2 ? 12 : (kind == 1 ? 2 : 1));
+        if (amount <= 0) return;
+
+        for (int i = 0; i < amount; i++) {
+            float angle = world.rand.nextFloat() * ((float) Math.PI * 2.0F);
+            float radius = kind == 1
+                    ? 0.25F + world.rand.nextFloat() * 0.35F
+                    : world.rand.nextFloat() * 0.2F;
+            double px = entity.posX + MathHelper.sin(angle) * radius;
+            double py = entity.posY + 0.1D + world.rand.nextFloat() * (kind == 2 ? 0.4D : 0.2D);
+            double pz = entity.posZ + MathHelper.cos(angle) * radius;
+            double mx = (world.rand.nextFloat() - world.rand.nextFloat()) * (kind == 2 ? 0.05F : 0.02F);
+            double my = 0.02D + world.rand.nextFloat() * (kind == 2 ? 0.04D : 0.02D);
+            double mz = (world.rand.nextFloat() - world.rand.nextFloat()) * (kind == 2 ? 0.05F : 0.02F);
+
+            FXBubble bubble = new FXBubble(world, px, py, pz, mx, my, mz, kind == 2 ? 6 : 4);
+            bubble.setRGB(0.8F, 0.9F, 1.0F);
+            bubble.setBubbleSpeed(0.003D + (kind == 2 ? 0.002D : 0.001D));
+            ParticleEngine.addEffect(world, bubble);
+        }
+    }
+
+    @Override
     public void spark(float x, float y, float z, float size, float red, float green, float blue, float alpha) {
         Minecraft mc = Minecraft.getMinecraft();
         World world = mc == null ? null : mc.world;

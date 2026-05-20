@@ -5,21 +5,23 @@ import net.minecraft.block.material.Material;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.MoverType;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
-import net.minecraft.world.WorldServer;
 import net.minecraftforge.fml.common.registry.IEntityAdditionalSpawnData;
+import thaumcraft.common.Thaumcraft;
 
 /**
  * Golem fishing bobber — projectile entity cast by EntityGolemBase fishermen.
  * Bobs in water, waits for bites, triggers splash particles.
  */
 public class EntityGolemBobber extends Entity implements IEntityAdditionalSpawnData {
+    public static final byte STATUS_SPLASH_AMBIENT = 16;
+    public static final byte STATUS_SPLASH_NIBBLE = 17;
+    public static final byte STATUS_SPLASH_CATCH = 18;
 
     private int xTile = -1;
     private int yTile = -1;
@@ -95,12 +97,7 @@ public class EntityGolemBobber extends Entity implements IEntityAdditionalSpawnD
             }
             // Ambient splash particles (server only)
             if (this.rand.nextFloat() < 0.02F) {
-                ((WorldServer) this.world).spawnParticle(
-                    EnumParticleTypes.WATER_SPLASH,
-                    this.posX + this.rand.nextFloat() - this.rand.nextFloat(),
-                    this.posY + this.rand.nextFloat(),
-                    this.posZ + this.rand.nextFloat() - this.rand.nextFloat(),
-                    2 + this.rand.nextInt(2), 0.1D, 0.0D, 0.1D, 0.0D);
+                this.world.setEntityState(this, STATUS_SPLASH_AMBIENT);
             }
         }
 
@@ -173,7 +170,6 @@ public class EntityGolemBobber extends Entity implements IEntityAdditionalSpawnD
 
             // Fishing logic (server only)
             if (!this.world.isRemote && waterVolume > 0.0D) {
-                WorldServer worldserver = (WorldServer) this.world;
                 int biteChance = 1;
 
                 if (this.rand.nextFloat() < 0.25F
@@ -202,13 +198,7 @@ public class EntityGolemBobber extends Entity implements IEntityAdditionalSpawnD
                         nibbleChance = (float) ((double) nibbleChance + (double) (60 - this.fishTimer) * 0.01D);
                     }
                     if (this.rand.nextFloat() < nibbleChance) {
-                        float f = MathHelper.nextFloat(this.rand, 0.0F, 360.0F) * ((float) Math.PI / 180.0F);
-                        float f2 = MathHelper.nextFloat(this.rand, 25.0F, 60.0F);
-                        double sx = this.posX + (double) (MathHelper.sin(f) * f2 * 0.1F);
-                        double sy = (double) MathHelper.floor(this.getEntityBoundingBox().minY) + 1.0D;
-                        double sz = this.posZ + (double) (MathHelper.cos(f) * f2 * 0.1F);
-                        worldserver.spawnParticle(EnumParticleTypes.WATER_SPLASH, sx, sy, sz,
-                            2 + this.rand.nextInt(2), 0.1D, 0.0D, 0.1D, 0.0D);
+                        this.world.setEntityState(this, STATUS_SPLASH_NIBBLE);
                     }
                     if (this.fishTimer <= 0) {
                         this.fishAngle = MathHelper.nextFloat(this.rand, 0.0F, 360.0F);
@@ -234,6 +224,23 @@ public class EntityGolemBobber extends Entity implements IEntityAdditionalSpawnD
 
             this.setPosition(this.posX, this.posY, this.posZ);
         }
+    }
+
+    @Override
+    public void handleStatusUpdate(byte id) {
+        if (id == STATUS_SPLASH_AMBIENT) {
+            Thaumcraft.proxy.golemFishingSplashFX(this, 0);
+            return;
+        }
+        if (id == STATUS_SPLASH_NIBBLE) {
+            Thaumcraft.proxy.golemFishingSplashFX(this, 1);
+            return;
+        }
+        if (id == STATUS_SPLASH_CATCH) {
+            Thaumcraft.proxy.golemFishingSplashFX(this, 2);
+            return;
+        }
+        super.handleStatusUpdate(id);
     }
 
     // ------------------------------------------------------------------

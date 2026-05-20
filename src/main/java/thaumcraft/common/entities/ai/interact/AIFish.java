@@ -9,7 +9,6 @@ import net.minecraft.item.ItemFishFood;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.FurnaceRecipes;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.SoundEvent;
@@ -17,7 +16,6 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
-import net.minecraft.world.WorldServer;
 import thaumcraft.common.config.Config;
 import thaumcraft.common.entities.golems.EntityGolemBase;
 import thaumcraft.common.entities.golems.EntityGolemBobber;
@@ -160,9 +158,7 @@ public class AIFish extends EntityAIBase {
                 }
                 if (this.bobber != null) {
                     this.bobber.playSound(SoundEvent.REGISTRY.getObject(new ResourceLocation("random.splash")), 0.15F, 1.0F + (theWorld.rand.nextFloat() - theWorld.rand.nextFloat()) * 0.4F);
-                    if (theWorld instanceof WorldServer) {
-                        ((WorldServer) theWorld).spawnParticle(EnumParticleTypes.WATER_SPLASH, this.bobber.posX, this.bobber.posY + 0.5, this.bobber.posZ, 20 + theWorld.rand.nextInt(20), 0.1, 0.0, 0.1, 0.0);
-                    }
+                    theWorld.setEntityState(this.bobber, EntityGolemBobber.STATUS_SPLASH_CATCH);
                     this.bobber.setDead();
                 }
                 this.target = null;

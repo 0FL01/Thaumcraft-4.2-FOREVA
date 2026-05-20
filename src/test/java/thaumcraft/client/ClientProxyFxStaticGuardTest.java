@@ -91,6 +91,12 @@ public class ClientProxyFxStaticGuardTest {
                         && source.contains("public void splooshFX(Entity entity)")
                         && source.contains("new FXBreaking(")
                         && source.contains("Items.SLIME_BALL"));
+        assertTrue("CommonProxy/ClientProxy must keep dedicated golem fishing splash surface on FXBubble",
+                commonProxy.contains("public void golemFishingSplashFX(Entity entity, int kind)")
+                        && source.contains("public void golemFishingSplashFX(Entity entity, int kind)")
+                        && source.contains("new FXBubble(world, px, py, pz, mx, my, mz, kind == 2 ? 6 : 4)")
+                        && source.contains("bubble.setRGB(0.8F, 0.9F, 1.0F)")
+                        && source.contains("bubble.setBubbleSpeed(0.003D + (kind == 2 ? 0.002D : 0.001D))"));
         assertTrue("ClientProxy must override drawGenericParticles for champion modifier fallback",
                 source.contains("public void drawGenericParticles(") && source.contains("new FXGeneric("));
         assertTrue("ClientProxy must override drawVentParticles for thaumatorium vent routing",
