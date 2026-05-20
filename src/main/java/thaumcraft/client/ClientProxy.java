@@ -1490,14 +1490,10 @@ public class ClientProxy extends CommonProxy {
         Minecraft mc = Minecraft.getMinecraft();
         World world = mc == null ? null : mc.world;
         if (world == null || !world.isRemote) return;
-        int amount = particleCount(1);
-        if (amount <= 0) return;
-        for (int i = 0; i < amount; i++) {
-            FXSpark fx = new FXSpark(world, x, y, z, size);
-            fx.setRBGColorF(red, green, blue);
-            fx.setAlphaF(alpha);
-            ParticleEngine.addEffect(world, fx);
-        }
+        FXSpark fx = new FXSpark(world, x, y, z, size);
+        fx.setRBGColorF(red, green, blue);
+        fx.setAlphaF(alpha);
+        ParticleEngine.addEffect(world, fx);
     }
 
     @Override
@@ -1505,10 +1501,13 @@ public class ClientProxy extends CommonProxy {
                                      double mx, double my, double mz,
                                      float red, float green, float blue, float alpha,
                                      boolean loop, int start, int num, int inc, int age, int delay, float scale) {
-        int step = Math.max(1, Math.abs(inc));
-        int amount = particleCount(Math.max(1, num / step));
-        drawGenericParticles(world, x, y, z, mx, my, mz, red, green, blue, alpha,
-                loop, start, num, inc, age, delay, scale, amount);
+        if (world == null || !world.isRemote) return;
+        ParticleEngine.addEffect(world, new FXGeneric(
+                world,
+                x, y, z,
+                mx, my, mz,
+                red, green, blue, alpha,
+                loop, start, num, inc, age, delay, scale));
     }
 
     @Override
@@ -1523,12 +1522,8 @@ public class ClientProxy extends CommonProxy {
         for (int i = 0; i < count; i++) {
             ParticleEngine.addEffect(world, new FXGeneric(
                     world,
-                    x + (world.rand.nextFloat() - 0.5f) * 0.15f,
-                    y + (world.rand.nextFloat() - 0.5f) * 0.15f,
-                    z + (world.rand.nextFloat() - 0.5f) * 0.15f,
-                    mx + (world.rand.nextFloat() - 0.5f) * 0.01f,
-                    my + (world.rand.nextFloat() - 0.5f) * 0.01f,
-                    mz + (world.rand.nextFloat() - 0.5f) * 0.01f,
+                    x, y, z,
+                    mx, my, mz,
                     red, green, blue, alpha,
                     loop, start, num, inc, age, delay, scale));
         }
@@ -1559,27 +1554,10 @@ public class ClientProxy extends CommonProxy {
     public void drawVentParticles(World world, double x, double y, double z,
                                   double mx, double my, double mz, int color, float scale) {
         if (world == null || !world.isRemote) return;
-        int amount = particleCount(1);
-        if (amount <= 0) return;
-
-        Color tint = decodeColor(color);
-        float red = normalizeColor(tint.getRed());
-        float green = normalizeColor(tint.getGreen());
-        float blue = normalizeColor(tint.getBlue());
-        for (int i = 0; i < amount; i++) {
-            FXVent fx = new FXVent(
-                    world,
-                    x + (world.rand.nextFloat() - 0.5f) * 0.05f,
-                    y + (world.rand.nextFloat() - 0.5f) * 0.05f,
-                    z + (world.rand.nextFloat() - 0.5f) * 0.05f,
-                    mx + (world.rand.nextFloat() - 0.5f) * 0.01f,
-                    my + (world.rand.nextFloat() - 0.5f) * 0.01f,
-                    mz + (world.rand.nextFloat() - 0.5f) * 0.01f,
-                    red, green, blue);
-            fx.setAlphaF(0.4F);
-            fx.setScale(scale);
-            ParticleEngine.addEffect(world, fx);
-        }
+        FXVent fx = new FXVent(world, x, y, z, mx, my, mz, color);
+        fx.setAlphaF(0.4F);
+        fx.setScale(scale);
+        ParticleEngine.addEffect(world, fx);
     }
 
     @Override
@@ -1587,11 +1565,10 @@ public class ClientProxy extends CommonProxy {
         Minecraft mc = Minecraft.getMinecraft();
         World world = mc == null ? null : mc.world;
         if (world == null || !world.isRemote) return;
-        int amount = particleCount(Math.max(1, (int) (scale * 4.0f)));
-        if (amount <= 0) return;
-        for (int i = 0; i < amount; i++) {
-            ParticleEngine.addEffect(world, new FXSparkle(world, x, y, z, scale, type, speed));
-        }
+        if (world.rand.nextInt(6) >= particleCount(2)) return;
+        FXSparkle fx = new FXSparkle(world, x, y, z, scale, type, 6.0F);
+        fx.setGravity(speed);
+        ParticleEngine.addEffect(world, fx);
     }
 
     @Override

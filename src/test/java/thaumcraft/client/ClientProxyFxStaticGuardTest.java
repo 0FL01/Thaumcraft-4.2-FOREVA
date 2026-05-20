@@ -100,9 +100,15 @@ public class ClientProxyFxStaticGuardTest {
                         && source.contains("bubble.setRGB(0.8F, 0.9F, 1.0F)")
                         && source.contains("bubble.setBubbleSpeed(0.003D + (kind == 2 ? 0.002D : 0.001D))"));
         assertTrue("ClientProxy must override drawGenericParticles for champion modifier fallback",
-                source.contains("public void drawGenericParticles(") && source.contains("new FXGeneric("));
+                source.contains("public void drawGenericParticles(")
+                        && source.contains("new FXGeneric(")
+                        && source.contains("x, y, z,")
+                        && source.contains("mx, my, mz,"));
         assertTrue("ClientProxy must override drawVentParticles for thaumatorium vent routing",
-                source.contains("public void drawVentParticles(") && source.contains("new FXVent("));
+                source.contains("public void drawVentParticles(")
+                        && source.contains("FXVent fx = new FXVent(world, x, y, z, mx, my, mz, color);")
+                        && source.contains("fx.setAlphaF(0.4F);")
+                        && source.contains("fx.setScale(scale);"));
         assertTrue("CommonProxy/ClientProxy must keep extended beam helpers for wand/bore/power routes",
                 commonProxy.contains("public Object beamCont(")
                         && commonProxy.contains("public Object beamBore(")
@@ -156,7 +162,15 @@ public class ClientProxyFxStaticGuardTest {
                         && source.contains("public void boreDigFx(World world,")
                         && source.contains("new FXBoreParticles("));
         assertTrue("ClientProxy must override sparkle for firebat/lifter visuals",
-                source.contains("public void sparkle(") && source.contains("new FXSparkle("));
+                source.contains("public void sparkle(")
+                        && source.contains("world.rand.nextInt(6) >= particleCount(2)")
+                        && source.contains("FXSparkle fx = new FXSparkle(world, x, y, z, scale, type, 6.0F);")
+                        && source.contains("fx.setGravity(speed);"));
+        assertTrue("ClientProxy spark helper should stay on a single direct FXSpark path without ad-hoc particle-count loops",
+                source.contains("public void spark(float x, float y, float z, float size, float red, float green, float blue, float alpha)")
+                        && source.contains("FXSpark fx = new FXSpark(world, x, y, z, size);")
+                        && source.contains("fx.setAlphaF(alpha);")
+                        && !source.contains("for (int i = 0; i < amount; i++) {\n            FXSpark fx = new FXSpark"));
         assertTrue("ClientProxy must override particleCount using client particle settings",
                 source.contains("public int particleCount(") && source.contains("mc.gameSettings.particleSetting"));
         assertTrue("ClientProxy must override crucibleFroth and crucibleFrothDown",
