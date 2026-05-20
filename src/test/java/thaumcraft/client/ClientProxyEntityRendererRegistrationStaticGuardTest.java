@@ -18,11 +18,11 @@ public class ClientProxyEntityRendererRegistrationStaticGuardTest {
 
         assertTrue("ClientProxy must keep setupEntityRenderers entry-point",
                 source.contains("private void setupEntityRenderers()"));
-        assertTrue("ClientProxy must keep non-noop RenderEntityItem registrations for item-like entities",
-                source.contains("registerEntityRenderer(EntitySpecialItem.class, manager -> new RenderEntityItem(manager, renderItem), registered);")
-                        && source.contains("registerEntityRenderer(EntityPermanentItem.class, manager -> new RenderEntityItem(manager, renderItem), registered);")
-                        && source.contains("registerEntityRenderer(EntityFollowingItem.class, manager -> new RenderEntityItem(manager, renderItem), registered);")
-                        && source.contains("registerEntityRenderer(EntityItemGrate.class, manager -> new RenderEntityItem(manager, renderItem), registered);"));
+        assertTrue("ClientProxy must keep dedicated special-item renderer registrations for item-like entities",
+                source.contains("registerEntityRenderer(EntitySpecialItem.class, RenderSpecialItem::new, registered);")
+                        && source.contains("registerEntityRenderer(EntityPermanentItem.class, RenderSpecialItem::new, registered);")
+                        && source.contains("registerEntityRenderer(EntityFollowingItem.class, RenderFollowingItem::new, registered);")
+                        && source.contains("registerEntityRenderer(EntityItemGrate.class, RenderSpecialItem::new, registered);"));
         assertTrue("ClientProxy must keep non-noop projectile baselines plus dedicated aspect-orb renderer",
                 source.contains("registerEntityRenderer(EntityDart.class, RenderDart::new, registered);")
                         && source.contains("registerEntityRenderer(EntityPrimalArrow.class, RenderPrimalArrow::new, registered);")
@@ -145,6 +145,19 @@ public class ClientProxyEntityRendererRegistrationStaticGuardTest {
                         && aspectOrbRenderer.contains("orb.getAspect().getBlend()")
                         && aspectOrbRenderer.contains("orb.orbMaxAge - orb.orbAge")
                         && aspectOrbRenderer.contains("DefaultVertexFormats.POSITION_TEX_COLOR"));
+        String specialItemRenderer = readFile("src/main/java/thaumcraft/client/renderers/entity/RenderSpecialItem.java");
+        String followingItemRenderer = readFile("src/main/java/thaumcraft/client/renderers/entity/RenderFollowingItem.java");
+        assertTrue("RenderSpecialItem and RenderFollowingItem must provide dedicated special-item render baselines",
+                specialItemRenderer.contains("extends Render<EntityItem>")
+                        && specialItemRenderer.contains("renderBurst(")
+                        && specialItemRenderer.contains("RenderEntityItem")
+                        && specialItemRenderer.contains("Random(245L)")
+                        && specialItemRenderer.contains("GL11.GL_TRIANGLE_FAN")
+                        && specialItemRenderer.contains("255, 0, 255, 0")
+                        && followingItemRenderer.contains("extends Render<EntityItem>")
+                        && followingItemRenderer.contains("RenderEntityItem")
+                        && followingItemRenderer.contains("!entity.getItem().isEmpty()")
+                        && followingItemRenderer.contains("this.itemRenderer.doRender(entity, x, y, z, entityYaw, partialTicks)"));
         String electricOrbRenderer = readFile("src/main/java/thaumcraft/client/renderers/entity/RenderElectricOrb.java");
         assertTrue("RenderElectricOrb must provide shared golem/shock orb particle billboard baseline",
                 electricOrbRenderer.contains("extends Render<Entity>")

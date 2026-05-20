@@ -105,6 +105,7 @@ import thaumcraft.client.renderers.entity.RenderDart;
 import thaumcraft.client.renderers.entity.RenderGolemBobber;
 import thaumcraft.client.renderers.entity.RenderFallingTaint;
 import thaumcraft.client.renderers.entity.RenderFrostShard;
+import thaumcraft.client.renderers.entity.RenderFollowingItem;
 import thaumcraft.client.renderers.entity.RenderCultistPortal;
 import thaumcraft.client.renderers.entity.RenderBrainyZombie;
 import thaumcraft.client.renderers.entity.RenderInhabitedZombie;
@@ -129,6 +130,7 @@ import thaumcraft.client.renderers.entity.RenderTravelingTrunk;
 import thaumcraft.client.renderers.entity.RenderWatcher;
 import thaumcraft.client.renderers.entity.RenderWisp;
 import thaumcraft.client.renderers.entity.RenderCultist;
+import thaumcraft.client.renderers.entity.RenderSpecialItem;
 import thaumcraft.client.renderers.item.ItemEldritchRenderer;
 import thaumcraft.client.renderers.item.ItemJarRenderer;
 import thaumcraft.client.renderers.item.ItemMetalDeviceRenderer;
@@ -454,10 +456,10 @@ public class ClientProxy extends CommonProxy {
         RenderItem renderItem = Minecraft.getMinecraft().getRenderItem();
         Set<Class<? extends Entity>> registered = new HashSet<>();
 
-        registerEntityRenderer(EntitySpecialItem.class, manager -> new RenderEntityItem(manager, renderItem), registered);
-        registerEntityRenderer(EntityPermanentItem.class, manager -> new RenderEntityItem(manager, renderItem), registered);
-        registerEntityRenderer(EntityFollowingItem.class, manager -> new RenderEntityItem(manager, renderItem), registered);
-        registerEntityRenderer(EntityItemGrate.class, manager -> new RenderEntityItem(manager, renderItem), registered);
+        registerEntityRenderer(EntitySpecialItem.class, RenderSpecialItem::new, registered);
+        registerEntityRenderer(EntityPermanentItem.class, RenderSpecialItem::new, registered);
+        registerEntityRenderer(EntityFollowingItem.class, RenderFollowingItem::new, registered);
+        registerEntityRenderer(EntityItemGrate.class, RenderSpecialItem::new, registered);
 
         registerEntityRenderer(EntityDart.class, RenderDart::new, registered);
         registerEntityRenderer(EntityPrimalArrow.class, RenderPrimalArrow::new, registered);
