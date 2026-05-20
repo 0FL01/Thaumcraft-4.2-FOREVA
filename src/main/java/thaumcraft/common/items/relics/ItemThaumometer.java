@@ -99,6 +99,10 @@ public class ItemThaumometer extends Item {
     }
 
     private ScanResult doScan(ItemStack stack, World world, EntityPlayer player) {
+        return this.findScanTarget(stack, world, player);
+    }
+
+    public ScanResult findScanTarget(ItemStack stack, World world, EntityPlayer player) {
         Entity pointed = EntityUtils.getPointedEntity(world, player, 10.0D, null);
         if (pointed != null) {
             ScanResult result = new ScanResult((byte)2, 0, 0, pointed, "");

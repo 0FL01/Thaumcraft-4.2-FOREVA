@@ -23,7 +23,7 @@ This file is a progress digest, not a parity certificate.
 - Stage 8 visual progress is not backend parity evidence.
 - Stage 9 recipe/research corpus progress is not server-authoritative progression proof.
 
-Current backend blockers remain: research/progression runtime route, research table C2S authority, scan authority, alchemy/thaumatorium/infusion runtime validation, Outer Lands portal/maze validation, and save/load behavior for complex tiles.
+Current backend blockers remain: research/progression runtime route, scan and research-table live-route/e2e validation, alchemy/thaumatorium/infusion runtime validation, Outer Lands portal/maze validation, and save/load behavior for complex tiles.
 
 ## Current Evidence
 
@@ -62,9 +62,9 @@ See `docs/GOAL_PROGRESS-archive/INDEX.md` for batch listings and content.
 
 Do not claim backend substantially complete until these are resolved or scoped out:
 
-1. Research table C2S authority.
-2. Scan authority.
-3. Normal research progression route.
+1. Normal research progression route.
+2. Research table live-route/adversarial validation.
+3. Scan authority live-route/adversarial validation.
 4. Research table NBT symmetry.
 5. Alchemy/thaumatorium/infusion runtime validation.
 6. Outer Lands runtime validation.
@@ -72,7 +72,7 @@ Do not claim backend substantially complete until these are resolved or scoped o
 
 ## Latest Checkpoint
 
-- Stage 9-e burst hardened research-table C2S packets: active `ContainerResearchTable`, matching tile/coords, usable-distance gate, valid note hexes, discovered aspects, real pool/bonus source checks, and atomic combination-cost validation.
-- Added non-GUI runtime tests for open-container resolution, invalid-hex rejection, valid aspect placement, and atomic combination-input consumption.
-- Validated this burst with `./scripts/dev.sh gradle test --tests thaumcraft.common.lib.network.playerdata.ResearchTableAuthorityRuntimeTest`, `./scripts/dev.sh compileJava`, and `./scripts/dev.sh validate --smoke`.
-- Still unverified and still forbidden to claim: normal Thaumonomicon route, full note solve/completion e2e, scan authority, and `bonusAspects` save/load parity. Do not call Stage 9-e complete or server-authoritative progression complete from this checkpoint.
+- Stage 9-e burst hardened `PacketScannedToServer`: only held thaumometer scans are accepted, the server recomputes the current thaumometer target, requires a payload match against the live server-observed entity/block/node scan, and rejects non-`@` prefixes plus forged id/meta/entity/phenomena payloads.
+- Added non-GUI runtime tests for valid block/entity/node authoritative matches and forged payload rejection via `PacketScannedAuthorityRuntimeTest`; kept the clue/progression static guard aligned with the new authority contract.
+- Validated this burst with `./scripts/dev.sh gradle test --tests thaumcraft.common.lib.network.playerdata.PacketScannedAuthorityRuntimeTest`, `./scripts/dev.sh compileJava`, and `./scripts/dev.sh validate --smoke`.
+- Still unverified and still forbidden to claim: full scan e2e parity, hidden/lost clue runtime closure, normal Thaumonomicon route, full note solve/completion e2e, and `bonusAspects` save/load parity. Do not call Stage 9-e complete or server-authoritative progression complete from this checkpoint.

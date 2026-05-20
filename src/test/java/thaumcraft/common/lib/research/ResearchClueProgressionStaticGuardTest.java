@@ -21,11 +21,14 @@ public class ResearchClueProgressionStaticGuardTest {
                         && scanManager.contains("Object clue = createScanClue(scan);")
                         && scanManager.contains("ResearchManager.createClue(player.world, player, clue, awardedAspects);")
                         && scanManager.contains("ResearchManager.updateCache(player.getName(), knowledge);"));
-        assertTrue("PacketScannedToServer must rebuild ScanResult server-side and route scans through ScanManager.completeScan",
-                packet.contains("if (this.type == 1)")
-                        && packet.contains("else if (this.type == 2)")
-                        && packet.contains("else if (this.type == 3)")
-                        && packet.contains("if (result != null && ScanManager.completeScan(player, result, this.prefix))")
+        assertTrue("PacketScannedToServer must require an authoritative held-thaumometer match before routing scans through ScanManager.completeScan",
+                packet.contains("if (player == null || !\"@\".equals(normalizePrefix(prefix)))")
+                        && packet.contains("getHeldThaumometerScan(player, player.getHeldItemMainhand()")
+                        && packet.contains("getHeldThaumometerScan(player, player.getHeldItemOffhand()")
+                        && packet.contains("ItemThaumometer thaumometer = (ItemThaumometer) held.getItem();")
+                        && packet.contains("ScanResult authoritative = thaumometer.findScanTarget(held, player.world, player);")
+                        && packet.contains("return matchesPayload(authoritative, type, id, md, entityid, phenomena) ? authoritative : null;")
+                        && packet.contains("if (result != null && ScanManager.completeScan(player, result, normalizedPrefix))")
                         && packet.contains("syncKnowledge(player);"));
     }
 

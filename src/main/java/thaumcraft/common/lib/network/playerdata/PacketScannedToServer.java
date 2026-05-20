@@ -14,6 +14,7 @@ import thaumcraft.common.lib.capabilities.IPlayerKnowledge;
 import thaumcraft.common.lib.network.PacketBase;
 import thaumcraft.common.lib.network.PacketHandler;
 import thaumcraft.common.lib.research.ScanManager;
+import thaumcraft.common.items.relics.ItemThaumometer;
 
 public class PacketScannedToServer extends PacketBase {
     private int playerid;
@@ -67,23 +68,66 @@ public class PacketScannedToServer extends PacketBase {
         this.scheduleServer(ctx, player -> {
             if (player.getEntityId() != this.playerid) return;
             if (player.world.provider.getDimension() != this.dim) return;
-            ScanResult result = null;
-            if (this.type == 1) {
-                Item item = Item.getItemById(this.id);
-                if (item != null) {
-                    result = new ScanResult((byte)1, this.id, this.md, null, null);
-                }
-            } else if (this.type == 2) {
-                Entity entity = this.entityid == 0 ? null : player.world.getEntityByID(this.entityid);
-                result = entity == null ? null : new ScanResult((byte)2, 0, 0, entity, null);
-            } else if (this.type == 3) {
-                result = new ScanResult((byte)3, 0, 0, null, this.phenomena);
-            }
-            if (result != null && ScanManager.completeScan(player, result, this.prefix)) {
+            String normalizedPrefix = normalizePrefix(this.prefix);
+            ScanResult result = findAuthoritativeMatchingScan(
+                    player, this.type, this.id, this.md, this.entityid, this.phenomena, normalizedPrefix);
+            if (result != null && ScanManager.completeScan(player, result, normalizedPrefix)) {
                 syncKnowledge(player);
             }
         });
         return null;
+    }
+
+    static ScanResult findAuthoritativeMatchingScan(EntityPlayer player,
+                                                    byte type,
+                                                    int id,
+                                                    int md,
+                                                    int entityid,
+                                                    String phenomena,
+                                                    String prefix) {
+        if (player == null || !"@".equals(normalizePrefix(prefix))) {
+            return null;
+        }
+        ScanResult mainHand = getHeldThaumometerScan(player, player.getHeldItemMainhand(), type, id, md, entityid, phenomena);
+        if (mainHand != null) {
+            return mainHand;
+        }
+        return getHeldThaumometerScan(player, player.getHeldItemOffhand(), type, id, md, entityid, phenomena);
+    }
+
+    private static ScanResult getHeldThaumometerScan(EntityPlayer player,
+                                                     ItemStack held,
+                                                     byte type,
+                                                     int id,
+                                                     int md,
+                                                     int entityid,
+                                                     String phenomena) {
+        if (player == null || held == null || held.isEmpty() || !(held.getItem() instanceof ItemThaumometer)) {
+            return null;
+        }
+        ItemThaumometer thaumometer = (ItemThaumometer) held.getItem();
+        ScanResult authoritative = thaumometer.findScanTarget(held, player.world, player);
+        return matchesPayload(authoritative, type, id, md, entityid, phenomena) ? authoritative : null;
+    }
+
+    static boolean matchesPayload(ScanResult authoritative,
+                                  byte type,
+                                  int id,
+                                  int md,
+                                  int entityid,
+                                  String phenomena) {
+        if (authoritative == null || authoritative.type != type) {
+            return false;
+        }
+        if (type == 1) {
+            Item item = Item.getItemById(id);
+            return item != null && authoritative.id == id && authoritative.meta == md;
+        }
+        if (type == 2) {
+            Entity entity = authoritative.entity;
+            return entity != null && entity.getEntityId() == entityid;
+        }
+        return type == 3 && authoritative.phenomena != null && authoritative.phenomena.equals(phenomena);
     }
 
     private static void syncKnowledge(EntityPlayerMP player) {
@@ -94,5 +138,9 @@ public class PacketScannedToServer extends PacketBase {
             PacketHandler.INSTANCE.sendTo(new PacketSyncScannedEntities(knowledge.getScannedEntities()), player);
             PacketHandler.INSTANCE.sendTo(new PacketSyncScannedPhenomena(knowledge.getScannedPhenomena()), player);
         }
+    }
+
+    private static String normalizePrefix(String prefix) {
+        return (prefix == null || prefix.isEmpty()) ? "@" : prefix;
     }
 }

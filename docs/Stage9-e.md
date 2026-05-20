@@ -48,7 +48,7 @@ Current blockers:
 
 - Normal Thaumonomicon/research-browser click flow is not proven to send validated progression packets.
 - Research table packet hardening now exists, but live GUI-route and broader adversarial/e2e validation remain open.
-- `PacketScannedToServer` trusts client-declared targets more than a server-authoritative scan system should.
+- `PacketScannedToServer` hardening now exists, but live packet-route and broader scan/runtime validation remain open.
 - `TileResearchTable` `bonusAspects` persistence is ambiguous.
 - Hidden/lost clue grants need runtime verification against reference behavior.
 - End-to-end progression runtime validation is still missing.
@@ -156,21 +156,24 @@ Remaining work:
 - validate primary note creation consumes paper/ink and does not add the research key directly;
 - validate sibling grants only after valid completion.
 
-### GAP-9: Scan packet is not server-authoritative enough
+### GAP-9: Scan packet hardening is implemented; broader scan/progression validation remains open
 
-**Статус:** unsafe/untrusted until fixed
-**Критичность:** blocker
+**Статус:** implementation hardened; targeted non-GUI runtime tests passed; live route/e2e validation open
+**Критичность:** high
 
-`PacketScannedToServer` reconstructs scan results from client payload. Server-side `ScanManager.completeScan(...)` validates duplicate/aspect/prerequisite rules, but the server does not fully recompute whether the player could physically scan the declared target.
+`PacketScannedToServer` now rejects raw client-declared scan targets unless they match a live server-observed thaumometer scan. The current hardening covers:
 
-Required work:
+- held thaumometer required on the server;
+- only `@` prefix is accepted through the current thaumometer route;
+- the server reruns the thaumometer target lookup and only accepts packet payloads that match the current server-observed block/entity/node scan;
+- arbitrary item id/meta, entity id, or node-phenomena strings are rejected unless they match the authoritative server target;
+- targeted non-GUI runtime tests cover valid block/entity/node matches and forged payload rejection.
 
-- verify held thaumometer or valid scanner item on server;
-- server-raytrace block/entity target with range and line of sight;
-- for entity scans, verify entity exists, is within range, and is visible/targeted;
-- for item scans, verify target item/block comes from server-observed state, not arbitrary item id/meta;
-- for phenomena scans, restrict strings to server-known nearby phenomena;
-- add malicious-payload rejection tests.
+What remains open for this gap:
+
+- validate the live packet-dispatch path, not just extracted authority helpers;
+- validate representative runtime scans end-to-end with awarded aspects and hidden/lost clue behavior;
+- verify additional edge cases such as rapid aim changes, multi-hand thaumometer states, and any future non-thaumometer scan routes before calling the system complete.
 
 ### GAP-8: Manual/runtime validation for research content is not yet complete
 
@@ -187,7 +190,7 @@ Current static validation covers the research corpus and asset references, but P
 - [x] Harden `PacketPlayerCompleteToServer` against direct arbitrary completion for primary/secondary research flows.
 - [ ] Validate full research graph against reference keys, parents, hidden parents, siblings, triggers, aspects, coordinates, complexity, flags, icons, and page order.
 - [x] Harden research table aspect placement/combination packets with active-container, tile-identity, usable-distance, valid-hex, discovered-aspect, and atomic source-consumption checks.
-- [ ] Make scan completion server-authoritative.
+- [x] Harden scan completion packet with held-thaumometer checks, server-observed target matching, and forged payload rejection coverage.
 - [ ] Wire and validate normal Thaumonomicon/research-browser action flow.
 - [ ] Validate end-to-end progression: scan -> clue/aspect -> note creation -> research table solve -> note completion -> unlock.
 - [ ] Fix or document/enforce `TileResearchTable.bonusAspects` persistence semantics.
