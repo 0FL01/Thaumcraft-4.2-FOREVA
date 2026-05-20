@@ -24,39 +24,39 @@ public class TubeConduitBurstContractTest {
         String itemRenderer = read("src/main/java/thaumcraft/client/renderers/item/ItemTubeRenderer.java");
         String tubeBlock = read("src/main/java/thaumcraft/common/blocks/BlockTube.java");
         String clientProxy = read("src/main/java/thaumcraft/client/ClientProxy.java");
-        String tubeModel = read("src/main/resources/assets/thaumcraft/models/block/blocktube_0.json");
-        String filterModel = read("src/main/resources/assets/thaumcraft/models/block/blocktube_3.json");
-        String bufferModel = read("src/main/resources/assets/thaumcraft/models/block/blocktube_4.json");
-        String onewayModel = read("src/main/resources/assets/thaumcraft/models/block/blocktube_6.json");
         String crystalizerItemModel = read("src/main/resources/assets/thaumcraft/models/item/blocktube_tesr.json");
 
         assertTrue("Tube conduit helper must drive dynamic connections through ThaumcraftApiHelper and extended-tube checks",
                 helper.contains("ThaumcraftApiHelper.getConnectableTile")
                         && helper.contains("renderExtendedTube()")
-                        && helper.contains("pipe_filter_core"));
+                        && helper.contains("pipe_filter_core")
+                        && helper.contains("renderInventoryShell(int meta)"));
         assertTrue("TileTube/Filter/Restrict renderers must delegate conduit drawing through the shared helper",
                 tubeRenderer.contains("TubeConduitRenderHelper.renderConduit")
                         && filterRenderer.contains("tile.aspectFilter")
                         && restrictRenderer.contains("\"thaumcraft:blocks/pipe_restrict\""));
-        assertTrue("Valve, buffer, and oneway renderers must render conduit arms before their dedicated overlays",
+        assertTrue("Valve, buffer, and oneway renderers must stay item-safe while rendering conduit arms before their dedicated overlays",
                 valveRenderer.contains("TubeConduitRenderHelper.renderConduit(tile, tile, tile.openSides")
+                        && valveRenderer.contains("if (tile == null)")
                         && bufferRenderer.contains("TubeConduitRenderHelper.renderConduit(tile, tile, tile.openSides")
+                        && bufferRenderer.contains("if (tile.getWorld() == null || tile.getPos() == null)")
                         && onewayRenderer.contains("TubeConduitRenderHelper.renderConduit(tile, tile, tile.openSides"));
-        assertTrue("Base tube model must use a narrow stem plus pipe_2 joint instead of the old cube_all placeholder",
-                tubeModel.contains("\"joint\": \"thaumcraft:blocks/pipe_2\"")
-                        && tubeModel.contains("\"from\": [7, 0, 7]")
-                        && tubeModel.contains("\"from\": [6.5, 6.5, 6.5]"));
-        assertTrue("Filter/buffer/oneway models must preserve their dedicated core textures while dropping the full-cube placeholder shape",
-                filterModel.contains("\"core\": \"thaumcraft:blocks/pipe_filter_core\"")
-                        && bufferModel.contains("\"from\": [4, 4, 4]")
-                        && onewayModel.contains("\"core\": \"thaumcraft:blocks/pipe_oneway\""));
 
-        assertTrue("Crystalizer tube meta should route through TESR-first world and item rendering instead of the old baked cube placeholder",
-                tubeBlock.contains("return this.getMetaFromState(state) == 7 ? EnumBlockRenderType.INVISIBLE : EnumBlockRenderType.MODEL;")
+        assertTrue("Tube ancillary metas plus crystalizer should route through TESR-first world and item rendering instead of baked placeholder shells",
+                tubeBlock.contains("return this.getMetaFromState(state) == 2 ? EnumBlockRenderType.MODEL : EnumBlockRenderType.INVISIBLE;")
+                        && clientProxy.contains("registerBuiltinItemModel(tubeItem, 0, \"blocktube_tesr\");")
+                        && clientProxy.contains("registerBuiltinItemModel(tubeItem, 1, \"blocktube_tesr\");")
+                        && clientProxy.contains("registerBuiltinItemModel(tubeItem, 3, \"blocktube_tesr\");")
+                        && clientProxy.contains("registerBuiltinItemModel(tubeItem, 4, \"blocktube_tesr\");")
+                        && clientProxy.contains("registerBuiltinItemModel(tubeItem, 5, \"blocktube_tesr\");")
+                        && clientProxy.contains("registerBuiltinItemModel(tubeItem, 6, \"blocktube_tesr\");")
                         && clientProxy.contains("registerBuiltinItemModel(tubeItem, 7, \"blocktube_tesr\");")
                         && clientProxy.contains("tubeItem.setTileEntityItemStackRenderer(new ItemTubeRenderer());")
                         && itemRenderer.contains("new TileEssentiaCrystalizerRenderer()")
-                        && itemRenderer.contains("if (stack.getMetadata() != 7)")
+                        && itemRenderer.contains("new TileTubeValveRenderer()")
+                        && itemRenderer.contains("TubeConduitRenderHelper.renderInventoryShell(meta);")
+                        && itemRenderer.contains("if (meta == 1)")
+                        && itemRenderer.contains("if (meta == 7)")
                         && itemRenderer.contains("GlStateManager.translate(-0.5F, -0.5F, -0.5F);")
                         && crystalizerItemModel.contains("\"parent\": \"builtin/entity\""));
 

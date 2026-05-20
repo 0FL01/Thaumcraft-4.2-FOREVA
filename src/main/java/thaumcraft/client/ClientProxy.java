@@ -627,6 +627,12 @@ public class ClientProxy extends CommonProxy {
         for (int meta = 0; meta <= 7; meta++) {
             registerBlockItemModel(tubeItem, meta, "type=" + meta);
         }
+        registerBuiltinItemModel(tubeItem, 0, "blocktube_tesr");
+        registerBuiltinItemModel(tubeItem, 1, "blocktube_tesr");
+        registerBuiltinItemModel(tubeItem, 3, "blocktube_tesr");
+        registerBuiltinItemModel(tubeItem, 4, "blocktube_tesr");
+        registerBuiltinItemModel(tubeItem, 5, "blocktube_tesr");
+        registerBuiltinItemModel(tubeItem, 6, "blocktube_tesr");
         registerBuiltinItemModel(tubeItem, 7, "blocktube_tesr");
         Item tableItem = Item.getItemFromBlock(ConfigBlocks.blockTable);
         for (int meta = 0; meta <= 15; meta++) {

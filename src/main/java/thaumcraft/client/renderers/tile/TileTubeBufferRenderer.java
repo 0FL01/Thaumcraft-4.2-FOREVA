@@ -18,10 +18,13 @@ public class TileTubeBufferRenderer extends TileEntitySpecialRenderer<TileTubeBu
 
     @Override
     public void render(TileTubeBuffer tile, double x, double y, double z, float partialTicks, int destroyStage, float alpha) {
-        if (tile == null || tile.getWorld() == null) {
+        if (tile == null) {
             return;
         }
         TubeConduitRenderHelper.renderConduit(tile, tile, tile.openSides, "thaumcraft:blocks/pipe_buffer", null, x, y, z);
+        if (tile.getWorld() == null || tile.getPos() == null) {
+            return;
+        }
         bindTexture(VALVE_TEXTURE);
         for (EnumFacing face : EnumFacing.VALUES) {
             int idx = face.getIndex();

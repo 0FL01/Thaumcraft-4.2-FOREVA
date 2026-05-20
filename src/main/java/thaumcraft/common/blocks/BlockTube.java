@@ -50,7 +50,7 @@ public class BlockTube extends BlockContainer {
 
     @Override
     public EnumBlockRenderType getRenderType(IBlockState state) {
-        return this.getMetaFromState(state) == 7 ? EnumBlockRenderType.INVISIBLE : EnumBlockRenderType.MODEL;
+        return this.getMetaFromState(state) == 2 ? EnumBlockRenderType.MODEL : EnumBlockRenderType.INVISIBLE;
     }
 
     @Override

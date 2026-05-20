@@ -6,7 +6,7 @@ import thaumcraft.common.tiles.TileTubeFilter;
 public class TileTubeFilterRenderer extends TileEntitySpecialRenderer<TileTubeFilter> {
     @Override
     public void render(TileTubeFilter tile, double x, double y, double z, float partialTicks, int destroyStage, float alpha) {
-        if (tile == null || tile.getWorld() == null) {
+        if (tile == null) {
             return;
         }
         TubeConduitRenderHelper.renderConduit(tile, tile, tile.openSides,

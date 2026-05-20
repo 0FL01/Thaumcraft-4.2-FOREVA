@@ -18,7 +18,7 @@ public class TileTubeValveRenderer extends TileEntitySpecialRenderer<TileTubeVal
 
     @Override
     public void render(TileTubeValve tile, double x, double y, double z, float partialTicks, int destroyStage, float alpha) {
-        if (tile == null || tile.getWorld() == null) {
+        if (tile == null) {
             return;
         }
         TubeConduitRenderHelper.renderConduit(tile, tile, tile.openSides, "thaumcraft:blocks/pipe_1", null, x, y, z);
