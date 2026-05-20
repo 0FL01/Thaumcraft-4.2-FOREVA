@@ -26,7 +26,7 @@ public class TileRunicMatrixRenderer extends TileEntitySpecialRenderer<TileInfus
 
     @Override
     public void render(TileInfusionMatrix tile, double x, double y, double z, float partialTicks, int destroyStage, float alpha) {
-        if (tile == null || tile.getWorld() == null || (!tile.active && !tile.crafting && tile.startUp <= 0.0F)) {
+        if (tile == null) {
             return;
         }
         renderInfusionMatrix(tile, x, y, z, partialTicks);
@@ -41,9 +41,11 @@ public class TileRunicMatrixRenderer extends TileEntitySpecialRenderer<TileInfus
         GlStateManager.pushMatrix();
         bindTexture(INFUSER_TEXTURE);
         GlStateManager.translate(x + 0.5D, y + 0.5D, z + 0.5D);
-        GlStateManager.rotate((ticks % 360.0F) * startUp, 0.0F, 1.0F, 0.0F);
-        GlStateManager.rotate(35.0F * startUp, 1.0F, 0.0F, 0.0F);
-        GlStateManager.rotate(45.0F * startUp, 0.0F, 0.0F, 1.0F);
+        if (tile.getWorld() != null) {
+            GlStateManager.rotate((ticks % 360.0F) * startUp, 0.0F, 1.0F, 0.0F);
+            GlStateManager.rotate(35.0F * startUp, 1.0F, 0.0F, 0.0F);
+            GlStateManager.rotate(45.0F * startUp, 0.0F, 0.0F, 1.0F);
+        }
 
         renderCubeCluster(tile, ticks, instability, startUp);
         if (tile.active) {

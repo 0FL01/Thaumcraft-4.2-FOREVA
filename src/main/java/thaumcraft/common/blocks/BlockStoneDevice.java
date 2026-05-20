@@ -71,7 +71,8 @@ extends BlockContainer {
 
     @Override
     public EnumBlockRenderType getRenderType(IBlockState state) {
-        return EnumBlockRenderType.MODEL;
+        int meta = getMetaFromState(state);
+        return meta == 2 || meta == 3 || meta == 4 ? EnumBlockRenderType.INVISIBLE : EnumBlockRenderType.MODEL;
     }
 
     @Override

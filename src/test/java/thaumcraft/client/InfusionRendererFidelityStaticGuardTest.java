@@ -17,12 +17,13 @@ public class InfusionRendererFidelityStaticGuardTest {
         String pillarRenderer = read("src/main/java/thaumcraft/client/renderers/tile/TileInfusionPillarRenderer.java");
         String pillarModel = read("src/main/java/thaumcraft/client/renderers/models/ModelInfusionPillar.java");
 
-        assertTrue("TileRunicMatrixRenderer should keep the animated cube cluster and halo paths for active infusion crafting",
+        assertTrue("TileRunicMatrixRenderer should keep the animated cube cluster and halo paths while leaving the idle shell available for TESR-only world/item rendering",
                 matrixRenderer.contains("new ModelCube(0)")
                         && matrixRenderer.contains("new ModelCube(32)")
                         && matrixRenderer.contains("renderCubeCluster(")
                         && matrixRenderer.contains("renderCubeOverlay(")
-                        && matrixRenderer.contains("drawHalo("));
+                        && matrixRenderer.contains("drawHalo(")
+                        && matrixRenderer.contains("if (tile.getWorld() != null) {"));
 
         assertTrue("TileInfusionPillarRenderer should use the dedicated model-driven reference pillar path instead of the old prism fallback",
                 pillarRenderer.contains("new ModelInfusionPillar()")
