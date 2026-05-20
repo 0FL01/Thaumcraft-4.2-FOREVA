@@ -41,8 +41,10 @@ public class DeviceTesrRoutingContractTest {
                         && woodenBlock.contains("if (meta == 2 || meta == 3 || meta == 8) {")
                         && woodenBlock.contains("return;"));
 
-        assertTrue("BlockMetalDevice should route alembic and thaumatorium halves through TESR-only world rendering",
-                metalBlock.contains("return meta == 1 || meta == 10 || meta == 11 ? EnumBlockRenderType.INVISIBLE : EnumBlockRenderType.MODEL;"));
+        assertTrue("BlockMetalDevice should route alembic, charger, vis relay, and thaumatorium halves through TESR-only world rendering",
+                metalBlock.contains("return meta == 1 || meta == 2 || meta == 10 || meta == 11 || meta == 14")
+                        && metalBlock.contains("? EnumBlockRenderType.INVISIBLE")
+                        && metalBlock.contains(": EnumBlockRenderType.MODEL;"));
 
         assertTrue("ClientProxy should assign block-metal variants and override tile-oriented item metas onto builtin/entity TEISR models",
                 clientProxy.contains("Item metalDeviceItem = Item.getItemFromBlock(ConfigBlocks.blockMetalDevice);")

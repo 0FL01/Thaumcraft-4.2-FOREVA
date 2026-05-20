@@ -73,7 +73,9 @@ public class BlockMetalDevice extends BlockContainer {
     @Override
     public EnumBlockRenderType getRenderType(IBlockState state) {
         int meta = state.getValue(TYPE);
-        return meta == 1 || meta == 10 || meta == 11 ? EnumBlockRenderType.INVISIBLE : EnumBlockRenderType.MODEL;
+        return meta == 1 || meta == 2 || meta == 10 || meta == 11 || meta == 14
+                ? EnumBlockRenderType.INVISIBLE
+                : EnumBlockRenderType.MODEL;
     }
     @Override
     public boolean hasTileEntity(IBlockState state) {

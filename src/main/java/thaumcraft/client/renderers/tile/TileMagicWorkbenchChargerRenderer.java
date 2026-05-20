@@ -51,6 +51,16 @@ public class TileMagicWorkbenchChargerRenderer extends TileEntitySpecialRenderer
         GlStateManager.disableCull();
         bindTexture(RELAY_TEXTURE);
 
+        model.renderRingFloat(MODEL_SCALE);
+        GlStateManager.pushMatrix();
+        GlStateManager.rotate(180.0F, 1.0F, 0.0F, 0.0F);
+        GlStateManager.translate(0.0F, 0.0F, 0.5F);
+        for (int i = 0; i < 4; i++) {
+            model.renderSupport(MODEL_SCALE);
+            GlStateManager.rotate(90.0F, 0.0F, 0.0F, 1.0F);
+        }
+        GlStateManager.popMatrix();
+
         if (tile.color >= 0 && tile.color < RELAY_COLORS.length) {
             Color tint = new Color(RELAY_COLORS[tile.color]);
             GlStateManager.color(tint.getRed() / 200.0F, tint.getGreen() / 200.0F, tint.getBlue() / 200.0F, 1.0F);

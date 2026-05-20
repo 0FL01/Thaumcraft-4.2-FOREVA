@@ -23,7 +23,6 @@ public class VisEnergyRendererFidelityStaticGuardTest {
         String relayModel = read("src/main/java/thaumcraft/client/renderers/models/ModelVisRelay.java");
         String stabilizerModel = read("src/main/java/thaumcraft/client/renderers/models/ModelNodeStabilizer.java");
         String chargerModel = read("src/main/java/thaumcraft/client/renderers/models/ModelMagicWorkbenchCharger.java");
-        String chargerBlockModel = read("src/main/resources/assets/thaumcraft/models/block/blockmetaldevice_2.json");
         String stoneDeviceBlockstate = read("src/main/resources/assets/thaumcraft/blockstates/blockstonedevice.json");
         String stabilizerBlockModel = read("src/main/resources/assets/thaumcraft/models/block/blockstonedevice_9.json");
         String converterBlockModel = read("src/main/resources/assets/thaumcraft/models/block/blockstonedevice_11.json");
@@ -51,14 +50,16 @@ public class VisEnergyRendererFidelityStaticGuardTest {
                         && converterRenderer.contains("model.renderPiston(MODEL_SCALE);")
                         && !converterRenderer.contains("bindTexture(BASE_TEXTURE);\n        model.renderLock(MODEL_SCALE);"));
 
-        assertTrue("TileMagicWorkbenchChargerRenderer should keep the dynamic crystal/lightmap path after the static shell moved into the block model",
+        assertTrue("TileMagicWorkbenchChargerRenderer should keep the reference ring/support/crystal TESR path with lightmap pulse contract",
                 chargerRenderer.contains("new ModelMagicWorkbenchCharger()")
+                        && chargerRenderer.contains("model.renderRingFloat(MODEL_SCALE)")
+                        && chargerRenderer.contains("model.renderSupport(MODEL_SCALE)")
+                        && chargerRenderer.contains("for (int i = 0; i < 4; i++)")
+                        && chargerRenderer.contains("GlStateManager.translate(0.0F, 0.0F, 0.5F);")
                         && chargerRenderer.contains("model.renderCrystal(MODEL_SCALE)")
                         && chargerRenderer.contains("OpenGlHelper.setLightmapTextureCoords(")
                         && chargerRenderer.contains("VisNetHandler.isNodeValid(tile.getParent())")
-                        && !chargerRenderer.contains("TileRenderHelper.drawTexturedQuad(")
-                        && !chargerRenderer.contains("model.renderRingFloat(MODEL_SCALE)")
-                        && !chargerRenderer.contains("model.renderSupport(MODEL_SCALE)"));
+                        && !chargerRenderer.contains("TileRenderHelper.drawTexturedQuad("));
 
         assertTrue("TileVisRelayRenderer should keep ring/crystal model path with lightmap pulse contract",
                 relayRenderer.contains("model.renderRingBase(MODEL_SCALE)")
@@ -112,13 +113,6 @@ public class VisEnergyRendererFidelityStaticGuardTest {
                         && chargerModel.contains("renderRingFloat(float scale)")
                         && chargerModel.contains("renderSupport(float scale)")
                         && chargerModel.contains("renderCrystal(float scale)"));
-
-        assertTrue("Workbench charger block model should carry the static ring/support shell instead of the old full cube placeholder",
-                chargerBlockModel.contains("\"ambientocclusion\": false")
-                        && chargerBlockModel.contains("\"shell\": \"thaumcraft:models/vis_relay\"")
-                        && chargerBlockModel.contains("\"from\": [5, 10, 5]")
-                        && chargerBlockModel.contains("\"from\": [7.5, 7, 4]")
-                        && chargerBlockModel.contains("\"to\": [12, 8, 8.5]"));
 
         assertTrue("Stone-device blockstate should route node stabilizer and converter metas away from the old shared arcane-stone placeholder",
                 stoneDeviceBlockstate.contains("\"type=9\": { \"model\": \"thaumcraft:blockstonedevice_9\" }")
