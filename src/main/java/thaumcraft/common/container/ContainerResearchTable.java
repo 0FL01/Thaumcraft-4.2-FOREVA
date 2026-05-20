@@ -26,6 +26,10 @@ public class ContainerResearchTable extends Container {
         bindPlayerInventory(playerInventory);
     }
 
+    public TileResearchTable getTileEntity() {
+        return this.tileEntity;
+    }
+
     @Override
     public boolean canInteractWith(EntityPlayer playerIn) {
         return this.tileEntity != null && this.tileEntity.isUsableByPlayer(playerIn) && isUsableTile(playerIn, this.tileEntity);

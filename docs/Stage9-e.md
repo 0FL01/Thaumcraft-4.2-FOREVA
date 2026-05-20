@@ -47,7 +47,7 @@ Current implementation present:
 Current blockers:
 
 - Normal Thaumonomicon/research-browser click flow is not proven to send validated progression packets.
-- Research table packets are not server-authoritative enough.
+- Research table packet hardening now exists, but live GUI-route and broader adversarial/e2e validation remain open.
 - `PacketScannedToServer` trusts client-declared targets more than a server-authoritative scan system should.
 - `TileResearchTable` `bonusAspects` persistence is ambiguous.
 - Hidden/lost clue grants need runtime verification against reference behavior.
@@ -106,12 +106,12 @@ Current code has `ResearchNoteData`, note creation/update/read/write, and comple
 - completed note grants research only after prerequisite checks;
 - discovery/fragment behavior matches hidden/lost rules.
 
-### GAP-5B: Research table C2S authority is incomplete
+### GAP-5B: Research table C2S hardening is implemented; wider progression validation remains open
 
-**Статус:** unsafe/untrusted until fixed
-**Критичность:** blocker
+**Статус:** implementation hardened; targeted non-GUI runtime tests passed; live route/e2e validation open
+**Критичность:** high
 
-`PacketAspectPlaceToServer` and `PacketAspectCombinationToServer` must be made server-authoritative. Required checks:
+`PacketAspectPlaceToServer` and `PacketAspectCombinationToServer` now enforce the core server-authoritative guards required by the backend priority list:
 
 - player has `ContainerResearchTable` open;
 - container tile identity equals packet coordinates;
@@ -121,6 +121,12 @@ Current code has `ResearchNoteData`, note creation/update/read/write, and comple
 - bonus aspect consumption verifies current `bonusAspects` amount;
 - aspect pool / bonus / ink costs are consumed atomically after validation;
 - invalid packets cannot mutate note NBT.
+
+What remains open for this gap is proof around the live client route and broader adversarial coverage:
+
+- validate the real GUI/research-table click path rather than helper-level/runtime-harness calls only;
+- extend malicious-payload coverage to true packet dispatch contexts, not only extracted server-side logic;
+- keep `bonusAspects` save/load semantics under GAP-5/TileResearchTable persistence, not as solved by the packet hardening itself.
 
 ### GAP-6: Hidden/lost scan clues are wired, but prerequisite/runtime behavior needs verification
 
@@ -180,7 +186,7 @@ Current static validation covers the research corpus and asset references, but P
 - [x] Add scan-triggered hidden/lost clue wiring through `ResearchManager.createClue(...)`.
 - [x] Harden `PacketPlayerCompleteToServer` against direct arbitrary completion for primary/secondary research flows.
 - [ ] Validate full research graph against reference keys, parents, hidden parents, siblings, triggers, aspects, coordinates, complexity, flags, icons, and page order.
-- [ ] Make research table aspect placement/combination packets server-authoritative.
+- [x] Harden research table aspect placement/combination packets with active-container, tile-identity, usable-distance, valid-hex, discovered-aspect, and atomic source-consumption checks.
 - [ ] Make scan completion server-authoritative.
 - [ ] Wire and validate normal Thaumonomicon/research-browser action flow.
 - [ ] Validate end-to-end progression: scan -> clue/aspect -> note creation -> research table solve -> note completion -> unlock.

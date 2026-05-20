@@ -70,7 +70,9 @@ Do not claim backend substantially complete until these are resolved or scoped o
 6. Outer Lands runtime validation.
 7. Static guard overconfidence.
 
-## Next Checkpoint Candidate
+## Latest Checkpoint
 
-- Continue grouped Stage 8/9 bursts only where runtime-safe non-GUI validation is available.
-- Preserve the GUI/manual exclusion marker and do not mark Stage 6 or Stage 7 complete from this checkpoint alone.
+- Stage 9-e burst hardened research-table C2S packets: active `ContainerResearchTable`, matching tile/coords, usable-distance gate, valid note hexes, discovered aspects, real pool/bonus source checks, and atomic combination-cost validation.
+- Added non-GUI runtime tests for open-container resolution, invalid-hex rejection, valid aspect placement, and atomic combination-input consumption.
+- Validated this burst with `./scripts/dev.sh gradle test --tests thaumcraft.common.lib.network.playerdata.ResearchTableAuthorityRuntimeTest`, `./scripts/dev.sh compileJava`, and `./scripts/dev.sh validate --smoke`.
+- Still unverified and still forbidden to claim: normal Thaumonomicon route, full note solve/completion e2e, scan authority, and `bonusAspects` save/load parity. Do not call Stage 9-e complete or server-authoritative progression complete from this checkpoint.

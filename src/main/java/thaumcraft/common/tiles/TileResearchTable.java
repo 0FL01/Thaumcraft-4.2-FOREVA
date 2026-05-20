@@ -318,16 +318,30 @@ implements IInventory, ITickable {
         boolean researcher2 = ResearchManager.isResearchComplete(player, "RESEARCHER2");
         HexUtils.Hex hex = new HexUtils.Hex(q, r);
         String hexKey = hex.toString();
+        if (!this.data.hexes.containsKey(hexKey) || !this.data.hexEntries.containsKey(hexKey)) {
+            return;
+        }
         ResearchManager.HexEntry current = this.data.hexEntries.get(hexKey);
+        if (current == null) {
+            return;
+        }
         ResearchManager.HexEntry next;
         if (aspect != null) {
+            if (!knowledge.hasDiscoveredAspect(aspect)) {
+                return;
+            }
+            int poolAmount = knowledge.getAspectPoolFor(aspect);
+            int bonusAmount = this.bonusAspects.getAmount(aspect);
+            if (poolAmount <= 0 && bonusAmount <= 0) {
+                return;
+            }
             next = new ResearchManager.HexEntry(aspect, 2);
             boolean refundSkip = researcher2 && this.world.rand.nextFloat() < 0.1F;
             if (refundSkip) {
                 this.world.playSound(null, this.pos, SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP,
                         SoundCategory.BLOCKS, 0.2F, 0.9F + player.world.rand.nextFloat() * 0.2F);
             } else {
-                if (knowledge.getAspectPoolFor(aspect) <= 0) {
+                if (poolAmount <= 0) {
                     this.bonusAspects.remove(aspect, 1);
                     this.world.notifyBlockUpdate(this.pos, this.world.getBlockState(this.pos), this.world.getBlockState(this.pos), 3);
                     this.markDirty();

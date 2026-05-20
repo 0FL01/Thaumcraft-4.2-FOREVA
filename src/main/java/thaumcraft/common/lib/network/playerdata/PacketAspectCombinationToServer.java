@@ -4,7 +4,6 @@ import io.netty.buffer.ByteBuf;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.fml.common.network.ByteBufUtils;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
@@ -15,6 +14,9 @@ import thaumcraft.common.lib.network.PacketHandler;
 import thaumcraft.common.lib.research.ResearchManager;
 import thaumcraft.common.lib.research.ScanManager;
 import thaumcraft.common.tiles.TileResearchTable;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class PacketAspectCombinationToServer extends PacketBase {
     private int dim;
@@ -73,45 +75,91 @@ public class PacketAspectCombinationToServer extends PacketBase {
             if (player.getEntityId() != this.playerid) return;
             if (player.world.provider.getDimension() != this.dim) return;
             if (this.aspect1 == null || this.aspect2 == null) return;
-            TileEntity tile = player.world.getTileEntity(new BlockPos(this.x, this.y, this.z));
-            if (!(tile instanceof TileResearchTable)) return;
+            TileResearchTable researchTable = PacketAspectPlaceToServer.resolveResearchTable(player, new BlockPos(this.x, this.y, this.z));
+            if (researchTable == null) return;
             IPlayerKnowledge knowledge = thaumcraft.common.CommonProxy.getPlayerKnowledge(player);
             if (knowledge == null) return;
-
-            Aspect combo = ResearchManager.getCombinationResult(this.aspect1, this.aspect2);
-            boolean hasAspect1 = knowledge.getAspectPoolFor(this.aspect1) > 0 || this.ab1;
-            boolean hasAspect2 = knowledge.getAspectPoolFor(this.aspect2) > 0 || this.ab2;
-            if (!hasAspect1 || !hasAspect2) {
-                return;
-            }
-
-            TileResearchTable researchTable = (TileResearchTable) tile;
-            if (knowledge.getAspectPoolFor(this.aspect1) <= 0 && this.ab1) {
-                researchTable.bonusAspects.remove(this.aspect1, 1);
-                player.world.notifyBlockUpdate(researchTable.getPos(), player.world.getBlockState(researchTable.getPos()), player.world.getBlockState(researchTable.getPos()), 3);
-                researchTable.markDirty();
-            } else if (knowledge.addAspectPool(this.aspect1, -1)) {
-                PacketHandler.INSTANCE.sendTo(
-                        new PacketAspectPool(this.aspect1.getTag(), (short) -1, knowledge.getAspectPoolFor(this.aspect1)),
-                        player);
-            }
-
-            if (knowledge.getAspectPoolFor(this.aspect2) <= 0 && this.ab2) {
-                researchTable.bonusAspects.remove(this.aspect2, 1);
-                player.world.notifyBlockUpdate(researchTable.getPos(), player.world.getBlockState(researchTable.getPos()), player.world.getBlockState(researchTable.getPos()), 3);
-                researchTable.markDirty();
-            } else if (knowledge.addAspectPool(this.aspect2, -1)) {
-                PacketHandler.INSTANCE.sendTo(
-                        new PacketAspectPool(this.aspect2.getTag(), (short) -1, knowledge.getAspectPoolFor(this.aspect2)),
-                        player);
-            }
-
-            if (combo != null) {
-                ScanManager.checkAndSyncAspectKnowledge(player, combo, 1);
-            }
-
+            Aspect combo = consumeCombinationInputs(player, researchTable, knowledge, this.aspect1, this.aspect2, this.ab1, this.ab2);
+            if (combo == null) return;
+            ScanManager.checkAndSyncAspectKnowledge(player, combo, 1);
             ResearchManager.updateCache(player.getName(), knowledge);
         });
         return null;
+    }
+
+    static Aspect consumeCombinationInputs(EntityPlayer player,
+                                           TileResearchTable researchTable,
+                                           IPlayerKnowledge knowledge,
+                                           Aspect aspect1,
+                                           Aspect aspect2,
+                                           boolean useBonus1,
+                                           boolean useBonus2) {
+        if (player == null || researchTable == null || knowledge == null || aspect1 == null || aspect2 == null) {
+            return null;
+        }
+        if (!knowledge.hasDiscoveredAspect(aspect1) || !knowledge.hasDiscoveredAspect(aspect2)) {
+            return null;
+        }
+        Aspect combo = ResearchManager.getCombinationResult(aspect1, aspect2);
+        if (combo == null) {
+            return null;
+        }
+
+        Map<Aspect, Integer> poolCosts = new HashMap<>();
+        Map<Aspect, Integer> bonusCosts = new HashMap<>();
+        addCost(useBonus1 ? bonusCosts : poolCosts, aspect1);
+        addCost(useBonus2 ? bonusCosts : poolCosts, aspect2);
+        if (!hasAvailableCosts(knowledge, poolCosts, researchTable, bonusCosts)) {
+            return null;
+        }
+
+        for (Map.Entry<Aspect, Integer> entry : poolCosts.entrySet()) {
+            Aspect aspect = entry.getKey();
+            int amount = entry.getValue();
+            if (!knowledge.addAspectPool(aspect, -amount)) {
+                return null;
+            }
+            if (player instanceof EntityPlayerMP) {
+                PacketHandler.INSTANCE.sendTo(
+                        new PacketAspectPool(aspect.getTag(), (short) (-amount), knowledge.getAspectPoolFor(aspect)),
+                        (EntityPlayerMP) player);
+            }
+        }
+
+        boolean changedBonus = false;
+        for (Map.Entry<Aspect, Integer> entry : bonusCosts.entrySet()) {
+            researchTable.bonusAspects.remove(entry.getKey(), entry.getValue());
+            changedBonus = true;
+        }
+        if (changedBonus && researchTable.getWorld() != null) {
+            researchTable.getWorld().notifyBlockUpdate(
+                    researchTable.getPos(),
+                    researchTable.getWorld().getBlockState(researchTable.getPos()),
+                    researchTable.getWorld().getBlockState(researchTable.getPos()),
+                    3);
+            researchTable.markDirty();
+        }
+        return combo;
+    }
+
+    private static void addCost(Map<Aspect, Integer> costs, Aspect aspect) {
+        costs.put(aspect, costs.getOrDefault(aspect, 0) + 1);
+    }
+
+    private static boolean hasAvailableCosts(IPlayerKnowledge knowledge,
+                                             Map<Aspect, Integer> poolCosts,
+                                             TileResearchTable researchTable,
+                                             Map<Aspect, Integer> bonusCosts) {
+        for (Map.Entry<Aspect, Integer> entry : poolCosts.entrySet()) {
+            if (knowledge.getAspectPoolFor(entry.getKey()) < entry.getValue()) {
+                return false;
+            }
+        }
+        for (Map.Entry<Aspect, Integer> entry : bonusCosts.entrySet()) {
+            if (researchTable.bonusAspects.getAmount(entry.getKey()) < entry.getValue()) {
+                return false;
+            }
+        }
+        return true;
     }
 }

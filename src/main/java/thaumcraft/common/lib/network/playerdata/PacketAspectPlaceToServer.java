@@ -8,6 +8,7 @@ import net.minecraftforge.fml.common.network.ByteBufUtils;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 import thaumcraft.api.aspects.Aspect;
+import thaumcraft.common.container.ContainerResearchTable;
 import thaumcraft.common.lib.network.PacketBase;
 import thaumcraft.common.tiles.TileResearchTable;
 
@@ -64,11 +65,26 @@ public class PacketAspectPlaceToServer extends PacketBase {
         this.scheduleServer(ctx, player -> {
             if (player.getEntityId() != this.playerid) return;
             if (player.world.provider.getDimension() != this.dim) return;
-            TileEntity tile = player.world.getTileEntity(new BlockPos(this.x, this.y, this.z));
-            if (tile instanceof TileResearchTable) {
-                ((TileResearchTable) tile).placeAspect(this.q, this.r, this.aspect, player);
-            }
+            TileResearchTable researchTable = resolveResearchTable(player, new BlockPos(this.x, this.y, this.z));
+            if (researchTable == null) return;
+            researchTable.placeAspect(this.q, this.r, this.aspect, player);
         });
         return null;
+    }
+
+    static TileResearchTable resolveResearchTable(EntityPlayer player, BlockPos pos) {
+        if (player == null || pos == null || !(player.openContainer instanceof ContainerResearchTable)) {
+            return null;
+        }
+        ContainerResearchTable container = (ContainerResearchTable) player.openContainer;
+        TileResearchTable researchTable = container.getTileEntity();
+        if (researchTable == null || researchTable.isInvalid()) {
+            return null;
+        }
+        TileEntity liveTile = player.world.getTileEntity(pos);
+        if (liveTile != researchTable || !pos.equals(researchTable.getPos())) {
+            return null;
+        }
+        return container.canInteractWith(player) ? researchTable : null;
     }
 }
