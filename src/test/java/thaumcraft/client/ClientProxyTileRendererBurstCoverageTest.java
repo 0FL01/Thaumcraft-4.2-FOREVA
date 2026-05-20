@@ -82,6 +82,8 @@ public class ClientProxyTileRendererBurstCoverageTest {
         assertTrue(source.contains("woodenDeviceItem.setTileEntityItemStackRenderer(new ItemWoodenDeviceRenderer());"));
         assertTrue(source.contains("Item metalDeviceItem = Item.getItemFromBlock(ConfigBlocks.blockMetalDevice);"));
         assertTrue(source.contains("metalDeviceItem.setTileEntityItemStackRenderer(new ItemMetalDeviceRenderer());"));
+        assertTrue(source.contains("Item tubeItem = Item.getItemFromBlock(ConfigBlocks.blockTube);"));
+        assertTrue(source.contains("tubeItem.setTileEntityItemStackRenderer(new ItemTubeRenderer());"));
     }
 
     private static String read(String path) throws IOException {

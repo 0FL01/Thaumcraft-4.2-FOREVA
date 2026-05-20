@@ -23,7 +23,7 @@ public class TileEssentiaCrystalizerRenderer extends TileEntitySpecialRenderer<T
 
     @Override
     public void render(TileEssentiaCrystalizer tile, double x, double y, double z, float partialTicks, int destroyStage, float alpha) {
-        if (tile == null || tile.getWorld() == null) {
+        if (tile == null) {
             return;
         }
 

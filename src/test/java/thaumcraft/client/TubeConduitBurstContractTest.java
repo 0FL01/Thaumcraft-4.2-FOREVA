@@ -20,10 +20,15 @@ public class TubeConduitBurstContractTest {
         String valveRenderer = read("src/main/java/thaumcraft/client/renderers/tile/TileTubeValveRenderer.java");
         String bufferRenderer = read("src/main/java/thaumcraft/client/renderers/tile/TileTubeBufferRenderer.java");
         String onewayRenderer = read("src/main/java/thaumcraft/client/renderers/tile/TileTubeOnewayRenderer.java");
+        String crystalizerRenderer = read("src/main/java/thaumcraft/client/renderers/tile/TileEssentiaCrystalizerRenderer.java");
+        String itemRenderer = read("src/main/java/thaumcraft/client/renderers/item/ItemTubeRenderer.java");
+        String tubeBlock = read("src/main/java/thaumcraft/common/blocks/BlockTube.java");
+        String clientProxy = read("src/main/java/thaumcraft/client/ClientProxy.java");
         String tubeModel = read("src/main/resources/assets/thaumcraft/models/block/blocktube_0.json");
         String filterModel = read("src/main/resources/assets/thaumcraft/models/block/blocktube_3.json");
         String bufferModel = read("src/main/resources/assets/thaumcraft/models/block/blocktube_4.json");
         String onewayModel = read("src/main/resources/assets/thaumcraft/models/block/blocktube_6.json");
+        String crystalizerItemModel = read("src/main/resources/assets/thaumcraft/models/item/blocktube_tesr.json");
 
         assertTrue("Tube conduit helper must drive dynamic connections through ThaumcraftApiHelper and extended-tube checks",
                 helper.contains("ThaumcraftApiHelper.getConnectableTile")
@@ -45,6 +50,21 @@ public class TubeConduitBurstContractTest {
                 filterModel.contains("\"core\": \"thaumcraft:blocks/pipe_filter_core\"")
                         && bufferModel.contains("\"from\": [4, 4, 4]")
                         && onewayModel.contains("\"core\": \"thaumcraft:blocks/pipe_oneway\""));
+
+        assertTrue("Crystalizer tube meta should route through TESR-first world and item rendering instead of the old baked cube placeholder",
+                tubeBlock.contains("return this.getMetaFromState(state) == 7 ? EnumBlockRenderType.INVISIBLE : EnumBlockRenderType.MODEL;")
+                        && clientProxy.contains("registerBuiltinItemModel(tubeItem, 7, \"blocktube_tesr\");")
+                        && clientProxy.contains("tubeItem.setTileEntityItemStackRenderer(new ItemTubeRenderer());")
+                        && itemRenderer.contains("new TileEssentiaCrystalizerRenderer()")
+                        && itemRenderer.contains("if (stack.getMetadata() != 7)")
+                        && itemRenderer.contains("GlStateManager.translate(-0.5F, -0.5F, -0.5F);")
+                        && crystalizerItemModel.contains("\"parent\": \"builtin/entity\""));
+
+        assertTrue("TileEssentiaCrystalizerRenderer should keep the crystalizer.obj shell path available for worldless TEISR inventory renders",
+                crystalizerRenderer.contains("if (tile == null)")
+                        && crystalizerRenderer.contains("baseModel.renderBase();")
+                        && crystalizerRenderer.contains("baseModel.renderTop();")
+                        && !crystalizerRenderer.contains("if (tile == null || tile.getWorld() == null)"));
     }
 
     private static String read(String path) throws IOException {

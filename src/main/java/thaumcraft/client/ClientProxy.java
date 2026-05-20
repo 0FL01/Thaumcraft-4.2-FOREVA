@@ -129,8 +129,9 @@ import thaumcraft.client.renderers.entity.RenderCultist;
 import thaumcraft.client.renderers.item.ItemJarRenderer;
 import thaumcraft.client.renderers.item.ItemMetalDeviceRenderer;
 import thaumcraft.client.renderers.item.ItemNodeRenderer;
-import thaumcraft.client.renderers.item.ItemWoodenDeviceRenderer;
 import thaumcraft.client.renderers.item.ItemCrystalRenderer;
+import thaumcraft.client.renderers.item.ItemTubeRenderer;
+import thaumcraft.client.renderers.item.ItemWoodenDeviceRenderer;
 import thaumcraft.client.renderers.tile.TileAlembicRenderer;
 import thaumcraft.client.renderers.tile.TileAlchemyFurnaceAdvancedRenderer;
 import thaumcraft.client.renderers.tile.TileArcaneLampRenderer;
@@ -429,6 +430,10 @@ public class ClientProxy extends CommonProxy {
         if (metalDeviceItem != null) {
             metalDeviceItem.setTileEntityItemStackRenderer(new ItemMetalDeviceRenderer());
         }
+        Item tubeItem = Item.getItemFromBlock(ConfigBlocks.blockTube);
+        if (tubeItem != null) {
+            tubeItem.setTileEntityItemStackRenderer(new ItemTubeRenderer());
+        }
     }
 
     private void setupEntityRenderers() {
@@ -543,6 +548,7 @@ public class ClientProxy extends CommonProxy {
         for (int meta = 0; meta <= 7; meta++) {
             registerBlockItemModel(tubeItem, meta, "type=" + meta);
         }
+        registerBuiltinItemModel(tubeItem, 7, "blocktube_tesr");
         Item tableItem = Item.getItemFromBlock(ConfigBlocks.blockTable);
         for (int meta = 0; meta <= 15; meta++) {
             registerBlockItemModel(tableItem, meta, "type=" + meta);

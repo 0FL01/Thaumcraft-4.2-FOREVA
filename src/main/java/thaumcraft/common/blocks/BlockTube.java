@@ -49,7 +49,9 @@ public class BlockTube extends BlockContainer {
     public boolean isFullCube(IBlockState state) { return false; }
 
     @Override
-    public EnumBlockRenderType getRenderType(IBlockState state) { return EnumBlockRenderType.MODEL; }
+    public EnumBlockRenderType getRenderType(IBlockState state) {
+        return this.getMetaFromState(state) == 7 ? EnumBlockRenderType.INVISIBLE : EnumBlockRenderType.MODEL;
+    }
 
     @Override
     public boolean hasTileEntity(IBlockState state) { return true; }
