@@ -1,11 +1,12 @@
 package thaumcraft.client.renderers.entity;
 
-import net.minecraft.client.model.ModelSpider;
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.entity.RenderLiving;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.client.renderer.entity.layers.LayerRenderer;
 import net.minecraft.util.ResourceLocation;
+import thaumcraft.client.renderers.models.entities.ModelEldritchCrab;
 import thaumcraft.common.entities.monster.EntityEldritchCrab;
 
 import javax.annotation.Nullable;
@@ -18,7 +19,7 @@ public class RenderEldritchCrab extends RenderLiving<EntityEldritchCrab> {
             new ResourceLocation("thaumcraft", "textures/models/craboverlay.png");
 
     public RenderEldritchCrab(RenderManager renderManager) {
-        super(renderManager, new ModelSpider(), 0.5F);
+        super(renderManager, new ModelEldritchCrab(), 1.0F);
         this.addLayer(new CrabOverlayLayer());
     }
 
@@ -36,14 +37,22 @@ public class RenderEldritchCrab extends RenderLiving<EntityEldritchCrab> {
             bindTexture(CRAB_OVERLAY_TEXTURE);
             GlStateManager.enableBlend();
             GlStateManager.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
+            if (entity.isInvisible()) {
+                GlStateManager.depthMask(false);
+            } else {
+                GlStateManager.depthMask(true);
+            }
+            int packedLight = 200;
+            OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, packedLight, 0.0F);
             GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
             getMainModel().render(entity, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch, scale);
+            GlStateManager.depthMask(true);
             GlStateManager.disableBlend();
         }
 
         @Override
         public boolean shouldCombineTextures() {
-            return true;
+            return false;
         }
     }
 }

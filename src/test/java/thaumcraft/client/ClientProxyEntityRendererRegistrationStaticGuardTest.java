@@ -248,12 +248,39 @@ public class ClientProxyEntityRendererRegistrationStaticGuardTest {
                         && eldritchGolemModel.contains("Frontcloth0")
                         && eldritchGolemModel.contains("getAttackTimer()"));
         String eldritchCrabRenderer = readFile("src/main/java/thaumcraft/client/renderers/entity/RenderEldritchCrab.java");
+        String eldritchCrabModel = readFile("src/main/java/thaumcraft/client/renderers/models/entities/ModelEldritchCrab.java");
         assertTrue("RenderEldritchCrab must provide crab texture and overlay layer baseline",
                 eldritchCrabRenderer.contains("extends RenderLiving<EntityEldritchCrab>")
+                        && eldritchCrabRenderer.contains("new ModelEldritchCrab()")
                         && eldritchCrabRenderer.contains("textures/models/crab.png")
                         && eldritchCrabRenderer.contains("textures/models/craboverlay.png")
                         && eldritchCrabRenderer.contains("class CrabOverlayLayer")
-                        && eldritchCrabRenderer.contains("this.addLayer(new CrabOverlayLayer())"));
+                        && eldritchCrabRenderer.contains("this.addLayer(new CrabOverlayLayer())")
+                        && eldritchCrabModel.contains("class ModelEldritchCrab")
+                        && eldritchCrabModel.contains("hasHelm()")
+                        && eldritchCrabModel.contains("rightClawEnd")
+                        && eldritchCrabModel.contains("tailHelm"));
+        String taintSporeRenderer = readFile("src/main/java/thaumcraft/client/renderers/entity/RenderTaintSpore.java");
+        String taintSporeModel = readFile("src/main/java/thaumcraft/client/renderers/models/entities/ModelTaintSpore.java");
+        assertTrue("RenderTaintSpore must provide dedicated spore model and size-driven negative-scale baseline",
+                taintSporeRenderer.contains("extends RenderLiving<EntityTaintSpore>")
+                        && taintSporeRenderer.contains("new ModelTaintSpore()")
+                        && taintSporeRenderer.contains("entity.displaySize")
+                        && taintSporeRenderer.contains("entity.getSporeSize()")
+                        && taintSporeRenderer.contains("baseScale = -0.12F")
+                        && taintSporeModel.contains("class ModelTaintSpore")
+                        && taintSporeModel.contains("hurtTime > 0")
+                        && taintSporeModel.contains("GL11.glEnable(GL11.GL_BLEND)"));
+        String taintSporeSwarmerRenderer = readFile("src/main/java/thaumcraft/client/renderers/entity/RenderTaintSporeSwarmer.java");
+        String taintSporeSwarmerModel = readFile("src/main/java/thaumcraft/client/renderers/models/entities/ModelTaintSporeSwarmer.java");
+        assertTrue("RenderTaintSporeSwarmer must provide dedicated swarmer model with fullbright inner shell baseline",
+                taintSporeSwarmerRenderer.contains("extends RenderLiving<EntityTaintSporeSwarmer>")
+                        && taintSporeSwarmerRenderer.contains("new ModelTaintSporeSwarmer()")
+                        && taintSporeSwarmerModel.contains("class ModelTaintSporeSwarmer")
+                        && taintSporeSwarmerModel.contains("displaySize")
+                        && taintSporeSwarmerModel.contains("0xF000F0")
+                        && taintSporeSwarmerModel.contains("outerCube")
+                        && taintSporeSwarmerModel.contains("hurtTime > 0"));
         String cultistPortalRenderer = readFile("src/main/java/thaumcraft/client/renderers/entity/RenderCultistPortal.java");
         assertTrue("RenderCultistPortal must provide dedicated portal texture baseline",
                 cultistPortalRenderer.contains("extends Render<EntityCultistPortal>")
@@ -273,16 +300,6 @@ public class ClientProxyEntityRendererRegistrationStaticGuardTest {
                         && thaumicSlimeRenderer.contains("entity.field_70811_b")
                         && thaumicSlimeRenderer.contains("class SlimeGelLayer")
                         && thaumicSlimeRenderer.contains("this.addLayer(new SlimeGelLayer())"));
-        String taintSporeRenderer = readFile("src/main/java/thaumcraft/client/renderers/entity/RenderTaintSpore.java");
-        assertTrue("RenderTaintSpore must provide taint spore texture and display-size scale baseline",
-                taintSporeRenderer.contains("extends RenderLiving<EntityTaintSpore>")
-                        && taintSporeRenderer.contains("textures/models/taint_spore.png")
-                        && taintSporeRenderer.contains("entity.displaySize")
-                        && taintSporeRenderer.contains("entity.getSporeSize()"));
-        String taintSporeSwarmerRenderer = readFile("src/main/java/thaumcraft/client/renderers/entity/RenderTaintSporeSwarmer.java");
-        assertTrue("RenderTaintSporeSwarmer must provide dedicated taint spore texture baseline",
-                taintSporeSwarmerRenderer.contains("extends RenderLiving<EntityTaintSporeSwarmer>")
-                        && taintSporeSwarmerRenderer.contains("textures/models/taint_spore.png"));
         String taintSwarmRenderer = readFile("src/main/java/thaumcraft/client/renderers/entity/RenderTaintSwarm.java");
         assertTrue("RenderTaintSwarm must stay as dedicated noop baseline renderer",
                 taintSwarmRenderer.contains("extends RenderNoop<EntityTaintSwarm>"));
