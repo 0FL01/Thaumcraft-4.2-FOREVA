@@ -27,8 +27,24 @@ public class FXBlockWard extends Particle {
     private final float sz;
 
     public FXBlockWard(World world, int x, int y, int z, int color, int count) {
-        super(world, x + 0.5D, y + 0.5D, z + 0.5D, 0.0D, 0.0D, 0.0D);
-        this.side = EnumFacing.random(this.rand);
+        this(world,
+                x + 0.5D,
+                y + 0.5D,
+                z + 0.5D,
+                EnumFacing.random(world.rand),
+                ((color >> 16) & 0xFF) / 255.0F,
+                ((color >> 8) & 0xFF) / 255.0F,
+                (color & 0xFF) / 255.0F,
+                count);
+    }
+
+    public FXBlockWard(World world, double x, double y, double z, EnumFacing side, float red, float green, float blue) {
+        this(world, x, y, z, side, red, green, blue, 0);
+    }
+
+    private FXBlockWard(World world, double x, double y, double z, EnumFacing side, float red, float green, float blue, int count) {
+        super(world, x, y, z, 0.0D, 0.0D, 0.0D);
+        this.side = side;
         this.rotation = this.rand.nextInt(360);
         this.particleMaxAge = 12 + this.rand.nextInt(5);
         this.canCollide = false;
@@ -39,9 +55,6 @@ public class FXBlockWard extends Particle {
         this.setSize(0.01F, 0.01F);
         this.particleScale = (float) (1.4D + this.rand.nextGaussian() * 0.3D) + Math.min(0.6F, Math.max(0, count) * 0.03F);
 
-        float red = (color & 0xFF) / 255.0F;
-        float green = ((color >> 8) & 0xFF) / 255.0F;
-        float blue = ((color >> 16) & 0xFF) / 255.0F;
         if (red == 0.0F && green == 0.0F && blue == 0.0F) {
             red = 0.8F;
             green = 0.8F;

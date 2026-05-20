@@ -8,6 +8,7 @@ import net.minecraft.inventory.IInventory;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.item.Item;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.network.IGuiHandler;
@@ -158,6 +159,9 @@ public class CommonProxy implements IGuiHandler {
     // ---- FX stubs (ClientProxy overrides with actual GL calls) ----
 
     public void blockSparkle(World world, int x, int y, int z, int color, int count) {
+    }
+
+    public void blockWard(World world, double x, double y, double z, EnumFacing side, float red, float green, float blue) {
     }
 
     public void beam(World world, double x, double y, double z, double tx, double ty, double tz, int color, boolean flicker, int ticks) {

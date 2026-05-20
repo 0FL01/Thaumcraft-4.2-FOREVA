@@ -48,9 +48,11 @@ public class ClientProxyFxStaticGuardTest {
         assertTrue("ClientProxy blockSparkle must preserve random-color sentinel routing for -9999",
                 source.contains("color == -9999")
                         && source.contains("new FXVisSparkle(world, x, y, z, 0.0f, 0.0f, 0.0f, amount, true)"));
-        assertTrue("ClientProxy blockSparkle must route ward/portable-hole colors through dedicated FXBlockWard",
-                source.contains("color == 0xFC9A00 || color == 0x400040")
-                        && source.contains("new FXBlockWard(world, x, y, z, color, amount)"));
+        assertTrue("CommonProxy/ClientProxy must keep dedicated blockWard surface separate from generic blockSparkle routing",
+                commonProxy.contains("public void blockWard(World world, double x, double y, double z, EnumFacing side, float red, float green, float blue)")
+                        && source.contains("public void blockWard(World world, double x, double y, double z, EnumFacing side, float red, float green, float blue)")
+                        && source.contains("new FXBlockWard(world, x + 0.5D, y + 0.5D, z + 0.5D, side, red, green, blue)")
+                        && !source.contains("color == 0xFC9A00 || color == 0x400040"));
         assertTrue("ClientProxy beam must contain dedicated FXBeam particle path",
                 source.contains("public void beam(") && source.contains("new FXBeam("));
         assertTrue("ClientProxy must expose dedicated beamPulseFX and beamPulseGolemBossFX paths",
@@ -213,9 +215,11 @@ public class ClientProxyFxStaticGuardTest {
                         && shieldRunesFx.contains("this.target")
                         && shieldRunesFx.contains("\"textures/models/\" + (useRipple ? \"ripple\" : \"hemis\")")
                         && shieldRunesFx.contains("GlStateManager.rotate(180.0F - this.yaw"));
-        assertTrue("Dedicated FXBlockWard particle must keep block-centered ward emission baseline",
+        assertTrue("Dedicated FXBlockWard particle must keep both generic color decode and side-aware ward overlay baselines",
                 blockWardFx.contains("class FXBlockWard extends Particle")
-                        && blockWardFx.contains("EnumFacing.random(this.rand)")
+                        && blockWardFx.contains("public FXBlockWard(World world, double x, double y, double z, EnumFacing side, float red, float green, float blue)")
+                        && blockWardFx.contains("EnumFacing.random(world.rand)")
+                        && blockWardFx.contains("((color >> 16) & 0xFF) / 255.0F")
                         && blockWardFx.contains("\"textures/models/hemis\"")
                         && blockWardFx.contains("GlStateManager.rotate(90.0F")
                         && !blockWardFx.contains("EnumParticleTypes.REDSTONE"));

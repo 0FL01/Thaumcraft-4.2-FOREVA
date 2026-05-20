@@ -25,6 +25,7 @@ import net.minecraft.init.SoundEvents;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.Item;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.BlockPos;
@@ -842,10 +843,6 @@ public class ClientProxy extends CommonProxy {
         if (world == null || !world.isRemote) return;
         int amount = particleCount(Math.max(1, count));
         if (amount <= 0) return;
-        if (color == 0xFC9A00 || color == 0x400040) {
-            ParticleEngine.addEffect(world, new FXBlockWard(world, x, y, z, color, amount));
-            return;
-        }
         if (color == -9999) {
             ParticleEngine.addEffect(world, new FXVisSparkle(world, x, y, z, 0.0f, 0.0f, 0.0f, amount, true));
             return;
@@ -856,6 +853,12 @@ public class ClientProxy extends CommonProxy {
         float green = normalizeColor(tint.getGreen());
         float blue = normalizeColor(tint.getBlue());
         ParticleEngine.addEffect(world, new FXVisSparkle(world, x, y, z, red, green, blue, amount));
+    }
+
+    @Override
+    public void blockWard(World world, double x, double y, double z, EnumFacing side, float red, float green, float blue) {
+        if (world == null || !world.isRemote || side == null) return;
+        ParticleEngine.addEffect(world, new FXBlockWard(world, x + 0.5D, y + 0.5D, z + 0.5D, side, red, green, blue));
     }
 
     @Override
