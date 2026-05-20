@@ -111,12 +111,15 @@ public class ClientProxyEntityRendererRegistrationStaticGuardTest {
                         && fireBatModel.contains("batOuterRightWing")
                         && fireBatModel.contains("getIsBatHanging()"));
         String wispRenderer = readFile("src/main/java/thaumcraft/client/renderers/entity/RenderWisp.java");
-        assertTrue("RenderWisp must provide aspect-tinted texture baseline",
-                wispRenderer.contains("extends RenderLiving<EntityWisp>")
+        assertTrue("RenderWisp must provide dedicated billboard core and halo baseline",
+                wispRenderer.contains("extends Render<EntityWisp>")
+                        && wispRenderer.contains("textures/misc/wisp.png")
                         && wispRenderer.contains("textures/misc/wispy.png")
                         && wispRenderer.contains("Aspect.getAspect(entity.getWispType())")
-                        && wispRenderer.contains("GlStateManager.color(red, green, blue, 1.0F)")
-                        && wispRenderer.contains("GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F)"));
+                        && wispRenderer.contains("renderCore(entity, red, green, blue)")
+                        && wispRenderer.contains("renderHalo(entity, partialTicks)")
+                        && wispRenderer.contains("OpenGlHelper.setLightmapTextureCoords")
+                        && wispRenderer.contains("DefaultVertexFormats.POSITION_TEX_COLOR"));
         String aspectOrbRenderer = readFile("src/main/java/thaumcraft/client/renderers/entity/RenderAspectOrb.java");
         assertTrue("RenderAspectOrb must provide particle-texture billboard with aspect tint and blend-factor mapping baseline",
                 aspectOrbRenderer.contains("extends Render<EntityAspectOrb>")
