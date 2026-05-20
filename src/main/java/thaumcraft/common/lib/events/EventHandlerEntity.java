@@ -42,6 +42,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.common.BiomeDictionary;
 import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
+import net.minecraftforge.event.entity.EntityEvent;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.event.entity.item.ItemExpireEvent;
 import net.minecraftforge.event.entity.item.ItemTossEvent;
@@ -114,6 +115,13 @@ public class EventHandlerEntity {
             PlayerKnowledgeProvider provider = new PlayerKnowledgeProvider();
             provider.getInstance().setPlayer((EntityPlayer) event.getObject());
             event.addCapability(PLAYER_KNOWLEDGE_KEY, provider);
+        }
+    }
+
+    @SubscribeEvent
+    public void onEntityConstructing(EntityEvent.EntityConstructing event) {
+        if (event.getEntity() instanceof EntityMob) {
+            EntityUtils.ensureChampionModAttribute((EntityMob) event.getEntity());
         }
     }
 
@@ -700,24 +708,7 @@ public class EventHandlerEntity {
     }
 
     private IAttributeInstance ensureChampionAttribute(EntityMob mob) {
-        IAttributeInstance mod = mob.getEntityAttribute(EntityUtils.CHAMPION_MOD);
-        if (mod != null) {
-            if (mod.getBaseValue() > -2.0D) {
-                mod.setBaseValue(-2.0D);
-            }
-            return mod;
-        }
-        try {
-            mod = mob.getAttributeMap().registerAttribute(EntityUtils.CHAMPION_MOD);
-            mod.setBaseValue(-2.0D);
-            return mod;
-        } catch (IllegalArgumentException ignored) {
-            mod = mob.getEntityAttribute(EntityUtils.CHAMPION_MOD);
-            if (mod != null && mod.getBaseValue() > -2.0D) {
-                mod.setBaseValue(-2.0D);
-            }
-            return mod;
-        }
+        return EntityUtils.ensureChampionModAttribute(mob);
     }
 
     private int getChampionWhitelistTier(Entity entity) {

@@ -71,7 +71,6 @@ Do not claim backend substantially complete until these are resolved or scoped o
 
 ## Latest Checkpoint
 
-- Client asset/render burst fixed the next reproduced load/crash routes: 1.7.10-style `door_*_open` parents now target valid 1.12 vanilla door parents, missing `blockfluid*`/`blockflux*` blockstates were added, and `blockarcanefurnace.json` now covers Forge's canonical `facing=...,type=...` variant order for every permutation.
-- `ItemCrystalRenderer` now seeds its TESR path with `TileEntityRendererDispatcher.instance` and origin positions, while `TileCrystalRenderer` also tolerates `null` positions defensively; this closes the crystal-item inventory crash route from the latest client report.
-- `ContainerArcaneWorkbench` now keeps a detached preview `InventoryCrafting(new ContainerDummy(), 3, 3)` snapshot instead of recursively wiring slot-9 preview recomputation back into the container callback path; this closes the reproduced integrated-server `StackOverflowError`.
-- Coverage/runtime evidence for this burst lives in `ModelErrorBurstAssetCoverageTest`, the updated `CrystalTesrRoutingContractTest`, `ContainerArcaneWorkbenchArcaneFlowStaticGuardTest`, and `ArcaneWorkbenchRuntimeIntegrationTest`.
+- Restored the original champion attribute lifecycle for `tc.mobmod`: [EventHandlerEntity.java](/home/opencode/ai/Thaumcraft-4.2-FOREVA/src/main/java/thaumcraft/common/lib/events/EventHandlerEntity.java) now registers `EntityUtils.CHAMPION_MOD` on `EntityEvent.EntityConstructing` for every `EntityMob`, instead of waiting until join/spawn logic.
+- Consolidated champion-attribute registration through [EntityUtils.java](/home/opencode/ai/Thaumcraft-4.2-FOREVA/src/main/java/thaumcraft/common/lib/utils/EntityUtils.java), keeping the base `-2.0D` contract and removing the load-order gap that produced `SharedMonsterAttributes: Ignoring unknown attribute 'tc.mobmod'`.
+- Added runtime evidence in `ChampionAttributePersistenceRuntimeTest`: once the early hook runs, `SharedMonsterAttributes.setAttributeModifiers(...)` can apply saved `tc.mobmod` NBT modifiers instead of dropping them as unknown.

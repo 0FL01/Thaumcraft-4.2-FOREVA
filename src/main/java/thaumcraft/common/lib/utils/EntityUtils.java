@@ -123,18 +123,27 @@ public class EntityUtils {
         return pointed;
     }
 
-    private static IAttributeInstance ensureChampionModAttribute(EntityLivingBase entity) {
+    public static IAttributeInstance ensureChampionModAttribute(EntityLivingBase entity) {
         if (!(entity instanceof EntityMob)) {
             return null;
         }
         IAttributeInstance instance = entity.getEntityAttribute(CHAMPION_MOD);
         if (instance != null) {
+            if (instance.getBaseValue() > -2.0D) {
+                instance.setBaseValue(-2.0D);
+            }
             return instance;
         }
         try {
-            return entity.getAttributeMap().registerAttribute(CHAMPION_MOD);
+            instance = entity.getAttributeMap().registerAttribute(CHAMPION_MOD);
+            instance.setBaseValue(-2.0D);
+            return instance;
         } catch (IllegalArgumentException ignored) {
-            return entity.getEntityAttribute(CHAMPION_MOD);
+            instance = entity.getEntityAttribute(CHAMPION_MOD);
+            if (instance != null && instance.getBaseValue() > -2.0D) {
+                instance.setBaseValue(-2.0D);
+            }
+            return instance;
         }
     }
 

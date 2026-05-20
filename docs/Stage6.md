@@ -973,7 +973,7 @@ Mapping:
 Оставшиеся ограничения:
 
 - Boss combat, aggro retargeting, player scaling, spawn invulnerability, and reward drops have not been observed in a runtime world because smoke-server remains environment-blocked and manual scenarios are excluded.
-- Champion-name parity remains a separate dependency because the current branch still has a simplified champion modifier helper and no restored `EntityUtils.CHAMPION_MOD` custom attribute path.
+- Champion-name parity remains a separate dependency, but the custom `EntityUtils.CHAMPION_MOD` attribute path is no longer missing: a later checkpoint restored the original early `EntityConstructing` registration so saved champion mobs no longer lose `tc.mobmod` during NBT attribute load.
 - Eldritch Golem low-hardness block-breaking / `BlockLoot` stomping is restored by checkpoint 8.2.13 below, but remains runtime-unobserved.
 
 ### 8.2.13 Eldritch Golem movement checkpoint — 2026-05-15
