@@ -7,74 +7,70 @@ Branch: `codex/durable-goal-stage8-9`
 
 ## Contract Checklist
 
-- [x] Read source-of-truth files: `AGENTS.md`, `docs/PRD.md`, `docs/GOAL.md`, `build.gradle`, `Dockerfile`.
-- [x] Read active stage plans: `docs/Stage3.md` through `docs/Stage9-e.md`.
-- [x] Start from `git status --short`: clean at recon start.
-- [x] Establish baseline non-GUI validation.
-- [ ] Close or classify the remaining Stage 3-7 blockers before any Stage 8/9 parity claim.
-- [ ] Finish Stage 8 client bootstrap, GUI, render, FX, and keybinding work.
-- [ ] Finish Stage 9 recipe/content/research population.
-- [ ] Complete Phase 10 polish and final non-GUI validation.
+- [x] Read source-of-truth files and Stage 3-9 docs.
+- [x] Start from `git status --short` and establish baseline non-GUI validation.
+- [ ] Close or classify Stage 3-7 blockers before any Stage 8/9 parity claim.
+- [ ] Finish Stage 8/9 implementation and validation work.
 - [ ] Record GUI/manual checks as skipped where interaction or DISPLAY is unavailable.
-- [ ] End with clean `git status --short` after the intended checkpoint commits.
+- [ ] End with clean `git status --short` after checkpoint commits.
+
+## Current-truth interpretation guard
+
+This file is a progress digest, not a parity certificate.
+
+- `static guarded` means source/corpus regressions only.
+- `validate --smoke passed` means build/server-load stability only.
+- Stage 8 visual progress is not backend parity evidence.
+- Stage 9 recipe/research corpus progress is not server-authoritative progression proof.
+
+Current backend blockers remain: research/progression runtime route, research table C2S authority, scan authority, alchemy/thaumatorium/infusion runtime validation, Outer Lands portal/maze validation, and save/load behavior for complex tiles.
 
 ## Current Evidence
 
-- Live checkpoint prose moved into `docs/GOAL_PROGRESS-archive/` batch files; the latest validated Stage 8-c eldritch follow-ups first returned the tile-backed `BlockEldritch` family (`0/1/3/8/9`) to TESR/TEISR-first routing, then restored the original inset static shells for `meta 4/5/6`, the creative exposure contract (`meta 4` only), and now the `meta 8/10` ambient path via lock sparks, trap runes, and randomized `es_5..8` trap shell variants.
-- Recent Stage 8-e bursts converted the remaining fallback particle families (`FXBreaking`/`FXSwarm`, smoke spiral/drift, sheet smoke/flame/spell emissions, entity `BLOCK_CRACK`/`SLIME`/`WATER_BUBBLE`/`VILLAGER_ANGRY` branches, and `TileNitor` ambient airy wisps) onto dedicated proxy or particle-engine paths, restored Eldritch Golem beam-charge FX parity, split generic `blockSparkle` back away from dedicated `blockWard` routing while fixing `FXBlockWard` RGB decode, restored the client shader/post-processing branch for `DeathGaze` / `BlurredVision` / `UnnaturalHunger` / `SunScorned` through `ClientTickEventsFML` + `RenderEventHandler` shader-group lifecycle, realigned the transfer/lightning fidelity bundle so `sourceStreamFX` restores zero-gravity `FXWispArcing` behavior, `arcLightning` again emits the colored target sparkle before the beam arc, packet beam pulses recover the original width/blend/reverse shaping for both the single-beam and golem-boss dual-beam paths, the shared `beamCont` / `beamBore` / `beamPower` lifecycle is back to reference-shaped spawn-vs-reuse behavior, and the generic helper surface (`spark`, both `sparkle` overloads, `drawGenericParticles`, `drawVentParticles`) now also follows the original single-effect/no-jitter routing instead of the later ad-hoc loop/randomized variants, returned `TileInfusionMatrix` source/eject FX to the dedicated infusion particle helpers (`drawInfusionParticles1..4`) plus `nodeBolt` instability discharge instead of the generic `beam/bolt` fallback, then fixed the first layer-3 crash family by making `FXBurst`, `FXBlockRunes`, `FXBreaking`, `FXSmokeSpiral`, and `FXSwarm` own exactly one self-contained `begin/draw` pass and now does the same for the packet-driven ward/sonic/shield overlay family (`FXBlockWard`, `FXShieldRunes`, `FXSonic`) so none of them tries to close a non-existent outer particle buffer; each burst passed `validate`, and runtime-risk bursts also passed `validate --smoke`.
-- Latest Stage 8 device/entity follow-ups restored the missing `LampFertility` bundle end-to-end, moved the crystal family back onto TESR/TEISR-first routing with a grouped `vcrystal.obj` path, swapped `RenderPech` / `RenderFireBat` off vanilla `ModelBiped` / `ModelBat` fallbacks onto dedicated `ModelPech` / `ModelFireBat` paths plus a custom Pech held-item layer, replaced `RenderTravelingTrunk` / `ModelPig` with dedicated `ModelTrunk` routing plus synced trunk `open/stay/upgrade/rows/anger`, lid/squish animation state, and knob upgrade-icon rendering, moved the eldritch guardian / warden / golem family off `ModelBiped` fallbacks onto dedicated `ModelEldritchGuardian` / `ModelEldritchGolem` paths with restored alpha/spawn-timer render shaping and the golem attack-timer surface, returned `RenderGolemBase` / `RenderCultistPortal` to dedicated golem-model and billboard-portal paths, then restored `RenderCultist` ritualist bob/beam plus leader scale over the shared `cultist.png` path, replaced the remaining `RenderWisp` `ModelBat` fallback while also swapping `RenderEldritchCrab`, `RenderTaintSpore`, `RenderTaintSporeSwarmer`, `RenderTaintacle`, and `EntityWatcher` off `ModelSpider`/`ModelSlime`/no-op routing onto dedicated `ModelEldritchCrab` / `ModelTaintSpore` / `ModelTaintSporeSwarmer` / `ModelTaintacle` / `ModelWatcher` paths with helm-aware crab shell animation, fullbright swarmer inner-cube behavior, length-routed taintacle registration (`10/6/14`) through `ModelRendererTaintacle`, and a frustum-safe watcher gaze beam on `watcher_beam.png`; the newest special-item burst also returns `EntitySpecialItem` to its lifted anti-explosion motion contract and replaces generic `RenderEntityItem` fallback routing for `EntitySpecialItem` / `EntityPermanentItem` / `EntityItemGrate` / `EntityFollowingItem` with dedicated `RenderSpecialItem` / `RenderFollowingItem` paths, while the latest common follow-up restores original-style golem/trunk client feedback by refreshing golem max-health on healing status `5` and restoring trunk status `18` heart feedback alongside the lid kick; `validate` passed throughout, and the runtime-risk render bundles also passed `validate --smoke`.
-- Recent Stage 9 bursts added typed `ConfigResearch` recipe-handle audits, restored the balanced shard (`itemShard:6`) / `itemResource:14` aspect derivation baseline, added aggregate guards for hidden/lost clue progression and the live research-table runtime contract (usability guard, one-bit bonus-aspect persistence, researcher orb feedback, earth/water bonus recalc cues), rebind `ConfigResearch.recipes` to the actually registered special recipes after `registerSpecialRecipes(...)`, lock the live Arcane Workbench server/client/container/slot runtime surface behind one aggregate Stage 9-b guard so this path no longer depends on the stale “client GUI route is null” assumption, restore the Arcane Workbench craft-result runtime closer to reference by dropping the extra staff preview gate and bringing back per-item container remainder handling with destroy-event plus inventory-first fallback, add a real runtime integration harness that exercises shaped/shapeless arcane matching, dynamic wand/sceptre outputs, vis cost lookup, and slot remainder handling through `TileArcaneWorkbench` instead of string-only static guards, and now restore the broad reference-shaped `ConfigAspects` scan/content corpus for vanilla plus Thaumcraft families by bringing back entity tags (powered creeper, wither skeleton, pech variants, typed wisps, taint/cultist/eldritch mobs, vehicles, bosses) and the missing vanilla mechanism/transport utility object tags (bow, cake, boat, minecart, repeater, compass/clock, dispenser, rails, pistons, enchanting/crafting tables, ender chest, hopper/dropper, beacon, torch/redstone/daylight family); validation passed, with smoke run only where common config registration paths changed.
-- Recent Stage 8-c bursts covered dynamic brainbox/sensor/lifter and tube conduit shells; the latest mirror/transport follow-up first moved mirror and essentia-reservoir static shells into block models, leaving TESR for portal/liquid layers and splitting normal vs essentia mirror inventory models, and now returns both mirror and eldritch obelisk portal fields to the shared texgen/matrix layered-field helper instead of the simplified manual parallax quad path; `validate` and `validate --smoke` passed afterward.
-- Latest Stage 8-c follow-up first moved the static charger and centrifuge shells into block models (`blockmetaldevice_2`, `blocktube_2`), then restored the workbench charger / vis relay family to TESR-first world routing and brought `TileMagicWorkbenchChargerRenderer` back to the reference ring/support/crystal path; the newest metal-device burst now also returns the arcane lamp family (`meta 7/8/13`) to TESR-first world rendering, with `TileArcaneLampRenderer` drawing the shaped lamp shell itself and switching growth/fertility on/off sprites from live tile charge state instead of static baked cube placeholders; `validate` and `validate --smoke` passed afterward.
-- Latest Stage 8-c follow-up moved the static arcane-workbench and deconstruction-table shells into `blocktable_15` and `blocktable_14`, leaving TESR responsible only for wand/thaumometer/item/aspect overlays; `validate` and `validate --smoke` passed afterward.
-- Latest Stage 8-c table-family follow-up moved the remaining plain-table and research-table shells into `blocktable_0`, `blocktable_2`, and `blocktable_6`, leaving TESR responsible only for research-table overlays and retiring duplicate plain-table shell rendering, then restored the dynamic inserted/display-item family (`TileArcaneWorkbenchRenderer`, `TileDeconstructionTableRenderer`, `TilePedestalRenderer`, `TileWandPedestalRenderer`, `TileFocalManipulatorRenderer`, `TileThaumatoriumRenderer`, `TileEldritchCapRenderer`, `TileEldritchLockRenderer`) from flat ground-item/ad-hoc line fallbacks back toward reference entity-item and wispy-beam paths; the newest follow-up centralizes that display-item contract in `TileRenderHelper` with client-world fallback for worldless TESR contexts, while the held-item branch routes `wandcasting`, `trunkspawner`, `thaumometer`, and `itemBowBone` through dedicated builtin/entity renderers instead of flat generated models; `validate` and `validate --smoke` passed afterward.
-- Latest common/research follow-up restored the `BlockTable` conversion contract: inkwells now form master/partner research tables with reference-shaped metadata, wand use recreates the arcane workbench block/tile path, and `TileResearchTable` again exposes expanded render bounds plus the client learn-event sound; `validate` and `validate --smoke` passed afterward.
-- Recent Stage 8-c shell-split follow-ups also moved focal manipulator / flux scrubber, jar family, node-device lock shells, and hungry chest body into block models, leaving TESRs responsible only for dynamic overlays, animation pulses, pistons, bubbles, or lid paths; each checkpoint passed `validate` and `validate --smoke`.
-- Latest follow-ups moved the static advanced alchemy-furnace shell into `blockstonedevice_0`, then restored its TESR panel path toward reference by keeping dedicated tank-frame rendering and atlas-based vis/lava overlays; the same burst also replaced the crucible `blockmetaldevice_0` full-cube placeholder with a shaped basin shell, restored `TileInfusionPillarRenderer`, `ModelThaumatorium`, `ModelAlembic`, `ModelVisRelay`, `ModelNodeStabilizer`, `TileEssentiaCrystalizerRenderer`, and `TileEldritchCrabSpawnerRenderer` to dedicated reference-shaped OBJ/model paths, then fixed `TileAlembic` 1.12 chunk/item parity by recomputing appearance on update-tag/load and restoring the worldless inventory shell offset; thaumatorium shell split remains deferred because its facing still lives only in tile NBT, not blockstate.
-- Latest common/client follow-up restored `TileJarBrain` client-side rotation/sigh behavior used by `TileJarRenderer`, then returned the brain jar to a model-driven `ModelBrain` render path instead of the old billboard fallback, brought back `EntityPech.handleStatusUpdate(...)` tame/anger feedback via the generic particle path, recovered item-grate open/closed parity in `BlockMetalDevice` with hand/redstone toggles, thin collision, open-item drops, and shaped `blockmetaldevice_5/_6` models, restored tile-oriented wooden/metal device routing by pushing bellows / bore base / bore / banner / alembic / charger / vis relay back onto TESR or item-side `builtin/entity` + TEISR paths with reference-shaped `BlockWoodenDevice` bounds, restored `TileArcaneBoreRenderer` `rotX`/`rotZ` aim easing, returned `BlockMetalDevice` construct/thaumatorium support contracts (creative meta exposure, null tile routing for support-only metas, `10/11 -> 9` drops, alembic facing, charger/brainbox/thaumatorium/vis-relay bounds, advanced-construct light value, comparator output, and `blockmetaldevice_3/_9` model routing), returned the `BlockStoneDevice` pedestal / wand pedestal / focus family to reference-shaped shell models plus wand-pedestal stepped collision and selection bounds, and now also moves the stone-device node/focal/flux utility family (`9/10/11/13/14`) back onto TESR-first world and inventory routing while restoring the focal manipulator shell model and the flux scrubber cap+tip TESR path; focused tests and `validate`/`validate --smoke` passed afterward.
-- Latest thaumatorium follow-up routed `blockMetalDevice` metas `10/11` back through TESR-first world/item paths, made `TileThaumatoriumRenderer` item-safe for worldless TEISR shell renders, and replaced the stale `metalbase` fallback textures for `blockmetaldevice_10/_11` with `alchemyblock`; both `validate` and `validate --smoke` passed afterward.
-- Latest crystalizer/reservoir follow-up routed ancillary `blockTube` metas `0/1/3/4/5/6` plus meta `7` back through TESR-first world/item paths, added shared inventory-shell routing through `ItemTubeRenderer` + `blocktube_tesr`, made `TileEssentiaCrystalizerRenderer` worldless-safe so the dedicated crystalizer shell no longer depends on the old baked `cube_all` placeholder, and now also moves `blockEssentiaReservoir` inventory rendering onto a dedicated builtin/entity + `ItemEssentiaReservoirRenderer` path so the static basin shell and worldless liquid layer render together instead of falling back to the plain `normal` item model; both `validate` and `validate --smoke` passed afterward.
-- Latest node/device follow-up kept the restored `BlockAiry` TESR/TEISR routing and `TileNode` discharge/lock path, repaired Arcane Furnace reference contracts by switching `TileArcaneFurnace` back to meta-`10` nozzle detection, adding facing-aware blockstate/item-model routing for `blockarcanefurnace`, replacing the meta `10` cube placeholder with a dedicated half-shell nozzle model, restoring the multiblock revert/drop plus core-break blaze branch in `BlockArcaneFurnace`, then restored `TileTube` vent cadence, color handoff, and client vent/creak-fizz feedback, brought the `Portable Hole` / warding runtime family back toward reference with `TileHole` client sparkle cadence plus `TileWardingStone` / `TileWardingStoneFence` server update logic, later moved both `TileHoleRenderer` and `TileEldritchNothingRenderer` off the simplified manual parallax path onto a shared texgen/matrix layered-field helper closer to the original portal tunnel flow, and now returns `TileWardedRenderer` to a full warded visual contract by rendering the stored full-cube facade through the baked block-model dispatcher before the focus-gated connected-glass overlay; the same run also corrected the node-core type strip mapping (`UNSTABLE/DARK/TAINTED/PURE/HUNGRY`) in `TileNodeRenderer`, pushed `TileNodeEnergizedRenderer` back onto `auraBase` plus world-position-stable ring/core phase, restored `FocusShock` local channel feedback through proxy-routed directed lightning plus target/block sparkles, realigned `BlockStoneDevice` creative meta exposure, null tile routing for support-only metas, support/drop/remap logic, comparator output, matrix blast, and meta-`2` light value, moved the infusion-matrix/pillar family off the baked `blockstonedevice_arcane` fallback via TESR-first world routing plus builtin/entity matrix item rendering, restored the champion modifier runtime bundle (`Bold`, `Grim`, `Poison`, `Sickly`, `Spined`, `Warded`) to reference-shaped `performEffect(...)` behavior, and now also returns `TileEldritchPortal` to the reference ambient/render/transfer baseline (`evilportal` cadence, expanded render bounds, player-list dimension transfer, first-entry `ENTEROUTER` grant); focused tests and `validate`/`validate --smoke` passed afterward.
-- Stage 3-7 residual blockers stay documented; GUI/manual parity checks remain skipped by instruction.
+- Detailed checkpoint prose lives in `docs/GOAL_PROGRESS-archive/`; this file is a digest only.
+- Stage 8 client/render/FX work is archived; Stage 9 remains runtime-open.
 
 ## Skipped GUI/Manual Graphics Checks
 
-- Interactive GUI, renderer, screenshot, and manual playthrough checks remain skipped until a real client session is available; record future ones as `SKIPPED by user instruction: GUI/graphics/user-interactive validation excluded`.
+- Interactive GUI, renderer, screenshot, and manual playthrough checks remain skipped until a real client session is available.
 
 ## Baseline Validation
 
 - `./scripts/dev.sh compileJava` — passed.
 - `./scripts/dev.sh check-jar` — passed.
 - `./scripts/dev.sh validate` — passed.
-- `./scripts/dev.sh validate --smoke` — passed, including server readiness and crash-marker checks.
+- `./scripts/dev.sh validate --smoke` — passed; server readiness and crash-marker checks only.
+
+### Validation interpretation limit
+
+Latest validation proves build/server-load stability only, not backend parity or gameplay closure.
 
 ## Checkpoint Digest
 
 | Area | Condensed status |
 | --- | --- |
 | Stage 3-7 | Residual blockers and runtime gaps are archived; no new closure claim here. |
-| Stage 8-a/b | Client bootstrap, GUI routing, and side boundaries are established. |
-| Stage 8-c | Tile/block renderer, model, and resource parity is largely in place. |
-| Stage 8-d | Entity renderer coverage is largely in place. |
-| Stage 8-e | Dedicated FX, beams/bolts, and packet routing are largely in place. |
-| Stage 9-a..e | Recipe/content/crafting/research systems are substantially ported and guarded. |
+| Stage 8 | Client/render/FX progress is archived; not backend parity evidence. |
+| Stage 9 | Substantial implementation/corpus present; runtime validation and server-authoritative progression remain open. |
 | Docs/validation | Progress history is archived into batches; live file stays concise. |
 
 ## Archive Index
 
-Archives live in `docs/GOAL_PROGRESS-archive/` with per-source subdirectories; each subdirectory has its own `INDEX.md` for detailed batch listings.
+See `docs/GOAL_PROGRESS-archive/INDEX.md` for batch listings and content.
 
-| Source | Directory | Content |
-|---|---|---|
-| `docs/GOAL_PROGRESS.md` | `goal-progress/` | Checkpoint summaries and old snapshot |
-| `docs/Stage8-d.md §6` | `stage8-d/` | 82 entity-renderer checkpoint logs (7 batches) |
+## Active backend blocker register
 
-See `docs/GOAL_PROGRESS-archive/INDEX.md` for the master index.
+Do not claim backend substantially complete until these are resolved or scoped out:
+
+1. Research table C2S authority.
+2. Scan authority.
+3. Normal research progression route.
+4. Research table NBT symmetry.
+5. Alchemy/thaumatorium/infusion runtime validation.
+6. Outer Lands runtime validation.
+7. Static guard overconfidence.
 
 ## Next Checkpoint Candidate
 
-- The remaining standalone original custom item renderer gap is no longer `ItemBowBoneRenderer`; bone bow now uses the same builtin/entity + dedicated item-renderer route as the other restored held-item surfaces.
-- Continue grouped Stage 8/9 bursts only where runtime-safe non-GUI validation is available, while keeping remaining Stage 3-7 blockers documented until they block a later burst.
-- Preserve the GUI/manual exclusion marker for any future visual checks.
-
-Do not mark Stage 6 or Stage 7 complete from this checkpoint alone.
+- Continue grouped Stage 8/9 bursts only where runtime-safe non-GUI validation is available.
+- Preserve the GUI/manual exclusion marker and do not mark Stage 6 or Stage 7 complete from this checkpoint alone.
