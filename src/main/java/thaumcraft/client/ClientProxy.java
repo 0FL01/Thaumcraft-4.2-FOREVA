@@ -499,9 +499,9 @@ public class ClientProxy extends CommonProxy {
         registerEntityRenderer(EntityTaintSpore.class, RenderTaintSpore::new, registered);
         registerEntityRenderer(EntityTaintSporeSwarmer.class, RenderTaintSporeSwarmer::new, registered);
         registerEntityRenderer(EntityTaintSwarm.class, RenderTaintSwarm::new, registered);
-        registerEntityRenderer(EntityTaintacle.class, manager -> new RenderTaintacle<>(manager, 0.6F, 1.0F), registered);
-        registerEntityRenderer(EntityTaintacleSmall.class, manager -> new RenderTaintacle<>(manager, 0.45F, 0.85F), registered);
-        registerEntityRenderer(EntityTaintacleGiant.class, manager -> new RenderTaintacle<>(manager, 0.8F, 1.33F), registered);
+        registerEntityRenderer(EntityTaintacle.class, manager -> new RenderTaintacle<>(manager, 0.6F, 10), registered);
+        registerEntityRenderer(EntityTaintacleSmall.class, manager -> new RenderTaintacle<>(manager, 0.2F, 6), registered);
+        registerEntityRenderer(EntityTaintacleGiant.class, manager -> new RenderTaintacle<>(manager, 1.0F, 14), registered);
         registerEntityRenderer(EntityGolemBase.class, RenderGolemBase::new, registered);
         registerEntityRenderer(EntityTravelingTrunk.class, RenderTravelingTrunk::new, registered);
         registerEntityRenderer(EntityCultistPortal.class, RenderCultistPortal::new, registered);

@@ -68,9 +68,9 @@ public class ClientProxyEntityRendererRegistrationStaticGuardTest {
                         && source.contains("registerEntityRenderer(EntityTaintSpore.class, RenderTaintSpore::new, registered);")
                         && source.contains("registerEntityRenderer(EntityTaintSporeSwarmer.class, RenderTaintSporeSwarmer::new, registered);")
                         && source.contains("registerEntityRenderer(EntityTaintSwarm.class, RenderTaintSwarm::new, registered);")
-                        && source.contains("registerEntityRenderer(EntityTaintacle.class, manager -> new RenderTaintacle<>(manager, 0.6F, 1.0F), registered);")
-                        && source.contains("registerEntityRenderer(EntityTaintacleSmall.class, manager -> new RenderTaintacle<>(manager, 0.45F, 0.85F), registered);")
-                        && source.contains("registerEntityRenderer(EntityTaintacleGiant.class, manager -> new RenderTaintacle<>(manager, 0.8F, 1.33F), registered);"));
+                        && source.contains("registerEntityRenderer(EntityTaintacle.class, manager -> new RenderTaintacle<>(manager, 0.6F, 10), registered);")
+                        && source.contains("registerEntityRenderer(EntityTaintacleSmall.class, manager -> new RenderTaintacle<>(manager, 0.2F, 6), registered);")
+                        && source.contains("registerEntityRenderer(EntityTaintacleGiant.class, manager -> new RenderTaintacle<>(manager, 1.0F, 14), registered);"));
         assertTrue("ClientProxy must keep fallback registrations for remaining special entities",
                 source.contains("registerEntityRenderer(EntityGolemBase.class, RenderGolemBase::new, registered);")
                         && source.contains("registerEntityRenderer(EntityTravelingTrunk.class, RenderTravelingTrunk::new, registered);")
@@ -304,11 +304,21 @@ public class ClientProxyEntityRendererRegistrationStaticGuardTest {
         assertTrue("RenderTaintSwarm must stay as dedicated noop baseline renderer",
                 taintSwarmRenderer.contains("extends RenderNoop<EntityTaintSwarm>"));
         String taintacleRenderer = readFile("src/main/java/thaumcraft/client/renderers/entity/RenderTaintacle.java");
-        assertTrue("RenderTaintacle must provide shared taintacle texture and scale baseline",
+        String taintacleModel = readFile("src/main/java/thaumcraft/client/renderers/models/entities/ModelTaintacle.java");
+        String taintacleModelRenderer = readFile("src/main/java/thaumcraft/client/renderers/models/entities/ModelRendererTaintacle.java");
+        assertTrue("RenderTaintacle must provide dedicated tentacle model, length-based routing, and giant-scale baseline",
                 taintacleRenderer.contains("extends RenderLiving<T>")
                         && taintacleRenderer.contains("textures/models/taintacle.png")
-                        && taintacleRenderer.contains("scaleMultiplier")
-                        && taintacleRenderer.contains("GlStateManager.scale(scaleMultiplier, scaleMultiplier, scaleMultiplier)"));
+                        && taintacleRenderer.contains("new ModelTaintacle(length)")
+                        && taintacleRenderer.contains("entity instanceof EntityTaintacleGiant")
+                        && taintacleRenderer.contains("GlStateManager.scale(1.33F, 1.33F, 1.33F)")
+                        && taintacleModel.contains("class ModelTaintacle")
+                        && taintacleModel.contains("tentacle.render(scale, 0.88F)")
+                        && taintacleModel.contains("getAgitationState()")
+                        && taintacleModel.contains("flailIntensity")
+                        && taintacleModelRenderer.contains("class ModelRendererTaintacle extends ModelRenderer")
+                        && taintacleModelRenderer.contains("OpenGlHelper.setLightmapTextureCoords")
+                        && taintacleModelRenderer.contains("childModels"));
         String brainyZombieRenderer = readFile("src/main/java/thaumcraft/client/renderers/entity/RenderBrainyZombie.java");
         assertTrue("RenderBrainyZombie must provide dedicated brainy texture baseline",
                 brainyZombieRenderer.contains("extends RenderZombie")

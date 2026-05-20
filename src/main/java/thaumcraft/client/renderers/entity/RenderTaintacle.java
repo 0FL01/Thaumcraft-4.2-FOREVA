@@ -1,11 +1,12 @@
 package thaumcraft.client.renderers.entity;
 
-import net.minecraft.client.model.ModelSpider;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.entity.RenderLiving;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.util.ResourceLocation;
+import thaumcraft.client.renderers.models.entities.ModelTaintacle;
+import thaumcraft.common.entities.monster.boss.EntityTaintacleGiant;
 
 import javax.annotation.Nullable;
 
@@ -14,17 +15,14 @@ public class RenderTaintacle<T extends EntityLiving> extends RenderLiving<T> {
     private static final ResourceLocation TAINTACLE_TEXTURE =
             new ResourceLocation("thaumcraft", "textures/models/taintacle.png");
 
-    private final float scaleMultiplier;
-
-    public RenderTaintacle(RenderManager renderManager, float shadowSize, float scaleMultiplier) {
-        super(renderManager, new ModelSpider(), shadowSize);
-        this.scaleMultiplier = scaleMultiplier;
+    public RenderTaintacle(RenderManager renderManager, float shadowSize, int length) {
+        super(renderManager, new ModelTaintacle(length), shadowSize);
     }
 
     @Override
     protected void preRenderCallback(T entity, float partialTickTime) {
-        if (scaleMultiplier != 1.0F) {
-            GlStateManager.scale(scaleMultiplier, scaleMultiplier, scaleMultiplier);
+        if (entity instanceof EntityTaintacleGiant) {
+            GlStateManager.scale(1.33F, 1.33F, 1.33F);
         }
     }
 
