@@ -14,6 +14,9 @@ import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.client.shader.ShaderGroup;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.ai.attributes.IAttributeInstance;
+import net.minecraft.entity.monster.EntityMob;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
@@ -34,7 +37,9 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.oredict.OreDictionary;
 import org.lwjgl.opengl.GL11;
 import thaumcraft.api.research.ScanResult;
+import thaumcraft.common.entities.monster.mods.ChampionModifier;
 import thaumcraft.common.config.Config;
+import thaumcraft.common.lib.utils.EntityUtils;
 import thaumcraft.common.lib.research.ScanManager;
 
 @SideOnly(Side.CLIENT)
@@ -165,6 +170,16 @@ public class RenderEventHandler {
     public void livingTick(LivingEvent.LivingUpdateEvent event) {
         if (event.getEntityLiving() == null || !event.getEntityLiving().world.isRemote) {
             return;
+        }
+        if (event.getEntityLiving() instanceof EntityMob && !event.getEntityLiving().isDead) {
+            EntityMob mob = (EntityMob) event.getEntityLiving();
+            IAttributeInstance mod = mob.getEntityAttribute(EntityUtils.CHAMPION_MOD);
+            if (mod != null) {
+                int type = (int) mod.getAttributeValue();
+                if (type >= 0 && type < ChampionModifier.mods.length) {
+                    ChampionModifier.mods[type].effect.showFX((EntityLivingBase) mob);
+                }
+            }
         }
         EntityPlayer player = Minecraft.getMinecraft().player;
         if (player == null || event.getEntityLiving().getEntityId() != player.getEntityId()) {
