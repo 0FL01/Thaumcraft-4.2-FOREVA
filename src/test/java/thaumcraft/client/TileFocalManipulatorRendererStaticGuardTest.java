@@ -15,6 +15,7 @@ public class TileFocalManipulatorRendererStaticGuardTest {
     public void focalManipulatorRendererKeepsReferenceModelAndFocusContract() throws IOException {
         String source = read("src/main/java/thaumcraft/client/renderers/tile/TileFocalManipulatorRenderer.java");
         String thaumatorium = read("src/main/java/thaumcraft/client/renderers/tile/TileThaumatoriumRenderer.java");
+        String thaumatoriumModel = read("src/main/java/thaumcraft/client/renderers/models/ModelThaumatorium.java");
         String arcaneWorkbench = read("src/main/java/thaumcraft/client/renderers/tile/TileArcaneWorkbenchRenderer.java");
         String blockstate = read("src/main/resources/assets/thaumcraft/blockstates/blockstonedevice.json");
         String blockModel = read("src/main/resources/assets/thaumcraft/models/block/blockstonedevice_13.json");
@@ -37,6 +38,14 @@ public class TileFocalManipulatorRendererStaticGuardTest {
         assertTrue(thaumatorium.contains("model.renderAll();"));
         assertTrue(thaumatorium.contains("renderItem(output.copy(), ItemCameraTransforms.TransformType.GROUND)"));
         assertTrue(thaumatorium.contains("GlStateManager.scale(0.75F, 0.75F, 0.75F);"));
+        assertTrue(thaumatoriumModel.contains("Wavefront thaumatorium.obj triangles"));
+        assertTrue(thaumatoriumModel.contains("private static final float[][] VERTICES"));
+        assertTrue(thaumatoriumModel.contains("private static final float[][] UVS"));
+        assertTrue(thaumatoriumModel.contains("private static final float[][] NORMALS"));
+        assertTrue(thaumatoriumModel.contains("private static final int[][] TRIANGLES"));
+        assertTrue(thaumatoriumModel.contains("DefaultVertexFormats.POSITION_TEX_NORMAL"));
+        assertTrue(!thaumatoriumModel.contains("extends ModelBase"));
+        assertTrue(!thaumatoriumModel.contains("new ModelRenderer("));
 
         assertTrue(arcaneWorkbench.contains("textures/models/worktable.png"));
         assertTrue(arcaneWorkbench.contains("wand.getItem() instanceof ItemWandCasting"));
