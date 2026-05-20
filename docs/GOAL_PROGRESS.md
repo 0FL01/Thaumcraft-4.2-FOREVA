@@ -73,6 +73,7 @@ See `docs/GOAL_PROGRESS-archive/INDEX.md` for the master index.
 
 ## Next Checkpoint Candidate
 
+- The remaining standalone original custom item renderer gap is no longer `ItemBowBoneRenderer`; bone bow now uses the same builtin/entity + dedicated item-renderer route as the other restored held-item surfaces.
 - Continue grouped Stage 8/9 bursts only where runtime-safe non-GUI validation is available, while keeping remaining Stage 3-7 blockers documented until they block a later burst.
 - Preserve the GUI/manual exclusion marker for any future visual checks.
 
