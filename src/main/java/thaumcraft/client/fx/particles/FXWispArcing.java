@@ -77,7 +77,9 @@ public class FXWispArcing extends Particle {
 
     @Override
     public int getFXLayer() {
-        return this.blendmode == 1 ? 0 : 1;
+        // This particle animates through setParticleTextureIndex(...) on the
+        // misc particle sheet, so it cannot use the terrain-texture layer.
+        return 0;
     }
 
     @Override

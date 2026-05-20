@@ -331,6 +331,7 @@ public class ClientProxyFxStaticGuardTest {
         assertTrue("Dedicated FXWispArcing particle must keep source-target arcing textured baseline",
                 wispArcingFx.contains("class FXWispArcing extends Particle")
                         && wispArcingFx.contains("anchorX")
+                        && wispArcingFx.contains("return 0;")
                         && wispArcingFx.contains("setParticleTextureIndex(240 + (this.particleAge % 2))")
                         && !wispArcingFx.contains("EnumParticleTypes.CRIT_MAGIC"));
         assertTrue("Dedicated FXWispEG particle must keep target-following elder textured baseline",
@@ -338,6 +339,7 @@ public class ClientProxyFxStaticGuardTest {
                         && wispEgFx.contains("this.target")
                         && wispEgFx.contains("setParticleTextureIndex(48 + (this.particleAge % 13))")
                         && wispEgFx.contains("public int getFXLayer()")
+                        && wispEgFx.contains("return 0;")
                         && !wispEgFx.contains("EnumParticleTypes.REDSTONE"));
         assertTrue("Dedicated FXBeamWand/FXBeamBore/FXBeamPower classes must keep extended beam control surface",
                 beamWandFx.contains("class FXBeamWand extends FXBeam")

@@ -150,7 +150,10 @@ public class FXWispEG extends Particle {
 
     @Override
     public int getFXLayer() {
-        return this.blendmode == 1 ? 0 : 1;
+        // FXWispEG also animates against the misc particle sheet with
+        // setParticleTextureIndex(...), so it must not be routed through the
+        // 1.12.2 terrain-texture layer.
+        return 0;
     }
 
     @Override
