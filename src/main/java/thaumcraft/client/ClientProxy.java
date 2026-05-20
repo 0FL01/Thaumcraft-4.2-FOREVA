@@ -29,6 +29,7 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.translation.I18n;
 import net.minecraft.world.World;
@@ -1148,6 +1149,35 @@ public class ClientProxy extends CommonProxy {
                 6,
                 0.5F,
                 8);
+        bolt.defaultFractal();
+        bolt.setType(2);
+        bolt.setWidth(0.125F);
+        bolt.finalizeBolt();
+    }
+
+    @Override
+    public void focusShockBolt(World world, EntityLivingBase source, double tx, double ty, double tz) {
+        if (world == null || !world.isRemote || source == null) return;
+        Minecraft mc = Minecraft.getMinecraft();
+        EntityPlayer clientPlayer = mc == null ? null : mc.player;
+        double sx = source.posX;
+        double sy = source.posY;
+        double sz = source.posZ;
+        if (clientPlayer == null || source.getEntityId() != clientPlayer.getEntityId()) {
+            sy = source.getEntityBoundingBox().minY + source.height * 0.5D + 0.25D;
+        }
+        sx += -MathHelper.cos((float) (source.rotationYaw / 180.0F * Math.PI)) * 0.06F;
+        sy -= 0.06D;
+        sz += -MathHelper.sin((float) (source.rotationYaw / 180.0F * Math.PI)) * 0.06F;
+        if (clientPlayer == null || source.getEntityId() != clientPlayer.getEntityId()) {
+            sy = source.getEntityBoundingBox().minY + source.height * 0.5D + 0.25D;
+        }
+        Vec3d look = source.getLook(1.0F);
+        sx += look.x * 0.3D;
+        sy += look.y * 0.3D;
+        sz += look.z * 0.3D;
+
+        FXLightningBolt bolt = new FXLightningBolt(world, sx, sy, sz, tx, ty, tz, world.rand.nextLong(), 6, 0.5F, 8);
         bolt.defaultFractal();
         bolt.setType(2);
         bolt.setWidth(0.125F);

@@ -175,7 +175,14 @@ public class ClientProxyFxStaticGuardTest {
         assertTrue("CommonProxy must keep no-op side-safe stubs for dedicated sonic/shield rune/zap fx",
                 commonProxy.contains("public void sonicFX(World world, Entity source, int age)")
                         && commonProxy.contains("public void shieldRunesFX(World world, Entity source, int age, float yaw, float pitch)")
-                        && commonProxy.contains("public void zapFX(World world, Entity source, Entity target)"));
+                        && commonProxy.contains("public void zapFX(World world, Entity source, Entity target)")
+                        && commonProxy.contains("public void focusShockBolt(World world, EntityLivingBase source, double tx, double ty, double tz)"));
+        assertTrue("ClientProxy must expose dedicated focusShockBolt helper for local shock-channel feedback",
+                source.contains("public void focusShockBolt(World world, EntityLivingBase source, double tx, double ty, double tz)")
+                        && source.contains("source.getEntityId() != clientPlayer.getEntityId()")
+                        && source.contains("new FXLightningBolt(world, sx, sy, sz, tx, ty, tz, world.rand.nextLong(), 6, 0.5F, 8)")
+                        && source.contains("bolt.setType(2);")
+                        && source.contains("bolt.setWidth(0.125F);"));
         assertTrue("RenderEventHandler must keep scan-state baseline and startScan hook",
                 renderHandler.contains("public static int scanEntityId = -1;")
                         && renderHandler.contains("public static BlockPos scanPos = BlockPos.ORIGIN;")
@@ -492,6 +499,11 @@ public class ClientProxyFxStaticGuardTest {
                 fallingTaint.contains("Thaumcraft.proxy.taintLandFX(this);"));
         assertTrue("FocusShock chain lightning path must send PacketFXZap",
                 focusShock.contains("new PacketFXZap(center.getEntityId(), closest.getEntityId())"));
+        assertTrue("FocusShock client channel branch must restore local sparkle + directed lightning feedback",
+                focusShock.contains("player.rayTrace(20.0D, 1.0F)")
+                        && focusShock.contains("Thaumcraft.proxy.sparkle(")
+                        && focusShock.contains("shootLightning(player.world, player, px, py, pz);")
+                        && focusShock.contains("Thaumcraft.proxy.focusShockBolt(world, entityplayer, tx, ty, tz);"));
         assertTrue("FocusWarding ward/unward paths must send PacketFXBlockSparkle around touched blocks",
                 focusWarding.contains("new PacketFXBlockSparkle(c.x, c.y, c.z, 0xFC9A00)")
                         && focusWarding.contains("PacketHandler.INSTANCE.sendToAllAround(")

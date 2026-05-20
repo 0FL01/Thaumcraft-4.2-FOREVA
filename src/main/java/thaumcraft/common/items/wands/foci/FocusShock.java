@@ -17,6 +17,7 @@ import thaumcraft.api.aspects.Aspect;
 import thaumcraft.api.aspects.AspectList;
 import thaumcraft.api.wands.FocusUpgradeType;
 import thaumcraft.api.wands.ItemFocusBasic;
+import thaumcraft.common.Thaumcraft;
 import thaumcraft.common.entities.projectile.EntityShockOrb;
 import thaumcraft.common.items.wands.ItemWandCasting;
 import thaumcraft.common.items.wands.WandManager;
@@ -92,9 +93,9 @@ public class FocusShock extends ItemFocusBasic {
             player.resetActiveHand();
             return;
         }
+        Entity target = this.getPointedEntity(player.world, player, 20.0D);
         if (!player.world.isRemote && wand.consumeAllVis(wandStack, player, this.getVisCost(focusStack), true, false)) {
             int potency = this.getUpgradeLevel(focusStack, FocusUpgradeType.potency);
-            Entity target = this.getPointedEntity(player.world, player, 20.0D);
             player.playSound(TCSounds.SHOCK, 0.25F, 1.0F);
             if (target instanceof EntityLivingBase && this.canDamageTarget(player, target)) {
                 int chainUpgrade = this.getUpgradeLevel(focusStack, chainlightning);
@@ -102,7 +103,48 @@ public class FocusShock extends ItemFocusBasic {
                 int chains = chainUpgrade * 2 + this.getUpgradeLevel(focusStack, FocusUpgradeType.enlarge) * 2;
                 this.chainLightning(player, (EntityLivingBase) target, potency, chains);
             }
+            return;
         }
+        if (player.world.isRemote) {
+            RayTraceResult hit = player.rayTrace(20.0D, 1.0F);
+            Vec3d look = player.getLook(1.0F);
+            double px = player.posX + look.x * 10.0D;
+            double py = player.posY + look.y * 10.0D;
+            double pz = player.posZ + look.z * 10.0D;
+            if (hit != null && hit.typeOfHit == RayTraceResult.Type.BLOCK && hit.hitVec != null) {
+                px = hit.hitVec.x;
+                py = hit.hitVec.y;
+                pz = hit.hitVec.z;
+                for (int i = 0; i < 5; i++) {
+                    Thaumcraft.proxy.sparkle(
+                            (float) px + (player.world.rand.nextFloat() - player.world.rand.nextFloat()) * 0.3F,
+                            (float) py + (player.world.rand.nextFloat() - player.world.rand.nextFloat()) * 0.3F,
+                            (float) pz + (player.world.rand.nextFloat() - player.world.rand.nextFloat()) * 0.3F,
+                            2.0F + player.world.rand.nextFloat(),
+                            2,
+                            0.05F + player.world.rand.nextFloat() * 0.05F);
+                }
+            }
+            if (target != null) {
+                px = target.posX;
+                py = target.getEntityBoundingBox().minY + target.height * 0.5D;
+                pz = target.posZ;
+                for (int i = 0; i < 5; i++) {
+                    Thaumcraft.proxy.sparkle(
+                            (float) px + (player.world.rand.nextFloat() - player.world.rand.nextFloat()) * 0.6F,
+                            (float) py + (player.world.rand.nextFloat() - player.world.rand.nextFloat()) * 0.6F,
+                            (float) pz + (player.world.rand.nextFloat() - player.world.rand.nextFloat()) * 0.6F,
+                            2.0F + player.world.rand.nextFloat(),
+                            2,
+                            0.05F + player.world.rand.nextFloat() * 0.05F);
+                }
+            }
+            shootLightning(player.world, player, px, py, pz);
+        }
+    }
+
+    public static void shootLightning(World world, EntityLivingBase entityplayer, double tx, double ty, double tz) {
+        Thaumcraft.proxy.focusShockBolt(world, entityplayer, tx, ty, tz);
     }
 
     private boolean canDamageTarget(EntityPlayer player, Entity target) {
