@@ -221,7 +221,10 @@ public class FXWisp extends Particle {
 
     @Override
     public int getFXLayer() {
-        return this.blendmode == 1 ? 0 : 1;
+        // FXWisp still uses the misc particle sheet via setParticleTextureIndex(...).
+        // In 1.12.2, routing this particle to layer 1 makes ParticleManager treat it
+        // as a terrain-texture particle, and setParticleTextureIndex then crashes.
+        return 0;
     }
 
     @Override

@@ -326,6 +326,7 @@ public class ClientProxyFxStaticGuardTest {
                         && wispFx.contains("hasTarget")
                         && wispFx.contains("moteParticleScale")
                         && wispFx.contains("setParticleTextureIndex(240 + (this.particleAge % 2))")
+                        && wispFx.contains("return 0;")
                         && !wispFx.contains("EnumParticleTypes.REDSTONE"));
         assertTrue("Dedicated FXWispArcing particle must keep source-target arcing textured baseline",
                 wispArcingFx.contains("class FXWispArcing extends Particle")
