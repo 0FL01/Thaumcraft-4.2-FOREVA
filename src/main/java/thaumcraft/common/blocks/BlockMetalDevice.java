@@ -60,7 +60,8 @@ public class BlockMetalDevice extends BlockContainer {
     @Override public boolean isFullCube(IBlockState state) { return false; }
     @Override
     public EnumBlockRenderType getRenderType(IBlockState state) {
-        return state.getValue(TYPE) == 1 ? EnumBlockRenderType.INVISIBLE : EnumBlockRenderType.MODEL;
+        int meta = state.getValue(TYPE);
+        return meta == 1 || meta == 10 || meta == 11 ? EnumBlockRenderType.INVISIBLE : EnumBlockRenderType.MODEL;
     }
     @Override public boolean hasTileEntity(IBlockState state) { return true; }
 

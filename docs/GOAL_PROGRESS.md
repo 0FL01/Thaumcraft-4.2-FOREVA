@@ -33,6 +33,7 @@ Branch: `codex/durable-goal-stage8-9`
 - Recent Stage 8-c shell-split follow-ups also moved focal manipulator / flux scrubber, jar family, node-device lock shells, and hungry chest body into block models, leaving TESRs responsible only for dynamic overlays, animation pulses, pistons, bubbles, or lid paths; each checkpoint passed `validate` and `validate --smoke`.
 - Latest follow-ups moved the static advanced alchemy-furnace shell into `blockstonedevice_0`, then restored its TESR panel path toward reference by keeping dedicated tank-frame rendering and atlas-based vis/lava overlays; the same burst also replaced the crucible `blockmetaldevice_0` full-cube placeholder with a shaped basin shell, restored `TileInfusionPillarRenderer`, `ModelThaumatorium`, `ModelAlembic`, `ModelVisRelay`, `ModelNodeStabilizer`, `TileEssentiaCrystalizerRenderer`, and `TileEldritchCrabSpawnerRenderer` to dedicated reference-shaped OBJ/model paths, and converted golem fishing `WATER_SPLASH` send-sites to entity-status-driven `Thaumcraft.proxy.golemFishingSplashFX(...)`; thaumatorium shell split remains deferred because its facing still lives only in tile NBT, not blockstate.
 - Latest common/client follow-up restored `TileJarBrain` client-side rotation/sigh behavior used by `TileJarRenderer`, brought back `EntityPech.handleStatusUpdate(...)` tame/anger feedback via the generic particle path, recovered item-grate open/closed parity in `BlockMetalDevice` with hand/redstone toggles, thin collision, open-item drops, and shaped `blockmetaldevice_5/_6` models, and then restored tile-oriented wooden/metal device routing by pushing bellows / bore base / bore / banner / alembic / charger / vis relay back onto TESR or item-side `builtin/entity` + TEISR paths with reference-shaped `BlockWoodenDevice` bounds; `validate` and `validate --smoke` passed afterward.
+- Latest thaumatorium follow-up routed `blockMetalDevice` metas `10/11` back through TESR-first world/item paths, made `TileThaumatoriumRenderer` item-safe for worldless TEISR shell renders, and replaced the stale `metalbase` fallback textures for `blockmetaldevice_10/_11` with `alchemyblock`; both `validate` and `validate --smoke` passed afterward.
 - Stage 3-7 residual blockers stay documented and non-blocking for current burst planning.
 - GUI/manual parity checks remain skipped by instruction.
 
@@ -61,8 +62,7 @@ Branch: `codex/durable-goal-stage8-9`
 
 ## Archive Index
 
-Archives live in `docs/GOAL_PROGRESS-archive/` with per-source subdirectories.
-Each subdirectory has its own `INDEX.md` for detailed batch listings.
+Archives live in `docs/GOAL_PROGRESS-archive/` with per-source subdirectories; each subdirectory has its own `INDEX.md` for detailed batch listings.
 
 | Source | Directory | Content |
 |---|---|---|

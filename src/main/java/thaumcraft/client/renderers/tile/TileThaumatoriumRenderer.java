@@ -20,11 +20,14 @@ public class TileThaumatoriumRenderer extends TileEntitySpecialRenderer<TileThau
 
     @Override
     public void render(TileThaumatorium tile, double x, double y, double z, float partialTicks, int destroyStage, float alpha) {
-        if (tile == null || tile.getWorld() == null) {
+        if (tile == null) {
             return;
         }
 
         renderThaumatoriumModel(tile, x, y, z);
+        if (tile.getWorld() == null) {
+            return;
+        }
         renderOutputItem(tile, x, y, z, partialTicks);
     }
 
