@@ -21,12 +21,26 @@ public class ClientFxEventLayerStaticGuardTest {
         assertTrue(tickSource.contains("RenderEventHandler.targetBrightness = 1.0F;"));
         assertTrue(tickSource.contains("if (RenderEventHandler.fogFiddled)"));
         assertTrue(tickSource.contains("RenderEventHandler.fogTarget = 0.1F"));
+        assertTrue(tickSource.contains("player.isPotionActive(Config.potionDeathGaze)"));
+        assertTrue(tickSource.contains("player.isPotionActive(Config.potionBlurredVision)"));
+        assertTrue(tickSource.contains("player.isPotionActive(Config.potionUnnaturalHunger)"));
+        assertTrue(tickSource.contains("player.isPotionActive(Config.potionSunScorned)"));
+        assertTrue(tickSource.contains("RenderEventHandler.shaderGroups.containsKey(shaderId)"));
+        assertTrue(tickSource.contains("RenderEventHandler.resetShaders = true;"));
+        assertTrue(tickSource.contains("new ShaderGroup(mc.getTextureManager(), mc.getResourceManager(), mc.getFramebuffer(), shaderResource)"));
+        assertTrue(tickSource.contains("deleteShaderGroup()"));
 
+        assertTrue(renderSource.contains("public static boolean resetShaders = false;"));
+        assertTrue(renderSource.contains("public static HashMap<Integer, ShaderGroup> shaderGroups"));
         assertTrue(renderSource.contains("public static float fogTarget = 0.0F;"));
         assertTrue(renderSource.contains("public static float targetBrightness = 1.0F;"));
         assertTrue(renderSource.contains("textures/misc/vignette.png"));
         assertTrue(renderSource.contains("event.getType() == RenderGameOverlayEvent.ElementType.PORTAL"));
         assertTrue(renderSource.contains("renderVignette(targetBrightness"));
+        assertTrue(renderSource.contains("public void renderShaders(RenderGameOverlayEvent.Pre event)"));
+        assertTrue(renderSource.contains("shaderGroup.render(event.getPartialTicks())"));
+        assertTrue(renderSource.contains("shaderGroup.createBindFramebuffers(mc.displayWidth, mc.displayHeight)"));
+        assertTrue(renderSource.contains("mc.getFramebuffer().bindFramebuffer(true);"));
         assertTrue(renderSource.contains("GL11.glFogf(GL11.GL_FOG_DENSITY, fogTarget);"));
         assertTrue(renderSource.contains("public static void startScan(Entity entity, BlockPos pos, long expireAtMs, int range)"));
         assertTrue(renderSource.contains("scanRange = MathHelper.clamp(range, 0, SCAN_GRID_RADIUS);"));

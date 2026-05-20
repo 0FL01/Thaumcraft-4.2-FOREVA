@@ -1,15 +1,18 @@
 package thaumcraft.client.lib;
 
 import java.awt.Color;
+import java.util.HashMap;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
+import net.minecraft.client.shader.ShaderGroup;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
@@ -31,10 +34,15 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.oredict.OreDictionary;
 import org.lwjgl.opengl.GL11;
 import thaumcraft.api.research.ScanResult;
+import thaumcraft.common.config.Config;
 import thaumcraft.common.lib.research.ScanManager;
 
 @SideOnly(Side.CLIENT)
 public class RenderEventHandler {
+    public static boolean resetShaders = false;
+    private static int oldDisplayWidth = 0;
+    private static int oldDisplayHeight = 0;
+    public static HashMap<Integer, ShaderGroup> shaderGroups = new HashMap<Integer, ShaderGroup>();
     public static boolean fogFiddled = false;
     public static float fogTarget = 0.0F;
     public static int fogDuration = 0;
@@ -84,6 +92,41 @@ public class RenderEventHandler {
                 ScaledResolution resolution = event.getResolution();
                 renderVignette(targetBrightness, resolution.getScaledWidth(), resolution.getScaledHeight());
             }
+        }
+    }
+
+    @SubscribeEvent
+    public void renderShaders(RenderGameOverlayEvent.Pre event) {
+        if (!Config.shaders || event.getType() != RenderGameOverlayEvent.ElementType.ALL || !OpenGlHelper.shadersSupported) {
+            return;
+        }
+        Minecraft mc = Minecraft.getMinecraft();
+        if (mc == null || shaderGroups.isEmpty()) {
+            return;
+        }
+        this.updateShaderFrameBuffers(mc);
+        GL11.glMatrixMode(GL11.GL_TEXTURE);
+        GL11.glLoadIdentity();
+        for (ShaderGroup shaderGroup : shaderGroups.values()) {
+            GL11.glPushMatrix();
+            try {
+                shaderGroup.render(event.getPartialTicks());
+            } catch (Exception ignored) {
+            }
+            GL11.glPopMatrix();
+        }
+        GL11.glMatrixMode(GL11.GL_MODELVIEW);
+        mc.getFramebuffer().bindFramebuffer(true);
+    }
+
+    private void updateShaderFrameBuffers(Minecraft mc) {
+        if (resetShaders || mc.displayWidth != oldDisplayWidth || mc.displayHeight != oldDisplayHeight) {
+            for (ShaderGroup shaderGroup : shaderGroups.values()) {
+                shaderGroup.createBindFramebuffers(mc.displayWidth, mc.displayHeight);
+            }
+            oldDisplayWidth = mc.displayWidth;
+            oldDisplayHeight = mc.displayHeight;
+            resetShaders = false;
         }
     }
 
