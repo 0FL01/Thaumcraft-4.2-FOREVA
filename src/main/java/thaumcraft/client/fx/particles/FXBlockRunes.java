@@ -73,7 +73,6 @@ public class FXBlockRunes extends Particle {
                                float rotationX, float rotationZ, float rotationYZ, float rotationXY, float rotationXZ) {
         Tessellator tessellator = Tessellator.getInstance();
         BufferBuilder buffer = tessellator.getBuffer();
-        tessellator.draw();
 
         float px = (float) (this.prevPosX + (this.posX - this.prevPosX) * partialTicks - Particle.interpPosX);
         float py = (float) (this.prevPosY + (this.posY - this.prevPosY) * partialTicks - Particle.interpPosY);
@@ -99,7 +98,6 @@ public class FXBlockRunes extends Particle {
         tessellator.draw();
 
         GlStateManager.popMatrix();
-        buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.PARTICLE_POSITION_TEX_COLOR_LMAP);
     }
 
     private void addLitVertex(BufferBuilder buffer, double x, double y, double z, double u, double v) {

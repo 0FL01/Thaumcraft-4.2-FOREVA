@@ -186,7 +186,6 @@ public class FXSwarm extends Particle {
                                float rotationXY, float rotationXZ) {
         Tessellator tessellator = Tessellator.getInstance();
         BufferBuilder buffer = tessellator.getBuffer();
-        tessellator.draw();
 
         float bob = MathHelper.sin(this.particleAge / 3.0F) * 0.25F + 1.0F;
         int frame = 7 + this.particleAge % 8;
@@ -216,8 +215,6 @@ public class FXSwarm extends Particle {
         addLitVertex(buffer, px + rotationX * size + rotationXY * size, py + rotationZ * size, pz + rotationYZ * size + rotationXZ * size, u0, v0, red, green, blue, alpha);
         addLitVertex(buffer, px + rotationX * size - rotationXY * size, py - rotationZ * size, pz + rotationYZ * size - rotationXZ * size, u0, v1, red, green, blue, alpha);
         tessellator.draw();
-
-        buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.PARTICLE_POSITION_TEX_COLOR_LMAP);
     }
 
     @Override

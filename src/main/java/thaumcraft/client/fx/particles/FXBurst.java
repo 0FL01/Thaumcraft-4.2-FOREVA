@@ -54,7 +54,6 @@ public class FXBurst extends Particle {
                                float rotationXY, float rotationXZ) {
         Tessellator tessellator = Tessellator.getInstance();
         BufferBuilder buffer = tessellator.getBuffer();
-        tessellator.draw();
 
         float u0 = (this.particleAge % 32) / 32.0F;
         float u1 = u0 + 0.03125F;
@@ -82,9 +81,6 @@ public class FXBurst extends Particle {
         GlStateManager.enableCull();
         GlStateManager.depthMask(true);
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
-
-        Minecraft.getMinecraft().renderEngine.bindTexture(PARTICLE_TEXTURE);
-        buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.PARTICLE_POSITION_TEX_COLOR_LMAP);
     }
 
     private void addLitVertex(BufferBuilder buffer, double x, double y, double z, double u, double v) {

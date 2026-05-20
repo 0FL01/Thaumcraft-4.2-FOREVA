@@ -52,7 +52,6 @@ public class FXSmokeSpiral extends Particle {
                                float rotationX, float rotationZ, float rotationYZ, float rotationXY, float rotationXZ) {
         Tessellator tessellator = Tessellator.getInstance();
         BufferBuilder buffer = tessellator.getBuffer();
-        tessellator.draw();
 
         int particle = 1 + (int) (this.particleAge / (float) this.particleMaxAge * 4.0F);
         float r1 = this.start + 720.0F * ((this.particleAge + partialTicks) / (float) this.particleMaxAge);
@@ -98,7 +97,5 @@ public class FXSmokeSpiral extends Particle {
                 .lightmap(lightU, lightV)
                 .endVertex();
         tessellator.draw();
-
-        buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.PARTICLE_POSITION_TEX_COLOR_LMAP);
     }
 }

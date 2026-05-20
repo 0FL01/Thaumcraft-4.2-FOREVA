@@ -98,7 +98,6 @@ public class FXBreaking extends Particle {
 
         Tessellator tessellator = Tessellator.getInstance();
         BufferBuilder buffer = tessellator.getBuffer();
-        tessellator.draw();
 
         float u0 = this.particleSprite.getInterpolatedU(this.textureJitterX / 4.0F * 16.0F);
         float u1 = this.particleSprite.getInterpolatedU((this.textureJitterX + 1.0F) / 4.0F * 16.0F);
@@ -140,7 +139,6 @@ public class FXBreaking extends Particle {
         tessellator.draw();
 
         Minecraft.getMinecraft().renderEngine.bindTexture(PARTICLE_TEXTURE);
-        buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.PARTICLE_POSITION_TEX_COLOR_LMAP);
     }
 
     @Override
