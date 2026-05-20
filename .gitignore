@@ -1,5 +1,6 @@
 # Compiled Java bytecode (derived from JAR)
 *.class
+logs
 
 # Gradle / Forge workspace
 .gradle/
