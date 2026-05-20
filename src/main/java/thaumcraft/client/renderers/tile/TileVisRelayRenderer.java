@@ -29,7 +29,7 @@ public class TileVisRelayRenderer extends TileEntitySpecialRenderer<TileVisRelay
 
     @Override
     public void render(TileVisRelay tile, double x, double y, double z, float partialTicks, int destroyStage, float alpha) {
-        if (tile == null || tile.getWorld() == null) {
+        if (tile == null) {
             return;
         }
 

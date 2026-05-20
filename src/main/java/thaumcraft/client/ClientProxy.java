@@ -524,6 +524,8 @@ public class ClientProxy extends CommonProxy {
         registerBuiltinItemModel(woodenDeviceItem, 5, "blockwoodendevice_tesr");
         registerBuiltinItemModel(woodenDeviceItem, 8, "blockwoodendevice_tesr");
         registerBuiltinItemModel(metalDeviceItem, 1, "blockmetaldevice_tesr");
+        registerBuiltinItemModel(metalDeviceItem, 2, "blockmetaldevice_tesr");
+        registerBuiltinItemModel(metalDeviceItem, 14, "blockmetaldevice_tesr");
         Item tubeItem = Item.getItemFromBlock(ConfigBlocks.blockTube);
         for (int meta = 0; meta <= 7; meta++) {
             registerBlockItemModel(tubeItem, meta, "type=" + meta);

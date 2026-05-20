@@ -4,21 +4,47 @@ import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.tileentity.TileEntityItemStackRenderer;
 import net.minecraft.item.ItemStack;
 import thaumcraft.client.renderers.tile.TileAlembicRenderer;
+import thaumcraft.client.renderers.tile.TileMagicWorkbenchChargerRenderer;
+import thaumcraft.client.renderers.tile.TileVisRelayRenderer;
 import thaumcraft.common.tiles.TileAlembic;
+import thaumcraft.common.tiles.TileMagicWorkbenchCharger;
+import thaumcraft.common.tiles.TileVisRelay;
 
 public class ItemMetalDeviceRenderer extends TileEntityItemStackRenderer {
 
     private final TileAlembicRenderer alembicRenderer = new TileAlembicRenderer();
+    private final TileMagicWorkbenchChargerRenderer chargerRenderer = new TileMagicWorkbenchChargerRenderer();
+    private final TileVisRelayRenderer relayRenderer = new TileVisRelayRenderer();
 
     @Override
     public void renderByItem(ItemStack stack, float partialTicks) {
-        if (stack == null || stack.isEmpty() || stack.getMetadata() != 1) {
+        if (stack == null || stack.isEmpty()) {
             return;
         }
-        TileAlembic alembic = new TileAlembic();
-        GlStateManager.pushMatrix();
-        GlStateManager.translate(-0.5F, 0.0F, -0.5F);
-        alembicRenderer.render(alembic, 0.0D, 0.0D, 0.0D, partialTicks, 0, 1.0F);
-        GlStateManager.popMatrix();
+        int meta = stack.getMetadata();
+        if (meta == 1) {
+            TileAlembic alembic = new TileAlembic();
+            GlStateManager.pushMatrix();
+            GlStateManager.translate(-0.5F, 0.0F, -0.5F);
+            alembicRenderer.render(alembic, 0.0D, 0.0D, 0.0D, partialTicks, 0, 1.0F);
+            GlStateManager.popMatrix();
+            return;
+        }
+        if (meta == 2) {
+            TileMagicWorkbenchCharger charger = new TileMagicWorkbenchCharger();
+            GlStateManager.pushMatrix();
+            GlStateManager.translate(-0.5F, -0.5F, -0.5F);
+            chargerRenderer.render(charger, 0.0D, 0.0D, 0.0D, partialTicks, 0, 1.0F);
+            GlStateManager.popMatrix();
+            return;
+        }
+        if (meta == 14) {
+            TileVisRelay relay = new TileVisRelay();
+            GlStateManager.pushMatrix();
+            GlStateManager.scale(1.5F, 1.5F, 1.5F);
+            GlStateManager.translate(-0.5F, -0.25F, -0.5F);
+            relayRenderer.render(relay, 0.0D, 0.0D, 0.0D, partialTicks, 0, 1.0F);
+            GlStateManager.popMatrix();
+        }
     }
 }

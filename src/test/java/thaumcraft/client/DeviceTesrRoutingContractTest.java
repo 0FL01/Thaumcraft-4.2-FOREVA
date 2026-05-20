@@ -48,6 +48,8 @@ public class DeviceTesrRoutingContractTest {
                         && clientProxy.contains("registerBuiltinItemModel(woodenDeviceItem, 5, \"blockwoodendevice_tesr\");")
                         && clientProxy.contains("registerBuiltinItemModel(woodenDeviceItem, 8, \"blockwoodendevice_tesr\");")
                         && clientProxy.contains("registerBuiltinItemModel(metalDeviceItem, 1, \"blockmetaldevice_tesr\");")
+                        && clientProxy.contains("registerBuiltinItemModel(metalDeviceItem, 2, \"blockmetaldevice_tesr\");")
+                        && clientProxy.contains("registerBuiltinItemModel(metalDeviceItem, 14, \"blockmetaldevice_tesr\");")
                         && clientProxy.contains("woodenDeviceItem.setTileEntityItemStackRenderer(new ItemWoodenDeviceRenderer());")
                         && clientProxy.contains("metalDeviceItem.setTileEntityItemStackRenderer(new ItemMetalDeviceRenderer());"));
 
@@ -60,7 +62,12 @@ public class DeviceTesrRoutingContractTest {
                         && woodenItemRenderer.contains("GlStateManager.translate(-0.5F, -0.75F, -0.5F);")
                         && woodenItemRenderer.contains("banner.setFacing((byte) 8);")
                         && metalItemRenderer.contains("new TileAlembicRenderer()")
-                        && metalItemRenderer.contains("GlStateManager.translate(-0.5F, 0.0F, -0.5F);"));
+                        && metalItemRenderer.contains("new TileMagicWorkbenchChargerRenderer()")
+                        && metalItemRenderer.contains("new TileVisRelayRenderer()")
+                        && metalItemRenderer.contains("GlStateManager.translate(-0.5F, 0.0F, -0.5F);")
+                        && metalItemRenderer.contains("GlStateManager.translate(-0.5F, -0.5F, -0.5F);")
+                        && metalItemRenderer.contains("GlStateManager.scale(1.5F, 1.5F, 1.5F);")
+                        && metalItemRenderer.contains("GlStateManager.translate(-0.5F, -0.25F, -0.5F);"));
 
         assertTrue("Builtin item model stubs must exist so Forge routes the targeted metadata to TEISR",
                 woodenTesrModel.contains("\"parent\": \"builtin/entity\"")

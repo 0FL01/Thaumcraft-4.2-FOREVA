@@ -27,7 +27,7 @@ public class TileMagicWorkbenchChargerRenderer extends TileEntitySpecialRenderer
 
     @Override
     public void render(TileMagicWorkbenchCharger tile, double x, double y, double z, float partialTicks, int destroyStage, float alpha) {
-        if (tile == null || tile.getWorld() == null) {
+        if (tile == null) {
             return;
         }
 
