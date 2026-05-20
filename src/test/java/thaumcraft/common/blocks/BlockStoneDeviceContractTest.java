@@ -52,6 +52,17 @@ public class BlockStoneDeviceContractTest {
                 source.contains("} else if (meta == 2) {")
                         && source.contains("return 10;")
                         && blockstate.contains("\"type=8\": { \"model\": \"thaumcraft:blockstonedevice_8\" }"));
+
+        assertTrue("pedestal-family bounds should keep the reference outlines and the wand pedestal should retain stepped collision boxes",
+                source.contains("private static final AxisAlignedBB PEDESTAL_AABB = new AxisAlignedBB(0.25D, 0.0D, 0.25D, 0.75D, 0.99D, 0.75D);")
+                        && source.contains("private static final AxisAlignedBB WAND_PEDESTAL_AABB = new AxisAlignedBB(0.25D, 0.0D, 0.25D, 0.75D, 1.0D, 0.75D);")
+                        && source.contains("private static final AxisAlignedBB WAND_FOCUS_AABB = new AxisAlignedBB(0.0625D, 0.0D, 0.0625D, 0.9375D, 0.4375D, 0.9375D);")
+                        && source.contains("case 1:\n                return PEDESTAL_AABB;")
+                        && source.contains("case 5:\n                return WAND_PEDESTAL_AABB;")
+                        && source.contains("case 8:\n                return WAND_FOCUS_AABB;")
+                        && source.contains("addCollisionBoxToList(pos, entityBox, collidingBoxes, WAND_PEDESTAL_BASE_AABB);")
+                        && source.contains("addCollisionBoxToList(pos, entityBox, collidingBoxes, WAND_PEDESTAL_MID_AABB);")
+                        && source.contains("addCollisionBoxToList(pos, entityBox, collidingBoxes, WAND_PEDESTAL_TOP_AABB);"));
     }
 
     private static String read(String path) throws IOException {

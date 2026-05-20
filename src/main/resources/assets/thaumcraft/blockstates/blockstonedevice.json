@@ -1,7 +1,7 @@
 {
   "variants": {
     "type=0": { "model": "thaumcraft:blockstonedevice_0" },
-    "type=1": { "model": "thaumcraft:blockmetaldevice_pedestal" },
+    "type=1": { "model": "thaumcraft:blockstonedevice_1" },
     "type=2": { "model": "thaumcraft:blockstonedevice_arcane" },
     "type=3": { "model": "thaumcraft:blockstonedevice_arcane" },
     "type=4": { "model": "thaumcraft:blockstonedevice_arcane" },

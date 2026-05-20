@@ -8,6 +8,7 @@ import net.minecraft.block.properties.PropertyInteger;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
@@ -33,11 +34,20 @@ import thaumcraft.common.lib.utils.InventoryUtils;
 import thaumcraft.common.tiles.*;
 
 import javax.annotation.Nullable;
+import java.util.List;
 
 public class BlockStoneDevice
 extends BlockContainer {
 
     public static final PropertyInteger TYPE = PropertyInteger.create("type", 0, 14);
+    private static final AxisAlignedBB PEDESTAL_AABB = new AxisAlignedBB(0.25D, 0.0D, 0.25D, 0.75D, 0.99D, 0.75D);
+    private static final AxisAlignedBB WAND_PEDESTAL_AABB = new AxisAlignedBB(0.25D, 0.0D, 0.25D, 0.75D, 1.0D, 0.75D);
+    private static final AxisAlignedBB INFUSION_PILLAR_BASE_AABB = new AxisAlignedBB(0.0D, 0.0D, 0.0D, 1.0D, 0.5D, 1.0D);
+    private static final AxisAlignedBB INFUSION_PILLAR_CAP_AABB = new AxisAlignedBB(0.0D, -1.0D, 0.0D, 1.0D, -0.5D, 1.0D);
+    private static final AxisAlignedBB WAND_FOCUS_AABB = new AxisAlignedBB(0.0625D, 0.0D, 0.0625D, 0.9375D, 0.4375D, 0.9375D);
+    private static final AxisAlignedBB WAND_PEDESTAL_BASE_AABB = new AxisAlignedBB(0.0D, 0.0D, 0.0D, 1.0D, 0.25D, 1.0D);
+    private static final AxisAlignedBB WAND_PEDESTAL_MID_AABB = new AxisAlignedBB(0.125D, 0.25D, 0.125D, 0.875D, 0.5D, 0.875D);
+    private static final AxisAlignedBB WAND_PEDESTAL_TOP_AABB = new AxisAlignedBB(0.25D, 0.5D, 0.25D, 0.75D, 1.0D, 0.75D);
 
     public BlockStoneDevice() {
         super(Material.ROCK);
@@ -243,7 +253,37 @@ extends BlockContainer {
     @Nullable
     @Override
     public AxisAlignedBB getCollisionBoundingBox(IBlockState blockState, IBlockAccess worldIn, BlockPos pos) {
-        return FULL_BLOCK_AABB;
+        return blockState.getValue(TYPE) == 5 ? WAND_PEDESTAL_AABB : FULL_BLOCK_AABB;
+    }
+
+    @Override
+    public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess source, BlockPos pos) {
+        switch (state.getValue(TYPE)) {
+            case 1:
+                return PEDESTAL_AABB;
+            case 3:
+                return INFUSION_PILLAR_BASE_AABB;
+            case 4:
+                return INFUSION_PILLAR_CAP_AABB;
+            case 5:
+                return WAND_PEDESTAL_AABB;
+            case 8:
+                return WAND_FOCUS_AABB;
+            default:
+                return FULL_BLOCK_AABB;
+        }
+    }
+
+    @Override
+    public void addCollisionBoxToList(IBlockState state, World worldIn, BlockPos pos, AxisAlignedBB entityBox,
+                                      List<AxisAlignedBB> collidingBoxes, @Nullable Entity entityIn, boolean isActualState) {
+        if (state.getValue(TYPE) == 5) {
+            addCollisionBoxToList(pos, entityBox, collidingBoxes, WAND_PEDESTAL_BASE_AABB);
+            addCollisionBoxToList(pos, entityBox, collidingBoxes, WAND_PEDESTAL_MID_AABB);
+            addCollisionBoxToList(pos, entityBox, collidingBoxes, WAND_PEDESTAL_TOP_AABB);
+            return;
+        }
+        super.addCollisionBoxToList(state, worldIn, pos, entityBox, collidingBoxes, entityIn, isActualState);
     }
 
     @Override

@@ -1,8 +1,119 @@
 {
-  "parent": "block/cube_bottom_top",
+  "ambientocclusion": false,
   "textures": {
-    "top": "thaumcraft:blocks/wandpedestal_focus_top",
+    "particle": "thaumcraft:blocks/wandpedestal_focus_side",
     "bottom": "thaumcraft:blocks/wandpedestal_focus_bot",
+    "top": "thaumcraft:blocks/wandpedestal_focus_top",
     "side": "thaumcraft:blocks/wandpedestal_focus_side"
-  }
+  },
+  "elements": [
+    {
+      "from": [5, 0, 5],
+      "to": [11, 1, 11],
+      "faces": {
+        "down": { "texture": "#bottom" },
+        "up": { "texture": "#top" },
+        "north": { "texture": "#side" },
+        "south": { "texture": "#side" },
+        "west": { "texture": "#side" },
+        "east": { "texture": "#side" }
+      }
+    },
+    {
+      "from": [1, 0, 7],
+      "to": [5, 1, 9],
+      "faces": {
+        "down": { "texture": "#bottom" },
+        "up": { "texture": "#top" },
+        "north": { "texture": "#side" },
+        "south": { "texture": "#side" },
+        "west": { "texture": "#side" },
+        "east": { "texture": "#side" }
+      }
+    },
+    {
+      "from": [11, 0, 7],
+      "to": [15, 1, 9],
+      "faces": {
+        "down": { "texture": "#bottom" },
+        "up": { "texture": "#top" },
+        "north": { "texture": "#side" },
+        "south": { "texture": "#side" },
+        "west": { "texture": "#side" },
+        "east": { "texture": "#side" }
+      }
+    },
+    {
+      "from": [7, 0, 1],
+      "to": [9, 1, 5],
+      "faces": {
+        "down": { "texture": "#bottom" },
+        "up": { "texture": "#top" },
+        "north": { "texture": "#side" },
+        "south": { "texture": "#side" },
+        "west": { "texture": "#side" },
+        "east": { "texture": "#side" }
+      }
+    },
+    {
+      "from": [7, 0, 11],
+      "to": [9, 1, 15],
+      "faces": {
+        "down": { "texture": "#bottom" },
+        "up": { "texture": "#top" },
+        "north": { "texture": "#side" },
+        "south": { "texture": "#side" },
+        "west": { "texture": "#side" },
+        "east": { "texture": "#side" }
+      }
+    },
+    {
+      "from": [1, 1, 7],
+      "to": [3, 7, 9],
+      "faces": {
+        "down": { "texture": "#bottom" },
+        "up": { "texture": "#top" },
+        "north": { "texture": "#side" },
+        "south": { "texture": "#side" },
+        "west": { "texture": "#side" },
+        "east": { "texture": "#side" }
+      }
+    },
+    {
+      "from": [7, 1, 1],
+      "to": [9, 7, 3],
+      "faces": {
+        "down": { "texture": "#bottom" },
+        "up": { "texture": "#top" },
+        "north": { "texture": "#side" },
+        "south": { "texture": "#side" },
+        "west": { "texture": "#side" },
+        "east": { "texture": "#side" }
+      }
+    },
+    {
+      "from": [13, 1, 7],
+      "to": [15, 7, 9],
+      "faces": {
+        "down": { "texture": "#bottom" },
+        "up": { "texture": "#top" },
+        "north": { "texture": "#side" },
+        "south": { "texture": "#side" },
+        "west": { "texture": "#side" },
+        "east": { "texture": "#side" }
+      }
+    },
+    {
+      "from": [7, 1, 13],
+      "to": [9, 7, 15],
+      "faces": {
+        "down": { "texture": "#bottom" },
+        "up": { "texture": "#top" },
+        "north": { "texture": "#side" },
+        "south": { "texture": "#side" },
+        "west": { "texture": "#side" },
+        "east": { "texture": "#side" }
+      }
+    }
+  ]
 }
