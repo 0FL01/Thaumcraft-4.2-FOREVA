@@ -19,6 +19,7 @@ public class ConfigAspects {
     public static void init() {
         registerVanillaBlocks();
         registerVanillaItems();
+        registerVanillaUtilityAndMechanismTags();
         registerOreDictionary();
         registerThaumcraftAlchemyBaseline();
         registerEntityAspects();
@@ -156,6 +157,47 @@ public class ConfigAspects {
         ThaumcraftApi.registerObjectTag(new ItemStack(Items.PAPER), new AspectList().add(Aspect.TREE, 1).add(Aspect.MIND, 1));
         ThaumcraftApi.registerObjectTag(new ItemStack(Items.FLINT), new AspectList().add(Aspect.EARTH, 1).add(Aspect.TOOL, 1));
         ThaumcraftApi.registerObjectTag(new ItemStack(Items.BUCKET), new AspectList().add(Aspect.METAL, 3).add(Aspect.VOID, 1));
+    }
+
+    private static void registerVanillaUtilityAndMechanismTags() {
+        // Transport, timing, and redstone-adjacent utility items.
+        ThaumcraftApi.registerComplexObjectTag(new ItemStack(Items.BOW), new AspectList().add(Aspect.WEAPON, 1));
+        ThaumcraftApi.registerComplexObjectTag(new ItemStack(Items.CAKE), new AspectList().add(Aspect.CRAFT, 2).add(Aspect.WATER, 2));
+        ThaumcraftApi.registerComplexObjectTag(new ItemStack(Items.MINECART), new AspectList().add(Aspect.MECHANISM, 2).add(Aspect.TRAVEL, 4));
+        ThaumcraftApi.registerComplexObjectTag(new ItemStack(Items.BOAT), new AspectList().add(Aspect.WATER, 4).add(Aspect.TRAVEL, 4));
+        ThaumcraftApi.registerComplexObjectTag(new ItemStack(Items.REPEATER), new AspectList().add(Aspect.MECHANISM, 2));
+        ThaumcraftApi.registerComplexObjectTag(new ItemStack(Items.COMPASS), new AspectList().add(Aspect.SENSES, 2));
+        ThaumcraftApi.registerComplexObjectTag(new ItemStack(Items.CLOCK), new AspectList().add(Aspect.SENSES, 4).add(Aspect.AIR, 4));
+
+        // Mechanism/transport blocks that are central to scan and object-tag parity.
+        ThaumcraftApi.registerComplexObjectTag(new ItemStack(Blocks.DISPENSER), new AspectList().add(Aspect.MECHANISM, 1));
+        ThaumcraftApi.registerComplexObjectTag(new ItemStack(Blocks.RAIL, 1, OreDictionary.WILDCARD_VALUE),
+                new AspectList().add(Aspect.METAL, 1).add(Aspect.TRAVEL, 1));
+        ThaumcraftApi.registerComplexObjectTag(new ItemStack(Blocks.DAYLIGHT_DETECTOR), new AspectList().add(Aspect.SENSES, 4).add(Aspect.MECHANISM, 2).add(Aspect.AIR, 4));
+        ThaumcraftApi.registerComplexObjectTag(new ItemStack(Blocks.REDSTONE_TORCH, 1, OreDictionary.WILDCARD_VALUE),
+                new AspectList().add(Aspect.MECHANISM, 1).add(Aspect.ENERGY, 1));
+        ThaumcraftApi.registerComplexObjectTag(new ItemStack(Blocks.REDSTONE_LAMP, 1, OreDictionary.WILDCARD_VALUE),
+                new AspectList().merge(Aspect.SENSES, 2).merge(Aspect.LIGHT, 3).merge(Aspect.MECHANISM, 3));
+        ThaumcraftApi.registerComplexObjectTag(new ItemStack(Blocks.TORCH, 1, OreDictionary.WILDCARD_VALUE), new AspectList().add(Aspect.LIGHT, 1));
+        ThaumcraftApi.registerComplexObjectTag(new ItemStack(Blocks.FIRE, 1, OreDictionary.WILDCARD_VALUE), new AspectList().add(Aspect.FIRE, 4));
+        ThaumcraftApi.registerObjectTag(new ItemStack(Blocks.CRAFTING_TABLE), new AspectList().add(Aspect.CRAFT, 4));
+        ThaumcraftApi.registerComplexObjectTag(new ItemStack(Blocks.ENCHANTING_TABLE), new AspectList().add(Aspect.AURA, 2).add(Aspect.MAGIC, 2).add(Aspect.EXCHANGE, 2));
+        ThaumcraftApi.registerComplexObjectTag(new ItemStack(Blocks.ANVIL, 1, OreDictionary.WILDCARD_VALUE),
+                new AspectList().add(Aspect.METAL, 64).add(Aspect.CRAFT, 2).add(Aspect.TOOL, 2));
+        ThaumcraftApi.registerComplexObjectTag(new ItemStack(Blocks.PISTON, 1, OreDictionary.WILDCARD_VALUE),
+                new AspectList().add(Aspect.MECHANISM, 2).add(Aspect.MOTION, 4));
+        ThaumcraftApi.registerComplexObjectTag(new ItemStack(Blocks.STICKY_PISTON, 1, OreDictionary.WILDCARD_VALUE),
+                new AspectList().add(Aspect.MECHANISM, 2).add(Aspect.MOTION, 4));
+        ThaumcraftApi.registerComplexObjectTag(new ItemStack(Blocks.ENDER_CHEST, 1, OreDictionary.WILDCARD_VALUE),
+                new AspectList().merge(Aspect.EXCHANGE, 2).merge(Aspect.TRAVEL, 2).merge(Aspect.VOID, 4));
+        ThaumcraftApi.registerComplexObjectTag(new ItemStack(Blocks.HOPPER, 1, OreDictionary.WILDCARD_VALUE),
+                new AspectList().merge(Aspect.MECHANISM, 1).merge(Aspect.EXCHANGE, 1).merge(Aspect.VOID, 1));
+        ThaumcraftApi.registerComplexObjectTag(new ItemStack(Blocks.DROPPER, 1, OreDictionary.WILDCARD_VALUE),
+                new AspectList().merge(Aspect.MECHANISM, 1).merge(Aspect.EXCHANGE, 1).merge(Aspect.VOID, 1));
+        ThaumcraftApi.registerComplexObjectTag(new ItemStack(Blocks.TRAPPED_CHEST, 1, OreDictionary.WILDCARD_VALUE),
+                new AspectList().merge(Aspect.MECHANISM, 1).merge(Aspect.EXCHANGE, 1).merge(Aspect.VOID, 1));
+        ThaumcraftApi.registerObjectTag(new ItemStack(Blocks.BEACON, 1, OreDictionary.WILDCARD_VALUE),
+                new AspectList().merge(Aspect.SENSES, 2).merge(Aspect.LIGHT, 3).merge(Aspect.MECHANISM, 3));
     }
 
     private static void registerOreDictionary() {
