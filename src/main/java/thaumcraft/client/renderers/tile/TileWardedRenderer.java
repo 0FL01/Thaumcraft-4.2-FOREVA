@@ -5,17 +5,21 @@ import java.util.Map;
 import java.util.Objects;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.BlockRendererDispatcher;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.EnumBlockRenderType;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.MathHelper;
 import org.lwjgl.opengl.GL11;
 import thaumcraft.api.wands.ItemFocusBasic;
 import thaumcraft.common.config.ConfigBlocks;
@@ -49,7 +53,12 @@ public class TileWardedRenderer extends TileEntitySpecialRenderer<TileWarded> {
 
     @Override
     public void render(TileWarded tile, double x, double y, double z, float partialTicks, int destroyStage, float alpha) {
-        if (tile == null || tile.getWorld() == null || !isWardingWandHeld()) {
+        if (tile == null || tile.getWorld() == null) {
+            return;
+        }
+
+        renderStoredFacade(tile, x, y, z);
+        if (!isWardingWandHeld()) {
             return;
         }
 
@@ -93,6 +102,38 @@ public class TileWardedRenderer extends TileEntitySpecialRenderer<TileWarded> {
         GlStateManager.disableBlend();
         GlStateManager.enableLighting();
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+        GlStateManager.popMatrix();
+    }
+
+    private void renderStoredFacade(TileWarded tile, double x, double y, double z) {
+        IBlockState storedState = tile.getStoredState();
+        if (storedState.getRenderType() != EnumBlockRenderType.MODEL) {
+            return;
+        }
+
+        BlockRendererDispatcher dispatcher = Minecraft.getMinecraft().getBlockRendererDispatcher();
+        bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
+
+        GlStateManager.pushMatrix();
+        GlStateManager.translate(x, y, z);
+        GlStateManager.disableLighting();
+
+        Tessellator tessellator = Tessellator.getInstance();
+        BufferBuilder buffer = tessellator.getBuffer();
+        buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.BLOCK);
+        buffer.setTranslation(-tile.getPos().getX(), -tile.getPos().getY(), -tile.getPos().getZ());
+        dispatcher.getBlockModelRenderer().renderModel(
+                tile.getWorld(),
+                dispatcher.getModelForState(storedState),
+                storedState,
+                tile.getPos(),
+                buffer,
+                false,
+                MathHelper.getPositionRandom(tile.getPos()));
+        buffer.setTranslation(0.0D, 0.0D, 0.0D);
+        tessellator.draw();
+
+        GlStateManager.enableLighting();
         GlStateManager.popMatrix();
     }
 

@@ -32,6 +32,14 @@ public class WardedHoleRendererFidelityStaticGuardTest {
                 warded.contains("focus instanceof FocusWarding")
                         && warded.contains("isWardingWandHeld()"));
 
+        assertTrue("TileWardedRenderer should render the stored facade through the baked block-model dispatcher before drawing the ward overlay",
+                warded.contains("renderStoredFacade(tile, x, y, z);")
+                        && warded.contains("tile.getStoredState()")
+                        && warded.contains("storedState.getRenderType() != EnumBlockRenderType.MODEL")
+                        && warded.contains("TextureMap.LOCATION_BLOCKS_TEXTURE")
+                        && warded.contains("dispatcher.getBlockModelRenderer().renderModel(")
+                        && warded.contains("MathHelper.getPositionRandom(tile.getPos())"));
+
         assertTrue("TileHoleRenderer should keep layered tunnel routing through the shared helper",
                 hole.contains("LayeredFieldPlaneHelper.renderLayeredFace(")
                         && hole.contains("shouldRenderFace(tile.getPos(), face)"));
