@@ -4,18 +4,30 @@ public class EntityTravelingTrunk extends net.minecraft.entity.EntityLiving impl
 
     private net.minecraft.entity.EntityLivingBase owner;
     public final InventoryTrunk inventory = new InventoryTrunk();
-    private boolean open;
-    private boolean stay;
-    private int upgrade = -1;
-    private int anger;
+    public float lidrot;
+    public float field_768_a;
+    public float field_767_b;
+    private int jumpDelay;
     private int attackCooldown;
     private static final net.minecraft.network.datasync.DataParameter<com.google.common.base.Optional<java.util.UUID>> OWNER_UUID =
         net.minecraft.network.datasync.EntityDataManager.createKey(EntityTravelingTrunk.class, net.minecraft.network.datasync.DataSerializers.OPTIONAL_UNIQUE_ID);
+    private static final net.minecraft.network.datasync.DataParameter<java.lang.Boolean> OPEN =
+        net.minecraft.network.datasync.EntityDataManager.createKey(EntityTravelingTrunk.class, net.minecraft.network.datasync.DataSerializers.BOOLEAN);
+    private static final net.minecraft.network.datasync.DataParameter<java.lang.Boolean> STAY =
+        net.minecraft.network.datasync.EntityDataManager.createKey(EntityTravelingTrunk.class, net.minecraft.network.datasync.DataSerializers.BOOLEAN);
+    private static final net.minecraft.network.datasync.DataParameter<java.lang.Integer> UPGRADE =
+        net.minecraft.network.datasync.EntityDataManager.createKey(EntityTravelingTrunk.class, net.minecraft.network.datasync.DataSerializers.VARINT);
+    private static final net.minecraft.network.datasync.DataParameter<java.lang.Integer> ROWS =
+        net.minecraft.network.datasync.EntityDataManager.createKey(EntityTravelingTrunk.class, net.minecraft.network.datasync.DataSerializers.VARINT);
+    private static final net.minecraft.network.datasync.DataParameter<java.lang.Integer> ANGER =
+        net.minecraft.network.datasync.EntityDataManager.createKey(EntityTravelingTrunk.class, net.minecraft.network.datasync.DataSerializers.VARINT);
 
     public EntityTravelingTrunk(net.minecraft.world.World world) {
         super(world);
         this.isImmuneToFire = true;
         this.enablePersistence();
+        this.jumpDelay = this.rand.nextInt(20) + 10;
+        this.lidrot = 0.0F;
         this.setSize(0.8f, 0.8f);
         this.inventory.setEntity(this);
     }
@@ -24,6 +36,11 @@ public class EntityTravelingTrunk extends net.minecraft.entity.EntityLiving impl
     protected void entityInit() {
         super.entityInit();
         this.dataManager.register(OWNER_UUID, com.google.common.base.Optional.absent());
+        this.dataManager.register(OPEN, false);
+        this.dataManager.register(STAY, false);
+        this.dataManager.register(UPGRADE, -1);
+        this.dataManager.register(ROWS, 3);
+        this.dataManager.register(ANGER, 0);
     }
 
     @Override
@@ -47,8 +64,8 @@ public class EntityTravelingTrunk extends net.minecraft.entity.EntityLiving impl
                 && (this.getUpgrade() == 3 || this.ticksExisted % 50 == 0)) {
             this.heal(1.0F);
         }
-        if (this.anger > 0) {
-            this.anger--;
+        if (this.getAnger() > 0) {
+            this.setAnger(this.getAnger() - 1);
         }
         if (this.attackCooldown > 0) {
             this.attackCooldown--;
@@ -66,29 +83,63 @@ public class EntityTravelingTrunk extends net.minecraft.entity.EntityLiving impl
         }
     }
 
+    @Override
+    public void onUpdate() {
+        boolean wasOnGround = this.onGround;
+        this.field_767_b += (this.field_768_a - this.field_767_b) * 0.5F;
+        super.onUpdate();
+        if (this.world.isRemote) {
+            if (!this.onGround && this.motionY < 0.0D) {
+                this.lidrot += 0.015F;
+            }
+            if ((this.onGround || this.isInWater()) && !this.isOpen()) {
+                this.lidrot -= 0.1F;
+                if (this.lidrot < 0.0F) {
+                    this.lidrot = 0.0F;
+                }
+            }
+            if (this.isOpen()) {
+                this.lidrot += 0.035F;
+            }
+            float limit = this.isOpen() ? 0.5F : 0.2F;
+            if (this.lidrot > limit) {
+                this.lidrot = limit;
+            }
+        }
+        if (this.onGround && !wasOnGround) {
+            this.field_768_a = -0.5F;
+        } else if (!this.onGround && wasOnGround) {
+            this.field_768_a = 1.0F;
+        } else if (this.onGround && (this.motionX * this.motionX + this.motionZ * this.motionZ) > 0.0025D && this.jumpDelay-- <= 0) {
+            this.field_768_a = 0.35F;
+            this.jumpDelay = this.rand.nextInt(10) + 5;
+        }
+        this.field_768_a *= 0.6F;
+    }
+
     private void updateDefensiveTarget(net.minecraft.entity.EntityLivingBase owner) {
         net.minecraft.entity.EntityLivingBase target = this.getAttackTarget();
         if (target != null && (!target.isEntityAlive() || target == owner)) {
             this.setAttackTarget(null);
-            this.anger = 5;
+            this.setAnger(5);
             target = null;
         }
-        if (target != null && this.anger <= 0) {
+        if (target != null && this.getAnger() <= 0) {
             this.setAttackTarget(null);
             target = null;
         }
-        if (!this.getStay() && this.getUpgrade() == 2 && this.anger == 0 && target == null && owner != null) {
+        if (!this.getStay() && this.getUpgrade() == 2 && this.getAnger() == 0 && target == null && owner != null) {
             net.minecraft.entity.EntityLivingBase ownerTarget = owner.getRevengeTarget();
             if (ownerTarget == null && owner instanceof net.minecraft.entity.EntityLiving) {
                 ownerTarget = ((net.minecraft.entity.EntityLiving) owner).getAttackTarget();
             }
             if (this.isValidDefensiveTarget(owner, ownerTarget)) {
-                this.anger = 600;
+                this.setAnger(600);
                 this.setAttackTarget(ownerTarget);
                 target = ownerTarget;
             }
         }
-        if (this.anger > 0 && target != null && target.isEntityAlive() && target != owner) {
+        if (this.getAnger() > 0 && target != null && target.isEntityAlive() && target != owner) {
             this.faceEntity(target, 10.0F, 20.0F);
             this.getNavigator().tryMoveToEntityLiving(target, 0.6D);
             if (this.attackCooldown <= 0 && this.getDistance(target) < 1.5F
@@ -179,39 +230,52 @@ public class EntityTravelingTrunk extends net.minecraft.entity.EntityLiving impl
     }
 
     public int getUpgrade() {
-        return this.upgrade;
+        return this.dataManager.get(UPGRADE);
     }
 
     public void setUpgrade(int upgrade) {
-        this.upgrade = upgrade;
+        this.dataManager.set(UPGRADE, upgrade);
     }
 
     public void setInvSize() {
-        this.inventory.setSlotCount(this.upgrade == 1 ? 36 : 27);
+        this.setRows(this.getUpgrade() == 1 ? 4 : 3);
+        this.inventory.setSlotCount(this.getRows() * 9);
     }
 
     public int getRows() {
-        return Math.max(1, Math.min(4, (this.inventory.getSizeInventory() + 8) / 9));
+        return this.dataManager.get(ROWS);
+    }
+
+    public void setRows(int rows) {
+        this.dataManager.set(ROWS, Math.max(1, Math.min(4, rows)));
     }
 
     public void setOpen(boolean open) {
-        this.open = open;
+        this.dataManager.set(OPEN, open);
     }
 
     public boolean getOpen() {
-        return this.open;
+        return this.isOpen();
+    }
+
+    public boolean isOpen() {
+        return this.dataManager.get(OPEN);
     }
 
     public void setStay(boolean stay) {
-        this.stay = stay;
+        this.dataManager.set(STAY, stay);
     }
 
     public boolean getStay() {
-        return this.stay;
+        return this.dataManager.get(STAY);
     }
 
     public int getAnger() {
-        return this.anger;
+        return this.dataManager.get(ANGER);
+    }
+
+    public void setAnger(int anger) {
+        this.dataManager.set(ANGER, anger);
     }
 
     @Override
@@ -321,7 +385,7 @@ public class EntityTravelingTrunk extends net.minecraft.entity.EntityLiving impl
     @Override
     public void handleStatusUpdate(byte id) {
         if (id == 17 || id == 18) {
-            this.open = true;
+            this.lidrot = 0.15F;
         } else {
             super.handleStatusUpdate(id);
         }
@@ -330,8 +394,8 @@ public class EntityTravelingTrunk extends net.minecraft.entity.EntityLiving impl
     @Override
     public void readEntityFromNBT(net.minecraft.nbt.NBTTagCompound compound) {
         super.readEntityFromNBT(compound);
-        this.stay = compound.getBoolean("Stay");
-        this.upgrade = compound.hasKey("upgrade") ? compound.getByte("upgrade") : -1;
+        this.setStay(compound.getBoolean("Stay"));
+        this.setUpgrade(compound.hasKey("upgrade") ? compound.getByte("upgrade") : -1);
         if (compound.hasUniqueId("OwnerUUID")) {
             this.setOwnerId(compound.getUniqueId("OwnerUUID"));
         }
@@ -343,8 +407,8 @@ public class EntityTravelingTrunk extends net.minecraft.entity.EntityLiving impl
     @Override
     public void writeEntityToNBT(net.minecraft.nbt.NBTTagCompound compound) {
         super.writeEntityToNBT(compound);
-        compound.setBoolean("Stay", this.stay);
-        compound.setByte("upgrade", (byte) this.upgrade);
+        compound.setBoolean("Stay", this.getStay());
+        compound.setByte("upgrade", (byte) this.getUpgrade());
         java.util.UUID ownerId = this.getOwnerId();
         if (ownerId != null) {
             compound.setUniqueId("OwnerUUID", ownerId);
