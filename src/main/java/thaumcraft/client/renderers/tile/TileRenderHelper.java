@@ -1,5 +1,6 @@
 package thaumcraft.client.renderers.tile;
 
+import java.awt.Color;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
@@ -8,15 +9,20 @@ import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.block.model.ItemCameraTransforms;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
+import net.minecraft.entity.item.EntityItem;
 import net.minecraft.item.ItemStack;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
-import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import org.lwjgl.opengl.GL11;
+import thaumcraft.common.config.Config;
 
 final class TileRenderHelper {
+    private static final ResourceLocation WISPY_TEXTURE =
+            new ResourceLocation("thaumcraft", "textures/misc/wispy.png");
 
     private TileRenderHelper() {}
 
@@ -36,6 +42,22 @@ final class TileRenderHelper {
         Minecraft.getMinecraft().getRenderItem().renderItem(stack, ItemCameraTransforms.TransformType.GROUND);
         RenderHelper.disableStandardItemLighting();
         GlStateManager.popMatrix();
+    }
+
+    static void renderEntityItem(World world, ItemStack stack, float hoverStart) {
+        if (world == null || stack == null || stack.isEmpty()) {
+            return;
+        }
+        RenderManager renderManager = Minecraft.getMinecraft().getRenderManager();
+        if (renderManager == null) {
+            return;
+        }
+
+        ItemStack renderStack = stack.copy();
+        renderStack.setCount(1);
+        EntityItem entity = new EntityItem(world, 0.0D, 0.0D, 0.0D, renderStack);
+        entity.hoverStart = hoverStart;
+        renderManager.renderEntity(entity, 0.0D, 0.0D, 0.0D, 0.0F, 0.0F, false);
     }
 
     static void orientBillboardToPlayer() {
@@ -145,6 +167,85 @@ final class TileRenderHelper {
         buf.pos(ex, ey, ez).color(r, g, b, alphaEnd).endVertex();
         tess.draw();
         GlStateManager.glLineWidth(1.0F);
+    }
+
+    static void drawWispyLine(double sx, double sy, double sz,
+                              double ex, double ey, double ez,
+                              int color, float time, float speed, float distance, float width) {
+        if (distance <= 0.0F) {
+            return;
+        }
+
+        double dx = sx - ex;
+        double dy = sy - ey;
+        double dz = sz - ez;
+        float dist = MathHelper.sqrt(dx * dx + dy * dy + dz * dz);
+        float blocks = Math.round(dist);
+        float length = Math.max(1.0F, blocks * (Config.golemLinkQuality / 2.0F));
+        Color tint = new Color(color);
+        float red = tint.getRed() / 255.0F;
+        float green = tint.getGreen() / 255.0F;
+        float blue = tint.getBlue() / 255.0F;
+
+        Minecraft.getMinecraft().getTextureManager().bindTexture(WISPY_TEXTURE);
+        GlStateManager.enableBlend();
+        GlStateManager.blendFunc(770, 771);
+        GlStateManager.disableLighting();
+        GlStateManager.disableCull();
+        GlStateManager.depthMask(false);
+
+        drawWispyStrip(sx, sy, sz, ex, ey, ez, dist, length, time, red, green, blue, speed, distance, width, true);
+        drawWispyStrip(sx, sy, sz, ex, ey, ez, dist, length, time, red, green, blue, speed, distance, width, false);
+
+        GlStateManager.depthMask(true);
+        GlStateManager.enableCull();
+        GlStateManager.enableLighting();
+        GlStateManager.disableBlend();
+    }
+
+    private static void drawWispyStrip(double sx, double sy, double sz,
+                                       double ex, double ey, double ez,
+                                       float dist, float length, float time,
+                                       float red, float green, float blue,
+                                       float speed, float distance, float width,
+                                       boolean vertical) {
+        double deltaX = sx - ex;
+        double deltaY = sy - ey;
+        double deltaZ = sz - ez;
+        Tessellator tessellator = Tessellator.getInstance();
+        BufferBuilder buffer = tessellator.getBuffer();
+        buffer.begin(GL11.GL_TRIANGLE_STRIP, DefaultVertexFormats.POSITION_TEX_COLOR);
+
+        int maxSegment = Math.max(1, (int) (length * distance));
+        for (int i = 0; i <= maxSegment; i++) {
+            float beamPos = i / length;
+            float centerWeight = 1.0F - Math.abs(i - length / 2.0F) / (length / 2.0F);
+            centerWeight = Math.max(0.0F, centerWeight);
+            double waveX = MathHelper.sin((float) ((sz % 16.0D + dist * (1.0F - beamPos) * Config.golemLinkQuality / 2.0F
+                    - (time % 32767.0F / 5.0F)) / 4.0D)) * 0.5F * centerWeight;
+            double waveY = MathHelper.sin((float) ((sx % 16.0D + dist * (1.0F - beamPos) * Config.golemLinkQuality / 2.0F
+                    - (time % 32767.0F / 5.0F)) / 3.0D)) * 0.5F * centerWeight;
+            double waveZ = MathHelper.sin((float) ((sy % 16.0D + dist * (1.0F - beamPos) * Config.golemLinkQuality / 2.0F
+                    - (time % 32767.0F / 5.0F)) / 2.0D)) * 0.5F * centerWeight;
+            double beamX = deltaX + waveX;
+            double beamY = deltaY + waveY;
+            double beamZ = deltaZ + waveZ;
+            float texU = (1.0F - beamPos) * dist - time * speed;
+
+            if (vertical) {
+                buffer.pos(ex + beamX * beamPos, ey + beamY * beamPos - width, ez + beamZ * beamPos)
+                        .tex(texU, 1.0F).color(red, green, blue, 0.8F).endVertex();
+                buffer.pos(ex + beamX * beamPos, ey + beamY * beamPos + width, ez + beamZ * beamPos)
+                        .tex(texU, 0.0F).color(red, green, blue, 0.8F).endVertex();
+            } else {
+                buffer.pos(ex + beamX * beamPos - width, ey + beamY * beamPos, ez + beamZ * beamPos)
+                        .tex(texU, 1.0F).color(red, green, blue, 0.8F).endVertex();
+                buffer.pos(ex + beamX * beamPos + width, ey + beamY * beamPos, ez + beamZ * beamPos)
+                        .tex(texU, 0.0F).color(red, green, blue, 0.8F).endVertex();
+            }
+        }
+
+        tessellator.draw();
     }
 
     static float clamp01(float value) {

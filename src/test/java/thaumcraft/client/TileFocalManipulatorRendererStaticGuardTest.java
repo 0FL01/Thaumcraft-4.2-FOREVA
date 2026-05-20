@@ -47,10 +47,10 @@ public class TileFocalManipulatorRendererStaticGuardTest {
         assertTrue(!thaumatoriumModel.contains("extends ModelBase"));
         assertTrue(!thaumatoriumModel.contains("new ModelRenderer("));
 
-        assertTrue(arcaneWorkbench.contains("textures/models/worktable.png"));
         assertTrue(arcaneWorkbench.contains("wand.getItem() instanceof ItemWandCasting"));
-        assertTrue(arcaneWorkbench.contains("renderItem(wand.copy(), ItemCameraTransforms.TransformType.GROUND)"));
+        assertTrue(arcaneWorkbench.contains("TileRenderHelper.renderEntityItem(tile.getWorld(), wand, 0.0F);"));
         assertTrue(arcaneWorkbench.contains("GlStateManager.scale(0.60F, 0.60F, 0.60F);"));
+        assertTrue(!arcaneWorkbench.contains("tableModel.renderAll(MODEL_SCALE);"));
     }
 
     private static String read(String path) throws IOException {

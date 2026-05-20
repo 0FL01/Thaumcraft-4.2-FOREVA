@@ -21,7 +21,7 @@ public class PedestalRendererFidelityStaticGuardTest {
                 pedestal.contains("MathHelper.sin((ticks % 32767.0F) / 16.0F) * 0.05F")
                         && pedestal.contains("GlStateManager.rotate(ticks % 360.0F, 0.0F, 1.0F, 0.0F);")
                         && pedestal.contains("stack.getItem() instanceof ItemBlock ? 2.0F : 1.0F")
-                        && pedestal.contains("renderItem(stack.copy(), ItemCameraTransforms.TransformType.GROUND)")
+                        && pedestal.contains("TileRenderHelper.renderEntityItem(tile.getWorld(), stack, 0.0F);")
                         && pedestal.contains("if (!Minecraft.isFancyGraphicsEnabled())"));
         assertFalse("TilePedestalRenderer should not regress to generic floating helper path",
                 pedestal.contains("TileRenderHelper.renderFloatingItem("));
@@ -29,7 +29,8 @@ public class PedestalRendererFidelityStaticGuardTest {
         assertTrue("TileWandPedestalRenderer should keep explicit reference bob/rotate item path",
                 wandPedestal.contains("MathHelper.sin((ticks % 32767.0F) / 16.0F) * 0.05F")
                         && wandPedestal.contains("GlStateManager.rotate(ticks % 360.0F, 0.0F, 1.0F, 0.0F);")
-                        && wandPedestal.contains("renderItem(stack.copy(), ItemCameraTransforms.TransformType.GROUND)"));
+                        && wandPedestal.contains("TileRenderHelper.renderEntityItem(tile.getWorld(), stack, 0.0F);")
+                        && wandPedestal.contains("TileRenderHelper.drawWispyLine("));
         assertFalse("TileWandPedestalRenderer should not use block-only item scaling",
                 wandPedestal.contains("instanceof ItemBlock"));
     }

@@ -28,7 +28,7 @@ public class TileWandPedestalDrainContractsStaticGuardTest {
         assertTrue(tileSource.contains("private void findNodes()"));
 
         assertTrue(rendererSource.contains("if (!stack.isEmpty() && tile.draining)"));
-        assertTrue(rendererSource.contains("TileRenderHelper.drawAdditiveLine("));
+        assertTrue(rendererSource.contains("TileRenderHelper.drawWispyLine("));
     }
 
     private static String read(String path) throws IOException {

@@ -2,8 +2,6 @@ package thaumcraft.client.renderers.tile;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.RenderHelper;
-import net.minecraft.client.renderer.block.model.ItemCameraTransforms;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
@@ -30,15 +28,11 @@ public class TilePedestalRenderer extends TileEntitySpecialRenderer<TilePedestal
         GlStateManager.translate(x + 0.5D, y + 1.15D + bob, z + 0.5D);
         GlStateManager.rotate(ticks % 360.0F, 0.0F, 1.0F, 0.0F);
         GlStateManager.scale(scale, scale, scale);
-        RenderHelper.enableStandardItemLighting();
-        net.minecraft.client.Minecraft.getMinecraft().getRenderItem()
-                .renderItem(stack.copy(), ItemCameraTransforms.TransformType.GROUND);
+        TileRenderHelper.renderEntityItem(tile.getWorld(), stack, 0.0F);
         if (!Minecraft.isFancyGraphicsEnabled()) {
             GlStateManager.rotate(180.0F, 0.0F, 1.0F, 0.0F);
-            net.minecraft.client.Minecraft.getMinecraft().getRenderItem()
-                    .renderItem(stack.copy(), ItemCameraTransforms.TransformType.GROUND);
+            TileRenderHelper.renderEntityItem(tile.getWorld(), stack, 0.0F);
         }
-        RenderHelper.disableStandardItemLighting();
         GlStateManager.popMatrix();
     }
 }

@@ -1,9 +1,7 @@
 package thaumcraft.client.renderers.tile;
 
 import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
-import net.minecraft.client.renderer.block.model.ItemCameraTransforms;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.MathHelper;
 import thaumcraft.common.tiles.TileWandPedestal;
@@ -23,9 +21,7 @@ public class TileWandPedestalRenderer extends TileEntitySpecialRenderer<TileWand
             GlStateManager.pushMatrix();
             GlStateManager.translate(x + 0.5D, y + 1.15D + bob, z + 0.5D);
             GlStateManager.rotate(ticks % 360.0F, 0.0F, 1.0F, 0.0F);
-            RenderHelper.enableStandardItemLighting();
-            net.minecraft.client.Minecraft.getMinecraft().getRenderItem().renderItem(stack.copy(), ItemCameraTransforms.TransformType.GROUND);
-            RenderHelper.disableStandardItemLighting();
+            TileRenderHelper.renderEntityItem(tile.getWorld(), stack, 0.0F);
             GlStateManager.popMatrix();
         }
 
@@ -40,12 +36,7 @@ public class TileWandPedestalRenderer extends TileEntitySpecialRenderer<TileWand
             double ez = z + 0.5D + (tile.drainZ - tile.getPos().getZ());
 
             GlStateManager.pushMatrix();
-            GlStateManager.disableLighting();
-            GlStateManager.enableBlend();
-            GlStateManager.blendFunc(770, 1);
-            TileRenderHelper.drawAdditiveLine(sx, sy, sz, ex, ey, ez, tile.drainColor, 0.9F, 0.1F, 2.0F);
-            GlStateManager.disableBlend();
-            GlStateManager.enableLighting();
+            TileRenderHelper.drawWispyLine(sx, sy, sz, ex, ey, ez, tile.drainColor, ticks, -0.02F, Math.min(ticks, 10.0F) / 10.0F, 0.25F);
             GlStateManager.popMatrix();
         }
     }

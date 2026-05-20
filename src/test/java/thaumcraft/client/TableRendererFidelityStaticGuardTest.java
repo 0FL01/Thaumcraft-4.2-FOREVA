@@ -39,17 +39,17 @@ public class TableRendererFidelityStaticGuardTest {
                         && !tableRenderer.contains("TileRenderHelper.orientBillboardToPlayer();"));
 
         assertTrue("TileDeconstructionTableRenderer should keep thaumometer/input/aspect overlays after the static shell moved into the block model",
-                deconRenderer.contains("new ModelArcaneWorkbench()")
-                        && deconRenderer.contains("renderThaumometer")
+                deconRenderer.contains("renderThaumometer")
                         && deconRenderer.contains("renderItemGround")
                         && deconRenderer.contains("tile.aspect.getImage()")
+                        && deconRenderer.contains("TileRenderHelper.renderEntityItem(")
                         && !deconRenderer.contains("renderTableModel")
                         && !deconRenderer.contains("tableModel.renderAll(MODEL_SCALE);")
                         && !deconRenderer.contains("renderPlate("));
 
         assertTrue("TileArcaneWorkbenchRenderer should keep only the wand overlay after the static shell moved into the block model",
                 arcaneWorkbenchRenderer.contains("wand.getItem() instanceof ItemWandCasting")
-                        && arcaneWorkbenchRenderer.contains("renderItem(wand.copy(), ItemCameraTransforms.TransformType.GROUND)")
+                        && arcaneWorkbenchRenderer.contains("TileRenderHelper.renderEntityItem(tile.getWorld(), wand, 0.0F);")
                         && !arcaneWorkbenchRenderer.contains("renderTableModel")
                         && !arcaneWorkbenchRenderer.contains("tableModel.renderAll(MODEL_SCALE);"));
 

@@ -1,23 +1,13 @@
 package thaumcraft.client.renderers.tile;
 
 import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.RenderHelper;
-import net.minecraft.client.renderer.block.model.ItemCameraTransforms;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.ResourceLocation;
-import thaumcraft.client.renderers.models.ModelArcaneWorkbench;
 import thaumcraft.common.config.ConfigItems;
 import thaumcraft.common.tiles.TileDeconstructionTable;
 
 public class TileDeconstructionTableRenderer extends TileEntitySpecialRenderer<TileDeconstructionTable> {
-    private static final ResourceLocation TABLE_TEXTURE =
-            new ResourceLocation("thaumcraft", "textures/models/decontable.png");
-    private static final float MODEL_SCALE = 0.0625F;
-
-    private final ModelArcaneWorkbench tableModel = new ModelArcaneWorkbench();
-
     @Override
     public void render(TileDeconstructionTable tile, double x, double y, double z, float partialTicks, int destroyStage, float alpha) {
         if (tile == null || tile.getWorld() == null) {
@@ -67,19 +57,18 @@ public class TileDeconstructionTableRenderer extends TileEntitySpecialRenderer<T
         if (thaumometer.isEmpty()) return;
         GlStateManager.pushMatrix();
         GlStateManager.translate(x + 0.5D, y + 0.92D, z + 0.5D);
-        renderItemGround(thaumometer, 0.8F);
+        GlStateManager.scale(0.8F, 0.8F, 0.8F);
+        TileRenderHelper.renderEntityItem(this.getWorld(), thaumometer, 0.0F);
         GlStateManager.popMatrix();
     }
 
-    private static void renderItemGround(ItemStack stack, float scale) {
+    private void renderItemGround(ItemStack stack, float scale) {
         if (stack.isEmpty()) {
             return;
         }
         GlStateManager.pushMatrix();
         GlStateManager.scale(scale, scale, scale);
-        RenderHelper.enableStandardItemLighting();
-        net.minecraft.client.Minecraft.getMinecraft().getRenderItem().renderItem(stack, ItemCameraTransforms.TransformType.GROUND);
-        RenderHelper.disableStandardItemLighting();
+        TileRenderHelper.renderEntityItem(this.getWorld(), stack, 0.0F);
         GlStateManager.popMatrix();
     }
 }
