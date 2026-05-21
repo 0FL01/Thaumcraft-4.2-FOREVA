@@ -21,8 +21,13 @@ public class ItemThaumometerStaticGuardTest {
                         && source.contains("public EnumAction getItemUseAction(ItemStack stack)")
                         && source.contains("return EnumAction.NONE;"));
         assertTrue("Thaumometer must keep start-scan capture on right-click and active-hand use flow",
-                source.contains("this.startScan = doScan(stack, world, player);")
+                source.contains("this.startScan = doActiveScan(stack, world, player, true);")
                         && source.contains("player.setActiveHand(hand);"));
+        assertTrue("Thaumometer active scanning should validate aspect prerequisites once per attempt and keep later use-ticks notification-free",
+                source.contains("private ScanResult doActiveScan(ItemStack stack, World world, EntityPlayer player, boolean notifyInvalid)")
+                        && source.contains("if (notifyInvalid) {")
+                        && source.contains("ScanManager.notifyInvalidScan(aspects, player);")
+                        && source.contains("ScanResult current = doActiveScan(stack, world, player, false);"));
         assertTrue("Thaumometer must keep client completion and packet send path",
                 source.contains("if (this.startScan != null && current != null && current.equals(this.startScan))")
                         && 

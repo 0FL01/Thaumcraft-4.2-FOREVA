@@ -61,7 +61,7 @@ public class ItemThaumometer extends Item {
     public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer player, EnumHand hand) {
         ItemStack stack = player.getHeldItem(hand);
         if (world.isRemote) {
-            this.startScan = doScan(stack, world, player);
+            this.startScan = doActiveScan(stack, world, player, true);
         }
         player.setActiveHand(hand);
         return new ActionResult<>(EnumActionResult.SUCCESS, stack);
@@ -78,7 +78,7 @@ public class ItemThaumometer extends Item {
             return;
         }
 
-        ScanResult current = doScan(stack, world, player);
+        ScanResult current = doActiveScan(stack, world, player, false);
         if (this.startScan != null && current != null && current.equals(this.startScan)) {
             if (count <= 5) {
                 this.startScan = null;
@@ -101,9 +101,16 @@ public class ItemThaumometer extends Item {
         this.startScan = null;
     }
 
-    private ScanResult doScan(ItemStack stack, World world, EntityPlayer player) {
+    private ScanResult doActiveScan(ItemStack stack, World world, EntityPlayer player, boolean notifyInvalid) {
         ScanResult result = this.findRawScanTarget(stack, world, player);
-        if (!ScanManager.isValidScanTarget(player, result, "@")) {
+        if (result == null || !ScanManager.isValidScanTarget(player, result, "@")) {
+            return null;
+        }
+        thaumcraft.api.aspects.AspectList aspects = ScanManager.getScanAspects(result, world);
+        if (!ScanManager.validScan(aspects, player)) {
+            if (notifyInvalid) {
+                ScanManager.notifyInvalidScan(aspects, player);
+            }
             return null;
         }
         this.showScanFeedback(world, player, result);

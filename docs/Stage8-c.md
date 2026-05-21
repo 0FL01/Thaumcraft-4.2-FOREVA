@@ -200,6 +200,22 @@ Current source tree has no `thaumcraft.client.renderers.tile`, no `thaumcraft.cl
 - The current likely cause is the fallback in [ItemThaumometer.java](/home/opencode/ai/Thaumcraft-4.2-FOREVA/src/main/java/thaumcraft/common/items/relics/ItemThaumometer.java), where `findRawScanTarget(...)` falls through to `ThaumcraftApi.scanEventhandlers`. The bundled [ScanManager.java](/home/opencode/ai/Thaumcraft-4.2-FOREVA/src/main/java/thaumcraft/common/lib/research/ScanManager.java) implements `IScanEventHandler` by scanning the held stack itself, so passive HUD/readout routes can end up validating the thaumometer item as a scan candidate and emitting `tc.discoveryerror` repeatedly.
 - That issue should be fixed in the scan/HUD checkpoint by splitting passive readout target selection from active scan completion semantics, not by reintroducing renderer-local target logic.
 
+### Checkpoint 2026-05-21 — held HUD plane and edge-trigger scan hints
+
+Статус: implemented, static-guarded, `validate --smoke` passed.
+
+Что скорректировано:
+
+- [ItemThaumometerRenderer.java](/home/opencode/ai/Thaumcraft-4.2-FOREVA/src/main/java/thaumcraft/client/renderers/item/ItemThaumometerRenderer.java) now renders the aspect/title readout inside the same translated and rotated matrix stack as `scanscreen.png`, matching the original TC4.2 screen-plane route instead of drawing HUD content back at the scanner origin.
+- [ItemThaumometer.java](/home/opencode/ai/Thaumcraft-4.2-FOREVA/src/main/java/thaumcraft/common/items/relics/ItemThaumometer.java) now splits active scan validation from passive readout: right-click capture uses an explicit `doActiveScan(..., true)` attempt route, while follow-up use ticks revalidate with `notifyInvalid=false` so discovery-error/unknown-object hints do not spam every tick.
+- [ScanManager.java](/home/opencode/ai/Thaumcraft-4.2-FOREVA/src/main/java/thaumcraft/common/lib/research/ScanManager.java) now keeps `validScan(...)` as a pure predicate and moves client hint emission into explicit `notifyInvalidScan(...)`, called only from the attempt-level thaumometer route.
+
+Проверки:
+
+- `./scripts/dev.sh compileJava` — passed.
+- `./scripts/dev.sh gradle test --rerun-tasks --tests thaumcraft.client.ThaumometerItemRendererContractTest --tests thaumcraft.common.items.relics.ItemThaumometerStaticGuardTest --tests thaumcraft.common.lib.research.ScanManagerThaumometerNotificationStaticGuardTest --tests thaumcraft.common.lib.research.ScanManagerValidScanRuntimeTest --tests thaumcraft.common.lib.network.playerdata.PacketScannedAuthorityRuntimeTest` — passed.
+- `./scripts/dev.sh validate --smoke` — passed.
+
 Проверки:
 
 - `./scripts/dev.sh compileJava` — passed.

@@ -37,7 +37,7 @@ public class ThaumometerItemRendererContractTest {
                         && perspectiveModel.contains("delegate.handlePerspective(cameraTransformType)")
                         && perspectiveModel.contains("delegatePerspective.getRight()"));
 
-        assertTrue("ItemThaumometerRenderer should restore the scanner OBJ render path, keep the TC6 mesh basis adapter, and render the HUD on top of donor item transforms instead of replacing the first-person pose",
+        assertTrue("ItemThaumometerRenderer should restore the scanner OBJ render path, keep the TC6 mesh basis adapter, and reattach the HUD to the scanner-screen transform plane",
                 renderer.contains("extends TileEntityItemStackRenderer")
                         && renderer.contains("textures/models/scanner.obj")
                         && renderer.contains("textures/models/scanner.png")
@@ -51,7 +51,12 @@ public class ThaumometerItemRendererContractTest {
                         && renderer.contains("ItemThaumometer")
                         && renderer.contains("findRawScanTarget(stack, player.world, player)")
                         && renderer.contains("UtilsFX.drawTag(")
-                        && renderer.contains("if (isFirstPerson(transformType) && player != null && mc.gameSettings.thirdPersonView == 0)")
+                        && renderer.contains("renderScannerDisplay(mc, stack, player, transformType);")
+                        && renderer.contains("GlStateManager.translate(0.0F, 0.11F, 0.0F);")
+                        && renderer.contains("GlStateManager.rotate(90.0F, 1.0F, 0.0F, 0.0F);")
+                        && renderer.contains("GlStateManager.rotate(90.0F, 0.0F, 0.0F, 1.0F);")
+                        && renderer.contains("if (isFirstPerson(transformType) && player != null && mc.gameSettings.thirdPersonView == 0) {")
+                        && renderer.contains("renderScanReadout(mc, stack, player);")
                         && renderer.contains("GlStateManager.scale(0.0075F, 0.0075F, 0.0075F);")
                         && renderer.contains("GlStateManager.translate(0.0F, -0.25F, 0.0F);")
                         && renderer.contains("scale -= 0.000025F * (titleWidth - 90);"));

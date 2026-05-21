@@ -261,36 +261,45 @@ public class ScanManager implements IScanEventHandler {
 
     public static boolean validScan(AspectList aspects, EntityPlayer player) {
         if (player == null) return false;
-        if (aspects == null || aspects.size() <= 0) {
-            logValidScanDebug(player, "reject-empty", null, null, aspects);
-            if (player.world != null && player.world.isRemote) {
-                Thaumcraft.proxy.notifyThaumometerUnknownObject();
-            }
-            return false;
-        }
+        if (aspects == null || aspects.size() <= 0) return false;
         IPlayerKnowledge knowledge = player.getCapability(PlayerKnowledgeProvider.PLAYER_KNOWLEDGE, null);
         if (knowledge == null) return false;
         for (Aspect aspect : aspects.getAspects()) {
             if (aspect != null && !aspect.isPrimal() && !knowledge.hasDiscoveredParentAspects(aspect)) {
-                Aspect missingParent = null;
-                if (player.world.isRemote) {
-                    Aspect[] components = aspect.getComponents();
-                    if (components != null) {
-                        for (Aspect parent : components) {
-                            if (parent == null || knowledge.hasDiscoveredAspect(parent)) {
-                                continue;
-                            }
-                            missingParent = parent;
-                            Thaumcraft.proxy.notifyThaumometerDiscoveryError(parent);
-                            break;
-                        }
-                    }
-                }
-                logValidScanDebug(player, "reject-missing-parent", aspect, missingParent, aspects);
                 return false;
             }
         }
         return true;
+    }
+
+    public static void notifyInvalidScan(AspectList aspects, EntityPlayer player) {
+        if (player == null || player.world == null || !player.world.isRemote) return;
+        if (aspects == null || aspects.size() <= 0) {
+            logValidScanDebug(player, "reject-empty", null, null, aspects);
+            Thaumcraft.proxy.notifyThaumometerUnknownObject();
+            return;
+        }
+        IPlayerKnowledge knowledge = player.getCapability(PlayerKnowledgeProvider.PLAYER_KNOWLEDGE, null);
+        if (knowledge == null) return;
+        for (Aspect aspect : aspects.getAspects()) {
+            if (aspect == null || aspect.isPrimal() || knowledge.hasDiscoveredParentAspects(aspect)) {
+                continue;
+            }
+            Aspect missingParent = null;
+            Aspect[] components = aspect.getComponents();
+            if (components != null) {
+                for (Aspect parent : components) {
+                    if (parent == null || knowledge.hasDiscoveredAspect(parent)) {
+                        continue;
+                    }
+                    missingParent = parent;
+                    Thaumcraft.proxy.notifyThaumometerDiscoveryError(parent);
+                    break;
+                }
+            }
+            logValidScanDebug(player, "reject-missing-parent", aspect, missingParent, aspects);
+            return;
+        }
     }
 
     public static AspectList getScanAspects(ScanResult scan, World world) {

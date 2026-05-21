@@ -74,10 +74,7 @@ public class ItemThaumometerRenderer extends TileEntityItemStackRenderer {
             // broke the visual placement in live testing.
             applyTc6ScannerBasis();
             renderScannerModel(mc);
-            renderScannerScreen(mc, player);
-            if (isFirstPerson(transformType) && player != null && mc.gameSettings.thirdPersonView == 0) {
-                renderScanReadout(mc, stack, player);
-            }
+            renderScannerDisplay(mc, stack, player, transformType);
         } finally {
             setTransformType(ItemCameraTransforms.TransformType.NONE);
             GlStateManager.popMatrix();
@@ -103,7 +100,8 @@ public class ItemThaumometerRenderer extends TileEntityItemStackRenderer {
         GlStateManager.popMatrix();
     }
 
-    private void renderScannerScreen(Minecraft mc, EntityPlayer player) {
+    private void renderScannerDisplay(Minecraft mc, ItemStack stack, EntityPlayer player,
+                                      ItemCameraTransforms.TransformType transformType) {
         mc.getTextureManager().bindTexture(SCANSCREEN_TEXTURE);
         int packed = getScannerGlow(player instanceof EntityPlayerSP ? (EntityPlayerSP) player : null, 0);
         OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, packed % 65536, packed / 65536);
@@ -124,6 +122,10 @@ public class ItemThaumometerRenderer extends TileEntityItemStackRenderer {
         buffer.pos(half, -half, 0.0D).tex(1.0D, 0.0D).color(1.0F, 1.0F, 1.0F, 0.92F).endVertex();
         buffer.pos(-half, -half, 0.0D).tex(0.0D, 0.0D).color(1.0F, 1.0F, 1.0F, 0.92F).endVertex();
         Tessellator.getInstance().draw();
+
+        if (isFirstPerson(transformType) && player != null && mc.gameSettings.thirdPersonView == 0) {
+            renderScanReadout(mc, stack, player);
+        }
 
         GlStateManager.disableBlend();
         GlStateManager.enableLighting();
