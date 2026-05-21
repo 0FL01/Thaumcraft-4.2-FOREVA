@@ -18,6 +18,9 @@ public class TableRendererFidelityStaticGuardTest {
         String deconRenderer = read("src/main/java/thaumcraft/client/renderers/tile/TileDeconstructionTableRenderer.java");
         String arcaneWorkbenchRenderer = read("src/main/java/thaumcraft/client/renderers/tile/TileArcaneWorkbenchRenderer.java");
         String researchRenderer = read("src/main/java/thaumcraft/client/renderers/tile/TileResearchTableRenderer.java");
+        String clientProxy = read("src/main/java/thaumcraft/client/ClientProxy.java");
+        String itemTableRenderer = read("src/main/java/thaumcraft/client/renderers/item/ItemTableRenderer.java");
+        String itemTableTesrModel = read("src/main/resources/assets/thaumcraft/models/item/blocktable_tesr.json");
         String helper = read("src/main/java/thaumcraft/client/renderers/tile/TileRenderHelper.java");
         String blockstate = read("src/main/resources/assets/thaumcraft/blockstates/blocktable.json");
         String plainTableModel = read("src/main/resources/assets/thaumcraft/models/block/blocktable_0.json");
@@ -34,26 +37,45 @@ public class TableRendererFidelityStaticGuardTest {
                         && modelTable.contains("crossbar")
                         && modelTable.contains("renderAll(float scale)"));
 
-        assertTrue("TileTableRenderer should no longer duplicate the static table shell once the shell moved into block models",
-                !tableRenderer.contains("new ModelTable()")
-                        && !tableRenderer.contains("tableModel.renderAll(MODEL_SCALE);")
-                        && !tableRenderer.contains("TileRenderHelper.orientBillboardToPlayer();"));
+        assertTrue("TileTableRenderer should restore the plain table shell via TESR and skip research partner halves",
+                tableRenderer.contains("new ModelTable()")
+                        && tableRenderer.contains("tableModel.renderAll(MODEL_SCALE);")
+                        && tableRenderer.contains("if (md >= 6) {")
+                        && tableRenderer.contains("bindTexture(TABLE_TEXTURE);"));
 
-        assertTrue("TileDeconstructionTableRenderer should keep thaumometer/input/aspect overlays after the static shell moved into the block model",
+        assertTrue("TileDeconstructionTableRenderer should restore the deconstruction table shell and keep thaumometer/input/aspect overlays",
                 deconRenderer.contains("renderThaumometer")
+                        && deconRenderer.contains("new ModelArcaneWorkbench()")
+                        && deconRenderer.contains("tableModel.renderAll(MODEL_SCALE);")
                         && deconRenderer.contains("renderItemGround")
                         && deconRenderer.contains("tile.aspect.getImage()")
                         && deconRenderer.contains("TileRenderHelper.renderEntityItem(tile, thaumometer, 0.0F);")
                         && deconRenderer.contains("TileRenderHelper.renderEntityItem(tile, stack, 0.0F);")
-                        && !deconRenderer.contains("renderTableModel")
-                        && !deconRenderer.contains("tableModel.renderAll(MODEL_SCALE);")
                         && !deconRenderer.contains("renderPlate("));
 
-        assertTrue("TileArcaneWorkbenchRenderer should keep only the wand overlay after the static shell moved into the block model",
+        assertTrue("TileArcaneWorkbenchRenderer should restore the worktable shell and keep the wand overlay",
                 arcaneWorkbenchRenderer.contains("wand.getItem() instanceof ItemWandCasting")
+                        && arcaneWorkbenchRenderer.contains("new ModelArcaneWorkbench()")
+                        && arcaneWorkbenchRenderer.contains("tableModel.renderAll(MODEL_SCALE);")
                         && arcaneWorkbenchRenderer.contains("TileRenderHelper.renderEntityItem(tile, wand, 0.0F);")
-                        && !arcaneWorkbenchRenderer.contains("renderTableModel")
-                        && !arcaneWorkbenchRenderer.contains("tableModel.renderAll(MODEL_SCALE);"));
+                        && !arcaneWorkbenchRenderer.contains("renderTableModel"));
+
+        assertTrue("ClientProxy should bind block table item metas 0, 14, and 15 to a builtin TESR item model and TEISR",
+                clientProxy.contains("tableItem.setTileEntityItemStackRenderer(new ItemTableRenderer());")
+                        && clientProxy.contains("registerBuiltinItemModel(tableItem, 0, \"blocktable_tesr\");")
+                        && clientProxy.contains("registerBuiltinItemModel(tableItem, 14, \"blocktable_tesr\");")
+                        && clientProxy.contains("registerBuiltinItemModel(tableItem, 15, \"blocktable_tesr\");"));
+
+        assertTrue("ItemTableRenderer should render plain, deconstruction, and arcane table item stacks through their TESR shells",
+                itemTableRenderer.contains("new TileTableRenderer()")
+                        && itemTableRenderer.contains("new TileDeconstructionTableRenderer()")
+                        && itemTableRenderer.contains("new TileArcaneWorkbenchRenderer()")
+                        && itemTableRenderer.contains("if (meta == 0)")
+                        && itemTableRenderer.contains("if (meta == 14)")
+                        && itemTableRenderer.contains("if (meta == 15)"));
+
+        assertTrue("Blocktable TESR item model should use builtin/entity parent",
+                itemTableTesrModel.contains("\"parent\": \"builtin/entity\""));
 
         assertTrue("TileRenderHelper should keep the shared TESR entity-item path worldless-safe for display-item renderers",
                 helper.contains("static void renderEntityItem(TileEntity tile, ItemStack stack, float hoverStart)")
@@ -74,23 +96,17 @@ public class TableRendererFidelityStaticGuardTest {
                         && blockstate.contains("\"type=6\": { \"model\": \"thaumcraft:blocktable_6\", \"y\": 90 }")
                         && blockstate.contains("\"type=8\": { \"model\": \"thaumcraft:blocktable_6\" }"));
 
-        assertTrue("Plain table block model should keep its shell geometry while research table block models stay empty for TESR-driven visuals",
-                plainTableModel.contains("\"surface\": \"thaumcraft:models/table\"")
-                        && plainTableModel.contains("\"from\": [0, 12, 0]")
-                        && plainTableModel.contains("\"from\": [0, 0, 4]")
+        assertTrue("Table-family block models should stay empty with particle fallback where TESR owns the visuals",
+                plainTableModel.contains("\"particle\": \"thaumcraft:blocks/woodplain\"")
+                        && plainTableModel.contains("\"elements\": []")
                         && researchMasterModel.contains("\"particle\": \"thaumcraft:blocks/woodplain\"")
                         && researchMasterModel.contains("\"elements\": []")
                         && researchPartnerModel.contains("\"particle\": \"thaumcraft:blocks/woodplain\"")
-                        && researchPartnerModel.contains("\"elements\": []"));
-
-        assertTrue("Deconstruction and arcane workbench block models should now carry the table shell geometry instead of full-cube placeholders",
-                deconModel.contains("\"ambientocclusion\": false")
-                        && deconModel.contains("\"surface\": \"thaumcraft:models/decontable\"")
-                        && deconModel.contains("\"from\": [0, 8, 0]")
-                        && deconModel.contains("\"from\": [9, 4, 11]")
-                        && arcaneWorkbenchModel.contains("\"surface\": \"thaumcraft:models/worktable\"")
-                        && arcaneWorkbenchModel.contains("\"from\": [0, 0, 0]")
-                        && arcaneWorkbenchModel.contains("\"from\": [3, 4, 11]"));
+                        && researchPartnerModel.contains("\"elements\": []")
+                        && deconModel.contains("\"particle\": \"thaumcraft:blocks/woodplain\"")
+                        && deconModel.contains("\"elements\": []")
+                        && arcaneWorkbenchModel.contains("\"particle\": \"thaumcraft:blocks/woodplain\"")
+                        && arcaneWorkbenchModel.contains("\"elements\": []"));
     }
 
     private static String read(String path) throws IOException {

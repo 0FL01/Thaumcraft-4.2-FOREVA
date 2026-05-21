@@ -228,7 +228,7 @@ implements IWandable {
     @Nullable
     @Override
     public AxisAlignedBB getCollisionBoundingBox(IBlockState blockState, IBlockAccess worldIn, BlockPos pos) {
-        return this.getBoundingBox(blockState, worldIn, pos).offset(pos);
+        return this.getBoundingBox(blockState, worldIn, pos);
     }
 
     @Override

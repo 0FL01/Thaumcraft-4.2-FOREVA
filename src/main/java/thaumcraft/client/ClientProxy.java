@@ -143,6 +143,7 @@ import thaumcraft.client.renderers.item.ItemNodeRenderer;
 import thaumcraft.client.renderers.item.ItemThaumometerRenderer;
 import thaumcraft.client.renderers.item.ItemCrystalRenderer;
 import thaumcraft.client.renderers.item.ItemStoneDeviceRenderer;
+import thaumcraft.client.renderers.item.ItemTableRenderer;
 import thaumcraft.client.renderers.item.ItemTubeRenderer;
 import thaumcraft.client.renderers.item.ItemWandRenderer;
 import thaumcraft.client.renderers.item.ItemWoodenDeviceRenderer;
@@ -513,6 +514,10 @@ public class ClientProxy extends CommonProxy {
         if (tubeItem != null) {
             tubeItem.setTileEntityItemStackRenderer(new ItemTubeRenderer());
         }
+        Item tableItem = Item.getItemFromBlock(ConfigBlocks.blockTable);
+        if (tableItem != null) {
+            tableItem.setTileEntityItemStackRenderer(new ItemTableRenderer());
+        }
         Item reservoirItem = Item.getItemFromBlock(ConfigBlocks.blockEssentiaReservoir);
         if (reservoirItem != null) {
             reservoirItem.setTileEntityItemStackRenderer(new ItemEssentiaReservoirRenderer());
@@ -673,6 +678,9 @@ public class ClientProxy extends CommonProxy {
         for (int meta = 0; meta <= 15; meta++) {
             registerBlockItemModel(tableItem, meta, "type=" + meta);
         }
+        registerBuiltinItemModel(tableItem, 0, "blocktable_tesr");
+        registerBuiltinItemModel(tableItem, 14, "blocktable_tesr");
+        registerBuiltinItemModel(tableItem, 15, "blocktable_tesr");
         Item mirrorItem = Item.getItemFromBlock(ConfigBlocks.blockMirror);
         for (int meta = 0; meta <= 11; meta++) {
             registerBlockItemModel(mirrorItem, meta, "type=" + meta);

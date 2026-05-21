@@ -1,56 +1,7 @@
 {
   "ambientocclusion": false,
   "textures": {
-    "surface": "thaumcraft:models/table"
+    "particle": "thaumcraft:blocks/woodplain"
   },
-  "elements": [
-    {
-      "from": [0, 12, 0],
-      "to": [16, 16, 16],
-      "faces": {
-        "down": { "texture": "#surface" },
-        "up": { "texture": "#surface" },
-        "north": { "texture": "#surface" },
-        "south": { "texture": "#surface" },
-        "west": { "texture": "#surface" },
-        "east": { "texture": "#surface" }
-      }
-    },
-    {
-      "from": [10, 4, 6],
-      "to": [14, 12, 10],
-      "faces": {
-        "down": { "texture": "#surface" },
-        "up": { "texture": "#surface" },
-        "north": { "texture": "#surface" },
-        "south": { "texture": "#surface" },
-        "west": { "texture": "#surface" },
-        "east": { "texture": "#surface" }
-      }
-    },
-    {
-      "from": [2, 4, 6],
-      "to": [6, 12, 10],
-      "faces": {
-        "down": { "texture": "#surface" },
-        "up": { "texture": "#surface" },
-        "north": { "texture": "#surface" },
-        "south": { "texture": "#surface" },
-        "west": { "texture": "#surface" },
-        "east": { "texture": "#surface" }
-      }
-    },
-    {
-      "from": [0, 0, 4],
-      "to": [16, 4, 12],
-      "faces": {
-        "down": { "texture": "#surface" },
-        "up": { "texture": "#surface" },
-        "north": { "texture": "#surface" },
-        "south": { "texture": "#surface" },
-        "west": { "texture": "#surface" },
-        "east": { "texture": "#surface" }
-      }
-    }
-  ]
+  "elements": []
 }

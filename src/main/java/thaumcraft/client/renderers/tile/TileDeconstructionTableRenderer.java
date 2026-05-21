@@ -3,16 +3,32 @@ package thaumcraft.client.renderers.tile;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.MathHelper;
+import thaumcraft.client.renderers.models.ModelArcaneWorkbench;
 import thaumcraft.common.config.ConfigItems;
 import thaumcraft.common.tiles.TileDeconstructionTable;
 
 public class TileDeconstructionTableRenderer extends TileEntitySpecialRenderer<TileDeconstructionTable> {
+    private static final ResourceLocation TABLE_TEXTURE =
+            new ResourceLocation("thaumcraft", "textures/models/decontable.png");
+    private static final float MODEL_SCALE = 0.0625F;
+
+    private final ModelArcaneWorkbench tableModel = new ModelArcaneWorkbench();
+
     @Override
     public void render(TileDeconstructionTable tile, double x, double y, double z, float partialTicks, int destroyStage, float alpha) {
         if (tile == null) {
             return;
         }
+
+        GlStateManager.pushMatrix();
+        bindTexture(TABLE_TEXTURE);
+        GlStateManager.translate(x + 0.5F, y + 1.0F, z + 0.5F);
+        GlStateManager.rotate(180.0F, 1.0F, 0.0F, 0.0F);
+        GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+        tableModel.renderAll(MODEL_SCALE);
+        GlStateManager.popMatrix();
 
         float ticks = TileRenderHelper.ticks(tile, partialTicks);
         renderThaumometer(tile, x, y, z);
