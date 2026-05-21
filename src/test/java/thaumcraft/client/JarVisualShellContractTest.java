@@ -47,6 +47,7 @@ public class JarVisualShellContractTest {
 
         assertTrue("ItemJarRenderer should keep delegating to TileJarRenderer so filled jars, node jars, and brain jars retain dynamic item visuals",
                 itemRenderer.contains("private final TileJarRenderer renderer = new TileJarRenderer();")
+                        && itemRenderer.contains("renderer.setRendererDispatcher(TileEntityRendererDispatcher.instance);")
                         && itemRenderer.contains("renderer.render(tile, 0.0D, 0.0D, 0.0D, partialTicks, 0, 1.0F);"));
 
         assertTrue("Jar blockstate should route brain and node jars to the normal shell and the void jar to the void shell",

@@ -1,6 +1,7 @@
 package thaumcraft.client.renderers.item;
 
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
 import net.minecraft.client.renderer.tileentity.TileEntityItemStackRenderer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -26,6 +27,10 @@ public class ItemJarRenderer extends TileEntityItemStackRenderer {
             .add(Aspect.WATER, 40);
 
     private final TileJarRenderer renderer = new TileJarRenderer();
+
+    public ItemJarRenderer() {
+        renderer.setRendererDispatcher(TileEntityRendererDispatcher.instance);
+    }
 
     @Override
     public void renderByItem(ItemStack stack, float partialTicks) {

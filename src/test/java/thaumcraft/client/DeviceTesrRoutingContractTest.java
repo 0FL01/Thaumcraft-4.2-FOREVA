@@ -63,6 +63,10 @@ public class DeviceTesrRoutingContractTest {
 
         assertTrue("Wooden and metal device item renderers should keep the original inventory transforms and delegate to dedicated tile renderers",
                 woodenItemRenderer.contains("new TileBellowsRenderer()")
+                        && woodenItemRenderer.contains("bellowsRenderer.setRendererDispatcher(TileEntityRendererDispatcher.instance);")
+                        && woodenItemRenderer.contains("boreBaseRenderer.setRendererDispatcher(TileEntityRendererDispatcher.instance);")
+                        && woodenItemRenderer.contains("boreRenderer.setRendererDispatcher(TileEntityRendererDispatcher.instance);")
+                        && woodenItemRenderer.contains("bannerRenderer.setRendererDispatcher(TileEntityRendererDispatcher.instance);")
                         && woodenItemRenderer.contains("new TileArcaneBoreBaseRenderer()")
                         && woodenItemRenderer.contains("new TileArcaneBoreRenderer()")
                         && woodenItemRenderer.contains("new TileBannerRenderer()")
@@ -70,6 +74,10 @@ public class DeviceTesrRoutingContractTest {
                         && woodenItemRenderer.contains("GlStateManager.translate(-0.5F, -0.75F, -0.5F);")
                         && woodenItemRenderer.contains("banner.setFacing((byte) 8);")
                         && metalItemRenderer.contains("new TileAlembicRenderer()")
+                        && metalItemRenderer.contains("alembicRenderer.setRendererDispatcher(TileEntityRendererDispatcher.instance);")
+                        && metalItemRenderer.contains("chargerRenderer.setRendererDispatcher(TileEntityRendererDispatcher.instance);")
+                        && metalItemRenderer.contains("thaumatoriumRenderer.setRendererDispatcher(TileEntityRendererDispatcher.instance);")
+                        && metalItemRenderer.contains("relayRenderer.setRendererDispatcher(TileEntityRendererDispatcher.instance);")
                         && metalItemRenderer.contains("new TileMagicWorkbenchChargerRenderer()")
                         && metalItemRenderer.contains("new TileThaumatoriumRenderer()")
                         && metalItemRenderer.contains("new TileVisRelayRenderer()")

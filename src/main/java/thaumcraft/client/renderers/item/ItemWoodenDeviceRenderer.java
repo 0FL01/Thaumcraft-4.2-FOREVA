@@ -1,6 +1,7 @@
 package thaumcraft.client.renderers.item;
 
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
 import net.minecraft.client.renderer.tileentity.TileEntityItemStackRenderer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -21,6 +22,13 @@ public class ItemWoodenDeviceRenderer extends TileEntityItemStackRenderer {
     private final TileArcaneBoreBaseRenderer boreBaseRenderer = new TileArcaneBoreBaseRenderer();
     private final TileArcaneBoreRenderer boreRenderer = new TileArcaneBoreRenderer();
     private final TileBannerRenderer bannerRenderer = new TileBannerRenderer();
+
+    public ItemWoodenDeviceRenderer() {
+        bellowsRenderer.setRendererDispatcher(TileEntityRendererDispatcher.instance);
+        boreBaseRenderer.setRendererDispatcher(TileEntityRendererDispatcher.instance);
+        boreRenderer.setRendererDispatcher(TileEntityRendererDispatcher.instance);
+        bannerRenderer.setRendererDispatcher(TileEntityRendererDispatcher.instance);
+    }
 
     @Override
     public void renderByItem(ItemStack stack, float partialTicks) {

@@ -4,6 +4,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.block.model.IBakedModel;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
+import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
 import net.minecraft.client.renderer.tileentity.TileEntityItemStackRenderer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -19,6 +20,10 @@ public class ItemEssentiaReservoirRenderer extends TileEntityItemStackRenderer {
             new ModelResourceLocation("thaumcraft:blockessentiareservoir", "inventory");
 
     private final TileEssentiaReservoirRenderer reservoirRenderer = new TileEssentiaReservoirRenderer();
+
+    public ItemEssentiaReservoirRenderer() {
+        reservoirRenderer.setRendererDispatcher(TileEntityRendererDispatcher.instance);
+    }
 
     @Override
     public void renderByItem(ItemStack stack, float partialTicks) {

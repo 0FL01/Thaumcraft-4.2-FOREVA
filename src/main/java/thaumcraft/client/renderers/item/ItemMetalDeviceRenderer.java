@@ -1,6 +1,7 @@
 package thaumcraft.client.renderers.item;
 
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
 import net.minecraft.client.renderer.tileentity.TileEntityItemStackRenderer;
 import net.minecraft.item.ItemStack;
 import thaumcraft.client.renderers.tile.TileAlembicRenderer;
@@ -18,6 +19,13 @@ public class ItemMetalDeviceRenderer extends TileEntityItemStackRenderer {
     private final TileMagicWorkbenchChargerRenderer chargerRenderer = new TileMagicWorkbenchChargerRenderer();
     private final TileThaumatoriumRenderer thaumatoriumRenderer = new TileThaumatoriumRenderer();
     private final TileVisRelayRenderer relayRenderer = new TileVisRelayRenderer();
+
+    public ItemMetalDeviceRenderer() {
+        alembicRenderer.setRendererDispatcher(TileEntityRendererDispatcher.instance);
+        chargerRenderer.setRendererDispatcher(TileEntityRendererDispatcher.instance);
+        thaumatoriumRenderer.setRendererDispatcher(TileEntityRendererDispatcher.instance);
+        relayRenderer.setRendererDispatcher(TileEntityRendererDispatcher.instance);
+    }
 
     @Override
     public void renderByItem(ItemStack stack, float partialTicks) {

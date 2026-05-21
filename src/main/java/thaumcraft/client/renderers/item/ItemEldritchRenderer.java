@@ -1,6 +1,7 @@
 package thaumcraft.client.renderers.item;
 
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
 import net.minecraft.client.renderer.tileentity.TileEntityItemStackRenderer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
@@ -22,6 +23,14 @@ public class ItemEldritchRenderer extends TileEntityItemStackRenderer {
     private final TileEldritchObeliskRenderer obeliskRenderer = new TileEldritchObeliskRenderer();
     private final TileEldritchLockRenderer lockRenderer = new TileEldritchLockRenderer();
     private final TileEldritchCrabSpawnerRenderer crabSpawnerRenderer = new TileEldritchCrabSpawnerRenderer();
+
+    public ItemEldritchRenderer() {
+        capRenderer.setRendererDispatcher(TileEntityRendererDispatcher.instance);
+        altarRenderer.setRendererDispatcher(TileEntityRendererDispatcher.instance);
+        obeliskRenderer.setRendererDispatcher(TileEntityRendererDispatcher.instance);
+        lockRenderer.setRendererDispatcher(TileEntityRendererDispatcher.instance);
+        crabSpawnerRenderer.setRendererDispatcher(TileEntityRendererDispatcher.instance);
+    }
 
     @Override
     public void renderByItem(ItemStack stack, float partialTicks) {

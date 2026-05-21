@@ -62,6 +62,7 @@ public class FluxReservoirRendererFidelityStaticGuardTest {
                 reservoirItemRenderer.contains("extends TileEntityItemStackRenderer")
                         && reservoirItemRenderer.contains("new ModelResourceLocation(\"thaumcraft:blockessentiareservoir\", \"inventory\")")
                         && reservoirItemRenderer.contains("new TileEssentiaReservoirRenderer()")
+                        && reservoirItemRenderer.contains("reservoirRenderer.setRendererDispatcher(TileEntityRendererDispatcher.instance);")
                         && reservoirItemRenderer.contains("mc.getRenderItem().renderItem(stack, model);")
                         && reservoirItemRenderer.contains("GlStateManager.translate(-0.5F, -0.5F, -0.5F);")
                         && reservoirItemRenderer.contains("essentia.readFromNBT(tag);"));

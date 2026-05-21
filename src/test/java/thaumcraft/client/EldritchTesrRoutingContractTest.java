@@ -45,10 +45,15 @@ public class EldritchTesrRoutingContractTest {
 
         assertTrue("ItemEldritchRenderer should delegate the TESR-backed metas to the existing eldritch tile renderers with item-safe fake tiles",
                 itemRenderer.contains("new TileEldritchCapRenderer()")
+                        && itemRenderer.contains("capRenderer.setRendererDispatcher(TileEntityRendererDispatcher.instance);")
                         && itemRenderer.contains("new TileEldritchCapRenderer(TileEldritchCapRenderer.altarTexture())")
+                        && itemRenderer.contains("altarRenderer.setRendererDispatcher(TileEntityRendererDispatcher.instance);")
                         && itemRenderer.contains("new TileEldritchObeliskRenderer()")
+                        && itemRenderer.contains("obeliskRenderer.setRendererDispatcher(TileEntityRendererDispatcher.instance);")
                         && itemRenderer.contains("new TileEldritchLockRenderer()")
+                        && itemRenderer.contains("lockRenderer.setRendererDispatcher(TileEntityRendererDispatcher.instance);")
                         && itemRenderer.contains("new TileEldritchCrabSpawnerRenderer()")
+                        && itemRenderer.contains("crabSpawnerRenderer.setRendererDispatcher(TileEntityRendererDispatcher.instance);")
                         && itemRenderer.contains("if (meta == 0)")
                         && itemRenderer.contains("if (meta == 1)")
                         && itemRenderer.contains("if (meta == 3)")
