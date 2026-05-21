@@ -1,0 +1,230 @@
+# =============================================================================
+# Release — triggered by push to master
+# Builds JARs, runs server smoke test, creates GitHub Release (pre-release).
+# =============================================================================
+name: Release
+
+on:
+  push:
+    branches:
+      - 'master'
+
+env:
+  CI: 'true'
+
+jobs:
+  release:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Compute release metadata
+        id: meta
+        run: |
+          SHORT_SHA="${GITHUB_SHA:0:7}"
+          TAG_DATE="$(date +%Y%m%d)"
+          TAG_NAME="alfa-${TAG_DATE}-${SHORT_SHA}"
+          COMMIT_MSG="$(git log -1 --format='%s')"
+
+          echo "tag_name=${TAG_NAME}" >> "$GITHUB_OUTPUT"
+          echo "short_sha=${SHORT_SHA}" >> "$GITHUB_OUTPUT"
+          echo "commit_msg=${COMMIT_MSG}" >> "$GITHUB_OUTPUT"
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Cache Docker layers
+        uses: actions/cache@v4
+        with:
+          path: /tmp/.buildx-cache
+          key: docker-buildx-${{ hashFiles('Dockerfile') }}
+          restore-keys: |
+            docker-buildx-
+
+      - name: Build Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          load: true
+          tags: thaumcraft-dev
+          cache-from: type=local,src=/tmp/.buildx-cache
+          cache-to: type=local,dest=/tmp/.buildx-cache,mode=max
+
+      - name: Restore Gradle cache
+        uses: actions/cache@v4
+        with:
+          path: .gradle_home
+          key: gradle-${{ hashFiles('build.gradle', 'gradle/wrapper/gradle-wrapper.properties') }}
+          restore-keys: |
+            gradle-
+
+      - name: Compile Java
+        run: |
+          docker run --rm \
+            -v "$PWD:/workspace/thaumcraft" \
+            -v "$PWD/.gradle_home:/home/ubuntu/.gradle" \
+            --user "$(id -u):$(id -g)" \
+            --entrypoint ./gradlew \
+            thaumcraft-dev \
+            compileJava --console=plain -Pci=true
+
+      - name: Run tests (non-client)
+        run: |
+          docker run --rm \
+            -v "$PWD:/workspace/thaumcraft" \
+            -v "$PWD/.gradle_home:/home/ubuntu/.gradle" \
+            --user "$(id -u):$(id -g)" \
+            --entrypoint ./gradlew \
+            thaumcraft-dev \
+            test --console=plain -Pci=true
+
+      - name: Build JARs
+        run: |
+          docker run --rm \
+            -v "$PWD:/workspace/thaumcraft" \
+            -v "$PWD/.gradle_home:/home/ubuntu/.gradle" \
+            --user "$(id -u):$(id -g)" \
+            --entrypoint ./gradlew \
+            thaumcraft-dev \
+            jar apiJar devJar --console=plain -Pci=true
+
+      - name: List built JARs
+        run: ls -lh build/libs/Thaumcraft-*.jar
+
+      - name: Server smoke test
+        run: |
+          set +e
+          mkdir -p run
+          SMOKE_LOG="$PWD/run/smoke-ci.log"
+          LATEST_LOG="$PWD/run/logs/latest.log"
+          TIMEOUT_SEC=240
+          STARTED_AT="$(date +%s)"
+
+          # Write eula
+          printf 'eula=true\n' > run/eula.txt
+
+          # Start server in background
+          docker run --rm --name thaumcraft-smoke-ci \
+            -v "$PWD:/workspace/thaumcraft" \
+            -v "$PWD/.gradle_home:/home/ubuntu/.gradle" \
+            --user "$(id -u):$(id -g)" \
+            --entrypoint ./gradlew \
+            thaumcraft-dev \
+            runServer -x getAssets --no-daemon --console=plain \
+            < /dev/null > "$SMOKE_LOG" 2>&1 &
+          SERVER_PID=$!
+
+          echo "Server PID: ${SERVER_PID}, timeout: ${TIMEOUT_SEC}s"
+
+          # Monitor for ready state or crash
+          READY=0
+          TIMED_OUT=0
+          while true; do
+            if ! kill -0 "$SERVER_PID" 2>/dev/null; then
+              echo "Server process exited"
+              break
+            fi
+
+            # Check for "Done (" in stdout log
+            if grep -Fq 'Done (' "$SMOKE_LOG" 2>/dev/null; then
+              READY=1
+              echo "Server reached ready state (from stdout)"
+              break
+            fi
+
+            # Check for "Done (" in latest.log
+            if [[ -f "$LATEST_LOG" ]] && grep -Fq 'Done (' "$LATEST_LOG" 2>/dev/null; then
+              READY=1
+              echo "Server reached ready state (from latest.log)"
+              break
+            fi
+
+            # Check crash markers
+            CRASH_MARKERS=$(grep -nE 'LoaderException|LoaderExceptionModCrash|Game crashed|Caught exception|NoClassDefFoundError|ClassNotFoundException|NoSuchMethodError|NoSuchFieldError|ExceptionInInitializerError|Repair material has already been set|Encountered an unexpected exception|FATAL|fatal' "$SMOKE_LOG" 2>/dev/null || true)
+            if [[ -n "$CRASH_MARKERS" ]]; then
+              echo "Crash markers detected in smoke log:"
+              echo "$CRASH_MARKERS"
+              break
+            fi
+
+            # Check crash reports
+            if [[ -d "$PWD/run/crash-reports" ]]; then
+              CRASH_COUNT=$(find "$PWD/run/crash-reports" -type f 2>/dev/null | wc -l)
+              if [[ "$CRASH_COUNT" -gt 0 ]]; then
+                echo "Crash reports found: $CRASH_COUNT"
+                ls -la "$PWD/run/crash-reports/"
+                break
+              fi
+            fi
+
+            # Timeout check
+            NOW="$(date +%s)"
+            ELAPSED=$(( NOW - STARTED_AT ))
+            if [[ "$ELAPSED" -ge "$TIMEOUT_SEC" ]]; then
+              TIMED_OUT=1
+              echo "Timed out after ${TIMEOUT_SEC}s"
+              break
+            fi
+
+            sleep 2
+          done
+
+          # Kill server container
+          docker stop -t 5 thaumcraft-smoke-ci 2>/dev/null || docker kill thaumcraft-smoke-ci 2>/dev/null || true
+          wait "$SERVER_PID" 2>/dev/null || true
+
+          # Final verdict
+          if [[ "$READY" -eq 1 ]]; then
+            echo ""
+            echo "=========================================="
+            echo "Server smoke test: PASSED"
+            echo "=========================================="
+            exit 0
+          fi
+
+          echo ""
+          echo "=========================================="
+          echo "Server smoke test: FAILED"
+          echo "=========================================="
+          if [[ "$TIMED_OUT" -eq 1 ]]; then
+            echo "Reason: timed out (${TIMEOUT_SEC}s)"
+          else
+            echo "Reason: server did not reach ready state"
+          fi
+          echo ""
+          echo "--- smoke log (last 50 lines) ---"
+          tail -50 "$SMOKE_LOG"
+          echo ""
+          if [[ -f "$LATEST_LOG" ]]; then
+            echo "--- latest.log (last 30 lines) ---"
+            tail -30 "$LATEST_LOG"
+          fi
+          exit 1
+        shell: bash
+        timeout-minutes: 6
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.meta.outputs.tag_name }}
+          name: Thaumcraft 4.2 1.12.2 (ALFA) — ${{ steps.meta.outputs.short_sha }}
+          body: |
+            ## Thaumcraft 4.2 1.12.2 (ALFA)
+
+            **Commit:** `${{ github.sha }}` — ${{ steps.meta.outputs.commit_msg }}
+
+            ### Artifacts
+            - Thaumcraft-1.0.0-universal.jar
+            - Thaumcraft-1.0.0-api.jar
+            - Thaumcraft-1.0.0-dev.jar
+
+            ---
+            *Pre-release. Fresh worlds only. 1.7.10/WIP saves are not supported.*
+          files: |
+            build/libs/Thaumcraft-*-universal.jar
+            build/libs/Thaumcraft-*-api.jar
+            build/libs/Thaumcraft-*-dev.jar
+          prerelease: true

@@ -90,4 +90,12 @@ reobf {
     jar { }
 }
 
+// CI test configuration: exclude client-only tests when running in CI
+// (client tests require display/GL context unavailable in headless CI)
+test {
+    if (System.getenv('CI') == 'true' || project.hasProperty('ci')) {
+        exclude 'thaumcraft/client/**'
+    }
+}
+
 idea { module { inheritOutputDirs = true } }

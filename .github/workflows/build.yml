@@ -1,0 +1,89 @@
+# =============================================================================
+# Build & Test — CI for every push and pull request
+# Runs inside the thaumcraft-dev Docker image (JDK 8, ForgeGradle 2.3).
+# Skips client-only tests (no display/GL in CI).
+# =============================================================================
+name: Build & Test
+
+on:
+  push:
+    branches-ignore:
+      - 'master'          # master triggers its own release workflow
+  pull_request:
+    branches:
+      - 'master'
+
+env:
+  CI: 'true'
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Cache Docker layers
+        uses: actions/cache@v4
+        with:
+          path: /tmp/.buildx-cache
+          key: docker-buildx-${{ hashFiles('Dockerfile') }}
+          restore-keys: |
+            docker-buildx-
+
+      - name: Build Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          load: true
+          tags: thaumcraft-dev
+          cache-from: type=local,src=/tmp/.buildx-cache
+          cache-to: type=local,dest=/tmp/.buildx-cache,mode=max
+
+      - name: Restore Gradle cache
+        uses: actions/cache@v4
+        with:
+          path: .gradle_home
+          key: gradle-${{ hashFiles('build.gradle', 'gradle/wrapper/gradle-wrapper.properties') }}
+          restore-keys: |
+            gradle-
+
+      - name: Compile Java
+        run: |
+          docker run --rm \
+            -v "$PWD:/workspace/thaumcraft" \
+            -v "$PWD/.gradle_home:/home/ubuntu/.gradle" \
+            --user "$(id -u):$(id -g)" \
+            --entrypoint ./gradlew \
+            thaumcraft-dev \
+            compileJava --console=plain -Pci=true
+
+      - name: Run tests (non-client)
+        run: |
+          docker run --rm \
+            -v "$PWD:/workspace/thaumcraft" \
+            -v "$PWD/.gradle_home:/home/ubuntu/.gradle" \
+            --user "$(id -u):$(id -g)" \
+            --entrypoint ./gradlew \
+            thaumcraft-dev \
+            test --console=plain -Pci=true
+
+      - name: Build JARs
+        run: |
+          docker run --rm \
+            -v "$PWD:/workspace/thaumcraft" \
+            -v "$PWD/.gradle_home:/home/ubuntu/.gradle" \
+            --user "$(id -u):$(id -g)" \
+            --entrypoint ./gradlew \
+            thaumcraft-dev \
+            jar apiJar devJar --console=plain -Pci=true
+
+      - name: Upload JAR artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: thaumcraft-jars
+          path: build/libs/Thaumcraft-*.jar
+          retention-days: 7
