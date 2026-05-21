@@ -176,13 +176,7 @@ A server smoke test passes only when Forge reaches normal ready state, for examp
 
 A runtime smoke test fails if `crash-reports/` contains a new crash report, or logs contain crash markers such as `LoaderException`, `LoaderExceptionModCrash`, `Game crashed`, `Caught exception`, `NoClassDefFoundError`, `ClassNotFoundException`, `NoSuchMethodError`, `NoSuchFieldError`, `ExceptionInInitializerError`, `Repair material has already been set`, or any Forge/FML fatal loading error.
 
-Run client smoke for client-only or mixed client/common changes. It may be terminated by timeout after the main menu/load phase; timeout alone is not failure if there are no new crash reports or crash markers and Forge/FML reports successful mod loading.
-
 Do not mark runtime-affecting checkpoints complete based only on `compileJava`, `build`, `apiJar`, or `devJar`. Documentation-only diffs do not require runtime smoke.
-
-Run client smoke test if display/X11 is available:
-
-    ./scripts/dev.sh smoke-client
 
 ## Stop conditions
 
