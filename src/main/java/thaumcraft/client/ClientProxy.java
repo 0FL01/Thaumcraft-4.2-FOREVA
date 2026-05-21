@@ -33,7 +33,9 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.translation.I18n;
+import net.minecraft.world.ColorizerFoliage;
 import net.minecraft.world.World;
+import net.minecraft.world.biome.BiomeColorHelper;
 import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.player.ItemTooltipEvent;
@@ -202,6 +204,7 @@ import thaumcraft.client.lib.PlayerNotifications;
 import thaumcraft.client.lib.RenderEventHandler;
 import thaumcraft.common.CommonProxy;
 import thaumcraft.common.blocks.BlockCandle;
+import thaumcraft.common.blocks.BlockMagicalLeaves;
 import thaumcraft.common.config.ConfigBlocks;
 import thaumcraft.common.config.ConfigEntities;
 import thaumcraft.common.config.ConfigItems;
@@ -405,6 +408,34 @@ public class ClientProxy extends CommonProxy {
     }
 
     private void registerItemColorHandlers() {
+        if (ConfigBlocks.blockMagicalLeaves != null && ConfigBlocks.blockMagicalLeavesItem != null) {
+            Minecraft minecraft = Minecraft.getMinecraft();
+            minecraft.getBlockColors().registerBlockColorHandler(
+                    (state, world, pos, tintIndex) -> {
+                        if (tintIndex != 0) {
+                            return -1;
+                        }
+                        if (state.getValue(BlockMagicalLeaves.TYPE) == 1) {
+                            return -1;
+                        }
+                        return world != null && pos != null
+                                ? BiomeColorHelper.getFoliageColorAtPos(world, pos)
+                                : ColorizerFoliage.getFoliageColorBasic();
+                    },
+                    ConfigBlocks.blockMagicalLeaves
+            );
+            minecraft.getItemColors().registerItemColorHandler(
+                    (stack, tintIndex) -> tintIndex == 0
+                            ? minecraft.getBlockColors().colorMultiplier(
+                                    ConfigBlocks.blockMagicalLeaves.getStateFromMeta(stack.getMetadata()),
+                                    null,
+                                    null,
+                                    tintIndex
+                            )
+                            : -1,
+                    ConfigBlocks.blockMagicalLeavesItem
+            );
+        }
         if (ConfigItems.itemResearchNotes != null) {
             Minecraft.getMinecraft().getItemColors().registerItemColorHandler(
                     (stack, tintIndex) -> ConfigItems.itemResearchNotes.getColorFromItemStack(stack, tintIndex),

@@ -16,12 +16,18 @@ public class BlockMagicalLeavesRenderContractTest {
     public void magicalLeavesRenderLayerAndMetadataContractsStayWired() throws IOException {
         String blockSource = readFile("src/main/java/thaumcraft/common/blocks/BlockMagicalLeaves.java");
         String itemSource = readFile("src/main/java/thaumcraft/common/blocks/ItemBlocks/BlockMagicalLeavesItem.java");
+        String clientSource = readFile("src/main/java/thaumcraft/client/ClientProxy.java");
 
         assertTrue("BlockMagicalLeaves must render in CUTOUT_MIPPED layer",
                 blockSource.contains("public BlockRenderLayer getRenderLayer()")
                         && blockSource.contains("return BlockRenderLayer.CUTOUT_MIPPED;"));
         assertTrue("BlockMagicalLeavesItem metadata contract must preserve only the type bit",
                 itemSource.contains("return damage & 1;"));
+        assertTrue("ClientProxy must register a biome foliage tint handler for greatwood leaves",
+                clientSource.contains("BiomeColorHelper.getFoliageColorAtPos(world, pos)")
+                        && clientSource.contains("ColorizerFoliage.getFoliageColorBasic()")
+                        && clientSource.contains("ConfigBlocks.blockMagicalLeaves")
+                        && clientSource.contains("ConfigBlocks.blockMagicalLeavesItem"));
     }
 
     @Test
