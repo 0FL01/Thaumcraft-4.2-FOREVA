@@ -1,5 +1,6 @@
 package thaumcraft.common.lib.world.biomes;
 
+import net.minecraft.block.BlockFlower;
 import net.minecraft.block.BlockTallGrass;
 import net.minecraft.entity.passive.EntityHorse;
 import net.minecraft.entity.passive.EntityWolf;
@@ -52,13 +53,20 @@ public class BiomeMagicalForest extends Biome {
         this.decorator.grassPerChunk = 12;
         this.decorator.mushroomsPerChunk = 6;
         this.decorator.reedsPerChunk = 6;
+        this.flowers.clear();
+        for (BlockFlower.EnumFlowerType type : BlockFlower.EnumFlowerType.values()) {
+            BlockFlower flower = type.getBlockType() == BlockFlower.EnumFlowerColor.YELLOW
+                    ? (BlockFlower)Blocks.YELLOW_FLOWER
+                    : (BlockFlower)Blocks.RED_FLOWER;
+            this.addFlower(flower.getDefaultState().withProperty(flower.getTypeProperty(), type), 10);
+        }
     }
 
     public WorldGenAbstractTree getRandomTreeFeature(Random rand) {
-        if (rand.nextInt(28) == 0) {
+        if (rand.nextInt(14) == 0) {
             return new WorldGenSilverwoodTrees(false, 8, 5);
         }
-        if (rand.nextInt(20) == 0) {
+        if (rand.nextInt(10) == 0) {
             return new WorldGenGreatwoodTrees(false);
         }
         return this.bigTree;
@@ -66,7 +74,7 @@ public class BiomeMagicalForest extends Biome {
 
     public WorldGenerator getRandomWorldGenForGrass(Random rand) {
         if (rand.nextInt(4) == 0) {
-            return new WorldGenTallGrass(BlockTallGrass.EnumType.GRASS);
+            return new WorldGenTallGrass(BlockTallGrass.EnumType.FERN);
         }
         return new WorldGenTallGrass(BlockTallGrass.EnumType.GRASS);
     }
@@ -85,36 +93,42 @@ public class BiomeMagicalForest extends Biome {
     public void decorate(World world, Random rand, BlockPos pos) {
         int x = pos.getX();
         int z = pos.getZ();
-        // Stone blobs
-        for (int i = 0; i < 3; ++i) {
-            int bx = x + rand.nextInt(16);
-            int bz = z + rand.nextInt(16);
+        int stoneBlobs = rand.nextInt(3);
+        for (int i = 0; i < stoneBlobs; ++i) {
+            int bx = x + rand.nextInt(16) + 8;
+            int bz = z + rand.nextInt(16) + 8;
             blobs.generate(world, rand, world.getHeight(new BlockPos(bx, 0, bz)));
         }
-        // Big mushrooms
-        for (int i = 0; i < 16; ++i) {
-            int mx = x + rand.nextInt(16);
-            int mz = z + rand.nextInt(16);
-            BlockPos mpos = world.getHeight(new BlockPos(mx, 0, mz));
-            if (rand.nextInt(40) == 0) {
+        for (int mx = 0; mx < 4; ++mx) {
+            for (int mz = 0; mz < 4; ++mz) {
+                if (rand.nextInt(40) != 0) {
+                    continue;
+                }
+                int bx = x + mx * 4 + 1 + 8 + rand.nextInt(3);
+                int bz = z + mz * 4 + 1 + 8 + rand.nextInt(3);
+                BlockPos mpos = world.getHeight(new BlockPos(bx, 0, bz));
                 (new WorldGenBigMushroom()).generate(world, rand, mpos);
             }
         }
         super.decorate(world, rand, pos);
-        // Mana pods
         for (int i = 0; i < 10; ++i) {
-            int px = x + rand.nextInt(16);
-            int pz = z + rand.nextInt(16);
+            int px = x + rand.nextInt(16) + 8;
+            int pz = z + rand.nextInt(16) + 8;
             BlockPos ppos = new BlockPos(px, 64, pz);
             (new WorldGenManaPods()).generate(world, rand, ppos);
         }
-        // Shimmerleaf adjacent to wood
         for (int i = 0; i < 8; ++i) {
             int sx = x + rand.nextInt(16);
             int sz = z + rand.nextInt(16);
-            BlockPos spos = world.getHeight(new BlockPos(sx, 0, sz));
-            if (isBlockAdjacentToWood(world, spos)) {
-                world.setBlockState(spos, ConfigBlocks.blockCustomPlant.getStateFromMeta(2), 2);
+            BlockPos ground = world.getHeight(new BlockPos(sx, 0, sz));
+            while (ground.getY() > 50 && world.getBlockState(ground).getBlock() != Blocks.GRASS) {
+                ground = ground.down();
+            }
+            BlockPos plantPos = ground.up();
+            if (world.getBlockState(ground).getBlock() == Blocks.GRASS
+                    && world.getBlockState(plantPos).getBlock().isReplaceable(world, plantPos)
+                    && isBlockAdjacentToWood(world, plantPos)) {
+                world.setBlockState(plantPos, ConfigBlocks.blockCustomPlant.getStateFromMeta(5), 2);
             }
         }
     }
@@ -123,6 +137,9 @@ public class BiomeMagicalForest extends Biome {
         for (int dx = -1; dx <= 1; ++dx) {
             for (int dy = -1; dy <= 1; ++dy) {
                 for (int dz = -1; dz <= 1; ++dz) {
+                    if (dx == 0 && dy == 0 && dz == 0) {
+                        continue;
+                    }
                     BlockPos check = pos.add(dx, dy, dz);
                     if (world.isBlockLoaded(check, false) && world.getBlockState(check).getBlock().isWood(world, check)) {
                         return true;
