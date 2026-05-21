@@ -61,10 +61,11 @@ public class TableRendererFidelityStaticGuardTest {
                         && helper.contains("return world != null ? world : Minecraft.getMinecraft().world;")
                         && helper.contains("renderStack.setCount(1);"));
 
-        assertTrue("TileResearchTableRenderer should keep only inkwell/quill/parchment/notes overlays after the static shell moved into block models",
-                researchRenderer.contains("tableModel.renderInkwell(MODEL_SCALE);")
-                        && researchRenderer.contains("tableModel.renderScroll(MODEL_SCALE, color);")
-                        && !researchRenderer.contains("tableModel.renderAll(MODEL_SCALE);"));
+        assertTrue("TileResearchTableRenderer should restore the full research-table shell in the TESR while keeping overlay rendering",
+                researchRenderer.contains("md = state.getValue(BlockTable.TYPE);")
+                        && researchRenderer.contains("tableModel.renderAll(MODEL_SCALE);")
+                        && researchRenderer.contains("tableModel.renderInkwell(MODEL_SCALE);")
+                        && researchRenderer.contains("tableModel.renderScroll(MODEL_SCALE, color);"));
 
         assertTrue("Table blockstate should route plain and research table halves to shaped block models instead of the old shared cube placeholder",
                 blockstate.contains("\"type=1\": { \"model\": \"thaumcraft:blocktable_0\", \"y\": 90 }")
@@ -73,14 +74,14 @@ public class TableRendererFidelityStaticGuardTest {
                         && blockstate.contains("\"type=6\": { \"model\": \"thaumcraft:blocktable_6\", \"y\": 90 }")
                         && blockstate.contains("\"type=8\": { \"model\": \"thaumcraft:blocktable_6\" }"));
 
-        assertTrue("Plain and research table block models should now carry the shell geometry that used to live in TESR-only paths",
+        assertTrue("Plain table block model should keep its shell geometry while research table block models stay empty for TESR-driven visuals",
                 plainTableModel.contains("\"surface\": \"thaumcraft:models/table\"")
                         && plainTableModel.contains("\"from\": [0, 12, 0]")
                         && plainTableModel.contains("\"from\": [0, 0, 4]")
-                        && researchMasterModel.contains("\"surface\": \"thaumcraft:models/restable\"")
-                        && researchMasterModel.contains("\"from\": [4, 2, 6]")
-                        && researchPartnerModel.contains("\"surface\": \"thaumcraft:models/restable\"")
-                        && researchPartnerModel.contains("\"from\": [10, 0, 10]"));
+                        && researchMasterModel.contains("\"particle\": \"thaumcraft:blocks/woodplain\"")
+                        && researchMasterModel.contains("\"elements\": []")
+                        && researchPartnerModel.contains("\"particle\": \"thaumcraft:blocks/woodplain\"")
+                        && researchPartnerModel.contains("\"elements\": []"));
 
         assertTrue("Deconstruction and arcane workbench block models should now carry the table shell geometry instead of full-cube placeholders",
                 deconModel.contains("\"ambientocclusion\": false")

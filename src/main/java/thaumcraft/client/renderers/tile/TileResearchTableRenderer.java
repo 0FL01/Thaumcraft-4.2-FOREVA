@@ -3,8 +3,11 @@ package thaumcraft.client.renderers.tile;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.item.ItemStack;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.util.ResourceLocation;
 import thaumcraft.api.IScribeTools;
+import thaumcraft.common.blocks.BlockTable;
+import thaumcraft.common.config.ConfigBlocks;
 import thaumcraft.client.renderers.models.ModelResearchTable;
 import thaumcraft.common.config.ConfigItems;
 import thaumcraft.common.lib.research.ResearchManager;
@@ -30,7 +33,13 @@ public class TileResearchTableRenderer extends TileEntitySpecialRenderer<TileRes
             return;
         }
 
-        int md = tile.getWorld() == null ? 0 : tile.getBlockMetadata();
+        int md = 0;
+        if (tile.getWorld() != null) {
+            IBlockState state = tile.getWorld().getBlockState(tile.getPos());
+            if (state.getBlock() == ConfigBlocks.blockTable) {
+                md = state.getValue(BlockTable.TYPE);
+            }
+        }
 
         GlStateManager.pushMatrix();
         GlStateManager.translate(x + 0.5F, y + 1.0F, z + 0.5F);
@@ -43,9 +52,11 @@ public class TileResearchTableRenderer extends TileEntitySpecialRenderer<TileRes
             GlStateManager.rotate(180.0F, 0.0F, 1.0F, 0.0F);
         }
 
+        bindTexture(TABLE_TEXTURE);
+        tableModel.renderAll(MODEL_SCALE);
+
         ItemStack tools = tile.getStackInSlot(0);
         if (!tools.isEmpty() && tools.getItem() instanceof IScribeTools) {
-            bindTexture(TABLE_TEXTURE);
             tableModel.renderInkwell(MODEL_SCALE);
             GlStateManager.pushMatrix();
             GlStateManager.rotate(-90.0F, 0.0F, 1.0F, 0.0F);

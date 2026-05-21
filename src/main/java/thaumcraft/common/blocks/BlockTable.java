@@ -41,6 +41,10 @@ extends BlockContainer
 implements IWandable {
 
     public static final PropertyInteger TYPE = PropertyInteger.create("type", 0, 15);
+    private static final AxisAlignedBB RESEARCH_NORTH_AABB = new AxisAlignedBB(0.0D, 0.0D, -1.0D, 1.0D, 1.0D, 1.0D);
+    private static final AxisAlignedBB RESEARCH_SOUTH_AABB = new AxisAlignedBB(0.0D, 0.0D, 0.0D, 1.0D, 1.0D, 2.0D);
+    private static final AxisAlignedBB RESEARCH_WEST_AABB = new AxisAlignedBB(-1.0D, 0.0D, 0.0D, 1.0D, 1.0D, 1.0D);
+    private static final AxisAlignedBB RESEARCH_EAST_AABB = new AxisAlignedBB(0.0D, 0.0D, 0.0D, 2.0D, 1.0D, 1.0D);
 
     public BlockTable() {
         super(Material.WOOD);
@@ -203,25 +207,28 @@ implements IWandable {
 
     @Override
     public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess source, BlockPos pos) {
-        return FULL_BLOCK_AABB;
+        switch (this.getMetaFromState(state)) {
+            case 5:
+            case 9:
+                return RESEARCH_EAST_AABB;
+            case 4:
+            case 8:
+                return RESEARCH_WEST_AABB;
+            case 3:
+            case 7:
+                return RESEARCH_SOUTH_AABB;
+            case 2:
+            case 6:
+                return RESEARCH_NORTH_AABB;
+            default:
+                return FULL_BLOCK_AABB;
+        }
     }
 
     @Nullable
     @Override
     public AxisAlignedBB getCollisionBoundingBox(IBlockState blockState, IBlockAccess worldIn, BlockPos pos) {
-        int md = this.getMetaFromState(blockState);
-        int x = pos.getX(), y = pos.getY(), z = pos.getZ();
-        switch (md) {
-            case 5: case 9:
-                return new AxisAlignedBB(x, y, z, x + 1, y + 1, z);
-            case 4: case 8:
-                return new AxisAlignedBB(x - 1, y, z, x, y + 1, z);
-            case 3: case 7:
-                return new AxisAlignedBB(x, y, z, x, y + 1, z + 1);
-            case 2: case 6:
-                return new AxisAlignedBB(x, y, z - 1, x, y + 1, z);
-        }
-        return FULL_BLOCK_AABB;
+        return this.getBoundingBox(blockState, worldIn, pos).offset(pos);
     }
 
     @Override

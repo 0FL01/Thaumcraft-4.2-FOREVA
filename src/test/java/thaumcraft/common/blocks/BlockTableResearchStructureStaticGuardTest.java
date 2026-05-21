@@ -16,13 +16,19 @@ public class BlockTableResearchStructureStaticGuardTest {
         String blockTable = read("src/main/java/thaumcraft/common/blocks/BlockTable.java");
         String itemInkwell = read("src/main/java/thaumcraft/common/items/ItemInkwell.java");
         String researchTable = read("src/main/java/thaumcraft/common/tiles/TileResearchTable.java");
+        String researchRenderer = read("src/main/java/thaumcraft/client/renderers/tile/TileResearchTableRenderer.java");
+        String researchMasterModel = read("src/main/resources/assets/thaumcraft/models/block/blocktable_2.json");
+        String researchPartnerModel = read("src/main/resources/assets/thaumcraft/models/block/blocktable_6.json");
 
         assertTrue("BlockTable should remain wand-convertible and restore the master/partner research-table state machine",
                 blockTable.contains("implements IWandable")
                         && blockTable.contains("tile instanceof TileResearchTable && md >= 2 && md <= 5")
                         && blockTable.contains("md >= 6 && md <= 9")
                         && blockTable.contains("ConfigBlocks.blockTable.getDefaultState().withProperty(TYPE, 15)")
-                        && blockTable.contains("player.inventory.setInventorySlotContents(player.inventory.currentItem, ItemStack.EMPTY);"));
+                        && blockTable.contains("player.inventory.setInventorySlotContents(player.inventory.currentItem, ItemStack.EMPTY);")
+                        && blockTable.contains("new AxisAlignedBB(0.0D, 0.0D, -1.0D, 1.0D, 1.0D, 1.0D)")
+                        && blockTable.contains("new AxisAlignedBB(0.0D, 0.0D, 0.0D, 2.0D, 1.0D, 1.0D)")
+                        && blockTable.contains("return this.getBoundingBox(blockState, worldIn, pos).offset(pos);"));
 
         assertTrue("ItemInkwell should convert one plain table into a research-table master and the adjacent plain table into the matching partner half",
                 itemInkwell.contains("world.removeTileEntity(pos);")
@@ -35,6 +41,17 @@ public class BlockTableResearchStructureStaticGuardTest {
                         && researchTable.contains("new AxisAlignedBB(this.pos.add(-1, 0, -1), this.pos.add(2, 2, 2))")
                         && researchTable.contains("public boolean receiveClientEvent(int id, int type)")
                         && researchTable.contains("TCSounds.LEARN"));
+
+        assertTrue("TileResearchTableRenderer should render the full research table model from the TESR using live BlockTable state",
+                researchRenderer.contains("state.getBlock() == ConfigBlocks.blockTable")
+                        && researchRenderer.contains("md = state.getValue(BlockTable.TYPE);")
+                        && researchRenderer.contains("tableModel.renderAll(MODEL_SCALE);"));
+
+        assertTrue("Research table block models should stay empty so the TESR owns the visuals while particles keep a wood fallback",
+                researchMasterModel.contains("\"particle\": \"thaumcraft:blocks/woodplain\"")
+                        && researchMasterModel.contains("\"elements\": []")
+                        && researchPartnerModel.contains("\"particle\": \"thaumcraft:blocks/woodplain\"")
+                        && researchPartnerModel.contains("\"elements\": []"));
     }
 
     private static String read(String path) throws IOException {
