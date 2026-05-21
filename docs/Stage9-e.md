@@ -187,7 +187,13 @@ Remaining work:
 - only `@` prefix is accepted through the current thaumometer route;
 - the server reruns the thaumometer target lookup and only accepts packet payloads that match the current server-observed block/entity/node scan;
 - arbitrary item id/meta, entity id, or node-phenomena strings are rejected unless they match the authoritative server target;
-- targeted non-GUI runtime tests cover valid block/entity/node matches, forged payload rejection, representative `ScanManager.completeScan(...)` item/entity/node execution, packet field-routing `playerid`/`dim` gates, and awarded-aspect/clue progression side effects.
+- targeted non-GUI runtime tests cover valid block/entity/node matches, forged payload rejection, representative `ScanManager.completeScan(...)` item/entity/node execution, packet field-routing `playerid`/`dim` gates, dropped `EntityItem` authoritative scan matching, and awarded-aspect/clue progression side effects.
+
+The live thaumometer route itself is now closer to the 1.7.10 reference again:
+
+- `ItemThaumometer` no longer relies on the simplified `canBeCollidedWith()` player raypick for all entity scans; it restores the older permissive pointed-entity path (`minrange=0.5`, `range=10`, `padding=0`, `nonCollide=true`) so dropped item entities can be scanned again.
+- target selection is split into a raw route and a validated route, so client HUD/readout, client use-tick scanning, and server authoritative revalidation no longer drift apart.
+- client-side `blockRunes(...)` feedback is restored for valid entity/block/node scan candidates during use-tick scanning.
 
 What remains open for this gap:
 

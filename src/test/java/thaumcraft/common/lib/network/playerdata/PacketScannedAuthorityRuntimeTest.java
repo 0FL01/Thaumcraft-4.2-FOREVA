@@ -4,9 +4,11 @@ import com.mojang.authlib.GameProfile;
 import com.google.common.base.Predicate;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Bootstrap;
 import net.minecraft.init.Blocks;
+import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.profiler.Profiler;
 import net.minecraft.util.EnumFacing;
@@ -35,6 +37,7 @@ import thaumcraft.api.research.ScanResult;
 import thaumcraft.common.items.relics.ItemThaumometer;
 import thaumcraft.common.lib.capabilities.PlayerKnowledgeCapability;
 import thaumcraft.common.lib.capabilities.PlayerKnowledgeProvider;
+import thaumcraft.common.lib.research.ScanManager;
 
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -45,6 +48,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
 public class PacketScannedAuthorityRuntimeTest {
@@ -96,6 +100,34 @@ public class PacketScannedAuthorityRuntimeTest {
         ScanResult forged = PacketScannedToServer.findAuthoritativeMatchingScan(
                 player, (byte) 2, 0, 0, entity.getEntityId() + 99, "", "@");
         assertNull(forged);
+    }
+
+    @Test
+    public void droppedItemEntityMustRemainTargetableForThaumometerScanCompletion() {
+        ThaumcraftApi.registerObjectTag(new ItemStack(Items.STICK), new AspectList().add(Aspect.AIR, 1));
+
+        ScanWorld world = new ScanWorld();
+        ScanPlayer player = new ScanPlayer(world, "scan_item_entity");
+        player.setPosition(0.0D, 0.0D, 0.0D);
+        player.rotationYaw = 0.0F;
+        player.rotationPitch = 0.0F;
+        ItemStack thaumometerStack = new ItemStack(new ItemThaumometer());
+        player.inventory.mainInventory.set(player.inventory.currentItem, thaumometerStack);
+
+        NonCollidableItemEntity itemEntity = new NonCollidableItemEntity(world, new ItemStack(Items.STICK));
+        itemEntity.setPosition(0.0D, 1.0D, 4.0D);
+        world.entities.add(itemEntity);
+
+        ItemThaumometer thaumometer = (ItemThaumometer) thaumometerStack.getItem();
+        ScanResult clientTarget = thaumometer.findScanTarget(thaumometerStack, world, player);
+        assertNotNull(clientTarget);
+        assertEquals(2, clientTarget.type);
+        assertSame(itemEntity, clientTarget.entity);
+        assertNotNull(PacketScannedToServer.findAuthoritativeMatchingScan(
+                player, (byte) 2, 0, 0, itemEntity.getEntityId(), "", "@"));
+        assertTrue(ScanManager.completeScan(player, clientTarget, "@"));
+        assertTrue(player.knowledge.hasScannedItem("@"
+                + ScanManager.generateItemHash(Items.STICK, 0)));
     }
 
     @Test
@@ -223,6 +255,17 @@ public class PacketScannedAuthorityRuntimeTest {
         @Override
         public boolean canBeCollidedWith() {
             return true;
+        }
+    }
+
+    private static class NonCollidableItemEntity extends EntityItem {
+        NonCollidableItemEntity(World worldIn, ItemStack stack) {
+            super(worldIn, 0.0D, 0.0D, 0.0D, stack);
+        }
+
+        @Override
+        public boolean canBeCollidedWith() {
+            return false;
         }
     }
 

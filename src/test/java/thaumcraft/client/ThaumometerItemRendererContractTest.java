@@ -48,9 +48,8 @@ public class ThaumometerItemRendererContractTest {
                         && renderer.contains("CCModel.parseObjModels")
                         && renderer.contains("player.isHandActive()")
                         && renderer.contains("ScanManager.hasBeenScanned")
-                        && renderer.contains("EntityUtils.getPointedEntity")
-                        && renderer.contains("player.rayTrace(10.0D, 1.0F)")
-                        && renderer.contains("ThaumcraftApi.scanEventhandlers"));
+                        && renderer.contains("ItemThaumometer")
+                        && renderer.contains("findRawScanTarget(stack, player.world, player)"));
 
         assertTrue("The scanner render path should adapt the TC4.2 OBJ basis onto the TC6 scanner basis before applying donor display transforms",
                 renderer.contains("GlStateManager.translate(0.0F, TC4_TO_TC6_VERTICAL_CENTER, 0.0F);")

@@ -21,6 +21,7 @@ import thaumcraft.api.ThaumcraftApi;
 import thaumcraft.api.nodes.INode;
 import thaumcraft.api.research.IScanEventHandler;
 import thaumcraft.api.research.ScanResult;
+import thaumcraft.common.Thaumcraft;
 import thaumcraft.common.lib.TCSounds;
 import thaumcraft.common.lib.network.PacketHandler;
 import thaumcraft.common.lib.network.playerdata.PacketScannedToServer;
@@ -99,14 +100,27 @@ public class ItemThaumometer extends Item {
     }
 
     private ScanResult doScan(ItemStack stack, World world, EntityPlayer player) {
-        return this.findScanTarget(stack, world, player);
+        ScanResult result = this.findRawScanTarget(stack, world, player);
+        if (!ScanManager.isValidScanTarget(player, result, "@")) {
+            return null;
+        }
+        this.showScanFeedback(world, player, result);
+        return result;
     }
 
     public ScanResult findScanTarget(ItemStack stack, World world, EntityPlayer player) {
-        Entity pointed = EntityUtils.getPointedEntity(world, player, 10.0D, null);
+        ScanResult result = this.findRawScanTarget(stack, world, player);
+        return ScanManager.isValidScanTarget(player, result, "@") ? result : null;
+    }
+
+    public ScanResult findRawScanTarget(ItemStack stack, World world, EntityPlayer player) {
+        if (stack == null || stack.isEmpty() || world == null || player == null) {
+            return null;
+        }
+
+        Entity pointed = EntityUtils.getPointedEntity(world, player, 0.5D, 10.0D, 0.0F, true);
         if (pointed != null) {
-            ScanResult result = new ScanResult((byte)2, 0, 0, pointed, "");
-            return ScanManager.isValidScanTarget(player, result, "@") ? result : null;
+            return new ScanResult((byte)2, 0, 0, pointed, "");
         }
 
         RayTraceResult hit = this.rayTrace(world, player, true);
@@ -119,8 +133,7 @@ public class ItemThaumometer extends Item {
                 if (id == null || id.isEmpty()) {
                     id = world.provider.getDimension() + ":" + pos.getX() + ":" + pos.getY() + ":" + pos.getZ();
                 }
-                ScanResult result = new ScanResult((byte)3, 0, 0, null, "NODE" + id);
-                return ScanManager.isValidScanTarget(player, result, "@") ? result : null;
+                return new ScanResult((byte)3, 0, 0, null, "NODE" + id);
             }
 
             IBlockState state = world.getBlockState(pos);
@@ -135,8 +148,7 @@ public class ItemThaumometer extends Item {
                 target = BlockUtils.createStackedBlock(block, meta);
             }
             if (!target.isEmpty()) {
-                ScanResult result = new ScanResult((byte)1, Item.getIdFromItem(target.getItem()), target.getMetadata(), null, "");
-                return ScanManager.isValidScanTarget(player, result, "@") ? result : null;
+                return new ScanResult((byte)1, Item.getIdFromItem(target.getItem()), target.getMetadata(), null, "");
             }
         }
 
@@ -147,5 +159,45 @@ public class ItemThaumometer extends Item {
             }
         }
         return null;
+    }
+
+    private void showScanFeedback(World world, EntityPlayer player, ScanResult result) {
+        if (!world.isRemote || player == null || result == null) {
+            return;
+        }
+
+        float red = 0.3F + world.rand.nextFloat() * 0.7F;
+        float blue = 0.3F + world.rand.nextFloat() * 0.7F;
+        if (result.type == 2 && result.entity != null) {
+            Entity entity = result.entity;
+            Thaumcraft.proxy.blockRunes(
+                    world,
+                    entity.posX - 0.5D,
+                    entity.posY + (double) (entity.getEyeHeight() / 2.0F),
+                    entity.posZ - 0.5D,
+                    red,
+                    0.0F,
+                    blue,
+                    (int) (entity.height * 15.0F),
+                    0.03F);
+            return;
+        }
+
+        RayTraceResult hit = this.rayTrace(world, player, true);
+        if (hit == null || hit.typeOfHit != RayTraceResult.Type.BLOCK) {
+            return;
+        }
+
+        BlockPos pos = hit.getBlockPos();
+        Thaumcraft.proxy.blockRunes(
+                world,
+                pos.getX(),
+                pos.getY() + 0.25D,
+                pos.getZ(),
+                red,
+                0.0F,
+                blue,
+                15,
+                0.03F);
     }
 }

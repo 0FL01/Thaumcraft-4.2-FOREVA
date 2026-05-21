@@ -30,6 +30,7 @@ import thaumcraft.api.research.IScanEventHandler;
 import thaumcraft.api.research.ScanResult;
 import thaumcraft.codechicken.lib.render.CCModel;
 import thaumcraft.codechicken.lib.render.CCRenderState;
+import thaumcraft.common.items.relics.ItemThaumometer;
 import thaumcraft.common.lib.research.ScanManager;
 import thaumcraft.common.lib.utils.BlockUtils;
 import thaumcraft.common.lib.utils.EntityUtils;
@@ -218,50 +219,8 @@ public class ItemThaumometerRenderer extends TileEntityItemStackRenderer {
         if (stack == null || stack.isEmpty() || player == null || player.world == null) {
             return null;
         }
-        World world = player.world;
-
-        Entity pointed = EntityUtils.getPointedEntity(world, player, 10.0D, null);
-        if (pointed != null) {
-            ScanResult result = new ScanResult((byte) 2, 0, 0, pointed, "");
-            return ScanManager.isValidScanTarget(player, result, "@") ? result : null;
-        }
-
-        RayTraceResult hit = player.rayTrace(10.0D, 1.0F);
-        if (hit != null && hit.typeOfHit == RayTraceResult.Type.BLOCK) {
-            BlockPos pos = hit.getBlockPos();
-            TileEntity tile = world.getTileEntity(pos);
-            if (tile instanceof INode) {
-                INode node = (INode) tile;
-                String id = node.getId();
-                if (id == null || id.isEmpty()) {
-                    id = world.provider.getDimension() + ":" + pos.getX() + ":" + pos.getY() + ":" + pos.getZ();
-                }
-                ScanResult result = new ScanResult((byte) 3, 0, 0, null, "NODE" + id);
-                return ScanManager.isValidScanTarget(player, result, "@") ? result : null;
-            }
-
-            IBlockState state = world.getBlockState(pos);
-            Block block = state.getBlock();
-            int meta = block.getMetaFromState(state);
-            ItemStack target = ItemStack.EMPTY;
-            try {
-                target = block.getPickBlock(state, hit, world, pos, player);
-            } catch (Exception ignored) {
-            }
-            if (target == null || target.isEmpty()) {
-                target = BlockUtils.createStackedBlock(block, meta);
-            }
-            if (!target.isEmpty()) {
-                ScanResult result = new ScanResult((byte) 1, Item.getIdFromItem(target.getItem()), target.getMetadata(), null, "");
-                return ScanManager.isValidScanTarget(player, result, "@") ? result : null;
-            }
-        }
-
-        for (IScanEventHandler handler : ThaumcraftApi.scanEventhandlers) {
-            ScanResult result = handler.scanPhenomena(stack, world, player);
-            if (result != null) {
-                return result;
-            }
+        if (stack.getItem() instanceof ItemThaumometer) {
+            return ((ItemThaumometer) stack.getItem()).findRawScanTarget(stack, player.world, player);
         }
         return null;
     }

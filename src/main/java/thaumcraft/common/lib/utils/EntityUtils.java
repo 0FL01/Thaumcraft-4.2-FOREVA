@@ -98,28 +98,113 @@ public class EntityUtils {
         entity.world.spawnEntity(entityitem);
     }
 
+    public static Entity getPointedEntity(World world, Entity entity, double minrange, double range, float padding) {
+        return getPointedEntity(world, entity, minrange, range, padding, false);
+    }
+
+    public static Entity getPointedEntity(World world, Entity entity, double minrange, double range, float padding, boolean nonCollide) {
+        if (world == null || entity == null) return null;
+
+        Entity pointed = null;
+        double maxDistance = range;
+        Vec3d eyes = new Vec3d(entity.posX, entity.posY + (double) entity.getEyeHeight(), entity.posZ);
+        Vec3d look = entity.getLook(1.0F);
+        Vec3d end = eyes.add(look.x * maxDistance, look.y * maxDistance, look.z * maxDistance);
+        List<Entity> candidates = world.getEntitiesInAABBexcluding(
+                entity,
+                entity.getEntityBoundingBox()
+                        .expand(look.x * maxDistance, look.y * maxDistance, look.z * maxDistance)
+                        .grow(padding, padding, padding),
+                candidate -> candidate != null);
+        double closest = 0.0D;
+
+        for (Entity candidate : candidates) {
+            if (candidate.getDistance(entity) < minrange) {
+                continue;
+            }
+            if (!candidate.canBeCollidedWith() && !nonCollide) {
+                continue;
+            }
+
+            Vec3d targetEyes = new Vec3d(candidate.posX, candidate.posY + (double) candidate.getEyeHeight(), candidate.posZ);
+            if (world.rayTraceBlocks(eyes, targetEyes, false, true, false) != null) {
+                continue;
+            }
+
+            float border = Math.max(0.8F, candidate.getCollisionBorderSize());
+            AxisAlignedBB bounds = candidate.getEntityBoundingBox().grow(border, border, border);
+            RayTraceResult intercept = bounds.calculateIntercept(eyes, end);
+            if (bounds.contains(eyes)) {
+                if (0.0D < closest || closest == 0.0D) {
+                    pointed = candidate;
+                    closest = 0.0D;
+                }
+                continue;
+            }
+            if (intercept == null) {
+                continue;
+            }
+
+            double distance = eyes.distanceTo(intercept.hitVec);
+            if (distance < closest || closest == 0.0D) {
+                pointed = candidate;
+                closest = distance;
+            }
+        }
+
+        return pointed;
+    }
+
     public static Entity getPointedEntity(World world, EntityPlayer player, double range, @Nullable Class<? extends Entity> excludedClass) {
         if (world == null || player == null) return null;
-        Vec3d eyes = player.getPositionEyes(1.0F);
-        Vec3d look = player.getLook(1.0F);
-        Vec3d end = eyes.add(look.x * range, look.y * range, look.z * range);
+
         Entity pointed = null;
-        double closest = range * range;
-        AxisAlignedBB searchBox = player.getEntityBoundingBox()
-                .expand(look.x * range, look.y * range, look.z * range)
-                .grow(1.0D);
-        for (Entity entity : world.getEntitiesInAABBexcluding(player, searchBox, entity -> {
-            if (entity == null || !entity.canBeCollidedWith()) return false;
-            return excludedClass == null || !excludedClass.isAssignableFrom(entity.getClass());
-        })) {
-            RayTraceResult hit = entity.getEntityBoundingBox().grow(0.3D).calculateIntercept(eyes, end);
-            if (hit == null) continue;
-            double distance = eyes.squareDistanceTo(hit.hitVec);
-            if (distance < closest) {
+        double maxDistance = range;
+        Vec3d eyes = new Vec3d(player.posX, player.posY + (double) player.getEyeHeight(), player.posZ);
+        Vec3d look = player.getLook(1.0F);
+        Vec3d end = eyes.add(look.x * maxDistance, look.y * maxDistance, look.z * maxDistance);
+        List<Entity> candidates = world.getEntitiesInAABBexcluding(
+                player,
+                player.getEntityBoundingBox()
+                        .expand(look.x * maxDistance, look.y * maxDistance, look.z * maxDistance)
+                        .grow(1.1D, 1.1D, 1.1D),
+                entity -> entity != null);
+        double closest = 0.0D;
+
+        for (Entity entity : candidates) {
+            if (!entity.canBeCollidedWith()) {
+                continue;
+            }
+            if (excludedClass != null && excludedClass.isInstance(entity)) {
+                continue;
+            }
+
+            Vec3d targetEyes = new Vec3d(entity.posX, entity.posY + (double) entity.getEyeHeight(), entity.posZ);
+            if (world.rayTraceBlocks(eyes, targetEyes, false, true, false) != null) {
+                continue;
+            }
+
+            float border = Math.max(0.8F, entity.getCollisionBorderSize());
+            AxisAlignedBB bounds = entity.getEntityBoundingBox().grow(border, border, border);
+            RayTraceResult intercept = bounds.calculateIntercept(eyes, end);
+            if (bounds.contains(eyes)) {
+                if (0.0D < closest || closest == 0.0D) {
+                    pointed = entity;
+                    closest = 0.0D;
+                }
+                continue;
+            }
+            if (intercept == null) {
+                continue;
+            }
+
+            double distance = eyes.distanceTo(intercept.hitVec);
+            if (distance < closest || closest == 0.0D) {
                 pointed = entity;
                 closest = distance;
             }
         }
+
         return pointed;
     }
 

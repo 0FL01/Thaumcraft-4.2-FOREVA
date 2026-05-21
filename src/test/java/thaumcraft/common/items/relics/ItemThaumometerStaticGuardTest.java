@@ -35,6 +35,16 @@ public class ItemThaumometerStaticGuardTest {
                         && source.contains("target = block.getPickBlock(state, hit, world, pos, player);")
                         && source.contains("} catch (Exception ignored)")
                         && source.contains("target = BlockUtils.createStackedBlock(block, meta);"));
+        assertTrue("Thaumometer should keep the original permissive pointed-entity route and separate raw target selection from validated scan completion",
+                source.contains("public ScanResult findRawScanTarget(ItemStack stack, World world, EntityPlayer player)")
+                        && source.contains("EntityUtils.getPointedEntity(world, player, 0.5D, 10.0D, 0.0F, true)")
+                        && source.contains("return new ScanResult((byte)2, 0, 0, pointed, \"\");")
+                        && source.contains("return ScanManager.isValidScanTarget(player, result, \"@\") ? result : null;"));
+        assertTrue("Thaumometer should restore client scan feedback through block runes for entity and block/node targets",
+                source.contains("private void showScanFeedback(World world, EntityPlayer player, ScanResult result)")
+                        && source.contains("Thaumcraft.proxy.blockRunes(")
+                        && source.contains("entity.posX - 0.5D")
+                        && source.contains("pos.getY() + 0.25D"));
     }
 
     private static String readFile(String path) throws IOException {
