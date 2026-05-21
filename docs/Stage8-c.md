@@ -162,6 +162,27 @@ Current source tree has no `thaumcraft.client.renderers.tile`, no `thaumcraft.cl
 
 - Этот checkpoint добавляет coverage guard и не закрывает основной TESR backlog Stage 8-c (jar/crucible/alembic/infusion/nodes/etc.).
 
+### Checkpoint 2026-05-21 — thaumometer HUD/notification parity correction
+
+Статус: implemented, static-guarded, `validate --smoke` passed.
+
+Что скорректировано:
+
+- First-person thaumometer readout больше не использует 1.12-only approximate scale chain; [ItemThaumometerRenderer.java](/home/opencode/ai/Thaumcraft-4.2-FOREVA/src/main/java/thaumcraft/client/renderers/item/ItemThaumometerRenderer.java) теперь повторяет TC4.2 aspect-tag/title layout math на сканерном экране, включая `0.0075F` aspect-tag scale, `-0.25F` title offset и original title shrink slope.
+- Corner scan notifications были заведены на неподходящий overlay hook. [RenderEventHandler.java](/home/opencode/ai/Thaumcraft-4.2-FOREVA/src/main/java/thaumcraft/client/lib/RenderEventHandler.java) теперь рендерит notification HUD через `RenderGameOverlayEvent.Text`, а не через `Post/ALL`, чтобы surface реально жил на 1.12 client overlay lifecycle.
+- [ScanManager.java](/home/opencode/ai/Thaumcraft-4.2-FOREVA/src/main/java/thaumcraft/common/lib/research/ScanManager.java) снова даёт original client hints для `tc.discoveryerror` и `tc.unknownobject`, вместо немого fail-path при unknown/unresearched scans.
+- `en_us.lang` добран недостающими `nodetype.*`, `nodemod.*` и полным `tc.aspect.help.*` corpus, чтобы first-person node titles и hint notifications не деградировали до raw lang keys.
+
+Проверки:
+
+- `./scripts/dev.sh compileJava` — passed.
+- `./scripts/dev.sh gradle test --rerun-tasks --tests thaumcraft.client.ThaumometerItemRendererContractTest --tests thaumcraft.client.ClientNotificationOverlayStaticGuardTest --tests thaumcraft.common.lib.network.playerdata.PlayerDataPacketClientBoundaryStaticGuardTest --tests thaumcraft.common.lib.research.ScanManagerThaumometerNotificationStaticGuardTest --tests thaumcraft.common.items.relics.ItemThaumometerStaticGuardTest --tests thaumcraft.common.lib.network.playerdata.PacketScannedAuthorityRuntimeTest` — passed.
+- `./scripts/dev.sh validate --smoke` — passed.
+
+Ограничения:
+
+- Manual client validation по-прежнему требуется; этот checkpoint закрывает diagnosed parity gaps по route/hook/math, но не заменяет живую визуальную проверку.
+
 **Что нужно доделать:**
 
 Port or reimplement the renderer/model classes required by Stage 8-c, preserving original visual behavior where feasible and adapting OpenGL/Tessellator/model APIs to 1.12.2.

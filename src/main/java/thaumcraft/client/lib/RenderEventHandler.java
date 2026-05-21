@@ -102,10 +102,7 @@ public class RenderEventHandler {
     }
 
     @SubscribeEvent
-    public void renderNotifications(RenderGameOverlayEvent.Post event) {
-        if (event.getType() != RenderGameOverlayEvent.ElementType.ALL) {
-            return;
-        }
+    public void renderNotifications(RenderGameOverlayEvent.Text event) {
         Minecraft mc = Minecraft.getMinecraft();
         if (mc == null || mc.player == null) {
             return;

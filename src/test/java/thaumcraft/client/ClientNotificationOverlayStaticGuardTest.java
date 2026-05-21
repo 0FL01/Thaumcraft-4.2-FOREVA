@@ -18,7 +18,7 @@ public class ClientNotificationOverlayStaticGuardTest {
         String notifications = read("src/main/java/thaumcraft/client/lib/PlayerNotifications.java");
 
         assertTrue(renderHandler.contains("private final REHNotifyHandler notifyHandler = new REHNotifyHandler();"));
-        assertTrue(renderHandler.contains("renderNotifications(RenderGameOverlayEvent.Post event)"));
+        assertTrue(renderHandler.contains("renderNotifications(RenderGameOverlayEvent.Text event)"));
         assertTrue(renderHandler.contains("this.notifyHandler.handleNotifications("));
 
         assertTrue(notifyHandler.contains("renderNotifyHUD("));

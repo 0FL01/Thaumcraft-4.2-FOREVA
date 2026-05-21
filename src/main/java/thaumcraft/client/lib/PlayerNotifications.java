@@ -48,13 +48,12 @@ public class PlayerNotifications {
         ArrayList<Notification> temp = new ArrayList<Notification>();
         boolean first = true;
         for (Notification notification : notificationList) {
-            if (notification.expire < time) {
-                continue;
-            }
-            if (!first) {
-                temp.add(new Notification(notification.text, notification.image, time + Config.notificationDelay, notification.created, notification.color));
-            } else {
-                temp.add(notification);
+            if (notification.expire >= time) {
+                if (!first) {
+                    temp.add(new Notification(notification.text, notification.image, time + Config.notificationDelay, notification.created, notification.color));
+                } else {
+                    temp.add(notification);
+                }
             }
             first = false;
         }

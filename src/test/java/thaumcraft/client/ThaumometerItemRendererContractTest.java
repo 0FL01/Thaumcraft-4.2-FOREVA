@@ -51,7 +51,10 @@ public class ThaumometerItemRendererContractTest {
                         && renderer.contains("ItemThaumometer")
                         && renderer.contains("findRawScanTarget(stack, player.world, player)")
                         && renderer.contains("UtilsFX.drawTag(")
-                        && renderer.contains("if (isFirstPerson(transformType) && player != null && mc.gameSettings.thirdPersonView == 0)"));
+                        && renderer.contains("if (isFirstPerson(transformType) && player != null && mc.gameSettings.thirdPersonView == 0)")
+                        && renderer.contains("GlStateManager.scale(0.0075F, 0.0075F, 0.0075F);")
+                        && renderer.contains("GlStateManager.translate(0.0F, -0.25F, 0.0F);")
+                        && renderer.contains("scale -= 0.000025F * (titleWidth - 90);"));
 
         assertTrue("Minimal UtilsFX helper surface should exist for thaumometer HUD aspect tags",
                 utilsFx.contains("public class UtilsFX")
