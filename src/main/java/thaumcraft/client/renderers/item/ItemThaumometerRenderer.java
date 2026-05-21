@@ -45,6 +45,7 @@ public class ItemThaumometerRenderer extends TileEntityItemStackRenderer {
     private static final float TC4_TO_TC6_VERTICAL_CENTER = -0.1F;
     private static final float TC4_TO_TC6_Y_ROTATION = -90.0F;
     private static final long DEBUG_LOG_INTERVAL_MS = 1500L;
+    private static final float HUD_SCALE_MULTIPLIER = 1.5F;
     private static final ThreadLocal<ItemCameraTransforms.TransformType> CURRENT_TRANSFORM =
             ThreadLocal.withInitial(() -> ItemCameraTransforms.TransformType.NONE);
     private static long lastReadoutDebugLogMs = 0L;
@@ -181,7 +182,7 @@ public class ItemThaumometerRenderer extends TileEntityItemStackRenderer {
                     nodeTitle = nodeTitle + ", " + net.minecraft.client.resources.I18n.format("nodemod." + node.getNodeModifier().name() + ".name");
                 }
                 int nodeTitleWidth = font.getStringWidth(nodeTitle);
-                GlStateManager.scale(0.004F, 0.004F, 0.004F);
+                GlStateManager.scale(0.004F * HUD_SCALE_MULTIPLIER, 0.004F * HUD_SCALE_MULTIPLIER, 0.004F * HUD_SCALE_MULTIPLIER);
                 font.drawString(nodeTitle, -nodeTitleWidth / 2, -40, 15642134, false);
                 GlStateManager.disableBlend();
                 GlStateManager.popMatrix();
@@ -203,7 +204,7 @@ public class ItemThaumometerRenderer extends TileEntityItemStackRenderer {
             int baseX = Math.min(5, remaining) * 8;
             for (Aspect aspect : aspects.getAspectsSorted()) {
                 GlStateManager.pushMatrix();
-                GlStateManager.scale(0.0075F, 0.0075F, 0.0075F);
+                GlStateManager.scale(0.0075F * HUD_SCALE_MULTIPLIER, 0.0075F * HUD_SCALE_MULTIPLIER, 0.0075F * HUD_SCALE_MULTIPLIER);
                 int localPacked = getScannerGlow(player instanceof EntityPlayerSP ? (EntityPlayerSP) player : null, posX);
                 OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, localPacked % 65536, localPacked / 65536);
                 UtilsFX.drawTag(-baseX + posX * 16, -8 + posY * 16, aspect, aspects.getAmount(aspect), 0, 0.01D, 1, 1.0F, false);
@@ -226,7 +227,7 @@ public class ItemThaumometerRenderer extends TileEntityItemStackRenderer {
             GlStateManager.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE);
             GlStateManager.translate(0.0F, -0.25F, 0.0F);
             int titleWidth = font.getStringWidth(title);
-            float scale = 0.005F;
+            float scale = 0.005F * HUD_SCALE_MULTIPLIER;
             if (titleWidth > 90) {
                 scale -= 0.000025F * (titleWidth - 90);
             }
