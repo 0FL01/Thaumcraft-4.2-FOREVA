@@ -1,5 +1,8 @@
 package thaumcraft.common.items.relics;
 
+import java.util.List;
+import javax.annotation.Nullable;
+import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.EnumRarity;
 import net.minecraft.item.Item;
@@ -12,8 +15,12 @@ import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextComponentTranslation;
+import net.minecraft.util.text.TextFormatting;
+import net.minecraft.util.text.translation.I18n;
 import net.minecraft.world.World;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import thaumcraft.api.aspects.Aspect;
 import thaumcraft.api.aspects.AspectList;
 import thaumcraft.api.aspects.IAspectContainer;
@@ -30,6 +37,16 @@ public class ItemResonator extends Item {
         this.setMaxDamage(0);
         this.setNoRepair();
         this.setCreativeTab(CreativeTabThaumcraft.tabThaumcraft);
+    }
+
+    @SideOnly(Side.CLIENT)
+    @Override
+    public void addInformation(ItemStack stack, @Nullable World worldIn, List<String> tooltip, ITooltipFlag flagIn) {
+        String desc = I18n.translateToLocal("item.thaumcraft.resonator.desc");
+        if (!desc.equals("item.thaumcraft.resonator.desc")) {
+            tooltip.add(TextFormatting.GOLD + desc);
+        }
+        super.addInformation(stack, worldIn, tooltip, flagIn);
     }
 
     @Override
