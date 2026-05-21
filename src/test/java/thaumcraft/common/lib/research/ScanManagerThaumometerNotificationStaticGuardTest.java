@@ -19,8 +19,10 @@ public class ScanManagerThaumometerNotificationStaticGuardTest {
         assertTrue(source.contains("Thaumcraft.proxy.notifyThaumometerUnknownObject()"));
         assertTrue(source.contains("Thaumcraft.proxy.notifyThaumometerDiscoveryError(parent)"));
         assertTrue(item.contains("ScanManager.notifyInvalidScan(aspects, player);"));
-        assertTrue(clientProxy.contains("net.minecraft.client.resources.I18n.format(\"tc.discoveryerror\", missing)"));
-        assertTrue(clientProxy.contains("net.minecraft.client.resources.I18n.format(\"tc.unknownobject\")"));
+        assertTrue(clientProxy.contains("localizeOrFallback(\"tc.discoveryerror\", \"To understand this you need to study %1$s.\")"));
+        assertTrue(clientProxy.contains("localizeOrFallback(\"tc.unknownobject\", \"Nothing can be learned from this.\")"));
+        assertTrue(clientProxy.contains("formatThaumometerAspectLabel(aspect)"));
+        assertTrue(clientProxy.contains("aspect.getLocalizedDescription()"));
         assertTrue(clientProxy.contains("tc.aspect.help."));
     }
 }

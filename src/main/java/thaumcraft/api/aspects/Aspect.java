@@ -98,7 +98,15 @@ public class Aspect {
     }
 
     public String getLocalizedDescription() {
-        return I18n.translateToLocal((String)("tc.aspect." + this.tag));
+        String description = I18n.translateToLocal((String)("tc.aspect." + this.tag));
+        if (description.equals("tc.aspect." + this.tag)) {
+            // The 1.12 asset corpus keeps the human-readable aspect descriptions under tc.aspect.help.*.
+            String helpDescription = I18n.translateToLocal((String)("tc.aspect.help." + this.tag));
+            if (!helpDescription.equals("tc.aspect.help." + this.tag)) {
+                description = helpDescription;
+            }
+        }
+        return description;
     }
 
     public String getTag() {
@@ -165,4 +173,3 @@ public class Aspect {
         this.chatcolor = chatcolor;
     }
 }
-

@@ -56,10 +56,11 @@ public class PlayerDataPacketClientBoundaryStaticGuardTest {
         assertTrue(clientProxy.contains("notifyThaumometerAspectPool"));
         assertTrue(clientProxy.contains("notifyThaumometerDiscoveryError"));
         assertTrue(clientProxy.contains("notifyThaumometerUnknownObject"));
-        assertTrue(clientProxy.contains("net.minecraft.client.resources.I18n.format(\"tc.addaspectdiscovery\")"));
-        assertTrue(clientProxy.contains("net.minecraft.client.resources.I18n.format(\"tc.addaspectpool\")"));
-        assertTrue(clientProxy.contains("net.minecraft.client.resources.I18n.format(\"tc.discoveryerror\", missing)"));
-        assertTrue(clientProxy.contains("net.minecraft.client.resources.I18n.format(\"tc.unknownobject\")"));
+        assertTrue(clientProxy.contains("localizeOrFallback(\"tc.addaspectdiscovery\", \"You have discovered %n!\")"));
+        assertTrue(clientProxy.contains("localizeOrFallback(\"tc.addaspectpool\", \"Gained %s research point(s) for %n\")"));
+        assertTrue(clientProxy.contains("localizeOrFallback(\"tc.discoveryerror\", \"To understand this you need to study %1$s.\")"));
+        assertTrue(clientProxy.contains("localizeOrFallback(\"tc.unknownobject\", \"Nothing can be learned from this.\")"));
+        assertTrue(clientProxy.contains("formatThaumometerAspectLabel(aspect)"));
     }
 
     private static String readFile(String path) throws IOException {

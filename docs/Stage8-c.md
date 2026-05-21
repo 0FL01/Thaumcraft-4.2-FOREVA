@@ -172,6 +172,7 @@ Current source tree has no `thaumcraft.client.renderers.tile`, no `thaumcraft.cl
 - Corner scan notifications были заведены на неподходящий overlay hook. [RenderEventHandler.java](/home/opencode/ai/Thaumcraft-4.2-FOREVA/src/main/java/thaumcraft/client/lib/RenderEventHandler.java) теперь рендерит notification HUD через `RenderGameOverlayEvent.Text`, а не через `Post/ALL`, чтобы surface реально жил на 1.12 client overlay lifecycle.
 - [ScanManager.java](/home/opencode/ai/Thaumcraft-4.2-FOREVA/src/main/java/thaumcraft/common/lib/research/ScanManager.java) снова даёт original client hints для `tc.discoveryerror` и `tc.unknownobject`, вместо немого fail-path при unknown/unresearched scans.
 - `en_us.lang` добран недостающими `nodetype.*`, `nodemod.*` и полным `tc.aspect.help.*` corpus, чтобы first-person node titles и hint notifications не деградировали до raw lang keys.
+- Thaumometer pool/discovery notifications now inline the localized aspect description as `AspectName (description)`; `Aspect.getLocalizedDescription()` falls back to the legacy `tc.aspect.help.*` corpus when `tc.aspect.<tag>` is absent, so the top-right notification stays descriptive even with the current en_us asset family.
 
 Проверки:
 

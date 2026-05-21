@@ -778,7 +778,7 @@ public class ClientProxy extends CommonProxy {
 
     @Override
     public void notifyThaumometerUnknownObject() {
-        PlayerNotifications.addNotification(net.minecraft.client.resources.I18n.format("tc.unknownobject"));
+        PlayerNotifications.addNotification(localizeOrFallback("tc.unknownobject", "Nothing can be learned from this."));
     }
 
     @Override
@@ -786,7 +786,9 @@ public class ClientProxy extends CommonProxy {
         String missing = missingAspect == null
                 ? "?"
                 : net.minecraft.client.resources.I18n.format("tc.aspect.help." + missingAspect.getTag());
-        PlayerNotifications.addNotification(net.minecraft.client.resources.I18n.format("tc.discoveryerror", missing));
+        String text = localizeOrFallback("tc.discoveryerror", "To understand this you need to study %1$s.")
+                .replace("%1$s", missing);
+        PlayerNotifications.addNotification(text);
     }
 
     @Override
@@ -794,7 +796,8 @@ public class ClientProxy extends CommonProxy {
         if (aspect == null) {
             return;
         }
-        String text = net.minecraft.client.resources.I18n.format("tc.addaspectdiscovery").replace("%n", aspect.getName());
+        String text = localizeOrFallback("tc.addaspectdiscovery", "You have discovered %n!")
+                .replace("%n", formatThaumometerAspectLabel(aspect));
         PlayerNotifications.addNotification("\u00a76" + text, aspect);
     }
 
@@ -803,13 +806,33 @@ public class ClientProxy extends CommonProxy {
         if (aspect == null || amount <= 0) {
             return;
         }
-        String text = net.minecraft.client.resources.I18n.format("tc.addaspectpool")
+        String text = localizeOrFallback("tc.addaspectpool", "Gained %s research point(s) for %n")
                 .replace("%s", Integer.toString(amount))
-                .replace("%n", aspect.getName());
+                .replace("%n", formatThaumometerAspectLabel(aspect));
         PlayerNotifications.addNotification(text, aspect);
         for (int a = 0; a < amount; ++a) {
             PlayerNotifications.addAspectNotification(aspect);
         }
+    }
+
+    private static String localizeOrFallback(String key, String fallback) {
+        String localized = net.minecraft.client.resources.I18n.format(key);
+        return key.equals(localized) ? fallback : localized;
+    }
+
+    private static String formatThaumometerAspectLabel(Aspect aspect) {
+        String description = aspect.getLocalizedDescription();
+        if (description == null || description.isEmpty()
+                || description.equals("tc.aspect." + aspect.getTag())
+                || description.equals("tc.aspect.help." + aspect.getTag())) {
+            description = net.minecraft.client.resources.I18n.format("tc.aspect.help." + aspect.getTag());
+        }
+        if (description == null || description.isEmpty()
+                || description.equals("tc.aspect." + aspect.getTag())
+                || description.equals("tc.aspect.help." + aspect.getTag())) {
+            return aspect.getName();
+        }
+        return aspect.getName() + " (" + description + ")";
     }
 
     @Nullable
