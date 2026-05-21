@@ -1,6 +1,7 @@
 package thaumcraft.client.renderers.item;
 
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
 import net.minecraft.client.renderer.tileentity.TileEntityItemStackRenderer;
 import net.minecraft.item.ItemStack;
 import thaumcraft.client.renderers.tile.TileFocalManipulatorRenderer;
@@ -20,6 +21,14 @@ public class ItemStoneDeviceRenderer extends TileEntityItemStackRenderer {
     private final TileNodeConverterRenderer converterRenderer = new TileNodeConverterRenderer();
     private final TileFocalManipulatorRenderer focalManipulatorRenderer = new TileFocalManipulatorRenderer();
     private final TileFluxScrubberRenderer fluxScrubberRenderer = new TileFluxScrubberRenderer();
+
+    public ItemStoneDeviceRenderer() {
+        matrixRenderer.setRendererDispatcher(TileEntityRendererDispatcher.instance);
+        stabilizerRenderer.setRendererDispatcher(TileEntityRendererDispatcher.instance);
+        converterRenderer.setRendererDispatcher(TileEntityRendererDispatcher.instance);
+        focalManipulatorRenderer.setRendererDispatcher(TileEntityRendererDispatcher.instance);
+        fluxScrubberRenderer.setRendererDispatcher(TileEntityRendererDispatcher.instance);
+    }
 
     @Override
     public void renderByItem(ItemStack stack, float partialTicks) {

@@ -42,6 +42,12 @@ public class StoneDeviceTesrRoutingContractTest {
 
         assertTrue("ItemStoneDeviceRenderer should route the matrix and the remaining reference TESR inventory family through their dedicated renderers",
                 itemRenderer.contains("new TileRunicMatrixRenderer()")
+                        && itemRenderer.contains("TileEntityRendererDispatcher.instance")
+                        && itemRenderer.contains("matrixRenderer.setRendererDispatcher(TileEntityRendererDispatcher.instance);")
+                        && itemRenderer.contains("stabilizerRenderer.setRendererDispatcher(TileEntityRendererDispatcher.instance);")
+                        && itemRenderer.contains("converterRenderer.setRendererDispatcher(TileEntityRendererDispatcher.instance);")
+                        && itemRenderer.contains("focalManipulatorRenderer.setRendererDispatcher(TileEntityRendererDispatcher.instance);")
+                        && itemRenderer.contains("fluxScrubberRenderer.setRendererDispatcher(TileEntityRendererDispatcher.instance);")
                         && itemRenderer.contains("new TileNodeStabilizerRenderer()")
                         && itemRenderer.contains("new TileNodeConverterRenderer()")
                         && itemRenderer.contains("new TileFocalManipulatorRenderer()")
