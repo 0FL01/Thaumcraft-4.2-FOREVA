@@ -110,6 +110,7 @@ public class WorldGenGreatwoodTrees extends WorldGenAbstractTree {
         byte var9 = otherCoordPairs[par5 + 3];
         int[] var10 = new int[]{par1, par2, par3};
         int[] var11 = new int[]{0, 0, 0};
+        var11[par5] = var10[par5];
 
         for (int var12 = -var7; var12 <= var7; ++var12) {
             var11[var8] = var10[var8] + var12;
