@@ -783,9 +783,7 @@ public class ClientProxy extends CommonProxy {
 
     @Override
     public void notifyThaumometerDiscoveryError(@Nullable Aspect missingAspect) {
-        String missing = missingAspect == null
-                ? "?"
-                : net.minecraft.client.resources.I18n.format("tc.aspect.help." + missingAspect.getTag());
+        String missing = missingAspect == null ? "?" : formatThaumometerAspectDescription(missingAspect);
         String text = localizeOrFallback("tc.discoveryerror", "To understand this you need to study %1$s.")
                 .replace("%1$s", missing);
         PlayerNotifications.addNotification(text);
@@ -821,6 +819,10 @@ public class ClientProxy extends CommonProxy {
     }
 
     private static String formatThaumometerAspectLabel(Aspect aspect) {
+        return aspect.getName() + " (" + formatThaumometerAspectDescription(aspect) + ")";
+    }
+
+    private static String formatThaumometerAspectDescription(Aspect aspect) {
         String description = aspect.getLocalizedDescription();
         if (description == null || description.isEmpty()
                 || description.equals("tc.aspect." + aspect.getTag())
@@ -832,7 +834,7 @@ public class ClientProxy extends CommonProxy {
                 || description.equals("tc.aspect.help." + aspect.getTag())) {
             return aspect.getName();
         }
-        return aspect.getName() + " (" + description + ")";
+        return description;
     }
 
     @Nullable

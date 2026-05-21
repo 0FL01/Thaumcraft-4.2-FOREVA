@@ -61,6 +61,7 @@ public class PlayerDataPacketClientBoundaryStaticGuardTest {
         assertTrue(clientProxy.contains("localizeOrFallback(\"tc.discoveryerror\", \"To understand this you need to study %1$s.\")"));
         assertTrue(clientProxy.contains("localizeOrFallback(\"tc.unknownobject\", \"Nothing can be learned from this.\")"));
         assertTrue(clientProxy.contains("formatThaumometerAspectLabel(aspect)"));
+        assertTrue(clientProxy.contains("formatThaumometerAspectDescription(missingAspect)"));
     }
 
     private static String readFile(String path) throws IOException {
