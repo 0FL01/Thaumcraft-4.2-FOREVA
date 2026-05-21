@@ -1,10 +1,7 @@
 package thaumcraft.common.items.relics;
 
-import java.util.List;
-import javax.annotation.Nullable;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
@@ -19,11 +16,7 @@ import net.minecraft.util.EnumHand;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
-import net.minecraft.util.text.TextFormatting;
-import net.minecraft.util.text.translation.I18n;
 import net.minecraft.world.World;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 import thaumcraft.api.ThaumcraftApi;
 import thaumcraft.api.nodes.INode;
 import thaumcraft.api.research.IScanEventHandler;
@@ -47,16 +40,6 @@ public class ItemThaumometer extends Item {
         this.setNoRepair();
         this.setMaxDamage(0);
         this.setCreativeTab(CreativeTabThaumcraft.tabThaumcraft);
-    }
-
-    @SideOnly(Side.CLIENT)
-    @Override
-    public void addInformation(ItemStack stack, @Nullable World worldIn, List<String> tooltip, ITooltipFlag flagIn) {
-        String desc = I18n.translateToLocal("item.thaumcraft.thaumometer.desc");
-        if (!desc.equals("item.thaumcraft.thaumometer.desc")) {
-            tooltip.add(TextFormatting.GOLD + desc);
-        }
-        super.addInformation(stack, worldIn, tooltip, flagIn);
     }
 
     @Override
