@@ -55,10 +55,10 @@ public class BiomeMagicalForest extends Biome {
     }
 
     public WorldGenAbstractTree getRandomTreeFeature(Random rand) {
-        if (rand.nextInt(14) == 0) {
+        if (rand.nextInt(28) == 0) {
             return new WorldGenSilverwoodTrees(false, 8, 5);
         }
-        if (rand.nextInt(10) == 0) {
+        if (rand.nextInt(20) == 0) {
             return new WorldGenGreatwoodTrees(false);
         }
         return this.bigTree;

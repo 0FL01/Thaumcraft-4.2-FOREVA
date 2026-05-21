@@ -16,7 +16,7 @@ public class ThaumcraftWorldGeneratorGreatwoodStaticGuardTest {
         String source = readFile("src/main/java/thaumcraft/common/lib/world/ThaumcraftWorldGenerator.java");
 
         assertTrue(source.contains("public static void generateGreatwood(World world, Random rand, int chunkX, int chunkZ)"));
-        assertTrue(source.contains("new WorldGenGreatwoodTrees(false).generate(world, rand, pos.getX(), pos.getY(), pos.getZ(), rand.nextInt(8) == 0);"));
+        assertTrue(source.contains("new WorldGenGreatwoodTrees(false).generate(world, rand, pos.getX(), pos.getY(), pos.getZ(), rand.nextInt(16) == 0);"));
         assertTrue(source.contains("BiomeHandler.getBiomeSupportsGreatwood(biome)"));
     }
 

@@ -378,10 +378,10 @@ public class ThaumcraftWorldGenerator implements IWorldGenerator {
     }
 
     private void generateVegetation(World world, Random rand, int x, int z, Biome biome) {
-        if (rand.nextInt(60) == 3) {
+        if (rand.nextInt(120) == 3) {
             generateSilverwood(world, rand, x, z, biome);
         }
-        if (rand.nextInt(25) == 7) {
+        if (rand.nextInt(50) == 7) {
             generateGreatwood(world, rand, x >> 4, z >> 4);
         }
 
@@ -465,7 +465,7 @@ public class ThaumcraftWorldGenerator implements IWorldGenerator {
         float chance = BiomeHandler.getBiomeSupportsGreatwood(biome);
         if (chance > 0 && rand.nextFloat() < chance) {
             BlockPos pos = world.getHeight(new BlockPos(bx, 0, bz));
-            new WorldGenGreatwoodTrees(false).generate(world, rand, pos.getX(), pos.getY(), pos.getZ(), rand.nextInt(8) == 0);
+            new WorldGenGreatwoodTrees(false).generate(world, rand, pos.getX(), pos.getY(), pos.getZ(), rand.nextInt(16) == 0);
         }
     }
 
