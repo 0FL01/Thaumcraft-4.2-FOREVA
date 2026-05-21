@@ -8,6 +8,7 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import thaumcraft.client.renderers.item.ThaumometerPerspectiveModel;
+import thaumcraft.client.renderers.item.TrunkSpawnerPerspectiveModel;
 import thaumcraft.common.Thaumcraft;
 
 @Mod.EventBusSubscriber(modid = Thaumcraft.MODID, value = Side.CLIENT)
@@ -15,6 +16,8 @@ public final class ClientModelRegistry {
 
     static final ModelResourceLocation THAUMOMETER_MODEL =
             new ModelResourceLocation("thaumcraft:itemthaumometer_tesr", "inventory");
+    static final ModelResourceLocation TRUNKSPAWNER_MODEL =
+            new ModelResourceLocation("thaumcraft:trunkspawner_tesr", "inventory");
 
     private ClientModelRegistry() {
     }
@@ -29,6 +32,10 @@ public final class ClientModelRegistry {
         IBakedModel model = event.getModelRegistry().getObject(THAUMOMETER_MODEL);
         if (model != null) {
             event.getModelRegistry().putObject(THAUMOMETER_MODEL, new ThaumometerPerspectiveModel(model));
+        }
+        model = event.getModelRegistry().getObject(TRUNKSPAWNER_MODEL);
+        if (model != null) {
+            event.getModelRegistry().putObject(TRUNKSPAWNER_MODEL, new TrunkSpawnerPerspectiveModel(model));
         }
     }
 }
