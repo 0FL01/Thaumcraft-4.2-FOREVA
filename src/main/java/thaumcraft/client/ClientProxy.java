@@ -141,7 +141,6 @@ import thaumcraft.client.renderers.item.ItemNodeRenderer;
 import thaumcraft.client.renderers.item.ItemThaumometerRenderer;
 import thaumcraft.client.renderers.item.ItemCrystalRenderer;
 import thaumcraft.client.renderers.item.ItemStoneDeviceRenderer;
-import thaumcraft.client.renderers.item.ItemBowBoneRenderer;
 import thaumcraft.client.renderers.item.ItemTubeRenderer;
 import thaumcraft.client.renderers.item.ItemWandRenderer;
 import thaumcraft.client.renderers.item.ItemWoodenDeviceRenderer;
@@ -398,12 +397,6 @@ public class ClientProxy extends CommonProxy {
                 }
                 continue;
             }
-            if (item == ConfigItems.itemBowBone) {
-                for (int meta = 0; meta < 64; meta++) {
-                    registerBuiltinItemModel(item, meta, "itembowbone_tesr");
-                }
-                continue;
-            }
             ModelResourceLocation model = new ModelResourceLocation(registryName, "inventory");
             for (int meta = 0; meta < 64; meta++) {
                 ModelLoader.setCustomModelResourceLocation(item, meta, model);
@@ -501,9 +494,6 @@ public class ClientProxy extends CommonProxy {
         }
         if (ConfigItems.itemThaumometer != null) {
             ConfigItems.itemThaumometer.setTileEntityItemStackRenderer(new ItemThaumometerRenderer());
-        }
-        if (ConfigItems.itemBowBone != null) {
-            ConfigItems.itemBowBone.setTileEntityItemStackRenderer(new ItemBowBoneRenderer());
         }
     }
 

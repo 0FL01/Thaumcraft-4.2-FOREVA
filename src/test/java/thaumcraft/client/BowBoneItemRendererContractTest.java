@@ -7,34 +7,48 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 public class BowBoneItemRendererContractTest {
 
     @Test
-    public void bowBoneShouldUseDedicatedBuiltinEntityRenderer() throws IOException {
+    public void bowBoneShouldUseVanillaBowModelPlacement() throws IOException {
         String clientProxy = read("src/main/java/thaumcraft/client/ClientProxy.java");
-        String renderer = read("src/main/java/thaumcraft/client/renderers/item/ItemBowBoneRenderer.java");
-        String itemModel = read("src/main/resources/assets/thaumcraft/models/item/itembowbone_tesr.json");
+        String itemModel = read("src/main/resources/assets/thaumcraft/models/item/itembowbone.json");
+        String pulling0Model = read("src/main/resources/assets/thaumcraft/models/item/itembowbone_pulling_0.json");
+        String pulling1Model = read("src/main/resources/assets/thaumcraft/models/item/itembowbone_pulling_1.json");
+        String pulling2Model = read("src/main/resources/assets/thaumcraft/models/item/itembowbone_pulling_2.json");
 
-        assertTrue("ClientProxy should route itemBowBone through builtin/entity and install ItemBowBoneRenderer",
+        assertTrue("ClientProxy should let itemBowBone use the normal item model route",
+                clientProxy.contains("ModelResourceLocation model = new ModelResourceLocation(registryName, \"inventory\");")
+                        && clientProxy.contains("ModelLoader.setCustomModelResourceLocation(item, meta, model);"));
+        assertFalse("Bone bow should not use a TEISR placement path when vanilla bow coordinates are used",
                 clientProxy.contains("if (item == ConfigItems.itemBowBone) {")
-                        && clientProxy.contains("registerBuiltinItemModel(item, meta, \"itembowbone_tesr\");")
-                        && clientProxy.contains("ConfigItems.itemBowBone.setTileEntityItemStackRenderer(new ItemBowBoneRenderer());"));
+                        || clientProxy.contains("ConfigItems.itemBowBone.setTileEntityItemStackRenderer(new ItemBowBoneRenderer());"));
 
-        assertTrue("ItemBowBoneRenderer should preserve the reference equipped bow surface with pull-state model selection",
-                renderer.contains("extends TileEntityItemStackRenderer")
-                        && renderer.contains("new ModelResourceLocation(\"thaumcraft:itembowbone\", \"inventory\")")
-                        && renderer.contains("new ModelResourceLocation(\"thaumcraft:itembowbone_pulling_0\", \"inventory\")")
-                        && renderer.contains("new ModelResourceLocation(\"thaumcraft:itembowbone_pulling_1\", \"inventory\")")
-                        && renderer.contains("new ModelResourceLocation(\"thaumcraft:itembowbone_pulling_2\", \"inventory\")")
-                        && renderer.contains("getItemModelMesher().getModelManager().getModel(")
-                        && renderer.contains("mc.getRenderItem().renderItem(stack, model)")
-                        && renderer.contains("player.isHandActive()")
-                        && renderer.contains("player.getItemInUseCount()"));
+        assertTrue("Bone bow should use vanilla Minecraft bow display coordinates for held contexts",
+                hasVanillaBowDisplay(itemModel)
+                        && hasVanillaBowDisplay(pulling0Model)
+                        && hasVanillaBowDisplay(pulling1Model)
+                        && hasVanillaBowDisplay(pulling2Model));
 
-        assertTrue("Bone bow builtin/entity stub must stay in place so Forge dispatches the dedicated item renderer",
-                itemModel.contains("\"parent\": \"builtin/entity\""));
+        assertTrue("Bone bow should keep vanilla pull override thresholds on the normal item model",
+                itemModel.contains("\"pulling\": 1")
+                        && itemModel.contains("\"pull\": 0.65")
+                        && itemModel.contains("\"pull\": 0.9")
+                        && itemModel.contains("\"model\": \"thaumcraft:item/itembowbone_pulling_0\"")
+                        && itemModel.contains("\"model\": \"thaumcraft:item/itembowbone_pulling_1\"")
+                        && itemModel.contains("\"model\": \"thaumcraft:item/itembowbone_pulling_2\""));
+    }
+
+    private static boolean hasVanillaBowDisplay(String model) {
+        return model.contains("\"rotation\": [-80, 260, -40]")
+                && model.contains("\"translation\": [-1, -2, 2.5]")
+                && model.contains("\"scale\": [0.9, 0.9, 0.9]")
+                && model.contains("\"rotation\": [0, -90, 25]")
+                && model.contains("\"translation\": [1.13, 3.2, 1.13]")
+                && model.contains("\"scale\": [0.68, 0.68, 0.68]");
     }
 
     private static String read(String path) throws IOException {
