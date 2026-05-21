@@ -45,7 +45,7 @@ public class ItemThaumometerRenderer extends TileEntityItemStackRenderer {
     private static final float TC4_TO_TC6_VERTICAL_CENTER = -0.1F;
     private static final float TC4_TO_TC6_Y_ROTATION = -90.0F;
     private static final long DEBUG_LOG_INTERVAL_MS = 1500L;
-    private static final float HUD_SCALE_MULTIPLIER = 1.5F;
+    private static final float HUD_SCALE_MULTIPLIER = 1.875F;
     private static final ThreadLocal<ItemCameraTransforms.TransformType> CURRENT_TRANSFORM =
             ThreadLocal.withInitial(() -> ItemCameraTransforms.TransformType.NONE);
     private static long lastReadoutDebugLogMs = 0L;
