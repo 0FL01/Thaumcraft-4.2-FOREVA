@@ -11,7 +11,7 @@ Read these files before changing code:
 - `build.gradle`
 - `Dockerfile`
 
-Use `thaumcraft_src/**` and `Thaumcraft-1.7.10-4.2.3.5.jar` as read-only original 1.7.10 reference material.
+Use `thaumcraft_src/**` and `Thaumcraft-1.7.10-4.2.3.5.jar` as read-only original 1.7.10 reference material. Use `Thaumcraft-1.12.2-6.1.BETA26.jar` as a read-only Thaumcraft 6 (1.12.2) donor reference for display transforms, model conventions, and positioning values.
 
 Asset origin: assets (textures, sounds, models, lang, shaders, etc.) for the port can be copied from `thaumcraft_src/assets/` into `src/main/resources/assets/thaumcraft/`. This is the source of truth for all ported assets — do not recreate assets from scratch when a working original exists in `thaumcraft_src/assets/`.
 
@@ -19,6 +19,7 @@ Asset origin: assets (textures, sounds, models, lang, shaders, etc.) for the por
 
 - Do not edit `thaumcraft_src/**`.
 - Do not edit `Thaumcraft-1.7.10-4.2.3.5.jar`.
+- Do not edit `Thaumcraft-1.12.2-6.1.BETA26.jar`.
 - Do not change public `thaumcraft.api.*` signatures unless there is no Forge 1.12.2-compatible alternative.
 - Do not rename packages away from original Thaumcraft package boundaries.
 - Do not change mod id, registry names, NBT keys, config keys, packet ids, GUI ids, or dimension ids silently.
