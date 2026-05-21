@@ -53,6 +53,11 @@ processResources {
     from(sourceSets.main.resources.srcDirs) {
         exclude 'mcmod.info'
     }
+
+    from(sourceSets.main.resources.srcDirs) {
+        include 'assets/thaumcraft/lang/en_us.lang'
+        rename { fileName -> fileName == 'en_us.lang' ? 'en_US.lang' : fileName }
+    }
 }
 
 jar {

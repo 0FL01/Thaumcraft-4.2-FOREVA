@@ -386,11 +386,11 @@ public class ItemWandCasting extends Item implements IArchitect {
 
         if (rod != null) {
             tooltip.add(TextFormatting.GOLD + I18n.translateToLocal("item.WandCasting.rod") + " " +
-                    TextFormatting.WHITE + I18n.translateToLocal(rod.getTag()));
+                    TextFormatting.WHITE + I18n.translateToLocal("item.Wand." + rod.getTag() + ".rod"));
         }
         if (cap != null) {
             tooltip.add(TextFormatting.GOLD + I18n.translateToLocal("item.WandCasting.cap") + " " +
-                    TextFormatting.WHITE + I18n.translateToLocal(cap.getTag()));
+                    TextFormatting.WHITE + I18n.translateToLocal("item.Wand." + cap.getTag() + ".cap"));
         }
 
         // Vis display
