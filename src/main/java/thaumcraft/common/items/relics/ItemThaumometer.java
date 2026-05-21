@@ -31,6 +31,8 @@ import thaumcraft.common.lib.utils.EntityUtils;
 import thaumcraft.common.lib.CreativeTabThaumcraft;
 
 public class ItemThaumometer extends Item {
+    private static final long DEBUG_LOG_INTERVAL_MS = 1500L;
+    private static long lastFallbackDebugLogMs = 0L;
     private ScanResult startScan;
 
     public ItemThaumometer() {
@@ -155,6 +157,7 @@ public class ItemThaumometer extends Item {
         for (IScanEventHandler handler : ThaumcraftApi.scanEventhandlers) {
             ScanResult result = handler.scanPhenomena(stack, world, player);
             if (result != null) {
+                logFallbackDebug(player, stack, result, handler);
                 return result;
             }
         }
@@ -199,5 +202,24 @@ public class ItemThaumometer extends Item {
                 blue,
                 15,
                 0.03F);
+    }
+
+    private static void logFallbackDebug(EntityPlayer player, ItemStack heldStack, ScanResult result, IScanEventHandler handler) {
+        long now = System.currentTimeMillis();
+        if (now - lastFallbackDebugLogMs < DEBUG_LOG_INTERVAL_MS) {
+            return;
+        }
+        lastFallbackDebugLogMs = now;
+
+        String heldName = heldStack.isEmpty() ? "<empty>" : heldStack.getItem().getRegistryName() + ":" + heldStack.getMetadata();
+        String target = "type=" + result.type + ",id=" + result.id + ",meta=" + result.meta + ",phenomena=" + result.phenomena;
+        if (result.entity != null) {
+            target += ",entity=" + result.entity.getName() + "#" + result.entity.getEntityId();
+        }
+        Thaumcraft.log.info("[ThaumometerDebug] Fallback scanEventhandler {} produced raw target for player {} while holding {} -> {}",
+                handler.getClass().getName(),
+                player == null ? "<null>" : player.getName(),
+                heldName,
+                target);
     }
 }

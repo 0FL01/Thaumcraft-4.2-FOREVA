@@ -39,6 +39,8 @@ import java.util.Arrays;
 import java.util.Random;
 
 public class ScanManager implements IScanEventHandler {
+    private static final long DEBUG_LOG_INTERVAL_MS = 1500L;
+    private static long lastValidScanDebugLogMs = 0L;
 
     @Override
     public ScanResult scanPhenomena(ItemStack stack, World world, EntityPlayer player) {
@@ -260,6 +262,7 @@ public class ScanManager implements IScanEventHandler {
     public static boolean validScan(AspectList aspects, EntityPlayer player) {
         if (player == null) return false;
         if (aspects == null || aspects.size() <= 0) {
+            logValidScanDebug(player, "reject-empty", null, null, aspects);
             if (player.world != null && player.world.isRemote) {
                 Thaumcraft.proxy.notifyThaumometerUnknownObject();
             }
@@ -269,6 +272,7 @@ public class ScanManager implements IScanEventHandler {
         if (knowledge == null) return false;
         for (Aspect aspect : aspects.getAspects()) {
             if (aspect != null && !aspect.isPrimal() && !knowledge.hasDiscoveredParentAspects(aspect)) {
+                Aspect missingParent = null;
                 if (player.world.isRemote) {
                     Aspect[] components = aspect.getComponents();
                     if (components != null) {
@@ -276,11 +280,13 @@ public class ScanManager implements IScanEventHandler {
                             if (parent == null || knowledge.hasDiscoveredAspect(parent)) {
                                 continue;
                             }
+                            missingParent = parent;
                             Thaumcraft.proxy.notifyThaumometerDiscoveryError(parent);
                             break;
                         }
                     }
                 }
+                logValidScanDebug(player, "reject-missing-parent", aspect, missingParent, aspects);
                 return false;
             }
         }
@@ -421,5 +427,20 @@ public class ScanManager implements IScanEventHandler {
         if (type == Constants.NBT.TAG_DOUBLE) return nbt.getDouble(key);
         if (type == Constants.NBT.TAG_STRING) return nbt.getString(key);
         return nbt.getTag(key);
+    }
+
+    private static void logValidScanDebug(EntityPlayer player, String reason, Aspect blockedAspect, Aspect missingParent, AspectList aspects) {
+        long now = System.currentTimeMillis();
+        if (now - lastValidScanDebugLogMs < DEBUG_LOG_INTERVAL_MS) {
+            return;
+        }
+        lastValidScanDebugLogMs = now;
+
+        Thaumcraft.log.info("[ThaumometerDebug] validScan {} for player {} blockedAspect={} missingParent={} aspects={}",
+                reason,
+                player == null ? "<null>" : player.getName(),
+                blockedAspect == null ? "<none>" : blockedAspect.getTag(),
+                missingParent == null ? "<none>" : missingParent.getTag(),
+                aspects == null ? "<none>" : aspects.toString());
     }
 }

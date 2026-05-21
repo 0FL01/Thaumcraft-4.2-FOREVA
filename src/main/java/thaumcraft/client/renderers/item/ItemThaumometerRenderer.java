@@ -29,6 +29,7 @@ import thaumcraft.api.research.ScanResult;
 import thaumcraft.codechicken.lib.render.CCModel;
 import thaumcraft.codechicken.lib.render.CCRenderState;
 import thaumcraft.client.lib.UtilsFX;
+import thaumcraft.common.Thaumcraft;
 import thaumcraft.common.items.relics.ItemThaumometer;
 import thaumcraft.common.lib.research.ScanManager;
 import java.util.Map;
@@ -43,8 +44,10 @@ public class ItemThaumometerRenderer extends TileEntityItemStackRenderer {
             new ResourceLocation("thaumcraft", "textures/models/scanscreen.png");
     private static final float TC4_TO_TC6_VERTICAL_CENTER = -0.1F;
     private static final float TC4_TO_TC6_Y_ROTATION = -90.0F;
+    private static final long DEBUG_LOG_INTERVAL_MS = 1500L;
     private static final ThreadLocal<ItemCameraTransforms.TransformType> CURRENT_TRANSFORM =
             ThreadLocal.withInitial(() -> ItemCameraTransforms.TransformType.NONE);
+    private static long lastReadoutDebugLogMs = 0L;
 
     private final CCModel scannerModel = loadScannerModel();
 
@@ -65,6 +68,10 @@ public class ItemThaumometerRenderer extends TileEntityItemStackRenderer {
         GlStateManager.pushMatrix();
         try {
             GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+            // The held pose is intentionally left to the donor display transforms.
+            // Only the scanner-mesh basis mismatch is adapted here; local first-person
+            // arm/equipped-progress transforms were tried and rolled back after they
+            // broke the visual placement in live testing.
             applyTc6ScannerBasis();
             renderScannerModel(mc);
             renderScannerScreen(mc, player);
@@ -222,6 +229,7 @@ public class ItemThaumometerRenderer extends TileEntityItemStackRenderer {
             GlStateManager.disableBlend();
             GlStateManager.popMatrix();
         }
+        logReadoutDebug(player, scan, title, aspects);
         RenderHelper.disableStandardItemLighting();
         GlStateManager.popMatrix();
     }
@@ -254,9 +262,31 @@ public class ItemThaumometerRenderer extends TileEntityItemStackRenderer {
             return null;
         }
         if (stack.getItem() instanceof ItemThaumometer) {
+            // This currently asks the gameplay item for the raw scan target so the HUD
+            // and the use-to-scan path stay aligned. Any remaining readout gaps should
+            // be fixed by tightening raw target selection, not by forking another
+            // renderer-local scan implementation.
             return ((ItemThaumometer) stack.getItem()).findRawScanTarget(stack, player.world, player);
         }
         return null;
+    }
+
+    private static void logReadoutDebug(EntityPlayer player, ScanResult scan, String title, AspectList aspects) {
+        long now = System.currentTimeMillis();
+        if (now - lastReadoutDebugLogMs < DEBUG_LOG_INTERVAL_MS) {
+            return;
+        }
+        lastReadoutDebugLogMs = now;
+
+        boolean scanned = player != null && scan != null && ScanManager.hasBeenScanned(player, scan);
+        Thaumcraft.log.info("[ThaumometerDebug] readout player={} type={} title={} scanned={} aspectCount={} phenomena={} entity={}",
+                player == null ? "<null>" : player.getName(),
+                scan == null ? -1 : scan.type,
+                title == null ? "<null>" : title,
+                scanned,
+                aspects == null ? 0 : aspects.size(),
+                scan == null || scan.phenomena == null ? "<none>" : scan.phenomena,
+                scan == null || scan.entity == null ? "<none>" : scan.entity.getName() + "#" + scan.entity.getEntityId());
     }
 
     private static CCModel loadScannerModel() {

@@ -58,6 +58,12 @@ public final class ThaumometerPerspectiveModel implements IBakedModel {
     @Override
     public Pair<? extends IBakedModel, Matrix4f> handlePerspective(ItemCameraTransforms.TransformType cameraTransformType) {
         ItemThaumometerRenderer.setTransformType(cameraTransformType);
+        // Keep donor first-person display matrices intact here.
+        // A previous attempt replaced them with an identity matrix and reimplemented
+        // the hand/equipped-progress transforms locally, but live testing showed that
+        // route regressed the held pose more severely than it helped the HUD. Until
+        // the full TC4 first-person scanner surface is ported end-to-end, the baked
+        // model remains responsible for item placement in every render context.
         Pair<? extends IBakedModel, Matrix4f> delegatePerspective = delegate.handlePerspective(cameraTransformType);
         return Pair.of(this, delegatePerspective.getRight());
     }

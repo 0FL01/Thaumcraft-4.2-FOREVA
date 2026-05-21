@@ -192,6 +192,13 @@ Current source tree has no `thaumcraft.client.renderers.tile`, no `thaumcraft.cl
 - Live retest showed the previous dedicated first-person route was a regression, not a parity win: `ThaumometerPerspectiveModel` bypassed donor first-person display matrices with an identity matrix, and `ItemThaumometerRenderer` overlaid a custom equipped-progress / arm transform chain that pushed the held scanner into a visibly broken pose.
 - [ThaumometerPerspectiveModel.java](/home/opencode/ai/Thaumcraft-4.2-FOREVA/src/main/java/thaumcraft/client/renderers/item/ThaumometerPerspectiveModel.java) now delegates first-person display matrices back to the donor baked model instead of nulling them out.
 - [ItemThaumometerRenderer.java](/home/opencode/ai/Thaumcraft-4.2-FOREVA/src/main/java/thaumcraft/client/renderers/item/ItemThaumometerRenderer.java) drops the custom first-person equipped-progress / arm render layer and returns to the already-calibrated donor pose plus TC4→TC6 scanner basis adapter, while keeping the restored aspect-grid/title HUD draw path intact.
+- This is intentional technical debt rather than a hidden compromise: first-person placement remains donor-driven until the full TC4 scanner HUD surface is ported without rebreaking the held pose.
+
+### Known live issue after rollback
+
+- A remaining thaumometer regression is still open in scan/HUD semantics: simply holding the item can flood the notification queue with `tc.discoveryerror`.
+- The current likely cause is the fallback in [ItemThaumometer.java](/home/opencode/ai/Thaumcraft-4.2-FOREVA/src/main/java/thaumcraft/common/items/relics/ItemThaumometer.java), where `findRawScanTarget(...)` falls through to `ThaumcraftApi.scanEventhandlers`. The bundled [ScanManager.java](/home/opencode/ai/Thaumcraft-4.2-FOREVA/src/main/java/thaumcraft/common/lib/research/ScanManager.java) implements `IScanEventHandler` by scanning the held stack itself, so passive HUD/readout routes can end up validating the thaumometer item as a scan candidate and emitting `tc.discoveryerror` repeatedly.
+- That issue should be fixed in the scan/HUD checkpoint by splitting passive readout target selection from active scan completion semantics, not by reintroducing renderer-local target logic.
 
 Проверки:
 
