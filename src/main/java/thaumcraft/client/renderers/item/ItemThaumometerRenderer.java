@@ -139,6 +139,10 @@ public class ItemThaumometerRenderer extends TileEntityItemStackRenderer {
         }
 
         GlStateManager.pushMatrix();
+        // The scanner screen plane is already aligned here, but its local axes are
+        // inverted relative to the 1.12 font/tag draw direction. Flip the readout
+        // inside the lens plane instead of touching the item pose again.
+        GlStateManager.rotate(180.0F, 0.0F, 0.0F, 1.0F);
         RenderHelper.enableStandardItemLighting();
         int packed = getScannerGlow(player instanceof EntityPlayerSP ? (EntityPlayerSP) player : null, 0);
         OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, packed % 65536, packed / 65536);

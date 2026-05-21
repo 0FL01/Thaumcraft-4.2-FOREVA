@@ -57,6 +57,7 @@ public class ThaumometerItemRendererContractTest {
                         && renderer.contains("GlStateManager.rotate(90.0F, 0.0F, 0.0F, 1.0F);")
                         && renderer.contains("if (isFirstPerson(transformType) && player != null && mc.gameSettings.thirdPersonView == 0) {")
                         && renderer.contains("renderScanReadout(mc, stack, player);")
+                        && renderer.contains("GlStateManager.rotate(180.0F, 0.0F, 0.0F, 1.0F);")
                         && renderer.contains("GlStateManager.scale(0.0075F, 0.0075F, 0.0075F);")
                         && renderer.contains("GlStateManager.translate(0.0F, -0.25F, 0.0F);")
                         && renderer.contains("scale -= 0.000025F * (titleWidth - 90);"));
