@@ -58,10 +58,6 @@ public final class ThaumometerPerspectiveModel implements IBakedModel {
     @Override
     public Pair<? extends IBakedModel, Matrix4f> handlePerspective(ItemCameraTransforms.TransformType cameraTransformType) {
         ItemThaumometerRenderer.setTransformType(cameraTransformType);
-        if (cameraTransformType == ItemCameraTransforms.TransformType.FIRST_PERSON_LEFT_HAND
-                || cameraTransformType == ItemCameraTransforms.TransformType.FIRST_PERSON_RIGHT_HAND) {
-            return Pair.of(this, null);
-        }
         Pair<? extends IBakedModel, Matrix4f> delegatePerspective = delegate.handlePerspective(cameraTransformType);
         return Pair.of(this, delegatePerspective.getRight());
     }

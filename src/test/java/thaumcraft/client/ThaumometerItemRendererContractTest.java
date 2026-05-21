@@ -29,24 +29,21 @@ public class ThaumometerItemRendererContractTest {
                         && modelRegistry.contains("THAUMOMETER_MODEL")
                         && modelRegistry.contains("new ThaumometerPerspectiveModel(model)"));
 
-        assertTrue("ThaumometerPerspectiveModel should override handlePerspective and push the active camera transform into the scanner renderer before returning an identity matrix",
+        assertTrue("ThaumometerPerspectiveModel should override handlePerspective, push the active camera transform into the scanner renderer, and preserve delegate display matrices including first-person TC6 poses",
                 perspectiveModel.contains("implements IBakedModel")
                         && perspectiveModel.contains("handlePerspective")
                         && perspectiveModel.contains("ItemThaumometerRenderer.setTransformType(cameraTransformType);")
-                        && perspectiveModel.contains("FIRST_PERSON_LEFT_HAND")
-                        && perspectiveModel.contains("return Pair.of(this, null);")
                         && perspectiveModel.contains("delegate.handlePerspective(cameraTransformType)")
                         && perspectiveModel.contains("delegatePerspective.getRight()"));
 
-        assertTrue("ItemThaumometerRenderer should restore the scanner OBJ render path with a custom first-person branch while allowing Forge display transforms to drive GUI/ground/third-person contexts",
+        assertTrue("ItemThaumometerRenderer should restore the scanner OBJ render path while allowing Forge display transforms to drive all contexts, including first-person TC6 poses",
                 renderer.contains("extends TileEntityItemStackRenderer")
                         && renderer.contains("textures/models/scanner.obj")
                         && renderer.contains("textures/models/scanner.png")
                         && renderer.contains("textures/models/scanscreen.png")
+                        && renderer.contains("TC4_TO_TC6_VERTICAL_CENTER")
+                        && renderer.contains("TC4_TO_TC6_Y_ROTATION")
                         && renderer.contains("CURRENT_TRANSFORM")
-                        && renderer.contains("applyContextTransform")
-                        && renderer.contains("renderFirstPersonSetup")
-                        && renderer.contains("renderFirstPersonHands")
                         && renderer.contains("ItemCameraTransforms.TransformType.FIRST_PERSON_RIGHT_HAND")
                         && renderer.contains("CCModel.parseObjModels")
                         && renderer.contains("player.isHandActive()")
@@ -55,8 +52,23 @@ public class ThaumometerItemRendererContractTest {
                         && renderer.contains("player.rayTrace(10.0D, 1.0F)")
                         && renderer.contains("ThaumcraftApi.scanEventhandlers"));
 
+        assertTrue("The scanner render path should adapt the TC4.2 OBJ basis onto the TC6 scanner basis before applying donor display transforms",
+                renderer.contains("GlStateManager.translate(0.0F, TC4_TO_TC6_VERTICAL_CENTER, 0.0F);")
+                        && renderer.contains("GlStateManager.rotate(TC4_TO_TC6_Y_ROTATION, 0.0F, 1.0F, 0.0F);"));
+
         assertTrue("The thaumometer item-model stub must stay builtin/entity so Forge still dispatches the custom baked-model + TEISR route",
                 itemModel.contains("\"parent\": \"builtin/entity\""));
+
+        assertTrue("The thaumometer TEISR display transforms should mirror the Thaumcraft 6 scanner donor poses for GUI, ground, fixed, and third-person contexts while retaining the dedicated first-person builtin route",
+                itemModel.contains("\"thirdperson_righthand\"")
+                        && itemModel.contains("\"rotation\": [90, 90, 0]")
+                        && itemModel.contains("\"translation\": [0.0, 0.0, -1.6]")
+                        && itemModel.contains("\"translation\": [0.0, -1.6, 0.0]")
+                        && itemModel.contains("\"translation\": [2.8, -2.8, 0.0]")
+                        && itemModel.contains("\"translation\": [1.6, 1.6, 1.6]")
+                        && itemModel.contains("\"translation\": [3.2, 3.2, -2.72]")
+                        && itemModel.contains("\"translation\": [-0.96, 0.096, -14.352]")
+                        && itemModel.contains("\"translation\": [-16.96, 0.096, -14.352]"));
     }
 
     private static String read(String path) throws IOException {

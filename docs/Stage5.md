@@ -372,7 +372,7 @@ Dependency: `TileVisRelay` availability is Stage 4; client consume effects are P
 **Критичность:** high
 
 **Текущая реализация:**
-- `src/main/java/thaumcraft/common/items/relics/ItemThaumometer.java:20-58`
+- `src/main/java/thaumcraft/common/items/relics/ItemThaumometer.java:32-65`
 - `src/main/java/thaumcraft/common/items/relics/ItemThaumonomicon.java:15-48`
 - `src/main/java/thaumcraft/common/items/relics/ItemHandMirror.java:15-42`
 - `src/main/java/thaumcraft/common/items/relics/ItemResonator.java:13-37`
@@ -387,7 +387,7 @@ Dependency: `TileVisRelay` availability is Stage 4; client consume effects are P
 
 **Что не совпадает:**
 
-`ItemThaumometer` currently completes scan logic server-side immediately on right click: `src/main/java/thaumcraft/common/items/relics/ItemThaumometer.java:35-56`. Reference uses a 25-tick use action, client-side target lock, scan validity checks for entity/block/node/scan event handlers, sounds and server packet completion.
+`ItemThaumometer` currently starts a client-side scan preview and sets the active hand on right click: `src/main/java/thaumcraft/common/items/relics/ItemThaumometer.java:58-65`. Reference uses a 25-tick use action, client-side target lock, scan validity checks for entity/block/node/scan event handlers, sounds and server packet completion.
 
 `ItemThaumonomicon` contains a GUI TODO: `src/main/java/thaumcraft/common/items/relics/ItemThaumonomicon.java:42-47`. `ItemHandMirror` contains TODO-only link/transport behavior: `src/main/java/thaumcraft/common/items/relics/ItemHandMirror.java:30-40`; reference stores NBT `linkX`, `linkY`, `linkZ`, `linkDim`, `dimname`, opens GUI id 16 and transports item stacks to linked mirror. `ItemResonator` and `ItemSanityChecker` are placeholders: `src/main/java/thaumcraft/common/items/relics/ItemResonator.java:28-35`, `src/main/java/thaumcraft/common/items/relics/ItemSanityChecker.java:28-35`.
 

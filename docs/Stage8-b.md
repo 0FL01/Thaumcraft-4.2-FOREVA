@@ -35,7 +35,7 @@ Current implementation sources:
 - `src/main/java/thaumcraft/common/CommonProxy.java:25-40`, `src/main/java/thaumcraft/common/CommonProxy.java:61-119`, `src/main/java/thaumcraft/common/CommonProxy.java:122-126`.
 - `src/main/java/thaumcraft/client/ClientProxy.java:61-88`.
 - Existing client GUI classes: `src/main/java/thaumcraft/client/gui/GuiFocusPouch.java:1-36`, `src/main/java/thaumcraft/client/gui/GuiHandMirror.java:1-30`, `src/main/java/thaumcraft/client/gui/GuiHoverHarness.java:1-30`, `src/main/java/thaumcraft/client/gui/GuiFactory.java:1-27`.
-- GUI open triggers: `src/main/java/thaumcraft/common/blocks/BlockTable.java:143-175`, `src/main/java/thaumcraft/common/blocks/BlockWoodenDevice.java:78-90`, `src/main/java/thaumcraft/common/blocks/BlockMetalDevice.java:131-147`, `src/main/java/thaumcraft/common/blocks/BlockStoneDevice.java:124-149`, `src/main/java/thaumcraft/common/entities/golems/EntityGolemBase.java:346-353`, `src/main/java/thaumcraft/common/entities/monster/EntityPech.java:279-286`, `src/main/java/thaumcraft/common/entities/golems/EntityTravelingTrunk.java:84-90`, `src/main/java/thaumcraft/common/items/relics/ItemThaumonomicon.java:43-50`, `src/main/java/thaumcraft/common/items/relics/ItemThaumometer.java:37-69`, `src/main/java/thaumcraft/common/items/armor/ItemHoverHarness.java:45-52`.
+- GUI open triggers: `src/main/java/thaumcraft/common/blocks/BlockTable.java:143-175`, `src/main/java/thaumcraft/common/blocks/BlockWoodenDevice.java:78-90`, `src/main/java/thaumcraft/common/blocks/BlockMetalDevice.java:131-147`, `src/main/java/thaumcraft/common/blocks/BlockStoneDevice.java:124-149`, `src/main/java/thaumcraft/common/entities/golems/EntityGolemBase.java:346-353`, `src/main/java/thaumcraft/common/entities/monster/EntityPech.java:279-286`, `src/main/java/thaumcraft/common/entities/golems/EntityTravelingTrunk.java:84-90`, `src/main/java/thaumcraft/common/items/relics/ItemThaumonomicon.java:43-50`, `src/main/java/thaumcraft/common/items/relics/ItemThaumometer.java:58-65`, `src/main/java/thaumcraft/common/items/armor/ItemHoverHarness.java:45-52`.
 - Current lang/resource evidence: `src/main/resources/assets/thaumcraft/lang/en_us.lang:101-104`, absence of `src/main/resources/assets/thaumcraft/textures/gui/**`, and only `src/main/resources/assets/thaumcraft/textures/misc/potions.png` under `textures/misc/**`.
 
 Reference implementation and resources:
@@ -79,7 +79,7 @@ Concrete current findings:
 - `src/main/resources/assets/thaumcraft/textures/aspects/**` now contains the original aspect icon set needed by Thaumatorium and later research/aspect GUI rendering.
 - Current English lang now includes item GUI labels plus focal/trunk/spa GUI keys used by implemented screens, but research-browser/table and other remaining Stage 8-b GUI key coverage is still incomplete.
 - Thaumonomicon right-click opens GUI ID `12` server-side in `src/main/java/thaumcraft/common/items/relics/ItemThaumonomicon.java:43-50`; client ID `12` now returns baseline `GuiResearchBrowser`.
-- Thaumometer currently performs server-side scanning in `src/main/java/thaumcraft/common/items/relics/ItemThaumometer.java:37-69`; no `GuiScreen`/overlay implementation was found under `src/main/java/thaumcraft/client/**`.
+- Thaumometer currently performs client-side scan initialization and server-side scan completion with active-hand use action in `src/main/java/thaumcraft/common/items/relics/ItemThaumometer.java:58-93`; no `GuiScreen`/overlay implementation was found under `src/main/java/thaumcraft/client/**`.
 
 ## 5. Gap list
 
@@ -746,7 +746,7 @@ Adding every reference lang key broadly would be noisy; keep this scoped to Stag
 **Критичность:** medium
 
 **Текущая реализация:**
-- `src/main/java/thaumcraft/common/items/relics/ItemThaumometer.java:37-69`
+- `src/main/java/thaumcraft/common/items/relics/ItemThaumometer.java:58-70`
 - No `GuiThaumometer`, scan overlay, scan HUD, or client event handler for scanner feedback found under `src/main/java/thaumcraft/client/**`.
 - `src/main/java/thaumcraft/client/ClientProxy.java:42-44` registers only a tooltip event handler; no scan overlay handler.
 
@@ -762,7 +762,7 @@ The current Thaumometer has server-side scanning but no client visual scan overl
 Decide and document whether Thaumometer scan feedback belongs to Stage 8-b GUI screens or Stage 8 client render/overlay chunk. If implemented as GUI/HUD overlay, add scoped client overlay code and resources; if kept as item renderer/model work, mark as dependency outside Stage 8-b and verify no GUI route is expected.
 
 **Как доделать:**
-- Inspect/decompile `ItemThaumometerRenderer` and current item renderer strategy before implementation.
+- Inspect/decompile `ItemThaumometerRenderer` and current item renderer strategy — the dedicated scanner renderer now uses a TC4.2→TC6 basis adapter with donor display transforms for all contexts (including first-person), and no longer has custom first-person arm rendering or context-branching code.
 - If GUI overlay is implemented: add client-only overlay handler under `src/main/java/thaumcraft/client/**`, required `scanscreen` resources, and manual scan scenario.
 - If not GUI: add no `GUI_*` route; document in Stage 8 render/overlay chunk instead.
 - Scenario: use Thaumometer on entity, node and block, verify player gets visible feedback or documented non-GUI renderer path.
