@@ -44,15 +44,22 @@ public class PlayerDataPacketClientBoundaryStaticGuardTest {
     public void aspectDiscoveryAndPoolPacketsShouldRestoreClientNotifications() throws IOException {
         String discovery = readFile("src/main/java/thaumcraft/common/lib/network/playerdata/PacketAspectDiscovery.java");
         String pool = readFile("src/main/java/thaumcraft/common/lib/network/playerdata/PacketAspectPool.java");
+        String clientProxy = readFile("src/main/java/thaumcraft/client/ClientProxy.java");
 
-        assertTrue(discovery.contains("PlayerNotifications.addNotification("));
-        assertTrue(discovery.contains("tc.addaspectdiscovery"));
+        assertTrue(discovery.contains("Thaumcraft.proxy.notifyThaumometerAspectDiscovery(aspect);"));
         assertTrue(discovery.contains("SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP"));
 
-        assertTrue(pool.contains("PlayerNotifications.addNotification("));
-        assertTrue(pool.contains("PlayerNotifications.addAspectNotification("));
-        assertTrue(pool.contains("tc.addaspectpool"));
+        assertTrue(pool.contains("Thaumcraft.proxy.notifyThaumometerAspectPool(aspect, amount);"));
         assertTrue(pool.contains("SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP"));
+
+        assertTrue(clientProxy.contains("notifyThaumometerAspectDiscovery"));
+        assertTrue(clientProxy.contains("notifyThaumometerAspectPool"));
+        assertTrue(clientProxy.contains("notifyThaumometerDiscoveryError"));
+        assertTrue(clientProxy.contains("notifyThaumometerUnknownObject"));
+        assertTrue(clientProxy.contains("net.minecraft.client.resources.I18n.format(\"tc.addaspectdiscovery\")"));
+        assertTrue(clientProxy.contains("net.minecraft.client.resources.I18n.format(\"tc.addaspectpool\")"));
+        assertTrue(clientProxy.contains("net.minecraft.client.resources.I18n.format(\"tc.discoveryerror\", missing)"));
+        assertTrue(clientProxy.contains("net.minecraft.client.resources.I18n.format(\"tc.unknownobject\")"));
     }
 
     private static String readFile(String path) throws IOException {

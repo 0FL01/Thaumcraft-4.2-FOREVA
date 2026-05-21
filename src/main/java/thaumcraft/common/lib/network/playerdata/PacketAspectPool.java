@@ -4,7 +4,6 @@ import io.netty.buffer.ByteBuf;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.SoundEvents;
 import net.minecraft.util.SoundCategory;
-import net.minecraft.util.text.translation.I18n;
 import net.minecraftforge.fml.common.network.ByteBufUtils;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
@@ -12,7 +11,6 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import thaumcraft.api.aspects.Aspect;
 import thaumcraft.common.Thaumcraft;
-import thaumcraft.client.lib.PlayerNotifications;
 import thaumcraft.common.lib.capabilities.IPlayerKnowledge;
 import thaumcraft.common.lib.capabilities.PlayerKnowledgeProvider;
 import thaumcraft.common.lib.network.PacketBase;
@@ -60,13 +58,7 @@ public class PacketAspectPool extends PacketBase {
                     knowledge.setAspectPool(aspect, total);
                 }
                 if (amount > 0) {
-                    String text = I18n.translateToLocal("tc.addaspectpool")
-                            .replace("%s", Short.toString(amount))
-                            .replace("%n", aspect.getName());
-                    PlayerNotifications.addNotification(text, aspect);
-                    for (int a = 0; a < amount; ++a) {
-                        PlayerNotifications.addAspectNotification(aspect);
-                    }
+                    Thaumcraft.proxy.notifyThaumometerAspectPool(aspect, amount);
                     if (player.world != null) {
                         player.world.playSound(
                                 player,

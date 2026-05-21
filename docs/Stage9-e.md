@@ -201,6 +201,11 @@ What remains open for this gap:
 - validate broader runtime scans end-to-end with awarded aspects and hidden/lost clue behavior;
 - verify additional edge cases such as rapid aim changes, multi-hand thaumometer states, and any future non-thaumometer scan routes before calling the system complete.
 
+Checkpoint 2026-05-21 update:
+
+- The active thaumometer notification surface no longer formats strings in common code through `net.minecraft.util.text.translation.I18n`. `ScanManager.validScan(...)`, `PacketAspectDiscovery`, and `PacketAspectPool` now cross a client proxy boundary, and `ClientProxy` performs the actual 1.12 client localization/notification queuing.
+- Focused runtime coverage now explicitly proves the current scan semantics behind the user retest: fresh-player `stone`/`sand` style aspect lists remain valid scan targets, while `grass`/`herba` style and deeper compound aspects still reject until prerequisite aspects are discovered. This narrows future retests to client presentation vs true progression gating instead of mixing the two.
+
 ### GAP-8: Manual/runtime validation for research content is not yet complete
 
 **Статус:** partial implementation; validation open

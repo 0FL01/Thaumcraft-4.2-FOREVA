@@ -16,7 +16,6 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
-import net.minecraft.util.text.translation.I18n;
 import thaumcraft.api.ThaumcraftApi;
 import thaumcraft.api.aspects.Aspect;
 import thaumcraft.api.aspects.AspectList;
@@ -24,7 +23,7 @@ import thaumcraft.api.nodes.INode;
 import thaumcraft.api.nodes.NodeType;
 import thaumcraft.api.research.IScanEventHandler;
 import thaumcraft.api.research.ScanResult;
-import thaumcraft.client.lib.PlayerNotifications;
+import thaumcraft.common.Thaumcraft;
 import thaumcraft.common.config.Config;
 import thaumcraft.common.lib.capabilities.IPlayerKnowledge;
 import thaumcraft.common.lib.capabilities.PlayerKnowledgeProvider;
@@ -262,7 +261,7 @@ public class ScanManager implements IScanEventHandler {
         if (player == null) return false;
         if (aspects == null || aspects.size() <= 0) {
             if (player.world != null && player.world.isRemote) {
-                PlayerNotifications.addNotification(I18n.translateToLocal("tc.unknownobject"));
+                Thaumcraft.proxy.notifyThaumometerUnknownObject();
             }
             return false;
         }
@@ -277,9 +276,7 @@ public class ScanManager implements IScanEventHandler {
                             if (parent == null || knowledge.hasDiscoveredAspect(parent)) {
                                 continue;
                             }
-                            PlayerNotifications.addNotification(I18n.translateToLocalFormatted(
-                                    "tc.discoveryerror",
-                                    I18n.translateToLocal("tc.aspect.help." + parent.getTag())));
+                            Thaumcraft.proxy.notifyThaumometerDiscoveryError(parent);
                             break;
                         }
                     }

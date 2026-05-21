@@ -199,6 +199,7 @@ import thaumcraft.client.renderers.tile.TileWandPedestalRenderer;
 import thaumcraft.client.renderers.tile.TileWardedRenderer;
 import thaumcraft.client.lib.ClientTickEventsFML;
 import thaumcraft.client.lib.KeyHandler;
+import thaumcraft.client.lib.PlayerNotifications;
 import thaumcraft.client.lib.RenderEventHandler;
 import thaumcraft.common.CommonProxy;
 import thaumcraft.common.blocks.BlockCandle;
@@ -772,6 +773,42 @@ public class ClientProxy extends CommonProxy {
     public void scheduleClientTask(Runnable task) {
         if (task != null) {
             Minecraft.getMinecraft().addScheduledTask(task);
+        }
+    }
+
+    @Override
+    public void notifyThaumometerUnknownObject() {
+        PlayerNotifications.addNotification(net.minecraft.client.resources.I18n.format("tc.unknownobject"));
+    }
+
+    @Override
+    public void notifyThaumometerDiscoveryError(@Nullable Aspect missingAspect) {
+        String missing = missingAspect == null
+                ? "?"
+                : net.minecraft.client.resources.I18n.format("tc.aspect.help." + missingAspect.getTag());
+        PlayerNotifications.addNotification(net.minecraft.client.resources.I18n.format("tc.discoveryerror", missing));
+    }
+
+    @Override
+    public void notifyThaumometerAspectDiscovery(@Nullable Aspect aspect) {
+        if (aspect == null) {
+            return;
+        }
+        String text = net.minecraft.client.resources.I18n.format("tc.addaspectdiscovery").replace("%n", aspect.getName());
+        PlayerNotifications.addNotification("\u00a76" + text, aspect);
+    }
+
+    @Override
+    public void notifyThaumometerAspectPool(@Nullable Aspect aspect, int amount) {
+        if (aspect == null || amount <= 0) {
+            return;
+        }
+        String text = net.minecraft.client.resources.I18n.format("tc.addaspectpool")
+                .replace("%s", Integer.toString(amount))
+                .replace("%n", aspect.getName());
+        PlayerNotifications.addNotification(text, aspect);
+        for (int a = 0; a < amount; ++a) {
+            PlayerNotifications.addAspectNotification(aspect);
         }
     }
 

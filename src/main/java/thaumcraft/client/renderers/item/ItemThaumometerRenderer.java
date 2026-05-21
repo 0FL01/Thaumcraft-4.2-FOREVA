@@ -1,30 +1,30 @@
 package thaumcraft.client.renderers.item;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.entity.AbstractClientPlayer;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.renderer.ItemRenderer;
 import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.block.model.ItemCameraTransforms;
+import net.minecraft.client.renderer.entity.Render;
+import net.minecraft.client.renderer.entity.RenderPlayer;
 import net.minecraft.client.renderer.tileentity.TileEntityItemStackRenderer;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
-import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
+import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
-import net.minecraft.util.text.translation.I18n;
 import org.lwjgl.opengl.GL11;
 import thaumcraft.api.aspects.Aspect;
 import thaumcraft.api.aspects.AspectList;
@@ -36,6 +36,7 @@ import thaumcraft.client.lib.UtilsFX;
 import thaumcraft.common.items.relics.ItemThaumometer;
 import thaumcraft.common.lib.research.ScanManager;
 
+import java.lang.reflect.Field;
 import java.util.Map;
 
 public class ItemThaumometerRenderer extends TileEntityItemStackRenderer {
@@ -50,6 +51,14 @@ public class ItemThaumometerRenderer extends TileEntityItemStackRenderer {
     private static final float TC4_TO_TC6_Y_ROTATION = -90.0F;
     private static final ThreadLocal<ItemCameraTransforms.TransformType> CURRENT_TRANSFORM =
             ThreadLocal.withInitial(() -> ItemCameraTransforms.TransformType.NONE);
+    private static final Field EQUIPPED_PROGRESS_MAINHAND =
+            findField("equippedProgressMainHand", "field_187469_f");
+    private static final Field PREV_EQUIPPED_PROGRESS_MAINHAND =
+            findField("prevEquippedProgressMainHand", "field_187470_g");
+    private static final Field EQUIPPED_PROGRESS_OFFHAND =
+            findField("equippedProgressOffHand", "field_187471_h");
+    private static final Field PREV_EQUIPPED_PROGRESS_OFFHAND =
+            findField("prevEquippedProgressOffHand", "field_187472_i");
 
     private final CCModel scannerModel = loadScannerModel();
 
@@ -70,6 +79,7 @@ public class ItemThaumometerRenderer extends TileEntityItemStackRenderer {
         GlStateManager.pushMatrix();
         try {
             GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+            applyContextTransform(mc, player, partialTicks, transformType);
             applyTc6ScannerBasis();
             renderScannerModel(mc);
             renderScannerScreen(mc, player);
@@ -80,6 +90,73 @@ public class ItemThaumometerRenderer extends TileEntityItemStackRenderer {
             setTransformType(ItemCameraTransforms.TransformType.NONE);
             GlStateManager.popMatrix();
         }
+    }
+
+    private void applyContextTransform(Minecraft mc, EntityPlayerSP player, float partialTicks,
+                                       ItemCameraTransforms.TransformType transformType) {
+        if (isFirstPerson(transformType) && player != null && mc.gameSettings.thirdPersonView == 0) {
+            renderFirstPersonSetup(mc, player, partialTicks, transformType == ItemCameraTransforms.TransformType.FIRST_PERSON_LEFT_HAND);
+        }
+    }
+
+    private void renderFirstPersonSetup(Minecraft mc, EntityPlayerSP player, float partialTicks, boolean leftHanded) {
+        float handedness = leftHanded ? -1.0F : 1.0F;
+        float scale = 0.8F;
+
+        GlStateManager.translate(handedness, 0.75F, -1.0F);
+        GlStateManager.rotate(135.0F * handedness, 0.0F, -1.0F, 0.0F);
+
+        float prevArmPitch = player.prevRenderArmPitch + (player.renderArmPitch - player.prevRenderArmPitch) * partialTicks;
+        float prevArmYaw = player.prevRenderArmYaw + (player.renderArmYaw - player.prevRenderArmYaw) * partialTicks;
+        GlStateManager.rotate((player.rotationPitch - prevArmPitch) * 0.1F, 1.0F, 0.0F, 0.0F);
+        GlStateManager.rotate((player.rotationYaw - prevArmYaw) * 0.1F, 0.0F, 1.0F, 0.0F);
+
+        ItemRenderer itemRenderer = mc.getItemRenderer();
+        float equippedProgress = getPrevEquippedProgress(itemRenderer, leftHanded)
+                + (getEquippedProgress(itemRenderer, leftHanded) - getPrevEquippedProgress(itemRenderer, leftHanded)) * partialTicks;
+        GlStateManager.translate(-0.7F * scale * handedness, 0.65F * scale + (1.0F - equippedProgress) * 1.5F, 0.9F * scale);
+        GlStateManager.rotate(90.0F, 0.0F, 1.0F, 0.0F);
+        GlStateManager.translate(0.0F, 0.0F, -0.9F * scale);
+        GlStateManager.rotate(90.0F, 0.0F, 1.0F, 0.0F);
+        GlStateManager.enableRescaleNormal();
+
+        renderFirstPersonHands(mc, player, leftHanded);
+
+        GlStateManager.rotate(90.0F * handedness, 0.0F, 0.0F, 1.0F);
+        GlStateManager.translate(0.4F * handedness, -0.4F, 0.0F);
+        GlStateManager.scale(2.0F, 2.0F, 2.0F);
+    }
+
+    private void renderFirstPersonHands(Minecraft mc, EntityPlayerSP player, boolean leftHanded) {
+        if (!(player instanceof AbstractClientPlayer)) {
+            return;
+        }
+        Render<?> render = mc.getRenderManager().getEntityRenderObject(player);
+        if (!(render instanceof RenderPlayer)) {
+            return;
+        }
+        RenderPlayer renderPlayer = (RenderPlayer) render;
+
+        mc.getTextureManager().bindTexture(((AbstractClientPlayer) player).getLocationSkin());
+        GlStateManager.pushMatrix();
+        GlStateManager.scale(5.0F, 5.0F, 5.0F);
+        for (int armIndex = 0; armIndex < 2; armIndex++) {
+            int direction = armIndex * 2 - 1;
+            float armHandedness = leftHanded ? -direction : direction;
+            GlStateManager.pushMatrix();
+            GlStateManager.translate(0.0F, -0.6F, 1.1F * armHandedness);
+            GlStateManager.rotate(-45.0F * armHandedness, 1.0F, 0.0F, 0.0F);
+            GlStateManager.rotate(-90.0F, 0.0F, 0.0F, 1.0F);
+            GlStateManager.rotate(59.0F, 0.0F, 0.0F, 1.0F);
+            GlStateManager.rotate(-65.0F * armHandedness, 0.0F, 1.0F, 0.0F);
+            if (armHandedness > 0.0F) {
+                renderPlayer.renderRightArm((AbstractClientPlayer) player);
+            } else {
+                renderPlayer.renderLeftArm((AbstractClientPlayer) player);
+            }
+            GlStateManager.popMatrix();
+        }
+        GlStateManager.popMatrix();
     }
 
     private void applyTc6ScannerBasis() {
@@ -168,9 +245,9 @@ public class ItemThaumometerRenderer extends TileEntityItemStackRenderer {
                 GlStateManager.pushMatrix();
                 GlStateManager.enableBlend();
                 GlStateManager.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE);
-                String nodeTitle = I18n.translateToLocal("nodetype." + node.getNodeType().name() + ".name");
+                String nodeTitle = net.minecraft.client.resources.I18n.format("nodetype." + node.getNodeType().name() + ".name");
                 if (node.getNodeModifier() != null) {
-                    nodeTitle = nodeTitle + ", " + I18n.translateToLocal("nodemod." + node.getNodeModifier().name() + ".name");
+                    nodeTitle = nodeTitle + ", " + net.minecraft.client.resources.I18n.format("nodemod." + node.getNodeModifier().name() + ".name");
                 }
                 int nodeTitleWidth = font.getStringWidth(nodeTitle);
                 GlStateManager.scale(0.004F, 0.004F, 0.004F);
@@ -274,5 +351,36 @@ public class ItemThaumometerRenderer extends TileEntityItemStackRenderer {
             return model;
         }
         return models.values().iterator().next();
+    }
+
+    private static float getEquippedProgress(ItemRenderer renderer, boolean leftHanded) {
+        return getFloat(renderer, leftHanded ? EQUIPPED_PROGRESS_OFFHAND : EQUIPPED_PROGRESS_MAINHAND);
+    }
+
+    private static float getPrevEquippedProgress(ItemRenderer renderer, boolean leftHanded) {
+        return getFloat(renderer, leftHanded ? PREV_EQUIPPED_PROGRESS_OFFHAND : PREV_EQUIPPED_PROGRESS_MAINHAND);
+    }
+
+    private static float getFloat(ItemRenderer renderer, Field field) {
+        if (renderer == null || field == null) {
+            return 0.0F;
+        }
+        try {
+            return field.getFloat(renderer);
+        } catch (IllegalAccessException ignored) {
+            return 0.0F;
+        }
+    }
+
+    private static Field findField(String... names) {
+        for (String name : names) {
+            try {
+                Field field = ItemRenderer.class.getDeclaredField(name);
+                field.setAccessible(true);
+                return field;
+            } catch (NoSuchFieldException ignored) {
+            }
+        }
+        return null;
     }
 }

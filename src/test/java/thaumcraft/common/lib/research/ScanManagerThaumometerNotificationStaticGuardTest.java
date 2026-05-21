@@ -13,10 +13,12 @@ public class ScanManagerThaumometerNotificationStaticGuardTest {
     @Test
     public void validScanShouldRestoreClientUnknownAndDiscoveryHints() throws IOException {
         String source = new String(Files.readAllBytes(Paths.get("src/main/java/thaumcraft/common/lib/research/ScanManager.java")), StandardCharsets.UTF_8);
-        assertTrue(source.contains("PlayerNotifications.addNotification"));
-        assertTrue(source.contains("tc.discoveryerror"));
-        assertTrue(source.contains("tc.unknownobject"));
-        assertTrue(source.contains("tc.aspect.help."));
+        String clientProxy = new String(Files.readAllBytes(Paths.get("src/main/java/thaumcraft/client/ClientProxy.java")), StandardCharsets.UTF_8);
+        assertTrue(source.contains("Thaumcraft.proxy.notifyThaumometerUnknownObject()"));
+        assertTrue(source.contains("Thaumcraft.proxy.notifyThaumometerDiscoveryError(parent)"));
         assertTrue(source.contains("player.world.isRemote"));
+        assertTrue(clientProxy.contains("net.minecraft.client.resources.I18n.format(\"tc.discoveryerror\", missing)"));
+        assertTrue(clientProxy.contains("net.minecraft.client.resources.I18n.format(\"tc.unknownobject\")"));
+        assertTrue(clientProxy.contains("tc.aspect.help."));
     }
 }

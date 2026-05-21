@@ -12,6 +12,7 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.network.IGuiHandler;
+import thaumcraft.api.aspects.Aspect;
 import thaumcraft.common.container.*;
 import thaumcraft.common.entities.ContainerPech;
 import thaumcraft.common.entities.golems.ContainerGolem;
@@ -147,6 +148,18 @@ public class CommonProxy implements IGuiHandler {
     }
 
     public void scheduleClientTask(Runnable task) {
+    }
+
+    public void notifyThaumometerUnknownObject() {
+    }
+
+    public void notifyThaumometerDiscoveryError(@Nullable Aspect missingAspect) {
+    }
+
+    public void notifyThaumometerAspectDiscovery(@Nullable Aspect aspect) {
+    }
+
+    public void notifyThaumometerAspectPool(@Nullable Aspect aspect, int amount) {
     }
 
     @Nullable
