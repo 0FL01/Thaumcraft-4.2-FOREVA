@@ -14,6 +14,7 @@ import net.minecraft.client.renderer.block.model.ItemCameraTransforms;
 import net.minecraft.client.renderer.tileentity.TileEntityItemStackRenderer;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -23,17 +24,17 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.World;
+import net.minecraft.util.text.translation.I18n;
 import org.lwjgl.opengl.GL11;
-import thaumcraft.api.ThaumcraftApi;
+import thaumcraft.api.aspects.Aspect;
+import thaumcraft.api.aspects.AspectList;
 import thaumcraft.api.nodes.INode;
-import thaumcraft.api.research.IScanEventHandler;
 import thaumcraft.api.research.ScanResult;
 import thaumcraft.codechicken.lib.render.CCModel;
 import thaumcraft.codechicken.lib.render.CCRenderState;
+import thaumcraft.client.lib.UtilsFX;
 import thaumcraft.common.items.relics.ItemThaumometer;
 import thaumcraft.common.lib.research.ScanManager;
-import thaumcraft.common.lib.utils.BlockUtils;
-import thaumcraft.common.lib.utils.EntityUtils;
 
 import java.util.Map;
 
@@ -72,9 +73,7 @@ public class ItemThaumometerRenderer extends TileEntityItemStackRenderer {
             applyTc6ScannerBasis();
             renderScannerModel(mc);
             renderScannerScreen(mc, player);
-            if (isFirstPerson(transformType) && player != null && player.isHandActive()
-                    && ItemStack.areItemStacksEqual(player.getActiveItemStack(), stack)
-                    && mc.gameSettings.thirdPersonView == 0) {
+            if (isFirstPerson(transformType) && player != null && mc.gameSettings.thirdPersonView == 0) {
                 renderScanReadout(mc, stack, player);
             }
         } finally {
@@ -136,13 +135,9 @@ public class ItemThaumometerRenderer extends TileEntityItemStackRenderer {
         }
 
         String title = getScanTitle(scan, player.world, player);
-        String detail = "";
+        AspectList aspects = null;
         if (ScanManager.hasBeenScanned(player, scan)) {
-            try {
-                int vis = ScanManager.getScanAspects(scan, player.world).visSize();
-                detail = "vis " + vis;
-            } catch (Exception ignored) {
-            }
+            aspects = getScanAspects(scan, player.world, player);
         }
 
         GlStateManager.pushMatrix();
@@ -155,14 +150,65 @@ public class ItemThaumometerRenderer extends TileEntityItemStackRenderer {
         GlStateManager.scale(0.01F, -0.01F, 0.01F);
         GlStateManager.disableLighting();
         FontRenderer font = mc.fontRenderer;
-        int titleWidth = font.getStringWidth(title);
-        font.drawString(title, -titleWidth / 2.0F, -8.0F, 0xFFFFFF, false);
-        if (!detail.isEmpty()) {
-            int detailWidth = font.getStringWidth(detail);
-            font.drawString(detail, -detailWidth / 2.0F, 4.0F, 0xA0E0FF, false);
+        if (aspects != null && aspects.size() > 0) {
+            int posX = 0;
+            int posY = 0;
+            int remaining = aspects.size();
+            int baseX = Math.min(5, remaining) * 8;
+            for (Aspect aspect : aspects.getAspectsSorted()) {
+                GlStateManager.pushMatrix();
+                GlStateManager.scale(0.75F, 0.75F, 0.75F);
+                int localPacked = getScannerGlow(player instanceof EntityPlayerSP ? (EntityPlayerSP) player : null, posX);
+                OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, localPacked % 65536, localPacked / 65536);
+                UtilsFX.drawTag(-baseX + posX * 16, -8 + posY * 16, aspect, aspects.getAmount(aspect), 0, 0.01D, 1, 1.0F, false);
+                GlStateManager.popMatrix();
+                if (++posX >= 5 - posY) {
+                    posX = 0;
+                    remaining -= 5 - posY;
+                    posY++;
+                    baseX = Math.min(5 - posY, remaining) * 8;
+                }
+            }
+        }
+        if (title == null) {
+            title = "?";
+        }
+        if (!title.isEmpty()) {
+            GlStateManager.pushMatrix();
+            GlStateManager.enableBlend();
+            GlStateManager.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE);
+            GlStateManager.translate(0.0F, -25.0F, 0.0F);
+            int titleWidth = font.getStringWidth(title);
+            float scale = 0.5F;
+            if (titleWidth > 90) {
+                scale -= 0.0025F * (titleWidth - 90);
+            }
+            GlStateManager.scale(scale, scale, scale);
+            font.drawString(title, -titleWidth / 2.0F, 0.0F, 0xFFFFFF, false);
+            GlStateManager.disableBlend();
+            GlStateManager.popMatrix();
         }
         GlStateManager.enableLighting();
         GlStateManager.popMatrix();
+    }
+
+    private static AspectList getScanAspects(ScanResult scan, World world, EntityPlayer player) {
+        if (scan == null) {
+            return null;
+        }
+        AspectList aspects = null;
+        if (scan.type == 1 || scan.type == 2) {
+            aspects = ScanManager.getScanAspects(scan, world);
+        } else if (scan.type == 3 && scan.phenomena != null && scan.phenomena.startsWith("NODE")) {
+            RayTraceResult hit = player.rayTrace(10.0D, 1.0F);
+            if (hit != null && hit.typeOfHit == RayTraceResult.Type.BLOCK) {
+                TileEntity tile = world.getTileEntity(hit.getBlockPos());
+                if (tile instanceof INode) {
+                    aspects = ((INode) tile).getAspects();
+                }
+            }
+        }
+        return aspects;
     }
 
     private static String getScanTitle(ScanResult scan, World world, EntityPlayer player) {
@@ -177,6 +223,12 @@ public class ItemThaumometerRenderer extends TileEntityItemStackRenderer {
                 }
             }
             if (scan.type == 2 && scan.entity != null) {
+                if (scan.entity instanceof EntityItem) {
+                    ItemStack stack = ((EntityItem) scan.entity).getItem();
+                    if (stack != null && !stack.isEmpty()) {
+                        return stack.getDisplayName();
+                    }
+                }
                 return scan.entity.getName();
             }
             if (scan.type == 3) {
@@ -185,9 +237,9 @@ public class ItemThaumometerRenderer extends TileEntityItemStackRenderer {
                     if (hit != null && hit.typeOfHit == RayTraceResult.Type.BLOCK) {
                         TileEntity tile = world.getTileEntity(hit.getBlockPos());
                         if (tile instanceof INode) {
-                            String out = ((INode) tile).getNodeType().name().toLowerCase();
+                            String out = I18n.translateToLocal("nodetype." + ((INode) tile).getNodeType().name().toLowerCase() + ".name");
                             if (((INode) tile).getNodeModifier() != null) {
-                                out = out + ", " + ((INode) tile).getNodeModifier().name().toLowerCase();
+                                out = out + ", " + I18n.translateToLocal("nodemod." + ((INode) tile).getNodeModifier().name().toLowerCase() + ".name");
                             }
                             return out;
                         }

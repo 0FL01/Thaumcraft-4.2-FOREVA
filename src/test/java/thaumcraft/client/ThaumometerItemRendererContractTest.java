@@ -17,6 +17,7 @@ public class ThaumometerItemRendererContractTest {
         String modelRegistry = read("src/main/java/thaumcraft/client/ClientModelRegistry.java");
         String renderer = read("src/main/java/thaumcraft/client/renderers/item/ItemThaumometerRenderer.java");
         String perspectiveModel = read("src/main/java/thaumcraft/client/renderers/item/ThaumometerPerspectiveModel.java");
+        String utilsFx = read("src/main/java/thaumcraft/client/lib/UtilsFX.java");
         String itemModel = read("src/main/resources/assets/thaumcraft/models/item/itemthaumometer_tesr.json");
 
         assertTrue("ClientProxy should route itemThaumometer onto a builtin/entity model and install the dedicated scanner renderer",
@@ -36,7 +37,7 @@ public class ThaumometerItemRendererContractTest {
                         && perspectiveModel.contains("delegate.handlePerspective(cameraTransformType)")
                         && perspectiveModel.contains("delegatePerspective.getRight()"));
 
-        assertTrue("ItemThaumometerRenderer should restore the scanner OBJ render path while allowing Forge display transforms to drive all contexts, including first-person TC6 poses",
+        assertTrue("ItemThaumometerRenderer should restore the scanner OBJ render path while allowing Forge display transforms to drive all contexts, including first-person TC6 poses and first-person scan HUD parity",
                 renderer.contains("extends TileEntityItemStackRenderer")
                         && renderer.contains("textures/models/scanner.obj")
                         && renderer.contains("textures/models/scanner.png")
@@ -46,10 +47,17 @@ public class ThaumometerItemRendererContractTest {
                         && renderer.contains("CURRENT_TRANSFORM")
                         && renderer.contains("ItemCameraTransforms.TransformType.FIRST_PERSON_RIGHT_HAND")
                         && renderer.contains("CCModel.parseObjModels")
-                        && renderer.contains("player.isHandActive()")
                         && renderer.contains("ScanManager.hasBeenScanned")
                         && renderer.contains("ItemThaumometer")
-                        && renderer.contains("findRawScanTarget(stack, player.world, player)"));
+                        && renderer.contains("findRawScanTarget(stack, player.world, player)")
+                        && renderer.contains("UtilsFX.drawTag(")
+                        && renderer.contains("if (isFirstPerson(transformType) && player != null && mc.gameSettings.thirdPersonView == 0)"));
+
+        assertTrue("Minimal UtilsFX helper surface should exist for thaumometer HUD aspect tags",
+                utilsFx.contains("public class UtilsFX")
+                        && utilsFx.contains("drawTag(")
+                        && utilsFx.contains("drawTexturedQuad(")
+                        && utilsFx.contains("bindTexture("));
 
         assertTrue("The scanner render path should adapt the TC4.2 OBJ basis onto the TC6 scanner basis before applying donor display transforms",
                 renderer.contains("GlStateManager.translate(0.0F, TC4_TO_TC6_VERTICAL_CENTER, 0.0F);")

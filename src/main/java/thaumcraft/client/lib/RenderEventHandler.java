@@ -44,6 +44,7 @@ import thaumcraft.common.lib.research.ScanManager;
 
 @SideOnly(Side.CLIENT)
 public class RenderEventHandler {
+    private final REHNotifyHandler notifyHandler = new REHNotifyHandler();
     public static boolean resetShaders = false;
     private static int oldDisplayWidth = 0;
     private static int oldDisplayHeight = 0;
@@ -98,6 +99,18 @@ public class RenderEventHandler {
                 renderVignette(targetBrightness, resolution.getScaledWidth(), resolution.getScaledHeight());
             }
         }
+    }
+
+    @SubscribeEvent
+    public void renderNotifications(RenderGameOverlayEvent.Post event) {
+        if (event.getType() != RenderGameOverlayEvent.ElementType.ALL) {
+            return;
+        }
+        Minecraft mc = Minecraft.getMinecraft();
+        if (mc == null || mc.player == null) {
+            return;
+        }
+        this.notifyHandler.handleNotifications(mc, System.nanoTime() / 1000000L, event.getResolution());
     }
 
     @SubscribeEvent

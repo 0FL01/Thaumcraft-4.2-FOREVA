@@ -40,6 +40,21 @@ public class PlayerDataPacketClientBoundaryStaticGuardTest {
         }
     }
 
+    @Test
+    public void aspectDiscoveryAndPoolPacketsShouldRestoreClientNotifications() throws IOException {
+        String discovery = readFile("src/main/java/thaumcraft/common/lib/network/playerdata/PacketAspectDiscovery.java");
+        String pool = readFile("src/main/java/thaumcraft/common/lib/network/playerdata/PacketAspectPool.java");
+
+        assertTrue(discovery.contains("PlayerNotifications.addNotification("));
+        assertTrue(discovery.contains("tc.addaspectdiscovery"));
+        assertTrue(discovery.contains("SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP"));
+
+        assertTrue(pool.contains("PlayerNotifications.addNotification("));
+        assertTrue(pool.contains("PlayerNotifications.addAspectNotification("));
+        assertTrue(pool.contains("tc.addaspectpool"));
+        assertTrue(pool.contains("SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP"));
+    }
+
     private static String readFile(String path) throws IOException {
         return new String(Files.readAllBytes(Paths.get(path)), StandardCharsets.UTF_8);
     }
