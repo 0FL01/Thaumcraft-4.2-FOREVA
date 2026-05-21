@@ -24,6 +24,14 @@ public class ItemInkwellCoreContractsStaticGuardTest {
                         && source.contains("withProperty(BlockTable.TYPE, facing.getIndex())")
                         && source.contains("withProperty(BlockTable.TYPE, facing.getOpposite().getIndex() + 4)")
                         && source.contains("((TileResearchTable) researchTile).setInventorySlotContents(0, copy);"));
+        assertTrue("ItemInkwell must never read BlockTable.TYPE from a non-table neighbor blockstate",
+                source.contains("IBlockState partnerState = world.getBlockState(candidate);")
+                        && source.contains("if (partnerState.getBlock() != ConfigBlocks.blockTable) continue;")
+                        && source.contains("int partnerMeta = partnerState.getValue(BlockTable.TYPE);"));
+        assertTrue("ItemInkwell must only convert plain table metadata, not existing research-table halves",
+                source.contains("if (!(tile instanceof thaumcraft.common.tiles.TileTable) || !isPlainTable(meta))")
+                        && source.contains("if (!(partnerTile instanceof thaumcraft.common.tiles.TileTable) || !isPlainTable(partnerMeta))")
+                        && source.contains("private static boolean isPlainTable(int meta)"));
     }
 
     private static String readFile(String path) throws IOException {

@@ -59,6 +59,6 @@ public final class TrunkSpawnerPerspectiveModel implements IBakedModel {
     public Pair<? extends IBakedModel, Matrix4f> handlePerspective(ItemCameraTransforms.TransformType cameraTransformType) {
         ItemTrunkSpawnerRenderer.setTransformType(cameraTransformType);
         Pair<? extends IBakedModel, Matrix4f> delegatePerspective = delegate.handlePerspective(cameraTransformType);
-        return Pair.of(this, delegatePerspective.getRight());
+        return Pair.of(delegatePerspective.getLeft(), delegatePerspective.getRight());
     }
 }

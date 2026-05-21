@@ -1,6 +1,7 @@
 package thaumcraft.common.items;
 
 import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -43,15 +44,18 @@ public class ItemInkwell extends Item implements IScribeTools {
     public EnumActionResult onItemUseFirst(EntityPlayer player, World world, BlockPos pos, EnumFacing side,
                                            float hitX, float hitY, float hitZ, EnumHand hand) {
         ItemStack stack = player.getHeldItem(hand);
-        if (world.getBlockState(pos).getBlock() != ConfigBlocks.blockTable) return EnumActionResult.PASS;
+        IBlockState state = world.getBlockState(pos);
+        if (state.getBlock() != ConfigBlocks.blockTable) return EnumActionResult.PASS;
         TileEntity tile = world.getTileEntity(pos);
-        int meta = world.getBlockState(pos).getValue(BlockTable.TYPE);
-        if (!(tile instanceof thaumcraft.common.tiles.TileTable) || meta == 6) return EnumActionResult.PASS;
+        int meta = state.getValue(BlockTable.TYPE);
+        if (!(tile instanceof thaumcraft.common.tiles.TileTable) || !isPlainTable(meta)) return EnumActionResult.PASS;
         for (EnumFacing facing : EnumFacing.HORIZONTALS) {
             BlockPos candidate = pos.offset(facing);
+            IBlockState partnerState = world.getBlockState(candidate);
+            if (partnerState.getBlock() != ConfigBlocks.blockTable) continue;
             TileEntity partnerTile = world.getTileEntity(candidate);
-            int partnerMeta = world.getBlockState(candidate).getValue(BlockTable.TYPE);
-            if (!(partnerTile instanceof thaumcraft.common.tiles.TileTable) || partnerMeta >= 6) continue;
+            int partnerMeta = partnerState.getValue(BlockTable.TYPE);
+            if (!(partnerTile instanceof thaumcraft.common.tiles.TileTable) || !isPlainTable(partnerMeta)) continue;
             if (world.isRemote) return EnumActionResult.PASS;
 
             world.removeTileEntity(pos);
@@ -72,5 +76,9 @@ public class ItemInkwell extends Item implements IScribeTools {
             return EnumActionResult.SUCCESS;
         }
         return EnumActionResult.PASS;
+    }
+
+    private static boolean isPlainTable(int meta) {
+        return meta == 0 || meta == 1;
     }
 }
