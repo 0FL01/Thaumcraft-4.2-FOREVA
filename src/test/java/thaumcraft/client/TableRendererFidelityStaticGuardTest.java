@@ -74,8 +74,22 @@ public class TableRendererFidelityStaticGuardTest {
                         && itemTableRenderer.contains("if (meta == 14)")
                         && itemTableRenderer.contains("if (meta == 15)"));
 
-        assertTrue("Blocktable TESR item model should use builtin/entity parent",
-                itemTableTesrModel.contains("\"parent\": \"builtin/entity\""));
+        assertTrue("Blocktable TESR item model should use builtin/entity parent and 1.12.2 block-style display transforms for gui and held poses",
+                itemTableTesrModel.contains("\"parent\": \"builtin/entity\"")
+                        && itemTableTesrModel.contains("\"gui\"")
+                        && itemTableTesrModel.contains("[30, 225, 0]")
+                        && itemTableTesrModel.contains("\"thirdperson_righthand\"")
+                        && itemTableTesrModel.contains("[75, 45, 0]")
+                        && itemTableTesrModel.contains("\"thirdperson_lefthand\"")
+                        && itemTableTesrModel.contains("[75, 225, 0]")
+                        && itemTableTesrModel.contains("\"firstperson_righthand\"")
+                        && itemTableTesrModel.contains("[0, 45, 0]")
+                        && itemTableTesrModel.contains("\"firstperson_lefthand\"")
+                        && itemTableTesrModel.contains("[0, 225, 0]")
+                        && itemTableTesrModel.contains("\"ground\"")
+                        && itemTableTesrModel.contains("[0.25, 0.25, 0.25]")
+                        && itemTableTesrModel.contains("\"fixed\"")
+                        && itemTableTesrModel.contains("[0.5, 0.5, 0.5]"));
 
         assertTrue("TileRenderHelper should keep the shared TESR entity-item path worldless-safe for display-item renderers",
                 helper.contains("static void renderEntityItem(TileEntity tile, ItemStack stack, float hoverStart)")
