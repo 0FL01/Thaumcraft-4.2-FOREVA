@@ -57,8 +57,6 @@ Use the phase guidance in `docs/PRD.md` and the explicit deferrals below as the 
 
 ## Commit policy
 
-Work on a dedicated branch. Do not work directly on `master` or `main`.
-
 Use one commit per completed checkpoint.
 
 A checkpoint commit is allowed only when:
