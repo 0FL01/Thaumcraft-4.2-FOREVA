@@ -30,16 +30,14 @@ public class ThaumometerItemRendererContractTest {
                         && modelRegistry.contains("THAUMOMETER_MODEL")
                         && modelRegistry.contains("new ThaumometerPerspectiveModel(model)"));
 
-        assertTrue("ThaumometerPerspectiveModel should override handlePerspective, push the active camera transform into the scanner renderer, preserve delegate display matrices for non-first-person contexts, and restore a dedicated first-person identity route for TC4 HUD parity",
+        assertTrue("ThaumometerPerspectiveModel should override handlePerspective, push the active camera transform into the scanner renderer, and preserve donor display matrices for every render context",
                 perspectiveModel.contains("implements IBakedModel")
                         && perspectiveModel.contains("handlePerspective")
                         && perspectiveModel.contains("ItemThaumometerRenderer.setTransformType(cameraTransformType);")
-                        && perspectiveModel.contains("TRSRTransformation.identity().getMatrix()")
-                        && perspectiveModel.contains("FIRST_PERSON_LEFT_HAND")
                         && perspectiveModel.contains("delegate.handlePerspective(cameraTransformType)")
                         && perspectiveModel.contains("delegatePerspective.getRight()"));
 
-        assertTrue("ItemThaumometerRenderer should restore the scanner OBJ render path, keep the TC6 mesh basis adapter, and reinstate a dedicated TC4-style first-person hand/HUD transform chain",
+        assertTrue("ItemThaumometerRenderer should restore the scanner OBJ render path, keep the TC6 mesh basis adapter, and render the HUD on top of donor item transforms instead of replacing the first-person pose",
                 renderer.contains("extends TileEntityItemStackRenderer")
                         && renderer.contains("textures/models/scanner.obj")
                         && renderer.contains("textures/models/scanner.png")
@@ -53,13 +51,6 @@ public class ThaumometerItemRendererContractTest {
                         && renderer.contains("ItemThaumometer")
                         && renderer.contains("findRawScanTarget(stack, player.world, player)")
                         && renderer.contains("UtilsFX.drawTag(")
-                        && renderer.contains("applyContextTransform(mc, player, partialTicks, transformType);")
-                        && renderer.contains("renderFirstPersonSetup(mc, player, partialTicks, transformType == ItemCameraTransforms.TransformType.FIRST_PERSON_LEFT_HAND);")
-                        && renderer.contains("renderFirstPersonHands(mc, player, leftHanded);")
-                        && renderer.contains("equippedProgressMainHand")
-                        && renderer.contains("prevEquippedProgressMainHand")
-                        && renderer.contains("renderPlayer.renderRightArm")
-                        && renderer.contains("renderPlayer.renderLeftArm")
                         && renderer.contains("if (isFirstPerson(transformType) && player != null && mc.gameSettings.thirdPersonView == 0)")
                         && renderer.contains("GlStateManager.scale(0.0075F, 0.0075F, 0.0075F);")
                         && renderer.contains("GlStateManager.translate(0.0F, -0.25F, 0.0F);")

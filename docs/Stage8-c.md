@@ -183,21 +183,20 @@ Current source tree has no `thaumcraft.client.renderers.tile`, no `thaumcraft.cl
 
 - Manual client validation по-прежнему требуется; этот checkpoint закрывает diagnosed parity gaps по route/hook/math, но не заменяет живую визуальную проверку.
 
-### Checkpoint 2026-05-21 — dedicated first-person thaumometer route restoration
+### Checkpoint 2026-05-21 — first-person thaumometer regression rollback
 
 Статус: implemented, static-guarded, `validate --smoke` passed.
 
 Что скорректировано:
 
-- Previous donor-first-person route was still swallowing the held readout: `ThaumometerPerspectiveModel` passed TC6 donor first-person display matrices straight through, so the held scanner body could render but the TC4.2 aspect/title HUD remained in the wrong coordinate space.
-- [ThaumometerPerspectiveModel.java](/home/opencode/ai/Thaumcraft-4.2-FOREVA/src/main/java/thaumcraft/client/renderers/item/ThaumometerPerspectiveModel.java) now restores a dedicated first-person identity matrix while preserving delegate display matrices for GUI/ground/fixed/third-person contexts.
-- [ItemThaumometerRenderer.java](/home/opencode/ai/Thaumcraft-4.2-FOREVA/src/main/java/thaumcraft/client/renderers/item/ItemThaumometerRenderer.java) again applies a TC4-style equipped-progress / arm / scanner-HUD transform chain before the already-validated TC4→TC6 mesh basis adapter. This keeps non-first-person donor positioning intact while moving the held aspect grid/title back into the original first-person scanner surface.
-- The restored first-person path now uses both main-hand and off-hand equipped-progress fields (`equippedProgressMainHand` / `prevEquippedProgressMainHand` and off-hand counterparts), so the route survives the reobfuscated 1.12 jar instead of being dev-only.
+- Live retest showed the previous dedicated first-person route was a regression, not a parity win: `ThaumometerPerspectiveModel` bypassed donor first-person display matrices with an identity matrix, and `ItemThaumometerRenderer` overlaid a custom equipped-progress / arm transform chain that pushed the held scanner into a visibly broken pose.
+- [ThaumometerPerspectiveModel.java](/home/opencode/ai/Thaumcraft-4.2-FOREVA/src/main/java/thaumcraft/client/renderers/item/ThaumometerPerspectiveModel.java) now delegates first-person display matrices back to the donor baked model instead of nulling them out.
+- [ItemThaumometerRenderer.java](/home/opencode/ai/Thaumcraft-4.2-FOREVA/src/main/java/thaumcraft/client/renderers/item/ItemThaumometerRenderer.java) drops the custom first-person equipped-progress / arm render layer and returns to the already-calibrated donor pose plus TC4→TC6 scanner basis adapter, while keeping the restored aspect-grid/title HUD draw path intact.
 
 Проверки:
 
 - `./scripts/dev.sh compileJava` — passed.
-- `./scripts/dev.sh gradle test --rerun-tasks --tests thaumcraft.client.ThaumometerItemRendererContractTest` — passed.
+- `./scripts/dev.sh gradle test --rerun-tasks --tests thaumcraft.client.ThaumometerItemRendererContractTest --tests thaumcraft.common.lib.network.playerdata.PlayerDataPacketClientBoundaryStaticGuardTest --tests thaumcraft.common.lib.research.ScanManagerThaumometerNotificationStaticGuardTest --tests thaumcraft.common.lib.research.ScanManagerValidScanRuntimeTest --tests thaumcraft.common.lib.network.playerdata.PacketScannedAuthorityRuntimeTest` — passed.
 - `./scripts/dev.sh validate --smoke` — passed.
 
 Ограничения:
