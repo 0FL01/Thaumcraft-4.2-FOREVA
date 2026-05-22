@@ -390,6 +390,24 @@ public class ClientProxy extends CommonProxy {
                 }
                 continue;
             }
+            if (item == ConfigItems.itemEldritchObject) {
+                String[] eldritchModels = {
+                    "itemeldritchobject_eldritch_object", "itemeldritchobject_crimson_rites",
+                    "itemeldritchobject_eldritch_object_2", "itemeldritchobject_eldritch_object_3",
+                    "itemeldritchobject_ob_placer"
+                };
+                for (int meta = 0; meta < eldritchModels.length; meta++) {
+                    ModelResourceLocation model = new ModelResourceLocation(
+                            new ResourceLocation("thaumcraft", eldritchModels[meta]), "inventory");
+                    ModelLoader.setCustomModelResourceLocation(item, meta, model);
+                }
+                for (int meta = eldritchModels.length; meta < 64; meta++) {
+                    ModelResourceLocation model = new ModelResourceLocation(
+                            new ResourceLocation("thaumcraft", eldritchModels[0]), "inventory");
+                    ModelLoader.setCustomModelResourceLocation(item, meta, model);
+                }
+                continue;
+            }
             if (item == ConfigItems.itemResource) {
                 String[] resourceModels = {
                     "itemresource_alumentum", "itemresource_nitor", "itemresource_thaumiumingot",
