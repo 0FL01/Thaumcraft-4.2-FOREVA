@@ -63,9 +63,9 @@ public class EntityCultistLeader extends EntityThaumcraftBoss implements net.min
 
     @Override
     protected void setEquipmentBasedOnDifficulty(DifficultyInstance difficulty) {
-        this.setItemStackToSlot(EntityEquipmentSlot.HEAD, new ItemStack(ConfigItems.itemCultistLeader));
-        this.setItemStackToSlot(EntityEquipmentSlot.CHEST, new ItemStack(ConfigItems.itemCultistLeader));
-        this.setItemStackToSlot(EntityEquipmentSlot.LEGS, new ItemStack(ConfigItems.itemCultistPlate));
+        this.setItemStackToSlot(EntityEquipmentSlot.HEAD, new ItemStack(ConfigItems.itemHelmetCultistLeader));
+        this.setItemStackToSlot(EntityEquipmentSlot.CHEST, new ItemStack(ConfigItems.itemChestCultistLeader));
+        this.setItemStackToSlot(EntityEquipmentSlot.LEGS, new ItemStack(ConfigItems.itemLegsCultistLeader));
         this.setItemStackToSlot(EntityEquipmentSlot.FEET, new ItemStack(ConfigItems.itemCultistBoots));
         if (this.world.getDifficulty() == EnumDifficulty.EASY) {
             this.setItemStackToSlot(EntityEquipmentSlot.MAINHAND, new ItemStack(ConfigItems.itemSwordVoid));
@@ -86,6 +86,8 @@ public class EntityCultistLeader extends EntityThaumcraftBoss implements net.min
     @Override
     public IEntityLivingData onInitialSpawn(DifficultyInstance difficulty, IEntityLivingData livingdata) {
         IEntityLivingData data = super.onInitialSpawn(difficulty, livingdata);
+        this.setEquipmentBasedOnDifficulty(difficulty);
+        this.setEnchantmentBasedOnDifficulty(difficulty);
         this.setTitle(this.rand.nextInt(NAMES.length));
         return data;
     }

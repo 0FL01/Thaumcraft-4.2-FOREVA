@@ -6,6 +6,7 @@ import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.entity.RenderBiped;
 import net.minecraft.client.renderer.entity.RenderManager;
+import net.minecraft.client.renderer.entity.layers.LayerBipedArmor;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.util.math.BlockPos;
@@ -29,6 +30,7 @@ public class RenderCultist<T extends EntityLiving> extends RenderBiped<T> {
 
     public RenderCultist(RenderManager renderManager, float shadowSize) {
         super(renderManager, new ModelBiped(), shadowSize);
+        this.addLayer(new LayerBipedArmor(this));
     }
 
     @Override

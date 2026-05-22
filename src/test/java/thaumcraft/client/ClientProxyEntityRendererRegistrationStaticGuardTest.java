@@ -447,6 +447,7 @@ public class ClientProxyEntityRendererRegistrationStaticGuardTest {
         String cultistRenderer = readFile("src/main/java/thaumcraft/client/renderers/entity/RenderCultist.java");
         assertTrue("RenderCultist must provide shared cultist texture plus ritualist beam and leader-scale baselines",
                 cultistRenderer.contains("extends RenderBiped<T>")
+                        && cultistRenderer.contains("new LayerBipedArmor(this)")
                         && cultistRenderer.contains("textures/models/cultist.png")
                         && cultistRenderer.contains("textures/misc/wispy.png")
                         && cultistRenderer.contains("entity instanceof EntityCultistCleric")
@@ -770,7 +771,9 @@ public class ClientProxyEntityRendererRegistrationStaticGuardTest {
                         && inhabitedZombieEntity.contains("EntityEquipmentSlot.HEAD")
                         && inhabitedZombieEntity.contains("EntityEquipmentSlot.CHEST")
                         && inhabitedZombieEntity.contains("EntityEquipmentSlot.LEGS")
-                        && inhabitedZombieEntity.contains("ConfigItems.itemCultistPlate")
+                        && inhabitedZombieEntity.contains("ConfigItems.itemHelmetCultistPlate")
+                        && inhabitedZombieEntity.contains("ConfigItems.itemChestCultistPlate")
+                        && inhabitedZombieEntity.contains("ConfigItems.itemLegsCultistPlate")
                         && inhabitedZombieEntity.contains("protected Item getDropItem()")
                         && inhabitedZombieEntity.contains("return Item.getItemById(0);")
                         && inhabitedZombieEntity.contains("EntityEldritchCrab crab = new EntityEldritchCrab(this.world);")

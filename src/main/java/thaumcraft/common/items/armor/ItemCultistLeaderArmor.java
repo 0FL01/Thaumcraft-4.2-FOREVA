@@ -51,14 +51,13 @@ public class ItemCultistLeaderArmor extends ItemArmor implements IRepairable, IR
     @SideOnly(Side.CLIENT)
     @Override
     public ModelBiped getArmorModel(EntityLivingBase entityLiving, ItemStack itemStack, EntityEquipmentSlot armorSlot, net.minecraft.client.model.ModelBiped _default) {
-        int type = this.armorType.ordinal();
         if (this.model1 == null) {
             this.model1 = new ModelLeaderArmor(1.0f);
         }
         if (this.model2 == null) {
             this.model2 = new ModelLeaderArmor(0.5f);
         }
-        this.model = type == 1 || type == 3 ? this.model1 : this.model2;
+        this.model = armorSlot == EntityEquipmentSlot.LEGS ? this.model2 : this.model1;
         if (this.model != null) {
             this.model.bipedHead.showModel = armorSlot == EntityEquipmentSlot.HEAD;
             this.model.bipedHeadwear.showModel = armorSlot == EntityEquipmentSlot.HEAD;

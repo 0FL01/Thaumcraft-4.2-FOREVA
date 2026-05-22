@@ -40,12 +40,12 @@ public class EntityInhabitedZombie extends net.minecraft.entity.monster.EntityZo
     @Override
     public IEntityLivingData onInitialSpawn(DifficultyInstance difficulty, IEntityLivingData livingData) {
         float armorChance = this.world.getDifficulty() == EnumDifficulty.HARD ? 0.9F : 0.6F;
-        this.setItemStackToSlot(EntityEquipmentSlot.HEAD, new ItemStack(ConfigItems.itemCultistPlate));
+        this.setItemStackToSlot(EntityEquipmentSlot.HEAD, new ItemStack(ConfigItems.itemHelmetCultistPlate));
         if (this.rand.nextFloat() <= armorChance) {
-            this.setItemStackToSlot(EntityEquipmentSlot.CHEST, new ItemStack(ConfigItems.itemCultistPlate));
+            this.setItemStackToSlot(EntityEquipmentSlot.CHEST, new ItemStack(ConfigItems.itemChestCultistPlate));
         }
         if (this.rand.nextFloat() <= armorChance) {
-            this.setItemStackToSlot(EntityEquipmentSlot.LEGS, new ItemStack(ConfigItems.itemCultistPlate));
+            this.setItemStackToSlot(EntityEquipmentSlot.LEGS, new ItemStack(ConfigItems.itemLegsCultistPlate));
         }
         return livingData;
     }

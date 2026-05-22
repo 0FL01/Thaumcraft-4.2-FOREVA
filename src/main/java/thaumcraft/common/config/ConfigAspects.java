@@ -375,11 +375,23 @@ public class ConfigAspects {
         ThaumcraftApi.registerComplexObjectTag(new ItemStack(ConfigBlocks.blockWoodenDevice, 1, 1), new AspectList().add(Aspect.SENSES, 4));
         ThaumcraftApi.registerObjectTag(new ItemStack(ConfigItems.focusPech),
                 new AspectList().add(Aspect.MAGIC, 5).add(Aspect.POISON, 5).add(Aspect.ENTROPY, 5).add(Aspect.ELDRITCH, 5).add(Aspect.WEAPON, 5));
+        ThaumcraftApi.registerObjectTag(new ItemStack(ConfigItems.itemHelmetCultistPlate, 1, OreDictionary.WILDCARD_VALUE),
+                new AspectList().add(Aspect.METAL, 5).add(Aspect.ELDRITCH, 1));
         ThaumcraftApi.registerObjectTag(new ItemStack(ConfigItems.itemCultistPlate, 1, OreDictionary.WILDCARD_VALUE),
                 new AspectList().add(Aspect.METAL, 5).add(Aspect.ELDRITCH, 1));
+        ThaumcraftApi.registerObjectTag(new ItemStack(ConfigItems.itemLegsCultistPlate, 1, OreDictionary.WILDCARD_VALUE),
+                new AspectList().add(Aspect.METAL, 5).add(Aspect.ELDRITCH, 1));
+        ThaumcraftApi.registerObjectTag(new ItemStack(ConfigItems.itemHelmetCultistRobe, 1, OreDictionary.WILDCARD_VALUE),
+                new AspectList().add(Aspect.METAL, 3).add(Aspect.CLOTH, 2).add(Aspect.ELDRITCH, 1));
         ThaumcraftApi.registerObjectTag(new ItemStack(ConfigItems.itemCultistRobe, 1, OreDictionary.WILDCARD_VALUE),
                 new AspectList().add(Aspect.METAL, 3).add(Aspect.CLOTH, 2).add(Aspect.ELDRITCH, 1));
+        ThaumcraftApi.registerObjectTag(new ItemStack(ConfigItems.itemLegsCultistRobe, 1, OreDictionary.WILDCARD_VALUE),
+                new AspectList().add(Aspect.METAL, 3).add(Aspect.CLOTH, 2).add(Aspect.ELDRITCH, 1));
+        ThaumcraftApi.registerObjectTag(new ItemStack(ConfigItems.itemHelmetCultistLeader, 1, OreDictionary.WILDCARD_VALUE),
+                new AspectList().add(Aspect.METAL, 5).add(Aspect.ELDRITCH, 2));
         ThaumcraftApi.registerObjectTag(new ItemStack(ConfigItems.itemCultistLeader, 1, OreDictionary.WILDCARD_VALUE),
+                new AspectList().add(Aspect.METAL, 5).add(Aspect.ELDRITCH, 2));
+        ThaumcraftApi.registerObjectTag(new ItemStack(ConfigItems.itemLegsCultistLeader, 1, OreDictionary.WILDCARD_VALUE),
                 new AspectList().add(Aspect.METAL, 5).add(Aspect.ELDRITCH, 2));
         ThaumcraftApi.registerObjectTag(new ItemStack(ConfigItems.itemCultistBoots, 1, OreDictionary.WILDCARD_VALUE),
                 new AspectList().add(Aspect.METAL, 4).add(Aspect.ELDRITCH, 1));

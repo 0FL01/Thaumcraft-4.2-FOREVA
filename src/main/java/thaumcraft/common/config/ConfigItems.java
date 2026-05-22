@@ -120,8 +120,17 @@ public class ConfigItems {
     public static ItemVoidRobeArmor itemChestVoidRobe;
     public static ItemVoidRobeArmor itemLegsVoidRobe;
     public static ItemVoidRobeArmor itemBootsVoidRobe;
+    public static ItemCultistRobeArmor itemHelmetCultistRobe;
+    public static ItemCultistRobeArmor itemChestCultistRobe;
+    public static ItemCultistRobeArmor itemLegsCultistRobe;
     public static ItemCultistRobeArmor itemCultistRobe;
+    public static ItemCultistPlateArmor itemHelmetCultistPlate;
+    public static ItemCultistPlateArmor itemChestCultistPlate;
+    public static ItemCultistPlateArmor itemLegsCultistPlate;
     public static ItemCultistPlateArmor itemCultistPlate;
+    public static ItemCultistLeaderArmor itemHelmetCultistLeader;
+    public static ItemCultistLeaderArmor itemChestCultistLeader;
+    public static ItemCultistLeaderArmor itemLegsCultistLeader;
     public static ItemCultistLeaderArmor itemCultistLeader;
     public static ItemCultistBoots itemCultistBoots;
     public static ItemGoggles itemGoggles;
@@ -676,23 +685,62 @@ public class ConfigItems {
                 .setCreativeTab(tab);
         allItems.add(itemBootsVoidRobe);
 
-        itemCultistRobe = (ItemCultistRobeArmor) new ItemCultistRobeArmor(ARMOR_CULTIST, 0, EntityEquipmentSlot.CHEST)
+        itemHelmetCultistRobe = (ItemCultistRobeArmor) new ItemCultistRobeArmor(ARMOR_CULTIST, 0, EntityEquipmentSlot.HEAD)
+                .setRegistryName("thaumcraft", ConfigBlocks.legacyPath("ItemHelmetCultistRobe"))
+                .setTranslationKey("thaumcraft.cultist_robe_hood")
+                .setCreativeTab(tab);
+        allItems.add(itemHelmetCultistRobe);
+
+        itemChestCultistRobe = (ItemCultistRobeArmor) new ItemCultistRobeArmor(ARMOR_CULTIST, 0, EntityEquipmentSlot.CHEST)
                 .setRegistryName("thaumcraft", ConfigBlocks.legacyPath("ItemChestplateCultistRobe"))
                 .setTranslationKey("thaumcraft.cultist_robe")
                 .setCreativeTab(tab);
-        allItems.add(itemCultistRobe);
+        allItems.add(itemChestCultistRobe);
+        itemCultistRobe = itemChestCultistRobe;
 
-        itemCultistPlate = (ItemCultistPlateArmor) new ItemCultistPlateArmor(ARMOR_CULTIST_PLATE, 0, EntityEquipmentSlot.CHEST)
+        itemLegsCultistRobe = (ItemCultistRobeArmor) new ItemCultistRobeArmor(ARMOR_CULTIST, 0, EntityEquipmentSlot.LEGS)
+                .setRegistryName("thaumcraft", ConfigBlocks.legacyPath("ItemLeggingsCultistRobe"))
+                .setTranslationKey("thaumcraft.cultist_robe_legs")
+                .setCreativeTab(tab);
+        allItems.add(itemLegsCultistRobe);
+
+        itemHelmetCultistPlate = (ItemCultistPlateArmor) new ItemCultistPlateArmor(ARMOR_CULTIST_PLATE, 0, EntityEquipmentSlot.HEAD)
+                .setRegistryName("thaumcraft", ConfigBlocks.legacyPath("ItemHelmetCultistPlate"))
+                .setTranslationKey("thaumcraft.cultist_plate_helm")
+                .setCreativeTab(tab);
+        allItems.add(itemHelmetCultistPlate);
+
+        itemChestCultistPlate = (ItemCultistPlateArmor) new ItemCultistPlateArmor(ARMOR_CULTIST_PLATE, 0, EntityEquipmentSlot.CHEST)
                 .setRegistryName("thaumcraft", ConfigBlocks.legacyPath("ItemChestplateCultistPlate"))
                 .setTranslationKey("thaumcraft.cultist_plate")
                 .setCreativeTab(tab);
-        allItems.add(itemCultistPlate);
+        allItems.add(itemChestCultistPlate);
+        itemCultistPlate = itemChestCultistPlate;
 
-        itemCultistLeader = (ItemCultistLeaderArmor) new ItemCultistLeaderArmor(ARMOR_CULTIST_LEADER, 0, EntityEquipmentSlot.CHEST)
+        itemLegsCultistPlate = (ItemCultistPlateArmor) new ItemCultistPlateArmor(ARMOR_CULTIST_PLATE, 0, EntityEquipmentSlot.LEGS)
+                .setRegistryName("thaumcraft", ConfigBlocks.legacyPath("ItemLeggingsCultistPlate"))
+                .setTranslationKey("thaumcraft.cultist_plate_legs")
+                .setCreativeTab(tab);
+        allItems.add(itemLegsCultistPlate);
+
+        itemHelmetCultistLeader = (ItemCultistLeaderArmor) new ItemCultistLeaderArmor(ARMOR_CULTIST_LEADER, 0, EntityEquipmentSlot.HEAD)
+                .setRegistryName("thaumcraft", ConfigBlocks.legacyPath("ItemHelmetCultistLeaderPlate"))
+                .setTranslationKey("thaumcraft.cultist_leader_helm")
+                .setCreativeTab(tab);
+        allItems.add(itemHelmetCultistLeader);
+
+        itemChestCultistLeader = (ItemCultistLeaderArmor) new ItemCultistLeaderArmor(ARMOR_CULTIST_LEADER, 0, EntityEquipmentSlot.CHEST)
                 .setRegistryName("thaumcraft", ConfigBlocks.legacyPath("ItemChestplateCultistLeaderPlate"))
                 .setTranslationKey("thaumcraft.cultist_leader")
                 .setCreativeTab(tab);
-        allItems.add(itemCultistLeader);
+        allItems.add(itemChestCultistLeader);
+        itemCultistLeader = itemChestCultistLeader;
+
+        itemLegsCultistLeader = (ItemCultistLeaderArmor) new ItemCultistLeaderArmor(ARMOR_CULTIST_LEADER, 0, EntityEquipmentSlot.LEGS)
+                .setRegistryName("thaumcraft", ConfigBlocks.legacyPath("ItemLeggingsCultistLeaderPlate"))
+                .setTranslationKey("thaumcraft.cultist_leader_legs")
+                .setCreativeTab(tab);
+        allItems.add(itemLegsCultistLeader);
 
         itemCultistBoots = (ItemCultistBoots) new ItemCultistBoots(ARMOR_CULTIST_BOOTS, 0, EntityEquipmentSlot.FEET)
                 .setRegistryName("thaumcraft", ConfigBlocks.legacyPath("ItemBootsCultist"))
