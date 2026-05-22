@@ -370,6 +370,27 @@ public class ClientProxy extends CommonProxy {
                 }
                 continue;
             }
+            if (item == ConfigItems.itemResource) {
+                String[] resourceModels = {
+                    "itemresource_alumentum", "itemresource_nitor", "itemresource_thaumiumingot",
+                    "itemresource_quicksilver", "itemresource_tallow", "itemresource_brain",
+                    "itemresource_amber", "itemresource_cloth", "itemresource_filter",
+                    "itemresource_knowledgefragment", "itemresource_mirrorglass", "itemresource_taint_slime",
+                    "itemresource_taint_tendril", "itemresource_label", "itemresource_dust",
+                    "itemresource_charm", "itemresource_voidingot", "itemresource_voidseed", "itemresource_coin"
+                };
+                for (int meta = 0; meta < resourceModels.length; meta++) {
+                    ModelResourceLocation model = new ModelResourceLocation(
+                            new ResourceLocation("thaumcraft", resourceModels[meta]), "inventory");
+                    ModelLoader.setCustomModelResourceLocation(item, meta, model);
+                }
+                for (int meta = resourceModels.length; meta < 64; meta++) {
+                    ModelResourceLocation model = new ModelResourceLocation(
+                            new ResourceLocation("thaumcraft", "itemresource_alumentum"), "inventory");
+                    ModelLoader.setCustomModelResourceLocation(item, meta, model);
+                }
+                continue;
+            }
             if (ConfigBlocks.blockMirror != null && item == Item.getItemFromBlock(ConfigBlocks.blockMirror)) {
                 ModelResourceLocation normalMirrorModel = new ModelResourceLocation(
                         new ResourceLocation("thaumcraft", "blockmirror"), "inventory");
