@@ -2,7 +2,6 @@ package thaumcraft.client.renderers.models.gear;
 
 import net.minecraft.client.model.ModelBiped;
 import net.minecraft.client.model.ModelRenderer;
-import net.minecraft.entity.Entity;
 
 public class ModelHoverHarness
 extends ModelBiped {
@@ -50,10 +49,4 @@ extends ModelBiped {
         this.bipedBody.addChild(pipeR);
     }
 
-    @Override
-    public void render(Entity entity, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch, float scale) {
-        // Delegate to standard ModelBiped rendering — handles all showModel flags
-        // Back engine assembly is rendered automatically as children of bipedBody
-        super.render(entity, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch, scale);
-    }
 }
