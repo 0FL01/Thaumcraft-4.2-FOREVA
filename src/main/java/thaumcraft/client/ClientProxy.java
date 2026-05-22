@@ -370,6 +370,26 @@ public class ClientProxy extends CommonProxy {
                 }
                 continue;
             }
+            if (item == ConfigItems.itemNugget) {
+                String[] nuggetModels = {
+                    "itemnugget_nuggetiron", "itemnugget_nuggetcopper", "itemnugget_nuggettin", "itemnugget_nuggetsilver", "itemnugget_nuggetlead",
+                    "itemnugget_nuggetquicksilver", "itemnugget_nuggetthaumium", "itemnugget_nuggetvoid",
+                    "", "", "", "", "", "", "", "",
+                    "itemnugget_clusteriron", "itemnugget_clustercopper", "itemnugget_clustertin", "itemnugget_clustersilver", "itemnugget_clusterlead",
+                    "itemnugget_clustercinnabar", "", "", "", "", "", "", "", "", "",
+                    "itemnugget_clustergold"
+                };
+                ModelResourceLocation fallback = new ModelResourceLocation(registryName, "inventory");
+                for (int meta = 0; meta < 64; meta++) {
+                    if (meta < nuggetModels.length && !nuggetModels[meta].isEmpty()) {
+                        ModelLoader.setCustomModelResourceLocation(item, meta,
+                                new ModelResourceLocation(new ResourceLocation("thaumcraft", nuggetModels[meta]), "inventory"));
+                    } else {
+                        ModelLoader.setCustomModelResourceLocation(item, meta, fallback);
+                    }
+                }
+                continue;
+            }
             if (item == ConfigItems.itemResource) {
                 String[] resourceModels = {
                     "itemresource_alumentum", "itemresource_nitor", "itemresource_thaumiumingot",
