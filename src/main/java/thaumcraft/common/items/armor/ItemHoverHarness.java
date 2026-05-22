@@ -1,9 +1,14 @@
 package thaumcraft.common.items.armor;
 
 import java.util.List;
+import javax.annotation.Nullable;
+import net.minecraft.client.model.ModelBiped;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
 import net.minecraft.inventory.EntityEquipmentSlot;
+import net.minecraft.item.EnumAction;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.item.EnumRarity;
 import net.minecraft.item.ItemArmor;
@@ -20,6 +25,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import thaumcraft.api.IRepairable;
 import thaumcraft.api.IRunicArmor;
 import thaumcraft.api.IVisDiscountGear;
+import thaumcraft.client.renderers.models.gear.ModelHoverHarness;
 import thaumcraft.api.aspects.Aspect;
 import thaumcraft.api.aspects.AspectList;
 import thaumcraft.common.CommonProxy;
@@ -30,6 +36,9 @@ import thaumcraft.common.lib.capabilities.IPlayerKnowledge;
 
 public class ItemHoverHarness extends ItemArmor implements IRepairable, IRunicArmor, IVisDiscountGear {
 
+    @SideOnly(Side.CLIENT)
+    private ModelBiped model;
+
     public ItemHoverHarness(ArmorMaterial material, int renderIndex, EntityEquipmentSlot slot) {
         super(material, renderIndex, slot);
         this.setMaxDamage(400);
@@ -39,6 +48,43 @@ public class ItemHoverHarness extends ItemArmor implements IRepairable, IRunicAr
     @Override
     public int getRunicCharge(ItemStack itemstack) {
         return 0;
+    }
+
+    @Override
+    public String getArmorTexture(ItemStack stack, Entity entity, EntityEquipmentSlot slot, String type) {
+        return "thaumcraft:textures/models/hoverharness.png";
+    }
+
+    @SideOnly(Side.CLIENT)
+    @Override
+    public ModelBiped getArmorModel(EntityLivingBase entityLiving, ItemStack itemStack, EntityEquipmentSlot armorSlot, ModelBiped _default) {
+        if (this.model == null) {
+            this.model = new ModelHoverHarness();
+        }
+        if (this.model != null) {
+            this.model.bipedHead.showModel = armorSlot == EntityEquipmentSlot.HEAD;
+            this.model.bipedHeadwear.showModel = armorSlot == EntityEquipmentSlot.HEAD;
+            this.model.bipedBody.showModel = armorSlot == EntityEquipmentSlot.CHEST || armorSlot == EntityEquipmentSlot.LEGS;
+            this.model.bipedRightArm.showModel = armorSlot == EntityEquipmentSlot.CHEST;
+            this.model.bipedLeftArm.showModel = armorSlot == EntityEquipmentSlot.CHEST;
+            this.model.bipedRightLeg.showModel = armorSlot == EntityEquipmentSlot.LEGS;
+            this.model.bipedLeftLeg.showModel = armorSlot == EntityEquipmentSlot.LEGS;
+            this.model.isSneak = entityLiving.isSneaking();
+            this.model.isRiding = entityLiving.isRiding();
+            this.model.isChild = entityLiving.isChild();
+            this.model.rightArmPose = ModelBiped.ArmPose.EMPTY;
+            this.model.leftArmPose = ModelBiped.ArmPose.EMPTY;
+            if (entityLiving instanceof EntityPlayer && ((EntityPlayer)entityLiving).getActiveItemStack().getItem() != null) {
+                ItemStack activeStack = ((EntityPlayer)entityLiving).getActiveItemStack();
+                EnumAction enumaction = activeStack.getItemUseAction();
+                if (enumaction == EnumAction.BLOCK) {
+                    this.model.rightArmPose = ModelBiped.ArmPose.BLOCK;
+                } else if (enumaction == EnumAction.BOW) {
+                    this.model.leftArmPose = ModelBiped.ArmPose.BOW_AND_ARROW;
+                }
+            }
+        }
+        return this.model;
     }
 
     @Override
