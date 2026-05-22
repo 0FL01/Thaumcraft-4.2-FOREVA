@@ -20,10 +20,8 @@ public class ItemGolemBellContractsStaticGuardTest {
                         && source.contains("stack.getTagCompound().hasKey(\"golemhomeface\")")
                         && source.contains("public static BlockPos getGolemHomeCoords(ItemStack stack)")
                         && source.contains("stack.getTagCompound().hasKey(\"golemhomex\")"));
-        assertTrue("ItemGolemBell must keep glint contract and side-aware use-first result semantics",
-                source.contains("public boolean hasEffect(ItemStack stack)")
-                        && source.contains("return true;")
-                        && source.contains("return world.isRemote ? EnumActionResult.PASS : EnumActionResult.SUCCESS;"));
+        assertTrue("ItemGolemBell must keep side-aware use-first result semantics",
+                source.contains("return world.isRemote ? EnumActionResult.PASS : EnumActionResult.SUCCESS;"));
         assertTrue("ItemGolemBell must keep creative copy-back behavior after golem link capture",
                 source.contains("if (player.capabilities.isCreativeMode)")
                         && source.contains("player.setHeldItem(hand, stack.copy());"));

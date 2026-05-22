@@ -15,10 +15,8 @@ public class ItemGolemPlacerCoreContractsStaticGuardTest {
     public void golemPlacerKeepsReferenceUseAndTooltipContracts() throws IOException {
         String source = readFile("src/main/java/thaumcraft/common/entities/golems/ItemGolemPlacer.java");
 
-        assertTrue("ItemGolemPlacer must keep always-glint and sneak-bypass contracts",
-                source.contains("public boolean hasEffect(ItemStack stack)")
-                        && source.contains("return true;")
-                        && source.contains("public boolean doesSneakBypassUse(ItemStack stack, IBlockAccess world, BlockPos pos, EntityPlayer player)"));
+        assertTrue("ItemGolemPlacer must keep sneak-bypass contract",
+                source.contains("public boolean doesSneakBypassUse(ItemStack stack, IBlockAccess world, BlockPos pos, EntityPlayer player)"));
         assertTrue("ItemGolemPlacer must keep core/advanced/upgrades/markers/deco tooltip contracts",
                 source.contains("I18n.translateToLocal(\"item.ItemGolemCore.name\")")
                         && source.contains("I18n.translateToLocal(\"tc.adv\")")

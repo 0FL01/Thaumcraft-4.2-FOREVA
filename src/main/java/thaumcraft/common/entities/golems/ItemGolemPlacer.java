@@ -38,11 +38,6 @@ public class ItemGolemPlacer extends Item {
     }
 
     @Override
-    public boolean hasEffect(ItemStack stack) {
-        return true;
-    }
-
-    @Override
     public void getSubItems(CreativeTabs tab, NonNullList<ItemStack> items) {
         if (this.isInCreativeTab(tab)) {
             for (int meta = 0; meta <= 7; meta++) {

@@ -127,11 +127,6 @@ public class ItemGolemBell extends Item {
     }
 
     @Override
-    public boolean hasEffect(ItemStack stack) {
-        return true;
-    }
-
-    @Override
     public EnumActionResult onItemUseFirst(EntityPlayer player, World world, BlockPos pos, EnumFacing side,
                                            float hitX, float hitY, float hitZ, EnumHand hand) {
         ItemStack stack = player.getHeldItem(hand);
