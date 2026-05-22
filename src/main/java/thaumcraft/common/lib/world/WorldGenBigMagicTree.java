@@ -45,14 +45,12 @@ public class WorldGenBigMagicTree extends WorldGenAbstractTree {
             this.heightLimit = 11 + this.rand.nextInt(this.heightLimitLimit);
         }
         if (!this.validTreeLocation()) {
-            this.world = null;
             return false;
         }
         this.generateLeafNodeList();
         this.generateLeaves();
         this.generateTrunk();
         this.generateLeafNodeBases();
-        this.world = null;
         return true;
     }
 
@@ -109,10 +107,15 @@ public class WorldGenBigMagicTree extends WorldGenAbstractTree {
                     continue;
                 }
                 BlockPos leafPos = pos.add(x, 0, z);
-                IBlockState target = this.world.getBlockState(leafPos);
-                Block block = target.getBlock();
-                if (block.isAir(target, this.world, leafPos) || block.isLeaves(target, this.world, leafPos)) {
-                    this.setBlockAndNotifyAdequately(this.world, leafPos, state);
+                try {
+                    IBlockState target = this.world.getBlockState(leafPos);
+                    Block block = target.getBlock();
+                    if (block.isAir(target, this.world, leafPos) || block.isLeaves(target, this.world, leafPos)) {
+                        this.setBlockAndNotifyAdequately(this.world, leafPos, state);
+                    }
+                }
+                catch (Exception e) {
+                    // silently skip — matching original 1.7.10 behavior
                 }
             }
         }
@@ -182,8 +185,13 @@ public class WorldGenBigMagicTree extends WorldGenAbstractTree {
     }
 
     private void generateLeaves() {
-        for (FoliageCoordinates node : this.leafNodes) {
-            this.generateLeafNode(node.pos);
+        try {
+            for (FoliageCoordinates node : this.leafNodes) {
+                this.generateLeafNode(node.pos);
+            }
+        }
+        catch (Exception e) {
+            // silently skip — matching original 1.7.10 behavior
         }
     }
 
@@ -214,16 +222,22 @@ public class WorldGenBigMagicTree extends WorldGenAbstractTree {
         float stepX = (float)diff.getX() / (float)max;
         float stepY = (float)diff.getY() / (float)max;
         float stepZ = (float)diff.getZ() / (float)max;
-        for (int i = 0; i <= max; ++i) {
-            BlockPos pos = new BlockPos(
-                    MathHelper.floor((float)start.getX() + (float)i * stepX),
-                    MathHelper.floor((float)start.getY() + (float)i * stepY),
-                    MathHelper.floor((float)start.getZ() + (float)i * stepZ));
-            if (!this.isReplaceable(this.world, pos)) {
-                return i;
+        int i = 0;
+        try {
+            for (i = 0; i <= max; ++i) {
+                BlockPos pos = new BlockPos(
+                        MathHelper.floor((float)start.getX() + (float)i * stepX),
+                        MathHelper.floor((float)start.getY() + (float)i * stepY),
+                        MathHelper.floor((float)start.getZ() + (float)i * stepZ));
+                if (!this.isReplaceable(this.world, pos)) {
+                    return i;
+                }
             }
         }
-        return -1;
+        catch (Exception e) {
+            // silently skip — matching original 1.7.10 behavior
+        }
+        return i == (max + 1) ? -1 : Math.abs(i);
     }
 
     private boolean validTreeLocation() {
