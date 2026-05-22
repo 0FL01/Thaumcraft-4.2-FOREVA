@@ -408,6 +408,88 @@ public class ClientProxy extends CommonProxy {
                 }
                 continue;
             }
+            if (item == ConfigItems.itemGolemPlacer) {
+                String[] placerModels = {
+                    "itemgolemplacer_straw", "itemgolemplacer_wood", "itemgolemplacer_tallow",
+                    "itemgolemplacer_clay", "itemgolemplacer_flesh", "itemgolemplacer_stone",
+                    "itemgolemplacer_iron", "itemgolemplacer_thaumium"
+                };
+                for (int meta = 0; meta < placerModels.length; meta++) {
+                    ModelResourceLocation model = new ModelResourceLocation(
+                            new ResourceLocation("thaumcraft", placerModels[meta]), "inventory");
+                    ModelLoader.setCustomModelResourceLocation(item, meta, model);
+                }
+                for (int meta = placerModels.length; meta < 64; meta++) {
+                    ModelResourceLocation model = new ModelResourceLocation(
+                            new ResourceLocation("thaumcraft", placerModels[0]), "inventory");
+                    ModelLoader.setCustomModelResourceLocation(item, meta, model);
+                }
+                continue;
+            }
+            if (item == ConfigItems.itemGolemCore) {
+                ModelResourceLocation coreFallback = new ModelResourceLocation(
+                        new ResourceLocation("thaumcraft", "itemgolemcore_blank"), "inventory");
+                String[] coreModels = new String[101];
+                coreModels[0] = "itemgolemcore_fill";
+                coreModels[1] = "itemgolemcore_empty";
+                coreModels[2] = "itemgolemcore_gather";
+                coreModels[3] = "itemgolemcore_harvest";
+                coreModels[4] = "itemgolemcore_guard";
+                coreModels[5] = "itemgolemcore_decanting";
+                coreModels[6] = "itemgolemcore_alchemy";
+                coreModels[7] = "itemgolemcore_chop";
+                coreModels[8] = "itemgolemcore_use";
+                coreModels[9] = "itemgolemcore_butcher";
+                coreModels[10] = "itemgolemcore_sorting";
+                coreModels[11] = "itemgolemcore_fishing";
+                coreModels[100] = "itemgolemcore_blank";
+                for (int meta = 0; meta < 64; meta++) {
+                    if (coreModels[meta] != null) {
+                        ModelLoader.setCustomModelResourceLocation(item, meta,
+                                new ModelResourceLocation(new ResourceLocation("thaumcraft", coreModels[meta]), "inventory"));
+                    } else {
+                        ModelLoader.setCustomModelResourceLocation(item, meta, coreFallback);
+                    }
+                }
+                ModelLoader.setCustomModelResourceLocation(item, 100,
+                        new ModelResourceLocation(new ResourceLocation("thaumcraft", "itemgolemcore_blank"), "inventory"));
+                continue;
+            }
+            if (item == ConfigItems.itemGolemUpgrade) {
+                String[] upgradeModels = {
+                    "itemgolemupgrade_air", "itemgolemupgrade_earth", "itemgolemupgrade_fire",
+                    "itemgolemupgrade_water", "itemgolemupgrade_order", "itemgolemupgrade_entropy"
+                };
+                for (int meta = 0; meta < upgradeModels.length; meta++) {
+                    ModelResourceLocation model = new ModelResourceLocation(
+                            new ResourceLocation("thaumcraft", upgradeModels[meta]), "inventory");
+                    ModelLoader.setCustomModelResourceLocation(item, meta, model);
+                }
+                for (int meta = upgradeModels.length; meta < 64; meta++) {
+                    ModelResourceLocation model = new ModelResourceLocation(
+                            new ResourceLocation("thaumcraft", upgradeModels[0]), "inventory");
+                    ModelLoader.setCustomModelResourceLocation(item, meta, model);
+                }
+                continue;
+            }
+            if (item == ConfigItems.itemGolemDecoration) {
+                String[] decoModels = {
+                    "itemgolemdecoration_tophat", "itemgolemdecoration_spectacles", "itemgolemdecoration_bowtie",
+                    "itemgolemdecoration_fez", "itemgolemdecoration_dart", "itemgolemdecoration_visor",
+                    "itemgolemdecoration_armor", "itemgolemdecoration_mace"
+                };
+                for (int meta = 0; meta < decoModels.length; meta++) {
+                    ModelResourceLocation model = new ModelResourceLocation(
+                            new ResourceLocation("thaumcraft", decoModels[meta]), "inventory");
+                    ModelLoader.setCustomModelResourceLocation(item, meta, model);
+                }
+                for (int meta = decoModels.length; meta < 64; meta++) {
+                    ModelResourceLocation model = new ModelResourceLocation(
+                            new ResourceLocation("thaumcraft", decoModels[0]), "inventory");
+                    ModelLoader.setCustomModelResourceLocation(item, meta, model);
+                }
+                continue;
+            }
             if (item == ConfigItems.itemResource) {
                 String[] resourceModels = {
                     "itemresource_alumentum", "itemresource_nitor", "itemresource_thaumiumingot",
