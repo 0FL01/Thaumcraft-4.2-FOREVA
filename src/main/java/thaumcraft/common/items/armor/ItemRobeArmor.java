@@ -2,6 +2,7 @@ package thaumcraft.common.items.armor;
 
 import net.minecraft.block.BlockCauldron;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.inventory.EntityEquipmentSlot;
@@ -33,6 +34,14 @@ public class ItemRobeArmor extends ItemArmor implements IRepairable, IRunicArmor
     @Override
     public int getRunicCharge(ItemStack itemstack) {
         return 0;
+    }
+
+    @Override
+    public String getArmorTexture(ItemStack stack, Entity entity, EntityEquipmentSlot slot, String type) {
+        if (slot == EntityEquipmentSlot.LEGS) {
+            return type == null ? "thaumcraft:textures/models/robes_2.png" : "thaumcraft:textures/models/robes_2_overlay.png";
+        }
+        return type == null ? "thaumcraft:textures/models/robes_1.png" : "thaumcraft:textures/models/robes_1_overlay.png";
     }
 
     @Override

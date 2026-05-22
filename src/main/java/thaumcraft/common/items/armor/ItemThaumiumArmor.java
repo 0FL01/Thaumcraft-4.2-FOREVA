@@ -1,5 +1,6 @@
 package thaumcraft.common.items.armor;
 
+import net.minecraft.entity.Entity;
 import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.item.EnumRarity;
 import net.minecraft.item.ItemArmor;
@@ -30,5 +31,13 @@ public class ItemThaumiumArmor extends ItemArmor implements IRepairable, IRunicA
     public boolean getIsRepairable(ItemStack toRepair, ItemStack repair) {
         ItemStack thaumiumIngot = new ItemStack(ConfigItems.itemResource, 1, 2);
         return repair.isItemEqual(thaumiumIngot) || super.getIsRepairable(toRepair, repair);
+    }
+
+    @Override
+    public String getArmorTexture(ItemStack stack, Entity entity, EntityEquipmentSlot slot, String type) {
+        if (slot == EntityEquipmentSlot.LEGS) {
+            return "thaumcraft:textures/models/thaumium_2.png";
+        }
+        return "thaumcraft:textures/models/thaumium_1.png";
     }
 }

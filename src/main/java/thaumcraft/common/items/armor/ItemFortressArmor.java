@@ -2,14 +2,17 @@ package thaumcraft.common.items.armor;
 
 import java.util.List;
 import javax.annotation.Nullable;
+import net.minecraft.client.model.ModelBiped;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.inventory.EntityEquipmentSlot;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.EnumAction;
 import net.minecraft.item.EnumRarity;
 import net.minecraft.item.ItemArmor;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.translation.I18n;
 import net.minecraft.world.World;
@@ -20,10 +23,15 @@ import thaumcraft.api.IGoggles;
 import thaumcraft.api.IRepairable;
 import thaumcraft.api.IRunicArmor;
 import thaumcraft.api.nodes.IRevealer;
+import thaumcraft.client.renderers.models.gear.ModelFortressArmor;
 import thaumcraft.common.config.ConfigItems;
 import thaumcraft.common.lib.CreativeTabThaumcraft;
 
 public class ItemFortressArmor extends ItemArmor implements IRepairable, IRunicArmor, ISpecialArmor, IGoggles, IRevealer {
+
+    ModelBiped model1 = null;
+    ModelBiped model2 = null;
+    ModelBiped model = null;
 
     public ItemFortressArmor(ArmorMaterial material, int renderIndex, EntityEquipmentSlot slot) {
         super(material, renderIndex, slot);
@@ -33,6 +41,11 @@ public class ItemFortressArmor extends ItemArmor implements IRepairable, IRunicA
     @Override
     public int getRunicCharge(ItemStack itemstack) {
         return 0;
+    }
+
+    @Override
+    public String getArmorTexture(ItemStack stack, Entity entity, EntityEquipmentSlot slot, String type) {
+        return "thaumcraft:textures/models/fortress_armor.png";
     }
 
     @Override
@@ -118,5 +131,42 @@ public class ItemFortressArmor extends ItemArmor implements IRepairable, IRunicA
     private boolean hasGogglesTag(ItemStack stack) {
         NBTTagCompound tag = stack.getTagCompound();
         return tag != null && tag.hasKey("goggles");
+    }
+
+    @SideOnly(Side.CLIENT)
+    @Override
+    public ModelBiped getArmorModel(EntityLivingBase entityLiving, ItemStack itemStack, EntityEquipmentSlot armorSlot, net.minecraft.client.model.ModelBiped _default) {
+        int type = this.armorType.ordinal();
+        if (this.model1 == null) {
+            this.model1 = new ModelFortressArmor(1.0f);
+        }
+        if (this.model2 == null) {
+            this.model2 = new ModelFortressArmor(0.5f);
+        }
+        this.model = type == 1 || type == 3 ? this.model1 : this.model2;
+        if (this.model != null) {
+            this.model.bipedHead.showModel = armorSlot == EntityEquipmentSlot.HEAD;
+            this.model.bipedHeadwear.showModel = armorSlot == EntityEquipmentSlot.HEAD;
+            this.model.bipedBody.showModel = armorSlot == EntityEquipmentSlot.CHEST || armorSlot == EntityEquipmentSlot.LEGS;
+            this.model.bipedRightArm.showModel = armorSlot == EntityEquipmentSlot.CHEST;
+            this.model.bipedLeftArm.showModel = armorSlot == EntityEquipmentSlot.CHEST;
+            this.model.bipedRightLeg.showModel = armorSlot == EntityEquipmentSlot.LEGS;
+            this.model.bipedLeftLeg.showModel = armorSlot == EntityEquipmentSlot.LEGS;
+            this.model.isSneak = entityLiving.isSneaking();
+            this.model.isRiding = entityLiving.isRiding();
+            this.model.isChild = entityLiving.isChild();
+            this.model.rightArmPose = net.minecraft.client.model.ModelBiped.ArmPose.EMPTY;
+            this.model.leftArmPose = net.minecraft.client.model.ModelBiped.ArmPose.EMPTY;
+            if (entityLiving instanceof EntityPlayer && ((EntityPlayer)entityLiving).getActiveItemStack().getItem() != null) {
+                ItemStack activeStack = ((EntityPlayer)entityLiving).getActiveItemStack();
+                EnumAction enumaction = activeStack.getItemUseAction();
+                if (enumaction == EnumAction.BLOCK) {
+                    this.model.rightArmPose = net.minecraft.client.model.ModelBiped.ArmPose.BLOCK;
+                } else if (enumaction == EnumAction.BOW) {
+                    this.model.leftArmPose = net.minecraft.client.model.ModelBiped.ArmPose.BOW_AND_ARROW;
+                }
+            }
+        }
+        return this.model;
     }
 }

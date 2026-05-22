@@ -1,5 +1,6 @@
 package thaumcraft.common.items.armor;
 
+import net.minecraft.entity.Entity;
 import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.init.Items;
 import net.minecraft.item.EnumRarity;
@@ -42,5 +43,10 @@ public class ItemCultistBoots extends ItemArmor implements IRepairable, IRunicAr
     @Override
     public int getVisDiscount(ItemStack stack, net.minecraft.entity.player.EntityPlayer player, Aspect aspect) {
         return 1;
+    }
+
+    @Override
+    public String getArmorTexture(ItemStack stack, Entity entity, EntityEquipmentSlot slot, String type) {
+        return "thaumcraft:textures/models/cultistboots.png";
     }
 }

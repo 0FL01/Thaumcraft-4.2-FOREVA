@@ -1,5 +1,6 @@
 package thaumcraft.common.items.armor;
 
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.item.EnumRarity;
@@ -36,5 +37,10 @@ public class ItemBootsTraveller extends ItemArmor implements IRepairable, IRunic
     @Override
     public void onArmorTick(World world, EntityPlayer player, ItemStack stack) {
         Hover.doHover(stack, player, world, player.inventory.armorInventory.indexOf(stack));
+    }
+
+    @Override
+    public String getArmorTexture(ItemStack stack, Entity entity, EntityEquipmentSlot slot, String type) {
+        return "thaumcraft:textures/models/bootstraveler.png";
     }
 }

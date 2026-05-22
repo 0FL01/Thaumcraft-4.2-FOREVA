@@ -1,5 +1,6 @@
 package thaumcraft.common.items.armor;
 
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.EntityEquipmentSlot;
@@ -51,5 +52,10 @@ public class ItemGoggles extends ItemArmor implements IRepairable, IVisDiscountG
     @Override
     public boolean showIngamePopups(ItemStack itemstack, EntityLivingBase player) {
         return true;
+    }
+
+    @Override
+    public String getArmorTexture(ItemStack stack, Entity entity, EntityEquipmentSlot slot, String type) {
+        return "thaumcraft:textures/models/goggles.png";
     }
 }

@@ -52,6 +52,14 @@ public class ItemVoidArmor extends ItemArmor implements IRepairable, IRunicArmor
         return 1;
     }
 
+    @Override
+    public String getArmorTexture(ItemStack stack, Entity entity, EntityEquipmentSlot slot, String type) {
+        if (slot == EntityEquipmentSlot.LEGS) {
+            return "thaumcraft:textures/models/void_2.png";
+        }
+        return "thaumcraft:textures/models/void_1.png";
+    }
+
     static boolean isVoidArmorRepair(ItemStack repair) {
         return !repair.isEmpty() && repair.getItem() == ConfigItems.itemResource && repair.getMetadata() == ItemResource.META_VOID_INGOT;
     }
