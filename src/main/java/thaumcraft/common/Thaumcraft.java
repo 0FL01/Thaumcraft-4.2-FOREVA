@@ -148,6 +148,10 @@ public class Thaumcraft {
 
         // Register dimension
         registerOuterLandsDimension();
+
+        // Register entity renderers (must be called in preInit for Forge 1.12.2
+        // RenderingRegistry.registerEntityRenderingHandler(Class, IRenderFactory))
+        proxy.registerEntityRenders();
     }
 
     private void registerOuterLandsDimension() {

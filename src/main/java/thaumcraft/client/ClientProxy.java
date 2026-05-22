@@ -327,8 +327,12 @@ public class ClientProxy extends CommonProxy {
     @Override
     public void registerDisplayInformation() {
         registerItemColorHandlers();
-        setupEntityRenderers();
         setupTileRenderers();
+    }
+
+    @Override
+    public void registerEntityRenders() {
+        setupEntityRenderers();
     }
 
     @Override
@@ -675,7 +679,8 @@ public class ClientProxy extends CommonProxy {
     }
 
     private void setupEntityRenderers() {
-        RenderItem renderItem = Minecraft.getMinecraft().getRenderItem();
+        // Note: called from preInit. Minecraft.getMinecraft().getRenderItem() is NOT available yet.
+        // RenderItem-dependent factories (RenderSnowball) retrieve it lazily at factory execution time.
         Set<Class<? extends Entity>> registered = new HashSet<>();
 
         registerEntityRenderer(EntitySpecialItem.class, RenderSpecialItem::new, registered);
@@ -686,7 +691,8 @@ public class ClientProxy extends CommonProxy {
         registerEntityRenderer(EntityDart.class, RenderDart::new, registered);
         registerEntityRenderer(EntityPrimalArrow.class, RenderPrimalArrow::new, registered);
         registerEntityRenderer(EntityBottleTaint.class,
-                manager -> new RenderSnowball<>(manager, itemOrFallback(ConfigItems.itemBottleTaint, Items.SPLASH_POTION), renderItem), registered);
+                manager -> new RenderSnowball<>(manager, itemOrFallback(ConfigItems.itemBottleTaint, Items.SPLASH_POTION),
+                        Minecraft.getMinecraft().getRenderItem()), registered);
         registerEntityRenderer(EntityAlumentum.class, RenderAlumentum::new, registered);
         registerEntityRenderer(EntityPrimalOrb.class, RenderPrimalOrb::new, registered);
         registerEntityRenderer(EntityFrostShard.class, RenderFrostShard::new, registered);

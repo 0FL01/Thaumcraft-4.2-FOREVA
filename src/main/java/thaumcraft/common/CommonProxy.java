@@ -138,6 +138,9 @@ public class CommonProxy implements IGuiHandler {
     public void registerDisplayInformation() {
     }
 
+    public void registerEntityRenders() {
+    }
+
     public void registerModelLocations() {
     }
 
