@@ -19,8 +19,8 @@ public class RenderWisp extends Render<EntityWisp> {
 
     private static final ResourceLocation WISP_TEXTURE =
             new ResourceLocation("thaumcraft", "textures/misc/wisp.png");
-    private static final ResourceLocation WISPY_TEXTURE =
-            new ResourceLocation("thaumcraft", "textures/misc/wispy.png");
+    private static final ResourceLocation PARTICLE_TEXTURE =
+            new ResourceLocation("textures/particle/particles.png");
 
     public RenderWisp(RenderManager renderManager) {
         super(renderManager);
@@ -34,13 +34,14 @@ public class RenderWisp extends Render<EntityWisp> {
             return;
         }
         Aspect aspect = Aspect.getAspect(entity.getWispType());
-        Color color = aspect != null ? new Color(aspect.getColor()) : new Color(0);
+        Color color = aspect != null ? new Color(aspect.getColor()) : Color.WHITE;
         float red = color.getRed() / 255.0F;
         float green = color.getGreen() / 255.0F;
         float blue = color.getBlue() / 255.0F;
         if (entity.hurtTime > 0) {
-            green /= 1.1764706F;
-            blue /= 1.1764706F;
+            red = 1.0F;
+            green = color.getGreen() / 300.0F;
+            blue = color.getBlue() / 300.0F;
         }
 
         GlStateManager.pushMatrix();
@@ -56,7 +57,7 @@ public class RenderWisp extends Render<EntityWisp> {
         GlStateManager.enableBlend();
         GlStateManager.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE);
 
-        int packedLight = 240;
+        int packedLight = entity.getBrightnessForRender();
         int lightU = packedLight % 65536;
         int lightV = packedLight / 65536;
         OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, lightU, lightV);
@@ -73,13 +74,13 @@ public class RenderWisp extends Render<EntityWisp> {
     }
 
     private void renderHalo(EntityWisp entity, float partialTicks) {
-        bindTexture(WISPY_TEXTURE);
+        bindTexture(PARTICLE_TEXTURE);
         GlStateManager.alphaFunc(516, 0.003921569F);
         GlStateManager.depthMask(false);
         GlStateManager.enableBlend();
         GlStateManager.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE);
 
-        int packedLight = 240;
+        int packedLight = entity.getBrightnessForRender();
         int lightU = packedLight % 65536;
         int lightV = packedLight / 65536;
         OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, lightU, lightV);
@@ -88,7 +89,7 @@ public class RenderWisp extends Render<EntityWisp> {
         float uMin = frame / 16.0F;
         float uMax = uMin + 1.0F / 16.0F;
         float pulse = 0.4F + MathHelper.sin((entity.ticksExisted + partialTicks) / 10.0F) * 0.1F;
-        drawBillboard(pulse, uMin, uMax, 0.0F, 0.25F, 1.0F, 1.0F, 1.0F, 1.0F);
+        drawBillboard(pulse, uMin, uMax, 5.0F / 16.0F, 6.0F / 16.0F, 1.0F, 1.0F, 1.0F, 1.0F);
 
         GlStateManager.disableBlend();
         GlStateManager.depthMask(true);

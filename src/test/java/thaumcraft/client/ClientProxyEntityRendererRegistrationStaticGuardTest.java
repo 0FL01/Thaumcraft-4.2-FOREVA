@@ -115,7 +115,7 @@ public class ClientProxyEntityRendererRegistrationStaticGuardTest {
         assertTrue("RenderWisp must provide dedicated billboard core and halo baseline",
                 wispRenderer.contains("extends Render<EntityWisp>")
                         && wispRenderer.contains("textures/misc/wisp.png")
-                        && wispRenderer.contains("textures/misc/wispy.png")
+                        && wispRenderer.contains("textures/particle/particles.png")
                         && wispRenderer.contains("Aspect.getAspect(entity.getWispType())")
                         && wispRenderer.contains("renderCore(entity, red, green, blue)")
                         && wispRenderer.contains("renderHalo(entity, partialTicks)")
