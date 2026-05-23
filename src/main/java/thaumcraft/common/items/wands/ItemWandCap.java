@@ -22,11 +22,8 @@ public class ItemWandCap extends Item {
     @Override
     public void getSubItems(CreativeTabs tab, NonNullList<ItemStack> items) {
         if (!this.isInCreativeTab(tab)) return;
-        for (WandCap cap : WandCap.caps.values()) {
-            ItemStack stack = cap.getItem();
-            if (!stack.isEmpty() && stack.getItem() == this) {
-                items.add(stack.copy());
-            }
+        for (int meta = 0; meta <= 8; meta++) {
+            items.add(new ItemStack(this, 1, meta));
         }
     }
 }

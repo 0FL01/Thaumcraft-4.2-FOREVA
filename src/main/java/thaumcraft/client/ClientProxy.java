@@ -559,6 +559,18 @@ public class ClientProxy extends CommonProxy {
                         new ModelResourceLocation(new ResourceLocation("thaumcraft", "wandrod_staff_primal"), "inventory"));
                 continue;
             }
+            if (item == ConfigItems.itemWandCap) {
+                String[] capModels = {
+                    "wandcap_iron", "wandcap_gold", "wandcap_thaumium", "wandcap_copper",
+                    "wandcap_silver", "wandcap_silver_inert", "wandcap_thaumium_inert",
+                    "wandcap_void", "wandcap_void_inert"
+                };
+                for (int meta = 0; meta < capModels.length; meta++) {
+                    ModelLoader.setCustomModelResourceLocation(item, meta,
+                            new ModelResourceLocation(new ResourceLocation("thaumcraft", capModels[meta]), "inventory"));
+                }
+                continue;
+            }
             ModelResourceLocation model = new ModelResourceLocation(registryName, "inventory");
             for (int meta = 0; meta < 64; meta++) {
                 ModelLoader.setCustomModelResourceLocation(item, meta, model);
