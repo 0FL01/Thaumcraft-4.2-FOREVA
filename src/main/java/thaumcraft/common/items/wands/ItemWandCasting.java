@@ -368,6 +368,23 @@ public class ItemWandCasting extends Item implements IArchitect {
     // ---- Item Overrides ----
 
     @Override
+    public String getItemStackDisplayName(ItemStack stack) {
+        String name = I18n.translateToLocal("item.Wand.name");
+        name = name.replace("%CAP", I18n.translateToLocal("item.Wand." + getCap(stack).getTag() + ".cap"));
+        String rodTag = getRod(stack).getTag();
+        if (rodTag.contains("_staff")) {
+            rodTag = rodTag.substring(0, rodTag.indexOf("_staff"));
+        }
+        name = name.replace("%ROD", I18n.translateToLocal("item.Wand." + rodTag + ".rod"));
+        name = name.replace("%OBJ", isStaff(stack)
+                ? I18n.translateToLocal("item.Wand.staff.obj")
+                : (isSceptre(stack)
+                ? I18n.translateToLocal("item.Wand.sceptre.obj")
+                : I18n.translateToLocal("item.Wand.wand.obj")));
+        return name;
+    }
+
+    @Override
     public void onUpdate(ItemStack stack, World world, Entity entity, int itemSlot, boolean isSelected) {
         if (!world.isRemote && entity instanceof EntityPlayer) {
             EntityPlayer player = (EntityPlayer) entity;
@@ -385,8 +402,12 @@ public class ItemWandCasting extends Item implements IArchitect {
         WandCap cap = getCap(stack);
 
         if (rod != null) {
+            String rodDisplay = rod.getTag();
+            if (rodDisplay.contains("_staff")) {
+                rodDisplay = rodDisplay.substring(0, rodDisplay.indexOf("_staff"));
+            }
             tooltip.add(TextFormatting.GOLD + I18n.translateToLocal("item.WandCasting.rod") + " " +
-                    TextFormatting.WHITE + I18n.translateToLocal("item.Wand." + rod.getTag() + ".rod"));
+                    TextFormatting.WHITE + I18n.translateToLocal("item.Wand." + rodDisplay + ".rod"));
         }
         if (cap != null) {
             tooltip.add(TextFormatting.GOLD + I18n.translateToLocal("item.WandCasting.cap") + " " +
