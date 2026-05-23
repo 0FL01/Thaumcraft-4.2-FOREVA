@@ -5,6 +5,7 @@ ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 IMAGE="${THAUMCRAFT_DOCKER_IMAGE:-thaumcraft-dev}"
 GRADLE_HOME_DIR="${THAUMCRAFT_GRADLE_HOME:-$ROOT/.gradle_home}"
 SMOKE_TIMEOUT="${THAUMCRAFT_SMOKE_TIMEOUT:-180s}"
+DAEMON_CONTAINER="thaumcraft-gradle-daemon"
 
 usage() {
   cat <<'EOF'
@@ -16,6 +17,8 @@ Usage:
   ./scripts/dev.sh smoke-server
   ./scripts/dev.sh smoke-client
   ./scripts/dev.sh gradle <task>        # advanced: passthrough Gradle task
+  ./scripts/dev.sh daemon-start         # start persistent Gradle daemon container
+  ./scripts/dev.sh daemon-stop          # stop persistent Gradle daemon container
 
 Examples:
   ./scripts/dev.sh image
@@ -28,19 +31,48 @@ Examples:
   ./scripts/dev.sh smoke-client
 
 Environment:
-  THAUMCRAFT_DOCKER_IMAGE   Docker image name, default: thaumcraft-dev
-  THAUMCRAFT_GRADLE_HOME    Mounted Gradle cache, default: .gradle_home
-  THAUMCRAFT_SMOKE_TIMEOUT  Smoke timeout, default: 180s
+  THAUMCRAFT_DOCKER_IMAGE    Docker image name, default: thaumcraft-dev
+  THAUMCRAFT_GRADLE_HOME     Mounted Gradle cache, default: .gradle_home
+  THAUMCRAFT_SMOKE_TIMEOUT   Smoke timeout, default: 180s
+  THAUMCRAFT_NO_DAEMON       Set to 1 to disable persistent daemon container
 EOF
 }
 
-docker_gradle() {
-  docker run --rm \
+docker_daemon_start() {
+  if docker container inspect "$DAEMON_CONTAINER" >/dev/null 2>&1; then
+    if docker container inspect -f '{{.State.Running}}' "$DAEMON_CONTAINER" 2>/dev/null | grep -q 'true'; then
+      return 0
+    fi
+    docker rm -f "$DAEMON_CONTAINER" >/dev/null 2>&1 || true
+  fi
+  docker run -d --name "$DAEMON_CONTAINER" \
     -v "$ROOT:/workspace/thaumcraft" \
     -v "$GRADLE_HOME_DIR:/home/ubuntu/.gradle" \
     --user "$(id -u):$(id -g)" \
-    --entrypoint ./gradlew \
-    "$IMAGE" "$@"
+    -w /workspace/thaumcraft \
+    --entrypoint tail \
+    "$IMAGE" -f /dev/null >/dev/null
+}
+
+docker_daemon_stop() {
+  docker stop -t 2 "$DAEMON_CONTAINER" >/dev/null 2>&1 || true
+  docker rm -f "$DAEMON_CONTAINER" >/dev/null 2>&1 || true
+}
+
+docker_gradle() {
+  if [[ "${THAUMCRAFT_NO_DAEMON:-}" == "1" ]]; then
+    docker run --rm \
+      -v "$ROOT:/workspace/thaumcraft" \
+      -v "$GRADLE_HOME_DIR:/home/ubuntu/.gradle" \
+      --user "$(id -u):$(id -g)" \
+      --entrypoint ./gradlew \
+      "$IMAGE" "$@"
+    return
+  fi
+
+  docker_daemon_start
+  docker exec -w /workspace/thaumcraft \
+    "$DAEMON_CONTAINER" ./gradlew "$@"
 }
 
 write_smoke_log4j_config() {
@@ -853,6 +885,46 @@ validate_step() {
   return 0
 }
 
+validate_step_batch_gradle() {
+  # Run multiple Gradle tasks in a single invocation to keep the daemon warm
+  local name="$1"
+  shift
+  local output status
+
+  VALIDATE_LAST_LOG=""
+  set +e
+  output="$(validate_gradle_log "$name" "$@" 2>&1)"
+  status="$?"
+  set -e
+
+  case "$status" in
+    0)
+      VALIDATE_TOTAL=$((VALIDATE_TOTAL + 1))
+      VALIDATE_PASSED=$((VALIDATE_PASSED + 1))
+      VALIDATE_PASSED_STEPS+=("$name")
+      ;;
+    2)
+      VALIDATE_SKIPPED=$((VALIDATE_SKIPPED + 1))
+      VALIDATE_SKIPPED_STEPS+=("$name")
+      ;;
+    *)
+      VALIDATE_TOTAL=$((VALIDATE_TOTAL + 1))
+      ;;
+  esac
+
+  if [[ "$status" -ne 0 && "$status" -ne 2 ]]; then
+    printf 'FAIL validate: %s\n' "$name"
+    printf 'reason: exit %s; log: %s\n' "$status" "$VALIDATE_LAST_LOG"
+    if [[ "$VALIDATE_VERBOSE" -eq 1 && -n "$VALIDATE_LAST_LOG" && -f "$ROOT/$VALIDATE_LAST_LOG" ]]; then
+      printf -- '--- %s tail ---\n' "$VALIDATE_LAST_LOG"
+      tail -40 "$ROOT/$VALIDATE_LAST_LOG"
+    fi
+    return 1
+  fi
+
+  return 0
+}
+
 validate() {
   local run_smoke=0
   VALIDATE_TOTAL=0
@@ -883,11 +955,12 @@ validate() {
   done
 
   validate_step git-status validate_git_status || return 1
-  validate_step compileJava validate_compile_java || return 1
-  validate_step test validate_tests || return 1
-  validate_step jar validate_jar_task || return 1
+  # Batch compileJava + test + jar in a single Gradle invocation to keep daemon warm
+  validate_step_batch_gradle 'compile+test+jar' compileJava test jar || return 1
   validate_step check-jar validate_mcp_summary || return 1
   if [[ "$run_smoke" -eq 1 ]]; then
+    # Smoke server uses --no-daemon and its own docker run: stop daemon first to avoid lock conflicts
+    docker_daemon_stop
     validate_step smoke-server validate_smoke_server || return 1
   fi
   printf 'PASS validate: %s\n' "${VALIDATE_PASSED_STEPS[*]}"
@@ -944,6 +1017,14 @@ case "$cmd" in
     ;;
   smoke-client)
     smoke_client
+    ;;
+  daemon-start)
+    docker_daemon_start
+    printf 'Daemon container %s started.\n' "$DAEMON_CONTAINER"
+    ;;
+  daemon-stop)
+    docker_daemon_stop
+    printf 'Daemon container %s stopped.\n' "$DAEMON_CONTAINER"
     ;;
   *)
     docker_gradle "$@"
