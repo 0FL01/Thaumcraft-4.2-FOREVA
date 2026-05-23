@@ -21,7 +21,6 @@ public class BlockTextureAssetCoverageTest {
 
         Files.walk(sourceRoot)
                 .filter(Files::isRegularFile)
-                .filter(source -> !source.getFileName().toString().contains(" - Copy"))
                 .forEach(source -> {
                     Path relative = sourceRoot.relativize(source);
                     if (!Files.exists(portRoot.resolve(relative))) {

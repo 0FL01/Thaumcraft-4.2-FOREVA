@@ -105,9 +105,6 @@ public class FXVent extends Particle {
 
     @Override
     public int getFXLayer() {
-        // Must return 0 because this particle uses setParticleTextureIndex(...).
-        // In 1.12.2, setParticleTextureIndex throws "Invalid call to Particle.setMiscTex"
-        // when getFXLayer() != 0.
-        return 0;
+        return 1;
     }
 }

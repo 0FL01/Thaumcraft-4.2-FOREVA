@@ -311,7 +311,7 @@ public class ClientProxyFxStaticGuardTest {
         assertTrue("Dedicated FXSparkle particle must keep colored sparkle emission baseline",
                 sparkleFx.contains("class FXSparkle extends Particle")
                         && sparkleFx.contains("setParticleTextureIndex(part)")
-                        && sparkleFx.contains("blendmode-based layer switching is disabled")
+                        && sparkleFx.contains("this.blendmode == 1 ? 0 : 1")
                         && sparkleFx.contains("leyLineEffect"));
         assertTrue("Dedicated FXSwarm particle must keep target-tracking swarm baseline",
                 swarmFx.contains("class FXSwarm extends Particle")
@@ -326,7 +326,7 @@ public class ClientProxyFxStaticGuardTest {
                         && ventFx.contains("setHeading(double x, double y, double z, float speed, float spread)")
                         && ventFx.contains("setParticleTextureIndex(part)")
                         && ventFx.contains("public int getFXLayer()")
-                        && ventFx.contains("return 0;"));
+                        && ventFx.contains("return 1;"));
         assertTrue("Dedicated FXVisSparkle particle must keep block-centered + vis-drain trail textured baseline",
                 visSparkleFx.contains("class FXVisSparkle extends Particle")
                         && visSparkleFx.contains("baseX")
