@@ -224,7 +224,6 @@ jobs:
             - Thaumcraft-1.0.0-dev.jar
 
             ---
-            *Pre-release. Fresh worlds only. 1.7.10/WIP saves are not supported.*
           files: |
             build/libs/Thaumcraft-*-universal.jar
             build/libs/Thaumcraft-*-api.jar
