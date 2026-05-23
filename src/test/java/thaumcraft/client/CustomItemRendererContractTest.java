@@ -69,7 +69,7 @@ public class CustomItemRendererContractTest {
                         && trunkPerspectiveModel.contains("delegate.handlePerspective(cameraTransformType)")
                         && trunkPerspectiveModel.contains("delegatePerspective.getRight()"));
 
-        assertTrue("The trunkspawner TEISR display transforms should mirror the vanilla 1.12.2 chest item model for GUI, ground, fixed, and right-hand poses",
+        assertTrue("The trunkspawner TEISR display transforms should include GUI, ground, fixed, thirdperson, firstperson, and mirrored left-hand entries",
                 trunkItemModel.contains("\"gui\"")
                         && trunkItemModel.contains("\"rotation\": [30, 45, 0]")
                         && trunkItemModel.contains("\"scale\": [0.625, 0.625, 0.625]")
@@ -83,9 +83,13 @@ public class CustomItemRendererContractTest {
                         && trunkItemModel.contains("\"rotation\": [75, 315, 0]")
                         && trunkItemModel.contains("\"translation\": [0, 2.5, 0]")
                         && trunkItemModel.contains("\"scale\": [0.375, 0.375, 0.375]")
+                        && trunkItemModel.contains("\"thirdperson_lefthand\"")
+                        && trunkItemModel.contains("\"rotation\": [75, 135, 0]")
                         && trunkItemModel.contains("\"firstperson_righthand\"")
                         && trunkItemModel.contains("\"rotation\": [0, 315, 0]")
-                        && trunkItemModel.contains("\"scale\": [0.4, 0.4, 0.4]"));
+                        && trunkItemModel.contains("\"scale\": [0.4, 0.4, 0.4]")
+                        && trunkItemModel.contains("\"firstperson_lefthand\"")
+                        && trunkItemModel.contains("\"rotation\": [0, 135, 0]"));
 
         assertTrue("The wand and trunk item-model stubs must stay builtin/entity so Forge dispatches the dedicated item renderers",
                 wandItemModel.contains("\"parent\": \"builtin/entity\"")

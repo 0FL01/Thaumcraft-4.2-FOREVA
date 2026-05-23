@@ -25,8 +25,14 @@ public class ItemTrunkSpawnerRenderer extends TileEntityItemStackRenderer {
     @Override
     public void renderByItem(ItemStack stack, float partialTicks) {
         ItemCameraTransforms.TransformType transformType = CURRENT_TRANSFORM.get();
+        boolean flipCullFace = transformType == ItemCameraTransforms.TransformType.GUI;
+
         GlStateManager.pushMatrix();
         try {
+            if (flipCullFace) {
+                GlStateManager.cullFace(GlStateManager.CullFace.FRONT);
+            }
+
             Minecraft.getMinecraft().getTextureManager().bindTexture(TRUNK_TEXTURE);
             GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
             GlStateManager.scale(1.0F, -1.0F, -1.0F);
@@ -36,6 +42,10 @@ public class ItemTrunkSpawnerRenderer extends TileEntityItemStackRenderer {
             chest.chestLid.render(0.0625F);
             chest.chestKnob.render(0.0625F);
         } finally {
+            if (flipCullFace) {
+                GlStateManager.cullFace(GlStateManager.CullFace.BACK);
+            }
+
             setTransformType(ItemCameraTransforms.TransformType.NONE);
             GlStateManager.popMatrix();
         }
