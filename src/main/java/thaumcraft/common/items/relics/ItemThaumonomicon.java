@@ -70,8 +70,8 @@ public class ItemThaumonomicon extends Item {
             world.playSound(player, player.posX, player.posY, player.posZ, TCSounds.PAGE, SoundCategory.PLAYERS, 1.0f, 1.0f);
         } else {
             applyResearchUnlocks(player, stack);
-            player.openGui(Thaumcraft.instance, CommonProxy.GUI_THAUMONOMICON, world, 0, 0, 0);
         }
+        player.openGui(Thaumcraft.instance, CommonProxy.GUI_THAUMONOMICON, world, 0, 0, 0);
         return new ActionResult<>(EnumActionResult.SUCCESS, stack);
     }
 

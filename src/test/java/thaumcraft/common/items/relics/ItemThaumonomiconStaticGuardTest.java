@@ -33,6 +33,12 @@ public class ItemThaumonomiconStaticGuardTest {
                 source.contains("research.siblings == null")
                         && source.contains("ResearchCategories.getResearch(sibling) != null")
                         && source.contains("ResearchManager.addResearch(player, sibling)"));
+        assertTrue("Thaumonomicon must keep original-style client sound plus local/server openGui parity",
+                source.contains("if (world.isRemote) {")
+                        && source.contains("world.playSound(player, player.posX, player.posY, player.posZ, TCSounds.PAGE, SoundCategory.PLAYERS, 1.0f, 1.0f);")
+                        && source.contains("applyResearchUnlocks(player, stack);")
+                        && source.contains("player.openGui(Thaumcraft.instance, CommonProxy.GUI_THAUMONOMICON, world, 0, 0, 0);")
+                        && !source.contains("applyResearchUnlocks(player, stack);\n            player.openGui(Thaumcraft.instance, CommonProxy.GUI_THAUMONOMICON, world, 0, 0, 0);\n        }\n        return"));
     }
 
     private static String readFile(String path) throws IOException {

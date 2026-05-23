@@ -31,10 +31,22 @@ public class ClientProxyGuiRoutingStaticGuardTest {
     @Test
     public void clientProxyShouldKeepResearchBrowserAndFocalManipulatorGuiRouting() throws IOException {
         String clientProxySource = readFile("src/main/java/thaumcraft/client/ClientProxy.java");
+        String browserSource = readFile("src/main/java/thaumcraft/client/gui/GuiResearchBrowser.java");
+        String recipeSource = readFile("src/main/java/thaumcraft/client/gui/GuiResearchRecipe.java");
 
         assertTrue("ClientProxy should keep Thaumonomicon GUI route to GuiResearchBrowser",
                 clientProxySource.contains("case GUI_THAUMONOMICON:")
                         && clientProxySource.contains("return new GuiResearchBrowser();"));
+        assertTrue("GuiResearchBrowser must keep research cache, purchase packets and recipe-book transition",
+                browserSource.contains("public static HashMap<String, ArrayList<String>> completedResearch = new HashMap<>();")
+                        && browserSource.contains("player.getCapability(PlayerKnowledgeProvider.PLAYER_KNOWLEDGE, null)")
+                        && browserSource.contains("new PacketPlayerCompleteToServer(")
+                        && browserSource.contains("(byte) 0")
+                        && browserSource.contains("(byte) 1")
+                        && browserSource.contains("this.mc.displayGuiScreen(new GuiResearchRecipe(this.currentHighlight, 0, this.guiMapX, this.guiMapY));"));
+        assertTrue("GuiResearchRecipe must preserve browser return path and map-position constructor",
+                recipeSource.contains("public GuiResearchRecipe(ResearchItem research, int page, double guiMapX, double guiMapY)")
+                        && recipeSource.contains("this.mc.displayGuiScreen(new GuiResearchBrowser(this.guiMapX, this.guiMapY));"));
         assertTrue("ClientProxy should keep focal manipulator GUI route",
                 clientProxySource.contains("case GUI_FOCAL_MANIPULATOR:")
                         && clientProxySource.contains("new GuiFocalManipulator(player.inventory, (TileFocalManipulator) tile)"));
