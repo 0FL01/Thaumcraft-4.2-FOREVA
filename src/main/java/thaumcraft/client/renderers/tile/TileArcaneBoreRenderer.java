@@ -12,7 +12,7 @@ import thaumcraft.common.tiles.TileArcaneBore;
 public class TileArcaneBoreRenderer extends TileEntitySpecialRenderer<TileArcaneBore> {
 
     private static final ResourceLocation BORE_TEXTURE =
-            new ResourceLocation("thaumcraft", "textures/models/Bore.png");
+            new ResourceLocation("thaumcraft", "textures/models/bore.png");
     private static final ResourceLocation JAR_TEXTURE =
             new ResourceLocation("thaumcraft", "textures/models/jar.png");
     private static final ResourceLocation VORTEX_TEXTURE =

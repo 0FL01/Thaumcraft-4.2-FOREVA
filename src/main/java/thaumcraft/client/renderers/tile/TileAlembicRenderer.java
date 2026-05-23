@@ -20,7 +20,7 @@ public class TileAlembicRenderer extends TileEntitySpecialRenderer<TileAlembic> 
     private static final ResourceLocation LABEL_TEXTURE =
             new ResourceLocation("thaumcraft", "textures/models/label.png");
     private static final ResourceLocation BORE_TEXTURE =
-            new ResourceLocation("thaumcraft", "textures/models/Bore.png");
+            new ResourceLocation("thaumcraft", "textures/models/bore.png");
     private static final float MODEL_SCALE = 0.0625F;
 
     private final ModelAlembic model = new ModelAlembic();

@@ -9,7 +9,7 @@ import thaumcraft.common.tiles.TileArcaneBoreBase;
 
 public class TileArcaneBoreBaseRenderer extends TileEntitySpecialRenderer<TileArcaneBoreBase> {
     private static final ResourceLocation BORE_TEXTURE =
-            new ResourceLocation("thaumcraft", "textures/models/Bore.png");
+            new ResourceLocation("thaumcraft", "textures/models/bore.png");
     private static final float MODEL_SCALE = 0.0625F;
 
     private final ModelBoreBase model = new ModelBoreBase();

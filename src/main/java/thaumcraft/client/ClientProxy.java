@@ -77,10 +77,8 @@ import thaumcraft.client.fx.particles.FXBlockRunes;
 import thaumcraft.client.fx.particles.FXBreaking;
 import thaumcraft.client.fx.particles.FXBurst;
 import thaumcraft.client.fx.particles.FXBubble;
-import thaumcraft.client.fx.particles.FXBubbleAlt;
 import thaumcraft.client.fx.particles.FXEssentiaTrail;
 import thaumcraft.client.fx.particles.FXGeneric;
-import thaumcraft.client.fx.particles.FXSmokeDrift;
 import thaumcraft.client.fx.particles.FXSmokeSpiral;
 import thaumcraft.client.fx.particles.FXSpark;
 import thaumcraft.client.fx.particles.FXSparkle;
@@ -1865,23 +1863,13 @@ public class ClientProxy extends CommonProxy {
                     x,
                     y,
                     z,
-                    (world.rand.nextFloat() - 0.5f) * 0.01f,
-                    0.02f + world.rand.nextFloat() * 0.01f,
-                    (world.rand.nextFloat() - 0.5f) * 0.01f,
-                    8);
+                    0.0D,
+                    0.0D,
+                    0.0D,
+                    -4);
+            bubble.setRGB(0.5F, 0.5F, 0.7F);
             bubble.setFroth();
             ParticleEngine.addEffect(world, bubble);
-            if (world.rand.nextInt(4) == 0) {
-                ParticleEngine.addEffect(world, new FXSmokeDrift(
-                        world,
-                        x,
-                        y + 0.03f,
-                        z,
-                        (world.rand.nextFloat() - 0.5f) * 0.002f,
-                        0.004f + world.rand.nextFloat() * 0.003f,
-                        (world.rand.nextFloat() - 0.5f) * 0.002f,
-                        7));
-            }
         }
     }
 
@@ -1897,10 +1885,11 @@ public class ClientProxy extends CommonProxy {
                     x,
                     y,
                     z,
-                    (world.rand.nextFloat() - 0.5f) * 0.01f,
-                    -0.02f - world.rand.nextFloat() * 0.02f,
-                    (world.rand.nextFloat() - 0.5f) * 0.01f,
-                    14);
+                    0.0D,
+                    0.0D,
+                    0.0D,
+                    -4);
+            bubble.setRGB(0.5F, 0.5F, 0.7F);
             bubble.setFroth2();
             ParticleEngine.addEffect(world, bubble);
         }
@@ -1913,15 +1902,15 @@ public class ClientProxy extends CommonProxy {
         if (amount <= 0) return;
 
         for (int i = 0; i < amount; i++) {
-            FXBubbleAlt bubble = new FXBubbleAlt(
+            FXBubble bubble = new FXBubble(
                     world,
                     x,
                     y,
                     z,
-                    (world.rand.nextFloat() - 0.5f) * 0.01f,
-                    0.015f + world.rand.nextFloat() * 0.01f,
-                    (world.rand.nextFloat() - 0.5f) * 0.01f,
-                    10);
+                    0.0D,
+                    0.0D,
+                    0.0D,
+                    1);
             bubble.setRGB(red, green, blue);
             ParticleEngine.addEffect(world, bubble);
         }
@@ -1932,10 +1921,10 @@ public class ClientProxy extends CommonProxy {
         if (world == null) return;
         world.playSound(
                 x + 0.5, y + 0.5, z + 0.5,
-                TCSounds.BUBBLE,
+                TCSounds.SPILL,
                 SoundCategory.BLOCKS,
                 0.2f,
-                1.0f + world.rand.nextFloat() * 0.4f,
+                1.0f,
                 false
         );
     }

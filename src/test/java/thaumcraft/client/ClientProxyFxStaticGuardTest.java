@@ -176,15 +176,21 @@ public class ClientProxyFxStaticGuardTest {
         assertTrue("ClientProxy must override crucibleFroth and crucibleFrothDown",
                 source.contains("public void crucibleFroth(")
                         && source.contains("public void crucibleFrothDown(")
-                        && source.contains("new FXSmokeDrift("));
-        assertTrue("ClientProxy must override crucibleBubble with colored bubble path",
+                        && source.contains("new FXBubble(")
+                        && source.contains("bubble.setRGB(0.5F, 0.5F, 0.7F)")
+                        && source.contains("bubble.setFroth()")
+                        && source.contains("bubble.setFroth2()")
+                        && !source.contains("new FXSmokeDrift("));
+        assertTrue("ClientProxy must override crucibleBubble with legacy colored bubble path",
                 source.contains("public void crucibleBubble(")
-                        && source.contains("new FXBubbleAlt(")
+                        && source.contains("new FXBubble(")
+                        && source.contains("bubble.setRGB(red, green, blue)")
+                        && !source.contains("new FXBubbleAlt(")
                         && source.contains("ParticleEngine.addEffect(world, bubble)"));
         assertTrue("ClientProxy must override crucibleBoilSound and crucibleBoil",
                 source.contains("public void crucibleBoilSound(")
                         && source.contains("public void crucibleBoil(")
-                        && source.contains("TCSounds.BUBBLE")
+                        && source.contains("TCSounds.SPILL")
                         && source.contains("new FXBubble(")
                         && source.contains("bubble.setBubbleSpeed(0.003D * type)"));
         assertTrue("CommonProxy and ClientProxy must keep startScan proxy surface",
