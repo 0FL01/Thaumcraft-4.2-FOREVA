@@ -78,7 +78,12 @@ public class EntityTravelingTrunk extends net.minecraft.entity.EntityLiving impl
         if (!this.world.isRemote) {
             this.updateDefensiveTarget(owner);
         }
-        if (!this.getStay() && owner != null && this.getAttackTarget() == null && this.getDistance(owner) > 4.0f) {
+        boolean teleported = !this.world.isRemote
+                && !this.getStay()
+                && owner != null
+                && this.getDistance(owner) > 20.0F
+                && this.tryTeleportToOwner(owner);
+        if (!teleported && !this.getStay() && owner != null && this.getAttackTarget() == null && this.getDistance(owner) > 4.0f) {
             this.getNavigator().tryMoveToEntityLiving(owner, this.getUpgrade() == 0 ? 0.65 : 0.5);
         }
     }
@@ -434,5 +439,114 @@ public class EntityTravelingTrunk extends net.minecraft.entity.EntityLiving impl
             compound.setUniqueId("OwnerUUID", ownerId);
         }
         compound.setTag("Inventory", this.inventory.writeToNBT(new net.minecraft.nbt.NBTTagList()));
+    }
+
+    /**
+     * Teleports the trunk to a safe position near its owner when too far away.
+     * Mirrors the original 1.7.10 logic from updateEntityActionState():
+     *   - distance {@code > 20} blocks triggers teleport
+     *   - searches a 5x5 perimeter around the owner (skipping inner 3x3)
+     *   - plays enderman teleport sound on arrival
+     *   - clears attack target and navigation path after teleport
+     * <p>
+     * <b>Reference:</b> {@code thaumcraft_src/EntityTravelingTrunk.class} &mdash;
+     * {@code func_70626_be} / {@code updateEntityActionState()}, teleport branch at
+     * distance {@code > 20}, 5x5 perimeter search, {@code setLocationAndAngles},
+     * portal sound, {@code setAttackTarget(null)}.
+     * <p>
+     * <b>Deviation from original (intentional):</b> The original {@code isAirBlock}
+     * checks invert body/head safety&mdash;it teleports the trunk inside blocks and
+     * relies on Minecraft\u2019s entity collision resolution to push it to open space.
+     * This implementation uses a conservative safe-spot check: solid floor (or water),
+     * clear body space, clear headroom. This avoids unpredictable collision pushes
+     * while still achieving the same gameplay result (trunk appears near owner).
+     * <p>
+     * <b>Blocked by:</b> In Forge 1.12.2, {@code EntityLiving.updateEntityActionState()}
+     * is {@code final}, so teleport logic runs from {@code onLivingUpdate()} instead.
+     *
+     * @param owner the owner to teleport near
+     * @return true if a teleport occurred
+     */
+    private boolean tryTeleportToOwner(net.minecraft.entity.EntityLivingBase owner) {
+        if (this.world.isRemote || this.getStay() || owner == null || this.getDistance(owner) <= 20.0F) {
+            return false;
+        }
+        net.minecraft.util.math.BlockPos ownerPos = new net.minecraft.util.math.BlockPos(owner);
+        if (!this.world.isBlockLoaded(ownerPos)) {
+            return false;
+        }
+        int baseX = ownerPos.getX() - 2;
+        int baseZ = ownerPos.getZ() - 2;
+        int baseY = net.minecraft.util.math.MathHelper.floor(owner.getEntityBoundingBox().minY);
+
+        for (int dx = 0; dx <= 4; ++dx) {
+            for (int dz = 0; dz <= 4; ++dz) {
+                // Skip inner 3x3 block — only check the perimeter (same as original)
+                if (dx >= 1 && dz >= 1 && dx <= 3 && dz <= 3) {
+                    continue;
+                }
+                net.minecraft.util.math.BlockPos candidate = new net.minecraft.util.math.BlockPos(baseX + dx, baseY, baseZ + dz);
+                if (!this.isSafeTeleportSpot(candidate)) {
+                    continue;
+                }
+                // All checks passed — teleport
+                double x = (double) (baseX + dx) + 0.5D;
+                double y = (double) baseY;
+                double z = (double) (baseZ + dz) + 0.5D;
+                this.world.playSound(null,
+                        (double) (baseX + dx) + 0.5D, (double) baseY, (double) (baseZ + dz) + 0.5D,
+                        net.minecraft.init.SoundEvents.ENTITY_ENDERMEN_TELEPORT,
+                        net.minecraft.util.SoundCategory.NEUTRAL, 0.5F, 1.0F);
+                this.setLocationAndAngles(x, (double) baseY, z, this.rotationYaw, this.rotationPitch);
+                this.setAttackTarget(null);
+                this.getNavigator().clearPath();
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Checks whether a given BlockPos is safe for the trunk to appear.
+     * <p>
+     * This is an <b>intentional gameplay-safe deviation</b> from the original
+     * 1.7.10 safe-spot check. The original logic (from {@code func_70626_be})
+     * accepts positions where the body and head levels are <b>not</b> air
+     * (i.e. trunk teleports inside blocks) and relies on Minecraft collision
+     * resolution to push the entity out. That approach is fragile with the
+     * 1.12.2 physics engine, so this check uses the inverse: it requires the
+     * body and head positions to be clear (air or replaceable), and the floor
+     * to be solid (or water).
+     * <p>
+     * Conditions:
+     *   <ol>
+     *     <li>Floor (pos.down()) must be present (not air) OR be water.</li>
+     *     <li>Body space (pos) must be air or replaceable.</li>
+     *     <li>Head space (pos.up()) must be air or replaceable.</li>
+     *     <li>All three positions must be in loaded chunks.</li>
+     *   </ol>
+     */
+    private boolean isSafeTeleportSpot(net.minecraft.util.math.BlockPos pos) {
+        if (!this.world.isBlockLoaded(pos)
+                || !this.world.isBlockLoaded(pos.down())
+                || !this.world.isBlockLoaded(pos.up())) {
+            return false;
+        }
+        // Floor: must be solid (non-air) OR water
+        net.minecraft.block.state.IBlockState floor = this.world.getBlockState(pos.down());
+        if (this.world.isAirBlock(pos.down()) && floor.getMaterial() != net.minecraft.block.material.Material.WATER) {
+            return false;
+        }
+        // Body: must be air or replaceable (trunk needs to fit)
+        if (!this.world.isAirBlock(pos)
+                && !this.world.getBlockState(pos).getBlock().isReplaceable(this.world, pos)) {
+            return false;
+        }
+        // Head: must be air or replaceable (headroom)
+        if (!this.world.isAirBlock(pos.up())
+                && !this.world.getBlockState(pos.up()).getBlock().isReplaceable(this.world, pos.up())) {
+            return false;
+        }
+        return true;
     }
 }
