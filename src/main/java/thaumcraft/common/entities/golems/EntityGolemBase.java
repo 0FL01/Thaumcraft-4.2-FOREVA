@@ -157,11 +157,9 @@ public class EntityGolemBase extends net.minecraft.entity.monster.EntityGolem im
 
         PathNavigate nav = this.getNavigator();
         if (nav instanceof PathNavigateGround) {
-            boolean avoidsWater = this.getGolemType() != EnumGolemType.STONE
-                    && this.getGolemType() != EnumGolemType.IRON
-                    && this.getGolemType() != EnumGolemType.THAUMIUM;
-            ((PathNavigateGround) nav).setCanSwim(!avoidsWater);
-            this.setPathPriority(PathNodeType.WATER, avoidsWater ? -1.0F : 0.0F);
+            boolean light = this.isLightGolem();
+            ((PathNavigateGround) nav).setCanSwim(light);
+            this.setPathPriority(PathNodeType.WATER, light ? 0.0F : -1.0F);
         }
         this.isImmuneToFire = this.getGolemType().fireResist;
 
@@ -490,6 +488,14 @@ public class EntityGolemBase extends net.minecraft.entity.monster.EntityGolem im
     public int getGolemStrength() { return this.getGolemType().strength + this.getUpgradeAmount(1); }
     public int getCarryLimit() { return this.golemType.carry + Math.min(16, Math.max(4, this.golemType.carry)) * this.getUpgradeAmount(1); }
     public int getFluidCarryLimit() { return net.minecraft.util.math.MathHelper.floor(Math.sqrt(this.getCarryLimit())) * 1000; }
+
+    public boolean isLightGolem() {
+        EnumGolemType type = this.getGolemType();
+        return type == EnumGolemType.STRAW
+            || type == EnumGolemType.WOOD
+            || type == EnumGolemType.FLESH
+            || type == EnumGolemType.TALLOW;
+    }
 
     public byte getUpgrade(int slot) {
         char[] chars = this.dataManager.get(UPGRADES_STR).toCharArray();

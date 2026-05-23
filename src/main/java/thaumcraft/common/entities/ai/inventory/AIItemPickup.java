@@ -3,12 +3,15 @@ package thaumcraft.common.entities.ai.inventory;
 import java.lang.reflect.Field;
 import java.util.List;
 
+import net.minecraft.block.material.Material;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.ai.EntityAIBase;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.item.ItemStack;
+import net.minecraft.pathfinding.Path;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.MathHelper;
 import net.minecraftforge.fml.relauncher.ReflectionHelper;
 import thaumcraft.common.config.Config;
 import thaumcraft.common.entities.golems.EntityGolemBase;
@@ -20,6 +23,7 @@ public class AIItemPickup extends EntityAIBase {
     private EntityGolemBase theGolem;
     private Entity targetEntity;
     int count = 0;
+    private int surfaceTicks = 0;
 
     public AIItemPickup(EntityGolemBase golem) {
         this.theGolem = golem;
@@ -32,7 +36,27 @@ public class AIItemPickup extends EntityAIBase {
         return this.findItem();
     }
 
+    // --- Helpers ---
+
+    private static boolean isEntityInWater(Entity entity) {
+        if (entity == null) return false;
+        BlockPos eyePos = new BlockPos(
+            MathHelper.floor(entity.posX),
+            MathHelper.floor(entity.posY + entity.getEyeHeight()),
+            MathHelper.floor(entity.posZ));
+        return entity.world.getBlockState(eyePos).getMaterial() == Material.WATER;
+    }
+
+    private boolean isWaterPickupTarget() {
+        return this.targetEntity != null
+            && isEntityInWater(this.targetEntity)
+            && theGolem.isLightGolem();
+    }
+
+    // --- Item finding ---
+
     private boolean findItem() {
+        this.targetEntity = null;
         double range = Double.MAX_VALUE;
         float dmod = theGolem.getRange();
         BlockPos home = theGolem.getHomePosition();
@@ -52,6 +76,15 @@ public class AIItemPickup extends EntityAIBase {
                 && (!InventoryUtils.areItemStacksEqualStrict(theGolem.getCarried(), ei.getItem())
                 || ei.getItem().getCount() > theGolem.getCarrySpace())) continue;
 
+            // Skip underwater items if golem is heavy (sinks, can't path through water)
+            if (isEntityInWater(e) && !theGolem.isLightGolem()) continue;
+
+            // For dry targets and light golems: verify a path exists
+            if (!isEntityInWater(e) && theGolem.isLightGolem()) {
+                Path path = theGolem.getNavigator().getPathToXYZ(e.posX, e.posY, e.posZ);
+                if (path == null || path.getCurrentPathLength() == 0) continue;
+            }
+
             double distToHome = e.getDistanceSq(home.getX() + 0.5, home.getY() + 0.5, home.getZ() + 0.5);
             double distToGolem = e.getDistanceSq(theGolem.posX, theGolem.posY, theGolem.posZ);
             if (distToGolem < range && distToHome <= dmod * dmod) {
@@ -64,23 +97,74 @@ public class AIItemPickup extends EntityAIBase {
 
     @Override
     public boolean shouldContinueExecuting() {
-        return this.count-- > 0 && !this.theGolem.getNavigator().noPath() && this.targetEntity.isEntityAlive();
+        if (this.count-- <= 0 || !this.targetEntity.isEntityAlive()) {
+            // Item was picked up or expired — keep task alive while surfacing
+            if (this.surfaceTicks > 0) return true;
+            return false;
+        }
+        // For underwater targets: allow continuation even when navigator path ends,
+        // because the final dive uses manual motion
+        if (isWaterPickupTarget()) return true;
+        return !this.theGolem.getNavigator().noPath();
     }
 
     @Override
     public void resetTask() {
         this.count = 0;
         this.targetEntity = null;
+        this.surfaceTicks = 0;
         this.theGolem.getNavigator().clearPath();
     }
 
     @Override
     public void updateTask() {
-        this.theGolem.getLookHelper().setLookPositionWithEntity(this.targetEntity, 30.0F, 30.0F);
         double dist = this.theGolem.getDistanceSq(this.targetEntity);
+
+        // --- Surface mode after underwater pickup ---
+        if (this.surfaceTicks > 0) {
+            this.theGolem.motionY += 0.06D;
+            if (this.theGolem.motionY > 0.5D) this.theGolem.motionY = 0.5D;
+            this.theGolem.velocityChanged = true;
+            this.surfaceTicks--;
+            return;
+        }
+
         if (dist <= 2.0) {
             this.pickUp();
+            // After picking up an underwater item, start surfacing boost
+            if (this.theGolem.isInWater() && this.theGolem.isLightGolem()) {
+                this.surfaceTicks = 30; // ~1.5 seconds of upward thrust
+            }
+            return;
         }
+
+        // Dive mode for underwater items
+        if (isWaterPickupTarget()) {
+            double dx = targetEntity.posX - theGolem.posX;
+            double dz = targetEntity.posZ - theGolem.posZ;
+            double dy = targetEntity.posY - theGolem.posY;
+            double horizontalSq = dx * dx + dz * dz;
+
+            theGolem.getLookHelper().setLookPosition(
+                targetEntity.posX, targetEntity.posY + 0.25D, targetEntity.posZ,
+                30.0F, 30.0F);
+
+            if (horizontalSq <= 2.25D && theGolem.isInWater()) {
+                // Don't clear the path — the pathfinder already has nodes
+                // at the target's Y and handles the vertical swim. Only
+                // apply light horizontal correction to stay on target.
+
+                // Small horizontal correction toward item
+                theGolem.motionX += MathHelper.clamp(dx * 0.02D, -0.04D, 0.04D);
+                theGolem.motionZ += MathHelper.clamp(dz * 0.02D, -0.04D, 0.04D);
+
+                theGolem.velocityChanged = true;
+                return;
+            }
+        }
+
+        // Normal update for dry targets
+        this.theGolem.getLookHelper().setLookPositionWithEntity(this.targetEntity, 30.0F, 30.0F);
     }
 
     private void pickUp() {
@@ -113,7 +197,18 @@ public class AIItemPickup extends EntityAIBase {
     @Override
     public void startExecuting() {
         this.count = 200;
-        this.theGolem.getNavigator().tryMoveToEntityLiving(this.targetEntity, this.theGolem.getAIMoveSpeed());
+        if (isWaterPickupTarget()) {
+            // For underwater items: path directly to the item's XYZ so the pathfinder
+            // creates nodes at the correct depth
+            this.theGolem.getNavigator().tryMoveToXYZ(
+                this.targetEntity.posX,
+                this.targetEntity.posY,
+                this.targetEntity.posZ,
+                this.theGolem.getAIMoveSpeed());
+        } else {
+            this.theGolem.getNavigator().tryMoveToEntityLiving(
+                this.targetEntity, this.theGolem.getAIMoveSpeed());
+        }
     }
 
     private static boolean hasPickupDelay(EntityItem item) {
