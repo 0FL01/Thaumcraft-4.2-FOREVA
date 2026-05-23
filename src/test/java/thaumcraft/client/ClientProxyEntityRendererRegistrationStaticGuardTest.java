@@ -115,10 +115,14 @@ public class ClientProxyEntityRendererRegistrationStaticGuardTest {
         assertTrue("RenderWisp must provide dedicated billboard core and halo baseline",
                 wispRenderer.contains("extends Render<EntityWisp>")
                         && wispRenderer.contains("textures/misc/wisp.png")
-                        && wispRenderer.contains("textures/particle/particles.png")
+                        && wispRenderer.contains("textures/misc/particles.png")
                         && wispRenderer.contains("Aspect.getAspect(entity.getWispType())")
+                        && wispRenderer.contains("GlStateManager.disableLighting()")
+                        && wispRenderer.contains("GlStateManager.disableCull()")
                         && wispRenderer.contains("renderCore(entity, red, green, blue)")
                         && wispRenderer.contains("renderHalo(entity, partialTicks)")
+                        && wispRenderer.contains("OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, FULL_BRIGHT, FULL_BRIGHT)")
+                        && wispRenderer.contains("this.renderManager.options.thirdPersonView == 2 ? -1.0F : 1.0F")
                         && wispRenderer.contains("OpenGlHelper.setLightmapTextureCoords")
                         && wispRenderer.contains("DefaultVertexFormats.POSITION_TEX_COLOR"));
         String watcherRenderer = readFile("src/main/java/thaumcraft/client/renderers/entity/RenderWatcher.java");
