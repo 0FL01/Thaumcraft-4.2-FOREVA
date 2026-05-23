@@ -77,6 +77,9 @@ public class EntityTravelingTrunk extends net.minecraft.entity.EntityLiving impl
         }
         if (!this.world.isRemote) {
             this.updateDefensiveTarget(owner);
+            if (this.isInWater()) {
+                this.setAir(300);
+            }
         }
         boolean teleported = !this.world.isRemote
                 && !this.getStay()
@@ -93,6 +96,9 @@ public class EntityTravelingTrunk extends net.minecraft.entity.EntityLiving impl
         boolean wasOnGround = this.onGround;
         this.field_767_b += (this.field_768_a - this.field_767_b) * 0.5F;
         super.onUpdate();
+        if (this.isInWater()) {
+            this.motionY += 0.033D;
+        }
         if (this.world.isRemote) {
             if (!this.onGround && this.motionY < 0.0D) {
                 this.lidrot += 0.015F;
