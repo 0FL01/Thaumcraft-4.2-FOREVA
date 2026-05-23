@@ -1,12 +1,20 @@
 package thaumcraft.client.renderers.entity;
 
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.entity.RenderLiving;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.client.renderer.entity.layers.LayerRenderer;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.client.renderer.texture.TextureMap;
+import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.util.ResourceLocation;
+import org.lwjgl.opengl.GL11;
 import thaumcraft.client.renderers.models.entities.ModelGolem;
 import thaumcraft.client.renderers.models.entities.ModelGolemAccessories;
+import thaumcraft.common.config.ConfigItems;
 import thaumcraft.common.entities.golems.EntityGolemBase;
 import thaumcraft.common.entities.golems.EnumGolemType;
 
@@ -24,6 +32,7 @@ public class RenderGolemBase extends RenderLiving<EntityGolemBase> {
 
     public RenderGolemBase(RenderManager renderManager) {
         super(renderManager, new ModelGolem(false), 0.25F);
+        this.addLayer(new GolemCoreLayer(this));
         this.addLayer(new GolemAccessoriesLayer(this));
         this.addLayer(new GolemDamageLayer(this));
     }
@@ -59,6 +68,110 @@ public class RenderGolemBase extends RenderLiving<EntityGolemBase> {
         textures.put(EnumGolemType.IRON, new ResourceLocation("thaumcraft", "textures/models/golem_iron.png"));
         textures.put(EnumGolemType.THAUMIUM, new ResourceLocation("thaumcraft", "textures/models/golem_thaumium.png"));
         return textures;
+    }
+
+    private static final class GolemCoreLayer implements LayerRenderer<EntityGolemBase> {
+        private final RenderGolemBase renderer;
+        private final ModelGolem model;
+
+        private GolemCoreLayer(RenderGolemBase renderer) {
+            this.renderer = renderer;
+            this.model = (ModelGolem) renderer.getMainModel();
+        }
+
+        @Override
+        public void doRenderLayer(EntityGolemBase entity, float limbSwing, float limbSwingAmount, float partialTicks,
+                                  float ageInTicks, float netHeadYaw, float headPitch, float scale) {
+            this.renderCore(entity);
+            this.renderUpgrades(entity);
+        }
+
+        private void renderCore(EntityGolemBase entity) {
+            int core = entity.getCore();
+            if (core < 0) {
+                return;
+            }
+            TextureAtlasSprite sprite = Minecraft.getMinecraft().getRenderItem().getItemModelMesher()
+                    .getParticleIcon(ConfigItems.itemGolemCore, core);
+            if (sprite == null) {
+                return;
+            }
+            this.renderer.bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
+            GlStateManager.pushMatrix();
+            beginIconRender();
+            GlStateManager.scale(0.4F, 0.4F, 0.4F);
+            this.model.golemBody.postRender(0.0625F);
+            float z = entity.getGolemDecoration() != null && entity.getGolemDecoration().contains("P") ? -7.25F : -6.05F;
+            renderBodySprite(sprite, 3.5F, 4.0F, z, 0.4375F);
+            endIconRender();
+            GlStateManager.popMatrix();
+        }
+
+        private void renderUpgrades(EntityGolemBase entity) {
+            if (entity.upgrades == null || entity.upgrades.length == 0) {
+                return;
+            }
+            this.renderer.bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
+            float shift = 0.08F;
+            GlStateManager.pushMatrix();
+            beginIconRender();
+            GlStateManager.scale(0.4F, 0.4F, 0.4F);
+            this.model.golemBody.postRender(0.0625F);
+            for (int slot = 0; slot < entity.upgrades.length; slot++) {
+                int upgrade = entity.getUpgrade(slot);
+                if (upgrade < 0) {
+                    continue;
+                }
+                TextureAtlasSprite sprite = Minecraft.getMinecraft().getRenderItem().getItemModelMesher()
+                        .getParticleIcon(ConfigItems.itemGolemUpgrade, upgrade);
+                if (sprite == null) {
+                    continue;
+                }
+                GlStateManager.pushMatrix();
+                float x = (-0.05F - shift * (float) (entity.upgrades.length - 1) / 2.0F + shift * slot) / 0.025F;
+                renderBodySprite(sprite, x, 8.5F, -6.08F, 0.25F);
+                GlStateManager.popMatrix();
+            }
+            endIconRender();
+            GlStateManager.popMatrix();
+        }
+
+        private static void beginIconRender() {
+            GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+            GlStateManager.enableBlend();
+            GlStateManager.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA,
+                    GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
+            GlStateManager.disableCull();
+        }
+
+        private static void endIconRender() {
+            GlStateManager.enableCull();
+            GlStateManager.disableBlend();
+            GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+        }
+
+        private static void renderBodySprite(TextureAtlasSprite sprite, float x, float y, float z, float size) {
+            GlStateManager.translate(x * 0.0625F, y * 0.0625F, z * 0.0625F);
+            GlStateManager.scale(size, size, size);
+            GlStateManager.translate(-0.5F, -0.5F, 0.0F);
+            renderSprite(sprite, 0.0D);
+        }
+
+        private static void renderSprite(TextureAtlasSprite sprite, double z) {
+            Tessellator tessellator = Tessellator.getInstance();
+            BufferBuilder buffer = tessellator.getBuffer();
+            buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
+            buffer.pos(0.0D, 0.0D, z).tex(sprite.getMinU(), sprite.getMaxV()).endVertex();
+            buffer.pos(1.0D, 0.0D, z).tex(sprite.getMaxU(), sprite.getMaxV()).endVertex();
+            buffer.pos(1.0D, 1.0D, z).tex(sprite.getMaxU(), sprite.getMinV()).endVertex();
+            buffer.pos(0.0D, 1.0D, z).tex(sprite.getMinU(), sprite.getMinV()).endVertex();
+            tessellator.draw();
+        }
+
+        @Override
+        public boolean shouldCombineTextures() {
+            return false;
+        }
     }
 
     private static final class GolemAccessoriesLayer implements LayerRenderer<EntityGolemBase> {

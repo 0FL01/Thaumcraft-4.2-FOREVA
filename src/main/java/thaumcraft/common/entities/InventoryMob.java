@@ -26,19 +26,19 @@ public class InventoryMob implements IInventory {
 
     @Override
     public boolean isEmpty() {
-        for (ItemStack s : this.inventory) { if (!s.isEmpty()) return false; }
+        for (ItemStack s : this.inventory) { if (s != null && !s.isEmpty()) return false; }
         return true;
     }
 
     @Override
     public ItemStack getStackInSlot(int i) {
         if (i < 0 || i >= this.inventory.length) return ItemStack.EMPTY;
-        return this.inventory[i];
+        return this.inventory[i] == null ? ItemStack.EMPTY : this.inventory[i];
     }
 
     @Override
     public ItemStack decrStackSize(int index, int count) {
-        if (this.inventory[index] == ItemStack.EMPTY) return ItemStack.EMPTY;
+        if (this.inventory[index] == null || this.inventory[index].isEmpty()) return ItemStack.EMPTY;
         if (this.inventory[index].getCount() <= count) {
             ItemStack s = this.inventory[index];
             this.inventory[index] = ItemStack.EMPTY;
@@ -49,7 +49,7 @@ public class InventoryMob implements IInventory {
 
     @Override
     public ItemStack removeStackFromSlot(int index) {
-        if (this.inventory[index] == ItemStack.EMPTY) return ItemStack.EMPTY;
+        if (this.inventory[index] == null || this.inventory[index].isEmpty()) return ItemStack.EMPTY;
         ItemStack s = this.inventory[index];
         this.inventory[index] = ItemStack.EMPTY;
         return s;
@@ -57,7 +57,7 @@ public class InventoryMob implements IInventory {
 
     @Override
     public void setInventorySlotContents(int index, ItemStack stack) {
-        this.inventory[index] = stack;
+        this.inventory[index] = stack == null ? ItemStack.EMPTY : stack;
     }
 
     @Override
@@ -78,7 +78,7 @@ public class InventoryMob implements IInventory {
 
     public NBTTagList writeToNBT(NBTTagList list) {
         for (int i = 0; i < this.inventory.length; i++) {
-            if (this.inventory[i] != ItemStack.EMPTY) {
+            if (this.inventory[i] != null && !this.inventory[i].isEmpty()) {
                 NBTTagCompound tc = new NBTTagCompound();
                 tc.setByte("Slot", (byte) i);
                 this.inventory[i].writeToNBT(tc);
@@ -90,17 +90,19 @@ public class InventoryMob implements IInventory {
 
     public void readFromNBT(NBTTagList list) {
         this.inventory = new ItemStack[this.inventory.length];
+        for (int i = 0; i < this.inventory.length; i++) this.inventory[i] = ItemStack.EMPTY;
         for (int i = 0; i < list.tagCount(); i++) {
             NBTTagCompound tc = list.getCompoundTagAt(i);
             int slot = tc.getByte("Slot") & 0xFF;
             if (slot >= 0 && slot < this.inventory.length) {
-                this.inventory[slot] = new ItemStack(tc);
+                ItemStack stack = new ItemStack(tc);
+                this.inventory[slot] = stack.isEmpty() ? ItemStack.EMPTY : stack;
             }
         }
     }
 
     public boolean hasSomething() {
-        for (ItemStack s : this.inventory) { if (!s.isEmpty()) return true; }
+        for (ItemStack s : this.inventory) { if (s != null && !s.isEmpty()) return true; }
         return false;
     }
 
@@ -111,7 +113,7 @@ public class InventoryMob implements IInventory {
         int needed = stack.getMaxStackSize();
         int total = 0;
         for (ItemStack s : this.inventory) {
-            if (s.isEmpty()) continue;
+            if (s == null || s.isEmpty()) continue;
             if (fuzzy) {
                 if (s.getItem() == stack.getItem()) total += s.getCount();
             } else {
@@ -125,7 +127,7 @@ public class InventoryMob implements IInventory {
         int perSlotRoom = maxStack;
         int totalRoom = 0;
         for (ItemStack s : this.inventory) {
-            if (s.isEmpty()) {
+            if (s == null || s.isEmpty()) {
                 totalRoom += perSlotRoom;
             } else {
                 boolean match = fuzzy ? (s.getItem() == stack.getItem())
