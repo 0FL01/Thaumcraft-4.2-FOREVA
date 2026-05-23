@@ -646,6 +646,14 @@ public class EntityGolemBase extends net.minecraft.entity.monster.EntityGolem im
         else super.handleStatusUpdate(id);
     }
 
+    @Override
+    public void notifyDataManagerChange(net.minecraft.network.datasync.DataParameter<?> key) {
+        super.notifyDataManagerChange(key);
+        if (CORE.equals(key) && this.world != null && this.world.isRemote && this.getCore() >= 0 && this.bootup < 0.0F) {
+            this.bootup = 33.0F;
+        }
+    }
+
     private void refreshClientHealingState() {
         int bonus = this.getGolemDecoration().contains("H") ? 5 : 0;
         this.getEntityAttribute(net.minecraft.entity.SharedMonsterAttributes.MAX_HEALTH)
@@ -853,6 +861,9 @@ public class EntityGolemBase extends net.minecraft.entity.monster.EntityGolem im
         try {
             this.setCore(buf.readByte());
             this.advanced = buf.readBoolean();
+            if (this.getCore() >= 0) {
+                this.bootup = 0.0F;
+            }
             this.upgrades = new byte[buf.readByte()];
             for (int a = 0; a < this.upgrades.length; a++) this.upgrades[a] = buf.readByte();
         } catch (Exception e) {}
