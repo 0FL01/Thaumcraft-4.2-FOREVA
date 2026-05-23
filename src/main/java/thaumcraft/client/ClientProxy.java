@@ -544,6 +544,21 @@ public class ClientProxy extends CommonProxy {
                 }
                 continue;
             }
+            if (item == ConfigItems.itemWandRod) {
+                String[] wandRods = {"greatwood","obsidian","silverwood","ice","quartz","reed","blaze","bone"};
+                for (int meta = 0; meta < wandRods.length; meta++) {
+                    ModelLoader.setCustomModelResourceLocation(item, meta,
+                            new ModelResourceLocation(new ResourceLocation("thaumcraft", "wandrod_rod_" + wandRods[meta]), "inventory"));
+                }
+                String[] staffRods = {"greatwood","obsidian","silverwood","ice","quartz","reed","blaze","bone"};
+                for (int meta = 0; meta < staffRods.length; meta++) {
+                    ModelLoader.setCustomModelResourceLocation(item, meta + 50,
+                            new ModelResourceLocation(new ResourceLocation("thaumcraft", "wandrod_staff_" + staffRods[meta]), "inventory"));
+                }
+                ModelLoader.setCustomModelResourceLocation(item, 100,
+                        new ModelResourceLocation(new ResourceLocation("thaumcraft", "wandrod_staff_primal"), "inventory"));
+                continue;
+            }
             ModelResourceLocation model = new ModelResourceLocation(registryName, "inventory");
             for (int meta = 0; meta < 64; meta++) {
                 ModelLoader.setCustomModelResourceLocation(item, meta, model);
