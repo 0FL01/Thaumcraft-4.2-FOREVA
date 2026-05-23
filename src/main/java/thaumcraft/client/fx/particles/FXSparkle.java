@@ -139,6 +139,9 @@ public class FXSparkle extends Particle {
 
     @Override
     public int getFXLayer() {
-        return this.blendmode == 1 ? 0 : 1;
+        // Must return 0 because this particle uses setParticleTextureIndex(...).
+        // In 1.12.2, setParticleTextureIndex throws "Invalid call to Particle.setMiscTex"
+        // when getFXLayer() != 0. Original blendmode-based layer switching is disabled.
+        return 0;
     }
 }
