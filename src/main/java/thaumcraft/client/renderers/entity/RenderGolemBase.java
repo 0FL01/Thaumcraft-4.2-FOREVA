@@ -4,13 +4,20 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.block.model.ItemCameraTransforms;
 import net.minecraft.client.renderer.entity.RenderLiving;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.client.renderer.entity.layers.LayerRenderer;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
+import net.minecraft.init.Items;
+import net.minecraft.item.ItemBlock;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.fluids.Fluid;
+import net.minecraftforge.fluids.FluidStack;
+import net.minecraftforge.fluids.FluidUtil;
 import org.lwjgl.opengl.GL11;
 import thaumcraft.client.renderers.models.entities.ModelGolem;
 import thaumcraft.client.renderers.models.entities.ModelGolemAccessories;
@@ -37,6 +44,7 @@ public class RenderGolemBase extends RenderLiving<EntityGolemBase> {
         this.addLayer(new GolemCoreLayer(this));
         this.addLayer(new GolemAccessoriesLayer(this));
         this.addLayer(new GolemDamageLayer(this));
+        this.addLayer(new GolemHeldItemLayer(this));
     }
 
     @Override
@@ -239,6 +247,175 @@ public class RenderGolemBase extends RenderLiving<EntityGolemBase> {
             this.damageModel.setLivingAnimations(entity, limbSwing, limbSwingAmount, partialTicks);
             this.damageModel.render(entity, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch, scale);
             GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+        }
+
+        @Override
+        public boolean shouldCombineTextures() {
+            return false;
+        }
+    }
+
+    private static final class GolemHeldItemLayer implements LayerRenderer<EntityGolemBase> {
+        private final RenderGolemBase renderer;
+
+        private GolemHeldItemLayer(RenderGolemBase renderer) {
+            this.renderer = renderer;
+        }
+
+        @Override
+        public void doRenderLayer(EntityGolemBase entity, float limbSwing, float limbSwingAmount, float partialTicks,
+                                  float ageInTicks, float netHeadYaw, float headPitch, float scale) {
+            if (entity.deathTime > 0) {
+                return;
+            }
+
+            int core = entity.getCore();
+
+            // Fisher golem: render fishing rod in right hand
+            if (core == 11) {
+                renderFishingRod(entity);
+            }
+
+            // Fluid golem: render bucket with fluid contents
+            if (core == 5) {
+                renderFluidBucket(entity);
+            }
+
+            // Carried items (skip fluid core 5 — it has its own rendering)
+            ItemStack carried = entity.getCarriedForDisplay();
+            if (core != 5 && !carried.isEmpty()) {
+                renderCarriedItem(entity, carried);
+            }
+        }
+
+        private void renderFishingRod(EntityGolemBase entity) {
+            GlStateManager.pushMatrix();
+            GlStateManager.scale(0.4F, 0.4F, 0.4F);
+
+            ModelGolem model = (ModelGolem) this.renderer.getMainModel();
+            model.golemRightArm.postRender(0.0625F);
+
+            // Position at the hand area: bottom-center of the arm box
+            GlStateManager.translate(-10.0F * 0.0625F, 20.0F * 0.0625F, 0.0F);
+            GlStateManager.rotate(-90.0F, 1.0F, 0.0F, 0.0F);
+            GlStateManager.rotate(180.0F, 0.0F, 1.0F, 0.0F);
+
+            Minecraft.getMinecraft().getItemRenderer().renderItemSide(
+                    entity,
+                    new ItemStack(Items.FISHING_ROD),
+                    ItemCameraTransforms.TransformType.THIRD_PERSON_RIGHT_HAND,
+                    false);
+
+            GlStateManager.popMatrix();
+        }
+
+        private void renderCarriedItem(EntityGolemBase entity, ItemStack stack) {
+            GlStateManager.pushMatrix();
+            GlStateManager.scale(0.4F, 0.4F, 0.4F);
+
+            ModelGolem model = (ModelGolem) this.renderer.getMainModel();
+            model.golemRightArm.postRender(0.0625F);
+
+            // Position at the hand area
+            GlStateManager.translate(-10.0F * 0.0625F, 20.0F * 0.0625F, 0.0F);
+
+            if (stack.getItem() instanceof ItemBlock) {
+                // Blocks: center in hand, no extra rotation — keep attached to arm
+                GlStateManager.scale(0.5F, 0.5F, 0.5F);
+            } else {
+                // Regular items: orient upright as held
+                GlStateManager.rotate(-90.0F, 1.0F, 0.0F, 0.0F);
+                GlStateManager.rotate(180.0F, 0.0F, 1.0F, 0.0F);
+            }
+
+            Minecraft.getMinecraft().getItemRenderer().renderItemSide(
+                    entity,
+                    stack,
+                    ItemCameraTransforms.TransformType.THIRD_PERSON_RIGHT_HAND,
+                    false);
+
+            GlStateManager.popMatrix();
+        }
+
+        private void renderFluidBucket(EntityGolemBase entity) {
+            if (entity.fluidCarried == null || entity.fluidCarried.amount <= 0) return;
+
+            GlStateManager.pushMatrix();
+            GlStateManager.scale(0.4F, 0.4F, 0.4F);
+
+            ModelGolem model = (ModelGolem) this.renderer.getMainModel();
+            model.golemRightArm.postRender(0.0625F);
+            GlStateManager.translate(-10.0F * 0.0625F, 20.0F * 0.0625F, 0.0F);
+            GlStateManager.rotate(-90.0F, 1.0F, 0.0F, 0.0F);
+            GlStateManager.rotate(180.0F, 0.0F, 1.0F, 0.0F);
+
+            // Try to render a filled bucket item if a bucket is registered for this fluid
+            FluidStack fluidStack = entity.fluidCarried.copy();
+            ItemStack bucketStack = FluidUtil.getFilledBucket(fluidStack);
+            boolean useEmptyBucket = bucketStack.isEmpty();
+
+            if (useEmptyBucket) {
+                // No registered bucket item — render empty bucket + fluid overlay
+                bucketStack = new ItemStack(Items.BUCKET);
+            }
+
+            Minecraft.getMinecraft().getItemRenderer().renderItemSide(
+                    entity, bucketStack,
+                    ItemCameraTransforms.TransformType.THIRD_PERSON_RIGHT_HAND, false);
+
+            // When a vanilla filled-bucket was used, the fluid is already shown in the model.
+            // When falling back to empty bucket + overlay, draw the fluid sprite here.
+            if (useEmptyBucket && fluidStack.getFluid() != null) {
+                renderFluidFillIndicator(entity, fluidStack);
+            }
+
+            GlStateManager.popMatrix();
+        }
+
+        private void renderFluidFillIndicator(EntityGolemBase entity, FluidStack fluidStack) {
+            Fluid fluid = fluidStack.getFluid();
+            if (fluid == null) return;
+
+            ResourceLocation stillLocation = fluid.getStill();
+            if (stillLocation == null) return;
+
+            TextureAtlasSprite fluidSprite = Minecraft.getMinecraft().getTextureMapBlocks()
+                    .getAtlasSprite(stillLocation.toString());
+            if (fluidSprite == null) return;
+
+            float fillRatio = Math.min(1.0F, (float) fluidStack.amount / (float) entity.getFluidCarryLimit());
+            if (fillRatio <= 0.0F) return;
+
+            int color = fluid.getColor(fluidStack);
+            float r = (float) ((color >> 16) & 0xFF) / 255.0F;
+            float g = (float) ((color >> 8) & 0xFF) / 255.0F;
+            float b = (float) (color & 0xFF) / 255.0F;
+
+            Minecraft.getMinecraft().getTextureManager().bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
+
+            GlStateManager.enableBlend();
+            GlStateManager.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA,
+                    GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
+            GlStateManager.disableLighting();
+            GlStateManager.color(r, g, b, 1.0F);
+
+            // Position slightly forward and up to sit inside/atop the bucket opening
+            GlStateManager.translate(0.0F, 0.25F, -0.35F);
+            float quadSize = 0.35F;
+            GlStateManager.scale(quadSize, quadSize * fillRatio, quadSize);
+
+            Tessellator tessellator = Tessellator.getInstance();
+            BufferBuilder buf = tessellator.getBuffer();
+            buf.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
+            buf.pos(-1.0D, -1.0D, 0.0D).tex(fluidSprite.getMinU(), fluidSprite.getMaxV()).endVertex();
+            buf.pos(1.0D, -1.0D, 0.0D).tex(fluidSprite.getMaxU(), fluidSprite.getMaxV()).endVertex();
+            buf.pos(1.0D, 1.0D, 0.0D).tex(fluidSprite.getMaxU(), fluidSprite.getMinV()).endVertex();
+            buf.pos(-1.0D, 1.0D, 0.0D).tex(fluidSprite.getMinU(), fluidSprite.getMinV()).endVertex();
+            tessellator.draw();
+
+            GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+            GlStateManager.enableLighting();
+            GlStateManager.disableBlend();
         }
 
         @Override

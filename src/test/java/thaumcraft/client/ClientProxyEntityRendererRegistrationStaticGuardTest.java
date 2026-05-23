@@ -472,6 +472,7 @@ public class ClientProxyEntityRendererRegistrationStaticGuardTest {
                         && golemRenderer.contains("new ModelGolem(false)")
                         && golemRenderer.contains("new GolemAccessoriesLayer(this)")
                         && golemRenderer.contains("new GolemDamageLayer(this)")
+                        && golemRenderer.contains("new GolemHeldItemLayer(this)")
                         && golemRenderer.contains("ModelGolemAccessories")
                         && golemRenderer.contains("golem_damage.png")
                         && golemRenderer.contains("golem_decoration.png")
