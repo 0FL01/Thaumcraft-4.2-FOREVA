@@ -43,53 +43,48 @@ public class CustomItemRendererContractTest {
                         && wandModel.contains("textures/models/wand.png")
                         && wandModel.contains("drawRune("));
 
-        assertTrue("ItemTrunkSpawnerRenderer should restore the chest-shell item render path instead of a flat generated sprite",
+        assertTrue("ItemTrunkSpawnerRenderer should render the chest-shell model via TEISR with transforms delegated to JSON display transforms",
                 trunkRenderer.contains("extends TileEntityItemStackRenderer")
                         && trunkRenderer.contains("new ModelChest()")
                         && trunkRenderer.contains("textures/models/trunk.png")
-                        && trunkRenderer.contains("CURRENT_TRANSFORM")
-                        && trunkRenderer.contains("ItemCameraTransforms.TransformType")
-                        && trunkRenderer.contains("applyHeldTransform(")
-                        && trunkRenderer.contains("THIRD_PERSON_RIGHT_HAND")
-                        && trunkRenderer.contains("THIRD_PERSON_LEFT_HAND")
-                        && trunkRenderer.contains("FIRST_PERSON_LEFT_HAND")
-                        && trunkRenderer.contains("FIRST_PERSON_RIGHT_HAND")
-                        && trunkRenderer.contains("chest.chestBelow.render(0.0625F)")
-                        && trunkRenderer.contains("chest.chestLid.render(0.0625F)")
-                        && trunkRenderer.contains("chest.chestKnob.render(0.0625F)"));
+                        && trunkRenderer.contains("model.renderAll()")
+                        && trunkRenderer.contains("bindTexture")
+                        && trunkRenderer.contains("GlStateManager.enableRescaleNormal()")
+                        && trunkRenderer.contains("GlStateManager.disableRescaleNormal()")
+                        && trunkRenderer.contains("chestLid.rotateAngleX = 0.0F")
+                        && trunkRenderer.contains("chestKnob.rotateAngleX = 0.0F"));
 
-        assertTrue("ClientModelRegistry should wrap trunkspawner into a perspective-aware baked model so the TEISR can read the active transform type",
+        assertTrue("ClientModelRegistry should wrap trunkspawner into a perspective-aware baked model",
                 clientModelRegistry.contains("TRUNKSPAWNER_MODEL")
                         && clientModelRegistry.contains("new TrunkSpawnerPerspectiveModel(model)"));
 
-        assertTrue("TrunkSpawnerPerspectiveModel should preserve baked model delegation while stashing the active perspective",
+        assertTrue("TrunkSpawnerPerspectiveModel should delegate handlePerspective to the baked model",
                 trunkPerspectiveModel.contains("implements IBakedModel")
                         && trunkPerspectiveModel.contains("handlePerspective")
-                        && trunkPerspectiveModel.contains("ItemTrunkSpawnerRenderer.setTransformType(cameraTransformType);")
-                        && trunkPerspectiveModel.contains("delegate.handlePerspective(cameraTransformType)")
-                        && trunkPerspectiveModel.contains("delegatePerspective.getRight()"));
+                        && trunkPerspectiveModel.contains("delegate.handlePerspective(cameraTransformType)"));
 
         assertTrue("The trunkspawner TEISR display transforms should include GUI, ground, fixed, thirdperson, firstperson, and mirrored left-hand entries",
                 trunkItemModel.contains("\"gui\"")
                         && trunkItemModel.contains("\"rotation\": [30, 45, 0]")
                         && trunkItemModel.contains("\"scale\": [0.625, 0.625, 0.625]")
                         && trunkItemModel.contains("\"ground\"")
+                        && trunkItemModel.contains("\"rotation\": [0, 0, 180]")
                         && trunkItemModel.contains("\"translation\": [0, 3, 0]")
                         && trunkItemModel.contains("\"scale\": [0.25, 0.25, 0.25]")
                         && trunkItemModel.contains("\"head\"")
                         && trunkItemModel.contains("\"fixed\"")
                         && trunkItemModel.contains("\"rotation\": [0, 180, 0]")
                         && trunkItemModel.contains("\"thirdperson_righthand\"")
-                        && trunkItemModel.contains("\"rotation\": [75, 315, 0]")
+                        && trunkItemModel.contains("\"rotation\": [75, 315, 180]")
                         && trunkItemModel.contains("\"translation\": [0, 2.5, 0]")
                         && trunkItemModel.contains("\"scale\": [0.375, 0.375, 0.375]")
                         && trunkItemModel.contains("\"thirdperson_lefthand\"")
-                        && trunkItemModel.contains("\"rotation\": [75, 135, 0]")
+                        && trunkItemModel.contains("\"rotation\": [75, 135, 180]")
                         && trunkItemModel.contains("\"firstperson_righthand\"")
-                        && trunkItemModel.contains("\"rotation\": [0, 315, 0]")
+                        && trunkItemModel.contains("\"rotation\": [0, 315, 180]")
                         && trunkItemModel.contains("\"scale\": [0.4, 0.4, 0.4]")
                         && trunkItemModel.contains("\"firstperson_lefthand\"")
-                        && trunkItemModel.contains("\"rotation\": [0, 135, 0]"));
+                        && trunkItemModel.contains("\"rotation\": [0, 135, 180]"));
 
         assertTrue("The wand and trunk item-model stubs must stay builtin/entity so Forge dispatches the dedicated item renderers",
                 wandItemModel.contains("\"parent\": \"builtin/entity\"")
