@@ -69,7 +69,7 @@ public class ItemResearchNotes extends Item {
 
     @Override
     public boolean hasEffect(ItemStack stack) {
-        return stack.getMetadata() >= META_DISCOVERY_START;
+        return true;
     }
 
     @SideOnly(Side.CLIENT)

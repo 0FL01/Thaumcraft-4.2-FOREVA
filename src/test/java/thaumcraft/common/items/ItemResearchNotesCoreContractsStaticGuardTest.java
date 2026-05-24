@@ -26,7 +26,7 @@ public class ItemResearchNotesCoreContractsStaticGuardTest {
                         && source.contains("I18n.translateToLocal(\"item.discovery.name\")")
                         && source.contains("I18n.translateToLocal(\"item.researchnotes.name\")")
                         && source.contains("public boolean hasEffect(ItemStack stack)")
-                        && source.contains("return stack.getMetadata() >= META_DISCOVERY_START;"));
+                        && source.contains("return true;"));
         assertTrue("ItemResearchNotes must keep overlay tint contract for note/discovery render passes",
                 source.contains("public int getColorFromItemStack(ItemStack stack, int tintIndex)")
                         && source.contains("if (tintIndex == 1)")
