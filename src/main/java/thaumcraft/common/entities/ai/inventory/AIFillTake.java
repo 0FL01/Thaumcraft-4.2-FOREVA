@@ -51,21 +51,24 @@ public class AIFillTake extends EntityAIBase {
                     target.setCount(theGolem.getToggles()[0] ? theGolem.getCarrySpace() : Math.min(target.getCount(), theGolem.getCarrySpace()));
                     ItemStack result = InventoryUtils.extractStack(te, target, side,
                         theGolem.checkOreDict(), theGolem.ignoreDamage(), theGolem.ignoreNBT(), true);
+                    IInventory sourceInv = te;
                     if (result == null || result.isEmpty()) {
                         TileEntity dc = InventoryUtils.getDoubleChest(tile);
                         if (dc != null) {
                             result = InventoryUtils.extractStack((IInventory) dc, target, side,
                                 theGolem.checkOreDict(), theGolem.ignoreDamage(), theGolem.ignoreNBT(), true);
+                            sourceInv = (IInventory) dc;
                         }
                     }
                     if (result == null || result.isEmpty()) continue;
                     theGolem.setCarried(result);
                     try {
                         if (Config.golemChestInteract) {
-                            te.openInventory(null);
+                            InventoryUtils.openInventoryForGolem(sourceInv);
                         }
                     } catch (Exception ignored) {}
                     this.countChest = 5;
+                    this.inv = sourceInv;
                     this.count = 200;
                     theGolem.itemWatched = null;
                     theGolem.updateCarried();
@@ -92,7 +95,7 @@ public class AIFillTake extends EntityAIBase {
     public void resetTask() {
         try {
             if (this.inv != null && Config.golemChestInteract) {
-                this.inv.closeInventory(null);
+                InventoryUtils.closeInventoryForGolem(this.inv);
             }
         } catch (Exception ignored) {}
     }

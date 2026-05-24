@@ -78,7 +78,7 @@ public class AISortingPlace extends EntityAIBase {
     public void resetTask() {
         try {
             if (this.inv != null && Config.golemChestInteract) {
-                this.inv.closeInventory(null);
+                InventoryUtils.closeInventoryForGolem(this.inv);
             }
         } catch (Exception ignored) {}
     }
@@ -125,7 +125,7 @@ public class AISortingPlace extends EntityAIBase {
                 if (this.countChest == 5) {
                     try {
                         if (Config.golemChestInteract) {
-                            te.openInventory(null);
+                            InventoryUtils.openInventoryForGolem(this.inv);
                         }
                     } catch (Exception ignored) {}
                     break;

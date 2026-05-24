@@ -66,7 +66,7 @@ public class AIHomeReplace extends EntityAIBase {
     public void resetTask() {
         try {
             if (this.inv != null && Config.golemChestInteract) {
-                this.inv.closeInventory(null);
+                InventoryUtils.closeInventoryForGolem(this.inv);
             }
         } catch (Exception ignored) {}
     }
@@ -95,7 +95,7 @@ public class AIHomeReplace extends EntityAIBase {
                     theGolem.setCarried(result);
                     try {
                         if (Config.golemChestInteract) {
-                            ((IInventory) tile).openInventory(null);
+                            InventoryUtils.openInventoryForGolem((IInventory) tile);
                         }
                     } catch (Exception ignored) {}
                     this.countChest = 5;

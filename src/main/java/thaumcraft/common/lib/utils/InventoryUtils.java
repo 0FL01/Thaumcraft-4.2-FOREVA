@@ -6,6 +6,7 @@ import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Blocks;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.ISidedInventory;
 import net.minecraft.item.Item;
@@ -15,6 +16,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityChest;
 import net.minecraft.tileentity.TileEntityHopper;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.oredict.OreDictionary;
 import thaumcraft.api.ThaumcraftApiHelper;
@@ -290,6 +292,42 @@ public class InventoryUtils {
             if (chest.adjacentChestZPos != null) return chest.adjacentChestZPos;
         }
         return null;
+    }
+
+    public static void openInventoryForGolem(IInventory inv) {
+        if (inv instanceof TileEntityChest) {
+            updateVanillaChestForGolem((TileEntityChest) inv, true);
+        } else {
+            inv.openInventory(null);
+        }
+    }
+
+    public static void closeInventoryForGolem(IInventory inv) {
+        if (inv instanceof TileEntityChest) {
+            updateVanillaChestForGolem((TileEntityChest) inv, false);
+        } else {
+            inv.closeInventory(null);
+        }
+    }
+
+    private static void updateVanillaChestForGolem(TileEntityChest chest, boolean open) {
+        if (chest.getWorld() == null || chest.getWorld().isRemote) return;
+
+        if (open) {
+            if (chest.numPlayersUsing < 0) chest.numPlayersUsing = 0;
+            ++chest.numPlayersUsing;
+        } else if (chest.numPlayersUsing > 0) {
+            --chest.numPlayersUsing;
+        } else {
+            chest.numPlayersUsing = 0;
+        }
+
+        BlockPos pos = chest.getPos();
+        chest.getWorld().addBlockEvent(pos, chest.getBlockType(), 1, chest.numPlayersUsing);
+        chest.getWorld().notifyNeighborsOfStateChange(pos, chest.getBlockType(), false);
+        if (chest.getBlockType() == Blocks.TRAPPED_CHEST) {
+            chest.getWorld().notifyNeighborsOfStateChange(pos.down(), chest.getBlockType(), false);
+        }
     }
 
     // --- Misc utilities ---
