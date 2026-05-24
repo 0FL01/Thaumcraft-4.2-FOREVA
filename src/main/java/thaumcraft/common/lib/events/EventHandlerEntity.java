@@ -57,6 +57,9 @@ import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.event.entity.living.LivingEntityUseItemEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import thaumcraft.api.ThaumcraftApi;
+import thaumcraft.api.research.ResearchCategories;
+import thaumcraft.api.research.ResearchCategoryList;
+import thaumcraft.api.research.ResearchItem;
 import thaumcraft.api.wands.ItemFocusBasic;
 import thaumcraft.common.Thaumcraft;
 import thaumcraft.common.config.Config;
@@ -538,11 +541,25 @@ public class EventHandlerEntity {
     }
 
     /**
-     * Player file load: legacy warpCounter.dat migration.
+     * Player file load: grant auto-unlock research and legacy warpCounter.dat migration.
      */
     @SubscribeEvent
     public void onPlayerLoadFromFile(PlayerEvent.LoadFromFile event) {
-        // Fresh-world Stage 3 data is stored by Forge capability serialization.
+        EntityPlayer player = event.getEntityPlayer();
+        if (player == null || player.world == null || player.world.isRemote) {
+            return;
+        }
+
+        // Grant all isAutoUnlock() research on every load.
+        // This matches original TC4 1.7.10 behavior: auto-unlock research is always
+        // re-granted on player load, never persisted in save files.
+        for (ResearchCategoryList category : ResearchCategories.researchCategories.values()) {
+            for (ResearchItem ri : category.research.values()) {
+                if (ri != null && ri.isAutoUnlock()) {
+                    ResearchManager.addResearch(player, ri.key);
+                }
+            }
+        }
     }
 
     /**

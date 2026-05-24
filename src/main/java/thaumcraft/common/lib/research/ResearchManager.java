@@ -333,13 +333,14 @@ public class ResearchManager {
             return ItemStack.EMPTY;
         }
 
-        consumeInkFromPlayer(player, true);
-        player.inventory.clearMatchingItems(Items.PAPER, -1, 1, null);
-
         ItemStack note = createNote(new ItemStack(ConfigItems.itemResearchNotes), key, world);
         if (note.isEmpty()) {
             return ItemStack.EMPTY;
         }
+
+        consumeInkFromPlayer(player, true);
+        player.inventory.clearMatchingItems(Items.PAPER, -1, 1, null);
+
         if (!player.inventory.addItemStackToInventory(note.copy())) {
             player.dropItem(note.copy(), false);
         }
