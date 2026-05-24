@@ -887,6 +887,10 @@ public class ClientProxy extends CommonProxy {
         for (int meta = 0; meta <= 15; meta++) {
             registerBlockItemModel(cosmeticSolidItem, meta, "type=" + meta);
         }
+        Item cosmeticOpaqueItem = Item.getItemFromBlock(ConfigBlocks.blockCosmeticOpaque);
+        for (int meta = 0; meta <= 4; meta++) {
+            registerBlockItemModel(cosmeticOpaqueItem, meta, "type=" + meta);
+        }
         Item jarItem2 = Item.getItemFromBlock(ConfigBlocks.blockJar);
         for (int meta = 0; meta <= 3; meta++) {
             registerBlockItemModel(jarItem2, meta, "type=" + meta);
