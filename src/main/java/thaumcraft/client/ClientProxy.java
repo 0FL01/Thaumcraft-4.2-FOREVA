@@ -874,6 +874,10 @@ public class ClientProxy extends CommonProxy {
         for (int meta = 0; meta < 16; meta++) {
             registerBlockItemModel(candleItem, meta, "type=" + meta);
         }
+        Item oreItem = Item.getItemFromBlock(ConfigBlocks.blockCustomOre);
+        for (int meta = 0; meta <= 7; meta++) {
+            registerBlockItemModel(oreItem, meta, "type=" + meta);
+        }
     }
 
     private static void registerBlockItemModel(Item item, int meta, String variant) {
