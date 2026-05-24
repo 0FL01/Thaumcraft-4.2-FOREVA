@@ -886,6 +886,8 @@ public class ClientProxy extends CommonProxy {
         for (int meta = 0; meta <= 3; meta++) {
             registerBlockItemModel(jarItem2, meta, "type=" + meta);
         }
+        Item chestItem = Item.getItemFromBlock(ConfigBlocks.blockChestHungry);
+        registerBlockItemModel(chestItem, 0, "facing=north");
     }
 
     private static void registerBlockItemModel(Item item, int meta, String variant) {

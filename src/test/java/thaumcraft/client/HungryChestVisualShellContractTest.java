@@ -36,8 +36,8 @@ public class HungryChestVisualShellContractTest {
                         && blockModel.contains("\"shell\": \"thaumcraft:models/chesthungry\"")
                         && blockModel.contains("\"from\": [1, 0, 1]")
                         && blockModel.contains("\"to\": [15, 10, 15]")
-                        && blockModel.contains("\"uv\": [14, 33, 28, 43]")
-                        && blockModel.contains("\"uv\": [42, 33, 56, 43]"));
+                        && blockModel.contains("\"uv\": [3.5, 8.25, 7, 10.75]")
+                        && blockModel.contains("\"uv\": [10.5, 8.25, 14, 10.75]"));
     }
 
     private static String read(String path) throws IOException {
