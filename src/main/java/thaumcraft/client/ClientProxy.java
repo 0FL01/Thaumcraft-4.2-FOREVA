@@ -812,11 +812,11 @@ public class ClientProxy extends CommonProxy {
         for (int meta = 0; meta <= 14; meta++) {
             registerBlockItemModel(stoneDeviceItem, meta, "type=" + meta);
         }
-        registerBuiltinItemModel(stoneDeviceItem, 2, "blockstonedevice_tesr");
+        registerBuiltinItemModel(stoneDeviceItem, 2, "blockstonedevice_2_inventory");
         registerBuiltinItemModel(stoneDeviceItem, 9, "blockstonedevice_tesr");
         registerBuiltinItemModel(stoneDeviceItem, 10, "blockstonedevice_tesr");
         registerBuiltinItemModel(stoneDeviceItem, 11, "blockstonedevice_tesr");
-        registerBuiltinItemModel(stoneDeviceItem, 13, "blockstonedevice_tesr");
+        registerBuiltinItemModel(stoneDeviceItem, 13, "blockstonedevice_13_inventory");
         registerBuiltinItemModel(stoneDeviceItem, 14, "blockstonedevice_tesr");
         Item metalDeviceItem = Item.getItemFromBlock(ConfigBlocks.blockMetalDevice);
         for (int meta = 0; meta <= 14; meta++) {
@@ -850,9 +850,9 @@ public class ClientProxy extends CommonProxy {
         for (int meta = 0; meta <= 15; meta++) {
             registerBlockItemModel(tableItem, meta, "type=" + meta);
         }
-        registerBuiltinItemModel(tableItem, 0, "blocktable_tesr");
-        registerBuiltinItemModel(tableItem, 14, "blocktable_tesr");
-        registerBuiltinItemModel(tableItem, 15, "blocktable_tesr");
+        registerBuiltinItemModel(tableItem, 0, "blocktable_0_inventory");
+        registerBuiltinItemModel(tableItem, 14, "blocktable_14_inventory");
+        registerBuiltinItemModel(tableItem, 15, "blocktable_15_inventory");
         Item mirrorItem = Item.getItemFromBlock(ConfigBlocks.blockMirror);
         for (int meta = 0; meta <= 11; meta++) {
             registerBlockItemModel(mirrorItem, meta, "type=" + meta);
