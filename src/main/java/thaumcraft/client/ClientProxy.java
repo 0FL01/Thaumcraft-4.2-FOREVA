@@ -917,6 +917,8 @@ public class ClientProxy extends CommonProxy {
         for (int meta = 0; meta <= 4; meta++) {
             registerBuiltinItemModel(taintFibresItem, meta, taintFibreItemModels[meta]);
         }
+        Item lifterItem = Item.getItemFromBlock(ConfigBlocks.blockLifter);
+        registerBlockItemModel(lifterItem, 0, "normal");
         Item chestItem = Item.getItemFromBlock(ConfigBlocks.blockChestHungry);
         registerBuiltinItemModel(chestItem, 0, "blockchesthungry_tesr");
     }
