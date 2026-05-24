@@ -76,7 +76,6 @@ public class GuiResearchTable extends GuiContainer {
         this.tileEntity = tile;
         this.xSize = 255;
         this.ySize = 255;
-        this.galFontRenderer = this.mc.fontRenderer;
         this.username = player.getName();
         this.player = player;
         RESEARCHER_1 = ResearchManager.isResearchComplete(player.getName(), "RESEARCHER1");
@@ -92,7 +91,9 @@ public class GuiResearchTable extends GuiContainer {
     @Override
     public void initGui() {
         super.initGui();
-        this.galFontRenderer = this.fontRenderer != null ? this.fontRenderer : this.mc.fontRenderer;
+        if (this.galFontRenderer == null) {
+            this.galFontRenderer = this.fontRenderer != null ? this.fontRenderer : this.mc.fontRenderer;
+        }
     }
 
     @Override
