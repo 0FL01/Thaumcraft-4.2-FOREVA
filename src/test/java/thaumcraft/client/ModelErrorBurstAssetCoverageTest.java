@@ -34,8 +34,11 @@ public class ModelErrorBurstAssetCoverageTest {
 
         assertTrue(pure.contains("\"model\": \"forge:fluid\"") && pure.contains("\"fluid\": \"fluidPure\"") && pure.contains("\"15\": {}"));
         assertTrue(death.contains("\"model\": \"forge:fluid\"") && death.contains("\"fluid\": \"fluidDeath\"") && death.contains("\"15\": {}"));
-        assertTrue(goo.contains("\"model\": \"minecraft:block/cube_all\"") && goo.contains("\"all\": \"thaumcraft:blocks/fluxgoo\"") && goo.contains("\"inventory\""));
+        assertTrue(goo.contains("\"model\": \"thaumcraft:blockfluxgoo\"") && goo.contains("\"inventory\""));
         assertTrue(gas.contains("\"model\": \"minecraft:block/cube_all\"") && gas.contains("\"all\": \"thaumcraft:blocks/fluxgas\"") && gas.contains("\"inventory\""));
+
+        String gooModel = read("src/main/resources/assets/thaumcraft/models/block/blockfluxgoo.json");
+        assertTrue(gooModel.contains("\"parent\": \"minecraft:block/cube_all\"") && gooModel.contains("\"all\": \"thaumcraft:blocks/fluxgoo\""));
     }
 
     @Test

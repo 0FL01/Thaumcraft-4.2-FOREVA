@@ -1,10 +1,7 @@
 {
   "forge_marker": 1,
   "defaults": {
-    "model": "minecraft:block/cube_all",
-    "textures": {
-      "all": "thaumcraft:blocks/fluxgoo"
-    }
+    "model": "thaumcraft:blockfluxgoo"
   },
   "variants": {
     "inventory": [
