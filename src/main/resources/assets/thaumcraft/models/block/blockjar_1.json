@@ -1,6 +1,7 @@
 {
   "ambientocclusion": false,
   "textures": {
+    "particle": "thaumcraft:blocks/jar_side_void",
     "side": "thaumcraft:blocks/jar_side_void",
     "bottom": "thaumcraft:blocks/jar_bottom",
     "top": "thaumcraft:blocks/jar_top_void"
