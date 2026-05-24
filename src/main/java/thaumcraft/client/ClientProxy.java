@@ -919,6 +919,12 @@ public class ClientProxy extends CommonProxy {
         }
         Item lifterItem = Item.getItemFromBlock(ConfigBlocks.blockLifter);
         registerBlockItemModel(lifterItem, 0, "normal");
+        Item lootCrateItem = Item.getItemFromBlock(ConfigBlocks.blockLootCrate);
+        for (int meta = 0; meta <= 2; meta++) {
+            registerBlockItemModel(lootCrateItem, meta, "type=" + meta);
+        }
+        Item manaPodItem = Item.getItemFromBlock(ConfigBlocks.blockManaPod);
+        registerBuiltinItemModel(manaPodItem, 0, "blockmanapod");
         Item chestItem = Item.getItemFromBlock(ConfigBlocks.blockChestHungry);
         registerBuiltinItemModel(chestItem, 0, "blockchesthungry_tesr");
     }
