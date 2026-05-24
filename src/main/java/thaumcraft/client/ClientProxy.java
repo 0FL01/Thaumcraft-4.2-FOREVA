@@ -887,6 +887,9 @@ public class ClientProxy extends CommonProxy {
         for (int meta = 0; meta <= 15; meta++) {
             registerBlockItemModel(cosmeticSolidItem, meta, "type=" + meta);
         }
+        Item magicalLogItem = Item.getItemFromBlock(ConfigBlocks.blockMagicalLog);
+        registerBlockItemModel(magicalLogItem, 0, "axis=y,type=0");
+        registerBlockItemModel(magicalLogItem, 1, "axis=y,type=1");
         Item cosmeticOpaqueItem = Item.getItemFromBlock(ConfigBlocks.blockCosmeticOpaque);
         for (int meta = 0; meta <= 4; meta++) {
             registerBlockItemModel(cosmeticOpaqueItem, meta, "type=" + meta);
@@ -894,6 +897,25 @@ public class ClientProxy extends CommonProxy {
         Item jarItem2 = Item.getItemFromBlock(ConfigBlocks.blockJar);
         for (int meta = 0; meta <= 3; meta++) {
             registerBlockItemModel(jarItem2, meta, "type=" + meta);
+        }
+        Item slabWoodItem = Item.getItemFromBlock(ConfigBlocks.blockSlabWood);
+        registerBlockItemModel(slabWoodItem, 0, "half=bottom,variant=greatwood");
+        registerBlockItemModel(slabWoodItem, 1, "half=bottom,variant=silverwood");
+        Item slabStoneItem = Item.getItemFromBlock(ConfigBlocks.blockSlabStone);
+        registerBlockItemModel(slabStoneItem, 0, "half=bottom,variant=arcane");
+        registerBlockItemModel(slabStoneItem, 1, "half=bottom,variant=eldritch");
+        Item taintItem = Item.getItemFromBlock(ConfigBlocks.blockTaint);
+        for (int meta = 0; meta <= 2; meta++) {
+            registerBlockItemModel(taintItem, meta, "type=" + meta);
+        }
+        String[] taintFibreItemModels = {
+            "blocktaintfibres_item_0", "blocktaintfibres_item_1",
+            "blocktaintfibres_item_2", "blocktaintfibres_item_3",
+            "blocktaintfibres_item_4"
+        };
+        Item taintFibresItem = Item.getItemFromBlock(ConfigBlocks.blockTaintFibres);
+        for (int meta = 0; meta <= 4; meta++) {
+            registerBuiltinItemModel(taintFibresItem, meta, taintFibreItemModels[meta]);
         }
         Item chestItem = Item.getItemFromBlock(ConfigBlocks.blockChestHungry);
         registerBuiltinItemModel(chestItem, 0, "blockchesthungry_tesr");
