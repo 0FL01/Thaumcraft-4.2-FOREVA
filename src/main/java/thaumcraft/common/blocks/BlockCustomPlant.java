@@ -7,10 +7,16 @@ import net.minecraft.block.properties.PropertyInteger;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.init.Blocks;
+import net.minecraft.init.MobEffects;
 import net.minecraft.item.ItemStack;
+import net.minecraft.potion.PotionEffect;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.NonNullList;
+import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
@@ -26,6 +32,7 @@ public class BlockCustomPlant extends BlockBush {
 
     public static final String[] plantTypes = {"greatwoodSapling", "silverwoodSapling", "shimmerleaf", "cinderpearl", "etherealBloom", "manashroom"};
     public static final PropertyInteger TYPE = PropertyInteger.create("type", 0, 5);
+    private static final AxisAlignedBB CUSTOM_PLANT_AABB = new AxisAlignedBB(0.1D, 0.0D, 0.1D, 0.9D, 0.8D, 0.9D);
 
     public BlockCustomPlant() {
         super(Material.PLANTS);
@@ -33,6 +40,11 @@ public class BlockCustomPlant extends BlockBush {
         this.setSoundType(SoundType.PLANT);
         this.setCreativeTab(Thaumcraft.tabTC);
         this.setDefaultState(this.blockState.getBaseState().withProperty(TYPE, 0));
+    }
+
+    @Override
+    public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess source, BlockPos pos) {
+        return CUSTOM_PLANT_AABB;
     }
 
     @Override
@@ -69,6 +81,48 @@ public class BlockCustomPlant extends BlockBush {
         if (meta == 4) return 15;
         if (meta == 5) return 8;
         return 0;
+    }
+
+    @Override
+    public void onEntityCollision(World worldIn, BlockPos pos, IBlockState state, Entity entityIn) {
+        if (state.getValue(TYPE) == 5 && entityIn instanceof EntityLivingBase) {
+            ((EntityLivingBase) entityIn).addPotionEffect(
+                    new PotionEffect(MobEffects.NAUSEA, 200, 0, true, false)
+            );
+        }
+        super.onEntityCollision(worldIn, pos, state, entityIn);
+    }
+
+    @Override
+    public void randomDisplayTick(IBlockState state, World world, BlockPos pos, Random rand) {
+        int type = state.getValue(TYPE);
+        double x = pos.getX() + 0.5D;
+        double y = pos.getY() + 0.5D;
+        double z = pos.getZ() + 0.5D;
+
+        if (type == 2 && rand.nextInt(3) == 0) {
+            float r = 0.3F + rand.nextFloat() * 0.3F;
+            float g = 0.7F + rand.nextFloat() * 0.3F;
+            float b = 0.3F + rand.nextFloat() * 0.3F;
+            Thaumcraft.proxy.drawGenericParticles(world,
+                    x + rand.nextGaussian() * 0.3D, y + rand.nextGaussian() * 0.3D, z + rand.nextGaussian() * 0.3D,
+                    0.0D, 0.0D, 0.0D,
+                    r, g, b, 0.9F,
+                    false, 0, 8, -1, 36, 0, 0.2F);
+        } else if (type == 3 && rand.nextBoolean()) {
+            world.spawnParticle(EnumParticleTypes.SMOKE_NORMAL,
+                    x + rand.nextGaussian() * 0.1D, y + 0.6D + rand.nextGaussian() * 0.1D, z + rand.nextGaussian() * 0.1D,
+                    0.0D, 0.0D, 0.0D);
+            world.spawnParticle(EnumParticleTypes.FLAME,
+                    x + rand.nextGaussian() * 0.1D, y + 0.6D + rand.nextGaussian() * 0.1D, z + rand.nextGaussian() * 0.1D,
+                    0.0D, 0.0D, 0.0D);
+        } else if (type == 5 && rand.nextInt(3) == 0) {
+            Thaumcraft.proxy.drawGenericParticles(world,
+                    x + rand.nextGaussian() * 0.4D, y + 0.3D, z + rand.nextGaussian() * 0.4D,
+                    0.0D, 0.0D, 0.0D,
+                    0.5F, 0.3F, 0.8F, 0.9F,
+                    false, 0, 8, -1, 36, 0, 0.1F);
+        }
     }
 
     @Override
