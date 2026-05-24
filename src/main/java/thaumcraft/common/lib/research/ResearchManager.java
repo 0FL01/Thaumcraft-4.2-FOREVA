@@ -104,12 +104,17 @@ public class ResearchManager {
                 }
             }
 
-            // Sync to client
+            // Sync to client.
+            // Guard against null connection: during PlayerEvent.LoadFromFile the
+            // network handler is not yet set up, so sendTo would NPE.
             if (!player.getEntityWorld().isRemote && player instanceof EntityPlayerMP) {
-                PacketHandler.INSTANCE.sendTo(
-                        new PacketResearchComplete(researchkey),
-                        (EntityPlayerMP) player
-                );
+                EntityPlayerMP mp = (EntityPlayerMP) player;
+                if (mp.connection != null) {
+                    PacketHandler.INSTANCE.sendTo(
+                            new PacketResearchComplete(researchkey),
+                            mp
+                    );
+                }
             }
 
             // Trigger research completion callbacks
