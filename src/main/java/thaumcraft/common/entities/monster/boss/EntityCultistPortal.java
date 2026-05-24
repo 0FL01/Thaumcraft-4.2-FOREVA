@@ -75,12 +75,12 @@ public class EntityCultistPortal extends EntityThaumcraftBoss {
 
     @Override
     public boolean canBePushed() {
-        return true;
+        return false;
     }
 
     @Override
     public boolean canBeCollidedWith() {
-        return false;
+        return true;
     }
 
     @Override
