@@ -1,6 +1,7 @@
 {
   "ambientocclusion": false,
   "textures": {
+    "particle": "#shell",
     "shell": "thaumcraft:models/centrifuge"
   },
   "elements": [

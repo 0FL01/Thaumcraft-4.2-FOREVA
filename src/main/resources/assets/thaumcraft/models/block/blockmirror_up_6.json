@@ -1,6 +1,7 @@
 {
   "ambientocclusion": false,
   "textures": {
+    "particle": "#frame",
     "frame": "thaumcraft:blocks/mirrorframe2"
   },
   "elements": [

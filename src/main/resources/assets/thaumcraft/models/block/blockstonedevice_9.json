@@ -1,6 +1,7 @@
 {
   "ambientocclusion": false,
   "textures": {
+    "particle": "#surface",
     "surface": "thaumcraft:models/node_stabilizer"
   },
   "elements": [

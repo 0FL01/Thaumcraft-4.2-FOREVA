@@ -1,6 +1,7 @@
 {
   "ambientocclusion": false,
   "textures": {
+    "particle": "#surface",
     "surface": "thaumcraft:blocks/grate",
     "side": "thaumcraft:blocks/metalbase",
     "hatch": "thaumcraft:blocks/grate_hatch"

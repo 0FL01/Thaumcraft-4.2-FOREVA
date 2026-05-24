@@ -38,6 +38,7 @@
     }
   },
   "textures": {
+    "particle": "#side",
     "top": "thaumcraft:blocks/al_furnace_top",
     "front": "thaumcraft:blocks/al_furnace_front_off",
     "side": "thaumcraft:blocks/al_furnace_side",

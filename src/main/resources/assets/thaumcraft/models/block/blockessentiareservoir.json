@@ -1,6 +1,7 @@
 {
   "ambientocclusion": false,
   "textures": {
+    "particle": "#reservoir",
     "reservoir": "thaumcraft:blocks/essentiareservoir"
   },
   "elements": [
