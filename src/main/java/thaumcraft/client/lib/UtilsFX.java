@@ -17,7 +17,7 @@ import java.util.Map;
 public class UtilsFX {
     private static final Map<String, ResourceLocation> BOUND_TEXTURES = new HashMap<String, ResourceLocation>();
     private static final DecimalFormat FORMATTER = new DecimalFormat("#######.##");
-    private static final ResourceLocation PARTICLE_TEXTURE = new ResourceLocation("textures/particle/particles.png");
+    private static final ResourceLocation PARTICLE_TEXTURE = new ResourceLocation("thaumcraft", "textures/misc/particles.png");
 
     public static void bindTexture(String texture) {
         ResourceLocation location = BOUND_TEXTURES.containsKey(texture) ? BOUND_TEXTURES.get(texture) : new ResourceLocation("thaumcraft", texture);
