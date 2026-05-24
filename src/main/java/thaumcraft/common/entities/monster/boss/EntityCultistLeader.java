@@ -178,11 +178,12 @@ public class EntityCultistLeader extends EntityThaumcraftBoss implements net.min
     public void onLivingUpdate() {
         super.onLivingUpdate();
         if (!this.world.isRemote) {
-            if (this.getItemStackFromSlot(EntityEquipmentSlot.HEAD).isEmpty()
+            if (this.ticksExisted <= 5
+                    && (this.getItemStackFromSlot(EntityEquipmentSlot.HEAD).isEmpty()
                     || this.getItemStackFromSlot(EntityEquipmentSlot.CHEST).isEmpty()
                     || this.getItemStackFromSlot(EntityEquipmentSlot.LEGS).isEmpty()
                     || this.getItemStackFromSlot(EntityEquipmentSlot.FEET).isEmpty()
-                    || this.getHeldItemMainhand().isEmpty()) {
+                    || this.getHeldItemMainhand().isEmpty())) {
                 this.ensurePraetorGear();
             }
             for (EntityCultist cultist : this.world.getEntitiesWithinAABB(EntityCultist.class, this.getEntityBoundingBox().grow(8.0D))) {
