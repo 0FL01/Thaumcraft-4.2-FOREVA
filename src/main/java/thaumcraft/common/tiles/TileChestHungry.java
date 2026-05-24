@@ -14,11 +14,33 @@ import thaumcraft.api.TileThaumcraft;
 import thaumcraft.common.config.ConfigBlocks;
 
 public class TileChestHungry extends TileThaumcraft implements IInventory, ITickable {
+    public static final int EAT_LID_TICKS = 6;
+    private static final float NORMAL_LID_SPEED = 0.1F;
+    private static final float EAT_LID_SPEED = 0.35F;
+
     private NonNullList<ItemStack> chestContents = NonNullList.withSize(27, ItemStack.EMPTY);
     public float lidAngle;
     public float prevLidAngle;
     public int numUsingPlayers;
     private int ticksSinceSync;
+    private int forcedLidTicks;
+    private boolean eatCloseActive;
+
+    /**
+     * Triggers a short, fast lid open/close animation when the chest eats an item.
+     * On the server, syncs the timer to the client via block event id=3.
+     * Speed is controlled by EAT_LID_SPEED (fast) vs NORMAL_LID_SPEED (slow for GUI).
+     */
+    public void animateEating(int ticks) {
+        if (ticks <= 0 || this.world == null) {
+            return;
+        }
+        this.forcedLidTicks = Math.max(this.forcedLidTicks, ticks);
+        this.eatCloseActive = true;
+        if (!this.world.isRemote) {
+            this.world.addBlockEvent(this.pos, ConfigBlocks.blockChestHungry, 3, this.forcedLidTicks);
+        }
+    }
 
     @Override
     public int getSizeInventory() {
@@ -145,16 +167,22 @@ public class TileChestHungry extends TileThaumcraft implements IInventory, ITick
         }
 
         this.prevLidAngle = this.lidAngle;
-        float delta = 0.1F;
 
-        if (this.numUsingPlayers > 0 && this.lidAngle == 0.0F) {
+        boolean forcedOpen = this.forcedLidTicks > 0;
+        boolean shouldOpen = this.numUsingPlayers > 0 || forcedOpen;
+
+        boolean eatMotion = forcedOpen || (this.eatCloseActive && this.numUsingPlayers <= 0);
+        float delta = eatMotion && this.numUsingPlayers <= 0 ? EAT_LID_SPEED : NORMAL_LID_SPEED;
+
+        if (shouldOpen && this.lidAngle == 0.0F) {
             this.world.playSound(null, this.pos, net.minecraft.init.SoundEvents.BLOCK_CHEST_OPEN,
                     net.minecraft.util.SoundCategory.BLOCKS, 0.5F, this.world.rand.nextFloat() * 0.1F + 0.9F);
         }
 
-        if ((this.numUsingPlayers == 0 && this.lidAngle > 0.0F) || (this.numUsingPlayers > 0 && this.lidAngle < 1.0F)) {
+        if ((!shouldOpen && this.lidAngle > 0.0F) || (shouldOpen && this.lidAngle < 1.0F)) {
             float previous = this.lidAngle;
-            this.lidAngle = this.numUsingPlayers > 0 ? this.lidAngle + delta : this.lidAngle - delta;
+
+            this.lidAngle = shouldOpen ? this.lidAngle + delta : this.lidAngle - delta;
 
             if (this.lidAngle > 1.0F) {
                 this.lidAngle = 1.0F;
@@ -169,6 +197,40 @@ public class TileChestHungry extends TileThaumcraft implements IInventory, ITick
                 this.lidAngle = 0.0F;
             }
         }
+
+        if (this.forcedLidTicks > 0) {
+            --this.forcedLidTicks;
+        }
+
+        if (this.eatCloseActive && this.forcedLidTicks == 0 && this.lidAngle <= 0.0F) {
+            this.eatCloseActive = false;
+        }
+
+        if ((!shouldOpen && this.lidAngle > 0.0F) || (shouldOpen && this.lidAngle < 1.0F)) {
+            float previous = this.lidAngle;
+            this.lidAngle = shouldOpen ? this.lidAngle + delta : this.lidAngle - delta;
+
+            if (this.lidAngle > 1.0F) {
+                this.lidAngle = 1.0F;
+            }
+
+            if (this.lidAngle < 0.5F && previous >= 0.5F) {
+                this.world.playSound(null, this.pos, net.minecraft.init.SoundEvents.BLOCK_CHEST_CLOSE,
+                        net.minecraft.util.SoundCategory.BLOCKS, 0.5F, this.world.rand.nextFloat() * 0.1F + 0.9F);
+            }
+
+            if (this.lidAngle < 0.0F) {
+                this.lidAngle = 0.0F;
+            }
+        }
+
+        if (this.forcedLidTicks > 0) {
+            --this.forcedLidTicks;
+        }
+
+        if (this.eatCloseActive && this.forcedLidTicks == 0 && this.lidAngle == 0.0F) {
+            this.eatCloseActive = false;
+        }
     }
 
     @Override
@@ -182,6 +244,10 @@ public class TileChestHungry extends TileThaumcraft implements IInventory, ITick
             if (this.lidAngle < open) {
                 this.lidAngle = open;
             }
+            return true;
+        }
+        if (id == 3) {
+            this.forcedLidTicks = Math.max(this.forcedLidTicks, type);
             return true;
         }
         return super.receiveClientEvent(id, type);

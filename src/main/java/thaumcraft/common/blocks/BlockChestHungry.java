@@ -100,7 +100,7 @@ public class BlockChestHungry extends BlockContainer {
             world.playSound(null, entityIn.posX, entityIn.posY, entityIn.posZ,
                     net.minecraft.init.SoundEvents.ENTITY_GENERIC_EAT, SoundCategory.BLOCKS, 0.25F,
                     (world.rand.nextFloat() - world.rand.nextFloat()) * 0.2F + 1.0F);
-            world.addBlockEvent(pos, ConfigBlocks.blockChestHungry, 2, 2);
+            chest.animateEating(TileChestHungry.EAT_LID_TICKS);
         }
 
         if (remainder.isEmpty()) {

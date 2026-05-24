@@ -17,6 +17,7 @@ public class HungryChestVisualShellContractTest {
         String blockstate = read("src/main/resources/assets/thaumcraft/blockstates/blockchesthungry.json");
         String blockModel = read("src/main/resources/assets/thaumcraft/models/block/blockchesthungry.json");
         String block = read("src/main/java/thaumcraft/common/blocks/BlockChestHungry.java");
+        String te = read("src/main/java/thaumcraft/common/tiles/TileChestHungry.java");
 
         assertTrue("BlockChestHungry should keep model-backed world rendering with horizontal facing state",
                 block.contains("return EnumBlockRenderType.MODEL;")
@@ -30,6 +31,18 @@ public class HungryChestVisualShellContractTest {
                         && renderer.contains("this.model.chestLid.render(0.0625F);")
                         && renderer.contains("this.model.chestKnob.render(0.0625F);")
                         && !renderer.contains("this.model.renderAll();"));
+
+        assertTrue("TileChestHungry should define eat-animation constants and close flag for fast open+close cycle",
+                te.contains("EAT_LID_TICKS = 6")
+                        && te.contains("NORMAL_LID_SPEED = 0.1F")
+                        && te.contains("EAT_LID_SPEED = 0.35F")
+                        && te.contains("private boolean eatCloseActive")
+                        && te.contains("this.eatCloseActive = true;"));
+
+        assertTrue("BlockChestHungry should trigger eat-animation via chest.animateEating(EAT_LID_TICKS) without faking GUI state",
+                block.contains("chest.animateEating(TileChestHungry.EAT_LID_TICKS);")
+                        && !block.contains("world.scheduleUpdate(")
+                        && !block.contains("updateTick("));
 
         assertTrue("Hungry chest block model should carry the static chest body shell instead of the old full cube placeholder",
                 blockModel.contains("\"ambientocclusion\": false")
