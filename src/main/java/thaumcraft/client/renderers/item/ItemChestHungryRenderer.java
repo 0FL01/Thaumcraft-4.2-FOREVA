@@ -18,8 +18,6 @@ public class ItemChestHungryRenderer extends TileEntityItemStackRenderer {
         net.minecraft.client.Minecraft.getMinecraft().renderEngine.bindTexture(TEXTURE);
         GlStateManager.pushMatrix();
         GlStateManager.enableRescaleNormal();
-        GlStateManager.translate(0.5F, 0.5F, 0.5F);
-        GlStateManager.scale(1.0F, -1.0F, -1.0F);
         this.model.chestLid.rotateAngleX = 0.0F;
         this.model.chestKnob.rotateAngleX = 0.0F;
         this.model.renderAll();

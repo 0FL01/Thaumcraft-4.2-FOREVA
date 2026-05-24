@@ -77,7 +77,29 @@ visually. For `worktable`/`wandtable` the correct pair is:
 "down": { "uv": [4, 0, 6, 4] }
 ```
 
-### 4. Item JSON structure
+### 4. Display transforms — axis guide and debug workflow
+
+Format: `"rotation": [X, Y, Z]`
+
+| Axis | Effect | Example change |
+|------|--------|---------------|
+| X | Tilt (pitch) — look down/up at item | `0 → 30` (tilt down for isometric) |
+| Y | Facing (yaw) — which side faces viewer | `45 → 225` (180° flip, show front instead of back) |
+| Z | Flip (roll) — upright vs upside-down | `0 → 180` (flip top-to-bottom) |
+
+**Debug workflow:**
+
+1. Start by fixing **Y** (facing). The item shows the wrong face (back instead of front). Add/remove 180°.
+2. Fix **Z** (flip). The item faces correctly but is upside-down. Add 180° to Z.
+3. Fix **X** (tilt) last if the viewing angle is off.
+
+Always fix the **same context first** (e.g. `firstperson_righthand`), then mirror to the opposite hand by adding 180° to Y:
+```
+right hand Y = 45  → left hand Y = 225
+right hand Y = 225 → left hand Y = 45
+```
+
+### 5. Item JSON structure
 
 Required sections:
 
@@ -94,7 +116,7 @@ Required sections:
     "firstperson_lefthand":   { "rotation": [0, 225, 0], "translation": [0, 0, 0], "scale": [0.4, 0.4, 0.4] }
   },
   "textures": {
-    "particle": "thaumcraft:models/name_inventory",
+    "particle": "thaumcraft:blocks/name",
     "surface": "thaumcraft:models/name_inventory"
   },
   "elements": [
@@ -106,7 +128,9 @@ Required sections:
 Copy display transforms from TC6 donor `models/item/*.json` if there are
 no special requirements.
 
-### 5. Routing in ClientProxy
+**Important:** `"particle"` texture for block models must be in the block atlas domain (`textures/blocks/`). Referencing `textures/models/` via `#variable` may fail to stitch into the block atlas, causing purple break particles. Either copy the texture to `textures/blocks/` and reference directly, or use a block texture.
+
+### 6. Routing in ClientProxy
 
 ```java
 // Normal blockstate variants
@@ -121,7 +145,48 @@ registerBuiltinItemModel(item, otherMeta, "blockname_tesr");
 item.setTileEntityItemStackRenderer(new ItemXxxRenderer());
 ```
 
-### 6. Update guard tests
+### 7. TEISR for split-model blocks (body in JSON, animated parts in TESR)
+
+For blocks where the static body is baked into a JSON block model and only the animated parts (lid, door, knob) remain in the TESR:
+
+```java
+// In ClientProxy.setupTileLinkedItemRenderers():
+Item item = Item.getItemFromBlock(ConfigBlocks.blockXxx);
+if (item != null) {
+    item.setTileEntityItemStackRenderer(new ItemXxxRenderer());
+}
+
+// In ClientProxy.setupBlockRenderers():
+registerBuiltinItemModel(item, 0, "blockxxx_tesr"); // → models/item/blockxxx_tesr.json
+```
+
+The TEISR pattern for such blocks:
+
+```java
+public class ItemXxxRenderer extends TileEntityItemStackRenderer {
+    private static final ResourceLocation TEXTURE = new ResourceLocation("thaumcraft", "textures/models/xxx.png");
+    private final ModelXxx model = new ModelXxx();
+
+    @Override
+    public void renderByItem(ItemStack stack, float partialTicks) {
+        // Bind texture, push matrix, render full model, pop matrix
+        // NO scale(1, -1, -1) — the display transforms in the JSON handle orientation
+        Minecraft.getMinecraft().renderEngine.bindTexture(TEXTURE);
+        GlStateManager.pushMatrix();
+        model.renderAll();
+        GlStateManager.popMatrix();
+    }
+}
+```
+
+Key rules:
+- `models/item/blockxxx_tesr.json`: `"parent": "builtin/entity"` + **full set of display transforms** (copy from `blockstonedevice_tesr` template)
+- TEISR renders `model.renderAll()` (body + lid + knob for the full item)
+- World rendering: JSON block model handles the static body; TESR adds animated parts
+- The display transforms in the JSON are responsible for positioning and orientation — do NOT add `translate`/`scale`/`rotate` in the TEISR unless absolutely necessary
+- The `builtin/entity` parent provides identity transforms; the `display` section overrides per-context
+
+### 8. Update guard tests
 
 For every changed JSON, add a check in an existing or new **static guard test**:
 
@@ -139,14 +204,6 @@ Check:
 - at least one geometry marker
 - up/down UV for top-visible blocks
 
-### 7. Validation
-
-- `jq empty ...json` — syntax check.
-- `./scripts/dev.sh compileJava` — compilation.
-- `./scripts/dev.sh validate --smoke` — runtime smoke (model/registration changes).
-- **Client visual check**: purple textures, offset coordinates, and
-  TC6-style textures are invisible at compile time.
-
 ## Known cases
 
 | Block | Meta | TC4 Model | Texture | Square atlas |
@@ -156,6 +213,8 @@ Check:
 | Arcane Worktable | 15 | ModelArcaneWorkbench | `worktable.png` 128×64 | `worktable_inventory.png` 128×128 |
 | Focal Manipulator | 13 | ModelArcaneWorkbench | `wandtable.png` 128×64 | `wandtable_inventory.png` 128×128 |
 | Runic Matrix | 2 | TileRunicMatrixRenderer (hardcoded cluster) | `arcane_stone` block texture | not needed (block texture) |
+| Hungry Chest | 0 | ModelChest (vanilla) | `chesthungry.png` 64×64 | square (no copy needed) |
+| Hungry Chest (item) | 0 | — | `chesthungry.png` 64×64 | TEISR + `builtin/entity` + display transforms |
 
 ## Anti-patterns
 
@@ -167,3 +226,14 @@ Check:
   TileEntitySpecialRenderer.
 - **Do NOT invent UV** — use exact pixel offsets from `ModelRenderer`
   atlas layout, recalculated to 0–16.
+- **Do NOT use `scale(1, -1, -1)` in TEISR when display transforms are
+  present** — the scale flips Y in the already-rotated display-transform
+  space, causing position drift. Use Z rotation (180°) in `display`
+  transforms instead to fix upside-down orientation.
+- **Do NOT apply `translate`/`scale` in TEISR unnecessarily** — the
+  `display` transforms in the model JSON handle positioning. Only add
+  TEISR transforms when the model needs special handling that display
+  transforms cannot express.
+- **Do NOT reference `textures/models/` for `"particle"`** — block atlas
+  may not stitch non-block-domain textures. Copy to `textures/blocks/`
+  and reference directly.
