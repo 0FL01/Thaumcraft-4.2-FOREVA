@@ -29,10 +29,7 @@ public class TileCrystalRenderer extends TileEntitySpecialRenderer<TileCrystal> 
         GlStateManager.pushMatrix();
 
         int md = tile.getBlockMetadata();
-        int color = ItemShard.colors[5];
-        if (md != 6) {
-            color = ItemShard.colors[MathHelper.clamp(md + 1, 1, 6)];
-        }
+        int color = getCrystalColor(md);
         bindTexture(CRYSTAL_TEXTURE);
         BlockPos pos = tile.getPos() == null ? BlockPos.ORIGIN : tile.getPos();
         Random rand = new Random(tile.getBlockMetadata()
@@ -55,6 +52,37 @@ public class TileCrystalRenderer extends TileEntitySpecialRenderer<TileCrystal> 
         GlStateManager.disableBlend();
     }
 
+    public void renderItemCluster(int metadata) {
+        GlStateManager.pushMatrix();
+
+        int color = getCrystalColor(metadata);
+        bindTexture(CRYSTAL_TEXTURE);
+        Random rand = new Random(metadata);
+        GlStateManager.rotate(90.0F, 0.0F, 1.0F, 0.0F);
+        GlStateManager.translate(0.0F, -0.8F, 0.0F);
+        drawItemCrystal((rand.nextFloat() - rand.nextFloat()) * 5.0F,
+                (rand.nextFloat() - rand.nextFloat()) * 5.0F,
+                rand, color, 1.1F);
+        for (int i = 1; i < 6; i++) {
+            if (metadata == 6) {
+                color = ItemShard.colors[i == 5 ? 6 : i];
+            }
+            int angle1 = rand.nextInt(36) + 72 * i;
+            int angle2 = 15 + rand.nextInt(15);
+            drawItemCrystal(angle1, angle2, rand, color, 0.8F);
+        }
+
+        GlStateManager.popMatrix();
+        GlStateManager.disableBlend();
+    }
+
+    private static int getCrystalColor(int metadata) {
+        if (metadata == 6) {
+            return ItemShard.colors[5];
+        }
+        return ItemShard.colors[MathHelper.clamp(metadata + 1, 1, 6)];
+    }
+
     private void drawCrystal(short orientation, double x, double y, double z, float yaw, float pitch, Random rand, int color, float size) {
         EntityPlayerSP player = Minecraft.getMinecraft().player;
         float ticks = player == null ? 0.0F : player.ticksExisted;
@@ -69,6 +97,44 @@ public class TileCrystalRenderer extends TileEntitySpecialRenderer<TileCrystal> 
         GlStateManager.enableBlend();
         GlStateManager.blendFunc(770, 771);
         translateFromOrientation((float) x, (float) y, (float) z, orientation);
+        GlStateManager.rotate(yaw, 0.0F, 1.0F, 0.0F);
+        GlStateManager.rotate(pitch, 1.0F, 0.0F, 0.0F);
+
+        float sx = (0.15F + rand.nextFloat() * 0.075F) * size;
+        float sy = (0.5F + rand.nextFloat() * 0.1F) * size;
+        float sz = (0.15F + rand.nextFloat() * 0.05F) * size;
+        GlStateManager.scale(sx, sy, sz);
+
+        float prevX = OpenGlHelper.lastBrightnessX;
+        float prevY = OpenGlHelper.lastBrightnessY;
+        int glow = (int) (210.0F * shade);
+        int lightU = glow % 65536;
+        int lightV = glow / 65536;
+        OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, lightU, lightV);
+
+        GlStateManager.color(r, g, b, 1.0F);
+        model.render();
+        OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, prevX, prevY);
+
+        GlStateManager.disableRescaleNormal();
+        GlStateManager.disableBlend();
+        GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+        GlStateManager.popMatrix();
+    }
+
+    private void drawItemCrystal(float yaw, float pitch, Random rand, int color, float size) {
+        EntityPlayerSP player = Minecraft.getMinecraft().player;
+        float ticks = player == null ? 0.0F : player.ticksExisted;
+        float shade = MathHelper.sin((ticks + rand.nextInt(10)) / (5.0F + rand.nextFloat())) * 0.075F + 0.925F;
+        Color tint = new Color(color);
+        float r = tint.getRed() / 220.0F;
+        float g = tint.getGreen() / 220.0F;
+        float b = tint.getBlue() / 220.0F;
+
+        GlStateManager.pushMatrix();
+        GlStateManager.enableRescaleNormal();
+        GlStateManager.enableBlend();
+        GlStateManager.blendFunc(770, 771);
         GlStateManager.rotate(yaw, 0.0F, 1.0F, 0.0F);
         GlStateManager.rotate(pitch, 1.0F, 0.0F, 0.0F);
 
