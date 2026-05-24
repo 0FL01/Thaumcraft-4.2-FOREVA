@@ -15,6 +15,7 @@ import net.minecraft.potion.PotionEffect;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.MobEffects;
 import net.minecraft.util.EnumHand;
+import net.minecraft.util.text.translation.I18n;
 import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.EnumDifficulty;
 import thaumcraft.common.config.ConfigItems;
@@ -24,8 +25,10 @@ import thaumcraft.common.entities.ai.combat.AILongRangeAttack;
 import thaumcraft.common.entities.monster.EntityCultist;
 import thaumcraft.common.entities.monster.EntityCultistCleric;
 import thaumcraft.common.entities.monster.EntityCultistKnight;
+import thaumcraft.common.entities.monster.mods.ChampionModifier;
 import thaumcraft.common.entities.projectile.EntityGolemOrb;
 import thaumcraft.common.lib.TCSounds;
+import thaumcraft.common.lib.utils.EntityUtils;
 
 public class EntityCultistLeader extends EntityThaumcraftBoss implements net.minecraft.entity.IRangedAttackMob {
     public static final String[] NAMES = {"Alberic", "Anselm", "Bastian", "Beturian", "Chabier", "Chorache", "Chuse", "Dodorol", "Ebardo", "Ferrando", "Fertus", "Guillen", "Larpe", "Obano", "Zelipe"};
@@ -63,6 +66,10 @@ public class EntityCultistLeader extends EntityThaumcraftBoss implements net.min
 
     @Override
     protected void setEquipmentBasedOnDifficulty(DifficultyInstance difficulty) {
+        this.equipPraetorGear();
+    }
+
+    private void equipPraetorGear() {
         this.setItemStackToSlot(EntityEquipmentSlot.HEAD, new ItemStack(ConfigItems.itemHelmetCultistLeader));
         this.setItemStackToSlot(EntityEquipmentSlot.CHEST, new ItemStack(ConfigItems.itemChestCultistLeader));
         this.setItemStackToSlot(EntityEquipmentSlot.LEGS, new ItemStack(ConfigItems.itemLegsCultistLeader));
@@ -71,6 +78,25 @@ public class EntityCultistLeader extends EntityThaumcraftBoss implements net.min
             this.setItemStackToSlot(EntityEquipmentSlot.MAINHAND, new ItemStack(ConfigItems.itemSwordVoid));
         } else {
             this.setItemStackToSlot(EntityEquipmentSlot.MAINHAND, new ItemStack(ConfigItems.itemCrimsonSword));
+        }
+    }
+
+    private void ensurePraetorGear() {
+        if (this.getItemStackFromSlot(EntityEquipmentSlot.HEAD).isEmpty()) {
+            this.setItemStackToSlot(EntityEquipmentSlot.HEAD, new ItemStack(ConfigItems.itemHelmetCultistLeader));
+        }
+        if (this.getItemStackFromSlot(EntityEquipmentSlot.CHEST).isEmpty()) {
+            this.setItemStackToSlot(EntityEquipmentSlot.CHEST, new ItemStack(ConfigItems.itemChestCultistLeader));
+        }
+        if (this.getItemStackFromSlot(EntityEquipmentSlot.LEGS).isEmpty()) {
+            this.setItemStackToSlot(EntityEquipmentSlot.LEGS, new ItemStack(ConfigItems.itemLegsCultistLeader));
+        }
+        if (this.getItemStackFromSlot(EntityEquipmentSlot.FEET).isEmpty()) {
+            this.setItemStackToSlot(EntityEquipmentSlot.FEET, new ItemStack(ConfigItems.itemCultistBoots));
+        }
+        if (this.getHeldItemMainhand().isEmpty()) {
+            this.setItemStackToSlot(EntityEquipmentSlot.MAINHAND, new ItemStack(
+                    this.world.getDifficulty() == EnumDifficulty.EASY ? ConfigItems.itemSwordVoid : ConfigItems.itemCrimsonSword));
         }
     }
 
@@ -89,7 +115,19 @@ public class EntityCultistLeader extends EntityThaumcraftBoss implements net.min
         this.setEquipmentBasedOnDifficulty(difficulty);
         this.setEnchantmentBasedOnDifficulty(difficulty);
         this.setTitle(this.rand.nextInt(NAMES.length));
+        EntityUtils.makeChampion(this, true);
         return data;
+    }
+
+    @Override
+    public void generateName() {
+        int type = EntityUtils.getChampionModifierType(this);
+        if (type >= 0 && type < ChampionModifier.mods.length) {
+            this.setCustomNameTag(String.format(
+                    I18n.translateToLocal("entity.thaumcraft.cultistleader.name"),
+                    this.getTitle(),
+                    ChampionModifier.mods[type].getModNameLocalized()));
+        }
     }
 
     private void setTitle(int title) {
@@ -140,6 +178,13 @@ public class EntityCultistLeader extends EntityThaumcraftBoss implements net.min
     public void onLivingUpdate() {
         super.onLivingUpdate();
         if (!this.world.isRemote) {
+            if (this.getItemStackFromSlot(EntityEquipmentSlot.HEAD).isEmpty()
+                    || this.getItemStackFromSlot(EntityEquipmentSlot.CHEST).isEmpty()
+                    || this.getItemStackFromSlot(EntityEquipmentSlot.LEGS).isEmpty()
+                    || this.getItemStackFromSlot(EntityEquipmentSlot.FEET).isEmpty()
+                    || this.getHeldItemMainhand().isEmpty()) {
+                this.ensurePraetorGear();
+            }
             for (EntityCultist cultist : this.world.getEntitiesWithinAABB(EntityCultist.class, this.getEntityBoundingBox().grow(8.0D))) {
                 if (cultist.isEntityAlive() && !cultist.isPotionActive(MobEffects.STRENGTH)) {
                     cultist.addPotionEffect(new PotionEffect(MobEffects.STRENGTH, 60, 1));

@@ -58,6 +58,7 @@ public class RenderCultistPortal extends Render<EntityCultistPortal> {
         GlStateManager.enableBlend();
         GlStateManager.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
         GlStateManager.disableLighting();
+        GlStateManager.disableCull();
         GlStateManager.depthMask(false);
 
         int light = 220;
@@ -84,6 +85,7 @@ public class RenderCultistPortal extends Render<EntityCultistPortal> {
         tessellator.draw();
 
         GlStateManager.depthMask(true);
+        GlStateManager.enableCull();
         GlStateManager.enableLighting();
         GlStateManager.disableBlend();
         GlStateManager.popMatrix();

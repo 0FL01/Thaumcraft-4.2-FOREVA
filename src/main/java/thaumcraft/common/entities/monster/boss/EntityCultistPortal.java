@@ -10,7 +10,10 @@ import net.minecraft.util.DamageSource;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.SoundEvent;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
 import thaumcraft.common.config.ConfigBlocks;
 import thaumcraft.common.config.ConfigItems;
@@ -78,6 +81,22 @@ public class EntityCultistPortal extends EntityThaumcraftBoss {
     @Override
     public boolean canBeCollidedWith() {
         return false;
+    }
+
+    @Override
+    public boolean isInRangeToRenderDist(double distance) {
+        return distance < 4096.0D;
+    }
+
+    @SideOnly(Side.CLIENT)
+    @Override
+    public int getBrightnessForRender() {
+        return 0xF000F0;
+    }
+
+    @Override
+    public float getBrightness() {
+        return 1.0F;
     }
 
     @Override
@@ -231,13 +250,14 @@ public class EntityCultistPortal extends EntityThaumcraftBoss {
     }
 
     private void spawnBoss() {
+        DifficultyInstance difficulty = this.world.getDifficultyForLocation(this.getPosition());
         EntityCultistLeader cultist = new EntityCultistLeader(this.world);
         cultist.setLocationAndAngles(
             this.posX + (double)this.rand.nextFloat() - (double)this.rand.nextFloat(),
             this.posY + 0.25D,
             this.posZ + (double)this.rand.nextFloat() - (double)this.rand.nextFloat(),
             0.0F, 0.0F);
-        cultist.onInitialSpawn(this.world.getDifficultyForLocation(this.getPosition()), null);
+        cultist.onInitialSpawn(difficulty, null);
         cultist.setHomePosAndDistance(this.getPosition(), 32);
         cultist.playLivingSound();
         this.world.spawnEntity(cultist);
