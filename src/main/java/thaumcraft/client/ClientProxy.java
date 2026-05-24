@@ -135,6 +135,7 @@ import thaumcraft.client.renderers.entity.RenderSpecialItem;
 import thaumcraft.client.renderers.item.ItemEldritchRenderer;
 import thaumcraft.client.renderers.item.ItemEssentiaReservoirRenderer;
 import thaumcraft.client.renderers.item.ItemJarRenderer;
+import thaumcraft.client.renderers.item.ItemChestHungryRenderer;
 import thaumcraft.client.renderers.item.ItemTrunkSpawnerRenderer;
 import thaumcraft.client.renderers.item.ItemMetalDeviceRenderer;
 import thaumcraft.client.renderers.item.ItemNodeRenderer;
@@ -672,6 +673,10 @@ public class ClientProxy extends CommonProxy {
         if (stoneDeviceItem != null) {
             stoneDeviceItem.setTileEntityItemStackRenderer(new ItemStoneDeviceRenderer());
         }
+        Item chestItemTeisr = Item.getItemFromBlock(ConfigBlocks.blockChestHungry);
+        if (chestItemTeisr != null) {
+            chestItemTeisr.setTileEntityItemStackRenderer(new ItemChestHungryRenderer());
+        }
         Item woodenDeviceItem = Item.getItemFromBlock(ConfigBlocks.blockWoodenDevice);
         if (woodenDeviceItem != null) {
             woodenDeviceItem.setTileEntityItemStackRenderer(new ItemWoodenDeviceRenderer());
@@ -887,7 +892,7 @@ public class ClientProxy extends CommonProxy {
             registerBlockItemModel(jarItem2, meta, "type=" + meta);
         }
         Item chestItem = Item.getItemFromBlock(ConfigBlocks.blockChestHungry);
-        registerBlockItemModel(chestItem, 0, "facing=north");
+        registerBuiltinItemModel(chestItem, 0, "blockchesthungry_tesr");
     }
 
     private static void registerBlockItemModel(Item item, int meta, String variant) {

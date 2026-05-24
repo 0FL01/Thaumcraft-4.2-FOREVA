@@ -1,7 +1,7 @@
 {
   "ambientocclusion": false,
   "textures": {
-    "particle": "#shell",
+    "particle": "thaumcraft:blocks/chesthungry",
     "shell": "thaumcraft:models/chesthungry"
   },
   "elements": [
