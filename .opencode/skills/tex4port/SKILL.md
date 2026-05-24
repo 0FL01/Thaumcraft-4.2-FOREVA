@@ -5,40 +5,40 @@ description: "Use when porting TC4 (1.7.10) model-rendered block visuals to Forg
 
 # Texture Porting: TC4 ModelRenderer -> Forge 1.12.2 Baked Item Models
 
-## Когда использовать
+## When to use
 
-Этот skill применяй, когда нужно перенести TC4 блок/предмет, который в оригинале рендерится через TESR + `ModelRenderer` (Java), на baked JSON модель для инвентаря/руки в 1.12.2 порте. Мирный рендер остаётся на TESR.
+Use this skill when porting a TC4 block/item that originally renders via TESR + `ModelRenderer` (Java) to a baked JSON model for inventory/hand in the 1.12.2 port. World rendering stays on TESR.
 
-## Короткая схема
+## Quick outline
 
 ```
 ClientProxy → registerBuiltinItemModel(item, meta, "model_name")
   → JSON: "textures": { "surface": "thaumcraft:models/..._inventory" }
   → JSON: "elements": [ ... baked box per ModelRenderer part ]
   → JSON: "display": { ... TC6/Forge block display transforms }
-  → текстура: square PNG copy из TC4 model texture
+  → texture: square PNG copy from TC4 model texture
 ```
 
-## Пошаговый алгоритм
+## Step-by-step algorithm
 
-### 1. Изучить reference
+### 1. Study the reference
 
-- Найди класс в `thaumcraft_src/**` или декомпиль из соответствующего jar.
-- Для блока — определи, какой `TileEntitySpecialRenderer` его рисует.
-- Запиши все `ModelRenderer` вызовы: `new ModelRenderer(this, offsetX, offsetY)`, `addBox`, `setRotationPoint`, `textureWidth`, `textureHeight`.
-- Совмести Java-классы:
+- Find the class in `thaumcraft_src/**` or decompile from the corresponding jar.
+- For a block, determine which `TileEntitySpecialRenderer` draws it.
+- Record all `ModelRenderer` calls: `new ModelRenderer(this, offsetX, offsetY)`, `addBox`, `setRotationPoint`, `textureWidth`, `textureHeight`.
+- Map Java classes:
 
-  | TC4 Java class | Используют |
+  | TC4 Java class | Used by |
   |---|---|
   | `ModelTable` | Table |
   | `ModelArcaneWorkbench` | Arcane Workbench, Deconstruction Table, Focal Manipulator |
-  | (другие) | — |
+  | (others) | — |
 
-### 2. Создать square atlas copy текстуры
+### 2. Create square atlas copy of the texture
 
-TC4 model textures часто не квадратные (`64x32`, `128x64`). Forge 1.12 block atlas rejects non-square sprites → magenta missing texture.
+TC4 model textures are often non-square (`64x32`, `128x64`). Forge 1.12 block atlas rejects non-square sprites → magenta missing texture.
 
-**Правило**: создай квадратную копию с NEAREST-масштабированием.
+**Rule**: create a square copy with NEAREST scaling.
 
 ```python
 from PIL import Image
@@ -47,39 +47,39 @@ side = max(img.size)
 img.resize((side, side), Image.Resampling.NEAREST).save('textures/models/name_inventory.png')
 ```
 
-Файл клади рядом с оригиналом: `textures/models/name_inventory.png`.
+Place the file next to the original: `textures/models/name_inventory.png`.
 
-### 3. Рассчитать UV для JSON faces
+### 3. Calculate UV for JSON faces
 
-Формула пересчёта из пикселей текстуры в UV-координаты Minecraft (0–16):
+Formula for converting texture pixels to Minecraft UV coordinates (0–16):
 
 ```
 u = pixelX * 16 / textureWidth
 v = pixelY * 16 / textureHeight
 ```
 
-Для квадратной копии `textureWidth == textureHeight == side`, поэтому
-деление упрощается, но v может быть scaled вдвое, если оригинал был вдвое
-короче.
+For the square copy `textureWidth == textureHeight == side`, so
+division simplifies, but v may be scaled by half if the original was half
+as tall.
 
 **ModelRenderer face → JSON face**:
 
-| ModelRenderer offset box | JSON элемент `from`/`to` |
-|---|---|
+| ModelRenderer offset box | JSON element `from`/`to` |
+|--------------------------|--------------------------|
 | `addBox(x, y, z, w, h, d)` at `setRotationPoint(px, py, pz)` | `from = [px+8, 16-py-d, pz+8]` (flip Y) |
-| Размеры: `w×h×d` | `to = [from[0]+w, from[1]+h, from[2]+d]` |
+| Dimensions: `w×h×d` | `to = [from[0]+w, from[1]+h, from[2]+d]` |
 
-**Поворот 180° X** в TESR означает, что up/down в JSON надо проверять
-визуально. Для `worktable`/`wandtable` корректная пара:
+**180° X rotation** in TESR means up/down in JSON must be checked
+visually. For `worktable`/`wandtable` the correct pair is:
 
 ```json
 "up":   { "uv": [2, 0, 4, 4] },
 "down": { "uv": [4, 0, 6, 4] }
 ```
 
-### 4. Структура item JSON
+### 4. Item JSON structure
 
-Обязательные секции:
+Required sections:
 
 ```json
 {
@@ -103,68 +103,67 @@ v = pixelY * 16 / textureHeight
 }
 ```
 
-Display transforms копируй из TC6 donor `models/item/*.json`, если нет
-особых требований.
+Copy display transforms from TC6 donor `models/item/*.json` if there are
+no special requirements.
 
-### 5. Routing в ClientProxy
+### 5. Routing in ClientProxy
 
 ```java
-// Обычные blockstate варианты
+// Normal blockstate variants
 for (int meta = 0; meta <= maxMeta; meta++) {
     registerBlockItemModel(item, meta, "type=" + meta);
 }
-// override конкретных мет
+// Override specific metas
 registerBuiltinItemModel(item, meta, "blockname_meta_inventory");
-// остальные меты, которым нужен TEISR
+// Other metas that need TEISR
 registerBuiltinItemModel(item, otherMeta, "blockname_tesr");
-// TEISR для оставшихся
+// TEISR for remaining
 item.setTileEntityItemStackRenderer(new ItemXxxRenderer());
 ```
 
-### 6. Обновить guard тесты
+### 6. Update guard tests
 
-Для каждого изменённого JSON добавь проверку в существующий или новый
-**static guard test**:
+For every changed JSON, add a check in an existing or new **static guard test**:
 
 ```java
 String model = read("path/to/model.json");
-assertTrue("описание", model.contains("\"surface\": \"thaumcraft:models/..._inventory\"")
+assertTrue("description", model.contains("\"surface\": \"thaumcraft:models/..._inventory\"")
         && model.contains("\"from\": [0, 8, 0]")
         && model.contains("\"thirdperson_righthand\"")
         && model.contains("[75, 45, 0]"));
 ```
 
-Проверяй:
-- texture path (на `_inventory`)
+Check:
+- texture path (for `_inventory`)
 - display transforms
-- хотя бы один geometry marker
-- up/down UV для top-visible блоков
+- at least one geometry marker
+- up/down UV for top-visible blocks
 
-### 7. Валидация
+### 7. Validation
 
-- `jq empty ...json` — синтаксис.
-- `./scripts/dev.sh compileJava` — компиляция.
-- `./scripts/dev.sh validate --smoke` — runtime smoke (меняются model/registration).
-- **Client visual check**: фиолетовые текстуры, смещённые координаты и
-  TC6-стиль текстур не видны в compile-time.
+- `jq empty ...json` — syntax check.
+- `./scripts/dev.sh compileJava` — compilation.
+- `./scripts/dev.sh validate --smoke` — runtime smoke (model/registration changes).
+- **Client visual check**: purple textures, offset coordinates, and
+  TC6-style textures are invisible at compile time.
 
-## Известные кейсы
+## Known cases
 
-| Блок | Meta | TC4 Model | Texture | Square atlas |
-|---|---|---|---|---|
+| Block | Meta | TC4 Model | Texture | Square atlas |
+|-------|------|-----------|---------|--------------|
 | Table | 0 | ModelTable | `table.png` 64×32 | `table_inventory.png` 64×64 |
 | Deconstruction Table | 14 | ModelArcaneWorkbench | `decontable.png` 128×64 | `decontable_inventory.png` 128×128 |
 | Arcane Worktable | 15 | ModelArcaneWorkbench | `worktable.png` 128×64 | `worktable_inventory.png` 128×128 |
 | Focal Manipulator | 13 | ModelArcaneWorkbench | `wandtable.png` 128×64 | `wandtable_inventory.png` 128×128 |
-| Runic Matrix | 2 | TileRunicMatrixRenderer (hardcoded cluster) | `arcane_stone` block texture | не нужна (block texture) |
+| Runic Matrix | 2 | TileRunicMatrixRenderer (hardcoded cluster) | `arcane_stone` block texture | not needed (block texture) |
 
-## Анти-паттерны
+## Anti-patterns
 
-- **Не копируй TC6 geometry** — оно даёт правильные координаты, но
-  неверное расположение текстур и силуэт.
-- **Не ссылайся напрямую на `thaumcraft:models/table`** (без `_inventory`)
-  если текстура не квадратная — получишь magenta missing texture.
-- **Не удаляй TEISR** полностью — мирный рендер всё ещё нуждается в
+- **Do NOT copy TC6 geometry** — it gives correct coordinates but
+  wrong texture placement and silhouette.
+- **Do NOT reference `thaumcraft:models/table` directly** (without `_inventory`)
+  if the texture is non-square — you'll get magenta missing texture.
+- **Do NOT remove TEISR entirely** — world rendering still needs the
   TileEntitySpecialRenderer.
-- **Не выдумывай UV** — используй exact pixel offsets из `ModelRenderer`
-  atlas layout, пересчитанные в 0–16.
+- **Do NOT invent UV** — use exact pixel offsets from `ModelRenderer`
+  atlas layout, recalculated to 0–16.
