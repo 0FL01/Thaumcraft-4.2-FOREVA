@@ -244,7 +244,7 @@ public class TileNodeRenderer extends TileEntitySpecialRenderer<TileEntity> {
                         break;
                 }
             }
-            renderFacingStrip(renderX, renderY, renderZ, angle, centerScale, alpha, FRAMES, strip, frame, 0xFFFFFF);
+            renderFacingStrip(renderX, renderY, renderZ, angle, centerScale, alpha, FRAMES, strip, frame, 0xFF00FF);
             GlStateManager.disableBlend();
 
             GlStateManager.enableCull();
@@ -260,7 +260,7 @@ public class TileNodeRenderer extends TileEntitySpecialRenderer<TileEntity> {
         GlStateManager.enableBlend();
         GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE);
         GlStateManager.depthMask(false);
-        renderFacingStrip(renderX, renderY, renderZ, 0.0F, 0.5F, 0.1F, FRAMES, 1, frame, 0xFFFFFF);
+        renderFacingStrip(renderX, renderY, renderZ, 0.0F, 0.5F, 0.1F, FRAMES, 1, frame, 0xFF00FF);
         GlStateManager.depthMask(true);
         GlStateManager.disableBlend();
         GlStateManager.alphaFunc(GL11.GL_GREATER, 0.1F);

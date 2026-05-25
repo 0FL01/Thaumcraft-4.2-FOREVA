@@ -46,10 +46,17 @@ public class ItemThaumometerStaticGuardTest {
                         && source.contains("EntityUtils.getPointedEntity(world, player, 0.5D, 10.0D, 0.0F, true)")
                         && source.contains("return new ScanResult((byte)2, 0, 0, pointed, \"\");")
                         && source.contains("return ScanManager.isValidScanTarget(player, result, \"@\") ? result : null;"));
+        assertTrue("Thaumometer should scan aura nodes through a slightly expanded node-only ray box while still respecting first solid block occlusion",
+                source.contains("public static TileEntity findLookedAtNodeTile(World world, EntityPlayer player, double range)")
+                        && source.contains("world.rayTraceBlocks(eyes, end, false, true, false)")
+                        && source.contains("eyes.distanceTo(blockHit.hitVec) + 0.25D")
+                        && source.contains("TileEntity lookedAtNode = findLookedAtNodeTile(world, player, 10.0D);")
+                        && source.contains("AxisAlignedBB scanBox = new AxisAlignedBB("));
         assertTrue("Thaumometer should restore client scan feedback through block runes for entity and block/node targets",
                 source.contains("private void showScanFeedback(World world, EntityPlayer player, ScanResult result)")
                         && source.contains("Thaumcraft.proxy.blockRunes(")
                         && source.contains("entity.posX - 0.5D")
+                        && source.contains("result.phenomena != null && result.phenomena.startsWith(\"NODE\")")
                         && source.contains("pos.getY() + 0.25D"));
     }
 

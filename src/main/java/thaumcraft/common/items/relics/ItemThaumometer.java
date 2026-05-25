@@ -16,8 +16,10 @@ import net.minecraft.util.ActionResult;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.SoundCategory;
+import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import thaumcraft.api.ThaumcraftApi;
 import thaumcraft.api.nodes.INode;
@@ -139,14 +141,17 @@ public class ItemThaumometer extends Item {
             BlockPos pos = hit.getBlockPos();
             TileEntity tile = world.getTileEntity(pos);
             if (tile instanceof INode) {
-                INode node = (INode) tile;
-                String id = node.getId();
-                if (id == null || id.isEmpty()) {
-                    id = world.provider.getDimension() + ":" + pos.getX() + ":" + pos.getY() + ":" + pos.getZ();
-                }
-                return new ScanResult((byte)3, 0, 0, null, "NODE" + id);
+                return createNodeScanResult((INode) tile, world, pos);
             }
+        }
 
+        TileEntity lookedAtNode = findLookedAtNodeTile(world, player, 10.0D);
+        if (lookedAtNode instanceof INode) {
+            return createNodeScanResult((INode) lookedAtNode, world, lookedAtNode.getPos());
+        }
+
+        if (hit != null && hit.typeOfHit == RayTraceResult.Type.BLOCK) {
+            BlockPos pos = hit.getBlockPos();
             IBlockState state = world.getBlockState(pos);
             Block block = state.getBlock();
             int meta = block.getMetaFromState(state);
@@ -224,6 +229,24 @@ public class ItemThaumometer extends Item {
             return;
         }
 
+        if (result.type == 3 && result.phenomena != null && result.phenomena.startsWith("NODE")) {
+            TileEntity nodeTile = findLookedAtNodeTile(world, player, 10.0D);
+            if (nodeTile instanceof INode) {
+                BlockPos pos = nodeTile.getPos();
+                Thaumcraft.proxy.blockRunes(
+                        world,
+                        pos.getX(),
+                        pos.getY() + 0.25D,
+                        pos.getZ(),
+                        red,
+                        0.0F,
+                        blue,
+                        15,
+                        0.03F);
+                return;
+            }
+        }
+
         RayTraceResult hit = this.rayTrace(world, player, true);
         if (hit == null || hit.typeOfHit != RayTraceResult.Type.BLOCK) {
             return;
@@ -240,6 +263,64 @@ public class ItemThaumometer extends Item {
                 blue,
                 15,
                 0.03F);
+    }
+
+    public static TileEntity findLookedAtNodeTile(World world, EntityPlayer player, double range) {
+        if (world == null || player == null || range <= 0.0D) {
+            return null;
+        }
+
+        Vec3d eyes = player.getPositionEyes(1.0F);
+        Vec3d look = player.getLook(1.0F).normalize();
+        Vec3d end = eyes.add(look.x * range, look.y * range, look.z * range);
+        RayTraceResult blockHit = world.rayTraceBlocks(eyes, end, false, true, false);
+        double maxDistance = range;
+        if (blockHit != null && blockHit.hitVec != null) {
+            maxDistance = Math.min(range, eyes.distanceTo(blockHit.hitVec) + 0.25D);
+        }
+
+        BlockPos min = new BlockPos(
+                Math.min(eyes.x, end.x) - 1.0D,
+                Math.min(eyes.y, end.y) - 1.0D,
+                Math.min(eyes.z, end.z) - 1.0D);
+        BlockPos max = new BlockPos(
+                Math.max(eyes.x, end.x) + 1.0D,
+                Math.max(eyes.y, end.y) + 1.0D,
+                Math.max(eyes.z, end.z) + 1.0D);
+
+        TileEntity closest = null;
+        double closestDistance = Double.MAX_VALUE;
+        for (BlockPos pos : BlockPos.getAllInBoxMutable(min, max)) {
+            if (!world.isBlockLoaded(pos)) {
+                continue;
+            }
+            TileEntity tile = world.getTileEntity(pos);
+            if (!(tile instanceof INode)) {
+                continue;
+            }
+            AxisAlignedBB scanBox = new AxisAlignedBB(
+                    pos.getX() + 0.2D, pos.getY() + 0.2D, pos.getZ() + 0.2D,
+                    pos.getX() + 0.8D, pos.getY() + 0.8D, pos.getZ() + 0.8D);
+            RayTraceResult intercept = scanBox.calculateIntercept(eyes, end);
+            if (intercept == null || intercept.hitVec == null) {
+                continue;
+            }
+            double distance = eyes.distanceTo(intercept.hitVec);
+            if (distance > maxDistance || distance >= closestDistance) {
+                continue;
+            }
+            closest = tile;
+            closestDistance = distance;
+        }
+        return closest;
+    }
+
+    private static ScanResult createNodeScanResult(INode node, World world, BlockPos pos) {
+        String id = node.getId();
+        if ((id == null || id.isEmpty()) && world != null && pos != null) {
+            id = world.provider.getDimension() + ":" + pos.getX() + ":" + pos.getY() + ":" + pos.getZ();
+        }
+        return new ScanResult((byte)3, 0, 0, null, "NODE" + id);
     }
 
     /**

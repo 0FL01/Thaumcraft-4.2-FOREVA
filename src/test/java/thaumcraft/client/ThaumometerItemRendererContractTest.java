@@ -50,6 +50,7 @@ public class ThaumometerItemRendererContractTest {
                         && renderer.contains("ScanManager.hasBeenScanned")
                         && renderer.contains("ItemThaumometer")
                         && renderer.contains("findRawScanTarget(stack, player.world, player)")
+                        && renderer.contains("ItemThaumometer.findLookedAtNodeTile(player.world, player, 10.0D)")
                         && renderer.contains("UtilsFX.drawTag(")
                         && renderer.contains("renderScannerDisplay(mc, stack, player, transformType);")
                         && renderer.contains("GlStateManager.translate(0.0F, 0.11F, 0.0F);")

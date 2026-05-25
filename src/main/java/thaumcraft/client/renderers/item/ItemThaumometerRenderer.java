@@ -252,11 +252,7 @@ public class ItemThaumometerRenderer extends TileEntityItemStackRenderer {
         if (player == null || player.world == null) {
             return null;
         }
-        RayTraceResult hit = player.rayTrace(10.0D, 1.0F);
-        if (hit == null || hit.typeOfHit != RayTraceResult.Type.BLOCK) {
-            return null;
-        }
-        return player.world.getTileEntity(hit.getBlockPos());
+        return ItemThaumometer.findLookedAtNodeTile(player.world, player, 10.0D);
     }
 
     private static boolean isFirstPerson(ItemCameraTransforms.TransformType transformType) {
