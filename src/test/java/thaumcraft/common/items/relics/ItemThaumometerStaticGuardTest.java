@@ -34,7 +34,13 @@ public class ItemThaumometerStaticGuardTest {
                 source.contains("if (count <= 5)")
                         && source.contains("player.stopActiveHand();")
                         && source.contains("ScanManager.completeScan(player, current, \"@\")")
+                        && source.contains("completedClientSide || isNodeScan(current)")
                         && source.contains("PacketHandler.INSTANCE.sendToServer(new PacketScannedToServer(current, player, \"@\"))"));
+        assertTrue("Thaumometer node scans should reach the server even when client-side node aspects are not synced yet",
+                source.contains("private static boolean isNodeScan(ScanResult result)")
+                        && source.contains("if (isNodeScan(result)) {")
+                        && source.contains("this.showScanFeedback(world, player, result);")
+                        && source.contains("return result;"));
         assertTrue("Thaumometer block scan must keep protected pick-block path with aspect-aware candidate ordering",
                 source.contains("try {")
                         && source.contains("result = toTaggedItemScan(block.getPickBlock(state, hit, world, pos, player), world);")

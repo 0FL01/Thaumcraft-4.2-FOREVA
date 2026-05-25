@@ -24,6 +24,10 @@ public class TileNodeRenderer extends TileEntitySpecialRenderer<TileEntity> {
 
     public static final ResourceLocation NODES_TEXTURE =
             new ResourceLocation("thaumcraft", "textures/misc/nodes.png");
+    private static final AspectList DEFAULT_NODE_ASPECTS = new AspectList()
+            .add(Aspect.AURA, 40)
+            .add(Aspect.MAGIC, 25)
+            .add(Aspect.AIR, 25);
     private static final int FRAMES = 32;
     private static final int STRIPS = 8;
 
@@ -74,11 +78,19 @@ public class TileNodeRenderer extends TileEntitySpecialRenderer<TileEntity> {
             }
         }
 
+        AspectList renderAspects = node.getAspects();
+        if ((renderAspects == null || renderAspects.size() <= 0) && node.getAspectsBase() != null && node.getAspectsBase().size() > 0) {
+            renderAspects = node.getAspectsBase();
+        }
+        if ((renderAspects == null || renderAspects.size() <= 0) && visible) {
+            renderAspects = DEFAULT_NODE_ASPECTS;
+        }
+
         renderNodeSeeded(viewer, viewDistance, visible, depthIgnore, size,
                 renderX, renderY, renderZ,
                 worldX, worldY, worldZ,
                 partialTicks,
-                node.getAspects(), node.getNodeType(), node.getNodeModifier(), 0);
+                renderAspects, node.getNodeType(), node.getNodeModifier(), pos.getX());
     }
 
     public static void renderNodeAt(INode node, double x, double y, double z, float partialTicks, float size) {
@@ -260,7 +272,9 @@ public class TileNodeRenderer extends TileEntitySpecialRenderer<TileEntity> {
         GlStateManager.enableBlend();
         GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE);
         GlStateManager.depthMask(false);
-        renderFacingStrip(renderX, renderY, renderZ, 0.0F, 0.5F, 0.1F, FRAMES, 1, frame, 0xFF00FF);
+        if (depthIgnore) GlStateManager.disableDepth();
+        renderFacingStrip(renderX, renderY, renderZ, 0.0F, 0.5F, visible ? 0.35F : 0.1F, FRAMES, 1, frame, 0xFF00FF);
+        if (depthIgnore) GlStateManager.enableDepth();
         GlStateManager.depthMask(true);
         GlStateManager.disableBlend();
         GlStateManager.alphaFunc(GL11.GL_GREATER, 0.1F);

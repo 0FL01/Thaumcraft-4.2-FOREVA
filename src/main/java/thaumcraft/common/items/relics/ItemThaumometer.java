@@ -87,7 +87,8 @@ public class ItemThaumometer extends Item {
             if (count <= 5) {
                 this.startScan = null;
                 player.stopActiveHand();
-                if (ScanManager.completeScan(player, current, "@")) {
+                boolean completedClientSide = ScanManager.completeScan(player, current, "@");
+                if (completedClientSide || isNodeScan(current)) {
                     PacketHandler.INSTANCE.sendToServer(new PacketScannedToServer(current, player, "@"));
                 }
             }
@@ -112,6 +113,10 @@ public class ItemThaumometer extends Item {
         }
         thaumcraft.api.aspects.AspectList aspects = ScanManager.getScanAspects(result, world);
         if (!ScanManager.validScan(aspects, player)) {
+            if (isNodeScan(result)) {
+                this.showScanFeedback(world, player, result);
+                return result;
+            }
             if (notifyInvalid) {
                 ScanManager.notifyInvalidScan(aspects, player);
             }
@@ -119,6 +124,10 @@ public class ItemThaumometer extends Item {
         }
         this.showScanFeedback(world, player, result);
         return result;
+    }
+
+    private static boolean isNodeScan(ScanResult result) {
+        return result != null && result.type == 3 && result.phenomena != null && result.phenomena.startsWith("NODE");
     }
 
     public ScanResult findScanTarget(ItemStack stack, World world, EntityPlayer player) {
