@@ -1,7 +1,10 @@
 package thaumcraft.client.lib;
 
+import java.util.ArrayList;
+import java.util.List;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
@@ -70,29 +73,63 @@ public class ItemAspectTooltipHandler {
         int tooltipW = event.getWidth();
         int tooltipH = event.getHeight();
 
-        int startX = tooltipX;
         int startY = tooltipY + tooltipH + 3;
-
         int iconSize = 16;
         int gap = 2;
-        int rowWidth = count * (iconSize + gap) - gap;
+        int step = iconSize + gap; // 18px per icon slot
 
-        // Draw dark tooltip-like background behind the icons
-        int bgLeft = startX - 2;
+        // Determine max width per row: from tooltipX to screen edge minus margin
+        ScaledResolution sr = new ScaledResolution(mc);
+        int maxRowWidth = Math.max(step, sr.getScaledWidth() - tooltipX - 8);
+
+        // Build rows: each row fills left-to-right until maxRowWidth is exceeded
+        List<List<Aspect>> rows = new ArrayList<>();
+        List<Aspect> currentRow = new ArrayList<>();
+        int currentRowWidth = 0;
+
+        for (Aspect aspect : sorted) {
+            if (aspect == null) continue;
+            if (aspects.getAmount(aspect) <= 0) continue;
+            if (currentRowWidth + step > maxRowWidth && !currentRow.isEmpty()) {
+                rows.add(currentRow);
+                currentRow = new ArrayList<>();
+                currentRowWidth = 0;
+            }
+            currentRow.add(aspect);
+            currentRowWidth += step;
+        }
+        if (!currentRow.isEmpty()) {
+            rows.add(currentRow);
+        }
+
+        int numRows = rows.size();
+        int totalHeight = numRows * step - gap;
+
+        // Widest row (for background sizing)
+        int maxContentWidth = 0;
+        for (List<Aspect> row : rows) {
+            int rowWidth = row.size() * step - gap;
+            if (rowWidth > maxContentWidth) maxContentWidth = rowWidth;
+        }
+
+        // Draw dark tooltip-like background behind all icon rows
+        int bgLeft = tooltipX - 2;
         int bgTop = startY - 2;
-        int bgRight = Math.max(tooltipX + tooltipW, startX + rowWidth) + 2;
-        int bgBottom = startY + iconSize + 2;
+        int bgRight = Math.max(tooltipX + tooltipW, tooltipX + maxContentWidth) + 2;
+        int bgBottom = startY + totalHeight + 2;
 
         drawRectBackground(bgLeft, bgTop, bgRight, bgBottom);
 
-        // Draw aspect icons in a horizontal row
-        int curX = startX;
-        for (Aspect aspect : sorted) {
-            if (aspect == null) continue;
-            int amount = aspects.getAmount(aspect);
-            if (amount <= 0) continue;
-            UtilsFX.drawTag(curX, startY, aspect, (float) amount, 0, 0.0, 771, 1.0f, false);
-            curX += iconSize + gap;
+        // Draw each row of aspect icons
+        int curY = startY;
+        for (List<Aspect> row : rows) {
+            int curX = tooltipX;
+            for (Aspect aspect : row) {
+                int amount = aspects.getAmount(aspect);
+                UtilsFX.drawTag(curX, curY, aspect, (float) amount, 0, 0.0, 771, 1.0f, false);
+                curX += step;
+            }
+            curY += step;
         }
 
         // drawTag disables blend and enables lighting; re-enable depth for subsequent rendering
