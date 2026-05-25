@@ -202,6 +202,7 @@ import thaumcraft.client.lib.ClientTickEventsFML;
 import thaumcraft.client.lib.KeyHandler;
 import thaumcraft.client.lib.PlayerNotifications;
 import thaumcraft.client.lib.RenderEventHandler;
+import thaumcraft.client.lib.ItemAspectTooltipHandler;
 import thaumcraft.common.CommonProxy;
 import thaumcraft.common.blocks.BlockCandle;
 import thaumcraft.common.blocks.BlockMagicalLeaves;
@@ -1029,6 +1030,7 @@ public class ClientProxy extends CommonProxy {
         MinecraftForge.EVENT_BUS.register(new RenderEventHandler());
         MinecraftForge.EVENT_BUS.register(ParticleEngine.INSTANCE);
         MinecraftForge.EVENT_BUS.register(new ClientEventHandler());
+        MinecraftForge.EVENT_BUS.register(new ItemAspectTooltipHandler());
     }
 
     @Override
