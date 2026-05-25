@@ -20,6 +20,7 @@ import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
 import thaumcraft.api.aspects.Aspect;
+import thaumcraft.api.aspects.AspectList;
 import thaumcraft.common.Thaumcraft;
 import thaumcraft.common.config.ConfigItems;
 import thaumcraft.common.items.ItemWispEssence;
@@ -253,12 +254,14 @@ public class EntityWisp extends EntityFlying implements IMob {
     // --- Drops ---
     @Override
     protected void dropFewItems(boolean wasRecentlyHit, int looting) {
-        if (Aspect.getAspect(this.getWispType()) != null) {
+        Aspect wispAspect = Aspect.getAspect(this.getWispType());
+        if (wispAspect != null) {
             ItemStack ess = new ItemStack(ConfigItems.itemWispEssence);
             if (ess.getItem() instanceof ItemWispEssence) {
-                net.minecraft.nbt.NBTTagCompound tag = new net.minecraft.nbt.NBTTagCompound();
-                tag.setString("Aspect", this.getWispType());
-                ess.setTagCompound(tag);
+                ((ItemWispEssence)ess.getItem()).setAspects(
+                    ess,
+                    new AspectList().add(wispAspect, 2)
+                );
             }
             this.entityDropItem(ess, 0.0f);
         }
