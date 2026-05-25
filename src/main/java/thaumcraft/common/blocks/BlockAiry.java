@@ -5,7 +5,6 @@ import java.util.Random;
 import javax.annotation.Nullable;
 import net.minecraft.block.BlockContainer;
 import net.minecraft.block.SoundType;
-import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.PropertyInteger;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
@@ -33,6 +32,7 @@ import thaumcraft.api.aspects.AspectList;
 import thaumcraft.api.entities.IEldritchMob;
 import thaumcraft.api.nodes.INode;
 import thaumcraft.common.Thaumcraft;
+import thaumcraft.common.config.Config;
 import thaumcraft.common.config.ConfigBlocks;
 import thaumcraft.common.config.ConfigItems;
 import thaumcraft.common.items.ItemWispEssence;
@@ -46,9 +46,10 @@ public class BlockAiry extends BlockContainer {
     public static final String[] airyTypes = {"node", "nitor", "leavesFiller1", "leavesFiller2", "wardingFence", "energizedNode", null, null, null, null, "fire", "eerie", "barrier"};
     public static final PropertyInteger TYPE = PropertyInteger.create("type", 0, 12);
     private static final AxisAlignedBB AIRY_AABB = new AxisAlignedBB(0.3D, 0.3D, 0.3D, 0.7D, 0.7D, 0.7D);
+    private static final AxisAlignedBB ZERO_AABB = new AxisAlignedBB(0.0D, 0.0D, 0.0D, 0.0D, 0.0D, 0.0D);
 
     public BlockAiry() {
-        super(Material.AIR);
+        super(Config.airyMaterial);
         this.setHardness(2.0f);
         this.setResistance(200.0f);
         this.setSoundType(SoundType.CLOTH);
@@ -243,7 +244,7 @@ public class BlockAiry extends BlockContainer {
     @Override
     public AxisAlignedBB getSelectedBoundingBox(IBlockState state, World world, BlockPos pos) {
         int meta = this.getMetaFromState(state);
-        return meta == 4 || meta == 12 ? super.getSelectedBoundingBox(state, world, pos) : NULL_AABB;
+        return meta == 4 || meta == 12 ? super.getSelectedBoundingBox(state, world, pos) : ZERO_AABB.offset(pos);
     }
 
     @Override

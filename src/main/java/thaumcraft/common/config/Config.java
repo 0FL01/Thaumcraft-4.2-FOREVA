@@ -187,7 +187,7 @@ public class Config {
     public static final Material taintMaterial;
 
     static {
-        airyMaterial = new Material(MapColor.AIR);
+        airyMaterial = new MaterialAiry(MapColor.AIR);
         fluxGoomaterial = new Material(MapColor.TNT);
         taintMaterial = new Material(MapColor.TNT);
     }

@@ -14,9 +14,21 @@ public class AiryNodeRoutingContractTest {
     @Test
     public void airyNodeFamilyShouldUseTesrWorldRoutingAndRestoreReferenceBlockContracts() throws IOException {
         String blockAiry = read("src/main/java/thaumcraft/common/blocks/BlockAiry.java");
+        String config = read("src/main/java/thaumcraft/common/config/Config.java");
+        String materialAiry = read("src/main/java/thaumcraft/common/config/MaterialAiry.java");
         String clientProxy = read("src/main/java/thaumcraft/client/ClientProxy.java");
         String itemRenderer = read("src/main/java/thaumcraft/client/renderers/item/ItemNodeRenderer.java");
         String itemModel = read("src/main/resources/assets/thaumcraft/models/item/blockairy.json");
+
+        assertTrue("BlockAiry should use the TC4-style airy material instead of vanilla Material.AIR so Forge 1.12 World.isAirBlock does not treat aura nodes as air",
+                blockAiry.contains("super(Config.airyMaterial);")
+                        && config.contains("airyMaterial = new MaterialAiry(MapColor.AIR);")
+                        && materialAiry.contains("extends Material")
+                        && materialAiry.contains("this.setReplaceable();")
+                        && materialAiry.contains("this.setImmovableMobility();")
+                        && materialAiry.contains("public boolean isSolid()")
+                        && materialAiry.contains("return false;")
+                        && materialAiry.contains("public boolean blocksMovement()"));
 
         assertTrue("BlockAiry should route node and energized-node world rendering through TESR while leaving the rest of the airy family on baked models for now",
                 blockAiry.contains("return meta == 0 || meta == 5 ? EnumBlockRenderType.INVISIBLE : EnumBlockRenderType.MODEL;"));
@@ -34,6 +46,8 @@ public class AiryNodeRoutingContractTest {
                         && blockAiry.contains("if (meta == 0 || meta == 2 || meta == 3 || meta == 4 || meta == 5 || meta == 10 || meta == 11 || meta == 12) {")
                         && blockAiry.contains("if (meta == 4 && entity instanceof EntityLivingBase && !(entity instanceof EntityPlayer)) {")
                         && blockAiry.contains("if (meta == 12) {")
+                        && blockAiry.contains("private static final AxisAlignedBB ZERO_AABB = new AxisAlignedBB(0.0D, 0.0D, 0.0D, 0.0D, 0.0D, 0.0D);")
+                        && blockAiry.contains("return meta == 4 || meta == 12 ? super.getSelectedBoundingBox(state, world, pos) : ZERO_AABB.offset(pos);")
                         && blockAiry.contains("return false;")
                         && blockAiry.contains("return this.getMetaFromState(state) == 1 && ConfigItems.itemResource != null ? ConfigItems.itemResource : Items.AIR;")
                         && blockAiry.contains("return this.getMetaFromState(state) == 1 && ConfigItems.itemResource != null")

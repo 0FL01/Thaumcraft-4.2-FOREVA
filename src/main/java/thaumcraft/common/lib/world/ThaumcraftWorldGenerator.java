@@ -28,6 +28,7 @@ import thaumcraft.api.aspects.Aspect;
 import thaumcraft.api.aspects.AspectList;
 import thaumcraft.api.nodes.NodeModifier;
 import thaumcraft.api.nodes.NodeType;
+import thaumcraft.common.Thaumcraft;
 import thaumcraft.common.config.Config;
 import thaumcraft.common.config.ConfigBlocks;
 import thaumcraft.common.lib.world.biomes.BiomeHandler;
@@ -45,6 +46,9 @@ public class ThaumcraftWorldGenerator implements IWorldGenerator {
     public static HashMap<Integer, Integer> dimensionBlacklist = new HashMap<>();
     public static HashMap<Integer, Integer> biomeBlacklist = new HashMap<>();
     private final HashMap<Integer, Boolean> structureNode = new HashMap<>();
+
+    // Debug flag: set true to log every node creation/update attempt
+    public static boolean logNodeGen = false;
 
     // Aspect caches for node generation (lazy-init)
     private static ArrayList<Aspect> basicAspects = new ArrayList<>();
@@ -72,20 +76,83 @@ public class ThaumcraftWorldGenerator implements IWorldGenerator {
 
     /**
      * Creates an aura node TileEntity at the given position.
-     * If the position is air, places BlockAiry(meta 0) first.
-     * Then looks for a TileNode and sets its type/modifier/aspects.
+     * Returns false if the position is occupied by a non-replaceable block
+     * that does not already carry a TileNode.
+     * <p>
+     * If the position is air or replaceable, places BlockAiry(meta 0) first.
+     * If the block at the position already has a TileNode (e.g.
+     * blockCosmeticSolid(8) or blockMagicalLog(2)), reuses it.
+     * After setting type/modifier/aspects, marks the TE dirty and notifies
+     * clients.
      */
-    public static void createNodeAt(World world, BlockPos pos, NodeType nt, NodeModifier nm, AspectList al) {
-        if (world.isAirBlock(pos)) {
-            world.setBlockState(pos, ConfigBlocks.blockAiry.getStateFromMeta(0), 0);
+    public static boolean createNodeAt(World world, BlockPos pos, NodeType nt, NodeModifier nm, AspectList al) {
+        IBlockState oldState = world.getBlockState(pos);
+        Block oldBlock = oldState.getBlock();
+        boolean isAir = world.isAirBlock(pos);
+        boolean isReplaceable = oldBlock.isReplaceable(world, pos);
+        boolean alreadyHasTileNode = world.getTileEntity(pos) instanceof TileNode;
+
+        // Already a node here — just update the TE
+        if (oldBlock == ConfigBlocks.blockAiry && oldState == ConfigBlocks.blockAiry.getStateFromMeta(0)) {
+            TileEntity te = world.getTileEntity(pos);
+            if (te instanceof TileNode) {
+                TileNode node = (TileNode) te;
+                node.setNodeType(nt);
+                node.setNodeModifier(nm);
+                node.setAspects(al);
+                node.markDirty();
+                world.notifyBlockUpdate(pos, oldState, oldState, 3);
+                if (ThaumcraftWorldGenerator.logNodeGen) {
+                    Thaumcraft.log.debug("Node updated at existing blockAiry(0) {}: type={} mod={} aspects={}",
+                            pos, nt, nm, al.size());
+                }
+                return true;
+            }
         }
-        TileEntity te = world.getTileEntity(pos);
-        if (te instanceof TileNode) {
-            ((TileNode) te).setNodeType(nt);
-            ((TileNode) te).setNodeModifier(nm);
-            ((TileNode) te).setAspects(al);
+
+        // Block already carries a TileNode (e.g. blockCosmeticSolid(8) or knot log)
+        if (alreadyHasTileNode) {
+            TileNode node = (TileNode) world.getTileEntity(pos);
+            node.setNodeType(nt);
+            node.setNodeModifier(nm);
+            node.setAspects(al);
+            node.markDirty();
+            world.notifyBlockUpdate(pos, oldState, oldState, 3);
+            if (ThaumcraftWorldGenerator.logNodeGen) {
+                Thaumcraft.log.debug("Node updated on existing TE-carrying block {} at {}: type={} mod={} aspects={}",
+                        oldState, pos, nt, nm, al.size());
+            }
+            return true;
         }
-        world.markBlockRangeForRenderUpdate(pos, pos);
+
+        // Air or replaceable — place blockAiry(0) which creates a TileNode
+        if (isAir || isReplaceable) {
+            world.setBlockState(pos, ConfigBlocks.blockAiry.getStateFromMeta(0), 3);
+            TileEntity te = world.getTileEntity(pos);
+            if (te instanceof TileNode) {
+                TileNode node = (TileNode) te;
+                node.setNodeType(nt);
+                node.setNodeModifier(nm);
+                node.setAspects(al);
+                node.markDirty();
+                world.notifyBlockUpdate(pos, ConfigBlocks.blockAiry.getStateFromMeta(0),
+                        ConfigBlocks.blockAiry.getStateFromMeta(0), 3);
+                if (ThaumcraftWorldGenerator.logNodeGen) {
+                    Thaumcraft.log.debug("Node created at {} (was {}): type={} mod={} aspects={}",
+                            pos, oldState.getBlock().getRegistryName(), nt, nm, al.size());
+                }
+                return true;
+            }
+            // TileNode wasn't created — unexpected
+            Thaumcraft.log.warn("Failed to create TileNode at {} after placing blockAiry, TE={}",
+                    pos, world.getTileEntity(pos));
+            return false;
+        }
+
+        // Position occupied by a non-replaceable solid block without a TileNode
+        Thaumcraft.log.warn("Cannot create node at {}: occupied by {} (isAir={} replaceable={} hasTileNode={})",
+                pos, oldState, isAir, isReplaceable, alreadyHasTileNode);
+        return false;
     }
 
     /**
@@ -253,7 +320,18 @@ public class ThaumcraftWorldGenerator implements IWorldGenerator {
             al.merge(al.getAspectsSorted()[a], (int) ((float) spread[a] / total * (float) value));
         }
 
-        createNodeAt(world, pos, type, modifier, al);
+        if (logNodeGen) {
+            IBlockState stateAt = world.getBlockState(pos);
+            TileEntity teAt = world.getTileEntity(pos);
+            Thaumcraft.log.debug("createRandomNodeAt({}): silverwood={} eerie={} small={} type={} mod={} aspects={} block={} isAir={} te={}",
+                    pos, silverwood, eerie, small, type, modifier, al.size(),
+                    stateAt.getBlock().getRegistryName(), world.isAirBlock(pos),
+                    teAt != null ? teAt.getClass().getSimpleName() : "null");
+        }
+        boolean ok = createNodeAt(world, pos, type, modifier, al);
+        if (logNodeGen) {
+            Thaumcraft.log.debug("createRandomNodeAt({}): result={}", pos, ok);
+        }
     }
 
     @Override

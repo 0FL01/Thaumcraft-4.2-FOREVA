@@ -7,6 +7,7 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.ResourceLocation;
 import thaumcraft.api.nodes.IRevealer;
@@ -32,6 +33,20 @@ public class TileNodeRenderer extends TileEntitySpecialRenderer<TileEntity> {
             return;
         }
         INode node = (INode) tile;
+
+        // Separate render-space (camera-relative) from world-space coordinates.
+        // x/y/z from TESR are: blockPos - cameraPos.
+        // render-space: use for actual drawing (GlStateManager.translate).
+        // world-space: use for viewer.getDistance() and isVisibleTo().
+        double renderX = x + 0.5D;
+        double renderY = y + 0.5D;
+        double renderZ = z + 0.5D;
+
+        BlockPos pos = tile.getPos();
+        double worldX = pos.getX() + 0.5D;
+        double worldY = pos.getY() + 0.5D;
+        double worldZ = pos.getZ() + 0.5D;
+
         EntityLivingBase viewer = Minecraft.getMinecraft().player;
         float size = 1.0F;
         double viewDistance = 64.0D;
@@ -51,7 +66,7 @@ public class TileNodeRenderer extends TileEntitySpecialRenderer<TileEntity> {
             } else {
                 ItemStack held = player.getHeldItemMainhand();
                 if (!held.isEmpty() && held.getItem() instanceof ItemThaumometer
-                        && isVisibleTo(0.44F, viewer, x + 0.5D, y + 0.5D, z + 0.5D, 48.0F)) {
+                        && isVisibleTo(0.44F, viewer, worldX, worldY, worldZ, 48.0F)) {
                     visible = true;
                     depthIgnore = true;
                     viewDistance = 48.0D;
@@ -59,8 +74,10 @@ public class TileNodeRenderer extends TileEntitySpecialRenderer<TileEntity> {
             }
         }
 
-        renderNode(viewer, viewDistance, visible, depthIgnore, size,
-                x + 0.5D, y + 0.5D, z + 0.5D, partialTicks,
+        renderNodeSeeded(viewer, viewDistance, visible, depthIgnore, size,
+                renderX, renderY, renderZ,
+                worldX, worldY, worldZ,
+                partialTicks,
                 node.getAspects(), node.getNodeType(), node.getNodeModifier(), 0);
     }
 
@@ -108,12 +125,40 @@ public class TileNodeRenderer extends TileEntitySpecialRenderer<TileEntity> {
         renderNodeSeeded(viewer, viewDistance, visible, depthIgnore, size, x, y, z, partialTicks, aspects, type, modifier, seed);
     }
 
+    /**
+     * Backward-compatible overload: uses the same coordinates for both render and world-space.
+     * Called from public static renderNode() / renderNodeAt() wrappers.
+     */
     private static void renderNodeSeeded(EntityLivingBase viewer,
                                          double viewDistance,
                                          boolean visible,
                                          boolean depthIgnore,
                                          float size,
                                          double x, double y, double z,
+                                         float partialTicks,
+                                         AspectList aspects,
+                                         NodeType type,
+                                         NodeModifier modifier,
+                                         int seed) {
+        renderNodeSeeded(viewer, viewDistance, visible, depthIgnore, size,
+                x, y, z,
+                x, y, z,
+                partialTicks, aspects, type, modifier, seed);
+    }
+
+    /**
+     * Core render implementation with separated render-space and world-space coordinates.
+     * <p>
+     * renderX/Y/Z — camera-relative coordinates, used for actual drawing (renderFacingStrip).
+     * worldX/Y/Z — absolute world coordinates, used for distance/visibility checks.
+     */
+    private static void renderNodeSeeded(EntityLivingBase viewer,
+                                         double viewDistance,
+                                         boolean visible,
+                                         boolean depthIgnore,
+                                         float size,
+                                         double renderX, double renderY, double renderZ,
+                                         double worldX, double worldY, double worldZ,
                                          float partialTicks,
                                          AspectList aspects,
                                          NodeType type,
@@ -126,7 +171,7 @@ public class TileNodeRenderer extends TileEntitySpecialRenderer<TileEntity> {
         if (aspects != null && aspects.size() > 0 && visible) {
             float alpha = 1.0F;
             if (viewer != null) {
-                double distance = viewer.getDistance(x, y, z);
+                double distance = viewer.getDistance(worldX, worldY, worldZ);
                 if (distance > viewDistance) return;
                 alpha = (float) ((viewDistance - distance) / viewDistance);
             }
@@ -157,7 +202,7 @@ public class TileNodeRenderer extends TileEntitySpecialRenderer<TileEntity> {
                 float scale = (float) Math.sin(viewerTicks(viewer, partialTicks) / (14.0F - count)) * bscale + bscale * 2.0F;
                 scale = 0.2F + scale * (aspects.getAmount(aspect) / 50.0F);
                 float angle = (float) (time % (5000L + 500L * count)) / (5000.0F + 500.0F * count) * ((float) Math.PI * 2.0F);
-                renderFacingStrip(x, y, z, angle, scale * size, aspectAlpha / Math.max(1.0F, aspects.size() / 2.0F),
+                renderFacingStrip(renderX, renderY, renderZ, angle, scale * size, aspectAlpha / Math.max(1.0F, aspects.size() / 2.0F),
                         FRAMES, 0, frame, aspect.getColor());
                 GlStateManager.disableBlend();
                 count++;
@@ -199,7 +244,7 @@ public class TileNodeRenderer extends TileEntitySpecialRenderer<TileEntity> {
                         break;
                 }
             }
-            renderFacingStrip(x, y, z, angle, centerScale, alpha, FRAMES, strip, frame, 0xFFFFFF);
+            renderFacingStrip(renderX, renderY, renderZ, angle, centerScale, alpha, FRAMES, strip, frame, 0xFFFFFF);
             GlStateManager.disableBlend();
 
             GlStateManager.enableCull();
@@ -215,7 +260,7 @@ public class TileNodeRenderer extends TileEntitySpecialRenderer<TileEntity> {
         GlStateManager.enableBlend();
         GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE);
         GlStateManager.depthMask(false);
-        renderFacingStrip(x, y, z, 0.0F, 0.5F, 0.1F, FRAMES, 1, frame, 0xFFFFFF);
+        renderFacingStrip(renderX, renderY, renderZ, 0.0F, 0.5F, 0.1F, FRAMES, 1, frame, 0xFFFFFF);
         GlStateManager.depthMask(true);
         GlStateManager.disableBlend();
         GlStateManager.alphaFunc(GL11.GL_GREATER, 0.1F);
