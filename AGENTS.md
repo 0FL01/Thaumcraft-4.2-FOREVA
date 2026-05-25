@@ -7,7 +7,6 @@ This repository is a work-in-progress Java 8 Minecraft Forge 1.12.2 port of Thau
 Read these files before changing code:
 
 - `AGENTS.md`
-- `docs/PRD.md`
 - `build.gradle`
 - `Dockerfile`
 
@@ -27,7 +26,7 @@ Asset origin: assets (textures, sounds, models, lang, shaders, etc.) for the por
 - Do not perform broad formatting-only cleanup.
 - Do not make unrelated dependency changes.
 - Do not claim parity based on compile success alone.
-- Preserve existing behavior unless the current task or `docs/PRD.md` explicitly authorizes a behavior change.
+- Preserve existing behavior unless the current task explicitly authorizes a behavior change.
 
 ## Project stack
 
@@ -53,7 +52,7 @@ Asset origin: assets (textures, sounds, models, lang, shaders, etc.) for the por
 
 ## Current status guard
 
-Use the phase guidance in `docs/PRD.md` and the explicit deferrals below as the active pre-Phase8 mine list. Do not convert prior `compileJava`/`build` success into parity closure. Current explicit deferrals include Portable Hole/Warding visual renderers, Phase 8 client GUI/render/FX/shader work, Phase 9 recipe/research/content registration, Hover Harness flight behavior, and Outer Lands runtime/portal parity validation. The active target is fresh worlds; old 1.7.10/WIP saves and external player-data imports are out of scope.
+The explicit deferrals below define the active pre-Phase8 mine list. Do not convert prior `compileJava`/`build` success into parity closure. Current explicit deferrals include Portable Hole/Warding visual renderers, Phase 8 client GUI/render/FX/shader work, Phase 9 recipe/research/content registration, Hover Harness flight behavior, and Outer Lands runtime/portal parity validation. The active target is fresh worlds; old 1.7.10/WIP saves and external player-data imports are out of scope.
 
 ## Commit policy
 
@@ -192,3 +191,11 @@ Stop as blocked when:
 - validation cannot run due to missing environment;
 - build/test failures are unclear;
 - completing the task would require out-of-scope dependency or architecture changes.
+
+## Background subagents
+
+- Prefer `background: true` when delegating independent work via the task tool.
+- Do not wait or poll unless asked; keep the main conversation moving.
+- After spawning a background task, report its subagent type, short description, and `task_id`.
+- Poll with `task_status` only when the result is needed to continue or I explicitly ask.
+- Do not background sequential, destructive, or confirmation-dependent work.
