@@ -191,7 +191,14 @@ public class ItemThaumometerRenderer extends TileEntityItemStackRenderer {
 
         if (!targetStack.isEmpty()) {
             try {
-                title = targetStack.getDisplayName();
+                // Placed fluid blocks use bucket item as scan target; show block name instead
+                if (scan.phenomena != null && scan.phenomena.equals("FLUID_WATER")) {
+                    title = net.minecraft.client.resources.I18n.format("tile.water.name");
+                } else if (scan.phenomena != null && scan.phenomena.equals("FLUID_LAVA")) {
+                    title = net.minecraft.client.resources.I18n.format("tile.lava.name");
+                } else {
+                    title = targetStack.getDisplayName();
+                }
             } catch (Exception ignored) {
             }
         }

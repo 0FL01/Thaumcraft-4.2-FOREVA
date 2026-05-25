@@ -35,11 +35,12 @@ public class ItemThaumometerStaticGuardTest {
                         && source.contains("player.stopActiveHand();")
                         && source.contains("ScanManager.completeScan(player, current, \"@\")")
                         && source.contains("PacketHandler.INSTANCE.sendToServer(new PacketScannedToServer(current, player, \"@\"))"));
-        assertTrue("Thaumometer block scan must keep protected pick-block path with fallback stack creation",
+        assertTrue("Thaumometer block scan must keep protected pick-block path with aspect-aware candidate ordering",
                 source.contains("try {")
-                        && source.contains("target = block.getPickBlock(state, hit, world, pos, player);")
+                        && source.contains("result = toTaggedItemScan(block.getPickBlock(state, hit, world, pos, player), world);")
                         && source.contains("} catch (Exception ignored)")
-                        && source.contains("target = BlockUtils.createStackedBlock(block, meta);"));
+                        && source.contains("BlockUtils.createStackedBlock(block, dropMeta), world);")
+                        && source.contains("if (block == Blocks.WATER || block == Blocks.FLOWING_WATER)"));
         assertTrue("Thaumometer should keep the original permissive pointed-entity route and separate raw target selection from validated scan completion",
                 source.contains("public ScanResult findRawScanTarget(ItemStack stack, World world, EntityPlayer player)")
                         && source.contains("EntityUtils.getPointedEntity(world, player, 0.5D, 10.0D, 0.0F, true)")

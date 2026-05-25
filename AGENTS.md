@@ -192,10 +192,3 @@ Stop as blocked when:
 - build/test failures are unclear;
 - completing the task would require out-of-scope dependency or architecture changes.
 
-## Background subagents
-
-- Prefer `background: true` when delegating independent work via the task tool.
-- Do not wait or poll unless asked; keep the main conversation moving.
-- After spawning a background task, report its subagent type, short description, and `task_id`.
-- Poll with `task_status` only when the result is needed to continue or I explicitly ask.
-- Do not background sequential, destructive, or confirmation-dependent work.

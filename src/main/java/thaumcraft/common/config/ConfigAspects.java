@@ -81,6 +81,47 @@ public class ConfigAspects {
         // Nether
         ThaumcraftApi.registerObjectTag(new ItemStack(Blocks.NETHERRACK), new AspectList().add(Aspect.EARTH, 1).add(Aspect.FIRE, 2));
         ThaumcraftApi.registerObjectTag(new ItemStack(Blocks.SOUL_SAND), new AspectList().add(Aspect.EARTH, 1).add(Aspect.SOUL, 2).add(Aspect.DEATH, 1));
+
+        // Tall grass / fern (meta 0=dead shrub is handled by DEADBUSH; tags only for 1=grass, 2=fern)
+        ThaumcraftApi.registerObjectTag(
+                new ItemStack(Blocks.TALLGRASS, 1, 1),
+                new int[] { 1, 2 },
+                new AspectList().add(Aspect.PLANT, 1).add(Aspect.EARTH, 1));
+
+        // Flowers
+        ThaumcraftApi.registerObjectTag(
+                new ItemStack(Blocks.YELLOW_FLOWER, 1, 0),
+                new AspectList().add(Aspect.PLANT, 2).add(Aspect.LIFE, 1));
+
+        ThaumcraftApi.registerObjectTag(
+                new ItemStack(Blocks.RED_FLOWER, 1, OreDictionary.WILDCARD_VALUE),
+                new AspectList().add(Aspect.PLANT, 2).add(Aspect.LIFE, 1));
+
+        // Small mushrooms
+        ThaumcraftApi.registerObjectTag(
+                new ItemStack(Blocks.BROWN_MUSHROOM),
+                new AspectList().add(Aspect.PLANT, 1).add(Aspect.DARKNESS, 1));
+        ThaumcraftApi.registerObjectTag(
+                new ItemStack(Blocks.RED_MUSHROOM),
+                new AspectList().add(Aspect.PLANT, 1).add(Aspect.POISON, 1));
+
+        // Mushroom blocks
+        ThaumcraftApi.registerObjectTag(
+                new ItemStack(Blocks.BROWN_MUSHROOM_BLOCK),
+                new AspectList().add(Aspect.PLANT, 3).add(Aspect.DARKNESS, 2));
+        ThaumcraftApi.registerObjectTag(
+                new ItemStack(Blocks.RED_MUSHROOM_BLOCK),
+                new AspectList().add(Aspect.PLANT, 3).add(Aspect.POISON, 2));
+
+        // Dead bush
+        ThaumcraftApi.registerObjectTag(
+                new ItemStack(Blocks.DEADBUSH),
+                new AspectList().add(Aspect.PLANT, 1).add(Aspect.DEATH, 1));
+
+        // Double plants (sunflower, lilac, tall grass, fern, rose, peony)
+        ThaumcraftApi.registerObjectTag(
+                new ItemStack(Blocks.DOUBLE_PLANT, 1, OreDictionary.WILDCARD_VALUE),
+                new AspectList().add(Aspect.PLANT, 3).add(Aspect.LIFE, 1));
     }
 
     private static void registerVanillaItems() {
@@ -157,6 +198,14 @@ public class ConfigAspects {
         ThaumcraftApi.registerObjectTag(new ItemStack(Items.PAPER), new AspectList().add(Aspect.TREE, 1).add(Aspect.MIND, 1));
         ThaumcraftApi.registerObjectTag(new ItemStack(Items.FLINT), new AspectList().add(Aspect.EARTH, 1).add(Aspect.TOOL, 1));
         ThaumcraftApi.registerObjectTag(new ItemStack(Items.BUCKET), new AspectList().add(Aspect.METAL, 3).add(Aspect.VOID, 1));
+
+        // Fluid bucket item tags (used by placed fluid scan fallback)
+        ThaumcraftApi.registerObjectTag(
+                new ItemStack(Items.WATER_BUCKET),
+                new AspectList().add(Aspect.WATER, 3));
+        ThaumcraftApi.registerObjectTag(
+                new ItemStack(Items.LAVA_BUCKET),
+                new AspectList().add(Aspect.FIRE, 3).add(Aspect.EARTH, 1));
     }
 
     private static void registerVanillaUtilityAndMechanismTags() {

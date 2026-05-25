@@ -5,6 +5,8 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Blocks;
+import net.minecraft.init.Items;
 import net.minecraft.item.EnumAction;
 import net.minecraft.item.EnumRarity;
 import net.minecraft.item.Item;
@@ -148,16 +150,45 @@ public class ItemThaumometer extends Item {
             IBlockState state = world.getBlockState(pos);
             Block block = state.getBlock();
             int meta = block.getMetaFromState(state);
-            ItemStack target = ItemStack.EMPTY;
+
+            // Try candidates in order, returning first one with actual aspects
+            ScanResult result = null;
+
+            // 1. Pick block (what you'd get in creative)
             try {
-                target = block.getPickBlock(state, hit, world, pos, player);
-            } catch (Exception ignored) {
+                result = toTaggedItemScan(block.getPickBlock(state, hit, world, pos, player), world);
+            } catch (Exception ignored) {}
+            if (result != null) return result;
+
+            // 2. Damage-dropped meta (what you'd get from breaking)
+            int dropMeta = meta;
+            try {
+                dropMeta = block.damageDropped(state);
+            } catch (Exception ignored) {}
+            result = toTaggedItemScan(BlockUtils.createStackedBlock(block, dropMeta), world);
+            if (result != null) return result;
+
+            // 3. Raw meta (if different from damage-dropped)
+            if (dropMeta != meta) {
+                result = toTaggedItemScan(BlockUtils.createStackedBlock(block, meta), world);
+                if (result != null) return result;
             }
-            if (target == null || target.isEmpty()) {
-                target = BlockUtils.createStackedBlock(block, meta);
+
+            // 4. Explicit fluid fallback (bucket items).
+            // Tag phenomena so the renderer can show "Water" / "Lava" instead of bucket names.
+            if (block == Blocks.WATER || block == Blocks.FLOWING_WATER) {
+                result = toTaggedItemScan(new ItemStack(Items.WATER_BUCKET), world);
+                if (result != null) {
+                    result.phenomena = "FLUID_WATER";
+                    return result;
+                }
             }
-            if (!target.isEmpty()) {
-                return new ScanResult((byte)1, Item.getIdFromItem(target.getItem()), target.getMetadata(), null, "");
+            if (block == Blocks.LAVA || block == Blocks.FLOWING_LAVA) {
+                result = toTaggedItemScan(new ItemStack(Items.LAVA_BUCKET), world);
+                if (result != null) {
+                    result.phenomena = "FLUID_LAVA";
+                    return result;
+                }
             }
         }
 
@@ -209,6 +240,24 @@ public class ItemThaumometer extends Item {
                 blue,
                 15,
                 0.03F);
+    }
+
+    /**
+     * Creates a ScanResult for an ItemStack only if it has non-empty aspects.
+     * Returns null if the stack is empty or has no registered aspects.
+     */
+    private static ScanResult toTaggedItemScan(ItemStack target, World world) {
+        if (target == null || target.isEmpty()) {
+            return null;
+        }
+        ScanResult result = new ScanResult(
+                (byte) 1,
+                Item.getIdFromItem(target.getItem()),
+                target.getMetadata(),
+                null,
+                ""
+        );
+        return ScanManager.getScanAspects(result, world).size() > 0 ? result : null;
     }
 
     private static void logFallbackDebug(EntityPlayer player, ItemStack heldStack, ScanResult result, IScanEventHandler handler) {
