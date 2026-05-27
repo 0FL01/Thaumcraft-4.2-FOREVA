@@ -2,6 +2,7 @@ package thaumcraft.client.renderers.tile;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
@@ -29,7 +30,6 @@ public class TileNodeRenderer extends TileEntitySpecialRenderer<TileEntity> {
             .add(Aspect.MAGIC, 25)
             .add(Aspect.AIR, 25);
     private static final int FRAMES = 32;
-    private static final int STRIPS = 8;
 
     @Override
     public void render(TileEntity tile, double x, double y, double z, float partialTicks, int destroyStage, float alpha) {
@@ -68,8 +68,7 @@ public class TileNodeRenderer extends TileEntitySpecialRenderer<TileEntity> {
                 visible = true;
                 depthIgnore = true;
             } else {
-                ItemStack held = player.getHeldItemMainhand();
-                if (!held.isEmpty() && held.getItem() instanceof ItemThaumometer
+                if (isHoldingThaumometer(player)
                         && isVisibleTo(0.44F, viewer, worldX, worldY, worldZ, 48.0F)) {
                     visible = true;
                     depthIgnore = true;
@@ -192,6 +191,7 @@ public class TileNodeRenderer extends TileEntitySpecialRenderer<TileEntity> {
             else if (modifier == NodeModifier.PALE) alpha *= 0.66F;
             else if (modifier == NodeModifier.FADING) alpha *= (float) Math.sin(viewerTicks(viewer, partialTicks) / 3.0F) * 0.25F + 0.33F;
 
+            NodeLightState lightState = enableNodeLighting();
             GlStateManager.pushMatrix();
             GlStateManager.alphaFunc(GL11.GL_GREATER, 1.0F / 255.0F);
             GlStateManager.depthMask(false);
@@ -256,7 +256,7 @@ public class TileNodeRenderer extends TileEntitySpecialRenderer<TileEntity> {
                         break;
                 }
             }
-            renderFacingStrip(renderX, renderY, renderZ, angle, centerScale, alpha, FRAMES, strip, frame, 0xFF00FF);
+            renderFacingStrip(renderX, renderY, renderZ, angle, centerScale, alpha, FRAMES, strip, frame, 0xFFFFFF);
             GlStateManager.disableBlend();
 
             GlStateManager.enableCull();
@@ -264,21 +264,60 @@ public class TileNodeRenderer extends TileEntitySpecialRenderer<TileEntity> {
             GlStateManager.depthMask(true);
             GlStateManager.alphaFunc(GL11.GL_GREATER, 0.1F);
             GlStateManager.popMatrix();
+            restoreNodeLighting(lightState);
             return;
         }
 
+        NodeLightState lightState = enableNodeLighting();
         GlStateManager.pushMatrix();
         GlStateManager.alphaFunc(GL11.GL_GREATER, 1.0F / 255.0F);
         GlStateManager.enableBlend();
         GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE);
         GlStateManager.depthMask(false);
         if (depthIgnore) GlStateManager.disableDepth();
-        renderFacingStrip(renderX, renderY, renderZ, 0.0F, 0.5F, visible ? 0.35F : 0.1F, FRAMES, 1, frame, 0xFF00FF);
+        renderFacingStrip(renderX, renderY, renderZ, 0.0F, 0.5F, 0.1F, FRAMES, 1, frame, 0xFFFFFF);
         if (depthIgnore) GlStateManager.enableDepth();
         GlStateManager.depthMask(true);
         GlStateManager.disableBlend();
         GlStateManager.alphaFunc(GL11.GL_GREATER, 0.1F);
         GlStateManager.popMatrix();
+        restoreNodeLighting(lightState);
+    }
+
+    private static boolean isHoldingThaumometer(EntityPlayer player) {
+        ItemStack main = player.getHeldItemMainhand();
+        ItemStack off = player.getHeldItemOffhand();
+        return (!main.isEmpty() && main.getItem() instanceof ItemThaumometer)
+                || (!off.isEmpty() && off.getItem() instanceof ItemThaumometer);
+    }
+
+    private static NodeLightState enableNodeLighting() {
+        NodeLightState state = new NodeLightState(OpenGlHelper.lastBrightnessX, OpenGlHelper.lastBrightnessY,
+                GL11.glIsEnabled(GL11.GL_LIGHTING));
+        GlStateManager.disableLighting();
+        OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, 220.0F, 220.0F);
+        return state;
+    }
+
+    private static void restoreNodeLighting(NodeLightState state) {
+        OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, state.lightX, state.lightY);
+        if (state.lightingEnabled) {
+            GlStateManager.enableLighting();
+        } else {
+            GlStateManager.disableLighting();
+        }
+    }
+
+    private static final class NodeLightState {
+        private final float lightX;
+        private final float lightY;
+        private final boolean lightingEnabled;
+
+        private NodeLightState(float lightX, float lightY, boolean lightingEnabled) {
+            this.lightX = lightX;
+            this.lightY = lightY;
+            this.lightingEnabled = lightingEnabled;
+        }
     }
 
     private static void renderFacingStrip(double x, double y, double z,
@@ -288,8 +327,8 @@ public class TileNodeRenderer extends TileEntitySpecialRenderer<TileEntity> {
         int argb = ((int) (clampedAlpha * 255.0F) << 24) | (color & 0x00FFFFFF);
         float u0 = frame / (float) frames;
         float u1 = (frame + 1) / (float) frames;
-        float v0 = strip / (float) STRIPS;
-        float v1 = v0 + 1.0F / STRIPS;
+        float v0 = strip / (float) frames;
+        float v1 = (strip + 1) / (float) frames;
 
         GlStateManager.pushMatrix();
         GlStateManager.translate(x, y, z);

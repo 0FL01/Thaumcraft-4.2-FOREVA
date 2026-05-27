@@ -17,6 +17,7 @@ public class AiryNodeRoutingContractTest {
         String config = read("src/main/java/thaumcraft/common/config/Config.java");
         String materialAiry = read("src/main/java/thaumcraft/common/config/MaterialAiry.java");
         String clientProxy = read("src/main/java/thaumcraft/client/ClientProxy.java");
+        String tileRenderer = read("src/main/java/thaumcraft/client/renderers/tile/TileNodeRenderer.java");
         String itemRenderer = read("src/main/java/thaumcraft/client/renderers/item/ItemNodeRenderer.java");
         String itemModel = read("src/main/resources/assets/thaumcraft/models/item/blockairy.json");
 
@@ -51,6 +52,9 @@ public class AiryNodeRoutingContractTest {
                         && blockAiry.contains("return false;")
                         && blockAiry.contains("return this.getMetaFromState(state) == 1 && ConfigItems.itemResource != null ? ConfigItems.itemResource : Items.AIR;")
                         && blockAiry.contains("return this.getMetaFromState(state) == 1 && ConfigItems.itemResource != null")
+                        && blockAiry.contains("public void onBlockPlacedBy(World worldIn, BlockPos pos, IBlockState state, EntityLivingBase placer, ItemStack stack)")
+                        && blockAiry.contains("stack.getMetadata() == 0 && placer instanceof EntityPlayer")
+                        && blockAiry.contains("ThaumcraftWorldGenerator.createRandomNodeAt(worldIn, pos, worldIn.rand, false, false, false);")
                         && blockAiry.contains("if (this.getMetaFromState(state) == 0 && !worldIn.isRemote && te instanceof INode && ConfigItems.itemWispEssence != null) {")
                         && blockAiry.contains("((ItemWispEssence) itemstack.getItem()).setAspects(itemstack, new AspectList().add(aspect, 2));"));
 
@@ -62,9 +66,24 @@ public class AiryNodeRoutingContractTest {
                         && clientProxy.contains("registerBuiltinItemModel(airyItem, 5, \"blockairy\");")
                         && clientProxy.contains("airyItem.setTileEntityItemStackRenderer(new ItemNodeRenderer());"));
 
-        assertTrue("ItemNodeRenderer and the airy item-model stub must keep the dedicated inventory node render path for metas 0 and 5",
+        assertTrue("TileNodeRenderer should sample the TC4 32x32 nodes.png sheet, not compress node strips into an 8-row grid",
+                tileRenderer.contains("public static final ResourceLocation NODES_TEXTURE")
+                        && tileRenderer.contains("new ResourceLocation(\"thaumcraft\", \"textures/misc/nodes.png\")")
+                        && tileRenderer.contains("float v0 = strip / (float) frames;")
+                        && tileRenderer.contains("float v1 = (strip + 1) / (float) frames;")
+                        && tileRenderer.contains("renderFacingStrip(renderX, renderY, renderZ, angle, centerScale, alpha, FRAMES, strip, frame, 0xFFFFFF);")
+                        && tileRenderer.contains("private static boolean isHoldingThaumometer(EntityPlayer player)")
+                        && tileRenderer.contains("player.getHeldItemOffhand()")
+                        && tileRenderer.contains("OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, 220.0F, 220.0F);")
+                        && tileRenderer.contains("renderFacingStrip(renderX, renderY, renderZ, 0.0F, 0.5F, 0.1F, FRAMES, 1, frame, 0xFFFFFF);")
+                        && !tileRenderer.contains("STRIPS = 8"));
+
+        assertTrue("ItemNodeRenderer and the airy item-model stub must keep the dedicated inventory node sprite path for metas 0 and 5",
                 itemRenderer.contains("if (meta != 0 && meta != 5)")
-                        && itemRenderer.contains("TileNodeRenderer.renderNode(")
+                        && itemRenderer.contains("Minecraft.getMinecraft().getTextureManager().bindTexture(TileNodeRenderer.NODES_TEXTURE);")
+                        && itemRenderer.contains("drawAnimatedQuadStrip(scale, alpha, frames, strip, frame, 0xFFFFFF);")
+                        && itemRenderer.contains("float v0 = strip / (float) frames;")
+                        && !itemRenderer.contains("TileNodeRenderer.renderNode(")
                         && itemRenderer.contains("GlStateManager.scale(2.0D, 2.0D, 2.0D);")
                         && itemModel.contains("\"parent\": \"builtin/entity\""));
     }

@@ -36,6 +36,7 @@ import thaumcraft.common.config.Config;
 import thaumcraft.common.config.ConfigBlocks;
 import thaumcraft.common.config.ConfigItems;
 import thaumcraft.common.items.ItemWispEssence;
+import thaumcraft.common.lib.world.ThaumcraftWorldGenerator;
 import thaumcraft.common.tiles.TileNode;
 import thaumcraft.common.tiles.TileNodeEnergized;
 import thaumcraft.common.tiles.TileNitor;
@@ -133,6 +134,14 @@ public class BlockAiry extends BlockContainer {
     @Override
     public TileEntity createTileEntity(World world, IBlockState state) {
         return createNewTileEntity(world, this.getMetaFromState(state));
+    }
+
+    @Override
+    public void onBlockPlacedBy(World worldIn, BlockPos pos, IBlockState state, EntityLivingBase placer, ItemStack stack) {
+        if (!worldIn.isRemote && stack.getMetadata() == 0 && placer instanceof EntityPlayer) {
+            ThaumcraftWorldGenerator.createRandomNodeAt(worldIn, pos, worldIn.rand, false, false, false);
+        }
+        super.onBlockPlacedBy(worldIn, pos, state, placer, stack);
     }
 
     @Override

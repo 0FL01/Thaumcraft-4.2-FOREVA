@@ -39,11 +39,13 @@ public class VisEnergyRendererFidelityStaticGuardTest {
                         && nodeCoreRenderer.contains("strip = 4;")
                         && nodeCoreRenderer.contains("case HUNGRY:")
                         && nodeCoreRenderer.contains("centerScale *= 0.75F;")
-                        && nodeCoreRenderer.contains("0xFF00FF")
+                        && nodeCoreRenderer.contains("0xFFFFFF")
+                        && !nodeCoreRenderer.contains("0xFF00FF")
                         && nodeCoreRenderer.contains("DEFAULT_NODE_ASPECTS")
                         && nodeCoreRenderer.contains("node.getAspectsBase()")
                         && nodeCoreRenderer.contains("pos.getX()")
-                        && nodeCoreRenderer.contains("visible ? 0.35F : 0.1F")
+                        && nodeCoreRenderer.contains("OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, 220.0F, 220.0F);")
+                        && nodeCoreRenderer.contains("renderFacingStrip(renderX, renderY, renderZ, 0.0F, 0.5F, 0.1F, FRAMES, 1, frame, 0xFFFFFF)")
                         && nodeCoreRenderer.contains("renderNodeSeeded("));
 
         assertTrue("TileNodeEnergizedRenderer should keep node-core rendering and animated lightning-ring overlay",
