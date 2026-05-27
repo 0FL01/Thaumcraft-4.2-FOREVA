@@ -184,6 +184,7 @@ public class ItemThaumometerRenderer extends TileEntityItemStackRenderer {
                 int nodeTitleWidth = font.getStringWidth(nodeTitle);
                 GlStateManager.scale(0.004F * HUD_SCALE_MULTIPLIER, 0.004F * HUD_SCALE_MULTIPLIER, 0.004F * HUD_SCALE_MULTIPLIER);
                 font.drawString(nodeTitle, -nodeTitleWidth / 2, -40, 15642134, false);
+                title = "";
                 GlStateManager.disableBlend();
                 GlStateManager.popMatrix();
             }

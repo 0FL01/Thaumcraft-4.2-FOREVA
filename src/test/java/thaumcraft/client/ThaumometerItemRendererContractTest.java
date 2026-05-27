@@ -63,6 +63,8 @@ public class ThaumometerItemRendererContractTest {
                         && renderer.contains("1.875F")
                         && renderer.contains("GlStateManager.scale(0.0075F * HUD_SCALE_MULTIPLIER, 0.0075F * HUD_SCALE_MULTIPLIER, 0.0075F * HUD_SCALE_MULTIPLIER);")
                         && renderer.contains("GlStateManager.scale(0.004F * HUD_SCALE_MULTIPLIER, 0.004F * HUD_SCALE_MULTIPLIER, 0.004F * HUD_SCALE_MULTIPLIER);")
+                        && renderer.contains("font.drawString(nodeTitle, -nodeTitleWidth / 2, -40, 15642134, false);")
+                        && renderer.contains("title = \"\";")
                         && renderer.contains("GlStateManager.translate(0.0F, -0.25F, 0.0F);")
                         && renderer.contains("scale -= 0.000025F * (titleWidth - 90);"));
 
