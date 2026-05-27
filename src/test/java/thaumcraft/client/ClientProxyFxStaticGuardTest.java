@@ -213,6 +213,14 @@ public class ClientProxyFxStaticGuardTest {
                         && renderHandler.contains("public static BlockPos scanPos = BlockPos.ORIGIN;")
                         && renderHandler.contains("public static void startScan(Entity entity, BlockPos pos, long expireAtMs, int range)")
                         && renderHandler.contains("scanExpireAtMs"));
+        assertTrue("RenderEventHandler must keep the TC4 goggles popup route for aspect containers and invisible Aura Nodes",
+                renderHandler.contains("helmet.getItem() instanceof IGoggles")
+                        && renderHandler.contains(".showIngamePopups(helmet, player)")
+                        && renderHandler.contains("tile instanceof IAspectContainer")
+                        && renderHandler.contains("tile instanceof INode")
+                        && renderHandler.contains("ItemThaumometer.findLookedAtNodeTile(player.world, player, 10.0D)")
+                        && renderHandler.contains("drawTagsOnContainer(")
+                        && renderHandler.contains("UtilsFX.drawTag("));
         assertTrue("ParticleEngine must keep queued particle intake + tick drain + effectRenderer dispatch baseline",
                 particleEngine.contains("public static void addEffect(World world, Particle particle)")
                         && particleEngine.contains("pendingParticles")

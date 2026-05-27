@@ -1,6 +1,5 @@
 package thaumcraft.client.lib;
 
-import java.awt.Color;
 import java.util.HashMap;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
@@ -21,10 +20,12 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.World;
 import net.minecraftforge.client.event.DrawBlockHighlightEvent;
 import net.minecraftforge.client.event.EntityViewRenderEvent;
@@ -36,9 +37,15 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.oredict.OreDictionary;
 import org.lwjgl.opengl.GL11;
+import thaumcraft.api.IGoggles;
+import thaumcraft.api.aspects.Aspect;
+import thaumcraft.api.aspects.AspectList;
+import thaumcraft.api.aspects.IAspectContainer;
+import thaumcraft.api.nodes.INode;
 import thaumcraft.api.research.ScanResult;
 import thaumcraft.common.entities.monster.mods.ChampionModifier;
 import thaumcraft.common.config.Config;
+import thaumcraft.common.items.relics.ItemThaumometer;
 import thaumcraft.common.lib.utils.EntityUtils;
 import thaumcraft.common.lib.research.ScanManager;
 
@@ -54,6 +61,7 @@ public class RenderEventHandler {
     public static int fogDuration = 0;
     public static float prevVignetteBrightness = 0.0F;
     public static float targetBrightness = 1.0F;
+    public static float tagscale = 0.0F;
 
     private static final ResourceLocation VIGNETTE_TEX =
             new ResourceLocation("thaumcraft", "textures/misc/vignette.png");
@@ -147,6 +155,33 @@ public class RenderEventHandler {
 
     @SubscribeEvent
     public void blockHighlight(DrawBlockHighlightEvent event) {
+        EntityPlayer player = event.getPlayer();
+        if (!canShowGogglesPopups(player)) {
+            return;
+        }
+        RayTraceResult target = event.getTarget();
+        if (target == null || target.typeOfHit != RayTraceResult.Type.BLOCK || target.getBlockPos() == null) {
+            return;
+        }
+        TileEntity tile = player.world.getTileEntity(target.getBlockPos());
+        if (!(tile instanceof IAspectContainer) || tile instanceof INode) {
+            return;
+        }
+        AspectList aspects = resolveAspectTags(tile);
+        if (aspects == null || aspects.size() <= 0) {
+            return;
+        }
+
+        BlockPos pos = target.getBlockPos();
+        EnumFacing side = target.sideHit == null ? EnumFacing.UP : target.sideHit;
+        boolean spaceAbove = player.world.isAirBlock(pos.up());
+        double x = pos.getX() + 0.5D + side.getXOffset() * 0.55D;
+        double y = pos.getY() + 0.5D + side.getYOffset() * 0.55D;
+        double z = pos.getZ() + 0.5D + side.getZOffset() * 0.55D;
+        if (spaceAbove) {
+            y = Math.max(y, pos.getY() + 1.15D);
+        }
+        drawTagsOnContainer(x, y, z, aspects, 220, side, event.getPartialTicks());
     }
 
     @SubscribeEvent
@@ -156,6 +191,10 @@ public class RenderEventHandler {
         if (player == null) {
             return;
         }
+        if (tagscale > 0.0F) {
+            tagscale = Math.max(0.0F, tagscale - 0.005F);
+        }
+        renderGogglesNodeTags(event.getPartialTicks(), player);
 
         long now = System.currentTimeMillis();
         if (scanExpireAtMs <= 0L || now >= scanExpireAtMs) {
@@ -198,6 +237,91 @@ public class RenderEventHandler {
         if (scanExpireAtMs > 0L && System.currentTimeMillis() >= scanExpireAtMs) {
             clearScanState();
         }
+    }
+
+    private static boolean canShowGogglesPopups(EntityPlayer player) {
+        if (player == null) {
+            return false;
+        }
+        ItemStack helmet = player.inventory.armorInventory.get(3);
+        return !helmet.isEmpty()
+                && helmet.getItem() instanceof IGoggles
+                && ((IGoggles) helmet.getItem()).showIngamePopups(helmet, player);
+    }
+
+    private static void renderGogglesNodeTags(float partialTicks, EntityPlayer player) {
+        if (!canShowGogglesPopups(player) || player.world == null) {
+            return;
+        }
+        TileEntity tile = ItemThaumometer.findLookedAtNodeTile(player.world, player, 10.0D);
+        if (!(tile instanceof INode)) {
+            return;
+        }
+        AspectList aspects = resolveAspectTags(tile);
+        if (aspects == null || aspects.size() <= 0) {
+            return;
+        }
+        BlockPos pos = tile.getPos();
+        drawTagsOnContainer(pos.getX() + 0.5D, pos.getY() + 1.15D, pos.getZ() + 0.5D,
+                aspects, 220, EnumFacing.UP, partialTicks);
+    }
+
+    private static AspectList resolveAspectTags(TileEntity tile) {
+        if (!(tile instanceof IAspectContainer)) {
+            return null;
+        }
+        AspectList aspects = ((IAspectContainer) tile).getAspects();
+        if ((aspects == null || aspects.size() <= 0) && tile instanceof INode) {
+            aspects = ((INode) tile).getAspectsBase();
+        }
+        return aspects;
+    }
+
+    private static void drawTagsOnContainer(double x, double y, double z, AspectList aspects, int bright, EnumFacing side, float partialTicks) {
+        if (aspects == null || aspects.size() <= 0) {
+            return;
+        }
+        Minecraft mc = Minecraft.getMinecraft();
+        if (mc == null || mc.player == null) {
+            return;
+        }
+        RenderManager renderManager = mc.getRenderManager();
+        tagscale += (0.3F - tagscale) * 0.25F;
+
+        GlStateManager.pushMatrix();
+        GlStateManager.translate(x - renderManager.viewerPosX, y - renderManager.viewerPosY, z - renderManager.viewerPosZ);
+        GlStateManager.rotate(-renderManager.playerViewY, 0.0F, 1.0F, 0.0F);
+        GlStateManager.rotate(renderManager.playerViewX, 1.0F, 0.0F, 0.0F);
+        float scale = 0.025F * Math.max(0.35F, tagscale / 0.3F);
+        GlStateManager.scale(-scale, -scale, scale);
+        GlStateManager.disableDepth();
+        GlStateManager.depthMask(false);
+        GlStateManager.disableLighting();
+
+        int posX = 0;
+        int posY = 0;
+        int rowSize = 5;
+        int remaining = aspects.size();
+        int baseX = Math.min(rowSize, remaining) * 8;
+        for (Aspect aspect : aspects.getAspectsSorted()) {
+            if (aspect == null) {
+                continue;
+            }
+            UtilsFX.drawTag(-baseX + posX * 16, -8 + posY * 16, aspect,
+                    aspects.getAmount(aspect), 0, 0.0D, bright, 1.0F, false);
+            if (++posX >= rowSize) {
+                posX = 0;
+                remaining -= rowSize;
+                posY++;
+                baseX = Math.min(rowSize, remaining) * 8;
+            }
+        }
+
+        GlStateManager.depthMask(true);
+        GlStateManager.enableDepth();
+        GlStateManager.enableLighting();
+        GlStateManager.popMatrix();
+        GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
     }
 
     private static void renderScannedBlocks(float partialTicks, EntityPlayer player, long now) {
