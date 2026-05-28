@@ -17,6 +17,7 @@ import thaumcraft.common.entities.monster.*;
 import thaumcraft.common.entities.monster.boss.*;
 import thaumcraft.common.entities.projectile.*;
 import thaumcraft.common.lib.world.ThaumcraftVillagerTrades;
+import thaumcraft.common.lib.world.ThaumcraftWorldGenerator;
 
 import java.util.Calendar;
 import java.util.ArrayList;
@@ -175,7 +176,8 @@ public class ConfigEntities {
         entitySpawnsInitialized = true;
         if (Config.spawnAngryZombie) {
             addSpawn(EntityBrainyZombie.class, 10, 1, 1, EnumCreatureType.MONSTER,
-                    biome -> !biome.getSpawnableList(EnumCreatureType.MONSTER).isEmpty());
+                    biome -> biome != ThaumcraftWorldGenerator.biomeEldritchLands
+                            && !biome.getSpawnableList(EnumCreatureType.MONSTER).isEmpty());
         }
         if (Config.spawnPech) {
             addSpawn(EntityPech.class, 10, 1, 1, EnumCreatureType.MONSTER,
