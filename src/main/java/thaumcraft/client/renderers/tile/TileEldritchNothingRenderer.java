@@ -7,6 +7,7 @@ import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
+import thaumcraft.client.lib.EldritchDiagnostics;
 import thaumcraft.common.tiles.TileEldritchNothing;
 
 public class TileEldritchNothingRenderer extends TileEntitySpecialRenderer<TileEldritchNothing> {
@@ -19,9 +20,11 @@ public class TileEldritchNothingRenderer extends TileEntitySpecialRenderer<TileE
             return;
         }
 
+        EldritchDiagnostics.nothingTESRCalls++;
+
         Entity viewer = Minecraft.getMinecraft().getRenderViewEntity();
         // LOD: full 16-layer field rendering within 32 blocks, cheap single-quad fallback beyond.
-        boolean inRange = viewer != null && tile.getPos().distanceSq(viewer.posX, viewer.posY, viewer.posZ) < 1024.0D;
+        boolean inRange = viewer != null && tile.getPos().distanceSq(viewer.posX, viewer.posY, viewer.posZ) < 256.0D;
         double viewX = 0.0D;
         double viewY = 0.0D;
         double viewZ = 0.0D;
@@ -40,6 +43,12 @@ public class TileEldritchNothingRenderer extends TileEntitySpecialRenderer<TileE
         for (EnumFacing face : EnumFacing.VALUES) {
             if (shouldRenderFace(tile.getPos(), face)) {
                 float offset = faceAxisOffset(face);
+                EldritchDiagnostics.nothingFacesRendered++;
+                if (inRange) {
+                    EldritchDiagnostics.nothingInRangeFaces++;
+                } else {
+                    EldritchDiagnostics.nothingFarFaces++;
+                }
                 LayeredFieldPlaneHelper.renderLayeredFace(
                         face, x, y, z, offset, inRange, 1.0F, viewX, viewY, viewZ);
             }

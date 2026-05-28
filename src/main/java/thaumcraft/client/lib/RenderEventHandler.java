@@ -191,6 +191,9 @@ public class RenderEventHandler {
         if (player == null) {
             return;
         }
+
+        EldritchDiagnostics.onFrame();
+
         if (tagscale > 0.0F) {
             tagscale = Math.max(0.0F, tagscale - 0.005F);
         }

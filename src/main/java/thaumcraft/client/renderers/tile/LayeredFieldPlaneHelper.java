@@ -13,6 +13,7 @@ import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
 import org.lwjgl.opengl.GL11;
+import thaumcraft.client.lib.EldritchDiagnostics;
 
 final class LayeredFieldPlaneHelper {
     static final ResourceLocation TUNNEL_TEXTURE =
@@ -64,6 +65,7 @@ final class LayeredFieldPlaneHelper {
             float maxA,
             float minB,
             float maxB) {
+        EldritchDiagnostics.fieldHelperFaces++;
         if (!inRange) {
             Minecraft.getMinecraft().renderEngine.bindTexture(FIELD_TEXTURE_FALLBACK);
             GlStateManager.enableBlend();
@@ -75,6 +77,7 @@ final class LayeredFieldPlaneHelper {
 
         Random random = new Random(FIELD_COLOR_SEED);
         for (int i = 0; i < 16; i++) {
+            EldritchDiagnostics.fieldHelperLayers++;
             float layerDepth = 16.0F - i;
             float texScale = 0.0625F;
             float shade = 1.0F / (layerDepth + 1.0F);
