@@ -20,7 +20,8 @@ public class TileEldritchNothingRenderer extends TileEntitySpecialRenderer<TileE
         }
 
         Entity viewer = Minecraft.getMinecraft().getRenderViewEntity();
-        boolean inRange = viewer != null && tile.getPos().distanceSq(viewer.posX, viewer.posY, viewer.posZ) < 512.0D;
+        // LOD: full 16-layer field rendering within 32 blocks, cheap single-quad fallback beyond.
+        boolean inRange = viewer != null && tile.getPos().distanceSq(viewer.posX, viewer.posY, viewer.posZ) < 1024.0D;
         double viewX = 0.0D;
         double viewY = 0.0D;
         double viewZ = 0.0D;

@@ -7,7 +7,9 @@ public class TileEldritchNothing extends TileEntity {
 
     @Override
     public double getMaxRenderDistanceSquared() {
-        return 9216.0;
+        // Reduced from 9216 (96 blocks) to 2304 (48 blocks) to limit TESR dispatch.
+        // Beyond 48 blocks the field-effect quads are invisible in the void anyway.
+        return 2304.0;
     }
 
     @Override
