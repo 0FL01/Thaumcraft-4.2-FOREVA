@@ -42,12 +42,15 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.text.translation.I18n;
 import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.World;
+import net.minecraft.world.biome.Biome;
+import net.minecraftforge.common.BiomeDictionary;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import thaumcraft.common.Thaumcraft;
 import thaumcraft.api.aspects.Aspect;
 import thaumcraft.api.aspects.AspectList;
 import thaumcraft.common.config.ConfigItems;
+import thaumcraft.common.lib.world.ThaumcraftWorldGenerator;
 import thaumcraft.common.entities.ai.combat.AIAttackOnCollide;
 import thaumcraft.common.entities.ai.pech.AIPechItemEntityGoto;
 import thaumcraft.common.entities.ai.pech.AIPechTradePlayer;
@@ -204,6 +207,32 @@ public class EntityPech extends net.minecraft.entity.monster.EntityMob implement
         this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(30.0D);
         this.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).setBaseValue(3.0D);
         this.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(0.25D);
+    }
+
+    // ------------------------------------------------------------------
+    // Spawn control — block natural spawns outside MAGICAL biomes and in
+    // Taint biome, matching original TC4 getCanSpawnHere logic.
+    // ------------------------------------------------------------------
+
+    @Override
+    public boolean getCanSpawnHere() {
+        Biome biome = this.world.getBiome(this.getPosition());
+        boolean magicBiome = false;
+        if (biome != null) {
+            // Pech belong in MAGICAL biomes, but not Taint
+            magicBiome = BiomeDictionary.hasType(biome, BiomeDictionary.Type.MAGICAL)
+                       && biome != ThaumcraftWorldGenerator.biomeTaint;
+        }
+        // Population cap: no more than 4 Pech in a 16-block cube
+        int count = this.world.getEntitiesWithinAABB(
+                EntityPech.class, this.getEntityBoundingBox().grow(16, 16, 16)).size();
+        // Outside the Overworld restrict to Magical Forest / Eerie only
+        if (this.world.provider.getDimension() != 0
+                && biome != ThaumcraftWorldGenerator.biomeMagicalForest
+                && biome != ThaumcraftWorldGenerator.biomeEerie) {
+            magicBiome = false;
+        }
+        return count < 4 && magicBiome && super.getCanSpawnHere();
     }
 
     @Override
