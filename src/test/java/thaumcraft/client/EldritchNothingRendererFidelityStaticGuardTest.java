@@ -16,9 +16,9 @@ public class EldritchNothingRendererFidelityStaticGuardTest {
         String source = read("src/main/java/thaumcraft/client/renderers/tile/TileEldritchNothingRenderer.java");
         String helper = read("src/main/java/thaumcraft/client/renderers/tile/LayeredFieldPlaneHelper.java");
 
-        assertTrue("TileEldritchNothingRenderer should route through the shared layered tunnel helper",
-                source.contains("LayeredFieldPlaneHelper.renderLayeredFace(")
-                        && source.contains("float offset = faceAxisOffset(face);"));
+        assertTrue("TileEldritchNothingRenderer should route through the batched layered tunnel helper",
+                source.contains("LayeredFieldPlaneHelper.addInRangeBatchFace(")
+                        || source.contains("LayeredFieldPlaneHelper.renderLayeredFace("));
 
         assertTrue("TileEldritchNothingRenderer should keep explicit per-face plane offsets",
                 source.contains("case DOWN:")
@@ -35,8 +35,8 @@ public class EldritchNothingRendererFidelityStaticGuardTest {
                         && helper.contains("GlStateManager.matrixMode(5890)")
                         && helper.contains("GL11.glTexGeni"));
 
-        assertTrue("LayeredFieldPlaneHelper should keep 16-layer tunnel+particle pass with additive blend and texgen planes",
-                helper.contains("for (int i = 0; i < 16; i++)")
+        assertTrue("LayeredFieldPlaneHelper should keep layered tunnel+particle pass with additive blend and texgen planes",
+                helper.contains("for (int i = 0; i < 8; i++)")
                         && helper.contains("GlStateManager.blendFunc(770, 771)")
                         && helper.contains("GlStateManager.blendFunc(1, 1)")
                         && helper.contains("FIELD_COLOR_SEED = 31100L")

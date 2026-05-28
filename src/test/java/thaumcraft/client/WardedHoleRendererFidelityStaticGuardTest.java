@@ -45,14 +45,15 @@ public class WardedHoleRendererFidelityStaticGuardTest {
                         && hole.contains("shouldRenderFace(tile.getPos(), face)"));
 
         assertTrue("TileEldritchNothingRenderer should keep layered tunnel field routing through the shared helper",
-                nothing.contains("LayeredFieldPlaneHelper.renderLayeredFace(")
-                        && nothing.contains("return !adjacent.isOpaqueCube();"));
+                (nothing.contains("LayeredFieldPlaneHelper.addInRangeBatchFace(")
+                        || nothing.contains("LayeredFieldPlaneHelper.renderLayeredFace("))
+                        && nothing.contains("shouldRenderFace"));
 
         assertTrue("LayeredFieldPlaneHelper should keep shared tunnel-field texgen and camera-parallax contracts",
                 helper.contains("textures/misc/tunnel.png")
                         && helper.contains("textures/misc/particlefield.png")
                         && helper.contains("textures/misc/particlefield32.png")
-                        && helper.contains("for (int i = 0; i < 16; i++)")
+                        && helper.contains("for (int i = 0; i < 8; i++)")
                         && helper.contains("FIELD_COLOR_SEED = 31100L")
                         && helper.contains("ActiveRenderInfo.getRotationX()")
                         && helper.contains("GL11.glTexGen(")

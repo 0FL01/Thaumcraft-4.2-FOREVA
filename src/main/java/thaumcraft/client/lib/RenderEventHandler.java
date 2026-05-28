@@ -192,7 +192,8 @@ public class RenderEventHandler {
             return;
         }
 
-        EldritchDiagnostics.onFrame();
+        // EldritchDiagnostics: disabled for release, re-enable for FPS profiling
+        // EldritchDiagnostics.onFrame();
 
         if (tagscale > 0.0F) {
             tagscale = Math.max(0.0F, tagscale - 0.005F);

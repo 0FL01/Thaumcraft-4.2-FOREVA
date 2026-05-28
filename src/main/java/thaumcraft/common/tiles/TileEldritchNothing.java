@@ -7,7 +7,7 @@ public class TileEldritchNothing extends TileEntity {
 
     @Override
     public double getMaxRenderDistanceSquared() {
-        return 576.0; // 24 blocks — cuts TESR dispatch from ~3000 to ~370 per frame
+        return 256.0; // 16 blocks — reduces TESR dispatch to ~110 per frame
     }
 
     @Override

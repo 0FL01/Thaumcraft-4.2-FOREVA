@@ -7,7 +7,9 @@ import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.chunk.Chunk;
 import thaumcraft.client.lib.EldritchDiagnostics;
+import thaumcraft.common.blocks.BlockEldritchNothing;
 import thaumcraft.common.tiles.TileEldritchNothing;
 
 public class TileEldritchNothingRenderer extends TileEntitySpecialRenderer<TileEldritchNothing> {
@@ -20,11 +22,11 @@ public class TileEldritchNothingRenderer extends TileEntitySpecialRenderer<TileE
             return;
         }
 
-        EldritchDiagnostics.nothingTESRCalls++;
+        // EldritchDiagnostics: disabled for release, re-enable for FPS profiling
+        // EldritchDiagnostics.nothingTESRCalls++;
 
         Entity viewer = Minecraft.getMinecraft().getRenderViewEntity();
-        // LOD: full 16-layer field rendering within 32 blocks, cheap single-quad fallback beyond.
-        boolean inRange = viewer != null && tile.getPos().distanceSq(viewer.posX, viewer.posY, viewer.posZ) < 256.0D;
+        boolean inRange = viewer != null && tile.getPos().distanceSq(viewer.posX, viewer.posY, viewer.posZ) < 144.0D;
         double viewX = 0.0D;
         double viewY = 0.0D;
         double viewZ = 0.0D;
@@ -43,11 +45,11 @@ public class TileEldritchNothingRenderer extends TileEntitySpecialRenderer<TileE
         for (EnumFacing face : EnumFacing.VALUES) {
             if (shouldRenderFace(tile.getPos(), face)) {
                 float offset = faceAxisOffset(face);
-                EldritchDiagnostics.nothingFacesRendered++;
+                // EldritchDiagnostics.nothingFacesRendered++;
                 if (inRange) {
-                    EldritchDiagnostics.nothingInRangeFaces++;
+                    // EldritchDiagnostics.nothingInRangeFaces++;
                 } else {
-                    EldritchDiagnostics.nothingFarFaces++;
+                    // EldritchDiagnostics.nothingFarFaces++;
                 }
                 LayeredFieldPlaneHelper.renderLayeredFace(
                         face, x, y, z, offset, inRange, 1.0F, viewX, viewY, viewZ);
@@ -61,23 +63,24 @@ public class TileEldritchNothingRenderer extends TileEntitySpecialRenderer<TileE
         GlStateManager.popMatrix();
     }
 
+    /**
+     * Skip faces between two adjacent void blocks (interior faces are never visible).
+     * Also skip faces adjacent to opaque blocks.
+     */
     private boolean shouldRenderFace(BlockPos origin, EnumFacing face) {
-        IBlockState adjacent = getWorld().getBlockState(origin.offset(face));
-        return !adjacent.isOpaqueCube();
+        BlockPos adjacent = origin.offset(face);
+        Chunk chunk = getWorld().getChunk(adjacent);
+        IBlockState state = chunk.getBlockState(adjacent);
+        if (state.isOpaqueCube()) return false;
+        if (state.getBlock() instanceof BlockEldritchNothing) return false;
+        return true;
     }
 
     private static float faceAxisOffset(EnumFacing face) {
         switch (face) {
-            case DOWN:
-            case NORTH:
-            case WEST:
-                return FACE_MIN;
-            case UP:
-            case SOUTH:
-            case EAST:
-                return FACE_MAX;
-            default:
-                return FACE_MIN;
+            case DOWN:  case NORTH: case WEST:  return FACE_MIN;
+            case UP:    case SOUTH: case EAST:  return FACE_MAX;
+            default: return FACE_MIN;
         }
     }
 }

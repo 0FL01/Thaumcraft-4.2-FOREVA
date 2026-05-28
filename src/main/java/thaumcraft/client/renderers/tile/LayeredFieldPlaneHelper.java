@@ -24,8 +24,6 @@ final class LayeredFieldPlaneHelper {
             new ResourceLocation("thaumcraft", "textures/misc/particlefield32.png");
     static final long FIELD_COLOR_SEED = 31100L;
 
-    // Pre-allocated texGen plane buffers -- avoids ByteBuffer.allocateDirect per frame.
-    // All 12 glTexGen calls in setTexGenPlanes() use only these 4 unique value sets.
     private static final FloatBuffer TEX_GEN_S = makeBuffer(1.0F, 0.0F, 0.0F, 0.0F);
     private static final FloatBuffer TEX_GEN_T_UP = makeBuffer(0.0F, 0.0F, 1.0F, 0.0F);
     private static final FloatBuffer TEX_GEN_T_NS = makeBuffer(0.0F, 1.0F, 0.0F, 0.0F);
@@ -65,7 +63,8 @@ final class LayeredFieldPlaneHelper {
             float maxA,
             float minB,
             float maxB) {
-        EldritchDiagnostics.fieldHelperFaces++;
+        // EldritchDiagnostics: disabled for release
+        // EldritchDiagnostics.fieldHelperFaces++;
         if (!inRange) {
             Minecraft.getMinecraft().renderEngine.bindTexture(FIELD_TEXTURE_FALLBACK);
             GlStateManager.enableBlend();
@@ -76,8 +75,8 @@ final class LayeredFieldPlaneHelper {
         }
 
         Random random = new Random(FIELD_COLOR_SEED);
-        for (int i = 0; i < 16; i++) {
-            EldritchDiagnostics.fieldHelperLayers++;
+        for (int i = 0; i < 8; i++) {
+            // EldritchDiagnostics.fieldHelperLayers++;
             float layerDepth = 16.0F - i;
             float texScale = 0.0625F;
             float shade = 1.0F / (layerDepth + 1.0F);
