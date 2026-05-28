@@ -39,7 +39,7 @@ public class TileEldritchTilesStaticGuardTest {
         assertTrue(source.contains("MobEffects.RESISTANCE"));
         assertTrue(source.contains("Thaumcraft.proxy.wispFXEG("));
         assertTrue(source.contains("this.pos.getY() + 5"));
-        assertTrue(source.contains("return 9216.0;"));
+        assertTrue(source.contains("return 2304.0;"));
     }
 
     @Test
