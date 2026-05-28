@@ -2,6 +2,7 @@ package thaumcraft.common.entities;
 
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.DamageSource;
 import net.minecraft.world.World;
 
@@ -27,6 +28,14 @@ public class EntityPermanentItem extends EntityItem {
         super(world, x, y, z, stack);
         this.lifespan = Integer.MAX_VALUE;
         this.isImmuneToFire = true;
+    }
+
+    @Override
+    public void readEntityFromNBT(NBTTagCompound compound) {
+        super.readEntityFromNBT(compound);
+        // Vanilla EntityItem does not persist lifespan; restore it after every load
+        // so the tablet never despawns after a server restart.
+        this.lifespan = Integer.MAX_VALUE;
     }
 
     @Override
