@@ -23,6 +23,15 @@ final class LayeredFieldPlaneHelper {
             new ResourceLocation("thaumcraft", "textures/misc/particlefield32.png");
     static final long FIELD_COLOR_SEED = 31100L;
 
+    // Pre-allocated texGen plane buffers -- avoids ByteBuffer.allocateDirect per frame.
+    // All 12 glTexGen calls in setTexGenPlanes() use only these 4 unique value sets.
+    private static final FloatBuffer TEX_GEN_S = makeBuffer(1.0F, 0.0F, 0.0F, 0.0F);
+    private static final FloatBuffer TEX_GEN_T_UP = makeBuffer(0.0F, 0.0F, 1.0F, 0.0F);
+    private static final FloatBuffer TEX_GEN_T_NS = makeBuffer(0.0F, 1.0F, 0.0F, 0.0F);
+    private static final FloatBuffer TEX_GEN_R = makeBuffer(0.0F, 0.0F, 0.0F, 1.0F);
+    private static final FloatBuffer TEX_GEN_Q_UP = makeBuffer(0.0F, 1.0F, 0.0F, 0.0F);
+    private static final FloatBuffer TEX_GEN_Q_NS = makeBuffer(0.0F, 0.0F, 1.0F, 0.0F);
+
     private LayeredFieldPlaneHelper() {}
 
     static void renderLayeredFace(
@@ -229,24 +238,24 @@ final class LayeredFieldPlaneHelper {
         switch (face) {
             case UP:
             case DOWN:
-                GL11.glTexGen(GL11.GL_S, GL11.GL_OBJECT_PLANE, calcFloatBuffer(1.0F, 0.0F, 0.0F, 0.0F));
-                GL11.glTexGen(GL11.GL_T, GL11.GL_OBJECT_PLANE, calcFloatBuffer(0.0F, 0.0F, 1.0F, 0.0F));
-                GL11.glTexGen(GL11.GL_R, GL11.GL_OBJECT_PLANE, calcFloatBuffer(0.0F, 0.0F, 0.0F, 1.0F));
-                GL11.glTexGen(GL11.GL_Q, GL11.GL_EYE_PLANE, calcFloatBuffer(0.0F, 1.0F, 0.0F, 0.0F));
+                GL11.glTexGen(GL11.GL_S, GL11.GL_OBJECT_PLANE, TEX_GEN_S);
+                GL11.glTexGen(GL11.GL_T, GL11.GL_OBJECT_PLANE, TEX_GEN_T_UP);
+                GL11.glTexGen(GL11.GL_R, GL11.GL_OBJECT_PLANE, TEX_GEN_R);
+                GL11.glTexGen(GL11.GL_Q, GL11.GL_EYE_PLANE, TEX_GEN_Q_UP);
                 break;
             case NORTH:
             case SOUTH:
-                GL11.glTexGen(GL11.GL_S, GL11.GL_OBJECT_PLANE, calcFloatBuffer(1.0F, 0.0F, 0.0F, 0.0F));
-                GL11.glTexGen(GL11.GL_T, GL11.GL_OBJECT_PLANE, calcFloatBuffer(0.0F, 1.0F, 0.0F, 0.0F));
-                GL11.glTexGen(GL11.GL_R, GL11.GL_OBJECT_PLANE, calcFloatBuffer(0.0F, 0.0F, 0.0F, 1.0F));
-                GL11.glTexGen(GL11.GL_Q, GL11.GL_EYE_PLANE, calcFloatBuffer(0.0F, 0.0F, 1.0F, 0.0F));
+                GL11.glTexGen(GL11.GL_S, GL11.GL_OBJECT_PLANE, TEX_GEN_S);
+                GL11.glTexGen(GL11.GL_T, GL11.GL_OBJECT_PLANE, TEX_GEN_T_NS);
+                GL11.glTexGen(GL11.GL_R, GL11.GL_OBJECT_PLANE, TEX_GEN_R);
+                GL11.glTexGen(GL11.GL_Q, GL11.GL_EYE_PLANE, TEX_GEN_Q_NS);
                 break;
             case WEST:
             case EAST:
-                GL11.glTexGen(GL11.GL_S, GL11.GL_OBJECT_PLANE, calcFloatBuffer(0.0F, 0.0F, 1.0F, 0.0F));
-                GL11.glTexGen(GL11.GL_T, GL11.GL_OBJECT_PLANE, calcFloatBuffer(0.0F, 1.0F, 0.0F, 0.0F));
-                GL11.glTexGen(GL11.GL_R, GL11.GL_OBJECT_PLANE, calcFloatBuffer(0.0F, 0.0F, 0.0F, 1.0F));
-                GL11.glTexGen(GL11.GL_Q, GL11.GL_EYE_PLANE, calcFloatBuffer(1.0F, 0.0F, 0.0F, 0.0F));
+                GL11.glTexGen(GL11.GL_S, GL11.GL_OBJECT_PLANE, TEX_GEN_Q_NS);
+                GL11.glTexGen(GL11.GL_T, GL11.GL_OBJECT_PLANE, TEX_GEN_T_NS);
+                GL11.glTexGen(GL11.GL_R, GL11.GL_OBJECT_PLANE, TEX_GEN_R);
+                GL11.glTexGen(GL11.GL_Q, GL11.GL_EYE_PLANE, TEX_GEN_S);
                 break;
             default:
                 break;
@@ -265,7 +274,7 @@ final class LayeredFieldPlaneHelper {
         GL11.glDisable(GL11.GL_TEXTURE_GEN_Q);
     }
 
-    private static FloatBuffer calcFloatBuffer(float x, float y, float z, float w) {
+    private static FloatBuffer makeBuffer(float x, float y, float z, float w) {
         FloatBuffer buffer = ByteBuffer.allocateDirect(16 * 4).order(ByteOrder.nativeOrder()).asFloatBuffer();
         buffer.put(x).put(y).put(z).put(w);
         buffer.flip();
