@@ -37,9 +37,10 @@ public class TileEldritchObeliskRenderer extends TileEntitySpecialRenderer<TileE
         float ticks = TileRenderHelper.ticks(tile, partialTicks);
         float bob = (float) Math.sin(ticks / 10.0F) * 0.1F + 0.1F;
         Entity viewer = Minecraft.getMinecraft().getRenderViewEntity();
+        // LOD: full rendering (sides + caps + fields) within 32 blocks, field-only fallback beyond.
         boolean inRange = tile.getWorld() != null
                 && viewer != null
-                && tile.getPos().distanceSq(viewer.posX, viewer.posY, viewer.posZ) < 512.0D;
+                && tile.getPos().distanceSq(viewer.posX, viewer.posY, viewer.posZ) < 1024.0D;
         double viewX = 0.0D;
         double viewY = 0.0D;
         double viewZ = 0.0D;
@@ -49,20 +50,22 @@ public class TileEldritchObeliskRenderer extends TileEntitySpecialRenderer<TileE
             viewZ = viewer.lastTickPosZ + (viewer.posZ - viewer.lastTickPosZ) * partialTicks;
         }
 
-        GlStateManager.pushMatrix();
-        GlStateManager.translate(x + 0.5D, y + bob + 1.0D, z + 0.5D);
-        GlStateManager.disableLighting();
-        GlStateManager.disableCull();
-        GlStateManager.depthMask(false);
-        GlStateManager.enableBlend();
-        GlStateManager.blendFunc(770, 771);
+        if (inRange) {
+            GlStateManager.pushMatrix();
+            GlStateManager.translate(x + 0.5D, y + bob + 1.0D, z + 0.5D);
+            GlStateManager.disableLighting();
+            GlStateManager.disableCull();
+            GlStateManager.depthMask(false);
+            GlStateManager.enableBlend();
+            GlStateManager.blendFunc(770, 771);
 
-        bindTexture(sideTexture);
-        renderSides(0.48F, 3.0F);
+            bindTexture(sideTexture);
+            renderSides(0.48F, 3.0F);
 
-        bindTexture(capTexture);
-        renderObeliskCapPair();
-        GlStateManager.popMatrix();
+            bindTexture(capTexture);
+            renderObeliskCapPair();
+            GlStateManager.popMatrix();
+        }
 
         renderSideFields(inRange, outer, x, y + bob + 1.0D, z, viewX, viewY, viewZ);
 

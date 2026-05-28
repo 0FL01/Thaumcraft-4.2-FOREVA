@@ -360,7 +360,7 @@ public class TileEldritchLock extends TileThaumcraft implements ITickable {
 
     @Override
     public double getMaxRenderDistanceSquared() {
-        return 9216.0D;
+        return 2304.0D;
     }
 
     @Override

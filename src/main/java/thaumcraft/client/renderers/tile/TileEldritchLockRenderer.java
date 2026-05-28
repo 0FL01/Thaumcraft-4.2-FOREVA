@@ -39,9 +39,10 @@ public class TileEldritchLockRenderer extends TileEntitySpecialRenderer<TileEldr
         float ticks = TileRenderHelper.ticks(tile, partialTicks);
         EnumFacing facing = EnumFacing.byIndex(tile.getFacing());
         Entity viewer = Minecraft.getMinecraft().getRenderViewEntity();
+        // LOD: full rendering (rings + key + field) within 32 blocks, field-only fallback beyond.
         boolean inRange = tile.getWorld() != null
                 && viewer != null
-                && tile.getPos().distanceSq(viewer.posX, viewer.posY, viewer.posZ) < 512.0D;
+                && tile.getPos().distanceSq(viewer.posX, viewer.posY, viewer.posZ) < 1024.0D;
         float time = (float) (System.currentTimeMillis() % 700000L) / 250000.0F;
         double viewX = 0.0D;
         double viewY = 0.0D;
@@ -52,8 +53,10 @@ public class TileEldritchLockRenderer extends TileEntitySpecialRenderer<TileEldr
             viewZ = viewer.lastTickPosZ + (viewer.posZ - viewer.lastTickPosZ) * partialTicks;
         }
 
-        renderLockRings(tile, x, y, z, ticks);
-        renderInsertKey(tile, x, y, z, ticks, facing);
+        if (inRange) {
+            renderLockRings(tile, x, y, z, ticks);
+            renderInsertKey(tile, x, y, z, ticks, facing);
+        }
         renderLockField(x, y, z, facing, inRange, time, viewX, viewY, viewZ);
     }
 

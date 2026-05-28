@@ -67,6 +67,6 @@ public class TileEldritchObelisk extends TileThaumcraft implements ITickable {
 
     @Override
     public double getMaxRenderDistanceSquared() {
-        return 9216.0;
+        return 2304.0;
     }
 }
