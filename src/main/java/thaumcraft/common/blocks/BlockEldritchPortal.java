@@ -16,6 +16,9 @@ import thaumcraft.common.tiles.TileEldritchPortal;
 
 public class BlockEldritchPortal extends Block {
 
+    /** Non-null zero-size AABB — replaces NULL_AABB which is null in 1.12.2. */
+    private static final AxisAlignedBB ZERO_AABB = new AxisAlignedBB(0, 0, 0, 0, 0, 0);
+
     public BlockEldritchPortal() {
         super(Material.PORTAL);
         this.setBlockUnbreakable();
@@ -47,7 +50,7 @@ public class BlockEldritchPortal extends Block {
 
     @Override
     public AxisAlignedBB getCollisionBoundingBox(IBlockState state, IBlockAccess world, BlockPos pos) {
-        return null;
+        return ZERO_AABB;
     }
 
     @Override

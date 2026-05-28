@@ -23,6 +23,9 @@ import thaumcraft.common.tiles.TileHole;
 
 public class BlockHole extends BlockContainer {
 
+    /** Non-null zero-size AABB — replaces NULL_AABB which is null in 1.12.2. */
+    private static final AxisAlignedBB ZERO_AABB = new AxisAlignedBB(0, 0, 0, 0, 0, 0);
+
     public BlockHole() {
         super(Material.PORTAL);
         this.setBlockUnbreakable();
@@ -54,7 +57,7 @@ public class BlockHole extends BlockContainer {
 
     @Override
     public AxisAlignedBB getCollisionBoundingBox(IBlockState state, IBlockAccess world, BlockPos pos) {
-        return NULL_AABB;
+        return ZERO_AABB;
     }
 
     @Override

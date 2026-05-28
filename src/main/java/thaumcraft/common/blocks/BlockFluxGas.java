@@ -16,6 +16,9 @@ import java.util.Random;
 
 public class BlockFluxGas extends Block {
 
+    /** Non-null zero-size AABB — replaces NULL_AABB which is null in 1.12.2. */
+    private static final AxisAlignedBB ZERO_AABB = new AxisAlignedBB(0, 0, 0, 0, 0, 0);
+
     public static final PropertyInteger LEVEL = PropertyInteger.create("level", 0, 7);
 
     public BlockFluxGas() {
@@ -48,7 +51,7 @@ public class BlockFluxGas extends Block {
 
     @Override
     public AxisAlignedBB getCollisionBoundingBox(IBlockState state, IBlockAccess world, BlockPos pos) {
-        return NULL_AABB;
+        return ZERO_AABB;
     }
 
     @Override

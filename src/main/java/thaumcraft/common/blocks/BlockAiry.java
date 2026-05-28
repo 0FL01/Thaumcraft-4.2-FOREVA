@@ -216,7 +216,7 @@ public class BlockAiry extends BlockContainer {
     @Override
     public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess source, BlockPos pos) {
         int meta = this.getMetaFromState(state);
-        return meta == 3 || meta == 4 || meta == 10 || meta == 11 || meta == 12 ? NULL_AABB : AIRY_AABB;
+        return meta == 3 || meta == 4 || meta == 10 || meta == 11 || meta == 12 ? ZERO_AABB : AIRY_AABB;
     }
 
     @Nullable
@@ -224,7 +224,7 @@ public class BlockAiry extends BlockContainer {
     public AxisAlignedBB getCollisionBoundingBox(IBlockState state, IBlockAccess world, BlockPos pos) {
         int meta = this.getMetaFromState(state);
         if (meta == 0 || meta == 2 || meta == 3 || meta == 4 || meta == 5 || meta == 10 || meta == 11 || meta == 12) {
-            return NULL_AABB;
+            return ZERO_AABB;
         }
         return super.getCollisionBoundingBox(state, world, pos);
     }

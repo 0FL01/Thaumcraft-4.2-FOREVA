@@ -20,6 +20,9 @@ import thaumcraft.api.crafting.IInfusionStabiliser;
 import thaumcraft.common.Thaumcraft;
 
 public class BlockCandle extends Block implements IInfusionStabiliser {
+
+    /** Non-null zero-size AABB — replaces NULL_AABB which is null in 1.12.2. */
+    private static final AxisAlignedBB ZERO_AABB = new AxisAlignedBB(0, 0, 0, 0, 0, 0);
     public static final PropertyInteger TYPE = PropertyInteger.create("type", 0, 15);
     public static final int[] COLORS = new int[]{
             0xF0F0F0, 0xEB8844, 0xC353CD, 0x6689F3,
@@ -72,7 +75,7 @@ public class BlockCandle extends Block implements IInfusionStabiliser {
 
     @Override
     public AxisAlignedBB getCollisionBoundingBox(IBlockState state, IBlockAccess worldIn, BlockPos pos) {
-        return NULL_AABB;
+        return ZERO_AABB;
     }
 
     @Override

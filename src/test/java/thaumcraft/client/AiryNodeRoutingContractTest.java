@@ -43,7 +43,7 @@ public class AiryNodeRoutingContractTest {
                         && blockAiry.contains("if (meta == 12) return Float.MAX_VALUE;")
                         && blockAiry.contains("return meta == 2 || meta == 3 || meta == 4;")
                         && blockAiry.contains("return meta == 2 || meta == 3;")
-                        && blockAiry.contains("return meta == 3 || meta == 4 || meta == 10 || meta == 11 || meta == 12 ? NULL_AABB : AIRY_AABB;")
+                        && blockAiry.contains("return meta == 3 || meta == 4 || meta == 10 || meta == 11 || meta == 12 ? ZERO_AABB : AIRY_AABB;")
                         && blockAiry.contains("if (meta == 0 || meta == 2 || meta == 3 || meta == 4 || meta == 5 || meta == 10 || meta == 11 || meta == 12) {")
                         && blockAiry.contains("if (meta == 4 && entity instanceof EntityLivingBase && !(entity instanceof EntityPlayer)) {")
                         && blockAiry.contains("if (meta == 12) {")

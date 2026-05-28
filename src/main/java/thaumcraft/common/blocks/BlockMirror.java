@@ -30,6 +30,9 @@ import thaumcraft.common.tiles.TileMirrorEssentia;
 public class BlockMirror extends BlockContainer {
     public static final PropertyInteger TYPE = PropertyInteger.create("type", 0, 11);
 
+    /** Non-null zero-size AABB — replaces NULL_AABB which is null in 1.12.2. */
+    private static final AxisAlignedBB ZERO_AABB = new AxisAlignedBB(0, 0, 0, 0, 0, 0);
+
     public BlockMirror() {
         super(Material.GLASS);
         this.setHardness(1.0F);
@@ -167,7 +170,7 @@ public class BlockMirror extends BlockContainer {
 
     @Nullable
     @Override
-    public AxisAlignedBB getCollisionBoundingBox(IBlockState blockState, IBlockAccess worldIn, BlockPos pos) { return NULL_AABB; }
+    public AxisAlignedBB getCollisionBoundingBox(IBlockState blockState, IBlockAccess worldIn, BlockPos pos) { return ZERO_AABB; }
 
     @Override
     public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess source, BlockPos pos) {

@@ -5,6 +5,7 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.potion.PotionEffect;
+import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
@@ -17,11 +18,22 @@ import thaumcraft.common.lib.capabilities.PlayerKnowledgeProvider;
 
 public class BlockFluidPure extends BlockFluidClassic {
 
+    /** Non-null zero-size AABB.  Block.NULL_AABB is null in 1.12.2; callers like
+     *  WalkNodeProcessor.getSafePoint do not null-check, so we must never return null. */
+    private static final AxisAlignedBB ZERO_AABB = new AxisAlignedBB(0, 0, 0, 0, 0, 0);
+
     public static final int SOURCE_LEVEL = 0;
 
     public BlockFluidPure() {
         super(ConfigBlocks.FLUIDPURE, Material.WATER);
         this.setCreativeTab(Thaumcraft.tabTC);
+    }
+
+    /** Override required: BlockFluidBase.getBoundingBox returns null (Block.NULL_AABB),
+     *  which causes NPE in vanilla WalkNodeProcessor.getSafePoint. */
+    @Override
+    public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess world, BlockPos pos) {
+        return ZERO_AABB;
     }
 
     @Override
