@@ -589,6 +589,17 @@ public class ClientProxy extends CommonProxy {
                 }
                 continue;
             }
+            if (item == ConfigItems.itemPrimalArrow) {
+                String[] arrowModels = {
+                    "primalarrow_0", "primalarrow_1", "primalarrow_2",
+                    "primalarrow_3", "primalarrow_4", "primalarrow_5"
+                };
+                for (int meta = 0; meta < arrowModels.length; meta++) {
+                    ModelLoader.setCustomModelResourceLocation(item, meta,
+                            new ModelResourceLocation(new ResourceLocation("thaumcraft", arrowModels[meta]), "inventory"));
+                }
+                continue;
+            }
             ModelResourceLocation model = new ModelResourceLocation(registryName, "inventory");
             for (int meta = 0; meta < 64; meta++) {
                 ModelLoader.setCustomModelResourceLocation(item, meta, model);
