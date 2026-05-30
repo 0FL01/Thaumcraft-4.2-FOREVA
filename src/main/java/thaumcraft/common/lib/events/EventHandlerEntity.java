@@ -509,24 +509,24 @@ public class EventHandlerEntity {
     }
 
     /**
-     * Bow nock interception for wand foci.
-     * Prevent drawing bow if holding a focus.
+     * Bow nock interception for primal arrows and wand foci.
+     * When primal arrows are in inventory, supply the bow as the action result
+     * so the bow enters use mode without searching for normal arrows.
+     * When holding a focus, return FAIL to prevent bow drawing.
      */
     @SubscribeEvent
     public void onArrowNock(ArrowNockEvent event) {
         EntityPlayer player = event.getEntityPlayer();
         ItemStack bow = event.getBow();
         if (!bow.isEmpty() && findPrimalArrowType(player) >= 0) {
-            player.setActiveHand(event.getHand());
             event.setAction(new ActionResult<>(EnumActionResult.SUCCESS, bow));
-            event.setCanceled(true);
             return;
         }
 
         ItemStack held = player.getHeldItemMainhand();
 
         if (!held.isEmpty() && held.getItem() instanceof ItemFocusBasic) {
-            event.setCanceled(true);
+            event.setAction(new ActionResult<>(EnumActionResult.FAIL, held));
         }
     }
 
