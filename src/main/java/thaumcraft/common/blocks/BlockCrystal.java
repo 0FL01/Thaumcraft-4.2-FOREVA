@@ -127,7 +127,7 @@ implements IInfusionStabiliser {
                 double x = pos.getX() + 0.3 + rand.nextFloat() * 0.4;
                 double y = pos.getY() + 0.3 + rand.nextFloat() * 0.4;
                 double z = pos.getZ() + 0.3 + rand.nextFloat() * 0.4;
-                int colorIndex = md == 6 ? rand.nextInt(6) + 1 : md + 1;
+                int colorIndex = md == 6 ? rand.nextInt(6) : md;
                 int color = ItemShard.colors[colorIndex];
                 float r = (color >> 16 & 255) / 255.0f;
                 float g = (color >> 8 & 255) / 255.0f;

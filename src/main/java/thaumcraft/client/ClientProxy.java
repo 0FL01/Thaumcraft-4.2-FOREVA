@@ -573,6 +573,22 @@ public class ClientProxy extends CommonProxy {
                 }
                 continue;
             }
+            if (item == ConfigItems.itemShard) {
+                String[] shardModels = {
+                    "", "", "", "", "", "", "itemshard_balanced"
+                };
+                ModelResourceLocation fallback = new ModelResourceLocation(registryName, "inventory");
+                for (int meta = 0; meta < 64; meta++) {
+                    if (meta < shardModels.length && !shardModels[meta].isEmpty()) {
+                        ModelLoader.setCustomModelResourceLocation(item, meta,
+                                new ModelResourceLocation(
+                                        new ResourceLocation("thaumcraft", shardModels[meta]), "inventory"));
+                    } else {
+                        ModelLoader.setCustomModelResourceLocation(item, meta, fallback);
+                    }
+                }
+                continue;
+            }
             ModelResourceLocation model = new ModelResourceLocation(registryName, "inventory");
             for (int meta = 0; meta < 64; meta++) {
                 ModelLoader.setCustomModelResourceLocation(item, meta, model);
@@ -637,6 +653,12 @@ public class ClientProxy extends CommonProxy {
             Minecraft.getMinecraft().getItemColors().registerItemColorHandler(
                     (stack, tintIndex) -> ConfigItems.itemWispEssence.getColorFromItemStack(stack),
                     ConfigItems.itemWispEssence
+            );
+        }
+        if (ConfigItems.itemShard != null) {
+            Minecraft.getMinecraft().getItemColors().registerItemColorHandler(
+                    (stack, tintIndex) -> ConfigItems.itemShard.getColorFromItemStack(stack, tintIndex),
+                    ConfigItems.itemShard
             );
         }
         if (ConfigBlocks.blockCandle != null) {

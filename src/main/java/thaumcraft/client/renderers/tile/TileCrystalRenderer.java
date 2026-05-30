@@ -41,7 +41,7 @@ public class TileCrystalRenderer extends TileEntitySpecialRenderer<TileCrystal> 
                 rand, color, 1.1F);
         for (int i = 1; i < 6; i++) {
             if (md == 6) {
-                color = ItemShard.colors[i == 5 ? 6 : i];
+                color = getBalancedSubColor(i);
             }
             int angle1 = rand.nextInt(36) + 72 * i;
             int angle2 = 15 + rand.nextInt(15);
@@ -65,7 +65,7 @@ public class TileCrystalRenderer extends TileEntitySpecialRenderer<TileCrystal> 
                 rand, color, 1.1F);
         for (int i = 1; i < 6; i++) {
             if (metadata == 6) {
-                color = ItemShard.colors[i == 5 ? 6 : i];
+                color = getBalancedSubColor(i);
             }
             int angle1 = rand.nextInt(36) + 72 * i;
             int angle2 = 15 + rand.nextInt(15);
@@ -77,10 +77,26 @@ public class TileCrystalRenderer extends TileEntitySpecialRenderer<TileCrystal> 
     }
 
     private static int getCrystalColor(int metadata) {
-        if (metadata == 6) {
-            return ItemShard.colors[5];
+        if (metadata >= 0 && metadata < ItemShard.colors.length) {
+            return ItemShard.colors[metadata];
         }
-        return ItemShard.colors[MathHelper.clamp(metadata + 1, 1, 6)];
+        return 0xEECCFF; // fallback: Order purple
+    }
+
+    /**
+     * Returns the sub-crystal color for balanced clusters (metadata 6).
+     * Original 1.7.10 used BlockCustomOreItem.colors[a==5 ? 6 : a]
+     * where a=1..5. With our re-indexed array (direct meta→color):
+     *   a=1→Air, a=2→Fire, a=3→Water, a=4→Earth, a=5→Entropy.
+     */
+    private static int getBalancedSubColor(int index) {
+        // index runs 1..5 in the original loop
+        // Original: colors[a==5 ? 6 : a] → with old array: Air(1),Fire(2),Water(3),Earth(4),Entropy(6)
+        // New array direct: Air(0),Fire(1),Water(2),Earth(3),Entropy(5)
+        if (index == 5) {
+            return ItemShard.colors[5]; // Entropy
+        }
+        return ItemShard.colors[index - 1]; // Air=0, Fire=1, Water=2, Earth=3
     }
 
     private void drawCrystal(short orientation, double x, double y, double z, float yaw, float pitch, Random rand, int color, float size) {
