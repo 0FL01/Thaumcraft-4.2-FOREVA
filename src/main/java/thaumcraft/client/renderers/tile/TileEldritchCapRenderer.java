@@ -41,6 +41,7 @@ public class TileEldritchCapRenderer extends TileEntitySpecialRenderer<TileEntit
         GlStateManager.pushMatrix();
         GlStateManager.translate(x + 0.5D, y, z + 0.5D);
         GlStateManager.disableLighting();
+        GlStateManager.disableCull();
         GlStateManager.enableBlend();
         GlStateManager.blendFunc(770, 771);
         bindTexture(texture);
@@ -48,6 +49,7 @@ public class TileEldritchCapRenderer extends TileEntitySpecialRenderer<TileEntit
         MODEL.renderCap();
 
         GlStateManager.disableBlend();
+        GlStateManager.enableCull();
         GlStateManager.enableLighting();
         GlStateManager.popMatrix();
 
