@@ -519,6 +519,7 @@ public class EventHandlerEntity {
         EntityPlayer player = event.getEntityPlayer();
         ItemStack bow = event.getBow();
         if (!bow.isEmpty() && findPrimalArrowType(player) >= 0) {
+            player.setActiveHand(event.getHand());
             event.setAction(new ActionResult<>(EnumActionResult.SUCCESS, bow));
             return;
         }
