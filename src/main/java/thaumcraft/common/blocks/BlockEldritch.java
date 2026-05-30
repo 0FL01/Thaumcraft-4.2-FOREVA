@@ -15,6 +15,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.EnumBlockRenderType;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
@@ -52,6 +53,8 @@ public class BlockEldritch extends Block {
         this.setCreativeTab(Thaumcraft.tabTC);
         this.setDefaultState(this.blockState.getBaseState().withProperty(TYPE, 0));
         this.setHarvestLevel("pickaxe", 2);
+        this.setLightOpacity(0);
+        this.useNeighborBrightness = true;
     }
     
     @Override
@@ -265,9 +268,15 @@ public class BlockEldritch extends Block {
     }
 
     @Override
+    @SideOnly(Side.CLIENT)
+    public BlockRenderLayer getRenderLayer() {
+        return BlockRenderLayer.CUTOUT;
+    }
+
+    @Override
     public EnumBlockRenderType getRenderType(IBlockState state) {
         int meta = this.getMetaFromState(state);
-        return meta == 0 || meta == 1 || meta == 3 || meta == 8 || meta == 9
+        return meta == 0 || meta == 1 || meta == 2 || meta == 3 || meta == 8 || meta == 9
                 ? EnumBlockRenderType.INVISIBLE
                 : EnumBlockRenderType.MODEL;
     }

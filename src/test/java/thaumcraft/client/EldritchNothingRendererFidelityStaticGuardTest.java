@@ -36,7 +36,7 @@ public class EldritchNothingRendererFidelityStaticGuardTest {
                         && helper.contains("GL11.glTexGeni"));
 
         assertTrue("LayeredFieldPlaneHelper should keep layered tunnel+particle pass with additive blend and texgen planes",
-                helper.contains("for (int i = 0; i < 8; i++)")
+                helper.contains("for (int i = 0; i < 16; i++)")
                         && helper.contains("GlStateManager.blendFunc(770, 771)")
                         && helper.contains("GlStateManager.blendFunc(1, 1)")
                         && helper.contains("FIELD_COLOR_SEED = 31100L")

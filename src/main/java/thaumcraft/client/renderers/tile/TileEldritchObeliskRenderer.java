@@ -3,6 +3,7 @@ package thaumcraft.client.renderers.tile;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
@@ -50,29 +51,38 @@ public class TileEldritchObeliskRenderer extends TileEntitySpecialRenderer<TileE
             viewZ = viewer.lastTickPosZ + (viewer.posZ - viewer.lastTickPosZ) * partialTicks;
         }
 
+        renderSideFields(inRange, outer, x, y + bob + 1.0D, z, viewX, viewY, viewZ);
+
         if (inRange) {
             GlStateManager.pushMatrix();
-            GlStateManager.translate(x + 0.5D, y + bob + 1.0D, z + 0.5D);
-            GlStateManager.disableLighting();
-            GlStateManager.disableCull();
-            GlStateManager.depthMask(false);
+            GlStateManager.enableRescaleNormal();
+            GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
             GlStateManager.enableBlend();
             GlStateManager.blendFunc(770, 771);
 
+            float previousLightX = OpenGlHelper.lastBrightnessX;
+            float previousLightY = OpenGlHelper.lastBrightnessY;
+            if (tile.getWorld() != null) {
+                int packedLight = tile.getWorld().getCombinedLight(tile.getPos().up(5), 0);
+                int low = packedLight % 65536;
+                int high = packedLight / 65536;
+                OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, low, high);
+            }
+
+            GlStateManager.translate(x + 0.5D, y + bob + 1.0D, z + 0.5D);
+            GlStateManager.disableCull();
             bindTexture(sideTexture);
             renderSides(0.48F, 3.0F);
 
             bindTexture(capTexture);
             renderObeliskCapPair();
+
+            OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, previousLightX, previousLightY);
+            GlStateManager.enableCull();
+            GlStateManager.disableBlend();
+            GlStateManager.disableRescaleNormal();
             GlStateManager.popMatrix();
         }
-
-        renderSideFields(inRange, outer, x, y + bob + 1.0D, z, viewX, viewY, viewZ);
-
-        GlStateManager.disableBlend();
-        GlStateManager.depthMask(true);
-        GlStateManager.enableCull();
-        GlStateManager.enableLighting();
     }
 
     private static void renderObeliskCapPair() {

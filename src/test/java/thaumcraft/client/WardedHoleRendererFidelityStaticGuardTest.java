@@ -53,7 +53,7 @@ public class WardedHoleRendererFidelityStaticGuardTest {
                 helper.contains("textures/misc/tunnel.png")
                         && helper.contains("textures/misc/particlefield.png")
                         && helper.contains("textures/misc/particlefield32.png")
-                        && helper.contains("for (int i = 0; i < 8; i++)")
+                        && helper.contains("for (int i = 0; i < 16; i++)")
                         && helper.contains("FIELD_COLOR_SEED = 31100L")
                         && helper.contains("ActiveRenderInfo.getRotationX()")
                         && helper.contains("GL11.glTexGen(")

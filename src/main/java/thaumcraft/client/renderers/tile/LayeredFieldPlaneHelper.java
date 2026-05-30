@@ -75,7 +75,7 @@ final class LayeredFieldPlaneHelper {
         }
 
         Random random = new Random(FIELD_COLOR_SEED);
-        for (int i = 0; i < 8; i++) {
+        for (int i = 0; i < 16; i++) {
             // EldritchDiagnostics.fieldHelperLayers++;
             float layerDepth = 16.0F - i;
             float texScale = 0.0625F;

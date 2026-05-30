@@ -1,6 +1,7 @@
 package thaumcraft.client.renderers.tile;
 
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
@@ -37,21 +38,25 @@ public class TileEldritchCapRenderer extends TileEntitySpecialRenderer<TileEntit
         ResourceLocation texture = tile.getWorld() != null && tile.getWorld().provider.getDimension() == Config.dimensionOuterId
                 ? CAP_TEXTURE_OUTER
                 : capTexture;
+        float previousLightX = OpenGlHelper.lastBrightnessX;
+        float previousLightY = OpenGlHelper.lastBrightnessY;
+        if (tile.getWorld() != null) {
+            int packedLight = tile.getWorld().getCombinedLight(tile.getPos(), 0);
+            int low = packedLight % 65536;
+            int high = packedLight / 65536;
+            OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, low, high);
+        }
 
         GlStateManager.pushMatrix();
         GlStateManager.translate(x + 0.5D, y, z + 0.5D);
-        GlStateManager.disableLighting();
         GlStateManager.disableCull();
-        GlStateManager.enableBlend();
-        GlStateManager.blendFunc(770, 771);
         bindTexture(texture);
         GlStateManager.rotate(90.0F, -1.0F, 0.0F, 0.0F);
         MODEL.renderCap();
 
-        GlStateManager.disableBlend();
         GlStateManager.enableCull();
-        GlStateManager.enableLighting();
         GlStateManager.popMatrix();
+        OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, previousLightX, previousLightY);
 
         if (tile instanceof TileEldritchAltar) {
             renderAltarEyes((TileEldritchAltar) tile, x, y, z);
