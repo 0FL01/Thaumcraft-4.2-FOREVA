@@ -16,6 +16,7 @@ public class BlockFluxGooStaticGuardTest {
         String goo = read("src/main/java/thaumcraft/common/blocks/BlockFluxGoo.java");
         String gas = read("src/main/java/thaumcraft/common/blocks/BlockFluxGas.java");
         String configBlocks = read("src/main/java/thaumcraft/common/config/ConfigBlocks.java");
+        String thaumicSlime = read("src/main/java/thaumcraft/common/entities/monster/EntityThaumicSlime.java");
 
         assertTrue("Flux goo must be a Forge finite fluid using the TC4 flux material and registered fluxGoo Fluid",
                 goo.contains("extends BlockFluidFinite")
@@ -26,11 +27,25 @@ public class BlockFluxGooStaticGuardTest {
                         && goo.contains("return originalColor;")
                         && goo.contains("onEntityCollision(World world, BlockPos pos, IBlockState state, Entity entity)")
                         && goo.contains("entity instanceof EntityThaumicSlime")
+                        && goo.contains("THAUMIC_SLIME_GROWTH_INTERVAL_TICKS = 20")
+                        && goo.contains("slime.ticksExisted % THAUMIC_SLIME_GROWTH_INTERVAL_TICKS == 0")
                         && goo.contains("slime.setSlimeSize(slime.getSlimeSize() + 1)")
                         && goo.contains("entity.motionX *= 1.0F - quanta;")
                         && goo.contains("entity.motionZ *= 1.0F - quanta;")
                         && goo.contains("new PotionEffect(Config.potionVisExhaust, 600, meta / 3, true, true)")
                         && goo.contains("pe.getCurativeItems().clear();")
+                        && goo.contains("updateTick(World world, BlockPos pos, IBlockState state, Random rand)")
+                        && goo.contains("super.updateTick(world, pos, state, rand);")
+                        && goo.contains("meta >= 2 && meta < 6 && world.isAirBlock(above) && rand.nextInt(25) == 0")
+                        && goo.contains("spawnThaumicSlime(world, pos, 1)")
+                        && goo.contains("meta >= 6 && world.isAirBlock(above)")
+                        && goo.contains("spawnThaumicSlime(world, pos, 2)")
+                        && goo.contains("Config.taintFromFlux && rand.nextInt(50) == 0")
+                        && goo.contains("Utils.setBiomeAt(world, pos.getX(), pos.getZ(), ThaumcraftWorldGenerator.biomeTaint)")
+                        && goo.contains("ConfigBlocks.blockTaintFibres.getStateFromMeta(0)")
+                        && goo.contains("rand.nextInt(30) == 0")
+                        && goo.contains("ConfigBlocks.blockFluxGas.getStateFromMeta(0)")
+                        && goo.contains("TCSounds.GORE")
                         && goo.contains("getQuanta()")
                         && goo.contains("MathHelper.clamp(meta, 0, this.getMaxRenderHeightMeta())")
                         && !goo.contains("EnumBlockRenderType.INVISIBLE")
@@ -71,6 +86,13 @@ public class BlockFluxGooStaticGuardTest {
                         && configBlocks.contains(".setDensity(-4)")
                         && configBlocks.contains(".setViscosity(6000)")
                         && configBlocks.contains(".setViscosity(2500)"));
+
+        assertTrue("Thaumic slime must drive 1.12 jumping through EntityJumpHelper so slime jump sounds produce movement",
+                thaumicSlime.contains("this.getJumpHelper().setJumping();")
+                        && thaumicSlime.contains("MIN_ATTACK_JUMP_DELAY_TICKS = 8")
+                        && thaumicSlime.contains("Math.max(MIN_ATTACK_JUMP_DELAY_TICKS, this.slimeJumpDelay / 2)")
+                        && !thaumicSlime.contains("this.slimeJumpDelay /= 3;")
+                        && !thaumicSlime.contains("this.isJumping = true;"));
     }
 
     private static String read(String path) throws IOException {

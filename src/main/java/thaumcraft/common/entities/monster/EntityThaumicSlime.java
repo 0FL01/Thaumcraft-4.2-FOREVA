@@ -32,6 +32,8 @@ public class EntityThaumicSlime extends EntityMob implements IMob, ITaintedMob {
     public float field_70812_c;
 
     // State
+    private static final int MIN_ATTACK_JUMP_DELAY_TICKS = 8;
+
     private int slimeJumpDelay = 0;
     public int launched = 10;
     private int spitCounter = 100;
@@ -142,8 +144,8 @@ public class EntityThaumicSlime extends EntityMob implements IMob, ITaintedMob {
         // Jump logic
         if (this.onGround && this.slimeJumpDelay-- <= 0) {
             this.slimeJumpDelay = this.getJumpDelayTicks();
-            if (player != null) this.slimeJumpDelay /= 3;
-            this.isJumping = true;
+            if (player != null) this.slimeJumpDelay = Math.max(MIN_ATTACK_JUMP_DELAY_TICKS, this.slimeJumpDelay / 2);
+            this.getJumpHelper().setJumping();
             if (this.makesSoundOnJump()) {
                 SoundEvent jumpSound = this.getSlimeSize() > 3
                     ? SoundEvent.REGISTRY.getObject(new ResourceLocation("entity.slime.squish"))
