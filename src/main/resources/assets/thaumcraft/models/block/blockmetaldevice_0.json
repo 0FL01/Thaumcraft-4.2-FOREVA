@@ -2,17 +2,19 @@
   "ambientocclusion": false,
   "textures": {
     "particle": "thaumcraft:blocks/crucible3",
-    "inner": "thaumcraft:blocks/crucible1",
+    "top": "thaumcraft:blocks/crucible1",
     "bottom": "thaumcraft:blocks/crucible2",
-    "outer": "thaumcraft:blocks/crucible3"
+    "outer": "thaumcraft:blocks/crucible3",
+    "inner": "thaumcraft:blocks/crucible5",
+    "inner_bottom": "thaumcraft:blocks/crucible6"
   },
   "elements": [
     {
-      "from": [1, 0, 1],
-      "to": [15, 2, 15],
+      "from": [0, 0, 0],
+      "to": [16, 16, 16],
       "faces": {
         "down": { "texture": "#bottom" },
-        "up": { "texture": "#inner" },
+        "up": { "texture": "#top" },
         "north": { "texture": "#outer" },
         "south": { "texture": "#outer" },
         "west": { "texture": "#outer" },
@@ -20,51 +22,39 @@
       }
     },
     {
-      "from": [1, 2, 1],
-      "to": [15, 11, 3],
+      "from": [2, 0, 0],
+      "to": [2, 16, 16],
       "faces": {
-        "down": { "texture": "#inner" },
-        "up": { "texture": "#inner" },
-        "north": { "texture": "#outer" },
-        "south": { "texture": "#inner" },
-        "west": { "texture": "#outer" },
-        "east": { "texture": "#outer" }
-      }
-    },
-    {
-      "from": [1, 2, 13],
-      "to": [15, 11, 15],
-      "faces": {
-        "down": { "texture": "#inner" },
-        "up": { "texture": "#inner" },
-        "north": { "texture": "#inner" },
-        "south": { "texture": "#outer" },
-        "west": { "texture": "#outer" },
-        "east": { "texture": "#outer" }
-      }
-    },
-    {
-      "from": [1, 2, 3],
-      "to": [3, 11, 13],
-      "faces": {
-        "down": { "texture": "#inner" },
-        "up": { "texture": "#inner" },
-        "north": { "texture": "#outer" },
-        "south": { "texture": "#outer" },
-        "west": { "texture": "#outer" },
         "east": { "texture": "#inner" }
       }
     },
     {
-      "from": [13, 2, 3],
-      "to": [15, 11, 13],
+      "from": [14, 0, 0],
+      "to": [14, 16, 16],
       "faces": {
-        "down": { "texture": "#inner" },
-        "up": { "texture": "#inner" },
-        "north": { "texture": "#outer" },
-        "south": { "texture": "#outer" },
-        "west": { "texture": "#inner" },
-        "east": { "texture": "#outer" }
+        "west": { "texture": "#inner" }
+      }
+    },
+    {
+      "from": [0, 0, 2],
+      "to": [16, 16, 2],
+      "faces": {
+        "south": { "texture": "#inner" }
+      }
+    },
+    {
+      "from": [0, 0, 14],
+      "to": [16, 16, 14],
+      "faces": {
+        "north": { "texture": "#inner" }
+      }
+    },
+    {
+      "from": [0, 4, 0],
+      "to": [16, 4, 16],
+      "faces": {
+        "down": { "texture": "#inner_bottom" },
+        "up": { "texture": "#inner_bottom" }
       }
     }
   ]

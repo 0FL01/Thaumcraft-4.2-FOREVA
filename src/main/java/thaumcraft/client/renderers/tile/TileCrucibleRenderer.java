@@ -50,7 +50,7 @@ public class TileCrucibleRenderer extends TileEntitySpecialRenderer<TileCrucible
         GlStateManager.enableBlend();
         GlStateManager.blendFunc(770, 771);
         OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, lightX, lightY);
-        TileRenderHelper.drawTexturedQuad(0.33F, color, water.getMinU(), water.getMaxU(), water.getMinV(), water.getMaxV());
+        TileRenderHelper.drawTexturedQuad(0.5F, color, water.getMinU(), water.getMaxU(), water.getMinV(), water.getMaxV());
         OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, prevLightX, prevLightY);
         GlStateManager.disableBlend();
         GlStateManager.popMatrix();

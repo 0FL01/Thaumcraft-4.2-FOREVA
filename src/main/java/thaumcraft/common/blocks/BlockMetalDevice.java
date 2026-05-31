@@ -7,6 +7,7 @@ import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.PropertyInteger;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
@@ -29,6 +30,8 @@ import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraft.init.SoundEvents;
 import net.minecraftforge.fluids.FluidUtil;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import thaumcraft.api.visnet.VisNetHandler;
 import thaumcraft.common.Thaumcraft;
 import thaumcraft.common.CommonProxy;
@@ -70,6 +73,10 @@ public class BlockMetalDevice extends BlockContainer {
     @Override
     public boolean isOpaqueCube(IBlockState state) { return false; }
     @Override public boolean isFullCube(IBlockState state) { return false; }
+    @Override
+    @SideOnly(Side.CLIENT)
+    public BlockRenderLayer getRenderLayer() { return BlockRenderLayer.CUTOUT; }
+
     @Override
     public EnumBlockRenderType getRenderType(IBlockState state) {
         int meta = state.getValue(TYPE);
