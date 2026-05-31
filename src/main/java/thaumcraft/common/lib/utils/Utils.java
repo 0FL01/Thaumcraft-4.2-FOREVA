@@ -20,6 +20,7 @@ import thaumcraft.common.config.ConfigItems;
 import thaumcraft.common.items.ItemResource;
 import thaumcraft.common.lib.network.PacketHandler;
 import thaumcraft.common.lib.network.fx.PacketFXVisDrain;
+import thaumcraft.common.lib.network.misc.PacketBiomeChange;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -197,14 +198,29 @@ public class Utils {
 
     /** Set the biome at a given x,z position in the world (used for taint spread in Eldritch dimension). */
     public static void setBiomeAt(World world, int x, int z, Biome biome) {
+        if (world == null || biome == null) return;
+        int biomeId = Biome.getIdForBiome(biome);
+        if (biomeId < 0) return;
         int cx = x >> 4;
         int cz = z >> 4;
         Chunk chunk = world.getChunkProvider().provideChunk(cx, cz);
         if (chunk == null) return;
         byte[] biomes = chunk.getBiomeArray();
         int index = ((z & 15) << 4) | (x & 15);
-        biomes[index] = (byte) Biome.getIdForBiome(biome);
+        biomes[index] = (byte) biomeId;
         chunk.setBiomeArray(biomes);
+        chunk.markDirty();
+        world.markBlockRangeForRenderUpdate(new BlockPos(x, 0, z), new BlockPos(x, world.getActualHeight(), z));
+        if (!world.isRemote) {
+            PacketHandler.INSTANCE.sendToAllAround(
+                    new PacketBiomeChange(x, z, (short) biomeId),
+                    new NetworkRegistry.TargetPoint(
+                            world.provider.getDimension(),
+                            x,
+                            world.getHeight(new BlockPos(x, 0, z)).getY(),
+                            z,
+                            32.0));
+        }
     }
 
     public static byte pack(boolean[] bits) {

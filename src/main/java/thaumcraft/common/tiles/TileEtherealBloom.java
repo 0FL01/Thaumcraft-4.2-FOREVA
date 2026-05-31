@@ -33,9 +33,9 @@ public class TileEtherealBloom extends TileEntity implements ITickable {
             Biome current = this.world.getBiome(target);
             int currentId = Biome.getIdForBiome(current);
 
-            if ((currentId == Config.biomeTaintID || currentId == Config.biomeEerieID || currentId == Config.biomeMagicalForestID)
+            if (isBloomTargetBiome(current, currentId)
                     && this.getDistanceSq((double) tx + 0.5D, this.pos.getY(), (double) tz + 0.5D) <= 81.0D) {
-                Biome[] generated = this.world.getBiomeProvider().getBiomesForGeneration(null, tx, tz, 1, 1);
+                Biome[] generated = this.world.getBiomeProvider().getBiomes(null, tx, tz, 1, 1);
                 if (generated != null && generated.length > 0 && generated[0] != null) {
                     Biome biome = generated[0];
                     if (ThaumcraftWorldGenerator.biomeTaint != null && biome == ThaumcraftWorldGenerator.biomeTaint) {
@@ -51,5 +51,19 @@ public class TileEtherealBloom extends TileEntity implements ITickable {
                     TCSounds.ROOTS, SoundCategory.BLOCKS, 1.0F, 0.6F, false);
         }
         ++this.growthCounter;
+    }
+
+    private static boolean isBloomTargetBiome(Biome biome, int biomeId) {
+        return biomeId == Config.biomeTaintID
+                || biomeId == Config.biomeEerieID
+                || biomeId == Config.biomeMagicalForestID
+                || isSameBiome(biome, ThaumcraftWorldGenerator.biomeTaint)
+                || isSameBiome(biome, ThaumcraftWorldGenerator.biomeEerie)
+                || isSameBiome(biome, ThaumcraftWorldGenerator.biomeMagicalForest);
+    }
+
+    private static boolean isSameBiome(Biome first, Biome second) {
+        return first == second || first != null && second != null
+                && Biome.getIdForBiome(first) == Biome.getIdForBiome(second);
     }
 }

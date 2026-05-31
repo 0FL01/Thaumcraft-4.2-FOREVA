@@ -15,7 +15,12 @@ import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
+import net.minecraft.world.biome.Biome;
 import thaumcraft.common.Thaumcraft;
+import thaumcraft.common.config.Config;
+import thaumcraft.common.lib.world.ThaumcraftWorldGenerator;
+
+import java.util.Random;
 
 public class BlockTaintFibres extends Block {
 
@@ -27,7 +32,24 @@ public class BlockTaintFibres extends Block {
         this.setHardness(0.5f);
         this.setSoundType(SoundType.PLANT);
         this.setCreativeTab(Thaumcraft.tabTC);
+        this.setTickRandomly(true);
         this.setDefaultState(this.blockState.getBaseState().withProperty(TYPE, 0));
+    }
+
+    @Override
+    public void updateTick(World world, BlockPos pos, IBlockState state, Random rand) {
+        if (world.isRemote) return;
+        if (!isTaintBiome(world, pos)) {
+            world.setBlockToAir(pos);
+        }
+    }
+
+    private static boolean isTaintBiome(World world, BlockPos pos) {
+        Biome biome = world.getBiome(pos);
+        return Biome.getIdForBiome(biome) == Config.biomeTaintID
+                || biome == ThaumcraftWorldGenerator.biomeTaint
+                || biome != null && ThaumcraftWorldGenerator.biomeTaint != null
+                && Biome.getIdForBiome(biome) == Biome.getIdForBiome(ThaumcraftWorldGenerator.biomeTaint);
     }
 
     @Override

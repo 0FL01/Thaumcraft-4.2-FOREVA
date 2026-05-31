@@ -14,6 +14,11 @@ public class EtherealBloomParityStaticGuardTest {
     @Test
     public void tileAndRendererKeepEtherealBloomGrowthAndCleanseContracts() throws IOException {
         String tile = read("src/main/java/thaumcraft/common/tiles/TileEtherealBloom.java");
+        String node = read("src/main/java/thaumcraft/common/tiles/TileNode.java");
+        String utils = read("src/main/java/thaumcraft/common/lib/utils/Utils.java");
+        String packet = read("src/main/java/thaumcraft/common/lib/network/misc/PacketBiomeChange.java");
+        String taintFibres = read("src/main/java/thaumcraft/common/blocks/BlockTaintFibres.java");
+        String taint = read("src/main/java/thaumcraft/common/blocks/BlockTaint.java");
         String renderer = read("src/main/java/thaumcraft/client/renderers/tile/TileEtherealBloomRenderer.java");
         String customPlant = read("src/main/java/thaumcraft/common/blocks/BlockCustomPlant.java");
 
@@ -23,7 +28,15 @@ public class EtherealBloomParityStaticGuardTest {
                         && tile.contains("public void update()"));
         assertTrue("TileEtherealBloom should keep periodic biome cleanse behavior",
                 tile.contains("this.counter % 20 == 0")
+                        && tile.contains("isBloomTargetBiome(current, currentId)")
+                        && tile.contains("getBiomes(null, tx, tz, 1, 1)")
+                        && !tile.contains("getBiomesForGeneration")
                         && tile.contains("Utils.setBiomeAt(this.world, tx, tz, biome);"));
+        assertTrue("TileEtherealBloom should match TC4 configured ids and 1.12 registered Thaumcraft biome instances",
+                tile.contains("biomeId == Config.biomeTaintID")
+                        && tile.contains("isSameBiome(biome, ThaumcraftWorldGenerator.biomeTaint)")
+                        && tile.contains("isSameBiome(biome, ThaumcraftWorldGenerator.biomeEerie)")
+                        && tile.contains("isSameBiome(biome, ThaumcraftWorldGenerator.biomeMagicalForest)"));
         assertTrue("TileEtherealBloom should keep roots sound bootstrap on client",
                 tile.contains("this.world.isRemote && this.growthCounter == 0")
                         && tile.contains("TCSounds.ROOTS"));
@@ -56,6 +69,41 @@ public class EtherealBloomParityStaticGuardTest {
         assertTrue("BlockCustomPlant should render cross plant models in the cutout layer",
                 customPlant.contains("public BlockRenderLayer getRenderLayer()")
                         && customPlant.contains("BlockRenderLayer.CUTOUT"));
+
+        assertTrue("TileNode should restore TC4 pure node biome cleansing cadence and radius",
+                node.contains("changed = handlePureNode(changed);")
+                        && node.contains("private boolean handlePureNode(boolean changed)")
+                        && node.contains("ThaumcraftWorldGenerator.getDimBlacklist(dim)")
+                        && node.contains("this.getNodeType() != NodeType.PURE || this.count % 50 != 0")
+                        && node.contains("this.world.rand.nextInt(8) - this.world.rand.nextInt(8)")
+                        && node.contains("ThaumcraftWorldGenerator.getBiomeBlacklist(biomeId)"));
+        assertTrue("TileNode pure effect should cleanse taint and spread magical forest from magical log nodes",
+                node.contains("Utils.setBiomeAt(this.world, x, z, ThaumcraftWorldGenerator.biomeMagicalForest)")
+                        && node.contains("isSameBiome(biome, ThaumcraftWorldGenerator.biomeTaint)")
+                        && node.contains("this.world.getBlockState(this.pos).getBlock() == ConfigBlocks.blockMagicalLog"));
+        assertTrue("Utils.setBiomeAt should keep TC4 client biome sync behavior",
+                utils.contains("new PacketBiomeChange(x, z, (short) biomeId)")
+                        && utils.contains("PacketHandler.INSTANCE.sendToAllAround")
+                        && utils.contains("chunk.markDirty();")
+                        && utils.contains("world.markBlockRangeForRenderUpdate")
+                        && utils.contains("new NetworkRegistry.TargetPoint")
+                        && utils.contains("world.provider.getDimension()"));
+        assertTrue("PacketBiomeChange should serialize x/z/biome and apply biome updates on the client thread",
+                packet.contains("private int x;")
+                        && packet.contains("private int z;")
+                        && packet.contains("private short biome;")
+                        && packet.contains("buf.writeShort(this.biome)")
+                        && packet.contains("this.biome = buf.readShort()")
+                        && packet.contains("Thaumcraft.proxy.scheduleClientTask")
+                        && packet.contains("Utils.setBiomeAt(world, this.x, this.z, biome);"));
+        assertTrue("Taint blocks should random-tick so biome purification visibly kills taint back like TC4",
+                taintFibres.contains("this.setTickRandomly(true);")
+                        && taintFibres.contains("public void updateTick(World world, BlockPos pos, IBlockState state, Random rand)")
+                        && taintFibres.contains("!isTaintBiome(world, pos)")
+                        && taintFibres.contains("world.setBlockToAir(pos)")
+                        && taint.contains("this.setTickRandomly(true);")
+                        && taint.contains("ConfigBlocks.blockFluxGoo.getStateFromMeta(ConfigBlocks.blockFluxGoo.getQuanta())")
+                        && taint.contains("Blocks.DIRT.getDefaultState()"));
     }
 
     private static String read(String path) throws IOException {

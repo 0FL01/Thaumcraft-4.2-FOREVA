@@ -4,6 +4,8 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.util.ITickable;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.biome.Biome;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
 import thaumcraft.api.TileThaumcraft;
 import thaumcraft.api.aspects.Aspect;
@@ -17,6 +19,8 @@ import thaumcraft.common.config.ConfigBlocks;
 import thaumcraft.common.items.ItemCompassStone;
 import thaumcraft.common.lib.network.PacketHandler;
 import thaumcraft.common.lib.network.fx.PacketFXBlockZap;
+import thaumcraft.common.lib.utils.Utils;
+import thaumcraft.common.lib.world.ThaumcraftWorldGenerator;
 
 public class TileNode
 extends TileThaumcraft
@@ -178,6 +182,7 @@ implements ITickable, INode, IAspectContainer {
             this.lastActive = System.currentTimeMillis();
             changed |= rechargeOneMissingAspect();
         }
+        changed = handlePureNode(changed);
 
         if (changed) {
             nodeChange();
@@ -229,6 +234,44 @@ implements ITickable, INode, IAspectContainer {
         Aspect aspect = missing.getAspects()[this.world.rand.nextInt(missing.size())];
         this.addToContainer(aspect, 1);
         return true;
+    }
+
+    private boolean handlePureNode(boolean changed) {
+        int dim = this.world.provider.getDimension();
+        int dimBlacklist = ThaumcraftWorldGenerator.getDimBlacklist(dim);
+        if (dim == -1 || dim == 1 || dimBlacklist == 0 || dimBlacklist == 2) {
+            return changed;
+        }
+        if (this.getNodeType() != NodeType.PURE || this.count % 50 != 0) {
+            return changed;
+        }
+        if (ThaumcraftWorldGenerator.biomeMagicalForest == null) {
+            return changed;
+        }
+
+        int x = this.pos.getX() + this.world.rand.nextInt(8) - this.world.rand.nextInt(8);
+        int z = this.pos.getZ() + this.world.rand.nextInt(8) - this.world.rand.nextInt(8);
+        Biome biome = this.world.getBiome(new BlockPos(x, 0, z));
+        int biomeId = Biome.getIdForBiome(biome);
+        int biomeBlacklist = ThaumcraftWorldGenerator.getBiomeBlacklist(biomeId);
+        if (biomeBlacklist == 0 || biomeBlacklist == 2) {
+            return changed;
+        }
+        if (isSameBiome(biome, ThaumcraftWorldGenerator.biomeMagicalForest)) {
+            return changed;
+        }
+
+        if (isSameBiome(biome, ThaumcraftWorldGenerator.biomeTaint)) {
+            Utils.setBiomeAt(this.world, x, z, ThaumcraftWorldGenerator.biomeMagicalForest);
+        } else if (this.world.getBlockState(this.pos).getBlock() == ConfigBlocks.blockMagicalLog) {
+            Utils.setBiomeAt(this.world, x, z, ThaumcraftWorldGenerator.biomeMagicalForest);
+        }
+        return changed;
+    }
+
+    private static boolean isSameBiome(Biome first, Biome second) {
+        return first == second || first != null && second != null
+                && Biome.getIdForBiome(first) == Biome.getIdForBiome(second);
     }
 
     private void nodeChange() {

@@ -10,6 +10,7 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -20,8 +21,12 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
+import net.minecraft.world.biome.Biome;
 import thaumcraft.common.Thaumcraft;
+import thaumcraft.common.config.Config;
+import thaumcraft.common.config.ConfigBlocks;
 import thaumcraft.common.lib.utils.Utils;
+import thaumcraft.common.lib.world.ThaumcraftWorldGenerator;
 
 import java.util.Random;
 
@@ -35,8 +40,29 @@ public class BlockTaint extends Block {
         this.setResistance(3.0f);
         this.setSoundType(SoundType.GROUND);
         this.setCreativeTab(Thaumcraft.tabTC);
+        this.setTickRandomly(true);
         this.setDefaultState(this.blockState.getBaseState().withProperty(TYPE, 0));
         this.setHarvestLevel("shovel", 0);
+    }
+
+    @Override
+    public void updateTick(World world, BlockPos pos, IBlockState state, Random rand) {
+        if (world.isRemote) return;
+        int meta = this.getMetaFromState(state);
+        if (meta == 2 || isTaintBiome(world, pos)) return;
+        if (meta == 0 && ConfigBlocks.blockFluxGoo != null && rand.nextInt(20) == 0) {
+            world.setBlockState(pos, ConfigBlocks.blockFluxGoo.getStateFromMeta(ConfigBlocks.blockFluxGoo.getQuanta()), 3);
+        } else if (meta == 1 && rand.nextInt(10) == 0) {
+            world.setBlockState(pos, Blocks.DIRT.getDefaultState(), 3);
+        }
+    }
+
+    private static boolean isTaintBiome(World world, BlockPos pos) {
+        Biome biome = world.getBiome(pos);
+        return Biome.getIdForBiome(biome) == Config.biomeTaintID
+                || biome == ThaumcraftWorldGenerator.biomeTaint
+                || biome != null && ThaumcraftWorldGenerator.biomeTaint != null
+                && Biome.getIdForBiome(biome) == Biome.getIdForBiome(ThaumcraftWorldGenerator.biomeTaint);
     }
 
     @Override
