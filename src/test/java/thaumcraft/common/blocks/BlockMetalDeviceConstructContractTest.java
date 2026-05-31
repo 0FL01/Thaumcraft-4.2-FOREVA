@@ -84,6 +84,25 @@ public class BlockMetalDeviceConstructContractTest {
                         && constructModel.contains("\"all\": \"thaumcraft:blocks/alchemyblock\""));
     }
 
+    @Test
+    public void crucibleCollisionShouldKeepTc4HollowBasinForDroppedItems() throws IOException {
+        String source = read("src/main/java/thaumcraft/common/blocks/BlockMetalDevice.java");
+
+        assertTrue("crucible metadata 0 should keep the TC4 hollow basin collision shape",
+                source.contains("private static final AxisAlignedBB CRUCIBLE_BOTTOM_AABB = new AxisAlignedBB(0.0D, 0.0D, 0.0D, 1.0D, 0.3125D, 1.0D);")
+                        && source.contains("private static final AxisAlignedBB CRUCIBLE_WEST_AABB = new AxisAlignedBB(0.0D, 0.0D, 0.0D, 0.125D, 0.85D, 1.0D);")
+                        && source.contains("private static final AxisAlignedBB CRUCIBLE_NORTH_AABB = new AxisAlignedBB(0.0D, 0.0D, 0.0D, 1.0D, 0.85D, 0.125D);")
+                        && source.contains("private static final AxisAlignedBB CRUCIBLE_EAST_AABB = new AxisAlignedBB(0.875D, 0.0D, 0.0D, 1.0D, 0.85D, 1.0D);")
+                        && source.contains("private static final AxisAlignedBB CRUCIBLE_SOUTH_AABB = new AxisAlignedBB(0.0D, 0.0D, 0.875D, 1.0D, 0.85D, 1.0D);")
+                        && source.contains("if (meta == 0) {")
+                        && source.contains("addCrucibleCollisionBoxes(pos, entityBox, collidingBoxes);")
+                        && source.contains("addCollisionBoxToList(pos, entityBox, collidingBoxes, CRUCIBLE_BOTTOM_AABB);")
+                        && source.contains("addCollisionBoxToList(pos, entityBox, collidingBoxes, CRUCIBLE_WEST_AABB);")
+                        && source.contains("addCollisionBoxToList(pos, entityBox, collidingBoxes, CRUCIBLE_NORTH_AABB);")
+                        && source.contains("addCollisionBoxToList(pos, entityBox, collidingBoxes, CRUCIBLE_EAST_AABB);")
+                        && source.contains("addCollisionBoxToList(pos, entityBox, collidingBoxes, CRUCIBLE_SOUTH_AABB);"));
+    }
+
     private static String read(String path) throws IOException {
         return new String(Files.readAllBytes(Paths.get(path)), StandardCharsets.UTF_8);
     }

@@ -45,6 +45,11 @@ import javax.annotation.Nullable;
 public class BlockMetalDevice extends BlockContainer {
 
     public static final PropertyInteger TYPE = PropertyInteger.create("type", 0, 14);
+    private static final AxisAlignedBB CRUCIBLE_BOTTOM_AABB = new AxisAlignedBB(0.0D, 0.0D, 0.0D, 1.0D, 0.3125D, 1.0D);
+    private static final AxisAlignedBB CRUCIBLE_WEST_AABB = new AxisAlignedBB(0.0D, 0.0D, 0.0D, 0.125D, 0.85D, 1.0D);
+    private static final AxisAlignedBB CRUCIBLE_NORTH_AABB = new AxisAlignedBB(0.0D, 0.0D, 0.0D, 1.0D, 0.85D, 0.125D);
+    private static final AxisAlignedBB CRUCIBLE_EAST_AABB = new AxisAlignedBB(0.875D, 0.0D, 0.0D, 1.0D, 0.85D, 1.0D);
+    private static final AxisAlignedBB CRUCIBLE_SOUTH_AABB = new AxisAlignedBB(0.0D, 0.0D, 0.875D, 1.0D, 0.85D, 1.0D);
     private static final AxisAlignedBB GRATE_AABB = new AxisAlignedBB(0.0D, 0.8125D, 0.0D, 1.0D, 1.0D, 1.0D);
     private static final AxisAlignedBB ARCANE_LAMP_AABB = new AxisAlignedBB(0.25D, 0.125D, 0.25D, 0.75D, 0.875D, 0.75D);
     private static final AxisAlignedBB CHARGER_AABB = new AxisAlignedBB(0.3125D, 0.5D, 0.3125D, 0.6875D, 1.0D, 0.6875D);
@@ -400,6 +405,10 @@ public class BlockMetalDevice extends BlockContainer {
     public void addCollisionBoxToList(IBlockState state, World worldIn, BlockPos pos, AxisAlignedBB entityBox,
                                       java.util.List<AxisAlignedBB> collidingBoxes, @Nullable Entity entityIn, boolean isActualState) {
         int meta = getMetaFromState(state);
+        if (meta == 0) {
+            addCrucibleCollisionBoxes(pos, entityBox, collidingBoxes);
+            return;
+        }
         if (meta == 5) {
             if (!(entityIn instanceof EntityItem)) {
                 addCollisionBoxToList(pos, entityBox, collidingBoxes, GRATE_AABB);
@@ -435,6 +444,14 @@ public class BlockMetalDevice extends BlockContainer {
             return;
         }
         super.addCollisionBoxToList(state, worldIn, pos, entityBox, collidingBoxes, entityIn, isActualState);
+    }
+
+    private void addCrucibleCollisionBoxes(BlockPos pos, AxisAlignedBB entityBox, java.util.List<AxisAlignedBB> collidingBoxes) {
+        addCollisionBoxToList(pos, entityBox, collidingBoxes, CRUCIBLE_BOTTOM_AABB);
+        addCollisionBoxToList(pos, entityBox, collidingBoxes, CRUCIBLE_WEST_AABB);
+        addCollisionBoxToList(pos, entityBox, collidingBoxes, CRUCIBLE_NORTH_AABB);
+        addCollisionBoxToList(pos, entityBox, collidingBoxes, CRUCIBLE_EAST_AABB);
+        addCollisionBoxToList(pos, entityBox, collidingBoxes, CRUCIBLE_SOUTH_AABB);
     }
 
     @Override
