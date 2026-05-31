@@ -15,6 +15,7 @@ public class EtherealBloomParityStaticGuardTest {
     public void tileAndRendererKeepEtherealBloomGrowthAndCleanseContracts() throws IOException {
         String tile = read("src/main/java/thaumcraft/common/tiles/TileEtherealBloom.java");
         String renderer = read("src/main/java/thaumcraft/client/renderers/tile/TileEtherealBloomRenderer.java");
+        String customPlant = read("src/main/java/thaumcraft/common/blocks/BlockCustomPlant.java");
 
         assertTrue("TileEtherealBloom should keep growth counters and tick update surface",
                 tile.contains("public int counter = 0;")
@@ -30,16 +31,44 @@ public class EtherealBloomParityStaticGuardTest {
         assertTrue("TileEtherealBloomRenderer should keep layered bloom rendering assets",
                 renderer.contains("textures/misc/nodes.png")
                         && renderer.contains("textures/models/crystalcapacitor.png")
-                        && renderer.contains("blocks/shimmerleaf")
-                        && renderer.contains("blocks/purifier_stalk"));
+                        && renderer.contains("textures/blocks/purifier_leaves.png")
+                        && renderer.contains("textures/blocks/purifier_stalk.png"));
         assertTrue("TileEtherealBloomRenderer should keep node pulse + core + leaf/stalk layer flow",
                 renderer.contains("renderNodePulse(")
                         && renderer.contains("renderCrystalCore(")
                         && renderer.contains("renderLeafLayers(")
-                        && renderer.contains("renderStalkLayers("));
+                        && renderer.contains("renderStalkLayers(")
+                        && renderer.contains("drawCenteredTexture()"));
+        assertTrue("TileEtherealBloomRenderer should bind direct bloom textures instead of missing atlas sprites",
+                renderer.contains("bindTexture(LEAF_TEXTURE)")
+                        && renderer.contains("bindTexture(STALK_TEXTURE)")
+                        && !renderer.contains("getAtlasSprite")
+                        && !renderer.contains("TextureMap.LOCATION_BLOCKS_TEXTURE"));
+        assertTrue("TileEtherealBloomRenderer should match TC4 quad orientation after the 180 degree X flip",
+                renderer.contains("buf.pos(-half, half, 0.0D).tex(0.0D, 1.0D)")
+                        && renderer.contains("buf.pos(half, -half, 0.0D).tex(1.0D, 0.0D)"));
+        assertTrue("TileEtherealBloomRenderer should not draw duplicate coplanar leaf/stalk quads",
+                countOccurrences(renderer, ".endVertex();") == 4);
+        assertTrue("TileEtherealBloomRenderer should avoid writing bloom planes into the depth buffer",
+                countOccurrences(renderer, "GlStateManager.depthMask(false)") >= 3
+                        && countOccurrences(renderer, "GlStateManager.depthMask(true)") >= 3
+                        && renderer.contains("DestFactor.ONE_MINUS_SRC_ALPHA"));
+        assertTrue("BlockCustomPlant should render cross plant models in the cutout layer",
+                customPlant.contains("public BlockRenderLayer getRenderLayer()")
+                        && customPlant.contains("BlockRenderLayer.CUTOUT"));
     }
 
     private static String read(String path) throws IOException {
         return new String(Files.readAllBytes(Paths.get(path)), StandardCharsets.UTF_8);
+    }
+
+    private static int countOccurrences(String text, String needle) {
+        int count = 0;
+        int index = 0;
+        while ((index = text.indexOf(needle, index)) >= 0) {
+            count++;
+            index += needle.length();
+        }
+        return count;
     }
 }

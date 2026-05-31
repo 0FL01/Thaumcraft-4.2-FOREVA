@@ -14,6 +14,7 @@ import net.minecraft.init.MobEffects;
 import net.minecraft.item.ItemStack;
 import net.minecraft.potion.PotionEffect;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.AxisAlignedBB;
@@ -72,6 +73,11 @@ public class BlockCustomPlant extends BlockBush {
     @Override
     public int damageDropped(IBlockState state) {
         return state.getValue(TYPE);
+    }
+
+    @Override
+    public BlockRenderLayer getRenderLayer() {
+        return BlockRenderLayer.CUTOUT;
     }
 
     @Override

@@ -1,11 +1,8 @@
 package thaumcraft.client.renderers.tile;
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.util.ResourceLocation;
@@ -18,12 +15,11 @@ public class TileEtherealBloomRenderer extends TileEntitySpecialRenderer<TileEth
             new ResourceLocation("thaumcraft", "textures/misc/nodes.png");
     private static final ResourceLocation CRYSTAL_CAPACITOR =
             new ResourceLocation("thaumcraft", "textures/models/crystalcapacitor.png");
-    private static final ResourceLocation BLOCKS = TextureMap.LOCATION_BLOCKS_TEXTURE;
 
-    private static final ResourceLocation LEAF_SPRITE =
-            new ResourceLocation("thaumcraft", "blocks/shimmerleaf");
-    private static final ResourceLocation STALK_SPRITE =
-            new ResourceLocation("thaumcraft", "blocks/purifier_stalk");
+    private static final ResourceLocation LEAF_TEXTURE =
+            new ResourceLocation("thaumcraft", "textures/blocks/purifier_leaves.png");
+    private static final ResourceLocation STALK_TEXTURE =
+            new ResourceLocation("thaumcraft", "textures/blocks/purifier_stalk.png");
 
     private final ModelCube model = new ModelCube();
 
@@ -89,10 +85,10 @@ public class TileEtherealBloomRenderer extends TileEntitySpecialRenderer<TileEth
     }
 
     private void renderLeafLayers(double x, double y, double z, float scale1, float scale3, float scale4) {
-        TextureAtlasSprite leaves = getSprite(LEAF_SPRITE);
-        if (leaves == null) return;
-        bindTexture(BLOCKS);
+        bindTexture(LEAF_TEXTURE);
+        GlStateManager.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
         GlStateManager.disableCull();
+        GlStateManager.depthMask(false);
 
         GlStateManager.pushMatrix();
         GlStateManager.translate(x + 0.5D, y + 0.25D, z + 0.5D);
@@ -101,7 +97,7 @@ public class TileEtherealBloomRenderer extends TileEntitySpecialRenderer<TileEth
             GlStateManager.pushMatrix();
             GlStateManager.scale(scale3, scale1, scale3);
             GlStateManager.rotate(90.0F * a, 0.0F, 1.0F, 0.0F);
-            drawCenteredIcon(leaves);
+            drawCenteredTexture();
             GlStateManager.popMatrix();
         }
         GlStateManager.popMatrix();
@@ -114,18 +110,19 @@ public class TileEtherealBloomRenderer extends TileEntitySpecialRenderer<TileEth
             GlStateManager.pushMatrix();
             GlStateManager.scale(scale4, scale1 * 0.7F, scale4);
             GlStateManager.rotate(90.0F * a, 0.0F, 1.0F, 0.0F);
-            drawCenteredIcon(leaves);
+            drawCenteredTexture();
             GlStateManager.popMatrix();
         }
         GlStateManager.popMatrix();
+        GlStateManager.depthMask(true);
         GlStateManager.enableCull();
     }
 
     private void renderStalkLayers(double x, double y, double z, float scale1, float scale2) {
-        TextureAtlasSprite stalk = getSprite(STALK_SPRITE);
-        if (stalk == null) return;
-        bindTexture(BLOCKS);
+        bindTexture(STALK_TEXTURE);
+        GlStateManager.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
         GlStateManager.disableCull();
+        GlStateManager.depthMask(false);
         GlStateManager.pushMatrix();
         GlStateManager.translate(x + 0.5D, y + 0.5D, z + 0.5D);
         GlStateManager.rotate(180.0F, 1.0F, 0.0F, 0.0F);
@@ -134,37 +131,24 @@ public class TileEtherealBloomRenderer extends TileEntitySpecialRenderer<TileEth
             GlStateManager.translate(0.0F, (1.0F - scale1) / 2.0F, 0.0F);
             GlStateManager.scale(scale2, scale1, scale2);
             GlStateManager.rotate(90.0F * a, 0.0F, 1.0F, 0.0F);
-            drawCenteredIcon(stalk);
+            drawCenteredTexture();
             GlStateManager.popMatrix();
         }
         GlStateManager.popMatrix();
+        GlStateManager.depthMask(true);
         GlStateManager.enableCull();
     }
 
-    private static TextureAtlasSprite getSprite(ResourceLocation sprite) {
-        TextureMap map = Minecraft.getMinecraft().getTextureMapBlocks();
-        return map == null ? null : map.getAtlasSprite(sprite.toString());
-    }
-
-    private static void drawCenteredIcon(TextureAtlasSprite icon) {
+    private static void drawCenteredTexture() {
         Tessellator tess = Tessellator.getInstance();
         BufferBuilder buf = tess.getBuffer();
-        float minU = icon.getMinU();
-        float maxU = icon.getMaxU();
-        float minV = icon.getMinV();
-        float maxV = icon.getMaxV();
         float half = 0.5F;
 
         buf.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX_COLOR);
-        buf.pos(-half, -half, 0.0D).tex(minU, maxV).color(1.0F, 1.0F, 1.0F, 1.0F).endVertex();
-        buf.pos(half, -half, 0.0D).tex(maxU, maxV).color(1.0F, 1.0F, 1.0F, 1.0F).endVertex();
-        buf.pos(half, half, 0.0D).tex(maxU, minV).color(1.0F, 1.0F, 1.0F, 1.0F).endVertex();
-        buf.pos(-half, half, 0.0D).tex(minU, minV).color(1.0F, 1.0F, 1.0F, 1.0F).endVertex();
-
-        buf.pos(-half, half, 0.0D).tex(minU, minV).color(1.0F, 1.0F, 1.0F, 1.0F).endVertex();
-        buf.pos(half, half, 0.0D).tex(maxU, minV).color(1.0F, 1.0F, 1.0F, 1.0F).endVertex();
-        buf.pos(half, -half, 0.0D).tex(maxU, maxV).color(1.0F, 1.0F, 1.0F, 1.0F).endVertex();
-        buf.pos(-half, -half, 0.0D).tex(minU, maxV).color(1.0F, 1.0F, 1.0F, 1.0F).endVertex();
+        buf.pos(-half, half, 0.0D).tex(0.0D, 1.0D).color(1.0F, 1.0F, 1.0F, 1.0F).endVertex();
+        buf.pos(half, half, 0.0D).tex(1.0D, 1.0D).color(1.0F, 1.0F, 1.0F, 1.0F).endVertex();
+        buf.pos(half, -half, 0.0D).tex(1.0D, 0.0D).color(1.0F, 1.0F, 1.0F, 1.0F).endVertex();
+        buf.pos(-half, -half, 0.0D).tex(0.0D, 0.0D).color(1.0F, 1.0F, 1.0F, 1.0F).endVertex();
         tess.draw();
     }
 }
