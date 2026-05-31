@@ -17,6 +17,7 @@ public class CustomItemRendererContractTest {
         String clientModelRegistry = read("src/main/java/thaumcraft/client/ClientModelRegistry.java");
         String wandRenderer = read("src/main/java/thaumcraft/client/renderers/item/ItemWandRenderer.java");
         String wandModel = read("src/main/java/thaumcraft/client/renderers/models/gear/ModelWand.java");
+        String wandPerspectiveModel = read("src/main/java/thaumcraft/client/renderers/item/WandPerspectiveModel.java");
         String trunkRenderer = read("src/main/java/thaumcraft/client/renderers/item/ItemTrunkSpawnerRenderer.java");
         String trunkPerspectiveModel = read("src/main/java/thaumcraft/client/renderers/item/TrunkSpawnerPerspectiveModel.java");
         String wandItemModel = read("src/main/resources/assets/thaumcraft/models/item/wandcasting_tesr.json");
@@ -33,6 +34,15 @@ public class CustomItemRendererContractTest {
         assertTrue("ItemWandRenderer and ModelWand should preserve the reference dynamic wand contract instead of a flat handheld icon",
                 wandRenderer.contains("extends TileEntityItemStackRenderer")
                         && wandRenderer.contains("new ModelWand()")
+                        && wandRenderer.contains("CURRENT_TRANSFORM")
+                        && wandRenderer.contains("isHandTransform(transformType)")
+                        && wandRenderer.contains("applyBasePose(wand, stack, transformType)")
+                        && wandRenderer.contains("applyInventoryPose")
+                        && wandRenderer.contains("applyEntityPose")
+                        && wandRenderer.contains("HAND_SCALE = 0.5F")
+                        && wandRenderer.contains("HAND_Y_OFFSET = -0.5F")
+                        && wandRenderer.contains("1.5F + HAND_Y_OFFSET")
+                        && wandRenderer.contains("GlStateManager.scale(HAND_SCALE, HAND_SCALE, HAND_SCALE)")
                         && wandRenderer.contains("player.isHandActive()")
                         && wandRenderer.contains("wand.getFocus(stack)")
                         && wandModel.contains("wand.getRod(wandStack).getTexture()")
@@ -42,6 +52,16 @@ public class CustomItemRendererContractTest {
                         && wandModel.contains("textures/misc/script.png")
                         && wandModel.contains("textures/models/wand.png")
                         && wandModel.contains("drawRune("));
+
+        assertTrue("ClientModelRegistry should wrap wandcasting into a perspective-aware baked model so the TEISR can distinguish GUI, hand, and ground contexts",
+                clientModelRegistry.contains("WANDCASTING_MODEL")
+                        && clientModelRegistry.contains("new WandPerspectiveModel(model)"));
+
+        assertTrue("WandPerspectiveModel should keep the baked display matrix and pass TransformType to ItemWandRenderer",
+                wandPerspectiveModel.contains("implements IBakedModel")
+                        && wandPerspectiveModel.contains("ItemWandRenderer.setTransformType(cameraTransformType)")
+                        && wandPerspectiveModel.contains("delegate.handlePerspective(cameraTransformType)")
+                        && wandPerspectiveModel.contains("Pair.of(this, delegatePerspective.getRight())"));
 
         assertTrue("ItemTrunkSpawnerRenderer should render the chest-shell model via TEISR with transforms delegated to JSON display transforms",
                 trunkRenderer.contains("extends TileEntityItemStackRenderer")
@@ -89,6 +109,16 @@ public class CustomItemRendererContractTest {
         assertTrue("The wand and trunk item-model stubs must stay builtin/entity so Forge dispatches the dedicated item renderers",
                 wandItemModel.contains("\"parent\": \"builtin/entity\"")
                         && trunkItemModel.contains("\"parent\": \"builtin/entity\""));
+
+        assertTrue("The wand TEISR model should keep neutral display matrices because ItemWandRenderer owns the TC4 context-specific pose and lower hand offset",
+                wandItemModel.contains("\"thirdperson_righthand\"")
+                        && wandItemModel.contains("\"firstperson_righthand\"")
+                        && wandItemModel.contains("\"gui\"")
+                        && wandItemModel.contains("\"ground\"")
+                        && wandItemModel.contains("\"fixed\"")
+                        && wandItemModel.contains("\"rotation\": [0, 0, 0]")
+                        && wandItemModel.contains("\"translation\": [0, 0, 0]")
+                        && wandItemModel.contains("\"scale\": [1.0, 1.0, 1.0]"));
     }
 
     private static String read(String path) throws IOException {

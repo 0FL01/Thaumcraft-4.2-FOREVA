@@ -10,6 +10,7 @@ import net.minecraftforge.fml.relauncher.Side;
 import thaumcraft.client.renderers.item.CrystalPerspectiveModel;
 import thaumcraft.client.renderers.item.ThaumometerPerspectiveModel;
 import thaumcraft.client.renderers.item.TrunkSpawnerPerspectiveModel;
+import thaumcraft.client.renderers.item.WandPerspectiveModel;
 import thaumcraft.common.Thaumcraft;
 
 @Mod.EventBusSubscriber(modid = Thaumcraft.MODID, value = Side.CLIENT)
@@ -21,6 +22,8 @@ public final class ClientModelRegistry {
             new ModelResourceLocation("thaumcraft:trunkspawner_tesr", "inventory");
     static final ModelResourceLocation BLOCKCRYSTAL_MODEL =
             new ModelResourceLocation("thaumcraft:blockcrystal_tesr", "inventory");
+    static final ModelResourceLocation WANDCASTING_MODEL =
+            new ModelResourceLocation("thaumcraft:wandcasting_tesr", "inventory");
 
     private ClientModelRegistry() {
     }
@@ -43,6 +46,10 @@ public final class ClientModelRegistry {
         model = event.getModelRegistry().getObject(BLOCKCRYSTAL_MODEL);
         if (model != null) {
             event.getModelRegistry().putObject(BLOCKCRYSTAL_MODEL, new CrystalPerspectiveModel(model));
+        }
+        model = event.getModelRegistry().getObject(WANDCASTING_MODEL);
+        if (model != null) {
+            event.getModelRegistry().putObject(WANDCASTING_MODEL, new WandPerspectiveModel(model));
         }
     }
 }
