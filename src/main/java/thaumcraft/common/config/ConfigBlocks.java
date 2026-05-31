@@ -18,6 +18,8 @@ public class ConfigBlocks {
     // Fluid instances
     public static Fluid FLUIDPURE;
     public static Fluid FLUIDDEATH;
+    public static Fluid FLUXGOO;
+    public static Fluid FLUXGAS;
 
     // Block instances
     public static BlockJar blockJar;
@@ -440,6 +442,36 @@ public class ConfigBlocks {
                     .setViscosity(1500)
                     .setRarity(EnumRarity.RARE);
             FluidRegistry.registerFluid(FLUIDDEATH);
+        }
+
+        Fluid existingFluxGoo = FluidRegistry.getFluid("fluxgoo");
+        if (existingFluxGoo != null) {
+            FLUXGOO = existingFluxGoo;
+        } else {
+            FLUXGOO = new Fluid("fluxgoo",
+                    new ResourceLocation("thaumcraft", "blocks/fluxgoo"),
+                    new ResourceLocation("thaumcraft", "blocks/fluxgoo"))
+                    .setGaseous(false)
+                    .setLuminosity(7)
+                    .setDensity(8)
+                    .setViscosity(6000)
+                    .setRarity(EnumRarity.RARE);
+            FluidRegistry.registerFluid(FLUXGOO);
+        }
+
+        Fluid existingFluxGas = FluidRegistry.getFluid("fluxgas");
+        if (existingFluxGas != null) {
+            FLUXGAS = existingFluxGas;
+        } else {
+            FLUXGAS = new Fluid("fluxgas",
+                    new ResourceLocation("thaumcraft", "blocks/fluxgas"),
+                    new ResourceLocation("thaumcraft", "blocks/fluxgas"))
+                    .setGaseous(true)
+                    .setLuminosity(7)
+                    .setDensity(-4)
+                    .setViscosity(2500)
+                    .setRarity(EnumRarity.RARE);
+            FluidRegistry.registerFluid(FLUXGAS);
         }
     }
 

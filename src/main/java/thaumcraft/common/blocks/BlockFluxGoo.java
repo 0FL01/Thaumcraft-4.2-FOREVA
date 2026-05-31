@@ -1,54 +1,44 @@
 package thaumcraft.common.blocks;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockLiquid;
-import net.minecraft.block.material.Material;
-import net.minecraft.block.properties.PropertyInteger;
-import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.util.EnumBlockRenderType;
+import net.minecraft.entity.Entity;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
+import net.minecraftforge.fluids.BlockFluidBase;
+import net.minecraftforge.fluids.BlockFluidFinite;
+import thaumcraft.common.Thaumcraft;
+import thaumcraft.common.config.Config;
+import thaumcraft.common.config.ConfigBlocks;
 
-import java.util.Random;
-
-public class BlockFluxGoo extends Block {
+public class BlockFluxGoo extends BlockFluidFinite {
 
     /** Non-null zero-size AABB — replaces NULL_AABB which is null in 1.12.2. */
     private static final AxisAlignedBB ZERO_AABB = new AxisAlignedBB(0, 0, 0, 0, 0, 0);
 
-    public static final PropertyInteger LEVEL = BlockLiquid.LEVEL;
-
     public BlockFluxGoo() {
-        super(Material.WATER);
-        this.setDefaultState(this.blockState.getBaseState().withProperty(LEVEL, 0));
-        this.setTickRandomly(true);
+        super(ConfigBlocks.FLUXGOO, Config.fluxGoomaterial);
+        this.setCreativeTab(Thaumcraft.tabTC);
         this.setHardness(0.0F);
     }
 
     @Override
-    protected BlockStateContainer createBlockState() {
-        return new BlockStateContainer(this, LEVEL);
-    }
-
-    @Override
     public IBlockState getStateFromMeta(int meta) {
-        return this.getDefaultState().withProperty(LEVEL, MathHelper.clamp(meta, 0, 7));
+        return super.getStateFromMeta(MathHelper.clamp(meta, 0, this.getMaxRenderHeightMeta()));
     }
 
     @Override
     public int getMetaFromState(IBlockState state) {
-        return MathHelper.clamp(state.getValue(LEVEL), 0, 7);
+        return MathHelper.clamp(state.getValue(BlockFluidBase.LEVEL), 0, this.getMaxRenderHeightMeta());
     }
 
     @Override
-    public boolean isOpaqueCube(IBlockState state) { return false; }
-
-    @Override
-    public boolean isFullCube(IBlockState state) { return false; }
+    public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess world, BlockPos pos) {
+        return ZERO_AABB;
+    }
 
     @Override
     public AxisAlignedBB getCollisionBoundingBox(IBlockState state, IBlockAccess world, BlockPos pos) {
@@ -56,8 +46,12 @@ public class BlockFluxGoo extends Block {
     }
 
     @Override
-    public int quantityDropped(Random random) { return 0; }
+    public Vec3d getFogColor(World world, BlockPos pos, IBlockState state, Entity entity, Vec3d originalColor, float partialTicks) {
+        return originalColor;
+    }
 
     @Override
-    public EnumBlockRenderType getRenderType(IBlockState state) { return EnumBlockRenderType.INVISIBLE; }
+    public boolean isReplaceable(IBlockAccess world, BlockPos pos) {
+        return this.getMetaFromState(world.getBlockState(pos)) < 2;
+    }
 }

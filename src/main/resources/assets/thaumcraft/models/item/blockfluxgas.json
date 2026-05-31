@@ -1,3 +1,6 @@
 {
-  "parent": "thaumcraft:block/blockeldritch_0"
+  "parent": "minecraft:block/cube_all",
+  "textures": {
+    "all": "thaumcraft:blocks/fluxgas"
+  }
 }
