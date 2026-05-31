@@ -1,6 +1,7 @@
 package thaumcraft.common.blocks;
 
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockLiquid;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.PropertyInteger;
 import net.minecraft.block.state.BlockStateContainer;
@@ -19,7 +20,7 @@ public class BlockFluxGoo extends Block {
     /** Non-null zero-size AABB — replaces NULL_AABB which is null in 1.12.2. */
     private static final AxisAlignedBB ZERO_AABB = new AxisAlignedBB(0, 0, 0, 0, 0, 0);
 
-    public static final PropertyInteger LEVEL = PropertyInteger.create("level", 0, 7);
+    public static final PropertyInteger LEVEL = BlockLiquid.LEVEL;
 
     public BlockFluxGoo() {
         super(Material.WATER);
@@ -40,7 +41,7 @@ public class BlockFluxGoo extends Block {
 
     @Override
     public int getMetaFromState(IBlockState state) {
-        return state.getValue(LEVEL);
+        return MathHelper.clamp(state.getValue(LEVEL), 0, 7);
     }
 
     @Override
