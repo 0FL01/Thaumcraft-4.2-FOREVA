@@ -296,7 +296,7 @@ public class RenderEventHandler {
         GlStateManager.translate(x - renderManager.viewerPosX, y - renderManager.viewerPosY, z - renderManager.viewerPosZ);
         GlStateManager.rotate(-renderManager.playerViewY, 0.0F, 1.0F, 0.0F);
         GlStateManager.rotate(renderManager.playerViewX, 1.0F, 0.0F, 0.0F);
-        float scale = 0.025F * Math.max(0.35F, tagscale / 0.3F);
+        float scale = 0.01875F * Math.max(0.35F, tagscale / 0.3F);
         GlStateManager.scale(-scale, -scale, scale);
         GlStateManager.disableDepth();
         GlStateManager.depthMask(false);

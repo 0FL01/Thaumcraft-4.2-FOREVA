@@ -223,6 +223,7 @@ public class ClientProxyFxStaticGuardTest {
                         && renderHandler.contains("tile instanceof INode")
                         && renderHandler.contains("ItemThaumometer.findLookedAtNodeTile(player.world, player, 10.0D)")
                         && renderHandler.contains("drawTagsOnContainer(")
+                        && renderHandler.contains("float scale = 0.01875F * Math.max(0.35F, tagscale / 0.3F);")
                         && renderHandler.contains("UtilsFX.drawTag("));
         assertTrue("ParticleEngine must keep queued particle intake + tick drain + effectRenderer dispatch baseline",
                 particleEngine.contains("public static void addEffect(World world, Particle particle)")
