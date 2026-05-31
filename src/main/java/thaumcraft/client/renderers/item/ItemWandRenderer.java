@@ -17,6 +17,12 @@ public class ItemWandRenderer extends TileEntityItemStackRenderer {
             ThreadLocal.withInitial(() -> ItemCameraTransforms.TransformType.NONE);
     private static final float HAND_SCALE = 0.5F;
     private static final float HAND_Y_OFFSET = -0.5F;
+    private static final float INVENTORY_X_OFFSET = 0.5F;
+    private static final float INVENTORY_Y_OFFSET = 0.5F;
+    private static final float INVENTORY_SCALE = 0.6F;
+    private static final float INVENTORY_X_ROTATION = 20.0F;
+    private static final float INVENTORY_Y_ROTATION = -45.0F;
+    private static final float INVENTORY_Z_ROTATION = 45.0F;
 
     private final ModelWand model = new ModelWand();
 
@@ -78,10 +84,14 @@ public class ItemWandRenderer extends TileEntityItemStackRenderer {
     }
 
     private static void applyInventoryPose(ItemWandCasting wand, ItemStack stack) {
+        GlStateManager.translate(INVENTORY_X_OFFSET, INVENTORY_Y_OFFSET, 0.0F);
+        GlStateManager.scale(INVENTORY_SCALE, INVENTORY_SCALE, INVENTORY_SCALE);
         if (wand.isStaff(stack)) {
             GlStateManager.scale(0.8F, 0.8F, 0.8F);
         }
-        GlStateManager.rotate(66.0F, 0.0F, 0.0F, 1.0F);
+        GlStateManager.rotate(INVENTORY_X_ROTATION, 1.0F, 0.0F, 0.0F);
+        GlStateManager.rotate(INVENTORY_Y_ROTATION, 0.0F, 1.0F, 0.0F);
+        GlStateManager.rotate(INVENTORY_Z_ROTATION, 0.0F, 0.0F, 1.0F);
         GlStateManager.translate(0.0F, 0.6F, 0.0F);
         if (wand.isStaff(stack)) {
             GlStateManager.translate(-0.7F, 0.6F, 0.0F);
