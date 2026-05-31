@@ -52,6 +52,61 @@ public class CrucibleRendererFidelityStaticGuardTest {
                         && blockSource.contains("return BlockRenderLayer.CUTOUT;"));
     }
 
+    @Test
+    public void crucibleBubbleFxKeepsOriginalCustomParticleShape() throws IOException {
+        String bubble = read("src/main/java/thaumcraft/client/fx/particles/FXBubble.java");
+        String proxy = read("src/main/java/thaumcraft/client/ClientProxy.java");
+
+        assertTrue("Crucible bubbles should support the TC6 particle strip indices 64-66 and frothDown index 73",
+                bubble.contains("setParticle(int particle)")
+                        && bubble.contains("setFinalParticles(int start, int count)")
+                        && proxy.contains("setParticle(64)")
+                        && proxy.contains("setFinalParticles(65, 2)")
+                        && proxy.contains("setParticle(73)"));
+        assertTrue("Crucible bubbles should render their own fullbright colored billboard instead of delegating to vanilla particle visuals",
+                bubble.contains("float u0 = (float) (this.particle % 16) / 16.0F;")
+                        && bubble.contains("Particle.interpPosX")
+                        && bubble.contains("PARTICLE_TEXTURE = new ResourceLocation(\"thaumcraft\", \"textures/misc/particles.png\")")
+                        && bubble.contains("Minecraft.getMinecraft().renderEngine.bindTexture(PARTICLE_TEXTURE)")
+                        && bubble.contains("DefaultVertexFormats.PARTICLE_POSITION_TEX_COLOR_LMAP")
+                        && bubble.contains("customBuffer.pos(")
+                        && bubble.contains(".color(this.particleRed, this.particleGreen, this.particleBlue, this.particleAlpha)")
+                        && bubble.contains(".lightmap(lightU, lightV)")
+                        && bubble.contains("return 0xF000F0;")
+                        && bubble.contains("return 3;")
+                        && !bubble.contains("super.renderParticle(buffer")
+                        && !bubble.contains("setParticleTextureIndex("));
+        assertTrue("Crucible proxy should use TC6-style gravity, random drift, alpha, and fixed boil burst count",
+                proxy.contains("setRandomMovementScale(0.001D, 0.001D, 0.001D)")
+                        && proxy.contains("setRandomMovementScale(0.002D, 0.002D, 0.002D)")
+                        && proxy.contains("setGravity(0.1F)")
+                        && proxy.contains("setGravity(0.05F)")
+                        && proxy.contains("setGravity(-0.001F)")
+                        && proxy.contains("setGravity(-0.025F * type)")
+                        && proxy.contains("setAlpha(0.8F)")
+                        && proxy.contains("for (int i = 0; i < 2; i++)"));
+    }
+
+    @Test
+    public void crucibleDrawEffectsKeepsTc4BoilTriggers() throws IOException {
+        String crucible = read("src/main/java/thaumcraft/common/tiles/TileCrucible.java");
+
+        assertTrue("Heated water must spawn continuous surface froth",
+                crucible.contains("if (this.heat > 150)")
+                        && crucible.contains("Thaumcraft.proxy.crucibleFroth("));
+        assertTrue("Aspected water must keep occasional colored bubble spawns",
+                crucible.contains("this.world.rand.nextInt(6) == 0")
+                        && crucible.contains("this.aspects.size() > 0")
+                        && crucible.contains("Thaumcraft.proxy.crucibleBubble("));
+        assertTrue("Overfilled crucibles must keep side froth overflow",
+                crucible.contains("this.tagAmount() > this.maxTags")
+                        && crucible.contains("Thaumcraft.proxy.crucibleFrothDown("));
+        assertTrue("Crucible block event 2 must keep the burst boil path",
+                crucible.contains("if (id == 2)")
+                        && crucible.contains("Thaumcraft.proxy.crucibleBoilSound(")
+                        && crucible.contains("Thaumcraft.proxy.crucibleBoil("));
+    }
+
     private static String read(String path) throws IOException {
         return new String(Files.readAllBytes(Paths.get(path)), StandardCharsets.UTF_8);
     }
