@@ -72,7 +72,7 @@ public class TileEldritchObeliskRenderer extends TileEntitySpecialRenderer<TileE
             GlStateManager.translate(x + 0.5D, y + bob + 1.0D, z + 0.5D);
             GlStateManager.disableCull();
             bindTexture(sideTexture);
-            renderSides(0.48F, 3.0F);
+            renderSides(0.5F, 3.0F);
 
             bindTexture(capTexture);
             renderObeliskCapPair();
@@ -132,26 +132,26 @@ public class TileEldritchObeliskRenderer extends TileEntitySpecialRenderer<TileE
         BufferBuilder buf = tess.getBuffer();
         buf.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX_COLOR);
 
-        face(buf, -half, 0.0F, -half, half, height, -half, 0.0F, 1.0F);
-        face(buf, -half, 0.0F, half, half, height, half, 0.0F, 1.0F);
-        faceZ(buf, -half, 0.0F, -half, -half, height, half, 0.0F, 1.0F);
-        faceZ(buf, half, 0.0F, -half, half, height, half, 0.0F, 1.0F);
+        face(buf, -half, 0.0F, -half, half, height, -half);
+        face(buf, -half, 0.0F, half, half, height, half);
+        faceZ(buf, -half, 0.0F, -half, -half, height, half);
+        faceZ(buf, half, 0.0F, -half, half, height, half);
 
         tess.draw();
     }
 
-    private static void face(BufferBuilder buf, float x0, float y0, float z, float x1, float y1, float z1, float v0, float v1) {
-        buf.pos(x0, y1, z).tex(0.0D, v0).color(1.0F, 1.0F, 1.0F, 1.0F).endVertex();
-        buf.pos(x0, y0, z).tex(0.0D, v1).color(1.0F, 1.0F, 1.0F, 1.0F).endVertex();
-        buf.pos(x1, y0, z1).tex(1.0D, v1).color(1.0F, 1.0F, 1.0F, 1.0F).endVertex();
-        buf.pos(x1, y1, z1).tex(1.0D, v0).color(1.0F, 1.0F, 1.0F, 1.0F).endVertex();
+    private static void face(BufferBuilder buf, float x0, float y0, float z, float x1, float y1, float z1) {
+        buf.pos(x0, y1, z).tex(0.0D, 1.0D).color(1.0F, 1.0F, 1.0F, 1.0F).endVertex();
+        buf.pos(x1, y1, z1).tex(1.0D, 1.0D).color(1.0F, 1.0F, 1.0F, 1.0F).endVertex();
+        buf.pos(x1, y0, z1).tex(1.0D, 0.0D).color(1.0F, 1.0F, 1.0F, 1.0F).endVertex();
+        buf.pos(x0, y0, z).tex(0.0D, 0.0D).color(1.0F, 1.0F, 1.0F, 1.0F).endVertex();
     }
 
-    private static void faceZ(BufferBuilder buf, float x, float y0, float z0, float x1, float y1, float z1, float v0, float v1) {
-        buf.pos(x, y1, z0).tex(0.0D, v0).color(1.0F, 1.0F, 1.0F, 1.0F).endVertex();
-        buf.pos(x, y0, z0).tex(0.0D, v1).color(1.0F, 1.0F, 1.0F, 1.0F).endVertex();
-        buf.pos(x1, y0, z1).tex(1.0D, v1).color(1.0F, 1.0F, 1.0F, 1.0F).endVertex();
-        buf.pos(x1, y1, z1).tex(1.0D, v0).color(1.0F, 1.0F, 1.0F, 1.0F).endVertex();
+    private static void faceZ(BufferBuilder buf, float x, float y0, float z0, float x1, float y1, float z1) {
+        buf.pos(x, y1, z0).tex(0.0D, 1.0D).color(1.0F, 1.0F, 1.0F, 1.0F).endVertex();
+        buf.pos(x1, y1, z1).tex(1.0D, 1.0D).color(1.0F, 1.0F, 1.0F, 1.0F).endVertex();
+        buf.pos(x1, y0, z1).tex(1.0D, 0.0D).color(1.0F, 1.0F, 1.0F, 1.0F).endVertex();
+        buf.pos(x, y0, z0).tex(0.0D, 0.0D).color(1.0F, 1.0F, 1.0F, 1.0F).endVertex();
     }
 
     private static void v(BufferBuilder buf, float x, float y, float z,

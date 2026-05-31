@@ -43,13 +43,18 @@ public class TableEldritchRendererFidelityStaticGuardTest {
         assertTrue(obelisk.contains("CAP_MODEL.renderCap();"));
         assertTrue(obelisk.contains("OpenGlHelper.setLightmapTextureCoords"));
         assertTrue(obelisk.contains("GlStateManager.enableRescaleNormal()"));
+        assertTrue(obelisk.contains("renderSides(0.5F, 3.0F);"));
+        assertTrue(obelisk.contains(".tex(0.0D, 1.0D)") && obelisk.contains(".tex(1.0D, 0.0D)"));
         assertTrue(obelisk.indexOf("renderSideFields(") < obelisk.indexOf("bindTexture(sideTexture);"));
         assertFalse(obelisk.contains("TileRenderHelper.drawTexturedQuad(0.52F"));
         assertFalse(obelisk.contains("GlStateManager.depthMask(false)"));
 
         assertTrue(capModel.contains("Wavefront \"Cap\" group triangles from obelisk_cap.obj"));
         assertTrue(capModel.contains("buf.begin(GL11.GL_TRIANGLES, DefaultVertexFormats.POSITION_TEX_NORMAL)"));
+        assertTrue(capModel.contains(".tex(uv[0], 1.0F - uv[1])"));
         assertTrue(capModel.contains("private static final int[][] TRIANGLES"));
+        assertTrue(capModel.contains("Wavefront \"Tip\" group triangles from obelisk_cap.obj"));
+        assertTrue(capModel.contains("private static final int[][] TIP_TRIANGLES"));
 
         assertTrue(lock.contains("TileRenderHelper.renderEntityItem(tile, key, 0.0F);"));
         assertTrue(lock.contains("ActiveRenderInfo.getRotationX()"));
