@@ -2,6 +2,9 @@ package thaumcraft.common.blocks;
 
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.init.MobEffects;
+import net.minecraft.potion.PotionEffect;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
@@ -10,6 +13,7 @@ import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.fluids.BlockFluidBase;
 import net.minecraftforge.fluids.BlockFluidFinite;
+import thaumcraft.api.entities.ITaintedMob;
 import thaumcraft.common.Thaumcraft;
 import thaumcraft.common.config.Config;
 import thaumcraft.common.config.ConfigBlocks;
@@ -46,8 +50,44 @@ public class BlockFluxGas extends BlockFluidFinite {
     }
 
     @Override
+    public void onEntityCollision(World world, BlockPos pos, IBlockState state, Entity entity) {
+        if (world.isRemote
+                || world.rand.nextInt(10) != 0
+                || !(entity instanceof EntityLivingBase)
+                || entity instanceof ITaintedMob) {
+            return;
+        }
+
+        EntityLivingBase living = (EntityLivingBase) entity;
+        if (living.isEntityUndead()
+                || (Config.potionVisExhaust != null && living.isPotionActive(Config.potionVisExhaust))
+                || living.isPotionActive(MobEffects.NAUSEA)) {
+            return;
+        }
+
+        int meta = this.getMetaFromState(state);
+        if (world.rand.nextBoolean() && Config.potionVisExhaust != null) {
+            PotionEffect pe = new PotionEffect(Config.potionVisExhaust, 1200, meta / 3, true, true);
+            pe.getCurativeItems().clear();
+            living.addPotionEffect(pe);
+        } else {
+            living.addPotionEffect(new PotionEffect(MobEffects.NAUSEA, 80 + meta * 20, 0, false, true));
+        }
+
+        if (meta > 0) {
+            world.setBlockState(pos, this.getStateFromMeta(meta - 1), 3);
+        } else {
+            world.setBlockToAir(pos);
+        }
+    }
+
+    @Override
     public Vec3d getFogColor(World world, BlockPos pos, IBlockState state, Entity entity, Vec3d originalColor, float partialTicks) {
         return originalColor;
+    }
+
+    public int getQuanta() {
+        return this.quantaPerBlock;
     }
 
     @Override

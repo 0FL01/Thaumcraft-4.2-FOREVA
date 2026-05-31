@@ -2,6 +2,8 @@ package thaumcraft.common.blocks;
 
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.potion.PotionEffect;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
@@ -13,6 +15,7 @@ import net.minecraftforge.fluids.BlockFluidFinite;
 import thaumcraft.common.Thaumcraft;
 import thaumcraft.common.config.Config;
 import thaumcraft.common.config.ConfigBlocks;
+import thaumcraft.common.entities.monster.EntityThaumicSlime;
 
 public class BlockFluxGoo extends BlockFluidFinite {
 
@@ -46,8 +49,39 @@ public class BlockFluxGoo extends BlockFluidFinite {
     }
 
     @Override
+    public void onEntityCollision(World world, BlockPos pos, IBlockState state, Entity entity) {
+        int meta = this.getMetaFromState(state);
+        if (entity instanceof EntityThaumicSlime) {
+            EntityThaumicSlime slime = (EntityThaumicSlime) entity;
+            if (!world.isRemote && slime.getSlimeSize() < meta && world.rand.nextBoolean()) {
+                slime.setSlimeSize(slime.getSlimeSize() + 1);
+                if (meta > 1) {
+                    world.setBlockState(pos, this.getStateFromMeta(meta - 1), 3);
+                } else {
+                    world.setBlockToAir(pos);
+                }
+            }
+            return;
+        }
+
+        float quanta = this.getQuantaPercentage(world, pos);
+        entity.motionX *= 1.0F - quanta;
+        entity.motionZ *= 1.0F - quanta;
+
+        if (!world.isRemote && entity instanceof EntityLivingBase && Config.potionVisExhaust != null) {
+            PotionEffect pe = new PotionEffect(Config.potionVisExhaust, 600, meta / 3, true, true);
+            pe.getCurativeItems().clear();
+            ((EntityLivingBase) entity).addPotionEffect(pe);
+        }
+    }
+
+    @Override
     public Vec3d getFogColor(World world, BlockPos pos, IBlockState state, Entity entity, Vec3d originalColor, float partialTicks) {
         return originalColor;
+    }
+
+    public int getQuanta() {
+        return this.quantaPerBlock;
     }
 
     @Override
