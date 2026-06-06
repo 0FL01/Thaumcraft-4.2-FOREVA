@@ -168,17 +168,17 @@ public class ConfigRecipes {
                         3,
                         3,
                         Arrays.asList(
-                                new ItemStack(Blocks.NETHERRACK), new ItemStack(Blocks.OBSIDIAN), new ItemStack(Blocks.NETHERRACK),
+                                new ItemStack(Blocks.NETHER_BRICK), new ItemStack(Blocks.OBSIDIAN), new ItemStack(Blocks.NETHER_BRICK),
                                 new ItemStack(Blocks.OBSIDIAN), ItemStack.EMPTY, new ItemStack(Blocks.OBSIDIAN),
-                                new ItemStack(Blocks.NETHERRACK), new ItemStack(Blocks.OBSIDIAN), new ItemStack(Blocks.NETHERRACK),
+                                new ItemStack(Blocks.NETHER_BRICK), new ItemStack(Blocks.OBSIDIAN), new ItemStack(Blocks.NETHER_BRICK),
 
-                                new ItemStack(Blocks.NETHERRACK), new ItemStack(Blocks.OBSIDIAN), new ItemStack(Blocks.NETHERRACK),
-                                new ItemStack(Blocks.OBSIDIAN), new ItemStack(Blocks.LAVA), new ItemStack(Blocks.NETHER_BRICK),
-                                new ItemStack(Blocks.NETHERRACK), new ItemStack(Blocks.OBSIDIAN), new ItemStack(Blocks.NETHERRACK),
+                                new ItemStack(Blocks.NETHER_BRICK), new ItemStack(Blocks.OBSIDIAN), new ItemStack(Blocks.NETHER_BRICK),
+                                new ItemStack(Blocks.OBSIDIAN), new ItemStack(Blocks.LAVA), new ItemStack(Blocks.IRON_BARS),
+                                new ItemStack(Blocks.NETHER_BRICK), new ItemStack(Blocks.OBSIDIAN), new ItemStack(Blocks.NETHER_BRICK),
 
-                                new ItemStack(Blocks.NETHERRACK), new ItemStack(Blocks.OBSIDIAN), new ItemStack(Blocks.NETHERRACK),
+                                new ItemStack(Blocks.NETHER_BRICK), new ItemStack(Blocks.OBSIDIAN), new ItemStack(Blocks.NETHER_BRICK),
                                 new ItemStack(Blocks.OBSIDIAN), new ItemStack(Blocks.OBSIDIAN), new ItemStack(Blocks.OBSIDIAN),
-                                new ItemStack(Blocks.NETHERRACK), new ItemStack(Blocks.OBSIDIAN), new ItemStack(Blocks.NETHERRACK))));
+                                new ItemStack(Blocks.NETHER_BRICK), new ItemStack(Blocks.OBSIDIAN), new ItemStack(Blocks.NETHER_BRICK))));
         ConfigResearch.recipes.put("InfusionAltar",
                 Arrays.asList(
                         new AspectList().add(Aspect.FIRE, 25).add(Aspect.EARTH, 25).add(Aspect.ORDER, 25)
@@ -249,8 +249,8 @@ public class ConfigRecipes {
             WandTriggerRegistry.registerWandBlockTrigger(Thaumcraft.proxy.wandManager, 0, Blocks.BOOKSHELF, 0, "Thaumcraft");
             WandTriggerRegistry.registerWandBlockTrigger(Thaumcraft.proxy.wandManager, 1, Blocks.CAULDRON, -1, "Thaumcraft");
             WandTriggerRegistry.registerWandBlockTrigger(Thaumcraft.proxy.wandManager, 2, Blocks.OBSIDIAN, -1, "Thaumcraft");
-            WandTriggerRegistry.registerWandBlockTrigger(Thaumcraft.proxy.wandManager, 2, Blocks.NETHERRACK, -1, "Thaumcraft");
-            WandTriggerRegistry.registerWandBlockTrigger(Thaumcraft.proxy.wandManager, 2, Blocks.NETHER_BRICK_FENCE, -1, "Thaumcraft");
+            WandTriggerRegistry.registerWandBlockTrigger(Thaumcraft.proxy.wandManager, 2, Blocks.NETHER_BRICK, -1, "Thaumcraft");
+            WandTriggerRegistry.registerWandBlockTrigger(Thaumcraft.proxy.wandManager, 2, Blocks.IRON_BARS, -1, "Thaumcraft");
             WandTriggerRegistry.registerWandBlockTrigger(Thaumcraft.proxy.wandManager, 3, ConfigBlocks.blockStoneDevice, 2, "Thaumcraft");
             WandTriggerRegistry.registerWandBlockTrigger(Thaumcraft.proxy.wandManager, 4, Blocks.GLASS, -1, "Thaumcraft");
             WandTriggerRegistry.registerWandBlockTrigger(Thaumcraft.proxy.wandManager, 5, ConfigBlocks.blockMetalDevice, 9, "Thaumcraft");

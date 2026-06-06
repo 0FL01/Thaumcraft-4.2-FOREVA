@@ -20,6 +20,10 @@ public class WandManagerTriggerStaticGuardTest {
         assertTrue(proxy.contains("public final WandManager wandManager = new WandManager();"));
         assertTrue(recipes.contains("WandTriggerRegistry.registerWandBlockTrigger(Thaumcraft.proxy.wandManager, 0, Blocks.BOOKSHELF, 0, \"Thaumcraft\");"));
         assertTrue(recipes.contains("WandTriggerRegistry.registerWandBlockTrigger(Thaumcraft.proxy.wandManager, 1, Blocks.CAULDRON, -1, \"Thaumcraft\");"));
+        assertTrue(recipes.contains("WandTriggerRegistry.registerWandBlockTrigger(Thaumcraft.proxy.wandManager, 2, Blocks.OBSIDIAN, -1, \"Thaumcraft\");"));
+        assertTrue(recipes.contains("WandTriggerRegistry.registerWandBlockTrigger(Thaumcraft.proxy.wandManager, 2, Blocks.NETHER_BRICK, -1, \"Thaumcraft\");"));
+        assertTrue(recipes.contains("WandTriggerRegistry.registerWandBlockTrigger(Thaumcraft.proxy.wandManager, 2, Blocks.IRON_BARS, -1, \"Thaumcraft\");"));
+        assertTrue(recipes.contains("new ItemStack(Blocks.IRON_BARS)"));
         assertTrue(recipes.contains("WandTriggerRegistry.registerWandBlockTrigger(Thaumcraft.proxy.wandManager, 5, ConfigBlocks.blockMetalDevice, 9, \"Thaumcraft\");"));
         assertTrue(recipes.contains("WandTriggerRegistry.registerWandBlockTrigger(Thaumcraft.proxy.wandManager, 7, ConfigBlocks.blockMetalDevice, 9, \"Thaumcraft_2\");"));
     }
@@ -68,8 +72,10 @@ public class WandManagerTriggerStaticGuardTest {
         assertTrue(source.contains("world.setBlockState(basePos, ConfigBlocks.blockMetalDevice.getDefaultState()"));
         assertTrue(source.contains("world.setBlockState(ringPos, ConfigBlocks.blockMetalDevice.getDefaultState()"));
         assertTrue(source.contains("new PacketFXBlockSparkle(center.getX(), center.getY(), center.getZ(), -9999)"));
-        assertTrue(source.contains("Blocks.NETHER_BRICK_FENCE"));
-        assertTrue(source.contains("ConfigBlocks.blockArcaneFurnace.getDefaultState().withProperty(BlockArcaneFurnace.TYPE, meta)"));
+        assertTrue(source.contains("Blocks.NETHER_BRICK"));
+        assertTrue(source.contains("Blocks.IRON_BARS"));
+        assertTrue(source.contains("Blocks.FLOWING_LAVA"));
+        assertTrue(source.contains("ConfigBlocks.blockArcaneFurnace.getDefaultState().withProperty(BlockArcaneFurnace.TYPE, meta), 0)"));
         assertTrue(source.contains("ConfigBlocks.blockStoneDevice.getDefaultState().withProperty(thaumcraft.common.blocks.BlockStoneDevice.TYPE, 3)"));
         assertTrue(source.contains("((TileInfusionMatrix) tile).active = true;"));
         assertTrue(source.contains("new PacketFXBlockSparkle(center.getX(), center.getY(), center.getZ(), -9999)"));

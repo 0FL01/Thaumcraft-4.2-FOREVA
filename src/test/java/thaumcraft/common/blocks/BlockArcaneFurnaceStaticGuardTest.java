@@ -61,9 +61,9 @@ public class BlockArcaneFurnaceStaticGuardTest {
         assertTrue(source.contains("private void restoreBlocks(World worldIn, BlockPos pos)"));
         assertTrue(source.contains("if ((yy == 0 && xx == 0 && zz == 0) || (yy == 1 && xx == 0 && zz == 0)) {"));
         assertTrue(source.contains("Blocks.AIR.getDefaultState()"));
-        assertTrue(source.contains("Blocks.NETHER_BRICK_FENCE.getDefaultState()"));
+        assertTrue(source.contains("Blocks.IRON_BARS.getDefaultState()"));
         assertTrue(source.contains("Blocks.OBSIDIAN.getDefaultState()"));
-        assertTrue(source.contains("Blocks.NETHERRACK.getDefaultState()"));
+        assertTrue(source.contains("Blocks.NETHER_BRICK.getDefaultState()"));
     }
 
     @Test

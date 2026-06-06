@@ -504,28 +504,28 @@ public class WandManager implements IWandTriggerManager {
 
     private static boolean fitArcaneFurnace(World world, int x, int y, int z) {
         Block obsidian = Blocks.OBSIDIAN;
-        Block netherrack = Blocks.NETHERRACK;
-        Block fence = Blocks.NETHER_BRICK_FENCE;
+        Block netherBrick = Blocks.NETHER_BRICK;
+        Block ironBars = Blocks.IRON_BARS;
         Block lava = Blocks.LAVA;
         Block[][][] blueprint = new Block[][][]{
                 {
-                        {netherrack, obsidian, netherrack},
+                        {netherBrick, obsidian, netherBrick},
                         {obsidian, Blocks.AIR, obsidian},
-                        {netherrack, obsidian, netherrack}
+                        {netherBrick, obsidian, netherBrick}
                 },
                 {
-                        {netherrack, obsidian, netherrack},
+                        {netherBrick, obsidian, netherBrick},
                         {obsidian, lava, obsidian},
-                        {netherrack, obsidian, netherrack}
+                        {netherBrick, obsidian, netherBrick}
                 },
                 {
-                        {netherrack, obsidian, netherrack},
+                        {netherBrick, obsidian, netherBrick},
                         {obsidian, obsidian, obsidian},
-                        {netherrack, obsidian, netherrack}
+                        {netherBrick, obsidian, netherBrick}
                 }
         };
 
-        boolean fenceFound = false;
+        boolean ironBarsFound = false;
         for (int yy = 0; yy < 3; yy++) {
             for (int xx = 0; xx < 3; xx++) {
                 for (int zz = 0; zz < 3; zz++) {
@@ -534,15 +534,15 @@ public class WandManager implements IWandTriggerManager {
                     if (found == blueprint[yy][xx][zz]) continue;
 
                     boolean crossSlot = (xx == 1 || zz == 1) && xx != zz;
-                    if (yy == 1 && !fenceFound && found == fence && crossSlot) {
-                        fenceFound = true;
+                    if (yy == 1 && !ironBarsFound && found == ironBars && crossSlot) {
+                        ironBarsFound = true;
                         continue;
                     }
                     return false;
                 }
             }
         }
-        return fenceFound;
+        return ironBarsFound;
     }
 
     private static boolean replaceArcaneFurnace(World world, int x, int y, int z) {
@@ -553,14 +553,13 @@ public class WandManager implements IWandTriggerManager {
                     BlockPos target = new BlockPos(x + xx, y + yy, z + zz);
                     int meta = step;
                     Block found = world.getBlockState(target).getBlock();
-                    if (found == Blocks.LAVA || found == Blocks.FIRE) {
+                    if (found == Blocks.LAVA || found == Blocks.FLOWING_LAVA) {
                         meta = 0;
-                    } else if (found == Blocks.NETHER_BRICK_FENCE) {
+                    } else if (found == Blocks.IRON_BARS) {
                         meta = 10;
                     }
                     if (!world.isAirBlock(target)) {
-                        world.setBlockState(target, ConfigBlocks.blockArcaneFurnace.getDefaultState().withProperty(BlockArcaneFurnace.TYPE, meta), 3);
-                        world.notifyNeighborsOfStateChange(target, ConfigBlocks.blockArcaneFurnace, false);
+                        world.setBlockState(target, ConfigBlocks.blockArcaneFurnace.getDefaultState().withProperty(BlockArcaneFurnace.TYPE, meta), 0);
                     }
                     step++;
                 }

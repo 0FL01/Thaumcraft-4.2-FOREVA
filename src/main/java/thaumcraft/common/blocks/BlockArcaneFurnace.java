@@ -306,11 +306,11 @@ public class BlockArcaneFurnace extends BlockContainer {
             return Blocks.AIR.getDefaultState();
         }
         if (meta == 10) {
-            return Blocks.NETHER_BRICK_FENCE.getDefaultState();
+            return Blocks.IRON_BARS.getDefaultState();
         }
         if (meta % 2 == 0 || meta == 5) {
             return Blocks.OBSIDIAN.getDefaultState();
         }
-        return Blocks.NETHERRACK.getDefaultState();
+        return Blocks.NETHER_BRICK.getDefaultState();
     }
 }
