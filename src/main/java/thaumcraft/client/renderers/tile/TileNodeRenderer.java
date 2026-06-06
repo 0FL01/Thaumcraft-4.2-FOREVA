@@ -4,11 +4,14 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.ResourceLocation;
 import thaumcraft.api.nodes.IRevealer;
@@ -19,6 +22,7 @@ import thaumcraft.api.nodes.NodeModifier;
 import thaumcraft.api.nodes.NodeType;
 import thaumcraft.common.items.relics.ItemThaumometer;
 import thaumcraft.common.tiles.TileJarNode;
+import thaumcraft.common.tiles.TileNode;
 import org.lwjgl.opengl.GL11;
 
 public class TileNodeRenderer extends TileEntitySpecialRenderer<TileEntity> {
@@ -90,6 +94,55 @@ public class TileNodeRenderer extends TileEntitySpecialRenderer<TileEntity> {
                 worldX, worldY, worldZ,
                 partialTicks,
                 renderAspects, node.getNodeType(), node.getNodeModifier(), pos.getX());
+
+        if (tile instanceof TileNode) {
+            renderDrainBeam((TileNode) tile, x, y, z, partialTicks);
+        }
+    }
+
+    private static void renderDrainBeam(TileNode node, double x, double y, double z, float partialTicks) {
+        if (node.drainEntity == null || node.drainCollision == null) {
+            return;
+        }
+
+        Entity entity = node.drainEntity;
+        if (entity instanceof EntityPlayer && !((EntityPlayer) entity).isHandActive()) {
+            node.drainEntity = null;
+            node.drainCollision = null;
+            return;
+        }
+
+        RayTraceResult hit = node.drainCollision;
+        BlockPos hitPos = hit.getBlockPos() == null ? node.getPos() : hit.getBlockPos();
+        int useCount = entity instanceof EntityPlayer ? ((EntityPlayer) entity).getItemInUseCount() : 0;
+        float wobble = entity instanceof EntityPlayer ? MathHelper.sin(useCount / 10.0F) * 10.0F : 0.0F;
+
+        Vec3d offset = new Vec3d(-0.1D, -0.1D, 0.5D);
+        float pitch = -(entity.prevRotationPitch + (entity.rotationPitch - entity.prevRotationPitch) * partialTicks) * (float) Math.PI / 180.0F;
+        float yaw = -(entity.prevRotationYaw + (entity.rotationYaw - entity.prevRotationYaw) * partialTicks) * (float) Math.PI / 180.0F;
+        offset = offset.rotatePitch(pitch);
+        offset = offset.rotateYaw(yaw);
+        offset = offset.rotateYaw(-wobble * 0.01F);
+        offset = offset.rotatePitch(-wobble * 0.015F);
+
+        double sourceWorldX = entity.lastTickPosX + (entity.posX - entity.lastTickPosX) * partialTicks + offset.x;
+        double sourceWorldY = entity.lastTickPosY + (entity.posY - entity.lastTickPosY) * partialTicks + offset.y
+                + (entity == Minecraft.getMinecraft().player ? 0.0D : entity.getEyeHeight());
+        double sourceWorldZ = entity.lastTickPosZ + (entity.posZ - entity.lastTickPosZ) * partialTicks + offset.z;
+
+        BlockPos nodePos = node.getPos();
+        double sx = x + (sourceWorldX - nodePos.getX());
+        double sy = y + (sourceWorldY - nodePos.getY());
+        double sz = z + (sourceWorldZ - nodePos.getZ());
+        double ex = x + 0.5D + (hitPos.getX() - nodePos.getX());
+        double ey = y + 0.5D + (hitPos.getY() - nodePos.getY());
+        double ez = z + 0.5D + (hitPos.getZ() - nodePos.getZ());
+        int color = node.color == null ? node.drainColor : node.color.getRGB();
+
+        GlStateManager.pushMatrix();
+        TileRenderHelper.drawWispyLine(sx, sy, sz, ex, ey, ez, color,
+                TileRenderHelper.ticks(node, partialTicks), -0.02F, Math.min(useCount, 10) / 10.0F, 0.25F);
+        GlStateManager.popMatrix();
     }
 
     public static void renderNodeAt(INode node, double x, double y, double z, float partialTicks, float size) {

@@ -1,12 +1,24 @@
 package thaumcraft.common.tiles;
 
-import net.minecraft.tileentity.TileEntity;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.EnumHand;
 import net.minecraft.util.ITickable;
+import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.RayTraceResult;
+import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import thaumcraft.api.TileThaumcraft;
 import thaumcraft.api.aspects.Aspect;
 import thaumcraft.api.aspects.AspectList;
@@ -14,17 +26,26 @@ import thaumcraft.api.aspects.IAspectContainer;
 import thaumcraft.api.nodes.INode;
 import thaumcraft.api.nodes.NodeModifier;
 import thaumcraft.api.nodes.NodeType;
+import thaumcraft.api.wands.IWandable;
+import thaumcraft.api.wands.WandCap;
+import thaumcraft.api.wands.WandRod;
 import thaumcraft.api.WorldCoordinates;
 import thaumcraft.common.config.ConfigBlocks;
 import thaumcraft.common.items.ItemCompassStone;
+import thaumcraft.common.items.wands.ItemWandCasting;
 import thaumcraft.common.lib.network.PacketHandler;
 import thaumcraft.common.lib.network.fx.PacketFXBlockZap;
+import thaumcraft.common.lib.research.ResearchManager;
 import thaumcraft.common.lib.utils.Utils;
 import thaumcraft.common.lib.world.ThaumcraftWorldGenerator;
 
+import java.awt.Color;
+import java.util.ArrayList;
+import java.util.List;
+
 public class TileNode
 extends TileThaumcraft
-implements ITickable, INode, IAspectContainer {
+implements ITickable, INode, IAspectContainer, IWandable {
 
     public String id = "";
     private AspectList aspects = new AspectList();
@@ -40,11 +61,33 @@ implements ITickable, INode, IAspectContainer {
     private boolean catchUp = false;
     public long fuel = 0;
     public boolean balanced = false;
+    public Entity drainEntity = null;
+    public RayTraceResult drainCollision = null;
+    public int drainColor = 0xFFFFFF;
+    public Color targetColor = new Color(0xFFFFFF);
+    public Color color = new Color(0xFFFFFF);
 
     public void readCustomNBT(NBTTagCompound nbttagcompound) {
         this.aspects.readFromNBT(nbttagcompound);
         this.id = nbttagcompound.getString("nodeId");
         this.lastActive = nbttagcompound.getLong("lastActive");
+        String drainer = nbttagcompound.getString("drainer");
+        if (drainer != null && !drainer.isEmpty() && this.world != null) {
+            this.drainEntity = this.world.getPlayerEntityByName(drainer);
+            if (this.drainEntity != null) {
+                this.drainCollision = new RayTraceResult(
+                        new Vec3d(this.pos.getX() + 0.5D, this.pos.getY() + 0.5D, this.pos.getZ() + 0.5D),
+                        EnumFacing.UP,
+                        this.pos);
+            } else {
+                this.drainCollision = null;
+            }
+        } else {
+            this.drainEntity = null;
+            this.drainCollision = null;
+        }
+        this.drainColor = nbttagcompound.hasKey("draincolor") ? nbttagcompound.getInteger("draincolor") : 0xFFFFFF;
+        this.targetColor = new Color(this.drainColor);
         AspectList al = new AspectList();
         NBTTagList tlist = nbttagcompound.getTagList("AspectsBase", 10);
         for (int j = 0; j < tlist.tagCount(); ++j) {
@@ -89,6 +132,18 @@ implements ITickable, INode, IAspectContainer {
         nbttagcompound.setByte("type", (byte)this.nodeType.ordinal());
         nbttagcompound.setByte("modifier", this.nodeModifier != null ? (byte)this.nodeModifier.ordinal() : -1);
         nbttagcompound.setLong("fuel", this.fuel);
+        if (this.drainEntity instanceof EntityPlayer) {
+            nbttagcompound.setString("drainer", this.drainEntity.getName());
+        }
+        nbttagcompound.setInteger("draincolor", this.drainColor);
+    }
+
+    @Override
+    @SideOnly(Side.CLIENT)
+    public AxisAlignedBB getRenderBoundingBox() {
+        return new AxisAlignedBB(
+                this.pos.getX(), this.pos.getY(), this.pos.getZ(),
+                this.pos.getX() + 1, this.pos.getY() + 1, this.pos.getZ() + 1).grow(8.0D, 8.0D, 8.0D);
     }
 
     // IAspectContainer
@@ -152,6 +207,53 @@ implements ITickable, INode, IAspectContainer {
     public String getId() { return this.id; }
     public void setId(String id) { this.id = id; }
 
+    // IWandable
+    @Override
+    public int onWandRightClick(World world, ItemStack wandstack, EntityPlayer player, int x, int y, int z, int side, int md) {
+        return -1;
+    }
+
+    @Override
+    public ItemStack onWandRightClick(World world, ItemStack wandstack, EntityPlayer player) {
+        if (wandstack != null && !wandstack.isEmpty() && wandstack.getItem() instanceof ItemWandCasting) {
+            setActiveWandHand(player, wandstack);
+            ((ItemWandCasting) wandstack.getItem()).setObjectInUse(wandstack, this.pos.getX(), this.pos.getY(), this.pos.getZ());
+        }
+        return wandstack;
+    }
+
+    @Override
+    public void onUsingWandTick(ItemStack wandstack, EntityPlayer player, int count) {
+        if (this.world == null || wandstack == null || wandstack.isEmpty() || !(wandstack.getItem() instanceof ItemWandCasting)) {
+            clearDrainVisual();
+            return;
+        }
+
+        RayTraceResult hit = rayTraceNodeTarget(player);
+        if (hit == null || hit.typeOfHit != RayTraceResult.Type.BLOCK || !this.pos.equals(hit.getBlockPos())) {
+            player.stopActiveHand();
+            clearDrainVisual();
+            return;
+        }
+
+        if (count % 5 == 0) {
+            ItemWandCasting wand = (ItemWandCasting) wandstack.getItem();
+            boolean drained = tryDrainWandVis(wand, wandstack, player, hit);
+            if (!drained) {
+                clearDrainVisual();
+            }
+        }
+
+        if (this.world.isRemote) {
+            blendDrainColor();
+        }
+    }
+
+    @Override
+    public void onWandStoppedUsing(ItemStack wandstack, World world, EntityPlayer player, int count) {
+        clearDrainVisual();
+    }
+
     @Override
     public void update() {
         if (this.world == null) return;
@@ -191,6 +293,124 @@ implements ITickable, INode, IAspectContainer {
 
     private String generateId() {
         return this.world.provider.getDimension() + ":" + this.pos.getX() + ":" + this.pos.getY() + ":" + this.pos.getZ();
+    }
+
+    private static void setActiveWandHand(EntityPlayer player, ItemStack wandstack) {
+        if (player == null) return;
+        if (player.getHeldItemOffhand() == wandstack) {
+            player.setActiveHand(EnumHand.OFF_HAND);
+        } else {
+            player.setActiveHand(EnumHand.MAIN_HAND);
+        }
+    }
+
+    private RayTraceResult rayTraceNodeTarget(EntityPlayer player) {
+        if (player == null || this.world == null) return null;
+        double reach = 5.0D;
+        if (player instanceof EntityPlayerMP) {
+            reach = ((EntityPlayerMP) player).interactionManager.getBlockReachDistance();
+        }
+        Vec3d eyes = new Vec3d(player.posX, player.posY + (double) player.getEyeHeight(), player.posZ);
+        Vec3d look = player.getLook(1.0F);
+        Vec3d end = eyes.add(look.x * reach, look.y * reach, look.z * reach);
+        return this.world.rayTraceBlocks(eyes, end, false, true, false);
+    }
+
+    private boolean tryDrainWandVis(ItemWandCasting wand, ItemStack wandstack, EntityPlayer player, RayTraceResult hit) {
+        int tap = 1;
+        if (ResearchManager.isResearchComplete(player, "NODETAPPER1")) {
+            ++tap;
+        }
+        if (ResearchManager.isResearchComplete(player, "NODETAPPER2")) {
+            ++tap;
+        }
+
+        boolean preserve = shouldPreserveNode(wandstack, player);
+        Aspect aspect = chooseRandomFilteredFromSource(wand.getAspectsWithRoom(wandstack), preserve);
+        if (aspect == null) {
+            return false;
+        }
+
+        int currentAmount = this.aspects.getAmount(aspect);
+        if (tap > currentAmount) {
+            tap = currentAmount;
+        }
+        if (preserve && tap == currentAmount) {
+            --tap;
+        }
+        if (tap <= 0) {
+            return false;
+        }
+
+        int remainder = ItemWandCasting.addVis(wandstack, aspect, tap, !this.world.isRemote);
+        if (remainder >= tap) {
+            return false;
+        }
+
+        this.drainColor = aspect.getColor();
+        setDrainVisual(player, hit, this.drainColor);
+        if (!this.world.isRemote && this.takeFromContainer(aspect, tap - remainder)) {
+            syncDrainChange();
+        }
+        return true;
+    }
+
+    private void syncDrainChange() {
+        this.markDirty();
+        this.world.notifyBlockUpdate(this.pos, this.world.getBlockState(this.pos), this.world.getBlockState(this.pos), 3);
+    }
+
+    private boolean shouldPreserveNode(ItemStack wandstack, EntityPlayer player) {
+        WandRod rod = ItemWandCasting.getRod(wandstack);
+        WandCap cap = ItemWandCasting.getCap(wandstack);
+        return !player.isSneaking()
+                && ResearchManager.isResearchComplete(player, "NODEPRESERVE")
+                && rod != null
+                && cap != null
+                && !"wood".equals(rod.getTag())
+                && !"iron".equals(cap.getTag());
+    }
+
+    private Aspect chooseRandomFilteredFromSource(AspectList room, boolean preserve) {
+        if (room == null || room.size() <= 0 || this.aspects == null || this.aspects.size() <= 0) {
+            return null;
+        }
+        int min = preserve ? 1 : 0;
+        List<Aspect> valid = new ArrayList<>();
+        for (Aspect aspect : this.aspects.getAspects()) {
+            if (aspect != null && room.getAmount(aspect) > 0 && this.aspects.getAmount(aspect) > min) {
+                valid.add(aspect);
+            }
+        }
+        if (valid.isEmpty()) {
+            return null;
+        }
+        return valid.get(this.world.rand.nextInt(valid.size()));
+    }
+
+    private void setDrainVisual(EntityPlayer player, RayTraceResult hit, int color) {
+        this.drainEntity = player;
+        this.drainCollision = hit;
+        this.drainColor = color;
+        this.targetColor = new Color(color);
+    }
+
+    private void clearDrainVisual() {
+        this.drainEntity = null;
+        this.drainCollision = null;
+    }
+
+    private void blendDrainColor() {
+        if (this.color == null) {
+            this.color = new Color(0xFFFFFF);
+        }
+        if (this.targetColor == null) {
+            this.targetColor = new Color(this.drainColor);
+        }
+        int red = (this.targetColor.getRed() + this.color.getRed() * 4) / 5;
+        int green = (this.targetColor.getGreen() + this.color.getGreen() * 4) / 5;
+        int blue = (this.targetColor.getBlue() + this.color.getBlue() * 4) / 5;
+        this.color = new Color(red, green, blue);
     }
 
     private int getRegenerationInterval() {

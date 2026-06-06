@@ -90,6 +90,53 @@ public class TileNodeConversionStaticGuardTest {
         assertTrue(source.contains("new NetworkRegistry.TargetPoint("));
     }
 
+    @Test
+    public void tileNodeShouldKeepTc42DirectWandDrainContracts() throws IOException {
+        String source = readFile("src/main/java/thaumcraft/common/tiles/TileNode.java");
+        String renderer = readFile("src/main/java/thaumcraft/client/renderers/tile/TileNodeRenderer.java");
+
+        assertTrue(source.contains("implements ITickable, INode, IAspectContainer, IWandable"));
+        assertTrue(source.contains("public Entity drainEntity = null;"));
+        assertTrue(source.contains("public RayTraceResult drainCollision = null;"));
+        assertTrue(source.contains("public int drainColor = 0xFFFFFF;"));
+        assertTrue(source.contains("public Color targetColor = new Color(0xFFFFFF);"));
+        assertTrue(source.contains("public Color color = new Color(0xFFFFFF);"));
+        assertTrue(source.contains("nbttagcompound.setString(\"drainer\", this.drainEntity.getName());"));
+        assertTrue(source.contains("nbttagcompound.setInteger(\"draincolor\", this.drainColor);"));
+
+        assertTrue(source.contains("public int onWandRightClick(World world, ItemStack wandstack, EntityPlayer player, int x, int y, int z, int side, int md)"));
+        assertTrue(source.contains("return -1;"));
+        assertTrue(source.contains("public ItemStack onWandRightClick(World world, ItemStack wandstack, EntityPlayer player)"));
+        assertTrue(source.contains("setActiveWandHand(player, wandstack);"));
+        assertTrue(source.contains("setObjectInUse(wandstack, this.pos.getX(), this.pos.getY(), this.pos.getZ());"));
+        assertTrue(source.contains("player.stopActiveHand();"));
+        assertTrue(source.contains("if (count % 5 == 0)"));
+        assertTrue(source.contains("ResearchManager.isResearchComplete(player, \"NODETAPPER1\")"));
+        assertTrue(source.contains("ResearchManager.isResearchComplete(player, \"NODETAPPER2\")"));
+        assertTrue(source.contains("ResearchManager.isResearchComplete(player, \"NODEPRESERVE\")"));
+        assertTrue(source.contains("!player.isSneaking()"));
+        assertTrue(source.contains("!\"wood\".equals(rod.getTag())"));
+        assertTrue(source.contains("!\"iron\".equals(cap.getTag())"));
+        assertTrue(source.contains("private Aspect chooseRandomFilteredFromSource(AspectList room, boolean preserve)"));
+        assertTrue(source.contains("int min = preserve ? 1 : 0;"));
+        assertTrue(source.contains("room.getAmount(aspect) > 0 && this.aspects.getAmount(aspect) > min"));
+        assertTrue(source.contains("if (preserve && tap == currentAmount)"));
+        assertTrue(source.contains("ItemWandCasting.addVis(wandstack, aspect, tap, !this.world.isRemote)"));
+        assertTrue(source.contains("this.takeFromContainer(aspect, tap - remainder)"));
+        assertTrue(source.contains("syncDrainChange();"));
+        assertTrue(source.contains("private void syncDrainChange()"));
+        assertTrue(source.contains("this.world.notifyBlockUpdate(this.pos, this.world.getBlockState(this.pos), this.world.getBlockState(this.pos), 3);"));
+        assertTrue(source.contains("this.color = new Color(red, green, blue);"));
+
+        assertTrue(renderer.contains("renderDrainBeam((TileNode) tile, x, y, z, partialTicks);"));
+        assertTrue(renderer.contains("!((EntityPlayer) entity).isHandActive()"));
+        assertTrue(renderer.contains("new Vec3d(-0.1D, -0.1D, 0.5D)"));
+        assertTrue(renderer.contains("offset = offset.rotateYaw(-wobble * 0.01F);"));
+        assertTrue(renderer.contains("offset = offset.rotatePitch(-wobble * 0.015F);"));
+        assertTrue(renderer.contains("node.color == null ? node.drainColor : node.color.getRGB()"));
+        assertTrue(renderer.contains("TileRenderHelper.drawWispyLine(sx, sy, sz, ex, ey, ez, color,"));
+    }
+
     private static String readFile(String path) throws IOException {
         return new String(Files.readAllBytes(Paths.get(path)), StandardCharsets.UTF_8);
     }
