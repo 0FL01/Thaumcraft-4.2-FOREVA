@@ -66,6 +66,7 @@ implements ITickable, INode, IAspectContainer, IWandable {
     public int drainColor = 0xFFFFFF;
     public Color targetColor = new Color(0xFFFFFF);
     public Color color = new Color(0xFFFFFF);
+    public int drainBeamAge = 0;
 
     public void readCustomNBT(NBTTagCompound nbttagcompound) {
         this.aspects.readFromNBT(nbttagcompound);
@@ -75,16 +76,18 @@ implements ITickable, INode, IAspectContainer, IWandable {
         if (drainer != null && !drainer.isEmpty() && this.world != null) {
             this.drainEntity = this.world.getPlayerEntityByName(drainer);
             if (this.drainEntity != null) {
+                if (this.drainCollision == null) {
+                    this.drainBeamAge = 0;
+                }
                 this.drainCollision = new RayTraceResult(
                         new Vec3d(this.pos.getX() + 0.5D, this.pos.getY() + 0.5D, this.pos.getZ() + 0.5D),
                         EnumFacing.UP,
                         this.pos);
             } else {
-                this.drainCollision = null;
+                clearDrainVisual();
             }
         } else {
-            this.drainEntity = null;
-            this.drainCollision = null;
+            clearDrainVisual();
         }
         this.drainColor = nbttagcompound.hasKey("draincolor") ? nbttagcompound.getInteger("draincolor") : 0xFFFFFF;
         this.targetColor = new Color(this.drainColor);
@@ -225,14 +228,14 @@ implements ITickable, INode, IAspectContainer, IWandable {
     @Override
     public void onUsingWandTick(ItemStack wandstack, EntityPlayer player, int count) {
         if (this.world == null || wandstack == null || wandstack.isEmpty() || !(wandstack.getItem() instanceof ItemWandCasting)) {
-            clearDrainVisual();
+            clearDrainVisualOnServer();
             return;
         }
 
         RayTraceResult hit = rayTraceNodeTarget(player);
         if (hit == null || hit.typeOfHit != RayTraceResult.Type.BLOCK || !this.pos.equals(hit.getBlockPos())) {
             player.stopActiveHand();
-            clearDrainVisual();
+            clearDrainVisualOnServer();
             return;
         }
 
@@ -240,18 +243,16 @@ implements ITickable, INode, IAspectContainer, IWandable {
             ItemWandCasting wand = (ItemWandCasting) wandstack.getItem();
             boolean drained = tryDrainWandVis(wand, wandstack, player, hit);
             if (!drained) {
-                clearDrainVisual();
+                clearDrainVisualOnServer();
             }
-        }
-
-        if (this.world.isRemote) {
-            blendDrainColor();
         }
     }
 
     @Override
     public void onWandStoppedUsing(ItemStack wandstack, World world, EntityPlayer player, int count) {
-        clearDrainVisual();
+        if (world != null && !world.isRemote) {
+            clearDrainVisualAndSync();
+        }
     }
 
     @Override
@@ -262,6 +263,7 @@ implements ITickable, INode, IAspectContainer, IWandable {
         }
         this.count++;
         if (this.world.isRemote) {
+            updateDrainBeamVisual();
             if (this.nodeType == NodeType.DARK && this.count % 50 == 0) {
                 ItemCompassStone.sinisterNodes.put(new WorldCoordinates(this), System.currentTimeMillis());
             }
@@ -389,6 +391,9 @@ implements ITickable, INode, IAspectContainer, IWandable {
     }
 
     private void setDrainVisual(EntityPlayer player, RayTraceResult hit, int color) {
+        if (this.drainEntity != player || this.drainCollision == null) {
+            this.drainBeamAge = 0;
+        }
         this.drainEntity = player;
         this.drainCollision = hit;
         this.drainColor = color;
@@ -398,6 +403,31 @@ implements ITickable, INode, IAspectContainer, IWandable {
     private void clearDrainVisual() {
         this.drainEntity = null;
         this.drainCollision = null;
+        this.drainBeamAge = 0;
+    }
+
+    private void clearDrainVisualAndSync() {
+        boolean hadVisual = this.drainEntity != null || this.drainCollision != null;
+        clearDrainVisual();
+        if (hadVisual && this.world != null && !this.world.isRemote) {
+            syncDrainChange();
+        }
+    }
+
+    private void clearDrainVisualOnServer() {
+        if (this.world != null && !this.world.isRemote) {
+            clearDrainVisualAndSync();
+        }
+    }
+
+    private void updateDrainBeamVisual() {
+        if (this.drainEntity == null || this.drainCollision == null) {
+            this.drainBeamAge = 0;
+            return;
+        }
+
+        ++this.drainBeamAge;
+        blendDrainColor();
     }
 
     private void blendDrainColor() {

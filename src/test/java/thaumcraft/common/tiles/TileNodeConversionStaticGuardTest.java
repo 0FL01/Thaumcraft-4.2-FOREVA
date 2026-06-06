@@ -7,6 +7,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 public class TileNodeConversionStaticGuardTest {
@@ -94,6 +95,7 @@ public class TileNodeConversionStaticGuardTest {
     public void tileNodeShouldKeepTc42DirectWandDrainContracts() throws IOException {
         String source = readFile("src/main/java/thaumcraft/common/tiles/TileNode.java");
         String renderer = readFile("src/main/java/thaumcraft/client/renderers/tile/TileNodeRenderer.java");
+        String utils = readFile("src/main/java/thaumcraft/client/lib/UtilsFX.java");
 
         assertTrue(source.contains("implements ITickable, INode, IAspectContainer, IWandable"));
         assertTrue(source.contains("public Entity drainEntity = null;"));
@@ -101,6 +103,9 @@ public class TileNodeConversionStaticGuardTest {
         assertTrue(source.contains("public int drainColor = 0xFFFFFF;"));
         assertTrue(source.contains("public Color targetColor = new Color(0xFFFFFF);"));
         assertTrue(source.contains("public Color color = new Color(0xFFFFFF);"));
+        assertTrue(source.contains("public int drainBeamAge = 0;"));
+        assertFalse(source.contains("drainBeamGrace"));
+        assertFalse(source.contains("DRAIN_BEAM_INACTIVE_GRACE_TICKS"));
         assertTrue(source.contains("nbttagcompound.setString(\"drainer\", this.drainEntity.getName());"));
         assertTrue(source.contains("nbttagcompound.setInteger(\"draincolor\", this.drainColor);"));
 
@@ -124,17 +129,39 @@ public class TileNodeConversionStaticGuardTest {
         assertTrue(source.contains("ItemWandCasting.addVis(wandstack, aspect, tap, !this.world.isRemote)"));
         assertTrue(source.contains("this.takeFromContainer(aspect, tap - remainder)"));
         assertTrue(source.contains("syncDrainChange();"));
+        assertTrue(source.contains("clearDrainVisualAndSync();"));
+        assertTrue(source.contains("clearDrainVisualOnServer();"));
+        assertTrue(source.contains("if (world != null && !world.isRemote)"));
+        assertTrue(source.contains("private void updateDrainBeamVisual()"));
+        assertTrue(source.contains("++this.drainBeamAge;"));
+        assertFalse(source.contains("isHandActive()"));
         assertTrue(source.contains("private void syncDrainChange()"));
         assertTrue(source.contains("this.world.notifyBlockUpdate(this.pos, this.world.getBlockState(this.pos), this.world.getBlockState(this.pos), 3);"));
         assertTrue(source.contains("this.color = new Color(red, green, blue);"));
 
-        assertTrue(renderer.contains("renderDrainBeam((TileNode) tile, x, y, z, partialTicks);"));
-        assertTrue(renderer.contains("!((EntityPlayer) entity).isHandActive()"));
+        assertTrue(renderer.contains("renderDrainBeam((TileNode) tile, partialTicks);"));
+        assertFalse(renderer.contains("getItemInUseMaxCount()"));
+        assertTrue(renderer.contains("float beamAge = node.drainBeamAge + partialTicks;"));
+        assertTrue(renderer.contains("MathHelper.sin(beamAge / 10.0F) * 10.0F"));
         assertTrue(renderer.contains("new Vec3d(-0.1D, -0.1D, 0.5D)"));
         assertTrue(renderer.contains("offset = offset.rotateYaw(-wobble * 0.01F);"));
         assertTrue(renderer.contains("offset = offset.rotatePitch(-wobble * 0.015F);"));
         assertTrue(renderer.contains("node.color == null ? node.drainColor : node.color.getRGB()"));
-        assertTrue(renderer.contains("TileRenderHelper.drawWispyLine(sx, sy, sz, ex, ey, ez, color,"));
+        assertTrue(renderer.contains("UtilsFX.drawFloatyLine(sourceWorldX, sourceWorldY, sourceWorldZ,"));
+        assertTrue(renderer.contains("targetWorldX, targetWorldY, targetWorldZ,"));
+        assertTrue(renderer.contains("partialTicks, color, \"textures/misc/wispy.png\", -0.02F, Math.min(beamAge, 10.0F) / 10.0F)"));
+
+        assertTrue(utils.contains("public static void drawFloatyLine(double x, double y, double z, double x2, double y2, double z2,"));
+        assertTrue(utils.contains("drawFloatyLine(x, y, z, x2, y2, z2, partialTicks, color, texture, speed, distance, 0.15F);"));
+        assertTrue(utils.contains("long timeLong = (System.nanoTime() / 30000000L) % 32767L;"));
+        assertTrue(utils.contains("float time = (float) timeLong;"));
+        assertTrue(utils.contains("GlStateManager.depthMask(false);"));
+        assertTrue(utils.contains("GlStateManager.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE);"));
+        assertTrue(utils.contains("GlStateManager.disableCull();"));
+        assertTrue(utils.contains("buffer.begin(GL11.GL_TRIANGLE_STRIP, DefaultVertexFormats.POSITION_TEX_COLOR);"));
+        assertTrue(utils.contains("drawFloatyStrip(x, y, z, x2, y2, z2, dist, length, time, red, green, blue, speed, distance, width, true);"));
+        assertTrue(utils.contains("drawFloatyStrip(x, y, z, x2, y2, z2, dist, length, time, red, green, blue, speed, distance, width, false);"));
+        assertTrue(utils.contains(".color(red, green, blue, centerWeight).endVertex();"));
     }
 
     private static String readFile(String path) throws IOException {

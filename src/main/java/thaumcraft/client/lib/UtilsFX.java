@@ -5,9 +5,12 @@ import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
+import net.minecraft.entity.Entity;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.MathHelper;
 import org.lwjgl.opengl.GL11;
 import thaumcraft.api.aspects.Aspect;
+import thaumcraft.common.config.Config;
 
 import java.awt.Color;
 import java.text.DecimalFormat;
@@ -26,6 +29,101 @@ public class UtilsFX {
 
     public static void bindTexture(ResourceLocation resource) {
         Minecraft.getMinecraft().getTextureManager().bindTexture(resource);
+    }
+
+    public static void drawFloatyLine(double x, double y, double z, double x2, double y2, double z2,
+                                      float partialTicks, int color, String texture, float speed, float distance) {
+        drawFloatyLine(x, y, z, x2, y2, z2, partialTicks, color, texture, speed, distance, 0.15F);
+    }
+
+    public static void drawFloatyLine(double x, double y, double z, double x2, double y2, double z2,
+                                      float partialTicks, int color, String texture, float speed, float distance, float width) {
+        if (distance <= 0.0F) {
+            return;
+        }
+        Entity renderEntity = Minecraft.getMinecraft().getRenderViewEntity();
+        if (renderEntity == null) {
+            renderEntity = Minecraft.getMinecraft().player;
+        }
+        if (renderEntity == null) {
+            return;
+        }
+
+        long timeLong = (System.nanoTime() / 30000000L) % 32767L;
+        float time = (float) timeLong;
+        Color tint = new Color(color);
+        float red = tint.getRed() / 255.0F;
+        float green = tint.getGreen() / 255.0F;
+        float blue = tint.getBlue() / 255.0F;
+        double dx = x - x2;
+        double dy = y - y2;
+        double dz = z - z2;
+        float dist = MathHelper.sqrt(dx * dx + dy * dy + dz * dz);
+        float blocks = Math.round(dist);
+        float length = blocks * ((float) Config.golemLinkQuality / 2.0F);
+        if (length <= 0.0F) {
+            return;
+        }
+
+        double interpX = renderEntity.lastTickPosX + (renderEntity.posX - renderEntity.lastTickPosX) * partialTicks;
+        double interpY = renderEntity.lastTickPosY + (renderEntity.posY - renderEntity.lastTickPosY) * partialTicks;
+        double interpZ = renderEntity.lastTickPosZ + (renderEntity.posZ - renderEntity.lastTickPosZ) * partialTicks;
+        GlStateManager.translate(-interpX + x2, -interpY + y2, -interpZ + z2);
+
+        GlStateManager.depthMask(false);
+        GlStateManager.enableBlend();
+        GlStateManager.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE);
+        bindTexture(texture);
+        GlStateManager.disableCull();
+
+        drawFloatyStrip(x, y, z, x2, y2, z2, dist, length, time, red, green, blue, speed, distance, width, true);
+        drawFloatyStrip(x, y, z, x2, y2, z2, dist, length, time, red, green, blue, speed, distance, width, false);
+
+        GlStateManager.enableCull();
+        GlStateManager.disableBlend();
+        GlStateManager.depthMask(true);
+    }
+
+    private static void drawFloatyStrip(double x, double y, double z, double x2, double y2, double z2,
+                                        float dist, float length, float time,
+                                        float red, float green, float blue,
+                                        float speed, float distance, float width,
+                                        boolean vertical) {
+        double deltaX = x - x2;
+        double deltaY = y - y2;
+        double deltaZ = z - z2;
+        Tessellator tessellator = Tessellator.getInstance();
+        BufferBuilder buffer = tessellator.getBuffer();
+        buffer.begin(GL11.GL_TRIANGLE_STRIP, DefaultVertexFormats.POSITION_TEX_COLOR);
+
+        for (int i = 0; i <= length * distance; ++i) {
+            float beamPos = (float) i / length;
+            float centerWeight = 1.0F - Math.abs((float) i - length / 2.0F) / (length / 2.0F);
+            double waveX = MathHelper.sin((float) ((z % 16.0D + dist * (1.0F - beamPos) * Config.golemLinkQuality / 2.0F
+                    - (time % 32767.0F / 5.0F)) / 4.0D)) * 0.5F * centerWeight;
+            double waveY = MathHelper.sin((float) ((x % 16.0D + dist * (1.0F - beamPos) * Config.golemLinkQuality / 2.0F
+                    - (time % 32767.0F / 5.0F)) / 3.0D)) * 0.5F * centerWeight;
+            double waveZ = MathHelper.sin((float) ((y % 16.0D + dist * (1.0F - beamPos) * Config.golemLinkQuality / 2.0F
+                    - (time % 32767.0F / 5.0F)) / 2.0D)) * 0.5F * centerWeight;
+            double beamX = deltaX + waveX;
+            double beamY = deltaY + waveY;
+            double beamZ = deltaZ + waveZ;
+            float texU = (1.0F - beamPos) * dist - time * speed;
+
+            if (vertical) {
+                buffer.pos(beamX * beamPos, beamY * beamPos - width, beamZ * beamPos)
+                        .tex(texU, 1.0F).color(red, green, blue, centerWeight).endVertex();
+                buffer.pos(beamX * beamPos, beamY * beamPos + width, beamZ * beamPos)
+                        .tex(texU, 0.0F).color(red, green, blue, centerWeight).endVertex();
+            } else {
+                buffer.pos(beamX * beamPos - width, beamY * beamPos, beamZ * beamPos)
+                        .tex(texU, 1.0F).color(red, green, blue, centerWeight).endVertex();
+                buffer.pos(beamX * beamPos + width, beamY * beamPos, beamZ * beamPos)
+                        .tex(texU, 0.0F).color(red, green, blue, centerWeight).endVertex();
+            }
+        }
+
+        tessellator.draw();
     }
 
     public static void drawTexturedQuad(int x, int y, int u, int v, int width, int height, double zLevel) {

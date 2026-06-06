@@ -20,6 +20,7 @@ import thaumcraft.api.aspects.AspectList;
 import thaumcraft.api.nodes.INode;
 import thaumcraft.api.nodes.NodeModifier;
 import thaumcraft.api.nodes.NodeType;
+import thaumcraft.client.lib.UtilsFX;
 import thaumcraft.common.items.relics.ItemThaumometer;
 import thaumcraft.common.tiles.TileJarNode;
 import thaumcraft.common.tiles.TileNode;
@@ -96,26 +97,21 @@ public class TileNodeRenderer extends TileEntitySpecialRenderer<TileEntity> {
                 renderAspects, node.getNodeType(), node.getNodeModifier(), pos.getX());
 
         if (tile instanceof TileNode) {
-            renderDrainBeam((TileNode) tile, x, y, z, partialTicks);
+            renderDrainBeam((TileNode) tile, partialTicks);
         }
     }
 
-    private static void renderDrainBeam(TileNode node, double x, double y, double z, float partialTicks) {
+    private static void renderDrainBeam(TileNode node, float partialTicks) {
         if (node.drainEntity == null || node.drainCollision == null) {
             return;
         }
 
         Entity entity = node.drainEntity;
-        if (entity instanceof EntityPlayer && !((EntityPlayer) entity).isHandActive()) {
-            node.drainEntity = null;
-            node.drainCollision = null;
-            return;
-        }
 
         RayTraceResult hit = node.drainCollision;
         BlockPos hitPos = hit.getBlockPos() == null ? node.getPos() : hit.getBlockPos();
-        int useCount = entity instanceof EntityPlayer ? ((EntityPlayer) entity).getItemInUseCount() : 0;
-        float wobble = entity instanceof EntityPlayer ? MathHelper.sin(useCount / 10.0F) * 10.0F : 0.0F;
+        float beamAge = node.drainBeamAge + partialTicks;
+        float wobble = MathHelper.sin(beamAge / 10.0F) * 10.0F;
 
         Vec3d offset = new Vec3d(-0.1D, -0.1D, 0.5D);
         float pitch = -(entity.prevRotationPitch + (entity.rotationPitch - entity.prevRotationPitch) * partialTicks) * (float) Math.PI / 180.0F;
@@ -129,19 +125,15 @@ public class TileNodeRenderer extends TileEntitySpecialRenderer<TileEntity> {
         double sourceWorldY = entity.lastTickPosY + (entity.posY - entity.lastTickPosY) * partialTicks + offset.y
                 + (entity == Minecraft.getMinecraft().player ? 0.0D : entity.getEyeHeight());
         double sourceWorldZ = entity.lastTickPosZ + (entity.posZ - entity.lastTickPosZ) * partialTicks + offset.z;
-
-        BlockPos nodePos = node.getPos();
-        double sx = x + (sourceWorldX - nodePos.getX());
-        double sy = y + (sourceWorldY - nodePos.getY());
-        double sz = z + (sourceWorldZ - nodePos.getZ());
-        double ex = x + 0.5D + (hitPos.getX() - nodePos.getX());
-        double ey = y + 0.5D + (hitPos.getY() - nodePos.getY());
-        double ez = z + 0.5D + (hitPos.getZ() - nodePos.getZ());
+        double targetWorldX = hitPos.getX() + 0.5D;
+        double targetWorldY = hitPos.getY() + 0.5D;
+        double targetWorldZ = hitPos.getZ() + 0.5D;
         int color = node.color == null ? node.drainColor : node.color.getRGB();
 
         GlStateManager.pushMatrix();
-        TileRenderHelper.drawWispyLine(sx, sy, sz, ex, ey, ez, color,
-                TileRenderHelper.ticks(node, partialTicks), -0.02F, Math.min(useCount, 10) / 10.0F, 0.25F);
+        UtilsFX.drawFloatyLine(sourceWorldX, sourceWorldY, sourceWorldZ,
+                targetWorldX, targetWorldY, targetWorldZ,
+                partialTicks, color, "textures/misc/wispy.png", -0.02F, Math.min(beamAge, 10.0F) / 10.0F);
         GlStateManager.popMatrix();
     }
 
