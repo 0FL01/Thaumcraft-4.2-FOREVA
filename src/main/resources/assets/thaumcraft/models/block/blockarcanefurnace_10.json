@@ -5,7 +5,8 @@
     "side": "thaumcraft:blocks/furnace10",
     "front": "thaumcraft:blocks/furnace13",
     "top": "thaumcraft:blocks/furnace15",
-    "inner": "thaumcraft:blocks/furnace9"
+    "inner": "thaumcraft:blocks/furnace9",
+    "fire": "minecraft:blocks/fire_layer_0"
   },
   "elements": [
     {
@@ -30,6 +31,14 @@
         "south": { "texture": "#front" },
         "west": { "texture": "#inner" },
         "east": { "texture": "#inner" }
+      }
+    },
+    {
+      "from": [0, 0, 1],
+      "to": [16, 16, 4],
+      "shade": false,
+      "faces": {
+        "north": { "texture": "#fire" }
       }
     }
   ]
