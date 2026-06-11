@@ -17,6 +17,9 @@ permission:
     "*.env.example": allow
     "/tmp": deny
     "/tmp/*": deny
+    "~/.ssh/*": deny
+    "*/.ssh/*": deny
+    "~/.ssh*": deny
   write:
     "*": allow
     "/tmp": deny
