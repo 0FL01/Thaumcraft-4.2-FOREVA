@@ -14,6 +14,9 @@ permission:
   edit: deny
   read:
     "*": allow
+    "~/.ssh/*": deny
+    "*/.ssh/*": deny
+    "~/.ssh*": deny
     "/tmp": deny
     "/tmp/*": deny
   tavily-local_*: allow
