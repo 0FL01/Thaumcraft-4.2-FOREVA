@@ -1,44 +1,64 @@
 {
+  "comment": "Nozzle (type=10) — designed for south-facing. Overlays at z=12-15 inside block volume, 'south' faces visible from +z viewer. Blockstate y:180 for north-facing flips to z=1-4 with 'north' faces.",
   "ambientocclusion": false,
   "textures": {
     "particle": "thaumcraft:blocks/furnace10",
     "side": "thaumcraft:blocks/furnace10",
     "front": "thaumcraft:blocks/furnace13",
-    "top": "thaumcraft:blocks/furnace15",
+    "trim": "thaumcraft:blocks/furnace15",
     "inner": "thaumcraft:blocks/furnace9",
     "fire": "minecraft:blocks/fire_layer_0"
   },
   "elements": [
     {
+      "comment": "Nozzle body half-block — north half (back of nozzle)",
       "from": [0, 0, 0],
       "to": [16, 16, 8],
       "faces": {
-        "down": { "texture": "#top" },
-        "up": { "texture": "#top" },
-        "north": { "texture": "#front" },
-        "south": { "texture": "#side" },
+        "down": { "texture": "#side" },
+        "up": { "texture": "#side" },
+        "north": { "texture": "#inner" },
+        "south": { "texture": "#inner" },
         "west": { "texture": "#side" },
         "east": { "texture": "#side" }
       }
     },
     {
+      "comment": "Inner throat cavity — dark interior visible through opening",
       "from": [4, 4, 8],
       "to": [12, 12, 12],
       "faces": {
         "down": { "texture": "#inner" },
         "up": { "texture": "#inner" },
         "north": { "texture": "#inner" },
-        "south": { "texture": "#front" },
+        "south": { "texture": "#inner" },
         "west": { "texture": "#inner" },
         "east": { "texture": "#inner" }
       }
     },
     {
-      "from": [0, 0, 1],
-      "to": [16, 16, 4],
+      "comment": "Opening face — furnace13 brick frame with transparent flame center",
+      "from": [0, 0, 12],
+      "to": [16, 16, 13],
+      "faces": {
+        "south": { "texture": "#front" }
+      }
+    },
+    {
+      "comment": "Trim face — furnace15 decorative accents",
+      "from": [0, 0, 13],
+      "to": [16, 16, 14],
+      "faces": {
+        "south": { "texture": "#trim" }
+      }
+    },
+    {
+      "comment": "Fire face — outermost layer, shade=false",
+      "from": [0, 0, 14],
+      "to": [16, 16, 15],
       "shade": false,
       "faces": {
-        "north": { "texture": "#fire" }
+        "south": { "texture": "#fire" }
       }
     }
   ]

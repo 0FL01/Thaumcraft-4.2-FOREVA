@@ -121,15 +121,15 @@
       "model": "thaumcraft:blockarcanefurnace_9"
     },
     "facing=north,type=10": {
-      "model": "thaumcraft:blockarcanefurnace_10"
+      "model": "thaumcraft:blockarcanefurnace_10",
+      "y": 180
     },
     "facing=east,type=10": {
       "model": "thaumcraft:blockarcanefurnace_10",
       "y": 90
     },
     "facing=south,type=10": {
-      "model": "thaumcraft:blockarcanefurnace_10",
-      "y": 180
+      "model": "thaumcraft:blockarcanefurnace_10"
     },
     "facing=west,type=10": {
       "model": "thaumcraft:blockarcanefurnace_10",
