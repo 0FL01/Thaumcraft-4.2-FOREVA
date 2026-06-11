@@ -115,7 +115,8 @@ Each final report must include:
 5. Run focused validation after each checkpoint.
 6. If validation fails, fix the failure before expanding scope.
 7. Keep the final diff scoped and reviewable.
-8. End with a final report listing exact commands and results.
+8. If code was changed, rebuild (`./scripts/dev.sh build`) as the final step to ensure the jar is up to date.
+9. End with a final report listing exact commands and results.
 
 ## Development practices
 
