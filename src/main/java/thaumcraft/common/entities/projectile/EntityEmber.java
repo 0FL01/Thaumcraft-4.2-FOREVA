@@ -22,6 +22,7 @@ public class EntityEmber extends EntityThrowable implements IEntityAdditionalSpa
     public EntityEmber(World world) { super(world); }
     public EntityEmber(World world, EntityLivingBase shooter, float scatter) {
         super(world, shooter);
+        this.shoot(shooter, shooter.rotationPitch, shooter.rotationYaw, 0.0F, 1.0F, scatter);
     }
 
     @Override

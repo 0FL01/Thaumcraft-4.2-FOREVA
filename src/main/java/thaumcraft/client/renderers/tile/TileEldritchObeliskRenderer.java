@@ -38,10 +38,10 @@ public class TileEldritchObeliskRenderer extends TileEntitySpecialRenderer<TileE
         float ticks = TileRenderHelper.ticks(tile, partialTicks);
         float bob = (float) Math.sin(ticks / 10.0F) * 0.1F + 0.1F;
         Entity viewer = Minecraft.getMinecraft().getRenderViewEntity();
-        // LOD: full rendering (sides + caps + fields) within 32 blocks, field-only fallback beyond.
+        // LOD: full rendering (sides + caps + fields) within 96 blocks, field-only fallback beyond.
         boolean inRange = tile.getWorld() != null
                 && viewer != null
-                && tile.getPos().distanceSq(viewer.posX, viewer.posY, viewer.posZ) < 1024.0D;
+                && tile.getPos().distanceSq(viewer.posX, viewer.posY, viewer.posZ) < 9216.0D;
         double viewX = 0.0D;
         double viewY = 0.0D;
         double viewZ = 0.0D;
