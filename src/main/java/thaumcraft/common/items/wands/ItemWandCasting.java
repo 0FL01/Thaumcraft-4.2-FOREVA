@@ -93,7 +93,7 @@ public class ItemWandCasting extends Item implements IArchitect {
             NBTTagCompound speed = new NBTTagCompound();
             speed.setString("AttributeName", SharedMonsterAttributes.ATTACK_SPEED.getName());
             speed.setString("Name", "Weapon speed modifier");
-            speed.setDouble("Amount", -2.4D);
+            speed.setDouble("Amount", -3.2D);
             speed.setInteger("Operation", 0);
             speed.setLong("UUIDMost", STAFF_SPEED_UUID.getMostSignificantBits());
             speed.setLong("UUIDLeast", STAFF_SPEED_UUID.getLeastSignificantBits());
