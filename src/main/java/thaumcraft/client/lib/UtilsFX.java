@@ -15,7 +15,11 @@ import thaumcraft.common.config.Config;
 import java.awt.Color;
 import java.text.DecimalFormat;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import net.minecraft.client.gui.FontRenderer;
+import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.client.renderer.RenderItem;
 
 public class UtilsFX {
     private static final Map<String, ResourceLocation> BOUND_TEXTURES = new HashMap<String, ResourceLocation>();
@@ -228,5 +232,99 @@ public class UtilsFX {
         GlStateManager.disableBlend();
         GlStateManager.enableLighting();
         GlStateManager.popMatrix();
+    }
+
+    public static void renderQuadCenteredFromTexture(String texture, float scale, float red, float green, float blue, int brightness, int blend, float opacity) {
+        bindTexture(texture);
+        renderQuadCenteredFromTexture(scale, red, green, blue, brightness, blend, opacity);
+    }
+
+    public static void renderQuadCenteredFromTexture(float scale, float red, float green, float blue, int brightness, int blend, float opacity) {
+        Tessellator tessellator = Tessellator.getInstance();
+        BufferBuilder buffer = tessellator.getBuffer();
+        GL11.glScalef(scale, scale, scale);
+        GlStateManager.enableBlend();
+        GlStateManager.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA,
+                blend == 1 ? GlStateManager.DestFactor.ONE : GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
+        GlStateManager.color(1.0F, 1.0F, 1.0F, opacity);
+        buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
+        buffer.pos(-0.5, 0.5, 0.0).tex(0.0, 1.0).endVertex();
+        buffer.pos(0.5, 0.5, 0.0).tex(1.0, 1.0).endVertex();
+        buffer.pos(0.5, -0.5, 0.0).tex(1.0, 0.0).endVertex();
+        buffer.pos(-0.5, -0.5, 0.0).tex(0.0, 0.0).endVertex();
+        tessellator.draw();
+        GlStateManager.disableBlend();
+    }
+
+    public static void drawCustomTooltip(GuiScreen gui, RenderItem itemRenderer, FontRenderer fr, List<String> lines, int x, int y, int subTipColor) {
+        GlStateManager.disableRescaleNormal();
+        GlStateManager.disableDepth();
+        if (!lines.isEmpty()) {
+            int maxW = 0;
+            for (String line : lines) {
+                int w = fr.getStringWidth(line);
+                if (w > maxW) maxW = w;
+            }
+            int tipX = x + 12;
+            int tipY = y - 12;
+            int height = 8;
+            if (lines.size() > 1) {
+                height += 2 + (lines.size() - 1) * 10;
+            }
+            itemRenderer.zLevel = 300.0F;
+            int bg = -267386864;
+            drawGradientRect(tipX - 3, tipY - 4, tipX + maxW + 3, tipY - 3, bg, bg);
+            drawGradientRect(tipX - 3, tipY + height + 3, tipX + maxW + 3, tipY + height + 4, bg, bg);
+            drawGradientRect(tipX - 3, tipY - 3, tipX + maxW + 3, tipY + height + 3, bg, bg);
+            drawGradientRect(tipX - 4, tipY - 3, tipX - 3, tipY + height + 3, bg, bg);
+            drawGradientRect(tipX + maxW + 3, tipY - 3, tipX + maxW + 4, tipY + height + 3, bg, bg);
+            int border1 = 0x505000FF;
+            int border2 = (border1 & 0xFEFEFE) >> 1 | border1 & 0xFF000000;
+            drawGradientRect(tipX - 3, tipY - 3 + 1, tipX - 3 + 1, tipY + height + 3 - 1, border1, border2);
+            drawGradientRect(tipX + maxW + 2, tipY - 3 + 1, tipX + maxW + 3, tipY + height + 3 - 1, border1, border2);
+            drawGradientRect(tipX - 3, tipY - 3, tipX + maxW + 3, tipY - 3 + 1, border1, border1);
+            drawGradientRect(tipX - 3, tipY + height + 2, tipX + maxW + 3, tipY + height + 3, border2, border2);
+            for (int i = 0; i < lines.size(); i++) {
+                String line = lines.get(i);
+                line = i == 0 ? "\u00a7" + Integer.toHexString(subTipColor) + line : "\u00a77" + line;
+                fr.drawString(line, tipX, tipY, -1);
+                if (i == 0) tipY += 2;
+                tipY += 10;
+            }
+            itemRenderer.zLevel = 0.0F;
+        }
+        GlStateManager.enableDepth();
+    }
+
+    public static void drawGradientRect(int x1, int y1, int x2, int y2, int color1, int color2) {
+        float a1 = (float)(color1 >> 24 & 0xFF) / 255.0F;
+        float r1 = (float)(color1 >> 16 & 0xFF) / 255.0F;
+        float g1 = (float)(color1 >> 8 & 0xFF) / 255.0F;
+        float b1 = (float)(color1 & 0xFF) / 255.0F;
+        float a2 = (float)(color2 >> 24 & 0xFF) / 255.0F;
+        float r2 = (float)(color2 >> 16 & 0xFF) / 255.0F;
+        float g2 = (float)(color2 >> 8 & 0xFF) / 255.0F;
+        float b2 = (float)(color2 & 0xFF) / 255.0F;
+        GlStateManager.disableTexture2D();
+        GlStateManager.enableBlend();
+        GlStateManager.disableAlpha();
+        GlStateManager.tryBlendFuncSeparate(
+                GlStateManager.SourceFactor.SRC_ALPHA,
+                GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA,
+                GlStateManager.SourceFactor.ONE,
+                GlStateManager.DestFactor.ZERO);
+        GlStateManager.shadeModel(GL11.GL_SMOOTH);
+        Tessellator tessellator = Tessellator.getInstance();
+        BufferBuilder buffer = tessellator.getBuffer();
+        buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_COLOR);
+        buffer.pos(x2, y1, 300.0).color(r1, g1, b1, a1).endVertex();
+        buffer.pos(x1, y1, 300.0).color(r1, g1, b1, a1).endVertex();
+        buffer.pos(x1, y2, 300.0).color(r2, g2, b2, a2).endVertex();
+        buffer.pos(x2, y2, 300.0).color(r2, g2, b2, a2).endVertex();
+        tessellator.draw();
+        GlStateManager.shadeModel(GL11.GL_FLAT);
+        GlStateManager.disableBlend();
+        GlStateManager.enableAlpha();
+        GlStateManager.enableTexture2D();
     }
 }

@@ -52,6 +52,7 @@ import thaumcraft.common.lib.research.ScanManager;
 @SideOnly(Side.CLIENT)
 public class RenderEventHandler {
     private final REHNotifyHandler notifyHandler = new REHNotifyHandler();
+    private final REHWandHandler wandHandler = new REHWandHandler();
     public static boolean resetShaders = false;
     private static int oldDisplayWidth = 0;
     private static int oldDisplayHeight = 0;
@@ -106,6 +107,11 @@ public class RenderEventHandler {
                 ScaledResolution resolution = event.getResolution();
                 renderVignette(targetBrightness, resolution.getScaledWidth(), resolution.getScaledHeight());
             }
+        }
+        // Focus selector radial HUD
+        Minecraft mc = Minecraft.getMinecraft();
+        if (mc != null && mc.player != null) {
+            wandHandler.handleFociRadial(mc, System.currentTimeMillis(), event);
         }
     }
 

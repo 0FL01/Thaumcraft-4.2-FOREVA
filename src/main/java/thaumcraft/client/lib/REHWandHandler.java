@@ -1,0 +1,310 @@
+package thaumcraft.client.lib;
+
+import baubles.api.BaublesApi;
+import baubles.api.cap.IBaublesItemHandler;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.ScaledResolution;
+import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.renderer.RenderHelper;
+import net.minecraft.client.renderer.RenderItem;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.ItemStack;
+import net.minecraft.util.math.MathHelper;
+import net.minecraft.client.util.ITooltipFlag;
+import net.minecraftforge.client.event.RenderGameOverlayEvent;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
+import org.lwjgl.input.Mouse;
+import org.lwjgl.opengl.Display;
+import org.lwjgl.opengl.GL11;
+import thaumcraft.api.wands.ItemFocusBasic;
+import thaumcraft.common.items.wands.ItemFocusPouch;
+import thaumcraft.common.items.wands.ItemWandCasting;
+import thaumcraft.common.lib.network.PacketHandler;
+import thaumcraft.common.lib.network.misc.PacketFocusChangeToServer;
+
+import java.util.HashMap;
+import java.util.TreeMap;
+
+@SideOnly(Side.CLIENT)
+public class REHWandHandler {
+
+    static float radialHudScale = 0.0F;
+
+    private final TreeMap<String, Integer> foci = new TreeMap<>();
+    private final HashMap<String, ItemStack> fociItem = new HashMap<>();
+    private final HashMap<String, Boolean> fociHover = new HashMap<>();
+    private final HashMap<String, Float> fociScale = new HashMap<>();
+    private long lastTime = 0L;
+    private boolean lastState = false;
+
+    public void handleFociRadial(Minecraft mc, long time, RenderGameOverlayEvent event) {
+        if (!KeyHandler.radialActive && radialHudScale <= 0.0F) {
+            return;
+        }
+
+        if (KeyHandler.radialActive) {
+            if (mc.currentScreen != null) {
+                KeyHandler.radialActive = false;
+                KeyHandler.radialLock = true;
+                mc.displayGuiScreen(null);
+                mc.setIngameFocus();
+                return;
+            }
+
+            if (radialHudScale == 0.0F) {
+                foci.clear();
+                fociItem.clear();
+                fociHover.clear();
+                fociScale.clear();
+
+                EntityPlayer player = mc.player;
+                int pouchCount = 0;
+
+                // Scan Baubles slots for focus pouches
+                IBaublesItemHandler baubles = BaublesApi.getBaublesHandler(player);
+                if (baubles != null) {
+                    for (int slot = 0; slot < baubles.getSlots(); slot++) {
+                        ItemStack stack = baubles.getStackInSlot(slot);
+                        if (!stack.isEmpty() && stack.getItem() instanceof ItemFocusPouch) {
+                            ++pouchCount;
+                            ItemStack[] inv = ((ItemFocusPouch) stack.getItem()).getInventory(stack);
+                            for (int q = 0; q < inv.length; q++) {
+                                ItemStack focus = inv[q];
+                                if (!focus.isEmpty() && focus.getItem() instanceof ItemFocusBasic) {
+                                    String key = ((ItemFocusBasic) focus.getItem()).getSortingHelper(focus);
+                                    foci.put(key, q + pouchCount * 1000);
+                                    fociItem.put(key, focus.copy());
+                                    fociScale.put(key, 1.0F);
+                                    fociHover.put(key, false);
+                                }
+                            }
+                        }
+                    }
+                }
+
+                // Scan player inventory
+                for (int slot = 0; slot < player.inventory.mainInventory.size(); slot++) {
+                    ItemStack stack = player.inventory.mainInventory.get(slot);
+                    if (!stack.isEmpty() && stack.getItem() instanceof ItemFocusBasic) {
+                        String key = ((ItemFocusBasic) stack.getItem()).getSortingHelper(stack);
+                        foci.put(key, slot);
+                        fociItem.put(key, stack.copy());
+                        fociScale.put(key, 1.0F);
+                        fociHover.put(key, false);
+                    }
+                    if (!stack.isEmpty() && stack.getItem() instanceof ItemFocusPouch) {
+                        ++pouchCount;
+                        ItemStack[] inv = ((ItemFocusPouch) stack.getItem()).getInventory(stack);
+                        for (int q = 0; q < inv.length; q++) {
+                            ItemStack focus = inv[q];
+                            if (!focus.isEmpty() && focus.getItem() instanceof ItemFocusBasic) {
+                                String key = ((ItemFocusBasic) focus.getItem()).getSortingHelper(focus);
+                                foci.put(key, q + pouchCount * 1000);
+                                fociItem.put(key, focus.copy());
+                                fociScale.put(key, 1.0F);
+                                fociHover.put(key, false);
+                            }
+                        }
+                    }
+                }
+
+                // Grab mouse so we can track position
+                if (!foci.isEmpty() && mc.inGameHasFocus) {
+                    mc.inGameHasFocus = false;
+                    mc.mouseHelper.ungrabMouseCursor();
+                }
+            }
+        } else if (mc.currentScreen == null && lastState) {
+            // Key released: re-grab mouse
+            if (Display.isActive() && !mc.inGameHasFocus) {
+                mc.inGameHasFocus = true;
+                mc.mouseHelper.grabMouseCursor();
+            }
+            lastState = false;
+        }
+
+        ScaledResolution resolution = event.getResolution();
+        renderFocusRadialHUD(resolution.getScaledWidth_double(), resolution.getScaledHeight_double(), time, event.getPartialTicks());
+
+        // Animate scales and handle selection
+        if (time > lastTime) {
+            for (String key : fociHover.keySet()) {
+                if (fociHover.get(key)) {
+                    // Hovered: send selection if key released
+                    if (!KeyHandler.radialActive && !KeyHandler.radialLock) {
+                        PacketHandler.INSTANCE.sendToServer(new PacketFocusChangeToServer(mc.player, key));
+                        KeyHandler.radialLock = true;
+                    }
+                    // Animate scale up
+                    if (fociScale.get(key) < 1.3F) {
+                        fociScale.put(key, fociScale.get(key) + 0.025F);
+                    }
+                } else {
+                    // Animate scale down
+                    if (fociScale.get(key) > 1.0F) {
+                        fociScale.put(key, fociScale.get(key) - 0.025F);
+                    }
+                }
+            }
+
+            // Animate overall HUD scale
+            if (!KeyHandler.radialActive) {
+                radialHudScale -= 0.05F;
+            } else if (radialHudScale < 1.0F) {
+                radialHudScale += 0.05F;
+            }
+            if (radialHudScale > 1.0F) radialHudScale = 1.0F;
+            if (radialHudScale < 0.0F) {
+                radialHudScale = 0.0F;
+                KeyHandler.radialLock = false;
+            }
+
+            lastTime = time + 5L;
+            lastState = KeyHandler.radialActive;
+        }
+    }
+
+    private void renderFocusRadialHUD(double sw, double sh, long time, float partialTicks) {
+        Minecraft mc = Minecraft.getMinecraft();
+        RenderItem ri = mc.getRenderItem();
+
+        if (mc.player == null) return;
+        ItemStack held = mc.player.getHeldItemMainhand();
+        if (held.isEmpty() || !(held.getItem() instanceof ItemWandCasting)) return;
+
+        ItemWandCasting wand = (ItemWandCasting) held.getItem();
+        ItemFocusBasic focus = wand.getFocus(held);
+
+        // Mouse position in scaled coordinates
+        int mouseX = (int) ((double) Mouse.getEventX() * sw / (double) mc.displayWidth);
+        int mouseY = (int) (sh - (double) Mouse.getEventY() * sh / (double) mc.displayHeight - 1.0);
+        int mouseButton = Mouse.getEventButton();
+
+        if (fociItem.isEmpty()) return;
+
+        GlStateManager.pushMatrix();
+        GL11.glClear(GL11.GL_DEPTH_BUFFER_BIT);
+
+        // Set up orthographic projection
+        GlStateManager.matrixMode(GL11.GL_PROJECTION);
+        GlStateManager.loadIdentity();
+        GlStateManager.ortho(0.0, sw, sh, 0.0, 1000.0, 3000.0);
+        GlStateManager.matrixMode(GL11.GL_MODELVIEW);
+        GlStateManager.loadIdentity();
+        GlStateManager.translate(0.0F, 0.0F, -2000.0F);
+        GlStateManager.disableDepth();
+        GlStateManager.depthMask(false);
+
+        GlStateManager.pushMatrix();
+        GlStateManager.translate((float)(sw / 2.0), (float)(sh / 2.0), 0.0F);
+
+        ItemStack tooltipStack = null;
+        float radius = 16.0F + (float) fociItem.size() * 2.5F;
+
+        // Draw spinning radial background 1
+        UtilsFX.bindTexture("textures/misc/radial.png");
+        GlStateManager.pushMatrix();
+        GlStateManager.rotate(partialTicks + (float)(mc.player.ticksExisted % 720) / 2.0F, 0.0F, 0.0F, 1.0F);
+        GlStateManager.alphaFunc(GL11.GL_GREATER, 0.003921569F);
+        GlStateManager.enableBlend();
+        GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+        UtilsFX.renderQuadCenteredFromTexture(radius * 2.75F * radialHudScale, 0.5F, 0.5F, 0.5F, 200, GL11.GL_ONE_MINUS_SRC_ALPHA, 0.5F);
+        GlStateManager.disableBlend();
+        GlStateManager.alphaFunc(GL11.GL_GREATER, 0.1F);
+        GlStateManager.popMatrix();
+
+        // Draw spinning radial background 2 (counter-rotating)
+        UtilsFX.bindTexture("textures/misc/radial2.png");
+        GlStateManager.pushMatrix();
+        GlStateManager.rotate(-(partialTicks + (float)(mc.player.ticksExisted % 720) / 2.0F), 0.0F, 0.0F, 1.0F);
+        GlStateManager.alphaFunc(GL11.GL_GREATER, 0.003921569F);
+        GlStateManager.enableBlend();
+        GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+        UtilsFX.renderQuadCenteredFromTexture(radius * 2.55F * radialHudScale, 0.5F, 0.5F, 0.5F, 200, GL11.GL_ONE_MINUS_SRC_ALPHA, 0.5F);
+        GlStateManager.disableBlend();
+        GlStateManager.alphaFunc(GL11.GL_GREATER, 0.1F);
+        GlStateManager.popMatrix();
+
+        // Draw current focus in center
+        if (focus != null) {
+            GlStateManager.pushMatrix();
+            GlStateManager.enableRescaleNormal();
+            RenderHelper.enableGUIStandardItemLighting();
+            ItemStack centerItem = wand.getFocusItem(held).copy();
+            centerItem.setTagCompound(null);
+            ri.renderItemAndEffectIntoGUI(centerItem, -8, -8);
+            RenderHelper.disableStandardItemLighting();
+            GlStateManager.disableRescaleNormal();
+            GlStateManager.popMatrix();
+
+            // Check if mouse hovers center (current focus)
+            int mx = (int)((double) mouseX - sw / 2.0);
+            int my = (int)((double) mouseY - sh / 2.0);
+            if (mx >= -10 && mx <= 10 && my >= -10 && my <= 10) {
+                tooltipStack = wand.getFocusItem(held);
+            }
+        }
+
+        // Scale for radial items
+        GlStateManager.scale(radialHudScale, radialHudScale, radialHudScale);
+        float currentRot = -90.0F * radialHudScale;
+        float pieSlice = 360.0F / (float) fociItem.size();
+
+        // Draw each focus item in a circle
+        String key = foci.firstKey();
+        for (int a = 0; a < fociItem.size(); a++) {
+            double xx = MathHelper.cos(currentRot / 180.0F * (float) Math.PI) * radius;
+            double yy = MathHelper.sin(currentRot / 180.0F * (float) Math.PI) * radius;
+            currentRot += pieSlice;
+
+            GlStateManager.pushMatrix();
+            GlStateManager.translate((float)xx, (float)yy, 100.0F);
+            float scale = fociScale.get(key);
+            GlStateManager.scale(scale, scale, scale);
+            GlStateManager.enableRescaleNormal();
+            RenderHelper.enableGUIStandardItemLighting();
+            ItemStack item = fociItem.get(key).copy();
+            item.setTagCompound(null);
+            ri.renderItemAndEffectIntoGUI(item, -8, -8);
+            RenderHelper.disableStandardItemLighting();
+            GlStateManager.disableRescaleNormal();
+            GlStateManager.popMatrix();
+
+            // Hover detection
+            if (!KeyHandler.radialLock && KeyHandler.radialActive) {
+                int mx = (int)((double) mouseX - sw / 2.0 - xx);
+                int my = (int)((double) mouseY - sh / 2.0 - yy);
+                if (mx >= -10 && mx <= 10 && my >= -10 && my <= 10) {
+                    fociHover.put(key, true);
+                    tooltipStack = fociItem.get(key);
+                    if (mouseButton == 0) {
+                        KeyHandler.radialActive = false;
+                        KeyHandler.radialLock = true;
+                        PacketHandler.INSTANCE.sendToServer(new PacketFocusChangeToServer(mc.player, key));
+                        break;
+                    }
+                } else {
+                    fociHover.put(key, false);
+                }
+            }
+
+            key = foci.higherKey(key);
+        }
+
+        GlStateManager.popMatrix();
+
+        // Draw tooltip for hovered focus
+        if (tooltipStack != null) {
+            UtilsFX.drawCustomTooltip(mc.currentScreen, ri, mc.fontRenderer,
+                    tooltipStack.getTooltip(mc.player, mc.gameSettings.advancedItemTooltips ? ITooltipFlag.TooltipFlags.ADVANCED : ITooltipFlag.TooltipFlags.NORMAL), -4, 20, 11);
+        }
+
+        // Restore GL state
+        GlStateManager.depthMask(true);
+        GlStateManager.enableDepth();
+        GlStateManager.disableBlend();
+        GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+        GlStateManager.popMatrix();
+    }
+}

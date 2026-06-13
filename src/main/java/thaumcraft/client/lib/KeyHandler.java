@@ -26,7 +26,7 @@ public class KeyHandler {
             KeyConflictContext.IN_GAME, Keyboard.KEY_F, "key.categories.misc");
     public final KeyBinding keyH = new KeyBinding("Activate Hover Harness",
             KeyConflictContext.IN_GAME, Keyboard.KEY_H, "key.categories.misc");
-    public final KeyBinding keyG = new KeyBinding("Misc Wand Toggle",
+    public final KeyBinding keyG = new KeyBinding("Wand Focus Selector",
             KeyConflictContext.IN_GAME, Keyboard.KEY_G, "key.categories.misc");
 
     public static boolean radialActive = false;
@@ -111,12 +111,26 @@ public class KeyHandler {
 
     private void handleMiscKey(EntityPlayer player) {
         if (this.keyG.isKeyDown()) {
-            if (player != null && !this.keyPressedG) {
+            boolean firstPress = !this.keyPressedG;
+            if (firstPress) {
                 lastPressG = System.currentTimeMillis();
-                PacketHandler.INSTANCE.sendToServer(new PacketItemKeyToServer(player, 1));
+                radialLock = false;
+            }
+            if (player != null) {
+                ItemStack held = player.getHeldItemMainhand();
+                if (!held.isEmpty() && held.getItem() instanceof ItemWandCasting && !ItemWandCasting.isSceptre(held)) {
+                    if (player.isSneaking()) {
+                        if (firstPress) {
+                            PacketHandler.INSTANCE.sendToServer(new PacketFocusChangeToServer(player, "REMOVE"));
+                        }
+                    } else if (!radialLock) {
+                        radialActive = true;
+                    }
+                }
             }
             this.keyPressedG = true;
         } else {
+            radialActive = false;
             if (this.keyPressedG) {
                 lastPressG = System.currentTimeMillis();
             }
