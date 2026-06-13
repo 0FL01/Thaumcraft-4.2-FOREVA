@@ -22,6 +22,8 @@ public class CustomItemRendererContractTest {
         String trunkPerspectiveModel = read("src/main/java/thaumcraft/client/renderers/item/TrunkSpawnerPerspectiveModel.java");
         String wandItemModel = read("src/main/resources/assets/thaumcraft/models/item/wandcasting_tesr.json");
         String trunkItemModel = read("src/main/resources/assets/thaumcraft/models/item/trunkspawner_tesr.json");
+        String wandCalibration = read("src/main/java/thaumcraft/client/renderers/item/WandRenderCalibration.java");
+        String wandCalibrationAsset = read("src/main/resources/assets/thaumcraft/render_calibration/wand_casting.json");
 
         assertTrue("ClientProxy should override wandcasting and trunkspawner onto builtin/entity item models and install dedicated item renderers",
                 clientProxy.contains("if (item == ConfigItems.itemWandCasting) {")
@@ -31,31 +33,19 @@ public class CustomItemRendererContractTest {
                         && clientProxy.contains("ConfigItems.itemWandCasting.setTileEntityItemStackRenderer(new ItemWandRenderer());")
                         && clientProxy.contains("ConfigItems.itemTrunkSpawner.setTileEntityItemStackRenderer(new ItemTrunkSpawnerRenderer());"));
 
-        assertTrue("ItemWandRenderer and ModelWand should preserve the reference dynamic wand contract instead of a flat handheld icon",
+        assertTrue("ItemWandRenderer and ModelWand should preserve the reference dynamic wand contract, now driven by an external calibration layer instead of flat hardcoded constants",
                 wandRenderer.contains("extends TileEntityItemStackRenderer")
                         && wandRenderer.contains("new ModelWand()")
                         && wandRenderer.contains("CURRENT_TRANSFORM")
                         && wandRenderer.contains("isHandTransform(transformType)")
-                        && wandRenderer.contains("applyBasePose(wand, stack, transformType)")
-                        && wandRenderer.contains("applyInventoryPose")
-                        && wandRenderer.contains("applyEntityPose")
-                        && wandRenderer.contains("HAND_SCALE = 0.5F")
-                        && wandRenderer.contains("HAND_Y_OFFSET = -0.5F")
-                        && wandRenderer.contains("INVENTORY_X_OFFSET = 0.5F")
-                        && wandRenderer.contains("INVENTORY_Y_OFFSET = 0.5F")
-                        && wandRenderer.contains("INVENTORY_SCALE = 0.6F")
-                        && wandRenderer.contains("INVENTORY_X_ROTATION = 20.0F")
-                        && wandRenderer.contains("INVENTORY_Y_ROTATION = -45.0F")
-                        && wandRenderer.contains("INVENTORY_Z_ROTATION = 45.0F")
-                        && wandRenderer.contains("1.5F + HAND_Y_OFFSET")
-                        && wandRenderer.contains("GlStateManager.scale(HAND_SCALE, HAND_SCALE, HAND_SCALE)")
-                        && wandRenderer.contains("GlStateManager.translate(INVENTORY_X_OFFSET, INVENTORY_Y_OFFSET, 0.0F)")
-                        && wandRenderer.contains("GlStateManager.scale(INVENTORY_SCALE, INVENTORY_SCALE, INVENTORY_SCALE)")
-                        && wandRenderer.contains("GlStateManager.rotate(INVENTORY_X_ROTATION, 1.0F, 0.0F, 0.0F)")
-                        && wandRenderer.contains("GlStateManager.rotate(INVENTORY_Y_ROTATION, 0.0F, 1.0F, 0.0F)")
-                        && wandRenderer.contains("GlStateManager.rotate(INVENTORY_Z_ROTATION, 0.0F, 0.0F, 1.0F)")
+                        && wandRenderer.contains("WandRenderCalibration.get(")
+                        && wandRenderer.contains("resolveKind(wand, stack)")
+                        && wandRenderer.contains("applyBasePose(")
+                        && wandRenderer.contains("applyUseAnimation(")
                         && wandRenderer.contains("player.isHandActive()")
                         && wandRenderer.contains("wand.getFocus(stack)")
+                        && wandRenderer.contains("isFirstPerson(transformType)")
+                        && wandRenderer.contains("GlStateManager.rotate(t.finalRotateX")
                         && wandModel.contains("wand.getRod(wandStack).getTexture()")
                         && wandModel.contains("wand.getCap(wandStack).getTexture()")
                         && wandModel.contains("wand.hasRunes(wandStack)")
@@ -63,6 +53,37 @@ public class CustomItemRendererContractTest {
                         && wandModel.contains("textures/misc/script.png")
                         && wandModel.contains("textures/models/wand.png")
                         && wandModel.contains("drawRune("));
+
+        assertTrue("WandRenderCalibration must keep the wand/staff/sceptre kinds, the TC4 final-rotate basis, and Java defaults that reproduce the prior port constants byte-for-byte",
+                wandCalibration.contains("KIND_WAND = \"wand\"")
+                        && wandCalibration.contains("KIND_STAFF = \"staff\"")
+                        && wandCalibration.contains("KIND_SCEPTRE = \"sceptre\"")
+                        && wandCalibration.contains("buildDefaultCalibration()")
+                        // prior port constants preserved as Java defaults
+                        && wandCalibration.contains("180f, 0f, 0f")
+                        && wandCalibration.contains("0.5f,0.5f,0f")
+                        && wandCalibration.contains("0.6f,0.6f,0.6f")
+                        && wandCalibration.contains("20f,-45f,45f")
+                        && wandCalibration.contains("0f,0.6f,0f")
+                        && wandCalibration.contains("0f,1f,0f")
+                        && wandCalibration.contains("0.5f,1f,0.5f")
+                        && wandCalibration.contains("1f,1.1f,1f")
+                        && wandCalibration.contains("0.5f,0.5f,0.5f")
+                        && wandCalibration.contains("0f,0.5f,0f")
+                        && wandCalibration.contains("-0.7f,1.2f,0f")
+                        && wandCalibration.contains("0f,1.5f,0f")
+                        && wandCalibration.contains("0.9f,0.9f,0.9f")
+                        && wandCalibration.contains("thaumcraft.debugWandRender"));
+
+        assertTrue("The bundled wand_casting.json calibration asset must declare the three kinds and the TC4 180-degree X final rotate",
+                wandCalibrationAsset.contains("\"finalRotate\": [180.0, 0.0, 0.0]")
+                        && wandCalibrationAsset.contains("\"wand\"")
+                        && wandCalibrationAsset.contains("\"staff\"")
+                        && wandCalibrationAsset.contains("\"sceptre\"")
+                        && wandCalibrationAsset.contains("\"FIRST_PERSON_RIGHT_HAND\"")
+                        && wandCalibrationAsset.contains("\"THIRD_PERSON_LEFT_HAND\"")
+                        && wandCalibrationAsset.contains("\"scaleMultiplier\": [0.8, 0.8, 0.8]")
+                        && wandCalibrationAsset.contains("\"postTranslateAdd\": [-0.7, 0.6, 0.0]"));
 
         assertTrue("ClientModelRegistry should wrap wandcasting into a perspective-aware baked model so the TEISR can distinguish GUI, hand, and ground contexts",
                 clientModelRegistry.contains("WANDCASTING_MODEL")

@@ -1,0 +1,71 @@
+{
+  "version": 1,
+  "notes": "Calibration for ItemWandCasting TEISR. These values reproduce the original hardcoded port constants. Order of application (see ItemWandRenderer): preTranslate -> translate -> [if first person] firstPersonScale -> scale -> scaleMultiplier -> rotateX -> rotateY -> rotateZ -> postTranslate -> finalRotate. Hot reload: edit this file (or the config/thaumcraft/render_calibration/wand_casting.json override) and press F3+T.",
+  "common": {
+    "finalRotate": [180.0, 0.0, 0.0]
+  },
+  "kinds": {
+    "wand": {
+      "preTranslate": [0.0, 0.0, 0.0],
+      "contexts": {
+        "GUI": {
+          "translate": [0.5, 0.5, 0.0],
+          "rotate": [20.0, -45.0, 45.0],
+          "scale": [0.6, 0.6, 0.6],
+          "postTranslate": [0.0, 0.6, 0.0]
+        },
+        "GROUND": {
+          "translate": [0.0, 1.0, 0.0],
+          "scale": [1.0, 1.0, 1.0]
+        },
+        "FIXED": {
+          "translate": [0.0, 1.0, 0.0],
+          "scale": [1.0, 1.0, 1.0]
+        },
+        "FIRST_PERSON_RIGHT_HAND": {
+          "translate": [0.5, 1.0, 0.5],
+          "firstPersonScale": [1.0, 1.1, 1.0],
+          "scale": [0.5, 0.5, 0.5]
+        },
+        "FIRST_PERSON_LEFT_HAND": {
+          "translate": [0.5, 1.0, 0.5],
+          "firstPersonScale": [1.0, 1.1, 1.0],
+          "scale": [0.5, 0.5, 0.5]
+        },
+        "THIRD_PERSON_RIGHT_HAND": {
+          "translate": [0.5, 1.0, 0.5],
+          "scale": [0.5, 0.5, 0.5]
+        },
+        "THIRD_PERSON_LEFT_HAND": {
+          "translate": [0.5, 1.0, 0.5],
+          "scale": [0.5, 0.5, 0.5]
+        },
+        "NONE": {
+          "translate": [0.5, 1.5, 0.5],
+          "scale": [1.0, 1.0, 1.0]
+        }
+      }
+    },
+    "staff": {
+      "inherit": "wand",
+      "preTranslate": [0.0, 0.5, 0.0],
+      "contexts": {
+        "GUI": {
+          "scaleMultiplier": [0.8, 0.8, 0.8],
+          "postTranslateAdd": [-0.7, 0.6, 0.0]
+        },
+        "GROUND": {
+          "translate": [0.0, 1.5, 0.0],
+          "scale": [0.9, 0.9, 0.9]
+        },
+        "FIXED": {
+          "translate": [0.0, 1.5, 0.0],
+          "scale": [0.9, 0.9, 0.9]
+        }
+      }
+    },
+    "sceptre": {
+      "inherit": "wand"
+    }
+  }
+}

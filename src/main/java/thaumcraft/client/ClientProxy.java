@@ -7,6 +7,7 @@ import javax.annotation.Nullable;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.WorldClient;
+import net.minecraft.client.resources.IReloadableResourceManager;
 import net.minecraft.client.model.ModelBat;
 import net.minecraft.client.model.ModelBiped;
 import net.minecraft.client.model.ModelSpider;
@@ -146,6 +147,7 @@ import thaumcraft.client.renderers.item.ItemTableRenderer;
 import thaumcraft.client.renderers.item.ItemTubeRenderer;
 import thaumcraft.client.renderers.item.ItemWandRenderer;
 import thaumcraft.client.renderers.item.ItemWoodenDeviceRenderer;
+import thaumcraft.client.renderers.item.WandRenderCalibration;
 import thaumcraft.client.renderers.tile.TileAlembicRenderer;
 import thaumcraft.client.renderers.tile.TileAlchemyFurnaceAdvancedRenderer;
 import thaumcraft.client.renderers.tile.TileArcaneLampRenderer;
@@ -1064,6 +1066,12 @@ public class ClientProxy extends CommonProxy {
         MinecraftForge.EVENT_BUS.register(ParticleEngine.INSTANCE);
         MinecraftForge.EVENT_BUS.register(new ClientEventHandler());
         MinecraftForge.EVENT_BUS.register(new ItemAspectTooltipHandler());
+
+        // Hot reload for wand/staff/sceptre render calibration (edit JSON, then F3+T).
+        if (Minecraft.getMinecraft().getResourceManager() instanceof IReloadableResourceManager) {
+            ((IReloadableResourceManager) Minecraft.getMinecraft().getResourceManager())
+                    .registerReloadListener(WandRenderCalibration::onResourceManagerReload);
+        }
     }
 
     @Override
