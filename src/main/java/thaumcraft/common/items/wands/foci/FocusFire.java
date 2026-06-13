@@ -5,6 +5,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.World;
 import thaumcraft.api.aspects.Aspect;
@@ -93,7 +94,7 @@ public class FocusFire extends ItemFocusBasic {
         if (!player.world.isRemote && wand.consumeAllVis(wandStack, player, this.getVisCost(focusStack), true, false)) {
             int potency = this.getUpgradeLevel(focusStack, FocusUpgradeType.potency);
             if (this.soundDelay < System.currentTimeMillis()) {
-                player.playSound(TCSounds.FIRELOOP, 0.33F, 2.0F);
+                player.world.playSound(null, player.posX, player.posY, player.posZ, TCSounds.FIRELOOP, SoundCategory.PLAYERS, 0.33F, 2.0F);
                 this.soundDelay = System.currentTimeMillis() + 500L;
             }
             float scatter = this.isUpgradedWith(focusStack, firebeam) ? 0.25F : 15.0F;
