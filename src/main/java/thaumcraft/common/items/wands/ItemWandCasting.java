@@ -53,6 +53,7 @@ import java.util.UUID;
 public class ItemWandCasting extends Item implements IArchitect {
 
     private static final UUID STAFF_ATTACK_UUID = UUID.fromString("1d082610-4093-11e4-916c-0800200c9a66");
+    private static final UUID STAFF_SPEED_UUID = UUID.fromString("1d082611-4093-11e4-916c-0800200c9a66");
 
     public static final String TAG_ROD = "rod";
     public static final String TAG_CAP = "cap";
@@ -89,6 +90,14 @@ public class ItemWandCasting extends Item implements IArchitect {
             attack.setLong("UUIDMost", STAFF_ATTACK_UUID.getMostSignificantBits());
             attack.setLong("UUIDLeast", STAFF_ATTACK_UUID.getLeastSignificantBits());
             modifiers.appendTag(attack);
+            NBTTagCompound speed = new NBTTagCompound();
+            speed.setString("AttributeName", SharedMonsterAttributes.ATTACK_SPEED.getName());
+            speed.setString("Name", "Weapon speed modifier");
+            speed.setDouble("Amount", -2.4D);
+            speed.setInteger("Operation", 0);
+            speed.setLong("UUIDMost", STAFF_SPEED_UUID.getMostSignificantBits());
+            speed.setLong("UUIDLeast", STAFF_SPEED_UUID.getLeastSignificantBits());
+            modifiers.appendTag(speed);
             tag.setTag("AttributeModifiers", modifiers);
         } else if (tag.hasKey("AttributeModifiers")) {
             tag.removeTag("AttributeModifiers");
