@@ -57,6 +57,9 @@ import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.event.entity.living.LivingEntityUseItemEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import thaumcraft.api.ThaumcraftApi;
+import thaumcraft.api.aspects.Aspect;
+import thaumcraft.api.aspects.AspectList;
+import thaumcraft.api.entities.ITaintedMob;
 import thaumcraft.api.research.ResearchCategories;
 import thaumcraft.api.research.ResearchCategoryList;
 import thaumcraft.api.research.ResearchItem;
@@ -66,6 +69,7 @@ import thaumcraft.common.config.Config;
 import thaumcraft.common.config.ConfigBlocks;
 import thaumcraft.common.config.ConfigEntities;
 import thaumcraft.common.config.ConfigItems;
+import thaumcraft.common.entities.EntityAspectOrb;
 import thaumcraft.common.entities.golems.EntityGolemBase;
 import thaumcraft.common.entities.golems.EntityTravelingTrunk;
 import thaumcraft.common.entities.monster.EntityBrainyZombie;
@@ -88,6 +92,7 @@ import thaumcraft.common.lib.network.playerdata.PacketSyncWarp;
 import thaumcraft.common.lib.network.playerdata.PacketSyncWipe;
 import thaumcraft.common.lib.network.playerdata.PacketRunicCharge;
 import thaumcraft.common.lib.research.ResearchManager;
+import thaumcraft.common.lib.research.ScanManager;
 import thaumcraft.common.lib.utils.EntityUtils;
 import thaumcraft.common.lib.utils.InventoryUtils;
 import thaumcraft.common.lib.world.dim.Cell;
@@ -311,20 +316,49 @@ public class EventHandlerEntity {
      * On player death:
      * - Calls WarpEvents.checkDeathGaze
      * - Resets warp counter
+     *
+     * On mob death (TC4 parity):
+     * - Drops EntityAspectOrb for each primal aspect (50% chance each)
+     * - Only for non-tainted mobs recently hit by a player
      */
     @SubscribeEvent
     public void onLivingDeath(LivingDeathEvent event) {
         if (event.getEntityLiving().world.isRemote) return;
-        if (!(event.getEntityLiving() instanceof EntityPlayer)) return;
 
-        EntityPlayer player = (EntityPlayer) event.getEntityLiving();
-        WarpEvents.checkDeathGaze(player);
+        if (event.getEntityLiving() instanceof EntityPlayer) {
+            EntityPlayer player = (EntityPlayer) event.getEntityLiving();
+            WarpEvents.checkDeathGaze(player);
 
-        // Reset warp counter on death
-        IPlayerKnowledge knowledge = player.getCapability(PlayerKnowledgeProvider.PLAYER_KNOWLEDGE, null);
-        if (knowledge != null) {
-            knowledge.setWarpCounter(0);
-            ResearchManager.syncWarp(player);
+            // Reset warp counter on death
+            IPlayerKnowledge knowledge = player.getCapability(PlayerKnowledgeProvider.PLAYER_KNOWLEDGE, null);
+            if (knowledge != null) {
+                knowledge.setWarpCounter(0);
+                ResearchManager.syncWarp(player);
+            }
+            return;
+        }
+
+        // TC4 parity: drop aspect orbs from non-tainted mobs killed by players.
+        // TC4 checks recentlyHit > 0; in 1.12 recentlyHit is protected, so we
+        // check the damage source's true source instead.
+        if (event.getEntityLiving() instanceof ITaintedMob) return;
+        if (!(event.getSource().getTrueSource() instanceof EntityPlayer)) return;
+        if (event.getSource().getTrueSource() instanceof FakePlayer) return;
+
+        AspectList aspectsCompound = ScanManager.generateEntityAspects(event.getEntity());
+        if (aspectsCompound == null || aspectsCompound.size() == 0) return;
+
+        AspectList aspects = ResearchManager.reduceToPrimals(aspectsCompound);
+        for (Aspect aspect : aspects.getAspects()) {
+            if (!event.getEntityLiving().world.rand.nextBoolean()) continue;
+            EntityAspectOrb orb = new EntityAspectOrb(
+                    event.getEntityLiving().world,
+                    event.getEntityLiving().posX,
+                    event.getEntityLiving().posY,
+                    event.getEntityLiving().posZ,
+                    aspect,
+                    1 + event.getEntityLiving().world.rand.nextInt(aspects.getAmount(aspect)));
+            event.getEntityLiving().world.spawnEntity(orb);
         }
     }
 

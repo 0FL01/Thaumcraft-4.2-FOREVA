@@ -396,9 +396,11 @@ public class InventoryUtils {
         for (int slot = 0; slot < hotbarSize; slot++) {
             ItemStack stack = player.inventory.mainInventory.get(slot);
             if (stack.isEmpty() || !(stack.getItem() instanceof ItemWandCasting)) continue;
-            int current = ItemWandCasting.getVis(stack, aspect);
-            int max = ItemWandCasting.getMaxVis(stack);
-            if (current + amount * 100 <= max) return slot;
+            // TC4 parity: attract if the wand has room for at least some vis,
+            // not necessarily the full amount.
+            if (ItemWandCasting.addVis(stack, aspect, amount, false) < amount) {
+                return slot;
+            }
         }
         return -1;
     }
