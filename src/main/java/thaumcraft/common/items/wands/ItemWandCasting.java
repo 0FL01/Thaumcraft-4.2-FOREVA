@@ -7,11 +7,12 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.SharedMonsterAttributes;
+import net.minecraft.entity.ai.attributes.AttributeModifier;
+import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.item.EnumAction;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagList;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumFacing;
@@ -50,6 +51,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import com.google.common.collect.Multimap;
+
 public class ItemWandCasting extends Item implements IArchitect {
 
     private static final UUID STAFF_ATTACK_UUID = UUID.fromString("1d082610-4093-11e4-916c-0800200c9a66");
@@ -80,33 +83,25 @@ public class ItemWandCasting extends Item implements IArchitect {
     public static void setRod(ItemStack stack, WandRod rod) {
         NBTTagCompound tag = ensureTag(stack);
         tag.setString(TAG_ROD, rod.getTag());
-        if (rod instanceof StaffRod) {
-            NBTTagList modifiers = new NBTTagList();
-            NBTTagCompound attack = new NBTTagCompound();
-            attack.setString("AttributeName", SharedMonsterAttributes.ATTACK_DAMAGE.getName());
-            attack.setString("Name", "Weapon modifier");
-            attack.setDouble("Amount", 6.0D);
-            attack.setInteger("Operation", 0);
-            attack.setLong("UUIDMost", STAFF_ATTACK_UUID.getMostSignificantBits());
-            attack.setLong("UUIDLeast", STAFF_ATTACK_UUID.getLeastSignificantBits());
-            modifiers.appendTag(attack);
-            NBTTagCompound speed = new NBTTagCompound();
-            speed.setString("AttributeName", SharedMonsterAttributes.ATTACK_SPEED.getName());
-            speed.setString("Name", "Weapon speed modifier");
-            speed.setDouble("Amount", -3.2D);
-            speed.setInteger("Operation", 0);
-            speed.setLong("UUIDMost", STAFF_SPEED_UUID.getMostSignificantBits());
-            speed.setLong("UUIDLeast", STAFF_SPEED_UUID.getLeastSignificantBits());
-            modifiers.appendTag(speed);
-            tag.setTag("AttributeModifiers", modifiers);
-        } else if (tag.hasKey("AttributeModifiers")) {
+        // Staff attack/speed attribute modifiers are now provided dynamically via
+        // getAttributeModifiers(). Strip any legacy NBT AttributeModifiers so the
+        // override is reached instead of the stale NBT path.
+        if (tag.hasKey("AttributeModifiers")) {
             tag.removeTag("AttributeModifiers");
         }
     }
 
     public static WandRod getRod(ItemStack stack) {
-        if (stack.hasTagCompound() && stack.getTagCompound().hasKey(TAG_ROD)) {
-            return WandRod.rods.get(stack.getTagCompound().getString(TAG_ROD));
+        if (stack.hasTagCompound()) {
+            // Lazy migration: strip legacy NBT AttributeModifiers so the
+            // getAttributeModifiers() override is used instead of stale NBT.
+            NBTTagCompound tag = stack.getTagCompound();
+            if (tag.hasKey("AttributeModifiers")) {
+                tag.removeTag("AttributeModifiers");
+            }
+            if (tag.hasKey(TAG_ROD)) {
+                return WandRod.rods.get(tag.getString(TAG_ROD));
+            }
         }
         return WandRod.rods.get("wood");
     }
@@ -349,6 +344,18 @@ public class ItemWandCasting extends Item implements IArchitect {
     public boolean hasRunes(ItemStack stack) {
         WandRod rod = getRod(stack);
         return rod instanceof StaffRod && ((StaffRod) rod).hasRunes();
+    }
+
+    @Override
+    public Multimap<String, AttributeModifier> getAttributeModifiers(EntityEquipmentSlot slot, ItemStack stack) {
+        Multimap<String, AttributeModifier> multimap = super.getAttributeModifiers(slot, stack);
+        if (slot == EntityEquipmentSlot.MAINHAND && isStaff(stack)) {
+            multimap.put(SharedMonsterAttributes.ATTACK_DAMAGE.getName(),
+                    new AttributeModifier(STAFF_ATTACK_UUID, "Weapon modifier", 6.0D, 0));
+            multimap.put(SharedMonsterAttributes.ATTACK_SPEED.getName(),
+                    new AttributeModifier(STAFF_SPEED_UUID, "Weapon speed modifier", -3.2D, 0));
+        }
+        return multimap;
     }
 
     public void setObjectInUse(ItemStack stack, int x, int y, int z) {
