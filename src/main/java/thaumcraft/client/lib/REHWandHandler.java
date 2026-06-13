@@ -183,14 +183,15 @@ public class REHWandHandler {
 
         if (fociItem.isEmpty()) return;
 
-        GlStateManager.pushMatrix();
-        GL11.glClear(GL11.GL_DEPTH_BUFFER_BIT);
-
-        // Set up orthographic projection
+        // Save and set orthographic projection
         GlStateManager.matrixMode(GL11.GL_PROJECTION);
+        GlStateManager.pushMatrix();
         GlStateManager.loadIdentity();
         GlStateManager.ortho(0.0, sw, sh, 0.0, 1000.0, 3000.0);
+
+        // Save and set modelview
         GlStateManager.matrixMode(GL11.GL_MODELVIEW);
+        GlStateManager.pushMatrix();
         GlStateManager.loadIdentity();
         GlStateManager.translate(0.0F, 0.0F, -2000.0F);
         GlStateManager.disableDepth();
@@ -300,11 +301,16 @@ public class REHWandHandler {
                     tooltipStack.getTooltip(mc.player, mc.gameSettings.advancedItemTooltips ? ITooltipFlag.TooltipFlags.ADVANCED : ITooltipFlag.TooltipFlags.NORMAL), -4, 20, 11);
         }
 
-        // Restore GL state
+        // Restore modelview
         GlStateManager.depthMask(true);
         GlStateManager.enableDepth();
         GlStateManager.disableBlend();
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
         GlStateManager.popMatrix();
+
+        // Restore projection
+        GlStateManager.matrixMode(GL11.GL_PROJECTION);
+        GlStateManager.popMatrix();
+        GlStateManager.matrixMode(GL11.GL_MODELVIEW);
     }
 }

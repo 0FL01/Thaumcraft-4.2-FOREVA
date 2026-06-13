@@ -108,11 +108,6 @@ public class RenderEventHandler {
                 renderVignette(targetBrightness, resolution.getScaledWidth(), resolution.getScaledHeight());
             }
         }
-        // Focus selector radial HUD
-        Minecraft mc = Minecraft.getMinecraft();
-        if (mc != null && mc.player != null) {
-            wandHandler.handleFociRadial(mc, System.currentTimeMillis(), event);
-        }
     }
 
     @SubscribeEvent
@@ -121,7 +116,9 @@ public class RenderEventHandler {
         if (mc == null || mc.player == null) {
             return;
         }
-        this.notifyHandler.handleNotifications(mc, System.nanoTime() / 1000000L, event.getResolution());
+        long time = System.nanoTime() / 1000000L;
+        this.notifyHandler.handleNotifications(mc, time, event.getResolution());
+        this.wandHandler.handleFociRadial(mc, time, event);
     }
 
     @SubscribeEvent
