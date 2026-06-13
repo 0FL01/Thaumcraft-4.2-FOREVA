@@ -5,6 +5,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.World;
 import thaumcraft.api.aspects.Aspect;
@@ -69,7 +70,7 @@ public class FocusFrost extends ItemFocusBasic {
                 world.spawnEntity(shard);
             }
             if (shard != null) {
-                shard.playSound(TCSounds.ICE, 0.4F, 1.0F + world.rand.nextFloat() * 0.1F);
+                world.playSound(null, player.posX, player.posY, player.posZ, TCSounds.ICE, SoundCategory.PLAYERS, 0.4F, 1.0F + world.rand.nextFloat() * 0.1F);
             }
         }
         player.swingArm(EnumHand.MAIN_HAND);
