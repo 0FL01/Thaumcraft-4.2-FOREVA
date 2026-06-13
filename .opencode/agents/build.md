@@ -20,6 +20,7 @@ permission:
     "~/.ssh/*": deny
     "*/.ssh/*": deny
     "~/.ssh*": deny
+    "~/.config/opencode/secrets.env": deny
   write:
     "*": allow
     "/tmp": deny
