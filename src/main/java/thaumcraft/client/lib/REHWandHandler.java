@@ -37,6 +37,7 @@ public class REHWandHandler {
     private final HashMap<String, Float> fociScale = new HashMap<>();
     private long lastTime = 0L;
     private boolean lastState = false;
+    private boolean prevMouseButton = false;
 
     public void handleFociRadial(Minecraft mc, long time, RenderGameOverlayEvent event) {
         if (!KeyHandler.radialActive && radialHudScale <= 0.0F) {
@@ -125,7 +126,35 @@ public class REHWandHandler {
         }
 
         ScaledResolution resolution = event.getResolution();
-        renderFocusRadialHUD(resolution.getScaledWidth_double(), resolution.getScaledHeight_double(), time, event.getPartialTicks());
+        double sw = resolution.getScaledWidth_double();
+        double sh = resolution.getScaledHeight_double();
+
+        // Lock cursor within radial circle while selector is open
+        if (KeyHandler.radialActive && radialHudScale > 0.0F && !foci.isEmpty()) {
+            float radius = 16.0F + fociItem.size() * 2.5F;
+            float clampRadius = radius * radialHudScale + 15.0F;
+            float centerX = (float)(sw / 2.0);
+            float centerY = (float)(sh / 2.0);
+
+            int rawX = Mouse.getX();
+            int rawY = Mouse.getY();
+            double mx = (double) rawX * sw / (double) mc.displayWidth;
+            double my = sh - (double) rawY * sh / (double) mc.displayHeight - 1.0;
+
+            double dx = mx - centerX;
+            double dy = my - centerY;
+            double dist = Math.sqrt(dx * dx + dy * dy);
+
+            if (dist > clampRadius && dist > 0.0) {
+                double clampedX = centerX + dx / dist * clampRadius;
+                double clampedY = centerY + dy / dist * clampRadius;
+                int newRawX = (int)(clampedX * mc.displayWidth / sw);
+                int newRawY = (int)((sh - clampedY - 1.0) * mc.displayHeight / sh);
+                Mouse.setCursorPosition(newRawX, newRawY);
+            }
+        }
+
+        renderFocusRadialHUD(sw, sh, time, event.getPartialTicks());
 
         // Animate scales and handle selection
         if (time > lastTime) {
@@ -176,10 +205,16 @@ public class REHWandHandler {
         ItemWandCasting wand = (ItemWandCasting) held.getItem();
         ItemFocusBasic focus = wand.getFocus(held);
 
-        // Mouse position in scaled coordinates
-        int mouseX = (int) ((double) Mouse.getEventX() * sw / (double) mc.displayWidth);
-        int mouseY = (int) (sh - (double) Mouse.getEventY() * sh / (double) mc.displayHeight - 1.0);
-        int mouseButton = Mouse.getEventButton();
+        // Mouse position in scaled coordinates (use current pos, not event pos)
+        int rawX = Mouse.getX();
+        int rawY = Mouse.getY();
+        int mouseX = (int) ((double) rawX * sw / (double) mc.displayWidth);
+        int mouseY = (int) (sh - (double) rawY * sh / (double) mc.displayHeight - 1.0);
+
+        // Click detection with debounce
+        boolean mouseDown = Mouse.isButtonDown(0);
+        boolean justClicked = mouseDown && !prevMouseButton;
+        prevMouseButton = mouseDown;
 
         if (fociItem.isEmpty()) return;
 
@@ -279,7 +314,7 @@ public class REHWandHandler {
                 if (mx >= -10 && mx <= 10 && my >= -10 && my <= 10) {
                     fociHover.put(key, true);
                     tooltipStack = fociItem.get(key);
-                    if (mouseButton == 0) {
+                    if (justClicked) {
                         KeyHandler.radialActive = false;
                         KeyHandler.radialLock = true;
                         PacketHandler.INSTANCE.sendToServer(new PacketFocusChangeToServer(mc.player, key));
