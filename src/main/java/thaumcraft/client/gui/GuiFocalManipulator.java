@@ -1,6 +1,7 @@
 package thaumcraft.client.gui;
 
 import java.io.IOException;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 import net.minecraft.client.gui.inventory.GuiContainer;
@@ -21,6 +22,10 @@ import thaumcraft.common.tiles.TileFocalManipulator;
 public class GuiFocalManipulator extends GuiContainer {
 
     private static final ResourceLocation TEXTURE = new ResourceLocation("thaumcraft", "textures/gui/gui_wandtable.png");
+
+    // Vis is stored internally as centi-vis (100 = 1.0 Vis); display values must be
+    // divided by 100, matching ItemWandCasting / ItemAmuletVis / ItemFocusBasic.
+    private static final DecimalFormat VIS_FORMAT = new DecimalFormat("#######.#");
 
     private final TileFocalManipulator table;
     private final List<FocusUpgradeType> possibleUpgrades = new ArrayList<FocusUpgradeType>();
@@ -163,7 +168,7 @@ public class GuiFocalManipulator extends GuiContainer {
         for (int i = 0; i < aspects.length && i < 6; ++i) {
             Aspect aspect = aspects[i];
             drawIcon(aspect.getImage(), this.guiLeft + 48 + i * 16, this.guiTop + 68, 16, 16);
-            this.fontRenderer.drawString(String.valueOf(this.selectedCost.getAmount(aspect)),
+            this.fontRenderer.drawString(VIS_FORMAT.format((float) this.selectedCost.getAmount(aspect) / 100.0F),
                     this.guiLeft + 50 + i * 16, this.guiTop + 84, 0xFFFFFF);
         }
     }
@@ -174,7 +179,7 @@ public class GuiFocalManipulator extends GuiContainer {
         int width = Math.max(0, Math.min(72, 72 - remaining * 72 / Math.max(1, this.table.size)));
         drawRect(this.guiLeft + 60, this.guiTop + 124, this.guiLeft + 132, this.guiTop + 130, 0x66000000);
         drawRect(this.guiLeft + 60, this.guiTop + 124, this.guiLeft + 60 + width, this.guiTop + 130, 0xAA8D62E9);
-        this.fontRenderer.drawString(I18n.translateToLocal("wandtable.text1") + ": " + remaining,
+        this.fontRenderer.drawString(I18n.translateToLocal("wandtable.text1") + ": " + VIS_FORMAT.format((float) remaining / 100.0F),
                 this.guiLeft + 48, this.guiTop + 132, 0xFFFFFF);
     }
 
