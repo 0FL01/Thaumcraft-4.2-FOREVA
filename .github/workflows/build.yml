@@ -79,7 +79,7 @@ jobs:
             --user "$(id -u):$(id -g)" \
             --entrypoint ./gradlew \
             thaumcraft-dev \
-            jar apiJar devJar --console=plain -Pci=true
+            jar apiJar devJar reobfJar --console=plain -Pci=true
 
       - name: Upload JAR artifacts
         uses: actions/upload-artifact@v4
