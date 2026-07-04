@@ -8,6 +8,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 public class WandManagerTriggerStaticGuardTest {
@@ -79,6 +80,14 @@ public class WandManagerTriggerStaticGuardTest {
         assertTrue(source.contains("ConfigBlocks.blockStoneDevice.getDefaultState().withProperty(thaumcraft.common.blocks.BlockStoneDevice.TYPE, 3)"));
         assertTrue(source.contains("((TileInfusionMatrix) tile).active = true;"));
         assertTrue(source.contains("new PacketFXBlockSparkle(center.getX(), center.getY(), center.getZ(), -9999)"));
+    }
+
+    @Test
+    public void thaumonomiconTriggerShouldWorkWithEquippedFocus() throws IOException {
+        String source = readFile("src/main/java/thaumcraft/common/items/wands/WandManager.java");
+
+        assertFalse("Creating the Thaumonomicon from a bookshelf must not be blocked by an equipped wand focus; the block trigger runs before focus casting and should still consume the bookshelf.",
+                source.contains("if (wand.getFocus(wandStack) != null) return false;"));
     }
 
     private static String readFile(String path) throws IOException {
