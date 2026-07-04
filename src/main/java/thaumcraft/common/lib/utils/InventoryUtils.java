@@ -482,6 +482,10 @@ public class InventoryUtils {
                 ItemStack it2 = new ItemStack(it.getItem(), 1, md);
                 if (it.hasTagCompound()) it2.setTagCompound(it.getTagCompound().copy());
                 it = it2;
+            } else if (it.getMetadata() == Short.MAX_VALUE) {
+                ItemStack it2 = new ItemStack(it.getItem(), 1, 0);
+                if (it.hasTagCompound()) it2.setTagCompound(it.getTagCompound().copy());
+                it = it2;
             }
         } else if (input instanceof ArrayList) {
             ArrayList<?> list = (ArrayList<?>) input;
