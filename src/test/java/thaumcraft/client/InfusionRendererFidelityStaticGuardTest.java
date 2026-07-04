@@ -25,6 +25,17 @@ public class InfusionRendererFidelityStaticGuardTest {
                         && matrixRenderer.contains("drawHalo(")
                         && matrixRenderer.contains("if (tile.getWorld() != null) {"));
 
+        assertTrue("TileRunicMatrixRenderer should harden the solid shell pass and restore GL state so active overlay cannot make matrix textures transparent",
+                matrixRenderer.contains("prepareSolidMatrixPass();\n        renderCubeCluster(tile, ticks, instability, startUp);")
+                        && matrixRenderer.contains("renderCubeOverlay(tile, ticks, instability, startUp);\n        }\n        restoreDefaultMatrixPass();")
+                        && matrixRenderer.contains("private static void prepareSolidMatrixPass()")
+                        && matrixRenderer.contains("private static void restoreDefaultMatrixPass()")
+                        && matrixRenderer.contains("GlStateManager.disableBlend();")
+                        && matrixRenderer.contains("GlStateManager.depthMask(false);")
+                        && matrixRenderer.contains("GlStateManager.depthMask(true);")
+                        && matrixRenderer.contains("GlStateManager.blendFunc(770, 771);")
+                        && matrixRenderer.contains("GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);"));
+
         assertTrue("TileInfusionPillarRenderer should use the dedicated model-driven reference pillar path instead of the old prism fallback",
                 pillarRenderer.contains("new ModelInfusionPillar()")
                         && pillarRenderer.contains("bindTexture(TEXTURE);")

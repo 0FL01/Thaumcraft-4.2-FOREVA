@@ -47,15 +47,37 @@ public class TileRunicMatrixRenderer extends TileEntitySpecialRenderer<TileInfus
             GlStateManager.rotate(45.0F * startUp, 0.0F, 0.0F, 1.0F);
         }
 
+        prepareSolidMatrixPass();
         renderCubeCluster(tile, ticks, instability, startUp);
         if (tile.active) {
             renderCubeOverlay(tile, ticks, instability, startUp);
         }
+        restoreDefaultMatrixPass();
         GlStateManager.popMatrix();
 
         if (tile.crafting) {
             drawHalo(x, y, z, tile.craftCount);
         }
+    }
+
+    private static void prepareSolidMatrixPass() {
+        GlStateManager.enableTexture2D();
+        GlStateManager.enableAlpha();
+        GlStateManager.alphaFunc(GL11.GL_GREATER, 0.1F);
+        GlStateManager.disableBlend();
+        GlStateManager.depthMask(true);
+        GlStateManager.blendFunc(770, 771);
+        GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+    }
+
+    private static void restoreDefaultMatrixPass() {
+        GlStateManager.enableTexture2D();
+        GlStateManager.enableAlpha();
+        GlStateManager.alphaFunc(GL11.GL_GREATER, 0.1F);
+        GlStateManager.disableBlend();
+        GlStateManager.depthMask(true);
+        GlStateManager.blendFunc(770, 771);
+        GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
     }
 
     private void renderCubeCluster(TileInfusionMatrix tile, float ticks, float instability, float startUp) {
@@ -93,6 +115,7 @@ public class TileRunicMatrixRenderer extends TileEntitySpecialRenderer<TileInfus
         GlStateManager.alphaFunc(GL11.GL_GREATER, 0.003921569F);
         GlStateManager.enableBlend();
         GlStateManager.blendFunc(770, 1);
+        GlStateManager.depthMask(false);
 
         float prevX = OpenGlHelper.lastBrightnessX;
         float prevY = OpenGlHelper.lastBrightnessY;
@@ -125,7 +148,9 @@ public class TileRunicMatrixRenderer extends TileEntitySpecialRenderer<TileInfus
         }
 
         OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, prevX, prevY);
+        GlStateManager.depthMask(true);
         GlStateManager.disableBlend();
+        GlStateManager.blendFunc(770, 771);
         GlStateManager.alphaFunc(GL11.GL_GREATER, 0.1F);
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
         GlStateManager.popMatrix();
