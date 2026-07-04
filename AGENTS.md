@@ -50,40 +50,7 @@ Asset origin: assets (textures, sounds, models, lang, shaders, etc.) for the por
 - `src/main/resources/assets/thaumcraft/**`: assets, sounds, textures, models, recipes, lang, GUI resources.
 - `thaumcraft_src/**`: read-only original reference.
 
-## Current status guard
-
-The explicit deferrals below define the active pre-Phase8 mine list. Do not convert prior `compileJava`/`build` success into parity closure. Current explicit deferrals include Portable Hole/Warding visual renderers, Phase 8 client GUI/render/FX/shader work, Phase 9 recipe/research/content registration, Hover Harness flight behavior, and Outer Lands runtime/portal parity validation. The active target is fresh worlds; old 1.7.10/WIP saves and external player-data imports are out of scope.
-
 ## Commit policy
-
-Use one commit per completed checkpoint.
-
-A checkpoint commit is allowed only when:
-
-- the checkpoint scope is complete;
-- the diff is limited to the checkpoint;
-- `git status --short` was reviewed;
-- relevant validation commands were run;
-- failures are either fixed or documented as pre-existing/environment failures;
-- no forbidden files were modified;
-- no generated build output is staged.
-
-Do not commit broken work unless explicitly instructed by the user. If a blocker is reached, stop with a final report and leave the diff uncommitted.
-
-Before every commit, run:
-
-    git status --short
-    git diff --stat
-    git diff --name-only
-
-Stage only files that belong to the checkpoint:
-
-    git add <explicit paths>
-
-Do not use broad staging commands like:
-
-    git add .
-    git add -A
 
 Use commit messages in this format (example):
 
@@ -176,20 +143,4 @@ A runtime smoke test fails if `crash-reports/` contains a new crash report, or l
 
 Do not mark runtime-affecting checkpoints complete based only on `compileJava`, `build`, `apiJar`, or `devJar`. Documentation-only diffs do not require runtime smoke.
 
-## Stop conditions
-
-Stop successfully when:
-
-- the current checkpoint is complete;
-- validation passes, or pre-existing/environment failures are documented;
-- final diff is scoped;
-- final report is complete.
-
-Stop as blocked when:
-
-- original behavior cannot be determined safely;
-- implementation requires forbidden public contract changes;
-- validation cannot run due to missing environment;
-- build/test failures are unclear;
-- completing the task would require out-of-scope dependency or architecture changes.
 
