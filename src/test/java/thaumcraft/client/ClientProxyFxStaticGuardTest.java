@@ -271,9 +271,13 @@ public class ClientProxyFxStaticGuardTest {
                         && boreFx.contains("getFXLayer()"));
         assertTrue("Dedicated FXBoreSparkle particle must keep target-chasing textured sparkle baseline",
                 boreSparkleFx.contains("class FXBoreSparkle extends Particle")
+                        && boreSparkleFx.contains("implements ITCParticle")
                         && boreSparkleFx.contains("targetX")
                         && boreSparkleFx.contains("particle = 24")
-                        && boreSparkleFx.contains("setParticleTextureIndex(this.particle + this.particleAge % 4)")
+                        && boreSparkleFx.contains("public int getTCParticleLayer()")
+                        && boreSparkleFx.contains("int part = this.particleAge % 4")
+                        && boreSparkleFx.contains("float vMin = 0.25F")
+                        && !boreSparkleFx.contains("setParticleTextureIndex(")
                         && boreSparkleFx.contains("getBrightnessForRender("));
         assertTrue("Dedicated FXBreaking particle must keep item-crack + tint baseline",
                 breakingFx.contains("class FXBreaking extends Particle")

@@ -10,9 +10,10 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import thaumcraft.client.fx.ITCParticle;
 
 @SideOnly(Side.CLIENT)
-public class FXBoreSparkle extends Particle {
+public class FXBoreSparkle extends Particle implements ITCParticle {
     public int particle = 24;
     private final double targetX;
     private final double targetY;
@@ -98,7 +99,6 @@ public class FXBoreSparkle extends Particle {
         this.motionX = MathHelper.clamp(this.motionX, -0.35D, 0.35D);
         this.motionY = MathHelper.clamp(this.motionY, -0.35D, 0.35D);
         this.motionZ = MathHelper.clamp(this.motionZ, -0.35D, 0.35D);
-        this.setParticleTextureIndex(this.particle + this.particleAge % 4);
     }
 
     protected boolean pushOutOfBlocks(double x, double y, double z) {
@@ -180,7 +180,13 @@ public class FXBoreSparkle extends Particle {
 
     @Override
     public int getFXLayer() {
-        return 1;
+        // Vanilla ParticleManager fallback. TC sheet/layer routing is handled by ParticleEngine.
+        return 0;
+    }
+
+    @Override
+    public int getTCParticleLayer() {
+        return 0;
     }
 
     @Override
@@ -193,9 +199,34 @@ public class FXBoreSparkle extends Particle {
                                float rotationX, float rotationZ, float rotationYZ,
                                float rotationXY, float rotationXZ) {
         float bob = MathHelper.sin(this.particleAge / 3.0F) * 0.5F + 1.0F;
-        float scale = this.particleScale;
-        this.particleScale = scale * bob;
-        super.renderParticle(buffer, entityIn, partialTicks, rotationX, rotationZ, rotationYZ, rotationXY, rotationXZ);
-        this.particleScale = scale;
+        float scale = 0.1F * this.particleScale * bob;
+        float x = (float) (this.prevPosX + (this.posX - this.prevPosX) * (double) partialTicks - Particle.interpPosX);
+        float y = (float) (this.prevPosY + (this.posY - this.prevPosY) * (double) partialTicks - Particle.interpPosY);
+        float z = (float) (this.prevPosZ + (this.posZ - this.prevPosZ) * (double) partialTicks - Particle.interpPosZ);
+        int brightness = this.getBrightnessForRender(partialTicks);
+        int lightX = brightness >> 16 & 65535;
+        int lightY = brightness & 65535;
+
+        int part = this.particleAge % 4;
+        float uMin = part / 16.0F;
+        float uMax = uMin + 0.0624375F;
+        float vMin = 0.25F;
+        float vMax = vMin + 0.0624375F;
+        addVertex(buffer, x - rotationX * scale - rotationXY * scale, y - rotationZ * scale,
+                z - rotationYZ * scale - rotationXZ * scale, uMax, vMax, lightX, lightY);
+        addVertex(buffer, x - rotationX * scale + rotationXY * scale, y + rotationZ * scale,
+                z - rotationYZ * scale + rotationXZ * scale, uMax, vMin, lightX, lightY);
+        addVertex(buffer, x + rotationX * scale + rotationXY * scale, y + rotationZ * scale,
+                z + rotationYZ * scale + rotationXZ * scale, uMin, vMin, lightX, lightY);
+        addVertex(buffer, x + rotationX * scale - rotationXY * scale, y - rotationZ * scale,
+                z + rotationYZ * scale - rotationXZ * scale, uMin, vMax, lightX, lightY);
+    }
+
+    private void addVertex(BufferBuilder buffer, double x, double y, double z, float u, float v, int lightX, int lightY) {
+        buffer.pos(x, y, z)
+                .tex(u, v)
+                .color(this.particleRed, this.particleGreen, this.particleBlue, 1.0F)
+                .lightmap(lightX, lightY)
+                .endVertex();
     }
 }
