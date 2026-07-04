@@ -1,6 +1,7 @@
 {
   "parent": "item/generated",
   "textures": {
-    "layer0": "thaumcraft:items/focus_hellbat"
+    "layer0": "thaumcraft:items/focus_hellbat_orn",
+    "layer1": "thaumcraft:items/focus_hellbat"
   }
 }

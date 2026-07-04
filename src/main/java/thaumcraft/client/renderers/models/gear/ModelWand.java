@@ -135,6 +135,25 @@ public class ModelWand extends ModelBase {
         }
 
         Minecraft mc = Minecraft.getMinecraft();
+        TextureAtlasSprite ornament = focusItem.getOrnament(focusStack);
+        if (ornament != null) {
+            mc.getTextureManager().bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
+            GlStateManager.pushMatrix();
+            GlStateManager.rotate(180.0F, 1.0F, 0.0F, 0.0F);
+            GlStateManager.pushMatrix();
+            GlStateManager.translate(-0.25F, -0.1F, 0.0275F);
+            GlStateManager.scale(0.5F, 0.5F, 0.5F);
+            renderOrnament(ornament);
+            GlStateManager.popMatrix();
+            GlStateManager.pushMatrix();
+            GlStateManager.rotate(90.0F, 0.0F, 1.0F, 0.0F);
+            GlStateManager.translate(-0.25F, -0.1F, 0.0275F);
+            GlStateManager.scale(0.5F, 0.5F, 0.5F);
+            renderOrnament(ornament);
+            GlStateManager.popMatrix();
+            GlStateManager.popMatrix();
+        }
+
         TextureAtlasSprite depthSprite = focusItem.getFocusDepthLayerIcon(focusStack);
         if (depthSprite != null) {
             mc.getTextureManager().bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
@@ -168,6 +187,30 @@ public class ModelWand extends ModelBase {
         restorePlayerLight(player);
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
         GlStateManager.popMatrix();
+    }
+
+    private void renderOrnament(TextureAtlasSprite sprite) {
+        BufferBuilder buffer = Tessellator.getInstance().getBuffer();
+        float minU = sprite.getMinU();
+        float maxU = sprite.getMaxU();
+        float minV = sprite.getMinV();
+        float maxV = sprite.getMaxV();
+        float depth = 0.1F;
+
+        buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX_NORMAL);
+        addQuad(buffer, 0.0F, 1.0F, 0.0F, 1.0F, 1.0F, 0.0F, 1.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F,
+                minU, minV, maxU, maxV, 0.0F, 0.0F, 1.0F);
+        addQuad(buffer, 1.0F, 1.0F, -depth, 0.0F, 1.0F, -depth, 0.0F, 0.0F, -depth, 1.0F, 0.0F, -depth,
+                minU, minV, maxU, maxV, 0.0F, 0.0F, -1.0F);
+        addQuad(buffer, 0.0F, 1.0F, -depth, 1.0F, 1.0F, -depth, 1.0F, 1.0F, 0.0F, 0.0F, 1.0F, 0.0F,
+                minU, minV, maxU, maxV, 0.0F, 1.0F, 0.0F);
+        addQuad(buffer, 0.0F, 0.0F, 0.0F, 1.0F, 0.0F, 0.0F, 1.0F, 0.0F, -depth, 0.0F, 0.0F, -depth,
+                minU, minV, maxU, maxV, 0.0F, -1.0F, 0.0F);
+        addQuad(buffer, 0.0F, 1.0F, -depth, 0.0F, 1.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, -depth,
+                minU, minV, maxU, maxV, -1.0F, 0.0F, 0.0F);
+        addQuad(buffer, 1.0F, 1.0F, 0.0F, 1.0F, 1.0F, -depth, 1.0F, 0.0F, -depth, 1.0F, 0.0F, 0.0F,
+                minU, minV, maxU, maxV, 1.0F, 0.0F, 0.0F);
+        Tessellator.getInstance().draw();
     }
 
     private void renderDepthCube(TextureAtlasSprite sprite) {

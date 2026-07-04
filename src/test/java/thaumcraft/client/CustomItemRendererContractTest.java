@@ -27,6 +27,7 @@ public class CustomItemRendererContractTest {
 
         assertTrue("ClientProxy should override wandcasting and trunkspawner onto builtin/entity item models and install dedicated item renderers",
                 clientProxy.contains("if (item == ConfigItems.itemWandCasting) {")
+                        && clientProxy.contains("ModelLoader.setCustomMeshDefinition(item, stack -> wandModel);")
                         && clientProxy.contains("registerBuiltinItemModel(item, meta, \"wandcasting_tesr\");")
                         && clientProxy.contains("if (item == ConfigItems.itemTrunkSpawner) {")
                         && clientProxy.contains("registerBuiltinItemModel(item, meta, \"trunkspawner_tesr\");")

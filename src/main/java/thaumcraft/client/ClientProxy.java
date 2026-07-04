@@ -531,6 +531,9 @@ public class ClientProxy extends CommonProxy {
                 continue;
             }
             if (item == ConfigItems.itemWandCasting) {
+                final ModelResourceLocation wandModel = new ModelResourceLocation(
+                        new ResourceLocation("thaumcraft", "wandcasting_tesr"), "inventory");
+                ModelLoader.setCustomMeshDefinition(item, stack -> wandModel);
                 for (int meta = 0; meta < 64; meta++) {
                     registerBuiltinItemModel(item, meta, "wandcasting_tesr");
                 }
