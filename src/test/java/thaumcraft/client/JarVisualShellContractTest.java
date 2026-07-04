@@ -78,6 +78,22 @@ public class JarVisualShellContractTest {
                         && voidModel.contains("\"top\": \"thaumcraft:blocks/jar_top_void\"")
                         && voidModel.contains("\"from\": [3, 0, 3]")
                         && voidModel.contains("\"to\": [11, 14, 11]"));
+
+        assertLidSideTextures("normal jar", normalModel);
+        assertLidSideTextures("void jar", voidModel);
+    }
+
+    private static void assertLidSideTextures(String name, String model) {
+        int lidStart = model.indexOf("\"from\": [5, 12, 5]");
+        assertTrue(name + " should contain the raised lid cuboid", lidStart >= 0);
+        String lid = model.substring(lidStart);
+        assertTrue(name + " lid should use top texture only on horizontal faces and side texture on vertical faces",
+                lid.contains("\"down\": { \"texture\": \"#top\" }")
+                        && lid.contains("\"up\": { \"texture\": \"#top\" }")
+                        && lid.contains("\"north\": { \"texture\": \"#side\" }")
+                        && lid.contains("\"south\": { \"texture\": \"#side\" }")
+                        && lid.contains("\"west\": { \"texture\": \"#side\" }")
+                        && lid.contains("\"east\": { \"texture\": \"#side\" }"));
     }
 
     private static String read(String path) throws IOException {

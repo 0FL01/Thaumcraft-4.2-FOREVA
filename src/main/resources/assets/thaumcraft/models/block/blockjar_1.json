@@ -25,10 +25,10 @@
       "faces": {
         "down": { "texture": "#top" },
         "up": { "texture": "#top" },
-        "north": { "texture": "#top" },
-        "south": { "texture": "#top" },
-        "west": { "texture": "#top" },
-        "east": { "texture": "#top" }
+        "north": { "texture": "#side" },
+        "south": { "texture": "#side" },
+        "west": { "texture": "#side" },
+        "east": { "texture": "#side" }
       }
     }
   ]
