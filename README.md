@@ -4,6 +4,17 @@ Port of Thaumcraft 4.2.3.5 from Minecraft 1.7.10 to 1.12.2.
 
 Original mod by Azanor (2013-2015). This is an unofficial community port.
 
+## Showcase
+
+<p align="center">
+  <img src="raw/showcase-thaumonomicon.jpg" width="48%" alt="Thaumonomicon research tree">
+  <img src="raw/showcase-research.jpg" width="48%" alt="Research system">
+</p>
+
+<p align="center">
+  <img src="raw/showcase-world.jpg" width="80%" alt="In-game showcase">
+</p>
+
 ## Project stack
 
 - **Language:** Java 8
