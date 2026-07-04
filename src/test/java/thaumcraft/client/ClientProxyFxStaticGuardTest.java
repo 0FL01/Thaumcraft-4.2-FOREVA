@@ -225,12 +225,17 @@ public class ClientProxyFxStaticGuardTest {
                         && renderHandler.contains("drawTagsOnContainer(")
                         && renderHandler.contains("float scale = 0.01875F * Math.max(0.35F, tagscale / 0.3F);")
                         && renderHandler.contains("UtilsFX.drawTag("));
-        assertTrue("ParticleEngine must keep queued particle intake + tick drain + effectRenderer dispatch baseline",
+        assertTrue("ParticleEngine must keep queued fallback intake + TC sheet render baseline",
                 particleEngine.contains("public static void addEffect(World world, Particle particle)")
                         && particleEngine.contains("pendingParticles")
+                        && particleEngine.contains("pendingTCParticles")
+                        && particleEngine.contains("particleTexture = new ResourceLocation(\"thaumcraft\", \"textures/misc/particles.png\")")
+                        && particleEngine.contains("particle instanceof ITCParticle")
+                        && particleEngine.contains("renderTCParticles(mc, event.getPartialTicks())")
                         && particleEngine.contains("event.side != Side.CLIENT")
                         && particleEngine.contains("event.phase != TickEvent.Phase.START")
                         && particleEngine.contains("mc.effectRenderer.addEffect(queued.particle)")
+                        && particleEngine.contains("particle.renderParticle(buffer, camera, partialTicks")
                         && particleEngine.contains("MAX_PARTICLE_ADDITIONS_PER_TICK")
                         && particleEngine.contains("MAX_PENDING_PARTICLES_PER_LAYER")
                         && particleEngine.contains("dropOldestPendingFromBucket")
@@ -330,9 +335,11 @@ public class ClientProxyFxStaticGuardTest {
                         && smokeSpiralFx.contains("Math.max(this.posY + mY, this.miny + 0.1F)")
                         && !smokeSpiralFx.contains("EnumParticleTypes.SMOKE_NORMAL"));
         assertTrue("Dedicated FXSparkle particle must keep colored sparkle emission baseline",
-                sparkleFx.contains("class FXSparkle extends Particle")
-                        && sparkleFx.contains("setParticleTextureIndex(part)")
-                        && sparkleFx.contains("this.blendmode == 1 ? 0 : 1")
+                sparkleFx.contains("class FXSparkle extends Particle implements ITCParticle")
+                        && sparkleFx.contains("getTCParticleLayer()")
+                        && sparkleFx.contains("0.0624375F")
+                        && sparkleFx.contains("float vMin = 0.25F")
+                        && sparkleFx.contains("return 0;")
                         && sparkleFx.contains("leyLineEffect"));
         assertTrue("Dedicated FXSwarm particle must keep target-tracking swarm baseline",
                 swarmFx.contains("class FXSwarm extends Particle")
@@ -358,10 +365,13 @@ public class ClientProxyFxStaticGuardTest {
                         && visSparkleFx.contains("setParticleTextureIndex(112 + (this.particleAge % 8))")
                         && !visSparkleFx.contains("EnumParticleTypes.REDSTONE"));
         assertTrue("Dedicated FXWisp particle must keep target-aware textured wisp baseline",
-                wispFx.contains("class FXWisp extends Particle")
+                wispFx.contains("class FXWisp extends Particle implements ITCParticle")
                         && wispFx.contains("hasTarget")
                         && wispFx.contains("moteParticleScale")
-                        && wispFx.contains("setParticleTextureIndex(240 + (this.particleAge % 2))")
+                        && wispFx.contains("public FXWisp(World world, double x, double y, double z, double tx, double ty, double tz, float size, int type)")
+                        && wispFx.contains("getTCParticleLayer()")
+                        && wispFx.contains("float uMax = 0.125F")
+                        && wispFx.contains("float vMin = 0.875F")
                         && wispFx.contains("return 0;")
                         && !wispFx.contains("EnumParticleTypes.REDSTONE"));
         assertTrue("Dedicated FXWispArcing particle must keep source-target arcing textured baseline",

@@ -26,6 +26,29 @@ public class EntityPechBlastCoreContractsStaticGuardTest {
                 focusSource.contains("blast.shoot(player, player.rotationPitch, player.rotationYaw, 0.0F, 1.5F, 1.0F);"));
     }
 
+    @Test
+    public void pechBlastKeepsReferenceClientFxParity() throws IOException {
+        String source = readFile("src/main/java/thaumcraft/common/entities/projectile/EntityPechBlast.java");
+        String focusSource = readFile("src/main/java/thaumcraft/common/items/wands/foci/FocusPech.java");
+
+        assertTrue("EntityPechBlast must keep reference client trail FX",
+                source.contains("if (this.world.isRemote)")
+                        && source.contains("for (int i = 0; i < 3; ++i)")
+                        && source.contains("Thaumcraft.proxy.wispFX2(")
+                        && source.contains("(this.posX + this.prevPosX) / 2.0D")
+                        && source.contains("Thaumcraft.proxy.sparkle("));
+        assertTrue("EntityPechBlast must keep reference client impact burst FX",
+                source.contains("for (int i = 0; i < 9; ++i)")
+                        && source.contains("Thaumcraft.proxy.wispFX3(")
+                        && source.contains("offsetX * 8.0F")
+                        && source.contains("0.3F,")
+                        && source.contains("0.02F"));
+        assertTrue("FocusPech must keep reference focus color and wand-derived potency/extend",
+                focusSource.contains("return 0x229944;")
+                        && focusSource.contains("wand.getFocusPotency(wandStack)")
+                        && focusSource.contains("wand.getFocusExtend(wandStack)"));
+    }
+
     private static String readFile(String path) throws IOException {
         return new String(Files.readAllBytes(Paths.get(path)), StandardCharsets.UTF_8);
     }

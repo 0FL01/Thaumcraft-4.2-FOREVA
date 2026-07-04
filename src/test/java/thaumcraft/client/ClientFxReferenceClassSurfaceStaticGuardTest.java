@@ -59,6 +59,7 @@ public class ClientFxReferenceClassSurfaceStaticGuardTest {
         ));
 
         Set<String> allowlistedExtra = new HashSet<>(Arrays.asList(
+                "thaumcraft/client/fx/ITCParticle.java",
                 "thaumcraft/client/fx/particles/FXSmokeDrift.java"
         ));
 

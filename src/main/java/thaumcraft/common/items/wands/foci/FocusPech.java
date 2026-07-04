@@ -26,7 +26,7 @@ public class FocusPech extends ItemFocusBasic {
 
     @Override
     public int getFocusColor(ItemStack stack) {
-        return 0xFFD700;
+        return 0x229944;
     }
 
     @Override
@@ -45,8 +45,8 @@ public class FocusPech extends ItemFocusBasic {
         ItemStack focusStack = wand.getFocusItem(wandStack);
         if (!world.isRemote && wand.consumeAllVis(wandStack, player, this.getVisCost(focusStack), true, false)) {
             EntityPechBlast blast = new EntityPechBlast(world, (EntityLivingBase) player,
-                    this.getUpgradeLevel(focusStack, FocusUpgradeType.potency),
-                    this.getUpgradeLevel(focusStack, FocusUpgradeType.extend),
+                    wand.getFocusPotency(wandStack),
+                    wand.getFocusExtend(wandStack),
                     this.isUpgradedWith(focusStack, nightshade));
             blast.shoot(player, player.rotationPitch, player.rotationYaw, 0.0F, 1.5F, 1.0F);
             world.spawnEntity(blast);

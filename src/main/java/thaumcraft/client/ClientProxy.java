@@ -1657,14 +1657,10 @@ public class ClientProxy extends CommonProxy {
     @Override
     public void wispFX3(World world, double x, double y, double z, double tx, double ty, double tz, float size, int count, boolean flag, float speed) {
         if (world == null || !world.isRemote) return;
-        int amount = particleCount(Math.max(2, (int) (size * 18.0f)));
-        if (amount <= 0) return;
-        for (int i = 0; i < amount; i++) {
-            double px = x + (world.rand.nextFloat() - 0.5f) * 0.25f;
-            double py = y + (world.rand.nextFloat() - 0.5f) * 0.25f;
-            double pz = z + (world.rand.nextFloat() - 0.5f) * 0.25f;
-            ParticleEngine.addEffect(world, new FXWisp(world, px, py, pz, tx, ty, tz, size, flag, speed));
-        }
+        FXWisp fx = new FXWisp(world, x, y, z, tx, ty, tz, size, count);
+        fx.setGravity(speed);
+        fx.shrink = flag;
+        ParticleEngine.addEffect(world, fx);
     }
 
     @Override

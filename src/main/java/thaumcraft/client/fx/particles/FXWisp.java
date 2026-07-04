@@ -9,13 +9,14 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import thaumcraft.client.fx.ITCParticle;
 
 @SideOnly(Side.CLIENT)
-public class FXWisp extends Particle {
-    private final double targetX;
-    private final double targetY;
-    private final double targetZ;
-    private final boolean hasTarget;
+public class FXWisp extends Particle implements ITCParticle {
+    private double targetX;
+    private double targetY;
+    private double targetZ;
+    private boolean hasTarget;
     public boolean shrink = false;
     public boolean tinkle = false;
     public int blendmode = 1;
@@ -53,6 +54,15 @@ public class FXWisp extends Particle {
     public FXWisp(World world, double x, double y, double z, float size, int type) {
         this(world, x, y, z, 0.0D, 0.0D, 0.0D, size, false, 0.0F);
         applyTypedColor(world, type);
+    }
+
+    public FXWisp(World world, double x, double y, double z, double tx, double ty, double tz, float size, int type) {
+        this(world, x, y, z, size, type);
+        if (this.particleMaxAge > 0) {
+            this.motionX = (tx - this.posX) / (double) this.particleMaxAge;
+            this.motionY = (ty - this.posY) / (double) this.particleMaxAge;
+            this.motionZ = (tz - this.posZ) / (double) this.particleMaxAge;
+        }
     }
 
     @Override
@@ -221,10 +231,13 @@ public class FXWisp extends Particle {
 
     @Override
     public int getFXLayer() {
-        // FXWisp still uses the misc particle sheet via setParticleTextureIndex(...).
-        // In 1.12.2, routing this particle to layer 1 makes ParticleManager treat it
-        // as a terrain-texture particle, and setParticleTextureIndex then crashes.
+        // Vanilla ParticleManager layer. TC sheet/blend routing is handled by ParticleEngine.
         return 0;
+    }
+
+    @Override
+    public int getTCParticleLayer() {
+        return this.blendmode == 1 ? 0 : 1;
     }
 
     @Override
@@ -246,13 +259,32 @@ public class FXWisp extends Particle {
             }
         }
 
-        float scale = this.particleScale;
-        float alpha = this.particleAlpha;
-        this.particleScale = this.moteParticleScale * ageScale;
-        this.particleAlpha = 0.5F;
-        this.setParticleTextureIndex(240 + (this.particleAge % 2));
-        super.renderParticle(buffer, entityIn, partialTicks, rotationX, rotationZ, rotationYZ, rotationXY, rotationXZ);
-        this.particleScale = scale;
-        this.particleAlpha = alpha;
+        float scale = 0.5F * this.moteParticleScale * ageScale;
+        float x = (float) (this.prevPosX + (this.posX - this.prevPosX) * (double) partialTicks - Particle.interpPosX);
+        float y = (float) (this.prevPosY + (this.posY - this.prevPosY) * (double) partialTicks - Particle.interpPosY);
+        float z = (float) (this.prevPosZ + (this.posZ - this.prevPosZ) * (double) partialTicks - Particle.interpPosZ);
+        int brightness = this.getBrightnessForRender(partialTicks);
+        int lightX = brightness >> 16 & 65535;
+        int lightY = brightness & 65535;
+        float uMin = 0.0F;
+        float uMax = 0.125F;
+        float vMin = 0.875F;
+        float vMax = 1.0F;
+        addVertex(buffer, x - rotationX * scale - rotationXY * scale, y - rotationZ * scale,
+                z - rotationYZ * scale - rotationXZ * scale, uMax, vMax, lightX, lightY);
+        addVertex(buffer, x - rotationX * scale + rotationXY * scale, y + rotationZ * scale,
+                z - rotationYZ * scale + rotationXZ * scale, uMax, vMin, lightX, lightY);
+        addVertex(buffer, x + rotationX * scale + rotationXY * scale, y + rotationZ * scale,
+                z + rotationYZ * scale + rotationXZ * scale, uMin, vMin, lightX, lightY);
+        addVertex(buffer, x + rotationX * scale - rotationXY * scale, y - rotationZ * scale,
+                z + rotationYZ * scale - rotationXZ * scale, uMin, vMax, lightX, lightY);
+    }
+
+    private void addVertex(BufferBuilder buffer, double x, double y, double z, float u, float v, int lightX, int lightY) {
+        buffer.pos(x, y, z)
+                .tex(u, v)
+                .color(this.particleRed, this.particleGreen, this.particleBlue, 0.5F)
+                .lightmap(lightX, lightY)
+                .endVertex();
     }
 }

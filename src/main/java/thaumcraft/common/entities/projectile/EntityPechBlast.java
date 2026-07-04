@@ -7,9 +7,9 @@ import net.minecraft.entity.projectile.EntityThrowable;
 import net.minecraft.init.MobEffects;
 import net.minecraft.potion.PotionEffect;
 import net.minecraft.util.DamageSource;
-import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.World;
+import thaumcraft.common.Thaumcraft;
 import thaumcraft.common.entities.monster.EntityPech;
 
 public class EntityPechBlast extends EntityThrowable {
@@ -40,6 +40,35 @@ public class EntityPechBlast extends EntityThrowable {
 
     @Override
     public void onUpdate() {
+        if (this.world.isRemote) {
+            for (int i = 0; i < 3; ++i) {
+                Thaumcraft.proxy.wispFX2(
+                        this.world,
+                        this.posX + (this.world.rand.nextFloat() - this.world.rand.nextFloat()) * 0.2F,
+                        this.posY + (this.world.rand.nextFloat() - this.world.rand.nextFloat()) * 0.2F,
+                        this.posZ + (this.world.rand.nextFloat() - this.world.rand.nextFloat()) * 0.2F,
+                        0.3F,
+                        3,
+                        true,
+                        true,
+                        0.02F);
+                Thaumcraft.proxy.wispFX2(
+                        this.world,
+                        (this.posX + this.prevPosX) / 2.0D + (this.world.rand.nextFloat() - this.world.rand.nextFloat()) * 0.2F,
+                        (this.posY + this.prevPosY) / 2.0D + (this.world.rand.nextFloat() - this.world.rand.nextFloat()) * 0.2F,
+                        (this.posZ + this.prevPosZ) / 2.0D + (this.world.rand.nextFloat() - this.world.rand.nextFloat()) * 0.2F,
+                        0.3F,
+                        2,
+                        true,
+                        true,
+                        0.02F);
+                Thaumcraft.proxy.sparkle(
+                        (float) this.posX + (this.world.rand.nextFloat() - this.world.rand.nextFloat()) * 0.1F,
+                        (float) this.posY + (this.world.rand.nextFloat() - this.world.rand.nextFloat()) * 0.1F,
+                        (float) this.posZ + (this.world.rand.nextFloat() - this.world.rand.nextFloat()) * 0.1F,
+                        5);
+            }
+        }
         super.onUpdate();
         if (this.ticksExisted > 500) this.setDead();
     }
@@ -47,6 +76,57 @@ public class EntityPechBlast extends EntityThrowable {
     @Override
     protected void onImpact(RayTraceResult result) {
         if (result == null) return;
+        if (this.world.isRemote) {
+            for (int i = 0; i < 9; ++i) {
+                float offsetX = (this.world.rand.nextFloat() - this.world.rand.nextFloat()) * 0.3F;
+                float offsetY = (this.world.rand.nextFloat() - this.world.rand.nextFloat()) * 0.3F;
+                float offsetZ = (this.world.rand.nextFloat() - this.world.rand.nextFloat()) * 0.3F;
+                Thaumcraft.proxy.wispFX3(
+                        this.world,
+                        this.posX + offsetX,
+                        this.posY + offsetY,
+                        this.posZ + offsetZ,
+                        this.posX + offsetX * 8.0F,
+                        this.posY + offsetY * 8.0F,
+                        this.posZ + offsetZ * 8.0F,
+                        0.3F,
+                        3,
+                        true,
+                        0.02F);
+
+                offsetX = (this.world.rand.nextFloat() - this.world.rand.nextFloat()) * 0.3F;
+                offsetY = (this.world.rand.nextFloat() - this.world.rand.nextFloat()) * 0.3F;
+                offsetZ = (this.world.rand.nextFloat() - this.world.rand.nextFloat()) * 0.3F;
+                Thaumcraft.proxy.wispFX3(
+                        this.world,
+                        this.posX + offsetX,
+                        this.posY + offsetY,
+                        this.posZ + offsetZ,
+                        this.posX + offsetX * 8.0F,
+                        this.posY + offsetY * 8.0F,
+                        this.posZ + offsetZ * 8.0F,
+                        0.3F,
+                        2,
+                        true,
+                        0.02F);
+
+                offsetX = (this.world.rand.nextFloat() - this.world.rand.nextFloat()) * 0.3F;
+                offsetY = (this.world.rand.nextFloat() - this.world.rand.nextFloat()) * 0.3F;
+                offsetZ = (this.world.rand.nextFloat() - this.world.rand.nextFloat()) * 0.3F;
+                Thaumcraft.proxy.wispFX3(
+                        this.world,
+                        this.posX + offsetX,
+                        this.posY + offsetY,
+                        this.posZ + offsetZ,
+                        this.posX + offsetX * 8.0F,
+                        this.posY + offsetY * 8.0F,
+                        this.posZ + offsetZ * 8.0F,
+                        0.3F,
+                        0,
+                        true,
+                        0.02F);
+            }
+        }
         if (!this.world.isRemote) {
             // AOE 3x3x3, excludes EntityPech
             List<Entity> list = this.world.getEntitiesWithinAABBExcludingEntity(
@@ -74,7 +154,7 @@ public class EntityPechBlast extends EntityThrowable {
                     }
                 } catch (Exception e) {}
             }
+            this.setDead();
         }
-        this.setDead();
     }
 }

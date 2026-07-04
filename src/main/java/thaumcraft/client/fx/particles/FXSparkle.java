@@ -6,10 +6,11 @@ import net.minecraft.entity.Entity;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import thaumcraft.client.fx.ITCParticle;
 import thaumcraft.client.fx.ParticleEngine;
 
 @SideOnly(Side.CLIENT)
-public class FXSparkle extends Particle {
+public class FXSparkle extends Particle implements ITCParticle {
     public boolean leyLineEffect = false;
     public int multiplier = 2;
     public boolean shrink = true;
@@ -34,7 +35,6 @@ public class FXSparkle extends Particle {
         this.canCollide = false;
         this.currentColor = type;
         applyColorByType(world, type);
-        this.setParticleTextureIndex(this.particle);
     }
 
     private void applyColorByType(World world, int type) {
@@ -106,11 +106,6 @@ public class FXSparkle extends Particle {
                 this.motionZ *= 0.7D;
             }
         }
-        int part = this.particle + this.particleAge / this.multiplier;
-        this.setParticleTextureIndex(part);
-        if (this.shrink && this.particleMaxAge > 0) {
-            this.particleScale = this.initialScale * (this.particleMaxAge - this.particleAge + 1) / (float) this.particleMaxAge;
-        }
         if (this.leyLineEffect && this.world.rand.nextBoolean()) {
             FXSparkle fx = new FXSparkle(
                     this.world,
@@ -129,7 +124,37 @@ public class FXSparkle extends Particle {
     public void renderParticle(BufferBuilder buffer, Entity entityIn, float partialTicks,
                                float rotationX, float rotationZ, float rotationYZ,
                                float rotationXY, float rotationXZ) {
-        super.renderParticle(buffer, entityIn, partialTicks, rotationX, rotationZ, rotationYZ, rotationXY, rotationXZ);
+        int part = this.particle + this.particleAge / this.multiplier;
+        float uMin = (float) (part % 4) / 16.0F;
+        float uMax = uMin + 0.0624375F;
+        float vMin = 0.25F;
+        float vMax = vMin + 0.0624375F;
+        float scale = 0.1F * this.initialScale;
+        if (this.shrink && this.particleMaxAge > 0) {
+            scale *= (float) (this.particleMaxAge - this.particleAge + 1) / (float) this.particleMaxAge;
+        }
+        float x = (float) (this.prevPosX + (this.posX - this.prevPosX) * (double) partialTicks - Particle.interpPosX);
+        float y = (float) (this.prevPosY + (this.posY - this.prevPosY) * (double) partialTicks - Particle.interpPosY);
+        float z = (float) (this.prevPosZ + (this.posZ - this.prevPosZ) * (double) partialTicks - Particle.interpPosZ);
+        int brightness = this.getBrightnessForRender(partialTicks);
+        int lightX = brightness >> 16 & 65535;
+        int lightY = brightness & 65535;
+        addVertex(buffer, x - rotationX * scale - rotationXY * scale, y - rotationZ * scale,
+                z - rotationYZ * scale - rotationXZ * scale, uMax, vMax, lightX, lightY);
+        addVertex(buffer, x - rotationX * scale + rotationXY * scale, y + rotationZ * scale,
+                z - rotationYZ * scale + rotationXZ * scale, uMax, vMin, lightX, lightY);
+        addVertex(buffer, x + rotationX * scale + rotationXY * scale, y + rotationZ * scale,
+                z + rotationYZ * scale + rotationXZ * scale, uMin, vMin, lightX, lightY);
+        addVertex(buffer, x + rotationX * scale - rotationXY * scale, y - rotationZ * scale,
+                z + rotationYZ * scale - rotationXZ * scale, uMin, vMax, lightX, lightY);
+    }
+
+    private void addVertex(BufferBuilder buffer, double x, double y, double z, float u, float v, int lightX, int lightY) {
+        buffer.pos(x, y, z)
+                .tex(u, v)
+                .color(this.particleRed, this.particleGreen, this.particleBlue, this.particleAlpha)
+                .lightmap(lightX, lightY)
+                .endVertex();
     }
 
     @Override
@@ -139,6 +164,12 @@ public class FXSparkle extends Particle {
 
     @Override
     public int getFXLayer() {
+        // Vanilla ParticleManager layer. TC sheet/blend routing is handled by ParticleEngine.
+        return 0;
+    }
+
+    @Override
+    public int getTCParticleLayer() {
         return this.blendmode == 1 ? 0 : 1;
     }
 }
