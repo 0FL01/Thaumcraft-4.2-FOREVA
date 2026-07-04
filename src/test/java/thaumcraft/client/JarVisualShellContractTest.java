@@ -16,13 +16,15 @@ public class JarVisualShellContractTest {
         String blockJar = read("src/main/java/thaumcraft/common/blocks/BlockJar.java");
         String jarRenderer = read("src/main/java/thaumcraft/client/renderers/tile/TileJarRenderer.java");
         String itemRenderer = read("src/main/java/thaumcraft/client/renderers/item/ItemJarRenderer.java");
+        String jarModel = read("src/main/java/thaumcraft/client/renderers/models/ModelJar.java");
         String brainModel = read("src/main/java/thaumcraft/client/renderers/models/ModelBrain.java");
         String blockstate = read("src/main/resources/assets/thaumcraft/blockstates/blockjar.json");
         String normalModel = read("src/main/resources/assets/thaumcraft/models/block/blockjar_0.json");
         String voidModel = read("src/main/resources/assets/thaumcraft/models/block/blockjar_1.json");
 
-        assertTrue("BlockJar should use baked block-model rendering now that the static shell lives in block models",
-                blockJar.contains("return EnumBlockRenderType.MODEL;"));
+        assertTrue("BlockJar should use baked translucent block-model rendering now that the static shell lives in block models",
+                blockJar.contains("return EnumBlockRenderType.MODEL;")
+                        && blockJar.contains("return BlockRenderLayer.TRANSLUCENT;"));
 
         assertTrue("TileJarRenderer should keep node, liquid, label, brain, and brine overlays while rendering the shell only for TEISR items or node-jar animation pulses",
                 jarRenderer.contains("TileNodeRenderer.renderNodeAt((TileJarNode) tile")
@@ -34,9 +36,19 @@ public class JarVisualShellContractTest {
                         && jarRenderer.contains("if (renderShell) {")
                         && jarRenderer.contains("renderJarShell(tile, x, y, z, shellScale);")
                         && jarRenderer.contains("bindTexture(BRINE_TEXTURE);")
+                        && jarRenderer.contains("private static final String LIQUID_TEXTURE = \"thaumcraft:blocks/animatedglow\";")
+                        && jarRenderer.contains("TileRenderHelper.drawTexturedCuboid(buf, minX, minY, minZ, maxX, maxY, maxZ, liquid, color);")
+                        && jarRenderer.contains("OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, 200.0F, 200.0F);")
                         && jarRenderer.contains("float delta = tile.rota - tile.rotb;")
                         && jarRenderer.contains("brain.render(MODEL_SCALE);")
+                        && !jarRenderer.contains("drawSolidHorizontalQuad")
                         && !jarRenderer.contains("renderJarShell(tile, x, y, z);"));
+
+        assertTrue("ModelJar should blend the glass core so TEISR item shells and node pulse shells stay transparent",
+                jarModel.contains("renderLid(scale);")
+                        && jarModel.contains("GlStateManager.enableBlend();")
+                        && jarModel.contains("renderCore(scale);")
+                        && jarModel.contains("GlStateManager.disableBlend();"));
 
         assertTrue("ModelBrain should exist so the brain jar uses model-driven geometry instead of a textured quad fallback",
                 brainModel.contains("class ModelBrain extends ModelBase")

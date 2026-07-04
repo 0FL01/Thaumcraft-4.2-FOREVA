@@ -2,6 +2,7 @@ package thaumcraft.client.renderers.models;
 
 import net.minecraft.client.model.ModelBase;
 import net.minecraft.client.model.ModelRenderer;
+import net.minecraft.client.renderer.GlStateManager;
 
 public class ModelJar extends ModelBase {
     public final ModelRenderer core;
@@ -44,7 +45,10 @@ public class ModelJar extends ModelBase {
     }
 
     public void renderAll(float scale) {
-        renderCore(scale);
         renderLid(scale);
+        GlStateManager.enableBlend();
+        GlStateManager.blendFunc(770, 771);
+        renderCore(scale);
+        GlStateManager.disableBlend();
     }
 }

@@ -1,11 +1,19 @@
 package thaumcraft.client.renderers.tile;
 
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.renderer.OpenGlHelper;
+import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
+import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.MathHelper;
+import org.lwjgl.opengl.GL11;
 import thaumcraft.api.aspects.Aspect;
 import thaumcraft.client.renderers.models.ModelBrain;
 import thaumcraft.client.renderers.models.ModelJar;
@@ -24,6 +32,7 @@ public class TileJarRenderer extends TileEntitySpecialRenderer<TileJar> {
             new ResourceLocation("thaumcraft", "textures/models/brain2.png");
     private static final ResourceLocation BRINE_TEXTURE =
             new ResourceLocation("thaumcraft", "textures/models/jarbrine.png");
+    private static final String LIQUID_TEXTURE = "thaumcraft:blocks/animatedglow";
     private static final float MODEL_SCALE = 0.0625F;
     private final ModelJar model = new ModelJar();
     private final ModelBrain brain = new ModelBrain();
@@ -82,25 +91,54 @@ public class TileJarRenderer extends TileEntitySpecialRenderer<TileJar> {
     }
 
     private void renderFillable(TileJarFillable tile, double x, double y, double z) {
-        if (tile.amount > 0 && tile.aspect != null) {
-            float level = 0.12F + 0.62F * TileRenderHelper.clamp01((float) tile.amount / (float) tile.maxAmount);
-            int color = 0xCC000000 | (tile.aspect.getColor() & 0x00FFFFFF);
-            GlStateManager.pushMatrix();
-            GlStateManager.translate(x + 0.5D, y + level, z + 0.5D);
-            GlStateManager.disableTexture2D();
-            GlStateManager.disableLighting();
-            GlStateManager.enableBlend();
-            GlStateManager.blendFunc(770, 771);
-            TileRenderHelper.drawSolidHorizontalQuad(0.24F, color);
-            GlStateManager.disableBlend();
-            GlStateManager.enableLighting();
-            GlStateManager.enableTexture2D();
-            GlStateManager.popMatrix();
-        }
+        renderLiquid(tile, x, y, z);
 
         if (tile.aspectFilter != null) {
             renderAspectLabel(tile, x, y, z, tile.aspectFilter);
         }
+    }
+
+    private void renderLiquid(TileJarFillable tile, double x, double y, double z) {
+        if (tile.amount <= 0 || tile.aspect == null) {
+            return;
+        }
+
+        TextureAtlasSprite liquid = Minecraft.getMinecraft().getTextureMapBlocks().getAtlasSprite(LIQUID_TEXTURE);
+        if (liquid == null) {
+            return;
+        }
+
+        float fill = TileRenderHelper.clamp01((float) tile.amount / (float) Math.max(1, tile.maxAmount));
+        float minX = (float) x + 4.0F / 16.0F;
+        float maxX = (float) x + 12.0F / 16.0F;
+        float minZ = (float) z + 4.0F / 16.0F;
+        float maxZ = (float) z + 12.0F / 16.0F;
+        float minY = (float) y + 1.0F / 16.0F;
+        float maxY = minY + 10.0F / 16.0F * fill;
+        int color = 0xFF000000 | (tile.aspect.getColor() & 0x00FFFFFF);
+        float prevLightX = OpenGlHelper.lastBrightnessX;
+        float prevLightY = OpenGlHelper.lastBrightnessY;
+
+        GlStateManager.pushMatrix();
+        GlStateManager.disableLighting();
+        GlStateManager.enableBlend();
+        GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+        GlStateManager.disableCull();
+        bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
+        OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, 200.0F, 200.0F);
+
+        Tessellator tess = Tessellator.getInstance();
+        BufferBuilder buf = tess.getBuffer();
+        buf.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX_COLOR);
+        TileRenderHelper.drawTexturedCuboid(buf, minX, minY, minZ, maxX, maxY, maxZ, liquid, color);
+        tess.draw();
+
+        OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, prevLightX, prevLightY);
+        GlStateManager.enableCull();
+        GlStateManager.disableBlend();
+        GlStateManager.enableLighting();
+        GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+        GlStateManager.popMatrix();
     }
 
     private void renderAspectLabel(TileJarFillable tile, double x, double y, double z, Aspect aspect) {
