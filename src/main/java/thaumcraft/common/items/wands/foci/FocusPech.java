@@ -1,5 +1,7 @@
 package thaumcraft.common.items.wands.foci;
 
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
@@ -7,6 +9,8 @@ import net.minecraft.util.EnumHand;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import thaumcraft.api.aspects.Aspect;
 import thaumcraft.api.aspects.AspectList;
 import thaumcraft.api.wands.FocusUpgradeType;
@@ -16,6 +20,8 @@ import thaumcraft.common.items.wands.ItemWandCasting;
 import thaumcraft.common.lib.TCSounds;
 
 public class FocusPech extends ItemFocusBasic {
+
+    private static final String DEPTH_SPRITE = "thaumcraft:items/focus_pech_depth";
 
     public static final FocusUpgradeType nightshade = new FocusUpgradeType(15, new ResourceLocation("thaumcraft", "textures/foci/nightshade.png"), "focus.upgrade.nightshade.name", "focus.upgrade.nightshade.text", new AspectList().add(Aspect.LIFE, 1).add(Aspect.POISON, 1).add(Aspect.MAGIC, 1));
 
@@ -27,6 +33,12 @@ public class FocusPech extends ItemFocusBasic {
     @Override
     public int getFocusColor(ItemStack stack) {
         return 0x229944;
+    }
+
+    @Override
+    @SideOnly(Side.CLIENT)
+    public TextureAtlasSprite getFocusDepthLayerIcon(ItemStack stack) {
+        return Minecraft.getMinecraft().getTextureMapBlocks().getAtlasSprite(DEPTH_SPRITE);
     }
 
     @Override

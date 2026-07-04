@@ -2,8 +2,10 @@ package thaumcraft.client;
 
 import net.minecraft.client.renderer.block.model.IBakedModel;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.event.ModelBakeEvent;
 import net.minecraftforge.client.event.ModelRegistryEvent;
+import net.minecraftforge.client.event.TextureStitchEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;
@@ -24,6 +26,8 @@ public final class ClientModelRegistry {
             new ModelResourceLocation("thaumcraft:blockcrystal_tesr", "inventory");
     static final ModelResourceLocation WANDCASTING_MODEL =
             new ModelResourceLocation("thaumcraft:wandcasting_tesr", "inventory");
+    static final ResourceLocation FOCUS_PECH_DEPTH_SPRITE =
+            new ResourceLocation("thaumcraft", "items/focus_pech_depth");
 
     private ClientModelRegistry() {
     }
@@ -31,6 +35,11 @@ public final class ClientModelRegistry {
     @SubscribeEvent
     public static void registerModels(ModelRegistryEvent event) {
         Thaumcraft.proxy.registerModelLocations();
+    }
+
+    @SubscribeEvent
+    public static void onTextureStitchPre(TextureStitchEvent.Pre event) {
+        event.getMap().registerSprite(FOCUS_PECH_DEPTH_SPRITE);
     }
 
     @SubscribeEvent
