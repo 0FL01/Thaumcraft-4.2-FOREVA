@@ -313,9 +313,13 @@ public class ClientProxyFxStaticGuardTest {
                         && !blockRunesFx.contains("EnumParticleTypes.CRIT_MAGIC"));
         assertTrue("Dedicated FXEssentiaTrail particle must keep colorized target-chasing textured trail baseline",
                 essentiaTrailFx.contains("class FXEssentiaTrail extends Particle")
+                        && essentiaTrailFx.contains("implements ITCParticle")
                         && essentiaTrailFx.contains("targetX")
                         && essentiaTrailFx.contains("new Color(")
-                        && essentiaTrailFx.contains("setParticleTextureIndex(this.particle + (this.particleAge % 16))")
+                        && essentiaTrailFx.contains("public int getTCParticleLayer()")
+                        && essentiaTrailFx.contains("return 1;")
+                        && essentiaTrailFx.contains("0.5625F")
+                        && !essentiaTrailFx.contains("setParticleTextureIndex(")
                         && essentiaTrailFx.contains("public int getFXLayer()")
                         && !essentiaTrailFx.contains("EnumParticleTypes.REDSTONE"));
         assertTrue("Dedicated FXGeneric particle must keep configurable generic particle baseline",
