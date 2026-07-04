@@ -27,8 +27,10 @@ public class ClientProxyFxStaticGuardTest {
         String blockRunesFx = readFile("src/main/java/thaumcraft/client/fx/particles/FXBlockRunes.java");
         String essentiaTrailFx = readFile("src/main/java/thaumcraft/client/fx/particles/FXEssentiaTrail.java");
         String genericFx = readFile("src/main/java/thaumcraft/client/fx/particles/FXGeneric.java");
+        String slimyBubbleFx = readFile("src/main/java/thaumcraft/client/fx/particles/FXSlimyBubble.java");
         String smokeDriftFx = readFile("src/main/java/thaumcraft/client/fx/particles/FXSmokeDrift.java");
         String smokeSpiralFx = readFile("src/main/java/thaumcraft/client/fx/particles/FXSmokeSpiral.java");
+        String sparkFx = readFile("src/main/java/thaumcraft/client/fx/particles/FXSpark.java");
         String sparkleFx = readFile("src/main/java/thaumcraft/client/fx/particles/FXSparkle.java");
         String swarmFx = readFile("src/main/java/thaumcraft/client/fx/particles/FXSwarm.java");
         String ventFx = readFile("src/main/java/thaumcraft/client/fx/particles/FXVent.java");
@@ -309,6 +311,12 @@ public class ClientProxyFxStaticGuardTest {
                         && bubbleAltFx.contains("particle = 25")
                         && bubbleAltFx.contains("this.particleAge == this.particleMaxAge - 2")
                         && bubbleAltFx.contains("setParticleTextureIndex(this.particle)"));
+        assertTrue("Dedicated FXSlimyBubble particle must keep TC-layer textured bubble baseline",
+                slimyBubbleFx.contains("class FXSlimyBubble extends Particle implements ITCParticle")
+                        && slimyBubbleFx.contains("public int getTCParticleLayer()")
+                        && slimyBubbleFx.contains("particle = 144")
+                        && slimyBubbleFx.contains("float uMin = (float) (this.particle % 16) / 16.0F")
+                        && !slimyBubbleFx.contains("setParticleTextureIndex("));
         assertTrue("Dedicated FXBlockRunes particle must keep rune-around-block emission baseline",
                 blockRunesFx.contains("class FXBlockRunes extends Particle")
                         && blockRunesFx.contains("setGravity(float gravity)")
@@ -335,6 +343,8 @@ public class ClientProxyFxStaticGuardTest {
                 smokeDriftFx.contains("class FXSmokeDrift extends Particle")
                         && smokeDriftFx.contains("setParticleTextureIndex(1 + Math.min(4")
                         && smokeDriftFx.contains("this.motionY *= 0.92D")
+                        && smokeDriftFx.contains("public int getFXLayer()")
+                        && smokeDriftFx.contains("return 0;")
                         && !smokeDriftFx.contains("EnumParticleTypes.SMOKE_NORMAL"));
         assertTrue("Dedicated FXSmokeSpiral particle must keep spiral smoke billboard baseline",
                 smokeSpiralFx.contains("class FXSmokeSpiral extends Particle")
@@ -342,6 +352,13 @@ public class ClientProxyFxStaticGuardTest {
                         && smokeSpiralFx.contains("particle = 1 + (int) (this.particleAge / (float) this.particleMaxAge * 4.0F)")
                         && smokeSpiralFx.contains("Math.max(this.posY + mY, this.miny + 0.1F)")
                         && !smokeSpiralFx.contains("EnumParticleTypes.SMOKE_NORMAL"));
+        assertTrue("Dedicated FXSpark particle must keep TC particles2 sparkle baseline",
+                sparkFx.contains("class FXSpark extends Particle implements ITCParticle")
+                        && sparkFx.contains("public int getTCParticleLayer()")
+                        && sparkFx.contains("return 2;")
+                        && sparkFx.contains("float uMin = (float) (part % 8) / 8.0F")
+                        && sparkFx.contains("if (this.flip)")
+                        && !sparkFx.contains("setParticleTextureIndex("));
         assertTrue("Dedicated FXSparkle particle must keep colored sparkle emission baseline",
                 sparkleFx.contains("class FXSparkle extends Particle implements ITCParticle")
                         && sparkleFx.contains("getTCParticleLayer()")
@@ -358,9 +375,11 @@ public class ClientProxyFxStaticGuardTest {
                         && !swarmFx.contains("EnumParticleTypes.REDSTONE")
                         && !swarmFx.contains("EnumParticleTypes.CRIT_MAGIC"));
         assertTrue("Dedicated FXVent particle must keep vent trail emission baseline",
-                ventFx.contains("class FXVent extends Particle")
+                ventFx.contains("class FXVent extends Particle implements ITCParticle")
                         && ventFx.contains("setHeading(double x, double y, double z, float speed, float spread)")
-                        && ventFx.contains("setParticleTextureIndex(part)")
+                        && ventFx.contains("public int getTCParticleLayer()")
+                        && ventFx.contains("int part = 1 + (int) (ratio * 4.0F)")
+                        && !ventFx.contains("setParticleTextureIndex(")
                         && ventFx.contains("public int getFXLayer()")
                         && ventFx.contains("return 1;"));
         assertTrue("Dedicated FXVisSparkle particle must keep block-centered + vis-drain trail textured baseline",

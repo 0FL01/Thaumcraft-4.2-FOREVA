@@ -6,9 +6,10 @@ import net.minecraft.entity.Entity;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import thaumcraft.client.fx.ITCParticle;
 
 @SideOnly(Side.CLIENT)
-public class FXSlimyBubble extends Particle {
+public class FXSlimyBubble extends Particle implements ITCParticle {
     private int particle = 144;
 
     public FXSlimyBubble(World world, double x, double y, double z, float scale) {
@@ -24,6 +25,12 @@ public class FXSlimyBubble extends Particle {
 
     @Override
     public int getFXLayer() {
+        // Vanilla ParticleManager fallback. TC sheet/layer routing is handled by ParticleEngine.
+        return 0;
+    }
+
+    @Override
+    public int getTCParticleLayer() {
         return 1;
     }
 
@@ -57,7 +64,33 @@ public class FXSlimyBubble extends Particle {
     @Override
     public void renderParticle(BufferBuilder buffer, Entity entityIn, float partialTicks,
                                float rotationX, float rotationZ, float rotationYZ, float rotationXY, float rotationXZ) {
-        this.setParticleTextureIndex(this.particle);
-        super.renderParticle(buffer, entityIn, partialTicks, rotationX, rotationZ, rotationYZ, rotationXY, rotationXZ);
+        float uMin = (float) (this.particle % 16) / 16.0F;
+        float uMax = uMin + 0.0625F;
+        float vMin = (float) (this.particle / 16) / 16.0F;
+        float vMax = vMin + 0.0625F;
+        float scale = this.particleScale;
+        float x = (float) (this.prevPosX + (this.posX - this.prevPosX) * (double) partialTicks - Particle.interpPosX);
+        float y = (float) (this.prevPosY + (this.posY - this.prevPosY) * (double) partialTicks - Particle.interpPosY);
+        float z = (float) (this.prevPosZ + (this.posZ - this.prevPosZ) * (double) partialTicks - Particle.interpPosZ);
+        int brightness = this.getBrightnessForRender(partialTicks);
+        int lightX = brightness >> 16 & 65535;
+        int lightY = brightness & 65535;
+
+        addVertex(buffer, x - rotationX * scale - rotationXY * scale, y - rotationZ * scale,
+                z - rotationYZ * scale - rotationXZ * scale, uMax, vMax, lightX, lightY);
+        addVertex(buffer, x - rotationX * scale + rotationXY * scale, y + rotationZ * scale,
+                z - rotationYZ * scale + rotationXZ * scale, uMax, vMin, lightX, lightY);
+        addVertex(buffer, x + rotationX * scale + rotationXY * scale, y + rotationZ * scale,
+                z + rotationYZ * scale + rotationXZ * scale, uMin, vMin, lightX, lightY);
+        addVertex(buffer, x + rotationX * scale - rotationXY * scale, y - rotationZ * scale,
+                z + rotationYZ * scale - rotationXZ * scale, uMin, vMax, lightX, lightY);
+    }
+
+    private void addVertex(BufferBuilder buffer, double x, double y, double z, float u, float v, int lightX, int lightY) {
+        buffer.pos(x, y, z)
+                .tex(u, v)
+                .color(this.particleRed, this.particleGreen, this.particleBlue, this.particleAlpha)
+                .lightmap(lightX, lightY)
+                .endVertex();
     }
 }

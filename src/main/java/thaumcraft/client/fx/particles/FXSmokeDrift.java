@@ -57,6 +57,6 @@ public class FXSmokeDrift extends Particle {
 
     @Override
     public int getFXLayer() {
-        return 1;
+        return 0;
     }
 }

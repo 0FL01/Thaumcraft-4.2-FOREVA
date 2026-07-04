@@ -7,9 +7,10 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import thaumcraft.client.fx.ITCParticle;
 
 @SideOnly(Side.CLIENT)
-public class FXVent extends Particle {
+public class FXVent extends Particle implements ITCParticle {
     private float psm = 1.0F;
 
     public FXVent(World world, double x, double y, double z, double mx, double my, double mz, float red, float green, float blue) {
@@ -90,21 +91,53 @@ public class FXVent extends Particle {
             this.motionZ *= 0.7D;
         }
 
-        int part = 1 + (int) (this.particleScale / this.psm * 4.0F);
-        this.setParticleTextureIndex(part);
-        float fade = this.psm <= 0.0F ? 0.0F : (this.psm - this.particleScale) / this.psm;
-        this.setAlphaF(MathHelper.clamp(fade, 0.0F, 1.0F));
     }
 
     @Override
     public void renderParticle(BufferBuilder buffer, Entity entityIn, float partialTicks,
                                float rotationX, float rotationZ, float rotationYZ,
                                float rotationXY, float rotationXZ) {
-        super.renderParticle(buffer, entityIn, partialTicks, rotationX, rotationZ, rotationYZ, rotationXY, rotationXZ);
+        float ratio = this.psm <= 0.0F ? 0.0F : this.particleScale / this.psm;
+        int part = 1 + (int) (ratio * 4.0F);
+        float uMin = (float) (part % 16) / 16.0F;
+        float uMax = uMin + 0.0624375F;
+        float vMin = (float) (part / 16) / 16.0F;
+        float vMax = vMin + 0.0624375F;
+        float scale = 0.3F * this.particleScale;
+        float x = (float) (this.prevPosX + (this.posX - this.prevPosX) * (double) partialTicks - Particle.interpPosX);
+        float y = (float) (this.prevPosY + (this.posY - this.prevPosY) * (double) partialTicks - Particle.interpPosY);
+        float z = (float) (this.prevPosZ + (this.posZ - this.prevPosZ) * (double) partialTicks - Particle.interpPosZ);
+        int brightness = this.getBrightnessForRender(partialTicks);
+        int lightX = brightness >> 16 & 65535;
+        int lightY = brightness & 65535;
+        float alpha = this.particleAlpha * MathHelper.clamp(this.psm <= 0.0F ? 0.0F : (this.psm - this.particleScale) / this.psm, 0.0F, 1.0F);
+
+        addVertex(buffer, x - rotationX * scale - rotationXY * scale, y - rotationZ * scale,
+                z - rotationYZ * scale - rotationXZ * scale, uMax, vMax, lightX, lightY, alpha);
+        addVertex(buffer, x - rotationX * scale + rotationXY * scale, y + rotationZ * scale,
+                z - rotationYZ * scale + rotationXZ * scale, uMax, vMin, lightX, lightY, alpha);
+        addVertex(buffer, x + rotationX * scale + rotationXY * scale, y + rotationZ * scale,
+                z + rotationYZ * scale + rotationXZ * scale, uMin, vMin, lightX, lightY, alpha);
+        addVertex(buffer, x + rotationX * scale - rotationXY * scale, y - rotationZ * scale,
+                z + rotationYZ * scale - rotationXZ * scale, uMin, vMax, lightX, lightY, alpha);
+    }
+
+    private void addVertex(BufferBuilder buffer, double x, double y, double z, float u, float v, int lightX, int lightY, float alpha) {
+        buffer.pos(x, y, z)
+                .tex(u, v)
+                .color(this.particleRed, this.particleGreen, this.particleBlue, alpha)
+                .lightmap(lightX, lightY)
+                .endVertex();
     }
 
     @Override
     public int getFXLayer() {
+        // Vanilla ParticleManager fallback. TC sheet/layer routing is handled by ParticleEngine.
+        return 0;
+    }
+
+    @Override
+    public int getTCParticleLayer() {
         return 1;
     }
 }
