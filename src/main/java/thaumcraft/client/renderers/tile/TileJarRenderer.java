@@ -184,7 +184,9 @@ public class TileJarRenderer extends TileEntitySpecialRenderer<TileJar> {
         float rot = tile.rotb + delta * partialTicks;
 
         GlStateManager.pushMatrix();
-        GlStateManager.translate(x + 0.5D, y - 0.79D + bob, z + 0.5D);
+        GlStateManager.translate(x + 0.5D, y + 0.01D, z + 0.5D);
+        GlStateManager.rotate(180.0F, 1.0F, 0.0F, 0.0F);
+        GlStateManager.translate(0.0F, -0.8F + bob, 0.0F);
         GlStateManager.rotate(rot * 180.0F / (float) Math.PI, 0.0F, 1.0F, 0.0F);
         GlStateManager.rotate(-90.0F, 0.0F, 1.0F, 0.0F);
         bindTexture(BRAIN_TEXTURE);

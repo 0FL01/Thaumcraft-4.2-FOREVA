@@ -37,6 +37,7 @@ import thaumcraft.api.aspects.Aspect;
 import thaumcraft.api.nodes.NodeModifier;
 import thaumcraft.api.nodes.NodeType;
 import thaumcraft.common.Thaumcraft;
+import thaumcraft.common.lib.TCSounds;
 import thaumcraft.common.tiles.TileJarBrain;
 import thaumcraft.common.tiles.TileJarFillable;
 import thaumcraft.common.tiles.TileJarFillableVoid;
@@ -181,7 +182,7 @@ extends BlockContainer {
     @Override
     public void breakBlock(World worldIn, BlockPos pos, IBlockState state) {
         int meta = this.getMetaFromState(state);
-        if (meta == 1) {
+        if (meta == 1 && !worldIn.isRemote) {
             TileEntity te = worldIn.getTileEntity(pos);
             if (te instanceof TileJarBrain) {
                 TileJarBrain brain = (TileJarBrain) te;
@@ -251,7 +252,7 @@ extends BlockContainer {
                     brain.markDirty();
                 }
             } else {
-                worldIn.playSound(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, SoundEvents.BLOCK_GLASS_BREAK, SoundCategory.BLOCKS, 0.2f, 1.0f, false);
+                worldIn.playSound(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, TCSounds.JAR, SoundCategory.BLOCKS, 0.2f, 1.0f, false);
             }
             return true;
         }

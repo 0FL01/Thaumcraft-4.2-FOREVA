@@ -39,6 +39,8 @@ public class JarVisualShellContractTest {
                         && jarRenderer.contains("private static final String LIQUID_TEXTURE = \"thaumcraft:blocks/animatedglow\";")
                         && jarRenderer.contains("TileRenderHelper.drawTexturedCuboid(buf, minX, minY, minZ, maxX, maxY, maxZ, liquid, color);")
                         && jarRenderer.contains("OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, 200.0F, 200.0F);")
+                        && jarRenderer.contains("GlStateManager.translate(x + 0.5D, y + 0.01D, z + 0.5D);")
+                        && jarRenderer.contains("GlStateManager.translate(0.0F, -0.8F + bob, 0.0F);")
                         && jarRenderer.contains("float delta = tile.rota - tile.rotb;")
                         && jarRenderer.contains("brain.render(MODEL_SCALE);")
                         && !jarRenderer.contains("drawSolidHorizontalQuad")

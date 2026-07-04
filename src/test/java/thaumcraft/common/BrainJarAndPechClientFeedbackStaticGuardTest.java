@@ -18,9 +18,23 @@ public class BrainJarAndPechClientFeedbackStaticGuardTest {
         assertTrue(source.contains("this.rotb = this.rota;"));
         assertTrue(source.contains("this.world.getClosestPlayer("));
         assertTrue(source.contains("TCSounds.BRAIN"));
+        assertTrue(source.contains("SoundCategory.AMBIENT"));
         assertTrue(source.contains("this.lastsigh = System.currentTimeMillis() + 5000L + this.world.rand.nextInt(25000);"));
         assertTrue(source.contains("this.field_40066_q = (float) Math.atan2(d1, d);"));
         assertTrue(source.contains("this.rota += f * 0.04F;"));
+        assertTrue(source.contains("/ 25.0D"));
+        assertTrue(source.contains("strength * 0.3"));
+        assertTrue(source.contains("strength * 0.5"));
+        assertTrue(source.contains(".grow(8.0, 8.0, 8.0)"));
+    }
+
+    @Test
+    public void blockJarShouldKeepBrainJarServerOnlyXpDropAndJarClickSound() throws IOException {
+        String source = readFile("src/main/java/thaumcraft/common/blocks/BlockJar.java");
+
+        assertTrue(source.contains("if (meta == 1 && !worldIn.isRemote)"));
+        assertTrue(source.contains("new EntityXPOrb(worldIn, pos.getX() + 0.5"));
+        assertTrue(source.contains("TCSounds.JAR"));
     }
 
     @Test
