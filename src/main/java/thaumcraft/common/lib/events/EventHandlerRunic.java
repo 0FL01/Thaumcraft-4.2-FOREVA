@@ -348,7 +348,7 @@ public class EventHandlerRunic {
      * Get the total runic shielding charge for a given item stack.
      */
     public static int getFinalCharge(ItemStack stack) {
-        if (stack.isEmpty() || !(stack.getItem() instanceof IRunicArmor)) {
+        if (stack == null || stack.isEmpty() || !(stack.getItem() instanceof IRunicArmor)) {
             return 0;
         }
         IRunicArmor armor = (IRunicArmor) stack.getItem();
@@ -374,7 +374,7 @@ public class EventHandlerRunic {
      * Get the hardening level for a given item stack.
      */
     public static int getHardening(ItemStack stack) {
-        if (stack.isEmpty() || !(stack.getItem() instanceof IRunicArmor)) {
+        if (stack == null || stack.isEmpty() || !(stack.getItem() instanceof IRunicArmor)) {
             return 0;
         }
         int base = 0;
