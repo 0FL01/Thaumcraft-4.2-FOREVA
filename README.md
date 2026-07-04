@@ -15,6 +15,12 @@ Original mod by Azanor (2013-2015). This is an unofficial community port.
   <img src="raw/showcase-world.jpg" width="80%" alt="In-game showcase">
 </p>
 
+## Status
+
+Active work-in-progress port. Core systems are wired, and a large July 2026 cleanup restored many visible TC4 parity issues: Thaumonomicon recipe pages, focus visuals, TC particle rendering, jars, essentia phials, and Brain in a Jar behavior.
+
+Remaining work is mostly item-specific logic, runtime parity testing, and final visual/rendering polish.
+
 ## Project stack
 
 - **Language:** Java 8
@@ -26,24 +32,37 @@ Original mod by Azanor (2013-2015). This is an unofficial community port.
 
 ## What works
 
-- Alchemy
+- Core alchemy and crafting systems
 - Golems
 - Research system
-- Thaumonomicon (text/images — semi-working)
-- World generation / Aura (minor defects)
-- Mob spawning, AI, textures
+- Thaumonomicon research tree, text/images, and recipe pages
+- Arcane/crucible/infusion recipe page rendering in the Thaumonomicon
+- World generation / Aura
+- Mob spawning, AI, and textures
 - Outer Lands dimension
+- TC4-style particle routes for many client effects
+- Jar rendering, essentia liquid display, labels, and Brain in a Jar visuals
+- Wand focus visuals for restored foci such as Pech and Hellbat
 
-## What does not work
+## Recent restoration highlights
 
-- Certain item logic (Arcane Levitator, Traveller's Charm, Caging Stone, etc.)
-- Infusion on the matrix (untested — may work)
-- Anything not listed above is likely broken or incomplete
+- Restored Thaumonomicon recipe page rendering and TC4 markup handling
+- Fixed wildcard recipe ingredient display in research pages
+- Allowed Thaumonomicon creation while a wand focus is equipped
+- Restored Pech focus behavior, projectile feedback, and equipped-wand visuals
+- Restored Hellbat focus two-layer item icon and wand ornament rendering
+- Fixed several TC particle renderers: essentia trails, bore sparkles, sparks, wisps, vents, smoke, and bubbles
+- Fixed jar transparency, liquid rendering, lid side textures, and Brain in a Jar animation/XP behavior
+- Fixed essentia phial item layers
+- Hardened runic helper null-stack handling
+- Hardened infusion matrix render state
 
-## Status
+## Known limitations
 
-Early-to-mid stage port. Most core systems are wired but need polish.
-Item logic and visual/rendering parity are the main gaps.
+- Some item-specific logic is still incomplete or needs parity review, including Arcane Levitator, Traveller's Charm, Caging Stone, and similar edge-case items
+- Infusion crafting gameplay still needs full runtime verification; the matrix renderer itself has been hardened
+- Visual parity is much better after the July cleanup, but remaining models/renderers/textures still need comparison against TC4
+- Untested systems may still have defects
 
 ## Development
 
@@ -51,7 +70,7 @@ Solo project. Development assisted by LLM agents using various models (GPT 5.5, 
 
 ### Major known issue
 
-Texture porting is the single largest resource drain. The original 1.7.10 rendering pipeline (ModelRenderer, AdvancedModelLoader OBJ, etc.) does not map cleanly to Forge 1.12.2 baked models. A significant amount of work goes into UV mapping, JSON model conversion, display transforms, and per-item model routing.
+Rendering/model parity remains the largest ongoing work area. Many high-visibility TC4 visuals have already been restored, but the original 1.7.10 rendering pipeline still does not map cleanly to Forge 1.12.2 baked models. Remaining work includes UV cleanup, JSON model conversion, display transforms, and per-item model routing.
 
 ## Downloads
 
