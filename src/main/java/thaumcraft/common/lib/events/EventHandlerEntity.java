@@ -14,6 +14,10 @@ import net.minecraft.entity.item.EntityXPOrb;
 import net.minecraft.entity.monster.EntityCreeper;
 import net.minecraft.entity.monster.EntityMob;
 import net.minecraft.entity.monster.EntityZombie;
+import net.minecraft.entity.passive.EntityChicken;
+import net.minecraft.entity.passive.EntityCow;
+import net.minecraft.entity.passive.EntityPig;
+import net.minecraft.entity.passive.EntitySheep;
 import net.minecraft.entity.passive.EntityVillager;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -73,6 +77,13 @@ import thaumcraft.common.entities.EntityAspectOrb;
 import thaumcraft.common.entities.golems.EntityGolemBase;
 import thaumcraft.common.entities.golems.EntityTravelingTrunk;
 import thaumcraft.common.entities.monster.EntityBrainyZombie;
+import thaumcraft.common.entities.monster.EntityTaintChicken;
+import thaumcraft.common.entities.monster.EntityTaintCow;
+import thaumcraft.common.entities.monster.EntityTaintCreeper;
+import thaumcraft.common.entities.monster.EntityTaintPig;
+import thaumcraft.common.entities.monster.EntityTaintSheep;
+import thaumcraft.common.entities.monster.EntityTaintVillager;
+import thaumcraft.common.entities.monster.EntityThaumicSlime;
 import thaumcraft.common.entities.monster.boss.EntityThaumcraftBoss;
 import thaumcraft.common.entities.monster.mods.ChampionModifier;
 import thaumcraft.common.entities.projectile.EntityPrimalArrow;
@@ -318,6 +329,7 @@ public class EventHandlerEntity {
      * - Resets warp counter
      *
      * On mob death (TC4 parity):
+     * - Converts mobs killed while taint-poisoned into tainted variants
      * - Drops EntityAspectOrb for each primal aspect (50% chance each)
      * - Only for non-tainted mobs recently hit by a player
      */
@@ -337,6 +349,8 @@ public class EventHandlerEntity {
             }
             return;
         }
+
+        if (tryConvertTaintedDeath(event.getEntityLiving())) return;
 
         // TC4 parity: drop aspect orbs from non-tainted mobs killed by players.
         // TC4 checks recentlyHit > 0; in 1.12 recentlyHit is protected, so we
@@ -360,6 +374,50 @@ public class EventHandlerEntity {
                     1 + event.getEntityLiving().world.rand.nextInt(aspects.getAmount(aspect)));
             event.getEntityLiving().world.spawnEntity(orb);
         }
+    }
+
+    private boolean tryConvertTaintedDeath(EntityLivingBase dying) {
+        if (dying instanceof ITaintedMob
+                || Config.potionFluxTaint == null
+                || !dying.isPotionActive(Config.potionFluxTaint)) {
+            return false;
+        }
+
+        EntityLivingBase replacement = createTaintedReplacement(dying);
+        if (replacement == null) {
+            return false;
+        }
+
+        replacement.setLocationAndAngles(dying.posX, dying.posY, dying.posZ, dying.rotationYaw, 0.0F);
+        dying.world.spawnEntity(replacement);
+        dying.setDead();
+        return true;
+    }
+
+    private EntityLivingBase createTaintedReplacement(EntityLivingBase dying) {
+        World world = dying.world;
+        if (dying instanceof EntityCreeper) {
+            return new EntityTaintCreeper(world);
+        }
+        if (dying instanceof EntitySheep) {
+            return new EntityTaintSheep(world);
+        }
+        if (dying instanceof EntityCow) {
+            return new EntityTaintCow(world);
+        }
+        if (dying instanceof EntityPig) {
+            return new EntityTaintPig(world);
+        }
+        if (dying instanceof EntityChicken) {
+            return new EntityTaintChicken(world);
+        }
+        if (dying instanceof EntityVillager) {
+            return new EntityTaintVillager(world);
+        }
+
+        EntityThaumicSlime slime = new EntityThaumicSlime(world);
+        slime.setSlimeSize(1 + Math.min((int) (dying.getMaxHealth() / 10.0F), 6));
+        return slime;
     }
 
     /**

@@ -11,8 +11,11 @@ import net.minecraft.block.properties.PropertyInteger;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
+import net.minecraft.potion.PotionEffect;
 import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
@@ -189,6 +192,25 @@ public class BlockTaintFibres extends Block {
     @Override
     public AxisAlignedBB getCollisionBoundingBox(IBlockState state, IBlockAccess world, BlockPos pos) {
         return NULL_AABB;
+    }
+
+    @Override
+    public void onEntityCollision(World world, BlockPos pos, IBlockState state, Entity entity) {
+        if (world.isRemote
+                || Config.potionFluxTaint == null
+                || !(entity instanceof EntityLivingBase)) {
+            return;
+        }
+        EntityLivingBase living = (EntityLivingBase) entity;
+        if (living.isEntityUndead()) {
+            return;
+        }
+
+        int chance = living instanceof EntityPlayer ? 1000 : 500;
+        if (world.rand.nextInt(chance) == 0) {
+            int duration = living instanceof EntityPlayer ? 80 : 160;
+            living.addPotionEffect(new PotionEffect(Config.potionFluxTaint, duration, 0, false, true));
+        }
     }
 
     @Override
