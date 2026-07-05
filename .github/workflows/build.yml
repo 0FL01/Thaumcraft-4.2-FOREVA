@@ -1,7 +1,7 @@
 # =============================================================================
 # Build & Test — CI for every push and pull request
 # Runs inside the thaumcraft-dev Docker image (JDK 8, ForgeGradle 2.3).
-# Skips client-only tests (no display/GL in CI).
+# Skips client-only tests (no display/GL in CI) and uploads only the production universal jar.
 # =============================================================================
 name: Build & Test
 
@@ -51,16 +51,6 @@ jobs:
           restore-keys: |
             gradle-
 
-      - name: Compile Java
-        run: |
-          docker run --rm \
-            -v "$PWD:/workspace/thaumcraft" \
-            -v "$PWD/.gradle_home:/home/ubuntu/.gradle" \
-            --user "$(id -u):$(id -g)" \
-            --entrypoint ./gradlew \
-            thaumcraft-dev \
-            compileJava --console=plain -Pci=true
-
       - name: Run tests (non-client)
         run: |
           docker run --rm \
@@ -69,9 +59,9 @@ jobs:
             --user "$(id -u):$(id -g)" \
             --entrypoint ./gradlew \
             thaumcraft-dev \
-            test --console=plain -Pci=true
+            clean test --console=plain -Pci=true
 
-      - name: Build JARs
+      - name: Build universal JAR
         run: |
           docker run --rm \
             -v "$PWD:/workspace/thaumcraft" \
@@ -79,11 +69,14 @@ jobs:
             --user "$(id -u):$(id -g)" \
             --entrypoint ./gradlew \
             thaumcraft-dev \
-            jar apiJar devJar reobfJar --console=plain -Pci=true
+            clean jar reobfJar --console=plain -Pci=true
 
-      - name: Upload JAR artifacts
+      - name: Verify universal JAR reobfuscation
+        run: ./scripts/dev.sh check-jar build/libs/Thaumcraft-1.0.0-universal.jar
+
+      - name: Upload universal JAR artifact
         uses: actions/upload-artifact@v4
         with:
-          name: thaumcraft-jars
-          path: build/libs/Thaumcraft-*.jar
+          name: thaumcraft-universal-jar
+          path: build/libs/Thaumcraft-*-universal.jar
           retention-days: 7

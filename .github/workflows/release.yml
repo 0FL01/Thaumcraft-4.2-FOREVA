@@ -1,6 +1,6 @@
 # =============================================================================
 # Release — triggered by push to master
-# Builds JARs, runs server smoke test, creates GitHub Release (pre-release).
+# Runs tests and server smoke, then publishes one production universal jar.
 # =============================================================================
 name: Release
 
@@ -63,16 +63,6 @@ jobs:
           restore-keys: |
             gradle-
 
-      - name: Compile Java
-        run: |
-          docker run --rm \
-            -v "$PWD:/workspace/thaumcraft" \
-            -v "$PWD/.gradle_home:/home/ubuntu/.gradle" \
-            --user "$(id -u):$(id -g)" \
-            --entrypoint ./gradlew \
-            thaumcraft-dev \
-            compileJava --console=plain -Pci=true
-
       - name: Run tests (non-client)
         run: |
           docker run --rm \
@@ -81,20 +71,7 @@ jobs:
             --user "$(id -u):$(id -g)" \
             --entrypoint ./gradlew \
             thaumcraft-dev \
-            test --console=plain -Pci=true
-
-      - name: Build JARs
-        run: |
-          docker run --rm \
-            -v "$PWD:/workspace/thaumcraft" \
-            -v "$PWD/.gradle_home:/home/ubuntu/.gradle" \
-            --user "$(id -u):$(id -g)" \
-            --entrypoint ./gradlew \
-            thaumcraft-dev \
-            jar apiJar devJar reobfJar --console=plain -Pci=true
-
-      - name: List built JARs
-        run: ls -lh build/libs/Thaumcraft-*.jar
+            clean test --console=plain -Pci=true
 
       - name: Server smoke test
         run: |
@@ -208,6 +185,22 @@ jobs:
         shell: bash
         timeout-minutes: 6
 
+      - name: Build universal JAR
+        run: |
+          docker run --rm \
+            -v "$PWD:/workspace/thaumcraft" \
+            -v "$PWD/.gradle_home:/home/ubuntu/.gradle" \
+            --user "$(id -u):$(id -g)" \
+            --entrypoint ./gradlew \
+            thaumcraft-dev \
+            clean jar reobfJar --console=plain -Pci=true
+
+      - name: Verify universal JAR reobfuscation
+        run: ./scripts/dev.sh check-jar build/libs/Thaumcraft-1.0.0-universal.jar
+
+      - name: List release artifact
+        run: ls -lh build/libs/Thaumcraft-*-universal.jar
+
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
@@ -220,12 +213,7 @@ jobs:
 
             ### Artifacts
             - Thaumcraft-1.0.0-universal.jar
-            - Thaumcraft-1.0.0-api.jar
-            - Thaumcraft-1.0.0-dev.jar
 
             ---
-          files: |
-            build/libs/Thaumcraft-*-universal.jar
-            build/libs/Thaumcraft-*-api.jar
-            build/libs/Thaumcraft-*-dev.jar
+          files: build/libs/Thaumcraft-*-universal.jar
           prerelease: true
