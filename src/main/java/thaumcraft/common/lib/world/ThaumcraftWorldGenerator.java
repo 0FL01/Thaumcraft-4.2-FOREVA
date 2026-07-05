@@ -439,7 +439,7 @@ public class ThaumcraftWorldGenerator implements IWorldGenerator {
         if (world.isAirBlock(candidate) || candidateState.getBlock().isReplaceable(world, candidate)) {
             pos = candidate;
         }
-        if (pos.getY() > world.getSeaLevel()) {
+        if (pos.getY() > world.getActualHeight()) {
             return false;
         }
 
@@ -466,7 +466,7 @@ public class ThaumcraftWorldGenerator implements IWorldGenerator {
         int bx = x + rand.nextInt(16);
         int bz = z + rand.nextInt(16);
         int by = world.getHeight(new BlockPos(bx, 0, bz)).getY();
-        if (by > world.getSeaLevel()) {
+        if (by > world.getActualHeight()) {
             return;
         }
         Biome flowerBiome = world.getBiome(new BlockPos(bx, 0, bz));
@@ -583,7 +583,7 @@ public class ThaumcraftWorldGenerator implements IWorldGenerator {
         int ringX = x + rand.nextInt(16);
         int ringZ = z + rand.nextInt(16);
         int ringY = world.getHeight(new BlockPos(ringX, 0, ringZ)).getY() - 9;
-        if (ringY < world.getSeaLevel()) {
+        if (ringY < world.getActualHeight()) {
             BlockPos moundPos = new BlockPos(ringX, ringY, ringZ);
             if (rand.nextInt(150) == 0) {
                 if (new WorldGenMound().generate(world, rand, moundPos)) {
@@ -639,7 +639,7 @@ public class ThaumcraftWorldGenerator implements IWorldGenerator {
         int x = chunkX * 16 + rand.nextInt(16);
         int z = chunkZ * 16 + rand.nextInt(16);
         int topY = dim == -1 ? getFirstUncoveredY(world, x, z) - 1 : world.getHeight(new BlockPos(x, 0, z)).getY() - 1;
-        if (topY > world.getSeaLevel()) {
+        if (topY > world.getActualHeight()) {
             return false;
         }
 
