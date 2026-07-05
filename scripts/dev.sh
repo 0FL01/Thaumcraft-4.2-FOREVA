@@ -563,6 +563,15 @@ smoke_client() {
   local log="$ROOT/run/smoke-client.log"
   rm -f "$log"
 
+  local prod_jar="$ROOT/build/libs/Thaumcraft-1.0.0-universal.jar"
+  local jar_backup=""
+  local had_prod_jar=0
+  if [[ -f "$prod_jar" ]]; then
+    jar_backup="$(mktemp)"
+    cp -p "$prod_jar" "$jar_backup"
+    had_prod_jar=1
+  fi
+
   local xauth="${XAUTHORITY:-$HOME/.Xauthority}"
   local docker_args=(
     --rm
@@ -586,6 +595,13 @@ smoke_client() {
     "$IMAGE" runClient -x getAssets --console=plain > "$log" 2>&1
   local status="$?"
   set -e
+
+  if [[ "$had_prod_jar" -eq 1 ]]; then
+    cp -p "$jar_backup" "$prod_jar"
+    rm -f "$jar_backup"
+  elif [[ -f "$prod_jar" ]]; then
+    rm -f "$prod_jar"
+  fi
 
   local markers
   markers="$(crash_markers "$log")"
@@ -794,33 +810,20 @@ validate_jar_task() {
 }
 
 validate_mcp_summary() {
-  local summary_file="$ROOT/run/validate/check-jar.summary"
-  mkdir -p "$(dirname "$summary_file")"
-  VALIDATE_LAST_LOG="$(relative_path "$summary_file")"
+  local check_file="$ROOT/run/validate/check-jar.log"
+  mkdir -p "$(dirname "$check_file")"
+  VALIDATE_LAST_LOG="$(relative_path "$check_file")"
 
   set +e
-  mcp_leak_summary > "$summary_file" 2>&1
+  check_jar > "$check_file" 2>&1
   local status="$?"
   set -e
   if [[ "$status" -ne 0 ]]; then
-    printf 'summary exit %s; log: %s' "$status" "$VALIDATE_LAST_LOG"
+    printf 'MCP leaks found; log: %s' "$VALIDATE_LAST_LOG"
     return "$status"
   fi
 
-  local current_count current_hash
-  current_count="$(grep -F 'Count:' "$summary_file" | sed 's/^Count: //')"
-  current_hash="$(grep -F 'Hash:' "$summary_file" | awk '{print $2}')"
-  if [[ -z "$current_hash" ]]; then
-    printf 'missing current hash; log: %s' "$VALIDATE_LAST_LOG"
-    return 1
-  fi
-
-  if [[ "$current_count" == '0 (unique leaks: 0)' ]]; then
-    printf 'no MCP leaks; log: %s' "$VALIDATE_LAST_LOG"
-    return 0
-  fi
-
-  printf 'MCP leaks present; %s; log: %s' "$current_count" "$VALIDATE_LAST_LOG"
+  printf 'no MCP leaks; log: %s' "$VALIDATE_LAST_LOG"
   return 0
 }
 
@@ -955,8 +958,8 @@ validate() {
   done
 
   validate_step git-status validate_git_status || return 1
-  # Batch compileJava + test + jar in a single Gradle invocation to keep daemon warm
-  validate_step_batch_gradle 'compile+test+jar' compileJava test jar || return 1
+  # Batch compileJava + test + production reobf jar in a single Gradle invocation to keep daemon warm.
+  validate_step_batch_gradle 'compile+test+reobf' compileJava test jar reobfJar || return 1
   validate_step check-jar validate_mcp_summary || return 1
   if [[ "$run_smoke" -eq 1 ]]; then
     # Smoke server uses --no-daemon and its own docker run: stop daemon first to avoid lock conflicts
