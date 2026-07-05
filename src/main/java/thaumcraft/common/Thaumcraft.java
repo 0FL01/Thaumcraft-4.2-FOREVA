@@ -50,6 +50,7 @@ import thaumcraft.common.lib.events.EventHandlerRunic;
 import thaumcraft.common.lib.events.EventHandlerWorld;
 import thaumcraft.common.lib.events.ServerTickEventsFML;
 import thaumcraft.common.lib.events.CommandThaumcraft;
+import thaumcraft.common.lib.CreativeTabThaumcraft;
 import thaumcraft.common.lib.network.PacketHandler;
 import thaumcraft.common.lib.research.ScanManager;
 import thaumcraft.common.blocks.BlockJarItem;
@@ -71,10 +72,7 @@ import java.util.Arrays;
     guiFactory = "thaumcraft.client.gui.GuiFactory"
 )
 public class Thaumcraft {
-    public static final CreativeTabs tabTC = new CreativeTabs("thaumcraft") {
-        public ItemStack createIcon() { return new ItemStack(Items.ENDER_EYE); }
-        public ItemStack getTabIconItem() { return createIcon(); }
-    };
+    public static final CreativeTabs tabTC = CreativeTabThaumcraft.tabThaumcraft;
 
     public static final String MODID = "thaumcraft";
     public static final String NAME = "Thaumcraft";
