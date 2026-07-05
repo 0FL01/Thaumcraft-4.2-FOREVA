@@ -60,11 +60,12 @@ public class FluxReservoirRendererFidelityStaticGuardTest {
 
         assertTrue("Reservoir item renderer should reuse the block-model shell plus the worldless TESR liquid path instead of falling back to a static normal item model",
                 reservoirItemRenderer.contains("extends TileEntityItemStackRenderer")
-                        && reservoirItemRenderer.contains("new ModelResourceLocation(\"thaumcraft:blockessentiareservoir\", \"inventory\")")
                         && reservoirItemRenderer.contains("new TileEssentiaReservoirRenderer()")
                         && reservoirItemRenderer.contains("reservoirRenderer.setRendererDispatcher(TileEntityRendererDispatcher.instance);")
-                        && reservoirItemRenderer.contains("mc.getRenderItem().renderItem(stack, model);")
-                        && reservoirItemRenderer.contains("GlStateManager.translate(-0.5F, -0.5F, -0.5F);")
+                        && reservoirItemRenderer.contains("renderReservoirShell(mc);")
+                        && reservoirItemRenderer.contains("TextureMap.LOCATION_BLOCKS_TEXTURE")
+                        && reservoirItemRenderer.contains("mc.getBlockRendererDispatcher().renderBlockBrightness(")
+                        && reservoirItemRenderer.contains("ConfigBlocks.blockEssentiaReservoir.getDefaultState()")
                         && reservoirItemRenderer.contains("essentia.readFromNBT(tag);"));
 
         assertTrue("Reservoir block model should define the basin shell geometry after the shell moved out of TESR",

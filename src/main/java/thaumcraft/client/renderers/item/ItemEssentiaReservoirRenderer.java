@@ -2,8 +2,7 @@ package thaumcraft.client.renderers.item;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.block.model.IBakedModel;
-import net.minecraft.client.renderer.block.model.ModelResourceLocation;
+import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
 import net.minecraft.client.renderer.tileentity.TileEntityItemStackRenderer;
 import net.minecraft.item.ItemStack;
@@ -12,12 +11,10 @@ import net.minecraft.util.EnumFacing;
 import thaumcraft.api.aspects.Aspect;
 import thaumcraft.api.aspects.AspectList;
 import thaumcraft.client.renderers.tile.TileEssentiaReservoirRenderer;
+import thaumcraft.common.config.ConfigBlocks;
 import thaumcraft.common.tiles.TileEssentiaReservoir;
 
 public class ItemEssentiaReservoirRenderer extends TileEntityItemStackRenderer {
-
-    private static final ModelResourceLocation RESERVOIR_SHELL =
-            new ModelResourceLocation("thaumcraft:blockessentiareservoir", "inventory");
 
     private final TileEssentiaReservoirRenderer reservoirRenderer = new TileEssentiaReservoirRenderer();
 
@@ -33,12 +30,21 @@ public class ItemEssentiaReservoirRenderer extends TileEntityItemStackRenderer {
 
         TileEssentiaReservoir reservoir = createTile(stack);
         Minecraft mc = Minecraft.getMinecraft();
-        IBakedModel model = mc.getRenderItem().getItemModelMesher().getModelManager().getModel(RESERVOIR_SHELL);
 
         GlStateManager.pushMatrix();
-        mc.getRenderItem().renderItem(stack, model);
-        GlStateManager.translate(-0.5F, -0.5F, -0.5F);
+        renderReservoirShell(mc);
         reservoirRenderer.render(reservoir, 0.0D, 0.0D, 0.0D, partialTicks, 0, 1.0F);
+        GlStateManager.popMatrix();
+    }
+
+    private static void renderReservoirShell(Minecraft mc) {
+        if (ConfigBlocks.blockEssentiaReservoir == null) {
+            return;
+        }
+        GlStateManager.pushMatrix();
+        mc.getTextureManager().bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
+        mc.getBlockRendererDispatcher().renderBlockBrightness(
+                ConfigBlocks.blockEssentiaReservoir.getDefaultState(), 1.0F);
         GlStateManager.popMatrix();
     }
 
