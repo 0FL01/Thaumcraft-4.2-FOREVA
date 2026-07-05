@@ -1,13 +1,11 @@
 package thaumcraft.client.renderers.tile;
 
-import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
-import thaumcraft.common.config.ConfigBlocks;
 import thaumcraft.common.tiles.TileHole;
 
 public class TileHoleRenderer extends TileEntitySpecialRenderer<TileHole> {
@@ -20,8 +18,12 @@ public class TileHoleRenderer extends TileEntitySpecialRenderer<TileHole> {
             return;
         }
 
+        HoleRenderBatchCache.HoleRenderGroup group = HoleRenderBatchCache.getGroup(tile);
+        if (group == null || !group.markRenderedThisFrame()) {
+            return;
+        }
+
         Entity viewer = Minecraft.getMinecraft().getRenderViewEntity();
-        boolean inRange = viewer != null && tile.getPos().distanceSq(viewer.posX, viewer.posY, viewer.posZ) < 512.0D;
         double viewX = 0.0D;
         double viewY = 0.0D;
         double viewZ = 0.0D;
@@ -37,12 +39,24 @@ public class TileHoleRenderer extends TileEntitySpecialRenderer<TileHole> {
         GlStateManager.disableCull();
         GlStateManager.depthMask(false);
 
-        for (EnumFacing face : EnumFacing.VALUES) {
-            if (shouldRenderFace(tile.getPos(), face)) {
-                float axisOffset = face.getAxisDirection() == EnumFacing.AxisDirection.POSITIVE ? OFFSET_FAR : OFFSET_NEAR;
-                LayeredFieldPlaneHelper.renderLayeredFace(
-                        face, x, y, z, axisOffset, inRange, 0.5F, viewX, viewY, viewZ);
-            }
+        BlockPos origin = tile.getPos();
+        for (HoleRenderBatchCache.MergedFaceRect rect : group.rects) {
+            float axisOffset = rect.face.getAxisDirection() == EnumFacing.AxisDirection.POSITIVE ? OFFSET_FAR : OFFSET_NEAR;
+            LayeredFieldPlaneHelper.renderLayeredFaceRect(
+                    rect.face,
+                    x + rect.baseX - origin.getX(),
+                    y + rect.baseY - origin.getY(),
+                    z + rect.baseZ - origin.getZ(),
+                    axisOffset,
+                    true,
+                    0.5F,
+                    viewX,
+                    viewY,
+                    viewZ,
+                    0.0F,
+                    rect.sizeA,
+                    0.0F,
+                    rect.sizeB);
         }
 
         GlStateManager.depthMask(true);
@@ -50,11 +64,5 @@ public class TileHoleRenderer extends TileEntitySpecialRenderer<TileHole> {
         GlStateManager.enableLighting();
         GlStateManager.enableFog();
         GlStateManager.popMatrix();
-    }
-
-    private boolean shouldRenderFace(BlockPos origin, EnumFacing face) {
-        BlockPos adjPos = origin.offset(face);
-        IBlockState adjState = getWorld().getBlockState(adjPos);
-        return adjState.isOpaqueCube() && adjState.getBlock() != ConfigBlocks.blockHole;
     }
 }

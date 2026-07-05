@@ -43,6 +43,7 @@ import thaumcraft.api.aspects.AspectList;
 import thaumcraft.api.aspects.IAspectContainer;
 import thaumcraft.api.nodes.INode;
 import thaumcraft.api.research.ScanResult;
+import thaumcraft.client.renderers.tile.HoleRenderBatchCache;
 import thaumcraft.common.entities.monster.mods.ChampionModifier;
 import thaumcraft.common.config.Config;
 import thaumcraft.common.items.relics.ItemThaumometer;
@@ -197,6 +198,7 @@ public class RenderEventHandler {
 
         // EldritchDiagnostics: disabled for release, re-enable for FPS profiling
         // EldritchDiagnostics.onFrame();
+        HoleRenderBatchCache.nextFrame();
 
         if (tagscale > 0.0F) {
             tagscale = Math.max(0.0F, tagscale - 0.005F);

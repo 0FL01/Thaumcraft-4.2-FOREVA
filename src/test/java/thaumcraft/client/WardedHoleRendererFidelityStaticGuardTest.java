@@ -15,6 +15,7 @@ public class WardedHoleRendererFidelityStaticGuardTest {
     public void wardedAndHoleRenderersKeepConnectedAndLayeredContracts() throws IOException {
         String warded = read("src/main/java/thaumcraft/client/renderers/tile/TileWardedRenderer.java");
         String hole = read("src/main/java/thaumcraft/client/renderers/tile/TileHoleRenderer.java");
+        String holeBatch = read("src/main/java/thaumcraft/client/renderers/tile/HoleRenderBatchCache.java");
         String nothing = read("src/main/java/thaumcraft/client/renderers/tile/TileEldritchNothingRenderer.java");
         String obelisk = read("src/main/java/thaumcraft/client/renderers/tile/TileEldritchObeliskRenderer.java");
         String helper = read("src/main/java/thaumcraft/client/renderers/tile/LayeredFieldPlaneHelper.java");
@@ -40,9 +41,17 @@ public class WardedHoleRendererFidelityStaticGuardTest {
                         && warded.contains("dispatcher.getBlockModelRenderer().renderModel(")
                         && warded.contains("MathHelper.getPositionRandom(tile.getPos())"));
 
-        assertTrue("TileHoleRenderer should keep layered tunnel routing through the shared helper",
-                hole.contains("LayeredFieldPlaneHelper.renderLayeredFace(")
-                        && hole.contains("shouldRenderFace(tile.getPos(), face)"));
+        assertTrue("TileHoleRenderer should batch connected holes and keep layered tunnel routing through the shared helper",
+                hole.contains("HoleRenderBatchCache.getGroup(tile)")
+                        && hole.contains("group.markRenderedThisFrame()")
+                        && hole.contains("LayeredFieldPlaneHelper.renderLayeredFaceRect("));
+
+        assertTrue("HoleRenderBatchCache should discover connected hole groups and merge unit faces into rectangles",
+                holeBatch.contains("ArrayDeque<BlockPos>")
+                        && holeBatch.contains("ConfigBlocks.blockHole")
+                        && holeBatch.contains("GROUP_BY_MEMBER")
+                        && holeBatch.contains("mergeCells(")
+                        && holeBatch.contains("shouldRenderFace"));
 
         assertTrue("TileEldritchNothingRenderer should keep layered tunnel field routing through the shared helper",
                 (nothing.contains("LayeredFieldPlaneHelper.addInRangeBatchFace(")
