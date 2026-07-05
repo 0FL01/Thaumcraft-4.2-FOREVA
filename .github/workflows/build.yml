@@ -55,7 +55,7 @@ jobs:
         run: |
           docker run --rm \
             -v "$PWD:/workspace/thaumcraft" \
-            -v "$PWD/.gradle_home:/home/ubuntu/.gradle" \
+            -e GRADLE_USER_HOME=/workspace/thaumcraft/.gradle_home \
             --user "$(id -u):$(id -g)" \
             --entrypoint ./gradlew \
             thaumcraft-dev \
@@ -65,7 +65,7 @@ jobs:
         run: |
           docker run --rm \
             -v "$PWD:/workspace/thaumcraft" \
-            -v "$PWD/.gradle_home:/home/ubuntu/.gradle" \
+            -e GRADLE_USER_HOME=/workspace/thaumcraft/.gradle_home \
             --user "$(id -u):$(id -g)" \
             --entrypoint ./gradlew \
             thaumcraft-dev \
