@@ -86,8 +86,9 @@ public class BlockUtils {
     /** Check if a block position is adjacent to any solid (full-cube) block. */
     public static boolean isAdjacentToSolidBlock(World world, BlockPos pos) {
         for (EnumFacing facing : EnumFacing.VALUES) {
-            IBlockState state = world.getBlockState(pos.offset(facing));
-            if (state.isFullBlock()) return true;
+            BlockPos sidePos = pos.offset(facing);
+            IBlockState state = world.getBlockState(sidePos);
+            if (state.isSideSolid(world, sidePos, facing.getOpposite())) return true;
         }
         return false;
     }

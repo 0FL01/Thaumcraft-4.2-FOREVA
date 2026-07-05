@@ -1,5 +1,5 @@
 {
-  "parent": "block/cross",
+  "parent": "thaumcraft:block/cross_tinted",
   "textures": {
     "cross": "thaumcraft:blocks/taint_spore_stalk_2"
   }

@@ -3,7 +3,6 @@ package thaumcraft.common.blocks;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockFalling;
 import net.minecraft.block.SoundType;
-import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.PropertyInteger;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
@@ -35,7 +34,7 @@ public class BlockTaint extends Block {
     public static final PropertyInteger TYPE = PropertyInteger.create("type", 0, 2);
 
     public BlockTaint() {
-        super(Material.GROUND);
+        super(Config.taintMaterial);
         this.setHardness(1.5f);
         this.setResistance(3.0f);
         this.setSoundType(SoundType.GROUND);
@@ -49,12 +48,39 @@ public class BlockTaint extends Block {
     public void updateTick(World world, BlockPos pos, IBlockState state, Random rand) {
         if (world.isRemote) return;
         int meta = this.getMetaFromState(state);
-        if (meta == 2 || isTaintBiome(world, pos)) return;
+        if (meta == 2) return;
+
+        if (isTaintBiome(world, pos)) {
+            BlockTaintFibres.taintBiomeSpread(world, pos, rand, this);
+            BlockPos target = pos.add(rand.nextInt(3) - 1, rand.nextInt(5) - 3, rand.nextInt(3) - 1);
+            if (BlockTaintFibres.isTaintBiome(world, target)) {
+                if (BlockTaintFibres.spreadFibres(world, target)) return;
+                int adjacent = BlockTaintFibres.getAdjacentTaint(world, target);
+                IBlockState targetState = world.getBlockState(target);
+                Block targetBlock = targetState.getBlock();
+                if (adjacent >= 2 && (Utils.isWoodLog(world, target) || targetBlock.isLeaves(targetState, world, target))) {
+                    world.setBlockState(target, ConfigBlocks.blockTaint.getStateFromMeta(0), 3);
+                } else if (adjacent >= 3 && isTaintSoilTarget(targetBlock)) {
+                    world.setBlockState(target, ConfigBlocks.blockTaint.getStateFromMeta(1), 3);
+                }
+            }
+            return;
+        }
+
         if (meta == 0 && ConfigBlocks.blockFluxGoo != null && rand.nextInt(20) == 0) {
             world.setBlockState(pos, ConfigBlocks.blockFluxGoo.getStateFromMeta(ConfigBlocks.blockFluxGoo.getQuanta()), 3);
         } else if (meta == 1 && rand.nextInt(10) == 0) {
             world.setBlockState(pos, Blocks.DIRT.getDefaultState(), 3);
         }
+    }
+
+    private static boolean isTaintSoilTarget(Block block) {
+        return block == Blocks.GRASS
+                || block == Blocks.DIRT
+                || block == Blocks.STONE
+                || block == Blocks.SAND
+                || block == Blocks.GRAVEL
+                || block == Blocks.CLAY;
     }
 
     private static boolean isTaintBiome(World world, BlockPos pos) {

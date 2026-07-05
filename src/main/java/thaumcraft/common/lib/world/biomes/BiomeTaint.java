@@ -11,6 +11,8 @@ import net.minecraft.world.gen.feature.WorldGenBlockBlob;
 import thaumcraft.common.config.Config;
 import thaumcraft.common.config.ConfigBlocks;
 import thaumcraft.common.entities.monster.EntityTaintacle;
+import thaumcraft.common.lib.utils.BlockUtils;
+import thaumcraft.common.lib.utils.Utils;
 import thaumcraft.common.lib.world.WorldGenBigMagicTree;
 import java.util.Random;
 
@@ -46,17 +48,17 @@ public class BiomeTaint extends Biome {
 
     @Override
     public int getFoliageColorAtPos(BlockPos pos) {
-        return 0x6D45E9;
+        return 0x7C6D87;
     }
 
     @Override
     public int getGrassColorAtPos(BlockPos pos) {
-        return 0x7C6607;
+        return 0x6D4189;
     }
 
     @Override
     public int getSkyColorByTemp(float temp) {
-        return 0x7C48FF;
+        return 0x7C44FF;
     }
 
     @Override
@@ -75,7 +77,8 @@ public class BiomeTaint extends Biome {
     private void decorateSpecial(World world, Random rand, int x, int z) {
         // Taint blobs
         if (blobs != null) {
-            for (int i = 0; i < 3; ++i) {
+            int count = rand.nextInt(3);
+            for (int i = 0; i < count; ++i) {
                 int bx = x + rand.nextInt(16) + 8;
                 int bz = z + rand.nextInt(16) + 8;
                 BlockPos bpos = world.getHeight(new BlockPos(bx, 0, bz));
@@ -84,26 +87,29 @@ public class BiomeTaint extends Biome {
         }
         // Taint fibres on grass
         IBlockState taintFibres0 = ConfigBlocks.blockTaintFibres.getStateFromMeta(0);
-        IBlockState taintFibres1 = ConfigBlocks.blockTaintFibres.getStateFromMeta(1);
         Block grassBlock = Blocks.GRASS;
         for (int i = 0; i < 10; ++i) {
-            int fx = x + rand.nextInt(16) + 8;
-            int fz = z + rand.nextInt(16) + 8;
-            BlockPos fpos = world.getHeight(new BlockPos(fx, 0, fz));
-            IBlockState state = world.getBlockState(fpos);
+            int fx = x + rand.nextInt(16);
+            int fz = z + rand.nextInt(16);
+            BlockPos surface = world.getHeight(new BlockPos(fx, 0, fz)).down();
+            IBlockState state = world.getBlockState(surface);
             if (state.getBlock() == grassBlock) {
-                world.setBlockState(fpos, taintFibres1, 2);
-            } else if (world.isAirBlock(fpos) && world.getBlockState(fpos.down()).getBlock() == grassBlock) {
+                world.setBlockState(surface.up(), taintFibres0, 2);
+            } else if (state.getBlock().isReplaceable(world, surface)
+                    && world.getBlockState(surface.down()).getBlock() == grassBlock) {
+                BlockPos fpos = surface;
                 world.setBlockState(fpos, taintFibres0, 2);
             }
         }
         // Force taint biome and place fibrous taint
         for (int i = 0; i < 8; ++i) {
-            int tx = x + rand.nextInt(16) + 8;
-            int tz = z + rand.nextInt(16) + 8;
+            int tx = x + rand.nextInt(16);
+            int tz = z + rand.nextInt(16);
             BlockPos tpos = world.getHeight(new BlockPos(tx, 0, tz));
-            IBlockState state = world.getBlockState(tpos);
-            if (state.getBlock() == grassBlock || state.getBlock() == Blocks.DIRT || state.getBlock() == Blocks.STONE) {
+            if (world.getBiome(tpos) != this) {
+                Utils.setBiomeAt(world, tx, tz, this);
+            }
+            if (world.isAirBlock(tpos) && BlockUtils.isAdjacentToSolidBlock(world, tpos)) {
                 world.setBlockState(tpos, ConfigBlocks.blockTaintFibres.getStateFromMeta(0), 2);
             }
         }

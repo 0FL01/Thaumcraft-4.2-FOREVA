@@ -1,6 +1,6 @@
 {
-  "parent": "block/cube_all",
+  "parent": "thaumcraft:block/cube_all_tinted",
   "textures": {
-    "all": "thaumcraft:blocks/taint_over_1"
+    "all": "thaumcraft:blocks/taint_soil"
   }
 }

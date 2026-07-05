@@ -208,6 +208,8 @@ import thaumcraft.client.lib.ItemAspectTooltipHandler;
 import thaumcraft.common.CommonProxy;
 import thaumcraft.common.blocks.BlockCandle;
 import thaumcraft.common.blocks.BlockMagicalLeaves;
+import thaumcraft.common.blocks.BlockTaint;
+import thaumcraft.common.blocks.BlockTaintFibres;
 import thaumcraft.common.config.ConfigBlocks;
 import thaumcraft.common.config.ConfigEntities;
 import thaumcraft.common.config.ConfigItems;
@@ -666,8 +668,9 @@ public class ClientProxy extends CommonProxy {
     }
 
     private void registerItemColorHandlers() {
+        Minecraft minecraft = Minecraft.getMinecraft();
+        final int taintGrassColor = 0x6D4189;
         if (ConfigBlocks.blockMagicalLeaves != null && ConfigBlocks.blockMagicalLeavesItem != null) {
-            Minecraft minecraft = Minecraft.getMinecraft();
             minecraft.getBlockColors().registerBlockColorHandler(
                     (state, world, pos, tintIndex) -> {
                         if (tintIndex != 0) {
@@ -693,6 +696,43 @@ public class ClientProxy extends CommonProxy {
                             : -1,
                     ConfigBlocks.blockMagicalLeavesItem
             );
+        }
+        if (ConfigBlocks.blockTaint != null) {
+            minecraft.getBlockColors().registerBlockColorHandler(
+                    (state, world, pos, tintIndex) -> {
+                        if (tintIndex != 0 || state.getValue(BlockTaint.TYPE) != 1) {
+                            return -1;
+                        }
+                        return world != null && pos != null
+                                ? BiomeColorHelper.getGrassColorAtPos(world, pos)
+                                : taintGrassColor;
+                    },
+                    ConfigBlocks.blockTaint
+            );
+            Item item = Item.getItemFromBlock(ConfigBlocks.blockTaint);
+            if (item != Items.AIR) {
+                minecraft.getItemColors().registerItemColorHandler(
+                        (stack, tintIndex) -> tintIndex == 0 && stack.getMetadata() == 1 ? taintGrassColor : -1,
+                        item
+                );
+            }
+        }
+        if (ConfigBlocks.blockTaintFibres != null) {
+            minecraft.getBlockColors().registerBlockColorHandler(
+                    (state, world, pos, tintIndex) -> tintIndex == 0
+                            ? (world != null && pos != null
+                                    ? BiomeColorHelper.getGrassColorAtPos(world, pos)
+                                    : taintGrassColor)
+                            : -1,
+                    ConfigBlocks.blockTaintFibres
+            );
+            Item item = Item.getItemFromBlock(ConfigBlocks.blockTaintFibres);
+            if (item != Items.AIR) {
+                minecraft.getItemColors().registerItemColorHandler(
+                        (stack, tintIndex) -> tintIndex == 0 ? taintGrassColor : -1,
+                        item
+                );
+            }
         }
         if (ConfigItems.itemResearchNotes != null) {
             Minecraft.getMinecraft().getItemColors().registerItemColorHandler(
