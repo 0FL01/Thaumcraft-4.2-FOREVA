@@ -387,6 +387,48 @@ public class ClientProxy extends CommonProxy {
                 }
                 continue;
             }
+            if (item == ConfigItems.itemRingRunic) {
+                ModelResourceLocation lesserModel = new ModelResourceLocation(
+                        new ResourceLocation("thaumcraft", "itemringrunic_lesser"), "inventory");
+                ModelResourceLocation normalModel = new ModelResourceLocation(
+                        new ResourceLocation("thaumcraft", "itemringrunic"), "inventory");
+                ModelResourceLocation chargedModel = new ModelResourceLocation(
+                        new ResourceLocation("thaumcraft", "itemringrunic_charged"), "inventory");
+                ModelResourceLocation regenModel = new ModelResourceLocation(
+                        new ResourceLocation("thaumcraft", "itemringrunic_regen"), "inventory");
+                ModelLoader.setCustomModelResourceLocation(item, 0, lesserModel);
+                ModelLoader.setCustomModelResourceLocation(item, 1, normalModel);
+                ModelLoader.setCustomModelResourceLocation(item, 2, chargedModel);
+                ModelLoader.setCustomModelResourceLocation(item, 3, regenModel);
+                for (int meta = 4; meta < 64; meta++) {
+                    ModelLoader.setCustomModelResourceLocation(item, meta, normalModel);
+                }
+                continue;
+            }
+            if (item == ConfigItems.itemAmuletRunic) {
+                ModelResourceLocation normalModel = new ModelResourceLocation(
+                        new ResourceLocation("thaumcraft", "itemamuletrunic"), "inventory");
+                ModelResourceLocation emergencyModel = new ModelResourceLocation(
+                        new ResourceLocation("thaumcraft", "itemamuletrunic_emergency"), "inventory");
+                ModelLoader.setCustomModelResourceLocation(item, 0, normalModel);
+                ModelLoader.setCustomModelResourceLocation(item, 1, emergencyModel);
+                for (int meta = 2; meta < 64; meta++) {
+                    ModelLoader.setCustomModelResourceLocation(item, meta, normalModel);
+                }
+                continue;
+            }
+            if (item == ConfigItems.itemGirdleRunic) {
+                ModelResourceLocation normalModel = new ModelResourceLocation(
+                        new ResourceLocation("thaumcraft", "itemgirdlerunic"), "inventory");
+                ModelResourceLocation kineticModel = new ModelResourceLocation(
+                        new ResourceLocation("thaumcraft", "itemgirdlerunic_kinetic"), "inventory");
+                ModelLoader.setCustomModelResourceLocation(item, 0, normalModel);
+                ModelLoader.setCustomModelResourceLocation(item, 1, kineticModel);
+                for (int meta = 2; meta < 64; meta++) {
+                    ModelLoader.setCustomModelResourceLocation(item, meta, normalModel);
+                }
+                continue;
+            }
             if (item == ConfigItems.itemNugget) {
                 String[] nuggetModels = {
                     "itemnugget_nuggetiron", "itemnugget_nuggetcopper", "itemnugget_nuggettin", "itemnugget_nuggetsilver", "itemnugget_nuggetlead",
