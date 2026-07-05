@@ -9,6 +9,7 @@ import net.minecraft.util.ActionResult;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.SoundCategory;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import thaumcraft.api.IScribeTools;
 import thaumcraft.common.entities.projectile.EntityBottleTaint;
@@ -29,6 +30,11 @@ public class ItemBottleTaint extends Item implements IScribeTools {
         world.playSound(null, player.posX, player.posY, player.posZ, SoundEvents.ENTITY_ARROW_SHOOT, SoundCategory.PLAYERS, 0.5F, 0.4F / (world.rand.nextFloat() * 0.4F + 0.8F));
         if (!world.isRemote) {
             EntityBottleTaint bottle = new EntityBottleTaint(world, player);
+            Vec3d look = player.getLookVec();
+            bottle.setPosition(
+                player.posX + look.x * 0.4D,
+                player.posY + player.getEyeHeight() - 0.1D + look.y * 0.4D,
+                player.posZ + look.z * 0.4D);
             bottle.shoot(player, player.rotationPitch, player.rotationYaw, -20.0F, 0.5F, 1.0F);
             world.spawnEntity(bottle);
             if (!player.capabilities.isCreativeMode) {

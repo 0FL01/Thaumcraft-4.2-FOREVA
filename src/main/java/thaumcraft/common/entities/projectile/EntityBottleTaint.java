@@ -16,6 +16,8 @@ import thaumcraft.common.lib.utils.Utils;
 import thaumcraft.common.lib.world.ThaumcraftWorldGenerator;
 
 public class EntityBottleTaint extends EntityThrowable {
+    private static final int THROWER_IMPACT_GRACE_TICKS = 10;
+
     public EntityBottleTaint(World world) { super(world); }
     public EntityBottleTaint(World world, EntityLivingBase shooter) { super(world, shooter); }
 
@@ -25,6 +27,11 @@ public class EntityBottleTaint extends EntityThrowable {
     @Override
     protected void onImpact(RayTraceResult result) {
         if (result == null) return;
+        if (this.ticksExisted <= THROWER_IMPACT_GRACE_TICKS
+            && result.entityHit != null
+            && result.entityHit == this.getThrower()) {
+            return;
+        }
         if (!this.world.isRemote) {
             // Taint poison to all nearby living entities (5-block radius)
             List<EntityLivingBase> ents = this.world.getEntitiesWithinAABB(EntityLivingBase.class,
