@@ -26,32 +26,24 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Cache Docker layers
-        uses: actions/cache@v4
-        with:
-          path: /tmp/.buildx-cache
-          key: docker-buildx-${{ hashFiles('Dockerfile') }}
-          restore-keys: |
-            docker-buildx-
-
       - name: Build Docker image
         uses: docker/build-push-action@v5
         with:
           context: .
           load: true
           tags: thaumcraft-dev
-          cache-from: type=local,src=/tmp/.buildx-cache
-          cache-to: type=local,dest=/tmp/.buildx-cache,mode=max
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
 
       - name: Restore Gradle cache
         uses: actions/cache@v4
         with:
           path: .gradle_home
-          key: gradle-${{ hashFiles('build.gradle', 'gradle/wrapper/gradle-wrapper.properties') }}
+          key: gradle-${{ hashFiles('build.gradle', 'gradle.properties', 'gradle/wrapper/gradle-wrapper.properties') }}
           restore-keys: |
             gradle-
 
-      - name: Run tests (non-client)
+      - name: Build and test universal JAR
         run: |
           docker run --rm \
             -v "$PWD:/workspace/thaumcraft" \
@@ -59,17 +51,7 @@ jobs:
             --user "$(id -u):$(id -g)" \
             --entrypoint ./gradlew \
             thaumcraft-dev \
-            clean test --console=plain -Pci=true
-
-      - name: Build universal JAR
-        run: |
-          docker run --rm \
-            -v "$PWD:/workspace/thaumcraft" \
-            -e GRADLE_USER_HOME=/workspace/thaumcraft/.gradle_home \
-            --user "$(id -u):$(id -g)" \
-            --entrypoint ./gradlew \
-            thaumcraft-dev \
-            clean jar reobfJar --console=plain -Pci=true
+            clean test jar reobfJar --console=plain -Pci=true
 
       - name: Verify universal JAR reobfuscation
         run: ./scripts/dev.sh check-jar build/libs/Thaumcraft-1.0.0-universal.jar

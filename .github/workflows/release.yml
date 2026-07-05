@@ -38,28 +38,20 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Cache Docker layers
-        uses: actions/cache@v4
-        with:
-          path: /tmp/.buildx-cache
-          key: docker-buildx-${{ hashFiles('Dockerfile') }}
-          restore-keys: |
-            docker-buildx-
-
       - name: Build Docker image
         uses: docker/build-push-action@v5
         with:
           context: .
           load: true
           tags: thaumcraft-dev
-          cache-from: type=local,src=/tmp/.buildx-cache
-          cache-to: type=local,dest=/tmp/.buildx-cache,mode=max
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
 
       - name: Restore Gradle cache
         uses: actions/cache@v4
         with:
           path: .gradle_home
-          key: gradle-${{ hashFiles('build.gradle', 'gradle/wrapper/gradle-wrapper.properties') }}
+          key: gradle-${{ hashFiles('build.gradle', 'gradle.properties', 'gradle/wrapper/gradle-wrapper.properties') }}
           restore-keys: |
             gradle-
 
