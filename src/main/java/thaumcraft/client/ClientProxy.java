@@ -871,6 +871,7 @@ public class ClientProxy extends CommonProxy {
         registerBuiltinItemModel(eldritchItem, 3, "blockeldritch_tesr");
         registerBuiltinItemModel(eldritchItem, 8, "blockeldritch_tesr");
         registerBuiltinItemModel(eldritchItem, 9, "blockeldritch_tesr");
+        registerBuiltinItemModel(Item.getItemFromBlock(ConfigBlocks.blockEldritchPortal), 0, "blockportaleldritch");
         Item stoneDeviceItem = Item.getItemFromBlock(ConfigBlocks.blockStoneDevice);
         for (int meta = 0; meta <= 14; meta++) {
             registerBlockItemModel(stoneDeviceItem, meta, "type=" + meta);
