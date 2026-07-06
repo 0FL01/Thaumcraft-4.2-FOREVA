@@ -14,7 +14,7 @@ public class Aspect {
     private String chatcolor;
     ResourceLocation image;
     int blend;
-    public static LinkedHashMap<String, Aspect> aspects = new LinkedHashMap();
+    public static LinkedHashMap<String, Aspect> aspects = new AspectRegistryMap();
     public static final Aspect AIR = new Aspect("aer", 0xFFFF7E, "e", 1);
     public static final Aspect EARTH = new Aspect("terra", 5685248, "2", 1);
     public static final Aspect FIRE = new Aspect("ignis", 16734721, "c", 1);
@@ -41,10 +41,6 @@ public class Aspect {
     public static final Aspect ELDRITCH = new Aspect("alienis", 0x805080, new Aspect[]{VOID, DARKNESS});
     public static final Aspect MAGIC = new Aspect("praecantatio", 9896128, new Aspect[]{VOID, ENERGY});
     public static final Aspect AURA = new Aspect("auram", 0xFFC0FF, new Aspect[]{MAGIC, AIR});
-    // TC6 compatibility: 1.12 addons reference these newer aspect constants
-    // directly. Keep the TC4 aspects, but expose the TC6 names so optional
-    // Thaumcraft bridges do not fail with NoSuchFieldError.
-    public static final Aspect ALCHEMY = new Aspect("alkimia", 2337949, new Aspect[]{MAGIC, WATER});
     public static final Aspect TAINT = new Aspect("vitium", 0x800080, new Aspect[]{MAGIC, ENTROPY});
     public static final Aspect FLUX = TAINT;
     public static final Aspect SLIME = new Aspect("limus", 129024, new Aspect[]{LIFE, WATER});
@@ -55,9 +51,6 @@ public class Aspect {
     public static final Aspect UNDEAD = new Aspect("exanimis", 3817472, new Aspect[]{MOTION, DEATH});
     public static final Aspect MIND = new Aspect("cognitio", 16761523, new Aspect[]{FIRE, SOUL});
     public static final Aspect SENSES = new Aspect("sensus", 1038847, new Aspect[]{AIR, SOUL});
-    public static final Aspect AVERSION = new Aspect("aversio", 12603472, new Aspect[]{SOUL, ENTROPY});
-    public static final Aspect PROTECT = new Aspect("praemunio", 49344, new Aspect[]{SOUL, EARTH});
-    public static final Aspect DESIRE = new Aspect("desiderium", 15121988, new Aspect[]{SOUL, VOID});
     public static final Aspect MAN = new Aspect("humanus", 16766912, new Aspect[]{BEAST, MIND});
     public static final Aspect CROP = new Aspect("messis", 14791537, new Aspect[]{PLANT, MAN});
     public static final Aspect MINE = new Aspect("perfodio", 14471896, new Aspect[]{MAN, EARTH});
@@ -71,6 +64,18 @@ public class Aspect {
     public static final Aspect CLOTH = new Aspect("pannus", 15395522, new Aspect[]{TOOL, BEAST});
     public static final Aspect MECHANISM = new Aspect("machina", 0x8080A0, new Aspect[]{MOTION, TOOL});
     public static final Aspect TRAP = new Aspect("vinculum", 10125440, new Aspect[]{MOTION, ENTROPY});
+
+    // TC6 compatibility: 1.12 addons may link these newer aspect constants
+    // directly. Keep the gameplay registry strictly TC4.2, but expose TC6
+    // names as aliases so optional bridges do not fail with NoSuchFieldError.
+    @Deprecated
+    public static final Aspect ALCHEMY = MAGIC;
+    @Deprecated
+    public static final Aspect AVERSION = WEAPON;
+    @Deprecated
+    public static final Aspect PROTECT = ARMOR;
+    @Deprecated
+    public static final Aspect DESIRE = GREED;
 
     public Aspect(String tag, int color, Aspect[] components, ResourceLocation image, int blend) {
         if (aspects.containsKey(tag)) {
@@ -138,7 +143,39 @@ public class Aspect {
     }
 
     public static Aspect getAspect(String tag) {
-        return aspects.get(tag);
+        Aspect aspect = aspects.get(tag);
+        return aspect != null ? aspect : getLegacyAspect(tag);
+    }
+
+    private static Aspect getLegacyAspect(Object tag) {
+        if (!(tag instanceof String)) {
+            return null;
+        }
+        switch ((String) tag) {
+            case "alkimia":
+                return MAGIC;
+            case "aversio":
+                return WEAPON;
+            case "praemunio":
+                return ARMOR;
+            case "desiderium":
+                return GREED;
+            default:
+                return null;
+        }
+    }
+
+    private static final class AspectRegistryMap extends LinkedHashMap<String, Aspect> {
+        @Override
+        public Aspect get(Object key) {
+            Aspect aspect = super.get(key);
+            return aspect != null ? aspect : getLegacyAspect(key);
+        }
+
+        @Override
+        public boolean containsKey(Object key) {
+            return super.containsKey(key) || getLegacyAspect(key) != null;
+        }
     }
 
     public int getBlend() {

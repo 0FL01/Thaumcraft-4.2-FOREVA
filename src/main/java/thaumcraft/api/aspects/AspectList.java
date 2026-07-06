@@ -113,10 +113,16 @@ implements Serializable {
     }
 
     public int getAmount(Aspect key) {
+        if (key == null) {
+            return 0;
+        }
         return this.aspects.get(key) == null ? 0 : this.aspects.get(key);
     }
 
     public boolean reduce(Aspect key, int amount) {
+        if (key == null) {
+            return false;
+        }
         if (this.getAmount(key) >= amount) {
             int am = this.getAmount(key) - amount;
             this.aspects.put(key, am);
@@ -126,6 +132,9 @@ implements Serializable {
     }
 
     public AspectList remove(Aspect key, int amount) {
+        if (key == null) {
+            return this;
+        }
         int am = this.getAmount(key) - amount;
         if (am <= 0) {
             this.aspects.remove(key);
@@ -136,11 +145,17 @@ implements Serializable {
     }
 
     public AspectList remove(Aspect key) {
+        if (key == null) {
+            return this;
+        }
         this.aspects.remove(key);
         return this;
     }
 
     public AspectList add(Aspect aspect, int amount) {
+        if (aspect == null) {
+            return this;
+        }
         if (this.aspects.containsKey(aspect)) {
             int oldamount = this.aspects.get(aspect);
             amount += oldamount;
@@ -150,6 +165,9 @@ implements Serializable {
     }
 
     public AspectList merge(Aspect aspect, int amount) {
+        if (aspect == null) {
+            return this;
+        }
         int oldamount;
         if (this.aspects.containsKey(aspect) && amount < (oldamount = this.aspects.get(aspect).intValue())) {
             amount = oldamount;
@@ -216,4 +234,3 @@ implements Serializable {
         }
     }
 }
-

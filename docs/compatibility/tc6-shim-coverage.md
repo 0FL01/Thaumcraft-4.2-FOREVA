@@ -10,7 +10,7 @@ contract shims guarded by unit tests and smoke modsets.
 | Addon / scenario | Covered TC6 surface | Regression guard | Smoke modset |
 | --- | --- | --- | --- |
 | EnderIO | Forge-visible `6.1.BETA26` version, `thaumcraft.api.items` aliases, `IInfusionStabiliser` `BlockPos` overload | `EnderIoThaumcraftSixApiShimStaticGuardTest`, `ThaumcraftAdvertisedVersionStaticGuardTest` | `scripts/smoke-modsets/enderio.txt` |
-| Fossils and Archeology | `AspectRegistryEvent`, `AspectEventProxy`, TC6 aspect constants, `ThaumcraftApi.registerSeed(Block, ItemStack)`, crop block registration | `FossilsThaumcraftSixApiShimStaticGuardTest` | `scripts/smoke-modsets/fossils.txt` |
+| Fossils and Archeology | `AspectRegistryEvent`, `AspectEventProxy`, TC6 aspect constants as TC4 aliases with legacy tag lookup, `ThaumcraftApi.registerSeed(Block, ItemStack)`, crop block registration | `FossilsThaumcraftSixApiShimStaticGuardTest`, `AspectTc42CompatibilityTest` | `scripts/smoke-modsets/fossils.txt` |
 | Magic Bees + Forestry | `BlocksTC`, `ItemsTC`, aura facades, `SoundsTC`, research-location registration, taint/cult/tainted package aliases | `MagicBeesThaumcraftSixApiShimStaticGuardTest` | `scripts/smoke-modsets/magicbees.txt` |
 | Astral Sorcery | No local evidence yet; keep as pending RECON before adding dependencies or shims | none | none |
 
