@@ -1,0 +1,5 @@
+# Minimal Magic Bees + Forestry compatibility smoke from GitHub issue #5.
+# Format: jar | sha256 | source/note
+# Baubles is intentionally omitted: it is already on the Gradle classpath in dev smoke runs.
+forestry_1.12.2-5.8.2.424.jar | fce6af7931dc054afc33fc79db7e3e4d81477591fe7bbd563cd1a5b2699342d4 | https://edge.forgecdn.net/files/5903/382/forestry_1.12.2-5.8.2.424.jar
+MagicBees-1.12.2-3.2.25.jar | 2c780e8e7b22a374c069e3a20674fac9382fe0ef1100555197ff23eb9ab12d9e | https://edge.forgecdn.net/files/2855/061/MagicBees-1.12.2-3.2.25.jar

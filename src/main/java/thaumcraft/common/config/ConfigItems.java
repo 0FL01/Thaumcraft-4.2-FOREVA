@@ -7,6 +7,7 @@ import net.minecraft.item.ItemArmor.ArmorMaterial;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.common.util.EnumHelper;
 import net.minecraftforge.oredict.OreDictionary;
+import thaumcraft.api.items.ItemsTC;
 import thaumcraft.common.entities.golems.ItemGolemBell;
 import thaumcraft.common.entities.golems.ItemGolemCore;
 import thaumcraft.common.entities.golems.ItemGolemDecoration;
@@ -19,7 +20,6 @@ import thaumcraft.common.items.ItemBottleTaint;
 import thaumcraft.common.items.ItemBucketDeath;
 import thaumcraft.common.items.ItemBucketPure;
 import thaumcraft.common.items.ItemCompassStone;
-import thaumcraft.common.items.ItemCrystalEssence;
 import thaumcraft.common.items.ItemEldritchObject;
 import thaumcraft.common.items.ItemEssence;
 import thaumcraft.common.items.ItemInkwell;
@@ -39,6 +39,7 @@ import thaumcraft.common.items.armor.*;
 import thaumcraft.common.items.baubles.*;
 import thaumcraft.common.items.equipment.*;
 import thaumcraft.common.items.relics.*;
+import thaumcraft.common.items.resources.ItemCrystalEssence;
 import thaumcraft.common.items.wands.ItemFocusPouch;
 import thaumcraft.common.items.wands.ItemFocusPouchBauble;
 import thaumcraft.common.items.wands.ItemWandCap;
@@ -870,6 +871,7 @@ public class ConfigItems {
                 .setCreativeTab(tab);
         allItems.add(itemGolemDecoration);
 
+        ItemsTC.init();
         registerOreDictionary();
     }
 

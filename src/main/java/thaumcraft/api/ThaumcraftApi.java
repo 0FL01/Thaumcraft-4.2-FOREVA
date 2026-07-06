@@ -11,6 +11,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemArmor;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundEvent;
 import net.minecraftforge.common.util.EnumHelper;
 import net.minecraftforge.oredict.OreDictionary;
@@ -57,6 +58,7 @@ public class ThaumcraftApi {
     public static ConcurrentHashMap<List, int[]> groupedObjectTags;
     private static HashMap<Object, Integer> warpMap;
     private static HashMap<String, ItemStack> seedList;
+    public static ArrayList<ResourceLocation> researchLocations;
 
     public static void registerScanEventhandler(IScanEventHandler scanEventHandler) {
         scanEventhandlers.add(scanEventHandler);
@@ -348,6 +350,12 @@ public class ThaumcraftApi {
         return seedList.get(crop.getTranslationKey());
     }
 
+    public static void registerResearchLocation(ResourceLocation location) {
+        if (location != null && !researchLocations.contains(location)) {
+            researchLocations.add(location);
+        }
+    }
+
     static {
         portableHoleBlackList = new ArrayList();
         internalMethods = new DummyInternalMethodHandler();
@@ -360,6 +368,7 @@ public class ThaumcraftApi {
         groupedObjectTags = new ConcurrentHashMap();
         warpMap = new HashMap();
         seedList = new HashMap();
+        researchLocations = new ArrayList();
     }
 
     public static class EntityTags {
