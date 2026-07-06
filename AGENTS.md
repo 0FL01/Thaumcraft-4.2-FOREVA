@@ -153,7 +153,7 @@ For issues caused by another mod loading with Thaumcraft, use a targeted modset 
 - Record each reusable modset under `scripts/smoke-modsets/<name>.txt` with jar name, sha256, and source URL/note.
 - Prepare and run the targeted smoke with `./scripts/dev.sh smoke-modset <name>`.
 - If Baubles is already on the Gradle classpath, do not also copy a Baubles jar into `run/mods`; duplicate mod ids cause false smoke failures.
-- For Thaumcraft 6 addon API gaps, inspect `Thaumcraft-1.12.2-6.1.BETA26.jar` as the donor reference, add the smallest compatible shim, and leave a code comment explaining which addon/API expectation requires it.
+- For Thaumcraft 6 addon API gaps, inspect `Thaumcraft-1.12.2-6.1.BETA26.jar` as the donor reference, add the smallest compatible shim, and update `docs/compatibility/tc6-shim-coverage.md`.
+- Keep production shim comments generic to the TC6 contract; keep addon-specific evidence in guard tests, smoke manifests, and the coverage doc.
 - Add a static guard test for every compatibility shim class, method, field, or lifecycle event that prevented the crash.
 - Final validation for a compatibility fix is: `./scripts/dev.sh validate`, `./scripts/dev.sh smoke-modset <name>`, then `./scripts/dev.sh build`.
-
