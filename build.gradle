@@ -18,6 +18,7 @@ buildscript {
 apply plugin: 'net.minecraftforge.gradle.forge'
 
 version = "1.0.0"
+ext.advertisedModVersion = "6.1.BETA26"
 group = "thaumcraft"
 archivesBaseName = "Thaumcraft"
 
@@ -28,7 +29,7 @@ minecraft {
     runDir = "run"
     mappings = "stable_39"
 
-    replace '@VERSION@', project.version
+    replace '@VERSION@', project.ext.advertisedModVersion
     replaceIn 'Thaumcraft.java'
 }
 
@@ -45,9 +46,11 @@ dependencies {
 }
 
 processResources {
+    inputs.property 'advertisedModVersion', project.ext.advertisedModVersion
+
     from(sourceSets.main.resources.srcDirs) {
         include 'mcmod.info'
-        expand version: version
+        expand version: project.ext.advertisedModVersion
     }
 
     from(sourceSets.main.resources.srcDirs) {
