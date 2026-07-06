@@ -106,6 +106,8 @@ public class DeviceTesrRoutingContractTest {
                         && woodenBannerTesrModel.contains("\"parent\": \"builtin/entity\"")
                         && woodenBannerTesrModel.contains("\"display\"")
                         && woodenBannerTesrModel.contains("\"gui\"")
+                        && woodenBannerTesrModel.contains("\"translation\": [0, 0, 0]")
+                        && woodenBannerTesrModel.contains("\"scale\": [0.48, 0.48, 0.48]")
                         && woodenBannerTesrModel.contains("\"firstperson_righthand\"")
                         && metalTesrModel.contains("\"parent\": \"builtin/entity\""));
 
