@@ -41,7 +41,12 @@ public class Aspect {
     public static final Aspect ELDRITCH = new Aspect("alienis", 0x805080, new Aspect[]{VOID, DARKNESS});
     public static final Aspect MAGIC = new Aspect("praecantatio", 9896128, new Aspect[]{VOID, ENERGY});
     public static final Aspect AURA = new Aspect("auram", 0xFFC0FF, new Aspect[]{MAGIC, AIR});
+    // TC6 compatibility: Fossils and other 1.12 addons reference these newer
+    // aspect constants directly. Keep the TC4 aspects, but expose the TC6 names
+    // so their optional Thaumcraft bridges do not fail with NoSuchFieldError.
+    public static final Aspect ALCHEMY = new Aspect("alkimia", 2337949, new Aspect[]{MAGIC, WATER});
     public static final Aspect TAINT = new Aspect("vitium", 0x800080, new Aspect[]{MAGIC, ENTROPY});
+    public static final Aspect FLUX = TAINT;
     public static final Aspect SLIME = new Aspect("limus", 129024, new Aspect[]{LIFE, WATER});
     public static final Aspect PLANT = new Aspect("herba", 109568, new Aspect[]{LIFE, EARTH});
     public static final Aspect TREE = new Aspect("arbor", 8873265, new Aspect[]{AIR, PLANT});
@@ -50,6 +55,9 @@ public class Aspect {
     public static final Aspect UNDEAD = new Aspect("exanimis", 3817472, new Aspect[]{MOTION, DEATH});
     public static final Aspect MIND = new Aspect("cognitio", 16761523, new Aspect[]{FIRE, SOUL});
     public static final Aspect SENSES = new Aspect("sensus", 1038847, new Aspect[]{AIR, SOUL});
+    public static final Aspect AVERSION = new Aspect("aversio", 12603472, new Aspect[]{SOUL, ENTROPY});
+    public static final Aspect PROTECT = new Aspect("praemunio", 49344, new Aspect[]{SOUL, EARTH});
+    public static final Aspect DESIRE = new Aspect("desiderium", 15121988, new Aspect[]{SOUL, VOID});
     public static final Aspect MAN = new Aspect("humanus", 16766912, new Aspect[]{BEAST, MIND});
     public static final Aspect CROP = new Aspect("messis", 14791537, new Aspect[]{PLANT, MAN});
     public static final Aspect MINE = new Aspect("perfodio", 14471896, new Aspect[]{MAN, EARTH});

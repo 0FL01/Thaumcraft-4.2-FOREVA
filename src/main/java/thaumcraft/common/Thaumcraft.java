@@ -32,6 +32,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import thaumcraft.api.ThaumcraftApi;
 import thaumcraft.api.aspects.Aspect;
+import thaumcraft.api.aspects.AspectEventProxy;
+import thaumcraft.api.aspects.AspectRegistryEvent;
 import thaumcraft.api.wands.StaffRod;
 import thaumcraft.api.wands.WandCap;
 import thaumcraft.api.wands.WandRod;
@@ -198,8 +200,19 @@ public class Thaumcraft {
         initWandComponents();
         ConfigRecipes.init();
         ConfigAspects.init();
+        postAspectRegistryEvent();
         ConfigResearch.init();
         ConfigEntities.initEntitySpawns();
+    }
+
+    private void postAspectRegistryEvent() {
+        // TC6 addons such as Fossils register AspectRegistryEvent subscribers in
+        // preInit and expect Thaumcraft to fire this after built-in aspect tags
+        // are ready. Posting it here mirrors TC6 and lets those addons add
+        // object/entity tags without a hard dependency on our TC4 internals.
+        AspectRegistryEvent aspectRegistryEvent = new AspectRegistryEvent();
+        aspectRegistryEvent.register = new AspectEventProxy();
+        MinecraftForge.EVENT_BUS.post(aspectRegistryEvent);
     }
 
     @Mod.EventHandler

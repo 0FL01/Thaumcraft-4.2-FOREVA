@@ -18,6 +18,10 @@ public class CropUtils {
 
     public static void addStandardCrop(ItemStack seed, int maxMeta) {
         Block block = Block.getBlockFromItem(seed.getItem());
+        addStandardCrop(block, maxMeta);
+    }
+
+    public static void addStandardCrop(Block block, int maxMeta) {
         if (block == null) return;
         if (maxMeta == Short.MAX_VALUE) {
             for (int a = 0; a < 16; a++) standardCrops.add(block.getTranslationKey() + a);

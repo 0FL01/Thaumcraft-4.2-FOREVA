@@ -30,6 +30,7 @@ import thaumcraft.api.research.ResearchCategories;
 import thaumcraft.api.research.ResearchCategoryList;
 import thaumcraft.api.research.ResearchItem;
 import thaumcraft.api.research.ResearchPage;
+import thaumcraft.common.lib.utils.CropUtils;
 
 public class ThaumcraftApi {
     public static Item.ToolMaterial toolMatThaumium = EnumHelper.addToolMaterial((String)"THAUMIUM", (int)3, (int)400, (float)7.0f, (float)2.0f, (int)22);
@@ -55,6 +56,7 @@ public class ThaumcraftApi {
     public static ConcurrentHashMap<List, AspectList> objectTags;
     public static ConcurrentHashMap<List, int[]> groupedObjectTags;
     private static HashMap<Object, Integer> warpMap;
+    private static HashMap<String, ItemStack> seedList;
 
     public static void registerScanEventhandler(IScanEventHandler scanEventHandler) {
         scanEventhandlers.add(scanEventHandler);
@@ -254,6 +256,17 @@ public class ThaumcraftApi {
         }
     }
 
+    public static void registerComplexObjectTag(String oreDict, AspectList aspects) {
+        if (aspects == null) {
+            aspects = new AspectList();
+        }
+        for (ItemStack ore : OreDictionary.getOres(oreDict)) {
+            try {
+                ThaumcraftApi.registerComplexObjectTag(ore, aspects.copy());
+            } catch (Exception e) {}
+        }
+    }
+
     public static void registerComplexObjectTag(ItemStack item, AspectList aspects) {
         if (!ThaumcraftApi.exists(item.getItem(), item.getMetadata())) {
             AspectList tmp = ThaumcraftApiHelper.generateTags(item.getItem(), item.getMetadata());
@@ -315,6 +328,26 @@ public class ThaumcraftApi {
         }
     }
 
+    public static void registerSeed(Block crop, ItemStack seed) {
+        if (crop == null || seed == null) {
+            return;
+        }
+
+        // TC6 addons such as Fossils call registerSeed(cropBlock, seedStack).
+        // Store the TC6 seed lookup and also register the crop block with this
+        // port's growth-lamp crop registry, which originally only accepted a
+        // seed ItemStack and inferred the block from it.
+        seedList.put(crop.getTranslationKey(), seed);
+        CropUtils.addStandardCrop(crop, Short.MAX_VALUE);
+    }
+
+    public static ItemStack getSeed(Block crop) {
+        if (crop == null) {
+            return null;
+        }
+        return seedList.get(crop.getTranslationKey());
+    }
+
     static {
         portableHoleBlackList = new ArrayList();
         internalMethods = new DummyInternalMethodHandler();
@@ -326,6 +359,7 @@ public class ThaumcraftApi {
         objectTags = new ConcurrentHashMap();
         groupedObjectTags = new ConcurrentHashMap();
         warpMap = new HashMap();
+        seedList = new HashMap();
     }
 
     public static class EntityTags {
