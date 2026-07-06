@@ -1,6 +1,7 @@
 package thaumcraft.client.renderers.item;
 
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.renderer.block.model.ItemCameraTransforms;
 import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
 import net.minecraft.client.renderer.tileentity.TileEntityItemStackRenderer;
 import net.minecraft.item.ItemStack;
@@ -18,6 +19,9 @@ import thaumcraft.common.tiles.TileBellows;
 
 public class ItemWoodenDeviceRenderer extends TileEntityItemStackRenderer {
 
+    private static final ThreadLocal<ItemCameraTransforms.TransformType> CURRENT_TRANSFORM =
+            ThreadLocal.withInitial(() -> ItemCameraTransforms.TransformType.NONE);
+
     private final TileBellowsRenderer bellowsRenderer = new TileBellowsRenderer();
     private final TileArcaneBoreBaseRenderer boreBaseRenderer = new TileArcaneBoreBaseRenderer();
     private final TileArcaneBoreRenderer boreRenderer = new TileArcaneBoreRenderer();
@@ -30,52 +34,71 @@ public class ItemWoodenDeviceRenderer extends TileEntityItemStackRenderer {
         bannerRenderer.setRendererDispatcher(TileEntityRendererDispatcher.instance);
     }
 
+    public static void setTransformType(ItemCameraTransforms.TransformType transformType) {
+        CURRENT_TRANSFORM.set(transformType == null ? ItemCameraTransforms.TransformType.NONE : transformType);
+    }
+
     @Override
     public void renderByItem(ItemStack stack, float partialTicks) {
-        if (stack == null || stack.isEmpty()) {
-            return;
+        ItemCameraTransforms.TransformType transformType = CURRENT_TRANSFORM.get();
+        try {
+            if (stack == null || stack.isEmpty()) {
+                return;
+            }
+            int meta = stack.getMetadata();
+            if (meta == 0) {
+                TileBellows bellows = new TileBellows();
+                GlStateManager.pushMatrix();
+                GlStateManager.rotate(90.0F, 0.0F, 1.0F, 0.0F);
+                GlStateManager.translate(-0.5F, -0.5F, -0.5F);
+                bellowsRenderer.render(bellows, 0.0D, 0.0D, 0.0D, partialTicks, 0, 1.0F);
+                GlStateManager.popMatrix();
+                return;
+            }
+            if (meta == 4) {
+                TileArcaneBoreBase boreBase = new TileArcaneBoreBase();
+                boreBase.orientation = EnumFacing.NORTH;
+                GlStateManager.pushMatrix();
+                GlStateManager.rotate(180.0F, 0.0F, 1.0F, 0.0F);
+                GlStateManager.translate(-0.5F, -0.5F, -0.5F);
+                boreBaseRenderer.render(boreBase, 0.0D, 0.0D, 0.0D, partialTicks, 0, 1.0F);
+                GlStateManager.popMatrix();
+                return;
+            }
+            if (meta == 5) {
+                TileArcaneBore bore = new TileArcaneBore();
+                bore.orientation = EnumFacing.NORTH;
+                bore.baseOrientation = EnumFacing.DOWN;
+                GlStateManager.pushMatrix();
+                GlStateManager.rotate(180.0F, 0.0F, 1.0F, 0.0F);
+                GlStateManager.translate(-0.5F, -0.75F, -0.5F);
+                boreRenderer.render(bore, 0.0D, 0.0D, 0.0D, partialTicks, 0, 1.0F);
+                GlStateManager.popMatrix();
+                return;
+            }
+            if (meta == 8) {
+                TileBanner banner = new TileBanner();
+                banner.setFacing((byte) 8);
+                applyBannerData(stack, banner);
+                GlStateManager.pushMatrix();
+                if (isHandTransform(transformType)) {
+                    GlStateManager.translate(1.0F, 1.0F, 1.0F);
+                }
+                GlStateManager.rotate(180.0F, 0.0F, 1.0F, 0.0F);
+                GlStateManager.translate(-0.5F, -1.0F, -0.5F);
+                bannerRenderer.render(banner, 0.0D, 0.0D, 0.0D, partialTicks, 0, 1.0F);
+                GlStateManager.popMatrix();
+            }
+        } finally {
+            setTransformType(ItemCameraTransforms.TransformType.NONE);
         }
-        int meta = stack.getMetadata();
-        if (meta == 0) {
-            TileBellows bellows = new TileBellows();
-            GlStateManager.pushMatrix();
-            GlStateManager.rotate(90.0F, 0.0F, 1.0F, 0.0F);
-            GlStateManager.translate(-0.5F, -0.5F, -0.5F);
-            bellowsRenderer.render(bellows, 0.0D, 0.0D, 0.0D, partialTicks, 0, 1.0F);
-            GlStateManager.popMatrix();
-            return;
-        }
-        if (meta == 4) {
-            TileArcaneBoreBase boreBase = new TileArcaneBoreBase();
-            boreBase.orientation = EnumFacing.NORTH;
-            GlStateManager.pushMatrix();
-            GlStateManager.rotate(180.0F, 0.0F, 1.0F, 0.0F);
-            GlStateManager.translate(-0.5F, -0.5F, -0.5F);
-            boreBaseRenderer.render(boreBase, 0.0D, 0.0D, 0.0D, partialTicks, 0, 1.0F);
-            GlStateManager.popMatrix();
-            return;
-        }
-        if (meta == 5) {
-            TileArcaneBore bore = new TileArcaneBore();
-            bore.orientation = EnumFacing.NORTH;
-            bore.baseOrientation = EnumFacing.DOWN;
-            GlStateManager.pushMatrix();
-            GlStateManager.rotate(180.0F, 0.0F, 1.0F, 0.0F);
-            GlStateManager.translate(-0.5F, -0.75F, -0.5F);
-            boreRenderer.render(bore, 0.0D, 0.0D, 0.0D, partialTicks, 0, 1.0F);
-            GlStateManager.popMatrix();
-            return;
-        }
-        if (meta == 8) {
-            TileBanner banner = new TileBanner();
-            banner.setFacing((byte) 8);
-            applyBannerData(stack, banner);
-            GlStateManager.pushMatrix();
-            GlStateManager.rotate(180.0F, 0.0F, 1.0F, 0.0F);
-            GlStateManager.translate(-0.5F, -1.0F, -0.5F);
-            bannerRenderer.render(banner, 0.0D, 0.0D, 0.0D, partialTicks, 0, 1.0F);
-            GlStateManager.popMatrix();
-        }
+    }
+
+    private static boolean isHandTransform(ItemCameraTransforms.TransformType transformType) {
+        return transformType == ItemCameraTransforms.TransformType.FIRST_PERSON_LEFT_HAND
+                || transformType == ItemCameraTransforms.TransformType.FIRST_PERSON_RIGHT_HAND
+                || transformType == ItemCameraTransforms.TransformType.THIRD_PERSON_LEFT_HAND
+                || transformType == ItemCameraTransforms.TransformType.THIRD_PERSON_RIGHT_HAND;
     }
 
     private static void applyBannerData(ItemStack stack, TileBanner banner) {

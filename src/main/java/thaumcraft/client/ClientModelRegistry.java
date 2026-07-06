@@ -13,6 +13,7 @@ import thaumcraft.client.renderers.item.CrystalPerspectiveModel;
 import thaumcraft.client.renderers.item.ThaumometerPerspectiveModel;
 import thaumcraft.client.renderers.item.TrunkSpawnerPerspectiveModel;
 import thaumcraft.client.renderers.item.WandPerspectiveModel;
+import thaumcraft.client.renderers.item.WoodenDevicePerspectiveModel;
 import thaumcraft.common.Thaumcraft;
 
 @Mod.EventBusSubscriber(modid = Thaumcraft.MODID, value = Side.CLIENT)
@@ -26,6 +27,8 @@ public final class ClientModelRegistry {
             new ModelResourceLocation("thaumcraft:blockcrystal_tesr", "inventory");
     static final ModelResourceLocation WANDCASTING_MODEL =
             new ModelResourceLocation("thaumcraft:wandcasting_tesr", "inventory");
+    static final ModelResourceLocation BLOCKWOODENDEVICE_BANNER_MODEL =
+            new ModelResourceLocation("thaumcraft:blockwoodendevice_banner_tesr", "inventory");
     static final ResourceLocation FOCUS_PECH_DEPTH_SPRITE =
             new ResourceLocation("thaumcraft", "items/focus_pech_depth");
 
@@ -59,6 +62,10 @@ public final class ClientModelRegistry {
         model = event.getModelRegistry().getObject(WANDCASTING_MODEL);
         if (model != null) {
             event.getModelRegistry().putObject(WANDCASTING_MODEL, new WandPerspectiveModel(model));
+        }
+        model = event.getModelRegistry().getObject(BLOCKWOODENDEVICE_BANNER_MODEL);
+        if (model != null) {
+            event.getModelRegistry().putObject(BLOCKWOODENDEVICE_BANNER_MODEL, new WoodenDevicePerspectiveModel(model));
         }
     }
 }

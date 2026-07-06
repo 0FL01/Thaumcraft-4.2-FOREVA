@@ -18,9 +18,12 @@ public class DeviceTesrRoutingContractTest {
         String metalBlock = read("src/main/java/thaumcraft/common/blocks/BlockMetalDevice.java");
         String clientProxy = read("src/main/java/thaumcraft/client/ClientProxy.java");
         String woodenItemRenderer = read("src/main/java/thaumcraft/client/renderers/item/ItemWoodenDeviceRenderer.java");
+        String woodenPerspectiveModel = read("src/main/java/thaumcraft/client/renderers/item/WoodenDevicePerspectiveModel.java");
         String metalItemRenderer = read("src/main/java/thaumcraft/client/renderers/item/ItemMetalDeviceRenderer.java");
         String thaumatoriumRenderer = read("src/main/java/thaumcraft/client/renderers/tile/TileThaumatoriumRenderer.java");
+        String clientModelRegistry = read("src/main/java/thaumcraft/client/ClientModelRegistry.java");
         String woodenTesrModel = read("src/main/resources/assets/thaumcraft/models/item/blockwoodendevice_tesr.json");
+        String woodenBannerTesrModel = read("src/main/resources/assets/thaumcraft/models/item/blockwoodendevice_banner_tesr.json");
         String metalTesrModel = read("src/main/resources/assets/thaumcraft/models/item/blockmetaldevice_tesr.json");
         String thaumatoriumBaseModel = read("src/main/resources/assets/thaumcraft/models/block/blockmetaldevice_10.json");
         String thaumatoriumTopModel = read("src/main/resources/assets/thaumcraft/models/block/blockmetaldevice_11.json");
@@ -52,7 +55,7 @@ public class DeviceTesrRoutingContractTest {
                         && clientProxy.contains("registerBuiltinItemModel(woodenDeviceItem, 0, \"blockwoodendevice_tesr\");")
                         && clientProxy.contains("registerBuiltinItemModel(woodenDeviceItem, 4, \"blockwoodendevice_tesr\");")
                         && clientProxy.contains("registerBuiltinItemModel(woodenDeviceItem, 5, \"blockwoodendevice_tesr\");")
-                        && clientProxy.contains("registerBuiltinItemModel(woodenDeviceItem, 8, \"blockwoodendevice_tesr\");")
+                        && clientProxy.contains("registerBuiltinItemModel(woodenDeviceItem, 8, \"blockwoodendevice_banner_tesr\");")
                         && clientProxy.contains("registerBuiltinItemModel(metalDeviceItem, 1, \"blockmetaldevice_tesr\");")
                         && clientProxy.contains("registerBuiltinItemModel(metalDeviceItem, 2, \"blockmetaldevice_tesr\");")
                         && clientProxy.contains("registerBuiltinItemModel(metalDeviceItem, 10, \"blockmetaldevice_tesr\");")
@@ -73,6 +76,8 @@ public class DeviceTesrRoutingContractTest {
                         && woodenItemRenderer.contains("GlStateManager.rotate(90.0F, 0.0F, 1.0F, 0.0F);")
                         && woodenItemRenderer.contains("GlStateManager.translate(-0.5F, -0.75F, -0.5F);")
                         && woodenItemRenderer.contains("banner.setFacing((byte) 8);")
+                        && woodenItemRenderer.contains("isHandTransform(transformType)")
+                        && woodenItemRenderer.contains("GlStateManager.translate(1.0F, 1.0F, 1.0F);")
                         && metalItemRenderer.contains("new TileAlembicRenderer()")
                         && metalItemRenderer.contains("alembicRenderer.setRendererDispatcher(TileEntityRendererDispatcher.instance);")
                         && metalItemRenderer.contains("chargerRenderer.setRendererDispatcher(TileEntityRendererDispatcher.instance);")
@@ -98,7 +103,18 @@ public class DeviceTesrRoutingContractTest {
 
         assertTrue("Builtin item model stubs must exist so Forge routes the targeted metadata to TEISR",
                 woodenTesrModel.contains("\"parent\": \"builtin/entity\"")
+                        && woodenBannerTesrModel.contains("\"parent\": \"builtin/entity\"")
+                        && woodenBannerTesrModel.contains("\"display\"")
+                        && woodenBannerTesrModel.contains("\"gui\"")
+                        && woodenBannerTesrModel.contains("\"firstperson_righthand\"")
                         && metalTesrModel.contains("\"parent\": \"builtin/entity\""));
+
+        assertTrue("Banner item model should preserve the donor display matrix while passing the active hand/gui transform to the wooden-device TEISR",
+                clientModelRegistry.contains("BLOCKWOODENDEVICE_BANNER_MODEL")
+                        && clientModelRegistry.contains("new WoodenDevicePerspectiveModel(model)")
+                        && woodenPerspectiveModel.contains("ItemWoodenDeviceRenderer.setTransformType(cameraTransformType)")
+                        && woodenPerspectiveModel.contains("delegate.handlePerspective(cameraTransformType)")
+                        && woodenPerspectiveModel.contains("Pair.of(this, delegatePerspective.getRight())"));
 
         assertTrue("Thaumatorium fallback models should at least retain the reference alchemyblock texture instead of the old metalbase placeholder",
                 thaumatoriumBaseModel.contains("\"thaumcraft:blocks/alchemyblock\"")
