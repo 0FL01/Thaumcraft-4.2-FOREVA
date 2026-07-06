@@ -33,6 +33,7 @@ Remaining work is mostly item-specific logic, runtime parity testing, and final 
 ## What works
 
 - Core alchemy and crafting systems
+- Infusion
 - Golems
 - Research system
 - Thaumonomicon research tree, text/images, and recipe pages
@@ -44,19 +45,6 @@ Remaining work is mostly item-specific logic, runtime parity testing, and final 
 - Jar rendering, essentia liquid display, labels, and Brain in a Jar visuals
 - Wand focus visuals for restored foci such as Pech and Hellbat
 
-## Recent restoration highlights
-
-- Restored Thaumonomicon recipe page rendering and TC4 markup handling
-- Fixed wildcard recipe ingredient display in research pages
-- Allowed Thaumonomicon creation while a wand focus is equipped
-- Restored Pech focus behavior, projectile feedback, and equipped-wand visuals
-- Restored Hellbat focus two-layer item icon and wand ornament rendering
-- Fixed several TC particle renderers: essentia trails, bore sparkles, sparks, wisps, vents, smoke, and bubbles
-- Fixed jar transparency, liquid rendering, lid side textures, and Brain in a Jar animation/XP behavior
-- Fixed essentia phial item layers
-- Hardened runic helper null-stack handling
-- Hardened infusion matrix render state
-
 ## Known limitations
 
 - Some item-specific logic is still incomplete or needs parity review, including Arcane Levitator, Traveller's Charm, Caging Stone, and similar edge-case items
@@ -66,7 +54,7 @@ Remaining work is mostly item-specific logic, runtime parity testing, and final 
 
 ## Development
 
-Solo project. Development assisted by LLM agents using various models (GPT 5.5, GLM 5.1, Deepseek V4, MiMo V2.5, etc.).
+Solo project. Development assisted by LLM agents using various models (GPT 5.5, GLM 5.2, Deepseek V4, MiMo V2.5, etc.).
 
 ### Major known issue
 
