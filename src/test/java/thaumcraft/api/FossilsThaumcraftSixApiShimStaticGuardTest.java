@@ -19,8 +19,7 @@ public class FossilsThaumcraftSixApiShimStaticGuardTest {
 
         assertTrue("Fossils expects the TC6 AspectRegistryEvent with a public register proxy field",
                 event.contains("extends Event")
-                        && event.contains("public AspectEventProxy register;")
-                        && event.contains("Fossils and Archeology 8.0.6"));
+                        && event.contains("public AspectEventProxy register;"));
         assertTrue("Fossils calls AspectEventProxy.registerObjectTag(ItemStack, AspectList)",
                 proxy.contains("public void registerObjectTag(ItemStack item, AspectList aspects)")
                         && proxy.contains("ThaumcraftApi.registerObjectTag(item, aspects);"));
@@ -55,17 +54,18 @@ public class FossilsThaumcraftSixApiShimStaticGuardTest {
     @Test
     public void thaumcraftPostInitMustPublishAspectRegistryEventAfterCoreAspectTags() throws IOException {
         String thaumcraft = readFile("src/main/java/thaumcraft/common/Thaumcraft.java");
+        String compat = readFile("src/main/java/thaumcraft/common/compat/ThaumcraftSixCompatibility.java");
 
         int coreTags = thaumcraft.indexOf("ConfigAspects.init();");
-        int compatEvent = thaumcraft.indexOf("postAspectRegistryEvent();");
+        int compatEvent = thaumcraft.indexOf("ThaumcraftSixCompatibility.postAspectRegistryEvent();");
         int research = thaumcraft.indexOf("ConfigResearch.init();");
 
         assertTrue("Thaumcraft.postInit must publish the TC6 aspect registry event after built-in tags and before research setup",
                 coreTags >= 0 && compatEvent > coreTags && research > compatEvent);
         assertTrue("The published event must include the TC6 register proxy Fossils reads",
-                thaumcraft.contains("AspectRegistryEvent aspectRegistryEvent = new AspectRegistryEvent();")
-                        && thaumcraft.contains("aspectRegistryEvent.register = new AspectEventProxy();")
-                        && thaumcraft.contains("MinecraftForge.EVENT_BUS.post(aspectRegistryEvent);"));
+                compat.contains("AspectRegistryEvent aspectRegistryEvent = new AspectRegistryEvent();")
+                        && compat.contains("aspectRegistryEvent.register = new AspectEventProxy();")
+                        && compat.contains("MinecraftForge.EVENT_BUS.post(aspectRegistryEvent);"));
     }
 
     private static String readFile(String path) throws IOException {

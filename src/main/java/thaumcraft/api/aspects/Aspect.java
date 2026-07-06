@@ -41,9 +41,9 @@ public class Aspect {
     public static final Aspect ELDRITCH = new Aspect("alienis", 0x805080, new Aspect[]{VOID, DARKNESS});
     public static final Aspect MAGIC = new Aspect("praecantatio", 9896128, new Aspect[]{VOID, ENERGY});
     public static final Aspect AURA = new Aspect("auram", 0xFFC0FF, new Aspect[]{MAGIC, AIR});
-    // TC6 compatibility: Fossils and other 1.12 addons reference these newer
-    // aspect constants directly. Keep the TC4 aspects, but expose the TC6 names
-    // so their optional Thaumcraft bridges do not fail with NoSuchFieldError.
+    // TC6 compatibility: 1.12 addons reference these newer aspect constants
+    // directly. Keep the TC4 aspects, but expose the TC6 names so optional
+    // Thaumcraft bridges do not fail with NoSuchFieldError.
     public static final Aspect ALCHEMY = new Aspect("alkimia", 2337949, new Aspect[]{MAGIC, WATER});
     public static final Aspect TAINT = new Aspect("vitium", 0x800080, new Aspect[]{MAGIC, ENTROPY});
     public static final Aspect FLUX = TAINT;

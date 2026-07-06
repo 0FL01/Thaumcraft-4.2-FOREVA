@@ -7,9 +7,9 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidRegistry;
-import thaumcraft.api.blocks.BlocksTC;
 import thaumcraft.common.blocks.*;
 import thaumcraft.common.blocks.ItemBlocks.*;
+import thaumcraft.common.compat.ThaumcraftSixCompatibility;
 import thaumcraft.common.tiles.*;
 
 import java.util.Locale;
@@ -289,7 +289,7 @@ public class ConfigBlocks {
         blockCrystalItem = (BlockCrystalItem) new BlockCrystalItem(blockCrystal)
                 .setRegistryName(blockCrystal.getRegistryName());
 
-        BlocksTC.init();
+        ThaumcraftSixCompatibility.initBlockAliases();
     }
 
     public static Block[] getAllBlocks() {

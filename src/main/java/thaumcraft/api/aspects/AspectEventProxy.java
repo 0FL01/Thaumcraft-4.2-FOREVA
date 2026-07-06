@@ -6,10 +6,8 @@ import thaumcraft.api.ThaumcraftApi;
 /**
  * Thaumcraft 6 aspect-registration facade backed by this port's TC4-style API.
  *
- * Fossils uses AspectRegistryEvent.register.registerObjectTag(...) to attach
- * aspects to its blocks/items. Keeping this proxy tiny and delegating to
- * ThaumcraftApi preserves the compatibility surface without duplicating the
- * object tag registry logic.
+ * Keeping this proxy tiny and delegating to ThaumcraftApi preserves the TC6
+ * compatibility surface without duplicating the object tag registry logic.
  */
 public class AspectEventProxy {
 

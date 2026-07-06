@@ -15,6 +15,7 @@ public class MagicBeesThaumcraftSixApiShimStaticGuardTest {
     public void blocksTcMustExposeMagicBeesThaumcraftSixBlockFields() throws IOException {
         String blocksTc = readFile("src/main/java/thaumcraft/api/blocks/BlocksTC.java");
         String configBlocks = readFile("src/main/java/thaumcraft/common/config/ConfigBlocks.java");
+        String compat = readFile("src/main/java/thaumcraft/common/compat/ThaumcraftSixCompatibility.java");
 
         assertTrue("Magic Bees links TC6 BlocksTC fields during thaumcraft integration init",
                 blocksTc.contains("public static Block shimmerleaf;")
@@ -28,7 +29,8 @@ public class MagicBeesThaumcraftSixApiShimStaticGuardTest {
                         && blocksTc.contains("public static Block crystalEntropy;")
                         && blocksTc.contains("public static Block crystalTaint;"));
         assertTrue("BlocksTC fields must be populated after ConfigBlocks creates the registered blocks",
-                configBlocks.contains("BlocksTC.init();")
+                configBlocks.contains("ThaumcraftSixCompatibility.initBlockAliases();")
+                        && compat.contains("BlocksTC.init();")
                         && blocksTc.contains("shimmerleaf = ConfigBlocks.blockCustomPlant;")
                         && blocksTc.contains("crystalAir = ConfigBlocks.blockCrystal;"));
     }
@@ -37,6 +39,7 @@ public class MagicBeesThaumcraftSixApiShimStaticGuardTest {
     public void itemsTcMustExposeMagicBeesThaumcraftSixItemFields() throws IOException {
         String itemsTc = readFile("src/main/java/thaumcraft/api/items/ItemsTC.java");
         String configItems = readFile("src/main/java/thaumcraft/common/config/ConfigItems.java");
+        String compat = readFile("src/main/java/thaumcraft/common/compat/ThaumcraftSixCompatibility.java");
         String resourceAlias = readFile("src/main/java/thaumcraft/common/items/resources/ItemCrystalEssence.java");
 
         assertTrue("Magic Bees links TC6 ItemsTC fields during thaumcraft recipes/init",
@@ -48,7 +51,8 @@ public class MagicBeesThaumcraftSixApiShimStaticGuardTest {
                         && itemsTc.contains("public static Item curio;")
                         && itemsTc.contains("public static Item nuggets;"));
         assertTrue("ItemsTC fields must be populated after ConfigItems creates registered items",
-                configItems.contains("ItemsTC.init();")
+                configItems.contains("ThaumcraftSixCompatibility.initItemAliases();")
+                        && compat.contains("ItemsTC.init();")
                         && itemsTc.contains("brain = ConfigItems.itemZombieBrain;")
                         && itemsTc.contains("crystalEssence = ConfigItems.itemCrystalEssence;")
                         && itemsTc.contains("nuggets = ConfigItems.itemNugget;"));

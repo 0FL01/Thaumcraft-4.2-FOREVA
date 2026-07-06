@@ -7,7 +7,6 @@ import net.minecraft.item.ItemArmor.ArmorMaterial;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.common.util.EnumHelper;
 import net.minecraftforge.oredict.OreDictionary;
-import thaumcraft.api.items.ItemsTC;
 import thaumcraft.common.entities.golems.ItemGolemBell;
 import thaumcraft.common.entities.golems.ItemGolemCore;
 import thaumcraft.common.entities.golems.ItemGolemDecoration;
@@ -15,6 +14,7 @@ import thaumcraft.common.entities.golems.ItemGolemPlacer;
 import thaumcraft.common.entities.golems.ItemGolemUpgrade;
 import thaumcraft.common.entities.golems.ItemTrunkSpawner;
 import thaumcraft.common.blocks.ItemArcaneDoor;
+import thaumcraft.common.compat.ThaumcraftSixCompatibility;
 import thaumcraft.common.items.ItemBathSalts;
 import thaumcraft.common.items.ItemBottleTaint;
 import thaumcraft.common.items.ItemBucketDeath;
@@ -871,7 +871,7 @@ public class ConfigItems {
                 .setCreativeTab(tab);
         allItems.add(itemGolemDecoration);
 
-        ItemsTC.init();
+        ThaumcraftSixCompatibility.initItemAliases();
         registerOreDictionary();
     }
 

@@ -8,7 +8,7 @@ import thaumcraft.common.config.ConfigBlocks;
  *
  * <p>This port keeps TC4's block model, so several TC6 fields intentionally
  * point at the same metadata-driven TC4 block. The public field names and
- * descriptors are the binary contract addons such as Magic Bees link against.</p>
+ * descriptors are the binary contract 1.12 addons link against.</p>
  */
 public final class BlocksTC {
 

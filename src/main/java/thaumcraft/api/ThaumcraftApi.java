@@ -335,8 +335,8 @@ public class ThaumcraftApi {
             return;
         }
 
-        // TC6 addons such as Fossils call registerSeed(cropBlock, seedStack).
-        // Store the TC6 seed lookup and also register the crop block with this
+        // TC6 addons call registerSeed(cropBlock, seedStack). Store the TC6
+        // seed lookup and also register the crop block with this
         // port's growth-lamp crop registry, which originally only accepted a
         // seed ItemStack and inferred the block from it.
         seedList.put(crop.getTranslationKey(), seed);
