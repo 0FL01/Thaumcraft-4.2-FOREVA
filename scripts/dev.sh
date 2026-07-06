@@ -5,6 +5,7 @@ ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 IMAGE="${THAUMCRAFT_DOCKER_IMAGE:-thaumcraft-dev}"
 GRADLE_HOME_DIR="${THAUMCRAFT_GRADLE_HOME:-$ROOT/.gradle_home}"
 SMOKE_TIMEOUT="${THAUMCRAFT_SMOKE_TIMEOUT:-180s}"
+SMOKE_CACHE_DIR="${THAUMCRAFT_SMOKE_DIR:-$ROOT/.smoke}"
 DAEMON_CONTAINER="thaumcraft-gradle-daemon"
 
 usage() {
@@ -15,6 +16,7 @@ Usage:
   ./scripts/dev.sh validate [--smoke]   # multi-step pipeline
   ./scripts/dev.sh check-jar [jar-path]
   ./scripts/dev.sh smoke-server
+  ./scripts/dev.sh smoke-modset <name>
   ./scripts/dev.sh smoke-client
   ./scripts/dev.sh gradle <task>        # advanced: passthrough Gradle task
   ./scripts/dev.sh daemon-start         # start persistent Gradle daemon container
@@ -28,11 +30,13 @@ Examples:
   ./scripts/dev.sh check-jar
   ./scripts/dev.sh validate --smoke
   ./scripts/dev.sh apiJar devJar
+  ./scripts/dev.sh smoke-modset fossils
   ./scripts/dev.sh smoke-client
 
 Environment:
   THAUMCRAFT_DOCKER_IMAGE    Docker image name, default: thaumcraft-dev
   THAUMCRAFT_GRADLE_HOME     Mounted Gradle cache, default: .gradle_home
+  THAUMCRAFT_SMOKE_DIR       Local third-party smoke jar cache, default: .smoke
   THAUMCRAFT_SMOKE_TIMEOUT   Smoke timeout, default: 180s
   THAUMCRAFT_NO_DAEMON       Set to 1 to disable persistent daemon container
 EOF
@@ -156,6 +160,92 @@ new_crash_reports() {
     find "$crash_dir" -type f -newer "$since_file" -print
   fi
   return 0
+}
+
+trim_string() {
+  local value="$1"
+  value="${value#"${value%%[![:space:]]*}"}"
+  value="${value%"${value##*[![:space:]]}"}"
+  printf '%s' "$value"
+}
+
+smoke_modset() {
+  if [[ "$#" -ne 1 || -z "${1:-}" ]]; then
+    printf 'Usage: ./scripts/dev.sh smoke-modset <name>\n' >&2
+    printf 'Available modsets:\n' >&2
+    find "$ROOT/scripts/smoke-modsets" -maxdepth 1 -type f -name '*.txt' -printf '  %f\n' 2>/dev/null | sed 's/\.txt$//' >&2 || true
+    return 2
+  fi
+
+  local modset="$1"
+  if [[ ! "$modset" =~ ^[A-Za-z0-9._-]+$ ]]; then
+    printf 'smoke-modset: invalid modset name: %s\n' "$modset" >&2
+    return 2
+  fi
+
+  local manifest="$ROOT/scripts/smoke-modsets/$modset.txt"
+  if [[ ! -f "$manifest" ]]; then
+    printf 'smoke-modset: manifest not found: %s\n' "$manifest" >&2
+    return 1
+  fi
+
+  local jars=()
+  local raw line jar expected actual source_path line_no=0 missing=0
+  while IFS= read -r raw || [[ -n "$raw" ]]; do
+    line_no=$((line_no + 1))
+    line="$(trim_string "$raw")"
+    [[ -z "$line" || "${line:0:1}" == "#" ]] && continue
+
+    IFS='|' read -r jar expected _ <<< "$line"
+    jar="$(trim_string "${jar:-}")"
+    expected="$(trim_string "${expected:-}")"
+    if [[ -z "$jar" || "$jar" == */* ]]; then
+      printf 'smoke-modset: invalid jar name at %s:%s\n' "$manifest" "$line_no" >&2
+      return 1
+    fi
+
+    source_path="$SMOKE_CACHE_DIR/$jar"
+    if [[ ! -f "$source_path" ]]; then
+      printf 'smoke-modset: missing %s in %s\n' "$jar" "$SMOKE_CACHE_DIR" >&2
+      missing=1
+      continue
+    fi
+
+    if [[ -n "$expected" && "$expected" != "-" ]]; then
+      actual="$(sha256sum "$source_path" | awk '{print $1}')"
+      if [[ "$actual" != "$expected" ]]; then
+        printf 'smoke-modset: sha256 mismatch for %s\n' "$jar" >&2
+        printf '  expected: %s\n' "$expected" >&2
+        printf '  actual:   %s\n' "$actual" >&2
+        missing=1
+        continue
+      fi
+    fi
+
+    jars+=("$jar")
+  done < "$manifest"
+
+  if [[ "$missing" -ne 0 ]]; then
+    printf 'smoke-modset: place required third-party jars in .smoke/; jars are not committed.\n' >&2
+    return 1
+  fi
+  if [[ "${#jars[@]}" -eq 0 ]]; then
+    printf 'smoke-modset: manifest contains no jars: %s\n' "$manifest" >&2
+    return 1
+  fi
+
+  local mods_dir="$ROOT/run/mods"
+  mkdir -p "$mods_dir"
+  find "$mods_dir" -maxdepth 1 -type f -name '*.jar' -delete
+
+  for jar in "${jars[@]}"; do
+    cp "$SMOKE_CACHE_DIR/$jar" "$mods_dir/$jar"
+  done
+
+  printf "Smoke modset '%s': prepared %s jar(s) from %s.\n" "$modset" "${#jars[@]}" "$SMOKE_CACHE_DIR"
+  # The smoke server runs Gradle with --no-daemon; stop the persistent daemon first to avoid cache lock false failures.
+  docker_daemon_stop
+  smoke_server
 }
 
 mcp_leak_summary() {
@@ -1017,6 +1107,10 @@ case "$cmd" in
     ;;
   smoke-server)
     smoke_server
+    ;;
+  smoke-modset)
+    shift
+    smoke_modset "$@"
     ;;
   smoke-client)
     smoke_client

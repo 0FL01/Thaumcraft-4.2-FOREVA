@@ -143,4 +143,17 @@ A runtime smoke test fails if `crash-reports/` contains a new crash report, or l
 
 Do not mark runtime-affecting checkpoints complete based only on `compileJava`, `build`, `apiJar`, or `devJar`. Documentation-only diffs do not require runtime smoke.
 
+## Addon compatibility smoke workflow
+
+For issues caused by another mod loading with Thaumcraft, use a targeted modset smoke before editing code and again after the fix.
+
+- Keep third-party jars local in `.smoke/`; do not commit them.
+- Commit only smoke manifests, scripts, docs, code, and tests.
+- Start with RECON: identify the root crash marker and the smallest required mod/dependency set.
+- Record each reusable modset under `scripts/smoke-modsets/<name>.txt` with jar name, sha256, and source URL/note.
+- Prepare and run the targeted smoke with `./scripts/dev.sh smoke-modset <name>`.
+- If Baubles is already on the Gradle classpath, do not also copy a Baubles jar into `run/mods`; duplicate mod ids cause false smoke failures.
+- For Thaumcraft 6 addon API gaps, inspect `Thaumcraft-1.12.2-6.1.BETA26.jar` as the donor reference, add the smallest compatible shim, and leave a code comment explaining which addon/API expectation requires it.
+- Add a static guard test for every compatibility shim class, method, field, or lifecycle event that prevented the crash.
+- Final validation for a compatibility fix is: `./scripts/dev.sh validate`, `./scripts/dev.sh smoke-modset <name>`, then `./scripts/dev.sh build`.
 

@@ -1,0 +1,5 @@
+# Minimal EnderIO compatibility smoke from GitHub issue #3.
+# Format: jar | sha256 | source/note
+# Baubles is intentionally omitted: it is already on the Gradle classpath in dev smoke runs.
+EnderCore-1.12.2-0.5.78.jar | adbd309f6c8001c38c4630aa701cdc5ea59fa7ee9ffa770e21f56b160adb443c | user-provided local smoke jar
+EnderIO-1.12.2-5.3.72.jar | 9b5e7756af35a191de8bc8f010c0f7c7ffc2e1e056a69ec265d1dd5ce90d19b4 | user-provided local smoke jar

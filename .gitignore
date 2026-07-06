@@ -30,6 +30,7 @@ Thumbs.db
 
 # Temp
 *.tmp
+.smoke/
 
 # Python
 __pycache__/

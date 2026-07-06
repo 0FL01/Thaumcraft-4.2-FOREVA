@@ -1,0 +1,5 @@
+# Minimal Fossils and Archeology compatibility smoke from GitHub issue #4.
+# Format: jar | sha256 | source/note
+# Baubles is intentionally omitted: it is already on the Gradle classpath in dev smoke runs.
+fossilsarcheology-8.0.6.jar | 1fc81d9cd006731cf61370f3dddd22db9aa59501068536adc8671e4451cbb23c | https://cdn.modrinth.com/data/IJY7IqPP/versions/2Wi50MGh/fossilsarcheology-8.0.6.jar
+llibrary-1.7.20-1.12.2.jar | 27fa8dbfc7428168229a445dad82a4696ba52cf0a6e054833bff0f93931d8ceb | https://edge.forgecdn.net/files/3116/493/llibrary-1.7.20-1.12.2.jar
