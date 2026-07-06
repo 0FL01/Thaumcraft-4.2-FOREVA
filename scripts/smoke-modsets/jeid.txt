@@ -1,0 +1,9 @@
+# Minimal JEID/MixinBooter compatibility smoke from GitHub issue #5 comment 4893554088.
+# Format: jar | sha256 | source/note
+# Baubles is intentionally omitted: it is already on the Gradle classpath in dev smoke runs.
+# Forestry + Magic Bees are included as the reported loadout and as a postInit trigger;
+# the expected regression target is JEID's Thaumcraft Utils mixin, not Magic Bees itself.
+!mixinbooter-10.7.jar | 8bb53080aede2d2b1e1c5f713bbf49a38f20add8caa3d52fabcdf8a536b55a18 | https://edge.forgecdn.net/files/7049/694/%21mixinbooter-10.7.jar
+JustEnoughIDs-1.0.4-SNAPSHOT-thin.jar | b556c5b98ea754a764ba0b0c863878d23fac2f750d0a4b5798dce14afbc7e2b1 | https://edge.forgecdn.net/files/3581/715/JustEnoughIDs-1.0.4-SNAPSHOT-thin.jar
+forestry_1.12.2-5.8.2.424.jar | fce6af7931dc054afc33fc79db7e3e4d81477591fe7bbd563cd1a5b2699342d4 | https://edge.forgecdn.net/files/5903/382/forestry_1.12.2-5.8.2.424.jar
+MagicBees-1.12.2-3.2.25.jar | 2c780e8e7b22a374c069e3a20674fac9382fe0ef1100555197ff23eb9ab12d9e | https://edge.forgecdn.net/files/2855/061/MagicBees-1.12.2-3.2.25.jar

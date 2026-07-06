@@ -150,7 +150,11 @@ stop_container() {
 }
 
 crash_markers() {
-  grep -nE 'LoaderException|LoaderExceptionModCrash|Game crashed|Caught exception|NoClassDefFoundError|ClassNotFoundException|NoSuchMethodError|NoSuchFieldError|ExceptionInInitializerError|Repair material has already been set|Encountered an unexpected exception|crash-reports|FATAL|fatal' "$1" || true
+  # Coremod scanners such as JEID/MixinBooter log WARN-level optional target misses as
+  # "Error loading class ... ClassNotFoundException". Keep fatal CNFE markers, but do
+  # not stop smoke runs for these optional mixin discovery warnings.
+  grep -nE 'LoaderException|LoaderExceptionModCrash|Game crashed|Caught exception|NoClassDefFoundError|ClassNotFoundException|NoSuchMethodError|NoSuchFieldError|ExceptionInInitializerError|Repair material has already been set|Encountered an unexpected exception|crash-reports|FATAL|fatal' "$1" \
+    | grep -vE 'WARN.*Error loading class: .*ClassNotFoundException: The specified class .* was not found' || true
 }
 
 new_crash_reports() {

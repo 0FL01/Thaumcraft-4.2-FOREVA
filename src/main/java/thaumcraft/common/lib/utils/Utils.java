@@ -198,20 +198,30 @@ public class Utils {
 
     /** Set the biome at a given x,z position in the world (used for taint spread in Eldritch dimension). */
     public static void setBiomeAt(World world, int x, int z, Biome biome) {
-        if (world == null || biome == null) return;
+        setBiomeAt(world, new BlockPos(x, 0, z), biome, true);
+    }
+
+    /** TC6-compatible biome mutation overload used by addons and coremod mixins. */
+    public static void setBiomeAt(World world, BlockPos pos, Biome biome) {
+        setBiomeAt(world, pos, biome, true);
+    }
+
+    /** TC6-compatible biome mutation overload used by addons and coremod mixins. */
+    public static void setBiomeAt(World world, BlockPos pos, Biome biome, boolean sync) {
+        if (world == null || pos == null || biome == null) return;
         int biomeId = Biome.getIdForBiome(biome);
         if (biomeId < 0) return;
-        int cx = x >> 4;
-        int cz = z >> 4;
-        Chunk chunk = world.getChunkProvider().provideChunk(cx, cz);
+        int x = pos.getX();
+        int z = pos.getZ();
+        Chunk chunk = world.getChunk(pos);
         if (chunk == null) return;
         byte[] biomes = chunk.getBiomeArray();
         int index = ((z & 15) << 4) | (x & 15);
-        biomes[index] = (byte) biomeId;
+        biomes[index] = (byte) (biomeId & 255);
         chunk.setBiomeArray(biomes);
         chunk.markDirty();
         world.markBlockRangeForRenderUpdate(new BlockPos(x, 0, z), new BlockPos(x, world.getActualHeight(), z));
-        if (!world.isRemote) {
+        if (sync && !world.isRemote) {
             PacketHandler.INSTANCE.sendToAllAround(
                     new PacketBiomeChange(x, z, (short) biomeId),
                     new NetworkRegistry.TargetPoint(
@@ -221,6 +231,23 @@ public class Utils {
                             z,
                             32.0));
         }
+    }
+
+    public static boolean resetBiomeAt(World world, BlockPos pos) {
+        return resetBiomeAt(world, pos, true);
+    }
+
+    public static boolean resetBiomeAt(World world, BlockPos pos, boolean sync) {
+        if (world == null || pos == null || world.getBiomeProvider() == null) return false;
+        Biome[] biomes = world.getBiomeProvider().getBiomes(null, pos.getX(), pos.getZ(), 1, 1);
+        if (biomes != null && biomes.length > 0 && biomes[0] != null) {
+            Biome biome = biomes[0];
+            if (biome != world.getBiome(pos)) {
+                setBiomeAt(world, pos, biome, sync);
+                return true;
+            }
+        }
+        return false;
     }
 
     public static byte pack(boolean[] bits) {
