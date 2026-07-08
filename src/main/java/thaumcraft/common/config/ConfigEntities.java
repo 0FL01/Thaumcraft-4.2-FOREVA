@@ -2,6 +2,7 @@ package thaumcraft.common.config;
 
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EnumCreatureType;
+import net.minecraft.entity.passive.EntityVillager;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.biome.Biome;
 import net.minecraftforge.common.BiomeDictionary;
@@ -162,11 +163,21 @@ public class ConfigEntities {
         );
         PROFESSIONS.add(PROF_BANKER);
 
-        // Initialize villager careers with trade lists
-        new VillagerRegistry.VillagerCareer(PROF_WIZARD, "wizard")
-                .addTrade(1, ThaumcraftVillagerTrades.WIZARD_TRADES);
-        new VillagerRegistry.VillagerCareer(PROF_BANKER, "banker")
-                .addTrade(1, ThaumcraftVillagerTrades.BANKER_TRADES);
+        // Initialize villager careers with level-gated trade lists.
+        VillagerRegistry.VillagerCareer wizardCareer = new VillagerRegistry.VillagerCareer(PROF_WIZARD, "wizard");
+        registerCareerTrades(wizardCareer, ThaumcraftVillagerTrades.WIZARD_TRADE_LEVELS);
+
+        VillagerRegistry.VillagerCareer bankerCareer = new VillagerRegistry.VillagerCareer(PROF_BANKER, "banker");
+        registerCareerTrades(bankerCareer, ThaumcraftVillagerTrades.BANKER_TRADE_LEVELS);
+    }
+
+    private static void registerCareerTrades(VillagerRegistry.VillagerCareer career, EntityVillager.ITradeList[][] tradeLevels) {
+        for (int i = 0; i < tradeLevels.length; i++) {
+            EntityVillager.ITradeList[] trades = tradeLevels[i];
+            if (trades != null && trades.length > 0) {
+                career.addTrade(i + 1, trades);
+            }
+        }
     }
 
     public static void initEntitySpawns() {
