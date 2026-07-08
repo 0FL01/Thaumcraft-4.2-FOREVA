@@ -158,6 +158,6 @@ public class ModelInfusionPillar {
         float[] pos = VERTICES[triangle[offset] - 1];
         float[] uv = UVS[triangle[offset + 1] - 1];
         float[] normal = NORMALS[triangle[offset + 2] - 1];
-        buf.pos(pos[0], pos[1], pos[2]).tex(uv[0], uv[1]).normal(normal[0], normal[1], normal[2]).endVertex();
+        buf.pos(pos[0], pos[1], pos[2]).tex(uv[0], 1.0F - uv[1]).normal(normal[0], normal[1], normal[2]).endVertex();
     }
 }

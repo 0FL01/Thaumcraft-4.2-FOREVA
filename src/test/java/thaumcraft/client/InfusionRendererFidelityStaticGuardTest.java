@@ -52,7 +52,8 @@ public class InfusionRendererFidelityStaticGuardTest {
                         && pillarModel.contains("private static final float[][] NORMALS")
                         && pillarModel.contains("private static final int[][] TRIANGLES")
                         && pillarModel.contains("DefaultVertexFormats.POSITION_TEX_NORMAL")
-                        && pillarModel.contains("GL11.GL_TRIANGLES"));
+                        && pillarModel.contains("GL11.GL_TRIANGLES")
+                        && pillarModel.contains(".tex(uv[0], 1.0F - uv[1])"));
 
         assertTrue("Infusion pillar texture asset must exist for the dedicated renderer path",
                 Files.exists(Paths.get("src/main/resources/assets/thaumcraft/textures/models/pillar.png")));
