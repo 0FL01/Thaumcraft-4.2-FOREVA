@@ -17,7 +17,7 @@ Original mod by Azanor (2013-2015). This is an unofficial community port.
 
 ## Status
 
-Active work-in-progress port. Core systems are wired, and a large July 2026 cleanup restored many visible TC4 parity issues: Thaumonomicon recipe pages, focus visuals, TC particle rendering, jars, essentia phials, and Brain in a Jar behavior.
+Active work-in-progress port. Core systems are wired, and a large July 2026 cleanup restored many visible TC4 parity issues: Thaumonomicon recipe pages, focus visuals, TC particle rendering, jars, essentia phials, Brain in a Jar behavior, and Travel/Warding paving stone parity.
 
 Remaining work is mostly item-specific logic, runtime parity testing, and final visual/rendering polish.
 
@@ -44,10 +44,11 @@ Remaining work is mostly item-specific logic, runtime parity testing, and final 
 - TC4-style particle routes for many client effects
 - Jar rendering, essentia liquid display, labels, and Brain in a Jar visuals
 - Wand focus visuals for restored foci such as Pech and Hellbat
+- Paving Stone of Travel and Paving Stone of Warding behavior, including redstone state parity, invisible warding aura collision, and TC4 rune particle visuals
 
 ## Known limitations
 
-- Some item-specific logic is still incomplete or needs parity review, including Traveller's Charm, Caging Stone, and similar edge-case items
+- Some item-specific logic is still incomplete or needs parity review for remaining edge-case items
 - Infusion crafting gameplay still needs full runtime verification; the matrix renderer itself has been hardened
 - Visual parity is much better after the July cleanup, but remaining models/renderers/textures still need comparison against TC4
 - Untested systems may still have defects

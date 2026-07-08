@@ -317,11 +317,14 @@ public class ClientProxyFxStaticGuardTest {
                         && slimyBubbleFx.contains("particle = 144")
                         && slimyBubbleFx.contains("float uMin = (float) (this.particle % 16) / 16.0F")
                         && !slimyBubbleFx.contains("setParticleTextureIndex("));
-        assertTrue("Dedicated FXBlockRunes particle must keep rune-around-block emission baseline",
-                blockRunesFx.contains("class FXBlockRunes extends Particle")
+        assertTrue("Dedicated FXBlockRunes particle must keep TC4 rune-around-block emission on the TC particle sheet, not vanilla particles",
+                blockRunesFx.contains("class FXBlockRunes extends Particle implements ITCParticle")
                         && blockRunesFx.contains("setGravity(float gravity)")
                         && blockRunesFx.contains("this.runeIndex = 224 + this.rand.nextInt(16)")
-                        && blockRunesFx.contains("GlStateManager.rotate(90.0F, 0.0F, 0.0F, 1.0F)")
+                        && blockRunesFx.contains("float v0 = 0.375F")
+                        && blockRunesFx.contains("public int getTCParticleLayer()")
+                        && blockRunesFx.contains("return 1;")
+                        && !blockRunesFx.contains("textures/particle/particles.png")
                         && !blockRunesFx.contains("EnumParticleTypes.CRIT_MAGIC"));
         assertTrue("Dedicated FXEssentiaTrail particle must keep colorized target-chasing textured trail baseline",
                 essentiaTrailFx.contains("class FXEssentiaTrail extends Particle")

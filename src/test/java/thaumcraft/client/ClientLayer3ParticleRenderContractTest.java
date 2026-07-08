@@ -15,7 +15,6 @@ public class ClientLayer3ParticleRenderContractTest {
     @Test
     public void layer3CustomParticlesShouldOwnExactlyOneInternalBeginDrawPass() throws IOException {
         assertLayer3SelfContained("src/main/java/thaumcraft/client/fx/particles/FXBurst.java");
-        assertLayer3SelfContained("src/main/java/thaumcraft/client/fx/particles/FXBlockRunes.java");
         assertLayer3SelfContained("src/main/java/thaumcraft/client/fx/particles/FXBreaking.java");
         assertLayer3SelfContained("src/main/java/thaumcraft/client/fx/particles/FXSmokeSpiral.java");
         assertLayer3SelfContained("src/main/java/thaumcraft/client/fx/particles/FXSwarm.java");

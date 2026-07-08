@@ -1,21 +1,16 @@
 package thaumcraft.client.fx.particles;
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.particle.Particle;
 import net.minecraft.client.renderer.BufferBuilder;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.Entity;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import org.lwjgl.opengl.GL11;
+import thaumcraft.client.fx.ITCParticle;
 
 @SideOnly(Side.CLIENT)
-public class FXBlockRunes extends Particle {
-    private static final ResourceLocation PARTICLE_TEXTURE = new ResourceLocation("textures/particle/particles.png");
+public class FXBlockRunes extends Particle implements ITCParticle {
     private static final int LIGHTMAP_FULLBRIGHT = 0x00F000F0;
 
     private final double ofx;
@@ -31,9 +26,15 @@ public class FXBlockRunes extends Particle {
         this.particleBlue = blue;
         this.rotation = this.rand.nextInt(4) * 90;
         this.gravity = 0.0F;
-        this.particleMaxAge = Math.max(6, 3 * duration);
+        this.motionX = 0.0D;
+        this.motionY = 0.0D;
+        this.motionZ = 0.0D;
+        this.particleMaxAge = 3 * duration;
         this.canCollide = false;
         this.setSize(0.01F, 0.01F);
+        this.prevPosX = this.posX;
+        this.prevPosY = this.posY;
+        this.prevPosZ = this.posZ;
         this.runeIndex = 224 + this.rand.nextInt(16);
         this.ofx = this.rand.nextFloat() * 0.2D;
         this.ofy = -0.3D + this.rand.nextFloat() * 0.6D;
@@ -51,67 +52,69 @@ public class FXBlockRunes extends Particle {
         this.prevPosY = this.posY;
         this.prevPosZ = this.posZ;
         if (this.world == null || !this.world.isRemote) {
-            setExpired();
+            this.setExpired();
             return;
         }
-        float threshold = this.particleMaxAge / 5.0F;
-        this.particleAlpha = this.particleAge <= threshold
-                ? this.particleAge / Math.max(1.0F, threshold)
-                : (this.particleMaxAge - this.particleAge) / (float) this.particleMaxAge;
+        float threshold = (float) this.particleMaxAge / 5.0F;
+        this.particleAlpha = (float) this.particleAge <= threshold
+                ? (float) this.particleAge / threshold
+                : (float) (this.particleMaxAge - this.particleAge) / (float) this.particleMaxAge;
         if (this.particleAge++ >= this.particleMaxAge) {
-            setExpired();
-            return;
+            this.setExpired();
         }
-        this.motionY -= 0.04D * this.gravity;
+        this.motionY -= 0.04D * (double) this.gravity;
         this.posX += this.motionX;
         this.posY += this.motionY;
         this.posZ += this.motionZ;
     }
 
     @Override
-    public void renderParticle(BufferBuilder ignored, Entity entityIn, float partialTicks,
+    public void renderParticle(BufferBuilder buffer, Entity entityIn, float partialTicks,
                                float rotationX, float rotationZ, float rotationYZ, float rotationXY, float rotationXZ) {
-        Tessellator tessellator = Tessellator.getInstance();
-        BufferBuilder buffer = tessellator.getBuffer();
-
-        float px = (float) (this.prevPosX + (this.posX - this.prevPosX) * partialTicks - Particle.interpPosX);
-        float py = (float) (this.prevPosY + (this.posY - this.prevPosY) * partialTicks - Particle.interpPosY);
-        float pz = (float) (this.prevPosZ + (this.posZ - this.prevPosZ) * partialTicks - Particle.interpPosZ);
-        float u0 = (this.runeIndex % 16) / 16.0F;
+        float px = (float) (this.prevPosX + (this.posX - this.prevPosX) * (double) partialTicks - Particle.interpPosX);
+        float py = (float) (this.prevPosY + (this.posY - this.prevPosY) * (double) partialTicks - Particle.interpPosY);
+        float pz = (float) (this.prevPosZ + (this.posZ - this.prevPosZ) * (double) partialTicks - Particle.interpPosZ);
+        float u0 = (float) (this.runeIndex % 16) / 16.0F;
         float u1 = u0 + 0.0624375F;
         float v0 = 0.375F;
         float v1 = v0 + 0.0624375F;
         float size = 0.3F * this.particleScale;
 
-        Minecraft.getMinecraft().renderEngine.bindTexture(PARTICLE_TEXTURE);
-        GlStateManager.pushMatrix();
-        GlStateManager.translate(px, py, pz);
-        GlStateManager.rotate((float) this.rotation, 0.0F, 1.0F, 0.0F);
-        GlStateManager.rotate(90.0F, 0.0F, 0.0F, 1.0F);
-        GlStateManager.translate(this.ofx, this.ofy, -0.51D);
-
-        buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.PARTICLE_POSITION_TEX_COLOR_LMAP);
-        addLitVertex(buffer, -0.5D * size, 0.5D * size, 0.0D, u1, v1);
-        addLitVertex(buffer, 0.5D * size, 0.5D * size, 0.0D, u1, v0);
-        addLitVertex(buffer, 0.5D * size, -0.5D * size, 0.0D, u0, v0);
-        addLitVertex(buffer, -0.5D * size, -0.5D * size, 0.0D, u0, v1);
-        tessellator.draw();
-
-        GlStateManager.popMatrix();
+        addLitVertex(buffer, px, py, pz, -0.5D * size, 0.5D * size, u1, v1);
+        addLitVertex(buffer, px, py, pz, 0.5D * size, 0.5D * size, u1, v0);
+        addLitVertex(buffer, px, py, pz, 0.5D * size, -0.5D * size, u0, v0);
+        addLitVertex(buffer, px, py, pz, -0.5D * size, -0.5D * size, u0, v1);
     }
 
-    private void addLitVertex(BufferBuilder buffer, double x, double y, double z, double u, double v) {
+    private void addLitVertex(BufferBuilder buffer, double px, double py, double pz, double x, double y, double u, double v) {
+        double tx = x + this.ofx;
+        double ty = y + this.ofy;
+        double tz = -0.51D;
+
+        double rzX = -ty;
+        double rzY = tx;
+        double angle = this.rotation * ((float) Math.PI / 180.0F);
+        double sin = MathHelper.sin((float) angle);
+        double cos = MathHelper.cos((float) angle);
+        double rx = rzX * cos + tz * sin;
+        double rz = tz * cos - rzX * sin;
+
         int lightU = LIGHTMAP_FULLBRIGHT & 0xFFFF;
         int lightV = LIGHTMAP_FULLBRIGHT >> 16 & 0xFFFF;
-        buffer.pos(x, y, z)
+        buffer.pos(px + rx, py + rzY, pz + rz)
                 .tex(u, v)
-                .color(this.particleRed, this.particleGreen, this.particleBlue, this.particleAlpha * 0.5F)
+                .color(this.particleRed, this.particleGreen, this.particleBlue, this.particleAlpha / 2.0F)
                 .lightmap(lightU, lightV)
                 .endVertex();
     }
 
     @Override
     public int getFXLayer() {
-        return 3;
+        return 0;
+    }
+
+    @Override
+    public int getTCParticleLayer() {
+        return 1;
     }
 }

@@ -88,7 +88,7 @@ public class BlockAiry extends BlockContainer {
     @Override
     public EnumBlockRenderType getRenderType(IBlockState state) {
         int meta = this.getMetaFromState(state);
-        return meta == 0 || meta == 5 ? EnumBlockRenderType.INVISIBLE : EnumBlockRenderType.MODEL;
+        return meta == 0 || meta == 4 || meta == 5 ? EnumBlockRenderType.INVISIBLE : EnumBlockRenderType.MODEL;
     }
 
     @Override
@@ -234,11 +234,7 @@ public class BlockAiry extends BlockContainer {
                                       List<AxisAlignedBB> collidingBoxes, @Nullable Entity entity, boolean isActualState) {
         int meta = this.getMetaFromState(state);
         if (meta == 4 && entity instanceof EntityLivingBase && !(entity instanceof EntityPlayer)) {
-            int offset = 1;
-            while (offset < 3 && world.getBlockState(pos.down(offset)).getBlock() != ConfigBlocks.blockCosmeticSolid) {
-                ++offset;
-            }
-            if (!world.isAirBlock(pos.down(offset))) {
+            if (isActiveWardingStoneSupport(world, pos)) {
                 addCollisionBoxToList(pos, entityBox, collidingBoxes, FULL_BLOCK_AABB);
             }
             return;
@@ -248,6 +244,18 @@ public class BlockAiry extends BlockContainer {
             return;
         }
         super.addCollisionBoxToList(state, world, pos, entityBox, collidingBoxes, entity, isActualState);
+    }
+
+    private static boolean isActiveWardingStoneSupport(World world, BlockPos pos) {
+        for (int offset = 1; offset <= 2; offset++) {
+            BlockPos basePos = pos.down(offset);
+            IBlockState base = world.getBlockState(basePos);
+            if (base.getBlock() == ConfigBlocks.blockCosmeticSolid
+                    && base.getValue(BlockCosmeticSolid.TYPE) == BlockCosmeticSolid.TYPE_WARDING) {
+                return !world.isBlockPowered(basePos);
+            }
+        }
+        return false;
     }
 
     @Override

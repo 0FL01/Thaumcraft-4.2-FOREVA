@@ -15,6 +15,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 import thaumcraft.common.Thaumcraft;
+import thaumcraft.common.config.ConfigBlocks;
 
 import net.minecraft.block.properties.PropertyInteger;
 
@@ -35,9 +36,23 @@ public class BlockCosmeticOpaque extends Block {
 
     @Override
     public void getSubBlocks(CreativeTabs tab, NonNullList<ItemStack> list) {
-        for (int i = 0; i < 5; i++) {
+        for (int i = 0; i < 3; i++) {
             list.add(new ItemStack(this, 1, i));
         }
+    }
+
+    @Override
+    public void onBlockAdded(World worldIn, BlockPos pos, IBlockState state) {
+        if (!worldIn.isRemote) {
+            int meta = state.getValue(TYPE);
+            if (meta == 3 || meta == 4) {
+                int target = meta == 3 ? BlockCosmeticSolid.TYPE_WARDING : BlockCosmeticSolid.TYPE_TRAVEL;
+                worldIn.setBlockState(pos, ConfigBlocks.blockCosmeticSolid.getDefaultState()
+                        .withProperty(BlockCosmeticSolid.TYPE, target), 3);
+                return;
+            }
+        }
+        super.onBlockAdded(worldIn, pos, state);
     }
 
     @Override
