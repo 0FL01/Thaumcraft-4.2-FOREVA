@@ -9,6 +9,10 @@ on:
     branches:
       - 'master'
 
+concurrency:
+  group: release-master
+  cancel-in-progress: true
+
 env:
   CI: 'true'
 
@@ -28,7 +32,7 @@ jobs:
         run: |
           SHORT_SHA="${GITHUB_SHA:0:7}"
           TAG_DATE="$(date +%Y%m%d)"
-          TAG_NAME="alfa-${TAG_DATE}-${SHORT_SHA}"
+          TAG_NAME="release-${TAG_DATE}-${SHORT_SHA}"
           COMMIT_MSG="$(git log -1 --format='%s')"
 
           echo "tag_name=${TAG_NAME}" >> "$GITHUB_OUTPUT"
@@ -197,9 +201,9 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ steps.meta.outputs.tag_name }}
-          name: Thaumcraft 4.2 1.12.2 (ALFA) — ${{ steps.meta.outputs.short_sha }}
+          name: Thaumcraft 4.2 1.12.2 — ${{ steps.meta.outputs.short_sha }}
           body: |
-            ## Thaumcraft 4.2 1.12.2 (ALFA)
+            ## Thaumcraft 4.2 1.12.2
 
             **Commit:** `${{ github.sha }}` — ${{ steps.meta.outputs.commit_msg }}
 
@@ -208,4 +212,5 @@ jobs:
 
             ---
           files: build/libs/Thaumcraft-*-universal.jar
-          prerelease: true
+          prerelease: false
+          make_latest: true
