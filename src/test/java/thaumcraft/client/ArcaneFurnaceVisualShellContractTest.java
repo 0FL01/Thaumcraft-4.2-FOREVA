@@ -14,8 +14,11 @@ public class ArcaneFurnaceVisualShellContractTest {
     @Test
     public void arcaneFurnaceShouldKeepNozzleFacingVariantsAndNonCubeShellModel() throws IOException {
         String clientProxy = read("src/main/java/thaumcraft/client/ClientProxy.java");
+        String clientModelRegistry = read("src/main/java/thaumcraft/client/ClientModelRegistry.java");
+        String bakedModel = read("src/main/java/thaumcraft/client/renderers/block/ArcaneFurnaceBakedModel.java");
         String blockstate = read("src/main/resources/assets/thaumcraft/blockstates/blockarcanefurnace.json");
         String nozzleModel = read("src/main/resources/assets/thaumcraft/models/block/blockarcanefurnace_10.json");
+        String itemBlock = read("src/main/java/thaumcraft/common/blocks/ItemBlocks/BlockArcaneFurnaceItem.java");
 
         assertTrue("Arcane Furnace item metadata should resolve through the new facing-aware blockstate variant keys",
                 clientProxy.contains("registerBlockItemModel(arcaneFurnaceItem, meta, \"type=\" + meta + \",facing=north\");"));
@@ -58,6 +61,24 @@ public class ArcaneFurnaceVisualShellContractTest {
                         && nozzleModel.contains("\"south\": { \"texture\": \"#trim\" }")
                         && nozzleModel.contains("\"south\": { \"texture\": \"#fire\" }")
                         && !nozzleModel.contains("\"parent\": \"block/cube_all\""));
+
+        assertTrue("Arcane Furnace world rendering should be replaced with a baked model that mirrors the 1.7.10 per-face texture resolver instead of cube_all-per-meta mosaics",
+                clientModelRegistry.contains("replaceArcaneFurnaceModels(event);")
+                        && clientModelRegistry.contains("ARCANE_FURNACE_TEXTURES")
+                        && bakedModel.contains("textureForSide(int meta, int level, int nozzleSide, EnumFacing face)")
+                        && bakedModel.contains("BlockArcaneFurnace.RENDER_LEVEL")
+                        && bakedModel.contains("BlockArcaneFurnace.NOZZLE_SIDE")
+                        && bakedModel.contains("minecraft:blocks/lava_still")
+                        && bakedModel.contains("return 2 + level + nozzleOffset;")
+                        && bakedModel.contains("return level != 9 ? 7 : 6;")
+                        && bakedModel.contains("case 2:")
+                        && bakedModel.contains("return 16;")
+                        && bakedModel.contains("case 8:")
+                        && bakedModel.contains("return 25;"));
+
+        assertTrue("Arcane Furnace metadata ItemBlock should not append .0..10 to the display key, so Waila/Hwyla shows the localized furnace name",
+                itemBlock.contains("class BlockArcaneFurnaceItem extends BlockMetadataItem")
+                        && itemBlock.contains("return this.block.getTranslationKey();"));
     }
 
     private static String read(String path) throws IOException {

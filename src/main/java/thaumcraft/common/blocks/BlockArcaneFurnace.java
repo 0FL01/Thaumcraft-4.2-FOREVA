@@ -4,6 +4,7 @@ import net.minecraft.block.BlockContainer;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.PropertyDirection;
+import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.properties.PropertyInteger;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
@@ -27,6 +28,9 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
+import net.minecraftforge.common.property.ExtendedBlockState;
+import net.minecraftforge.common.property.IExtendedBlockState;
+import net.minecraftforge.common.property.IUnlistedProperty;
 import thaumcraft.common.Thaumcraft;
 import thaumcraft.common.tiles.TileArcaneFurnace;
 import thaumcraft.common.tiles.TileArcaneFurnaceNozzle;
@@ -34,11 +38,14 @@ import thaumcraft.common.tiles.TileArcaneFurnaceNozzle;
 public class BlockArcaneFurnace extends BlockContainer {
     public static final PropertyInteger TYPE = PropertyInteger.create("type", 0, 10);
     public static final PropertyDirection FACING = PropertyDirection.create("facing", EnumFacing.Plane.HORIZONTAL);
+    public static final IUnlistedProperty<Integer> RENDER_LEVEL = new IntUnlistedProperty("render_level", 0, 18);
+    public static final IUnlistedProperty<Integer> NOZZLE_SIDE = new IntUnlistedProperty("nozzle_side", -1, 5);
     private static final AxisAlignedBB CORE_AABB = new AxisAlignedBB(0.0D, 0.0D, 0.0D, 1.0D, 0.25D, 1.0D);
     private static final AxisAlignedBB NOZZLE_WEST_AABB = new AxisAlignedBB(0.0D, 0.0D, 0.0D, 0.5D, 1.0D, 1.0D);
     private static final AxisAlignedBB NOZZLE_EAST_AABB = new AxisAlignedBB(0.5D, 0.0D, 0.0D, 1.0D, 1.0D, 1.0D);
     private static final AxisAlignedBB NOZZLE_NORTH_AABB = new AxisAlignedBB(0.0D, 0.0D, 0.0D, 1.0D, 1.0D, 0.5D);
     private static final AxisAlignedBB NOZZLE_SOUTH_AABB = new AxisAlignedBB(0.0D, 0.0D, 0.5D, 1.0D, 1.0D, 1.0D);
+    private boolean restoring = false;
 
     public BlockArcaneFurnace() {
         super(Material.ROCK);
@@ -77,6 +84,17 @@ public class BlockArcaneFurnace extends BlockContainer {
             return state.withProperty(FACING, EnumFacing.NORTH);
         }
         return state.withProperty(FACING, this.getNozzleFacing(worldIn, pos));
+    }
+
+    @Override
+    public IBlockState getExtendedState(IBlockState state, IBlockAccess worldIn, BlockPos pos) {
+        state = this.getMetaFromState(state) == 10
+                ? state.withProperty(FACING, this.getNozzleFacing(worldIn, pos))
+                : state.withProperty(FACING, EnumFacing.NORTH);
+        IExtendedBlockState extended = (IExtendedBlockState) state;
+        return extended
+                .withProperty(RENDER_LEVEL, this.calculateRenderLevel(worldIn, pos))
+                .withProperty(NOZZLE_SIDE, this.getTouchingNozzleSide(worldIn, pos));
     }
 
     @Override
@@ -205,31 +223,31 @@ public class BlockArcaneFurnace extends BlockContainer {
     }
 
     @Override
-    public void onBlockHarvested(World worldIn, BlockPos pos, IBlockState state, net.minecraft.entity.player.EntityPlayer player) {
+    public void onPlayerDestroy(World worldIn, BlockPos pos, IBlockState state) {
         if (this.getMetaFromState(state) == 0 && !worldIn.isRemote) {
-            TileEntity tile = worldIn.getTileEntity(pos);
-            if (tile instanceof TileArcaneFurnace) {
-                EntityBlaze blaze = new EntityBlaze(worldIn);
-                blaze.setPositionAndRotation(pos.getX() + 0.5D, pos.getY() + 1.0D, pos.getZ() + 0.5D, 0.0F, 0.0F);
-                blaze.addPotionEffect(new PotionEffect(MobEffects.RESISTANCE, 6000, 2, false, true));
-                blaze.addPotionEffect(new PotionEffect(MobEffects.FIRE_RESISTANCE, 12000, 0, false, true));
-                worldIn.spawnEntity(blaze);
-            }
+            EntityBlaze blaze = new EntityBlaze(worldIn);
+            blaze.setPositionAndRotation(pos.getX() + 0.5D, pos.getY() + 1.0D, pos.getZ() + 0.5D, 0.0F, 0.0F);
+            blaze.addPotionEffect(new PotionEffect(MobEffects.RESISTANCE, 6000, 2, false, true));
+            blaze.addPotionEffect(new PotionEffect(MobEffects.FIRE_RESISTANCE, 12000, 0, false, true));
+            worldIn.spawnEntity(blaze);
         }
-        super.onBlockHarvested(worldIn, pos, state, player);
+        super.onPlayerDestroy(worldIn, pos, state);
     }
 
     @Override
     public void breakBlock(World worldIn, BlockPos pos, IBlockState state) {
-        if (!worldIn.isRemote && this.getMetaFromState(state) == 0) {
-            this.restoreBlocks(worldIn, pos);
+        if (!worldIn.isRemote && !this.restoring) {
+            BlockPos core = this.findCore(worldIn, pos, state);
+            if (core != null) {
+                this.restoreBlocks(worldIn, core);
+            }
         }
         super.breakBlock(worldIn, pos, state);
     }
 
     @Override
     public void neighborChanged(IBlockState state, World worldIn, BlockPos pos, net.minecraft.block.Block blockIn, BlockPos fromPos) {
-        if (!worldIn.isRemote && this.getMetaFromState(state) == 0 && this.isArcaneFurnaceBroken(worldIn, pos)) {
+        if (!worldIn.isRemote && !this.restoring && this.getMetaFromState(state) == 0 && this.isArcaneFurnaceBroken(worldIn, pos)) {
             this.restoreBlocks(worldIn, pos);
             return;
         }
@@ -238,7 +256,9 @@ public class BlockArcaneFurnace extends BlockContainer {
 
     @Override
     protected BlockStateContainer createBlockState() {
-        return new BlockStateContainer(this, TYPE, FACING);
+        return new ExtendedBlockState(this,
+                new IProperty[]{TYPE, FACING},
+                new IUnlistedProperty[]{RENDER_LEVEL, NOZZLE_SIDE});
     }
 
     @Override
@@ -288,20 +308,79 @@ public class BlockArcaneFurnace extends BlockContainer {
         }
     }
 
-    private void restoreBlocks(World worldIn, BlockPos pos) {
+    private BlockPos findCore(IBlockAccess world, BlockPos pos, IBlockState state) {
+        if (this.getMetaFromState(state) == 0) {
+            return pos;
+        }
         for (int yy = -1; yy <= 1; ++yy) {
             for (int xx = -1; xx <= 1; ++xx) {
                 for (int zz = -1; zz <= 1; ++zz) {
                     BlockPos target = pos.add(xx, yy, zz);
-                    IBlockState targetState = worldIn.getBlockState(target);
-                    if (targetState.getBlock() != this) {
-                        continue;
+                    IBlockState targetState = world.getBlockState(target);
+                    if (targetState.getBlock() == this && this.getMetaFromState(targetState) == 0) {
+                        return target;
                     }
-                    worldIn.setBlockState(target, this.getRestoredState(this.getMetaFromState(targetState)), 3);
-                    worldIn.notifyBlockUpdate(target, targetState, worldIn.getBlockState(target), 3);
-                    worldIn.notifyNeighborsOfStateChange(target, worldIn.getBlockState(target).getBlock(), false);
                 }
             }
+        }
+        return null;
+    }
+
+    private int calculateRenderLevel(IBlockAccess world, BlockPos pos) {
+        int meta = this.getMetaFromState(world.getBlockState(pos));
+        IBlockState upState = world.getBlockState(pos.up());
+        IBlockState downState = world.getBlockState(pos.down());
+
+        int upMeta = upState.getBlock() == this ? this.getMetaFromState(upState) : -1;
+        if (upMeta == 10 || upMeta == 0) {
+            upMeta = meta;
+        }
+        int downMeta = downState.getBlock() == this ? this.getMetaFromState(downState) : -1;
+        if (downMeta == 10 || downMeta == 0) {
+            downMeta = meta;
+        }
+
+        if (meta == upMeta && meta == downMeta && upState.getBlock() == this && downState.getBlock() == this) {
+            return 9;
+        }
+        if (meta == upMeta && upState.getBlock() == this && (meta != downMeta || downState.getBlock() != this)) {
+            return 18;
+        }
+        return 0;
+    }
+
+    private int getTouchingNozzleSide(IBlockAccess world, BlockPos pos) {
+        for (EnumFacing side : EnumFacing.VALUES) {
+            IBlockState neighbor = world.getBlockState(pos.offset(side));
+            if (neighbor.getBlock() == this && this.getMetaFromState(neighbor) == 10) {
+                return side.getIndex();
+            }
+        }
+        return -1;
+    }
+
+    private void restoreBlocks(World worldIn, BlockPos pos) {
+        if (this.restoring) {
+            return;
+        }
+        this.restoring = true;
+        try {
+            for (int yy = -1; yy <= 1; ++yy) {
+                for (int xx = -1; xx <= 1; ++xx) {
+                    for (int zz = -1; zz <= 1; ++zz) {
+                        BlockPos target = pos.add(xx, yy, zz);
+                        IBlockState targetState = worldIn.getBlockState(target);
+                        if (targetState.getBlock() != this) {
+                            continue;
+                        }
+                        worldIn.setBlockState(target, this.getRestoredState(this.getMetaFromState(targetState)), 3);
+                        worldIn.notifyBlockUpdate(target, targetState, worldIn.getBlockState(target), 3);
+                        worldIn.notifyNeighborsOfStateChange(target, worldIn.getBlockState(target).getBlock(), false);
+                    }
+                }
+            }
+        } finally {
+            this.restoring = false;
         }
     }
 
@@ -332,5 +411,37 @@ public class BlockArcaneFurnace extends BlockContainer {
             return Blocks.OBSIDIAN.getDefaultState();
         }
         return Blocks.NETHER_BRICK.getDefaultState();
+    }
+
+    private static final class IntUnlistedProperty implements IUnlistedProperty<Integer> {
+        private final String name;
+        private final int min;
+        private final int max;
+
+        private IntUnlistedProperty(String name, int min, int max) {
+            this.name = name;
+            this.min = min;
+            this.max = max;
+        }
+
+        @Override
+        public String getName() {
+            return this.name;
+        }
+
+        @Override
+        public boolean isValid(Integer value) {
+            return value != null && value >= this.min && value <= this.max;
+        }
+
+        @Override
+        public Class<Integer> getType() {
+            return Integer.class;
+        }
+
+        @Override
+        public String valueToString(Integer value) {
+            return String.valueOf(value);
+        }
     }
 }

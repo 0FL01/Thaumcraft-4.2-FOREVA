@@ -31,7 +31,8 @@ public class BlockArcaneFurnaceStaticGuardTest {
         assertTrue(source.contains("return this.getNozzleBounds(this.getNozzleFacing(worldIn, pos));"));
         assertTrue(source.contains("return this.getBoundingBox(state, worldIn, pos);"));
         assertTrue(source.contains("Block.addCollisionBoxToList(pos, entityBox, collidingBoxes, CORE_AABB);"));
-        assertTrue(source.contains("return new BlockStateContainer(this, TYPE, FACING);"));
+        assertTrue(source.contains("return new ExtendedBlockState(this,"));
+        assertTrue(source.contains("new IUnlistedProperty[]{RENDER_LEVEL, NOZZLE_SIDE}"));
         assertTrue(source.contains("withProperty(FACING, EnumFacing.NORTH);"));
         assertTrue(source.contains("this.getMetaFromState(world.getBlockState(pos.west())) == 0"));
         assertTrue(source.contains("this.getMetaFromState(world.getBlockState(pos.east())) == 0"));
@@ -51,15 +52,21 @@ public class BlockArcaneFurnaceStaticGuardTest {
         assertTrue(source.contains("IBlockState restoredState = this.getRestoredState(this.getMetaFromState(state));"));
         assertTrue(source.contains("if (restoredState.getBlock() != Blocks.AIR) {"));
         assertTrue(source.contains("restoredState.getBlock().damageDropped(restoredState)"));
-        assertTrue(source.contains("public void onBlockHarvested(World worldIn, BlockPos pos, IBlockState state, net.minecraft.entity.player.EntityPlayer player)"));
+        assertTrue(source.contains("public void onPlayerDestroy(World worldIn, BlockPos pos, IBlockState state)"));
         assertTrue(source.contains("new EntityBlaze(worldIn);"));
         assertTrue(source.contains("new PotionEffect(MobEffects.RESISTANCE, 6000, 2, false, true)"));
         assertTrue(source.contains("new PotionEffect(MobEffects.FIRE_RESISTANCE, 12000, 0, false, true)"));
         assertTrue(source.contains("public void breakBlock(World worldIn, BlockPos pos, IBlockState state)"));
-        assertTrue(source.contains("if (!worldIn.isRemote && this.getMetaFromState(state) == 0) {"));
+        assertTrue(source.contains("if (!worldIn.isRemote && !this.restoring) {"));
+        assertTrue(source.contains("BlockPos core = this.findCore(worldIn, pos, state);"));
+        assertTrue(source.contains("if (core != null) {"));
         assertTrue(source.contains("public void neighborChanged(IBlockState state, World worldIn, BlockPos pos, net.minecraft.block.Block blockIn, BlockPos fromPos)"));
         assertTrue(source.contains("this.isArcaneFurnaceBroken(worldIn, pos)"));
+        assertTrue(source.contains("private BlockPos findCore(IBlockAccess world, BlockPos pos, IBlockState state)"));
+        assertTrue(source.contains("private boolean restoring = false;"));
         assertTrue(source.contains("private void restoreBlocks(World worldIn, BlockPos pos)"));
+        assertTrue(source.contains("this.restoring = true;"));
+        assertTrue(source.contains("this.restoring = false;"));
         assertTrue(source.contains("if ((yy == 0 && xx == 0 && zz == 0) || (yy == 1 && xx == 0 && zz == 0)) {"));
         assertTrue(source.contains("Blocks.AIR.getDefaultState()"));
         assertTrue(source.contains("Blocks.IRON_BARS.getDefaultState()"));
@@ -75,7 +82,7 @@ public class BlockArcaneFurnaceStaticGuardTest {
         assertTrue(source.contains("blockArcaneFurnace = (BlockArcaneFurnace) new BlockArcaneFurnace()"));
         assertTrue(source.contains("legacyPath(\"blockArcaneFurnace\")"));
         assertTrue(source.contains("blockArcaneFurnace,"));
-        assertTrue(source.contains("new BlockMetadataItem(blockArcaneFurnace)"));
+        assertTrue(source.contains("new BlockArcaneFurnaceItem(blockArcaneFurnace)"));
         assertTrue(source.contains("setRegistryName(blockArcaneFurnace.getRegistryName())"));
     }
 

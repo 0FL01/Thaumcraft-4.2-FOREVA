@@ -368,7 +368,7 @@ public class ConfigBlocks {
                 .setRegistryName(blockMirror.getRegistryName()));
         registry.register(new BlockEssentiaReservoirItem(blockEssentiaReservoir)
                 .setRegistryName(blockEssentiaReservoir.getRegistryName()));
-        registry.register(new BlockMetadataItem(blockArcaneFurnace)
+        registry.register(new BlockArcaneFurnaceItem(blockArcaneFurnace)
                 .setRegistryName(blockArcaneFurnace.getRegistryName()));
         registry.register(new BlockMetadataItem(blockMagicalLog)
                 .setRegistryName(blockMagicalLog.getRegistryName()));
