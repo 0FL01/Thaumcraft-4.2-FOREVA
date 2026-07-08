@@ -6,6 +6,7 @@ import java.util.Set;
 import javax.annotation.Nullable;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.client.resources.IReloadableResourceManager;
 import net.minecraft.client.model.ModelBat;
@@ -1154,6 +1155,11 @@ public class ClientProxy extends CommonProxy {
     @Override
     public void registerKeyBindings() {
         MinecraftForge.EVENT_BUS.register(new KeyHandler());
+    }
+
+    @Override
+    public boolean isShiftKeyDown() {
+        return GuiScreen.isShiftKeyDown();
     }
 
     @Override

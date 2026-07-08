@@ -2,10 +2,11 @@ package thaumcraft.common.tiles;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityItem;
-import net.minecraft.entity.passive.EntityHorse;
+import net.minecraft.entity.passive.AbstractHorse;
 import net.minecraft.util.ITickable;
 import net.minecraft.util.math.AxisAlignedBB;
 import thaumcraft.api.TileThaumcraft;
+import thaumcraft.common.Thaumcraft;
 import thaumcraft.common.config.ConfigBlocks;
 
 import java.util.List;
@@ -37,7 +38,7 @@ public class TileLifter extends TileThaumcraft implements ITickable {
 
             this.rangeAbove = 0;
             while (this.rangeAbove < max
-                    && !this.world.getBlockState(this.pos.up(1 + this.rangeAbove)).isFullCube()) {
+                    && !this.world.getBlockState(this.pos.up(1 + this.rangeAbove)).isOpaqueCube()) {
                 this.rangeAbove++;
             }
         }
@@ -53,10 +54,10 @@ public class TileLifter extends TileThaumcraft implements ITickable {
             List<Entity> targets = this.world.getEntitiesWithinAABB(Entity.class, bb);
             if (!targets.isEmpty()) {
                 for (Entity e : targets) {
-                    if (!(e instanceof EntityItem) && !e.isSneaking() && !(e instanceof EntityHorse)) {
+                    if (!(e instanceof EntityItem) && !e.canBeCollidedWith() && !(e instanceof AbstractHorse)) {
                         continue;
                     }
-                    if (e.isSneaking()) {
+                    if (Thaumcraft.proxy.isShiftKeyDown()) {
                         if (e.motionY < 0.0D) {
                             e.motionY *= 0.9D;
                         }

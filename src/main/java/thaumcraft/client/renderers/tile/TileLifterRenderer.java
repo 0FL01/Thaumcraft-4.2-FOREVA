@@ -11,10 +11,11 @@ import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.util.EnumFacing;
 import org.lwjgl.opengl.GL11;
-import thaumcraft.common.blocks.ItemBlocks.BlockCustomOreItem;
 import thaumcraft.common.tiles.TileLifter;
 
 public class TileLifterRenderer extends TileEntitySpecialRenderer<TileLifter> {
+    private static final int TOP_GLOW_COLOR = 0xD000A000;
+    private static final int SIDE_GLOW_COLOR = 0xD0DD11FF;
 
     @Override
     public void render(TileLifter tile, double x, double y, double z, float partialTicks, int destroyStage, float alpha) {
@@ -49,7 +50,7 @@ public class TileLifterRenderer extends TileEntitySpecialRenderer<TileLifter> {
                     0.01F, 0.99F, 0.99F,
                     0.99F, 0.99F, 0.99F,
                     0.99F, 0.99F, 0.01F,
-                    glow, 0xD040A000);
+                    glow, TOP_GLOW_COLOR);
         }
         if (shouldRenderFace(tile, EnumFacing.WEST)) {
             TileRenderHelper.addTexturedFace(buf,
@@ -57,7 +58,7 @@ public class TileLifterRenderer extends TileEntitySpecialRenderer<TileLifter> {
                     0.01F, 0.10F, 0.99F,
                     0.01F, 0.10F, 0.01F,
                     0.01F, 0.90F, 0.01F,
-                    glow, 0xD0EECCFF);
+                    glow, SIDE_GLOW_COLOR);
         }
         if (shouldRenderFace(tile, EnumFacing.EAST)) {
             TileRenderHelper.addTexturedFace(buf,
@@ -65,7 +66,7 @@ public class TileLifterRenderer extends TileEntitySpecialRenderer<TileLifter> {
                     0.99F, 0.10F, 0.01F,
                     0.99F, 0.10F, 0.99F,
                     0.99F, 0.90F, 0.99F,
-                    glow, 0xD0EECCFF);
+                    glow, SIDE_GLOW_COLOR);
         }
         if (shouldRenderFace(tile, EnumFacing.NORTH)) {
             TileRenderHelper.addTexturedFace(buf,
@@ -73,7 +74,7 @@ public class TileLifterRenderer extends TileEntitySpecialRenderer<TileLifter> {
                     0.99F, 0.10F, 0.01F,
                     0.01F, 0.10F, 0.01F,
                     0.01F, 0.90F, 0.01F,
-                    glow, 0xD0EECCFF);
+                    glow, SIDE_GLOW_COLOR);
         }
         if (shouldRenderFace(tile, EnumFacing.SOUTH)) {
             TileRenderHelper.addTexturedFace(buf,
@@ -81,7 +82,7 @@ public class TileLifterRenderer extends TileEntitySpecialRenderer<TileLifter> {
                     0.01F, 0.10F, 0.99F,
                     0.99F, 0.10F, 0.99F,
                     0.99F, 0.90F, 0.99F,
-                    glow, 0xD0EECCFF);
+                    glow, SIDE_GLOW_COLOR);
         }
         tess.draw();
 

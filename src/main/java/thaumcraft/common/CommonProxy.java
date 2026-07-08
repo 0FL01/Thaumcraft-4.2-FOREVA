@@ -147,6 +147,10 @@ public class CommonProxy implements IGuiHandler {
     public void registerKeyBindings() {
     }
 
+    public boolean isShiftKeyDown() {
+        return false;
+    }
+
     public void registerHandlers() {
     }
 

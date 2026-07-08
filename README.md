@@ -47,7 +47,7 @@ Remaining work is mostly item-specific logic, runtime parity testing, and final 
 
 ## Known limitations
 
-- Some item-specific logic is still incomplete or needs parity review, including Arcane Levitator, Traveller's Charm, Caging Stone, and similar edge-case items
+- Some item-specific logic is still incomplete or needs parity review, including Traveller's Charm, Caging Stone, and similar edge-case items
 - Infusion crafting gameplay still needs full runtime verification; the matrix renderer itself has been hardened
 - Visual parity is much better after the July cleanup, but remaining models/renderers/textures still need comparison against TC4
 - Untested systems may still have defects
