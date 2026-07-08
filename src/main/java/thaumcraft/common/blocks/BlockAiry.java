@@ -202,6 +202,26 @@ public class BlockAiry extends BlockContainer {
     }
 
     @Override
+    public void randomDisplayTick(IBlockState state, World world, BlockPos pos, Random rand) {
+        int meta = this.getMetaFromState(state);
+        if (meta != 10 && meta != 11) {
+            return;
+        }
+
+        float h = rand.nextFloat() * 0.33F;
+        float x = (float) pos.getX() + rand.nextFloat();
+        float y = (float) pos.getY() + 0.1515F + h / 2.0F;
+        float z = (float) pos.getZ() + rand.nextFloat();
+        float scale = 0.33F + h;
+        if (meta == 10) {
+            Thaumcraft.proxy.spark(x, y, z, scale, 0.65F + rand.nextFloat() * 0.1F, 1.0F, 1.0F, 0.8F);
+        } else {
+            Thaumcraft.proxy.spark(x, y, z, scale, 0.3F - rand.nextFloat() * 0.1F, 0.0F,
+                    0.5F + rand.nextFloat() * 0.2F, 1.0F);
+        }
+    }
+
+    @Override
     public boolean canBeReplacedByLeaves(IBlockState state, IBlockAccess world, BlockPos pos) {
         int meta = this.getMetaFromState(state);
         return meta == 2 || meta == 3 || meta == 4;

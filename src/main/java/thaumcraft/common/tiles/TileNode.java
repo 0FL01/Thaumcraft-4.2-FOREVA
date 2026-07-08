@@ -30,7 +30,10 @@ import thaumcraft.api.wands.IWandable;
 import thaumcraft.api.wands.WandCap;
 import thaumcraft.api.wands.WandRod;
 import thaumcraft.api.WorldCoordinates;
+import thaumcraft.common.blocks.BlockTaintFibres;
+import thaumcraft.common.config.Config;
 import thaumcraft.common.config.ConfigBlocks;
+import thaumcraft.common.entities.monster.EntityGiantBrainyZombie;
 import thaumcraft.common.items.ItemCompassStone;
 import thaumcraft.common.items.wands.ItemWandCasting;
 import thaumcraft.common.lib.network.PacketHandler;
@@ -286,6 +289,8 @@ implements ITickable, INode, IAspectContainer, IWandable {
             this.lastActive = System.currentTimeMillis();
             changed |= rechargeOneMissingAspect();
         }
+        changed = handleTaintNode(changed);
+        changed = handleDarkNode(changed);
         changed = handlePureNode(changed);
 
         if (changed) {
@@ -484,6 +489,85 @@ implements ITickable, INode, IAspectContainer, IWandable {
         Aspect aspect = missing.getAspects()[this.world.rand.nextInt(missing.size())];
         this.addToContainer(aspect, 1);
         return true;
+    }
+
+    private boolean handleTaintNode(boolean changed) {
+        if (this.getNodeType() == NodeType.TAINTED && this.count % 50 == 0) {
+            int x = this.pos.getX() + this.world.rand.nextInt(8) - this.world.rand.nextInt(8);
+            int z = this.pos.getZ() + this.world.rand.nextInt(8) - this.world.rand.nextInt(8);
+            if (ThaumcraftWorldGenerator.biomeTaint != null) {
+                Biome biome = this.world.getBiome(new BlockPos(x, 0, z));
+                if (!isSameBiome(biome, ThaumcraftWorldGenerator.biomeTaint)) {
+                    Utils.setBiomeAt(this.world, x, z, ThaumcraftWorldGenerator.biomeTaint);
+                }
+            }
+
+            if (Config.hardNode && this.world.rand.nextBoolean()) {
+                x = this.pos.getX() + this.world.rand.nextInt(5) - this.world.rand.nextInt(5);
+                int y = this.pos.getY() + this.world.rand.nextInt(5) - this.world.rand.nextInt(5);
+                z = this.pos.getZ() + this.world.rand.nextInt(5) - this.world.rand.nextInt(5);
+                BlockTaintFibres.spreadFibres(this.world, new BlockPos(x, y, z));
+            }
+        }
+
+        if (this.getNodeType() == NodeType.PURE || this.getNodeType() == NodeType.TAINTED || this.count % 100 != 0) {
+            return changed;
+        }
+        if (ThaumcraftWorldGenerator.biomeTaint == null) {
+            return changed;
+        }
+        Biome biome = this.world.getBiome(this.pos);
+        if (!isSameBiome(biome, ThaumcraftWorldGenerator.biomeTaint) || this.world.rand.nextInt(500) != 0) {
+            return changed;
+        }
+        this.setNodeType(NodeType.TAINTED);
+        return true;
+    }
+
+    private boolean handleDarkNode(boolean changed) {
+        int dim = this.world.provider.getDimension();
+        int dimBlacklist = ThaumcraftWorldGenerator.getDimBlacklist(dim);
+        Biome nodeBiome = this.world.getBiome(this.pos);
+        int biomeBlacklist = ThaumcraftWorldGenerator.getBiomeBlacklist(Biome.getIdForBiome(nodeBiome));
+        if (dim == -1 || dim == 1 || dimBlacklist == 0 || dimBlacklist == 2 || biomeBlacklist == 0 || biomeBlacklist == 2) {
+            return changed;
+        }
+        if (this.getNodeType() != NodeType.DARK || this.count % 50 != 0) {
+            return changed;
+        }
+        if (ThaumcraftWorldGenerator.biomeEerie == null) {
+            return changed;
+        }
+
+        int x = this.pos.getX() + this.world.rand.nextInt(12) - this.world.rand.nextInt(12);
+        int z = this.pos.getZ() + this.world.rand.nextInt(12) - this.world.rand.nextInt(12);
+        Biome biome = this.world.getBiome(new BlockPos(x, 0, z));
+        if (!isSameBiome(biome, ThaumcraftWorldGenerator.biomeEerie)) {
+            Utils.setBiomeAt(this.world, x, z, ThaumcraftWorldGenerator.biomeEerie);
+        }
+
+        if (Config.hardNode && this.world.rand.nextBoolean()
+                && this.world.getClosestPlayer(
+                        (double) this.pos.getX() + 0.5D,
+                        (double) this.pos.getY() + 0.5D,
+                        (double) this.pos.getZ() + 0.5D,
+                        24.0D,
+                        false) != null) {
+            EntityGiantBrainyZombie entity = new EntityGiantBrainyZombie(this.world);
+            AxisAlignedBB nearby = new AxisAlignedBB(this.pos).grow(10.0D, 6.0D, 10.0D);
+            if (this.world.getEntitiesWithinAABB(EntityGiantBrainyZombie.class, nearby).size() <= 3) {
+                double spawnX = (double) this.pos.getX() + (this.world.rand.nextDouble() - this.world.rand.nextDouble()) * 5.0D;
+                double spawnY = this.pos.getY() + this.world.rand.nextInt(3) - 1;
+                double spawnZ = (double) this.pos.getZ() + (this.world.rand.nextDouble() - this.world.rand.nextDouble()) * 5.0D;
+                entity.setLocationAndAngles(spawnX, spawnY, spawnZ, this.world.rand.nextFloat() * 360.0F, 0.0F);
+                if (entity.getCanSpawnHere()) {
+                    this.world.spawnEntity(entity);
+                    this.world.playEvent(2004, this.pos, 0);
+                    entity.spawnExplosionParticle();
+                }
+            }
+        }
+        return changed;
     }
 
     private boolean handlePureNode(boolean changed) {
