@@ -15,7 +15,7 @@ import thaumcraft.common.config.ConfigItems;
 
 public class EntityTaintSporeSwarmer extends EntityTaintSpore {
     private int spawnCounter;
-    private final ArrayList<Integer> swarm = new ArrayList<>();
+    private final ArrayList<Object> swarm = new ArrayList<>();
 
     public EntityTaintSporeSwarmer(World world) {
         super(world);
@@ -59,15 +59,16 @@ public class EntityTaintSporeSwarmer extends EntityTaintSpore {
         }
 
         if (this.world.isRemote) {
-            for (int i = this.swarm.size() - 1; i >= 0; i--) {
-                if (this.ticksExisted - this.swarm.get(i) > 12) {
+            for (int i = 0; i < this.swarm.size();) {
+                if (!thaumcraft.common.Thaumcraft.proxy.isParticleAlive(this.swarm.get(i))) {
                     this.swarm.remove(i);
+                } else {
+                    i++;
                 }
             }
             int maxSwarmParticles = (500 - this.spawnCounter) / 25;
             if (this.swarm.size() < maxSwarmParticles) {
-                this.swarm.add(this.ticksExisted);
-                thaumcraft.common.Thaumcraft.proxy.swarmParticleFX(this.world, this, 0.1F, 10.0F, 0.0F);
+                this.swarm.add(thaumcraft.common.Thaumcraft.proxy.swarmParticleFX(this.world, this, 0.1F, 10.0F, 0.0F));
             }
         }
 

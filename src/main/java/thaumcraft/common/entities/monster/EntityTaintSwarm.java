@@ -33,7 +33,7 @@ public class EntityTaintSwarm extends EntityMob implements ITaintedMob {
     private BlockPos currentFlightTarget;
     private int attackCooldown;
     public int damBonus = 0;
-    public final ArrayList<Integer> swarm = new ArrayList<>();
+    public final ArrayList<Object> swarm = new ArrayList<>();
 
     public EntityTaintSwarm(net.minecraft.world.World world) {
         super(world);
@@ -116,15 +116,16 @@ public class EntityTaintSwarm extends EntityMob implements ITaintedMob {
         }
         this.motionY *= 0.6000000238418579D;
         if (this.world.isRemote) {
-            for (int i = this.swarm.size() - 1; i >= 0; i--) {
-                if (this.ticksExisted - this.swarm.get(i) > 8) {
+            for (int i = 0; i < this.swarm.size();) {
+                if (!Thaumcraft.proxy.isParticleAlive(this.swarm.get(i))) {
                     this.swarm.remove(i);
+                } else {
+                    i++;
                 }
             }
             int maxParticles = Math.max(10, Thaumcraft.proxy.particleCount(25));
             if (this.swarm.size() < maxParticles) {
-                this.swarm.add(this.ticksExisted);
-                Thaumcraft.proxy.swarmParticleFX(this.world, this, 0.22F, 15.0F, 0.08F);
+                this.swarm.add(Thaumcraft.proxy.swarmParticleFX(this.world, this, 0.22F, 15.0F, 0.08F));
             }
         }
     }

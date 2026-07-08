@@ -92,6 +92,7 @@ public class ClientProxyFxStaticGuardTest {
         assertTrue("ClientProxy must expose dedicated swarmParticleFX/splooshFX routes for taint swarm-family visuals",
                 source.contains("public Object swarmParticleFX(")
                         && source.contains("new FXSwarm(")
+                        && source.contains("public boolean isParticleAlive(Object particle)")
                         && source.contains("public void splooshFX(Entity entity)")
                         && source.contains("new FXBreaking(")
                         && source.contains("Items.SLIME_BALL"));
@@ -369,11 +370,15 @@ public class ClientProxyFxStaticGuardTest {
                         && sparkleFx.contains("float vMin = 0.25F")
                         && sparkleFx.contains("return 0;")
                         && sparkleFx.contains("leyLineEffect"));
-        assertTrue("Dedicated FXSwarm particle must keep target-tracking swarm baseline",
-                swarmFx.contains("class FXSwarm extends Particle")
+        assertTrue("Dedicated FXSwarm particle must keep TC4 target-tracking batch-rendered swarm baseline",
+                swarmFx.contains("class FXSwarm extends Particle implements ITCParticle")
                         && swarmFx.contains("private final Entity target;")
-                        && swarmFx.contains("steerTowardsTarget()")
+                        && swarmFx.contains("steerTowardsTarget(boolean targetHurt)")
                         && swarmFx.contains("pushOutOfBlocks(this.posX, this.posY, this.posZ);")
+                        && swarmFx.contains("public int getTCParticleLayer()")
+                        && swarmFx.contains("return 1;")
+                        && !swarmFx.contains("buffer.begin(GL11.GL_QUADS")
+                        && !swarmFx.contains("tessellator.draw();")
                         && swarmFx.contains("TCSounds.FLY")
                         && !swarmFx.contains("EnumParticleTypes.REDSTONE")
                         && !swarmFx.contains("EnumParticleTypes.CRIT_MAGIC"));

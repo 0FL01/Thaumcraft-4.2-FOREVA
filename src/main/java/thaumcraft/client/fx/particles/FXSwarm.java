@@ -3,19 +3,15 @@ package thaumcraft.client.fx.particles;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.particle.Particle;
 import net.minecraft.client.renderer.BufferBuilder;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import org.lwjgl.opengl.GL11;
+import thaumcraft.client.fx.ITCParticle;
 import thaumcraft.common.config.ConfigBlocks;
 import thaumcraft.common.lib.TCSounds;
 
@@ -23,8 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @SideOnly(Side.CLIENT)
-public class FXSwarm extends Particle {
-    private static final ResourceLocation PARTICLE_TEXTURE = new ResourceLocation("textures/particle/particles.png");
+public class FXSwarm extends Particle implements ITCParticle {
     private static final float MAX_SPEED = 0.35F;
     private static final int LIGHTMAP_FULLBRIGHT = 0x00F000F0;
     private static final List<Long> buzzcount = new ArrayList<>();
@@ -56,7 +51,7 @@ public class FXSwarm extends Particle {
         EntityLivingBase player = mc.player;
         int visibleDistance = mc.gameSettings.fancyGraphics ? 64 : 32;
         if (player != null && player.getDistance(this.posX, this.posY, this.posZ) > visibleDistance) {
-            this.particleMaxAge = 0;
+            this.setExpired();
         }
     }
 
@@ -82,14 +77,12 @@ public class FXSwarm extends Particle {
             return;
         }
 
-        if (this.particleAge++ >= this.particleMaxAge) {
-            this.setExpired();
-            return;
-        }
+        this.particleAge++;
 
         boolean targetAlive = this.target != null
                 && !this.target.isDead
                 && (!(this.target instanceof EntityLivingBase) || ((EntityLivingBase) this.target).deathTime <= 0);
+        boolean targetHurt = this.target instanceof EntityLivingBase && ((EntityLivingBase) this.target).hurtTime > 0;
 
         if (!targetAlive) {
             this.deathTimer++;
@@ -100,7 +93,6 @@ public class FXSwarm extends Particle {
             }
         } else {
             this.motionY += this.particleGravity;
-            steerTowardsTarget();
         }
 
         pushOutOfBlocks(this.posX, this.posY, this.posZ);
@@ -108,6 +100,10 @@ public class FXSwarm extends Particle {
         this.motionX *= 0.985D;
         this.motionY *= 0.985D;
         this.motionZ *= 0.985D;
+
+        if (targetAlive) {
+            steerTowardsTarget(targetHurt);
+        }
 
         if (this.world.rand.nextInt(50) == 0) {
             EntityLivingBase player = Minecraft.getMinecraft().player;
@@ -122,30 +118,34 @@ public class FXSwarm extends Particle {
         }
     }
 
-    private void steerTowardsTarget() {
+    private void steerTowardsTarget(boolean targetHurt) {
         double tx = this.target.posX - this.posX;
-        double ty = this.target.posY + this.target.height * 0.5D - this.posY;
+        double ty = (this.target.getEntityBoundingBox().minY + this.target.getEntityBoundingBox().maxY) * 0.5D
+                - (this.getBoundingBox().minY + this.getBoundingBox().maxY) * 0.5D;
         double tz = this.target.posZ - this.posZ;
         double distSq = tx * tx + ty * ty + tz * tz;
         if (distSq < 1.0E-6D) {
             return;
         }
 
-        float maxTurn = Math.max(1.0F, this.turnSpeed);
-        if (distSq > this.target.width * this.target.width) {
-            rotateToward(tx, ty, tz, maxTurn);
+        float halfTurn = Math.max(1.0F, this.turnSpeed * 0.5F);
+        int randomTurn = Math.max(1, (int) halfTurn);
+        float maxYaw = halfTurn + this.rand.nextInt(randomTurn);
+        float maxPitch = halfTurn + this.rand.nextInt(randomTurn);
+        if (distSq > this.target.width && !targetHurt) {
+            rotateToward(tx, ty, tz, maxYaw, maxPitch);
         } else {
-            rotateToward(-tx, -ty, -tz, maxTurn);
+            rotateToward(-tx, -ty, -tz, maxYaw, maxPitch);
         }
     }
 
-    private void rotateToward(double tx, double ty, double tz, float maxTurn) {
+    private void rotateToward(double tx, double ty, double tz, float maxYaw, float maxPitch) {
         double flat = Math.sqrt(tx * tx + tz * tz);
         float targetYaw = (float) (Math.atan2(tz, tx) * 180.0D / Math.PI) - 90.0F;
         float targetPitch = (float) (-(Math.atan2(ty, flat) * 180.0D / Math.PI));
 
-        this.particleAngle = updateRotation(this.particleAngle, targetYaw, maxTurn);
-        this.pitch = updateRotation(this.pitch, targetPitch, maxTurn);
+        this.particleAngle = updateRotation(this.particleAngle, targetYaw, maxYaw);
+        this.pitch = updateRotation(this.pitch, targetPitch, maxPitch);
 
         float yawRad = this.particleAngle * 0.017453292F;
         float pitchRad = this.pitch * 0.017453292F;
@@ -181,12 +181,9 @@ public class FXSwarm extends Particle {
     }
 
     @Override
-    public void renderParticle(BufferBuilder ignored, Entity entityIn, float partialTicks,
+    public void renderParticle(BufferBuilder buffer, Entity entityIn, float partialTicks,
                                float rotationX, float rotationZ, float rotationYZ,
                                float rotationXY, float rotationXZ) {
-        Tessellator tessellator = Tessellator.getInstance();
-        BufferBuilder buffer = tessellator.getBuffer();
-
         float bob = MathHelper.sin(this.particleAge / 3.0F) * 0.25F + 1.0F;
         int frame = 7 + this.particleAge % 8;
         float u0 = frame / 16.0F;
@@ -206,20 +203,20 @@ public class FXSwarm extends Particle {
             blue *= 0.5F;
         }
 
-        Minecraft.getMinecraft().renderEngine.bindTexture(PARTICLE_TEXTURE);
-        GlStateManager.enableBlend();
-        GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-        buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.PARTICLE_POSITION_TEX_COLOR_LMAP);
         addLitVertex(buffer, px - rotationX * size - rotationXY * size, py - rotationZ * size, pz - rotationYZ * size - rotationXZ * size, u1, v1, red, green, blue, alpha);
         addLitVertex(buffer, px - rotationX * size + rotationXY * size, py + rotationZ * size, pz - rotationYZ * size + rotationXZ * size, u1, v0, red, green, blue, alpha);
         addLitVertex(buffer, px + rotationX * size + rotationXY * size, py + rotationZ * size, pz + rotationYZ * size + rotationXZ * size, u0, v0, red, green, blue, alpha);
         addLitVertex(buffer, px + rotationX * size - rotationXY * size, py - rotationZ * size, pz + rotationYZ * size - rotationXZ * size, u0, v1, red, green, blue, alpha);
-        tessellator.draw();
     }
 
     @Override
     public int getFXLayer() {
-        return 3;
+        return 1;
+    }
+
+    @Override
+    public int getTCParticleLayer() {
+        return 1;
     }
 
     protected boolean pushOutOfBlocks(double x, double y, double z) {

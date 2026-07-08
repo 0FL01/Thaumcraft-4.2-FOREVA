@@ -537,12 +537,14 @@ public class ClientProxyEntityRendererRegistrationStaticGuardTest {
                 taintCreeperEntity.contains("SoundEvents.ENTITY_CREEPER_PRIMED")
                         && taintCreeperEntity.contains("this.timeSinceIgnited += state;")
                         && taintCreeperEntity.contains("if (this.timeSinceIgnited < 0)")
-                        && taintCreeperEntity.contains("createExplosion(this, this.posX, this.posY + (double)(this.height / 2.0F), this.posZ, 1.5F, false)"));
-        assertTrue("EntityTaintCreeper must keep early client taint FX baseline",
+                        && taintCreeperEntity.contains("createExplosion(this, this.posX, this.posY + (double)(this.height / 2.0F), this.posZ, 1.5F, false)")
+                        && taintCreeperEntity.contains("Thaumcraft.proxy.particleCount(100)")
+                        && taintCreeperEntity.contains("Thaumcraft.proxy.taintsplosionFX(this)"));
+        assertTrue("EntityTaintCreeper must keep early client sploosh FX baseline",
                 taintCreeperEntity.contains("public void onLivingUpdate()")
                         && taintCreeperEntity.contains("this.world.isRemote && this.ticksExisted < 5")
                         && taintCreeperEntity.contains("Thaumcraft.proxy.particleCount(10)")
-                        && taintCreeperEntity.contains("Thaumcraft.proxy.taintLandFX(this)"));
+                        && taintCreeperEntity.contains("Thaumcraft.proxy.splooshFX(this)"));
         assertTrue("EntityTaintCreeper must keep fall-accelerated fuse baseline",
                 taintCreeperEntity.contains("public void fall(float distance, float damageMultiplier)")
                         && taintCreeperEntity.contains("distance * 1.5F")
@@ -582,7 +584,7 @@ public class ClientProxyEntityRendererRegistrationStaticGuardTest {
                         && taintSheepEntity.contains("protected boolean canDespawn()")
                         && taintSheepEntity.contains("public int getTotalArmorValue()")
                         && taintSheepEntity.contains("this.world.isRemote && this.ticksExisted < 5")
-                        && taintSheepEntity.contains("Thaumcraft.proxy.taintLandFX(this)")
+                        && taintSheepEntity.contains("Thaumcraft.proxy.splooshFX(this)")
                         && taintSheepEntity.contains("SoundEvents.ENTITY_SHEEP_AMBIENT")
                         && taintSheepEntity.contains("this.world.rand.nextInt(3) == 0")
                         && taintSheepEntity.contains("return !this.getSheared();")
@@ -609,7 +611,7 @@ public class ClientProxyEntityRendererRegistrationStaticGuardTest {
                         && taintVillagerEntity.contains("this.world.getVillageCollection().addToVillagerPositionList(pos)")
                         && taintVillagerEntity.contains("this.villageObj = this.world.getVillageCollection().getNearestVillage(pos, 32)")
                         && taintVillagerEntity.contains("this.villageObj.addOrRenewAgressor(livingBase)")
-                        && taintVillagerEntity.contains("Thaumcraft.proxy.taintLandFX(this)")
+                        && taintVillagerEntity.contains("Thaumcraft.proxy.splooshFX(this)")
                         && taintVillagerEntity.contains("SoundEvents.ENTITY_VILLAGER_AMBIENT")
                         && taintVillagerEntity.contains("SoundEvents.ENTITY_VILLAGER_HURT")
                         && taintVillagerEntity.contains("SoundEvents.ENTITY_VILLAGER_DEATH")
@@ -630,6 +632,9 @@ public class ClientProxyEntityRendererRegistrationStaticGuardTest {
                         && taintSwarmEntity.contains("return 15728880;")
                         && taintSwarmEntity.contains("return 1.0F;")
                         && taintSwarmEntity.contains("this.motionY *= 0.6000000238418579D;")
+                        && taintSwarmEntity.contains("public final ArrayList<Object> swarm = new ArrayList<>();")
+                        && taintSwarmEntity.contains("Thaumcraft.proxy.isParticleAlive(this.swarm.get(i))")
+                        && taintSwarmEntity.contains("this.swarm.add(Thaumcraft.proxy.swarmParticleFX")
                         && taintSwarmEntity.contains("Thaumcraft.proxy.particleCount(25)")
                         && taintSwarmEntity.contains("this.attackEntityFrom(DamageSource.STARVE, 5.0F);")
                         && taintSwarmEntity.contains("this.world.getClosestPlayerToEntity(this, 12.0D)")
@@ -644,7 +649,7 @@ public class ClientProxyEntityRendererRegistrationStaticGuardTest {
                         && taintSwarmEntity.contains("itemResource, 1, 11"));
         String taintSporeEntity = readFile("src/main/java/thaumcraft/common/entities/monster/EntityTaintSpore.java");
         assertTrue("EntityTaintSpore must keep reference-shaped size/fullbright/swarm-particle/burst baseline contracts",
-                taintSporeEntity.contains("public final ArrayList<Integer> swarm = new ArrayList<>();")
+                taintSporeEntity.contains("public final ArrayList<Object> swarm = new ArrayList<>();")
                         && taintSporeEntity.contains("this.setSporeSize(2);")
                         && taintSporeEntity.contains("this.dataManager.register(SPORE_SIZE, 1);")
                         && taintSporeEntity.contains("return 0.0D;")
@@ -653,8 +658,9 @@ public class ClientProxyEntityRendererRegistrationStaticGuardTest {
                         && taintSporeEntity.contains("return 1.0F;")
                         && taintSporeEntity.contains("this.world.getBiome(this.getPosition()) != ThaumcraftWorldGenerator.biomeTaint")
                         && taintSporeEntity.contains("this.attackEntityFrom(DamageSource.DROWN, 1.0f);")
+                        && taintSporeEntity.contains("Thaumcraft.proxy.isParticleAlive(this.swarm.get(i))")
                         && taintSporeEntity.contains("this.swarm.size() < this.getSporeSize() / 3")
-                        && taintSporeEntity.contains("Thaumcraft.proxy.swarmParticleFX(this.world, this, 0.1F, 10.0F, 0.0F);")
+                        && taintSporeEntity.contains("this.swarm.add(thaumcraft.common.Thaumcraft.proxy.swarmParticleFX(this.world, this, 0.1F, 10.0F, 0.0F));")
                         && taintSporeEntity.contains("this.sploosh(50);")
                         && taintSporeEntity.contains("protected void sploosh(int amount)")
                         && taintSporeEntity.contains("Thaumcraft.proxy.splooshFX(this);")
@@ -675,7 +681,9 @@ public class ClientProxyEntityRendererRegistrationStaticGuardTest {
                         && taintSporeSwarmerEntity.contains("this.pushOutOfBlocks(this.posX, this.posY, this.posZ);")
                         && taintSporeSwarmerEntity.contains("this.world.getClosestPlayerToEntity(this, 16.0D)")
                         && taintSporeSwarmerEntity.contains("this.swarmBurst(1);")
-                        && taintSporeSwarmerEntity.contains("Thaumcraft.proxy.swarmParticleFX(this.world, this, 0.1F, 10.0F, 0.0F);")
+                        && taintSporeSwarmerEntity.contains("private final ArrayList<Object> swarm = new ArrayList<>();")
+                        && taintSporeSwarmerEntity.contains("Thaumcraft.proxy.isParticleAlive(this.swarm.get(i))")
+                        && taintSporeSwarmerEntity.contains("this.swarm.add(thaumcraft.common.Thaumcraft.proxy.swarmParticleFX(this.world, this, 0.1F, 10.0F, 0.0F));")
                         && taintSporeSwarmerEntity.contains("this.world.setEntityState(this, (byte) 6);")
                         && taintSporeSwarmerEntity.contains("if (id == 6)")
                         && taintSporeSwarmerEntity.contains("this.spawnCounter = 500;")
@@ -711,6 +719,7 @@ public class ClientProxyEntityRendererRegistrationStaticGuardTest {
                         && taintacleEntity.contains("return false;")
                         && taintacleEntity.contains("this.attackTentacle(this.getAttackTarget(), dist);")
                         && taintacleEntity.contains("this.setAttackTarget(this.findNearestTarget());")
+                        && taintacleEntity.contains("Thaumcraft.proxy.tentacleAriseFX(this);")
                         && taintacleEntity.contains("protected void attackTentacle(Entity entity, float distance)")
                         && taintacleEntity.contains("DamageSourceThaumcraft.causeTentacleDamage(this)")
                         && taintacleEntity.contains("EnchantmentHelper.getModifierForCreature")
@@ -836,7 +845,7 @@ public class ClientProxyEntityRendererRegistrationStaticGuardTest {
                         && taintChickenEntity.contains("protected boolean canDespawn()")
                         && taintChickenEntity.contains("public void fall(float distance, float damageMultiplier)")
                         && taintChickenEntity.contains("this.world.isRemote && this.ticksExisted < 5")
-                        && taintChickenEntity.contains("Thaumcraft.proxy.taintLandFX(this)")
+                        && taintChickenEntity.contains("Thaumcraft.proxy.splooshFX(this)")
                         && taintChickenEntity.contains("SoundEvents.ENTITY_CHICKEN_HURT"));
         String taintCowEntity = readFile("src/main/java/thaumcraft/common/entities/monster/EntityTaintCow.java");
         assertTrue("EntityTaintCow must keep reference-shaped AI/attribute/sound baseline contracts",
@@ -854,7 +863,7 @@ public class ClientProxyEntityRendererRegistrationStaticGuardTest {
                         && taintCowEntity.contains("setBaseValue(0.27D)")
                         && taintCowEntity.contains("public boolean canBreatheUnderwater()")
                         && taintCowEntity.contains("this.world.isRemote && this.ticksExisted < 5")
-                        && taintCowEntity.contains("Thaumcraft.proxy.taintLandFX(this)")
+                        && taintCowEntity.contains("Thaumcraft.proxy.splooshFX(this)")
                         && taintCowEntity.contains("SoundEvents.ENTITY_COW_HURT"));
         String taintPigEntity = readFile("src/main/java/thaumcraft/common/entities/monster/EntityTaintPig.java");
         assertTrue("EntityTaintPig must keep reference-shaped AI/attribute/sound/drop baseline contracts",
@@ -874,7 +883,7 @@ public class ClientProxyEntityRendererRegistrationStaticGuardTest {
                         && taintPigEntity.contains("protected boolean canDespawn()")
                         && taintPigEntity.contains("public int getMaxSpawnedInChunk()")
                         && taintPigEntity.contains("this.world.isRemote && this.ticksExisted < 5")
-                        && taintPigEntity.contains("Thaumcraft.proxy.taintLandFX(this)")
+                        && taintPigEntity.contains("Thaumcraft.proxy.splooshFX(this)")
                         && taintPigEntity.contains("SoundEvents.ENTITY_PIG_AMBIENT")
                         && taintPigEntity.contains("this.world.rand.nextInt(3) == 0"));
         assertTrue("ClientProxy must iterate ConfigEntities.ENTITIES for renderer registration coverage",

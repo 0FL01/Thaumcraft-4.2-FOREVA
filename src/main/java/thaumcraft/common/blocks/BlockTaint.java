@@ -16,6 +16,8 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.NonNullList;
+import net.minecraft.util.SoundCategory;
+import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.IBlockAccess;
@@ -24,6 +26,8 @@ import net.minecraft.world.biome.Biome;
 import thaumcraft.common.Thaumcraft;
 import thaumcraft.common.config.Config;
 import thaumcraft.common.config.ConfigBlocks;
+import thaumcraft.common.entities.monster.EntityTaintSporeSwarmer;
+import thaumcraft.common.lib.TCSounds;
 import thaumcraft.common.lib.utils.Utils;
 import thaumcraft.common.lib.world.ThaumcraftWorldGenerator;
 
@@ -54,14 +58,20 @@ public class BlockTaint extends Block {
             BlockTaintFibres.taintBiomeSpread(world, pos, rand, this);
             BlockPos target = pos.add(rand.nextInt(3) - 1, rand.nextInt(5) - 3, rand.nextInt(3) - 1);
             if (BlockTaintFibres.isTaintBiome(world, target)) {
-                if (BlockTaintFibres.spreadFibres(world, target)) return;
-                int adjacent = BlockTaintFibres.getAdjacentTaint(world, target);
-                IBlockState targetState = world.getBlockState(target);
-                Block targetBlock = targetState.getBlock();
-                if (adjacent >= 2 && (Utils.isWoodLog(world, target) || targetBlock.isLeaves(targetState, world, target))) {
-                    world.setBlockState(target, ConfigBlocks.blockTaint.getStateFromMeta(0), 3);
-                } else if (adjacent >= 3 && isTaintSoilTarget(targetBlock)) {
-                    world.setBlockState(target, ConfigBlocks.blockTaint.getStateFromMeta(1), 3);
+                if (!BlockTaintFibres.spreadFibres(world, target)) {
+                    int adjacent = BlockTaintFibres.getAdjacentTaint(world, target);
+                    IBlockState targetState = world.getBlockState(target);
+                    Block targetBlock = targetState.getBlock();
+                    if (adjacent >= 2 && (Utils.isWoodLog(world, target) || targetBlock.isLeaves(targetState, world, target))) {
+                        world.setBlockState(target, ConfigBlocks.blockTaint.getStateFromMeta(0), 3);
+                        world.addBlockEvent(target, ConfigBlocks.blockTaint, 1, 0);
+                    } else if (adjacent >= 3 && isTaintSoilTarget(targetBlock)) {
+                        world.setBlockState(target, ConfigBlocks.blockTaint.getStateFromMeta(1), 3);
+                        world.addBlockEvent(target, ConfigBlocks.blockTaint, 1, 0);
+                    }
+                }
+                if (meta == 0 && !handleTaintSporeSwarmerSpawn(world, pos, rand)) {
+                    convertSurroundedTaintToFlux(world, pos);
                 }
             }
             return;
@@ -72,6 +82,35 @@ public class BlockTaint extends Block {
         } else if (meta == 1 && rand.nextInt(10) == 0) {
             world.setBlockState(pos, Blocks.DIRT.getDefaultState(), 3);
         }
+    }
+
+    private boolean handleTaintSporeSwarmerSpawn(World world, BlockPos pos, Random rand) {
+        if (!Config.spawnTaintSpore || !world.isAirBlock(pos.up()) || rand.nextInt(200) != 0) {
+            return false;
+        }
+        if (!world.getEntitiesWithinAABB(EntityTaintSporeSwarmer.class, new AxisAlignedBB(pos).grow(16.0D)).isEmpty()) {
+            return true;
+        }
+        world.setBlockToAir(pos);
+        EntityTaintSporeSwarmer swarmer = new EntityTaintSporeSwarmer(world);
+        swarmer.setLocationAndAngles(pos.getX() + 0.5D, pos.getY(), pos.getZ() + 0.5D, 0.0F, 0.0F);
+        world.spawnEntity(swarmer);
+        world.playSound(null, pos, TCSounds.ROOTS, SoundCategory.BLOCKS,
+                0.1F, 0.9F + world.rand.nextFloat() * 0.2F);
+        return true;
+    }
+
+    private boolean convertSurroundedTaintToFlux(World world, BlockPos pos) {
+        if (ConfigBlocks.blockFluxGoo == null || world.getBlockState(pos.up()).getBlock() != this) {
+            return false;
+        }
+        for (EnumFacing facing : EnumFacing.HORIZONTALS) {
+            if (world.getBlockState(pos.offset(facing)).getBlock() != this) {
+                return false;
+            }
+        }
+        world.setBlockState(pos, ConfigBlocks.blockFluxGoo.getStateFromMeta(ConfigBlocks.blockFluxGoo.getQuanta()), 3);
+        return true;
     }
 
     private static boolean isTaintSoilTarget(Block block) {
@@ -120,6 +159,18 @@ public class BlockTaint extends Block {
     @Override
     public boolean canSilkHarvest(World world, BlockPos pos, IBlockState state, EntityPlayer player) {
         return this.getMetaFromState(state) == 2;
+    }
+
+    @Override
+    public boolean eventReceived(IBlockState state, World world, BlockPos pos, int id, int param) {
+        if (id == 1) {
+            if (world.isRemote) {
+                world.playSound(pos.getX(), pos.getY(), pos.getZ(), TCSounds.ROOTS,
+                        SoundCategory.BLOCKS, 0.1F, 0.9F + world.rand.nextFloat() * 0.2F, false);
+            }
+            return true;
+        }
+        return super.eventReceived(state, world, pos, id, param);
     }
 
     @Override

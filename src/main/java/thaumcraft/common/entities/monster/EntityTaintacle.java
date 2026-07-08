@@ -106,7 +106,7 @@ public class EntityTaintacle extends EntityMob implements ITaintedMob {
                 this.flailIntensity -= 0.2f;
             }
             if ((float) this.ticksExisted < this.height * 10.0f && this.onGround) {
-                Thaumcraft.proxy.burst(this.world, this.posX, this.posY, this.posZ, 1.0F);
+                Thaumcraft.proxy.tentacleAriseFX(this);
             }
         }
 

@@ -63,7 +63,7 @@ public class EntityTaintPig extends net.minecraft.entity.monster.EntityMob imple
         super.onLivingUpdate();
         if (this.world.isRemote && this.ticksExisted < 5) {
             for (int i = 0; i < thaumcraft.common.Thaumcraft.proxy.particleCount(10); i++) {
-                thaumcraft.common.Thaumcraft.proxy.taintLandFX(this);
+                thaumcraft.common.Thaumcraft.proxy.splooshFX(this);
             }
         }
     }

@@ -305,10 +305,17 @@ public class CommonProxy implements IGuiHandler {
         return null;
     }
 
+    public boolean isParticleAlive(Object particle) {
+        return false;
+    }
+
     public void splooshFX(Entity entity) {
     }
 
     public void taintsplosionFX(Entity entity) {
+    }
+
+    public void tentacleAriseFX(Entity entity) {
     }
 
     public void golemFishingSplashFX(Entity entity, int kind) {

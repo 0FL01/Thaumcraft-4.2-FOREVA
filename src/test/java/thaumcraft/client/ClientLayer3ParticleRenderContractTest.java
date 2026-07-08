@@ -17,7 +17,6 @@ public class ClientLayer3ParticleRenderContractTest {
         assertLayer3SelfContained("src/main/java/thaumcraft/client/fx/particles/FXBurst.java");
         assertLayer3SelfContained("src/main/java/thaumcraft/client/fx/particles/FXBreaking.java");
         assertLayer3SelfContained("src/main/java/thaumcraft/client/fx/particles/FXSmokeSpiral.java");
-        assertLayer3SelfContained("src/main/java/thaumcraft/client/fx/particles/FXSwarm.java");
         assertLayer3SelfContained("src/main/java/thaumcraft/client/fx/other/FXSonic.java");
         assertLayer3SelfContained("src/main/java/thaumcraft/client/fx/other/FXShieldRunes.java");
         assertLayer3SelfContained("src/main/java/thaumcraft/client/fx/other/FXBlockWard.java");

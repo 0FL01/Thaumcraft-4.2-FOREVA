@@ -73,7 +73,7 @@ public class EntityTaintChicken extends net.minecraft.entity.monster.EntityMob i
         this.field_752_b += this.field_755_h * 2.0f;
         if (this.world.isRemote && this.ticksExisted < 5) {
             for (int i = 0; i < thaumcraft.common.Thaumcraft.proxy.particleCount(10); i++) {
-                thaumcraft.common.Thaumcraft.proxy.taintLandFX(this);
+                thaumcraft.common.Thaumcraft.proxy.splooshFX(this);
             }
         }
     }

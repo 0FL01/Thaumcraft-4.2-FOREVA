@@ -99,7 +99,7 @@ public class EntityTaintVillager extends net.minecraft.entity.monster.EntityMob 
         super.onLivingUpdate();
         if (this.world.isRemote && this.ticksExisted < 5) {
             for (int i = 0; i < Thaumcraft.proxy.particleCount(10); i++) {
-                Thaumcraft.proxy.taintLandFX(this);
+                Thaumcraft.proxy.splooshFX(this);
             }
         }
     }

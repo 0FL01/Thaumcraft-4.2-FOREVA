@@ -26,7 +26,7 @@ public class ModelTaintacle extends ModelBase {
         for (int i = 0; i < length - 1; i++) {
             tents[i] = new ModelRendererTaintacle(this, 0, 16);
             tents[i].addBox(-4.0F, -4.0F, -4.0F, 8, 8, 8);
-            tents[i].rotationPointZ = -8.0F;
+            tents[i].rotationPointY = -8.0F;
             if (i == 0) {
                 tentacle.addChild(tents[i]);
             } else {
@@ -36,12 +36,12 @@ public class ModelTaintacle extends ModelBase {
 
         ModelRendererTaintacle orb = new ModelRendererTaintacle(this, 0, 56);
         orb.addBox(-2.0F, -2.0F, -2.0F, 4, 4, 4);
-        orb.rotationPointZ = -8.0F;
+        orb.rotationPointY = -8.0F;
         tents[length - 2].addChild(orb);
 
         tents[length - 1] = new ModelRendererTaintacle(this, 0, 32);
         tents[length - 1].addBox(-6.0F, -6.0F, -6.0F, 12, 12, 12);
-        tents[length - 1].rotationPointZ = -8.0F;
+        tents[length - 1].rotationPointY = -8.0F;
         tents[length - 2].addChild(tents[length - 1]);
     }
 

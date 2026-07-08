@@ -6,6 +6,8 @@ import java.util.Set;
 import javax.annotation.Nullable;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.particle.Particle;
+import net.minecraft.client.particle.ParticleDigging;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.client.resources.IReloadableResourceManager;
@@ -1790,22 +1792,17 @@ public class ClientProxy extends CommonProxy {
     public void taintLandFX(Entity entity) {
         if (entity == null || entity.world == null || !entity.world.isRemote) return;
         World world = entity.world;
-        int amount = particleCount(1);
-        if (amount <= 0) return;
+        float angle = world.rand.nextFloat() * ((float) Math.PI * 2.0F);
+        float radius = world.rand.nextFloat() * 0.5F + 0.5F;
+        float offsetX = MathHelper.sin(angle) * radius;
+        float offsetZ = MathHelper.cos(angle) * radius;
+        double y = (entity.getEntityBoundingBox().minY + entity.getEntityBoundingBox().maxY) * 0.5D;
 
-        for (int i = 0; i < amount; i++) {
-            float angle = world.rand.nextFloat() * ((float) Math.PI * 2.0F);
-            float radius = world.rand.nextFloat() * 0.5F + 0.5F;
-            float offsetX = MathHelper.sin(angle) * 0.5F * radius;
-            float offsetZ = MathHelper.cos(angle) * 0.5F * radius;
-            double y = (entity.getEntityBoundingBox().minY + entity.getEntityBoundingBox().maxY) * 0.5D;
-
-            FXBreaking fx = new FXBreaking(world, entity.posX + offsetX, y, entity.posZ + offsetZ, Items.SLIME_BALL);
-            fx.setRBGColorF(0.1F, 0.0F, 0.1F);
-            fx.setAlphaF(0.4F);
-            fx.setParticleMaxAge((int) (66.0F / (world.rand.nextFloat() * 0.9F + 0.1F)));
-            ParticleEngine.addEffect(world, fx);
-        }
+        FXBreaking fx = new FXBreaking(world, entity.posX + offsetX, y, entity.posZ + offsetZ, Items.SLIME_BALL);
+        fx.setRBGColorF(0.1F, 0.0F, 0.1F);
+        fx.setAlphaF(0.4F);
+        fx.setParticleMaxAge((int) (66.0F / (world.rand.nextFloat() * 0.9F + 0.1F)));
+        ParticleEngine.addEffect(world, fx);
     }
 
     @Override
@@ -1833,26 +1830,25 @@ public class ClientProxy extends CommonProxy {
     @Override
     public Object swarmParticleFX(World world, Entity targetedEntity, float speed, float turnSpeed, float particleGravity) {
         if (world == null || !world.isRemote || targetedEntity == null) return null;
-        int amount = particleCount(1);
-        if (amount <= 0) return null;
-
-        FXSwarm swarm = null;
-        for (int i = 0; i < amount; i++) {
-            swarm = new FXSwarm(
-                    world,
-                    targetedEntity.posX + (world.rand.nextFloat() - world.rand.nextFloat()) * 2.0F,
-                    targetedEntity.posY + (world.rand.nextFloat() - world.rand.nextFloat()) * 2.0F,
-                    targetedEntity.posZ + (world.rand.nextFloat() - world.rand.nextFloat()) * 2.0F,
-                    targetedEntity,
-                    0.8F + world.rand.nextFloat() * 0.2F,
-                    world.rand.nextFloat() * 0.4F,
-                    1.0F - world.rand.nextFloat() * 0.2F,
-                    speed,
-                    turnSpeed,
-                    particleGravity);
-            ParticleEngine.addEffect(world, swarm);
-        }
+        FXSwarm swarm = new FXSwarm(
+                world,
+                targetedEntity.posX + (world.rand.nextFloat() - world.rand.nextFloat()) * 2.0F,
+                targetedEntity.posY + (world.rand.nextFloat() - world.rand.nextFloat()) * 2.0F,
+                targetedEntity.posZ + (world.rand.nextFloat() - world.rand.nextFloat()) * 2.0F,
+                targetedEntity,
+                0.8F + world.rand.nextFloat() * 0.2F,
+                world.rand.nextFloat() * 0.4F,
+                1.0F - world.rand.nextFloat() * 0.2F,
+                speed,
+                turnSpeed,
+                particleGravity);
+        ParticleEngine.addEffect(world, swarm);
         return swarm;
+    }
+
+    @Override
+    public boolean isParticleAlive(Object particle) {
+        return particle instanceof Particle && ((Particle) particle).isAlive();
     }
 
     @Override
@@ -1891,9 +1887,9 @@ public class ClientProxy extends CommonProxy {
         double speed = (Math.random() + Math.random() + 1.0D) * 0.15D;
         double length = Math.sqrt(motionX * motionX + motionY * motionY + motionZ * motionZ);
         if (length > 1.0E-6D) {
-            motionX = motionX / length * speed;
-            motionY = motionY / length * speed;
-            motionZ = motionZ / length * speed;
+            motionX = motionX / length * speed * 0.9640000000596046D;
+            motionY = motionY / length * speed * 0.9640000000596046D + 0.10000000149011612D;
+            motionZ = motionZ / length * speed * 0.9640000000596046D;
         }
         FXBreaking fx = new FXBreaking(
                 world,
@@ -1913,6 +1909,43 @@ public class ClientProxy extends CommonProxy {
         }
         fx.setParticleMaxAge((int) (66.0F / (world.rand.nextFloat() * 0.9F + 0.1F)));
         ParticleEngine.addEffect(world, fx);
+    }
+
+    @Override
+    public void tentacleAriseFX(Entity entity) {
+        if (entity == null || entity.world == null || !entity.world.isRemote) return;
+        World world = entity.world;
+        BlockPos blockPos = new BlockPos(
+                MathHelper.floor(entity.posX),
+                MathHelper.floor(entity.posY) - 1,
+                MathHelper.floor(entity.posZ));
+        IBlockState state = world.getBlockState(blockPos);
+
+        for (int i = 0; (float) i < 2.0F * entity.height; i++) {
+            float angle = world.rand.nextFloat() * (float) Math.PI * entity.height;
+            float radius = world.rand.nextFloat() * 0.5F + 0.5F;
+            float offsetX = MathHelper.sin(angle) * entity.height * 0.25F * radius;
+            float offsetZ = MathHelper.cos(angle) * entity.height * 0.25F * radius;
+
+            FXBreaking fx = new FXBreaking(world, entity.posX + offsetX, entity.posY, entity.posZ + offsetZ, Items.SLIME_BALL);
+            fx.setRBGColorF(0.4F, 0.0F, 0.4F);
+            fx.setAlphaF(0.5F);
+            fx.setParticleMaxAge((int) (66.0F / (world.rand.nextFloat() * 0.9F + 0.1F)));
+            ParticleEngine.addEffect(world, fx);
+
+            if (!world.isAirBlock(blockPos)) {
+                float digAngle = world.rand.nextFloat() * (float) Math.PI * entity.height;
+                float digRadius = world.rand.nextFloat() * 0.5F + 0.5F;
+                float digOffsetX = MathHelper.sin(digAngle) * entity.height * 0.25F * digRadius;
+                float digOffsetZ = MathHelper.cos(digAngle) * entity.height * 0.25F * digRadius;
+                ParticleEngine.addEffect(world, new TaintDiggingFX(
+                        world,
+                        entity.posX + digOffsetX,
+                        entity.posY,
+                        entity.posZ + digOffsetZ,
+                        state).setBlockPos(blockPos));
+            }
+        }
     }
 
     @Override
@@ -2207,6 +2240,12 @@ public class ClientProxy extends CommonProxy {
     @Override
     public void startScan(Entity entity, BlockPos pos, long expireAtMs, int radius) {
         RenderEventHandler.startScan(entity, pos, expireAtMs, radius);
+    }
+
+    private static final class TaintDiggingFX extends ParticleDigging {
+        private TaintDiggingFX(World world, double x, double y, double z, IBlockState state) {
+            super(world, x, y, z, 0.0D, 0.0D, 0.0D, state);
+        }
     }
 
     private static Color decodeColor(int color) {

@@ -26,7 +26,7 @@ import thaumcraft.common.lib.TCSounds;
 import thaumcraft.common.lib.world.ThaumcraftWorldGenerator;
 
 public class EntityTaintSpore extends EntityMob implements ITaintedMob, IEntityAdditionalSpawnData {
-    public final ArrayList<Integer> swarm = new ArrayList<>();
+    public final ArrayList<Object> swarm = new ArrayList<>();
     protected int growth = 0;
     public float displaySize = 0.0f;
     private static final DataParameter<Integer> SPORE_SIZE =
@@ -120,14 +120,15 @@ public class EntityTaintSpore extends EntityMob implements ITaintedMob, IEntityA
             if (this.displaySize < (float)this.getSporeSize()) {
                 this.displaySize += 0.02f;
             }
-            for (int i = this.swarm.size() - 1; i >= 0; i--) {
-                if (this.ticksExisted - this.swarm.get(i) > 10) {
+            for (int i = 0; i < this.swarm.size();) {
+                if (!thaumcraft.common.Thaumcraft.proxy.isParticleAlive(this.swarm.get(i))) {
                     this.swarm.remove(i);
+                } else {
+                    i++;
                 }
             }
             if (this.swarm.size() < this.getSporeSize() / 3) {
-                this.swarm.add(this.ticksExisted);
-                thaumcraft.common.Thaumcraft.proxy.swarmParticleFX(this.world, this, 0.1F, 10.0F, 0.0F);
+                this.swarm.add(thaumcraft.common.Thaumcraft.proxy.swarmParticleFX(this.world, this, 0.1F, 10.0F, 0.0F));
             }
         }
         // Burst check

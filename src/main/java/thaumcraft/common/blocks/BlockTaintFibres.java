@@ -30,6 +30,7 @@ import net.minecraft.world.biome.Biome;
 import thaumcraft.common.Thaumcraft;
 import thaumcraft.common.config.Config;
 import thaumcraft.common.config.ConfigBlocks;
+import thaumcraft.common.entities.monster.EntityTaintSpore;
 import thaumcraft.common.lib.TCSounds;
 import thaumcraft.common.lib.utils.BlockUtils;
 import thaumcraft.common.lib.utils.Utils;
@@ -79,8 +80,44 @@ public class BlockTaintFibres extends Block {
         taintBiomeSpread(world, pos, rand, this);
         BlockPos target = pos.add(rand.nextInt(3) - 1, rand.nextInt(5) - 3, rand.nextInt(3) - 1);
         if (isTaintBiome(world, target)) {
-            spreadFibres(world, target);
+            if (!spreadFibres(world, target)) {
+                convertAdjacentBlockToTaint(world, target);
+            }
+            updateSporeStalk(world, pos, meta, rand);
         }
+    }
+
+    private void updateSporeStalk(World world, BlockPos pos, int meta, Random rand) {
+        if (meta == 3 && Config.spawnTaintSpore && rand.nextInt(10) == 0 && world.isAirBlock(pos.up())) {
+            world.setBlockState(pos, ConfigBlocks.blockTaintFibres.getStateFromMeta(4), 3);
+            EntityTaintSpore spore = new EntityTaintSpore(world);
+            spore.setLocationAndAngles(pos.getX() + 0.5D, pos.getY() + 1.0D, pos.getZ() + 0.5D, 0.0F, 0.0F);
+            world.spawnEntity(spore);
+        } else if (meta == 4 && world.getEntitiesWithinAABB(EntityTaintSpore.class, new AxisAlignedBB(pos.up())).isEmpty()) {
+            world.setBlockState(pos, ConfigBlocks.blockTaintFibres.getStateFromMeta(3), 3);
+        }
+    }
+
+    private static void convertAdjacentBlockToTaint(World world, BlockPos target) {
+        int adjacent = getAdjacentTaint(world, target);
+        IBlockState targetState = world.getBlockState(target);
+        Block targetBlock = targetState.getBlock();
+        Material material = targetState.getMaterial();
+        if (adjacent >= 2 && (Utils.isWoodLog(world, target) || targetBlock.isLeaves(targetState, world, target))) {
+            world.setBlockState(target, ConfigBlocks.blockTaint.getStateFromMeta(0), 3);
+            world.addBlockEvent(target, ConfigBlocks.blockTaint, 1, 0);
+        } else if (adjacent >= 3 && isTaintSoilTarget(material)) {
+            world.setBlockState(target, ConfigBlocks.blockTaint.getStateFromMeta(1), 3);
+            world.addBlockEvent(target, ConfigBlocks.blockTaint, 1, 0);
+        }
+    }
+
+    private static boolean isTaintSoilTarget(Material material) {
+        return material == Material.GRASS
+                || material == Material.GROUND
+                || material == Material.ROCK
+                || material == Material.SAND
+                || material == Material.CLAY;
     }
 
     public static boolean isTaintBiome(World world, BlockPos pos) {
