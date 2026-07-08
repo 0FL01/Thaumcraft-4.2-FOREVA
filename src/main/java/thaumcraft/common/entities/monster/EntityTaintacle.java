@@ -1,6 +1,7 @@
 package thaumcraft.common.entities.monster;
 
 import java.util.List;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
@@ -14,6 +15,7 @@ import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
+import net.minecraft.world.biome.Biome;
 import thaumcraft.api.damagesource.DamageSourceThaumcraft;
 import thaumcraft.api.entities.ITaintedMob;
 import thaumcraft.common.Thaumcraft;
@@ -46,24 +48,33 @@ public class EntityTaintacle extends EntityMob implements ITaintedMob {
 
     @Override
     public boolean getCanSpawnHere() {
-        int y = MathHelper.floor(this.getEntityBoundingBox().minY);
-        int x = MathHelper.floor(this.posX);
-        int z = MathHelper.floor(this.posZ);
+        BlockPos pos = new BlockPos(
+            MathHelper.floor(this.posX),
+            MathHelper.floor(this.getEntityBoundingBox().minY),
+            MathHelper.floor(this.posZ));
         List<EntityTaintacle> nearby = this.world.getEntitiesWithinAABB(
             EntityTaintacle.class,
             new AxisAlignedBB(this.posX, this.posY, this.posZ, this.posX, this.posY, this.posZ).grow(24.0D, 8.0D, 24.0D));
-        boolean validTaintGround = false;
-        if (this.world.getBlockState(new BlockPos(x, y, z)).getBlock() == ConfigBlocks.blockTaintFibres
-            && this.world.getBlockState(new BlockPos(x, y, z)).getValue(BlockTaintFibres.TYPE) == 0
-            && this.world.getBiome(new BlockPos(x, y, z)) == ThaumcraftWorldGenerator.biomeTaint) {
-            validTaintGround = true;
+        return nearby.isEmpty()
+            && (this.isValidTaintacleSpawnGround(pos) || this.isValidTaintacleSpawnGround(pos.down()))
+            && super.getCanSpawnHere();
+    }
+
+    private boolean isValidTaintacleSpawnGround(BlockPos pos) {
+        if (!this.isTaintBiome(pos)) {
+            return false;
         }
-        if (this.world.getBlockState(new BlockPos(x, y, z)).getBlock() == ConfigBlocks.blockTaint
-            && this.world.getBlockState(new BlockPos(x, y, z)).getValue(BlockTaint.TYPE) == 1
-            && this.world.getBiome(new BlockPos(x, y, z)) == ThaumcraftWorldGenerator.biomeTaint) {
-            validTaintGround = true;
-        }
-        return nearby.isEmpty() && validTaintGround && super.getCanSpawnHere();
+        IBlockState state = this.world.getBlockState(pos);
+        return state.getBlock() == ConfigBlocks.blockTaintFibres && state.getValue(BlockTaintFibres.TYPE) == 0
+            || state.getBlock() == ConfigBlocks.blockTaint && state.getValue(BlockTaint.TYPE) == 1;
+    }
+
+    private boolean isTaintBiome(BlockPos pos) {
+        Biome biome = this.world.getBiome(pos);
+        return Biome.getIdForBiome(biome) == Config.biomeTaintID
+            || biome == ThaumcraftWorldGenerator.biomeTaint
+            || biome != null && ThaumcraftWorldGenerator.biomeTaint != null
+            && Biome.getIdForBiome(biome) == Biome.getIdForBiome(ThaumcraftWorldGenerator.biomeTaint);
     }
 
     @Override
@@ -93,7 +104,7 @@ public class EntityTaintacle extends EntityMob implements ITaintedMob {
         }
         // Biome damage
         if (!this.world.isRemote && this.ticksExisted % 20 == 0
-                && this.world.getBiome(this.getPosition()) != ThaumcraftWorldGenerator.biomeTaint) {
+                && !this.isTaintBiome(this.getPosition())) {
             this.attackEntityFrom(DamageSource.DROWN, 1.0f);
         }
         // Client flail animation

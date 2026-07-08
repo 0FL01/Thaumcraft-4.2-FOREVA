@@ -17,6 +17,7 @@ public class TaintEcologySpawnParityStaticGuardTest {
         String fibres = read("src/main/java/thaumcraft/common/blocks/BlockTaintFibres.java");
         String biomeTaint = read("src/main/java/thaumcraft/common/lib/world/biomes/BiomeTaint.java");
         String magicalForest = read("src/main/java/thaumcraft/common/lib/world/biomes/BiomeMagicalForest.java");
+        String taintacle = read("src/main/java/thaumcraft/common/entities/monster/EntityTaintacle.java");
         String smallTaintacle = read("src/main/java/thaumcraft/common/entities/monster/EntityTaintacleSmall.java");
         String giantTaintacle = read("src/main/java/thaumcraft/common/entities/monster/boss/EntityTaintacleGiant.java");
 
@@ -31,6 +32,14 @@ public class TaintEcologySpawnParityStaticGuardTest {
                 smallTaintacle.contains("public boolean getCanSpawnHere()")
                         && smallTaintacle.contains("return false;")
                         && giantTaintacle.contains("public boolean getCanSpawnHere() { return false; }"));
+        assertTrue("Base taintacles should keep TC4 ground rules while accepting 1.12 natural-spawn air cells above taint ground",
+                taintacle.contains("private boolean isValidTaintacleSpawnGround(BlockPos pos)")
+                        && taintacle.contains("this.isValidTaintacleSpawnGround(pos) || this.isValidTaintacleSpawnGround(pos.down())")
+                        && taintacle.contains("state.getBlock() == ConfigBlocks.blockTaintFibres && state.getValue(BlockTaintFibres.TYPE) == 0")
+                        && taintacle.contains("state.getBlock() == ConfigBlocks.blockTaint && state.getValue(BlockTaint.TYPE) == 1")
+                        && taintacle.contains("private boolean isTaintBiome(BlockPos pos)")
+                        && taintacle.contains("Biome.getIdForBiome(biome) == Config.biomeTaintID")
+                        && taintacle.contains("Biome.getIdForBiome(biome) == Biome.getIdForBiome(ThaumcraftWorldGenerator.biomeTaint)"));
         assertTrue("Magical Forest should directly carry Pech and Wisp monster entries, independent of global post-init injection",
                 magicalForest.contains("if (Config.spawnPech)")
                         && magicalForest.contains("new Biome.SpawnListEntry(EntityPech.class, 10, 1, 2)")
