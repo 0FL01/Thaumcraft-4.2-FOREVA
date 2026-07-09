@@ -1735,16 +1735,20 @@ public class ClientProxy extends CommonProxy {
         if (world == null || !world.isRemote || source == null) return;
         Minecraft mc = Minecraft.getMinecraft();
         EntityPlayer clientPlayer = mc == null ? null : mc.player;
+        boolean localPlayer = clientPlayer != null && source.getEntityId() == clientPlayer.getEntityId();
         double sx = source.posX;
         double sy = source.posY;
         double sz = source.posZ;
-        if (clientPlayer == null || source.getEntityId() != clientPlayer.getEntityId()) {
+        if (localPlayer) {
+            // In 1.7.10 player posY included the eye-level yOffset; in 1.12 it is feet-level.
+            sy += source.getEyeHeight();
+        } else {
             sy = source.getEntityBoundingBox().minY + source.height * 0.5D + 0.25D;
         }
         sx += -MathHelper.cos((float) (source.rotationYaw / 180.0F * Math.PI)) * 0.06F;
         sy -= 0.06D;
         sz += -MathHelper.sin((float) (source.rotationYaw / 180.0F * Math.PI)) * 0.06F;
-        if (clientPlayer == null || source.getEntityId() != clientPlayer.getEntityId()) {
+        if (!localPlayer) {
             sy = source.getEntityBoundingBox().minY + source.height * 0.5D + 0.25D;
         }
         Vec3d look = source.getLook(1.0F);

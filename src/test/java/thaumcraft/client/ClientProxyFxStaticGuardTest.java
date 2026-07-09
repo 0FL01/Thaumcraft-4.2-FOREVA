@@ -214,9 +214,11 @@ public class ClientProxyFxStaticGuardTest {
                         && commonProxy.contains("public void shieldRunesFX(World world, Entity source, int age, float yaw, float pitch)")
                         && commonProxy.contains("public void zapFX(World world, Entity source, Entity target)")
                         && commonProxy.contains("public void focusShockBolt(World world, EntityLivingBase source, double tx, double ty, double tz)"));
-        assertTrue("ClientProxy must expose dedicated focusShockBolt helper for local shock-channel feedback",
+        assertTrue("ClientProxy must keep the 1.12 eye-height correction for local shock-channel feedback",
                 source.contains("public void focusShockBolt(World world, EntityLivingBase source, double tx, double ty, double tz)")
-                        && source.contains("source.getEntityId() != clientPlayer.getEntityId()")
+                        && source.contains("boolean localPlayer = clientPlayer != null && source.getEntityId() == clientPlayer.getEntityId();")
+                        && source.contains("sy += source.getEyeHeight();")
+                        && source.contains("if (!localPlayer)")
                         && source.contains("new FXLightningBolt(world, sx, sy, sz, tx, ty, tz, world.rand.nextLong(), 6, 0.5F, 8)")
                         && source.contains("bolt.setType(2);")
                         && source.contains("bolt.setWidth(0.125F);"));
@@ -609,6 +611,9 @@ public class ClientProxyFxStaticGuardTest {
                         && focusShock.contains("Thaumcraft.proxy.sparkle(")
                         && focusShock.contains("shootLightning(player.world, player, px, py, pz);")
                         && focusShock.contains("Thaumcraft.proxy.focusShockBolt(world, entityplayer, tx, ty, tz);"));
+        assertTrue("FocusShock channel sound must use the original positional world route",
+                focusShock.contains("player.world.playSound(null, player.posX, player.posY, player.posZ, TCSounds.SHOCK, SoundCategory.PLAYERS, 0.25F, 1.0F);")
+                        && !focusShock.contains("player.playSound(TCSounds.SHOCK"));
         assertTrue("FocusWarding ward/unward paths must send PacketFXBlockSparkle around touched blocks",
                 focusWarding.contains("new PacketFXBlockSparkle(c.x, c.y, c.z, 0xFC9A00)")
                         && focusWarding.contains("PacketHandler.INSTANCE.sendToAllAround(")

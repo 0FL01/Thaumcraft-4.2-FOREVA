@@ -9,6 +9,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
@@ -96,7 +97,7 @@ public class FocusShock extends ItemFocusBasic {
         Entity target = this.getPointedEntity(player.world, player, 20.0D);
         if (!player.world.isRemote && wand.consumeAllVis(wandStack, player, this.getVisCost(focusStack), true, false)) {
             int potency = this.getUpgradeLevel(focusStack, FocusUpgradeType.potency);
-            player.playSound(TCSounds.SHOCK, 0.25F, 1.0F);
+            player.world.playSound(null, player.posX, player.posY, player.posZ, TCSounds.SHOCK, SoundCategory.PLAYERS, 0.25F, 1.0F);
             if (target instanceof EntityLivingBase && this.canDamageTarget(player, target)) {
                 int chainUpgrade = this.getUpgradeLevel(focusStack, chainlightning);
                 target.attackEntityFrom(DamageSource.causePlayerDamage(player), (chainUpgrade > 0 ? 6.0F : 4.0F) + potency);
