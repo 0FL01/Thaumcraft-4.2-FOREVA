@@ -25,9 +25,12 @@ import net.minecraftforge.fml.common.registry.IEntityAdditionalSpawnData;
 import thaumcraft.common.Thaumcraft;
 
 public class EntityFrostShard extends EntityThrowable implements IEntityAdditionalSpawnData {
+    private static final int THROWER_IMPACT_GRACE_TICKS = 5;
+
     public double bounce = 0.5;
     public int bounceLimit = 3;
     public boolean fragile = false;
+    private int throwerId = -1;
 
     private static final DataParameter<Float> DAMAGE =
         EntityDataManager.createKey(EntityFrostShard.class, DataSerializers.FLOAT);
@@ -37,6 +40,13 @@ public class EntityFrostShard extends EntityThrowable implements IEntityAddition
     public EntityFrostShard(World world) { super(world); }
     public EntityFrostShard(World world, EntityLivingBase shooter, float scatter) {
         super(world, shooter);
+        this.throwerId = shooter.getEntityId();
+        float yaw = shooter.rotationYaw * 0.017453292F;
+        // Start outside the caster collision box, matching the Bottle Taint fix.
+        this.setPosition(
+                shooter.posX - MathHelper.sin(yaw) * 0.8D,
+                shooter.posY + shooter.getEyeHeight() - 0.1D,
+                shooter.posZ + MathHelper.cos(yaw) * 0.8D);
         this.shoot(shooter, shooter.rotationPitch, shooter.rotationYaw, 0.0F, 1.5F, scatter);
     }
 
@@ -80,6 +90,8 @@ public class EntityFrostShard extends EntityThrowable implements IEntityAddition
     @Override
     protected void onImpact(RayTraceResult result) {
         if (result == null) return;
+        // EntityThrowable does not restore its thrower on mod-entity clients.
+        if (this.ticksExisted <= THROWER_IMPACT_GRACE_TICKS && this.isThrower(result.entityHit)) return;
 
         // Bounce physics: reverse velocity on hit side
         if (result.typeOfHit == RayTraceResult.Type.ENTITY && result.entityHit != null) {
@@ -164,6 +176,13 @@ public class EntityFrostShard extends EntityThrowable implements IEntityAddition
         }
     }
 
+    private boolean isThrower(Entity entity) {
+        if (entity == null) return false;
+        EntityLivingBase thrower = this.getThrower();
+        if (entity == thrower) return true;
+        return this.throwerId >= 0 && entity.getEntityId() == this.throwerId;
+    }
+
     @Override
     public void readEntityFromNBT(NBTTagCompound nbt) {
         super.readEntityFromNBT(nbt);
@@ -184,11 +203,14 @@ public class EntityFrostShard extends EntityThrowable implements IEntityAddition
         buf.writeDouble(this.bounce);
         buf.writeInt(this.bounceLimit);
         buf.writeBoolean(this.fragile);
+        EntityLivingBase thrower = this.getThrower();
+        buf.writeInt(thrower != null ? thrower.getEntityId() : this.throwerId);
     }
     @Override public void readSpawnData(ByteBuf buf) {
         this.bounce = buf.readDouble();
         this.bounceLimit = buf.readInt();
         this.fragile = buf.readBoolean();
+        this.throwerId = buf.readInt();
     }
 
     @Override protected boolean canTriggerWalking() { return false; }

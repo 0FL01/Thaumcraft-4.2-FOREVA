@@ -30,6 +30,16 @@ public class FocusFrostVisualParityStaticGuardTest {
         assertFalse("EntityFrostShard must not overwrite the smoothed pitch with an instantaneous motion angle",
                 shard.contains("this.rotationPitch ="));
 
+        assertTrue("EntityFrostShard must spawn ahead of the caster instead of inside their head collision box",
+                shard.contains("shooter.posX - MathHelper.sin(yaw) * 0.8D")
+                        && shard.contains("shooter.posY + shooter.getEyeHeight() - 0.1D")
+                        && shard.contains("shooter.posZ + MathHelper.cos(yaw) * 0.8D"));
+        assertTrue("EntityFrostShard must sync and briefly ignore its thrower on the client",
+                shard.contains("private int throwerId = -1;")
+                        && shard.contains("this.ticksExisted <= THROWER_IMPACT_GRACE_TICKS && this.isThrower(result.entityHit)")
+                        && shard.contains("buf.writeInt(thrower != null ? thrower.getEntityId() : this.throwerId);")
+                        && shard.contains("this.throwerId = buf.readInt();"));
+
         assertTrue("ClientModelRegistry must stitch and bake the original orb OBJ with the frost shard texture",
                 modelRegistry.contains("new ResourceLocation(\"thaumcraft\", \"textures/models/orb.obj\")")
                         && modelRegistry.contains("event.getMap().registerSprite(FROST_SHARD_SPRITE);")
