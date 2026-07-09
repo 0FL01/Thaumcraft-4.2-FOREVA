@@ -62,6 +62,8 @@ public class TileEtherealBloomRenderer extends TileEntitySpecialRenderer<TileEth
         int frame = tile.counter % 32;
         float u0 = frame / 32.0F;
         float u1 = u0 + 1.0F / 32.0F;
+        float v0 = 6.0F / 32.0F;
+        float v1 = 7.0F / 32.0F;
 
         bindTexture(NODES);
         GlStateManager.pushMatrix();
@@ -69,7 +71,7 @@ public class TileEtherealBloomRenderer extends TileEntitySpecialRenderer<TileEth
         GlStateManager.depthMask(false);
         GlStateManager.translate(x + 0.5D, y + scale1, z + 0.5D);
         TileRenderHelper.orientBillboardToPlayer();
-        TileRenderHelper.drawTexturedQuad(0.20F * scale1, 0xAADDFF, u0, u1, 0.0F, 1.0F);
+        TileRenderHelper.drawTexturedQuad(scale1, 0xFFAADDFF, u0, u1, v0, v1);
         GlStateManager.depthMask(true);
         GlStateManager.enableCull();
         GlStateManager.popMatrix();
@@ -87,8 +89,6 @@ public class TileEtherealBloomRenderer extends TileEntitySpecialRenderer<TileEth
     private void renderLeafLayers(double x, double y, double z, float scale1, float scale3, float scale4) {
         bindTexture(LEAF_TEXTURE);
         GlStateManager.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
-        GlStateManager.disableCull();
-        GlStateManager.depthMask(false);
 
         GlStateManager.pushMatrix();
         GlStateManager.translate(x + 0.5D, y + 0.25D, z + 0.5D);
@@ -114,15 +114,11 @@ public class TileEtherealBloomRenderer extends TileEntitySpecialRenderer<TileEth
             GlStateManager.popMatrix();
         }
         GlStateManager.popMatrix();
-        GlStateManager.depthMask(true);
-        GlStateManager.enableCull();
     }
 
     private void renderStalkLayers(double x, double y, double z, float scale1, float scale2) {
         bindTexture(STALK_TEXTURE);
         GlStateManager.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
-        GlStateManager.disableCull();
-        GlStateManager.depthMask(false);
         GlStateManager.pushMatrix();
         GlStateManager.translate(x + 0.5D, y + 0.5D, z + 0.5D);
         GlStateManager.rotate(180.0F, 1.0F, 0.0F, 0.0F);
@@ -135,8 +131,6 @@ public class TileEtherealBloomRenderer extends TileEntitySpecialRenderer<TileEth
             GlStateManager.popMatrix();
         }
         GlStateManager.popMatrix();
-        GlStateManager.depthMask(true);
-        GlStateManager.enableCull();
     }
 
     private static void drawCenteredTexture() {

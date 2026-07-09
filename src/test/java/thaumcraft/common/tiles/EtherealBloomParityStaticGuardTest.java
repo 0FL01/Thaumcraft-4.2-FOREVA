@@ -21,6 +21,8 @@ public class EtherealBloomParityStaticGuardTest {
         String taint = read("src/main/java/thaumcraft/common/blocks/BlockTaint.java");
         String renderer = read("src/main/java/thaumcraft/client/renderers/tile/TileEtherealBloomRenderer.java");
         String customPlant = read("src/main/java/thaumcraft/common/blocks/BlockCustomPlant.java");
+        String bloomBlockModel = read("src/main/resources/assets/thaumcraft/models/block/blockcustomplant_4.json");
+        String bloomItemModel = read("src/main/resources/assets/thaumcraft/models/item/blockcustomplant_item_4.json");
 
         assertTrue("TileEtherealBloom should keep growth counters and tick update surface",
                 tile.contains("public int counter = 0;")
@@ -52,6 +54,11 @@ public class EtherealBloomParityStaticGuardTest {
                         && renderer.contains("renderLeafLayers(")
                         && renderer.contains("renderStalkLayers(")
                         && renderer.contains("drawCenteredTexture()"));
+        assertTrue("TileEtherealBloomRenderer should animate the opaque TC4 node strip around the crystal",
+                renderer.contains("int frame = tile.counter % 32;")
+                        && renderer.contains("float v0 = 6.0F / 32.0F;")
+                        && renderer.contains("float v1 = 7.0F / 32.0F;")
+                        && renderer.contains("drawTexturedQuad(scale1, 0xFFAADDFF, u0, u1, v0, v1)"));
         assertTrue("TileEtherealBloomRenderer should bind direct bloom textures instead of missing atlas sprites",
                 renderer.contains("bindTexture(LEAF_TEXTURE)")
                         && renderer.contains("bindTexture(STALK_TEXTURE)")
@@ -62,10 +69,17 @@ public class EtherealBloomParityStaticGuardTest {
                         && renderer.contains("buf.pos(half, -half, 0.0D).tex(1.0D, 0.0D)"));
         assertTrue("TileEtherealBloomRenderer should not draw duplicate coplanar leaf/stalk quads",
                 countOccurrences(renderer, ".endVertex();") == 4);
-        assertTrue("TileEtherealBloomRenderer should avoid writing bloom planes into the depth buffer",
-                countOccurrences(renderer, "GlStateManager.depthMask(false)") >= 3
-                        && countOccurrences(renderer, "GlStateManager.depthMask(true)") >= 3
+        assertTrue("TileEtherealBloomRenderer should limit disabled culling and depth writes to the node billboard",
+                countOccurrences(renderer, "GlStateManager.disableCull()") == 1
+                        && countOccurrences(renderer, "GlStateManager.enableCull()") == 1
+                        && countOccurrences(renderer, "GlStateManager.depthMask(false)") == 1
+                        && countOccurrences(renderer, "GlStateManager.depthMask(true)") == 1
                         && renderer.contains("DestFactor.ONE_MINUS_SRC_ALPHA"));
+        assertTrue("Ethereal Bloom should have no static world cross while retaining its purifier seed item and particles",
+                bloomBlockModel.contains("\"elements\": []")
+                        && bloomBlockModel.contains("\"particle\": \"thaumcraft:blocks/purifier_seed\"")
+                        && !bloomBlockModel.contains("block/cross")
+                        && bloomItemModel.contains("thaumcraft:blocks/purifier_seed"));
         assertTrue("BlockCustomPlant should render cross plant models in the cutout layer",
                 customPlant.contains("public BlockRenderLayer getRenderLayer()")
                         && customPlant.contains("BlockRenderLayer.CUTOUT"));

@@ -1,6 +1,7 @@
 {
-  "parent": "block/cross",
+  "ambientocclusion": false,
   "textures": {
-    "cross": "thaumcraft:blocks/purifier_seed"
-  }
+    "particle": "thaumcraft:blocks/purifier_seed"
+  },
+  "elements": []
 }
