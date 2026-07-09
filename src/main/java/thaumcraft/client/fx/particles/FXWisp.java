@@ -51,6 +51,11 @@ public class FXWisp extends Particle implements ITCParticle {
         }
     }
 
+    public FXWisp(World world, double x, double y, double z, float size, float red, float green, float blue) {
+        this(world, x, y, z, 0.0D, 0.0D, 0.0D, size, false, 0.0F);
+        this.setRBGColorF(red, green, blue);
+    }
+
     public FXWisp(World world, double x, double y, double z, float size, int type) {
         this(world, x, y, z, 0.0D, 0.0D, 0.0D, size, false, 0.0F);
         applyTypedColor(world, type);

@@ -76,8 +76,14 @@ public class ClientProxyFxStaticGuardTest {
                         && source.contains("bolt.setType(2);")
                         && source.contains("bolt.setWidth(0.125F);")
                         && source.contains("bolt.finalizeBolt();"));
-        assertTrue("ClientProxy must override wispFX3 for wisp ambient FX",
-                source.contains("public void wispFX3(") && source.contains("new FXWisp("));
+        assertTrue("CommonProxy/ClientProxy must keep dedicated RGB wisp ambient FX routing",
+                commonProxy.contains("public void wispFX(World world, double x, double y, double z, float size, float red, float green, float blue)")
+                        && source.contains("public void wispFX(World world, double x, double y, double z, float size, float red, float green, float blue)")
+                        && source.contains("new FXWisp(world, x, y, z, size, red, green, blue)")
+                        && source.contains("fx.setGravity(0.02F);"));
+        assertTrue("ClientProxy must keep typed target-aware wispFX3 routing",
+                source.contains("public void wispFX3(")
+                        && source.contains("new FXWisp(world, x, y, z, tx, ty, tz, size, count)"));
         assertTrue("ClientProxy must override wispFXEG for eldritch guardian trail FX",
                 source.contains("public void wispFXEG(") && source.contains("new FXWispEG("));
         assertTrue("ClientProxy must override taintLandFX for falling taint landing FX",
@@ -403,6 +409,8 @@ public class ClientProxyFxStaticGuardTest {
                 wispFx.contains("class FXWisp extends Particle implements ITCParticle")
                         && wispFx.contains("hasTarget")
                         && wispFx.contains("moteParticleScale")
+                        && wispFx.contains("public FXWisp(World world, double x, double y, double z, float size, float red, float green, float blue)")
+                        && wispFx.contains("this.setRBGColorF(red, green, blue);")
                         && wispFx.contains("public FXWisp(World world, double x, double y, double z, double tx, double ty, double tz, float size, int type)")
                         && wispFx.contains("getTCParticleLayer()")
                         && wispFx.contains("float uMax = 0.125F")
@@ -580,6 +588,12 @@ public class ClientProxyFxStaticGuardTest {
                 eldritchWarden.contains("Thaumcraft.proxy.wispFXEG("));
         assertTrue("Wisp ranged attack path must send PacketFXWispZap",
                 wisp.contains("new PacketFXWispZap(this.getEntityId(), this.targetedEntity.getEntityId())"));
+        assertTrue("Wisp ambient particles must preserve the aspect RGB route instead of typed wispFX3",
+                wisp.contains("Thaumcraft.proxy.wispFX(this.world,")
+                        && wisp.contains("(float)color.getRed() / 255.0f")
+                        && wisp.contains("(float)color.getGreen() / 255.0f")
+                        && wisp.contains("(float)color.getBlue() / 255.0f")
+                        && !wisp.contains("Thaumcraft.proxy.wispFX3("));
         assertTrue("Taint swarm-family client loops must route through proxy swarmParticleFX/splooshFX",
                 taintSwarm.contains("Thaumcraft.proxy.swarmParticleFX(this.world, this, 0.22F, 15.0F, 0.08F)")
                         && taintSpore.contains("Thaumcraft.proxy.swarmParticleFX(this.world, this, 0.1F, 10.0F, 0.0F)")

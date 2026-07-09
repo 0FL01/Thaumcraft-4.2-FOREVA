@@ -286,6 +286,9 @@ public class CommonProxy implements IGuiHandler {
     public void focusShockBolt(World world, EntityLivingBase source, double tx, double ty, double tz) {
     }
 
+    public void wispFX(World world, double x, double y, double z, float size, float red, float green, float blue) {
+    }
+
     public void wispFX3(World world, double x, double y, double z, double tx, double ty, double tz, float size, int count, boolean flag, float speed) {
     }
 

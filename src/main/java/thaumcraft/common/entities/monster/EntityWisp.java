@@ -203,13 +203,14 @@ public class EntityWisp extends EntityFlying implements IMob {
             }
             if (this.world.rand.nextBoolean() && Aspect.getAspect(this.getWispType()) != null) {
                 Color color = new Color(Aspect.getAspect(this.getWispType()).getColor());
-                Thaumcraft.proxy.wispFX3(this.world,
+                Thaumcraft.proxy.wispFX(this.world,
                     this.posX + (double)((this.rand.nextFloat() - this.rand.nextFloat()) * 0.7f),
                     this.posY + 0.45 + (double)((this.rand.nextFloat() - this.rand.nextFloat()) * 0.7f),
                     this.posZ + (double)((this.rand.nextFloat() - this.rand.nextFloat()) * 0.7f),
-                    0.0, 0.0, 0.0,
-                    0.1f, 1, true,
-                    (float)color.getRed() / 255.0f);
+                    0.1f,
+                    (float)color.getRed() / 255.0f,
+                    (float)color.getGreen() / 255.0f,
+                    (float)color.getBlue() / 255.0f);
             }
         }
     }
