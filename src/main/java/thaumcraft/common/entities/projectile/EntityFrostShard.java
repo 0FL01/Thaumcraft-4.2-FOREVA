@@ -60,11 +60,8 @@ public class EntityFrostShard extends EntityThrowable implements IEntityAddition
 
     @Override
     public void onUpdate() {
+        // EntityThrowable already applies the original wrapped 0.2 rotation smoothing in 1.12.
         super.onUpdate();
-        // Rotation
-        float h = MathHelper.sqrt(this.motionX * this.motionX + this.motionZ * this.motionZ);
-        this.rotationYaw = (float)(Math.atan2(this.motionX, this.motionZ) * 180.0 / Math.PI);
-        this.rotationPitch = (float)(Math.atan2(this.motionY, (double)h) * 180.0 / Math.PI);
         // Client sparkle FX if frosty
         if (this.world.isRemote && this.getFrosty() > 0) {
             float s = this.getDamage() / 10.0f;

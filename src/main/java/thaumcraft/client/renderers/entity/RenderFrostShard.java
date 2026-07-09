@@ -1,12 +1,16 @@
 package thaumcraft.client.renderers.entity;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.block.model.IBakedModel;
 import net.minecraft.client.renderer.entity.Render;
 import net.minecraft.client.renderer.entity.RenderManager;
+import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.util.ResourceLocation;
+import thaumcraft.client.ClientModelRegistry;
 import thaumcraft.common.entities.projectile.EntityFrostShard;
 
 import javax.annotation.Nullable;
@@ -22,12 +26,10 @@ public class RenderFrostShard extends Render<EntityFrostShard> {
 
     @Override
     public void doRender(EntityFrostShard entity, double x, double y, double z, float entityYaw, float partialTicks) {
-        bindTexture(TEXTURE);
         GlStateManager.pushMatrix();
         GlStateManager.enableRescaleNormal();
         GlStateManager.enableBlend();
         GlStateManager.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
-        GlStateManager.disableCull();
         GlStateManager.translate((float) x, (float) y, (float) z);
 
         Random random = new Random(entity.getEntityId());
@@ -40,9 +42,19 @@ public class RenderFrostShard extends Render<EntityFrostShard> {
                 baseScale + random.nextFloat() * 0.1F
         );
 
-        renderCrossQuads();
+        IBakedModel model = ClientModelRegistry.getFrostShardModel();
+        if (model != null) {
+            bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
+            Minecraft.getMinecraft().getBlockRendererDispatcher().getBlockModelRenderer()
+                    .renderModelBrightnessColor(model, 1.0F, 1.0F, 1.0F, 1.0F);
+        } else {
+            // Keep the shard visible if a resource pack supplies an invalid replacement OBJ.
+            bindTexture(TEXTURE);
+            GlStateManager.disableCull();
+            renderCrossQuads();
+            GlStateManager.enableCull();
+        }
 
-        GlStateManager.enableCull();
         GlStateManager.disableBlend();
         GlStateManager.disableRescaleNormal();
         GlStateManager.popMatrix();

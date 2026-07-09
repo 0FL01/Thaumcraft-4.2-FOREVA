@@ -31,7 +31,7 @@ public class FocusFrost extends ItemFocusBasic {
 
     @Override
     public int getFocusColor(ItemStack stack) {
-        return 0x87CEEB;
+        return 0x4F69CC;
     }
 
     @Override
