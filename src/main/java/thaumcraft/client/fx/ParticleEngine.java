@@ -252,6 +252,7 @@ public final class ParticleEngine {
         }
 
         GlStateManager.disableBlend();
+        GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
         GlStateManager.depthMask(true);
         GlStateManager.alphaFunc(GL11.GL_GREATER, 0.1F);
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);

@@ -46,6 +46,8 @@ public class RenderWisp extends Render<EntityWisp> {
             blue = color.getBlue() / 300.0F;
         }
 
+        float previousBrightnessX = OpenGlHelper.lastBrightnessX;
+        float previousBrightnessY = OpenGlHelper.lastBrightnessY;
         GlStateManager.pushMatrix();
         GlStateManager.translate(x, y + 0.45D, z);
         GlStateManager.disableLighting();
@@ -53,6 +55,10 @@ public class RenderWisp extends Render<EntityWisp> {
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
         renderCore(entity, red, green, blue);
         renderHalo(entity, partialTicks);
+        GlStateManager.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA,
+                GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
+        OpenGlHelper.setLightmapTextureCoords(
+                OpenGlHelper.lightmapTexUnit, previousBrightnessX, previousBrightnessY);
         GlStateManager.enableCull();
         GlStateManager.enableLighting();
         GlStateManager.popMatrix();
