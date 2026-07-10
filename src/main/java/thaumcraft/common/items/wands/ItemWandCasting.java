@@ -333,7 +333,7 @@ public class ItemWandCasting extends Item implements IArchitect {
     }
 
     public static boolean isSceptre(ItemStack stack) {
-        return stack != null && !stack.isEmpty() && stack.hasTagCompound() && stack.getTagCompound().getBoolean("sceptre");
+        return stack != null && !stack.isEmpty() && stack.hasTagCompound() && stack.getTagCompound().hasKey("sceptre");
     }
 
     public boolean isStaff(ItemStack stack) {
@@ -454,20 +454,25 @@ public class ItemWandCasting extends Item implements IArchitect {
     @Override
     public void getSubItems(CreativeTabs tab, NonNullList<ItemStack> items) {
         if (this.isInCreativeTab(tab)) {
-            // Create default presets
-            for (WandRod rod : WandRod.rods.values()) {
-                for (WandCap cap : WandCap.caps.values()) {
-                    ItemStack stack = new ItemStack(this);
-                    setRod(stack, rod);
-                    setCap(stack, cap);
-                    // Fill with max vis for creative tab display
-                    for (Aspect aspect : Aspect.getPrimalAspects()) {
-                        setVis(stack, aspect, getMaxVis(stack));
-                    }
-                    items.add(stack);
-                }
-            }
+            items.add(createCreativeWand("wood", "iron", false));
+            items.add(createCreativeWand("greatwood", "gold", false));
+            items.add(createCreativeWand("silverwood_staff", "thaumium", false));
+            items.add(createCreativeWand("silverwood", "thaumium", true));
         }
+    }
+
+    private ItemStack createCreativeWand(String rodTag, String capTag, boolean sceptre) {
+        ItemStack stack = new ItemStack(this);
+        WandRod rod = WandRod.rods.get(rodTag);
+        setRod(stack, rod);
+        setCap(stack, WandCap.caps.get(capTag));
+        if (sceptre) {
+            stack.getTagCompound().setByte("sceptre", (byte) 1);
+        }
+        for (Aspect aspect : Aspect.getPrimalAspects()) {
+            setVis(stack, aspect, getMaxVis(stack));
+        }
+        return stack;
     }
 
     @Override

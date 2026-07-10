@@ -353,14 +353,14 @@ public final class WandRenderCalibration {
     /**
      * Built-in defaults. These reproduce the constants that were hardcoded in
      * {@code ItemWandRenderer} before calibration was introduced, byte-for-byte, so a missing or
-     * malformed JSON changes nothing visually.
+     * malformed JSON still uses the Thaumcraft 4.2.3.5 item-render protocol.
      *
      * <p>Constants mirrored here (original code references):
      * <ul>
      *   <li>common final rotate: 180 about X</li>
-     *   <li>wand GUI: translate(0.5,0.5,0) scale(0.6) rotate(20,-45,45) translate(0,0.6,0)</li>
+     *   <li>wand GUI: rotateZ(66) translate(0,0.6,0)</li>
      *   <li>wand GROUND/FIXED: translate(0,1,0)</li>
-     *   <li>wand hand: translate(0.5,1.0,0.5) [fp: scale(1,1.1,1)] scale(0.5)</li>
+     *   <li>wand hand: translate(0.5,1.5,0.5) [fp: scale(1,1.1,1)]</li>
      *   <li>wand NONE: translate(0.5,1.5,0.5)</li>
      *   <li>staff preTranslate(0,0.5,0); staff GUI scaleMul(0.8) postAdd(-0.7,0.6,0);
      *       staff GROUND/FIXED translate(0,1.5,0) scale(0.9)</li>
@@ -375,9 +375,9 @@ public final class WandRenderCalibration {
         // ---- wand ----
         EnumMap<ItemCameraTransforms.TransformType, Transform> wand = new EnumMap<>(ItemCameraTransforms.TransformType.class);
         putContext(wand, ItemCameraTransforms.TransformType.GUI,
-                0,0,0,  0.5f,0.5f,0f,
-                1f,1.1f,1f,  0.6f,0.6f,0.6f,  1f,1f,1f,
-                20f,-45f,45f,  0f,0.6f,0f,  finalRotate, false);
+                0,0,0,  0f,0f,0f,
+                1f,1.1f,1f,  1f,1f,1f,  1f,1f,1f,
+                0f,0f,66f,  0f,0.6f,0f,  finalRotate, false);
         putContext(wand, ItemCameraTransforms.TransformType.GROUND,
                 0,0,0,  0f,1f,0f,  1f,1.1f,1f,  1f,1f,1f,  1f,1f,1f,
                 0f,0f,0f,  0f,0f,0f,  finalRotate, false);
@@ -385,16 +385,16 @@ public final class WandRenderCalibration {
                 0,0,0,  0f,1f,0f,  1f,1.1f,1f,  1f,1f,1f,  1f,1f,1f,
                 0f,0f,0f,  0f,0f,0f,  finalRotate, false);
         putContext(wand, ItemCameraTransforms.TransformType.FIRST_PERSON_RIGHT_HAND,
-                0,0,0,  0.5f,1f,0.5f,  1f,1.1f,1f,  0.5f,0.5f,0.5f,  1f,1f,1f,
+                0,0,0,  0.5f,1.5f,0.5f,  1f,1.1f,1f,  1f,1f,1f,  1f,1f,1f,
                 0f,0f,0f,  0f,0f,0f,  finalRotate, false);
         putContext(wand, ItemCameraTransforms.TransformType.FIRST_PERSON_LEFT_HAND,
-                0,0,0,  0.5f,1f,0.5f,  1f,1.1f,1f,  0.5f,0.5f,0.5f,  1f,1f,1f,
+                0,0,0,  0.5f,1.5f,0.5f,  1f,1.1f,1f,  1f,1f,1f,  1f,1f,1f,
                 0f,0f,0f,  0f,0f,0f,  finalRotate, false);
         putContext(wand, ItemCameraTransforms.TransformType.THIRD_PERSON_RIGHT_HAND,
-                0,0,0,  0.5f,1f,0.5f,  1f,1.1f,1f,  0.5f,0.5f,0.5f,  1f,1f,1f,
+                0,0,0,  0.5f,1.5f,0.5f,  1f,1.1f,1f,  1f,1f,1f,  1f,1f,1f,
                 0f,0f,0f,  0f,0f,0f,  finalRotate, false);
         putContext(wand, ItemCameraTransforms.TransformType.THIRD_PERSON_LEFT_HAND,
-                0,0,0,  0.5f,1f,0.5f,  1f,1.1f,1f,  0.5f,0.5f,0.5f,  1f,1f,1f,
+                0,0,0,  0.5f,1.5f,0.5f,  1f,1.1f,1f,  1f,1f,1f,  1f,1f,1f,
                 0f,0f,0f,  0f,0f,0f,  finalRotate, false);
         putContext(wand, ItemCameraTransforms.TransformType.NONE,
                 0,0,0,  0.5f,1.5f,0.5f,  1f,1.1f,1f,  1f,1f,1f,  1f,1f,1f,
@@ -405,9 +405,9 @@ public final class WandRenderCalibration {
         EnumMap<ItemCameraTransforms.TransformType, Transform> staff = new EnumMap<>(ItemCameraTransforms.TransformType.class);
         // preTranslate [0,0.5,0] applied to all staff contexts
         putContext(staff, ItemCameraTransforms.TransformType.GUI,
-                0f,0.5f,0f,  0.5f,0.5f,0f,
-                1f,1.1f,1f,  0.6f,0.6f,0.6f,  0.8f,0.8f,0.8f,
-                20f,-45f,45f,  -0.7f,1.2f,0f,  finalRotate, false);
+                0f,0.5f,0f,  0f,0f,0f,
+                1f,1.1f,1f,  1f,1f,1f,  0.8f,0.8f,0.8f,
+                0f,0f,66f,  -0.7f,1.2f,0f,  finalRotate, false);
         putContext(staff, ItemCameraTransforms.TransformType.GROUND,
                 0f,0.5f,0f,  0f,1.5f,0f,  1f,1.1f,1f,  0.9f,0.9f,0.9f,  1f,1f,1f,
                 0f,0f,0f,  0f,0f,0f,  finalRotate, false);
@@ -415,16 +415,16 @@ public final class WandRenderCalibration {
                 0f,0.5f,0f,  0f,1.5f,0f,  1f,1.1f,1f,  0.9f,0.9f,0.9f,  1f,1f,1f,
                 0f,0f,0f,  0f,0f,0f,  finalRotate, false);
         putContext(staff, ItemCameraTransforms.TransformType.FIRST_PERSON_RIGHT_HAND,
-                0f,0.5f,0f,  0.5f,1f,0.5f,  1f,1.1f,1f,  0.5f,0.5f,0.5f,  1f,1f,1f,
+                0f,0.5f,0f,  0.5f,1.5f,0.5f,  1f,1.1f,1f,  1f,1f,1f,  1f,1f,1f,
                 0f,0f,0f,  0f,0f,0f,  finalRotate, false);
         putContext(staff, ItemCameraTransforms.TransformType.FIRST_PERSON_LEFT_HAND,
-                0f,0.5f,0f,  0.5f,1f,0.5f,  1f,1.1f,1f,  0.5f,0.5f,0.5f,  1f,1f,1f,
+                0f,0.5f,0f,  0.5f,1.5f,0.5f,  1f,1.1f,1f,  1f,1f,1f,  1f,1f,1f,
                 0f,0f,0f,  0f,0f,0f,  finalRotate, false);
         putContext(staff, ItemCameraTransforms.TransformType.THIRD_PERSON_RIGHT_HAND,
-                0f,0.5f,0f,  0.5f,1f,0.5f,  1f,1.1f,1f,  0.5f,0.5f,0.5f,  1f,1f,1f,
+                0f,0.5f,0f,  0.5f,1.5f,0.5f,  1f,1.1f,1f,  1f,1f,1f,  1f,1f,1f,
                 0f,0f,0f,  0f,0f,0f,  finalRotate, false);
         putContext(staff, ItemCameraTransforms.TransformType.THIRD_PERSON_LEFT_HAND,
-                0f,0.5f,0f,  0.5f,1f,0.5f,  1f,1.1f,1f,  0.5f,0.5f,0.5f,  1f,1f,1f,
+                0f,0.5f,0f,  0.5f,1.5f,0.5f,  1f,1.1f,1f,  1f,1f,1f,  1f,1f,1f,
                 0f,0f,0f,  0f,0f,0f,  finalRotate, false);
         putContext(staff, ItemCameraTransforms.TransformType.NONE,
                 0f,0.5f,0f,  0.5f,1.5f,0.5f,  1f,1.1f,1f,  1f,1f,1f,  1f,1f,1f,

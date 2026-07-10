@@ -22,4 +22,19 @@ public class ItemWandCastingCraftingParityStaticGuardTest {
         assertFalse(source.contains("discount = Math.min(discount, cap.getSpecialCostModifier())"));
         assertFalse(consume.contains("player.capabilities.isCreativeMode"));
     }
+
+    @Test
+    public void creativeTabShouldExposeTheFourTc4PresetsIncludingSceptre() throws Exception {
+        String source = new String(Files.readAllBytes(Paths.get(
+                "src/main/java/thaumcraft/common/items/wands/ItemWandCasting.java")), StandardCharsets.UTF_8);
+
+        assertTrue(source.contains("createCreativeWand(\"wood\", \"iron\", false)"));
+        assertTrue(source.contains("createCreativeWand(\"greatwood\", \"gold\", false)"));
+        assertTrue(source.contains("createCreativeWand(\"silverwood_staff\", \"thaumium\", false)"));
+        assertTrue(source.contains("createCreativeWand(\"silverwood\", \"thaumium\", true)"));
+        assertTrue(source.contains("stack.getTagCompound().setByte(\"sceptre\", (byte) 1)"));
+        assertTrue(source.contains("stack.getTagCompound().hasKey(\"sceptre\")"));
+        assertFalse(source.contains("for (WandRod rod : WandRod.rods.values())"));
+        assertFalse(source.contains("for (WandCap cap : WandCap.caps.values())"));
+    }
 }
