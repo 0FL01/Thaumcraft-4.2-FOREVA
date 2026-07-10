@@ -41,9 +41,12 @@ public class ArcaneBoreRendererFidelityStaticGuardTest {
 
         assertTrue("TileArcaneBoreRenderer should consume the tile aim/easing state instead of static facing-only rotations",
                 renderer.contains("GlStateManager.rotate((float) tile.rotX - tile.vRadX + partialTicks * (float) tile.speedX, 0.0F, 1.0F, 0.0F);")
-                        && renderer.contains("GlStateManager.rotate((float) tile.rotZ - tile.vRadZ + partialTicks * (float) tile.speedZ, 0.0F, 0.0F, 1.0F);")
-                        && renderer.contains("if (tile.baseOrientation == EnumFacing.DOWN) {")
-                        && renderer.contains("emitModel.render(MODEL_SCALE, tile.hasFocus);"));
+                         && renderer.contains("GlStateManager.rotate((float) tile.rotZ - tile.vRadZ + partialTicks * (float) tile.speedZ, 0.0F, 0.0F, 1.0F);")
+                         && renderer.contains("if (tile.baseOrientation == EnumFacing.DOWN) {")
+                         && renderer.indexOf("GlStateManager.pushMatrix();\n        bindTexture(BORE_TEXTURE);")
+                         < renderer.indexOf("if (tile.baseOrientation == EnumFacing.DOWN) {")
+                         && renderer.contains("GlStateManager.rotate(tile.topRotation, 0.0F, 1.0F, 0.0F);")
+                         && renderer.contains("emitModel.render(MODEL_SCALE, tile.hasFocus);"));
     }
 
     private static String read(String path) throws IOException {

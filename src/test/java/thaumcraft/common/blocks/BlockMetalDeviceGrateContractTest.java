@@ -58,6 +58,22 @@ public class BlockMetalDeviceGrateContractTest {
                         && !closedModel.contains("\"parent\": \"block/cube_all\""));
     }
 
+    @Test
+    public void grateItemShouldUseTheLoweredTwoPassTc4InventoryShell() throws IOException {
+        String clientProxy = read("src/main/java/thaumcraft/client/ClientProxy.java");
+        String itemModel = read("src/main/resources/assets/thaumcraft/models/item/blockmetaldevice_5_inventory.json");
+
+        assertTrue("Open and internal closed grate stacks should use the dedicated inventory model without changing world models",
+                clientProxy.contains("registerBuiltinItemModel(metalDeviceItem, 5, \"blockmetaldevice_5_inventory\");")
+                        && clientProxy.contains("registerBuiltinItemModel(metalDeviceItem, 6, \"blockmetaldevice_5_inventory\");"));
+        assertTrue("Grate inventory model should preserve the original -0.3 Y lowering and grate/hatch render passes",
+                itemModel.contains("\"parent\": \"block/block\"")
+                        && itemModel.contains("\"surface\": \"thaumcraft:blocks/grate\"")
+                        && itemModel.contains("\"hatch\": \"thaumcraft:blocks/grate_hatch\"")
+                        && itemModel.contains("\"from\": [0, 8.2, 0]")
+                        && itemModel.contains("\"to\": [16, 11.2, 16]"));
+    }
+
     private static String read(String path) throws IOException {
         return new String(Files.readAllBytes(Paths.get(path)), StandardCharsets.UTF_8);
     }

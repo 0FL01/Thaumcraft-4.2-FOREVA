@@ -18,6 +18,8 @@ public class HungryChestVisualShellContractTest {
         String blockModel = read("src/main/resources/assets/thaumcraft/models/block/blockchesthungry.json");
         String block = read("src/main/java/thaumcraft/common/blocks/BlockChestHungry.java");
         String te = read("src/main/java/thaumcraft/common/tiles/TileChestHungry.java");
+        String clientProxy = read("src/main/java/thaumcraft/client/ClientProxy.java");
+        String itemModel = read("src/main/resources/assets/thaumcraft/models/item/blockchesthungry.json");
 
         assertTrue("BlockChestHungry should keep model-backed world rendering with horizontal facing state",
                 block.contains("return EnumBlockRenderType.MODEL;")
@@ -51,6 +53,16 @@ public class HungryChestVisualShellContractTest {
                         && blockModel.contains("\"to\": [15, 10, 15]")
                         && blockModel.contains("\"uv\": [3.5, 8.25, 7, 10.75]")
                         && blockModel.contains("\"uv\": [10.5, 8.25, 14, 10.75]"));
+        assertTrue("Hungry chest item should use a complete closed baked chest instead of the world body-only shell or TEISR",
+                clientProxy.contains("registerBuiltinItemModel(chestItem, 0, \"blockchesthungry\");")
+                        && !clientProxy.contains("chestItemTeisr.setTileEntityItemStackRenderer")
+                        && itemModel.contains("\"parent\": \"block/block\"")
+                        && itemModel.contains("\"from\": [1, 0, 1]")
+                        && itemModel.contains("\"to\": [15, 10, 15]")
+                        && itemModel.contains("\"from\": [1, 9, 1]")
+                        && itemModel.contains("\"to\": [15, 14, 15]")
+                        && itemModel.contains("\"from\": [7, 7, 0]")
+                        && itemModel.contains("\"to\": [9, 11, 1]"));
     }
 
     private static String read(String path) throws IOException {

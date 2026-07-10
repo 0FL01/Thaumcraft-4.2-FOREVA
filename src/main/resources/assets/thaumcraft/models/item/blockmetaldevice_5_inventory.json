@@ -1,0 +1,35 @@
+{
+  "parent": "block/block",
+  "ambientocclusion": false,
+  "textures": {
+    "particle": "#surface",
+    "surface": "thaumcraft:blocks/grate",
+    "hatch": "thaumcraft:blocks/grate_hatch"
+  },
+  "elements": [
+    {
+      "from": [0, 8.2, 0],
+      "to": [16, 11.2, 16],
+      "faces": {
+        "down": { "texture": "#surface", "uv": [0, 0, 16, 16] },
+        "up": { "texture": "#surface", "uv": [0, 0, 16, 16] },
+        "north": { "texture": "#surface", "uv": [0, 0, 16, 16] },
+        "south": { "texture": "#surface", "uv": [0, 0, 16, 16] },
+        "west": { "texture": "#surface", "uv": [0, 0, 16, 16] },
+        "east": { "texture": "#surface", "uv": [0, 0, 16, 16] }
+      }
+    },
+    {
+      "from": [0, 8.2, 0],
+      "to": [16, 11.2, 16],
+      "faces": {
+        "down": { "texture": "#hatch", "uv": [0, 0, 16, 16] },
+        "up": { "texture": "#hatch", "uv": [0, 0, 16, 16] },
+        "north": { "texture": "#hatch", "uv": [0, 0, 16, 16] },
+        "south": { "texture": "#hatch", "uv": [0, 0, 16, 16] },
+        "west": { "texture": "#hatch", "uv": [0, 0, 16, 16] },
+        "east": { "texture": "#hatch", "uv": [0, 0, 16, 16] }
+      }
+    }
+  ]
+}

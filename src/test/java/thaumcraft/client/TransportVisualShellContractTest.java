@@ -25,7 +25,10 @@ public class TransportVisualShellContractTest {
         String mirrorFloor = read("src/main/resources/assets/thaumcraft/models/block/blockmirror_up_0.json");
         String reservoirModel = read("src/main/resources/assets/thaumcraft/models/block/blockessentiareservoir.json");
         String reservoirItemModel = read("src/main/resources/assets/thaumcraft/models/item/blockessentiareservoir_tesr.json");
+        String mirrorItem = read("src/main/resources/assets/thaumcraft/models/item/blockmirror.json");
+        String mirrorOpenItem = read("src/main/resources/assets/thaumcraft/models/item/blockmirror_open.json");
         String essentiaMirrorItem = read("src/main/resources/assets/thaumcraft/models/item/blockmirror_essentia.json");
+        String essentiaMirrorOpenItem = read("src/main/resources/assets/thaumcraft/models/item/blockmirror_essentia_open.json");
 
         assertTrue("Mirror blockstate must route ceiling/floor variants explicitly and rotate the wall frame for side metas",
                 mirrorBlockstate.contains("\"type=0\": { \"model\": \"thaumcraft:blockmirror_down_0\" }")
@@ -65,11 +68,17 @@ public class TransportVisualShellContractTest {
                         && clientProxy.contains("registerBuiltinItemModel(Item.getItemFromBlock(ConfigBlocks.blockEssentiaReservoir), 0, \"blockessentiareservoir_tesr\");")
                         && reservoirItemModel.contains("\"parent\": \"builtin/entity\"")
                         && reservoirItemRenderer.contains("new TileEssentiaReservoirRenderer()"));
-        assertTrue("ClientProxy must split normal and essentia mirror inventory models by meta range",
-                clientProxy.contains("new ResourceLocation(\"thaumcraft\", \"blockmirror_essentia\")")
-                        && clientProxy.contains("for (int meta = 6; meta < 12; meta++) {"));
-        assertTrue("Essentia mirror item model must point at the alternate block shell",
-                essentiaMirrorItem.contains("\"parent\": \"thaumcraft:block/blockmirror_6\""));
+        assertTrue("ClientProxy must route mirror item metas to closed/open layered icons instead of placement blockstates",
+                clientProxy.contains("registerBuiltinItemModel(mirrorItem, meta, meta == 1 ? \"blockmirror_open\" : \"blockmirror\");")
+                        && clientProxy.contains("meta == 7 ? \"blockmirror_essentia_open\" : \"blockmirror_essentia\"")
+                        && !clientProxy.contains("registerBlockItemModel(mirrorItem, meta, \"type=\" + meta);"));
+        assertTrue("Mirror item models must reproduce the original two render passes with frame and closed/open pane layers",
+                mirrorItem.contains("\"parent\": \"item/generated\"")
+                        && mirrorItem.contains("\"layer0\": \"thaumcraft:items/mirrorframe\"")
+                        && mirrorItem.contains("\"layer1\": \"thaumcraft:blocks/mirrorpane\"")
+                        && mirrorOpenItem.contains("\"layer1\": \"thaumcraft:blocks/mirrorpaneopen\"")
+                        && essentiaMirrorItem.contains("\"layer0\": \"thaumcraft:items/mirrorframe2\"")
+                        && essentiaMirrorOpenItem.contains("\"layer1\": \"thaumcraft:blocks/mirrorpaneopen\""));
     }
 
     private static String read(String path) throws IOException {

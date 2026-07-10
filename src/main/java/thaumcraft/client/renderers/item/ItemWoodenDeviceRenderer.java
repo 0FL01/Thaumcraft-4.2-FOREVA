@@ -6,7 +6,6 @@ import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
 import net.minecraft.client.renderer.tileentity.TileEntityItemStackRenderer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.EnumFacing;
 import thaumcraft.api.aspects.Aspect;
 import thaumcraft.client.renderers.tile.TileArcaneBoreBaseRenderer;
 import thaumcraft.client.renderers.tile.TileArcaneBoreRenderer;
@@ -40,7 +39,6 @@ public class ItemWoodenDeviceRenderer extends TileEntityItemStackRenderer {
 
     @Override
     public void renderByItem(ItemStack stack, float partialTicks) {
-        ItemCameraTransforms.TransformType transformType = CURRENT_TRANSFORM.get();
         try {
             if (stack == null || stack.isEmpty()) {
                 return;
@@ -49,33 +47,40 @@ public class ItemWoodenDeviceRenderer extends TileEntityItemStackRenderer {
             if (meta == 0) {
                 TileBellows bellows = new TileBellows();
                 GlStateManager.pushMatrix();
-                // The TC4 TESR is centered on the origin; Forge item transforms rotate around the 0..1 block center.
-                GlStateManager.translate(0.5F, 0.5F, 0.5F);
-                GlStateManager.rotate(90.0F, 0.0F, 1.0F, 0.0F);
-                GlStateManager.translate(-0.5F, -0.5F, -0.5F);
-                bellowsRenderer.render(bellows, 0.0D, 0.0D, 0.0D, partialTicks, 0, 1.0F);
-                GlStateManager.popMatrix();
+                try {
+                    restoreLegacyInventoryOrigin();
+                    GlStateManager.rotate(90.0F, 0.0F, 1.0F, 0.0F);
+                    GlStateManager.translate(-0.5F, -0.5F, -0.5F);
+                    bellowsRenderer.render(bellows, 0.0D, 0.0D, 0.0D, partialTicks, 0, 1.0F);
+                } finally {
+                    GlStateManager.popMatrix();
+                }
                 return;
             }
             if (meta == 4) {
                 TileArcaneBoreBase boreBase = new TileArcaneBoreBase();
-                boreBase.orientation = EnumFacing.NORTH;
                 GlStateManager.pushMatrix();
-                GlStateManager.rotate(180.0F, 0.0F, 1.0F, 0.0F);
-                GlStateManager.translate(-0.5F, -0.5F, -0.5F);
-                boreBaseRenderer.render(boreBase, 0.0D, 0.0D, 0.0D, partialTicks, 0, 1.0F);
-                GlStateManager.popMatrix();
+                try {
+                    restoreLegacyInventoryOrigin();
+                    GlStateManager.rotate(180.0F, 0.0F, 1.0F, 0.0F);
+                    GlStateManager.translate(-0.5F, -0.5F, -0.5F);
+                    boreBaseRenderer.render(boreBase, 0.0D, 0.0D, 0.0D, partialTicks, 0, 1.0F);
+                } finally {
+                    GlStateManager.popMatrix();
+                }
                 return;
             }
             if (meta == 5) {
                 TileArcaneBore bore = new TileArcaneBore();
-                bore.orientation = EnumFacing.NORTH;
-                bore.baseOrientation = EnumFacing.DOWN;
                 GlStateManager.pushMatrix();
-                GlStateManager.rotate(180.0F, 0.0F, 1.0F, 0.0F);
-                GlStateManager.translate(-0.5F, -0.75F, -0.5F);
-                boreRenderer.render(bore, 0.0D, 0.0D, 0.0D, partialTicks, 0, 1.0F);
-                GlStateManager.popMatrix();
+                try {
+                    restoreLegacyInventoryOrigin();
+                    GlStateManager.rotate(180.0F, 0.0F, 1.0F, 0.0F);
+                    GlStateManager.translate(-0.5F, -0.75F, -0.5F);
+                    boreRenderer.render(bore, 0.0D, 0.0D, 0.0D, partialTicks, 0, 1.0F);
+                } finally {
+                    GlStateManager.popMatrix();
+                }
                 return;
             }
             if (meta == 8) {
@@ -83,24 +88,24 @@ public class ItemWoodenDeviceRenderer extends TileEntityItemStackRenderer {
                 banner.setFacing((byte) 8);
                 applyBannerData(stack, banner);
                 GlStateManager.pushMatrix();
-                if (isHandTransform(transformType)) {
-                    GlStateManager.translate(1.0F, 1.0F, 1.0F);
+                try {
+                    // NBT changes only the banner skin; every variant must expose the same normalized item origin.
+                    restoreLegacyInventoryOrigin();
+                    GlStateManager.rotate(180.0F, 0.0F, 1.0F, 0.0F);
+                    GlStateManager.translate(-0.5F, -1.0F, -0.5F);
+                    bannerRenderer.render(banner, 0.0D, 0.0D, 0.0D, partialTicks, 0, 1.0F);
+                } finally {
+                    GlStateManager.popMatrix();
                 }
-                GlStateManager.rotate(180.0F, 0.0F, 1.0F, 0.0F);
-                GlStateManager.translate(-0.5F, -1.0F, -0.5F);
-                bannerRenderer.render(banner, 0.0D, 0.0D, 0.0D, partialTicks, 0, 1.0F);
-                GlStateManager.popMatrix();
             }
         } finally {
             setTransformType(ItemCameraTransforms.TransformType.NONE);
         }
     }
 
-    private static boolean isHandTransform(ItemCameraTransforms.TransformType transformType) {
-        return transformType == ItemCameraTransforms.TransformType.FIRST_PERSON_LEFT_HAND
-                || transformType == ItemCameraTransforms.TransformType.FIRST_PERSON_RIGHT_HAND
-                || transformType == ItemCameraTransforms.TransformType.THIRD_PERSON_LEFT_HAND
-                || transformType == ItemCameraTransforms.TransformType.THIRD_PERSON_RIGHT_HAND;
+    private static void restoreLegacyInventoryOrigin() {
+        // Forge 1.12 enters TEISR at -0.5 on every axis; TC4's custom inventory renderers did not.
+        GlStateManager.translate(0.5F, 0.5F, 0.5F);
     }
 
     private static void applyBannerData(ItemStack stack, TileBanner banner) {

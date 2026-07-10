@@ -30,20 +30,21 @@ public class ItemStoneDeviceRenderer extends TileEntityItemStackRenderer {
 
         int meta = stack.getMetadata();
         GlStateManager.pushMatrix();
-        if (meta == 9 || meta == 10) {
-            TileNodeStabilizer stabilizer = new TileNodeStabilizer();
-            stabilizer.lock = meta == 9 ? 1 : 2;
-            GlStateManager.translate(-0.5F, -0.5F, -0.5F);
-            stabilizerRenderer.render(stabilizer, 0.0D, 0.0D, 0.0D, partialTicks, 0, 1.0F);
-        } else if (meta == 11) {
-            TileNodeConverter converter = new TileNodeConverter();
-            GlStateManager.translate(-0.5F, -0.5F, -0.5F);
-            converterRenderer.render(converter, 0.0D, 0.0D, 0.0D, partialTicks, 0, 1.0F);
-        } else if (meta == 14) {
-            TileFluxScrubber scrubber = new TileFluxScrubber();
-            GlStateManager.translate(-0.5F, -0.5F, -0.5F);
-            fluxScrubberRenderer.render(scrubber, 0.0D, 0.0D, 0.0D, partialTicks, 0, 1.0F);
+        try {
+            // Forge's TEISR entry translation supplies the single -0.5 item offset used by TC4 here.
+            if (meta == 9 || meta == 10) {
+                TileNodeStabilizer stabilizer = new TileNodeStabilizer();
+                stabilizer.lock = meta == 9 ? 1 : 2;
+                stabilizerRenderer.render(stabilizer, 0.0D, 0.0D, 0.0D, partialTicks, 0, 1.0F);
+            } else if (meta == 11) {
+                TileNodeConverter converter = new TileNodeConverter();
+                converterRenderer.render(converter, 0.0D, 0.0D, 0.0D, partialTicks, 0, 1.0F);
+            } else if (meta == 14) {
+                TileFluxScrubber scrubber = new TileFluxScrubber();
+                fluxScrubberRenderer.render(scrubber, 0.0D, 0.0D, 0.0D, partialTicks, 0, 1.0F);
+            }
+        } finally {
+            GlStateManager.popMatrix();
         }
-        GlStateManager.popMatrix();
     }
 }

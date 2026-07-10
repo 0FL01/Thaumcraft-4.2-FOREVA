@@ -2,6 +2,6 @@
   "parent": "item/generated",
   "textures": {
     "layer0": "thaumcraft:items/mirrorframe2",
-    "layer1": "thaumcraft:blocks/mirrorpane"
+    "layer1": "thaumcraft:blocks/mirrorpaneopen"
   }
 }

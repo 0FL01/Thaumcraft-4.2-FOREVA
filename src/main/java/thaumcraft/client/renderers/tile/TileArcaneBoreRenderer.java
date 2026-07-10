@@ -1,5 +1,6 @@
 package thaumcraft.client.renderers.tile;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.util.EnumFacing;
@@ -29,17 +30,19 @@ public class TileArcaneBoreRenderer extends TileEntitySpecialRenderer<TileArcane
             return;
         }
 
-        float ticks = TileRenderHelper.ticks(tile, partialTicks);
+        float ticks = Minecraft.getMinecraft().player == null
+                ? TileRenderHelper.ticks(tile, partialTicks)
+                : Minecraft.getMinecraft().player.ticksExisted + partialTicks;
 
         GlStateManager.pushMatrix();
         GlStateManager.translate(x + 0.5D, y + 0.5D, z + 0.5D);
         GlStateManager.rotate((float) tile.rotX - tile.vRadX + partialTicks * (float) tile.speedX, 0.0F, 1.0F, 0.0F);
-        if (tile.baseOrientation == EnumFacing.DOWN) {
-            GlStateManager.rotate(180.0F, 0.0F, 0.0F, 1.0F);
-        }
 
         GlStateManager.pushMatrix();
         bindTexture(BORE_TEXTURE);
+        if (tile.baseOrientation == EnumFacing.DOWN) {
+            GlStateManager.rotate(180.0F, 0.0F, 0.0F, 1.0F);
+        }
         GlStateManager.translate(0.0F, -0.5F, 0.0F);
         boreModel.renderBase(MODEL_SCALE);
         GlStateManager.popMatrix();
@@ -52,14 +55,12 @@ public class TileArcaneBoreRenderer extends TileEntitySpecialRenderer<TileArcane
         GlStateManager.popMatrix();
 
         GlStateManager.pushMatrix();
-        float spinSpeed = tile.hasFocus && tile.hasPickaxe ? 4.0F : 1.0F;
-        float spin = (tile.topRotation + partialTicks * spinSpeed) % 360.0F;
-        GlStateManager.rotate(spin, 0.0F, 1.0F, 0.0F);
+        GlStateManager.rotate(tile.topRotation, 0.0F, 1.0F, 0.0F);
         GlStateManager.translate(0.0F, 0.5F, 0.0F);
         emitModel.render(MODEL_SCALE, tile.hasFocus);
         GlStateManager.popMatrix();
 
-        float rotation = (ticks % 45.0F);
+        float rotation = ticks % 45.0F;
         renderVortexLayer(-0.17F, -(rotation * 8.0F), 10.0F, 0.40F, 0xFFFFFFFF);
         renderVortexLayer(-0.21F, rotation * 8.0F, 10.0F, 0.30F, 0xCCFFFFFF);
         renderVortexLayer(-0.25F, -(rotation * 8.0F), -10.0F, 0.20F, 0xCCFFFFFF);
@@ -69,12 +70,12 @@ public class TileArcaneBoreRenderer extends TileEntitySpecialRenderer<TileArcane
         GlStateManager.rotate(180.0F, 0.0F, 0.0F, 1.0F);
         GlStateManager.translate(0.0F, 0.3F, 0.0F);
         GlStateManager.scale(0.6F, 0.6F, 0.6F);
-        GlStateManager.disableLighting();
+        GlStateManager.depthMask(false);
         GlStateManager.enableBlend();
         GlStateManager.blendFunc(770, 771);
         jarModel.renderCore(MODEL_SCALE);
         GlStateManager.disableBlend();
-        GlStateManager.enableLighting();
+        GlStateManager.depthMask(true);
         GlStateManager.popMatrix();
 
         GlStateManager.popMatrix();

@@ -25,6 +25,8 @@ public class TubeConduitBurstContractTest {
         String tubeBlock = read("src/main/java/thaumcraft/common/blocks/BlockTube.java");
         String clientProxy = read("src/main/java/thaumcraft/client/ClientProxy.java");
         String crystalizerItemModel = read("src/main/resources/assets/thaumcraft/models/item/blocktube_tesr.json");
+        String tubeItemModel = read("src/main/resources/assets/thaumcraft/models/block/blocktube_0.json");
+        String bufferItemModel = read("src/main/resources/assets/thaumcraft/models/block/blocktube_4.json");
 
         assertTrue("Tube conduit helper must drive dynamic connections through ThaumcraftApiHelper and extended-tube checks",
                 helper.contains("ThaumcraftApiHelper.getConnectableTile")
@@ -42,12 +44,12 @@ public class TubeConduitBurstContractTest {
                         && bufferRenderer.contains("if (tile.getWorld() == null || tile.getPos() == null)")
                         && onewayRenderer.contains("TubeConduitRenderHelper.renderConduit(tile, tile, tile.openSides"));
 
-        assertTrue("Tube ancillary metas plus crystalizer should route through TESR-first world and item rendering instead of baked placeholder shells",
+        assertTrue("Static tube and buffer items should use their original inventory shells while dynamic ancillary metas keep TEISR routing",
                 tubeBlock.contains("return this.getMetaFromState(state) == 2 ? EnumBlockRenderType.MODEL : EnumBlockRenderType.INVISIBLE;")
-                        && clientProxy.contains("registerBuiltinItemModel(tubeItem, 0, \"blocktube_tesr\");")
+                        && !clientProxy.contains("registerBuiltinItemModel(tubeItem, 0, \"blocktube_tesr\");")
                         && clientProxy.contains("registerBuiltinItemModel(tubeItem, 1, \"blocktube_tesr\");")
                         && clientProxy.contains("registerBuiltinItemModel(tubeItem, 3, \"blocktube_tesr\");")
-                        && clientProxy.contains("registerBuiltinItemModel(tubeItem, 4, \"blocktube_tesr\");")
+                        && !clientProxy.contains("registerBuiltinItemModel(tubeItem, 4, \"blocktube_tesr\");")
                         && clientProxy.contains("registerBuiltinItemModel(tubeItem, 5, \"blocktube_tesr\");")
                         && clientProxy.contains("registerBuiltinItemModel(tubeItem, 6, \"blocktube_tesr\");")
                         && clientProxy.contains("registerBuiltinItemModel(tubeItem, 7, \"blocktube_tesr\");")
@@ -60,7 +62,11 @@ public class TubeConduitBurstContractTest {
                         && itemRenderer.contains("if (meta == 1)")
                         && itemRenderer.contains("if (meta == 7)")
                         && itemRenderer.contains("GlStateManager.translate(-0.5F, -0.5F, -0.5F);")
-                        && crystalizerItemModel.contains("\"parent\": \"builtin/entity\""));
+                        && crystalizerItemModel.contains("\"parent\": \"builtin/entity\"")
+                        && tubeItemModel.contains("\"parent\": \"block/block\"")
+                        && tubeItemModel.contains("\"from\": [6.5, 6.5, 6.5]")
+                        && bufferItemModel.contains("\"parent\": \"block/block\"")
+                        && bufferItemModel.contains("\"from\": [4, 4, 4]"));
 
         assertTrue("TileEssentiaCrystalizerRenderer should keep the crystalizer.obj shell path available for worldless TEISR inventory renders",
                 crystalizerRenderer.contains("if (tile == null)")

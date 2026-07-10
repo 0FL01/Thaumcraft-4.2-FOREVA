@@ -15,6 +15,7 @@ public class FluxReservoirRendererFidelityStaticGuardTest {
     public void fluxScrubberAndReservoirRenderersUseModelDrivenDevicePaths() throws IOException {
         String fluxRenderer = read("src/main/java/thaumcraft/client/renderers/tile/TileFluxScrubberRenderer.java");
         String fluxModel = read("src/main/java/thaumcraft/client/renderers/models/ModelFluxScrubber.java");
+        String capModel = read("src/main/java/thaumcraft/client/renderers/models/ModelEldritchCap.java");
         String stoneDeviceBlockstate = read("src/main/resources/assets/thaumcraft/blockstates/blockstonedevice.json");
         String fluxBlockModel = read("src/main/resources/assets/thaumcraft/models/block/blockstonedevice_14.json");
         String reservoirRenderer = read("src/main/java/thaumcraft/client/renderers/tile/TileEssentiaReservoirRenderer.java");
@@ -29,17 +30,20 @@ public class FluxReservoirRendererFidelityStaticGuardTest {
                         && !fluxRenderer.contains("TileRenderHelper.orientBillboardToPlayer()")
                         && !fluxRenderer.contains("TileRenderHelper.drawTexturedQuad("));
 
-        assertTrue("ModelFluxScrubber should expose cap and tip parts",
-                fluxModel.contains("class ModelFluxScrubber extends ModelBase")
-                        && fluxModel.contains("cap")
-                        && fluxModel.contains("tip")
+        assertTrue("ModelFluxScrubber should reuse the exact obelisk-cap OBJ groups instead of substitute cuboids",
+                fluxModel.contains("new ModelEldritchCap()")
                         && fluxModel.contains("renderCap(float scale)")
-                        && fluxModel.contains("renderTip(float scale)"));
+                        && fluxModel.contains("renderTip(float scale)")
+                        && fluxModel.contains("renderCapGroup()")
+                        && fluxModel.contains("renderTipGroup()")
+                        && !fluxModel.contains("ModelRenderer")
+                        && capModel.contains("public void renderCapGroup()")
+                        && capModel.contains("public void renderTipGroup()"));
 
-        assertTrue("Stone-device blockstate should route focal manipulator and flux scrubber away from the old arcane-stone placeholder",
+        assertTrue("Stone-device fallback blockstates should remain metadata-specific",
                 stoneDeviceBlockstate.contains("\"type=13\": { \"model\": \"thaumcraft:blockstonedevice_13\" }")
                         && stoneDeviceBlockstate.contains("\"type=14\": { \"model\": \"thaumcraft:blockstonedevice_14\" }"));
-        assertTrue("Flux scrubber block model should now carry the static cap shell instead of the old full-cube placeholder",
+        assertTrue("Flux scrubber fallback assets should retain representative source texture and bounds while TESR owns the live shell",
                 fluxBlockModel.contains("\"ambientocclusion\": false")
                         && fluxBlockModel.contains("\"surface\": \"thaumcraft:models/fluxscrubber\"")
                         && fluxBlockModel.contains("\"from\": [4, 7, 4]")

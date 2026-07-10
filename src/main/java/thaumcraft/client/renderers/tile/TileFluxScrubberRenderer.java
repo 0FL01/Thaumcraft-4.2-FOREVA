@@ -1,5 +1,6 @@
 package thaumcraft.client.renderers.tile;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.util.EnumFacing;
@@ -20,24 +21,29 @@ public class TileFluxScrubberRenderer extends TileEntitySpecialRenderer<TileFlux
             return;
         }
 
-        float ticks = TileRenderHelper.ticks(tile, partialTicks);
+        float ticks = Minecraft.getMinecraft().player == null
+                ? TileRenderHelper.ticks(tile, partialTicks)
+                : Minecraft.getMinecraft().player.ticksExisted + partialTicks;
         float bob = (float) Math.sin((ticks + tile.count) / 8.0F) * 0.075F + 0.075F;
 
         GlStateManager.pushMatrix();
-        translateFromOrientation(x, y, z, tile.facing);
-        GlStateManager.disableLighting();
-        GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
-        bindTexture(SCRUBBER);
+        try {
+            translateFromOrientation(x, y, z, tile.facing);
+            GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+            bindTexture(SCRUBBER);
+            model.renderCap(MODEL_SCALE);
 
-        model.renderCap(MODEL_SCALE);
-
-        GlStateManager.pushMatrix();
-        GlStateManager.translate(0.0D, 0.0D, -bob);
-        model.renderTip(MODEL_SCALE);
-        GlStateManager.popMatrix();
-
-        GlStateManager.enableLighting();
-        GlStateManager.popMatrix();
+            GlStateManager.pushMatrix();
+            try {
+                GlStateManager.translate(0.0D, 0.0D, -bob);
+                model.renderTip(MODEL_SCALE);
+            } finally {
+                GlStateManager.popMatrix();
+            }
+        } finally {
+            GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+            GlStateManager.popMatrix();
+        }
     }
 
     private static void translateFromOrientation(double x, double y, double z, EnumFacing facing) {

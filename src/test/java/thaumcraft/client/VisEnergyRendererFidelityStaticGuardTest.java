@@ -59,19 +59,24 @@ public class VisEnergyRendererFidelityStaticGuardTest {
                         && nodeRenderer.contains("drawTexturedQuad(0.33F, u0, u1, v0, v1)")
                         && !nodeRenderer.contains("textures/misc/node_bubble.png"));
 
-        assertTrue("TileNodeStabilizerRenderer should keep only the animated pistons and bubble overlay after the static lock shell moved into the block model",
-                stabilizerRenderer.contains("new ModelNodeStabilizer()")
-                        && stabilizerRenderer.contains("bindTexture(BASE_TEXTURE);")
-                        && stabilizerRenderer.contains("model.renderPiston(MODEL_SCALE);")
-                        && stabilizerRenderer.contains("textures/misc/node_bubble.png")
-                        && !stabilizerRenderer.contains("model.renderLock(MODEL_SCALE);"));
+        assertTrue("TileNodeStabilizerRenderer should render the complete TC4 lock, count-driven pistons, and bubble overlay through TESR",
+                 stabilizerRenderer.contains("new ModelNodeStabilizer()")
+                         && stabilizerRenderer.contains("bindTexture(BASE_TEXTURE);")
+                         && stabilizerRenderer.contains("model.renderLock(MODEL_SCALE);")
+                         && stabilizerRenderer.contains("model.renderPiston(MODEL_SCALE);")
+                         && stabilizerRenderer.contains("textures/misc/node_bubble.png")
+                         && stabilizerRenderer.contains("tile.count / 100.0D")
+                         && stabilizerRenderer.contains("drawTexturedQuad(0.9F, bubbleColor")
+                         && stabilizerRenderer.contains("OpenGlHelper.setLightmapTextureCoords"));
 
-        assertTrue("TileNodeConverterRenderer should keep the colored overlay lock and animated pistons after the static base shell moved into the block model",
-                converterRenderer.contains("new ModelNodeStabilizer()")
-                        && converterRenderer.contains("bindTexture(OVER_TEXTURE);")
-                        && converterRenderer.contains("model.renderLock(MODEL_SCALE);")
-                        && converterRenderer.contains("model.renderPiston(MODEL_SCALE);")
-                        && !converterRenderer.contains("bindTexture(BASE_TEXTURE);\n        model.renderLock(MODEL_SCALE);"));
+        assertTrue("TileNodeConverterRenderer should render both the base and colored overlay lock plus count-driven pistons",
+                 converterRenderer.contains("new ModelNodeStabilizer()")
+                         && converterRenderer.contains("bindTexture(BASE_TEXTURE);\n            model.renderLock(MODEL_SCALE);")
+                         && converterRenderer.contains("bindTexture(OVER_TEXTURE);")
+                         && converterRenderer.contains("model.renderLock(MODEL_SCALE);")
+                         && converterRenderer.contains("model.renderPiston(MODEL_SCALE);")
+                         && converterRenderer.contains("OpenGlHelper.setLightmapTextureCoords")
+                         && !converterRenderer.contains("ticks * (1.8F"));
 
         assertTrue("TileMagicWorkbenchChargerRenderer should keep the reference ring/support/crystal TESR path with lightmap pulse contract",
                 chargerRenderer.contains("new ModelMagicWorkbenchCharger()")
@@ -123,7 +128,8 @@ public class VisEnergyRendererFidelityStaticGuardTest {
                         && stabilizerModel.contains("LOCK_TRIANGLES")
                         && stabilizerModel.contains("PISTON_TRIANGLES")
                         && stabilizerModel.contains("renderLock(float scale)")
-                        && stabilizerModel.contains("renderPiston(float scale)")
+                         && stabilizerModel.contains("renderPiston(float scale)")
+                         && stabilizerModel.contains(".tex(uv[0], 1.0F - uv[1])")
                         && stabilizerModel.contains("DefaultVertexFormats.POSITION_TEX_NORMAL")
                         && !stabilizerModel.contains("extends ModelBase")
                         && !stabilizerModel.contains("new ModelRenderer("));
@@ -137,12 +143,12 @@ public class VisEnergyRendererFidelityStaticGuardTest {
                         && chargerModel.contains("renderSupport(float scale)")
                         && chargerModel.contains("renderCrystal(float scale)"));
 
-        assertTrue("Stone-device blockstate should route node stabilizer and converter metas away from the old shared arcane-stone placeholder",
+        assertTrue("Stone-device fallback models should remain metadata-specific even though TESR owns the live shell",
                 stoneDeviceBlockstate.contains("\"type=9\": { \"model\": \"thaumcraft:blockstonedevice_9\" }")
                         && stoneDeviceBlockstate.contains("\"type=10\": { \"model\": \"thaumcraft:blockstonedevice_9\" }")
                         && stoneDeviceBlockstate.contains("\"type=11\": { \"model\": \"thaumcraft:blockstonedevice_11\" }"));
 
-        assertTrue("Node stabilizer and converter block models should now carry the static lock shell geometry instead of the old full cube placeholder",
+        assertTrue("Node-device fallback assets should retain representative source textures and bounds",
                 stabilizerBlockModel.contains("\"ambientocclusion\": false")
                         && stabilizerBlockModel.contains("\"surface\": \"thaumcraft:models/node_stabilizer\"")
                         && stabilizerBlockModel.contains("\"from\": [4, 4, 7]")

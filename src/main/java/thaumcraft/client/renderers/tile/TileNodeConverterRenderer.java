@@ -1,6 +1,8 @@
 package thaumcraft.client.renderers.tile;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.util.ResourceLocation;
 import thaumcraft.client.renderers.models.ModelNodeStabilizer;
@@ -22,64 +24,79 @@ public class TileNodeConverterRenderer extends TileEntitySpecialRenderer<TileNod
             return;
         }
 
-        float ticks = TileRenderHelper.ticks(tile, partialTicks);
-        float progress = TileRenderHelper.clamp01(Math.min(50.0F, Math.max(0.0F, tile.count)) / 137.0F);
-        int overlayColor = statusColor(tile.status);
-        float pulse = 0.9F + (float) Math.sin(ticks / 3.0F) * 0.1F;
-        float[] color = unpackRgb(overlayColor, pulse);
+        float progress = Math.min(50.0F, tile.count) / 137.0F;
+        float[] color = statusColor(tile.status);
+        float ticks = Minecraft.getMinecraft().player == null
+                ? TileRenderHelper.ticks(tile, partialTicks)
+                : Minecraft.getMinecraft().player.ticksExisted + partialTicks;
+        float previousLightX = OpenGlHelper.lastBrightnessX;
+        float previousLightY = OpenGlHelper.lastBrightnessY;
+        int blockLight = tile.getWorld() == null ? -1 : tile.getWorld().getCombinedLight(tile.getPos(), 0);
 
         GlStateManager.pushMatrix();
-        GlStateManager.translate(x + 0.5D, y + 1.0D, z + 0.5D);
-        GlStateManager.rotate(90.0F, 1.0F, 0.0F, 0.0F);
-        GlStateManager.disableLighting();
-        GlStateManager.enableBlend();
-        GlStateManager.blendFunc(770, 771);
-        GlStateManager.disableCull();
-
-        bindTexture(OVER_TEXTURE);
-        GlStateManager.color(color[0], color[1], color[2], 1.0F);
-        model.renderLock(MODEL_SCALE);
-        GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
-
-        for (int i = 0; i < 4; i++) {
-            GlStateManager.pushMatrix();
-            GlStateManager.rotate(i * 90.0F, 0.0F, 0.0F, 1.0F);
-            GlStateManager.rotate(45.0F, 0.0F, 1.0F, 0.0F);
-            GlStateManager.rotate((ticks * (1.8F + i * 0.25F)) % 360.0F, 0.0F, 1.0F, 0.0F);
-            GlStateManager.translate(0.0D, 0.0D, progress);
-
-            bindTexture(BASE_TEXTURE);
-            model.renderPiston(MODEL_SCALE);
-
-            bindTexture(OVER_TEXTURE);
-            float pistonPulse = 0.85F + (float) Math.sin((ticks + i * 4.0F) / 3.0F) * 0.1F;
-            float[] pistonColor = unpackRgb(overlayColor, pistonPulse);
-            GlStateManager.color(pistonColor[0], pistonColor[1], pistonColor[2], 1.0F);
-            model.renderPiston(MODEL_SCALE);
+        try {
+            GlStateManager.translate(x + 0.5D, y + 1.0D, z + 0.5D);
+            GlStateManager.rotate(90.0F, 1.0F, 0.0F, 0.0F);
             GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+            applyPackedLight(blockLight);
+            bindTexture(BASE_TEXTURE);
+            model.renderLock(MODEL_SCALE);
+            if (tile.getWorld() != null) {
+                applyGlowLight(progress, ticks);
+            }
+            bindTexture(OVER_TEXTURE);
+            GlStateManager.color(color[0], color[1], color[2], 1.0F);
+            model.renderLock(MODEL_SCALE);
+            GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+
+            for (int i = 0; i < 4; i++) {
+                GlStateManager.pushMatrix();
+                try {
+                    GlStateManager.rotate(i * 90.0F, 0.0F, 0.0F, 1.0F);
+                    GlStateManager.rotate(45.0F, 0.0F, 1.0F, 0.0F);
+                    GlStateManager.translate(0.0D, 0.0D, progress);
+
+                    applyPackedLight(blockLight);
+                    bindTexture(BASE_TEXTURE);
+                    model.renderPiston(MODEL_SCALE);
+                    if (tile.getWorld() != null) {
+                        applyGlowLight(progress, ticks + i * 5.0F);
+                    }
+                    bindTexture(OVER_TEXTURE);
+                    GlStateManager.color(color[0], color[1], color[2], 1.0F);
+                    model.renderPiston(MODEL_SCALE);
+                    GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+                } finally {
+                    GlStateManager.popMatrix();
+                }
+            }
+        } finally {
+            GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+            OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, previousLightX, previousLightY);
             GlStateManager.popMatrix();
         }
-
-        GlStateManager.enableCull();
-        GlStateManager.disableBlend();
-        GlStateManager.enableLighting();
-        GlStateManager.popMatrix();
     }
 
-    private static int statusColor(int status) {
+    private static float[] statusColor(int status) {
         if (status == 2) {
-            return 0xCCFF004D;
+            return new float[]{1.0F, 0.0F, 0.3F};
         }
         if (status == 1) {
-            return 0xCCFF9920;
+            return new float[]{1.0F, 0.6F, 0.1F};
         }
-        return 0xCC90FF90;
+        return new float[]{0.5F, 1.0F, 0.5F};
     }
 
-    private static float[] unpackRgb(int color, float scale) {
-        float r = ((color >> 16) & 0xFF) / 255.0F * scale;
-        float g = ((color >> 8) & 0xFF) / 255.0F * scale;
-        float b = (color & 0xFF) / 255.0F * scale;
-        return new float[]{r, g, b};
+    private static void applyGlowLight(float progress, float ticks) {
+        float pulse = (float) Math.sin(ticks / 3.0F) * 0.1F + 0.9F;
+        int glow = 50 + (int) (170.0F * (progress * 2.5F * pulse));
+        applyPackedLight(glow);
+    }
+
+    private static void applyPackedLight(int light) {
+        if (light >= 0) {
+            OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit,
+                    light & 0xFFFF, light >>> 16);
+        }
     }
 }

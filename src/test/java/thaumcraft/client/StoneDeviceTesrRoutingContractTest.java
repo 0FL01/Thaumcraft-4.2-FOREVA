@@ -54,9 +54,9 @@ public class StoneDeviceTesrRoutingContractTest {
                         && itemRenderer.contains("stabilizer.lock = meta == 9 ? 1 : 2;")
                         && itemRenderer.contains("else if (meta == 11)")
                         && itemRenderer.contains("TileNodeConverter converter = new TileNodeConverter();")
-                        && itemRenderer.contains("else if (meta == 14)")
-                        && itemRenderer.contains("TileFluxScrubber scrubber = new TileFluxScrubber();")
-                        && itemRenderer.contains("GlStateManager.translate(-0.5F, -0.5F, -0.5F);")
+                         && itemRenderer.contains("else if (meta == 14)")
+                         && itemRenderer.contains("TileFluxScrubber scrubber = new TileFluxScrubber();")
+                         && !itemRenderer.contains("GlStateManager.translate(-0.5F, -0.5F, -0.5F);")
                         && !itemRenderer.contains("new TileRunicMatrixRenderer()")
                         && !itemRenderer.contains("new TileFocalManipulatorRenderer()")
                         && !itemRenderer.contains("if (meta == 2)")
@@ -78,14 +78,17 @@ public class StoneDeviceTesrRoutingContractTest {
                         && !pillarRenderer.contains("tile == null || tile.getWorld() == null"));
 
         assertTrue("TileNodeStabilizerRenderer should keep the original lock/piston/bubble path available for worldless TEISR inventory rendering",
-                stabilizerRenderer.contains("if (tile == null)")
-                        && stabilizerRenderer.contains("int lock = resolveLock(tile);")
-                        && stabilizerRenderer.contains("if (tile.count > 0)")
+                 stabilizerRenderer.contains("if (tile == null)")
+                         && stabilizerRenderer.contains("int lock = resolveLock(tile);")
+                         && stabilizerRenderer.contains("model.renderLock(MODEL_SCALE);")
+                         && stabilizerRenderer.contains("tile.count / 100.0D")
+                         && stabilizerRenderer.contains("if (tile.count > 0)")
                         && !stabilizerRenderer.contains("tile == null || tile.getWorld() == null"));
 
         assertTrue("TileNodeConverterRenderer should keep the original lock-plus-piston path available without a hard world guard so the converter item can render through TEISR",
-                converterRenderer.contains("if (tile == null)")
-                        && converterRenderer.contains("model.renderLock(MODEL_SCALE);")
+                 converterRenderer.contains("if (tile == null)")
+                         && converterRenderer.contains("bindTexture(BASE_TEXTURE);")
+                         && converterRenderer.contains("model.renderLock(MODEL_SCALE);")
                         && converterRenderer.contains("model.renderPiston(MODEL_SCALE);")
                         && !converterRenderer.contains("tile == null || tile.getWorld() == null"));
 

@@ -43,7 +43,8 @@ public class PedestalVisualShellContractTest {
                         && wandPedestalModel.contains("\"to\": [12, 16, 12]"));
 
         assertTrue("Compound focus shell model should keep the cross-arm and raised-prong geometry instead of the old cube_bottom_top placeholder",
-                focusModel.contains("\"bottom\": \"thaumcraft:blocks/wandpedestal_focus_bot\"")
+                focusModel.contains("\"parent\": \"block/block\"")
+                        && focusModel.contains("\"bottom\": \"thaumcraft:blocks/wandpedestal_focus_bot\"")
                         && focusModel.contains("\"top\": \"thaumcraft:blocks/wandpedestal_focus_top\"")
                         && focusModel.contains("\"from\": [5, 0, 5]")
                         && focusModel.contains("\"to\": [11, 1, 11]")

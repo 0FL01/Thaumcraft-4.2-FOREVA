@@ -139,7 +139,6 @@ import thaumcraft.client.renderers.entity.RenderSpecialItem;
 import thaumcraft.client.renderers.item.ItemEldritchRenderer;
 import thaumcraft.client.renderers.item.ItemEssentiaReservoirRenderer;
 import thaumcraft.client.renderers.item.ItemJarRenderer;
-import thaumcraft.client.renderers.item.ItemChestHungryRenderer;
 import thaumcraft.client.renderers.item.ItemTrunkSpawnerRenderer;
 import thaumcraft.client.renderers.item.ItemMetalDeviceRenderer;
 import thaumcraft.client.renderers.item.ItemNodeRenderer;
@@ -575,19 +574,6 @@ public class ClientProxy extends CommonProxy {
                 }
                 continue;
             }
-            if (ConfigBlocks.blockMirror != null && item == Item.getItemFromBlock(ConfigBlocks.blockMirror)) {
-                ModelResourceLocation normalMirrorModel = new ModelResourceLocation(
-                        new ResourceLocation("thaumcraft", "blockmirror"), "inventory");
-                ModelResourceLocation essentiaMirrorModel = new ModelResourceLocation(
-                        new ResourceLocation("thaumcraft", "blockmirror_essentia"), "inventory");
-                for (int meta = 0; meta < 64; meta++) {
-                    ModelLoader.setCustomModelResourceLocation(item, meta, normalMirrorModel);
-                }
-                for (int meta = 6; meta < 12; meta++) {
-                    ModelLoader.setCustomModelResourceLocation(item, meta, essentiaMirrorModel);
-                }
-                continue;
-            }
             if (item == ConfigItems.itemWandCasting) {
                 final ModelResourceLocation wandModel = new ModelResourceLocation(
                         new ResourceLocation("thaumcraft", "wandcasting_tesr"), "inventory");
@@ -808,10 +794,6 @@ public class ClientProxy extends CommonProxy {
         if (stoneDeviceItem != null) {
             stoneDeviceItem.setTileEntityItemStackRenderer(new ItemStoneDeviceRenderer());
         }
-        Item chestItemTeisr = Item.getItemFromBlock(ConfigBlocks.blockChestHungry);
-        if (chestItemTeisr != null) {
-            chestItemTeisr.setTileEntityItemStackRenderer(new ItemChestHungryRenderer());
-        }
         Item woodenDeviceItem = Item.getItemFromBlock(ConfigBlocks.blockWoodenDevice);
         if (woodenDeviceItem != null) {
             woodenDeviceItem.setTileEntityItemStackRenderer(new ItemWoodenDeviceRenderer());
@@ -971,6 +953,8 @@ public class ClientProxy extends CommonProxy {
         for (int meta = 0; meta <= 14; meta++) {
             registerBlockItemModel(metalDeviceItem, meta, "type=" + meta);
         }
+        registerBuiltinItemModel(metalDeviceItem, 5, "blockmetaldevice_5_inventory");
+        registerBuiltinItemModel(metalDeviceItem, 6, "blockmetaldevice_5_inventory");
         Item woodenDeviceItem = Item.getItemFromBlock(ConfigBlocks.blockWoodenDevice);
         for (int meta = 0; meta <= 8; meta++) {
             registerBlockItemModel(woodenDeviceItem, meta, "type=" + meta);
@@ -988,10 +972,8 @@ public class ClientProxy extends CommonProxy {
         for (int meta = 0; meta <= 7; meta++) {
             registerBlockItemModel(tubeItem, meta, "type=" + meta);
         }
-        registerBuiltinItemModel(tubeItem, 0, "blocktube_tesr");
         registerBuiltinItemModel(tubeItem, 1, "blocktube_tesr");
         registerBuiltinItemModel(tubeItem, 3, "blocktube_tesr");
-        registerBuiltinItemModel(tubeItem, 4, "blocktube_tesr");
         registerBuiltinItemModel(tubeItem, 5, "blocktube_tesr");
         registerBuiltinItemModel(tubeItem, 6, "blocktube_tesr");
         registerBuiltinItemModel(tubeItem, 7, "blocktube_tesr");
@@ -1003,8 +985,12 @@ public class ClientProxy extends CommonProxy {
         registerBuiltinItemModel(tableItem, 14, "blocktable_14_inventory");
         registerBuiltinItemModel(tableItem, 15, "blocktable_15_inventory");
         Item mirrorItem = Item.getItemFromBlock(ConfigBlocks.blockMirror);
-        for (int meta = 0; meta <= 11; meta++) {
-            registerBlockItemModel(mirrorItem, meta, "type=" + meta);
+        for (int meta = 0; meta <= 5; meta++) {
+            registerBuiltinItemModel(mirrorItem, meta, meta == 1 ? "blockmirror_open" : "blockmirror");
+        }
+        for (int meta = 6; meta <= 11; meta++) {
+            registerBuiltinItemModel(mirrorItem, meta,
+                    meta == 7 ? "blockmirror_essentia_open" : "blockmirror_essentia");
         }
         Item arcaneFurnaceItem = Item.getItemFromBlock(ConfigBlocks.blockArcaneFurnace);
         for (int meta = 0; meta <= 10; meta++) {
@@ -1062,7 +1048,7 @@ public class ClientProxy extends CommonProxy {
         Item manaPodItem = Item.getItemFromBlock(ConfigBlocks.blockManaPod);
         registerBuiltinItemModel(manaPodItem, 0, "blockmanapod");
         Item chestItem = Item.getItemFromBlock(ConfigBlocks.blockChestHungry);
-        registerBuiltinItemModel(chestItem, 0, "blockchesthungry_tesr");
+        registerBuiltinItemModel(chestItem, 0, "blockchesthungry");
     }
 
     private static void registerBlockItemModel(Item item, int meta, String variant) {

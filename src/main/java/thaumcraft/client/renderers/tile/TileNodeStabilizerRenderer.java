@@ -1,8 +1,11 @@
 package thaumcraft.client.renderers.tile;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.util.ResourceLocation;
+import org.lwjgl.opengl.GL11;
 import thaumcraft.client.renderers.models.ModelNodeStabilizer;
 import thaumcraft.common.tiles.TileNodeStabilizer;
 
@@ -24,64 +27,88 @@ public class TileNodeStabilizerRenderer extends TileEntitySpecialRenderer<TileNo
             return;
         }
 
-        float ticks = TileRenderHelper.ticks(tile, partialTicks);
-        float progress = TileRenderHelper.clamp01(tile.count / 37.0F);
+        float ticks = Minecraft.getMinecraft().player == null
+                ? TileRenderHelper.ticks(tile, partialTicks)
+                : Minecraft.getMinecraft().player.ticksExisted + partialTicks;
         int lock = resolveLock(tile);
-        boolean locked = lock == 2;
+        float previousLightX = OpenGlHelper.lastBrightnessX;
+        float previousLightY = OpenGlHelper.lastBrightnessY;
+        int blockLight = tile.getWorld() == null ? -1 : tile.getWorld().getCombinedLight(tile.getPos(), 0);
 
         GlStateManager.pushMatrix();
-        GlStateManager.translate(x + 0.5D, y + 0.55D, z + 0.5D);
-        GlStateManager.rotate(90.0F, -1.0F, 0.0F, 0.0F);
-        GlStateManager.disableLighting();
-        GlStateManager.enableBlend();
-        GlStateManager.blendFunc(770, 771);
-        GlStateManager.disableCull();
-
-        for (int i = 0; i < 4; i++) {
-            GlStateManager.pushMatrix();
-            GlStateManager.rotate(i * 90.0F, 0.0F, 0.0F, 1.0F);
-            GlStateManager.rotate(45.0F, 0.0F, 1.0F, 0.0F);
-            GlStateManager.rotate((ticks * (1.5F + i * 0.2F)) % 360.0F, 0.0F, 1.0F, 0.0F);
-            GlStateManager.translate(0.0D, 0.0D, 0.12D + progress * 0.11D);
-
-            bindTexture(BASE_TEXTURE);
-            model.renderPiston(MODEL_SCALE);
-
-            bindTexture(OVER_TEXTURE);
-            float pulse = 0.85F + (float) Math.sin((ticks + i * 5.0F) / 3.0F) * 0.1F;
-            if (locked) {
-                GlStateManager.color(1.0F * pulse, 0.2F * pulse, 0.2F * pulse, 1.0F);
-            } else {
-                GlStateManager.color(pulse, pulse, pulse, 1.0F);
-            }
-            model.renderPiston(MODEL_SCALE);
+        try {
+            GlStateManager.translate(x + 0.5D, y, z + 0.5D);
+            GlStateManager.rotate(90.0F, -1.0F, 0.0F, 0.0F);
             GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+            bindTexture(BASE_TEXTURE);
+            model.renderLock(MODEL_SCALE);
+
+            for (int i = 0; i < 4; i++) {
+                GlStateManager.pushMatrix();
+                try {
+                    GlStateManager.rotate(i * 90.0F, 0.0F, 0.0F, 1.0F);
+                    GlStateManager.rotate(45.0F, 0.0F, 1.0F, 0.0F);
+                    GlStateManager.translate(0.0D, 0.0D, tile.count / 100.0D);
+
+                    applyPackedLight(blockLight);
+                    bindTexture(BASE_TEXTURE);
+                    model.renderPiston(MODEL_SCALE);
+                    if (lock == 2) {
+                        GlStateManager.color(1.0F, 0.2F, 0.2F, 1.0F);
+                    }
+                    if (tile.getWorld() != null) {
+                        float pulse = (float) Math.sin((ticks + i * 5.0F) / 3.0F) * 0.1F + 0.9F;
+                        int glow = 50 + (int) (170.0F * (tile.count / 37.0F * pulse));
+                        applyPackedLight(glow);
+                    }
+                    bindTexture(OVER_TEXTURE);
+                    model.renderPiston(MODEL_SCALE);
+                    GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+                } finally {
+                    GlStateManager.popMatrix();
+                }
+            }
+        } finally {
+            GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+            OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, previousLightX, previousLightY);
             GlStateManager.popMatrix();
         }
 
         if (tile.count > 0) {
-            float bubblePulse = 0.5F + (float) Math.sin(ticks / 8.0F) * 0.1F;
-            int bubbleColor = locked ? 0xCCFF4444 : 0xCCFFFFFF;
+            float bubblePulse = (float) Math.sin(ticks / 8.0F) * 0.1F + 0.5F;
+            int bubbleAlpha = Math.round(Math.max(0.0F, Math.min(1.0F, tile.count / 37.0F * bubblePulse)) * 255.0F);
+            int bubbleColor = (bubbleAlpha << 24) | (lock == 1 ? 0xFFFFFF : 0xFF4444);
             GlStateManager.pushMatrix();
-            GlStateManager.translate(0.0D, -0.9D, 0.0D);
-            GlStateManager.rotate(90.0F, 1.0F, 0.0F, 0.0F);
-            TileRenderHelper.orientBillboardToPlayer();
-            bindTexture(BUBBLE_TEXTURE);
-            TileRenderHelper.drawTexturedQuad(0.18F * progress * bubblePulse, bubbleColor, 0.0F, 1.0F, 0.0F, 1.0F);
-            GlStateManager.popMatrix();
+            try {
+                GlStateManager.alphaFunc(GL11.GL_GREATER, 1.0F / 255.0F);
+                GlStateManager.enableBlend();
+                GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE);
+                GlStateManager.depthMask(false);
+                GlStateManager.translate(x + 0.5D, y + 1.5D, z + 0.5D);
+                TileRenderHelper.orientBillboardToPlayer();
+                bindTexture(BUBBLE_TEXTURE);
+                TileRenderHelper.drawTexturedQuad(0.9F, bubbleColor, 0.0F, 1.0F, 0.0F, 1.0F);
+            } finally {
+                GlStateManager.depthMask(true);
+                GlStateManager.disableBlend();
+                GlStateManager.alphaFunc(GL11.GL_GREATER, 0.1F);
+                GlStateManager.popMatrix();
+            }
         }
-
-        GlStateManager.enableCull();
-        GlStateManager.disableBlend();
-        GlStateManager.enableLighting();
-        GlStateManager.popMatrix();
     }
 
     private static int resolveLock(TileNodeStabilizer tile) {
-        if (tile.lock > 0) {
-            return tile.lock;
+        if (tile.getWorld() != null) {
+            int meta = tile.getBlockType().getMetaFromState(tile.getWorld().getBlockState(tile.getPos()));
+            return meta == 10 ? 2 : 1;
         }
-        int meta = tile.getBlockType().getMetaFromState(tile.getWorld().getBlockState(tile.getPos()));
-        return meta == 9 ? 1 : 2;
+        return tile.lock == 2 ? 2 : 1;
+    }
+
+    private static void applyPackedLight(int light) {
+        if (light >= 0) {
+            OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit,
+                    light & 0xFFFF, light >>> 16);
+        }
     }
 }

@@ -106,15 +106,23 @@ public class ModelEldritchCap {
     };
 
     public void renderCap() {
+        renderGroup(TRIANGLES);
+        renderGroup(TIP_TRIANGLES);
+    }
+
+    public void renderCapGroup() {
+        renderGroup(TRIANGLES);
+    }
+
+    public void renderTipGroup() {
+        renderGroup(TIP_TRIANGLES);
+    }
+
+    private static void renderGroup(int[][] triangles) {
         Tessellator tess = Tessellator.getInstance();
         BufferBuilder buf = tess.getBuffer();
         buf.begin(GL11.GL_TRIANGLES, DefaultVertexFormats.POSITION_TEX_NORMAL);
-        for (int[] triangle : TRIANGLES) {
-            addVertex(buf, triangle, 0);
-            addVertex(buf, triangle, 3);
-            addVertex(buf, triangle, 6);
-        }
-        for (int[] triangle : TIP_TRIANGLES) {
+        for (int[] triangle : triangles) {
             addVertex(buf, triangle, 0);
             addVertex(buf, triangle, 3);
             addVertex(buf, triangle, 6);

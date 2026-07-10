@@ -74,12 +74,13 @@ public class DeviceTesrRoutingContractTest {
                         && woodenItemRenderer.contains("new TileArcaneBoreBaseRenderer()")
                         && woodenItemRenderer.contains("new TileArcaneBoreRenderer()")
                         && woodenItemRenderer.contains("new TileBannerRenderer()")
-                        && woodenItemRenderer.contains("GlStateManager.translate(0.5F, 0.5F, 0.5F);")
-                        && woodenItemRenderer.contains("GlStateManager.rotate(90.0F, 0.0F, 1.0F, 0.0F);")
-                        && woodenItemRenderer.contains("GlStateManager.translate(-0.5F, -0.75F, -0.5F);")
-                        && woodenItemRenderer.contains("banner.setFacing((byte) 8);")
-                        && woodenItemRenderer.contains("isHandTransform(transformType)")
-                        && woodenItemRenderer.contains("GlStateManager.translate(1.0F, 1.0F, 1.0F);")
+                         && woodenItemRenderer.contains("GlStateManager.translate(0.5F, 0.5F, 0.5F);")
+                         && woodenItemRenderer.contains("GlStateManager.rotate(90.0F, 0.0F, 1.0F, 0.0F);")
+                         && woodenItemRenderer.contains("GlStateManager.translate(-0.5F, -0.75F, -0.5F);")
+                         && woodenItemRenderer.contains("banner.setFacing((byte) 8);")
+                         && !woodenItemRenderer.contains("hasStyledBannerData")
+                         && !woodenItemRenderer.contains("usesLegacyStyledOffset")
+                         && !woodenItemRenderer.contains("GlStateManager.translate(1.0F, 1.0F, 1.0F);")
                         && metalItemRenderer.contains("new TileAlembicRenderer()")
                         && metalItemRenderer.contains("alembicRenderer.setRendererDispatcher(TileEntityRendererDispatcher.instance);")
                         && metalItemRenderer.contains("chargerRenderer.setRendererDispatcher(TileEntityRendererDispatcher.instance);")
@@ -104,7 +105,11 @@ public class DeviceTesrRoutingContractTest {
                 thaumatoriumRenderer.contains("if (tile == null || tile.getWorld() == null) {"));
 
         assertTrue("Builtin item model stubs must exist so Forge routes the targeted metadata to TEISR",
-                woodenTesrModel.contains("\"parent\": \"builtin/entity\"")
+                 woodenTesrModel.contains("\"parent\": \"builtin/entity\"")
+                         && woodenTesrModel.contains("\"display\"")
+                         && woodenTesrModel.contains("\"rotation\": [30, 225, 0]")
+                         && woodenTesrModel.contains("\"thirdperson_lefthand\"")
+                         && woodenTesrModel.contains("\"firstperson_lefthand\"")
                         && woodenBellowsTesrModel.contains("\"parent\": \"builtin/entity\"")
                         && woodenBellowsTesrModel.contains("\"display\"")
                         && woodenBellowsTesrModel.contains("\"rotation\": [30, 225, 0]")
@@ -119,8 +124,9 @@ public class DeviceTesrRoutingContractTest {
                         && woodenBannerTesrModel.contains("\"display\"")
                         && woodenBannerTesrModel.contains("\"gui\"")
                         && woodenBannerTesrModel.contains("\"translation\": [0, 0, 0]")
-                        && woodenBannerTesrModel.contains("\"scale\": [0.48, 0.48, 0.48]")
-                        && woodenBannerTesrModel.contains("\"firstperson_righthand\"")
+                         && woodenBannerTesrModel.contains("\"scale\": [0.48, 0.48, 0.48]")
+                         && woodenBannerTesrModel.contains("\"firstperson_righthand\"")
+                         && woodenBannerTesrModel.contains("\"firstperson_lefthand\"")
                         && metalTesrModel.contains("\"parent\": \"builtin/entity\""));
 
         assertTrue("Banner item model should preserve the donor display matrix while passing the active hand/gui transform to the wooden-device TEISR",
