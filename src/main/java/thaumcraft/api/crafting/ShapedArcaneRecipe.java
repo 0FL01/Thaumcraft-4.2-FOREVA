@@ -1,7 +1,7 @@
 package thaumcraft.api.crafting;
 
-import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import net.minecraft.block.Block;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
@@ -145,15 +145,15 @@ implements IArcaneRecipe {
                     if (this.checkItemEquals((ItemStack)target, slot)) continue;
                     return false;
                 }
-                if (target instanceof ArrayList) {
+                if (target instanceof List) {
                     boolean matched = false;
-                    for (ItemStack item : (ArrayList<ItemStack>)target) {
+                    for (ItemStack item : (List<ItemStack>)target) {
                         matched = matched || this.checkItemEquals(item, slot);
                     }
                     if (matched) continue;
                     return false;
                 }
-                if (target != null || slot == null || slot.isEmpty()) continue;
+                if (target == null && (slot == null || slot.isEmpty())) continue;
                 return false;
             }
         }
@@ -163,9 +163,6 @@ implements IArcaneRecipe {
     private boolean checkItemEquals(ItemStack target, ItemStack input) {
         boolean inputEmpty = input == null || input.isEmpty();
         boolean targetEmpty = target == null || target.isEmpty();
-        if (inputEmpty && targetEmpty) {
-            return true;
-        }
         if (inputEmpty || targetEmpty) {
             return false;
         }

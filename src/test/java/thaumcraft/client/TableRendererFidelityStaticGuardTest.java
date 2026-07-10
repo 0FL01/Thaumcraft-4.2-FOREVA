@@ -22,7 +22,6 @@ public class TableRendererFidelityStaticGuardTest {
         String itemTableRenderer = read("src/main/java/thaumcraft/client/renderers/item/ItemTableRenderer.java");
         String plainItemModel = read("src/main/resources/assets/thaumcraft/models/item/blocktable_0_inventory.json");
         String deconItemModel = read("src/main/resources/assets/thaumcraft/models/item/blocktable_14_inventory.json");
-        String arcaneItemModel = read("src/main/resources/assets/thaumcraft/models/item/blocktable_15_inventory.json");
         String itemTableTesrModel = read("src/main/resources/assets/thaumcraft/models/item/blocktable_tesr.json");
         String helper = read("src/main/java/thaumcraft/client/renderers/tile/TileRenderHelper.java");
         String blockstate = read("src/main/resources/assets/thaumcraft/blockstates/blocktable.json");
@@ -59,15 +58,18 @@ public class TableRendererFidelityStaticGuardTest {
         assertTrue("TileArcaneWorkbenchRenderer should restore the worktable shell and keep the wand overlay",
                 arcaneWorkbenchRenderer.contains("wand.getItem() instanceof ItemWandCasting")
                         && arcaneWorkbenchRenderer.contains("new ModelArcaneWorkbench()")
+                        && arcaneWorkbenchRenderer.contains("new ModelWand()")
                         && arcaneWorkbenchRenderer.contains("tableModel.renderAll(MODEL_SCALE);")
-                        && arcaneWorkbenchRenderer.contains("TileRenderHelper.renderEntityItem(tile, wand, 0.0F);")
+                        && arcaneWorkbenchRenderer.contains("wandModel.render(wand, partialTicks, player);")
+                        && !arcaneWorkbenchRenderer.contains("TileRenderHelper.renderEntityItem(tile, wand")
                         && !arcaneWorkbenchRenderer.contains("renderTableModel"));
 
-        assertTrue("ClientProxy should keep the table TEISR for world rendering support but route creative item metas 0, 14, and 15 onto dedicated donor-style inventory models",
+        assertTrue("ClientProxy should route Arcane Workbench meta 15 through the existing table TEISR while keeping audited baked routes for metas 0 and 14",
                 clientProxy.contains("tableItem.setTileEntityItemStackRenderer(new ItemTableRenderer());")
                         && clientProxy.contains("registerBuiltinItemModel(tableItem, 0, \"blocktable_0_inventory\");")
                         && clientProxy.contains("registerBuiltinItemModel(tableItem, 14, \"blocktable_14_inventory\");")
-                        && clientProxy.contains("registerBuiltinItemModel(tableItem, 15, \"blocktable_15_inventory\");"));
+                        && clientProxy.contains("registerBuiltinItemModel(tableItem, 15, \"blocktable_tesr\");")
+                        && !clientProxy.contains("blocktable_15_inventory"));
 
         int restoreOrigin = itemTableRenderer.indexOf("restoreLegacyInventoryOrigin();");
         int legacyRotation = itemTableRenderer.indexOf("GlStateManager.rotate(90.0F, 0.0F, 1.0F, 0.0F);");
@@ -107,7 +109,7 @@ public class TableRendererFidelityStaticGuardTest {
                         && itemTableTesrModel.contains("\"firstperson_righthand\"")
                         && itemTableTesrModel.contains("\"firstperson_lefthand\""));
 
-        assertTrue("The table-family creative item models should carry donor-style block display transforms, shaped baked geometry, and TC4 model-texture UVs instead of routing inventory through the empty TEISR stubs",
+        assertTrue("The audited plain and deconstruction table item models should retain donor-style transforms and TC4 model-texture UVs",
                 plainItemModel.contains("\"rotation\": [30, 225, 0]")
                         && plainItemModel.contains("\"surface\": \"thaumcraft:models/table_inventory\"")
                         && plainItemModel.contains("\"uv\": [8, 0, 12, 8]")
@@ -120,14 +122,7 @@ public class TableRendererFidelityStaticGuardTest {
                         && deconItemModel.contains("\"up\": { \"uv\": [2, 0, 4, 4]")
                         && deconItemModel.contains("\"from\": [0, 8, 0]")
                         && deconItemModel.contains("\"from\": [0, 0, 0]")
-                        && deconItemModel.contains("\"to\": [16, 16, 16]")
-                        && arcaneItemModel.contains("\"surface\": \"thaumcraft:models/worktable_inventory\"")
-                        && arcaneItemModel.contains("\"up\": { \"uv\": [2, 0, 4, 4]")
-                        && arcaneItemModel.contains("\"uv\": [4, 8, 6, 12]")
-                        && arcaneItemModel.contains("\"from\": [0, 8, 0]")
-                        && arcaneItemModel.contains("\"to\": [16, 16, 16]")
-                        && arcaneItemModel.contains("\"thirdperson_righthand\"")
-                        && arcaneItemModel.contains("[75, 45, 0]"));
+                        && deconItemModel.contains("\"to\": [16, 16, 16]"));
 
         assertTrue("TileRenderHelper should keep the shared TESR entity-item path worldless-safe for display-item renderers",
                 helper.contains("static void renderEntityItem(TileEntity tile, ItemStack stack, float hoverStart)")

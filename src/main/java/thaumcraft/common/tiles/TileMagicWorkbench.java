@@ -8,16 +8,27 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.util.text.ITextComponent;
+import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.items.CapabilityItemHandler;
+import net.minecraftforge.items.IItemHandler;
+import net.minecraftforge.items.wrapper.SidedInvWrapper;
 import thaumcraft.api.TileThaumcraft;
 import thaumcraft.common.items.wands.ItemWandCasting;
+
+import javax.annotation.Nullable;
+import java.util.Collections;
+import java.util.IdentityHashMap;
+import java.util.Set;
 
 public class TileMagicWorkbench
 extends TileThaumcraft
 implements IInventory,
 ISidedInventory {
     public ItemStack[] stackList = new ItemStack[11];
-    public Container eventHandler;
+    private final Set<Container> eventHandlers = Collections.newSetFromMap(new IdentityHashMap<Container, Boolean>());
+    private final IItemHandler[] itemHandlers = new IItemHandler[EnumFacing.values().length];
 
     public TileMagicWorkbench() {
         for (int i = 0; i < this.stackList.length; i++) {
@@ -32,7 +43,9 @@ ISidedInventory {
 
     @Override
     public ItemStack getStackInSlot(int par1) {
-        return par1 >= this.getSizeInventory() ? ItemStack.EMPTY : this.stackList[par1];
+        if (par1 < 0 || par1 >= this.getSizeInventory()) return ItemStack.EMPTY;
+        ItemStack stack = this.stackList[par1];
+        return stack == null ? ItemStack.EMPTY : stack;
     }
 
     public ItemStack getStackInRowAndColumn(int par1, int par2) {
@@ -45,10 +58,10 @@ ISidedInventory {
 
     @Override
     public ItemStack removeStackFromSlot(int par1) {
-        if (this.stackList[par1] != null && !this.stackList[par1].isEmpty()) {
+        if (par1 >= 0 && par1 < this.stackList.length && this.stackList[par1] != null && !this.stackList[par1].isEmpty()) {
             ItemStack var2 = this.stackList[par1];
             this.stackList[par1] = ItemStack.EMPTY;
-            this.markDirty();
+            this.inventoryChanged();
             return var2;
         }
         return ItemStack.EMPTY;
@@ -61,20 +74,14 @@ ISidedInventory {
             if (this.stackList[par1].getCount() <= par2) {
                 var3 = this.stackList[par1];
                 this.stackList[par1] = ItemStack.EMPTY;
-                if (this.eventHandler != null) {
-                    this.eventHandler.onCraftMatrixChanged(this);
-                }
-                this.markDirty();
+                this.inventoryChanged();
                 return var3;
             }
             var3 = this.stackList[par1].splitStack(par2);
             if (this.stackList[par1].getCount() == 0) {
                 this.stackList[par1] = ItemStack.EMPTY;
             }
-            if (this.eventHandler != null) {
-                this.eventHandler.onCraftMatrixChanged(this);
-            }
-            this.markDirty();
+            this.inventoryChanged();
             return var3;
         }
         return ItemStack.EMPTY;
@@ -83,10 +90,7 @@ ISidedInventory {
     @Override
     public void setInventorySlotContents(int par1, ItemStack par2ItemStack) {
         this.stackList[par1] = par2ItemStack == null ? ItemStack.EMPTY : par2ItemStack;
-        this.markDirty();
-        if (this.eventHandler != null) {
-            this.eventHandler.onCraftMatrixChanged(this);
-        }
+        this.inventoryChanged();
     }
 
     public void setInventorySlotContentsSoftly(int par1, ItemStack par2ItemStack) {
@@ -113,15 +117,17 @@ ISidedInventory {
         for (int var3 = 0; var3 < var2.tagCount(); ++var3) {
             NBTTagCompound var4 = var2.getCompoundTagAt(var3);
             int var5 = var4.getByte("Slot") & 0xFF;
-            if (var5 < 0 || var5 >= this.stackList.length) continue;
+            if (var5 < 0 || var5 >= this.stackList.length || var5 == 9) continue;
             this.stackList[var5] = new ItemStack(var4);
         }
+        this.stackList[9] = ItemStack.EMPTY;
     }
 
     @Override
     public void writeCustomNBT(NBTTagCompound par1NBTTagCompound) {
         NBTTagList var2 = new NBTTagList();
         for (int var3 = 0; var3 < this.stackList.length; ++var3) {
+            if (var3 == 9) continue;
             if (this.stackList[var3] == null || this.stackList[var3].isEmpty()) continue;
             NBTTagCompound var4 = new NBTTagCompound();
             var4.setByte("Slot", (byte) var3);
@@ -151,7 +157,7 @@ ISidedInventory {
 
     @Override
     public ITextComponent getDisplayName() {
-        return null;
+        return new TextComponentTranslation(this.getName());
     }
 
     @Override
@@ -164,7 +170,8 @@ ISidedInventory {
 
     @Override
     public boolean isItemValidForSlot(int i, ItemStack itemstack) {
-        return true;
+        if (i >= 0 && i < 9) return true;
+        return i == 10 && isValidWorkbenchWand(itemstack);
     }
 
     @Override
@@ -174,7 +181,7 @@ ISidedInventory {
 
     @Override
     public boolean canInsertItem(int i, ItemStack itemstack, EnumFacing direction) {
-        return i == 10 && !itemstack.isEmpty() && itemstack.getItem() instanceof ItemWandCasting;
+        return i == 10 && isValidWorkbenchWand(itemstack);
     }
 
     @Override
@@ -201,5 +208,55 @@ ISidedInventory {
         for (int i = 0; i < this.stackList.length; i++) {
             this.stackList[i] = ItemStack.EMPTY;
         }
+        this.inventoryChanged();
+    }
+
+    public void addWorkbenchListener(Container listener) {
+        if (listener != null) this.eventHandlers.add(listener);
+    }
+
+    public void removeWorkbenchListener(Container listener) {
+        this.eventHandlers.remove(listener);
+    }
+
+    public void onWandVisChanged() {
+        this.inventoryChanged();
+    }
+
+    private void inventoryChanged() {
+        this.stackList[9] = ItemStack.EMPTY;
+        this.markDirty();
+        for (Container listener : this.eventHandlers.toArray(new Container[0])) {
+            listener.onCraftMatrixChanged(this);
+        }
+        if (this.world != null && this.world.isBlockLoaded(this.pos)) {
+            net.minecraft.block.state.IBlockState state = this.world.getBlockState(this.pos);
+            this.world.notifyBlockUpdate(this.pos, state, state, 3);
+        }
+    }
+
+    private static boolean isValidWorkbenchWand(ItemStack stack) {
+        return stack != null && !stack.isEmpty()
+                && stack.getItem() instanceof ItemWandCasting
+                && !((ItemWandCasting) stack.getItem()).isStaff(stack);
+    }
+
+    @Override
+    public boolean hasCapability(Capability<?> capability, @Nullable EnumFacing facing) {
+        return capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY || super.hasCapability(capability, facing);
+    }
+
+    @Nullable
+    @Override
+    public <T> T getCapability(Capability<T> capability, @Nullable EnumFacing facing) {
+        if (capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY) {
+            EnumFacing side = facing == null ? EnumFacing.UP : facing;
+            int index = side.ordinal();
+            if (this.itemHandlers[index] == null) {
+                this.itemHandlers[index] = new SidedInvWrapper(this, side);
+            }
+            return CapabilityItemHandler.ITEM_HANDLER_CAPABILITY.cast(this.itemHandlers[index]);
+        }
+        return super.getCapability(capability, facing);
     }
 }

@@ -2,6 +2,7 @@ package thaumcraft.api.crafting;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import net.minecraft.block.Block;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
@@ -89,14 +90,14 @@ implements IArcaneRecipe {
                 Object next = req.next();
                 if (next instanceof ItemStack) {
                     match = this.checkItemEquals((ItemStack)next, slot);
-                } else if (next instanceof ArrayList) {
-                    for (ItemStack item : (ArrayList<ItemStack>)next) {
+                } else if (next instanceof List) {
+                    for (ItemStack item : (List<ItemStack>)next) {
                         match = match || this.checkItemEquals(item, slot);
                     }
                 }
                 if (!match) continue;
                 inRecipe = true;
-                required.remove(next);
+                req.remove();
                 break;
             }
             if (inRecipe) continue;

@@ -32,9 +32,12 @@ public class TileMagicWorkbenchChargerStaticGuardTest {
         assertTrue(source.contains("below instanceof TileMagicWorkbench"));
         assertTrue(source.contains("ItemStack wand = workbench.getStackInSlot(10);"));
         assertTrue(source.contains("wand.getItem() instanceof ItemWandCasting"));
+        assertTrue(source.contains("((ItemWandCasting) wand.getItem()).isStaff(wand)"));
         assertTrue(source.contains("AspectList room = wandItem.getAspectsWithRoom(wand);"));
         assertTrue(source.contains("int drain = Math.min(5, ItemWandCasting.getMaxVis(wand) - ItemWandCasting.getVis(wand, aspect));"));
-        assertTrue(source.contains("ItemWandCasting.addRealVis(wand, aspect, this.consumeVis(aspect, drain), true);"));
+        assertTrue(source.contains("int consumed = this.consumeVis(aspect, drain);"));
+        assertTrue(source.contains("ItemWandCasting.addRealVis(wand, aspect, consumed, true);"));
+        assertTrue(source.contains("workbench.onWandVisChanged();"));
     }
 
     private static String readFile(String path) throws IOException {

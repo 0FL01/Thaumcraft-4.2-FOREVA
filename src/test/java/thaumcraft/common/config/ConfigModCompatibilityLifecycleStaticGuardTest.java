@@ -31,11 +31,14 @@ public class ConfigModCompatibilityLifecycleStaticGuardTest {
                         && configSource.contains("ItemElementalAxe.oreDictLogs.add(Arrays.<Object>asList(Item.getIdFromItem(is.getItem()), is.getItemDamage()));"));
         assertTrue("Thaumcraft.postInit must run compatibility and wand-component setup before recipes/aspects/research",
                 thaumcraftSource.contains("Config.initModCompatibility();")
-                        && thaumcraftSource.contains("initWandComponents();")
+                        && thaumcraftSource.contains("initOptionalWandComponents();")
                         && thaumcraftSource.indexOf("Config.initModCompatibility();") < thaumcraftSource.indexOf("ConfigRecipes.init();")
-                        && thaumcraftSource.indexOf("initWandComponents();") < thaumcraftSource.indexOf("ConfigRecipes.init();")
+                        && thaumcraftSource.indexOf("initOptionalWandComponents();") < thaumcraftSource.indexOf("ConfigRecipes.init();")
                         && thaumcraftSource.indexOf("ConfigRecipes.init();") < thaumcraftSource.indexOf("ConfigAspects.init();")
                         && thaumcraftSource.indexOf("ConfigAspects.init();") < thaumcraftSource.indexOf("ConfigResearch.init();"));
+        assertTrue("Wand component lifecycle must not erase addon registrations during post-init",
+                !thaumcraftSource.contains("WandRod.rods.clear();")
+                        && !thaumcraftSource.contains("WandCap.caps.clear();"));
     }
 
     private static String readFile(String path) throws IOException {

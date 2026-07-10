@@ -8,9 +8,7 @@ import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.inventory.IInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
@@ -136,16 +134,7 @@ implements IWandable {
 
     @Override
     public void breakBlock(World worldIn, BlockPos pos, IBlockState state) {
-        TileEntity te = worldIn.getTileEntity(pos);
-        if (te instanceof IInventory) {
-            IInventory inv = (IInventory) te;
-            for (int i = 0; i < inv.getSizeInventory(); i++) {
-                ItemStack stack = inv.getStackInSlot(i);
-                if (!stack.isEmpty()) {
-                    worldIn.spawnEntity(new EntityItem(worldIn, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, stack));
-                }
-            }
-        }
+        InventoryUtils.dropItems(worldIn, pos.getX(), pos.getY(), pos.getZ());
         super.breakBlock(worldIn, pos, state);
     }
 
@@ -264,7 +253,7 @@ implements IWandable {
                     TileArcaneWorkbench tawb = (TileArcaneWorkbench) tile;
                     if (!wand.isStaff(wandstack)) {
                         tawb.setInventorySlotContents(10, wandstack.copy());
-                        player.inventory.setInventorySlotContents(player.inventory.currentItem, ItemStack.EMPTY);
+                        wandstack.setCount(0);
                     }
                     tawb.markDirty();
                 }

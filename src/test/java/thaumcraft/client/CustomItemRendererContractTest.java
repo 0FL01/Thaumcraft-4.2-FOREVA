@@ -7,6 +7,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 public class CustomItemRendererContractTest {
@@ -54,6 +55,15 @@ public class CustomItemRendererContractTest {
                         && wandModel.contains("textures/misc/script.png")
                         && wandModel.contains("textures/models/wand.png")
                         && wandModel.contains("drawRune("));
+
+        assertTrue("ModelWand should preserve the caller lightmap for world and item contexts and restore TC4's Halloween focus texture",
+                wandModel.contains("OpenGlHelper.lastBrightnessX")
+                        && wandModel.contains("OpenGlHelper.lastBrightnessY")
+                        && wandModel.contains("textures/models/spec_h.png")
+                        && wandModel.contains("Calendar.OCTOBER")
+                        && wandModel.contains("Calendar.DAY_OF_MONTH"));
+        assertFalse("ModelWand must not restore player lighting while it is rendered at a tile",
+                wandModel.contains("getBrightnessForRender()"));
 
         assertTrue("WandRenderCalibration must keep the wand/staff/sceptre kinds, the TC4 final-rotate basis, and Java defaults that reproduce the prior port constants byte-for-byte",
                 wandCalibration.contains("KIND_WAND = \"wand\"")

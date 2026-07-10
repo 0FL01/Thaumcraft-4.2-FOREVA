@@ -28,23 +28,20 @@ public class ArcaneWorkbenchStage9bRuntimeSurfaceStaticGuardTest {
                         && clientProxy.contains("case GUI_ARCANE_WORKBENCH:")
                         && clientProxy.contains("new GuiArcaneWorkbench(player.inventory, (TileArcaneWorkbench) tile)"));
 
-        assertTrue("ContainerArcaneWorkbench should keep output slot, wand slot, vanilla-first output path, and arcane matcher probe",
-                container.contains("new SlotCraftingArcaneWorkbench(playerInventory.player, this.tileEntity, this.tileEntity, 9, 160, 64)")
+        assertTrue("ContainerArcaneWorkbench should keep a player-local result slot and unified authoritative resolver",
+                container.contains("new SlotCraftingArcaneWorkbench(playerInventory.player, this.tileEntity, this.craftResult, this, 0, 160, 64)")
                         && container.contains("new SlotLimitedByWand(this.tileEntity, 10, 160, 24)")
-                        && container.contains("CraftingManager.findMatchingResult(this.craftMatrix, this.tileEntity.getWorld())")
-                        && container.contains("AspectList cost = ThaumcraftCraftingManager.findMatchingArcaneRecipeAspects(this.tileEntity, this.playerInventory.player);")
-                        && container.contains("wand.consumeAllVisCrafting(wandStack, this.playerInventory.player, cost, false)")
-                        && container.contains("ThaumcraftCraftingManager.findMatchingArcaneRecipe(this.tileEntity, this.playerInventory.player)")
-                        && !container.contains("wand.isStaff(wandStack)"));
-        assertTrue("SlotCraftingArcaneWorkbench should keep real vis consumption plus reference-shaped container-item remainder handling",
-                slot.contains("AspectList cost = ThaumcraftCraftingManager.findMatchingArcaneRecipeAspects(this.craftMatrix, this.thePlayer);")
-                        && slot.contains("wand.consumeAllVisCrafting(wandStack, player, cost, true);")
-                        && slot.contains("input.getItem().hasContainerItem(input)")
-                        && slot.contains("ItemStack remainder = input.getItem().getContainerItem(input);")
-                        && slot.contains("MinecraftForge.EVENT_BUS.post(new PlayerDestroyItemEvent(this.thePlayer, remainder, EnumHand.MAIN_HAND));")
-                        && slot.contains("this.thePlayer.inventory.addItemStackToInventory(remainder.copy())")
-                        && slot.contains("this.craftMatrix.setInventorySlotContents(i, remainder);")
-                        && slot.contains("this.thePlayer.dropItem(remainder, false);"));
+                        && container.contains("ArcaneWorkbenchRecipeResolver.resolve")
+                        && container.contains("this.craftResult.setRecipeUsed(this.resolution.vanillaRecipe)")
+                        && container.contains("fresh.vanillaRecipe.getRemainingItems(this.craftMatrix)")
+                        && container.contains("ForgeHooks.defaultRecipeGetRemainingItems(this.craftMatrix)")
+                        && container.contains("consumeAllVisCrafting(wandStack, player, fresh.cost, true)"));
+        int onTake = slot.indexOf("public ItemStack onTake(EntityPlayer player, ItemStack stack)");
+        assertTrue("SlotCraftingArcaneWorkbench should require server revalidation before firing crafting hooks",
+                slot.contains("this.container.canTakeResult(playerIn, this.getStack())")
+                        && slot.contains("this.container.prepareCraft(player, stack)")
+                        && slot.indexOf("this.container.prepareCraft(player, stack)", onTake)
+                        < slot.indexOf("this.onCrafting(stack)", onTake));
         assertTrue("ThaumcraftCraftingManager should keep public arcane matcher methods used by the workbench path",
                 matcher.contains("public static ItemStack findMatchingArcaneRecipe(IInventory awb, EntityPlayer player)")
                         && matcher.contains("public static AspectList findMatchingArcaneRecipeAspects(IInventory awb, EntityPlayer player)")

@@ -2,30 +2,36 @@ package thaumcraft.common.container;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
+import net.minecraft.inventory.InventoryCraftResult;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.EnumHand;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.entity.player.PlayerDestroyItemEvent;
+import net.minecraft.item.crafting.IRecipe;
 import net.minecraftforge.fml.common.FMLCommonHandler;
-import thaumcraft.api.aspects.AspectList;
-import thaumcraft.common.items.wands.ItemWandCasting;
-import thaumcraft.common.lib.crafting.ThaumcraftCraftingManager;
+
+import java.util.Collections;
 
 public class SlotCraftingArcaneWorkbench extends Slot {
     private final EntityPlayer thePlayer;
     private final IInventory craftMatrix;
+    private final ContainerArcaneWorkbench container;
     private int amountCrafted;
 
-    public SlotCraftingArcaneWorkbench(EntityPlayer player, IInventory craftMatrix, IInventory resultInventory, int index, int x, int y) {
+    public SlotCraftingArcaneWorkbench(EntityPlayer player, IInventory craftMatrix, IInventory resultInventory,
+                                       ContainerArcaneWorkbench container, int index, int x, int y) {
         super(resultInventory, index, x, y);
         this.thePlayer = player;
         this.craftMatrix = craftMatrix;
+        this.container = container;
     }
 
     @Override
     public boolean isItemValid(ItemStack stack) {
         return false;
+    }
+
+    @Override
+    public boolean canTakeStack(EntityPlayer playerIn) {
+        return this.container != null && this.container.canTakeResult(playerIn, this.getStack());
     }
 
     @Override
@@ -54,42 +60,25 @@ public class SlotCraftingArcaneWorkbench extends Slot {
             FMLCommonHandler.instance().firePlayerCraftingEvent(this.thePlayer, stack, this.craftMatrix);
         }
         this.amountCrafted = 0;
+        InventoryCraftResult result = (InventoryCraftResult) this.inventory;
+        IRecipe recipe = result.getRecipeUsed();
+        if (recipe != null && !recipe.isDynamic()) {
+            this.thePlayer.unlockRecipes(Collections.singletonList(recipe));
+            result.setRecipeUsed(null);
+        }
     }
 
     @Override
     public ItemStack onTake(EntityPlayer player, ItemStack stack) {
+        ContainerArcaneWorkbench.CraftTransaction transaction = this.container == null
+                ? null : this.container.prepareCraft(player, stack);
+        if (transaction == null) {
+            stack.setCount(0);
+            this.amountCrafted = 0;
+            return ItemStack.EMPTY;
+        }
         this.onCrafting(stack);
-
-        AspectList cost = ThaumcraftCraftingManager.findMatchingArcaneRecipeAspects(this.craftMatrix, this.thePlayer);
-        ItemStack wandStack = this.craftMatrix.getStackInSlot(10);
-        if (cost.size() > 0 && !wandStack.isEmpty() && wandStack.getItem() instanceof ItemWandCasting) {
-            ItemWandCasting wand = (ItemWandCasting) wandStack.getItem();
-            wand.consumeAllVisCrafting(wandStack, player, cost, true);
-        }
-
-        for (int i = 0; i < 9; i++) {
-            ItemStack input = this.craftMatrix.getStackInSlot(i);
-            if (input.isEmpty()) continue;
-            this.craftMatrix.decrStackSize(i, 1);
-            if (!input.getItem().hasContainerItem(input)) continue;
-
-            ItemStack remainder = input.getItem().getContainerItem(input);
-            if (remainder.isEmpty()) continue;
-            if (remainder.isItemStackDamageable() && remainder.getItemDamage() > remainder.getMaxDamage()) {
-                MinecraftForge.EVENT_BUS.post(new PlayerDestroyItemEvent(this.thePlayer, remainder, EnumHand.MAIN_HAND));
-                continue;
-            }
-
-            if (input.getItem().hasContainerItem(input) && this.thePlayer.inventory.addItemStackToInventory(remainder.copy())) {
-                continue;
-            }
-            if (this.craftMatrix.getStackInSlot(i).isEmpty()) {
-                this.craftMatrix.setInventorySlotContents(i, remainder);
-            } else {
-                this.thePlayer.dropItem(remainder, false);
-            }
-        }
-
+        this.container.finishCraft(transaction);
         return stack;
     }
 }

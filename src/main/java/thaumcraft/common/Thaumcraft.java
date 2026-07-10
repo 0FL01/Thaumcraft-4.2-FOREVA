@@ -196,7 +196,7 @@ public class Thaumcraft {
     @Mod.EventHandler
     public void postInit(FMLPostInitializationEvent event) {
         Config.initModCompatibility();
-        initWandComponents();
+        initOptionalWandComponents();
         ConfigRecipes.init();
         ConfigAspects.init();
         ThaumcraftSixCompatibility.postAspectRegistryEvent();
@@ -333,20 +333,10 @@ public class Thaumcraft {
     // ---- Wand Component Registration ----
 
     private void initWandComponents() {
-        WandRod.rods.clear();
-        WandCap.caps.clear();
-
         new WandCap("iron", 1.1f, new ItemStack(ConfigItems.itemWandCap, 1, 0), 1);
         new WandCap("gold", 1.0f, new ItemStack(ConfigItems.itemWandCap, 1, 1), 3);
         new WandCap("thaumium", 0.9f, new ItemStack(ConfigItems.itemWandCap, 1, 2), 6);
         new WandCap("void", 0.8f, new ItemStack(ConfigItems.itemWandCap, 1, 7), 9);
-        if (Config.foundCopperIngot) {
-            new WandCap("copper", 1.1f, Arrays.asList(Aspect.ORDER, Aspect.ENTROPY), 1.0f, new ItemStack(ConfigItems.itemWandCap, 1, 3), 2);
-        }
-        if (Config.foundSilverIngot) {
-            new WandCap("silver", 1.0f, Arrays.asList(Aspect.AIR, Aspect.EARTH, Aspect.FIRE, Aspect.WATER), 0.95f, new ItemStack(ConfigItems.itemWandCap, 1, 4), 4);
-        }
-
         new WandRod("wood", 25, new ItemStack(Items.STICK), 1);
         new WandRod("greatwood", 50, new ItemStack(ConfigItems.itemWandRod, 1, 0), 3);
         new WandRod("obsidian", 75, new ItemStack(ConfigItems.itemWandRod, 1, 1), 6, new WandRodPrimalOnUpdate(Aspect.EARTH));
@@ -370,6 +360,18 @@ public class Thaumcraft {
         primal.setRunes(true);
 
         log.info("Wand components registered: {} rods, {} caps", WandRod.rods.size(), WandCap.caps.size());
+    }
+
+    private void initOptionalWandComponents() {
+        if (Config.foundCopperIngot && !WandCap.caps.containsKey("copper")) {
+            new WandCap("copper", 1.1f, Arrays.asList(Aspect.ORDER, Aspect.ENTROPY), 1.0f,
+                    new ItemStack(ConfigItems.itemWandCap, 1, 3), 2);
+        }
+        if (Config.foundSilverIngot && !WandCap.caps.containsKey("silver")) {
+            new WandCap("silver", 1.0f, Arrays.asList(Aspect.AIR, Aspect.EARTH, Aspect.FIRE, Aspect.WATER), 0.95f,
+                    new ItemStack(ConfigItems.itemWandCap, 1, 4), 4);
+        }
+        log.info("Optional wand components registered: {} rods, {} caps", WandRod.rods.size(), WandCap.caps.size());
     }
 
     // ---- Enchantment Initialisation ----

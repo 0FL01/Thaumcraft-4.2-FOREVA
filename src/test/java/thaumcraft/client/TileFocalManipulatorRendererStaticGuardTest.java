@@ -52,8 +52,9 @@ public class TileFocalManipulatorRendererStaticGuardTest {
         assertTrue(arcaneWorkbench.contains("textures/models/worktable.png"));
         assertTrue(arcaneWorkbench.contains("new ModelArcaneWorkbench()"));
         assertTrue(arcaneWorkbench.contains("tableModel.renderAll(MODEL_SCALE);"));
-        assertTrue(arcaneWorkbench.contains("TileRenderHelper.renderEntityItem(tile, wand, 0.0F);"));
-        assertTrue(arcaneWorkbench.contains("GlStateManager.scale(0.60F, 0.60F, 0.60F);"));
+        assertTrue(arcaneWorkbench.contains("new ModelWand()"));
+        assertTrue(arcaneWorkbench.contains("wandModel.render(wand, partialTicks, player);"));
+        assertTrue(!arcaneWorkbench.contains("TileRenderHelper.renderEntityItem(tile, wand"));
     }
 
     private static String read(String path) throws IOException {

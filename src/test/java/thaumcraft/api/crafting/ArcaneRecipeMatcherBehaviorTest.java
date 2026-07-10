@@ -4,6 +4,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.init.Bootstrap;
 import net.minecraft.inventory.IInventory;
+import net.minecraftforge.oredict.OreDictionary;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -22,11 +23,13 @@ public class ArcaneRecipeMatcherBehaviorTest {
     private static final Item ITEM_C = new Item();
     private static final Item ITEM_EXTRA = new Item();
     private static final Item ITEM_OUTPUT = new Item();
+    private static final String TEST_ORE = "arcaneRecipeMatcherBehaviorOre";
     private static IInternalMethodHandler originalInternalMethods;
 
     @BeforeClass
     public static void bootstrapMinecraftStatics() {
         Bootstrap.register();
+        OreDictionary.registerOre(TEST_ORE, new ItemStack(ITEM_A));
         originalInternalMethods = ThaumcraftApi.internalMethods;
         ThaumcraftApi.internalMethods = new DummyInternalMethodHandler() {
             @Override
@@ -114,6 +117,43 @@ public class ArcaneRecipeMatcherBehaviorTest {
         setGrid(invalid, 1, 1, new ItemStack(ITEM_B));
         setGrid(invalid, 0, 0, new ItemStack(ITEM_EXTRA));
         assertFalse("Shapeless recipe should reject unmatched extra ingredients", recipe.matches(invalid, null, null));
+    }
+
+    @Test
+    public void shapedOreRecipeShouldMatchOreEntryAndRejectEmptyOrUnrelatedInputs() {
+        ShapedArcaneRecipe recipe = new ShapedArcaneRecipe(
+                "", new ItemStack(ITEM_OUTPUT), new AspectList(),
+                "O",
+                'O', TEST_ORE);
+
+        TileMagicWorkbench valid = new TileMagicWorkbench();
+        setGrid(valid, 0, 0, new ItemStack(ITEM_A));
+        assertTrue("Shaped ore recipe should accept a registered ore entry", recipe.matches(valid, null, null));
+
+        assertFalse("Shaped ore recipe should not treat an empty slot as an ore entry",
+                recipe.matches(new TileMagicWorkbench(), null, null));
+
+        TileMagicWorkbench unrelated = new TileMagicWorkbench();
+        setGrid(unrelated, 0, 0, new ItemStack(ITEM_C));
+        assertFalse("Shaped ore recipe should not accept an arbitrary item", recipe.matches(unrelated, null, null));
+    }
+
+    @Test
+    public void shapelessOreRecipeShouldConsumeEachListRequirementExactlyOnce() {
+        ShapelessArcaneRecipe recipe = new ShapelessArcaneRecipe(
+                "", new ItemStack(ITEM_OUTPUT), new AspectList(),
+                TEST_ORE, new ItemStack(ITEM_B));
+
+        TileMagicWorkbench valid = new TileMagicWorkbench();
+        setGrid(valid, 0, 0, new ItemStack(ITEM_B));
+        setGrid(valid, 2, 2, new ItemStack(ITEM_A));
+        assertTrue("Shapeless ore recipe should consume stack and ore-list requirements in slot order",
+                recipe.matches(valid, null, null));
+
+        TileMagicWorkbench missingOre = new TileMagicWorkbench();
+        setGrid(missingOre, 0, 0, new ItemStack(ITEM_B));
+        assertFalse("Shapeless ore recipe should retain an unmatched ore-list requirement",
+                recipe.matches(missingOre, null, null));
     }
 
     private static void setGrid(TileMagicWorkbench table, int x, int y, ItemStack stack) {

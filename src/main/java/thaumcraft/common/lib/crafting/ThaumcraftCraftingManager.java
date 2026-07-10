@@ -343,7 +343,7 @@ public class ThaumcraftCraftingManager {
 
     private static ItemStack firstCatalyst(Object catalyst, ArrayList<List> history) {
         if (catalyst instanceof ItemStack) return singleStack((ItemStack)catalyst);
-        if (catalyst instanceof ArrayList) return chooseStack((ArrayList<ItemStack>)catalyst, history);
+        if (catalyst instanceof List) return chooseStack((List<ItemStack>)catalyst, history);
         return ItemStack.EMPTY;
     }
 
@@ -377,8 +377,8 @@ public class ThaumcraftCraftingManager {
             addSingleStack(ingredients, (ItemStack)input);
             return true;
         }
-        if (input instanceof ArrayList) {
-            ItemStack chosen = chooseStack((ArrayList<ItemStack>)input, history);
+        if (input instanceof List) {
+            ItemStack chosen = chooseStack((List<ItemStack>)input, history);
             if (chosen != null && !chosen.isEmpty()) ingredients.add(singleStack(chosen));
             return true;
         }

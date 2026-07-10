@@ -994,7 +994,7 @@ public class ClientProxy extends CommonProxy {
         registerBuiltinItemModel(tableItem, 0, "blocktable_0_inventory");
         registerBuiltinItemModel(tableItem, 1, "blocktable_tesr");
         registerBuiltinItemModel(tableItem, 14, "blocktable_14_inventory");
-        registerBuiltinItemModel(tableItem, 15, "blocktable_15_inventory");
+        registerBuiltinItemModel(tableItem, 15, "blocktable_tesr");
         Item mirrorItem = Item.getItemFromBlock(ConfigBlocks.blockMirror);
         for (int meta = 0; meta <= 5; meta++) {
             registerBuiltinItemModel(mirrorItem, meta, meta == 1 ? "blockmirror_open" : "blockmirror");

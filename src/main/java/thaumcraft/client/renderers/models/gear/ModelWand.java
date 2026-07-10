@@ -19,11 +19,14 @@ import thaumcraft.api.wands.ItemFocusBasic;
 import thaumcraft.common.items.wands.ItemWandCasting;
 
 import java.awt.Color;
+import java.util.Calendar;
 
 public class ModelWand extends ModelBase {
 
     private static final ResourceLocation WAND_TEXTURE =
             new ResourceLocation("thaumcraft", "textures/models/wand.png");
+    private static final ResourceLocation HALLOWEEN_WAND_TEXTURE =
+            new ResourceLocation("thaumcraft", "textures/models/spec_h.png");
     private static final ResourceLocation SCRIPT_TEXTURE =
             new ResourceLocation("thaumcraft", "textures/misc/script.png");
 
@@ -72,7 +75,10 @@ public class ModelWand extends ModelBase {
         }
 
         GlStateManager.pushMatrix();
-        if (wand.getRod(wandStack).isGlowing() && player != null) {
+        boolean glowingRod = wand.getRod(wandStack).isGlowing() && player != null;
+        float lightX = OpenGlHelper.lastBrightnessX;
+        float lightY = OpenGlHelper.lastBrightnessY;
+        if (glowingRod) {
             setAnimatedFullbright(player.ticksExisted, 200.0F, 5.0F);
         }
         if (staff) {
@@ -80,7 +86,9 @@ public class ModelWand extends ModelBase {
             GlStateManager.scale(1.2F, 2.0F, 1.2F);
         }
         rod.render(0.0625F);
-        restorePlayerLight(player);
+        if (glowingRod) {
+            restoreLight(lightX, lightY);
+        }
         GlStateManager.popMatrix();
 
         mc.getTextureManager().bindTexture(wand.getCap(wandStack).getTexture());
@@ -169,7 +177,7 @@ public class ModelWand extends ModelBase {
             GlStateManager.popMatrix();
         }
 
-        mc.getTextureManager().bindTexture(WAND_TEXTURE);
+        mc.getTextureManager().bindTexture(isHalloween() ? HALLOWEEN_WAND_TEXTURE : WAND_TEXTURE);
         GlStateManager.pushMatrix();
         if (staff) {
             GlStateManager.translate(0.0F, -0.0475F, 0.0F);
@@ -181,10 +189,14 @@ public class ModelWand extends ModelBase {
         float alpha = depthSprite != null ? 0.6F : 0.95F;
         GlStateManager.color(color.getRed() / 255.0F, color.getGreen() / 255.0F, color.getBlue() / 255.0F, alpha);
         if (player != null) {
+            float lightX = OpenGlHelper.lastBrightnessX;
+            float lightY = OpenGlHelper.lastBrightnessY;
             setAnimatedFullbright(player.ticksExisted / 3.0F, 195.0F, 10.0F);
+            focus.render(0.0625F);
+            restoreLight(lightX, lightY);
+        } else {
+            focus.render(0.0625F);
         }
-        focus.render(0.0625F);
-        restorePlayerLight(player);
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
         GlStateManager.popMatrix();
     }
@@ -250,6 +262,8 @@ public class ModelWand extends ModelBase {
         if (player == null) {
             return;
         }
+        float lightX = OpenGlHelper.lastBrightnessX;
+        float lightY = OpenGlHelper.lastBrightnessY;
         GlStateManager.pushMatrix();
         setFixedFullbright(200);
         GlStateManager.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE);
@@ -260,7 +274,7 @@ public class ModelWand extends ModelBase {
             GlStateManager.popMatrix();
         }
         GlStateManager.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
-        restorePlayerLight(player);
+        restoreLight(lightX, lightY);
         GlStateManager.popMatrix();
     }
 
@@ -268,6 +282,8 @@ public class ModelWand extends ModelBase {
         if (player == null) {
             return;
         }
+        float lightX = OpenGlHelper.lastBrightnessX;
+        float lightY = OpenGlHelper.lastBrightnessY;
         GlStateManager.pushMatrix();
         setFixedFullbright(200);
         GlStateManager.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE);
@@ -279,7 +295,7 @@ public class ModelWand extends ModelBase {
             }
         }
         GlStateManager.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
-        restorePlayerLight(player);
+        restoreLight(lightX, lightY);
         GlStateManager.popMatrix();
     }
 
@@ -325,13 +341,13 @@ public class ModelWand extends ModelBase {
         OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, sky, block);
     }
 
-    private static void restorePlayerLight(EntityPlayer player) {
-        if (player == null) {
-            return;
-        }
-        int packed = player.getBrightnessForRender();
-        int sky = packed % 65536;
-        int block = packed / 65536;
-        OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, sky, block);
+    private static void restoreLight(float lightX, float lightY) {
+        OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, lightX, lightY);
+    }
+
+    private static boolean isHalloween() {
+        Calendar calendar = Calendar.getInstance();
+        return calendar.get(Calendar.MONTH) == Calendar.OCTOBER
+                && calendar.get(Calendar.DAY_OF_MONTH) == 31;
     }
 }

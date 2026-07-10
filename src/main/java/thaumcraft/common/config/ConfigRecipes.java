@@ -41,6 +41,7 @@ import thaumcraft.common.items.armor.RecipesVoidRobeArmorDyes;
 
 public class ConfigRecipes {
     private static boolean specialRecipesRegistered = false;
+    private static boolean recipesInitialized = false;
     private static final String[] DYES = new String[]{
             "dyeBlack", "dyeRed", "dyeGreen", "dyeBrown",
             "dyeBlue", "dyePurple", "dyeCyan", "dyeLightGray",
@@ -77,8 +78,12 @@ public class ConfigRecipes {
     private static CrucibleRecipe recipeVoidSeed;
 
     public static void init() {
+        if (recipesInitialized) {
+            return;
+        }
         ConfigResearch.recipes.clear();
         initializeArcaneRecipeBaseline();
+        insertDynamicArcaneRecipes(ThaumcraftApi.getCraftingRecipes(), ConfigResearch.recipes.get("JarVoid"));
         initializeInfusionWandRecipeBaseline();
         initializeInfusionEnchantmentRecipeBaseline();
         initializeInfusionFocusDeviceRecipeBaseline();
@@ -366,31 +371,40 @@ public class ConfigRecipes {
                 ConfigResearch.recipes.put("JarLabel" + i, recipe);
             }
         }
-        if (pruneAndCountDynamicRecipe(ArcaneWandRecipe.class) == 0) {
-            ThaumcraftApi.getCraftingRecipes().add(new ArcaneWandRecipe());
-        }
-        if (pruneAndCountDynamicRecipe(ArcaneSceptreRecipe.class) == 0) {
-            ThaumcraftApi.getCraftingRecipes().add(new ArcaneSceptreRecipe());
-        }
-        if (pruneAndCountDynamicRecipe(InfusionRunicAugmentRecipe.class) == 0) {
+        if (!containsExactRecipeClass(ThaumcraftApi.getCraftingRecipes(), InfusionRunicAugmentRecipe.class)) {
             ThaumcraftApi.getCraftingRecipes().add(new InfusionRunicAugmentRecipe());
         }
+        recipesInitialized = true;
     }
 
-    private static int pruneAndCountDynamicRecipe(Class<?> recipeClass) {
-        int count = 0;
-        List recipes = ThaumcraftApi.getCraftingRecipes();
-        for (int i = recipes.size() - 1; i >= 0; --i) {
+    static void insertDynamicArcaneRecipes(List recipes, Object jarVoid) {
+        int insertionIndex = recipes.indexOf(jarVoid);
+        insertionIndex = insertionIndex < 0 ? recipes.size() : insertionIndex + 1;
+        insertionIndex = insertDynamicRecipeIfMissing(
+                recipes, insertionIndex, ArcaneWandRecipe.class, new ArcaneWandRecipe());
+        insertDynamicRecipeIfMissing(
+                recipes, insertionIndex, ArcaneSceptreRecipe.class, new ArcaneSceptreRecipe());
+    }
+
+    private static int insertDynamicRecipeIfMissing(List recipes, int insertionIndex,
+                                                     Class<?> recipeClass, Object recipeToInsert) {
+        for (int i = 0; i < recipes.size(); ++i) {
             Object recipe = recipes.get(i);
-            if (!recipeClass.isInstance(recipe)) {
-                continue;
-            }
-            ++count;
-            if (count > 1) {
-                recipes.remove(i);
+            if (recipe != null && recipe.getClass() == recipeClass) {
+                return i == insertionIndex ? insertionIndex + 1 : insertionIndex;
             }
         }
-        return count;
+        recipes.add(insertionIndex, recipeToInsert);
+        return insertionIndex + 1;
+    }
+
+    private static boolean containsExactRecipeClass(List recipes, Class<?> recipeClass) {
+        for (Object recipe : recipes) {
+            if (recipe != null && recipe.getClass() == recipeClass) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private static void initializeCrucibleRecipeBaseline() {

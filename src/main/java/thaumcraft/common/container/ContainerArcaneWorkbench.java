@@ -5,21 +5,24 @@ import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.ClickType;
 import net.minecraft.inventory.Container;
 import net.minecraft.inventory.IInventory;
+import net.minecraft.inventory.InventoryCraftResult;
 import net.minecraft.inventory.InventoryCrafting;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.crafting.CraftingManager;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
+import net.minecraftforge.common.ForgeHooks;
 import thaumcraft.api.aspects.AspectList;
 import thaumcraft.common.items.wands.ItemWandCasting;
-import thaumcraft.common.lib.crafting.ThaumcraftCraftingManager;
 import thaumcraft.common.tiles.TileArcaneWorkbench;
 
 public class ContainerArcaneWorkbench extends Container {
     private final TileArcaneWorkbench tileEntity;
     private final InventoryPlayer playerInventory;
     private final InventoryCrafting craftMatrix = new InventoryCrafting(new ContainerDummy(), 3, 3);
+    private final InventoryCraftResult craftResult = new InventoryCraftResult();
+    private ArcaneWorkbenchRecipeResolver.Resolution resolution = ArcaneWorkbenchRecipeResolver.Resolution.NONE;
 
     public ContainerArcaneWorkbench() {
         this(null, null);
@@ -29,8 +32,9 @@ public class ContainerArcaneWorkbench extends Container {
         this.tileEntity = tileEntity;
         this.playerInventory = playerInventory;
         if (this.tileEntity != null) {
-            this.tileEntity.eventHandler = this;
-            this.addSlotToContainer(new SlotCraftingArcaneWorkbench(playerInventory.player, this.tileEntity, this.tileEntity, 9, 160, 64));
+            this.tileEntity.addWorkbenchListener(this);
+            this.tileEntity.setInventorySlotContentsSoftly(9, ItemStack.EMPTY);
+            this.addSlotToContainer(new SlotCraftingArcaneWorkbench(playerInventory.player, this.tileEntity, this.craftResult, this, 0, 160, 64));
             this.addSlotToContainer(new SlotLimitedByWand(this.tileEntity, 10, 160, 24));
 
             for (int row = 0; row < 3; row++) {
@@ -61,33 +65,35 @@ public class ContainerArcaneWorkbench extends Container {
 
     @Override
     public void onCraftMatrixChanged(IInventory inventoryIn) {
-        super.onCraftMatrixChanged(inventoryIn);
         if (this.tileEntity == null || this.playerInventory == null || this.playerInventory.player == null) return;
 
         for (int i = 0; i < 9; i++) {
             this.craftMatrix.setInventorySlotContents(i, this.tileEntity.getStackInSlot(i));
         }
 
-        ItemStack vanillaResult = CraftingManager.findMatchingResult(this.craftMatrix, this.tileEntity.getWorld());
-        this.tileEntity.setInventorySlotContentsSoftly(9, vanillaResult);
+        this.resolution = ArcaneWorkbenchRecipeResolver.resolve(this.tileEntity, this.craftMatrix, this.playerInventory.player);
+        this.craftResult.setRecipeUsed(this.resolution.vanillaRecipe);
+        this.craftResult.setInventorySlotContents(0,
+                this.resolution.craftable ? this.resolution.output.copy() : ItemStack.EMPTY);
+    }
 
-        ItemStack output = this.tileEntity.getStackInSlot(9);
-        ItemStack wandStack = this.tileEntity.getStackInSlot(10);
-        if (!output.isEmpty() || wandStack.isEmpty() || !(wandStack.getItem() instanceof ItemWandCasting)) return;
+    @Override
+    public void detectAndSendChanges() {
+        this.refreshResult();
+        super.detectAndSendChanges();
+    }
 
-        ItemWandCasting wand = (ItemWandCasting) wandStack.getItem();
-        AspectList cost = ThaumcraftCraftingManager.findMatchingArcaneRecipeAspects(this.tileEntity, this.playerInventory.player);
-        if (cost.size() <= 0 || !wand.consumeAllVisCrafting(wandStack, this.playerInventory.player, cost, false)) return;
-
-        this.tileEntity.setInventorySlotContentsSoftly(9,
-                ThaumcraftCraftingManager.findMatchingArcaneRecipe(this.tileEntity, this.playerInventory.player));
+    public void refreshResult() {
+        if (this.tileEntity != null) {
+            this.onCraftMatrixChanged(this.tileEntity);
+        }
     }
 
     @Override
     public void onContainerClosed(EntityPlayer playerIn) {
         super.onContainerClosed(playerIn);
-        if (this.tileEntity != null && this.tileEntity.getWorld() != null && !this.tileEntity.getWorld().isRemote) {
-            this.tileEntity.eventHandler = null;
+        if (this.tileEntity != null) {
+            this.tileEntity.removeWorkbenchListener(this);
         }
     }
 
@@ -95,12 +101,13 @@ public class ContainerArcaneWorkbench extends Container {
     public ItemStack transferStackInSlot(EntityPlayer playerIn, int index) {
         ItemStack original = ItemStack.EMPTY;
         Slot slot = index >= 0 && index < this.inventorySlots.size() ? this.inventorySlots.get(index) : null;
-        if (slot == null || !slot.getHasStack()) return ItemStack.EMPTY;
+        if (slot == null || !slot.getHasStack() || !slot.canTakeStack(playerIn)) return ItemStack.EMPTY;
 
         ItemStack stack = slot.getStack();
         original = stack.copy();
 
         if (index == 0) {
+            if (!this.canFullyMerge(stack, 11, 47)) return ItemStack.EMPTY;
             if (!this.mergeItemStack(stack, 11, 47, true)) return ItemStack.EMPTY;
             slot.onSlotChange(stack, original);
         } else if (index >= 11 && index < 38) {
@@ -123,7 +130,7 @@ public class ContainerArcaneWorkbench extends Container {
 
         if (stack.isEmpty()) slot.putStack(ItemStack.EMPTY); else slot.onSlotChanged();
         if (stack.getCount() == original.getCount()) return ItemStack.EMPTY;
-        slot.onTake(playerIn, stack);
+        slot.onTake(playerIn, index == 0 ? original : stack);
         return original;
     }
 
@@ -137,11 +144,121 @@ public class ContainerArcaneWorkbench extends Container {
 
     @Override
     public boolean canDragIntoSlot(Slot slotIn) {
-        return slotIn.inventory != this.tileEntity && super.canDragIntoSlot(slotIn);
+        return slotIn.inventory != this.tileEntity
+                && slotIn.inventory != this.craftResult
+                && super.canDragIntoSlot(slotIn);
+    }
+
+    private boolean canFullyMerge(ItemStack stack, int startIndex, int endIndex) {
+        int remaining = stack.getCount();
+        for (int i = startIndex; i < endIndex && remaining > 0; i++) {
+            Slot target = this.inventorySlots.get(i);
+            ItemStack existing = target.getStack();
+            if (!existing.isEmpty() && ItemStack.areItemsEqual(existing, stack)
+                    && ItemStack.areItemStackTagsEqual(existing, stack)) {
+                int limit = Math.min(target.getSlotStackLimit(), stack.getMaxStackSize());
+                remaining -= Math.max(0, limit - existing.getCount());
+            }
+        }
+        for (int i = startIndex; i < endIndex && remaining > 0; i++) {
+            Slot target = this.inventorySlots.get(i);
+            if (!target.getHasStack() && target.isItemValid(stack)) {
+                remaining -= Math.min(target.getSlotStackLimit(), stack.getMaxStackSize());
+            }
+        }
+        return remaining <= 0;
     }
 
     private static boolean isValidWorkbenchWand(ItemStack stack) {
-        return !stack.isEmpty() && stack.getItem() instanceof ItemWandCasting && !((ItemWandCasting) stack.getItem()).isStaff(stack);
+        return ArcaneWorkbenchRecipeResolver.isValidWand(stack);
+    }
+
+    boolean canTakeResult(EntityPlayer player, ItemStack expected) {
+        ArcaneWorkbenchRecipeResolver.Resolution fresh = this.resolveCurrent(player);
+        return fresh.craftable && ItemStack.areItemStacksEqual(fresh.output, expected);
+    }
+
+    CraftTransaction prepareCraft(EntityPlayer player, ItemStack expected) {
+        ArcaneWorkbenchRecipeResolver.Resolution fresh = this.resolveCurrent(player);
+        if (!fresh.craftable || !ItemStack.areItemStacksEqual(fresh.output, expected)) {
+            this.onCraftMatrixChanged(this.tileEntity);
+            return null;
+        }
+
+        NonNullList<ItemStack> remainders;
+        ForgeHooks.setCraftingPlayer(player);
+        try {
+            remainders = fresh.isVanilla()
+                    ? fresh.vanillaRecipe.getRemainingItems(this.craftMatrix)
+                    : ForgeHooks.defaultRecipeGetRemainingItems(this.craftMatrix);
+        } finally {
+            ForgeHooks.setCraftingPlayer(null);
+        }
+        if (remainders == null) {
+            remainders = NonNullList.withSize(9, ItemStack.EMPTY);
+        }
+
+        if (fresh.isArcane()) {
+            ItemStack wandStack = this.tileEntity.getStackInSlot(10);
+            if (!ArcaneWorkbenchRecipeResolver.isValidWand(wandStack)
+                    || !((ItemWandCasting) wandStack.getItem()).consumeAllVisCrafting(wandStack, player, fresh.cost, true)) {
+                this.onCraftMatrixChanged(this.tileEntity);
+                return null;
+            }
+        }
+        this.craftResult.setRecipeUsed(fresh.vanillaRecipe);
+        return new CraftTransaction(player, remainders);
+    }
+
+    void finishCraft(CraftTransaction transaction) {
+        EntityPlayer player = transaction.player;
+        NonNullList<ItemStack> remainders = transaction.remainders;
+        for (int i = 0; i < 9; i++) {
+            if (!this.tileEntity.getStackInSlot(i).isEmpty()) {
+                this.tileEntity.decrStackSize(i, 1);
+            }
+            ItemStack remainder = i < remainders.size() ? remainders.get(i) : ItemStack.EMPTY;
+            if (remainder.isEmpty()) continue;
+
+            ItemStack inputLeft = this.tileEntity.getStackInSlot(i);
+            if (inputLeft.isEmpty()) {
+                this.tileEntity.setInventorySlotContents(i, remainder);
+            } else if (ItemStack.areItemsEqual(inputLeft, remainder)
+                    && ItemStack.areItemStackTagsEqual(inputLeft, remainder)
+                    && inputLeft.getCount() + remainder.getCount() <= inputLeft.getMaxStackSize()) {
+                inputLeft.grow(remainder.getCount());
+                this.tileEntity.setInventorySlotContents(i, inputLeft);
+            } else if (!player.inventory.addItemStackToInventory(remainder)) {
+                player.dropItem(remainder, false);
+            }
+        }
+        this.tileEntity.onWandVisChanged();
+    }
+
+    private ArcaneWorkbenchRecipeResolver.Resolution resolveCurrent(EntityPlayer player) {
+        if (this.tileEntity == null || player == null) return ArcaneWorkbenchRecipeResolver.Resolution.NONE;
+        for (int i = 0; i < 9; i++) {
+            this.craftMatrix.setInventorySlotContents(i, this.tileEntity.getStackInSlot(i));
+        }
+        return ArcaneWorkbenchRecipeResolver.resolve(this.tileEntity, this.craftMatrix, player);
+    }
+
+    public ItemStack getArcanePreviewResult() {
+        return this.resolution.isArcane() ? this.resolution.output.copy() : ItemStack.EMPTY;
+    }
+
+    public AspectList getArcanePreviewCost() {
+        return this.resolution.isArcane() ? this.resolution.cost.copy() : new AspectList();
+    }
+
+    static final class CraftTransaction {
+        final EntityPlayer player;
+        final NonNullList<ItemStack> remainders;
+
+        CraftTransaction(EntityPlayer player, NonNullList<ItemStack> remainders) {
+            this.player = player;
+            this.remainders = remainders;
+        }
     }
 
     static boolean isThrowClick(ClickType clickTypeIn) {

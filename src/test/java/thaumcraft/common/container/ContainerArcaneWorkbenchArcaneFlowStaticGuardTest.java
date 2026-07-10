@@ -15,17 +15,17 @@ public class ContainerArcaneWorkbenchArcaneFlowStaticGuardTest {
     public void containerArcaneWorkbenchShouldRetainArcaneOutputComputationFlow() throws IOException {
         String source = readFile("src/main/java/thaumcraft/common/container/ContainerArcaneWorkbench.java");
 
-        assertTrue("Container should route arcane aspect cost probe through ThaumcraftCraftingManager",
-                source.contains("AspectList cost = ThaumcraftCraftingManager.findMatchingArcaneRecipeAspects(this.tileEntity, this.playerInventory.player);"));
-        assertTrue("Container should probe wand vis consumption with simulate=false before setting arcane output",
-                source.contains("wand.consumeAllVisCrafting(wandStack, this.playerInventory.player, cost, false)"));
-        assertTrue("Container should set output slot from ThaumcraftCraftingManager.findMatchingArcaneRecipe",
-                source.contains("ThaumcraftCraftingManager.findMatchingArcaneRecipe(this.tileEntity, this.playerInventory.player)"));
+        assertTrue("Container should resolve preview and take through the same player-local resolver",
+                source.contains("ArcaneWorkbenchRecipeResolver.resolve(this.tileEntity, this.craftMatrix")
+                        && source.contains("private final InventoryCraftResult craftResult")
+                        && source.contains("boolean canTakeResult(EntityPlayer player, ItemStack expected)")
+                        && source.contains("CraftTransaction prepareCraft(EntityPlayer player, ItemStack expected)"));
         assertTrue("Container should keep a detached preview craft matrix so recomputing slot 9 does not recurse back through InventoryCrafting callbacks",
                 source.contains("new InventoryCrafting(new ContainerDummy(), 3, 3)")
                         && source.contains("private static final class ContainerDummy extends Container"));
-        assertTrue("Container should not add an extra staff-only preview gate beyond the reference wand-slot contract",
-                !source.contains("wand.isStaff(wandStack)"));
+        assertTrue("Container should keep the result outside the shared legacy tile output slot",
+                source.contains("this.craftResult.setInventorySlotContents(0,")
+                        && !source.contains("setInventorySlotContentsSoftly(9, vanillaResult)"));
     }
 
     @Test

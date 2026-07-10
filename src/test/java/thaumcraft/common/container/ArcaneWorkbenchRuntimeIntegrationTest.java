@@ -3,9 +3,12 @@ package thaumcraft.common.container;
 import com.mojang.authlib.GameProfile;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Bootstrap;
+import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
+import net.minecraft.inventory.IInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.profiler.Profiler;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
@@ -24,11 +27,13 @@ import org.junit.Test;
 import thaumcraft.api.ThaumcraftApi;
 import thaumcraft.api.aspects.Aspect;
 import thaumcraft.api.aspects.AspectList;
+import thaumcraft.api.crafting.IArcaneRecipe;
 import thaumcraft.api.crafting.ShapedArcaneRecipe;
 import thaumcraft.api.crafting.ShapelessArcaneRecipe;
 import thaumcraft.api.internal.IInternalMethodHandler;
 import thaumcraft.api.wands.WandCap;
 import thaumcraft.api.wands.WandRod;
+import thaumcraft.api.wands.StaffRod;
 import thaumcraft.common.config.ConfigItems;
 import thaumcraft.common.items.ItemResource;
 import thaumcraft.common.items.wands.ItemWandCasting;
@@ -220,8 +225,8 @@ public class ArcaneWorkbenchRuntimeIntegrationTest {
     }
 
     @Test
-    public void craftingSlotShouldConsumeVisOnceAndPreferInventoryForContainerRemainders() {
-        Item outputItem = new Item();
+    public void craftingSlotShouldConsumeVisOnceAndKeepContainerRemainderInGrid() {
+        Item outputItem = Items.DIAMOND;
         TestContainerItem inputItem = new TestContainerItem();
         TestWandItem wandItem = new TestWandItem();
 
@@ -234,13 +239,14 @@ public class ArcaneWorkbenchRuntimeIntegrationTest {
         tile.setInventorySlotContentsSoftly(slot(0, 0), new ItemStack(inputItem, 1, 0));
         tile.setInventorySlotContentsSoftly(10, new ItemStack(wandItem, 1, 0));
 
-        SlotCraftingArcaneWorkbench slot = new SlotCraftingArcaneWorkbench(this.player, tile, tile, 9, 0, 0);
-        ItemStack crafted = slot.onTake(this.player, new ItemStack(outputItem));
+        ContainerArcaneWorkbench container = new ContainerArcaneWorkbench(this.player.inventory, tile);
+        SlotCraftingArcaneWorkbench slot = (SlotCraftingArcaneWorkbench) container.inventorySlots.get(0);
+        ItemStack crafted = slot.decrStackSize(1);
+        slot.onTake(this.player, crafted);
 
         assertSame(outputItem, crafted.getItem());
-        assertEquals(1, wandItem.consumeCalls);
-        assertTrue(tile.getStackInSlot(slot(0, 0)).isEmpty());
-        assertTrue(this.player.inventory.hasItemStack(inputItem.containerStack()));
+        assertEquals(1, wandItem.actualConsumeCalls);
+        assertTrue(ItemStack.areItemStacksEqual(inputItem.containerStack(), tile.getStackInSlot(slot(0, 0))));
     }
 
     @Test
@@ -252,6 +258,109 @@ public class ArcaneWorkbenchRuntimeIntegrationTest {
         container.onCraftMatrixChanged(tile);
 
         assertEquals(47, container.inventorySlots.size());
+    }
+
+    @Test
+    public void resultShouldBePlayerLocalAndRevalidatedBeforeTake() {
+        Item input = Items.STICK;
+        TestWandItem wand = new TestWandItem();
+        ThaumcraftApi.getCraftingRecipes().add(new PlayerLockedRecipe("allowed", input, Items.DIAMOND));
+
+        TileArcaneWorkbench tile = newWorkbench();
+        tile.setInventorySlotContentsSoftly(0, new ItemStack(input));
+        tile.setInventorySlotContentsSoftly(10, new ItemStack(wand));
+
+        DummyPlayer allowed = new DummyPlayer(this.world, "allowed");
+        DummyPlayer allowedSecondViewer = new DummyPlayer(this.world, "allowed");
+        ContainerArcaneWorkbench deniedContainer = new ContainerArcaneWorkbench(this.player.inventory, tile);
+        ContainerArcaneWorkbench allowedContainer = new ContainerArcaneWorkbench(allowed.inventory, tile);
+        ContainerArcaneWorkbench allowedSecondContainer = new ContainerArcaneWorkbench(allowedSecondViewer.inventory, tile);
+
+        assertFalse(deniedContainer.inventorySlots.get(0).getHasStack());
+        assertTrue(allowedContainer.inventorySlots.get(0).getHasStack());
+        assertTrue(allowedSecondContainer.inventorySlots.get(0).getHasStack());
+        assertTrue(tile.getStackInSlot(9).isEmpty());
+
+        tile.setInventorySlotContents(0, ItemStack.EMPTY);
+        assertFalse(allowedContainer.inventorySlots.get(0).getHasStack());
+        assertFalse(allowedSecondContainer.inventorySlots.get(0).getHasStack());
+        allowedSecondContainer.onContainerClosed(allowedSecondViewer);
+        tile.setInventorySlotContents(0, new ItemStack(input));
+        assertTrue(allowedContainer.inventorySlots.get(0).getHasStack());
+
+        SlotCraftingArcaneWorkbench result = (SlotCraftingArcaneWorkbench) allowedContainer.inventorySlots.get(0);
+        ItemStack staleOutput = result.getStack().copy();
+        tile.setInventorySlotContentsSoftly(10, ItemStack.EMPTY);
+
+        assertFalse(result.canTakeStack(allowed));
+        assertTrue(result.onTake(allowed, staleOutput).isEmpty());
+        assertFalse(tile.getStackInSlot(0).isEmpty());
+        assertEquals(0, wand.actualConsumeCalls);
+    }
+
+    @Test
+    public void shiftClickShouldNotPartiallyMoveAndLoseMultiItemResult() {
+        TestWandItem wand = new TestWandItem();
+        ThaumcraftApi.getCraftingRecipes().add(new ShapedArcaneRecipe("",
+                new ItemStack(Items.DIAMOND, 4), new AspectList().add(Aspect.AIR, 1),
+                "A", 'A', new ItemStack(Items.STICK)));
+
+        TileArcaneWorkbench tile = newWorkbench();
+        tile.setInventorySlotContentsSoftly(0, new ItemStack(Items.STICK));
+        tile.setInventorySlotContentsSoftly(10, new ItemStack(wand));
+        for (int i = 0; i < this.player.inventory.getSizeInventory(); i++) {
+            this.player.inventory.setInventorySlotContents(i, new ItemStack(Blocks.COBBLESTONE, 64));
+        }
+        this.player.inventory.setInventorySlotContents(9, new ItemStack(Items.DIAMOND, 62));
+
+        ContainerArcaneWorkbench container = new ContainerArcaneWorkbench(this.player.inventory, tile);
+        assertTrue(container.transferStackInSlot(this.player, 0).isEmpty());
+        assertEquals(4, container.inventorySlots.get(0).getStack().getCount());
+        assertFalse(tile.getStackInSlot(0).isEmpty());
+        assertEquals(0, wand.actualConsumeCalls);
+
+        this.player.inventory.setInventorySlotContents(9, new ItemStack(Items.DIAMOND, 60));
+        assertEquals(4, container.transferStackInSlot(this.player, 0).getCount());
+        assertEquals(64, this.player.inventory.getStackInSlot(9).getCount());
+        assertTrue(tile.getStackInSlot(0).isEmpty());
+        assertEquals(1, wand.actualConsumeCalls);
+    }
+
+    @Test
+    public void legacyResultSlotShouldNotPersistAndStaffShouldBeRejected() {
+        TileArcaneWorkbench source = newWorkbench();
+        source.setInventorySlotContentsSoftly(0, new ItemStack(Items.STICK));
+        source.setInventorySlotContentsSoftly(9, new ItemStack(Items.DIAMOND));
+
+        NBTTagCompound tag = new NBTTagCompound();
+        source.writeCustomNBT(tag);
+        TileArcaneWorkbench loaded = newWorkbench();
+        loaded.readCustomNBT(tag);
+
+        assertFalse(loaded.getStackInSlot(0).isEmpty());
+        assertTrue(loaded.getStackInSlot(9).isEmpty());
+
+        StaffRod staffRod = new StaffRod("test_staff", 100, new ItemStack(Items.STICK), 1);
+        ItemStack staff = new ItemStack(ConfigItems.itemWandCasting);
+        ItemWandCasting.setRod(staff, staffRod);
+        assertFalse(loaded.isItemValidForSlot(10, staff));
+        assertFalse(loaded.canInsertItem(10, staff, net.minecraft.util.EnumFacing.UP));
+    }
+
+    @Test
+    public void craftingVisShouldRequireStoredVisAndSpecialCapModifierShouldReplaceBase() {
+        WandCap cap = new WandCap("test_special", 0.5F,
+                java.util.Collections.singletonList(Aspect.AIR), 0.9F, new ItemStack(Items.IRON_NUGGET), 1);
+        WandRod rod = new WandRod("test_rod", 25, new ItemStack(Items.STICK), 1);
+        ItemWandCasting wand = new ItemWandCasting();
+        ItemStack stack = new ItemStack(wand);
+        ItemWandCasting.setCap(stack, cap);
+        ItemWandCasting.setRod(stack, rod);
+
+        assertEquals(0.9F, ItemWandCasting.getConsumptionModifier(stack, null, Aspect.AIR, true), 0.0001F);
+        assertEquals(0.5F, ItemWandCasting.getConsumptionModifier(stack, null, Aspect.FIRE, true), 0.0001F);
+
+        assertFalse(wand.consumeAllVisCrafting(stack, null, new AspectList().add(Aspect.AIR, 1), false));
     }
 
     private TestArcaneWorkbench newWorkbench() {
@@ -349,11 +458,11 @@ public class ArcaneWorkbenchRuntimeIntegrationTest {
     }
 
     private static class TestWandItem extends ItemWandCasting {
-        int consumeCalls;
+        int actualConsumeCalls;
 
         @Override
         public boolean consumeAllVisCrafting(ItemStack stack, EntityPlayer player, AspectList cost, boolean doit) {
-            this.consumeCalls++;
+            if (doit) this.actualConsumeCalls++;
             return true;
         }
     }
@@ -373,6 +482,54 @@ public class ArcaneWorkbenchRuntimeIntegrationTest {
 
         ItemStack containerStack() {
             return new ItemStack(this.container, 1, 0);
+        }
+    }
+
+    private static class PlayerLockedRecipe implements IArcaneRecipe {
+        private final String playerName;
+        private final Item input;
+        private final Item output;
+
+        PlayerLockedRecipe(String playerName, Item input, Item output) {
+            this.playerName = playerName;
+            this.input = input;
+            this.output = output;
+        }
+
+        @Override
+        public boolean matches(IInventory inventory, World world, EntityPlayer player) {
+            return player != null && this.playerName.equals(player.getName())
+                    && inventory.getStackInSlot(0).getItem() == this.input;
+        }
+
+        @Override
+        public ItemStack getCraftingResult(IInventory inventory) {
+            return new ItemStack(this.output);
+        }
+
+        @Override
+        public int getRecipeSize() {
+            return 1;
+        }
+
+        @Override
+        public ItemStack getRecipeOutput() {
+            return new ItemStack(this.output);
+        }
+
+        @Override
+        public AspectList getAspects() {
+            return new AspectList().add(Aspect.AIR, 1);
+        }
+
+        @Override
+        public AspectList getAspects(IInventory inventory) {
+            return this.getAspects();
+        }
+
+        @Override
+        public String getResearch() {
+            return "";
         }
     }
 }

@@ -41,7 +41,8 @@ public class TileMagicWorkbenchCharger extends TileVisRelay {
         }
         TileMagicWorkbench workbench = (TileMagicWorkbench) below;
         ItemStack wand = workbench.getStackInSlot(10);
-        if (wand.isEmpty() || !(wand.getItem() instanceof ItemWandCasting)) {
+        if (wand.isEmpty() || !(wand.getItem() instanceof ItemWandCasting)
+                || ((ItemWandCasting) wand.getItem()).isStaff(wand)) {
             return;
         }
 
@@ -50,12 +51,20 @@ public class TileMagicWorkbenchCharger extends TileVisRelay {
         if (room == null || room.size() <= 0) {
             return;
         }
+        boolean changed = false;
         for (Aspect aspect : room.getAspects()) {
             int drain = Math.min(5, ItemWandCasting.getMaxVis(wand) - ItemWandCasting.getVis(wand, aspect));
             if (drain <= 0) {
                 continue;
             }
-            ItemWandCasting.addRealVis(wand, aspect, this.consumeVis(aspect, drain), true);
+            int consumed = this.consumeVis(aspect, drain);
+            if (consumed > 0) {
+                ItemWandCasting.addRealVis(wand, aspect, consumed, true);
+                changed = true;
+            }
+        }
+        if (changed) {
+            workbench.onWandVisChanged();
         }
     }
 }

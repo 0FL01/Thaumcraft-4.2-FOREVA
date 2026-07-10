@@ -25,7 +25,7 @@ public class BlockTableResearchStructureStaticGuardTest {
                         && blockTable.contains("tile instanceof TileResearchTable && md >= 2 && md <= 5")
                         && blockTable.contains("md >= 6 && md <= 9")
                         && blockTable.contains("ConfigBlocks.blockTable.getDefaultState().withProperty(TYPE, 15)")
-                        && blockTable.contains("player.inventory.setInventorySlotContents(player.inventory.currentItem, ItemStack.EMPTY);")
+                        && blockTable.contains("wandstack.setCount(0);")
                         && blockTable.contains("new AxisAlignedBB(0.0D, 0.0D, -1.0D, 1.0D, 1.0D, 1.0D)")
                         && blockTable.contains("new AxisAlignedBB(0.0D, 0.0D, 0.0D, 2.0D, 1.0D, 1.0D)")
                         && blockTable.contains("return this.getBoundingBox(blockState, worldIn, pos);"));

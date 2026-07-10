@@ -46,13 +46,6 @@ public class ConfigRecipesArcaneSlice {
                 '5', new ItemStack(ConfigItems.itemShard, 1, 4),
                 '6', new ItemStack(ConfigItems.itemShard, 1, 5));
 
-        registerArcaneRecipe("IronKey", "WARDEDARCANA",
-                new ItemStack(ConfigItems.itemKey, 2, 0),
-                new AspectList().add(Aspect.WATER, 5).add(Aspect.ORDER, 5),
-                "NNI", "N  ",
-                'I', Items.IRON_INGOT,
-                'N', "nuggetIron");
-
         registerArcaneRecipe("ArcaneDoor", "WARDEDARCANA",
                 new ItemStack(ConfigItems.itemArcaneDoor),
                 new AspectList().add(Aspect.WATER, 20).add(Aspect.ORDER, 10).add(Aspect.EARTH, 10).add(Aspect.FIRE, 5),
@@ -68,6 +61,13 @@ public class ConfigRecipesArcaneSlice {
                 'B', new ItemStack(ConfigItems.itemZombieBrain),
                 'G', new ItemStack(Blocks.GLASS),
                 'W', new ItemStack(ConfigBlocks.blockWoodenDevice, 1, 6));
+
+        registerArcaneRecipe("IronKey", "WARDEDARCANA",
+                new ItemStack(ConfigItems.itemKey, 2, 0),
+                new AspectList().add(Aspect.WATER, 5).add(Aspect.ORDER, 5),
+                "NNI", "N  ",
+                'I', Items.IRON_INGOT,
+                'N', "nuggetIron");
 
         registerArcaneRecipe("FluxScrubber", "FLUXSCRUB",
                 new ItemStack(ConfigBlocks.blockStoneDevice, 1, 14),
@@ -95,13 +95,6 @@ public class ConfigRecipesArcaneSlice {
                     'B', new ItemStack(ConfigItems.itemZombieBrain),
                     'D', new ItemStack(ConfigBlocks.blockWoodenDevice, 1, 6));
         }
-
-        registerArcaneRecipe("ArcaneStone1", "ARCANESTONE",
-                new ItemStack(ConfigBlocks.blockCosmeticSolid, 9, 6),
-                new AspectList().add(Aspect.EARTH, 1).add(Aspect.FIRE, 1),
-                "SSS", "SCS", "SSS",
-                'S', "stone",
-                'C', new ItemStack(ConfigItems.itemShard, 1, OreDictionary.WILDCARD_VALUE));
 
         registerArcaneRecipe("NodeStabilizer", "NODESTABILIZER",
                 new ItemStack(ConfigBlocks.blockStoneDevice, 1, 9),
@@ -159,19 +152,111 @@ public class ConfigRecipesArcaneSlice {
                 'B', new ItemStack(ConfigBlocks.blockCosmeticSolid, 1, 7),
                 'R', new ItemStack(Blocks.REDSTONE_BLOCK));
 
-        registerArcaneRecipe("HungryChest", "HUNGRYCHEST",
-                new ItemStack(ConfigBlocks.blockChestHungry),
-                new AspectList().add(Aspect.AIR, 5).add(Aspect.ORDER, 3).add(Aspect.ENTROPY, 3),
-                "WTW", "W W", "WWW",
-                'W', "plankWood",
-                'T', new ItemStack(Blocks.TRAPDOOR));
+        registerArcaneRecipe("ArcaneStone1", "ARCANESTONE",
+                new ItemStack(ConfigBlocks.blockCosmeticSolid, 9, 6),
+                new AspectList().add(Aspect.EARTH, 1).add(Aspect.FIRE, 1),
+                "SSS", "SCS", "SSS",
+                'S', "stone",
+                'C', new ItemStack(ConfigItems.itemShard, 1, OreDictionary.WILDCARD_VALUE));
+
+        registerArcaneRecipe("PaveTravel", "PAVETRAVEL",
+                new ItemStack(ConfigBlocks.blockCosmeticSolid, 4, 2),
+                new AspectList().add(Aspect.EARTH, 10).add(Aspect.AIR, 10),
+                "SAS", "SBS",
+                'S', new ItemStack(ConfigBlocks.blockCosmeticSolid, 1, 7),
+                'A', new ItemStack(ConfigItems.itemShard, 1, 0),
+                'B', new ItemStack(ConfigItems.itemShard, 1, 3));
+
+        registerArcaneRecipe("ArcaneLamp", "ARCANELAMP",
+                new ItemStack(ConfigBlocks.blockMetalDevice, 1, 7),
+                new AspectList().add(Aspect.FIRE, 8).add(Aspect.AIR, 8).add(Aspect.WATER, 4).add(Aspect.ENTROPY, 4),
+                " S ", "IAI", " N ",
+                'A', new ItemStack(ConfigBlocks.blockCosmeticOpaque, 1, 0),
+                'S', new ItemStack(Blocks.DAYLIGHT_DETECTOR),
+                'N', new ItemStack(ConfigItems.itemResource, 1, 1),
+                'I', new ItemStack(Items.IRON_INGOT));
+
+        registerArcaneRecipe("ArcaneSpa", "ARCANESPA",
+                new ItemStack(ConfigBlocks.blockStoneDevice, 1, 12),
+                new AspectList().add(Aspect.WATER, 16).add(Aspect.ORDER, 8).add(Aspect.EARTH, 4),
+                "QIQ", "SJS", "SPS",
+                'P', new ItemStack(Blocks.PISTON),
+                'J', new ItemStack(ConfigBlocks.blockJar),
+                'S', new ItemStack(ConfigBlocks.blockCosmeticSolid, 1, 6),
+                'Q', new ItemStack(Blocks.QUARTZ_BLOCK),
+                'I', new ItemStack(Blocks.IRON_BARS));
+
+        registerArcaneRecipe("PaveWard", "PAVEWARD",
+                new ItemStack(ConfigBlocks.blockCosmeticSolid, 4, 3),
+                new AspectList().add(Aspect.FIRE, 10).add(Aspect.ORDER, 10),
+                "SAS", "SBS",
+                'S', new ItemStack(ConfigBlocks.blockCosmeticSolid, 1, 7),
+                'A', new ItemStack(ConfigItems.itemShard, 1, 1),
+                'B', new ItemStack(ConfigItems.itemShard, 1, 4));
+
+        registerArcaneRecipe("Levitator", "LEVITATOR",
+                new ItemStack(ConfigBlocks.blockLifter),
+                new AspectList().add(Aspect.AIR, 10).add(Aspect.EARTH, 5),
+                "WEW", "BNB", "WAW",
+                'W', new ItemStack(ConfigBlocks.blockWoodenDevice, 1, 6),
+                'E', new ItemStack(ConfigItems.itemShard, 1, 3),
+                'A', new ItemStack(ConfigItems.itemShard, 1, 0),
+                'N', new ItemStack(ConfigItems.itemResource, 1, 1),
+                'B', new ItemStack(Items.IRON_INGOT));
+
+        registerArcaneRecipe("ArcaneEar", "ARCANEEAR",
+                new ItemStack(ConfigBlocks.blockWoodenDevice, 1, 1),
+                new AspectList().add(Aspect.AIR, 10).add(Aspect.ORDER, 10),
+                "GIG", "GBG", "WRW",
+                'W', new ItemStack(ConfigBlocks.blockWoodenDevice, 1, 6),
+                'R', Items.REDSTONE,
+                'I', Items.IRON_INGOT,
+                'G', Items.GOLD_INGOT,
+                'B', new ItemStack(ConfigItems.itemZombieBrain));
+
+        registerShapelessArcaneRecipe("MirrorGlass", "BASICARTIFACE",
+                new ItemStack(ConfigItems.itemResource, 1, 10),
+                new AspectList().add(Aspect.FIRE, 10).add(Aspect.EARTH, 10),
+                new ItemStack(ConfigItems.itemResource, 1, 3), Blocks.GLASS_PANE);
+
+        registerArcaneRecipe("BoneBow", "BONEBOW",
+                new ItemStack(ConfigItems.itemBowBone),
+                new AspectList().add(Aspect.AIR, 16).add(Aspect.ENTROPY, 32),
+                "SB ", "SEB", "SB ",
+                'E', new ItemStack(ConfigItems.itemShard, 1, 5),
+                'B', Items.BONE,
+                'S', Items.STRING);
+
+        Aspect[] primalAspects = new Aspect[]{Aspect.AIR, Aspect.FIRE, Aspect.WATER, Aspect.EARTH, Aspect.ORDER, Aspect.ENTROPY};
+        for (int i = 0; i < primalAspects.length; i++) {
+            registerArcaneRecipe("PrimalArrow_" + i, "PRIMALARROW",
+                    new ItemStack(ConfigItems.itemPrimalArrow, 8, i),
+                    new AspectList().add(primalAspects[i], 8),
+                    "AAA", "ASA", "AAA",
+                    'A', Items.ARROW,
+                    'S', new ItemStack(ConfigItems.itemShard, 1, i));
+        }
+
+        registerArcaneRecipe("InfusionMatrix", "INFUSION",
+                new ItemStack(ConfigBlocks.blockStoneDevice, 1, 2),
+                new AspectList().add(Aspect.ORDER, 40),
+                "SBS", "BEB", "SBS",
+                'S', new ItemStack(ConfigBlocks.blockCosmeticSolid, 1, 6),
+                'E', Items.ENDER_PEARL,
+                'B', new ItemStack(ConfigItems.itemShard, 1, OreDictionary.WILDCARD_VALUE));
+
+        registerArcaneRecipe("ArcanePedestal", "INFUSION",
+                new ItemStack(ConfigBlocks.blockStoneDevice, 2, 1),
+                new AspectList().add(Aspect.AIR, 5),
+                "SSS", " S ", "SSS",
+                'S', new ItemStack(ConfigBlocks.blockCosmeticSolid, 1, 6));
 
         registerArcaneRecipe("WardedJar", "DISTILESSENTIA",
                 new ItemStack(ConfigBlocks.blockJar, 1, 0),
                 new AspectList().add(Aspect.WATER, 1),
                 "GWG", "G G", "GGG",
                 'W', "slabWood",
-                'G', Blocks.GLASS);
+                'G', Blocks.GLASS_PANE);
 
         registerArcaneRecipe("JarVoid", "JARVOID",
                 new ItemStack(ConfigBlocks.blockJar, 1, 3),
@@ -304,125 +389,6 @@ public class ConfigRecipesArcaneSlice {
                 'Q', Items.QUARTZ,
                 'C', new ItemStack(ConfigItems.itemShard, 1, 2));
 
-        registerArcaneRecipe("RobeChest", "ENCHFABRIC",
-                new ItemStack(ConfigItems.itemChestRobe, 1),
-                new AspectList().add(Aspect.AIR, 5),
-                "I I", "III", "III",
-                'I', new ItemStack(ConfigItems.itemResource, 1, 7));
-
-        registerArcaneRecipe("RobeLegs", "ENCHFABRIC",
-                new ItemStack(ConfigItems.itemLegsRobe, 1),
-                new AspectList().add(Aspect.WATER, 5),
-                "III", "I I", "I I",
-                'I', new ItemStack(ConfigItems.itemResource, 1, 7));
-
-        registerArcaneRecipe("RobeBoots", "ENCHFABRIC",
-                new ItemStack(ConfigItems.itemBootsRobe, 1),
-                new AspectList().add(Aspect.EARTH, 3),
-                "I I", "I I",
-                'I', new ItemStack(ConfigItems.itemResource, 1, 7));
-
-        registerArcaneRecipe("Goggles", "GOGGLES",
-                new ItemStack(ConfigItems.itemGoggles),
-                new AspectList().add(Aspect.AIR, 5).add(Aspect.FIRE, 5).add(Aspect.WATER, 5)
-                        .add(Aspect.EARTH, 5).add(Aspect.ENTROPY, 3).add(Aspect.ORDER, 3),
-                "LGL", "L L", "TGT",
-                'T', ConfigItems.itemThaumometer,
-                'G', Items.GOLD_INGOT,
-                'L', Items.LEATHER);
-
-        registerShapelessArcaneRecipe("MirrorGlass", "BASICARTIFACE",
-                new ItemStack(ConfigItems.itemResource, 1, 10),
-                new AspectList().add(Aspect.FIRE, 10).add(Aspect.EARTH, 10),
-                new ItemStack(ConfigItems.itemResource, 1, 3), Blocks.GLASS_PANE);
-
-        registerArcaneRecipe("BoneBow", "BONEBOW",
-                new ItemStack(ConfigItems.itemBowBone),
-                new AspectList().add(Aspect.AIR, 16).add(Aspect.ENTROPY, 32),
-                "SB ", "SEB", "SB ",
-                'E', new ItemStack(ConfigItems.itemShard, 1, 5),
-                'B', Items.BONE,
-                'S', Items.STRING);
-
-        Aspect[] primalAspects = new Aspect[]{Aspect.AIR, Aspect.FIRE, Aspect.WATER, Aspect.EARTH, Aspect.ORDER, Aspect.ENTROPY};
-        for (int i = 0; i < primalAspects.length; i++) {
-            registerArcaneRecipe("PrimalArrow_" + i, "PRIMALARROW",
-                    new ItemStack(ConfigItems.itemPrimalArrow, 8, i),
-                    new AspectList().add(primalAspects[i], 8),
-                    "AAA", "ASA", "AAA",
-                    'A', Items.ARROW,
-                    'S', new ItemStack(ConfigItems.itemShard, 1, i));
-        }
-
-        registerArcaneRecipe("InfusionMatrix", "INFUSION",
-                new ItemStack(ConfigBlocks.blockStoneDevice, 1, 2),
-                new AspectList().add(Aspect.ORDER, 40),
-                "SBS", "BEB", "SBS",
-                'S', new ItemStack(ConfigBlocks.blockCosmeticSolid, 1, 6),
-                'E', Items.ENDER_PEARL,
-                'B', new ItemStack(ConfigItems.itemShard, 1, OreDictionary.WILDCARD_VALUE));
-
-        registerArcaneRecipe("ArcanePedestal", "INFUSION",
-                new ItemStack(ConfigBlocks.blockStoneDevice, 2, 1),
-                new AspectList().add(Aspect.AIR, 5),
-                "SSS", " S ", "SSS",
-                'S', new ItemStack(ConfigBlocks.blockCosmeticSolid, 1, 6));
-
-        registerArcaneRecipe("PaveTravel", "PAVETRAVEL",
-                new ItemStack(ConfigBlocks.blockCosmeticSolid, 4, 2),
-                new AspectList().add(Aspect.EARTH, 10).add(Aspect.AIR, 10),
-                "SAS", "SBS",
-                'S', new ItemStack(ConfigBlocks.blockCosmeticSolid, 1, 7),
-                'A', new ItemStack(ConfigItems.itemShard, 1, 0),
-                'B', new ItemStack(ConfigItems.itemShard, 1, 3));
-
-        registerArcaneRecipe("ArcaneLamp", "ARCANELAMP",
-                new ItemStack(ConfigBlocks.blockMetalDevice, 1, 7),
-                new AspectList().add(Aspect.FIRE, 8).add(Aspect.AIR, 8).add(Aspect.WATER, 4).add(Aspect.ENTROPY, 4),
-                " S ", "IAI", " N ",
-                'A', new ItemStack(ConfigBlocks.blockCosmeticOpaque, 1, 0),
-                'S', new ItemStack(Blocks.DAYLIGHT_DETECTOR),
-                'N', new ItemStack(ConfigItems.itemResource, 1, 1),
-                'I', new ItemStack(Items.IRON_INGOT));
-
-        registerArcaneRecipe("ArcaneSpa", "ARCANESPA",
-                new ItemStack(ConfigBlocks.blockStoneDevice, 1, 12),
-                new AspectList().add(Aspect.WATER, 16).add(Aspect.ORDER, 8).add(Aspect.EARTH, 4),
-                "QIQ", "SJS", "SPS",
-                'P', new ItemStack(Blocks.PISTON),
-                'J', new ItemStack(ConfigBlocks.blockJar),
-                'S', new ItemStack(ConfigBlocks.blockCosmeticSolid, 1, 6),
-                'Q', new ItemStack(Blocks.QUARTZ_BLOCK),
-                'I', new ItemStack(Blocks.IRON_BARS));
-
-        registerArcaneRecipe("PaveWard", "PAVEWARD",
-                new ItemStack(ConfigBlocks.blockCosmeticSolid, 4, 3),
-                new AspectList().add(Aspect.FIRE, 10).add(Aspect.ORDER, 10),
-                "SAS", "SBS",
-                'S', new ItemStack(ConfigBlocks.blockCosmeticSolid, 1, 7),
-                'A', new ItemStack(ConfigItems.itemShard, 1, 1),
-                'B', new ItemStack(ConfigItems.itemShard, 1, 4));
-
-        registerArcaneRecipe("Levitator", "LEVITATOR",
-                new ItemStack(ConfigBlocks.blockLifter),
-                new AspectList().add(Aspect.AIR, 10).add(Aspect.EARTH, 5),
-                "WEW", "BNB", "WAW",
-                'W', new ItemStack(ConfigBlocks.blockWoodenDevice, 1, 6),
-                'E', new ItemStack(ConfigItems.itemShard, 1, 3),
-                'A', new ItemStack(ConfigItems.itemShard, 1, 0),
-                'N', new ItemStack(ConfigItems.itemResource, 1, 1),
-                'B', new ItemStack(Items.IRON_INGOT));
-
-        registerArcaneRecipe("ArcaneEar", "ARCANEEAR",
-                new ItemStack(ConfigBlocks.blockWoodenDevice, 1, 1),
-                new AspectList().add(Aspect.AIR, 10).add(Aspect.ORDER, 10),
-                "GIG", "GBG", "WRW",
-                'W', new ItemStack(ConfigBlocks.blockWoodenDevice, 1, 6),
-                'R', Items.REDSTONE,
-                'I', Items.IRON_INGOT,
-                'G', Items.GOLD_INGOT,
-                'B', new ItemStack(ConfigItems.itemZombieBrain));
-
         registerArcaneRecipe("FocusShock", "FOCUSSHOCK",
                 new ItemStack(ConfigItems.focusShock),
                 new AspectList().add(Aspect.AIR, 10).add(Aspect.ORDER, 10).add(Aspect.ENTROPY, 10),
@@ -489,6 +455,40 @@ public class ConfigRecipesArcaneSlice {
                 " S ", "SCS", " S ",
                 'S', new ItemStack(Items.STRING, 1, OreDictionary.WILDCARD_VALUE),
                 'C', new ItemStack(Blocks.WOOL, 1, OreDictionary.WILDCARD_VALUE));
+
+        registerArcaneRecipe("RobeChest", "ENCHFABRIC",
+                new ItemStack(ConfigItems.itemChestRobe, 1),
+                new AspectList().add(Aspect.AIR, 5),
+                "I I", "III", "III",
+                'I', new ItemStack(ConfigItems.itemResource, 1, 7));
+
+        registerArcaneRecipe("RobeLegs", "ENCHFABRIC",
+                new ItemStack(ConfigItems.itemLegsRobe, 1),
+                new AspectList().add(Aspect.WATER, 5),
+                "III", "I I", "I I",
+                'I', new ItemStack(ConfigItems.itemResource, 1, 7));
+
+        registerArcaneRecipe("RobeBoots", "ENCHFABRIC",
+                new ItemStack(ConfigItems.itemBootsRobe, 1),
+                new AspectList().add(Aspect.EARTH, 3),
+                "I I", "I I",
+                'I', new ItemStack(ConfigItems.itemResource, 1, 7));
+
+        registerArcaneRecipe("Goggles", "GOGGLES",
+                new ItemStack(ConfigItems.itemGoggles),
+                new AspectList().add(Aspect.AIR, 5).add(Aspect.FIRE, 5).add(Aspect.WATER, 5)
+                        .add(Aspect.EARTH, 5).add(Aspect.ENTROPY, 3).add(Aspect.ORDER, 3),
+                "LGL", "L L", "TGT",
+                'T', ConfigItems.itemThaumometer,
+                'G', Items.GOLD_INGOT,
+                'L', Items.LEATHER);
+
+        registerArcaneRecipe("HungryChest", "HUNGRYCHEST",
+                new ItemStack(ConfigBlocks.blockChestHungry),
+                new AspectList().add(Aspect.AIR, 5).add(Aspect.ORDER, 3).add(Aspect.ENTROPY, 3),
+                "WTW", "W W", "WWW",
+                'W', "plankWood",
+                'T', Blocks.TRAPDOOR);
 
         registerArcaneRecipe("GolemBell", "GOLEMBELL",
                 new ItemStack(ConfigItems.itemGolemBell),

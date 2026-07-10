@@ -204,7 +204,7 @@ public class ItemWandCasting extends Item implements IArchitect {
         WandCap cap = getCap(stack);
         float discount = cap != null ? cap.getBaseCostModifier() : 1.0F;
         if (cap != null && cap.getSpecialCostModifierAspects() != null && cap.getSpecialCostModifierAspects().contains(aspect)) {
-            discount = Math.min(discount, cap.getSpecialCostModifier());
+            discount = cap.getSpecialCostModifier();
         }
         if (player != null) {
             discount -= WandManager.getTotalVisDiscount(player, aspect);
@@ -223,7 +223,6 @@ public class ItemWandCasting extends Item implements IArchitect {
      */
     public boolean consumeAllVis(ItemStack stack, EntityPlayer player, AspectList cost, boolean doit, boolean crafting) {
         if (cost == null || cost.size() == 0) return false;
-        if (player != null && player.capabilities.isCreativeMode) return true;
 
         AspectList realCost = new AspectList();
         for (Aspect aspect : cost.getAspects()) {
