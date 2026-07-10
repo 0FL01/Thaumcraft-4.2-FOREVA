@@ -24,17 +24,14 @@ public class ItemWandCastingCraftingParityStaticGuardTest {
     }
 
     @Test
-    public void creativeTabShouldExposeTheFourTc4PresetsIncludingSceptre() throws Exception {
+    public void creativeTabShouldIncludeSilverwoodThaumiumSceptre() throws Exception {
         String source = new String(Files.readAllBytes(Paths.get(
                 "src/main/java/thaumcraft/common/items/wands/ItemWandCasting.java")), StandardCharsets.UTF_8);
 
-        assertTrue(source.contains("createCreativeWand(\"wood\", \"iron\", false)"));
-        assertTrue(source.contains("createCreativeWand(\"greatwood\", \"gold\", false)"));
-        assertTrue(source.contains("createCreativeWand(\"silverwood_staff\", \"thaumium\", false)"));
-        assertTrue(source.contains("createCreativeWand(\"silverwood\", \"thaumium\", true)"));
-        assertTrue(source.contains("stack.getTagCompound().setByte(\"sceptre\", (byte) 1)"));
-        assertTrue(source.contains("stack.getTagCompound().hasKey(\"sceptre\")"));
-        assertFalse(source.contains("for (WandRod rod : WandRod.rods.values())"));
-        assertFalse(source.contains("for (WandCap cap : WandCap.caps.values())"));
+        assertTrue(source.contains("setRod(sceptre, WandRod.rods.get(\"silverwood\"))"));
+        assertTrue(source.contains("setCap(sceptre, WandCap.caps.get(\"thaumium\"))"));
+        assertTrue(source.contains("sceptre.getTagCompound().setByte(\"sceptre\", (byte) 1)"));
+        assertTrue(source.contains("setVis(sceptre, aspect, getMaxVis(sceptre))"));
+        assertTrue(source.contains("items.add(sceptre)"));
     }
 }

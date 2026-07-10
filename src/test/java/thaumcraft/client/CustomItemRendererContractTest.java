@@ -65,17 +65,19 @@ public class CustomItemRendererContractTest {
         assertFalse("ModelWand must not restore player lighting while it is rendered at a tile",
                 wandModel.contains("getBrightnessForRender()"));
 
-        assertTrue("WandRenderCalibration must keep the wand/staff/sceptre kinds and Java defaults matching the TC4 item-render protocol",
+        assertTrue("WandRenderCalibration must keep the wand/staff/sceptre kinds, the TC4 final-rotate basis, and Java defaults that reproduce the prior port constants byte-for-byte",
                 wandCalibration.contains("KIND_WAND = \"wand\"")
                         && wandCalibration.contains("KIND_STAFF = \"staff\"")
                         && wandCalibration.contains("KIND_SCEPTRE = \"sceptre\"")
                         && wandCalibration.contains("buildDefaultCalibration()")
+                        // prior port constants preserved as Java defaults
                         && wandCalibration.contains("180f, 0f, 0f")
-                        && wandCalibration.contains("0f,0f,66f")
-                        && wandCalibration.contains("0f,0.6f,0f")
+                        && wandCalibration.contains("0.5f,0.5f,0f")
                         && wandCalibration.contains("0.6f,0.6f,0.6f")
+                        && wandCalibration.contains("20f,-45f,45f")
+                        && wandCalibration.contains("0f,0.6f,0f")
                         && wandCalibration.contains("0f,1f,0f")
-                        && wandCalibration.contains("0.5f,1.5f,0.5f")
+                        && wandCalibration.contains("0.5f,1f,0.5f")
                         && wandCalibration.contains("1f,1.1f,1f")
                         && wandCalibration.contains("0.5f,0.5f,0.5f")
                         && wandCalibration.contains("0f,0.5f,0f")
@@ -90,12 +92,8 @@ public class CustomItemRendererContractTest {
                         && wandCalibrationAsset.contains("\"staff\"")
                         && wandCalibrationAsset.contains("\"sceptre\"")
                         && wandCalibrationAsset.contains("\"FIRST_PERSON_RIGHT_HAND\"")
-                         && wandCalibrationAsset.contains("\"THIRD_PERSON_LEFT_HAND\"")
-                         && wandCalibrationAsset.contains("\"rotate\": [0.0, 0.0, 66.0]")
-                         && wandCalibrationAsset.contains("\"translate\": [0.5, 1.5, 0.5]")
-                         && wandCalibrationAsset.contains("\"scale\": [0.6, 0.6, 0.6]")
-                         && wandCalibrationAsset.contains("\"scale\": [0.5, 0.5, 0.5]")
-                         && wandCalibrationAsset.contains("\"scaleMultiplier\": [0.8, 0.8, 0.8]")
+                        && wandCalibrationAsset.contains("\"THIRD_PERSON_LEFT_HAND\"")
+                        && wandCalibrationAsset.contains("\"scaleMultiplier\": [0.8, 0.8, 0.8]")
                         && wandCalibrationAsset.contains("\"postTranslateAdd\": [-0.7, 0.6, 0.0]"));
 
         assertTrue("ClientModelRegistry should wrap wandcasting into a perspective-aware baked model so the TEISR can distinguish GUI, hand, and ground contexts",

@@ -8,7 +8,6 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.assertFalse;
 
 public class CrystalTesrRoutingContractTest {
 
@@ -35,15 +34,17 @@ public class CrystalTesrRoutingContractTest {
                         && modelRegistry.contains("new ModelResourceLocation(\"thaumcraft:blockcrystal_tesr\", \"inventory\")")
                         && modelRegistry.contains("new CrystalPerspectiveModel(model)"));
 
-        assertTrue("ItemCrystalRenderer should route every context through the original TC4 inventory TESR path",
+        assertTrue("ItemCrystalRenderer should preserve the original first-person path while routing other item contexts through the centered item-cluster renderer",
                 itemRenderer.contains("new TileCrystalRenderer()")
                         && itemRenderer.contains("new TileEldritchCrystalRenderer()")
                         && itemRenderer.contains("CURRENT_TRANSFORM")
                         && itemRenderer.contains("setTransformType(ItemCameraTransforms.TransformType transformType)")
+                        && itemRenderer.contains("ItemCameraTransforms.TransformType transformType = CURRENT_TRANSFORM.get()")
                         && itemRenderer.contains("meta <= 6")
                         && itemRenderer.contains("meta == 7")
+                        && itemRenderer.contains("isFirstPerson(transformType)")
                         && itemRenderer.contains("crystalRenderer.setRendererDispatcher(TileEntityRendererDispatcher.instance);")
-                        && itemRenderer.contains("crystalRenderer.render(crystal, 0.0D, 0.0D, 0.0D, partialTicks, 0, 1.0F);")
+                        && itemRenderer.contains("crystalRenderer.renderItemCluster(meta);")
                         && itemRenderer.contains("TileEntityRendererDispatcher.instance")
                         && itemRenderer.contains("BlockPos.ORIGIN")
                         && itemRenderer.contains("GlStateManager.rotate(90.0F, 0.0F, 1.0F, 0.0F);")
@@ -51,10 +52,14 @@ public class CrystalTesrRoutingContractTest {
                         && itemRenderer.contains("private static final class InventoryTileCrystal extends TileCrystal")
                         && itemRenderer.contains("public int getBlockMetadata()"));
 
-        assertFalse("TileCrystalRenderer must not bypass world orientation for item contexts",
-                tileRenderer.contains("renderItemCluster") || tileRenderer.contains("drawItemCrystal"));
+        assertTrue("TileCrystalRenderer should expose a centered item-cluster path that omits world orientation anchoring",
+                tileRenderer.contains("public void renderItemCluster(int metadata)")
+                        && tileRenderer.contains("drawItemCrystal(")
+                        && tileRenderer.contains("GlStateManager.rotate(90.0F, 0.0F, 1.0F, 0.0F);")
+                        && tileRenderer.contains("GlStateManager.translate(0.0F, -0.8F, 0.0F);")
+                        && tileRenderer.contains("private void drawItemCrystal(float yaw, float pitch, Random rand, int color, float size)"));
 
-        assertTrue("The crystal TEISR item-model must keep every display matrix neutral because the TC4 renderer owns its pose",
+        assertTrue("The crystal TEISR item-model should mirror TC6 donor default-block coordinates for each context",
                 itemModel.contains("\"parent\": \"builtin/entity\"")
                         && itemModel.contains("\"gui\"")
                         && itemModel.contains("\"ground\"")
@@ -63,9 +68,10 @@ public class CrystalTesrRoutingContractTest {
                         && itemModel.contains("\"thirdperson_lefthand\"")
                         && itemModel.contains("\"firstperson_righthand\"")
                         && itemModel.contains("\"firstperson_lefthand\"")
+                        && itemModel.contains("\"rotation\": [30, 225, 0]")
                         && itemModel.contains("\"rotation\": [0, 0, 0]")
-                        && itemModel.contains("\"translation\": [0, 0, 0]")
-                        && itemModel.contains("\"scale\": [1, 1, 1]"));
+                        && itemModel.contains("\"rotation\": [75, 45, 0]")
+                        && itemModel.contains("\"scale\": [0.625, 0.625, 0.625]"));
     }
 
     private static String read(String path) throws IOException {

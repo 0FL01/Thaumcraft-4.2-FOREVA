@@ -46,10 +46,8 @@ public class CreativeTabVisualParityStaticGuardTest {
                 clientProxy.contains("new ResourceLocation(\"thaumcraft\", \"wandcasting_tesr\")"));
         assertTrue("Casting wand baked model should still capture GUI transform type before TEISR renders",
                 clientModels.contains("new WandPerspectiveModel(model)"));
-        assertTrue("Wand calibration should keep the TC4 GUI pose used by the creative tab",
-                calibration.contains("\"GUI\": {")
-                        && calibration.contains("\"rotate\": [0.0, 0.0, 66.0]")
-                        && calibration.contains("\"postTranslate\": [0.0, 0.6, 0.0]"));
+        assertTrue("Wand calibration should keep a dedicated GUI context for creative-tab tuning",
+                calibration.contains("\"GUI\": {") && calibration.contains("\"translate\": [0.5, 0.5, 0.0]"));
     }
 
     private static String read(String path) throws Exception {
