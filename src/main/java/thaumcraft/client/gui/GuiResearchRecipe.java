@@ -6,6 +6,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
@@ -52,6 +53,7 @@ public class GuiResearchRecipe extends GuiScreen {
     private final ResearchItem research;
     private final double guiMapX;
     private final double guiMapY;
+    private final FontRenderer researchFontRenderer;
     private ResearchPage[] pages;
     private int page;
     private int maxPages;
@@ -65,9 +67,12 @@ public class GuiResearchRecipe extends GuiScreen {
         this.research = research;
         this.guiMapX = guiMapX;
         this.guiMapY = guiMapY;
+        Minecraft minecraft = Minecraft.getMinecraft();
+        this.researchFontRenderer = new FontRenderer(minecraft.gameSettings,
+                new ResourceLocation("minecraft", "textures/font/ascii.png"), minecraft.getTextureManager(), true);
         ResearchPage[] sourcePages = research == null || research.getPages() == null ? new ResearchPage[0] : research.getPages();
         List<ResearchPage> visiblePages = new ArrayList<ResearchPage>();
-        EntityPlayer player = Minecraft.getMinecraft().player;
+        EntityPlayer player = minecraft.player;
         for (ResearchPage visiblePage : Arrays.asList(sourcePages)) {
             if (visiblePage != null && visiblePage.type == ResearchPage.PageType.TEXT_CONCEALED
                     && player != null && !ThaumcraftApiHelper.isResearchComplete(player.getName(), visiblePage.research)) {
@@ -542,80 +547,81 @@ public class GuiResearchRecipe extends GuiScreen {
     }
 
     private int drawMarkupText(String text, int x, int y, int width) {
-        int cursor = 0;
-        while (cursor < text.length()) {
-            int next = this.nextMarkupToken(text, cursor);
-            if (next < 0) {
-                y = this.drawWrappedSegment(text.substring(cursor), x, y, width);
-                break;
-            }
-            if (next > cursor) {
-                y = this.drawWrappedSegment(text.substring(cursor, next), x, y, width);
-            }
-            if (text.startsWith("<BR>", next)) {
-                y += this.fontRenderer.FONT_HEIGHT;
-                cursor = next + 4;
-            } else if (text.startsWith("<LINE>", next)) {
-                y = this.drawTextDivider(x, y, width);
-                cursor = next + 6;
-            } else if (text.startsWith("<IMG>", next)) {
-                int end = text.indexOf("</IMG>", next);
-                if (end < 0) {
-                    cursor = next + 5;
-                    continue;
-                }
-                y = this.drawImageToken(text.substring(next + 5, end), x, y, width);
-                cursor = end + 6;
+        List<String> inserts = new ArrayList<String>();
+        String formatted = this.prepareMarkupText(text, inserts);
+        List<String> lines = this.researchFontRenderer.listFormattedStringToWidth(formatted, width);
+        for (String line : lines) {
+            int insertion = this.markupInsertionIndex(line, inserts.size());
+            if (insertion < 0) {
+                this.researchFontRenderer.drawString(line, x, y, 0x303030);
             } else {
-                y = this.drawWrappedSegment(text.substring(next, next + 1), x, y, width);
-                cursor = next + 1;
-            }
-        }
-        return y;
-    }
-
-    private int nextMarkupToken(String text, int cursor) {
-        int br = text.indexOf("<BR>", cursor);
-        int line = text.indexOf("<LINE>", cursor);
-        int img = text.indexOf("<IMG>", cursor);
-        int next = -1;
-        if (br >= 0) {
-            next = br;
-        }
-        if (line >= 0 && (next < 0 || line < next)) {
-            next = line;
-        }
-        if (img >= 0 && (next < 0 || img < next)) {
-            next = img;
-        }
-        return next;
-    }
-
-    private int drawWrappedSegment(String segment, int x, int y, int width) {
-        if (segment == null || segment.isEmpty()) {
-            return y;
-        }
-        String[] paragraphs = segment.replace("\r", "").split("\n", -1);
-        for (int p = 0; p < paragraphs.length; ++p) {
-            if (!paragraphs[p].isEmpty()) {
-                List<String> lines = this.fontRenderer.listFormattedStringToWidth(paragraphs[p], width);
-                for (String line : lines) {
-                    this.fontRenderer.drawString(line, x, y, 0x303030);
-                    y += this.fontRenderer.FONT_HEIGHT;
+                String token = inserts.get(insertion);
+                if (token.startsWith("<LINE")) {
+                    this.drawTextDivider(x, y, width);
+                } else if (token.startsWith("<IMG>")) {
+                    int end = token.indexOf("</IMG>");
+                    if (end >= 0) {
+                        int imageBottom = this.drawImageToken(token.substring(5, end), x, y, width);
+                        y += Math.max(0, imageBottom - y - this.researchFontRenderer.FONT_HEIGHT);
+                    }
                 }
             }
-            if (p < paragraphs.length - 1) {
-                y += this.fontRenderer.FONT_HEIGHT;
-            }
+            y += this.researchFontRenderer.FONT_HEIGHT;
         }
         return y;
     }
 
-    private int drawTextDivider(int x, int y, int width) {
-        y += 4;
-        this.drawHorizontalLine(x, x + width, y, 0x885A4A32);
-        this.drawHorizontalLine(x, x + width, y + 1, 0x44FFFFFF);
-        return y + 8;
+    private String prepareMarkupText(String text, List<String> inserts) {
+        String formatted = (text == null ? "" : text).replace("\r", "").replace("<BR>", "\n").replace("<BR/>", "\n");
+        while (true) {
+            int line = formatted.indexOf("<LINE>");
+            int shortLine = formatted.indexOf("<LINE/>");
+            if (line < 0 || shortLine >= 0 && shortLine < line) {
+                line = shortLine;
+            }
+            int image = formatted.indexOf("<IMG>");
+            if (line < 0 && image < 0) {
+                return formatted;
+            }
+
+            if (line >= 0 && (image < 0 || line < image)) {
+                int length = formatted.startsWith("<LINE/>", line) ? 7 : 6;
+                int index = inserts.size();
+                inserts.add("<LINE>");
+                formatted = formatted.substring(0, line) + "\n@" + index + "@\n" + formatted.substring(line + length);
+                continue;
+            }
+
+            int end = formatted.indexOf("</IMG>", image + 5);
+            if (end < 0) {
+                formatted = formatted.substring(0, image) + formatted.substring(image + 5);
+                continue;
+            }
+            String token = formatted.substring(image, end + 6);
+            int index = inserts.size();
+            inserts.add(token);
+            formatted = formatted.substring(0, image) + "\n@" + index + "@\n" + formatted.substring(end + 6);
+        }
+    }
+
+    private int markupInsertionIndex(String line, int insertionCount) {
+        int start = line.indexOf('@');
+        int end = start < 0 ? -1 : line.indexOf('@', start + 1);
+        if (start < 0 || end <= start + 1) {
+            return -1;
+        }
+        try {
+            int index = Integer.parseInt(line.substring(start + 1, end));
+            return index >= 0 && index < insertionCount ? index : -1;
+        } catch (NumberFormatException ignored) {
+            return -1;
+        }
+    }
+
+    private void drawTextDivider(int x, int y, int width) {
+        this.mc.getTextureManager().bindTexture(TEXTURE);
+        GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+        this.drawTexturedModalRect(x + (width - 96) / 2, y + 2, 24, 184, 96, 4);
     }
 
     private int drawImageToken(String spec, int x, int y, int width) {
@@ -657,7 +663,7 @@ public class GuiResearchRecipe extends GuiScreen {
         buffer.pos(drawX + drawWidth, y, this.zLevel).tex(u1, v0).endVertex();
         buffer.pos(drawX, y, this.zLevel).tex(u0, v0).endVertex();
         tessellator.draw();
-        return y + drawHeight + 4;
+        return y + drawHeight;
     }
 
     private void drawOverlayScaled(int x, int y, int translateX, int translateY, int u, int v, int width, int height, float scale) {

@@ -37,6 +37,21 @@ public class GuiResearchRecipeStaticGuardTest {
         assertTrue(lang.contains("tc.inst.5=§4Dangerous§0"));
     }
 
+    @Test
+    public void thaumonomiconTextPagesShouldUseDedicatedUnicodeFontMetrics() throws IOException {
+        String source = read("src/main/java/thaumcraft/client/gui/GuiResearchRecipe.java");
+
+        assertTrue("Research text must use the dedicated forced-Unicode renderer expected by TC4 page layouts",
+                source.contains("private final FontRenderer researchFontRenderer;")
+                        && source.contains("new FontRenderer(")
+                        && source.contains("minecraft.getTextureManager(), true)")
+                        && source.contains("this.researchFontRenderer.listFormattedStringToWidth")
+                        && source.contains("this.researchFontRenderer.drawString"));
+        assertTrue("TC4 markup must be laid out with the same renderer in a single wrapped text pass",
+                source.contains("prepareMarkupText(text, inserts)")
+                        && source.contains("this.researchFontRenderer.FONT_HEIGHT"));
+    }
+
     private static String read(String path) throws IOException {
         return new String(Files.readAllBytes(Paths.get(path)), StandardCharsets.UTF_8);
     }
