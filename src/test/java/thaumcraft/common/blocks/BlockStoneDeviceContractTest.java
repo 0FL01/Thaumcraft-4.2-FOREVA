@@ -53,6 +53,14 @@ public class BlockStoneDeviceContractTest {
                         && source.contains("return 10;")
                         && blockstate.contains("\"type=8\": { \"model\": \"thaumcraft:blockstonedevice_8\" }"));
 
+        assertTrue("meta 0 should expose only the TC4 furnace fill and burn visuals through extended state",
+                source.contains("public static final IUnlistedProperty<Boolean> FILLED = new BooleanUnlistedProperty(\"filled\");")
+                        && source.contains("public static final IUnlistedProperty<Boolean> BURNING = new BooleanUnlistedProperty(\"burning\");")
+                        && source.contains("if (state.getValue(TYPE) != 0) {\n            return state;")
+                        && source.contains("((TileAlchemyFurnace) tile).vis > 0")
+                        && source.contains("((TileAlchemyFurnace) tile).isBurning()")
+                        && source.contains("new IUnlistedProperty[]{FILLED, BURNING}"));
+
         assertTrue("pedestal-family bounds should keep the reference outlines and the wand pedestal should retain stepped collision boxes",
                 source.contains("private static final AxisAlignedBB PEDESTAL_AABB = new AxisAlignedBB(0.25D, 0.0D, 0.25D, 0.75D, 0.99D, 0.75D);")
                         && source.contains("private static final AxisAlignedBB WAND_PEDESTAL_AABB = new AxisAlignedBB(0.25D, 0.0D, 0.25D, 0.75D, 1.0D, 0.75D);")

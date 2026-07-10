@@ -12,35 +12,32 @@ import static org.junit.Assert.assertTrue;
 public class AlchemyFurnaceAdvancedRendererFidelityStaticGuardTest {
 
     @Test
-    public void alchemyFurnaceAdvancedRendererUsesModelDrivenBaseTankAndGlowPaths() throws IOException {
-        String model = read("src/main/java/thaumcraft/client/renderers/models/ModelAlchemyFurnaceAdvanced.java");
+    public void alchemyFurnaceAdvancedRendererUsesTc4ObjAndOverlayPaths() throws IOException {
         String renderer = read("src/main/java/thaumcraft/client/renderers/tile/TileAlchemyFurnaceAdvancedRenderer.java");
         String alembic = read("src/main/java/thaumcraft/client/renderers/tile/TileAlembicRenderer.java");
         String alembicModel = read("src/main/java/thaumcraft/client/renderers/models/ModelAlembic.java");
         String furnaceBlockModel = read("src/main/resources/assets/thaumcraft/models/block/blockstonedevice_0.json");
 
-        assertTrue("ModelAlchemyFurnaceAdvanced should define base/tank/lava panels",
-                model.contains("class ModelAlchemyFurnaceAdvanced extends ModelBase")
-                        && model.contains("base")
-                        && model.contains("tankPanel")
-                        && model.contains("lavaPanel")
-                        && model.contains("renderBase(float scale)")
-                        && model.contains("renderTankPanel(float scale)")
-                        && model.contains("renderLavaPanel(float scale)"));
-
-        assertTrue("TileAlchemyFurnaceAdvancedRenderer should keep the dedicated tank-frame path plus reference-shaped vis/lava atlas overlays after the static shell moved into the block model",
-                renderer.contains("new ModelAlchemyFurnaceAdvanced()")
-                        && renderer.contains("model.renderTankPanel(MODEL_SCALE)")
-                        && renderer.contains("new ResourceLocation(\"thaumcraft\", \"blocks/al_furnace_top_filled\")")
+        assertTrue("TileAlchemyFurnaceAdvancedRenderer should preserve the TC4 OBJ groups and dynamic overlays",
+                renderer.contains("TileEntitySpecialRenderer<TileAlchemyFurnaceAdvanced>")
+                        && renderer.contains("CCModel.parseObjModels(FURNACE_MODEL)")
+                        && renderer.contains("models.get(\"Base\")")
+                        && renderer.contains("models.get(\"Tank\")")
+                        && renderer.contains("renderModel(this.base)")
+                        && renderer.contains("renderModel(this.tank)")
+                        && renderer.contains("atlas(\"thaumcraft:blocks/fluxgoo\")")
+                        && renderer.contains("atlas(\"thaumcraft:blocks/metalbase\")")
                         && renderer.contains("TextureMap.LOCATION_BLOCKS_TEXTURE")
-                        && renderer.contains("Blocks.LAVA.getDefaultState()")
-                        && renderer.contains("renderVisPanels(")
-                        && renderer.contains("renderHeatPanels(")
-                        && renderer.contains("drawAtlasQuad(")
-                        && renderer.contains("bindTexture(content > 0.0F ? TANK_ON : TANK);")
-                        && renderer.contains("for (int side = 0; side < 4; side++)")
+                        && renderer.contains("Blocks.FIRE.getDefaultState()")
+                        && renderer.contains("renderVis(")
+                        && renderer.contains("renderHeat(")
+                        && renderer.contains("renderQuadCenteredFromIcon(")
+                        && renderer.contains("bindTexture(tile.heat > 100 ? FURNACE_ON : FURNACE);")
+                        && renderer.contains("bindTexture(tile.vis > 0 ? TANK_ON : TANK);")
+                        && renderer.contains("for (int side = 0; side < 4; ++side)")
                         && renderer.contains("OpenGlHelper.setLightmapTextureCoords(")
-                        && !renderer.contains("model.renderBase(MODEL_SCALE)")
+                        && !renderer.contains("ModelAlchemyFurnaceAdvanced")
+                        && !renderer.contains("Blocks.LAVA")
                         && !renderer.contains("TileRenderHelper.orientBillboardToPlayer()")
                         && !renderer.contains("drawFurnaceGlowQuad("));
 
@@ -69,14 +66,13 @@ public class AlchemyFurnaceAdvancedRendererFidelityStaticGuardTest {
                         && !alembicModel.contains("extends ModelBase")
                         && !alembicModel.contains("new ModelRenderer("));
 
-        assertTrue("Alchemy furnace block model should now carry the static base and tank-panel shell instead of the old full-cube placeholder",
-                furnaceBlockModel.contains("\"ambientocclusion\": false")
-                        && furnaceBlockModel.contains("\"front\": \"thaumcraft:blocks/al_furnace_front_off\"")
-                        && furnaceBlockModel.contains("\"tank\": \"thaumcraft:models/alch_furnace_tank\"")
-                        && furnaceBlockModel.contains("\"from\": [0, 0, 0]")
-                        && furnaceBlockModel.contains("\"to\": [16, 14, 16]")
-                        && furnaceBlockModel.contains("\"from\": [4.5, 5, 0]")
-                        && furnaceBlockModel.contains("\"from\": [15, 5, 4.5]"));
+        assertTrue("Basic alchemy furnace block model should be the TC4 full-cube item fallback rather than the advanced furnace tank-panel shell",
+                furnaceBlockModel.contains("\"parent\": \"block/cube\"")
+                        && furnaceBlockModel.contains("\"down\": \"thaumcraft:blocks/al_furnace_top\"")
+                        && furnaceBlockModel.contains("\"up\": \"thaumcraft:blocks/al_furnace_top\"")
+                        && furnaceBlockModel.contains("\"north\": \"thaumcraft:blocks/al_furnace_front_off\"")
+                        && !furnaceBlockModel.contains("thaumcraft:models/alch_furnace_tank")
+                        && !furnaceBlockModel.contains("\"elements\""));
     }
 
     private static String read(String path) throws IOException {

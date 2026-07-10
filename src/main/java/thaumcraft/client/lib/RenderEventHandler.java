@@ -37,6 +37,7 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.oredict.OreDictionary;
 import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL14;
 import thaumcraft.api.IGoggles;
 import thaumcraft.api.aspects.Aspect;
 import thaumcraft.api.aspects.AspectList;
@@ -47,6 +48,8 @@ import thaumcraft.client.renderers.tile.HoleRenderBatchCache;
 import thaumcraft.common.entities.monster.mods.ChampionModifier;
 import thaumcraft.common.config.Config;
 import thaumcraft.common.items.relics.ItemThaumometer;
+import thaumcraft.common.lib.capabilities.IPlayerKnowledge;
+import thaumcraft.common.lib.capabilities.PlayerKnowledgeProvider;
 import thaumcraft.common.lib.utils.EntityUtils;
 import thaumcraft.common.lib.research.ScanManager;
 
@@ -69,6 +72,8 @@ public class RenderEventHandler {
             new ResourceLocation("thaumcraft", "textures/misc/vignette.png");
     private static final ResourceLocation NODE_SCAN_TEX =
             new ResourceLocation("thaumcraft", "textures/misc/nodes.png");
+    private static final ResourceLocation UNKNOWN_ASPECT_TEX =
+            new ResourceLocation("thaumcraft", "textures/aspects/_unknown.png");
     private static final int SCAN_GRID_RADIUS = 8;
     private static final int SCAN_GRID_SIZE = SCAN_GRID_RADIUS * 2 + 1;
     private static final int[][][] scannedBlocks = new int[SCAN_GRID_SIZE][SCAN_GRID_SIZE][SCAN_GRID_SIZE];
@@ -295,42 +300,113 @@ public class RenderEventHandler {
             return;
         }
         RenderManager renderManager = mc.getRenderManager();
+        IPlayerKnowledge knowledge = mc.player.getCapability(PlayerKnowledgeProvider.PLAYER_KNOWLEDGE, null);
         tagscale += (0.3F - tagscale) * 0.25F;
 
+        boolean depthEnabled = GL11.glIsEnabled(GL11.GL_DEPTH_TEST);
+        boolean depthMask = GL11.glGetBoolean(GL11.GL_DEPTH_WRITEMASK);
+        boolean lightingEnabled = GL11.glIsEnabled(GL11.GL_LIGHTING);
+        boolean blendEnabled = GL11.glIsEnabled(GL11.GL_BLEND);
+        boolean alphaEnabled = GL11.glIsEnabled(GL11.GL_ALPHA_TEST);
+        int alphaFunction = GL11.glGetInteger(GL11.GL_ALPHA_TEST_FUNC);
+        float alphaReference = GL11.glGetFloat(GL11.GL_ALPHA_TEST_REF);
+        int blendSrcRgb = GL11.glGetInteger(GL14.GL_BLEND_SRC_RGB);
+        int blendDstRgb = GL11.glGetInteger(GL14.GL_BLEND_DST_RGB);
+        int blendSrcAlpha = GL11.glGetInteger(GL14.GL_BLEND_SRC_ALPHA);
+        int blendDstAlpha = GL11.glGetInteger(GL14.GL_BLEND_DST_ALPHA);
+
         GlStateManager.pushMatrix();
-        GlStateManager.translate(x - renderManager.viewerPosX, y - renderManager.viewerPosY, z - renderManager.viewerPosZ);
-        GlStateManager.rotate(-renderManager.playerViewY, 0.0F, 1.0F, 0.0F);
-        GlStateManager.rotate(renderManager.playerViewX, 1.0F, 0.0F, 0.0F);
-        float scale = 0.01875F * Math.max(0.35F, tagscale / 0.3F);
-        GlStateManager.scale(-scale, -scale, scale);
-        GlStateManager.disableDepth();
-        GlStateManager.depthMask(false);
-        GlStateManager.disableLighting();
+        try {
+            GlStateManager.translate(x - renderManager.viewerPosX, y - renderManager.viewerPosY, z - renderManager.viewerPosZ);
+            GlStateManager.rotate(-renderManager.playerViewY, 0.0F, 1.0F, 0.0F);
+            GlStateManager.rotate(renderManager.playerViewX, 1.0F, 0.0F, 0.0F);
+            float scale = 0.01875F * Math.max(0.35F, tagscale / 0.3F);
+            GlStateManager.scale(-scale, -scale, scale);
+            GlStateManager.disableDepth();
+            GlStateManager.depthMask(false);
+            GlStateManager.disableLighting();
 
-        int posX = 0;
-        int posY = 0;
-        int rowSize = 5;
-        int remaining = aspects.size();
-        int baseX = Math.min(rowSize, remaining) * 8;
-        for (Aspect aspect : aspects.getAspectsSorted()) {
-            if (aspect == null) {
-                continue;
+            int posX = 0;
+            int posY = 0;
+            int rowSize = 5;
+            int remaining = aspects.size();
+            int baseX = Math.min(rowSize, remaining) * 8;
+            for (Aspect aspect : aspects.getAspectsSorted()) {
+                if (aspect == null) {
+                    continue;
+                }
+                int tagX = -baseX + posX * 16;
+                int tagY = -8 + posY * 16;
+                int amount = aspects.getAmount(aspect);
+                if (knowledge == null || !knowledge.hasDiscoveredAspect(aspect)) {
+                    drawUnknownAspectTag(tagX, tagY, aspect, amount, bright);
+                } else {
+                    UtilsFX.drawTag(tagX, tagY, aspect, amount, 0, 0.0D, bright, 1.0F, false);
+                }
+                if (++posX >= rowSize) {
+                    posX = 0;
+                    remaining -= rowSize;
+                    posY++;
+                    baseX = Math.min(rowSize, remaining) * 8;
+                }
             }
-            UtilsFX.drawTag(-baseX + posX * 16, -8 + posY * 16, aspect,
-                    aspects.getAmount(aspect), 0, 0.0D, bright, 1.0F, false);
-            if (++posX >= rowSize) {
-                posX = 0;
-                remaining -= rowSize;
-                posY++;
-                baseX = Math.min(rowSize, remaining) * 8;
-            }
+        } finally {
+            GlStateManager.depthMask(depthMask);
+            if (depthEnabled) GlStateManager.enableDepth(); else GlStateManager.disableDepth();
+            if (lightingEnabled) GlStateManager.enableLighting(); else GlStateManager.disableLighting();
+            GlStateManager.tryBlendFuncSeparate(blendSrcRgb, blendDstRgb, blendSrcAlpha, blendDstAlpha);
+            if (blendEnabled) GlStateManager.enableBlend(); else GlStateManager.disableBlend();
+            GlStateManager.alphaFunc(alphaFunction, alphaReference);
+            if (alphaEnabled) GlStateManager.enableAlpha(); else GlStateManager.disableAlpha();
+            GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+            GlStateManager.popMatrix();
         }
+    }
 
-        GlStateManager.depthMask(true);
-        GlStateManager.enableDepth();
-        GlStateManager.enableLighting();
-        GlStateManager.popMatrix();
-        GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+    private static void drawUnknownAspectTag(int x, int y, Aspect aspect, int amount, int blend) {
+        int color = aspect.getColor();
+        float red = (color >> 16 & 255) / 255.0F;
+        float green = (color >> 8 & 255) / 255.0F;
+        float blue = (color & 255) / 255.0F;
+
+        GlStateManager.pushMatrix();
+        try {
+            GlStateManager.disableLighting();
+            GlStateManager.alphaFunc(GL11.GL_GREATER, 0.003921569F);
+            GlStateManager.enableBlend();
+            GlStateManager.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA,
+                    blend == 1 ? GlStateManager.DestFactor.ONE : GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
+            UtilsFX.bindTexture(UNKNOWN_ASPECT_TEX);
+            GlStateManager.color(red, green, blue, 0.75F);
+            UtilsFX.drawTexturedQuadFull(x, y, 0.0D);
+
+            if (amount > 0) {
+                GlStateManager.pushMatrix();
+                try {
+                    Minecraft mc = Minecraft.getMinecraft();
+                    GlStateManager.scale(0.5F, 0.5F, 0.5F);
+                    GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+                    String amountText = Integer.toString(amount);
+                    int width = mc.fontRenderer.getStringWidth(amountText);
+                    if (blend > 1) {
+                        mc.fontRenderer.drawString(amountText, 31 - width + x * 2, 32 - mc.fontRenderer.FONT_HEIGHT + y * 2, 0);
+                        mc.fontRenderer.drawString(amountText, 33 - width + x * 2, 32 - mc.fontRenderer.FONT_HEIGHT + y * 2, 0);
+                        mc.fontRenderer.drawString(amountText, 32 - width + x * 2, 31 - mc.fontRenderer.FONT_HEIGHT + y * 2, 0);
+                        mc.fontRenderer.drawString(amountText, 32 - width + x * 2, 33 - mc.fontRenderer.FONT_HEIGHT + y * 2, 0);
+                    }
+                    mc.fontRenderer.drawString(amountText, 32 - width + x * 2,
+                            32 - mc.fontRenderer.FONT_HEIGHT + y * 2, 0xFFFFFF);
+                } finally {
+                    GlStateManager.popMatrix();
+                }
+            }
+        } finally {
+            GlStateManager.disableBlend();
+            GlStateManager.enableLighting();
+            GlStateManager.alphaFunc(GL11.GL_GREATER, 0.1F);
+            GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+            GlStateManager.popMatrix();
+        }
     }
 
     private static void renderScannedBlocks(float partialTicks, EntityPlayer player, long now) {

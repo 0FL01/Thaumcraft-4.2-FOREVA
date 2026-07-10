@@ -34,6 +34,15 @@ public class ReportedTextureUvParityContractTest {
     }
 
     @Test
+    public void dynamicallyRenderedValveSpriteShouldBeExplicitlyStitched() throws IOException {
+        String registry = read("src/main/java/thaumcraft/client/ClientModelRegistry.java");
+        String renderer = read("src/main/java/thaumcraft/client/renderers/tile/TileTubeValveRenderer.java");
+        assertTrue(renderer.contains("thaumcraft:blocks/pipe_valve"));
+        assertTrue(registry.contains("new ResourceLocation(\"thaumcraft\", \"blocks/pipe_valve\")"));
+        assertTrue(registry.contains("registerSprite(PIPE_VALVE_SPRITE)"));
+    }
+
+    @Test
     public void lampItemsShouldUseDedicatedAnimatedInventoryShells() throws IOException {
         String proxy = read("src/main/java/thaumcraft/client/ClientProxy.java");
         String stitcher = read("src/main/java/thaumcraft/client/ClientModelRegistry.java");

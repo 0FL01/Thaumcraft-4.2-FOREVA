@@ -268,6 +268,7 @@ import thaumcraft.common.entities.projectile.EntityPrimalArrow;
 import thaumcraft.common.entities.projectile.EntityPrimalOrb;
 import thaumcraft.common.entities.projectile.EntityShockOrb;
 import thaumcraft.common.tiles.TileAlchemyFurnace;
+import thaumcraft.common.tiles.TileAlchemyFurnaceAdvanced;
 import thaumcraft.common.tiles.TileArcaneBore;
 import thaumcraft.common.tiles.TileArcaneLamp;
 import thaumcraft.common.tiles.TileArcaneLampFertility;
@@ -1091,7 +1092,7 @@ public class ClientProxy extends CommonProxy {
         ClientRegistry.bindTileEntitySpecialRenderer(TileNodeConverter.class, new TileNodeConverterRenderer());
         ClientRegistry.bindTileEntitySpecialRenderer(TileVisRelay.class, new TileVisRelayRenderer());
 
-        ClientRegistry.bindTileEntitySpecialRenderer(TileAlchemyFurnace.class, new TileAlchemyFurnaceAdvancedRenderer());
+        ClientRegistry.bindTileEntitySpecialRenderer(TileAlchemyFurnaceAdvanced.class, new TileAlchemyFurnaceAdvancedRenderer());
         ClientRegistry.bindTileEntitySpecialRenderer(TileBellows.class, new TileBellowsRenderer());
         ClientRegistry.bindTileEntitySpecialRenderer(TileTable.class, new TileTableRenderer());
         ClientRegistry.bindTileEntitySpecialRenderer(TileCrucible.class, new TileCrucibleRenderer());

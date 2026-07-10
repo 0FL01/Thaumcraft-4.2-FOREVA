@@ -6,11 +6,14 @@ import net.minecraft.inventory.ISidedInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
+import net.minecraft.network.NetworkManager;
+import net.minecraft.network.play.server.SPacketUpdateTileEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityFurnace;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ITickable;
 import net.minecraft.util.text.ITextComponent;
+import net.minecraft.world.EnumSkyBlock;
 import thaumcraft.api.TileThaumcraft;
 import thaumcraft.api.aspects.Aspect;
 import thaumcraft.api.aspects.AspectList;
@@ -87,6 +90,7 @@ public class TileAlchemyFurnace extends TileThaumcraft implements ITickable, ISi
             if (wasBurning != this.furnaceBurnTime > 0) {
                 dirty = true;
                 this.notifyUpdate();
+                this.world.checkLightFor(EnumSkyBlock.BLOCK, this.pos);
             }
         }
 
@@ -107,11 +111,11 @@ public class TileAlchemyFurnace extends TileThaumcraft implements ITickable, ISi
             if (alembic.aspect != null && alembic.amount < alembic.maxAmount
                     && (alembic.aspectFilter == null || alembic.aspectFilter == alembic.aspect)
                     && this.aspects.getAmount(alembic.aspect) > 0) {
-                this.takeFromContainer(alembic.aspect, 1);
-                alembic.addToContainer(alembic.aspect, 1);
-                exclude.merge(alembic.aspect, 1);
-                this.notifyUpdate();
-                alembic.markDirty();
+                Aspect aspect = alembic.aspect;
+                if (this.takeFromContainer(aspect, 1) && alembic.addToContainer(aspect, 1) == 0) {
+                    exclude.merge(aspect, 1);
+                    this.notifyUpdate(alembic);
+                }
             }
         }
 
@@ -124,18 +128,17 @@ public class TileAlchemyFurnace extends TileThaumcraft implements ITickable, ISi
 
             Aspect aspect;
             if (alembic.aspectFilter != null) {
-                if (this.aspects.getAmount(alembic.aspectFilter) <= 0) continue;
                 aspect = alembic.aspectFilter;
+                if (!this.takeFromContainer(aspect, 1)) continue;
             } else {
                 aspect = this.takeRandomAspect(exclude);
             }
             if (aspect == null) continue;
-            if (aspect == alembic.aspectFilter) this.takeFromContainer(aspect, 1);
 
-            alembic.addToContainer(aspect, 1);
-            this.notifyUpdate();
-            alembic.markDirty();
-            break;
+            if (alembic.addToContainer(aspect, 1) == 0) {
+                this.notifyUpdate(alembic);
+                break;
+            }
         }
     }
 
@@ -195,6 +198,7 @@ public class TileAlchemyFurnace extends TileThaumcraft implements ITickable, ISi
         this.aspects.remove(aspect, 1);
         this.vis = this.aspects.visSize();
         this.markDirty();
+        this.notifyUpdate();
         return aspect;
     }
 
@@ -203,6 +207,7 @@ public class TileAlchemyFurnace extends TileThaumcraft implements ITickable, ISi
             this.aspects.remove(aspect, amount);
             this.vis = this.aspects.visSize();
             this.markDirty();
+            this.notifyUpdate();
             return true;
         }
         return false;
@@ -215,7 +220,9 @@ public class TileAlchemyFurnace extends TileThaumcraft implements ITickable, ISi
         this.furnaceCookTime = nbt.getShort("CookTime");
         this.speedBoost = nbt.getBoolean("speedBoost");
         this.aspects.readFromNBT(nbt);
-        this.vis = this.aspects.visSize();
+        this.vis = nbt.hasKey("Vis")
+                ? Math.max(0, nbt.getShort("Vis"))
+                : this.aspects.visSize();
         if (nbt.hasKey("CustomName")) {
             this.customName = nbt.getString("CustomName");
         }
@@ -236,6 +243,7 @@ public class TileAlchemyFurnace extends TileThaumcraft implements ITickable, ISi
         nbt.setShort("BurnTime", (short) this.furnaceBurnTime);
         nbt.setShort("CurrentBurnTime", (short) this.currentItemBurnTime);
         nbt.setShort("CookTime", (short) this.furnaceCookTime);
+        nbt.setShort("Vis", (short) this.vis);
         nbt.setBoolean("speedBoost", this.speedBoost);
         this.aspects.writeToNBT(nbt);
         if (this.hasCustomName()) {
@@ -251,6 +259,24 @@ public class TileAlchemyFurnace extends TileThaumcraft implements ITickable, ISi
             items.appendTag(itemTag);
         }
         nbt.setTag("Items", items);
+    }
+
+    @Override
+    public void onDataPacket(NetworkManager net, SPacketUpdateTileEntity pkt) {
+        super.onDataPacket(net, pkt);
+        this.relight();
+    }
+
+    @Override
+    public void handleUpdateTag(NBTTagCompound tag) {
+        super.handleUpdateTag(tag);
+        this.relight();
+    }
+
+    private void relight() {
+        if (this.world != null && this.pos != null) {
+            this.world.checkLightFor(EnumSkyBlock.BLOCK, this.pos);
+        }
     }
 
     public int getCookProgressScaled(int scale) {
@@ -425,8 +451,13 @@ public class TileAlchemyFurnace extends TileThaumcraft implements ITickable, ISi
     }
 
     private void notifyUpdate() {
+        this.notifyUpdate(this);
+    }
+
+    private void notifyUpdate(TileEntity tile) {
         if (this.world != null && !this.world.isRemote) {
-            this.world.notifyBlockUpdate(this.pos, this.world.getBlockState(this.pos), this.world.getBlockState(this.pos), 3);
+            this.world.notifyBlockUpdate(tile.getPos(), this.world.getBlockState(tile.getPos()),
+                    this.world.getBlockState(tile.getPos()), 3);
         }
     }
 }

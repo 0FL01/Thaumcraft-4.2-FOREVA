@@ -33,6 +33,7 @@ public class ConfigBlocks {
     public static BlockMirror blockMirror;
     public static BlockEssentiaReservoir blockEssentiaReservoir;
     public static BlockArcaneFurnace blockArcaneFurnace;
+    public static BlockAlchemyFurnace blockAlchemyFurnace;
     public static BlockMagicalLog blockMagicalLog;
     public static BlockMagicalLeaves blockMagicalLeaves;
     public static BlockCustomOre blockCustomOre;
@@ -122,6 +123,10 @@ public class ConfigBlocks {
         blockArcaneFurnace = (BlockArcaneFurnace) new BlockArcaneFurnace()
                 .setRegistryName("thaumcraft", legacyPath("blockArcaneFurnace"))
                 .setTranslationKey("thaumcraft.arcane_furnace");
+
+        blockAlchemyFurnace = (BlockAlchemyFurnace) new BlockAlchemyFurnace()
+                .setRegistryName("thaumcraft", legacyPath("blockAlchemyFurnace"))
+                .setTranslationKey("thaumcraft.alchemy_furnace_advanced");
 
         blockMagicalLog = (BlockMagicalLog) new BlockMagicalLog()
                 .setRegistryName("thaumcraft", legacyPath("blockMagicalLog"))
@@ -304,6 +309,7 @@ public class ConfigBlocks {
                 blockMirror,
                 blockEssentiaReservoir,
                 blockArcaneFurnace,
+                blockAlchemyFurnace,
                 blockMagicalLog,
                 blockMagicalLeaves,
                 blockCustomOre,
@@ -498,6 +504,8 @@ public class ConfigBlocks {
             new TileRegistration(TilePedestal.class, "TilePedestal"),
             new TileRegistration(TileWandPedestal.class, "TileWandPedestal"),
             new TileRegistration(TileAlchemyFurnace.class, "TileAlchemyFurnace"),
+            new TileRegistration(TileAlchemyFurnaceAdvanced.class, "TileAlchemyFurnaceAdvanced"),
+            new TileRegistration(TileAlchemyFurnaceAdvancedNozzle.class, "TileAlchemyFurnaceAdvancedNozzle"),
             new TileRegistration(TileInfusionMatrix.class, "TileInfusionStone"),
             new TileRegistration(TileInfusionPillar.class, "TileInfusionPillar"),
             new TileRegistration(TileNodeStabilizer.class, "TileNodeStabilizer"),

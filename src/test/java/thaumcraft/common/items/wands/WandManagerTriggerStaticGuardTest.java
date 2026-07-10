@@ -68,10 +68,27 @@ public class WandManagerTriggerStaticGuardTest {
         assertTrue(source.contains("return ((TileEldritchAltar) tile).onWandRightClick(world, wandStack, player, x, y, z, side, meta) == 1;"));
         assertTrue(source.contains("private static boolean createAdvancedAlchemicalFurnace("));
         assertTrue(source.contains("new AspectList().add(Aspect.FIRE, 50).add(Aspect.WATER, 50).add(Aspect.ORDER, 50)"));
-        assertTrue(source.contains("return matchesAdvancedAlchemyInput(world, center, 1) ? 1 : (matchesAdvancedAlchemyInput(world, center, -1) ? -1 : 0);"));
-        assertTrue(source.contains("world.getBlockState(basePos).getValue(thaumcraft.common.blocks.BlockMetalDevice.TYPE)"));
-        assertTrue(source.contains("world.setBlockState(basePos, ConfigBlocks.blockMetalDevice.getDefaultState()"));
-        assertTrue(source.contains("world.setBlockState(ringPos, ConfigBlocks.blockMetalDevice.getDefaultState()"));
+        assertTrue(source.contains("matchesMetalDeviceRing(world, center, 0, 3, 3)"));
+        assertTrue(source.contains("matchesMetalDeviceRing(world, center, 1, 1, 9)"));
+        assertTrue(source.indexOf("if (matchesAdvancedAlchemyInput(world, center))")
+                < source.indexOf("int legacyRingOffset = findLegacyAdvancedAlchemyRingOffset(world, center);"));
+        assertFalse(source.contains("matchesAdvancedAlchemyInput(world, center, -1)"));
+        assertTrue(source.contains("matchesLegacyAdvancedAlchemyLayout(world, center, -1)"));
+        assertFalse(source.contains("matchesLegacyAdvancedAlchemyLayout(world, center, 1)"));
+        assertTrue(source.indexOf("int legacyRingOffset = findLegacyAdvancedAlchemyRingOffset(world, center);")
+                < source.lastIndexOf("wand.consumeAllVisCrafting(wandStack, player,"));
+        assertTrue(source.contains("matchesMetalDeviceRing(world, center, ringOffset, 1, 9)"));
+        assertTrue(source.contains("hasSafeLegacyShellTileData(world, center, ringOffset)"));
+        assertTrue(source.contains("alembic.aspect != null || alembic.aspectFilter != null || alembic.amount != 0"));
+        assertTrue(source.contains("!world.isAirBlock(center.add(dx, 1, dz))"));
+        assertTrue(source.contains("old upper output is byte-for-byte identical to the canonical TC4 input"));
+        assertTrue(source.contains("matchesAdvancedAlchemyFurnace(world, center)"));
+        assertTrue(source.contains("ConfigBlocks.blockAlchemyFurnace.getStateFromMeta(0)"));
+        assertTrue(source.contains("ConfigBlocks.blockAlchemyFurnace.getStateFromMeta(corner ? 4 : 1)"));
+        assertTrue(source.contains("ConfigBlocks.blockAlchemyFurnace.getStateFromMeta(corner ? 2 : 3)"));
+        assertTrue(source.contains("world.setBlockToAir(center.add(dx, legacyRingOffset, dz))"));
+        assertTrue(source.contains("sourceData.removeTag(\"Items\")"));
+        assertTrue(source.contains("transferOrDropInventory(world, center, inventory)"));
         assertTrue(source.contains("new PacketFXBlockSparkle(center.getX(), center.getY(), center.getZ(), -9999)"));
         assertTrue(source.contains("Blocks.NETHER_BRICK"));
         assertTrue(source.contains("Blocks.IRON_BARS"));

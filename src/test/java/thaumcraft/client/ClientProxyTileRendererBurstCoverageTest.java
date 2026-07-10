@@ -25,7 +25,7 @@ public class ClientProxyTileRendererBurstCoverageTest {
         assertTrue(source.contains("ClientRegistry.bindTileEntitySpecialRenderer(TileNodeStabilizer.class, new TileNodeStabilizerRenderer());"));
         assertTrue(source.contains("ClientRegistry.bindTileEntitySpecialRenderer(TileNodeConverter.class, new TileNodeConverterRenderer());"));
         assertTrue(source.contains("ClientRegistry.bindTileEntitySpecialRenderer(TileVisRelay.class, new TileVisRelayRenderer());"));
-        assertTrue(source.contains("ClientRegistry.bindTileEntitySpecialRenderer(TileAlchemyFurnace.class, new TileAlchemyFurnaceAdvancedRenderer());"));
+        assertTrue(source.contains("ClientRegistry.bindTileEntitySpecialRenderer(TileAlchemyFurnaceAdvanced.class, new TileAlchemyFurnaceAdvancedRenderer());"));
         assertTrue(source.contains("ClientRegistry.bindTileEntitySpecialRenderer(TileBellows.class, new TileBellowsRenderer());"));
         assertTrue(source.contains("ClientRegistry.bindTileEntitySpecialRenderer(TileTable.class, new TileTableRenderer());"));
         assertTrue(source.contains("ClientRegistry.bindTileEntitySpecialRenderer(TileCrucible.class, new TileCrucibleRenderer());"));

@@ -15,6 +15,7 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import thaumcraft.client.renderers.block.ArcaneFurnaceBakedModel;
+import thaumcraft.client.renderers.block.AlchemyFurnaceBakedModel;
 import thaumcraft.client.renderers.item.CrystalPerspectiveModel;
 import thaumcraft.client.renderers.item.ThaumometerPerspectiveModel;
 import thaumcraft.client.renderers.item.TrunkSpawnerPerspectiveModel;
@@ -39,6 +40,12 @@ public final class ClientModelRegistry {
             new ResourceLocation("thaumcraft", "items/focus_pech_depth");
     static final ResourceLocation FROST_SHARD_SPRITE =
             new ResourceLocation("thaumcraft", "blocks/frostshard");
+    static final ResourceLocation PIPE_VALVE_SPRITE =
+            new ResourceLocation("thaumcraft", "blocks/pipe_valve");
+    static final ResourceLocation ADVANCED_FURNACE_FLUXGOO_SPRITE =
+            new ResourceLocation("thaumcraft", "blocks/fluxgoo");
+    static final ResourceLocation ADVANCED_FURNACE_METALBASE_SPRITE =
+            new ResourceLocation("thaumcraft", "blocks/metalbase");
     private static final ResourceLocation FROST_SHARD_OBJ =
             new ResourceLocation("thaumcraft", "textures/models/orb.obj");
     private static IBakedModel frostShardModel;
@@ -60,6 +67,11 @@ public final class ClientModelRegistry {
     public static void onTextureStitchPre(TextureStitchEvent.Pre event) {
         event.getMap().registerSprite(FOCUS_PECH_DEPTH_SPRITE);
         event.getMap().registerSprite(FROST_SHARD_SPRITE);
+        event.getMap().registerSprite(PIPE_VALVE_SPRITE);
+        event.getMap().registerSprite(ADVANCED_FURNACE_FLUXGOO_SPRITE);
+        event.getMap().registerSprite(ADVANCED_FURNACE_METALBASE_SPRITE);
+        event.getMap().registerSprite(new ResourceLocation("thaumcraft", "blocks/al_furnace_top_filled"));
+        event.getMap().registerSprite(new ResourceLocation("thaumcraft", "blocks/al_furnace_front_on"));
         event.getMap().registerSprite(new ResourceLocation("thaumcraft", "blocks/lamp_grow_top_off"));
         event.getMap().registerSprite(new ResourceLocation("thaumcraft", "blocks/lamp_grow_side_off"));
         event.getMap().registerSprite(new ResourceLocation("thaumcraft", "blocks/lamp_fert_top_off"));
@@ -92,6 +104,7 @@ public final class ClientModelRegistry {
             event.getModelRegistry().putObject(BLOCKWOODENDEVICE_BANNER_MODEL, new WoodenDevicePerspectiveModel(model));
         }
         bakeFrostShardModel(event);
+        replaceAlchemyFurnaceModel(event);
         replaceArcaneFurnaceModels(event);
     }
 
@@ -110,6 +123,14 @@ public final class ClientModelRegistry {
                     location -> event.getModelManager().getTextureMap().getAtlasSprite(location.toString()));
         } catch (Exception e) {
             Thaumcraft.log.error("Unable to bake frost shard model {}", FROST_SHARD_OBJ, e);
+        }
+    }
+
+    private static void replaceAlchemyFurnaceModel(ModelBakeEvent event) {
+        ModelResourceLocation location = new ModelResourceLocation("thaumcraft:blockstonedevice", "type=0");
+        IBakedModel delegate = event.getModelRegistry().getObject(location);
+        if (delegate != null) {
+            event.getModelRegistry().putObject(location, new AlchemyFurnaceBakedModel(delegate));
         }
     }
 

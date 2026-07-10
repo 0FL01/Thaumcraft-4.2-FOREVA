@@ -1,89 +1,13 @@
 {
+  "parent": "block/cube",
   "ambientocclusion": false,
-  "display": {
-    "gui": {
-      "rotation": [300, 0, 45],
-      "translation": [0, 0, 0],
-      "scale": [0.275, 0.275, 0.275]
-    },
-    "ground": {
-      "rotation": [0, 0, 0],
-      "translation": [0, 3, 0],
-      "scale": [0.25, 0.25, 0.25]
-    },
-    "fixed": {
-      "rotation": [0, 0, 0],
-      "translation": [0, 0, 0],
-      "scale": [0.5, 0.5, 0.5]
-    },
-    "thirdperson_righthand": {
-      "rotation": [75, 45, 0],
-      "translation": [0, 2.5, 0],
-      "scale": [0.375, 0.375, 0.375]
-    },
-    "thirdperson_lefthand": {
-      "rotation": [75, 225, 0],
-      "translation": [0, 2.5, 0],
-      "scale": [0.375, 0.375, 0.375]
-    },
-    "firstperson_righthand": {
-      "rotation": [0, 45, 0],
-      "translation": [0, 0, 0],
-      "scale": [0.4, 0.4, 0.4]
-    },
-    "firstperson_lefthand": {
-      "rotation": [0, 225, 0],
-      "translation": [0, 0, 0],
-      "scale": [0.4, 0.4, 0.4]
-    }
-  },
   "textures": {
-    "particle": "#side",
-    "top": "thaumcraft:blocks/al_furnace_top",
-    "front": "thaumcraft:blocks/al_furnace_front_off",
-    "side": "thaumcraft:blocks/al_furnace_side",
-    "tank": "thaumcraft:models/alch_furnace_tank"
-  },
-  "elements": [
-    {
-      "from": [0, 0, 0],
-      "to": [16, 14, 16],
-      "faces": {
-        "down": { "texture": "#top" },
-        "up": { "texture": "#top" },
-        "north": { "texture": "#front" },
-        "south": { "texture": "#side" },
-        "west": { "texture": "#side" },
-        "east": { "texture": "#side" }
-      }
-    },
-    {
-      "from": [4.5, 5, 0],
-      "to": [11.5, 15, 1],
-      "faces": {
-        "north": { "texture": "#tank" }
-      }
-    },
-    {
-      "from": [4.5, 5, 15],
-      "to": [11.5, 15, 16],
-      "faces": {
-        "south": { "texture": "#tank" }
-      }
-    },
-    {
-      "from": [0, 5, 4.5],
-      "to": [1, 15, 11.5],
-      "faces": {
-        "west": { "texture": "#tank" }
-      }
-    },
-    {
-      "from": [15, 5, 4.5],
-      "to": [16, 15, 11.5],
-      "faces": {
-        "east": { "texture": "#tank" }
-      }
-    }
-  ]
+    "particle": "thaumcraft:blocks/al_furnace_side",
+    "down": "thaumcraft:blocks/al_furnace_top",
+    "up": "thaumcraft:blocks/al_furnace_top",
+    "north": "thaumcraft:blocks/al_furnace_front_off",
+    "south": "thaumcraft:blocks/al_furnace_front_off",
+    "west": "thaumcraft:blocks/al_furnace_front_off",
+    "east": "thaumcraft:blocks/al_furnace_front_off"
+  }
 }

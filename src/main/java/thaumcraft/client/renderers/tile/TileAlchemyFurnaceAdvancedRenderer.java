@@ -1,5 +1,6 @@
 package thaumcraft.client.renderers.tile;
 
+import java.util.Map;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
@@ -11,11 +12,16 @@ import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.ResourceLocation;
-import thaumcraft.client.renderers.models.ModelAlchemyFurnaceAdvanced;
-import thaumcraft.common.tiles.TileAlchemyFurnace;
 import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL12;
+import org.lwjgl.opengl.GL14;
+import thaumcraft.codechicken.lib.render.CCModel;
+import thaumcraft.codechicken.lib.render.CCRenderState;
+import thaumcraft.common.tiles.TileAlchemyFurnaceAdvanced;
 
-public class TileAlchemyFurnaceAdvancedRenderer extends TileEntitySpecialRenderer<TileAlchemyFurnace> {
+public class TileAlchemyFurnaceAdvancedRenderer extends TileEntitySpecialRenderer<TileAlchemyFurnaceAdvanced> {
+    private static final ResourceLocation FURNACE_MODEL =
+            new ResourceLocation("thaumcraft", "textures/models/adv_alch_furnace.obj");
     private static final ResourceLocation FURNACE =
             new ResourceLocation("thaumcraft", "textures/models/alch_furnace.png");
     private static final ResourceLocation FURNACE_ON =
@@ -24,151 +30,193 @@ public class TileAlchemyFurnaceAdvancedRenderer extends TileEntitySpecialRendere
             new ResourceLocation("thaumcraft", "textures/models/alch_furnace_tank.png");
     private static final ResourceLocation TANK_ON =
             new ResourceLocation("thaumcraft", "textures/models/alch_furnace_tank_on.png");
-    private static final ResourceLocation PANEL_BACKING =
-            new ResourceLocation("thaumcraft", "blocks/al_furnace_side");
-    private static final ResourceLocation PANEL_FILL =
-            new ResourceLocation("thaumcraft", "blocks/al_furnace_top_filled");
-    private static final float MODEL_SCALE = 0.0625F;
 
-    private final ModelAlchemyFurnaceAdvanced model = new ModelAlchemyFurnaceAdvanced();
+    private final CCModel base;
+    private final CCModel tank;
+
+    public TileAlchemyFurnaceAdvancedRenderer() {
+        Map<String, CCModel> models = CCModel.parseObjModels(FURNACE_MODEL);
+        this.base = models.get("Base");
+        this.tank = models.get("Tank");
+        if (this.base == null || this.tank == null) {
+            throw new IllegalStateException("Advanced alchemical furnace OBJ is missing Base or Tank");
+        }
+    }
 
     @Override
-    public void render(TileAlchemyFurnace tile, double x, double y, double z, float partialTicks, int destroyStage, float alpha) {
-        if (tile == null || tile.getWorld() == null) {
+    public void render(TileAlchemyFurnaceAdvanced tile, double x, double y, double z,
+                       float partialTicks, int destroyStage, float alpha) {
+        if (tile == null) {
             return;
         }
 
-        float content = Math.min(1.0F, tile.vis / 50.0F);
-        boolean burning = tile.isBurning();
-        float ticks = TileRenderHelper.ticks(tile, partialTicks);
-        float pulse = burning ? (0.85F + (float) Math.sin(ticks / 6.0F) * 0.15F) : 0.65F;
-        float heatNorm = tile.currentItemBurnTime <= 0 ? 0.0F : Math.min(1.0F, (float) tile.furnaceBurnTime / (float) tile.currentItemBurnTime);
-        TextureAtlasSprite panelBacking = atlas(PANEL_BACKING);
-        TextureAtlasSprite panelFill = atlas(PANEL_FILL);
-        TextureAtlasSprite lava = Minecraft.getMinecraft().getBlockRendererDispatcher()
-                .getBlockModelShapes()
-                .getTexture(Blocks.LAVA.getDefaultState());
+        TextureAtlasSprite fluxgoo = atlas("thaumcraft:blocks/fluxgoo");
+        TextureAtlasSprite metalbase = atlas("thaumcraft:blocks/metalbase");
+        TextureAtlasSprite fire = Minecraft.getMinecraft().getBlockRendererDispatcher()
+                .getBlockModelShapes().getTexture(Blocks.FIRE.getDefaultState());
+        float previousLightX = OpenGlHelper.lastBrightnessX;
+        float previousLightY = OpenGlHelper.lastBrightnessY;
+        boolean blendEnabled = GL11.glIsEnabled(GL11.GL_BLEND);
+        boolean lightingEnabled = GL11.glIsEnabled(GL11.GL_LIGHTING);
+        boolean rescaleNormalEnabled = GL11.glIsEnabled(GL12.GL_RESCALE_NORMAL);
+        int blendSrcRgb = GL11.glGetInteger(GL14.GL_BLEND_SRC_RGB);
+        int blendDstRgb = GL11.glGetInteger(GL14.GL_BLEND_DST_RGB);
+        int blendSrcAlpha = GL11.glGetInteger(GL14.GL_BLEND_SRC_ALPHA);
+        int blendDstAlpha = GL11.glGetInteger(GL14.GL_BLEND_DST_ALPHA);
 
         GlStateManager.pushMatrix();
-        GlStateManager.translate(x + 0.5D, y, z + 0.5D);
-        GlStateManager.rotate(90.0F, -1.0F, 0.0F, 0.0F);
-        GlStateManager.disableLighting();
-        GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+        try {
+            GlStateManager.translate(x + 0.5D, y, z + 0.5D);
+            GlStateManager.rotate(90.0F, -1.0F, 0.0F, 0.0F);
+            GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+            if (!rescaleNormalEnabled) {
+                GlStateManager.enableRescaleNormal();
+            }
 
-        bindTexture(content > 0.0F ? TANK_ON : TANK);
-        for (int side = 0; side < 4; side++) {
-            GlStateManager.pushMatrix();
-            GlStateManager.rotate(side * 90.0F, 0.0F, 0.0F, 1.0F);
-            model.renderTankPanel(MODEL_SCALE);
+            bindTexture(tile.heat > 100 ? FURNACE_ON : FURNACE);
+            renderModel(this.base);
+
+            bindTexture(tile.vis > 0 ? TANK_ON : TANK);
+            for (int side = 0; side < 4; ++side) {
+                GlStateManager.pushMatrix();
+                try {
+                    GlStateManager.rotate(90.0F * side, 0.0F, 0.0F, 1.0F);
+                    renderModel(this.tank);
+                } finally {
+                    GlStateManager.popMatrix();
+                }
+            }
+
+            if (tile.vis > 0) {
+                renderVis(tile, fluxgoo, metalbase);
+            }
+            if (tile.heat > 100) {
+                renderHeat(tile, fire, metalbase);
+            }
+        } finally {
+            OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit,
+                    previousLightX, previousLightY);
+            GlStateManager.tryBlendFuncSeparate(blendSrcRgb, blendDstRgb, blendSrcAlpha, blendDstAlpha);
+            if (blendEnabled) {
+                GlStateManager.enableBlend();
+            } else {
+                GlStateManager.disableBlend();
+            }
+            if (lightingEnabled) {
+                GlStateManager.enableLighting();
+            } else {
+                GlStateManager.disableLighting();
+            }
+            if (rescaleNormalEnabled) {
+                GlStateManager.enableRescaleNormal();
+            } else {
+                GlStateManager.disableRescaleNormal();
+            }
+            GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+            GlStateManager.popMatrix();
+        }
+    }
+
+    private static void renderVis(TileAlchemyFurnaceAdvanced tile, TextureAtlasSprite fluxgoo,
+                                  TextureAtlasSprite metalbase) {
+        GlStateManager.pushMatrix();
+        try {
+            GlStateManager.translate(0.5F, -0.5F, 1.1F);
+            GlStateManager.rotate(180.0F, 0.0F, 1.0F, 0.0F);
+            renderQuadCenteredFromIcon(fluxgoo, 190, 0.0F);
+        } finally {
             GlStateManager.popMatrix();
         }
 
-        if (content > 0.0F) {
-            float fillWidth = 1.0F - content;
-            int overlayAlpha = Math.max(0x66, (int) (0xFF * pulse));
-            int overlayColor = (overlayAlpha << 24) | 0xFFFFFF;
-            if (panelBacking != null && panelFill != null) {
-                renderVisPanels(panelBacking, panelFill, fillWidth, overlayColor);
+        float fill = 1.0F - (float) tile.vis / (float) tile.maxVis;
+        for (int side = 0; side < 4; ++side) {
+            GlStateManager.pushMatrix();
+            try {
+                GlStateManager.rotate(90.0F * side, 0.0F, 0.0F, 1.0F);
+                GlStateManager.rotate(90.0F, -1.0F, 0.0F, 0.0F);
+                GlStateManager.translate(0.85F, -1.8F, -1.4F);
+                GlStateManager.scale(0.3D, 0.6D, 1.0D);
+                renderQuadCenteredFromIcon(metalbase, 150, 0.0F);
+                GlStateManager.translate(0.0F, 0.0F, -0.01F);
+                renderQuadCenteredFromIcon(fluxgoo, 190, fill);
+            } finally {
+                GlStateManager.popMatrix();
+            }
+
+            GlStateManager.pushMatrix();
+            try {
+                GlStateManager.rotate(90.0F * side, 0.0F, 0.0F, -1.0F);
+                GlStateManager.rotate(90.0F, 1.0F, 0.0F, 0.0F);
+                GlStateManager.translate(1.15F, 1.8F, -1.4F);
+                GlStateManager.scale(-0.3D, -0.6D, -1.0D);
+                renderQuadCenteredFromIcon(metalbase, 150, 0.0F);
+                GlStateManager.translate(0.0F, 0.0F, 0.01F);
+                renderQuadCenteredFromIcon(fluxgoo, 190, fill);
+            } finally {
+                GlStateManager.popMatrix();
             }
         }
-
-        if (burning && heatNorm > 0.0F && panelBacking != null && lava != null) {
-            renderHeatPanels(panelBacking, lava, 1.0F - heatNorm);
-        }
-
-        GlStateManager.enableLighting();
-        GlStateManager.popMatrix();
     }
 
-    private void renderVisPanels(TextureAtlasSprite panelBacking, TextureAtlasSprite panelFill, float fillWidth, int overlayColor) {
-        bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
-        float prevLightX = OpenGlHelper.lastBrightnessX;
-        float prevLightY = OpenGlHelper.lastBrightnessY;
-        OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, 190.0F, 190.0F);
-
-        for (int side = 0; side < 4; side++) {
-            GlStateManager.pushMatrix();
-            GlStateManager.rotate(side * 90.0F, 0.0F, 0.0F, 1.0F);
-            GlStateManager.rotate(90.0F, -1.0F, 0.0F, 0.0F);
-            GlStateManager.translate(0.85F, -1.8F, -1.4F);
-            GlStateManager.scale(0.3F, 0.6F, 1.0F);
-            drawAtlasQuad(panelBacking, 0xFFFFFFFF, 0.0F);
-            GlStateManager.translate(0.0F, 0.0F, -0.01F);
-            drawAtlasQuad(panelFill, overlayColor, fillWidth);
-            GlStateManager.popMatrix();
-
-            GlStateManager.pushMatrix();
-            GlStateManager.rotate(side * 90.0F, 0.0F, 0.0F, -1.0F);
-            GlStateManager.rotate(90.0F, 1.0F, 0.0F, 0.0F);
-            GlStateManager.translate(1.15F, 1.8F, -1.4F);
-            GlStateManager.scale(-0.3F, -0.6F, -1.0F);
-            drawAtlasQuad(panelBacking, 0xFFFFFFFF, 0.0F);
-            GlStateManager.translate(0.0F, 0.0F, 0.01F);
-            drawAtlasQuad(panelFill, overlayColor, fillWidth);
-            GlStateManager.popMatrix();
-        }
-
-        OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, prevLightX, prevLightY);
-    }
-
-    private void renderHeatPanels(TextureAtlasSprite panelBacking, TextureAtlasSprite lava, float fillWidth) {
-        bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
-        float prevLightX = OpenGlHelper.lastBrightnessX;
-        float prevLightY = OpenGlHelper.lastBrightnessY;
-        OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, 220.0F, 220.0F);
-
+    private static void renderHeat(TileAlchemyFurnaceAdvanced tile, TextureAtlasSprite fire,
+                                   TextureAtlasSprite metalbase) {
+        float fill = 1.0F - Math.min(1.0F, (float) tile.heat / (float) tile.maxPower);
         GlStateManager.pushMatrix();
-        GlStateManager.translate(0.0F, 0.0F, 1.0F);
-        for (int side = 0; side < 4; side++) {
-            GlStateManager.pushMatrix();
-            GlStateManager.rotate(side * 90.0F, 0.0F, 0.0F, 1.0F);
-            GlStateManager.rotate(135.0F, 1.0F, 0.0F, 0.0F);
-            GlStateManager.rotate(180.0F, 0.0F, 0.0F, 1.0F);
-            GlStateManager.translate(-0.5F, 0.0F, -1.0F);
-            drawAtlasQuad(lava, 0xFFFFFFFF, fillWidth);
-            GlStateManager.translate(0.0F, 0.0F, 0.05F);
-            drawAtlasQuad(panelBacking, 0xD0FFFFFF, 0.0F);
+        try {
+            GlStateManager.translate(0.0F, 0.0F, 1.0F);
+            for (int side = 0; side < 4; ++side) {
+                GlStateManager.pushMatrix();
+                try {
+                    GlStateManager.rotate(90.0F * side, 0.0F, 0.0F, 1.0F);
+                    GlStateManager.rotate(135.0F, 1.0F, 0.0F, 0.0F);
+                    GlStateManager.rotate(180.0F, 0.0F, 0.0F, 1.0F);
+                    GlStateManager.translate(-0.5F, 0.0F, -1.0F);
+                    renderQuadCenteredFromIcon(fire, 220, fill);
+                    GlStateManager.translate(0.0F, 0.0F, 0.05F);
+                    renderQuadCenteredFromIcon(metalbase, 150, 0.0F);
+                } finally {
+                    GlStateManager.popMatrix();
+                }
+            }
+        } finally {
             GlStateManager.popMatrix();
         }
-        GlStateManager.popMatrix();
-
-        OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, prevLightX, prevLightY);
     }
 
-    private static void drawAtlasQuad(TextureAtlasSprite sprite, int argb, float width) {
+    private static void renderQuadCenteredFromIcon(TextureAtlasSprite sprite, int brightness, float fill) {
         if (sprite == null) {
             return;
         }
-        float clampedWidth = Math.max(0.0F, Math.min(1.0F, width));
-        float drawHeight = 1.0F - clampedWidth;
-        if (drawHeight <= 0.0F) {
-            return;
-        }
 
-        float alpha = ((argb >> 24) & 0xFF) / 255.0F;
-        float red = ((argb >> 16) & 0xFF) / 255.0F;
-        float green = ((argb >> 8) & 0xFF) / 255.0F;
-        float blue = (argb & 0xFF) / 255.0F;
-        float u0 = sprite.getMinU();
-        float u1 = sprite.getMaxU();
-        float v0 = sprite.getMinV();
-        float v1 = sprite.getMaxV();
-        float vFill = v0 + (v1 - v0) * drawHeight;
-
+        Minecraft.getMinecraft().getTextureManager().bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
+        GlStateManager.disableLighting();
+        GlStateManager.enableRescaleNormal();
         GlStateManager.enableBlend();
-        GlStateManager.blendFunc(770, 771);
-        Tessellator tess = Tessellator.getInstance();
-        BufferBuilder buf = tess.getBuffer();
-        buf.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX_COLOR);
-        buf.pos(0.0D, 1.0D, 0.0D).tex(u0, v0).color(red, green, blue, alpha).endVertex();
-        buf.pos(1.0D, 1.0D, 0.0D).tex(u1, v0).color(red, green, blue, alpha).endVertex();
-        buf.pos(1.0D, clampedWidth, 0.0D).tex(u1, vFill).color(red, green, blue, alpha).endVertex();
-        buf.pos(0.0D, clampedWidth, 0.0D).tex(u0, vFill).color(red, green, blue, alpha).endVertex();
-        tess.draw();
-        GlStateManager.disableBlend();
+        GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+        OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, brightness, 0.0F);
+
+        float minU = sprite.getMinU();
+        float maxU = sprite.getMaxU();
+        float minV = sprite.getMinV();
+        float maxV = sprite.getMaxV();
+        Tessellator tessellator = Tessellator.getInstance();
+        BufferBuilder buffer = tessellator.getBuffer();
+        buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX_COLOR);
+        buffer.pos(0.0D, 1.0D, 0.0D).tex(minU, maxV).color(255, 255, 255, 255).endVertex();
+        buffer.pos(1.0D, 1.0D, 0.0D).tex(maxU, maxV).color(255, 255, 255, 255).endVertex();
+        buffer.pos(1.0D, fill, 0.0D).tex(maxU, minV).color(255, 255, 255, 255).endVertex();
+        buffer.pos(0.0D, fill, 0.0D).tex(minU, minV).color(255, 255, 255, 255).endVertex();
+        tessellator.draw();
     }
 
-    private static TextureAtlasSprite atlas(ResourceLocation sprite) {
-        return Minecraft.getMinecraft().getTextureMapBlocks().getAtlasSprite(sprite.toString());
+    private static void renderModel(CCModel model) {
+        CCRenderState.reset();
+        CCRenderState.startDrawing(GL11.GL_TRIANGLES, DefaultVertexFormats.OLDMODEL_POSITION_TEX_NORMAL);
+        model.render(CCRenderState.normalAttrib);
+        CCRenderState.draw();
+    }
+
+    private static TextureAtlasSprite atlas(String sprite) {
+        return Minecraft.getMinecraft().getTextureMapBlocks().getAtlasSprite(sprite);
     }
 }

@@ -1,0 +1,7 @@
+{
+  "ambientocclusion": false,
+  "textures": {
+    "particle": "thaumcraft:blocks/metalbase"
+  },
+  "elements": []
+}

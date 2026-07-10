@@ -1,0 +1,9 @@
+{
+  "variants": {
+    "type=0": { "model": "thaumcraft:blockalchemyfurnace" },
+    "type=1": { "model": "thaumcraft:blockalchemyfurnace" },
+    "type=2": { "model": "thaumcraft:blockalchemyfurnace" },
+    "type=3": { "model": "thaumcraft:blockalchemyfurnace" },
+    "type=4": { "model": "thaumcraft:blockalchemyfurnace" }
+  }
+}

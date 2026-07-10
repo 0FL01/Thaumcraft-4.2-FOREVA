@@ -27,6 +27,9 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
+import net.minecraftforge.common.property.ExtendedBlockState;
+import net.minecraftforge.common.property.IExtendedBlockState;
+import net.minecraftforge.common.property.IUnlistedProperty;
 import thaumcraft.common.Thaumcraft;
 import thaumcraft.common.CommonProxy;
 import thaumcraft.common.items.wands.ItemWandCasting;
@@ -40,6 +43,8 @@ public class BlockStoneDevice
 extends BlockContainer {
 
     public static final PropertyInteger TYPE = PropertyInteger.create("type", 0, 14);
+    public static final IUnlistedProperty<Boolean> FILLED = new BooleanUnlistedProperty("filled");
+    public static final IUnlistedProperty<Boolean> BURNING = new BooleanUnlistedProperty("burning");
     private static final AxisAlignedBB PEDESTAL_AABB = new AxisAlignedBB(0.25D, 0.0D, 0.25D, 0.75D, 0.99D, 0.75D);
     private static final AxisAlignedBB WAND_PEDESTAL_AABB = new AxisAlignedBB(0.25D, 0.0D, 0.25D, 0.75D, 1.0D, 0.75D);
     private static final AxisAlignedBB INFUSION_PILLAR_BASE_AABB = new AxisAlignedBB(0.0D, 0.0D, 0.0D, 1.0D, 0.5D, 1.0D);
@@ -327,8 +332,23 @@ extends BlockContainer {
     }
 
     @Override
+    public IBlockState getExtendedState(IBlockState state, IBlockAccess worldIn, BlockPos pos) {
+        if (state.getValue(TYPE) != 0) {
+            return state;
+        }
+        TileEntity tile = worldIn.getTileEntity(pos);
+        boolean filled = tile instanceof TileAlchemyFurnace && ((TileAlchemyFurnace) tile).vis > 0;
+        boolean burning = tile instanceof TileAlchemyFurnace && ((TileAlchemyFurnace) tile).isBurning();
+        return ((IExtendedBlockState) state)
+                .withProperty(FILLED, filled)
+                .withProperty(BURNING, burning);
+    }
+
+    @Override
     protected BlockStateContainer createBlockState() {
-        return new BlockStateContainer(this, TYPE);
+        return new ExtendedBlockState(this,
+                new net.minecraft.block.properties.IProperty[]{TYPE},
+                new IUnlistedProperty[]{FILLED, BURNING});
     }
 
     @Override
@@ -344,5 +364,33 @@ extends BlockContainer {
     @Override
     public IBlockState getStateForPlacement(World worldIn, BlockPos pos, EnumFacing facing, float hitX, float hitY, float hitZ, int meta, EntityLivingBase placer, EnumHand hand) {
         return this.getDefaultState().withProperty(TYPE, MathHelper.clamp(meta, 0, 14));
+    }
+
+    private static final class BooleanUnlistedProperty implements IUnlistedProperty<Boolean> {
+        private final String name;
+
+        private BooleanUnlistedProperty(String name) {
+            this.name = name;
+        }
+
+        @Override
+        public String getName() {
+            return this.name;
+        }
+
+        @Override
+        public boolean isValid(Boolean value) {
+            return value != null;
+        }
+
+        @Override
+        public Class<Boolean> getType() {
+            return Boolean.class;
+        }
+
+        @Override
+        public String valueToString(Boolean value) {
+            return String.valueOf(value);
+        }
     }
 }
