@@ -23,6 +23,7 @@ public class DeviceTesrRoutingContractTest {
         String thaumatoriumRenderer = read("src/main/java/thaumcraft/client/renderers/tile/TileThaumatoriumRenderer.java");
         String clientModelRegistry = read("src/main/java/thaumcraft/client/ClientModelRegistry.java");
         String woodenTesrModel = read("src/main/resources/assets/thaumcraft/models/item/blockwoodendevice_tesr.json");
+        String woodenBellowsTesrModel = read("src/main/resources/assets/thaumcraft/models/item/blockwoodendevice_bellows_tesr.json");
         String woodenBannerTesrModel = read("src/main/resources/assets/thaumcraft/models/item/blockwoodendevice_banner_tesr.json");
         String metalTesrModel = read("src/main/resources/assets/thaumcraft/models/item/blockmetaldevice_tesr.json");
         String thaumatoriumBaseModel = read("src/main/resources/assets/thaumcraft/models/block/blockmetaldevice_10.json");
@@ -52,7 +53,7 @@ public class DeviceTesrRoutingContractTest {
         assertTrue("ClientProxy should assign block-metal variants and override tile-oriented item metas onto builtin/entity TEISR models",
                 clientProxy.contains("Item metalDeviceItem = Item.getItemFromBlock(ConfigBlocks.blockMetalDevice);")
                         && clientProxy.contains("for (int meta = 0; meta <= 14; meta++) {")
-                        && clientProxy.contains("registerBuiltinItemModel(woodenDeviceItem, 0, \"blockwoodendevice_tesr\");")
+                        && clientProxy.contains("registerBuiltinItemModel(woodenDeviceItem, 0, \"blockwoodendevice_bellows_tesr\");")
                         && clientProxy.contains("registerBuiltinItemModel(woodenDeviceItem, 4, \"blockwoodendevice_tesr\");")
                         && clientProxy.contains("registerBuiltinItemModel(woodenDeviceItem, 5, \"blockwoodendevice_tesr\");")
                         && clientProxy.contains("registerBuiltinItemModel(woodenDeviceItem, 8, \"blockwoodendevice_banner_tesr\");")
@@ -103,6 +104,16 @@ public class DeviceTesrRoutingContractTest {
 
         assertTrue("Builtin item model stubs must exist so Forge routes the targeted metadata to TEISR",
                 woodenTesrModel.contains("\"parent\": \"builtin/entity\"")
+                        && woodenBellowsTesrModel.contains("\"parent\": \"builtin/entity\"")
+                        && woodenBellowsTesrModel.contains("\"display\"")
+                        && woodenBellowsTesrModel.contains("\"rotation\": [30, 225, 0]")
+                        && woodenBellowsTesrModel.contains("\"scale\": [0.625, 0.625, 0.625]")
+                        && woodenBellowsTesrModel.contains("\"ground\"")
+                        && woodenBellowsTesrModel.contains("\"fixed\"")
+                        && woodenBellowsTesrModel.contains("\"thirdperson_righthand\"")
+                        && woodenBellowsTesrModel.contains("\"thirdperson_lefthand\"")
+                        && woodenBellowsTesrModel.contains("\"firstperson_righthand\"")
+                        && woodenBellowsTesrModel.contains("\"firstperson_lefthand\"")
                         && woodenBannerTesrModel.contains("\"parent\": \"builtin/entity\"")
                         && woodenBannerTesrModel.contains("\"display\"")
                         && woodenBannerTesrModel.contains("\"gui\"")

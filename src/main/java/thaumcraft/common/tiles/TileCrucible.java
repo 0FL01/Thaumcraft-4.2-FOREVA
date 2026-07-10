@@ -452,7 +452,15 @@ public class TileCrucible extends TileThaumcraft implements ITickable, IWandable
     // ========== Bellows ==========
 
     public void getBellows() {
-        this.bellows = TileBellows.getBellows(this.world, this.pos, EnumFacing.HORIZONTALS);
+        // TC4 counts adjacent bellows blocks directly, regardless of facing or redstone power.
+        this.bellows = 0;
+        for (EnumFacing dir : EnumFacing.HORIZONTALS) {
+            IBlockState state = this.world.getBlockState(this.pos.offset(dir));
+            if (state.getBlock() == ConfigBlocks.blockWoodenDevice
+                    && ConfigBlocks.blockWoodenDevice.getMetaFromState(state) == 0) {
+                ++this.bellows;
+            }
+        }
     }
 
     // ========== IWandable ==========

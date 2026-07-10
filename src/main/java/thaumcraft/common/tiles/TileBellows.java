@@ -1,10 +1,12 @@
 package thaumcraft.common.tiles;
 
+import net.minecraft.init.SoundEvents;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityFurnace;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ITickable;
+import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import thaumcraft.api.TileThaumcraft;
@@ -33,7 +35,12 @@ public class TileBellows extends TileThaumcraft implements ITickable {
             if (this.inflation > 0.35F && !this.direction) this.inflation -= 0.075F;
             if (this.inflation <= 0.35F && !this.direction) this.direction = true;
             if (this.inflation < 1.0F && this.direction) this.inflation += 0.025F;
-            if (this.inflation >= 1.0F && this.direction) this.direction = false;
+            if (this.inflation >= 1.0F && this.direction) {
+                this.direction = false;
+                this.world.playSound(this.pos.getX() + 0.5D, this.pos.getY() + 0.5D, this.pos.getZ() + 0.5D,
+                        SoundEvents.ENTITY_GHAST_SHOOT, SoundCategory.BLOCKS, 0.01F,
+                        0.5F + (this.world.rand.nextFloat() - this.world.rand.nextFloat()) * 0.2F, false);
+            }
             return;
         }
 
@@ -65,8 +72,7 @@ public class TileBellows extends TileThaumcraft implements ITickable {
 
             TileBellows bellowsTile = (TileBellows) tile;
             int opposite = dir.getOpposite().getIndex();
-            if ((bellowsTile.orientation == 0 || bellowsTile.orientation == opposite)
-                    && !bellowsTile.gettingPower()) {
+            if (bellowsTile.orientation == opposite && !bellowsTile.gettingPower()) {
                 ++bellows;
             }
         }

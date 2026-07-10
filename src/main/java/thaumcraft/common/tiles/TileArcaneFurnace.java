@@ -177,7 +177,7 @@ public class TileArcaneFurnace extends TileThaumcraft implements ITickable {
                 continue;
             }
             TileBellows tile = (TileBellows) this.world.getTileEntity(bellowsPos);
-            if (tile == null || tile.orientation != dir.getOpposite().getIndex() || this.world.isAirBlock(bellowsPos)) {
+            if (tile.orientation != dir.getOpposite().getIndex() || this.world.isBlockPowered(bellowsPos)) {
                 continue;
             }
             bellows++;

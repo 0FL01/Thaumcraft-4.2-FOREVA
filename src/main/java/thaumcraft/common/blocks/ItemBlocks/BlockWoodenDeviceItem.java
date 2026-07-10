@@ -51,6 +51,9 @@ public class BlockWoodenDeviceItem extends BlockMetadataItem {
                     || world.getBlockState(pos.offset(out)).getBlock() == Blocks.LIT_FURNACE;
             bellows.markDirty();
             world.notifyBlockUpdate(pos, world.getBlockState(pos), world.getBlockState(pos), 3);
+            if (!world.isRemote) {
+                world.notifyNeighborsOfStateChange(pos, newState.getBlock(), false);
+            }
         } else if (metadata == 4 && tile instanceof TileArcaneBoreBase) {
             ((TileArcaneBoreBase) tile).orientation = player == null ? EnumFacing.NORTH : player.getHorizontalFacing().getOpposite();
             tile.markDirty();

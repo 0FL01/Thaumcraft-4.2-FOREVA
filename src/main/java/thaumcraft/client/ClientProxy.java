@@ -975,7 +975,7 @@ public class ClientProxy extends CommonProxy {
         for (int meta = 0; meta <= 8; meta++) {
             registerBlockItemModel(woodenDeviceItem, meta, "type=" + meta);
         }
-        registerBuiltinItemModel(woodenDeviceItem, 0, "blockwoodendevice_tesr");
+        registerBuiltinItemModel(woodenDeviceItem, 0, "blockwoodendevice_bellows_tesr");
         registerBuiltinItemModel(woodenDeviceItem, 4, "blockwoodendevice_tesr");
         registerBuiltinItemModel(woodenDeviceItem, 5, "blockwoodendevice_tesr");
         registerBuiltinItemModel(woodenDeviceItem, 8, "blockwoodendevice_banner_tesr");

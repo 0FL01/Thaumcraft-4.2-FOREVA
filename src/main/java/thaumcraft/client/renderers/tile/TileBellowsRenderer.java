@@ -38,38 +38,50 @@ public class TileBellowsRenderer extends TileEntitySpecialRenderer<TileBellows> 
         bindTexture(BELLOWS);
 
         GlStateManager.pushMatrix();
+        GlStateManager.enableNormalize();
         GlStateManager.enableRescaleNormal();
         GlStateManager.enableBlend();
         GlStateManager.blendFunc(770, 771);
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+        try {
+            translateFromOrientation(x, y, z, orientation);
+            GlStateManager.translate(0.0F, 1.0F, 0.0F);
 
-        translateFromOrientation(x, y, z, orientation);
-        GlStateManager.translate(0.0F, 1.0F, 0.0F);
+            GlStateManager.pushMatrix();
+            try {
+                GlStateManager.scale(0.5F, (inflate + 0.1F) / 2.0F, 0.5F);
+                model.bag.setRotationPoint(0.0F, 0.5F, 0.0F);
+                model.bag.render(MODEL_SCALE);
+            } finally {
+                GlStateManager.popMatrix();
+            }
 
-        GlStateManager.pushMatrix();
-        GlStateManager.scale(0.5F, (inflate + 0.1F) / 2.0F, 0.5F);
-        model.bag.setRotationPoint(0.0F, 0.5F, 0.0F);
-        model.bag.render(MODEL_SCALE);
-        GlStateManager.popMatrix();
+            GlStateManager.translate(0.0F, -1.0F, 0.0F);
 
-        GlStateManager.translate(0.0F, -1.0F, 0.0F);
+            GlStateManager.pushMatrix();
+            try {
+                GlStateManager.translate(0.0F, -tscale / 2.0F + 0.5F, 0.0F);
+                model.topPlank.render(MODEL_SCALE);
+            } finally {
+                GlStateManager.popMatrix();
+            }
 
-        GlStateManager.pushMatrix();
-        GlStateManager.translate(0.0F, -tscale / 2.0F + 0.5F, 0.0F);
-        model.topPlank.render(MODEL_SCALE);
-        GlStateManager.popMatrix();
+            GlStateManager.pushMatrix();
+            try {
+                GlStateManager.translate(0.0F, tscale / 2.0F - 0.5F, 0.0F);
+                model.bottomPlank.render(MODEL_SCALE);
+            } finally {
+                GlStateManager.popMatrix();
+            }
 
-        GlStateManager.pushMatrix();
-        GlStateManager.translate(0.0F, tscale / 2.0F - 0.5F, 0.0F);
-        model.bottomPlank.render(MODEL_SCALE);
-        GlStateManager.popMatrix();
-
-        model.render();
-
-        GlStateManager.disableRescaleNormal();
-        GlStateManager.disableBlend();
-        GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
-        GlStateManager.popMatrix();
+            model.render();
+        } finally {
+            GlStateManager.disableBlend();
+            GlStateManager.disableRescaleNormal();
+            GlStateManager.disableNormalize();
+            GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+            GlStateManager.popMatrix();
+        }
     }
 
     private static void translateFromOrientation(double x, double y, double z, int orientation) {
