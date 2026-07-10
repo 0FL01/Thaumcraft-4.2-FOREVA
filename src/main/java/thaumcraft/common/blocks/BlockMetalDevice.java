@@ -35,7 +35,9 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import thaumcraft.api.visnet.VisNetHandler;
 import thaumcraft.common.Thaumcraft;
 import thaumcraft.common.CommonProxy;
+import thaumcraft.common.config.ConfigItems;
 import thaumcraft.common.entities.EntitySpecialItem;
+import thaumcraft.common.lib.TCSounds;
 import thaumcraft.common.lib.utils.InventoryUtils;
 import thaumcraft.common.items.wands.ItemWandCasting;
 import thaumcraft.common.tiles.*;
@@ -178,6 +180,36 @@ public class BlockMetalDevice extends BlockContainer {
             if (!held.isEmpty() && held.getItem() instanceof ItemWandCasting) {
                 return ((TileAlembic) tileEntity).onWandRightClick(worldIn, held, playerIn,
                         pos.getX(), pos.getY(), pos.getZ(), facing.getIndex(), state.getValue(TYPE)) >= 0;
+            }
+            if (state.getValue(TYPE) == 1 && playerIn.isSneaking()) {
+                TileAlembic alembic = (TileAlembic) tileEntity;
+                // TC4 gives an installed filter priority over emptying the alembic.
+                if (alembic.aspectFilter != null) {
+                    if (!worldIn.isRemote) {
+                        alembic.aspectFilter = null;
+                        alembic.markDirty();
+                        worldIn.notifyBlockUpdate(pos, state, state, 3);
+                        worldIn.spawnEntity(new EntityItem(worldIn,
+                                pos.getX() + 0.5D + facing.getXOffset() / 3.0D,
+                                pos.getY() + 0.5D,
+                                pos.getZ() + 0.5D + facing.getZOffset() / 3.0D,
+                                new ItemStack(ConfigItems.itemResource, 1, 13)));
+                        worldIn.playSound(null, pos, TCSounds.PAGE, SoundCategory.BLOCKS, 1.0F, 1.1F);
+                    }
+                    return true;
+                }
+                if (held.isEmpty()) {
+                    if (!worldIn.isRemote) {
+                        alembic.amount = 0;
+                        alembic.aspect = null;
+                        alembic.markDirty();
+                        worldIn.notifyBlockUpdate(pos, state, state, 3);
+                        worldIn.playSound(null, pos, TCSounds.ALEMBICKNOCK, SoundCategory.BLOCKS, 0.2F, 1.0F);
+                        worldIn.playSound(null, pos, SoundEvents.ENTITY_PLAYER_SWIM, SoundCategory.BLOCKS,
+                                0.5F, 1.0F + (worldIn.rand.nextFloat() - worldIn.rand.nextFloat()) * 0.3F);
+                    }
+                    return true;
+                }
             }
         }
         if (state.getValue(TYPE) == 5) {
