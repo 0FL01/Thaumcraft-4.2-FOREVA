@@ -1,13 +1,12 @@
 package thaumcraft.common.blocks;
 
-import net.minecraft.block.BlockStairs;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.util.BlockRenderLayer;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import thaumcraft.common.config.ConfigBlocks;
 
-public class BlockStairsArcaneStone extends BlockStairs {
+public class BlockStairsArcaneStone extends BlockThaumcraftStairs {
 
     public BlockStairsArcaneStone() {
         super(ConfigBlocks.blockCosmeticSolid.getStateFromMeta(7));

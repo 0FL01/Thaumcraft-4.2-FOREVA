@@ -1037,6 +1037,14 @@ public class ClientProxy extends CommonProxy {
         Item slabStoneItem = Item.getItemFromBlock(ConfigBlocks.blockSlabStone);
         registerBlockItemModel(slabStoneItem, 0, "half=bottom,variant=arcane");
         registerBlockItemModel(slabStoneItem, 1, "half=bottom,variant=eldritch");
+        registerBuiltinItemModel(Item.getItemFromBlock(ConfigBlocks.blockStairsArcaneStone), 0,
+                "blockstairsarcanestone");
+        registerBuiltinItemModel(Item.getItemFromBlock(ConfigBlocks.blockStairsGreatwood), 0,
+                "blockstairsgreatwood");
+        registerBuiltinItemModel(Item.getItemFromBlock(ConfigBlocks.blockStairsSilverwood), 0,
+                "blockstairssilverwood");
+        registerBuiltinItemModel(Item.getItemFromBlock(ConfigBlocks.blockStairsEldritch), 0,
+                "blockstairseldritch");
         Item taintItem = Item.getItemFromBlock(ConfigBlocks.blockTaint);
         for (int meta = 0; meta <= 2; meta++) {
             registerBlockItemModel(taintItem, meta, "type=" + meta);
