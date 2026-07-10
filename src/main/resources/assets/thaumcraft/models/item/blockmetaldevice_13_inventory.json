@@ -1,0 +1,23 @@
+{
+  "parent": "block/block",
+  "ambientocclusion": false,
+  "textures": {
+    "particle": "#side",
+    "top": "thaumcraft:blocks/lamp_fert_top",
+    "side": "thaumcraft:blocks/lamp_fert_side"
+  },
+  "elements": [
+    {
+      "from": [4, 2, 4],
+      "to": [12, 14, 12],
+      "faces": {
+        "down": { "texture": "#top", "uv": [4, 12, 12, 4] },
+        "up": { "texture": "#top", "uv": [4, 4, 12, 12] },
+        "north": { "texture": "#side", "uv": [4, 2, 12, 14] },
+        "south": { "texture": "#side", "uv": [4, 2, 12, 14] },
+        "west": { "texture": "#side", "uv": [4, 2, 12, 14] },
+        "east": { "texture": "#side", "uv": [4, 2, 12, 14] }
+      }
+    }
+  ]
+}

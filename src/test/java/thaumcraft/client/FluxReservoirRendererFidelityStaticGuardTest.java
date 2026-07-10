@@ -96,6 +96,7 @@ public class FluxReservoirRendererFidelityStaticGuardTest {
                         && reservoirItemRenderer.contains("reservoirRenderer.setRendererDispatcher(TileEntityRendererDispatcher.instance);")
                         && reservoirItemRenderer.contains("renderReservoirCore(mc);")
                         && reservoirItemRenderer.contains("TextureMap.LOCATION_BLOCKS_TEXTURE")
+                        && reservoirItemRenderer.contains("GlStateManager.rotate(-90.0F, 0.0F, 1.0F, 0.0F);")
                         && reservoirItemRenderer.contains("mc.getBlockRendererDispatcher().renderBlockBrightness(")
                         && reservoirItemRenderer.contains("ConfigBlocks.blockEssentiaReservoir.getDefaultState()")
                         && reservoirItemRenderer.contains("essentia.readFromNBT(tag);"));

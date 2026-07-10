@@ -2,33 +2,46 @@
   "parent": "block/block",
   "ambientocclusion": false,
   "textures": {
-    "particle": "thaumcraft:blocks/pipe_filter",
+    "particle": "thaumcraft:blocks/pipe_1",
+    "tube": "thaumcraft:blocks/pipe_1",
     "filter": "thaumcraft:blocks/pipe_filter",
     "core": "thaumcraft:blocks/pipe_filter_core"
   },
   "elements": [
     {
-      "from": [5.5, 5.5, 5.5],
-      "to": [10.5, 10.5, 10.5],
+      "from": [7, 0, 7],
+      "to": [9, 16, 9],
       "faces": {
-        "down": { "texture": "#filter" },
-        "up": { "texture": "#filter" },
-        "north": { "texture": "#filter" },
-        "south": { "texture": "#filter" },
-        "west": { "texture": "#filter" },
-        "east": { "texture": "#filter" }
+        "down": { "uv": [7, 9, 9, 7], "texture": "#tube" },
+        "up": { "uv": [7, 7, 9, 9], "texture": "#tube" },
+        "north": { "uv": [7, 0, 9, 16], "texture": "#tube" },
+        "south": { "uv": [7, 0, 9, 16], "texture": "#tube" },
+        "west": { "uv": [7, 0, 9, 16], "texture": "#tube" },
+        "east": { "uv": [7, 0, 9, 16], "texture": "#tube" }
       }
     },
     {
       "from": [5.5, 5.5, 5.5],
       "to": [10.5, 10.5, 10.5],
       "faces": {
-        "down": { "texture": "#core" },
-        "up": { "texture": "#core" },
-        "north": { "texture": "#core" },
-        "south": { "texture": "#core" },
-        "west": { "texture": "#core" },
-        "east": { "texture": "#core" }
+        "down": { "uv": [5.5, 10.5, 10.5, 5.5], "texture": "#filter" },
+        "up": { "uv": [5.5, 5.5, 10.5, 10.5], "texture": "#filter" },
+        "north": { "uv": [5.5, 5.5, 10.5, 10.5], "texture": "#filter" },
+        "south": { "uv": [5.5, 5.5, 10.5, 10.5], "texture": "#filter" },
+        "west": { "uv": [5.5, 5.5, 10.5, 10.5], "texture": "#filter" },
+        "east": { "uv": [5.5, 5.5, 10.5, 10.5], "texture": "#filter" }
+      }
+    },
+    {
+      "from": [5.5, 5.5, 5.5],
+      "to": [10.5, 10.5, 10.5],
+      "faces": {
+        "down": { "uv": [5.5, 10.5, 10.5, 5.5], "texture": "#core" },
+        "up": { "uv": [5.5, 5.5, 10.5, 10.5], "texture": "#core" },
+        "north": { "uv": [5.5, 5.5, 10.5, 10.5], "texture": "#core" },
+        "south": { "uv": [5.5, 5.5, 10.5, 10.5], "texture": "#core" },
+        "west": { "uv": [5.5, 5.5, 10.5, 10.5], "texture": "#core" },
+        "east": { "uv": [5.5, 5.5, 10.5, 10.5], "texture": "#core" }
       }
     }
   ]

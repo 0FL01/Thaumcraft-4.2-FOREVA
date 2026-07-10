@@ -124,6 +124,7 @@ public class VisEnergyRendererFidelityStaticGuardTest {
                         && crystalizerModel.contains("TOP_TRIANGLES")
                         && crystalizerModel.contains("renderBase()")
                         && crystalizerModel.contains("renderTop()")
+                        && crystalizerModel.contains(".tex(uv[0], 1.0F - uv[1])")
                         && crystalizerModel.contains("DefaultVertexFormats.POSITION_TEX_NORMAL"));
 
         assertTrue("ModelVisRelay should keep grouped vis_relay.obj surfaces instead of the old ModelRenderer cuboids",

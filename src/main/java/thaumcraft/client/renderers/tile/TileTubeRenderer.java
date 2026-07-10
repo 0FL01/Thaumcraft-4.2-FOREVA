@@ -9,6 +9,7 @@ public class TileTubeRenderer extends TileEntitySpecialRenderer<TileTube> {
         if (tile == null) {
             return;
         }
-        TubeConduitRenderHelper.renderConduit(tile, tile, tile.openSides, "thaumcraft:blocks/pipe_1", null, x, y, z);
+        TubeConduitRenderHelper.renderConduit(tile, tile, tile.openSides,
+                TubeConduitRenderHelper.TubeType.ORDINARY, null, x, y, z);
     }
 }

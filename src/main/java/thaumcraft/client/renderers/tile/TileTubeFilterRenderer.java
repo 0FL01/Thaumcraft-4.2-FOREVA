@@ -10,6 +10,6 @@ public class TileTubeFilterRenderer extends TileEntitySpecialRenderer<TileTubeFi
             return;
         }
         TubeConduitRenderHelper.renderConduit(tile, tile, tile.openSides,
-                "thaumcraft:blocks/pipe_1", tile.aspectFilter, x, y, z);
+                TubeConduitRenderHelper.TubeType.FILTER, tile.aspectFilter, x, y, z);
     }
 }

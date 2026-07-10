@@ -963,6 +963,9 @@ public class ClientProxy extends CommonProxy {
         registerBuiltinItemModel(metalDeviceItem, 0, "blockmetaldevice_0_inventory");
         registerBuiltinItemModel(metalDeviceItem, 5, "blockmetaldevice_5_inventory");
         registerBuiltinItemModel(metalDeviceItem, 6, "blockmetaldevice_5_inventory");
+        registerBuiltinItemModel(metalDeviceItem, 7, "blockmetaldevice_7_inventory");
+        registerBuiltinItemModel(metalDeviceItem, 8, "blockmetaldevice_8_inventory");
+        registerBuiltinItemModel(metalDeviceItem, 13, "blockmetaldevice_13_inventory");
         Item woodenDeviceItem = Item.getItemFromBlock(ConfigBlocks.blockWoodenDevice);
         for (int meta = 0; meta <= 8; meta++) {
             registerBlockItemModel(woodenDeviceItem, meta, "type=" + meta);
@@ -982,9 +985,6 @@ public class ClientProxy extends CommonProxy {
         }
         registerBuiltinItemModel(tubeItem, 1, "blocktube_tesr");
         registerBuiltinItemModel(tubeItem, 2, "blocktube_2_inventory");
-        registerBuiltinItemModel(tubeItem, 3, "blocktube_tesr");
-        registerBuiltinItemModel(tubeItem, 5, "blocktube_tesr");
-        registerBuiltinItemModel(tubeItem, 6, "blocktube_tesr");
         registerBuiltinItemModel(tubeItem, 7, "blocktube_tesr");
         Item tableItem = Item.getItemFromBlock(ConfigBlocks.blockTable);
         for (int meta = 0; meta <= 15; meta++) {

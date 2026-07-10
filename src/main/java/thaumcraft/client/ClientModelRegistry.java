@@ -60,6 +60,10 @@ public final class ClientModelRegistry {
     public static void onTextureStitchPre(TextureStitchEvent.Pre event) {
         event.getMap().registerSprite(FOCUS_PECH_DEPTH_SPRITE);
         event.getMap().registerSprite(FROST_SHARD_SPRITE);
+        event.getMap().registerSprite(new ResourceLocation("thaumcraft", "blocks/lamp_grow_top_off"));
+        event.getMap().registerSprite(new ResourceLocation("thaumcraft", "blocks/lamp_grow_side_off"));
+        event.getMap().registerSprite(new ResourceLocation("thaumcraft", "blocks/lamp_fert_top_off"));
+        event.getMap().registerSprite(new ResourceLocation("thaumcraft", "blocks/lamp_fert_side_off"));
         for (int texture : ARCANE_FURNACE_TEXTURES) {
             event.getMap().registerSprite(new ResourceLocation("thaumcraft", "blocks/furnace" + texture));
         }

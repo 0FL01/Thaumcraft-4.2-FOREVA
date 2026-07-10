@@ -25,7 +25,10 @@ public class ReportedItemModelRoutingContractTest {
 
         assertFalse("Static tube and buffer inventory shells must not route through TEISR",
                 clientProxy.contains("registerBuiltinItemModel(tubeItem, 0, \"blocktube_tesr\");")
-                        || clientProxy.contains("registerBuiltinItemModel(tubeItem, 4, \"blocktube_tesr\");"));
+                        || clientProxy.contains("registerBuiltinItemModel(tubeItem, 3, \"blocktube_tesr\");")
+                        || clientProxy.contains("registerBuiltinItemModel(tubeItem, 4, \"blocktube_tesr\");")
+                        || clientProxy.contains("registerBuiltinItemModel(tubeItem, 5, \"blocktube_tesr\");")
+                        || clientProxy.contains("registerBuiltinItemModel(tubeItem, 6, \"blocktube_tesr\");"));
         assertTrue("Grate and hungry chest must route to complete dedicated baked item models",
                 clientProxy.contains("registerBuiltinItemModel(metalDeviceItem, 5, \"blockmetaldevice_5_inventory\");")
                         && clientProxy.contains("registerBuiltinItemModel(chestItem, 0, \"blockchesthungry\");"));
@@ -128,6 +131,10 @@ public class ReportedItemModelRoutingContractTest {
                 clientProxy.contains("registerBuiltinItemModel(tubeItem, 2, \"blocktube_2_inventory\");")
                         && clientProxy.contains("registerBuiltinItemModel(tubeItem, 7, \"blocktube_tesr\");")
                         && clientProxy.contains("tubeItem.setTileEntityItemStackRenderer(new ItemTubeRenderer());"));
+        assertTrue("Lamp previews should use dedicated TC4 inventory shells",
+                clientProxy.contains("registerBuiltinItemModel(metalDeviceItem, 7, \"blockmetaldevice_7_inventory\");")
+                        && clientProxy.contains("registerBuiltinItemModel(metalDeviceItem, 8, \"blockmetaldevice_8_inventory\");")
+                        && clientProxy.contains("registerBuiltinItemModel(metalDeviceItem, 13, \"blockmetaldevice_13_inventory\");"));
         assertTrue("Every jar metadata should resolve to the shared NBT-aware built-in renderer",
                 clientProxy.contains("for (int meta = 0; meta <= 3; meta++) {\n            registerBuiltinItemModel(jarItem2, meta, \"blockjar\");")
                         && clientProxy.contains("jarItem.setTileEntityItemStackRenderer(renderer);"));
@@ -141,6 +148,13 @@ public class ReportedItemModelRoutingContractTest {
         assertBlockDisplayParent("src/main/resources/assets/thaumcraft/models/item/blockmetaldevice_0_inventory.json");
         assertBlockDisplayParent("src/main/resources/assets/thaumcraft/models/item/blocklifter.json");
         assertBlockDisplayParent("src/main/resources/assets/thaumcraft/models/item/blocktube_2_inventory.json");
+        assertBlockDisplayParent("src/main/resources/assets/thaumcraft/models/block/blocktube_1.json");
+        assertBlockDisplayParent("src/main/resources/assets/thaumcraft/models/block/blocktube_3.json");
+        assertBlockDisplayParent("src/main/resources/assets/thaumcraft/models/block/blocktube_5.json");
+        assertBlockDisplayParent("src/main/resources/assets/thaumcraft/models/block/blocktube_6.json");
+        assertBlockDisplayParent("src/main/resources/assets/thaumcraft/models/item/blockmetaldevice_7_inventory.json");
+        assertBlockDisplayParent("src/main/resources/assets/thaumcraft/models/item/blockmetaldevice_8_inventory.json");
+        assertBlockDisplayParent("src/main/resources/assets/thaumcraft/models/item/blockmetaldevice_13_inventory.json");
 
         assertComplete3dDisplay(read("src/main/resources/assets/thaumcraft/models/item/blockmetaldevice_dynamic_tesr.json"));
         assertComplete3dDisplay(read("src/main/resources/assets/thaumcraft/models/item/blocktube_tesr.json"));
@@ -176,6 +190,10 @@ public class ReportedItemModelRoutingContractTest {
         assertFalse("Reservoir core, OBJ and liquid must share Forge's one outer offset",
                 reservoir.contains("GlStateManager.translate(0.5F, 0.5F, 0.5F);")
                         || reservoir.contains("GlStateManager.translate(-0.5F, -0.5F, -0.5F);"));
+        int reservoirRotation = reservoir.indexOf("GlStateManager.rotate(-90.0F, 0.0F, 1.0F, 0.0F);");
+        int reservoirModel = reservoir.indexOf("renderBlockBrightness(");
+        assertTrue("Reservoir must cancel BlockModelRenderer's hidden +90 Y rotation before drawing its core",
+                reservoirRotation >= 0 && reservoirModel >= 0 && reservoirRotation < reservoirModel);
         assertTrue("Only metal metas 1, 2 and 14 should restore the legacy TC4 origin",
                 occurrences(metal, "restoreLegacyInventoryOrigin();") == 3);
         assertTrue("Research Table must cancel Forge before replaying its rotated TC4 inventory chain",

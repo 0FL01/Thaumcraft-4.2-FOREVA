@@ -10,6 +10,6 @@ public class TileTubeRestrictRenderer extends TileEntitySpecialRenderer<TileTube
             return;
         }
         TubeConduitRenderHelper.renderConduit(tile, tile, tile.openSides,
-                "thaumcraft:blocks/pipe_restrict", null, x, y, z);
+                TubeConduitRenderHelper.TubeType.RESTRICTED, null, x, y, z);
     }
 }

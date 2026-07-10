@@ -21,7 +21,8 @@ public class TileTubeOnewayRenderer extends TileEntitySpecialRenderer<TileTubeOn
         if (tile == null) {
             return;
         }
-        TubeConduitRenderHelper.renderConduit(tile, tile, tile.openSides, "thaumcraft:blocks/pipe_1", null, x, y, z);
+        TubeConduitRenderHelper.renderConduit(tile, tile, tile.openSides,
+                TubeConduitRenderHelper.TubeType.DIRECTIONAL, null, x, y, z);
         if (tile.getWorld() == null || tile.getPos() == null) {
             return;
         }
@@ -37,18 +38,21 @@ public class TileTubeOnewayRenderer extends TileEntitySpecialRenderer<TileTubeOn
 
     private void renderStackedValves(double x, double y, double z, EnumFacing face) {
         GlStateManager.pushMatrix();
-        GlStateManager.translate(x + 0.5D, y + 0.5D, z + 0.5D);
-        orientByFace(face);
-        GlStateManager.color(0.45F, 0.5F, 1.0F, 1.0F);
-        GlStateManager.scale(1.1F, 0.5F, 1.1F);
-        GlStateManager.translate(0.0D, -0.5D, 0.0D);
-        model.render(MODEL_SCALE);
-        GlStateManager.translate(0.0D, -0.25D, 0.0D);
-        model.render(MODEL_SCALE);
-        GlStateManager.translate(0.0D, -0.25D, 0.0D);
-        model.render(MODEL_SCALE);
-        GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
-        GlStateManager.popMatrix();
+        try {
+            GlStateManager.translate(x + 0.5D, y + 0.5D, z + 0.5D);
+            orientByFace(face);
+            GlStateManager.color(0.45F, 0.5F, 1.0F, 1.0F);
+            GlStateManager.scale(1.1F, 0.5F, 1.1F);
+            GlStateManager.translate(0.0D, -0.5D, 0.0D);
+            model.render(MODEL_SCALE);
+            GlStateManager.translate(0.0D, -0.25D, 0.0D);
+            model.render(MODEL_SCALE);
+            GlStateManager.translate(0.0D, -0.25D, 0.0D);
+            model.render(MODEL_SCALE);
+        } finally {
+            GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+            GlStateManager.popMatrix();
+        }
     }
 
     private static void orientByFace(EnumFacing face) {

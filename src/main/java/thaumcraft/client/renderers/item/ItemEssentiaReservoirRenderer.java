@@ -47,6 +47,8 @@ public class ItemEssentiaReservoirRenderer extends TileEntityItemStackRenderer {
         }
         GlStateManager.pushMatrix();
         try {
+            // BlockModelRenderer adds +90 Y for inventory brightness rendering.
+            GlStateManager.rotate(-90.0F, 0.0F, 1.0F, 0.0F);
             mc.getTextureManager().bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
             mc.getBlockRendererDispatcher().renderBlockBrightness(
                     ConfigBlocks.blockEssentiaReservoir.getDefaultState(), 1.0F);

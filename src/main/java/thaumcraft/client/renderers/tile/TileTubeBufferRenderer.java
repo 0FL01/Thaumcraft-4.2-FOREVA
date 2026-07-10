@@ -21,7 +21,8 @@ public class TileTubeBufferRenderer extends TileEntitySpecialRenderer<TileTubeBu
         if (tile == null) {
             return;
         }
-        TubeConduitRenderHelper.renderConduit(tile, tile, tile.openSides, "thaumcraft:blocks/pipe_buffer", null, x, y, z);
+        TubeConduitRenderHelper.renderConduit(tile, tile, tile.openSides,
+                TubeConduitRenderHelper.TubeType.BUFFER, null, x, y, z);
         if (tile.getWorld() == null || tile.getPos() == null) {
             return;
         }
@@ -42,18 +43,21 @@ public class TileTubeBufferRenderer extends TileEntitySpecialRenderer<TileTubeBu
 
     private void renderValve(double x, double y, double z, EnumFacing face, boolean hardChoked) {
         GlStateManager.pushMatrix();
-        GlStateManager.translate(x + 0.5D, y + 0.5D, z + 0.5D);
-        orientByFace(face);
-        GlStateManager.scale(1.2F, 1.0F, 1.2F);
-        GlStateManager.translate(0.0D, -0.5D, 0.0D);
-        if (hardChoked) {
-            GlStateManager.color(1.0F, 0.3F, 0.3F, 1.0F);
-        } else {
-            GlStateManager.color(0.3F, 0.3F, 1.0F, 1.0F);
+        try {
+            GlStateManager.translate(x + 0.5D, y + 0.5D, z + 0.5D);
+            orientByFace(face);
+            GlStateManager.scale(1.2F, 1.0F, 1.2F);
+            GlStateManager.translate(0.0D, -0.5D, 0.0D);
+            if (hardChoked) {
+                GlStateManager.color(1.0F, 0.3F, 0.3F, 1.0F);
+            } else {
+                GlStateManager.color(0.3F, 0.3F, 1.0F, 1.0F);
+            }
+            model.render(MODEL_SCALE);
+        } finally {
+            GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+            GlStateManager.popMatrix();
         }
-        model.render(MODEL_SCALE);
-        GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
-        GlStateManager.popMatrix();
     }
 
     private static void orientByFace(EnumFacing face) {
