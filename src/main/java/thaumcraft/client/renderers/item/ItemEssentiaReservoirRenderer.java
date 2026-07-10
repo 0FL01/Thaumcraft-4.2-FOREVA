@@ -32,20 +32,27 @@ public class ItemEssentiaReservoirRenderer extends TileEntityItemStackRenderer {
         Minecraft mc = Minecraft.getMinecraft();
 
         GlStateManager.pushMatrix();
-        renderReservoirShell(mc);
-        reservoirRenderer.render(reservoir, 0.0D, 0.0D, 0.0D, partialTicks, 0, 1.0F);
-        GlStateManager.popMatrix();
+        try {
+            renderReservoirCore(mc);
+            // Forge's builtin/entity path already supplies the outer -0.5 block transform.
+            reservoirRenderer.render(reservoir, 0.0D, 0.0D, 0.0D, partialTicks, 0, 1.0F);
+        } finally {
+            GlStateManager.popMatrix();
+        }
     }
 
-    private static void renderReservoirShell(Minecraft mc) {
+    private static void renderReservoirCore(Minecraft mc) {
         if (ConfigBlocks.blockEssentiaReservoir == null) {
             return;
         }
         GlStateManager.pushMatrix();
-        mc.getTextureManager().bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
-        mc.getBlockRendererDispatcher().renderBlockBrightness(
-                ConfigBlocks.blockEssentiaReservoir.getDefaultState(), 1.0F);
-        GlStateManager.popMatrix();
+        try {
+            mc.getTextureManager().bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
+            mc.getBlockRendererDispatcher().renderBlockBrightness(
+                    ConfigBlocks.blockEssentiaReservoir.getDefaultState(), 1.0F);
+        } finally {
+            GlStateManager.popMatrix();
+        }
     }
 
     private static TileEssentiaReservoir createTile(ItemStack stack) {
@@ -77,6 +84,18 @@ public class ItemEssentiaReservoirRenderer extends TileEntityItemStackRenderer {
         }
         if (tag.hasKey("displayAspect")) {
             reservoir.displayAspect = Aspect.getAspect(tag.getString("displayAspect"));
+        }
+        if (reservoir.displayAspect == null && reservoir.essentia.visSize() > 0) {
+            Aspect[] aspects = reservoir.essentia.getAspects();
+            if (aspects.length > 0) {
+                reservoir.displayAspect = aspects[0];
+            }
+        }
+        if (reservoir.displayAspect != null) {
+            int color = reservoir.displayAspect.getColor();
+            reservoir.colorR = ((color >> 16) & 0xFF) / 255.0F;
+            reservoir.colorG = ((color >> 8) & 0xFF) / 255.0F;
+            reservoir.colorB = (color & 0xFF) / 255.0F;
         }
         if (tag.hasKey("colorR")) {
             reservoir.colorR = tag.getFloat("colorR");

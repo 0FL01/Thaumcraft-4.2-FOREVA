@@ -23,6 +23,7 @@ public class TableRendererFidelityStaticGuardTest {
         String plainItemModel = read("src/main/resources/assets/thaumcraft/models/item/blocktable_0_inventory.json");
         String deconItemModel = read("src/main/resources/assets/thaumcraft/models/item/blocktable_14_inventory.json");
         String arcaneItemModel = read("src/main/resources/assets/thaumcraft/models/item/blocktable_15_inventory.json");
+        String itemTableTesrModel = read("src/main/resources/assets/thaumcraft/models/item/blocktable_tesr.json");
         String helper = read("src/main/java/thaumcraft/client/renderers/tile/TileRenderHelper.java");
         String blockstate = read("src/main/resources/assets/thaumcraft/blockstates/blocktable.json");
         String plainTableModel = read("src/main/resources/assets/thaumcraft/models/block/blocktable_0.json");
@@ -68,15 +69,43 @@ public class TableRendererFidelityStaticGuardTest {
                         && clientProxy.contains("registerBuiltinItemModel(tableItem, 14, \"blocktable_14_inventory\");")
                         && clientProxy.contains("registerBuiltinItemModel(tableItem, 15, \"blocktable_15_inventory\");"));
 
-        assertTrue("ItemTableRenderer should stay as the legacy TEISR path for table shells without perspective-specific GUI hacks now that creative item metas use baked donor-style models",
+        int restoreOrigin = itemTableRenderer.indexOf("restoreLegacyInventoryOrigin();");
+        int legacyRotation = itemTableRenderer.indexOf("GlStateManager.rotate(90.0F, 0.0F, 1.0F, 0.0F);");
+        int legacyTranslation = itemTableRenderer.indexOf("GlStateManager.translate(-0.5F, -0.5F, -0.5F);");
+        int researchTranslation = itemTableRenderer.indexOf("GlStateManager.translate(-0.5F, 0.0F, 0.0F);");
+        assertTrue("ItemTableRenderer should preserve the Forge-correct TC4 inventory transform chain and render a populated research-table preview for meta 1",
                 itemTableRenderer.contains("new TileTableRenderer()")
-                        && itemTableRenderer.contains("GlStateManager.rotate(90.0F, 0.0F, 1.0F, 0.0F);")
-                        && itemTableRenderer.contains("GlStateManager.translate(-0.5F, -0.5F, -0.5F);")
+                        && itemTableRenderer.contains("new TileResearchTableRenderer()")
+                        && itemTableRenderer.contains("new TileResearchTable()")
+                        && itemTableRenderer.contains("researchTable.setInventorySlotContents(0, new ItemStack(ConfigItems.itemInkwell));")
+                        && itemTableRenderer.contains("researchTable.setInventorySlotContents(1, new ItemStack(ConfigItems.itemResearchNotes));")
                         && itemTableRenderer.contains("new TileDeconstructionTableRenderer()")
                         && itemTableRenderer.contains("new TileArcaneWorkbenchRenderer()")
                         && itemTableRenderer.contains("if (meta == 0)")
+                        && itemTableRenderer.contains("if (meta == 1)")
                         && itemTableRenderer.contains("if (meta == 14)")
-                        && itemTableRenderer.contains("if (meta == 15)"));
+                        && itemTableRenderer.contains("if (meta == 15)")
+                        && itemTableRenderer.contains("GlStateManager.translate(0.5F, 0.5F, 0.5F);")
+                        && restoreOrigin >= 0
+                        && restoreOrigin < legacyRotation
+                        && legacyRotation < legacyTranslation
+                        && legacyTranslation < researchTranslation
+                        && itemTableRenderer.contains("finally {")
+                        && itemTableRenderer.contains("GlStateManager.enableRescaleNormal();")
+                        && itemTableRenderer.contains("GlStateManager.popMatrix();"));
+
+        assertTrue("The research-table preview should reuse the existing builtin TESR model and complete block-style display transforms",
+                itemTableTesrModel.contains("\"parent\": \"builtin/entity\"")
+                        && itemTableTesrModel.contains("\"gui\"")
+                        && itemTableTesrModel.contains("[30, 225, 0]")
+                        && itemTableTesrModel.contains("\"ground\"")
+                        && itemTableTesrModel.contains("[0.25, 0.25, 0.25]")
+                        && itemTableTesrModel.contains("\"fixed\"")
+                        && itemTableTesrModel.contains("[0.5, 0.5, 0.5]")
+                        && itemTableTesrModel.contains("\"thirdperson_righthand\"")
+                        && itemTableTesrModel.contains("\"thirdperson_lefthand\"")
+                        && itemTableTesrModel.contains("\"firstperson_righthand\"")
+                        && itemTableTesrModel.contains("\"firstperson_lefthand\""));
 
         assertTrue("The table-family creative item models should carry donor-style block display transforms, shaped baked geometry, and TC4 model-texture UVs instead of routing inventory through the empty TEISR stubs",
                 plainItemModel.contains("\"rotation\": [30, 225, 0]")

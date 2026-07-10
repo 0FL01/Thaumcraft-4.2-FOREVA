@@ -139,6 +139,7 @@ import thaumcraft.client.renderers.entity.RenderSpecialItem;
 import thaumcraft.client.renderers.item.ItemEldritchRenderer;
 import thaumcraft.client.renderers.item.ItemEssentiaReservoirRenderer;
 import thaumcraft.client.renderers.item.ItemJarRenderer;
+import thaumcraft.client.renderers.item.LifterItemColor;
 import thaumcraft.client.renderers.item.ItemTrunkSpawnerRenderer;
 import thaumcraft.client.renderers.item.ItemMetalDeviceRenderer;
 import thaumcraft.client.renderers.item.ItemNodeRenderer;
@@ -759,6 +760,12 @@ public class ClientProxy extends CommonProxy {
                     ConfigItems.itemShard
             );
         }
+        if (ConfigBlocks.blockLifter != null) {
+            Item item = Item.getItemFromBlock(ConfigBlocks.blockLifter);
+            if (item != Items.AIR) {
+                minecraft.getItemColors().registerItemColorHandler(new LifterItemColor(), item);
+            }
+        }
         if (ConfigBlocks.blockCandle != null) {
             Minecraft.getMinecraft().getItemColors().registerItemColorHandler(
                     (stack, tintIndex) -> tintIndex == 0 ? BlockCandle.getCandleColor(stack.getItemDamage()) : -1,
@@ -953,6 +960,7 @@ public class ClientProxy extends CommonProxy {
         for (int meta = 0; meta <= 14; meta++) {
             registerBlockItemModel(metalDeviceItem, meta, "type=" + meta);
         }
+        registerBuiltinItemModel(metalDeviceItem, 0, "blockmetaldevice_0_inventory");
         registerBuiltinItemModel(metalDeviceItem, 5, "blockmetaldevice_5_inventory");
         registerBuiltinItemModel(metalDeviceItem, 6, "blockmetaldevice_5_inventory");
         Item woodenDeviceItem = Item.getItemFromBlock(ConfigBlocks.blockWoodenDevice);
@@ -963,16 +971,17 @@ public class ClientProxy extends CommonProxy {
         registerBuiltinItemModel(woodenDeviceItem, 4, "blockwoodendevice_tesr");
         registerBuiltinItemModel(woodenDeviceItem, 5, "blockwoodendevice_tesr");
         registerBuiltinItemModel(woodenDeviceItem, 8, "blockwoodendevice_banner_tesr");
-        registerBuiltinItemModel(metalDeviceItem, 1, "blockmetaldevice_tesr");
-        registerBuiltinItemModel(metalDeviceItem, 2, "blockmetaldevice_tesr");
+        registerBuiltinItemModel(metalDeviceItem, 1, "blockmetaldevice_dynamic_tesr");
+        registerBuiltinItemModel(metalDeviceItem, 2, "blockmetaldevice_dynamic_tesr");
         registerBuiltinItemModel(metalDeviceItem, 10, "blockmetaldevice_tesr");
         registerBuiltinItemModel(metalDeviceItem, 11, "blockmetaldevice_tesr");
-        registerBuiltinItemModel(metalDeviceItem, 14, "blockmetaldevice_tesr");
+        registerBuiltinItemModel(metalDeviceItem, 14, "blockmetaldevice_dynamic_tesr");
         Item tubeItem = Item.getItemFromBlock(ConfigBlocks.blockTube);
         for (int meta = 0; meta <= 7; meta++) {
             registerBlockItemModel(tubeItem, meta, "type=" + meta);
         }
         registerBuiltinItemModel(tubeItem, 1, "blocktube_tesr");
+        registerBuiltinItemModel(tubeItem, 2, "blocktube_2_inventory");
         registerBuiltinItemModel(tubeItem, 3, "blocktube_tesr");
         registerBuiltinItemModel(tubeItem, 5, "blocktube_tesr");
         registerBuiltinItemModel(tubeItem, 6, "blocktube_tesr");
@@ -982,6 +991,7 @@ public class ClientProxy extends CommonProxy {
             registerBlockItemModel(tableItem, meta, "type=" + meta);
         }
         registerBuiltinItemModel(tableItem, 0, "blocktable_0_inventory");
+        registerBuiltinItemModel(tableItem, 1, "blocktable_tesr");
         registerBuiltinItemModel(tableItem, 14, "blocktable_14_inventory");
         registerBuiltinItemModel(tableItem, 15, "blocktable_15_inventory");
         Item mirrorItem = Item.getItemFromBlock(ConfigBlocks.blockMirror);
@@ -1018,7 +1028,7 @@ public class ClientProxy extends CommonProxy {
         }
         Item jarItem2 = Item.getItemFromBlock(ConfigBlocks.blockJar);
         for (int meta = 0; meta <= 3; meta++) {
-            registerBlockItemModel(jarItem2, meta, "type=" + meta);
+            registerBuiltinItemModel(jarItem2, meta, "blockjar");
         }
         Item slabWoodItem = Item.getItemFromBlock(ConfigBlocks.blockSlabWood);
         registerBlockItemModel(slabWoodItem, 0, "half=bottom,variant=greatwood");
@@ -1040,7 +1050,7 @@ public class ClientProxy extends CommonProxy {
             registerBuiltinItemModel(taintFibresItem, meta, taintFibreItemModels[meta]);
         }
         Item lifterItem = Item.getItemFromBlock(ConfigBlocks.blockLifter);
-        registerBlockItemModel(lifterItem, 0, "normal");
+        registerBuiltinItemModel(lifterItem, 0, "blocklifter");
         Item lootCrateItem = Item.getItemFromBlock(ConfigBlocks.blockLootCrate);
         for (int meta = 0; meta <= 2; meta++) {
             registerBlockItemModel(lootCrateItem, meta, "type=" + meta);

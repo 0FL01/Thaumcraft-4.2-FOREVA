@@ -202,22 +202,7 @@ extends BlockContainer {
         TileEntity tile = worldIn.getTileEntity(pos);
         if (tile instanceof TileJarNode && stack != null && !stack.isEmpty()) {
             TileJarNode node = (TileJarNode) tile;
-            if (stack.getItem() instanceof IEssentiaContainerItem) {
-                AspectList aspects = ((IEssentiaContainerItem) stack.getItem()).getAspects(stack);
-                if (aspects != null && aspects.size() > 0) {
-                    node.setAspects(aspects.copy());
-                }
-            }
-            if (stack.getItem() instanceof BlockJarItem) {
-                BlockJarItem item = (BlockJarItem) stack.getItem();
-                NodeType type = item.getNodeType(stack);
-                if (type != null) {
-                    node.setNodeType(type);
-                }
-                NodeModifier modifier = item.getNodeModifier(stack);
-                node.setNodeModifier(modifier);
-                node.setId(item.getNodeId(stack));
-            }
+            restoreNodeData(stack, node);
             node.markDirty();
             worldIn.notifyBlockUpdate(pos, state, state, 3);
             return;
@@ -228,6 +213,54 @@ extends BlockContainer {
             if (l == 1) jar.facing = 5;
             if (l == 2) jar.facing = 3;
             if (l == 3) jar.facing = 4;
+            restoreFillableData(stack, jar);
+            jar.markDirty();
+            worldIn.notifyBlockUpdate(pos, state, state, 3);
+        }
+    }
+
+    static void restoreFillableData(ItemStack stack, TileJarFillable jar) {
+        if (stack == null || stack.isEmpty()) {
+            return;
+        }
+        if (stack.getItem() instanceof IEssentiaContainerItem) {
+            AspectList aspects = ((IEssentiaContainerItem) stack.getItem()).getAspects(stack);
+            if (aspects != null && aspects.size() == 1) {
+                Aspect aspect = aspects.getAspects()[0];
+                if (aspect != null) {
+                    jar.aspect = aspect;
+                    jar.amount = aspects.getAmount(aspect);
+                }
+            }
+        }
+        if (stack.hasTagCompound() && stack.getTagCompound().hasKey("AspectFilter")) {
+            Aspect filter = Aspect.getAspect(stack.getTagCompound().getString("AspectFilter"));
+            if (filter != null) {
+                jar.aspectFilter = filter;
+            }
+        }
+    }
+
+    static void restoreNodeData(ItemStack stack, TileJarNode node) {
+        if (stack == null || stack.isEmpty()) {
+            return;
+        }
+        if (stack.getItem() instanceof IEssentiaContainerItem) {
+            AspectList aspects = ((IEssentiaContainerItem) stack.getItem()).getAspects(stack);
+            if (aspects != null && aspects.size() > 0) {
+                node.setAspects(aspects.copy());
+            }
+        }
+        if (stack.getItem() instanceof BlockJarItem) {
+            BlockJarItem item = (BlockJarItem) stack.getItem();
+            NodeType type = item.getNodeType(stack);
+            if (type != null) {
+                node.setNodeType(type);
+            }
+            node.setNodeModifier(item.getNodeModifier(stack));
+            if (stack.hasTagCompound() && stack.getTagCompound().hasKey("nodeid")) {
+                node.setId(item.getNodeId(stack));
+            }
         }
     }
 

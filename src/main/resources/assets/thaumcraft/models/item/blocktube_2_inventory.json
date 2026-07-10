@@ -1,0 +1,119 @@
+{
+  "parent": "block/block",
+  "ambientocclusion": false,
+  "display": {
+    "gui": {
+      "rotation": [30, 225, 0],
+      "translation": [0, 0, 0],
+      "scale": [0.625, 0.625, 0.625]
+    },
+    "ground": {
+      "rotation": [0, 0, 0],
+      "translation": [0, 3, 0],
+      "scale": [0.25, 0.25, 0.25]
+    },
+    "fixed": {
+      "rotation": [0, 0, 0],
+      "translation": [0, 0, 0],
+      "scale": [0.5, 0.5, 0.5]
+    },
+    "thirdperson_righthand": {
+      "rotation": [75, 45, 0],
+      "translation": [0, 2.5, 0],
+      "scale": [0.375, 0.375, 0.375]
+    },
+    "thirdperson_lefthand": {
+      "rotation": [75, 225, 0],
+      "translation": [0, 2.5, 0],
+      "scale": [0.375, 0.375, 0.375]
+    },
+    "firstperson_righthand": {
+      "rotation": [0, 45, 0],
+      "translation": [0, 0, 0],
+      "scale": [0.4, 0.4, 0.4]
+    },
+    "firstperson_lefthand": {
+      "rotation": [0, 225, 0],
+      "translation": [0, 0, 0],
+      "scale": [0.4, 0.4, 0.4]
+    }
+  },
+  "textures": {
+    "particle": "thaumcraft:models/centrifuge_inventory",
+    "surface": "thaumcraft:models/centrifuge_inventory"
+  },
+  "elements": [
+    {
+      "from": [4, 7, 7],
+      "to": [12, 9, 9],
+      "faces": {
+        "down": { "uv": [4.5, 0, 6.5, 1], "texture": "#surface" },
+        "up": { "uv": [6.5, 0, 8.5, 1], "texture": "#surface" },
+        "north": { "uv": [4.5, 1, 6.5, 2], "texture": "#surface" },
+        "south": { "uv": [7, 1, 9, 2], "texture": "#surface" },
+        "west": { "uv": [4, 1, 4.5, 2], "texture": "#surface" },
+        "east": { "uv": [6.5, 1, 7, 2], "texture": "#surface" }
+      }
+    },
+    {
+      "from": [12, 5, 6],
+      "to": [16, 11, 10],
+      "faces": {
+        "down": { "uv": [1, 8, 2, 10], "texture": "#surface" },
+        "up": { "uv": [2, 8, 3, 10], "texture": "#surface" },
+        "north": { "uv": [1, 10, 2, 13], "texture": "#surface" },
+        "south": { "uv": [3, 10, 4, 13], "texture": "#surface" },
+        "west": { "uv": [0, 10, 1, 13], "texture": "#surface" },
+        "east": { "uv": [2, 10, 3, 13], "texture": "#surface" }
+      }
+    },
+    {
+      "from": [0, 5, 6],
+      "to": [4, 11, 10],
+      "faces": {
+        "down": { "uv": [1, 8, 2, 10], "texture": "#surface" },
+        "up": { "uv": [2, 8, 3, 10], "texture": "#surface" },
+        "north": { "uv": [1, 10, 2, 13], "texture": "#surface" },
+        "south": { "uv": [3, 10, 4, 13], "texture": "#surface" },
+        "west": { "uv": [0, 10, 1, 13], "texture": "#surface" },
+        "east": { "uv": [2, 10, 3, 13], "texture": "#surface" }
+      }
+    },
+    {
+      "from": [6.5, 4, 6.5],
+      "to": [9.5, 12, 9.5],
+      "faces": {
+        "down": { "uv": [0.75, 0, 1.5, 1.5], "texture": "#surface" },
+        "up": { "uv": [1.5, 0, 2.25, 1.5], "texture": "#surface" },
+        "north": { "uv": [0.75, 1.5, 1.5, 5.5], "texture": "#surface" },
+        "south": { "uv": [2.25, 1.5, 3, 5.5], "texture": "#surface" },
+        "west": { "uv": [0, 1.5, 0.75, 5.5], "texture": "#surface" },
+        "east": { "uv": [1.5, 1.5, 2.25, 5.5], "texture": "#surface" }
+      }
+    },
+    {
+      "from": [4, 12, 4],
+      "to": [12, 16, 12],
+      "faces": {
+        "down": { "uv": [7, 8, 9, 12], "texture": "#surface" },
+        "up": { "uv": [9, 8, 11, 12], "texture": "#surface" },
+        "north": { "uv": [7, 12, 9, 14], "texture": "#surface" },
+        "south": { "uv": [11, 12, 13, 14], "texture": "#surface" },
+        "west": { "uv": [5, 12, 7, 14], "texture": "#surface" },
+        "east": { "uv": [9, 12, 11, 14], "texture": "#surface" }
+      }
+    },
+    {
+      "from": [4, 0, 4],
+      "to": [12, 4, 12],
+      "faces": {
+        "down": { "uv": [7, 8, 9, 12], "texture": "#surface" },
+        "up": { "uv": [9, 8, 11, 12], "texture": "#surface" },
+        "north": { "uv": [7, 12, 9, 14], "texture": "#surface" },
+        "south": { "uv": [11, 12, 13, 14], "texture": "#surface" },
+        "west": { "uv": [5, 12, 7, 14], "texture": "#surface" },
+        "east": { "uv": [9, 12, 11, 14], "texture": "#surface" }
+      }
+    }
+  ]
+}

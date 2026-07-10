@@ -7,6 +7,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 public class TubeConduitBurstContractTest {
@@ -24,7 +25,7 @@ public class TubeConduitBurstContractTest {
         String itemRenderer = read("src/main/java/thaumcraft/client/renderers/item/ItemTubeRenderer.java");
         String tubeBlock = read("src/main/java/thaumcraft/common/blocks/BlockTube.java");
         String clientProxy = read("src/main/java/thaumcraft/client/ClientProxy.java");
-        String crystalizerItemModel = read("src/main/resources/assets/thaumcraft/models/item/blocktube_tesr.json");
+        String tubeTesrItemModel = read("src/main/resources/assets/thaumcraft/models/item/blocktube_tesr.json");
         String tubeItemModel = read("src/main/resources/assets/thaumcraft/models/block/blocktube_0.json");
         String bufferItemModel = read("src/main/resources/assets/thaumcraft/models/block/blocktube_4.json");
 
@@ -54,6 +55,7 @@ public class TubeConduitBurstContractTest {
                         && clientProxy.contains("registerBuiltinItemModel(tubeItem, 6, \"blocktube_tesr\");")
                         && clientProxy.contains("registerBuiltinItemModel(tubeItem, 7, \"blocktube_tesr\");")
                         && clientProxy.contains("tubeItem.setTileEntityItemStackRenderer(new ItemTubeRenderer());")
+                        && clientProxy.contains("registerBuiltinItemModel(tubeItem, 2, \"blocktube_2_inventory\");")
                         && itemRenderer.contains("new TileEssentiaCrystalizerRenderer()")
                         && itemRenderer.contains("crystalizerRenderer.setRendererDispatcher(TileEntityRendererDispatcher.instance);")
                         && itemRenderer.contains("new TileTubeValveRenderer()")
@@ -61,12 +63,18 @@ public class TubeConduitBurstContractTest {
                         && itemRenderer.contains("TubeConduitRenderHelper.renderInventoryShell(meta);")
                         && itemRenderer.contains("if (meta == 1)")
                         && itemRenderer.contains("if (meta == 7)")
-                        && itemRenderer.contains("GlStateManager.translate(-0.5F, -0.5F, -0.5F);")
-                        && crystalizerItemModel.contains("\"parent\": \"builtin/entity\"")
+                        && itemRenderer.contains("valve.facing = EnumFacing.EAST;")
+                        && itemRenderer.contains("try {")
+                        && itemRenderer.contains("} finally {")
+                        && tubeTesrItemModel.contains("\"parent\": \"builtin/entity\"")
+                        && tubeTesrItemModel.contains("\"thirdperson_righthand\"")
+                        && tubeTesrItemModel.contains("\"firstperson_lefthand\"")
                         && tubeItemModel.contains("\"parent\": \"block/block\"")
                         && tubeItemModel.contains("\"from\": [6.5, 6.5, 6.5]")
                         && bufferItemModel.contains("\"parent\": \"block/block\"")
                         && bufferItemModel.contains("\"from\": [4, 4, 4]"));
+        assertFalse("Forge item display transforms must not receive a duplicate legacy -0.5 origin shift",
+                itemRenderer.contains("GlStateManager.translate(-0.5F, -0.5F, -0.5F);"));
 
         assertTrue("TileEssentiaCrystalizerRenderer should keep the crystalizer.obj shell path available for worldless TEISR inventory renders",
                 crystalizerRenderer.contains("if (tile == null)")

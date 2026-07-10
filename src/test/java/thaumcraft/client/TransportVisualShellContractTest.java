@@ -13,7 +13,7 @@ import static org.junit.Assert.assertTrue;
 public class TransportVisualShellContractTest {
 
     @Test
-    public void mirrorAndReservoirShellsStayOnBlockModelsWhileTesrKeepsOnlyDynamicLayers() throws IOException {
+    public void mirrorAndReservoirVisualLayersStayOnTheirReferenceRenderPaths() throws IOException {
         String clientProxy = read("src/main/java/thaumcraft/client/ClientProxy.java");
         String reservoirItemRenderer = read("src/main/java/thaumcraft/client/renderers/item/ItemEssentiaReservoirRenderer.java");
         String mirrorRenderer = read("src/main/java/thaumcraft/client/renderers/tile/TileMirrorRenderer.java");
@@ -54,19 +54,24 @@ public class TransportVisualShellContractTest {
         assertTrue("Mirror TESR must keep the dynamic pane/portal layers after the static shell moved into block models",
                 mirrorRenderer.contains("renderPortalLayers(facing, x, y, z, partialTicks);")
                         && mirrorRenderer.contains("renderPane(facing, x, y, z, MIRROR_PANE_TRANS, 0.02F + instability);"));
-        assertTrue("Reservoir block model must expose the basin shell geometry instead of the old full cube placeholder",
+        assertTrue("Reservoir block model must expose only the exact central core cube",
                 reservoirModel.contains("\"ambientocclusion\": false")
-                        && reservoirModel.contains("\"from\": [2, 7, 2]")
-                        && reservoirModel.contains("\"from\": [13, 2, 3]")
-                        && reservoirModel.contains("\"to\": [14, 7, 13]"));
-        assertTrue("Reservoir TESR must keep only the dynamic liquid layer after the shell moved into the block model",
-                reservoirRenderer.contains("renderLiquid(tile, x, y, z);"));
-        assertFalse("Reservoir TESR must not keep rendering the duplicate static shell model",
-                reservoirRenderer.contains("model.renderAll(") || reservoirRenderer.contains("RESERVOIR_TEXTURE"));
-        assertTrue("Reservoir inventory path must now use builtin/entity plus a dedicated item renderer so the basin shell and worldless liquid both render in item contexts",
+                        && reservoirModel.contains("\"from\": [2, 2, 2]")
+                        && reservoirModel.contains("\"to\": [14, 14, 14]")
+                        && reservoirModel.contains("thaumcraft:blocks/essentiareservoir"));
+        assertTrue("Reservoir TESR must restore the source OBJ shell and retain a separate liquid pass",
+                reservoirRenderer.contains("renderReservoirShell(tile, x, y, z);")
+                        && reservoirRenderer.contains("renderLiquid(tile, x, y, z);")
+                        && reservoirRenderer.contains("RESERVOIR_OBJ")
+                        && reservoirRenderer.contains("RESERVOIR_TEXTURE")
+                        && reservoirRenderer.contains("translateFromOrientation("));
+        assertTrue("Reservoir inventory path must compose the baked core with the OBJ/liquid renderer through builtin/entity",
                 clientProxy.contains("reservoirItem.setTileEntityItemStackRenderer(new ItemEssentiaReservoirRenderer());")
                         && clientProxy.contains("registerBuiltinItemModel(Item.getItemFromBlock(ConfigBlocks.blockEssentiaReservoir), 0, \"blockessentiareservoir_tesr\");")
                         && reservoirItemModel.contains("\"parent\": \"builtin/entity\"")
+                        && reservoirItemModel.contains("\"thirdperson_lefthand\"")
+                        && reservoirItemModel.contains("\"firstperson_lefthand\"")
+                        && reservoirItemRenderer.contains("renderReservoirCore(mc);")
                         && reservoirItemRenderer.contains("new TileEssentiaReservoirRenderer()"));
         assertTrue("ClientProxy must route mirror item metas to closed/open layered icons instead of placement blockstates",
                 clientProxy.contains("registerBuiltinItemModel(mirrorItem, meta, meta == 1 ? \"blockmirror_open\" : \"blockmirror\");")

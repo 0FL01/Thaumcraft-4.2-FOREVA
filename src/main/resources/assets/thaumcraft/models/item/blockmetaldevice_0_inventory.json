@@ -1,0 +1,24 @@
+{
+  "parent": "block/block",
+  "ambientocclusion": false,
+  "textures": {
+    "particle": "thaumcraft:blocks/crucible3",
+    "down": "thaumcraft:blocks/crucible2",
+    "up": "thaumcraft:blocks/crucible4",
+    "side": "thaumcraft:blocks/crucible3"
+  },
+  "elements": [
+    {
+      "from": [0, 0, 0],
+      "to": [16, 16, 16],
+      "faces": {
+        "down": { "texture": "#down" },
+        "up": { "texture": "#up" },
+        "north": { "texture": "#side" },
+        "south": { "texture": "#side" },
+        "west": { "texture": "#side" },
+        "east": { "texture": "#side" }
+      }
+    }
+  ]
+}

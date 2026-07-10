@@ -20,12 +20,6 @@ import thaumcraft.common.tiles.TileJarNode;
 
 public class ItemJarRenderer extends TileEntityItemStackRenderer {
 
-    private static final AspectList DEFAULT_NODE_ASPECTS = new AspectList()
-            .add(Aspect.AIR, 40)
-            .add(Aspect.FIRE, 40)
-            .add(Aspect.EARTH, 40)
-            .add(Aspect.WATER, 40);
-
     private final TileJarRenderer renderer = new TileJarRenderer();
 
     public ItemJarRenderer() {
@@ -42,8 +36,12 @@ public class ItemJarRenderer extends TileEntityItemStackRenderer {
             return;
         }
         GlStateManager.pushMatrix();
-        renderer.render(tile, 0.0D, 0.0D, 0.0D, partialTicks, 0, 1.0F);
-        GlStateManager.popMatrix();
+        try {
+            // Forge supplies the outer -0.5 TEISR translation; the tile renderer keeps its normal block origin.
+            renderer.render(tile, 0.0D, 0.0D, 0.0D, partialTicks, 0, 1.0F);
+        } finally {
+            GlStateManager.popMatrix();
+        }
     }
 
     private static TileJar createTile(ItemStack stack) {
@@ -53,7 +51,7 @@ public class ItemJarRenderer extends TileEntityItemStackRenderer {
         }
         if (meta == 2) {
             TileJarNode jarNode = new TileJarNode();
-            applyNodeAspects(stack, jarNode);
+            applyNodeData(stack, jarNode);
             return jarNode;
         }
         if (meta == 3) {
@@ -88,24 +86,17 @@ public class ItemJarRenderer extends TileEntityItemStackRenderer {
         Aspect filter = Aspect.getAspect(nbt.getString("AspectFilter"));
         if (filter != null) {
             jar.aspectFilter = filter;
-            if (jar.aspect == null) {
-                jar.aspect = filter;
-            }
         }
     }
 
-    private static void applyNodeAspects(ItemStack stack, TileJarNode jarNode) {
+    private static void applyNodeData(ItemStack stack, TileJarNode jarNode) {
         AspectList aspects = null;
         if (stack.getItem() instanceof IEssentiaContainerItem) {
             aspects = ((IEssentiaContainerItem) stack.getItem()).getAspects(stack);
         }
-        if (aspects == null || aspects.size() <= 0) {
-            aspects = DEFAULT_NODE_ASPECTS.copy();
+        if (aspects != null && aspects.size() > 0) {
+            jarNode.setAspects(aspects);
         }
-        jarNode.setAspects(aspects);
-        jarNode.setNodeType(NodeType.NORMAL);
-        jarNode.setNodeModifier(null);
-        jarNode.setId("item");
         if (stack.getItem() instanceof BlockJarItem) {
             BlockJarItem item = (BlockJarItem) stack.getItem();
             NodeType type = item.getNodeType(stack);
@@ -114,9 +105,11 @@ public class ItemJarRenderer extends TileEntityItemStackRenderer {
             }
             NodeModifier modifier = item.getNodeModifier(stack);
             jarNode.setNodeModifier(modifier);
-            String id = item.getNodeId(stack);
-            if (id != null && !id.isEmpty()) {
-                jarNode.setId(id);
+            if (stack.hasTagCompound() && stack.getTagCompound().hasKey("nodeid")) {
+                String id = item.getNodeId(stack);
+                if (id != null && !id.isEmpty()) {
+                    jarNode.setId(id);
+                }
             }
         } else if (stack.hasTagCompound()) {
             NBTTagCompound nbt = stack.getTagCompound();

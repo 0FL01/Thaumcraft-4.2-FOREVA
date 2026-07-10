@@ -4,6 +4,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
+import net.minecraft.util.SoundCategory;
 import net.minecraft.util.ITickable;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
@@ -16,6 +17,7 @@ import thaumcraft.api.aspects.IAspectSource;
 import thaumcraft.api.aspects.IAspectContainer;
 import thaumcraft.api.aspects.IEssentiaTransport;
 import thaumcraft.api.wands.IWandable;
+import thaumcraft.common.lib.TCSounds;
 
 public class TileEssentiaReservoir extends TileThaumcraft implements ITickable, IAspectSource, IEssentiaTransport, IWandable {
     public AspectList essentia = new AspectList();
@@ -26,11 +28,51 @@ public class TileEssentiaReservoir extends TileThaumcraft implements ITickable, 
     public float colorB = 1.0f;
     public Aspect displayAspect = null;
     private int count = 0;
+    private float targetR = 1.0F;
+    private float targetG = 1.0F;
+    private float targetB = 1.0F;
+    private float stepR;
+    private float stepG;
+    private float stepB;
 
     @Override
     public void update() {
-        if (this.world != null && !this.world.isRemote && ++this.count % 5 == 0 && this.essentia.visSize() < this.maxAmount) {
-            this.fillReservoir();
+        if (this.world == null) {
+            return;
+        }
+        ++this.count;
+        if (!this.world.isRemote && this.count % 5 == 0 && this.essentia.visSize() < this.maxAmount) {
+            fillReservoir();
+        }
+        int amount = this.essentia.visSize();
+        if (this.world.isRemote && amount > 0) {
+            if (this.world.rand.nextInt(500 - amount) == 0) {
+                this.world.playSound(this.pos.getX() + 0.5D, this.pos.getY() + 0.5D, this.pos.getZ() + 0.5D,
+                        TCSounds.CREAK, SoundCategory.BLOCKS, 1.0F, 1.4F + this.world.rand.nextFloat() * 0.2F, false);
+            }
+            if (this.count % 20 == 0 && this.essentia.size() > 0) {
+                Aspect[] aspects = this.essentia.getAspects();
+                this.displayAspect = aspects[this.count / 20 % aspects.length];
+                int color = this.displayAspect.getColor();
+                this.targetR = ((color >> 16) & 0xFF) / 255.0F;
+                this.targetG = ((color >> 8) & 0xFF) / 255.0F;
+                this.targetB = (color & 0xFF) / 255.0F;
+                this.stepR = (this.colorR - this.targetR) / 20.0F;
+                this.stepG = (this.colorG - this.targetG) / 20.0F;
+                this.stepB = (this.colorB - this.targetB) / 20.0F;
+            }
+            if (this.displayAspect == null) {
+                this.targetR = 1.0F;
+                this.targetG = 1.0F;
+                this.targetB = 1.0F;
+                this.stepR = 0.0F;
+                this.stepG = 0.0F;
+                this.stepB = 0.0F;
+            } else {
+                this.colorR -= this.stepR;
+                this.colorG -= this.stepG;
+                this.colorB -= this.stepB;
+            }
         }
     }
 
@@ -69,9 +111,9 @@ public class TileEssentiaReservoir extends TileThaumcraft implements ITickable, 
         } else {
             this.displayAspect = null;
         }
-        this.colorR = nbt.getFloat("colorR");
-        this.colorG = nbt.getFloat("colorG");
-        this.colorB = nbt.getFloat("colorB");
+        if (nbt.hasKey("colorR")) this.colorR = nbt.getFloat("colorR");
+        if (nbt.hasKey("colorG")) this.colorG = nbt.getFloat("colorG");
+        if (nbt.hasKey("colorB")) this.colorB = nbt.getFloat("colorB");
     }
 
     @Override

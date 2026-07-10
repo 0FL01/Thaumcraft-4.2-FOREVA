@@ -11,8 +11,10 @@ import net.minecraft.util.ResourceLocation;
 import thaumcraft.api.ThaumcraftApi;
 import thaumcraft.api.aspects.Aspect;
 import thaumcraft.api.aspects.AspectList;
+import thaumcraft.api.nodes.NodeType;
 import thaumcraft.api.research.ResearchItem;
 import thaumcraft.api.research.ResearchPage;
+import thaumcraft.common.blocks.BlockJarItem;
 import thaumcraft.common.config.ConfigBlocks;
 import thaumcraft.common.config.ConfigItems;
 
@@ -350,7 +352,7 @@ final class ConfigResearchBasics {
                 -7,
                 4,
                 3,
-                new ItemStack(ConfigBlocks.blockJar, 1, 0))
+                createNodeJarResearchStack())
                 .setPages(
                         new ResearchPage("tc.research_page.NODEJAR.1"),
                         new ResearchPage(recipeList("NodeJar")),
@@ -374,6 +376,20 @@ final class ConfigResearchBasics {
                 .setSpecial()
                 .registerResearchItem();
         ThaumcraftApi.addWarpToResearch("CRIMSON", 3);
+    }
+
+    private static ItemStack createNodeJarResearchStack() {
+        ItemStack stack = new ItemStack(ConfigBlocks.blockJar, 1, 2);
+        if (stack.getItem() instanceof BlockJarItem) {
+            BlockJarItem item = (BlockJarItem) stack.getItem();
+            item.setAspects(stack, new AspectList()
+                    .add(Aspect.AIR, 40)
+                    .add(Aspect.FIRE, 40)
+                    .add(Aspect.WATER, 40)
+                    .add(Aspect.EARTH, 40));
+            item.setNodeAttributes(stack, NodeType.NORMAL, null, "");
+        }
+        return stack;
     }
 
 }

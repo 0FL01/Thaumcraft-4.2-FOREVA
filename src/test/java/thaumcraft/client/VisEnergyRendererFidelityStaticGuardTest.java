@@ -23,7 +23,6 @@ public class VisEnergyRendererFidelityStaticGuardTest {
         String crystalizerModel = read("src/main/java/thaumcraft/client/renderers/models/ModelCrystalizer.java");
         String relayModel = read("src/main/java/thaumcraft/client/renderers/models/ModelVisRelay.java");
         String stabilizerModel = read("src/main/java/thaumcraft/client/renderers/models/ModelNodeStabilizer.java");
-        String chargerModel = read("src/main/java/thaumcraft/client/renderers/models/ModelMagicWorkbenchCharger.java");
         String stoneDeviceBlockstate = read("src/main/resources/assets/thaumcraft/blockstates/blockstonedevice.json");
         String stabilizerBlockModel = read("src/main/resources/assets/thaumcraft/models/block/blockstonedevice_9.json");
         String converterBlockModel = read("src/main/resources/assets/thaumcraft/models/block/blockstonedevice_11.json");
@@ -79,7 +78,7 @@ public class VisEnergyRendererFidelityStaticGuardTest {
                          && !converterRenderer.contains("ticks * (1.8F"));
 
         assertTrue("TileMagicWorkbenchChargerRenderer should keep the reference ring/support/crystal TESR path with lightmap pulse contract",
-                chargerRenderer.contains("new ModelMagicWorkbenchCharger()")
+                chargerRenderer.contains("new ModelVisRelay()")
                         && chargerRenderer.contains("model.renderRingFloat(MODEL_SCALE)")
                         && chargerRenderer.contains("model.renderSupport(MODEL_SCALE)")
                         && chargerRenderer.contains("for (int i = 0; i < 4; i++)")
@@ -87,6 +86,14 @@ public class VisEnergyRendererFidelityStaticGuardTest {
                         && chargerRenderer.contains("model.renderCrystal(MODEL_SCALE)")
                         && chargerRenderer.contains("OpenGlHelper.setLightmapTextureCoords(")
                         && chargerRenderer.contains("VisNetHandler.isNodeValid(tile.getParent())")
+                        && chargerRenderer.contains("new Color(ItemShard.colors[tile.color])")
+                        && chargerRenderer.contains("float previousLightX = OpenGlHelper.lastBrightnessX;")
+                        && chargerRenderer.contains("GlStateManager.tryBlendFuncSeparate(")
+                        && chargerRenderer.indexOf("model.renderSupport(MODEL_SCALE)")
+                                < chargerRenderer.indexOf("GlStateManager.enableBlend();")
+                        && !chargerRenderer.contains("ModelMagicWorkbenchCharger")
+                        && !chargerRenderer.contains("GlStateManager.disableLighting()")
+                        && !chargerRenderer.contains("GlStateManager.disableCull()")
                         && !chargerRenderer.contains("TileRenderHelper.drawTexturedQuad("));
 
         assertTrue("TileVisRelayRenderer should keep ring/crystal model path with lightmap pulse contract",
@@ -94,7 +101,14 @@ public class VisEnergyRendererFidelityStaticGuardTest {
                         && relayRenderer.contains("model.renderRingFloat(MODEL_SCALE)")
                         && relayRenderer.contains("model.renderCrystal(MODEL_SCALE)")
                         && relayRenderer.contains("OpenGlHelper.setLightmapTextureCoords(")
-                        && relayRenderer.contains("VisNetHandler.isNodeValid(tile.getParent())"));
+                        && relayRenderer.contains("VisNetHandler.isNodeValid(tile.getParent())")
+                        && relayRenderer.contains("new Color(ItemShard.colors[tile.color])")
+                        && relayRenderer.contains("float previousLightX = OpenGlHelper.lastBrightnessX;")
+                        && relayRenderer.contains("GlStateManager.tryBlendFuncSeparate(")
+                        && relayRenderer.indexOf("model.renderRingFloat(MODEL_SCALE)")
+                                < relayRenderer.indexOf("GlStateManager.enableBlend();")
+                        && !relayRenderer.contains("GlStateManager.disableLighting()")
+                        && !relayRenderer.contains("GlStateManager.disableCull()"));
 
         assertTrue("TileEssentiaCrystalizerRenderer should keep the crystalizer.obj shell plus crystal loop and lightmap-driven glow contract",
                 crystalizerRenderer.contains("new ModelCrystalizer()")
@@ -119,6 +133,7 @@ public class VisEnergyRendererFidelityStaticGuardTest {
                         && relayModel.contains("RING_BASE_TRIANGLES")
                         && relayModel.contains("SUPPORT_TRIANGLES")
                         && relayModel.contains("renderSupport(float scale)")
+                        && relayModel.contains(".tex(uv[0], 1.0F - uv[1])")
                         && relayModel.contains("DefaultVertexFormats.POSITION_TEX_NORMAL")
                         && !relayModel.contains("extends ModelBase")
                         && !relayModel.contains("new ModelRenderer("));
@@ -133,15 +148,6 @@ public class VisEnergyRendererFidelityStaticGuardTest {
                         && stabilizerModel.contains("DefaultVertexFormats.POSITION_TEX_NORMAL")
                         && !stabilizerModel.contains("extends ModelBase")
                         && !stabilizerModel.contains("new ModelRenderer("));
-
-        assertTrue("ModelMagicWorkbenchCharger should expose ring/support/crystal model parts",
-                chargerModel.contains("class ModelMagicWorkbenchCharger extends ModelBase")
-                        && chargerModel.contains("ringFloat")
-                        && chargerModel.contains("support")
-                        && chargerModel.contains("crystal")
-                        && chargerModel.contains("renderRingFloat(float scale)")
-                        && chargerModel.contains("renderSupport(float scale)")
-                        && chargerModel.contains("renderCrystal(float scale)"));
 
         assertTrue("Stone-device fallback models should remain metadata-specific even though TESR owns the live shell",
                 stoneDeviceBlockstate.contains("\"type=9\": { \"model\": \"thaumcraft:blockstonedevice_9\" }")

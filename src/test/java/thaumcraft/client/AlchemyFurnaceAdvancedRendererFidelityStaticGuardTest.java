@@ -64,6 +64,7 @@ public class AlchemyFurnaceAdvancedRendererFidelityStaticGuardTest {
                         && alembicModel.contains("private static final int[][] TUBE_MAIN_TRIANGLES")
                         && alembicModel.contains("private static final int[][] TUBE_SMALL_TRIANGLES")
                         && alembicModel.contains("private static final int[][] PANEL_TRIANGLES")
+                        && alembicModel.contains(".tex(uv[0], 1.0F - uv[1])")
                         && alembicModel.contains("DefaultVertexFormats.POSITION_TEX_NORMAL")
                         && !alembicModel.contains("extends ModelBase")
                         && !alembicModel.contains("new ModelRenderer("));

@@ -21,6 +21,7 @@ public class JarVisualShellContractTest {
         String blockstate = read("src/main/resources/assets/thaumcraft/blockstates/blockjar.json");
         String normalModel = read("src/main/resources/assets/thaumcraft/models/block/blockjar_0.json");
         String voidModel = read("src/main/resources/assets/thaumcraft/models/block/blockjar_1.json");
+        String itemModel = read("src/main/resources/assets/thaumcraft/models/item/blockjar.json");
 
         assertTrue("BlockJar should use baked translucent block-model rendering now that the static shell lives in block models",
                 blockJar.contains("return EnumBlockRenderType.MODEL;")
@@ -39,12 +40,27 @@ public class JarVisualShellContractTest {
                         && jarRenderer.contains("private static final String LIQUID_TEXTURE = \"thaumcraft:blocks/animatedglow\";")
                         && jarRenderer.contains("TileRenderHelper.drawTexturedCuboid(buf, minX, minY, minZ, maxX, maxY, maxZ, liquid, color);")
                         && jarRenderer.contains("OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, 200.0F, 200.0F);")
+                        && jarRenderer.contains("OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, prevLightX, prevLightY);")
                         && jarRenderer.contains("GlStateManager.translate(x + 0.5D, y + 0.01D, z + 0.5D);")
                         && jarRenderer.contains("GlStateManager.translate(0.0F, -0.8F + bob, 0.0F);")
+                        && jarRenderer.contains("tile.getWorld() == null && Minecraft.getMinecraft().player != null")
+                        && jarRenderer.contains("Minecraft.getMinecraft().player.ticksExisted + partialTicks")
                         && jarRenderer.contains("float delta = tile.rota - tile.rotb;")
                         && jarRenderer.contains("brain.render(MODEL_SCALE);")
+                        && jarRenderer.contains("boolean lightingEnabled = GL11.glIsEnabled(GL11.GL_LIGHTING);")
+                        && jarRenderer.contains("} finally {")
                         && !jarRenderer.contains("drawSolidHorizontalQuad")
                         && !jarRenderer.contains("renderJarShell(tile, x, y, z);"));
+
+        assertTrue("Jar labels should preserve TC4 size, height, tinted aspect glyph, and deterministic crooked tilt",
+                jarRenderer.contains("GlStateManager.translate(0.0F, -0.4F, 0.315F);")
+                        && jarRenderer.contains("TileRenderHelper.drawTexturedQuad(0.25F, 0xFFFFFFFF")
+                        && jarRenderer.contains("GlStateManager.translate(0.0F, -0.4F, 0.316F);")
+                        && jarRenderer.contains("GlStateManager.scale(0.021F, 0.021F, 0.021F);")
+                        && jarRenderer.contains("TileRenderHelper.drawTexturedQuad(8.0F,")
+                        && jarRenderer.contains("0xFF000000 | (aspect.getColor() & 0x00FFFFFF)")
+                        && jarRenderer.contains("aspect.getTag().hashCode() + tile.getPos().getX() + tile.facing")
+                        && jarRenderer.contains("if (Config.crooked) {"));
 
         assertTrue("ModelJar should blend the glass core so TEISR item shells and node pulse shells stay transparent",
                 jarModel.contains("renderLid(scale);")
@@ -62,7 +78,12 @@ public class JarVisualShellContractTest {
         assertTrue("ItemJarRenderer should keep delegating to TileJarRenderer so filled jars, node jars, and brain jars retain dynamic item visuals",
                 itemRenderer.contains("private final TileJarRenderer renderer = new TileJarRenderer();")
                         && itemRenderer.contains("renderer.setRendererDispatcher(TileEntityRendererDispatcher.instance);")
-                        && itemRenderer.contains("renderer.render(tile, 0.0D, 0.0D, 0.0D, partialTicks, 0, 1.0F);"));
+                        && itemRenderer.contains("renderer.render(tile, 0.0D, 0.0D, 0.0D, partialTicks, 0, 1.0F);")
+                        && itemRenderer.contains("Forge supplies the outer -0.5 TEISR translation")
+                        && !itemRenderer.contains("DEFAULT_NODE_ASPECTS")
+                        && !itemRenderer.contains("GlStateManager.translate(0.5F, 0.5F, 0.5F);"));
+
+        assertComplete3dDisplay(itemModel);
 
         assertTrue("Jar blockstate should route brain and node jars to the normal shell and the void jar to the void shell",
                 blockstate.contains("\"type=0\": { \"model\": \"thaumcraft:blockjar_0\" }")
@@ -96,6 +117,17 @@ public class JarVisualShellContractTest {
                         && lid.contains("\"south\": { \"texture\": \"#side\" }")
                         && lid.contains("\"west\": { \"texture\": \"#side\" }")
                         && lid.contains("\"east\": { \"texture\": \"#side\" }"));
+    }
+
+    private static void assertComplete3dDisplay(String model) {
+        assertTrue("Jar builtin item model should define every 3D display context",
+                model.contains("\"gui\"")
+                        && model.contains("\"ground\"")
+                        && model.contains("\"fixed\"")
+                        && model.contains("\"thirdperson_righthand\"")
+                        && model.contains("\"thirdperson_lefthand\"")
+                        && model.contains("\"firstperson_righthand\"")
+                        && model.contains("\"firstperson_lefthand\""));
     }
 
     private static String read(String path) throws IOException {

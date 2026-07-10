@@ -36,17 +36,25 @@ public class ItemMetalDeviceRenderer extends TileEntityItemStackRenderer {
         if (meta == 1) {
             TileAlembic alembic = new TileAlembic();
             GlStateManager.pushMatrix();
-            GlStateManager.translate(-0.5F, 0.0F, -0.5F);
-            alembicRenderer.render(alembic, 0.0D, 0.0D, 0.0D, partialTicks, 0, 1.0F);
-            GlStateManager.popMatrix();
+            try {
+                restoreLegacyInventoryOrigin();
+                GlStateManager.translate(-0.5F, 0.0F, -0.5F);
+                alembicRenderer.render(alembic, 0.0D, 0.0D, 0.0D, 0.0F, 0, 1.0F);
+            } finally {
+                GlStateManager.popMatrix();
+            }
             return;
         }
         if (meta == 2) {
             TileMagicWorkbenchCharger charger = new TileMagicWorkbenchCharger();
             GlStateManager.pushMatrix();
-            GlStateManager.translate(-0.5F, -0.5F, -0.5F);
-            chargerRenderer.render(charger, 0.0D, 0.0D, 0.0D, partialTicks, 0, 1.0F);
-            GlStateManager.popMatrix();
+            try {
+                restoreLegacyInventoryOrigin();
+                GlStateManager.translate(-0.5F, -0.5F, -0.5F);
+                chargerRenderer.render(charger, 0.0D, 0.0D, 0.0D, 0.0F, 0, 1.0F);
+            } finally {
+                GlStateManager.popMatrix();
+            }
             return;
         }
         if (meta == 10 || meta == 11) {
@@ -61,10 +69,19 @@ public class ItemMetalDeviceRenderer extends TileEntityItemStackRenderer {
         if (meta == 14) {
             TileVisRelay relay = new TileVisRelay();
             GlStateManager.pushMatrix();
-            GlStateManager.scale(1.5F, 1.5F, 1.5F);
-            GlStateManager.translate(-0.5F, -0.25F, -0.5F);
-            relayRenderer.render(relay, 0.0D, 0.0D, 0.0D, partialTicks, 0, 1.0F);
-            GlStateManager.popMatrix();
+            try {
+                restoreLegacyInventoryOrigin();
+                GlStateManager.scale(1.5F, 1.5F, 1.5F);
+                GlStateManager.translate(-0.5F, -0.25F, -0.5F);
+                relayRenderer.render(relay, 0.0D, 0.0D, 0.0D, 0.0F, 0, 1.0F);
+            } finally {
+                GlStateManager.popMatrix();
+            }
         }
+    }
+
+    private static void restoreLegacyInventoryOrigin() {
+        // Forge 1.12 enters TEISR at -0.5 on every axis; TC4's custom inventory renderer did not.
+        GlStateManager.translate(0.5F, 0.5F, 0.5F);
     }
 }

@@ -1,3 +1,49 @@
 {
-  "parent": "thaumcraft:block/blocklifter"
+  "parent": "block/block",
+  "ambientocclusion": false,
+  "textures": {
+    "particle": "thaumcraft:blocks/lifterside",
+    "bottom": "thaumcraft:blocks/arcaneearbottom",
+    "top": "thaumcraft:blocks/liftertop",
+    "side": "thaumcraft:blocks/lifterside",
+    "glow": "thaumcraft:blocks/animatedglow"
+  },
+  "elements": [
+    {
+      "from": [0, 0, 0],
+      "to": [16, 16, 16],
+      "faces": {
+        "down": { "texture": "#bottom" },
+        "up": { "texture": "#top" },
+        "north": { "texture": "#side" },
+        "south": { "texture": "#side" },
+        "west": { "texture": "#side" },
+        "east": { "texture": "#side" }
+      }
+    },
+    {
+      "from": [0.16, 14.4, 0.16],
+      "to": [15.84, 15.84, 15.84],
+      "faces": {
+        "down": { "texture": "#glow", "tintindex": 0 },
+        "up": { "texture": "#glow", "tintindex": 0 },
+        "north": { "texture": "#glow", "tintindex": 0 },
+        "south": { "texture": "#glow", "tintindex": 0 },
+        "west": { "texture": "#glow", "tintindex": 0 },
+        "east": { "texture": "#glow", "tintindex": 0 }
+      }
+    },
+    {
+      "from": [0.16, 1.6, 0.16],
+      "to": [15.84, 14.4, 15.84],
+      "faces": {
+        "down": { "texture": "#glow", "tintindex": 1 },
+        "up": { "texture": "#glow", "tintindex": 1 },
+        "north": { "texture": "#glow", "tintindex": 1 },
+        "south": { "texture": "#glow", "tintindex": 1 },
+        "west": { "texture": "#glow", "tintindex": 1 },
+        "east": { "texture": "#glow", "tintindex": 1 }
+      }
+    }
+  ]
 }

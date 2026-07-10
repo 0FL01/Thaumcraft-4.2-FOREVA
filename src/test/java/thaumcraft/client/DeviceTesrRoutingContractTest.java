@@ -26,6 +26,7 @@ public class DeviceTesrRoutingContractTest {
         String woodenBellowsTesrModel = read("src/main/resources/assets/thaumcraft/models/item/blockwoodendevice_bellows_tesr.json");
         String woodenBannerTesrModel = read("src/main/resources/assets/thaumcraft/models/item/blockwoodendevice_banner_tesr.json");
         String metalTesrModel = read("src/main/resources/assets/thaumcraft/models/item/blockmetaldevice_tesr.json");
+        String metalDynamicTesrModel = read("src/main/resources/assets/thaumcraft/models/item/blockmetaldevice_dynamic_tesr.json");
         String thaumatoriumBaseModel = read("src/main/resources/assets/thaumcraft/models/block/blockmetaldevice_10.json");
         String thaumatoriumTopModel = read("src/main/resources/assets/thaumcraft/models/block/blockmetaldevice_11.json");
 
@@ -57,13 +58,20 @@ public class DeviceTesrRoutingContractTest {
                         && clientProxy.contains("registerBuiltinItemModel(woodenDeviceItem, 4, \"blockwoodendevice_tesr\");")
                         && clientProxy.contains("registerBuiltinItemModel(woodenDeviceItem, 5, \"blockwoodendevice_tesr\");")
                         && clientProxy.contains("registerBuiltinItemModel(woodenDeviceItem, 8, \"blockwoodendevice_banner_tesr\");")
-                        && clientProxy.contains("registerBuiltinItemModel(metalDeviceItem, 1, \"blockmetaldevice_tesr\");")
-                        && clientProxy.contains("registerBuiltinItemModel(metalDeviceItem, 2, \"blockmetaldevice_tesr\");")
+                        && clientProxy.contains("registerBuiltinItemModel(metalDeviceItem, 1, \"blockmetaldevice_dynamic_tesr\");")
+                        && clientProxy.contains("registerBuiltinItemModel(metalDeviceItem, 2, \"blockmetaldevice_dynamic_tesr\");")
                         && clientProxy.contains("registerBuiltinItemModel(metalDeviceItem, 10, \"blockmetaldevice_tesr\");")
                         && clientProxy.contains("registerBuiltinItemModel(metalDeviceItem, 11, \"blockmetaldevice_tesr\");")
-                        && clientProxy.contains("registerBuiltinItemModel(metalDeviceItem, 14, \"blockmetaldevice_tesr\");")
+                        && clientProxy.contains("registerBuiltinItemModel(metalDeviceItem, 14, \"blockmetaldevice_dynamic_tesr\");")
                         && clientProxy.contains("woodenDeviceItem.setTileEntityItemStackRenderer(new ItemWoodenDeviceRenderer());")
                         && clientProxy.contains("metalDeviceItem.setTileEntityItemStackRenderer(new ItemMetalDeviceRenderer());"));
+        assertTrue("Only the approved metal dynamic family should override the shared 10/11 TEISR manifest",
+                clientProxy.contains("registerBuiltinItemModel(metalDeviceItem, 1, \"blockmetaldevice_dynamic_tesr\");")
+                        && clientProxy.contains("registerBuiltinItemModel(metalDeviceItem, 2, \"blockmetaldevice_dynamic_tesr\");")
+                        && clientProxy.contains("registerBuiltinItemModel(metalDeviceItem, 14, \"blockmetaldevice_dynamic_tesr\");")
+                        && !metalTesrModel.contains("\"display\"")
+                        && metalDynamicTesrModel.contains("\"parent\": \"builtin/entity\"")
+                        && hasCompleteBlockDisplay(metalDynamicTesrModel));
 
         assertTrue("Wooden and metal device item renderers should keep the original inventory transforms and delegate to dedicated tile renderers",
                 woodenItemRenderer.contains("new TileBellowsRenderer()")
@@ -95,6 +103,21 @@ public class DeviceTesrRoutingContractTest {
                         && metalItemRenderer.contains("GlStateManager.scale(0.65F, 0.65F, 0.65F);")
                         && metalItemRenderer.contains("GlStateManager.scale(1.5F, 1.5F, 1.5F);")
                         && metalItemRenderer.contains("GlStateManager.translate(-0.5F, -0.25F, -0.5F);"));
+
+        int relayBranch = metalItemRenderer.indexOf("if (meta == 14)");
+        int relayOrigin = metalItemRenderer.indexOf("restoreLegacyInventoryOrigin();", relayBranch);
+        int relayScale = metalItemRenderer.indexOf("GlStateManager.scale(1.5F, 1.5F, 1.5F);", relayBranch);
+        assertTrue("Metal dynamic items should restore TC4's inventory origin in exactly the audited 1/2/14 branches, before relay scaling",
+                occurrences(metalItemRenderer, "restoreLegacyInventoryOrigin();") == 3
+                        && metalItemRenderer.contains("private static void restoreLegacyInventoryOrigin()")
+                        && metalItemRenderer.contains("GlStateManager.translate(0.5F, 0.5F, 0.5F);")
+                        && relayBranch < relayOrigin
+                        && relayOrigin < relayScale);
+        assertTrue("Audited TC4 metal item renders should use the original zero partial tick while thaumatorium 10/11 remains unchanged",
+                metalItemRenderer.contains("alembicRenderer.render(alembic, 0.0D, 0.0D, 0.0D, 0.0F, 0, 1.0F);")
+                        && metalItemRenderer.contains("chargerRenderer.render(charger, 0.0D, 0.0D, 0.0D, 0.0F, 0, 1.0F);")
+                        && metalItemRenderer.contains("relayRenderer.render(relay, 0.0D, 0.0D, 0.0D, 0.0F, 0, 1.0F);")
+                        && metalItemRenderer.contains("thaumatoriumRenderer.render(thaumatorium, 0.0D, 0.0D, 0.0D, partialTicks, 0, 1.0F);"));
 
         assertTrue("Thaumatorium renderer should keep the shell path available for worldless TEISR renders while gating only the output-item layer on world presence",
                 thaumatoriumRenderer.contains("if (tile == null)")
@@ -143,5 +166,23 @@ public class DeviceTesrRoutingContractTest {
 
     private static String read(String path) throws IOException {
         return new String(Files.readAllBytes(Paths.get(path)), StandardCharsets.UTF_8);
+    }
+
+    private static int occurrences(String text, String value) {
+        int count = 0;
+        for (int at = 0; (at = text.indexOf(value, at)) >= 0; at += value.length()) {
+            count++;
+        }
+        return count;
+    }
+
+    private static boolean hasCompleteBlockDisplay(String model) {
+        return model.contains("\"gui\"")
+                && model.contains("\"ground\"")
+                && model.contains("\"fixed\"")
+                && model.contains("\"thirdperson_righthand\"")
+                && model.contains("\"thirdperson_lefthand\"")
+                && model.contains("\"firstperson_righthand\"")
+                && model.contains("\"firstperson_lefthand\"");
     }
 }

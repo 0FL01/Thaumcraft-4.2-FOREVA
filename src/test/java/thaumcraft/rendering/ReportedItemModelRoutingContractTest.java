@@ -107,6 +107,97 @@ public class ReportedItemModelRoutingContractTest {
                 && capModel.contains(".tex(uv[0], 1.0F - uv[1])"));
     }
 
+    @Test
+    public void secondWaveItemsShouldResolveToTheirParityItemRoutes() throws IOException {
+        String clientProxy = read("src/main/java/thaumcraft/client/ClientProxy.java");
+
+        assertTrue("Crucible and levitator should use their complete baked inventory models",
+                clientProxy.contains("registerBuiltinItemModel(metalDeviceItem, 0, \"blockmetaldevice_0_inventory\");")
+                        && clientProxy.contains("registerBuiltinItemModel(lifterItem, 0, \"blocklifter\");")
+                        && clientProxy.contains("new LifterItemColor()"));
+        assertTrue("Research Table sentinel meta 1 should reach its populated TEISR preview",
+                clientProxy.contains("registerBuiltinItemModel(tableItem, 1, \"blocktable_tesr\");")
+                        && clientProxy.contains("tableItem.setTileEntityItemStackRenderer(new ItemTableRenderer());"));
+        assertTrue("Only audited metal metas should use the complete dynamic display manifest",
+                clientProxy.contains("registerBuiltinItemModel(metalDeviceItem, 1, \"blockmetaldevice_dynamic_tesr\");")
+                        && clientProxy.contains("registerBuiltinItemModel(metalDeviceItem, 2, \"blockmetaldevice_dynamic_tesr\");")
+                        && clientProxy.contains("registerBuiltinItemModel(metalDeviceItem, 14, \"blockmetaldevice_dynamic_tesr\");")
+                        && clientProxy.contains("registerBuiltinItemModel(metalDeviceItem, 10, \"blockmetaldevice_tesr\");")
+                        && clientProxy.contains("registerBuiltinItemModel(metalDeviceItem, 11, \"blockmetaldevice_tesr\");"));
+        assertTrue("Centrifuge should use its complete static shell while crystallizer stays dynamic",
+                clientProxy.contains("registerBuiltinItemModel(tubeItem, 2, \"blocktube_2_inventory\");")
+                        && clientProxy.contains("registerBuiltinItemModel(tubeItem, 7, \"blocktube_tesr\");")
+                        && clientProxy.contains("tubeItem.setTileEntityItemStackRenderer(new ItemTubeRenderer());"));
+        assertTrue("Every jar metadata should resolve to the shared NBT-aware built-in renderer",
+                clientProxy.contains("for (int meta = 0; meta <= 3; meta++) {\n            registerBuiltinItemModel(jarItem2, meta, \"blockjar\");")
+                        && clientProxy.contains("jarItem.setTileEntityItemStackRenderer(renderer);"));
+        assertTrue("Reservoir should keep its baked-core plus dynamic-shell item composition",
+                clientProxy.contains("registerBuiltinItemModel(Item.getItemFromBlock(ConfigBlocks.blockEssentiaReservoir), 0, \"blockessentiareservoir_tesr\");")
+                        && clientProxy.contains("reservoirItem.setTileEntityItemStackRenderer(new ItemEssentiaReservoirRenderer());"));
+    }
+
+    @Test
+    public void secondWaveModelsShouldExposeCompletePerspectiveAndSourceGeometry() throws IOException {
+        assertBlockDisplayParent("src/main/resources/assets/thaumcraft/models/item/blockmetaldevice_0_inventory.json");
+        assertBlockDisplayParent("src/main/resources/assets/thaumcraft/models/item/blocklifter.json");
+        assertBlockDisplayParent("src/main/resources/assets/thaumcraft/models/item/blocktube_2_inventory.json");
+
+        assertComplete3dDisplay(read("src/main/resources/assets/thaumcraft/models/item/blockmetaldevice_dynamic_tesr.json"));
+        assertComplete3dDisplay(read("src/main/resources/assets/thaumcraft/models/item/blocktube_tesr.json"));
+        assertComplete3dDisplay(read("src/main/resources/assets/thaumcraft/models/item/blockjar.json"));
+        assertComplete3dDisplay(read("src/main/resources/assets/thaumcraft/models/item/blockessentiareservoir_tesr.json"));
+        assertComplete3dDisplay(read("src/main/resources/assets/thaumcraft/models/item/blocktable_tesr.json"));
+
+        String lifter = read("src/main/resources/assets/thaumcraft/models/item/blocklifter.json");
+        assertTrue("Levitator item should retain both independently tinted animated TC4 glow layers",
+                lifter.contains("\"glow\": \"thaumcraft:blocks/animatedglow\"")
+                        && lifter.contains("\"tintindex\": 0")
+                        && lifter.contains("\"tintindex\": 1"));
+        String reservoir = read("src/main/resources/assets/thaumcraft/models/block/blockessentiareservoir.json");
+        assertTrue("Reservoir baked pass should be the exact TC4 2..14 core, not a substitute shell",
+                reservoir.contains("\"from\": [2, 2, 2]")
+                        && reservoir.contains("\"to\": [14, 14, 14]")
+                        && occurrences(reservoir, "\"from\"") == 1);
+    }
+
+    @Test
+    public void secondWaveTeisrOriginPolicyShouldKeepExactlyOneForgeOffset() throws IOException {
+        String tube = read("src/main/java/thaumcraft/client/renderers/item/ItemTubeRenderer.java");
+        String jar = read("src/main/java/thaumcraft/client/renderers/item/ItemJarRenderer.java");
+        String reservoir = read("src/main/java/thaumcraft/client/renderers/item/ItemEssentiaReservoirRenderer.java");
+        String metal = read("src/main/java/thaumcraft/client/renderers/item/ItemMetalDeviceRenderer.java");
+        String table = read("src/main/java/thaumcraft/client/renderers/item/ItemTableRenderer.java");
+
+        assertFalse("Tube renderer must not duplicate Forge's built-in item offset",
+                tube.contains("GlStateManager.translate(-0.5F, -0.5F, -0.5F);"));
+        assertFalse("Jar renderer must preserve direct block-space liquid and label coordinates",
+                jar.contains("GlStateManager.translate(0.5F, 0.5F, 0.5F);")
+                        || jar.contains("GlStateManager.translate(-0.5F, -0.5F, -0.5F);"));
+        assertFalse("Reservoir core, OBJ and liquid must share Forge's one outer offset",
+                reservoir.contains("GlStateManager.translate(0.5F, 0.5F, 0.5F);")
+                        || reservoir.contains("GlStateManager.translate(-0.5F, -0.5F, -0.5F);"));
+        assertTrue("Only metal metas 1, 2 and 14 should restore the legacy TC4 origin",
+                occurrences(metal, "restoreLegacyInventoryOrigin();") == 3);
+        assertTrue("Research Table must cancel Forge before replaying its rotated TC4 inventory chain",
+                table.indexOf("restoreLegacyInventoryOrigin();") >= 0
+                        && table.indexOf("GlStateManager.rotate(90.0F, 0.0F, 1.0F, 0.0F);") >= 0
+                        && table.indexOf("restoreLegacyInventoryOrigin();")
+                        < table.indexOf("GlStateManager.rotate(90.0F, 0.0F, 1.0F, 0.0F);"));
+    }
+
+    @Test
+    public void nodeJarResearchPreviewShouldKeepTc4StackData() throws IOException {
+        String research = read("src/main/java/thaumcraft/common/config/research/ConfigResearchBasics.java");
+        int air = research.indexOf(".add(Aspect.AIR, 40)");
+        int fire = research.indexOf(".add(Aspect.FIRE, 40)", air);
+        int water = research.indexOf(".add(Aspect.WATER, 40)", fire);
+        int earth = research.indexOf(".add(Aspect.EARTH, 40)", water);
+        assertTrue("NODEJAR preview should retain the ordered TC4 primal aspects",
+                air >= 0 && air < fire && fire < water && water < earth);
+        assertTrue("NODEJAR preview should use normal type, no modifier and the original empty id",
+                research.contains("item.setNodeAttributes(stack, NodeType.NORMAL, null, \"\");"));
+    }
+
     private static void assertGeneratedLayers(String fileName, String frame, String pane) throws IOException {
         String model = read("src/main/resources/assets/thaumcraft/models/item/" + fileName);
         assertTrue(fileName + " must inherit generated-item transforms", model.contains("\"parent\": \"item/generated\""));
@@ -127,6 +218,16 @@ public class ReportedItemModelRoutingContractTest {
                 && model.contains("\"thirdperson_lefthand\"")
                 && model.contains("\"firstperson_righthand\"")
                 && model.contains("\"firstperson_lefthand\""));
+    }
+
+    private static int occurrences(String text, String needle) {
+        int count = 0;
+        int from = 0;
+        while ((from = text.indexOf(needle, from)) >= 0) {
+            count++;
+            from += needle.length();
+        }
+        return count;
     }
 
     private static String read(String path) throws IOException {
