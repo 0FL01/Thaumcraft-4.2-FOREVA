@@ -6,6 +6,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import org.junit.Test;
 
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 public class BrainJarAndPechClientFeedbackStaticGuardTest {
@@ -35,6 +36,18 @@ public class BrainJarAndPechClientFeedbackStaticGuardTest {
         assertTrue(source.contains("if (meta == 1 && !worldIn.isRemote)"));
         assertTrue(source.contains("new EntityXPOrb(worldIn, pos.getX() + 0.5"));
         assertTrue(source.contains("TCSounds.JAR"));
+    }
+
+    @Test
+    public void emptyingJarUsesTheTc4JarAndLiquidSoundsRatherThanGlassBreakage() throws IOException {
+        String source = readFile("src/main/java/thaumcraft/common/blocks/BlockJar.java");
+        int emptyJarStart = source.indexOf("// Sneak + empty hand = empty jar");
+        int nextInteraction = source.indexOf("// Apply label", emptyJarStart);
+        String emptyJarInteraction = source.substring(emptyJarStart, nextInteraction);
+
+        assertTrue(emptyJarInteraction.contains("TCSounds.JAR"));
+        assertTrue(emptyJarInteraction.contains("SoundEvents.ENTITY_PLAYER_SWIM"));
+        assertFalse(emptyJarInteraction.contains("SoundEvents.BLOCK_GLASS_BREAK"));
     }
 
     @Test

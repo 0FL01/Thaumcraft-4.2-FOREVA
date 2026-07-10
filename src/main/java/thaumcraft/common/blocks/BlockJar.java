@@ -312,7 +312,7 @@ extends BlockContainer {
                     jar.aspect = null;
                 }
                 if (worldIn.isRemote) {
-                    worldIn.playSound(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, SoundEvents.BLOCK_GLASS_BREAK, SoundCategory.BLOCKS, 0.4f, 1.0f, false);
+                    worldIn.playSound(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, TCSounds.JAR, SoundCategory.BLOCKS, 0.4f, 1.0f, false);
                     worldIn.playSound(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, net.minecraft.init.SoundEvents.ENTITY_PLAYER_SWIM, SoundCategory.BLOCKS, 0.5f, 1.0f + (worldIn.rand.nextFloat() - worldIn.rand.nextFloat()) * 0.3f, false);
                 }
                 return true;
