@@ -124,6 +124,7 @@ public class RenderEventHandler {
         }
         long time = System.nanoTime() / 1000000L;
         this.notifyHandler.handleNotifications(mc, time, event.getResolution());
+        this.wandHandler.handleCastingWandHud(mc, time, event);
         this.wandHandler.handleFociRadial(mc, time, event);
     }
 

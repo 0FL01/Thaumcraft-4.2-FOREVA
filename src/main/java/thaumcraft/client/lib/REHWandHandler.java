@@ -18,18 +18,27 @@ import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
 import thaumcraft.api.wands.ItemFocusBasic;
+import thaumcraft.api.aspects.Aspect;
+import thaumcraft.api.aspects.AspectList;
+import thaumcraft.common.config.Config;
 import thaumcraft.common.items.wands.ItemFocusPouch;
 import thaumcraft.common.items.wands.ItemWandCasting;
+import thaumcraft.common.items.wands.WandManager;
+import thaumcraft.common.items.wands.foci.FocusTrade;
 import thaumcraft.common.lib.network.PacketHandler;
 import thaumcraft.common.lib.network.misc.PacketFocusChangeToServer;
 
+import java.text.DecimalFormat;
 import java.util.HashMap;
+import java.util.List;
 import java.util.TreeMap;
 
 @SideOnly(Side.CLIENT)
 public class REHWandHandler {
 
     static float radialHudScale = 0.0F;
+    private static final DecimalFormat VIS_FORMAT = new DecimalFormat("0.#");
+    private static final DecimalFormat COOLDOWN_FORMAT = new DecimalFormat("0.0");
 
     private final TreeMap<String, Integer> foci = new TreeMap<>();
     private final HashMap<String, ItemStack> fociItem = new HashMap<>();
@@ -38,6 +47,156 @@ public class REHWandHandler {
     private long lastTime = 0L;
     private boolean lastState = false;
     private boolean prevMouseButton = false;
+    private final int[][] oldVis = new int[9][6];
+    private final boolean[] oldVisValid = new boolean[9];
+    private long nextVisSnapshot = 0L;
+
+    public void handleCastingWandHud(Minecraft mc, long time, RenderGameOverlayEvent event) {
+        if (mc.player == null || !mc.inGameHasFocus || mc.isGamePaused()) {
+            return;
+        }
+        ItemStack held = mc.player.getHeldItemMainhand();
+        if (held.isEmpty() || !(held.getItem() instanceof ItemWandCasting)) {
+            return;
+        }
+
+        ItemWandCasting wand = (ItemWandCasting) held.getItem();
+        AspectList vis = wand.getAllVis(held);
+        List<Aspect> primals = Aspect.getPrimalAspects();
+        int slot = MathHelper.clamp(mc.player.inventory.currentItem, 0, oldVis.length - 1);
+        if (!oldVisValid[slot]) {
+            snapshotVis(slot, vis, primals);
+        }
+
+        ScaledResolution resolution = event.getResolution();
+        int hudY = Config.dialBottom ? resolution.getScaledHeight() - 34 : 2;
+
+        GL11.glPushAttrib(GL11.GL_ALL_ATTRIB_BITS);
+        GlStateManager.pushMatrix();
+        try {
+            GlStateManager.disableDepth();
+            GlStateManager.depthMask(false);
+            GlStateManager.enableBlend();
+            GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+            GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+            GlStateManager.translate(2.0F, hudY, 0.0F);
+            GlStateManager.scale(0.5F, 0.5F, 1.0F);
+
+            UtilsFX.bindTexture("textures/gui/hud.png");
+            UtilsFX.drawTexturedQuad(0, 0, 0, 0, 64, 64, -90.0D);
+            GlStateManager.translate(16.0F, 16.0F, 0.0F);
+
+            ItemFocusBasic focus = wand.getFocus(held);
+            ItemStack focusStack = wand.getFocusItem(held);
+            AspectList focusCost = focus == null || focusStack.isEmpty() ? null : focus.getVisCost(focusStack);
+            int maxVis = Math.max(1, ItemWandCasting.getMaxVis(held));
+
+            for (int i = 0; i < primals.size() && i < 6; i++) {
+                Aspect aspect = primals.get(i);
+                int amount = vis.getAmount(aspect);
+                GlStateManager.pushMatrix();
+                if (!Config.dialBottom) {
+                    GlStateManager.rotate(90.0F, 0.0F, 0.0F, 1.0F);
+                }
+                GlStateManager.rotate(-15.0F + i * 24.0F, 0.0F, 0.0F, 1.0F);
+                GlStateManager.translate(0.0F, -32.0F, 0.0F);
+                GlStateManager.scale(0.5F, 0.5F, 1.0F);
+
+                int fill = MathHelper.clamp((int)(30.0F * amount / maxVis), 0, 30);
+                int color = aspect.getColor();
+                GlStateManager.color((color >> 16 & 255) / 255.0F,
+                        (color >> 8 & 255) / 255.0F, (color & 255) / 255.0F, 0.8F);
+                UtilsFX.bindTexture("textures/gui/hud.png");
+                UtilsFX.drawTexturedQuad(-4, 35 - fill, 104, 0, 8, fill, -89.0D);
+                GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+                UtilsFX.drawTexturedQuad(-8, -3, 72, 0, 16, 42, -88.0D);
+
+                boolean usedByFocus = focusCost != null && focusCost.getAmount(aspect) > 0;
+                if (usedByFocus) {
+                    UtilsFX.drawTexturedQuad(-4, -8, 136, 0, 8, 8, -87.0D);
+                }
+                int previous = oldVis[slot][i];
+                if (previous != amount) {
+                    int arrowU = previous > amount ? 128 : 120;
+                    UtilsFX.drawTexturedQuad(-4, usedByFocus ? -16 : -8, arrowU, 0, 8, 8, -86.0D);
+                }
+
+                if (mc.player.isSneaking()) {
+                    GlStateManager.rotate(-90.0F, 0.0F, 0.0F, 1.0F);
+                    String stored = VIS_FORMAT.format(amount / 100.0F);
+                    mc.fontRenderer.drawString(stored, -32, -4, 0xFFFFFF);
+                    if (usedByFocus) {
+                        float cost = focusCost.getAmount(aspect)
+                                * ItemWandCasting.getConsumptionModifier(held, mc.player, aspect, false) / 100.0F;
+                        mc.fontRenderer.drawString(VIS_FORMAT.format(cost), 8, -4, 0xFFFFFF);
+                    }
+                }
+                GlStateManager.popMatrix();
+            }
+
+            renderCenterItem(mc, held, wand, focus, focusStack);
+        } finally {
+            GlStateManager.popMatrix();
+            GL11.glPopAttrib();
+            GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+        }
+
+        if (time >= nextVisSnapshot) {
+            snapshotVis(slot, vis, primals);
+            nextVisSnapshot = time + 1000L;
+        }
+    }
+
+    private void renderCenterItem(Minecraft mc, ItemStack held, ItemWandCasting wand,
+                                  ItemFocusBasic focus, ItemStack focusStack) {
+        ItemStack display = focusStack;
+        int count = -1;
+        if (focus instanceof FocusTrade) {
+            ItemStack picked = ((FocusTrade) focus).getPickedBlock(held);
+            if (!picked.isEmpty()) {
+                display = picked;
+                count = countMatchingItems(mc.player, picked);
+            }
+        }
+
+        GlStateManager.pushMatrix();
+        GlStateManager.scale(2.0F, 2.0F, 1.0F);
+        if (!display.isEmpty()) {
+            GlStateManager.enableRescaleNormal();
+            RenderHelper.enableGUIStandardItemLighting();
+            mc.getRenderItem().renderItemAndEffectIntoGUI(display, -8, -8);
+            RenderHelper.disableStandardItemLighting();
+            GlStateManager.disableRescaleNormal();
+        }
+        if (count >= 0) {
+            String text = Integer.toString(count);
+            mc.fontRenderer.drawStringWithShadow(text, -mc.fontRenderer.getStringWidth(text) / 2.0F, 9.0F, 0xFFFFFF);
+        }
+        float cooldown = WandManager.getCooldown(mc.player);
+        if (cooldown > 0.0F) {
+            String text = COOLDOWN_FORMAT.format(cooldown);
+            mc.fontRenderer.drawStringWithShadow(text, -mc.fontRenderer.getStringWidth(text) / 2.0F, -4.0F, 0xFFFFFF);
+        }
+        GlStateManager.popMatrix();
+    }
+
+    private static int countMatchingItems(EntityPlayer player, ItemStack picked) {
+        int count = 0;
+        for (ItemStack stack : player.inventory.mainInventory) {
+            if (!stack.isEmpty() && ItemStack.areItemsEqual(stack, picked)
+                    && ItemStack.areItemStackTagsEqual(stack, picked)) {
+                count += stack.getCount();
+            }
+        }
+        return count;
+    }
+
+    private void snapshotVis(int slot, AspectList vis, List<Aspect> primals) {
+        for (int i = 0; i < primals.size() && i < 6; i++) {
+            oldVis[slot][i] = vis.getAmount(primals.get(i));
+        }
+        oldVisValid[slot] = true;
+    }
 
     public void handleFociRadial(Minecraft mc, long time, RenderGameOverlayEvent event) {
         if (!KeyHandler.radialActive && radialHudScale <= 0.0F) {
