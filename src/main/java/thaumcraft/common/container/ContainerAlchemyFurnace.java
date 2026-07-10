@@ -19,8 +19,8 @@ public class ContainerAlchemyFurnace extends Container {
     public ContainerAlchemyFurnace(InventoryPlayer playerInventory, TileAlchemyFurnace furnace) {
         this.furnace = furnace;
         if (furnace != null) {
-            this.addSlotToContainer(new Slot(furnace, 0, 56, 17));
-            this.addSlotToContainer(new Slot(furnace, 1, 56, 53));
+            this.addSlotToContainer(new SlotLimitedHasAspects(furnace, 0, 80, 8));
+            this.addSlotToContainer(new Slot(furnace, 1, 80, 48));
         }
         if (playerInventory != null) {
             for (int row = 0; row < 3; ++row) {
