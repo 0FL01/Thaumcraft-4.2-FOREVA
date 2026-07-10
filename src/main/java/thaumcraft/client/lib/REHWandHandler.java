@@ -37,7 +37,7 @@ import java.util.TreeMap;
 public class REHWandHandler {
 
     static float radialHudScale = 0.0F;
-    private static final DecimalFormat VIS_FORMAT = new DecimalFormat("0.#");
+    private static final DecimalFormat VIS_FORMAT = new DecimalFormat("#######.##");
     private static final DecimalFormat COOLDOWN_FORMAT = new DecimalFormat("0.0");
 
     private final TreeMap<String, Integer> foci = new TreeMap<>();
@@ -69,7 +69,7 @@ public class REHWandHandler {
         }
 
         ScaledResolution resolution = event.getResolution();
-        int hudY = Config.dialBottom ? resolution.getScaledHeight() - 34 : 2;
+        int hudY = Config.dialBottom ? resolution.getScaledHeight() - 32 : 0;
 
         GL11.glPushAttrib(GL11.GL_ALL_ATTRIB_BITS);
         GlStateManager.pushMatrix();
@@ -79,11 +79,14 @@ public class REHWandHandler {
             GlStateManager.enableBlend();
             GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
             GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
-            GlStateManager.translate(2.0F, hudY, 0.0F);
-            GlStateManager.scale(0.5F, 0.5F, 1.0F);
+            GlStateManager.translate(0.0F, hudY, 0.0F);
 
+            GlStateManager.pushMatrix();
+            GlStateManager.scale(0.5F, 0.5F, 1.0F);
             UtilsFX.bindTexture("textures/gui/hud.png");
             UtilsFX.drawTexturedQuad(0, 0, 0, 0, 64, 64, -90.0D);
+            GlStateManager.popMatrix();
+
             GlStateManager.translate(16.0F, 16.0F, 0.0F);
 
             ItemFocusBasic focus = wand.getFocus(held);
@@ -123,7 +126,7 @@ public class REHWandHandler {
 
                 if (mc.player.isSneaking()) {
                     GlStateManager.rotate(-90.0F, 0.0F, 0.0F, 1.0F);
-                    String stored = VIS_FORMAT.format(amount / 100.0F);
+                    String stored = Integer.toString(amount / 100);
                     mc.fontRenderer.drawString(stored, -32, -4, 0xFFFFFF);
                     if (usedByFocus) {
                         float cost = focusCost.getAmount(aspect)
@@ -160,7 +163,6 @@ public class REHWandHandler {
         }
 
         GlStateManager.pushMatrix();
-        GlStateManager.scale(2.0F, 2.0F, 1.0F);
         if (!display.isEmpty()) {
             GlStateManager.enableRescaleNormal();
             RenderHelper.enableGUIStandardItemLighting();
@@ -170,12 +172,21 @@ public class REHWandHandler {
         }
         if (count >= 0) {
             String text = Integer.toString(count);
-            mc.fontRenderer.drawStringWithShadow(text, -mc.fontRenderer.getStringWidth(text) / 2.0F, 9.0F, 0xFFFFFF);
+            int width = mc.fontRenderer.getStringWidth(text);
+            GlStateManager.pushMatrix();
+            GlStateManager.translate(0.0F, -mc.fontRenderer.FONT_HEIGHT, 500.0F);
+            GlStateManager.scale(0.5F, 0.5F, 0.5F);
+            mc.fontRenderer.drawString(text, 16 - width, 24, 0xFFFFFF);
+            GlStateManager.popMatrix();
         }
         float cooldown = WandManager.getCooldown(mc.player);
         if (cooldown > 0.0F) {
-            String text = COOLDOWN_FORMAT.format(cooldown);
-            mc.fontRenderer.drawStringWithShadow(text, -mc.fontRenderer.getStringWidth(text) / 2.0F, -4.0F, 0xFFFFFF);
+            String text = COOLDOWN_FORMAT.format(cooldown) + "s";
+            GlStateManager.pushMatrix();
+            GlStateManager.translate(0.0F, 0.0F, 150.0F);
+            GlStateManager.scale(0.5F, 0.5F, 0.5F);
+            mc.fontRenderer.drawString(text, -mc.fontRenderer.getStringWidth(text) / 2, -4, 0xFFFFFF);
+            GlStateManager.popMatrix();
         }
         GlStateManager.popMatrix();
     }
