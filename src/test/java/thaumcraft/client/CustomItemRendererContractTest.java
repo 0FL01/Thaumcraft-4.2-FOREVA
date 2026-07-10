@@ -73,9 +73,11 @@ public class CustomItemRendererContractTest {
                         && wandCalibration.contains("180f, 0f, 0f")
                         && wandCalibration.contains("0f,0f,66f")
                         && wandCalibration.contains("0f,0.6f,0f")
+                        && wandCalibration.contains("0.6f,0.6f,0.6f")
                         && wandCalibration.contains("0f,1f,0f")
                         && wandCalibration.contains("0.5f,1.5f,0.5f")
                         && wandCalibration.contains("1f,1.1f,1f")
+                        && wandCalibration.contains("0.5f,0.5f,0.5f")
                         && wandCalibration.contains("0f,0.5f,0f")
                         && wandCalibration.contains("-0.7f,1.2f,0f")
                         && wandCalibration.contains("0f,1.5f,0f")
@@ -91,6 +93,8 @@ public class CustomItemRendererContractTest {
                          && wandCalibrationAsset.contains("\"THIRD_PERSON_LEFT_HAND\"")
                          && wandCalibrationAsset.contains("\"rotate\": [0.0, 0.0, 66.0]")
                          && wandCalibrationAsset.contains("\"translate\": [0.5, 1.5, 0.5]")
+                         && wandCalibrationAsset.contains("\"scale\": [0.6, 0.6, 0.6]")
+                         && wandCalibrationAsset.contains("\"scale\": [0.5, 0.5, 0.5]")
                          && wandCalibrationAsset.contains("\"scaleMultiplier\": [0.8, 0.8, 0.8]")
                         && wandCalibrationAsset.contains("\"postTranslateAdd\": [-0.7, 0.6, 0.0]"));
 
