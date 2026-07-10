@@ -149,6 +149,11 @@ public class ContainerArcaneWorkbench extends Container {
                 && super.canDragIntoSlot(slotIn);
     }
 
+    @Override
+    public boolean canMergeSlot(ItemStack stack, Slot slotIn) {
+        return slotIn.inventory != this.craftResult && super.canMergeSlot(stack, slotIn);
+    }
+
     private boolean canFullyMerge(ItemStack stack, int startIndex, int endIndex) {
         int remaining = stack.getCount();
         for (int i = startIndex; i < endIndex && remaining > 0; i++) {

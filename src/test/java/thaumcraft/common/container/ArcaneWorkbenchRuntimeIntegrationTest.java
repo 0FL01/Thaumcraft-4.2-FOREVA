@@ -314,6 +314,8 @@ public class ArcaneWorkbenchRuntimeIntegrationTest {
         this.player.inventory.setInventorySlotContents(9, new ItemStack(Items.DIAMOND, 62));
 
         ContainerArcaneWorkbench container = new ContainerArcaneWorkbench(this.player.inventory, tile);
+        assertFalse(container.canMergeSlot(new ItemStack(Items.DIAMOND), container.inventorySlots.get(0)));
+        assertTrue(container.canMergeSlot(new ItemStack(Items.DIAMOND), container.inventorySlots.get(11)));
         assertTrue(container.transferStackInSlot(this.player, 0).isEmpty());
         assertEquals(4, container.inventorySlots.get(0).getStack().getCount());
         assertFalse(tile.getStackInSlot(0).isEmpty());
