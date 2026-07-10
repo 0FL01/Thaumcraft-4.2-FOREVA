@@ -74,6 +74,7 @@ public class DeviceTesrRoutingContractTest {
                         && woodenItemRenderer.contains("new TileArcaneBoreBaseRenderer()")
                         && woodenItemRenderer.contains("new TileArcaneBoreRenderer()")
                         && woodenItemRenderer.contains("new TileBannerRenderer()")
+                        && woodenItemRenderer.contains("GlStateManager.translate(0.5F, 0.5F, 0.5F);")
                         && woodenItemRenderer.contains("GlStateManager.rotate(90.0F, 0.0F, 1.0F, 0.0F);")
                         && woodenItemRenderer.contains("GlStateManager.translate(-0.5F, -0.75F, -0.5F);")
                         && woodenItemRenderer.contains("banner.setFacing((byte) 8);")

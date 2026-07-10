@@ -49,6 +49,8 @@ public class ItemWoodenDeviceRenderer extends TileEntityItemStackRenderer {
             if (meta == 0) {
                 TileBellows bellows = new TileBellows();
                 GlStateManager.pushMatrix();
+                // The TC4 TESR is centered on the origin; Forge item transforms rotate around the 0..1 block center.
+                GlStateManager.translate(0.5F, 0.5F, 0.5F);
                 GlStateManager.rotate(90.0F, 0.0F, 1.0F, 0.0F);
                 GlStateManager.translate(-0.5F, -0.5F, -0.5F);
                 bellowsRenderer.render(bellows, 0.0D, 0.0D, 0.0D, partialTicks, 0, 1.0F);
