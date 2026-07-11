@@ -187,6 +187,9 @@ public class CommonProxy implements IGuiHandler {
     public void blockWard(World world, double x, double y, double z, EnumFacing side, float red, float green, float blue) {
     }
 
+    public void refreshWardedBlockRender(World world, BlockPos pos) {
+    }
+
     public void beam(World world, double x, double y, double z, double tx, double ty, double tz, int color, boolean flicker, int ticks) {
     }
 

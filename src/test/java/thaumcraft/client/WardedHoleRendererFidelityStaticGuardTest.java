@@ -41,6 +41,22 @@ public class WardedHoleRendererFidelityStaticGuardTest {
                         && warded.contains("dispatcher.getBlockModelRenderer().renderModel(")
                         && warded.contains("MathHelper.getPositionRandom(tile.getPos())"));
 
+        assertTrue("TileWardedRenderer should preserve render layers and invalidate its dimension-aware connected-texture cache",
+                warded.contains("for (BlockRenderLayer layer : BlockRenderLayer.values())")
+                        && warded.contains("block.canRenderInLayer(actualState, layer)")
+                        && warded.contains("ForgeHooksClient.setRenderLayer(layer)")
+                        && warded.contains("ForgeHooksClient.setRenderLayer(null)")
+                        && warded.contains("new StoredBlockAccess(tile.getWorld(), tile.getPos(), storedState)")
+                        && warded.contains("private final int dimension;")
+                        && warded.contains("public static void invalidate(World world, BlockPos pos)")
+                        && warded.contains("public static void onWorldUnload(WorldEvent.Unload event)")
+                        && warded.contains("ICON_CACHE.clear()"));
+
+        assertTrue("TileWardedRenderer should only cull shared faces for the same stored block and metadata",
+                warded.contains("hasSameStoredBlock(tile, (TileWarded) neighbor)")
+                        && warded.contains("left.block == right.block")
+                        && warded.contains("(left.blockMd & 255) == (right.blockMd & 255)"));
+
         assertTrue("TileHoleRenderer should batch connected holes and keep layered tunnel routing through the shared helper",
                 hole.contains("HoleRenderBatchCache.getGroup(tile)")
                         && hole.contains("group.markRenderedThisFrame()")

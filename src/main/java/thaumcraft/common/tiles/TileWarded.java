@@ -4,11 +4,14 @@ import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.network.NetworkManager;
+import net.minecraft.network.play.server.SPacketUpdateTileEntity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.registry.ForgeRegistries;
 import thaumcraft.api.TileThaumcraft;
+import thaumcraft.common.Thaumcraft;
 import thaumcraft.common.config.ConfigBlocks;
 
 public class TileWarded extends TileThaumcraft {
@@ -50,7 +53,7 @@ public class TileWarded extends TileThaumcraft {
         if (!name.isEmpty()) {
             this.block = ForgeRegistries.BLOCKS.getValue(new ResourceLocation(name));
         }
-        if (this.block == null) {
+        if (this.block == null || this.block == Blocks.AIR || this.block == ConfigBlocks.blockWarded) {
             this.block = Blocks.STONE;
         }
         this.blockMd = nbt.getByte("md");
@@ -69,6 +72,27 @@ public class TileWarded extends TileThaumcraft {
         nbt.setByte("md", this.blockMd);
         nbt.setByte("ll", this.light);
         nbt.setInteger("oi", this.owner);
+    }
+
+    @Override
+    public void onDataPacket(NetworkManager net, SPacketUpdateTileEntity pkt) {
+        super.onDataPacket(net, pkt);
+        this.requestRenderUpdate();
+    }
+
+    @Override
+    public void handleUpdateTag(NBTTagCompound tag) {
+        super.handleUpdateTag(tag);
+        this.requestRenderUpdate();
+    }
+
+    private void requestRenderUpdate() {
+        if (this.world != null && this.pos != null) {
+            this.world.markBlockRangeForRenderUpdate(this.pos, this.pos);
+            if (Thaumcraft.proxy != null) {
+                Thaumcraft.proxy.refreshWardedBlockRender(this.world, this.pos);
+            }
+        }
     }
 
 }

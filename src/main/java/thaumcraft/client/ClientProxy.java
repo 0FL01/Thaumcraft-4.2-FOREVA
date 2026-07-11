@@ -1409,6 +1409,12 @@ public class ClientProxy extends CommonProxy {
     }
 
     @Override
+    public void refreshWardedBlockRender(World world, BlockPos pos) {
+        if (world == null || !world.isRemote || pos == null) return;
+        TileWardedRenderer.invalidate(world, pos);
+    }
+
+    @Override
     public void beam(World world, double x, double y, double z, double tx, double ty, double tz, int color, boolean flicker, int ticks) {
         if (world == null || !world.isRemote) return;
         int amount = particleCount(Math.max(4, ticks / 2));
