@@ -50,7 +50,7 @@ public class FXBeamWand extends FXBeam {
             return;
         }
         Vec3d src = sourcePos(this.player, 1.0F, this.sourceYOffset);
-        super.updateBeam(src.x, src.y, src.z, this.tX, this.tY, this.tZ);
+        this.setPosition(src.x, src.y, src.z);
         if (this.impact > 0) {
             --this.impact;
         }

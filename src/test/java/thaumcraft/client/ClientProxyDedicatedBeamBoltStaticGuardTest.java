@@ -83,6 +83,10 @@ public class ClientProxyDedicatedBeamBoltStaticGuardTest {
                         && beamWandClass.contains("this.sourceYOffset")
                         && beamWandClass.contains("if (this.impact <= 0)")
                         && beamWandClass.contains("super.updateBeam("));
+        assertTrue("FXBeamWand onUpdate must move its source without refreshing its own lifetime",
+                beamWandClass.contains("this.setPosition(src.x, src.y, src.z);\n"
+                        + "        if (this.impact > 0)")
+                        && !beamWandClass.contains("super.updateBeam(src.x, src.y, src.z, this.tX, this.tY, this.tZ);"));
         assertTrue("FXBeamPower should keep pulse-opacity flare overlay contract",
                 beamPowerClass.contains("private float opacity = 0.3F;")
                         && beamPowerClass.contains(".lightmap(240, 240)")
