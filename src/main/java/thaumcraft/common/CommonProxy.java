@@ -199,6 +199,9 @@ public class CommonProxy implements IGuiHandler {
     public void beamPulseGolemBossFX(World world, EntityLivingBase source, Entity target) {
     }
 
+    public void excavateFX(World world, BlockPos pos, EntityPlayer player, int progress) {
+    }
+
     public Object beamCont(World world,
                            EntityPlayer player,
                            double tx, double ty, double tz,

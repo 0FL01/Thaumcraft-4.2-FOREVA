@@ -1476,6 +1476,12 @@ public class ClientProxy extends CommonProxy {
     }
 
     @Override
+    public void excavateFX(World world, BlockPos pos, EntityPlayer player, int progress) {
+        if (world == null || !world.isRemote || pos == null || player == null) return;
+        Minecraft.getMinecraft().renderGlobal.sendBlockBreakProgress(player.getEntityId(), pos, progress);
+    }
+
+    @Override
     public Object beamCont(World world,
                            EntityPlayer player,
                            double tx, double ty, double tz,

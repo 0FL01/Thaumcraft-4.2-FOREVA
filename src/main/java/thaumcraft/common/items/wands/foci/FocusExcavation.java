@@ -18,6 +18,7 @@ import net.minecraft.util.NonNullList;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.GameType;
 import net.minecraft.world.World;
 import net.minecraftforge.common.ForgeHooks;
@@ -26,6 +27,7 @@ import thaumcraft.api.aspects.Aspect;
 import thaumcraft.api.aspects.AspectList;
 import thaumcraft.api.wands.FocusUpgradeType;
 import thaumcraft.api.wands.ItemFocusBasic;
+import thaumcraft.common.Thaumcraft;
 import thaumcraft.common.items.wands.ItemWandCasting;
 import thaumcraft.common.lib.TCSounds;
 import thaumcraft.common.lib.utils.BlockUtils;
@@ -34,6 +36,7 @@ public class FocusExcavation extends ItemFocusBasic {
 
     private static final HashMap<String, Float> breakcount = new HashMap<>();
     private static final HashMap<String, BlockPos> lastBlock = new HashMap<>();
+    private static final HashMap<String, Object> beam = new HashMap<>();
     public static final FocusUpgradeType dowsing = new FocusUpgradeType(20, new ResourceLocation("thaumcraft", "textures/foci/dowsing.png"), "focus.upgrade.dowsing.name", "focus.upgrade.dowsing.text", new AspectList().add(Aspect.MINE, 1));
 
     public FocusExcavation() {
@@ -43,7 +46,7 @@ public class FocusExcavation extends ItemFocusBasic {
 
     @Override
     public int getFocusColor(ItemStack stack) {
-        return 0x8B4513;
+        return 0x064006;
     }
 
     @Override
@@ -75,13 +78,16 @@ public class FocusExcavation extends ItemFocusBasic {
         if (!(wandStack.getItem() instanceof ItemWandCasting)) return;
         ItemWandCasting wand = (ItemWandCasting) wandStack.getItem();
         ItemStack focusStack = wand.getFocusItem(wandStack);
+        String key = (player.world.isRemote ? "R" : "S") + player.getName();
         if (!wand.consumeAllVis(wandStack, player, this.getVisCost(focusStack), false, false)) {
+            this.resetBreakProgress(player);
+            beam.remove(key);
             player.resetActiveHand();
             return;
         }
-        if (player.world.isRemote) return;
 
         RayTraceResult mop = this.rayTrace(player.world, player, false);
+        this.updateBeam(player, mop, key);
         if (mop == null || mop.typeOfHit != RayTraceResult.Type.BLOCK || !player.world.isBlockModifiable(player, mop.getBlockPos())) {
             this.resetBreakProgress(player);
             return;
@@ -97,9 +103,11 @@ public class FocusExcavation extends ItemFocusBasic {
             return;
         }
 
-        String key = "S" + player.getName();
         BlockPos last = lastBlock.get(key);
         if (!pos.equals(last)) {
+            if (player.world.isRemote && last != null) {
+                Thaumcraft.proxy.excavateFX(player.world, last, player, -1);
+            }
             lastBlock.put(key, pos);
             breakcount.put(key, 0.0F);
             return;
@@ -107,6 +115,15 @@ public class FocusExcavation extends ItemFocusBasic {
 
         float bc = breakcount.containsKey(key) ? breakcount.get(key) : 0.0F;
         float speed = this.getBreakSpeed(block, state, this.getUpgradeLevel(focusStack, FocusUpgradeType.potency));
+        if (player.world.isRemote) {
+            if (bc > 0.0F) {
+                int progress = (int) (bc / hardness * 9.0F);
+                Thaumcraft.proxy.excavateFX(player.world, pos, player, progress);
+            }
+            breakcount.put(key, bc >= hardness ? 0.0F : bc + speed);
+            return;
+        }
+
         if (bc >= hardness && wand.consumeAllVis(wandStack, player, this.getVisCost(focusStack), true, false)) {
             if (this.excavate(player.world, wandStack, player, block, state, meta, pos)) {
                 for (int a = 0; a < this.getUpgradeLevel(focusStack, FocusUpgradeType.enlarge); ++a) {
@@ -129,6 +146,7 @@ public class FocusExcavation extends ItemFocusBasic {
     @Override
     public void onPlayerStoppedUsingFocus(ItemStack wandStack, World world, EntityPlayer player, int count) {
         this.resetBreakProgress(player);
+        beam.remove((world.isRemote ? "R" : "S") + player.getName());
     }
 
     @Override
@@ -195,9 +213,32 @@ public class FocusExcavation extends ItemFocusBasic {
     }
 
     private void resetBreakProgress(EntityPlayer player) {
-        String key = "S" + player.getName();
+        String key = (player.world.isRemote ? "R" : "S") + player.getName();
+        BlockPos previous = lastBlock.get(key);
+        if (player.world.isRemote && previous != null) {
+            Thaumcraft.proxy.excavateFX(player.world, previous, player, -1);
+        }
         breakcount.put(key, 0.0F);
         lastBlock.remove(key);
+    }
+
+    private void updateBeam(EntityPlayer player, RayTraceResult mop, String key) {
+        if (!player.world.isRemote) return;
+
+        Vec3d look = player.getLookVec();
+        double tx = player.posX + look.x * 10.0D;
+        double ty = player.posY + look.y * 10.0D;
+        double tz = player.posZ + look.z * 10.0D;
+        int impact = 0;
+        if (mop != null && mop.hitVec != null) {
+            tx = mop.hitVec.x;
+            ty = mop.hitVec.y;
+            tz = mop.hitVec.z;
+            impact = 5;
+        }
+        beam.put(key, Thaumcraft.proxy.beamCont(
+                player.world, player, tx, ty, tz, 2, 0x00FF66, false,
+                impact > 0 ? 2.0F : 0.0F, beam.get(key), impact));
     }
 
     @Override
