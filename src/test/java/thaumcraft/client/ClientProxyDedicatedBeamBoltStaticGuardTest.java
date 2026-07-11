@@ -70,6 +70,7 @@ public class ClientProxyDedicatedBeamBoltStaticGuardTest {
         assertTrue("FXBeam should keep dedicated custom render-path beam logic",
                 beamClass.contains("class FXBeam extends Particle")
                         && beamClass.contains("renderImpact(")
+                        && beamClass.contains("private static final ResourceLocation IMPACT = ParticleEngine.particleTexture;")
                         && beamClass.contains("public void setBlendMode(int blendmode)")
                         && beamClass.contains("public void setBeamWidth(float width)")
                         && beamClass.contains("getBeamTexture()")

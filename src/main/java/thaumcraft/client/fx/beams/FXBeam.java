@@ -13,6 +13,7 @@ import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.lwjgl.opengl.GL11;
+import thaumcraft.client.fx.ParticleEngine;
 
 @SideOnly(Side.CLIENT)
 public class FXBeam extends Particle {
@@ -20,7 +21,7 @@ public class FXBeam extends Particle {
     private static final ResourceLocation BEAM_1 = new ResourceLocation("thaumcraft", "textures/misc/beam1.png");
     private static final ResourceLocation BEAM_2 = new ResourceLocation("thaumcraft", "textures/misc/beam2.png");
     private static final ResourceLocation BEAM_3 = new ResourceLocation("thaumcraft", "textures/misc/beam3.png");
-    private static final ResourceLocation IMPACT = new ResourceLocation("thaumcraft", "textures/misc/p_large.png");
+    private static final ResourceLocation IMPACT = ParticleEngine.particleTexture;
 
     protected int particle = 16;
     protected boolean updated = false;
