@@ -570,10 +570,10 @@ public class ClientProxyFxStaticGuardTest {
         assertTrue("Server block-swap path must send PacketFXBlockSparkle around replaced block",
                 serverTick.contains("new PacketFXBlockSparkle(vs.x, vs.y, vs.z, 0xC0C0FF)"));
         assertTrue("Server block-swap path must keep silk-harvest and fortune drop routing",
-                serverTick.contains("currentBlock.canSilkHarvest(world, pos, state, vs.player)")
-                        && serverTick.contains("currentBlock.getDrops(drops, world, pos, state, fortune)"));
+                serverTick.contains("currentBlock.canSilkHarvest(world, pos, sourceState, vs.player)")
+                        && serverTick.contains("currentBlock.getDrops(drops, world, pos, sourceState, fortune)"));
         assertTrue("Swapper queue add path must play wand sound cue",
-                serverTick.contains("world.playSound(player, x, y, z, TCSounds.WAND, SoundCategory.PLAYERS, 0.25f, 1.0f)"));
+                serverTick.contains("world.playSound(null, pos, TCSounds.WAND, SoundCategory.PLAYERS, 0.25f, 1.0f)"));
         assertTrue("Runic shielding paths must send PacketFXShield for player and champion shield reactions",
                 runic.contains("new PacketFXShield(player.getEntityId(), target)")
                         && runic.contains("new PacketFXShield(mob.getEntityId(), target)"));

@@ -1,6 +1,7 @@
 package thaumcraft.common.lib.events;
 
 import net.minecraft.block.Block;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.item.EntityItem;
@@ -10,6 +11,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.SoundCategory;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
@@ -115,8 +117,10 @@ public class ServerTickEventsFML {
                 break;
             }
 
-            Block currentBlock = world.getBlockState(new net.minecraft.util.math.BlockPos(vs.x, vs.y, vs.z)).getBlock();
-            int currentMeta = currentBlock.getMetaFromState(world.getBlockState(new net.minecraft.util.math.BlockPos(vs.x, vs.y, vs.z)));
+            BlockPos pos = new BlockPos(vs.x, vs.y, vs.z);
+            IBlockState sourceState = world.getBlockState(pos);
+            Block currentBlock = sourceState.getBlock();
+            int currentMeta = currentBlock.getMetaFromState(sourceState);
 
             ItemWandCasting wand = null;
             ItemFocusBasic focus = null;
@@ -131,7 +135,7 @@ public class ServerTickEventsFML {
                 focus = wand.getFocus(wandStack);
             }
 
-            if (!world.isBlockModifiable(vs.player, new net.minecraft.util.math.BlockPos(vs.x, vs.y, vs.z))) continue;
+            if (!world.isBlockModifiable(vs.player, pos)) continue;
             if (vs.target.isItemEqual(new ItemStack(currentBlock, 1, currentMeta))) continue;
             if (wand == null || focus == null) continue;
             if (!wand.consumeAllVis(vs.player.inventory.getStackInSlot(vs.wand), vs.player,
@@ -143,28 +147,36 @@ public class ServerTickEventsFML {
             }
             if (vs.bSource != currentBlock || vs.mSource != currentMeta || slot < 0) continue;
 
+            Block targetBlock = Block.getBlockFromItem(vs.target.getItem());
+            if (targetBlock == Blocks.AIR) continue;
+            IBlockState targetState;
+            try {
+                targetState = targetBlock.getStateFromMeta(vs.target.getItemDamage());
+            } catch (RuntimeException ignored) {
+                continue;
+            }
+
+            int fortune = 0;
+            boolean silk = false;
+            NonNullList<ItemStack> drops = NonNullList.create();
+            if (!vs.player.capabilities.isCreativeMode) {
+                fortune = wand.getFocusTreasure(vs.player.inventory.getStackInSlot(vs.wand));
+                silk = focus.isUpgradedWith(focusStack, FocusUpgradeType.silktouch);
+                if (silk && currentBlock.canSilkHarvest(world, pos, sourceState, vs.player)) {
+                    ItemStack silked = BlockUtils.createStackedBlock(currentBlock, currentMeta);
+                    if (!silked.isEmpty()) drops.add(silked);
+                } else {
+                    currentBlock.getDrops(drops, world, pos, sourceState, fortune);
+                }
+            }
+
+            // Do not charge the player or award drops unless the replacement actually succeeded.
+            if (!world.setBlockState(pos, targetState, 3)) continue;
+
             didSomething = true;
 
             if (!vs.player.capabilities.isCreativeMode) {
-                int fortune = wand.getFocusTreasure(vs.player.inventory.getStackInSlot(vs.wand));
-                boolean silk = focus.isUpgradedWith(focusStack, FocusUpgradeType.silktouch);
-
                 vs.player.inventory.decrStackSize(slot, 1);
-
-                NonNullList<ItemStack> drops = NonNullList.create();
-                net.minecraft.util.math.BlockPos pos = new net.minecraft.util.math.BlockPos(vs.x, vs.y, vs.z);
-                net.minecraft.block.state.IBlockState state = world.getBlockState(pos);
-
-                if (silk) {
-                    if (currentBlock.canSilkHarvest(world, pos, state, vs.player)) {
-                        ItemStack silked = BlockUtils.createStackedBlock(currentBlock, currentMeta);
-                        if (!silked.isEmpty()) {
-                            drops.add(silked);
-                        }
-                    }
-                } else {
-                    currentBlock.getDrops(drops, world, pos, state, fortune);
-                }
 
                 if (!drops.isEmpty()) {
                     for (ItemStack is : drops) {
@@ -179,20 +191,13 @@ public class ServerTickEventsFML {
                         focus.getVisCost(focusStack), true, false);
             }
 
-            // Replace the block
-            Block targetBlock = Block.getBlockFromItem(vs.target.getItem());
-            int targetMeta = vs.target.getItemDamage();
-            world.setBlockState(new net.minecraft.util.math.BlockPos(vs.x, vs.y, vs.z),
-                    targetBlock.getStateFromMeta(targetMeta), 3);
-            targetBlock.onBlockPlacedBy(world, new net.minecraft.util.math.BlockPos(vs.x, vs.y, vs.z),
-                    targetBlock.getStateFromMeta(targetMeta), (EntityLivingBase) vs.player, vs.target);
+            targetBlock.onBlockPlacedBy(world, pos, targetState, (EntityLivingBase) vs.player, vs.target);
 
             PacketHandler.INSTANCE.sendToAllAround(
                     new PacketFXBlockSparkle(vs.x, vs.y, vs.z, 0xC0C0FF),
                     new NetworkRegistry.TargetPoint(world.provider.getDimension(), vs.x, vs.y, vs.z, 32.0));
 
-            world.playEvent(2001, new net.minecraft.util.math.BlockPos(vs.x, vs.y, vs.z),
-                    Block.getIdFromBlock(vs.bSource) + (vs.mSource << 12));
+            world.playEvent(2001, pos, Block.getStateId(sourceState));
 
             // Chain to adjacent blocks (for Portable Hole area effect)
             if (vs.lifespan > 0) {
@@ -200,11 +205,11 @@ public class ServerTickEventsFML {
                     for (int yy = -1; yy <= 1; yy++) {
                         for (int zz = -1; zz <= 1; zz++) {
                             if (xx == 0 && yy == 0 && zz == 0) continue;
-                            net.minecraft.util.math.BlockPos np = new net.minecraft.util.math.BlockPos(vs.x + xx, vs.y + yy, vs.z + zz);
+                            BlockPos np = new BlockPos(vs.x + xx, vs.y + yy, vs.z + zz);
                             Block adjBlock = world.getBlockState(np).getBlock();
                             int adjMeta = adjBlock.getMetaFromState(world.getBlockState(np));
                             if (adjBlock == vs.bSource && adjMeta == vs.mSource
-                                    && BlockUtils.breakFurthestBlock(world, np, vs.player)) {
+                                    && BlockUtils.isBlockExposed(world, np.getX(), np.getY(), np.getZ())) {
                                 queue.offer(new VirtualSwapper(vs.x + xx, vs.y + yy, vs.z + zz,
                                         vs.bSource, vs.mSource, vs.target,
                                         vs.lifespan - 1, vs.player, vs.wand));
@@ -223,8 +228,10 @@ public class ServerTickEventsFML {
     public static void addSwapper(World world, int x, int y, int z, Block bs, int ms, ItemStack target,
                                   int life, EntityPlayer player, int wand) {
         int dim = world.provider.getDimension();
+        if (target.isEmpty() || Block.getBlockFromItem(target.getItem()) == Blocks.AIR) return;
         // Don't swap air or unbreakable blocks
-        if (bs == Blocks.AIR || bs.getBlockHardness(world.getBlockState(new net.minecraft.util.math.BlockPos(x, y, z)), world, new net.minecraft.util.math.BlockPos(x, y, z)) < 0.0f) {
+        BlockPos pos = new BlockPos(x, y, z);
+        if (bs == Blocks.AIR || bs.getBlockHardness(world.getBlockState(pos), world, pos) < 0.0f) {
             return;
         }
         // Don't swap if same block type
@@ -237,7 +244,7 @@ public class ServerTickEventsFML {
         }
         queue.offer(new VirtualSwapper(x, y, z, bs, ms, target, life, player, wand));
 
-        world.playSound(player, x, y, z, TCSounds.WAND, SoundCategory.PLAYERS, 0.25f, 1.0f);
+        world.playSound(null, pos, TCSounds.WAND, SoundCategory.PLAYERS, 0.25f, 1.0f);
     }
 
     // ---- Inner classes ----

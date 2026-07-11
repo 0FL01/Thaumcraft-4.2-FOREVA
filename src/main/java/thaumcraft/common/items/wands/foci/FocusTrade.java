@@ -73,9 +73,14 @@ public class FocusTrade extends ItemFocusBasic implements IArchitect {
         }
 
         ItemStack picked = this.getPickedBlock(wandStack);
-        if (picked.isEmpty() || world.isRemote || world.getTileEntity(pos) != null || !this.canSwapBlock(world, pos, player)) {
+        if (picked.isEmpty()) {
             return wandStack;
         }
+        if (world.isRemote) {
+            player.swingArm(net.minecraft.util.EnumHand.MAIN_HAND);
+            return wandStack;
+        }
+        if (world.getTileEntity(pos) != null || !this.canSwapBlock(world, pos, player)) return wandStack;
 
         ItemWandCasting wand = (ItemWandCasting) wandStack.getItem();
         ItemStack focusStack = wand.getFocusItem(wandStack);
