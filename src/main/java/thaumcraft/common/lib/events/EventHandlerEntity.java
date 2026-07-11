@@ -53,6 +53,7 @@ import net.minecraftforge.event.entity.item.ItemTossEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.living.LivingDropsEvent;
 import net.minecraftforge.event.entity.living.LivingEvent;
+import net.minecraftforge.event.entity.living.LivingSpawnEvent;
 import net.minecraftforge.event.entity.player.ArrowLooseEvent;
 import net.minecraftforge.event.entity.player.ArrowNockEvent;
 import net.minecraftforge.event.entity.player.EntityItemPickupEvent;
@@ -60,6 +61,7 @@ import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.event.entity.living.LivingEntityUseItemEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.eventhandler.Event;
 import thaumcraft.api.ThaumcraftApi;
 import thaumcraft.api.aspects.Aspect;
 import thaumcraft.api.aspects.AspectList;
@@ -109,6 +111,7 @@ import thaumcraft.common.lib.utils.InventoryUtils;
 import thaumcraft.common.lib.world.dim.Cell;
 import thaumcraft.common.lib.world.dim.CellLoc;
 import thaumcraft.common.lib.world.dim.MazeHandler;
+import thaumcraft.common.lib.world.dim.TeleporterThaumcraft;
 import thaumcraft.common.tiles.TileOwned;
 
 import java.io.File;
@@ -121,6 +124,22 @@ import java.util.Map;
 import java.util.UUID;
 
 public class EventHandlerEntity {
+
+    @SubscribeEvent
+    public void onCheckSpawn(LivingSpawnEvent.CheckSpawn event) {
+        World world = event.getWorld();
+        if (world.isRemote
+                || world.provider.getDimension() != Config.dimensionOuterId
+                || event.isSpawner()) {
+            return;
+        }
+
+        BlockPos pos = new BlockPos(event.getX(), event.getY(), event.getZ());
+        Cell cell = MazeHandler.getFromHashMap(new CellLoc(pos.getX() >> 4, pos.getZ() >> 4));
+        if (cell == null || !TeleporterThaumcraft.hasCeiling(world, pos, 16)) {
+            event.setResult(Event.Result.DENY);
+        }
+    }
 
     public static final net.minecraft.util.ResourceLocation PLAYER_KNOWLEDGE_KEY =
             new net.minecraft.util.ResourceLocation("thaumcraft", "player_knowledge");
