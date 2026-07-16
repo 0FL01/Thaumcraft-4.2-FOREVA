@@ -6,12 +6,14 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.util.ITickable;
+import net.minecraft.util.SoundCategory;
 import thaumcraft.api.TileThaumcraft;
 import thaumcraft.api.aspects.Aspect;
 import thaumcraft.api.aspects.AspectList;
 import thaumcraft.api.visnet.VisNetHandler;
 import thaumcraft.api.wands.FocusUpgradeType;
 import thaumcraft.api.wands.ItemFocusBasic;
+import thaumcraft.common.lib.TCSounds;
 
 public class TileFocalManipulator extends TileThaumcraft implements ITickable, IInventory {
     public AspectList aspects = new AspectList();
@@ -30,6 +32,7 @@ public class TileFocalManipulator extends TileThaumcraft implements ITickable, I
         if (this.world == null || this.world.isRemote) return;
 
         boolean complete = false;
+        boolean upgraded = false;
         if (this.rank < 0) this.rank = 0;
         ++this.ticks;
 
@@ -52,12 +55,18 @@ public class TileFocalManipulator extends TileThaumcraft implements ITickable, I
                     if (this.upgrade >= 0 && this.upgrade < FocusUpgradeType.types.length
                             && FocusUpgradeType.types[this.upgrade] != null) {
                         focus.applyUpgrade(this.getStackInSlot(0), FocusUpgradeType.types[this.upgrade], this.rank);
+                        upgraded = true;
                     }
                 }
             }
         }
 
         if (complete) {
+            if (upgraded) {
+                this.world.playSound(null, this.pos, TCSounds.WAND, SoundCategory.BLOCKS, 1.0F, 1.0F);
+            } else {
+                this.world.playSound(null, this.pos, TCSounds.CRAFTFAIL, SoundCategory.BLOCKS, 0.33F, 1.0F);
+            }
             this.size = 0;
             this.rank = -1;
             this.upgrade = -1;
@@ -111,6 +120,7 @@ public class TileFocalManipulator extends TileThaumcraft implements ITickable, I
             player.addExperienceLevel(-xp);
         }
         this.markDirtyAndSync();
+        this.world.playSound(null, this.pos, TCSounds.CRAFTSTART, SoundCategory.BLOCKS, 0.25F, 1.0F);
         return true;
     }
 
