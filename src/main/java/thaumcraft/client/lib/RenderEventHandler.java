@@ -47,6 +47,7 @@ import thaumcraft.api.research.ScanResult;
 import thaumcraft.client.renderers.tile.HoleRenderBatchCache;
 import thaumcraft.common.entities.monster.mods.ChampionModifier;
 import thaumcraft.common.config.Config;
+import thaumcraft.common.items.relics.ItemSanityChecker;
 import thaumcraft.common.items.relics.ItemThaumometer;
 import thaumcraft.common.lib.capabilities.IPlayerKnowledge;
 import thaumcraft.common.lib.capabilities.PlayerKnowledgeProvider;
@@ -124,8 +125,74 @@ public class RenderEventHandler {
         }
         long time = System.nanoTime() / 1000000L;
         this.notifyHandler.handleNotifications(mc, time, event.getResolution());
+        this.renderSanityHud(mc);
         this.wandHandler.handleCastingWandHud(mc, time, event);
         this.wandHandler.handleFociRadial(mc, time, event);
+    }
+
+    private void renderSanityHud(Minecraft mc) {
+        if (!mc.inGameHasFocus || mc.isGamePaused()) {
+            return;
+        }
+        ItemStack held = mc.player.getHeldItemMainhand();
+        if (held.isEmpty() || !(held.getItem() instanceof ItemSanityChecker)) {
+            return;
+        }
+        IPlayerKnowledge knowledge = mc.player.getCapability(PlayerKnowledgeProvider.PLAYER_KNOWLEDGE, null);
+        if (knowledge == null) {
+            return;
+        }
+
+        float total = knowledge.getTotalWarp();
+        int perm = knowledge.getWarpPerm();
+        int sticky = knowledge.getWarpSticky();
+        int temporary = knowledge.getWarpTemp();
+        float componentScale = 1.0F;
+        if (total > 100.0F) {
+            componentScale = 100.0F / total;
+            total = 100.0F;
+        }
+        int empty = (int) ((100.0F - total) / 100.0F * 48.0F);
+        int temporaryHeight = (int) (temporary / 100.0F * 48.0F * componentScale);
+        int stickyHeight = (int) (sticky / 100.0F * 48.0F * componentScale);
+
+        GL11.glPushAttrib(GL11.GL_ALL_ATTRIB_BITS);
+        GlStateManager.pushMatrix();
+        try {
+            GlStateManager.disableDepth();
+            GlStateManager.depthMask(false);
+            GlStateManager.enableBlend();
+            GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+            GlStateManager.scale(0.5F, 0.5F, 1.0F);
+            UtilsFX.bindTexture("textures/gui/hud.png");
+
+            GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+            UtilsFX.drawTexturedQuad(1, 1, 152, 0, 20, 76, -90.0D);
+            if (temporary > 0) {
+                GlStateManager.color(1.0F, 0.5F, 1.0F, 1.0F);
+                UtilsFX.drawTexturedQuad(7, 21 + empty, 200, empty,
+                        8, temporaryHeight + empty, -90.0D);
+            }
+            if (sticky > 0) {
+                GlStateManager.color(0.75F, 0.0F, 0.75F, 1.0F);
+                UtilsFX.drawTexturedQuad(7, 21 + temporaryHeight + empty, 200, temporaryHeight + empty,
+                        8, temporaryHeight + stickyHeight + empty, -90.0D);
+            }
+            if (perm > 0) {
+                GlStateManager.color(0.5F, 0.0F, 0.5F, 1.0F);
+                UtilsFX.drawTexturedQuad(7, 21 + temporaryHeight + stickyHeight + empty, 200,
+                        temporaryHeight + stickyHeight + empty, 8, 48, -90.0D);
+            }
+            GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+            UtilsFX.drawTexturedQuad(1, 1, 176, 0, 20, 76, -90.0D);
+            if (total >= 100.0F) {
+                UtilsFX.drawTexturedQuad(1, 1, 216, 0, 20, 16, -90.0D);
+            }
+        } finally {
+            GlStateManager.popMatrix();
+            GL11.glPopAttrib();
+            GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+        }
     }
 
     @SubscribeEvent
