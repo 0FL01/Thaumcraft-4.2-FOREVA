@@ -1,17 +1,30 @@
 package thaumcraft.common.blocks;
 
+import java.util.List;
+import javax.annotation.Nullable;
 import net.minecraft.block.Block;
+import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.text.TextComponentTranslation;
+import net.minecraft.util.text.TextFormatting;
+import net.minecraft.world.World;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
+import thaumcraft.api.aspects.Aspect;
 import thaumcraft.api.aspects.AspectList;
 import thaumcraft.api.aspects.IEssentiaContainerItem;
 import thaumcraft.api.nodes.NodeModifier;
 import thaumcraft.api.nodes.NodeType;
+import thaumcraft.common.CommonProxy;
+import thaumcraft.common.Thaumcraft;
+import thaumcraft.common.lib.capabilities.IPlayerKnowledge;
 
 public class BlockJarItem
 extends ItemBlock
 implements IEssentiaContainerItem {
 
+    private static final String ASPECT_FILTER_KEY = "AspectFilter";
     private static final String NODE_TYPE_KEY = "nodetype";
     private static final String NODE_MOD_KEY = "nodemod";
     private static final String NODE_ID_KEY = "nodeid";
@@ -30,6 +43,39 @@ implements IEssentiaContainerItem {
     @Override
     public String getTranslationKey(ItemStack stack) {
         return super.getTranslationKey() + "." + stack.getItemDamage();
+    }
+
+    @SideOnly(Side.CLIENT)
+    @Override
+    public void addInformation(ItemStack stack, @Nullable World worldIn, List<String> tooltip, ITooltipFlag flagIn) {
+        IPlayerKnowledge knowledge = CommonProxy.getPlayerKnowledge(
+                Thaumcraft.proxy == null ? null : Thaumcraft.proxy.getClientPlayer());
+        this.addJarInformation(stack, tooltip, knowledge);
+        super.addInformation(stack, worldIn, tooltip, flagIn);
+    }
+
+    void addJarInformation(ItemStack stack, List<String> tooltip, @Nullable IPlayerKnowledge knowledge) {
+        AspectList aspects = this.getAspects(stack);
+        if (aspects != null && aspects.size() > 0) {
+            for (Aspect aspect : aspects.getAspectsSorted()) {
+                if (aspect == null) continue;
+                if (knowledge != null && knowledge.hasDiscoveredAspect(aspect)) {
+                    tooltip.add(aspect.getName() + " x" + aspects.getAmount(aspect));
+                } else {
+                    tooltip.add(new TextComponentTranslation("tc.aspect.unknown").getFormattedText());
+                }
+            }
+        }
+
+        if (stack.hasTagCompound() && stack.getTagCompound().hasKey(ASPECT_FILTER_KEY)) {
+            Aspect filter = Aspect.getAspect(stack.getTagCompound().getString(ASPECT_FILTER_KEY));
+            if (filter != null) {
+                String filterName = knowledge != null && knowledge.hasDiscoveredAspect(filter)
+                        ? filter.getName()
+                        : new TextComponentTranslation("tc.aspect.unknown").getFormattedText();
+                tooltip.add(TextFormatting.DARK_PURPLE + filterName);
+            }
+        }
     }
 
     @Override
