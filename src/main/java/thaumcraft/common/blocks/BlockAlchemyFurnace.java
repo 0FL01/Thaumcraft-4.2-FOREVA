@@ -18,6 +18,7 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
+import net.minecraft.init.SoundEvents;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
@@ -30,6 +31,9 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
+import thaumcraft.common.Thaumcraft;
 import thaumcraft.common.config.ConfigBlocks;
 import thaumcraft.common.lib.TCSounds;
 import thaumcraft.common.tiles.TileAlchemyFurnaceAdvanced;
@@ -128,6 +132,35 @@ public class BlockAlchemyFurnace extends BlockContainer {
             return 0;
         }
         return MathHelper.clamp((int) ((float) heat / maxPower * 12.0F), 0, 15);
+    }
+
+    @Override
+    @SideOnly(Side.CLIENT)
+    public void randomDisplayTick(IBlockState state, World world, BlockPos pos, Random rand) {
+        if (this.getMetaFromState(state) == CENTER) {
+            TileEntity tile = world.getTileEntity(pos);
+            if (tile instanceof TileAlchemyFurnaceAdvanced && ((TileAlchemyFurnaceAdvanced) tile).vis > 0) {
+                Thaumcraft.proxy.slimyBubble(world,
+                        pos.getX() + rand.nextFloat(), pos.getY() + 1.0D, pos.getZ() + rand.nextFloat(),
+                        0.06F + rand.nextFloat() * 0.06F,
+                        0.6F - rand.nextFloat() * 0.2F, 0.0F, 0.6F + rand.nextFloat() * 0.2F, 0.8F);
+                if (rand.nextInt(50) == 0) {
+                    world.playSound(pos.getX() + rand.nextFloat(), pos.getY() + 1.0D,
+                            pos.getZ() + rand.nextFloat(), SoundEvents.BLOCK_LAVA_POP, SoundCategory.BLOCKS,
+                            0.1F + rand.nextFloat() * 0.1F, 0.9F + rand.nextFloat() * 0.15F, false);
+                }
+
+                int xOffset = rand.nextInt(2);
+                int zOffset = rand.nextInt(2);
+                Thaumcraft.proxy.slimyBubble(world,
+                        pos.getX() - 0.6D + rand.nextFloat() * 0.2D + xOffset * 2.0D,
+                        pos.getY() + 2.0D,
+                        pos.getZ() - 0.6D + rand.nextFloat() * 0.2D + zOffset * 2.0D,
+                        0.06F + rand.nextFloat() * 0.06F,
+                        0.6F - rand.nextFloat() * 0.2F, 0.0F, 0.6F + rand.nextFloat() * 0.2F, 0.8F);
+            }
+        }
+        super.randomDisplayTick(state, world, pos, rand);
     }
 
     @Override

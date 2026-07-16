@@ -87,6 +87,90 @@ public class AlchemyFurnaceAdvancedRendererContractTest {
         assertEquals(Arrays.asList("Base", "Tank"), groups);
     }
 
+    @Test
+    public void baseFloorShouldBeSelectivelyRaisedAboveCoplanarSupportBlocks() throws IOException {
+        String renderer = read(RENDERER);
+        String[] lines = new String(Files.readAllBytes(Paths.get(OBJ)), StandardCharsets.US_ASCII)
+                .split("\\R");
+        List<double[]> vertices = new ArrayList<>();
+        boolean inBase = false;
+        int baseFaces = 0;
+        for (String rawLine : lines) {
+            String line = rawLine.trim();
+            if (line.startsWith("v ")) {
+                String[] values = line.split("\\s+");
+                vertices.add(new double[] {
+                        Double.parseDouble(values[1]),
+                        Double.parseDouble(values[2]),
+                        Double.parseDouble(values[3])
+                });
+            } else if (line.startsWith("g ")) {
+                inBase = "g Base".equals(line);
+            } else if (inBase && line.startsWith("f ")) {
+                boolean floorFace = true;
+                String[] corners = line.split("\\s+");
+                for (int i = 1; i < corners.length; ++i) {
+                    int vertex = Integer.parseInt(corners[i].split("/")[0]);
+                    floorFace &= Math.abs(vertices.get(vertex - 1)[2]) < 0.000001D;
+                }
+                if (baseFaces < 18) {
+                    assertTrue("The first 18 Base triangles must remain the local z=0 floor", floorFace);
+                } else if (baseFaces == 18) {
+                    assertFalse("The selective floor range must end before the Base walls", floorFace);
+                }
+                ++baseFaces;
+            }
+        }
+
+        assertEquals(116, baseFaces);
+        assertTrue(renderer.contains("BASE_FLOOR_VERTEX_COUNT = 18 * 3")
+                && renderer.contains("BASE_FLOOR_Z_OFFSET = 0.002F")
+                && renderer.contains("renderModel(model, BASE_FLOOR_VERTEX_COUNT, model.verts.length);")
+                && renderer.contains("GlStateManager.translate(0.0F, 0.0F, BASE_FLOOR_Z_OFFSET);")
+                && renderer.contains("renderModel(model, 0, BASE_FLOOR_VERTEX_COUNT);"));
+    }
+
+    @Test
+    public void workingFurnaceShouldRetainTc4HeatAndAmbientEffects() throws IOException {
+        String renderer = read(RENDERER);
+        String block = read("src/main/java/thaumcraft/common/blocks/BlockAlchemyFurnace.java");
+        String commonProxy = read("src/main/java/thaumcraft/common/CommonProxy.java");
+        String clientProxy = read("src/main/java/thaumcraft/client/ClientProxy.java");
+
+        assertTrue(renderer.contains("bindTexture(tile.heat > 100 ? FURNACE_ON : FURNACE);")
+                && renderer.contains("if (tile.heat > 100)")
+                && renderer.contains("(float) tile.heat / (float) tile.maxPower")
+                && renderer.contains("renderQuadCenteredFromIcon(fire, 220, fill);"));
+        assertTrue(block.contains("public void randomDisplayTick(")
+                && block.contains("this.getMetaFromState(state) == CENTER")
+                && block.contains("((TileAlchemyFurnaceAdvanced) tile).vis > 0")
+                && occurrences(block, "Thaumcraft.proxy.slimyBubble(") == 2
+                && block.contains("0.06F + rand.nextFloat() * 0.06F")
+                && block.contains("0.6F - rand.nextFloat() * 0.2F")
+                && block.contains("0.6F + rand.nextFloat() * 0.2F")
+                && block.contains("rand.nextInt(50) == 0")
+                && block.contains("SoundEvents.BLOCK_LAVA_POP")
+                && block.contains("super.randomDisplayTick(state, world, pos, rand);"));
+        assertFalse("Common furnace blocks must not directly load client particle classes",
+                block.contains("thaumcraft.client.fx"));
+        assertTrue(commonProxy.contains("public void slimyBubble("));
+        assertTrue(clientProxy.contains("public void slimyBubble(")
+                && clientProxy.contains("FXSlimyBubble bubble = new FXSlimyBubble(")
+                && clientProxy.contains("bubble.setRBGColorF(red, green, blue);")
+                && clientProxy.contains("bubble.setAlphaF(alpha);")
+                && clientProxy.contains("ParticleEngine.addEffect(world, bubble);"));
+    }
+
+    private static int occurrences(String source, String needle) {
+        int count = 0;
+        int offset = 0;
+        while ((offset = source.indexOf(needle, offset)) >= 0) {
+            ++count;
+            offset += needle.length();
+        }
+        return count;
+    }
+
     private static String read(String path) throws IOException {
         return new String(Files.readAllBytes(Paths.get(path)), StandardCharsets.UTF_8);
     }

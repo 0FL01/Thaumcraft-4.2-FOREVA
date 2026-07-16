@@ -85,6 +85,7 @@ import thaumcraft.client.fx.particles.FXBubble;
 import thaumcraft.client.fx.particles.FXEssentiaTrail;
 import thaumcraft.client.fx.particles.FXGeneric;
 import thaumcraft.client.fx.particles.FXSmokeSpiral;
+import thaumcraft.client.fx.particles.FXSlimyBubble;
 import thaumcraft.client.fx.particles.FXSpark;
 import thaumcraft.client.fx.particles.FXSparkle;
 import thaumcraft.client.fx.particles.FXSwarm;
@@ -2217,6 +2218,16 @@ public class ClientProxy extends CommonProxy {
                     .setGravity(-0.001F);
             ParticleEngine.addEffect(world, bubble);
         }
+    }
+
+    @Override
+    public void slimyBubble(World world, double x, double y, double z, float scale,
+                            float red, float green, float blue, float alpha) {
+        if (world == null || !world.isRemote) return;
+        FXSlimyBubble bubble = new FXSlimyBubble(world, x, y, z, scale);
+        bubble.setRBGColorF(red, green, blue);
+        bubble.setAlphaF(alpha);
+        ParticleEngine.addEffect(world, bubble);
     }
 
     @Override

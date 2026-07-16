@@ -20,6 +20,8 @@ import thaumcraft.codechicken.lib.render.CCRenderState;
 import thaumcraft.common.tiles.TileAlchemyFurnaceAdvanced;
 
 public class TileAlchemyFurnaceAdvancedRenderer extends TileEntitySpecialRenderer<TileAlchemyFurnaceAdvanced> {
+    private static final int BASE_FLOOR_VERTEX_COUNT = 18 * 3;
+    private static final float BASE_FLOOR_Z_OFFSET = 0.002F;
     private static final ResourceLocation FURNACE_MODEL =
             new ResourceLocation("thaumcraft", "textures/models/adv_alch_furnace.obj");
     private static final ResourceLocation FURNACE =
@@ -74,7 +76,7 @@ public class TileAlchemyFurnaceAdvancedRenderer extends TileEntitySpecialRendere
             }
 
             bindTexture(tile.heat > 100 ? FURNACE_ON : FURNACE);
-            renderModel(this.base);
+            renderBase(this.base);
 
             bindTexture(tile.vis > 0 ? TANK_ON : TANK);
             for (int side = 0; side < 4; ++side) {
@@ -210,9 +212,24 @@ public class TileAlchemyFurnaceAdvancedRenderer extends TileEntitySpecialRendere
     }
 
     private static void renderModel(CCModel model) {
+        renderModel(model, 0, model.verts.length);
+    }
+
+    private static void renderBase(CCModel model) {
+        renderModel(model, BASE_FLOOR_VERTEX_COUNT, model.verts.length);
+        GlStateManager.pushMatrix();
+        try {
+            GlStateManager.translate(0.0F, 0.0F, BASE_FLOOR_Z_OFFSET);
+            renderModel(model, 0, BASE_FLOOR_VERTEX_COUNT);
+        } finally {
+            GlStateManager.popMatrix();
+        }
+    }
+
+    private static void renderModel(CCModel model, int start, int end) {
         CCRenderState.reset();
         CCRenderState.startDrawing(GL11.GL_TRIANGLES, DefaultVertexFormats.OLDMODEL_POSITION_TEX_NORMAL);
-        model.render(CCRenderState.normalAttrib);
+        model.render(start, end, CCRenderState.normalAttrib);
         CCRenderState.draw();
     }
 

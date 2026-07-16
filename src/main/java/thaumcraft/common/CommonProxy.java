@@ -387,6 +387,10 @@ public class CommonProxy implements IGuiHandler {
     public void crucibleBubble(World world, float x, float y, float z, float red, float green, float blue) {
     }
 
+    public void slimyBubble(World world, double x, double y, double z, float scale,
+                            float red, float green, float blue, float alpha) {
+    }
+
     public void crucibleBoilSound(World world, int x, int y, int z) {
     }
 
