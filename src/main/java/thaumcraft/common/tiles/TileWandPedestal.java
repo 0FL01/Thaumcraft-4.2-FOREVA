@@ -3,12 +3,14 @@ package thaumcraft.common.tiles;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ITickable;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import thaumcraft.api.aspects.Aspect;
+import thaumcraft.api.aspects.IAspectContainer;
 import thaumcraft.api.aspects.AspectList;
 import thaumcraft.api.nodes.INode;
 import thaumcraft.common.config.ConfigBlocks;
@@ -21,7 +23,7 @@ import java.util.List;
 
 public class TileWandPedestal
 extends TilePedestal
-implements ITickable {
+implements ITickable, IAspectContainer {
 
     public int counter = 0;
     public boolean somethingChanged = false;
@@ -38,6 +40,22 @@ implements ITickable {
         return new AxisAlignedBB(
                 this.pos.getX(), this.pos.getY(), this.pos.getZ(),
                 this.pos.getX() + 1, this.pos.getY() + 1, this.pos.getZ() + 1).grow(2.0D, 2.0D, 2.0D);
+    }
+
+    @Override
+    public boolean isItemValidForSlot(int index, ItemStack stack) {
+        return index == 0 && !stack.isEmpty()
+                && (stack.getItem() instanceof ItemWandCasting || stack.getItem() instanceof ItemAmuletVis);
+    }
+
+    @Override
+    public boolean canInsertItem(int index, ItemStack stack, EnumFacing direction) {
+        return index == 0 && this.getStackInSlot(0).isEmpty() && this.isItemValidForSlot(index, stack);
+    }
+
+    @Override
+    public boolean canExtractItem(int index, ItemStack stack, EnumFacing direction) {
+        return true;
     }
 
     @Override
@@ -182,5 +200,65 @@ implements ITickable {
                 }
             }
         }
+    }
+
+    @Override
+    public AspectList getAspects() {
+        ItemStack stack = this.getStackInSlot(0);
+        if (stack.isEmpty()) return null;
+        if (stack.getItem() instanceof ItemWandCasting) {
+            return this.toDisplayAspects(((ItemWandCasting) stack.getItem()).getAllVis(stack));
+        }
+        if (stack.getItem() instanceof ItemAmuletVis) {
+            return this.toDisplayAspects(((ItemAmuletVis) stack.getItem()).getAllVis(stack));
+        }
+        return null;
+    }
+
+    private AspectList toDisplayAspects(AspectList stored) {
+        AspectList visible = new AspectList();
+        for (Aspect aspect : stored.getAspectsSorted()) {
+            visible.add(aspect, stored.getAmount(aspect) / 100);
+        }
+        return visible;
+    }
+
+    @Override
+    public void setAspects(AspectList aspects) {
+    }
+
+    @Override
+    public boolean doesContainerAccept(Aspect aspect) {
+        return true;
+    }
+
+    @Override
+    public int addToContainer(Aspect aspect, int amount) {
+        return 0;
+    }
+
+    @Override
+    public boolean takeFromContainer(Aspect aspect, int amount) {
+        return false;
+    }
+
+    @Override
+    public boolean takeFromContainer(AspectList aspects) {
+        return false;
+    }
+
+    @Override
+    public boolean doesContainerContainAmount(Aspect aspect, int amount) {
+        return false;
+    }
+
+    @Override
+    public boolean doesContainerContain(AspectList aspects) {
+        return false;
+    }
+
+    @Override
+    public int containerContains(Aspect aspect) {
+        return 0;
     }
 }

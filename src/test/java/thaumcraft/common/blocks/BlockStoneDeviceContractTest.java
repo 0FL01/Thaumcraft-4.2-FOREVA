@@ -46,7 +46,19 @@ public class BlockStoneDeviceContractTest {
                         && source.contains("worldIn.createExplosion(null, pos.getX() + 0.5D, pos.getY() + 0.5D, pos.getZ() + 0.5D, 2.0F, true);")
                         && source.contains("return Container.calcRedstoneFromInventory((IInventory) te);")
                         && source.contains("wand.getAllVis(stack).visSize()")
+                        && source.indexOf("if (te instanceof TileWandPedestal)")
+                        < source.indexOf("if (te instanceof TilePedestal || te instanceof TileAlchemyFurnace)")
+                        && source.contains("/ ((float) ItemWandCasting.getMaxVis(stack) * 6.0F);")
                         && source.contains("return MathHelper.floor(fill * 14.0F) + 1;"));
+
+        assertTrue("wand pedestal and compound focus should route restricted insert, extraction, and focus placement",
+                source.contains("if (state.getValue(TYPE) == 5 || state.getValue(TYPE) == 8) {")
+                        && source.contains("BlockPos pedestalPos = state.getValue(TYPE) == 8 ? pos.down() : pos;")
+                        && source.contains("return this.handleWandPedestalActivation(worldIn, pedestalPos, playerIn, hand,")
+                        && source.contains("held.getItem() instanceof ItemBlock")
+                        && source.contains("((ItemBlock) held.getItem()).getBlock() == this && held.getMetadata() == 8")
+                        && source.contains("held.getItem() instanceof ItemWandCasting")
+                        && source.contains("held.getItem() instanceof ItemAmuletVis"));
 
         assertTrue("light and blockstate contracts should keep infusion-matrix glow and wand-focus shell routing",
                 source.contains("} else if (meta == 2) {")

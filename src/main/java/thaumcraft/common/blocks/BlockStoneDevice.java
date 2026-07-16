@@ -15,6 +15,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.SoundEvents;
 import net.minecraft.inventory.Container;
 import net.minecraft.inventory.IInventory;
+import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumBlockRenderType;
@@ -32,6 +33,7 @@ import net.minecraftforge.common.property.IExtendedBlockState;
 import net.minecraftforge.common.property.IUnlistedProperty;
 import thaumcraft.common.Thaumcraft;
 import thaumcraft.common.CommonProxy;
+import thaumcraft.common.items.baubles.ItemAmuletVis;
 import thaumcraft.common.items.wands.ItemWandCasting;
 import thaumcraft.common.lib.utils.InventoryUtils;
 import thaumcraft.common.tiles.*;
@@ -199,6 +201,18 @@ extends BlockContainer {
         if (state.getValue(TYPE) == 1 && te instanceof TilePedestal) {
             return this.handlePedestalActivation(worldIn, pos, playerIn, hand, (TilePedestal) te);
         }
+        if (state.getValue(TYPE) == 5 || state.getValue(TYPE) == 8) {
+            if (worldIn.isRemote) return true;
+            BlockPos pedestalPos = state.getValue(TYPE) == 8 ? pos.down() : pos;
+            IBlockState pedestalState = worldIn.getBlockState(pedestalPos);
+            TileEntity pedestalTile = worldIn.getTileEntity(pedestalPos);
+            if (pedestalState.getBlock() == this && pedestalState.getValue(TYPE) == 5
+                    && pedestalTile instanceof TileWandPedestal) {
+                return this.handleWandPedestalActivation(worldIn, pedestalPos, playerIn, hand,
+                        (TileWandPedestal) pedestalTile);
+            }
+            return false;
+        }
         if (te instanceof TileInfusionMatrix) {
             ItemStack held = playerIn.getHeldItem(hand);
             if (!held.isEmpty() && held.getItem() instanceof ItemWandCasting) {
@@ -219,6 +233,48 @@ extends BlockContainer {
             }
             return true;
         }
+        return false;
+    }
+
+    private boolean handleWandPedestalActivation(World world, BlockPos pos, EntityPlayer player, EnumHand hand,
+                                                  TileWandPedestal pedestal) {
+        ItemStack held = player.getHeldItem(hand);
+        if (!held.isEmpty() && held.getItem() instanceof ItemBlock
+                && ((ItemBlock) held.getItem()).getBlock() == this && held.getMetadata() == 8) {
+            return false;
+        }
+
+        ItemStack stored = pedestal.getStackInSlot(0);
+        if (!stored.isEmpty()) {
+            ItemStack remaining = pedestal.removeStackFromSlot(0).copy();
+            if (!player.inventory.addItemStackToInventory(remaining) || !remaining.isEmpty()) {
+                EntityItem entity = new EntityItem(world, player.posX, player.posY + player.height / 2.0F,
+                        player.posZ, remaining.copy());
+                entity.setNoPickupDelay();
+                world.spawnEntity(entity);
+            }
+            player.inventoryContainer.detectAndSendChanges();
+            world.playSound(null, pos, SoundEvents.ENTITY_ITEM_PICKUP, SoundCategory.BLOCKS,
+                    0.2F, ((world.rand.nextFloat() - world.rand.nextFloat()) * 0.7F + 1.0F) * 1.5F);
+            return true;
+        }
+
+        if (!held.isEmpty() && (held.getItem() instanceof ItemWandCasting
+                || held.getItem() instanceof ItemAmuletVis)) {
+            ItemStack placed = held.copy();
+            placed.setCount(1);
+            pedestal.setInventorySlotContents(0, placed);
+            if (!player.capabilities.isCreativeMode) {
+                held.shrink(1);
+                if (held.isEmpty()) player.setHeldItem(hand, ItemStack.EMPTY);
+            }
+            player.inventory.markDirty();
+            player.inventoryContainer.detectAndSendChanges();
+            world.playSound(null, pos, SoundEvents.ENTITY_ITEM_PICKUP, SoundCategory.BLOCKS,
+                    0.2F, ((world.rand.nextFloat() - world.rand.nextFloat()) * 0.7F + 1.0F) * 1.6F);
+            return true;
+        }
+
         return false;
     }
 
@@ -302,17 +358,18 @@ extends BlockContainer {
     @Override
     public int getComparatorInputOverride(IBlockState state, World worldIn, BlockPos pos) {
         TileEntity te = worldIn.getTileEntity(pos);
-        if (te instanceof TilePedestal || te instanceof TileAlchemyFurnace) {
-            return Container.calcRedstoneFromInventory((IInventory) te);
-        }
         if (te instanceof TileWandPedestal) {
             TileWandPedestal pedestal = (TileWandPedestal) te;
             ItemStack stack = pedestal.getStackInSlot(0);
             if (!stack.isEmpty() && stack.getItem() instanceof ItemWandCasting) {
                 ItemWandCasting wand = (ItemWandCasting) stack.getItem();
-                float fill = (float) wand.getAllVis(stack).visSize() / (float) ItemWandCasting.getMaxVis(stack) * 6.0F;
+                float fill = (float) wand.getAllVis(stack).visSize()
+                        / ((float) ItemWandCasting.getMaxVis(stack) * 6.0F);
                 return MathHelper.floor(fill * 14.0F) + 1;
             }
+        }
+        if (te instanceof TilePedestal || te instanceof TileAlchemyFurnace) {
+            return Container.calcRedstoneFromInventory((IInventory) te);
         }
         return 0;
     }

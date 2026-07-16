@@ -16,7 +16,7 @@ public class TileWandPedestalDrainContractsStaticGuardTest {
         String tileSource = read("src/main/java/thaumcraft/common/tiles/TileWandPedestal.java");
         String rendererSource = read("src/main/java/thaumcraft/client/renderers/tile/TileWandPedestalRenderer.java");
 
-        assertTrue(tileSource.contains("implements ITickable"));
+        assertTrue(tileSource.contains("implements ITickable, IAspectContainer"));
         assertTrue(tileSource.contains("public boolean draining = false;"));
         assertTrue(tileSource.contains("public int drainX = 0;"));
         assertTrue(tileSource.contains("public int drainColor = 0;"));
@@ -26,6 +26,11 @@ public class TileWandPedestalDrainContractsStaticGuardTest {
         assertTrue(tileSource.contains("instanceof ItemAmuletVis"));
         assertTrue(tileSource.contains("this.drainColor = color;"));
         assertTrue(tileSource.contains("private void findNodes()"));
+        assertTrue(tileSource.contains("public boolean isItemValidForSlot(int index, ItemStack stack)"));
+        assertTrue(tileSource.contains("public boolean canInsertItem(int index, ItemStack stack, EnumFacing direction)"));
+        assertTrue(tileSource.contains("public AspectList getAspects()"));
+        assertTrue(tileSource.contains("stored.getAmount(aspect) / 100"));
+        assertTrue(tileSource.contains("public boolean doesContainerAccept(Aspect aspect)"));
 
         assertTrue(rendererSource.contains("if (!stack.isEmpty() && tile.draining)"));
         assertTrue(rendererSource.contains("TileRenderHelper.drawWispyLine("));
