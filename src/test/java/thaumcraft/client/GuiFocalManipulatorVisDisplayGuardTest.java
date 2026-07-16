@@ -33,11 +33,12 @@ public class GuiFocalManipulatorVisDisplayGuardTest {
         assertFalse("selectedCost amount must not be rendered as a raw int",
                 source.contains("String.valueOf(this.selectedCost.getAmount(aspect))"));
 
-        // The in-progress remaining Vis text must likewise be divided by 100.
-        assertTrue("remaining visSize must be divided by 100.0F for display",
+        // Active crafting copies the remaining aspect list into selectedCost, so the
+        // same conversion must remain the sole numeric Vis display path.
+        assertTrue("active crafting must display its remaining per-aspect costs",
+                source.contains("this.selectedCost.add(this.table.aspects);"));
+        assertFalse("the removed aggregate progress label must not return",
                 source.contains("VIS_FORMAT.format((float) remaining / 100.0F)"));
-        assertFalse("remaining visSize must not be concatenated as a raw int",
-                source.contains("wandtable.text1\") + \": \" + remaining"));
     }
 
     private static String read(String path) throws IOException {

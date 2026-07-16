@@ -3,6 +3,7 @@ package thaumcraft.client.gui;
 import java.io.IOException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.renderer.GlStateManager;
@@ -26,6 +27,13 @@ public class GuiFocalManipulator extends GuiContainer {
     // Vis is stored internally as centi-vis (100 = 1.0 Vis); display values must be
     // divided by 100, matching ItemWandCasting / ItemAmuletVis / ItemFocusBasic.
     private static final DecimalFormat VIS_FORMAT = new DecimalFormat("#######.#");
+    private static final int START_X = 48;
+    private static final int START_Y = 88;
+    private static final int START_WIDTH = 96;
+    private static final int START_HEIGHT = 8;
+    private static final int OPTIONS_X = 48;
+    private static final int OPTIONS_Y = 104;
+    private static final int OPTION_SIZE = 16;
 
     private final TileFocalManipulator table;
     private final List<FocusUpgradeType> possibleUpgrades = new ArrayList<FocusUpgradeType>();
@@ -46,6 +54,8 @@ public class GuiFocalManipulator extends GuiContainer {
     @Override
     public void drawScreen(int mouseX, int mouseY, float partialTicks) {
         super.drawScreen(mouseX, mouseY, partialTicks);
+        this.renderHoveredToolTip(mouseX, mouseY);
+        this.drawControlTooltip(mouseX, mouseY);
         this.drawUpgradeTooltip(mouseX, mouseY);
     }
 
@@ -58,12 +68,17 @@ public class GuiFocalManipulator extends GuiContainer {
         this.gatherInfo();
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
         this.mc.getTextureManager().bindTexture(TEXTURE);
+        GlStateManager.enableBlend();
+        GlStateManager.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA,
+                GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
         this.drawTexturedModalRect(this.guiLeft, this.guiTop, 0, 0, this.xSize, this.ySize);
 
         this.drawAppliedUpgrades();
         this.drawPossibleUpgrades();
         this.drawSelectedCost();
         this.drawProgress();
+        GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+        GlStateManager.disableBlend();
     }
 
     private void gatherInfo() {
@@ -147,40 +162,66 @@ public class GuiFocalManipulator extends GuiContainer {
     private void drawPossibleUpgrades() {
         for (int i = 0; i < this.possibleUpgrades.size(); ++i) {
             FocusUpgradeType type = this.possibleUpgrades.get(i);
-            int x = this.guiLeft + 48 + i * 16;
-            int y = this.guiTop + 104;
+            int x = this.guiLeft + OPTIONS_X + i * OPTION_SIZE;
+            int y = this.guiTop + OPTIONS_Y;
             if (type.id == this.selected) {
-                drawRect(x - 1, y - 1, x + 17, y + 17, 0x66FFFFFF);
+                GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+                this.mc.getTextureManager().bindTexture(TEXTURE);
+                this.drawTexturedModalRect(x, y, 200, 0, OPTION_SIZE, OPTION_SIZE);
             }
-            drawIcon(type.icon, x, y, 16, 16);
+            drawIcon(type.icon, x, y, OPTION_SIZE, OPTION_SIZE);
         }
     }
 
     private void drawSelectedCost() {
         if (this.selected < 0 || this.rank < 1) return;
 
-        String rankText = "Rank " + this.rank;
-        this.fontRenderer.drawString(rankText, this.guiLeft + 48, this.guiTop + 48, 0xFFFFFF);
-        this.fontRenderer.drawString(I18n.translateToLocal("wandtable.text2") + ": " + this.rank * TileFocalManipulator.XP_MULT,
-                this.guiLeft + 108, this.guiTop + 58, 0xFFFFFF);
+        int xp = getRequiredExperience();
+        boolean enoughExperience = hasEnoughExperience(xp);
+        GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+        this.mc.getTextureManager().bindTexture(TEXTURE);
+        if (canStartUpgrade()) {
+            this.drawTexturedModalRect(this.guiLeft + START_X, this.guiTop + START_Y,
+                    8, 240, START_WIDTH, START_HEIGHT);
+        }
+        this.drawTexturedModalRect(this.guiLeft + 108, this.guiTop + 59, 200, 16, 16, 16);
+        this.fontRenderer.drawString(String.valueOf(xp), this.guiLeft + 125, this.guiTop + 64,
+                enoughExperience ? 10092429 : 16151160);
 
         Aspect[] aspects = this.selectedCost.getAspectsSorted();
-        for (int i = 0; i < aspects.length && i < 6; ++i) {
-            Aspect aspect = aspects[i];
-            drawIcon(aspect.getImage(), this.guiLeft + 48 + i * 16, this.guiTop + 68, 16, 16);
+        GlStateManager.pushMatrix();
+        GlStateManager.translate(this.guiLeft + 49.0F,
+                this.guiTop + 68.0F - this.selectedCost.size() * 2.5F, 0.0F);
+        GlStateManager.scale(0.5F, 0.5F, 0.5F);
+        int row = 0;
+        for (Aspect aspect : aspects) {
+            if (aspect == null) continue;
+            this.fontRenderer.drawString(aspect.getName(), 0, row * 10, aspect.getColor());
             this.fontRenderer.drawString(VIS_FORMAT.format((float) this.selectedCost.getAmount(aspect) / 100.0F),
-                    this.guiLeft + 50 + i * 16, this.guiTop + 84, 0xFFFFFF);
+                    48, row * 10, aspect.getColor());
+            ++row;
         }
+        GlStateManager.popMatrix();
     }
 
     private void drawProgress() {
         if (this.table.size <= 0) return;
-        int remaining = this.table.aspects.visSize();
-        int width = Math.max(0, Math.min(72, 72 - remaining * 72 / Math.max(1, this.table.size)));
-        drawRect(this.guiLeft + 60, this.guiTop + 124, this.guiLeft + 132, this.guiTop + 130, 0x66000000);
-        drawRect(this.guiLeft + 60, this.guiTop + 124, this.guiLeft + 60 + width, this.guiTop + 130, 0xAA8D62E9);
-        this.fontRenderer.drawString(I18n.translateToLocal("wandtable.text1") + ": " + VIS_FORMAT.format((float) remaining / 100.0F),
-                this.guiLeft + 48, this.guiTop + 132, 0xFFFFFF);
+        int start = 0;
+        this.mc.getTextureManager().bindTexture(TEXTURE);
+        for (Aspect aspect : this.table.aspects.getAspectsSorted()) {
+            if (aspect == null) continue;
+            int amount = this.table.aspects.getAmount(aspect);
+            if (amount <= 0) continue;
+            int width = (int) ((float) amount / (float) this.table.size * START_WIDTH);
+            int color = aspect.getColor();
+            GlStateManager.color(((color >> 16) & 0xFF) / 255.0F,
+                    ((color >> 8) & 0xFF) / 255.0F,
+                    (color & 0xFF) / 255.0F, 0.9F);
+            this.drawTexturedModalRect(this.guiLeft + START_X + start, this.guiTop + START_Y,
+                    112 + start, 240, width, START_HEIGHT);
+            start += width;
+        }
+        GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
     }
 
     private void drawIcon(ResourceLocation texture, int x, int y, int width, int height) {
@@ -193,22 +234,39 @@ public class GuiFocalManipulator extends GuiContainer {
     @Override
     protected void mouseClicked(int mouseX, int mouseY, int mouseButton) throws IOException {
         super.mouseClicked(mouseX, mouseY, mouseButton);
-        for (int i = 0; i < this.possibleUpgrades.size(); ++i) {
-            if (isMouseIn(mouseX, mouseY, 48 + i * 16, 104, 16, 16)) {
-                this.selected = this.possibleUpgrades.get(i).id;
+        if (canStartUpgrade() && isMouseIn(mouseX, mouseY, START_X, START_Y, START_WIDTH, START_HEIGHT)) {
+            this.mc.playerController.sendEnchantPacket(this.inventorySlots.windowId, this.selected);
+            this.playButtonClick();
+            return;
+        }
+        if (this.table.size <= 0) {
+            for (int i = 0; i < this.possibleUpgrades.size(); ++i) {
+                if (!isMouseIn(mouseX, mouseY, OPTIONS_X + i * OPTION_SIZE, OPTIONS_Y,
+                        OPTION_SIZE, OPTION_SIZE)) continue;
+                int id = this.possibleUpgrades.get(i).id;
+                this.selected = this.selected == id ? -1 : id;
                 this.playButtonClick();
                 return;
             }
         }
-        if (this.selected >= 0 && this.table.size <= 0 && isMouseIn(mouseX, mouseY, 108, 58, 36, 16)) {
-            this.mc.playerController.sendEnchantPacket(this.inventorySlots.windowId, this.selected);
-            this.playButtonClick();
+    }
+
+    private void drawControlTooltip(int mouseX, int mouseY) {
+        if (this.selected < 0 || this.rank < 1) return;
+        if (isMouseIn(mouseX, mouseY, 48, 48, 36, 36)) {
+            this.drawHoveringText(Collections.singletonList(I18n.translateToLocal("wandtable.text1")), mouseX, mouseY);
+        } else if (isMouseIn(mouseX, mouseY, 108, 58, 36, 16)) {
+            this.drawHoveringText(Collections.singletonList(I18n.translateToLocal("wandtable.text2")), mouseX, mouseY);
+        } else if (canStartUpgrade() && isMouseIn(mouseX, mouseY,
+                START_X, START_Y, START_WIDTH, START_HEIGHT)) {
+            this.drawHoveringText(Collections.singletonList(I18n.translateToLocal("wandtable.text3")), mouseX, mouseY);
         }
     }
 
     private void drawUpgradeTooltip(int mouseX, int mouseY) {
         for (int i = 0; i < this.possibleUpgrades.size(); ++i) {
-            if (!isMouseIn(mouseX, mouseY, 48 + i * 16, 104, 16, 16)) continue;
+            if (!isMouseIn(mouseX, mouseY, OPTIONS_X + i * OPTION_SIZE, OPTIONS_Y,
+                    OPTION_SIZE, OPTION_SIZE)) continue;
             FocusUpgradeType type = this.possibleUpgrades.get(i);
             List<String> tooltip = new ArrayList<String>();
             tooltip.add(TextFormatting.DARK_PURPLE.toString() + TextFormatting.UNDERLINE + type.getLocalizedName());
@@ -221,6 +279,27 @@ public class GuiFocalManipulator extends GuiContainer {
     private FocusUpgradeType getSelectedType() {
         if (this.selected < 0 || this.selected >= FocusUpgradeType.types.length) return null;
         return FocusUpgradeType.types[this.selected];
+    }
+
+    private boolean canStartUpgrade() {
+        if (this.table.size > 0 || this.rank < 1 || !isSelectedUpgradeAvailable()) return false;
+        return hasEnoughExperience(getRequiredExperience());
+    }
+
+    private boolean isSelectedUpgradeAvailable() {
+        for (FocusUpgradeType type : this.possibleUpgrades) {
+            if (type.id == this.selected) return true;
+        }
+        return false;
+    }
+
+    private int getRequiredExperience() {
+        return this.rank * TileFocalManipulator.XP_MULT;
+    }
+
+    private boolean hasEnoughExperience(int required) {
+        return this.mc.player != null && (this.mc.player.capabilities.isCreativeMode
+                || this.mc.player.experienceLevel >= required);
     }
 
     private boolean isMouseIn(int mouseX, int mouseY, int x, int y, int width, int height) {
