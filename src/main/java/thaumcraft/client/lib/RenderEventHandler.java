@@ -163,7 +163,7 @@ public class RenderEventHandler {
             GlStateManager.depthMask(false);
             GlStateManager.enableBlend();
             GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-            GlStateManager.scale(0.5F, 0.5F, 1.0F);
+            GlStateManager.scale(0.625F, 0.625F, 1.0F);
             UtilsFX.bindTexture("textures/gui/hud.png");
 
             GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);

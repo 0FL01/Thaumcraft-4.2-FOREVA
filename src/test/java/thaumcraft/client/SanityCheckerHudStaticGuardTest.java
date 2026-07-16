@@ -21,7 +21,7 @@ public class SanityCheckerHudStaticGuardTest {
         assertTrue(source.contains("knowledge.getWarpPerm()"));
         assertTrue(source.contains("knowledge.getWarpSticky()"));
         assertTrue(source.contains("knowledge.getWarpTemp()"));
-        assertTrue(source.contains("GlStateManager.scale(0.5F, 0.5F, 1.0F);"));
+        assertTrue(source.contains("GlStateManager.scale(0.625F, 0.625F, 1.0F);"));
         assertTrue(source.contains("UtilsFX.drawTexturedQuad(1, 1, 152, 0, 20, 76, -90.0D);"));
         assertTrue(source.contains("GlStateManager.color(1.0F, 0.5F, 1.0F, 1.0F);"));
         assertTrue(source.contains("GlStateManager.color(0.75F, 0.0F, 0.75F, 1.0F);"));
