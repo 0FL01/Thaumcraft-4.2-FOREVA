@@ -66,6 +66,9 @@ public class VisEnergyRendererFidelityStaticGuardTest {
                          && stabilizerRenderer.contains("textures/misc/node_bubble.png")
                          && stabilizerRenderer.contains("tile.count / 100.0D")
                          && stabilizerRenderer.contains("drawTexturedQuad(0.9F, bubbleColor")
+                         && stabilizerRenderer.contains("GlStateManager.disableLighting();")
+                         && stabilizerRenderer.contains("GlStateManager.disableCull();")
+                         && stabilizerRenderer.contains("OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, 220.0F, 220.0F);")
                          && stabilizerRenderer.contains("OpenGlHelper.setLightmapTextureCoords"));
 
         assertTrue("TileNodeConverterRenderer should render both the base and colored overlay lock plus count-driven pistons",

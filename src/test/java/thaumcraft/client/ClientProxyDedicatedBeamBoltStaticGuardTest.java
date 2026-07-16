@@ -93,6 +93,15 @@ public class ClientProxyDedicatedBeamBoltStaticGuardTest {
                         && beamPowerClass.contains(".lightmap(240, 240)")
                         && beamPowerClass.contains("addFlareVertex(")
                         && beamPowerClass.contains("this.opacity = 0.8F"));
+        assertTrue("FXBeamPower should keep TC4 channel geometry and revealer attenuation",
+                beamPowerClass.contains("this.setType(1);")
+                        && beamPowerClass.contains("this.setBeamWidth(0.7F);")
+                        && beamPowerClass.contains("protected int getBeamStripCount()")
+                        && beamPowerClass.contains("return 2;")
+                        && beamPowerClass.contains("isRevealed() ? 1.0F : 0.1F")
+                        && beamPowerClass.contains("isRevealed() ? 1.0F : 0.2F")
+                        && beamPowerClass.contains(".showNodes(helmet, living)")
+                        && beamPowerClass.contains("bindTexture(ParticleEngine.particleTexture)"));
         assertTrue("FXBeamGolemBoss should keep boss-facing source vector and target-anchored endpoint updates",
                 beamGolemBossClass.contains("this.boss.renderYawOffset")
                         && beamGolemBossClass.contains("this.target.prevPosX")

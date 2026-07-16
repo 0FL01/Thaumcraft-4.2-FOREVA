@@ -78,18 +78,30 @@ public class TileNodeStabilizerRenderer extends TileEntitySpecialRenderer<TileNo
             float bubblePulse = (float) Math.sin(ticks / 8.0F) * 0.1F + 0.5F;
             int bubbleAlpha = Math.round(Math.max(0.0F, Math.min(1.0F, tile.count / 37.0F * bubblePulse)) * 255.0F);
             int bubbleColor = (bubbleAlpha << 24) | (lock == 1 ? 0xFFFFFF : 0xFF4444);
+            boolean lightingEnabled = GL11.glIsEnabled(GL11.GL_LIGHTING);
+            boolean cullEnabled = GL11.glIsEnabled(GL11.GL_CULL_FACE);
             GlStateManager.pushMatrix();
             try {
                 GlStateManager.alphaFunc(GL11.GL_GREATER, 1.0F / 255.0F);
                 GlStateManager.enableBlend();
                 GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE);
+                GlStateManager.disableLighting();
+                GlStateManager.disableCull();
                 GlStateManager.depthMask(false);
+                OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, 220.0F, 220.0F);
                 GlStateManager.translate(x + 0.5D, y + 1.5D, z + 0.5D);
                 TileRenderHelper.orientBillboardToPlayer();
                 bindTexture(BUBBLE_TEXTURE);
                 TileRenderHelper.drawTexturedQuad(0.9F, bubbleColor, 0.0F, 1.0F, 0.0F, 1.0F);
             } finally {
+                OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, previousLightX, previousLightY);
                 GlStateManager.depthMask(true);
+                if (cullEnabled) {
+                    GlStateManager.enableCull();
+                }
+                if (lightingEnabled) {
+                    GlStateManager.enableLighting();
+                }
                 GlStateManager.disableBlend();
                 GlStateManager.alphaFunc(GL11.GL_GREATER, 0.1F);
                 GlStateManager.popMatrix();

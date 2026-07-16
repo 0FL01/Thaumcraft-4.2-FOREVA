@@ -6,18 +6,18 @@ import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.lwjgl.opengl.GL11;
 import thaumcraft.api.nodes.IRevealer;
+import thaumcraft.client.fx.ParticleEngine;
 
 @SideOnly(Side.CLIENT)
 public class FXBeamPower extends FXBeam {
-    private static final ResourceLocation FLARE = new ResourceLocation("thaumcraft", "textures/misc/p_large.png");
     private float opacity = 0.3F;
 
     public FXBeamPower(World world,
@@ -26,6 +26,9 @@ public class FXBeamPower extends FXBeam {
                        float red, float green, float blue,
                        int age, boolean flicker, int density) {
         super(world, px, py, pz, tx, ty, tz, red, green, blue, age, flicker, density);
+        this.setType(1);
+        this.setBeamWidth(0.7F);
+        this.setPulse(false);
     }
 
     public void updateBeam(double px, double py, double pz, double tx, double ty, double tz) {
@@ -33,13 +36,32 @@ public class FXBeamPower extends FXBeam {
     }
 
     public void setPulse(boolean pulse, float red, float green, float blue) {
-        setPulse(pulse);
         this.particleRed = red;
         this.particleGreen = green;
         this.particleBlue = blue;
         if (pulse) {
             this.opacity = 0.8F;
         }
+    }
+
+    @Override
+    protected float getBeamAlpha(float alpha) {
+        return this.opacity * (isRevealed() ? 1.0F : 0.1F);
+    }
+
+    @Override
+    protected int getBeamStripCount() {
+        return 2;
+    }
+
+    @Override
+    protected float getBeamStripVOffset(int strip, int strips) {
+        return strip / 3.0F;
+    }
+
+    @Override
+    protected float getBeamStripRotation() {
+        return 90.0F;
     }
 
     @Override
@@ -56,20 +78,13 @@ public class FXBeamPower extends FXBeam {
     protected void renderImpact(float partialTicks, float rotationX, float rotationZ, float rotationYZ, float rotationXY, float rotationXZ) {
         Tessellator tess = Tessellator.getInstance();
         BufferBuilder buf = tess.getBuffer();
-        Minecraft.getMinecraft().renderEngine.bindTexture(FLARE);
+        Minecraft.getMinecraft().renderEngine.bindTexture(ParticleEngine.particleTexture);
         GlStateManager.pushMatrix();
         GlStateManager.depthMask(false);
         GlStateManager.enableBlend();
         GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE);
 
-        float opmod = 0.2F;
-        Entity viewer = Minecraft.getMinecraft().getRenderViewEntity();
-        if (viewer instanceof EntityPlayer) {
-            ItemStack helm = ((EntityPlayer) viewer).inventory.armorInventory.get(3);
-            if (!helm.isEmpty() && helm.getItem() instanceof IRevealer) {
-                opmod = 1.0F;
-            }
-        }
+        float opmod = isRevealed() ? 1.0F : 0.2F;
 
         int part = this.particleAge % 16;
         float u0 = part / 16.0F;
@@ -91,7 +106,19 @@ public class FXBeamPower extends FXBeam {
 
         GlStateManager.disableBlend();
         GlStateManager.depthMask(true);
+        GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
         GlStateManager.popMatrix();
+    }
+
+    private boolean isRevealed() {
+        Entity viewer = Minecraft.getMinecraft().getRenderViewEntity();
+        if (!(viewer instanceof EntityLivingBase)) {
+            return false;
+        }
+        EntityLivingBase living = (EntityLivingBase) viewer;
+        ItemStack helmet = living.getItemStackFromSlot(EntityEquipmentSlot.HEAD);
+        return !helmet.isEmpty() && helmet.getItem() instanceof IRevealer
+                && ((IRevealer) helmet.getItem()).showNodes(helmet, living);
     }
 
     private void addFlareVertex(BufferBuilder buf, double x, double y, double z, double u, double v, float alpha) {

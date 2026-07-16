@@ -1,16 +1,20 @@
 package thaumcraft.api;
 
 import java.util.HashMap;
+import net.minecraft.block.Block;
+import net.minecraft.block.material.Material;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
-import net.minecraft.util.EnumFacing;
 import thaumcraft.api.ThaumcraftApi;
 import thaumcraft.api.aspects.Aspect;
 import thaumcraft.api.aspects.AspectList;
@@ -198,7 +202,89 @@ public class ThaumcraftApiHelper {
             Double.isNaN(v2.x) || Double.isNaN(v2.y) || Double.isNaN(v2.z)) {
             return null;
         }
-        return world.rayTraceBlocks(v1, v2, stopOnLiquid, ignoreBlockWithoutBoundingBox, returnLastUncollidableBlock);
+
+        int targetX = MathHelper.floor(v2.x);
+        int targetY = MathHelper.floor(v2.y);
+        int targetZ = MathHelper.floor(v2.z);
+        int currentX = MathHelper.floor(v1.x);
+        int currentY = MathHelper.floor(v1.y);
+        int currentZ = MathHelper.floor(v1.z);
+        RayTraceResult lastMiss = null;
+        int steps = 200;
+
+        // This is the vanilla 1.12 DDA traversal without its initial collision
+        // check. TC4 relies on that distinction when a ray starts inside a vis
+        // relay: the relay itself must not obstruct its link to the next node.
+        while (steps-- >= 0) {
+            if (Double.isNaN(v1.x) || Double.isNaN(v1.y) || Double.isNaN(v1.z)) {
+                return null;
+            }
+            if (currentX == targetX && currentY == targetY && currentZ == targetZ) {
+                return returnLastUncollidableBlock ? lastMiss : null;
+            }
+
+            boolean stepX = targetX != currentX;
+            boolean stepY = targetY != currentY;
+            boolean stepZ = targetZ != currentZ;
+            double boundaryX = 999.0D;
+            double boundaryY = 999.0D;
+            double boundaryZ = 999.0D;
+            if (targetX > currentX) {
+                boundaryX = currentX + 1.0D;
+            } else if (targetX < currentX) {
+                boundaryX = currentX;
+            }
+            if (targetY > currentY) {
+                boundaryY = currentY + 1.0D;
+            } else if (targetY < currentY) {
+                boundaryY = currentY;
+            }
+            if (targetZ > currentZ) {
+                boundaryZ = currentZ + 1.0D;
+            } else if (targetZ < currentZ) {
+                boundaryZ = currentZ;
+            }
+
+            double deltaX = v2.x - v1.x;
+            double deltaY = v2.y - v1.y;
+            double deltaZ = v2.z - v1.z;
+            double fractionX = stepX ? (boundaryX - v1.x) / deltaX : 999.0D;
+            double fractionY = stepY ? (boundaryY - v1.y) / deltaY : 999.0D;
+            double fractionZ = stepZ ? (boundaryZ - v1.z) / deltaZ : 999.0D;
+            if (fractionX == -0.0D) fractionX = -1.0E-4D;
+            if (fractionY == -0.0D) fractionY = -1.0E-4D;
+            if (fractionZ == -0.0D) fractionZ = -1.0E-4D;
+
+            EnumFacing face;
+            if (fractionX < fractionY && fractionX < fractionZ) {
+                face = targetX > currentX ? EnumFacing.WEST : EnumFacing.EAST;
+                v1 = new Vec3d(boundaryX, v1.y + deltaY * fractionX, v1.z + deltaZ * fractionX);
+            } else if (fractionY < fractionZ) {
+                face = targetY > currentY ? EnumFacing.DOWN : EnumFacing.UP;
+                v1 = new Vec3d(v1.x + deltaX * fractionY, boundaryY, v1.z + deltaZ * fractionY);
+            } else {
+                face = targetZ > currentZ ? EnumFacing.NORTH : EnumFacing.SOUTH;
+                v1 = new Vec3d(v1.x + deltaX * fractionZ, v1.y + deltaY * fractionZ, boundaryZ);
+            }
+
+            currentX = MathHelper.floor(v1.x) - (face == EnumFacing.EAST ? 1 : 0);
+            currentY = MathHelper.floor(v1.y) - (face == EnumFacing.UP ? 1 : 0);
+            currentZ = MathHelper.floor(v1.z) - (face == EnumFacing.SOUTH ? 1 : 0);
+            BlockPos currentPos = new BlockPos(currentX, currentY, currentZ);
+            IBlockState state = world.getBlockState(currentPos);
+            Block block = state.getBlock();
+            if (!ignoreBlockWithoutBoundingBox || state.getMaterial() == Material.PORTAL
+                    || state.getCollisionBoundingBox(world, currentPos) != Block.NULL_AABB) {
+                if (block.canCollideCheck(state, stopOnLiquid)) {
+                    RayTraceResult hit = state.collisionRayTrace(world, currentPos, v1, v2);
+                    if (hit != null) {
+                        return hit;
+                    }
+                } else {
+                    lastMiss = new RayTraceResult(RayTraceResult.Type.MISS, v1, face, currentPos);
+                }
+            }
+        }
+        return returnLastUncollidableBlock ? lastMiss : null;
     }
 }
-

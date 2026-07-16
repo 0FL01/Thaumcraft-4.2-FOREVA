@@ -186,6 +186,7 @@ public class FXBeam extends Particle {
             alpha = Math.min(1.0F, alpha + (this.rand.nextFloat() - 0.5F) * 0.15F);
         }
         alpha = Math.max(0.05F, alpha);
+        alpha = getBeamAlpha(alpha);
 
         float scroll = this.reverse ? -(ageSlide + partialTicks) : (ageSlide + partialTicks);
         float uvSlide = -scroll * 0.2F - MathHelper.floor(-scroll * 0.1F);
@@ -213,14 +214,14 @@ public class FXBeam extends Particle {
         float rot = (this.world.getTotalWorldTime() % Math.max(1, 360 / this.rotationspeed)) * this.rotationspeed + this.rotationspeed * partialTicks;
         GlStateManager.rotate(rot, 0.0F, 1.0F, 0.0F);
 
-        int strips = Math.max(3, this.density / 8);
+        int strips = getBeamStripCount();
         for (int t = 0; t < strips; t++) {
             double beamLen = this.length * size / Math.max(0.001F, this.particleScale);
             double u0 = 0.0D;
             double u1 = 1.0D;
-            double v0 = -1.0F + uvSlide + (float) t / (float) strips;
+            double v0 = -1.0F + uvSlide + getBeamStripVOffset(t, strips);
             double v1 = beamLen + v0;
-            GlStateManager.rotate(60.0F, 0.0F, 1.0F, 0.0F);
+            GlStateManager.rotate(getBeamStripRotation(), 0.0F, 1.0F, 0.0F);
 
             buf.begin(GL11.GL_QUADS, DefaultVertexFormats.PARTICLE_POSITION_TEX_COLOR_LMAP);
             addLitVertex(buf, e0, beamLen, 0.0D, u1, v1, alpha);
@@ -237,6 +238,22 @@ public class FXBeam extends Particle {
 
         renderImpact(partialTicks, rotationX, rotationZ, rotationYZ, rotationXY, rotationXZ);
         this.prevSize = size;
+    }
+
+    protected float getBeamAlpha(float alpha) {
+        return alpha;
+    }
+
+    protected int getBeamStripCount() {
+        return Math.max(3, this.density / 8);
+    }
+
+    protected float getBeamStripVOffset(int strip, int strips) {
+        return (float) strip / (float) strips;
+    }
+
+    protected float getBeamStripRotation() {
+        return 60.0F;
     }
 
     protected void renderImpact(float partialTicks, float rotationX, float rotationZ, float rotationYZ, float rotationXY, float rotationXZ) {

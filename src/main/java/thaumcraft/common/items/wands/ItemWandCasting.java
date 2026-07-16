@@ -41,6 +41,7 @@ import thaumcraft.api.wands.StaffRod;
 import thaumcraft.api.wands.WandCap;
 import thaumcraft.api.wands.WandRod;
 import thaumcraft.api.wands.WandTriggerRegistry;
+import thaumcraft.common.Thaumcraft;
 import thaumcraft.common.config.Config;
 import thaumcraft.common.config.ConfigBlocks;
 import thaumcraft.common.config.ConfigItems;
@@ -413,6 +414,7 @@ public class ItemWandCasting extends Item implements IArchitect {
     @SideOnly(Side.CLIENT)
     @Override
     public void addInformation(ItemStack stack, World worldIn, List<String> tooltip, ITooltipFlag flagIn) {
+        int tooltipStart = tooltip.size();
         WandRod rod = getRod(stack);
         WandCap cap = getCap(stack);
 
@@ -429,25 +431,60 @@ public class ItemWandCasting extends Item implements IArchitect {
                     TextFormatting.WHITE + I18n.translateToLocal("item.Wand." + cap.getTag() + ".cap"));
         }
 
-        // Vis display
         DecimalFormat formatter = new DecimalFormat("#####.##");
-        tooltip.add(TextFormatting.AQUA + "" + TextFormatting.ITALIC + I18n.translateToLocal("item.WandCasting.vis"));
+        EntityPlayer player = Thaumcraft.proxy == null ? null : Thaumcraft.proxy.getClientPlayer();
+        boolean shift = Thaumcraft.proxy != null && Thaumcraft.proxy.isShiftKeyDown();
+        String compactVis = "";
+        int totalCostModifier = 0;
+        int aspectCount = 0;
+        ItemStack focusStack = getFocusItem(stack);
+        ItemFocusBasic focus = getFocus(stack);
+        AspectList focusCost = focus == null ? null : focus.getVisCost(focusStack);
+
         for (Aspect aspect : Aspect.getPrimalAspects()) {
             if (aspect == null) continue;
-            int vis = getVis(stack, aspect);
-            int max = getMaxVis(stack);
-            if (vis > 0 || max > 0) {
-                tooltip.add(" " + TextFormatting.GRAY + aspect.getName() + ": " +
-                        TextFormatting.WHITE + formatter.format((float) vis / 100.0F) + "/" + formatter.format((float) max / 100.0F));
+            String amount = formatter.format((float) getVis(stack, aspect) / 100.0F);
+            float costModifier = getConsumptionModifier(stack, player, aspect, false);
+            String costModifierText = formatter.format(costModifier * 100.0F);
+            totalCostModifier += costModifier * 100.0F;
+            aspectCount++;
+
+            String focusCostText = "";
+            if (focusCost != null && focusCost.getAmount(aspect) > 0) {
+                focusCostText = TextFormatting.RESET + ", "
+                        + formatter.format(focusCost.getAmount(aspect) * costModifier / 100.0F) + " "
+                        + I18n.translateToLocal(focus.isVisCostPerTick(focusStack)
+                        ? "item.Focus.cost2" : "item.Focus.cost1");
+            }
+
+            if (shift) {
+                tooltip.add(" \u00a7" + aspect.getChatcolor() + aspect.getName() + TextFormatting.RESET + " x"
+                        + amount + ", " + TextFormatting.ITALIC + "(" + costModifierText + "% "
+                        + I18n.translateToLocal("tc.vis.cost") + ")" + focusCostText);
+            } else {
+                if (!compactVis.isEmpty()) {
+                    compactVis += " | ";
+                }
+                compactVis += "\u00a7" + aspect.getChatcolor() + amount + TextFormatting.RESET;
             }
         }
 
+        String averageCost = "";
+        if (!shift && aspectCount > 0) {
+            tooltip.add(compactVis);
+            averageCost = " (" + totalCostModifier / aspectCount + "% "
+                    + I18n.translateToLocal("tc.vis.costavg") + ")";
+        }
+        tooltip.add(tooltipStart, TextFormatting.GOLD + I18n.translateToLocal("item.capacity.text") + " "
+                + getMaxVis(stack) / 100 + TextFormatting.RESET + averageCost);
+
         // Focus info
-        ItemFocusBasic focus = getFocus(stack);
         if (focus != null) {
-            ItemStack focusStack = getFocusItem(stack);
             tooltip.add(TextFormatting.LIGHT_PURPLE + I18n.translateToLocal("item.WandCasting.focus") + " " +
                     TextFormatting.WHITE + focusStack.getDisplayName());
+            if (shift) {
+                focus.addFocusInformation(focusStack, player, tooltip, flagIn.isAdvanced());
+            }
         }
     }
 

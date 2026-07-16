@@ -24,6 +24,23 @@ public class TileVisRelayStaticGuardTest {
         assertTrue(source.contains("return null;"));
     }
 
+    @Test
+    public void visRelayShouldKeepReferenceChannelSyncAndPulseLifecycle() throws IOException {
+        String source = readFile("src/main/java/thaumcraft/common/tiles/TileVisRelay.java");
+
+        assertTrue(source.contains("protected Object beam1;"));
+        assertTrue(source.contains("this.drawEffect();"));
+        assertTrue(source.contains("Thaumcraft.proxy.beamPower(this.world,"));
+        assertTrue(source.contains("this.pulse > 0, this.beam1"));
+        assertTrue(source.contains("this.world.addBlockEvent(this.pos"));
+        assertTrue(source.contains("public boolean receiveClientEvent(int id, int type)"));
+        assertTrue(source.contains("relayParent.get() instanceof TileVisRelay"));
+        assertTrue(source.contains("nbt.setByte(\"px\""));
+        assertTrue(source.contains("this.px = nbt.getByte(\"px\");"));
+        assertTrue(source.contains("this.parentLoaded = true;"));
+        assertTrue(source.contains("this.beam1 = null;"));
+    }
+
     private static String readFile(String path) throws IOException {
         return new String(Files.readAllBytes(Paths.get(path)), StandardCharsets.UTF_8);
     }
