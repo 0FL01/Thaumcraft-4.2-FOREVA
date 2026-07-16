@@ -6,6 +6,7 @@ import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.PropertyInteger;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.client.particle.ParticleManager;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.item.ItemStack;
@@ -13,11 +14,15 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.NonNullList;
+import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import thaumcraft.common.Thaumcraft;
+import thaumcraft.common.lib.TCSounds;
 import thaumcraft.common.tiles.TileNode;
 
 public class BlockMagicalLog extends BlockLog {
@@ -44,6 +49,18 @@ public class BlockMagicalLog extends BlockLog {
         int type = state.getValue(TYPE);
         if (type == 2 || type == 3) return 1; // silverwood knot/legacy alias -> silverwood
         return type;
+    }
+
+    @Override
+    @SideOnly(Side.CLIENT)
+    public boolean addDestroyEffects(World world, BlockPos pos, ParticleManager manager) {
+        IBlockState state = world.getBlockState(pos);
+        if (state.getBlock() == this && state.getValue(TYPE) == 2) {
+            Thaumcraft.proxy.burst(world, pos.getX() + 0.5D, pos.getY() + 0.5D, pos.getZ() + 0.5D, 1.0F);
+            world.playSound(pos.getX() + 0.5D, pos.getY() + 0.5D, pos.getZ() + 0.5D,
+                    TCSounds.CRAFTFAIL, SoundCategory.BLOCKS, 1.0F, 1.0F, false);
+        }
+        return super.addDestroyEffects(world, pos, manager);
     }
 
     @Override

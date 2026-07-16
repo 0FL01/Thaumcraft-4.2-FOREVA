@@ -919,6 +919,11 @@ public class ClientProxy extends CommonProxy {
     }
 
     private void setupBlockRenderers() {
+        registerBuiltinItemModel(ConfigBlocks.blockFluxGooItem, 0, "blockfluxgoo");
+        registerBuiltinItemModel(ConfigBlocks.blockFluxGasItem, 0, "blockfluxgas");
+        registerBuiltinItemModel(Item.getItemFromBlock(ConfigBlocks.blockHole), 0, "blockhole");
+        registerBuiltinItemModel(Item.getItemFromBlock(ConfigBlocks.blockWarded), 0, "blockwarded");
+        registerBuiltinItemModel(Item.getItemFromBlock(ConfigBlocks.blockEldritchNothing), 0, "blockeldritchnothing");
         registerBlockItemModel(ConfigBlocks.blockMagicalLeavesItem, 0, "type=0");
         registerBlockItemModel(ConfigBlocks.blockMagicalLeavesItem, 1, "type=1");
         Item customPlantItem = Item.getItemFromBlock(ConfigBlocks.blockCustomPlant);
@@ -1065,6 +1070,10 @@ public class ClientProxy extends CommonProxy {
         Item lootCrateItem = Item.getItemFromBlock(ConfigBlocks.blockLootCrate);
         for (int meta = 0; meta <= 2; meta++) {
             registerBlockItemModel(lootCrateItem, meta, "type=" + meta);
+        }
+        Item lootUrnItem = Item.getItemFromBlock(ConfigBlocks.blockLootUrn);
+        for (int meta = 0; meta <= 2; meta++) {
+            registerBlockItemModel(lootUrnItem, meta, "type=" + meta);
         }
         Item manaPodItem = Item.getItemFromBlock(ConfigBlocks.blockManaPod);
         registerBuiltinItemModel(manaPodItem, 0, "blockmanapod");
@@ -1408,6 +1417,24 @@ public class ClientProxy extends CommonProxy {
                     0.9F, false, 112, 9, 1,
                     5 + world.rand.nextInt(8), world.rand.nextInt(10),
                     0.7F + world.rand.nextFloat() * 0.4F);
+        }
+    }
+
+    @Override
+    public void infusedStoneSparkle(World world, int x, int y, int z, int metadata) {
+        if (world == null || !world.isRemote) return;
+        int color = metadata;
+        if (metadata == 2) color = 4;
+        if (metadata == 3) color = 2;
+        if (metadata == 4) color = 3;
+        if (metadata == 5) color = 6;
+        if (metadata == 6) color = 5;
+        for (int i = 0; i < particleCount(3); ++i) {
+            FXSparkle fx = new FXSparkle(world,
+                    x + world.rand.nextFloat(), y + world.rand.nextFloat(), z + world.rand.nextFloat(),
+                    1.75F, color, 3.0F + world.rand.nextInt(3));
+            fx.setGravity(0.1F);
+            ParticleEngine.addEffect(world, fx);
         }
     }
 

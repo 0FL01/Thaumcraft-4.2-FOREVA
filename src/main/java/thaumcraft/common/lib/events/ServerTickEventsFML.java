@@ -171,7 +171,9 @@ public class ServerTickEventsFML {
             }
 
             // Do not charge the player or award drops unless the replacement actually succeeded.
-            if (!world.setBlockState(pos, targetState, 3)) continue;
+            if (!world.setBlockState(pos, targetState, 1)) continue;
+            world.playEvent(2001, pos, Block.getStateId(sourceState));
+            world.notifyBlockUpdate(pos, sourceState, targetState, 2);
 
             didSomething = true;
 
@@ -196,8 +198,6 @@ public class ServerTickEventsFML {
             PacketHandler.INSTANCE.sendToAllAround(
                     new PacketFXBlockSparkle(vs.x, vs.y, vs.z, 0xC0C0FF),
                     new NetworkRegistry.TargetPoint(world.provider.getDimension(), vs.x, vs.y, vs.z, 32.0));
-
-            world.playEvent(2001, pos, Block.getStateId(sourceState));
 
             // Chain to adjacent blocks (for Portable Hole area effect)
             if (vs.lifespan > 0) {

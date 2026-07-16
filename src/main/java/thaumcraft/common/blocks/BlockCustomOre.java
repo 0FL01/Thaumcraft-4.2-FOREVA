@@ -6,6 +6,7 @@ import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.PropertyInteger;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.client.particle.ParticleManager;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
@@ -17,8 +18,11 @@ import net.minecraft.util.EnumHand;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import thaumcraft.common.Thaumcraft;
 import thaumcraft.common.config.ConfigItems;
 import java.util.ArrayList;
@@ -50,6 +54,17 @@ public class BlockCustomOre extends Block {
     @Override
     public int damageDropped(IBlockState state) {
         return this.getMetaFromState(state);
+    }
+
+    @Override
+    @SideOnly(Side.CLIENT)
+    public boolean addHitEffects(IBlockState state, World world, RayTraceResult target, ParticleManager manager) {
+        int meta = this.getMetaFromState(world.getBlockState(target.getBlockPos()));
+        if (meta != 0 && meta < 6) {
+            Thaumcraft.proxy.infusedStoneSparkle(world, target.getBlockPos().getX(), target.getBlockPos().getY(),
+                    target.getBlockPos().getZ(), meta);
+        }
+        return super.addHitEffects(state, world, target, manager);
     }
 
     @Override

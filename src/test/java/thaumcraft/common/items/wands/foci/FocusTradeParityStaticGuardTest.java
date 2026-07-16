@@ -37,9 +37,13 @@ public class FocusTradeParityStaticGuardTest {
     public void swapShouldChargeAndRewardOnlyAfterSuccessfulPlacement() throws IOException {
         String source = read("src/main/java/thaumcraft/common/lib/events/ServerTickEventsFML.java");
         String tickSwap = method(source, "private void tickBlockSwap", "public static void addSwapper");
-        int placement = tickSwap.indexOf("if (!world.setBlockState(pos, targetState, 3)) continue;");
+        int placement = tickSwap.indexOf("if (!world.setBlockState(pos, targetState, 1)) continue;");
+        int sourceFx = tickSwap.indexOf("world.playEvent(2001, pos, Block.getStateId(sourceState));", placement);
+        int clientUpdate = tickSwap.indexOf("world.notifyBlockUpdate(pos, sourceState, targetState, 2);", sourceFx);
 
         assertTrue(placement >= 0);
+        assertTrue(sourceFx > placement);
+        assertTrue(clientUpdate > sourceFx);
         assertTrue(tickSwap.indexOf("decrStackSize(slot, 1)") > placement);
         assertTrue(tickSwap.indexOf("focus.getVisCost(focusStack), true, false)") > placement);
         assertTrue(tickSwap.indexOf("addItemStackToInventory(is)") > placement);

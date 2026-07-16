@@ -188,8 +188,8 @@ public class FocusExcavation extends ItemFocusBasic {
             BlockUtils.dropBlockAsItemWithChance(world, block, pos.getX(), pos.getY(), pos.getZ(), meta, 1.0F, fortune, player);
             block.dropXpOnBlockBreak(world, pos, block.getExpDrop(state, world, pos, fortune));
         }
-        world.setBlockToAir(pos);
         world.playEvent(2001, pos, Block.getStateId(state));
+        world.setBlockToAir(pos);
         return true;
     }
 

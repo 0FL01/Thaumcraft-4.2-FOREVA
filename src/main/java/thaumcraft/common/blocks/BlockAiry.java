@@ -8,6 +8,7 @@ import net.minecraft.block.SoundType;
 import net.minecraft.block.properties.PropertyInteger;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.client.particle.ParticleManager;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
@@ -21,12 +22,15 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.EnumBlockRenderType;
 import net.minecraft.util.NonNullList;
+import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import thaumcraft.api.aspects.Aspect;
 import thaumcraft.api.aspects.AspectList;
 import thaumcraft.api.entities.IEldritchMob;
@@ -36,6 +40,7 @@ import thaumcraft.common.config.Config;
 import thaumcraft.common.config.ConfigBlocks;
 import thaumcraft.common.config.ConfigItems;
 import thaumcraft.common.items.ItemWispEssence;
+import thaumcraft.common.lib.TCSounds;
 import thaumcraft.common.lib.world.ThaumcraftWorldGenerator;
 import thaumcraft.common.tiles.TileNode;
 import thaumcraft.common.tiles.TileNodeEnergized;
@@ -89,6 +94,29 @@ public class BlockAiry extends BlockContainer {
     public EnumBlockRenderType getRenderType(IBlockState state) {
         int meta = this.getMetaFromState(state);
         return meta == 0 || meta == 4 || meta == 5 ? EnumBlockRenderType.INVISIBLE : EnumBlockRenderType.MODEL;
+    }
+
+    @Override
+    @SideOnly(Side.CLIENT)
+    public boolean addHitEffects(IBlockState state, World world, RayTraceResult target, ParticleManager manager) {
+        int meta = this.getMetaFromState(world.getBlockState(target.getBlockPos()));
+        if ((meta == 0 || meta == 5) && world.rand.nextBoolean()) {
+            Thaumcraft.proxy.infusedStoneSparkle(world, target.getBlockPos().getX(), target.getBlockPos().getY(),
+                    target.getBlockPos().getZ(), 0);
+        }
+        return super.addHitEffects(state, world, target, manager);
+    }
+
+    @Override
+    @SideOnly(Side.CLIENT)
+    public boolean addDestroyEffects(World world, BlockPos pos, ParticleManager manager) {
+        int meta = this.getMetaFromState(world.getBlockState(pos));
+        if (meta == 0 || meta == 5) {
+            Thaumcraft.proxy.burst(world, pos.getX() + 0.5D, pos.getY() + 0.5D, pos.getZ() + 0.5D, 1.0F);
+            world.playSound(pos.getX() + 0.5D, pos.getY() + 0.5D, pos.getZ() + 0.5D,
+                    TCSounds.CRAFTFAIL, SoundCategory.BLOCKS, 1.0F, 1.0F, false);
+        }
+        return super.addDestroyEffects(world, pos, manager);
     }
 
     @Override

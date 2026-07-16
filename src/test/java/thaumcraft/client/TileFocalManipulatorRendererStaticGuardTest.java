@@ -30,10 +30,9 @@ public class TileFocalManipulatorRendererStaticGuardTest {
         assertTrue(source.contains("TileRenderHelper.renderEntityItem(tile, focus, hover);"));
 
         assertTrue(blockstate.contains("\"type=13\": { \"model\": \"thaumcraft:blockstonedevice_13\" }"));
-        assertTrue(blockModel.contains("\"surface\": \"thaumcraft:models/wandtable\""));
-        assertTrue(blockModel.contains("\"from\": [0, 8, 0]"));
-        assertTrue(blockModel.contains("\"from\": [0, 0, 0]"));
-        assertTrue(blockModel.contains("\"from\": [9, 4, 11]"));
+        assertTrue(blockModel.contains("\"particle\": \"thaumcraft:blocks/pedestal_top\""));
+        assertTrue(blockModel.contains("\"elements\": []"));
+        assertTrue(!blockModel.contains("thaumcraft:models/wandtable"));
 
         assertTrue(thaumatorium.contains("textures/models/thaumatorium.png"));
         assertTrue(thaumatorium.contains("model.renderAll();"));

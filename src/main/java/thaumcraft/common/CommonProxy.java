@@ -184,6 +184,9 @@ public class CommonProxy implements IGuiHandler {
     public void blockSparkle(World world, int x, int y, int z, int color, int count) {
     }
 
+    public void infusedStoneSparkle(World world, int x, int y, int z, int metadata) {
+    }
+
     public void blockWard(World world, double x, double y, double z, EnumFacing side, float red, float green, float blue) {
     }
 

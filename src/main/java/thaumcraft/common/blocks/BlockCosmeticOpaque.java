@@ -5,6 +5,7 @@ import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.client.particle.ParticleManager;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.item.ItemStack;
@@ -13,7 +14,10 @@ import net.minecraft.util.EnumHand;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import thaumcraft.common.Thaumcraft;
 import thaumcraft.common.config.ConfigBlocks;
 
@@ -39,6 +43,20 @@ public class BlockCosmeticOpaque extends Block {
         for (int i = 0; i < 3; i++) {
             list.add(new ItemStack(this, 1, i));
         }
+    }
+
+    @Override
+    @SideOnly(Side.CLIENT)
+    public boolean addHitEffects(IBlockState state, World world, RayTraceResult target, ParticleManager manager) {
+        if (this.getMetaFromState(world.getBlockState(target.getBlockPos())) == 2) {
+            BlockPos pos = target.getBlockPos();
+            Thaumcraft.proxy.blockWard(world, pos.getX(), pos.getY(), pos.getZ(), target.sideHit,
+                    (float) (target.hitVec.x - pos.getX()),
+                    (float) (target.hitVec.y - pos.getY()),
+                    (float) (target.hitVec.z - pos.getZ()));
+            return true;
+        }
+        return false;
     }
 
     @Override

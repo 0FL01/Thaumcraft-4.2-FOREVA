@@ -39,11 +39,13 @@ public class RotaryMachineShellContractTest {
                         && centrifugeModel.contains("renderSpinnyBit(float scale)"));
         assertTrue("Centrifuge block model should carry the top and bottom shell slabs instead of the old cube_all placeholder",
                 centrifugeBlockModel.contains("\"ambientocclusion\": false")
-                        && centrifugeBlockModel.contains("\"shell\": \"thaumcraft:models/centrifuge\"")
+                        && centrifugeBlockModel.contains("\"particle\": \"thaumcraft:blocks/pipe_1\"")
+                        && centrifugeBlockModel.contains("\"shell\": \"thaumcraft:models/centrifuge_inventory\"")
                         && centrifugeBlockModel.contains("\"from\": [4, 0, 4]")
                         && centrifugeBlockModel.contains("\"to\": [12, 4, 12]")
                         && centrifugeBlockModel.contains("\"from\": [4, 12, 4]")
-                        && centrifugeBlockModel.contains("\"to\": [12, 16, 12]"));
+                        && centrifugeBlockModel.contains("\"to\": [12, 16, 12]")
+                        && occurrences(centrifugeBlockModel, "\"uv\"") == 12);
         assertTrue("Centrifuge item model must bake all six TC4 ModelCentrifuge parts with the square atlas",
                 centrifugeItemModel.contains("\"surface\": \"thaumcraft:models/centrifuge_inventory\"")
                         && centrifugeItemModel.contains("\"from\": [4, 7, 7]")

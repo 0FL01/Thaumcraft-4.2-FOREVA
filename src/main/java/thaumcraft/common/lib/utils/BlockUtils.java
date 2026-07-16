@@ -5,14 +5,19 @@ import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
+import net.minecraftforge.common.ForgeHooks;
+
+import javax.annotation.Nullable;
 
 public class BlockUtils {
 
@@ -93,20 +98,84 @@ public class BlockUtils {
         return false;
     }
 
-    /** Break the furthest connected block of the given type from the start position. Used by lumber/harvest golems. */
-    public static boolean breakFurthestBlock(World world, BlockPos pos, net.minecraft.entity.player.EntityPlayer player) {
-        // Simplified: break the block at the given position
+    public static boolean harvestBlock(World world, BlockPos pos, @Nullable EntityPlayer player) {
+        if (world == null || world.isRemote) return false;
         IBlockState state = world.getBlockState(pos);
-        if (state.getBlock().isAir(state, world, pos)) return false;
-        if (player != null && !world.isRemote) {
-            state.getBlock().harvestBlock(world, player, pos, state, world.getTileEntity(pos), net.minecraft.item.ItemStack.EMPTY);
-            world.setBlockToAir(pos);
-            return true;
+        Block block = state.getBlock();
+        if (block.isAir(state, world, pos) || state.getBlockHardness(world, pos) < 0.0F) return false;
+        if (player == null) return world.destroyBlock(pos, true);
+
+        int xp = 0;
+        if (player instanceof EntityPlayerMP) {
+            EntityPlayerMP serverPlayer = (EntityPlayerMP) player;
+            xp = ForgeHooks.onBlockBreakEvent(world, serverPlayer.interactionManager.getGameType(), serverPlayer, pos);
+            if (xp < 0) return false;
         }
-        if (!world.isRemote) {
-            world.destroyBlock(pos, true);
-            return true;
+
+        boolean creative = player.capabilities.isCreativeMode;
+        boolean canHarvest = !creative && block.canHarvestBlock(world, pos, player);
+        TileEntity tile = world.getTileEntity(pos);
+        ItemStack tool = player.getHeldItemMainhand();
+        world.playEvent(2001, pos, Block.getStateId(state));
+        block.onBlockHarvested(world, pos, state, player);
+        if (!block.removedByPlayer(state, world, pos, player, canHarvest)) return false;
+        block.onPlayerDestroy(world, pos, state);
+        if (canHarvest) block.harvestBlock(world, player, pos, state, tile, tool);
+        if (!creative && xp > 0) block.dropXpOnBlockBreak(world, pos, xp);
+        return true;
+    }
+
+    public static void destroyBlockPartially(World world, int breakerId, BlockPos pos, int progress) {
+        if (world != null && !world.isRemote) world.sendBlockBreakProgress(breakerId, pos, progress);
+    }
+
+    /** Break the furthest connected block of the given type from the start position. Used by lumber/harvest golems. */
+    public static boolean breakFurthestBlock(World world, BlockPos pos, @Nullable EntityPlayer player) {
+        if (world == null || world.isRemote) return false;
+        IBlockState originState = world.getBlockState(pos);
+        Block originBlock = originState.getBlock();
+        if (originBlock.isAir(originState, world, pos)) return false;
+
+        BlockPos current = pos;
+        double lastDistance = 0.0D;
+        while (true) {
+            BlockPos next = null;
+            search:
+            for (int xx = -2; xx <= 2; xx++) {
+                for (int yy = 2; yy >= -2; yy--) {
+                    for (int zz = -2; zz <= 2; zz++) {
+                        BlockPos candidate = current.add(xx, yy, zz);
+                        if (Math.abs(candidate.getX() - pos.getX()) > 24
+                                || Math.abs(candidate.getY() - pos.getY()) > 48
+                                || Math.abs(candidate.getZ() - pos.getZ()) > 24) continue;
+                        double distance = candidate.distanceSq(pos);
+                        IBlockState candidateState = world.getBlockState(candidate);
+                        if (distance > lastDistance
+                                && candidateState.getBlock() == originBlock
+                                && Utils.isWoodLog(world, candidate)
+                                && candidateState.getBlockHardness(world, candidate) >= 0.0F) {
+                            next = candidate;
+                            lastDistance = distance;
+                            break search;
+                        }
+                    }
+                }
+            }
+            if (next == null) break;
+            current = next;
         }
-        return false;
+
+        if (!harvestBlock(world, current, player)) return false;
+        world.markBlockRangeForRenderUpdate(pos, pos);
+        world.markBlockRangeForRenderUpdate(current, current);
+        for (int xx = -3; xx <= 3; xx++) {
+            for (int yy = -3; yy <= 3; yy++) {
+                for (int zz = -3; zz <= 3; zz++) {
+                    BlockPos updatePos = current.add(xx, yy, zz);
+                    world.scheduleUpdate(updatePos, world.getBlockState(updatePos).getBlock(), 150 + world.rand.nextInt(150));
+                }
+            }
+        }
+        return true;
     }
 }

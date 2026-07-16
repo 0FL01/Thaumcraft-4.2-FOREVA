@@ -5,6 +5,7 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.particle.Particle;
 import net.minecraft.client.renderer.BufferBuilder;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
@@ -51,12 +52,18 @@ public class FXBoreParticles extends Particle {
         this.targetX = tx;
         this.targetY = ty;
         this.targetZ = tz;
-        this.setParticleTexture(Minecraft.getMinecraft().getRenderItem().getItemModelMesher().getParticleIcon(item, meta));
+        TextureAtlasSprite sprite = Minecraft.getMinecraft().getRenderItem().getItemModelMesher().getParticleIcon(item, meta);
+        if (sprite != null) {
+            this.setParticleTexture(sprite);
+        }
         this.particleGravity = 0.2F;
         this.particleRed = 0.6F;
         this.particleGreen = 0.6F;
         this.particleBlue = 0.6F;
         initMotionAndLifetime();
+        if (sprite == null) {
+            this.setExpired();
+        }
     }
 
     private void initMotionAndLifetime() {

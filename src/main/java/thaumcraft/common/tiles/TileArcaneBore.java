@@ -543,8 +543,8 @@ public class TileArcaneBore extends TileThaumcraft implements ITickable, IInvent
 
         this.collectExistingDrops(target, drops);
         this.sendDigEvent(target);
-        this.world.setBlockToAir(target);
         this.world.playEvent(2001, target, Block.getStateId(state));
+        this.world.setBlockToAir(target);
         for (ItemStack drop : drops) {
             this.ejectOrStore(drop);
         }

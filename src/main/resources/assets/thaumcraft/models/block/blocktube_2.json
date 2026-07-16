@@ -1,32 +1,32 @@
 {
   "ambientocclusion": false,
   "textures": {
-    "particle": "#shell",
-    "shell": "thaumcraft:models/centrifuge"
+    "particle": "thaumcraft:blocks/pipe_1",
+    "shell": "thaumcraft:models/centrifuge_inventory"
   },
   "elements": [
     {
       "from": [4, 0, 4],
       "to": [12, 4, 12],
       "faces": {
-        "down": { "texture": "#shell" },
-        "up": { "texture": "#shell" },
-        "north": { "texture": "#shell" },
-        "south": { "texture": "#shell" },
-        "west": { "texture": "#shell" },
-        "east": { "texture": "#shell" }
+        "down": { "uv": [7, 8, 9, 12], "texture": "#shell" },
+        "up": { "uv": [9, 8, 11, 12], "texture": "#shell" },
+        "north": { "uv": [7, 12, 9, 14], "texture": "#shell" },
+        "south": { "uv": [11, 12, 13, 14], "texture": "#shell" },
+        "west": { "uv": [5, 12, 7, 14], "texture": "#shell" },
+        "east": { "uv": [9, 12, 11, 14], "texture": "#shell" }
       }
     },
     {
       "from": [4, 12, 4],
       "to": [12, 16, 12],
       "faces": {
-        "down": { "texture": "#shell" },
-        "up": { "texture": "#shell" },
-        "north": { "texture": "#shell" },
-        "south": { "texture": "#shell" },
-        "west": { "texture": "#shell" },
-        "east": { "texture": "#shell" }
+        "down": { "uv": [7, 8, 9, 12], "texture": "#shell" },
+        "up": { "uv": [9, 8, 11, 12], "texture": "#shell" },
+        "north": { "uv": [7, 12, 9, 14], "texture": "#shell" },
+        "south": { "uv": [11, 12, 13, 14], "texture": "#shell" },
+        "west": { "uv": [5, 12, 7, 14], "texture": "#shell" },
+        "east": { "uv": [9, 12, 11, 14], "texture": "#shell" }
       }
     }
   ]

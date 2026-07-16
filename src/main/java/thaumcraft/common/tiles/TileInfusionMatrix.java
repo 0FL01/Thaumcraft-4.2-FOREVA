@@ -825,9 +825,14 @@ public class TileInfusionMatrix extends TileThaumcraft implements ITickable, IWa
                         } else {
                             Item item = stack.getItem();
                             int meta = stack.getItemDamage();
-                            if (meta == 0 && item instanceof ItemBlock) {
+                            if (item instanceof ItemBlock) {
                                 Block block = Block.getBlockFromItem(item);
-                                IBlockState state = block.getStateFromMeta(meta);
+                                IBlockState state;
+                                try {
+                                    state = block.getStateFromMeta(meta);
+                                } catch (RuntimeException ignored) {
+                                    state = block.getDefaultState();
+                                }
                                 for (int i = 0; i < Thaumcraft.proxy.particleCount(2); ++i) {
                                     Thaumcraft.proxy.drawInfusionParticles2(
                                             this.world,

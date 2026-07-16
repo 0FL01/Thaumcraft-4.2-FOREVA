@@ -37,6 +37,17 @@ public class ConfigBlockItemModelCoverageTest {
         assertTrue("Missing thaumcraft block item models: " + missing, missing.isEmpty());
     }
 
+    @Test
+    public void registeredSpecialItemBlocksHaveExplicitModelLocations() throws IOException {
+        String proxy = readFile("src/main/java/thaumcraft/client/ClientProxy.java");
+        assertTrue(proxy.contains("registerBuiltinItemModel(ConfigBlocks.blockFluxGooItem, 0, \"blockfluxgoo\");"));
+        assertTrue(proxy.contains("registerBuiltinItemModel(ConfigBlocks.blockFluxGasItem, 0, \"blockfluxgas\");"));
+        assertTrue(proxy.contains("registerBuiltinItemModel(Item.getItemFromBlock(ConfigBlocks.blockHole), 0, \"blockhole\");"));
+        assertTrue(proxy.contains("registerBuiltinItemModel(Item.getItemFromBlock(ConfigBlocks.blockWarded), 0, \"blockwarded\");"));
+        assertTrue(proxy.contains("registerBuiltinItemModel(Item.getItemFromBlock(ConfigBlocks.blockEldritchNothing), 0, \"blockeldritchnothing\");"));
+        assertTrue(proxy.contains("registerBlockItemModel(lootUrnItem, meta, \"type=\" + meta);"));
+    }
+
     private static Set<String> extractBlockPaths(String source) {
         Set<String> out = new HashSet<>();
         Matcher matcher = LEGACY_BLOCK_PATH.matcher(source);
