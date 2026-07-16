@@ -6,7 +6,8 @@ import net.minecraft.client.renderer.block.model.ItemCameraTransforms;
 import net.minecraft.client.renderer.tileentity.TileEntityItemStackRenderer;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.EnumHand;
+import net.minecraft.util.EnumHandSide;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.apache.logging.log4j.LogManager;
@@ -35,9 +36,9 @@ import java.io.File;
  *     scale(scaleMultiplier)
  *     rotateX -> rotateY -> rotateZ
  *     translate(postTranslate)
- *     rotate(finalRotate)            // TC4 model basis correction (180 about X)
- *     [if hand] applyUseAnimation    // separate from base pose
  *     enableBlend
+ *     [if hand] applyUseAnimation    // separate from base pose
+ *     rotate(finalRotate)            // final model-basis correction (180 about X)
  *     model.render(stack, partialTicks, player)
  *     disableBlend
  *   popMatrix
@@ -45,13 +46,14 @@ import java.io.File;
  *
  * <p>Model basis (see ModelWand): the ModelRenderer geometry is authored Y-down (cap at model
  * y~0, rod extending to y~20, bottom cap at y~20). The {@code finalRotate} of 180 about X flips
- * it so the wand points upward in world space. This mirrors the original TC4 IItemRenderer which
- * called {@code glRotatef(180, 1, 0, 0)} immediately before {@code model.render(...)}.
+ * it so the wand points upward in world space. It is deliberately applied after the logical use
+ * pose so animation pivots and axes remain in the calibrated hand basis.
  */
 @SideOnly(Side.CLIENT)
 public class ItemWandRenderer extends TileEntityItemStackRenderer {
 
     private static final Logger LOGGER = LogManager.getLogger("Thaumcraft");
+    private static final float CORRECTED_USE_PIVOT_Y = -1.0F;
 
     private static final ThreadLocal<ItemCameraTransforms.TransformType> CURRENT_TRANSFORM =
             ThreadLocal.withInitial(() -> ItemCameraTransforms.TransformType.NONE);
@@ -89,12 +91,12 @@ public class ItemWandRenderer extends TileEntityItemStackRenderer {
         GlStateManager.pushMatrix();
         try {
             applyBasePose(t, transformType);
-            if (isHandTransform(transformType)) {
-                applyUseAnimation(wand, stack, player, partialTicks, isFirstPerson(transformType));
-            }
-
             GlStateManager.enableBlend();
             GlStateManager.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
+            if (isHandTransform(transformType)) {
+                applyUseAnimation(wand, stack, player, partialTicks, transformType);
+            }
+            applyModelBasisCorrection(t);
             model.render(stack, partialTicks, player);
         } finally {
             GlStateManager.disableBlend();
@@ -121,7 +123,10 @@ public class ItemWandRenderer extends TileEntityItemStackRenderer {
         GlStateManager.rotate(t.rotateY, 0.0F, 1.0F, 0.0F);
         GlStateManager.rotate(t.rotateZ, 0.0F, 0.0F, 1.0F);
         GlStateManager.translate(t.postTranslateX, t.postTranslateY, t.postTranslateZ);
-        // TC4 model basis correction (see class javadoc).
+    }
+
+    /** Applies the model-authored Y-down to rendered Y-up correction immediately before render. */
+    private static void applyModelBasisCorrection(WandRenderCalibration.Transform t) {
         GlStateManager.rotate(t.finalRotateX, 1.0F, 0.0F, 0.0F);
         GlStateManager.rotate(t.finalRotateY, 0.0F, 1.0F, 0.0F);
         GlStateManager.rotate(t.finalRotateZ, 0.0F, 0.0F, 1.0F);
@@ -213,49 +218,83 @@ public class ItemWandRenderer extends TileEntityItemStackRenderer {
         }
     }
 
-    // ------------------------------------------------------------------ Use animation (unchanged)
+    // ------------------------------------------------------------------ Use animation
 
     private static void applyUseAnimation(ItemWandCasting wand, ItemStack stack, EntityPlayer player, float partialTicks,
-                                          boolean firstPerson) {
-        if (player == null || !player.isHandActive() || !ItemStack.areItemStacksEqual(player.getActiveItemStack(), stack)) {
+                                           ItemCameraTransforms.TransformType transformType) {
+        if (!isRenderedActiveHand(player, stack, transformType)) {
             return;
         }
 
-        float useTicks = player.getItemInUseCount() + partialTicks;
-        float t = Math.min(useTicks, 3.0F);
-        GlStateManager.translate(0.0F, 1.0F, 0.0F);
-        if (firstPerson) {
-            GlStateManager.rotate(10.0F, 1.0F, 0.0F, 0.0F);
-            GlStateManager.rotate(10.0F, 0.0F, 0.0F, 1.0F);
-        } else {
-            GlStateManager.rotate(33.0F, 0.0F, 0.0F, 1.0F);
-        }
-        GlStateManager.rotate(60.0F * (t / 3.0F), -1.0F, 0.0F, 0.0F);
-
+        float useTicks = player.getItemInUseMaxCount() + partialTicks;
         ItemFocusBasic focus = wand.getFocus(stack);
         ItemStack focusStack = wand.getFocusItem(stack);
-        if (focus == null || focus.getAnimation(focusStack) == ItemFocusBasic.WandFocusAnimation.WAVE) {
-            float wave = MathHelper.sin(useTicks / 10.0F) * 10.0F;
-            GlStateManager.rotate(wave, 0.0F, 0.0F, 1.0F);
-            wave = MathHelper.sin(useTicks / 15.0F) * 10.0F;
-            GlStateManager.rotate(wave, 1.0F, 0.0F, 0.0F);
-        } else if (focus.getAnimation(focusStack) == ItemFocusBasic.WandFocusAnimation.CHARGE) {
-            float wave = MathHelper.sin(useTicks / 0.8F);
-            GlStateManager.rotate(wave, 0.0F, 0.0F, 1.0F);
-            wave = MathHelper.sin(useTicks / 0.7F);
-            GlStateManager.rotate(wave, 1.0F, 0.0F, 0.0F);
-        }
-        GlStateManager.translate(0.0F, -1.0F, 0.0F);
+        ItemFocusBasic.WandFocusAnimation animation = focus == null ? null : focus.getAnimation(focusStack);
+        EnumHandSide side = isLeftHandTransform(transformType) ? EnumHandSide.LEFT : EnumHandSide.RIGHT;
+        WandUsePose pose = WandUsePoseSampler.sample(useTicks, animation, side, isFirstPerson(transformType));
+
+        // TC4 authored this pose before its Rx(180) model correction, around Y=+1. The renderer
+        // now applies the pose before that final correction, so use the conjugated transform
+        // F*A*F^-1: pivot Y changes to -1, X rotations stay the same and Z rotations change sign.
+        GlStateManager.translate(0.0F, CORRECTED_USE_PIVOT_Y, 0.0F);
+        GlStateManager.rotate(pose.contextRotateX, 1.0F, 0.0F, 0.0F);
+        // Hand mirroring is already represented by pose.*Z; this negation changes model basis.
+        GlStateManager.rotate(-pose.contextRotateZ, 0.0F, 0.0F, 1.0F);
+        GlStateManager.rotate(pose.startupRotateX, 1.0F, 0.0F, 0.0F);
+        GlStateManager.rotate(-pose.waveRotateZ, 0.0F, 0.0F, 1.0F);
+        GlStateManager.rotate(pose.waveRotateX, 1.0F, 0.0F, 0.0F);
+        GlStateManager.translate(0.0F, -CORRECTED_USE_PIVOT_Y, 0.0F);
     }
 
     private static boolean isHandTransform(ItemCameraTransforms.TransformType transformType) {
-        return isFirstPerson(transformType)
-                || transformType == ItemCameraTransforms.TransformType.THIRD_PERSON_LEFT_HAND
+        return isLeftHandTransform(transformType) || isRightHandTransform(transformType);
+    }
+
+    private static boolean isLeftHandTransform(ItemCameraTransforms.TransformType transformType) {
+        return transformType == ItemCameraTransforms.TransformType.FIRST_PERSON_LEFT_HAND
+                || transformType == ItemCameraTransforms.TransformType.THIRD_PERSON_LEFT_HAND;
+    }
+
+    private static boolean isRightHandTransform(ItemCameraTransforms.TransformType transformType) {
+        return transformType == ItemCameraTransforms.TransformType.FIRST_PERSON_RIGHT_HAND
                 || transformType == ItemCameraTransforms.TransformType.THIRD_PERSON_RIGHT_HAND;
     }
 
-    private static boolean isFirstPerson(ItemCameraTransforms.TransformType transformType) {
+    private static boolean isRenderedActiveHand(EntityPlayer player, ItemStack renderedStack,
+                                                ItemCameraTransforms.TransformType transformType) {
+        if (player == null || !player.isHandActive() || !isHandTransform(transformType)) {
+            return false;
+        }
+
+        EnumHand activeHand = player.getActiveHand();
+        if (activeHand == null) {
+            return false;
+        }
+
+        EnumHandSide renderedSide = isLeftHandTransform(transformType)
+                ? EnumHandSide.LEFT : EnumHandSide.RIGHT;
+        if (renderedSide != getActivePhysicalSide(player)) {
+            return false;
+        }
+
+        ItemStack activeStack = player.getHeldItem(activeHand);
+        return activeStack == renderedStack || ItemStack.areItemStacksEqual(activeStack, renderedStack);
+    }
+
+    private static EnumHandSide getActivePhysicalSide(EntityPlayer player) {
+        EnumHandSide side = player.getPrimaryHand();
+        if (player.getActiveHand() == EnumHand.OFF_HAND) {
+            side = side == EnumHandSide.RIGHT ? EnumHandSide.LEFT : EnumHandSide.RIGHT;
+        }
+        return side;
+    }
+
+    private static boolean isFirstPersonTransform(ItemCameraTransforms.TransformType transformType) {
         return transformType == ItemCameraTransforms.TransformType.FIRST_PERSON_LEFT_HAND
                 || transformType == ItemCameraTransforms.TransformType.FIRST_PERSON_RIGHT_HAND;
+    }
+
+    private static boolean isFirstPerson(ItemCameraTransforms.TransformType transformType) {
+        return isFirstPersonTransform(transformType);
     }
 }

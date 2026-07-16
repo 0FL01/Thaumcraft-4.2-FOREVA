@@ -47,6 +47,7 @@ public class FocusFire extends ItemFocusBasic {
         if (!(wandStack.getItem() instanceof ItemWandCasting)) return wandStack;
         ItemWandCasting wand = (ItemWandCasting) wandStack.getItem();
         ItemStack focusStack = wand.getFocusItem(wandStack);
+        EnumHand hand = ItemWandCasting.getHandHoldingWand(player, wandStack);
         if (this.isUpgradedWith(focusStack, fireball)) {
             if (!world.isRemote && wand.consumeAllVis(wandStack, player, this.getVisCost(focusStack), true, false)) {
                 EntityExplosiveOrb orb = new EntityExplosiveOrb(world, (EntityLivingBase) player);
@@ -55,9 +56,9 @@ public class FocusFire extends ItemFocusBasic {
                 world.spawnEntity(orb);
                 orb.playSound(TCSounds.FIRELOOP, 0.33F, 2.0F);
             }
-            player.swingArm(EnumHand.MAIN_HAND);
+            player.swingArm(hand);
         } else {
-            player.setActiveHand(EnumHand.MAIN_HAND);
+            player.setActiveHand(hand);
             WandManager.setCooldown(player, -1);
         }
         return wandStack;
@@ -84,11 +85,16 @@ public class FocusFire extends ItemFocusBasic {
         ItemWandCasting wand = (ItemWandCasting) wandStack.getItem();
         ItemStack focusStack = wand.getFocusItem(wandStack);
         if (this.isUpgradedWith(focusStack, fireball)) {
-            player.resetActiveHand();
+            if (!player.world.isRemote) {
+                player.stopActiveHand();
+            }
             return;
         }
-        if (!wand.consumeAllVis(wandStack, player, this.getVisCost(focusStack), false, false)) {
-            player.resetActiveHand();
+        // The server owns resource state. Clearing use only on the client prevents vanilla from
+        // sending RELEASE_USE_ITEM and leaves the server channel running indefinitely.
+        if (!player.world.isRemote
+                && !wand.consumeAllVis(wandStack, player, this.getVisCost(focusStack), false, false)) {
+            player.stopActiveHand();
             return;
         }
         if (!player.world.isRemote && wand.consumeAllVis(wandStack, player, this.getVisCost(focusStack), true, false)) {

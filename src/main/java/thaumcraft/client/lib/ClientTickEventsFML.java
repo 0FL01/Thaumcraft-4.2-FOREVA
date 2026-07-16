@@ -6,6 +6,7 @@ import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.shader.ShaderGroup;
 import net.minecraft.client.util.JsonException;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -14,6 +15,7 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import thaumcraft.common.Thaumcraft;
 import thaumcraft.common.config.Config;
+import thaumcraft.common.items.wands.ItemWandCasting;
 import thaumcraft.common.lib.events.EssentiaHandler;
 import thaumcraft.common.tiles.TileInfusionMatrix;
 
@@ -31,6 +33,7 @@ public class ClientTickEventsFML {
             new ResourceLocation("shaders/post/sunscorned.json")
     };
     private int tickCount = 0;
+    private boolean wandUseReleasePending;
 
     @SubscribeEvent
     public void playerTick(TickEvent.PlayerTickEvent event) {
@@ -145,10 +148,14 @@ public class ClientTickEventsFML {
 
     @SubscribeEvent
     public void clientWorldTick(TickEvent.ClientTickEvent event) {
-        if (event.side != Side.CLIENT || event.phase != TickEvent.Phase.START) {
+        if (event.side != Side.CLIENT) {
             return;
         }
         Minecraft mc = Minecraft.getMinecraft();
+        if (event.phase == TickEvent.Phase.END) {
+            this.ensureWandUseRelease(mc);
+            return;
+        }
         if (mc.world == null) {
             return;
         }
@@ -185,6 +192,35 @@ public class ClientTickEventsFML {
             fx.ticks--;
             EssentiaHandler.sourceFX.put(fxKey, fx);
         }
+    }
+
+    /**
+     * Vanilla only sends RELEASE_USE_ITEM while the client still considers the hand active.
+     * Wand NBT/hand synchronization can clear that flag before the physical key is released,
+     * leaving the server's indefinite use action alive. Keep a key-down latch and send the
+     * normal controller release once on key-up even if the local active-hand flag was lost.
+     */
+    private void ensureWandUseRelease(Minecraft mc) {
+        if (mc.player == null || mc.world == null || mc.playerController == null) {
+            this.wandUseReleasePending = false;
+            return;
+        }
+
+        boolean useKeyDown = mc.gameSettings.keyBindUseItem.isKeyDown();
+        boolean hasWand = isWand(mc.player.getHeldItemMainhand())
+                || isWand(mc.player.getHeldItemOffhand())
+                || isWand(mc.player.getActiveItemStack());
+        if (useKeyDown && hasWand) {
+            this.wandUseReleasePending = true;
+        }
+        if (this.wandUseReleasePending && (!useKeyDown || !hasWand)) {
+            mc.playerController.onStoppedUsingItem(mc.player);
+            this.wandUseReleasePending = false;
+        }
+    }
+
+    private static boolean isWand(ItemStack stack) {
+        return stack != null && !stack.isEmpty() && stack.getItem() instanceof ItemWandCasting;
     }
 
     @SubscribeEvent

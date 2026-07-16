@@ -64,7 +64,7 @@ public class FocusExcavation extends ItemFocusBasic {
 
     @Override
     public ItemStack onFocusRightClick(ItemStack wandStack, World world, EntityPlayer player, RayTraceResult movingobjectposition) {
-        player.setActiveHand(EnumHand.MAIN_HAND);
+        player.setActiveHand(ItemWandCasting.getHandHoldingWand(player, wandStack));
         return wandStack;
     }
 
@@ -79,10 +79,11 @@ public class FocusExcavation extends ItemFocusBasic {
         ItemWandCasting wand = (ItemWandCasting) wandStack.getItem();
         ItemStack focusStack = wand.getFocusItem(wandStack);
         String key = (player.world.isRemote ? "R" : "S") + player.getName();
-        if (!wand.consumeAllVis(wandStack, player, this.getVisCost(focusStack), false, false)) {
+        if (!player.world.isRemote
+                && !wand.consumeAllVis(wandStack, player, this.getVisCost(focusStack), false, false)) {
             this.resetBreakProgress(player);
             beam.remove(key);
-            player.resetActiveHand();
+            player.stopActiveHand();
             return;
         }
 
@@ -132,7 +133,7 @@ public class FocusExcavation extends ItemFocusBasic {
                         wand.consumeAllVis(wandStack, player, this.getVisCost(focusStack), true, false);
                     }
                 }
-                player.swingArm(EnumHand.MAIN_HAND);
+                player.swingArm(ItemWandCasting.getHandHoldingWand(player, wandStack));
             }
             this.resetBreakProgress(player);
         } else {

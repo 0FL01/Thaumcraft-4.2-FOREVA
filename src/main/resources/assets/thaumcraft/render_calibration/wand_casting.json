@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "notes": "Calibration for ItemWandCasting TEISR. These values reproduce the original hardcoded port constants. Order of application (see ItemWandRenderer): preTranslate -> translate -> [if first person] firstPersonScale -> scale -> scaleMultiplier -> rotateX -> rotateY -> rotateZ -> postTranslate -> finalRotate. Hot reload: edit this file (or the config/thaumcraft/render_calibration/wand_casting.json override) and press F3+T.",
+  "notes": "Calibration for ItemWandCasting TEISR. These values reproduce the original hardcoded port constants. Order of application (see ItemWandRenderer): preTranslate -> translate -> [if first person] firstPersonScale -> scale -> scaleMultiplier -> rotateX -> rotateY -> rotateZ -> postTranslate -> optional use pose -> finalRotate. Hot reload: edit this file (or the config/thaumcraft/render_calibration/wand_casting.json override) and press F3+T.",
   "common": {
     "finalRotate": [180.0, 0.0, 0.0]
   },

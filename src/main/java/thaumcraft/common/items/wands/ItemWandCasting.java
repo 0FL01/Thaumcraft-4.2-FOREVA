@@ -585,6 +585,26 @@ public class ItemWandCasting extends Item implements IArchitect {
         return new ActionResult<>(EnumActionResult.PASS, stack);
     }
 
+    /** Resolves the actual held hand for legacy focus callbacks which predate offhand support. */
+    public static EnumHand getHandHoldingWand(EntityPlayer player, ItemStack wandStack) {
+        ItemStack main = player.getHeldItem(EnumHand.MAIN_HAND);
+        ItemStack off = player.getHeldItem(EnumHand.OFF_HAND);
+        if (main == wandStack) return EnumHand.MAIN_HAND;
+        if (off == wandStack) return EnumHand.OFF_HAND;
+
+        EnumHand activeHand = player.getActiveHand();
+        if (activeHand != null
+                && ItemStack.areItemStacksEqual(player.getHeldItem(activeHand), wandStack)) {
+            return activeHand;
+        }
+        boolean mainMatches = ItemStack.areItemStacksEqual(main, wandStack);
+        boolean offMatches = ItemStack.areItemStacksEqual(off, wandStack);
+        if (mainMatches != offMatches) {
+            return mainMatches ? EnumHand.MAIN_HAND : EnumHand.OFF_HAND;
+        }
+        return activeHand == null ? EnumHand.MAIN_HAND : activeHand;
+    }
+
     @Override
     public void onUsingTick(ItemStack stack, EntityLivingBase player, int count) {
         if (player instanceof EntityPlayer) {

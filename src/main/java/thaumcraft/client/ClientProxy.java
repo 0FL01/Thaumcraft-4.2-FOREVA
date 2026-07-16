@@ -71,6 +71,7 @@ import thaumcraft.client.fx.beams.FXBeamBore;
 import thaumcraft.client.fx.beams.FXBeamGolemBoss;
 import thaumcraft.client.fx.beams.FXBeamPower;
 import thaumcraft.client.fx.beams.FXBeamWand;
+import thaumcraft.client.fx.beams.WandEffectOrigin;
 import thaumcraft.client.fx.bolt.FXLightningBolt;
 import thaumcraft.client.fx.other.FXBlockWard;
 import thaumcraft.client.fx.other.FXShieldRunes;
@@ -1750,28 +1751,25 @@ public class ClientProxy extends CommonProxy {
     @Override
     public void focusShockBolt(World world, EntityLivingBase source, double tx, double ty, double tz) {
         if (world == null || !world.isRemote || source == null) return;
-        Minecraft mc = Minecraft.getMinecraft();
-        EntityPlayer clientPlayer = mc == null ? null : mc.player;
-        boolean localPlayer = clientPlayer != null && source.getEntityId() == clientPlayer.getEntityId();
-        double sx = source.posX;
-        double sy = source.posY;
-        double sz = source.posZ;
-        if (localPlayer) {
-            // In 1.7.10 player posY included the eye-level yOffset; in 1.12 it is feet-level.
-            sy += source.getEyeHeight();
+        double sx;
+        double sy;
+        double sz;
+        if (source instanceof EntityPlayer) {
+            EntityPlayer player = (EntityPlayer) source;
+            Vec3d origin = WandEffectOrigin.resolve(
+                    player, 1.0F, WandEffectOrigin.sourceYOffset(player));
+            sx = origin.x;
+            sy = origin.y;
+            sz = origin.z;
         } else {
+            sx = source.posX;
             sy = source.getEntityBoundingBox().minY + source.height * 0.5D + 0.25D;
+            sz = source.posZ;
+            Vec3d look = source.getLook(1.0F);
+            sx += look.x * 0.3D;
+            sy += look.y * 0.3D;
+            sz += look.z * 0.3D;
         }
-        sx += -MathHelper.cos((float) (source.rotationYaw / 180.0F * Math.PI)) * 0.06F;
-        sy -= 0.06D;
-        sz += -MathHelper.sin((float) (source.rotationYaw / 180.0F * Math.PI)) * 0.06F;
-        if (!localPlayer) {
-            sy = source.getEntityBoundingBox().minY + source.height * 0.5D + 0.25D;
-        }
-        Vec3d look = source.getLook(1.0F);
-        sx += look.x * 0.3D;
-        sy += look.y * 0.3D;
-        sz += look.z * 0.3D;
 
         FXLightningBolt bolt = new FXLightningBolt(world, sx, sy, sz, tx, ty, tz, world.rand.nextLong(), 6, 0.5F, 8);
         bolt.defaultFractal();

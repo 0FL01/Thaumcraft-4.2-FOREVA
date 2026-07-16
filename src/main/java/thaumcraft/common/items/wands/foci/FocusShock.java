@@ -55,6 +55,7 @@ public class FocusShock extends ItemFocusBasic {
         if (!(wandStack.getItem() instanceof ItemWandCasting)) return wandStack;
         ItemWandCasting wand = (ItemWandCasting) wandStack.getItem();
         ItemStack focusStack = wand.getFocusItem(wandStack);
+        EnumHand hand = ItemWandCasting.getHandHoldingWand(player, wandStack);
         if (this.isUpgradedWith(focusStack, earthshock)) {
             if (!world.isRemote && wand.consumeAllVis(wandStack, player, this.getVisCost(focusStack), true, false)) {
                 EntityShockOrb orb = new EntityShockOrb(world, (EntityLivingBase) player);
@@ -63,9 +64,9 @@ public class FocusShock extends ItemFocusBasic {
                 world.spawnEntity(orb);
                 orb.playSound(TCSounds.ZAP, 1.0F, 1.0F + (world.rand.nextFloat() - world.rand.nextFloat()) * 0.2F);
             }
-            player.swingArm(EnumHand.MAIN_HAND);
+            player.swingArm(hand);
         } else {
-            player.setActiveHand(EnumHand.MAIN_HAND);
+            player.setActiveHand(hand);
             WandManager.setCooldown(player, -1);
         }
         return wandStack;
@@ -87,11 +88,16 @@ public class FocusShock extends ItemFocusBasic {
         ItemWandCasting wand = (ItemWandCasting) wandStack.getItem();
         ItemStack focusStack = wand.getFocusItem(wandStack);
         if (this.isUpgradedWith(focusStack, earthshock)) {
-            player.resetActiveHand();
+            if (!player.world.isRemote) {
+                player.stopActiveHand();
+            }
             return;
         }
-        if (!wand.consumeAllVis(wandStack, player, this.getVisCost(focusStack), false, false)) {
-            player.resetActiveHand();
+        // Keep the client active until the authoritative server stop is synchronized. This
+        // preserves both the release packet and the renderer's active-use pose.
+        if (!player.world.isRemote
+                && !wand.consumeAllVis(wandStack, player, this.getVisCost(focusStack), false, false)) {
+            player.stopActiveHand();
             return;
         }
         Entity target = this.getPointedEntity(player.world, player, 20.0D);

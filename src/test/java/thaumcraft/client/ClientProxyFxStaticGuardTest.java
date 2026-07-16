@@ -214,11 +214,10 @@ public class ClientProxyFxStaticGuardTest {
                         && commonProxy.contains("public void shieldRunesFX(World world, Entity source, int age, float yaw, float pitch)")
                         && commonProxy.contains("public void zapFX(World world, Entity source, Entity target)")
                         && commonProxy.contains("public void focusShockBolt(World world, EntityLivingBase source, double tx, double ty, double tz)"));
-        assertTrue("ClientProxy must keep the 1.12 eye-height correction for local shock-channel feedback",
+        assertTrue("ClientProxy must anchor player shock-channel feedback to the shared animated wand tip",
                 source.contains("public void focusShockBolt(World world, EntityLivingBase source, double tx, double ty, double tz)")
-                        && source.contains("boolean localPlayer = clientPlayer != null && source.getEntityId() == clientPlayer.getEntityId();")
-                        && source.contains("sy += source.getEyeHeight();")
-                        && source.contains("if (!localPlayer)")
+                        && source.contains("WandEffectOrigin.resolve(")
+                        && source.contains("WandEffectOrigin.sourceYOffset(player)")
                         && source.contains("new FXLightningBolt(world, sx, sy, sz, tx, ty, tz, world.rand.nextLong(), 6, 0.5F, 8)")
                         && source.contains("bolt.setType(2);")
                         && source.contains("bolt.setWidth(0.125F);"));

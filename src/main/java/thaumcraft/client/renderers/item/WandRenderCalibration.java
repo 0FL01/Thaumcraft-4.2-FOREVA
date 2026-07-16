@@ -42,7 +42,8 @@ import java.util.Map;
  *   -> scale(scale) -> scale(scaleMultiplier)
  *   -> rotateX -> rotateY -> rotateZ
  *   -> translate(postTranslate)   // already includes postTranslateAdd
- *   -> rotate(finalRotate)
+ *   -> optional use pose
+ *   -> rotate(finalRotate)        // model-basis correction immediately before render
  * </pre>
  *
  * <p>Hot reload: edit the JSON on disk and trigger a resource reload (F3+T). The reload listener
