@@ -48,15 +48,16 @@ public class VisEnergyRendererFidelityStaticGuardTest {
                         && nodeCoreRenderer.contains("renderNodeSeeded("));
 
         assertTrue("TileNodeEnergizedRenderer should keep node-core rendering and animated lightning-ring overlay",
-                nodeRenderer.contains("TileNodeRenderer.renderNode(")
-                        && nodeRenderer.contains("tile.getAuraBase()")
-                        && nodeRenderer.contains("tile.getNodeType()")
-                        && nodeRenderer.contains("tile.getNodeModifier()")
-                        && nodeRenderer.contains("tile.getPos().getX()")
-                        && nodeRenderer.contains("textures/items/lightningringv.png")
-                        && nodeRenderer.contains("RING_FRAMES = 16")
-                        && nodeRenderer.contains("drawTexturedQuad(0.33F, u0, u1, v0, v1)")
-                        && !nodeRenderer.contains("textures/misc/node_bubble.png"));
+                nodeRenderer.contains("TileNodeRenderer.renderNodeSeeded(")
+                         && nodeRenderer.contains("tile.getAuraBase()")
+                         && nodeRenderer.contains("tile.getNodeType()")
+                         && nodeRenderer.contains("tile.getNodeModifier()")
+                         && nodeRenderer.contains("pos.getX() + 0.5D, pos.getY() + 0.5D, pos.getZ() + 0.5D")
+                         && nodeRenderer.contains("textures/items/lightningringv.png")
+                         && nodeRenderer.contains("RING_FRAMES = 16")
+                         && nodeRenderer.contains("drawTexturedQuad(0.33F, u0, u1, v0, v1)")
+                         && nodeRenderer.contains("GlStateManager.disableCull();")
+                         && !nodeRenderer.contains("textures/misc/node_bubble.png"));
 
         assertTrue("TileNodeStabilizerRenderer should render the complete TC4 lock, count-driven pistons, and bubble overlay through TESR",
                  stabilizerRenderer.contains("new ModelNodeStabilizer()")

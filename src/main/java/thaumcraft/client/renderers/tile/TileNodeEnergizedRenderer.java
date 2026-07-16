@@ -8,6 +8,7 @@ import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.BlockPos;
 import org.lwjgl.opengl.GL11;
 import thaumcraft.common.tiles.TileNodeEnergized;
 
@@ -23,14 +24,16 @@ public class TileNodeEnergizedRenderer extends TileEntitySpecialRenderer<TileNod
         }
 
         EntityLivingBase viewer = Minecraft.getMinecraft().player;
-        int seed = tile.getPos() == null ? 0 : tile.getPos().getX();
-        TileNodeRenderer.renderNode(
+        BlockPos pos = tile.getPos();
+        int seed = pos.getX();
+        TileNodeRenderer.renderNodeSeeded(
                 viewer,
                 64.0D,
                 true,
                 false,
                 1.0F,
                 x + 0.5D, y + 0.5D, z + 0.5D,
+                pos.getX() + 0.5D, pos.getY() + 0.5D, pos.getZ() + 0.5D,
                 partialTicks,
                 tile.getAuraBase(),
                 tile.getNodeType(),
@@ -41,16 +44,18 @@ public class TileNodeEnergizedRenderer extends TileEntitySpecialRenderer<TileNod
 
     private void renderAnimatedRing(TileNodeEnergized tile, double x, double y, double z, float partialTicks) {
         int frames = Math.max(1, RING_FRAMES);
-        int phase = tile.getPos() == null ? 0 : tile.getPos().getX();
+        int phase = tile.getPos().getX();
         int frame = (int) (((System.nanoTime() / 40_000_000L) + phase) % frames);
         float u0 = frame / (float) frames;
         float u1 = (frame + 1) / (float) frames;
         float v0 = 0.0F;
         float v1 = 1.0F;
 
+        boolean cullEnabled = GL11.glIsEnabled(GL11.GL_CULL_FACE);
         GlStateManager.pushMatrix();
         GlStateManager.translate(x + 0.5D, y + 0.5D, z + 0.5D);
         GlStateManager.disableLighting();
+        GlStateManager.disableCull();
         GlStateManager.enableBlend();
         GlStateManager.blendFunc(770, 1);
         bindTexture(LIGHTNING_RING);
@@ -63,6 +68,9 @@ public class TileNodeEnergizedRenderer extends TileEntitySpecialRenderer<TileNod
         GlStateManager.depthMask(true);
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
         GlStateManager.disableBlend();
+        if (cullEnabled) {
+            GlStateManager.enableCull();
+        }
         GlStateManager.enableLighting();
         GlStateManager.popMatrix();
     }

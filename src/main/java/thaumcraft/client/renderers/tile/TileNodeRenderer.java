@@ -208,18 +208,18 @@ public class TileNodeRenderer extends TileEntitySpecialRenderer<TileEntity> {
      * renderX/Y/Z — camera-relative coordinates, used for actual drawing (renderFacingStrip).
      * worldX/Y/Z — absolute world coordinates, used for distance/visibility checks.
      */
-    private static void renderNodeSeeded(EntityLivingBase viewer,
-                                         double viewDistance,
-                                         boolean visible,
-                                         boolean depthIgnore,
-                                         float size,
-                                         double renderX, double renderY, double renderZ,
-                                         double worldX, double worldY, double worldZ,
-                                         float partialTicks,
-                                         AspectList aspects,
-                                         NodeType type,
-                                         NodeModifier modifier,
-                                         int seed) {
+    static void renderNodeSeeded(EntityLivingBase viewer,
+                                 double viewDistance,
+                                 boolean visible,
+                                 boolean depthIgnore,
+                                 float size,
+                                 double renderX, double renderY, double renderZ,
+                                 double worldX, double worldY, double worldZ,
+                                 float partialTicks,
+                                 AspectList aspects,
+                                 NodeType type,
+                                 NodeModifier modifier,
+                                 int seed) {
         Minecraft.getMinecraft().getTextureManager().bindTexture(NODES_TEXTURE);
         long nano = System.nanoTime();
         int frame = (int) ((nano / 40000000L + seed) % FRAMES);
