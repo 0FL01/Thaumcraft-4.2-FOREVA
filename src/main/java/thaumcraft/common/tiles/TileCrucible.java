@@ -275,6 +275,10 @@ public class TileCrucible extends TileThaumcraft implements ITickable, IWandable
         return out;
     }
 
+    public boolean hasWater() {
+        return this.tank.getFluidAmount() > 0;
+    }
+
     public AspectList takeRandomFromSource() {
         AspectList output = new AspectList();
         if (this.aspects.size() > 0) {

@@ -14,6 +14,7 @@ public class CrucibleRendererFidelityStaticGuardTest {
     @Test
     public void tileCrucibleRendererUsesWaterAtlasUvAndCombinedLight() throws IOException {
         String source = read("src/main/java/thaumcraft/client/renderers/tile/TileCrucibleRenderer.java");
+        String tileSource = read("src/main/java/thaumcraft/common/tiles/TileCrucible.java");
         String blockSource = read("src/main/java/thaumcraft/common/blocks/BlockMetalDevice.java");
         String blockModel = read("src/main/resources/assets/thaumcraft/models/block/blockmetaldevice_0.json");
 
@@ -21,15 +22,25 @@ public class CrucibleRendererFidelityStaticGuardTest {
                 source.contains("Blocks.WATER.getDefaultState()"));
         assertTrue("Crucible renderer should use world combined light at tile position",
                 source.contains("getCombinedLight(tile.getPos(), 0)"));
-        assertTrue("Crucible renderer should wire combined light into lightmap coordinates",
-                source.contains("OpenGlHelper.setLightmapTextureCoords"));
+        assertTrue("Crucible renderer should submit original per-vertex combined light and upward normals",
+                source.contains("DefaultVertexFormats.BLOCK")
+                        && source.contains("int lightU = (packedLight >> 16) & 0xFFFF;")
+                        && source.contains("int lightV = packedLight & 0xFFFF;")
+                        && source.contains(".lightmap(lightU, lightV)")
+                        && source.contains(".normal(0.0F, 0.0F, 1.0F)"));
         assertTrue("Crucible renderer should map quad UVs from water sprite bounds",
                 source.contains("water.getMinU()")
                         && source.contains("water.getMaxU()")
                         && source.contains("water.getMinV()")
                         && source.contains("water.getMaxV()"));
         assertTrue("Crucible fluid quad should cover a full block like the original UtilsFX.renderQuadFromIcon scale 1.0 path",
-                source.contains("TileRenderHelper.drawTexturedQuad(0.5F"));
+                source.contains("drawFluidSurface(0.5F"));
+        assertTrue("Crucible surface should require actual water like TC4",
+                source.contains("if (!tile.hasWater())")
+                        && tileSource.contains("public boolean hasWater()"));
+        assertTrue("Crucible renderer should preserve an incoming enabled blend state",
+                source.contains("boolean blendEnabled = GL11.glIsEnabled(GL11.GL_BLEND);")
+                        && source.contains("if (!blendEnabled)"));
         assertTrue("Crucible block model should use original full-block alpha shell scale, not a shrunken basin mesh",
                 blockModel.contains("\"ambientocclusion\": false")
                         && blockModel.contains("\"particle\": \"thaumcraft:blocks/crucible3\"")
