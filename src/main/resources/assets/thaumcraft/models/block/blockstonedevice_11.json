@@ -1,7 +1,7 @@
 {
   "ambientocclusion": false,
   "textures": {
-    "particle": "#surface",
+    "particle": "thaumcraft:blocks/pedestal_top",
     "surface": "thaumcraft:models/node_converter"
   },
   "elements": [

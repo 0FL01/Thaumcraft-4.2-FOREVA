@@ -14,6 +14,7 @@ public class InfusionRendererFidelityStaticGuardTest {
     @Test
     public void infusionRendererFamilyKeepsReferenceMatrixAndPillarModelContracts() throws IOException {
         String matrixRenderer = read("src/main/java/thaumcraft/client/renderers/tile/TileRunicMatrixRenderer.java");
+        String matrixTile = read("src/main/java/thaumcraft/common/tiles/TileInfusionMatrix.java");
         String pillarRenderer = read("src/main/java/thaumcraft/client/renderers/tile/TileInfusionPillarRenderer.java");
         String pillarModel = read("src/main/java/thaumcraft/client/renderers/models/ModelInfusionPillar.java");
 
@@ -23,7 +24,11 @@ public class InfusionRendererFidelityStaticGuardTest {
                         && matrixRenderer.contains("renderCubeCluster(")
                         && matrixRenderer.contains("renderCubeOverlay(")
                         && matrixRenderer.contains("drawHalo(")
-                        && matrixRenderer.contains("if (tile.getWorld() != null) {"));
+                         && matrixRenderer.contains("if (tile.getWorld() != null) {"));
+        assertTrue("An idle standalone matrix must stay neutral until altar activation ramps startUp",
+                matrixRenderer.contains("float startUp = tile.startUp;")
+                        && !matrixRenderer.contains("tile.startUp <= 0.0F ? 1.0F : tile.startUp")
+                        && matrixTile.contains("if (this.crafting) {\n            Thaumcraft.proxy.blockRunes("));
 
         assertTrue("TileRunicMatrixRenderer should harden the solid shell pass and restore GL state so active overlay cannot make matrix textures transparent",
                 matrixRenderer.contains("prepareSolidMatrixPass();\n        renderCubeCluster(tile, ticks, instability, startUp);")

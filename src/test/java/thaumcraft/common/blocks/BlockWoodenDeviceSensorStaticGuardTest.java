@@ -51,7 +51,11 @@ public class BlockWoodenDeviceSensorStaticGuardTest {
         String source = readFile("src/main/java/thaumcraft/common/blocks/BlockWoodenDevice.java");
 
         assertTrue(source.contains("public boolean eventReceived(IBlockState state, World worldIn, BlockPos pos, int id, int param)"));
-        assertTrue(source.contains("if (id <= 4)"));
+        assertTrue(source.contains("boolean silentSensorEvent = id == -1 || id == 255;"));
+        assertTrue(source.contains("if (silentSensorEvent || id >= 0 && id <= 4)"));
+        assertTrue(source.contains("if (!silentSensorEvent)"));
+        assertTrue(source.contains("if (worldIn.isRemote && silentSensorEvent)"));
+        assertTrue(source.contains("((TileSensor) tile).redstoneSignal = 10;"));
         assertTrue(source.contains("Math.pow(2.0D, (param - 12) / 12.0D)"));
         assertTrue(source.contains("SoundEvents.BLOCK_NOTE_HARP"));
         assertTrue(source.contains("SoundEvents.BLOCK_NOTE_BASEDRUM"));

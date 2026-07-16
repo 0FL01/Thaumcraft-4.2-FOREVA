@@ -38,16 +38,22 @@ public class TileSensor extends TileThaumcraft implements ITickable {
 
     @Override
     public void update() {
-        if (this.world == null || this.world.isRemote) {
+        if (this.world == null) {
             return;
         }
 
         if (this.redstoneSignal > 0) {
             --this.redstoneSignal;
             if (this.redstoneSignal == 0) {
-                notifySignalChange();
+                if (this.world.isRemote) {
+                    this.world.markBlockRangeForRenderUpdate(this.pos, this.pos);
+                } else {
+                    notifySignalChange();
+                }
             }
         }
+
+        if (this.world.isRemote) return;
 
         if (!(this.world instanceof WorldServer)) {
             return;
@@ -88,16 +94,7 @@ public class TileSensor extends TileThaumcraft implements ITickable {
             return;
         }
         Material materialBelow = this.world.getBlockState(this.pos.down()).getMaterial();
-        this.tone = 0;
-        if (materialBelow == Material.ROCK) {
-            this.tone = 1;
-        } else if (materialBelow == Material.GLASS) {
-            this.tone = 2;
-        } else if (materialBelow == Material.WOOD) {
-            this.tone = 3;
-        } else if (materialBelow == Material.SAND) {
-            this.tone = 4;
-        }
+        this.tone = (byte) getInstrument(materialBelow);
     }
 
     public void changePitch() {
@@ -110,18 +107,17 @@ public class TileSensor extends TileThaumcraft implements ITickable {
             int instrument = -1;
             if (sound) {
                 Material materialBelow = world.getBlockState(new BlockPos(x, y - 1, z)).getMaterial();
-                instrument = 0;
-                if (materialBelow == Material.ROCK) {
-                    instrument = 1;
-                } else if (materialBelow == Material.GLASS) {
-                    instrument = 2;
-                } else if (materialBelow == Material.WOOD) {
-                    instrument = 3;
-                } else if (materialBelow == Material.SAND) {
-                    instrument = 4;
-                }
+                instrument = getInstrument(materialBelow);
             }
             world.addBlockEvent(new BlockPos(x, y, z), ConfigBlocks.blockWoodenDevice, instrument, this.note);
         }
+    }
+
+    private static int getInstrument(Material material) {
+        if (material == Material.ROCK) return 1;
+        if (material == Material.SAND) return 2;
+        if (material == Material.GLASS) return 3;
+        if (material == Material.WOOD) return 4;
+        return 0;
     }
 }

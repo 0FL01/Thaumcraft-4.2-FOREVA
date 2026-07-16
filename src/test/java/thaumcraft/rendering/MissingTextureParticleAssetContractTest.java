@@ -78,6 +78,20 @@ public class MissingTextureParticleAssetContractTest {
                 focal.getAsJsonArray("elements").size() == 0);
     }
 
+    @Test
+    public void tesrDevicesUseOriginalBlockAtlasParticleCarriers() throws IOException {
+        assertParticle("blockstonedevice_9.json", "thaumcraft:blocks/pedestal_top");
+        assertParticle("blockstonedevice_11.json", "thaumcraft:blocks/pedestal_top");
+        assertParticle("blockstonedevice_14.json", "thaumcraft:blocks/pedestal_top");
+        assertParticle("blockmetaldevice_2.json", "thaumcraft:blocks/metalbase");
+        assertParticle("blockessentiareservoir.json", "thaumcraft:blocks/essentiareservoir");
+    }
+
+    private static void assertParticle(String model, String expected) throws IOException {
+        JsonObject json = parse(ASSET_ROOT.resolve("models/block").resolve(model));
+        assertEquals(expected, json.getAsJsonObject("textures").get("particle").getAsString());
+    }
+
     private static JsonObject parse(Path path) throws IOException {
         String json = new String(Files.readAllBytes(path), StandardCharsets.UTF_8);
         return new JsonParser().parse(json).getAsJsonObject();

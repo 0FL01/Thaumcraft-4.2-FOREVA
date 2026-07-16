@@ -150,7 +150,7 @@ public class ClientProxyFxStaticGuardTest {
                         && source.contains("public void essentiaTrailFx(")
                         && source.contains("new FXEssentiaTrail(")
                         && source.contains("public void blockRunes(")
-                        && source.contains("new FXBlockRunes(")
+                        && source.contains("new FXBlockRunes(world, x + 0.5D, y + 0.5D, z + 0.5D,")
                         && source.contains("public void smokeSpiral(World world, double x, double y, double z, float radius, int start, int miny, int color)")
                         && source.contains("new FXSmokeSpiral(world, x, y, z, radius, start, miny)")
                         && source.contains("public void arcLightning(")

@@ -1,0 +1,8 @@
+{
+  "parent": "thaumcraft:block/blockwoodendevice_1",
+  "textures": {
+    "particle": "thaumcraft:blocks/arcaneearsideon",
+    "top": "thaumcraft:blocks/arcaneeartopon",
+    "side": "thaumcraft:blocks/arcaneearsideon"
+  }
+}

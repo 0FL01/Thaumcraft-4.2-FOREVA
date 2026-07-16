@@ -34,7 +34,7 @@ public class TileRunicMatrixRenderer extends TileEntitySpecialRenderer<TileInfus
 
     private void renderInfusionMatrix(TileInfusionMatrix tile, double x, double y, double z, float partialTicks) {
         float ticks = TileRenderHelper.ticks(tile, partialTicks);
-        float startUp = tile.startUp <= 0.0F ? 1.0F : tile.startUp;
+        float startUp = tile.startUp;
         float craftFactor = (float) Math.min(tile.craftCount, 50) / 50.0F;
         float instability = Math.min(6.0F, 1.0F + tile.instability * 0.66F * craftFactor);
 

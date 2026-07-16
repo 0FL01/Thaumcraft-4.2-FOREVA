@@ -32,6 +32,8 @@ public class TileSensorStaticGuardTest {
 
         assertTrue(source.contains("if (this.redstoneSignal > 0)"));
         assertTrue(source.contains("if (this.redstoneSignal == 0)"));
+        assertTrue(source.contains("if (this.world.isRemote) return;"));
+        assertTrue(source.contains("this.world.markBlockRangeForRenderUpdate(this.pos, this.pos);"));
         assertTrue(source.contains("noteBlockEvents.get((WorldServer) this.world)"));
         assertTrue(source.contains("if (data[3] != this.tone || data[4] != this.note)"));
         assertTrue(source.contains("getDistanceSq(data[0] + 0.5, data[1] + 0.5, data[2] + 0.5) <= 4096.0"));
@@ -44,10 +46,12 @@ public class TileSensorStaticGuardTest {
     public void tileSensorShouldKeepToneAndTriggerNoteMaterialMapping() throws IOException {
         String source = readFile("src/main/java/thaumcraft/common/tiles/TileSensor.java");
 
-        assertTrue(source.contains("if (materialBelow == Material.ROCK)"));
-        assertTrue(source.contains("} else if (materialBelow == Material.GLASS)"));
-        assertTrue(source.contains("} else if (materialBelow == Material.WOOD)"));
-        assertTrue(source.contains("} else if (materialBelow == Material.SAND)"));
+        assertTrue(source.contains("this.tone = (byte) getInstrument(materialBelow);"));
+        assertTrue(source.contains("instrument = getInstrument(materialBelow);"));
+        assertTrue(source.contains("if (material == Material.ROCK) return 1;"));
+        assertTrue(source.contains("if (material == Material.SAND) return 2;"));
+        assertTrue(source.contains("if (material == Material.GLASS) return 3;"));
+        assertTrue(source.contains("if (material == Material.WOOD) return 4;"));
         assertTrue(source.contains("this.note = (byte) ((this.note + 1) % 25);"));
         assertTrue(source.contains("world.addBlockEvent(new BlockPos(x, y, z), ConfigBlocks.blockWoodenDevice, instrument, this.note);"));
     }

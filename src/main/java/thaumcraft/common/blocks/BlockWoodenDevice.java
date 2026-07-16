@@ -392,9 +392,10 @@ public class BlockWoodenDevice extends BlockContainer {
 
     @Override
     public boolean eventReceived(IBlockState state, World worldIn, BlockPos pos, int id, int param) {
-        if (id <= 4) {
+        boolean silentSensorEvent = id == -1 || id == 255;
+        if (silentSensorEvent || id >= 0 && id <= 4) {
             float pitch = (float) Math.pow(2.0D, (param - 12) / 12.0D);
-            if (id >= 0) {
+            if (!silentSensorEvent) {
                 switch (id) {
                     case 1:
                         worldIn.playSound(null, pos, SoundEvents.BLOCK_NOTE_BASEDRUM, SoundCategory.BLOCKS, 3.0F, pitch);
@@ -411,6 +412,13 @@ public class BlockWoodenDevice extends BlockContainer {
                     default:
                         worldIn.playSound(null, pos, SoundEvents.BLOCK_NOTE_HARP, SoundCategory.BLOCKS, 3.0F, pitch);
                         break;
+                }
+            }
+            if (worldIn.isRemote && silentSensorEvent) {
+                TileEntity tile = worldIn.getTileEntity(pos);
+                if (tile instanceof TileSensor) {
+                    ((TileSensor) tile).redstoneSignal = 10;
+                    worldIn.markBlockRangeForRenderUpdate(pos, pos);
                 }
             }
             float note = (float) param / 24.0F;

@@ -979,6 +979,7 @@ public class ClientProxy extends CommonProxy {
             registerBlockItemModel(woodenDeviceItem, meta, "type=" + meta);
         }
         registerBuiltinItemModel(woodenDeviceItem, 0, "blockwoodendevice_bellows_tesr");
+        registerBuiltinItemModel(woodenDeviceItem, 1, "blockwoodendevice_1_inventory");
         registerBuiltinItemModel(woodenDeviceItem, 4, "blockwoodendevice_tesr");
         registerBuiltinItemModel(woodenDeviceItem, 5, "blockwoodendevice_tesr");
         registerBuiltinItemModel(woodenDeviceItem, 8, "blockwoodendevice_banner_tesr");
@@ -1681,7 +1682,7 @@ public class ClientProxy extends CommonProxy {
     @Override
     public void blockRunes(World world, double x, double y, double z, float red, float green, float blue, int duration, float gravity) {
         if (world == null || !world.isRemote) return;
-        FXBlockRunes runes = new FXBlockRunes(world, x, y, z, red, green, blue, duration);
+        FXBlockRunes runes = new FXBlockRunes(world, x + 0.5D, y + 0.5D, z + 0.5D, red, green, blue, duration);
         runes.setGravity(gravity);
         ParticleEngine.addEffect(world, runes);
     }

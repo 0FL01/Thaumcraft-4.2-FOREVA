@@ -18,6 +18,8 @@ public class DynamicDeviceRendererContractTest {
         String lifterRenderer = read("src/main/java/thaumcraft/client/renderers/tile/TileLifterRenderer.java");
         String renderHelper = read("src/main/java/thaumcraft/client/renderers/tile/TileRenderHelper.java");
         String sensorModel = read("src/main/resources/assets/thaumcraft/models/block/blockwoodendevice_1.json");
+        String sensorItemModel = read("src/main/resources/assets/thaumcraft/models/item/blockwoodendevice_1_inventory.json");
+        String clientProxy = read("src/main/java/thaumcraft/client/ClientProxy.java");
 
         assertTrue("TileRenderHelper must expose reusable textured cuboid helpers for Stage 8-c dynamic device overlays",
                 renderHelper.contains("static void drawTexturedCuboid(BufferBuilder buf,")
@@ -39,6 +41,11 @@ public class DynamicDeviceRendererContractTest {
                         && sensorModel.contains("\"belltop\": \"thaumcraft:blocks/arcaneearbelltop\"")
                         && sensorModel.contains("\"from\": [4, 8, 1]")
                         && sensorModel.contains("\"from\": [13, 8, 4]"));
+        assertTrue("Arcane Ear inventory model must keep the original lit top and side textures",
+                sensorItemModel.contains("\"parent\": \"thaumcraft:block/blockwoodendevice_1\"")
+                        && sensorItemModel.contains("\"top\": \"thaumcraft:blocks/arcaneeartopon\"")
+                        && sensorItemModel.contains("\"side\": \"thaumcraft:blocks/arcaneearsideon\"")
+                        && clientProxy.contains("registerBuiltinItemModel(woodenDeviceItem, 1, \"blockwoodendevice_1_inventory\");"));
     }
 
     private static String read(String path) throws IOException {

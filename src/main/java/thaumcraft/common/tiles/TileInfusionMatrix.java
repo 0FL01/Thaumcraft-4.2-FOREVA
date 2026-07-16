@@ -750,6 +750,16 @@ public class TileInfusionMatrix extends TileThaumcraft implements ITickable, IWa
 
     private void doEffects() {
         if (this.crafting) {
+            Thaumcraft.proxy.blockRunes(
+                    this.world,
+                    this.pos.getX(),
+                    this.pos.getY() - 2,
+                    this.pos.getZ(),
+                    0.5F + this.world.rand.nextFloat() * 0.2F,
+                    0.1F,
+                    0.7F + this.world.rand.nextFloat() * 0.3F,
+                    25,
+                    -0.03F);
             if (this.craftCount == 0) {
                 this.world.playSound(
                         this.pos.getX(),
