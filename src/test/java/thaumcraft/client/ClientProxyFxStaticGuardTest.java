@@ -43,6 +43,7 @@ public class ClientProxyFxStaticGuardTest {
         String beamWandFx = readFile("src/main/java/thaumcraft/client/fx/beams/FXBeamWand.java");
         String beamBoreFx = readFile("src/main/java/thaumcraft/client/fx/beams/FXBeamBore.java");
         String beamPowerFx = readFile("src/main/java/thaumcraft/client/fx/beams/FXBeamPower.java");
+        String visUtils = readFile("src/main/java/thaumcraft/common/lib/utils/Utils.java");
 
         assertTrue("ClientProxy blockSparkle must route generic colors through dedicated FXVisSparkle",
                 source.contains("public void blockSparkle(")
@@ -398,14 +399,22 @@ public class ClientProxyFxStaticGuardTest {
                         && ventFx.contains("public int getFXLayer()")
                         && ventFx.contains("return 1;"));
         assertTrue("Dedicated FXVisSparkle particle must keep block-centered + vis-drain trail textured baseline",
-                visSparkleFx.contains("class FXVisSparkle extends Particle")
+                visSparkleFx.contains("class FXVisSparkle extends Particle implements ITCParticle")
                         && visSparkleFx.contains("baseX")
                         && visSparkleFx.contains("trailMode")
                         && visSparkleFx.contains("randomizeColor")
                         && visSparkleFx.contains("0.33f + this.rand.nextFloat() * 0.67f")
-                        && visSparkleFx.contains("setParticleTextureIndex(32 + (this.particleAge % 16))")
+                        && visSparkleFx.contains("setParticleTextureIndex(128 + (this.particleAge % 16))")
                         && visSparkleFx.contains("setParticleTextureIndex(112 + (this.particleAge % 8))")
+                        && visSparkleFx.contains("public int getTCParticleLayer()")
+                        && visSparkleFx.contains("return 0;")
                         && !visSparkleFx.contains("EnumParticleTypes.REDSTONE"));
+        assertTrue("Vis drain effects must use the original expiry-based per-source throttle",
+                visUtils.contains("Long expiresAt = effectBuffer.get(key);")
+                        && visUtils.contains("if (expiresAt != null)")
+                        && visUtils.contains("if (expiresAt < now)")
+                        && visUtils.contains("effectBuffer.remove(key);")
+                        && !visUtils.contains("now - last < 500L"));
         assertTrue("Dedicated FXWisp particle must keep target-aware textured wisp baseline",
                 wispFx.contains("class FXWisp extends Particle implements ITCParticle")
                         && wispFx.contains("hasTarget")

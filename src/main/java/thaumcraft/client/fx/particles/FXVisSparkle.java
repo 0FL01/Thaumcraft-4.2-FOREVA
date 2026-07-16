@@ -9,9 +9,10 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import thaumcraft.client.fx.ITCParticle;
 
 @SideOnly(Side.CLIENT)
-public class FXVisSparkle extends Particle {
+public class FXVisSparkle extends Particle implements ITCParticle {
     private final int baseX;
     private final int baseY;
     private final int baseZ;
@@ -70,7 +71,7 @@ public class FXVisSparkle extends Particle {
         this.sizeMod = 45 + this.rand.nextInt(15);
         this.particleGravity = 0.2F;
         this.canCollide = false;
-        this.setParticleTextureIndex(32);
+        this.setParticleTextureIndex(128);
 
         Minecraft mc = Minecraft.getMinecraft();
         EntityLivingBase player = mc.player;
@@ -123,7 +124,7 @@ public class FXVisSparkle extends Particle {
                 this.motionY = MathHelper.clamp(this.motionY, -0.1D, 0.1D);
                 this.motionZ = MathHelper.clamp(this.motionZ, -0.1D, 0.1D);
             }
-            this.setParticleTextureIndex(32 + (this.particleAge % 16));
+            this.setParticleTextureIndex(128 + (this.particleAge % 16));
             return;
         }
 
@@ -147,7 +148,7 @@ public class FXVisSparkle extends Particle {
     public void renderParticle(BufferBuilder buffer, Entity entityIn, float partialTicks,
                                float rotationX, float rotationZ, float rotationYZ,
                                float rotationXY, float rotationXZ) {
-        float bob = MathHelper.sin(this.particleAge / 3.0F) * 0.3F + 1.0F;
+        float bob = MathHelper.sin(this.particleAge / 3.0F) * 0.3F + (this.trailMode ? 6.0F : 1.0F);
         float scale = this.particleScale;
         float alpha = this.particleAlpha;
         this.particleScale = this.particleScale * bob;
@@ -165,6 +166,16 @@ public class FXVisSparkle extends Particle {
         this.particleRed = clamp(particleRedIn);
         this.particleGreen = clamp(particleGreenIn);
         this.particleBlue = clamp(particleBlueIn);
+    }
+
+    @Override
+    public int getFXLayer() {
+        return 0;
+    }
+
+    @Override
+    public int getTCParticleLayer() {
+        return 0;
     }
 
     @Override

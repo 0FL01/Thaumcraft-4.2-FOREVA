@@ -4,6 +4,7 @@ import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import net.minecraft.util.math.BlockPos;
 import org.junit.Test;
+import thaumcraft.api.aspects.Aspect;
 import thaumcraft.common.lib.network.PacketBase;
 
 import java.lang.reflect.Field;
@@ -171,13 +172,14 @@ public class PacketFXSerializationTest {
 
     @Test
     public void visDrainPacketRoundTripsPayload() {
-        PacketFXVisDrain source = new PacketFXVisDrain(new BlockPos(1, 2, 3), new BlockPos(-4, 5, -6), 0x55AAFF);
+        int fireIndex = Aspect.getPrimalAspects().indexOf(Aspect.FIRE);
+        PacketFXVisDrain source = new PacketFXVisDrain(new BlockPos(1, 2, 3), new BlockPos(-4, 5, -6), fireIndex);
         PacketFXVisDrain target = new PacketFXVisDrain();
         roundTrip(source, target);
 
         assertEquals(new BlockPos(1, 2, 3), getField(target, "from"));
         assertEquals(new BlockPos(-4, 5, -6), getField(target, "to"));
-        assertEquals(0x55AAFF, (int) getField(target, "color"));
+        assertEquals(Aspect.FIRE.getColor(), (int) getField(target, "color"));
     }
 
     private static void roundTrip(PacketBase source, PacketBase target) {

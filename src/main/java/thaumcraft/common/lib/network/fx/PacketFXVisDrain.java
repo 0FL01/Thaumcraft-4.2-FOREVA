@@ -6,6 +6,7 @@ import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import thaumcraft.api.aspects.Aspect;
 import thaumcraft.common.Thaumcraft;
 import thaumcraft.common.lib.network.PacketBase;
 
@@ -34,7 +35,7 @@ public class PacketFXVisDrain extends PacketBase {
     public void fromBytes(ByteBuf buf) {
         this.from = BlockPos.fromLong(buf.readLong());
         this.to = BlockPos.fromLong(buf.readLong());
-        this.color = buf.readInt();
+        this.color = Aspect.getPrimalAspects().get(buf.readInt()).getColor();
     }
 
     @Override

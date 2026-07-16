@@ -123,6 +123,57 @@ public class VisNetworkChargingRuntimeTest {
     }
 
     @Test
+    public void infernalFurnaceDrainsIgnisThroughForcedRelayChain() {
+        VisWorld world = new VisWorld(false);
+        TestEnergizedNode source = new TestEnergizedNode();
+        TestRelay relay = new TestRelay();
+        TestArcaneFurnace furnace = new TestArcaneFurnace();
+        attachForcedRelayChain(world, source, relay, furnace);
+
+        furnace.update();
+
+        assertEquals(4, furnace.speedyTime);
+        assertEquals(0, source.vis.getAmount(Aspect.FIRE));
+        assertEquals(1, world.blockEvents);
+    }
+
+    @Test
+    public void fluxScrubberDrainsAerThroughForcedRelayChain() {
+        VisWorld world = new VisWorld(false);
+        TestEnergizedNode source = new TestEnergizedNode();
+        TestRelay relay = new TestRelay();
+        TestFluxScrubber scrubber = new TestFluxScrubber();
+        attachForcedRelayChain(world, source, relay, scrubber);
+
+        scrubber.update();
+
+        assertEquals(4, scrubber.power);
+        assertEquals(0, source.vis.getAmount(Aspect.AIR));
+        assertEquals(1, world.blockEvents);
+    }
+
+    @Test
+    public void advancedAlchemyFurnaceDrainsAllRequiredPrimalsThroughForcedRelayChain() {
+        VisWorld world = new VisWorld(false);
+        TestEnergizedNode source = new TestEnergizedNode();
+        TestRelay relay = new TestRelay();
+        TestAdvancedAlchemyFurnace furnace = new TestAdvancedAlchemyFurnace();
+        attachForcedRelayChain(world, source, relay, furnace);
+
+        for (int i = 0; i < 5; ++i) {
+            furnace.update();
+        }
+
+        assertEquals(4, furnace.heat);
+        assertEquals(4, furnace.power1);
+        assertEquals(4, furnace.power2);
+        assertEquals(0, source.vis.getAmount(Aspect.FIRE));
+        assertEquals(0, source.vis.getAmount(Aspect.ENTROPY));
+        assertEquals(0, source.vis.getAmount(Aspect.WATER));
+        assertEquals(1, world.blockEvents);
+    }
+
+    @Test
     public void relaySyncsParentOffsetAndPropagatesColoredClientPulse() {
         VisWorld serverWorld = new VisWorld(false);
         TestEnergizedNode parent = new TestEnergizedNode();
@@ -168,6 +219,25 @@ public class VisNetworkChargingRuntimeTest {
                 false, true, false);
     }
 
+    private static void attachForcedRelayChain(VisWorld world, TestEnergizedNode source,
+                                                TestRelay relay, TileEntity consumer) {
+        BlockPos sourcePos = new BlockPos(0, 64, 0);
+        BlockPos relayPos = new BlockPos(7, 64, 0);
+        BlockPos consumerPos = new BlockPos(14, 64, 0);
+        world.attach(sourcePos, source);
+        world.attach(relayPos, relay);
+        world.attach(consumerPos, consumer);
+        world.putState(sourcePos, Blocks.STONE.getDefaultState());
+        world.putState(relayPos, Blocks.STONE.getDefaultState());
+        world.putState(consumerPos, Blocks.STONE.getDefaultState());
+
+        source.update();
+        relay.update();
+
+        assertTrue(VisNetHandler.isNodeValid(relay.getParent()));
+        assertSame(source, relay.getParent().get());
+    }
+
     private static class TestEnergizedNode extends TileNodeEnergized {
         @Override
         public void markDirty() {
@@ -187,6 +257,28 @@ public class VisNetworkChargingRuntimeTest {
     }
 
     private static class TestWorkbench extends TileMagicWorkbench {
+        @Override
+        public void markDirty() {
+        }
+    }
+
+    private static class TestArcaneFurnace extends TileArcaneFurnace {
+        @Override
+        public void markDirty() {
+        }
+    }
+
+    private static class TestFluxScrubber extends TileFluxScrubber {
+        @Override
+        public void markDirty() {
+        }
+    }
+
+    private static class TestAdvancedAlchemyFurnace extends TileAlchemyFurnaceAdvanced {
+        @Override
+        void sync(boolean relight) {
+        }
+
         @Override
         public void markDirty() {
         }

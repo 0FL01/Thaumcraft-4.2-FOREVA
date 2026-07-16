@@ -40,10 +40,12 @@ public class Utils {
         int dim = world.provider.getDimension();
         WorldCoordinates key = new WorldCoordinates(from.getX(), from.getY(), from.getZ(), dim);
         long now = System.currentTimeMillis();
-        Long last = effectBuffer.get(key);
+        Long expiresAt = effectBuffer.get(key);
 
-        // Rate limit: max one packet per 500ms per source position
-        if (last != null && now - last < 500L) {
+        if (expiresAt != null) {
+            if (expiresAt < now) {
+                effectBuffer.remove(key);
+            }
             return;
         }
         effectBuffer.put(key, now + 500L + (long)(Math.random() * 100.0));
