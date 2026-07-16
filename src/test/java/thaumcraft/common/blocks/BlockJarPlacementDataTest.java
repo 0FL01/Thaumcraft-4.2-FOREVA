@@ -3,7 +3,6 @@ package thaumcraft.common.blocks;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Bootstrap;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import thaumcraft.api.aspects.Aspect;
@@ -26,26 +25,28 @@ public class BlockJarPlacementDataTest {
     }
 
     @Test
-    public void filledNormalAndVoidJarsRestoreEssentiaAndFilter() {
+    public void filledNormalAndVoidJarDropsRestoreEssentiaAndFilter() {
         BlockJarItem item = createItem();
-        ItemStack stack = new ItemStack(item, 1, 0);
-        item.setAspects(stack, new AspectList().add(Aspect.AIR, 37));
-        stack.getTagCompound().setString("AspectFilter", Aspect.FIRE.getTag());
+        TileJarFillable normal = filledJar(new TileJarFillable());
+        ItemStack normalDrop = BlockJar.createJarDrop(new ItemStack(item, 1, 0), normal);
+        TileJarFillableVoid voidJar = filledJar(new TileJarFillableVoid());
+        ItemStack voidDrop = BlockJar.createJarDrop(new ItemStack(item, 1, 3), voidJar);
 
-        assertFillableData(stack, new TileJarFillable());
-        assertFillableData(stack, new TileJarFillableVoid());
+        assertEquals(0, normalDrop.getItemDamage());
+        assertFillableData(normalDrop, new TileJarFillable());
+        assertEquals(3, voidDrop.getItemDamage());
+        assertFillableData(voidDrop, new TileJarFillableVoid());
     }
 
     @Test
-    public void filterOnlyJarDoesNotInventStoredEssentia() {
+    public void filterOnlyJarDropDoesNotInventStoredEssentia() {
         BlockJarItem item = createItem();
-        ItemStack stack = new ItemStack(item, 1, 3);
-        NBTTagCompound tag = new NBTTagCompound();
-        tag.setString("AspectFilter", Aspect.EARTH.getTag());
-        stack.setTagCompound(tag);
+        TileJarFillableVoid source = new TileJarFillableVoid();
+        source.aspectFilter = Aspect.EARTH;
+        ItemStack drop = BlockJar.createJarDrop(new ItemStack(item, 1, 3), source);
         TileJarFillableVoid jar = new TileJarFillableVoid();
 
-        BlockJar.restoreFillableData(stack, jar);
+        BlockJar.restoreFillableData(drop, jar);
 
         assertSame(Aspect.EARTH, jar.aspectFilter);
         assertNull(jar.aspect);
@@ -53,7 +54,7 @@ public class BlockJarPlacementDataTest {
     }
 
     @Test
-    public void nodePlacementRestoresTaggedDataButLeavesRawMetaTwoEmpty() {
+    public void nodeDropRestoresTaggedDataButLeavesRawMetaTwoEmpty() {
         BlockJarItem item = createItem();
         TileJarNode rawNode = new TileJarNode();
 
@@ -64,9 +65,12 @@ public class BlockJarPlacementDataTest {
         assertNull(rawNode.getNodeModifier());
         assertEquals("", rawNode.getId());
 
-        ItemStack tagged = new ItemStack(item, 1, 2);
-        item.setAspects(tagged, new AspectList().add(Aspect.MAGIC, 24).add(Aspect.AIR, 16));
-        item.setNodeAttributes(tagged, NodeType.PURE, NodeModifier.BRIGHT, "placed-node");
+        TileJarNode source = new TileJarNode();
+        source.setAspects(new AspectList().add(Aspect.MAGIC, 24).add(Aspect.AIR, 16));
+        source.setNodeType(NodeType.PURE);
+        source.setNodeModifier(NodeModifier.BRIGHT);
+        source.setId("placed-node");
+        ItemStack tagged = BlockJar.createJarDrop(new ItemStack(item, 1, 2), source);
         TileJarNode restoredNode = new TileJarNode();
 
         BlockJar.restoreNodeData(tagged, restoredNode);
@@ -83,6 +87,13 @@ public class BlockJarPlacementDataTest {
         assertSame(Aspect.AIR, jar.aspect);
         assertEquals(37, jar.amount);
         assertSame(Aspect.FIRE, jar.aspectFilter);
+    }
+
+    private static <T extends TileJarFillable> T filledJar(T jar) {
+        jar.aspect = Aspect.AIR;
+        jar.amount = 37;
+        jar.aspectFilter = Aspect.FIRE;
+        return jar;
     }
 
     private static BlockJarItem createItem() {

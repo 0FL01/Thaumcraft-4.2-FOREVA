@@ -8,15 +8,18 @@ import net.minecraft.block.properties.PropertyInteger;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.item.EntityXPOrb;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Enchantments;
 import net.minecraft.init.SoundEvents;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.stats.StatList;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.EnumBlockRenderType;
@@ -27,8 +30,10 @@ import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
+import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import thaumcraft.api.aspects.AspectList;
@@ -130,53 +135,90 @@ extends BlockContainer {
 
     @Override
     public void getDrops(NonNullList<ItemStack> drops, IBlockAccess world, BlockPos pos, IBlockState state, int fortune) {
-        int meta = this.getMetaFromState(state);
-        if (meta == 0 || meta == 3) {
-            TileEntity te = world.getTileEntity(pos);
-            if (te instanceof TileJarFillable) {
-                TileJarFillable jar = (TileJarFillable) te;
-                ItemStack drop = new ItemStack(this, 1, 0);
-                if (te instanceof TileJarFillableVoid) {
-                    drop.setItemDamage(3);
-                }
-                if (jar.amount <= 0 && jar.aspectFilter == null) {
-                    drop = new ItemStack(this, 1, meta == 3 ? 3 : 0);
-                }
-                if (jar.amount > 0) {
-                    if (drop.getItem() instanceof IEssentiaContainerItem) {
-                        ((IEssentiaContainerItem) drop.getItem()).setAspects(drop, new AspectList().add(jar.aspect, jar.amount));
-                    }
-                }
-                if (jar.aspectFilter != null) {
-                    if (!drop.hasTagCompound()) {
-                        drop.setTagCompound(new NBTTagCompound());
-                    }
-                    drop.getTagCompound().setString("AspectFilter", jar.aspectFilter.getTag());
-                }
-                drops.add(drop);
-                return;
-            }
+        ItemStack drop = this.createJarDrop(state, world.getTileEntity(pos));
+        if (!drop.isEmpty()) {
+            drops.add(drop);
+        }
+    }
+
+    private ItemStack createJarDrop(IBlockState state, @Nullable TileEntity tile) {
+        return createJarDrop(new ItemStack(this, 1, this.getMetaFromState(state)), tile);
+    }
+
+    static ItemStack createJarDrop(ItemStack drop, @Nullable TileEntity tile) {
+        int meta = drop.getItemDamage();
+        if ((meta == 0 || meta == 3) && tile instanceof TileJarFillable) {
+            TileJarFillable jar = (TileJarFillable) tile;
+            drop.setItemDamage(tile instanceof TileJarFillableVoid ? 3 : 0);
+            storeFillableData(drop, jar);
+            return drop;
         }
         if (meta == 2) {
-            TileEntity te = world.getTileEntity(pos);
-            if (te instanceof TileJarNode && ((TileJarNode) te).drop && ((TileJarNode) te).getAspects() != null) {
-                ItemStack drop = new ItemStack(this, 1, 2);
-                if (drop.getItem() instanceof IEssentiaContainerItem) {
-                    ((IEssentiaContainerItem) drop.getItem()).setAspects(drop, ((TileJarNode) te).getAspects().copy());
-                }
-                if (drop.getItem() instanceof BlockJarItem) {
-                    TileJarNode node = (TileJarNode) te;
-                    ((BlockJarItem) drop.getItem()).setNodeAttributes(
-                            drop,
-                            node.getNodeType(),
-                            node.getNodeModifier(),
-                            node.getId());
-                }
-                drops.add(drop);
+            if (tile instanceof TileJarNode && ((TileJarNode) tile).drop && ((TileJarNode) tile).getAspects() != null) {
+                storeNodeData(drop, (TileJarNode) tile);
+                return drop;
             }
+            return ItemStack.EMPTY;
+        }
+        return drop;
+    }
+
+    private static void storeFillableData(ItemStack drop, TileJarFillable jar) {
+        if (jar.amount > 0 && drop.getItem() instanceof IEssentiaContainerItem) {
+            ((IEssentiaContainerItem) drop.getItem()).setAspects(drop, new AspectList().add(jar.aspect, jar.amount));
+        }
+        if (jar.aspectFilter != null) {
+            if (!drop.hasTagCompound()) {
+                drop.setTagCompound(new NBTTagCompound());
+            }
+            drop.getTagCompound().setString("AspectFilter", jar.aspectFilter.getTag());
+        }
+    }
+
+    private static void storeNodeData(ItemStack drop, TileJarNode node) {
+        if (drop.getItem() instanceof IEssentiaContainerItem) {
+            ((IEssentiaContainerItem) drop.getItem()).setAspects(drop, node.getAspects().copy());
+        }
+        if (drop.getItem() instanceof BlockJarItem) {
+            ((BlockJarItem) drop.getItem()).setNodeAttributes(
+                    drop,
+                    node.getNodeType(),
+                    node.getNodeModifier(),
+                    node.getId());
+        }
+    }
+
+    @Override
+    public void harvestBlock(World world, EntityPlayer player, BlockPos pos, IBlockState state, @Nullable TileEntity tile, ItemStack tool) {
+        player.addStat(StatList.getBlockStats(this));
+        player.addExhaustion(0.005F);
+        if (world.isRemote) {
             return;
         }
-        drops.add(new ItemStack(this, 1, meta));
+
+        this.harvesters.set(player);
+        try {
+            int fortune = EnchantmentHelper.getEnchantmentLevel(Enchantments.FORTUNE, tool);
+            NonNullList<ItemStack> drops = NonNullList.create();
+            ItemStack drop = this.createJarDrop(state, tile);
+            if (!drop.isEmpty()) {
+                drops.add(drop);
+            }
+            float chance = ForgeEventFactory.fireBlockHarvesting(drops, world, pos, state, fortune, 1.0F, false, player);
+            for (ItemStack eventDrop : drops) {
+                if (world.rand.nextFloat() <= chance) {
+                    spawnAsEntity(world, pos, eventDrop);
+                }
+            }
+        } finally {
+            this.harvesters.set(null);
+        }
+    }
+
+    @Override
+    public ItemStack getPickBlock(IBlockState state, RayTraceResult target, World world, BlockPos pos, EntityPlayer player) {
+        ItemStack drop = this.createJarDrop(state, world.getTileEntity(pos));
+        return drop.isEmpty() ? super.getPickBlock(state, target, world, pos, player) : drop;
     }
 
     @Override
