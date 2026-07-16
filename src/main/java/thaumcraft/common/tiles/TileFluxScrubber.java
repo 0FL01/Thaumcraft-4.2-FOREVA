@@ -90,12 +90,18 @@ public class TileFluxScrubber extends TileThaumcraft implements ITickable, IEsse
             } else {
                 this.world.setBlockToAir(target);
             }
-            PacketHandler.INSTANCE.sendToAllAround(new PacketFXBlockSparkle(x, y, z, 0xDD00FF),
-                    new NetworkRegistry.TargetPoint(this.world.provider.getDimension(), x, y, z, 32.0));
+            this.sendFluxCleanupEffect(target);
             ++this.charges;
             this.markDirty();
             return;
         }
+    }
+
+    void sendFluxCleanupEffect(BlockPos target) {
+        PacketHandler.INSTANCE.sendToAllAround(
+                new PacketFXBlockSparkle(target.getX(), target.getY(), target.getZ(), 0xDD00FF),
+                new NetworkRegistry.TargetPoint(this.world.provider.getDimension(),
+                        target.getX(), target.getY(), target.getZ(), 32.0));
     }
 
     @Override

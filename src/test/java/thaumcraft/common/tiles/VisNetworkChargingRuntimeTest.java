@@ -28,6 +28,7 @@ import thaumcraft.api.aspects.Aspect;
 import thaumcraft.api.visnet.TileVisNode;
 import thaumcraft.api.visnet.VisNetHandler;
 import thaumcraft.common.items.wands.ItemWandCasting;
+import thaumcraft.common.config.ConfigBlocks;
 
 import java.awt.Color;
 import java.lang.ref.WeakReference;
@@ -44,6 +45,9 @@ public class VisNetworkChargingRuntimeTest {
     @BeforeClass
     public static void bootstrapMinecraftStatics() {
         Bootstrap.register();
+        if (ConfigBlocks.blockFluxGoo == null || ConfigBlocks.blockFluxGas == null) {
+            ConfigBlocks.init();
+        }
     }
 
     @Before
@@ -150,6 +154,68 @@ public class VisNetworkChargingRuntimeTest {
         assertEquals(4, scrubber.power);
         assertEquals(0, source.vis.getAmount(Aspect.AIR));
         assertEquals(1, world.blockEvents);
+    }
+
+    @Test
+    public void fluxScrubberConsumesGooAndGasThroughPoweredRelayChain() {
+        VisWorld world = new VisWorld(false);
+        TestEnergizedNode source = new TestEnergizedNode();
+        TestRelay relay = new TestRelay();
+        TestFluxScrubber scrubber = new TestFluxScrubber();
+        attachForcedRelayChain(world, source, relay, scrubber);
+        BlockPos gooPos = scrubber.getPos().south(2);
+        BlockPos gasPos = scrubber.getPos().north(2);
+        world.putState(gooPos, ConfigBlocks.blockFluxGoo.getStateFromMeta(3));
+        world.putState(gasPos, ConfigBlocks.blockFluxGas.getStateFromMeta(0));
+        scrubber.checklist.add(new thaumcraft.api.BlockCoordinates(gooPos.getX(), gooPos.getY(), gooPos.getZ()));
+        scrubber.checklist.add(new thaumcraft.api.BlockCoordinates(gasPos.getX(), gasPos.getY(), gasPos.getZ()));
+
+        scrubber.update();
+        source.update();
+        scrubber.update();
+
+        assertEquals(2, ConfigBlocks.blockFluxGoo.getMetaFromState(world.getBlockState(gooPos)));
+        assertEquals(3, scrubber.power);
+        assertEquals(1, scrubber.charges);
+        assertEquals(1, scrubber.cleanupEffects);
+
+        source.update();
+        scrubber.update();
+
+        assertTrue(world.isAirBlock(gasPos));
+        assertEquals(2, scrubber.power);
+        assertEquals(2, scrubber.charges);
+        assertEquals(2, scrubber.cleanupEffects);
+    }
+
+    @Test
+    public void fluxScrubberRequiresPowerAndStrictSixteenBlockRadius() {
+        VisWorld world = new VisWorld(false);
+        TestFluxScrubber scrubber = new TestFluxScrubber();
+        BlockPos scrubberPos = new BlockPos(0, 64, 0);
+        BlockPos nearbyFlux = scrubberPos.east(2);
+        BlockPos boundaryFlux = scrubberPos.east(16);
+        world.attach(scrubberPos, scrubber);
+        world.putState(scrubberPos, Blocks.STONE.getDefaultState());
+        world.putState(nearbyFlux, ConfigBlocks.blockFluxGoo.getStateFromMeta(1));
+        scrubber.power = 4;
+        scrubber.checklist.add(new thaumcraft.api.BlockCoordinates(nearbyFlux.getX(), nearbyFlux.getY(), nearbyFlux.getZ()));
+
+        scrubber.update();
+
+        assertEquals(1, ConfigBlocks.blockFluxGoo.getMetaFromState(world.getBlockState(nearbyFlux)));
+        assertEquals(4, scrubber.power);
+        assertEquals(0, scrubber.charges);
+
+        world.putState(boundaryFlux, ConfigBlocks.blockFluxGas.getStateFromMeta(1));
+        scrubber.power = 5;
+        scrubber.checklist.clear();
+        scrubber.checklist.add(new thaumcraft.api.BlockCoordinates(boundaryFlux.getX(), boundaryFlux.getY(), boundaryFlux.getZ()));
+        scrubber.update();
+
+        assertEquals(1, ConfigBlocks.blockFluxGas.getMetaFromState(world.getBlockState(boundaryFlux)));
+        assertEquals(5, scrubber.power);
+        assertEquals(0, scrubber.cleanupEffects);
     }
 
     @Test
@@ -269,8 +335,15 @@ public class VisNetworkChargingRuntimeTest {
     }
 
     private static class TestFluxScrubber extends TileFluxScrubber {
+        private int cleanupEffects;
+
         @Override
         public void markDirty() {
+        }
+
+        @Override
+        void sendFluxCleanupEffect(BlockPos target) {
+            this.cleanupEffects++;
         }
     }
 
@@ -316,6 +389,18 @@ public class VisNetworkChargingRuntimeTest {
         @Override
         public TileEntity getTileEntity(BlockPos pos) {
             return this.tiles.get(pos);
+        }
+
+        @Override
+        public boolean setBlockState(BlockPos pos, IBlockState state, int flags) {
+            this.states.put(pos.toImmutable(), state);
+            return true;
+        }
+
+        @Override
+        public boolean setBlockToAir(BlockPos pos) {
+            this.states.remove(pos);
+            return true;
         }
 
         @Override

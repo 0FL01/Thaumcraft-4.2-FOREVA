@@ -1392,16 +1392,23 @@ public class ClientProxy extends CommonProxy {
         if (world == null || !world.isRemote) return;
         int amount = particleCount(Math.max(1, count));
         if (amount <= 0) return;
-        if (color == -9999) {
-            ParticleEngine.addEffect(world, new FXVisSparkle(world, x, y, z, 0.0f, 0.0f, 0.0f, amount, true));
-            return;
+        Color tint = color == -9999 ? null : decodeColor(color);
+        for (int i = 0; i < amount; ++i) {
+            float red = tint == null ? 0.33F + world.rand.nextFloat() * 0.67F : normalizeColor(tint.getRed());
+            float green = tint == null ? 0.33F + world.rand.nextFloat() * 0.67F : normalizeColor(tint.getGreen());
+            float blue = tint == null ? 0.33F + world.rand.nextFloat() * 0.67F : normalizeColor(tint.getBlue());
+            drawGenericParticles(world,
+                    x - 0.1F + world.rand.nextFloat() * 1.2F,
+                    y - 0.1F + world.rand.nextFloat() * 1.2F,
+                    z - 0.1F + world.rand.nextFloat() * 1.2F,
+                    0.0D, world.rand.nextFloat() * 0.02D, 0.0D,
+                    red - 0.2F + world.rand.nextFloat() * 0.4F,
+                    green - 0.2F + world.rand.nextFloat() * 0.4F,
+                    blue - 0.2F + world.rand.nextFloat() * 0.4F,
+                    0.9F, false, 112, 9, 1,
+                    5 + world.rand.nextInt(8), world.rand.nextInt(10),
+                    0.7F + world.rand.nextFloat() * 0.4F);
         }
-
-        Color tint = decodeColor(color);
-        float red = normalizeColor(tint.getRed());
-        float green = normalizeColor(tint.getGreen());
-        float blue = normalizeColor(tint.getBlue());
-        ParticleEngine.addEffect(world, new FXVisSparkle(world, x, y, z, red, green, blue, amount));
     }
 
     @Override

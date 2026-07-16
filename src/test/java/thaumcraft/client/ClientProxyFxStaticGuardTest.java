@@ -45,12 +45,16 @@ public class ClientProxyFxStaticGuardTest {
         String beamPowerFx = readFile("src/main/java/thaumcraft/client/fx/beams/FXBeamPower.java");
         String visUtils = readFile("src/main/java/thaumcraft/common/lib/utils/Utils.java");
 
-        assertTrue("ClientProxy blockSparkle must route generic colors through dedicated FXVisSparkle",
+        assertTrue("ClientProxy blockSparkle must restore the TC4 generic particle cloud",
                 source.contains("public void blockSparkle(")
-                        && source.contains("new FXVisSparkle(world, x, y, z, red, green, blue, amount)"));
+                        && source.contains("for (int i = 0; i < amount; ++i)")
+                        && source.contains("drawGenericParticles(world,")
+                        && source.contains("0.9F, false, 112, 9, 1")
+                        && source.contains("5 + world.rand.nextInt(8), world.rand.nextInt(10)")
+                        && source.contains("0.7F + world.rand.nextFloat() * 0.4F"));
         assertTrue("ClientProxy blockSparkle must preserve random-color sentinel routing for -9999",
                 source.contains("color == -9999")
-                        && source.contains("new FXVisSparkle(world, x, y, z, 0.0f, 0.0f, 0.0f, amount, true)"));
+                        && source.contains("0.33F + world.rand.nextFloat() * 0.67F"));
         assertTrue("CommonProxy/ClientProxy must keep dedicated blockWard surface separate from generic blockSparkle routing",
                 commonProxy.contains("public void blockWard(World world, double x, double y, double z, EnumFacing side, float red, float green, float blue)")
                         && source.contains("public void blockWard(World world, double x, double y, double z, EnumFacing side, float red, float green, float blue)")
@@ -348,6 +352,9 @@ public class ClientProxyFxStaticGuardTest {
                         && !essentiaTrailFx.contains("EnumParticleTypes.REDSTONE"));
         assertTrue("Dedicated FXGeneric particle must keep configurable generic particle baseline",
                 genericFx.contains("class FXGeneric extends Particle")
+                        && genericFx.contains("implements ITCParticle")
+                        && genericFx.contains("public int getTCParticleLayer()")
+                        && genericFx.contains("return 0;")
                         && genericFx.contains("setParticles(int startParticle, int numParticles, int particleInc)")
                         && genericFx.contains("setMaxAge(int max, int delay)")
                         && genericFx.contains("if (this.particleAge < this.delay)"));

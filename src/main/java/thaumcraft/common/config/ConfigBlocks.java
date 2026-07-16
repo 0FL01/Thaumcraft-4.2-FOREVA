@@ -362,7 +362,7 @@ public class ConfigBlocks {
         );
         registry.register(new BlockMetadataItem(blockTable)
                 .setRegistryName(blockTable.getRegistryName()));
-        registry.register(new BlockMetadataItem(blockStoneDevice)
+        registry.register(new BlockStoneDeviceItem(blockStoneDevice)
                 .setRegistryName(blockStoneDevice.getRegistryName()));
         registry.register(new BlockWoodenDeviceItem(blockWoodenDevice)
                 .setRegistryName(blockWoodenDevice.getRegistryName()));

@@ -7,9 +7,10 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import thaumcraft.client.fx.ITCParticle;
 
 @SideOnly(Side.CLIENT)
-public class FXGeneric extends Particle {
+public class FXGeneric extends Particle implements ITCParticle {
     private boolean loop = false;
     private int delay = 0;
     private int startParticle = 0;
@@ -87,5 +88,10 @@ public class FXGeneric extends Particle {
         }
         super.renderParticle(buffer, entityIn, partialTicks, rotationX, rotationZ, rotationYZ, rotationXY, rotationXZ);
         this.particleAlpha = alpha;
+    }
+
+    @Override
+    public int getTCParticleLayer() {
+        return 0;
     }
 }
