@@ -64,6 +64,7 @@ public class MirrorRendererFidelityStaticGuardTest {
 
         assertTrue("TileMirrorRenderer should route linked portal fields through the shared layered-field helper with inset bounds",
                 source.contains("LayeredFieldPlaneHelper.renderLayeredFaceRect(")
+                        && source.contains("facing.getOpposite(), x, y, z, axisOffset")
                         && source.contains("AxisDirection.POSITIVE ? near : far")
                         && source.contains("INSET, 1.0F - INSET, INSET, 1.0F - INSET")
                         && source.contains("view.lastTickPosX + (view.posX - view.lastTickPosX) * partialTicks"));

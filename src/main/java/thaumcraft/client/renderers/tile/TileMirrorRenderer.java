@@ -57,7 +57,7 @@ public class TileMirrorRenderer extends TileEntitySpecialRenderer<TileEntity> {
         float far = 0.99F;
         float axisOffset = facing.getAxisDirection() == EnumFacing.AxisDirection.POSITIVE ? near : far;
         LayeredFieldPlaneHelper.renderLayeredFaceRect(
-                facing, x, y, z, axisOffset, true, 1.0F, viewX, viewY, viewZ,
+                facing.getOpposite(), x, y, z, axisOffset, true, 1.0F, viewX, viewY, viewZ,
                 INSET, 1.0F - INSET, INSET, 1.0F - INSET);
     }
 
