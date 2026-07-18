@@ -19,6 +19,7 @@ import net.minecraft.entity.monster.EntityMob;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemDye;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
@@ -47,6 +48,10 @@ import thaumcraft.api.research.ScanResult;
 import thaumcraft.client.renderers.tile.HoleRenderBatchCache;
 import thaumcraft.common.entities.monster.mods.ChampionModifier;
 import thaumcraft.common.config.Config;
+import thaumcraft.common.entities.golems.EntityGolemBase;
+import thaumcraft.common.entities.golems.ItemGolemBell;
+import thaumcraft.common.entities.golems.ItemGolemPlacer;
+import thaumcraft.common.entities.golems.Marker;
 import thaumcraft.common.items.relics.ItemSanityChecker;
 import thaumcraft.common.items.relics.ItemThaumometer;
 import thaumcraft.common.lib.capabilities.IPlayerKnowledge;
@@ -75,6 +80,14 @@ public class RenderEventHandler {
             new ResourceLocation("thaumcraft", "textures/misc/nodes.png");
     private static final ResourceLocation UNKNOWN_ASPECT_TEX =
             new ResourceLocation("thaumcraft", "textures/aspects/_unknown.png");
+    private static final ResourceLocation GOLEM_MARKER_TEX =
+            new ResourceLocation("thaumcraft", "textures/misc/mark.png");
+    private static final ResourceLocation GOLEM_HOME_TEX =
+            new ResourceLocation("thaumcraft", "textures/misc/home.png");
+    private static final ResourceLocation GOLEM_LINK_TEX =
+            new ResourceLocation("thaumcraft", "textures/misc/script.png");
+    private static final ResourceLocation GOLEM_EMPTY_TEX =
+            new ResourceLocation("thaumcraft", "textures/blocks/empty.png");
     private static final int SCAN_GRID_RADIUS = 8;
     private static final int SCAN_GRID_SIZE = SCAN_GRID_RADIUS * 2 + 1;
     private static final int[][][] scannedBlocks = new int[SCAN_GRID_SIZE][SCAN_GRID_SIZE][SCAN_GRID_SIZE];
@@ -277,6 +290,7 @@ public class RenderEventHandler {
             tagscale = Math.max(0.0F, tagscale - 0.005F);
         }
         renderGogglesNodeTags(event.getPartialTicks(), player);
+        renderMarkedBlocks(event.getPartialTicks(), player);
 
         long now = System.currentTimeMillis();
         if (scanExpireAtMs <= 0L || now >= scanExpireAtMs) {
@@ -516,6 +530,200 @@ public class RenderEventHandler {
         GlStateManager.popMatrix();
     }
 
+    private static void renderMarkedBlocks(float partialTicks, EntityPlayer player) {
+        ItemStack held = player.getHeldItemMainhand();
+        if (held.isEmpty() || !held.hasTagCompound() || !held.getTagCompound().hasKey("markers")) {
+            return;
+        }
+        boolean bell = held.getItem() instanceof ItemGolemBell;
+        if (!bell && !(held.getItem() instanceof ItemGolemPlacer)) {
+            return;
+        }
+
+        EntityGolemBase golem = null;
+        if (bell) {
+            Entity linked = player.world.getEntityByID(ItemGolemBell.getGolemId(held));
+            if (!(linked instanceof EntityGolemBase)) {
+                return;
+            }
+            golem = (EntityGolemBase) linked;
+
+            BlockPos home = ItemGolemBell.getGolemHomeCoords(held);
+            int homeFace = ItemGolemBell.getGolemHomeFace(held);
+            if (home != null && validFace(homeFace)
+                    && player.getDistanceSq(home.getX(), home.getY(), home.getZ()) < 4096.0D) {
+                drawFaceOverlay(home, EnumFacing.byIndex(homeFace), partialTicks, player,
+                        GOLEM_HOME_TEX, 0.325F, -1);
+            }
+        }
+
+        int dimension = player.world.provider.getDimension();
+        for (Marker marker : ItemGolemBell.getMarkers(held)) {
+            if (marker.dim != (byte) dimension || !validFace(marker.side)) {
+                continue;
+            }
+            EnumFacing face = EnumFacing.byIndex(marker.side);
+            double markerX = marker.x + face.getXOffset();
+            double markerY = marker.y + face.getYOffset();
+            double markerZ = marker.z + face.getZOffset();
+            if (player.getDistanceSq(markerX, markerY, markerZ) >= 4096.0D) {
+                continue;
+            }
+
+            BlockPos markedPos = new BlockPos(marker.x, marker.y, marker.z);
+            int color = validMarkerColor(marker.color) ? marker.color : -1;
+            drawFaceOverlay(markedPos, face, partialTicks, player, GOLEM_MARKER_TEX, 0.2F, color);
+            if (player.world.isAirBlock(markedPos)) {
+                for (EnumFacing airFace : EnumFacing.values()) {
+                    drawFaceOverlay(markedPos, airFace, partialTicks, player, GOLEM_EMPTY_TEX, 0.49F, color);
+                }
+            }
+            if (golem != null && Config.golemLinkQuality > 3) {
+                drawMarkerLine(markedPos, face, partialTicks, color, golem, player);
+            }
+        }
+    }
+
+    private static void drawFaceOverlay(BlockPos pos, EnumFacing face, float partialTicks, EntityPlayer player,
+                                        ResourceLocation texture, float halfSize, int color) {
+        double px = player.lastTickPosX + (player.posX - player.lastTickPosX) * partialTicks;
+        double py = player.lastTickPosY + (player.posY - player.lastTickPosY) * partialTicks;
+        double pz = player.lastTickPosZ + (player.posZ - player.lastTickPosZ) * partialTicks;
+        float time = (System.nanoTime() / 30000000L) % 32767L;
+        int rgb = markerColor(color, face.getIndex(), time, 0);
+
+        GlStateManager.pushMatrix();
+        try {
+            GlStateManager.translate(pos.getX() + 0.5D - px, pos.getY() + 0.5D - py, pos.getZ() + 0.5D - pz);
+            alignToFace(face);
+            GlStateManager.translate(0.0F, 0.0F, -0.01F);
+            GlStateManager.depthMask(false);
+            GlStateManager.disableLighting();
+            GlStateManager.disableCull();
+            GlStateManager.enableBlend();
+            GlStateManager.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE);
+            GlStateManager.alphaFunc(GL11.GL_GREATER, 0.003921569F);
+            Minecraft.getMinecraft().getTextureManager().bindTexture(texture);
+            drawTexturedQuad(halfSize, argb(1.0F, rgb), 0.0F, 1.0F, 0.0F, 1.0F);
+        } finally {
+            GlStateManager.alphaFunc(GL11.GL_GREATER, 0.1F);
+            GlStateManager.disableBlend();
+            GlStateManager.enableCull();
+            GlStateManager.enableLighting();
+            GlStateManager.depthMask(true);
+            GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+            GlStateManager.popMatrix();
+        }
+    }
+
+    private static void drawMarkerLine(BlockPos marker, EnumFacing face, float partialTicks, int color,
+                                       EntityGolemBase golem, EntityPlayer player) {
+        double sourceX = golem.lastTickPosX + (golem.posX - golem.lastTickPosX) * partialTicks;
+        double sourceY = golem.lastTickPosY + (golem.posY - golem.lastTickPosY) * partialTicks + golem.height;
+        double sourceZ = golem.lastTickPosZ + (golem.posZ - golem.lastTickPosZ) * partialTicks;
+        double outerX = marker.getX() + 0.5D + face.getXOffset();
+        double outerY = marker.getY() + 0.5D + face.getYOffset();
+        double outerZ = marker.getZ() + 0.5D + face.getZOffset();
+        double faceX = marker.getX() + 0.5D + face.getXOffset() * 0.5D;
+        double faceY = marker.getY() + 0.5D + face.getYOffset() * 0.5D;
+        double faceZ = marker.getZ() + 0.5D + face.getZOffset() * 0.5D;
+        double distanceX = marker.getX() - sourceX;
+        double distanceY = marker.getY() - sourceY;
+        double distanceZ = marker.getZ() - sourceZ;
+        float distance = MathHelper.sqrt(distanceX * distanceX + distanceY * distanceY + distanceZ * distanceZ);
+        float length = Math.round(distance) * Config.golemLinkQuality;
+        if (length <= 0.0F) {
+            return;
+        }
+
+        double px = player.lastTickPosX + (player.posX - player.lastTickPosX) * partialTicks;
+        double py = player.lastTickPosY + (player.posY - player.lastTickPosY) * partialTicks;
+        double pz = player.lastTickPosZ + (player.posZ - player.lastTickPosZ) * partialTicks;
+        double outerDeltaX = outerX - sourceX;
+        double outerDeltaY = outerY - sourceY;
+        double outerDeltaZ = outerZ - sourceZ;
+        double faceDeltaX = faceX - sourceX;
+        double faceDeltaY = faceY - sourceY;
+        double faceDeltaZ = faceZ - sourceZ;
+        float time = (System.nanoTime() / 30000000L) % 32767L;
+
+        GlStateManager.pushMatrix();
+        try {
+            GlStateManager.translate(sourceX - px, sourceY - py, sourceZ - pz);
+            GlStateManager.depthMask(false);
+            GlStateManager.disableLighting();
+            GlStateManager.disableCull();
+            GlStateManager.enableBlend();
+            GlStateManager.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE);
+            Minecraft.getMinecraft().getTextureManager().bindTexture(GOLEM_LINK_TEX);
+
+            Tessellator tessellator = Tessellator.getInstance();
+            BufferBuilder buffer = tessellator.getBuffer();
+            buffer.begin(GL11.GL_TRIANGLE_STRIP, DefaultVertexFormats.POSITION_TEX_COLOR);
+            for (int segment = 0; segment <= (int) length; segment++) {
+                float progress = segment / length;
+                float alpha = Math.min(0.75F, segment * 1.5F / length);
+                float centerWeight = 1.0F - Math.abs(segment - length / 2.0F) / (length / 2.0F);
+                double waveX = MathHelper.sin((float) ((face.getIndex() * 20.0D + marker.getZ() % 16.0D
+                        + distance * (1.0F - progress) * Config.golemLinkQuality - time / 5.0F) / 4.0D))
+                        * 0.5F * centerWeight;
+                double waveY = MathHelper.sin((float) ((face.getIndex() * 20.0D + marker.getX() % 16.0D
+                        + distance * (1.0F - progress) * Config.golemLinkQuality - time / 5.0F) / 3.0D))
+                        * 0.5F * centerWeight;
+                double waveZ = MathHelper.sin((float) ((face.getIndex() * 20.0D + marker.getY() % 16.0D
+                        + distance * (1.0F - progress) * Config.golemLinkQuality - time / 5.0F) / 2.0D))
+                        * 0.5F * centerWeight;
+                double lineX = outerDeltaX + waveX;
+                double lineY = outerDeltaY + waveY;
+                double lineZ = outerDeltaZ + waveZ;
+                float tail = 0.0F;
+                if (segment > length - Config.golemLinkQuality / 2.0F) {
+                    float outerWeight = (length - segment) / (Config.golemLinkQuality / 2.0F);
+                    tail = 1.0F - outerWeight;
+                    lineX = lineX * outerWeight + (faceDeltaX + waveX) * tail;
+                    lineY = lineY * outerWeight + (faceDeltaY + waveY) * tail;
+                    lineZ = lineZ * outerWeight + (faceDeltaZ + waveZ) * tail;
+                }
+                int rgb = markerColor(color, face.getIndex(), time, segment);
+                float red = ((rgb >> 16) & 0xFF) / 255.0F;
+                float green = ((rgb >> 8) & 0xFF) / 255.0F;
+                float blue = (rgb & 0xFF) / 255.0F;
+                float textureU = (1.0F - progress) * distance - time * 0.005F;
+                float vertexAlpha = alpha * (1.0F - tail);
+                buffer.pos(lineX * progress, lineY * progress - 0.05D, lineZ * progress)
+                        .tex(textureU, 1.0D).color(red, green, blue, vertexAlpha).endVertex();
+                buffer.pos(lineX * progress, lineY * progress + 0.05D, lineZ * progress)
+                        .tex(textureU, 0.0D).color(red, green, blue, vertexAlpha).endVertex();
+            }
+            tessellator.draw();
+        } finally {
+            GlStateManager.disableBlend();
+            GlStateManager.enableCull();
+            GlStateManager.enableLighting();
+            GlStateManager.depthMask(true);
+            GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+            GlStateManager.popMatrix();
+        }
+    }
+
+    private static boolean validFace(int face) {
+        return face >= 0 && face < EnumFacing.values().length;
+    }
+
+    private static boolean validMarkerColor(int color) {
+        return color >= -1 && color < ItemDye.DYE_COLORS.length;
+    }
+
+    private static int markerColor(int color, int side, float time, int segment) {
+        if (color >= 0 && color < ItemDye.DYE_COLORS.length) {
+            return ItemDye.DYE_COLORS[ItemDye.DYE_COLORS.length - 1 - color];
+        }
+        int red = MathHelper.clamp((int) ((MathHelper.sin(time / 12.0F + side + segment) * 0.2F + 0.8F) * 255.0F), 0, 255);
+        int green = MathHelper.clamp((int) ((MathHelper.sin(time / 14.0F + side + segment) * 0.2F + 0.8F) * 255.0F), 0, 255);
+        int blue = MathHelper.clamp((int) ((MathHelper.sin(time / 16.0F + side + segment) * 0.2F + 0.8F) * 255.0F), 0, 255);
+        return red << 16 | green << 8 | blue;
+    }
+
     private static float computeScanAlpha(long remaining, int xx, int yy, int zz) {
         float alpha = 1.0F;
         if (remaining > 4750L) {
@@ -591,10 +799,10 @@ public class RenderEventHandler {
     private static void alignToFace(EnumFacing face) {
         switch (face) {
             case DOWN:
-                GlStateManager.rotate(90.0F, 1.0F, 0.0F, 0.0F);
+                GlStateManager.rotate(-90.0F, 1.0F, 0.0F, 0.0F);
                 break;
             case UP:
-                GlStateManager.rotate(-90.0F, 1.0F, 0.0F, 0.0F);
+                GlStateManager.rotate(90.0F, 1.0F, 0.0F, 0.0F);
                 break;
             case SOUTH:
                 GlStateManager.rotate(180.0F, 0.0F, 1.0F, 0.0F);
