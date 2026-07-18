@@ -9,6 +9,7 @@ import net.minecraft.nbt.NBTTagList;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ITickable;
+import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraftforge.common.DimensionManager;
@@ -21,6 +22,7 @@ import thaumcraft.common.config.ConfigBlocks;
 import java.util.ArrayList;
 
 public class TileMirror extends TileThaumcraft implements ITickable, IInventory {
+    private static final String OUTPUT_ORIGIN = "tcMirrorOutput";
     public boolean linked = false;
     public int linkX;
     public int linkY;
@@ -30,6 +32,27 @@ public class TileMirror extends TileThaumcraft implements ITickable, IInventory 
     int count = 0;
     int inc = 40;
     private final ArrayList<ItemStack> outputStacks = new ArrayList<>();
+
+    @Override
+    public AxisAlignedBB getRenderBoundingBox() {
+        return new AxisAlignedBB(this.pos, this.pos.add(1, 1, 1));
+    }
+
+    static void writeOutputOrigin(NBTTagCompound data, int dimension, BlockPos origin) {
+        NBTTagCompound outputOrigin = new NBTTagCompound();
+        outputOrigin.setInteger("dimension", dimension);
+        outputOrigin.setLong("position", origin.toLong());
+        data.setTag(OUTPUT_ORIGIN, outputOrigin);
+    }
+
+    static boolean isOutputFrom(NBTTagCompound data, int dimension, BlockPos origin) {
+        if (!data.hasKey(OUTPUT_ORIGIN, 10)) {
+            return false;
+        }
+        NBTTagCompound outputOrigin = data.getCompoundTag(OUTPUT_ORIGIN);
+        return outputOrigin.getInteger("dimension") == dimension
+                && outputOrigin.getLong("position") == origin.toLong();
+    }
 
     @Override
     public void update() {
@@ -162,6 +185,9 @@ public class TileMirror extends TileThaumcraft implements ITickable, IInventory 
     }
 
     public boolean transport(EntityItem ie) {
+        if (this.world != null && isOutputFrom(ie.getEntityData(), this.world.provider.getDimension(), this.pos)) {
+            return false;
+        }
         ItemStack items = ie.getItem();
         if (!this.linked || !this.isLinkValid()) {
             return false;
@@ -214,6 +240,7 @@ public class TileMirror extends TileThaumcraft implements ITickable, IInventory 
             ie2.motionY = face.getYOffset() * 0.15F;
             ie2.motionZ = face.getZOffset() * 0.15F;
             ie2.setPickupDelay(20);
+            writeOutputOrigin(ie2.getEntityData(), this.world.provider.getDimension(), this.pos);
             this.world.spawnEntity(ie2);
             return true;
         } catch (Exception e) {

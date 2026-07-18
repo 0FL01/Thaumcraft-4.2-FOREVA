@@ -32,6 +32,7 @@ public class TileMirrorEssentiaStaticGuardTest {
         assertTrue(source.contains("if (this.inc < 600) this.inc += 20;"));
         assertTrue(source.contains("this.restoreLink();"));
         assertTrue(source.contains("this.inc = 40;"));
+        assertTrue(source.contains("public AxisAlignedBB getRenderBoundingBox()"));
     }
 
     private static String readFile(String path) throws IOException {

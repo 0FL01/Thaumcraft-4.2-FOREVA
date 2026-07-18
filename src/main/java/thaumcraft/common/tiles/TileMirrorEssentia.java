@@ -4,6 +4,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ITickable;
+import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.WorldServer;
 import net.minecraftforge.common.DimensionManager;
@@ -22,6 +23,11 @@ public class TileMirrorEssentia extends TileThaumcraft implements ITickable, IAs
     public EnumFacing linkedFacing = null;
     private int count = 0;
     private int inc = 40;
+
+    @Override
+    public AxisAlignedBB getRenderBoundingBox() {
+        return new AxisAlignedBB(this.pos, this.pos.add(1, 1, 1));
+    }
 
     @Override
     public void update() {

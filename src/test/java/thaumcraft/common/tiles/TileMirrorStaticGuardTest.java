@@ -6,7 +6,12 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.util.math.BlockPos;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 public class TileMirrorStaticGuardTest {
@@ -43,6 +48,8 @@ public class TileMirrorStaticGuardTest {
         assertTrue(source.contains("ie2.motionX = face.getXOffset() * 0.15F;"));
         assertTrue(source.contains("ie2.motionY = face.getYOffset() * 0.15F;"));
         assertTrue(source.contains("ie2.motionZ = face.getZOffset() * 0.15F;"));
+        assertTrue(source.contains("writeOutputOrigin(ie2.getEntityData()"));
+        assertTrue(source.contains("isOutputFrom(ie.getEntityData()"));
         assertTrue(source.contains("public void setInventorySlotContents(int index, ItemStack stack)"));
         assertTrue(source.contains("target instanceof TileMirror"));
         assertTrue(source.contains("this.spawnItem(stack.copy());"));
@@ -62,6 +69,33 @@ public class TileMirrorStaticGuardTest {
         assertTrue(source.contains("tag.setInteger(\"linkDim\", mirror.linkDim);"));
         assertTrue(source.contains("worldIn.isSideSolid(pos.offset(side.getOpposite()), side, false)"));
         assertTrue(source.contains("this.dropBlockAsItem(worldIn, pos, state, 0);"));
+        assertTrue(source.contains("return NULL_AABB;"));
+    }
+
+    @Test
+    public void mirrorOutputsRememberOnlyTheirEjectingMirror() {
+        BlockPos origin = new BlockPos(4, 70, -9);
+        NBTTagCompound data = new NBTTagCompound();
+
+        TileMirror.writeOutputOrigin(data, 7, origin);
+
+        assertTrue(TileMirror.isOutputFrom(data, 7, origin));
+        assertFalse(TileMirror.isOutputFrom(data, 7, origin.east()));
+        assertFalse(TileMirror.isOutputFrom(data, 8, origin));
+        assertFalse(TileMirror.isOutputFrom(new NBTTagCompound(), 7, origin));
+    }
+
+    @Test
+    public void bothMirrorTilesUseStableBlockSizedRenderBounds() {
+        BlockPos pos = new BlockPos(4, 70, -9);
+        AxisAlignedBB expected = new AxisAlignedBB(pos, pos.add(1, 1, 1));
+        TileMirror itemMirror = new TileMirror();
+        TileMirrorEssentia essentiaMirror = new TileMirrorEssentia();
+        itemMirror.setPos(pos);
+        essentiaMirror.setPos(pos);
+
+        assertEquals(expected, itemMirror.getRenderBoundingBox());
+        assertEquals(expected, essentiaMirror.getRenderBoundingBox());
     }
 
     private static String readFile(String path) throws IOException {
