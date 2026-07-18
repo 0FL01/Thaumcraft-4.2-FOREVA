@@ -52,6 +52,20 @@ public class CrystalTesrRoutingContractTest {
                         && itemRenderer.contains("private static final class InventoryTileCrystal extends TileCrystal")
                         && itemRenderer.contains("public int getBlockMetadata()"));
 
+        int primalBranch = itemRenderer.indexOf("if (meta <= 6)");
+        int matrixPush = itemRenderer.indexOf("GlStateManager.pushMatrix();", primalBranch);
+        int restoreOrigin = itemRenderer.indexOf("restoreLegacyInventoryOrigin();", primalBranch);
+        int perspectiveBranch = itemRenderer.indexOf("if (isFirstPerson(transformType))", primalBranch);
+        int matrixPop = itemRenderer.indexOf("GlStateManager.popMatrix();", perspectiveBranch);
+        assertTrue("Primal crystal items should cancel Forge 1.12's TEISR offset before applying the original TC4 inventory transform in every item context",
+                primalBranch >= 0
+                        && primalBranch < matrixPush
+                        && matrixPush < restoreOrigin
+                        && restoreOrigin < perspectiveBranch
+                        && perspectiveBranch < matrixPop
+                        && itemRenderer.contains("private static void restoreLegacyInventoryOrigin()")
+                        && itemRenderer.contains("GlStateManager.translate(0.5F, 0.5F, 0.5F);"));
+
         assertTrue("TileCrystalRenderer should expose a centered item-cluster path that omits world orientation anchoring",
                 tileRenderer.contains("public void renderItemCluster(int metadata)")
                         && tileRenderer.contains("drawItemCrystal(")

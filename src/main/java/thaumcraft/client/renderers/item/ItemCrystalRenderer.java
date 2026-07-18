@@ -32,17 +32,21 @@ public class ItemCrystalRenderer extends TileEntityItemStackRenderer {
         try {
             int meta = stack.getMetadata();
             if (meta <= 6) {
-                if (isFirstPerson(transformType)) {
-                    TileCrystal crystal = new InventoryTileCrystal(meta);
-                    crystalRenderer.setRendererDispatcher(TileEntityRendererDispatcher.instance);
-                    GlStateManager.pushMatrix();
-                    GlStateManager.rotate(90.0F, 0.0F, 1.0F, 0.0F);
-                    GlStateManager.translate(-0.5F, -0.5F, -0.5F);
-                    crystalRenderer.render(crystal, 0.0D, 0.0D, 0.0D, partialTicks, 0, 1.0F);
+                GlStateManager.pushMatrix();
+                try {
+                    restoreLegacyInventoryOrigin();
+                    if (isFirstPerson(transformType)) {
+                        TileCrystal crystal = new InventoryTileCrystal(meta);
+                        crystalRenderer.setRendererDispatcher(TileEntityRendererDispatcher.instance);
+                        GlStateManager.rotate(90.0F, 0.0F, 1.0F, 0.0F);
+                        GlStateManager.translate(-0.5F, -0.5F, -0.5F);
+                        crystalRenderer.render(crystal, 0.0D, 0.0D, 0.0D, partialTicks, 0, 1.0F);
+                    } else {
+                        crystalRenderer.setRendererDispatcher(TileEntityRendererDispatcher.instance);
+                        crystalRenderer.renderItemCluster(meta);
+                    }
+                } finally {
                     GlStateManager.popMatrix();
-                } else {
-                    crystalRenderer.setRendererDispatcher(TileEntityRendererDispatcher.instance);
-                    crystalRenderer.renderItemCluster(meta);
                 }
                 return;
             }
@@ -58,6 +62,11 @@ public class ItemCrystalRenderer extends TileEntityItemStackRenderer {
         } finally {
             setTransformType(ItemCameraTransforms.TransformType.NONE);
         }
+    }
+
+    private static void restoreLegacyInventoryOrigin() {
+        // Forge 1.12 enters TEISR at -0.5 on every axis; TC4's inventory renderer did not.
+        GlStateManager.translate(0.5F, 0.5F, 0.5F);
     }
 
     private static boolean isFirstPerson(ItemCameraTransforms.TransformType transformType) {
