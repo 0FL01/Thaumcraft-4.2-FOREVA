@@ -1,7 +1,10 @@
 package thaumcraft.common.blocks.ItemBlocks;
 
+import java.util.List;
+import javax.annotation.Nullable;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -10,6 +13,7 @@ import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.world.World;
 import thaumcraft.common.config.ConfigBlocks;
 import thaumcraft.common.tiles.TileMirror;
@@ -18,6 +22,31 @@ import thaumcraft.common.tiles.TileMirrorEssentia;
 public class BlockMirrorItem extends BlockMetadataItem {
     public BlockMirrorItem(Block block) {
         super(block);
+    }
+
+    @Override
+    public String getTranslationKey(ItemStack stack) {
+        int meta = stack.getItemDamage() < 6 ? 0 : 6;
+        return super.getTranslationKey() + "." + meta;
+    }
+
+    @Override
+    public void addInformation(ItemStack stack, @Nullable World worldIn, List<String> tooltip, ITooltipFlag flagIn) {
+        NBTTagCompound tag = stack.getTagCompound();
+        if (tag != null
+                && tag.hasKey("linkX")
+                && tag.hasKey("linkY")
+                && tag.hasKey("linkZ")
+                && tag.hasKey("linkDim")
+                && tag.hasKey("dimname")) {
+            int x = tag.getInteger("linkX");
+            int y = tag.getInteger("linkY");
+            int z = tag.getInteger("linkZ");
+            String dimName = tag.getString("dimname");
+            tooltip.add(new TextComponentTranslation("tc.handmirrorlinkedto").getFormattedText()
+                    + " " + x + "," + y + "," + z + " in " + dimName);
+        }
+        super.addInformation(stack, worldIn, tooltip, flagIn);
     }
 
     @Override

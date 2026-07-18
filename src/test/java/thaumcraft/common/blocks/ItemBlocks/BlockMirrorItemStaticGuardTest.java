@@ -35,6 +35,18 @@ public class BlockMirrorItemStaticGuardTest {
         assertTrue(source.contains("else if (tile instanceof TileMirrorEssentia)"));
     }
 
+    @Test
+    public void linkedMirrorItemsShouldKeepTheirVariantNameAndDestinationTooltip() throws IOException {
+        String source = readFile("src/main/java/thaumcraft/common/blocks/ItemBlocks/BlockMirrorItem.java");
+
+        assertTrue(source.contains("public String getTranslationKey(ItemStack stack)"));
+        assertTrue(source.contains("stack.getItemDamage() < 6 ? 0 : 6"));
+        assertTrue(source.contains("return super.getTranslationKey() + \".\" + meta;"));
+        assertTrue(source.contains("public void addInformation(ItemStack stack"));
+        assertTrue(source.contains("new TextComponentTranslation(\"tc.handmirrorlinkedto\").getFormattedText()"));
+        assertTrue(source.contains("+ \" \" + x + \",\" + y + \",\" + z + \" in \" + dimName"));
+    }
+
     private static String readFile(String path) throws IOException {
         return new String(Files.readAllBytes(Paths.get(path)), StandardCharsets.UTF_8);
     }
