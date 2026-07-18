@@ -25,6 +25,21 @@ public class BlockBreakingFlowStaticGuardTest {
     }
 
     @Test
+    public void fakePlayerHarvestPostsBreakEventWithoutUsingPlayerConnection() throws IOException {
+        String source = read("src/main/java/thaumcraft/common/lib/utils/BlockUtils.java");
+        int fakePlayerBranch = source.indexOf("if (serverPlayer instanceof FakePlayer)");
+        int breakEvent = source.indexOf("new BlockEvent.BreakEvent(world, pos, state, serverPlayer)", fakePlayerBranch);
+        int eventPost = source.indexOf("MinecraftForge.EVENT_BUS.post(event);", breakEvent);
+        int realPlayerHook = source.indexOf("ForgeHooks.onBlockBreakEvent", eventPost);
+
+        assertTrue("Connectionless Forge FakePlayer must use BreakEvent directly before the real-player packet hook",
+                fakePlayerBranch >= 0 && breakEvent > fakePlayerBranch && eventPost > breakEvent
+                        && realPlayerHook > eventPost);
+        assertTrue("Canceled fake-player breaks must remain denied",
+                source.contains("xp = event.isCanceled() ? -1 : event.getExpToDrop();"));
+    }
+
+    @Test
     public void golemHarvestersRestoreTimedCracksAndCentralHarvest() throws IOException {
         String logs = read("src/main/java/thaumcraft/common/entities/ai/interact/AIHarvestLogs.java");
         String crops = read("src/main/java/thaumcraft/common/entities/ai/interact/AIHarvestCrops.java");
@@ -36,6 +51,27 @@ public class BlockBreakingFlowStaticGuardTest {
                 && crops.contains("BlockUtils.harvestBlock"));
         assertFalse(logs.contains("while (broken < 20"));
         assertFalse(crops.contains("world.setBlockToAir(targetPos)"));
+    }
+
+    @Test
+    public void chopKeepsTc4TrunkBaseTargetAcrossTopDownBreaks() throws IOException {
+        String source = read("src/main/java/thaumcraft/common/entities/ai/interact/AIHarvestLogs.java");
+        assertTrue(source.contains("this.distance = MathHelper.floor(golem.getRange() / 3.0F);"));
+        assertTrue(source.contains("attempt < this.distance * 4"));
+        assertTrue(source.contains("BlockPos below = pos.down();")
+                && source.contains("below.getY() + 0.5D")
+                && source.contains("< targetDistance"));
+        assertTrue(source.contains("state.getBlock() == this.targetBlock")
+                && source.contains("state.getBlock().getMetaFromState(state) == this.targetMeta"));
+
+        int harvest = source.indexOf("this.harvest();");
+        int rootStillWood = source.indexOf("if (Utils.isWoodLog(theGolem.world, this.targetPos))", harvest);
+        int restartAtRoot = source.indexOf("this.startExecuting();", rootStillWood);
+        int adjacent = source.indexOf("this.checkAdjacent();", restartAtRoot);
+        assertTrue("TC4 Chop must keep working from the trunk base while upper connected logs remain",
+                harvest >= 0 && rootStillWood > harvest && restartAtRoot > rootStillWood && adjacent > restartAtRoot);
+        assertTrue(source.contains("private void checkAdjacent()"));
+        assertFalse("A top-down break must not discard the trunk-base target", source.contains("this.targetPos = null;"));
     }
 
     @Test

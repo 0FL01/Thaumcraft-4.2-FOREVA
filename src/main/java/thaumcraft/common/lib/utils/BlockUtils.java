@@ -15,7 +15,10 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.ForgeHooks;
+import net.minecraftforge.common.util.FakePlayer;
+import net.minecraftforge.event.world.BlockEvent;
 
 import javax.annotation.Nullable;
 
@@ -108,7 +111,13 @@ public class BlockUtils {
         int xp = 0;
         if (player instanceof EntityPlayerMP) {
             EntityPlayerMP serverPlayer = (EntityPlayerMP) player;
-            xp = ForgeHooks.onBlockBreakEvent(world, serverPlayer.interactionManager.getGameType(), serverPlayer, pos);
+            if (serverPlayer instanceof FakePlayer) {
+                BlockEvent.BreakEvent event = new BlockEvent.BreakEvent(world, pos, state, serverPlayer);
+                MinecraftForge.EVENT_BUS.post(event);
+                xp = event.isCanceled() ? -1 : event.getExpToDrop();
+            } else {
+                xp = ForgeHooks.onBlockBreakEvent(world, serverPlayer.interactionManager.getGameType(), serverPlayer, pos);
+            }
             if (xp < 0) return false;
         }
 
