@@ -1,5 +1,8 @@
 package thaumcraft.common.items.armor;
 
+import java.util.List;
+import javax.annotation.Nullable;
+import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
@@ -8,6 +11,11 @@ import net.minecraft.init.Items;
 import net.minecraft.item.EnumRarity;
 import net.minecraft.item.ItemArmor;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.text.TextFormatting;
+import net.minecraft.util.text.translation.I18n;
+import net.minecraft.world.World;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import thaumcraft.api.IGoggles;
 import thaumcraft.api.IRepairable;
 import thaumcraft.api.IRunicArmor;
@@ -42,6 +50,13 @@ public class ItemGoggles extends ItemArmor implements IRepairable, IVisDiscountG
     @Override
     public int getVisDiscount(ItemStack stack, EntityPlayer player, Aspect aspect) {
         return 5;
+    }
+
+    @SideOnly(Side.CLIENT)
+    @Override
+    public void addInformation(ItemStack stack, @Nullable World worldIn, List<String> tooltip, ITooltipFlag flagIn) {
+        super.addInformation(stack, worldIn, tooltip, flagIn);
+        tooltip.add(TextFormatting.DARK_PURPLE + I18n.translateToLocal("tc.visdiscount") + ": " + this.getVisDiscount(stack, null, null) + "%");
     }
 
     @Override

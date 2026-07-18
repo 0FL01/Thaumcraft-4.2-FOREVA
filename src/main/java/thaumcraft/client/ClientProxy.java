@@ -28,6 +28,7 @@ import net.minecraft.init.Items;
 import net.minecraft.init.SoundEvents;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemArmor;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
@@ -726,6 +727,14 @@ public class ClientProxy extends CommonProxy {
                         item
                 );
             }
+        }
+        if (ConfigItems.itemChestRobe != null && ConfigItems.itemLegsRobe != null && ConfigItems.itemBootsRobe != null) {
+            minecraft.getItemColors().registerItemColorHandler(
+                    (stack, tintIndex) -> tintIndex == 0 ? ((ItemArmor) stack.getItem()).getColor(stack) : -1,
+                    ConfigItems.itemChestRobe,
+                    ConfigItems.itemLegsRobe,
+                    ConfigItems.itemBootsRobe
+            );
         }
         if (ConfigItems.itemResearchNotes != null) {
             Minecraft.getMinecraft().getItemColors().registerItemColorHandler(

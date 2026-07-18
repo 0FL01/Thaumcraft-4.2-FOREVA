@@ -22,7 +22,8 @@ public class ItemArmorRepairRarityStaticGuardTest {
                         && thaumium.contains("repair.isItemEqual(thaumiumIngot)"));
         assertTrue("ItemGoggles must keep rare rarity and leather repair contract",
                 goggles.contains("return EnumRarity.RARE;")
-                        && goggles.contains("repair.getItem() == Items.LEATHER"));
+                        && goggles.contains("repair.getItem() == Items.LEATHER")
+                        && goggles.contains("I18n.translateToLocal(\"tc.visdiscount\")"));
     }
 
     private static String readFile(String path) throws IOException {

@@ -1,7 +1,10 @@
 package thaumcraft.common.items.armor;
 
+import java.util.List;
+import javax.annotation.Nullable;
 import net.minecraft.block.BlockCauldron;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
@@ -14,7 +17,11 @@ import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.text.TextFormatting;
+import net.minecraft.util.text.translation.I18n;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import thaumcraft.api.IRepairable;
 import thaumcraft.api.IRunicArmor;
 import thaumcraft.api.IVisDiscountGear;
@@ -58,6 +65,12 @@ public class ItemRobeArmor extends ItemArmor implements IRepairable, IRunicArmor
     @Override
     public int getVisDiscount(ItemStack stack, EntityPlayer player, Aspect aspect) {
         return this.armorType == EntityEquipmentSlot.FEET ? 1 : 2;
+    }
+
+    @SideOnly(Side.CLIENT)
+    @Override
+    public void addInformation(ItemStack stack, @Nullable World worldIn, List<String> tooltip, ITooltipFlag flagIn) {
+        tooltip.add(TextFormatting.DARK_PURPLE + I18n.translateToLocal("tc.visdiscount") + ": " + this.getVisDiscount(stack, null, null) + "%");
     }
 
     @Override

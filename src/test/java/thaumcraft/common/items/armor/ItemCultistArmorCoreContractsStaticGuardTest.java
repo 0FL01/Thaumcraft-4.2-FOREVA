@@ -24,6 +24,7 @@ public class ItemCultistArmorCoreContractsStaticGuardTest {
                         && robe.contains("repair.getItem() == Items.LEATHER")
                         && robe.contains("return 1;")
                         && robe.contains("getVisDiscount(")
+                        && robe.contains("I18n.translateToLocal(\"tc.visdiscount\")")
                         && robe.contains("getWarp("));
         assertTrue("ItemCultistPlateArmor must keep uncommon rarity + leather repair contracts",
                 plate.contains("return EnumRarity.UNCOMMON;")
@@ -37,6 +38,7 @@ public class ItemCultistArmorCoreContractsStaticGuardTest {
                         && boots.contains("repair.getItem() == Items.LEATHER")
                         && boots.contains("getWarp(")
                         && boots.contains("getVisDiscount(")
+                        && boots.contains("I18n.translateToLocal(\"tc.visdiscount\")")
                         && boots.contains("return 1;"));
     }
 

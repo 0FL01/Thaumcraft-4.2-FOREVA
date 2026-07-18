@@ -1,6 +1,7 @@
 {
   "parent": "item/generated",
   "textures": {
-    "layer0": "thaumcraft:items/clothchest"
+    "layer0": "thaumcraft:items/clothchest",
+    "layer1": "thaumcraft:items/clothchestover"
   }
 }
