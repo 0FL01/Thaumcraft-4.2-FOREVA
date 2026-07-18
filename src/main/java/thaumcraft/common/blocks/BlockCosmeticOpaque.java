@@ -8,8 +8,13 @@ import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.particle.ParticleManager;
 import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Items;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
@@ -18,6 +23,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.IBlockAccess;
+import net.minecraft.world.Explosion;
 import net.minecraft.world.World;
 import net.minecraftforge.common.property.ExtendedBlockState;
 import net.minecraftforge.common.property.IExtendedBlockState;
@@ -25,11 +31,14 @@ import net.minecraftforge.common.property.IUnlistedProperty;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import thaumcraft.common.Thaumcraft;
+import thaumcraft.common.config.Config;
 import thaumcraft.common.config.ConfigBlocks;
 import thaumcraft.common.lib.utils.ConnectedTextureUtils;
+import thaumcraft.common.tiles.TileOwned;
 
 import net.minecraft.block.properties.PropertyInteger;
 
+import java.util.Random;
 import java.util.function.Predicate;
 
 public class BlockCosmeticOpaque extends Block {
@@ -91,6 +100,26 @@ public class BlockCosmeticOpaque extends Block {
     }
 
     @Override
+    public boolean hasTileEntity(IBlockState state) {
+        return state.getValue(TYPE) == 2;
+    }
+
+    @Override
+    public TileEntity createTileEntity(World world, IBlockState state) {
+        return state.getValue(TYPE) == 2 ? new TileOwned() : null;
+    }
+
+    @Override
+    public void onBlockPlacedBy(World world, BlockPos pos, IBlockState state, EntityLivingBase placer, ItemStack stack) {
+        super.onBlockPlacedBy(world, pos, state, placer, stack);
+        TileEntity tile = world.getTileEntity(pos);
+        if (tile instanceof TileOwned && placer instanceof EntityPlayer) {
+            ((TileOwned) tile).owner = placer.getName();
+            tile.markDirty();
+        }
+    }
+
+    @Override
     @SideOnly(Side.CLIENT)
     public boolean addHitEffects(IBlockState state, World world, RayTraceResult target, ParticleManager manager) {
         if (this.getMetaFromState(world.getBlockState(target.getBlockPos())) == 2) {
@@ -121,6 +150,39 @@ public class BlockCosmeticOpaque extends Block {
     @Override
     public int damageDropped(IBlockState state) {
         return this.getMetaFromState(state);
+    }
+
+    @Override
+    public Item getItemDropped(IBlockState state, Random rand, int fortune) {
+        return state.getValue(TYPE) == 2 && Config.wardedStone ? Items.AIR : super.getItemDropped(state, rand, fortune);
+    }
+
+    @Override
+    public float getBlockHardness(IBlockState state, World world, BlockPos pos) {
+        if (state.getValue(TYPE) == 2) {
+            return Config.wardedStone ? -1.0F : 5.0F;
+        }
+        return super.getBlockHardness(state, world, pos);
+    }
+
+    @Override
+    public float getExplosionResistance(World world, BlockPos pos, Entity exploder, Explosion explosion) {
+        if (world.getBlockState(pos).getValue(TYPE) == 2) {
+            return 999.0F;
+        }
+        return super.getExplosionResistance(world, pos, exploder, explosion);
+    }
+
+    @Override
+    public boolean canEntityDestroy(IBlockState state, IBlockAccess world, BlockPos pos, Entity entity) {
+        return state.getValue(TYPE) != 2 && super.canEntityDestroy(state, world, pos, entity);
+    }
+
+    @Override
+    public void onBlockExploded(World world, BlockPos pos, Explosion explosion) {
+        if (world.getBlockState(pos).getValue(TYPE) != 2) {
+            super.onBlockExploded(world, pos, explosion);
+        }
     }
 
     @Override

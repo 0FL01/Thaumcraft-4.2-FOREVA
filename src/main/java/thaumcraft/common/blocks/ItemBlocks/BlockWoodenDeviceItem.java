@@ -16,7 +16,6 @@ import thaumcraft.common.tiles.TileArcaneBore;
 import thaumcraft.common.tiles.TileArcaneBoreBase;
 import thaumcraft.common.tiles.TileBanner;
 import thaumcraft.common.tiles.TileBellows;
-import thaumcraft.common.tiles.TileOwned;
 
 public class BlockWoodenDeviceItem extends BlockMetadataItem {
     public BlockWoodenDeviceItem(Block block) {
@@ -39,10 +38,6 @@ public class BlockWoodenDeviceItem extends BlockMetadataItem {
 
         TileEntity tile = world.getTileEntity(pos);
         int metadata = stack.getItemDamage();
-        if (tile instanceof TileOwned && player != null && (((TileOwned) tile).owner == null || ((TileOwned) tile).owner.isEmpty())) {
-            ((TileOwned) tile).owner = player.getName();
-            tile.markDirty();
-        }
         if (metadata == 0 && tile instanceof TileBellows) {
             EnumFacing out = side.getOpposite();
             TileBellows bellows = (TileBellows) tile;

@@ -1,14 +1,22 @@
 package thaumcraft.common.tiles;
 
 import java.util.ArrayList;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
 import thaumcraft.api.TileThaumcraft;
 
 public class TileOwned extends TileThaumcraft {
     public String owner = "";
     public ArrayList<String> accessList = new ArrayList<>();
     public boolean safeToRemove = false;
+
+    @Override
+    public boolean shouldRefresh(World world, BlockPos pos, IBlockState oldState, IBlockState newState) {
+        return oldState.getBlock() != newState.getBlock();
+    }
 
     @Override
     public void readFromNBT(NBTTagCompound compound) {
