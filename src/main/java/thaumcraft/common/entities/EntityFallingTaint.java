@@ -8,6 +8,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.MoverType;
 import net.minecraft.init.Blocks;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
@@ -137,15 +138,17 @@ public class EntityFallingTaint extends Entity implements IEntityAdditionalSpawn
                 IBlockState landState = this.world.getBlockState(landPos);
                 Block landBlock = landState.getBlock();
 
-                // Don't replace certain blocks
-                if (landBlock == Blocks.SNOW_LAYER || landBlock == Blocks.TALLGRASS || landBlock == Blocks.DEADBUSH) {
-                    this.setDead();
+                this.motionX *= 0.7D;
+                this.motionZ *= 0.7D;
+                this.motionY *= -0.5D;
+                if (landBlock == Blocks.PISTON || landBlock == Blocks.PISTON_EXTENSION || landBlock == Blocks.PISTON_HEAD) {
                     return;
                 }
 
                 this.world.playSound(null, this.posX, this.posY, this.posZ,
                     TCSounds.GORE, this.getSoundCategory(), 0.5F,
                     ((this.rand.nextFloat() - this.rand.nextFloat()) * 0.2F + 1.0F) * 0.8F);
+                this.setDead();
 
                 // Try to place the taint block
                 BlockPos targetPos = new BlockPos(i, j, k);
@@ -155,7 +158,6 @@ public class EntityFallingTaint extends Entity implements IEntityAdditionalSpawn
                         BlockTaint.onFinishFalling(this.world, targetPos, newState);
                     }
                 }
-                this.setDead();
             } else {
                 // Despawn if taking too long or out of world
                 if ((this.fallTime > 100 && (j < 1 || j > 256)) || this.fallTime > 600) {
@@ -177,7 +179,7 @@ public class EntityFallingTaint extends Entity implements IEntityAdditionalSpawn
         Block existing = state.getBlock();
         return existing == ConfigBlocks.blockTaintFibres
             || existing == ConfigBlocks.blockFluxGoo
-            || this.block.canPlaceBlockAt(this.world, pos);
+            || this.world.mayPlace(this.block, pos, true, EnumFacing.UP, null);
     }
 
     // ------------------------------------------------------------------

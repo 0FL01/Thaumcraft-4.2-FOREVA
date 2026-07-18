@@ -5,6 +5,7 @@ import net.minecraft.entity.EnumCreatureType;
 import net.minecraft.entity.passive.EntityVillager;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.biome.Biome;
+import net.minecraft.world.biome.BiomeProvider;
 import net.minecraftforge.common.BiomeDictionary;
 import net.minecraftforge.fml.common.event.FMLInterModComms;
 import net.minecraftforge.fml.common.registry.EntityEntry;
@@ -18,7 +19,6 @@ import thaumcraft.common.entities.monster.*;
 import thaumcraft.common.entities.monster.boss.*;
 import thaumcraft.common.entities.projectile.*;
 import thaumcraft.common.lib.world.ThaumcraftVillagerTrades;
-import thaumcraft.common.lib.world.ThaumcraftWorldGenerator;
 
 import java.util.Calendar;
 import java.util.ArrayList;
@@ -187,8 +187,8 @@ public class ConfigEntities {
         entitySpawnsInitialized = true;
         if (Config.spawnAngryZombie) {
             addSpawn(EntityBrainyZombie.class, 10, 1, 1, EnumCreatureType.MONSTER,
-                    biome -> biome != ThaumcraftWorldGenerator.biomeEldritchLands
-                            && !biome.getSpawnableList(EnumCreatureType.MONSTER).isEmpty());
+                    BiomeProvider.allowedBiomes,
+                    biome -> !biome.getSpawnableList(EnumCreatureType.MONSTER).isEmpty());
         }
         if (Config.spawnPech) {
             addSpawn(EntityPech.class, 10, 1, 1, EnumCreatureType.MONSTER,
@@ -218,8 +218,13 @@ public class ConfigEntities {
     }
 
     private static void addSpawn(Class<? extends EntityLiving> entityClass, int weight, int min, int max,
-                                 EnumCreatureType creatureType, Predicate<Biome> filter) {
-        for (Biome biome : ForgeRegistries.BIOMES.getValuesCollection()) {
+                                  EnumCreatureType creatureType, Predicate<Biome> filter) {
+        addSpawn(entityClass, weight, min, max, creatureType, ForgeRegistries.BIOMES.getValuesCollection(), filter);
+    }
+
+    private static void addSpawn(Class<? extends EntityLiving> entityClass, int weight, int min, int max,
+                                 EnumCreatureType creatureType, Iterable<Biome> biomes, Predicate<Biome> filter) {
+        for (Biome biome : biomes) {
             if (biome != null && filter.test(biome)) {
                 List<Biome.SpawnListEntry> spawns = biome.getSpawnableList(creatureType);
                 if (!hasSpawnEntry(spawns, entityClass)) {

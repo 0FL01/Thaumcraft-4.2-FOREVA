@@ -70,14 +70,13 @@ public class BlockTaintFibres extends Block {
     public void updateTick(World world, BlockPos pos, IBlockState state, Random rand) {
         if (world.isRemote) return;
         int meta = this.getMetaFromState(state);
+        taintBiomeSpread(world, pos, rand, this);
         if (!isTaintBiome(world, pos)
-                || !BlockUtils.isAdjacentToSolidBlock(world, pos)
                 || meta == 0 && isOnlyAdjacentToTaint(world, pos)) {
             world.setBlockToAir(pos);
             return;
         }
 
-        taintBiomeSpread(world, pos, rand, this);
         BlockPos target = pos.add(rand.nextInt(3) - 1, rand.nextInt(5) - 3, rand.nextInt(3) - 1);
         if (isTaintBiome(world, target)) {
             if (!spreadFibres(world, target)) {

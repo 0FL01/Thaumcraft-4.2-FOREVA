@@ -1,8 +1,8 @@
 package thaumcraft.common.blocks;
 
 import net.minecraft.block.Block;
-import net.minecraft.block.BlockFalling;
 import net.minecraft.block.SoundType;
+import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.PropertyInteger;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
@@ -22,14 +22,13 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
-import net.minecraft.world.biome.Biome;
 import thaumcraft.common.Thaumcraft;
 import thaumcraft.common.config.Config;
 import thaumcraft.common.config.ConfigBlocks;
+import thaumcraft.common.entities.EntityFallingTaint;
 import thaumcraft.common.entities.monster.EntityTaintSporeSwarmer;
 import thaumcraft.common.lib.TCSounds;
 import thaumcraft.common.lib.utils.Utils;
-import thaumcraft.common.lib.world.ThaumcraftWorldGenerator;
 
 import java.util.Random;
 
@@ -54,30 +53,45 @@ public class BlockTaint extends Block {
         int meta = this.getMetaFromState(state);
         if (meta == 2) return;
 
-        if (isTaintBiome(world, pos)) {
-            BlockTaintFibres.taintBiomeSpread(world, pos, rand, this);
-            BlockPos target = pos.add(rand.nextInt(3) - 1, rand.nextInt(5) - 3, rand.nextInt(3) - 1);
-            if (BlockTaintFibres.isTaintBiome(world, target)) {
-                if (!BlockTaintFibres.spreadFibres(world, target)) {
-                    int adjacent = BlockTaintFibres.getAdjacentTaint(world, target);
-                    IBlockState targetState = world.getBlockState(target);
-                    Block targetBlock = targetState.getBlock();
-                    if (adjacent >= 2 && (Utils.isWoodLog(world, target) || targetBlock.isLeaves(targetState, world, target))) {
-                        world.setBlockState(target, ConfigBlocks.blockTaint.getStateFromMeta(0), 3);
-                        world.addBlockEvent(target, ConfigBlocks.blockTaint, 1, 0);
-                    } else if (adjacent >= 3 && isTaintSoilTarget(targetBlock)) {
-                        world.setBlockState(target, ConfigBlocks.blockTaint.getStateFromMeta(1), 3);
-                        world.addBlockEvent(target, ConfigBlocks.blockTaint, 1, 0);
+        BlockTaintFibres.taintBiomeSpread(world, pos, rand, this);
+        if (meta == 0) {
+            if (this.tryToFall(world, pos, pos)) {
+                return;
+            }
+            if (world.isAirBlock(pos.up())) {
+                EnumFacing direction = EnumFacing.HORIZONTALS[rand.nextInt(EnumFacing.HORIZONTALS.length)];
+                boolean canCascade = true;
+                for (int depth = 0; depth < 4; depth++) {
+                    if (!world.isAirBlock(pos.offset(direction).down(depth))
+                            || world.getBlockState(pos.down(depth)).getBlock() != this) {
+                        canCascade = false;
+                        break;
                     }
                 }
-                if (meta == 0 && !handleTaintSporeSwarmerSpawn(world, pos, rand)) {
-                    convertSurroundedTaintToFlux(world, pos);
+                if (canCascade && this.tryToFall(world, pos, pos.offset(direction))) {
+                    return;
                 }
             }
-            return;
         }
 
-        if (meta == 0 && ConfigBlocks.blockFluxGoo != null && rand.nextInt(20) == 0) {
+        BlockPos target = pos.add(rand.nextInt(3) - 1, rand.nextInt(5) - 3, rand.nextInt(3) - 1);
+        if (BlockTaintFibres.isTaintBiome(world, target)) {
+            if (!BlockTaintFibres.spreadFibres(world, target)) {
+                int adjacent = BlockTaintFibres.getAdjacentTaint(world, target);
+                IBlockState targetState = world.getBlockState(target);
+                Block targetBlock = targetState.getBlock();
+                if (adjacent >= 2 && (Utils.isWoodLog(world, target) || targetBlock.isLeaves(targetState, world, target))) {
+                    world.setBlockState(target, ConfigBlocks.blockTaint.getStateFromMeta(0), 3);
+                    world.addBlockEvent(target, ConfigBlocks.blockTaint, 1, 0);
+                } else if (adjacent >= 3 && isTaintSoilTarget(targetBlock)) {
+                    world.setBlockState(target, ConfigBlocks.blockTaint.getStateFromMeta(1), 3);
+                    world.addBlockEvent(target, ConfigBlocks.blockTaint, 1, 0);
+                }
+            }
+            if (meta == 0 && !handleTaintSporeSwarmerSpawn(world, pos, rand)) {
+                convertSurroundedTaintToFlux(world, pos);
+            }
+        } else if (meta == 0 && ConfigBlocks.blockFluxGoo != null && rand.nextInt(20) == 0) {
             world.setBlockState(pos, ConfigBlocks.blockFluxGoo.getStateFromMeta(ConfigBlocks.blockFluxGoo.getQuanta()), 3);
         } else if (meta == 1 && rand.nextInt(10) == 0) {
             world.setBlockState(pos, Blocks.DIRT.getDefaultState(), 3);
@@ -120,14 +134,6 @@ public class BlockTaint extends Block {
                 || block == Blocks.SAND
                 || block == Blocks.GRAVEL
                 || block == Blocks.CLAY;
-    }
-
-    private static boolean isTaintBiome(World world, BlockPos pos) {
-        Biome biome = world.getBiome(pos);
-        return Biome.getIdForBiome(biome) == Config.biomeTaintID
-                || biome == ThaumcraftWorldGenerator.biomeTaint
-                || biome != null && ThaumcraftWorldGenerator.biomeTaint != null
-                && Biome.getIdForBiome(biome) == Biome.getIdForBiome(ThaumcraftWorldGenerator.biomeTaint);
     }
 
     @Override
@@ -199,7 +205,6 @@ public class BlockTaint extends Block {
      */
     public static boolean canFallBelow(World world, BlockPos pos) {
         IBlockState state = world.getBlockState(pos);
-        // Check if surrounded by wood logs (support)
         for (int xx = -1; xx <= 1; xx++) {
             for (int zz = -1; zz <= 1; zz++) {
                 for (int yy = -1; yy <= 1; yy++) {
@@ -209,9 +214,50 @@ public class BlockTaint extends Block {
                 }
             }
         }
-        return state.getBlock().isAir(state, world, pos)
-            || BlockFalling.canFallThrough(state)
-            || state.getBlock().isReplaceable(world, pos);
+        Block block = state.getBlock();
+        if (block.isAir(state, world, pos)) {
+            return true;
+        }
+        if (block == ConfigBlocks.blockFluxGoo && block.getMetaFromState(state) >= 4) {
+            return false;
+        }
+        if (block == Blocks.FIRE || block == ConfigBlocks.blockTaintFibres || block.isReplaceable(world, pos)) {
+            return true;
+        }
+        Material material = state.getMaterial();
+        return material == Material.WATER || material == Material.LAVA;
+    }
+
+    private boolean tryToFall(World world, BlockPos source, BlockPos destination) {
+        if (destination.getY() < 0 || !canFallBelow(world, destination.down())) {
+            return false;
+        }
+
+        int radius = 32;
+        if (world.isAreaLoaded(destination.add(-radius, -radius, -radius),
+                destination.add(radius, radius, radius), false)) {
+            int meta = this.getMetaFromState(world.getBlockState(source));
+            EntityFallingTaint fallingTaint = new EntityFallingTaint(world,
+                    destination.getX() + 0.5D, destination.getY() + 0.5D, destination.getZ() + 0.5D,
+                    this, meta, source.getX(), source.getY(), source.getZ());
+            this.onStartFalling(fallingTaint);
+            world.spawnEntity(fallingTaint);
+            return true;
+        }
+
+        IBlockState sourceState = world.getBlockState(source);
+        world.setBlockToAir(source);
+        BlockPos landing = destination;
+        while (landing.getY() > 0 && canFallBelow(world, landing.down())) {
+            landing = landing.down();
+        }
+        if (landing.getY() > 0) {
+            world.setBlockState(source, sourceState, 3);
+        }
+        return false;
+    }
+
+    protected void onStartFalling(EntityFallingTaint fallingTaint) {
     }
 
     /**

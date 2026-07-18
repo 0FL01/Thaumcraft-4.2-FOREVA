@@ -15,6 +15,8 @@ public class TaintEcologySpawnParityStaticGuardTest {
     public void taintBiomeAndBlockSpawnsStayOnTc4EcologyRoutes() throws IOException {
         String taint = read("src/main/java/thaumcraft/common/blocks/BlockTaint.java");
         String fibres = read("src/main/java/thaumcraft/common/blocks/BlockTaintFibres.java");
+        String fallingTaint = read("src/main/java/thaumcraft/common/entities/EntityFallingTaint.java");
+        String configEntities = read("src/main/java/thaumcraft/common/config/ConfigEntities.java");
         String biomeTaint = read("src/main/java/thaumcraft/common/lib/world/biomes/BiomeTaint.java");
         String magicalForest = read("src/main/java/thaumcraft/common/lib/world/biomes/BiomeMagicalForest.java");
         String taintacle = read("src/main/java/thaumcraft/common/entities/monster/EntityTaintacle.java");
@@ -45,6 +47,10 @@ public class TaintEcologySpawnParityStaticGuardTest {
                         && magicalForest.contains("new Biome.SpawnListEntry(EntityPech.class, 10, 1, 2)")
                         && magicalForest.contains("if (Config.spawnWisp)")
                         && magicalForest.contains("new Biome.SpawnListEntry(EntityWisp.class, 10, 1, 2)"));
+        assertTrue("Brainy zombies should only be injected into TC4's vanilla spawn-biome scope",
+                configEntities.contains("BiomeProvider.allowedBiomes,")
+                        && configEntities.contains("biome -> !biome.getSpawnableList(EnumCreatureType.MONSTER).isEmpty()")
+                        && configEntities.contains("Iterable<Biome> biomes"));
 
         assertTrue("Fibrous taint blocks should restore the TC4 spore-swarmer block tick route",
                 taint.contains("private boolean handleTaintSporeSwarmerSpawn(World world, BlockPos pos, Random rand)")
@@ -71,6 +77,26 @@ public class TaintEcologySpawnParityStaticGuardTest {
                         && fibres.contains("adjacent >= 2 && (Utils.isWoodLog(world, target) || targetBlock.isLeaves(targetState, world, target))")
                         && fibres.contains("adjacent >= 3 && isTaintSoilTarget(material)")
                         && fibres.contains("world.addBlockEvent(target, ConfigBlocks.blockTaint, 1, 0)"));
+
+        int crustBiomeSpread = taint.indexOf("BlockTaintFibres.taintBiomeSpread(world, pos, rand, this);");
+        int directFall = taint.indexOf("this.tryToFall(world, pos, pos)", crustBiomeSpread);
+        int crustSpreadTarget = taint.indexOf("BlockPos target = pos.add", directFall);
+        assertTrue("Taint crust ticks should spread the biome, restore falling, then run local ecology like TC4",
+                crustBiomeSpread >= 0 && directFall > crustBiomeSpread && crustSpreadTarget > directFall
+                        && taint.contains("new EntityFallingTaint(world,")
+                        && taint.contains("this.tryToFall(world, pos, pos.offset(direction))")
+                        && taint.contains("block == ConfigBlocks.blockFluxGoo && block.getMetaFromState(state) >= 4"));
+
+        int fibreBiomeSpread = fibres.indexOf("taintBiomeSpread(world, pos, rand, this);");
+        int fibreCleanup = fibres.indexOf("if (!isTaintBiome(world, pos)", fibreBiomeSpread);
+        assertTrue("Taint fibres should attempt TC4 biome spread before invalid fibres are cleaned up",
+                fibreBiomeSpread >= 0 && fibreCleanup > fibreBiomeSpread);
+
+        assertTrue("Falling taint should preserve TC4 landing behavior now that the route is reachable",
+                fallingTaint.contains("this.motionX *= 0.7D;")
+                        && fallingTaint.contains("this.motionY *= -0.5D;")
+                        && fallingTaint.contains("landBlock == Blocks.PISTON || landBlock == Blocks.PISTON_EXTENSION || landBlock == Blocks.PISTON_HEAD")
+                        && fallingTaint.contains("this.world.mayPlace(this.block, pos, true, EnumFacing.UP, null)"));
     }
 
     private static String read(String path) throws IOException {
