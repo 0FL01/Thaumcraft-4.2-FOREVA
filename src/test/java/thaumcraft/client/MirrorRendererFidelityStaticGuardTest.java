@@ -29,6 +29,12 @@ public class MirrorRendererFidelityStaticGuardTest {
                         && source.contains("renderPane(facing, x, y, z, MIRROR_PANE_TRANS")
                         && source.contains("renderPane(facing, x, y, z, MIRROR_PANE"));
 
+        assertTrue("Mirror panes should keep the original visible winding, normals, and alpha blend",
+                source.contains("GlStateManager.enableBlend();")
+                        && source.contains("DefaultVertexFormats.POSITION_TEX_COLOR_NORMAL")
+                        && source.contains(".tex(u1, v0).color(r, g, b, a).normal(0.0F, 0.0F, -1.0F)")
+                        && source.contains("GlStateManager.disableBlend();"));
+
         assertTrue("TileMirrorRenderer should keep mirror frame atlas pass and orientation transform",
                 source.contains("TextureMap.LOCATION_BLOCKS_TEXTURE")
                         && source.contains("blocks/mirrorframe")
@@ -37,6 +43,12 @@ public class MirrorRendererFidelityStaticGuardTest {
 
         assertTrue("Mirror world rendering should remain TESR-only",
                 block.contains("return EnumBlockRenderType.INVISIBLE;"));
+
+        assertTrue("TESR-only mirrors should use their frame sprites for destroy particles",
+                block.contains("public boolean addDestroyEffects(World world, BlockPos pos, ParticleManager manager)")
+                        && block.contains("blocks/mirrorframe2")
+                        && block.contains("particle.setParticleTexture(frame);")
+                        && block.contains("return true;"));
 
         assertTrue("TileMirrorRenderer should render the stable extruded frame after the pane",
                 source.contains("renderFrame(facing, x, y, z, tile instanceof TileMirrorEssentia);")

@@ -64,9 +64,18 @@ public class TileMirrorRenderer extends TileEntitySpecialRenderer<TileEntity> {
     private void renderPane(EnumFacing facing, double x, double y, double z, ResourceLocation tex, float offset) {
         bindTexture(tex);
         GlStateManager.pushMatrix();
-        transformFromOrientation(x, y, z, facing.getIndex(), offset);
-        drawUnitQuad(1.0F, 1.0F, 1.0F, 1.0F);
-        GlStateManager.popMatrix();
+        GlStateManager.enableBlend();
+        GlStateManager.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA,
+                GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
+        GlStateManager.enableRescaleNormal();
+        try {
+            transformFromOrientation(x, y, z, facing.getIndex(), offset);
+            drawUnitQuad(1.0F, 1.0F, 1.0F, 1.0F);
+        } finally {
+            GlStateManager.disableRescaleNormal();
+            GlStateManager.disableBlend();
+            GlStateManager.popMatrix();
+        }
     }
 
     private void renderFrame(EnumFacing facing, double x, double y, double z, boolean essentiaFrame) {
@@ -138,11 +147,11 @@ public class TileMirrorRenderer extends TileEntitySpecialRenderer<TileEntity> {
     private static void drawUnitQuad(float u0, float v0, float u1, float v1, float r, float g, float b, float a) {
         Tessellator tess = Tessellator.getInstance();
         BufferBuilder buf = tess.getBuffer();
-        buf.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX_COLOR);
-        buf.pos(0.0D, 0.0D, 0.0D).tex(u0, v1).color(r, g, b, a).endVertex();
-        buf.pos(1.0D, 0.0D, 0.0D).tex(u1, v1).color(r, g, b, a).endVertex();
-        buf.pos(1.0D, 1.0D, 0.0D).tex(u1, v0).color(r, g, b, a).endVertex();
-        buf.pos(0.0D, 1.0D, 0.0D).tex(u0, v0).color(r, g, b, a).endVertex();
+        buf.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX_COLOR_NORMAL);
+        buf.pos(0.0D, 1.0D, 0.0D).tex(u1, v0).color(r, g, b, a).normal(0.0F, 0.0F, -1.0F).endVertex();
+        buf.pos(1.0D, 1.0D, 0.0D).tex(u0, v0).color(r, g, b, a).normal(0.0F, 0.0F, -1.0F).endVertex();
+        buf.pos(1.0D, 0.0D, 0.0D).tex(u0, v1).color(r, g, b, a).normal(0.0F, 0.0F, -1.0F).endVertex();
+        buf.pos(0.0D, 0.0D, 0.0D).tex(u1, v1).color(r, g, b, a).normal(0.0F, 0.0F, -1.0F).endVertex();
         tess.draw();
     }
 
