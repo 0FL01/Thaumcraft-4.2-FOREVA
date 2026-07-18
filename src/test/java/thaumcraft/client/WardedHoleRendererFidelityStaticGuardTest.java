@@ -19,9 +19,11 @@ public class WardedHoleRendererFidelityStaticGuardTest {
         String nothing = read("src/main/java/thaumcraft/client/renderers/tile/TileEldritchNothingRenderer.java");
         String obelisk = read("src/main/java/thaumcraft/client/renderers/tile/TileEldritchObeliskRenderer.java");
         String helper = read("src/main/java/thaumcraft/client/renderers/tile/LayeredFieldPlaneHelper.java");
+        String connectedTextures = read("src/main/java/thaumcraft/common/lib/utils/ConnectedTextureUtils.java");
 
         assertTrue("TileWardedRenderer should keep warded connected-texture matrix routing",
-                warded.contains("CONNECTED_TEXTURE_REF_BY_ID")
+                connectedTextures.contains("CONNECTED_TEXTURE_REF_BY_ID")
+                        && warded.contains("ConnectedTextureUtils.getTextureIndex")
                         && warded.contains("ICON_CACHE")
                         && warded.contains("(worldTime + side) % 10L != 0L")
                         && warded.contains("warded_glass_")

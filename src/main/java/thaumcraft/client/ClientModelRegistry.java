@@ -16,6 +16,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import thaumcraft.client.renderers.block.ArcaneFurnaceBakedModel;
 import thaumcraft.client.renderers.block.AlchemyFurnaceBakedModel;
+import thaumcraft.client.renderers.block.WardedGlassBakedModel;
 import thaumcraft.client.renderers.item.CrystalPerspectiveModel;
 import thaumcraft.client.renderers.item.ThaumometerPerspectiveModel;
 import thaumcraft.client.renderers.item.TrunkSpawnerPerspectiveModel;
@@ -36,6 +37,8 @@ public final class ClientModelRegistry {
             new ModelResourceLocation("thaumcraft:wandcasting_tesr", "inventory");
     static final ModelResourceLocation BLOCKWOODENDEVICE_BANNER_MODEL =
             new ModelResourceLocation("thaumcraft:blockwoodendevice_banner_tesr", "inventory");
+    static final ModelResourceLocation WARDED_GLASS_MODEL =
+            new ModelResourceLocation("thaumcraft:blockcosmeticopaque", "type=2");
     static final ResourceLocation FOCUS_PECH_DEPTH_SPRITE =
             new ResourceLocation("thaumcraft", "items/focus_pech_depth");
     static final ResourceLocation FROST_SHARD_SPRITE =
@@ -79,6 +82,9 @@ public final class ClientModelRegistry {
         for (int texture : ARCANE_FURNACE_TEXTURES) {
             event.getMap().registerSprite(new ResourceLocation("thaumcraft", "blocks/furnace" + texture));
         }
+        for (int texture = 1; texture <= 47; texture++) {
+            event.getMap().registerSprite(new ResourceLocation("thaumcraft", "blocks/warded_glass_" + texture));
+        }
     }
 
     @SubscribeEvent
@@ -106,6 +112,7 @@ public final class ClientModelRegistry {
         bakeFrostShardModel(event);
         replaceAlchemyFurnaceModel(event);
         replaceArcaneFurnaceModels(event);
+        replaceWardedGlassModel(event);
     }
 
     public static IBakedModel getFrostShardModel() {
@@ -167,5 +174,12 @@ public final class ClientModelRegistry {
             delegate = fallback;
         }
         event.getModelRegistry().putObject(location, new ArcaneFurnaceBakedModel(delegate, meta));
+    }
+
+    private static void replaceWardedGlassModel(ModelBakeEvent event) {
+        IBakedModel delegate = event.getModelRegistry().getObject(WARDED_GLASS_MODEL);
+        if (delegate != null) {
+            event.getModelRegistry().putObject(WARDED_GLASS_MODEL, new WardedGlassBakedModel(delegate));
+        }
     }
 }

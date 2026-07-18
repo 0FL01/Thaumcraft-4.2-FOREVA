@@ -38,6 +38,7 @@ import thaumcraft.common.config.ConfigBlocks;
 import thaumcraft.common.Thaumcraft;
 import thaumcraft.common.items.wands.ItemWandCasting;
 import thaumcraft.common.items.wands.foci.FocusWarding;
+import thaumcraft.common.lib.utils.ConnectedTextureUtils;
 import thaumcraft.common.tiles.TileWarded;
 
 @Mod.EventBusSubscriber(modid = Thaumcraft.MODID, value = Side.CLIENT)
@@ -48,16 +49,6 @@ public class TileWardedRenderer extends TileEntitySpecialRenderer<TileWarded> {
     private static final float Y_MAX = 1.001F;
     private static final ResourceLocation[] WARDED_GLASS = new ResourceLocation[47];
     private static final Map<CacheKey, ResourceLocation> ICON_CACHE = new HashMap<>();
-    private static final int[] CONNECTED_TEXTURE_REF_BY_ID = new int[]{
-            0, 0, 6, 6, 0, 0, 6, 6, 3, 3, 19, 15, 3, 3, 19, 15, 1, 1, 18, 18, 1, 1, 13, 13, 2, 2, 23, 31, 2, 2, 27, 14,
-            0, 0, 6, 6, 0, 0, 6, 6, 3, 3, 19, 15, 3, 3, 19, 15, 1, 1, 18, 18, 1, 1, 13, 13, 2, 2, 23, 31, 2, 2, 27, 14,
-            4, 4, 5, 5, 4, 4, 5, 5, 17, 17, 22, 26, 17, 17, 22, 26, 16, 16, 20, 20, 16, 16, 28, 28, 21, 21, 46, 42, 21, 21, 43, 38,
-            4, 4, 5, 5, 4, 4, 5, 5, 9, 9, 30, 12, 9, 9, 30, 12, 16, 16, 20, 20, 16, 16, 28, 28, 25, 25, 45, 37, 25, 25, 40, 32,
-            0, 0, 6, 6, 0, 0, 6, 6, 3, 3, 19, 15, 3, 3, 19, 15, 1, 1, 18, 18, 1, 1, 13, 13, 2, 2, 23, 31, 2, 2, 27, 14,
-            0, 0, 6, 6, 0, 0, 6, 6, 3, 3, 19, 15, 3, 3, 19, 15, 1, 1, 18, 18, 1, 1, 13, 13, 2, 2, 23, 31, 2, 2, 27, 14,
-            4, 4, 5, 5, 4, 4, 5, 5, 17, 17, 22, 26, 17, 17, 22, 26, 7, 7, 24, 24, 7, 7, 10, 10, 29, 29, 44, 41, 29, 29, 39, 33,
-            4, 4, 5, 5, 4, 4, 5, 5, 9, 9, 30, 12, 9, 9, 30, 12, 7, 7, 24, 24, 7, 7, 10, 10, 8, 8, 36, 35, 8, 8, 34, 11
-    };
 
     static {
         for (int i = 0; i < WARDED_GLASS.length; i++) {
@@ -263,52 +254,8 @@ public class TileWardedRenderer extends TileEntitySpecialRenderer<TileWarded> {
             return cached;
         }
 
-        boolean[] bitMatrix = new boolean[8];
-        int x = pos.getX();
-        int y = pos.getY();
-        int z = pos.getZ();
-
-        if (side == 0 || side == 1) {
-            bitMatrix[0] = isConnectedBlock(x - 1, y, z - 1, owner);
-            bitMatrix[1] = isConnectedBlock(x, y, z - 1, owner);
-            bitMatrix[2] = isConnectedBlock(x + 1, y, z - 1, owner);
-            bitMatrix[3] = isConnectedBlock(x - 1, y, z, owner);
-            bitMatrix[4] = isConnectedBlock(x + 1, y, z, owner);
-            bitMatrix[5] = isConnectedBlock(x - 1, y, z + 1, owner);
-            bitMatrix[6] = isConnectedBlock(x, y, z + 1, owner);
-            bitMatrix[7] = isConnectedBlock(x + 1, y, z + 1, owner);
-        } else if (side == 2 || side == 3) {
-            bitMatrix[0] = isConnectedBlock(x + (side == 2 ? 1 : -1), y + 1, z, owner);
-            bitMatrix[1] = isConnectedBlock(x, y + 1, z, owner);
-            bitMatrix[2] = isConnectedBlock(x + (side == 3 ? 1 : -1), y + 1, z, owner);
-            bitMatrix[3] = isConnectedBlock(x + (side == 2 ? 1 : -1), y, z, owner);
-            bitMatrix[4] = isConnectedBlock(x + (side == 3 ? 1 : -1), y, z, owner);
-            bitMatrix[5] = isConnectedBlock(x + (side == 2 ? 1 : -1), y - 1, z, owner);
-            bitMatrix[6] = isConnectedBlock(x, y - 1, z, owner);
-            bitMatrix[7] = isConnectedBlock(x + (side == 3 ? 1 : -1), y - 1, z, owner);
-        } else if (side == 4 || side == 5) {
-            bitMatrix[0] = isConnectedBlock(x, y + 1, z + (side == 5 ? 1 : -1), owner);
-            bitMatrix[1] = isConnectedBlock(x, y + 1, z, owner);
-            bitMatrix[2] = isConnectedBlock(x, y + 1, z + (side == 4 ? 1 : -1), owner);
-            bitMatrix[3] = isConnectedBlock(x, y, z + (side == 5 ? 1 : -1), owner);
-            bitMatrix[4] = isConnectedBlock(x, y, z + (side == 4 ? 1 : -1), owner);
-            bitMatrix[5] = isConnectedBlock(x, y - 1, z + (side == 5 ? 1 : -1), owner);
-            bitMatrix[6] = isConnectedBlock(x, y - 1, z, owner);
-            bitMatrix[7] = isConnectedBlock(x, y - 1, z + (side == 4 ? 1 : -1), owner);
-        }
-
-        int idBuilder = 0;
-        for (int i = 0; i < bitMatrix.length; i++) {
-            if (bitMatrix[i]) {
-                idBuilder += 1 << i;
-            }
-        }
-        if (idBuilder < 0 || idBuilder >= CONNECTED_TEXTURE_REF_BY_ID.length) {
-            ICON_CACHE.put(key, WARDED_GLASS[0]);
-            return WARDED_GLASS[0];
-        }
-
-        int textureIndex = CONNECTED_TEXTURE_REF_BY_ID[idBuilder];
+        int textureIndex = ConnectedTextureUtils.getTextureIndex(pos, side,
+                check -> isConnectedBlock(check.getX(), check.getY(), check.getZ(), owner));
         if (textureIndex < 0 || textureIndex >= WARDED_GLASS.length) {
             ICON_CACHE.put(key, WARDED_GLASS[0]);
             return WARDED_GLASS[0];

@@ -3,30 +3,45 @@ package thaumcraft.common.blocks;
 import net.minecraft.block.Block;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
+import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.particle.ParticleManager;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.RayTraceResult;
+import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
+import net.minecraftforge.common.property.ExtendedBlockState;
+import net.minecraftforge.common.property.IExtendedBlockState;
+import net.minecraftforge.common.property.IUnlistedProperty;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import thaumcraft.common.Thaumcraft;
 import thaumcraft.common.config.ConfigBlocks;
+import thaumcraft.common.lib.utils.ConnectedTextureUtils;
 
 import net.minecraft.block.properties.PropertyInteger;
+
+import java.util.function.Predicate;
 
 public class BlockCosmeticOpaque extends Block {
 
     public static final String[] opaqueTypes = {"arcaneStoneBrick", "arcaneStoneTile", "arcaneStonePaver", "stonePaver", "stonePaverTraveller"};
     public static final PropertyInteger TYPE = PropertyInteger.create("type", 0, 4);
+    public static final IUnlistedProperty<Integer> GLASS_DOWN = new IntUnlistedProperty("glass_down", 0, 46);
+    public static final IUnlistedProperty<Integer> GLASS_UP = new IntUnlistedProperty("glass_up", 0, 46);
+    public static final IUnlistedProperty<Integer> GLASS_NORTH = new IntUnlistedProperty("glass_north", 0, 46);
+    public static final IUnlistedProperty<Integer> GLASS_SOUTH = new IntUnlistedProperty("glass_south", 0, 46);
+    public static final IUnlistedProperty<Integer> GLASS_WEST = new IntUnlistedProperty("glass_west", 0, 46);
+    public static final IUnlistedProperty<Integer> GLASS_EAST = new IntUnlistedProperty("glass_east", 0, 46);
 
     public BlockCosmeticOpaque() {
         super(Material.ROCK);
@@ -36,6 +51,36 @@ public class BlockCosmeticOpaque extends Block {
         this.setCreativeTab(Thaumcraft.tabTC);
         this.setDefaultState(this.blockState.getBaseState().withProperty(TYPE, 0));
         this.setHarvestLevel("pickaxe", 0);
+    }
+
+    @Override
+    public boolean isOpaqueCube(IBlockState state) {
+        return state.getValue(TYPE) != 2;
+    }
+
+    @Override
+    public boolean isFullCube(IBlockState state) {
+        return state.getValue(TYPE) != 2;
+    }
+
+    @Override
+    @SideOnly(Side.CLIENT)
+    public boolean canRenderInLayer(IBlockState state, BlockRenderLayer layer) {
+        return state.getValue(TYPE) == 2
+                ? layer == BlockRenderLayer.TRANSLUCENT
+                : layer == BlockRenderLayer.SOLID;
+    }
+
+    @Override
+    @SideOnly(Side.CLIENT)
+    public boolean shouldSideBeRendered(IBlockState state, IBlockAccess world, BlockPos pos, EnumFacing side) {
+        if (state.getValue(TYPE) == 2) {
+            IBlockState neighbor = world.getBlockState(pos.offset(side));
+            if (neighbor.getBlock() == this && neighbor.getValue(TYPE) == 2) {
+                return false;
+            }
+        }
+        return super.shouldSideBeRendered(state, world, pos, side);
     }
 
     @Override
@@ -80,7 +125,27 @@ public class BlockCosmeticOpaque extends Block {
 
     @Override
     protected BlockStateContainer createBlockState() {
-        return new BlockStateContainer(this, TYPE);
+        return new ExtendedBlockState(this,
+                new IProperty[]{TYPE},
+                new IUnlistedProperty[]{GLASS_DOWN, GLASS_UP, GLASS_NORTH, GLASS_SOUTH, GLASS_WEST, GLASS_EAST});
+    }
+
+    @Override
+    public IBlockState getExtendedState(IBlockState state, IBlockAccess world, BlockPos pos) {
+        if (state.getValue(TYPE) != 2) {
+            return state;
+        }
+        Predicate<BlockPos> connected = check -> {
+            IBlockState neighbor = world.getBlockState(check);
+            return neighbor.getBlock() == this && neighbor.getValue(TYPE) == 2;
+        };
+        return ((IExtendedBlockState) state)
+                .withProperty(GLASS_DOWN, ConnectedTextureUtils.getTextureIndex(pos, EnumFacing.DOWN.getIndex(), connected))
+                .withProperty(GLASS_UP, ConnectedTextureUtils.getTextureIndex(pos, EnumFacing.UP.getIndex(), connected))
+                .withProperty(GLASS_NORTH, ConnectedTextureUtils.getTextureIndex(pos, EnumFacing.NORTH.getIndex(), connected))
+                .withProperty(GLASS_SOUTH, ConnectedTextureUtils.getTextureIndex(pos, EnumFacing.SOUTH.getIndex(), connected))
+                .withProperty(GLASS_WEST, ConnectedTextureUtils.getTextureIndex(pos, EnumFacing.WEST.getIndex(), connected))
+                .withProperty(GLASS_EAST, ConnectedTextureUtils.getTextureIndex(pos, EnumFacing.EAST.getIndex(), connected));
     }
 
     @Override
@@ -96,5 +161,37 @@ public class BlockCosmeticOpaque extends Block {
     @Override
     public IBlockState getStateForPlacement(World worldIn, BlockPos pos, EnumFacing facing, float hitX, float hitY, float hitZ, int meta, EntityLivingBase placer, EnumHand hand) {
         return this.getDefaultState().withProperty(TYPE, MathHelper.clamp(meta, 0, 4));
+    }
+
+    private static final class IntUnlistedProperty implements IUnlistedProperty<Integer> {
+        private final String name;
+        private final int min;
+        private final int max;
+
+        private IntUnlistedProperty(String name, int min, int max) {
+            this.name = name;
+            this.min = min;
+            this.max = max;
+        }
+
+        @Override
+        public String getName() {
+            return this.name;
+        }
+
+        @Override
+        public boolean isValid(Integer value) {
+            return value != null && value >= this.min && value <= this.max;
+        }
+
+        @Override
+        public Class<Integer> getType() {
+            return Integer.class;
+        }
+
+        @Override
+        public String valueToString(Integer value) {
+            return String.valueOf(value);
+        }
     }
 }
