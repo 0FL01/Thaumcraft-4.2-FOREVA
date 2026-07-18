@@ -18,6 +18,7 @@ public class TubeRendererFidelityStaticGuardTest {
         String bufferRenderer = read("src/main/java/thaumcraft/client/renderers/tile/TileTubeBufferRenderer.java");
         String onewayRenderer = read("src/main/java/thaumcraft/client/renderers/tile/TileTubeOnewayRenderer.java");
         String conduitHelper = read("src/main/java/thaumcraft/client/renderers/tile/TubeConduitRenderHelper.java");
+        String extrudedHelper = read("src/main/java/thaumcraft/client/renderers/tile/ExtrudedSpriteRenderHelper.java");
 
         assertTrue("TileTubeValve should keep client rotation state and squeek feedback toggle path",
                 valveTile.contains("public float rotation = 0.0F;")
@@ -31,8 +32,8 @@ public class TubeRendererFidelityStaticGuardTest {
                         && valveRenderer.contains("face.getYOffset() == 0")
                         && valveRenderer.contains("thaumcraft:blocks/pipe_valve")
                         && valveRenderer.contains("VALVE_THICKNESS = 0.1F")
-                        && valveRenderer.contains("renderExtrudedSprite(sprite, VALVE_THICKNESS)")
-                        && valveRenderer.contains("POSITION_TEX_NORMAL")
+                        && valveRenderer.contains("ExtrudedSpriteRenderHelper.render(sprite, VALVE_THICKNESS)")
+                        && extrudedHelper.contains("POSITION_TEX_NORMAL")
                         && valveRenderer.contains("renderValveOverlay()")
                         && !valveRenderer.contains("tile.allowFlow")
                         && valveRenderer.contains("try {")

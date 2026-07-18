@@ -49,7 +49,7 @@ public class BlockMirror extends BlockContainer {
     public boolean isFullCube(IBlockState state) { return false; }
 
     @Override
-    public EnumBlockRenderType getRenderType(IBlockState state) { return EnumBlockRenderType.MODEL; }
+    public EnumBlockRenderType getRenderType(IBlockState state) { return EnumBlockRenderType.INVISIBLE; }
 
     @Override
     public TileEntity createNewTileEntity(World worldIn, int meta) {

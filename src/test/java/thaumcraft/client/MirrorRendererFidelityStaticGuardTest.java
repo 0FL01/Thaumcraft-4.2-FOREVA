@@ -15,6 +15,9 @@ public class MirrorRendererFidelityStaticGuardTest {
     public void tileMirrorRendererKeepsLayeredPortalPaneAndFrameContracts() throws IOException {
         String source = read("src/main/java/thaumcraft/client/renderers/tile/TileMirrorRenderer.java");
         String helper = read("src/main/java/thaumcraft/client/renderers/tile/LayeredFieldPlaneHelper.java");
+        String extruded = read("src/main/java/thaumcraft/client/renderers/tile/ExtrudedSpriteRenderHelper.java");
+        String valve = read("src/main/java/thaumcraft/client/renderers/tile/TileTubeValveRenderer.java");
+        String block = read("src/main/java/thaumcraft/common/blocks/BlockMirror.java");
 
         assertTrue("TileMirrorRenderer should keep mirror portal textures and pane overlays",
                 source.contains("textures/blocks/mirrorpane.png")
@@ -31,6 +34,21 @@ public class MirrorRendererFidelityStaticGuardTest {
                         && source.contains("blocks/mirrorframe")
                         && source.contains("blocks/mirrorframe2")
                         && source.contains("transformFromOrientation("));
+
+        assertTrue("Mirror world rendering should remain TESR-only",
+                block.contains("return EnumBlockRenderType.INVISIBLE;"));
+
+        assertTrue("TileMirrorRenderer should render the stable extruded frame after the pane",
+                source.contains("renderFrame(facing, x, y, z, tile instanceof TileMirrorEssentia);")
+                        && source.contains("private static final float FRAME_THICKNESS = 0.0625F;")
+                        && source.contains("transformFromOrientation(x, y, z, facing.getIndex(), 0.0F);")
+                        && source.contains("ExtrudedSpriteRenderHelper.render(sprite, FRAME_THICKNESS);"));
+
+        assertTrue("Mirror and valve renderers should share the existing extruded-sprite geometry",
+                valve.contains("ExtrudedSpriteRenderHelper.render(sprite, VALVE_THICKNESS);")
+                        && extruded.contains("DefaultVertexFormats.POSITION_TEX_NORMAL")
+                        && extruded.contains("for (int i = 0; i < width; ++i)")
+                        && extruded.contains("for (int i = 0; i < height; ++i)"));
 
         assertTrue("TileMirrorRenderer should route linked portal fields through the shared layered-field helper with inset bounds",
                 source.contains("LayeredFieldPlaneHelper.renderLayeredFaceRect(")

@@ -26,6 +26,7 @@ public class TileMirrorRenderer extends TileEntitySpecialRenderer<TileEntity> {
     private static final ResourceLocation MIRROR_FRAME_ESS = new ResourceLocation("thaumcraft", "blocks/mirrorframe2");
 
     private static final float INSET = 0.1875F;
+    private static final float FRAME_THICKNESS = 0.0625F;
 
     @Override
     public void render(TileEntity tile, double x, double y, double z, float partialTicks, int destroyStage, float alpha) {
@@ -42,6 +43,7 @@ public class TileMirrorRenderer extends TileEntitySpecialRenderer<TileEntity> {
         } else {
             renderPane(facing, x, y, z, MIRROR_PANE, 0.02F + instability);
         }
+        renderFrame(facing, x, y, z, tile instanceof TileMirrorEssentia);
     }
 
     private void renderPortalLayers(EnumFacing facing, double x, double y, double z, float partialTicks) {
@@ -67,14 +69,14 @@ public class TileMirrorRenderer extends TileEntitySpecialRenderer<TileEntity> {
         GlStateManager.popMatrix();
     }
 
-    private void renderFrame(EnumFacing facing, double x, double y, double z, boolean essentiaFrame, float instability) {
+    private void renderFrame(EnumFacing facing, double x, double y, double z, boolean essentiaFrame) {
         TextureAtlasSprite sprite = getFrameSprite(essentiaFrame);
         if (sprite == null) return;
 
         Minecraft.getMinecraft().getTextureManager().bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
         GlStateManager.pushMatrix();
-        transformFromOrientation(x, y, z, facing.getIndex(), instability);
-        drawUnitQuad(sprite.getMinU(), sprite.getMinV(), sprite.getMaxU(), sprite.getMaxV(), 1.0F, 1.0F, 1.0F, 1.0F);
+        transformFromOrientation(x, y, z, facing.getIndex(), 0.0F);
+        ExtrudedSpriteRenderHelper.render(sprite, FRAME_THICKNESS);
         GlStateManager.popMatrix();
     }
 
