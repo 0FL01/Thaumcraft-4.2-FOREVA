@@ -79,6 +79,20 @@ public class WardedOwnershipRuntimeContractTest {
     }
 
     @Test
+    public void cosmeticOpaqueStatesKeepTc4LightOpacity() {
+        BlockCosmeticOpaque block = new BlockCosmeticOpaque();
+        OwnedWorld world = new OwnedWorld();
+        int[] expectedOpacity = {3, 3, 0, 0, 0};
+
+        for (int type = 0; type < expectedOpacity.length; type++) {
+            IBlockState state = block.getStateFromMeta(type);
+            assertEquals("state opacity for type " + type, expectedOpacity[type], state.getLightOpacity());
+            assertEquals("world opacity for type " + type, expectedOpacity[type],
+                    state.getLightOpacity(world, BlockPos.ORIGIN));
+        }
+    }
+
+    @Test
     public void playerPlacementAlwaysReplacesCopiedOwnership() {
         OwnedWorld world = new OwnedWorld();
         TestPlayer player = new TestPlayer(world, "new_owner");

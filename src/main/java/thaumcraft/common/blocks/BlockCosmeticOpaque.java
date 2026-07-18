@@ -73,6 +73,11 @@ public class BlockCosmeticOpaque extends Block {
     }
 
     @Override
+    public int getLightOpacity(IBlockState state) {
+        return state.getValue(TYPE) <= 1 ? 3 : 0;
+    }
+
+    @Override
     @SideOnly(Side.CLIENT)
     public boolean canRenderInLayer(IBlockState state, BlockRenderLayer layer) {
         return state.getValue(TYPE) == 2
