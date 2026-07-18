@@ -29,15 +29,62 @@ jobs:
 
       - name: Compute release metadata
         id: meta
+        env:
+          BEFORE_SHA: ${{ github.event.before }}
         run: |
+          set -euo pipefail
+
           SHORT_SHA="${GITHUB_SHA:0:7}"
           TAG_DATE="$(date +%Y%m%d)"
           TAG_NAME="release-${TAG_DATE}-${SHORT_SHA}"
-          COMMIT_MSG="$(git log -1 --format='%s')"
+          ZERO_SHA="0000000000000000000000000000000000000000"
+          PREVIOUS_TAG="$(git describe --tags --match 'release-*' --abbrev=0 "${GITHUB_SHA}^" 2>/dev/null || true)"
+          BASE_REF=""
+
+          if [[ -n "$PREVIOUS_TAG" ]]; then
+            BASE_REF="$PREVIOUS_TAG"
+            RANGE="${PREVIOUS_TAG}..${GITHUB_SHA}"
+          elif [[ -n "$BEFORE_SHA" && "$BEFORE_SHA" != "$ZERO_SHA" ]] \
+            && git cat-file -e "${BEFORE_SHA}^{commit}" 2>/dev/null; then
+            BASE_REF="$BEFORE_SHA"
+            RANGE="${BEFORE_SHA}..${GITHUB_SHA}"
+          else
+            RANGE="$GITHUB_SHA"
+          fi
+
+          COMMIT_COUNT="$(git rev-list --count "$RANGE")"
+
+          {
+            echo "## Thaumcraft 4.2 1.12.2"
+            echo
+            if [[ -n "$PREVIOUS_TAG" ]]; then
+              echo "**Предыдущий релиз:** \`${PREVIOUS_TAG}\`"
+            elif [[ -n "$BASE_REF" ]]; then
+              echo "**Предыдущий коммит:** \`${BASE_REF:0:7}\`"
+            else
+              echo "**Диапазон:** с начала истории"
+            fi
+            echo
+            echo "**Новых коммитов:** ${COMMIT_COUNT}"
+            echo
+            echo "### Изменения"
+            echo
+            git log --reverse \
+              --format="- [\`%h\`](${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/commit/%H) %s" \
+              "$RANGE"
+            echo
+            if [[ -n "$BASE_REF" ]]; then
+              echo "[Полный список изменений](${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/compare/${BASE_REF}...${GITHUB_SHA})"
+              echo
+            fi
+            echo "### Artifacts"
+            echo "- Thaumcraft-1.0.0-universal.jar"
+            echo
+            echo "---"
+          } > release-notes.md
 
           echo "tag_name=${TAG_NAME}" >> "$GITHUB_OUTPUT"
           echo "short_sha=${SHORT_SHA}" >> "$GITHUB_OUTPUT"
-          echo "commit_msg=${COMMIT_MSG}" >> "$GITHUB_OUTPUT"
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -202,15 +249,7 @@ jobs:
         with:
           tag_name: ${{ steps.meta.outputs.tag_name }}
           name: Thaumcraft 4.2 1.12.2 — ${{ steps.meta.outputs.short_sha }}
-          body: |
-            ## Thaumcraft 4.2 1.12.2
-
-            **Commit:** `${{ github.sha }}` — ${{ steps.meta.outputs.commit_msg }}
-
-            ### Artifacts
-            - Thaumcraft-1.0.0-universal.jar
-
-            ---
+          body_path: release-notes.md
           files: build/libs/Thaumcraft-*-universal.jar
           prerelease: false
           make_latest: true
