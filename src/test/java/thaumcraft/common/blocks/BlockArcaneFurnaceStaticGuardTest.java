@@ -21,6 +21,8 @@ public class BlockArcaneFurnaceStaticGuardTest {
         assertTrue(source.contains("if (meta == 0) {"));
         assertTrue(source.contains("return new TileArcaneFurnace();"));
         assertTrue(source.contains("return new TileArcaneFurnaceNozzle();"));
+        assertTrue("Infernal Furnace multiblock metadata must stay hidden from creative tabs",
+                source.contains("public void getSubBlocks(CreativeTabs tab, NonNullList<ItemStack> list) {\n    }"));
         assertTrue(source.contains("if (this.getMetaFromState(state) != 10) {"));
         assertTrue(source.contains("return state.withProperty(FACING, EnumFacing.NORTH);"));
         assertTrue(source.contains("return state.withProperty(FACING, this.getNozzleFacing(worldIn, pos));"));

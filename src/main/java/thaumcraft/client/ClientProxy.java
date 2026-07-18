@@ -736,6 +736,14 @@ public class ClientProxy extends CommonProxy {
                     ConfigItems.itemBootsRobe
             );
         }
+        if (ConfigItems.itemHelmVoidRobe != null && ConfigItems.itemChestVoidRobe != null && ConfigItems.itemLegsVoidRobe != null) {
+            minecraft.getItemColors().registerItemColorHandler(
+                    (stack, tintIndex) -> tintIndex == 0 ? ((ItemArmor) stack.getItem()).getColor(stack) : -1,
+                    ConfigItems.itemHelmVoidRobe,
+                    ConfigItems.itemChestVoidRobe,
+                    ConfigItems.itemLegsVoidRobe
+            );
+        }
         if (ConfigItems.itemResearchNotes != null) {
             Minecraft.getMinecraft().getItemColors().registerItemColorHandler(
                     (stack, tintIndex) -> ConfigItems.itemResearchNotes.getColorFromItemStack(stack, tintIndex),

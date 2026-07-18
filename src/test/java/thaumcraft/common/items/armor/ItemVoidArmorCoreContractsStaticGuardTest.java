@@ -15,6 +15,10 @@ public class ItemVoidArmorCoreContractsStaticGuardTest {
     public void voidArmorFamilyKeepsReferenceRarityRepairAndRevealerContracts() throws IOException {
         String voidArmor = readFile("src/main/java/thaumcraft/common/items/armor/ItemVoidArmor.java");
         String voidRobe = readFile("src/main/java/thaumcraft/common/items/armor/ItemVoidRobeArmor.java");
+        String clientProxy = readFile("src/main/java/thaumcraft/client/ClientProxy.java");
+        String voidRobeHelmModel = readFile("src/main/resources/assets/thaumcraft/models/item/itemhelmetvoidfortress.json");
+        String voidRobeChestModel = readFile("src/main/resources/assets/thaumcraft/models/item/itemchestplatevoidfortress.json");
+        String voidRobeLegsModel = readFile("src/main/resources/assets/thaumcraft/models/item/itemleggingsvoidfortress.json");
 
         assertTrue("ItemVoidArmor must keep uncommon rarity and void-ingot repair baseline",
                 voidArmor.contains("return EnumRarity.UNCOMMON;")
@@ -29,6 +33,18 @@ public class ItemVoidArmorCoreContractsStaticGuardTest {
                         && voidRobe.contains("return this.armorType == EntityEquipmentSlot.HEAD;")
                         && voidRobe.contains("showNodes(")
                         && voidRobe.contains("showIngamePopups("));
+        assertTrue("Void Robe inventory models must keep the reference dyed base and untinted detail layers",
+                voidRobeHelmModel.contains("\"layer0\": \"thaumcraft:items/voidrobehelm\"")
+                        && !voidRobeHelmModel.contains("layer1")
+                        && voidRobeChestModel.contains("\"layer0\": \"thaumcraft:items/voidrobechestover\"")
+                        && voidRobeChestModel.contains("\"layer1\": \"thaumcraft:items/voidrobechest\"")
+                        && voidRobeLegsModel.contains("\"layer0\": \"thaumcraft:items/voidrobelegsover\"")
+                        && voidRobeLegsModel.contains("\"layer1\": \"thaumcraft:items/voidrobelegs\""));
+        assertTrue("Void Robe inventory models must tint only their base layer",
+                clientProxy.contains("(stack, tintIndex) -> tintIndex == 0 ? ((ItemArmor) stack.getItem()).getColor(stack) : -1")
+                        && clientProxy.contains("ConfigItems.itemHelmVoidRobe")
+                        && clientProxy.contains("ConfigItems.itemChestVoidRobe")
+                        && clientProxy.contains("ConfigItems.itemLegsVoidRobe"));
         assertTrue("ItemVoidRobeArmor must keep special-armor mitigation hooks",
                 voidRobe.contains("public ISpecialArmor.ArmorProperties getProperties(")
                         && voidRobe.contains("source.isUnblockable()")

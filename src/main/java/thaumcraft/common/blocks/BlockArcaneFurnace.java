@@ -121,9 +121,6 @@ public class BlockArcaneFurnace extends BlockContainer {
 
     @Override
     public void getSubBlocks(CreativeTabs tab, NonNullList<ItemStack> list) {
-        for (int meta = 0; meta <= 10; meta++) {
-            list.add(new ItemStack(this, 1, meta));
-        }
     }
 
     @Override
