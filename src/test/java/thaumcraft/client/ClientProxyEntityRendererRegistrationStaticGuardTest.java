@@ -899,6 +899,24 @@ public class ClientProxyEntityRendererRegistrationStaticGuardTest {
                         && noopRenderer.contains("public void doRender(T entity, double x, double y, double z, float entityYaw, float partialTicks)"));
     }
 
+    @Test
+    public void golemCarriedItemStaysCenteredBetweenHands() throws IOException {
+        String renderer = readFile("src/main/java/thaumcraft/client/renderers/entity/RenderGolemBase.java");
+        int carriedItemStart = renderer.indexOf("private void renderCarriedItem");
+        int fluidBucketStart = renderer.indexOf("private void renderFluidBucket", carriedItemStart);
+        String carriedItemMethod = renderer.substring(carriedItemStart, fluidBucketStart);
+
+        assertTrue("Golem carried items must use the original body-centered position",
+                carriedItemMethod.contains("GlStateManager.translate(0.0F, 2.5F, -1.25F);"));
+        assertTrue("Golem carried items must not be attached to a single arm",
+                !carriedItemMethod.contains("golemRightArm.postRender"));
+
+        String model = readFile("src/main/java/thaumcraft/client/renderers/models/entities/ModelGolem.java");
+        assertTrue("Golem carrying pose must raise both arms",
+                model.contains("this.golemRightArm.rotateAngleX = -1.0F;")
+                        && model.contains("this.golemLeftArm.rotateAngleX = -1.0F;"));
+    }
+
     private static String readFile(String path) throws IOException {
         return new String(Files.readAllBytes(Paths.get(path)), StandardCharsets.UTF_8);
     }

@@ -312,15 +312,10 @@ public class RenderGolemBase extends RenderLiving<EntityGolemBase> {
         private void renderCarriedItem(EntityGolemBase entity, ItemStack stack) {
             GlStateManager.pushMatrix();
             GlStateManager.scale(0.4F, 0.4F, 0.4F);
-
-            ModelGolem model = (ModelGolem) this.renderer.getMainModel();
-            model.golemRightArm.postRender(0.0625F);
-
-            // Position at the hand area
-            GlStateManager.translate(-10.0F * 0.0625F, 20.0F * 0.0625F, 0.0F);
+            GlStateManager.translate(0.0F, 2.5F, -1.25F);
 
             if (stack.getItem() instanceof ItemBlock) {
-                // Blocks: center in hand, no extra rotation — keep attached to arm
+                // Blocks: center between the hands without extra item rotation
                 GlStateManager.scale(0.5F, 0.5F, 0.5F);
             } else {
                 // Regular items: orient upright as held
