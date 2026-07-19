@@ -43,7 +43,33 @@ public class ItemGolemPlacerCoreContractsStaticGuardTest {
         assertTrue("ItemGolemPlacer must keep server-side success consume semantics for use-first path",
                 source.contains("if (world.isRemote || player.isSneaking()) {")
                         && source.contains("return EnumActionResult.PASS;")
-                        && source.contains("return EnumActionResult.SUCCESS;"));
+                         && source.contains("return EnumActionResult.SUCCESS;"));
+    }
+
+    @Test
+    public void golemPlacerModelsShowTheStoredCoreOverlay() throws IOException {
+        String placerSource = readFile("src/main/java/thaumcraft/common/entities/golems/ItemGolemPlacer.java");
+        String bellSource = readFile("src/main/java/thaumcraft/common/entities/golems/ItemGolemBell.java");
+
+        assertTrue("Bell pickup must store the golem core on the placer",
+                bellSource.contains("tag.setByte(\"core\", golem.getCore());"));
+        assertTrue("ItemGolemPlacer must expose the stored core to item model overrides",
+                placerSource.contains("new ResourceLocation(\"thaumcraft\", \"core\")")
+                        && placerSource.contains("stack.hasTagCompound() && stack.getTagCompound().hasKey(\"core\")"));
+
+        String[] materials = {"straw", "wood", "tallow", "clay", "flesh", "stone", "iron", "thaumium"};
+        for (String material : materials) {
+            String modelName = "itemgolemplacer_" + material;
+            String baseModel = readFile("src/main/resources/assets/thaumcraft/models/item/" + modelName + ".json");
+            String coreModel = readFile("src/main/resources/assets/thaumcraft/models/item/" + modelName + "_core.json");
+
+            assertTrue(modelName + " must select its core-overlay model from the NBT property",
+                    baseModel.contains("\"thaumcraft:core\": 1.0")
+                            && baseModel.contains("\"model\": \"thaumcraft:item/" + modelName + "_core\""));
+            assertTrue(modelName + " core model must retain its material and use the original heart overlay",
+                    coreModel.contains("\"layer0\": \"thaumcraft:items/golem_" + material + "\"")
+                            && coreModel.contains("\"layer1\": \"thaumcraft:items/golem_over_core\""));
+        }
     }
 
     private static String readFile(String path) throws IOException {

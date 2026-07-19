@@ -18,6 +18,7 @@ import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.NonNullList;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.IBlockAccess;
@@ -30,6 +31,8 @@ public class ItemGolemPlacer extends Item {
         this.setHasSubtypes(true);
         this.setMaxDamage(0);
         this.setCreativeTab(CreativeTabThaumcraft.tabThaumcraft);
+        this.addPropertyOverride(new ResourceLocation("thaumcraft", "core"),
+                (stack, world, entity) -> stack.hasTagCompound() && stack.getTagCompound().hasKey("core") ? 1.0F : 0.0F);
     }
 
     @Override

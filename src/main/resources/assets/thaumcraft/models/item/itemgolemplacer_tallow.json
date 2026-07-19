@@ -2,5 +2,13 @@
   "parent": "item/generated",
   "textures": {
     "layer0": "thaumcraft:items/golem_tallow"
-  }
+  },
+  "overrides": [
+    {
+      "predicate": {
+        "thaumcraft:core": 1.0
+      },
+      "model": "thaumcraft:item/itemgolemplacer_tallow_core"
+    }
+  ]
 }
