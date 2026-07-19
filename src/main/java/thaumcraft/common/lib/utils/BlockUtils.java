@@ -78,14 +78,20 @@ public class BlockUtils {
         return count;
     }
 
-    /** Check if a block has at least `count` adjacent blocks of the given type. */
+    /** Check the surrounding 3x3x3 cube for at least `count` matching blocks. */
     public static boolean isBlockAdjacentToAtleast(IBlockAccess world, int x, int y, int z, Block block, int maxMeta, int count) {
         int found = 0;
-        BlockPos pos = new BlockPos(x, y, z);
-        for (EnumFacing facing : EnumFacing.VALUES) {
-            if (world.getBlockState(pos.offset(facing)).getBlock() == block) {
-                found++;
-                if (found >= count) return true;
+        for (int xx = -1; xx <= 1; xx++) {
+            for (int yy = -1; yy <= 1; yy++) {
+                for (int zz = -1; zz <= 1; zz++) {
+                    if (xx == 0 && yy == 0 && zz == 0) continue;
+                    IBlockState state = world.getBlockState(new BlockPos(x + xx, y + yy, z + zz));
+                    if (state.getBlock() == block
+                            && (maxMeta == Short.MAX_VALUE || block.getMetaFromState(state) == maxMeta)) {
+                        found++;
+                        if (found >= count) return true;
+                    }
+                }
             }
         }
         return false;

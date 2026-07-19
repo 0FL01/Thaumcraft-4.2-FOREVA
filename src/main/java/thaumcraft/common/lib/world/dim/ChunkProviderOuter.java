@@ -50,19 +50,22 @@ public class ChunkProviderOuter implements IChunkGenerator {
     @Override
     public void populate(int x, int z) {
         BlockFalling.fallInstantly = true;
-        int cx = x * 16;
-        int cz = z * 16;
-        BlockPos blockpos = new BlockPos(cx, 0, cz);
-        Biome biome = this.world.getBiome(blockpos.add(16, 0, 16));
-        this.rand.setSeed(this.world.getSeed());
-        long k = this.rand.nextLong() / 2L * 2L + 1L;
-        long l = this.rand.nextLong() / 2L * 2L + 1L;
-        this.rand.setSeed((long)x * k + (long)z * l ^ this.world.getSeed());
-        boolean flag = false;
-        ForgeEventFactory.onChunkPopulate(true, this, this.world, this.rand, x, z, flag);
-        biome.decorate(this.world, this.rand, blockpos);
-        ForgeEventFactory.onChunkPopulate(false, this, this.world, this.rand, x, z, flag);
-        BlockFalling.fallInstantly = false;
+        try {
+            int cx = x * 16;
+            int cz = z * 16;
+            BlockPos blockpos = new BlockPos(cx, 0, cz);
+            Biome biome = this.world.getBiome(blockpos.add(16, 0, 16));
+            this.rand.setSeed(this.world.getSeed());
+            long k = this.rand.nextLong() / 2L * 2L + 1L;
+            long l = this.rand.nextLong() / 2L * 2L + 1L;
+            this.rand.setSeed((long)x * k + (long)z * l ^ this.world.getSeed());
+            boolean flag = false;
+            ForgeEventFactory.onChunkPopulate(true, this, this.world, this.rand, x, z, flag);
+            biome.decorate(this.world, this.rand, blockpos);
+            ForgeEventFactory.onChunkPopulate(false, this, this.world, this.rand, x, z, flag);
+        } finally {
+            BlockFalling.fallInstantly = false;
+        }
     }
 
     @Override

@@ -298,7 +298,7 @@ public class BlockEldritch extends Block {
     @Override
     public EnumBlockRenderType getRenderType(IBlockState state) {
         int meta = this.getMetaFromState(state);
-        return meta == 0 || meta == 1 || meta == 2 || meta == 3 || meta == 8 || meta == 9
+        return meta == 0 || meta == 1 || meta == 2 || meta == 3 || meta == 8
                 ? EnumBlockRenderType.INVISIBLE
                 : EnumBlockRenderType.MODEL;
     }

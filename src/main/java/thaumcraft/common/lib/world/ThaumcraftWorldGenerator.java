@@ -602,8 +602,7 @@ public class ThaumcraftWorldGenerator implements IWorldGenerator {
                 if (ring.generate(world, rand, pos)) {
                     createRandomNodeAt(world, pos.up(2), rand, false, true, false);
                     auraGen = true;
-                    Thread mazeThread = new Thread(new MazeThread(chunkX, chunkZ, width, height, rand.nextLong()));
-                    mazeThread.start();
+                    new MazeThread(chunkX, chunkZ, width, height, rand.nextLong()).run();
                 }
             } else if (rand.nextInt(40) == 0) {
                 BlockPos pos = new BlockPos(ringX, ringY + 9, ringZ);

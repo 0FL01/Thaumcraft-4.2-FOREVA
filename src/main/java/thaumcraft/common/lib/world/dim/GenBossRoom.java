@@ -32,16 +32,18 @@ public class GenBossRoom extends GenCommon {
             case 5: Gen2x2.generateLowerRight(world, random, cx, cz, y, cell); break;
         }
 
+        EnumFacing dir = null;
+        if (cell.north) dir = EnumFacing.NORTH;
+        if (cell.south) dir = EnumFacing.SOUTH;
+        if (cell.east) dir = EnumFacing.EAST;
+        if (cell.west) dir = EnumFacing.WEST;
+        if (dir == null) return;
+
         // Place doorway pattern on the connected side
         for (int a = 0; a < 7; a++) {
             for (int b = 0; b < 7; b++) {
-                int xx = 0, zz = 0;
-                EnumFacing dir = EnumFacing.UP;
-
-                if (cell.north) { xx = x + 5 + a; zz = z + 3;     dir = EnumFacing.NORTH; }
-                if (cell.south) { xx = x + 5 + a; zz = z + 13;    dir = EnumFacing.SOUTH; }
-                if (cell.east)  { xx = x + 13;    zz = z + 5 + a; dir = EnumFacing.EAST;  }
-                if (cell.west)  { xx = x + 3;     zz = z + 5 + a; dir = EnumFacing.WEST;  }
+                int xx = dir == EnumFacing.EAST ? x + 13 : dir == EnumFacing.WEST ? x + 3 : x + 5 + a;
+                int zz = dir == EnumFacing.NORTH ? z + 3 : dir == EnumFacing.SOUTH ? z + 13 : z + 5 + a;
 
                 switch (PAT_DOORWAY[a][b]) {
                     case 1: // Lock block

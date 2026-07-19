@@ -42,6 +42,8 @@ public class ConfigEntities {
     // Static list of all entity entries
     public static List<EntityEntry> ENTITIES = new ArrayList<>();
     public static final Map<String, Integer> CHAMPION_WHITELIST = new LinkedHashMap<>();
+    public static final ResourceLocation MIND_SPIDER_ID =
+            new ResourceLocation(Thaumcraft.MODID, ConfigBlocks.legacyPath("MindSpider"));
 
     private static boolean entitySpawnsInitialized = false;
 

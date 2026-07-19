@@ -10,6 +10,7 @@ import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import thaumcraft.api.TileThaumcraft;
+import thaumcraft.common.Thaumcraft;
 import thaumcraft.common.entities.monster.EntityEldritchCrab;
 import thaumcraft.common.lib.TCSounds;
 
@@ -30,6 +31,11 @@ public class TileEldritchCrabSpawner extends TileThaumcraft implements ITickable
         if (this.world.isRemote) {
             if (this.venting > 0) {
                 --this.venting;
+                for (int i = 0; i < 3; i++) {
+                    this.drawVent();
+                }
+            } else if (this.world.rand.nextInt(20) == 0) {
+                this.drawVent();
             }
             return;
         }
@@ -50,6 +56,26 @@ public class TileEldritchCrabSpawner extends TileThaumcraft implements ITickable
             this.spawnCrab();
             this.world.playSound(null, this.pos, TCSounds.GORE, SoundCategory.BLOCKS, 0.5F, 1.0F);
         }
+    }
+
+    private void drawVent() {
+        EnumFacing direction = EnumFacing.byIndex(this.facing);
+        float xOffset = 0.15F - this.world.rand.nextFloat() * 0.3F;
+        float zOffset = 0.15F - this.world.rand.nextFloat() * 0.3F;
+        float yOffset = 0.15F - this.world.rand.nextFloat() * 0.3F;
+        float xMotion = 0.1F - this.world.rand.nextFloat() * 0.2F;
+        float zMotion = 0.1F - this.world.rand.nextFloat() * 0.2F;
+        float yMotion = 0.1F - this.world.rand.nextFloat() * 0.2F;
+        Thaumcraft.proxy.drawVentParticles(
+                this.world,
+                this.pos.getX() + 0.5F + xOffset + direction.getXOffset() / 2.1F,
+                this.pos.getY() + 0.5F + yOffset + direction.getYOffset() / 2.1F,
+                this.pos.getZ() + 0.5F + zOffset + direction.getZOffset() / 2.1F,
+                direction.getXOffset() / 3.0F + xMotion,
+                direction.getYOffset() / 3.0F + yMotion,
+                direction.getZOffset() / 3.0F + zMotion,
+                10061994,
+                2.0F);
     }
 
     @Override

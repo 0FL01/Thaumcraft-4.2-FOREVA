@@ -5,6 +5,7 @@ import net.minecraft.tileentity.TileEntityMobSpawner;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.world.World;
 import thaumcraft.common.config.ConfigBlocks;
+import thaumcraft.common.config.ConfigEntities;
 import thaumcraft.common.lib.utils.BlockUtils;
 import thaumcraft.common.lib.utils.Utils;
 import thaumcraft.common.lib.world.ThaumcraftWorldGenerator;
@@ -262,20 +263,21 @@ public class GenPassage extends GenCommon {
 
         // Feature 14: Web nest with mind spider spawner
         if (cell.feature == 14) {
+            BlockPos spawnerPos = new BlockPos(x + 8, y + 4, z + 8);
             for (int w = -3; w <= 3; w++) {
                 for (int h = -3; h <= 3; h++) {
                     for (int j = -3; j <= 3; j++) {
                         BlockPos p = new BlockPos(x + 8 + w, y + 4 + h, z + 8 + j);
-                        if (world.isAirBlock(p) && random.nextFloat() < 0.35f) {
+                        if (!p.equals(spawnerPos) && world.isAirBlock(p) && random.nextFloat() < 0.35f) {
                             world.setBlockState(p, Blocks.WEB.getDefaultState(), 3);
                         }
                     }
                 }
             }
-            world.setBlockState(new BlockPos(x + 8, y + 4, z + 8), Blocks.MOB_SPAWNER.getDefaultState(), 3);
-            TileEntityMobSpawner spawner = (TileEntityMobSpawner) world.getTileEntity(new BlockPos(x + 8, y + 4, z + 8));
+            world.setBlockState(spawnerPos, Blocks.MOB_SPAWNER.getDefaultState(), 3);
+            TileEntityMobSpawner spawner = (TileEntityMobSpawner) world.getTileEntity(spawnerPos);
             if (spawner != null) {
-                spawner.getSpawnerBaseLogic().setEntityId(new net.minecraft.util.ResourceLocation("thaumcraft", "mind_spider"));
+                spawner.getSpawnerBaseLogic().setEntityId(ConfigEntities.MIND_SPIDER_ID);
             }
         }
     }

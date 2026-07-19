@@ -26,8 +26,8 @@ public class EldritchTesrRoutingContractTest {
         String shell5 = read("src/main/resources/assets/thaumcraft/models/block/blockeldritch_5.json");
         String shell6 = read("src/main/resources/assets/thaumcraft/models/block/blockeldritch_6.json");
 
-        assertTrue("BlockEldritch should route altar/obelisk/capstone/lock/crab-spawner metas through TESR-first world rendering instead of baked cube placeholders",
-                block.contains("return meta == 0 || meta == 1 || meta == 2 || meta == 3 || meta == 8 || meta == 9")
+        assertTrue("BlockEldritch should keep the original crust cube behind the crab-vent TESR while routing the other tile-backed metas through TESR-first rendering",
+                block.contains("return meta == 0 || meta == 1 || meta == 2 || meta == 3 || meta == 8")
                         && block.contains("? EnumBlockRenderType.INVISIBLE")
                         && block.contains(": EnumBlockRenderType.MODEL;")
                         && block.contains(".withProperty(TYPE, 4)"));

@@ -63,7 +63,7 @@ public class BlockLoot extends Block {
         List<ItemStack> drops = new ArrayList<>();
         Random random = world instanceof World ? ((World) world).rand : new Random();
         int meta = this.getMetaFromState(state);
-        int rolls = 1 + Math.max(0, fortune) + random.nextInt(3);
+        int rolls = 1 + meta + random.nextInt(3);
         for (int i = 0; i < rolls; i++) {
             ItemStack loot = Utils.generateLoot(meta, random);
             if (!loot.isEmpty()) {

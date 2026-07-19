@@ -128,9 +128,7 @@ public class TileEldritchAltar extends TileThaumcraft implements ITickable, IWan
         int chunkX = this.pos.getX() >> 4;
         int chunkZ = this.pos.getZ() >> 4;
         if (!MazeHandler.mazesInRange(chunkX, chunkZ, width, height)) {
-            Thread mazeThread = new Thread(new MazeThread(chunkX, chunkZ, width, height, this.world.rand.nextLong()));
-            mazeThread.start();
-            return false;
+            new MazeThread(chunkX, chunkZ, width, height, this.world.rand.nextLong()).run();
         }
         return true;
     }

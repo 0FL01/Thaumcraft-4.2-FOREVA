@@ -168,6 +168,7 @@ public class MazeGenerator {
         }
 
         if (!connected) {
+            success = false;
             // Try carving new path to exit
             List<Integer> dirs2 = Arrays.asList(N, S, E, W);
             Collections.shuffle(dirs2, rand);

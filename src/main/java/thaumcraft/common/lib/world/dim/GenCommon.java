@@ -65,28 +65,29 @@ public class GenCommon {
         Block block = null;
         int meta = 0;
 
+        if (b == STONE && cell.feature == 7 && world.rand.nextInt(3) == 0) {
+            b = CRUST;
+        }
+
         switch (b) {
             case 1: // BEDROCK
                 if (world.isAirBlock(new BlockPos(x, y, z))) {
-                    block = Blocks.STONE;
+                    block = Blocks.BEDROCK;
                 }
                 break;
 
             case 2: // STONE
-                if (cell.feature != 7 || world.rand.nextInt(3) != 0) {
-                    if (world.getBlockState(new BlockPos(x, y, z)).getBlock() == ConfigBlocks.blockEldritchNothing) break;
-                    if (world.rand.nextInt(25) == 0) {
-                        boolean crab = false;
-                        boolean bl = cell.feature == 7 ? true : (crab = world.rand.nextInt(50) == 0);
-                        if ((crab && cell.feature == 0) || (crab && cell.feature == 7)) {
-                            crabSpawner.add(new BlockPos(x, y, z));
-                        } else {
-                            decoCommon.add(new BlockPos(x, y, z));
-                        }
+                if (world.getBlockState(new BlockPos(x, y, z)).getBlock() == ConfigBlocks.blockEldritchNothing) break;
+                if (world.rand.nextInt(25) == 0) {
+                    boolean crab = cell.feature == 7 || world.rand.nextInt(50) == 0;
+                    if (crab && (cell.feature == 0 || cell.feature == 7)) {
+                        crabSpawner.add(new BlockPos(x, y, z));
+                    } else {
+                        decoCommon.add(new BlockPos(x, y, z));
                     }
-                    block = ConfigBlocks.blockCosmeticSolid;
-                    meta = 11;
                 }
+                block = ConfigBlocks.blockCosmeticSolid;
+                meta = 11;
                 break;
 
             case 3: // Stair variant (outer corner connection)
@@ -212,23 +213,22 @@ public class GenCommon {
                     break;
                 }
                 if (world.rand.nextInt(25) == 0) {
-                    boolean crab = false;
-                    boolean bl = cell.feature == 7 ? true :
-                            cell.feature == 12 && world.rand.nextBoolean() ? true :
-                                    (crab = world.rand.nextInt(25) == 0);
-                    if ((crab && cell.feature == 0) || (crab && cell.feature == 7) || (crab && cell.feature == 12)) {
+                    boolean crab = cell.feature == 7
+                            || cell.feature == 12 && world.rand.nextBoolean()
+                            || world.rand.nextInt(25) == 0;
+                    if (crab && (cell.feature == 0 || cell.feature == 7 || cell.feature == 12)) {
                         crabSpawner.add(new BlockPos(x, y, z));
                     }
                 }
                 break;
 
             case 99: // BEDROCK_REPL
-                block = Blocks.STONE;
+                block = Blocks.BEDROCK;
                 break;
         }
 
         if (block != null) {
-            int flags = (block == ConfigBlocks.blockEldritchNothing || block == Blocks.STONE || block == Blocks.AIR) ? 0 : 3;
+            int flags = (block == ConfigBlocks.blockEldritchNothing || block == Blocks.BEDROCK || block == Blocks.AIR) ? 0 : 3;
             world.setBlockState(new BlockPos(x, y, z), block.getStateFromMeta(meta), flags);
         }
     }
@@ -319,7 +319,7 @@ public class GenCommon {
             if (world.getBlockState(pos.offset(dir)).isFullBlock()) continue;
             BlockPos opposite = pos.offset(dir.getOpposite());
             Block oppositeBlock = world.getBlockState(opposite).getBlock();
-            if (oppositeBlock == Blocks.STONE || oppositeBlock == ConfigBlocks.blockEldritchNothing) {
+            if (oppositeBlock == Blocks.BEDROCK || oppositeBlock == ConfigBlocks.blockEldritchNothing) {
                 return true;
             }
         }
