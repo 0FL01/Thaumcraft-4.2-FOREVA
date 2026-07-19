@@ -71,8 +71,9 @@ public class FluxReservoirRendererFidelityStaticGuardTest {
                         && reservoirRenderer.contains("float r = tile.colorR;")
                         && reservoirRenderer.contains("float g = tile.colorG;")
                         && reservoirRenderer.contains("float b = tile.colorB;")
-                        && reservoirRenderer.contains("float a = 0.9F;")
+                        && reservoirRenderer.contains("float a = 1.0F;")
                         && reservoirRenderer.contains("drawTexturedCuboid(")
+                        && countOccurrences(reservoirRenderer, "face(buf,") == 6
                         && reservoirRenderer.contains("OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, prevLightX, prevLightY);")
                         && !reservoirRenderer.contains("tile.getWorld() == null"));
         assertTrue("Reservoir client ticks should retain TC4's rotating aspect and 20-tick color interpolation",

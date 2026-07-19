@@ -88,7 +88,7 @@ public class TileEssentiaReservoirRenderer extends TileEntitySpecialRenderer<Til
         float r = tile.colorR;
         float g = tile.colorG;
         float b = tile.colorB;
-        float a = 0.9F;
+        float a = 1.0F;
         float prevLightX = OpenGlHelper.lastBrightnessX;
         float prevLightY = OpenGlHelper.lastBrightnessY;
         boolean lightingEnabled = GL11.glIsEnabled(GL11.GL_LIGHTING);
