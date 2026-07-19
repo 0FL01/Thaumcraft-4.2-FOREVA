@@ -26,6 +26,9 @@ public class FluxReservoirRendererFidelityStaticGuardTest {
         String reservoirTile = read("src/main/java/thaumcraft/common/tiles/TileEssentiaReservoir.java");
         String reservoirModel = read("src/main/resources/assets/thaumcraft/models/block/blockessentiareservoir.json");
         String reservoirItemModel = read("src/main/resources/assets/thaumcraft/models/item/blockessentiareservoir_tesr.json");
+        String reservoirShell = reservoirRenderer.substring(
+                reservoirRenderer.indexOf("private void renderReservoirShell"),
+                reservoirRenderer.indexOf("private void renderLiquid"));
 
         assertTrue("Flux scrubber renderer should keep the orientation path and render the full reference cap-plus-tip model through TESR",
                 fluxRenderer.contains("new ModelFluxScrubber()")
@@ -71,11 +74,16 @@ public class FluxReservoirRendererFidelityStaticGuardTest {
                         && reservoirRenderer.contains("float r = tile.colorR;")
                         && reservoirRenderer.contains("float g = tile.colorG;")
                         && reservoirRenderer.contains("float b = tile.colorB;")
-                        && reservoirRenderer.contains("float a = 1.0F;")
+                        && reservoirRenderer.contains("float a = 0.9F;")
                         && reservoirRenderer.contains("drawTexturedCuboid(")
                         && countOccurrences(reservoirRenderer, "face(buf,") == 6
                         && reservoirRenderer.contains("OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, prevLightX, prevLightY);")
                         && !reservoirRenderer.contains("tile.getWorld() == null"));
+        assertTrue("Reservoir source OBJ shell should stay two-sided without leaking cull state",
+                reservoirShell.contains("boolean cullEnabled = GL11.glIsEnabled(GL11.GL_CULL_FACE);")
+                        && countOccurrences(reservoirShell, "GlStateManager.disableCull();") == 2
+                        && reservoirShell.contains("if (cullEnabled)")
+                        && reservoirShell.contains("GlStateManager.enableCull();"));
         assertTrue("Reservoir client ticks should retain TC4's rotating aspect and 20-tick color interpolation",
                 reservoirTile.contains("this.displayAspect = aspects[this.count / 20 % aspects.length];")
                         && reservoirTile.contains("this.stepR = (this.colorR - this.targetR) / 20.0F;")

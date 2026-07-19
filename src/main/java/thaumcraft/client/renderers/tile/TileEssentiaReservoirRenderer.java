@@ -44,6 +44,7 @@ public class TileEssentiaReservoirRenderer extends TileEntitySpecialRenderer<Til
         }
 
         boolean rescaleNormalEnabled = GL11.glIsEnabled(GL12.GL_RESCALE_NORMAL);
+        boolean cullEnabled = GL11.glIsEnabled(GL11.GL_CULL_FACE);
         GlStateManager.pushMatrix();
         try {
             translateFromOrientation(x, y, z,
@@ -53,6 +54,7 @@ public class TileEssentiaReservoirRenderer extends TileEntitySpecialRenderer<Til
             if (!rescaleNormalEnabled) {
                 GlStateManager.enableRescaleNormal();
             }
+            GlStateManager.disableCull();
             CCRenderState.reset();
             CCRenderState.startDrawing(GL11.GL_TRIANGLES, DefaultVertexFormats.OLDMODEL_POSITION_TEX_NORMAL);
             model.render(CCRenderState.normalAttrib);
@@ -60,6 +62,11 @@ public class TileEssentiaReservoirRenderer extends TileEntitySpecialRenderer<Til
         } finally {
             if (!rescaleNormalEnabled) {
                 GlStateManager.disableRescaleNormal();
+            }
+            if (cullEnabled) {
+                GlStateManager.enableCull();
+            } else {
+                GlStateManager.disableCull();
             }
             GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
             GlStateManager.popMatrix();
@@ -88,7 +95,7 @@ public class TileEssentiaReservoirRenderer extends TileEntitySpecialRenderer<Til
         float r = tile.colorR;
         float g = tile.colorG;
         float b = tile.colorB;
-        float a = 1.0F;
+        float a = 0.9F;
         float prevLightX = OpenGlHelper.lastBrightnessX;
         float prevLightY = OpenGlHelper.lastBrightnessY;
         boolean lightingEnabled = GL11.glIsEnabled(GL11.GL_LIGHTING);
