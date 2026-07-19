@@ -93,9 +93,9 @@ public class EldritchTesrRoutingContractTest {
         assertTrue("The eldritch TEISR model stub must stay builtin/entity so Forge dispatches the custom renderer",
                 itemModel.contains("\"parent\": \"builtin/entity\""));
         assertTrue("The static eldritch shell fallback models should keep the original centered inventory bounds",
-                shell4.contains("\"from\": [2, 2, 2]") && shell4.contains("\"to\": [14, 14, 14]")
-                        && shell5.contains("\"from\": [2, 2, 2]") && shell5.contains("\"to\": [14, 14, 14]")
-                        && shell6.contains("\"from\": [2, 2, 2]") && shell6.contains("\"to\": [14, 14, 14]"));
+                shell4.contains("\"parent\": \"block/block\"") && shell4.contains("\"from\": [2, 2, 2]") && shell4.contains("\"to\": [14, 14, 14]")
+                        && shell5.contains("\"parent\": \"block/block\"") && shell5.contains("\"from\": [2, 2, 2]") && shell5.contains("\"to\": [14, 14, 14]")
+                        && shell6.contains("\"parent\": \"block/block\"") && shell6.contains("\"from\": [2, 2, 2]") && shell6.contains("\"to\": [14, 14, 14]"));
     }
 
     private static String read(String path) throws IOException {

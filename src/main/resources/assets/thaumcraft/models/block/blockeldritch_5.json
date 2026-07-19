@@ -1,4 +1,5 @@
 {
+  "parent": "block/block",
   "ambientocclusion": false,
   "textures": {
     "particle": "thaumcraft:blocks/es_i_2",

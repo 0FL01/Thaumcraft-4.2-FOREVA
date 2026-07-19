@@ -25,7 +25,9 @@ public class EldritchCrustBakedModelStaticGuardTest {
                 && block.contains("withProperty(CRUST_NEIGHBOR_MASK, mask)"));
 
         assertTrue(model.contains("for (int mask = 0; mask < 64; mask++)")
-                && model.contains("return this.shapes.get(this.getNeighborMask(state));")
+                && model.contains("if (side == null)")
+                && model.contains("this.getNeighborMask(state) * EnumFacing.values().length + side.getIndex()")
+                && model.contains("return this.faceQuads.get(index);")
                 && model.contains("EnumFacing.WEST) ? 0.0F : 2.0F")
                 && model.contains("EnumFacing.DOWN) ? 0.0F : 2.0F")
                 && model.contains("EnumFacing.NORTH) ? 0.0F : 2.0F")

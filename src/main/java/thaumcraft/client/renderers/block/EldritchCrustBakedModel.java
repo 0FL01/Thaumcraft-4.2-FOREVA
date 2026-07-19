@@ -26,23 +26,27 @@ import thaumcraft.common.blocks.BlockEldritch;
 public final class EldritchCrustBakedModel implements IBakedModel {
     private static final FaceBakery FACE_BAKERY = new FaceBakery();
     private final IBakedModel delegate;
-    private final List<List<BakedQuad>> shapes;
+    private final List<List<BakedQuad>> faceQuads;
 
     public EldritchCrustBakedModel(IBakedModel delegate) {
         this.delegate = delegate;
         ImmutableList.Builder<List<BakedQuad>> builder = ImmutableList.builder();
         for (int mask = 0; mask < 64; mask++) {
-            builder.add(this.buildQuads(mask));
+            List<BakedQuad> shape = this.buildQuads(mask);
+            for (EnumFacing facing : EnumFacing.values()) {
+                builder.add(ImmutableList.of(shape.get(facing.getIndex())));
+            }
         }
-        this.shapes = builder.build();
+        this.faceQuads = builder.build();
     }
 
     @Override
     public List<BakedQuad> getQuads(@Nullable IBlockState state, @Nullable EnumFacing side, long rand) {
-        if (side != null) {
+        if (side == null) {
             return ImmutableList.of();
         }
-        return this.shapes.get(this.getNeighborMask(state));
+        int index = this.getNeighborMask(state) * EnumFacing.values().length + side.getIndex();
+        return this.faceQuads.get(index);
     }
 
     private int getNeighborMask(@Nullable IBlockState state) {
