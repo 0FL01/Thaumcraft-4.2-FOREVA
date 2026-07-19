@@ -58,23 +58,23 @@ jobs:
             echo "## Thaumcraft 4.2 1.12.2"
             echo
             if [[ -n "$PREVIOUS_TAG" ]]; then
-              echo "**Предыдущий релиз:** \`${PREVIOUS_TAG}\`"
+              echo "**Previous release:** \`${PREVIOUS_TAG}\`"
             elif [[ -n "$BASE_REF" ]]; then
-              echo "**Предыдущий коммит:** \`${BASE_REF:0:7}\`"
+              echo "**Previous commit:** \`${BASE_REF:0:7}\`"
             else
-              echo "**Диапазон:** с начала истории"
+              echo "**Range:** entire commit history"
             fi
             echo
-            echo "**Новых коммитов:** ${COMMIT_COUNT}"
+            echo "**New commits:** ${COMMIT_COUNT}"
             echo
-            echo "### Изменения"
+            echo "### Changes"
             echo
             git log --reverse \
               --format="- [\`%h\`](${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/commit/%H) %s" \
               "$RANGE"
             echo
             if [[ -n "$BASE_REF" ]]; then
-              echo "[Полный список изменений](${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/compare/${BASE_REF}...${GITHUB_SHA})"
+              echo "[Full changelog](${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/compare/${BASE_REF}...${GITHUB_SHA})"
               echo
             fi
             echo "### Artifacts"
