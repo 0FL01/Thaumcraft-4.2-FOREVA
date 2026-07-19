@@ -927,7 +927,7 @@ public class ClientProxyEntityRendererRegistrationStaticGuardTest {
         String jarBranch = carriedItemMethod.substring(jarStart, blockStart);
         assertTrue("Alchemy golem jars must use the upright carry-limit-scaled transform",
                 jarBranch.contains("GlStateManager.translate(0.0F, 2.5F, -1.0F);")
-                        && jarBranch.contains("Math.min(64, entity.getCarryLimit()) / 64.0F) * 1.5F")
+                        && jarBranch.contains("Math.min(64, entity.getCarryLimit()) / 64.0F) * 2.25F")
                         && jarBranch.contains("GlStateManager.rotate(90.0F, 0.0F, 1.0F, 0.0F);")
                         && jarBranch.contains("GlStateManager.rotate(180.0F, 1.0F, 0.0F, 0.0F);")
                         && jarBranch.contains("transformType = ItemCameraTransforms.TransformType.FIXED;"));
