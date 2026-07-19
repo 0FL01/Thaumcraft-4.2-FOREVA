@@ -544,7 +544,7 @@ public class ClientProxyFxStaticGuardTest {
                         && miscEvent.contains("RenderEventHandler.fogFiddled"));
         assertTrue("PacketWarpMessage must schedule client task via proxy boundary and show warp notifications",
                 warpMessage.contains("Thaumcraft.proxy.scheduleClientTask(")
-                        && warpMessage.contains("TextComponentTranslation"));
+                        && warpMessage.contains("PlayerNotifications.addNotification"));
         assertTrue("PacketBoreDig must schedule client task via proxy boundary and route to TileArcaneBore.getDigEvent",
                 packetBoreDig.contains("Thaumcraft.proxy.scheduleClientTask(")
                         && packetBoreDig.contains("getDigEvent"));

@@ -53,6 +53,7 @@ import thaumcraft.common.lib.events.ServerTickEventsFML;
 import thaumcraft.common.lib.events.CommandThaumcraft;
 import thaumcraft.common.lib.CreativeTabThaumcraft;
 import thaumcraft.common.lib.network.PacketHandler;
+import thaumcraft.common.lib.network.playerdata.PacketWarpMessage;
 import thaumcraft.common.lib.research.ScanManager;
 import thaumcraft.common.blocks.BlockJarItem;
 import thaumcraft.common.lib.world.ComponentBankerHome;
@@ -313,6 +314,11 @@ public class Thaumcraft {
         }
         knowledge.setWarpCounter(knowledge.getTotalWarp());
         thaumcraft.common.lib.research.ResearchManager.syncWarp(player);
+        if (player instanceof net.minecraft.entity.player.EntityPlayerMP) {
+            PacketHandler.INSTANCE.sendTo(
+                    new PacketWarpMessage(player, (byte) (temporary ? 2 : 0), amount),
+                    (net.minecraft.entity.player.EntityPlayerMP) player);
+        }
     }
 
     public static void addStickyWarpToPlayer(net.minecraft.entity.player.EntityPlayer player, int amount) {
@@ -324,6 +330,11 @@ public class Thaumcraft {
         knowledge.addWarpSticky(amount);
         knowledge.setWarpCounter(knowledge.getTotalWarp());
         thaumcraft.common.lib.research.ResearchManager.syncWarp(player);
+        if (player instanceof net.minecraft.entity.player.EntityPlayerMP) {
+            PacketHandler.INSTANCE.sendTo(
+                    new PacketWarpMessage(player, (byte) 1, amount),
+                    (net.minecraft.entity.player.EntityPlayerMP) player);
+        }
     }
 
     // ---- Aspect Initialisation ----

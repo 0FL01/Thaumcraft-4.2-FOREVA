@@ -1,14 +1,15 @@
 package thaumcraft.common.lib.network.playerdata;
 
 import io.netty.buffer.ByteBuf;
+import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.SoundCategory;
-import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import thaumcraft.client.lib.PlayerNotifications;
 import thaumcraft.common.Thaumcraft;
 import thaumcraft.common.lib.TCSounds;
 import thaumcraft.common.lib.network.PacketBase;
@@ -50,31 +51,32 @@ public class PacketWarpMessage extends PacketBase {
             if (player == null || world == null) return;
             if (this.data == 0) return;
 
-            String key;
-            switch (this.type) {
-                case 0:
-                    key = this.data < 0 ? "tc.removewarp" : "tc.addwarp";
-                    break;
-                case 1:
-                    key = this.data < 0 ? "tc.removewarpsticky" : "tc.addwarpsticky";
-                    break;
-                default:
-                    key = this.data < 0 ? "tc.removewarptemp" : "tc.addwarptemp";
-                    break;
-            }
-            player.sendMessage(new TextComponentTranslation(key));
-            if (this.data > 0) {
-                world.playSound(
-                        player,
-                        player.posX,
-                        player.posY,
-                        player.posZ,
-                        TCSounds.WHISPERS,
-                        SoundCategory.PLAYERS,
-                        0.5f,
-                        1.0f);
+            if (this.type == 0 && this.data > 0) {
+                PlayerNotifications.addNotification(I18n.format("tc.addwarp"));
+                playWhisper(world, player);
+            } else if (this.type == 1) {
+                PlayerNotifications.addNotification(I18n.format(
+                        this.data < 0 ? "tc.removewarpsticky" : "tc.addwarpsticky"));
+                if (this.data > 0) {
+                    playWhisper(world, player);
+                }
+            } else if (this.data > 0) {
+                PlayerNotifications.addNotification(I18n.format("tc.addwarptemp"));
             }
         });
         return null;
+    }
+
+    @SideOnly(Side.CLIENT)
+    private static void playWhisper(World world, EntityPlayer player) {
+        world.playSound(
+                player,
+                player.posX,
+                player.posY,
+                player.posZ,
+                TCSounds.WHISPERS,
+                SoundCategory.PLAYERS,
+                0.5f,
+                1.0f);
     }
 }

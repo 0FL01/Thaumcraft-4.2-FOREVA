@@ -84,13 +84,13 @@ public final class WarpEvents {
                         if (eff <= 12) {
                             player.sendMessage(new TextComponentString("\u00a75\u00a7o" + net.minecraft.util.text.translation.I18n.translateToLocal("warp.text.11")));
                         } else if (eff <= 16) {
-                            applyPotionSafely(player, Config.potionVisExhaust, 5000, Math.min(3, warp / 15), true);
+                            applyPotionWithoutCuratives(player, Config.potionVisExhaust, 5000, Math.min(3, warp / 15), true);
                             player.sendMessage(new TextComponentString("\u00a75\u00a7o" + net.minecraft.util.text.translation.I18n.translateToLocal("warp.text.1")));
                         } else if (eff <= 20) {
-                            applyPotionSafely(player, Config.potionThaumarhia, Math.min(32000, 10 * warp), 0, true);
+                            applyPotionWithoutCuratives(player, Config.potionThaumarhia, Math.min(32000, 10 * warp), 0, true);
                             player.sendMessage(new TextComponentString("\u00a75\u00a7o" + net.minecraft.util.text.translation.I18n.translateToLocal("warp.text.15")));
                         } else if (eff <= 24) {
-                            PotionEffect pe = new PotionEffect(Config.potionUnnaturalHunger, 5000, Math.min(3, warp / 15), false, true);
+                            PotionEffect pe = new PotionEffect(Config.potionUnnaturalHunger, 5000, Math.min(3, warp / 15), true, true);
                             pe.getCurativeItems().clear();
                             pe.addCurativeItem(new ItemStack(Items.ROTTEN_FLESH));
                             pe.addCurativeItem(new ItemStack(ConfigItems.itemZombieBrain));
@@ -103,19 +103,19 @@ public final class WarpEvents {
                         } else if (eff <= 36) {
                             applyPotionSafely(player, Config.potionBlurredVision, Math.min(32000, 10 * warp), 0, true);
                         } else if (eff <= 40) {
-                            applyPotionSafely(player, Config.potionSunScorned, 5000, Math.min(3, warp / 15), true);
+                            applyPotionWithoutCuratives(player, Config.potionSunScorned, 5000, Math.min(3, warp / 15), true);
                             player.sendMessage(new TextComponentString("\u00a75\u00a7o" + net.minecraft.util.text.translation.I18n.translateToLocal("warp.text.5")));
                         } else if (eff <= 44) {
                             applyPotionSafely(player, MobEffects.REGENERATION, 1200, Math.min(3, warp / 15), true);
                             player.sendMessage(new TextComponentString("\u00a75\u00a7o" + net.minecraft.util.text.translation.I18n.translateToLocal("warp.text.9")));
                         } else if (eff <= 48) {
-                            applyPotionSafely(player, Config.potionInfectiousVisExhaust, 6000, Math.min(3, warp / 15), false);
+                            applyPotionWithoutCuratives(player, Config.potionInfectiousVisExhaust, 6000, Math.min(3, warp / 15), false);
                             player.sendMessage(new TextComponentString("\u00a75\u00a7o" + net.minecraft.util.text.translation.I18n.translateToLocal("warp.text.1")));
                         } else if (eff <= 52) {
                             applyPotionSafely(player, MobEffects.NIGHT_VISION, Math.min(40 * warp, 6000), 0, true);
                             player.sendMessage(new TextComponentString("\u00a75\u00a7o" + net.minecraft.util.text.translation.I18n.translateToLocal("warp.text.10")));
                         } else if (eff <= 56) {
-                            applyPotionSafely(player, Config.potionDeathGaze, 6000, Math.min(3, warp / 15), true);
+                            applyPotionWithoutCuratives(player, Config.potionDeathGaze, 6000, Math.min(3, warp / 15), true);
                             player.sendMessage(new TextComponentString("\u00a75\u00a7o" + net.minecraft.util.text.translation.I18n.translateToLocal("warp.text.4")));
                         } else if (eff <= 60) {
                             suddenlySpiders(player, warp, false);
@@ -133,7 +133,7 @@ public final class WarpEvents {
                             }
                             player.sendMessage(new TextComponentString("\u00a75\u00a7o" + net.minecraft.util.text.translation.I18n.translateToLocal("warp.text.14")));
                         } else if (eff <= 80) {
-                            PotionEffect pe = new PotionEffect(Config.potionUnnaturalHunger, 6000, Math.min(3, warp / 15), false, true);
+                            PotionEffect pe = new PotionEffect(Config.potionUnnaturalHunger, 6000, Math.min(3, warp / 15), true, true);
                             pe.getCurativeItems().clear();
                             pe.addCurativeItem(new ItemStack(Items.ROTTEN_FLESH));
                             pe.addCurativeItem(new ItemStack(ConfigItems.itemZombieBrain));
@@ -174,7 +174,7 @@ public final class WarpEvents {
     }
 
     /**
-     * Called from EventHandlerEntity.onLivingDeath().
+     * Called from EventHandlerEntity.onLivingUpdate().
      * If the player has death gaze potion active, nearby entities aggro.
      */
     public static void checkDeathGaze(EntityPlayer player) {
@@ -189,15 +189,16 @@ public final class WarpEvents {
                 player.getEntityBoundingBox().grow(range, range, range));
 
         for (Entity entity : list) {
-            if (!entity.isEntityAlive() || !(entity instanceof EntityLivingBase)) continue;
+            if (!entity.canBeCollidedWith() || !(entity instanceof EntityLivingBase) || !entity.isEntityAlive()) continue;
             EntityLivingBase living = (EntityLivingBase) entity;
+            if (!EntityUtils.isVisibleTo(0.75F, player, entity, range)) continue;
             if (!player.canEntityBeSeen(entity)) continue;
-            if (entity == player) continue;
             if (entity instanceof EntityPlayer && !FMLCommonHandler.instance().getMinecraftServerInstance().isPVPEnabled())
                 continue;
             if (living.isPotionActive(MobEffects.WITHER)) continue;
 
             living.setRevengeTarget(player);
+            living.setLastAttackedEntity(player);
             if (entity instanceof EntityCreature) {
                 ((EntityCreature) entity).setAttackTarget(player);
             }
@@ -314,13 +315,20 @@ public final class WarpEvents {
 
     // ---- Utility ----
 
-    private static void applyPotionSafely(EntityPlayer player, Potion potion, int duration, int amplifier, boolean showParticles) {
+    private static void applyPotionSafely(EntityPlayer player, Potion potion, int duration, int amplifier, boolean ambient) {
         if (potion == null) return;
         try {
-            player.addPotionEffect(new PotionEffect(potion, duration, amplifier, false, showParticles));
+            player.addPotionEffect(new PotionEffect(potion, duration, amplifier, ambient, true));
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    private static void applyPotionWithoutCuratives(EntityPlayer player, Potion potion, int duration, int amplifier, boolean ambient) {
+        if (potion == null) return;
+        PotionEffect effect = new PotionEffect(potion, duration, amplifier, ambient, true);
+        effect.getCurativeItems().clear();
+        applyEffectSafely(player, effect);
     }
 
     private static void applyEffectSafely(EntityPlayer player, PotionEffect pe) {
