@@ -16,6 +16,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import thaumcraft.client.renderers.block.ArcaneFurnaceBakedModel;
 import thaumcraft.client.renderers.block.AlchemyFurnaceBakedModel;
+import thaumcraft.client.renderers.block.EldritchCrustBakedModel;
 import thaumcraft.client.renderers.block.WardedGlassBakedModel;
 import thaumcraft.client.renderers.item.CrystalPerspectiveModel;
 import thaumcraft.client.renderers.item.ThaumometerPerspectiveModel;
@@ -112,6 +113,7 @@ public final class ClientModelRegistry {
         bakeFrostShardModel(event);
         replaceAlchemyFurnaceModel(event);
         replaceArcaneFurnaceModels(event);
+        replaceEldritchCrustModels(event);
         replaceWardedGlassModel(event);
     }
 
@@ -180,6 +182,16 @@ public final class ClientModelRegistry {
         IBakedModel delegate = event.getModelRegistry().getObject(WARDED_GLASS_MODEL);
         if (delegate != null) {
             event.getModelRegistry().putObject(WARDED_GLASS_MODEL, new WardedGlassBakedModel(delegate));
+        }
+    }
+
+    private static void replaceEldritchCrustModels(ModelBakeEvent event) {
+        for (int meta = 4; meta <= 6; meta++) {
+            ModelResourceLocation location = new ModelResourceLocation("thaumcraft:blockeldritch", "type=" + meta);
+            IBakedModel delegate = event.getModelRegistry().getObject(location);
+            if (delegate != null) {
+                event.getModelRegistry().putObject(location, new EldritchCrustBakedModel(delegate));
+            }
         }
     }
 }
