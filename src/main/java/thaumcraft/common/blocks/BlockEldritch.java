@@ -4,7 +4,6 @@ import java.util.Random;
 import net.minecraft.block.Block;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
-import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.properties.PropertyInteger;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
@@ -27,9 +26,6 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.Explosion;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
-import net.minecraftforge.common.property.ExtendedBlockState;
-import net.minecraftforge.common.property.IExtendedBlockState;
-import net.minecraftforge.common.property.IUnlistedProperty;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import thaumcraft.common.Thaumcraft;
@@ -48,8 +44,7 @@ public class BlockEldritch extends Block {
     public static final String[] types = {"altar", "obelisk", "obelisk_middle", "capstone", "glowing_crust",
             "glyphed", "deco", "doorway", "lock", "crab_spawner", "runed"};
     public static final PropertyInteger TYPE = PropertyInteger.create("type", 0, 10);
-    public static final IUnlistedProperty<Integer> CRUST_NEIGHBOR_MASK =
-            new IntUnlistedProperty("crust_neighbor_mask", 0, 63);
+    public static final PropertyInteger CRUST_NEIGHBOR_MASK = PropertyInteger.create("crust_neighbor_mask", 0, 63);
 
     public BlockEldritch() {
         super(Material.ROCK);
@@ -57,7 +52,9 @@ public class BlockEldritch extends Block {
         this.setResistance(20000.0f);
         this.setSoundType(SoundType.STONE);
         this.setCreativeTab(Thaumcraft.tabTC);
-        this.setDefaultState(this.blockState.getBaseState().withProperty(TYPE, 0));
+        this.setDefaultState(this.blockState.getBaseState()
+                .withProperty(TYPE, 0)
+                .withProperty(CRUST_NEIGHBOR_MASK, 0));
         this.setHarvestLevel("pickaxe", 2);
         this.setLightOpacity(0);
         this.useNeighborBrightness = true;
@@ -70,13 +67,11 @@ public class BlockEldritch extends Block {
     
     @Override
     protected BlockStateContainer createBlockState() {
-        return new ExtendedBlockState(this,
-                new IProperty[]{TYPE},
-                new IUnlistedProperty[]{CRUST_NEIGHBOR_MASK});
+        return new BlockStateContainer(this, TYPE, CRUST_NEIGHBOR_MASK);
     }
 
     @Override
-    public IBlockState getExtendedState(IBlockState state, IBlockAccess worldIn, BlockPos pos) {
+    public IBlockState getActualState(IBlockState state, IBlockAccess worldIn, BlockPos pos) {
         int meta = this.getMetaFromState(state);
         if (meta < 4 || meta > 6) {
             return state;
@@ -90,7 +85,7 @@ public class BlockEldritch extends Block {
                 mask |= 1 << facing.getIndex();
             }
         }
-        return ((IExtendedBlockState) state).withProperty(CRUST_NEIGHBOR_MASK, mask);
+        return state.withProperty(CRUST_NEIGHBOR_MASK, mask);
     }
 
     @Override
@@ -369,35 +364,4 @@ public class BlockEldritch extends Block {
         super.breakBlock(world, pos, state);
     }
 
-    private static final class IntUnlistedProperty implements IUnlistedProperty<Integer> {
-        private final String name;
-        private final int min;
-        private final int max;
-
-        private IntUnlistedProperty(String name, int min, int max) {
-            this.name = name;
-            this.min = min;
-            this.max = max;
-        }
-
-        @Override
-        public String getName() {
-            return this.name;
-        }
-
-        @Override
-        public boolean isValid(Integer value) {
-            return value != null && value >= this.min && value <= this.max;
-        }
-
-        @Override
-        public Class<Integer> getType() {
-            return Integer.class;
-        }
-
-        @Override
-        public String valueToString(Integer value) {
-            return String.valueOf(value);
-        }
-    }
 }

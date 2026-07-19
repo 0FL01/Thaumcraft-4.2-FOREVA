@@ -16,6 +16,7 @@ import net.minecraft.client.model.ModelBiped;
 import net.minecraft.client.model.ModelSpider;
 import net.minecraft.client.renderer.RenderItem;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
+import net.minecraft.client.renderer.block.statemap.StateMap;
 import net.minecraft.client.renderer.entity.RenderEntityItem;
 import net.minecraft.client.renderer.entity.RenderSnowball;
 import net.minecraft.client.renderer.entity.RenderSpider;
@@ -213,6 +214,7 @@ import thaumcraft.client.lib.RenderEventHandler;
 import thaumcraft.client.lib.ItemAspectTooltipHandler;
 import thaumcraft.common.CommonProxy;
 import thaumcraft.common.blocks.BlockCandle;
+import thaumcraft.common.blocks.BlockEldritch;
 import thaumcraft.common.blocks.BlockMagicalLeaves;
 import thaumcraft.common.blocks.BlockTaint;
 import thaumcraft.common.blocks.BlockTaintFibres;
@@ -936,6 +938,8 @@ public class ClientProxy extends CommonProxy {
     }
 
     private void setupBlockRenderers() {
+        ModelLoader.setCustomStateMapper(ConfigBlocks.blockEldritch,
+                new StateMap.Builder().ignore(BlockEldritch.CRUST_NEIGHBOR_MASK).build());
         registerBuiltinItemModel(ConfigBlocks.blockFluxGooItem, 0, "blockfluxgoo");
         registerBuiltinItemModel(ConfigBlocks.blockFluxGasItem, 0, "blockfluxgas");
         registerBuiltinItemModel(Item.getItemFromBlock(ConfigBlocks.blockHole), 0, "blockhole");

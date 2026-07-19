@@ -18,7 +18,6 @@ import net.minecraft.client.renderer.block.model.ItemOverrideList;
 import net.minecraft.client.renderer.block.model.ModelRotation;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.util.EnumFacing;
-import net.minecraftforge.common.property.IExtendedBlockState;
 import org.apache.commons.lang3.tuple.Pair;
 import org.lwjgl.util.vector.Vector3f;
 import thaumcraft.common.blocks.BlockEldritch;
@@ -50,13 +49,7 @@ public final class EldritchCrustBakedModel implements IBakedModel {
     }
 
     private int getNeighborMask(@Nullable IBlockState state) {
-        if (state instanceof IExtendedBlockState) {
-            Integer mask = ((IExtendedBlockState) state).getValue(BlockEldritch.CRUST_NEIGHBOR_MASK);
-            if (mask != null) {
-                return mask;
-            }
-        }
-        return 0;
+        return state == null ? 0 : state.getValue(BlockEldritch.CRUST_NEIGHBOR_MASK);
     }
 
     private List<BakedQuad> buildQuads(int mask) {

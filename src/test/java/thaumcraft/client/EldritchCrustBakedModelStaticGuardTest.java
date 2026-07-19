@@ -16,13 +16,18 @@ public class EldritchCrustBakedModelStaticGuardTest {
         String block = read("src/main/java/thaumcraft/common/blocks/BlockEldritch.java");
         String model = read("src/main/java/thaumcraft/client/renderers/block/EldritchCrustBakedModel.java");
         String registry = read("src/main/java/thaumcraft/client/ClientModelRegistry.java");
+        String proxy = read("src/main/java/thaumcraft/client/ClientProxy.java");
 
-        assertTrue(block.contains("new IntUnlistedProperty(\"crust_neighbor_mask\", 0, 63)")
-                && block.contains("new ExtendedBlockState(this,")
+        assertTrue(block.contains("PropertyInteger.create(\"crust_neighbor_mask\", 0, 63)")
+                && block.contains("new BlockStateContainer(this, TYPE, CRUST_NEIGHBOR_MASK)")
+                && block.contains("getActualState(IBlockState state, IBlockAccess worldIn, BlockPos pos)")
                 && block.contains("if (meta < 4 || meta > 6)")
                 && block.contains("neighbor.isSideSolid(worldIn, neighborPos, facing.getOpposite())")
                 && block.contains("mask |= 1 << facing.getIndex();")
                 && block.contains("withProperty(CRUST_NEIGHBOR_MASK, mask)"));
+
+        assertTrue(proxy.contains("ModelLoader.setCustomStateMapper(ConfigBlocks.blockEldritch,")
+                && proxy.contains("new StateMap.Builder().ignore(BlockEldritch.CRUST_NEIGHBOR_MASK).build()"));
 
         assertTrue(model.contains("for (int mask = 0; mask < 64; mask++)")
                 && model.contains("if (side == null)")
@@ -36,7 +41,7 @@ public class EldritchCrustBakedModelStaticGuardTest {
                 && model.contains("EnumFacing.SOUTH) ? 16.0F : 14.0F"));
 
         assertTrue("The item mask must remain centered and BlockPart must provide vanilla cropped default UVs",
-                model.contains("return 0;")
+                model.contains("state == null ? 0 : state.getValue(BlockEldritch.CRUST_NEIGHBOR_MASK)")
                         && model.contains("new BlockFaceUV(null, 0)")
                         && model.contains("new BlockPart(from, to, faces, null, true)"));
 
