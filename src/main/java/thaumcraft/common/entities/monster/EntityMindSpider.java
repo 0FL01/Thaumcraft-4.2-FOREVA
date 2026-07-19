@@ -1,11 +1,15 @@
 package thaumcraft.common.entities.monster;
 
 import net.minecraft.entity.SharedMonsterAttributes;
+import net.minecraft.entity.ai.EntityAINearestAttackableTarget;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.EntityDataManager;
+import net.minecraft.util.ResourceLocation;
+
+import javax.annotation.Nullable;
 
 public class EntityMindSpider extends net.minecraft.entity.monster.EntitySpider {
     private static final DataParameter<Byte> HARMLESS =
@@ -19,6 +23,7 @@ public class EntityMindSpider extends net.minecraft.entity.monster.EntitySpider 
         super(world);
         this.setSize(0.3F, 0.3F);
         this.experienceValue = 1;
+        this.targetTasks.addTask(0, new EntityAINearestAttackableTarget<>(this, EntityPlayer.class, 0, true, false, null));
     }
 
     @Override
@@ -33,6 +38,7 @@ public class EntityMindSpider extends net.minecraft.entity.monster.EntitySpider 
         super.applyEntityAttributes();
         this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(1.0D);
         this.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).setBaseValue(1.0D);
+        this.getEntityAttribute(SharedMonsterAttributes.FOLLOW_RANGE).setBaseValue(12.0D);
     }
 
     @Override
@@ -58,12 +64,6 @@ public class EntityMindSpider extends net.minecraft.entity.monster.EntitySpider 
     @Override
     protected float getSoundPitch() { return 0.7F; }
 
-    @Override
-    public boolean isAIDisabled() { return this.isHarmless(); }
-
-    @Override
-    public boolean isEntityInvulnerable(net.minecraft.util.DamageSource src) { return this.isHarmless(); }
-
     public float spiderScaleAmount() {
         return 0.3F;
     }
@@ -73,10 +73,7 @@ public class EntityMindSpider extends net.minecraft.entity.monster.EntitySpider 
         return this.isHarmless() ? 0.0D : 0.1D;
     }
 
-    @Override
-    public boolean canBeCollidedWith() {
-        return true;
-    }
+    @Override public boolean doesEntityNotTriggerPressurePlate() { return true; }
 
     @Override
     protected boolean canTriggerWalking() {
@@ -91,8 +88,11 @@ public class EntityMindSpider extends net.minecraft.entity.monster.EntitySpider 
         return super.attackEntityAsMob(entityIn);
     }
 
+    @Nullable
+    @Override
+    protected ResourceLocation getLootTable() { return null; }
+
     @Override protected void dropFewItems(boolean wasRecentlyHit, int looting) {}
-    @Override public int getMaxSpawnedInChunk() { return 200; }
 
     // ---- WarpEvents phantom spider support ----
 

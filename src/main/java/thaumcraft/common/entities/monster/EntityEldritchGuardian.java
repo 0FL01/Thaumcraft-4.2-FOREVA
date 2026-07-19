@@ -92,7 +92,7 @@ public class EntityEldritchGuardian extends EntityMob implements IRangedAttackMo
 
     @Override
     protected boolean canDespawn() {
-        return false;
+        return !this.hasHome();
     }
 
     @Override

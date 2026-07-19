@@ -23,8 +23,8 @@ Complete the frozen Required Outcomes using the listed Change Envelope and Prima
   - Source: Approved plan, step 2; original `WarpEvents`, `EntityMindSpider`, and `EntityEldritchGuardian` behavior.
   - Acceptance: Spawn selection and placement stay equivalent; harmless viewer-bound spiders retain pursuit AI, cannot attack, remain damageable, do not trigger pressure plates, and use no vanilla loot; Warp guardians without a home may despawn.
   - Primary evidence: Focused entity parity guards, `./scripts/dev.sh validate --smoke`, and controlled runtime observation where available.
-  - Status: pending
-  - Evidence:
+  - Status: verified
+  - Evidence: `WarpManifestationParityStaticGuardTest`, updated renderer/entity guard, `./scripts/dev.sh validate --smoke`, and `./scripts/dev.sh build` passed on 2026-07-19.
 - R3: Restore non-spawn Warp effect and feedback parity.
   - Source: Approved plan, step 3; original `WarpEvents`, Death Gaze, and `PacketWarpMessage` behavior.
   - Acceptance: Warp potion curatives and ambient/particle flags, Death Gaze target filtering, and Warp HUD notifications/whisper conditions match TC4 behavior on 1.12.2.
@@ -56,16 +56,16 @@ Complete the frozen Required Outcomes using the listed Change Envelope and Prima
 - User or harness budget: One deployable commit per approved plan iteration; compare changed behavior with TC4 before advancing.
 
 ## Current Checkpoint
-- Closes: R2; advances R4.
-- Smallest next action: Restore Mind Spider harmless behavior and guardian despawn parity without changing the proven spawn helper.
-- Expected evidence: Focused entity parity guards, `./scripts/dev.sh validate --smoke`, then `./scripts/dev.sh build` pass before commit.
-- Stop or replan if: 1.12 entity APIs cannot preserve the original behavior without a registry, NBT, or public API change.
+- Closes: R3; advances R4.
+- Smallest next action: Restore Warp potion flags/curatives, Death Gaze filtering, and original HUD feedback behavior.
+- Expected evidence: Focused effect/network guards, packet tests, `./scripts/dev.sh validate --smoke`, then `./scripts/dev.sh build` pass before commit.
+- Stop or replan if: The original feedback or potion contract requires a new packet id, public API, or persistent state.
 
 ## Current State
-- Resolved: R1 Warp mutation, cadence, suppression, and Death Gaze scheduling parity.
-- Last relevant evidence: Focused lifecycle test, server smoke, and build passed.
+- Resolved: R1 lifecycle and R2 manifestation entity parity.
+- Last relevant evidence: Focused manifestation tests, full server smoke, and build passed.
 - Blocker: None.
-- Next: Implement R2.
+- Next: Implement R3.
 
 ## Material Decisions
 - 2026-07-19: Split work into lifecycle, manifestations, and effects/feedback so each commit is independently deployable.
@@ -73,7 +73,8 @@ Complete the frozen Required Outcomes using the listed Change Envelope and Prima
 
 ## Checkpoint History
 - 2026-07-19: Contract frozen from the approved RECON plan; R1 selected first.
-- 2026-07-19: R1 verified. Restored counter arming, 2000-tick Warp scheduling, Warp Ward/wuss suppression, 10-tick Death Gaze scheduling, and removed the non-original death reset. Focused test, server smoke, and build passed; iteration commit pending.
+- 2026-07-19: R1 verified in commit `1e8f811c`. Restored counter arming, 2000-tick Warp scheduling, Warp Ward/wuss suppression, 10-tick Death Gaze scheduling, and removed the non-original death reset. Focused test, server smoke, and build passed.
+- 2026-07-19: R2 verified. Preserved the already-matching spawn helper, restored harmless-spider AI/damage/pressure-plate/loot contracts and 12-block player acquisition, and restored home-sensitive guardian despawn. The first full gate exposed a stale guard expecting the mistranslated collision override; the guard was corrected, then focused tests, server smoke, and build passed.
 
 ## Completion
 - Resolved outcomes:
