@@ -439,7 +439,7 @@ public class ConfigBlocks {
             FluidRegistry.registerFluid(FLUIDPURE);
         }
 
-        Fluid existingDeath = FluidRegistry.getFluid("fluidDeath");
+        Fluid existingDeath = FluidRegistry.getFluid("fluiddeath");
         if (existingDeath != null) {
             FLUIDDEATH = existingDeath;
         } else {

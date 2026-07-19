@@ -3,7 +3,7 @@
   "defaults": {
     "model": "forge:fluid",
     "custom": {
-      "fluid": "fluidDeath"
+      "fluid": "fluiddeath"
     }
   },
   "variants": {

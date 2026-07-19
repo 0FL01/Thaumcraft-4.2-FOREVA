@@ -65,6 +65,7 @@ import net.minecraftforge.fml.common.eventhandler.Event;
 import thaumcraft.api.ThaumcraftApi;
 import thaumcraft.api.aspects.Aspect;
 import thaumcraft.api.aspects.AspectList;
+import thaumcraft.api.damagesource.DamageSourceThaumcraft;
 import thaumcraft.api.entities.ITaintedMob;
 import thaumcraft.api.research.ResearchCategories;
 import thaumcraft.api.research.ResearchCategoryList;
@@ -494,6 +495,27 @@ public class EventHandlerEntity {
                         event.getEntityLiving().posZ,
                         new ItemStack(ConfigItems.itemResource, 1, 18)
                 ));
+        }
+
+        if (event.getSource() == DamageSourceThaumcraft.dissolve) {
+            World world = event.getEntityLiving().world;
+            AspectList aspects = ScanManager.generateEntityAspects(event.getEntityLiving());
+            if (aspects == null) return;
+
+            for (Aspect aspect : aspects.getAspects()) {
+                if (world.rand.nextBoolean()) continue;
+                int size = 1 + world.rand.nextInt(aspects.getAmount(aspect));
+                size = Math.max(1, size / 2);
+                ItemStack crystal = new ItemStack(ConfigItems.itemCrystalEssence, size, 0);
+                ConfigItems.itemCrystalEssence.setAspects(crystal, new AspectList().add(aspect, 1));
+                event.getDrops().add(new EntityItem(
+                        world,
+                        event.getEntityLiving().posX,
+                        event.getEntityLiving().posY + event.getEntityLiving().getEyeHeight(),
+                        event.getEntityLiving().posZ,
+                        crystal
+                ));
+            }
         }
     }
 
