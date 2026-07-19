@@ -15,6 +15,7 @@ public class TransportVisualShellContractTest {
     @Test
     public void mirrorAndReservoirVisualLayersStayOnTheirReferenceRenderPaths() throws IOException {
         String clientProxy = read("src/main/java/thaumcraft/client/ClientProxy.java");
+        String reservoirBlock = read("src/main/java/thaumcraft/common/blocks/BlockEssentiaReservoir.java");
         String reservoirItemRenderer = read("src/main/java/thaumcraft/client/renderers/item/ItemEssentiaReservoirRenderer.java");
         String mirrorRenderer = read("src/main/java/thaumcraft/client/renderers/tile/TileMirrorRenderer.java");
         String reservoirRenderer = read("src/main/java/thaumcraft/client/renderers/tile/TileEssentiaReservoirRenderer.java");
@@ -54,8 +55,9 @@ public class TransportVisualShellContractTest {
         assertTrue("Mirror TESR must keep the dynamic pane/portal layers after the static shell moved into block models",
                 mirrorRenderer.contains("renderPortalLayers(facing, x, y, z, partialTicks);")
                         && mirrorRenderer.contains("renderPane(facing, x, y, z, MIRROR_PANE_TRANS, 0.02F + instability);"));
-        assertTrue("Reservoir block model must expose only the exact central core cube",
-                reservoirModel.contains("\"ambientocclusion\": false")
+        assertTrue("Reservoir glass core must use the translucent block layer and exact central cube",
+                reservoirBlock.contains("return BlockRenderLayer.TRANSLUCENT;")
+                        && reservoirModel.contains("\"ambientocclusion\": false")
                         && reservoirModel.contains("\"from\": [2, 2, 2]")
                         && reservoirModel.contains("\"to\": [14, 14, 14]")
                         && reservoirModel.contains("thaumcraft:blocks/essentiareservoir"));
