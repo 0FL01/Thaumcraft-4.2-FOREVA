@@ -902,6 +902,12 @@ public class ClientProxyEntityRendererRegistrationStaticGuardTest {
     @Test
     public void golemCarriedItemStaysCenteredBetweenHands() throws IOException {
         String renderer = readFile("src/main/java/thaumcraft/client/renderers/entity/RenderGolemBase.java");
+        int coreStart = renderer.indexOf("private void renderCore");
+        int upgradesStart = renderer.indexOf("private void renderUpgrades", coreStart);
+        String coreMethod = renderer.substring(coreStart, upgradesStart);
+        assertTrue("Golem core badges must keep the original upright orientation",
+                coreMethod.contains("GlStateManager.rotate(180.0F, 0.0F, 0.0F, 1.0F);"));
+
         int carriedItemStart = renderer.indexOf("private void renderCarriedItem");
         int fluidBucketStart = renderer.indexOf("private void renderFluidBucket", carriedItemStart);
         String carriedItemMethod = renderer.substring(carriedItemStart, fluidBucketStart);
@@ -915,6 +921,15 @@ public class ClientProxyEntityRendererRegistrationStaticGuardTest {
                         && carriedItemMethod.contains("GlStateManager.rotate(180.0F, 0.0F, 0.0F, 1.0F);")
                         && carriedItemMethod.contains("transformType = ItemCameraTransforms.TransformType.FIXED;")
                         && !carriedItemMethod.contains("GlStateManager.rotate(-90.0F"));
+
+        int jarStart = carriedItemMethod.indexOf("if (stack.getItem() instanceof BlockJarItem)");
+        int blockStart = carriedItemMethod.indexOf("else if (stack.getItem() instanceof ItemBlock)", jarStart);
+        String jarBranch = carriedItemMethod.substring(jarStart, blockStart);
+        assertTrue("Alchemy golem jars must use the upright carry-limit-scaled transform",
+                jarBranch.contains("GlStateManager.translate(0.0F, 2.5F, -1.0F);")
+                        && jarBranch.contains("Math.min(64, entity.getCarryLimit()) / 64.0F")
+                        && jarBranch.contains("GlStateManager.rotate(90.0F, 0.0F, 1.0F, 0.0F);")
+                        && jarBranch.contains("transformType = ItemCameraTransforms.TransformType.FIXED;"));
 
         String model = readFile("src/main/java/thaumcraft/client/renderers/models/entities/ModelGolem.java");
         assertTrue("Golem carrying pose must raise both arms",
