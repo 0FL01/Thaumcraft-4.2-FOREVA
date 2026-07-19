@@ -316,9 +316,10 @@ public class RenderGolemBase extends RenderLiving<EntityGolemBase> {
             ItemCameraTransforms.TransformType transformType;
             if (stack.getItem() instanceof BlockJarItem) {
                 GlStateManager.translate(0.0F, 2.5F, -1.0F);
-                float jarScale = 1.0F + (float) Math.min(64, entity.getCarryLimit()) / 64.0F;
+                float jarScale = (1.0F + (float) Math.min(64, entity.getCarryLimit()) / 64.0F) * 1.5F;
                 GlStateManager.scale(jarScale, jarScale, jarScale);
                 GlStateManager.rotate(90.0F, 0.0F, 1.0F, 0.0F);
+                GlStateManager.rotate(180.0F, 1.0F, 0.0F, 0.0F);
                 transformType = ItemCameraTransforms.TransformType.FIXED;
             } else if (stack.getItem() instanceof ItemBlock) {
                 GlStateManager.translate(0.0F, 2.5F, -1.25F);
