@@ -29,12 +29,19 @@ public class AIGolemAttackOnCollide extends EntityAIBase {
         }
         this.entityTarget = target;
         this.entityPathEntity = this.theGolem.getNavigator().getPathToEntityLiving(this.entityTarget);
-        return this.entityPathEntity != null;
+        return this.entityPathEntity != null || this.isWithinAttackRange(target);
     }
 
     @Override
     public boolean shouldContinueExecuting() {
-        return this.shouldExecute() && !this.theGolem.getNavigator().noPath();
+        EntityLivingBase target = this.theGolem.getAttackTarget();
+        if (target == null) return false;
+        if (!this.theGolem.isValidTarget(target)) {
+            this.theGolem.setAttackTarget(null);
+            return false;
+        }
+        this.entityTarget = target;
+        return !this.theGolem.getNavigator().noPath() || this.isWithinAttackRange(target);
     }
 
     @Override
@@ -57,8 +64,7 @@ public class AIGolemAttackOnCollide extends EntityAIBase {
             this.theGolem.getNavigator().tryMoveToEntityLiving(this.entityTarget, (double)this.theGolem.getAIMoveSpeed());
         }
         this.attackTick = Math.max(this.attackTick - 1, 0);
-        double attackRange = (double)(this.entityTarget.width * 2.0F * this.entityTarget.width * 2.0F) + 1.0D;
-        if (this.theGolem.getDistanceSq(this.entityTarget.posX, this.entityTarget.getEntityBoundingBox().minY, this.entityTarget.posZ) <= attackRange && this.attackTick <= 0) {
+        if (this.isWithinAttackRange(this.entityTarget) && this.attackTick <= 0) {
             this.attackTick = this.theGolem.getAttackSpeed();
             if (!this.theGolem.getHeldItemMainhand().isEmpty()) {
                 this.theGolem.swingArm(net.minecraft.util.EnumHand.MAIN_HAND);
@@ -67,5 +73,10 @@ public class AIGolemAttackOnCollide extends EntityAIBase {
             }
             this.theGolem.attackEntityAsMob(this.entityTarget);
         }
+    }
+
+    private boolean isWithinAttackRange(EntityLivingBase target) {
+        double attackRange = (double)(target.width * 2.0F * target.width * 2.0F) + 1.0D;
+        return this.theGolem.getDistanceSq(target.posX, target.getEntityBoundingBox().minY, target.posZ) <= attackRange;
     }
 }
