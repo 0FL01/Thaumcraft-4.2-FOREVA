@@ -313,11 +313,7 @@ public class EventHandlerEntity {
     //  Filled stubs (ported from original EventHandlerEntity)
     // ==========================================================
 
-    /**
-     * Called every living entity tick (~20/sec per entity).
-     * - Calls WarpEvents.checkWarpEvent for players
-     * - Handles warp vomit/tick effects
-     */
+    /** Called every living entity tick (~20/sec per entity). */
     @SubscribeEvent
     public void onLivingUpdate(LivingEvent.LivingUpdateEvent event) {
         if (event.getEntityLiving().world.isRemote) {
@@ -326,7 +322,13 @@ public class EventHandlerEntity {
 
         if (event.getEntityLiving() instanceof EntityPlayer) {
             EntityPlayer player = (EntityPlayer) event.getEntityLiving();
-            WarpEvents.checkWarpEvent(player);
+            if (!Config.wuss && player.ticksExisted > 0 && player.ticksExisted % 2000 == 0
+                    && !player.isPotionActive(Config.potionWarpWard)) {
+                WarpEvents.checkWarpEvent(player);
+            }
+            if (player.ticksExisted % 10 == 0 && player.isPotionActive(Config.potionDeathGaze)) {
+                WarpEvents.checkDeathGaze(player);
+            }
             applyTravellerHasteMovement(player);
             enforceHoverFlightBounds(player);
         }
@@ -344,10 +346,6 @@ public class EventHandlerEntity {
     }
 
     /**
-     * On player death:
-     * - Calls WarpEvents.checkDeathGaze
-     * - Resets warp counter
-     *
      * On mob death (TC4 parity):
      * - Converts mobs killed while taint-poisoned into tainted variants
      * - Drops EntityAspectOrb for each primal aspect (50% chance each)
@@ -358,15 +356,6 @@ public class EventHandlerEntity {
         if (event.getEntityLiving().world.isRemote) return;
 
         if (event.getEntityLiving() instanceof EntityPlayer) {
-            EntityPlayer player = (EntityPlayer) event.getEntityLiving();
-            WarpEvents.checkDeathGaze(player);
-
-            // Reset warp counter on death
-            IPlayerKnowledge knowledge = player.getCapability(PlayerKnowledgeProvider.PLAYER_KNOWLEDGE, null);
-            if (knowledge != null) {
-                knowledge.setWarpCounter(0);
-                ResearchManager.syncWarp(player);
-            }
             return;
         }
 

@@ -301,23 +301,29 @@ public class Thaumcraft {
     // ---- Warp utilities ----
 
     public static void addWarpToPlayer(net.minecraft.entity.player.EntityPlayer player, int amount, boolean temporary) {
+        if (player == null || player.world.isRemote || amount == 0 || (!temporary && amount < 0)) return;
+
         IPlayerKnowledge knowledge = player.getCapability(PlayerKnowledgeProvider.PLAYER_KNOWLEDGE, null);
-        if (knowledge != null) {
-            if (temporary) {
-                knowledge.addWarpTemp(amount);
-            } else {
-                knowledge.addWarpPerm(amount);
-            }
-            thaumcraft.common.lib.research.ResearchManager.syncWarp(player);
+        if (knowledge == null || (temporary && amount < 0 && knowledge.getWarpTemp() <= 0)) return;
+
+        if (temporary) {
+            knowledge.addWarpTemp(amount);
+        } else {
+            knowledge.addWarpPerm(amount);
         }
+        knowledge.setWarpCounter(knowledge.getTotalWarp());
+        thaumcraft.common.lib.research.ResearchManager.syncWarp(player);
     }
 
     public static void addStickyWarpToPlayer(net.minecraft.entity.player.EntityPlayer player, int amount) {
+        if (player == null || player.world.isRemote || amount == 0) return;
+
         IPlayerKnowledge knowledge = player.getCapability(PlayerKnowledgeProvider.PLAYER_KNOWLEDGE, null);
-        if (knowledge != null) {
-            knowledge.addWarpSticky(amount);
-            thaumcraft.common.lib.research.ResearchManager.syncWarp(player);
-        }
+        if (knowledge == null || (amount < 0 && knowledge.getWarpSticky() <= 0)) return;
+
+        knowledge.addWarpSticky(amount);
+        knowledge.setWarpCounter(knowledge.getTotalWarp());
+        thaumcraft.common.lib.research.ResearchManager.syncWarp(player);
     }
 
     // ---- Aspect Initialisation ----
