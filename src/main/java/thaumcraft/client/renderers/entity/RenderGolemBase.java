@@ -314,19 +314,21 @@ public class RenderGolemBase extends RenderLiving<EntityGolemBase> {
             GlStateManager.scale(0.4F, 0.4F, 0.4F);
             GlStateManager.translate(0.0F, 2.5F, -1.25F);
 
+            ItemCameraTransforms.TransformType transformType;
             if (stack.getItem() instanceof ItemBlock) {
                 // Blocks: center between the hands without extra item rotation
                 GlStateManager.scale(0.5F, 0.5F, 0.5F);
+                transformType = ItemCameraTransforms.TransformType.THIRD_PERSON_RIGHT_HAND;
             } else {
-                // Regular items: orient upright as held
-                GlStateManager.rotate(-90.0F, 1.0F, 0.0F, 0.0F);
-                GlStateManager.rotate(180.0F, 0.0F, 1.0F, 0.0F);
+                GlStateManager.scale(1.25F, 1.25F, 1.25F);
+                GlStateManager.rotate(180.0F, 0.0F, 0.0F, 1.0F);
+                transformType = ItemCameraTransforms.TransformType.FIXED;
             }
 
             Minecraft.getMinecraft().getItemRenderer().renderItemSide(
                     entity,
                     stack,
-                    ItemCameraTransforms.TransformType.THIRD_PERSON_RIGHT_HAND,
+                    transformType,
                     false);
 
             GlStateManager.popMatrix();

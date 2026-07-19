@@ -910,6 +910,11 @@ public class ClientProxyEntityRendererRegistrationStaticGuardTest {
                 carriedItemMethod.contains("GlStateManager.translate(0.0F, 2.5F, -1.25F);"));
         assertTrue("Golem carried items must not be attached to a single arm",
                 !carriedItemMethod.contains("golemRightArm.postRender"));
+        assertTrue("Golem carried flat items must render larger and upright",
+                carriedItemMethod.contains("GlStateManager.scale(1.25F, 1.25F, 1.25F);")
+                        && carriedItemMethod.contains("GlStateManager.rotate(180.0F, 0.0F, 0.0F, 1.0F);")
+                        && carriedItemMethod.contains("transformType = ItemCameraTransforms.TransformType.FIXED;")
+                        && !carriedItemMethod.contains("GlStateManager.rotate(-90.0F"));
 
         String model = readFile("src/main/java/thaumcraft/client/renderers/models/entities/ModelGolem.java");
         assertTrue("Golem carrying pose must raise both arms",
