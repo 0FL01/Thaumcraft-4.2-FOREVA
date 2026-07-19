@@ -52,8 +52,9 @@ public class BlockEldritch extends Block {
         this.setResistance(20000.0f);
         this.setSoundType(SoundType.STONE);
         this.setCreativeTab(Thaumcraft.tabTC);
+        // RenderChunk gates all metadata variants through the default state's render type.
         this.setDefaultState(this.blockState.getBaseState()
-                .withProperty(TYPE, 0)
+                .withProperty(TYPE, 4)
                 .withProperty(CRUST_NEIGHBOR_MASK, 0));
         this.setHarvestLevel("pickaxe", 2);
         this.setLightOpacity(0);

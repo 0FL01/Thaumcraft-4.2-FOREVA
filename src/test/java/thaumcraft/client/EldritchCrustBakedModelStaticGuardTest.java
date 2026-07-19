@@ -20,6 +20,7 @@ public class EldritchCrustBakedModelStaticGuardTest {
 
         assertTrue(block.contains("PropertyInteger.create(\"crust_neighbor_mask\", 0, 63)")
                 && block.contains("new BlockStateContainer(this, TYPE, CRUST_NEIGHBOR_MASK)")
+                && block.contains(".withProperty(TYPE, 4)")
                 && block.contains("getActualState(IBlockState state, IBlockAccess worldIn, BlockPos pos)")
                 && block.contains("if (meta < 4 || meta > 6)")
                 && block.contains("neighbor.isSideSolid(worldIn, neighborPos, facing.getOpposite())")

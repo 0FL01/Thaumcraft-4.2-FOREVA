@@ -29,7 +29,8 @@ public class EldritchTesrRoutingContractTest {
         assertTrue("BlockEldritch should route altar/obelisk/capstone/lock/crab-spawner metas through TESR-first world rendering instead of baked cube placeholders",
                 block.contains("return meta == 0 || meta == 1 || meta == 2 || meta == 3 || meta == 8 || meta == 9")
                         && block.contains("? EnumBlockRenderType.INVISIBLE")
-                        && block.contains(": EnumBlockRenderType.MODEL;"));
+                        && block.contains(": EnumBlockRenderType.MODEL;")
+                        && block.contains(".withProperty(TYPE, 4)"));
         assertTrue("BlockEldritch should use cutout world-layer rendering with neighbor brightness for its non-full shell family",
                 block.contains("this.setLightOpacity(0);")
                         && block.contains("this.useNeighborBrightness = true;")
