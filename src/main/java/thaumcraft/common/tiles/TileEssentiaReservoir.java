@@ -108,8 +108,6 @@ public class TileEssentiaReservoir extends TileThaumcraft implements ITickable, 
         if (this.facing == null) this.facing = EnumFacing.DOWN;
         if (nbt.hasKey("displayAspect")) {
             this.displayAspect = Aspect.getAspect(nbt.getString("displayAspect"));
-        } else {
-            this.displayAspect = null;
         }
         if (nbt.hasKey("colorR")) this.colorR = nbt.getFloat("colorR");
         if (nbt.hasKey("colorG")) this.colorG = nbt.getFloat("colorG");
@@ -123,12 +121,6 @@ public class TileEssentiaReservoir extends TileThaumcraft implements ITickable, 
             this.essentia.writeToNBT(nbt);
         }
         nbt.setByte("face", (byte) this.facing.getIndex());
-        if (this.displayAspect != null) {
-            nbt.setString("displayAspect", this.displayAspect.getTag());
-        }
-        nbt.setFloat("colorR", this.colorR);
-        nbt.setFloat("colorG", this.colorG);
-        nbt.setFloat("colorB", this.colorB);
     }
 
     // --- IAspectContainer ---
@@ -141,7 +133,7 @@ public class TileEssentiaReservoir extends TileThaumcraft implements ITickable, 
     @Override
     public void setAspects(AspectList aspects) {
         this.essentia = aspects != null ? aspects : new AspectList();
-        this.markDirty();
+        this.markDirtyAndSync();
     }
 
     @Override
@@ -156,7 +148,7 @@ public class TileEssentiaReservoir extends TileThaumcraft implements ITickable, 
         int add = Math.min(amount, this.maxAmount - total);
         if (add <= 0) return amount;
         this.essentia.add(tag, add);
-        this.markDirty();
+        this.markDirtyAndSync();
         return amount - add;
     }
 
@@ -165,7 +157,7 @@ public class TileEssentiaReservoir extends TileThaumcraft implements ITickable, 
         if (tag == null || amount <= 0) return false;
         if (this.containerContains(tag) < amount) return false;
         this.essentia.remove(tag, amount);
-        this.markDirty();
+        this.markDirtyAndSync();
         return true;
     }
 
@@ -180,7 +172,7 @@ public class TileEssentiaReservoir extends TileThaumcraft implements ITickable, 
         for (Aspect aspect : list.getAspects()) {
             this.essentia.remove(aspect, list.getAmount(aspect));
         }
-        this.markDirty();
+        this.markDirtyAndSync();
         return true;
     }
 
@@ -284,8 +276,7 @@ public class TileEssentiaReservoir extends TileThaumcraft implements ITickable, 
         if (clicked == null) return 0;
         this.facing = player != null && player.isSneaking() ? clicked : clicked.getOpposite();
         if (player != null) player.swingArm(EnumHand.MAIN_HAND);
-        this.markDirty();
-        if (world != null && !world.isRemote) world.notifyBlockUpdate(this.pos, world.getBlockState(this.pos), world.getBlockState(this.pos), 3);
+        this.markDirtyAndSync();
         return 0;
     }
 
@@ -297,4 +288,11 @@ public class TileEssentiaReservoir extends TileThaumcraft implements ITickable, 
 
     @Override
     public void onWandStoppedUsing(ItemStack wandstack, World world, EntityPlayer player, int count) {}
+
+    private void markDirtyAndSync() {
+        this.markDirty();
+        if (this.world != null && !this.world.isRemote) {
+            this.world.notifyBlockUpdate(this.pos, this.world.getBlockState(this.pos), this.world.getBlockState(this.pos), 3);
+        }
+    }
 }
