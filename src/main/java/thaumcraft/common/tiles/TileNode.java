@@ -1,5 +1,6 @@
 package thaumcraft.common.tiles;
 
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -7,6 +8,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.DamageSource;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.ITickable;
@@ -19,17 +21,20 @@ import net.minecraft.world.biome.Biome;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import thaumcraft.api.ThaumcraftApiHelper;
 import thaumcraft.api.TileThaumcraft;
+import thaumcraft.api.WorldCoordinates;
 import thaumcraft.api.aspects.Aspect;
 import thaumcraft.api.aspects.AspectList;
 import thaumcraft.api.aspects.IAspectContainer;
 import thaumcraft.api.nodes.INode;
 import thaumcraft.api.nodes.NodeModifier;
 import thaumcraft.api.nodes.NodeType;
+import thaumcraft.api.research.ScanResult;
 import thaumcraft.api.wands.IWandable;
 import thaumcraft.api.wands.WandCap;
 import thaumcraft.api.wands.WandRod;
-import thaumcraft.api.WorldCoordinates;
+import thaumcraft.common.Thaumcraft;
 import thaumcraft.common.blocks.BlockTaintFibres;
 import thaumcraft.common.config.Config;
 import thaumcraft.common.config.ConfigBlocks;
@@ -39,6 +44,7 @@ import thaumcraft.common.items.wands.ItemWandCasting;
 import thaumcraft.common.lib.network.PacketHandler;
 import thaumcraft.common.lib.network.fx.PacketFXBlockZap;
 import thaumcraft.common.lib.research.ResearchManager;
+import thaumcraft.common.lib.research.ScanManager;
 import thaumcraft.common.lib.utils.Utils;
 import thaumcraft.common.lib.world.ThaumcraftWorldGenerator;
 
@@ -264,6 +270,7 @@ implements ITickable, INode, IAspectContainer, IWandable {
         if (this.id == null || this.id.isEmpty()) {
             this.id = generateId();
         }
+        boolean changed = handleHungryNodeFirst(false);
         this.count++;
         if (this.world.isRemote) {
             updateDrainBeamVisual();
@@ -277,9 +284,8 @@ implements ITickable, INode, IAspectContainer, IWandable {
             this.regeneration = getRegenerationInterval();
         }
 
-        boolean changed = false;
         if (this.catchUp) {
-            changed = handleCatchUpRecharge();
+            changed |= handleCatchUpRecharge();
         }
         changed |= handleDischarge();
         if (this.wait > 0) {
@@ -292,6 +298,7 @@ implements ITickable, INode, IAspectContainer, IWandable {
         changed = handleTaintNode(changed);
         changed = handleDarkNode(changed);
         changed = handlePureNode(changed);
+        changed = handleHungryNodeSecond(changed);
 
         if (changed) {
             nodeChange();
@@ -489,6 +496,116 @@ implements ITickable, INode, IAspectContainer, IWandable {
         Aspect aspect = missing.getAspects()[this.world.rand.nextInt(missing.size())];
         this.addToContainer(aspect, 1);
         return true;
+    }
+
+    private boolean handleHungryNodeFirst(boolean changed) {
+        if (this.getNodeType() != NodeType.HUNGRY) {
+            return changed;
+        }
+
+        if (this.world.isRemote) {
+            for (int i = 0; i < Thaumcraft.proxy.particleCount(1); ++i) {
+                RayTraceResult hit = findHungryNodeTarget();
+                if (hit == null || hit.typeOfHit != RayTraceResult.Type.BLOCK || !isHungryTargetInRange(hit.getBlockPos())) {
+                    continue;
+                }
+                BlockPos target = hit.getBlockPos();
+                IBlockState state = this.world.getBlockState(target);
+                if (!state.getBlock().isAir(state, this.world, target)) {
+                    Thaumcraft.proxy.boreDigFx(
+                            this.world,
+                            target.getX() + this.world.rand.nextFloat(),
+                            target.getY() + this.world.rand.nextFloat(),
+                            target.getZ() + this.world.rand.nextFloat(),
+                            this.pos.getX() + 0.5D,
+                            this.pos.getY() + 0.5D,
+                            this.pos.getZ() + 0.5D,
+                            state,
+                            null,
+                            state.getBlock().getMetaFromState(state));
+                }
+            }
+        }
+
+        if (!Config.hardNode) {
+            return changed;
+        }
+
+        List<Entity> entities = this.world.getEntitiesWithinAABB(Entity.class, new AxisAlignedBB(this.pos).grow(15.0D));
+        for (Entity entity : entities) {
+            if (entity instanceof EntityPlayer && ((EntityPlayer) entity).capabilities.disableDamage) {
+                continue;
+            }
+
+            double distanceSq = getDistanceSq(entity.posX, entity.posY, entity.posZ);
+            if (entity.isEntityAlive() && !entity.getIsInvulnerable() && distanceSq < 2.0D) {
+                entity.attackEntityFrom(DamageSource.OUT_OF_WORLD, 1.0F);
+                if (!entity.isEntityAlive() && !this.world.isRemote) {
+                    AspectList aspects = ScanManager.getScanAspects(new ScanResult((byte) 2, 0, 0, entity, ""), this.world);
+                    aspects = ResearchManager.reduceToPrimals(aspects.copy());
+                    if (aspects.size() > 0) {
+                        Aspect aspect = aspects.getAspects()[this.world.rand.nextInt(aspects.size())];
+                        if (this.getAspects().getAmount(aspect) < this.getNodeVisBase(aspect)) {
+                            this.addToContainer(aspect, 1);
+                            changed = true;
+                        } else if (this.world.rand.nextInt(1 + this.getNodeVisBase(aspect) * 2) < aspects.getAmount(aspect)) {
+                            this.aspectsBase.add(aspect, 1);
+                            changed = true;
+                        }
+                    }
+                }
+            }
+
+            double dx = (this.pos.getX() + 0.5D - entity.posX) / 15.0D;
+            double dy = (this.pos.getY() + 0.5D - entity.posY) / 15.0D;
+            double dz = (this.pos.getZ() + 0.5D - entity.posZ) / 15.0D;
+            double distance = Math.sqrt(dx * dx + dy * dy + dz * dz);
+            double pull = 1.0D - distance;
+            if (pull > 0.0D && distance > 0.0D) {
+                pull *= pull;
+                entity.motionX += dx / distance * pull * 0.15D;
+                entity.motionY += dy / distance * pull * 0.25D;
+                entity.motionZ += dz / distance * pull * 0.15D;
+            }
+        }
+        return changed;
+    }
+
+    private boolean handleHungryNodeSecond(boolean changed) {
+        if (this.getNodeType() != NodeType.HUNGRY || this.count % 50 != 0) {
+            return changed;
+        }
+
+        RayTraceResult hit = findHungryNodeTarget();
+        if (hit == null || hit.typeOfHit != RayTraceResult.Type.BLOCK || !isHungryTargetInRange(hit.getBlockPos())) {
+            return changed;
+        }
+
+        BlockPos target = hit.getBlockPos();
+        IBlockState state = this.world.getBlockState(target);
+        float hardness = state.getBlockHardness(this.world, target);
+        if (!state.getBlock().isAir(state, this.world, target) && hardness >= 0.0F && hardness < 5.0F) {
+            this.world.destroyBlock(target, true);
+        }
+        return changed;
+    }
+
+    private RayTraceResult findHungryNodeTarget() {
+        int x = this.pos.getX() + this.world.rand.nextInt(16) - this.world.rand.nextInt(16);
+        int y = this.pos.getY() + this.world.rand.nextInt(16) - this.world.rand.nextInt(16);
+        int z = this.pos.getZ() + this.world.rand.nextInt(16) - this.world.rand.nextInt(16);
+        y = Math.min(y, this.world.getHeight(x, z));
+        return ThaumcraftApiHelper.rayTraceIgnoringSource(
+                this.world,
+                new Vec3d(this.pos.getX() + 0.5D, this.pos.getY() + 0.5D, this.pos.getZ() + 0.5D),
+                new Vec3d(x + 0.5D, y + 0.5D, z + 0.5D),
+                true,
+                false,
+                false);
+    }
+
+    private boolean isHungryTargetInRange(BlockPos target) {
+        return getDistanceSq(target.getX(), target.getY(), target.getZ()) < 256.0D;
     }
 
     private boolean handleTaintNode(boolean changed) {
