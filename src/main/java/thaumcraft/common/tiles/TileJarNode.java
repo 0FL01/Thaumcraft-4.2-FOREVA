@@ -1,20 +1,33 @@
 package thaumcraft.common.tiles;
 
+import net.minecraft.block.Block;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Blocks;
+import net.minecraft.init.SoundEvents;
+import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.SoundCategory;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
 import thaumcraft.api.aspects.Aspect;
 import thaumcraft.api.aspects.AspectList;
 import thaumcraft.api.aspects.IAspectContainer;
 import thaumcraft.api.nodes.INode;
 import thaumcraft.api.nodes.NodeModifier;
 import thaumcraft.api.nodes.NodeType;
+import thaumcraft.api.wands.IWandable;
 import thaumcraft.common.Thaumcraft;
-import thaumcraft.common.tiles.TileJar;
+import thaumcraft.common.blocks.BlockAiry;
+import thaumcraft.common.config.ConfigBlocks;
+import thaumcraft.common.items.wands.ItemWandCasting;
 
 public class TileJarNode
 extends TileJar
 implements IAspectContainer,
-INode {
+ INode,
+ IWandable {
     private AspectList aspects = new AspectList();
     private AspectList aspectsBase = new AspectList();
     private NodeType nodeType = NodeType.NORMAL;
@@ -165,6 +178,46 @@ INode {
         } else {
             this.aspectsBase.reduce(aspect, this.aspectsBase.getAmount(aspect) - nodeVisBase);
         }
+    }
+
+    @Override
+    public int onWandRightClick(World world, ItemStack wandstack, EntityPlayer player,
+                                int x, int y, int z, int side, int md) {
+        BlockPos nodePos = new BlockPos(x, y, z);
+        if (!world.isRemote) {
+            this.drop = false;
+            world.setBlockState(nodePos,
+                    ConfigBlocks.blockAiry.getDefaultState().withProperty(BlockAiry.TYPE, 0), 3);
+            TileEntity tile = world.getTileEntity(nodePos);
+            if (tile instanceof TileNode) {
+                TileNode node = (TileNode) tile;
+                node.setAspects(this.getAspects());
+                node.setNodeModifier(this.getNodeModifier());
+                node.setNodeType(this.getNodeType());
+                node.setId(this.getId());
+                node.markDirty();
+                world.notifyBlockUpdate(nodePos, world.getBlockState(nodePos), world.getBlockState(nodePos), 3);
+            }
+            world.playEvent(2001, nodePos, Block.getStateId(Blocks.GLASS.getDefaultState()));
+            world.playSound(null, nodePos, SoundEvents.BLOCK_GLASS_BREAK, SoundCategory.BLOCKS,
+                    1.0F, 0.9F + world.rand.nextFloat() * 0.2F);
+        } else {
+            player.swingArm(ItemWandCasting.getHandHoldingWand(player, wandstack));
+        }
+        return 0;
+    }
+
+    @Override
+    public ItemStack onWandRightClick(World world, ItemStack wandstack, EntityPlayer player) {
+        return null;
+    }
+
+    @Override
+    public void onUsingWandTick(ItemStack wandstack, EntityPlayer player, int count) {
+    }
+
+    @Override
+    public void onWandStoppedUsing(ItemStack wandstack, World world, EntityPlayer player, int count) {
     }
 
     @Override
