@@ -58,7 +58,8 @@ public class TileJarRenderer extends TileEntitySpecialRenderer<TileJar> {
         }
 
         if (tile instanceof TileJarNode) {
-            TileNodeRenderer.renderNodeAt((TileJarNode) tile, x + 0.5D, y + 0.4D, z + 0.5D, partialTicks, 0.7F);
+            TileNodeRenderer.renderNodeAt((TileJarNode) tile, x + 0.5D, y + 0.4D, z + 0.5D, partialTicks, 0.7F,
+                    tile.getWorld() != null);
         }
 
         if (tile instanceof TileJarBrain) {

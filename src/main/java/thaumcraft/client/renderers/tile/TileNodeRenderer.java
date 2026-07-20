@@ -138,6 +138,11 @@ public class TileNodeRenderer extends TileEntitySpecialRenderer<TileEntity> {
     }
 
     public static void renderNodeAt(INode node, double x, double y, double z, float partialTicks, float size) {
+        renderNodeAt(node, x, y, z, partialTicks, size, false);
+    }
+
+    public static void renderNodeAt(INode node, double x, double y, double z, float partialTicks, float size,
+                                    boolean depthIgnore) {
         if (node == null) return;
         EntityLivingBase viewer = Minecraft.getMinecraft().player;
         double worldX = x;
@@ -155,7 +160,7 @@ public class TileNodeRenderer extends TileEntitySpecialRenderer<TileEntity> {
             }
         }
         int seed = node.getId() == null ? 0 : node.getId().hashCode();
-        renderNodeSeeded(viewer, 64.0D, true, false, size,
+        renderNodeSeeded(viewer, 64.0D, true, depthIgnore, size,
                 x, y, z,
                 worldX, worldY, worldZ,
                 partialTicks, node.getAspects(), node.getNodeType(), node.getNodeModifier(), seed);

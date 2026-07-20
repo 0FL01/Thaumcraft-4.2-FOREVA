@@ -30,6 +30,7 @@ public class JarVisualShellContractTest {
 
         assertTrue("TileJarRenderer should keep node, liquid, label, brain, and brine overlays while rendering the shell only for TEISR items or node-jar animation pulses",
                 jarRenderer.contains("TileNodeRenderer.renderNodeAt((TileJarNode) tile")
+                        && jarRenderer.contains("tile.getWorld() != null")
                         && jarRenderer.contains("renderBrain((TileJarBrain) tile, x, y, z, partialTicks);")
                         && jarRenderer.contains("private final ModelBrain brain = new ModelBrain();")
                         && jarRenderer.contains("renderFillable((TileJarFillable) tile, x, y, z);")
@@ -61,6 +62,13 @@ public class JarVisualShellContractTest {
                         && nodeRenderer.contains("worldY = pos.getY() + 0.5D;")
                         && nodeRenderer.contains("worldZ = pos.getZ() + 0.5D;")
                         && nodeRenderer.contains("x, y, z,\n                worldX, worldY, worldZ,"));
+
+        assertTrue("Placed node jars should ignore block depth while worldless item jars retain the default depth path",
+                nodeRenderer.contains("renderNodeAt(node, x, y, z, partialTicks, size, false);")
+                        && nodeRenderer.contains("boolean depthIgnore)")
+                        && nodeRenderer.contains("renderNodeSeeded(viewer, 64.0D, true, depthIgnore, size")
+                        && nodeRenderer.contains("if (depthIgnore) GlStateManager.disableDepth();")
+                        && nodeRenderer.contains("if (depthIgnore) GlStateManager.enableDepth();"));
 
         assertTrue("Jar labels should preserve TC4 size, height, tinted aspect glyph, and deterministic crooked tilt",
                 jarRenderer.contains("GlStateManager.translate(0.0F, -0.4F, 0.315F);")
