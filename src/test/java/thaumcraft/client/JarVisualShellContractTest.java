@@ -15,6 +15,7 @@ public class JarVisualShellContractTest {
     public void jarShellLivesInBlockModelsWhileTesrKeepsDynamicContentsAndItemParity() throws IOException {
         String blockJar = read("src/main/java/thaumcraft/common/blocks/BlockJar.java");
         String jarRenderer = read("src/main/java/thaumcraft/client/renderers/tile/TileJarRenderer.java");
+        String nodeRenderer = read("src/main/java/thaumcraft/client/renderers/tile/TileNodeRenderer.java");
         String itemRenderer = read("src/main/java/thaumcraft/client/renderers/item/ItemJarRenderer.java");
         String jarModel = read("src/main/java/thaumcraft/client/renderers/models/ModelJar.java");
         String brainModel = read("src/main/java/thaumcraft/client/renderers/models/ModelBrain.java");
@@ -51,6 +52,15 @@ public class JarVisualShellContractTest {
                         && jarRenderer.contains("} finally {")
                         && !jarRenderer.contains("drawSolidHorizontalQuad")
                         && !jarRenderer.contains("renderJarShell(tile, x, y, z);"));
+
+        assertTrue("Node jars should draw in camera-relative render space while culling against their world position, and worldless item tiles should bypass world-distance culling",
+                nodeRenderer.contains("if (node instanceof TileEntity)")
+                        && nodeRenderer.contains("if (tile.getWorld() == null) {")
+                        && nodeRenderer.contains("viewer = null;")
+                        && nodeRenderer.contains("worldX = pos.getX() + 0.5D;")
+                        && nodeRenderer.contains("worldY = pos.getY() + 0.5D;")
+                        && nodeRenderer.contains("worldZ = pos.getZ() + 0.5D;")
+                        && nodeRenderer.contains("x, y, z,\n                worldX, worldY, worldZ,"));
 
         assertTrue("Jar labels should preserve TC4 size, height, tinted aspect glyph, and deterministic crooked tilt",
                 jarRenderer.contains("GlStateManager.translate(0.0F, -0.4F, 0.315F);")

@@ -139,7 +139,26 @@ public class TileNodeRenderer extends TileEntitySpecialRenderer<TileEntity> {
 
     public static void renderNodeAt(INode node, double x, double y, double z, float partialTicks, float size) {
         if (node == null) return;
-        renderNodeAt(node.getAspects(), node.getId(), node.getNodeType(), node.getNodeModifier(), x, y, z, partialTicks, size);
+        EntityLivingBase viewer = Minecraft.getMinecraft().player;
+        double worldX = x;
+        double worldY = y;
+        double worldZ = z;
+        if (node instanceof TileEntity) {
+            TileEntity tile = (TileEntity) node;
+            if (tile.getWorld() == null) {
+                viewer = null;
+            } else {
+                BlockPos pos = tile.getPos();
+                worldX = pos.getX() + 0.5D;
+                worldY = pos.getY() + 0.5D;
+                worldZ = pos.getZ() + 0.5D;
+            }
+        }
+        int seed = node.getId() == null ? 0 : node.getId().hashCode();
+        renderNodeSeeded(viewer, 64.0D, true, false, size,
+                x, y, z,
+                worldX, worldY, worldZ,
+                partialTicks, node.getAspects(), node.getNodeType(), node.getNodeModifier(), seed);
     }
 
     public static void renderNodeAt(AspectList aspectsList,
