@@ -81,12 +81,12 @@ public class BiomeMagicalForest extends Biome {
 
     @Override
     public int getFoliageColorAtPos(BlockPos pos) {
-        return Config.blueBiome ? 0x66AACC : 0x55FF11;
+        return Config.blueBiome ? 0x77CCEE : 0x66FFC5;
     }
 
     @Override
     public int getGrassColorAtPos(BlockPos pos) {
-        return Config.blueBiome ? 0x77CCEE : 0x66FF05;
+        return Config.blueBiome ? 0x66AACC : 0x55FF81;
     }
 
     @Override
