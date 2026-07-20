@@ -11,12 +11,15 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.util.text.TextFormatting;
+import net.minecraft.util.text.translation.I18n;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import thaumcraft.api.aspects.Aspect;
 import thaumcraft.api.aspects.AspectList;
+import thaumcraft.api.nodes.NodeModifier;
+import thaumcraft.api.nodes.NodeType;
 import thaumcraft.common.CommonProxy;
 import thaumcraft.common.Thaumcraft;
 import thaumcraft.common.lib.capabilities.PlayerKnowledgeCapability;
@@ -91,6 +94,37 @@ public class BlockJarItemTooltipTest {
         List<String> emptyTooltip = new ArrayList<>();
         item.addJarInformation(new ItemStack(item, 1, 0), emptyTooltip, knowledge);
         assertTrue(emptyTooltip.isEmpty());
+    }
+
+    @Test
+    public void nodeJarShowsLocalizedTypeAndModifierBeforeAspects() {
+        BlockJarItem item = createItem();
+        ItemStack stack = new ItemStack(item, 1, 2);
+        item.setNodeAttributes(stack, NodeType.HUNGRY, NodeModifier.BRIGHT, "tooltip-node");
+        item.setAspects(stack, new AspectList().add(Aspect.MAGIC, 24));
+        PlayerKnowledgeCapability knowledge = new PlayerKnowledgeCapability();
+        knowledge.addDiscoveredAspect(Aspect.MAGIC.getTag());
+        List<String> tooltip = new ArrayList<>();
+
+        item.addJarInformation(stack, tooltip, knowledge);
+
+        assertEquals(Arrays.asList(
+                TextFormatting.BLUE + I18n.translateToLocal("nodetype.HUNGRY.name") + ", "
+                        + I18n.translateToLocal("nodemod.BRIGHT.name"),
+                Aspect.MAGIC.getName() + " x24"), tooltip);
+    }
+
+    @Test
+    public void nodeJarWithoutModifierShowsOnlyItsLocalizedType() {
+        BlockJarItem item = createItem();
+        ItemStack pureNode = new ItemStack(item, 1, 2);
+        item.setNodeAttributes(pureNode, NodeType.PURE, null, "pure-node");
+        List<String> pureTooltip = new ArrayList<>();
+
+        item.addJarInformation(pureNode, pureTooltip, null);
+
+        assertEquals(Collections.singletonList(
+                TextFormatting.BLUE + I18n.translateToLocal("nodetype.PURE.name")), pureTooltip);
     }
 
     private static BlockJarItem createItem() {

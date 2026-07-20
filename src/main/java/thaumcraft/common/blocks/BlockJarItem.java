@@ -8,6 +8,7 @@ import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.util.text.TextFormatting;
+import net.minecraft.util.text.translation.I18n;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -55,6 +56,18 @@ implements IEssentiaContainerItem {
     }
 
     void addJarInformation(ItemStack stack, List<String> tooltip, @Nullable IPlayerKnowledge knowledge) {
+        if (stack.getItemDamage() == 2) {
+            NodeType type = this.getNodeType(stack);
+            if (type != null) {
+                String description = I18n.translateToLocal("nodetype." + type.name() + ".name");
+                NodeModifier modifier = this.getNodeModifier(stack);
+                if (modifier != null) {
+                    description += ", " + I18n.translateToLocal("nodemod." + modifier.name() + ".name");
+                }
+                tooltip.add(TextFormatting.BLUE + description);
+            }
+        }
+
         AspectList aspects = this.getAspects(stack);
         if (aspects != null && aspects.size() > 0) {
             for (Aspect aspect : aspects.getAspectsSorted()) {
