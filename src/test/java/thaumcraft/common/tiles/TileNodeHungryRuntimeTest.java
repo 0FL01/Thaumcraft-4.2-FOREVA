@@ -2,9 +2,12 @@ package thaumcraft.common.tiles;
 
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.item.EntityItem;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Bootstrap;
 import net.minecraft.init.Biomes;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.profiler.Profiler;
 import net.minecraft.tileentity.TileEntity;
@@ -24,6 +27,9 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import thaumcraft.api.ThaumcraftApi;
+import thaumcraft.api.aspects.Aspect;
+import thaumcraft.api.aspects.AspectList;
 import thaumcraft.api.nodes.NodeType;
 import thaumcraft.common.config.Config;
 
@@ -32,15 +38,18 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
 public class TileNodeHungryRuntimeTest {
+    private static final Item TEST_FOOD = new Item();
     private boolean oldHardNode;
 
     @BeforeClass
@@ -111,6 +120,50 @@ public class TileNodeHungryRuntimeTest {
     }
 
     @Test
+    public void hungryNodeRefillsBeforeGrowingAndPersistsNewBaseVis() throws Exception {
+        ThaumcraftApi.registerObjectTag(new ItemStack(TEST_FOOD), new AspectList().add(Aspect.AIR, 4));
+        try {
+            HungryWorld refillWorld = new HungryWorld(Blocks.AIR.getDefaultState());
+            TileNode refillNode = attachHungryNode(refillWorld);
+            refillNode.setAspects(new AspectList().add(Aspect.AIR, 2));
+            assertTrue(refillNode.takeFromContainer(Aspect.AIR, 1));
+
+            consumeTestItem(refillWorld, refillNode);
+
+            assertEquals("A hungry node should refill missing current vis before increasing capacity", 2,
+                    refillNode.getAspects().getAmount(Aspect.AIR));
+            assertEquals(2, refillNode.getAspectsBase().getAmount(Aspect.AIR));
+
+            HungryWorld growthWorld = new HungryWorld(Blocks.AIR.getDefaultState());
+            TileNode growthNode = attachHungryNode(growthWorld);
+            growthNode.setAspects(new AspectList().add(Aspect.FIRE, 1));
+
+            consumeTestItem(growthWorld, growthNode);
+
+            assertEquals("A full hungry node should gain permanent base vis from a new primal aspect", 1,
+                    growthNode.getAspectsBase().getAmount(Aspect.AIR));
+            assertEquals("Permanent growth should become visually charged through normal regeneration", 0,
+                    growthNode.getAspects().getAmount(Aspect.AIR));
+
+            NBTTagCompound saved = new NBTTagCompound();
+            growthNode.writeCustomNBT(saved);
+            TileNode restored = new TileNode();
+            restored.readCustomNBT(saved);
+            assertEquals(1, restored.getAspectsBase().getAmount(Aspect.AIR));
+            assertEquals(0, restored.getAspects().getAmount(Aspect.AIR));
+
+            java.lang.reflect.Field count = TileNode.class.getDeclaredField("count");
+            count.setAccessible(true);
+            count.setInt(growthNode, 599);
+            growthNode.update();
+            assertEquals("The next regenerated vis should expose permanent growth to the renderer", 1,
+                    growthNode.getAspects().getAmount(Aspect.AIR));
+        } finally {
+            ThaumcraftApi.objectTags.remove(Arrays.asList(TEST_FOOD, 0));
+        }
+    }
+
+    @Test
     public void hungryNodeKeepsOriginalRayTraceParticlesAndAspectFeeding() throws IOException {
         String source = new String(Files.readAllBytes(Paths.get(
                 "src/main/java/thaumcraft/common/tiles/TileNode.java")), StandardCharsets.UTF_8);
@@ -125,11 +178,27 @@ public class TileNodeHungryRuntimeTest {
     }
 
     private static TileNode attachHungryNode(HungryWorld world) {
-        TileNode node = new TileNode();
+        TileNode node = new TestTileNode();
         node.setWorld(world);
         node.setPos(HungryWorld.NODE_POS);
         node.setNodeType(NodeType.HUNGRY);
         return node;
+    }
+
+    private static class TestTileNode extends TileNode {
+        @Override
+        public void markDirty() {
+        }
+    }
+
+    private static void consumeTestItem(HungryWorld world, TileNode node) {
+        EntityItem item = new EntityItem(world, 0.75D, 64.5D, 0.5D, new ItemStack(TEST_FOOD));
+        world.entities.add(item);
+        for (int i = 0; i < 5; ++i) {
+            node.update();
+        }
+        assertFalse("Hungry nodes should consume close item entities after five void-damage ticks", item.isEntityAlive());
+        world.entities.remove(item);
     }
 
     private static void runHungryBlockAttempts(TileNode node, int attempts) throws Exception {

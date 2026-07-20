@@ -821,9 +821,6 @@ implements ITickable, INode, IAspectContainer, IWandable {
 
         if (te instanceof TileNode) {
             TileNode targetNode = (TileNode) te;
-            if (targetNode.regeneration < 0) {
-                targetNode.regeneration = targetNode.getRegenerationInterval();
-            }
             targetNode.wait = targetNode.regeneration / 2;
             te.markDirty();
             this.world.notifyBlockUpdate(te.getPos(), this.world.getBlockState(te.getPos()), this.world.getBlockState(te.getPos()), 3);

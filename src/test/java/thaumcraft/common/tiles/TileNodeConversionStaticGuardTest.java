@@ -86,9 +86,19 @@ public class TileNodeConversionStaticGuardTest {
         assertTrue(source.contains("} else if (meta == 10)"));
         assertTrue(source.contains("private boolean handleDischarge()"));
         assertTrue(source.contains("this.world.getBlockState(this.pos).getBlock() != ConfigBlocks.blockAiry || this.getLock() == 1"));
+        assertTrue(source.contains("this.getNodeModifier() == NodeModifier.FADING"));
+        assertTrue(source.contains("boolean shiny = this.getNodeType() == NodeType.HUNGRY || this.getNodeModifier() == NodeModifier.BRIGHT"));
+        assertTrue(source.contains("int targetAverage = (node.getAspects().visSize() + node.getAspectsBase().visSize()) / 2;"));
+        assertTrue(source.contains("int thisAverage = (this.getAspects().visSize() + this.getAspectsBase().visSize()) / 2;"));
+        assertTrue(source.contains("this.getAspects().getAmount(aspect) < this.getNodeVisBase(aspect)"));
+        assertTrue(source.contains("this.aspectsBase.add(aspect, 1);"));
+        assertTrue(source.contains("node.setNodeVisBase(aspect, (short) (node.getNodeVisBase(aspect) - 1));"));
         assertTrue(source.contains("targetNode.wait = targetNode.regeneration / 2;"));
+        assertFalse(source.contains("targetNode.regeneration = targetNode.getRegenerationInterval();"));
         assertTrue(source.contains("new PacketFXBlockZap("));
         assertTrue(source.contains("new NetworkRegistry.TargetPoint("));
+        assertTrue(source.contains("nbttagcompound.setTag(\"AspectsBase\", tlist);"));
+        assertTrue(source.contains("this.world.notifyBlockUpdate(this.pos"));
     }
 
     @Test

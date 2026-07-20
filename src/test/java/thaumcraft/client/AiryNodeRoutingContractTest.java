@@ -75,6 +75,10 @@ public class AiryNodeRoutingContractTest {
                         && tileRenderer.contains("private static boolean isHoldingThaumometer(EntityPlayer player)")
                         && tileRenderer.contains("player.getHeldItemOffhand()")
                         && tileRenderer.contains("OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, 220.0F, 220.0F);")
+                        && tileRenderer.contains("AspectList renderAspects = node.getAspects();")
+                        && tileRenderer.contains("scale = 0.2F + scale * (aspects.getAmount(aspect) / 50.0F);")
+                        && tileRenderer.contains("float centerScale = 0.1F + (average / aspects.size()) / 150.0F;")
+                        && tileRenderer.contains("centerScale *= 0.75F;")
                         && tileRenderer.contains("renderFacingStrip(renderX, renderY, renderZ, 0.0F, 0.5F, 0.1F, FRAMES, 1, frame, 0xFFFFFF);")
                         && !tileRenderer.contains("STRIPS = 8"));
 
