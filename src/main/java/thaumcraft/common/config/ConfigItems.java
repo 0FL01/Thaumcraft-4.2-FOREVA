@@ -59,7 +59,6 @@ public class ConfigItems {
     public static ItemWandCap itemWandCap;
 
     public static ItemFocusPouch itemFocusPouch;
-    public static ItemFocusPouchBauble itemFocusPouchBauble;
 
     // Wand foci
     public static FocusShock focusShock;
@@ -247,17 +246,11 @@ public class ConfigItems {
                 .setCreativeTab(tab);
         allItems.add(itemWandCap);
 
-        itemFocusPouch = (ItemFocusPouch) new ItemFocusPouch()
+        itemFocusPouch = (ItemFocusPouch) new ItemFocusPouchBauble()
                 .setRegistryName("thaumcraft", ConfigBlocks.legacyPath("FocusPouch"))
                 .setTranslationKey("thaumcraft.focus_pouch")
                 .setCreativeTab(tab);
         allItems.add(itemFocusPouch);
-
-        itemFocusPouchBauble = (ItemFocusPouchBauble) new ItemFocusPouchBauble()
-                .setRegistryName("thaumcraft", ConfigBlocks.legacyPath("FocusPouchBauble"))
-                .setTranslationKey("thaumcraft.focus_pouch_bauble")
-                .setCreativeTab(tab);
-        allItems.add(itemFocusPouchBauble);
 
         focusShock = (FocusShock) new FocusShock()
                 .setRegistryName("thaumcraft", ConfigBlocks.legacyPath("FocusShock"))
