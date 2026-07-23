@@ -74,8 +74,8 @@ public final class ArcaneFurnaceBakedModel implements IBakedModel {
     private void addNozzleQuads(List<BakedQuad> quads, EnumFacing facing) {
         ModelRotation rotation = this.nozzleRotation(facing);
         this.addFace(quads, 0, 0, 12, 16, 16, 13, EnumFacing.SOUTH, this.sprite(13), rotation, true);
-        this.addFace(quads, 0, 0, 13, 16, 16, 14, EnumFacing.SOUTH, this.sprite(15), rotation, true);
-        this.addFace(quads, 0, 0, 14, 16, 16, 15, EnumFacing.SOUTH, this.sprite("minecraft:blocks/fire_layer_0"), rotation, false);
+        this.addFace(quads, 0, 0, 13, 16, 16, 14, EnumFacing.SOUTH, this.sprite("minecraft:blocks/fire_layer_0"), rotation, false);
+        this.addFace(quads, 0, 0, 14, 16, 16, 15, EnumFacing.SOUTH, this.sprite(15), rotation, true);
     }
 
     private int textureForSide(int meta, int level, int nozzleSide, EnumFacing face) {

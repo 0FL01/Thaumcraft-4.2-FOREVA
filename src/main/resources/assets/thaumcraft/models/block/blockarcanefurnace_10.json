@@ -45,20 +45,20 @@
       }
     },
     {
-      "comment": "Trim face — furnace15 decorative accents",
+      "comment": "Fire face — behind decorative accents, shade=false",
       "from": [0, 0, 13],
       "to": [16, 16, 14],
-      "faces": {
-        "south": { "texture": "#trim" }
-      }
-    },
-    {
-      "comment": "Fire face — outermost layer, shade=false",
-      "from": [0, 0, 14],
-      "to": [16, 16, 15],
       "shade": false,
       "faces": {
         "south": { "texture": "#fire" }
+      }
+    },
+    {
+      "comment": "Trim face — furnace15 decorative accents above fire",
+      "from": [0, 0, 14],
+      "to": [16, 16, 15],
+      "faces": {
+        "south": { "texture": "#trim" }
       }
     }
   ]
