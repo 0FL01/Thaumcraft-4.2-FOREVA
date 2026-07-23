@@ -14,7 +14,6 @@ import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.client.resources.I18n;
-import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
@@ -60,6 +59,7 @@ public class GuiResearchRecipe extends GuiScreen {
     private long lastCycle;
     private int cycle = -1;
     private List<String> tooltip;
+    private ItemStack tooltipStack = ItemStack.EMPTY;
     private int tooltipX;
     private int tooltipY;
 
@@ -138,6 +138,7 @@ public class GuiResearchRecipe extends GuiScreen {
         GlStateManager.popMatrix();
 
         this.tooltip = null;
+        this.tooltipStack = ItemStack.EMPTY;
         this.updateRecipeCycle();
         if (this.pages.length > 0) {
             for (int side = 0; side < 2 && this.page + side < this.pages.length; ++side) {
@@ -155,7 +156,9 @@ public class GuiResearchRecipe extends GuiScreen {
         }
 
         super.drawScreen(mouseX, mouseY, partialTicks);
-        if (this.tooltip != null && !this.tooltip.isEmpty()) {
+        if (!this.tooltipStack.isEmpty()) {
+            this.renderToolTip(this.tooltipStack, this.tooltipX, this.tooltipY);
+        } else if (this.tooltip != null && !this.tooltip.isEmpty()) {
             this.drawHoveringText(this.tooltip, this.tooltipX, this.tooltipY);
         }
     }
@@ -811,8 +814,7 @@ public class GuiResearchRecipe extends GuiScreen {
         if (this.isEmpty(stack) || !this.isMouseIn(mouseX, mouseY, x, y, Math.max(1, width), Math.max(1, height))) {
             return;
         }
-        ITooltipFlag flag = this.mc.gameSettings.advancedItemTooltips ? ITooltipFlag.TooltipFlags.ADVANCED : ITooltipFlag.TooltipFlags.NORMAL;
-        this.setTooltip(stack.getTooltip(this.mc.player, flag), mouseX, mouseY);
+        this.setItemTooltip(stack, mouseX, mouseY);
     }
 
     private void addAspectTooltip(Aspect aspect, int mouseX, int mouseY, int x, int y, int width, int height, int amountMultiplier) {
@@ -829,6 +831,14 @@ public class GuiResearchRecipe extends GuiScreen {
 
     private void setTooltip(List<String> lines, int x, int y) {
         this.tooltip = lines == null ? Collections.<String>emptyList() : lines;
+        this.tooltipStack = ItemStack.EMPTY;
+        this.tooltipX = x;
+        this.tooltipY = y;
+    }
+
+    private void setItemTooltip(ItemStack stack, int x, int y) {
+        this.tooltip = null;
+        this.tooltipStack = stack;
         this.tooltipX = x;
         this.tooltipY = y;
     }

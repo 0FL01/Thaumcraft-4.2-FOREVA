@@ -1,6 +1,6 @@
 # Goal: Restore item status tooltips in custom interfaces
 
-Status: in progress
+Status: complete
 Source: User-approved RECON plan from 2026-07-23; TC4 bytecode, TC6 donor behavior, and Forge 1.12.2 GUI lifecycle
 Last updated: 2026-07-23
 
@@ -21,10 +21,12 @@ Implement the approved correction iteratively. Each iteration must remain deploy
   - Evidence: Both synthetic results now use standard stack-aware tooltips after slot rendering, with carried-stack suppression and real-result deduplication covered by focused guards.
 - R3: Research recipe item tooltips use the standard stack-aware rendering path.
   - Acceptance: Item entries preserve their existing hitboxes while gaining standard rarity formatting, advanced-tooltip behavior, Forge render hooks, and scanned-aspect overlays; aspect-only tooltips remain unchanged.
-  - Status: planned
+  - Status: verified
+  - Evidence: GuiResearchRecipe now defers the hovered ItemStack to `renderToolTip` while retaining separate mutually exclusive aspect text and all existing item hitboxes.
 - R4: Keep the correction deployable and regression-resistant.
   - Acceptance: A headless-safe source guard audits every direct `GuiContainer`; focused tests, build, final server smoke, and scoped commits pass.
-  - Status: in progress
+  - Status: verified
+  - Evidence: Focused and full tests, clean-world `./scripts/dev.sh validate --smoke`, MCP leak inspection, and the final `./scripts/dev.sh build` passed.
 
 ## Constraints
 - Preserve Java 8, Forge 1.12.2, GUI/packet/registry ids, container interactions, slot validity, NBT, and original assets.
@@ -47,13 +49,14 @@ Implement the approved correction iteratively. Each iteration must remain deploy
 3. Move GuiResearchRecipe item entries to the standard stack-aware tooltip path and complete final validation.
 
 ## Current Checkpoint
-- Target: iteration 3.
+- Target: complete.
 - Iteration 1 restored standard slot tooltips in all 12 affected screens and original Arcane Bore status-label spacing.
 - Iteration 2 restored synthetic-result tooltips in Thaumatorium and Arcane Workbench.
-- Focused source guards and per-iteration builds passed.
+- Iteration 3 restored stack-aware research recipe tooltips. Focused/full tests, all per-iteration builds, final clean-world server smoke, and production reobfuscation passed.
 - Known limitation: server/static checks cannot verify final GL tooltip appearance; interactive client checks remain the visual authority.
 
 ## Checkpoint History
 - 2026-07-23: User approved the three-iteration RECON plan.
 - 2026-07-23: Iteration 1 restored the standard Forge item-tooltip path across all direct container screens and added complete headless regression coverage.
 - 2026-07-23: Iteration 2 restored standard tooltips for the Thaumatorium recipe output and Arcane Workbench insufficient-vis preview without duplicating real-slot tooltips.
+- 2026-07-23: Iteration 3 moved research recipe items to the standard stack-aware tooltip renderer. Full validation and a clean-world server smoke passed; the retained development world was restored unchanged.
