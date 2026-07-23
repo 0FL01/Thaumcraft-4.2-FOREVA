@@ -87,14 +87,14 @@ public class BlockBreakingFlowStaticGuardTest {
     }
 
     @Test
-    public void excavationAndBoreEmitDestroyEventBeforeMutation() throws IOException {
+    public void excavationAndBoreEmitDestroyFxBeforeMutation() throws IOException {
         assertEventBeforeMutation(
                 read("src/main/java/thaumcraft/common/items/wands/foci/FocusExcavation.java"),
                 "world.playEvent(2001, pos, Block.getStateId(state));",
                 "world.setBlockToAir(pos);");
         assertEventBeforeMutation(
                 read("src/main/java/thaumcraft/common/tiles/TileArcaneBore.java"),
-                "this.world.playEvent(2001, target, Block.getStateId(state));",
+                "this.world.addBlockEvent(this.pos, ConfigBlocks.blockWoodenDevice, 99,",
                 "this.world.setBlockToAir(target);");
     }
 

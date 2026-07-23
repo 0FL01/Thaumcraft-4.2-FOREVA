@@ -63,6 +63,15 @@ public class ArcaneBoreGameplayParityStaticGuardTest {
     }
 
     @Test
+    public void clientDiggingDoesNotLayerVanillaBlockSoundsOverRumble() throws IOException {
+        String source = read("src/main/java/thaumcraft/common/tiles/TileArcaneBore.java");
+
+        assertTrue(source.contains("TCSounds.RUMBLE"));
+        assertFalse(source.contains("this.world.playEvent(2001, target, Block.getStateId(state));"));
+        assertFalse(source.contains("getHitSound()"));
+    }
+
+    @Test
     public void borePlacementRequiresVerticalArcaneBoreBaseSupport() throws IOException {
         String source = read("src/main/java/thaumcraft/common/blocks/ItemBlocks/BlockWoodenDeviceItem.java");
 

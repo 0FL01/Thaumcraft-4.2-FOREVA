@@ -629,7 +629,6 @@ public class TileArcaneBore extends TileThaumcraft implements ITickable, IInvent
         this.collectExistingDrops(target, drops);
         this.world.addBlockEvent(this.pos, ConfigBlocks.blockWoodenDevice, 99,
                 (Block.getIdFromBlock(block) & 0xFFF) | ((meta & 0xFF) << 12));
-        this.world.playEvent(2001, target, Block.getStateId(state));
         this.world.setBlockToAir(target);
         for (ItemStack drop : drops) {
             this.ejectOrStore(this.applySpecialMiningResult(drop, silk, dropFortune));
@@ -789,15 +788,6 @@ public class TileArcaneBore extends TileThaumcraft implements ITickable, IInvent
         int sx = this.pos.getX() + this.orientation.getXOffset();
         int sy = this.pos.getY() + this.orientation.getYOffset();
         int sz = this.pos.getZ() + this.orientation.getZOffset();
-        this.world.playSound(
-                this.digX + 0.5D,
-                this.digY + 0.5D,
-                this.digZ + 0.5D,
-                block.getSoundType(state, this.world, new BlockPos(this.digX, this.digY, this.digZ), null).getHitSound(),
-                SoundCategory.BLOCKS,
-                0.45F,
-                0.85F,
-                false);
         for (int i = 0; i < thaumcraft.common.Thaumcraft.proxy.particleCount(10); i++) {
             double px = this.digX + this.world.rand.nextFloat();
             double py = this.digY + this.world.rand.nextFloat();
