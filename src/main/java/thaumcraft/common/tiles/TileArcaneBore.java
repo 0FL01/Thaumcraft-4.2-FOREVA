@@ -7,7 +7,6 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Enchantments;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
@@ -25,24 +24,37 @@ import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.RayTraceResult;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
-import net.minecraftforge.common.ForgeHooks;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.common.util.FakePlayerFactory;
+import net.minecraftforge.event.world.BlockEvent;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
+import thaumcraft.api.IRepairable;
+import thaumcraft.api.IRepairableExtended;
 import thaumcraft.api.TileThaumcraft;
 import thaumcraft.api.aspects.Aspect;
+import thaumcraft.api.aspects.AspectList;
 import thaumcraft.api.visnet.VisNetHandler;
 import thaumcraft.api.wands.FocusUpgradeType;
 import thaumcraft.api.wands.IWandable;
+import thaumcraft.common.blocks.BlockAiry;
+import thaumcraft.common.config.Config;
+import thaumcraft.common.config.ConfigBlocks;
+import thaumcraft.common.items.equipment.ItemElementalPickaxe;
 import thaumcraft.common.items.wands.foci.FocusExcavation;
+import thaumcraft.common.lib.crafting.ThaumcraftCraftingManager;
 import thaumcraft.common.lib.network.PacketHandler;
 import thaumcraft.common.lib.network.misc.PacketBoreDig;
+import thaumcraft.common.lib.research.ResearchManager;
 import thaumcraft.common.lib.TCSounds;
 import thaumcraft.common.lib.utils.BlockUtils;
 import thaumcraft.common.lib.utils.InventoryUtils;
+import thaumcraft.common.lib.utils.Utils;
 
 public class TileArcaneBore extends TileThaumcraft implements ITickable, IInventory, IWandable {
     public int spiral = 0;
@@ -71,8 +83,20 @@ public class TileArcaneBore extends TileThaumcraft implements ITickable, IInvent
     public int area = 0;
 
     private boolean first = true;
-    private int digCooldown = 20;
-    private int scanIndex = 0;
+    private int count = 0;
+    private long soundDelay = 0L;
+    private Object beam1 = null;
+    private Object beam2 = null;
+    private int beamLength = 0;
+    private int lastX = 0;
+    private int lastY = 0;
+    private int lastZ = 0;
+    private float radInc = 0.0F;
+    private int paused = 100;
+    private int maxPause = 100;
+    private long repairCounter = 0L;
+    private final AspectList repairCost = new AspectList();
+    private final AspectList currentRepairVis = new AspectList();
     private FakePlayer fakePlayer = null;
     private float speedyTime = 0.0F;
     private int digX;
@@ -84,23 +108,35 @@ public class TileArcaneBore extends TileThaumcraft implements ITickable, IInvent
 
     @Override
     public void update() {
-        if (this.world != null && this.world.isRemote) {
+        if (this.world == null) return;
+        if (this.world.isRemote) {
             if (this.first) {
                 this.setOrientation(this.orientation, true);
                 this.first = false;
             }
-            this.playClientDigFx();
+        } else {
+            this.rechargeSpeedyTime();
+            this.ensureFakePlayer();
         }
         this.updateOrientationRotation();
-        this.topRotation = (this.topRotation + (this.hasFocus && this.hasPickaxe ? 4 : 1)) % 360;
-        if (this.world != null && this.isPowered() && this.hasFocus && this.hasPickaxe && this.canUsePickaxe()) {
-            this.updateAimPreview();
-        } else if (this.world != null && this.world.isRemote) {
+        if (this.isPowered() && this.hasFocus && this.hasPickaxe && this.canUsePickaxe()) {
+            if (this.world.isRemote) {
+                this.updateClientDigging();
+            } else {
+                this.updateMining();
+            }
+        } else if (this.world.isRemote) {
             this.relaxAimState();
         }
-        if (this.world != null && !this.world.isRemote) {
-            this.rechargeSpeedyTime();
-            this.updateMining();
+        if (!this.world.isRemote) {
+            this.updatePickaxeLifecycle();
+        }
+    }
+
+    private void ensureFakePlayer() {
+        if (this.fakePlayer == null && this.world instanceof WorldServer) {
+            this.fakePlayer = FakePlayerFactory.get((WorldServer) this.world,
+                    new GameProfile(UUID.nameUUIDFromBytes("FakeThaumcraftBore".getBytes()), "FakeThaumcraftBore"));
         }
     }
 
@@ -154,7 +190,12 @@ public class TileArcaneBore extends TileThaumcraft implements ITickable, IInvent
         }
         this.speedX = 0;
         this.speedZ = 0;
+        this.lastX = 0;
+        this.lastY = 0;
+        this.lastZ = 0;
         this.toDig = false;
+        this.radInc = 0.0F;
+        this.paused = 100;
         this.tRadX = 0.0F;
         this.tRadZ = 0.0F;
         this.mRadX = 0.0F;
@@ -198,7 +239,7 @@ public class TileArcaneBore extends TileThaumcraft implements ITickable, IInvent
         this.baseOrientation = EnumFacing.byIndex(nbt.getInteger("baseOrientation"));
         if (this.orientation == null) this.orientation = EnumFacing.UP;
         if (this.baseOrientation == null) this.baseOrientation = EnumFacing.UP;
-        this.speedyTime = nbt.getFloat("SpeedyTime");
+        this.speedyTime = nbt.getShort("SpeedyTime");
         this.contents = new ItemStack[]{ItemStack.EMPTY, ItemStack.EMPTY};
         NBTTagList list = nbt.getTagList("Inventory", 10);
         for (int i = 0; i < list.tagCount(); ++i) {
@@ -216,7 +257,7 @@ public class TileArcaneBore extends TileThaumcraft implements ITickable, IInvent
     public void writeCustomNBT(NBTTagCompound nbt) {
         nbt.setInteger("orientation", this.orientation.getIndex());
         nbt.setInteger("baseOrientation", this.baseOrientation.getIndex());
-        nbt.setFloat("SpeedyTime", this.speedyTime);
+        nbt.setShort("SpeedyTime", (short) this.speedyTime);
         NBTTagList list = new NBTTagList();
         for (int i = 0; i < this.contents.length; ++i) {
             if (this.contents[i].isEmpty()) continue;
@@ -370,32 +411,21 @@ public class TileArcaneBore extends TileThaumcraft implements ITickable, IInvent
     }
 
     private void updateMining() {
-        if (!this.hasFocus || !this.hasPickaxe || !this.isPowered() || !this.canUsePickaxe()) {
-            this.digCooldown = Math.max(this.digCooldown, 10);
-            return;
-        }
-        if (this.fakePlayer == null && this.world instanceof WorldServer) {
-            this.fakePlayer = FakePlayerFactory.get((WorldServer) this.world, new GameProfile(UUID.nameUUIDFromBytes("FakeThaumcraftBore".getBytes()), "FakeThaumcraftBore"));
-        }
-        if (this.fakePlayer == null) return;
-        if (this.digCooldown-- > 0) return;
+        if (this.fakePlayer == null || this.rotX != this.tarX || this.rotZ != this.tarZ) return;
+        if (--this.count > 0) return;
 
-        BlockPos target = this.findNextBlockToDig();
-        if (target == null) {
-            this.digCooldown = 20;
-            return;
+        boolean dug = false;
+        if (this.toDig) {
+            this.toDig = false;
+            BlockPos target = new BlockPos(this.digX, this.digY, this.digZ);
+            IBlockState state = this.world.getBlockState(target);
+            if (!state.getBlock().isAir(state, this.world, target)) {
+                dug = this.mineBlock(target, state);
+            }
         }
-        this.updateAimRotation(target);
-
-        IBlockState state = this.world.getBlockState(target);
-        float hardness = state.getBlockHardness(this.world, target);
-        this.digCooldown = Math.max(4, 12 + (int) (Math.max(0.0F, hardness) * 2.0F) - this.speed * 2);
-        if (this.speedyTime < 1.0F) {
-            this.digCooldown *= 4;
-        }
-        if (this.mineBlock(target, state)) {
-            if (this.speedyTime > 0.0F) this.speedyTime -= 1.0F;
-            this.topRotation = (this.topRotation + 30) % 360;
+        this.findNextBlockToDig();
+        if (dug && this.speedyTime > 0.0F) {
+            this.speedyTime -= 1.0F;
         }
     }
 
@@ -430,19 +460,10 @@ public class TileArcaneBore extends TileThaumcraft implements ITickable, IInvent
         }
     }
 
-    private void updateAimPreview() {
-        BlockPos target = this.findNextBlockToDig();
-        if (target != null) {
-            this.updateAimRotation(target);
-        } else if (this.world.isRemote) {
-            this.relaxAimState();
-        }
-    }
-
-    private void updateAimRotation(BlockPos target) {
-        double xd = (double) target.getX() + 0.5D - ((double) this.pos.getX() + 0.5D);
-        double yd = (double) target.getY() + 0.5D - ((double) this.pos.getY() + 0.5D);
-        double zd = (double) target.getZ() + 0.5D - ((double) this.pos.getZ() + 0.5D);
+    private void updateAimTarget(BlockPos target) {
+        double xd = (double) this.pos.getX() + 0.5D - ((double) target.getX() + 0.5D);
+        double yd = (double) this.pos.getY() + 0.5D - ((double) target.getY() + 0.5D);
+        double zd = (double) this.pos.getZ() + 0.5D - ((double) target.getZ() + 0.5D);
         double horizontal = Math.sqrt(xd * xd + zd * zd);
         float rx = (float) (Math.atan2(zd, xd) * 180.0D / Math.PI);
         float rz = (float) (-(Math.atan2(yd, horizontal) * 180.0D / Math.PI)) + 90.0F;
@@ -467,15 +488,23 @@ public class TileArcaneBore extends TileThaumcraft implements ITickable, IInvent
         }
         this.mRadX = Math.abs((this.vRadX - this.tRadX) / 6.0F);
         this.mRadZ = Math.abs((this.vRadZ - this.tRadZ) / 6.0F);
-        if (this.vRadX < this.tRadX) {
-            this.vRadX += this.mRadX;
-        } else if (this.vRadX > this.tRadX) {
-            this.vRadX -= this.mRadX;
-        }
-        if (this.vRadZ < this.tRadZ) {
-            this.vRadZ += this.mRadZ;
-        } else if (this.vRadZ > this.tRadZ) {
-            this.vRadZ -= this.mRadZ;
+    }
+
+    private void updateAimEasing() {
+        if (this.paused < this.maxPause) {
+            if (this.vRadX < this.tRadX) {
+                this.vRadX += this.mRadX;
+            } else if (this.vRadX > this.tRadX) {
+                this.vRadX -= this.mRadX;
+            }
+            if (this.vRadZ < this.tRadZ) {
+                this.vRadZ += this.mRadZ;
+            } else if (this.vRadZ > this.tRadZ) {
+                this.vRadZ -= this.mRadZ;
+            }
+        } else {
+            this.vRadX *= 0.9F;
+            this.vRadZ *= 0.9F;
         }
         this.mRadX *= 0.9F;
         this.mRadZ *= 0.9F;
@@ -489,43 +518,98 @@ public class TileArcaneBore extends TileThaumcraft implements ITickable, IInvent
         this.vRadZ *= 0.9F;
     }
 
-    private BlockPos findNextBlockToDig() {
-        int radius = this.maxRadius + this.area;
-        int diameter = radius * 2 + 1;
-        int crossSection = diameter * diameter;
-        int maxDepth = 64;
-        int total = crossSection * maxDepth;
-        for (int attempts = 0; attempts < total; attempts++) {
-            int index = this.scanIndex++ % total;
-            int depth = index / crossSection + 1;
-            int cross = index % crossSection;
-            int a = cross / diameter - radius;
-            int b = cross % diameter - radius;
-            BlockPos target = this.pos.offset(this.orientation, depth);
-            if (this.orientation.getAxis() == EnumFacing.Axis.Y) {
-                target = target.add(a, 0, b);
-            } else if (this.orientation.getAxis() == EnumFacing.Axis.Z) {
-                target = target.add(a, b, 0);
-            } else {
-                target = target.add(0, b, a);
-            }
-            IBlockState state = this.world.getBlockState(target);
-            Block block = state.getBlock();
-            if (block.isAir(state, this.world, target)) continue;
-            if (state.getBlockHardness(this.world, target) < 0.0F) return null;
-            if (!block.canCollideCheck(state, false) || block.getCollisionBoundingBox(state, this.world, target) == null) continue;
-            return target;
+    private void findNextBlockToDig() {
+        if (this.radInc == 0.0F) {
+            this.radInc = (float) (this.maxRadius + this.area) / 360.0F;
         }
-        return null;
+
+        BlockPos lane;
+        do {
+            this.spiral = (this.spiral + 2) % 360;
+            this.currentRadius += this.radInc;
+            int radius = this.maxRadius + this.area;
+            if (this.currentRadius > (float) radius || this.currentRadius < (float) -radius) {
+                this.radInc *= -1.0F;
+            }
+
+            double angle = (double) this.spiral / 180.0D * Math.PI;
+            double ox = (double) this.currentRadius * Math.sin(angle);
+            double oy = (double) this.currentRadius * Math.cos(angle);
+            double oz = 0.0D;
+
+            double yaw = Math.PI * 0.5D * (double) this.orientation.getXOffset();
+            double yawX = ox * Math.cos(yaw) + oz * Math.sin(yaw);
+            double yawZ = oz * Math.cos(yaw) - ox * Math.sin(yaw);
+            double pitch = Math.PI * 0.5D * (double) this.orientation.getYOffset();
+            double pitchY = oy * Math.cos(pitch) + yawZ * Math.sin(pitch);
+            double pitchZ = yawZ * Math.cos(pitch) - oy * Math.sin(pitch);
+
+            lane = new BlockPos(
+                    (double) this.pos.getX() + 0.5D + (double) this.orientation.getXOffset() + yawX,
+                    (double) this.pos.getY() + 0.5D + (double) this.orientation.getYOffset() + pitchY,
+                    (double) this.pos.getZ() + 0.5D + (double) this.orientation.getZOffset() + pitchZ);
+        } while (lane.getX() == this.lastX && lane.getY() == this.lastY && lane.getZ() == this.lastZ);
+
+        this.lastX = lane.getX();
+        this.lastY = lane.getY();
+        this.lastZ = lane.getZ();
+        BlockPos scan = lane.offset(this.orientation, 2);
+        for (int depth = 0; depth < 64; ++depth, scan = scan.offset(this.orientation)) {
+            IBlockState state = this.world.getBlockState(scan);
+            if (state.getBlockHardness(this.world, scan) < 0.0F) break;
+            if (!isDiggable(state, scan)) continue;
+
+            BlockPos target = scan;
+            Vec3d start = new Vec3d(
+                    (double) this.pos.getX() + 0.5D + (double) this.orientation.getXOffset(),
+                    (double) this.pos.getY() + 0.5D + (double) this.orientation.getYOffset(),
+                    (double) this.pos.getZ() + 0.5D + (double) this.orientation.getZOffset());
+            RayTraceResult hit = this.world.rayTraceBlocks(start,
+                    new Vec3d((double) scan.getX() + 0.5D, (double) scan.getY() + 0.5D, (double) scan.getZ() + 0.5D),
+                    false, true, false);
+            if (hit != null && hit.typeOfHit == RayTraceResult.Type.BLOCK) {
+                IBlockState hitState = this.world.getBlockState(hit.getBlockPos());
+                if (hitState.getBlockHardness(this.world, hit.getBlockPos()) >= 0.0F
+                        && isDiggable(hitState, hit.getBlockPos())) {
+                    target = hit.getBlockPos();
+                    state = hitState;
+                }
+            }
+
+            this.digX = target.getX();
+            this.digY = target.getY();
+            this.digZ = target.getZ();
+            this.count = this.getDigDelay(state, target);
+            this.toDig = true;
+            this.sendDigEvent(target);
+            break;
+        }
+    }
+
+    private boolean isDiggable(IBlockState state, BlockPos target) {
+        Block block = state.getBlock();
+        return !block.isAir(state, this.world, target)
+                && block.canCollideCheck(state, false)
+                && block.getCollisionBoundingBox(state, this.world, target) != null;
+    }
+
+    private int getDigDelay(IBlockState state, BlockPos target) {
+        int delay = Math.max(10 - this.speed,
+                (int) (state.getBlockHardness(this.world, target) * 2.0F) - this.speed * 2);
+        return this.speedyTime < 1.0F ? delay * 4 : delay;
     }
 
     private boolean mineBlock(BlockPos target, IBlockState state) {
         Block block = state.getBlock();
         int meta = block.getMetaFromState(state);
         this.fakePlayer.setPosition((double) this.pos.getX() + 0.5D, (double) this.pos.getY() + 0.5D, (double) this.pos.getZ() + 0.5D);
-        int xp = ForgeHooks.onBlockBreakEvent(this.world, this.fakePlayer.interactionManager.getGameType(), (EntityPlayerMP) this.fakePlayer, target);
-        if (xp < 0) return false;
+        this.fakePlayer.setHeldItem(EnumHand.MAIN_HAND, this.getStackInSlot(1));
+        BlockEvent.BreakEvent event = new BlockEvent.BreakEvent(this.world, target, state, this.fakePlayer);
+        MinecraftForge.EVENT_BUS.post(event);
+        if (event.isCanceled()) return false;
+        int xp = event.getExpToDrop();
 
+        int dropFortune = this.fortune;
         boolean silk = EnchantmentHelper.getEnchantmentLevel(Enchantments.SILK_TOUCH, this.getStackInSlot(1)) > 0;
         ItemStack focus = this.getStackInSlot(0);
         if (!silk && !focus.isEmpty() && focus.getItem() instanceof FocusExcavation) {
@@ -534,22 +618,36 @@ public class TileArcaneBore extends TileThaumcraft implements ITickable, IInvent
 
         NonNullList<ItemStack> drops = NonNullList.create();
         if (silk && block.canSilkHarvest(this.world, target, state, this.fakePlayer)) {
+            dropFortune = 0;
             ItemStack stack = BlockUtils.createStackedBlock(block, meta);
             if (!stack.isEmpty()) drops.add(stack);
         } else {
-            block.getDrops(drops, (IBlockAccess) this.world, target, state, this.fortune);
+            block.getDrops(drops, (IBlockAccess) this.world, target, state, dropFortune);
             block.dropXpOnBlockBreak(this.world, target, xp);
         }
 
         this.collectExistingDrops(target, drops);
-        this.sendDigEvent(target);
+        this.world.addBlockEvent(this.pos, ConfigBlocks.blockWoodenDevice, 99,
+                (Block.getIdFromBlock(block) & 0xFFF) | ((meta & 0xFF) << 12));
         this.world.playEvent(2001, target, Block.getStateId(state));
         this.world.setBlockToAir(target);
         for (ItemStack drop : drops) {
-            this.ejectOrStore(drop);
+            this.ejectOrStore(this.applySpecialMiningResult(drop, silk, dropFortune));
         }
         this.damagePickaxe();
+        this.placeTunnelLight();
         return true;
+    }
+
+    private ItemStack applySpecialMiningResult(ItemStack drop, boolean silk, int dropFortune) {
+        if (silk || drop == null || drop.isEmpty()) return drop;
+        ItemStack focus = this.getStackInSlot(0);
+        boolean nativeClusters = this.getStackInSlot(1).getItem() instanceof ItemElementalPickaxe
+                || (!focus.isEmpty() && focus.getItem() instanceof FocusExcavation
+                && ((FocusExcavation) focus.getItem()).isUpgradedWith(focus, FocusExcavation.dowsing));
+        return nativeClusters
+                ? Utils.findSpecialMiningResult(drop, 0.2F + (float) dropFortune * 0.075F, this.world.rand)
+                : drop;
     }
 
     public void getDigEvent(int packed) {
@@ -580,23 +678,122 @@ public class TileArcaneBore extends TileThaumcraft implements ITickable, IInvent
                         64.0));
     }
 
-    private void playClientDigFx() {
-        if (!this.toDig || this.world == null || this.digBlock == null || this.digBlock == Blocks.AIR) return;
-        this.toDig = false;
+    private void updateClientDigging() {
+        ++this.paused;
+        if (this.paused < this.maxPause && this.soundDelay < System.currentTimeMillis()) {
+            this.soundDelay = System.currentTimeMillis() + 1200L + (long) this.world.rand.nextInt(100);
+            this.world.playSound(
+                    (double) this.pos.getX() + 0.5D,
+                    (double) this.pos.getY() + 0.5D,
+                    (double) this.pos.getZ() + 0.5D,
+                    TCSounds.RUMBLE,
+                    SoundCategory.BLOCKS,
+                    0.25F,
+                    0.9F + this.world.rand.nextFloat() * 0.2F,
+                    false);
+        }
+        if (this.beamLength > 0 && this.paused > this.maxPause) {
+            --this.beamLength;
+        }
+        if (this.toDig) {
+            this.paused = 0;
+            this.beamLength = 64;
+            BlockPos target = new BlockPos(this.digX, this.digY, this.digZ);
+            IBlockState state = this.world.getBlockState(target);
+            this.maxPause = 10 + Math.max(10 - this.speed,
+                    (int) (state.getBlockHardness(this.world, target) * 2.0F) - this.speed * 2);
+            if (this.speedyTime <= 0.0F) {
+                this.maxPause *= 4;
+            }
+            this.toDig = false;
+            this.updateAimTarget(target);
+            if (this.speedyTime > 0.0F) {
+                this.speedyTime -= 1.0F;
+            }
+        }
+        this.updateAimEasing();
+        this.updateClientBeam();
+    }
+
+    private void updateClientBeam() {
+        float vx = (float) (this.rotX + 90) - this.vRadX;
+        float vz = (float) (this.rotZ + 90) - this.vRadZ;
+        float dx = MathHelper.sin(vx / 180.0F * (float) Math.PI) * MathHelper.cos(vz / 180.0F * (float) Math.PI);
+        float dz = MathHelper.cos(vx / 180.0F * (float) Math.PI) * MathHelper.cos(vz / 180.0F * (float) Math.PI);
+        float dy = MathHelper.sin(vz / 180.0F * (float) Math.PI);
+        Vec3d start = new Vec3d(
+                (double) this.pos.getX() + 0.5D + (double) dx,
+                (double) this.pos.getY() + 0.5D + (double) dy,
+                (double) this.pos.getZ() + 0.5D + (double) dz);
+        Vec3d end = new Vec3d(
+                (double) this.pos.getX() + 0.5D + (double) (dx * (float) this.beamLength),
+                (double) this.pos.getY() + 0.5D + (double) (dy * (float) this.beamLength),
+                (double) this.pos.getZ() + 0.5D + (double) (dz * (float) this.beamLength));
+        RayTraceResult hit = this.world.rayTraceBlocks(start, end, false, true, false);
+        int impact = 0;
+        double bx = end.x;
+        double by = end.y;
+        double bz = end.z;
+        if (hit != null && hit.hitVec != null) {
+            bx = hit.hitVec.x;
+            by = hit.hitVec.y;
+            bz = hit.hitVec.z;
+            impact = 5;
+            if (hit.typeOfHit == RayTraceResult.Type.BLOCK) {
+                BlockPos hitPos = hit.getBlockPos();
+                IBlockState state = this.world.getBlockState(hitPos);
+                if (!state.getBlock().isAir(state, this.world, hitPos)) {
+                    thaumcraft.common.Thaumcraft.proxy.boreDigFx(
+                            this.world,
+                            hitPos.getX(),
+                            hitPos.getY(),
+                            hitPos.getZ(),
+                            this.pos.getX() + this.orientation.getXOffset(),
+                            this.pos.getY() + this.orientation.getYOffset(),
+                            this.pos.getZ() + this.orientation.getZOffset(),
+                            state,
+                            null,
+                            0);
+                }
+            }
+        }
+        this.topRotation = (this.topRotation + this.beamLength / 6) % 360;
+        this.beam1 = thaumcraft.common.Thaumcraft.proxy.beamBore(
+                this.world, this.pos.getX() + 0.5D, this.pos.getY() + 0.5D, this.pos.getZ() + 0.5D,
+                bx, by, bz, 1, 65382, true, impact > 0 ? 2.0F : 0.0F, this.beam1, impact);
+        this.beam2 = thaumcraft.common.Thaumcraft.proxy.beamBore(
+                this.world, this.pos.getX() + 0.5D, this.pos.getY() + 0.5D, this.pos.getZ() + 0.5D,
+                bx, by, bz, 2, 0xFF8855, false, impact > 0 ? 2.0F : 0.0F, this.beam2, impact);
+    }
+
+    @Override
+    public boolean receiveClientEvent(int id, int type) {
+        if (id == 99) {
+            Block block = Block.getBlockById(type & 0xFFF);
+            if (block != null && block != Blocks.AIR) {
+                this.playClientDigFx(block, type >> 12 & 0xFF);
+            }
+            return true;
+        }
+        return super.receiveClientEvent(id, type);
+    }
+
+    private void playClientDigFx(Block block, int meta) {
+        if (this.world == null || !this.world.isRemote || block == null || block == Blocks.AIR) return;
         IBlockState state;
         try {
-            state = this.digBlock.getStateFromMeta(this.digMd);
+            state = block.getStateFromMeta(meta);
         } catch (Exception ignored) {
-            state = this.digBlock.getDefaultState();
+            state = block.getDefaultState();
         }
         int sx = this.pos.getX() + this.orientation.getXOffset();
         int sy = this.pos.getY() + this.orientation.getYOffset();
         int sz = this.pos.getZ() + this.orientation.getZOffset();
         this.world.playSound(
-                sx + 0.5,
-                sy + 0.5,
-                sz + 0.5,
-                this.digBlock.getSoundType(state, this.world, new BlockPos(this.digX, this.digY, this.digZ), null).getHitSound(),
+                this.digX + 0.5D,
+                this.digY + 0.5D,
+                this.digZ + 0.5D,
+                block.getSoundType(state, this.world, new BlockPos(this.digX, this.digY, this.digZ), null).getHitSound(),
                 SoundCategory.BLOCKS,
                 0.45F,
                 0.85F,
@@ -616,6 +813,103 @@ public class TileArcaneBore extends TileThaumcraft implements ITickable, IInvent
                     state,
                     null,
                     0);
+        }
+    }
+
+    private void updatePickaxeLifecycle() {
+        if (!this.hasPickaxe || this.fakePlayer == null) return;
+        ItemStack pickaxe = this.getStackInSlot(1);
+        if (pickaxe.isEmpty()) return;
+        this.fakePlayer.setHeldItem(EnumHand.MAIN_HAND, pickaxe);
+        if (this.repairCounter++ % 40L == 0L && pickaxe.isItemDamaged()) {
+            this.doRepair(pickaxe);
+        }
+        if (this.repairCost.size() > 0 && this.repairCounter % 5L == 0L) {
+            for (Aspect aspect : this.repairCost.getAspects()) {
+                if (aspect == null || this.currentRepairVis.getAmount(aspect) >= this.repairCost.getAmount(aspect)) continue;
+                this.currentRepairVis.add(aspect, VisNetHandler.drainVis(
+                        this.world,
+                        this.pos.getX(),
+                        this.pos.getY(),
+                        this.pos.getZ(),
+                        aspect,
+                        this.repairCost.getAmount(aspect)));
+            }
+        }
+        this.fakePlayer.ticksExisted = (int) this.repairCounter;
+        try {
+            pickaxe.updateAnimation(this.world, this.fakePlayer, 0, true);
+        } catch (Exception ignored) {
+        }
+    }
+
+    private void doRepair(ItemStack pickaxe) {
+        int level = Config.enchRepair == null ? 0 : EnchantmentHelper.getEnchantmentLevel(Config.enchRepair, pickaxe);
+        if (level <= 0) return;
+        level = Math.min(level, 2);
+        if (!(pickaxe.getItem() instanceof IRepairable)) {
+            this.repairCost.aspects.clear();
+            return;
+        }
+
+        AspectList cost = ResearchManager.reduceToPrimals(ThaumcraftCraftingManager.getObjectTags(pickaxe));
+        if (cost == null || cost.size() == 0) return;
+        for (Aspect aspect : cost.getAspects()) {
+            if (aspect != null) {
+                this.repairCost.merge(aspect, (int) Math.sqrt(cost.getAmount(aspect) * 2) * level);
+            }
+        }
+
+        boolean repair = true;
+        if (pickaxe.getItem() instanceof IRepairableExtended) {
+            repair = ((IRepairableExtended) pickaxe.getItem()).doRepair(pickaxe, this.fakePlayer, level);
+        }
+        if (repair) {
+            for (Aspect aspect : this.repairCost.getAspects()) {
+                if (aspect != null && this.currentRepairVis.getAmount(aspect) < this.repairCost.getAmount(aspect)) {
+                    repair = false;
+                    break;
+                }
+            }
+        }
+        if (!repair) return;
+        for (Aspect aspect : this.repairCost.getAspects()) {
+            if (aspect != null) {
+                this.currentRepairVis.reduce(aspect, this.repairCost.getAmount(aspect));
+            }
+        }
+        pickaxe.setItemDamage(Math.max(0, pickaxe.getItemDamage() - level));
+        this.markDirty();
+    }
+
+    private void placeTunnelLight() {
+        TileArcaneBoreBase base = this.getBase();
+        if (base == null) return;
+        for (EnumFacing facing : EnumFacing.HORIZONTALS) {
+            if (!(this.world.getTileEntity(base.getPos().offset(facing)) instanceof TileArcaneLamp)) continue;
+            int distance = this.world.rand.nextInt(32) * 2;
+            int x = this.pos.getX() + this.orientation.getXOffset() * (distance + 1);
+            int y = this.pos.getY() + this.orientation.getYOffset() * (distance + 1);
+            int z = this.pos.getZ() + this.orientation.getZOffset() * (distance + 1);
+            int pattern = distance / 2 % 4;
+            if (this.orientation.getXOffset() != 0) {
+                z += pattern == 0 ? 3 : (pattern == 2 ? -3 : 0);
+            } else {
+                x += pattern == 0 ? 3 : (pattern == 2 ? -3 : 0);
+            }
+            if (pattern == 3 && this.orientation.getYOffset() == 0) {
+                y -= 2;
+            }
+            BlockPos target = new BlockPos(x, y, z);
+            IBlockState state = this.world.getBlockState(target);
+            if (!this.world.isAirBlock(target)
+                    || state.getBlock() == ConfigBlocks.blockAiry
+                    || this.world.getLight(target) >= 15) {
+                return;
+            }
+            this.world.setBlockState(target,
+                    ConfigBlocks.blockAiry.getDefaultState().withProperty(BlockAiry.TYPE, 3), 3);
+            return;
         }
     }
 

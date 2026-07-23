@@ -12,6 +12,8 @@ import net.minecraft.world.World;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.block.state.IBlockState;
 import thaumcraft.api.aspects.Aspect;
+import thaumcraft.common.blocks.BlockWoodenDevice;
+import thaumcraft.common.config.ConfigBlocks;
 import thaumcraft.common.tiles.TileArcaneBore;
 import thaumcraft.common.tiles.TileArcaneBoreBase;
 import thaumcraft.common.tiles.TileBanner;
@@ -56,16 +58,7 @@ public class BlockWoodenDeviceItem extends BlockMetadataItem {
         } else if (metadata == 5 && tile instanceof TileArcaneBore) {
             TileArcaneBore bore = (TileArcaneBore) tile;
             bore.baseOrientation = side;
-            if (player != null) {
-                int facing = MathHelper.floor((double) (player.rotationYaw * 4.0F / 360.0F) + 0.5D) & 3;
-                switch (facing) {
-                    case 0: bore.orientation = EnumFacing.SOUTH; break;
-                    case 1: bore.orientation = EnumFacing.WEST; break;
-                    case 2: bore.orientation = EnumFacing.NORTH; break;
-                    case 3: bore.orientation = EnumFacing.EAST; break;
-                    default: bore.orientation = EnumFacing.UP; break;
-                }
-            }
+            bore.orientation = player == null ? EnumFacing.SOUTH : EnumFacing.getDirectionFromEntityLiving(pos, player);
             bore.markDirty();
             world.notifyBlockUpdate(pos, world.getBlockState(pos), world.getBlockState(pos), 3);
         } else if (metadata == 8 && tile instanceof TileBanner) {
@@ -98,5 +91,18 @@ public class BlockWoodenDeviceItem extends BlockMetadataItem {
             world.notifyBlockUpdate(pos, world.getBlockState(pos), world.getBlockState(pos), 3);
         }
         return true;
+    }
+
+    @Override
+    public boolean canPlaceBlockOnSide(World world, BlockPos pos, EnumFacing side, EntityPlayer player, ItemStack stack) {
+        if (stack.getItemDamage() == 5) {
+            IBlockState support = world.getBlockState(pos);
+            if ((side != EnumFacing.UP && side != EnumFacing.DOWN)
+                    || support.getBlock() != ConfigBlocks.blockWoodenDevice
+                    || support.getValue(BlockWoodenDevice.TYPE) != 4) {
+                return false;
+            }
+        }
+        return super.canPlaceBlockOnSide(world, pos, side, player, stack);
     }
 }

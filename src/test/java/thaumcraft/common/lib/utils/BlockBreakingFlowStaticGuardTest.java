@@ -40,6 +40,18 @@ public class BlockBreakingFlowStaticGuardTest {
     }
 
     @Test
+    public void arcaneBorePostsBreakEventWithoutUsingPlayerConnection() throws IOException {
+        String source = read("src/main/java/thaumcraft/common/tiles/TileArcaneBore.java");
+
+        assertFalse("Connectionless bore FakePlayer must not use ForgeHooks.onBlockBreakEvent",
+                source.contains("ForgeHooks.onBlockBreakEvent"));
+        assertTrue(source.contains("new BlockEvent.BreakEvent(this.world, target, state, this.fakePlayer)")
+                && source.contains("MinecraftForge.EVENT_BUS.post(event);")
+                && source.contains("if (event.isCanceled()) return false;")
+                && source.contains("int xp = event.getExpToDrop();"));
+    }
+
+    @Test
     public void golemHarvestersRestoreTimedCracksAndCentralHarvest() throws IOException {
         String logs = read("src/main/java/thaumcraft/common/entities/ai/interact/AIHarvestLogs.java");
         String crops = read("src/main/java/thaumcraft/common/entities/ai/interact/AIHarvestCrops.java");
