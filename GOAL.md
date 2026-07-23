@@ -19,7 +19,8 @@ Implement the approved plan in three deployable iterations. Each iteration ends 
   - Evidence: `TileDeconstructionTableRuntimeTest`; focused test, `./scripts/dev.sh validate --smoke`, and `./scripts/dev.sh build` passed on 2026-07-23.
 - R2: Restore authoritative container behavior.
   - Acceptance: Progress synchronizes, shift-click follows the original order, and claiming a pending aspect awards exactly one pool point without duplication or loss before clearing and synchronizing the result.
-  - Status: pending
+  - Status: verified
+  - Evidence: `ContainerDeconstructionTableRuntimeTest`; focused tile/container tests, `./scripts/dev.sh validate --smoke`, and `./scripts/dev.sh build` passed on 2026-07-23.
 - R3: Restore GUI, TESR, and item-form visual parity.
   - Acceptance: Aspect tint/tooltip, table overlays, input animation, blend/scale/position, and meta-14 TESR item routing match the audited TC4 paths; original assets remain unchanged.
   - Status: pending
@@ -39,9 +40,9 @@ Implement the approved plan in three deployable iterations. Each iteration ends 
 3. GUI/TESR/item routing, visual guards, smoke/build, and final TC4 comparison.
 
 ## Current Checkpoint
-- Target: R2.
-- Expected files: `ContainerDeconstructionTable`, focused container tests, and this contract.
-- Stop or replan if the 1.12 capability award cannot remain atomic with pending-output clearing.
+- Target: R3.
+- Expected files: Deconstruction Table GUI/TESR/item model routing, focused visual guards, and this contract.
+- Stop or replan if Forge 1.12 cannot reproduce the original framed item pose without changing shared renderer behavior.
 
 ## Material Decisions
 - Write canonical `Items`/`Aspect`/`CustomName`; read accidental `Inventory`/`aspect` keys as migration fallback.
@@ -50,3 +51,4 @@ Implement the approved plan in three deployable iterations. Each iteration ends 
 
 ## Checkpoint History
 - 2026-07-23: R1 restored the 40-tick server state machine, original primal roll/selection and consumption rules, inventory limits/usability, canonical TC4 persistence with legacy port-key reads, transient progress, and stale-client-state clearing. Focused runtime tests, server smoke, and build passed.
+- 2026-07-23: R2 made result claims server-authoritative and lossless when player knowledge is unavailable, retained one-shot pool/cache/packet synchronization, restored direct-order table shift-click, and covered progress, distance, transfer, and duplicate-claim behavior. Focused runtime tests, server smoke, and build passed.

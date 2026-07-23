@@ -81,17 +81,17 @@ public class ContainerDeconstructionTable extends Container {
 
     @Override
     public boolean enchantItem(EntityPlayer playerIn, int id) {
-        if (this.table == null || id != 1 || this.table.aspect == null) return false;
+        if (this.table == null || id != 1 || this.table.aspect == null
+                || playerIn == null || playerIn.world == null || playerIn.world.isRemote) return false;
 
         Aspect aspect = this.table.aspect;
         IPlayerKnowledge knowledge = CommonProxy.getPlayerKnowledge(playerIn);
-        if (knowledge != null) {
-            knowledge.addAspectPool(aspect, 1);
-            ResearchManager.updateCache(playerIn);
-            if (!playerIn.world.isRemote && playerIn instanceof EntityPlayerMP) {
-                PacketHandler.INSTANCE.sendTo(new PacketAspectPool(aspect.getTag(), (short) 1,
-                        knowledge.getAspectPoolFor(aspect)), (EntityPlayerMP) playerIn);
-            }
+        if (knowledge == null || !knowledge.addAspectPool(aspect, 1)) return false;
+
+        ResearchManager.updateCache(playerIn);
+        if (playerIn instanceof EntityPlayerMP) {
+            PacketHandler.INSTANCE.sendTo(new PacketAspectPool(aspect.getTag(), (short) 1,
+                    knowledge.getAspectPoolFor(aspect)), (EntityPlayerMP) playerIn);
         }
 
         this.table.aspect = null;
@@ -113,7 +113,7 @@ public class ContainerDeconstructionTable extends Container {
         ItemStack stack = slot.getStack();
         original = stack.copy();
         if (index == 0) {
-            if (!this.mergeItemStack(stack, 1, this.inventorySlots.size(), true)) return ItemStack.EMPTY;
+            if (!this.mergeItemStack(stack, 1, this.inventorySlots.size(), false)) return ItemStack.EMPTY;
         } else if (this.table != null && this.table.isItemValidForSlot(0, stack)) {
             if (!this.mergeItemStack(stack, 0, 1, false)) return ItemStack.EMPTY;
         } else if (index >= 1 && index < 28) {
