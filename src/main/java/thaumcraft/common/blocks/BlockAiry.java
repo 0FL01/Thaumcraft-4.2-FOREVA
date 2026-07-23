@@ -3,6 +3,7 @@ package thaumcraft.common.blocks;
 import java.util.List;
 import java.util.Random;
 import javax.annotation.Nullable;
+import net.minecraft.block.Block;
 import net.minecraft.block.BlockContainer;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.properties.PropertyInteger;
@@ -43,7 +44,9 @@ import thaumcraft.common.items.ItemWispEssence;
 import thaumcraft.common.lib.TCSounds;
 import thaumcraft.common.lib.world.ThaumcraftWorldGenerator;
 import thaumcraft.common.tiles.TileNode;
+import thaumcraft.common.tiles.TileNodeConverter;
 import thaumcraft.common.tiles.TileNodeEnergized;
+import thaumcraft.common.tiles.TileNodeStabilizer;
 import thaumcraft.common.tiles.TileNitor;
 import thaumcraft.common.tiles.TileWardingStoneFence;
 
@@ -170,6 +173,23 @@ public class BlockAiry extends BlockContainer {
             ThaumcraftWorldGenerator.createRandomNodeAt(worldIn, pos, worldIn.rand, false, false, false);
         }
         super.onBlockPlacedBy(worldIn, pos, state, placer, stack);
+    }
+
+    @Override
+    public void neighborChanged(IBlockState state, World worldIn, BlockPos pos, Block blockIn, BlockPos fromPos) {
+        if (state.getValue(TYPE) == 5) {
+            BlockPos stabilizerPos = pos.down();
+            TileEntity te = worldIn.getTileEntity(stabilizerPos);
+            if (worldIn.isAirBlock(stabilizerPos) || !(te instanceof TileNodeStabilizer)) {
+                explodify(worldIn, pos.getX(), pos.getY(), pos.getZ());
+            } else {
+                te = worldIn.getTileEntity(pos.up());
+                if (!(te instanceof TileNodeConverter)) {
+                    explodify(worldIn, pos.getX(), pos.getY(), pos.getZ());
+                }
+            }
+        }
+        super.neighborChanged(state, worldIn, pos, blockIn, fromPos);
     }
 
     @Override
