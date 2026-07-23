@@ -55,6 +55,14 @@ public class ArcaneBoreGameplayParityStaticGuardTest {
     }
 
     @Test
+    public void clientRumbleCadenceDoesNotOverlapLongestPitchedClip() throws IOException {
+        String source = read("src/main/java/thaumcraft/common/tiles/TileArcaneBore.java");
+
+        assertTrue(source.contains("System.currentTimeMillis() + 1700L +"));
+        assertFalse(source.contains("System.currentTimeMillis() + 1200L +"));
+    }
+
+    @Test
     public void borePlacementRequiresVerticalArcaneBoreBaseSupport() throws IOException {
         String source = read("src/main/java/thaumcraft/common/blocks/ItemBlocks/BlockWoodenDeviceItem.java");
 

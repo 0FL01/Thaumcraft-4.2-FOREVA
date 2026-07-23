@@ -681,7 +681,7 @@ public class TileArcaneBore extends TileThaumcraft implements ITickable, IInvent
     private void updateClientDigging() {
         ++this.paused;
         if (this.paused < this.maxPause && this.soundDelay < System.currentTimeMillis()) {
-            this.soundDelay = System.currentTimeMillis() + 1200L + (long) this.world.rand.nextInt(100);
+            this.soundDelay = System.currentTimeMillis() + 1700L + (long) this.world.rand.nextInt(100);
             this.world.playSound(
                     (double) this.pos.getX() + 0.5D,
                     (double) this.pos.getY() + 0.5D,
