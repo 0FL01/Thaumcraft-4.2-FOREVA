@@ -28,6 +28,12 @@ public class GuiArcaneBore extends GuiContainer {
     }
 
     @Override
+    public void drawScreen(int mouseX, int mouseY, float partialTicks) {
+        super.drawScreen(mouseX, mouseY, partialTicks);
+        this.renderHoveredToolTip(mouseX, mouseY);
+    }
+
+    @Override
     protected void drawGuiContainerForegroundLayer(int mouseX, int mouseY) {
     }
 
@@ -46,7 +52,7 @@ public class GuiArcaneBore extends GuiContainer {
         GlStateManager.pushMatrix();
         GlStateManager.translate((float) (this.guiLeft + 112), (float) (this.guiTop + 8), 505.0F);
         GlStateManager.scale(0.5F, 0.5F, 0.0F);
-        this.fontRenderer.drawString("Width:" + (1 + (this.bore.area + this.bore.maxRadius) * 2), 0, 0, 0xFFFFFF);
+        this.fontRenderer.drawString("Width: " + (1 + (this.bore.area + this.bore.maxRadius) * 2), 0, 0, 0xFFFFFF);
         this.fontRenderer.drawString("Speed: +" + this.bore.speed, 0, 10, 0xFFFFFF);
         this.fontRenderer.drawString("Other properties:", 0, 24, 0xFFFFFF);
 
@@ -56,7 +62,7 @@ public class GuiArcaneBore extends GuiContainer {
             offset += 9;
         }
         if (this.bore.fortune > 0) {
-            this.fontRenderer.drawString("Fortune" + this.bore.fortune, 4, 34 + offset, 0xEECACA);
+            this.fontRenderer.drawString("Fortune " + this.bore.fortune, 4, 34 + offset, 0xEECACA);
             offset += 9;
         }
         if (hasSilkTouch(pickaxe)) {

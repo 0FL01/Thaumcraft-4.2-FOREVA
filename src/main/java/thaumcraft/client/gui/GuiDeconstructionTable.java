@@ -51,6 +51,7 @@ public class GuiDeconstructionTable extends GuiContainer {
     @Override
     public void drawScreen(int mouseX, int mouseY, float partialTicks) {
         super.drawScreen(mouseX, mouseY, partialTicks);
+        this.renderHoveredToolTip(mouseX, mouseY);
         if (this.table.aspect != null && isMouseIn(mouseX, mouseY, 64, 48, 16, 16)) {
             UtilsFX.drawCustomTooltip(this, this.itemRender, this.fontRenderer,
                     Arrays.asList(this.table.aspect.getName(), this.table.aspect.getLocalizedDescription()),

@@ -1,46 +1,56 @@
-# Goal: Correct Deconstruction Table object placement
+# Goal: Restore item status tooltips in custom interfaces
 
-Status: complete
-Source: User-approved visual defect plan from 2026-07-23; evidence screenshot and TC4 renderer bytecode/assets
+Status: in progress
+Source: User-approved RECON plan from 2026-07-23; TC4 bytecode, TC6 donor behavior, and Forge 1.12.2 GUI lifecycle
 Last updated: 2026-07-23
 
 ## Objective
-Make the table-mounted thaumometer lie flat on the Deconstruction Table and place the processed item inside its aperture without regressing the restored backend, GUI, aspect overlay, or meta-14 item route.
+Restore complete standard item-property tooltips in Thaumcraft-specific interfaces, including Focus Pouch, Arcane Bore, synthetic recipe outputs, and the research recipe viewer, without changing container behavior or unrelated visuals.
 
 ## Execution Directive
-Implement the approved correction as a minimal follow-up to `eb4b8c1a`. Finish with focused tests, `./scripts/dev.sh validate --smoke`, `./scripts/dev.sh build`, a final transform audit, and one scoped commit.
+Implement the approved correction iteratively. Each iteration must remain deployable, receive focused regression coverage and a build, and end in a scoped commit. Finish with server smoke validation, a final build, and a manual client acceptance matrix where practical.
 
 ## Required Outcomes
-- R1: Separate the thaumometer and input render contexts.
-  - Acceptance: The scanner no longer receives `TransformType.GROUND`; it uses the TC4 ENTITY-context scale and its natural horizontal OBJ plane. Regular processed items retain their independent framed ground pose, count-one rendering, rotation, hover, alpha, and additive blend.
+- R1: Every direct `GuiContainer` screen renders standard slot tooltips exactly once after `super.drawScreen`.
+  - Acceptance: Hovered non-empty machine, player, locked, and ghost-filter slots use `renderHoveredToolTip`; carried-stack suppression and existing custom-tooltip precedence remain intact.
   - Status: verified
-  - Evidence: The table scanner now uses the complete TC4 ENTITY/frame transform chain and a raw table-specific TEISR entry point; the regular input retains its independent ground-model path.
-- R2: Preserve the surrounding visual contract.
-  - Acceptance: Scanner and input remain centered over the table; aspect geometry, GUI tint/tooltip, meta-14 TEISR route, and original assets remain unchanged.
-  - Status: verified
-  - Evidence: Updated visual guards cover scanner bounds/orientation, input transforms, GUI/aspect invariants, meta-14 routing, and byte-exact original assets.
-- R3: Keep the correction deployable.
-  - Acceptance: Focused Deconstruction Table tests, server smoke, build, and source-level transform audit pass before a scoped commit.
-  - Status: verified
-  - Evidence: Focused Deconstruction Table/thaumometer tests, clean-world `./scripts/dev.sh validate --smoke`, `./scripts/dev.sh build`, and final source-level transform audit passed on 2026-07-23.
+  - Evidence: All 15 direct container screens now use the standard post-container path exactly once; the complete headless source guard and iteration build passed.
+- R2: Manually rendered container results receive stack-aware tooltips.
+  - Acceptance: The Thaumatorium recipe output and Arcane Workbench insufficient-vis ghost result use `renderToolTip` without duplicating real-slot tooltips.
+  - Status: planned
+- R3: Research recipe item tooltips use the standard stack-aware rendering path.
+  - Acceptance: Item entries preserve their existing hitboxes while gaining standard rarity formatting, advanced-tooltip behavior, Forge render hooks, and scanned-aspect overlays; aspect-only tooltips remain unchanged.
+  - Status: planned
+- R4: Keep the correction deployable and regression-resistant.
+  - Acceptance: A headless-safe source guard audits every direct `GuiContainer`; focused tests, build, final server smoke, and scoped commits pass.
+  - Status: in progress
 
 ## Constraints
-- Preserve Java 8, Forge 1.12.2, registry/GUI/packet ids, backend behavior, and original assets.
-- Do not alter global thaumometer GUI, held, ground, or fixed transforms.
-- Keep `thaumcraft_src/**` and donor jars read-only.
+- Preserve Java 8, Forge 1.12.2, GUI/packet/registry ids, container interactions, slot validity, NBT, and original assets.
+- Use the standard `renderHoveredToolTip`/`renderToolTip` paths rather than hand-building item tooltip text.
+- Do not add a shared GUI superclass or `drawDefaultBackground`; avoid unrelated hierarchy and backdrop changes.
+- Preserve bespoke control/aspect/research tooltips and render them after standard slot tooltips where applicable.
+- Keep research-node icons and the focus radial HUD outside this correction.
+- Keep `thaumcraft_src/**`, original jars, and donor artifacts read-only.
 - Do not include unrelated working-tree changes.
 
 ## Material Decisions
-- The previous table-local `GROUND` approximation is invalid specifically for the custom thaumometer TEISR: its JSON ground transform rotates an already horizontal scanner plane by 90 degrees.
-- Reproduce TC4's full table scanner chain: table scale `0.8`, entity bob, frame scale/offset/rotation, entity-model scale `0.5`, thaumometer ENTITY scale `0.5`, then raw TEISR rendering without its normal item-display basis adapter.
-- Keep the ordinary input-item ground path separate; do not use it for the scanner.
+- The defect is a 1.7.10-to-1.12.2 lifecycle mismatch: target `GuiContainer.drawScreen` computes `hoveredSlot` but does not render its tooltip.
+- Apply the established local/TC6 pattern per screen instead of changing the class hierarchy.
+- Treat manually rendered ItemStacks separately because `renderHoveredToolTip` can only discover real slots.
+- Ensure each item tooltip is rendered exactly once so Forge tooltip events and Thaumcraft's aspect overlay are not duplicated.
+
+## Iterations
+1. Restore standard slot tooltips in all 12 affected container screens, correct Arcane Bore status-label spacing, and add a complete source guard.
+2. Restore synthetic-result tooltips in Thaumatorium and Arcane Workbench.
+3. Move GuiResearchRecipe item entries to the standard stack-aware tooltip path and complete final validation.
 
 ## Current Checkpoint
-- Target: complete.
-- Result: R1-R3 verified; scanner source bounds are horizontal and centered at world Y `1.05..1.10`, with the processed item rendered independently inside the aperture.
-- Known limitation: Automated server/static checks cannot replace a live client screenshot check of the final GL pose.
+- Target: iteration 2.
+- Iteration 1 restored standard slot tooltips in all 12 affected screens and original Arcane Bore status-label spacing.
+- Focused source guard and `./scripts/dev.sh build` passed.
+- Known limitation: server/static checks cannot verify final GL tooltip appearance; interactive client checks remain the visual authority.
 
 ## Checkpoint History
-- 2026-07-23: Replaced the shared `GROUND` route with separate scanner/input paths. The scanner now receives the TC4 table/frame/entity transforms and bypasses the item JSON X rotation and ordinary item basis adapter.
-- 2026-07-23: Added a table-specific raw scanner entry point without changing normal thaumometer GUI, held, ground, fixed, or HUD behavior. Effective scanner scale is `0.25`; source-derived bounds are X `0.15..0.85`, Y `1.05..1.10`, Z `0.1969..0.8031`.
-- 2026-07-23: Focused tests and build passed. The first server smoke stopped on the retained development world's already-missing `thaumcraft:focuspouchbauble`; a clean-world validation passed and the original world was restored unchanged.
+- 2026-07-23: User approved the three-iteration RECON plan.
+- 2026-07-23: Iteration 1 restored the standard Forge item-tooltip path across all direct container screens and added complete headless regression coverage.

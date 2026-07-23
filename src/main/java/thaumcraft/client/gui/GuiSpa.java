@@ -71,6 +71,7 @@ public class GuiSpa extends GuiContainer {
     @Override
     public void drawScreen(int mouseX, int mouseY, float partialTicks) {
         super.drawScreen(mouseX, mouseY, partialTicks);
+        this.renderHoveredToolTip(mouseX, mouseY);
 
         if (isMouseIn(mouseX, mouseY, 104, 10, 10, 55)) {
             FluidStack fluid = this.spa.tank.getFluid();

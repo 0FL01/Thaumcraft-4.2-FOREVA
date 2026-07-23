@@ -104,6 +104,7 @@ public class GuiResearchTable extends GuiContainer {
     @Override
     public void drawScreen(int mouseX, int mouseY, float partialTicks) {
         super.drawScreen(mouseX, mouseY, partialTicks);
+        this.renderHoveredToolTip(mouseX, mouseY);
         this.xSize_lo = (float) mouseX;
         this.ySize_lo = (float) mouseY;
         int gx = (this.width - this.xSize) / 2;
