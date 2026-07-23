@@ -48,10 +48,11 @@ public class TableRendererFidelityStaticGuardTest {
                 deconRenderer.contains("renderThaumometer")
                         && deconRenderer.contains("new ModelArcaneWorkbench()")
                         && deconRenderer.contains("tableModel.renderAll(MODEL_SCALE);")
-                        && deconRenderer.contains("renderFramedItem")
+                        && deconRenderer.contains("renderTableThaumometer")
+                        && deconRenderer.contains("renderDeconstructionInput")
                         && deconRenderer.contains("UtilsFX.drawTag(-8, -8, tile.aspect")
-                        && deconRenderer.contains("renderFramedItem(tile, this.thaumometer, 0.0F);")
-                        && deconRenderer.contains("renderFramedItem(tile, input, hoverStart);")
+                        && deconRenderer.contains("renderTableThaumometer(this.thaumometer);")
+                        && deconRenderer.contains("renderDeconstructionInput(tile, input, hoverStart);")
                         && !deconRenderer.contains("renderPlate("));
 
         assertTrue("TileArcaneWorkbenchRenderer should restore the worktable shell and keep the wand overlay",

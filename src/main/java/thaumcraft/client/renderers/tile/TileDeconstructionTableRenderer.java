@@ -6,12 +6,14 @@ import net.minecraft.client.renderer.RenderItem;
 import net.minecraft.client.renderer.block.model.IBakedModel;
 import net.minecraft.client.renderer.block.model.ItemCameraTransforms;
 import net.minecraft.client.renderer.texture.TextureMap;
+import net.minecraft.client.renderer.tileentity.TileEntityItemStackRenderer;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.MathHelper;
 import net.minecraftforge.client.ForgeHooksClient;
 import thaumcraft.client.lib.UtilsFX;
+import thaumcraft.client.renderers.item.ItemThaumometerRenderer;
 import thaumcraft.client.renderers.models.ModelArcaneWorkbench;
 import thaumcraft.common.config.ConfigItems;
 import thaumcraft.common.tiles.TileDeconstructionTable;
@@ -20,6 +22,11 @@ public class TileDeconstructionTableRenderer extends TileEntitySpecialRenderer<T
     private static final ResourceLocation TABLE_TEXTURE =
             new ResourceLocation("thaumcraft", "textures/models/decontable.png");
     private static final float MODEL_SCALE = 0.0625F;
+    private static final float FRAME_SCALE = 1.25F;
+    private static final float FRAME_Y_OFFSET = 0.05F;
+    private static final float ENTITY_MODEL_SCALE = 0.5F;
+    private static final float THAUMOMETER_ENTITY_SCALE = 0.5F;
+    private static final float ENTITY_ITEM_BASE_BOB = 0.1F;
 
     private final ModelArcaneWorkbench tableModel = new ModelArcaneWorkbench();
     private ItemStack thaumometer = ItemStack.EMPTY;
@@ -50,7 +57,7 @@ public class TileDeconstructionTableRenderer extends TileEntitySpecialRenderer<T
             GlStateManager.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE);
             GlStateManager.color(1.0F, 1.0F, 1.0F, 0.75F);
             float hoverStart = MathHelper.sin(ticks / 14.0F) * 0.2F + 0.2F;
-            renderFramedItem(tile, input, hoverStart);
+            renderDeconstructionInput(tile, input, hoverStart);
             GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
             GlStateManager.disableBlend();
             GlStateManager.popMatrix();
@@ -84,17 +91,47 @@ public class TileDeconstructionTableRenderer extends TileEntitySpecialRenderer<T
         GlStateManager.enableBlend();
         GlStateManager.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA,
                 GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
-        renderFramedItem(tile, this.thaumometer, 0.0F);
+        renderTableThaumometer(this.thaumometer);
         GlStateManager.disableBlend();
         GlStateManager.popMatrix();
     }
 
     /**
-     * TC4 rendered these EntityItems with RenderItem.renderInFrame enabled. The 1.12
-     * equivalent is a direct ground-model render: preserve the original bob phase,
-     * but do not add dropped-item camera rotation or the modern ground-height offset.
+     * TC4 sent the scanner through its ENTITY item renderer, where it kept its natural
+     * horizontal OBJ basis and received a 0.5 scale. Applying the 1.12 GROUND transform
+     * here would add another 90-degree X rotation and stand the scanner on edge.
      */
-    private void renderFramedItem(TileDeconstructionTable tile, ItemStack stack, float hoverStart) {
+    private void renderTableThaumometer(ItemStack stack) {
+        if (stack == null || stack.isEmpty()) {
+            return;
+        }
+
+        GlStateManager.pushMatrix();
+        try {
+            GlStateManager.translate(0.0F, ENTITY_ITEM_BASE_BOB, 0.0F);
+            GlStateManager.scale(FRAME_SCALE, FRAME_SCALE, FRAME_SCALE);
+            GlStateManager.translate(0.0F, FRAME_Y_OFFSET, 0.0F);
+            GlStateManager.rotate(-90.0F, 0.0F, 1.0F, 0.0F);
+            GlStateManager.scale(ENTITY_MODEL_SCALE, ENTITY_MODEL_SCALE, ENTITY_MODEL_SCALE);
+            GlStateManager.scale(THAUMOMETER_ENTITY_SCALE, THAUMOMETER_ENTITY_SCALE,
+                    THAUMOMETER_ENTITY_SCALE);
+
+            TileEntityItemStackRenderer renderer = stack.getItem().getTileEntityItemStackRenderer();
+            if (renderer instanceof ItemThaumometerRenderer) {
+                ((ItemThaumometerRenderer) renderer).renderTableDisplay(stack);
+            } else {
+                renderer.renderByItem(stack, 0.0F);
+            }
+        } finally {
+            GlStateManager.popMatrix();
+        }
+    }
+
+    /**
+     * Regular input items still use the 1.12 ground model as the closest equivalent
+     * of TC4's framed EntityItem pose, without dropped-item camera spin or height.
+     */
+    private void renderDeconstructionInput(TileDeconstructionTable tile, ItemStack stack, float hoverStart) {
         if (stack == null || stack.isEmpty()) {
             return;
         }

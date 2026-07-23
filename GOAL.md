@@ -1,64 +1,46 @@
-# Goal: Restore the canonical Focus Pouch
+# Goal: Correct Deconstruction Table object placement
 
 Status: complete
-Source: User-approved RECON plan from 2026-07-23; original TC4 classes under `thaumcraft_src/**`
+Source: User-approved visual defect plan from 2026-07-23; evidence screenshot and TC4 renderer bytecode/assets
 Last updated: 2026-07-23
 
 ## Objective
-Restore the TC4 Focus Pouch as one canonical `thaumcraft:focuspouch` item that keeps the normal pouch texture and can be worn in the Baubles belt slot.
+Make the table-mounted thaumometer lie flat on the Deconstruction Table and place the processed item inside its aperture without regressing the restored backend, GUI, aspect overlay, or meta-14 item route.
 
 ## Execution Directive
-Complete the frozen Required Outcomes using the listed Change Envelope and Primary Evidence. Keep the change scoped to the Focus Pouch registration and its stale second-item resource route. Finish with a deployable commit and rebuilt jar.
+Implement the approved correction as a minimal follow-up to `eb4b8c1a`. Finish with focused tests, `./scripts/dev.sh validate --smoke`, `./scripts/dev.sh build`, a final transform audit, and one scoped commit.
 
-## Frozen Contract
-
-### Required Outcomes
-- R1: Register one canonical Focus Pouch with TC4 class behavior.
-  - Acceptance: `ConfigItems.itemFocusPouch` is an `ItemFocusPouchBauble` registered as `thaumcraft:focuspouch`; no second `thaumcraft:focuspouchbauble` item is registered; the item remains a `BELT` bauble and inherits pouch GUI/NBT behavior.
-  - Primary evidence: Focused registration parity guard, original `ConfigItems`/`ItemFocusPouchBauble` comparison, and runtime smoke.
+## Required Outcomes
+- R1: Separate the thaumometer and input render contexts.
+  - Acceptance: The scanner no longer receives `TransformType.GROUND`; it uses the TC4 ENTITY-context scale and its natural horizontal OBJ plane. Regular processed items retain their independent framed ground pose, count-one rendering, rotation, hover, alpha, and additive blend.
   - Status: verified
-  - Evidence: `FocusPouchRegistrationParityStaticGuardTest`; focused test and `./scripts/dev.sh validate --smoke` passed on 2026-07-23.
-- R2: Route the canonical item through the visible original texture.
-  - Acceptance: The canonical model uses `focuspouch.png`; the stale `focuspouchbauble` model and localization route are removed; recipes, research, Pech trades, and the creative item all resolve to the canonical item.
-  - Primary evidence: Focused resource/output guard and client-facing source/resource inspection.
+  - Evidence: The table scanner now uses the complete TC4 ENTITY/frame transform chain and a raw table-specific TEISR entry point; the regular input retains its independent ground-model path.
+- R2: Preserve the surrounding visual contract.
+  - Acceptance: Scanner and input remain centered over the table; aspect geometry, GUI tint/tooltip, meta-14 TEISR route, and original assets remain unchanged.
   - Status: verified
-  - Evidence: The focused guard verifies canonical consumers, exact TC4 texture bytes, visible alpha, and removal of the stale model/language route.
-- R3: Keep the checkpoint deployable.
-  - Acceptance: Focused tests, `./scripts/dev.sh validate --smoke`, and `./scripts/dev.sh build` pass before a scoped commit.
-  - Primary evidence: Validation logs, rebuilt jar, and commit hash.
+  - Evidence: Updated visual guards cover scanner bounds/orientation, input transforms, GUI/aspect invariants, meta-14 routing, and byte-exact original assets.
+- R3: Keep the correction deployable.
+  - Acceptance: Focused Deconstruction Table tests, server smoke, build, and source-level transform audit pass before a scoped commit.
   - Status: verified
-  - Evidence: Focused test, clean-world `./scripts/dev.sh validate --smoke`, and `./scripts/dev.sh build` passed on 2026-07-23.
+  - Evidence: Focused Deconstruction Table/thaumometer tests, clean-world `./scripts/dev.sh validate --smoke`, `./scripts/dev.sh build`, and final source-level transform audit passed on 2026-07-23.
 
-### Constraints
-- C1: Preserve Java 8, Forge 1.12.2, the canonical `thaumcraft:focuspouch` registry name, pouch NBT key, GUI id, and Baubles dependency.
-- C2: Treat `thaumcraft_src/**` and donor jars as read-only references.
-- C3: Do not include unrelated working-tree changes in the checkpoint commit.
+## Constraints
+- Preserve Java 8, Forge 1.12.2, registry/GUI/packet ids, backend behavior, and original assets.
+- Do not alter global thaumometer GUI, held, ground, or fixed transforms.
+- Keep `thaumcraft_src/**` and donor jars read-only.
+- Do not include unrelated working-tree changes.
 
-### Non-goals
-- Migrating saves or stacks using the erroneous `thaumcraft:focuspouchbauble` registry name.
-- Redrawing the original fully transparent `focuspouchbauble.png` asset.
-- Refactoring focus switching, pouch containers, or unrelated Baubles.
-
-## Change Envelope
-- Expected runtime paths: `ConfigItems`, `ItemFocusPouchBauble`, canonical item model/language resources, and existing recipe/research/Pech consumers.
-- Allowed artifacts: Minimal registration/resource fixes, one focused regression test, this contract, validation logs, rebuilt jar, and a scoped commit.
-- Forbidden artifacts: Changes under `thaumcraft_src/**`, registry migration handlers, dependency upgrades, and unrelated cleanup.
+## Material Decisions
+- The previous table-local `GROUND` approximation is invalid specifically for the custom thaumometer TEISR: its JSON ground transform rotates an already horizontal scanner plane by 90 degrees.
+- Reproduce TC4's full table scanner chain: table scale `0.8`, entity bob, frame scale/offset/rotation, entity-model scale `0.5`, thaumometer ENTITY scale `0.5`, then raw TEISR rendering without its normal item-display basis adapter.
+- Keep the ordinary input-item ground path separate; do not use it for the scanner.
 
 ## Current Checkpoint
 - Target: complete.
-- Result: R1, R2, and R3 are verified; one canonical textured belt pouch is registered.
-
-## Material Decisions
-- Keep `ItemFocusPouch` as the shared GUI/NBT base class and instantiate `ItemFocusPouchBauble` for the canonical `itemFocusPouch` field, matching TC4.
-- Do not add migration for the erroneous port-only `thaumcraft:focuspouchbauble` id, per the approved plan.
-- Keep the original transparent donor PNG unchanged and unused; remove only the port-created model and localization route that exposed it as a second item.
+- Result: R1-R3 verified; scanner source bounds are horizontal and centered at world Y `1.05..1.10`, with the processed item rendered independently inside the aperture.
+- Known limitation: Automated server/static checks cannot replace a live client screenshot check of the final GL pose.
 
 ## Checkpoint History
-- 2026-07-23: Replaced the two registered pouch instances with one `ItemFocusPouchBauble` under `thaumcraft:focuspouch`; existing recipe, research, Pech, creative, GUI, NBT, and focus-switch consumers now share that item.
-- 2026-07-23: Removed the stale second model/localization route and added a focused guard for registration, belt type, canonical outputs, and exact visible TC4 texture parity.
-- 2026-07-23: The first smoke attempt reached registry loading but paused on the intentionally unsupported old `focuspouchbauble` entry in the retained development world. A clean-world rerun passed and the prior development world was restored unchanged; focused tests and the final build also passed.
-
-## Completion
-- Resolved outcomes: R1, R2, and R3 verified.
-- Validation: Focused guard; `./scripts/dev.sh validate --smoke`; `./scripts/dev.sh build`.
-- Known limitation: Existing stacks saved under `thaumcraft:focuspouchbauble` are not migrated.
+- 2026-07-23: Replaced the shared `GROUND` route with separate scanner/input paths. The scanner now receives the TC4 table/frame/entity transforms and bypasses the item JSON X rotation and ordinary item basis adapter.
+- 2026-07-23: Added a table-specific raw scanner entry point without changing normal thaumometer GUI, held, ground, fixed, or HUD behavior. Effective scanner scale is `0.25`; source-derived bounds are X `0.15..0.85`, Y `1.05..1.10`, Z `0.1969..0.8031`.
+- 2026-07-23: Focused tests and build passed. The first server smoke stopped on the retained development world's already-missing `thaumcraft:focuspouchbauble`; a clean-world validation passed and the original world was restored unchanged.

@@ -58,13 +58,21 @@ public class ItemThaumometerRenderer extends TileEntityItemStackRenderer {
 
     @Override
     public void renderByItem(ItemStack stack, float partialTicks) {
+        renderScanner(stack, CURRENT_TRANSFORM.get(), true);
+    }
+
+    public void renderTableDisplay(ItemStack stack) {
+        renderScanner(stack, ItemCameraTransforms.TransformType.NONE, false);
+    }
+
+    private void renderScanner(ItemStack stack, ItemCameraTransforms.TransformType transformType,
+                               boolean applyItemBasis) {
         if (stack == null || stack.isEmpty() || scannerModel == null) {
             return;
         }
 
         Minecraft mc = Minecraft.getMinecraft();
         EntityPlayerSP player = mc.player;
-        ItemCameraTransforms.TransformType transformType = CURRENT_TRANSFORM.get();
 
         GlStateManager.pushMatrix();
         try {
@@ -73,7 +81,9 @@ public class ItemThaumometerRenderer extends TileEntityItemStackRenderer {
             // Only the scanner-mesh basis mismatch is adapted here; local first-person
             // arm/equipped-progress transforms were tried and rolled back after they
             // broke the visual placement in live testing.
-            applyTc6ScannerBasis();
+            if (applyItemBasis) {
+                applyTc6ScannerBasis();
+            }
             renderScannerModel(mc);
             renderScannerDisplay(mc, stack, player, transformType);
         } finally {
