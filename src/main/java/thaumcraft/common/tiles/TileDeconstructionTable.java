@@ -7,11 +7,14 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ITickable;
+import net.minecraft.util.text.TextComponentString;
+import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.util.text.ITextComponent;
 import thaumcraft.api.TileThaumcraft;
 import thaumcraft.api.aspects.Aspect;
 import thaumcraft.api.aspects.AspectList;
 import thaumcraft.common.lib.crafting.ThaumcraftCraftingManager;
+import thaumcraft.common.lib.research.ResearchManager;
 
 public class TileDeconstructionTable
 extends TileThaumcraft
@@ -20,6 +23,7 @@ implements ISidedInventory, ITickable {
     public Aspect aspect;
     public int breaktime;
     private ItemStack[] itemStacks = new ItemStack[1];
+    private String customName;
     private static final int[] sides = new int[]{0};
 
     public TileDeconstructionTable() {
@@ -65,7 +69,10 @@ implements ISidedInventory, ITickable {
     @Override
     public void setInventorySlotContents(int index, ItemStack stack) {
         if (index == 0) {
-            itemStacks[0] = stack;
+            itemStacks[0] = stack == null ? ItemStack.EMPTY : stack;
+            if (!itemStacks[0].isEmpty() && itemStacks[0].getCount() > this.getInventoryStackLimit()) {
+                itemStacks[0].setCount(this.getInventoryStackLimit());
+            }
             this.markDirty();
         }
     }
@@ -74,7 +81,12 @@ implements ISidedInventory, ITickable {
     public int getInventoryStackLimit() { return 64; }
 
     @Override
-    public boolean isUsableByPlayer(EntityPlayer player) { return true; }
+    public boolean isUsableByPlayer(EntityPlayer player) {
+        return this.world != null && this.world.getTileEntity(this.pos) == this
+                && player.getDistanceSq((double) this.pos.getX() + 0.5D,
+                (double) this.pos.getY() + 0.5D,
+                (double) this.pos.getZ() + 0.5D) <= 64.0D;
+    }
 
     @Override
     public void openInventory(EntityPlayer player) {}
@@ -117,35 +129,68 @@ implements ISidedInventory, ITickable {
     public int getFieldCount() { return 1; }
 
     @Override
-    public void clear() { itemStacks[0] = ItemStack.EMPTY; }
+    public void clear() {
+        itemStacks[0] = ItemStack.EMPTY;
+        this.markDirty();
+    }
 
     @Override
-    public String getName() { return "container.deconstruction"; }
+    public String getName() {
+        return this.hasCustomName() ? this.customName : "container.decontable";
+    }
 
     @Override
-    public boolean hasCustomName() { return false; }
+    public boolean hasCustomName() {
+        return this.customName != null && !this.customName.isEmpty();
+    }
 
     @Override
-    public ITextComponent getDisplayName() { return null; }
+    public ITextComponent getDisplayName() {
+        return this.hasCustomName()
+                ? new TextComponentString(this.getName())
+                : new TextComponentTranslation(this.getName());
+    }
+
+    public void setGuiDisplayName(String customName) {
+        this.customName = customName;
+    }
 
     @Override
     public boolean isEmpty() { return itemStacks[0].isEmpty(); }
 
     @Override
     public void readCustomNBT(NBTTagCompound compound) {
-        NBTTagList list = compound.getTagList("Inventory", 10);
-        if (list.tagCount() > 0) {
-            NBTTagCompound item = list.getCompoundTagAt(0);
-            itemStacks[0] = new ItemStack(item);
-        }
-        if (compound.hasKey("aspect")) {
+        this.aspect = null;
+        if (compound.hasKey("Aspect", 8)) {
+            this.aspect = Aspect.getAspect(compound.getString("Aspect"));
+        } else if (compound.hasKey("aspect", 8)) {
             this.aspect = Aspect.getAspect(compound.getString("aspect"));
         }
-        this.breaktime = compound.getInteger("breaktime");
+
+        this.itemStacks = new ItemStack[]{ItemStack.EMPTY};
+        String inventoryKey = compound.hasKey("Items", 9) ? "Items" : "Inventory";
+        NBTTagList list = compound.getTagList(inventoryKey, 10);
+        for (int i = 0; i < list.tagCount(); ++i) {
+            NBTTagCompound item = list.getCompoundTagAt(i);
+            int slot = item.getByte("Slot") & 255;
+            if (slot >= 0 && slot < this.itemStacks.length) {
+                this.itemStacks[slot] = new ItemStack(item);
+            }
+        }
     }
 
     @Override
     public void writeCustomNBT(NBTTagCompound compound) {
+        compound.removeTag("Inventory");
+        compound.removeTag("aspect");
+        compound.removeTag("breaktime");
+
+        if (this.aspect != null) {
+            compound.setString("Aspect", this.aspect.getTag());
+        } else {
+            compound.removeTag("Aspect");
+        }
+
         NBTTagList list = new NBTTagList();
         if (!itemStacks[0].isEmpty()) {
             NBTTagCompound item = new NBTTagCompound();
@@ -153,16 +198,76 @@ implements ISidedInventory, ITickable {
             itemStacks[0].writeToNBT(item);
             list.appendTag(item);
         }
-        compound.setTag("Inventory", list);
-        if (this.aspect != null) {
-            compound.setString("aspect", this.aspect.getTag());
+        compound.setTag("Items", list);
+    }
+
+    @Override
+    public void readFromNBT(NBTTagCompound compound) {
+        super.readFromNBT(compound);
+        this.customName = compound.hasKey("CustomName", 8) ? compound.getString("CustomName") : null;
+    }
+
+    @Override
+    public NBTTagCompound writeToNBT(NBTTagCompound compound) {
+        NBTTagCompound result = super.writeToNBT(compound);
+        if (this.hasCustomName()) {
+            result.setString("CustomName", this.customName);
+        } else {
+            result.removeTag("CustomName");
         }
-        compound.setInteger("breaktime", this.breaktime);
+        return result;
     }
 
     @Override
     public void update() {
-        // Deconstruction logic will be added later
+        if (this.world == null || this.world.isRemote) return;
+
+        boolean changed = false;
+        if (this.breaktime == 0 && this.canBreak()) {
+            this.breaktime = 40;
+            changed = true;
+        }
+
+        if (this.breaktime > 0 && this.canBreak()) {
+            --this.breaktime;
+            if (this.breaktime == 0) {
+                this.breakItem();
+                changed = true;
+            }
+        } else {
+            this.breaktime = 0;
+        }
+
+        if (changed) {
+            this.markDirty();
+            this.world.notifyBlockUpdate(this.pos,
+                    this.world.getBlockState(this.pos),
+                    this.world.getBlockState(this.pos), 3);
+        }
+    }
+
+    private boolean canBreak() {
+        if (this.itemStacks[0].isEmpty() || this.aspect != null) return false;
+        AspectList tags = ThaumcraftCraftingManager.getObjectTags(this.itemStacks[0]);
+        tags = ThaumcraftCraftingManager.getBonusTags(this.itemStacks[0], tags);
+        return tags != null && tags.size() > 0;
+    }
+
+    public void breakItem() {
+        if (!this.canBreak()) return;
+
+        AspectList tags = ThaumcraftCraftingManager.getObjectTags(this.itemStacks[0]);
+        tags = ThaumcraftCraftingManager.getBonusTags(this.itemStacks[0], tags);
+        AspectList primals = ResearchManager.reduceToPrimals(tags);
+        if (this.world.rand.nextInt(80) < primals.visSize()) {
+            Aspect[] choices = primals.getAspects();
+            this.aspect = choices[this.world.rand.nextInt(choices.length)];
+        }
+
+        this.itemStacks[0].shrink(1);
+        if (this.itemStacks[0].getCount() <= 0) {
+            this.itemStacks[0] = ItemStack.EMPTY;
+        }
     }
 
     public int getBreakTimeScaled(int scale) {
