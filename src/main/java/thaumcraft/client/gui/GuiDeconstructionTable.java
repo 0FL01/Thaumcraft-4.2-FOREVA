@@ -6,7 +6,7 @@ import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.util.ResourceLocation;
-import thaumcraft.api.aspects.Aspect;
+import thaumcraft.client.lib.UtilsFX;
 import thaumcraft.common.container.ContainerDeconstructionTable;
 import thaumcraft.common.lib.TCSounds;
 import thaumcraft.common.tiles.TileDeconstructionTable;
@@ -39,12 +39,11 @@ public class GuiDeconstructionTable extends GuiContainer {
                     176, 46 - progress, 9, progress);
         }
 
-        Aspect aspect = this.table.aspect;
-        if (aspect != null) {
-            this.mc.getTextureManager().bindTexture(aspect.getImage());
-            this.drawModalRectWithCustomSizedTexture(this.guiLeft + 64, this.guiTop + 48,
-                    0.0F, 0.0F, 16, 16, 16.0F, 16.0F);
-            this.mc.getTextureManager().bindTexture(TEXTURE);
+        if (this.table.aspect != null) {
+            UtilsFX.drawTag(this.guiLeft + 64, this.guiTop + 48, this.table.aspect,
+                    0.0F, 0, this.zLevel, 771, 1.0F, false);
+            GlStateManager.alphaFunc(516, 0.1F);
+            GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
         }
         GlStateManager.disableBlend();
     }
@@ -52,9 +51,10 @@ public class GuiDeconstructionTable extends GuiContainer {
     @Override
     public void drawScreen(int mouseX, int mouseY, float partialTicks) {
         super.drawScreen(mouseX, mouseY, partialTicks);
-        Aspect aspect = this.table.aspect;
-        if (aspect != null && isMouseIn(mouseX, mouseY, 64, 48, 16, 16)) {
-            this.drawHoveringText(Arrays.asList(aspect.getName(), aspect.getLocalizedDescription()), mouseX, mouseY);
+        if (this.table.aspect != null && isMouseIn(mouseX, mouseY, 64, 48, 16, 16)) {
+            UtilsFX.drawCustomTooltip(this, this.itemRender, this.fontRenderer,
+                    Arrays.asList(this.table.aspect.getName(), this.table.aspect.getLocalizedDescription()),
+                    mouseX, mouseY - 8, 11);
         }
     }
 

@@ -1,6 +1,6 @@
 # Goal: Restore TC4 Deconstruction Table parity
 
-Status: in progress
+Status: complete
 Source: User-approved RECON plan from 2026-07-23; original TC4 classes under `thaumcraft_src/**`
 Last updated: 2026-07-23
 
@@ -23,10 +23,12 @@ Implement the approved plan in three deployable iterations. Each iteration ends 
   - Evidence: `ContainerDeconstructionTableRuntimeTest`; focused tile/container tests, `./scripts/dev.sh validate --smoke`, and `./scripts/dev.sh build` passed on 2026-07-23.
 - R3: Restore GUI, TESR, and item-form visual parity.
   - Acceptance: Aspect tint/tooltip, table overlays, input animation, blend/scale/position, and meta-14 TESR item routing match the audited TC4 paths; original assets remain unchanged.
-  - Status: pending
+  - Status: verified
+  - Evidence: `DeconstructionTableVisualParityStaticGuardTest` and updated table renderer guard; focused Deconstruction Table tests, `./scripts/dev.sh validate --smoke`, and `./scripts/dev.sh build` passed on 2026-07-23.
 - R4: Keep every iteration deployable and close with a TC4 branch comparison.
   - Acceptance: Each checkpoint has a scoped commit after focused validation, server smoke, and jar build; final report records hashes, files, commands, runtime status, and known visual limitations.
-  - Status: pending
+  - Status: verified
+  - Evidence: Three scoped checkpoints and a final read-only audit against the TC4 classes/assets; no unresolved gameplay or source-level visual parity mismatch remains.
 
 ### Constraints
 - Preserve Java 8, Forge 1.12.2, public API signatures, registry names, packet ids, GUI ids, and dimensions.
@@ -40,15 +42,16 @@ Implement the approved plan in three deployable iterations. Each iteration ends 
 3. GUI/TESR/item routing, visual guards, smoke/build, and final TC4 comparison.
 
 ## Current Checkpoint
-- Target: R3.
-- Expected files: Deconstruction Table GUI/TESR/item model routing, focused visual guards, and this contract.
-- Stop or replan if Forge 1.12 cannot reproduce the original framed item pose without changing shared renderer behavior.
+- Target: complete.
+- Result: R1-R4 verified; the original framed item pose is reproduced locally without changing shared renderer behavior.
 
 ## Material Decisions
 - Write canonical `Items`/`Aspect`/`CustomName`; read accidental `Inventory`/`aspect` keys as migration fallback.
 - Keep `breaktime` transient and synchronized through the existing container property rather than NBT.
 - Keep original textures byte-for-byte; visual work changes render paths only.
+- Reproduce TC4's `renderInFrame` behavior with a Deconstruction Table-local direct `GROUND` model render: retain the original `EntityItem` bob phase, but omit the 1.12 dropped-item camera spin and extra ground offset without changing shared renderers.
 
 ## Checkpoint History
 - 2026-07-23: R1 restored the 40-tick server state machine, original primal roll/selection and consumption rules, inventory limits/usability, canonical TC4 persistence with legacy port-key reads, transient progress, and stale-client-state clearing. Focused runtime tests, server smoke, and build passed.
 - 2026-07-23: R2 made result claims server-authoritative and lossless when player knowledge is unavailable, retained one-shot pool/cache/packet synchronization, restored direct-order table shift-click, and covered progress, distance, transfer, and duplicate-claim behavior. Focused runtime tests, server smoke, and build passed.
+- 2026-07-23: R3 restored tinted GUI aspects and the TC4 tooltip, exact TESR aspect geometry/blend/position, framed input-item hover semantics, player tick animation, and the meta-14 TEISR item form with its thaumometer. Original visual assets remained byte-identical. Focused tests, server smoke, build, and final TC4 audit passed; live client screenshot comparison remains a manual visual check.
