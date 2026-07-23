@@ -17,7 +17,8 @@ Implement the approved correction iteratively. Each iteration must remain deploy
   - Evidence: All 15 direct container screens now use the standard post-container path exactly once; the complete headless source guard and iteration build passed.
 - R2: Manually rendered container results receive stack-aware tooltips.
   - Acceptance: The Thaumatorium recipe output and Arcane Workbench insufficient-vis ghost result use `renderToolTip` without duplicating real-slot tooltips.
-  - Status: planned
+  - Status: verified
+  - Evidence: Both synthetic results now use standard stack-aware tooltips after slot rendering, with carried-stack suppression and real-result deduplication covered by focused guards.
 - R3: Research recipe item tooltips use the standard stack-aware rendering path.
   - Acceptance: Item entries preserve their existing hitboxes while gaining standard rarity formatting, advanced-tooltip behavior, Forge render hooks, and scanned-aspect overlays; aspect-only tooltips remain unchanged.
   - Status: planned
@@ -46,11 +47,13 @@ Implement the approved correction iteratively. Each iteration must remain deploy
 3. Move GuiResearchRecipe item entries to the standard stack-aware tooltip path and complete final validation.
 
 ## Current Checkpoint
-- Target: iteration 2.
+- Target: iteration 3.
 - Iteration 1 restored standard slot tooltips in all 12 affected screens and original Arcane Bore status-label spacing.
-- Focused source guard and `./scripts/dev.sh build` passed.
+- Iteration 2 restored synthetic-result tooltips in Thaumatorium and Arcane Workbench.
+- Focused source guards and per-iteration builds passed.
 - Known limitation: server/static checks cannot verify final GL tooltip appearance; interactive client checks remain the visual authority.
 
 ## Checkpoint History
 - 2026-07-23: User approved the three-iteration RECON plan.
 - 2026-07-23: Iteration 1 restored the standard Forge item-tooltip path across all direct container screens and added complete headless regression coverage.
+- 2026-07-23: Iteration 2 restored standard tooltips for the Thaumatorium recipe output and Arcane Workbench insufficient-vis preview without duplicating real-slot tooltips.

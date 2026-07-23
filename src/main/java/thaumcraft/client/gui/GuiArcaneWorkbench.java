@@ -68,6 +68,20 @@ public class GuiArcaneWorkbench extends GuiContainer {
     public void drawScreen(int mouseX, int mouseY, float partialTicks) {
         super.drawScreen(mouseX, mouseY, partialTicks);
         this.renderHoveredToolTip(mouseX, mouseY);
+        this.renderArcanePreviewTooltip(mouseX, mouseY);
+    }
+
+    private void renderArcanePreviewTooltip(int mouseX, int mouseY) {
+        if (!this.playerInventory.getItemStack().isEmpty()
+                || this.inventorySlots.getSlot(0).getHasStack()
+                || !this.isPointInRegion(160, 64, 16, 16, mouseX, mouseY)) {
+            return;
+        }
+
+        ItemStack preview = this.workbenchContainer.getArcanePreviewResult();
+        if (!preview.isEmpty()) {
+            this.renderToolTip(preview, mouseX, mouseY);
+        }
     }
 
     @Override

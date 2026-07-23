@@ -49,6 +49,23 @@ public class GuiThaumatorium extends GuiContainer {
     public void drawScreen(int mouseX, int mouseY, float partialTicks) {
         super.drawScreen(mouseX, mouseY, partialTicks);
         this.renderHoveredToolTip(mouseX, mouseY);
+        this.renderRecipeOutputTooltip(mouseX, mouseY);
+    }
+
+    private void renderRecipeOutputTooltip(int mouseX, int mouseY) {
+        if (this.mc.player == null
+                || !this.mc.player.inventory.getItemStack().isEmpty()
+                || this.container.recipes.isEmpty()
+                || this.index < 0
+                || this.index >= this.container.recipes.size()
+                || !isMouseIn(mouseX, mouseY, 112, 16, 16, 16)) {
+            return;
+        }
+
+        ItemStack output = this.container.recipes.get(this.index).getRecipeOutput();
+        if (!output.isEmpty()) {
+            this.renderToolTip(output, mouseX, mouseY);
+        }
     }
 
     @Override
