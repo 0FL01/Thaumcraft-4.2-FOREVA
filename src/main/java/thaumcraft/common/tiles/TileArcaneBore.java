@@ -603,7 +603,8 @@ public class TileArcaneBore extends TileThaumcraft implements ITickable, IInvent
         Block block = state.getBlock();
         int meta = block.getMetaFromState(state);
         this.fakePlayer.setPosition((double) this.pos.getX() + 0.5D, (double) this.pos.getY() + 0.5D, (double) this.pos.getZ() + 0.5D);
-        this.fakePlayer.setHeldItem(EnumHand.MAIN_HAND, this.getStackInSlot(1));
+        this.fakePlayer.inventory.setInventorySlotContents(
+                this.fakePlayer.inventory.currentItem, this.getStackInSlot(1));
         BlockEvent.BreakEvent event = new BlockEvent.BreakEvent(this.world, target, state, this.fakePlayer);
         MinecraftForge.EVENT_BUS.post(event);
         if (event.isCanceled()) return false;
@@ -629,6 +630,7 @@ public class TileArcaneBore extends TileThaumcraft implements ITickable, IInvent
         this.collectExistingDrops(target, drops);
         this.world.addBlockEvent(this.pos, ConfigBlocks.blockWoodenDevice, 99,
                 (Block.getIdFromBlock(block) & 0xFFF) | ((meta & 0xFF) << 12));
+        this.world.playEvent(2001, target, Block.getStateId(state));
         this.world.setBlockToAir(target);
         for (ItemStack drop : drops) {
             this.ejectOrStore(this.applySpecialMiningResult(drop, silk, dropFortune));
@@ -680,7 +682,7 @@ public class TileArcaneBore extends TileThaumcraft implements ITickable, IInvent
     private void updateClientDigging() {
         ++this.paused;
         if (this.paused < this.maxPause && this.soundDelay < System.currentTimeMillis()) {
-            this.soundDelay = System.currentTimeMillis() + 1700L + (long) this.world.rand.nextInt(100);
+            this.soundDelay = System.currentTimeMillis() + 1200L + (long) this.world.rand.nextInt(100);
             this.world.playSound(
                     (double) this.pos.getX() + 0.5D,
                     (double) this.pos.getY() + 0.5D,
@@ -788,6 +790,15 @@ public class TileArcaneBore extends TileThaumcraft implements ITickable, IInvent
         int sx = this.pos.getX() + this.orientation.getXOffset();
         int sy = this.pos.getY() + this.orientation.getYOffset();
         int sz = this.pos.getZ() + this.orientation.getZOffset();
+        this.world.playSound(
+                this.digX + 0.5D,
+                this.digY + 0.5D,
+                this.digZ + 0.5D,
+                block.getSoundType(state, this.world, new BlockPos(this.digX, this.digY, this.digZ), null).getHitSound(),
+                SoundCategory.BLOCKS,
+                0.45F,
+                0.85F,
+                false);
         for (int i = 0; i < thaumcraft.common.Thaumcraft.proxy.particleCount(10); i++) {
             double px = this.digX + this.world.rand.nextFloat();
             double py = this.digY + this.world.rand.nextFloat();
@@ -810,7 +821,6 @@ public class TileArcaneBore extends TileThaumcraft implements ITickable, IInvent
         if (!this.hasPickaxe || this.fakePlayer == null) return;
         ItemStack pickaxe = this.getStackInSlot(1);
         if (pickaxe.isEmpty()) return;
-        this.fakePlayer.setHeldItem(EnumHand.MAIN_HAND, pickaxe);
         if (this.repairCounter++ % 40L == 0L && pickaxe.isItemDamaged()) {
             this.doRepair(pickaxe);
         }

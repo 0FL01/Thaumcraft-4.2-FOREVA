@@ -55,20 +55,20 @@ public class ArcaneBoreGameplayParityStaticGuardTest {
     }
 
     @Test
-    public void clientRumbleCadenceDoesNotOverlapLongestPitchedClip() throws IOException {
+    public void clientAudioKeepsBoreRumbleAndBlockSounds() throws IOException {
         String source = read("src/main/java/thaumcraft/common/tiles/TileArcaneBore.java");
 
-        assertTrue(source.contains("System.currentTimeMillis() + 1700L +"));
-        assertFalse(source.contains("System.currentTimeMillis() + 1200L +"));
+        assertTrue(source.contains("System.currentTimeMillis() + 1200L +")
+                && source.contains("this.world.playEvent(2001, target, Block.getStateId(state));")
+                && source.contains("getHitSound()"));
     }
 
     @Test
-    public void clientDiggingDoesNotLayerVanillaBlockSoundsOverRumble() throws IOException {
+    public void fakePlayerToolBindingDoesNotBroadcastGearEquipSounds() throws IOException {
         String source = read("src/main/java/thaumcraft/common/tiles/TileArcaneBore.java");
 
-        assertTrue(source.contains("TCSounds.RUMBLE"));
-        assertFalse(source.contains("this.world.playEvent(2001, target, Block.getStateId(state));"));
-        assertFalse(source.contains("getHitSound()"));
+        assertTrue(source.contains("this.fakePlayer.inventory.setInventorySlotContents("));
+        assertFalse(source.contains("this.fakePlayer.setHeldItem(EnumHand.MAIN_HAND"));
     }
 
     @Test
