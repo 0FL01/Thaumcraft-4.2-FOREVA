@@ -14,6 +14,7 @@ contract shims guarded by unit tests and smoke modsets.
 | Magic Bees + Forestry | `BlocksTC`, `ItemsTC`, aura facades, `SoundsTC`, research-location registration, taint/cult/tainted package aliases | `MagicBeesThaumcraftSixApiShimStaticGuardTest` | `scripts/smoke-modsets/magicbees.txt` |
 | JEID + MixinBooter | TC6 `Utils.setBiomeAt(World, BlockPos, Biome, boolean)` coremod mixin target, `setBiomeAt(World, BlockPos, Biome)`, `resetBiomeAt` overloads, and legacy TC4 x/z delegation through the mixin-owned path | `UtilsThaumcraftSixBiomeCompatStaticGuardTest` | `scripts/smoke-modsets/jeid.txt` |
 | Witchery Resurrected + Companion | `CommonInternals.scanEntities` canonical identity alias and untyped vis drain projected onto TC4 primal visnet | `WitcheryThaumcraftSixApiShimTest`, corpus resolver | `scripts/smoke-modsets/witchery.txt` |
+| Aqua Acrobatics | TC6-style `TileCrucibleRenderer.renderFluid` client mixin target with the redirectable water texture lookup | `CrucibleRendererFidelityStaticGuardTest` | `scripts/smoke-modsets/aquaacrobatics.txt` |
 | Astral Sorcery | No local evidence yet; keep as pending RECON before adding dependencies or shims | none | none |
 
 Exact per-symbol support levels and known unsupported operations are recorded in

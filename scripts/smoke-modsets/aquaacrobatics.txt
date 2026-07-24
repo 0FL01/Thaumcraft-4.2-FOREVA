@@ -1,0 +1,5 @@
+# Minimal Aqua Acrobatics compatibility smoke from GitHub issue #10.
+# Format: jar | sha256 | source/note | direct/dev-remap
+# The Thaumcraft integration is client-only; server smoke guards common-side loading.
+!mixinbooter-10.7.jar | 8bb53080aede2d2b1e1c5f713bbf49a38f20add8caa3d52fabcdf8a536b55a18 | https://www.curseforge.com/minecraft/mc-mods/mixin-booter/files/7049694 | direct
+AquaAcrobatics-1.15.4.jar | 506ee8e264c347fad33302183b8f4daddb05d5e5f75c0b6d833266c886e127ce | https://www.curseforge.com/minecraft/mc-mods/aqua-acrobatics/files/5225456 | dev-remap

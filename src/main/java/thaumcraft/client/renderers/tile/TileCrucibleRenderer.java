@@ -16,6 +16,10 @@ public class TileCrucibleRenderer extends TileEntitySpecialRenderer<TileCrucible
 
     @Override
     public void render(TileCrucible tile, double x, double y, double z, float partialTicks, int destroyStage, float alpha) {
+        renderFluid(tile, x, y, z);
+    }
+
+    public void renderFluid(TileCrucible tile, double x, double y, double z) {
         if (tile == null || tile.getWorld() == null) {
             return;
         }

@@ -64,6 +64,18 @@ public class CrucibleRendererFidelityStaticGuardTest {
     }
 
     @Test
+    public void tileCrucibleRendererKeepsRequiredFluidMixinTarget() throws IOException {
+        String source = read("src/main/java/thaumcraft/client/renderers/tile/TileCrucibleRenderer.java");
+        int renderFluid = source.indexOf("public void renderFluid(TileCrucible tile, double x, double y, double z)");
+        int textureLookup = source.indexOf(".getTexture(Blocks.WATER.getDefaultState())", renderFluid);
+
+        assertTrue("Aqua Acrobatics requires render() to delegate to the TC6-style renderFluid target",
+                source.contains("renderFluid(tile, x, y, z);"));
+        assertTrue("The required renderFluid mixin target must own the water texture lookup redirected by Aqua Acrobatics",
+                renderFluid >= 0 && textureLookup > renderFluid);
+    }
+
+    @Test
     public void crucibleBubbleFxKeepsOriginalCustomParticleShape() throws IOException {
         String bubble = read("src/main/java/thaumcraft/client/fx/particles/FXBubble.java");
         String proxy = read("src/main/java/thaumcraft/client/ClientProxy.java");
