@@ -390,7 +390,7 @@ public class TileCrucible extends TileThaumcraft implements ITickable, IWandable
         }
 
         int stacksize = item.getCount();
-        for (int a = 0; a < item.getCount(); ++a) {
+        for (int a = 0; a < stacksize && this.canProcessItems(); ++a) {
             if (stacksize <= 0) break;
 
             CrucibleRecipe rc = ThaumcraftCraftingManager.findMatchingCrucibleRecipe(username, this.aspects, item);

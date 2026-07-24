@@ -22,6 +22,8 @@ public class TileCrucibleSmeltContractStaticGuardTest {
                 source.contains("ThaumcraftCraftingManager.findMatchingCrucibleRecipe(username, this.aspects, item)"));
         assertTrue("attemptSmelt must drain 50mB water on recipe craft",
                 source.contains("this.tank.drain(50, true);"));
+        assertTrue("attemptSmelt must stop the shrinking batch when the crucible runs dry",
+                source.contains("for (int a = 0; a < stacksize && this.canProcessItems(); ++a)"));
         assertTrue("attemptSmelt must reject no-aspect items with pickup pop path",
                 source.contains("this.world.playSound(null, pos, SoundEvents.ENTITY_ITEM_PICKUP"));
         assertTrue("attemptSmelt must stop processing after no-aspect rejection",
