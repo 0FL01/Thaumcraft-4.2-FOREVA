@@ -28,7 +28,9 @@ public class HungryChestVisualShellContractTest {
                         && blockstate.contains("\"facing=east\": { \"model\": \"thaumcraft:blockchesthungry\", \"y\": 270 }"));
 
         assertTrue("TileChestHungryRenderer should keep only the animated lid/knob path after the static chest body moved into the block model",
-                renderer.contains("this.model.chestLid.rotateAngleX")
+                renderer.contains("GlStateManager.rotate(yaw, 0.0F, 1.0F, 0.0F);")
+                        && !renderer.contains("GlStateManager.rotate(-yaw, 0.0F, 1.0F, 0.0F);")
+                        && renderer.contains("this.model.chestLid.rotateAngleX")
                         && renderer.contains("this.model.chestKnob.rotateAngleX = this.model.chestLid.rotateAngleX;")
                         && renderer.contains("this.model.chestLid.render(0.0625F);")
                         && renderer.contains("this.model.chestKnob.render(0.0625F);")

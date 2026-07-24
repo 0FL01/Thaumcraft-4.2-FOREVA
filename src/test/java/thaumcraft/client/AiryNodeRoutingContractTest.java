@@ -31,8 +31,8 @@ public class AiryNodeRoutingContractTest {
                         && materialAiry.contains("return false;")
                         && materialAiry.contains("public boolean blocksMovement()"));
 
-        assertTrue("BlockAiry should route node/energized-node through TESR and keep warding aura invisible like TC4",
-                blockAiry.contains("return meta == 0 || meta == 4 || meta == 5 ? EnumBlockRenderType.INVISIBLE : EnumBlockRenderType.MODEL;"));
+        assertTrue("BlockAiry should suppress baked geometry for every airy metadata like TC4",
+                blockAiry.contains("return EnumBlockRenderType.INVISIBLE;"));
 
         assertTrue("BlockAiry should restore the original airy small-bounds, no-side-solid, meta-specific collision, and nitor-only item-drop contract",
                 blockAiry.contains("private static final AxisAlignedBB AIRY_AABB = new AxisAlignedBB(0.3D, 0.3D, 0.3D, 0.7D, 0.7D, 0.7D);")
@@ -44,12 +44,16 @@ public class AiryNodeRoutingContractTest {
                         && blockAiry.contains("return meta == 2 || meta == 3 || meta == 4;")
                         && blockAiry.contains("return meta == 2 || meta == 3;")
                         && blockAiry.contains("return meta == 3 || meta == 4 || meta == 10 || meta == 11 || meta == 12 ? ZERO_AABB : AIRY_AABB;")
-                        && blockAiry.contains("if (meta == 0 || meta == 2 || meta == 3 || meta == 4 || meta == 5 || meta == 10 || meta == 11 || meta == 12) {")
+                        && blockAiry.contains("return NULL_AABB;")
                         && blockAiry.contains("if (meta == 4 && entity instanceof EntityLivingBase && !(entity instanceof EntityPlayer)) {")
                         && blockAiry.contains("if (meta == 12) {")
+                        && !blockAiry.contains("super.addCollisionBoxToList(")
                         && blockAiry.contains("private static final AxisAlignedBB ZERO_AABB = new AxisAlignedBB(0.0D, 0.0D, 0.0D, 0.0D, 0.0D, 0.0D);")
+                        && blockAiry.contains("if (meta == 1) return AIRY_AABB.offset(pos);")
                         && blockAiry.contains("return meta == 4 || meta == 12 ? super.getSelectedBoundingBox(state, world, pos) : ZERO_AABB.offset(pos);")
                         && blockAiry.contains("return false;")
+                        && blockAiry.contains("list.add(new ItemStack(this, 1, 0));")
+                        && !blockAiry.contains("list.add(new ItemStack(this, 1, 1));")
                         && blockAiry.contains("return this.getMetaFromState(state) == 1 && ConfigItems.itemResource != null ? ConfigItems.itemResource : Items.AIR;")
                         && blockAiry.contains("return this.getMetaFromState(state) == 1 && ConfigItems.itemResource != null")
                         && blockAiry.contains("public void onBlockPlacedBy(World worldIn, BlockPos pos, IBlockState state, EntityLivingBase placer, ItemStack stack)")

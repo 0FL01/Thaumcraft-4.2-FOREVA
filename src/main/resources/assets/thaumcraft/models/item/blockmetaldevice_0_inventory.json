@@ -3,21 +3,59 @@
   "ambientocclusion": false,
   "textures": {
     "particle": "thaumcraft:blocks/crucible3",
-    "down": "thaumcraft:blocks/crucible2",
-    "up": "thaumcraft:blocks/crucible4",
-    "side": "thaumcraft:blocks/crucible3"
+    "top": "thaumcraft:blocks/crucible1",
+    "bottom": "thaumcraft:blocks/crucible2",
+    "outer": "thaumcraft:blocks/crucible3",
+    "inner": "thaumcraft:blocks/crucible5",
+    "inner_bottom": "thaumcraft:blocks/crucible6"
   },
   "elements": [
     {
       "from": [0, 0, 0],
       "to": [16, 16, 16],
       "faces": {
-        "down": { "texture": "#down" },
-        "up": { "texture": "#up" },
-        "north": { "texture": "#side" },
-        "south": { "texture": "#side" },
-        "west": { "texture": "#side" },
-        "east": { "texture": "#side" }
+        "down": { "texture": "#bottom" },
+        "up": { "texture": "#top" },
+        "north": { "texture": "#outer" },
+        "south": { "texture": "#outer" },
+        "west": { "texture": "#outer" },
+        "east": { "texture": "#outer" }
+      }
+    },
+    {
+      "from": [2, 0, 0],
+      "to": [2, 16, 16],
+      "faces": {
+        "east": { "texture": "#inner" }
+      }
+    },
+    {
+      "from": [14, 0, 0],
+      "to": [14, 16, 16],
+      "faces": {
+        "west": { "texture": "#inner" }
+      }
+    },
+    {
+      "from": [0, 0, 2],
+      "to": [16, 16, 2],
+      "faces": {
+        "south": { "texture": "#inner" }
+      }
+    },
+    {
+      "from": [0, 0, 14],
+      "to": [16, 16, 14],
+      "faces": {
+        "north": { "texture": "#inner" }
+      }
+    },
+    {
+      "from": [0, 4, 0],
+      "to": [16, 4, 16],
+      "faces": {
+        "down": { "texture": "#inner_bottom" },
+        "up": { "texture": "#inner_bottom" }
       }
     }
   ]

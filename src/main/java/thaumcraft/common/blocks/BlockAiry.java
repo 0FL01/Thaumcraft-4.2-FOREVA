@@ -69,7 +69,6 @@ public class BlockAiry extends BlockContainer {
     @Override
     public void getSubBlocks(CreativeTabs tab, NonNullList<ItemStack> list) {
         list.add(new ItemStack(this, 1, 0));
-        list.add(new ItemStack(this, 1, 1));
     }
 
     public boolean isAir(IBlockState state) {
@@ -95,8 +94,7 @@ public class BlockAiry extends BlockContainer {
 
     @Override
     public EnumBlockRenderType getRenderType(IBlockState state) {
-        int meta = this.getMetaFromState(state);
-        return meta == 0 || meta == 4 || meta == 5 ? EnumBlockRenderType.INVISIBLE : EnumBlockRenderType.MODEL;
+        return EnumBlockRenderType.INVISIBLE;
     }
 
     @Override
@@ -290,11 +288,7 @@ public class BlockAiry extends BlockContainer {
     @Nullable
     @Override
     public AxisAlignedBB getCollisionBoundingBox(IBlockState state, IBlockAccess world, BlockPos pos) {
-        int meta = this.getMetaFromState(state);
-        if (meta == 0 || meta == 2 || meta == 3 || meta == 4 || meta == 5 || meta == 10 || meta == 11 || meta == 12) {
-            return ZERO_AABB;
-        }
-        return super.getCollisionBoundingBox(state, world, pos);
+        return NULL_AABB;
     }
 
     @Override
@@ -309,9 +303,7 @@ public class BlockAiry extends BlockContainer {
         }
         if (meta == 12) {
             addCollisionBoxToList(pos, entityBox, collidingBoxes, FULL_BLOCK_AABB);
-            return;
         }
-        super.addCollisionBoxToList(state, world, pos, entityBox, collidingBoxes, entity, isActualState);
     }
 
     private static boolean isActiveWardingStoneSupport(World world, BlockPos pos) {
@@ -329,6 +321,7 @@ public class BlockAiry extends BlockContainer {
     @Override
     public AxisAlignedBB getSelectedBoundingBox(IBlockState state, World world, BlockPos pos) {
         int meta = this.getMetaFromState(state);
+        if (meta == 1) return AIRY_AABB.offset(pos);
         return meta == 4 || meta == 12 ? super.getSelectedBoundingBox(state, world, pos) : ZERO_AABB.offset(pos);
     }
 

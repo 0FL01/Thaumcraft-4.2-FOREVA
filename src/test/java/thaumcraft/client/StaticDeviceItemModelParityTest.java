@@ -13,15 +13,21 @@ import static org.junit.Assert.assertTrue;
 public class StaticDeviceItemModelParityTest {
 
     @Test
-    public void crucibleItemKeepsTc4InventoryExterior() throws IOException {
+    public void crucibleItemUsesCompleteHollowGeometry() throws IOException {
         String model = read("src/main/resources/assets/thaumcraft/models/item/blockmetaldevice_0_inventory.json");
 
         assertTrue(model.contains("\"parent\": \"block/block\"")
-                && model.contains("\"down\": \"thaumcraft:blocks/crucible2\"")
-                && model.contains("\"up\": \"thaumcraft:blocks/crucible4\"")
-                && model.contains("\"side\": \"thaumcraft:blocks/crucible3\"")
+                && model.contains("\"top\": \"thaumcraft:blocks/crucible1\"")
+                && model.contains("\"bottom\": \"thaumcraft:blocks/crucible2\"")
+                && model.contains("\"outer\": \"thaumcraft:blocks/crucible3\"")
+                && model.contains("\"inner\": \"thaumcraft:blocks/crucible5\"")
+                && model.contains("\"inner_bottom\": \"thaumcraft:blocks/crucible6\"")
                 && model.contains("\"from\": [0, 0, 0]")
-                && model.contains("\"to\": [16, 16, 16]"));
+                && model.contains("\"to\": [16, 16, 16]")
+                && model.contains("\"from\": [0, 4, 0]")
+                && model.contains("\"to\": [16, 4, 16]")
+                && !model.contains("crucible4"));
+        assertEquals(6, occurrences(model, "\"from\":"));
     }
 
     @Test

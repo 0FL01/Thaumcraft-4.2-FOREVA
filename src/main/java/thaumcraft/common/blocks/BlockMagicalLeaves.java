@@ -31,6 +31,7 @@ public class BlockMagicalLeaves extends Block implements net.minecraftforge.comm
     public BlockMagicalLeaves() {
         super(Material.LEAVES);
         this.setHardness(0.2f);
+        this.setLightOpacity(1);
         this.setSoundType(SoundType.PLANT);
         this.setCreativeTab(Thaumcraft.tabTC);
         this.setDefaultState(this.blockState.getBaseState().withProperty(TYPE, 0));
@@ -64,7 +65,7 @@ public class BlockMagicalLeaves extends Block implements net.minecraftforge.comm
 
     @Override
     public boolean isFullCube(IBlockState state) {
-        return false;
+        return true;
     }
 
     @Override

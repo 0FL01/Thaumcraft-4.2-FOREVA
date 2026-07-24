@@ -21,6 +21,10 @@ public class BlockMagicalLeavesRenderContractTest {
         assertTrue("BlockMagicalLeaves must render in CUTOUT_MIPPED layer",
                 blockSource.contains("public BlockRenderLayer getRenderLayer()")
                         && blockSource.contains("return BlockRenderLayer.CUTOUT_MIPPED;"));
+        assertTrue("BlockMagicalLeaves must keep the TC4 leaf lighting and full-cube geometry contracts",
+                blockSource.contains("this.setLightOpacity(1);")
+                        && blockSource.contains("public boolean isOpaqueCube(IBlockState state) {\n        return false;")
+                        && blockSource.contains("public boolean isFullCube(IBlockState state) {\n        return true;"));
         assertTrue("BlockMagicalLeavesItem metadata contract must preserve only the type bit",
                 itemSource.contains("return damage & 1;"));
         assertTrue("ClientProxy must register a biome foliage tint handler for greatwood leaves",

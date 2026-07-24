@@ -49,6 +49,15 @@ public class BlockTaintFibres extends Block {
 
     private static final AxisAlignedBB PLANT_AABB = new AxisAlignedBB(0.1D, 0.0D, 0.1D, 0.9D, 0.8D, 0.9D);
     private static final AxisAlignedBB STALK_AABB = new AxisAlignedBB(0.2D, 0.0D, 0.2D, 0.8D, 0.8D, 0.8D);
+    private static final AxisAlignedBB DOWN_AABB = new AxisAlignedBB(0.0D, 0.0D, 0.0D, 1.0D, 0.0625D, 1.0D);
+    private static final AxisAlignedBB UP_AABB = new AxisAlignedBB(0.0D, 0.9375D, 0.0D, 1.0D, 1.0D, 1.0D);
+    private static final AxisAlignedBB NORTH_AABB = new AxisAlignedBB(0.0D, 0.0D, 0.0D, 1.0D, 1.0D, 0.0625D);
+    private static final AxisAlignedBB SOUTH_AABB = new AxisAlignedBB(0.0D, 0.0D, 0.9375D, 1.0D, 1.0D, 1.0D);
+    private static final AxisAlignedBB WEST_AABB = new AxisAlignedBB(0.0D, 0.0D, 0.0D, 0.0625D, 1.0D, 1.0D);
+    private static final AxisAlignedBB EAST_AABB = new AxisAlignedBB(0.9375D, 0.0D, 0.0D, 1.0D, 1.0D, 1.0D);
+    private static final AxisAlignedBB[] FIBRE_AABBS = {
+            DOWN_AABB, UP_AABB, NORTH_AABB, SOUTH_AABB, WEST_AABB, EAST_AABB
+    };
 
     public BlockTaintFibres() {
         super(Config.taintMaterial);
@@ -221,7 +230,10 @@ public class BlockTaintFibres extends Block {
         int meta = this.getMetaFromState(state);
         if (meta == 3 || meta == 4) return STALK_AABB;
         if (meta == 1 || meta == 2) return PLANT_AABB;
-        return FULL_BLOCK_AABB;
+        for (EnumFacing facing : EnumFacing.VALUES) {
+            if (shouldRenderSurface(source, pos, facing)) return FIBRE_AABBS[facing.getIndex()];
+        }
+        return DOWN_AABB;
     }
 
     @Nullable

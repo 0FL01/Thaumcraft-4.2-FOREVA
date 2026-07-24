@@ -56,7 +56,7 @@ public class PavingStoneParityStaticGuardTest {
         String airy = read("src/main/java/thaumcraft/common/blocks/BlockAiry.java");
 
         assertTrue("Warding aura block must be invisible and only collide when supported by unpowered warding stone",
-                airy.contains("meta == 0 || meta == 4 || meta == 5 ? EnumBlockRenderType.INVISIBLE")
+                airy.contains("return EnumBlockRenderType.INVISIBLE;")
                         && airy.contains("private static boolean isActiveWardingStoneSupport(World world, BlockPos pos)")
                         && airy.contains("BlockCosmeticSolid.TYPE_WARDING")
                         && airy.contains("return !world.isBlockPowered(basePos);"));
