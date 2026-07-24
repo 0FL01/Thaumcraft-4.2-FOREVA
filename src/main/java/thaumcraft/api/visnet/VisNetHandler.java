@@ -3,7 +3,9 @@ package thaumcraft.api.visnet;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Set;
 
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
@@ -78,6 +80,55 @@ public class VisNetHandler {
                     }
                 }
                 if (amount <= 0) break;
+            }
+        }
+        return drainedAmount;
+    }
+
+    public static int drainVis(World world, int x, int y, int z, int amount, boolean simulate) {
+        if (world == null || world.provider == null || amount <= 0) {
+            return 0;
+        }
+        WorldCoordinates drainer = new WorldCoordinates(x, y, z, world.provider.getDimension());
+        if (!nearbyNodes.containsKey(drainer)) {
+            VisNetHandler.calculateNearbyNodes(world, x, y, z);
+        }
+        ArrayList<WeakReference<TileVisNode>> nodes = nearbyNodes.get(drainer);
+        if (nodes == null || nodes.isEmpty()) {
+            return 0;
+        }
+
+        int drainedAmount = 0;
+        Set<TileVisNode> visitedSources = new HashSet<>();
+        for (WeakReference<TileVisNode> nodeRef : nodes) {
+            TileVisNode node = nodeRef.get();
+            if (node == null) {
+                continue;
+            }
+            WeakReference<TileVisNode> sourceRef = node.getRootSource();
+            if (!VisNetHandler.isNodeValid(sourceRef)) {
+                continue;
+            }
+            TileVisNode source = sourceRef.get();
+            if (!visitedSources.add(source)) {
+                continue;
+            }
+            for (Aspect aspect : Aspect.getPrimalAspects()) {
+                int remaining = amount - drainedAmount;
+                if (remaining <= 0) {
+                    return drainedAmount;
+                }
+                int request = Math.min(remaining, source.getAvailableVis(aspect));
+                if (request <= 0) {
+                    continue;
+                }
+                int drained = simulate ? request : node.consumeVis(aspect, request);
+                drainedAmount += drained;
+                if (!simulate && drained > 0) {
+                    int color = Aspect.getPrimalAspects().indexOf(aspect);
+                    VisNetHandler.generateVisEffect(world.provider.getDimension(), x, y, z,
+                            node.getPos().getX(), node.getPos().getY(), node.getPos().getZ(), color);
+                }
             }
         }
         return drainedAmount;

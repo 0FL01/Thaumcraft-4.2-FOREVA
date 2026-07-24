@@ -44,6 +44,12 @@ public abstract class TileVisNode extends TileThaumcraft implements ITickable {
         return 0;
     }
 
+    public int getAvailableVis(Aspect aspect) {
+        return VisNetHandler.isNodeValid(this.getParent())
+                ? this.getParent().get().getAvailableVis(aspect)
+                : 0;
+    }
+
     public void removeThisNode() {
         for (WeakReference<TileVisNode> n : this.getChildren()) {
             if (n != null && n.get() != null) {

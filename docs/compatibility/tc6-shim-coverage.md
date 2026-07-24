@@ -13,7 +13,14 @@ contract shims guarded by unit tests and smoke modsets.
 | Fossils and Archeology | `AspectRegistryEvent`, `AspectEventProxy`, TC6 aspect constants as TC4 aliases with legacy tag lookup, `ThaumcraftApi.registerSeed(Block, ItemStack)`, crop block registration | `FossilsThaumcraftSixApiShimStaticGuardTest`, `AspectTc42CompatibilityTest` | `scripts/smoke-modsets/fossils.txt` |
 | Magic Bees + Forestry | `BlocksTC`, `ItemsTC`, aura facades, `SoundsTC`, research-location registration, taint/cult/tainted package aliases | `MagicBeesThaumcraftSixApiShimStaticGuardTest` | `scripts/smoke-modsets/magicbees.txt` |
 | JEID + MixinBooter | TC6 `Utils.setBiomeAt(World, BlockPos, Biome, boolean)` coremod mixin target, `setBiomeAt(World, BlockPos, Biome)`, `resetBiomeAt` overloads, and legacy TC4 x/z delegation through the mixin-owned path | `UtilsThaumcraftSixBiomeCompatStaticGuardTest` | `scripts/smoke-modsets/jeid.txt` |
+| Witchery Resurrected + Companion | `CommonInternals.scanEntities` canonical identity alias and untyped vis drain projected onto TC4 primal visnet | `WitcheryThaumcraftSixApiShimTest`, corpus resolver | `scripts/smoke-modsets/witchery.txt` |
 | Astral Sorcery | No local evidence yet; keep as pending RECON before adding dependencies or shims | none | none |
+
+Exact per-symbol support levels and known unsupported operations are recorded in
+`docs/compatibility/abi/tc6-target.txt`; see
+`docs/compatibility/tc6-validation.md` for their meaning. In particular, the
+Magic Bees aura classes link, but TC6 chunk aura/flux world state and JSON
+research ingestion are explicitly unsupported rather than backed by fake state.
 
 ## Maintenance rules
 
@@ -26,3 +33,5 @@ contract shims guarded by unit tests and smoke modsets.
    shim comments should describe the generic TC6 contract.
 5. Treat required third-party mixin targets as compatibility surface too: a
    missing target descriptor can crash before regular addon code runs.
+6. Every pinned demand symbol must have an `EXACT`, `PROJECTED`, `LINK_ONLY`, or
+   `UNSUPPORTED` entry in the accepted target snapshot.

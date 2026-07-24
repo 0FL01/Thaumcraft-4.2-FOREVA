@@ -1,0 +1,29 @@
+# First matching rule wins. Levels: EXACT, PROJECTED, LINK_ONLY, UNSUPPORTED.
+# level | canonical demand glob | rationale
+UNSUPPORTED | M * thaumcraft/api/aura/AuraHelper getVis * | TC6 chunk aura values have no safe TC4 visnet equivalent
+UNSUPPORTED | M * thaumcraft/api/aura/AuraHelper addVis * | TC6 chunk aura mutation has no safe TC4 visnet equivalent
+UNSUPPORTED | M * thaumcraft/api/aura/AuraHelper getFlux * | TC6 flux has no safe TC4 projection
+UNSUPPORTED | M * thaumcraft/api/aura/AuraHelper addFlux * | TC6 flux has no safe TC4 projection
+UNSUPPORTED | M * thaumcraft/common/world/aura/AuraHandler getAuraChunk * | TC6 chunk aura state is deliberately fail-closed
+UNSUPPORTED | M * thaumcraft/common/world/aura/AuraHandler addFlux * | TC6 flux mutation is deliberately fail-closed
+UNSUPPORTED | M * thaumcraft/api/ThaumcraftApi registerResearchLocation * | TC6 JSON research has no TC4 ingestion adapter
+PROJECTED | * thaumcraft/api/aspects/* | TC6 aspects and registrations project onto canonical TC4 aspects
+PROJECTED | * thaumcraft/api/blocks/BlocksTC* | TC6 block fields alias canonical TC4 registered blocks
+PROJECTED | * thaumcraft/api/items/ItemsTC* | TC6 item fields alias canonical TC4 registered items
+PROJECTED | * thaumcraft/api/internal/CommonInternals* | TC6 scan registry aliases canonical TC4 state
+PROJECTED | M * thaumcraft/common/world/aura/AuraHandler drainVis * | Untyped TC6 vis drains canonical TC4 primal visnet sources
+PROJECTED | * thaumcraft/api/ThaumcraftApi* | TC6 registration calls project onto canonical TC4 registries
+PROJECTED | * thaumcraft/common/blocks/world/taint/TaintHelper* | TC6 taint operations project onto TC4 taint behavior
+PROJECTED | * thaumcraft/common/lib/utils/Utils* | TC6 biome calls project onto the Forge 1.12 biome update path
+PROJECTED | * thaumcraft/common/items/resources/ItemCrystalEssence* | TC6 crystal aspect data projects onto the TC4 crystal item
+PROJECTED | * thaumcraft/common/lib/SoundsTC* | TC6 sound fields alias canonical TC4 registered sounds
+EXACT | * thaumcraft/api/crafting/IInfusionStabiliser* | Exact observed callback descriptor with legacy adapter
+EXACT | * thaumcraft/api/items/IGoggles* | Exact observed structural interface
+EXACT | * thaumcraft/api/items/IRevealer* | Exact observed structural interface
+EXACT | * thaumcraft/api/items/IVisDiscountGear* | Exact observed structural interface
+EXACT | * thaumcraft/api/entities/IEldritchMob* | Exact marker interface
+EXACT | * thaumcraft/api/entities/ITaintedMob* | Exact marker interface
+EXACT | * thaumcraft/common/world/aura/AuraChunk* | Exact structural DTO only; world-owned chunk aura access is unsupported
+LINK_ONLY | C thaumcraft/api/aura/AuraHelper | Structural facade class; individual stateful methods are classified separately
+LINK_ONLY | C thaumcraft/common/world/aura/AuraHandler | Structural facade class; individual stateful methods are classified separately
+LINK_ONLY | * thaumcraft/common/entities/monster/* | Entity aliases resolve, but registered runtime class identity is not guaranteed

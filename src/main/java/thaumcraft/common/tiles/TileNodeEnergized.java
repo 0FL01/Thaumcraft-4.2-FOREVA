@@ -139,6 +139,11 @@ public class TileNodeEnergized extends TileVisNode implements IAspectContainer {
         return drain;
     }
 
+    @Override
+    public int getAvailableVis(Aspect aspect) {
+        return this.vis.getAmount(aspect);
+    }
+
     public AspectList getAuraBase() {
         return this.auraBase;
     }

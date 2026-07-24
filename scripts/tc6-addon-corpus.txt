@@ -1,0 +1,7 @@
+# id | status | jar | sha256 | side | source/note
+enderio | supported | EnderIO-1.12.2-5.3.72.jar | 9b5e7756af35a191de8bc8f010c0f7c7ffc2e1e056a69ec265d1dd5ce90d19b4 | both | user-provided issue #3 regression jar
+fossils | supported | fossilsarcheology-8.0.6.jar | 1fc81d9cd006731cf61370f3dddd22db9aa59501068536adc8671e4451cbb23c | both | https://cdn.modrinth.com/data/IJY7IqPP/versions/2Wi50MGh/fossilsarcheology-8.0.6.jar
+magicbees | supported | MagicBees-1.12.2-3.2.25.jar | 2c780e8e7b22a374c069e3a20674fac9382fe0ef1100555197ff23eb9ab12d9e | both | https://edge.forgecdn.net/files/2855/061/MagicBees-1.12.2-3.2.25.jar
+jeid | supported | JustEnoughIDs-1.0.4-SNAPSHOT-thin.jar | b556c5b98ea754a764ba0b0c863878d23fac2f750d0a4b5798dce14afbc7e2b1 | both | https://edge.forgecdn.net/files/3581/715/JustEnoughIDs-1.0.4-SNAPSHOT-thin.jar
+witchery-companion | supported | witcherycompanion-0.36.2-beta.jar | 94546f5b4c1f41b268b6cc01c89b34da091dd6b5071f8bedb041f5ec0aa3fc5f | both | https://www.curseforge.com/minecraft/mc-mods/witchery-companion/files/8237896
+witchery-resurrected | supported | WitcheryResurrected-1.12.2-0.5.2.4-forge-all.jar | 40b3a6f8451ec63aa8ec9a9a38eb08dc8bb80ba05889babc1a783acc9431133c | both | https://witchery.msrandom.net/home/downloads

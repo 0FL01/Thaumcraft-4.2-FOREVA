@@ -1,41 +1,35 @@
 package thaumcraft.common.world.aura;
 
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import thaumcraft.api.visnet.VisNetHandler;
 
 /**
  * Minimal TC6 aura handler facade.
  */
 public final class AuraHandler {
 
-    private static final Map<String, AuraChunk> AURA = new ConcurrentHashMap<>();
-
     private AuraHandler() {
     }
 
     public static AuraChunk getAuraChunk(int dim, int chunkX, int chunkZ) {
-        String key = dim + ":" + chunkX + ":" + chunkZ;
-        AuraChunk chunk = AURA.get(key);
-        if (chunk == null) {
-            AuraChunk created = new AuraChunk();
-            AuraChunk existing = AURA.putIfAbsent(key, created);
-            chunk = existing == null ? created : existing;
-        }
-        return chunk;
+        throw new UnsupportedOperationException("TC6 chunk aura state has no safe TC4 projection");
     }
 
     public static AuraChunk getAuraChunk(World world, BlockPos pos) {
-        return getAuraChunk(getDimension(world), pos.getX() >> 4, pos.getZ() >> 4);
+        throw new UnsupportedOperationException("TC6 chunk aura state has no safe TC4 projection");
     }
 
     public static void addFlux(World world, BlockPos pos, float amount) {
-        AuraChunk chunk = getAuraChunk(world, pos);
-        chunk.setFlux(chunk.getFlux() + amount);
+        throw new UnsupportedOperationException("TC6 flux has no safe TC4 projection");
     }
 
-    private static int getDimension(World world) {
-        return world != null && world.provider != null ? world.provider.getDimension() : 0;
+    public static float drainVis(World world, BlockPos pos, float amount, boolean simulate) {
+        if (pos == null || amount < 1.0F) {
+            return 0.0F;
+        }
+        int requested = (int) Math.floor(amount);
+        return VisNetHandler.drainVis(world, pos.getX(), pos.getY(), pos.getZ(), requested, simulate);
     }
+
 }

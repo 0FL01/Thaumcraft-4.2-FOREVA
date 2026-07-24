@@ -1,0 +1,239 @@
+FORMAT tc6-addon-demand-v1
+A enderio supported both EnderIO-1.12.2-5.3.72.jar 9b5e7756af35a191de8bc8f010c0f7c7ffc2e1e056a69ec265d1dd5ce90d19b4
+C enderio thaumcraft/api/ThaumcraftApi
+C enderio thaumcraft/api/aspects/Aspect
+C enderio thaumcraft/api/aspects/AspectList
+C enderio thaumcraft/api/crafting/IInfusionStabiliser
+C enderio thaumcraft/api/items/IGoggles
+C enderio thaumcraft/api/items/IRevealer
+C enderio thaumcraft/api/items/IVisDiscountGear
+F enderio GETSTATIC thaumcraft/api/aspects/Aspect AIR Lthaumcraft/api/aspects/Aspect;
+F enderio GETSTATIC thaumcraft/api/aspects/Aspect CRYSTAL Lthaumcraft/api/aspects/Aspect;
+F enderio GETSTATIC thaumcraft/api/aspects/Aspect EARTH Lthaumcraft/api/aspects/Aspect;
+F enderio GETSTATIC thaumcraft/api/aspects/Aspect ELDRITCH Lthaumcraft/api/aspects/Aspect;
+F enderio GETSTATIC thaumcraft/api/aspects/Aspect FIRE Lthaumcraft/api/aspects/Aspect;
+F enderio GETSTATIC thaumcraft/api/aspects/Aspect LIGHT Lthaumcraft/api/aspects/Aspect;
+F enderio GETSTATIC thaumcraft/api/aspects/Aspect MAN Lthaumcraft/api/aspects/Aspect;
+F enderio GETSTATIC thaumcraft/api/aspects/Aspect ORDER Lthaumcraft/api/aspects/Aspect;
+F enderio GETSTATIC thaumcraft/api/aspects/Aspect SENSES Lthaumcraft/api/aspects/Aspect;
+F enderio GETSTATIC thaumcraft/api/aspects/Aspect UNDEAD Lthaumcraft/api/aspects/Aspect;
+M enderio INVOKESPECIAL thaumcraft/api/aspects/AspectList <init> ()V
+M enderio INVOKESPECIAL thaumcraft/api/aspects/AspectList <init> (Lnet/minecraft/item/ItemStack;)V
+M enderio INVOKESTATIC thaumcraft/api/ThaumcraftApi registerObjectTag (Ljava/lang/String;Lthaumcraft/api/aspects/AspectList;)V
+M enderio INVOKESTATIC thaumcraft/api/ThaumcraftApi registerObjectTag (Lnet/minecraft/item/ItemStack;Lthaumcraft/api/aspects/AspectList;)V
+M enderio INVOKEVIRTUAL thaumcraft/api/aspects/AspectList add (Lthaumcraft/api/aspects/Aspect;I)Lthaumcraft/api/aspects/AspectList;
+M enderio INVOKEVIRTUAL thaumcraft/api/aspects/AspectList add (Lthaumcraft/api/aspects/AspectList;)Lthaumcraft/api/aspects/AspectList;
+M enderio INVOKEVIRTUAL thaumcraft/api/aspects/AspectList visSize ()I
+A fossils supported both fossilsarcheology-8.0.6.jar 1fc81d9cd006731cf61370f3dddd22db9aa59501068536adc8671e4451cbb23c
+C fossils thaumcraft/api/ThaumcraftApi
+C fossils thaumcraft/api/ThaumcraftApi$EntityTagsNBT
+C fossils thaumcraft/api/aspects/Aspect
+C fossils thaumcraft/api/aspects/AspectEventProxy
+C fossils thaumcraft/api/aspects/AspectList
+C fossils thaumcraft/api/aspects/AspectRegistryEvent
+F fossils GETFIELD thaumcraft/api/aspects/AspectRegistryEvent register Lthaumcraft/api/aspects/AspectEventProxy;
+F fossils GETSTATIC thaumcraft/api/aspects/Aspect AIR Lthaumcraft/api/aspects/Aspect;
+F fossils GETSTATIC thaumcraft/api/aspects/Aspect ALCHEMY Lthaumcraft/api/aspects/Aspect;
+F fossils GETSTATIC thaumcraft/api/aspects/Aspect AVERSION Lthaumcraft/api/aspects/Aspect;
+F fossils GETSTATIC thaumcraft/api/aspects/Aspect BEAST Lthaumcraft/api/aspects/Aspect;
+F fossils GETSTATIC thaumcraft/api/aspects/Aspect COLD Lthaumcraft/api/aspects/Aspect;
+F fossils GETSTATIC thaumcraft/api/aspects/Aspect CRAFT Lthaumcraft/api/aspects/Aspect;
+F fossils GETSTATIC thaumcraft/api/aspects/Aspect CRYSTAL Lthaumcraft/api/aspects/Aspect;
+F fossils GETSTATIC thaumcraft/api/aspects/Aspect DARKNESS Lthaumcraft/api/aspects/Aspect;
+F fossils GETSTATIC thaumcraft/api/aspects/Aspect DEATH Lthaumcraft/api/aspects/Aspect;
+F fossils GETSTATIC thaumcraft/api/aspects/Aspect DESIRE Lthaumcraft/api/aspects/Aspect;
+F fossils GETSTATIC thaumcraft/api/aspects/Aspect EARTH Lthaumcraft/api/aspects/Aspect;
+F fossils GETSTATIC thaumcraft/api/aspects/Aspect ENERGY Lthaumcraft/api/aspects/Aspect;
+F fossils GETSTATIC thaumcraft/api/aspects/Aspect ENTROPY Lthaumcraft/api/aspects/Aspect;
+F fossils GETSTATIC thaumcraft/api/aspects/Aspect EXCHANGE Lthaumcraft/api/aspects/Aspect;
+F fossils GETSTATIC thaumcraft/api/aspects/Aspect FIRE Lthaumcraft/api/aspects/Aspect;
+F fossils GETSTATIC thaumcraft/api/aspects/Aspect FLIGHT Lthaumcraft/api/aspects/Aspect;
+F fossils GETSTATIC thaumcraft/api/aspects/Aspect LIFE Lthaumcraft/api/aspects/Aspect;
+F fossils GETSTATIC thaumcraft/api/aspects/Aspect LIGHT Lthaumcraft/api/aspects/Aspect;
+F fossils GETSTATIC thaumcraft/api/aspects/Aspect MAGIC Lthaumcraft/api/aspects/Aspect;
+F fossils GETSTATIC thaumcraft/api/aspects/Aspect MAN Lthaumcraft/api/aspects/Aspect;
+F fossils GETSTATIC thaumcraft/api/aspects/Aspect MECHANISM Lthaumcraft/api/aspects/Aspect;
+F fossils GETSTATIC thaumcraft/api/aspects/Aspect METAL Lthaumcraft/api/aspects/Aspect;
+F fossils GETSTATIC thaumcraft/api/aspects/Aspect MOTION Lthaumcraft/api/aspects/Aspect;
+F fossils GETSTATIC thaumcraft/api/aspects/Aspect PLANT Lthaumcraft/api/aspects/Aspect;
+F fossils GETSTATIC thaumcraft/api/aspects/Aspect PROTECT Lthaumcraft/api/aspects/Aspect;
+F fossils GETSTATIC thaumcraft/api/aspects/Aspect SENSES Lthaumcraft/api/aspects/Aspect;
+F fossils GETSTATIC thaumcraft/api/aspects/Aspect SOUL Lthaumcraft/api/aspects/Aspect;
+F fossils GETSTATIC thaumcraft/api/aspects/Aspect TOOL Lthaumcraft/api/aspects/Aspect;
+F fossils GETSTATIC thaumcraft/api/aspects/Aspect UNDEAD Lthaumcraft/api/aspects/Aspect;
+F fossils GETSTATIC thaumcraft/api/aspects/Aspect VOID Lthaumcraft/api/aspects/Aspect;
+F fossils GETSTATIC thaumcraft/api/aspects/Aspect WATER Lthaumcraft/api/aspects/Aspect;
+M fossils INVOKESPECIAL thaumcraft/api/aspects/Aspect <init> (Ljava/lang/String;I[Lthaumcraft/api/aspects/Aspect;Lnet/minecraft/util/ResourceLocation;I)V
+M fossils INVOKESPECIAL thaumcraft/api/aspects/AspectList <init> ()V
+M fossils INVOKESTATIC thaumcraft/api/ThaumcraftApi registerEntityTag (Ljava/lang/String;Lthaumcraft/api/aspects/AspectList;[Lthaumcraft/api/ThaumcraftApi$EntityTagsNBT;)V
+M fossils INVOKESTATIC thaumcraft/api/ThaumcraftApi registerSeed (Lnet/minecraft/block/Block;Lnet/minecraft/item/ItemStack;)V
+M fossils INVOKEVIRTUAL thaumcraft/api/aspects/AspectEventProxy registerObjectTag (Lnet/minecraft/item/ItemStack;Lthaumcraft/api/aspects/AspectList;)V
+M fossils INVOKEVIRTUAL thaumcraft/api/aspects/AspectList add (Lthaumcraft/api/aspects/Aspect;I)Lthaumcraft/api/aspects/AspectList;
+A magicbees supported both MagicBees-1.12.2-3.2.25.jar 2c780e8e7b22a374c069e3a20674fac9382fe0ef1100555197ff23eb9ab12d9e
+C magicbees thaumcraft/api/ThaumcraftApi
+C magicbees thaumcraft/api/aspects/Aspect
+C magicbees thaumcraft/api/aspects/AspectList
+C magicbees thaumcraft/api/aura/AuraHelper
+C magicbees thaumcraft/api/blocks/BlocksTC
+C magicbees thaumcraft/api/entities/IEldritchMob
+C magicbees thaumcraft/api/entities/ITaintedMob
+C magicbees thaumcraft/api/items/ItemsTC
+C magicbees thaumcraft/common/blocks/world/taint/TaintHelper
+C magicbees thaumcraft/common/entities/monster/boss/EntityTaintacleGiant
+C magicbees thaumcraft/common/entities/monster/cult/EntityCultist
+C magicbees thaumcraft/common/entities/monster/cult/EntityCultistCleric
+C magicbees thaumcraft/common/entities/monster/cult/EntityCultistKnight
+C magicbees thaumcraft/common/entities/monster/tainted/EntityTaintSeed
+C magicbees thaumcraft/common/entities/monster/tainted/EntityTaintSeedPrime
+C magicbees thaumcraft/common/entities/monster/tainted/EntityTaintacle
+C magicbees thaumcraft/common/entities/monster/tainted/EntityTaintacleSmall
+C magicbees thaumcraft/common/items/resources/ItemCrystalEssence
+C magicbees thaumcraft/common/lib/SoundsTC
+C magicbees thaumcraft/common/world/aura/AuraChunk
+C magicbees thaumcraft/common/world/aura/AuraHandler
+F magicbees GETSTATIC thaumcraft/api/aspects/Aspect ORDER Lthaumcraft/api/aspects/Aspect;
+F magicbees GETSTATIC thaumcraft/api/aspects/Aspect VOID Lthaumcraft/api/aspects/Aspect;
+F magicbees GETSTATIC thaumcraft/api/blocks/BlocksTC cinderpearl Lnet/minecraft/block/Block;
+F magicbees GETSTATIC thaumcraft/api/blocks/BlocksTC crystalAir Lnet/minecraft/block/Block;
+F magicbees GETSTATIC thaumcraft/api/blocks/BlocksTC crystalEarth Lnet/minecraft/block/Block;
+F magicbees GETSTATIC thaumcraft/api/blocks/BlocksTC crystalEntropy Lnet/minecraft/block/Block;
+F magicbees GETSTATIC thaumcraft/api/blocks/BlocksTC crystalFire Lnet/minecraft/block/Block;
+F magicbees GETSTATIC thaumcraft/api/blocks/BlocksTC crystalOrder Lnet/minecraft/block/Block;
+F magicbees GETSTATIC thaumcraft/api/blocks/BlocksTC crystalTaint Lnet/minecraft/block/Block;
+F magicbees GETSTATIC thaumcraft/api/blocks/BlocksTC crystalWater Lnet/minecraft/block/Block;
+F magicbees GETSTATIC thaumcraft/api/blocks/BlocksTC shimmerleaf Lnet/minecraft/block/Block;
+F magicbees GETSTATIC thaumcraft/api/blocks/BlocksTC vishroom Lnet/minecraft/block/Block;
+F magicbees GETSTATIC thaumcraft/api/items/ItemsTC amber Lnet/minecraft/item/Item;
+F magicbees GETSTATIC thaumcraft/api/items/ItemsTC brain Lnet/minecraft/item/Item;
+F magicbees GETSTATIC thaumcraft/api/items/ItemsTC celestialNotes Lnet/minecraft/item/Item;
+F magicbees GETSTATIC thaumcraft/api/items/ItemsTC chunks Lnet/minecraft/item/Item;
+F magicbees GETSTATIC thaumcraft/api/items/ItemsTC crystalEssence Lnet/minecraft/item/Item;
+F magicbees GETSTATIC thaumcraft/api/items/ItemsTC curio Lnet/minecraft/item/Item;
+F magicbees GETSTATIC thaumcraft/api/items/ItemsTC nuggets Lnet/minecraft/item/Item;
+F magicbees GETSTATIC thaumcraft/common/lib/SoundsTC wandfail Lnet/minecraft/util/SoundEvent;
+M magicbees INVOKESPECIAL thaumcraft/api/aspects/Aspect <init> (Ljava/lang/String;I[Lthaumcraft/api/aspects/Aspect;Lnet/minecraft/util/ResourceLocation;I)V
+M magicbees INVOKESPECIAL thaumcraft/api/aspects/AspectList <init> ()V
+M magicbees INVOKESPECIAL thaumcraft/common/entities/monster/boss/EntityTaintacleGiant <init> (Lnet/minecraft/world/World;)V
+M magicbees INVOKESPECIAL thaumcraft/common/entities/monster/cult/EntityCultistCleric <init> (Lnet/minecraft/world/World;)V
+M magicbees INVOKESPECIAL thaumcraft/common/entities/monster/cult/EntityCultistKnight <init> (Lnet/minecraft/world/World;)V
+M magicbees INVOKESPECIAL thaumcraft/common/entities/monster/tainted/EntityTaintSeed <init> (Lnet/minecraft/world/World;)V
+M magicbees INVOKESPECIAL thaumcraft/common/entities/monster/tainted/EntityTaintSeedPrime <init> (Lnet/minecraft/world/World;)V
+M magicbees INVOKESPECIAL thaumcraft/common/entities/monster/tainted/EntityTaintacle <init> (Lnet/minecraft/world/World;)V
+M magicbees INVOKESPECIAL thaumcraft/common/entities/monster/tainted/EntityTaintacleSmall <init> (Lnet/minecraft/world/World;)V
+M magicbees INVOKESTATIC thaumcraft/api/ThaumcraftApi registerResearchLocation (Lnet/minecraft/util/ResourceLocation;)V
+M magicbees INVOKESTATIC thaumcraft/api/aura/AuraHelper getVis (Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;)F
+M magicbees INVOKESTATIC thaumcraft/common/blocks/world/taint/TaintHelper addTaintSeed (Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;)V
+M magicbees INVOKESTATIC thaumcraft/common/blocks/world/taint/TaintHelper spreadFibres (Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;Z)V
+M magicbees INVOKESTATIC thaumcraft/common/world/aura/AuraHandler addFlux (Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;F)V
+M magicbees INVOKESTATIC thaumcraft/common/world/aura/AuraHandler getAuraChunk (III)Lthaumcraft/common/world/aura/AuraChunk;
+M magicbees INVOKEVIRTUAL thaumcraft/api/aspects/AspectList add (Lthaumcraft/api/aspects/Aspect;I)Lthaumcraft/api/aspects/AspectList;
+M magicbees INVOKEVIRTUAL thaumcraft/common/entities/monster/cult/EntityCultist func_180425_c ()Lnet/minecraft/util/math/BlockPos;
+M magicbees INVOKEVIRTUAL thaumcraft/common/entities/monster/cult/EntityCultist func_180482_a (Lnet/minecraft/world/DifficultyInstance;Lnet/minecraft/entity/IEntityLivingData;)Lnet/minecraft/entity/IEntityLivingData;
+M magicbees INVOKEVIRTUAL thaumcraft/common/entities/monster/cult/EntityCultist func_184185_a (Lnet/minecraft/util/SoundEvent;FF)V
+M magicbees INVOKEVIRTUAL thaumcraft/common/entities/monster/cult/EntityCultist func_70107_b (DDD)V
+M magicbees INVOKEVIRTUAL thaumcraft/common/entities/monster/cult/EntityCultist func_70656_aK ()V
+M magicbees INVOKEVIRTUAL thaumcraft/common/items/resources/ItemCrystalEssence setAspects (Lnet/minecraft/item/ItemStack;Lthaumcraft/api/aspects/AspectList;)V
+M magicbees INVOKEVIRTUAL thaumcraft/common/world/aura/AuraChunk getBase ()S
+M magicbees INVOKEVIRTUAL thaumcraft/common/world/aura/AuraChunk getFlux ()F
+M magicbees INVOKEVIRTUAL thaumcraft/common/world/aura/AuraChunk getVis ()F
+M magicbees INVOKEVIRTUAL thaumcraft/common/world/aura/AuraChunk setBase (S)V
+M magicbees INVOKEVIRTUAL thaumcraft/common/world/aura/AuraChunk setFlux (F)V
+M magicbees INVOKEVIRTUAL thaumcraft/common/world/aura/AuraChunk setVis (F)V
+A jeid supported both JustEnoughIDs-1.0.4-SNAPSHOT-thin.jar b556c5b98ea754a764ba0b0c863878d23fac2f750d0a4b5798dce14afbc7e2b1
+C jeid thaumcraft/common/lib/utils/Utils
+X jeid OVERWRITE thaumcraft/common/lib/utils/Utils setBiomeAt (Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/world/biome/Biome;Z)V
+A witchery-companion supported both witcherycompanion-0.36.2-beta.jar 94546f5b4c1f41b268b6cc01c89b34da091dd6b5071f8bedb041f5ec0aa3fc5f
+C witchery-companion thaumcraft/api/ThaumcraftApi
+C witchery-companion thaumcraft/api/ThaumcraftApi$EntityTags
+C witchery-companion thaumcraft/api/ThaumcraftApi$EntityTagsNBT
+C witchery-companion thaumcraft/api/aspects/Aspect
+C witchery-companion thaumcraft/api/aspects/AspectEventProxy
+C witchery-companion thaumcraft/api/aspects/AspectList
+C witchery-companion thaumcraft/api/aspects/AspectRegistryEvent
+C witchery-companion thaumcraft/api/internal/CommonInternals
+F witchery-companion GETFIELD thaumcraft/api/aspects/AspectRegistryEvent register Lthaumcraft/api/aspects/AspectEventProxy;
+F witchery-companion GETSTATIC thaumcraft/api/aspects/Aspect AIR Lthaumcraft/api/aspects/Aspect;
+F witchery-companion GETSTATIC thaumcraft/api/aspects/Aspect BEAST Lthaumcraft/api/aspects/Aspect;
+F witchery-companion GETSTATIC thaumcraft/api/aspects/Aspect COLD Lthaumcraft/api/aspects/Aspect;
+F witchery-companion GETSTATIC thaumcraft/api/aspects/Aspect CRAFT Lthaumcraft/api/aspects/Aspect;
+F witchery-companion GETSTATIC thaumcraft/api/aspects/Aspect CRYSTAL Lthaumcraft/api/aspects/Aspect;
+F witchery-companion GETSTATIC thaumcraft/api/aspects/Aspect DARKNESS Lthaumcraft/api/aspects/Aspect;
+F witchery-companion GETSTATIC thaumcraft/api/aspects/Aspect DEATH Lthaumcraft/api/aspects/Aspect;
+F witchery-companion GETSTATIC thaumcraft/api/aspects/Aspect EARTH Lthaumcraft/api/aspects/Aspect;
+F witchery-companion GETSTATIC thaumcraft/api/aspects/Aspect ELDRITCH Lthaumcraft/api/aspects/Aspect;
+F witchery-companion GETSTATIC thaumcraft/api/aspects/Aspect ENERGY Lthaumcraft/api/aspects/Aspect;
+F witchery-companion GETSTATIC thaumcraft/api/aspects/Aspect ENTROPY Lthaumcraft/api/aspects/Aspect;
+F witchery-companion GETSTATIC thaumcraft/api/aspects/Aspect EXCHANGE Lthaumcraft/api/aspects/Aspect;
+F witchery-companion GETSTATIC thaumcraft/api/aspects/Aspect FIRE Lthaumcraft/api/aspects/Aspect;
+F witchery-companion GETSTATIC thaumcraft/api/aspects/Aspect FLIGHT Lthaumcraft/api/aspects/Aspect;
+F witchery-companion GETSTATIC thaumcraft/api/aspects/Aspect LIFE Lthaumcraft/api/aspects/Aspect;
+F witchery-companion GETSTATIC thaumcraft/api/aspects/Aspect LIGHT Lthaumcraft/api/aspects/Aspect;
+F witchery-companion GETSTATIC thaumcraft/api/aspects/Aspect MAGIC Lthaumcraft/api/aspects/Aspect;
+F witchery-companion GETSTATIC thaumcraft/api/aspects/Aspect MAN Lthaumcraft/api/aspects/Aspect;
+F witchery-companion GETSTATIC thaumcraft/api/aspects/Aspect MECHANISM Lthaumcraft/api/aspects/Aspect;
+F witchery-companion GETSTATIC thaumcraft/api/aspects/Aspect METAL Lthaumcraft/api/aspects/Aspect;
+F witchery-companion GETSTATIC thaumcraft/api/aspects/Aspect MIND Lthaumcraft/api/aspects/Aspect;
+F witchery-companion GETSTATIC thaumcraft/api/aspects/Aspect MOTION Lthaumcraft/api/aspects/Aspect;
+F witchery-companion GETSTATIC thaumcraft/api/aspects/Aspect ORDER Lthaumcraft/api/aspects/Aspect;
+F witchery-companion GETSTATIC thaumcraft/api/aspects/Aspect PLANT Lthaumcraft/api/aspects/Aspect;
+F witchery-companion GETSTATIC thaumcraft/api/aspects/Aspect SENSES Lthaumcraft/api/aspects/Aspect;
+F witchery-companion GETSTATIC thaumcraft/api/aspects/Aspect SOUL Lthaumcraft/api/aspects/Aspect;
+F witchery-companion GETSTATIC thaumcraft/api/aspects/Aspect TOOL Lthaumcraft/api/aspects/Aspect;
+F witchery-companion GETSTATIC thaumcraft/api/aspects/Aspect TRAP Lthaumcraft/api/aspects/Aspect;
+F witchery-companion GETSTATIC thaumcraft/api/aspects/Aspect UNDEAD Lthaumcraft/api/aspects/Aspect;
+F witchery-companion GETSTATIC thaumcraft/api/aspects/Aspect VOID Lthaumcraft/api/aspects/Aspect;
+F witchery-companion GETSTATIC thaumcraft/api/aspects/Aspect WATER Lthaumcraft/api/aspects/Aspect;
+F witchery-companion GETSTATIC thaumcraft/api/internal/CommonInternals scanEntities Ljava/util/ArrayList;
+M witchery-companion INVOKESPECIAL thaumcraft/api/ThaumcraftApi$EntityTags <init> (Ljava/lang/String;Lthaumcraft/api/aspects/AspectList;[Lthaumcraft/api/ThaumcraftApi$EntityTagsNBT;)V
+M witchery-companion INVOKESPECIAL thaumcraft/api/aspects/AspectList <init> ()V
+M witchery-companion INVOKEVIRTUAL thaumcraft/api/aspects/AspectEventProxy registerObjectTag (Lnet/minecraft/item/ItemStack;Lthaumcraft/api/aspects/AspectList;)V
+M witchery-companion INVOKEVIRTUAL thaumcraft/api/aspects/AspectList add (Lthaumcraft/api/aspects/Aspect;I)Lthaumcraft/api/aspects/AspectList;
+A witchery-resurrected supported both WitcheryResurrected-1.12.2-0.5.2.4-forge-all.jar 40b3a6f8451ec63aa8ec9a9a38eb08dc8bb80ba05889babc1a783acc9431133c
+C witchery-resurrected thaumcraft/api/ThaumcraftApi
+C witchery-resurrected thaumcraft/api/ThaumcraftApi$EntityTags
+C witchery-resurrected thaumcraft/api/ThaumcraftApi$EntityTagsNBT
+C witchery-resurrected thaumcraft/api/aspects/Aspect
+C witchery-resurrected thaumcraft/api/aspects/AspectEventProxy
+C witchery-resurrected thaumcraft/api/aspects/AspectList
+C witchery-resurrected thaumcraft/api/internal/CommonInternals
+C witchery-resurrected thaumcraft/common/world/aura/AuraHandler
+F witchery-resurrected GETSTATIC thaumcraft/api/aspects/Aspect AIR Lthaumcraft/api/aspects/Aspect;
+F witchery-resurrected GETSTATIC thaumcraft/api/aspects/Aspect BEAST Lthaumcraft/api/aspects/Aspect;
+F witchery-resurrected GETSTATIC thaumcraft/api/aspects/Aspect COLD Lthaumcraft/api/aspects/Aspect;
+F witchery-resurrected GETSTATIC thaumcraft/api/aspects/Aspect CRAFT Lthaumcraft/api/aspects/Aspect;
+F witchery-resurrected GETSTATIC thaumcraft/api/aspects/Aspect CRYSTAL Lthaumcraft/api/aspects/Aspect;
+F witchery-resurrected GETSTATIC thaumcraft/api/aspects/Aspect DARKNESS Lthaumcraft/api/aspects/Aspect;
+F witchery-resurrected GETSTATIC thaumcraft/api/aspects/Aspect DEATH Lthaumcraft/api/aspects/Aspect;
+F witchery-resurrected GETSTATIC thaumcraft/api/aspects/Aspect EARTH Lthaumcraft/api/aspects/Aspect;
+F witchery-resurrected GETSTATIC thaumcraft/api/aspects/Aspect ELDRITCH Lthaumcraft/api/aspects/Aspect;
+F witchery-resurrected GETSTATIC thaumcraft/api/aspects/Aspect ENERGY Lthaumcraft/api/aspects/Aspect;
+F witchery-resurrected GETSTATIC thaumcraft/api/aspects/Aspect ENTROPY Lthaumcraft/api/aspects/Aspect;
+F witchery-resurrected GETSTATIC thaumcraft/api/aspects/Aspect EXCHANGE Lthaumcraft/api/aspects/Aspect;
+F witchery-resurrected GETSTATIC thaumcraft/api/aspects/Aspect FIRE Lthaumcraft/api/aspects/Aspect;
+F witchery-resurrected GETSTATIC thaumcraft/api/aspects/Aspect FLIGHT Lthaumcraft/api/aspects/Aspect;
+F witchery-resurrected GETSTATIC thaumcraft/api/aspects/Aspect LIFE Lthaumcraft/api/aspects/Aspect;
+F witchery-resurrected GETSTATIC thaumcraft/api/aspects/Aspect LIGHT Lthaumcraft/api/aspects/Aspect;
+F witchery-resurrected GETSTATIC thaumcraft/api/aspects/Aspect MAGIC Lthaumcraft/api/aspects/Aspect;
+F witchery-resurrected GETSTATIC thaumcraft/api/aspects/Aspect MAN Lthaumcraft/api/aspects/Aspect;
+F witchery-resurrected GETSTATIC thaumcraft/api/aspects/Aspect MECHANISM Lthaumcraft/api/aspects/Aspect;
+F witchery-resurrected GETSTATIC thaumcraft/api/aspects/Aspect METAL Lthaumcraft/api/aspects/Aspect;
+F witchery-resurrected GETSTATIC thaumcraft/api/aspects/Aspect MIND Lthaumcraft/api/aspects/Aspect;
+F witchery-resurrected GETSTATIC thaumcraft/api/aspects/Aspect MOTION Lthaumcraft/api/aspects/Aspect;
+F witchery-resurrected GETSTATIC thaumcraft/api/aspects/Aspect ORDER Lthaumcraft/api/aspects/Aspect;
+F witchery-resurrected GETSTATIC thaumcraft/api/aspects/Aspect PLANT Lthaumcraft/api/aspects/Aspect;
+F witchery-resurrected GETSTATIC thaumcraft/api/aspects/Aspect SENSES Lthaumcraft/api/aspects/Aspect;
+F witchery-resurrected GETSTATIC thaumcraft/api/aspects/Aspect SOUL Lthaumcraft/api/aspects/Aspect;
+F witchery-resurrected GETSTATIC thaumcraft/api/aspects/Aspect TOOL Lthaumcraft/api/aspects/Aspect;
+F witchery-resurrected GETSTATIC thaumcraft/api/aspects/Aspect TRAP Lthaumcraft/api/aspects/Aspect;
+F witchery-resurrected GETSTATIC thaumcraft/api/aspects/Aspect UNDEAD Lthaumcraft/api/aspects/Aspect;
+F witchery-resurrected GETSTATIC thaumcraft/api/aspects/Aspect VOID Lthaumcraft/api/aspects/Aspect;
+F witchery-resurrected GETSTATIC thaumcraft/api/aspects/Aspect WATER Lthaumcraft/api/aspects/Aspect;
+F witchery-resurrected GETSTATIC thaumcraft/api/aspects/Aspect aspects Ljava/util/LinkedHashMap;
+F witchery-resurrected GETSTATIC thaumcraft/api/internal/CommonInternals scanEntities Ljava/util/ArrayList;
+M witchery-resurrected INVOKESPECIAL thaumcraft/api/ThaumcraftApi$EntityTags <init> (Ljava/lang/String;Lthaumcraft/api/aspects/AspectList;[Lthaumcraft/api/ThaumcraftApi$EntityTagsNBT;)V
+M witchery-resurrected INVOKESPECIAL thaumcraft/api/aspects/AspectEventProxy <init> ()V
+M witchery-resurrected INVOKESPECIAL thaumcraft/api/aspects/AspectList <init> ()V
+M witchery-resurrected INVOKESTATIC thaumcraft/common/world/aura/AuraHandler drainVis (Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;FZ)F
+M witchery-resurrected INVOKEVIRTUAL thaumcraft/api/aspects/AspectEventProxy registerObjectTag (Lnet/minecraft/item/ItemStack;Lthaumcraft/api/aspects/AspectList;)V
+M witchery-resurrected INVOKEVIRTUAL thaumcraft/api/aspects/AspectList add (Lthaumcraft/api/aspects/Aspect;I)Lthaumcraft/api/aspects/AspectList;
+M witchery-resurrected INVOKEVIRTUAL thaumcraft/api/aspects/AspectList visSize ()I

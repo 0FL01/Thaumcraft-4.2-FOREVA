@@ -18,12 +18,7 @@ public final class AuraHelper {
     }
 
     public static float drainVis(World world, BlockPos pos, float amount, boolean simulate) {
-        AuraChunk chunk = AuraHandler.getAuraChunk(world, pos);
-        float drained = Math.min(chunk.getVis(), Math.max(0.0F, amount));
-        if (!simulate) {
-            chunk.setVis(chunk.getVis() - drained);
-        }
-        return drained;
+        return AuraHandler.drainVis(world, pos, amount, simulate);
     }
 
     public static void addVis(World world, BlockPos pos, float amount) {

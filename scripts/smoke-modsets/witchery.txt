@@ -1,0 +1,7 @@
+# Minimal Witchery Resurrected + Companion compatibility smoke from GitHub issue #9.
+# Format: jar | sha256 | source/note | direct/dev-remap
+# Baubles is intentionally omitted: it is already on the Gradle classpath in dev smoke runs.
+# Production SRG jars remain the inputs; ForgeGradle dev smoke remaps only ignored staging copies.
+!mixinbooter-9.4.jar | 0c87eae9e444b313dd756a1c688b2d23ba89cdea173133b059d0720396eaf341 | https://edge.forgecdn.net/files/5739/618/%21mixinbooter-9.4.jar | direct
+WitcheryResurrected-1.12.2-0.5.2.4-forge-all.jar | 40b3a6f8451ec63aa8ec9a9a38eb08dc8bb80ba05889babc1a783acc9431133c | https://witchery-api.msrandom.net/download/WitcheryResurrected0.5.2Hotfix4/WitcheryResurrected-1.12.2-0.5.2.4-forge-all.jar | dev-remap
+witcherycompanion-0.36.2-beta.jar | 94546f5b4c1f41b268b6cc01c89b34da091dd6b5071f8bedb041f5ec0aa3fc5f | https://www.curseforge.com/minecraft/mc-mods/witchery-companion/files/8237896 | dev-remap

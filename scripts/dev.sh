@@ -14,6 +14,8 @@ Usage:
   ./scripts/dev.sh image
   ./scripts/dev.sh compileJava          # quiet compile-only check (logs to run/validate/)
   ./scripts/dev.sh validate [--smoke]   # multi-step pipeline
+  ./scripts/dev.sh compat-validate      # TC6 donor ABI and addon compatibility gates
+  ./scripts/dev.sh compat-release       # validation + supported modset smoke matrix + final artifact
   ./scripts/dev.sh check-jar [jar-path]
   ./scripts/dev.sh smoke-server
   ./scripts/dev.sh smoke-modset <name>
@@ -29,6 +31,7 @@ Examples:
   ./scripts/dev.sh build
   ./scripts/dev.sh check-jar
   ./scripts/dev.sh validate --smoke
+  ./scripts/dev.sh compat-validate
   ./scripts/dev.sh apiJar devJar
   ./scripts/dev.sh smoke-modset fossils
   ./scripts/dev.sh smoke-client
@@ -173,6 +176,143 @@ trim_string() {
   printf '%s' "$value"
 }
 
+compat_validate() {
+  local snapshot="$ROOT/docs/compatibility/abi/tc6-6.1.BETA26-api.txt"
+  local demand="$ROOT/docs/compatibility/abi/tc6-addon-demand.txt"
+  local target="$ROOT/build/libs/Thaumcraft-1.0.0-universal.jar"
+  local forge_src="$GRADLE_HOME_DIR/caches/minecraft/net/minecraftforge/forge/1.12.2-14.23.5.2847/stable/39/forgeSrc-1.12.2-14.23.5.2847.jar"
+  local mappings="$GRADLE_HOME_DIR/caches/minecraft/de/oceanlabs/mcp/mcp_stable/39/1.12.2/srgs/mcp-srg.srg"
+  python3 "$ROOT/scripts/tc6-compat.py" abi \
+    --jar "$ROOT/Thaumcraft-1.12.2-6.1.BETA26.jar" \
+    --check "$snapshot" || return 1
+  python3 "$ROOT/scripts/tc6-compat.py" demand \
+    --manifest "$ROOT/scripts/tc6-addon-corpus.txt" \
+    --jar-dir "$SMOKE_CACHE_DIR" \
+    --target "$target" \
+    --classpath "$forge_src" \
+    --mappings "$mappings" \
+    --check "$demand" || return 1
+  python3 "$ROOT/scripts/tc6-compat.py" target \
+    --demand "$demand" \
+    --policy "$ROOT/scripts/tc6-semantic-policy.txt" \
+    --check "$ROOT/docs/compatibility/abi/tc6-target.txt"
+}
+
+smoke_remap_modset() {
+  local modset="$1"
+  shift
+  local remap_jars=("$@")
+  [[ "${#remap_jars[@]}" -eq 0 ]] && return 0
+
+  local fg_dir="$GRADLE_HOME_DIR/caches/modules-2/files-2.1/net.minecraftforge.gradle/ForgeGradle/2.3-SNAPSHOT"
+  local fg_jar
+  fg_jar="$(find "$fg_dir" -type f -name 'ForgeGradle-*.jar' -print -quit 2>/dev/null || true)"
+  local mappings="$GRADLE_HOME_DIR/caches/minecraft/de/oceanlabs/mcp/mcp_stable/39/1.12.2/srgs/mcp-srg.srg"
+  local forge_src="$GRADLE_HOME_DIR/caches/minecraft/net/minecraftforge/forge/1.12.2-14.23.5.2847/stable/39/forgeSrc-1.12.2-14.23.5.2847.jar"
+  if [[ -z "$fg_jar" || ! -f "$mappings" || ! -f "$forge_src" ]]; then
+    printf 'smoke-modset: ForgeGradle remap inputs are missing; run ./scripts/dev.sh build first.\n' >&2
+    return 1
+  fi
+
+  local staging="$ROOT/run/smoke-remapped/$modset"
+  local scratch="$staging/.work"
+  rm -rf "$staging"
+  mkdir -p "$scratch/maps"
+
+  local container_root="/workspace/thaumcraft"
+  local container_gradle="/home/ubuntu/.gradle"
+  local fg_container="$container_gradle/${fg_jar#$GRADLE_HOME_DIR/}"
+  local mappings_container="$container_gradle/${mappings#$GRADLE_HOME_DIR/}"
+  local forge_container="$container_gradle/${forge_src#$GRADLE_HOME_DIR/}"
+  local special_source=(net.md_5.specialsource.SpecialSource -q -r -m "$mappings_container")
+
+  if ! docker run --rm \
+    -v "$ROOT:$container_root" \
+    -v "$GRADLE_HOME_DIR:$container_gradle" \
+    --user "$(id -u):$(id -g)" \
+    -w "$container_root" \
+    --entrypoint java \
+    "$IMAGE" -cp "$fg_container" "${special_source[@]}" \
+    -i "$forge_container" \
+    -o "$container_root/run/smoke-remapped/$modset/.work/forge.jar" \
+    -H "$container_root/run/smoke-remapped/$modset/.work/maps/forge.map" \
+    > "$scratch/forge-remap.log" 2>&1; then
+    cat "$scratch/forge-remap.log" >&2
+    return 1
+  fi
+
+  local jar base
+  for jar in "${remap_jars[@]}"; do
+    base="${jar%.jar}"
+    if ! docker run --rm \
+      -v "$ROOT:$container_root" \
+      -v "$GRADLE_HOME_DIR:$container_gradle" \
+      --user "$(id -u):$(id -g)" \
+      -w "$container_root" \
+      --entrypoint java \
+      "$IMAGE" -cp "$fg_container" "${special_source[@]}" \
+      -i "$container_root/.smoke/$jar" \
+      -o "$container_root/run/smoke-remapped/$modset/.work/$jar" \
+      -H "$container_root/run/smoke-remapped/$modset/.work/maps/$base.map" \
+      > "$scratch/$base-inheritance.log" 2>&1; then
+      cat "$scratch/$base-inheritance.log" >&2
+      return 1
+    fi
+  done
+  sort -u "$scratch"/maps/*.map > "$scratch/inheritance.map"
+
+  for jar in "${remap_jars[@]}"; do
+    base="${jar%.jar}"
+    if ! docker run --rm \
+      -v "$ROOT:$container_root" \
+      -v "$GRADLE_HOME_DIR:$container_gradle" \
+      --user "$(id -u):$(id -g)" \
+      -w "$container_root" \
+      --entrypoint java \
+      "$IMAGE" -cp "$fg_container" "${special_source[@]}" \
+      -h "$container_root/run/smoke-remapped/$modset/.work/inheritance.map" \
+      -i "$container_root/.smoke/$jar" \
+      -o "$container_root/run/smoke-remapped/$modset/$jar" \
+      > "$scratch/$base-remap.log" 2>&1; then
+      cat "$scratch/$base-remap.log" >&2
+      return 1
+    fi
+  done
+
+  for jar in "${remap_jars[@]}"; do
+    local verify_args=(
+      verify-remap
+      --source "$SMOKE_CACHE_DIR/$jar"
+      --remapped "$staging/$jar"
+      --mappings "$mappings"
+    )
+    python3 "$ROOT/scripts/tc6-compat.py" "${verify_args[@]}"
+  done
+  rm -rf "$scratch"
+}
+
+smoke_server_isolated_world() {
+  local world="$ROOT/run/world"
+  local backup=""
+  if [[ -e "$world" ]]; then
+    backup="$(mktemp -d "$ROOT/run/smoke-world-backup.XXXXXX")"
+    mv "$world" "$backup/world"
+  fi
+
+  local result
+  set +e
+  smoke_server
+  result=$?
+  set -e
+
+  rm -rf "$world"
+  if [[ -n "$backup" ]]; then
+    mv "$backup/world" "$world"
+    rmdir "$backup"
+  fi
+  return "$result"
+}
+
 smoke_modset() {
   if [[ "$#" -ne 1 || -z "${1:-}" ]]; then
     printf 'Usage: ./scripts/dev.sh smoke-modset <name>\n' >&2
@@ -194,17 +334,24 @@ smoke_modset() {
   fi
 
   local jars=()
-  local raw line jar expected actual source_path line_no=0 missing=0
+  local modes=()
+  local remap_jars=()
+  local raw line jar expected mode actual source_path line_no=0 missing=0
   while IFS= read -r raw || [[ -n "$raw" ]]; do
     line_no=$((line_no + 1))
     line="$(trim_string "$raw")"
     [[ -z "$line" || "${line:0:1}" == "#" ]] && continue
 
-    IFS='|' read -r jar expected _ <<< "$line"
+    IFS='|' read -r jar expected _ mode <<< "$line"
     jar="$(trim_string "${jar:-}")"
     expected="$(trim_string "${expected:-}")"
+    mode="$(trim_string "${mode:-direct}")"
     if [[ -z "$jar" || "$jar" == */* ]]; then
       printf 'smoke-modset: invalid jar name at %s:%s\n' "$manifest" "$line_no" >&2
+      return 1
+    fi
+    if [[ "$mode" != "direct" && "$mode" != "dev-remap" ]]; then
+      printf 'smoke-modset: invalid mode %s at %s:%s\n' "$mode" "$manifest" "$line_no" >&2
       return 1
     fi
 
@@ -227,6 +374,10 @@ smoke_modset() {
     fi
 
     jars+=("$jar")
+    modes+=("$mode")
+    if [[ "$mode" == "dev-remap" ]]; then
+      remap_jars+=("$jar")
+    fi
   done < "$manifest"
 
   if [[ "$missing" -ne 0 ]]; then
@@ -242,14 +393,22 @@ smoke_modset() {
   mkdir -p "$mods_dir"
   find "$mods_dir" -maxdepth 1 -type f -name '*.jar' -delete
 
-  for jar in "${jars[@]}"; do
-    cp "$SMOKE_CACHE_DIR/$jar" "$mods_dir/$jar"
+  smoke_remap_modset "$modset" "${remap_jars[@]}"
+
+  local index
+  for index in "${!jars[@]}"; do
+    jar="${jars[$index]}"
+    if [[ "${modes[$index]}" == "dev-remap" ]]; then
+      cp "$ROOT/run/smoke-remapped/$modset/$jar" "$mods_dir/$jar"
+    else
+      cp "$SMOKE_CACHE_DIR/$jar" "$mods_dir/$jar"
+    fi
   done
 
   printf "Smoke modset '%s': prepared %s jar(s) from %s.\n" "$modset" "${#jars[@]}" "$SMOKE_CACHE_DIR"
   # The smoke server runs Gradle with --no-daemon; stop the persistent daemon first to avoid cache lock false failures.
   docker_daemon_stop
-  smoke_server
+  smoke_server_isolated_world
 }
 
 mcp_leak_summary() {
@@ -1071,6 +1230,29 @@ validate() {
   fi
 }
 
+compat_release() {
+  validate || return 1
+  compat_validate || return 1
+
+  local modset
+  for modset in enderio fossils magicbees jeid witchery; do
+    printf '\nTC6 compatibility smoke: %s\n' "$modset"
+    smoke_modset "$modset" || return 1
+  done
+
+  mkdir -p "$ROOT/run/validate"
+  docker_gradle --console=plain -q build > "$ROOT/run/validate/compat-build.log" 2>&1 || {
+    printf 'TC6 compatibility release FAILED: final build; log: run/validate/compat-build.log\n' >&2
+    return 1
+  }
+  check_jar > "$ROOT/run/validate/compat-check-jar.log" 2>&1 || {
+    printf 'TC6 compatibility release FAILED: final jar check; log: run/validate/compat-check-jar.log\n' >&2
+    return 1
+  }
+  compat_validate || return 1
+  printf '\nTC6 compatibility release PASSED: validation, 5 modsets, final build and artifact checks\n'
+}
+
 cmd="${1:-help}"
 case "$cmd" in
   help|-h|--help)
@@ -1108,6 +1290,12 @@ case "$cmd" in
   validate)
     shift
     validate "$@"
+    ;;
+  compat-validate)
+    compat_validate
+    ;;
+  compat-release)
+    compat_release
     ;;
   smoke-server)
     smoke_server
