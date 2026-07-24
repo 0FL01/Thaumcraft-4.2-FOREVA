@@ -48,7 +48,7 @@ public class TileCrucibleRenderer extends TileEntitySpecialRenderer<TileCrucible
         float r = 1.0F;
         float g = 1.0F - recolor / 3.0F;
         float b = 1.0F - recolor;
-        float a = 1.0F - recolor / 2.0F;
+        float a = 1.0F - raw / 2.0F;
         int color = ((int) (a * 255.0F) << 24)
                 | ((int) (r * 255.0F) << 16)
                 | ((int) (g * 255.0F) << 8)
