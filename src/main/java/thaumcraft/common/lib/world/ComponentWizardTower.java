@@ -3,9 +3,10 @@ package thaumcraft.common.lib.world;
 import java.util.List;
 import java.util.Random;
 
-import net.minecraft.block.Block;
+import net.minecraft.block.BlockLadder;
+import net.minecraft.block.BlockStairs;
+import net.minecraft.block.BlockTrapDoor;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.entity.passive.EntityVillager;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
@@ -13,8 +14,6 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityChest;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.WeightedRandom;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.gen.structure.StructureBoundingBox;
@@ -55,57 +54,59 @@ public class ComponentWizardTower extends StructureVillagePieces.Village {
             this.boundingBox.offset(0, this.averageGroundLevel - this.boundingBox.maxY + 12 - 1, 0);
         }
 
+        IBlockState cobblestone = this.getBiomeSpecificBlockState(Blocks.COBBLESTONE.getDefaultState());
+        IBlockState planks = this.getBiomeSpecificBlockState(Blocks.PLANKS.getDefaultState());
+        IBlockState stoneStairs = this.getBiomeSpecificBlockState(Blocks.STONE_STAIRS.getDefaultState()
+                .withProperty(BlockStairs.FACING, EnumFacing.NORTH));
+
         // Hollow interior
         this.fillWithBlocks(world, bb, 2, 1, 2, 4, 11, 4, Blocks.AIR.getDefaultState(), Blocks.AIR.getDefaultState(), false);
         // Base floor
-        this.fillWithBlocks(world, bb, 2, 0, 2, 4, 0, 4, Blocks.COBBLESTONE.getDefaultState(), Blocks.COBBLESTONE.getDefaultState(), false);
+        this.fillWithBlocks(world, bb, 2, 0, 2, 4, 0, 4, planks, planks, false);
         // Mid floor (y=5)
-        this.fillWithBlocks(world, bb, 2, 5, 2, 4, 5, 4, Blocks.PLANKS.getDefaultState(), Blocks.PLANKS.getDefaultState(), false);
+        this.fillWithBlocks(world, bb, 2, 5, 2, 4, 5, 4, planks, planks, false);
         // Roof (y=10)
-        this.fillWithBlocks(world, bb, 2, 10, 2, 4, 10, 4, Blocks.PLANKS.getDefaultState(), Blocks.PLANKS.getDefaultState(), false);
+        this.fillWithBlocks(world, bb, 2, 10, 2, 4, 10, 4, planks, planks, false);
 
         // Wall pillars / corners (cobblestone vertical strips)
-        this.fillWithBlocks(world, bb, 1, 0, 2, 1, 11, 4, Blocks.COBBLESTONE.getDefaultState(), Blocks.COBBLESTONE.getDefaultState(), false);
-        this.fillWithBlocks(world, bb, 2, 0, 1, 4, 11, 1, Blocks.COBBLESTONE.getDefaultState(), Blocks.COBBLESTONE.getDefaultState(), false);
-        this.fillWithBlocks(world, bb, 5, 0, 2, 5, 11, 4, Blocks.COBBLESTONE.getDefaultState(), Blocks.COBBLESTONE.getDefaultState(), false);
-        this.fillWithBlocks(world, bb, 2, 0, 5, 4, 11, 5, Blocks.COBBLESTONE.getDefaultState(), Blocks.COBBLESTONE.getDefaultState(), false);
+        this.fillWithBlocks(world, bb, 1, 0, 2, 1, 11, 4, cobblestone, cobblestone, false);
+        this.fillWithBlocks(world, bb, 2, 0, 1, 4, 11, 1, cobblestone, cobblestone, false);
+        this.fillWithBlocks(world, bb, 5, 0, 2, 5, 11, 4, cobblestone, cobblestone, false);
+        this.fillWithBlocks(world, bb, 2, 0, 5, 4, 11, 5, cobblestone, cobblestone, false);
 
-        // Fence posts at outer corners (bottom)
-        this.setBlockState(world, Blocks.OAK_FENCE.getDefaultState(), 1, 0, 1, bb);
-        this.setBlockState(world, Blocks.OAK_FENCE.getDefaultState(), 1, 0, 5, bb);
-        this.setBlockState(world, Blocks.OAK_FENCE.getDefaultState(), 5, 0, 1, bb);
-        this.setBlockState(world, Blocks.OAK_FENCE.getDefaultState(), 5, 0, 5, bb);
+        // Outer corners
+        this.setBlockState(world, cobblestone, 1, 0, 1, bb);
+        this.setBlockState(world, cobblestone, 1, 0, 5, bb);
+        this.setBlockState(world, cobblestone, 5, 0, 1, bb);
+        this.setBlockState(world, cobblestone, 5, 0, 5, bb);
+        this.setBlockState(world, cobblestone, 1, 5, 1, bb);
+        this.setBlockState(world, cobblestone, 1, 5, 5, bb);
+        this.setBlockState(world, cobblestone, 5, 5, 1, bb);
+        this.setBlockState(world, cobblestone, 5, 5, 5, bb);
+        this.setBlockState(world, cobblestone, 1, 10, 1, bb);
+        this.setBlockState(world, cobblestone, 1, 10, 5, bb);
+        this.setBlockState(world, cobblestone, 5, 10, 1, bb);
+        this.setBlockState(world, cobblestone, 5, 10, 5, bb);
 
-        // Fence posts at outer corners (mid)
-        this.setBlockState(world, Blocks.OAK_FENCE.getDefaultState(), 1, 5, 1, bb);
-        this.setBlockState(world, Blocks.OAK_FENCE.getDefaultState(), 1, 5, 5, bb);
-        this.setBlockState(world, Blocks.OAK_FENCE.getDefaultState(), 5, 5, 1, bb);
-        this.setBlockState(world, Blocks.OAK_FENCE.getDefaultState(), 5, 5, 5, bb);
-
-        // Fence posts at outer corners (roof)
-        this.setBlockState(world, Blocks.OAK_FENCE.getDefaultState(), 1, 10, 1, bb);
-        this.setBlockState(world, Blocks.OAK_FENCE.getDefaultState(), 1, 10, 5, bb);
-        this.setBlockState(world, Blocks.OAK_FENCE.getDefaultState(), 5, 10, 1, bb);
-        this.setBlockState(world, Blocks.OAK_FENCE.getDefaultState(), 5, 10, 5, bb);
-
-        // Fence gate at front (z=1)
-        this.setBlockState(world, Blocks.OAK_FENCE_GATE.getDefaultState(), 3, 7, 1, bb);
-        this.setBlockState(world, Blocks.OAK_FENCE_GATE.getDefaultState(), 3, 8, 1, bb);
-        this.setBlockState(world, Blocks.OAK_FENCE_GATE.getDefaultState(), 3, 7, 5, bb);
-        this.setBlockState(world, Blocks.OAK_FENCE_GATE.getDefaultState(), 3, 8, 5, bb);
-        this.setBlockState(world, Blocks.OAK_FENCE_GATE.getDefaultState(), 3, 2, 5, bb);
-        this.setBlockState(world, Blocks.OAK_FENCE_GATE.getDefaultState(), 3, 3, 5, bb);
+        // Windows
+        this.setBlockState(world, Blocks.GLASS_PANE.getDefaultState(), 3, 7, 1, bb);
+        this.setBlockState(world, Blocks.GLASS_PANE.getDefaultState(), 3, 8, 1, bb);
+        this.setBlockState(world, Blocks.GLASS_PANE.getDefaultState(), 3, 7, 5, bb);
+        this.setBlockState(world, Blocks.GLASS_PANE.getDefaultState(), 3, 8, 5, bb);
+        this.setBlockState(world, Blocks.GLASS_PANE.getDefaultState(), 3, 2, 5, bb);
+        this.setBlockState(world, Blocks.GLASS_PANE.getDefaultState(), 3, 3, 5, bb);
 
         // Ladder going up
-        IBlockState ladderState = Blocks.LADDER.getDefaultState();
+        IBlockState ladderState = Blocks.LADDER.getDefaultState().withProperty(BlockLadder.FACING, EnumFacing.WEST);
         for (int y = 1; y <= 9; ++y) {
             this.setBlockState(world, ladderState, 4, y, 3, bb);
         }
         // Trapdoor at top of ladder
-        this.setBlockState(world, Blocks.TRAPDOOR.getDefaultState(), 4, 10, 3, bb);
+        this.setBlockState(world, Blocks.TRAPDOOR.getDefaultState()
+                .withProperty(BlockTrapDoor.FACING, EnumFacing.WEST), 4, 10, 3, bb);
 
-        // Bookshelf
-        this.setBlockState(world, Blocks.BOOKSHELF.getDefaultState(), 3, 5, 3, bb);
+        // Light source
+        this.setBlockState(world, Blocks.GLOWSTONE.getDefaultState(), 3, 5, 3, bb);
 
         // Chest with loot
         this.placeChestWithLoot(world, bb, random, 2, 6, 2);
@@ -113,19 +114,19 @@ public class ComponentWizardTower extends StructureVillagePieces.Village {
         // Door placement
         this.setBlockState(world, Blocks.AIR.getDefaultState(), 3, 1, 1, bb);
         this.setBlockState(world, Blocks.AIR.getDefaultState(), 3, 2, 1, bb);
-        this.generateDoor(world, bb, random, 3, 1, 1, this.getCoordBaseMode(), Blocks.OAK_DOOR);
+        this.createVillageDoor(world, bb, random, 3, 1, 1, EnumFacing.NORTH);
 
-        // Step (double stone slab) outside door
+        // Step outside door
         if (this.getBlockStateFromPos(world, 3, 0, 0, bb).getMaterial() == net.minecraft.block.material.Material.AIR
                 && this.getBlockStateFromPos(world, 3, -1, 0, bb).getMaterial() != net.minecraft.block.material.Material.AIR) {
-            this.setBlockState(world, Blocks.DOUBLE_STONE_SLAB.getDefaultState(), 3, 0, 0, bb);
+            this.setBlockState(world, stoneStairs, 3, 0, 0, bb);
         }
 
         // Clear above the structure
         for (int z = 0; z < 12; ++z) {
             for (int x = 0; x < 5; ++x) {
                 this.clearCurrentPositionBlocksUpwards(world, x, 12, z, bb);
-                this.replaceAirAndLiquidDownwards(world, Blocks.COBBLESTONE.getDefaultState(), x, -1, z, bb);
+                this.replaceAirAndLiquidDownwards(world, cobblestone, x, -1, z, bb);
             }
         }
 

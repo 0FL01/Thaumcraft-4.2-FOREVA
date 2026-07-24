@@ -87,6 +87,8 @@ entity.Thaumcraft.Pech.2.name=Pech Stalker
 entity.thaumcraft.pech.name=Pech Forager
 entity.thaumcraft.pech.1.name=Pech Mage
 entity.thaumcraft.pech.2.name=Pech Stalker
+entity.Villager.wizard=Wizard
+entity.Villager.banker=Banker
 # Entities
 entity.thaumcraft.specialitem.name=Magic Item
 entity.thaumcraft.permanentitem.name=Permanent Item
