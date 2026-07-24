@@ -27,7 +27,6 @@ import java.util.Random;
 
 public class BiomeMagicalForest extends Biome {
 
-    protected WorldGenBigMagicTree bigTree = new WorldGenBigMagicTree(false);
     private static final WorldGenBlockBlob blobs = new WorldGenBlockBlob(Blocks.STONE, 0);
 
     public BiomeMagicalForest() {
@@ -69,7 +68,7 @@ public class BiomeMagicalForest extends Biome {
         if (rand.nextInt(10) == 0) {
             return new WorldGenGreatwoodTrees(false);
         }
-        return this.bigTree;
+        return new WorldGenBigMagicTree(false);
     }
 
     public WorldGenerator getRandomWorldGenForGrass(Random rand) {
