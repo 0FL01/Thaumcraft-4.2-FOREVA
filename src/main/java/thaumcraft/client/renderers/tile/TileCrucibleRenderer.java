@@ -8,11 +8,20 @@ import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
+import net.minecraft.client.renderer.vertex.VertexFormat;
 import net.minecraft.init.Blocks;
 import org.lwjgl.opengl.GL11;
 import thaumcraft.common.tiles.TileCrucible;
 
 public class TileCrucibleRenderer extends TileEntitySpecialRenderer<TileCrucible> {
+
+    private static final VertexFormat FLUID_VERTEX_FORMAT = new VertexFormat()
+            .addElement(DefaultVertexFormats.POSITION_3F)
+            .addElement(DefaultVertexFormats.TEX_2F)
+            .addElement(DefaultVertexFormats.COLOR_4UB)
+            .addElement(DefaultVertexFormats.TEX_2S)
+            .addElement(DefaultVertexFormats.NORMAL_3B)
+            .addElement(DefaultVertexFormats.PADDING_1B);
 
     @Override
     public void render(TileCrucible tile, double x, double y, double z, float partialTicks, int destroyStage, float alpha) {
@@ -69,7 +78,7 @@ public class TileCrucibleRenderer extends TileEntitySpecialRenderer<TileCrucible
         float g = ((argb >> 8) & 0xFF) / 255.0F;
         float b = (argb & 0xFF) / 255.0F;
         BufferBuilder buffer = Tessellator.getInstance().getBuffer();
-        buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.BLOCK);
+        buffer.begin(GL11.GL_QUADS, FLUID_VERTEX_FORMAT);
         addFluidVertex(buffer, -half, -half, u0, v1, r, g, b, a, lightU, lightV);
         addFluidVertex(buffer, half, -half, u1, v1, r, g, b, a, lightU, lightV);
         addFluidVertex(buffer, half, half, u1, v0, r, g, b, a, lightU, lightV);
@@ -80,8 +89,8 @@ public class TileCrucibleRenderer extends TileEntitySpecialRenderer<TileCrucible
     private static void addFluidVertex(BufferBuilder buffer, float x, float y, float u, float v,
                                        float r, float g, float b, float a, int lightU, int lightV) {
         buffer.pos(x, y, 0.0D)
-                .color(r, g, b, a)
                 .tex(u, v)
+                .color(r, g, b, a)
                 .lightmap(lightU, lightV)
                 .normal(0.0F, 0.0F, 1.0F)
                 .endVertex();

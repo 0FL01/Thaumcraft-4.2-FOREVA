@@ -17,17 +17,41 @@ public class CrucibleRendererFidelityStaticGuardTest {
         String tileSource = read("src/main/java/thaumcraft/common/tiles/TileCrucible.java");
         String blockSource = read("src/main/java/thaumcraft/common/blocks/BlockMetalDevice.java");
         String blockModel = read("src/main/resources/assets/thaumcraft/models/block/blockmetaldevice_0.json");
+        int fluidFormat = source.indexOf("private static final VertexFormat FLUID_VERTEX_FORMAT");
+        int positionElement = source.indexOf(".addElement(DefaultVertexFormats.POSITION_3F)", fluidFormat);
+        int textureElement = source.indexOf(".addElement(DefaultVertexFormats.TEX_2F)", positionElement);
+        int colorElement = source.indexOf(".addElement(DefaultVertexFormats.COLOR_4UB)", textureElement);
+        int lightmapElement = source.indexOf(".addElement(DefaultVertexFormats.TEX_2S)", colorElement);
+        int normalElement = source.indexOf(".addElement(DefaultVertexFormats.NORMAL_3B)", lightmapElement);
+        int paddingElement = source.indexOf(".addElement(DefaultVertexFormats.PADDING_1B)", normalElement);
+        int vertex = source.indexOf("buffer.pos(x, y, 0.0D)");
+        int vertexTexture = source.indexOf(".tex(u, v)", vertex);
+        int vertexColor = source.indexOf(".color(r, g, b, a)", vertexTexture);
+        int vertexLightmap = source.indexOf(".lightmap(lightU, lightV)", vertexColor);
+        int vertexNormal = source.indexOf(".normal(0.0F, 0.0F, 1.0F)", vertexLightmap);
 
         assertTrue("Crucible renderer should resolve water atlas sprite for the surface quad",
                 source.contains("Blocks.WATER.getDefaultState()"));
         assertTrue("Crucible renderer should use world combined light at tile position",
                 source.contains("getCombinedLight(tile.getPos(), 0)"));
-        assertTrue("Crucible renderer should submit original per-vertex combined light and upward normals",
-                source.contains("DefaultVertexFormats.BLOCK")
+        assertTrue("Crucible renderer should use the donor vertex layout instead of writing normals into BLOCK positions",
+                fluidFormat >= 0
+                        && positionElement > fluidFormat
+                        && textureElement > positionElement
+                        && colorElement > textureElement
+                        && lightmapElement > colorElement
+                        && normalElement > lightmapElement
+                        && paddingElement > normalElement
+                        && source.contains("buffer.begin(GL11.GL_QUADS, FLUID_VERTEX_FORMAT);"));
+        assertTrue("Crucible renderer should submit data in the same order as its vertex format",
+                vertex >= 0
+                        && vertexTexture > vertex
+                        && vertexColor > vertexTexture
+                        && vertexLightmap > vertexColor
+                        && vertexNormal > vertexLightmap
                         && source.contains("int lightU = (packedLight >> 16) & 0xFFFF;")
                         && source.contains("int lightV = packedLight & 0xFFFF;")
-                        && source.contains(".lightmap(lightU, lightV)")
-                        && source.contains(".normal(0.0F, 0.0F, 1.0F)"));
+                        && !source.contains("buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.BLOCK);"));
         assertTrue("Crucible renderer should map quad UVs from water sprite bounds",
                 source.contains("water.getMinU()")
                         && source.contains("water.getMaxU()")
