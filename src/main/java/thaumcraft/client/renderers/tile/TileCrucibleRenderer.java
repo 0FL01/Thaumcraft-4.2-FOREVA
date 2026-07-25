@@ -43,11 +43,10 @@ public class TileCrucibleRenderer extends TileEntitySpecialRenderer<TileCrucible
             return;
         }
 
-        float raw = TileRenderHelper.clamp01((float) tile.tagAmount() / 500.0F);
-        float recolor = raw;
+        float raw = TileRenderHelper.clamp01((float) tile.tagAmount() / (float) tile.maxTags);
         float r = 1.0F;
-        float g = 1.0F - recolor / 3.0F;
-        float b = 1.0F - recolor;
+        float g = 1.0F - raw;
+        float b = 1.0F - raw * 0.75F;
         float a = 1.0F - raw / 2.0F;
         int color = ((int) (a * 255.0F) << 24)
                 | ((int) (r * 255.0F) << 16)
