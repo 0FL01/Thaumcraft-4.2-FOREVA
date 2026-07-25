@@ -15,9 +15,12 @@ public class VillageStructureParityStaticGuardTest {
     public void wizardTowerKeepsTc4BlocksAndLocalDirections() throws Exception {
         String source = read("src/main/java/thaumcraft/common/lib/world/ComponentWizardTower.java");
 
-        assertTrue(source.contains("getBiomeSpecificBlockState(Blocks.COBBLESTONE.getDefaultState())"));
+        assertTrue(source.contains("0, 0, 0, 6, 12, 6, facing"));
+        assertTrue(source.contains("for (int z = 0; z < 6; ++z)"));
+        assertTrue(source.contains("for (int x = 0; x < 6; ++x)"));
+        assertTrue(source.contains("IBlockState cobblestone = Blocks.COBBLESTONE.getDefaultState()"));
         assertTrue(source.contains("getBiomeSpecificBlockState(Blocks.PLANKS.getDefaultState())"));
-        assertTrue(source.contains("getBiomeSpecificBlockState(Blocks.STONE_STAIRS.getDefaultState()"));
+        assertTrue(source.contains("IBlockState stoneStairs = Blocks.STONE_STAIRS.getDefaultState()"));
         assertTrue(source.contains("fillWithBlocks(world, bb, 2, 0, 2, 4, 0, 4, planks, planks, false)"));
         assertTrue(source.contains("Blocks.GLASS_PANE.getDefaultState()"));
         assertTrue(source.contains("Blocks.GLOWSTONE.getDefaultState()"));

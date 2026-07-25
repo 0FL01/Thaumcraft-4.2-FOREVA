@@ -40,7 +40,7 @@ public class ComponentWizardTower extends StructureVillagePieces.Village {
      * Builds the wizard tower component.
      */
     public static ComponentWizardTower buildComponent(StructureVillagePieces.Start start, List<StructureComponent> pieces, Random random, int p1, int p2, int p3, EnumFacing facing, int p5) {
-        StructureBoundingBox bb = StructureBoundingBox.getComponentToAddBoundingBox(p1, p2, p3, 0, 0, 0, 5, 12, 5, facing);
+        StructureBoundingBox bb = StructureBoundingBox.getComponentToAddBoundingBox(p1, p2, p3, 0, 0, 0, 6, 12, 6, facing);
         return (!canVillageGoDeeper(bb) || StructureComponent.findIntersecting(pieces, bb) != null) ? null : new ComponentWizardTower(start, p5, random, bb, facing);
     }
 
@@ -54,10 +54,10 @@ public class ComponentWizardTower extends StructureVillagePieces.Village {
             this.boundingBox.offset(0, this.averageGroundLevel - this.boundingBox.maxY + 12 - 1, 0);
         }
 
-        IBlockState cobblestone = this.getBiomeSpecificBlockState(Blocks.COBBLESTONE.getDefaultState());
+        IBlockState cobblestone = Blocks.COBBLESTONE.getDefaultState();
         IBlockState planks = this.getBiomeSpecificBlockState(Blocks.PLANKS.getDefaultState());
-        IBlockState stoneStairs = this.getBiomeSpecificBlockState(Blocks.STONE_STAIRS.getDefaultState()
-                .withProperty(BlockStairs.FACING, EnumFacing.NORTH));
+        IBlockState stoneStairs = Blocks.STONE_STAIRS.getDefaultState()
+                .withProperty(BlockStairs.FACING, EnumFacing.NORTH);
 
         // Hollow interior
         this.fillWithBlocks(world, bb, 2, 1, 2, 4, 11, 4, Blocks.AIR.getDefaultState(), Blocks.AIR.getDefaultState(), false);
@@ -123,8 +123,8 @@ public class ComponentWizardTower extends StructureVillagePieces.Village {
         }
 
         // Clear above the structure
-        for (int z = 0; z < 12; ++z) {
-            for (int x = 0; x < 5; ++x) {
+        for (int z = 0; z < 6; ++z) {
+            for (int x = 0; x < 6; ++x) {
                 this.clearCurrentPositionBlocksUpwards(world, x, 12, z, bb);
                 this.replaceAirAndLiquidDownwards(world, cobblestone, x, -1, z, bb);
             }
