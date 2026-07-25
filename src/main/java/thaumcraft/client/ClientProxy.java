@@ -1023,6 +1023,7 @@ public class ClientProxy extends CommonProxy {
         }
         registerBuiltinItemModel(woodenDeviceItem, 0, "blockwoodendevice_bellows_tesr");
         registerBuiltinItemModel(woodenDeviceItem, 1, "blockwoodendevice_1_inventory");
+        registerBuiltinItemModel(woodenDeviceItem, 2, "blockwoodendevice_2_inventory");
         registerBuiltinItemModel(woodenDeviceItem, 4, "blockwoodendevice_tesr");
         registerBuiltinItemModel(woodenDeviceItem, 5, "blockwoodendevice_tesr");
         registerBuiltinItemModel(woodenDeviceItem, 8, "blockwoodendevice_banner_tesr");
