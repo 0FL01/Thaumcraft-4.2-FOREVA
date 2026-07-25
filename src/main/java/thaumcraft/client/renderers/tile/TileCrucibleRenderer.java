@@ -43,7 +43,7 @@ public class TileCrucibleRenderer extends TileEntitySpecialRenderer<TileCrucible
             return;
         }
 
-        float raw = TileRenderHelper.clamp01((float) tile.tagAmount() / 100.0F);
+        float raw = TileRenderHelper.clamp01((float) tile.tagAmount() / 500.0F);
         float recolor = raw;
         float r = 1.0F;
         float g = 1.0F - recolor / 3.0F;

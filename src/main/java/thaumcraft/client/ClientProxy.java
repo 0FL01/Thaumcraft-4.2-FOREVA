@@ -2201,79 +2201,27 @@ public class ClientProxy extends CommonProxy {
     @Override
     public void crucibleFroth(World world, float x, float y, float z) {
         if (world == null || !world.isRemote) return;
-        int amount = particleCount(1);
-        if (amount <= 0) return;
-
-        for (int i = 0; i < amount; i++) {
-            FXBubble bubble = new FXBubble(
-                    world,
-                    x,
-                    y,
-                    z,
-                    0.0D,
-                    0.0D,
-                    0.0D,
-                    4 + world.rand.nextInt(3));
-            bubble.setRGB(0.5F, 0.5F, 0.7F);
-            bubble.setParticle(64)
-                    .setFinalParticles(65, 2)
-                    .setScale(0.2F + world.rand.nextFloat() * 0.2F)
-                    .setRandomMovementScale(0.001D, 0.001D, 0.001D)
-                    .setGravity(0.1F);
-            ParticleEngine.addEffect(world, bubble);
-        }
+        FXBubble bubble = new FXBubble(world, x, y, z, 0.0D, 0.0D, 0.0D, -4);
+        bubble.setRGB(0.5F, 0.5F, 0.7F);
+        bubble.setFroth();
+        ParticleEngine.addEffect(world, bubble);
     }
 
     @Override
     public void crucibleFrothDown(World world, float x, float y, float z) {
         if (world == null || !world.isRemote) return;
-        int amount = particleCount(1);
-        if (amount <= 0) return;
-
-        for (int i = 0; i < amount; i++) {
-            FXBubble bubble = new FXBubble(
-                    world,
-                    x,
-                    y,
-                    z,
-                    0.0D,
-                    0.0D,
-                    0.0D,
-                    12 + world.rand.nextInt(12));
-            bubble.setRGB(0.25F, 0.0F, 0.75F);
-            bubble.setParticle(73)
-                    .setFinalParticles(65, 2)
-                    .setScale(0.4F + world.rand.nextFloat() * 0.2F)
-                    .setAlpha(0.8F)
-                    .setGravity(0.05F);
-            ParticleEngine.addEffect(world, bubble);
-        }
+        FXBubble bubble = new FXBubble(world, x, y, z, 0.0D, 0.0D, 0.0D, -4);
+        bubble.setRGB(0.5F, 0.5F, 0.7F);
+        bubble.setFroth2();
+        ParticleEngine.addEffect(world, bubble);
     }
 
     @Override
     public void crucibleBubble(World world, float x, float y, float z, float red, float green, float blue) {
         if (world == null || !world.isRemote) return;
-        int amount = particleCount(1);
-        if (amount <= 0) return;
-
-        for (int i = 0; i < amount; i++) {
-            FXBubble bubble = new FXBubble(
-                    world,
-                    x,
-                    y,
-                    z,
-                    0.0D,
-                    0.0D,
-                    0.0D,
-                    15 + world.rand.nextInt(10));
-            bubble.setRGB(red, green, blue);
-            bubble.setParticle(64)
-                    .setFinalParticles(65, 2)
-                    .setScale(0.3F + world.rand.nextFloat() * 0.3F)
-                    .setRandomMovementScale(0.002D, 0.002D, 0.002D)
-                    .setGravity(-0.001F);
-            ParticleEngine.addEffect(world, bubble);
-        }
+        FXBubble bubble = new FXBubble(world, x, y, z, 0.0D, 0.0D, 0.0D, 1);
+        bubble.setRGB(red, green, blue);
+        ParticleEngine.addEffect(world, bubble);
     }
 
     @Override
@@ -2303,7 +2251,7 @@ public class ClientProxy extends CommonProxy {
     public void crucibleBoil(World world, int x, int y, int z, TileCrucible crucible, int type) {
         if (world == null || !world.isRemote || crucible == null) return;
 
-        for (int i = 0; i < 2; i++) {
+        for (int i = 0; i < particleCount(1); i++) {
             FXBubble bubble = new FXBubble(
                     world,
                     x + 0.2f + world.rand.nextFloat() * 0.6f,
@@ -2312,7 +2260,7 @@ public class ClientProxy extends CommonProxy {
                     0.0,
                     0.0,
                     0.0,
-                    (int) (7.0D + 8.0D / (world.rand.nextDouble() * 0.8D + 0.2D)));
+                    3);
             if (crucible.aspects == null || crucible.aspects.size() <= 0) {
                 bubble.setRGB(1.0f, 1.0f, 1.0f);
             } else {
@@ -2322,11 +2270,7 @@ public class ClientProxy extends CommonProxy {
                     bubble.setRGB(normalizeColor(tint.getRed()), normalizeColor(tint.getGreen()), normalizeColor(tint.getBlue()));
                 }
             }
-            bubble.setParticle(64)
-                    .setFinalParticles(65, 2)
-                    .setScale(0.2F + world.rand.nextFloat() * 0.3F)
-                    .setRandomMovementScale(0.001D, 0.001D, 0.001D)
-                    .setGravity(-0.025F * type);
+            bubble.setBubbleSpeed(0.003D * type);
             ParticleEngine.addEffect(world, bubble);
         }
     }

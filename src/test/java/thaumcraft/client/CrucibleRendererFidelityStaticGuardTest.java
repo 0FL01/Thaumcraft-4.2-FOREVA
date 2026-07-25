@@ -59,9 +59,11 @@ public class CrucibleRendererFidelityStaticGuardTest {
                         && source.contains("water.getMaxV()"));
         assertTrue("Crucible fluid quad should cover a full block like the original UtilsFX.renderQuadFromIcon scale 1.0 path",
                 source.contains("drawFluidSurface(0.5F"));
-        assertTrue("Low aspect counts should tint translucent 1.12 water sprites without immediate RGB or alpha drops",
-                source.contains("float recolor = raw;")
+        assertTrue("Crucible tint should use the donor 1.12 capacity scale without immediate RGB or alpha drops",
+                source.contains("tile.tagAmount() / 500.0F")
+                        && source.contains("float recolor = raw;")
                         && source.contains("float a = 1.0F - raw / 2.0F;")
+                        && !source.contains("tile.tagAmount() / 100.0F")
                         && !source.contains("0.5F + raw / 2.0F")
                         && !source.contains("float a = 1.0F - recolor / 2.0F;"));
         assertTrue("Crucible surface should require actual water like TC4",
@@ -109,12 +111,10 @@ public class CrucibleRendererFidelityStaticGuardTest {
         String bubble = read("src/main/java/thaumcraft/client/fx/particles/FXBubble.java");
         String proxy = read("src/main/java/thaumcraft/client/ClientProxy.java");
 
-        assertTrue("Crucible bubbles should support the TC6 particle strip indices 64-66 and frothDown index 73",
-                bubble.contains("setParticle(int particle)")
-                        && bubble.contains("setFinalParticles(int start, int count)")
-                        && proxy.contains("setParticle(64)")
-                        && proxy.contains("setFinalParticles(65, 2)")
-                        && proxy.contains("setParticle(73)"));
+        assertTrue("Crucible bubbles should keep the original TC4 ring strip frames 16-19",
+                bubble.contains("public int particle = 16;")
+                        && bubble.contains("private int finalParticleStart = 17;")
+                        && bubble.contains("private int finalParticleCount = 2;"));
         assertTrue("Crucible bubbles should render their own fullbright colored billboard instead of delegating to vanilla particle visuals",
                 bubble.contains("float u0 = (float) (this.particle % 16) / 16.0F;")
                         && bubble.contains("Particle.interpPosX")
@@ -128,15 +128,15 @@ public class CrucibleRendererFidelityStaticGuardTest {
                         && bubble.contains("return 3;")
                         && !bubble.contains("super.renderParticle(buffer")
                         && !bubble.contains("setParticleTextureIndex("));
-        assertTrue("Crucible proxy should use TC6-style gravity, random drift, alpha, and fixed boil burst count",
-                proxy.contains("setRandomMovementScale(0.001D, 0.001D, 0.001D)")
-                        && proxy.contains("setRandomMovementScale(0.002D, 0.002D, 0.002D)")
-                        && proxy.contains("setGravity(0.1F)")
-                        && proxy.contains("setGravity(0.05F)")
-                        && proxy.contains("setGravity(-0.001F)")
-                        && proxy.contains("setGravity(-0.025F * type)")
-                        && proxy.contains("setAlpha(0.8F)")
-                        && proxy.contains("for (int i = 0; i < 2; i++)"));
+        assertTrue("Crucible proxy should use original TC4 bubble setup instead of TC6 particle overrides",
+                proxy.contains("new FXBubble(world, x, y, z, 0.0D, 0.0D, 0.0D, -4)")
+                        && proxy.contains("bubble.setFroth();")
+                        && proxy.contains("bubble.setFroth2();")
+                        && proxy.contains("new FXBubble(world, x, y, z, 0.0D, 0.0D, 0.0D, 1)")
+                        && proxy.contains("for (int i = 0; i < particleCount(1); i++)")
+                        && proxy.contains("bubble.setBubbleSpeed(0.003D * type);")
+                        && !proxy.contains("setParticle(64)")
+                        && !proxy.contains("setParticle(73)"));
     }
 
     @Test

@@ -192,10 +192,8 @@ public class ClientProxyFxStaticGuardTest {
                         && source.contains("public void crucibleFrothDown(")
                         && source.contains("new FXBubble(")
                         && source.contains("bubble.setRGB(0.5F, 0.5F, 0.7F)")
-                        && source.contains("bubble.setRGB(0.25F, 0.0F, 0.75F)")
-                        && source.contains("setParticle(64)")
-                        && source.contains("setParticle(73)")
-                        && source.contains("setFinalParticles(65, 2)")
+                        && source.contains("bubble.setFroth();")
+                        && source.contains("bubble.setFroth2();")
                         && !source.contains("new FXSmokeDrift("));
         assertTrue("ClientProxy must override crucibleBubble with legacy colored bubble path",
                 source.contains("public void crucibleBubble(")
@@ -208,8 +206,8 @@ public class ClientProxyFxStaticGuardTest {
                         && source.contains("public void crucibleBoil(")
                         && source.contains("TCSounds.SPILL")
                         && source.contains("new FXBubble(")
-                        && source.contains("for (int i = 0; i < 2; i++)")
-                        && source.contains("setGravity(-0.025F * type)"));
+                        && source.contains("for (int i = 0; i < particleCount(1); i++)")
+                        && source.contains("bubble.setBubbleSpeed(0.003D * type);"));
         assertTrue("CommonProxy and ClientProxy must keep startScan proxy surface",
                 commonProxy.contains("public void startScan(Entity entity, BlockPos pos, long expireAtMs, int radius)")
                         && source.contains("public void startScan(Entity entity, BlockPos pos, long expireAtMs, int radius)")
