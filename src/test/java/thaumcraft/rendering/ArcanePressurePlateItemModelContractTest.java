@@ -23,10 +23,7 @@ public class ArcanePressurePlateItemModelContractTest {
                 "src/main/resources/assets/thaumcraft/models/item/blockwoodendevice_2_inventory.json"));
         assertEquals("block/thin_block", model.get("parent").getAsString());
         assertFalse(model.get("ambientocclusion").getAsBoolean());
-
-        JsonObject gui = model.getAsJsonObject("display").getAsJsonObject("gui");
-        assertEquals("[30,225,0]", gui.getAsJsonArray("rotation").toString());
-        assertEquals("[0.8125,0.8125,0.8125]", gui.getAsJsonArray("scale").toString());
+        assertFalse("standard block GUI scale keeps the plate inside its slot", model.has("display"));
 
         JsonObject textures = model.getAsJsonObject("textures");
         assertEquals("thaumcraft:blocks/applate1", textures.get("particle").getAsString());
@@ -46,6 +43,40 @@ public class ArcanePressurePlateItemModelContractTest {
         String proxy = read(Paths.get("src/main/java/thaumcraft/client/ClientProxy.java"));
         assertTrue(proxy.contains(
                 "registerBuiltinItemModel(woodenDeviceItem, 2, \"blockwoodendevice_2_inventory\");"));
+    }
+
+    @Test
+    public void worldModelsUseExplicitVisiblePlateGeometry() throws IOException {
+        JsonObject blockstate = parse(Paths.get(
+                "src/main/resources/assets/thaumcraft/blockstates/blockwoodendevice.json"));
+        JsonObject variants = blockstate.getAsJsonObject("variants");
+        assertEquals("thaumcraft:blockwoodendevice_2",
+                variants.getAsJsonObject("type=2").get("model").getAsString());
+        assertEquals("thaumcraft:blockwoodendevice_3",
+                variants.getAsJsonObject("type=3").get("model").getAsString());
+
+        assertWorldModel("blockwoodendevice_2.json", "applate1", "[15,1,15]");
+        assertWorldModel("blockwoodendevice_3.json", "applate2", "[15,0.5,15]");
+    }
+
+    private static void assertWorldModel(String fileName, String texture, String expectedTo) throws IOException {
+        JsonObject model = parse(Paths.get(
+                "src/main/resources/assets/thaumcraft/models/block/" + fileName));
+        assertEquals("block/block", model.get("parent").getAsString());
+        assertFalse(model.get("ambientocclusion").getAsBoolean());
+        assertEquals("thaumcraft:blocks/" + texture,
+                model.getAsJsonObject("textures").get("particle").getAsString());
+
+        JsonObject element = model.getAsJsonArray("elements").get(0).getAsJsonObject();
+        assertEquals("[1,0,1]", element.getAsJsonArray("from").toString());
+        assertEquals(expectedTo, element.getAsJsonArray("to").toString());
+        JsonObject faces = element.getAsJsonObject("faces");
+        assertEquals(6, faces.entrySet().size());
+        for (String direction : FACES) {
+            JsonObject face = faces.getAsJsonObject(direction);
+            assertEquals("#texture", face.get("texture").getAsString());
+            assertFalse("world face must not be neighbor-culled: " + direction, face.has("cullface"));
+        }
     }
 
     private static JsonObject parse(Path path) throws IOException {

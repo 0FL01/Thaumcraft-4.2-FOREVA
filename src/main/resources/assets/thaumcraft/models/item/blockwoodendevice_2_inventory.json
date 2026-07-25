@@ -1,13 +1,6 @@
 {
   "parent": "block/thin_block",
   "ambientocclusion": false,
-  "display": {
-    "gui": {
-      "rotation": [30, 225, 0],
-      "translation": [0, 0, 0],
-      "scale": [0.8125, 0.8125, 0.8125]
-    }
-  },
   "textures": {
     "particle": "thaumcraft:blocks/applate1",
     "texture": "thaumcraft:blocks/applate1"

@@ -1,6 +1,22 @@
 {
-  "parent": "block/pressure_plate_down",
+  "parent": "block/block",
+  "ambientocclusion": false,
   "textures": {
+    "particle": "thaumcraft:blocks/applate2",
     "texture": "thaumcraft:blocks/applate2"
-  }
+  },
+  "elements": [
+    {
+      "from": [1, 0, 1],
+      "to": [15, 0.5, 15],
+      "faces": {
+        "down": { "texture": "#texture" },
+        "up": { "texture": "#texture" },
+        "north": { "texture": "#texture" },
+        "south": { "texture": "#texture" },
+        "west": { "texture": "#texture" },
+        "east": { "texture": "#texture" }
+      }
+    }
+  ]
 }
