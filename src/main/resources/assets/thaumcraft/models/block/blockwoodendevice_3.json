@@ -7,10 +7,10 @@
   },
   "elements": [
     {
-      "from": [1, 0, 1],
-      "to": [15, 0.5, 15],
+      "from": [1.0, 0.0, 1.0],
+      "to": [15.0, 0.5, 15.0],
       "faces": {
-        "down": { "texture": "#texture" },
+        "down": { "texture": "#texture", "cullface": "down" },
         "up": { "texture": "#texture" },
         "north": { "texture": "#texture" },
         "south": { "texture": "#texture" },

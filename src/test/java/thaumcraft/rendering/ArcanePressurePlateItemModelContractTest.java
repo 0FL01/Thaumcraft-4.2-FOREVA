@@ -55,8 +55,8 @@ public class ArcanePressurePlateItemModelContractTest {
         assertEquals("thaumcraft:blockwoodendevice_3",
                 variants.getAsJsonObject("type=3").get("model").getAsString());
 
-        assertWorldModel("blockwoodendevice_2.json", "applate1", "[15,1,15]");
-        assertWorldModel("blockwoodendevice_3.json", "applate2", "[15,0.5,15]");
+        assertWorldModel("blockwoodendevice_2.json", "applate1", "[15.0,1.0,15.0]");
+        assertWorldModel("blockwoodendevice_3.json", "applate2", "[15.0,0.5,15.0]");
     }
 
     private static void assertWorldModel(String fileName, String texture, String expectedTo) throws IOException {
@@ -68,14 +68,19 @@ public class ArcanePressurePlateItemModelContractTest {
                 model.getAsJsonObject("textures").get("particle").getAsString());
 
         JsonObject element = model.getAsJsonArray("elements").get(0).getAsJsonObject();
-        assertEquals("[1,0,1]", element.getAsJsonArray("from").toString());
+        assertEquals("[1.0,0.0,1.0]", element.getAsJsonArray("from").toString());
         assertEquals(expectedTo, element.getAsJsonArray("to").toString());
         JsonObject faces = element.getAsJsonObject("faces");
         assertEquals(6, faces.entrySet().size());
         for (String direction : FACES) {
             JsonObject face = faces.getAsJsonObject(direction);
             assertEquals("#texture", face.get("texture").getAsString());
-            assertFalse("world face must not be neighbor-culled: " + direction, face.has("cullface"));
+            if ("down".equals(direction)) {
+                assertTrue("down face must have cullface:down for ground contact", face.has("cullface"));
+                assertEquals("down", face.get("cullface").getAsString());
+            } else {
+                assertFalse("world face (except down) must not be neighbor-culled: " + direction, face.has("cullface"));
+            }
         }
     }
 
