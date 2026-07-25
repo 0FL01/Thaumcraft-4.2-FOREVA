@@ -677,7 +677,7 @@ implements ITickable, INode, IAspectContainer, IWandable {
                 double spawnY = this.pos.getY() + this.world.rand.nextInt(3) - 1;
                 double spawnZ = (double) this.pos.getZ() + (this.world.rand.nextDouble() - this.world.rand.nextDouble()) * 5.0D;
                 entity.setLocationAndAngles(spawnX, spawnY, spawnZ, this.world.rand.nextFloat() * 360.0F, 0.0F);
-                if (entity.getCanSpawnHere()) {
+                if (entity.getCanSpawnHere() && entity.isNotColliding()) {
                     this.world.spawnEntity(entity);
                     this.world.playEvent(2004, this.pos, 0);
                     entity.spawnExplosionParticle();
