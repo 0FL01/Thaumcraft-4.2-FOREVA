@@ -44,7 +44,7 @@ public class ItemRobeTravellerArmorCoreContractsStaticGuardTest {
         assertTrue("BootsTraveller must keep hover-tick integration contract",
                 traveller.contains("Hover.doHover(stack, player, world, player.inventory.armorInventory.indexOf(stack));"));
         assertTrue("Hover must keep traveller movement core contracts",
-                hover.contains("!player.capabilities.isCreativeMode && player.moveForward > 0.0F")
+                hover.contains("!player.capabilities.isFlying && player.moveForward > 0.0F")
                         && hover.contains("player.stepHeight = 1.0F;")
                         && hover.contains("player.moveRelative(0.0F, 0.0F, 1.0F, bonus);")
                         && hover.contains("player.jumpMovementFactor = getHover(playerId) ? 0.03F : 0.05F;")

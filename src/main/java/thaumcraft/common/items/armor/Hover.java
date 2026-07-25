@@ -36,7 +36,7 @@ public class Hover {
             return;
         }
         int playerId = player.getEntityId();
-        if (!player.capabilities.isCreativeMode && player.moveForward > 0.0F) {
+        if (!player.capabilities.isFlying && player.moveForward > 0.0F) {
             if (world.isRemote && !player.isSneaking()) {
                 if (!PREV_STEP.containsKey(playerId)) {
                     PREV_STEP.put(playerId, player.stepHeight);
