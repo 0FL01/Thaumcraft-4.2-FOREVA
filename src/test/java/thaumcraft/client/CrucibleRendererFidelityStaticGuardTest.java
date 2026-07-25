@@ -59,13 +59,14 @@ public class CrucibleRendererFidelityStaticGuardTest {
                         && source.contains("water.getMaxV()"));
         assertTrue("Crucible fluid quad should cover a full block like the original UtilsFX.renderQuadFromIcon scale 1.0 path",
                 source.contains("drawFluidSurface(0.5F"));
-        assertTrue("Crucible tint should progress from clean water to dark purple at the actual TC4 capacity",
+        assertTrue("Crucible tint should become opaque saturated purple at the actual TC4 capacity",
                 source.contains("tile.tagAmount() / (float) tile.maxTags")
-                        && source.contains("float g = 1.0F - raw;")
-                        && source.contains("float b = 1.0F - raw * 0.75F;")
-                        && source.contains("float a = 1.0F - raw / 2.0F;")
+                        && source.contains("float g = 1.0F - raw * 0.75F;")
+                        && source.contains("float b = 1.0F - raw * 0.15F;")
+                        && source.contains("float a = 1.0F;")
                         && !source.contains("tile.tagAmount() / 500.0F")
                         && !source.contains("0.5F + raw / 2.0F")
+                        && !source.contains("float a = 1.0F - raw / 2.0F;")
                         && !source.contains("float a = 1.0F - recolor / 2.0F;"));
         assertTrue("Crucible surface should require actual water like TC4",
                 source.contains("if (!tile.hasWater())")
