@@ -17,6 +17,7 @@ import net.minecraftforge.fml.relauncher.Side;
 import thaumcraft.client.renderers.block.ArcaneFurnaceBakedModel;
 import thaumcraft.client.renderers.block.AlchemyFurnaceBakedModel;
 import thaumcraft.client.renderers.block.EldritchCrustBakedModel;
+import thaumcraft.client.renderers.block.ObsidianTotemBakedModel;
 import thaumcraft.client.renderers.block.WardedGlassBakedModel;
 import thaumcraft.client.renderers.item.CrystalPerspectiveModel;
 import thaumcraft.client.renderers.item.ThaumometerPerspectiveModel;
@@ -86,6 +87,10 @@ public final class ClientModelRegistry {
         for (int texture = 1; texture <= 47; texture++) {
             event.getMap().registerSprite(new ResourceLocation("thaumcraft", "blocks/warded_glass_" + texture));
         }
+        for (String texture : new String[]{"obsidiantotembase", "obsidiantotembaseshaded",
+                "obsidiantotem1", "obsidiantotem2", "obsidiantotem3", "obsidiantotem4"}) {
+            event.getMap().registerSprite(new ResourceLocation("thaumcraft", "blocks/" + texture));
+        }
     }
 
     @SubscribeEvent
@@ -115,6 +120,7 @@ public final class ClientModelRegistry {
         replaceArcaneFurnaceModels(event);
         replaceEldritchCrustModels(event);
         replaceWardedGlassModel(event);
+        replaceObsidianTotemModels(event);
     }
 
     public static IBakedModel getFrostShardModel() {
@@ -191,6 +197,16 @@ public final class ClientModelRegistry {
             IBakedModel delegate = event.getModelRegistry().getObject(location);
             if (delegate != null) {
                 event.getModelRegistry().putObject(location, new EldritchCrustBakedModel(delegate));
+            }
+        }
+    }
+
+    private static void replaceObsidianTotemModels(ModelBakeEvent event) {
+        for (int meta : new int[]{0, 8}) {
+            ModelResourceLocation location = new ModelResourceLocation("thaumcraft:blockcosmeticsolid", "type=" + meta);
+            IBakedModel delegate = event.getModelRegistry().getObject(location);
+            if (delegate != null) {
+                event.getModelRegistry().putObject(location, new ObsidianTotemBakedModel(delegate));
             }
         }
     }

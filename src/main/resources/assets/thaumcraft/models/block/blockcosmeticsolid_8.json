@@ -1,6 +1,6 @@
 {
   "parent": "block/cube_all",
   "textures": {
-    "all": "thaumcraft:blocks/obsidiantotembaseshaded"
+    "all": "thaumcraft:blocks/obsidiantile"
   }
 }

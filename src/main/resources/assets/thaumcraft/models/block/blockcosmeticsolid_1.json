@@ -1,7 +1,6 @@
 {
-  "parent": "block/cube_column",
+  "parent": "block/cube_all",
   "textures": {
-    "side": "thaumcraft:blocks/obsidiantotem1",
-    "end": "thaumcraft:blocks/obsidiantotem2"
+    "all": "thaumcraft:blocks/obsidiantile"
   }
 }

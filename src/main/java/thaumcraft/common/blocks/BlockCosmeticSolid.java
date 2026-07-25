@@ -3,9 +3,11 @@ package thaumcraft.common.blocks;
 import java.util.List;
 import java.util.Random;
 
+import javax.annotation.Nullable;
 import net.minecraft.block.Block;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
+import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.properties.PropertyInteger;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
@@ -28,19 +30,35 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
+import net.minecraftforge.common.property.ExtendedBlockState;
+import net.minecraftforge.common.property.IExtendedBlockState;
+import net.minecraftforge.common.property.IUnlistedProperty;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import thaumcraft.api.aspects.Aspect;
+import thaumcraft.api.aspects.AspectList;
+import thaumcraft.api.nodes.INode;
 import thaumcraft.common.Thaumcraft;
 import thaumcraft.common.config.ConfigBlocks;
+import thaumcraft.common.config.ConfigItems;
+import thaumcraft.common.items.ItemWispEssence;
 import thaumcraft.common.lib.TCSounds;
 import thaumcraft.common.tiles.TileNode;
 import thaumcraft.common.tiles.TileWardingStone;
 
 public class BlockCosmeticSolid extends Block {
 
+    public static final int TYPE_OBSIDIAN_TOTEM = 0;
+    public static final int TYPE_OBSIDIAN_TILE = 1;
     public static final int TYPE_TRAVEL = 2;
     public static final int TYPE_WARDING = 3;
-    public static final String[] types = {"obsidianTile", "obsidianTotem", "pavingStone", "wardingStone", "thaumiumBlock", "tallowBlock", "pedestalTop", "arcaneStone", "nodeStone", "golemStone", "golemStoneActive", "eldritchStone", "eldritchPattern", "eldritchStone2", "crust", "eldritchPedestal"};
+    public static final int TYPE_CHARGED_TOTEM = 8;
+    public static final int TOTEM_STYLE_BASE = 0;
+    public static final int TOTEM_STYLE_SHADED = 1;
+    public static final int TOTEM_STYLE_RUNED = 2;
+    public static final IUnlistedProperty<Integer> TOTEM_STYLE = new IntUnlistedProperty("totem_style", 0, 2);
+    public static final IUnlistedProperty<Integer> TOTEM_VARIANT = new IntUnlistedProperty("totem_variant", -9, 9);
+    public static final String[] types = {"obsidianTotem", "obsidianTile", "pavingStone", "wardingStone", "thaumiumBlock", "tallowBlock", "pedestalTop", "arcaneStone", "nodeStone", "golemStone", "golemStoneActive", "eldritchStone", "eldritchPattern", "eldritchStone2", "crust", "eldritchPedestal"};
     public static final PropertyInteger TYPE = PropertyInteger.create("type", 0, 15);
 
     public BlockCosmeticSolid() {
@@ -64,7 +82,8 @@ public class BlockCosmeticSolid extends Block {
 
     @Override
     public int damageDropped(IBlockState state) {
-        return this.getMetaFromState(state);
+        int meta = this.getMetaFromState(state);
+        return meta == TYPE_CHARGED_TOTEM ? TYPE_OBSIDIAN_TILE : meta;
     }
 
     @Override
@@ -81,7 +100,7 @@ public class BlockCosmeticSolid extends Block {
     @Override
     public float getBlockHardness(IBlockState state, World world, BlockPos pos) {
         int meta = this.getMetaFromState(state);
-        if (meta <= 1) return 30.0f;
+        if (meta <= 1 || meta == TYPE_CHARGED_TOTEM) return 30.0f;
         if (meta == 4 || meta == 6 || meta == 7) return 4.0f;
         return 2.0f;
     }
@@ -103,15 +122,36 @@ public class BlockCosmeticSolid extends Block {
     @Override
     public boolean hasTileEntity(IBlockState state) {
         int meta = this.getMetaFromState(state);
-        return meta == TYPE_WARDING || meta == 8;
+        return meta == TYPE_WARDING || meta == TYPE_CHARGED_TOTEM;
     }
 
     @Override
     public TileEntity createTileEntity(World world, IBlockState state) {
         int meta = this.getMetaFromState(state);
         if (meta == TYPE_WARDING) return new TileWardingStone();
-        if (meta == 8) return new TileNode();
+        if (meta == TYPE_CHARGED_TOTEM) return new TileNode();
         return null;
+    }
+
+    @Override
+    public void harvestBlock(World world, EntityPlayer player, BlockPos pos, IBlockState state,
+                             @Nullable TileEntity tile, ItemStack tool) {
+        if (this.getMetaFromState(state) == TYPE_CHARGED_TOTEM && !world.isRemote
+                && tile instanceof INode && ConfigItems.itemWispEssence != null) {
+            AspectList aspects = ((INode) tile).getAspects();
+            if (aspects != null && aspects.size() > 0) {
+                for (Aspect aspect : aspects.getAspects()) {
+                    if (aspect == null || aspects.getAmount(aspect) < 5) continue;
+                    for (int a = 0; a < aspects.getAmount(aspect) / 10; ++a) {
+                        ItemStack essence = new ItemStack(ConfigItems.itemWispEssence);
+                        ((ItemWispEssence) essence.getItem()).setAspects(essence,
+                                new AspectList().add(aspect, 2));
+                        spawnAsEntity(world, pos, essence);
+                    }
+                }
+            }
+        }
+        super.harvestBlock(world, player, pos, state, tile, tool);
     }
 
     @Override
@@ -181,8 +221,34 @@ public class BlockCosmeticSolid extends Block {
     }
 
     @Override
+    public IBlockState getExtendedState(IBlockState state, IBlockAccess world, BlockPos pos) {
+        int meta = state.getValue(TYPE);
+        if (meta != TYPE_OBSIDIAN_TOTEM && meta != TYPE_CHARGED_TOTEM) return state;
+
+        int style;
+        if (isTotem(world.getBlockState(pos.up()))) {
+            style = TOTEM_STYLE_SHADED;
+        } else if (isTotem(world.getBlockState(pos.down()))) {
+            style = TOTEM_STYLE_RUNED;
+        } else {
+            style = TOTEM_STYLE_BASE;
+        }
+        int variant = pos.getX() % 4 + pos.getY() % 4 + pos.getZ() % 4;
+        return ((IExtendedBlockState) state)
+                .withProperty(TOTEM_STYLE, style)
+                .withProperty(TOTEM_VARIANT, variant);
+    }
+
+    private static boolean isTotem(IBlockState state) {
+        if (!(state.getBlock() instanceof BlockCosmeticSolid)) return false;
+        int meta = state.getValue(TYPE);
+        return meta == TYPE_OBSIDIAN_TOTEM || meta == TYPE_CHARGED_TOTEM;
+    }
+
+    @Override
     protected BlockStateContainer createBlockState() {
-        return new BlockStateContainer(this, TYPE);
+        return new ExtendedBlockState(this, new IProperty[]{TYPE},
+                new IUnlistedProperty[]{TOTEM_STYLE, TOTEM_VARIANT});
     }
 
     @Override
@@ -198,5 +264,37 @@ public class BlockCosmeticSolid extends Block {
     @Override
     public IBlockState getStateForPlacement(World worldIn, BlockPos pos, EnumFacing facing, float hitX, float hitY, float hitZ, int meta, EntityLivingBase placer, EnumHand hand) {
         return this.getDefaultState().withProperty(TYPE, MathHelper.clamp(meta, 0, 15));
+    }
+
+    private static final class IntUnlistedProperty implements IUnlistedProperty<Integer> {
+        private final String name;
+        private final int min;
+        private final int max;
+
+        private IntUnlistedProperty(String name, int min, int max) {
+            this.name = name;
+            this.min = min;
+            this.max = max;
+        }
+
+        @Override
+        public String getName() {
+            return this.name;
+        }
+
+        @Override
+        public boolean isValid(Integer value) {
+            return value != null && value >= this.min && value <= this.max;
+        }
+
+        @Override
+        public Class<Integer> getType() {
+            return Integer.class;
+        }
+
+        @Override
+        public String valueToString(Integer value) {
+            return String.valueOf(value);
+        }
     }
 }
