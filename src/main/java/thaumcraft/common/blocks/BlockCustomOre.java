@@ -15,6 +15,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
+import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
@@ -54,6 +55,15 @@ public class BlockCustomOre extends Block {
     @Override
     public int damageDropped(IBlockState state) {
         return this.getMetaFromState(state);
+    }
+
+    @Override
+    @SideOnly(Side.CLIENT)
+    public boolean canRenderInLayer(IBlockState state, BlockRenderLayer layer) {
+        int meta = state.getValue(TYPE);
+        return meta >= 1 && meta <= 6
+                ? layer == BlockRenderLayer.CUTOUT_MIPPED
+                : layer == BlockRenderLayer.SOLID;
     }
 
     @Override

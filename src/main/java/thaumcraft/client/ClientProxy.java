@@ -214,10 +214,12 @@ import thaumcraft.client.lib.RenderEventHandler;
 import thaumcraft.client.lib.ItemAspectTooltipHandler;
 import thaumcraft.common.CommonProxy;
 import thaumcraft.common.blocks.BlockCandle;
+import thaumcraft.common.blocks.BlockCustomOre;
 import thaumcraft.common.blocks.BlockEldritch;
 import thaumcraft.common.blocks.BlockMagicalLeaves;
 import thaumcraft.common.blocks.BlockTaint;
 import thaumcraft.common.blocks.BlockTaintFibres;
+import thaumcraft.common.blocks.ItemBlocks.BlockCustomOreItem;
 import thaumcraft.common.config.ConfigBlocks;
 import thaumcraft.common.config.ConfigEntities;
 import thaumcraft.common.config.ConfigItems;
@@ -666,6 +668,26 @@ public class ClientProxy extends CommonProxy {
     private void registerItemColorHandlers() {
         Minecraft minecraft = Minecraft.getMinecraft();
         final int taintGrassColor = 0x6D4189;
+        if (ConfigBlocks.blockCustomOre != null && ConfigBlocks.blockCustomOreItem != null) {
+            minecraft.getBlockColors().registerBlockColorHandler(
+                    (state, world, pos, tintIndex) -> {
+                        int meta = state.getValue(BlockCustomOre.TYPE);
+                        return tintIndex == 0 && meta >= 1 && meta <= 6
+                                ? BlockCustomOreItem.colors[meta]
+                                : -1;
+                    },
+                    ConfigBlocks.blockCustomOre
+            );
+            minecraft.getItemColors().registerItemColorHandler(
+                    (stack, tintIndex) -> {
+                        int meta = stack.getMetadata();
+                        return tintIndex == 0 && meta >= 1 && meta <= 6
+                                ? BlockCustomOreItem.colors[meta]
+                                : -1;
+                    },
+                    ConfigBlocks.blockCustomOreItem
+            );
+        }
         if (ConfigBlocks.blockMagicalLeaves != null && ConfigBlocks.blockMagicalLeavesItem != null) {
             minecraft.getBlockColors().registerBlockColorHandler(
                     (state, world, pos, tintIndex) -> {
@@ -1089,13 +1111,15 @@ public class ClientProxy extends CommonProxy {
         }
         Item lifterItem = Item.getItemFromBlock(ConfigBlocks.blockLifter);
         registerBuiltinItemModel(lifterItem, 0, "blocklifter");
+        String[] lootCrateItemModels = {"blocklootcrate", "blocklootcrate_1", "blocklootcrate_2"};
         Item lootCrateItem = Item.getItemFromBlock(ConfigBlocks.blockLootCrate);
         for (int meta = 0; meta <= 2; meta++) {
-            registerBlockItemModel(lootCrateItem, meta, "type=" + meta);
+            registerBuiltinItemModel(lootCrateItem, meta, lootCrateItemModels[meta]);
         }
+        String[] lootUrnItemModels = {"blocklooturn", "blocklooturn_1", "blocklooturn_2"};
         Item lootUrnItem = Item.getItemFromBlock(ConfigBlocks.blockLootUrn);
         for (int meta = 0; meta <= 2; meta++) {
-            registerBlockItemModel(lootUrnItem, meta, "type=" + meta);
+            registerBuiltinItemModel(lootUrnItem, meta, lootUrnItemModels[meta]);
         }
         Item manaPodItem = Item.getItemFromBlock(ConfigBlocks.blockManaPod);
         registerBuiltinItemModel(manaPodItem, 0, "blockmanapod");

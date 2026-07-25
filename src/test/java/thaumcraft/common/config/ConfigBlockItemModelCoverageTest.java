@@ -14,6 +14,7 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 public class ConfigBlockItemModelCoverageTest {
@@ -45,7 +46,10 @@ public class ConfigBlockItemModelCoverageTest {
         assertTrue(proxy.contains("registerBuiltinItemModel(Item.getItemFromBlock(ConfigBlocks.blockHole), 0, \"blockhole\");"));
         assertTrue(proxy.contains("registerBuiltinItemModel(Item.getItemFromBlock(ConfigBlocks.blockWarded), 0, \"blockwarded\");"));
         assertTrue(proxy.contains("registerBuiltinItemModel(Item.getItemFromBlock(ConfigBlocks.blockEldritchNothing), 0, \"blockeldritchnothing\");"));
-        assertTrue(proxy.contains("registerBlockItemModel(lootUrnItem, meta, \"type=\" + meta);"));
+        assertTrue(proxy.contains("registerBuiltinItemModel(lootCrateItem, meta, lootCrateItemModels[meta]);"));
+        assertTrue(proxy.contains("registerBuiltinItemModel(lootUrnItem, meta, lootUrnItemModels[meta]);"));
+        assertFalse(proxy.contains("registerBlockItemModel(lootCrateItem"));
+        assertFalse(proxy.contains("registerBlockItemModel(lootUrnItem"));
     }
 
     private static Set<String> extractBlockPaths(String source) {

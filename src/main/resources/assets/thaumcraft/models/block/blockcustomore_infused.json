@@ -1,0 +1,34 @@
+{
+  "parent": "block/block",
+  "textures": {
+    "particle": "thaumcraft:blocks/infusedorestone",
+    "base": "thaumcraft:blocks/infusedorestone",
+    "overlay": "thaumcraft:blocks/infusedore"
+  },
+  "elements": [
+    {
+      "from": [0, 0, 0],
+      "to": [16, 16, 16],
+      "faces": {
+        "down": { "texture": "#base", "cullface": "down" },
+        "up": { "texture": "#base", "cullface": "up" },
+        "north": { "texture": "#base", "cullface": "north" },
+        "south": { "texture": "#base", "cullface": "south" },
+        "west": { "texture": "#base", "cullface": "west" },
+        "east": { "texture": "#base", "cullface": "east" }
+      }
+    },
+    {
+      "from": [0, 0, 0],
+      "to": [16, 16, 16],
+      "faces": {
+        "down": { "texture": "#overlay", "tintindex": 0, "cullface": "down" },
+        "up": { "texture": "#overlay", "tintindex": 0, "cullface": "up" },
+        "north": { "texture": "#overlay", "tintindex": 0, "cullface": "north" },
+        "south": { "texture": "#overlay", "tintindex": 0, "cullface": "south" },
+        "west": { "texture": "#overlay", "tintindex": 0, "cullface": "west" },
+        "east": { "texture": "#overlay", "tintindex": 0, "cullface": "east" }
+      }
+    }
+  ]
+}
