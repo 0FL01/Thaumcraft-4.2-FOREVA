@@ -160,6 +160,7 @@ import thaumcraft.client.renderers.tile.TileAlchemyFurnaceAdvancedRenderer;
 import thaumcraft.client.renderers.tile.TileArcaneLampRenderer;
 import thaumcraft.client.renderers.tile.TileArcaneBoreBaseRenderer;
 import thaumcraft.client.renderers.tile.TileArcaneBoreRenderer;
+import thaumcraft.client.renderers.tile.TileArcanePressurePlateRenderer;
 import thaumcraft.client.renderers.tile.TileArcaneWorkbenchRenderer;
 import thaumcraft.client.renderers.tile.TileBannerRenderer;
 import thaumcraft.client.renderers.tile.TileBellowsRenderer;
@@ -277,6 +278,7 @@ import thaumcraft.common.entities.projectile.EntityShockOrb;
 import thaumcraft.common.tiles.TileAlchemyFurnace;
 import thaumcraft.common.tiles.TileAlchemyFurnaceAdvanced;
 import thaumcraft.common.tiles.TileArcaneBore;
+import thaumcraft.common.tiles.TileArcanePressurePlate;
 import thaumcraft.common.tiles.TileArcaneLamp;
 import thaumcraft.common.tiles.TileArcaneLampFertility;
 import thaumcraft.common.tiles.TileArcaneLampGrowth;
@@ -1160,6 +1162,7 @@ public class ClientProxy extends CommonProxy {
 
         ClientRegistry.bindTileEntitySpecialRenderer(TileAlchemyFurnaceAdvanced.class, new TileAlchemyFurnaceAdvancedRenderer());
         ClientRegistry.bindTileEntitySpecialRenderer(TileBellows.class, new TileBellowsRenderer());
+        ClientRegistry.bindTileEntitySpecialRenderer(TileArcanePressurePlate.class, new TileArcanePressurePlateRenderer());
         ClientRegistry.bindTileEntitySpecialRenderer(TileTable.class, new TileTableRenderer());
         ClientRegistry.bindTileEntitySpecialRenderer(TileCrucible.class, new TileCrucibleRenderer());
         ClientRegistry.bindTileEntitySpecialRenderer(thaumcraft.common.tiles.TileAlembic.class, new TileAlembicRenderer());

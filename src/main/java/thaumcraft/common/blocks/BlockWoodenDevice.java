@@ -73,7 +73,7 @@ public class BlockWoodenDevice extends BlockContainer {
     @Override
     public EnumBlockRenderType getRenderType(IBlockState state) {
         int meta = state.getValue(TYPE);
-        return meta == 0 || meta == 4 || meta == 5 || meta == 8
+        return meta == 0 || meta == 2 || meta == 3 || meta == 4 || meta == 5 || meta == 8
                 ? EnumBlockRenderType.INVISIBLE
                 : EnumBlockRenderType.MODEL;
     }

@@ -30,10 +30,10 @@ public class DeviceTesrRoutingContractTest {
         String thaumatoriumBaseModel = read("src/main/resources/assets/thaumcraft/models/block/blockmetaldevice_10.json");
         String thaumatoriumTopModel = read("src/main/resources/assets/thaumcraft/models/block/blockmetaldevice_11.json");
 
-        assertTrue("BlockWoodenDevice should route bellows, bore base, bore, and banner through TESR-only world rendering while keeping sensor/plates/planks on baked models",
-                woodenBlock.contains("return meta == 0 || meta == 4 || meta == 5 || meta == 8")
-                        && woodenBlock.contains("? EnumBlockRenderType.INVISIBLE")
-                        && woodenBlock.contains(": EnumBlockRenderType.MODEL;"));
+        assertTrue("BlockWoodenDevice should route bellows, pressure plates, bore base, bore, and banner through TESR-only world rendering while keeping sensor/planks on baked models",
+                woodenBlock.contains("return meta == 0 || meta == 2 || meta == 3 || meta == 4 || meta == 5 || meta == 8")
+                         && woodenBlock.contains("? EnumBlockRenderType.INVISIBLE")
+                         && woodenBlock.contains(": EnumBlockRenderType.MODEL;"));
 
         assertTrue("BlockWoodenDevice should restore reference-shaped bellows, bore, banner, and pressure-plate bounds/collision behavior",
                 woodenBlock.contains("private static final AxisAlignedBB BELLOWS_AABB")

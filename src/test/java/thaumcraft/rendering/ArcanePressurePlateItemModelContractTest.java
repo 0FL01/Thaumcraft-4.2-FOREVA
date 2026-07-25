@@ -46,42 +46,20 @@ public class ArcanePressurePlateItemModelContractTest {
     }
 
     @Test
-    public void worldModelsUseExplicitVisiblePlateGeometry() throws IOException {
-        JsonObject blockstate = parse(Paths.get(
-                "src/main/resources/assets/thaumcraft/blockstates/blockwoodendevice.json"));
-        JsonObject variants = blockstate.getAsJsonObject("variants");
-        assertEquals("thaumcraft:blockwoodendevice_2",
-                variants.getAsJsonObject("type=2").get("model").getAsString());
-        assertEquals("thaumcraft:blockwoodendevice_3",
-                variants.getAsJsonObject("type=3").get("model").getAsString());
+    public void worldPlateUsesDedicatedRendererAtOriginalHeights() throws IOException {
+        String block = read(Paths.get("src/main/java/thaumcraft/common/blocks/BlockWoodenDevice.java"));
+        assertTrue(block.contains(
+                "return meta == 0 || meta == 2 || meta == 3 || meta == 4 || meta == 5 || meta == 8"));
 
-        assertWorldModel("blockwoodendevice_2.json", "applate1", "[15.0,1.0,15.0]");
-        assertWorldModel("blockwoodendevice_3.json", "applate2", "[15.0,0.5,15.0]");
-    }
+        String proxy = read(Paths.get("src/main/java/thaumcraft/client/ClientProxy.java"));
+        assertTrue(proxy.contains("ClientRegistry.bindTileEntitySpecialRenderer(TileArcanePressurePlate.class, new TileArcanePressurePlateRenderer());"));
 
-    private static void assertWorldModel(String fileName, String texture, String expectedTo) throws IOException {
-        JsonObject model = parse(Paths.get(
-                "src/main/resources/assets/thaumcraft/models/block/" + fileName));
-        assertEquals("block/block", model.get("parent").getAsString());
-        assertFalse(model.get("ambientocclusion").getAsBoolean());
-        assertEquals("thaumcraft:blocks/" + texture,
-                model.getAsJsonObject("textures").get("particle").getAsString());
-
-        JsonObject element = model.getAsJsonArray("elements").get(0).getAsJsonObject();
-        assertEquals("[1.0,0.0,1.0]", element.getAsJsonArray("from").toString());
-        assertEquals(expectedTo, element.getAsJsonArray("to").toString());
-        JsonObject faces = element.getAsJsonObject("faces");
-        assertEquals(6, faces.entrySet().size());
-        for (String direction : FACES) {
-            JsonObject face = faces.getAsJsonObject(direction);
-            assertEquals("#texture", face.get("texture").getAsString());
-            if ("down".equals(direction)) {
-                assertTrue("down face must have cullface:down for ground contact", face.has("cullface"));
-                assertEquals("down", face.get("cullface").getAsString());
-            } else {
-                assertFalse("world face (except down) must not be neighbor-culled: " + direction, face.has("cullface"));
-            }
-        }
+        String renderer = read(Paths.get(
+                "src/main/java/thaumcraft/client/renderers/tile/TileArcanePressurePlateRenderer.java"));
+        assertTrue(renderer.contains("float height = type == 3 ? 0.5F / 16.0F : 1.0F / 16.0F;"));
+        assertTrue(renderer.contains("textures/blocks/applate1.png"));
+        assertTrue(renderer.contains("textures/blocks/applate2.png"));
+        assertTrue(renderer.contains("textures/blocks/applate3.png"));
     }
 
     private static JsonObject parse(Path path) throws IOException {
