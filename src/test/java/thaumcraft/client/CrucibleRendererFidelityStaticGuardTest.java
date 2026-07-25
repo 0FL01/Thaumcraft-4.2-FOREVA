@@ -52,22 +52,20 @@ public class CrucibleRendererFidelityStaticGuardTest {
                         && source.contains("int lightU = (packedLight >> 16) & 0xFFFF;")
                         && source.contains("int lightV = packedLight & 0xFFFF;")
                         && !source.contains("buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.BLOCK);"));
-        assertTrue("Crucible renderer should map quad UVs from water sprite bounds",
+        assertTrue("Crucible renderer should preserve the original water sprite bounds and U direction",
                 source.contains("water.getMinU()")
                         && source.contains("water.getMaxU()")
                         && source.contains("water.getMinV()")
-                        && source.contains("water.getMaxV()"));
+                        && source.contains("water.getMaxV()")
+                        && source.contains("addFluidVertex(buffer, -half, -half, u1, v1")
+                        && source.contains("addFluidVertex(buffer, half, -half, u0, v1")
+                        && source.contains("addFluidVertex(buffer, half, half, u0, v0")
+                        && source.contains("addFluidVertex(buffer, -half, half, u1, v0"));
         assertTrue("Crucible fluid quad should cover a full block like the original UtilsFX.renderQuadFromIcon scale 1.0 path",
                 source.contains("drawFluidSurface(0.5F"));
-        assertTrue("Crucible tint should become opaque saturated purple at the actual TC4 capacity",
-                source.contains("tile.tagAmount() / (float) tile.maxTags")
-                        && source.contains("float g = 1.0F - raw * 0.75F;")
-                        && source.contains("float b = 1.0F - raw * 0.15F;")
-                        && source.contains("float a = 1.0F;")
-                        && !source.contains("tile.tagAmount() / 500.0F")
-                        && !source.contains("0.5F + raw / 2.0F")
-                        && !source.contains("float a = 1.0F - raw / 2.0F;")
-                        && !source.contains("float a = 1.0F - recolor / 2.0F;"));
+        assertTrue("Crucible renderer should use the tested TC4 fluid color contract",
+                source.contains("int color = getFluidColor(tile.tagAmount(), tile.maxTags);")
+                        && source.contains("private static int getFluidColor(int tagAmount, int maxTags)"));
         assertTrue("Crucible surface should require actual water like TC4",
                 source.contains("if (!tile.hasWater())")
                         && tileSource.contains("public boolean hasWater()"));

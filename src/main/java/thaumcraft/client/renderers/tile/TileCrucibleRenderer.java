@@ -43,15 +43,7 @@ public class TileCrucibleRenderer extends TileEntitySpecialRenderer<TileCrucible
             return;
         }
 
-        float raw = TileRenderHelper.clamp01((float) tile.tagAmount() / (float) tile.maxTags);
-        float r = 1.0F;
-        float g = 1.0F - raw * 0.75F;
-        float b = 1.0F - raw * 0.15F;
-        float a = 1.0F;
-        int color = ((int) (a * 255.0F) << 24)
-                | ((int) (r * 255.0F) << 16)
-                | ((int) (g * 255.0F) << 8)
-                | (int) (b * 255.0F);
+        int color = getFluidColor(tile.tagAmount(), tile.maxTags);
         int packedLight = tile.getWorld().getCombinedLight(tile.getPos(), 0);
         int lightU = (packedLight >> 16) & 0xFFFF;
         int lightV = packedLight & 0xFFFF;
@@ -78,11 +70,24 @@ public class TileCrucibleRenderer extends TileEntitySpecialRenderer<TileCrucible
         float b = (argb & 0xFF) / 255.0F;
         BufferBuilder buffer = Tessellator.getInstance().getBuffer();
         buffer.begin(GL11.GL_QUADS, FLUID_VERTEX_FORMAT);
-        addFluidVertex(buffer, -half, -half, u0, v1, r, g, b, a, lightU, lightV);
-        addFluidVertex(buffer, half, -half, u1, v1, r, g, b, a, lightU, lightV);
-        addFluidVertex(buffer, half, half, u1, v0, r, g, b, a, lightU, lightV);
-        addFluidVertex(buffer, -half, half, u0, v0, r, g, b, a, lightU, lightV);
+        addFluidVertex(buffer, -half, -half, u1, v1, r, g, b, a, lightU, lightV);
+        addFluidVertex(buffer, half, -half, u0, v1, r, g, b, a, lightU, lightV);
+        addFluidVertex(buffer, half, half, u0, v0, r, g, b, a, lightU, lightV);
+        addFluidVertex(buffer, -half, half, u1, v0, r, g, b, a, lightU, lightV);
         Tessellator.getInstance().draw();
+    }
+
+    private static int getFluidColor(int tagAmount, int maxTags) {
+        float raw = (float) tagAmount / (float) maxTags;
+        float recolor = raw > 0.0F ? 0.5F + raw / 2.0F : 0.0F;
+        float r = TileRenderHelper.clamp01(1.0F - recolor / 3.0F);
+        float g = TileRenderHelper.clamp01(1.0F - recolor);
+        float b = TileRenderHelper.clamp01(1.0F - recolor / 2.0F);
+        float a = 1.0F;
+        return ((int) (a * 255.0F) << 24)
+                | ((int) (r * 255.0F) << 16)
+                | ((int) (g * 255.0F) << 8)
+                | (int) (b * 255.0F);
     }
 
     private static void addFluidVertex(BufferBuilder buffer, float x, float y, float u, float v,
