@@ -8,12 +8,18 @@ import net.minecraft.util.text.translation.I18n;
 import org.apache.logging.log4j.Level;
 import thaumcraft.api.research.ResearchCategoryList;
 import thaumcraft.api.research.ResearchItem;
+import thaumcraft.api.aspects.AspectList;
 
-public class ResearchCategories {
+public class ResearchCategories extends ResearchCategoriesCompat {
     public static LinkedHashMap<String, ResearchCategoryList> researchCategories = new LinkedHashMap();
 
     public static ResearchCategoryList getResearchList(String key) {
         return researchCategories.get(key);
+    }
+
+    public static ResearchCategory getResearchCategory(String key) {
+        ResearchCategoryList category = getResearchList(key);
+        return category instanceof ResearchCategory ? (ResearchCategory) category : null;
     }
 
     public static String getCategoryName(String key) {
@@ -37,6 +43,23 @@ public class ResearchCategories {
             ResearchCategoryList rl = new ResearchCategoryList(icon, background);
             researchCategories.put(key, rl);
         }
+    }
+
+    public static ResearchCategory registerCategory(String key, String researchKey, AspectList formula,
+                                                    ResourceLocation icon, ResourceLocation background) {
+        return registerCategory(key, researchKey, formula, icon, background, null);
+    }
+
+    public static ResearchCategory registerCategory(String key, String researchKey, AspectList formula,
+                                                    ResourceLocation icon, ResourceLocation background,
+                                                    ResourceLocation background2) {
+        if (getResearchList(key) != null) {
+            return null;
+        }
+        ResearchCategory category = new ResearchCategory(
+                key, researchKey, formula, icon, background, background2);
+        researchCategories.put(key, category);
+        return category;
     }
 
     public static void addResearch(ResearchItem ri) {
@@ -65,4 +88,3 @@ public class ResearchCategories {
         }
     }
 }
-

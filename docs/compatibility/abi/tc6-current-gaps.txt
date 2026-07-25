@@ -1,0 +1,507 @@
+FORMAT tc6-abi-gaps-v1
+DONOR_SHA256 9425f8643581b27ff8845b087c8bc6fc10425a32942f1a3f0e265ce6b38f7b5f
+G CLASS_FINAL C thaumcraft/api/aura/AuraHelper
+G CLASS_FINAL C thaumcraft/api/blocks/BlocksTC
+G CLASS_FINAL C thaumcraft/api/items/ItemsTC
+G CLASS_MISSING C thaumcraft/api/OreDictionaryEntries
+G CLASS_MISSING C thaumcraft/api/ThaumcraftApi$BluePrint
+G CLASS_MISSING C thaumcraft/api/ThaumcraftApi$SmeltBonus
+G CLASS_MISSING C thaumcraft/api/ThaumcraftInvHelper
+G CLASS_MISSING C thaumcraft/api/ThaumcraftInvHelper$InvFilter
+G CLASS_MISSING C thaumcraft/api/ThaumcraftMaterials$MaterialTaint
+G CLASS_MISSING C thaumcraft/api/blocks/ILabelable
+G CLASS_MISSING C thaumcraft/api/capabilities/IPlayerWarp
+G CLASS_MISSING C thaumcraft/api/capabilities/IPlayerWarp$EnumWarpType
+G CLASS_MISSING C thaumcraft/api/capabilities/ThaumcraftCapabilities
+G CLASS_MISSING C thaumcraft/api/casters/CasterTriggerRegistry
+G CLASS_MISSING C thaumcraft/api/casters/FocusEffect
+G CLASS_MISSING C thaumcraft/api/casters/FocusEngine
+G CLASS_MISSING C thaumcraft/api/casters/FocusMedium
+G CLASS_MISSING C thaumcraft/api/casters/FocusMediumRoot
+G CLASS_MISSING C thaumcraft/api/casters/FocusMod
+G CLASS_MISSING C thaumcraft/api/casters/FocusModSplit
+G CLASS_MISSING C thaumcraft/api/casters/FocusNode
+G CLASS_MISSING C thaumcraft/api/casters/FocusNode$EnumSupplyType
+G CLASS_MISSING C thaumcraft/api/casters/FocusPackage
+G CLASS_MISSING C thaumcraft/api/casters/ICaster
+G CLASS_MISSING C thaumcraft/api/casters/ICasterTriggerManager
+G CLASS_MISSING C thaumcraft/api/casters/IFocusBlockPicker
+G CLASS_MISSING C thaumcraft/api/casters/IFocusElement
+G CLASS_MISSING C thaumcraft/api/casters/IFocusElement$EnumUnitType
+G CLASS_MISSING C thaumcraft/api/casters/IInteractWithCaster
+G CLASS_MISSING C thaumcraft/api/casters/NodeSetting
+G CLASS_MISSING C thaumcraft/api/casters/NodeSetting$INodeSettingType
+G CLASS_MISSING C thaumcraft/api/casters/NodeSetting$NodeSettingIntList
+G CLASS_MISSING C thaumcraft/api/casters/NodeSetting$NodeSettingIntRange
+G CLASS_MISSING C thaumcraft/api/casters/Trajectory
+G CLASS_MISSING C thaumcraft/api/crafting/ContainerDummy
+G CLASS_MISSING C thaumcraft/api/crafting/IArcaneWorkbench
+G CLASS_MISSING C thaumcraft/api/crafting/IDustTrigger
+G CLASS_MISSING C thaumcraft/api/crafting/IDustTrigger$Placement
+G CLASS_MISSING C thaumcraft/api/crafting/IInfusionStabiliserExt
+G CLASS_MISSING C thaumcraft/api/crafting/IStabilizable
+G CLASS_MISSING C thaumcraft/api/crafting/IStabilizable$EnumStability
+G CLASS_MISSING C thaumcraft/api/crafting/IThaumcraftRecipe
+G CLASS_MISSING C thaumcraft/api/crafting/IngredientNBTTC
+G CLASS_MISSING C thaumcraft/api/crafting/Part
+G CLASS_MISSING C thaumcraft/api/crafting/RecipeMisc
+G CLASS_MISSING C thaumcraft/api/crafting/RecipeMisc$MiscRecipeType
+G CLASS_MISSING C thaumcraft/api/golems/EnumGolemTrait
+G CLASS_MISSING C thaumcraft/api/golems/GolemHelper
+G CLASS_MISSING C thaumcraft/api/golems/IGolemAPI
+G CLASS_MISSING C thaumcraft/api/golems/IGolemProperties
+G CLASS_MISSING C thaumcraft/api/golems/ISealDisplayer
+G CLASS_MISSING C thaumcraft/api/golems/ProvisionRequest
+G CLASS_MISSING C thaumcraft/api/golems/parts/GolemAddon
+G CLASS_MISSING C thaumcraft/api/golems/parts/GolemAddon$IAddonFunction
+G CLASS_MISSING C thaumcraft/api/golems/parts/GolemArm
+G CLASS_MISSING C thaumcraft/api/golems/parts/GolemArm$IArmFunction
+G CLASS_MISSING C thaumcraft/api/golems/parts/GolemHead
+G CLASS_MISSING C thaumcraft/api/golems/parts/GolemHead$IHeadFunction
+G CLASS_MISSING C thaumcraft/api/golems/parts/GolemLeg
+G CLASS_MISSING C thaumcraft/api/golems/parts/GolemLeg$ILegFunction
+G CLASS_MISSING C thaumcraft/api/golems/parts/GolemMaterial
+G CLASS_MISSING C thaumcraft/api/golems/parts/IGenericFunction
+G CLASS_MISSING C thaumcraft/api/golems/parts/PartModel
+G CLASS_MISSING C thaumcraft/api/golems/parts/PartModel$EnumAttachPoint
+G CLASS_MISSING C thaumcraft/api/golems/parts/PartModel$EnumLimbSide
+G CLASS_MISSING C thaumcraft/api/golems/seals/ISeal
+G CLASS_MISSING C thaumcraft/api/golems/seals/ISealConfigArea
+G CLASS_MISSING C thaumcraft/api/golems/seals/ISealConfigFilter
+G CLASS_MISSING C thaumcraft/api/golems/seals/ISealConfigToggles
+G CLASS_MISSING C thaumcraft/api/golems/seals/ISealConfigToggles$SealToggle
+G CLASS_MISSING C thaumcraft/api/golems/seals/ISealEntity
+G CLASS_MISSING C thaumcraft/api/golems/seals/ISealGui
+G CLASS_MISSING C thaumcraft/api/golems/seals/SealPos
+G CLASS_MISSING C thaumcraft/api/golems/tasks/Task
+G CLASS_MISSING C thaumcraft/api/internal/WorldCoordinates
+G CLASS_MISSING C thaumcraft/api/items/IArchitect
+G CLASS_MISSING C thaumcraft/api/items/IArchitect$EnumAxis
+G CLASS_MISSING C thaumcraft/api/items/IGogglesDisplayExtended
+G CLASS_MISSING C thaumcraft/api/items/IRechargable
+G CLASS_MISSING C thaumcraft/api/items/IRechargable$EnumChargeDisplay
+G CLASS_MISSING C thaumcraft/api/items/ItemGenericEssentiaContainer
+G CLASS_MISSING C thaumcraft/api/items/RechargeHelper
+G CLASS_MISSING C thaumcraft/api/research/ResearchEvent
+G CLASS_MISSING C thaumcraft/api/research/ResearchEvent$Knowledge
+G CLASS_MISSING C thaumcraft/api/research/ResearchEvent$Research
+G CLASS_MISSING C thaumcraft/api/research/ScanAspect
+G CLASS_MISSING C thaumcraft/api/research/ScanBlockState
+G CLASS_MISSING C thaumcraft/api/research/ScanEntity
+G CLASS_MISSING C thaumcraft/api/research/ScanItem
+G CLASS_MISSING C thaumcraft/api/research/ScanMaterial
+G CLASS_MISSING C thaumcraft/api/research/ScanOreDictionary
+G CLASS_MISSING C thaumcraft/api/research/theorycraft/AidBookshelf
+G CLASS_MISSING C thaumcraft/api/research/theorycraft/CardAnalyze
+G CLASS_MISSING C thaumcraft/api/research/theorycraft/CardBalance
+G CLASS_MISSING C thaumcraft/api/research/theorycraft/CardExperimentation
+G CLASS_MISSING C thaumcraft/api/research/theorycraft/CardInspired
+G CLASS_MISSING C thaumcraft/api/research/theorycraft/CardNotation
+G CLASS_MISSING C thaumcraft/api/research/theorycraft/CardPonder
+G CLASS_MISSING C thaumcraft/api/research/theorycraft/CardReject
+G CLASS_MISSING C thaumcraft/api/research/theorycraft/CardRethink
+G CLASS_MISSING C thaumcraft/api/research/theorycraft/CardStudy
+G CLASS_MISSING C thaumcraft/api/research/theorycraft/ResearchTableData$CardChoice
+G FIELD_ACCESS F thaumcraft/api/crafting/InfusionRecipe aspects Lthaumcraft/api/aspects/AspectList;
+G FIELD_ACCESS F thaumcraft/api/crafting/InfusionRecipe instability I
+G FIELD_ACCESS F thaumcraft/api/crafting/InfusionRecipe recipeOutput Ljava/lang/Object;
+G FIELD_ACCESS F thaumcraft/api/crafting/InfusionRecipe research Ljava/lang/String;
+G FIELD_FINAL F thaumcraft/api/research/theorycraft/ResearchTableData categoryTotals Ljava/util/TreeMap;
+G FIELD_FINAL F thaumcraft/api/research/theorycraft/TheorycraftManager aids Ljava/util/HashMap;
+G FIELD_FINAL F thaumcraft/api/research/theorycraft/TheorycraftManager cards Ljava/util/HashMap;
+G FIELD_MISSING F thaumcraft/api/ThaumcraftApiHelper CHAMPION_MOD Lnet/minecraft/entity/ai/attributes/IAttribute;
+G FIELD_MISSING F thaumcraft/api/ThaumcraftMaterials ARMORMAT_CULTIST_LEADER Lnet/minecraft/item/ItemArmor$ArmorMaterial;
+G FIELD_MISSING F thaumcraft/api/ThaumcraftMaterials ARMORMAT_CULTIST_PLATE Lnet/minecraft/item/ItemArmor$ArmorMaterial;
+G FIELD_MISSING F thaumcraft/api/ThaumcraftMaterials ARMORMAT_CULTIST_ROBE Lnet/minecraft/item/ItemArmor$ArmorMaterial;
+G FIELD_MISSING F thaumcraft/api/ThaumcraftMaterials ARMORMAT_FORTRESS Lnet/minecraft/item/ItemArmor$ArmorMaterial;
+G FIELD_MISSING F thaumcraft/api/ThaumcraftMaterials ARMORMAT_SPECIAL Lnet/minecraft/item/ItemArmor$ArmorMaterial;
+G FIELD_MISSING F thaumcraft/api/ThaumcraftMaterials ARMORMAT_THAUMIUM Lnet/minecraft/item/ItemArmor$ArmorMaterial;
+G FIELD_MISSING F thaumcraft/api/ThaumcraftMaterials ARMORMAT_VOID Lnet/minecraft/item/ItemArmor$ArmorMaterial;
+G FIELD_MISSING F thaumcraft/api/ThaumcraftMaterials ARMORMAT_VOIDROBE Lnet/minecraft/item/ItemArmor$ArmorMaterial;
+G FIELD_MISSING F thaumcraft/api/ThaumcraftMaterials MATERIAL_TAINT Lnet/minecraft/block/material/Material;
+G FIELD_MISSING F thaumcraft/api/ThaumcraftMaterials TOOLMAT_ELEMENTAL Lnet/minecraft/item/Item$ToolMaterial;
+G FIELD_MISSING F thaumcraft/api/aspects/Aspect mixList Ljava/util/HashMap;
+G FIELD_MISSING F thaumcraft/api/blocks/BlocksTC activatorRail Lnet/minecraft/block/Block;
+G FIELD_MISSING F thaumcraft/api/blocks/BlocksTC alembic Lnet/minecraft/block/Block;
+G FIELD_MISSING F thaumcraft/api/blocks/BlocksTC amberBlock Lnet/minecraft/block/Block;
+G FIELD_MISSING F thaumcraft/api/blocks/BlocksTC amberBrick Lnet/minecraft/block/Block;
+G FIELD_MISSING F thaumcraft/api/blocks/BlocksTC arcaneEar Lnet/minecraft/block/Block;
+G FIELD_MISSING F thaumcraft/api/blocks/BlocksTC arcaneEarToggle Lnet/minecraft/block/Block;
+G FIELD_MISSING F thaumcraft/api/blocks/BlocksTC arcaneWorkbench Lnet/minecraft/block/Block;
+G FIELD_MISSING F thaumcraft/api/blocks/BlocksTC arcaneWorkbenchCharger Lnet/minecraft/block/Block;
+G FIELD_MISSING F thaumcraft/api/blocks/BlocksTC auraTotem Lnet/minecraft/block/Block;
+G FIELD_MISSING F thaumcraft/api/blocks/BlocksTC bannerCrimsonCult Lnet/minecraft/block/Block;
+G FIELD_MISSING F thaumcraft/api/blocks/BlocksTC banners Ljava/util/HashMap;
+G FIELD_MISSING F thaumcraft/api/blocks/BlocksTC barrier Lnet/minecraft/block/Block;
+G FIELD_MISSING F thaumcraft/api/blocks/BlocksTC bellows Lnet/minecraft/block/Block;
+G FIELD_MISSING F thaumcraft/api/blocks/BlocksTC bloom Lnet/minecraft/block/Block;
+G FIELD_MISSING F thaumcraft/api/blocks/BlocksTC brainBox Lnet/minecraft/block/Block;
+G FIELD_MISSING F thaumcraft/api/blocks/BlocksTC candles Ljava/util/HashMap;
+G FIELD_MISSING F thaumcraft/api/blocks/BlocksTC centrifuge Lnet/minecraft/block/Block;
+G FIELD_MISSING F thaumcraft/api/blocks/BlocksTC condenser Lnet/minecraft/block/Block;
+G FIELD_MISSING F thaumcraft/api/blocks/BlocksTC condenserlattice Lnet/minecraft/block/Block;
+G FIELD_MISSING F thaumcraft/api/blocks/BlocksTC condenserlatticeDirty Lnet/minecraft/block/Block;
+G FIELD_MISSING F thaumcraft/api/blocks/BlocksTC crucible Lnet/minecraft/block/Block;
+G FIELD_MISSING F thaumcraft/api/blocks/BlocksTC dioptra Lnet/minecraft/block/Block;
+G FIELD_MISSING F thaumcraft/api/blocks/BlocksTC doubleSlabAncient Lnet/minecraft/block/BlockSlab;
+G FIELD_MISSING F thaumcraft/api/blocks/BlocksTC doubleSlabArcaneBrick Lnet/minecraft/block/BlockSlab;
+G FIELD_MISSING F thaumcraft/api/blocks/BlocksTC doubleSlabArcaneStone Lnet/minecraft/block/BlockSlab;
+G FIELD_MISSING F thaumcraft/api/blocks/BlocksTC doubleSlabEldritch Lnet/minecraft/block/BlockSlab;
+G FIELD_MISSING F thaumcraft/api/blocks/BlocksTC doubleSlabGreatwood Lnet/minecraft/block/BlockSlab;
+G FIELD_MISSING F thaumcraft/api/blocks/BlocksTC doubleSlabSilverwood Lnet/minecraft/block/BlockSlab;
+G FIELD_MISSING F thaumcraft/api/blocks/BlocksTC effectGlimmer Lnet/minecraft/block/Block;
+G FIELD_MISSING F thaumcraft/api/blocks/BlocksTC effectSap Lnet/minecraft/block/Block;
+G FIELD_MISSING F thaumcraft/api/blocks/BlocksTC effectShock Lnet/minecraft/block/Block;
+G FIELD_MISSING F thaumcraft/api/blocks/BlocksTC eldritch Lnet/minecraft/block/Block;
+G FIELD_MISSING F thaumcraft/api/blocks/BlocksTC empty Lnet/minecraft/block/Block;
+G FIELD_MISSING F thaumcraft/api/blocks/BlocksTC essentiaTransportInput Lnet/minecraft/block/Block;
+G FIELD_MISSING F thaumcraft/api/blocks/BlocksTC essentiaTransportOutput Lnet/minecraft/block/Block;
+G FIELD_MISSING F thaumcraft/api/blocks/BlocksTC everfullUrn Lnet/minecraft/block/Block;
+G FIELD_MISSING F thaumcraft/api/blocks/BlocksTC fleshBlock Lnet/minecraft/block/Block;
+G FIELD_MISSING F thaumcraft/api/blocks/BlocksTC fluxGoo Lnet/minecraft/block/Block;
+G FIELD_MISSING F thaumcraft/api/blocks/BlocksTC fluxScrubber Lnet/minecraft/block/Block;
+G FIELD_MISSING F thaumcraft/api/blocks/BlocksTC golemBuilder Lnet/minecraft/block/Block;
+G FIELD_MISSING F thaumcraft/api/blocks/BlocksTC grassAmbient Lnet/minecraft/block/Block;
+G FIELD_MISSING F thaumcraft/api/blocks/BlocksTC hole Lnet/minecraft/block/Block;
+G FIELD_MISSING F thaumcraft/api/blocks/BlocksTC hungryChest Lnet/minecraft/block/Block;
+G FIELD_MISSING F thaumcraft/api/blocks/BlocksTC infernalFurnace Lnet/minecraft/block/Block;
+G FIELD_MISSING F thaumcraft/api/blocks/BlocksTC infusionMatrix Lnet/minecraft/block/Block;
+G FIELD_MISSING F thaumcraft/api/blocks/BlocksTC inlay Lnet/minecraft/block/Block;
+G FIELD_MISSING F thaumcraft/api/blocks/BlocksTC jarBrain Lnet/minecraft/block/Block;
+G FIELD_MISSING F thaumcraft/api/blocks/BlocksTC jarNormal Lnet/minecraft/block/Block;
+G FIELD_MISSING F thaumcraft/api/blocks/BlocksTC jarVoid Lnet/minecraft/block/Block;
+G FIELD_MISSING F thaumcraft/api/blocks/BlocksTC lampArcane Lnet/minecraft/block/Block;
+G FIELD_MISSING F thaumcraft/api/blocks/BlocksTC lampFertility Lnet/minecraft/block/Block;
+G FIELD_MISSING F thaumcraft/api/blocks/BlocksTC lampGrowth Lnet/minecraft/block/Block;
+G FIELD_MISSING F thaumcraft/api/blocks/BlocksTC leafGreatwood Lnet/minecraft/block/Block;
+G FIELD_MISSING F thaumcraft/api/blocks/BlocksTC leafSilverwood Lnet/minecraft/block/Block;
+G FIELD_MISSING F thaumcraft/api/blocks/BlocksTC levitator Lnet/minecraft/block/Block;
+G FIELD_MISSING F thaumcraft/api/blocks/BlocksTC liquidDeath Lnet/minecraft/block/Block;
+G FIELD_MISSING F thaumcraft/api/blocks/BlocksTC logGreatwood Lnet/minecraft/block/Block;
+G FIELD_MISSING F thaumcraft/api/blocks/BlocksTC logSilverwood Lnet/minecraft/block/Block;
+G FIELD_MISSING F thaumcraft/api/blocks/BlocksTC matrixCost Lnet/minecraft/block/Block;
+G FIELD_MISSING F thaumcraft/api/blocks/BlocksTC matrixSpeed Lnet/minecraft/block/Block;
+G FIELD_MISSING F thaumcraft/api/blocks/BlocksTC metalAlchemical Lnet/minecraft/block/Block;
+G FIELD_MISSING F thaumcraft/api/blocks/BlocksTC metalAlchemicalAdvanced Lnet/minecraft/block/Block;
+G FIELD_MISSING F thaumcraft/api/blocks/BlocksTC metalBlockBrass Lnet/minecraft/block/Block;
+G FIELD_MISSING F thaumcraft/api/blocks/BlocksTC metalBlockThaumium Lnet/minecraft/block/Block;
+G FIELD_MISSING F thaumcraft/api/blocks/BlocksTC metalBlockVoid Lnet/minecraft/block/Block;
+G FIELD_MISSING F thaumcraft/api/blocks/BlocksTC mirror Lnet/minecraft/block/Block;
+G FIELD_MISSING F thaumcraft/api/blocks/BlocksTC mirrorEssentia Lnet/minecraft/block/Block;
+G FIELD_MISSING F thaumcraft/api/blocks/BlocksTC oreAmber Lnet/minecraft/block/Block;
+G FIELD_MISSING F thaumcraft/api/blocks/BlocksTC oreCinnabar Lnet/minecraft/block/Block;
+G FIELD_MISSING F thaumcraft/api/blocks/BlocksTC oreQuartz Lnet/minecraft/block/Block;
+G FIELD_MISSING F thaumcraft/api/blocks/BlocksTC patternCrafter Lnet/minecraft/block/Block;
+G FIELD_MISSING F thaumcraft/api/blocks/BlocksTC pavingStoneBarrier Lnet/minecraft/block/Block;
+G FIELD_MISSING F thaumcraft/api/blocks/BlocksTC pavingStoneTravel Lnet/minecraft/block/Block;
+G FIELD_MISSING F thaumcraft/api/blocks/BlocksTC pedestalAncient Lnet/minecraft/block/Block;
+G FIELD_MISSING F thaumcraft/api/blocks/BlocksTC pedestalArcane Lnet/minecraft/block/Block;
+G FIELD_MISSING F thaumcraft/api/blocks/BlocksTC pedestalEldritch Lnet/minecraft/block/Block;
+G FIELD_MISSING F thaumcraft/api/blocks/BlocksTC pillarAncient Lnet/minecraft/block/Block;
+G FIELD_MISSING F thaumcraft/api/blocks/BlocksTC pillarArcane Lnet/minecraft/block/Block;
+G FIELD_MISSING F thaumcraft/api/blocks/BlocksTC pillarEldritch Lnet/minecraft/block/Block;
+G FIELD_MISSING F thaumcraft/api/blocks/BlocksTC placeholderAnvil Lnet/minecraft/block/Block;
+G FIELD_MISSING F thaumcraft/api/blocks/BlocksTC placeholderBars Lnet/minecraft/block/Block;
+G FIELD_MISSING F thaumcraft/api/blocks/BlocksTC placeholderCauldron Lnet/minecraft/block/Block;
+G FIELD_MISSING F thaumcraft/api/blocks/BlocksTC placeholderNetherbrick Lnet/minecraft/block/Block;
+G FIELD_MISSING F thaumcraft/api/blocks/BlocksTC placeholderObsidian Lnet/minecraft/block/Block;
+G FIELD_MISSING F thaumcraft/api/blocks/BlocksTC placeholderTable Lnet/minecraft/block/Block;
+G FIELD_MISSING F thaumcraft/api/blocks/BlocksTC plankGreatwood Lnet/minecraft/block/Block;
+G FIELD_MISSING F thaumcraft/api/blocks/BlocksTC plankSilverwood Lnet/minecraft/block/Block;
+G FIELD_MISSING F thaumcraft/api/blocks/BlocksTC potionSprayer Lnet/minecraft/block/Block;
+G FIELD_MISSING F thaumcraft/api/blocks/BlocksTC purifyingFluid Lnet/minecraft/block/Block;
+G FIELD_MISSING F thaumcraft/api/blocks/BlocksTC rechargePedestal Lnet/minecraft/block/Block;
+G FIELD_MISSING F thaumcraft/api/blocks/BlocksTC redstoneRelay Lnet/minecraft/block/Block;
+G FIELD_MISSING F thaumcraft/api/blocks/BlocksTC researchTable Lnet/minecraft/block/Block;
+G FIELD_MISSING F thaumcraft/api/blocks/BlocksTC saplingGreatwood Lnet/minecraft/block/Block;
+G FIELD_MISSING F thaumcraft/api/blocks/BlocksTC saplingSilverwood Lnet/minecraft/block/Block;
+G FIELD_MISSING F thaumcraft/api/blocks/BlocksTC slabAncient Lnet/minecraft/block/BlockSlab;
+G FIELD_MISSING F thaumcraft/api/blocks/BlocksTC slabArcaneBrick Lnet/minecraft/block/BlockSlab;
+G FIELD_MISSING F thaumcraft/api/blocks/BlocksTC slabArcaneStone Lnet/minecraft/block/BlockSlab;
+G FIELD_MISSING F thaumcraft/api/blocks/BlocksTC slabEldritch Lnet/minecraft/block/BlockSlab;
+G FIELD_MISSING F thaumcraft/api/blocks/BlocksTC slabGreatwood Lnet/minecraft/block/BlockSlab;
+G FIELD_MISSING F thaumcraft/api/blocks/BlocksTC slabSilverwood Lnet/minecraft/block/BlockSlab;
+G FIELD_MISSING F thaumcraft/api/blocks/BlocksTC smelterAux Lnet/minecraft/block/Block;
+G FIELD_MISSING F thaumcraft/api/blocks/BlocksTC smelterBasic Lnet/minecraft/block/Block;
+G FIELD_MISSING F thaumcraft/api/blocks/BlocksTC smelterThaumium Lnet/minecraft/block/Block;
+G FIELD_MISSING F thaumcraft/api/blocks/BlocksTC smelterVent Lnet/minecraft/block/Block;
+G FIELD_MISSING F thaumcraft/api/blocks/BlocksTC smelterVoid Lnet/minecraft/block/Block;
+G FIELD_MISSING F thaumcraft/api/blocks/BlocksTC spa Lnet/minecraft/block/Block;
+G FIELD_MISSING F thaumcraft/api/blocks/BlocksTC stabilizer Lnet/minecraft/block/Block;
+G FIELD_MISSING F thaumcraft/api/blocks/BlocksTC stairsAncient Lnet/minecraft/block/Block;
+G FIELD_MISSING F thaumcraft/api/blocks/BlocksTC stairsArcane Lnet/minecraft/block/Block;
+G FIELD_MISSING F thaumcraft/api/blocks/BlocksTC stairsArcaneBrick Lnet/minecraft/block/Block;
+G FIELD_MISSING F thaumcraft/api/blocks/BlocksTC stairsEldritch Lnet/minecraft/block/Block;
+G FIELD_MISSING F thaumcraft/api/blocks/BlocksTC stairsGreatwood Lnet/minecraft/block/Block;
+G FIELD_MISSING F thaumcraft/api/blocks/BlocksTC stairsSilverwood Lnet/minecraft/block/Block;
+G FIELD_MISSING F thaumcraft/api/blocks/BlocksTC stoneAncient Lnet/minecraft/block/Block;
+G FIELD_MISSING F thaumcraft/api/blocks/BlocksTC stoneAncientDoorway Lnet/minecraft/block/Block;
+G FIELD_MISSING F thaumcraft/api/blocks/BlocksTC stoneAncientGlyphed Lnet/minecraft/block/Block;
+G FIELD_MISSING F thaumcraft/api/blocks/BlocksTC stoneAncientRock Lnet/minecraft/block/Block;
+G FIELD_MISSING F thaumcraft/api/blocks/BlocksTC stoneAncientTile Lnet/minecraft/block/Block;
+G FIELD_MISSING F thaumcraft/api/blocks/BlocksTC stoneArcane Lnet/minecraft/block/Block;
+G FIELD_MISSING F thaumcraft/api/blocks/BlocksTC stoneArcaneBrick Lnet/minecraft/block/Block;
+G FIELD_MISSING F thaumcraft/api/blocks/BlocksTC stoneEldritchTile Lnet/minecraft/block/Block;
+G FIELD_MISSING F thaumcraft/api/blocks/BlocksTC stonePorous Lnet/minecraft/block/Block;
+G FIELD_MISSING F thaumcraft/api/blocks/BlocksTC tableStone Lnet/minecraft/block/Block;
+G FIELD_MISSING F thaumcraft/api/blocks/BlocksTC tableWood Lnet/minecraft/block/Block;
+G FIELD_MISSING F thaumcraft/api/blocks/BlocksTC taintCrust Lnet/minecraft/block/Block;
+G FIELD_MISSING F thaumcraft/api/blocks/BlocksTC taintDust Lnet/minecraft/block/Block;
+G FIELD_MISSING F thaumcraft/api/blocks/BlocksTC taintFeature Lnet/minecraft/block/Block;
+G FIELD_MISSING F thaumcraft/api/blocks/BlocksTC taintFibre Lnet/minecraft/block/Block;
+G FIELD_MISSING F thaumcraft/api/blocks/BlocksTC taintGeyser Lnet/minecraft/block/Block;
+G FIELD_MISSING F thaumcraft/api/blocks/BlocksTC taintLog Lnet/minecraft/block/Block;
+G FIELD_MISSING F thaumcraft/api/blocks/BlocksTC taintRock Lnet/minecraft/block/Block;
+G FIELD_MISSING F thaumcraft/api/blocks/BlocksTC taintSoil Lnet/minecraft/block/Block;
+G FIELD_MISSING F thaumcraft/api/blocks/BlocksTC thaumatorium Lnet/minecraft/block/Block;
+G FIELD_MISSING F thaumcraft/api/blocks/BlocksTC thaumatoriumTop Lnet/minecraft/block/Block;
+G FIELD_MISSING F thaumcraft/api/blocks/BlocksTC tube Lnet/minecraft/block/Block;
+G FIELD_MISSING F thaumcraft/api/blocks/BlocksTC tubeBuffer Lnet/minecraft/block/Block;
+G FIELD_MISSING F thaumcraft/api/blocks/BlocksTC tubeFilter Lnet/minecraft/block/Block;
+G FIELD_MISSING F thaumcraft/api/blocks/BlocksTC tubeOneway Lnet/minecraft/block/Block;
+G FIELD_MISSING F thaumcraft/api/blocks/BlocksTC tubeRestrict Lnet/minecraft/block/Block;
+G FIELD_MISSING F thaumcraft/api/blocks/BlocksTC tubeValve Lnet/minecraft/block/Block;
+G FIELD_MISSING F thaumcraft/api/blocks/BlocksTC visBattery Lnet/minecraft/block/Block;
+G FIELD_MISSING F thaumcraft/api/blocks/BlocksTC visGenerator Lnet/minecraft/block/Block;
+G FIELD_MISSING F thaumcraft/api/blocks/BlocksTC voidSiphon Lnet/minecraft/block/Block;
+G FIELD_MISSING F thaumcraft/api/blocks/BlocksTC wandWorkbench Lnet/minecraft/block/Block;
+G FIELD_MISSING F thaumcraft/api/crafting/InfusionRecipe components Lnet/minecraft/util/NonNullList;
+G FIELD_MISSING F thaumcraft/api/crafting/InfusionRecipe sourceInput Lnet/minecraft/item/crafting/Ingredient;
+G FIELD_MISSING F thaumcraft/api/internal/CommonInternals craftingRecipeCatalog Ljava/util/HashMap;
+G FIELD_MISSING F thaumcraft/api/internal/CommonInternals craftingRecipeCatalogFake Ljava/util/HashMap;
+G FIELD_MISSING F thaumcraft/api/internal/CommonInternals jsonLocs Ljava/util/HashMap;
+G FIELD_MISSING F thaumcraft/api/internal/CommonInternals seedList Ljava/util/HashMap;
+G FIELD_MISSING F thaumcraft/api/internal/CommonInternals smeltingBonus Ljava/util/ArrayList;
+G FIELD_MISSING F thaumcraft/api/internal/CommonInternals warpMap Ljava/util/HashMap;
+G FIELD_MISSING F thaumcraft/api/items/ItemsTC alumentum Lnet/minecraft/item/Item;
+G FIELD_MISSING F thaumcraft/api/items/ItemsTC amuletVis Lnet/minecraft/item/Item;
+G FIELD_MISSING F thaumcraft/api/items/ItemsTC bandCuriosity Lnet/minecraft/item/Item;
+G FIELD_MISSING F thaumcraft/api/items/ItemsTC bathSalts Lnet/minecraft/item/Item;
+G FIELD_MISSING F thaumcraft/api/items/ItemsTC baubles Lnet/minecraft/item/Item;
+G FIELD_MISSING F thaumcraft/api/items/ItemsTC bottleTaint Lnet/minecraft/item/Item;
+G FIELD_MISSING F thaumcraft/api/items/ItemsTC casterBasic Lnet/minecraft/item/Item;
+G FIELD_MISSING F thaumcraft/api/items/ItemsTC causalityCollapser Lnet/minecraft/item/Item;
+G FIELD_MISSING F thaumcraft/api/items/ItemsTC charmUndying Lnet/minecraft/item/Item;
+G FIELD_MISSING F thaumcraft/api/items/ItemsTC charmVerdant Lnet/minecraft/item/Item;
+G FIELD_MISSING F thaumcraft/api/items/ItemsTC charmVoidseer Lnet/minecraft/item/Item;
+G FIELD_MISSING F thaumcraft/api/items/ItemsTC clothBoots Lnet/minecraft/item/Item;
+G FIELD_MISSING F thaumcraft/api/items/ItemsTC clothChest Lnet/minecraft/item/Item;
+G FIELD_MISSING F thaumcraft/api/items/ItemsTC clothLegs Lnet/minecraft/item/Item;
+G FIELD_MISSING F thaumcraft/api/items/ItemsTC clusters Lnet/minecraft/item/Item;
+G FIELD_MISSING F thaumcraft/api/items/ItemsTC creativeFluxSponge Lnet/minecraft/item/Item;
+G FIELD_MISSING F thaumcraft/api/items/ItemsTC creativePlacer Lnet/minecraft/item/Item;
+G FIELD_MISSING F thaumcraft/api/items/ItemsTC eldritchEye Lnet/minecraft/item/Item;
+G FIELD_MISSING F thaumcraft/api/items/ItemsTC elementalAxe Lnet/minecraft/item/Item;
+G FIELD_MISSING F thaumcraft/api/items/ItemsTC elementalHoe Lnet/minecraft/item/Item;
+G FIELD_MISSING F thaumcraft/api/items/ItemsTC elementalPick Lnet/minecraft/item/Item;
+G FIELD_MISSING F thaumcraft/api/items/ItemsTC elementalShovel Lnet/minecraft/item/Item;
+G FIELD_MISSING F thaumcraft/api/items/ItemsTC elementalSword Lnet/minecraft/item/Item;
+G FIELD_MISSING F thaumcraft/api/items/ItemsTC enchantedPlaceholder Lnet/minecraft/item/Item;
+G FIELD_MISSING F thaumcraft/api/items/ItemsTC fabric Lnet/minecraft/item/Item;
+G FIELD_MISSING F thaumcraft/api/items/ItemsTC filter Lnet/minecraft/item/Item;
+G FIELD_MISSING F thaumcraft/api/items/ItemsTC focus1 Lnet/minecraft/item/Item;
+G FIELD_MISSING F thaumcraft/api/items/ItemsTC focus2 Lnet/minecraft/item/Item;
+G FIELD_MISSING F thaumcraft/api/items/ItemsTC focus3 Lnet/minecraft/item/Item;
+G FIELD_MISSING F thaumcraft/api/items/ItemsTC focusPouch Lnet/minecraft/item/Item;
+G FIELD_MISSING F thaumcraft/api/items/ItemsTC fortressChest Lnet/minecraft/item/Item;
+G FIELD_MISSING F thaumcraft/api/items/ItemsTC fortressHelm Lnet/minecraft/item/Item;
+G FIELD_MISSING F thaumcraft/api/items/ItemsTC fortressLegs Lnet/minecraft/item/Item;
+G FIELD_MISSING F thaumcraft/api/items/ItemsTC goggles Lnet/minecraft/item/Item;
+G FIELD_MISSING F thaumcraft/api/items/ItemsTC golemBell Lnet/minecraft/item/Item;
+G FIELD_MISSING F thaumcraft/api/items/ItemsTC golemPlacer Lnet/minecraft/item/Item;
+G FIELD_MISSING F thaumcraft/api/items/ItemsTC grappleGun Lnet/minecraft/item/Item;
+G FIELD_MISSING F thaumcraft/api/items/ItemsTC grappleGunSpool Lnet/minecraft/item/Item;
+G FIELD_MISSING F thaumcraft/api/items/ItemsTC grappleGunTip Lnet/minecraft/item/Item;
+G FIELD_MISSING F thaumcraft/api/items/ItemsTC handMirror Lnet/minecraft/item/Item;
+G FIELD_MISSING F thaumcraft/api/items/ItemsTC jarBrace Lnet/minecraft/item/Item;
+G FIELD_MISSING F thaumcraft/api/items/ItemsTC label Lnet/minecraft/item/Item;
+G FIELD_MISSING F thaumcraft/api/items/ItemsTC mind Lnet/minecraft/item/Item;
+G FIELD_MISSING F thaumcraft/api/items/ItemsTC mirroredGlass Lnet/minecraft/item/Item;
+G FIELD_MISSING F thaumcraft/api/items/ItemsTC modules Lnet/minecraft/item/Item;
+G FIELD_MISSING F thaumcraft/api/items/ItemsTC morphicResonator Lnet/minecraft/item/Item;
+G FIELD_MISSING F thaumcraft/api/items/ItemsTC pechWand Lnet/minecraft/item/Item;
+G FIELD_MISSING F thaumcraft/api/items/ItemsTC phial Lnet/minecraft/item/Item;
+G FIELD_MISSING F thaumcraft/api/items/ItemsTC primalCrusher Lnet/minecraft/item/Item;
+G FIELD_MISSING F thaumcraft/api/items/ItemsTC quicksilver Lnet/minecraft/item/Item;
+G FIELD_MISSING F thaumcraft/api/items/ItemsTC resonator Lnet/minecraft/item/Item;
+G FIELD_MISSING F thaumcraft/api/items/ItemsTC ringCloud Lnet/minecraft/item/Item;
+G FIELD_MISSING F thaumcraft/api/items/ItemsTC runedTablet Lnet/minecraft/item/Item;
+G FIELD_MISSING F thaumcraft/api/items/ItemsTC salisMundus Lnet/minecraft/item/Item;
+G FIELD_MISSING F thaumcraft/api/items/ItemsTC sanityChecker Lnet/minecraft/item/Item;
+G FIELD_MISSING F thaumcraft/api/items/ItemsTC sanitySoap Lnet/minecraft/item/Item;
+G FIELD_MISSING F thaumcraft/api/items/ItemsTC scribingTools Lnet/minecraft/item/Item;
+G FIELD_MISSING F thaumcraft/api/items/ItemsTC seals Lnet/minecraft/item/Item;
+G FIELD_MISSING F thaumcraft/api/items/ItemsTC tallow Lnet/minecraft/item/Item;
+G FIELD_MISSING F thaumcraft/api/items/ItemsTC thaumiumAxe Lnet/minecraft/item/Item;
+G FIELD_MISSING F thaumcraft/api/items/ItemsTC thaumiumBoots Lnet/minecraft/item/Item;
+G FIELD_MISSING F thaumcraft/api/items/ItemsTC thaumiumChest Lnet/minecraft/item/Item;
+G FIELD_MISSING F thaumcraft/api/items/ItemsTC thaumiumHelm Lnet/minecraft/item/Item;
+G FIELD_MISSING F thaumcraft/api/items/ItemsTC thaumiumHoe Lnet/minecraft/item/Item;
+G FIELD_MISSING F thaumcraft/api/items/ItemsTC thaumiumLegs Lnet/minecraft/item/Item;
+G FIELD_MISSING F thaumcraft/api/items/ItemsTC thaumiumPick Lnet/minecraft/item/Item;
+G FIELD_MISSING F thaumcraft/api/items/ItemsTC thaumiumShovel Lnet/minecraft/item/Item;
+G FIELD_MISSING F thaumcraft/api/items/ItemsTC thaumometer Lnet/minecraft/item/Item;
+G FIELD_MISSING F thaumcraft/api/items/ItemsTC thaumonomicon Lnet/minecraft/item/Item;
+G FIELD_MISSING F thaumcraft/api/items/ItemsTC travellerBoots Lnet/minecraft/item/Item;
+G FIELD_MISSING F thaumcraft/api/items/ItemsTC tripleMeatTreat Lnet/minecraft/item/Item;
+G FIELD_MISSING F thaumcraft/api/items/ItemsTC turretPlacer Lnet/minecraft/item/Item;
+G FIELD_MISSING F thaumcraft/api/items/ItemsTC visResonator Lnet/minecraft/item/Item;
+G FIELD_MISSING F thaumcraft/api/items/ItemsTC voidAxe Lnet/minecraft/item/Item;
+G FIELD_MISSING F thaumcraft/api/items/ItemsTC voidBoots Lnet/minecraft/item/Item;
+G FIELD_MISSING F thaumcraft/api/items/ItemsTC voidChest Lnet/minecraft/item/Item;
+G FIELD_MISSING F thaumcraft/api/items/ItemsTC voidHelm Lnet/minecraft/item/Item;
+G FIELD_MISSING F thaumcraft/api/items/ItemsTC voidHoe Lnet/minecraft/item/Item;
+G FIELD_MISSING F thaumcraft/api/items/ItemsTC voidLegs Lnet/minecraft/item/Item;
+G FIELD_MISSING F thaumcraft/api/items/ItemsTC voidPick Lnet/minecraft/item/Item;
+G FIELD_MISSING F thaumcraft/api/items/ItemsTC voidRobeChest Lnet/minecraft/item/Item;
+G FIELD_MISSING F thaumcraft/api/items/ItemsTC voidRobeHelm Lnet/minecraft/item/Item;
+G FIELD_MISSING F thaumcraft/api/items/ItemsTC voidRobeLegs Lnet/minecraft/item/Item;
+G FIELD_MISSING F thaumcraft/api/items/ItemsTC voidShovel Lnet/minecraft/item/Item;
+G FIELD_MISSING F thaumcraft/api/potions/PotionFluxTaint instance Lnet/minecraft/potion/Potion;
+G FIELD_MISSING F thaumcraft/api/potions/PotionVisExhaust instance Lnet/minecraft/potion/Potion;
+G FIELD_MISSING F thaumcraft/api/research/theorycraft/ResearchTableData aidCards Ljava/util/ArrayList;
+G FIELD_MISSING F thaumcraft/api/research/theorycraft/ResearchTableData aidsChosen I
+G FIELD_MISSING F thaumcraft/api/research/theorycraft/ResearchTableData cardChoices Ljava/util/ArrayList;
+G FIELD_MISSING F thaumcraft/api/research/theorycraft/ResearchTableData categoriesBlocked Ljava/util/ArrayList;
+G FIELD_MISSING F thaumcraft/api/research/theorycraft/ResearchTableData lastDraw Lthaumcraft/api/research/theorycraft/ResearchTableData$CardChoice;
+G FIELD_MISSING F thaumcraft/api/research/theorycraft/ResearchTableData penaltyStart I
+G FIELD_MISSING F thaumcraft/api/research/theorycraft/ResearchTableData placedCards I
+G FIELD_MISSING F thaumcraft/api/research/theorycraft/ResearchTableData savedCards Ljava/util/ArrayList;
+G INTERFACE C thaumcraft/api/crafting/CrucibleRecipe thaumcraft/api/crafting/IThaumcraftRecipe
+G INTERFACE C thaumcraft/api/crafting/IArcaneRecipe net/minecraft/item/crafting/IRecipe
+G INTERFACE C thaumcraft/api/crafting/InfusionRecipe thaumcraft/api/crafting/IThaumcraftRecipe
+G METHOD_ACCESS M thaumcraft/api/aura/AuraHelper <init> ()V
+G METHOD_ACCESS M thaumcraft/api/blocks/BlocksTC <init> ()V
+G METHOD_ACCESS M thaumcraft/api/items/ItemsTC <init> ()V
+G METHOD_MISSING M thaumcraft/api/ThaumcraftApi addFakeCraftingRecipe (Lnet/minecraft/util/ResourceLocation;Ljava/lang/Object;)V
+G METHOD_MISSING M thaumcraft/api/ThaumcraftApi addMultiblockRecipeToCatalog (Lnet/minecraft/util/ResourceLocation;Lthaumcraft/api/ThaumcraftApi$BluePrint;)V
+G METHOD_MISSING M thaumcraft/api/ThaumcraftApi addSmeltingBonus (Ljava/lang/Object;Lnet/minecraft/item/ItemStack;)V
+G METHOD_MISSING M thaumcraft/api/ThaumcraftApi exists (Lnet/minecraft/item/ItemStack;)Z
+G METHOD_MISSING M thaumcraft/api/ThaumcraftApi getCraftingRecipes ()Ljava/util/HashMap;
+G METHOD_MISSING M thaumcraft/api/ThaumcraftApi getCraftingRecipesFake ()Ljava/util/HashMap;
+G METHOD_MISSING M thaumcraft/api/ThaumcraftApi getWarp (Lnet/minecraft/item/ItemStack;)I
+G METHOD_MISSING M thaumcraft/api/ThaumcraftApiHelper areItemStackTagsEqualRelaxed (Lnet/minecraft/item/ItemStack;Lnet/minecraft/item/ItemStack;)Z
+G METHOD_MISSING M thaumcraft/api/ThaumcraftApiHelper areItemStacksEqualForCrafting (Lnet/minecraft/item/ItemStack;Ljava/lang/Object;)Z
+G METHOD_MISSING M thaumcraft/api/ThaumcraftApiHelper compareTagsRelaxed (Lnet/minecraft/nbt/NBTTagCompound;Lnet/minecraft/nbt/NBTTagCompound;)Z
+G METHOD_MISSING M thaumcraft/api/ThaumcraftApiHelper containsMatch (Z[Lnet/minecraft/item/ItemStack;Ljava/util/List;)Z
+G METHOD_MISSING M thaumcraft/api/ThaumcraftApiHelper getByteInInt (II)B
+G METHOD_MISSING M thaumcraft/api/ThaumcraftApiHelper getByteInLong (JI)B
+G METHOD_MISSING M thaumcraft/api/ThaumcraftApiHelper getConnectableTile (Lnet/minecraft/world/IBlockAccess;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/util/EnumFacing;)Lnet/minecraft/tileentity/TileEntity;
+G METHOD_MISSING M thaumcraft/api/ThaumcraftApiHelper getConnectableTile (Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/util/EnumFacing;)Lnet/minecraft/tileentity/TileEntity;
+G METHOD_MISSING M thaumcraft/api/ThaumcraftApiHelper getIngredient (Ljava/lang/Object;)Lnet/minecraft/item/crafting/Ingredient;
+G METHOD_MISSING M thaumcraft/api/ThaumcraftApiHelper getItemHandlerAt (Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/util/EnumFacing;)Lnet/minecraftforge/items/IItemHandler;
+G METHOD_MISSING M thaumcraft/api/ThaumcraftApiHelper getNBTDataFromId (Lnet/minecraft/nbt/NBTTagCompound;BLjava/lang/String;)Ljava/lang/Object;
+G METHOD_MISSING M thaumcraft/api/ThaumcraftApiHelper getNibbleInInt (II)I
+G METHOD_MISSING M thaumcraft/api/ThaumcraftApiHelper setByteInInt (IBI)I
+G METHOD_MISSING M thaumcraft/api/ThaumcraftApiHelper setByteInLong (JBI)J
+G METHOD_MISSING M thaumcraft/api/ThaumcraftApiHelper setNibbleInInt (III)I
+G METHOD_MISSING M thaumcraft/api/ThaumcraftApiHelper wrapInventory (Lnet/minecraft/inventory/IInventory;Lnet/minecraft/util/EnumFacing;)Lnet/minecraftforge/items/IItemHandler;
+G METHOD_MISSING M thaumcraft/api/aspects/AspectHelper cullTags (Lthaumcraft/api/aspects/AspectList;)Lthaumcraft/api/aspects/AspectList;
+G METHOD_MISSING M thaumcraft/api/aspects/AspectHelper cullTags (Lthaumcraft/api/aspects/AspectList;I)Lthaumcraft/api/aspects/AspectList;
+G METHOD_MISSING M thaumcraft/api/aspects/AspectHelper generateTags (Lnet/minecraft/item/ItemStack;)Lthaumcraft/api/aspects/AspectList;
+G METHOD_MISSING M thaumcraft/api/aspects/AspectHelper getAuraAspects (Lthaumcraft/api/aspects/AspectList;)Lthaumcraft/api/aspects/AspectList;
+G METHOD_MISSING M thaumcraft/api/aspects/AspectHelper getCombinationResult (Lthaumcraft/api/aspects/Aspect;Lthaumcraft/api/aspects/Aspect;)Lthaumcraft/api/aspects/Aspect;
+G METHOD_MISSING M thaumcraft/api/aspects/AspectHelper getEntityAspects (Lnet/minecraft/entity/Entity;)Lthaumcraft/api/aspects/AspectList;
+G METHOD_MISSING M thaumcraft/api/aspects/AspectHelper getPrimalAspects (Lthaumcraft/api/aspects/AspectList;)Lthaumcraft/api/aspects/AspectList;
+G METHOD_MISSING M thaumcraft/api/aspects/AspectHelper getRandomPrimal (Ljava/util/Random;Lthaumcraft/api/aspects/Aspect;)Lthaumcraft/api/aspects/Aspect;
+G METHOD_MISSING M thaumcraft/api/aspects/AspectHelper reduceToPrimals (Lthaumcraft/api/aspects/AspectList;)Lthaumcraft/api/aspects/AspectList;
+G METHOD_MISSING M thaumcraft/api/aspects/AspectList getAspectsSortedByName ()[Lthaumcraft/api/aspects/Aspect;
+G METHOD_MISSING M thaumcraft/api/aspects/AspectList remove (Lthaumcraft/api/aspects/AspectList;)Lthaumcraft/api/aspects/AspectList;
+G METHOD_MISSING M thaumcraft/api/aspects/IAspectSource isBlocked ()Z
+G METHOD_MISSING M thaumcraft/api/aspects/IEssentiaContainerItem ignoreContainedAspects ()Z
+G METHOD_MISSING M thaumcraft/api/aura/AuraHelper drainFlux (Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;FZ)F
+G METHOD_MISSING M thaumcraft/api/aura/AuraHelper getAuraBase (Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;)I
+G METHOD_MISSING M thaumcraft/api/aura/AuraHelper polluteAura (Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;FZ)V
+G METHOD_MISSING M thaumcraft/api/aura/AuraHelper shouldPreserveAura (Lnet/minecraft/world/World;Lnet/minecraft/entity/player/EntityPlayer;Lnet/minecraft/util/math/BlockPos;)Z
+G METHOD_MISSING M thaumcraft/api/crafting/CrucibleRecipe getAspects ()Lthaumcraft/api/aspects/AspectList;
+G METHOD_MISSING M thaumcraft/api/crafting/CrucibleRecipe getCatalyst ()Lnet/minecraft/item/crafting/Ingredient;
+G METHOD_MISSING M thaumcraft/api/crafting/CrucibleRecipe getGroup ()Ljava/lang/String;
+G METHOD_MISSING M thaumcraft/api/crafting/CrucibleRecipe getResearch ()Ljava/lang/String;
+G METHOD_MISSING M thaumcraft/api/crafting/CrucibleRecipe setAspects (Lthaumcraft/api/aspects/AspectList;)V
+G METHOD_MISSING M thaumcraft/api/crafting/CrucibleRecipe setCatalyst (Lnet/minecraft/item/crafting/Ingredient;)V
+G METHOD_MISSING M thaumcraft/api/crafting/CrucibleRecipe setGroup (Lnet/minecraft/util/ResourceLocation;)Lthaumcraft/api/crafting/CrucibleRecipe;
+G METHOD_MISSING M thaumcraft/api/crafting/IArcaneRecipe getCrystals ()Lthaumcraft/api/aspects/AspectList;
+G METHOD_MISSING M thaumcraft/api/crafting/IArcaneRecipe getVis ()I
+G METHOD_MISSING M thaumcraft/api/crafting/InfusionRecipe getAspects (Lnet/minecraft/entity/player/EntityPlayer;Lnet/minecraft/item/ItemStack;Ljava/util/List;)Lthaumcraft/api/aspects/AspectList;
+G METHOD_MISSING M thaumcraft/api/crafting/InfusionRecipe getComponents ()Lnet/minecraft/util/NonNullList;
+G METHOD_MISSING M thaumcraft/api/crafting/InfusionRecipe getGroup ()Ljava/lang/String;
+G METHOD_MISSING M thaumcraft/api/crafting/InfusionRecipe getInstability (Lnet/minecraft/entity/player/EntityPlayer;Lnet/minecraft/item/ItemStack;Ljava/util/List;)I
+G METHOD_MISSING M thaumcraft/api/crafting/InfusionRecipe getRecipeInput ()Lnet/minecraft/item/crafting/Ingredient;
+G METHOD_MISSING M thaumcraft/api/crafting/InfusionRecipe getRecipeOutput (Lnet/minecraft/entity/player/EntityPlayer;Lnet/minecraft/item/ItemStack;Ljava/util/List;)Ljava/lang/Object;
+G METHOD_MISSING M thaumcraft/api/crafting/InfusionRecipe matches (Ljava/util/List;Lnet/minecraft/item/ItemStack;Lnet/minecraft/world/World;Lnet/minecraft/entity/player/EntityPlayer;)Z
+G METHOD_MISSING M thaumcraft/api/crafting/InfusionRecipe setGroup (Lnet/minecraft/util/ResourceLocation;)Lthaumcraft/api/crafting/InfusionRecipe;
+G METHOD_MISSING M thaumcraft/api/crafting/ShapedArcaneRecipe <init> (Lnet/minecraft/util/ResourceLocation;Ljava/lang/String;ILthaumcraft/api/aspects/AspectList;Lnet/minecraft/item/ItemStack;Lnet/minecraftforge/common/crafting/CraftingHelper$ShapedPrimer;)V
+G METHOD_MISSING M thaumcraft/api/crafting/ShapedArcaneRecipe func_77569_a (Lnet/minecraft/inventory/InventoryCrafting;Lnet/minecraft/world/World;)Z
+G METHOD_MISSING M thaumcraft/api/crafting/ShapedArcaneRecipe func_77572_b (Lnet/minecraft/inventory/InventoryCrafting;)Lnet/minecraft/item/ItemStack;
+G METHOD_MISSING M thaumcraft/api/crafting/ShapedArcaneRecipe getCrystals ()Lthaumcraft/api/aspects/AspectList;
+G METHOD_MISSING M thaumcraft/api/crafting/ShapedArcaneRecipe getVis ()I
+G METHOD_MISSING M thaumcraft/api/crafting/ShapelessArcaneRecipe <init> (Lnet/minecraft/util/ResourceLocation;Ljava/lang/String;ILthaumcraft/api/aspects/AspectList;Lnet/minecraft/block/Block;[Ljava/lang/Object;)V
+G METHOD_MISSING M thaumcraft/api/crafting/ShapelessArcaneRecipe <init> (Lnet/minecraft/util/ResourceLocation;Ljava/lang/String;ILthaumcraft/api/aspects/AspectList;Lnet/minecraft/item/Item;[Ljava/lang/Object;)V
+G METHOD_MISSING M thaumcraft/api/crafting/ShapelessArcaneRecipe <init> (Lnet/minecraft/util/ResourceLocation;Ljava/lang/String;ILthaumcraft/api/aspects/AspectList;Lnet/minecraft/item/ItemStack;[Ljava/lang/Object;)V
+G METHOD_MISSING M thaumcraft/api/crafting/ShapelessArcaneRecipe <init> (Lnet/minecraft/util/ResourceLocation;Ljava/lang/String;ILthaumcraft/api/aspects/AspectList;Lnet/minecraft/util/NonNullList;Lnet/minecraft/item/ItemStack;)V
+G METHOD_MISSING M thaumcraft/api/crafting/ShapelessArcaneRecipe func_77569_a (Lnet/minecraft/inventory/InventoryCrafting;Lnet/minecraft/world/World;)Z
+G METHOD_MISSING M thaumcraft/api/crafting/ShapelessArcaneRecipe func_77572_b (Lnet/minecraft/inventory/InventoryCrafting;)Lnet/minecraft/item/ItemStack;
+G METHOD_MISSING M thaumcraft/api/crafting/ShapelessArcaneRecipe getCrystals ()Lthaumcraft/api/aspects/AspectList;
+G METHOD_MISSING M thaumcraft/api/crafting/ShapelessArcaneRecipe getVis ()I
+G METHOD_MISSING M thaumcraft/api/internal/CommonInternals generateUniqueItemstackIdStripped (Lnet/minecraft/item/ItemStack;)I
+G METHOD_MISSING M thaumcraft/api/internal/CommonInternals getCatalogRecipe (Lnet/minecraft/util/ResourceLocation;)Lthaumcraft/api/crafting/IThaumcraftRecipe;
+G METHOD_MISSING M thaumcraft/api/internal/CommonInternals getCatalogRecipeFake (Lnet/minecraft/util/ResourceLocation;)Ljava/lang/Object;
+G METHOD_MISSING M thaumcraft/api/internal/DummyInternalMethodHandler addFlux (Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;FZ)V
+G METHOD_MISSING M thaumcraft/api/internal/DummyInternalMethodHandler addGolemTask (ILthaumcraft/api/golems/tasks/Task;)V
+G METHOD_MISSING M thaumcraft/api/internal/DummyInternalMethodHandler addKnowledge (Lnet/minecraft/entity/player/EntityPlayer;Lthaumcraft/api/capabilities/IPlayerKnowledge$EnumKnowledgeType;Lthaumcraft/api/research/ResearchCategory;I)Z
+G METHOD_MISSING M thaumcraft/api/internal/DummyInternalMethodHandler addVis (Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;F)V
+G METHOD_MISSING M thaumcraft/api/internal/DummyInternalMethodHandler addWarpToPlayer (Lnet/minecraft/entity/player/EntityPlayer;ILthaumcraft/api/capabilities/IPlayerWarp$EnumWarpType;)V
+G METHOD_MISSING M thaumcraft/api/internal/DummyInternalMethodHandler completeResearch (Lnet/minecraft/entity/player/EntityPlayer;Ljava/lang/String;)Z
+G METHOD_MISSING M thaumcraft/api/internal/DummyInternalMethodHandler doesPlayerHaveRequisites (Lnet/minecraft/entity/player/EntityPlayer;Ljava/lang/String;)Z
+G METHOD_MISSING M thaumcraft/api/internal/DummyInternalMethodHandler drainFlux (Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;FZ)F
+G METHOD_MISSING M thaumcraft/api/internal/DummyInternalMethodHandler drainVis (Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;FZ)F
+G METHOD_MISSING M thaumcraft/api/internal/DummyInternalMethodHandler generateTags (Lnet/minecraft/item/ItemStack;)Lthaumcraft/api/aspects/AspectList;
+G METHOD_MISSING M thaumcraft/api/internal/DummyInternalMethodHandler getActualWarp (Lnet/minecraft/entity/player/EntityPlayer;)I
+G METHOD_MISSING M thaumcraft/api/internal/DummyInternalMethodHandler getAuraBase (Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;)I
+G METHOD_MISSING M thaumcraft/api/internal/DummyInternalMethodHandler getFlux (Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;)F
+G METHOD_MISSING M thaumcraft/api/internal/DummyInternalMethodHandler getSeal (Ljava/lang/String;)Lthaumcraft/api/golems/seals/ISeal;
+G METHOD_MISSING M thaumcraft/api/internal/DummyInternalMethodHandler getSealEntity (ILthaumcraft/api/golems/seals/SealPos;)Lthaumcraft/api/golems/seals/ISealEntity;
+G METHOD_MISSING M thaumcraft/api/internal/DummyInternalMethodHandler getSealStack (Ljava/lang/String;)Lnet/minecraft/item/ItemStack;
+G METHOD_MISSING M thaumcraft/api/internal/DummyInternalMethodHandler getTotalAura (Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;)F
+G METHOD_MISSING M thaumcraft/api/internal/DummyInternalMethodHandler getVis (Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;)F
+G METHOD_MISSING M thaumcraft/api/internal/DummyInternalMethodHandler progressResearch (Lnet/minecraft/entity/player/EntityPlayer;Ljava/lang/String;)Z
+G METHOD_MISSING M thaumcraft/api/internal/DummyInternalMethodHandler registerSeal (Lthaumcraft/api/golems/seals/ISeal;)V
+G METHOD_MISSING M thaumcraft/api/internal/DummyInternalMethodHandler shouldPreserveAura (Lnet/minecraft/world/World;Lnet/minecraft/entity/player/EntityPlayer;Lnet/minecraft/util/math/BlockPos;)Z
+G METHOD_MISSING M thaumcraft/api/internal/IInternalMethodHandler addFlux (Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;FZ)V
+G METHOD_MISSING M thaumcraft/api/internal/IInternalMethodHandler addGolemTask (ILthaumcraft/api/golems/tasks/Task;)V
+G METHOD_MISSING M thaumcraft/api/internal/IInternalMethodHandler addKnowledge (Lnet/minecraft/entity/player/EntityPlayer;Lthaumcraft/api/capabilities/IPlayerKnowledge$EnumKnowledgeType;Lthaumcraft/api/research/ResearchCategory;I)Z
+G METHOD_MISSING M thaumcraft/api/internal/IInternalMethodHandler addVis (Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;F)V
+G METHOD_MISSING M thaumcraft/api/internal/IInternalMethodHandler addWarpToPlayer (Lnet/minecraft/entity/player/EntityPlayer;ILthaumcraft/api/capabilities/IPlayerWarp$EnumWarpType;)V
+G METHOD_MISSING M thaumcraft/api/internal/IInternalMethodHandler completeResearch (Lnet/minecraft/entity/player/EntityPlayer;Ljava/lang/String;)Z
+G METHOD_MISSING M thaumcraft/api/internal/IInternalMethodHandler doesPlayerHaveRequisites (Lnet/minecraft/entity/player/EntityPlayer;Ljava/lang/String;)Z
+G METHOD_MISSING M thaumcraft/api/internal/IInternalMethodHandler drainFlux (Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;FZ)F
+G METHOD_MISSING M thaumcraft/api/internal/IInternalMethodHandler drainVis (Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;FZ)F
+G METHOD_MISSING M thaumcraft/api/internal/IInternalMethodHandler generateTags (Lnet/minecraft/item/ItemStack;)Lthaumcraft/api/aspects/AspectList;
+G METHOD_MISSING M thaumcraft/api/internal/IInternalMethodHandler getActualWarp (Lnet/minecraft/entity/player/EntityPlayer;)I
+G METHOD_MISSING M thaumcraft/api/internal/IInternalMethodHandler getAuraBase (Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;)I
+G METHOD_MISSING M thaumcraft/api/internal/IInternalMethodHandler getFlux (Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;)F
+G METHOD_MISSING M thaumcraft/api/internal/IInternalMethodHandler getSeal (Ljava/lang/String;)Lthaumcraft/api/golems/seals/ISeal;
+G METHOD_MISSING M thaumcraft/api/internal/IInternalMethodHandler getSealEntity (ILthaumcraft/api/golems/seals/SealPos;)Lthaumcraft/api/golems/seals/ISealEntity;
+G METHOD_MISSING M thaumcraft/api/internal/IInternalMethodHandler getSealStack (Ljava/lang/String;)Lnet/minecraft/item/ItemStack;
+G METHOD_MISSING M thaumcraft/api/internal/IInternalMethodHandler getTotalAura (Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;)F
+G METHOD_MISSING M thaumcraft/api/internal/IInternalMethodHandler getVis (Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;)F
+G METHOD_MISSING M thaumcraft/api/internal/IInternalMethodHandler progressResearch (Lnet/minecraft/entity/player/EntityPlayer;Ljava/lang/String;)Z
+G METHOD_MISSING M thaumcraft/api/internal/IInternalMethodHandler registerSeal (Lthaumcraft/api/golems/seals/ISeal;)V
+G METHOD_MISSING M thaumcraft/api/internal/IInternalMethodHandler shouldPreserveAura (Lnet/minecraft/world/World;Lnet/minecraft/entity/player/EntityPlayer;Lnet/minecraft/util/math/BlockPos;)Z
+G METHOD_MISSING M thaumcraft/api/potions/PotionFluxTaint func_76398_f ()Z
+G METHOD_MISSING M thaumcraft/api/potions/PotionVisExhaust func_76398_f ()Z
+G METHOD_MISSING M thaumcraft/api/research/ResearchStage$Knowledge parse (Ljava/lang/String;)Lthaumcraft/api/research/ResearchStage$Knowledge;
+G METHOD_MISSING M thaumcraft/api/research/ScanningManager getItemFromParms (Lnet/minecraft/entity/player/EntityPlayer;Ljava/lang/Object;)Lnet/minecraft/item/ItemStack;
+G METHOD_MISSING M thaumcraft/api/research/ScanningManager isThingStillScannable (Lnet/minecraft/entity/player/EntityPlayer;Ljava/lang/Object;)Z
+G METHOD_MISSING M thaumcraft/api/research/ScanningManager scanTheThing (Lnet/minecraft/entity/player/EntityPlayer;Ljava/lang/Object;)V
+G METHOD_MISSING M thaumcraft/api/research/theorycraft/ResearchTableData deserialize (Lnet/minecraft/nbt/NBTTagCompound;)V
+G METHOD_MISSING M thaumcraft/api/research/theorycraft/ResearchTableData deserializeCardChoice (Lnet/minecraft/nbt/NBTTagCompound;)Lthaumcraft/api/research/theorycraft/ResearchTableData$CardChoice;
+G METHOD_MISSING M thaumcraft/api/research/theorycraft/ResearchTableData drawCards (ILnet/minecraft/entity/player/EntityPlayer;)V
+G METHOD_MISSING M thaumcraft/api/research/theorycraft/ResearchTableData getAvailableCategories (Lnet/minecraft/entity/player/EntityPlayer;)Ljava/util/ArrayList;
+G METHOD_MISSING M thaumcraft/api/research/theorycraft/ResearchTableData getAvailableInspiration (Lnet/minecraft/entity/player/EntityPlayer;)I
+G METHOD_MISSING M thaumcraft/api/research/theorycraft/ResearchTableData initialize (Lnet/minecraft/entity/player/EntityPlayer;Ljava/util/Set;)V
+G METHOD_MISSING M thaumcraft/api/research/theorycraft/ResearchTableData isComplete ()Z
+G METHOD_MISSING M thaumcraft/api/research/theorycraft/ResearchTableData serialize ()Lnet/minecraft/nbt/NBTTagCompound;
+G METHOD_MISSING M thaumcraft/api/research/theorycraft/ResearchTableData serializeCardChoice (Lthaumcraft/api/research/theorycraft/ResearchTableData$CardChoice;)Lnet/minecraft/nbt/NBTTagCompound;
+G SUPERCLASS C thaumcraft/api/crafting/ShapedArcaneRecipe net/minecraftforge/oredict/ShapedOreRecipe
+G SUPERCLASS C thaumcraft/api/crafting/ShapelessArcaneRecipe net/minecraftforge/oredict/ShapelessOreRecipe

@@ -112,6 +112,10 @@ implements Serializable {
         }
     }
 
+    public Aspect[] getAspectsSortedByAmount() {
+        return getAspectsSortedAmount();
+    }
+
     public int getAmount(Aspect key) {
         if (key == null) {
             return 0;

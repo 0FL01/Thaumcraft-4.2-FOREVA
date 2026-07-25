@@ -15,6 +15,11 @@ contract shims guarded by unit tests and smoke modsets.
 | JEID + MixinBooter | TC6 `Utils.setBiomeAt(World, BlockPos, Biome, boolean)` coremod mixin target, `setBiomeAt(World, BlockPos, Biome)`, `resetBiomeAt` overloads, and legacy TC4 x/z delegation through the mixin-owned path | `UtilsThaumcraftSixBiomeCompatStaticGuardTest` | `scripts/smoke-modsets/jeid.txt` |
 | Witchery Resurrected + Companion | `CommonInternals.scanEntities` canonical identity alias and untyped vis drain projected onto TC4 primal visnet | `WitcheryThaumcraftSixApiShimTest`, corpus resolver | `scripts/smoke-modsets/witchery.txt` |
 | Aqua Acrobatics | TC6-style `TileCrucibleRenderer.renderFluid` client mixin target with the redirectable water texture lookup | `CrucibleRendererFidelityStaticGuardTest` | `scripts/smoke-modsets/aquaacrobatics.txt` |
+| Balkon's Expansion | TC6 item interfaces, canonical tool-material aliases, projected ingot and void-seed fields | `Issues15To19ThaumcraftSixCompatibilityStaticGuardTest`, corpus resolver | `scripts/smoke-modsets/balkonsexpansion.txt` |
+| Solar Flux | TC6 category/entry/stage projection, scanning/theorycraft linkage, recipe overloads, and canonical aspect/research insertion | `Issues15To19ThaumcraftSixCompatibilityStaticGuardTest`, corpus resolver | `scripts/smoke-modsets/solarflux.txt` |
+| Botania CEu | canonical `warpward` registry identity with legacy remap, TC6 item interfaces, and object-aspect lookup | `Issues15To19ThaumcraftSixCompatibilityStaticGuardTest`, corpus resolver | `scripts/smoke-modsets/botania.txt` |
+| Just Enough Magiculture | projected loot/item fields and unregistered TC4-backed entity class-token aliases | `Issues15To19ThaumcraftSixCompatibilityStaticGuardTest`, corpus resolver | `scripts/smoke-modsets/justenoughmagiculture.txt` |
+| JAOPCA + WrapUp | dual TC4/TC6 research lookup return descriptors and projected recipe registration | `Issues15To19ThaumcraftSixCompatibilityStaticGuardTest`, corpus resolver | `scripts/smoke-modsets/jaopca.txt` |
 | Astral Sorcery | No local evidence yet; keep as pending RECON before adding dependencies or shims | none | none |
 
 Exact per-symbol support levels and known unsupported operations are recorded in
@@ -22,6 +27,9 @@ Exact per-symbol support levels and known unsupported operations are recorded in
 `docs/compatibility/tc6-validation.md` for their meaning. In particular, the
 Magic Bees aura classes link, but TC6 chunk aura/flux world state and JSON
 research ingestion are explicitly unsupported rather than backed by fake state.
+The complete donor API gap set remains visible in
+`docs/compatibility/abi/tc6-current-gaps.txt`; supported corpus rows define the
+reviewed linkage floor rather than implying donor-wide TC6 parity.
 
 ## Maintenance rules
 

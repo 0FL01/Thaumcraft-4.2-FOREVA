@@ -17,13 +17,18 @@ import zipfile
 
 ACC_PUBLIC = 0x0001
 ACC_STATIC = 0x0008
+ACC_FINAL = 0x0010
 ACC_INTERFACE = 0x0200
+ACC_ABSTRACT = 0x0400
 ACC_PROTECTED = 0x0004
 ABI_ACCESS = ACC_PUBLIC | ACC_PROTECTED
 
 THAUMCRAFT_PREFIX = "thaumcraft/"
 CLASS_NAME_RE = re.compile(r"^thaumcraft(?:[./][A-Za-z_$][A-Za-z0-9_$]*)+$")
 SEMANTIC_LEVELS = ("EXACT", "PROJECTED", "LINK_ONLY", "UNSUPPORTED")
+PLATFORM_METHODS = {
+    ("java/lang/Enum", "ordinal", "()I"): ACC_PUBLIC | ACC_FINAL,
+}
 
 MEMBER_OPCODES = {
     178: "GETSTATIC",
@@ -518,6 +523,96 @@ def check_snapshot(path, expected_lines):
     return differences
 
 
+def access_satisfies(expected, actual):
+    if expected & ACC_PUBLIC:
+        return bool(actual & ACC_PUBLIC)
+    return bool(actual & ABI_ACCESS)
+
+
+def is_subtype(index, name, expected, visited=None):
+    if name == expected:
+        return True
+    cls = index.classes.get(name)
+    if not cls:
+        return False
+    visited = set() if visited is None else visited
+    if name in visited:
+        return False
+    visited.add(name)
+    parents = cls.interfaces + ([cls.super_name] if cls.super_name != "-" else [])
+    return any(is_subtype(index, parent, expected, visited) for parent in parents)
+
+
+def abi_gap_records(donor_index, target_index, prefix="thaumcraft/api/"):
+    gaps = []
+    for name in sorted(donor_index.classes):
+        donor = donor_index.classes[name]
+        if not name.startswith(prefix) or not donor.access & ACC_PUBLIC:
+            continue
+        target = target_index.classes.get(name)
+        symbol = "C {}".format(name)
+        if not target:
+            gaps.append("CLASS_MISSING " + symbol)
+            continue
+        if not target.access & ACC_PUBLIC:
+            gaps.append("CLASS_ACCESS " + symbol)
+        if bool(donor.access & ACC_INTERFACE) != bool(target.access & ACC_INTERFACE):
+            gaps.append("CLASS_KIND " + symbol)
+        if not donor.access & ACC_FINAL and target.access & ACC_FINAL:
+            gaps.append("CLASS_FINAL " + symbol)
+        if not donor.access & ACC_ABSTRACT and target.access & ACC_ABSTRACT:
+            gaps.append("CLASS_ABSTRACT " + symbol)
+        if donor.super_name != "-" and not is_subtype(target_index, name, donor.super_name):
+            gaps.append("SUPERCLASS {} {}".format(symbol, donor.super_name))
+        for interface in donor.interfaces:
+            if not is_subtype(target_index, name, interface):
+                gaps.append("INTERFACE {} {}".format(symbol, interface))
+
+        for access, member_name, descriptor, _ in donor.fields:
+            if not access & ABI_ACCESS:
+                continue
+            member = "F {} {} {}".format(name, member_name, descriptor)
+            found = target_index.resolve_field(name, member_name, descriptor)
+            if not found:
+                gaps.append("FIELD_MISSING " + member)
+                continue
+            _, target_access = found
+            if not access_satisfies(access, target_access):
+                gaps.append("FIELD_ACCESS " + member)
+            if bool(access & ACC_STATIC) != bool(target_access & ACC_STATIC):
+                gaps.append("FIELD_STATIC " + member)
+            if not access & ACC_FINAL and target_access & ACC_FINAL:
+                gaps.append("FIELD_FINAL " + member)
+
+        for access, member_name, descriptor, _ in donor.methods:
+            if not access & ABI_ACCESS:
+                continue
+            member = "M {} {} {}".format(name, member_name, descriptor)
+            found = target_index.resolve_method(name, member_name, descriptor)
+            if not found:
+                gaps.append("METHOD_MISSING " + member)
+                continue
+            _, target_access = found
+            if not access_satisfies(access, target_access):
+                gaps.append("METHOD_ACCESS " + member)
+            if bool(access & ACC_STATIC) != bool(target_access & ACC_STATIC):
+                gaps.append("METHOD_STATIC " + member)
+            if not access & ACC_FINAL and target_access & ACC_FINAL and member_name != "<init>":
+                gaps.append("METHOD_FINAL " + member)
+            if not access & ACC_ABSTRACT and target_access & ACC_ABSTRACT:
+                gaps.append("METHOD_ABSTRACT " + member)
+    return sorted(gaps)
+
+
+def abi_gap_lines(donor_path, target_path, prefix="thaumcraft/api/"):
+    donor_index = ClassIndex([donor_path])
+    target_index = ClassIndex([target_path])
+    return [
+        "FORMAT tc6-abi-gaps-v1",
+        "DONOR_SHA256 {}".format(sha256_file(donor_path)),
+    ] + ["G " + gap for gap in abi_gap_records(donor_index, target_index, prefix)]
+
+
 def read_corpus_manifest(path):
     entries = []
     with io.open(path, "r", encoding="utf-8") as handle:
@@ -694,6 +789,9 @@ class ClassIndex(object):
         direct_alias = self.method_aliases.get((owner, name, descriptor))
         if direct_alias:
             return direct_alias
+        platform_access = PLATFORM_METHODS.get((owner, name, descriptor))
+        if platform_access is not None:
+            return None, platform_access
         cls = self.classes.get(owner)
         if not cls:
             return None
@@ -778,6 +876,22 @@ def command_abi(args):
         return 0
     write_lines(args.output, lines)
     print("TC6 ABI snapshot written: {} entries".format(len(lines) - 3))
+    return 0
+
+
+def command_abi_diff(args):
+    lines = abi_gap_lines(args.donor, args.target, args.prefix)
+    if args.check:
+        differences = check_snapshot(args.check, lines)
+        if differences:
+            print("TC6 donor-to-target ABI gap snapshot mismatch:", file=sys.stderr)
+            for difference in differences:
+                print("  " + difference, file=sys.stderr)
+            return 1
+    else:
+        write_lines(args.output, lines)
+    action = "verified" if args.check else "written"
+    print("TC6 donor-to-target ABI gaps {}: {} gaps".format(action, len(lines) - 2))
     return 0
 
 
@@ -867,6 +981,14 @@ def build_parser():
     output.add_argument("--output")
     output.add_argument("--check")
     abi.set_defaults(handler=command_abi)
+    abi_diff = subparsers.add_parser("abi-diff", help="extract or verify donor-to-target public ABI gaps")
+    abi_diff.add_argument("--donor", required=True)
+    abi_diff.add_argument("--target", required=True)
+    abi_diff.add_argument("--prefix", default="thaumcraft/api/")
+    abi_diff_output = abi_diff.add_mutually_exclusive_group(required=True)
+    abi_diff_output.add_argument("--output")
+    abi_diff_output.add_argument("--check")
+    abi_diff.set_defaults(handler=command_abi_diff)
     demand = subparsers.add_parser("demand", help="extract and resolve pinned addon Thaumcraft references")
     demand.add_argument("--manifest", required=True)
     demand.add_argument("--jar-dir", required=True)

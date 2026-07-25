@@ -1,0 +1,4 @@
+# JAOPCA and WrapUp compatibility smoke from GitHub issue #19.
+# Format: jar | sha256 | source/note | direct/dev-remap
+JAOPCA-1.12.2-2.3.5.7.jar | 88931f0a8d995b33959c9e1618c6e87802e854e5b8944740b846a977442e147e | issue-era JAOPCA 2.3.5.7 jar | direct
+WrapUp-1.12-1.1.3.jar | 133c55730e48e1652c861898d05c6092b4f58badf9e627f12019000426e7df95 | https://cdn.modrinth.com/data/vlot89Sj/versions/izIpwUWi/WrapUp-1.12-1.1.3.jar | direct

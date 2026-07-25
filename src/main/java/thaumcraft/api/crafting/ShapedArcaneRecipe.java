@@ -8,6 +8,7 @@ import net.minecraft.inventory.IInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.oredict.OreDictionary;
 import thaumcraft.api.ThaumcraftApiHelper;
 import thaumcraft.api.aspects.AspectList;
@@ -97,6 +98,21 @@ implements IArcaneRecipe {
         for (char chr : shape.toCharArray()) {
             this.input[x++] = itemMap.get(Character.valueOf(chr));
         }
+    }
+
+    public ShapedArcaneRecipe(ResourceLocation group, String research, int vis,
+                              AspectList crystals, Block result, Object... recipe) {
+        this(research, result, crystals, recipe);
+    }
+
+    public ShapedArcaneRecipe(ResourceLocation group, String research, int vis,
+                              AspectList crystals, Item result, Object... recipe) {
+        this(research, result, crystals, recipe);
+    }
+
+    public ShapedArcaneRecipe(ResourceLocation group, String research, int vis,
+                              AspectList crystals, ItemStack result, Object... recipe) {
+        this(research, result, crystals, recipe);
     }
 
     @Override

@@ -37,12 +37,14 @@ import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.EntityDataManager;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.EnumHand;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundEvent;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.text.translation.I18n;
 import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
+import net.minecraft.world.storage.loot.LootTableList;
 import net.minecraftforge.common.BiomeDictionary;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -60,6 +62,8 @@ import thaumcraft.common.lib.TCSounds;
 import thaumcraft.common.lib.crafting.ThaumcraftCraftingManager;
 
 public class EntityPech extends net.minecraft.entity.monster.EntityMob implements IRangedAttackMob {
+
+    public static final ResourceLocation LOOT = LootTableList.register(new ResourceLocation("thaumcraft", "pech"));
 
     // Data watcher keys — corrected 1.12.2
     private static final DataParameter<Integer> PECH_TYPE =

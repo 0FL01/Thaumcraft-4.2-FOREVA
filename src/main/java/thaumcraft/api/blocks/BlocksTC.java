@@ -1,6 +1,8 @@
 package thaumcraft.api.blocks;
 
+import java.util.HashMap;
 import net.minecraft.block.Block;
+import net.minecraft.item.EnumDyeColor;
 import thaumcraft.common.config.ConfigBlocks;
 
 /**
@@ -23,6 +25,13 @@ public final class BlocksTC {
     public static Block crystalOrder;
     public static Block crystalEntropy;
     public static Block crystalTaint;
+    public static Block lootCrateCommon;
+    public static Block lootCrateRare;
+    public static Block lootCrateUncommon;
+    public static Block lootUrnCommon;
+    public static Block lootUrnRare;
+    public static Block lootUrnUncommon;
+    public static HashMap<EnumDyeColor, Block> nitor;
 
     private BlocksTC() {
     }
@@ -44,5 +53,17 @@ public final class BlocksTC {
         crystalOrder = ConfigBlocks.blockCrystal;
         crystalEntropy = ConfigBlocks.blockCrystal;
         crystalTaint = ConfigBlocks.blockCrystal;
+
+        lootCrateCommon = ConfigBlocks.blockLootCrate;
+        lootCrateRare = ConfigBlocks.blockLootCrate;
+        lootCrateUncommon = ConfigBlocks.blockLootCrate;
+        lootUrnCommon = ConfigBlocks.blockLootUrn;
+        lootUrnRare = ConfigBlocks.blockLootUrn;
+        lootUrnUncommon = ConfigBlocks.blockLootUrn;
+
+        nitor = new HashMap<>();
+        for (EnumDyeColor color : EnumDyeColor.values()) {
+            nitor.put(color, ConfigBlocks.blockAiry);
+        }
     }
 }

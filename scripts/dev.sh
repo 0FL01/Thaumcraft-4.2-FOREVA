@@ -20,6 +20,7 @@ Usage:
   ./scripts/dev.sh smoke-server
   ./scripts/dev.sh smoke-modset <name>
   ./scripts/dev.sh smoke-client
+  ./scripts/dev.sh smoke-client-modset <name>
   ./scripts/dev.sh gradle <task>        # advanced: passthrough Gradle task
   ./scripts/dev.sh daemon-start         # start persistent Gradle daemon container
   ./scripts/dev.sh daemon-stop          # stop persistent Gradle daemon container
@@ -35,6 +36,7 @@ Examples:
   ./scripts/dev.sh apiJar devJar
   ./scripts/dev.sh smoke-modset fossils
   ./scripts/dev.sh smoke-client
+  ./scripts/dev.sh smoke-client-modset justenoughmagiculture
 
 Environment:
   THAUMCRAFT_DOCKER_IMAGE    Docker image name, default: thaumcraft-dev
@@ -185,6 +187,10 @@ compat_validate() {
   python3 "$ROOT/scripts/tc6-compat.py" abi \
     --jar "$ROOT/Thaumcraft-1.12.2-6.1.BETA26.jar" \
     --check "$snapshot" || return 1
+  python3 "$ROOT/scripts/tc6-compat.py" abi-diff \
+    --donor "$ROOT/Thaumcraft-1.12.2-6.1.BETA26.jar" \
+    --target "$target" \
+    --check "$ROOT/docs/compatibility/abi/tc6-current-gaps.txt" || return 1
   python3 "$ROOT/scripts/tc6-compat.py" demand \
     --manifest "$ROOT/scripts/tc6-addon-corpus.txt" \
     --jar-dir "$SMOKE_CACHE_DIR" \
@@ -313,7 +319,7 @@ smoke_server_isolated_world() {
   return "$result"
 }
 
-smoke_modset() {
+prepare_smoke_modset() {
   if [[ "$#" -ne 1 || -z "${1:-}" ]]; then
     printf 'Usage: ./scripts/dev.sh smoke-modset <name>\n' >&2
     printf 'Available modsets:\n' >&2
@@ -333,6 +339,7 @@ smoke_modset() {
     return 1
   fi
 
+  SMOKE_EXPECT_LOGS=()
   local jars=()
   local modes=()
   local remap_jars=()
@@ -340,7 +347,12 @@ smoke_modset() {
   while IFS= read -r raw || [[ -n "$raw" ]]; do
     line_no=$((line_no + 1))
     line="$(trim_string "$raw")"
-    [[ -z "$line" || "${line:0:1}" == "#" ]] && continue
+    [[ -z "$line" ]] && continue
+    if [[ "$line" == "# expect-log:"* ]]; then
+      SMOKE_EXPECT_LOGS+=("$(trim_string "${line#\# expect-log:}")")
+      continue
+    fi
+    [[ "${line:0:1}" == "#" ]] && continue
 
     IFS='|' read -r jar expected _ mode <<< "$line"
     jar="$(trim_string "${jar:-}")"
@@ -406,9 +418,39 @@ smoke_modset() {
   done
 
   printf "Smoke modset '%s': prepared %s jar(s) from %s.\n" "$modset" "${#jars[@]}" "$SMOKE_CACHE_DIR"
+}
+
+verify_smoke_expected_logs() {
+  local expected file found
+  for expected in "${SMOKE_EXPECT_LOGS[@]:-}"; do
+    [[ -z "$expected" ]] && continue
+    found=0
+    for file in "$@"; do
+      if [[ -f "$file" ]] && grep -Fq "$expected" "$file"; then
+        found=1
+        break
+      fi
+    done
+    if [[ "$found" -eq 0 ]]; then
+      printf 'Smoke FAILED: expected integration marker not found: %s\n' "$expected" >&2
+      return 1
+    fi
+  done
+}
+
+smoke_modset() {
+  prepare_smoke_modset "$@" || return 1
   # The smoke server runs Gradle with --no-daemon; stop the persistent daemon first to avoid cache lock false failures.
   docker_daemon_stop
-  smoke_server_isolated_world
+  smoke_server_isolated_world || return 1
+  verify_smoke_expected_logs "$ROOT/run/smoke-server.log" "$ROOT/run/logs/latest.log"
+}
+
+smoke_client_modset() {
+  prepare_smoke_modset "$@" || return 1
+  docker_daemon_stop
+  smoke_client || return 1
+  verify_smoke_expected_logs "$ROOT/run/smoke-client.log" "$ROOT/run/logs/latest.log"
 }
 
 mcp_leak_summary() {
@@ -807,11 +849,6 @@ smoke_server() {
 }
 
 smoke_client() {
-  if [[ -z "${DISPLAY:-}" ]]; then
-    printf 'Smoke client skipped: DISPLAY is not set.\n' >&2
-    return 2
-  fi
-
   mkdir -p "$ROOT/run"
   local log="$ROOT/run/smoke-client.log"
   rm -f "$log"
@@ -825,29 +862,24 @@ smoke_client() {
     had_prod_jar=1
   fi
 
-  local xauth="${XAUTHORITY:-$HOME/.Xauthority}"
+  local container_name="thaumcraft-smoke-client-$$-$RANDOM"
   local docker_args=(
     --rm
+    --name "$container_name"
     -v "$ROOT:/workspace/thaumcraft"
     -v "$GRADLE_HOME_DIR:/home/ubuntu/.gradle"
-    -e DISPLAY="$DISPLAY"
-    -v /tmp/.X11-unix:/tmp/.X11-unix
+    -e LIBGL_ALWAYS_SOFTWARE=1
     --user "$(id -u):$(id -g)"
-    --entrypoint ./gradlew
+    --entrypoint /bin/bash
   )
 
-  if [[ -f "$xauth" ]]; then
-    docker_args+=(
-      -e XAUTHORITY=/tmp/.thaumcraft.Xauthority
-      -v "$xauth:/tmp/.thaumcraft.Xauthority:ro"
-    )
-  fi
-
   set +e
-  timeout "$SMOKE_TIMEOUT" docker run "${docker_args[@]}" \
-    "$IMAGE" runClient -x getAssets --console=plain > "$log" 2>&1
+  timeout -k 10s "$SMOKE_TIMEOUT" docker run "${docker_args[@]}" "$IMAGE" -lc \
+    'Xorg :99 -noreset -nolisten tcp -config /workspace/thaumcraft/scripts/xorg-dummy.conf -logfile /workspace/thaumcraft/run/validate/smoke-client-xorg.log >/dev/null 2>&1 & sleep 2; export DISPLAY=:99; exec ./gradlew runClient -x getAssets --console=plain' \
+    > "$log" 2>&1
   local status="$?"
   set -e
+  docker rm -f "$container_name" >/dev/null 2>&1 || true
 
   if [[ "$had_prod_jar" -eq 1 ]]; then
     cp -p "$jar_backup" "$prod_jar"
@@ -1306,6 +1338,10 @@ case "$cmd" in
     ;;
   smoke-client)
     smoke_client
+    ;;
+  smoke-client-modset)
+    shift
+    smoke_client_modset "$@"
     ;;
   daemon-start)
     docker_daemon_start

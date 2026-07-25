@@ -1,6 +1,5 @@
 package thaumcraft.common.lib.events;
 
-import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -25,7 +24,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 
-public class CommandThaumcraft extends CommandBase {
+public class CommandThaumcraft extends thaumcraft.common.lib.CommandThaumcraft {
     private final List<String> aliases = new ArrayList<>();
 
     public CommandThaumcraft() {

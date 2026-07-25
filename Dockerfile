@@ -53,6 +53,9 @@ RUN set -eux; \
         libxcursor1 \
         libxi6 \
         libxtst6 \
+        x11-xserver-utils \
+        xserver-xorg-core \
+        xserver-xorg-video-dummy \
         libopenal1 \
         libasound2t64; \
     apt-get clean; \

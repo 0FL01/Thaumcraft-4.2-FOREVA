@@ -1,5 +1,4 @@
 package thaumcraft.api;
 
-public interface IScribeTools {
+public interface IScribeTools extends thaumcraft.api.items.IScribeTools {
 }
-

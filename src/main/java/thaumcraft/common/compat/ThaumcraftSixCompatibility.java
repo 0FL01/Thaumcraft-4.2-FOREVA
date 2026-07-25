@@ -1,6 +1,7 @@
 package thaumcraft.common.compat;
 
 import net.minecraftforge.common.MinecraftForge;
+import thaumcraft.api.ThaumcraftMaterials;
 import thaumcraft.api.aspects.AspectEventProxy;
 import thaumcraft.api.aspects.AspectRegistryEvent;
 import thaumcraft.api.blocks.BlocksTC;
@@ -24,6 +25,7 @@ public final class ThaumcraftSixCompatibility {
 
     public static void initItemAliases() {
         ItemsTC.init();
+        ThaumcraftMaterials.init();
     }
 
     public static void postAspectRegistryEvent() {

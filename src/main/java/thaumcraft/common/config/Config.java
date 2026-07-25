@@ -230,7 +230,7 @@ public class Config {
         potionUnnaturalHunger.setRegistryName("thaumcraft", "unnatural_hunger");
 
         potionWarpWard = new PotionWarpWard(false, 0xFFAA00);
-        potionWarpWard.setRegistryName("thaumcraft", "warp_ward");
+        potionWarpWard.setRegistryName("thaumcraft", "warpward");
 
         potionDeathGaze = new PotionDeathGaze(true, 0x440044);
         potionDeathGaze.setRegistryName("thaumcraft", "death_gaze");

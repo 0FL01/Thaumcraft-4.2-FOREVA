@@ -21,6 +21,7 @@ import thaumcraft.api.aspects.AspectList;
 import thaumcraft.api.research.ResearchCategories;
 import thaumcraft.api.research.ResearchCategoryList;
 import thaumcraft.api.research.ResearchItem;
+import thaumcraft.api.research.ResearchEntry;
 import thaumcraft.common.Thaumcraft;
 import thaumcraft.common.config.Config;
 import thaumcraft.common.config.ConfigItems;
@@ -41,6 +42,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.LinkedHashSet;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
@@ -51,6 +53,50 @@ public class ResearchManager {
     private static final Map<String, IPlayerKnowledge> playerDataCache = new HashMap<>();
     private static List<ResearchItem> allHiddenResearch;
     private static List<ResearchItem> allValidResearch;
+    public static LinkedHashSet<Integer> craftingReferences = new LinkedHashSet<>();
+
+    public static int createItemStackHash(ItemStack stack) {
+        if (stack == null || stack.isEmpty()) {
+            return 0;
+        }
+        stack.setCount(1);
+        return stack.toString().hashCode();
+    }
+
+    private static void addResearchToCategory(ResearchEntry entry) {
+        Object[] icons = entry.getIcons();
+        ResearchItem projected;
+        if (icons != null && icons.length > 0 && icons[0] instanceof ItemStack) {
+            projected = new ResearchItem(entry.getKey(), entry.getCategory(), new AspectList(),
+                    entry.getDisplayColumn(), entry.getDisplayRow(), 1, (ItemStack) icons[0]);
+        } else {
+            net.minecraft.util.ResourceLocation icon = icons != null && icons.length > 0
+                    && icons[0] instanceof net.minecraft.util.ResourceLocation
+                    ? (net.minecraft.util.ResourceLocation) icons[0] : null;
+            projected = new ResearchItem(entry.getKey(), entry.getCategory(), new AspectList(),
+                    entry.getDisplayColumn(), entry.getDisplayRow(), 1, icon);
+        }
+        if (entry.getParents() != null) {
+            projected.setParents(entry.getParents());
+        }
+        if (entry.getSiblings() != null) {
+            projected.setSiblings(entry.getSiblings());
+        }
+        if (entry.hasMeta(ResearchEntry.EnumResearchMeta.HIDDEN)) {
+            projected.setHidden();
+        }
+        if (entry.hasMeta(ResearchEntry.EnumResearchMeta.ROUND)) {
+            projected.setRound();
+        }
+        if (entry.hasMeta(ResearchEntry.EnumResearchMeta.AUTOUNLOCK)) {
+            projected.setAutoUnlock();
+        }
+        projected.setStages(entry.getStages());
+        projected.setRewardItem(entry.getRewardItem());
+        projected.setRewardKnow(entry.getRewardKnow());
+        projected.setAddenda(entry.getAddenda());
+        ResearchCategories.addResearch(projected);
+    }
 
     public static class HexEntry {
         public Aspect aspect;

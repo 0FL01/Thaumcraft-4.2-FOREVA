@@ -1,6 +1,8 @@
 package thaumcraft.api;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
@@ -18,7 +20,10 @@ import net.minecraft.world.World;
 import thaumcraft.api.ThaumcraftApi;
 import thaumcraft.api.aspects.Aspect;
 import thaumcraft.api.aspects.AspectList;
+import thaumcraft.api.aspects.IEssentiaContainerItem;
 import thaumcraft.api.aspects.IEssentiaTransport;
+import thaumcraft.api.items.ItemsTC;
+import net.minecraftforge.oredict.OreDictionary;
 
 public class ThaumcraftApiHelper {
     private static HashMap<Integer, AspectList> allAspects = new HashMap();
@@ -96,6 +101,33 @@ public class ThaumcraftApiHelper {
 
     public static AspectList getBonusObjectTags(ItemStack is, AspectList ot) {
         return ThaumcraftApi.internalMethods.getBonusObjectTags(is, ot);
+    }
+
+    public static List<ItemStack> getOresWithWildCards(String oreName) {
+        if (!oreName.endsWith("*")) {
+            return OreDictionary.getOres(oreName, false);
+        }
+        String prefix = oreName.substring(0, oreName.length() - 1);
+        List<ItemStack> ores = new ArrayList<>();
+        for (String name : OreDictionary.getOreNames()) {
+            if (name.startsWith(prefix)) {
+                ores.addAll(OreDictionary.getOres(name, false));
+            }
+        }
+        return ores;
+    }
+
+    public static ItemStack makeCrystal(Aspect aspect) {
+        return makeCrystal(aspect, 1);
+    }
+
+    public static ItemStack makeCrystal(Aspect aspect, int amount) {
+        if (aspect == null) {
+            return null;
+        }
+        ItemStack crystal = new ItemStack(ItemsTC.crystalEssence, amount, 0);
+        ((IEssentiaContainerItem) crystal.getItem()).setAspects(crystal, new AspectList().add(aspect, 1));
+        return crystal;
     }
 
     public static AspectList generateTags(Item item, int meta) {

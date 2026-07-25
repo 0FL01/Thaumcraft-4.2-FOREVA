@@ -1,0 +1,4 @@
+# Solar Flux Reborn compatibility smoke from GitHub issue #16.
+# Format: jar | sha256 | source/note | direct/dev-remap
+SolarFluxReborn-1.12.2-12.4.11.jar | be490ddbeb08b35ba76bee38feaae465a9553ba3bcfbe2d5eef83875d5b5eda2 | https://www.curseforge.com/minecraft/mc-mods/solar-flux-reborn/files/3050838 | direct
+# expect-log: Added SolarFlux compat - tk.zeitheron.solarflux.compat.thaumcraft.CompatThaumcraft

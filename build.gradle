@@ -1,3 +1,9 @@
+import org.objectweb.asm.ClassReader
+import org.objectweb.asm.ClassVisitor
+import org.objectweb.asm.ClassWriter
+import org.objectweb.asm.MethodVisitor
+import org.objectweb.asm.Opcodes
+
 buildscript {
     repositories {
         mavenCentral()
@@ -43,6 +49,52 @@ repositories {
 dependencies {
     compile 'curse.maven:baubles-227083:2518667'
     testCompile 'junit:junit:4.12'
+}
+
+// ResearchItem's TC4 fluent setters and TC6 ResearchEntry's void setters have
+// identical Java signatures but distinct JVM return descriptors. Java source
+// cannot declare both, so add the two TC6 descriptors after compilation.
+compileJava.inputs.property 'tc6ResearchEntryVoidSetters', 1
+compileJava.doLast {
+    File classFile = file("${compileJava.destinationDir}/thaumcraft/api/research/ResearchEntry.class")
+    ClassReader reader = new ClassReader(classFile.bytes)
+    ClassWriter writer = new ClassWriter(reader, 0)
+    Set<String> methods = [] as Set
+    ClassVisitor visitor = new ClassVisitor(Opcodes.ASM5, writer) {
+        @Override
+        MethodVisitor visitMethod(int access, String name, String descriptor,
+                                  String signature, String[] exceptions) {
+            methods.add(name + descriptor)
+            return super.visitMethod(access, name, descriptor, signature, exceptions)
+        }
+
+        @Override
+        void visitEnd() {
+            addVoidSetter('setParents', 'parents')
+            addVoidSetter('setSiblings', 'siblings')
+            super.visitEnd()
+        }
+
+        private void addVoidSetter(String methodName, String fieldName) {
+            String descriptor = '([Ljava/lang/String;)V'
+            if (methods.contains(methodName + descriptor)) {
+                return
+            }
+            MethodVisitor method = cv.visitMethod(Opcodes.ACC_PUBLIC, methodName,
+                    descriptor, null, null)
+            method.visitCode()
+            method.visitVarInsn(Opcodes.ALOAD, 0)
+            method.visitVarInsn(Opcodes.ALOAD, 1)
+            method.visitFieldInsn(Opcodes.PUTFIELD,
+                    'thaumcraft/api/research/ResearchEntry', fieldName,
+                    '[Ljava/lang/String;')
+            method.visitInsn(Opcodes.RETURN)
+            method.visitMaxs(2, 2)
+            method.visitEnd()
+        }
+    }
+    reader.accept(visitor, 0)
+    classFile.bytes = writer.toByteArray()
 }
 
 processResources {

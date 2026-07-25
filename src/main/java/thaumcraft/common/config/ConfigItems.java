@@ -7,6 +7,8 @@ import net.minecraft.item.ItemArmor.ArmorMaterial;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.common.util.EnumHelper;
 import net.minecraftforge.oredict.OreDictionary;
+import thaumcraft.api.ThaumcraftApiHelper;
+import thaumcraft.api.aspects.Aspect;
 import thaumcraft.common.entities.golems.ItemGolemBell;
 import thaumcraft.common.entities.golems.ItemGolemCore;
 import thaumcraft.common.entities.golems.ItemGolemDecoration;
@@ -52,6 +54,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ConfigItems {
+
+    public static ItemStack FLUX_CRYSTAL;
 
     // Wand items
     public static ItemWandCasting itemWandCasting;
@@ -865,6 +869,7 @@ public class ConfigItems {
         allItems.add(itemGolemDecoration);
 
         ThaumcraftSixCompatibility.initItemAliases();
+        FLUX_CRYSTAL = ThaumcraftApiHelper.makeCrystal(Aspect.FLUX);
         registerOreDictionary();
     }
 

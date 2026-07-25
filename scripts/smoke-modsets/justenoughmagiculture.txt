@@ -1,0 +1,6 @@
+# Client-side Just Enough Magiculture compatibility smoke from GitHub issue #18.
+# Format: jar | sha256 | source/note | direct/dev-remap
+# Baubles is intentionally omitted because it is already on the Gradle classpath.
+HadEnoughItems_1.12.2-4.24.7.jar | e23a358359d535faced5e0b7e8dc71b7d46a7f81d745b2d740dfa829c48ad5b7 | https://edge.forgecdn.net/files/4543/375/HadEnoughItems_1.12.2-4.24.7.jar | direct
+JustEnoughResources-1.12.2-0.9.2.60.jar | 9ea4d7df19c0a53880aae5e745ef1e886854bea5c533878688587a5e3fdaebdd | https://edge.forgecdn.net/files/2728/585/JustEnoughResources-1.12.2-0.9.2.60.jar | direct
+justenoughmagiculture-1.12.2-1.2.2.jar | b1477c2ff5867fbd4ee97c0a5f387cc628155c03155722fca0b9068d3d5819a0 | https://edge.forgecdn.net/files/8018/292/justenoughmagiculture-1.12.2-1.2.2.jar | direct

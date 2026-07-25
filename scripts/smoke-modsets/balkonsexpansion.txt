@@ -1,0 +1,5 @@
+# WeaponMod and Balkon's Expansion compatibility smoke from GitHub issue #15.
+# Format: jar | sha256 | source/note | direct/dev-remap
+# Baubles is intentionally omitted because it is already on the Gradle classpath.
+weaponmod-forge-1.12.2-1.24.4.jar | 9054539b63ab3425399463dfa2393e30676eb35d093a4a053b094f120b5b0024 | https://edge.forgecdn.net/files/7690/474/weaponmod-forge-1.12.2-1.24.4.jar | direct
+BalkonsExpansion-1.12.2-1.2.0.jar | bc2544c777b1f8b048df056d95b1216966761118a78aafba048faf22cc2012d6 | https://edge.forgecdn.net/files/8008/573/BalkonsExpansion-1.12.2-1.2.0.jar | direct

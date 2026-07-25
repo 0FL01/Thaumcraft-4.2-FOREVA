@@ -25,6 +25,26 @@ public class InfusionRecipe {
         this.instability = inst;
     }
 
+    public InfusionRecipe(String research, Object output, int inst, AspectList aspects,
+                          Object input, Object[] recipe) {
+        this(research, output, inst, aspects, requireStack(input), requireStacks(recipe));
+    }
+
+    private static ItemStack requireStack(Object value) {
+        if (!(value instanceof ItemStack)) {
+            throw new IllegalArgumentException("TC4 infusion requires an ItemStack central input");
+        }
+        return (ItemStack) value;
+    }
+
+    private static ItemStack[] requireStacks(Object[] values) {
+        ItemStack[] stacks = new ItemStack[values.length];
+        for (int i = 0; i < values.length; i++) {
+            stacks[i] = requireStack(values[i]);
+        }
+        return stacks;
+    }
+
     public boolean matches(ArrayList<ItemStack> input, ItemStack central, World world, EntityPlayer player) {
         if (this.getRecipeInput() == null) {
             return false;
@@ -123,4 +143,3 @@ public class InfusionRecipe {
         return this.instability;
     }
 }
-

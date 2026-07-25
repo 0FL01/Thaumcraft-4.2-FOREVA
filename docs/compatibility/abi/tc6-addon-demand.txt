@@ -237,3 +237,305 @@ M witchery-resurrected INVOKESTATIC thaumcraft/common/world/aura/AuraHandler dra
 M witchery-resurrected INVOKEVIRTUAL thaumcraft/api/aspects/AspectEventProxy registerObjectTag (Lnet/minecraft/item/ItemStack;Lthaumcraft/api/aspects/AspectList;)V
 M witchery-resurrected INVOKEVIRTUAL thaumcraft/api/aspects/AspectList add (Lthaumcraft/api/aspects/Aspect;I)Lthaumcraft/api/aspects/AspectList;
 M witchery-resurrected INVOKEVIRTUAL thaumcraft/api/aspects/AspectList visSize ()I
+A balkonsexpansion supported both BalkonsExpansion-1.12.2-1.2.0.jar bc2544c777b1f8b048df056d95b1216966761118a78aafba048faf22cc2012d6
+C balkonsexpansion thaumcraft/api/ThaumcraftMaterials
+C balkonsexpansion thaumcraft/api/items/IWarpingGear
+C balkonsexpansion thaumcraft/api/items/ItemsTC
+F balkonsexpansion GETSTATIC thaumcraft/api/ThaumcraftMaterials TOOLMAT_THAUMIUM Lnet/minecraft/item/Item$ToolMaterial;
+F balkonsexpansion GETSTATIC thaumcraft/api/ThaumcraftMaterials TOOLMAT_VOID Lnet/minecraft/item/Item$ToolMaterial;
+F balkonsexpansion GETSTATIC thaumcraft/api/items/ItemsTC nuggets Lnet/minecraft/item/Item;
+F balkonsexpansion GETSTATIC thaumcraft/api/items/ItemsTC voidSeed Lnet/minecraft/item/Item;
+A solarflux supported both SolarFluxReborn-1.12.2-12.4.11.jar be490ddbeb08b35ba76bee38feaae465a9553ba3bcfbe2d5eef83875d5b5eda2
+C solarflux thaumcraft/api/ThaumcraftApi
+C solarflux thaumcraft/api/ThaumcraftApiHelper
+C solarflux thaumcraft/api/aspects/Aspect
+C solarflux thaumcraft/api/aspects/AspectList
+C solarflux thaumcraft/api/blocks/BlocksTC
+C solarflux thaumcraft/api/capabilities/IPlayerKnowledge
+C solarflux thaumcraft/api/capabilities/IPlayerKnowledge$EnumKnowledgeType
+C solarflux thaumcraft/api/crafting/CrucibleRecipe
+C solarflux thaumcraft/api/crafting/IArcaneRecipe
+C solarflux thaumcraft/api/crafting/InfusionRecipe
+C solarflux thaumcraft/api/crafting/ShapedArcaneRecipe
+C solarflux thaumcraft/api/internal/CommonInternals
+C solarflux thaumcraft/api/items/ItemsTC
+C solarflux thaumcraft/api/research/IScanThing
+C solarflux thaumcraft/api/research/ResearchAddendum
+C solarflux thaumcraft/api/research/ResearchCategories
+C solarflux thaumcraft/api/research/ResearchCategory
+C solarflux thaumcraft/api/research/ResearchEntry
+C solarflux thaumcraft/api/research/ResearchEntry$EnumResearchMeta
+C solarflux thaumcraft/api/research/ResearchStage
+C solarflux thaumcraft/api/research/ResearchStage$Knowledge
+C solarflux thaumcraft/api/research/ScanBlock
+C solarflux thaumcraft/api/research/ScanningManager
+C solarflux thaumcraft/api/research/theorycraft/ITheorycraftAid
+C solarflux thaumcraft/api/research/theorycraft/ResearchTableData
+C solarflux thaumcraft/api/research/theorycraft/TheorycraftCard
+C solarflux thaumcraft/api/research/theorycraft/TheorycraftManager
+C solarflux thaumcraft/common/lib/CommandThaumcraft
+C solarflux thaumcraft/common/lib/crafting/ThaumcraftCraftingManager
+C solarflux thaumcraft/common/lib/research/ResearchManager
+F solarflux GETFIELD thaumcraft/api/research/ResearchCategory key Ljava/lang/String;
+F solarflux GETFIELD thaumcraft/api/research/ResearchCategory research Ljava/util/Map;
+F solarflux GETFIELD thaumcraft/api/research/theorycraft/ResearchTableData bonusDraws I
+F solarflux GETSTATIC thaumcraft/api/aspects/Aspect ALCHEMY Lthaumcraft/api/aspects/Aspect;
+F solarflux GETSTATIC thaumcraft/api/aspects/Aspect AVERSION Lthaumcraft/api/aspects/Aspect;
+F solarflux GETSTATIC thaumcraft/api/aspects/Aspect DESIRE Lthaumcraft/api/aspects/Aspect;
+F solarflux GETSTATIC thaumcraft/api/aspects/Aspect ENERGY Lthaumcraft/api/aspects/Aspect;
+F solarflux GETSTATIC thaumcraft/api/aspects/Aspect LIFE Lthaumcraft/api/aspects/Aspect;
+F solarflux GETSTATIC thaumcraft/api/aspects/Aspect LIGHT Lthaumcraft/api/aspects/Aspect;
+F solarflux GETSTATIC thaumcraft/api/aspects/Aspect MAGIC Lthaumcraft/api/aspects/Aspect;
+F solarflux GETSTATIC thaumcraft/api/aspects/Aspect MECHANISM Lthaumcraft/api/aspects/Aspect;
+F solarflux GETSTATIC thaumcraft/api/aspects/Aspect VOID Lthaumcraft/api/aspects/Aspect;
+F solarflux GETSTATIC thaumcraft/api/aspects/Aspect WATER Lthaumcraft/api/aspects/Aspect;
+F solarflux GETSTATIC thaumcraft/api/blocks/BlocksTC nitor Ljava/util/HashMap;
+F solarflux GETSTATIC thaumcraft/api/capabilities/IPlayerKnowledge$EnumKnowledgeType OBSERVATION Lthaumcraft/api/capabilities/IPlayerKnowledge$EnumKnowledgeType;
+F solarflux GETSTATIC thaumcraft/api/capabilities/IPlayerKnowledge$EnumKnowledgeType THEORY Lthaumcraft/api/capabilities/IPlayerKnowledge$EnumKnowledgeType;
+F solarflux GETSTATIC thaumcraft/api/internal/CommonInternals objectTags Ljava/util/concurrent/ConcurrentHashMap;
+F solarflux GETSTATIC thaumcraft/api/items/ItemsTC mechanismComplex Lnet/minecraft/item/Item;
+F solarflux GETSTATIC thaumcraft/api/items/ItemsTC mechanismSimple Lnet/minecraft/item/Item;
+F solarflux GETSTATIC thaumcraft/api/items/ItemsTC plate Lnet/minecraft/item/Item;
+F solarflux GETSTATIC thaumcraft/api/research/ResearchEntry$EnumResearchMeta HIDDEN Lthaumcraft/api/research/ResearchEntry$EnumResearchMeta;
+F solarflux GETSTATIC thaumcraft/api/research/ResearchEntry$EnumResearchMeta SPIKY Lthaumcraft/api/research/ResearchEntry$EnumResearchMeta;
+F solarflux GETSTATIC thaumcraft/common/lib/research/ResearchManager craftingReferences Ljava/util/LinkedHashSet;
+F solarflux PUTFIELD thaumcraft/api/research/theorycraft/ResearchTableData bonusDraws I
+M solarflux INVOKESPECIAL thaumcraft/api/aspects/Aspect <init> (Ljava/lang/String;I[Lthaumcraft/api/aspects/Aspect;Lnet/minecraft/util/ResourceLocation;I)V
+M solarflux INVOKESPECIAL thaumcraft/api/aspects/AspectList <init> ()V
+M solarflux INVOKESPECIAL thaumcraft/api/crafting/CrucibleRecipe <init> (Ljava/lang/String;Lnet/minecraft/item/ItemStack;Ljava/lang/Object;Lthaumcraft/api/aspects/AspectList;)V
+M solarflux INVOKESPECIAL thaumcraft/api/crafting/InfusionRecipe <init> (Ljava/lang/String;Ljava/lang/Object;ILthaumcraft/api/aspects/AspectList;Ljava/lang/Object;[Ljava/lang/Object;)V
+M solarflux INVOKESPECIAL thaumcraft/api/crafting/ShapedArcaneRecipe <init> (Lnet/minecraft/util/ResourceLocation;Ljava/lang/String;ILthaumcraft/api/aspects/AspectList;Lnet/minecraft/block/Block;[Ljava/lang/Object;)V
+M solarflux INVOKESPECIAL thaumcraft/api/crafting/ShapedArcaneRecipe <init> (Lnet/minecraft/util/ResourceLocation;Ljava/lang/String;ILthaumcraft/api/aspects/AspectList;Lnet/minecraft/item/Item;[Ljava/lang/Object;)V
+M solarflux INVOKESPECIAL thaumcraft/api/crafting/ShapedArcaneRecipe <init> (Lnet/minecraft/util/ResourceLocation;Ljava/lang/String;ILthaumcraft/api/aspects/AspectList;Lnet/minecraft/item/ItemStack;[Ljava/lang/Object;)V
+M solarflux INVOKESPECIAL thaumcraft/api/research/ResearchAddendum <init> ()V
+M solarflux INVOKESPECIAL thaumcraft/api/research/ResearchEntry <init> ()V
+M solarflux INVOKESPECIAL thaumcraft/api/research/ResearchStage <init> ()V
+M solarflux INVOKESPECIAL thaumcraft/api/research/ResearchStage$Knowledge <init> (Lthaumcraft/api/capabilities/IPlayerKnowledge$EnumKnowledgeType;Lthaumcraft/api/research/ResearchCategory;I)V
+M solarflux INVOKESPECIAL thaumcraft/api/research/ScanBlock <init> (Ljava/lang/String;[Lnet/minecraft/block/Block;)V
+M solarflux INVOKESPECIAL thaumcraft/api/research/theorycraft/TheorycraftCard <init> ()V
+M solarflux INVOKESTATIC thaumcraft/api/ThaumcraftApi addArcaneCraftingRecipe (Lnet/minecraft/util/ResourceLocation;Lthaumcraft/api/crafting/IArcaneRecipe;)V
+M solarflux INVOKESTATIC thaumcraft/api/ThaumcraftApi addCrucibleRecipe (Lnet/minecraft/util/ResourceLocation;Lthaumcraft/api/crafting/CrucibleRecipe;)V
+M solarflux INVOKESTATIC thaumcraft/api/ThaumcraftApi addInfusionCraftingRecipe (Lnet/minecraft/util/ResourceLocation;Lthaumcraft/api/crafting/InfusionRecipe;)V
+M solarflux INVOKESTATIC thaumcraft/api/ThaumcraftApiHelper getOresWithWildCards (Ljava/lang/String;)Ljava/util/List;
+M solarflux INVOKESTATIC thaumcraft/api/aspects/Aspect getAspect (Ljava/lang/String;)Lthaumcraft/api/aspects/Aspect;
+M solarflux INVOKESTATIC thaumcraft/api/internal/CommonInternals generateUniqueItemstackId (Lnet/minecraft/item/ItemStack;)I
+M solarflux INVOKESTATIC thaumcraft/api/research/ResearchCategories registerCategory (Ljava/lang/String;Ljava/lang/String;Lthaumcraft/api/aspects/AspectList;Lnet/minecraft/util/ResourceLocation;Lnet/minecraft/util/ResourceLocation;Lnet/minecraft/util/ResourceLocation;)Lthaumcraft/api/research/ResearchCategory;
+M solarflux INVOKESTATIC thaumcraft/api/research/ScanningManager addScannableThing (Lthaumcraft/api/research/IScanThing;)V
+M solarflux INVOKESTATIC thaumcraft/api/research/theorycraft/TheorycraftManager registerAid (Lthaumcraft/api/research/theorycraft/ITheorycraftAid;)V
+M solarflux INVOKESTATIC thaumcraft/api/research/theorycraft/TheorycraftManager registerCard (Ljava/lang/Class;)V
+M solarflux INVOKESTATIC thaumcraft/common/lib/crafting/ThaumcraftCraftingManager getObjectTags (Lnet/minecraft/item/ItemStack;)Lthaumcraft/api/aspects/AspectList;
+M solarflux INVOKESTATIC thaumcraft/common/lib/research/ResearchManager createItemStackHash (Lnet/minecraft/item/ItemStack;)I
+M solarflux INVOKEVIRTUAL thaumcraft/api/aspects/Aspect getName ()Ljava/lang/String;
+M solarflux INVOKEVIRTUAL thaumcraft/api/aspects/AspectList add (Lthaumcraft/api/aspects/Aspect;I)Lthaumcraft/api/aspects/AspectList;
+M solarflux INVOKEVIRTUAL thaumcraft/api/aspects/AspectList add (Lthaumcraft/api/aspects/AspectList;)Lthaumcraft/api/aspects/AspectList;
+M solarflux INVOKEVIRTUAL thaumcraft/api/aspects/AspectList copy ()Lthaumcraft/api/aspects/AspectList;
+M solarflux INVOKEVIRTUAL thaumcraft/api/aspects/AspectList getAmount (Lthaumcraft/api/aspects/Aspect;)I
+M solarflux INVOKEVIRTUAL thaumcraft/api/aspects/AspectList getAspectsSortedByAmount ()[Lthaumcraft/api/aspects/Aspect;
+M solarflux INVOKEVIRTUAL thaumcraft/api/aspects/AspectList remove (Lthaumcraft/api/aspects/Aspect;)Lthaumcraft/api/aspects/AspectList;
+M solarflux INVOKEVIRTUAL thaumcraft/api/research/ResearchAddendum setRecipes ([Lnet/minecraft/util/ResourceLocation;)V
+M solarflux INVOKEVIRTUAL thaumcraft/api/research/ResearchAddendum setResearch ([Ljava/lang/String;)V
+M solarflux INVOKEVIRTUAL thaumcraft/api/research/ResearchAddendum setText (Ljava/lang/String;)V
+M solarflux INVOKEVIRTUAL thaumcraft/api/research/ResearchEntry setAddenda ([Lthaumcraft/api/research/ResearchAddendum;)V
+M solarflux INVOKEVIRTUAL thaumcraft/api/research/ResearchEntry setCategory (Ljava/lang/String;)V
+M solarflux INVOKEVIRTUAL thaumcraft/api/research/ResearchEntry setDisplayColumn (I)V
+M solarflux INVOKEVIRTUAL thaumcraft/api/research/ResearchEntry setDisplayRow (I)V
+M solarflux INVOKEVIRTUAL thaumcraft/api/research/ResearchEntry setIcons ([Ljava/lang/Object;)V
+M solarflux INVOKEVIRTUAL thaumcraft/api/research/ResearchEntry setKey (Ljava/lang/String;)V
+M solarflux INVOKEVIRTUAL thaumcraft/api/research/ResearchEntry setMeta ([Lthaumcraft/api/research/ResearchEntry$EnumResearchMeta;)V
+M solarflux INVOKEVIRTUAL thaumcraft/api/research/ResearchEntry setName (Ljava/lang/String;)V
+M solarflux INVOKEVIRTUAL thaumcraft/api/research/ResearchEntry setParents ([Ljava/lang/String;)V
+M solarflux INVOKEVIRTUAL thaumcraft/api/research/ResearchEntry setRewardItem ([Lnet/minecraft/item/ItemStack;)V
+M solarflux INVOKEVIRTUAL thaumcraft/api/research/ResearchEntry setRewardKnow ([Lthaumcraft/api/research/ResearchStage$Knowledge;)V
+M solarflux INVOKEVIRTUAL thaumcraft/api/research/ResearchEntry setSiblings ([Ljava/lang/String;)V
+M solarflux INVOKEVIRTUAL thaumcraft/api/research/ResearchEntry setStages ([Lthaumcraft/api/research/ResearchStage;)V
+M solarflux INVOKEVIRTUAL thaumcraft/api/research/ResearchStage getCraft ()[Ljava/lang/Object;
+M solarflux INVOKEVIRTUAL thaumcraft/api/research/ResearchStage setCraft ([Ljava/lang/Object;)V
+M solarflux INVOKEVIRTUAL thaumcraft/api/research/ResearchStage setCraftReference ([I)V
+M solarflux INVOKEVIRTUAL thaumcraft/api/research/ResearchStage setKnow ([Lthaumcraft/api/research/ResearchStage$Knowledge;)V
+M solarflux INVOKEVIRTUAL thaumcraft/api/research/ResearchStage setObtain ([Ljava/lang/Object;)V
+M solarflux INVOKEVIRTUAL thaumcraft/api/research/ResearchStage setRecipes ([Lnet/minecraft/util/ResourceLocation;)V
+M solarflux INVOKEVIRTUAL thaumcraft/api/research/ResearchStage setResearch ([Ljava/lang/String;)V
+M solarflux INVOKEVIRTUAL thaumcraft/api/research/ResearchStage setResearchIcon ([Ljava/lang/String;)V
+M solarflux INVOKEVIRTUAL thaumcraft/api/research/ResearchStage setText (Ljava/lang/String;)V
+M solarflux INVOKEVIRTUAL thaumcraft/api/research/ResearchStage setWarp (I)V
+M solarflux INVOKEVIRTUAL thaumcraft/api/research/theorycraft/ResearchTableData addInspiration (I)V
+M solarflux INVOKEVIRTUAL thaumcraft/api/research/theorycraft/ResearchTableData addTotal (Ljava/lang/String;I)V
+A botania supported both botania-r1.10-374.jar 5cd8078a94c28172ee62e15b727aa7bb08612f3af86176b07bfbf2adaaafa6e5
+C botania thaumcraft/api/ThaumcraftApi
+C botania thaumcraft/api/ThaumcraftApi$EntityTagsNBT
+C botania thaumcraft/api/aspects/Aspect
+C botania thaumcraft/api/aspects/AspectEventProxy
+C botania thaumcraft/api/aspects/AspectHelper
+C botania thaumcraft/api/aspects/AspectList
+C botania thaumcraft/api/aspects/AspectRegistryEvent
+C botania thaumcraft/api/crafting/IInfusionStabiliser
+C botania thaumcraft/api/items/IGoggles
+C botania thaumcraft/api/items/IRevealer
+C botania thaumcraft/api/items/IScribeTools
+F botania GETFIELD thaumcraft/api/aspects/AspectRegistryEvent register Lthaumcraft/api/aspects/AspectEventProxy;
+F botania GETSTATIC thaumcraft/api/aspects/Aspect AIR Lthaumcraft/api/aspects/Aspect;
+F botania GETSTATIC thaumcraft/api/aspects/Aspect ALCHEMY Lthaumcraft/api/aspects/Aspect;
+F botania GETSTATIC thaumcraft/api/aspects/Aspect AURA Lthaumcraft/api/aspects/Aspect;
+F botania GETSTATIC thaumcraft/api/aspects/Aspect AVERSION Lthaumcraft/api/aspects/Aspect;
+F botania GETSTATIC thaumcraft/api/aspects/Aspect BEAST Lthaumcraft/api/aspects/Aspect;
+F botania GETSTATIC thaumcraft/api/aspects/Aspect COLD Lthaumcraft/api/aspects/Aspect;
+F botania GETSTATIC thaumcraft/api/aspects/Aspect CRAFT Lthaumcraft/api/aspects/Aspect;
+F botania GETSTATIC thaumcraft/api/aspects/Aspect CRYSTAL Lthaumcraft/api/aspects/Aspect;
+F botania GETSTATIC thaumcraft/api/aspects/Aspect DARKNESS Lthaumcraft/api/aspects/Aspect;
+F botania GETSTATIC thaumcraft/api/aspects/Aspect DEATH Lthaumcraft/api/aspects/Aspect;
+F botania GETSTATIC thaumcraft/api/aspects/Aspect DESIRE Lthaumcraft/api/aspects/Aspect;
+F botania GETSTATIC thaumcraft/api/aspects/Aspect EARTH Lthaumcraft/api/aspects/Aspect;
+F botania GETSTATIC thaumcraft/api/aspects/Aspect ELDRITCH Lthaumcraft/api/aspects/Aspect;
+F botania GETSTATIC thaumcraft/api/aspects/Aspect ENERGY Lthaumcraft/api/aspects/Aspect;
+F botania GETSTATIC thaumcraft/api/aspects/Aspect ENTROPY Lthaumcraft/api/aspects/Aspect;
+F botania GETSTATIC thaumcraft/api/aspects/Aspect EXCHANGE Lthaumcraft/api/aspects/Aspect;
+F botania GETSTATIC thaumcraft/api/aspects/Aspect FIRE Lthaumcraft/api/aspects/Aspect;
+F botania GETSTATIC thaumcraft/api/aspects/Aspect FLIGHT Lthaumcraft/api/aspects/Aspect;
+F botania GETSTATIC thaumcraft/api/aspects/Aspect FLUX Lthaumcraft/api/aspects/Aspect;
+F botania GETSTATIC thaumcraft/api/aspects/Aspect LIFE Lthaumcraft/api/aspects/Aspect;
+F botania GETSTATIC thaumcraft/api/aspects/Aspect LIGHT Lthaumcraft/api/aspects/Aspect;
+F botania GETSTATIC thaumcraft/api/aspects/Aspect MAGIC Lthaumcraft/api/aspects/Aspect;
+F botania GETSTATIC thaumcraft/api/aspects/Aspect MAN Lthaumcraft/api/aspects/Aspect;
+F botania GETSTATIC thaumcraft/api/aspects/Aspect MECHANISM Lthaumcraft/api/aspects/Aspect;
+F botania GETSTATIC thaumcraft/api/aspects/Aspect METAL Lthaumcraft/api/aspects/Aspect;
+F botania GETSTATIC thaumcraft/api/aspects/Aspect MIND Lthaumcraft/api/aspects/Aspect;
+F botania GETSTATIC thaumcraft/api/aspects/Aspect MOTION Lthaumcraft/api/aspects/Aspect;
+F botania GETSTATIC thaumcraft/api/aspects/Aspect ORDER Lthaumcraft/api/aspects/Aspect;
+F botania GETSTATIC thaumcraft/api/aspects/Aspect PLANT Lthaumcraft/api/aspects/Aspect;
+F botania GETSTATIC thaumcraft/api/aspects/Aspect PROTECT Lthaumcraft/api/aspects/Aspect;
+F botania GETSTATIC thaumcraft/api/aspects/Aspect SENSES Lthaumcraft/api/aspects/Aspect;
+F botania GETSTATIC thaumcraft/api/aspects/Aspect SOUL Lthaumcraft/api/aspects/Aspect;
+F botania GETSTATIC thaumcraft/api/aspects/Aspect TOOL Lthaumcraft/api/aspects/Aspect;
+F botania GETSTATIC thaumcraft/api/aspects/Aspect TRAP Lthaumcraft/api/aspects/Aspect;
+F botania GETSTATIC thaumcraft/api/aspects/Aspect UNDEAD Lthaumcraft/api/aspects/Aspect;
+F botania GETSTATIC thaumcraft/api/aspects/Aspect VOID Lthaumcraft/api/aspects/Aspect;
+F botania GETSTATIC thaumcraft/api/aspects/Aspect WATER Lthaumcraft/api/aspects/Aspect;
+M botania INVOKESPECIAL thaumcraft/api/aspects/AspectList <init> ()V
+M botania INVOKESPECIAL thaumcraft/api/aspects/AspectList <init> (Lnet/minecraft/item/ItemStack;)V
+M botania INVOKESTATIC thaumcraft/api/ThaumcraftApi registerEntityTag (Ljava/lang/String;Lthaumcraft/api/aspects/AspectList;[Lthaumcraft/api/ThaumcraftApi$EntityTagsNBT;)V
+M botania INVOKESTATIC thaumcraft/api/aspects/AspectHelper getObjectAspects (Lnet/minecraft/item/ItemStack;)Lthaumcraft/api/aspects/AspectList;
+M botania INVOKEVIRTUAL thaumcraft/api/aspects/AspectEventProxy registerComplexObjectTag (Lnet/minecraft/item/ItemStack;Lthaumcraft/api/aspects/AspectList;)V
+M botania INVOKEVIRTUAL thaumcraft/api/aspects/AspectEventProxy registerObjectTag (Ljava/lang/String;Lthaumcraft/api/aspects/AspectList;)V
+M botania INVOKEVIRTUAL thaumcraft/api/aspects/AspectEventProxy registerObjectTag (Lnet/minecraft/item/ItemStack;Lthaumcraft/api/aspects/AspectList;)V
+M botania INVOKEVIRTUAL thaumcraft/api/aspects/AspectList add (Lthaumcraft/api/aspects/Aspect;I)Lthaumcraft/api/aspects/AspectList;
+M botania INVOKEVIRTUAL thaumcraft/api/aspects/AspectList add (Lthaumcraft/api/aspects/AspectList;)Lthaumcraft/api/aspects/AspectList;
+M botania INVOKEVIRTUAL thaumcraft/api/aspects/AspectList copy ()Lthaumcraft/api/aspects/AspectList;
+M botania INVOKEVIRTUAL thaumcraft/api/aspects/AspectList getAmount (Lthaumcraft/api/aspects/Aspect;)I
+M botania INVOKEVIRTUAL thaumcraft/api/aspects/AspectList getAspects ()[Lthaumcraft/api/aspects/Aspect;
+M botania INVOKEVIRTUAL thaumcraft/api/aspects/AspectList merge (Lthaumcraft/api/aspects/Aspect;I)Lthaumcraft/api/aspects/AspectList;
+M botania INVOKEVIRTUAL thaumcraft/api/aspects/AspectList reduce (Lthaumcraft/api/aspects/Aspect;I)Z
+M botania INVOKEVIRTUAL thaumcraft/api/aspects/AspectList remove (Lthaumcraft/api/aspects/Aspect;)Lthaumcraft/api/aspects/AspectList;
+S botania thaumcraft/common/entities/EntityFluxRift
+A justenoughmagiculture supported client justenoughmagiculture-1.12.2-1.2.2.jar b1477c2ff5867fbd4ee97c0a5f387cc628155c03155722fca0b9068d3d5819a0
+C justenoughmagiculture thaumcraft/api/ThaumcraftApiHelper
+C justenoughmagiculture thaumcraft/api/aspects/Aspect
+C justenoughmagiculture thaumcraft/api/blocks/BlocksTC
+C justenoughmagiculture thaumcraft/api/internal/WeightedRandomLoot
+C justenoughmagiculture thaumcraft/api/items/ItemsTC
+C justenoughmagiculture thaumcraft/common/blocks/world/BlockLoot
+C justenoughmagiculture thaumcraft/common/blocks/world/BlockLoot$LootType
+C justenoughmagiculture thaumcraft/common/config/ConfigItems
+C justenoughmagiculture thaumcraft/common/entities/monster/EntityBrainyZombie
+C justenoughmagiculture thaumcraft/common/entities/monster/EntityEldritchCrab
+C justenoughmagiculture thaumcraft/common/entities/monster/EntityFireBat
+C justenoughmagiculture thaumcraft/common/entities/monster/EntityGiantBrainyZombie
+C justenoughmagiculture thaumcraft/common/entities/monster/EntityPech
+C justenoughmagiculture thaumcraft/common/entities/monster/EntityThaumicSlime
+C justenoughmagiculture thaumcraft/common/entities/monster/EntityWisp
+C justenoughmagiculture thaumcraft/common/entities/monster/boss/EntityCultistLeader
+C justenoughmagiculture thaumcraft/common/entities/monster/boss/EntityCultistPortalGreater
+C justenoughmagiculture thaumcraft/common/entities/monster/boss/EntityEldritchGolem
+C justenoughmagiculture thaumcraft/common/entities/monster/boss/EntityEldritchWarden
+C justenoughmagiculture thaumcraft/common/entities/monster/boss/EntityTaintacleGiant
+C justenoughmagiculture thaumcraft/common/entities/monster/cult/EntityCultist
+C justenoughmagiculture thaumcraft/common/entities/monster/cult/EntityCultistCleric
+C justenoughmagiculture thaumcraft/common/entities/monster/cult/EntityCultistKnight
+C justenoughmagiculture thaumcraft/common/entities/monster/tainted/EntityTaintCrawler
+C justenoughmagiculture thaumcraft/common/entities/monster/tainted/EntityTaintSeed
+C justenoughmagiculture thaumcraft/common/entities/monster/tainted/EntityTaintSeedPrime
+C justenoughmagiculture thaumcraft/common/entities/monster/tainted/EntityTaintSwarm
+C justenoughmagiculture thaumcraft/common/entities/monster/tainted/EntityTaintacle
+C justenoughmagiculture thaumcraft/common/entities/monster/tainted/EntityTaintacleSmall
+F justenoughmagiculture GETFIELD thaumcraft/api/internal/WeightedRandomLoot field_76292_a I
+F justenoughmagiculture GETFIELD thaumcraft/api/internal/WeightedRandomLoot item Lnet/minecraft/item/ItemStack;
+F justenoughmagiculture GETSTATIC thaumcraft/api/blocks/BlocksTC lootCrateCommon Lnet/minecraft/block/Block;
+F justenoughmagiculture GETSTATIC thaumcraft/api/blocks/BlocksTC lootCrateRare Lnet/minecraft/block/Block;
+F justenoughmagiculture GETSTATIC thaumcraft/api/blocks/BlocksTC lootCrateUncommon Lnet/minecraft/block/Block;
+F justenoughmagiculture GETSTATIC thaumcraft/api/blocks/BlocksTC lootUrnCommon Lnet/minecraft/block/Block;
+F justenoughmagiculture GETSTATIC thaumcraft/api/blocks/BlocksTC lootUrnRare Lnet/minecraft/block/Block;
+F justenoughmagiculture GETSTATIC thaumcraft/api/blocks/BlocksTC lootUrnUncommon Lnet/minecraft/block/Block;
+F justenoughmagiculture GETSTATIC thaumcraft/api/internal/WeightedRandomLoot lootBagCommon Ljava/util/ArrayList;
+F justenoughmagiculture GETSTATIC thaumcraft/api/internal/WeightedRandomLoot lootBagRare Ljava/util/ArrayList;
+F justenoughmagiculture GETSTATIC thaumcraft/api/internal/WeightedRandomLoot lootBagUncommon Ljava/util/ArrayList;
+F justenoughmagiculture GETSTATIC thaumcraft/api/items/ItemsTC brain Lnet/minecraft/item/Item;
+F justenoughmagiculture GETSTATIC thaumcraft/api/items/ItemsTC crimsonBlade Lnet/minecraft/item/Item;
+F justenoughmagiculture GETSTATIC thaumcraft/api/items/ItemsTC crimsonBoots Lnet/minecraft/item/Item;
+F justenoughmagiculture GETSTATIC thaumcraft/api/items/ItemsTC crimsonPlateChest Lnet/minecraft/item/Item;
+F justenoughmagiculture GETSTATIC thaumcraft/api/items/ItemsTC crimsonPlateHelm Lnet/minecraft/item/Item;
+F justenoughmagiculture GETSTATIC thaumcraft/api/items/ItemsTC crimsonPlateLegs Lnet/minecraft/item/Item;
+F justenoughmagiculture GETSTATIC thaumcraft/api/items/ItemsTC crimsonPraetorChest Lnet/minecraft/item/Item;
+F justenoughmagiculture GETSTATIC thaumcraft/api/items/ItemsTC crimsonPraetorHelm Lnet/minecraft/item/Item;
+F justenoughmagiculture GETSTATIC thaumcraft/api/items/ItemsTC crimsonPraetorLegs Lnet/minecraft/item/Item;
+F justenoughmagiculture GETSTATIC thaumcraft/api/items/ItemsTC crimsonRobeChest Lnet/minecraft/item/Item;
+F justenoughmagiculture GETSTATIC thaumcraft/api/items/ItemsTC crimsonRobeHelm Lnet/minecraft/item/Item;
+F justenoughmagiculture GETSTATIC thaumcraft/api/items/ItemsTC crimsonRobeLegs Lnet/minecraft/item/Item;
+F justenoughmagiculture GETSTATIC thaumcraft/api/items/ItemsTC lootBag Lnet/minecraft/item/Item;
+F justenoughmagiculture GETSTATIC thaumcraft/api/items/ItemsTC primordialPearl Lnet/minecraft/item/Item;
+F justenoughmagiculture GETSTATIC thaumcraft/api/items/ItemsTC thaumiumSword Lnet/minecraft/item/Item;
+F justenoughmagiculture GETSTATIC thaumcraft/api/items/ItemsTC voidSword Lnet/minecraft/item/Item;
+F justenoughmagiculture GETSTATIC thaumcraft/common/blocks/world/BlockLoot$LootType COMMON Lthaumcraft/common/blocks/world/BlockLoot$LootType;
+F justenoughmagiculture GETSTATIC thaumcraft/common/blocks/world/BlockLoot$LootType RARE Lthaumcraft/common/blocks/world/BlockLoot$LootType;
+F justenoughmagiculture GETSTATIC thaumcraft/common/blocks/world/BlockLoot$LootType UNCOMMON Lthaumcraft/common/blocks/world/BlockLoot$LootType;
+F justenoughmagiculture GETSTATIC thaumcraft/common/config/ConfigItems FLUX_CRYSTAL Lnet/minecraft/item/ItemStack;
+F justenoughmagiculture GETSTATIC thaumcraft/common/entities/monster/EntityPech LOOT Lnet/minecraft/util/ResourceLocation;
+F justenoughmagiculture GETSTATIC thaumcraft/common/entities/monster/cult/EntityCultist LOOT Lnet/minecraft/util/ResourceLocation;
+M justenoughmagiculture INVOKESPECIAL thaumcraft/common/entities/monster/EntityBrainyZombie <init> (Lnet/minecraft/world/World;)V
+M justenoughmagiculture INVOKESPECIAL thaumcraft/common/entities/monster/EntityEldritchCrab <init> (Lnet/minecraft/world/World;)V
+M justenoughmagiculture INVOKESPECIAL thaumcraft/common/entities/monster/EntityFireBat <init> (Lnet/minecraft/world/World;)V
+M justenoughmagiculture INVOKESPECIAL thaumcraft/common/entities/monster/EntityGiantBrainyZombie <init> (Lnet/minecraft/world/World;)V
+M justenoughmagiculture INVOKESPECIAL thaumcraft/common/entities/monster/EntityPech <init> (Lnet/minecraft/world/World;)V
+M justenoughmagiculture INVOKESPECIAL thaumcraft/common/entities/monster/EntityThaumicSlime <init> (Lnet/minecraft/world/World;)V
+M justenoughmagiculture INVOKESPECIAL thaumcraft/common/entities/monster/EntityWisp <init> (Lnet/minecraft/world/World;)V
+M justenoughmagiculture INVOKESPECIAL thaumcraft/common/entities/monster/boss/EntityCultistLeader <init> (Lnet/minecraft/world/World;)V
+M justenoughmagiculture INVOKESPECIAL thaumcraft/common/entities/monster/boss/EntityCultistPortalGreater <init> (Lnet/minecraft/world/World;)V
+M justenoughmagiculture INVOKESPECIAL thaumcraft/common/entities/monster/boss/EntityEldritchGolem <init> (Lnet/minecraft/world/World;)V
+M justenoughmagiculture INVOKESPECIAL thaumcraft/common/entities/monster/boss/EntityEldritchWarden <init> (Lnet/minecraft/world/World;)V
+M justenoughmagiculture INVOKESPECIAL thaumcraft/common/entities/monster/boss/EntityTaintacleGiant <init> (Lnet/minecraft/world/World;)V
+M justenoughmagiculture INVOKESPECIAL thaumcraft/common/entities/monster/cult/EntityCultistCleric <init> (Lnet/minecraft/world/World;)V
+M justenoughmagiculture INVOKESPECIAL thaumcraft/common/entities/monster/cult/EntityCultistKnight <init> (Lnet/minecraft/world/World;)V
+M justenoughmagiculture INVOKESPECIAL thaumcraft/common/entities/monster/tainted/EntityTaintCrawler <init> (Lnet/minecraft/world/World;)V
+M justenoughmagiculture INVOKESPECIAL thaumcraft/common/entities/monster/tainted/EntityTaintSeed <init> (Lnet/minecraft/world/World;)V
+M justenoughmagiculture INVOKESPECIAL thaumcraft/common/entities/monster/tainted/EntityTaintSeedPrime <init> (Lnet/minecraft/world/World;)V
+M justenoughmagiculture INVOKESPECIAL thaumcraft/common/entities/monster/tainted/EntityTaintSwarm <init> (Lnet/minecraft/world/World;)V
+M justenoughmagiculture INVOKESPECIAL thaumcraft/common/entities/monster/tainted/EntityTaintacle <init> (Lnet/minecraft/world/World;)V
+M justenoughmagiculture INVOKESPECIAL thaumcraft/common/entities/monster/tainted/EntityTaintacleSmall <init> (Lnet/minecraft/world/World;)V
+M justenoughmagiculture INVOKESTATIC thaumcraft/api/ThaumcraftApiHelper makeCrystal (Lthaumcraft/api/aspects/Aspect;)Lnet/minecraft/item/ItemStack;
+M justenoughmagiculture INVOKESTATIC thaumcraft/api/aspects/Aspect getPrimalAspects ()Ljava/util/ArrayList;
+M justenoughmagiculture INVOKEVIRTUAL thaumcraft/common/blocks/world/BlockLoot$LootType ordinal ()I
+M justenoughmagiculture INVOKEVIRTUAL thaumcraft/common/entities/monster/boss/EntityCultistLeader func_184201_a (Lnet/minecraft/inventory/EntityEquipmentSlot;Lnet/minecraft/item/ItemStack;)V
+M justenoughmagiculture INVOKEVIRTUAL thaumcraft/common/entities/monster/cult/EntityCultistCleric func_184201_a (Lnet/minecraft/inventory/EntityEquipmentSlot;Lnet/minecraft/item/ItemStack;)V
+M justenoughmagiculture INVOKEVIRTUAL thaumcraft/common/entities/monster/cult/EntityCultistKnight func_184201_a (Lnet/minecraft/inventory/EntityEquipmentSlot;Lnet/minecraft/item/ItemStack;)V
+A jaopca supported both JAOPCA-1.12.2-2.3.5.7.jar 88931f0a8d995b33959c9e1618c6e87802e854e5b8944740b846a977442e147e
+C jaopca thaumcraft/api/ThaumcraftApi
+C jaopca thaumcraft/api/aspects/Aspect
+C jaopca thaumcraft/api/aspects/AspectList
+C jaopca thaumcraft/api/crafting/CrucibleRecipe
+C jaopca thaumcraft/api/items/ItemsTC
+C jaopca thaumcraft/api/research/ResearchCategories
+C jaopca thaumcraft/api/research/ResearchEntry
+C jaopca thaumcraft/api/research/ResearchStage
+C jaopca thaumcraft/common/lib/utils/Utils
+F jaopca GETSTATIC thaumcraft/api/aspects/Aspect METAL Lthaumcraft/api/aspects/Aspect;
+F jaopca GETSTATIC thaumcraft/api/aspects/Aspect ORDER Lthaumcraft/api/aspects/Aspect;
+F jaopca GETSTATIC thaumcraft/api/items/ItemsTC nuggets Lnet/minecraft/item/Item;
+M jaopca INVOKESPECIAL thaumcraft/api/aspects/AspectList <init> ()V
+M jaopca INVOKESPECIAL thaumcraft/api/crafting/CrucibleRecipe <init> (Ljava/lang/String;Lnet/minecraft/item/ItemStack;Ljava/lang/Object;Lthaumcraft/api/aspects/AspectList;)V
+M jaopca INVOKESTATIC thaumcraft/api/ThaumcraftApi addCrucibleRecipe (Lnet/minecraft/util/ResourceLocation;Lthaumcraft/api/crafting/CrucibleRecipe;)V
+M jaopca INVOKESTATIC thaumcraft/api/ThaumcraftApi addSmeltingBonus (Ljava/lang/Object;Lnet/minecraft/item/ItemStack;F)V
+M jaopca INVOKESTATIC thaumcraft/api/aspects/Aspect getAspect (Ljava/lang/String;)Lthaumcraft/api/aspects/Aspect;
+M jaopca INVOKESTATIC thaumcraft/api/research/ResearchCategories getResearch (Ljava/lang/String;)Lthaumcraft/api/research/ResearchEntry;
+M jaopca INVOKESTATIC thaumcraft/common/lib/utils/Utils addSpecialMiningResult (Lnet/minecraft/item/ItemStack;Lnet/minecraft/item/ItemStack;F)V
+M jaopca INVOKEVIRTUAL thaumcraft/api/aspects/AspectList add (Lthaumcraft/api/aspects/Aspect;I)Lthaumcraft/api/aspects/AspectList;
+M jaopca INVOKEVIRTUAL thaumcraft/api/research/ResearchEntry getStages ()[Lthaumcraft/api/research/ResearchStage;
+M jaopca INVOKEVIRTUAL thaumcraft/api/research/ResearchStage getRecipes ()[Lnet/minecraft/util/ResourceLocation;
+M jaopca INVOKEVIRTUAL thaumcraft/api/research/ResearchStage setRecipes ([Lnet/minecraft/util/ResourceLocation;)V

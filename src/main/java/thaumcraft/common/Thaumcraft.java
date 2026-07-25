@@ -11,6 +11,7 @@ import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.potion.Potion;
 import net.minecraft.world.DimensionType;
 import net.minecraft.world.biome.Biome;
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.fml.client.event.ConfigChangedEvent;
@@ -268,6 +269,16 @@ public class Thaumcraft {
                 Config.potionSunScorned,
                 Config.potionThaumarhia
         );
+    }
+
+    @SubscribeEvent
+    public void remapPotions(RegistryEvent.MissingMappings<Potion> event) {
+        ResourceLocation legacyWarpWard = new ResourceLocation(MODID, "warp_ward");
+        for (RegistryEvent.MissingMappings.Mapping<Potion> mapping : event.getMappings()) {
+            if (legacyWarpWard.equals(mapping.key)) {
+                mapping.remap(Config.potionWarpWard);
+            }
+        }
     }
 
     @SubscribeEvent

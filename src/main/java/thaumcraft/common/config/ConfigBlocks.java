@@ -425,7 +425,7 @@ public class ConfigBlocks {
     }
 
     private static void initFluids() {
-        Fluid existingPure = FluidRegistry.getFluid("fluidPure");
+        Fluid existingPure = FluidRegistry.getFluid("fluidpure");
         if (existingPure != null) {
             FLUIDPURE = existingPure;
         } else {

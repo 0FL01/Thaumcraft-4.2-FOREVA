@@ -76,6 +76,16 @@ public class ThaumcraftApi {
         smeltingBonus.put(in, new ItemStack(out.getItem(), 0, out.getMetadata()));
     }
 
+    public static void addSmeltingBonus(Object in, ItemStack out, float chance) {
+        // ponytail: TC4 has one furnace-wide bonus chance; add per-entry chance
+        // storage only if a supported integration needs runtime chance parity.
+        if (in instanceof ItemStack) {
+            addSmeltingBonus((ItemStack) in, out);
+        } else if (in instanceof String) {
+            addSmeltingBonus((String) in, out);
+        }
+    }
+
     public static ItemStack getSmeltingBonus(ItemStack in) {
         ItemStack out = smeltingBonus.get(Arrays.asList(in.getItem(), in.getMetadata()));
         if (out == null) {
@@ -93,6 +103,18 @@ public class ThaumcraftApi {
 
     public static List getCraftingRecipes() {
         return craftingRecipes;
+    }
+
+    public static void addArcaneCraftingRecipe(ResourceLocation key, thaumcraft.api.crafting.IArcaneRecipe recipe) {
+        craftingRecipes.add(recipe);
+    }
+
+    public static void addCrucibleRecipe(ResourceLocation key, CrucibleRecipe recipe) {
+        craftingRecipes.add(recipe);
+    }
+
+    public static void addInfusionCraftingRecipe(ResourceLocation key, InfusionRecipe recipe) {
+        craftingRecipes.add(recipe);
     }
 
     public static ShapedArcaneRecipe addArcaneCraftingRecipe(String research, ItemStack result, AspectList aspects, Object ... recipe) {

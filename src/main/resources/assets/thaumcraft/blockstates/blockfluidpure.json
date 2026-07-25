@@ -3,7 +3,7 @@
   "defaults": {
     "model": "forge:fluid",
     "custom": {
-      "fluid": "fluidPure"
+      "fluid": "fluidpure"
     }
   },
   "variants": {

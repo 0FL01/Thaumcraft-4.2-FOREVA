@@ -1,71 +1,125 @@
 FORMAT tc6-target-v1
-K PROJECTED C thaumcraft/api/ThaumcraftApi | enderio,fossils,magicbees,witchery-companion,witchery-resurrected | TC6 registration calls project onto canonical TC4 registries
+K PROJECTED C thaumcraft/api/ThaumcraftApi | botania,enderio,fossils,jaopca,magicbees,solarflux,witchery-companion,witchery-resurrected | TC6 registration calls project onto canonical TC4 registries
 K PROJECTED C thaumcraft/api/ThaumcraftApi$EntityTags | witchery-companion,witchery-resurrected | TC6 registration calls project onto canonical TC4 registries
-K PROJECTED C thaumcraft/api/ThaumcraftApi$EntityTagsNBT | fossils,witchery-companion,witchery-resurrected | TC6 registration calls project onto canonical TC4 registries
-K PROJECTED C thaumcraft/api/aspects/Aspect | enderio,fossils,magicbees,witchery-companion,witchery-resurrected | TC6 aspects and registrations project onto canonical TC4 aspects
-K PROJECTED C thaumcraft/api/aspects/AspectEventProxy | fossils,witchery-companion,witchery-resurrected | TC6 aspects and registrations project onto canonical TC4 aspects
-K PROJECTED C thaumcraft/api/aspects/AspectList | enderio,fossils,magicbees,witchery-companion,witchery-resurrected | TC6 aspects and registrations project onto canonical TC4 aspects
-K PROJECTED C thaumcraft/api/aspects/AspectRegistryEvent | fossils,witchery-companion | TC6 aspects and registrations project onto canonical TC4 aspects
+K PROJECTED C thaumcraft/api/ThaumcraftApi$EntityTagsNBT | botania,fossils,witchery-companion,witchery-resurrected | TC6 registration calls project onto canonical TC4 registries
+K PROJECTED C thaumcraft/api/ThaumcraftApiHelper | justenoughmagiculture,solarflux | TC6 registration calls project onto canonical TC4 registries
+K PROJECTED C thaumcraft/api/ThaumcraftMaterials | balkonsexpansion | TC6 material fields alias canonical TC4 tool materials
+K PROJECTED C thaumcraft/api/aspects/Aspect | botania,enderio,fossils,jaopca,justenoughmagiculture,magicbees,solarflux,witchery-companion,witchery-resurrected | TC6 aspects and registrations project onto canonical TC4 aspects
+K PROJECTED C thaumcraft/api/aspects/AspectEventProxy | botania,fossils,witchery-companion,witchery-resurrected | TC6 aspects and registrations project onto canonical TC4 aspects
+K PROJECTED C thaumcraft/api/aspects/AspectHelper | botania | TC6 aspects and registrations project onto canonical TC4 aspects
+K PROJECTED C thaumcraft/api/aspects/AspectList | botania,enderio,fossils,jaopca,magicbees,solarflux,witchery-companion,witchery-resurrected | TC6 aspects and registrations project onto canonical TC4 aspects
+K PROJECTED C thaumcraft/api/aspects/AspectRegistryEvent | botania,fossils,witchery-companion | TC6 aspects and registrations project onto canonical TC4 aspects
 K LINK_ONLY C thaumcraft/api/aura/AuraHelper | magicbees | Structural facade class; individual stateful methods are classified separately
-K PROJECTED C thaumcraft/api/blocks/BlocksTC | magicbees | TC6 block fields alias canonical TC4 registered blocks
-K EXACT C thaumcraft/api/crafting/IInfusionStabiliser | enderio | Exact observed callback descriptor with legacy adapter
+K PROJECTED C thaumcraft/api/blocks/BlocksTC | justenoughmagiculture,magicbees,solarflux | TC6 block fields alias canonical TC4 registered blocks
+K PROJECTED C thaumcraft/api/capabilities/IPlayerKnowledge | solarflux | TC6 knowledge value types back projected research entries without separate capability state
+K PROJECTED C thaumcraft/api/capabilities/IPlayerKnowledge$EnumKnowledgeType | solarflux | TC6 knowledge value types back projected research entries without separate capability state
+K PROJECTED C thaumcraft/api/crafting/CrucibleRecipe | jaopca,solarflux | TC6 recipe contracts project onto canonical TC4 recipe collections
+K PROJECTED C thaumcraft/api/crafting/IArcaneRecipe | solarflux | TC6 recipe contracts project onto canonical TC4 recipe collections
+K PROJECTED C thaumcraft/api/crafting/IInfusionStabiliser | botania,enderio | TC6 recipe contracts project onto canonical TC4 recipe collections
+K PROJECTED C thaumcraft/api/crafting/InfusionRecipe | solarflux | TC6 recipe contracts project onto canonical TC4 recipe collections
+K PROJECTED C thaumcraft/api/crafting/ShapedArcaneRecipe | solarflux | TC6 recipe contracts project onto canonical TC4 recipe collections
 K EXACT C thaumcraft/api/entities/IEldritchMob | magicbees | Exact marker interface
 K EXACT C thaumcraft/api/entities/ITaintedMob | magicbees | Exact marker interface
-K PROJECTED C thaumcraft/api/internal/CommonInternals | witchery-companion,witchery-resurrected | TC6 scan registry aliases canonical TC4 state
-K EXACT C thaumcraft/api/items/IGoggles | enderio | Exact observed structural interface
-K EXACT C thaumcraft/api/items/IRevealer | enderio | Exact observed structural interface
+K PROJECTED C thaumcraft/api/internal/CommonInternals | solarflux,witchery-companion,witchery-resurrected | TC6 scan registry aliases canonical TC4 state
+K EXACT C thaumcraft/api/internal/WeightedRandomLoot | justenoughmagiculture | Exact shared weighted-loot data contract
+K EXACT C thaumcraft/api/items/IGoggles | botania,enderio | Exact observed structural interface
+K EXACT C thaumcraft/api/items/IRevealer | botania,enderio | Exact observed structural interface
+K EXACT C thaumcraft/api/items/IScribeTools | botania | Exact observed structural interface
 K EXACT C thaumcraft/api/items/IVisDiscountGear | enderio | Exact observed structural interface
-K PROJECTED C thaumcraft/api/items/ItemsTC | magicbees | TC6 item fields alias canonical TC4 registered items
+K EXACT C thaumcraft/api/items/IWarpingGear | balkonsexpansion | Exact observed structural interface
+K PROJECTED C thaumcraft/api/items/ItemsTC | balkonsexpansion,jaopca,justenoughmagiculture,magicbees,solarflux | TC6 item fields alias canonical TC4 registered items
+K LINK_ONLY C thaumcraft/api/research/IScanThing | solarflux | TC6 scan contracts link, but TC4 has no equivalent generic scanner
+K PROJECTED C thaumcraft/api/research/ResearchAddendum | solarflux | TC6 research data projects onto canonical TC4 categories and entries
+K PROJECTED C thaumcraft/api/research/ResearchCategories | jaopca,solarflux | TC6 research data projects onto canonical TC4 categories and entries
+K PROJECTED C thaumcraft/api/research/ResearchCategory | solarflux | TC6 research data projects onto canonical TC4 categories and entries
+K PROJECTED C thaumcraft/api/research/ResearchEntry | jaopca,solarflux | TC6 research data projects onto canonical TC4 categories and entries
+K PROJECTED C thaumcraft/api/research/ResearchEntry$EnumResearchMeta | solarflux | TC6 research data projects onto canonical TC4 categories and entries
+K PROJECTED C thaumcraft/api/research/ResearchStage | jaopca,solarflux | TC6 research data projects onto canonical TC4 categories and entries
+K PROJECTED C thaumcraft/api/research/ResearchStage$Knowledge | solarflux | TC6 research data projects onto canonical TC4 categories and entries
+K LINK_ONLY C thaumcraft/api/research/ScanBlock | solarflux | TC6 block scans are retained for linkage without a TC4 scanner consumer
+K LINK_ONLY C thaumcraft/api/research/ScanningManager | solarflux | TC6 scan registrations are retained without creating a second scan system
+K LINK_ONLY C thaumcraft/api/research/theorycraft/ITheorycraftAid | solarflux | TC6 theorycraft types link, but TC4 has no theorycraft gameplay loop
+K LINK_ONLY C thaumcraft/api/research/theorycraft/ResearchTableData | solarflux | TC6 theorycraft types link, but TC4 has no theorycraft gameplay loop
+K LINK_ONLY C thaumcraft/api/research/theorycraft/TheorycraftCard | solarflux | TC6 theorycraft types link, but TC4 has no theorycraft gameplay loop
+K LINK_ONLY C thaumcraft/api/research/theorycraft/TheorycraftManager | solarflux | TC6 theorycraft types link, but TC4 has no theorycraft gameplay loop
+K LINK_ONLY C thaumcraft/common/blocks/world/BlockLoot | justenoughmagiculture | TC6 loot rarity types link while canonical TC4 metadata blocks own gameplay
+K LINK_ONLY C thaumcraft/common/blocks/world/BlockLoot$LootType | justenoughmagiculture | TC6 loot rarity types link while canonical TC4 metadata blocks own gameplay
 K PROJECTED C thaumcraft/common/blocks/world/taint/TaintHelper | magicbees | TC6 taint operations project onto TC4 taint behavior
-K LINK_ONLY C thaumcraft/common/entities/monster/boss/EntityTaintacleGiant | magicbees | Entity aliases resolve, but registered runtime class identity is not guaranteed
-K LINK_ONLY C thaumcraft/common/entities/monster/cult/EntityCultist | magicbees | Entity aliases resolve, but registered runtime class identity is not guaranteed
-K LINK_ONLY C thaumcraft/common/entities/monster/cult/EntityCultistCleric | magicbees | Entity aliases resolve, but registered runtime class identity is not guaranteed
-K LINK_ONLY C thaumcraft/common/entities/monster/cult/EntityCultistKnight | magicbees | Entity aliases resolve, but registered runtime class identity is not guaranteed
-K LINK_ONLY C thaumcraft/common/entities/monster/tainted/EntityTaintSeed | magicbees | Entity aliases resolve, but registered runtime class identity is not guaranteed
-K LINK_ONLY C thaumcraft/common/entities/monster/tainted/EntityTaintSeedPrime | magicbees | Entity aliases resolve, but registered runtime class identity is not guaranteed
-K LINK_ONLY C thaumcraft/common/entities/monster/tainted/EntityTaintacle | magicbees | Entity aliases resolve, but registered runtime class identity is not guaranteed
-K LINK_ONLY C thaumcraft/common/entities/monster/tainted/EntityTaintacleSmall | magicbees | Entity aliases resolve, but registered runtime class identity is not guaranteed
+K PROJECTED C thaumcraft/common/config/ConfigItems | justenoughmagiculture | TC6 shared stacks project onto canonical TC4 item instances
+K LINK_ONLY C thaumcraft/common/entities/monster/EntityBrainyZombie | justenoughmagiculture | Entity aliases resolve, but registered runtime class identity is not guaranteed
+K LINK_ONLY C thaumcraft/common/entities/monster/EntityEldritchCrab | justenoughmagiculture | Entity aliases resolve, but registered runtime class identity is not guaranteed
+K LINK_ONLY C thaumcraft/common/entities/monster/EntityFireBat | justenoughmagiculture | Entity aliases resolve, but registered runtime class identity is not guaranteed
+K LINK_ONLY C thaumcraft/common/entities/monster/EntityGiantBrainyZombie | justenoughmagiculture | Entity aliases resolve, but registered runtime class identity is not guaranteed
+K LINK_ONLY C thaumcraft/common/entities/monster/EntityPech | justenoughmagiculture | Entity aliases resolve, but registered runtime class identity is not guaranteed
+K LINK_ONLY C thaumcraft/common/entities/monster/EntityThaumicSlime | justenoughmagiculture | Entity aliases resolve, but registered runtime class identity is not guaranteed
+K LINK_ONLY C thaumcraft/common/entities/monster/EntityWisp | justenoughmagiculture | Entity aliases resolve, but registered runtime class identity is not guaranteed
+K LINK_ONLY C thaumcraft/common/entities/monster/boss/EntityCultistLeader | justenoughmagiculture | Entity aliases resolve, but registered runtime class identity is not guaranteed
+K LINK_ONLY C thaumcraft/common/entities/monster/boss/EntityCultistPortalGreater | justenoughmagiculture | Entity aliases resolve, but registered runtime class identity is not guaranteed
+K LINK_ONLY C thaumcraft/common/entities/monster/boss/EntityEldritchGolem | justenoughmagiculture | Entity aliases resolve, but registered runtime class identity is not guaranteed
+K LINK_ONLY C thaumcraft/common/entities/monster/boss/EntityEldritchWarden | justenoughmagiculture | Entity aliases resolve, but registered runtime class identity is not guaranteed
+K LINK_ONLY C thaumcraft/common/entities/monster/boss/EntityTaintacleGiant | justenoughmagiculture,magicbees | Entity aliases resolve, but registered runtime class identity is not guaranteed
+K LINK_ONLY C thaumcraft/common/entities/monster/cult/EntityCultist | justenoughmagiculture,magicbees | Entity aliases resolve, but registered runtime class identity is not guaranteed
+K LINK_ONLY C thaumcraft/common/entities/monster/cult/EntityCultistCleric | justenoughmagiculture,magicbees | Entity aliases resolve, but registered runtime class identity is not guaranteed
+K LINK_ONLY C thaumcraft/common/entities/monster/cult/EntityCultistKnight | justenoughmagiculture,magicbees | Entity aliases resolve, but registered runtime class identity is not guaranteed
+K LINK_ONLY C thaumcraft/common/entities/monster/tainted/EntityTaintCrawler | justenoughmagiculture | Entity aliases resolve, but registered runtime class identity is not guaranteed
+K LINK_ONLY C thaumcraft/common/entities/monster/tainted/EntityTaintSeed | justenoughmagiculture,magicbees | Entity aliases resolve, but registered runtime class identity is not guaranteed
+K LINK_ONLY C thaumcraft/common/entities/monster/tainted/EntityTaintSeedPrime | justenoughmagiculture,magicbees | Entity aliases resolve, but registered runtime class identity is not guaranteed
+K LINK_ONLY C thaumcraft/common/entities/monster/tainted/EntityTaintSwarm | justenoughmagiculture | Entity aliases resolve, but registered runtime class identity is not guaranteed
+K LINK_ONLY C thaumcraft/common/entities/monster/tainted/EntityTaintacle | justenoughmagiculture,magicbees | Entity aliases resolve, but registered runtime class identity is not guaranteed
+K LINK_ONLY C thaumcraft/common/entities/monster/tainted/EntityTaintacleSmall | justenoughmagiculture,magicbees | Entity aliases resolve, but registered runtime class identity is not guaranteed
 K PROJECTED C thaumcraft/common/items/resources/ItemCrystalEssence | magicbees | TC6 crystal aspect data projects onto the TC4 crystal item
+K LINK_ONLY C thaumcraft/common/lib/CommandThaumcraft | solarflux | Structural command superclass preserves TC6 instanceof linkage
 K PROJECTED C thaumcraft/common/lib/SoundsTC | magicbees | TC6 sound fields alias canonical TC4 registered sounds
-K PROJECTED C thaumcraft/common/lib/utils/Utils | jeid | TC6 biome calls project onto the Forge 1.12 biome update path
+K PROJECTED C thaumcraft/common/lib/crafting/ThaumcraftCraftingManager | solarflux | TC6 lookups delegate to canonical TC4 crafting helpers
+K PROJECTED C thaumcraft/common/lib/research/ResearchManager | solarflux | TC6 research insertion projects onto canonical TC4 research state
+K PROJECTED C thaumcraft/common/lib/utils/Utils | jaopca,jeid | TC6 biome calls project onto the Forge 1.12 biome update path
 K EXACT C thaumcraft/common/world/aura/AuraChunk | magicbees | Exact structural DTO only; world-owned chunk aura access is unsupported
 K LINK_ONLY C thaumcraft/common/world/aura/AuraHandler | magicbees,witchery-resurrected | Structural facade class; individual stateful methods are classified separately
-K PROJECTED F GETFIELD thaumcraft/api/aspects/AspectRegistryEvent register Lthaumcraft/api/aspects/AspectEventProxy; | fossils,witchery-companion | TC6 aspects and registrations project onto canonical TC4 aspects
-K PROJECTED F GETSTATIC thaumcraft/api/aspects/Aspect AIR Lthaumcraft/api/aspects/Aspect; | enderio,fossils,witchery-companion,witchery-resurrected | TC6 aspects and registrations project onto canonical TC4 aspects
-K PROJECTED F GETSTATIC thaumcraft/api/aspects/Aspect ALCHEMY Lthaumcraft/api/aspects/Aspect; | fossils | TC6 aspects and registrations project onto canonical TC4 aspects
-K PROJECTED F GETSTATIC thaumcraft/api/aspects/Aspect AVERSION Lthaumcraft/api/aspects/Aspect; | fossils | TC6 aspects and registrations project onto canonical TC4 aspects
-K PROJECTED F GETSTATIC thaumcraft/api/aspects/Aspect BEAST Lthaumcraft/api/aspects/Aspect; | fossils,witchery-companion,witchery-resurrected | TC6 aspects and registrations project onto canonical TC4 aspects
-K PROJECTED F GETSTATIC thaumcraft/api/aspects/Aspect COLD Lthaumcraft/api/aspects/Aspect; | fossils,witchery-companion,witchery-resurrected | TC6 aspects and registrations project onto canonical TC4 aspects
-K PROJECTED F GETSTATIC thaumcraft/api/aspects/Aspect CRAFT Lthaumcraft/api/aspects/Aspect; | fossils,witchery-companion,witchery-resurrected | TC6 aspects and registrations project onto canonical TC4 aspects
-K PROJECTED F GETSTATIC thaumcraft/api/aspects/Aspect CRYSTAL Lthaumcraft/api/aspects/Aspect; | enderio,fossils,witchery-companion,witchery-resurrected | TC6 aspects and registrations project onto canonical TC4 aspects
-K PROJECTED F GETSTATIC thaumcraft/api/aspects/Aspect DARKNESS Lthaumcraft/api/aspects/Aspect; | fossils,witchery-companion,witchery-resurrected | TC6 aspects and registrations project onto canonical TC4 aspects
-K PROJECTED F GETSTATIC thaumcraft/api/aspects/Aspect DEATH Lthaumcraft/api/aspects/Aspect; | fossils,witchery-companion,witchery-resurrected | TC6 aspects and registrations project onto canonical TC4 aspects
-K PROJECTED F GETSTATIC thaumcraft/api/aspects/Aspect DESIRE Lthaumcraft/api/aspects/Aspect; | fossils | TC6 aspects and registrations project onto canonical TC4 aspects
-K PROJECTED F GETSTATIC thaumcraft/api/aspects/Aspect EARTH Lthaumcraft/api/aspects/Aspect; | enderio,fossils,witchery-companion,witchery-resurrected | TC6 aspects and registrations project onto canonical TC4 aspects
-K PROJECTED F GETSTATIC thaumcraft/api/aspects/Aspect ELDRITCH Lthaumcraft/api/aspects/Aspect; | enderio,witchery-companion,witchery-resurrected | TC6 aspects and registrations project onto canonical TC4 aspects
-K PROJECTED F GETSTATIC thaumcraft/api/aspects/Aspect ENERGY Lthaumcraft/api/aspects/Aspect; | fossils,witchery-companion,witchery-resurrected | TC6 aspects and registrations project onto canonical TC4 aspects
-K PROJECTED F GETSTATIC thaumcraft/api/aspects/Aspect ENTROPY Lthaumcraft/api/aspects/Aspect; | fossils,witchery-companion,witchery-resurrected | TC6 aspects and registrations project onto canonical TC4 aspects
-K PROJECTED F GETSTATIC thaumcraft/api/aspects/Aspect EXCHANGE Lthaumcraft/api/aspects/Aspect; | fossils,witchery-companion,witchery-resurrected | TC6 aspects and registrations project onto canonical TC4 aspects
-K PROJECTED F GETSTATIC thaumcraft/api/aspects/Aspect FIRE Lthaumcraft/api/aspects/Aspect; | enderio,fossils,witchery-companion,witchery-resurrected | TC6 aspects and registrations project onto canonical TC4 aspects
-K PROJECTED F GETSTATIC thaumcraft/api/aspects/Aspect FLIGHT Lthaumcraft/api/aspects/Aspect; | fossils,witchery-companion,witchery-resurrected | TC6 aspects and registrations project onto canonical TC4 aspects
-K PROJECTED F GETSTATIC thaumcraft/api/aspects/Aspect LIFE Lthaumcraft/api/aspects/Aspect; | fossils,witchery-companion,witchery-resurrected | TC6 aspects and registrations project onto canonical TC4 aspects
-K PROJECTED F GETSTATIC thaumcraft/api/aspects/Aspect LIGHT Lthaumcraft/api/aspects/Aspect; | enderio,fossils,witchery-companion,witchery-resurrected | TC6 aspects and registrations project onto canonical TC4 aspects
-K PROJECTED F GETSTATIC thaumcraft/api/aspects/Aspect MAGIC Lthaumcraft/api/aspects/Aspect; | fossils,witchery-companion,witchery-resurrected | TC6 aspects and registrations project onto canonical TC4 aspects
-K PROJECTED F GETSTATIC thaumcraft/api/aspects/Aspect MAN Lthaumcraft/api/aspects/Aspect; | enderio,fossils,witchery-companion,witchery-resurrected | TC6 aspects and registrations project onto canonical TC4 aspects
-K PROJECTED F GETSTATIC thaumcraft/api/aspects/Aspect MECHANISM Lthaumcraft/api/aspects/Aspect; | fossils,witchery-companion,witchery-resurrected | TC6 aspects and registrations project onto canonical TC4 aspects
-K PROJECTED F GETSTATIC thaumcraft/api/aspects/Aspect METAL Lthaumcraft/api/aspects/Aspect; | fossils,witchery-companion,witchery-resurrected | TC6 aspects and registrations project onto canonical TC4 aspects
-K PROJECTED F GETSTATIC thaumcraft/api/aspects/Aspect MIND Lthaumcraft/api/aspects/Aspect; | witchery-companion,witchery-resurrected | TC6 aspects and registrations project onto canonical TC4 aspects
-K PROJECTED F GETSTATIC thaumcraft/api/aspects/Aspect MOTION Lthaumcraft/api/aspects/Aspect; | fossils,witchery-companion,witchery-resurrected | TC6 aspects and registrations project onto canonical TC4 aspects
-K PROJECTED F GETSTATIC thaumcraft/api/aspects/Aspect ORDER Lthaumcraft/api/aspects/Aspect; | enderio,magicbees,witchery-companion,witchery-resurrected | TC6 aspects and registrations project onto canonical TC4 aspects
-K PROJECTED F GETSTATIC thaumcraft/api/aspects/Aspect PLANT Lthaumcraft/api/aspects/Aspect; | fossils,witchery-companion,witchery-resurrected | TC6 aspects and registrations project onto canonical TC4 aspects
-K PROJECTED F GETSTATIC thaumcraft/api/aspects/Aspect PROTECT Lthaumcraft/api/aspects/Aspect; | fossils | TC6 aspects and registrations project onto canonical TC4 aspects
-K PROJECTED F GETSTATIC thaumcraft/api/aspects/Aspect SENSES Lthaumcraft/api/aspects/Aspect; | enderio,fossils,witchery-companion,witchery-resurrected | TC6 aspects and registrations project onto canonical TC4 aspects
-K PROJECTED F GETSTATIC thaumcraft/api/aspects/Aspect SOUL Lthaumcraft/api/aspects/Aspect; | fossils,witchery-companion,witchery-resurrected | TC6 aspects and registrations project onto canonical TC4 aspects
-K PROJECTED F GETSTATIC thaumcraft/api/aspects/Aspect TOOL Lthaumcraft/api/aspects/Aspect; | fossils,witchery-companion,witchery-resurrected | TC6 aspects and registrations project onto canonical TC4 aspects
-K PROJECTED F GETSTATIC thaumcraft/api/aspects/Aspect TRAP Lthaumcraft/api/aspects/Aspect; | witchery-companion,witchery-resurrected | TC6 aspects and registrations project onto canonical TC4 aspects
-K PROJECTED F GETSTATIC thaumcraft/api/aspects/Aspect UNDEAD Lthaumcraft/api/aspects/Aspect; | enderio,fossils,witchery-companion,witchery-resurrected | TC6 aspects and registrations project onto canonical TC4 aspects
-K PROJECTED F GETSTATIC thaumcraft/api/aspects/Aspect VOID Lthaumcraft/api/aspects/Aspect; | fossils,magicbees,witchery-companion,witchery-resurrected | TC6 aspects and registrations project onto canonical TC4 aspects
-K PROJECTED F GETSTATIC thaumcraft/api/aspects/Aspect WATER Lthaumcraft/api/aspects/Aspect; | fossils,witchery-companion,witchery-resurrected | TC6 aspects and registrations project onto canonical TC4 aspects
+K PROJECTED F GETFIELD thaumcraft/api/aspects/AspectRegistryEvent register Lthaumcraft/api/aspects/AspectEventProxy; | botania,fossils,witchery-companion | TC6 aspects and registrations project onto canonical TC4 aspects
+K EXACT F GETFIELD thaumcraft/api/internal/WeightedRandomLoot field_76292_a I | justenoughmagiculture | Exact shared weighted-loot data contract
+K EXACT F GETFIELD thaumcraft/api/internal/WeightedRandomLoot item Lnet/minecraft/item/ItemStack; | justenoughmagiculture | Exact shared weighted-loot data contract
+K PROJECTED F GETFIELD thaumcraft/api/research/ResearchCategory key Ljava/lang/String; | solarflux | TC6 research data projects onto canonical TC4 categories and entries
+K PROJECTED F GETFIELD thaumcraft/api/research/ResearchCategory research Ljava/util/Map; | solarflux | TC6 research data projects onto canonical TC4 categories and entries
+K LINK_ONLY F GETFIELD thaumcraft/api/research/theorycraft/ResearchTableData bonusDraws I | solarflux | TC6 theorycraft types link, but TC4 has no theorycraft gameplay loop
+K PROJECTED F GETSTATIC thaumcraft/api/ThaumcraftMaterials TOOLMAT_THAUMIUM Lnet/minecraft/item/Item$ToolMaterial; | balkonsexpansion | TC6 material fields alias canonical TC4 tool materials
+K PROJECTED F GETSTATIC thaumcraft/api/ThaumcraftMaterials TOOLMAT_VOID Lnet/minecraft/item/Item$ToolMaterial; | balkonsexpansion | TC6 material fields alias canonical TC4 tool materials
+K PROJECTED F GETSTATIC thaumcraft/api/aspects/Aspect AIR Lthaumcraft/api/aspects/Aspect; | botania,enderio,fossils,witchery-companion,witchery-resurrected | TC6 aspects and registrations project onto canonical TC4 aspects
+K PROJECTED F GETSTATIC thaumcraft/api/aspects/Aspect ALCHEMY Lthaumcraft/api/aspects/Aspect; | botania,fossils,solarflux | TC6 aspects and registrations project onto canonical TC4 aspects
+K PROJECTED F GETSTATIC thaumcraft/api/aspects/Aspect AURA Lthaumcraft/api/aspects/Aspect; | botania | TC6 aspects and registrations project onto canonical TC4 aspects
+K PROJECTED F GETSTATIC thaumcraft/api/aspects/Aspect AVERSION Lthaumcraft/api/aspects/Aspect; | botania,fossils,solarflux | TC6 aspects and registrations project onto canonical TC4 aspects
+K PROJECTED F GETSTATIC thaumcraft/api/aspects/Aspect BEAST Lthaumcraft/api/aspects/Aspect; | botania,fossils,witchery-companion,witchery-resurrected | TC6 aspects and registrations project onto canonical TC4 aspects
+K PROJECTED F GETSTATIC thaumcraft/api/aspects/Aspect COLD Lthaumcraft/api/aspects/Aspect; | botania,fossils,witchery-companion,witchery-resurrected | TC6 aspects and registrations project onto canonical TC4 aspects
+K PROJECTED F GETSTATIC thaumcraft/api/aspects/Aspect CRAFT Lthaumcraft/api/aspects/Aspect; | botania,fossils,witchery-companion,witchery-resurrected | TC6 aspects and registrations project onto canonical TC4 aspects
+K PROJECTED F GETSTATIC thaumcraft/api/aspects/Aspect CRYSTAL Lthaumcraft/api/aspects/Aspect; | botania,enderio,fossils,witchery-companion,witchery-resurrected | TC6 aspects and registrations project onto canonical TC4 aspects
+K PROJECTED F GETSTATIC thaumcraft/api/aspects/Aspect DARKNESS Lthaumcraft/api/aspects/Aspect; | botania,fossils,witchery-companion,witchery-resurrected | TC6 aspects and registrations project onto canonical TC4 aspects
+K PROJECTED F GETSTATIC thaumcraft/api/aspects/Aspect DEATH Lthaumcraft/api/aspects/Aspect; | botania,fossils,witchery-companion,witchery-resurrected | TC6 aspects and registrations project onto canonical TC4 aspects
+K PROJECTED F GETSTATIC thaumcraft/api/aspects/Aspect DESIRE Lthaumcraft/api/aspects/Aspect; | botania,fossils,solarflux | TC6 aspects and registrations project onto canonical TC4 aspects
+K PROJECTED F GETSTATIC thaumcraft/api/aspects/Aspect EARTH Lthaumcraft/api/aspects/Aspect; | botania,enderio,fossils,witchery-companion,witchery-resurrected | TC6 aspects and registrations project onto canonical TC4 aspects
+K PROJECTED F GETSTATIC thaumcraft/api/aspects/Aspect ELDRITCH Lthaumcraft/api/aspects/Aspect; | botania,enderio,witchery-companion,witchery-resurrected | TC6 aspects and registrations project onto canonical TC4 aspects
+K PROJECTED F GETSTATIC thaumcraft/api/aspects/Aspect ENERGY Lthaumcraft/api/aspects/Aspect; | botania,fossils,solarflux,witchery-companion,witchery-resurrected | TC6 aspects and registrations project onto canonical TC4 aspects
+K PROJECTED F GETSTATIC thaumcraft/api/aspects/Aspect ENTROPY Lthaumcraft/api/aspects/Aspect; | botania,fossils,witchery-companion,witchery-resurrected | TC6 aspects and registrations project onto canonical TC4 aspects
+K PROJECTED F GETSTATIC thaumcraft/api/aspects/Aspect EXCHANGE Lthaumcraft/api/aspects/Aspect; | botania,fossils,witchery-companion,witchery-resurrected | TC6 aspects and registrations project onto canonical TC4 aspects
+K PROJECTED F GETSTATIC thaumcraft/api/aspects/Aspect FIRE Lthaumcraft/api/aspects/Aspect; | botania,enderio,fossils,witchery-companion,witchery-resurrected | TC6 aspects and registrations project onto canonical TC4 aspects
+K PROJECTED F GETSTATIC thaumcraft/api/aspects/Aspect FLIGHT Lthaumcraft/api/aspects/Aspect; | botania,fossils,witchery-companion,witchery-resurrected | TC6 aspects and registrations project onto canonical TC4 aspects
+K PROJECTED F GETSTATIC thaumcraft/api/aspects/Aspect FLUX Lthaumcraft/api/aspects/Aspect; | botania | TC6 aspects and registrations project onto canonical TC4 aspects
+K PROJECTED F GETSTATIC thaumcraft/api/aspects/Aspect LIFE Lthaumcraft/api/aspects/Aspect; | botania,fossils,solarflux,witchery-companion,witchery-resurrected | TC6 aspects and registrations project onto canonical TC4 aspects
+K PROJECTED F GETSTATIC thaumcraft/api/aspects/Aspect LIGHT Lthaumcraft/api/aspects/Aspect; | botania,enderio,fossils,solarflux,witchery-companion,witchery-resurrected | TC6 aspects and registrations project onto canonical TC4 aspects
+K PROJECTED F GETSTATIC thaumcraft/api/aspects/Aspect MAGIC Lthaumcraft/api/aspects/Aspect; | botania,fossils,solarflux,witchery-companion,witchery-resurrected | TC6 aspects and registrations project onto canonical TC4 aspects
+K PROJECTED F GETSTATIC thaumcraft/api/aspects/Aspect MAN Lthaumcraft/api/aspects/Aspect; | botania,enderio,fossils,witchery-companion,witchery-resurrected | TC6 aspects and registrations project onto canonical TC4 aspects
+K PROJECTED F GETSTATIC thaumcraft/api/aspects/Aspect MECHANISM Lthaumcraft/api/aspects/Aspect; | botania,fossils,solarflux,witchery-companion,witchery-resurrected | TC6 aspects and registrations project onto canonical TC4 aspects
+K PROJECTED F GETSTATIC thaumcraft/api/aspects/Aspect METAL Lthaumcraft/api/aspects/Aspect; | botania,fossils,jaopca,witchery-companion,witchery-resurrected | TC6 aspects and registrations project onto canonical TC4 aspects
+K PROJECTED F GETSTATIC thaumcraft/api/aspects/Aspect MIND Lthaumcraft/api/aspects/Aspect; | botania,witchery-companion,witchery-resurrected | TC6 aspects and registrations project onto canonical TC4 aspects
+K PROJECTED F GETSTATIC thaumcraft/api/aspects/Aspect MOTION Lthaumcraft/api/aspects/Aspect; | botania,fossils,witchery-companion,witchery-resurrected | TC6 aspects and registrations project onto canonical TC4 aspects
+K PROJECTED F GETSTATIC thaumcraft/api/aspects/Aspect ORDER Lthaumcraft/api/aspects/Aspect; | botania,enderio,jaopca,magicbees,witchery-companion,witchery-resurrected | TC6 aspects and registrations project onto canonical TC4 aspects
+K PROJECTED F GETSTATIC thaumcraft/api/aspects/Aspect PLANT Lthaumcraft/api/aspects/Aspect; | botania,fossils,witchery-companion,witchery-resurrected | TC6 aspects and registrations project onto canonical TC4 aspects
+K PROJECTED F GETSTATIC thaumcraft/api/aspects/Aspect PROTECT Lthaumcraft/api/aspects/Aspect; | botania,fossils | TC6 aspects and registrations project onto canonical TC4 aspects
+K PROJECTED F GETSTATIC thaumcraft/api/aspects/Aspect SENSES Lthaumcraft/api/aspects/Aspect; | botania,enderio,fossils,witchery-companion,witchery-resurrected | TC6 aspects and registrations project onto canonical TC4 aspects
+K PROJECTED F GETSTATIC thaumcraft/api/aspects/Aspect SOUL Lthaumcraft/api/aspects/Aspect; | botania,fossils,witchery-companion,witchery-resurrected | TC6 aspects and registrations project onto canonical TC4 aspects
+K PROJECTED F GETSTATIC thaumcraft/api/aspects/Aspect TOOL Lthaumcraft/api/aspects/Aspect; | botania,fossils,witchery-companion,witchery-resurrected | TC6 aspects and registrations project onto canonical TC4 aspects
+K PROJECTED F GETSTATIC thaumcraft/api/aspects/Aspect TRAP Lthaumcraft/api/aspects/Aspect; | botania,witchery-companion,witchery-resurrected | TC6 aspects and registrations project onto canonical TC4 aspects
+K PROJECTED F GETSTATIC thaumcraft/api/aspects/Aspect UNDEAD Lthaumcraft/api/aspects/Aspect; | botania,enderio,fossils,witchery-companion,witchery-resurrected | TC6 aspects and registrations project onto canonical TC4 aspects
+K PROJECTED F GETSTATIC thaumcraft/api/aspects/Aspect VOID Lthaumcraft/api/aspects/Aspect; | botania,fossils,magicbees,solarflux,witchery-companion,witchery-resurrected | TC6 aspects and registrations project onto canonical TC4 aspects
+K PROJECTED F GETSTATIC thaumcraft/api/aspects/Aspect WATER Lthaumcraft/api/aspects/Aspect; | botania,fossils,solarflux,witchery-companion,witchery-resurrected | TC6 aspects and registrations project onto canonical TC4 aspects
 K PROJECTED F GETSTATIC thaumcraft/api/aspects/Aspect aspects Ljava/util/LinkedHashMap; | witchery-resurrected | TC6 aspects and registrations project onto canonical TC4 aspects
 K PROJECTED F GETSTATIC thaumcraft/api/blocks/BlocksTC cinderpearl Lnet/minecraft/block/Block; | magicbees | TC6 block fields alias canonical TC4 registered blocks
 K PROJECTED F GETSTATIC thaumcraft/api/blocks/BlocksTC crystalAir Lnet/minecraft/block/Block; | magicbees | TC6 block fields alias canonical TC4 registered blocks
@@ -75,49 +129,177 @@ K PROJECTED F GETSTATIC thaumcraft/api/blocks/BlocksTC crystalFire Lnet/minecraf
 K PROJECTED F GETSTATIC thaumcraft/api/blocks/BlocksTC crystalOrder Lnet/minecraft/block/Block; | magicbees | TC6 block fields alias canonical TC4 registered blocks
 K PROJECTED F GETSTATIC thaumcraft/api/blocks/BlocksTC crystalTaint Lnet/minecraft/block/Block; | magicbees | TC6 block fields alias canonical TC4 registered blocks
 K PROJECTED F GETSTATIC thaumcraft/api/blocks/BlocksTC crystalWater Lnet/minecraft/block/Block; | magicbees | TC6 block fields alias canonical TC4 registered blocks
+K PROJECTED F GETSTATIC thaumcraft/api/blocks/BlocksTC lootCrateCommon Lnet/minecraft/block/Block; | justenoughmagiculture | TC6 block fields alias canonical TC4 registered blocks
+K PROJECTED F GETSTATIC thaumcraft/api/blocks/BlocksTC lootCrateRare Lnet/minecraft/block/Block; | justenoughmagiculture | TC6 block fields alias canonical TC4 registered blocks
+K PROJECTED F GETSTATIC thaumcraft/api/blocks/BlocksTC lootCrateUncommon Lnet/minecraft/block/Block; | justenoughmagiculture | TC6 block fields alias canonical TC4 registered blocks
+K PROJECTED F GETSTATIC thaumcraft/api/blocks/BlocksTC lootUrnCommon Lnet/minecraft/block/Block; | justenoughmagiculture | TC6 block fields alias canonical TC4 registered blocks
+K PROJECTED F GETSTATIC thaumcraft/api/blocks/BlocksTC lootUrnRare Lnet/minecraft/block/Block; | justenoughmagiculture | TC6 block fields alias canonical TC4 registered blocks
+K PROJECTED F GETSTATIC thaumcraft/api/blocks/BlocksTC lootUrnUncommon Lnet/minecraft/block/Block; | justenoughmagiculture | TC6 block fields alias canonical TC4 registered blocks
+K PROJECTED F GETSTATIC thaumcraft/api/blocks/BlocksTC nitor Ljava/util/HashMap; | solarflux | TC6 block fields alias canonical TC4 registered blocks
 K PROJECTED F GETSTATIC thaumcraft/api/blocks/BlocksTC shimmerleaf Lnet/minecraft/block/Block; | magicbees | TC6 block fields alias canonical TC4 registered blocks
 K PROJECTED F GETSTATIC thaumcraft/api/blocks/BlocksTC vishroom Lnet/minecraft/block/Block; | magicbees | TC6 block fields alias canonical TC4 registered blocks
+K PROJECTED F GETSTATIC thaumcraft/api/capabilities/IPlayerKnowledge$EnumKnowledgeType OBSERVATION Lthaumcraft/api/capabilities/IPlayerKnowledge$EnumKnowledgeType; | solarflux | TC6 knowledge value types back projected research entries without separate capability state
+K PROJECTED F GETSTATIC thaumcraft/api/capabilities/IPlayerKnowledge$EnumKnowledgeType THEORY Lthaumcraft/api/capabilities/IPlayerKnowledge$EnumKnowledgeType; | solarflux | TC6 knowledge value types back projected research entries without separate capability state
+K PROJECTED F GETSTATIC thaumcraft/api/internal/CommonInternals objectTags Ljava/util/concurrent/ConcurrentHashMap; | solarflux | TC6 scan registry aliases canonical TC4 state
 K PROJECTED F GETSTATIC thaumcraft/api/internal/CommonInternals scanEntities Ljava/util/ArrayList; | witchery-companion,witchery-resurrected | TC6 scan registry aliases canonical TC4 state
+K EXACT F GETSTATIC thaumcraft/api/internal/WeightedRandomLoot lootBagCommon Ljava/util/ArrayList; | justenoughmagiculture | Exact shared weighted-loot data contract
+K EXACT F GETSTATIC thaumcraft/api/internal/WeightedRandomLoot lootBagRare Ljava/util/ArrayList; | justenoughmagiculture | Exact shared weighted-loot data contract
+K EXACT F GETSTATIC thaumcraft/api/internal/WeightedRandomLoot lootBagUncommon Ljava/util/ArrayList; | justenoughmagiculture | Exact shared weighted-loot data contract
 K PROJECTED F GETSTATIC thaumcraft/api/items/ItemsTC amber Lnet/minecraft/item/Item; | magicbees | TC6 item fields alias canonical TC4 registered items
-K PROJECTED F GETSTATIC thaumcraft/api/items/ItemsTC brain Lnet/minecraft/item/Item; | magicbees | TC6 item fields alias canonical TC4 registered items
+K PROJECTED F GETSTATIC thaumcraft/api/items/ItemsTC brain Lnet/minecraft/item/Item; | justenoughmagiculture,magicbees | TC6 item fields alias canonical TC4 registered items
 K PROJECTED F GETSTATIC thaumcraft/api/items/ItemsTC celestialNotes Lnet/minecraft/item/Item; | magicbees | TC6 item fields alias canonical TC4 registered items
 K PROJECTED F GETSTATIC thaumcraft/api/items/ItemsTC chunks Lnet/minecraft/item/Item; | magicbees | TC6 item fields alias canonical TC4 registered items
+K PROJECTED F GETSTATIC thaumcraft/api/items/ItemsTC crimsonBlade Lnet/minecraft/item/Item; | justenoughmagiculture | TC6 item fields alias canonical TC4 registered items
+K PROJECTED F GETSTATIC thaumcraft/api/items/ItemsTC crimsonBoots Lnet/minecraft/item/Item; | justenoughmagiculture | TC6 item fields alias canonical TC4 registered items
+K PROJECTED F GETSTATIC thaumcraft/api/items/ItemsTC crimsonPlateChest Lnet/minecraft/item/Item; | justenoughmagiculture | TC6 item fields alias canonical TC4 registered items
+K PROJECTED F GETSTATIC thaumcraft/api/items/ItemsTC crimsonPlateHelm Lnet/minecraft/item/Item; | justenoughmagiculture | TC6 item fields alias canonical TC4 registered items
+K PROJECTED F GETSTATIC thaumcraft/api/items/ItemsTC crimsonPlateLegs Lnet/minecraft/item/Item; | justenoughmagiculture | TC6 item fields alias canonical TC4 registered items
+K PROJECTED F GETSTATIC thaumcraft/api/items/ItemsTC crimsonPraetorChest Lnet/minecraft/item/Item; | justenoughmagiculture | TC6 item fields alias canonical TC4 registered items
+K PROJECTED F GETSTATIC thaumcraft/api/items/ItemsTC crimsonPraetorHelm Lnet/minecraft/item/Item; | justenoughmagiculture | TC6 item fields alias canonical TC4 registered items
+K PROJECTED F GETSTATIC thaumcraft/api/items/ItemsTC crimsonPraetorLegs Lnet/minecraft/item/Item; | justenoughmagiculture | TC6 item fields alias canonical TC4 registered items
+K PROJECTED F GETSTATIC thaumcraft/api/items/ItemsTC crimsonRobeChest Lnet/minecraft/item/Item; | justenoughmagiculture | TC6 item fields alias canonical TC4 registered items
+K PROJECTED F GETSTATIC thaumcraft/api/items/ItemsTC crimsonRobeHelm Lnet/minecraft/item/Item; | justenoughmagiculture | TC6 item fields alias canonical TC4 registered items
+K PROJECTED F GETSTATIC thaumcraft/api/items/ItemsTC crimsonRobeLegs Lnet/minecraft/item/Item; | justenoughmagiculture | TC6 item fields alias canonical TC4 registered items
 K PROJECTED F GETSTATIC thaumcraft/api/items/ItemsTC crystalEssence Lnet/minecraft/item/Item; | magicbees | TC6 item fields alias canonical TC4 registered items
 K PROJECTED F GETSTATIC thaumcraft/api/items/ItemsTC curio Lnet/minecraft/item/Item; | magicbees | TC6 item fields alias canonical TC4 registered items
-K PROJECTED F GETSTATIC thaumcraft/api/items/ItemsTC nuggets Lnet/minecraft/item/Item; | magicbees | TC6 item fields alias canonical TC4 registered items
+K PROJECTED F GETSTATIC thaumcraft/api/items/ItemsTC lootBag Lnet/minecraft/item/Item; | justenoughmagiculture | TC6 item fields alias canonical TC4 registered items
+K PROJECTED F GETSTATIC thaumcraft/api/items/ItemsTC mechanismComplex Lnet/minecraft/item/Item; | solarflux | TC6 item fields alias canonical TC4 registered items
+K PROJECTED F GETSTATIC thaumcraft/api/items/ItemsTC mechanismSimple Lnet/minecraft/item/Item; | solarflux | TC6 item fields alias canonical TC4 registered items
+K PROJECTED F GETSTATIC thaumcraft/api/items/ItemsTC nuggets Lnet/minecraft/item/Item; | balkonsexpansion,jaopca,magicbees | TC6 item fields alias canonical TC4 registered items
+K PROJECTED F GETSTATIC thaumcraft/api/items/ItemsTC plate Lnet/minecraft/item/Item; | solarflux | TC6 item fields alias canonical TC4 registered items
+K PROJECTED F GETSTATIC thaumcraft/api/items/ItemsTC primordialPearl Lnet/minecraft/item/Item; | justenoughmagiculture | TC6 item fields alias canonical TC4 registered items
+K PROJECTED F GETSTATIC thaumcraft/api/items/ItemsTC thaumiumSword Lnet/minecraft/item/Item; | justenoughmagiculture | TC6 item fields alias canonical TC4 registered items
+K PROJECTED F GETSTATIC thaumcraft/api/items/ItemsTC voidSeed Lnet/minecraft/item/Item; | balkonsexpansion | TC6 item fields alias canonical TC4 registered items
+K PROJECTED F GETSTATIC thaumcraft/api/items/ItemsTC voidSword Lnet/minecraft/item/Item; | justenoughmagiculture | TC6 item fields alias canonical TC4 registered items
+K PROJECTED F GETSTATIC thaumcraft/api/research/ResearchEntry$EnumResearchMeta HIDDEN Lthaumcraft/api/research/ResearchEntry$EnumResearchMeta; | solarflux | TC6 research data projects onto canonical TC4 categories and entries
+K PROJECTED F GETSTATIC thaumcraft/api/research/ResearchEntry$EnumResearchMeta SPIKY Lthaumcraft/api/research/ResearchEntry$EnumResearchMeta; | solarflux | TC6 research data projects onto canonical TC4 categories and entries
+K LINK_ONLY F GETSTATIC thaumcraft/common/blocks/world/BlockLoot$LootType COMMON Lthaumcraft/common/blocks/world/BlockLoot$LootType; | justenoughmagiculture | TC6 loot rarity types link while canonical TC4 metadata blocks own gameplay
+K LINK_ONLY F GETSTATIC thaumcraft/common/blocks/world/BlockLoot$LootType RARE Lthaumcraft/common/blocks/world/BlockLoot$LootType; | justenoughmagiculture | TC6 loot rarity types link while canonical TC4 metadata blocks own gameplay
+K LINK_ONLY F GETSTATIC thaumcraft/common/blocks/world/BlockLoot$LootType UNCOMMON Lthaumcraft/common/blocks/world/BlockLoot$LootType; | justenoughmagiculture | TC6 loot rarity types link while canonical TC4 metadata blocks own gameplay
+K PROJECTED F GETSTATIC thaumcraft/common/config/ConfigItems FLUX_CRYSTAL Lnet/minecraft/item/ItemStack; | justenoughmagiculture | TC6 shared stacks project onto canonical TC4 item instances
+K LINK_ONLY F GETSTATIC thaumcraft/common/entities/monster/EntityPech LOOT Lnet/minecraft/util/ResourceLocation; | justenoughmagiculture | Entity aliases resolve, but registered runtime class identity is not guaranteed
+K LINK_ONLY F GETSTATIC thaumcraft/common/entities/monster/cult/EntityCultist LOOT Lnet/minecraft/util/ResourceLocation; | justenoughmagiculture | Entity aliases resolve, but registered runtime class identity is not guaranteed
 K PROJECTED F GETSTATIC thaumcraft/common/lib/SoundsTC wandfail Lnet/minecraft/util/SoundEvent; | magicbees | TC6 sound fields alias canonical TC4 registered sounds
+K PROJECTED F GETSTATIC thaumcraft/common/lib/research/ResearchManager craftingReferences Ljava/util/LinkedHashSet; | solarflux | TC6 research insertion projects onto canonical TC4 research state
+K LINK_ONLY F PUTFIELD thaumcraft/api/research/theorycraft/ResearchTableData bonusDraws I | solarflux | TC6 theorycraft types link, but TC4 has no theorycraft gameplay loop
 K PROJECTED M INVOKESPECIAL thaumcraft/api/ThaumcraftApi$EntityTags <init> (Ljava/lang/String;Lthaumcraft/api/aspects/AspectList;[Lthaumcraft/api/ThaumcraftApi$EntityTagsNBT;)V | witchery-companion,witchery-resurrected | TC6 registration calls project onto canonical TC4 registries
-K PROJECTED M INVOKESPECIAL thaumcraft/api/aspects/Aspect <init> (Ljava/lang/String;I[Lthaumcraft/api/aspects/Aspect;Lnet/minecraft/util/ResourceLocation;I)V | fossils,magicbees | TC6 aspects and registrations project onto canonical TC4 aspects
+K PROJECTED M INVOKESPECIAL thaumcraft/api/aspects/Aspect <init> (Ljava/lang/String;I[Lthaumcraft/api/aspects/Aspect;Lnet/minecraft/util/ResourceLocation;I)V | fossils,magicbees,solarflux | TC6 aspects and registrations project onto canonical TC4 aspects
 K PROJECTED M INVOKESPECIAL thaumcraft/api/aspects/AspectEventProxy <init> ()V | witchery-resurrected | TC6 aspects and registrations project onto canonical TC4 aspects
-K PROJECTED M INVOKESPECIAL thaumcraft/api/aspects/AspectList <init> ()V | enderio,fossils,magicbees,witchery-companion,witchery-resurrected | TC6 aspects and registrations project onto canonical TC4 aspects
-K PROJECTED M INVOKESPECIAL thaumcraft/api/aspects/AspectList <init> (Lnet/minecraft/item/ItemStack;)V | enderio | TC6 aspects and registrations project onto canonical TC4 aspects
-K LINK_ONLY M INVOKESPECIAL thaumcraft/common/entities/monster/boss/EntityTaintacleGiant <init> (Lnet/minecraft/world/World;)V | magicbees | Entity aliases resolve, but registered runtime class identity is not guaranteed
-K LINK_ONLY M INVOKESPECIAL thaumcraft/common/entities/monster/cult/EntityCultistCleric <init> (Lnet/minecraft/world/World;)V | magicbees | Entity aliases resolve, but registered runtime class identity is not guaranteed
-K LINK_ONLY M INVOKESPECIAL thaumcraft/common/entities/monster/cult/EntityCultistKnight <init> (Lnet/minecraft/world/World;)V | magicbees | Entity aliases resolve, but registered runtime class identity is not guaranteed
-K LINK_ONLY M INVOKESPECIAL thaumcraft/common/entities/monster/tainted/EntityTaintSeed <init> (Lnet/minecraft/world/World;)V | magicbees | Entity aliases resolve, but registered runtime class identity is not guaranteed
-K LINK_ONLY M INVOKESPECIAL thaumcraft/common/entities/monster/tainted/EntityTaintSeedPrime <init> (Lnet/minecraft/world/World;)V | magicbees | Entity aliases resolve, but registered runtime class identity is not guaranteed
-K LINK_ONLY M INVOKESPECIAL thaumcraft/common/entities/monster/tainted/EntityTaintacle <init> (Lnet/minecraft/world/World;)V | magicbees | Entity aliases resolve, but registered runtime class identity is not guaranteed
-K LINK_ONLY M INVOKESPECIAL thaumcraft/common/entities/monster/tainted/EntityTaintacleSmall <init> (Lnet/minecraft/world/World;)V | magicbees | Entity aliases resolve, but registered runtime class identity is not guaranteed
-K PROJECTED M INVOKESTATIC thaumcraft/api/ThaumcraftApi registerEntityTag (Ljava/lang/String;Lthaumcraft/api/aspects/AspectList;[Lthaumcraft/api/ThaumcraftApi$EntityTagsNBT;)V | fossils | TC6 registration calls project onto canonical TC4 registries
+K PROJECTED M INVOKESPECIAL thaumcraft/api/aspects/AspectList <init> ()V | botania,enderio,fossils,jaopca,magicbees,solarflux,witchery-companion,witchery-resurrected | TC6 aspects and registrations project onto canonical TC4 aspects
+K PROJECTED M INVOKESPECIAL thaumcraft/api/aspects/AspectList <init> (Lnet/minecraft/item/ItemStack;)V | botania,enderio | TC6 aspects and registrations project onto canonical TC4 aspects
+K PROJECTED M INVOKESPECIAL thaumcraft/api/crafting/CrucibleRecipe <init> (Ljava/lang/String;Lnet/minecraft/item/ItemStack;Ljava/lang/Object;Lthaumcraft/api/aspects/AspectList;)V | jaopca,solarflux | TC6 recipe contracts project onto canonical TC4 recipe collections
+K PROJECTED M INVOKESPECIAL thaumcraft/api/crafting/InfusionRecipe <init> (Ljava/lang/String;Ljava/lang/Object;ILthaumcraft/api/aspects/AspectList;Ljava/lang/Object;[Ljava/lang/Object;)V | solarflux | TC6 recipe contracts project onto canonical TC4 recipe collections
+K PROJECTED M INVOKESPECIAL thaumcraft/api/crafting/ShapedArcaneRecipe <init> (Lnet/minecraft/util/ResourceLocation;Ljava/lang/String;ILthaumcraft/api/aspects/AspectList;Lnet/minecraft/block/Block;[Ljava/lang/Object;)V | solarflux | TC6 recipe contracts project onto canonical TC4 recipe collections
+K PROJECTED M INVOKESPECIAL thaumcraft/api/crafting/ShapedArcaneRecipe <init> (Lnet/minecraft/util/ResourceLocation;Ljava/lang/String;ILthaumcraft/api/aspects/AspectList;Lnet/minecraft/item/Item;[Ljava/lang/Object;)V | solarflux | TC6 recipe contracts project onto canonical TC4 recipe collections
+K PROJECTED M INVOKESPECIAL thaumcraft/api/crafting/ShapedArcaneRecipe <init> (Lnet/minecraft/util/ResourceLocation;Ljava/lang/String;ILthaumcraft/api/aspects/AspectList;Lnet/minecraft/item/ItemStack;[Ljava/lang/Object;)V | solarflux | TC6 recipe contracts project onto canonical TC4 recipe collections
+K PROJECTED M INVOKESPECIAL thaumcraft/api/research/ResearchAddendum <init> ()V | solarflux | TC6 research data projects onto canonical TC4 categories and entries
+K PROJECTED M INVOKESPECIAL thaumcraft/api/research/ResearchEntry <init> ()V | solarflux | TC6 research data projects onto canonical TC4 categories and entries
+K PROJECTED M INVOKESPECIAL thaumcraft/api/research/ResearchStage <init> ()V | solarflux | TC6 research data projects onto canonical TC4 categories and entries
+K PROJECTED M INVOKESPECIAL thaumcraft/api/research/ResearchStage$Knowledge <init> (Lthaumcraft/api/capabilities/IPlayerKnowledge$EnumKnowledgeType;Lthaumcraft/api/research/ResearchCategory;I)V | solarflux | TC6 research data projects onto canonical TC4 categories and entries
+K LINK_ONLY M INVOKESPECIAL thaumcraft/api/research/ScanBlock <init> (Ljava/lang/String;[Lnet/minecraft/block/Block;)V | solarflux | TC6 block scans are retained for linkage without a TC4 scanner consumer
+K LINK_ONLY M INVOKESPECIAL thaumcraft/api/research/theorycraft/TheorycraftCard <init> ()V | solarflux | TC6 theorycraft types link, but TC4 has no theorycraft gameplay loop
+K LINK_ONLY M INVOKESPECIAL thaumcraft/common/entities/monster/EntityBrainyZombie <init> (Lnet/minecraft/world/World;)V | justenoughmagiculture | Entity aliases resolve, but registered runtime class identity is not guaranteed
+K LINK_ONLY M INVOKESPECIAL thaumcraft/common/entities/monster/EntityEldritchCrab <init> (Lnet/minecraft/world/World;)V | justenoughmagiculture | Entity aliases resolve, but registered runtime class identity is not guaranteed
+K LINK_ONLY M INVOKESPECIAL thaumcraft/common/entities/monster/EntityFireBat <init> (Lnet/minecraft/world/World;)V | justenoughmagiculture | Entity aliases resolve, but registered runtime class identity is not guaranteed
+K LINK_ONLY M INVOKESPECIAL thaumcraft/common/entities/monster/EntityGiantBrainyZombie <init> (Lnet/minecraft/world/World;)V | justenoughmagiculture | Entity aliases resolve, but registered runtime class identity is not guaranteed
+K LINK_ONLY M INVOKESPECIAL thaumcraft/common/entities/monster/EntityPech <init> (Lnet/minecraft/world/World;)V | justenoughmagiculture | Entity aliases resolve, but registered runtime class identity is not guaranteed
+K LINK_ONLY M INVOKESPECIAL thaumcraft/common/entities/monster/EntityThaumicSlime <init> (Lnet/minecraft/world/World;)V | justenoughmagiculture | Entity aliases resolve, but registered runtime class identity is not guaranteed
+K LINK_ONLY M INVOKESPECIAL thaumcraft/common/entities/monster/EntityWisp <init> (Lnet/minecraft/world/World;)V | justenoughmagiculture | Entity aliases resolve, but registered runtime class identity is not guaranteed
+K LINK_ONLY M INVOKESPECIAL thaumcraft/common/entities/monster/boss/EntityCultistLeader <init> (Lnet/minecraft/world/World;)V | justenoughmagiculture | Entity aliases resolve, but registered runtime class identity is not guaranteed
+K LINK_ONLY M INVOKESPECIAL thaumcraft/common/entities/monster/boss/EntityCultistPortalGreater <init> (Lnet/minecraft/world/World;)V | justenoughmagiculture | Entity aliases resolve, but registered runtime class identity is not guaranteed
+K LINK_ONLY M INVOKESPECIAL thaumcraft/common/entities/monster/boss/EntityEldritchGolem <init> (Lnet/minecraft/world/World;)V | justenoughmagiculture | Entity aliases resolve, but registered runtime class identity is not guaranteed
+K LINK_ONLY M INVOKESPECIAL thaumcraft/common/entities/monster/boss/EntityEldritchWarden <init> (Lnet/minecraft/world/World;)V | justenoughmagiculture | Entity aliases resolve, but registered runtime class identity is not guaranteed
+K LINK_ONLY M INVOKESPECIAL thaumcraft/common/entities/monster/boss/EntityTaintacleGiant <init> (Lnet/minecraft/world/World;)V | justenoughmagiculture,magicbees | Entity aliases resolve, but registered runtime class identity is not guaranteed
+K LINK_ONLY M INVOKESPECIAL thaumcraft/common/entities/monster/cult/EntityCultistCleric <init> (Lnet/minecraft/world/World;)V | justenoughmagiculture,magicbees | Entity aliases resolve, but registered runtime class identity is not guaranteed
+K LINK_ONLY M INVOKESPECIAL thaumcraft/common/entities/monster/cult/EntityCultistKnight <init> (Lnet/minecraft/world/World;)V | justenoughmagiculture,magicbees | Entity aliases resolve, but registered runtime class identity is not guaranteed
+K LINK_ONLY M INVOKESPECIAL thaumcraft/common/entities/monster/tainted/EntityTaintCrawler <init> (Lnet/minecraft/world/World;)V | justenoughmagiculture | Entity aliases resolve, but registered runtime class identity is not guaranteed
+K LINK_ONLY M INVOKESPECIAL thaumcraft/common/entities/monster/tainted/EntityTaintSeed <init> (Lnet/minecraft/world/World;)V | justenoughmagiculture,magicbees | Entity aliases resolve, but registered runtime class identity is not guaranteed
+K LINK_ONLY M INVOKESPECIAL thaumcraft/common/entities/monster/tainted/EntityTaintSeedPrime <init> (Lnet/minecraft/world/World;)V | justenoughmagiculture,magicbees | Entity aliases resolve, but registered runtime class identity is not guaranteed
+K LINK_ONLY M INVOKESPECIAL thaumcraft/common/entities/monster/tainted/EntityTaintSwarm <init> (Lnet/minecraft/world/World;)V | justenoughmagiculture | Entity aliases resolve, but registered runtime class identity is not guaranteed
+K LINK_ONLY M INVOKESPECIAL thaumcraft/common/entities/monster/tainted/EntityTaintacle <init> (Lnet/minecraft/world/World;)V | justenoughmagiculture,magicbees | Entity aliases resolve, but registered runtime class identity is not guaranteed
+K LINK_ONLY M INVOKESPECIAL thaumcraft/common/entities/monster/tainted/EntityTaintacleSmall <init> (Lnet/minecraft/world/World;)V | justenoughmagiculture,magicbees | Entity aliases resolve, but registered runtime class identity is not guaranteed
+K PROJECTED M INVOKESTATIC thaumcraft/api/ThaumcraftApi addArcaneCraftingRecipe (Lnet/minecraft/util/ResourceLocation;Lthaumcraft/api/crafting/IArcaneRecipe;)V | solarflux | TC6 registration calls project onto canonical TC4 registries
+K PROJECTED M INVOKESTATIC thaumcraft/api/ThaumcraftApi addCrucibleRecipe (Lnet/minecraft/util/ResourceLocation;Lthaumcraft/api/crafting/CrucibleRecipe;)V | jaopca,solarflux | TC6 registration calls project onto canonical TC4 registries
+K PROJECTED M INVOKESTATIC thaumcraft/api/ThaumcraftApi addInfusionCraftingRecipe (Lnet/minecraft/util/ResourceLocation;Lthaumcraft/api/crafting/InfusionRecipe;)V | solarflux | TC6 registration calls project onto canonical TC4 registries
+K PROJECTED M INVOKESTATIC thaumcraft/api/ThaumcraftApi addSmeltingBonus (Ljava/lang/Object;Lnet/minecraft/item/ItemStack;F)V | jaopca | TC6 registration calls project onto canonical TC4 registries
+K PROJECTED M INVOKESTATIC thaumcraft/api/ThaumcraftApi registerEntityTag (Ljava/lang/String;Lthaumcraft/api/aspects/AspectList;[Lthaumcraft/api/ThaumcraftApi$EntityTagsNBT;)V | botania,fossils | TC6 registration calls project onto canonical TC4 registries
 K PROJECTED M INVOKESTATIC thaumcraft/api/ThaumcraftApi registerObjectTag (Ljava/lang/String;Lthaumcraft/api/aspects/AspectList;)V | enderio | TC6 registration calls project onto canonical TC4 registries
 K PROJECTED M INVOKESTATIC thaumcraft/api/ThaumcraftApi registerObjectTag (Lnet/minecraft/item/ItemStack;Lthaumcraft/api/aspects/AspectList;)V | enderio | TC6 registration calls project onto canonical TC4 registries
 K UNSUPPORTED M INVOKESTATIC thaumcraft/api/ThaumcraftApi registerResearchLocation (Lnet/minecraft/util/ResourceLocation;)V | magicbees | TC6 JSON research has no TC4 ingestion adapter
 K PROJECTED M INVOKESTATIC thaumcraft/api/ThaumcraftApi registerSeed (Lnet/minecraft/block/Block;Lnet/minecraft/item/ItemStack;)V | fossils | TC6 registration calls project onto canonical TC4 registries
+K PROJECTED M INVOKESTATIC thaumcraft/api/ThaumcraftApiHelper getOresWithWildCards (Ljava/lang/String;)Ljava/util/List; | solarflux | TC6 registration calls project onto canonical TC4 registries
+K PROJECTED M INVOKESTATIC thaumcraft/api/ThaumcraftApiHelper makeCrystal (Lthaumcraft/api/aspects/Aspect;)Lnet/minecraft/item/ItemStack; | justenoughmagiculture | TC6 registration calls project onto canonical TC4 registries
+K PROJECTED M INVOKESTATIC thaumcraft/api/aspects/Aspect getAspect (Ljava/lang/String;)Lthaumcraft/api/aspects/Aspect; | jaopca,solarflux | TC6 aspects and registrations project onto canonical TC4 aspects
+K PROJECTED M INVOKESTATIC thaumcraft/api/aspects/Aspect getPrimalAspects ()Ljava/util/ArrayList; | justenoughmagiculture | TC6 aspects and registrations project onto canonical TC4 aspects
+K PROJECTED M INVOKESTATIC thaumcraft/api/aspects/AspectHelper getObjectAspects (Lnet/minecraft/item/ItemStack;)Lthaumcraft/api/aspects/AspectList; | botania | TC6 aspects and registrations project onto canonical TC4 aspects
 K UNSUPPORTED M INVOKESTATIC thaumcraft/api/aura/AuraHelper getVis (Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;)F | magicbees | TC6 chunk aura values have no safe TC4 visnet equivalent
+K PROJECTED M INVOKESTATIC thaumcraft/api/internal/CommonInternals generateUniqueItemstackId (Lnet/minecraft/item/ItemStack;)I | solarflux | TC6 scan registry aliases canonical TC4 state
+K PROJECTED M INVOKESTATIC thaumcraft/api/research/ResearchCategories getResearch (Ljava/lang/String;)Lthaumcraft/api/research/ResearchEntry; | jaopca | TC6 research data projects onto canonical TC4 categories and entries
+K PROJECTED M INVOKESTATIC thaumcraft/api/research/ResearchCategories registerCategory (Ljava/lang/String;Ljava/lang/String;Lthaumcraft/api/aspects/AspectList;Lnet/minecraft/util/ResourceLocation;Lnet/minecraft/util/ResourceLocation;Lnet/minecraft/util/ResourceLocation;)Lthaumcraft/api/research/ResearchCategory; | solarflux | TC6 research data projects onto canonical TC4 categories and entries
+K LINK_ONLY M INVOKESTATIC thaumcraft/api/research/ScanningManager addScannableThing (Lthaumcraft/api/research/IScanThing;)V | solarflux | TC6 scan registrations are retained without creating a second scan system
+K LINK_ONLY M INVOKESTATIC thaumcraft/api/research/theorycraft/TheorycraftManager registerAid (Lthaumcraft/api/research/theorycraft/ITheorycraftAid;)V | solarflux | TC6 theorycraft types link, but TC4 has no theorycraft gameplay loop
+K LINK_ONLY M INVOKESTATIC thaumcraft/api/research/theorycraft/TheorycraftManager registerCard (Ljava/lang/Class;)V | solarflux | TC6 theorycraft types link, but TC4 has no theorycraft gameplay loop
 K PROJECTED M INVOKESTATIC thaumcraft/common/blocks/world/taint/TaintHelper addTaintSeed (Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;)V | magicbees | TC6 taint operations project onto TC4 taint behavior
 K PROJECTED M INVOKESTATIC thaumcraft/common/blocks/world/taint/TaintHelper spreadFibres (Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;Z)V | magicbees | TC6 taint operations project onto TC4 taint behavior
+K PROJECTED M INVOKESTATIC thaumcraft/common/lib/crafting/ThaumcraftCraftingManager getObjectTags (Lnet/minecraft/item/ItemStack;)Lthaumcraft/api/aspects/AspectList; | solarflux | TC6 lookups delegate to canonical TC4 crafting helpers
+K PROJECTED M INVOKESTATIC thaumcraft/common/lib/research/ResearchManager createItemStackHash (Lnet/minecraft/item/ItemStack;)I | solarflux | TC6 research insertion projects onto canonical TC4 research state
+K PROJECTED M INVOKESTATIC thaumcraft/common/lib/utils/Utils addSpecialMiningResult (Lnet/minecraft/item/ItemStack;Lnet/minecraft/item/ItemStack;F)V | jaopca | TC6 biome calls project onto the Forge 1.12 biome update path
 K UNSUPPORTED M INVOKESTATIC thaumcraft/common/world/aura/AuraHandler addFlux (Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;F)V | magicbees | TC6 flux mutation is deliberately fail-closed
 K PROJECTED M INVOKESTATIC thaumcraft/common/world/aura/AuraHandler drainVis (Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;FZ)F | witchery-resurrected | Untyped TC6 vis drains canonical TC4 primal visnet sources
 K UNSUPPORTED M INVOKESTATIC thaumcraft/common/world/aura/AuraHandler getAuraChunk (III)Lthaumcraft/common/world/aura/AuraChunk; | magicbees | TC6 chunk aura state is deliberately fail-closed
-K PROJECTED M INVOKEVIRTUAL thaumcraft/api/aspects/AspectEventProxy registerObjectTag (Lnet/minecraft/item/ItemStack;Lthaumcraft/api/aspects/AspectList;)V | fossils,witchery-companion,witchery-resurrected | TC6 aspects and registrations project onto canonical TC4 aspects
-K PROJECTED M INVOKEVIRTUAL thaumcraft/api/aspects/AspectList add (Lthaumcraft/api/aspects/Aspect;I)Lthaumcraft/api/aspects/AspectList; | enderio,fossils,magicbees,witchery-companion,witchery-resurrected | TC6 aspects and registrations project onto canonical TC4 aspects
-K PROJECTED M INVOKEVIRTUAL thaumcraft/api/aspects/AspectList add (Lthaumcraft/api/aspects/AspectList;)Lthaumcraft/api/aspects/AspectList; | enderio | TC6 aspects and registrations project onto canonical TC4 aspects
+K PROJECTED M INVOKEVIRTUAL thaumcraft/api/aspects/Aspect getName ()Ljava/lang/String; | solarflux | TC6 aspects and registrations project onto canonical TC4 aspects
+K PROJECTED M INVOKEVIRTUAL thaumcraft/api/aspects/AspectEventProxy registerComplexObjectTag (Lnet/minecraft/item/ItemStack;Lthaumcraft/api/aspects/AspectList;)V | botania | TC6 aspects and registrations project onto canonical TC4 aspects
+K PROJECTED M INVOKEVIRTUAL thaumcraft/api/aspects/AspectEventProxy registerObjectTag (Ljava/lang/String;Lthaumcraft/api/aspects/AspectList;)V | botania | TC6 aspects and registrations project onto canonical TC4 aspects
+K PROJECTED M INVOKEVIRTUAL thaumcraft/api/aspects/AspectEventProxy registerObjectTag (Lnet/minecraft/item/ItemStack;Lthaumcraft/api/aspects/AspectList;)V | botania,fossils,witchery-companion,witchery-resurrected | TC6 aspects and registrations project onto canonical TC4 aspects
+K PROJECTED M INVOKEVIRTUAL thaumcraft/api/aspects/AspectList add (Lthaumcraft/api/aspects/Aspect;I)Lthaumcraft/api/aspects/AspectList; | botania,enderio,fossils,jaopca,magicbees,solarflux,witchery-companion,witchery-resurrected | TC6 aspects and registrations project onto canonical TC4 aspects
+K PROJECTED M INVOKEVIRTUAL thaumcraft/api/aspects/AspectList add (Lthaumcraft/api/aspects/AspectList;)Lthaumcraft/api/aspects/AspectList; | botania,enderio,solarflux | TC6 aspects and registrations project onto canonical TC4 aspects
+K PROJECTED M INVOKEVIRTUAL thaumcraft/api/aspects/AspectList copy ()Lthaumcraft/api/aspects/AspectList; | botania,solarflux | TC6 aspects and registrations project onto canonical TC4 aspects
+K PROJECTED M INVOKEVIRTUAL thaumcraft/api/aspects/AspectList getAmount (Lthaumcraft/api/aspects/Aspect;)I | botania,solarflux | TC6 aspects and registrations project onto canonical TC4 aspects
+K PROJECTED M INVOKEVIRTUAL thaumcraft/api/aspects/AspectList getAspects ()[Lthaumcraft/api/aspects/Aspect; | botania | TC6 aspects and registrations project onto canonical TC4 aspects
+K PROJECTED M INVOKEVIRTUAL thaumcraft/api/aspects/AspectList getAspectsSortedByAmount ()[Lthaumcraft/api/aspects/Aspect; | solarflux | TC6 aspects and registrations project onto canonical TC4 aspects
+K PROJECTED M INVOKEVIRTUAL thaumcraft/api/aspects/AspectList merge (Lthaumcraft/api/aspects/Aspect;I)Lthaumcraft/api/aspects/AspectList; | botania | TC6 aspects and registrations project onto canonical TC4 aspects
+K PROJECTED M INVOKEVIRTUAL thaumcraft/api/aspects/AspectList reduce (Lthaumcraft/api/aspects/Aspect;I)Z | botania | TC6 aspects and registrations project onto canonical TC4 aspects
+K PROJECTED M INVOKEVIRTUAL thaumcraft/api/aspects/AspectList remove (Lthaumcraft/api/aspects/Aspect;)Lthaumcraft/api/aspects/AspectList; | botania,solarflux | TC6 aspects and registrations project onto canonical TC4 aspects
 K PROJECTED M INVOKEVIRTUAL thaumcraft/api/aspects/AspectList visSize ()I | enderio,witchery-resurrected | TC6 aspects and registrations project onto canonical TC4 aspects
+K PROJECTED M INVOKEVIRTUAL thaumcraft/api/research/ResearchAddendum setRecipes ([Lnet/minecraft/util/ResourceLocation;)V | solarflux | TC6 research data projects onto canonical TC4 categories and entries
+K PROJECTED M INVOKEVIRTUAL thaumcraft/api/research/ResearchAddendum setResearch ([Ljava/lang/String;)V | solarflux | TC6 research data projects onto canonical TC4 categories and entries
+K PROJECTED M INVOKEVIRTUAL thaumcraft/api/research/ResearchAddendum setText (Ljava/lang/String;)V | solarflux | TC6 research data projects onto canonical TC4 categories and entries
+K PROJECTED M INVOKEVIRTUAL thaumcraft/api/research/ResearchEntry getStages ()[Lthaumcraft/api/research/ResearchStage; | jaopca | TC6 research data projects onto canonical TC4 categories and entries
+K PROJECTED M INVOKEVIRTUAL thaumcraft/api/research/ResearchEntry setAddenda ([Lthaumcraft/api/research/ResearchAddendum;)V | solarflux | TC6 research data projects onto canonical TC4 categories and entries
+K PROJECTED M INVOKEVIRTUAL thaumcraft/api/research/ResearchEntry setCategory (Ljava/lang/String;)V | solarflux | TC6 research data projects onto canonical TC4 categories and entries
+K PROJECTED M INVOKEVIRTUAL thaumcraft/api/research/ResearchEntry setDisplayColumn (I)V | solarflux | TC6 research data projects onto canonical TC4 categories and entries
+K PROJECTED M INVOKEVIRTUAL thaumcraft/api/research/ResearchEntry setDisplayRow (I)V | solarflux | TC6 research data projects onto canonical TC4 categories and entries
+K PROJECTED M INVOKEVIRTUAL thaumcraft/api/research/ResearchEntry setIcons ([Ljava/lang/Object;)V | solarflux | TC6 research data projects onto canonical TC4 categories and entries
+K PROJECTED M INVOKEVIRTUAL thaumcraft/api/research/ResearchEntry setKey (Ljava/lang/String;)V | solarflux | TC6 research data projects onto canonical TC4 categories and entries
+K PROJECTED M INVOKEVIRTUAL thaumcraft/api/research/ResearchEntry setMeta ([Lthaumcraft/api/research/ResearchEntry$EnumResearchMeta;)V | solarflux | TC6 research data projects onto canonical TC4 categories and entries
+K PROJECTED M INVOKEVIRTUAL thaumcraft/api/research/ResearchEntry setName (Ljava/lang/String;)V | solarflux | TC6 research data projects onto canonical TC4 categories and entries
+K PROJECTED M INVOKEVIRTUAL thaumcraft/api/research/ResearchEntry setParents ([Ljava/lang/String;)V | solarflux | TC6 research data projects onto canonical TC4 categories and entries
+K PROJECTED M INVOKEVIRTUAL thaumcraft/api/research/ResearchEntry setRewardItem ([Lnet/minecraft/item/ItemStack;)V | solarflux | TC6 research data projects onto canonical TC4 categories and entries
+K PROJECTED M INVOKEVIRTUAL thaumcraft/api/research/ResearchEntry setRewardKnow ([Lthaumcraft/api/research/ResearchStage$Knowledge;)V | solarflux | TC6 research data projects onto canonical TC4 categories and entries
+K PROJECTED M INVOKEVIRTUAL thaumcraft/api/research/ResearchEntry setSiblings ([Ljava/lang/String;)V | solarflux | TC6 research data projects onto canonical TC4 categories and entries
+K PROJECTED M INVOKEVIRTUAL thaumcraft/api/research/ResearchEntry setStages ([Lthaumcraft/api/research/ResearchStage;)V | solarflux | TC6 research data projects onto canonical TC4 categories and entries
+K PROJECTED M INVOKEVIRTUAL thaumcraft/api/research/ResearchStage getCraft ()[Ljava/lang/Object; | solarflux | TC6 research data projects onto canonical TC4 categories and entries
+K PROJECTED M INVOKEVIRTUAL thaumcraft/api/research/ResearchStage getRecipes ()[Lnet/minecraft/util/ResourceLocation; | jaopca | TC6 research data projects onto canonical TC4 categories and entries
+K PROJECTED M INVOKEVIRTUAL thaumcraft/api/research/ResearchStage setCraft ([Ljava/lang/Object;)V | solarflux | TC6 research data projects onto canonical TC4 categories and entries
+K PROJECTED M INVOKEVIRTUAL thaumcraft/api/research/ResearchStage setCraftReference ([I)V | solarflux | TC6 research data projects onto canonical TC4 categories and entries
+K PROJECTED M INVOKEVIRTUAL thaumcraft/api/research/ResearchStage setKnow ([Lthaumcraft/api/research/ResearchStage$Knowledge;)V | solarflux | TC6 research data projects onto canonical TC4 categories and entries
+K PROJECTED M INVOKEVIRTUAL thaumcraft/api/research/ResearchStage setObtain ([Ljava/lang/Object;)V | solarflux | TC6 research data projects onto canonical TC4 categories and entries
+K PROJECTED M INVOKEVIRTUAL thaumcraft/api/research/ResearchStage setRecipes ([Lnet/minecraft/util/ResourceLocation;)V | jaopca,solarflux | TC6 research data projects onto canonical TC4 categories and entries
+K PROJECTED M INVOKEVIRTUAL thaumcraft/api/research/ResearchStage setResearch ([Ljava/lang/String;)V | solarflux | TC6 research data projects onto canonical TC4 categories and entries
+K PROJECTED M INVOKEVIRTUAL thaumcraft/api/research/ResearchStage setResearchIcon ([Ljava/lang/String;)V | solarflux | TC6 research data projects onto canonical TC4 categories and entries
+K PROJECTED M INVOKEVIRTUAL thaumcraft/api/research/ResearchStage setText (Ljava/lang/String;)V | solarflux | TC6 research data projects onto canonical TC4 categories and entries
+K PROJECTED M INVOKEVIRTUAL thaumcraft/api/research/ResearchStage setWarp (I)V | solarflux | TC6 research data projects onto canonical TC4 categories and entries
+K LINK_ONLY M INVOKEVIRTUAL thaumcraft/api/research/theorycraft/ResearchTableData addInspiration (I)V | solarflux | TC6 theorycraft types link, but TC4 has no theorycraft gameplay loop
+K LINK_ONLY M INVOKEVIRTUAL thaumcraft/api/research/theorycraft/ResearchTableData addTotal (Ljava/lang/String;I)V | solarflux | TC6 theorycraft types link, but TC4 has no theorycraft gameplay loop
+K LINK_ONLY M INVOKEVIRTUAL thaumcraft/common/blocks/world/BlockLoot$LootType ordinal ()I | justenoughmagiculture | TC6 loot rarity types link while canonical TC4 metadata blocks own gameplay
+K LINK_ONLY M INVOKEVIRTUAL thaumcraft/common/entities/monster/boss/EntityCultistLeader func_184201_a (Lnet/minecraft/inventory/EntityEquipmentSlot;Lnet/minecraft/item/ItemStack;)V | justenoughmagiculture | Entity aliases resolve, but registered runtime class identity is not guaranteed
 K LINK_ONLY M INVOKEVIRTUAL thaumcraft/common/entities/monster/cult/EntityCultist func_180425_c ()Lnet/minecraft/util/math/BlockPos; | magicbees | Entity aliases resolve, but registered runtime class identity is not guaranteed
 K LINK_ONLY M INVOKEVIRTUAL thaumcraft/common/entities/monster/cult/EntityCultist func_180482_a (Lnet/minecraft/world/DifficultyInstance;Lnet/minecraft/entity/IEntityLivingData;)Lnet/minecraft/entity/IEntityLivingData; | magicbees | Entity aliases resolve, but registered runtime class identity is not guaranteed
 K LINK_ONLY M INVOKEVIRTUAL thaumcraft/common/entities/monster/cult/EntityCultist func_184185_a (Lnet/minecraft/util/SoundEvent;FF)V | magicbees | Entity aliases resolve, but registered runtime class identity is not guaranteed
 K LINK_ONLY M INVOKEVIRTUAL thaumcraft/common/entities/monster/cult/EntityCultist func_70107_b (DDD)V | magicbees | Entity aliases resolve, but registered runtime class identity is not guaranteed
 K LINK_ONLY M INVOKEVIRTUAL thaumcraft/common/entities/monster/cult/EntityCultist func_70656_aK ()V | magicbees | Entity aliases resolve, but registered runtime class identity is not guaranteed
+K LINK_ONLY M INVOKEVIRTUAL thaumcraft/common/entities/monster/cult/EntityCultistCleric func_184201_a (Lnet/minecraft/inventory/EntityEquipmentSlot;Lnet/minecraft/item/ItemStack;)V | justenoughmagiculture | Entity aliases resolve, but registered runtime class identity is not guaranteed
+K LINK_ONLY M INVOKEVIRTUAL thaumcraft/common/entities/monster/cult/EntityCultistKnight func_184201_a (Lnet/minecraft/inventory/EntityEquipmentSlot;Lnet/minecraft/item/ItemStack;)V | justenoughmagiculture | Entity aliases resolve, but registered runtime class identity is not guaranteed
 K PROJECTED M INVOKEVIRTUAL thaumcraft/common/items/resources/ItemCrystalEssence setAspects (Lnet/minecraft/item/ItemStack;Lthaumcraft/api/aspects/AspectList;)V | magicbees | TC6 crystal aspect data projects onto the TC4 crystal item
 K EXACT M INVOKEVIRTUAL thaumcraft/common/world/aura/AuraChunk getBase ()S | magicbees | Exact structural DTO only; world-owned chunk aura access is unsupported
 K EXACT M INVOKEVIRTUAL thaumcraft/common/world/aura/AuraChunk getFlux ()F | magicbees | Exact structural DTO only; world-owned chunk aura access is unsupported
@@ -125,4 +307,5 @@ K EXACT M INVOKEVIRTUAL thaumcraft/common/world/aura/AuraChunk getVis ()F | magi
 K EXACT M INVOKEVIRTUAL thaumcraft/common/world/aura/AuraChunk setBase (S)V | magicbees | Exact structural DTO only; world-owned chunk aura access is unsupported
 K EXACT M INVOKEVIRTUAL thaumcraft/common/world/aura/AuraChunk setFlux (F)V | magicbees | Exact structural DTO only; world-owned chunk aura access is unsupported
 K EXACT M INVOKEVIRTUAL thaumcraft/common/world/aura/AuraChunk setVis (F)V | magicbees | Exact structural DTO only; world-owned chunk aura access is unsupported
+K UNSUPPORTED S thaumcraft/common/entities/EntityFluxRift | botania | TC6 flux rifts have no TC4 entity counterpart
 K PROJECTED X OVERWRITE thaumcraft/common/lib/utils/Utils setBiomeAt (Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/world/biome/Biome;Z)V | jeid | TC6 biome calls project onto the Forge 1.12 biome update path

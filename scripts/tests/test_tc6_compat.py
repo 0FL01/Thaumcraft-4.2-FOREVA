@@ -92,6 +92,15 @@ class Tc6CompatResolverTest(unittest.TestCase):
         self.assertEqual("fixture/Base", index.resolve_method("fixture/Child", "run", "()V")[0].name)
         self.assertEqual("fixture/Contract", index.resolve_method("fixture/Contract", "call", "()V")[0].name)
 
+    def test_jvm_resolution_includes_observed_java_enum_contract(self):
+        index = self.fixture_index()
+        enum = self.fixture_class("fixture/Kind", super_name="java/lang/Enum")
+        index.classes[enum.name] = enum
+
+        resolved = index.resolve_method("fixture/Kind", "ordinal", "()I")
+
+        self.assertEqual(TC6.ACC_PUBLIC | TC6.ACC_FINAL, resolved[1])
+
     def test_srg_alias_resolves_when_bytecode_uses_inherited_subclass_owner(self):
         index = self.fixture_index()
         base = index.classes["fixture/Base"]
@@ -113,6 +122,37 @@ class Tc6CompatResolverTest(unittest.TestCase):
         }
         reasons = [result[2] for result in TC6.resolve_demands(entries, demands, index)]
         self.assertEqual(["FIELD_STATIC_MISMATCH", "OWNER_NOT_INTERFACE"], reasons)
+
+    def test_abi_gap_comparison_accepts_inherited_members_and_reports_shape_regressions(self):
+        public_static = TC6.ACC_PUBLIC | TC6.ACC_STATIC
+        donor_base = self.fixture_class(
+            "fixture/Base",
+            fields=[(public_static, "VALUE", "I", [])],
+            methods=[(TC6.ACC_PUBLIC, "run", "()V", [])],
+        )
+        donor_child = self.fixture_class("fixture/Child", super_name="fixture/Base")
+        target_base = self.fixture_class(
+            "fixture/Base",
+            fields=[(public_static, "VALUE", "I", [])],
+            methods=[(TC6.ACC_PUBLIC, "run", "()V", [])],
+        )
+        target_child = self.fixture_class("fixture/Child", super_name="fixture/Base")
+        donor = self.fixture_index()
+        donor.classes = {donor_base.name: donor_base, donor_child.name: donor_child}
+        target = self.fixture_index()
+        target.classes = {target_base.name: target_base, target_child.name: target_child}
+
+        self.assertEqual([], TC6.abi_gap_records(donor, target, "fixture/"))
+
+        target_child.access |= TC6.ACC_FINAL
+        target_base.methods = []
+        self.assertEqual(
+            [
+                "CLASS_FINAL C fixture/Child",
+                "METHOD_MISSING M fixture/Base run ()V",
+            ],
+            TC6.abi_gap_records(donor, target, "fixture/"),
+        )
 
 
 class Tc6SemanticTargetTest(unittest.TestCase):

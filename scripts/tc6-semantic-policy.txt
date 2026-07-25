@@ -7,17 +7,34 @@ UNSUPPORTED | M * thaumcraft/api/aura/AuraHelper addFlux * | TC6 flux has no saf
 UNSUPPORTED | M * thaumcraft/common/world/aura/AuraHandler getAuraChunk * | TC6 chunk aura state is deliberately fail-closed
 UNSUPPORTED | M * thaumcraft/common/world/aura/AuraHandler addFlux * | TC6 flux mutation is deliberately fail-closed
 UNSUPPORTED | M * thaumcraft/api/ThaumcraftApi registerResearchLocation * | TC6 JSON research has no TC4 ingestion adapter
+UNSUPPORTED | S thaumcraft/common/entities/EntityFluxRift | TC6 flux rifts have no TC4 entity counterpart
+LINK_ONLY | * thaumcraft/api/research/IScanThing* | TC6 scan contracts link, but TC4 has no equivalent generic scanner
+LINK_ONLY | * thaumcraft/api/research/ScanBlock* | TC6 block scans are retained for linkage without a TC4 scanner consumer
+LINK_ONLY | * thaumcraft/api/research/ScanningManager* | TC6 scan registrations are retained without creating a second scan system
+LINK_ONLY | * thaumcraft/api/research/theorycraft/* | TC6 theorycraft types link, but TC4 has no theorycraft gameplay loop
+LINK_ONLY | * thaumcraft/common/blocks/world/BlockLoot* | TC6 loot rarity types link while canonical TC4 metadata blocks own gameplay
+LINK_ONLY | * thaumcraft/common/lib/CommandThaumcraft* | Structural command superclass preserves TC6 instanceof linkage
 PROJECTED | * thaumcraft/api/aspects/* | TC6 aspects and registrations project onto canonical TC4 aspects
 PROJECTED | * thaumcraft/api/blocks/BlocksTC* | TC6 block fields alias canonical TC4 registered blocks
+PROJECTED | * thaumcraft/api/crafting/* | TC6 recipe contracts project onto canonical TC4 recipe collections
+PROJECTED | * thaumcraft/api/capabilities/IPlayerKnowledge* | TC6 knowledge value types back projected research entries without separate capability state
 PROJECTED | * thaumcraft/api/items/ItemsTC* | TC6 item fields alias canonical TC4 registered items
 PROJECTED | * thaumcraft/api/internal/CommonInternals* | TC6 scan registry aliases canonical TC4 state
+PROJECTED | * thaumcraft/api/research/Research* | TC6 research data projects onto canonical TC4 categories and entries
+PROJECTED | * thaumcraft/api/ThaumcraftMaterials* | TC6 material fields alias canonical TC4 tool materials
 PROJECTED | M * thaumcraft/common/world/aura/AuraHandler drainVis * | Untyped TC6 vis drains canonical TC4 primal visnet sources
 PROJECTED | * thaumcraft/api/ThaumcraftApi* | TC6 registration calls project onto canonical TC4 registries
 PROJECTED | * thaumcraft/common/blocks/world/taint/TaintHelper* | TC6 taint operations project onto TC4 taint behavior
+PROJECTED | * thaumcraft/common/config/ConfigItems* | TC6 shared stacks project onto canonical TC4 item instances
 PROJECTED | * thaumcraft/common/lib/utils/Utils* | TC6 biome calls project onto the Forge 1.12 biome update path
+PROJECTED | * thaumcraft/common/lib/crafting/ThaumcraftCraftingManager* | TC6 lookups delegate to canonical TC4 crafting helpers
+PROJECTED | * thaumcraft/common/lib/research/ResearchManager* | TC6 research insertion projects onto canonical TC4 research state
 PROJECTED | * thaumcraft/common/items/resources/ItemCrystalEssence* | TC6 crystal aspect data projects onto the TC4 crystal item
 PROJECTED | * thaumcraft/common/lib/SoundsTC* | TC6 sound fields alias canonical TC4 registered sounds
+EXACT | * thaumcraft/api/internal/WeightedRandomLoot* | Exact shared weighted-loot data contract
 EXACT | * thaumcraft/api/crafting/IInfusionStabiliser* | Exact observed callback descriptor with legacy adapter
+EXACT | * thaumcraft/api/items/IScribeTools* | Exact observed structural interface
+EXACT | * thaumcraft/api/items/IWarpingGear* | Exact observed structural interface
 EXACT | * thaumcraft/api/items/IGoggles* | Exact observed structural interface
 EXACT | * thaumcraft/api/items/IRevealer* | Exact observed structural interface
 EXACT | * thaumcraft/api/items/IVisDiscountGear* | Exact observed structural interface

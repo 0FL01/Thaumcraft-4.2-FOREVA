@@ -33,11 +33,12 @@ public class ModelErrorBurstAssetCoverageTest {
         String gas = read("src/main/resources/assets/thaumcraft/blockstates/blockfluxgas.json");
         String configBlocks = read("src/main/java/thaumcraft/common/config/ConfigBlocks.java");
 
-        assertTrue(pure.contains("\"model\": \"forge:fluid\"") && pure.contains("\"fluid\": \"fluidPure\"") && pure.contains("\"15\": {}"));
+        assertTrue(pure.contains("\"model\": \"forge:fluid\"") && pure.contains("\"fluid\": \"fluidpure\"") && pure.contains("\"15\": {}") && !pure.contains("\"fluidPure\""));
         assertTrue(death.contains("\"model\": \"forge:fluid\"") && death.contains("\"fluid\": \"fluiddeath\"") && death.contains("\"15\": {}") && !death.contains("\"fluidDeath\""));
         assertTrue(goo.contains("\"model\": \"forge:fluid\"") && goo.contains("\"fluid\": \"fluxgoo\"") && goo.contains("\"15\": {}") && !goo.contains("\"fluxGoo\""));
         assertTrue(gas.contains("\"model\": \"forge:fluid\"") && gas.contains("\"fluid\": \"fluxgas\"") && gas.contains("\"15\": {}") && !gas.contains("\"fluxGas\""));
         assertTrue(configBlocks.contains("FluidRegistry.getFluid(\"fluiddeath\")"));
+        assertTrue(configBlocks.contains("FluidRegistry.getFluid(\"fluidpure\")"));
 
         String gooModel = read("src/main/resources/assets/thaumcraft/models/block/blockfluxgoo.json");
         assertTrue(gooModel.contains("\"parent\": \"minecraft:block/cube_all\"") && gooModel.contains("\"all\": \"thaumcraft:blocks/fluxgoo\""));

@@ -1,0 +1,4 @@
+# Botania CEu compatibility smoke from GitHub issue #17.
+# Format: jar | sha256 | source/note | direct/dev-remap
+# Baubles is intentionally omitted because it is already on the Gradle classpath.
+botania-r1.10-374.jar | 5cd8078a94c28172ee62e15b727aa7bb08612f3af86176b07bfbf2adaaafa6e5 | https://edge.forgecdn.net/files/8461/084/botania-r1.10-374.jar | direct

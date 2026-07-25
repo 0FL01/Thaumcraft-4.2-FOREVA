@@ -10,7 +10,7 @@ import thaumcraft.api.aspects.AspectList;
 import thaumcraft.api.research.ResearchCategories;
 import thaumcraft.api.research.ResearchPage;
 
-public class ResearchItem {
+public class ResearchItem extends ResearchEntry {
     public final String key;
     public final String category;
     public final AspectList tags;
@@ -50,6 +50,7 @@ public class ResearchItem {
         this.icon_item = null;
         this.displayColumn = 0;
         this.displayRow = 0;
+        syncBase(null);
         this.setVirtual();
     }
 
@@ -61,6 +62,7 @@ public class ResearchItem {
         this.icon_item = null;
         this.displayColumn = col;
         this.displayRow = row;
+        syncBase(icon);
         this.complexity = complex;
         if (this.complexity < 1) {
             this.complexity = 1;
@@ -78,6 +80,7 @@ public class ResearchItem {
         this.icon_resource = null;
         this.displayColumn = col;
         this.displayRow = row;
+        syncBase(icon);
         this.complexity = complex;
         if (this.complexity < 1) {
             this.complexity = 1;
@@ -119,6 +122,7 @@ public class ResearchItem {
 
     public ResearchItem setParents(String ... par) {
         this.parents = par;
+        setParentsValue(par);
         return this;
     }
 
@@ -129,7 +133,16 @@ public class ResearchItem {
 
     public ResearchItem setSiblings(String ... sib) {
         this.siblings = sib;
+        setSiblingsValue(sib);
         return this;
+    }
+
+    private void syncBase(Object icon) {
+        setKey(key);
+        setCategory(category);
+        setDisplayColumn(displayColumn);
+        setDisplayRow(displayRow);
+        setIcons(icon == null ? null : new Object[]{icon});
     }
 
     public ResearchItem setPages(ResearchPage ... par) {
@@ -254,4 +267,3 @@ public class ResearchItem {
         return aspect;
     }
 }
-

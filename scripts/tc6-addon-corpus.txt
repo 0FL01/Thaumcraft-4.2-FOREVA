@@ -5,3 +5,8 @@ magicbees | supported | MagicBees-1.12.2-3.2.25.jar | 2c780e8e7b22a374c069e3a206
 jeid | supported | JustEnoughIDs-1.0.4-SNAPSHOT-thin.jar | b556c5b98ea754a764ba0b0c863878d23fac2f750d0a4b5798dce14afbc7e2b1 | both | https://edge.forgecdn.net/files/3581/715/JustEnoughIDs-1.0.4-SNAPSHOT-thin.jar
 witchery-companion | supported | witcherycompanion-0.36.2-beta.jar | 94546f5b4c1f41b268b6cc01c89b34da091dd6b5071f8bedb041f5ec0aa3fc5f | both | https://www.curseforge.com/minecraft/mc-mods/witchery-companion/files/8237896
 witchery-resurrected | supported | WitcheryResurrected-1.12.2-0.5.2.4-forge-all.jar | 40b3a6f8451ec63aa8ec9a9a38eb08dc8bb80ba05889babc1a783acc9431133c | both | https://witchery.msrandom.net/home/downloads
+balkonsexpansion | supported | BalkonsExpansion-1.12.2-1.2.0.jar | bc2544c777b1f8b048df056d95b1216966761118a78aafba048faf22cc2012d6 | both | GitHub issue #15
+solarflux | supported | SolarFluxReborn-1.12.2-12.4.11.jar | be490ddbeb08b35ba76bee38feaae465a9553ba3bcfbe2d5eef83875d5b5eda2 | both | GitHub issue #16
+botania | supported | botania-r1.10-374.jar | 5cd8078a94c28172ee62e15b727aa7bb08612f3af86176b07bfbf2adaaafa6e5 | both | GitHub issue #17
+justenoughmagiculture | supported | justenoughmagiculture-1.12.2-1.2.2.jar | b1477c2ff5867fbd4ee97c0a5f387cc628155c03155722fca0b9068d3d5819a0 | client | GitHub issue #18
+jaopca | supported | JAOPCA-1.12.2-2.3.5.7.jar | 88931f0a8d995b33959c9e1618c6e87802e854e5b8944740b846a977442e147e | both | GitHub issue #19
