@@ -217,12 +217,12 @@ public class BlockTaintFibres extends Block {
 
     @Override
     public BlockRenderLayer getRenderLayer() {
-        return BlockRenderLayer.CUTOUT_MIPPED;
+        return BlockRenderLayer.TRANSLUCENT;
     }
 
     @Override
     public boolean canRenderInLayer(IBlockState state, BlockRenderLayer layer) {
-        return layer == BlockRenderLayer.CUTOUT_MIPPED;
+        return layer == BlockRenderLayer.TRANSLUCENT;
     }
 
     @Override
