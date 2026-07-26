@@ -8,6 +8,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.EnumHandSide;
+import net.minecraftforge.common.ForgeHooks;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.apache.logging.log4j.LogManager;
@@ -277,8 +278,8 @@ public class ItemWandRenderer extends TileEntityItemStackRenderer {
             return false;
         }
 
-        ItemStack activeStack = player.getHeldItem(activeHand);
-        return activeStack == renderedStack || ItemStack.areItemStacksEqual(activeStack, renderedStack);
+        ItemStack activeStack = player.getActiveItemStack();
+        return activeStack == renderedStack || ForgeHooks.canContinueUsing(activeStack, renderedStack);
     }
 
     private static EnumHandSide getActivePhysicalSide(EntityPlayer player) {

@@ -29,10 +29,12 @@ public class ItemWandCastingUseContinuityRuntimeTest {
         }
 
         assertTrue(ForgeHooks.canContinueUsing(original, visUpdate));
+        assertTrue(ForgeHooks.canContinueUsing(visUpdate, original));
 
         ItemStack focusChanged = visUpdate.copy();
         ItemWandCasting.ensureTag(focusChanged).setString(ItemWandCasting.TAG_FOCUS, "changed");
         assertFalse(ForgeHooks.canContinueUsing(original, focusChanged));
+        assertFalse(ForgeHooks.canContinueUsing(focusChanged, original));
         assertFalse(ForgeHooks.canContinueUsing(original, new ItemStack(wand, 1, 8)));
         assertFalse(ForgeHooks.canContinueUsing(original, new ItemStack(Items.STICK)));
     }

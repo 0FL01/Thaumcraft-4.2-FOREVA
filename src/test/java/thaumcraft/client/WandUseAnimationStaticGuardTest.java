@@ -21,8 +21,12 @@ public class WandUseAnimationStaticGuardTest {
                 && renderer.contains("isRenderedActiveHand(")
                 && renderer.contains("getActivePhysicalSide(")
                 && renderer.contains("isLeftHandTransform(")
-                && renderer.contains("isRightHandTransform("));
-        assertFalse(renderer.contains("getItemInUseCount()"));
+                && renderer.contains("isRightHandTransform(")
+                && renderer.contains("player.getActiveItemStack()")
+                && renderer.contains("ForgeHooks.canContinueUsing(activeStack, renderedStack)"));
+        assertFalse(renderer.contains("getItemInUseCount()")
+                || renderer.contains("player.getHeldItem(activeHand)")
+                || renderer.contains("ItemStack.areItemStacksEqual(activeStack, renderedStack)"));
         assertTrue(sampler.contains("MathHelper.clamp(elapsedTicks / 3.0F, 0.0F, 1.0F)")
                 && sampler.contains("MathHelper.sin(elapsedTicks / 10.0F)")
                 && sampler.contains("MathHelper.sin(elapsedTicks / 0.8F)"));
