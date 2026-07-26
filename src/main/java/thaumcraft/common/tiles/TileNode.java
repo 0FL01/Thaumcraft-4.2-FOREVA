@@ -327,7 +327,7 @@ implements ITickable, INode, IAspectContainer, IWandable {
         Vec3d eyes = new Vec3d(player.posX, player.posY + (double) player.getEyeHeight(), player.posZ);
         Vec3d look = player.getLook(1.0F);
         Vec3d end = eyes.add(look.x * reach, look.y * reach, look.z * reach);
-        return this.world.rayTraceBlocks(eyes, end, false, true, false);
+        return this.world.rayTraceBlocks(eyes, end, true, false, false);
     }
 
     private boolean tryDrainWandVis(ItemWandCasting wand, ItemStack wandstack, EntityPlayer player, RayTraceResult hit) {

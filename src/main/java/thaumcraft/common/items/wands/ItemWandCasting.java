@@ -592,7 +592,7 @@ public class ItemWandCasting extends Item implements IArchitect {
     @Override
     public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer player, EnumHand hand) {
         ItemStack stack = player.getHeldItem(hand);
-        RayTraceResult mop = this.rayTrace(world, player, false);
+        RayTraceResult mop = this.rayTrace(world, player, true);
 
         if (mop != null && mop.typeOfHit == RayTraceResult.Type.BLOCK) {
             TileEntity tile = world.getTileEntity(mop.getBlockPos());
