@@ -37,9 +37,6 @@ import thaumcraft.common.Thaumcraft;
 import thaumcraft.common.items.relics.ItemThaumometer;
 import thaumcraft.common.lib.research.ScanManager;
 import java.util.Map;
-import javax.vecmath.AxisAngle4f;
-import javax.vecmath.Matrix4f;
-import javax.vecmath.Vector3f;
 
 public class ItemThaumometerRenderer extends TileEntityItemStackRenderer {
 
@@ -55,8 +52,6 @@ public class ItemThaumometerRenderer extends TileEntityItemStackRenderer {
     private static final float HUD_SCALE_MULTIPLIER = 1.875F;
     private static final ThreadLocal<ItemCameraTransforms.TransformType> CURRENT_TRANSFORM =
             ThreadLocal.withInitial(() -> ItemCameraTransforms.TransformType.NONE);
-    private static final ThreadLocal<FirstPersonItemTransform> FIRST_PERSON_ITEM_TRANSFORM =
-            new ThreadLocal<>();
     private static long lastReadoutDebugLogMs = 0L;
 
     private final CCModel scannerModel = loadScannerModel();
@@ -65,57 +60,21 @@ public class ItemThaumometerRenderer extends TileEntityItemStackRenderer {
         CURRENT_TRANSFORM.set(transformType == null ? ItemCameraTransforms.TransformType.NONE : transformType);
     }
 
-    public static void prepareFirstPersonItemTransform(EnumHandSide heldSide, float swingProgress,
-                                                       float equipProgress, boolean restoreVanillaTransform) {
-        if (!restoreVanillaTransform) {
-            FIRST_PERSON_ITEM_TRANSFORM.remove();
-            return;
-        }
-
-        ItemCameraTransforms.TransformType transformType = heldSide == EnumHandSide.RIGHT
-                ? ItemCameraTransforms.TransformType.FIRST_PERSON_RIGHT_HAND
-                : ItemCameraTransforms.TransformType.FIRST_PERSON_LEFT_HAND;
-        FIRST_PERSON_ITEM_TRANSFORM.set(new FirstPersonItemTransform(transformType,
-                createVanillaFirstPersonTransform(swingProgress, equipProgress)));
-    }
-
-    public static Matrix4f consumeFirstPersonItemTransform(ItemCameraTransforms.TransformType transformType) {
-        FirstPersonItemTransform prepared = FIRST_PERSON_ITEM_TRANSFORM.get();
-        FIRST_PERSON_ITEM_TRANSFORM.remove();
-        return prepared != null && prepared.transformType == transformType ? prepared.matrix : null;
-    }
-
-    private static Matrix4f createVanillaFirstPersonTransform(float swingProgress, float equipProgress) {
-        // Forge mirrors returned perspective matrices for a physical left hand.
-        float handedness = 1.0F;
+    public static void applyVanillaFirstPersonTransform(EnumHandSide heldSide, float swingProgress,
+                                                        float equipProgress) {
+        float handedness = heldSide == EnumHandSide.RIGHT ? 1.0F : -1.0F;
         float swingRoot = MathHelper.sin(MathHelper.sqrt(swingProgress) * (float) Math.PI);
         float swingLinear = MathHelper.sin(swingProgress * (float) Math.PI);
         float swingSquared = MathHelper.sin(swingProgress * swingProgress * (float) Math.PI);
 
-        Matrix4f matrix = new Matrix4f();
-        matrix.setIdentity();
-        appendTranslation(matrix, -swingRoot * 0.4F * handedness,
+        GlStateManager.translate(-swingRoot * 0.4F * handedness,
                 MathHelper.sin(MathHelper.sqrt(swingProgress) * (float) Math.PI * 2.0F) * 0.2F,
                 -swingLinear * 0.2F);
-        appendTranslation(matrix, 0.56F * handedness, -0.52F - equipProgress * 0.6F, -0.72F);
-        appendRotation(matrix, handedness * (45.0F - swingSquared * 20.0F), 0.0F, 1.0F, 0.0F);
-        appendRotation(matrix, -swingRoot * 20.0F * handedness, 0.0F, 0.0F, 1.0F);
-        appendRotation(matrix, -swingRoot * 80.0F, 1.0F, 0.0F, 0.0F);
-        appendRotation(matrix, -45.0F * handedness, 0.0F, 1.0F, 0.0F);
-        return matrix;
-    }
-
-    private static void appendTranslation(Matrix4f matrix, float x, float y, float z) {
-        Matrix4f translation = new Matrix4f();
-        translation.setIdentity();
-        translation.setTranslation(new Vector3f(x, y, z));
-        matrix.mul(translation);
-    }
-
-    private static void appendRotation(Matrix4f matrix, float degrees, float x, float y, float z) {
-        Matrix4f rotation = new Matrix4f();
-        rotation.set(new AxisAngle4f(x, y, z, degrees * (float) Math.PI / 180.0F));
-        matrix.mul(rotation);
+        GlStateManager.translate(0.56F * handedness, -0.52F - equipProgress * 0.6F, -0.72F);
+        GlStateManager.rotate(handedness * (45.0F - swingSquared * 20.0F), 0.0F, 1.0F, 0.0F);
+        GlStateManager.rotate(-swingRoot * 20.0F * handedness, 0.0F, 0.0F, 1.0F);
+        GlStateManager.rotate(-swingRoot * 80.0F, 1.0F, 0.0F, 0.0F);
+        GlStateManager.rotate(-45.0F * handedness, 0.0F, 1.0F, 0.0F);
     }
 
     @Override
@@ -196,16 +155,6 @@ public class ItemThaumometerRenderer extends TileEntityItemStackRenderer {
         } finally {
             GlStateManager.popMatrix();
             GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
-        }
-    }
-
-    private static final class FirstPersonItemTransform {
-        private final ItemCameraTransforms.TransformType transformType;
-        private final Matrix4f matrix;
-
-        private FirstPersonItemTransform(ItemCameraTransforms.TransformType transformType, Matrix4f matrix) {
-            this.transformType = transformType;
-            this.matrix = matrix;
         }
     }
 

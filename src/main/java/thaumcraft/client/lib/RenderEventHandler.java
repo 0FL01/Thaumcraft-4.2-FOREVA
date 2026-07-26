@@ -154,10 +154,22 @@ public class RenderEventHandler {
                     && player.getItemInUseCount() > 0
                     && player.getActiveHand() == thaumometerHand
                     && event.getItemStack().getItemUseAction() == EnumAction.NONE;
-            ItemThaumometerRenderer.prepareFirstPersonItemTransform(heldSide,
-                    event.getSwingProgress(), event.getEquipProgress(), vanillaSkipsItemTransform);
+            float renderEquipProgress = vanillaSkipsItemTransform ? 0.0F : event.getEquipProgress();
             ItemThaumometerRenderer.renderFirstPersonHands(player, heldSide,
-                    event.getSwingProgress(), event.getEquipProgress());
+                    event.getSwingProgress(), renderEquipProgress);
+            if (vanillaSkipsItemTransform) {
+                GlStateManager.pushMatrix();
+                try {
+                    ItemThaumometerRenderer.applyVanillaFirstPersonTransform(heldSide,
+                            event.getSwingProgress(), renderEquipProgress);
+                    mc.getItemRenderer().renderItemInFirstPerson(player, event.getPartialTicks(),
+                            event.getInterpolatedPitch(), event.getHand(), event.getSwingProgress(),
+                            event.getItemStack(), renderEquipProgress);
+                } finally {
+                    GlStateManager.popMatrix();
+                }
+                event.setCanceled(true);
+            }
             return;
         }
 

@@ -59,13 +59,6 @@ public final class ThaumometerPerspectiveModel implements IBakedModel {
     public Pair<? extends IBakedModel, Matrix4f> handlePerspective(ItemCameraTransforms.TransformType cameraTransformType) {
         ItemThaumometerRenderer.setTransformType(cameraTransformType);
         Pair<? extends IBakedModel, Matrix4f> delegatePerspective = delegate.handlePerspective(cameraTransformType);
-        Matrix4f activeUseTransform = ItemThaumometerRenderer.consumeFirstPersonItemTransform(cameraTransformType);
-        if (activeUseTransform != null) {
-            // EnumAction.NONE skips vanilla's per-hand matrix while active; restore it
-            // before the unchanged donor matrix so scanner and hands stay together.
-            activeUseTransform.mul(delegatePerspective.getRight());
-            return Pair.of(this, activeUseTransform);
-        }
         return Pair.of(this, delegatePerspective.getRight());
     }
 }
