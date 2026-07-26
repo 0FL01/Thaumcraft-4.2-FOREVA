@@ -62,6 +62,8 @@ public class PlayerDataPacketClientBoundaryStaticGuardTest {
         assertTrue(clientProxy.contains("localizeOrFallback(\"tc.unknownobject\", \"Nothing can be learned from this.\")"));
         assertTrue(clientProxy.contains("formatThaumometerAspectLabel(aspect)"));
         assertTrue(clientProxy.contains("formatThaumometerAspectDescription(missingAspect)"));
+        assertTrue(clientProxy.contains("String localized = I18n.translateToLocal(key);"));
+        assertFalse(clientProxy.contains("String localized = net.minecraft.client.resources.I18n.format(key);"));
     }
 
     private static String readFile(String path) throws IOException {

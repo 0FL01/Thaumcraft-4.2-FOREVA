@@ -1290,7 +1290,7 @@ public class ClientProxy extends CommonProxy {
     }
 
     private static String localizeOrFallback(String key, String fallback) {
-        String localized = net.minecraft.client.resources.I18n.format(key);
+        String localized = I18n.translateToLocal(key);
         return key.equals(localized) ? fallback : localized;
     }
 

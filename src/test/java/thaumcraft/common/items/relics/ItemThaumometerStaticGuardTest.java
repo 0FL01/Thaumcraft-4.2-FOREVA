@@ -21,13 +21,13 @@ public class ItemThaumometerStaticGuardTest {
                         && source.contains("public EnumAction getItemUseAction(ItemStack stack)")
                         && source.contains("return EnumAction.NONE;"));
         assertTrue("Thaumometer must keep start-scan capture on right-click and active-hand use flow",
-                source.contains("this.startScan = doActiveScan(stack, world, player, true);")
+                source.contains("this.startScan = doActiveScan(stack, world, player);")
                         && source.contains("player.setActiveHand(hand);"));
-        assertTrue("Thaumometer active scanning should validate aspect prerequisites once per attempt and keep later use-ticks notification-free",
-                source.contains("private ScanResult doActiveScan(ItemStack stack, World world, EntityPlayer player, boolean notifyInvalid)")
-                        && source.contains("if (notifyInvalid) {")
-                        && source.contains("ScanManager.notifyInvalidScan(aspects, player);")
-                        && source.contains("ScanResult current = doActiveScan(stack, world, player, false);"));
+        assertTrue("Thaumometer should defer aspect-prerequisite feedback until the timed attempt completes",
+                source.contains("private ScanResult doActiveScan(ItemStack stack, World world, EntityPlayer player)")
+                        && source.contains("ScanResult current = doActiveScan(stack, world, player);")
+                        && !source.contains("boolean notifyInvalid")
+                        && !source.contains("ScanManager.validScan(aspects, player)"));
         assertTrue("Thaumometer must keep client completion and packet send path",
                 source.contains("if (this.startScan != null && current != null && current.equals(this.startScan))")
                         && 
@@ -35,12 +35,12 @@ public class ItemThaumometerStaticGuardTest {
                         && source.contains("player.stopActiveHand();")
                         && source.contains("ScanManager.completeScan(player, current, \"@\")")
                         && source.contains("completedClientSide || isNodeScan(current)")
-                        && source.contains("PacketHandler.INSTANCE.sendToServer(new PacketScannedToServer(current, player, \"@\"))"));
+                        && source.contains("PacketHandler.INSTANCE.sendToServer(new PacketScannedToServer(current, player, \"@\"))")
+                        && source.contains("ScanManager.notifyInvalidScan(ScanManager.getScanAspects(current, world), player);"));
         assertTrue("Thaumometer node scans should reach the server even when client-side node aspects are not synced yet",
                 source.contains("private static boolean isNodeScan(ScanResult result)")
-                        && source.contains("if (isNodeScan(result)) {")
-                        && source.contains("this.showScanFeedback(world, player, result);")
-                        && source.contains("return result;"));
+                        && source.contains("if (completedClientSide || isNodeScan(current)) {")
+                        && source.contains("} else {\n                    ScanManager.notifyInvalidScan"));
         assertTrue("Thaumometer block scan must keep protected pick-block path with aspect-aware candidate ordering",
                 source.contains("try {")
                         && source.contains("result = toTaggedItemScan(block.getPickBlock(state, hit, world, pos, player), world);")

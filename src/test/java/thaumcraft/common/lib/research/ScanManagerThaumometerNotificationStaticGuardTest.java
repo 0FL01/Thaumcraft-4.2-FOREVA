@@ -18,7 +18,7 @@ public class ScanManagerThaumometerNotificationStaticGuardTest {
         assertTrue(source.contains("public static void notifyInvalidScan(AspectList aspects, EntityPlayer player)"));
         assertTrue(source.contains("Thaumcraft.proxy.notifyThaumometerUnknownObject()"));
         assertTrue(source.contains("Thaumcraft.proxy.notifyThaumometerDiscoveryError(parent)"));
-        assertTrue(item.contains("ScanManager.notifyInvalidScan(aspects, player);"));
+        assertTrue(item.contains("ScanManager.notifyInvalidScan(ScanManager.getScanAspects(current, world), player);"));
         assertTrue(clientProxy.contains("localizeOrFallback(\"tc.discoveryerror\", \"To understand this you need to study %1$s.\")"));
         assertTrue(clientProxy.contains("localizeOrFallback(\"tc.unknownobject\", \"Nothing can be learned from this.\")"));
         assertTrue(clientProxy.contains("formatThaumometerAspectLabel(aspect)"));

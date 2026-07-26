@@ -45,9 +45,12 @@ import thaumcraft.api.research.ResearchCategories;
 import thaumcraft.api.research.ResearchCategoryList;
 import thaumcraft.api.research.ResearchItem;
 import thaumcraft.api.research.ScanResult;
+import thaumcraft.common.CommonProxy;
+import thaumcraft.common.Thaumcraft;
 import thaumcraft.common.config.ConfigItems;
 import thaumcraft.common.items.ItemResearchNotes;
 import thaumcraft.common.items.ItemResource;
+import thaumcraft.common.items.relics.ItemThaumometer;
 import thaumcraft.common.lib.capabilities.PlayerKnowledgeCapability;
 import thaumcraft.common.lib.capabilities.PlayerKnowledgeProvider;
 
@@ -167,6 +170,41 @@ public class ScanProgressionRuntimeTest {
         assertTrue(ScanManager.completeScan(player, scan, "@"));
         assertTrue(player.knowledge().hasScannedPhenomena("@NODE0:0:1:4"));
         assertEquals(4, player.knowledge().getAspectPoolFor(Aspect.AIR));
+    }
+
+    @Test
+    public void blockedThaumometerScanNotifiesOnceAfterTheTimedAttempt() {
+        ThaumcraftApi.registerObjectTag(new ItemStack(Blocks.LOG, 1, 0), new AspectList().add(Aspect.TREE, 1));
+        ScanWorld world = new ScanWorld(true);
+        BlockPos pos = new BlockPos(0, 1, 4);
+        world.setBlock(pos, Blocks.LOG.getDefaultState());
+        world.setHit(new RayTraceResult(new Vec3d(0.5D, 1.0D, 4.5D), EnumFacing.UP, pos));
+        TestPlayer player = new TestPlayer(world, "blocked_thaumometer_scan");
+        ItemThaumometer thaumometer = new ItemThaumometer();
+        ItemStack stack = holdMainHand(player, new ItemStack(thaumometer));
+        ThaumometerNotificationProxy proxy = new ThaumometerNotificationProxy();
+        CommonProxy oldProxy = Thaumcraft.proxy;
+
+        try {
+            Thaumcraft.proxy = proxy;
+            ActionResult<ItemStack> result = thaumometer.onItemRightClick(world, player, EnumHand.MAIN_HAND);
+
+            assertEquals(EnumActionResult.SUCCESS, result.getType());
+            assertEquals(0, proxy.failureCount);
+
+            thaumometer.onUsingTick(stack, player, 7);
+            assertEquals(0, proxy.failureCount);
+
+            thaumometer.onUsingTick(stack, player, 5);
+            assertEquals(1, proxy.failureCount);
+            assertTrue(proxy.missingAspect == Aspect.PLANT);
+            assertFalse(player.knowledge().hasScannedItem("@" + ScanManager.generateItemHash(net.minecraft.item.Item.getItemFromBlock(Blocks.LOG), 0)));
+
+            thaumometer.onUsingTick(stack, player, 4);
+            assertEquals(1, proxy.failureCount);
+        } finally {
+            Thaumcraft.proxy = oldProxy;
+        }
     }
 
     @Test
@@ -355,6 +393,17 @@ public class ScanProgressionRuntimeTest {
         }
     }
 
+    private static class ThaumometerNotificationProxy extends CommonProxy {
+        private int failureCount;
+        private Aspect missingAspect;
+
+        @Override
+        public void notifyThaumometerDiscoveryError(Aspect missingAspect) {
+            ++this.failureCount;
+            this.missingAspect = missingAspect;
+        }
+    }
+
     private static class ScanWorld extends World {
         private final List<Entity> entities = new ArrayList<>();
         private final List<Entity> spawned = new ArrayList<>();
@@ -364,11 +413,15 @@ public class ScanProgressionRuntimeTest {
         private TestNodeTile node;
 
         ScanWorld() {
+            this(false);
+        }
+
+        ScanWorld(boolean remote) {
             super(null,
                     new WorldInfo(new WorldSettings(0L, GameType.CREATIVE, false, false, WorldType.DEFAULT), "scan_progression"),
                     new WorldProviderSurface(),
                     new Profiler(),
-                    false);
+                    remote);
             this.provider.setWorld(this);
             this.chunkProvider = this.createChunkProvider();
         }

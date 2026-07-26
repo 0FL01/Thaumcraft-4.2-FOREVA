@@ -65,7 +65,7 @@ public class ItemThaumometer extends Item {
     public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer player, EnumHand hand) {
         ItemStack stack = player.getHeldItem(hand);
         if (world.isRemote) {
-            this.startScan = doActiveScan(stack, world, player, true);
+            this.startScan = doActiveScan(stack, world, player);
         }
         player.setActiveHand(hand);
         return new ActionResult<>(EnumActionResult.SUCCESS, stack);
@@ -82,7 +82,7 @@ public class ItemThaumometer extends Item {
             return;
         }
 
-        ScanResult current = doActiveScan(stack, world, player, false);
+        ScanResult current = doActiveScan(stack, world, player);
         if (this.startScan != null && current != null && current.equals(this.startScan)) {
             if (count <= 5) {
                 this.startScan = null;
@@ -90,6 +90,8 @@ public class ItemThaumometer extends Item {
                 boolean completedClientSide = ScanManager.completeScan(player, current, "@");
                 if (completedClientSide || isNodeScan(current)) {
                     PacketHandler.INSTANCE.sendToServer(new PacketScannedToServer(current, player, "@"));
+                } else {
+                    ScanManager.notifyInvalidScan(ScanManager.getScanAspects(current, world), player);
                 }
             }
             if (count % 2 == 0) {
@@ -106,20 +108,9 @@ public class ItemThaumometer extends Item {
         this.startScan = null;
     }
 
-    private ScanResult doActiveScan(ItemStack stack, World world, EntityPlayer player, boolean notifyInvalid) {
+    private ScanResult doActiveScan(ItemStack stack, World world, EntityPlayer player) {
         ScanResult result = this.findRawScanTarget(stack, world, player);
         if (result == null || !ScanManager.isValidScanTarget(player, result, "@")) {
-            return null;
-        }
-        thaumcraft.api.aspects.AspectList aspects = ScanManager.getScanAspects(result, world);
-        if (!ScanManager.validScan(aspects, player)) {
-            if (isNodeScan(result)) {
-                this.showScanFeedback(world, player, result);
-                return result;
-            }
-            if (notifyInvalid) {
-                ScanManager.notifyInvalidScan(aspects, player);
-            }
             return null;
         }
         this.showScanFeedback(world, player, result);
