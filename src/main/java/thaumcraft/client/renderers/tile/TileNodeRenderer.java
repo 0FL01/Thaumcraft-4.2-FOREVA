@@ -4,13 +4,11 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
-import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.ResourceLocation;
@@ -20,6 +18,7 @@ import thaumcraft.api.aspects.AspectList;
 import thaumcraft.api.nodes.INode;
 import thaumcraft.api.nodes.NodeModifier;
 import thaumcraft.api.nodes.NodeType;
+import thaumcraft.client.fx.beams.WandEffectOrigin;
 import thaumcraft.client.lib.UtilsFX;
 import thaumcraft.common.items.relics.ItemThaumometer;
 import thaumcraft.common.tiles.TileJarNode;
@@ -102,29 +101,20 @@ public class TileNodeRenderer extends TileEntitySpecialRenderer<TileEntity> {
     }
 
     private static void renderDrainBeam(TileNode node, float partialTicks) {
-        if (node.drainEntity == null || node.drainCollision == null) {
+        if (!(node.drainEntity instanceof EntityPlayer) || node.drainCollision == null) {
             return;
         }
 
-        Entity entity = node.drainEntity;
+        EntityPlayer player = (EntityPlayer) node.drainEntity;
 
         RayTraceResult hit = node.drainCollision;
         BlockPos hitPos = hit.getBlockPos() == null ? node.getPos() : hit.getBlockPos();
         float beamAge = node.drainBeamAge + partialTicks;
-        float wobble = MathHelper.sin(beamAge / 10.0F) * 10.0F;
-
-        Vec3d offset = new Vec3d(-0.1D, -0.1D, 0.5D);
-        float pitch = -(entity.prevRotationPitch + (entity.rotationPitch - entity.prevRotationPitch) * partialTicks) * (float) Math.PI / 180.0F;
-        float yaw = -(entity.prevRotationYaw + (entity.rotationYaw - entity.prevRotationYaw) * partialTicks) * (float) Math.PI / 180.0F;
-        offset = offset.rotatePitch(pitch);
-        offset = offset.rotateYaw(yaw);
-        offset = offset.rotateYaw(-wobble * 0.01F);
-        offset = offset.rotatePitch(-wobble * 0.015F);
-
-        double sourceWorldX = entity.lastTickPosX + (entity.posX - entity.lastTickPosX) * partialTicks + offset.x;
-        double sourceWorldY = entity.lastTickPosY + (entity.posY - entity.lastTickPosY) * partialTicks + offset.y
-                + (entity == Minecraft.getMinecraft().player ? 0.0D : entity.getEyeHeight());
-        double sourceWorldZ = entity.lastTickPosZ + (entity.posZ - entity.lastTickPosZ) * partialTicks + offset.z;
+        Vec3d source = WandEffectOrigin.resolve(
+                player, partialTicks, WandEffectOrigin.sourceYOffset(player));
+        double sourceWorldX = source.x;
+        double sourceWorldY = source.y;
+        double sourceWorldZ = source.z;
         double targetWorldX = hitPos.getX() + 0.5D;
         double targetWorldY = hitPos.getY() + 0.5D;
         double targetWorldZ = hitPos.getZ() + 0.5D;

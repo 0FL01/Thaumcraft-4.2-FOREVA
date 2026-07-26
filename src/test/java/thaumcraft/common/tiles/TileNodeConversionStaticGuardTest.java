@@ -151,11 +151,17 @@ public class TileNodeConversionStaticGuardTest {
 
         assertTrue(renderer.contains("renderDrainBeam((TileNode) tile, partialTicks);"));
         assertFalse(renderer.contains("getItemInUseMaxCount()"));
+        assertTrue(renderer.contains("if (!(node.drainEntity instanceof EntityPlayer) || node.drainCollision == null)"));
+        assertTrue(renderer.contains("EntityPlayer player = (EntityPlayer) node.drainEntity;"));
         assertTrue(renderer.contains("float beamAge = node.drainBeamAge + partialTicks;"));
-        assertTrue(renderer.contains("MathHelper.sin(beamAge / 10.0F) * 10.0F"));
-        assertTrue(renderer.contains("new Vec3d(-0.1D, -0.1D, 0.5D)"));
-        assertTrue(renderer.contains("offset = offset.rotateYaw(-wobble * 0.01F);"));
-        assertTrue(renderer.contains("offset = offset.rotatePitch(-wobble * 0.015F);"));
+        assertTrue(renderer.contains("Vec3d source = WandEffectOrigin.resolve("));
+        assertTrue(renderer.contains("player, partialTicks, WandEffectOrigin.sourceYOffset(player));"));
+        assertTrue(renderer.contains("double sourceWorldX = source.x;"));
+        assertTrue(renderer.contains("double sourceWorldY = source.y;"));
+        assertTrue(renderer.contains("double sourceWorldZ = source.z;"));
+        assertFalse(renderer.contains("new Vec3d(-0.1D, -0.1D, 0.5D)"));
+        assertFalse(renderer.contains("offset.rotatePitch(") || renderer.contains("offset.rotateYaw(")
+                || renderer.contains("float wobble ="));
         assertTrue(renderer.contains("node.color == null ? node.drainColor : node.color.getRGB()"));
         assertTrue(renderer.contains("UtilsFX.drawFloatyLine(sourceWorldX, sourceWorldY, sourceWorldZ,"));
         assertTrue(renderer.contains("targetWorldX, targetWorldY, targetWorldZ,"));
