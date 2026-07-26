@@ -4,6 +4,7 @@ import java.util.HashMap;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
@@ -23,6 +24,8 @@ import net.minecraft.item.ItemDye;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.EnumHand;
+import net.minecraft.util.EnumHandSide;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
@@ -31,6 +34,7 @@ import net.minecraft.world.World;
 import net.minecraftforge.client.event.DrawBlockHighlightEvent;
 import net.minecraftforge.client.event.EntityViewRenderEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
+import net.minecraftforge.client.event.RenderSpecificHandEvent;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.event.entity.living.LivingEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -45,6 +49,7 @@ import thaumcraft.api.aspects.AspectList;
 import thaumcraft.api.aspects.IAspectContainer;
 import thaumcraft.api.nodes.INode;
 import thaumcraft.api.research.ScanResult;
+import thaumcraft.client.renderers.item.ItemThaumometerRenderer;
 import thaumcraft.client.renderers.tile.HoleRenderBatchCache;
 import thaumcraft.common.entities.monster.mods.ChampionModifier;
 import thaumcraft.common.config.Config;
@@ -116,6 +121,42 @@ public class RenderEventHandler {
                     scannedBlocks[xx + SCAN_GRID_RADIUS][yy + SCAN_GRID_RADIUS][zz + SCAN_GRID_RADIUS] = value;
                 }
             }
+        }
+    }
+
+    @SubscribeEvent
+    public void renderThaumometerHands(RenderSpecificHandEvent event) {
+        Minecraft mc = Minecraft.getMinecraft();
+        EntityPlayerSP player = mc.player;
+        if (player == null || mc.gameSettings.thirdPersonView != 0) {
+            return;
+        }
+
+        ItemStack mainStack = player.getHeldItemMainhand();
+        ItemStack offStack = player.getHeldItemOffhand();
+        boolean mainThaumometer = mainStack.getItem() instanceof ItemThaumometer;
+        boolean offThaumometer = offStack.getItem() instanceof ItemThaumometer;
+        if (mainThaumometer == offThaumometer) {
+            return;
+        }
+
+        ItemStack otherStack = mainThaumometer ? offStack : mainStack;
+        if (!otherStack.isEmpty()) {
+            return;
+        }
+
+        EnumHand thaumometerHand = mainThaumometer ? EnumHand.MAIN_HAND : EnumHand.OFF_HAND;
+        if (event.getHand() == thaumometerHand) {
+            EnumHandSide heldSide = thaumometerHand == EnumHand.MAIN_HAND
+                    ? player.getPrimaryHand() : player.getPrimaryHand().opposite();
+            ItemThaumometerRenderer.renderFirstPersonHands(player, heldSide, event.getEquipProgress());
+            return;
+        }
+
+        if (thaumometerHand == EnumHand.OFF_HAND
+                && event.getHand() == EnumHand.MAIN_HAND
+                && event.getItemStack().isEmpty()) {
+            event.setCanceled(true);
         }
     }
 

@@ -1,6 +1,7 @@
 package thaumcraft.client.renderers.item;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.entity.AbstractClientPlayer;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.renderer.BufferBuilder;
@@ -9,6 +10,8 @@ import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.block.model.ItemCameraTransforms;
+import net.minecraft.client.renderer.entity.Render;
+import net.minecraft.client.renderer.entity.RenderPlayer;
 import net.minecraft.client.renderer.tileentity.TileEntityItemStackRenderer;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.item.EntityItem;
@@ -16,6 +19,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.EnumHandSide;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.ResourceLocation;
@@ -63,6 +67,61 @@ public class ItemThaumometerRenderer extends TileEntityItemStackRenderer {
 
     public void renderTableDisplay(ItemStack stack) {
         renderScanner(stack, ItemCameraTransforms.TransformType.NONE, false);
+    }
+
+    public static void renderFirstPersonHands(EntityPlayerSP player, EnumHandSide heldSide,
+                                              float equipProgress) {
+        if (player == null || heldSide == null || player.isInvisible()) {
+            return;
+        }
+
+        Minecraft mc = Minecraft.getMinecraft();
+        Render<?> render = mc.getRenderManager().getEntityRenderObject(player);
+        if (!(render instanceof RenderPlayer)) {
+            return;
+        }
+
+        AbstractClientPlayer clientPlayer = player;
+        RenderPlayer renderPlayer = (RenderPlayer) render;
+        float handedness = heldSide == EnumHandSide.RIGHT ? 1.0F : -1.0F;
+        float scale = 0.8F;
+
+        mc.getTextureManager().bindTexture(clientPlayer.getLocationSkin());
+        GlStateManager.pushMatrix();
+        try {
+            GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+            GlStateManager.translate(handedness, 0.75F, -1.0F);
+            GlStateManager.rotate(135.0F * handedness, 0.0F, -1.0F, 0.0F);
+            GlStateManager.translate(-0.7F * scale * handedness,
+                    0.65F * scale + equipProgress * 1.5F, 0.9F * scale);
+            GlStateManager.rotate(90.0F, 0.0F, 1.0F, 0.0F);
+            GlStateManager.translate(0.0F, 0.0F, -0.9F * scale);
+            GlStateManager.rotate(90.0F, 0.0F, 1.0F, 0.0F);
+            GlStateManager.scale(5.0F, 5.0F, 5.0F);
+
+            for (int armIndex = 0; armIndex < 2; armIndex++) {
+                int direction = armIndex * 2 - 1;
+                float armHandedness = heldSide == EnumHandSide.RIGHT ? direction : -direction;
+                GlStateManager.pushMatrix();
+                try {
+                    GlStateManager.translate(0.0F, -0.6F, 1.1F * armHandedness);
+                    GlStateManager.rotate(-45.0F * armHandedness, 1.0F, 0.0F, 0.0F);
+                    GlStateManager.rotate(-90.0F, 0.0F, 0.0F, 1.0F);
+                    GlStateManager.rotate(59.0F, 0.0F, 0.0F, 1.0F);
+                    GlStateManager.rotate(-65.0F * armHandedness, 0.0F, 1.0F, 0.0F);
+                    if (armHandedness > 0.0F) {
+                        renderPlayer.renderRightArm(clientPlayer);
+                    } else {
+                        renderPlayer.renderLeftArm(clientPlayer);
+                    }
+                } finally {
+                    GlStateManager.popMatrix();
+                }
+            }
+        } finally {
+            GlStateManager.popMatrix();
+            GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+        }
     }
 
     private void renderScanner(ItemStack stack, ItemCameraTransforms.TransformType transformType,

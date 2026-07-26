@@ -7,6 +7,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 public class ThaumometerItemRendererContractTest {
@@ -91,6 +92,39 @@ public class ThaumometerItemRendererContractTest {
                         && itemModel.contains("\"translation\": [3.2, 3.2, -2.72]")
                         && itemModel.contains("\"translation\": [-0.96, 0.096, -14.352]")
                         && itemModel.contains("\"translation\": [-16.96, 0.096, -14.352]"));
+    }
+
+    @Test
+    public void thaumometerShouldRenderTc4HandsWithoutReplacingTheScannerRoute() throws IOException {
+        String eventHandler = read("src/main/java/thaumcraft/client/lib/RenderEventHandler.java");
+        String renderer = read("src/main/java/thaumcraft/client/renderers/item/ItemThaumometerRenderer.java");
+
+        assertTrue("The specific-hand event should add the two-hand pose only when the other hand is empty",
+                eventHandler.contains("renderThaumometerHands(RenderSpecificHandEvent event)")
+                        && eventHandler.contains("if (mainThaumometer == offThaumometer) {")
+                        && eventHandler.contains("if (!otherStack.isEmpty()) {")
+                        && eventHandler.contains("if (event.getHand() == thaumometerHand) {")
+                        && eventHandler.contains("player.getPrimaryHand().opposite()")
+                        && eventHandler.contains("ItemThaumometerRenderer.renderFirstPersonHands(player, heldSide, event.getEquipProgress());"));
+
+        assertTrue("An offhand thaumometer should suppress only the extra empty main-hand arm",
+                eventHandler.contains("thaumometerHand == EnumHand.OFF_HAND")
+                        && eventHandler.contains("event.getHand() == EnumHand.MAIN_HAND")
+                        && eventHandler.contains("event.getItemStack().isEmpty()")
+                        && eventHandler.contains("event.setCanceled(true);"));
+
+        assertTrue("The arm-only renderer should use both physical player arms and the event equip offset",
+                renderer.contains("renderFirstPersonHands(EntityPlayerSP player, EnumHandSide heldSide,")
+                        && renderer.contains("0.65F * scale + equipProgress * 1.5F")
+                        && renderer.contains("renderPlayer.renderRightArm(clientPlayer);")
+                        && renderer.contains("renderPlayer.renderLeftArm(clientPlayer);"));
+
+        assertFalse("The hand event must not replace or duplicate the existing scanner renderer",
+                eventHandler.contains("renderByItem(") || eventHandler.contains("renderScanner("));
+        assertFalse("Equipped progress must come from the event rather than reflected ItemRenderer fields",
+                renderer.contains("java.lang.reflect")
+                        || renderer.contains("setAccessible(")
+                        || renderer.contains("equippedProgressMainHand"));
     }
 
     private static String read(String path) throws IOException {
