@@ -121,6 +121,9 @@ public class ThaumometerItemRendererContractTest {
                         && renderer.contains("GlStateManager.scale(0.4F, 0.4F, 0.4F);")
                         && renderer.contains("0.65F * scale + equipProgress * 1.5F")
                         && renderer.contains("for (int armIndex = 0; armIndex < 2; armIndex++)")
+                        && renderer.contains("GlStateManager.translate(-0.3F * handedness, -0.47F, -0.85F);")
+                        && renderer.contains("GlStateManager.translate(0.0F, -0.6F, 1.15F * direction);")
+                        && renderer.contains("GlStateManager.scale(0.78F, 0.78F, 0.78F);")
                         && renderer.contains("if (heldSide == EnumHandSide.RIGHT)")
                         && renderer.contains("renderPlayer.renderRightArm(clientPlayer);")
                         && renderer.contains("renderPlayer.renderLeftArm(clientPlayer);"));

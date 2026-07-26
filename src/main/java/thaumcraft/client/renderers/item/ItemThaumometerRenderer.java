@@ -93,6 +93,8 @@ public class ItemThaumometerRenderer extends TileEntityItemStackRenderer {
         GlStateManager.pushMatrix();
         try {
             GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+            // Align the 1.7 arm pose with the donor-positioned 1.12 scanner.
+            GlStateManager.translate(-0.3F * handedness, -0.47F, -0.85F);
             // Forge 1.7 invoked EQUIPPED_FIRST_PERSON after this vanilla item transform.
             GlStateManager.translate(-swingRoot * 0.4F * handedness,
                     MathHelper.sin(MathHelper.sqrt(swingProgress) * (float) Math.PI * 2.0F) * 0.2F,
@@ -118,11 +120,12 @@ public class ItemThaumometerRenderer extends TileEntityItemStackRenderer {
                 int direction = armIndex * 2 - 1;
                 GlStateManager.pushMatrix();
                 try {
-                    GlStateManager.translate(0.0F, -0.6F, 1.1F * direction);
+                    GlStateManager.translate(0.0F, -0.6F, 1.15F * direction);
                     GlStateManager.rotate(-45.0F * direction, 1.0F, 0.0F, 0.0F);
                     GlStateManager.rotate(-90.0F * handedness, 0.0F, 0.0F, 1.0F);
                     GlStateManager.rotate(59.0F * handedness, 0.0F, 0.0F, 1.0F);
                     GlStateManager.rotate(-65.0F * direction * handedness, 0.0F, 1.0F, 0.0F);
+                    GlStateManager.scale(0.78F, 0.78F, 0.78F);
                     if (heldSide == EnumHandSide.RIGHT) {
                         renderPlayer.renderRightArm(clientPlayer);
                     } else {
