@@ -38,6 +38,7 @@ import net.minecraftforge.client.event.EntityViewRenderEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.client.event.RenderSpecificHandEvent;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
+import net.minecraftforge.common.ForgeHooks;
 import net.minecraftforge.event.entity.living.LivingEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;
@@ -61,6 +62,7 @@ import thaumcraft.common.entities.golems.ItemGolemPlacer;
 import thaumcraft.common.entities.golems.Marker;
 import thaumcraft.common.items.relics.ItemSanityChecker;
 import thaumcraft.common.items.relics.ItemThaumometer;
+import thaumcraft.common.items.wands.ItemWandCasting;
 import thaumcraft.common.lib.capabilities.IPlayerKnowledge;
 import thaumcraft.common.lib.capabilities.PlayerKnowledgeProvider;
 import thaumcraft.common.lib.utils.EntityUtils;
@@ -123,6 +125,93 @@ public class RenderEventHandler {
                     scannedBlocks[xx + SCAN_GRID_RADIUS][yy + SCAN_GRID_RADIUS][zz + SCAN_GRID_RADIUS] = value;
                 }
             }
+        }
+    }
+
+    @SubscribeEvent
+    public void renderActiveWandHand(RenderSpecificHandEvent event) {
+        Minecraft mc = Minecraft.getMinecraft();
+        EntityPlayerSP player = mc.player;
+        if (player == null || !player.isHandActive() || player.getItemInUseCount() <= 0
+                || player.getActiveHand() != event.getHand()) {
+            return;
+        }
+
+        ItemStack activeStack = player.getActiveItemStack();
+        ItemStack renderedStack = event.getItemStack();
+        if (activeStack.isEmpty() || renderedStack.isEmpty()
+                || !(activeStack.getItem() instanceof ItemWandCasting)
+                || !(renderedStack.getItem() instanceof ItemWandCasting)
+                || renderedStack.getItemUseAction() != EnumAction.BOW
+                || (activeStack != renderedStack
+                && !ForgeHooks.canContinueUsing(activeStack, renderedStack))) {
+            return;
+        }
+
+        EnumHandSide heldSide = event.getHand() == EnumHand.MAIN_HAND
+                ? player.getPrimaryHand() : player.getPrimaryHand().opposite();
+        renderLegacyWandFirstPerson(mc, player, renderedStack, heldSide,
+                event.getPartialTicks(), event.getEquipProgress(), event.getSwingProgress());
+        event.setCanceled(true);
+    }
+
+    /** Replays the active first-person item and bow transforms used by Minecraft 1.7.10. */
+    private static void renderLegacyWandFirstPerson(Minecraft mc, EntityPlayerSP player, ItemStack stack,
+                                                     EnumHandSide heldSide, float partialTicks,
+                                                     float equipProgress, float swingProgress) {
+        float handedness = heldSide == EnumHandSide.RIGHT ? 1.0F : -1.0F;
+        float swingSquared = MathHelper.sin(swingProgress * swingProgress * (float) Math.PI);
+        float swingRoot = MathHelper.sin(MathHelper.sqrt(swingProgress) * (float) Math.PI);
+
+        GlStateManager.pushMatrix();
+        try {
+            // Active BOW use skipped the idle swing translation, but retained these rotations.
+            GlStateManager.translate(0.56F * handedness, -0.52F - equipProgress * 0.6F, -0.72F);
+            GlStateManager.rotate(45.0F * handedness, 0.0F, 1.0F, 0.0F);
+            GlStateManager.rotate(-20.0F * swingSquared * handedness, 0.0F, 1.0F, 0.0F);
+            GlStateManager.rotate(-20.0F * swingRoot * handedness, 0.0F, 0.0F, 1.0F);
+            GlStateManager.rotate(-80.0F * swingRoot, 1.0F, 0.0F, 0.0F);
+            GlStateManager.scale(0.4F, 0.4F, 0.4F);
+
+            GlStateManager.rotate(-18.0F * handedness, 0.0F, 0.0F, 1.0F);
+            GlStateManager.rotate(-12.0F * handedness, 0.0F, 1.0F, 0.0F);
+            GlStateManager.rotate(-8.0F, 1.0F, 0.0F, 0.0F);
+            GlStateManager.translate(-0.9F * handedness, 0.2F, 0.0F);
+
+            float useTicks = (float) stack.getMaxItemUseDuration()
+                    - ((float) player.getItemInUseCount() - partialTicks + 1.0F);
+            float draw = useTicks / 20.0F;
+            draw = (draw * draw + draw * 2.0F) / 3.0F;
+            if (draw > 1.0F) {
+                draw = 1.0F;
+            }
+            if (draw > 0.1F) {
+                float wobble = MathHelper.sin((useTicks - 0.1F) * 1.3F) * 0.01F * (draw - 0.1F);
+                GlStateManager.translate(0.0F, wobble, 0.0F);
+            }
+
+            GlStateManager.translate(0.0F, 0.0F, draw * 0.1F);
+            GlStateManager.rotate(-335.0F * handedness, 0.0F, 0.0F, 1.0F);
+            GlStateManager.rotate(-50.0F * handedness, 0.0F, 1.0F, 0.0F);
+            GlStateManager.translate(0.0F, 0.5F, 0.0F);
+            GlStateManager.scale(1.0F, 1.0F, 1.0F + draw * 0.2F);
+            GlStateManager.translate(0.0F, -0.5F, 0.0F);
+            GlStateManager.rotate(50.0F * handedness, 0.0F, 1.0F, 0.0F);
+            GlStateManager.rotate(335.0F * handedness, 0.0F, 0.0F, 1.0F);
+
+            ItemWandCasting wand = (ItemWandCasting) stack.getItem();
+            if (wand.isStaff(stack)) {
+                GlStateManager.translate(0.0F, -0.5F, 0.0F);
+            }
+            // ponytail: replace this adapter only if custom active-use calibration needs exact legacy normalization.
+            GlStateManager.scale(2.0F, 2.0F, 2.0F);
+
+            ItemCameraTransforms.TransformType transformType = heldSide == EnumHandSide.RIGHT
+                    ? ItemCameraTransforms.TransformType.FIRST_PERSON_RIGHT_HAND
+                    : ItemCameraTransforms.TransformType.FIRST_PERSON_LEFT_HAND;
+            mc.getItemRenderer().renderItemSide(player, stack, transformType, heldSide == EnumHandSide.LEFT);
+        } finally {
+            GlStateManager.popMatrix();
         }
     }
 
