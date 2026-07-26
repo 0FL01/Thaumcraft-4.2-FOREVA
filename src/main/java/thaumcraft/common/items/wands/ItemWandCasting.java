@@ -659,6 +659,27 @@ public class ItemWandCasting extends Item implements IArchitect {
     }
 
     @Override
+    public boolean canContinueUsing(ItemStack oldStack, ItemStack newStack) {
+        if (oldStack == newStack) return true;
+        if (oldStack.getItem() != newStack.getItem()
+                || oldStack.getCount() != newStack.getCount()
+                || oldStack.getMetadata() != newStack.getMetadata()) {
+            return false;
+        }
+
+        NBTTagCompound oldTag = oldStack.hasTagCompound() ? oldStack.getTagCompound().copy() : new NBTTagCompound();
+        NBTTagCompound newTag = newStack.hasTagCompound() ? newStack.getTagCompound().copy() : new NBTTagCompound();
+        for (Aspect aspect : Aspect.getPrimalAspects()) {
+            String key = TAG_VIS_PREFIX + aspect.getTag();
+            oldTag.removeTag(key);
+            newTag.removeTag(key);
+        }
+
+        // ponytail: Add persistent stack identity if swapping value-identical wands must interrupt use.
+        return oldTag.equals(newTag);
+    }
+
+    @Override
     public void onPlayerStoppedUsing(ItemStack stack, World world, EntityLivingBase player, int timeLeft) {
         if (player instanceof EntityPlayer) {
             IWandable wandable = getObjectInUse(stack, world);
