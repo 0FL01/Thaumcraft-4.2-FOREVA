@@ -9,6 +9,7 @@ import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.OpenGlHelper;
+import net.minecraft.client.renderer.block.model.ItemCameraTransforms;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
@@ -162,9 +163,11 @@ public class RenderEventHandler {
                 try {
                     ItemThaumometerRenderer.applyVanillaFirstPersonTransform(heldSide,
                             event.getSwingProgress(), renderEquipProgress);
-                    mc.getItemRenderer().renderItemInFirstPerson(player, event.getPartialTicks(),
-                            event.getInterpolatedPitch(), event.getHand(), event.getSwingProgress(),
-                            event.getItemStack(), renderEquipProgress);
+                    ItemCameraTransforms.TransformType transformType = heldSide == EnumHandSide.RIGHT
+                            ? ItemCameraTransforms.TransformType.FIRST_PERSON_RIGHT_HAND
+                            : ItemCameraTransforms.TransformType.FIRST_PERSON_LEFT_HAND;
+                    mc.getItemRenderer().renderItemSide(player, event.getItemStack(), transformType,
+                            heldSide == EnumHandSide.LEFT);
                 } finally {
                     GlStateManager.popMatrix();
                 }

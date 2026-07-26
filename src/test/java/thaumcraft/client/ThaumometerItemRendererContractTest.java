@@ -136,9 +136,15 @@ public class ThaumometerItemRendererContractTest {
                 renderer.contains("applyVanillaFirstPersonTransform(EnumHandSide heldSide, float swingProgress,")
                         && renderer.contains("GlStateManager.translate(0.56F * handedness, -0.52F - equipProgress * 0.6F, -0.72F);")
                         && renderer.contains("GlStateManager.rotate(-45.0F * handedness")
-                        && eventHandler.contains("mc.getItemRenderer().renderItemInFirstPerson(player, event.getPartialTicks(),")
+                        && eventHandler.contains("ItemCameraTransforms.TransformType.FIRST_PERSON_RIGHT_HAND")
+                        && eventHandler.contains("ItemCameraTransforms.TransformType.FIRST_PERSON_LEFT_HAND")
+                        && eventHandler.contains("mc.getItemRenderer().renderItemSide(player, event.getItemStack(), transformType,")
+                        && eventHandler.contains("heldSide == EnumHandSide.LEFT")
                         && eventHandler.contains("event.setCanceled(true);")
                         && perspectiveModel.contains("return Pair.of(this, delegatePerspective.getRight());"));
+
+        assertFalse("Active scanning must not re-enter the vanilla active-use transform branch",
+                eventHandler.contains("renderItemInFirstPerson(player"));
 
         assertFalse("The scanner perspective model must not carry active-use state between event and item rendering",
                 renderer.contains("FIRST_PERSON_ITEM_TRANSFORM")
