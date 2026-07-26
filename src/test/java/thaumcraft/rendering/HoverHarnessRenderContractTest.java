@@ -69,6 +69,12 @@ public class HoverHarnessRenderContractTest {
         assertTrue(model.contains("GlStateManager.tryBlendFuncSeparate(")
                 && model.contains("GL12.GL_RESCALE_NORMAL")
                 && model.contains("} finally {"));
+        String ring = between(model, "private static void renderRing", "private static void ringVertex");
+        assertTrue(ring.contains("buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.BLOCK)"));
+        assertFalse(ring.contains("DefaultVertexFormats.ITEM"));
+        String ringVertex = between(model, "private static void ringVertex", "private void spawnLightningBolt");
+        assertTrue(ringVertex.contains(".lightmap(230, 0)"));
+        assertFalse(ringVertex.contains(".normal("));
     }
 
     @Test
@@ -90,6 +96,7 @@ public class HoverHarnessRenderContractTest {
                 && model.contains("bolt.setWidth(0.015F)")
                 && model.contains("bolt.finalizeBolt()"));
         assertTrue(bolt.contains("if (this.type == 6)")
+                && bolt.contains("renderTc4Type6Bolt(entityIn, partialTicks)")
                 && bolt.contains("minecraft.gameSettings.fancyGraphics ? 100 : 50")
                 && bolt.contains("GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA)")
                 && bolt.contains("(1.0F - boltAge) * 0.4F")
@@ -101,6 +108,9 @@ public class HoverHarnessRenderContractTest {
                 && bolt.contains("color(0.75F, 1.0F, 1.0F, alpha)"));
         String typeSix = between(bolt, "private void renderTc4Type6Bolt", "private void renderTc4Type6Pass");
         assertFalse(typeSix.contains("tessellator.draw()") || typeSix.contains("buffer.begin("));
+        assertTrue(typeSix.contains("Vec3d cameraView = camera.getLook(partialTicks)")
+                && typeSix.contains("new WRVector3(cameraView.x, cameraView.y, cameraView.z)"));
+        assertFalse(typeSix.contains("/ cosYaw") || typeSix.contains("cosSinPitch"));
         String typeSixPass = between(bolt, "private void renderTc4Type6Pass", "private static float relativeViewLength");
         assertTrue(typeSixPass.contains("buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.PARTICLE_POSITION_TEX_COLOR_LMAP)")
                 && typeSixPass.contains("tessellator.draw()"));

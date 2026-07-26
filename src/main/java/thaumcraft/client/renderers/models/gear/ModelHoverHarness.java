@@ -164,7 +164,7 @@ public class ModelHoverHarness extends ModelBiped {
         GlStateManager.scale(scale, scale, scale);
         Tessellator tessellator = Tessellator.getInstance();
         BufferBuilder buffer = tessellator.getBuffer();
-        buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.ITEM);
+        buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.BLOCK);
         ringVertex(buffer, -0.5D, 0.5D, sprite.getMinU(), sprite.getMaxV(), red, green, blue, opacity);
         ringVertex(buffer, 0.5D, 0.5D, sprite.getMaxU(), sprite.getMaxV(), red, green, blue, opacity);
         ringVertex(buffer, 0.5D, -0.5D, sprite.getMaxU(), sprite.getMinV(), red, green, blue, opacity);
@@ -175,7 +175,7 @@ public class ModelHoverHarness extends ModelBiped {
     private static void ringVertex(BufferBuilder buffer, double x, double y, double u, double v,
                                    float red, float green, float blue, float opacity) {
         buffer.pos(x, y, 0.0D).color(red, green, blue, opacity).tex(u, v).lightmap(230, 0)
-                .normal(0.0F, 0.0F, 1.0F).endVertex();
+                .endVertex();
     }
 
     private void spawnLightningBolt(EntityPlayer player, boolean sneaking) {

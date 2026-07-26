@@ -207,7 +207,7 @@ public class FXLightningBolt extends Particle {
 
         if (this.main != null && this.useCommonBoltSegments && this.boltFinalized) {
             if (this.type == 6) {
-                renderTc4Type6Bolt(partialTicks, rotationX, rotationZ, rotationYZ, rotationXZ);
+                renderTc4Type6Bolt(entityIn, partialTicks);
                 return;
             }
             renderCommonBolt(partialTicks);
@@ -241,8 +241,7 @@ public class FXLightningBolt extends Particle {
         return maxSegment;
     }
 
-    private void renderTc4Type6Bolt(float partialTicks, float cosYaw, float cosPitch,
-                                    float sinYaw, float cosSinPitch) {
+    private void renderTc4Type6Bolt(Entity camera, float partialTicks) {
         Minecraft minecraft = Minecraft.getMinecraft();
         int visibleDistance = minecraft.gameSettings.fancyGraphics ? 100 : 50;
         if (minecraft.player == null
@@ -265,10 +264,8 @@ public class FXLightningBolt extends Particle {
             GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
             float boltAge = this.main.particleAge >= 0
                     ? (float) this.main.particleAge / (float) this.main.particleMaxAge : 0.0F;
-            WRVector3 playerVector = new WRVector3(
-                    sinYaw * -cosPitch,
-                    -cosSinPitch / cosYaw,
-                    cosYaw * cosPitch);
+            Vec3d cameraView = camera.getLook(partialTicks);
+            WRVector3 playerVector = new WRVector3(cameraView.x, cameraView.y, cameraView.z);
             int travelWindow = (int) (this.main.length * 3.0F);
             int renderLength = (int) (((float) this.main.particleAge + partialTicks + travelWindow)
                     / (float) travelWindow * this.main.numsegments0);
