@@ -70,7 +70,7 @@ public class ItemThaumometerRenderer extends TileEntityItemStackRenderer {
     }
 
     public static void renderFirstPersonHands(EntityPlayerSP player, EnumHandSide heldSide,
-                                              float equipProgress) {
+                                              float swingProgress, float equipProgress) {
         if (player == null || heldSide == null || player.isInvisible()) {
             return;
         }
@@ -85,31 +85,45 @@ public class ItemThaumometerRenderer extends TileEntityItemStackRenderer {
         RenderPlayer renderPlayer = (RenderPlayer) render;
         float handedness = heldSide == EnumHandSide.RIGHT ? 1.0F : -1.0F;
         float scale = 0.8F;
+        float swingRoot = MathHelper.sin(MathHelper.sqrt(swingProgress) * (float) Math.PI);
+        float swingLinear = MathHelper.sin(swingProgress * (float) Math.PI);
+        float swingSquared = MathHelper.sin(swingProgress * swingProgress * (float) Math.PI);
 
         mc.getTextureManager().bindTexture(clientPlayer.getLocationSkin());
         GlStateManager.pushMatrix();
         try {
             GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+            // Forge 1.7 invoked EQUIPPED_FIRST_PERSON after this vanilla item transform.
+            GlStateManager.translate(-swingRoot * 0.4F * handedness,
+                    MathHelper.sin(MathHelper.sqrt(swingProgress) * (float) Math.PI * 2.0F) * 0.2F,
+                    -swingLinear * 0.2F);
+            GlStateManager.translate(0.7F * scale * handedness,
+                    -0.65F * scale - equipProgress * 0.6F, -0.9F * scale);
+            GlStateManager.rotate(45.0F * handedness, 0.0F, 1.0F, 0.0F);
+            GlStateManager.rotate(-swingSquared * 20.0F * handedness, 0.0F, 1.0F, 0.0F);
+            GlStateManager.rotate(-swingRoot * 20.0F * handedness, 0.0F, 0.0F, 1.0F);
+            GlStateManager.rotate(-swingRoot * 80.0F, 1.0F, 0.0F, 0.0F);
+            GlStateManager.scale(0.4F, 0.4F, 0.4F);
+
             GlStateManager.translate(handedness, 0.75F, -1.0F);
-            GlStateManager.rotate(135.0F * handedness, 0.0F, -1.0F, 0.0F);
+            GlStateManager.rotate(-135.0F * handedness, 0.0F, 1.0F, 0.0F);
             GlStateManager.translate(-0.7F * scale * handedness,
                     0.65F * scale + equipProgress * 1.5F, 0.9F * scale);
-            GlStateManager.rotate(90.0F, 0.0F, 1.0F, 0.0F);
+            GlStateManager.rotate(90.0F * handedness, 0.0F, 1.0F, 0.0F);
             GlStateManager.translate(0.0F, 0.0F, -0.9F * scale);
-            GlStateManager.rotate(90.0F, 0.0F, 1.0F, 0.0F);
+            GlStateManager.rotate(90.0F * handedness, 0.0F, 1.0F, 0.0F);
             GlStateManager.scale(5.0F, 5.0F, 5.0F);
 
             for (int armIndex = 0; armIndex < 2; armIndex++) {
                 int direction = armIndex * 2 - 1;
-                float armHandedness = heldSide == EnumHandSide.RIGHT ? direction : -direction;
                 GlStateManager.pushMatrix();
                 try {
-                    GlStateManager.translate(0.0F, -0.6F, 1.1F * armHandedness);
-                    GlStateManager.rotate(-45.0F * armHandedness, 1.0F, 0.0F, 0.0F);
-                    GlStateManager.rotate(-90.0F, 0.0F, 0.0F, 1.0F);
-                    GlStateManager.rotate(59.0F, 0.0F, 0.0F, 1.0F);
-                    GlStateManager.rotate(-65.0F * armHandedness, 0.0F, 1.0F, 0.0F);
-                    if (armHandedness > 0.0F) {
+                    GlStateManager.translate(0.0F, -0.6F, 1.1F * direction);
+                    GlStateManager.rotate(-45.0F * direction, 1.0F, 0.0F, 0.0F);
+                    GlStateManager.rotate(-90.0F * handedness, 0.0F, 0.0F, 1.0F);
+                    GlStateManager.rotate(59.0F * handedness, 0.0F, 0.0F, 1.0F);
+                    GlStateManager.rotate(-65.0F * direction * handedness, 0.0F, 1.0F, 0.0F);
+                    if (heldSide == EnumHandSide.RIGHT) {
                         renderPlayer.renderRightArm(clientPlayer);
                     } else {
                         renderPlayer.renderLeftArm(clientPlayer);

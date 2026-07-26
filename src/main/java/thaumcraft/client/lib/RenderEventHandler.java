@@ -149,7 +149,8 @@ public class RenderEventHandler {
         if (event.getHand() == thaumometerHand) {
             EnumHandSide heldSide = thaumometerHand == EnumHand.MAIN_HAND
                     ? player.getPrimaryHand() : player.getPrimaryHand().opposite();
-            ItemThaumometerRenderer.renderFirstPersonHands(player, heldSide, event.getEquipProgress());
+            ItemThaumometerRenderer.renderFirstPersonHands(player, heldSide,
+                    event.getSwingProgress(), event.getEquipProgress());
             return;
         }
 

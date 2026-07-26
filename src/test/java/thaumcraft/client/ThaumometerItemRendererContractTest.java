@@ -105,7 +105,7 @@ public class ThaumometerItemRendererContractTest {
                         && eventHandler.contains("if (!otherStack.isEmpty()) {")
                         && eventHandler.contains("if (event.getHand() == thaumometerHand) {")
                         && eventHandler.contains("player.getPrimaryHand().opposite()")
-                        && eventHandler.contains("ItemThaumometerRenderer.renderFirstPersonHands(player, heldSide, event.getEquipProgress());"));
+                        && eventHandler.contains("event.getSwingProgress(), event.getEquipProgress());"));
 
         assertTrue("An offhand thaumometer should suppress only the extra empty main-hand arm",
                 eventHandler.contains("thaumometerHand == EnumHand.OFF_HAND")
@@ -113,9 +113,15 @@ public class ThaumometerItemRendererContractTest {
                         && eventHandler.contains("event.getItemStack().isEmpty()")
                         && eventHandler.contains("event.setCanceled(true);"));
 
-        assertTrue("The arm-only renderer should use both physical player arms and the event equip offset",
+        assertTrue("The arm-only renderer should restore the 1.7 incoming item transform and render both TC4 pose instances with the held-side arm model",
                 renderer.contains("renderFirstPersonHands(EntityPlayerSP player, EnumHandSide heldSide,")
+                        && renderer.contains("float swingProgress, float equipProgress)")
+                        && renderer.contains("-0.65F * scale - equipProgress * 0.6F")
+                        && renderer.contains("GlStateManager.rotate(45.0F * handedness")
+                        && renderer.contains("GlStateManager.scale(0.4F, 0.4F, 0.4F);")
                         && renderer.contains("0.65F * scale + equipProgress * 1.5F")
+                        && renderer.contains("for (int armIndex = 0; armIndex < 2; armIndex++)")
+                        && renderer.contains("if (heldSide == EnumHandSide.RIGHT)")
                         && renderer.contains("renderPlayer.renderRightArm(clientPlayer);")
                         && renderer.contains("renderPlayer.renderLeftArm(clientPlayer);"));
 
