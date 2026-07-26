@@ -52,6 +52,7 @@ import thaumcraft.api.aspects.AspectList;
 import thaumcraft.api.aspects.IAspectContainer;
 import thaumcraft.api.nodes.INode;
 import thaumcraft.api.research.ScanResult;
+import thaumcraft.client.renderers.item.FirstPersonWandTipOrigin;
 import thaumcraft.client.renderers.item.ItemThaumometerRenderer;
 import thaumcraft.client.renderers.tile.HoleRenderBatchCache;
 import thaumcraft.common.entities.monster.mods.ChampionModifier;
@@ -429,6 +430,7 @@ public class RenderEventHandler {
 
     @SubscribeEvent
     public void renderLast(RenderWorldLastEvent event) {
+        FirstPersonWandTipOrigin.nextWorldFrame();
         Minecraft mc = Minecraft.getMinecraft();
         EntityPlayer player = mc.player;
         if (player == null) {

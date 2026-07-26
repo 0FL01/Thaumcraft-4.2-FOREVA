@@ -13,6 +13,7 @@ import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.MathHelper;
 import org.lwjgl.opengl.GL11;
 import thaumcraft.api.wands.ItemFocusBasic;
@@ -22,6 +23,8 @@ import java.awt.Color;
 import java.util.Calendar;
 
 public class ModelWand extends ModelBase {
+
+    private static final double CAP_FACE_Y = -0.0625D;
 
     private static final ResourceLocation WAND_TEXTURE =
             new ResourceLocation("thaumcraft", "textures/models/wand.png");
@@ -54,6 +57,14 @@ public class ModelWand extends ModelBase {
         focus = new ModelRenderer(this, 0, 0);
         focus.addBox(-3.0F, -6.0F, -3.0F, 6, 6, 6);
         focus.setRotationPoint(0.0F, 0.0F, 0.0F);
+    }
+
+    /** Center of the outward face of the primary top cap in this model's local coordinates. */
+    public static Vec3d getPrimaryCapTip(boolean staff, boolean sceptre) {
+        double rootY = staff ? 0.2D : 0.0D;
+        double capScaleY = staff ? 1.1D : 1.0D;
+        double sceptreScale = sceptre ? 1.3D : 1.0D;
+        return new Vec3d(0.0D, rootY + CAP_FACE_Y * capScaleY * sceptreScale, 0.0D);
     }
 
     public void render(ItemStack wandStack, float partialTicks, EntityPlayer player) {

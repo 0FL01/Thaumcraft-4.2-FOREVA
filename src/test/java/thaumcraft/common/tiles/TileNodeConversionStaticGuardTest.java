@@ -154,7 +154,10 @@ public class TileNodeConversionStaticGuardTest {
         assertTrue(renderer.contains("if (!(node.drainEntity instanceof EntityPlayer) || node.drainCollision == null)"));
         assertTrue(renderer.contains("EntityPlayer player = (EntityPlayer) node.drainEntity;"));
         assertTrue(renderer.contains("float beamAge = node.drainBeamAge + partialTicks;"));
-        assertTrue(renderer.contains("Vec3d source = WandEffectOrigin.resolve("));
+        assertTrue(renderer.contains("boolean localFirstPerson = player == mc.player"));
+        assertTrue(renderer.contains("FirstPersonWandTipOrigin.resolveAndRequest("));
+        assertTrue(renderer.contains("if (source == null)"));
+        assertTrue(renderer.contains("source = WandEffectOrigin.resolve("));
         assertTrue(renderer.contains("player, partialTicks, WandEffectOrigin.sourceYOffset(player));"));
         assertTrue(renderer.contains("double sourceWorldX = source.x;"));
         assertTrue(renderer.contains("double sourceWorldY = source.y;"));
@@ -163,9 +166,14 @@ public class TileNodeConversionStaticGuardTest {
         assertFalse(renderer.contains("offset.rotatePitch(") || renderer.contains("offset.rotateYaw(")
                 || renderer.contains("float wobble ="));
         assertTrue(renderer.contains("node.color == null ? node.drainColor : node.color.getRGB()"));
+        assertTrue(renderer.contains("float reveal = Math.min(beamAge, 10.0F) / 10.0F;"));
         assertTrue(renderer.contains("UtilsFX.drawFloatyLine(sourceWorldX, sourceWorldY, sourceWorldZ,"));
         assertTrue(renderer.contains("targetWorldX, targetWorldY, targetWorldZ,"));
-        assertTrue(renderer.contains("partialTicks, color, \"textures/misc/wispy.png\", -0.02F, Math.min(beamAge, 10.0F) / 10.0F)"));
+        assertTrue(renderer.contains("partialTicks, color, \"textures/misc/wispy.png\", -0.02F, reveal)"));
+        assertTrue(renderer.contains("if (reveal >= 1.0F && lineLength > 0.0F)"));
+        assertTrue(renderer.contains("drawDrainContact(deltaX, deltaY, deltaZ, color);"));
+        assertTrue(renderer.contains("GlStateManager.disableTexture2D();"));
+        assertTrue(renderer.contains("DefaultVertexFormats.POSITION_COLOR"));
 
         assertTrue(utils.contains("public static void drawFloatyLine(double x, double y, double z, double x2, double y2, double z2,"));
         assertTrue(utils.contains("drawFloatyLine(x, y, z, x2, y2, z2, partialTicks, color, texture, speed, distance, 0.15F);"));

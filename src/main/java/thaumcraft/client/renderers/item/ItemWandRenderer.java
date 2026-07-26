@@ -98,6 +98,10 @@ public class ItemWandRenderer extends TileEntityItemStackRenderer {
                 applyUseAnimation(wand, stack, player, partialTicks, transformType);
             }
             applyModelBasisCorrection(t);
+            if (isFirstPerson(transformType) && isRenderedActiveHand(player, stack, transformType)) {
+                FirstPersonWandTipOrigin.capture(player, stack, transformType,
+                        ModelWand.getPrimaryCapTip(wand.isStaff(stack), ItemWandCasting.isSceptre(stack)));
+            }
             model.render(stack, partialTicks, player);
         } finally {
             GlStateManager.disableBlend();
