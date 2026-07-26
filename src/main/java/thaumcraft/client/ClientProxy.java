@@ -1271,7 +1271,7 @@ public class ClientProxy extends CommonProxy {
             return;
         }
         String text = localizeOrFallback("tc.addaspectdiscovery", "You have discovered %n!")
-                .replace("%n", formatThaumometerAspectLabel(aspect));
+                .replace("%n", aspect.getName());
         PlayerNotifications.addNotification("\u00a76" + text, aspect);
     }
 
@@ -1282,7 +1282,7 @@ public class ClientProxy extends CommonProxy {
         }
         String text = localizeOrFallback("tc.addaspectpool", "Gained %s research point(s) for %n")
                 .replace("%s", Integer.toString(amount))
-                .replace("%n", formatThaumometerAspectLabel(aspect));
+                .replace("%n", aspect.getName());
         PlayerNotifications.addNotification(text, aspect);
         for (int a = 0; a < amount; ++a) {
             PlayerNotifications.addAspectNotification(aspect);
@@ -1292,10 +1292,6 @@ public class ClientProxy extends CommonProxy {
     private static String localizeOrFallback(String key, String fallback) {
         String localized = I18n.translateToLocal(key);
         return key.equals(localized) ? fallback : localized;
-    }
-
-    private static String formatThaumometerAspectLabel(Aspect aspect) {
-        return aspect.getName() + " (" + formatThaumometerAspectDescription(aspect) + ")";
     }
 
     private static String formatThaumometerAspectDescription(Aspect aspect) {

@@ -21,7 +21,7 @@ public class ScanManagerThaumometerNotificationStaticGuardTest {
         assertTrue(item.contains("ScanManager.notifyInvalidScan(ScanManager.getScanAspects(current, world), player);"));
         assertTrue(clientProxy.contains("localizeOrFallback(\"tc.discoveryerror\", \"To understand this you need to study %1$s.\")"));
         assertTrue(clientProxy.contains("localizeOrFallback(\"tc.unknownobject\", \"Nothing can be learned from this.\")"));
-        assertTrue(clientProxy.contains("formatThaumometerAspectLabel(aspect)"));
+        assertTrue(clientProxy.contains(".replace(\"%n\", aspect.getName())"));
         assertTrue(clientProxy.contains("aspect.getLocalizedDescription()"));
         assertTrue(clientProxy.contains("tc.aspect.help."));
     }

@@ -60,7 +60,8 @@ public class PlayerDataPacketClientBoundaryStaticGuardTest {
         assertTrue(clientProxy.contains("localizeOrFallback(\"tc.addaspectpool\", \"Gained %s research point(s) for %n\")"));
         assertTrue(clientProxy.contains("localizeOrFallback(\"tc.discoveryerror\", \"To understand this you need to study %1$s.\")"));
         assertTrue(clientProxy.contains("localizeOrFallback(\"tc.unknownobject\", \"Nothing can be learned from this.\")"));
-        assertTrue(clientProxy.contains("formatThaumometerAspectLabel(aspect)"));
+        assertTrue(clientProxy.contains(".replace(\"%n\", aspect.getName())"));
+        assertFalse(clientProxy.contains("formatThaumometerAspectLabel"));
         assertTrue(clientProxy.contains("formatThaumometerAspectDescription(missingAspect)"));
         assertTrue(clientProxy.contains("String localized = I18n.translateToLocal(key);"));
         assertFalse(clientProxy.contains("String localized = net.minecraft.client.resources.I18n.format(key);"));
