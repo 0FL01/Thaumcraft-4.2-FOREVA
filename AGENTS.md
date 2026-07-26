@@ -127,6 +127,8 @@ Use the passthrough only when a dedicated shortcut above does not exist or when 
 
 ## Runtime smoke validation
 
+CFR located here: `/usr/local/bin/cfr`
+
 Compile success is not enough for parity or checkpoint completion.
 
 Run runtime smoke validation whenever a change can affect mod loading, registries, config, items, blocks, materials, recipes, entities, dimensions, networking, proxies, GUI registration, renderers, models, assets, or lifecycle handlers.
