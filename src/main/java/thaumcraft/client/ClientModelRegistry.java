@@ -51,6 +51,8 @@ public final class ClientModelRegistry {
             new ResourceLocation("thaumcraft", "blocks/fluxgoo");
     static final ResourceLocation ADVANCED_FURNACE_METALBASE_SPRITE =
             new ResourceLocation("thaumcraft", "blocks/metalbase");
+    public static final ResourceLocation LIGHTNING_RING_SPRITE =
+            new ResourceLocation("thaumcraft", "items/lightningring");
     private static final ResourceLocation FROST_SHARD_OBJ =
             new ResourceLocation("thaumcraft", "textures/models/orb.obj");
     private static IBakedModel frostShardModel;
@@ -75,6 +77,7 @@ public final class ClientModelRegistry {
         event.getMap().registerSprite(PIPE_VALVE_SPRITE);
         event.getMap().registerSprite(ADVANCED_FURNACE_FLUXGOO_SPRITE);
         event.getMap().registerSprite(ADVANCED_FURNACE_METALBASE_SPRITE);
+        event.getMap().registerSprite(LIGHTNING_RING_SPRITE);
         event.getMap().registerSprite(new ResourceLocation("thaumcraft", "blocks/al_furnace_top_filled"));
         event.getMap().registerSprite(new ResourceLocation("thaumcraft", "blocks/al_furnace_front_on"));
         event.getMap().registerSprite(new ResourceLocation("thaumcraft", "blocks/lamp_grow_top_off"));

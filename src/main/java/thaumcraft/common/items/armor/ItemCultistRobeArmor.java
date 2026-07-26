@@ -82,7 +82,7 @@ public class ItemCultistRobeArmor extends ItemArmor implements IRepairable, IRun
         if (this.model2 == null) {
             this.model2 = new ModelRobe(0.5f);
         }
-        this.model = armorSlot == EntityEquipmentSlot.LEGS ? this.model2 : this.model1;
+        this.model = armorSlot == EntityEquipmentSlot.CHEST || armorSlot == EntityEquipmentSlot.FEET ? this.model1 : this.model2;
         if (this.model != null) {
             this.model.bipedHead.showModel = armorSlot == EntityEquipmentSlot.HEAD;
             this.model.bipedHeadwear.showModel = armorSlot == EntityEquipmentSlot.HEAD;

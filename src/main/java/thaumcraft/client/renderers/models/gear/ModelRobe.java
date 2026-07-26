@@ -412,7 +412,7 @@ extends ModelBiped {
         this.ClothBackR3.rotateAngleX = this.ClothBackL3.rotateAngleX = -c + 0.2268928f;
         this.ClothBackL2.rotateAngleX = this.ClothBackL3.rotateAngleX;
         this.ClothBackR2.rotateAngleX = this.ClothBackL3.rotateAngleX;
-        if (this.isSneak) {
+        if (this.isChild) {
             float f6 = 2.0f;
             GlStateManager.pushMatrix();
             GlStateManager.scale(1.5f / f6, 1.5f / f6, 1.5f / f6);
@@ -431,6 +431,10 @@ extends ModelBiped {
             GlStateManager.popMatrix();
         } else {
             GlStateManager.pushMatrix();
+            if (this.isSneak) {
+                GlStateManager.translate(0.0f, 0.2f, 0.0f);
+            }
+            GlStateManager.pushMatrix();
             GlStateManager.scale(1.01f, 1.01f, 1.01f);
             this.bipedHead.render(f5);
             GlStateManager.popMatrix();
@@ -440,6 +444,7 @@ extends ModelBiped {
             this.bipedRightLeg.render(f5);
             this.bipedLeftLeg.render(f5);
             this.bipedHeadwear.render(f5);
+            GlStateManager.popMatrix();
         }
     }
 

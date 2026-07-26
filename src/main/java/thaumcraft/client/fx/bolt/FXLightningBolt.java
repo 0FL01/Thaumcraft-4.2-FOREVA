@@ -18,6 +18,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import thaumcraft.client.fx.ParticleEngine;
 import thaumcraft.client.fx.WRVector3;
 import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL14;
 
 @SideOnly(Side.CLIENT)
 public class FXLightningBolt extends Particle {
@@ -205,6 +206,10 @@ public class FXLightningBolt extends Particle {
         float alphaMain = Math.max(0.05F, (1.0F - ageNorm) * 0.5F);
 
         if (this.main != null && this.useCommonBoltSegments && this.boltFinalized) {
+            if (this.type == 6) {
+                renderTc4Type6Bolt(partialTicks, rotationX, rotationZ, rotationYZ, rotationXZ);
+                return;
+            }
             renderCommonBolt(partialTicks);
             return;
         }
@@ -234,6 +239,113 @@ public class FXLightningBolt extends Particle {
             return 0;
         }
         return maxSegment;
+    }
+
+    private void renderTc4Type6Bolt(float partialTicks, float cosYaw, float cosPitch,
+                                    float sinYaw, float cosSinPitch) {
+        Minecraft minecraft = Minecraft.getMinecraft();
+        int visibleDistance = minecraft.gameSettings.fancyGraphics ? 100 : 50;
+        if (minecraft.player == null
+                || minecraft.player.getDistance(this.posX, this.posY, this.posZ) > visibleDistance) {
+            return;
+        }
+
+        Tessellator tessellator = Tessellator.getInstance();
+        BufferBuilder buffer = tessellator.getBuffer();
+        tessellator.draw();
+        boolean blendEnabled = GL11.glIsEnabled(GL11.GL_BLEND);
+        boolean depthMask = GL11.glGetBoolean(GL11.GL_DEPTH_WRITEMASK);
+        int blendSrcRgb = GL11.glGetInteger(GL14.GL_BLEND_SRC_RGB);
+        int blendDstRgb = GL11.glGetInteger(GL14.GL_BLEND_DST_RGB);
+        int blendSrcAlpha = GL11.glGetInteger(GL14.GL_BLEND_SRC_ALPHA);
+        int blendDstAlpha = GL11.glGetInteger(GL14.GL_BLEND_DST_ALPHA);
+        int boundTexture = GL11.glGetInteger(GL11.GL_TEXTURE_BINDING_2D);
+
+        GlStateManager.pushMatrix();
+        try {
+            GlStateManager.depthMask(false);
+            GlStateManager.enableBlend();
+            GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+            float boltAge = this.main.particleAge >= 0
+                    ? (float) this.main.particleAge / (float) this.main.particleMaxAge : 0.0F;
+            WRVector3 playerVector = new WRVector3(
+                    sinYaw * -cosPitch,
+                    -cosSinPitch / cosYaw,
+                    cosYaw * cosPitch);
+            int travelWindow = (int) (this.main.length * 3.0F);
+            int renderLength = (int) (((float) this.main.particleAge + partialTicks + travelWindow)
+                    / (float) travelWindow * this.main.numsegments0);
+            renderTc4Type6Pass(LARGE, playerVector, renderLength, (1.0F - boltAge) * 0.4F);
+            renderTc4Type6Pass(SMALL, playerVector, renderLength, 1.0F - boltAge * 0.5F);
+        } finally {
+            GlStateManager.tryBlendFuncSeparate(blendSrcRgb, blendDstRgb, blendSrcAlpha, blendDstAlpha);
+            if (blendEnabled) {
+                GlStateManager.enableBlend();
+            } else {
+                GlStateManager.disableBlend();
+            }
+            GlStateManager.depthMask(depthMask);
+            GlStateManager.popMatrix();
+            GlStateManager.bindTexture(boundTexture);
+            buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.PARTICLE_POSITION_TEX_COLOR_LMAP);
+        }
+    }
+
+    private void renderTc4Type6Pass(ResourceLocation texture, WRVector3 playerVector,
+                                    int renderLength, float alpha) {
+        Tessellator tessellator = Tessellator.getInstance();
+        BufferBuilder buffer = tessellator.getBuffer();
+        Minecraft.getMinecraft().getTextureManager().bindTexture(texture);
+        buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.PARTICLE_POSITION_TEX_COLOR_LMAP);
+        for (FXLightningBoltCommon.Segment segment : this.main.segments) {
+            if (segment.segmentno > renderLength) {
+                continue;
+            }
+            float segmentWidth = this.width * (relativeViewLength(segment.startpoint.point) / 5.0F + 1.0F)
+                    * (1.0F + segment.light) * 0.5F;
+            WRVector3 startOffset = WRVector3.crossProduct(playerVector, segment.prevdiff)
+                    .scale(segmentWidth / segment.sinprev);
+            WRVector3 endOffset = WRVector3.crossProduct(playerVector, segment.nextdiff)
+                    .scale(segmentWidth / segment.sinnext);
+            WRVector3 start = segment.startpoint.point;
+            WRVector3 end = segment.endpoint.point;
+            float segmentAlpha = alpha * segment.light;
+
+            addTc4BoltVertex(buffer, end.copy().sub(endOffset), 0.5D, 0.0D, segmentAlpha);
+            addTc4BoltVertex(buffer, start.copy().sub(startOffset), 0.5D, 0.0D, segmentAlpha);
+            addTc4BoltVertex(buffer, start.copy().add(startOffset), 0.5D, 1.0D, segmentAlpha);
+            addTc4BoltVertex(buffer, end.copy().add(endOffset), 0.5D, 1.0D, segmentAlpha);
+
+            if (segment.next == null) {
+                WRVector3 roundEnd = end.copy().add(segment.diff.copy().normalize().scale(segmentWidth));
+                addTc4BoltVertex(buffer, roundEnd.copy().sub(endOffset), 0.0D, 0.0D, segmentAlpha);
+                addTc4BoltVertex(buffer, end.copy().sub(endOffset), 0.5D, 0.0D, segmentAlpha);
+                addTc4BoltVertex(buffer, end.copy().add(endOffset), 0.5D, 1.0D, segmentAlpha);
+                addTc4BoltVertex(buffer, roundEnd.copy().add(endOffset), 0.0D, 1.0D, segmentAlpha);
+            }
+            if (segment.prev == null) {
+                WRVector3 roundStart = start.copy().sub(segment.diff.copy().normalize().scale(segmentWidth));
+                addTc4BoltVertex(buffer, start.copy().sub(startOffset), 0.5D, 0.0D, segmentAlpha);
+                addTc4BoltVertex(buffer, roundStart.copy().sub(startOffset), 0.0D, 0.0D, segmentAlpha);
+                addTc4BoltVertex(buffer, roundStart.copy().add(startOffset), 0.0D, 1.0D, segmentAlpha);
+                addTc4BoltVertex(buffer, start.copy().add(startOffset), 0.5D, 1.0D, segmentAlpha);
+            }
+        }
+        tessellator.draw();
+    }
+
+    private static float relativeViewLength(WRVector3 point) {
+        Entity player = Minecraft.getMinecraft().player;
+        return new WRVector3(player.posX - point.x, player.posY - point.y, player.posZ - point.z).length();
+    }
+
+    private static void addTc4BoltVertex(BufferBuilder buffer, WRVector3 point, double u, double v,
+                                         float alpha) {
+        buffer.pos(point.x - Particle.interpPosX, point.y - Particle.interpPosY, point.z - Particle.interpPosZ)
+                .tex(u, v)
+                .color(0.75F, 1.0F, 1.0F, alpha)
+                .lightmap(240, 240)
+                .endVertex();
     }
 
     private int typeSalt() {
