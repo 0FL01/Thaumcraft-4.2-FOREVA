@@ -19,6 +19,7 @@ import net.minecraft.entity.ai.attributes.IAttributeInstance;
 import net.minecraft.entity.monster.EntityMob;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
+import net.minecraft.item.EnumAction;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemDye;
 import net.minecraft.item.ItemStack;
@@ -149,6 +150,12 @@ public class RenderEventHandler {
         if (event.getHand() == thaumometerHand) {
             EnumHandSide heldSide = thaumometerHand == EnumHand.MAIN_HAND
                     ? player.getPrimaryHand() : player.getPrimaryHand().opposite();
+            boolean vanillaSkipsItemTransform = player.isHandActive()
+                    && player.getItemInUseCount() > 0
+                    && player.getActiveHand() == thaumometerHand
+                    && event.getItemStack().getItemUseAction() == EnumAction.NONE;
+            ItemThaumometerRenderer.prepareFirstPersonItemTransform(heldSide,
+                    event.getSwingProgress(), event.getEquipProgress(), vanillaSkipsItemTransform);
             ItemThaumometerRenderer.renderFirstPersonHands(player, heldSide,
                     event.getSwingProgress(), event.getEquipProgress());
             return;

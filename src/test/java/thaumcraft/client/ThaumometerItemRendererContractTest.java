@@ -98,6 +98,7 @@ public class ThaumometerItemRendererContractTest {
     public void thaumometerShouldRenderTc4HandsWithoutReplacingTheScannerRoute() throws IOException {
         String eventHandler = read("src/main/java/thaumcraft/client/lib/RenderEventHandler.java");
         String renderer = read("src/main/java/thaumcraft/client/renderers/item/ItemThaumometerRenderer.java");
+        String perspectiveModel = read("src/main/java/thaumcraft/client/renderers/item/ThaumometerPerspectiveModel.java");
 
         assertTrue("The specific-hand event should add the two-hand pose only when the other hand is empty",
                 eventHandler.contains("renderThaumometerHands(RenderSpecificHandEvent event)")
@@ -105,6 +106,9 @@ public class ThaumometerItemRendererContractTest {
                         && eventHandler.contains("if (!otherStack.isEmpty()) {")
                         && eventHandler.contains("if (event.getHand() == thaumometerHand) {")
                         && eventHandler.contains("player.getPrimaryHand().opposite()")
+                        && eventHandler.contains("vanillaSkipsItemTransform")
+                        && eventHandler.contains("event.getItemStack().getItemUseAction() == EnumAction.NONE")
+                        && eventHandler.contains("prepareFirstPersonItemTransform(heldSide,")
                         && eventHandler.contains("event.getSwingProgress(), event.getEquipProgress());"));
 
         assertTrue("An offhand thaumometer should suppress only the extra empty main-hand arm",
@@ -123,10 +127,17 @@ public class ThaumometerItemRendererContractTest {
                         && renderer.contains("for (int armIndex = 0; armIndex < 2; armIndex++)")
                         && renderer.contains("GlStateManager.translate(-0.3F * handedness, -0.47F, -0.85F);")
                         && renderer.contains("GlStateManager.translate(0.0F, -0.6F, 1.15F * direction);")
-                        && renderer.contains("GlStateManager.scale(0.78F, 0.78F, 0.78F);")
+                        && renderer.contains("GlStateManager.scale(0.92F, 0.92F, 0.92F);")
                         && renderer.contains("if (heldSide == EnumHandSide.RIGHT)")
                         && renderer.contains("renderPlayer.renderRightArm(clientPlayer);")
                         && renderer.contains("renderPlayer.renderLeftArm(clientPlayer);"));
+
+        assertTrue("Active EnumAction.NONE scanning should restore the skipped vanilla hand matrix before the donor perspective matrix",
+                renderer.contains("createVanillaFirstPersonTransform(swingProgress, equipProgress)")
+                        && renderer.contains("appendTranslation(matrix, 0.56F * handedness, -0.52F - equipProgress * 0.6F, -0.72F);")
+                        && renderer.contains("appendRotation(matrix, -45.0F * handedness")
+                        && perspectiveModel.contains("consumeFirstPersonItemTransform(cameraTransformType)")
+                        && perspectiveModel.contains("activeUseTransform.mul(delegatePerspective.getRight());"));
 
         assertFalse("The hand event must not replace or duplicate the existing scanner renderer",
                 eventHandler.contains("renderByItem(") || eventHandler.contains("renderScanner("));
