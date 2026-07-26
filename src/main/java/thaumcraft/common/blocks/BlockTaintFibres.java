@@ -165,9 +165,17 @@ public class BlockTaintFibres extends Block {
 
     @Override
     public void neighborChanged(IBlockState state, World world, BlockPos pos, Block blockIn, BlockPos fromPos) {
-        if (!world.isRemote && (!isTaintBiome(world, pos) || !BlockUtils.isAdjacentToSolidBlock(world, pos))) {
+        if (!world.isRemote && (!isTaintBiome(world, pos) || !hasSupport(state, world, pos))) {
             world.setBlockToAir(pos);
         }
+    }
+
+    private static boolean hasSupport(IBlockState state, World world, BlockPos pos) {
+        if (state.getValue(TYPE) == 0) {
+            return BlockUtils.isAdjacentToSolidBlock(world, pos);
+        }
+        BlockPos supportPos = pos.down();
+        return world.getBlockState(supportPos).isSideSolid(world, supportPos, EnumFacing.UP);
     }
 
     @Override

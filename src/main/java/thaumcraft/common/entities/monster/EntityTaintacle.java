@@ -10,6 +10,7 @@ import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.monster.EntityMob;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.DamageSource;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.SoundEvent;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
@@ -209,8 +210,11 @@ public class EntityTaintacle extends EntityMob implements ITaintedMob {
             && this.world.isAirBlock(pos)
             && BlockUtils.isAdjacentToSolidBlock(this.world, pos)) {
             Utils.setBiomeAt(this.world, x, z, ThaumcraftWorldGenerator.biomeTaint);
+            BlockPos supportPos = pos.down();
+            boolean upright = this.world.rand.nextInt(4) == 0
+                && this.world.getBlockState(supportPos).isSideSolid(this.world, supportPos, EnumFacing.UP);
             this.world.setBlockState(pos, ConfigBlocks.blockTaintFibres.getDefaultState()
-                .withProperty(BlockTaintFibres.TYPE, this.world.rand.nextInt(4) == 0 ? 1 : 0), 3);
+                .withProperty(BlockTaintFibres.TYPE, upright ? 1 : 0), 3);
         }
     }
 

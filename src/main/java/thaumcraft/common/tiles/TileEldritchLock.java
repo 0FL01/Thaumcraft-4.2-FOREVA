@@ -5,6 +5,7 @@ import net.minecraft.entity.EntityCreature;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ITickable;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.AxisAlignedBB;
@@ -262,7 +263,10 @@ public class TileEldritchLock extends TileThaumcraft implements ITickable {
                     if (this.world.isAirBlock(fibre)
                             && BlockUtils.isAdjacentToSolidBlock(this.world, fibre)
                             && this.world.rand.nextInt(3) != 0) {
-                        setBlock(fibre, ConfigBlocks.blockTaintFibres, this.world.rand.nextInt(4) == 0 ? 1 : 0);
+                        BlockPos supportPos = fibre.down();
+                        boolean upright = this.world.rand.nextInt(4) == 0
+                                && this.world.getBlockState(supportPos).isSideSolid(this.world, supportPos, EnumFacing.UP);
+                        setBlock(fibre, ConfigBlocks.blockTaintFibres, upright ? 1 : 0);
                     }
                 }
                 if (this.world.rand.nextFloat() < 0.15F) {

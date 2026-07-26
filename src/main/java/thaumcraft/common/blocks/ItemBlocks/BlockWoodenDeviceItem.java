@@ -35,11 +35,14 @@ public class BlockWoodenDeviceItem extends BlockMetadataItem {
     @Override
     public boolean placeBlockAt(ItemStack stack, EntityPlayer player, World world, BlockPos pos, EnumFacing side,
                                 float hitX, float hitY, float hitZ, IBlockState newState) {
+        int metadata = newState.getValue(BlockWoodenDevice.TYPE);
+        if ((metadata == 2 || metadata == 3) && !hasSolidSupport(world, pos)) {
+            return false;
+        }
         boolean placed = super.placeBlockAt(stack, player, world, pos, side, hitX, hitY, hitZ, newState);
         if (!placed) return false;
 
         TileEntity tile = world.getTileEntity(pos);
-        int metadata = stack.getItemDamage();
         if (metadata == 0 && tile instanceof TileBellows) {
             EnumFacing out = side.getOpposite();
             TileBellows bellows = (TileBellows) tile;
@@ -95,7 +98,17 @@ public class BlockWoodenDeviceItem extends BlockMetadataItem {
 
     @Override
     public boolean canPlaceBlockOnSide(World world, BlockPos pos, EnumFacing side, EntityPlayer player, ItemStack stack) {
-        if (stack.getItemDamage() == 5) {
+        int metadata = stack.getItemDamage();
+        if (metadata == 2 || metadata == 3) {
+            Block clickedBlock = world.getBlockState(pos).getBlock();
+            BlockPos placementPos = pos;
+            if (!clickedBlock.isReplaceable(world, pos)) {
+                placementPos = pos.offset(side);
+            }
+            if (!hasSolidSupport(world, placementPos)) {
+                return false;
+            }
+        } else if (metadata == 5) {
             IBlockState support = world.getBlockState(pos);
             if ((side != EnumFacing.UP && side != EnumFacing.DOWN)
                     || support.getBlock() != ConfigBlocks.blockWoodenDevice
@@ -104,5 +117,10 @@ public class BlockWoodenDeviceItem extends BlockMetadataItem {
             }
         }
         return super.canPlaceBlockOnSide(world, pos, side, player, stack);
+    }
+
+    private static boolean hasSolidSupport(World world, BlockPos pos) {
+        BlockPos supportPos = pos.down();
+        return world.getBlockState(supportPos).isSideSolid(world, supportPos, EnumFacing.UP);
     }
 }

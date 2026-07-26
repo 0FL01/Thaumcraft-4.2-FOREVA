@@ -252,7 +252,10 @@ public class GenPassage extends GenCommon {
                         BlockPos p = new BlockPos(x + 8 + w, y + 4 + h, z + 8 + j);
                         if (world.isAirBlock(p) && BlockUtils.isAdjacentToSolidBlock(world, p)) {
                             if (random.nextInt(3) != 0) {
-                                world.setBlockState(p, ConfigBlocks.blockTaintFibres.getStateFromMeta(random.nextInt(4) == 0 ? 1 : 0), 3);
+                                BlockPos supportPos = p.down();
+                                boolean upright = random.nextInt(4) == 0
+                                        && world.getBlockState(supportPos).isSideSolid(world, supportPos, EnumFacing.UP);
+                                world.setBlockState(p, ConfigBlocks.blockTaintFibres.getStateFromMeta(upright ? 1 : 0), 3);
                             }
                             Utils.setBiomeAt(world, x + 8 + w, z + 8 + j, ThaumcraftWorldGenerator.biomeTaint);
                         }

@@ -1,0 +1,267 @@
+package thaumcraft.common.blocks;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockDoor;
+import net.minecraft.block.state.IBlockState;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.item.EntityItem;
+import net.minecraft.init.Bootstrap;
+import net.minecraft.init.Blocks;
+import net.minecraft.init.Items;
+import net.minecraft.item.ItemStack;
+import net.minecraft.profiler.Profiler;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.NonNullList;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.Explosion;
+import net.minecraft.world.GameType;
+import net.minecraft.world.World;
+import net.minecraft.world.WorldProviderSurface;
+import net.minecraft.world.WorldSettings;
+import net.minecraft.world.WorldType;
+import net.minecraft.world.chunk.Chunk;
+import net.minecraft.world.chunk.IChunkProvider;
+import net.minecraft.world.storage.WorldInfo;
+import org.junit.BeforeClass;
+import org.junit.Test;
+import thaumcraft.common.blocks.ItemBlocks.BlockWoodenDeviceItem;
+import thaumcraft.common.config.Config;
+import thaumcraft.common.config.ConfigBlocks;
+import thaumcraft.common.config.ConfigItems;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
+
+public class ArcanePlateDoorSupportRuntimeTest {
+    private static final BlockPos POS = new BlockPos(0, 64, 0);
+
+    @BeforeClass
+    public static void bootstrapMinecraftStatics() {
+        Bootstrap.register();
+        if (ConfigBlocks.blockWoodenDevice == null) {
+            ConfigBlocks.init();
+        }
+        if (ConfigItems.itemArcaneDoor == null) {
+            ConfigItems.itemArcaneDoor = new ItemArcaneDoor();
+        }
+    }
+
+    @Test
+    public void creativeInventoryPublishesOnlyTheUnpressedPlate() {
+        NonNullList<ItemStack> stacks = NonNullList.create();
+        ConfigBlocks.blockWoodenDevice.getSubBlocks(null, stacks);
+
+        assertEquals(1, countMetadata(stacks, 2));
+        assertEquals(0, countMetadata(stacks, 3));
+    }
+
+    @Test
+    public void plateItemRequiresSolidSupportForClientAndServerPlacement() {
+        BlockWoodenDevice block = ConfigBlocks.blockWoodenDevice;
+        BlockWoodenDeviceItem item = new BlockWoodenDeviceItem(block);
+        for (int metadata : new int[]{2, 3}) {
+            ItemStack stack = new ItemStack(item, 1, metadata);
+
+            SupportWorld solidWorld = new SupportWorld();
+            solidWorld.put(POS, Blocks.STONE.getDefaultState());
+            assertTrue(item.canPlaceBlockOnSide(solidWorld, POS, EnumFacing.UP, null, stack));
+            assertTrue(item.placeBlockAt(stack, null, solidWorld, POS.up(), EnumFacing.UP,
+                    0.5F, 1.0F, 0.5F, block.getStateFromMeta(metadata)));
+            assertSame(block, solidWorld.getBlockState(POS.up()).getBlock());
+
+            SupportWorld fenceWorld = new SupportWorld();
+            fenceWorld.put(POS, Blocks.OAK_FENCE.getDefaultState());
+            assertFalse(item.canPlaceBlockOnSide(fenceWorld, POS, EnumFacing.UP, null, stack));
+            assertFalse(item.placeBlockAt(stack, null, fenceWorld, POS.up(), EnumFacing.UP,
+                    0.5F, 1.0F, 0.5F, block.getStateFromMeta(metadata)));
+            assertTrue(fenceWorld.isAirBlock(POS.up()));
+
+            SupportWorld unsupportedWorld = new SupportWorld();
+            assertFalse(item.placeBlockAt(stack, null, unsupportedWorld, POS, EnumFacing.UP,
+                    0.5F, 1.0F, 0.5F, block.getStateFromMeta(metadata)));
+            assertTrue(unsupportedWorld.isAirBlock(POS));
+        }
+    }
+
+    @Test
+    public void plateSupportLossRemovesBothRuntimeStatesWithCanonicalDropMetadata() {
+        BlockWoodenDevice block = ConfigBlocks.blockWoodenDevice;
+        boolean previousWardedStone = Config.wardedStone;
+        try {
+            Config.wardedStone = false;
+            for (int metadata : new int[]{2, 3}) {
+                SupportWorld world = new SupportWorld();
+                IBlockState state = block.getStateFromMeta(metadata);
+                world.put(POS, state);
+
+                block.neighborChanged(state, world, POS, Blocks.STONE, POS.down());
+
+                assertTrue(world.isAirBlock(POS));
+                assertEquals(1, world.destroyCalls);
+                assertTrue(world.dropRequested);
+                assertEquals(2, block.damageDropped(world.destroyedState));
+            }
+
+            Config.wardedStone = true;
+            SupportWorld wardedWorld = new SupportWorld();
+            IBlockState state = block.getStateFromMeta(3);
+            wardedWorld.put(POS, state);
+            block.neighborChanged(state, wardedWorld, POS, Blocks.STONE, POS.down());
+            assertTrue(wardedWorld.isAirBlock(POS));
+            assertSame(Items.AIR, block.getItemDropped(state, wardedWorld.rand, 0));
+        } finally {
+            Config.wardedStone = previousWardedStone;
+        }
+    }
+
+    @Test
+    public void doorSupportLossRunsBeforeWoodenDevicePressureHandling() {
+        BlockArcaneDoor door = ConfigBlocks.blockArcaneDoor;
+        boolean previousWardedStone = Config.wardedStone;
+        try {
+            Config.wardedStone = false;
+            SupportWorld world = doorWorld(door);
+            IBlockState lower = world.getBlockState(POS);
+            world.setBlockToAir(POS.down());
+
+            door.neighborChanged(lower, world, POS, ConfigBlocks.blockWoodenDevice, POS.down());
+
+            assertTrue(world.isAirBlock(POS));
+            assertTrue(world.isAirBlock(POS.up()));
+            assertEquals(1, world.drops.size());
+            assertSame(ConfigItems.itemArcaneDoor, world.drops.get(0).getItem());
+
+            Config.wardedStone = true;
+            SupportWorld wardedWorld = doorWorld(door);
+            IBlockState wardedLower = wardedWorld.getBlockState(POS);
+            wardedWorld.setBlockToAir(POS.down());
+            door.neighborChanged(wardedLower, wardedWorld, POS,
+                    ConfigBlocks.blockWoodenDevice, POS.down());
+            assertTrue(wardedWorld.isAirBlock(POS));
+            assertTrue(wardedWorld.isAirBlock(POS.up()));
+            assertTrue(wardedWorld.drops.isEmpty());
+        } finally {
+            Config.wardedStone = previousWardedStone;
+        }
+    }
+
+    private static SupportWorld doorWorld(BlockArcaneDoor door) {
+        SupportWorld world = new SupportWorld();
+        world.put(POS.down(), ConfigBlocks.blockWoodenDevice.getStateFromMeta(6));
+        world.put(POS, door.getDefaultState().withProperty(BlockArcaneDoor.HALF, BlockDoor.EnumDoorHalf.LOWER));
+        world.put(POS.up(), door.getDefaultState().withProperty(BlockArcaneDoor.HALF, BlockDoor.EnumDoorHalf.UPPER));
+        return world;
+    }
+
+    private static int countMetadata(List<ItemStack> stacks, int metadata) {
+        int count = 0;
+        for (ItemStack stack : stacks) {
+            if (stack.getMetadata() == metadata) {
+                count++;
+            }
+        }
+        return count;
+    }
+
+    private static final class SupportWorld extends World {
+        private final Map<BlockPos, IBlockState> states = new HashMap<>();
+        private final List<ItemStack> drops = new ArrayList<>();
+        private int destroyCalls;
+        private boolean dropRequested;
+        private IBlockState destroyedState;
+
+        private SupportWorld() {
+            super(null,
+                    new WorldInfo(new WorldSettings(0L, GameType.SURVIVAL, false, false, WorldType.DEFAULT),
+                            "arcane_support_runtime"),
+                    new WorldProviderSurface(), new Profiler(), false);
+            this.provider.setWorld(this);
+            this.chunkProvider = this.createChunkProvider();
+        }
+
+        private void put(BlockPos pos, IBlockState state) {
+            this.states.put(pos.toImmutable(), state);
+        }
+
+        @Override
+        public IBlockState getBlockState(BlockPos pos) {
+            IBlockState state = this.states.get(pos);
+            return state == null ? Blocks.AIR.getDefaultState() : state;
+        }
+
+        @Override
+        public boolean setBlockState(BlockPos pos, IBlockState state, int flags) {
+            if (state.getBlock() == Blocks.AIR) {
+                this.states.remove(pos);
+            } else {
+                this.states.put(pos.toImmutable(), state);
+            }
+            return true;
+        }
+
+        @Override
+        public boolean setBlockToAir(BlockPos pos) {
+            return this.setBlockState(pos, Blocks.AIR.getDefaultState(), 3);
+        }
+
+        @Override
+        public boolean destroyBlock(BlockPos pos, boolean dropBlock) {
+            IBlockState state = this.getBlockState(pos);
+            if (state.getBlock() == Blocks.AIR) {
+                return false;
+            }
+            this.destroyedState = state;
+            this.destroyCalls++;
+            this.dropRequested = dropBlock;
+            return this.setBlockToAir(pos);
+        }
+
+        @Override
+        public boolean mayPlace(Block block, BlockPos pos, boolean skipCollisionCheck,
+                                EnumFacing sidePlacedOn, Entity placer) {
+            return this.getBlockState(pos).getBlock().isReplaceable(this, pos)
+                    && block.canPlaceBlockAt(this, pos);
+        }
+
+        @Override
+        public boolean spawnEntity(Entity entity) {
+            if (entity instanceof EntityItem) {
+                this.drops.add(((EntityItem) entity).getItem().copy());
+            }
+            return true;
+        }
+
+        @Override public TileEntity getTileEntity(BlockPos pos) { return null; }
+        @Override public Explosion createExplosion(Entity entityIn, double x, double y, double z,
+                                                   float strength, boolean isSmoking) { return null; }
+        @Override public void notifyBlockUpdate(BlockPos pos, IBlockState oldState,
+                                                IBlockState newState, int flags) { }
+        @Override public void notifyNeighborsOfStateChange(BlockPos pos, Block blockType,
+                                                           boolean updateObservers) { }
+        @Override public void markChunkDirty(BlockPos pos, TileEntity unusedTileEntity) { }
+        @Override public void updateComparatorOutputLevel(BlockPos pos, Block blockIn) { }
+
+        @Override
+        protected IChunkProvider createChunkProvider() {
+            return new IChunkProvider() {
+                @Override public Chunk getLoadedChunk(int x, int z) { return null; }
+                @Override public Chunk provideChunk(int x, int z) { return null; }
+                @Override public boolean tick() { return false; }
+                @Override public String makeString() { return "arcane_support_runtime_dummy"; }
+                @Override public boolean isChunkGeneratedAt(int x, int z) { return true; }
+            };
+        }
+
+        @Override
+        protected boolean isChunkLoaded(int x, int z, boolean allowEmpty) {
+            return true;
+        }
+    }
+}
