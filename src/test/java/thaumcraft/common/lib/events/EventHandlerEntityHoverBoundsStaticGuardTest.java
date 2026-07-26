@@ -22,6 +22,12 @@ public class EventHandlerEntityHoverBoundsStaticGuardTest {
         assertTrue(source.contains("Hover.setHover(player.getEntityId(), false);"));
         assertTrue(source.contains("player.sendMessage(new TextComponentTranslation(\"tc.break.fly\"));"));
         assertTrue(source.contains("chest.getItem() != ConfigItems.itemHoverHarness"));
+        assertTrue(source.indexOf("enforceHoverHarnessEquipped((EntityPlayer) living);")
+                < source.indexOf("if (living.world.isRemote)"));
+        assertTrue(source.contains("player.capabilities.isFlying = false;")
+                && source.contains("player.capabilities.allowFlying = false;")
+                && source.contains("chest.getTagCompound().setBoolean(\"hover\", false);")
+                && source.contains("((EntityPlayerMP) player).sendPlayerAbilities();"));
         assertTrue(lang.contains("tc.break.fly=Something disrupts your ability to fly."));
     }
 

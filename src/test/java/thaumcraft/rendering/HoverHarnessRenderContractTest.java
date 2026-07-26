@@ -53,10 +53,12 @@ public class HoverHarnessRenderContractTest {
         assertTrue(registry.contains("LIGHTNING_RING_SPRITE")
                 && registry.contains("new ResourceLocation(\"thaumcraft\", \"items/lightningring\")")
                 && registry.contains("registerSprite(LIGHTNING_RING_SPRITE)"));
-        assertTrue(model.contains("GL11.glIsEnabled(GL11.GL_BLEND)")
+        String activeGate = between(model, "private static boolean isHoverActive", "private static void renderLightningRings");
+        assertTrue(activeGate.contains("GL11.glGetBoolean(GL11.GL_DEPTH_WRITEMASK)")
                 && model.contains("GL11.glGetInteger(GL11.GL_MATRIX_MODE) != GL11.GL_MODELVIEW")
                 && model.contains("getItemStackFromSlot(EntityEquipmentSlot.CHEST)")
                 && model.contains("getByte(\"hover\") == 1"));
+        assertFalse(activeGate.contains("GL11.glIsEnabled(GL11.GL_BLEND)"));
         assertTrue(model.contains("GlStateManager.translate(0.0F, 0.075F, -0.05F);")
                 && model.contains("GlStateManager.translate(0.0F, 0.2F, 0.55F);")
                 && model.contains("renderRing(sprite, 2.5F, 1.0F, 1.0F, 1.0F, 1.0F)")
@@ -97,6 +99,11 @@ public class HoverHarnessRenderContractTest {
                 && bolt.contains("segment.next == null")
                 && bolt.contains("segment.prev == null")
                 && bolt.contains("color(0.75F, 1.0F, 1.0F, alpha)"));
+        String typeSix = between(bolt, "private void renderTc4Type6Bolt", "private void renderTc4Type6Pass");
+        assertFalse(typeSix.contains("tessellator.draw()") || typeSix.contains("buffer.begin("));
+        String typeSixPass = between(bolt, "private void renderTc4Type6Pass", "private static float relativeViewLength");
+        assertTrue(typeSixPass.contains("buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.PARTICLE_POSITION_TEX_COLOR_LMAP)")
+                && typeSixPass.contains("tessellator.draw()"));
     }
 
     @Test
@@ -144,5 +151,12 @@ public class HoverHarnessRenderContractTest {
 
     private static String read(String path) throws IOException {
         return new String(Files.readAllBytes(Paths.get(path)), StandardCharsets.UTF_8);
+    }
+
+    private static String between(String source, String start, String end) {
+        int startIndex = source.indexOf(start);
+        int endIndex = source.indexOf(end, startIndex);
+        assertTrue("Missing source section: " + start + " -> " + end, startIndex >= 0 && endIndex > startIndex);
+        return source.substring(startIndex, endIndex);
     }
 }

@@ -11,6 +11,7 @@ import net.minecraft.util.SoundCategory;
 import net.minecraft.world.World;
 import thaumcraft.api.aspects.Aspect;
 import thaumcraft.api.aspects.AspectList;
+import thaumcraft.common.Thaumcraft;
 import thaumcraft.common.blocks.BlockJarItem;
 import thaumcraft.common.config.Config;
 import thaumcraft.common.items.baubles.ItemGirdleHover;
@@ -106,9 +107,8 @@ public class Hover {
         boolean hover = !getHover(playerId);
         boolean actualHover = setHover(player, harness, hover);
         if (hover && !actualHover) return false;
-        if (player.world.isRemote) {
-            PacketHandler.INSTANCE.sendToServer(new PacketFlyToServer(player, hover));
-            player.playSound(hover ? TCSounds.HHON : TCSounds.HHOFF, 0.1F, 1.0F);
+        if (isLocalClientPlayer(player)) {
+            notifyClientHoverChange(player, hover);
         }
         return true;
     }
@@ -116,19 +116,21 @@ public class Hover {
     public static void handleHoverArmor(EntityPlayer player, ItemStack harness) {
         if (player == null || harness.isEmpty()) return;
         NBTTagCompound tag = ensureTag(harness);
-        if (!HOVERING.containsKey(player.getEntityId())) {
-            setHover(player.getEntityId(), tag.getBoolean("hover"));
-        }
-        boolean hover = getHover(player);
+        boolean hover = tag.getBoolean("hover");
+        setHover(player.getEntityId(), hover);
         if (hover && !expendCharge(player, harness, true)) {
+            setHover(player, harness, false);
             hover = false;
+            if (isLocalClientPlayer(player)) {
+                notifyClientHoverChange(player, false);
+            }
         }
 
         setHover(player.getEntityId(), hover);
         tag.setBoolean("hover", hover);
-        player.capabilities.allowFlying = hover || player.capabilities.isCreativeMode;
-        if (!hover && !player.capabilities.isCreativeMode) {
-            player.capabilities.isFlying = false;
+        if (!player.capabilities.isCreativeMode) {
+            player.capabilities.allowFlying = hover;
+            player.capabilities.isFlying = hover;
         }
         if (hover) {
             if (!player.world.isRemote && player instanceof EntityPlayerMP) {
@@ -150,7 +152,6 @@ public class Hover {
     }
 
     public static boolean expendCharge(EntityPlayer player, ItemStack harness, boolean doit) {
-        if (player != null && player.capabilities.isCreativeMode) return true;
         if (!harness.hasTagCompound() || !harness.getTagCompound().hasKey("jar")) return false;
         ItemStack jar = new ItemStack(harness.getTagCompound().getCompoundTag("jar"));
         if (jar.isEmpty() || !(jar.getItem() instanceof BlockJarItem)) return false;
@@ -161,35 +162,49 @@ public class Hover {
         int charge = harness.getTagCompound().getShort("charge") & 65535;
         int threshold = Math.max(1, Math.round(360.0F * getEfficiency(player)));
         if (!doit) return true;
-        charge++;
-        if (charge >= threshold) {
-            charge = 0;
-            aspects.remove(Aspect.ENERGY, 1);
-            container.setAspects(jar, aspects);
-            NBTTagCompound jarTag = new NBTTagCompound();
-            jar.writeToNBT(jarTag);
-            harness.getTagCompound().setTag("jar", jarTag);
-            if (aspects.getAmount(Aspect.ENERGY) <= 0) {
-                harness.getTagCompound().setShort("charge", (short) charge);
-                return false;
-            }
+        if (charge < threshold) {
+            harness.getTagCompound().setShort("charge", (short) (charge + 1));
+            return true;
+        }
+
+        charge = 0;
+        aspects.remove(Aspect.ENERGY, 1);
+        container.setAspects(jar, aspects);
+        NBTTagCompound jarTag = new NBTTagCompound();
+        jar.writeToNBT(jarTag);
+        harness.getTagCompound().setTag("jar", jarTag);
+        if (aspects.getAmount(Aspect.ENERGY) <= 0) {
+            harness.getTagCompound().setShort("charge", (short) charge);
+            return false;
         }
         harness.getTagCompound().setShort("charge", (short) charge);
         return true;
     }
 
     private static void applyClientHoverMotion(EntityPlayer player, ItemStack harness) {
-        if (!player.world.isRemote) return;
+        if (!isLocalClientPlayer(player)) return;
         long currentTime = System.currentTimeMillis();
         Long time = TIMING.get(player.getEntityId());
         if (time == null || time < currentTime) {
             TIMING.put(player.getEntityId(), currentTime + 1200L);
             player.world.playSound(player.posX, player.posY, player.posZ, TCSounds.JACOBS,
-                    SoundCategory.PLAYERS, 0.05F, 1.0F + player.world.rand.nextFloat() * 0.05F, false);
+                    SoundCategory.MASTER, 0.05F, 1.0F + player.world.rand.nextFloat() * 0.05F, false);
         }
         float motionModifier = getHoverMotionModifier(player, harness);
         player.motionX *= motionModifier;
         player.motionZ *= motionModifier;
+    }
+
+    private static boolean isLocalClientPlayer(EntityPlayer player) {
+        return player.world.isRemote && Thaumcraft.proxy != null
+                && Thaumcraft.proxy.getClientPlayer() == player;
+    }
+
+    private static void notifyClientHoverChange(EntityPlayer player, boolean hover) {
+        PacketHandler.INSTANCE.sendToServer(new PacketFlyToServer(player, hover));
+        player.world.playSound(player.posX, player.posY, player.posZ,
+                hover ? TCSounds.HHON : TCSounds.HHOFF,
+                SoundCategory.MASTER, 0.33F, 1.0F, false);
     }
 
     private static float getHoverMotionModifier(EntityPlayer player, ItemStack harness) {

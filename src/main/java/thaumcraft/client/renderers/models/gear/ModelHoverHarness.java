@@ -96,7 +96,7 @@ public class ModelHoverHarness extends ModelBiped {
 
     private static boolean isHoverActive(Entity entity) {
         if (!(entity instanceof EntityPlayer)
-                || GL11.glIsEnabled(GL11.GL_BLEND)
+                || !GL11.glGetBoolean(GL11.GL_DEPTH_WRITEMASK)
                 || GL11.glGetInteger(GL11.GL_MATRIX_MODE) != GL11.GL_MODELVIEW) {
             return false;
         }

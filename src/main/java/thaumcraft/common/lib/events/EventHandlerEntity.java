@@ -316,12 +316,16 @@ public class EventHandlerEntity {
     /** Called every living entity tick (~20/sec per entity). */
     @SubscribeEvent
     public void onLivingUpdate(LivingEvent.LivingUpdateEvent event) {
-        if (event.getEntityLiving().world.isRemote) {
+        EntityLivingBase living = event.getEntityLiving();
+        if (living instanceof EntityPlayer) {
+            enforceHoverHarnessEquipped((EntityPlayer) living);
+        }
+        if (living.world.isRemote) {
             return;
         }
 
-        if (event.getEntityLiving() instanceof EntityPlayer) {
-            EntityPlayer player = (EntityPlayer) event.getEntityLiving();
+        if (living instanceof EntityPlayer) {
+            EntityPlayer player = (EntityPlayer) living;
             if (!Config.wuss && player.ticksExisted > 0 && player.ticksExisted % 2000 == 0
                     && !player.isPotionActive(Config.potionWarpWard)) {
                 WarpEvents.checkWarpEvent(player);
@@ -787,17 +791,33 @@ public class EventHandlerEntity {
                 && player.ticksExisted > 0
                 && player.ticksExisted % 20 == 0
                 && (player.capabilities.isFlying || Hover.getHover(player.getEntityId()))) {
-            player.capabilities.isFlying = false;
-            Hover.setHover(player.getEntityId(), false);
+            stopHoverFlight(player);
             player.sendMessage(new TextComponentTranslation("tc.break.fly"));
         }
+    }
 
+    private void enforceHoverHarnessEquipped(EntityPlayer player) {
         if (Hover.getHover(player.getEntityId())) {
             ItemStack chest = player.inventory.armorInventory.get(2);
             if (chest.isEmpty() || chest.getItem() != ConfigItems.itemHoverHarness) {
-                Hover.setHover(player.getEntityId(), false);
-                player.capabilities.isFlying = false;
+                stopHoverFlight(player);
             }
+        }
+    }
+
+    private void stopHoverFlight(EntityPlayer player) {
+        Hover.setHover(player.getEntityId(), false);
+        player.capabilities.isFlying = false;
+        if (!player.capabilities.isCreativeMode) {
+            player.capabilities.allowFlying = false;
+        }
+
+        ItemStack chest = player.inventory.armorInventory.get(2);
+        if (!chest.isEmpty() && chest.getItem() == ConfigItems.itemHoverHarness && chest.hasTagCompound()) {
+            chest.getTagCompound().setBoolean("hover", false);
+        }
+        if (player instanceof EntityPlayerMP) {
+            ((EntityPlayerMP) player).sendPlayerAbilities();
         }
     }
 

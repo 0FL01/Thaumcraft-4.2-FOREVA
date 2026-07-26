@@ -250,9 +250,6 @@ public class FXLightningBolt extends Particle {
             return;
         }
 
-        Tessellator tessellator = Tessellator.getInstance();
-        BufferBuilder buffer = tessellator.getBuffer();
-        tessellator.draw();
         boolean blendEnabled = GL11.glIsEnabled(GL11.GL_BLEND);
         boolean depthMask = GL11.glGetBoolean(GL11.GL_DEPTH_WRITEMASK);
         int blendSrcRgb = GL11.glGetInteger(GL14.GL_BLEND_SRC_RGB);
@@ -287,7 +284,6 @@ public class FXLightningBolt extends Particle {
             GlStateManager.depthMask(depthMask);
             GlStateManager.popMatrix();
             GlStateManager.bindTexture(boundTexture);
-            buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.PARTICLE_POSITION_TEX_COLOR_LMAP);
         }
     }
 
