@@ -19,6 +19,7 @@ import net.minecraftforge.event.world.BlockEvent;
 import net.minecraftforge.event.world.ChunkDataEvent;
 import net.minecraftforge.event.world.NoteBlockEvent;
 import net.minecraftforge.event.world.WorldEvent;
+import net.minecraftforge.event.terraingen.PopulateChunkEvent;
 import net.minecraftforge.fml.common.eventhandler.Event;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import org.apache.logging.log4j.LogManager;
@@ -49,6 +50,33 @@ import java.util.List;
 public class EventHandlerWorld {
 
     private static final Logger LOGGER = LogManager.getLogger(Thaumcraft.MODID);
+    private static final String WORLDGEN_CASCADE_DEBUG_PROPERTY = "thaumcraft.debugWorldgenCascades";
+    private static final boolean DEBUG_WORLDGEN_CASCADES = Boolean.getBoolean(WORLDGEN_CASCADE_DEBUG_PROPERTY);
+    private static final int NORMAL_POPULATE_STACK_FRAMES = 2;
+
+    @SubscribeEvent
+    public void onPopulateChunkPre(PopulateChunkEvent.Pre event) {
+        if (!DEBUG_WORLDGEN_CASCADES) return;
+
+        StackTraceElement[] stack = Thread.currentThread().getStackTrace();
+        if (isRecursiveChunkPopulation(stack)) {
+            Throwable caller = new Throwable("Recursive chunk population caller");
+            caller.setStackTrace(stack);
+            LOGGER.warn("Recursive chunk population entered chunk [{}, {}] in dimension {}",
+                    event.getChunkX(), event.getChunkZ(), event.getWorld().provider.getDimension(), caller);
+        }
+    }
+
+    static boolean isRecursiveChunkPopulation(StackTraceElement[] stack) {
+        int populateFrames = 0;
+        for (StackTraceElement element : stack) {
+            if ("net.minecraft.world.chunk.Chunk".equals(element.getClassName())
+                    && "populate".equals(element.getMethodName())) {
+                ++populateFrames;
+            }
+        }
+        return populateFrames > NORMAL_POPULATE_STACK_FRAMES;
+    }
 
     // ---- World lifecycle ----
 
