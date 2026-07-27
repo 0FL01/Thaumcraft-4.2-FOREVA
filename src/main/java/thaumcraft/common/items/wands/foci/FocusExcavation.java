@@ -226,10 +226,10 @@ public class FocusExcavation extends ItemFocusBasic {
     private void updateBeam(EntityPlayer player, RayTraceResult mop, String key) {
         if (!player.world.isRemote) return;
 
-        Vec3d look = player.getLookVec();
-        double tx = player.posX + look.x * 10.0D;
-        double ty = player.posY + look.y * 10.0D;
-        double tz = player.posZ + look.z * 10.0D;
+        Vec3d target = player.getPositionEyes(1.0F).add(player.getLookVec().scale(10.0D));
+        double tx = target.x;
+        double ty = target.y;
+        double tz = target.z;
         int impact = 0;
         if (mop != null && mop.hitVec != null) {
             tx = mop.hitVec.x;

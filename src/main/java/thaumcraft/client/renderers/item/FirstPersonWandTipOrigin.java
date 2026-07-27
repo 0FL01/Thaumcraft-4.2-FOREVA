@@ -19,7 +19,7 @@ import org.lwjgl.opengl.GL11;
 import org.lwjgl.util.glu.GLU;
 import thaumcraft.common.items.wands.ItemWandCasting;
 
-/** Bridges the previous first-person hand pass to the next world-rendered node drain beam. */
+/** Bridges the previous first-person hand pass to the next world-rendered wand effect. */
 @SideOnly(Side.CLIENT)
 public final class FirstPersonWandTipOrigin {
     private static final double MIN_CAMERA_DISTANCE = 0.05D;
@@ -51,7 +51,8 @@ public final class FirstPersonWandTipOrigin {
 
     /**
      * Requests a capture from the upcoming hand pass and resolves the immediately preceding one.
-     * The returned point is absolute world space, matching {@code UtilsFX.drawFloatyLine}.
+     * The returned point is absolute world space. A valid sample remains available to every
+     * matching effect rendered in the current world pass.
      */
     public static Vec3d resolveAndRequest(EntityPlayer player, EnumHand hand, ItemStack activeStack,
                                           float partialTicks) {
@@ -67,7 +68,6 @@ public final class FirstPersonWandTipOrigin {
 
         request = new Request(player.world, player, hand, physicalSide(player, hand), activeStack.copy(), generation + 1L);
         Sample current = sample;
-        sample = null;
         if (current == null || current.generation != generation
                 || current.world != player.world || current.player != player || current.hand != hand
                 || current.side != physicalSide(player, hand)

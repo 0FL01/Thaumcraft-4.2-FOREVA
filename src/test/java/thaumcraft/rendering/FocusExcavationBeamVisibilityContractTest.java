@@ -6,6 +6,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import org.junit.Test;
 
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 /** CI-visible guard for the TC4 continuous excavation beam lifecycle. */
@@ -35,6 +36,45 @@ public class FocusExcavationBeamVisibilityContractTest {
                 "buf.begin(GL11.GL_QUADS, DefaultVertexFormats.PARTICLE_POSITION_TEX_COLOR_LMAP);",
                 "renderImpact(partialTicks, rotationX, rotationZ, rotationYZ, rotationXY, rotationXZ);",
                 "GlStateManager.alphaFunc(GL11.GL_GREATER, 0.1F);");
+    }
+
+    @Test
+    public void excavationBeamShouldRenderFromTheCapturedWandTipToTheCrosshair() throws IOException {
+        String focus = read("src/main/java/thaumcraft/common/items/wands/foci/FocusExcavation.java");
+        String beam = read("src/main/java/thaumcraft/client/fx/beams/FXBeam.java");
+        String wandBeam = read("src/main/java/thaumcraft/client/fx/beams/FXBeamWand.java");
+        String origin = read("src/main/java/thaumcraft/client/renderers/item/FirstPersonWandTipOrigin.java");
+        String updateBeam = between(focus, "private void updateBeam(", "@Override\n    public FocusUpgradeType[]");
+        String renderFromSource = between(beam, "void renderParticleFromSource(", "protected float getBeamAlpha(");
+        String wandRender = between(wandBeam, "public void renderParticle(", "private static Vec3d sourcePos(");
+        String resolve = between(origin, "public static Vec3d resolveAndRequest(", "/** Captures the visible cap");
+
+        assertTrue(updateBeam.contains("player.getPositionEyes(1.0F).add(player.getLookVec().scale(10.0D))")
+                && updateBeam.contains("tx = mop.hitVec.x;")
+                && updateBeam.contains("ty = mop.hitVec.y;")
+                && updateBeam.contains("tz = mop.hitVec.z;"));
+        assertFalse(updateBeam.contains("player.posY +"));
+
+        assertInOrder(wandRender,
+                "boolean localFirstPerson",
+                "FirstPersonWandTipOrigin.resolveAndRequest(",
+                "if (renderSource == null)",
+                "return;",
+                "this.renderParticleFromSource(");
+        assertTrue(renderFromSource.contains("if (sourceOverride == null)")
+                && renderFromSource.contains("double targetX = this.ptX + (this.tX - this.ptX) * partialTicks;")
+                && renderFromSource.contains("double targetY = this.ptY + (this.tY - this.ptY) * partialTicks;")
+                && renderFromSource.contains("double targetZ = this.ptZ + (this.tZ - this.ptZ) * partialTicks;")
+                && renderFromSource.contains("renderLength = MathHelper.sqrt(")
+                && renderFromSource.contains("Math.atan2(xd, zd)")
+                && renderFromSource.contains("Math.atan2(yd, horizontal)"));
+        assertFalse(renderFromSource.contains("this.length =")
+                || renderFromSource.contains("this.rotYaw =")
+                || renderFromSource.contains("this.rotPitch =")
+                || renderFromSource.contains("this.setPosition("));
+
+        assertTrue(resolve.contains("Sample current = sample;"));
+        assertFalse(resolve.contains("Sample current = sample;\n        sample = null;"));
     }
 
     private static String read(String path) throws IOException {

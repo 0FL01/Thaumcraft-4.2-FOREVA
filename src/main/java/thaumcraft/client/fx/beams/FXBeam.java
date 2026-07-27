@@ -9,6 +9,7 @@ import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -165,6 +166,13 @@ public class FXBeam extends Particle {
     public void renderParticle(BufferBuilder ignored, Entity entityIn, float partialTicks,
                                float rotationX, float rotationZ, float rotationYZ,
                                float rotationXY, float rotationXZ) {
+        this.renderParticleFromSource(ignored, entityIn, partialTicks,
+                rotationX, rotationZ, rotationYZ, rotationXY, rotationXZ, null);
+    }
+
+    void renderParticleFromSource(BufferBuilder ignored, Entity entityIn, float partialTicks,
+                                  float rotationX, float rotationZ, float rotationYZ,
+                                  float rotationXY, float rotationXZ, Vec3d sourceOverride) {
         Tessellator tess = Tessellator.getInstance();
         BufferBuilder buf = tess.getBuffer();
         ResourceLocation beamTexture = getBeamTexture();
@@ -190,11 +198,34 @@ public class FXBeam extends Particle {
 
         float scroll = this.reverse ? -(ageSlide + partialTicks) : (ageSlide + partialTicks);
         float uvSlide = -scroll * 0.2F - MathHelper.floor(-scroll * 0.1F);
-        float xx = (float) (this.prevPosX + (this.posX - this.prevPosX) * partialTicks - Particle.interpPosX);
-        float yy = (float) (this.prevPosY + (this.posY - this.prevPosY) * partialTicks - Particle.interpPosY);
-        float zz = (float) (this.prevPosZ + (this.posZ - this.prevPosZ) * partialTicks - Particle.interpPosZ);
-        float ry = this.prevYaw + (this.rotYaw - this.prevYaw) * partialTicks;
-        float rp = this.prevPitch + (this.rotPitch - this.prevPitch) * partialTicks;
+        float xx;
+        float yy;
+        float zz;
+        float renderYaw;
+        float renderPitch;
+        float renderLength;
+        if (sourceOverride == null) {
+            xx = (float) (this.prevPosX + (this.posX - this.prevPosX) * partialTicks - Particle.interpPosX);
+            yy = (float) (this.prevPosY + (this.posY - this.prevPosY) * partialTicks - Particle.interpPosY);
+            zz = (float) (this.prevPosZ + (this.posZ - this.prevPosZ) * partialTicks - Particle.interpPosZ);
+            renderYaw = this.prevYaw + (this.rotYaw - this.prevYaw) * partialTicks;
+            renderPitch = this.prevPitch + (this.rotPitch - this.prevPitch) * partialTicks;
+            renderLength = this.length;
+        } else {
+            xx = (float) (sourceOverride.x - Particle.interpPosX);
+            yy = (float) (sourceOverride.y - Particle.interpPosY);
+            zz = (float) (sourceOverride.z - Particle.interpPosZ);
+            double targetX = this.ptX + (this.tX - this.ptX) * partialTicks;
+            double targetY = this.ptY + (this.tY - this.ptY) * partialTicks;
+            double targetZ = this.ptZ + (this.tZ - this.ptZ) * partialTicks;
+            double xd = sourceOverride.x - targetX;
+            double yd = sourceOverride.y - targetY;
+            double zd = sourceOverride.z - targetZ;
+            renderLength = MathHelper.sqrt(xd * xd + yd * yd + zd * zd);
+            double horizontal = MathHelper.sqrt(xd * xd + zd * zd);
+            renderYaw = (float) (Math.atan2(xd, zd) * 180.0D / Math.PI);
+            renderPitch = (float) (Math.atan2(yd, horizontal) * 180.0D / Math.PI);
+        }
 
         GlStateManager.alphaFunc(GL11.GL_GREATER, 1.0F / 255.0F);
         Minecraft.getMinecraft().renderEngine.bindTexture(beamTexture);
@@ -205,8 +236,8 @@ public class FXBeam extends Particle {
         GlStateManager.depthMask(false);
         GlStateManager.translate(xx, yy, zz);
         GlStateManager.rotate(90.0F, 1.0F, 0.0F, 0.0F);
-        GlStateManager.rotate(180.0F + ry, 0.0F, 0.0F, -1.0F);
-        GlStateManager.rotate(rp, 1.0F, 0.0F, 0.0F);
+        GlStateManager.rotate(180.0F + renderYaw, 0.0F, 0.0F, -1.0F);
+        GlStateManager.rotate(renderPitch, 1.0F, 0.0F, 0.0F);
 
         double w0 = -0.15D * size;
         double w1 = 0.15D * size;
@@ -217,7 +248,7 @@ public class FXBeam extends Particle {
 
         int strips = getBeamStripCount();
         for (int t = 0; t < strips; t++) {
-            double beamLen = this.length * size / Math.max(0.001F, this.particleScale);
+            double beamLen = renderLength * size / Math.max(0.001F, this.particleScale);
             double u0 = 0.0D;
             double u1 = 1.0D;
             double v0 = -1.0F + uvSlide + getBeamStripVOffset(t, strips);

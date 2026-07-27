@@ -1,5 +1,6 @@
 package thaumcraft.client.fx.beams;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.particle.Particle;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
@@ -12,6 +13,7 @@ import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.lwjgl.opengl.GL11;
+import thaumcraft.client.renderers.item.FirstPersonWandTipOrigin;
 import thaumcraft.common.items.wands.ItemWandCasting;
 
 @SideOnly(Side.CLIENT)
@@ -89,10 +91,23 @@ public class FXBeamWand extends FXBeam {
     public void renderParticle(BufferBuilder ignored, Entity entityIn, float partialTicks,
                                float rotationX, float rotationZ, float rotationYZ,
                                float rotationXY, float rotationXZ) {
-        super.renderParticle(ignored, entityIn, partialTicks,
-                rotationX, rotationZ, rotationYZ, rotationXY, rotationXZ);
+        Vec3d renderSource = null;
+        Minecraft minecraft = Minecraft.getMinecraft();
+        boolean localFirstPerson = this.player != null
+                && this.player == minecraft.player
+                && this.player.world == minecraft.world
+                && minecraft.gameSettings.thirdPersonView == 0;
+        if (localFirstPerson) {
+            renderSource = FirstPersonWandTipOrigin.resolveAndRequest(
+                    this.player, this.player.getActiveHand(), this.player.getActiveItemStack(), partialTicks);
+            if (renderSource == null) {
+                return;
+            }
+        }
+        this.renderParticleFromSource(ignored, entityIn, partialTicks,
+                rotationX, rotationZ, rotationYZ, rotationXY, rotationXZ, renderSource);
         if (DEBUG_EFFECT_ORIGIN && this.player != null) {
-            renderDebugFrame(partialTicks);
+            renderDebugFrame(partialTicks, renderSource);
         }
     }
 
@@ -100,10 +115,10 @@ public class FXBeamWand extends FXBeam {
         return WandEffectOrigin.resolve(player, partialTicks, yOffset);
     }
 
-    private void renderDebugFrame(float partialTicks) {
+    private void renderDebugFrame(float partialTicks, Vec3d renderSource) {
         WandEffectOrigin.DebugFrame frame =
                 WandEffectOrigin.debugFrame(this.player, partialTicks, this.sourceYOffset);
-        Vec3d origin = cameraRelative(frame.origin);
+        Vec3d origin = cameraRelative(renderSource == null ? frame.origin : renderSource);
         Vec3d target = cameraRelative(new Vec3d(
                 this.ptX + (this.tX - this.ptX) * partialTicks,
                 this.ptY + (this.tY - this.ptY) * partialTicks,
