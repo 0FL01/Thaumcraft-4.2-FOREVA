@@ -1,11 +1,11 @@
 {
   "multipart": [
-    { "when": { "type": "0", "down": "true" },  "apply": { "model": "thaumcraft:blocktaintfibres_surface_down" } },
-    { "when": { "type": "0", "up": "true" },    "apply": { "model": "thaumcraft:blocktaintfibres_surface_up" } },
-    { "when": { "type": "0", "north": "true" }, "apply": { "model": "thaumcraft:blocktaintfibres_surface_north" } },
-    { "when": { "type": "0", "south": "true" }, "apply": { "model": "thaumcraft:blocktaintfibres_surface_south" } },
-    { "when": { "type": "0", "west": "true" },  "apply": { "model": "thaumcraft:blocktaintfibres_surface_west" } },
-    { "when": { "type": "0", "east": "true" },  "apply": { "model": "thaumcraft:blocktaintfibres_surface_east" } },
+    { "when": { "down": "true" },  "apply": { "model": "thaumcraft:blocktaintfibres_surface_down" } },
+    { "when": { "up": "true" },    "apply": { "model": "thaumcraft:blocktaintfibres_surface_up" } },
+    { "when": { "north": "true" }, "apply": { "model": "thaumcraft:blocktaintfibres_surface_north" } },
+    { "when": { "south": "true" }, "apply": { "model": "thaumcraft:blocktaintfibres_surface_south" } },
+    { "when": { "west": "true" },  "apply": { "model": "thaumcraft:blocktaintfibres_surface_west" } },
+    { "when": { "east": "true" },  "apply": { "model": "thaumcraft:blocktaintfibres_surface_east" } },
     { "when": { "type": "1" }, "apply": { "model": "thaumcraft:blocktaintfibres_1" } },
     { "when": { "type": "2" }, "apply": { "model": "thaumcraft:blocktaintfibres_2" } },
     { "when": { "type": "3" }, "apply": { "model": "thaumcraft:blocktaintfibres_3" } },

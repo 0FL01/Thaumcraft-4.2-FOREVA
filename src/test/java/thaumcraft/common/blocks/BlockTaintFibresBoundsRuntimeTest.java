@@ -27,6 +27,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
@@ -61,13 +62,33 @@ public class BlockTaintFibresBoundsRuntimeTest {
     }
 
     @Test
-    public void fibrousTaintRemainsPassableReplaceableAndNonColliding() {
+    public void fibrousTaintRemainsPassableNonReplaceableAndNonColliding() {
         BoundsWorld world = new BoundsWorld();
         IBlockState fibres = ConfigBlocks.blockTaintFibres.getStateFromMeta(0);
 
         assertNull(ConfigBlocks.blockTaintFibres.getCollisionBoundingBox(fibres, world, POS));
         assertTrue(ConfigBlocks.blockTaintFibres.isPassable(world, POS));
-        assertTrue(ConfigBlocks.blockTaintFibres.isReplaceable(world, POS));
+        assertFalse(ConfigBlocks.blockTaintFibres.isReplaceable(world, POS));
+    }
+
+    @Test
+    public void everyTaintFibreTypeKeepsItsAttachedSurfaceState() {
+        BlockTaintFibres fibres = ConfigBlocks.blockTaintFibres;
+        BoundsWorld world = new BoundsWorld();
+        world.support(EnumFacing.DOWN);
+        world.support(EnumFacing.EAST);
+        world.put(EnumFacing.WEST, ConfigBlocks.blockTaint.getDefaultState());
+
+        for (int meta = 0; meta <= 4; meta++) {
+            IBlockState actual = fibres.getActualState(fibres.getStateFromMeta(meta), world, POS);
+            assertEquals(meta, fibres.getMetaFromState(actual));
+            assertTrue(actual.getValue(BlockTaintFibres.DOWN));
+            assertTrue(actual.getValue(BlockTaintFibres.EAST));
+            assertFalse(actual.getValue(BlockTaintFibres.UP));
+            assertFalse(actual.getValue(BlockTaintFibres.NORTH));
+            assertFalse(actual.getValue(BlockTaintFibres.SOUTH));
+            assertFalse(actual.getValue(BlockTaintFibres.WEST));
+        }
     }
 
     private static AxisAlignedBB expected(EnumFacing facing) {
@@ -96,6 +117,10 @@ public class BlockTaintFibresBoundsRuntimeTest {
 
         private void support(EnumFacing facing) {
             this.states.put(POS.offset(facing), Blocks.STONE.getDefaultState());
+        }
+
+        private void put(EnumFacing facing, IBlockState state) {
+            this.states.put(POS.offset(facing), state);
         }
 
         @Override

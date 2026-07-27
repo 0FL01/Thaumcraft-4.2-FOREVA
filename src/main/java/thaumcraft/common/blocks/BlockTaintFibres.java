@@ -90,8 +90,8 @@ public class BlockTaintFibres extends Block {
         if (isTaintBiome(world, target)) {
             if (!spreadFibres(world, target)) {
                 convertAdjacentBlockToTaint(world, target);
+                updateSporeStalk(world, pos, meta, rand);
             }
-            updateSporeStalk(world, pos, meta, rand);
         }
     }
 
@@ -138,14 +138,6 @@ public class BlockTaintFibres extends Block {
 
     @Override
     public IBlockState getActualState(IBlockState state, IBlockAccess world, BlockPos pos) {
-        if (state.getValue(TYPE) != 0) {
-            return state.withProperty(DOWN, false)
-                    .withProperty(UP, false)
-                    .withProperty(NORTH, false)
-                    .withProperty(SOUTH, false)
-                    .withProperty(WEST, false)
-                    .withProperty(EAST, false);
-        }
         return state.withProperty(DOWN, shouldRenderSurface(world, pos, EnumFacing.DOWN))
                 .withProperty(UP, shouldRenderSurface(world, pos, EnumFacing.UP))
                 .withProperty(NORTH, shouldRenderSurface(world, pos, EnumFacing.NORTH))
@@ -220,7 +212,7 @@ public class BlockTaintFibres extends Block {
 
     @Override
     public boolean isReplaceable(IBlockAccess world, BlockPos pos) {
-        return true;
+        return false;
     }
 
     @Override
