@@ -41,6 +41,19 @@ public class ThaumcraftWorldGeneratorCascadingGuardTest {
     }
 
     @Test
+    public void nodeAspectScanShouldSkipUnloadedChunks() throws IOException {
+        String source = readGeneratorSource();
+        int start = source.indexOf("// Scan 11x11x11 surroundings");
+        int end = source.indexOf("if (water > 100)", start);
+        assertTrue(start >= 0 && end > start);
+
+        String scan = source.substring(start, end);
+        int loadedCheck = scan.indexOf("if (!world.isBlockLoaded(bp, false)) continue;");
+        int stateRead = scan.indexOf("world.getBlockState(bp)");
+        assertTrue(loadedCheck >= 0 && stateRead > loadedCheck);
+    }
+
+    @Test
     public void pointOresShouldUsePopulationSafeOffsets() throws IOException {
         String source = readGeneratorSource();
         int start = source.indexOf("private void generateOres");

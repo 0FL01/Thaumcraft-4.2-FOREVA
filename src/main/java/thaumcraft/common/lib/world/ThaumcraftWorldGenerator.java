@@ -285,6 +285,7 @@ public class ThaumcraftWorldGenerator implements IWorldGenerator {
             for (int yy = -5; yy <= 5; yy++) {
                 for (int zz = -5; zz <= 5; zz++) {
                     BlockPos bp = pos.add(xx, yy, zz);
+                    if (!world.isBlockLoaded(bp, false)) continue;
                     IBlockState state = world.getBlockState(bp);
                     Block bi = state.getBlock();
                     if (state.getMaterial() == Material.WATER) {
