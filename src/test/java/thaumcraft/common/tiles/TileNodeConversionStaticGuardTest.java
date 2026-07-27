@@ -170,10 +170,8 @@ public class TileNodeConversionStaticGuardTest {
         assertTrue(renderer.contains("UtilsFX.drawFloatyLine(sourceWorldX, sourceWorldY, sourceWorldZ,"));
         assertTrue(renderer.contains("targetWorldX, targetWorldY, targetWorldZ,"));
         assertTrue(renderer.contains("partialTicks, color, \"textures/misc/wispy.png\", -0.02F, reveal)"));
-        assertTrue(renderer.contains("if (reveal >= 1.0F && lineLength > 0.0F)"));
-        assertTrue(renderer.contains("drawDrainContact(deltaX, deltaY, deltaZ, color);"));
-        assertTrue(renderer.contains("GlStateManager.disableTexture2D();"));
-        assertTrue(renderer.contains("DefaultVertexFormats.POSITION_COLOR"));
+        assertFalse(renderer.contains("drawDrainContact("));
+        assertFalse(renderer.contains("DefaultVertexFormats.POSITION_COLOR"));
 
         assertTrue(utils.contains("public static void drawFloatyLine(double x, double y, double z, double x2, double y2, double z2,"));
         assertTrue(utils.contains("drawFloatyLine(x, y, z, x2, y2, z2, partialTicks, color, texture, speed, distance, 0.15F);"));

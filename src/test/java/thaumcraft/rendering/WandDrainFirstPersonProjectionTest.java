@@ -104,13 +104,9 @@ public class WandDrainFirstPersonProjectionTest {
                 && tile.contains("FirstPersonWandTipOrigin.resolveAndRequest(")
                 && tile.contains("if (source == null) {")
                 && tile.contains("source = WandEffectOrigin.resolve("));
-        assertInOrder(tile,
-                "UtilsFX.drawFloatyLine(",
-                "if (reveal >= 1.0F && lineLength > 0.0F)",
-                "drawDrainContact(deltaX, deltaY, deltaZ, color);");
-        assertTrue(tile.contains("GlStateManager.disableTexture2D();")
-                && tile.contains("DefaultVertexFormats.POSITION_COLOR")
-                && tile.contains("GlStateManager.depthMask(false);"));
+        assertTrue(tile.contains("UtilsFX.drawFloatyLine("));
+        assertFalse(tile.contains("drawDrainContact("));
+        assertFalse(tile.contains("DefaultVertexFormats.POSITION_COLOR"));
     }
 
     private static void assertPoint(Vec3d point, double expectedY) {

@@ -1,19 +1,15 @@
 package thaumcraft.client.renderers.tile;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.OpenGlHelper;
-import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
-import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.ResourceLocation;
@@ -26,7 +22,6 @@ import thaumcraft.api.nodes.NodeType;
 import thaumcraft.client.fx.beams.WandEffectOrigin;
 import thaumcraft.client.lib.UtilsFX;
 import thaumcraft.client.renderers.item.FirstPersonWandTipOrigin;
-import thaumcraft.common.config.Config;
 import thaumcraft.common.items.relics.ItemThaumometer;
 import thaumcraft.common.tiles.TileJarNode;
 import thaumcraft.common.tiles.TileNode;
@@ -145,63 +140,12 @@ public class TileNodeRenderer extends TileEntitySpecialRenderer<TileEntity> {
         double targetWorldZ = hitPos.getZ() + 0.5D;
         int color = node.color == null ? node.drainColor : node.color.getRGB();
         float reveal = Math.min(beamAge, 10.0F) / 10.0F;
-        double deltaX = sourceWorldX - targetWorldX;
-        double deltaY = sourceWorldY - targetWorldY;
-        double deltaZ = sourceWorldZ - targetWorldZ;
-        float lineDistance = MathHelper.sqrt(deltaX * deltaX + deltaY * deltaY + deltaZ * deltaZ);
-        float lineLength = Math.round(lineDistance) * ((float) Config.golemLinkQuality / 2.0F);
 
         GlStateManager.pushMatrix();
         UtilsFX.drawFloatyLine(sourceWorldX, sourceWorldY, sourceWorldZ,
                 targetWorldX, targetWorldY, targetWorldZ,
                 partialTicks, color, "textures/misc/wispy.png", -0.02F, reveal);
-        if (reveal >= 1.0F && lineLength > 0.0F) {
-            drawDrainContact(deltaX, deltaY, deltaZ, color);
-        }
         GlStateManager.popMatrix();
-    }
-
-    /** Drawn target-local after UtilsFX translates to the node endpoint. */
-    private static void drawDrainContact(double deltaX, double deltaY, double deltaZ, int color) {
-        final double start = 0.9D;
-        final float startWidth = 0.1F;
-        final float endWidth = 0.02F;
-        Color tint = new Color(color);
-        float red = tint.getRed() / 255.0F;
-        float green = tint.getGreen() / 255.0F;
-        float blue = tint.getBlue() / 255.0F;
-        double startX = deltaX * start;
-        double startY = deltaY * start;
-        double startZ = deltaZ * start;
-
-        NodeLightState lightState = enableNodeLighting();
-        GlStateManager.depthMask(false);
-        GlStateManager.enableBlend();
-        GlStateManager.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE);
-        GlStateManager.disableTexture2D();
-        GlStateManager.disableCull();
-
-        Tessellator tessellator = Tessellator.getInstance();
-        BufferBuilder buffer = tessellator.getBuffer();
-        buffer.begin(GL11.GL_TRIANGLE_STRIP, DefaultVertexFormats.POSITION_COLOR);
-        buffer.pos(startX, startY - startWidth, startZ).color(red, green, blue, 0.35F).endVertex();
-        buffer.pos(startX, startY + startWidth, startZ).color(red, green, blue, 0.35F).endVertex();
-        buffer.pos(deltaX, deltaY - endWidth, deltaZ).color(red, green, blue, 0.7F).endVertex();
-        buffer.pos(deltaX, deltaY + endWidth, deltaZ).color(red, green, blue, 0.7F).endVertex();
-        tessellator.draw();
-
-        buffer.begin(GL11.GL_TRIANGLE_STRIP, DefaultVertexFormats.POSITION_COLOR);
-        buffer.pos(startX - startWidth, startY, startZ).color(red, green, blue, 0.35F).endVertex();
-        buffer.pos(startX + startWidth, startY, startZ).color(red, green, blue, 0.35F).endVertex();
-        buffer.pos(deltaX - endWidth, deltaY, deltaZ).color(red, green, blue, 0.7F).endVertex();
-        buffer.pos(deltaX + endWidth, deltaY, deltaZ).color(red, green, blue, 0.7F).endVertex();
-        tessellator.draw();
-
-        GlStateManager.enableCull();
-        GlStateManager.enableTexture2D();
-        GlStateManager.disableBlend();
-        GlStateManager.depthMask(true);
-        restoreNodeLighting(lightState);
     }
 
     public static void renderNodeAt(INode node, double x, double y, double z, float partialTicks, float size) {

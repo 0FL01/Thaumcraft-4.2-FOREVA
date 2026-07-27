@@ -196,6 +196,7 @@ public class FXBeam extends Particle {
         float ry = this.prevYaw + (this.rotYaw - this.prevYaw) * partialTicks;
         float rp = this.prevPitch + (this.rotPitch - this.prevPitch) * partialTicks;
 
+        GlStateManager.alphaFunc(GL11.GL_GREATER, 1.0F / 255.0F);
         Minecraft.getMinecraft().renderEngine.bindTexture(beamTexture);
         GlStateManager.pushMatrix();
         GlStateManager.disableCull();
@@ -237,6 +238,7 @@ public class FXBeam extends Particle {
         GlStateManager.popMatrix();
 
         renderImpact(partialTicks, rotationX, rotationZ, rotationYZ, rotationXY, rotationXZ);
+        GlStateManager.alphaFunc(GL11.GL_GREATER, 0.1F);
         this.prevSize = size;
     }
 
