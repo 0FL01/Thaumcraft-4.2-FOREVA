@@ -391,7 +391,7 @@ public class ThaumcraftWorldGenerator implements IWorldGenerator {
 
         boolean auraGen = false;
         if (Config.genAura && (newGen || Config.regenAura) && biomeBlacklistLevel < 1) {
-            auraGen = generateStructureNode(world, random, x, z);
+            auraGen = generateStructureNode(world, random, chunkX, chunkZ);
             auraGen = generateWildNodes(world, random, x, z, auraGen) || auraGen;
         }
 
@@ -406,10 +406,12 @@ public class ThaumcraftWorldGenerator implements IWorldGenerator {
         }
     }
 
-    private boolean generateStructureNode(World world, Random rand, int x, int z) {
-        BlockPos origin = new BlockPos(x + 8, world.getHeight(new BlockPos(x + 8, 0, z + 8)).getY(), z + 8);
+    private boolean generateStructureNode(World world, Random rand, int chunkX, int chunkZ) {
+        BlockPos origin = new BlockPos((chunkX << 4) + 8, 64, (chunkZ << 4) + 8);
         BlockPos nearest = new MapGenScatteredFeature().getNearestStructurePos(world, origin, false);
-        if (nearest == null || structureNode.containsKey(nearest.hashCode())) return false;
+        if (nearest == null) return false;
+        if ((nearest.getX() >> 4) != chunkX || (nearest.getZ() >> 4) != chunkZ) return false;
+        if (structureNode.containsKey(nearest.hashCode())) return false;
 
         structureNode.put(nearest.hashCode(), true);
         BlockPos nodePos = new BlockPos(nearest.getX(), world.getHeight(nearest).getY() + 3, nearest.getZ());
@@ -481,14 +483,14 @@ public class ThaumcraftWorldGenerator implements IWorldGenerator {
         }
         if (Config.genCinnibar && (newGen || Config.regenCinnibar)) {
             for (int i = 0; i < 18; ++i) {
-                BlockPos pos = new BlockPos(x + rand.nextInt(16), rand.nextInt(Math.max(1, world.getActualHeight() / 5)), z + rand.nextInt(16));
+                BlockPos pos = new BlockPos(x + 8 + rand.nextInt(16), rand.nextInt(Math.max(1, world.getActualHeight() / 5)), z + 8 + rand.nextInt(16));
                 placeOreBlockIfStone(world, pos, ConfigBlocks.blockCustomOre.getStateFromMeta(0), 0);
             }
         }
         if (Config.genAmber && (newGen || Config.regenAmber)) {
             for (int i = 0; i < 20; ++i) {
-                int bx = x + rand.nextInt(16);
-                int bz = z + rand.nextInt(16);
+                int bx = x + 8 + rand.nextInt(16);
+                int bz = z + 8 + rand.nextInt(16);
                 BlockPos pos = new BlockPos(bx, world.getHeight(new BlockPos(bx, 0, bz)).getY() - rand.nextInt(25), bz);
                 placeOreBlockIfStone(world, pos, ConfigBlocks.blockCustomOre.getStateFromMeta(7), 2);
             }
