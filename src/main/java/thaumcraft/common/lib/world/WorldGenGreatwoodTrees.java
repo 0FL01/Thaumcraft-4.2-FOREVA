@@ -21,6 +21,7 @@ import thaumcraft.common.config.ConfigBlocks;
 import java.util.Random;
 
 public class WorldGenGreatwoodTrees extends WorldGenAbstractTree {
+    private static final int WORLDGEN_RADIUS = 16;
     static final byte[] otherCoordPairs = new byte[]{2, 0, 0, 1, 2, 1};
     Random rand = new Random();
     World worldObj;
@@ -36,10 +37,12 @@ public class WorldGenGreatwoodTrees extends WorldGenAbstractTree {
     int heightLimitLimit = 11;
     int leafDistanceLimit = 4;
     int[][] leafNodes;
+    private final boolean worldgen;
     private static final IBlockState GREATWOOD_LEAVES = ConfigBlocks.blockMagicalLeaves.getStateFromMeta(0);
 
     public WorldGenGreatwoodTrees(boolean notify) {
         super(notify);
+        this.worldgen = !notify;
     }
 
     void generateLeafNodeList() {
@@ -354,6 +357,11 @@ public class WorldGenGreatwoodTrees extends WorldGenAbstractTree {
 
         if (this.heightLimit == 0) {
             this.heightLimit = this.heightLimitLimit + this.rand.nextInt(this.heightLimitLimit);
+        }
+        if (this.worldgen && !worldIn.isAreaLoaded(
+                new BlockPos(x - WORLDGEN_RADIUS, y - 2, z - WORLDGEN_RADIUS),
+                new BlockPos(x + WORLDGEN_RADIUS, y + this.heightLimit * 2, z + WORLDGEN_RADIUS), false)) {
+            return false;
         }
 
         boolean valid = false;

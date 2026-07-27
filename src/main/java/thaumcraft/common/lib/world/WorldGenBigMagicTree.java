@@ -18,6 +18,7 @@ import net.minecraft.world.gen.feature.WorldGenAbstractTree;
 import net.minecraftforge.common.IPlantable;
 
 public class WorldGenBigMagicTree extends WorldGenAbstractTree {
+    private static final int WORLDGEN_RADIUS = 10;
     private Random rand = new Random();
     private World world;
     private BlockPos basePos = BlockPos.ORIGIN;
@@ -30,9 +31,11 @@ public class WorldGenBigMagicTree extends WorldGenAbstractTree {
     private int heightLimitLimit = 12;
     private int leafDistanceLimit = 3;
     private List<FoliageCoordinates> leafNodes = new ArrayList<>();
+    private final boolean worldgen;
 
     public WorldGenBigMagicTree(boolean notify) {
         super(notify);
+        this.worldgen = !notify;
     }
 
     @Override
@@ -43,6 +46,11 @@ public class WorldGenBigMagicTree extends WorldGenAbstractTree {
         this.leafNodes.clear();
         if (this.heightLimit == 0) {
             this.heightLimit = 11 + this.rand.nextInt(this.heightLimitLimit);
+        }
+        if (this.worldgen && !world.isAreaLoaded(
+                pos.add(-WORLDGEN_RADIUS, -1, -WORLDGEN_RADIUS),
+                pos.add(WORLDGEN_RADIUS, this.heightLimit, WORLDGEN_RADIUS), false)) {
+            return false;
         }
         if (!this.validTreeLocation()) {
             return false;
