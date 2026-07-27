@@ -8,6 +8,7 @@ import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.gen.feature.WorldGenAbstractTree;
 import net.minecraft.world.gen.feature.WorldGenBlockBlob;
+import net.minecraftforge.common.util.Constants;
 import thaumcraft.common.config.Config;
 import thaumcraft.common.config.ConfigBlocks;
 import thaumcraft.common.entities.monster.EntityTaintacle;
@@ -18,6 +19,7 @@ import java.util.Random;
 
 public class BiomeTaint extends Biome {
 
+    private static final int WORLDGEN_FLAGS = Constants.BlockFlags.SEND_TO_CLIENTS | Constants.BlockFlags.NO_OBSERVERS;
     public static WorldGenBlockBlob blobs = null;
     protected WorldGenBigMagicTree bigTree = new WorldGenBigMagicTree(false);
 
@@ -94,11 +96,11 @@ public class BiomeTaint extends Biome {
             BlockPos surface = world.getHeight(new BlockPos(fx, 0, fz)).down();
             IBlockState state = world.getBlockState(surface);
             if (state.getBlock() == grassBlock) {
-                world.setBlockState(surface.up(), taintFibres0, 2);
+                world.setBlockState(surface.up(), taintFibres0, WORLDGEN_FLAGS);
             } else if (state.getBlock().isReplaceable(world, surface)
                     && world.getBlockState(surface.down()).getBlock() == grassBlock) {
                 BlockPos fpos = surface;
-                world.setBlockState(fpos, taintFibres0, 2);
+                world.setBlockState(fpos, taintFibres0, WORLDGEN_FLAGS);
             }
         }
         // Force taint biome and place fibrous taint
@@ -109,8 +111,10 @@ public class BiomeTaint extends Biome {
             if (world.getBiome(tpos) != this) {
                 Utils.setBiomeAt(world, tx, tz, this);
             }
-            if (world.isAirBlock(tpos) && BlockUtils.isAdjacentToSolidBlock(world, tpos)) {
-                world.setBlockState(tpos, ConfigBlocks.blockTaintFibres.getStateFromMeta(0), 2);
+            if (world.isAirBlock(tpos)
+                    && world.isAreaLoaded(tpos.add(-1, -1, -1), tpos.add(1, 1, 1), false)
+                    && BlockUtils.isAdjacentToSolidBlock(world, tpos)) {
+                world.setBlockState(tpos, ConfigBlocks.blockTaintFibres.getStateFromMeta(0), WORLDGEN_FLAGS);
             }
         }
     }

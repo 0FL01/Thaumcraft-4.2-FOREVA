@@ -23,6 +23,7 @@ public class WorldGenEldritchRing extends WorldGenerator {
         if (world.provider.getDimension() != 0) return false;
         if (this.width <= 0) this.width = 11;
         if (this.height <= 0) this.height = 11;
+        if (!world.isAreaLoaded(pos.add(-4, -4, -4), pos.add(4, 8, 4), false)) return false;
         if (!isValidRingSpawn(world, pos.add(-3, 0, -3))
                 || !isValidRingSpawn(world, pos)
                 || !isValidRingSpawn(world, pos.add(3, 0, 0))
