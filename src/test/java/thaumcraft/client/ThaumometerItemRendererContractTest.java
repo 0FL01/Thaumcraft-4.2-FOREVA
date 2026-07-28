@@ -154,10 +154,12 @@ public class ThaumometerItemRendererContractTest {
                         && renderer.contains("renderScannerDisplay(mc, stack, player, transformType);"));
 
         int centerCorrection = firstPersonRenderer.indexOf(
-                "GlStateManager.translate(-FIRST_PERSON_CENTER_OFFSET_X * handedness, 0.0F, 0.0F);");
+                "GlStateManager.translate(-FIRST_PERSON_CENTER_OFFSET_X * handedness,");
         int legacyTransform = firstPersonRenderer.indexOf("if (!activeUse) {");
         assertTrue("The first-person view-space centering correction should move the complete mirrored composition before the legacy pose",
                 renderer.contains("private static final float FIRST_PERSON_CENTER_OFFSET_X = 0.272F;")
+                        && renderer.contains("private static final float FIRST_PERSON_CENTER_OFFSET_Y = 0.148F;")
+                        && firstPersonRenderer.contains("-FIRST_PERSON_CENTER_OFFSET_Y, 0.0F);")
                         && centerCorrection >= 0
                         && centerCorrection < legacyTransform);
 
