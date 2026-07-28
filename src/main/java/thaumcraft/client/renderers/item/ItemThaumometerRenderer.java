@@ -264,6 +264,7 @@ public class ItemThaumometerRenderer extends TileEntityItemStackRenderer {
         GlStateManager.disableLighting();
         GlStateManager.enableBlend();
         GlStateManager.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
+        GlStateManager.disableCull();
 
         BufferBuilder buffer = Tessellator.getInstance().getBuffer();
         float half = 1.25F;
@@ -273,6 +274,7 @@ public class ItemThaumometerRenderer extends TileEntityItemStackRenderer {
         buffer.pos(half, -half, 0.0D).tex(1.0D, 0.0D).color(1.0F, 1.0F, 1.0F, 0.92F).endVertex();
         buffer.pos(-half, -half, 0.0D).tex(0.0D, 0.0D).color(1.0F, 1.0F, 1.0F, 0.92F).endVertex();
         Tessellator.getInstance().draw();
+        GlStateManager.enableCull();
 
         if (isFirstPerson(transformType) && player != null && mc.gameSettings.thirdPersonView == 0) {
             renderScanReadout(mc, stack, player);

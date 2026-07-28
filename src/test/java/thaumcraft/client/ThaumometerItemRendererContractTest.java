@@ -24,6 +24,8 @@ public class ThaumometerItemRendererContractTest {
                 "\"thirdperson_righthand\": {", "\"thirdperson_lefthand\": {");
         String leftThirdPerson = between(itemModel,
                 "\"thirdperson_lefthand\": {", "\"firstperson_righthand\": {");
+        String scannerDisplay = between(renderer,
+                "private void renderScannerDisplay(", "private void renderScanReadout(");
 
         assertTrue("ClientProxy should route itemThaumometer onto a builtin/entity model and install the dedicated scanner renderer",
                 clientProxy.contains("if (item == ConfigItems.itemThaumometer) {")
@@ -74,6 +76,13 @@ public class ThaumometerItemRendererContractTest {
 
         assertFalse("The scanner readout should inherit the original screen orientation without an extra 180-degree flip",
                 renderer.contains("GlStateManager.rotate(180.0F, 0.0F, 0.0F, 1.0F);"));
+
+        assertTrue("The scanner glass should render from both sides without leaking disabled culling",
+                scannerDisplay.indexOf("GlStateManager.disableCull();") >= 0
+                        && scannerDisplay.indexOf("GlStateManager.disableCull();")
+                        < scannerDisplay.indexOf("Tessellator.getInstance().draw();")
+                        && scannerDisplay.indexOf("Tessellator.getInstance().draw();")
+                        < scannerDisplay.indexOf("GlStateManager.enableCull();"));
 
         assertTrue("Minimal UtilsFX helper surface should exist for thaumometer HUD aspect tags",
                 utilsFx.contains("public class UtilsFX")
