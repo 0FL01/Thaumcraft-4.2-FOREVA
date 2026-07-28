@@ -28,7 +28,10 @@ Remaining work is mostly item-specific logic, runtime parity testing, and final 
 - **Mappings:** stable_39
 - **Build:** Gradle (ForgeGradle 2.3)
 - **Dependency:** Baubles (CurseMaven)
+- **Optional integration:** JEI 4.16.1.1012
 - **Bundled:** CodeChicken Lib (thaumcraft.codechicken.*)
+
+Install JEI without Thaumic JEI to browse Thaumcraft's Arcane Workbench, Crucible, and Infusion recipes. Thaumic JEI targets Thaumcraft 6 and is not compatible with this TC4 port.
 
 ## What works
 

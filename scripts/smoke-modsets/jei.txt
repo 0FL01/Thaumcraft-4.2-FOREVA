@@ -1,0 +1,5 @@
+# Native JEI integration smoke for GitHub issue #20.
+# Format: jar | sha256 | source/note | direct/dev-remap
+# Baubles is intentionally omitted because it is already on the Gradle classpath.
+# expect-log: Thaumcraft JEI integration registered
+jei_1.12.2-4.16.1.1012.jar | d5f08917e5e8db2618b2b005bc403ee1cf16a24dafcc1e30885e236a985dc133 | https://edge.forgecdn.net/files/5101/347/jei_1.12.2-4.16.1.1012.jar | direct

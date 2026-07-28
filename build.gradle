@@ -44,10 +44,15 @@ repositories {
         name = "curse"
         url = "https://www.cursemaven.com"
     }
+    maven {
+        name = "blamejared"
+        url = "https://maven.blamejared.com"
+    }
 }
 
 dependencies {
     compile 'curse.maven:baubles-227083:2518667'
+    deobfProvided 'mezz.jei:jei_1.12.2:4.16.1.1012:api'
     testCompile 'junit:junit:4.12'
 }
 
