@@ -52,6 +52,23 @@ public class GuiResearchRecipeStaticGuardTest {
                         && source.contains("this.researchFontRenderer.FONT_HEIGHT"));
     }
 
+    @Test
+    public void thaumonomiconPagesShouldNormalizeFontRenderState() throws IOException {
+        String source = read("src/main/java/thaumcraft/client/gui/GuiResearchRecipe.java");
+        int drawPage = source.indexOf("private void drawPage(");
+        int dispatch = source.indexOf("switch (page.type)", drawPage);
+        String setup = source.substring(drawPage, dispatch);
+
+        assertTrue("Thaumonomicon pages must render text on the default texture unit",
+                setup.contains("GlStateManager.setActiveTexture(OpenGlHelper.defaultTexUnit)"));
+        assertTrue("Thaumonomicon pages must restore the textured alpha-blended GUI state",
+                setup.contains("GlStateManager.disableLighting()")
+                        && setup.contains("GlStateManager.enableTexture2D()")
+                        && setup.contains("GlStateManager.enableAlpha()")
+                        && setup.contains("GlStateManager.enableBlend()")
+                        && setup.contains("GlStateManager.tryBlendFuncSeparate("));
+    }
+
     private static String read(String path) throws IOException {
         return new String(Files.readAllBytes(Paths.get(path)), StandardCharsets.UTF_8);
     }
