@@ -48,6 +48,7 @@ public class ItemThaumometerRenderer extends TileEntityItemStackRenderer {
             new ResourceLocation("thaumcraft", "textures/models/scanscreen.png");
     private static final float TC4_TO_TC6_VERTICAL_CENTER = -0.1F;
     private static final float TC4_TO_TC6_Y_ROTATION = -90.0F;
+    private static final float FIRST_PERSON_CENTER_OFFSET_X = 0.272F;
     private static final long DEBUG_LOG_INTERVAL_MS = 1500L;
     private static final float HUD_SCALE_MULTIPLIER = 1.875F;
     private static final ThreadLocal<ItemCameraTransforms.TransformType> CURRENT_TRANSFORM =
@@ -92,6 +93,8 @@ public class ItemThaumometerRenderer extends TileEntityItemStackRenderer {
         GlStateManager.pushMatrix();
         try {
             GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+            // The neutral TC4 pose places the scanner lens 0.272 units to the held side.
+            GlStateManager.translate(-FIRST_PERSON_CENTER_OFFSET_X * handedness, 0.0F, 0.0F);
             // Forge 1.7 invoked EQUIPPED_FIRST_PERSON after this vanilla item transform.
             if (!activeUse) {
                 GlStateManager.translate(-swingRoot * 0.4F * handedness,

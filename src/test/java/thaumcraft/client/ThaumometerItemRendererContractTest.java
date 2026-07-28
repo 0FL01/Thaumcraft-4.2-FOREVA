@@ -104,6 +104,9 @@ public class ThaumometerItemRendererContractTest {
         String handHandler = between(eventHandler,
                 "public void renderThaumometerHands(RenderSpecificHandEvent event)",
                 "public void renderOverlay(RenderGameOverlayEvent event)");
+        String firstPersonRenderer = between(renderer,
+                "public boolean renderFirstPerson(ItemStack stack, EntityPlayerSP player, EnumHandSide heldSide,",
+                "private void renderFirstPersonArms(");
 
         assertTrue("The specific-hand event should own one complete pose only when the cached owner stack matches and the other hand is empty",
                 handHandler.contains("if (mainThaumometer == offThaumometer) {")
@@ -149,6 +152,14 @@ public class ThaumometerItemRendererContractTest {
                         && renderer.contains("GlStateManager.scale(2.0F, 2.0F, 2.0F);")
                         && renderer.contains("renderScannerModel(mc);")
                         && renderer.contains("renderScannerDisplay(mc, stack, player, transformType);"));
+
+        int centerCorrection = firstPersonRenderer.indexOf(
+                "GlStateManager.translate(-FIRST_PERSON_CENTER_OFFSET_X * handedness, 0.0F, 0.0F);");
+        int legacyTransform = firstPersonRenderer.indexOf("if (!activeUse) {");
+        assertTrue("The first-person view-space centering correction should move the complete mirrored composition before the legacy pose",
+                renderer.contains("private static final float FIRST_PERSON_CENTER_OFFSET_X = 0.272F;")
+                        && centerCorrection >= 0
+                        && centerCorrection < legacyTransform);
 
         assertTrue("The direct path should restore the render state it mutates, while donor perspective remains available as fallback",
                 renderer.contains("previousLightmapX")
