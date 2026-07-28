@@ -13,7 +13,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.item.ItemStack;
-import org.lwjgl.opengl.GL11;
 import thaumcraft.api.aspects.Aspect;
 import thaumcraft.api.aspects.AspectList;
 import thaumcraft.client.lib.UtilsFX;
@@ -38,17 +37,12 @@ abstract class ThaumcraftRecipeWrapper implements IRecipeWrapper {
     @Override
     public void drawInfo(Minecraft minecraft, int recipeWidth, int recipeHeight, int mouseX, int mouseY) {
         Aspect[] tags = this.getAspects();
-        GL11.glPushAttrib(GL11.GL_ALL_ATTRIB_BITS);
-        GlStateManager.pushMatrix();
-        try {
-            for (int i = 0; i < tags.length; i++) {
-                int x = aspectX(i, tags.length);
-                int y = this.aspectY + (i / ASPECT_COLUMNS) * 18;
-                UtilsFX.drawTag(x, y, tags[i], this.aspects.getAmount(tags[i]), 0, 0.0D, 771, 1.0F, false);
-            }
-        } finally {
-            GlStateManager.popMatrix();
-            GL11.glPopAttrib();
+        for (int i = 0; i < tags.length; i++) {
+            int x = aspectX(i, tags.length);
+            int y = this.aspectY + (i / ASPECT_COLUMNS) * 18;
+            UtilsFX.drawTag(x, y, tags[i], this.aspects.getAmount(tags[i]), 0, 0.0D, 771, 1.0F, false);
+            GlStateManager.disableLighting();
+            GlStateManager.enableBlend();
             GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
         }
     }
