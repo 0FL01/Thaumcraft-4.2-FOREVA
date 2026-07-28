@@ -131,7 +131,9 @@ CFR located here: `/usr/local/bin/cfr`
 
 Compile success is not enough for parity or checkpoint completion.
 
-Run runtime smoke validation whenever a change can affect mod loading, registries, config, items, blocks, materials, recipes, entities, dimensions, networking, proxies, GUI registration, renderers, models, assets, or lifecycle handlers.
+Run runtime smoke validation for common/server changes that can affect mod loading, registries, config, items, blocks, materials, recipes, entities, dimensions, networking, proxies, or lifecycle handlers.
+
+Do not run automated client smoke as routine validation. For client-only GUI, renderer, model, shader, or asset changes, run focused tests and `./scripts/dev.sh build`; report any manual in-game visual validation separately.
 
 For common/server-side changes, run the dedicated server smoke test first:
 
@@ -143,7 +145,7 @@ A server smoke test passes only when Forge reaches normal ready state, for examp
 
 A runtime smoke test fails if `crash-reports/` contains a new crash report, or logs contain crash markers such as `LoaderException`, `LoaderExceptionModCrash`, `Game crashed`, `Caught exception`, `NoClassDefFoundError`, `ClassNotFoundException`, `NoSuchMethodError`, `NoSuchFieldError`, `ExceptionInInitializerError`, `Repair material has already been set`, or any Forge/FML fatal loading error.
 
-Do not mark runtime-affecting checkpoints complete based only on `compileJava`, `build`, `apiJar`, or `devJar`. Documentation-only diffs do not require runtime smoke.
+Do not mark common/server runtime-affecting checkpoints complete based only on `compileJava`, `build`, `apiJar`, or `devJar`. Do not claim visual parity without manual in-game evidence. Documentation-only diffs do not require runtime smoke.
 
 ## Addon compatibility smoke workflow
 
