@@ -2,12 +2,16 @@ package thaumcraft.common.lib;
 
 import org.junit.Test;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 public class WarpEffectFeedbackParityStaticGuardTest {
@@ -35,6 +39,56 @@ public class WarpEffectFeedbackParityStaticGuardTest {
         assertIconIndex("src/main/java/thaumcraft/common/lib/potions/PotionBlurredVision.java", 5, 2);
         assertIconIndex("src/main/java/thaumcraft/common/lib/potions/PotionSunScorned.java", 6, 2);
         assertIconIndex("src/main/java/thaumcraft/common/lib/potions/PotionThaumarhia.java", 7, 2);
+    }
+
+    @Test
+    public void unnaturalHungerIconKeepsScopedReadabilityOverride() throws IOException {
+        BufferedImage runtime = ImageIO.read(Paths.get("src/main/resources/assets/thaumcraft/textures/misc/potions.png").toFile());
+        BufferedImage original = ImageIO.read(Paths.get("thaumcraft_src/assets/thaumcraft/textures/misc/potions.png").toFile());
+
+        assertNotNull(runtime);
+        assertNotNull(original);
+        assertEquals(256, runtime.getWidth());
+        assertEquals(256, runtime.getHeight());
+        assertEquals(256, original.getWidth());
+        assertEquals(256, original.getHeight());
+        assertTrue(runtime.getColorModel().hasAlpha());
+        assertEquals(4, runtime.getColorModel().getNumComponents());
+
+        int changedInsideCell = 0;
+        int visibleInsideCell = 0;
+        int minX = runtime.getWidth();
+        int minY = runtime.getHeight();
+        int maxX = -1;
+        int maxY = -1;
+        for (int y = 0; y < runtime.getHeight(); y++) {
+            for (int x = 0; x < runtime.getWidth(); x++) {
+                int runtimeArgb = runtime.getRGB(x, y);
+                int originalArgb = original.getRGB(x, y);
+                boolean insideCell = x >= 126 && x < 144 && y >= 216 && y < 234;
+                if (!insideCell) {
+                    assertEquals("Unexpected atlas change at " + x + "," + y, originalArgb, runtimeArgb);
+                } else {
+                    if (runtimeArgb != originalArgb) {
+                        changedInsideCell++;
+                    }
+                    if ((runtimeArgb >>> 24) != 0) {
+                        visibleInsideCell++;
+                        minX = Math.min(minX, x);
+                        minY = Math.min(minY, y);
+                        maxX = Math.max(maxX, x);
+                        maxY = Math.max(maxY, y);
+                    }
+                }
+            }
+        }
+
+        assertTrue(changedInsideCell > 0);
+        assertTrue(visibleInsideCell > 0);
+        assertEquals(129, minX);
+        assertEquals(217, minY);
+        assertEquals(140, maxX);
+        assertEquals(232, maxY);
     }
 
     @Test
