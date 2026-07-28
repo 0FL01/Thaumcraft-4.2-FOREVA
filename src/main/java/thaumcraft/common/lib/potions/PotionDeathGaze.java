@@ -17,7 +17,7 @@ public class PotionDeathGaze extends Potion {
 
     public PotionDeathGaze(boolean isBadEffect, int liquidColor) {
         super(isBadEffect, liquidColor);
-        setIconIndex(2, 2);
+        setIconIndex(4, 2);
         setPotionName("potion.deathgaze");
     }
 

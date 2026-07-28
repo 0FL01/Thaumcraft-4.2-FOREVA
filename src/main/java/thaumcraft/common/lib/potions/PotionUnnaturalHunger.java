@@ -16,7 +16,7 @@ public class PotionUnnaturalHunger extends Potion {
 
     public PotionUnnaturalHunger(boolean isBadEffect, int liquidColor) {
         super(isBadEffect, liquidColor);
-        setIconIndex(0, 2);
+        setIconIndex(7, 1);
         setPotionName("potion.unnaturalhunger");
     }
 

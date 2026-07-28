@@ -17,7 +17,7 @@ public class PotionThaumarhia extends Potion {
 
     public PotionThaumarhia(boolean isBadEffect, int liquidColor) {
         super(isBadEffect, liquidColor);
-        setIconIndex(6, 1);
+        setIconIndex(7, 2);
         setPotionName("potion.thaumarhia");
     }
 

@@ -14,7 +14,7 @@ public class PotionBlurredVision extends Potion {
 
     public PotionBlurredVision(boolean isBadEffect, int liquidColor) {
         super(isBadEffect, liquidColor);
-        setIconIndex(1, 2);
+        setIconIndex(5, 2);
         setPotionName("potion.blurredvision");
     }
 

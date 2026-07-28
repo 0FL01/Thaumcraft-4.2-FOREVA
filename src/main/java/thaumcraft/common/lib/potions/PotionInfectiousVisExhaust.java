@@ -18,7 +18,7 @@ public class PotionInfectiousVisExhaust extends Potion {
 
     public PotionInfectiousVisExhaust(boolean isBadEffect, int liquidColor) {
         super(isBadEffect, liquidColor);
-        setIconIndex(5, 1);
+        setIconIndex(6, 1);
         setPotionName("potion.infvisexhaust");
     }
 

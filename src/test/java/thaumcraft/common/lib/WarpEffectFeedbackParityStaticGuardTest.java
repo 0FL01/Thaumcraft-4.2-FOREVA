@@ -25,6 +25,31 @@ public class WarpEffectFeedbackParityStaticGuardTest {
     }
 
     @Test
+    public void warpPotionsKeepOriginalStatusIconContracts() throws IOException {
+        assertIconIndex("src/main/java/thaumcraft/api/potions/PotionFluxTaint.java", 3, 1);
+        assertIconIndex("src/main/java/thaumcraft/api/potions/PotionVisExhaust.java", 5, 1);
+        assertIconIndex("src/main/java/thaumcraft/common/lib/potions/PotionInfectiousVisExhaust.java", 6, 1);
+        assertIconIndex("src/main/java/thaumcraft/common/lib/potions/PotionUnnaturalHunger.java", 7, 1);
+        assertIconIndex("src/main/java/thaumcraft/common/lib/potions/PotionWarpWard.java", 3, 2);
+        assertIconIndex("src/main/java/thaumcraft/common/lib/potions/PotionDeathGaze.java", 4, 2);
+        assertIconIndex("src/main/java/thaumcraft/common/lib/potions/PotionBlurredVision.java", 5, 2);
+        assertIconIndex("src/main/java/thaumcraft/common/lib/potions/PotionSunScorned.java", 6, 2);
+        assertIconIndex("src/main/java/thaumcraft/common/lib/potions/PotionThaumarhia.java", 7, 2);
+    }
+
+    @Test
+    public void unnaturalHungerUsesNativeColorConvolveShader() throws IOException {
+        String shader = readFile("src/main/resources/assets/minecraft/shaders/post/hunger.json");
+
+        assertTrue(shader.contains("\"name\": \"color_convolve\""));
+        assertFalse(shader.contains("color_convolve2"));
+        assertTrue(shader.contains("\"values\": [ 1.0, 0.8, 0.8 ]"));
+        assertTrue(shader.contains("\"values\": [ 1.1 ]"));
+        assertFalse(Files.exists(Paths.get("src/main/resources/assets/minecraft/shaders/program/color_convolve2.json")));
+        assertFalse(Files.exists(Paths.get("src/main/resources/assets/minecraft/shaders/program/color_convolve2.fsh")));
+    }
+
+    @Test
     public void deathGazeKeepsOriginalTargetAndAggressionFilters() throws IOException {
         String warpEvents = readFile("src/main/java/thaumcraft/common/lib/WarpEvents.java");
         String entityUtils = readFile("src/main/java/thaumcraft/common/lib/utils/EntityUtils.java");
@@ -64,6 +89,12 @@ public class WarpEffectFeedbackParityStaticGuardTest {
             offset += needle.length();
         }
         return count;
+    }
+
+    private static void assertIconIndex(String path, int x, int y) throws IOException {
+        String source = readFile(path);
+        assertTrue(path, source.contains("setIconIndex(" + x + ", " + y + ")"));
+        assertTrue(path, count(source, "setIconIndex(") == 1);
     }
 
     private static String readFile(String path) throws IOException {

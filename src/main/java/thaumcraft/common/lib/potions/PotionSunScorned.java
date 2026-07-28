@@ -17,7 +17,7 @@ public class PotionSunScorned extends Potion {
 
     public PotionSunScorned(boolean isBadEffect, int liquidColor) {
         super(isBadEffect, liquidColor);
-        setIconIndex(3, 2);
+        setIconIndex(6, 2);
         setPotionName("potion.sunscorned");
     }
 

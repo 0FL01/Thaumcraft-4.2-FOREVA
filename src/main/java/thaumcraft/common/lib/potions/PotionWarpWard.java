@@ -14,7 +14,7 @@ public class PotionWarpWard extends Potion {
 
     public PotionWarpWard(boolean isBadEffect, int liquidColor) {
         super(isBadEffect, liquidColor);
-        setIconIndex(4, 2);
+        setIconIndex(3, 2);
         setPotionName("potion.warpward");
         setBeneficial();
     }
