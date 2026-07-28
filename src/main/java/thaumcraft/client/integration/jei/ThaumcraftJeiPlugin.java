@@ -11,7 +11,6 @@ import mezz.jei.api.gui.IDrawable;
 import mezz.jei.api.recipe.IRecipeCategoryRegistration;
 import mezz.jei.api.recipe.IStackHelper;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.MinecraftForge;
 import thaumcraft.api.ThaumcraftApi;
 import thaumcraft.client.gui.GuiArcaneWorkbench;
@@ -24,9 +23,6 @@ public final class ThaumcraftJeiPlugin implements IModPlugin {
     static final String CRUCIBLE_UID = "thaumcraft.crucible";
     static final String INFUSION_UID = "thaumcraft.infusion";
 
-    private static final ResourceLocation RESEARCH_OVERLAY =
-            new ResourceLocation("thaumcraft", "textures/gui/gui_researchbook_overlay.png");
-
     private final List<ResearchVisibility.Entry<ThaumcraftRecipeWrapper>> visibilityEntries =
             new ArrayList<ResearchVisibility.Entry<ThaumcraftRecipeWrapper>>();
 
@@ -35,14 +31,11 @@ public final class ThaumcraftJeiPlugin implements IModPlugin {
         IGuiHelper gui = registration.getJeiHelpers().getGuiHelper();
         registration.addRecipeCategories(
                 new ThaumcraftRecipeCategory<ThaumcraftRecipeWrapper.Arcane>(
-                        ARCANE_UID, "recipe.type.arcane", gui.createBlankDrawable(160, 100),
-                        gui.createDrawable(RESEARCH_OVERLAY, 2, 27, 112, 15), 24, 2),
+                        ARCANE_UID, "recipe.type.arcane", gui.createBlankDrawable(160, 100)),
                 new ThaumcraftRecipeCategory<ThaumcraftRecipeWrapper.Crucible>(
-                        CRUCIBLE_UID, "recipe.type.crucible", gui.createBlankDrawable(160, 92),
-                        gui.createDrawable(RESEARCH_OVERLAY, 0, 3, 56, 17), 52, 28),
+                        CRUCIBLE_UID, "recipe.type.crucible", gui.createBlankDrawable(160, 92)),
                 new ThaumcraftRecipeCategory<ThaumcraftRecipeWrapper.Infusion>(
-                        INFUSION_UID, "recipe.type.infusion", gui.createBlankDrawable(160, 125),
-                        gui.createDrawable(RESEARCH_OVERLAY, 200, 77, 56, 44), 52, 32));
+                        INFUSION_UID, "recipe.type.infusion", gui.createBlankDrawable(160, 125)));
     }
 
     @Override

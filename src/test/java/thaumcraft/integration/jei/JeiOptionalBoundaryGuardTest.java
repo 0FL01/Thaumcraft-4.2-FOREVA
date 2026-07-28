@@ -19,10 +19,14 @@ public class JeiOptionalBoundaryGuardTest {
             paths.filter(path -> path.toString().endsWith(".java")).forEach(path -> {
                 try {
                     String source = new String(Files.readAllBytes(path), StandardCharsets.UTF_8);
+                    String normalized = path.toString().replace('\\', '/');
                     if (source.contains("mezz.jei")) {
-                        String normalized = path.toString().replace('\\', '/');
                         assertTrue("JEI reference escaped optional client boundary: " + normalized,
                                 normalized.contains("/thaumcraft/client/integration/jei/"));
+                    }
+                    if (normalized.contains("/thaumcraft/client/integration/jei/")) {
+                        assertFalse("JEI integration must not crop the research book atlas: " + normalized,
+                                source.contains("gui_researchbook_overlay.png"));
                     }
                 } catch (IOException e) {
                     throw new RuntimeException(e);

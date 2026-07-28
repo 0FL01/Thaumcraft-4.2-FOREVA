@@ -149,7 +149,7 @@ abstract class ThaumcraftRecipeWrapper implements IRecipeWrapper {
         private final JeiRecipeData.Infusion recipe;
 
         Infusion(JeiRecipeData.Infusion recipe, IDrawable slotDrawable) {
-            super(recipe, slotDrawable, 106);
+            super(recipe, slotDrawable, 105);
             this.recipe = recipe;
         }
 
@@ -165,15 +165,15 @@ abstract class ThaumcraftRecipeWrapper implements IRecipeWrapper {
         @Override
         void setRecipe(IRecipeLayout layout) {
             IGuiItemStackGroup stacks = layout.getItemStacks();
-            stacks.init(0, true, 72, 48);
+            stacks.init(0, true, 54, 34);
             stacks.setBackground(0, this.slotDrawable);
             stacks.set(0, this.recipe.central);
 
             int count = this.recipe.components.size();
             for (int i = 0; i < count; i++) {
                 double angle = Math.PI * 2.0D * i / Math.max(1, count);
-                int x = 72 + (int) Math.round(Math.cos(angle) * 55.0D);
-                int y = 48 + (int) Math.round(Math.sin(angle) * 30.0D);
+                int x = 54 + (int) Math.round(Math.cos(angle) * 46.0D);
+                int y = 34 + (int) Math.round(Math.sin(angle) * 31.0D);
                 int slot = i + 1;
                 stacks.init(slot, true, x, y);
                 stacks.setBackground(slot, this.slotDrawable);
@@ -181,7 +181,7 @@ abstract class ThaumcraftRecipeWrapper implements IRecipeWrapper {
             }
 
             int outputSlot = count + 1;
-            stacks.init(outputSlot, false, 72, 2);
+            stacks.init(outputSlot, false, 132, 34);
             stacks.setBackground(outputSlot, this.slotDrawable);
             stacks.set(outputSlot, this.recipe.outputs);
         }
@@ -191,7 +191,7 @@ abstract class ThaumcraftRecipeWrapper implements IRecipeWrapper {
             super.drawInfo(minecraft, recipeWidth, recipeHeight, mouseX, mouseY);
             int tier = Math.min(5, Math.max(0, this.recipe.instability / 2));
             String text = I18n.format("tc.inst") + " " + I18n.format("tc.inst." + tier);
-            minecraft.fontRenderer.drawString(text, (160 - minecraft.fontRenderer.getStringWidth(text)) / 2, 91, 0x505050);
+            minecraft.fontRenderer.drawString(text, (160 - minecraft.fontRenderer.getStringWidth(text)) / 2, 88, 0x505050);
         }
     }
 }
