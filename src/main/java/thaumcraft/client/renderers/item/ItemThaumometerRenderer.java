@@ -214,11 +214,9 @@ public class ItemThaumometerRenderer extends TileEntityItemStackRenderer {
         GlStateManager.pushMatrix();
         try {
             GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
-            // The held pose is intentionally left to the donor display transforms.
-            // Only the scanner-mesh basis mismatch is adapted here; local first-person
-            // arm/equipped-progress transforms were tried and rolled back after they
-            // broke the visual placement in live testing.
-            if (applyItemBasis) {
+            // Third-person display transforms already convert the original TC4
+            // equipped pose directly into the Forge 1.12 hand coordinate space.
+            if (applyItemBasis && !isThirdPerson(transformType)) {
                 applyTc6ScannerBasis();
             }
             renderScannerModel(mc);
@@ -232,6 +230,11 @@ public class ItemThaumometerRenderer extends TileEntityItemStackRenderer {
     private void applyTc6ScannerBasis() {
         GlStateManager.translate(0.0F, TC4_TO_TC6_VERTICAL_CENTER, 0.0F);
         GlStateManager.rotate(TC4_TO_TC6_Y_ROTATION, 0.0F, 1.0F, 0.0F);
+    }
+
+    private static boolean isThirdPerson(ItemCameraTransforms.TransformType transformType) {
+        return transformType == ItemCameraTransforms.TransformType.THIRD_PERSON_RIGHT_HAND
+                || transformType == ItemCameraTransforms.TransformType.THIRD_PERSON_LEFT_HAND;
     }
 
     private void renderScannerModel(Minecraft mc) {

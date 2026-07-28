@@ -2,14 +2,14 @@
   "parent": "builtin/entity",
   "display": {
     "thirdperson_righthand": {
-      "rotation": [90, 90, 0],
-      "translation": [0.0, 0.0, -1.6],
-      "scale": [0.2, 0.2, 0.2]
+      "rotation": [-20, 0, -75],
+      "translation": [-0.848528, -1.907665, -0.8125],
+      "scale": [0.1875, 0.1875, 0.1875]
     },
     "thirdperson_lefthand": {
-      "rotation": [90, 90, 0],
-      "translation": [0.0, -1.6, 0.0],
-      "scale": [0.2, 0.2, 0.2]
+      "rotation": [-20, 0, 75],
+      "translation": [0.848528, -1.907665, -0.8125],
+      "scale": [0.1875, 0.1875, 0.1875]
     },
     "firstperson_righthand": {
       "rotation": [90, 0, 0],

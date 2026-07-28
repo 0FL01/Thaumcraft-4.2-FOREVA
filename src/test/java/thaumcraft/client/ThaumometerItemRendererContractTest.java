@@ -20,6 +20,10 @@ public class ThaumometerItemRendererContractTest {
         String perspectiveModel = read("src/main/java/thaumcraft/client/renderers/item/ThaumometerPerspectiveModel.java");
         String utilsFx = read("src/main/java/thaumcraft/client/lib/UtilsFX.java");
         String itemModel = read("src/main/resources/assets/thaumcraft/models/item/itemthaumometer_tesr.json");
+        String rightThirdPerson = between(itemModel,
+                "\"thirdperson_righthand\": {", "\"thirdperson_lefthand\": {");
+        String leftThirdPerson = between(itemModel,
+                "\"thirdperson_lefthand\": {", "\"firstperson_righthand\": {");
 
         assertTrue("ClientProxy should route itemThaumometer onto a builtin/entity model and install the dedicated scanner renderer",
                 clientProxy.contains("if (item == ConfigItems.itemThaumometer) {")
@@ -77,19 +81,28 @@ public class ThaumometerItemRendererContractTest {
                         && utilsFx.contains("drawTexturedQuad(")
                         && utilsFx.contains("bindTexture("));
 
-        assertTrue("The scanner render path should adapt the TC4.2 OBJ basis onto the TC6 scanner basis after the dedicated first-person setup or donor display transforms",
-                renderer.contains("GlStateManager.translate(0.0F, TC4_TO_TC6_VERTICAL_CENTER, 0.0F);")
+        assertTrue("The scanner render path should bypass the TC6 mesh adapter only for TC4-derived third-person hand transforms",
+                renderer.contains("if (applyItemBasis && !isThirdPerson(transformType)) {")
+                        && renderer.contains("transformType == ItemCameraTransforms.TransformType.THIRD_PERSON_RIGHT_HAND")
+                        && renderer.contains("transformType == ItemCameraTransforms.TransformType.THIRD_PERSON_LEFT_HAND")
+                        && renderer.contains("GlStateManager.translate(0.0F, TC4_TO_TC6_VERTICAL_CENTER, 0.0F);")
                         && renderer.contains("GlStateManager.rotate(TC4_TO_TC6_Y_ROTATION, 0.0F, 1.0F, 0.0F);"));
 
         assertTrue("The thaumometer item-model stub must stay builtin/entity so Forge still dispatches the custom baked-model + TEISR route",
                 itemModel.contains("\"parent\": \"builtin/entity\""));
 
-        assertTrue("The thaumometer TEISR display transforms should mirror the Thaumcraft 6 scanner donor poses for GUI, ground, fixed, and third-person contexts while retaining the dedicated first-person builtin route",
-                itemModel.contains("\"thirdperson_righthand\"")
-                        && itemModel.contains("\"rotation\": [90, 90, 0]")
-                        && itemModel.contains("\"translation\": [0.0, 0.0, -1.6]")
-                        && itemModel.contains("\"translation\": [0.0, -1.6, 0.0]")
-                        && itemModel.contains("\"translation\": [2.8, -2.8, 0.0]")
+        assertTrue("The right-hand third-person transform should reproduce the original TC4 equipped pose in Forge 1.12 hand space",
+                rightThirdPerson.contains("\"rotation\": [-20, 0, -75]")
+                        && rightThirdPerson.contains("\"translation\": [-0.848528, -1.907665, -0.8125]")
+                        && rightThirdPerson.contains("\"scale\": [0.1875, 0.1875, 0.1875]"));
+
+        assertTrue("The 1.12 left-hand extension should mirror the TC4-derived pose without negative scale",
+                leftThirdPerson.contains("\"rotation\": [-20, 0, 75]")
+                        && leftThirdPerson.contains("\"translation\": [0.848528, -1.907665, -0.8125]")
+                        && leftThirdPerson.contains("\"scale\": [0.1875, 0.1875, 0.1875]"));
+
+        assertTrue("GUI, ground, fixed, and first-person fallback transforms should retain their donor calibration",
+                itemModel.contains("\"translation\": [2.8, -2.8, 0.0]")
                         && itemModel.contains("\"translation\": [1.6, 1.6, 1.6]")
                         && itemModel.contains("\"translation\": [3.2, 3.2, -2.72]")
                         && itemModel.contains("\"translation\": [-0.96, 0.096, -14.352]")
