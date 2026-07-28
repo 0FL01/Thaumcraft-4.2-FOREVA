@@ -95,63 +95,80 @@ public class ThaumometerItemRendererContractTest {
     }
 
     @Test
-    public void thaumometerShouldRenderTc4HandsWithoutReplacingTheScannerRoute() throws IOException {
+    public void thaumometerShouldRenderTc4HandsAndScannerAtomically() throws IOException {
         String eventHandler = read("src/main/java/thaumcraft/client/lib/RenderEventHandler.java");
         String renderer = read("src/main/java/thaumcraft/client/renderers/item/ItemThaumometerRenderer.java");
         String perspectiveModel = read("src/main/java/thaumcraft/client/renderers/item/ThaumometerPerspectiveModel.java");
+        String handHandler = between(eventHandler,
+                "public void renderThaumometerHands(RenderSpecificHandEvent event)",
+                "public void renderOverlay(RenderGameOverlayEvent event)");
 
-        assertTrue("The specific-hand event should add the two-hand pose only when the other hand is empty",
-                eventHandler.contains("renderThaumometerHands(RenderSpecificHandEvent event)")
-                        && eventHandler.contains("if (mainThaumometer == offThaumometer) {")
-                        && eventHandler.contains("if (!otherStack.isEmpty()) {")
-                        && eventHandler.contains("if (event.getHand() == thaumometerHand) {")
-                        && eventHandler.contains("player.getPrimaryHand().opposite()")
-                        && eventHandler.contains("vanillaSkipsItemTransform")
-                        && eventHandler.contains("event.getItemStack().getItemUseAction() == EnumAction.NONE")
-                        && eventHandler.contains("float renderEquipProgress = vanillaSkipsItemTransform ? 0.0F : event.getEquipProgress();")
-                        && eventHandler.contains("event.getSwingProgress(), renderEquipProgress);"));
+        assertTrue("The specific-hand event should own one complete pose only when the cached owner stack matches and the other hand is empty",
+                handHandler.contains("if (mainThaumometer == offThaumometer) {")
+                        && handHandler.contains("if (!otherStack.isEmpty()) {")
+                        && handHandler.contains("if (event.getHand() == thaumometerHand) {")
+                        && handHandler.contains("if (!(event.getItemStack().getItem() instanceof ItemThaumometer)) {")
+                        && handHandler.contains("player.getPrimaryHand().opposite()")
+                        && handHandler.contains("getTileEntityItemStackRenderer()")
+                        && handHandler.contains("itemRenderer instanceof ItemThaumometerRenderer")
+                        && handHandler.contains(".renderFirstPerson(event.getItemStack(), player,")
+                        && handHandler.contains("event.getPartialTicks(), event.getSwingProgress(), renderEquipProgress,")
+                        && handHandler.contains("event.setCanceled(true);"));
+
+        assertTrue("Active EnumAction.NONE scanning should keep the observed stable equip progress while using the same direct renderer",
+                handHandler.contains("vanillaSkipsItemTransform")
+                        && handHandler.contains("event.getItemStack().getItemUseAction() == EnumAction.NONE")
+                        && handHandler.contains("float renderEquipProgress = vanillaSkipsItemTransform ? 0.0F : event.getEquipProgress();")
+                        && handHandler.contains("vanillaSkipsItemTransform))"));
 
         assertTrue("An offhand thaumometer should suppress only the extra empty main-hand arm",
-                eventHandler.contains("thaumometerHand == EnumHand.OFF_HAND")
-                        && eventHandler.contains("event.getHand() == EnumHand.MAIN_HAND")
-                        && eventHandler.contains("event.getItemStack().isEmpty()")
-                        && eventHandler.contains("event.setCanceled(true);"));
+                handHandler.contains("thaumometerHand == EnumHand.OFF_HAND")
+                        && handHandler.contains("event.getHand() == EnumHand.MAIN_HAND")
+                        && handHandler.contains("event.getItemStack().isEmpty()")
+                        && handHandler.contains("event.setCanceled(true);"));
 
-        assertTrue("The arm-only renderer should restore the 1.7 incoming item transform and render both TC4 pose instances with the held-side arm model",
-                renderer.contains("renderFirstPersonHands(EntityPlayerSP player, EnumHandSide heldSide,")
-                        && renderer.contains("float swingProgress, float equipProgress)")
+        assertTrue("The direct renderer should preserve the original first-person parent through both arms and the scanner tail",
+                renderer.contains("boolean renderFirstPerson(ItemStack stack, EntityPlayerSP player, EnumHandSide heldSide,")
+                        && renderer.contains("float partialTicks, float swingProgress, float equipProgress,")
+                        && renderer.contains("if (!activeUse) {")
                         && renderer.contains("-0.65F * scale - equipProgress * 0.6F")
                         && renderer.contains("GlStateManager.rotate(45.0F * handedness")
                         && renderer.contains("GlStateManager.scale(0.4F, 0.4F, 0.4F);")
+                        && renderer.contains("player.prevRenderArmPitch")
+                        && renderer.contains("player.prevRenderArmYaw")
                         && renderer.contains("0.65F * scale + equipProgress * 1.5F")
                         && renderer.contains("for (int armIndex = 0; armIndex < 2; armIndex++)")
-                        && renderer.contains("GlStateManager.translate(-0.3F * handedness, -0.47F, -0.85F);")
-                        && renderer.contains("GlStateManager.translate(0.0F, -0.6F, 1.15F * direction);")
-                        && renderer.contains("GlStateManager.scale(0.92F, 0.92F, 0.92F);")
+                        && renderer.contains("GlStateManager.translate(0.0F, -0.6F, 1.1F * direction);")
                         && renderer.contains("if (heldSide == EnumHandSide.RIGHT)")
                         && renderer.contains("renderPlayer.renderRightArm(clientPlayer);")
-                        && renderer.contains("renderPlayer.renderLeftArm(clientPlayer);"));
+                        && renderer.contains("renderPlayer.renderLeftArm(clientPlayer);")
+                        && renderer.contains("GlStateManager.rotate(90.0F * handedness, 0.0F, 0.0F, 1.0F);")
+                        && renderer.contains("GlStateManager.translate(0.4F * handedness, -0.4F, 0.0F);")
+                        && renderer.contains("GlStateManager.scale(2.0F, 2.0F, 2.0F);")
+                        && renderer.contains("renderScannerModel(mc);")
+                        && renderer.contains("renderScannerDisplay(mc, stack, player, transformType);"));
 
-        assertTrue("Active EnumAction.NONE scanning should render through the existing item route under a stable vanilla hand matrix",
-                renderer.contains("applyVanillaFirstPersonTransform(EnumHandSide heldSide, float swingProgress,")
-                        && renderer.contains("GlStateManager.translate(0.56F * handedness, -0.52F - equipProgress * 0.6F, -0.72F);")
-                        && renderer.contains("GlStateManager.rotate(-45.0F * handedness")
-                        && eventHandler.contains("ItemCameraTransforms.TransformType.FIRST_PERSON_RIGHT_HAND")
-                        && eventHandler.contains("ItemCameraTransforms.TransformType.FIRST_PERSON_LEFT_HAND")
-                        && eventHandler.contains("mc.getItemRenderer().renderItemSide(player, event.getItemStack(), transformType,")
-                        && eventHandler.contains("heldSide == EnumHandSide.LEFT")
-                        && eventHandler.contains("event.setCanceled(true);")
+        assertTrue("The direct path should restore the render state it mutates, while donor perspective remains available as fallback",
+                renderer.contains("previousLightmapX")
+                        && renderer.contains("previousLightmapY")
+                        && renderer.contains("GlStateManager.alphaFunc(GL11.GL_GREATER, 0.1F);")
+                        && renderer.contains("RenderHelper.enableStandardItemLighting();")
+                        && renderer.contains("private void applyTc6ScannerBasis()")
                         && perspectiveModel.contains("return Pair.of(this, delegatePerspective.getRight());"));
 
-        assertFalse("Active scanning must not re-enter the vanilla active-use transform branch",
-                eventHandler.contains("renderItemInFirstPerson(player"));
+        assertFalse("The atomic hand event must not re-enter or redispatch the vanilla item renderer",
+                handHandler.contains("renderItemInFirstPerson(")
+                        || handHandler.contains("renderItemSide(")
+                        || handHandler.contains("renderByItem("));
 
         assertFalse("The scanner perspective model must not carry active-use state between event and item rendering",
                 renderer.contains("FIRST_PERSON_ITEM_TRANSFORM")
                         || perspectiveModel.contains("consumeFirstPersonItemTransform"));
 
-        assertFalse("The hand event must not replace or duplicate the existing scanner renderer",
-                eventHandler.contains("renderByItem(") || eventHandler.contains("renderScanner("));
+        assertFalse("The original first-person chain must not retain donor-alignment calibration hacks",
+                renderer.contains("GlStateManager.translate(-0.3F * handedness, -0.47F, -0.85F);")
+                        || renderer.contains("GlStateManager.translate(0.0F, -0.6F, 1.15F * direction);")
+                        || renderer.contains("GlStateManager.scale(0.92F, 0.92F, 0.92F);"));
         assertFalse("Equipped progress must come from the event rather than reflected ItemRenderer fields",
                 renderer.contains("java.lang.reflect")
                         || renderer.contains("setAccessible(")
@@ -160,5 +177,11 @@ public class ThaumometerItemRendererContractTest {
 
     private static String read(String path) throws IOException {
         return new String(Files.readAllBytes(Paths.get(path)), StandardCharsets.UTF_8);
+    }
+
+    private static String between(String source, String start, String end) {
+        int startIndex = source.indexOf(start);
+        int endIndex = source.indexOf(end, startIndex);
+        return startIndex >= 0 && endIndex > startIndex ? source.substring(startIndex, endIndex) : "";
     }
 }

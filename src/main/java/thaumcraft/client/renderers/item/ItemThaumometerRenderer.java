@@ -60,23 +60,6 @@ public class ItemThaumometerRenderer extends TileEntityItemStackRenderer {
         CURRENT_TRANSFORM.set(transformType == null ? ItemCameraTransforms.TransformType.NONE : transformType);
     }
 
-    public static void applyVanillaFirstPersonTransform(EnumHandSide heldSide, float swingProgress,
-                                                        float equipProgress) {
-        float handedness = heldSide == EnumHandSide.RIGHT ? 1.0F : -1.0F;
-        float swingRoot = MathHelper.sin(MathHelper.sqrt(swingProgress) * (float) Math.PI);
-        float swingLinear = MathHelper.sin(swingProgress * (float) Math.PI);
-        float swingSquared = MathHelper.sin(swingProgress * swingProgress * (float) Math.PI);
-
-        GlStateManager.translate(-swingRoot * 0.4F * handedness,
-                MathHelper.sin(MathHelper.sqrt(swingProgress) * (float) Math.PI * 2.0F) * 0.2F,
-                -swingLinear * 0.2F);
-        GlStateManager.translate(0.56F * handedness, -0.52F - equipProgress * 0.6F, -0.72F);
-        GlStateManager.rotate(handedness * (45.0F - swingSquared * 20.0F), 0.0F, 1.0F, 0.0F);
-        GlStateManager.rotate(-swingRoot * 20.0F * handedness, 0.0F, 0.0F, 1.0F);
-        GlStateManager.rotate(-swingRoot * 80.0F, 1.0F, 0.0F, 0.0F);
-        GlStateManager.rotate(-45.0F * handedness, 0.0F, 1.0F, 0.0F);
-    }
-
     @Override
     public void renderByItem(ItemStack stack, float partialTicks) {
         renderScanner(stack, CURRENT_TRANSFORM.get(), true);
@@ -86,36 +69,35 @@ public class ItemThaumometerRenderer extends TileEntityItemStackRenderer {
         renderScanner(stack, ItemCameraTransforms.TransformType.NONE, false);
     }
 
-    public static void renderFirstPersonHands(EntityPlayerSP player, EnumHandSide heldSide,
-                                              float swingProgress, float equipProgress) {
-        if (player == null || heldSide == null || player.isInvisible()) {
-            return;
+    public boolean renderFirstPerson(ItemStack stack, EntityPlayerSP player, EnumHandSide heldSide,
+                                     float partialTicks, float swingProgress, float equipProgress,
+                                     boolean activeUse) {
+        if (stack == null || stack.isEmpty() || player == null || heldSide == null || scannerModel == null) {
+            return false;
         }
 
         Minecraft mc = Minecraft.getMinecraft();
-        Render<?> render = mc.getRenderManager().getEntityRenderObject(player);
-        if (!(render instanceof RenderPlayer)) {
-            return;
-        }
-
-        AbstractClientPlayer clientPlayer = player;
-        RenderPlayer renderPlayer = (RenderPlayer) render;
         float handedness = heldSide == EnumHandSide.RIGHT ? 1.0F : -1.0F;
         float scale = 0.8F;
         float swingRoot = MathHelper.sin(MathHelper.sqrt(swingProgress) * (float) Math.PI);
         float swingLinear = MathHelper.sin(swingProgress * (float) Math.PI);
         float swingSquared = MathHelper.sin(swingProgress * swingProgress * (float) Math.PI);
+        float armPitch = player.prevRenderArmPitch
+                + (player.renderArmPitch - player.prevRenderArmPitch) * partialTicks;
+        float armYaw = player.prevRenderArmYaw
+                + (player.renderArmYaw - player.prevRenderArmYaw) * partialTicks;
+        float previousLightmapX = OpenGlHelper.lastBrightnessX;
+        float previousLightmapY = OpenGlHelper.lastBrightnessY;
 
-        mc.getTextureManager().bindTexture(clientPlayer.getLocationSkin());
         GlStateManager.pushMatrix();
         try {
             GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
-            // Align the 1.7 arm pose with the donor-positioned 1.12 scanner.
-            GlStateManager.translate(-0.3F * handedness, -0.47F, -0.85F);
             // Forge 1.7 invoked EQUIPPED_FIRST_PERSON after this vanilla item transform.
-            GlStateManager.translate(-swingRoot * 0.4F * handedness,
-                    MathHelper.sin(MathHelper.sqrt(swingProgress) * (float) Math.PI * 2.0F) * 0.2F,
-                    -swingLinear * 0.2F);
+            if (!activeUse) {
+                GlStateManager.translate(-swingRoot * 0.4F * handedness,
+                        MathHelper.sin(MathHelper.sqrt(swingProgress) * (float) Math.PI * 2.0F) * 0.2F,
+                        -swingLinear * 0.2F);
+            }
             GlStateManager.translate(0.7F * scale * handedness,
                     -0.65F * scale - equipProgress * 0.6F, -0.9F * scale);
             GlStateManager.rotate(45.0F * handedness, 0.0F, 1.0F, 0.0F);
@@ -126,23 +108,81 @@ public class ItemThaumometerRenderer extends TileEntityItemStackRenderer {
 
             GlStateManager.translate(handedness, 0.75F, -1.0F);
             GlStateManager.rotate(-135.0F * handedness, 0.0F, 1.0F, 0.0F);
+            GlStateManager.rotate((player.rotationPitch - armPitch) * 0.1F, 1.0F, 0.0F, 0.0F);
+            GlStateManager.rotate((player.rotationYaw - armYaw) * 0.1F * handedness,
+                    0.0F, 1.0F, 0.0F);
             GlStateManager.translate(-0.7F * scale * handedness,
                     0.65F * scale + equipProgress * 1.5F, 0.9F * scale);
             GlStateManager.rotate(90.0F * handedness, 0.0F, 1.0F, 0.0F);
             GlStateManager.translate(0.0F, 0.0F, -0.9F * scale);
             GlStateManager.rotate(90.0F * handedness, 0.0F, 1.0F, 0.0F);
-            GlStateManager.scale(5.0F, 5.0F, 5.0F);
+            renderFirstPersonArms(mc, player, heldSide, handedness);
 
+            GlStateManager.rotate(90.0F * handedness, 0.0F, 0.0F, 1.0F);
+            GlStateManager.translate(0.4F * handedness, -0.4F, 0.0F);
+            GlStateManager.enableRescaleNormal();
+            GlStateManager.scale(2.0F, 2.0F, 2.0F);
+
+            ItemCameraTransforms.TransformType transformType = heldSide == EnumHandSide.RIGHT
+                    ? ItemCameraTransforms.TransformType.FIRST_PERSON_RIGHT_HAND
+                    : ItemCameraTransforms.TransformType.FIRST_PERSON_LEFT_HAND;
+            renderScannerModel(mc);
+            renderScannerDisplay(mc, stack, player, transformType);
+            return true;
+        } finally {
+            GlStateManager.popMatrix();
+            OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit,
+                    previousLightmapX, previousLightmapY);
+            GlStateManager.alphaFunc(GL11.GL_GREATER, 0.1F);
+            GlStateManager.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA,
+                    GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
+            GlStateManager.disableBlend();
+            GlStateManager.enableCull();
+            GlStateManager.enableRescaleNormal();
+            GlStateManager.pushMatrix();
+            try {
+                GlStateManager.rotate((armYaw - player.rotationYaw) * 0.1F, 0.0F, 1.0F, 0.0F);
+                GlStateManager.rotate((armPitch - player.rotationPitch) * 0.1F, 1.0F, 0.0F, 0.0F);
+                float viewPitch = player.prevRotationPitch
+                        + (player.rotationPitch - player.prevRotationPitch) * partialTicks;
+                float viewYaw = player.prevRotationYaw
+                        + (player.rotationYaw - player.prevRotationYaw) * partialTicks;
+                GlStateManager.rotate(viewPitch, 1.0F, 0.0F, 0.0F);
+                GlStateManager.rotate(viewYaw, 0.0F, 1.0F, 0.0F);
+                RenderHelper.enableStandardItemLighting();
+            } finally {
+                GlStateManager.popMatrix();
+            }
+            GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+        }
+    }
+
+    private void renderFirstPersonArms(Minecraft mc, EntityPlayerSP player, EnumHandSide heldSide,
+                                       float handedness) {
+        if (player.isInvisible()) {
+            return;
+        }
+
+        Render<?> render = mc.getRenderManager().getEntityRenderObject(player);
+        if (!(render instanceof RenderPlayer)) {
+            return;
+        }
+
+        AbstractClientPlayer clientPlayer = player;
+        RenderPlayer renderPlayer = (RenderPlayer) render;
+        mc.getTextureManager().bindTexture(clientPlayer.getLocationSkin());
+        GlStateManager.pushMatrix();
+        try {
+            GlStateManager.scale(5.0F, 5.0F, 5.0F);
             for (int armIndex = 0; armIndex < 2; armIndex++) {
                 int direction = armIndex * 2 - 1;
                 GlStateManager.pushMatrix();
                 try {
-                    GlStateManager.translate(0.0F, -0.6F, 1.15F * direction);
+                    GlStateManager.translate(0.0F, -0.6F, 1.1F * direction);
                     GlStateManager.rotate(-45.0F * direction, 1.0F, 0.0F, 0.0F);
                     GlStateManager.rotate(-90.0F * handedness, 0.0F, 0.0F, 1.0F);
                     GlStateManager.rotate(59.0F * handedness, 0.0F, 0.0F, 1.0F);
                     GlStateManager.rotate(-65.0F * direction * handedness, 0.0F, 1.0F, 0.0F);
-                    GlStateManager.scale(0.92F, 0.92F, 0.92F);
                     if (heldSide == EnumHandSide.RIGHT) {
                         renderPlayer.renderRightArm(clientPlayer);
                     } else {
@@ -154,7 +194,6 @@ public class ItemThaumometerRenderer extends TileEntityItemStackRenderer {
             }
         } finally {
             GlStateManager.popMatrix();
-            GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
         }
     }
 

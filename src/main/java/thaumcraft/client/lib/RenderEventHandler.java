@@ -12,6 +12,7 @@ import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.block.model.ItemCameraTransforms;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.tileentity.TileEntityItemStackRenderer;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.client.shader.ShaderGroup;
 import net.minecraft.entity.Entity;
@@ -239,6 +240,10 @@ public class RenderEventHandler {
 
         EnumHand thaumometerHand = mainThaumometer ? EnumHand.MAIN_HAND : EnumHand.OFF_HAND;
         if (event.getHand() == thaumometerHand) {
+            if (!(event.getItemStack().getItem() instanceof ItemThaumometer)) {
+                return;
+            }
+
             EnumHandSide heldSide = thaumometerHand == EnumHand.MAIN_HAND
                     ? player.getPrimaryHand() : player.getPrimaryHand().opposite();
             boolean vanillaSkipsItemTransform = player.isHandActive()
@@ -246,21 +251,13 @@ public class RenderEventHandler {
                     && player.getActiveHand() == thaumometerHand
                     && event.getItemStack().getItemUseAction() == EnumAction.NONE;
             float renderEquipProgress = vanillaSkipsItemTransform ? 0.0F : event.getEquipProgress();
-            ItemThaumometerRenderer.renderFirstPersonHands(player, heldSide,
-                    event.getSwingProgress(), renderEquipProgress);
-            if (vanillaSkipsItemTransform) {
-                GlStateManager.pushMatrix();
-                try {
-                    ItemThaumometerRenderer.applyVanillaFirstPersonTransform(heldSide,
-                            event.getSwingProgress(), renderEquipProgress);
-                    ItemCameraTransforms.TransformType transformType = heldSide == EnumHandSide.RIGHT
-                            ? ItemCameraTransforms.TransformType.FIRST_PERSON_RIGHT_HAND
-                            : ItemCameraTransforms.TransformType.FIRST_PERSON_LEFT_HAND;
-                    mc.getItemRenderer().renderItemSide(player, event.getItemStack(), transformType,
-                            heldSide == EnumHandSide.LEFT);
-                } finally {
-                    GlStateManager.popMatrix();
-                }
+
+            TileEntityItemStackRenderer itemRenderer = event.getItemStack().getItem()
+                    .getTileEntityItemStackRenderer();
+            if (itemRenderer instanceof ItemThaumometerRenderer
+                    && ((ItemThaumometerRenderer) itemRenderer).renderFirstPerson(event.getItemStack(), player,
+                    heldSide, event.getPartialTicks(), event.getSwingProgress(), renderEquipProgress,
+                    vanillaSkipsItemTransform)) {
                 event.setCanceled(true);
             }
             return;
