@@ -360,13 +360,7 @@ public class BlockWoodenDevice extends BlockContainer {
     @Override
     public void neighborChanged(IBlockState state, World worldIn, BlockPos pos, Block blockIn, BlockPos fromPos) {
         int meta = state.getValue(TYPE);
-        if (meta == 2 || meta == 3) {
-            BlockPos supportPos = pos.down();
-            if (!worldIn.getBlockState(supportPos).isSideSolid(worldIn, supportPos, EnumFacing.UP)) {
-                worldIn.destroyBlock(pos, true);
-                return;
-            }
-        } else if (meta == 1) {
+        if (meta == 1) {
             TileEntity te = worldIn.getTileEntity(pos);
             if (te instanceof TileSensor) {
                 ((TileSensor) te).updateTone();

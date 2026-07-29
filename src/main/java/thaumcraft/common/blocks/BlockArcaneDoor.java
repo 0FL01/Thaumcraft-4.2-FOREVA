@@ -261,6 +261,11 @@ public class BlockArcaneDoor extends BlockContainer {
         if (worldIn.isRemote) {
             return;
         }
+        if (blockIn == ConfigBlocks.blockWoodenDevice) {
+            this.updateFromArcanePressurePlates(worldIn, pos);
+            return;
+        }
+
         if (state.getValue(HALF) == BlockDoor.EnumDoorHalf.UPPER) {
             BlockPos lowerPos = pos.down();
             IBlockState lower = worldIn.getBlockState(lowerPos);
@@ -272,22 +277,11 @@ public class BlockArcaneDoor extends BlockContainer {
             return;
         }
 
-        BlockPos supportPos = pos.down();
-        IBlockState upper = worldIn.getBlockState(pos.up());
-        if (upper.getBlock() != this
-                || !worldIn.getBlockState(supportPos).isSideSolid(worldIn, supportPos, EnumFacing.UP)) {
+        if (worldIn.getBlockState(pos.up()).getBlock() != this) {
             worldIn.setBlockToAir(pos);
-            if (upper.getBlock() == this) {
-                worldIn.setBlockToAir(pos.up());
-            }
             if (!Config.wardedStone) {
                 this.dropBlockAsItem(worldIn, pos, state, 0);
             }
-            return;
-        }
-
-        if (blockIn == ConfigBlocks.blockWoodenDevice) {
-            this.updateFromArcanePressurePlates(worldIn, pos);
         }
     }
 

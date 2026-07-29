@@ -11,7 +11,6 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.init.Bootstrap;
 import net.minecraft.init.Blocks;
-import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.profiler.Profiler;
 import net.minecraft.tileentity.TileEntity;
@@ -30,7 +29,6 @@ import net.minecraft.world.storage.WorldInfo;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import thaumcraft.common.blocks.ItemBlocks.BlockWoodenDeviceItem;
-import thaumcraft.common.config.Config;
 import thaumcraft.common.config.ConfigBlocks;
 import thaumcraft.common.config.ConfigItems;
 
@@ -91,70 +89,42 @@ public class ArcanePlateDoorSupportRuntimeTest {
     }
 
     @Test
-    public void plateSupportLossRemovesBothRuntimeStatesWithCanonicalDropMetadata() {
+    public void plateSupportLossLeavesBothRuntimeStatesFloating() {
         BlockWoodenDevice block = ConfigBlocks.blockWoodenDevice;
-        boolean previousWardedStone = Config.wardedStone;
-        try {
-            Config.wardedStone = false;
-            for (int metadata : new int[]{2, 3}) {
-                SupportWorld world = new SupportWorld();
-                IBlockState state = block.getStateFromMeta(metadata);
-                world.put(POS, state);
+        for (int metadata : new int[]{2, 3}) {
+            SupportWorld world = new SupportWorld();
+            IBlockState state = block.getStateFromMeta(metadata);
+            world.put(POS, state);
 
-                block.neighborChanged(state, world, POS, Blocks.STONE, POS.down());
+            block.neighborChanged(state, world, POS, Blocks.STONE, POS.down());
 
-                assertTrue(world.isAirBlock(POS));
-                assertEquals(1, world.destroyCalls);
-                assertTrue(world.dropRequested);
-                assertEquals(2, block.damageDropped(world.destroyedState));
-            }
-
-            Config.wardedStone = true;
-            SupportWorld wardedWorld = new SupportWorld();
-            IBlockState state = block.getStateFromMeta(3);
-            wardedWorld.put(POS, state);
-            block.neighborChanged(state, wardedWorld, POS, Blocks.STONE, POS.down());
-            assertTrue(wardedWorld.isAirBlock(POS));
-            assertSame(Items.AIR, block.getItemDropped(state, wardedWorld.rand, 0));
-        } finally {
-            Config.wardedStone = previousWardedStone;
+            assertSame(block, world.getBlockState(POS).getBlock());
+            assertEquals(metadata, world.getBlockState(POS).getValue(BlockWoodenDevice.TYPE).intValue());
+            assertEquals(0, world.destroyCalls);
+            assertFalse(world.dropRequested);
         }
     }
 
     @Test
-    public void doorSupportLossRunsBeforeWoodenDevicePressureHandling() {
+    public void doorSupportLossLeavesBothHalvesFloating() {
         BlockArcaneDoor door = ConfigBlocks.blockArcaneDoor;
-        boolean previousWardedStone = Config.wardedStone;
-        try {
-            Config.wardedStone = false;
-            SupportWorld world = doorWorld(door);
+        for (IBlockState support : new IBlockState[]{Blocks.STONE.getDefaultState(),
+                ConfigBlocks.blockWoodenDevice.getStateFromMeta(6)}) {
+            SupportWorld world = doorWorld(door, support);
             IBlockState lower = world.getBlockState(POS);
             world.setBlockToAir(POS.down());
 
-            door.neighborChanged(lower, world, POS, ConfigBlocks.blockWoodenDevice, POS.down());
+            door.neighborChanged(lower, world, POS, support.getBlock(), POS.down());
 
-            assertTrue(world.isAirBlock(POS));
-            assertTrue(world.isAirBlock(POS.up()));
-            assertEquals(1, world.drops.size());
-            assertSame(ConfigItems.itemArcaneDoor, world.drops.get(0).getItem());
-
-            Config.wardedStone = true;
-            SupportWorld wardedWorld = doorWorld(door);
-            IBlockState wardedLower = wardedWorld.getBlockState(POS);
-            wardedWorld.setBlockToAir(POS.down());
-            door.neighborChanged(wardedLower, wardedWorld, POS,
-                    ConfigBlocks.blockWoodenDevice, POS.down());
-            assertTrue(wardedWorld.isAirBlock(POS));
-            assertTrue(wardedWorld.isAirBlock(POS.up()));
-            assertTrue(wardedWorld.drops.isEmpty());
-        } finally {
-            Config.wardedStone = previousWardedStone;
+            assertSame(door, world.getBlockState(POS).getBlock());
+            assertSame(door, world.getBlockState(POS.up()).getBlock());
+            assertTrue(world.drops.isEmpty());
         }
     }
 
-    private static SupportWorld doorWorld(BlockArcaneDoor door) {
+    private static SupportWorld doorWorld(BlockArcaneDoor door, IBlockState support) {
         SupportWorld world = new SupportWorld();
-        world.put(POS.down(), ConfigBlocks.blockWoodenDevice.getStateFromMeta(6));
+        world.put(POS.down(), support);
         world.put(POS, door.getDefaultState().withProperty(BlockArcaneDoor.HALF, BlockDoor.EnumDoorHalf.LOWER));
         world.put(POS.up(), door.getDefaultState().withProperty(BlockArcaneDoor.HALF, BlockDoor.EnumDoorHalf.UPPER));
         return world;
@@ -175,7 +145,6 @@ public class ArcanePlateDoorSupportRuntimeTest {
         private final List<ItemStack> drops = new ArrayList<>();
         private int destroyCalls;
         private boolean dropRequested;
-        private IBlockState destroyedState;
 
         private SupportWorld() {
             super(null,
@@ -217,7 +186,6 @@ public class ArcanePlateDoorSupportRuntimeTest {
             if (state.getBlock() == Blocks.AIR) {
                 return false;
             }
-            this.destroyedState = state;
             this.destroyCalls++;
             this.dropRequested = dropBlock;
             return this.setBlockToAir(pos);
