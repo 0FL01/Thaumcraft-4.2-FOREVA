@@ -588,21 +588,34 @@ public class EntityGolemBase extends net.minecraft.entity.monster.EntityGolem im
     }
 
     // --- Configuration toggles ---
-    public boolean checkOreDict() { return (this.getUpgradeAmount(5) > 0); }
-    public boolean ignoreDamage() { return (this.getUpgradeAmount(5) > 0); }
-    public boolean ignoreNBT() { return (this.getUpgradeAmount(5) > 0); }
+    public boolean checkOreDict() { return this.getToggles()[5]; }
+    public boolean ignoreDamage() { return this.getToggles()[6]; }
+    public boolean ignoreNBT() { return this.getToggles()[7]; }
 
     // --- Color matching ---
     public java.util.ArrayList<Byte> getColorsMatching(net.minecraft.item.ItemStack match) {
         java.util.ArrayList<Byte> result = new java.util.ArrayList<>();
-        if (match == null || match.isEmpty()) return result;
-        for (Marker m : this.getMarkers()) {
-            if (m.dim == this.world.provider.getDimension()) {
-                Byte color = m.color;
-                if (!result.contains(color)) result.add(color);
+        if (this.inventory == null || this.inventory.inventory == null || this.inventory.inventory.length == 0) {
+            return result;
+        }
+
+        boolean allEmpty = true;
+        for (int slot = 0; slot < this.inventory.inventory.length; slot++) {
+            net.minecraft.item.ItemStack filter = this.inventory.getStackInSlot(slot);
+            if (filter == null || filter.isEmpty()) continue;
+            allEmpty = false;
+            if (match != null && !match.isEmpty()
+                    && thaumcraft.common.lib.utils.InventoryUtils.areItemStacksEqual(filter, match,
+                    this.checkOreDict(), this.ignoreDamage(), this.ignoreNBT())) {
+                result.add(this.colors != null && slot < this.colors.length ? this.colors[slot] : (byte) -1);
             }
         }
-        if (result.isEmpty()) result.add((byte)-1);
+
+        if (allEmpty) {
+            for (int slot = 0; slot < this.inventory.inventory.length; slot++) {
+                result.add(this.colors != null && slot < this.colors.length ? this.colors[slot] : (byte) -1);
+            }
+        }
         return result;
     }
 

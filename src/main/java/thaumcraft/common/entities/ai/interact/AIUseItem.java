@@ -52,6 +52,7 @@ public class AIUseItem extends EntityAIBase {
         this.distance = MathHelper.floor(golem.getRange() / 3.0f);
         if (this.theWorld instanceof WorldServer) {
             this.player = FakePlayerFactory.get((WorldServer) this.theWorld, GAME_PROFILE);
+            this.im = this.player.interactionManager;
         }
         try {
             this.nextTick = this.theGolem.ticksExisted + this.theWorld.rand.nextInt(6);
@@ -111,7 +112,7 @@ public class AIUseItem extends EntityAIBase {
     }
 
     void click() {
-        if (!(this.theWorld instanceof WorldServer)) return;
+        if (!(this.theWorld instanceof WorldServer) || this.player == null) return;
         BlockPos home = this.theGolem.getHomePosition();
         EnumFacing facing = EnumFacing.VALUES[this.theGolem.homeFacing % EnumFacing.VALUES.length];
         int cX = home.getX() - facing.getXOffset();
@@ -135,13 +136,12 @@ public class AIUseItem extends EntityAIBase {
                 y = s.getOpposite().getYOffset();
                 z = s.getOpposite().getZOffset();
             }
-            if (this.im == null) {
-                this.im = new PlayerInteractionManager(this.theWorld);
-            }
+            if (this.im == null) this.im = this.player.interactionManager;
             if ((this.theGolem.itemCarried == null || this.theGolem.itemCarried.isEmpty()) && ignoreItem) {
                 this.resetTask();
                 return;
             }
+            this.player.setSneaking(this.theGolem.getToggles()[2]);
             try {
                 if (this.theGolem.getToggles()[1]) {
                     // Left-click mode (break)
@@ -154,7 +154,7 @@ public class AIUseItem extends EntityAIBase {
                     EnumFacing clickSide = EnumFacing.VALUES[sideInt % EnumFacing.VALUES.length];
                     net.minecraft.util.EnumActionResult result = this.im.processRightClickBlock(
                         this.player, this.theWorld, this.player.getHeldItem(EnumHand.MAIN_HAND),
-                        EnumHand.MAIN_HAND, targetPos, clickSide.getOpposite(),
+                        EnumHand.MAIN_HAND, targetPos, clickSide,
                         0.5f, 0.5f, 0.5f);
                     if (result == net.minecraft.util.EnumActionResult.PASS) {
                         result = this.im.processRightClick(
@@ -186,6 +186,8 @@ public class AIUseItem extends EntityAIBase {
             } catch (Exception e) {
                 this.resetTask();
                 return;
+            } finally {
+                this.player.setSneaking(false);
             }
         }
     }

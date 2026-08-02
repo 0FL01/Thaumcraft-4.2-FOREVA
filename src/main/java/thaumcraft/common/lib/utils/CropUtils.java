@@ -62,8 +62,9 @@ public class CropUtils {
         Block block = state.getBlock();
         int meta = block.getMetaFromState(state);
 
-        // Vanilla crops
-        if (block instanceof BlockCrops) return meta >= 7;
+        // Vanilla crops. Do not assume every BlockCrops implementation uses age 7:
+        // beetroot and many addon crops use a smaller maximum age.
+        if (block instanceof BlockCrops && ((BlockCrops) block).isMaxAge(state)) return true;
         if (block instanceof BlockStem) {
             // Check if stem is mature (connected to a fruit)
             for (EnumFacing f : net.minecraft.util.EnumFacing.VALUES) {
@@ -72,9 +73,9 @@ public class CropUtils {
                 IBlockState s = world.getBlockState(p);
                 if (s.getBlock() instanceof BlockMelon || s.getBlock() instanceof BlockPumpkin) return true;
             }
-            return false;
+        } else if (block instanceof IGrowable && !((IGrowable) block).canGrow(world, pos, state, world.isRemote)) {
+            return true;
         }
-        if (block instanceof IGrowable) return !((IGrowable) block).canGrow(world, pos, state, world.isRemote);
         if (block == Blocks.NETHER_WART) return meta >= 3;
         if (block == Blocks.COCOA) return (meta & 0xC) >> 2 >= 2;
 

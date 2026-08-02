@@ -1,33 +1,50 @@
 package thaumcraft.client.gui;
 
 import java.io.IOException;
+import net.minecraft.client.gui.inventory.GuiInventory;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.ResourceLocation;
 import thaumcraft.common.entities.golems.ContainerGolem;
 import thaumcraft.common.entities.golems.EntityGolemBase;
 import thaumcraft.common.entities.golems.ItemGolemCore;
+import thaumcraft.common.lib.utils.Utils;
 
 public class GuiGolem extends GuiContainer {
 
     private static final ResourceLocation TEXTURE = new ResourceLocation("thaumcraft", "textures/gui/guigolem.png");
+    private static final int GOLEM_PREVIEW_X = 18;
+    private static final int GOLEM_PREVIEW_Y = 45;
 
     private final EntityGolemBase golem;
+    private int threat = -1;
 
     public GuiGolem(EntityPlayer player, EntityGolemBase golem) {
         super(new ContainerGolem(player.inventory, golem));
         this.golem = golem;
+        if (this.golem.advanced && this.golem.world.rand.nextInt(4) == 0) {
+            this.threat = this.golem.world.rand.nextInt(9);
+        }
     }
 
     @Override
     public void drawScreen(int mouseX, int mouseY, float partialTicks) {
         super.drawScreen(mouseX, mouseY, partialTicks);
+        drawColorFilterName(mouseX, mouseY);
         this.renderHoveredToolTip(mouseX, mouseY);
     }
 
     @Override
     protected void drawGuiContainerForegroundLayer(int mouseX, int mouseY) {
+        String blurbKey = this.threat >= 0 ? "golemthreat." + this.threat + ".text"
+                : "golemblurb." + this.golem.getCore() + ".text";
+        GlStateManager.pushMatrix();
+        GlStateManager.scale(0.5F, 0.5F, 1.0F);
+        this.fontRenderer.drawSplitString(I18n.format(blurbKey), 80, 22, 110, 0xDDDDDD);
+        GlStateManager.popMatrix();
+
         ContainerGolem container = getContainer();
         if (container.maxScroll > 0) {
             String page = (container.currentScroll + 1) + "/" + (container.maxScroll + 1);
@@ -52,6 +69,9 @@ public class GuiGolem extends GuiContainer {
         drawSortingToggles();
 
         GlStateManager.disableBlend();
+        GuiInventory.drawEntityOnScreen(this.guiLeft + GOLEM_PREVIEW_X, this.guiTop + GOLEM_PREVIEW_Y, 30,
+                (float) (this.guiLeft + GOLEM_PREVIEW_X) - mouseX,
+                (float) (this.guiTop + GOLEM_PREVIEW_Y - 50) - mouseY, this.golem);
     }
 
     private void drawInventoryPanels() {
@@ -67,7 +87,12 @@ public class GuiGolem extends GuiContainer {
                 this.drawTexturedModalRect(this.guiLeft + 96 + a / 2 * 28, this.guiTop + 4 + a % 2 * 31, 72, 168, 24, 12);
                 short color = this.golem.getColors(a + getContainer().currentScroll * 6);
                 if (color >= 0) {
+                    int rgb = Utils.colors[color];
+                    GlStateManager.color(((rgb >> 16) & 0xFF) / 255.0F,
+                            ((rgb >> 8) & 0xFF) / 255.0F,
+                            (rgb & 0xFF) / 255.0F, 1.0F);
                     this.drawTexturedModalRect(this.guiLeft + 105 + a / 2 * 28, this.guiTop + 7 + a % 2 * 31, 0, 176, 6, 6);
+                    GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
                 }
             }
         }
@@ -92,20 +117,24 @@ public class GuiGolem extends GuiContainer {
             drawToggle(104, 21, this.golem.canAttackAnimals());
             drawToggle(104, 37, this.golem.canAttackPlayers());
             drawToggle(104, 53, this.golem.canAttackCreepers());
-            this.fontRenderer.drawString("Monsters", 122, 6, 0xFFCCCC);
-            this.fontRenderer.drawString("Animals", 122, 22, 0xFFFFCC);
-            this.fontRenderer.drawString("Players", 122, 38, 0xCCCCFF);
-            this.fontRenderer.drawString("Creepers", 122, 54, 0xCCFFCC);
+            this.fontRenderer.drawString("Monsters", this.guiLeft + 122, this.guiTop + 6, 0xFFCCCC);
+            this.fontRenderer.drawString("Animals", this.guiLeft + 122, this.guiTop + 22, 0xFFFFCC);
+            this.fontRenderer.drawString("Players", this.guiLeft + 122, this.guiTop + 38, 0xCCCCFF);
+            this.fontRenderer.drawString("Creepers", this.guiLeft + 122, this.guiTop + 54, 0xCCFFCC);
         }
 
         if (this.golem.getCore() == 0) {
             drawToggle(62, 54, !this.golem.getToggles()[0]);
+            drawSmallCenteredText(this.golem.getToggles()[0] ? "Any amount" : "Precise amount", 66, 48, 0xFDFDFD);
         }
 
         if (this.golem.getCore() == 8) {
             drawToggle(42, 40, !this.golem.getToggles()[0]);
             drawToggle(42, 50, !this.golem.getToggles()[1]);
             drawToggle(42, 60, !this.golem.getToggles()[2]);
+            drawSmallText(this.golem.getToggles()[0] ? "Empty space" : "Block", 53, 42, 0xFDFDFD);
+            drawSmallText(this.golem.getToggles()[1] ? "Left click" : "Right click", 53, 52, 0xFDFDFD);
+            drawSmallText(this.golem.getToggles()[2] ? "Sneaking" : "Not sneaking", 53, 62, 0xFDFDFD);
         }
     }
 
@@ -116,6 +145,28 @@ public class GuiGolem extends GuiContainer {
         drawToggle(shiftX, 24 + shiftY, this.golem.checkOreDict());
         drawToggle(shiftX, 34 + shiftY, this.golem.ignoreDamage());
         drawToggle(shiftX, 44 + shiftY, this.golem.ignoreNBT());
+        drawSmallText("Use Ore dictionary", shiftX + 10, 26 + shiftY,
+                this.golem.checkOreDict() ? 0xFDFDFD : 0x666666);
+        drawSmallText("Ignore item damage", shiftX + 10, 36 + shiftY,
+                this.golem.ignoreDamage() ? 0xFDFDFD : 0x666666);
+        drawSmallText("Ignore NBT values", shiftX + 10, 46 + shiftY,
+                this.golem.ignoreNBT() ? 0xFDFDFD : 0x666666);
+    }
+
+    private void drawSmallText(String text, int x, int y, int color) {
+        GlStateManager.pushMatrix();
+        GlStateManager.translate(this.guiLeft + x, this.guiTop + y, 0.0F);
+        GlStateManager.scale(0.5F, 0.5F, 1.0F);
+        this.fontRenderer.drawString(text, 0, 0, color);
+        GlStateManager.popMatrix();
+    }
+
+    private void drawSmallCenteredText(String text, int x, int y, int color) {
+        GlStateManager.pushMatrix();
+        GlStateManager.translate(this.guiLeft + x, this.guiTop + y, 0.0F);
+        GlStateManager.scale(0.5F, 0.5F, 1.0F);
+        this.fontRenderer.drawString(text, -this.fontRenderer.getStringWidth(text) / 2, 0, color);
+        GlStateManager.popMatrix();
     }
 
     private void drawToggle(int x, int y, boolean enabled) {
@@ -139,17 +190,17 @@ public class GuiGolem extends GuiContainer {
         if (this.golem.getCore() < 0 || !ItemGolemCore.hasInventory(this.golem.getCore()) || this.golem.inventory == null) {
             return false;
         }
-        if (this.golem.getUpgradeAmount(5) <= 0) return false;
+        if (this.golem.getUpgradeAmount(4) <= 0) return false;
 
         int slots = this.golem.inventory.slotCount;
         int visible = Math.min(6, Math.max(0, slots - getContainer().currentScroll * 6));
         for (int a = 0; a < visible; a++) {
             int slotIndex = a + getContainer().currentScroll * 6;
-            if (isMouseIn(mouseX, mouseY, 96 + a / 2 * 28, 16 + a % 2 * 31, 8, 12)) {
+            if (isMouseIn(mouseX, mouseY, 96 + a / 2 * 28, 4 + a % 2 * 31, 8, 12)) {
                 this.mc.playerController.sendEnchantPacket(this.inventorySlots.windowId, slotIndex);
                 return true;
             }
-            if (isMouseIn(mouseX, mouseY, 112 + a / 2 * 28, 16 + a % 2 * 31, 8, 12)) {
+            if (isMouseIn(mouseX, mouseY, 112 + a / 2 * 28, 4 + a % 2 * 31, 8, 12)) {
                 this.mc.playerController.sendEnchantPacket(this.inventorySlots.windowId, slotIndex + slots);
                 return true;
             }
@@ -211,6 +262,22 @@ public class GuiGolem extends GuiContainer {
 
     private ContainerGolem getContainer() {
         return (ContainerGolem) this.inventorySlots;
+    }
+
+    private void drawColorFilterName(int mouseX, int mouseY) {
+        if (this.golem.getCore() < 0 || !ItemGolemCore.hasInventory(this.golem.getCore())
+                || this.golem.inventory == null || this.golem.getUpgradeAmount(4) <= 0) return;
+
+        int slots = this.golem.inventory.slotCount;
+        int visible = Math.min(6, Math.max(0, slots - getContainer().currentScroll * 6));
+        for (int a = 0; a < visible; a++) {
+            if (!isMouseIn(mouseX, mouseY, 96 + a / 2 * 28, 4 + a % 2 * 31, 24, 12)) continue;
+            short color = this.golem.getColors(a + getContainer().currentScroll * 6);
+            String text = color >= 0 ? Utils.colorNames[color] : "Any color";
+            this.fontRenderer.drawString(text, this.guiLeft + 133 - this.fontRenderer.getStringWidth(text) / 2,
+                    this.guiTop - 6, 0xFDFDFD);
+            return;
+        }
     }
 
     private boolean isMouseIn(int mouseX, int mouseY, int x, int y, int width, int height) {
