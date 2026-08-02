@@ -62,7 +62,7 @@ public class AILiquidEmpty extends EntityAIBase {
         TileEntity tile = this.theWorld.getTileEntity(new BlockPos(cX, cY, cZ));
         if (tile == null) return;
 
-        EnumFacing capSide = facing.getOpposite();
+        EnumFacing capSide = facing;
         if (!tile.hasCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, capSide)) return;
         IFluidHandler fh = tile.getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, capSide);
         if (fh == null) return;
@@ -79,7 +79,7 @@ public class AILiquidEmpty extends EntityAIBase {
             if (amt > 200) {
                 float vol = Math.min(0.2f, 0.2f * ((float) amt / (float) this.theGolem.getFluidCarryLimit()));
                 this.theWorld.playSound(null, this.theGolem.getPosition(),
-                    net.minecraft.util.SoundEvent.REGISTRY.getObject(new net.minecraft.util.ResourceLocation("game.neutral.swim")),
+                    net.minecraft.init.SoundEvents.ENTITY_GENERIC_SWIM,
                     net.minecraft.util.SoundCategory.NEUTRAL, vol,
                     1.0f + (this.theWorld.rand.nextFloat() - this.theWorld.rand.nextFloat()) * 0.3f);
             }

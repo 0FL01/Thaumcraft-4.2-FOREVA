@@ -54,10 +54,8 @@ public class AIUseItem extends EntityAIBase {
             this.player = FakePlayerFactory.get((WorldServer) this.theWorld, GAME_PROFILE);
             this.im = this.player.interactionManager;
         }
-        try {
-            this.nextTick = this.theGolem.ticksExisted + this.theWorld.rand.nextInt(6);
-        } catch (Exception ignored) {
-        }
+        this.nextTick = this.theGolem.ticksExisted
+                + clickIntervalTicks(this.theGolem.getUpgradeAmount(0));
     }
 
     @Override
@@ -70,15 +68,17 @@ public class AIUseItem extends EntityAIBase {
         TileEntity tile = this.theGolem.world.getTileEntity(new BlockPos(cX, cY, cZ));
         boolean ignoreItem = tile == null || !(tile instanceof IInventory);
 
-        int d = 5 - this.theGolem.ticksExisted;
-        if (d < 1) d = 1;
-
         if ((this.theGolem.itemCarried == null || this.theGolem.itemCarried.isEmpty()) && !ignoreItem) return false;
         if (this.theGolem.ticksExisted < this.nextTick) return false;
         if (!this.theGolem.getNavigator().noPath()) return false;
 
-        this.nextTick = this.theGolem.ticksExisted + d * 3;
+        this.nextTick = this.theGolem.ticksExisted
+                + clickIntervalTicks(this.theGolem.getUpgradeAmount(0));
         return this.findSomething();
+    }
+
+    static int clickIntervalTicks(int aerUpgrades) {
+        return Math.max(1, 5 - aerUpgrades) * 3;
     }
 
     @Override

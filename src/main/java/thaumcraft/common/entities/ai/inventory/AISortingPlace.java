@@ -4,14 +4,11 @@ import net.minecraft.entity.ai.EntityAIBase;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import thaumcraft.common.config.Config;
 import thaumcraft.common.entities.golems.EntityGolemBase;
 import thaumcraft.common.entities.golems.GolemHelper;
 import thaumcraft.common.lib.utils.InventoryUtils;
-
-import java.util.ArrayList;
 
 public class AISortingPlace extends EntityAIBase {
     private EntityGolemBase theGolem;
@@ -30,43 +27,14 @@ public class AISortingPlace extends EntityAIBase {
         if (theGolem.getCarried() == null || theGolem.getCarried().isEmpty()) return false;
         if (!theGolem.getNavigator().noPath()) return false;
 
-        BlockPos home = theGolem.getHomePosition();
-        EnumFacing facing = EnumFacing.VALUES[theGolem.homeFacing % EnumFacing.VALUES.length];
-        int cX = home.getX() - facing.getXOffset();
-        int cY = home.getY() - facing.getYOffset();
-        int cZ = home.getZ() - facing.getZOffset();
-
-        ArrayList<Byte> matchingColors = theGolem.getColorsMatching(theGolem.getCarried());
-        ArrayList<IInventory> mc = GolemHelper.getMarkedContainersAdjacentToGolem(theGolem.world, theGolem);
-        for (IInventory te : mc) {
-            TileEntity tile = (TileEntity) te;
-            if (tile == null) continue;
-            BlockPos pos = tile.getPos();
-            if (pos.getX() == cX && pos.getY() == cY && pos.getZ() == cZ) continue;
-
-            for (byte color : matchingColors) {
-                for (Integer side : GolemHelper.getMarkedSides(theGolem, tile, color)) {
-                    ItemStack is = InventoryUtils.placeItemStackIntoInventory(theGolem.getCarried(), te, side, false);
-                    if (ItemStack.areItemStacksEqual(is, theGolem.itemCarried)) continue;
-                    this.xx = pos.getX();
-                    this.yy = pos.getY();
-                    this.zz = pos.getZ();
-                    return true;
-                }
-                TileEntity dc = InventoryUtils.getDoubleChest(tile);
-                if (dc != null) {
-                    for (Integer side : GolemHelper.getMarkedSides(theGolem, tile, color)) {
-                        ItemStack is = InventoryUtils.placeItemStackIntoInventory(theGolem.getCarried(), (IInventory) dc, side, false);
-                        if (!ItemStack.areItemStacksEqual(is, theGolem.itemCarried)) continue;
-                        this.xx = pos.getX();
-                        this.yy = pos.getY();
-                        this.zz = pos.getZ();
-                        return true;
-                    }
-                }
-            }
-        }
-        return false;
+        IInventory destination = GolemHelper.findSortingDestination(
+                theGolem, theGolem.getCarried(), GolemHelper.ADJACENT_RANGE);
+        if (!(destination instanceof TileEntity)) return false;
+        BlockPos pos = ((TileEntity) destination).getPos();
+        this.xx = pos.getX();
+        this.yy = pos.getY();
+        this.zz = pos.getZ();
+        return true;
     }
 
     @Override
@@ -81,6 +49,8 @@ public class AISortingPlace extends EntityAIBase {
                 InventoryUtils.closeInventoryForGolem(this.inv);
             }
         } catch (Exception ignored) {}
+        this.inv = null;
+        this.countChest = 0;
     }
 
     @Override
@@ -93,43 +63,26 @@ public class AISortingPlace extends EntityAIBase {
     @Override
     public void startExecuting() {
         this.count = 200;
-        BlockPos home = theGolem.getHomePosition();
-        EnumFacing facing = EnumFacing.VALUES[theGolem.homeFacing % EnumFacing.VALUES.length];
-        int cX = home.getX() - facing.getXOffset();
-        int cY = home.getY() - facing.getYOffset();
-        int cZ = home.getZ() - facing.getZOffset();
+        this.countChest = 0;
+        this.inv = null;
         TileEntity tile = theGolem.world.getTileEntity(new BlockPos(this.xx, this.yy, this.zz));
-        if (tile != null && !(tile.getPos().getX() == cX && tile.getPos().getY() == cY && tile.getPos().getZ() == cZ)) {
-            IInventory te = (IInventory) tile;
-            ArrayList<Byte> matchingColors = theGolem.getColorsMatching(theGolem.getCarried());
-            for (byte color : matchingColors) {
-                for (Integer side : GolemHelper.getMarkedSides(theGolem, tile, color)) {
-                    theGolem.setCarried(InventoryUtils.placeItemStackIntoInventory(theGolem.getCarried(), te, side, true));
-                    this.countChest = 5;
-                    this.inv = te;
-                    if (theGolem.getCarried() == null || theGolem.getCarried().isEmpty()) break;
-                }
-                if (theGolem.getCarried() != null && !theGolem.getCarried().isEmpty()) {
-                    TileEntity dc = InventoryUtils.getDoubleChest(tile);
-                    if (dc != null) {
-                        for (Integer side : GolemHelper.getMarkedSides(theGolem, tile, color)) {
-                            ItemStack is = InventoryUtils.placeItemStackIntoInventory(theGolem.getCarried(), (IInventory) dc, side, false);
-                            if (ItemStack.areItemStacksEqual(is, theGolem.itemCarried)) continue;
-                            theGolem.setCarried(InventoryUtils.placeItemStackIntoInventory(theGolem.getCarried(), (IInventory) dc, side, true));
-                            this.countChest = 5;
-                            this.inv = (IInventory) dc;
-                            if (theGolem.getCarried() == null || theGolem.getCarried().isEmpty()) break;
-                        }
+        if (tile instanceof IInventory && GolemHelper.isValidSortingDestination(
+                theGolem, (IInventory) tile, theGolem.getCarried(), GolemHelper.ADJACENT_RANGE)) {
+            IInventory destination = (IInventory) tile;
+            for (int side : GolemHelper.getMarkedSides(theGolem, tile, (byte) -1)) {
+                ItemStack carried = theGolem.getCarried();
+                if (!GolemHelper.canSortItemIntoInventory(theGolem, destination, carried, side)) continue;
+                ItemStack remaining = InventoryUtils.placeItemStackIntoInventory(carried, destination, side, true);
+                if (ItemStack.areItemStacksEqual(remaining, carried)) continue;
+                theGolem.setCarried(remaining);
+                this.countChest = 5;
+                this.inv = destination;
+                try {
+                    if (Config.golemChestInteract) {
+                        InventoryUtils.openInventoryForGolem(this.inv);
                     }
-                }
-                if (this.countChest == 5) {
-                    try {
-                        if (Config.golemChestInteract) {
-                            InventoryUtils.openInventoryForGolem(this.inv);
-                        }
-                    } catch (Exception ignored) {}
-                    break;
-                }
+                } catch (Exception ignored) {}
+                break;
             }
         }
         theGolem.updateCarried();

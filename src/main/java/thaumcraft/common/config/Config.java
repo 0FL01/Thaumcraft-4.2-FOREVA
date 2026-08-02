@@ -23,6 +23,7 @@ import thaumcraft.api.aspects.AspectList;
 import thaumcraft.api.potions.PotionFluxTaint;
 import thaumcraft.api.potions.PotionVisExhaust;
 import thaumcraft.common.items.equipment.ItemElementalAxe;
+import thaumcraft.common.lib.utils.CropUtils;
 import thaumcraft.common.lib.utils.Utils;
 import thaumcraft.common.lib.world.ThaumcraftWorldGenerator;
 import thaumcraft.common.lib.enchantment.EnchantmentFrugal;
@@ -571,6 +572,12 @@ public class Config {
     }
 
     public static void initMisc() {
-        // Phase 4: misc registrations
+        CropUtils.addStandardCrop(Blocks.MELON_BLOCK, Short.MAX_VALUE);
+        CropUtils.addStandardCrop(Blocks.PUMPKIN, Short.MAX_VALUE);
+        if (ConfigBlocks.blockManaPod != null) {
+            CropUtils.addStandardCrop(ConfigBlocks.blockManaPod, 7);
+        }
+        CropUtils.addStackedCrop(Blocks.REEDS, Short.MAX_VALUE);
+        CropUtils.addStackedCrop(Blocks.CACTUS, Short.MAX_VALUE);
     }
 }

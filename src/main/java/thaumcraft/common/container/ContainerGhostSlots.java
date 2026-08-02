@@ -25,18 +25,40 @@ public abstract class ContainerGhostSlots extends Container {
         if (slotId >= 0 && slotId < this.inventorySlots.size()) {
             Slot slot = this.inventorySlots.get(slotId);
             if (slot != null && isGhostSlot(slot)) {
-                // Ghost slot: only allow putting items in, never taking out
                 ItemStack held = player.inventory.getItemStack();
+                if (clickType == ClickType.QUICK_MOVE) {
+                    if (slot.getHasStack()) {
+                        if (dragType == 0) {
+                            slot.putStack(ItemStack.EMPTY);
+                        } else if (dragType == 1) {
+                            ItemStack stack = slot.getStack().copy();
+                            stack.setCount(Math.min(slot.getSlotStackLimit(), stack.getCount() + 16));
+                            slot.putStack(stack);
+                        }
+                    }
+                    return ItemStack.EMPTY;
+                }
+                if (clickType != ClickType.PICKUP) return ItemStack.EMPTY;
+
                 if (!held.isEmpty()) {
-                    // Put a copy of held item into ghost slot
-                    ItemStack copy = held.copy();
-                    copy.setCount(1);
-                    slot.putStack(copy);
-                } else if (clickType == ClickType.QUICK_MOVE && slot.getHasStack()) {
-                    // Shift-click on ghost: no-op
-                } else {
-                    // Right-click on empty ghost with empty hand: clear
-                    slot.putStack(ItemStack.EMPTY);
+                    if (!slot.isItemValid(held)) return ItemStack.EMPTY;
+                    ItemStack stack = slot.getStack();
+                    if (stack.isEmpty() || !stack.isItemEqual(held)
+                            || !ItemStack.areItemStackTagsEqual(stack, held)) {
+                        ItemStack copy = held.copy();
+                        copy.setCount(Math.min(slot.getSlotStackLimit(), dragType == 0 ? held.getCount() : 1));
+                        slot.putStack(copy);
+                    } else {
+                        ItemStack copy = stack.copy();
+                        int added = dragType == 0 ? held.getCount() : 1;
+                        copy.setCount(Math.min(slot.getSlotStackLimit(), copy.getCount() + added));
+                        slot.putStack(copy);
+                    }
+                } else if (slot.getHasStack()) {
+                    ItemStack stack = slot.getStack().copy();
+                    stack.setCount(dragType == 0 ? stack.getCount() - 1
+                            : Math.min(slot.getSlotStackLimit(), stack.getCount() + 1));
+                    slot.putStack(stack.getCount() > 0 ? stack : ItemStack.EMPTY);
                 }
                 return ItemStack.EMPTY;
             }

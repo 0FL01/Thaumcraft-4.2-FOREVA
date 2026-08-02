@@ -7,8 +7,11 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextComponentString;
+import net.minecraftforge.oredict.OreDictionary;
+import thaumcraft.api.ThaumcraftApiHelper;
 
 public class InventoryMob implements IInventory {
+    private static final String EXTENDED_COUNT_TAG = "tcGhostCount";
     public ItemStack[] inventory;
     public int slotCount;
     private String name = "";
@@ -82,6 +85,7 @@ public class InventoryMob implements IInventory {
                 NBTTagCompound tc = new NBTTagCompound();
                 tc.setByte("Slot", (byte) i);
                 this.inventory[i].writeToNBT(tc);
+                tc.setInteger(EXTENDED_COUNT_TAG, this.inventory[i].getCount());
                 list.appendTag(tc);
             }
         }
@@ -96,6 +100,9 @@ public class InventoryMob implements IInventory {
             int slot = tc.getByte("Slot") & 0xFF;
             if (slot >= 0 && slot < this.inventory.length) {
                 ItemStack stack = new ItemStack(tc);
+                if (tc.hasKey(EXTENDED_COUNT_TAG, 3)) {
+                    stack.setCount(tc.getInteger(EXTENDED_COUNT_TAG));
+                }
                 this.inventory[slot] = stack.isEmpty() ? ItemStack.EMPTY : stack;
             }
         }
@@ -110,33 +117,27 @@ public class InventoryMob implements IInventory {
 
     public int getAmountNeededSmart(ItemStack stack, boolean fuzzy) {
         if (stack == null || stack.isEmpty()) return 0;
-        int needed = stack.getMaxStackSize();
-        int total = 0;
-        for (ItemStack s : this.inventory) {
-            if (s == null || s.isEmpty()) continue;
+        int amount = 0;
+        for (int slot = 0; slot < this.slotCount; slot++) {
+            ItemStack filter = this.inventory[slot];
+            if (filter == null || filter.isEmpty()) continue;
             if (fuzzy) {
-                if (s.getItem() == stack.getItem()) total += s.getCount();
-            } else {
-                if (s.getItem() == stack.getItem() && s.getMetadata() == stack.getMetadata()
-                    && net.minecraft.item.ItemStack.areItemStackTagsEqual(s, stack)) total += s.getCount();
+                if (filter.isItemEqual(stack)) {
+                    amount += filter.getCount();
+                    continue;
+                }
+                int[] oreIDs = OreDictionary.getOreIDs(filter);
+                if (oreIDs.length > 0) {
+                    ItemStack[] ores = OreDictionary.getOres(OreDictionary.getOreName(oreIDs[0])).toArray(new ItemStack[0]);
+                    if (ThaumcraftApiHelper.containsMatch(false, new ItemStack[]{stack}, ores)) {
+                        amount += filter.getCount();
+                    }
+                }
+            } else if (filter.isItemEqual(stack) && ItemStack.areItemStackTagsEqual(filter, stack)) {
+                amount += filter.getCount();
             }
         }
-        int maxStack = Math.min(stack.getMaxStackSize(), this.getInventoryStackLimit());
-        int capacity = this.slotCount * maxStack;
-        if (total >= capacity) return 0;
-        int perSlotRoom = maxStack;
-        int totalRoom = 0;
-        for (ItemStack s : this.inventory) {
-            if (s == null || s.isEmpty()) {
-                totalRoom += perSlotRoom;
-            } else {
-                boolean match = fuzzy ? (s.getItem() == stack.getItem())
-                    : (s.getItem() == stack.getItem() && s.getMetadata() == stack.getMetadata()
-                        && net.minecraft.item.ItemStack.areItemStackTagsEqual(s, stack));
-                if (match) totalRoom += (perSlotRoom - s.getCount());
-            }
-        }
-        return Math.min(needed, Math.max(0, totalRoom));
+        return amount;
     }
 
     public java.util.ArrayList<ItemStack> getItemsNeeded(boolean fuzzy) {

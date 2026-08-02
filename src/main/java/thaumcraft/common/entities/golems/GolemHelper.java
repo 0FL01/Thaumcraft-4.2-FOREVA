@@ -150,7 +150,7 @@ public class GolemHelper {
         ArrayList<Marker> gm = golem.getMarkers();
         if (gm == null || gm.isEmpty()) return out;
         for (int a = 0; a < 6; a++) {
-            Marker marker = new Marker(x, y, z, (byte) dim, (byte) a, color);
+            Marker marker = new Marker(x, y, z, dim, (byte) a, color);
             if (contained(gm, marker)) out.add(a);
         }
         return out;
@@ -389,26 +389,67 @@ public class GolemHelper {
 
     public static boolean findSomethingSortCore(EntityGolemBase golem, ItemStack itemToMatch) {
         if (itemToMatch == null || itemToMatch.isEmpty()) return false;
-        ArrayList<IInventory> markers = getContainersWithRoom(golem.world, golem, (byte) -1, itemToMatch);
-        if (!markers.isEmpty()) {
-            EnumFacing facing = EnumFacing.VALUES[golem.homeFacing % EnumFacing.VALUES.length];
-            BlockPos home = golem.getHomePosition();
-            int cX = home.getX() - facing.getXOffset();
-            int cY = home.getY() - facing.getYOffset();
-            int cZ = home.getZ() - facing.getZOffset();
-            float dmod = golem.getRange();
-            for (IInventory te : markers) {
-                TileEntity tile = (TileEntity) te;
-                double dist = golem.getDistanceSq(tile.getPos().getX() + 0.5, tile.getPos().getY() + 0.5, tile.getPos().getZ() + 0.5);
-                if (dist > dmod * dmod) continue;
-                for (int side : getMarkedSides(golem, tile, (byte) -1)) {
-                    if (InventoryUtils.inventoryContains(te, itemToMatch, side,
-                        golem.checkOreDict(), golem.ignoreDamage(), golem.ignoreNBT())) return true;
-                }
-            }
-        }
+        float range = golem.getRange();
+        if (findSortingDestination(golem, itemToMatch, range * range) != null) return true;
         itemTimeout.add(new SortingItemTimeout(golem.getEntityId(), itemToMatch.copy(), System.currentTimeMillis() + Config.golemIgnoreDelay));
         return false;
+    }
+
+    public static IInventory findSortingDestination(EntityGolemBase golem, ItemStack itemToMatch,
+                                                     double maxDistanceSq) {
+        if (itemToMatch == null || itemToMatch.isEmpty()) return null;
+        IInventory nearest = null;
+        double nearestDistance = Double.MAX_VALUE;
+        for (IInventory inventory : getMarkedContainers(golem.world, golem)) {
+            if (!(inventory instanceof TileEntity)) continue;
+            TileEntity tile = (TileEntity) inventory;
+            double distance = golem.getDistanceSq(tile.getPos().getX() + 0.5,
+                    tile.getPos().getY() + 0.5, tile.getPos().getZ() + 0.5);
+            if (distance >= nearestDistance
+                    || !isValidSortingDestination(golem, inventory, itemToMatch, maxDistanceSq)) continue;
+            nearest = inventory;
+            nearestDistance = distance;
+        }
+        return nearest;
+    }
+
+    public static boolean isValidSortingDestination(EntityGolemBase golem, IInventory inventory,
+                                                     ItemStack itemToMatch, double maxDistanceSq) {
+        if (!(inventory instanceof TileEntity) || itemToMatch == null || itemToMatch.isEmpty()) return false;
+        TileEntity tile = (TileEntity) inventory;
+        if (isSortingHomeContainer(golem, tile)) return false;
+        double distance = golem.getDistanceSq(tile.getPos().getX() + 0.5,
+                tile.getPos().getY() + 0.5, tile.getPos().getZ() + 0.5);
+        if (distance > maxDistanceSq) return false;
+        for (int side : getMarkedSides(golem, tile, (byte) -1)) {
+            if (canSortItemIntoInventory(golem, inventory, itemToMatch, side)) return true;
+        }
+        return false;
+    }
+
+    public static boolean canSortItemIntoInventory(EntityGolemBase golem, IInventory inventory,
+                                                    ItemStack itemToMatch, int side) {
+        boolean seeded = InventoryUtils.inventoryContains(inventory, itemToMatch, side,
+                golem.checkOreDict(), golem.ignoreDamage(), golem.ignoreNBT());
+        TileEntity doubleChest = inventory instanceof TileEntity
+                ? InventoryUtils.getDoubleChest((TileEntity) inventory) : null;
+        if (!seeded && doubleChest instanceof IInventory) {
+            seeded = InventoryUtils.inventoryContains((IInventory) doubleChest, itemToMatch, side,
+                    golem.checkOreDict(), golem.ignoreDamage(), golem.ignoreNBT());
+        }
+        if (!seeded) return false;
+        ItemStack remaining = InventoryUtils.placeItemStackIntoInventory(itemToMatch, inventory, side, false);
+        return !ItemStack.areItemStacksEqual(remaining, itemToMatch);
+    }
+
+    private static boolean isSortingHomeContainer(EntityGolemBase golem, TileEntity tile) {
+        EnumFacing facing = EnumFacing.VALUES[golem.homeFacing % EnumFacing.VALUES.length];
+        BlockPos sourcePos = golem.getHomePosition().subtract(new BlockPos(
+                facing.getXOffset(), facing.getYOffset(), facing.getZOffset()));
+        if (sourcePos.equals(tile.getPos())) return true;
+        TileEntity source = golem.world.getTileEntity(sourcePos);
+        TileEntity doubleChest = InventoryUtils.getDoubleChest(source);
+        return doubleChest != null && doubleChest.getPos().equals(tile.getPos());
     }
 
     // --- Timeout ---
@@ -765,7 +806,7 @@ public class GolemHelper {
         TileEntity tile = golem.world.getTileEntity(target);
         if (tile == null) return out;
 
-        EnumFacing capSide = facing.getOpposite();
+        EnumFacing capSide = facing;
         if (!tile.hasCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, capSide)) return out;
         IFluidHandler handler = tile.getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, capSide);
         if (handler == null) return out;
@@ -781,17 +822,7 @@ public class GolemHelper {
             FluidStack probe = new FluidStack(fluid, golem.getFluidCarryLimit());
             if (handler.fill(probe, false) <= 0) continue;
 
-            if (golem.inventory.hasSomething()) {
-                boolean found = false;
-                for (int slot = 0; slot < golem.inventory.slotCount; ++slot) {
-                    FluidStack contained = FluidUtil.getFluidContained(golem.inventory.getStackInSlot(slot));
-                    if (contained != null && contained.isFluidEqual(probe)) {
-                        found = true;
-                        break;
-                    }
-                }
-                if (!found) continue;
-            }
+            if (getFluidColorsMatching(golem, probe).isEmpty()) continue;
 
             out.add(new FluidStack(fluid, Integer.MAX_VALUE));
         }
@@ -805,18 +836,19 @@ public class GolemHelper {
         ArrayList<Marker> results = new ArrayList<>();
         for (Marker marker : golem.getMarkers()) {
             if (marker.dim != world.provider.getDimension()) continue;
+            if (!markerMatchesFluid(golem, marker, ls)) continue;
             BlockPos pos = new BlockPos(marker.x, marker.y, marker.z);
             TileEntity te = world.getTileEntity(pos);
             if (te == null) continue;
 
             EnumFacing side = EnumFacing.VALUES[marker.side % EnumFacing.VALUES.length];
-            if (!te.hasCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, side.getOpposite())) continue;
+            if (!te.hasCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, side)) continue;
 
             // Check proximity
             double dist = golem.getDistanceSq(marker.x + 0.5, marker.y + 0.5, marker.z + 0.5);
             if (dist > ADJACENT_RANGE) continue;
 
-            IFluidHandler handler = te.getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, side.getOpposite());
+            IFluidHandler handler = te.getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, side);
             if (handler == null) continue;
 
             if (ls != null) {
@@ -827,6 +859,44 @@ public class GolemHelper {
             results.add(marker);
         }
         return results;
+    }
+
+    public static ArrayList<BlockPos> getMarkedFluidBlocksAdjacentToGolem(FluidStack ls, World world,
+                                                                           EntityGolemBase golem) {
+        ArrayList<BlockPos> results = new ArrayList<>();
+        for (Marker marker : golem.getMarkers()) {
+            if (marker.dim != world.provider.getDimension()) continue;
+            if (!markerMatchesFluid(golem, marker, ls)) continue;
+            BlockPos pos = new BlockPos(marker.x, marker.y, marker.z);
+            if (golem.getDistanceSq(marker.x + 0.5, marker.y + 0.5, marker.z + 0.5) >= ADJACENT_RANGE) {
+                continue;
+            }
+            FluidStack drained = drainWorldFluidBlock(world, pos, false);
+            if (drained != null && drained.isFluidEqual(ls)) results.add(pos);
+        }
+        return results;
+    }
+
+    private static ArrayList<Byte> getFluidColorsMatching(EntityGolemBase golem, FluidStack fluid) {
+        ArrayList<Byte> colors = new ArrayList<>();
+        if (golem.inventory == null || !golem.inventory.hasSomething()) {
+            colors.add((byte) -1);
+            return colors;
+        }
+        for (int slot = 0; slot < golem.inventory.slotCount; ++slot) {
+            FluidStack contained = FluidUtil.getFluidContained(golem.inventory.getStackInSlot(slot));
+            if (contained != null && contained.isFluidEqual(fluid)) {
+                colors.add(golem.colors != null && slot < golem.colors.length ? golem.colors[slot] : (byte) -1);
+            }
+        }
+        return colors;
+    }
+
+    private static boolean markerMatchesFluid(EntityGolemBase golem, Marker marker, FluidStack fluid) {
+        for (byte color : getFluidColorsMatching(golem, fluid)) {
+            if (color == -1 || marker.color == color) return true;
+        }
+        return false;
     }
 
     // --- Drain World Fluid Block ---
@@ -865,65 +935,45 @@ public class GolemHelper {
     // --- Find Possible Liquid ---
 
     public static Vec3d findPossibleLiquid(FluidStack ls, EntityGolemBase golem) {
-        ensureLiquidsRegistered();
-
-        // 1. Check marked IFluidHandler sources
+        if (ls == null) return null;
+        Marker nearest = null;
+        double nearestDistance = Double.MAX_VALUE;
+        double rangeSq = golem.getRange() * golem.getRange();
         for (Marker marker : golem.getMarkers()) {
             if (marker.dim != golem.world.provider.getDimension()) continue;
+            if (!markerMatchesFluid(golem, marker, ls)) continue;
             BlockPos pos = new BlockPos(marker.x, marker.y, marker.z);
+            if (!golem.world.isBlockLoaded(pos)) continue;
+            double distance = golem.getDistanceSq(marker.x + 0.5, marker.y + 0.5, marker.z + 0.5);
+            if (distance > rangeSq || distance >= nearestDistance) continue;
+
+            boolean valid = false;
             TileEntity te = golem.world.getTileEntity(pos);
-            if (te == null) continue;
-
-            EnumFacing side = EnumFacing.VALUES[marker.side % EnumFacing.VALUES.length];
-            if (!te.hasCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, side.getOpposite())) continue;
-
-            IFluidHandler handler = te.getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, side.getOpposite());
-            if (handler == null) continue;
-
-            int maxDrain = golem.getFluidCarryLimit();
-            if (golem.fluidCarried != null) {
-                maxDrain -= golem.fluidCarried.amount;
-            }
-
-            FluidStack probe;
-            if (ls != null) {
-                FluidStack simDrain = ls.copy();
-                simDrain.amount = Math.min(simDrain.amount, maxDrain);
-                probe = handler.drain(simDrain, false);
-            } else {
-                probe = handler.drain(maxDrain, false);
-            }
-
-            if (probe != null && probe.amount > 0) {
-                return new Vec3d(marker.x + 0.5, marker.y + 0.5, marker.z + 0.5);
-            }
-        }
-
-        // 2. Check world fluid source blocks within range
-        float range = golem.getRange();
-        BlockPos home = golem.getHomePosition();
-        int minX = home.getX() - (int) range;
-        int maxX = home.getX() + (int) range;
-        int minZ = home.getZ() - (int) range;
-        int maxZ = home.getZ() + (int) range;
-
-        for (int x = minX; x <= maxX; x++) {
-            for (int z = minZ; z <= maxZ; z++) {
-                for (int y = home.getY() - 3; y <= home.getY() + 3; y++) {
-                    BlockPos scanPos = new BlockPos(x, y, z);
-                    if (!golem.world.isBlockLoaded(scanPos)) continue;
-
-                    FluidStack drained = drainWorldFluidBlock(golem.world, scanPos, false);
-                    if (drained != null && drained.amount > 0) {
-                        if (ls == null || drained.isFluidEqual(ls)) {
-                            return new Vec3d(x + 0.5, y + 0.5, z + 0.5);
-                        }
+            if (te != null) {
+                EnumFacing side = EnumFacing.VALUES[marker.side % EnumFacing.VALUES.length];
+                if (te.hasCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, side)) {
+                    IFluidHandler handler = te.getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, side);
+                    int maxDrain = golem.getFluidCarryLimit()
+                            - (golem.fluidCarried == null ? 0 : golem.fluidCarried.amount);
+                    if (handler != null && maxDrain > 0) {
+                        FluidStack request = ls.copy();
+                        request.amount = Math.min(request.amount, maxDrain);
+                        FluidStack probe = handler.drain(request, false);
+                        valid = probe != null && probe.amount > 0 && probe.isFluidEqual(ls);
                     }
                 }
             }
+            if (!valid) {
+                FluidStack drained = drainWorldFluidBlock(golem.world, pos, false);
+                valid = drained != null && drained.amount > 0 && drained.isFluidEqual(ls);
+            }
+            if (valid) {
+                nearest = marker;
+                nearestDistance = distance;
+            }
         }
-
-        return null;
+        return nearest == null ? null
+                : new Vec3d(nearest.x + 0.5, nearest.y + 0.5, nearest.z + 0.5);
     }
 
     // --- Inner class for timeout ---

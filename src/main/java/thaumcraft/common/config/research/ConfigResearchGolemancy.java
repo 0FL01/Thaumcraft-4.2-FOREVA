@@ -207,6 +207,7 @@ final class ConfigResearchGolemancy {
                         new ResearchPage("tc.research_page.GOLEMSTRAW.2"),
                         new ResearchPage(ConfigResearch.recipeCrucible("GolemStraw")),
                         new ResearchPage("tc.research_page.GOLEMSTRAW.3"))
+                .setSiblings("COREGATHER", "GOLEMBELL")
                 .setParents("HUNGRYCHEST")
                 .registerResearchItem();
 
@@ -698,6 +699,7 @@ final class ConfigResearchGolemancy {
                 .setSecondary()
                 .setParents("COREGUARD", "COREHARVEST")
                 .registerResearchItem();
+        ThaumcraftApi.addWarpToResearch("COREBUTCHER", 1);
 
         new ResearchItem(
                 "CORELIQUID",

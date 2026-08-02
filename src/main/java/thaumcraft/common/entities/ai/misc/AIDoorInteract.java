@@ -2,9 +2,12 @@ package thaumcraft.common.entities.ai.misc;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockDoor;
+import net.minecraft.block.BlockFenceGate;
+import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.ai.EntityAIBase;
 import net.minecraft.pathfinding.Path;
+import net.minecraft.pathfinding.PathNavigateGround;
 import net.minecraft.pathfinding.PathPoint;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
@@ -14,7 +17,7 @@ public abstract class AIDoorInteract extends EntityAIBase {
 
     protected EntityGolemBase theEntity;
     protected BlockPos doorPosition = BlockPos.ORIGIN;
-    protected BlockDoor doorBlock;
+    protected Block doorBlock;
     protected boolean hasStoppedDoorInteraction;
     protected float entityPositionX;
     protected float entityPositionZ;
@@ -30,8 +33,9 @@ public abstract class AIDoorInteract extends EntityAIBase {
 
         net.minecraft.pathfinding.PathNavigate nav = this.theEntity.getNavigator();
         Path path = nav.getPath();
-        if (path != null && !path.isFinished() && nav.noPath()) {
-            for (int i = 0; i < Math.min(path.getCurrentPathLength() + 2, path.getCurrentPathIndex()); ++i) {
+        if (nav instanceof PathNavigateGround && path != null && !path.isFinished()
+                && ((PathNavigateGround) nav).getEnterDoors()) {
+            for (int i = 0; i < Math.min(path.getCurrentPathIndex() + 2, path.getCurrentPathLength()); ++i) {
                 PathPoint point = path.getPathPointFromIndex(i);
                 this.doorPosition = new BlockPos(point.x, point.y, point.z);
                 if (this.theEntity.getDistanceSq(this.doorPosition.getX(), this.theEntity.posY, this.doorPosition.getZ()) > 2.25)
@@ -84,9 +88,10 @@ public abstract class AIDoorInteract extends EntityAIBase {
         if (dot < 0.0f) this.hasStoppedDoorInteraction = true;
     }
 
-    private BlockDoor getBlockDoor(BlockPos pos) {
+    private Block getBlockDoor(BlockPos pos) {
         IBlockState state = this.theEntity.world.getBlockState(pos);
         Block block = state.getBlock();
-        return block instanceof BlockDoor ? (BlockDoor) block : null;
+        if (block instanceof BlockDoor && state.getMaterial() == Material.WOOD) return block;
+        return block instanceof BlockFenceGate ? block : null;
     }
 }

@@ -6,6 +6,8 @@ import net.minecraft.init.SoundEvents;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.SoundCategory;
+import thaumcraft.common.container.SlotGhost;
+import thaumcraft.common.container.SlotGhostFluid;
 import thaumcraft.common.entities.InventoryMob;
 import thaumcraft.common.container.ContainerGhostSlots;
 
@@ -60,7 +62,14 @@ public class ContainerGolem extends ContainerGhostSlots {
         for (int a = 0; a < visibleSlots; a++) {
             int slotIndex = a + this.currentScroll * 6;
             if (slotIndex >= slots) break;
-            Slot slot = new Slot(this.mobInv, slotIndex, 100 + a / 2 * 28, 16 + a % 2 * 31);
+            Slot slot;
+            if (this.golem.getCore() == 0) {
+                slot = new SlotGhost(this.mobInv, slotIndex, 100 + a / 2 * 28, 16 + a % 2 * 31);
+            } else if (this.golem.getCore() == 5) {
+                slot = new SlotGhostFluid(this.mobInv, slotIndex, 100 + a / 2 * 28, 16 + a % 2 * 31);
+            } else {
+                slot = new SlotGhost(this.mobInv, slotIndex, 100 + a / 2 * 28, 16 + a % 2 * 31, 1);
+            }
             this.ghostSlots.add(slot);
             this.addSlotToContainer(slot);
         }

@@ -60,7 +60,7 @@ public class ItemGolemBell extends Item {
             for (int i = 0; i < tagList.tagCount(); i++) {
                 NBTTagCompound tag = tagList.getCompoundTagAt(i);
                 markers.add(new Marker(tag.getInteger("x"), tag.getInteger("y"), tag.getInteger("z"),
-                        (byte) tag.getInteger("dim"), tag.getByte("side"), tag.getByte("color")));
+                        tag.getInteger("dim"), tag.getByte("side"), tag.getByte("color")));
             }
         }
         return markers;
@@ -91,7 +91,7 @@ public class ItemGolemBell extends Item {
 
         int index = -1;
         int color = 0;
-        byte dim = (byte) world.provider.getDimension();
+        int dim = world.provider.getDimension();
         byte sideIndex = (byte) side.getIndex();
         if (!markMultipleColors) {
             index = markers.indexOf(new Marker(pos.getX(), pos.getY(), pos.getZ(), dim, sideIndex, (byte) -1));
@@ -228,21 +228,7 @@ public class ItemGolemBell extends Item {
                 }
             }
         } else {
-            if (golem.hasCustomName()) {
-                dropped.setStackDisplayName(golem.getCustomNameTag());
-            }
-            NBTTagCompound tag = getOrCreateTag(dropped);
-            if (golem.decoration.length() > 0) {
-                tag.setString("deco", golem.decoration);
-            }
-            if (golem.getCore() > -1) {
-                tag.setByte("core", golem.getCore());
-            }
-            tag.setByteArray("upgrades", golem.upgrades);
-            tag.setTag("markers", writeMarkers(golem.getMarkers()));
-            if (golem.inventory != null) {
-                tag.setTag("Inventory", golem.inventory.writeToNBT(new NBTTagList()));
-            }
+            writeGolemStateToPlacer(dropped, golem);
         }
 
         golem.entityDropItem(dropped, 0.5F);
@@ -252,6 +238,26 @@ public class ItemGolemBell extends Item {
         return true;
     }
 
+    static void writeGolemStateToPlacer(ItemStack placer, EntityGolemBase golem) {
+        if (golem.hasCustomName()) {
+            placer.setStackDisplayName(golem.getCustomNameTag());
+        }
+        NBTTagCompound tag = getOrCreateTag(placer);
+        if (golem.decoration.length() > 0) {
+            tag.setString("deco", golem.decoration);
+        }
+        if (golem.getCore() > -1) {
+            tag.setByte("core", golem.getCore());
+        }
+        tag.setByteArray("upgrades", golem.upgrades);
+        tag.setByte("toggles", golem.getTogglesValue());
+        tag.setByteArray("colors", golem.colors == null ? new byte[0] : golem.colors);
+        tag.setTag("markers", writeMarkers(golem.getMarkers()));
+        if (golem.inventory != null) {
+            tag.setTag("Inventory", golem.inventory.writeToNBT(new NBTTagList()));
+        }
+    }
+
     private static NBTTagCompound getOrCreateTag(ItemStack stack) {
         if (!stack.hasTagCompound()) {
             stack.setTagCompound(new NBTTagCompound());
@@ -259,7 +265,7 @@ public class ItemGolemBell extends Item {
         return stack.getTagCompound();
     }
 
-    private static NBTTagList writeMarkers(ArrayList<Marker> markers) {
+    static NBTTagList writeMarkers(ArrayList<Marker> markers) {
         NBTTagList tagList = new NBTTagList();
         for (Marker marker : markers) {
             NBTTagCompound tag = new NBTTagCompound();

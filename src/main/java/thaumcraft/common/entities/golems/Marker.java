@@ -2,11 +2,12 @@ package thaumcraft.common.entities.golems;
 
 public class Marker extends java.lang.Object {
     public int x, y, z;
-    public byte dim, side, color;
+    public int dim;
+    public byte side, color;
 
     public Marker() {}
 
-    public Marker(int x, int y, int z, byte dim, byte side, byte color) {
+    public Marker(int x, int y, int z, int dim, byte side, byte color) {
         this.x = x; this.y = y; this.z = z;
         this.dim = dim; this.side = side; this.color = color;
     }

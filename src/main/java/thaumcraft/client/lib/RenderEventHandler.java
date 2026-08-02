@@ -711,7 +711,7 @@ public class RenderEventHandler {
 
         int dimension = player.world.provider.getDimension();
         for (Marker marker : ItemGolemBell.getMarkers(held)) {
-            if (marker.dim != (byte) dimension || !validFace(marker.side)) {
+            if (marker.dim != dimension || !validFace(marker.side)) {
                 continue;
             }
             EnumFacing face = EnumFacing.byIndex(marker.side);

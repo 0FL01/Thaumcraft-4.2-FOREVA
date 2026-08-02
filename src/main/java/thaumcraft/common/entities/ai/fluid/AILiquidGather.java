@@ -64,14 +64,14 @@ public class AILiquidGather extends EntityAIBase {
                 TileEntity te = this.theWorld.getTileEntity(new BlockPos(marker.x, marker.y, marker.z));
                 if (te == null) continue;
                 EnumFacing side = EnumFacing.VALUES[marker.side % EnumFacing.VALUES.length];
-                if (!te.hasCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, side.getOpposite())) continue;
-                IFluidHandler handler = te.getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, side.getOpposite());
+                if (!te.hasCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, side)) continue;
+                IFluidHandler handler = te.getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, side);
                 if (handler == null) continue;
                 FluidStack sim = handler.drain(new FluidStack(fluid.getFluid(), max - camt), false);
                 if (sim != null && sim.amount > 0) return true;
             }
 
-            ArrayList<BlockPos> coords = GolemHelper.getMarkedBlocksAdjacentToGolem(this.theWorld, this.theGolem, (byte) -1);
+            ArrayList<BlockPos> coords = GolemHelper.getMarkedFluidBlocksAdjacentToGolem(fluid, this.theWorld, this.theGolem);
             for (BlockPos loc : coords) {
                 IBlockState state = this.theWorld.getBlockState(loc);
                 Block bi = state.getBlock();
@@ -116,7 +116,6 @@ public class AILiquidGather extends EntityAIBase {
         int cX = home.getX() - facing.getXOffset();
         int cY = home.getY() - facing.getYOffset();
         int cZ = home.getZ() - facing.getZOffset();
-        int camt = this.theGolem.fluidCarried != null ? this.theGolem.fluidCarried.amount : 0;
         int max = this.theGolem.getFluidCarryLimit();
 
         ArrayList<FluidStack> fluids = GolemHelper.getMissingLiquids(this.theGolem);
@@ -129,21 +128,25 @@ public class AILiquidGather extends EntityAIBase {
                 TileEntity te = this.theWorld.getTileEntity(new BlockPos(marker.x, marker.y, marker.z));
                 if (te == null) continue;
                 EnumFacing side = EnumFacing.VALUES[marker.side % EnumFacing.VALUES.length];
-                if (!te.hasCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, side.getOpposite())) continue;
-                IFluidHandler handler = te.getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, side.getOpposite());
+                if (!te.hasCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, side)) continue;
+                IFluidHandler handler = te.getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, side);
                 if (handler == null) continue;
 
-                FluidStack drained = handler.drain(new FluidStack(fluidstack.getFluid(), max - camt), true);
+                int space = max - (this.theGolem.fluidCarried == null ? 0 : this.theGolem.fluidCarried.amount);
+                if (space <= 0) return;
+                FluidStack drained = handler.drain(new FluidStack(fluidstack.getFluid(), space), true);
                 if (drained != null && drained.amount > 0) {
+                    int accepted = Math.min(space, drained.amount);
                     if (this.theGolem.fluidCarried != null) {
-                        this.theGolem.fluidCarried.amount += drained.amount;
+                        this.theGolem.fluidCarried.amount += accepted;
                     } else {
                         this.theGolem.fluidCarried = drained.copy();
+                        this.theGolem.fluidCarried.amount = accepted;
                     }
-                    if (drained.amount > 200) {
-                        float vol = 0.2f * ((float) drained.amount / (float) max);
+                    if (accepted > 200) {
+                        float vol = 0.2f * ((float) accepted / (float) max);
                         this.theWorld.playSound(null, this.theGolem.getPosition(),
-                            net.minecraft.util.SoundEvent.REGISTRY.getObject(new net.minecraft.util.ResourceLocation("game.neutral.swim")),
+                            net.minecraft.init.SoundEvents.ENTITY_GENERIC_SWIM,
                             net.minecraft.util.SoundCategory.NEUTRAL, vol,
                             1.0f + (this.theWorld.rand.nextFloat() - this.theWorld.rand.nextFloat()) * 0.3f);
                     }
@@ -152,11 +155,12 @@ public class AILiquidGather extends EntityAIBase {
                         this.theGolem.itemWatched = null;
                     }
                     this.count = 0;
+                    if (this.theGolem.fluidCarried.amount >= max) return;
                 }
             }
 
             // World fluid block sources
-            ArrayList<BlockPos> coords = GolemHelper.getMarkedBlocksAdjacentToGolem(this.theWorld, this.theGolem, (byte) -1);
+            ArrayList<BlockPos> coords = GolemHelper.getMarkedFluidBlocksAdjacentToGolem(fluidstack, this.theWorld, this.theGolem);
             for (BlockPos loc : coords) {
                 int i = loc.getX();
                 int j = loc.getY();
@@ -181,7 +185,8 @@ public class AILiquidGather extends EntityAIBase {
 
                 FluidStack drained = drainWorldFluidBlock(this.theWorld, new BlockPos(i, j, k), false);
                 if (drained != null && drained.getFluid() == fluidstack.getFluid()) {
-                    int space = max - camt;
+                    int space = max - (this.theGolem.fluidCarried == null ? 0 : this.theGolem.fluidCarried.amount);
+                    if (space <= 0) return;
                     if (drained.amount > space) continue;
 
                     drainWorldFluidBlock(this.theWorld, new BlockPos(i, j, k), true);
@@ -193,7 +198,7 @@ public class AILiquidGather extends EntityAIBase {
                         this.theGolem.fluidCarried = drained.copy();
                     }
                     this.theWorld.playSound(null, this.theGolem.getPosition(),
-                        net.minecraft.util.SoundEvent.REGISTRY.getObject(new net.minecraft.util.ResourceLocation("game.neutral.swim")),
+                        net.minecraft.init.SoundEvents.ENTITY_GENERIC_SWIM,
                         net.minecraft.util.SoundCategory.NEUTRAL, 0.2f,
                         1.0f + (this.theWorld.rand.nextFloat() - this.theWorld.rand.nextFloat()) * 0.3f);
                     this.theGolem.updateCarried();
@@ -227,7 +232,7 @@ public class AILiquidGather extends EntityAIBase {
         this.origin = loc;
         ArrayList<SourceBlock> sources = new ArrayList<>();
         this.getConnectedFluidBlocks(this.theWorld, loc.getX(), loc.getY(), loc.getZ(), fluid, sources);
-        Collections.sort(sources, Collections.reverseOrder());
+        Collections.sort(sources);
         this.queue.put(loc, sources);
     }
 
@@ -287,7 +292,7 @@ public class AILiquidGather extends EntityAIBase {
         return new FluidStack(fluid, Fluid.BUCKET_VOLUME);
     }
 
-    private class SourceBlock implements Comparable<Object> {
+    private class SourceBlock implements Comparable<SourceBlock> {
         BlockPos loc;
         float dist;
 
@@ -297,9 +302,8 @@ public class AILiquidGather extends EntityAIBase {
         }
 
         @Override
-        public int compareTo(Object target) {
-            SourceBlock other = (SourceBlock) target;
-            return Float.compare(other.dist, this.dist);
+        public int compareTo(SourceBlock target) {
+            return Float.compare(target.dist, this.dist);
         }
     }
 }

@@ -5,13 +5,15 @@ import net.minecraft.entity.ai.EntityAIBase;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
+import net.minecraft.init.PotionTypes;
+import net.minecraft.init.SoundEvents;
 import net.minecraft.item.ItemFishFood;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.FurnaceRecipes;
+import net.minecraft.potion.PotionType;
+import net.minecraft.potion.PotionUtils;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundCategory;
-import net.minecraft.util.SoundEvent;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
@@ -20,7 +22,8 @@ import thaumcraft.common.config.Config;
 import thaumcraft.common.entities.golems.EntityGolemBase;
 import thaumcraft.common.entities.golems.EntityGolemBobber;
 
-import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
@@ -35,36 +38,33 @@ public class AIFish extends EntityAIBase {
     private Vec3d target = null;
     private EntityGolemBobber bobber = null;
 
-    // Weighted loot tables (replaces WeightedRandomFishable which doesn't exist in 1.12.2)
-    private static final List<WeightedLoot> LOOT_CRAP = new ArrayList<>();
-    private static final List<WeightedLoot> LOOT_RARE = new ArrayList<>();
-    private static final List<WeightedLoot> LOOT_FISH = new ArrayList<>();
-
-    static {
-        LOOT_CRAP.add(new WeightedLoot(new ItemStack(Items.LEATHER_BOOTS), 10, 0.9F));
-        LOOT_CRAP.add(new WeightedLoot(new ItemStack(Items.ROTTEN_FLESH), 10));
-        LOOT_CRAP.add(new WeightedLoot(new ItemStack(Items.BONE), 10));
-        LOOT_CRAP.add(new WeightedLoot(new ItemStack(Items.STRING), 10));
-        LOOT_CRAP.add(new WeightedLoot(new ItemStack(Items.BOWL), 5));
-        LOOT_CRAP.add(new WeightedLoot(new ItemStack(Items.FISHING_ROD), 2, 0.9F));
-        LOOT_CRAP.add(new WeightedLoot(new ItemStack(Items.STICK), 10));
-        LOOT_CRAP.add(new WeightedLoot(new ItemStack(Items.BONE), 5));
-        LOOT_CRAP.add(new WeightedLoot(new ItemStack(Items.ARROW, 10), 5));
-        LOOT_CRAP.add(new WeightedLoot(new ItemStack(Blocks.TRIPWIRE_HOOK), 10));
-        LOOT_CRAP.add(new WeightedLoot(new ItemStack(Items.GUNPOWDER), 10));
-
-        LOOT_RARE.add(new WeightedLoot(new ItemStack(Blocks.WATERLILY), 1));
-        LOOT_RARE.add(new WeightedLoot(new ItemStack(Items.NAME_TAG), 1));
-        LOOT_RARE.add(new WeightedLoot(new ItemStack(Items.SADDLE), 1));
-        LOOT_RARE.add(new WeightedLoot(new ItemStack(Items.BOW), 1, 0.25F));
-        LOOT_RARE.add(new WeightedLoot(new ItemStack(Items.FISHING_ROD), 1, 0.25F));
-        LOOT_RARE.add(new WeightedLoot(new ItemStack(Items.ENCHANTED_BOOK), 1));
-
-        LOOT_FISH.add(new WeightedLoot(new ItemStack(Items.FISH, 1, ItemFishFood.FishType.COD.getMetadata()), 60));
-        LOOT_FISH.add(new WeightedLoot(new ItemStack(Items.FISH, 1, ItemFishFood.FishType.SALMON.getMetadata()), 25));
-        LOOT_FISH.add(new WeightedLoot(new ItemStack(Items.FISH, 1, ItemFishFood.FishType.CLOWNFISH.getMetadata()), 2));
-        LOOT_FISH.add(new WeightedLoot(new ItemStack(Items.FISH, 1, ItemFishFood.FishType.PUFFERFISH.getMetadata()), 13));
-    }
+    private static final List<WeightedLoot> LOOT_CRAP = Collections.unmodifiableList(Arrays.asList(
+            new WeightedLoot(new ItemStack(Items.LEATHER_BOOTS), 10, 0.9F, false),
+            new WeightedLoot(new ItemStack(Items.LEATHER), 10),
+            new WeightedLoot(new ItemStack(Items.BONE), 10),
+            new WeightedLoot(potion(PotionTypes.WATER), 10),
+            new WeightedLoot(new ItemStack(Items.STRING), 5),
+            new WeightedLoot(new ItemStack(Items.FISHING_ROD), 2, 0.9F, false),
+            new WeightedLoot(new ItemStack(Items.BOWL), 10),
+            new WeightedLoot(new ItemStack(Items.STICK), 5),
+            new WeightedLoot(new ItemStack(Items.DYE, 10, 0), 5),
+            new WeightedLoot(new ItemStack(Blocks.TRIPWIRE_HOOK), 10),
+            new WeightedLoot(new ItemStack(Items.ROTTEN_FLESH), 10)
+    ));
+    private static final List<WeightedLoot> LOOT_RARE = Collections.unmodifiableList(Arrays.asList(
+            new WeightedLoot(new ItemStack(Blocks.WATERLILY), 1),
+            new WeightedLoot(new ItemStack(Items.NAME_TAG), 1),
+            new WeightedLoot(new ItemStack(Items.SADDLE), 1),
+            new WeightedLoot(new ItemStack(Items.BOW), 1, 0.25F, true),
+            new WeightedLoot(new ItemStack(Items.FISHING_ROD), 1, 0.25F, true),
+            new WeightedLoot(new ItemStack(Items.BOOK), 1, 0.0F, true)
+    ));
+    private static final List<WeightedLoot> LOOT_FISH = Collections.unmodifiableList(Arrays.asList(
+            new WeightedLoot(new ItemStack(Items.FISH, 1, ItemFishFood.FishType.COD.getMetadata()), 60),
+            new WeightedLoot(new ItemStack(Items.FISH, 1, ItemFishFood.FishType.SALMON.getMetadata()), 25),
+            new WeightedLoot(new ItemStack(Items.FISH, 1, ItemFishFood.FishType.CLOWNFISH.getMetadata()), 2),
+            new WeightedLoot(new ItemStack(Items.FISH, 1, ItemFishFood.FishType.PUFFERFISH.getMetadata()), 13)
+    ));
 
     public AIFish(EntityGolemBase golem) {
         this.theGolem = golem;
@@ -110,7 +110,7 @@ public class AIFish extends EntityAIBase {
         }
 
         theWorld.playSound(null, theGolem.getPosition(),
-            SoundEvent.REGISTRY.getObject(new ResourceLocation("random.bow")),
+            SoundEvents.ENTITY_BOBBER_THROW,
             SoundCategory.NEUTRAL, 0.5F,
             0.4F / (theWorld.rand.nextFloat() * 0.4F + 0.8F));
 
@@ -127,25 +127,14 @@ public class AIFish extends EntityAIBase {
     public void updateTask() {
         if (this.target != null) {
             theGolem.getLookHelper().setLookPosition(this.target.x + 0.5, this.target.y + 1.0, this.target.z + 0.5, 30.0F, 30.0F);
-            float chance = this.quality + (float) theGolem.getGolemStrength() * 1.5E-4F;
-            if (theWorld.rand.nextFloat() < chance) {
+            if (shouldCatch(theWorld.rand.nextFloat(), this.quality, theGolem.getGolemStrength())) {
                 theGolem.startRightArmTimer();
-                int qq = 1;
-                if (theGolem.getUpgradeAmount(0) > 0 && theWorld.rand.nextInt(10) < theGolem.getUpgradeAmount(0)) {
-                    qq++;
-                }
+                int qq = catchCount(theGolem.getUpgradeAmount(0), theWorld.rand);
                 for (int a = 0; a < qq; a++) {
                     ItemStack fs = this.getFishingResult();
-                    // Smelt upgrade
-                    if (theGolem.getUpgradeAmount(2) > 0) {
-                        ItemStack sr = FurnaceRecipes.instance().getSmeltingResult(fs);
-                        if (sr != null && !sr.isEmpty()) fs = sr.copy();
-                    }
-                    EntityItem entityitem = new EntityItem(theWorld, this.target.x + 0.5, this.target.y + 1.0, this.target.z + 0.5, fs);
-                    if (theGolem.getUpgradeAmount(2) > 0) {
-                        entityitem.setNoDespawn();
-                    }
-                    entityitem.setPickupDelay(20);
+                    boolean ignis = theGolem.getUpgradeAmount(2) > 0;
+                    fs = applyIgnisSmelting(fs, ignis);
+                    EntityItem entityitem = createCatchEntity(theWorld, this.target, fs, ignis);
                     double d1 = theGolem.posX + theWorld.rand.nextFloat() - theWorld.rand.nextFloat() - (this.target.x + 0.5);
                     double d3 = theGolem.posY - (this.target.y + 1.0);
                     double d5 = theGolem.posZ + theWorld.rand.nextFloat() - theWorld.rand.nextFloat() - (this.target.z + 0.5);
@@ -157,7 +146,7 @@ public class AIFish extends EntityAIBase {
                     theWorld.spawnEntity(entityitem);
                 }
                 if (this.bobber != null) {
-                    this.bobber.playSound(SoundEvent.REGISTRY.getObject(new ResourceLocation("random.splash")), 0.15F, 1.0F + (theWorld.rand.nextFloat() - theWorld.rand.nextFloat()) * 0.4F);
+                    this.bobber.playSound(SoundEvents.ENTITY_BOBBER_SPLASH, 0.15F, 1.0F + (theWorld.rand.nextFloat() - theWorld.rand.nextFloat()) * 0.4F);
                     theWorld.setEntityState(this.bobber, EntityGolemBobber.STATUS_SPLASH_CATCH);
                     this.bobber.setDead();
                 }
@@ -201,8 +190,8 @@ public class AIFish extends EntityAIBase {
     private ItemStack getFishingResult() {
         Random rand = theWorld.rand;
         float f = rand.nextFloat();
-        float f1 = 0.1F - (float) theGolem.getUpgradeAmount(5) * 0.025F;
-        float f2 = 0.05F + (float) theGolem.getUpgradeAmount(4) * 0.0125F;
+        float f1 = junkChance(theGolem.getUpgradeAmount(5));
+        float f2 = rareChance(theGolem.getUpgradeAmount(4));
 
         // Adjust quality based on surrounding water
         if (this.target != null) {
@@ -232,14 +221,60 @@ public class AIFish extends EntityAIBase {
         f1 = MathHelper.clamp(f1, 0.0F, 1.0F);
         f2 = MathHelper.clamp(f2, 0.0F, 1.0F);
 
-        if (f < f1) {
-            return getRandomLoot(LOOT_CRAP, rand);
-        }
-        f -= f1;
-        if (f < f2) {
-            return getRandomLoot(LOOT_RARE, rand);
-        }
-        return getRandomLoot(LOOT_FISH, rand);
+        return getRandomLoot(lootTable(selectLootTable(f, f1, f2)), rand);
+    }
+
+    static float catchChance(float quality, int golemStrength) {
+        return quality + (float) golemStrength * 1.5E-4F;
+    }
+
+    static boolean shouldCatch(float roll, float quality, int golemStrength) {
+        return roll < catchChance(quality, golemStrength);
+    }
+
+    static int catchCount(int aerUpgrades, int roll) {
+        return aerUpgrades > 0 && roll < aerUpgrades ? 2 : 1;
+    }
+
+    private static int catchCount(int aerUpgrades, Random rand) {
+        return catchCount(aerUpgrades, aerUpgrades > 0 ? rand.nextInt(10) : 10);
+    }
+
+    static float junkChance(int perditioUpgrades) {
+        return 0.1F - (float) perditioUpgrades * 0.025F;
+    }
+
+    static float rareChance(int ordoUpgrades) {
+        return 0.05F + (float) ordoUpgrades * 0.0125F;
+    }
+
+    static LootTable selectLootTable(float roll, float junkChance, float rareChance) {
+        if (roll < junkChance) return LootTable.JUNK;
+        if (roll - junkChance < rareChance) return LootTable.RARE;
+        return LootTable.COMMON;
+    }
+
+    static List<WeightedLoot> lootTable(LootTable table) {
+        if (table == LootTable.JUNK) return LOOT_CRAP;
+        if (table == LootTable.RARE) return LOOT_RARE;
+        return LOOT_FISH;
+    }
+
+    static ItemStack applyIgnisSmelting(ItemStack stack, boolean ignis) {
+        if (!ignis) return stack;
+        ItemStack smelted = FurnaceRecipes.instance().getSmeltingResult(stack);
+        return smelted == null || smelted.isEmpty() ? stack : smelted.copy();
+    }
+
+    static EntityItem createCatchEntity(World world, Vec3d target, ItemStack stack, boolean ignis) {
+        EntityItem entity = new EntityItem(world, target.x + 0.5, target.y + 1.0, target.z + 0.5, stack);
+        if (ignis) entity.setFire(2);
+        entity.setPickupDelay(20);
+        return entity;
+    }
+
+    private static ItemStack potion(PotionType type) {
+        return PotionUtils.addPotionToItemStack(new ItemStack(Items.POTIONITEM), type);
     }
 
     private static ItemStack getRandomLoot(List<WeightedLoot> lootTable, Random rand) {
@@ -250,37 +285,48 @@ public class AIFish extends EntityAIBase {
         for (WeightedLoot wl : lootTable) {
             cumulative += wl.weight;
             if (roll < cumulative) {
-                ItemStack result = wl.stack.copy();
-                if (rand.nextFloat() < wl.enchantChance) {
-                    result = enchantItem(result, rand);
-                }
-                return result;
+                return wl.createStack(rand);
             }
         }
-        return lootTable.get(0).stack.copy();
+        return lootTable.get(0).createStack(rand);
     }
 
-    private static ItemStack enchantItem(ItemStack stack, Random rand) {
-        try {
-            return net.minecraft.enchantment.EnchantmentHelper.addRandomEnchantment(rand, stack, 30, false);
-        } catch (Exception e) {
-            return stack;
-        }
+    enum LootTable {
+        JUNK,
+        RARE,
+        COMMON
     }
 
-    private static class WeightedLoot {
+    static final class WeightedLoot {
         final ItemStack stack;
         final int weight;
-        final float enchantChance;
+        final float damageFraction;
+        final boolean enchantable;
 
         WeightedLoot(ItemStack stack, int weight) {
-            this(stack, weight, 0.0F);
+            this(stack, weight, 0.0F, false);
         }
 
-        WeightedLoot(ItemStack stack, int weight, float enchantChance) {
+        WeightedLoot(ItemStack stack, int weight, float damageFraction, boolean enchantable) {
             this.stack = stack;
             this.weight = weight;
-            this.enchantChance = enchantChance;
+            this.damageFraction = damageFraction;
+            this.enchantable = enchantable;
+        }
+
+        ItemStack createStack(Random rand) {
+            ItemStack result = this.stack.copy();
+            if (this.damageFraction > 0.0F) {
+                int maximumDamage = (int) (this.damageFraction * (float) result.getMaxDamage());
+                int damage = result.getMaxDamage() - rand.nextInt(rand.nextInt(maximumDamage) + 1);
+                if (damage > maximumDamage) damage = maximumDamage;
+                if (damage < 1) damage = 1;
+                result.setItemDamage(damage);
+            }
+            if (this.enchantable) {
+                result = net.minecraft.enchantment.EnchantmentHelper.addRandomEnchantment(rand, result, 30, false);
+            }
+            return result;
         }
     }
 }

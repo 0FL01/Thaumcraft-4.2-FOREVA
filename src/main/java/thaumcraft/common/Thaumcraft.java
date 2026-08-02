@@ -56,6 +56,7 @@ import thaumcraft.common.lib.CreativeTabThaumcraft;
 import thaumcraft.common.lib.network.PacketHandler;
 import thaumcraft.common.lib.network.playerdata.PacketWarpMessage;
 import thaumcraft.common.lib.research.ScanManager;
+import thaumcraft.common.lib.utils.CropUtils;
 import thaumcraft.common.blocks.BlockJarItem;
 import thaumcraft.common.lib.world.ComponentBankerHome;
 import thaumcraft.common.lib.world.ComponentWizardTower;
@@ -213,6 +214,7 @@ public class Thaumcraft {
 
     @Mod.EventHandler
     public void processIMC(FMLInterModComms.IMCEvent event) {
+        CropUtils.processIMC(event.getMessages());
         ConfigEntities.processIMC(event.getMessages());
     }
 

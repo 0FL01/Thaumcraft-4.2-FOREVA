@@ -66,6 +66,7 @@ public abstract class AITarget extends EntityAIBase {
         if (target == null) return false;
         if (target == this.taskOwner) return false;
         if (!target.isEntityAlive()) return false;
+        if (!this.taskOwner.canAttackClass(target.getClass())) return false;
         if (this.taskOwner instanceof EntityTameable) {
             EntityTameable tameable = (EntityTameable)this.taskOwner;
             if (tameable.isTamed()) {

@@ -149,12 +149,12 @@ public class InventoryUtils {
         if (inv instanceof ISidedInventory && face != null) {
             ISidedInventory sided = (ISidedInventory) inv;
             int[] slots = sided.getSlotsForFace(face);
-            for (int i = 0; i < slots.length && result == null; i++) {
+            for (int i = 0; slots != null && i < slots.length && (result == null || result.isEmpty()); i++) {
                 result = attemptExtraction(inv, needed, slots[i], face, oreDict, ignoreDamage, ignoreNBT, doit);
             }
         } else {
             int size = inv.getSizeInventory();
-            for (int i = 0; i < size && result == null; i++) {
+            for (int i = 0; i < size && (result == null || result.isEmpty()); i++) {
                 result = attemptExtraction(inv, needed, i, face, oreDict, ignoreDamage, ignoreNBT, doit);
             }
         }
@@ -216,32 +216,24 @@ public class InventoryUtils {
         if (a.isEmpty() && b.isEmpty()) return true;
         if (a.isEmpty() || b.isEmpty()) return false;
 
-        // Ore dictionary match
         if (oreDict) {
-            int[] idsA = OreDictionary.getOreIDs(a);
-            int[] idsB = OreDictionary.getOreIDs(b);
-            for (int idA : idsA) {
-                for (int idB : idsB) {
-                    if (idA == idB) return true;
-                }
+            int[] oreIDs = OreDictionary.getOreIDs(a);
+            if (oreIDs.length > 0) {
+                ItemStack[] ores = OreDictionary.getOres(OreDictionary.getOreName(oreIDs[0])).toArray(new ItemStack[0]);
+                if (ThaumcraftApiHelper.containsMatch(false, new ItemStack[]{b}, ores)) return true;
             }
         }
 
-        // Item type must match
-        if (a.getItem() != b.getItem()) return false;
-
-        // Damage/metadata check
-        if (!ignoreDamage) {
-            boolean dm = a.getItem().isDamageable() && b.getItem().isDamageable();
-            if (!dm && a.getMetadata() != b.getMetadata()) return false;
+        boolean tagsEqual = ignoreNBT || ItemStack.areItemStackTagsEqual(a, b);
+        boolean damageDiffers = a.getMetadata() != b.getMetadata();
+        if (ignoreDamage && a.isItemStackDamageable() && b.isItemStackDamageable()) {
+            damageDiffers = false;
         }
-
-        // NBT check
-        if (!ignoreNBT) {
-            if (!ItemStack.areItemStackTagsEqual(a, b)) return false;
+        if (damageDiffers && ignoreDamage
+                && (a.getMetadata() == Short.MAX_VALUE || b.getMetadata() == Short.MAX_VALUE)) {
+            damageDiffers = false;
         }
-
-        return true;
+        return a.getItem() == b.getItem() && !damageDiffers && tagsEqual;
     }
 
     public static boolean areItemStacksEqualForCrafting(ItemStack a, ItemStack b, boolean oreDict, boolean ignoreDamage, boolean ignoreNBT) {

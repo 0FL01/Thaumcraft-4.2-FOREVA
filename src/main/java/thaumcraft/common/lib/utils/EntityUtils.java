@@ -49,7 +49,12 @@ public class EntityUtils {
 
     public static void setRecentlyHit(Entity entity, int time) {
         if (entity instanceof EntityLivingBase) {
-            ((EntityLivingBase)entity).hurtResistantTime = time;
+            try {
+                net.minecraftforge.fml.common.ObfuscationReflectionHelper.setPrivateValue(
+                        EntityLivingBase.class, (EntityLivingBase) entity, time,
+                        "recentlyHit", "field_70718_bc");
+            } catch (Exception ignored) {
+            }
         }
     }
 

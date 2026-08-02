@@ -34,13 +34,7 @@ public class AIDartAttack extends EntityAIBase {
 
     @Override
     public boolean shouldContinueExecuting() {
-        EntityLivingBase target = this.theGolem.getAttackTarget();
-        if (target == null) return false;
-        if (!this.theGolem.isValidTarget(target)) {
-            this.theGolem.setAttackTarget(null);
-            return false;
-        }
-        return !this.theGolem.getNavigator().noPath();
+        return this.shouldExecute() && !this.theGolem.getNavigator().noPath();
     }
 
     @Override

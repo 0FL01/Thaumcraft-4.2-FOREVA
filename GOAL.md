@@ -1,101 +1,135 @@
-# Goal: Systematic Thaumcraft 6 addon compatibility
+# Goal: Complete TC4 golem heart and upgrade backend parity
 
 Status: complete
-Source: User-approved TC6 compatibility audit and iterative implementation plan from 2026-07-24; GitHub issue #9
-Last updated: 2026-07-24
+Source: User-approved multi-agent RECON and implementation directive dated 2026-08-02
+Last updated: 2026-08-02
 
 ## Objective
-Replace one-crash-at-a-time TC6 addon shims with a deterministic compatibility layer that inventories the BETA26 ABI, resolves pinned addon bytecode before runtime, maps supported state to canonical TC4 owners, reports unsupported symbols explicitly, and loads the Witchery modset through dedicated-server smoke.
+
+Restore the complete server/backend behavior of all TC4 golem hearts and their Aer, Terra, Ignis, Aqua, Ordo, and Perditio interactions on Forge 1.12.2. Resolve shared inventory, filtering, persistence, navigation, fluid, combat, crop, and fishing defects before closing individual heart behavior. Cover the high-value behavioral contracts with Pareto-focused runtime tests, validate every runtime checkpoint on a dedicated server, and finish with an up-to-date universal jar.
 
 ## Execution Directive
-Complete the frozen Required Outcomes using the listed Change Envelope and Primary Evidence. Work on the smallest unresolved outcome. Do not add requirements from reviews, tests, tools, speculative risks, or optional source text. Finish when every required outcome is resolved and affected constraints remain satisfied.
+
+Complete the frozen Required Outcomes in dependency order using the listed Change Envelope and Primary Evidence. Work iteratively on the smallest unresolved backend slice, run focused tests after each slice, and do not declare a heart complete from compilation or source-string guards alone. Prefer TC4 bytecode behavior unless it conflicts with an explicit shipped research promise, a proven 1.12 API requirement, or a user-approved safety correction.
 
 ## Frozen Contract
 
 ### Required Outcomes
-- R1: Record and verify the complete public/protected TC6 BETA26 API shape.
-  - Source: Approved prompts 1 and 3.
-  - Acceptance: A deterministic, dependency-free classfile tool verifies the donor hash and emits/compares a committed ABI snapshot with exact JVM owners, descriptors, access, hierarchy, and member flags.
-  - Primary evidence: Focused tool tests and `./scripts/dev.sh compat-validate` pass.
+
+- R1: Remove runtime action blockers shared by Fishing, Liquid, and Essentia.
+  - Acceptance: All obsolete 1.7 sound identifiers are replaced by valid 1.12 `SoundEvents`; representative fishing and transfer paths execute without null sound events.
+  - Primary evidence: Focused runtime tests and `./scripts/dev.sh validate --smoke`.
   - Status: verified
-  - Evidence: `scripts/tc6-compat.py` reproducibly verified the donor SHA and 158 class / 541 field / 966 method records; focused Python tests, `./scripts/dev.sh compat-validate`, and `./scripts/dev.sh validate` passed.
-- R2: Resolve addon TC references before runtime.
-  - Source: Approved prompts 2 and 3.
-  - Acceptance: Pinned addon manifests produce deterministic demand inventories; the resolver handles JVM inheritance and reports class/member/access/static/interface mismatches, mixin targets, and reflective candidates without committing third-party jars.
-  - Primary evidence: Corpus rescan and synthetic resolver tests pass with zero unresolved symbols for supported targets.
+  - Evidence: Fishing uses registered bobber throw/splash events and all Liquid/Essentia transfers use `ENTITY_GENERIC_SWIM`; focused guards and `./scripts/dev.sh validate --smoke` passed.
+
+- R2: Restore shared item-filter, ghost-slot, extraction, and persistence contracts.
+  - Acceptance: Extraction scans all accessible slots; Fill precise amounts are configurable and honored; Empty/Gather/Use filters remain unit filters; Liquid accepts only fluid containers; Perditio metadata/durability/NBT/ore behavior matches the reviewed TC4 contract; colors and upgrades remain synchronized after load and live changes.
+  - Primary evidence: Runtime tests covering sided extraction, amount calculation, ghost clicks, fluid validation, comparison-toggle matrices, and NBT/data synchronization.
   - Status: verified
-  - Evidence: The opcode-aware corpus snapshot records six pinned addons and 238 class/member/mixin entries; JVM hierarchy/static/access/interface resolution passes all supported addons and reports the three distinct audited Witchery candidate gaps. Eight focused Python tests and `./scripts/dev.sh compat-validate` passed.
-- R3: Make ForgeGradle modset smoke reproducible for production SRG jars.
-  - Source: Approved prompt 4.
-  - Acceptance: Smoke preprocessing verifies source hashes, performs owner-aware SRG-to-MCP remapping into ignored staging, preserves source jars/resources, and isolates the smoke world; production smoke continues to use original jars.
-  - Primary evidence: Synthetic inherited-owner regression and Witchery dev smoke pass.
+  - Evidence: Runtime tests cover normal/sided extraction, requested amounts, first-ore matching, Perditio comparison semantics, core-specific ghost limits, fluid validation, extended-count NBT, color publication, and live upgrade-array sync; focused tests and `./scripts/dev.sh validate --smoke` passed.
+
+- R3: Restore Sorting heart end to end.
+  - Acceptance: A Sorting golem extracts from home only when an in-range marked destination already contains the matching item and has room, carries the item to that destination, inserts through the marked side including double chests, excludes home, and recovers from path stalls.
+  - Primary evidence: Runtime/integration inventory tests with empty, seeded, full, farther, sided, and double-chest destinations.
   - Status: verified
-  - Evidence: `smoke-modset` now hash-checks original jars, builds dependency-inclusive inheritance metadata, remaps ignored staging copies, verifies unchanged entries/resources and absence of mapped SRG refs, and uses an isolated world. The Witchery run passed both remap checks and reached the expected `CommonInternals` crash instead of the prior inherited-owner `NoSuchMethodError`.
-- R4: Fix the observed Witchery TC6 contracts through canonical TC4-backed adapters.
-  - Source: GitHub issue #9 and approved prompts 5-7.
-  - Acceptance: `CommonInternals.scanEntities` is an exact identity alias; the observed `AuraHandler.drainVis(World, BlockPos, float, boolean)` contract is implemented only if donor/TC4 RECON proves a safe adapter; the pinned Witchery corpus has no unresolved accepted symbols and reaches dedicated-server ready state.
-  - Primary evidence: Focused ABI/semantic tests, corpus resolution, and `./scripts/dev.sh smoke-modset witchery` pass.
+  - Evidence: Sorting retains a hidden wildcard sentinel, validates seeded non-home destinations with room and marker-side/Perditio rules, routes carried items, handles double chests, and keeps stall recovery; seven integration scenarios plus shared R2 suites and `./scripts/dev.sh validate --smoke` passed.
+
+- R4: Complete Harvest and Lumber backend parity.
+  - Acceptance: Baseline and IMC crop registrations work; standard/clickable/stacked categories preserve their distinct semantics; stems and stacked bases survive; Harvest uses the reviewed TC4 search/adjacency model; Ordo replants only the harvested crop using consumed drops; Lumber keeps TC4 top-down connected-log behavior and does not replant.
+  - Primary evidence: Runtime crop matrix, Harvest search/Ordo tests, Lumber traversal tests, and server smoke.
   - Status: verified
-  - Evidence: `CommonInternals.scanEntities` is an exact `ArrayList` identity alias to `ThaumcraftApi.scanEntities`; untyped TC6 drain uses unique canonical TC4 visnet sources with non-mutating simulation. Focused tests, full validation, zero-gap corpus resolution, and `./scripts/dev.sh smoke-modset witchery` passed.
-- R5: Publish an explicit hybrid compatibility policy and release gate.
-  - Source: Approved prompts 8-10.
-  - Acceptance: Every accepted symbol is classified `EXACT`, `PROJECTED`, `LINK_ONLY`, or `UNSUPPORTED`; safe structural symbols have exact ABI guards; stateful domains use canonical adapters or remain explicitly unsupported; one command runs provenance, ABI, demand, tests, smoke-required checks, MCP leak check, and final artifact verification.
-  - Primary evidence: `./scripts/dev.sh compat-validate`, `./scripts/dev.sh validate`, required modset smoke, and final `./scripts/dev.sh build` pass on one tree.
+  - Evidence: Baseline/IMC crop registration, standard/clickable/stacked semantics, stem/base preservation, shuffled range/adjacency behavior, exact-state continuation, and safe Ordo replanting are runtime-covered; Lumber parity guards remain green; focused suites and `./scripts/dev.sh validate --smoke` passed.
+
+- R5: Complete Liquid and Essentia backend parity.
+  - Acceptance: Marker-only in-range liquid source selection works; sided capabilities use the proven clicked/home face; Perditio drains the farthest connected source first; transfers cannot exceed capacity; Ignis fluid filters and Ordo marker colors route correctly; reservoir essentia extraction works; marker dimensions round-trip as full integers.
+  - Primary evidence: Capability-backed sided tank tests, source-order tests, reservoir tests, marker NBT tests, and server smoke.
   - Status: verified
-  - Evidence: The accepted target classifies all 127 observed symbols (`EXACT=13`, `PROJECTED=88`, `LINK_ONLY=22`, `UNSUPPORTED=4`) and fails on unclassified demand. `./scripts/dev.sh compat-release` passed normal validation, all five isolated server modsets, final build, MCP leak check, and repeated ABI/demand/target verification.
-- R6: Commit the completed scoped implementation.
-  - Source: User instruction from 2026-07-24.
-  - Acceptance: A single scoped commit contains the implementation and generated text manifests after all required validation.
-  - Primary evidence: Commit hash and committed-file list in the final report.
+  - Evidence: Capability-backed tests prove home/clicked face use, marker-only nearest in-range selection, fluid/color routing, carry-capacity bounds, and farthest-first Perditio draining; reservoir empty/partial extraction and full signed marker-dimension NBT round trips are runtime-covered; `./scripts/dev.sh validate --smoke` passed.
+
+- R6: Complete Fishing backend parity and special upgrades.
+  - Acceptance: Fishing uses the reviewed TC4 loot table, damage and enchant rules; Aer extra-catch, Ignis cooking/fire, Ordo good-loot, and Perditio junk-reduction effects are deterministic under tests; bobber lifecycle/backend flags are correct.
+  - Primary evidence: Seeded loot tests, upgrade probability-boundary tests, catch entity tests, and server smoke.
   - Status: verified
-  - Evidence: The validated implementation and deterministic text artifacts are contained in the single scoped commit reported with the final result.
+  - Evidence: Runtime tests cover exact loot descriptors/weights, TC4 damage and guaranteed-enchantment construction, Aer/Terra/Ordo/Perditio probability boundaries, Ignis smelting and burning catch entities, and bobber flags/effective lifetime; Fishing sound guards remain green and `./scripts/dev.sh validate --smoke` passed.
+
+- R7: Complete Guard, Butcher, ranged combat, retaliation, and shared navigation parity.
+  - Acceptance: Visor attribution does not create damage immunity; darts use the target-aware trajectory and hand off to melee inside three blocks; Perditio retaliates against the reviewed immediate source; Guard/Butcher exclusions and population rules hold; Aqua home range is dynamic; all hearts can open and close supported doors/fence gates; heavy golems retain reviewed water movement.
+  - Primary evidence: Combat runtime tests, target-selection tests, door/gate tests, range/movement tests, and server smoke.
+  - Status: verified
+  - Evidence: Runtime tests cover Visor XP attribution without immunity, target-aware darts and melee handoff, immediate-source Perditio retaliation before fire immunity, Guard exclusions/owner/tame safety, Butcher pair preservation, strict Aqua home range, universal wooden-door/fence-gate lifecycle, and heavy-water policy/speed; focused suites and `./scripts/dev.sh validate --smoke` passed.
+
+- R8: Close remaining heart/upgrade persistence and research contracts.
+  - Acceptance: Bell pickup/replacement preserves toggles and filter colors; client/backend calculations use synchronized golem type, upgrades, and carried fluid; Use Aer cadence honors the shipped research promise; missing Butcher warp and golem research sibling are restored; every core capability map and core-specific upgrade promise has regression coverage.
+  - Primary evidence: NBT/bell round-trip tests, live sync tests where practical, cadence tests, research guards, full validation, and manual gameplay matrix.
+  - Status: verified
+  - Evidence: Runtime tests cover bell/placer toggles, colors, filters and normalized hidden Sorting state; synchronized type/upgrades/full-width fluid identity+amount drive client calculations/render data; Use Aer cadence is 15/12/9 ticks; exact capability/slot/duplicate-upgrade and core-specific gates are covered; research siblings/warp guards and `./scripts/dev.sh validate --smoke` passed.
+
+- R9: Produce the validated release artifact.
+  - Acceptance: All focused and non-GUI tests pass, dedicated-server smoke reaches ready state without crash markers, `git diff --check` passes, and `./scripts/dev.sh build` produces the final universal jar.
+  - Primary evidence: Exact commands and artifact path in the final report.
+  - Status: verified
+  - Evidence: `git diff --check`, `./scripts/dev.sh validate --smoke`, and `./scripts/dev.sh build` all passed; the release artifact is `build/libs/Thaumcraft-1.0.0-universal.jar`.
 
 ### Constraints
-- Preserve Java 8, Forge 1.12.2, TC4 public API signatures, package boundaries, ids, keys, and canonical gameplay state.
-- Keep `thaumcraft_src/**`, original TC4/TC6 jars, and third-party addon jars read-only; do not commit remapped jars, logs, worlds, inheritance maps, or decompiled output.
-- Do not claim full TC6 semantic parity from ABI or smoke success.
-- Do not create duplicate mutable stores or silent no-op implementations for stateful TC6 systems.
-- Runtime-affecting checkpoints require dedicated-server smoke; the final code change requires `./scripts/dev.sh build`.
+
+- Preserve Java 8, Forge 1.12.2, TC4 package/API identities, registry ids, packet ids, and existing saved worlds unless an explicit compatible migration is included.
+- Keep `thaumcraft_src/**` and donor jars read-only; do not commit decompiled output, logs, worlds, generated remap state, or third-party binaries.
+- Keep the user-approved same-crop Harvest replant safety rule even though original TC4 accepted any nearby plantable item.
+- Keep corrected Ordo GUI gating rather than restoring known hidden-hitbox and hover-gate bugs from TC4.
+- Runtime-affecting checkpoints require `./scripts/dev.sh validate --smoke`; final code requires `./scripts/dev.sh build`.
+- Tests follow Pareto coverage: prioritize shared helpers, state transitions, upgrade gates, routing decisions, capacity/inventory invariants, and deterministic RNG boundaries over exhaustive rendering or trivial accessors.
 
 ### Non-goals
-- Porting TC6 casters, modular golems, theorycraft, or other gameplay systems without a proven TC4 backend.
-- Making arbitrary reflective or dynamically generated addon calls statically provable.
-- Replacing TC4 gameplay architecture with TC6 internals.
+
+- Pixel-perfect client renderer/model parity unrelated to backend correctness, including custom dart geometry.
+- Reproducing known TC4 item duplication, capacity overflow, unrelated-seed planting, hidden GUI hitbox, or stale-client bugs.
+- Dependency, platform, mapping, or architecture upgrades.
+- Rewriting golems into the Thaumcraft 6 modular golem system.
 
 ## Change Envelope
-- Target: ABI/demand tooling, smoke preprocessing, compatibility manifests/docs, exact structural shims, and canonical adapters required by the pinned supported corpus.
-- Expected paths, symbols, and direct consumers: `scripts/dev.sh`, `scripts/tc6-compat.py`, `scripts/smoke-modsets/**`, `docs/compatibility/**`, focused tests, `thaumcraft.api.internal.CommonInternals`, `thaumcraft.common.world.aura.AuraHandler`, `ThaumcraftApi.scanEntities`, and `ScanManager`.
-- Allowed artifacts: Java/Python/shell source, deterministic text manifests, tests, docs, existing dependency-free tooling.
-- Forbidden artifacts: new dependencies, modified donor/original jars, committed third-party/remapped jars, fake persistent state, speculative subsystem implementations.
-- User or harness budget: iterative checkpoints; one final commit after smoke and build.
+
+- Target: `thaumcraft.common.entities.golems`, golem AI packages, `InventoryMob`, inventory/fluid helpers, golem containers/ghost slots, crop registration utilities and IMC handling, focused tests, golem research registration, and this goal.
+- Allowed supporting changes: synchronized display state needed to represent authoritative backend state, existing English localization keys required by restored feedback, and minimal test fixtures.
+- Forbidden supporting changes: unrelated gameplay systems, donor edits, new dependencies, speculative abstractions, and visual-only scope expansion before R1-R9 close.
+- User or harness budget: iterative implementation from R1 through R9; no intermediate commit required unless requested.
 
 ## Current Checkpoint
-- Closes: none; the frozen objective is complete.
-- Smallest next action: none.
-- Expected evidence: none beyond the completion evidence below.
-- Stop or replan if: a future request creates a new objective.
+
+- Closes: R9 and the complete TC4 golem heart/upgrade backend parity goal.
+- Smallest next action: Manual in-game spot checks or commit on user request.
+- Expected evidence: Complete; automated validation, dedicated-server readiness, and release artifact are recorded below.
+- Stop or replan if: a required 1.12 behavior cannot be represented without breaking a stable public/NBT contract, or runtime evidence contradicts the reviewed side/direction mapping.
 
 ## Current State
-- Resolved: R1-R6 are verified: ABI/demand gates, owner-aware smoke, Witchery adapters, semantic policy, combined release validation, final build, and the requested scoped commit.
-- Last relevant evidence: `./scripts/dev.sh compat-release`, final `./scripts/dev.sh compat-validate`, and explicit final `./scripts/dev.sh build` passed.
+
+- Resolved: R1-R9; all reviewed heart and upgrade backend contracts are implemented and the final universal jar is built.
+- Last relevant evidence: `git diff --check`, `./scripts/dev.sh validate --smoke`, and `./scripts/dev.sh build` passed.
 - Blocker: None.
-- Next: none.
+- Next: Optional manual gameplay spot checks and commit.
 
 ## Material Decisions
-- 2026-07-24: Use a hybrid layer: exact ABI where safe, canonical TC4 projections where proven, link-only only when explicit, and fail-closed unsupported stateful domains.
-- 2026-07-24: The achievable silver bullet is exhaustive pre-runtime resolution and explicit semantic coverage, not an unsupported claim that every TC6 gameplay subsystem exists.
-- 2026-07-24: `CommonInternals.scanEntities` is a canonical-state alias, not an addon-specific independent registry.
+
+- 2026-08-02: Shared backend invariants are repaired before individual heart AI so later fixes rely on one authoritative filter/extraction model.
+- 2026-08-02: The shipped Use+Aer research promise is an acceptance contract even though the TC4 binary appears not to apply the upgrade correctly.
+- 2026-08-02: Fluid capability faces are changed only after a sided 1.12 runtime test proves the correct marker/home face.
+- 2026-08-02: Same-crop Ordo replanting remains stricter than TC4 to prevent observed wheat-for-beetroot replacement.
 
 ## Checkpoint History
-- 2026-07-24: User approved the audited ten-step implementation plan and requested iterative implementation, smoke validation, and a final commit.
-- 2026-07-24: R1 added dependency-free classfile ABI extraction and the deterministic BETA26 snapshot; focused tests and full validation passed.
-- 2026-07-24: R2 added opcode-aware addon demand extraction, mixin/reflective classification, JVM hierarchy resolution, and a pinned six-addon corpus; supported addons resolve and Witchery fails closed on three known symbols.
-- 2026-07-24: R3 added hash-verified owner-aware dev remapping and isolated smoke worlds; Witchery production inputs now reproduce the real TC gap without ForgeGradle mapping false failures.
-- 2026-07-24: R4 added the canonical entity-scan identity alias and projected untyped vis drain onto TC4 visnet; focused checks, full validation, corpus resolution, and Witchery smoke passed.
-- 2026-07-24: R5 added complete per-symbol semantic classification, removed substitute chunk aura state, and introduced a combined release command; all five modsets and final artifact gates passed.
+
+- 2026-08-02: User requested mass parallel audit of every heart and improvement. Eight general agents audited core contracts, inventory/sorting, Harvest/Lumber, Use/Fishing, combat, fluids/essentia, and generic upgrades against TC4.
+- 2026-08-02: User approved full iterative implementation with Pareto-focused backend test coverage and final build.
+- 2026-08-02: R1 replaced obsolete Fishing/Liquid/Essentia sound lookups with registered 1.12 events; focused tests and dedicated-server smoke passed.
+- 2026-08-02: R2 restored extraction scans, TC4 filter amount/comparison behavior, core-specific item/fluid ghost slots, extended precise-count persistence, color publication, and live client upgrade-array synchronization; focused runtime tests and dedicated-server smoke passed.
+- 2026-08-02: R3 restored Sorting's hidden wildcard state, seeded destination routing, source exclusion, marker-side comparisons, double-chest insertion, and stall recovery; integration tests and dedicated-server smoke passed.
+- 2026-08-02: R4 restored baseline/IMC crop registrations, crop-category semantics, stem/stacked-base preservation, TC4 Harvest search/continuation/adjacency behavior, and retained safe same-crop Ordo replanting; focused runtime suites and dedicated-server smoke passed.
+- 2026-08-02: R5 restored marker-only nearest fluid selection, proved and applied direct capability faces, bounded multi-source transfers, farthest-first Perditio draining, fluid/color routing, reservoir extraction, and full-width marker dimensions; capability-backed tests and dedicated-server smoke passed.
+- 2026-08-02: R6 restored exact Fishing loot construction, deterministic upgrade effects, Ignis smelting/fire, and effective bobber flags/lifetime; runtime suites and dedicated-server smoke passed.
+- 2026-08-02: R7 restored Visor attribution, target-aware darts/melee handoff, immediate-source retaliation, target safety, dynamic Aqua home range, universal door/gate handling, and heavy-water behavior; runtime suites and dedicated-server smoke passed.
+- 2026-08-02: R8 preserved bell toggles/colors, synchronized type/upgrades/full-width fluid display state, fulfilled Use Aer cadence, restored research sibling/warp metadata, and added exact core/upgrade contract coverage; focused suites and dedicated-server smoke passed.
+- 2026-08-02: R9 passed full validation, dedicated-server smoke, jar checks, and the final Gradle build; `build/libs/Thaumcraft-1.0.0-universal.jar` was produced.
 
 ## Completion
-- Resolved outcomes: R1-R6.
-- Commands and artifacts: focused Python/Java tests; `./scripts/dev.sh validate`; `./scripts/dev.sh smoke-modset witchery`; `./scripts/dev.sh compat-release`; final `./scripts/dev.sh compat-validate`; final `./scripts/dev.sh build`; donor/demand/semantic snapshots and the universal jar.
-- Constraint and diff-scope check: donor/original/addon jars remained unchanged and uncommitted; remapped jars, worlds, logs, and inheritance maps stayed ignored; no dependency, id, key, or TC4 signature changes were introduced.
+
+- Resolved outcomes: R1-R9.
+- Commands and artifacts: `git diff --check`; `./scripts/dev.sh validate --smoke`; `./scripts/dev.sh build`; `build/libs/Thaumcraft-1.0.0-universal.jar`.
 - Final status: complete.

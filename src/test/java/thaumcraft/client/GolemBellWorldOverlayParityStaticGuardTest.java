@@ -28,7 +28,7 @@ public class GolemBellWorldOverlayParityStaticGuardTest {
                         && source.contains("ItemGolemBell.getGolemHomeCoords(held)")
                         && source.contains("ItemGolemBell.getGolemHomeFace(held)"));
         assertTrue("Marker visibility must remain dimension- and 64-block-limited",
-                source.contains("marker.dim != (byte) dimension")
+                source.contains("marker.dim != dimension")
                         && source.contains("player.getDistanceSq(markerX, markerY, markerZ) >= 4096.0D"));
 
         assertTrue("TC4 marker, home, empty-block, and script textures must all be routed",

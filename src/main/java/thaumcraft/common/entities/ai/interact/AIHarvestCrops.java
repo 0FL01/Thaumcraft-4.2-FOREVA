@@ -16,6 +16,7 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.WorldServer;
 import net.minecraftforge.common.IPlantable;
@@ -30,17 +31,23 @@ import thaumcraft.common.lib.utils.CropUtils;
 import thaumcraft.common.lib.utils.EntityUtils;
 
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
 public class AIHarvestCrops extends EntityAIBase {
     private EntityGolemBase theGolem;
     int count = 0;
+    private final int distance;
     private BlockPos targetPos = null;
+    private Block targetBlock = Blocks.AIR;
+    private int targetMeta;
     private int delay = -1;
     private int maxDelay;
     private int mod = 1;
     private FakePlayer player;
+    private final ArrayList<BlockPos> checklist = new ArrayList<>();
 
     private static final int[] REPLANT_X = {0, 0, 1, 1, -1, 0, -1, -1, 1};
     private static final int[] REPLANT_Z = {0, 1, 0, 1, 0, -1, -1, 1, -1};
@@ -52,6 +59,7 @@ public class AIHarvestCrops extends EntityAIBase {
     public AIHarvestCrops(EntityGolemBase golem) {
         this.theGolem = golem;
         this.setMutexBits(3);
+        this.distance = MathHelper.floor(golem.getRange() / 4.0F);
         if (golem.world instanceof WorldServer) {
             this.player = FakePlayerFactory.get((WorldServer) golem.world, GAME_PROFILE);
         }
@@ -59,35 +67,44 @@ public class AIHarvestCrops extends EntityAIBase {
 
     @Override
     public boolean shouldExecute() {
-        if (theGolem.ticksExisted % Config.golemDelay > 0) return false;
+        if (this.delay >= 0 || theGolem.ticksExisted % Config.golemDelay > 0) return false;
         if (!theGolem.getNavigator().noPath()) return false;
         return this.findCrop();
     }
 
     private boolean findCrop() {
+        BlockPos pos = this.findGrownCrop();
+        if (pos == null) return false;
+        this.setTarget(pos);
+        return true;
+    }
+
+    BlockPos findGrownCrop() {
         BlockPos home = theGolem.getHomePosition();
-        float range = theGolem.getRange();
-        int r = (int) range;
-        for (int dx = -r; dx <= r; dx++) {
-            for (int dz = -r; dz <= r; dz++) {
-                for (int dy = -2; dy <= 2; dy++) {
-                    BlockPos pos = new BlockPos(home.getX() + dx, home.getY() + dy, home.getZ() + dz);
-                    if (theGolem.getDistanceSq(pos) > range * range) continue;
-                    if (CropUtils.isGrownCrop(theGolem.world, pos)) {
-                        if (theGolem.world.isAirBlock(pos.up()) || CropUtils.isGrownCrop(theGolem.world, pos.up())) {
-                            this.targetPos = pos;
-                            return true;
-                        }
-                    }
+        if (this.checklist.isEmpty()) {
+            for (int dx = -this.distance; dx <= this.distance; dx++) {
+                for (int dz = -this.distance; dz <= this.distance; dz++) {
+                    this.checklist.add(new BlockPos(home.getX() + dx, 0, home.getZ() + dz));
                 }
             }
+            Collections.shuffle(this.checklist, theGolem.getRNG());
         }
-        return false;
+        BlockPos column = this.checklist.remove(0);
+        for (int y = home.getY() - 3; y <= home.getY() + 3; y++) {
+            BlockPos pos = new BlockPos(column.getX(), y, column.getZ());
+            if (CropUtils.isGrownCrop(theGolem.world, pos)) return pos;
+        }
+        return null;
     }
 
     @Override
     public boolean shouldContinueExecuting() {
-        return this.count > 0 && this.targetPos != null;
+        if (this.targetPos == null) return false;
+        IBlockState state = theGolem.world.getBlockState(this.targetPos);
+        return state.getBlock() == this.targetBlock
+                && state.getBlock().getMetaFromState(state) == this.targetMeta
+                && this.count-- > 0
+                && (this.delay > 0 || !theGolem.getNavigator().noPath());
     }
 
     @Override
@@ -103,7 +120,6 @@ public class AIHarvestCrops extends EntityAIBase {
 
     @Override
     public void updateTask() {
-        --this.count;
         if (this.targetPos != null) {
             theGolem.getLookHelper().setLookPosition(targetPos.getX() + 0.5, targetPos.getY() + 0.5, targetPos.getZ() + 0.5, 30.0F, 30.0F);
             double dist = theGolem.getDistanceSq(targetPos);
@@ -150,20 +166,65 @@ public class AIHarvestCrops extends EntityAIBase {
         this.player.setHeldItem(EnumHand.MAIN_HAND, ItemStack.EMPTY);
         Block block = state.getBlock();
         boolean harvested = false;
-        try {
-            harvested = block.onBlockActivated(theGolem.world, this.targetPos, state, this.player,
-                    EnumHand.MAIN_HAND, EnumFacing.UP, 0.5F, 0.5F, 0.5F);
-        } catch (Exception ignored) {}
-        if (!harvested) {
+        if (shouldActivateCrop(state)) {
+            try {
+                harvested = block.onBlockActivated(theGolem.world, this.targetPos, state, this.player,
+                        EnumHand.MAIN_HAND, EnumFacing.UP, 0.5F, 0.5F, 0.5F);
+            } catch (Exception ignored) {}
+        } else {
             harvested = BlockUtils.harvestBlock(theGolem.world, this.targetPos, this.player);
             if (harvested && theGolem.getUpgradeAmount(4) > 0) {
                 this.replant(state);
             }
         }
         if (harvested) theGolem.startActionTimer();
-        this.count = 0;
         this.delay = -1;
-        this.targetPos = null;
+        BlockPos harvestedPos = this.targetPos;
+        if (!this.checkAdjacent(harvestedPos)) {
+            this.count = 0;
+            this.targetPos = null;
+        }
+    }
+
+    static boolean shouldActivateCrop(IBlockState state) {
+        return CropUtils.isClickableCrop(state);
+    }
+
+    private boolean checkAdjacent(BlockPos origin) {
+        BlockPos adjacent = this.findAdjacentCrop(origin);
+        if (adjacent == null) return false;
+        this.setTarget(adjacent);
+        this.delay = -1;
+        this.startExecuting();
+        return true;
+    }
+
+    BlockPos findAdjacentCrop(BlockPos origin) {
+        BlockPos home = theGolem.getHomePosition();
+        for (int dx = -2; dx <= 2; dx++) {
+            for (int dz = -2; dz <= 2; dz++) {
+                for (int dy = -1; dy <= 1; dy++) {
+                    BlockPos pos = origin.add(dx, dy, dz);
+                    if (Math.abs(home.getX() - pos.getX()) > this.distance
+                            || Math.abs(home.getY() - pos.getY()) > this.distance
+                            || Math.abs(home.getZ() - pos.getZ()) > this.distance
+                            || !CropUtils.isGrownCrop(theGolem.world, pos)) continue;
+                    return pos;
+                }
+            }
+        }
+        return null;
+    }
+
+    int getSearchDistance() {
+        return this.distance;
+    }
+
+    void setTarget(BlockPos pos) {
+        this.targetPos = pos;
+        IBlockState state = theGolem.world.getBlockState(pos);
+        this.targetBlock = state.getBlock();
+        this.targetMeta = this.targetBlock.getMetaFromState(state);
     }
 
     /** Restore the TC4 order-upgrade behavior by consuming nearby dropped planting items. */

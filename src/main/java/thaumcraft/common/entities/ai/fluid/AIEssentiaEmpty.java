@@ -63,7 +63,7 @@ public class AIEssentiaEmpty extends EntityAIBase {
                 this.theGolem.essentia = null;
             }
             this.theWorld.playSound(null, this.theGolem.getPosition(),
-                net.minecraft.util.SoundEvent.REGISTRY.getObject(new net.minecraft.util.ResourceLocation("game.neutral.swim")),
+                net.minecraft.init.SoundEvents.ENTITY_GENERIC_SWIM,
                 net.minecraft.util.SoundCategory.NEUTRAL, 0.2f,
                 1.0f + (this.theWorld.rand.nextFloat() - this.theWorld.rand.nextFloat()) * 0.3f);
             this.theGolem.updateCarried();
@@ -83,7 +83,7 @@ public class AIEssentiaEmpty extends EntityAIBase {
                         this.theGolem.essentia = null;
                     }
                     this.theWorld.playSound(null, this.theGolem.getPosition(),
-                        net.minecraft.util.SoundEvent.REGISTRY.getObject(new net.minecraft.util.ResourceLocation("game.neutral.swim")),
+                        net.minecraft.init.SoundEvents.ENTITY_GENERIC_SWIM,
                         net.minecraft.util.SoundCategory.NEUTRAL, 0.2f,
                         1.0f + (this.theWorld.rand.nextFloat() - this.theWorld.rand.nextFloat()) * 0.3f);
                     this.theGolem.updateCarried();
@@ -107,7 +107,7 @@ public class AIEssentiaEmpty extends EntityAIBase {
                         this.theGolem.essentia = null;
                     }
                     this.theWorld.playSound(null, this.theGolem.getPosition(),
-                        net.minecraft.util.SoundEvent.REGISTRY.getObject(new net.minecraft.util.ResourceLocation("game.neutral.swim")),
+                        net.minecraft.init.SoundEvents.ENTITY_GENERIC_SWIM,
                         net.minecraft.util.SoundCategory.NEUTRAL, 0.2f,
                         1.0f + (this.theWorld.rand.nextFloat() - this.theWorld.rand.nextFloat()) * 0.3f);
                     this.theGolem.updateCarried();

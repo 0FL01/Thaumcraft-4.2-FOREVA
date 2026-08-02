@@ -47,6 +47,10 @@ public class EntityGolemBase extends net.minecraft.entity.monster.EntityGolem im
         net.minecraft.network.datasync.EntityDataManager.createKey(EntityGolemBase.class, net.minecraft.network.datasync.DataSerializers.STRING);
     private static final net.minecraft.network.datasync.DataParameter<String> UPGRADES_STR =
         net.minecraft.network.datasync.EntityDataManager.createKey(EntityGolemBase.class, net.minecraft.network.datasync.DataSerializers.STRING);
+    private static final net.minecraft.network.datasync.DataParameter<String> CARRIED_FLUID =
+        net.minecraft.network.datasync.EntityDataManager.createKey(EntityGolemBase.class, net.minecraft.network.datasync.DataSerializers.STRING);
+    private static final net.minecraft.network.datasync.DataParameter<Integer> CARRIED_FLUID_AMOUNT =
+        net.minecraft.network.datasync.EntityDataManager.createKey(EntityGolemBase.class, net.minecraft.network.datasync.DataSerializers.VARINT);
     private static final net.minecraft.network.datasync.DataParameter<Byte> HEALTH_PERCENT =
         net.minecraft.network.datasync.EntityDataManager.createKey(EntityGolemBase.class, net.minecraft.network.datasync.DataSerializers.BYTE);
 
@@ -62,6 +66,7 @@ public class EntityGolemBase extends net.minecraft.entity.monster.EntityGolem im
     public EntityGolemBase(net.minecraft.world.World world, EnumGolemType type, boolean adv) {
         this(world);
         this.golemType = type;
+        this.dataManager.set(GOLEM_TYPE, type.ordinal());
         this.advanced = adv;
         this.upgrades = new byte[this.golemType.upgrades + (this.advanced ? 1 : 0)];
         for (int a = 0; a < this.upgrades.length; a++) this.upgrades[a] = -1;
@@ -78,6 +83,8 @@ public class EntityGolemBase extends net.minecraft.entity.monster.EntityGolem im
         this.dataManager.register(CORE, (byte) -1);
         this.dataManager.register(COLORS_STR, "");
         this.dataManager.register(UPGRADES_STR, "");
+        this.dataManager.register(CARRIED_FLUID, "");
+        this.dataManager.register(CARRIED_FLUID_AMOUNT, 0);
         this.dataManager.register(HEALTH_PERCENT, (byte) 20);
     }
 
@@ -157,9 +164,11 @@ public class EntityGolemBase extends net.minecraft.entity.monster.EntityGolem im
 
         PathNavigate nav = this.getNavigator();
         if (nav instanceof PathNavigateGround) {
-            boolean light = this.isLightGolem();
-            ((PathNavigateGround) nav).setCanSwim(light);
-            this.setPathPriority(PathNodeType.WATER, light ? 0.0F : -1.0F);
+            boolean heavyWaterGolem = this.isHeavyWaterGolem();
+            ((PathNavigateGround) nav).setCanSwim(heavyWaterGolem);
+            ((PathNavigateGround) nav).setBreakDoors(true);
+            this.setPathPriority(PathNodeType.WATER,
+                    heavyWaterGolem ? 0.0F : PathNodeType.WATER.getPriority());
         }
         this.isImmuneToFire = this.getGolemType().fireResist;
 
@@ -247,6 +256,12 @@ public class EntityGolemBase extends net.minecraft.entity.monster.EntityGolem im
 
     public boolean setupGolemInventory() {
         if (!ItemGolemCore.hasInventory(this.getCore())) {
+            if (this.getCore() == 10) {
+                this.inventory = new thaumcraft.common.entities.InventoryMob(1);
+                this.colors = new byte[]{-1};
+                this.publishColors();
+                return true;
+            }
             this.inventory = null;
             return false;
         }
@@ -353,7 +368,7 @@ public class EntityGolemBase extends net.minecraft.entity.monster.EntityGolem im
         for (int i = 0; i < markersList.tagCount(); i++) {
             net.minecraft.nbt.NBTTagCompound tc = markersList.getCompoundTagAt(i);
             this.markers.add(new Marker(tc.getInteger("x"), tc.getInteger("y"), tc.getInteger("z"),
-                (byte) tc.getInteger("dim"), tc.getByte("side"), tc.getByte("color")));
+                tc.getInteger("dim"), tc.getByte("side"), tc.getByte("color")));
         }
         byte[] savedUpgrades = nbt.getByteArray("upgrades");
         this.upgrades = new byte[this.golemType.upgrades + (this.advanced ? 1 : 0)];
@@ -364,17 +379,11 @@ public class EntityGolemBase extends net.minecraft.entity.monster.EntityGolem im
             this.setUpgrade(slot, this.upgrades[slot]);
         }
         this.setupGolemInventory();
-        if (nbt.hasKey("Inventory")) {
+        if (nbt.hasKey("Inventory") && this.getCore() != 10) {
             net.minecraft.nbt.NBTTagList invList = nbt.getTagList("Inventory", 10);
             if (this.inventory != null) this.inventory.readFromNBT(invList);
         }
-        byte[] oldcolors = nbt.getByteArray("colors");
-        if (this.inventory != null) {
-            this.colors = new byte[this.inventory.getSizeInventory()];
-            for (int a = 0; a < this.inventory.getSizeInventory(); a++) {
-                this.colors[a] = (a < oldcolors.length) ? oldcolors[a] : -1;
-            }
-        }
+        this.restoreFilterColors(nbt.getByteArray("colors"));
     }
 
     // --- Interaction ---
@@ -486,7 +495,10 @@ public class EntityGolemBase extends net.minecraft.entity.monster.EntityGolem im
     public void setTogglesValue(byte v) { this.dataManager.set(TOGGLES, v); }
 
     public int getGolemStrength() { return this.getGolemType().strength + this.getUpgradeAmount(1); }
-    public int getCarryLimit() { return this.golemType.carry + Math.min(16, Math.max(4, this.golemType.carry)) * this.getUpgradeAmount(1); }
+    public int getCarryLimit() {
+        int carry = this.getGolemType().carry;
+        return carry + Math.min(16, Math.max(4, carry)) * this.getUpgradeAmount(1);
+    }
     public int getFluidCarryLimit() { return net.minecraft.util.math.MathHelper.floor(Math.sqrt(this.getCarryLimit())) * 1000; }
 
     public boolean isLightGolem() {
@@ -495,6 +507,13 @@ public class EntityGolemBase extends net.minecraft.entity.monster.EntityGolem im
             || type == EnumGolemType.WOOD
             || type == EnumGolemType.FLESH
             || type == EnumGolemType.TALLOW;
+    }
+
+    private boolean isHeavyWaterGolem() {
+        EnumGolemType type = this.getGolemType();
+        return type == EnumGolemType.STONE
+            || type == EnumGolemType.IRON
+            || type == EnumGolemType.THAUMIUM;
     }
 
     public byte getUpgrade(int slot) {
@@ -514,6 +533,10 @@ public class EntityGolemBase extends net.minecraft.entity.monster.EntityGolem im
 
     public void setUpgrade(int slot, byte upgrade) {
         this.upgrades[slot] = upgrade;
+        this.publishUpgrades();
+    }
+
+    private void publishUpgrades() {
         StringBuilder sb = new StringBuilder();
         for (byte c : this.upgrades) sb.append(Integer.toHexString(c < 0 ? 15 : c));
         this.dataManager.set(UPGRADES_STR, sb.toString());
@@ -530,14 +553,36 @@ public class EntityGolemBase extends net.minecraft.entity.monster.EntityGolem im
 
     public void setColors(int slot, int color) {
         this.colors[slot] = (byte) color;
+        this.publishColors();
+    }
+
+    private void publishColors() {
         StringBuilder sb = new StringBuilder();
         for (byte c : this.colors) sb.append(c == -1 ? "h" : Integer.toHexString(c));
         this.dataManager.set(COLORS_STR, sb.toString());
     }
 
+    void restoreFilterColors(byte[] savedColors) {
+        if (this.inventory == null) return;
+        this.colors = new byte[this.inventory.getSizeInventory()];
+        java.util.Arrays.fill(this.colors, (byte) -1);
+        if (this.getCore() != 10 && savedColors != null) {
+            System.arraycopy(savedColors, 0, this.colors, 0, Math.min(savedColors.length, this.colors.length));
+        }
+        this.publishColors();
+    }
+
     // --- Carried item ---
     public net.minecraft.item.ItemStack getCarriedForDisplay() {
         return this.dataManager.get(CARRIED);
+    }
+
+    public net.minecraftforge.fluids.FluidStack getFluidCarried() {
+        if (this.world == null || !this.world.isRemote) return this.fluidCarried;
+        int amount = this.dataManager.get(CARRIED_FLUID_AMOUNT);
+        net.minecraftforge.fluids.Fluid fluid = net.minecraftforge.fluids.FluidRegistry.getFluid(
+                this.dataManager.get(CARRIED_FLUID));
+        return fluid == null || amount <= 0 ? null : new net.minecraftforge.fluids.FluidStack(fluid, amount);
     }
 
     public void setCarried(net.minecraft.item.ItemStack stack) {
@@ -556,15 +601,11 @@ public class EntityGolemBase extends net.minecraft.entity.monster.EntityGolem im
     }
 
     public void updateCarried() {
+        this.publishFluidCarried();
         if (this.itemCarried != null && !this.itemCarried.isEmpty()) {
             this.dataManager.set(CARRIED, this.itemCarried.copy());
-        } else if (this.getCore() == 5 && this.fluidCarried != null) {
-            net.minecraft.block.Block fluidBlock = this.fluidCarried.getFluid().getBlock();
-            if (fluidBlock != null) {
-                this.dataManager.set(CARRIED, new net.minecraft.item.ItemStack(fluidBlock, 1, this.fluidCarried.amount));
-            } else {
-                this.dataManager.set(CARRIED, net.minecraft.item.ItemStack.EMPTY);
-            }
+        } else if (this.getCore() == 5) {
+            this.dataManager.set(CARRIED, net.minecraft.item.ItemStack.EMPTY);
         } else if (this.getCore() == 6) {
             net.minecraft.item.ItemStack display = thaumcraft.common.config.ConfigBlocks.blockJar == null
                     ? net.minecraft.item.ItemStack.EMPTY
@@ -579,6 +620,16 @@ public class EntityGolemBase extends net.minecraft.entity.monster.EntityGolem im
         } else {
             this.dataManager.set(CARRIED, net.minecraft.item.ItemStack.EMPTY);
         }
+    }
+
+    private void publishFluidCarried() {
+        if (this.world == null || this.world.isRemote) return;
+        String fluidName = this.fluidCarried == null || this.fluidCarried.getFluid() == null
+                ? null
+                : net.minecraftforge.fluids.FluidRegistry.getFluidName(this.fluidCarried);
+        this.dataManager.set(CARRIED_FLUID, fluidName == null ? "" : fluidName);
+        this.dataManager.set(CARRIED_FLUID_AMOUNT,
+                this.fluidCarried == null || this.fluidCarried.amount <= 0 ? 0 : this.fluidCarried.amount);
     }
 
     public boolean hasSomething() {
@@ -671,6 +722,15 @@ public class EntityGolemBase extends net.minecraft.entity.monster.EntityGolem im
         if (CORE.equals(key) && this.world != null && this.world.isRemote && this.getCore() >= 0 && this.bootup < 0.0F) {
             this.bootup = 33.0F;
         }
+        if (UPGRADES_STR.equals(key) && this.world != null && this.world.isRemote) {
+            char[] encoded = this.dataManager.get(UPGRADES_STR).toCharArray();
+            byte[] synced = new byte[encoded.length];
+            for (int slot = 0; slot < encoded.length; slot++) {
+                int value = Character.digit(encoded[slot], 16);
+                synced[slot] = (byte) (value < 0 || value == 15 ? -1 : value);
+            }
+            this.upgrades = synced;
+        }
     }
 
     private void refreshClientHealingState() {
@@ -684,9 +744,14 @@ public class EntityGolemBase extends net.minecraft.entity.monster.EntityGolem im
     }
 
     // --- Target validation ---
-    public boolean isWithinHomeDistanceFromPosition(int x, int y, int z) {
+    @Override
+    public boolean isWithinHomeDistanceFromPosition(net.minecraft.util.math.BlockPos pos) {
         float range = this.getRange();
-        return this.getHomePosition().distanceSq(x, y, z) < range * range;
+        return this.getHomePosition().distanceSq(pos) < range * range;
+    }
+
+    public boolean isWithinHomeDistanceFromPosition(int x, int y, int z) {
+        return this.isWithinHomeDistanceFromPosition(new net.minecraft.util.math.BlockPos(x, y, z));
     }
 
     public float getRange() {
@@ -699,10 +764,7 @@ public class EntityGolemBase extends net.minecraft.entity.monster.EntityGolem im
     public boolean isValidTarget(net.minecraft.entity.Entity target) {
         if (!target.isEntityAlive()) return false;
         if (target instanceof net.minecraft.entity.player.EntityPlayer && ((net.minecraft.entity.player.EntityPlayer)target).getName().equals(this.getOwnerName())) return false;
-        if (!this.isWithinHomeDistanceFromPosition(
-                net.minecraft.util.math.MathHelper.floor(target.posX),
-                net.minecraft.util.math.MathHelper.floor(target.posY),
-                net.minecraft.util.math.MathHelper.floor(target.posZ))) return false;
+        if (!this.isWithinHomeDistanceFromPosition(new net.minecraft.util.math.BlockPos(target))) return false;
         if (this.getCore() == 9) {
             if (this.isValidAnimalTarget(target, true)) return true;
         } else {
@@ -730,6 +792,13 @@ public class EntityGolemBase extends net.minecraft.entity.monster.EntityGolem im
     public boolean canAttackAnimals() { return !this.getToggles()[2]; }
     public boolean canAttackPlayers() { return !this.getToggles()[3]; }
     public boolean canAttackCreepers() { return !this.getToggles()[4]; }
+
+    @Override
+    public boolean canAttackClass(Class<? extends net.minecraft.entity.EntityLivingBase> cls) {
+        return cls != net.minecraft.entity.passive.EntityVillager.class
+                && cls != EntityGolemBase.class
+                && cls != net.minecraft.entity.passive.EntityBat.class;
+    }
 
     // --- Combat ---
     @Override
@@ -775,15 +844,15 @@ public class EntityGolemBase extends net.minecraft.entity.monster.EntityGolem im
     public boolean attackEntityFrom(net.minecraft.util.DamageSource source, float amount) {
         this.paused = false;
         if (source == net.minecraft.util.DamageSource.IN_WALL) return false;
-        if (source.isFireDamage() && this.getGolemType().fireResist) return false;
         if (this.getGolemType() == EnumGolemType.THAUMIUM && source == net.minecraft.util.DamageSource.MAGIC) amount *= 0.5f;
-        net.minecraft.entity.Entity attacker = source.getTrueSource();
+        net.minecraft.entity.Entity attacker = source.getImmediateSource();
         int thornUpgrades = this.getUpgradeAmount(5);
-        if (attacker != null && attacker.getEntityId() != this.getEntityId() && thornUpgrades > 0) {
+        if (attacker != null && attacker != this && thornUpgrades > 0) {
             attacker.attackEntityFrom(net.minecraft.util.DamageSource.causeThornsDamage(this),
                     thornUpgrades * 2 + this.rand.nextInt(2 * thornUpgrades));
             attacker.playSound(net.minecraft.init.SoundEvents.ENCHANT_THORNS_HIT, 0.5F, 1.0F);
         }
+        if (source.isFireDamage() && this.getGolemType().fireResist) return false;
         return super.attackEntityFrom(source, amount);
     }
 
@@ -811,10 +880,11 @@ public class EntityGolemBase extends net.minecraft.entity.monster.EntityGolem im
     @Override
     public float getAIMoveSpeed() {
         if (this.paused || this.inactive) return 0.0f;
-        float speed = (float)this.golemType.speed * (this.decoration.contains("B") ? 1.1f : 1.0f);
+        float speed = (float)this.getGolemType().speed * (this.decoration.contains("B") ? 1.1f : 1.0f);
         if (this.decoration.contains("P")) speed *= 0.88f;
         speed *= 1.0f + (float) this.getUpgradeAmount(0) * 0.15f;
         if (this.advanced) speed *= 1.1f;
+        if (this.isInWater() && this.isHeavyWaterGolem()) speed *= 2.0F;
         return speed;
     }
 
@@ -837,13 +907,9 @@ public class EntityGolemBase extends net.minecraft.entity.monster.EntityGolem im
     }
 
     public void attackEntityWithRangedAttack(net.minecraft.entity.EntityLivingBase target) {
-        thaumcraft.common.entities.projectile.EntityDart dart = new thaumcraft.common.entities.projectile.EntityDart(this.world, this);
-        double dx = target.posX - this.posX;
-        double dy = target.getEntityBoundingBox().minY + (double)(target.height / 3.0F) - dart.posY;
-        double dz = target.posZ - this.posZ;
-        float speed = 1.6F;
         float inaccuracy = 7.0F - (float)this.getUpgradeAmount(3) * 1.75F;
-        dart.shoot(dx, dy, dz, speed, inaccuracy);
+        thaumcraft.common.entities.projectile.EntityDart dart = new thaumcraft.common.entities.projectile.EntityDart(
+                this.world, this, target, 1.6F, inaccuracy);
         double dmg = this.getEntityAttribute(net.minecraft.entity.SharedMonsterAttributes.ATTACK_DAMAGE).getAttributeValue();
         dart.setDamage(dmg * 0.4D);
         this.playSound(TCSounds.GOLEMIRONSHOOT, 0.5F, 1.0F / (this.rand.nextFloat() * 0.4F + 0.6F));

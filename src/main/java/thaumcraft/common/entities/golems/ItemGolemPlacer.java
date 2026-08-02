@@ -144,9 +144,15 @@ public class ItemGolemPlacer extends Item {
             golem.setCustomNameTag(stack.getDisplayName());
             golem.enablePersistence();
         }
-        if (tag != null && tag.hasKey("Inventory") && golem.inventory != null) {
+        if (tag != null && tag.hasKey("Inventory") && golem.inventory != null && golem.getCore() != 10) {
             NBTTagList inventoryTag = tag.getTagList("Inventory", 10);
             golem.inventory.readFromNBT(inventoryTag);
+        }
+        if (tag != null && tag.hasKey("toggles")) {
+            golem.setTogglesValue(tag.getByte("toggles"));
+        }
+        if (tag != null && tag.hasKey("colors")) {
+            golem.restoreFilterColors(tag.getByteArray("colors"));
         }
 
         boolean spawned = world.spawnEntity(golem);

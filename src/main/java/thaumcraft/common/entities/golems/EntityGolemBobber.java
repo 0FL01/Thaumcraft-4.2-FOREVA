@@ -22,6 +22,8 @@ public class EntityGolemBobber extends Entity implements IEntityAdditionalSpawnD
     public static final byte STATUS_SPLASH_AMBIENT = 16;
     public static final byte STATUS_SPLASH_NIBBLE = 17;
     public static final byte STATUS_SPLASH_CATCH = 18;
+    // TC4 advanced ticksExisted twice per update and expired on update 2001.
+    static final int MAX_LIFETIME_TICKS = 2000;
 
     private int xTile = -1;
     private int yTile = -1;
@@ -38,7 +40,7 @@ public class EntityGolemBobber extends Entity implements IEntityAdditionalSpawnD
     public EntityGolemBobber(World world) {
         super(world);
         this.setSize(0.25F, 0.25F);
-        this.isImmuneToFire = true;
+        this.ignoreFrustumCheck = true;
         this.motionX = 0.0D;
         this.motionY = 0.0D;
         this.motionZ = 0.0D;
@@ -48,7 +50,7 @@ public class EntityGolemBobber extends Entity implements IEntityAdditionalSpawnD
         super(world);
         this.setSize(0.25F, 0.25F);
         this.fisher = golem;
-        this.isImmuneToFire = true;
+        this.ignoreFrustumCheck = true;
 
         double dx = (double) x + 0.5D - golem.posX;
         double dy = (double) (y + 1) - golem.posY;
@@ -84,7 +86,7 @@ public class EntityGolemBobber extends Entity implements IEntityAdditionalSpawnD
     public void onUpdate() {
         super.onUpdate();
 
-        if (this.ticksExisted > 4000) {
+        if (isPastEffectiveLifetime(this.ticksExisted)) {
             this.setDead();
             return;
         }
@@ -224,6 +226,10 @@ public class EntityGolemBobber extends Entity implements IEntityAdditionalSpawnD
 
             this.setPosition(this.posX, this.posY, this.posZ);
         }
+    }
+
+    static boolean isPastEffectiveLifetime(int ticksExisted) {
+        return ticksExisted > MAX_LIFETIME_TICKS;
     }
 
     @Override

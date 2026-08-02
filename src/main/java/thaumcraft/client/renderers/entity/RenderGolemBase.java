@@ -343,7 +343,8 @@ public class RenderGolemBase extends RenderLiving<EntityGolemBase> {
         }
 
         private void renderFluidBucket(EntityGolemBase entity) {
-            if (entity.fluidCarried == null || entity.fluidCarried.amount <= 0) return;
+            FluidStack fluidStack = entity.getFluidCarried();
+            if (fluidStack == null || fluidStack.amount <= 0) return;
 
             GlStateManager.pushMatrix();
             GlStateManager.scale(0.4F, 0.4F, 0.4F);
@@ -355,7 +356,6 @@ public class RenderGolemBase extends RenderLiving<EntityGolemBase> {
             GlStateManager.rotate(180.0F, 0.0F, 1.0F, 0.0F);
 
             // Try to render a filled bucket item if a bucket is registered for this fluid
-            FluidStack fluidStack = entity.fluidCarried.copy();
             ItemStack bucketStack = FluidUtil.getFilledBucket(fluidStack);
             boolean useEmptyBucket = bucketStack.isEmpty();
 

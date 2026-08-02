@@ -46,13 +46,14 @@ public class AIEssentiaGather extends EntityAIBase {
         if (te != null) {
             if (te instanceof IEssentiaTransport) {
                 IEssentiaTransport etrans = (IEssentiaTransport) te;
+                Aspect available = getEssentiaType(etrans, facing);
                 if ((te instanceof TileJarFillable || te instanceof TileEssentiaReservoir
                     || etrans.canOutputTo(facing))
                     && etrans.getEssentiaAmount(facing) > 0
+                    && available != null
                     && (this.theGolem.essentiaAmount == 0
                         || (this.theGolem.essentia == null
-                            || this.theGolem.essentia.equals(etrans.getEssentiaType(facing))
-                            || this.theGolem.essentia.equals(etrans.getEssentiaType(EnumFacing.UP)))
+                            || this.theGolem.essentia.equals(available))
                         && this.theGolem.essentiaAmount < this.theGolem.getCarryLimit())) {
                     this.delay = System.currentTimeMillis() + 1000L;
                     this.start = 0;
@@ -104,16 +105,14 @@ public class AIEssentiaGather extends EntityAIBase {
                 dir = ((TileEssentiaReservoir) te).facing;
             }
             if (ta.getEssentiaAmount(dir) == 0) return;
+            Aspect available = getEssentiaType(ta, dir);
             if (ta.canOutputTo(dir) && ta.getEssentiaAmount(dir) > 0
+                && available != null
                 && (this.theGolem.essentiaAmount == 0
                     || (this.theGolem.essentia == null
-                        || this.theGolem.essentia.equals(ta.getEssentiaType(dir))
-                        || this.theGolem.essentia.equals(ta.getEssentiaType(EnumFacing.UP)))
+                        || this.theGolem.essentia.equals(available))
                     && this.theGolem.essentiaAmount < this.theGolem.getCarryLimit())) {
-                Aspect a = ta.getEssentiaType(dir);
-                if (a == null) {
-                    a = ta.getEssentiaType(EnumFacing.UP);
-                }
+                Aspect a = available;
                 int qq = ta.getEssentiaAmount(dir);
                 if (te instanceof TileEssentiaReservoir) {
                     qq = ((TileEssentiaReservoir) te).containerContains(a);
@@ -124,7 +123,7 @@ public class AIEssentiaGather extends EntityAIBase {
                 if (taken > 0) {
                     this.theGolem.essentiaAmount += taken;
                     this.theWorld.playSound(null, this.theGolem.getPosition(),
-                        net.minecraft.util.SoundEvent.REGISTRY.getObject(new net.minecraft.util.ResourceLocation("game.neutral.swim")),
+                        net.minecraft.init.SoundEvents.ENTITY_GENERIC_SWIM,
                         net.minecraft.util.SoundCategory.NEUTRAL, 0.05f,
                         1.0f + (this.theWorld.rand.nextFloat() - this.theWorld.rand.nextFloat()) * 0.3f);
                     this.theGolem.updateCarried();
@@ -138,4 +137,9 @@ public class AIEssentiaGather extends EntityAIBase {
 
     @Override
     public void resetTask() {}
+
+    static Aspect getEssentiaType(IEssentiaTransport transport, EnumFacing face) {
+        Aspect aspect = transport.getEssentiaType(face);
+        return aspect != null ? aspect : transport.getEssentiaType(null);
+    }
 }
