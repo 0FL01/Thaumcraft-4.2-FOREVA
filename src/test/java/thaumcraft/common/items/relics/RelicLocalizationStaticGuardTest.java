@@ -23,9 +23,8 @@ public class RelicLocalizationStaticGuardTest {
         assertTrue("Sanity checker must keep total-warp localization key usage and key presence",
                 sanityCheckerSource.contains("new TextComponentTranslation(\"tc.sanity\", total)")
                         && lang.contains("tc.sanity=Current Warp: %s"));
-        assertTrue("Sanity checker must keep detailed-warp localization key usage and key presence",
-                sanityCheckerSource.contains("new TextComponentTranslation(\"tc.sanity.detail\", perm, sticky, temp)")
-                        && lang.contains("tc.sanity.detail=Permanent: %1$s  Sticky: %2$s  Temporary: %3$s"));
+        assertTrue("Sanity checker must not overwrite its total-warp actionbar message",
+                !sanityCheckerSource.contains("new TextComponentTranslation(\"tc.sanity.detail\", perm, sticky, temp)"));
     }
 
     private static String readFile(String path) throws IOException {

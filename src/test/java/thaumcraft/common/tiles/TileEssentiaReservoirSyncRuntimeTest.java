@@ -19,12 +19,14 @@ import net.minecraft.world.storage.WorldInfo;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import thaumcraft.api.aspects.Aspect;
+import thaumcraft.api.aspects.AspectList;
 
 import java.util.HashSet;
 import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
@@ -64,6 +66,32 @@ public class TileEssentiaReservoirSyncRuntimeTest {
         assertEquals(4, source.takeEssentia(Aspect.WATER, 4, EnumFacing.DOWN));
         assertEquals(12, source.containerContains(Aspect.WATER));
         assertTrue(world.notified.contains(pos));
+    }
+
+    @Test
+    public void assignmentAndExtractionKeepTc4ContainerContracts() {
+        SyncWorld world = new SyncWorld();
+        TestReservoir reservoir = new TestReservoir();
+        world.attach(new BlockPos(0, 64, 0), reservoir);
+        AspectList supplied = new AspectList().add(Aspect.WATER, 4);
+
+        reservoir.setAspects(supplied);
+        supplied.add(Aspect.FIRE, 7);
+
+        assertNotSame(supplied, reservoir.getAspects());
+        assertEquals(4, reservoir.containerContains(Aspect.WATER));
+        assertEquals(0, reservoir.containerContains(Aspect.FIRE));
+        assertTrue(reservoir.doesContainerAccept(Aspect.FIRE));
+        assertEquals(0, reservoir.takeEssentia(Aspect.WATER, 5, EnumFacing.DOWN));
+        assertEquals(4, reservoir.containerContains(Aspect.WATER));
+        assertFalse(reservoir.takeFromContainer(new AspectList().add(Aspect.WATER, 4)));
+        assertEquals(4, reservoir.containerContains(Aspect.WATER));
+        assertEquals(4, reservoir.takeEssentia(Aspect.WATER, 4, EnumFacing.DOWN));
+        assertEquals(0, reservoir.containerContains(Aspect.WATER));
+
+        reservoir.maxAmount = 4;
+        reservoir.setAspects(new AspectList().add(Aspect.ORDER, 4));
+        assertTrue(reservoir.doesContainerAccept(Aspect.ENTROPY));
     }
 
     private static class TestReservoir extends TileEssentiaReservoir {

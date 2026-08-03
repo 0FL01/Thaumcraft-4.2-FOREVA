@@ -37,7 +37,6 @@ public class ItemSanityChecker extends Item {
             int temp = knowledge == null ? 0 : knowledge.getWarpTemp();
             int total = perm + sticky + temp;
             player.sendStatusMessage(new TextComponentTranslation("tc.sanity", total), true);
-            player.sendStatusMessage(new TextComponentTranslation("tc.sanity.detail", perm, sticky, temp), true);
         }
         return new ActionResult<>(EnumActionResult.SUCCESS, stack);
     }

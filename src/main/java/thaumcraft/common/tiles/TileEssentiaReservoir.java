@@ -132,13 +132,13 @@ public class TileEssentiaReservoir extends TileThaumcraft implements ITickable, 
 
     @Override
     public void setAspects(AspectList aspects) {
-        this.essentia = aspects != null ? aspects : new AspectList();
+        this.essentia = aspects != null ? aspects.copy() : new AspectList();
         this.markDirtyAndSync();
     }
 
     @Override
     public boolean doesContainerAccept(Aspect tag) {
-        return tag != null && this.containerContains(null) < this.maxAmount;
+        return true;
     }
 
     @Override
@@ -163,17 +163,7 @@ public class TileEssentiaReservoir extends TileThaumcraft implements ITickable, 
 
     @Override
     public boolean takeFromContainer(AspectList list) {
-        if (list == null) return false;
-        for (Aspect aspect : list.getAspects()) {
-            if (this.essentia.getAmount(aspect) < list.getAmount(aspect)) {
-                return false;
-            }
-        }
-        for (Aspect aspect : list.getAspects()) {
-            this.essentia.remove(aspect, list.getAmount(aspect));
-        }
-        this.markDirtyAndSync();
-        return true;
+        return false;
     }
 
     @Override
@@ -256,11 +246,7 @@ public class TileEssentiaReservoir extends TileThaumcraft implements ITickable, 
 
     @Override
     public int takeEssentia(Aspect aspect, int amount, EnumFacing face) {
-        if (!this.canOutputTo(face)) return 0;
-        int taken = Math.min(amount, this.containerContains(aspect));
-        if (taken <= 0) return 0;
-        this.takeFromContainer(aspect, taken);
-        return taken;
+        return this.canOutputTo(face) && this.takeFromContainer(aspect, amount) ? amount : 0;
     }
 
     @Override

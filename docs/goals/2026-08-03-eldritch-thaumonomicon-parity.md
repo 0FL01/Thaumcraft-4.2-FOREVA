@@ -69,8 +69,8 @@ Complete the frozen Required Outcomes using the listed Change Envelope and Prima
   - Source: RECON findings for `TileEssentiaReservoir`, `BlockEssentiaReservoir`, wand interaction, and `ItemSanityChecker`.
   - Acceptance: Reservoir aspect assignment copies caller state, extraction contracts, destruction spill/explosion/retry behavior, and wand callback count match TC4; the Sanity Checker does not emit an immediately overwritten extra actionbar message. Existing valid 1.12 sync and finite-fluid adaptations remain intact.
   - Primary evidence: Focused reservoir runtime tests cover aliasing, extraction, spill counts/explosion, retries, and single wand callback; Sanity Checker interaction tests pass; checkpoint server smoke passes.
-  - Status: pending
-  - Evidence:
+  - Status: verified
+  - Evidence: Reservoir assignment copies caller state; bulk removal remains unsupported, transport extraction is all-or-nothing, and acceptance remains type-agnostic as in TC4. Destruction now applies the 16-essentia threshold, non-terrain strength-one explosion, up-to-50 retry loop, and original successful spill count while retaining the Forge finite-fluid default-state mapping. Wand routing invokes the tile once, and Sanity Checker emits one total-warp actionbar message instead of immediately overwriting it. Focused Reservoir/Sanity tests and `./scripts/dev.sh validate --smoke` passed on 2026-08-03.
 
 - R9: Preserve the already exact Thaumonomicon declarations and close the full objective.
   - Source: RECON results: 16/16 research entries, 24/24 recipe handles/definitions, 55/55 English research keys, and 9/9 referenced PNG files match the original.
@@ -115,17 +115,17 @@ Complete the frozen Required Outcomes using the listed Change Envelope and Prima
 
 ## Current Checkpoint
 
-- Closes: R8.
-- Smallest next action: Restore Reservoir copy/extraction/destruction/wand callback semantics and remove the Sanity Checker actionbar overwrite while preserving valid 1.12 sync and finite-fluid behavior.
-- Expected evidence: Focused Reservoir runtime tests prove alias isolation, all-or-nothing extraction, spill/explosion/retry behavior, and one wand callback; Sanity Checker interaction evidence proves no overwritten duplicate message.
-- Stop or replan if: TC4 parity would require reverting the accepted finite-fluid level translation or explicit 1.12 tile synchronization.
+- Closes: R9.
+- Smallest next action: Run the frozen graph/recipe/resource preservation guards, final repository validation and server smoke, then build the distributable jar and perform the closure check.
+- Expected evidence: The 16 research entries, 24 recipe handles/definitions, 55 English research keys, and 9 PNG fixtures remain exact; `./scripts/dev.sh validate --smoke` and `./scripts/dev.sh build` pass with every R-item resolved.
+- Stop or replan if: A final mandatory gate fails due to an R1-R8 change or any frozen parity corpus differs.
 
 ## Current State
 
-- Resolved: R1-R7 are verified. Research, Primal, Outer progression, Void equipment, Eldritch scan aspects, and audited English display values now follow the TC4 contracts.
-- Last relevant evidence: R7 focused registry/scan/localization tests, `./scripts/dev.sh validate --smoke`, and `./scripts/dev.sh build` passed on 2026-08-03.
+- Resolved: R1-R8 are verified. All audited runtime, progression, equipment, aspect, localization, Reservoir, and Sanity outcomes now follow their frozen contracts.
+- Last relevant evidence: R8 focused Reservoir/Sanity tests and `./scripts/dev.sh validate --smoke` passed on 2026-08-03.
 - Blocker: None.
-- Next: Commit R7, then begin R8 with Reservoir runtime contracts.
+- Next: Commit R8, then run the R9 preservation and closure gates.
 
 ## Material Decisions
 
@@ -148,6 +148,7 @@ Complete the frozen Required Outcomes using the listed Change Envelope and Prima
 - 2026-08-03: R5 verified. Guardian Eye rarity and Outer ward/spawn gates, explosion-immune Pearl drops, Crab attachment/combat/drop behavior, and Warden room home ordering were restored. Focused entity tests and `./scripts/dev.sh validate --smoke` passed.
 - 2026-08-03: R6 verified. Void tool material/effect/repair behavior, Void robe material, Forge slot-mapped Void/Fortress protection, and original living/creative self-repair semantics were restored. Focused item/armor tests and `./scripts/dev.sh validate --smoke` passed.
 - 2026-08-03: R7 verified. Exact vanilla Eldritch scan tags, the itemless End Portal phenomena fallback, TC4-derived final Void equipment tags, and canonical audited English display values were restored. Focused tests, server smoke, and build passed.
+- 2026-08-03: R8 verified. Reservoir copy/extraction/spill/explosion/wand-routing semantics and the single Sanity Checker actionbar message were restored while preserving 1.12 sync and finite-fluid adaptations. Focused tests and `./scripts/dev.sh validate --smoke` passed.
 
 ## Completion
 
