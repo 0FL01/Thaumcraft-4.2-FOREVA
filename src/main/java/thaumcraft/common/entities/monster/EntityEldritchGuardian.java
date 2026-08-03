@@ -2,7 +2,6 @@ package thaumcraft.common.entities.monster;
 
 import net.minecraft.entity.*;
 import net.minecraft.entity.ai.*;
-import net.minecraft.entity.ai.attributes.IAttributeInstance;
 import net.minecraft.entity.monster.EntityMob;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -180,17 +179,15 @@ public class EntityEldritchGuardian extends EntityMob implements IRangedAttackMo
             ((ItemWispEssence) ConfigItems.itemWispEssence).setAspects(ess, new AspectList().add(Aspect.ELDRITCH, 2));
             this.entityDropItem(ess, 1.0F);
         }
+        if (wasRecentlyHit && this.rand.nextInt(200) - lootingModifier < 5) {
+            this.dropItem(ConfigItems.itemEldritchObject, 1);
+        }
         super.dropFewItems(wasRecentlyHit, lootingModifier);
     }
 
     @Override
     public EnumCreatureAttribute getCreatureAttribute() {
         return EnumCreatureAttribute.UNDEAD;
-    }
-
-    @Override
-    protected void dropEquipment(boolean wasRecentlyHit, int lootingModifier) {
-        this.dropItem(ConfigItems.itemEldritchObject, 1);
     }
 
     @Override
@@ -221,10 +218,8 @@ public class EntityEldritchGuardian extends EntityMob implements IRangedAttackMo
     public IEntityLivingData onInitialSpawn(DifficultyInstance difficulty, IEntityLivingData livingdata) {
         IEntityLivingData data = super.onInitialSpawn(difficulty, livingdata);
         if (this.world.provider.getDimension() == Config.dimensionOuterId) {
-            IAttributeInstance maxHealth = this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH);
-            double bonusHP = maxHealth.getBaseValue() / 2.0D;
-            maxHealth.setBaseValue(maxHealth.getBaseValue() + bonusHP);
-            this.setHealth(this.getHealth() + (float) bonusHP);
+            int ward = (int) this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).getAttributeValue() / 2;
+            this.setAbsorptionAmount(this.getAbsorptionAmount() + ward);
         }
         return data;
     }
@@ -232,13 +227,13 @@ public class EntityEldritchGuardian extends EntityMob implements IRangedAttackMo
     @Override
     protected void updateAITasks() {
         super.updateAITasks();
-        // Passive HP regen in Outer Lands
+        // Regenerate the Outer Lands absorption ward.
         if (this.world.provider.getDimension() == Config.dimensionOuterId
                 && this.hurtResistantTime <= 0
                 && this.ticksExisted % 25 == 0) {
-            int halfHP = (int) this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).getBaseValue() / 2;
-            if (this.getHealth() < (float) halfHP) {
-                this.heal(1.0F);
+            int ward = (int) this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).getAttributeValue() / 2;
+            if (this.getAbsorptionAmount() < ward) {
+                this.setAbsorptionAmount(this.getAbsorptionAmount() + 1.0F);
             }
         }
     }
@@ -272,7 +267,12 @@ public class EntityEldritchGuardian extends EntityMob implements IRangedAttackMo
         java.util.List<EntityEldritchGuardian> nearby = this.world.getEntitiesWithinAABB(
             EntityEldritchGuardian.class,
             this.getEntityBoundingBox().grow(32.0, 16.0, 32.0));
-        return nearby.size() <= 1 && super.getCanSpawnHere();
+        return nearby.isEmpty() && super.getCanSpawnHere();
+    }
+
+    @Override
+    protected boolean isValidLightLevel() {
+        return true;
     }
 
     @Override

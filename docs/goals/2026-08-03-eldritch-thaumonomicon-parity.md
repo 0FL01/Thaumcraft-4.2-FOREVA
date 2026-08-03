@@ -46,10 +46,10 @@ Complete the frozen Required Outcomes using the listed Change Envelope and Prima
 
 - R5: Restore Outer progression entity and drop behavior.
   - Source: RECON findings for Eldritch Guardians, protected boss drops, Eldritch Crabs, altar spawning, and Warden room ownership.
-  - Acceptance: Eldritch Eyes use the original rare-drop path; Primordial Pearls use explosion-immune non-despawning special drops; Guardian ward regeneration and altar spawn gates, Crab attachment/combat/drop behavior, and Warden room home match TC4.
+  - Acceptance: Eldritch Eyes use the original rare-drop path; Primordial Pearls use the original explosion-immune special drops with normal item lifetime; Guardian ward regeneration and altar spawn gates, Crab attachment/combat/drop behavior, and Warden room home match TC4.
   - Primary evidence: Focused entity runtime/static parity tests cover rare Eye drops, protected Pearl entities, ward regeneration, altar population/light checks, Crab phases and drops, and post-spawn Warden home; checkpoint server smoke passes.
-  - Status: pending
-  - Evidence:
+  - Status: verified
+  - Evidence: Guardian Eyes use the TC4 rare-drop roll, Outer Guardians retain base health with a regenerating 25-point absorption ward and original light/population gates, and all Primordial Pearl boss routes create explosion-immune `EntitySpecialItem` drops with normal item lifetime. Crab attachment, mounted attacks, helmet-break rendering, spider-eye loot, creature/potion traits, and Warden post-spawn room home are restored. Focused runtime/static tests and `./scripts/dev.sh validate --smoke` passed on 2026-08-03.
 
 - R6: Restore Void equipment behavior and balance.
   - Source: RECON findings for Void tools, Void armor, Fortress armor, Void robes, and `CAP_void` consumers.
@@ -115,17 +115,17 @@ Complete the frozen Required Outcomes using the listed Change Envelope and Prima
 
 ## Current Checkpoint
 
-- Closes: R5.
-- Smallest next action: Restore rare Guardian Eye drops and protected Primordial Pearl entities, then close the coupled Guardian/Crab/Warden behavior deltas with focused entity tests.
-- Expected evidence: Focused entity tests prove rare-drop routing, protected Pearl lifetime/damage behavior, ward regeneration, altar gates, Crab phases/drops, and post-spawn Warden home.
-- Stop or replan if: A TC4 entity phase depends on a removed vanilla riding API that cannot be represented through the existing 1.12 passenger API inside the R5 envelope.
+- Closes: R6.
+- Smallest next action: Restore the TC4 Void tool material/effect/repair contracts and remap Void/Fortress armor materials and slot protection for Forge 1.12, then cover valid self-repair and robe state with focused tests.
+- Expected evidence: Focused item/armor tests prove Weakness duration, tool tuples and repair inputs, attack intent, per-slot durability/protection, robe vis/warp behavior, and repair cadence.
+- Stop or replan if: Correct slot protection requires changing a public `thaumcraft.api.*` signature rather than adapting the existing 1.12 material construction inside the R6 envelope.
 
 ## Current State
 
-- Resolved: R1-R4 are verified. Research, Primal, and Outer void/portal behavior now follow the audited TC4 contracts.
-- Last relevant evidence: Eldritch Nothing/teleporter focused tests and `./scripts/dev.sh validate --smoke` passed on 2026-08-03.
+- Resolved: R1-R5 are verified. Research, Primal, Outer void/portal, and Outer progression entity/drop behavior now follow the audited TC4 contracts.
+- Last relevant evidence: Outer progression entity focused tests and `./scripts/dev.sh validate --smoke` passed on 2026-08-03.
 - Blocker: None.
-- Next: Commit R4, then begin R5 with progression-critical Eye and Pearl drop routing.
+- Next: Commit R5, then begin R6 with Void tool potion/material/repair parity.
 
 ## Material Decisions
 
@@ -133,6 +133,7 @@ Complete the frozen Required Outcomes using the listed Change Envelope and Prima
 - 2026-08-03: Work is bounded to confirmed P0/P1 findings summarized after RECON plus the directly listed low-cost parity corrections inside R1-R8; unknowns and benign adaptations cannot expand the goal.
 - 2026-08-03: Existing tests that assert an audited regression, notably Wither on Void tools and static primary/secondary packet gating, must be replaced with behavioral parity evidence rather than preserved.
 - 2026-08-03: Commits are required and remain checkpoint-scoped.
+- 2026-08-03: Direct CFR of `EntitySpecialItem` corrected the RECON wording: Primordial Pearls are explosion-immune special drops but retain normal `EntityItem` despawn lifetime; only key-room tablets use `EntityPermanentItem`.
 
 ## Checkpoint History
 
@@ -143,6 +144,7 @@ Complete the frozen Required Outcomes using the listed Change Envelope and Prima
 - 2026-08-03: R2 verified. Primal Orb launch, impact/water/special-effect semantics, taint placement, focus color/hand animation, and TC4 wisp feedback were restored. Focused tests, server smoke, and build passed; manual visual inspection was not run.
 - 2026-08-03: R3 verified. Primal Crusher now uses the exact TC4 effective matrix, Forge-safe player harvesting, following drops, and original wear accounting. Focused tests and `./scripts/dev.sh validate --smoke` passed.
 - 2026-08-03: R4 verified. Eldritch Nothing recovered TC4 block identity, exposure/render-tile sparsity, and void damage; portal transfers now retain their destination cache per live world. Focused tests and `./scripts/dev.sh validate --smoke` passed.
+- 2026-08-03: R5 verified. Guardian Eye rarity and Outer ward/spawn gates, explosion-immune Pearl drops, Crab attachment/combat/drop behavior, and Warden room home ordering were restored. Focused entity tests and `./scripts/dev.sh validate --smoke` passed.
 
 ## Completion
 

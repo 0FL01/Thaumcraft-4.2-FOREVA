@@ -138,7 +138,8 @@ public class EntityTaintacleGiant extends thaumcraft.common.entities.monster.Ent
                 new AxisAlignedBB(this.posX - 48, this.posY - 24, this.posZ - 48,
                                   this.posX + 48, this.posY + 24, this.posZ + 48));
         if (nearby.size() <= 1) {
-            this.entityDropItem(new ItemStack(ConfigItems.itemEldritchObject, 1, 3), this.height / 2.0f);
+            EntityUtils.entityDropSpecialItem(
+                    this, new ItemStack(ConfigItems.itemEldritchObject, 1, 3), this.height / 2.0F);
         }
     }
 }

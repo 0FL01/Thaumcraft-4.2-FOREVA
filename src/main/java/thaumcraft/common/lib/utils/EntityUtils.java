@@ -17,6 +17,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
+import thaumcraft.common.entities.EntitySpecialItem;
 import thaumcraft.common.entities.monster.boss.EntityThaumcraftBoss;
 import thaumcraft.common.entities.monster.mods.ChampionModifier;
 
@@ -95,12 +96,20 @@ public class EntityUtils {
     /**
      * Drop a special item from an entity (with pickup delay).
      */
-    public static void entityDropSpecialItem(Entity entity, ItemStack stack, float offsetY) {
-        if (stack.isEmpty()) return;
-        EntityItem entityitem = new EntityItem(entity.world,
-            entity.posX, entity.posY + (double)offsetY, entity.posZ, stack);
-        entityitem.setDefaultPickupDelay();
-        entity.world.spawnEntity(entityitem);
+    public static EntityItem entityDropSpecialItem(Entity entity, ItemStack stack, float offsetY) {
+        if (stack.isEmpty()) return null;
+        EntitySpecialItem entityitem = new EntitySpecialItem(entity.world,
+                entity.posX, entity.posY + (double) offsetY, entity.posZ, stack);
+        entityitem.setPickupDelay(10);
+        entityitem.motionX = 0.0D;
+        entityitem.motionY = 0.1D;
+        entityitem.motionZ = 0.0D;
+        if (entity.captureDrops) {
+            entity.capturedDrops.add(entityitem);
+        } else {
+            entity.world.spawnEntity(entityitem);
+        }
+        return entityitem;
     }
 
     public static Entity getPointedEntity(World world, Entity entity, double minrange, double range, float padding) {

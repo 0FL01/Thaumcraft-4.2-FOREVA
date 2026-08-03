@@ -114,8 +114,9 @@ public class TileEldritchLock extends TileThaumcraft implements ITickable {
         decorateWardenRoom(room);
         BlockPos spawn = room.getOffsetSpawnPos();
         EntityEldritchWarden boss = new EntityEldritchWarden(this.world);
-        placeBoss(boss, spawn, room.getCenterHomePos());
+        placeBoss(boss, spawn, null);
         boss.onInitialSpawn(this.world.getDifficultyForLocation(spawn), null);
+        boss.setHomePosAndDistance(room.getCenterHomePos(), 32);
         this.world.spawnEntity(boss);
     }
 
