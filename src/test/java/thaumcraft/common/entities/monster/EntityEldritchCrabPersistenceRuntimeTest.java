@@ -35,6 +35,13 @@ public class EntityEldritchCrabPersistenceRuntimeTest {
     }
 
     @Test
+    public void mountedCrabRemainsTargetableByItsRider() {
+        EntityEldritchCrab crab = new EntityEldritchCrab(new TestWorld());
+
+        assertTrue(crab.canRiderInteract());
+    }
+
+    @Test
     public void attachedCrabSnapshotSurvivesPlayerNbtRoundTrip() {
         TestWorld world = new TestWorld();
         TestPlayer player = new TestPlayer(world, "crab_player");

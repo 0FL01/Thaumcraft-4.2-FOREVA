@@ -31,6 +31,7 @@ public class OuterProgressionEntityStaticGuardTest {
         String source = read("src/main/java/thaumcraft/common/entities/monster/EntityEldritchCrab.java");
 
         assertTrue(source.contains("this.startRiding(target, true)")
+                && source.contains("public boolean canRiderInteract()")
                 && source.contains("new SPacketSetPassengers(vehicle)")
                 && source.contains("player.connection.sendPacket")
                 && source.contains("public void dismountRidingEntity()")

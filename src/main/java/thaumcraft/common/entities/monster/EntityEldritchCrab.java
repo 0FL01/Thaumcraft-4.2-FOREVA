@@ -82,6 +82,11 @@ public class EntityEldritchCrab extends net.minecraft.entity.monster.EntityMob {
     }
 
     @Override
+    public boolean canRiderInteract() {
+        return true;
+    }
+
+    @Override
     public void onUpdate() {
         super.onUpdate();
         if (this.ridingAttackTime > 0) --this.ridingAttackTime;
