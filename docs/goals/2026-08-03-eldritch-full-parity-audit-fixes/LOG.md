@@ -339,3 +339,36 @@ Log-Policy: append-only; correct prior entries with a new event
 - Preserve Result: Explicit `scanItem`, `scanEntity`, keyed `scanPhenomena(player,key)`, End Portal bridge, item/entity awards, timed invalid feedback, and handler ordering after null remain green/unchanged.
 - Budget: F-105 consumed 1/1 fix checkpoint and 0 material replans.
 - Next: Commit the R-008 checkpoint excluding user-owned `SKILL.md`, then begin the single closure review pass.
+
+## E-0031 — 2026-08-03 — closure_start
+
+- State-Revision: 30
+- Outcomes/Findings: R-001..R-008 / F-018,F-035,F-038,F-039,F-085,F-087,F-088,F-105
+- Git before/after: `525df452` / `525df452`; only user-owned `SKILL.md` dirty before closure ledger update
+- Prior checkpoint commit: R-008/F-105 -> `525df452 fix(scanning): preserve phenomenon handler dispatch`.
+- Action: Consumed the single frozen closure review pass (`Closure Review Passes Used: 1/1`).
+- Expected Evidence: Exact change-envelope paths/commits, all required statuses/counters, full build, preserve controls/constraint, stamped hashes, and zero-warning goal lint.
+- Stop/Replan: Any current-diff regression, out-of-envelope path, preserve failure, resource overrun, or lint/hash error blocks terminalization; no extra review pass is authorized.
+- Next: Run closure evidence only; do not discover or promote adjacent work.
+
+## E-0032 — 2026-08-03 — closure_complete
+
+- State-Revision: 32
+- Outcomes/Findings: R-001..R-008 verified; all eight required findings verified; F-127..F-131 verified and F-133 satisfied
+- Git implementation range: `f27fddfb..525df452`; eight reversible outcome commits (`aa0ab9eb`, `90c689b0`, `7b2f1909`, `c6bf4c78`, `65c6f9b2`, `f7570d16`, `c8567267`, `525df452`)
+- Envelope Evidence: `git diff --name-status f27fddfb..525df452` contains only the admitted product symbols, focused existing tests, and STATE/LOG. No dependency, migration, translation, JEI/crafting policy, alternate `#` scan, addon-only, renderer, or deferred candidate path changed.
+- Validation: Every R outcome's focused command passed; every common/server checkpoint passed `./scripts/dev.sh validate --smoke`; R-005 and final closure builds passed. Final `./scripts/dev.sh build` -> BUILD SUCCESSFUL in 22s.
+- Preserve/Constraint Result: F-127 declaration/recipe/resource surfaces were untouched; F-128 changed runtime surfaces retain their local focused controls and full tests; F-129/F-130 FollowingItem paths untouched; F-131 approved Forge/server/data-safety adaptations retained; F-133 policy boundaries untouched.
+- Resource Result: required findings 8/8; fix checkpoints 10/10 frozen (within max 12); material replans 0; implementation subagent waves 0; closure reviews 1/1; scope amendments/auto-promotions/post-closure work 0.
+- Worktree Boundary: only user-owned `.opencode/skills/goal-repo-docs-opencode/SKILL.md` remains outside the goal and is deliberately unstaged.
+- Decision: Set `Goal-Status: complete`, remove `.opencode/active-goal`, stamp/lint, commit terminal ledger, and stop. All 120 deferred findings remain non-actionable in this completed goal.
+- Lint correction: The first terminal lint correctly rejected `verified` for constraint F-133; changed only that execution status to schema-valid `satisfied` before rerunning the same stamp/lint commands.
+
+## E-0033 — 2026-08-03 — terminal_lint_passed
+
+- State-Revision: 33
+- Goal-Status: complete
+- Action: Ran terminal stamp and read-only lint after the F-133 status correction.
+- Evidence: `goal_lint.py <goal> --stamp` -> `0 error(s), 0 warning(s)`; `goal_lint.py <goal>` -> `0 error(s), 0 warning(s)`.
+- Boundary: `.opencode/active-goal` is removed; only terminal STATE/LOG/pointer deletion will be staged. User-owned `SKILL.md` remains unstaged.
+- Next: Create the terminal ledger commit and stop substantive work.

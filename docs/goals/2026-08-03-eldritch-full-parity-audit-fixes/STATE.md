@@ -1,8 +1,8 @@
 # Active State: Full Eldritch parity audit fixes
 
 Goal-ID: goal-20260803-eldritch-full-parity-audit-fixes
-Goal-Status: active
-State-Revision: 29
+Goal-Status: complete
+State-Revision: 33
 Last-Updated: 2026-08-03
 Contract-Version: 2.1
 Contract-SHA256: 8e61c9d38410bccb4bc113123852bade9e62a44d9b9c388a3382ad4ba53605fd
@@ -11,8 +11,8 @@ Recon-SHA256: 446b153014e62315f935223a765cbafdec9f2ace5e622faaa548202e336b79c6
 Sources-SHA256: 627bad6dfae656e2f98998eacfa70f10c2c2a92db4c4126731a772f7fb3dc714
 Reports-SHA256: 2563ac1d90f12a2cd83bb06486ea9782c7ad7c48d45242cabc180b4a213500f5
 Git-Branch: master
-Git-HEAD: c8567267
-Expected-Dirty-Paths: `src/main/java/thaumcraft/common/lib/research/ScanManager.java`, `src/test/java/thaumcraft/common/lib/research/{ScanProgressionRuntimeTest.java,ScanManagerThaumometerNotificationStaticGuardTest.java}`, `docs/goals/2026-08-03-eldritch-full-parity-audit-fixes/{STATE.md,LOG.md}`
+Git-HEAD: 525df452
+Expected-Dirty-Paths: `docs/goals/2026-08-03-eldritch-full-parity-audit-fixes/{STATE.md,LOG.md}`, `.opencode/active-goal` only at terminalization
 Last-Durable-Flush: 2026-08-03
 
 <protect>
@@ -22,12 +22,12 @@ Last-Durable-Flush: 2026-08-03
 - Active Findings: none
 - Checkpoint Status: closed
 - Hypothesis: Confirmed; the interface override is distinct from explicit keyed scanning and now returns null without mutation, allowing the next registered handler to supply the raw target.
-- Smallest Next Action: Commit R-008/F-105, then consume the single frozen closure review pass.
-- Expected Evidence: The commit contains only the override, focused handler/pass-through evidence, and ledger state.
-- Stop/Replan If: commit contents include explicit keyed/item/entity scan APIs, End Portal routing, award semantics, or deferred scan findings.
-- Working Set: R-008 product/test diff and STATE/LOG until commit
-- Last Material Command: focused scan runtime/static tests followed by `./scripts/dev.sh validate --smoke`
-- Last Material Result: focused BUILD SUCCESSFUL in 18s; smoke PASS; built-in handler is side-effect-free and later handler is reached exactly once
+- Smallest Next Action: Stamp/lint the terminal ledger, commit STATE/LOG and active-pointer removal, then stop substantive work.
+- Expected Evidence: Goal lint reports zero errors/warnings and the terminal commit contains only goal ledger files plus `.opencode/active-goal` deletion; user-owned `SKILL.md` remains unstaged.
+- Stop/Replan If: terminal lint/hash fails or commit contents include product/toolkit changes.
+- Working Set: terminal STATE/LOG and `.opencode/active-goal` removal only
+- Last Material Command: terminal `goal_lint.py --stamp` followed by read-only `goal_lint.py`
+- Last Material Result: both terminal lint commands report `0 error(s), 0 warning(s)`; BUILD SUCCESSFUL in 22s; all outcomes/findings/preserves/constraint and resource counters are terminal
 - Blocker: none
 - First Re-entry Action: verify hashes and Git, then read active R/F entries before edits
 </protect>
@@ -53,12 +53,12 @@ Last-Durable-Flush: 2026-08-03
 - F-087 | verified | evidence: type-1 guard precedes every mutation/completion branch; E-0026
 - F-088 | verified | evidence: hidden/lost clue check precedes every completion workflow; E-0028
 - F-105 | verified | evidence: interface override returns null; explicit scan APIs/End Portal retained; E-0030
-- F-127 | pending | evidence: reports/proposals accepted; final-diff check pending
-- F-128 | pending | evidence: reports/proposals accepted; final-diff check pending
-- F-129 | pending | evidence: A-017 preserve evidence; final-diff check pending
-- F-130 | pending | evidence: A-017 preserve evidence; final-diff check pending
-- F-131 | pending | evidence: adaptation reports accepted; final-diff check pending
-- F-133 | pending | evidence: deferred policy boundary recorded
+- F-127 | verified | evidence: no declaration/recipe/registry/localization/research-art path changed; full build passed; E-0032
+- F-128 | verified | evidence: changed runtime paths are exactly admitted and focused/full tests passed; E-0032
+- F-129 | verified | evidence: `FollowingItem` payload paths unchanged from frozen preserve evidence; E-0032
+- F-130 | verified | evidence: `FollowingItem` lifespan paths unchanged from frozen preserve evidence; E-0032
+- F-131 | verified | evidence: server authority, Forge 1.12 safety, current-save and synchronous/safe adaptations retained; E-0032
+- F-133 | satisfied | evidence: crafting/JEI/limited-crafting and alternate/addon scan policy paths unchanged; E-0032
 
 ## Finding Work Counters
 
@@ -74,20 +74,20 @@ Last-Durable-Flush: 2026-08-03
 ## Resource Counters
 
 - Implementation Subagent Waves Used: 0
-- Closure Review Passes Used: 0
+- Closure Review Passes Used: 1
 - Scope Amendments Used: 0
 - Adjacent Finding Auto-Promotions Used: 0
 - Post-Closure Work Items Used: 0
 
 ## Current Diff/Reconciliation
 
-- Git status: user-owned `SKILL.md` remains dirty; R-008 scan/test and STATE/LOG are ready to commit
-- Relevant diff summary: built-in phenomenon override is unconditional null; focused test restores handler list and proves later dispatch/no mutation
+- Git status: user-owned `SKILL.md` remains dirty; terminal STATE/LOG and active-pointer removal pending commit
+- Relevant diff summary: eight admitted outcome commits plus terminal ledger only; no deferred candidate or out-of-envelope product path
 - Unexpected paths/state: HEAD advanced from `6737687` to `866fea24` during the second interrupted report wave through an unrelated general-agent configuration commit.
-- Reconciliation decision: preserve user-updated `SKILL.md`; commit only R-008 scan/test/ledger paths; explicit scanning and End Portal behavior remain untouched.
+- Reconciliation decision: closure passed; preserve user-updated `SKILL.md`, remove active pointer, commit terminal ledger, and stop with all deferred findings unchanged.
 
 ## Queued Next Checkpoint
 
-- Outcomes/Findings: closure pass after R-008 closes and commits
-- Why it is next: R-008 is the final admitted outcome
-- Preconditions: R-008 focused evidence/smoke pass and checkpoint commit exists
+- Outcomes/Findings: none; terminal goal
+- Why it is next: completion is terminal
+- Preconditions: none after terminal ledger commit
