@@ -7,6 +7,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 public class EntityEldritchGuardianStaticGuardTest {
@@ -23,6 +24,9 @@ public class EntityEldritchGuardianStaticGuardTest {
         assertTrue(source.contains("this.isBurning()"));
         assertTrue(source.contains("this.rand.nextFloat() < (float) difficulty * 0.3F"));
         assertTrue(source.contains("entityIn.setFire(2 * difficulty);"));
+        assertTrue(source.contains("public int getTotalArmorValue() {")
+                && source.contains("return 4;"));
+        assertFalse(source.contains("public int getMaxSpawnedInChunk() {"));
     }
 
     private static String readFile(String path) throws IOException {

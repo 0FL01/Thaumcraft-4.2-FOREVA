@@ -157,3 +157,26 @@ Log-Policy: append-only; correct prior entries with a new event
 - Result: The shipped `GenCommon` placement-before-orientation sequence is retained and no longer drops meta-7 crystals before orientation assignment; later support changes use TC4 metadata/orientation semantics.
 - Decision/Reason: Close F-035 and derive R-002 verified. No `GenCommon` topology/probability edit or global Eldritch side-solid change was needed.
 - Next: Commit the R-002 checkpoint excluding user-owned `SKILL.md`, then start R-003/F-038.
+
+## E-0015 — 2026-08-03 — checkpoint_start
+
+- State-Revision: 14
+- Outcomes/Findings: R-003 / F-038
+- Git before/after: `90c689b0` / `90c689b0`; only user-owned `SKILL.md` dirty
+- Prior checkpoint commit: R-002/F-035 -> `90c689b0 fix(outer): preserve oriented crystal support`.
+- Action: Started the single allowed F-038 fix checkpoint and incremented `checkpoints_started` to 1/1.
+- Hypothesis: The SRG-mapped TC4 constant is Guardian intrinsic armor, while the port attached it to the default-equivalent spawn-cap method.
+- Expected Evidence: Focused source evidence requires armor 4 and no custom spawn-cap override; smoke confirms common/server compatibility.
+- Stop/Replan: Stop if mapped 1.12 armor requires a broader attribute/lifecycle change.
+- Next: Read the frozen outcome/finding and direct Guardian/test paths, then replace only the mistranslated method.
+
+## E-0016 — 2026-08-03 — checkpoint_closed
+
+- State-Revision: 15
+- Outcomes/Findings: R-003 / F-038
+- Git before/after: `90c689b0` / checkpoint commit pending
+- Action: Replaced the mistranslated Guardian `getMaxSpawnedInChunk()` override with `getTotalArmorValue()` returning 4 and added focused source assertions rejecting the spawn-cap misuse.
+- Evidence: `./scripts/dev.sh gradle test --tests thaumcraft.common.entities.monster.EntityEldritchGuardianStaticGuardTest` -> BUILD SUCCESSFUL; `./scripts/dev.sh validate --smoke` -> PASS; focused diff check clean.
+- Result: Guardian intrinsic armor is restored from 0 to 4 while inherited spawn-cap behavior remains unchanged.
+- Decision/Reason: Close F-038 and derive R-003 verified; no other Guardian attributes, AI, isolation, or entity behavior changed.
+- Next: Commit the R-003 checkpoint excluding user-owned `SKILL.md`, then start R-004/F-039.

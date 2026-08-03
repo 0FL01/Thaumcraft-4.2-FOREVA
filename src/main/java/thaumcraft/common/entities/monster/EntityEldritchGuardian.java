@@ -85,7 +85,7 @@ public class EntityEldritchGuardian extends EntityMob implements IRangedAttackMo
     }
 
     @Override
-    public int getMaxSpawnedInChunk() {
+    public int getTotalArmorValue() {
         return 4;
     }
 
