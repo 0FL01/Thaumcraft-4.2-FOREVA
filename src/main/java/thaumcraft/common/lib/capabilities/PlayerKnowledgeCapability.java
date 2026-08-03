@@ -7,6 +7,8 @@ import net.minecraft.nbt.NBTTagString;
 import net.minecraftforge.common.util.Constants;
 import thaumcraft.api.aspects.Aspect;
 import thaumcraft.api.aspects.AspectList;
+import thaumcraft.api.research.ResearchCategories;
+import thaumcraft.api.research.ResearchItem;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -347,7 +349,7 @@ public class PlayerKnowledgeCapability implements IPlayerKnowledge {
         writeStringSet(nbt, TAG_SCANNED_ENTITIES, scannedEntities);
         writeStringSet(nbt, TAG_SCANNED_ITEMS, scannedItems);
         writeStringSet(nbt, TAG_SCANNED_PHENOMENA, scannedPhenomena);
-        writeStringSet(nbt, TAG_RESEARCH_COMPLETE, researchComplete);
+        writeResearchSet(nbt, TAG_RESEARCH_COMPLETE, researchComplete);
 
         return nbt;
     }
@@ -374,6 +376,25 @@ public class PlayerKnowledgeCapability implements IPlayerKnowledge {
         NBTTagList list = new NBTTagList();
         for (String s : set) {
             list.appendTag(new NBTTagString(s));
+        }
+        nbt.setTag(tag, list);
+    }
+
+    private void writeResearchSet(NBTTagCompound nbt, String tag, Set<String> set) {
+        if (ResearchCategories.researchCategories.isEmpty()) {
+            writeStringSet(nbt, tag, set);
+            return;
+        }
+        NBTTagList list = new NBTTagList();
+        for (String key : set) {
+            if (key == null) continue;
+            if (key.startsWith("@")) {
+                if (researchComplete.contains(key.substring(1))) continue;
+            } else {
+                ResearchItem research = ResearchCategories.getResearch(key);
+                if (research == null || research.isAutoUnlock()) continue;
+            }
+            list.appendTag(new NBTTagString(key));
         }
         nbt.setTag(tag, list);
     }

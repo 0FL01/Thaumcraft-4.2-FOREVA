@@ -1,8 +1,16 @@
 package thaumcraft.common.lib.capabilities;
 
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.ResourceLocation;
 import org.junit.Test;
 import thaumcraft.api.aspects.Aspect;
+import thaumcraft.api.aspects.AspectList;
+import thaumcraft.api.research.ResearchCategories;
+import thaumcraft.api.research.ResearchCategoryList;
+import thaumcraft.api.research.ResearchItem;
+
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -99,5 +107,40 @@ public class PlayerKnowledgeCapabilityTest {
         assertEquals(0, knowledge.getWarpTemp());
         assertEquals(0, knowledge.getWarpCounter());
         assertEquals(0, knowledge.getRunicCharge());
+    }
+
+    @Test
+    public void researchSerializationFiltersUnknownAutoUnlockAndRedundantClues() {
+        Map<String, ResearchCategoryList> oldCategories = new LinkedHashMap<>(ResearchCategories.researchCategories);
+        try {
+            ResearchCategories.researchCategories.clear();
+            ResearchCategories.registerCategory("TEST", new ResourceLocation("thaumcraft", "textures/test/icon.png"),
+                    new ResourceLocation("thaumcraft", "textures/test/background.png"));
+            new ResearchItem("VALID", "TEST", new AspectList().add(Aspect.AIR, 1), 0, 0, 1,
+                    new ResourceLocation("thaumcraft", "textures/test/research.png")).registerResearchItem();
+            new ResearchItem("CLUE", "TEST", new AspectList().add(Aspect.FIRE, 1), 1, 0, 1,
+                    new ResourceLocation("thaumcraft", "textures/test/clue.png")).setHidden().registerResearchItem();
+            new ResearchItem("AUTO", "TEST", new AspectList().add(Aspect.ORDER, 1), 2, 0, 1,
+                    new ResourceLocation("thaumcraft", "textures/test/auto.png")).setAutoUnlock().registerResearchItem();
+
+            PlayerKnowledgeCapability knowledge = new PlayerKnowledgeCapability();
+            knowledge.addResearch("VALID");
+            knowledge.addResearch("@VALID");
+            knowledge.addResearch("@CLUE");
+            knowledge.addResearch("AUTO");
+            knowledge.addResearch("STALE");
+
+            PlayerKnowledgeCapability copy = new PlayerKnowledgeCapability();
+            copy.deserializeNBT(knowledge.serializeNBT());
+
+            assertTrue(copy.isResearchComplete("VALID"));
+            assertTrue(copy.isResearchComplete("@CLUE"));
+            assertFalse(copy.isResearchComplete("@VALID"));
+            assertFalse(copy.isResearchComplete("AUTO"));
+            assertFalse(copy.isResearchComplete("STALE"));
+        } finally {
+            ResearchCategories.researchCategories.clear();
+            ResearchCategories.researchCategories.putAll(oldCategories);
+        }
     }
 }

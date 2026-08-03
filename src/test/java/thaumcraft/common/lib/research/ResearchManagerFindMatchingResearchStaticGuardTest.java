@@ -17,7 +17,8 @@ public class ResearchManagerFindMatchingResearchStaticGuardTest {
         assertTrue("ResearchManager should expose findMatchingResearch(EntityPlayer, Aspect) helper",
                 source.contains("public static String findMatchingResearch(EntityPlayer player, Aspect aspect)"));
         assertTrue("findMatchingResearch should keep reference candidate filters for secondary/hidden/lost/autounlock/virtual/stub research",
-                source.contains("research.isSecondary() && (Config.researchDifficulty == 0 || Config.researchDifficulty == -1)")
+                source.contains("Config.researchDifficulty == -1")
+                        && source.contains("research.isSecondary() && Config.researchDifficulty == 0")
                         && source.contains("research.isHidden()")
                         && source.contains("research.isLost()")
                         && source.contains("research.isAutoUnlock()")

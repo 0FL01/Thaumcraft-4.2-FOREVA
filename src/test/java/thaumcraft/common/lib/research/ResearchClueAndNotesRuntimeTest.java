@@ -30,6 +30,7 @@ import thaumcraft.api.research.ResearchCategories;
 import thaumcraft.api.research.ResearchCategoryList;
 import thaumcraft.api.research.ResearchItem;
 import thaumcraft.common.config.ConfigItems;
+import thaumcraft.common.config.Config;
 import thaumcraft.common.items.ItemResearchNotes;
 import thaumcraft.common.lib.capabilities.PlayerKnowledgeCapability;
 import thaumcraft.common.lib.capabilities.PlayerKnowledgeProvider;
@@ -49,6 +50,7 @@ public class ResearchClueAndNotesRuntimeTest {
 
     private Map<String, ResearchCategoryList> oldCategories;
     private ItemResearchNotes oldResearchNotes;
+    private int oldResearchDifficulty;
 
     @BeforeClass
     public static void bootstrapMinecraftStatics() {
@@ -59,6 +61,8 @@ public class ResearchClueAndNotesRuntimeTest {
     public void setUp() throws Exception {
         this.oldCategories = new LinkedHashMap<>(ResearchCategories.researchCategories);
         this.oldResearchNotes = ConfigItems.itemResearchNotes;
+        this.oldResearchDifficulty = Config.researchDifficulty;
+        Config.researchDifficulty = 0;
         ResearchCategories.researchCategories.clear();
         ResearchCategories.registerCategory("TEST", new ResourceLocation("thaumcraft", "textures/test/icon.png"), new ResourceLocation("thaumcraft", "textures/test/background.png"));
         ConfigItems.itemResearchNotes = new ItemResearchNotes();
@@ -70,6 +74,7 @@ public class ResearchClueAndNotesRuntimeTest {
         ResearchCategories.researchCategories.clear();
         ResearchCategories.researchCategories.putAll(this.oldCategories);
         ConfigItems.itemResearchNotes = this.oldResearchNotes;
+        Config.researchDifficulty = this.oldResearchDifficulty;
         clearResearchCaches();
     }
 
@@ -98,6 +103,27 @@ public class ResearchClueAndNotesRuntimeTest {
         player.knowledge().addResearch("BASE");
 
         assertEquals("MATCH", ResearchManager.findMatchingResearch(player, Aspect.AIR));
+    }
+
+    @Test
+    public void easyDifficultyExcludesAllRandomPrimaryResearchMatches() throws Exception {
+        Config.researchDifficulty = -1;
+        registerResearch(new ResearchItem("MATCH", "TEST", new AspectList().add(Aspect.AIR, 2), 1, 0, 1, new ItemStack(Items.FEATHER)));
+        clearResearchCaches();
+
+        TestWorld world = new TestWorld();
+        TestPlayer player = new TestPlayer(world, "easy_no_match");
+
+        assertEquals(null, ResearchManager.findMatchingResearch(player, Aspect.AIR));
+    }
+
+    @Test
+    public void unknownPlainResearchKeyNeverCountsAsComplete() {
+        TestWorld world = new TestWorld();
+        TestPlayer player = new TestPlayer(world, "unknown_research");
+        player.knowledge().addResearch("STALE_ELDRITCH_KEY");
+
+        assertFalse(ResearchManager.isResearchComplete(player, "STALE_ELDRITCH_KEY"));
     }
 
     @Test

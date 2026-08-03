@@ -112,6 +112,9 @@ public class ResearchManager {
      * Check if a player has completed a specific research.
      */
     public static boolean isResearchComplete(String username, String researchkey) {
+        if (researchkey == null || (!researchkey.startsWith("@") && ResearchCategories.getResearch(researchkey) == null)) {
+            return false;
+        }
         IPlayerKnowledge knowledge = getResearchData(username);
         return knowledge != null && knowledge.isResearchComplete(researchkey);
     }
@@ -120,7 +123,10 @@ public class ResearchManager {
      * Check if a player has completed a specific research (EntityPlayer variant).
      */
     public static boolean isResearchComplete(EntityPlayer player, String researchkey) {
-        if (player == null) return false;
+        if (player == null || researchkey == null
+                || (!researchkey.startsWith("@") && ResearchCategories.getResearch(researchkey) == null)) {
+            return false;
+        }
         IPlayerKnowledge knowledge = player.getCapability(PlayerKnowledgeProvider.PLAYER_KNOWLEDGE, null);
         if (knowledge != null) {
             return knowledge.isResearchComplete(researchkey);
@@ -520,7 +526,8 @@ public class ResearchManager {
             allValidResearch = new ArrayList<>();
             for (ResearchCategoryList category : ResearchCategories.researchCategories.values()) {
                 for (ResearchItem research : category.research.values()) {
-                    boolean secondary = research.isSecondary() && (Config.researchDifficulty == 0 || Config.researchDifficulty == -1);
+                    boolean secondary = Config.researchDifficulty == -1
+                            || (research.isSecondary() && Config.researchDifficulty == 0);
                     if (secondary || research.isHidden() || research.isLost() || research.isAutoUnlock()
                             || research.isVirtual() || research.isStub()) {
                         continue;
