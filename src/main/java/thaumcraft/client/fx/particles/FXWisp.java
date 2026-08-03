@@ -17,6 +17,7 @@ public class FXWisp extends Particle implements ITCParticle {
     private double targetY;
     private double targetZ;
     private boolean hasTarget;
+    private Entity targetEntity;
     public boolean shrink = false;
     public boolean tinkle = false;
     public int blendmode = 1;
@@ -70,6 +71,11 @@ public class FXWisp extends Particle implements ITCParticle {
         }
     }
 
+    public FXWisp(World world, double x, double y, double z, Entity target, int type) {
+        this(world, x, y, z, 0.4F, type);
+        this.targetEntity = target;
+    }
+
     @Override
     public void onUpdate() {
         this.prevPosX = this.posX;
@@ -90,7 +96,23 @@ public class FXWisp extends Particle implements ITCParticle {
         }
         this.move(this.motionX, this.motionY, this.motionZ);
 
-        if (this.hasTarget) {
+        if (this.targetEntity != null && !this.targetEntity.isDead) {
+            this.motionX *= 0.985D;
+            this.motionY *= 0.985D;
+            this.motionZ *= 0.985D;
+            double dx = this.targetEntity.posX - this.posX;
+            double dy = this.targetEntity.posY + (double) this.targetEntity.height * 0.5D - this.posY;
+            double dz = this.targetEntity.posZ - this.posZ;
+            double distance = Math.sqrt(dx * dx + dy * dy + dz * dz);
+            if (distance > 1.0E-6D) {
+                this.motionX += dx / distance * 0.2D;
+                this.motionY += dy / distance * 0.2D;
+                this.motionZ += dz / distance * 0.2D;
+                this.motionX = MathHelper.clamp(this.motionX, -0.2D, 0.2D);
+                this.motionY = MathHelper.clamp(this.motionY, -0.2D, 0.2D);
+                this.motionZ = MathHelper.clamp(this.motionZ, -0.2D, 0.2D);
+            }
+        } else if (this.hasTarget) {
             this.motionX *= 0.985D;
             this.motionY *= 0.985D;
             this.motionZ *= 0.985D;

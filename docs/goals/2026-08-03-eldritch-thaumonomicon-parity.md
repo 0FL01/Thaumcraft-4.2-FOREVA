@@ -27,8 +27,8 @@ Complete the frozen Required Outcomes using the listed Change Envelope and Prima
   - Source: RECON findings for `FocusPrimal` and `EntityPrimalOrb`.
   - Acceptance: A cast launches the orb at the original velocity; normal and underwater impacts, special-effect probability and eligibility, node/taint placement, hand animation, focus color, and original trail/impact feedback match the TC4 behavior except for documented Forge 1.12 representation changes.
   - Primary evidence: Focused projectile/focus runtime and static parity tests pass, including launch motion, water impact, probability boundary, negative-coordinate placement, hand routing, color, and FX dispatch; checkpoint server smoke passes.
-  - Status: pending
-  - Evidence:
+  - Status: verified
+  - Evidence: Shooter construction now launches at `0.5F`; runtime coverage verifies motion and ownership. Water boost is block-impact-only, the inclusive special roll and entity-impact node fallback are restored, taint placement matches TC4 truncation/gating, focus color/hand routing are corrected, and trail/impact wisp feedback is wired through the proxy. Focused tests, `./scripts/dev.sh validate --smoke`, and `./scripts/dev.sh build` passed on 2026-08-03.
 
 - R3: Restore Primal Crusher harvesting behavior.
   - Source: RECON findings for `ItemPrimalCrusher`.
@@ -115,17 +115,17 @@ Complete the frozen Required Outcomes using the listed Change Envelope and Prima
 
 ## Current Checkpoint
 
-- Closes: R2.
-- Smallest next action: Add a projectile launch-motion test for the shooter constructor, then restore the original `0.5F` launch velocity through the 1.12 `shoot` API.
-- Expected evidence: A focused runtime test observes non-zero forward motion with the original velocity while preserving owner and seeker spawn data.
-- Stop or replan if: Forge 1.12 applies launch motion elsewhere and a second `shoot` call would duplicate velocity.
+- Closes: R3.
+- Smallest next action: Reconstruct the TC4 player-aware secondary harvest helper from `BlockUtils.class`, then add focused Crusher tests before replacing `world.destroyBlock`.
+- Expected evidence: Tests distinguish ordinary destruction from player harvest and prove Silk Touch/Fortune, XP/callback, following-drop, and wear semantics on secondary blocks.
+- Stop or replan if: The original helper depends on an unported global hook whose smallest compatible restoration crosses the R3 change envelope.
 
 ## Current State
 
-- Resolved: R1 is verified. Research difficulty workflows, incremental feedback, matching, and persisted membership now follow TC4 semantics while retaining server authority and the proxy boundary.
-- Last relevant evidence: Focused research/capability tests and `./scripts/dev.sh validate --smoke` passed on 2026-08-03.
+- Resolved: R1 and R2 are verified. Research runtime and Primal Focus/Orb behavior now follow the audited TC4 contracts.
+- Last relevant evidence: Primal Orb focused tests, `./scripts/dev.sh validate --smoke`, and `./scripts/dev.sh build` passed on 2026-08-03.
 - Blocker: None.
-- Next: Commit R1 matching/persistence, then begin R2 with the Primal Orb launch regression.
+- Next: Commit R2, then begin R3 with the smallest player-aware Crusher harvest path.
 
 ## Material Decisions
 
@@ -140,6 +140,7 @@ Complete the frozen Required Outcomes using the listed Change Envelope and Prima
 - 2026-08-03: R1 difficulty workflow checkpoint passed focused packet tests and `./scripts/dev.sh validate --smoke`; valid `-1`, `0`, and positive difficulty paths now follow the same effective workflow as `GuiResearchBrowser`.
 - 2026-08-03: R1 feedback checkpoint restored the TC4 clue notification/sound, queued research-complete overlay, Thaumonomicon highlights, and live browser refresh. Focused guards and `./scripts/dev.sh build` passed; manual in-game overlay inspection remains part of final client limitations rather than a semantic blocker.
 - 2026-08-03: R1 verified after restoring exact `findMatchingResearch` difficulty precedence, rejecting unknown plain completion keys, and filtering unknown, auto-unlock, and redundant clue keys from persisted capability state. Focused tests and `./scripts/dev.sh validate --smoke` passed.
+- 2026-08-03: R2 verified. Primal Orb launch, impact/water/special-effect semantics, taint placement, focus color/hand animation, and TC4 wisp feedback were restored. Focused tests, server smoke, and build passed; manual visual inspection was not run.
 
 ## Completion
 

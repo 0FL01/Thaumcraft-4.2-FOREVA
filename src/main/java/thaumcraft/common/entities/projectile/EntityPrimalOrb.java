@@ -12,6 +12,7 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.registry.IEntityAdditionalSpawnData;
+import thaumcraft.common.Thaumcraft;
 import thaumcraft.common.blocks.BlockTaintFibres;
 import thaumcraft.common.config.ConfigBlocks;
 import thaumcraft.common.lib.utils.Utils;
@@ -27,6 +28,7 @@ public class EntityPrimalOrb extends EntityThrowable implements IEntityAdditiona
         super(world, shooter);
         this.seeker = seeker;
         this.oi = shooter.getEntityId();
+        this.shoot(shooter, shooter.rotationPitch, shooter.rotationYaw, 0.0F, 0.5F, 1.0F);
     }
 
     @Override
@@ -43,6 +45,22 @@ public class EntityPrimalOrb extends EntityThrowable implements IEntityAdditiona
             if (this.isDead) {
                 return;
             }
+        }
+        if (this.world.isRemote) {
+            for (int a = 0; a < 6; ++a) {
+                Thaumcraft.proxy.wispFX4(
+                        this.world,
+                        (this.world.rand.nextFloat() - this.world.rand.nextFloat()) * 0.2F,
+                        (this.world.rand.nextFloat() - this.world.rand.nextFloat()) * 0.2F,
+                        (this.world.rand.nextFloat() - this.world.rand.nextFloat()) * 0.2F,
+                        this, a, true, 0.0F);
+            }
+            Thaumcraft.proxy.wispFX2(
+                    this.world,
+                    this.posX + (this.world.rand.nextFloat() - this.world.rand.nextFloat()) * 0.2F,
+                    this.posY + (this.world.rand.nextFloat() - this.world.rand.nextFloat()) * 0.2F,
+                    this.posZ + (this.world.rand.nextFloat() - this.world.rand.nextFloat()) * 0.2F,
+                    0.1F, this.rand.nextInt(6), true, true, 0.0F);
         }
         if (this.ticksExisted > 20) {
             Random seeded = new Random(this.getEntityId() + this.count);
@@ -94,41 +112,58 @@ public class EntityPrimalOrb extends EntityThrowable implements IEntityAdditiona
     @Override
     protected void onImpact(RayTraceResult result) {
         if (result == null) return;
-        if (!this.world.isRemote) {
+        if (this.world.isRemote) {
+            for (int a = 0; a < 6; ++a) {
+                for (int type = 0; type < 6; ++type) {
+                    float offsetX = (this.world.rand.nextFloat() - this.world.rand.nextFloat()) * 0.5F;
+                    float offsetY = (this.world.rand.nextFloat() - this.world.rand.nextFloat()) * 0.5F;
+                    float offsetZ = (this.world.rand.nextFloat() - this.world.rand.nextFloat()) * 0.5F;
+                    Thaumcraft.proxy.wispFX3(
+                            this.world,
+                            this.posX + offsetX, this.posY + offsetY, this.posZ + offsetZ,
+                            this.posX + offsetX * 10.0F, this.posY + offsetY * 10.0F, this.posZ + offsetZ * 10.0F,
+                            0.4F, type, true, 0.05F);
+                }
+            }
+        } else {
             float explosiveRadius = 2.0f;
             float specialChance = 1.0f;
-            // Underwater: bigger explosion + higher special chance
-            if (this.isInsideOfMaterial(Material.WATER)) {
+            if (result.typeOfHit == RayTraceResult.Type.BLOCK && this.isInsideOfMaterial(Material.WATER)) {
                 explosiveRadius = 4.0f;
                 specialChance = 10.0f;
             }
             this.world.createExplosion(null, this.posX, this.posY, this.posZ, explosiveRadius, true);
-            // Special effect: taint biome or random node
-            if (!this.seeker && (float)this.rand.nextInt(100) < specialChance) {
+            if (!this.seeker && (float)this.rand.nextInt(100) <= specialChance) {
                 if (this.rand.nextBoolean()) {
                     this.taintSplosion();
-                } else if (result.typeOfHit == RayTraceResult.Type.BLOCK) {
-                    ThaumcraftWorldGenerator.createRandomNodeAt(
-                        this.world, result.getBlockPos(), this.rand, false, false, true);
+                } else {
+                    BlockPos impactPos = result.getBlockPos();
+                    if (impactPos == null && result.hitVec != null) {
+                        impactPos = new BlockPos(result.hitVec);
+                    }
+                    if (impactPos != null) {
+                        ThaumcraftWorldGenerator.createRandomNodeAt(
+                                this.world, impactPos, this.rand, false, false, true);
+                    }
                 }
             }
+            this.setDead();
         }
-        this.setDead();
     }
 
     private void taintSplosion() {
-        int x = MathHelper.floor(this.posX);
-        int y = MathHelper.floor(this.posY);
-        int z = MathHelper.floor(this.posZ);
+        int x = (int) this.posX;
+        int y = (int) this.posY;
+        int z = (int) this.posZ;
         for (int a = 0; a < 10; ++a) {
             int xx = x + (int)(this.rand.nextFloat() - this.rand.nextFloat() * 6.0f);
             int zz = z + (int)(this.rand.nextFloat() - this.rand.nextFloat() * 6.0f);
-            if (this.rand.nextBoolean()
+            if (!this.rand.nextBoolean()
                 || this.world.getBiome(new BlockPos(xx, 0, zz)) == ThaumcraftWorldGenerator.biomeTaint)
                 continue;
             Utils.setBiomeAt(this.world, xx, zz, ThaumcraftWorldGenerator.biomeTaint);
             BlockPos bp = new BlockPos(xx, this.world.getHeight(xx, zz), zz);
-            if (this.world.isAirBlock(bp) || this.world.getBlockState(bp).getBlock().isReplaceable(this.world, bp)) {
+            if (!this.world.isAirBlock(bp.down())) {
                 this.world.setBlockState(bp, ConfigBlocks.blockTaintFibres.getDefaultState()
                     .withProperty(BlockTaintFibres.TYPE, 0), 3);
             }

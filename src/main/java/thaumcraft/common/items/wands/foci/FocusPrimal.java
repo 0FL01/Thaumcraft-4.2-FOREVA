@@ -27,7 +27,7 @@ public class FocusPrimal extends ItemFocusBasic {
 
     @Override
     public int getFocusColor(ItemStack stack) {
-        return 0xFFFFFF;
+        return 0xA5A1C1;
     }
 
     @Override
@@ -53,7 +53,7 @@ public class FocusPrimal extends ItemFocusBasic {
             world.spawnEntity(orb);
             orb.playSound(TCSounds.ICE, 0.3F, 0.8F + world.rand.nextFloat() * 0.1F);
         }
-        player.swingArm(EnumHand.MAIN_HAND);
+        player.swingArm(player.isHandActive() ? player.getActiveHand() : EnumHand.MAIN_HAND);
         return wandStack;
     }
 
