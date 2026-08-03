@@ -27,7 +27,7 @@ public class OuterProgressionEntityStaticGuardTest {
     }
 
     @Test
-    public void crabKeepsAttachmentPlateBreakAndSpiderEyeContracts() throws IOException {
+    public void crabKeepsAttachmentPlateBreakAndEnderPearlContracts() throws IOException {
         String source = read("src/main/java/thaumcraft/common/entities/monster/EntityEldritchCrab.java");
 
         assertTrue(source.contains("this.startRiding(target, true)")
@@ -40,9 +40,11 @@ public class OuterProgressionEntityStaticGuardTest {
                 && source.contains("this.dismountRidingEntity();"));
         assertTrue(source.contains("this.renderBrokenItemStack(new ItemStack(ConfigItems.itemChestCultistPlate));"));
         assertFalse(source.contains("this.entityDropItem(new ItemStack(ConfigItems.itemCultistPlate)"));
-        assertTrue(source.contains("this.dropItem(Items.SPIDER_EYE, 1);")
+        assertTrue(source.contains("wasRecentlyHit && (this.rand.nextInt(3) == 0 || this.rand.nextInt(1 + looting) > 0)")
+                && source.contains("this.dropItem(Items.ENDER_PEARL, 1);")
                 && source.contains("return EnumCreatureAttribute.ARTHROPOD;")
                 && source.contains("effect.getPotion() != MobEffects.POISON"));
+        assertFalse(source.contains("this.dropItem(Items.SPIDER_EYE, 1);"));
     }
 
     @Test

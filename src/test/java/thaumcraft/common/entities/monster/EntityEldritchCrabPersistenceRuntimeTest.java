@@ -3,9 +3,12 @@ package thaumcraft.common.entities.monster;
 import com.mojang.authlib.GameProfile;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Bootstrap;
 import net.minecraft.init.Blocks;
+import net.minecraft.init.Items;
+import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.profiler.Profiler;
 import net.minecraft.world.GameType;
@@ -20,11 +23,14 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
 public class EntityEldritchCrabPersistenceRuntimeTest {
@@ -39,6 +45,31 @@ public class EntityEldritchCrabPersistenceRuntimeTest {
         EntityEldritchCrab crab = new EntityEldritchCrab(new TestWorld());
 
         assertTrue(crab.canRiderInteract());
+    }
+
+    @Test
+    public void recentlyHitCrabDropsExactlyOneVanillaEnderPearl() {
+        TestWorld world = new TestWorld();
+        TestCrab crab = new TestCrab(world);
+        crab.setDropRandomSeed(0L);
+
+        crab.dropFewItemsForTest(true, 0);
+
+        assertEquals(1, world.drops.size());
+        ItemStack drop = world.drops.get(0);
+        assertSame(Items.ENDER_PEARL, drop.getItem());
+        assertEquals(1, drop.getCount());
+    }
+
+    @Test
+    public void crabDropsNothingWithoutRecentPlayerHit() {
+        TestWorld world = new TestWorld();
+        TestCrab crab = new TestCrab(world);
+        crab.setDropRandomSeed(0L);
+
+        crab.dropFewItemsForTest(false, 3);
+
+        assertTrue(world.drops.isEmpty());
     }
 
     @Test
@@ -96,7 +127,23 @@ public class EntityEldritchCrabPersistenceRuntimeTest {
         @Override public boolean isCreative() { return false; }
     }
 
+    private static final class TestCrab extends EntityEldritchCrab {
+        private TestCrab(World world) {
+            super(world);
+        }
+
+        private void setDropRandomSeed(long seed) {
+            this.rand.setSeed(seed);
+        }
+
+        private void dropFewItemsForTest(boolean wasRecentlyHit, int looting) {
+            this.dropFewItems(wasRecentlyHit, looting);
+        }
+    }
+
     private static final class TestWorld extends World {
+        private final List<ItemStack> drops = new ArrayList<>();
+
         private TestWorld() {
             super(null,
                     new WorldInfo(new WorldSettings(0L, GameType.SURVIVAL, false, false, WorldType.DEFAULT),
@@ -108,6 +155,9 @@ public class EntityEldritchCrabPersistenceRuntimeTest {
 
         @Override
         public boolean spawnEntity(Entity entity) {
+            if (entity instanceof EntityItem) {
+                this.drops.add(((EntityItem) entity).getItem().copy());
+            }
             return true;
         }
 

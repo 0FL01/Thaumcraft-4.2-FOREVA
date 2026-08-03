@@ -286,7 +286,7 @@ public class EntityEldritchCrab extends net.minecraft.entity.monster.EntityMob {
     @Override protected void dropFewItems(boolean wasRecentlyHit, int looting) {
         super.dropFewItems(wasRecentlyHit, looting);
         if (wasRecentlyHit && (this.rand.nextInt(3) == 0 || this.rand.nextInt(1 + looting) > 0)) {
-            this.dropItem(Items.SPIDER_EYE, 1);
+            this.dropItem(Items.ENDER_PEARL, 1);
         }
     }
 
