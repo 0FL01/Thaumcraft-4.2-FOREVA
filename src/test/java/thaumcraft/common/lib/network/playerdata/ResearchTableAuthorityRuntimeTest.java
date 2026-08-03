@@ -115,6 +115,59 @@ public class ResearchTableAuthorityRuntimeTest {
     }
 
     @Test
+    public void placeAspectCannotReplaceOrEraseFixedEndpoints() throws Exception {
+        ResearchWorld world = new ResearchWorld();
+        TileResearchTable table = new TestResearchTable();
+        world.attachTable(table, BlockPos.ORIGIN);
+        TestPlayer player = new TestPlayer(world, "fixed_endpoint_guard");
+        player.knowledge().addDiscoveredAspect(Aspect.FIRE.getTag());
+        player.knowledge().setAspectPool(Aspect.FIRE, 1);
+        ItemStack note = createNoteStack();
+        ResearchNoteData initial = ResearchManager.getData(note);
+        initial.hexEntries.put("0:0", new ResearchManager.HexEntry(Aspect.AIR, 1));
+        initial.hexEntries.put("-1:0", new ResearchManager.HexEntry(Aspect.ORDER, 1));
+        ResearchManager.updateData(note, initial);
+        seedTableInventory(table, note, new ItemStack(new TestScribeTools()));
+
+        table.placeAspect(0, 0, Aspect.FIRE, player);
+        table.placeAspect(-1, 0, null, player);
+
+        ResearchNoteData unchanged = ResearchManager.getData(table.getStackInSlot(1));
+        assertTrue(unchanged.hexEntries.get("0:0").type == 1
+                && unchanged.hexEntries.get("0:0").aspect == Aspect.AIR);
+        assertTrue(unchanged.hexEntries.get("-1:0").type == 1
+                && unchanged.hexEntries.get("-1:0").aspect == Aspect.ORDER);
+        int fixedEndpoints = 0;
+        for (ResearchManager.HexEntry entry : unchanged.hexEntries.values()) {
+            if (entry != null && entry.type == 1) fixedEndpoints++;
+        }
+        assertEquals(2, fixedEndpoints);
+        assertFalse(unchanged.complete);
+        assertEquals(0, table.getStackInSlot(1).getItemDamage());
+        assertEquals(1, player.knowledge().getAspectPoolFor(Aspect.FIRE));
+        assertEquals(0, table.getStackInSlot(0).getItemDamage());
+    }
+
+    @Test
+    public void placeAspectStillErasesOrdinaryPlacedCells() throws Exception {
+        ResearchWorld world = new ResearchWorld();
+        TileResearchTable table = new TestResearchTable();
+        world.attachTable(table, BlockPos.ORIGIN);
+        TestPlayer player = new TestPlayer(world, "ordinary_erasure");
+        ItemStack note = createNoteStack();
+        ResearchNoteData data = ResearchManager.getData(note);
+        data.hexEntries.put("1:0", new ResearchManager.HexEntry(Aspect.AIR, 2));
+        ResearchManager.updateData(note, data);
+        seedTableInventory(table, note, new ItemStack(new TestScribeTools()));
+
+        table.placeAspect(1, 0, null, player);
+
+        ResearchManager.HexEntry erased = ResearchManager.getData(table.getStackInSlot(1)).hexEntries.get("1:0");
+        assertTrue(erased != null && erased.type == 0 && erased.aspect == null);
+        assertEquals(1, table.getStackInSlot(0).getItemDamage());
+    }
+
+    @Test
     public void combinationInputValidationIsAtomicForPoolAndBonusSources() {
         ResearchWorld world = new ResearchWorld();
         TileResearchTable table = new TestResearchTable();

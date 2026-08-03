@@ -2,7 +2,7 @@
 
 Goal-ID: goal-20260803-eldritch-full-parity-audit-fixes
 Goal-Status: active
-State-Revision: 21
+State-Revision: 25
 Last-Updated: 2026-08-03
 Contract-Version: 2.1
 Contract-SHA256: 8e61c9d38410bccb4bc113123852bade9e62a44d9b9c388a3382ad4ba53605fd
@@ -11,7 +11,7 @@ Recon-SHA256: 446b153014e62315f935223a765cbafdec9f2ace5e622faaa548202e336b79c6
 Sources-SHA256: 627bad6dfae656e2f98998eacfa70f10c2c2a92db4c4126731a772f7fb3dc714
 Reports-SHA256: 2563ac1d90f12a2cd83bb06486ea9782c7ad7c48d45242cabc180b4a213500f5
 Git-Branch: master
-Git-HEAD: c6bf4c78
+Git-HEAD: 65c6f9b2
 Expected-Dirty-Paths: `src/main/java/thaumcraft/common/entities/monster/EntityEldritchGuardian.java`, `src/test/java/thaumcraft/common/entities/monster/EntityEldritchGuardianStaticGuardTest.java`, `docs/goals/2026-08-03-eldritch-full-parity-audit-fixes/{STATE.md,LOG.md}`
 Last-Durable-Flush: 2026-08-03
 
@@ -21,13 +21,13 @@ Last-Durable-Flush: 2026-08-03
 - Active Outcomes: none
 - Active Findings: none
 - Checkpoint Status: closed
-- Hypothesis: Confirmed; server lookup remains first and the username-matched proxy-local capability is returned before stale cache/disk fallback, so full and incremental client packet mutations remain visible without duplicate state.
-- Smallest Next Action: Commit R-005/F-085, then start R-006/F-087 checkpoint 1/2.
-- Expected Evidence: The commit contains only the bounded manager bridge, focused runtime/static evidence, and ledger state.
-- Stop/Replan If: commit contents include packet protocol, browser, persistence, deferred research findings, or user-owned toolkit changes.
-- Working Set: R-005 product/test diff and STATE/LOG until commit
-- Last Material Command: frozen R-005 three-test command, `validate --smoke`, then `build`
-- Last Material Result: focused BUILD SUCCESSFUL in 10s; smoke PASS; full BUILD SUCCESSFUL in 20s; final comment-only clarification did not change behavior
+- Hypothesis: Confirmed; `current.type == 1` is authoritative after note/coordinate validation and before aspect discovery, pool/refund, hex mutation, ink consumption, and completion checks.
+- Smallest Next Action: Commit R-006/F-087, then start R-007/F-088.
+- Expected Evidence: A fixed endpoint remains byte-for-byte unchanged under null/non-null forged requests, note completion stays false, and normal type-0/type-2 behavior remains accepted.
+- Stop/Replan If: endpoint identity is unavailable at the authoritative tile, or enforcement requires changing authentication, puzzle traversal, costs/refunds, or note ownership.
+- Working Set: R-006 product/test diff and STATE/LOG until commit
+- Last Material Command: focused authority test and `./scripts/dev.sh validate --smoke` after the final endpoint fixture
+- Last Material Result: focused BUILD SUCCESSFUL in 11s; smoke PASS; fixed endpoints/aspects/count/pools/ink/completion unchanged; type-0 placement and type-2 erasure pass
 - Blocker: none
 - First Re-entry Action: verify hashes and Git, then read active R/F entries before edits
 </protect>
@@ -39,7 +39,7 @@ Last-Durable-Flush: 2026-08-03
 - R-003 | verified | evidence: mapped Guardian method guard and `validate --smoke`, E-0016
 - R-004 | verified | evidence: focused Guardian guard; `validate --smoke`; E-0018
 - R-005 | verified | evidence: client capability runtime/static guards; smoke/build; E-0022
-- R-006 | pending | evidence: none
+- R-006 | verified | evidence: fixed endpoint authority runtime test; smoke; E-0026
 - R-007 | pending | evidence: none
 - R-008 | pending | evidence: none
 
@@ -50,7 +50,7 @@ Last-Durable-Flush: 2026-08-03
 - F-038 | verified | evidence: `getTotalArmorValue() == 4`, no custom spawn-cap override; E-0016
 - F-039 | verified | evidence: constructor XP 20, no XP override, talk interval 500; E-0018
 - F-085 | verified | evidence: server-first live local capability bridge exposes ELDRITCHMINOR/Eldritch aspect; E-0022
-- F-087 | pending | evidence: none
+- F-087 | verified | evidence: type-1 guard precedes every mutation/completion branch; E-0026
 - F-088 | pending | evidence: none
 - F-105 | pending | evidence: none
 - F-127 | pending | evidence: reports/proposals accepted; final-diff check pending
@@ -67,7 +67,7 @@ Last-Durable-Flush: 2026-08-03
 - F-038 | checkpoints_started=1 | material_replans=0
 - F-039 | checkpoints_started=1 | material_replans=0
 - F-085 | checkpoints_started=2 | material_replans=0
-- F-087 | checkpoints_started=0 | material_replans=0
+- F-087 | checkpoints_started=2 | material_replans=0
 - F-088 | checkpoints_started=0 | material_replans=0
 - F-105 | checkpoints_started=0 | material_replans=0
 
@@ -81,13 +81,13 @@ Last-Durable-Flush: 2026-08-03
 
 ## Current Diff/Reconciliation
 
-- Git status: user-owned `SKILL.md` remains dirty; R-005 manager/test and STATE/LOG are ready to commit
-- Relevant diff summary: server-first username lookup now falls back to matching local client capability; runtime/static evidence covers research and discovered aspects
+- Git status: user-owned `SKILL.md` remains dirty; R-006 tile/test and STATE/LOG are ready to commit
+- Relevant diff summary: fixed type-1 endpoints now reject all placement payloads before mutation; focused tests preserve type-0/type-2 behavior
 - Unexpected paths/state: HEAD advanced from `6737687` to `866fea24` during the second interrupted report wave through an unrelated general-agent configuration commit.
-- Reconciliation decision: preserve user-updated `SKILL.md`; commit only R-005 manager/test/ledger paths; packet capability ownership and server persistence remain unchanged.
+- Reconciliation decision: preserve user-updated `SKILL.md`; commit only the R-006 tile/test/ledger paths; packet authentication and puzzle traversal remain unchanged.
 
 ## Queued Next Checkpoint
 
-- Outcomes/Findings: R-006 / F-087 checkpoint 1/2 after R-005 commit
-- Why it is next: next admitted server-authority finding under frozen order
-- Preconditions: R-005 commit exists and only user-owned `SKILL.md` remains dirty
+- Outcomes/Findings: R-007 / F-088 after R-006 commit
+- Why it is next: next admitted server-authority finding and one bounded checkpoint
+- Preconditions: R-006 commit exists and only user-owned `SKILL.md` remains dirty

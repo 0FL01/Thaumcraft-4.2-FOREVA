@@ -248,3 +248,48 @@ Log-Policy: append-only; correct prior entries with a new event
 - Preserve Result: Server lookup/authority stays first; full and incremental packets still own capability mutation; no packet protocol, disk, reconnect, browser, or aspect-pool behavior changed.
 - Budget: F-085 consumed 2/2 fix checkpoints and 0 material replans.
 - Next: Commit the R-005 checkpoint excluding user-owned `SKILL.md`, then start R-006/F-087 checkpoint 1/2.
+
+## E-0023 — 2026-08-03 — checkpoint_start
+
+- State-Revision: 22
+- Outcomes/Findings: R-006 / F-087, checkpoint 1/2
+- Git before/after: `65c6f9b2` / `65c6f9b2`; only user-owned `SKILL.md` dirty
+- Prior checkpoint commit: R-005/F-085 -> `65c6f9b2 fix(research): bridge client knowledge lookups`.
+- Action: Started the first of two allowed F-087 checkpoints and incremented `checkpoints_started` to 1/2.
+- Hypothesis: The live authoritative hex cell type can be rejected at the start of tile placement, before all mutation and completion paths.
+- Expected Evidence: Exact trace identifies the minimum guard and focused fixtures for fixed endpoint immutability plus normal type-0/type-2 behavior.
+- Stop/Replan: Stop if the cell type is not authoritative or enforcement requires puzzle algorithm/authentication changes.
+- Next: Inspect only the named tile, packet, completion path, and focused authority test.
+
+## E-0024 — 2026-08-03 — checkpoint_closed
+
+- State-Revision: 23
+- Outcomes/Findings: R-006 / F-087 checkpoint 1/2 -> evidence complete, finding still pending
+- Git before/after: `65c6f9b2` / no product edit; only STATE/LOG plus user-owned `SKILL.md`
+- Action: Traced authenticated dispatch through authoritative note/cell lookup, aspect pool/refund branches, mutation, ink consumption, and completion.
+- Evidence: `TileResearchTable.placeAspect` resolves `current` at lines 319-327 before every mutable branch at 328-378. Type 1 is the fixed endpoint marker; returning there preserves endpoint count, aspects, pool/bonus, ink, note metadata, and completion state. Existing tests cover type-0 placement but not fixed requests or type-2 erasure.
+- Decision: Checkpoint 2 will add only `current.type == 1` to the existing pre-mutation rejection and focused tests for both forged payload forms plus erasure preservation.
+- Budget: F-087 consumed checkpoint 1/2 and 0 material replans.
+- Next: Start checkpoint 2/2 and implement/prove the bounded guard.
+
+## E-0025 — 2026-08-03 — checkpoint_start
+
+- State-Revision: 24
+- Outcomes/Findings: R-006 / F-087, checkpoint 2/2
+- Git before/after: `65c6f9b2` / `65c6f9b2`; R-006 ledger edits and user-owned `SKILL.md` dirty
+- Action: Started the final allowed F-087 checkpoint and incremented `checkpoints_started` to 2/2.
+- Hypothesis: A single pre-mutation fixed-type guard closes both null and aspect payloads without changing any valid puzzle operation.
+- Expected Evidence: Focused authority runtime test proves fixed endpoints/count/completion/pools/ink are unchanged and existing type-0 plus new type-2 paths remain valid; smoke passes.
+- Stop/Replan: Stop if the guard does not cover both payload forms or changes ordinary placement/erasure.
+- Next: Apply the guard and focused tests, then run the frozen R-006 validation ladder.
+
+## E-0026 — 2026-08-03 — checkpoint_closed
+
+- State-Revision: 25
+- Outcomes/Findings: R-006 / F-087 -> verified
+- Git before/after: `65c6f9b2` / tile, focused test, STATE/LOG ready for commit
+- Action: Rejected `current.type == 1` immediately after authoritative coordinate/current-entry validation. Added forged non-null/null endpoint cases and a normal type-2 erasure preserve case.
+- Evidence: Focused `ResearchTableAuthorityRuntimeTest` -> BUILD SUCCESSFUL in 11s after the final realistic endpoint-aspect fixture; `./scripts/dev.sh validate --smoke` -> PASS.
+- Preserve Result: Both fixed endpoint aspects and count 2 remain unchanged; note stays incomplete/meta 0; aspect pool and ink stay unchanged. Existing type-0 placement and new type-2 erasure consume ink normally. Packet authentication, cost/refund rules, and completion traversal were untouched.
+- Budget: F-087 consumed 2/2 fix checkpoints and 0 material replans.
+- Next: Commit the R-006 checkpoint excluding user-owned `SKILL.md`, then begin R-007/F-088.

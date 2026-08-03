@@ -322,7 +322,7 @@ implements IInventory, ITickable {
             return;
         }
         ResearchManager.HexEntry current = this.data.hexEntries.get(hexKey);
-        if (current == null) {
+        if (current == null || current.type == 1) {
             return;
         }
         ResearchManager.HexEntry next;
