@@ -30,7 +30,11 @@ public class OuterProgressionEntityStaticGuardTest {
     public void crabKeepsAttachmentPlateBreakAndSpiderEyeContracts() throws IOException {
         String source = read("src/main/java/thaumcraft/common/entities/monster/EntityEldritchCrab.java");
 
-        assertTrue(source.contains("this.startRiding(target, true);")
+        assertTrue(source.contains("this.startRiding(target, true)")
+                && source.contains("new SPacketSetPassengers(vehicle)")
+                && source.contains("player.connection.sendPacket")
+                && source.contains("public void dismountRidingEntity()")
+                && source.contains("super.dismountRidingEntity();")
                 && source.contains("this.attackEntityAsMob(mount);")
                 && source.contains("this.dismountRidingEntity();"));
         assertTrue(source.contains("this.renderBrokenItemStack(new ItemStack(ConfigItems.itemChestCultistPlate));"));
@@ -38,6 +42,23 @@ public class OuterProgressionEntityStaticGuardTest {
         assertTrue(source.contains("this.dropItem(Items.SPIDER_EYE, 1);")
                 && source.contains("return EnumCreatureAttribute.ARTHROPOD;")
                 && source.contains("effect.getPotion() != MobEffects.POISON"));
+    }
+
+    @Test
+    public void crabPersistsAcrossServerStopAndRestoresAfterPlayerLoad() throws IOException {
+        String crab = read("src/main/java/thaumcraft/common/entities/monster/EntityEldritchCrab.java");
+        String mod = read("src/main/java/thaumcraft/common/Thaumcraft.java");
+        String events = read("src/main/java/thaumcraft/common/lib/events/EventHandlerEntity.java");
+
+        assertTrue(mod.contains("public void serverStopping(FMLServerStoppingEvent event)")
+                && mod.contains("EntityEldritchCrab.preserveAttachedCrabs("));
+        assertTrue(events.contains("EntityEldritchCrab.restoreAttachedCrab((EntityPlayerMP) living);"));
+        assertTrue(crab.contains("crab.writeToNBT(new NBTTagCompound())")
+                && crab.contains("player.hasDisconnected() && server != null && server.isSinglePlayer()")
+                && crab.contains("EntityPlayer.PERSISTED_NBT_TAG")
+                && crab.contains("new EntityEldritchCrab(player.world)")
+                && crab.contains("player.world.spawnEntity(crab)")
+                && crab.contains("crab.attachTo(player)"));
     }
 
     @Test

@@ -15,6 +15,7 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.fml.client.event.ConfigChangedEvent;
+import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.SidedProxy;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
@@ -22,6 +23,7 @@ import net.minecraftforge.fml.common.event.FMLInterModComms;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
+import net.minecraftforge.fml.common.event.FMLServerStoppingEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraft.world.gen.structure.MapGenStructureIO;
@@ -44,6 +46,7 @@ import thaumcraft.common.config.ConfigEntities;
 import thaumcraft.common.config.ConfigItems;
 import thaumcraft.common.config.ConfigRecipes;
 import thaumcraft.common.config.research.ConfigResearch;
+import thaumcraft.common.entities.monster.EntityEldritchCrab;
 import thaumcraft.common.lib.InternalMethodHandler;
 import thaumcraft.common.lib.capabilities.IPlayerKnowledge;
 import thaumcraft.common.lib.capabilities.PlayerKnowledgeProvider;
@@ -210,6 +213,12 @@ public class Thaumcraft {
     @Mod.EventHandler
     public void serverLoad(FMLServerStartingEvent event) {
         event.registerServerCommand(new CommandThaumcraft());
+    }
+
+    @Mod.EventHandler
+    public void serverStopping(FMLServerStoppingEvent event) {
+        EntityEldritchCrab.preserveAttachedCrabs(
+                FMLCommonHandler.instance().getMinecraftServerInstance());
     }
 
     @Mod.EventHandler

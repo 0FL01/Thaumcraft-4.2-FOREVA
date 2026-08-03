@@ -80,6 +80,7 @@ import thaumcraft.common.entities.EntityAspectOrb;
 import thaumcraft.common.entities.golems.EntityGolemBase;
 import thaumcraft.common.entities.golems.EntityTravelingTrunk;
 import thaumcraft.common.entities.monster.EntityBrainyZombie;
+import thaumcraft.common.entities.monster.EntityEldritchCrab;
 import thaumcraft.common.entities.monster.EntityTaintChicken;
 import thaumcraft.common.entities.monster.EntityTaintCow;
 import thaumcraft.common.entities.monster.EntityTaintCreeper;
@@ -322,6 +323,10 @@ public class EventHandlerEntity {
         }
         if (living.world.isRemote) {
             return;
+        }
+
+        if (living instanceof EntityPlayerMP) {
+            EntityEldritchCrab.restoreAttachedCrab((EntityPlayerMP) living);
         }
 
         if (living instanceof EntityPlayer) {

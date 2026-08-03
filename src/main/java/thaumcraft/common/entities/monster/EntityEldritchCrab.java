@@ -6,17 +6,25 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.EnumCreatureAttribute;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.*;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Items;
 import net.minecraft.init.MobEffects;
 import net.minecraft.item.ItemStack;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.network.play.server.SPacketSetPassengers;
 import net.minecraft.potion.PotionEffect;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.EnumDifficulty;
+import net.minecraft.world.WorldServer;
 import thaumcraft.common.config.ConfigItems;
 import thaumcraft.common.entities.ai.combat.AIAttackOnCollide;
 
 public class EntityEldritchCrab extends net.minecraft.entity.monster.EntityMob {
+    static final String ATTACHED_CRAB_TAG = "ThaumcraftAttachedEldritchCrab";
+    private static final String SNAPSHOT_ENTITY_TAG = "Entity";
+    private static final String SNAPSHOT_ATTACK_TIME_TAG = "AttackTime";
     private static final net.minecraft.network.datasync.DataParameter<Byte> HELM = 
         net.minecraft.network.datasync.EntityDataManager.createKey(EntityEldritchCrab.class, net.minecraft.network.datasync.DataSerializers.BYTE);
     private int ridingAttackTime;
@@ -79,11 +87,11 @@ public class EntityEldritchCrab extends net.minecraft.entity.monster.EntityMob {
         if (this.ridingAttackTime > 0) --this.ridingAttackTime;
         if (this.ticksExisted < 20) this.fallDistance = 0.0F;
         EntityLivingBase target = this.getAttackTarget();
-        if (!this.isRiding() && target != null && !target.isBeingRidden() && !this.onGround
+        if (!this.world.isRemote && !this.isRiding() && target != null && !target.isBeingRidden() && !this.onGround
                 && !this.hasHelm() && !target.isDead
                 && this.posY - target.posY >= target.height / 2.0F
                 && this.getDistanceSq(target) < 4.0D) {
-            this.startRiding(target, true);
+            this.attachTo(target);
         }
         if (!this.world.isRemote && this.isRiding() && this.ridingAttackTime <= 0) {
             this.ridingAttackTime = 10 + this.rand.nextInt(10);
@@ -92,6 +100,137 @@ public class EntityEldritchCrab extends net.minecraft.entity.monster.EntityMob {
                 this.attackEntityAsMob(mount);
                 if (this.rand.nextFloat() < 0.2F) this.dismountRidingEntity();
             }
+        }
+    }
+
+    private boolean attachTo(EntityLivingBase target) {
+        if (this.world.isRemote || !this.startRiding(target, true)) {
+            return false;
+        }
+        // The vehicle's tracker does not send its passenger list to the tracked player itself.
+        this.syncPassengerState(target);
+        return true;
+    }
+
+    @Override
+    public void dismountRidingEntity() {
+        Entity vehicle = this.getRidingEntity();
+        if (!this.world.isRemote && vehicle instanceof EntityPlayerMP) {
+            EntityPlayerMP player = (EntityPlayerMP) vehicle;
+            MinecraftServer server = player.getServer();
+            // Integrated-server disconnect removes passengers before saving and stopping.
+            if (player.hasDisconnected() && server != null && server.isSinglePlayer()) {
+                preserveAttachedCrab(player);
+            }
+        }
+        super.dismountRidingEntity();
+        if (vehicle != null && this.getRidingEntity() == null) {
+            this.syncPassengerState(vehicle);
+        }
+    }
+
+    private void syncPassengerState(Entity vehicle) {
+        if (!this.world.isRemote && vehicle instanceof EntityPlayerMP) {
+            EntityPlayerMP player = (EntityPlayerMP) vehicle;
+            if (player.connection != null) {
+                player.connection.sendPacket(new SPacketSetPassengers(vehicle));
+            }
+        }
+    }
+
+    // Player NBT writes passengers, but the player load path does not recreate them.
+    public static void preserveAttachedCrabs(MinecraftServer server) {
+        if (server == null || server.getPlayerList() == null) {
+            return;
+        }
+        for (EntityPlayerMP player : server.getPlayerList().getPlayers()) {
+            preserveAttachedCrab(player);
+        }
+    }
+
+    static void preserveAttachedCrab(EntityPlayer player) {
+        for (Entity passenger : player.getPassengers()) {
+            if (passenger instanceof EntityEldritchCrab && !passenger.isDead) {
+                getPersistedPlayerData(player).setTag(ATTACHED_CRAB_TAG,
+                        createAttachedCrabSnapshot((EntityEldritchCrab) passenger));
+                return;
+            }
+        }
+    }
+
+    private static NBTTagCompound getPersistedPlayerData(EntityPlayer player) {
+        NBTTagCompound entityData = player.getEntityData();
+        if (!entityData.hasKey(EntityPlayer.PERSISTED_NBT_TAG, 10)) {
+            entityData.setTag(EntityPlayer.PERSISTED_NBT_TAG, new NBTTagCompound());
+        }
+        return entityData.getCompoundTag(EntityPlayer.PERSISTED_NBT_TAG);
+    }
+
+    static NBTTagCompound createAttachedCrabSnapshot(EntityEldritchCrab crab) {
+        NBTTagCompound snapshot = new NBTTagCompound();
+        snapshot.setTag(SNAPSHOT_ENTITY_TAG, crab.writeToNBT(new NBTTagCompound()));
+        snapshot.setInteger(SNAPSHOT_ATTACK_TIME_TAG, crab.ridingAttackTime);
+        return snapshot;
+    }
+
+    static EntityEldritchCrab loadAttachedCrabSnapshot(EntityPlayer player) {
+        NBTTagCompound snapshot = getPersistedPlayerData(player).getCompoundTag(ATTACHED_CRAB_TAG);
+        if (!snapshot.hasKey(SNAPSHOT_ENTITY_TAG, 10)) {
+            return null;
+        }
+        EntityEldritchCrab crab = new EntityEldritchCrab(player.world);
+        crab.readFromNBT(snapshot.getCompoundTag(SNAPSHOT_ENTITY_TAG));
+        crab.ridingAttackTime = Math.max(0, snapshot.getInteger(SNAPSHOT_ATTACK_TIME_TAG));
+        return crab;
+    }
+
+    public static void restoreAttachedCrab(EntityPlayerMP player) {
+        if (!player.getEntityData().hasKey(EntityPlayer.PERSISTED_NBT_TAG, 10)) {
+            return;
+        }
+        NBTTagCompound playerData = getPersistedPlayerData(player);
+        if (!playerData.hasKey(ATTACHED_CRAB_TAG, 10)) {
+            return;
+        }
+
+        EntityEldritchCrab restored = loadAttachedCrabSnapshot(player);
+        if (restored == null) {
+            playerData.removeTag(ATTACHED_CRAB_TAG);
+            return;
+        }
+        if (player.isBeingRidden()) {
+            for (Entity passenger : player.getPassengers()) {
+                if (passenger instanceof EntityEldritchCrab
+                        && passenger.getUniqueID().equals(restored.getUniqueID())) {
+                    playerData.removeTag(ATTACHED_CRAB_TAG);
+                    return;
+                }
+            }
+            return;
+        }
+
+        EntityEldritchCrab crab = restored;
+        if (player.world instanceof WorldServer) {
+            Entity existing = ((WorldServer) player.world).getEntityFromUuid(restored.getUniqueID());
+            if (existing != null) {
+                if (!(existing instanceof EntityEldritchCrab) || existing.isRiding()) {
+                    playerData.removeTag(ATTACHED_CRAB_TAG);
+                    return;
+                }
+                crab = (EntityEldritchCrab) existing;
+                crab.ridingAttackTime = restored.ridingAttackTime;
+            }
+        }
+
+        if (crab == restored) {
+            crab.setPosition(player.posX, player.posY, player.posZ);
+            if (!player.world.spawnEntity(crab)) {
+                return;
+            }
+        }
+
+        if (crab.attachTo(player)) {
+            playerData.removeTag(ATTACHED_CRAB_TAG);
         }
     }
 
