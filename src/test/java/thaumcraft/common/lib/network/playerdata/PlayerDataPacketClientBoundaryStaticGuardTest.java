@@ -67,6 +67,22 @@ public class PlayerDataPacketClientBoundaryStaticGuardTest {
         assertFalse(clientProxy.contains("String localized = net.minecraft.client.resources.I18n.format(key);"));
     }
 
+    @Test
+    public void usernameApisShouldReadTheSynchronizedLocalClientCapability() throws IOException {
+        String manager = readFile("src/main/java/thaumcraft/common/lib/research/ResearchManager.java");
+        String researchSync = readFile("src/main/java/thaumcraft/common/lib/network/playerdata/PacketSyncResearch.java");
+        String aspectSync = readFile("src/main/java/thaumcraft/common/lib/network/playerdata/PacketSyncAspects.java");
+
+        int serverLookup = manager.indexOf("EntityPlayer player = findPlayer(username);");
+        int clientLookup = manager.indexOf("IPlayerKnowledge clientKnowledge = getClientResearchData(key);");
+        assertTrue(serverLookup >= 0 && clientLookup > serverLookup);
+        assertTrue(manager.contains("!normalizedUsername.equals(normalizeUsername(clientPlayer.getName()))"));
+        assertTrue(manager.contains("return clientPlayer.getCapability(PlayerKnowledgeProvider.PLAYER_KNOWLEDGE, null);"));
+        assertTrue(researchSync.contains("knowledge.getResearchComplete().clear();"));
+        assertTrue(researchSync.contains("knowledge.addResearch(key);"));
+        assertTrue(aspectSync.contains("knowledge.setAspectsDiscovered(aspects);"));
+    }
+
     private static String readFile(String path) throws IOException {
         return new String(Files.readAllBytes(Paths.get(path)), StandardCharsets.UTF_8);
     }

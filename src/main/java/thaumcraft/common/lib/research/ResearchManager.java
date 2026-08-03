@@ -200,7 +200,7 @@ public class ResearchManager {
     }
 
     /**
-     * Get online player capability data by username, falling back to the local server cache.
+     * Get live server/client capability data by username, falling back to the local server cache.
      */
     public static IPlayerKnowledge getResearchData(String username) {
         String key = normalizeUsername(username);
@@ -215,6 +215,9 @@ public class ResearchManager {
             }
         }
 
+        IPlayerKnowledge clientKnowledge = getClientResearchData(key);
+        if (clientKnowledge != null) return clientKnowledge;
+
         IPlayerKnowledge cached = playerDataCache.get(key);
         if (cached != null) return cached;
 
@@ -223,6 +226,14 @@ public class ResearchManager {
             playerDataCache.put(key, cached);
         }
         return cached;
+    }
+
+    static IPlayerKnowledge getClientResearchData(String normalizedUsername) {
+        EntityPlayer clientPlayer = Thaumcraft.proxy == null ? null : Thaumcraft.proxy.getClientPlayer();
+        if (clientPlayer == null || !normalizedUsername.equals(normalizeUsername(clientPlayer.getName()))) {
+            return null;
+        }
+        return clientPlayer.getCapability(PlayerKnowledgeProvider.PLAYER_KNOWLEDGE, null);
     }
 
     /**

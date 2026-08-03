@@ -29,6 +29,8 @@ import thaumcraft.api.aspects.AspectList;
 import thaumcraft.api.research.ResearchCategories;
 import thaumcraft.api.research.ResearchCategoryList;
 import thaumcraft.api.research.ResearchItem;
+import thaumcraft.common.CommonProxy;
+import thaumcraft.common.Thaumcraft;
 import thaumcraft.common.config.ConfigItems;
 import thaumcraft.common.config.Config;
 import thaumcraft.common.items.ItemResearchNotes;
@@ -124,6 +126,31 @@ public class ResearchClueAndNotesRuntimeTest {
         player.knowledge().addResearch("STALE_ELDRITCH_KEY");
 
         assertFalse(ResearchManager.isResearchComplete(player, "STALE_ELDRITCH_KEY"));
+    }
+
+    @Test
+    public void usernameApisReadSynchronizedClientCapability() {
+        registerResearch(new ResearchItem("ELDRITCHMINOR", "TEST", new AspectList(), 0, 0, 1, new ItemStack(Items.BOOK)));
+        TestWorld world = new TestWorld();
+        TestPlayer player = new TestPlayer(world, "remote_client");
+        player.knowledge().addResearch("ELDRITCHMINOR");
+        player.knowledge().setAspectsDiscovered(new AspectList().add(Aspect.ELDRITCH, 1));
+        CommonProxy oldProxy = Thaumcraft.proxy;
+
+        try {
+            Thaumcraft.proxy = new CommonProxy() {
+                @Override
+                public EntityPlayer getClientPlayer() {
+                    return player;
+                }
+            };
+
+            assertTrue(ResearchManager.getClientResearchData(player.getName()).isResearchComplete("ELDRITCHMINOR"));
+            assertTrue(ResearchManager.getClientResearchData(player.getName()).hasDiscoveredAspect(Aspect.ELDRITCH));
+            assertEquals(null, ResearchManager.getClientResearchData("another_player"));
+        } finally {
+            Thaumcraft.proxy = oldProxy;
+        }
     }
 
     @Test

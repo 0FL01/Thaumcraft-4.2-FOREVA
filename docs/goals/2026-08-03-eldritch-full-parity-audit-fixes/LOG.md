@@ -203,3 +203,48 @@ Log-Policy: append-only; correct prior entries with a new event
 - Preserve Result: Guardian ambient/hurt/death sound and drop methods were unchanged; R-003 armor method remains guarded.
 - Budget: F-039 consumed 1/1 fix checkpoint and 0 material replans.
 - Next: Commit the R-004 checkpoint excluding user-owned `SKILL.md`, then begin R-005/F-085 checkpoint 1/2.
+
+## E-0019 — 2026-08-03 — checkpoint_start
+
+- State-Revision: 18
+- Outcomes/Findings: R-005 / F-085, checkpoint 1/2
+- Git before/after: `c6bf4c78` / `c6bf4c78`; only user-owned `SKILL.md` dirty
+- Prior checkpoint commit: R-004/F-039 -> `c6bf4c78 fix(entities): restore Guardian XP cadence`.
+- Action: Started the first of two allowed F-085 fix checkpoints and incremented `checkpoints_started` to 1/2.
+- Hypothesis: Client sync packets can mirror their authoritative capability payload into the existing process-local username cache, making shipped username readers coherent without changing server ownership.
+- Expected Evidence: Exact lifecycle trace identifies the cache bridge and a focused client-boundary test that fails before the bridge and passes afterward.
+- Stop/Replan: Stop if implementation would require server persistence, reconnect, browser rendering, or unrelated cache redesign.
+- Next: Inspect only the named manager, packet handlers, and focused test surfaces.
+
+## E-0020 — 2026-08-03 — checkpoint_closed
+
+- State-Revision: 19
+- Outcomes/Findings: R-005 / F-085 checkpoint 1/2 -> evidence complete, finding still pending
+- Git before/after: `c6bf4c78` / no product edit; only STATE/LOG plus user-owned `SKILL.md`
+- Action: Traced username lookup, process cache, local proxy boundary, full research/aspect packets, incremental research packet, and focused test fixtures.
+- Evidence: `getResearchData(String)` checks an online server player first; `CommonProxy.getClientPlayer()` is null server-side and `ClientProxy` supplies the local synchronized player; packets already mutate that capability. Mirroring only full packets into a cache would remain stale after incremental updates, while a username-matched live fallback is coherent.
+- Decision: Checkpoint 2 will add the live local-client fallback after the server lookup and before stale cache/disk fallback. No packet mutation or browser/persistence change is needed.
+- Budget: F-085 consumed checkpoint 1/2 and 0 material replans; this checkpoint produced concrete evidence that materially narrows the implementation.
+- Next: Start checkpoint 2/2 and implement/prove only the bounded manager bridge.
+
+## E-0021 — 2026-08-03 — checkpoint_start
+
+- State-Revision: 20
+- Outcomes/Findings: R-005 / F-085, checkpoint 2/2
+- Git before/after: `c6bf4c78` / `c6bf4c78`; R-005 ledger edits and user-owned `SKILL.md` dirty
+- Action: Started the final allowed F-085 checkpoint and incremented `checkpoints_started` to 2/2.
+- Hypothesis: Server-first lookup followed by a username-matched proxy-local capability fallback makes all current client packet mutations visible to legacy username APIs without any duplicate state.
+- Expected Evidence: Focused runtime test reads synchronized `ELDRITCHMINOR` and Eldritch aspect through username APIs; static boundary test locks server-first and proxy matching; mandatory smoke/build pass.
+- Stop/Replan: Stop if the fallback shadows server state, accepts another username, or requires a third checkpoint.
+- Next: Apply the bounded manager/test change and run the frozen R-005 validation ladder.
+
+## E-0022 — 2026-08-03 — checkpoint_closed
+
+- State-Revision: 21
+- Outcomes/Findings: R-005 / F-085 -> verified
+- Git before/after: `c6bf4c78` / manager, two focused tests, STATE/LOG ready for commit
+- Action: Kept online-server lookup first, then returned a capability only for the proxy-local player whose normalized username matches; stale cache/disk fallback remains last. Added runtime proof for synchronized `ELDRITCHMINOR` plus Eldritch aspect and static proof that full packets populate the same capability.
+- Evidence: Initial runtime attempt failed because the bare Forge test harness cannot call `FMLCommonHandler.getMinecraftServerInstance`; implementation was unchanged and the test was narrowed to the package-local client bridge while static evidence locks its position after server lookup. Revised frozen three-test command -> BUILD SUCCESSFUL in 10s; `./scripts/dev.sh validate --smoke` -> PASS; `./scripts/dev.sh build` -> BUILD SUCCESSFUL in 20s.
+- Preserve Result: Server lookup/authority stays first; full and incremental packets still own capability mutation; no packet protocol, disk, reconnect, browser, or aspect-pool behavior changed.
+- Budget: F-085 consumed 2/2 fix checkpoints and 0 material replans.
+- Next: Commit the R-005 checkpoint excluding user-owned `SKILL.md`, then start R-006/F-087 checkpoint 1/2.
