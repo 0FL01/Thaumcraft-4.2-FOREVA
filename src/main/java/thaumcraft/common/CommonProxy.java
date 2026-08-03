@@ -169,6 +169,9 @@ public class CommonProxy implements IGuiHandler {
     public void notifyThaumometerAspectPool(@Nullable Aspect aspect, int amount) {
     }
 
+    public void notifyResearchComplete(String researchKey) {
+    }
+
     @Nullable
     public EntityPlayer getClientPlayer() {
         return null;

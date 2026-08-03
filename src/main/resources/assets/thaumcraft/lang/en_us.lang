@@ -833,6 +833,7 @@ tc.research.getprim=Click to get a research note for this research
 tc.research.shortprim=You need scribing tools and paper to get this research note
 tc.research.hasnote=You already have this research note in your inventory
 tc.research.popup=Research note added to your inventory for %1$s
+tc.addclue=You have discovered a clue to new research!
 tc.research.copy=Cost to copy this research:
 tc.forbidden=§l§5Forbidden knowledge (%n)§0
 tc.forbidden.level.1=Mostly Harmless

@@ -45,6 +45,7 @@ public class PacketResearchComplete extends PacketBase {
                 if (knowledge != null) {
                     knowledge.addResearch(researchKey);
                 }
+                Thaumcraft.proxy.notifyResearchComplete(researchKey);
             }
         });
         return null;

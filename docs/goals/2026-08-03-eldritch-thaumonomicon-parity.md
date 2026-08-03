@@ -21,7 +21,7 @@ Complete the frozen Required Outcomes using the listed Change Envelope and Prima
   - Acceptance: All supported `researchDifficulty` values choose the same purchase/note path as the TC4 GUI/server contract; clue and normal completion restore their original client feedback; matching and persisted completion membership no longer retain the audited TC4-incompatible states.
   - Primary evidence: Focused `PacketPlayerComplete*`, `ResearchManager*`, and client notification tests pass for difficulties `-1`, `0`, and positive values, followed by `./scripts/dev.sh validate --smoke` for the checkpoint.
   - Status: in_progress
-  - Evidence: Difficulty-aware packet workflow is implemented and covered for `-1`, `0`, and positive values; focused tests and `./scripts/dev.sh validate --smoke` passed on 2026-08-03. Client feedback, matching, and persisted membership remain.
+  - Evidence: Difficulty-aware packet workflow is covered for `-1`, `0`, and positive values. Incremental packets now restore clue notification/sound, non-virtual completion popup/highlights, and live browser refresh. Focused tests, checkpoint smoke, and the client-feedback build passed on 2026-08-03. Matching and persisted membership remain.
 
 - R2: Restore Primal Focus and Primal Orb behavior.
   - Source: RECON findings for `FocusPrimal` and `EntityPrimalOrb`.
@@ -116,16 +116,16 @@ Complete the frozen Required Outcomes using the listed Change Envelope and Prima
 ## Current Checkpoint
 
 - Closes: R1.
-- Smallest next action: Restore `PacketResearchComplete` clue notification/sound, non-virtual research popup/highlights, and live browser cache refresh through the existing client notification/render surfaces.
-- Expected evidence: Focused client static/runtime guards prove the TC4 packet branches and popup queue/render routing; affected tests and build pass.
-- Stop or replan if: Restoring feedback requires a packet id or wire-format change rather than consuming the existing research key.
+- Smallest next action: Parenthesize `findMatchingResearch` exactly like the TC4 binary and filter unknown, auto-unlock, and redundant clue entries at capability query/serialization boundaries.
+- Expected evidence: Focused matching tests cover difficulty `-1`, and capability round-trip tests prove the TC4 persistence filters while preserving valid clue and research keys.
+- Stop or replan if: Filtering would discard a registered non-auto research or an unresolved valid `@KEY` clue.
 
 ## Current State
 
-- Resolved: RECON and fan-out comparison are complete. Research graph, recipes, research English text, and directly referenced PNG assets are exact. The server now accepts only the effective GUI workflow for each research difficulty without deadlocking valid primary or secondary research.
-- Last relevant evidence: Focused packet tests and `./scripts/dev.sh validate --smoke` passed on 2026-08-03 after the difficulty workflow correction.
+- Resolved: RECON and fan-out comparison are complete. Research graph, recipes, research English text, and directly referenced PNG assets are exact. Difficulty workflows and incremental research/clue feedback are restored.
+- Last relevant evidence: The research completion feedback guard and packet client-boundary guard passed, followed by `./scripts/dev.sh build`, on 2026-08-03.
 - Blocker: None.
-- Next: Commit the difficulty workflow checkpoint, then restore incremental completion feedback.
+- Next: Commit the completion feedback checkpoint, then close R1 matching and persistence semantics.
 
 ## Material Decisions
 
@@ -138,6 +138,7 @@ Complete the frozen Required Outcomes using the listed Change Envelope and Prima
 
 - 2026-08-03: SEARCH PROBE located the Forge 1.12.2 port and TC4 4.2.3.5 binary/resource baseline. Nine atomic audits completed with no workspace edits and produced the frozen R1-R9 scope.
 - 2026-08-03: R1 difficulty workflow checkpoint passed focused packet tests and `./scripts/dev.sh validate --smoke`; valid `-1`, `0`, and positive difficulty paths now follow the same effective workflow as `GuiResearchBrowser`.
+- 2026-08-03: R1 feedback checkpoint restored the TC4 clue notification/sound, queued research-complete overlay, Thaumonomicon highlights, and live browser refresh. Focused guards and `./scripts/dev.sh build` passed; manual in-game overlay inspection remains part of final client limitations rather than a semantic blocker.
 
 ## Completion
 

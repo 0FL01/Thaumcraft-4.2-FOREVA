@@ -18,9 +18,11 @@ import thaumcraft.common.config.Config;
 import thaumcraft.common.items.wands.ItemWandCasting;
 import thaumcraft.common.lib.events.EssentiaHandler;
 import thaumcraft.common.tiles.TileInfusionMatrix;
+import thaumcraft.client.gui.GuiResearchPopup;
 
 @SideOnly(Side.CLIENT)
 public class ClientTickEventsFML {
+    public static GuiResearchPopup researchPopup;
     public static int warpVignette = 0;
     private static final int SHADER_DESAT = 0;
     private static final int SHADER_BLUR = 1;
@@ -225,5 +227,16 @@ public class ClientTickEventsFML {
 
     @SubscribeEvent
     public void renderTick(TickEvent.RenderTickEvent event) {
+        if (event.side != Side.CLIENT || event.phase != TickEvent.Phase.END) {
+            return;
+        }
+        Minecraft mc = Minecraft.getMinecraft();
+        if (mc.player == null || mc.world == null) {
+            return;
+        }
+        if (researchPopup == null) {
+            researchPopup = new GuiResearchPopup(mc);
+        }
+        researchPopup.updateResearchWindow();
     }
 }

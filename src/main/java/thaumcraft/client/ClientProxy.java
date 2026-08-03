@@ -50,6 +50,8 @@ import net.minecraftforge.fml.client.registry.RenderingRegistry;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import org.lwjgl.opengl.GL11;
 import thaumcraft.api.aspects.Aspect;
+import thaumcraft.api.research.ResearchCategories;
+import thaumcraft.api.research.ResearchItem;
 import thaumcraft.client.gui.GuiArcaneBore;
 import thaumcraft.client.gui.GuiArcaneWorkbench;
 import thaumcraft.client.gui.GuiAlchemyFurnace;
@@ -62,6 +64,7 @@ import thaumcraft.client.gui.GuiHoverHarness;
 import thaumcraft.client.gui.GuiMagicBox;
 import thaumcraft.client.gui.GuiPech;
 import thaumcraft.client.gui.GuiResearchBrowser;
+import thaumcraft.client.gui.GuiResearchPopup;
 import thaumcraft.client.gui.GuiResearchTable;
 import thaumcraft.client.gui.GuiSpa;
 import thaumcraft.client.gui.GuiThaumatorium;
@@ -1286,6 +1289,38 @@ public class ClientProxy extends CommonProxy {
         PlayerNotifications.addNotification(text, aspect);
         for (int a = 0; a < amount; ++a) {
             PlayerNotifications.addAspectNotification(aspect);
+        }
+    }
+
+    @Override
+    public void notifyResearchComplete(String researchKey) {
+        Minecraft mc = Minecraft.getMinecraft();
+        EntityPlayer player = mc.player;
+        if (player == null || researchKey == null || researchKey.isEmpty()) {
+            return;
+        }
+        if (researchKey.startsWith("@")) {
+            PlayerNotifications.addNotification("\u00a7a" + localizeOrFallback(
+                    "tc.addclue", "You have discovered a clue to new research!"));
+            player.playSound(TCSounds.LEARN, 0.2F, 1.0F + player.world.rand.nextFloat() * 0.1F);
+        } else {
+            ResearchItem research = ResearchCategories.getResearch(researchKey);
+            if (research != null && !research.isVirtual()) {
+                if (ClientTickEventsFML.researchPopup == null) {
+                    ClientTickEventsFML.researchPopup = new GuiResearchPopup(mc);
+                }
+                ClientTickEventsFML.researchPopup.queueResearchInformation(research);
+                if (!GuiResearchBrowser.highlightedItem.contains(researchKey)) {
+                    GuiResearchBrowser.highlightedItem.add(researchKey);
+                }
+                if (!GuiResearchBrowser.highlightedItem.contains(research.category)) {
+                    GuiResearchBrowser.highlightedItem.add(research.category);
+                }
+            }
+        }
+        GuiResearchBrowser.syncClientKnowledgeCache(player);
+        if (mc.currentScreen instanceof GuiResearchBrowser) {
+            ((GuiResearchBrowser) mc.currentScreen).updateResearch();
         }
     }
 
