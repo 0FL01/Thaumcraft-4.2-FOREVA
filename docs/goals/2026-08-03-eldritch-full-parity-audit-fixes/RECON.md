@@ -1,0 +1,3475 @@
+# RECON Ledger: Full Eldritch parity audit fixes
+
+Goal-ID: goal-20260803-eldritch-full-parity-audit-fixes
+Recon-Version: 2.1
+Recon-Status: frozen
+Last-Updated: 2026-08-03
+Audit-Promotion-Policy: production_gate
+Budget-Authority: S-009
+Audit-Assignments-Cap: 29
+Audit-Waves-Cap: 3
+Audit-Waves-Used: 3
+Candidate-Reproduction-Cap-Per-Finding: 1
+Required-Findings-Cap: 8
+Total-Fix-Checkpoints-Cap: 12
+Scope-Amendments-Cap: 0
+## Audit Charter
+
+- Objective: Produce a durable, atomic parity ledger for the complete TC4 Thaumonomicon `ELDRITCH` surface, apply the v2.1 Production Admission Gate, and implement the eight priority findings admitted by S-009 inside ten frozen checkpoints.
+- Target surface: The 16 `ELDRITCH` researches; their 24 recipe handles; localization and research art; directly unlocked items, blocks, tiles, entities, Outer Lands world/runtime, aspects/scans, progression consumers; and shared research, note, persistence, networking, browser, page-rendering, crafting-visibility, localization-loader, and scan-engine behavior that changes those researches.
+- Oracle and comparison direction: S-003/S-004 Thaumcraft 4.2.3.5 behavior and resources -> S-005 Forge 1.12.2 port. S-007 may explain 1.12 client adaptations but cannot override TC4 gameplay.
+- Anti-scope: `.thaum` and `DIM-42` migration pending separate support decision; non-Eldritch categories except directly required shared infrastructure; translation expansion beyond shipped English; dependency/platform upgrades; broad refactors; unsafe TC4 implementation details; dynamic JEI wrappers, `doLimitedCrafting` policy, alternate `#` scan route, and addon-only scan derivation deltas.
+- Platform adaptations to preserve: server-authoritative mutation, main-thread packet scheduling, synchronous maze generation/publication, safe portal arrival, finite-fluid level translation, namespaced 1.12 registries, capability architecture, null/empty-stack safety, explicit block/tile synchronization, Forge slots/state/packet APIs, and safe dead-projectile return unless a finding below states otherwise.
+- Required gates: Per-finding focused regression evidence; affected test package; `./scripts/dev.sh validate --smoke` for common/server checkpoints; `./scripts/dev.sh build` at closure; manual client matrix where source evidence cannot prove visual behavior.
+- Stop conditions: all 29 assignments terminal and all material claims represented; any new scope-changing migration decision; or two checkpoints fail to close a finding or materially change the next action.
+
+## Production Relevance Envelope
+
+- Supported versions/configurations: Forge 1.12.2-14.23.5.2847, MCP stable_39, Java 8, current repository defaults, integrated and dedicated client/server, fresh/current-format Forge worlds; TC4 4.2.3.5 is the finite parity oracle.
+- Supported entry points/data/lifecycle: the 16 Eldritch researches and their ordinary unlock, recipe, item/block/tile/entity, Outer Lands, scan, note, packet, browser, page and renderer paths exercised by shipped registrations and current-format saves.
+- Production invariants: server-authoritative progression/mutation, main-thread packet work, current namespaced registries/capabilities, exact registered recipes/metas, and only shipped/default reachable content unless a report proves a supported addon/API contract.
+- Explicitly excluded/unreachable paths: TC4 `.thaum`/`DIM-42` migration pending separate decision; non-English expansion; dependency upgrades; dynamic JEI policy; `doLimitedCrafting` policy; native-unreachable alternate `#` scan route; addon-only late derivation; synthetic-only or speculative hardening.
+- Concrete impact threshold: deterministic wrong progression, recipe/output, item stats, world/entity behavior, server authority, data integrity, or visibly incorrect shipped Eldritch UI/rendering on a supported path; parity-only chronology or unreachable/addon-only differences do not pass by themselves.
+- Critical-risk exception policy: only concrete exploitable authority bypass or irreversible supported-save corruption established by direct evidence; no generic hardening exception.
+
+## Audit Coverage
+
+- A-001 | status: complete | report: reports/A-001-category-root-outer-declarations.md | scope: Category, roots, Oculus, Enter Outer, Outer Revelation declarations.
+- A-002 | status: complete | report: reports/A-002-primordial-declarations.md | scope: Primordial Pearl/Node, Primal Focus/Staff declarations.
+- A-003 | status: complete | report: reports/A-003-void-device-declarations.md | scope: Void, devices, Crusher, Sanity declarations.
+- A-004 | status: complete | report: reports/A-004-eldritch-localization.md | scope: English category/research localization corpus.
+- A-005 | status: complete | report: reports/A-005-research-art.md | scope: Nine research-only PNG assets and references.
+- A-006 | status: complete | report: reports/A-006-void-recipes.md | scope: Sixteen Void recipe definitions/handles.
+- A-007 | status: complete | report: reports/A-007-primal-oculus-recipes.md | scope: Focus, staff, Crusher, Eye recipes.
+- A-008 | status: complete | report: reports/A-008-device-recipes.md | scope: Advanced furnace, reservoir, sanity recipes/pages.
+- A-009 | status: complete | report: reports/A-009-registries-materials.md | scope: Eldritch item/block/tile/entity registry and material surface.
+- A-010 | status: complete | report: reports/A-010-progression-consumers.md | scope: Direct research unlock/gate/clue/trigger consumers.
+- A-011 | status: complete | report: reports/A-011-primal-runtime.md | scope: Primal focus/orb/rod/Crusher runtime.
+- A-012 | status: complete | report: reports/A-012-void-equipment-runtime.md | scope: Void tools, armor, robes, dyes, cap runtime.
+- A-013 | status: complete | report: reports/A-013-advanced-furnace-runtime.md | scope: Advanced furnace block/tile/container/GUI runtime.
+- A-014 | status: complete | report: reports/A-014-reservoir-runtime.md | scope: Essentia Reservoir runtime.
+- A-015 | status: complete | report: reports/A-015-sanity-checker-runtime.md | scope: Sanity Checker item/HUD runtime.
+- A-016 | status: complete | report: reports/A-016-outer-world-runtime.md | scope: Outer terrain, structures, teleport, Eldritch blocks/tiles.
+- A-017 | status: complete | report: reports/A-017-outer-entities-drops.md | scope: Eldritch mobs, bosses, projectiles, special drops.
+- A-018 | status: complete | report: reports/A-018-aspects-scans-data.md | scope: Eldritch-specific aspect/scan data.
+- A-019 | status: complete | report: reports/A-019-client-visuals.md | scope: Eldritch/Primal/Void/device client visuals except A-005.
+- A-020 | status: complete | report: reports/A-020-research-schema.md | scope: ResearchItem/Page/Categories schema semantics.
+- A-021 | status: complete | report: reports/A-021-research-gating.md | scope: Research prerequisites, discovery, clues, trigger matching.
+- A-022 | status: complete | report: reports/A-022-research-notes.md | scope: Note generation, solving, table interactions.
+- A-023 | status: complete | report: reports/A-023-knowledge-persistence.md | scope: Capability lifecycle and TC4-semantic persistence.
+- A-024 | status: complete | report: reports/A-024-research-networking.md | scope: Completion/sync authority and packet workflows.
+- A-025 | status: complete | report: reports/A-025-research-browser.md | scope: Eldritch browser graph, visibility, tooltips, interactions.
+- A-026 | status: complete | report: reports/A-026-research-page-rendering.md | scope: Research page/recipe rendering and navigation.
+- A-027 | status: complete | report: reports/A-027-crafting-visibility.md | scope: Actual recipe enforcement and JEI visibility.
+- A-028 | status: complete | report: reports/A-028-localization-loader.md | scope: Locale packaging/loading and formatting behavior.
+- A-029 | status: complete | report: reports/A-029-scan-engine.md | scope: Generic scan/aspect-resolution mechanics affecting Eldritch.
+
+Terminal assignment statuses: `complete`, `no_findings`, `blocked`, `superseded`, or `continued_as A-###`.
+
+## Finding Ledger
+
+The following blocks are the normalized atomic ledger. S-003/S-004 are the gameplay/resource oracle and S-005 is the observed port unless a block says otherwise. Report line/section locators are immutable primary evidence.
+
+## F-001 — VoidSeed catalyst
+- Type: defect
+- Disposition: deferred
+- Severity: medium
+- Confidence: high
+- Source IDs: S-003, S-004, S-005
+- Audit IDs/Reports: A-006 / reports/A-006-void-recipes.md:59-73
+- Oracle: TC4 `ConfigRecipes.initializeAlchemyRecipes`, `VoidSeed` crucible registration.
+- Observed: port catalyst is `Items.ENDER_PEARL` x1 meta 0 with no NBT.
+- Expected: catalyst is `Items.WHEAT_SEEDS` x1 meta 0 with no NBT; output remains `itemResource:17` x1, key `VOIDMETAL`, aspects `DARKNESS 8 + VOID 8 + ELDRITCH 2`.
+- Exact deltas: `ENDER_PEARL` -> `WHEAT_SEEDS`; output/key/aspects unchanged.
+- Affected paths/symbols: `ConfigRecipesCrucibleSlice.initializeCrucibleRecipeBaseline`, `recipeVoidSeed`, `ELDRITCHMINOR` page.
+- Primary evidence: CFR `run/recon-r4-cfr/.../ConfigRecipes.java:119`; port `ConfigRecipesCrucibleSlice.java:240-244`.
+- Production Gate: fail
+- Admission Basis: over_capacity
+- Production Trigger/Reachability: The cited report path is retained as evidence, but it is not admitted for this S-009 pass. port catalyst is `Items.ENDER_PEARL` x1 meta 0 with no NBT.
+- Concrete Impact/Contract: The exact delta remains durable evidence, but this candidate was ranked below S-009's eight admitted slots and receives no fix capacity. catalyst is `Items.WHEAT_SEEDS` x1 meta 0 with no NBT; output remains `itemResource:17` x1, key `VOIDMETAL`, aspects `DARKNESS 8 + VOID 8 + ELDRITCH 2`.
+- Admission Evidence: CFR `run/recon-r4-cfr/.../ConfigRecipes.java:119`; port `ConfigRecipesCrucibleSlice.java:240-244`.; S-009 priority ranking/deferred scope.
+- Admission Budget: reproduce_attempts=0; fix_checkpoints=0; review_passes=0
+- Admission Attempts Used: 0
+- Speculation Boundary: the direct cited finding only; no adjacent hardening, migration, policy, addon, or cleanup scope.
+- Regression hazards: preserve the separate `VoidMetal` resource `17` input and catalyst count one.
+- Outcome: none
+- Notes/Disposition reason: confirmed in-charter recipe defect.; deferred with Production Gate fail and basis over_capacity; ranked below S-009's eight admitted slots.
+
+## F-002 — VoidSeed catalyst proof
+- Type: test_debt
+- Disposition: deferred
+- Severity: low
+- Confidence: high
+- Source IDs: S-005
+- Audit IDs/Reports: A-006 / reports/A-006-void-recipes.md:75-87
+- Oracle: registered TC4 `VoidSeed` catalyst.
+- Observed: existing key/handle tests pass with the wrong catalyst.
+- Expected: focused evidence inspects `CrucibleRecipe` catalyst `WHEAT_SEEDS`, while retaining output/key/aspects.
+- Exact deltas: minimum proof must distinguish `WHEAT_SEEDS` from `ENDER_PEARL`.
+- Affected paths/symbols: `ConfigRecipesCrucibleSlice`; focused tests under `src/test/java/thaumcraft/common/config/`.
+- Primary evidence: report A-006:81-86.
+- Production Gate: fail
+- Admission Basis: adjacent_non_requirement
+- Production Trigger/Reachability: The cited test gap is not an independent production trigger; it is verification work for another finding or optional coverage.
+- Concrete Impact/Contract: No separate product outcome is admitted; minimum test edits for selected findings are charged to those findings' fix checkpoint/evidence budget.
+- Admission Evidence: report A-006:81-86.; no separate production admission.
+- Admission Budget: reproduce_attempts=0; fix_checkpoints=0; review_passes=0
+- Admission Attempts Used: 0
+- Speculation Boundary: minimum proof for an admitted finding only; no independent test/product scope or broad coverage expansion.
+- Regression hazards: do not make this an independent product change.
+- Outcome: none
+- Notes/Disposition reason: retained report-local proof claim; the single required R-001 proof is F-107.; deferred under adjacent_non_requirement because selected-finding test edits are charged to the selected finding budget.
+
+## F-003 — Cultist armor materials
+- Type: defect
+- Disposition: deferred
+- Severity: high
+- Confidence: high
+- Source IDs: S-003, S-004, S-005
+- Audit IDs/Reports: A-009 / reports/A-009-registries-materials.md:31-67
+- Oracle: TC4 iron armor for cultist robe/plate/boots and `armorMatThaumiumFortress` for leader.
+- Observed: port uses `armorMatSpecial`/`armorMatThaumium`; leader uses `armorMatVoid`. Port robe/plate/boots protection is `1/2/3/1`, factor 25, enchantability 25; leader factor 10, enchantability 10.
+- Expected: cultist protection `2/6/5/2`, factor 15, enchantability 9; leader protection `3/7/6/3`, factor 40, enchantability 25.
+- Exact deltas: durability cultist head/chest/legs `275/400/375` -> `165/240/225`, boots `325` -> `195`; leader `110/160/150` -> `440/640/600`; restore material identity only.
+- Affected paths/symbols: `ConfigItems.java:221-233,686-747`, `ThaumcraftApi.java:40-44`, cultist entity loadouts.
+- Primary evidence: A-009:31-67 material table and constructors.
+- Production Gate: fail
+- Admission Basis: over_capacity
+- Production Trigger/Reachability: The cited report path is retained as evidence, but it is not admitted for this S-009 pass. port uses `armorMatSpecial`/`armorMatThaumium`; leader uses `armorMatVoid`. Port robe/plate/boots protection is `1/2/3/1`, factor 25, enchantability 25; leader factor 10, enchantability 10.
+- Concrete Impact/Contract: The exact delta remains durable evidence, but this candidate was ranked below S-009's eight admitted slots and receives no fix capacity. cultist protection `2/6/5/2`, factor 15, enchantability 9; leader protection `3/7/6/3`, factor 40, enchantability 25.
+- Admission Evidence: A-009:31-67 material table and constructors.; S-009 priority ranking/deferred scope.
+- Admission Budget: reproduce_attempts=0; fix_checkpoints=0; review_passes=0
+- Admission Attempts Used: 0
+- Speculation Boundary: the direct cited finding only; no adjacent hardening, migration, policy, addon, or cleanup scope.
+- Regression hazards: preserve registry names/classes, slots, loadouts, rarity, textures, repair, vis, and warp behavior.
+- Outcome: none
+- Notes/Disposition reason: confirmed material substitution defect.; deferred with Production Gate fail and basis over_capacity; ranked below S-009's eight admitted slots.
+
+## F-004 — Crimson Void tool material
+- Type: defect
+- Disposition: deferred
+- Severity: high
+- Confidence: high
+- Source IDs: S-003, S-004, S-005
+- Audit IDs/Reports: A-009 / reports/A-009-registries-materials.md:69-82
+- Oracle: TC4 dedicated `toolMatCrimsonVoid = CVOID`.
+- Observed: Crimson sword uses shared `TOOLMAT_VOID`: uses 150, attack 3.0, enchantability 10.
+- Expected: `CVOID`: harvest 4, uses 200, efficiency 8.0, attack 3.5, enchantability 20.
+- Exact deltas: uses `-50`, attack `-0.5`, enchantability `-10`; harvest/efficiency currently match.
+- Affected paths/symbols: `ConfigItems.java:547-551`, `ThaumcraftApi.java:38`, `ItemCrimsonSword.java:24-29`.
+- Primary evidence: A-009:69-82 and `EntityCultistLeader.java:77-81,97-100`.
+- Production Gate: fail
+- Admission Basis: over_capacity
+- Production Trigger/Reachability: The cited report path is retained as evidence, but it is not admitted for this S-009 pass. Crimson sword uses shared `TOOLMAT_VOID`: uses 150, attack 3.0, enchantability 10.
+- Concrete Impact/Contract: The exact delta remains durable evidence, but this candidate was ranked below S-009's eight admitted slots and receives no fix capacity. `CVOID`: harvest 4, uses 200, efficiency 8.0, attack 3.5, enchantability 20.
+- Admission Evidence: A-009:69-82 and `EntityCultistLeader.java:77-81,97-100`.; S-009 priority ranking/deferred scope.
+- Admission Budget: reproduce_attempts=0; fix_checkpoints=0; review_passes=0
+- Admission Attempts Used: 0
+- Speculation Boundary: the direct cited finding only; no adjacent hardening, migration, policy, addon, or cleanup scope.
+- Regression hazards: do not alter ordinary Void material, rarity, repair/auto-repair, debuffs, warp, or leader selection.
+- Outcome: none
+- Notes/Disposition reason: confirmed dedicated-material defect.; deferred with Production Gate fail and basis over_capacity; ranked below S-009's eight admitted slots.
+
+## F-005 — Extra Void Robe boots registry
+- Type: defect
+- Disposition: deferred
+- Severity: medium
+- Confidence: high
+- Source IDs: S-003, S-004, S-005, S-001
+- Audit IDs/Reports: A-009 / reports/A-009-registries-materials.md:84-97; A-012 / reports/A-012-void-equipment-runtime.md:59-85; A-019 / reports/A-019-client-visuals.md:268-279
+- Oracle: TC4 has only helmet, chest, and legs Void Robe pieces.
+- Observed: port registers `thaumcraft:itembootsvoidrobe` in FEET with protection 3, durability 130, 5% discount, warp 2, dye/NBT behavior and creative visibility.
+- Expected: fresh-game parity exposes exactly three legitimate robe IDs; existing persisted stacks must not be silently deleted.
+- Exact deltas: extra FEET item changes aggregate discount `15% -> 20%` and warp `6 -> 8`; icon uses ordinary Void Boots and FEET model has no geometry.
+- Affected paths/symbols: `ConfigItems.java:123-126,662-684`, `ItemVoidRobeArmor.java`, `ClientProxy.java:760-775`, item model.
+- Primary evidence: A-009:84-97; A-012:59-85; A-019:268-279.
+- Production Gate: fail
+- Admission Basis: over_capacity
+- Production Trigger/Reachability: The cited report path is retained as evidence, but it is not admitted for this S-009 pass. port registers `thaumcraft:itembootsvoidrobe` in FEET with protection 3, durability 130, 5% discount, warp 2, dye/NBT behavior and creative visibility.
+- Concrete Impact/Contract: The exact delta remains durable evidence, but this candidate was ranked below S-009's eight admitted slots and receives no fix capacity. fresh-game parity exposes exactly three legitimate robe IDs; existing persisted stacks must not be silently deleted.
+- Admission Evidence: A-009:84-97; A-012:59-85; A-019:268-279.; S-009 priority ranking/deferred scope.
+- Admission Budget: reproduce_attempts=0; fix_checkpoints=0; review_passes=0
+- Admission Attempts Used: 0
+- Speculation Boundary: the direct cited finding only; no adjacent hardening, migration, policy, addon, or cleanup scope.
+- Regression hazards: hide/quarantine as a compatibility/tombstone registry, not silent persisted-ID deletion; keep three legitimate pieces, research pages, recipes, dye routing, and ordinary `VoidBoots`.
+- Outcome: none
+- Notes/Disposition reason: E-0006 adjudicates required fresh-game correction with non-destructive tombstone handling.; deferred with Production Gate fail and basis over_capacity; ranked below S-009's eight admitted slots.
+
+## F-006 — Wand cap creative membership
+- Type: defect
+- Disposition: deferred
+- Severity: low
+- Confidence: high
+- Source IDs: S-003, S-004, S-005
+- Audit IDs/Reports: A-009 / reports/A-009-registries-materials.md:99-112
+- Oracle: TC4 exposes metas `0,1,2,6,7,8`, copper meta `3` only when `foundCopperIngot`, silver metas `4,5` only when `foundSilverIngot`.
+- Observed: port `getSubItems()` exposes `0..8` unconditionally.
+- Expected: conditional membership above, with unconditional gold/thaumium/void metas.
+- Exact deltas: absent copper/silver changes hidden metas `3`/`4,5` into exposed creative entries.
+- Affected paths/symbols: `ItemWandCap.java:11-27`, `Thaumcraft.java:365-403`.
+- Primary evidence: A-009:99-112 and TC4 `ItemWandCap.func_150895_a`.
+- Production Gate: fail
+- Admission Basis: over_capacity
+- Production Trigger/Reachability: The cited report path is retained as evidence, but it is not admitted for this S-009 pass. port `getSubItems()` exposes `0..8` unconditionally.
+- Concrete Impact/Contract: The exact delta remains durable evidence, but this candidate was ranked below S-009's eight admitted slots and receives no fix capacity. conditional membership above, with unconditional gold/thaumium/void metas.
+- Admission Evidence: A-009:99-112 and TC4 `ItemWandCap.func_150895_a`.; S-009 priority ranking/deferred scope.
+- Admission Budget: reproduce_attempts=0; fix_checkpoints=0; review_passes=0
+- Admission Attempts Used: 0
+- Speculation Boundary: the direct cited finding only; no adjacent hardening, migration, policy, addon, or cleanup scope.
+- Regression hazards: preserve metadata identities and optional registration behavior.
+- Outcome: none
+- Notes/Disposition reason: confirmed creative-surface defect.; deferred with Production Gate fail and basis over_capacity; ranked below S-009's eight admitted slots.
+
+## F-007 — OCULUS first use result
+- Type: defect
+- Disposition: deferred
+- Severity: medium
+- Confidence: high
+- Source IDs: S-003, S-004, S-005
+- Audit IDs/Reports: A-010 / reports/A-010-progression-consumers.md:57-75
+- Oracle: TC4 missing-maze `checkForMaze` starts thread and returns false.
+- Observed: port `new MazeThread(...).run()` synchronously publishes maze and returns true, consuming six primal aspects at 100 each, opening altar, replacing dark node.
+- Expected: retain synchronous safe publication but first call returns false, consumes no vis, leaves `open=false` and dark node; later use activates.
+- Exact deltas: first return `true -> false`; first-call vis `600 -> 0`; activation state deferred to later call.
+- Affected paths/symbols: `TileEldritchAltar.java:124-171`, `WandManager.java:874-889`.
+- Primary evidence: A-010:57-75, TC4 `checkForMaze/createOculus`.
+- Production Gate: fail
+- Admission Basis: over_capacity
+- Production Trigger/Reachability: The cited report path is retained as evidence, but it is not admitted for this S-009 pass. port `new MazeThread(...).run()` synchronously publishes maze and returns true, consuming six primal aspects at 100 each, opening altar, replacing dark node.
+- Concrete Impact/Contract: The exact delta remains durable evidence, but this candidate was ranked below S-009's eight admitted slots and receives no fix capacity. retain synchronous safe publication but first call returns false, consumes no vis, leaves `open=false` and dark node; later use activates.
+- Admission Evidence: A-010:57-75, TC4 `checkForMaze/createOculus`.; S-009 priority ranking/deferred scope.
+- Admission Budget: reproduce_attempts=0; fix_checkpoints=0; review_passes=0
+- Admission Attempts Used: 0
+- Speculation Boundary: the direct cited finding only; no adjacent hardening, migration, policy, addon, or cleanup scope.
+- Regression hazards: preserve server authority, completed `OCULUS`, four eyes, six 100 costs on activation, synchronization, notifications, and synchronous publication.
+- Outcome: none
+- Notes/Disposition reason: E-0006 resolves timing/adaptation conflict.; deferred with Production Gate fail and basis over_capacity; ranked below S-009's eight admitted slots.
+
+## F-008 — PRIMNODE flux level
+- Type: defect
+- Disposition: deferred
+- Severity: low
+- Confidence: high
+- Source IDs: S-003, S-004, S-005
+- Audit IDs/Reports: A-010 / reports/A-010-progression-consumers.md:77-96
+- Oracle: TC4 writes flux goo/gas metadata 8.
+- Observed: port writes state metadata 7 for both `blockFluxGoo` and `blockFluxGas`.
+- Expected: `getStateFromMeta(8)` for both outputs.
+- Exact deltas: output meta `7 -> 8`; target meta 3, gates, random bounds, multipliers 3/5, 33 attempts, split, timing, and NBT remain unchanged.
+- Affected paths/symbols: `ItemEldritchObject.java:115-195`, `BlockAiry.java:234-236`.
+- Primary evidence: A-010:77-96.
+- Production Gate: fail
+- Admission Basis: over_capacity
+- Production Trigger/Reachability: The cited report path is retained as evidence, but it is not admitted for this S-009 pass. port writes state metadata 7 for both `blockFluxGoo` and `blockFluxGas`.
+- Concrete Impact/Contract: The exact delta remains durable evidence, but this candidate was ranked below S-009's eight admitted slots and receives no fix capacity. `getStateFromMeta(8)` for both outputs.
+- Admission Evidence: A-010:77-96.; S-009 priority ranking/deferred scope.
+- Admission Budget: reproduce_attempts=0; fix_checkpoints=0; review_passes=0
+- Admission Attempts Used: 0
+- Speculation Boundary: the direct cited finding only; no adjacent hardening, migration, policy, addon, or cleanup scope.
+- Regression hazards: use state conversion, not raw/global metadata translation; preserve server timing and explosion.
+- Outcome: none
+- Notes/Disposition reason: confirmed representable state defect.; deferred with Production Gate fail and basis over_capacity; ranked below S-009's eight admitted slots.
+
+## F-009 — Primal orb launch
+- Type: defect
+- Disposition: deferred
+- Severity: high
+- Confidence: high
+- Source IDs: S-003, S-004, S-005
+- Audit IDs/Reports: A-011 / reports/A-011-primal-runtime.md:51-66
+- Oracle: TC4 eye-minus-0.1 spawn Y, horizontal muzzle offset 0.16, speed about 0.5, inaccuracy 1.0.
+- Observed: port `EntityThrowable.shoot` omits horizontal offset and adds shooter X/Z and airborne Y motion.
+- Expected: preserve TC4 spawn offset and direction while retaining gravity 0.001, owner, seeker data, server spawn.
+- Exact deltas: missing horizontal `0.16`; jumping adds about `+0.42` Y; speed/inaccuracy must remain `0.5/1.0`.
+- Affected paths/symbols: `EntityPrimalOrb.java:27-32`.
+- Primary evidence: A-011:51-66 and TC4 constructor/on-impact sources.
+- Production Gate: fail
+- Admission Basis: over_capacity
+- Production Trigger/Reachability: The cited report path is retained as evidence, but it is not admitted for this S-009 pass. port `EntityThrowable.shoot` omits horizontal offset and adds shooter X/Z and airborne Y motion.
+- Concrete Impact/Contract: The exact delta remains durable evidence, but this candidate was ranked below S-009's eight admitted slots and receives no fix capacity. preserve TC4 spawn offset and direction while retaining gravity 0.001, owner, seeker data, server spawn.
+- Admission Evidence: A-011:51-66 and TC4 constructor/on-impact sources.; S-009 priority ranking/deferred scope.
+- Admission Budget: reproduce_attempts=0; fix_checkpoints=0; review_passes=0
+- Admission Attempts Used: 0
+- Speculation Boundary: the direct cited finding only; no adjacent hardening, migration, policy, addon, or cleanup scope.
+- Regression hazards: preserve ownership, seeker protocol, gravity and server-only spawn.
+- Outcome: none
+- Notes/Disposition reason: confirmed projectile launch defect.; deferred with Production Gate fail and basis over_capacity; ranked below S-009's eight admitted slots.
+
+## F-010 — Primal orb impact coordinates and roll
+- Type: defect
+- Disposition: deferred
+- Severity: high
+- Confidence: high
+- Source IDs: S-003, S-004, S-005
+- Audit IDs/Reports: A-011 / reports/A-011-primal-runtime.md:68-84
+- Oracle: TC4 entity hit passes `mop.blockX/Y/Z` (normally 0,0,0); special roll `nextInt(100) <= 1`.
+- Observed: port falls back to `floor(hitVec)` and can create a victim-location node; ordinary non-seeker chance is 2% split taint/node.
+- Expected: use block-impact coordinates and preserve explosion-before-special order, seeker suppression, 1%/1% split.
+- Exact deltas: entity target coordinates `0,0,0` -> not victim floor coordinates; roll remains exactly two values out of 100.
+- Affected paths/symbols: `EntityPrimalOrb.java:136-147`.
+- Primary evidence: A-011:68-84.
+- Production Gate: fail
+- Admission Basis: over_capacity
+- Production Trigger/Reachability: The cited report path is retained as evidence, but it is not admitted for this S-009 pass. port falls back to `floor(hitVec)` and can create a victim-location node; ordinary non-seeker chance is 2% split taint/node.
+- Concrete Impact/Contract: The exact delta remains durable evidence, but this candidate was ranked below S-009's eight admitted slots and receives no fix capacity. use block-impact coordinates and preserve explosion-before-special order, seeker suppression, 1%/1% split.
+- Admission Evidence: A-011:68-84.; S-009 priority ranking/deferred scope.
+- Admission Budget: reproduce_attempts=0; fix_checkpoints=0; review_passes=0
+- Admission Attempts Used: 0
+- Speculation Boundary: the direct cited finding only; no adjacent hardening, migration, policy, addon, or cleanup scope.
+- Regression hazards: preserve explosion order and seeker behavior.
+- Outcome: none
+- Notes/Disposition reason: confirmed impact-target defect.; deferred with Production Gate fail and basis over_capacity; ranked below S-009's eight admitted slots.
+
+## F-011 — Air-only node placement
+- Type: defect
+- Disposition: deferred
+- Severity: low
+- Confidence: high
+- Source IDs: S-003, S-004, S-005
+- Audit IDs/Reports: A-011 / reports/A-011-primal-runtime.md:86-97
+- Oracle: TC4 `createNodeAt` accepts air only.
+- Observed: port accepts `air || oldBlock.isReplaceable` and replaces replaceable non-air blocks.
+- Expected: reject every non-air block, including replaceable blocks; retain existing TileNode update behavior.
+- Exact deltas: eligibility `air` -> `air || replaceable` in port; narrow to `air`.
+- Affected paths/symbols: `ThaumcraftWorldGenerator.java:128-145`.
+- Primary evidence: A-011:86-97.
+- Production Gate: fail
+- Admission Basis: over_capacity
+- Production Trigger/Reachability: The cited report path is retained as evidence, but it is not admitted for this S-009 pass. port accepts `air || oldBlock.isReplaceable` and replaces replaceable non-air blocks.
+- Concrete Impact/Contract: The exact delta remains durable evidence, but this candidate was ranked below S-009's eight admitted slots and receives no fix capacity. reject every non-air block, including replaceable blocks; retain existing TileNode update behavior.
+- Admission Evidence: A-011:86-97.; S-009 priority ranking/deferred scope.
+- Admission Budget: reproduce_attempts=0; fix_checkpoints=0; review_passes=0
+- Admission Attempts Used: 0
+- Speculation Boundary: the direct cited finding only; no adjacent hardening, migration, policy, addon, or cleanup scope.
+- Regression hazards: retain 1.12 state/tile synchronization.
+- Outcome: none
+- Notes/Disposition reason: confirmed node eligibility defect.; deferred with Production Gate fail and basis over_capacity; ranked below S-009's eight admitted slots.
+
+## F-012 — Crusher material-only effectiveness
+- Type: defect
+- Disposition: deferred
+- Severity: medium
+- Confidence: high
+- Source IDs: S-003, S-004, S-005
+- Audit IDs/Reports: A-011 / reports/A-011-primal-runtime.md:99-110
+- Oracle: TC4 accepts tool effectiveness or fixed exception set only.
+- Observed: port additionally accepts materials `ROCK, IRON, ANVIL, GROUND, GRASS, SAND, CLAY`.
+- Expected: custom material-only blocks do not enter 3x3 AOE; retain tool-effective and fixed exceptions and negative-hardness rejection.
+- Exact deltas: material-only branch is port-only.
+- Affected paths/symbols: `ItemPrimalCrusher.java:88-109,119-127`.
+- Primary evidence: A-011:99-110.
+- Production Gate: fail
+- Admission Basis: over_capacity
+- Production Trigger/Reachability: The cited report path is retained as evidence, but it is not admitted for this S-009 pass. port additionally accepts materials `ROCK, IRON, ANVIL, GROUND, GRASS, SAND, CLAY`.
+- Concrete Impact/Contract: The exact delta remains durable evidence, but this candidate was ranked below S-009's eight admitted slots and receives no fix capacity. custom material-only blocks do not enter 3x3 AOE; retain tool-effective and fixed exceptions and negative-hardness rejection.
+- Admission Evidence: A-011:99-110.; S-009 priority ranking/deferred scope.
+- Admission Budget: reproduce_attempts=0; fix_checkpoints=0; review_passes=0
+- Admission Attempts Used: 0
+- Speculation Boundary: the direct cited finding only; no adjacent hardening, migration, policy, addon, or cleanup scope.
+- Regression hazards: preserve fixed exceptions, hardness checks and harvest semantics.
+- Outcome: none
+- Notes/Disposition reason: confirmed AOE eligibility defect.; deferred with Production Gate fail and basis over_capacity; ranked below S-009's eight admitted slots.
+
+## F-013 — Crusher center break event duplicate
+- Type: defect
+- Disposition: deferred
+- Severity: medium
+- Confidence: high
+- Source IDs: S-003, S-004, S-005, S-006
+- Audit IDs/Reports: A-011 / reports/A-011-primal-runtime.md:112-128
+- Oracle: TC4 has one primary BreakEvent for center; port needs secondary protection checks.
+- Observed: full 3x3 port delivers 2 center/primary plus 8 secondary events, 10 deliveries.
+- Expected: one center event plus eight secondary events; retain secondary protection, fake-player, XP, drops, conversion and durability ordering.
+- Exact deltas: center deliveries `2 -> 1`; total `10 -> 9`; secondary checks remain.
+- Affected paths/symbols: `BlockUtils.java:125-135`, `PlayerInteractionManager.tryHarvestBlock`.
+- Primary evidence: A-011:112-128.
+- Production Gate: fail
+- Admission Basis: over_capacity
+- Production Trigger/Reachability: The cited report path is retained as evidence, but it is not admitted for this S-009 pass. full 3x3 port delivers 2 center/primary plus 8 secondary events, 10 deliveries.
+- Concrete Impact/Contract: The exact delta remains durable evidence, but this candidate was ranked below S-009's eight admitted slots and receives no fix capacity. one center event plus eight secondary events; retain secondary protection, fake-player, XP, drops, conversion and durability ordering.
+- Admission Evidence: A-011:112-128.; S-009 priority ranking/deferred scope.
+- Admission Budget: reproduce_attempts=0; fix_checkpoints=0; review_passes=0
+- Admission Attempts Used: 0
+- Speculation Boundary: the direct cited finding only; no adjacent hardening, migration, policy, addon, or cleanup scope.
+- Regression hazards: do not remove secondary break protection.
+- Outcome: none
+- Notes/Disposition reason: E-0006 preserves safety checks and removes only center duplicate.; deferred with Production Gate fail and basis over_capacity; ranked below S-009's eight admitted slots.
+
+## F-014 — Wandable dispatch priority
+- Type: defect
+- Disposition: deferred
+- Severity: medium
+- Confidence: high
+- Source IDs: S-003, S-004, S-005
+- Audit IDs/Reports: A-011 / reports/A-011-primal-runtime.md:130-141
+- Oracle: TC4 block IWandable dispatch stops before tile dispatch.
+- Observed: port tile dispatch stops before block dispatch, preventing focus dispatch when both consume.
+- Expected: block -> stop, then tile -> stop, then focus; preserve ActionResult/null fallthrough, coordinates and cooldown boundary.
+- Exact deltas: dispatch order `tile, block` -> `block, tile`.
+- Affected paths/symbols: `ItemWandCasting.java:597-607`.
+- Primary evidence: A-011:130-141.
+- Production Gate: fail
+- Admission Basis: over_capacity
+- Production Trigger/Reachability: The cited report path is retained as evidence, but it is not admitted for this S-009 pass. port tile dispatch stops before block dispatch, preventing focus dispatch when both consume.
+- Concrete Impact/Contract: The exact delta remains durable evidence, but this candidate was ranked below S-009's eight admitted slots and receives no fix capacity. block -> stop, then tile -> stop, then focus; preserve ActionResult/null fallthrough, coordinates and cooldown boundary.
+- Admission Evidence: A-011:130-141.; S-009 priority ranking/deferred scope.
+- Admission Budget: reproduce_attempts=0; fix_checkpoints=0; review_passes=0
+- Admission Attempts Used: 0
+- Speculation Boundary: the direct cited finding only; no adjacent hardening, migration, policy, addon, or cleanup scope.
+- Regression hazards: preserve null fallthrough and server authority.
+- Outcome: none
+- Notes/Disposition reason: confirmed interaction routing defect.; deferred with Production Gate fail and basis over_capacity; ranked below S-009's eight admitted slots.
+
+## F-015 — Crusher creative repair
+- Type: defect
+- Disposition: deferred
+- Severity: low
+- Confidence: high
+- Source IDs: S-003, S-004, S-005
+- Audit IDs/Reports: A-011 / reports/A-011-primal-runtime.md:160-171
+- Oracle: TC4 creative `damageItem(-1)` leaves damage unchanged; survival repairs one per 20 ticks.
+- Observed: port directly sets `max(0, damage-1)` for creative and repairs one.
+- Expected: creative remains unchanged; survival cadence and one-point repair remain.
+- Exact deltas: creative repair `1 -> 0`.
+- Affected paths/symbols: `ItemPrimalCrusher.java:149-153`.
+- Primary evidence: A-011:160-171.
+- Production Gate: fail
+- Admission Basis: over_capacity
+- Production Trigger/Reachability: The cited report path is retained as evidence, but it is not admitted for this S-009 pass. port directly sets `max(0, damage-1)` for creative and repairs one.
+- Concrete Impact/Contract: The exact delta remains durable evidence, but this candidate was ranked below S-009's eight admitted slots and receives no fix capacity. creative remains unchanged; survival cadence and one-point repair remain.
+- Admission Evidence: A-011:160-171.; S-009 priority ranking/deferred scope.
+- Admission Budget: reproduce_attempts=0; fix_checkpoints=0; review_passes=0
+- Admission Attempts Used: 0
+- Speculation Boundary: the direct cited finding only; no adjacent hardening, migration, policy, addon, or cleanup scope.
+- Regression hazards: preserve zero lower bound, Unbreakable and server guard.
+- Outcome: none
+- Notes/Disposition reason: confirmed lifecycle defect.; deferred with Production Gate fail and basis over_capacity; ranked below S-009's eight admitted slots.
+
+## F-016 — Primal focus offhand swing
+- Type: defect
+- Disposition: deferred
+- Severity: low
+- Confidence: high
+- Source IDs: S-003, S-004, S-005
+- Audit IDs/Reports: A-011 / reports/A-011-primal-runtime.md:190-201
+- Oracle: TC4 swings the hand containing the wand stack.
+- Observed: port always chooses `MAIN_HAND` when active hand is absent.
+- Expected: use identity-aware hand containing `wandStack`; orb, cost and cooldown unchanged.
+- Exact deltas: offhand use swing `MAIN_HAND -> OFF_HAND`.
+- Affected paths/symbols: `FocusPrimal.java:56`.
+- Primary evidence: A-011:190-201.
+- Production Gate: fail
+- Admission Basis: over_capacity
+- Production Trigger/Reachability: The cited report path is retained as evidence, but it is not admitted for this S-009 pass. port always chooses `MAIN_HAND` when active hand is absent.
+- Concrete Impact/Contract: The exact delta remains durable evidence, but this candidate was ranked below S-009's eight admitted slots and receives no fix capacity. use identity-aware hand containing `wandStack`; orb, cost and cooldown unchanged.
+- Admission Evidence: A-011:190-201.; S-009 priority ranking/deferred scope.
+- Admission Budget: reproduce_attempts=0; fix_checkpoints=0; review_passes=0
+- Admission Attempts Used: 0
+- Speculation Boundary: the direct cited finding only; no adjacent hardening, migration, policy, addon, or cleanup scope.
+- Regression hazards: preserve instant orb/cost/cooldown behavior.
+- Outcome: none
+- Notes/Disposition reason: confirmed hand-selection defect.; deferred with Production Gate fail and basis over_capacity; ranked below S-009's eight admitted slots.
+
+## F-017 — Special mining RNG consumption
+- Type: defect
+- Disposition: deferred
+- Severity: low
+- Confidence: high
+- Source IDs: S-003, S-004, S-005
+- Audit IDs/Reports: A-011 / reports/A-011-primal-runtime.md:203-214
+- Oracle: TC4 consumes one random float for every drop before replacement checks.
+- Observed: port consumes only for registered replacement candidates.
+- Expected: consume one float per drop, threshold `r <= 0.2 + 0.075 * fortune`, retain copied count/item/meta/fortune/sound/server mutation.
+- Exact deltas: mixed registered/unregistered drop sequences advance RNG differently.
+- Affected paths/symbols: `Utils.java:83-95`.
+- Primary evidence: A-011:203-214.
+- Production Gate: fail
+- Admission Basis: over_capacity
+- Production Trigger/Reachability: The cited report path is retained as evidence, but it is not admitted for this S-009 pass. port consumes only for registered replacement candidates.
+- Concrete Impact/Contract: The exact delta remains durable evidence, but this candidate was ranked below S-009's eight admitted slots and receives no fix capacity. consume one float per drop, threshold `r <= 0.2 + 0.075 * fortune`, retain copied count/item/meta/fortune/sound/server mutation.
+- Admission Evidence: A-011:203-214.; S-009 priority ranking/deferred scope.
+- Admission Budget: reproduce_attempts=0; fix_checkpoints=0; review_passes=0
+- Admission Attempts Used: 0
+- Speculation Boundary: the direct cited finding only; no adjacent hardening, migration, policy, addon, or cleanup scope.
+- Regression hazards: preserve replacement threshold and drop mutation.
+- Outcome: none
+- Notes/Disposition reason: confirmed deterministic RNG defect.; deferred with Production Gate fail and basis over_capacity; ranked below S-009's eight admitted slots.
+
+## F-018 — Equipped Void armor double repair
+- Type: defect
+- Disposition: required
+- Severity: high
+- Confidence: high
+- Source IDs: S-003, S-004, S-005, S-009
+- Audit IDs/Reports: A-012 / reports/A-012-void-equipment-runtime.md:37-57
+- Oracle: equipped TC4 armor repairs one point per 20 ticks; stored inventory also repairs one.
+- Observed: port invokes ordinary `onUpdate` plus `onArmorTick`, repairing 2 when worn.
+- Expected: exactly one equipped repair per 20 ticks; stored behavior remains one.
+- Exact deltas: equipped repair `2 -> 1`.
+- Affected paths/symbols: `ItemVoidArmor.java:41-49,68-72`, `ItemVoidRobeArmor.java:120-128`.
+- Primary evidence: A-012:37-57.
+- Production Gate: pass
+- Admission Basis: deterministic_supported_path
+- Production Trigger/Reachability: ordinary supported equipment tick reaches an equipped Void armor stack through both onUpdate and onArmorTick; equipped Void armor receives both onUpdate and onArmorTick, deterministic repair 2 vs 1.
+- Concrete Impact/Contract: equipped Void armor repairs 2 durability points instead of the TC4 contract of 1 because both callbacks execute.
+- Admission Evidence: A-012:37-57 directly identifies both callbacks and the deterministic 2 vs 1 repair; S-009 is the capacity authority.
+- Admission Budget: reproduce_attempts=0; fix_checkpoints=1; review_passes=0
+- Admission Attempts Used: 0
+- Speculation Boundary: equipped Void armor callback composition and its one-point repair contract only; stored-stack repair and unrelated armor architecture are excluded.
+- Regression hazards: preserve server/living-owner guards and stored stacks.
+- Outcome: R-001
+- Notes/Disposition reason: confirmed callback composition defect.; admitted by the S-009 priority grant as one of exactly eight production findings.
+
+## F-019 — Void tool attack modifiers
+- Type: defect
+- Disposition: deferred
+- Severity: medium
+- Confidence: high
+- Source IDs: S-003, S-004, S-005
+- Audit IDs/Reports: A-012 / reports/A-012-void-equipment-runtime.md:87-108
+- Oracle: TC4 MAINHAND modifiers sword 7.0, pickaxe 5.0, axe 6.0, shovel 4.0.
+- Observed: port sword 6.0, pickaxe 4.0, axe 6.0, shovel 4.5.
+- Expected: exact TC4 values with 1.12 cooldown/attribute plumbing preserved.
+- Exact deltas: sword `-1.0`, pickaxe `-1.0`, axe `0`, shovel `+0.5`.
+- Affected paths/symbols: `ItemVoidSword.java:28-30`, `ItemVoidPickaxe.java:19-21`, `ItemVoidAxe.java:19-21`, `ItemVoidShovel.java:19-21`.
+- Primary evidence: A-012:87-108.
+- Production Gate: fail
+- Admission Basis: over_capacity
+- Production Trigger/Reachability: The cited report path is retained as evidence, but it is not admitted for this S-009 pass. port sword 6.0, pickaxe 4.0, axe 6.0, shovel 4.5.
+- Concrete Impact/Contract: The exact delta remains durable evidence, but this candidate was ranked below S-009's eight admitted slots and receives no fix capacity. exact TC4 values with 1.12 cooldown/attribute plumbing preserved.
+- Admission Evidence: A-012:87-108.; S-009 priority ranking/deferred scope.
+- Admission Budget: reproduce_attempts=0; fix_checkpoints=0; review_passes=0
+- Admission Attempts Used: 0
+- Speculation Boundary: the direct cited finding only; no adjacent hardening, migration, policy, addon, or cleanup scope.
+- Regression hazards: never alter shared `TOOLMAT_VOID`.
+- Outcome: none
+- Notes/Disposition reason: confirmed item-specific stat defect.; deferred with Production Gate fail and basis over_capacity; ranked below S-009's eight admitted slots.
+
+## F-020 — Void hoe entity-hit durability
+- Type: defect
+- Disposition: deferred
+- Severity: low
+- Confidence: high
+- Source IDs: S-003, S-004, S-005
+- Audit IDs/Reports: A-012 / reports/A-012-void-equipment-runtime.md:110-122
+- Oracle: successful TC4 Void Hoe entity hit costs 0 durability and applies Weakness 80 ticks under the same gates.
+- Observed: inherited 1.12 `ItemHoe.hitEntity` costs 1.
+- Expected: successful hit costs 0; retain Weakness, PvP/living conditions, parent return, tilling durability and self-repair.
+- Exact deltas: hit durability `1 -> 0`.
+- Affected paths/symbols: `ItemVoidHoe.java:37-41`.
+- Primary evidence: A-012:110-122.
+- Production Gate: fail
+- Admission Basis: over_capacity
+- Production Trigger/Reachability: The cited report path is retained as evidence, but it is not admitted for this S-009 pass. inherited 1.12 `ItemHoe.hitEntity` costs 1.
+- Concrete Impact/Contract: The exact delta remains durable evidence, but this candidate was ranked below S-009's eight admitted slots and receives no fix capacity. successful hit costs 0; retain Weakness, PvP/living conditions, parent return, tilling durability and self-repair.
+- Admission Evidence: A-012:110-122.; S-009 priority ranking/deferred scope.
+- Admission Budget: reproduce_attempts=0; fix_checkpoints=0; review_passes=0
+- Admission Attempts Used: 0
+- Speculation Boundary: the direct cited finding only; no adjacent hardening, migration, policy, addon, or cleanup scope.
+- Regression hazards: preserve combat gates and tilling behavior.
+- Outcome: none
+- Notes/Disposition reason: confirmed inherited callback defect.; deferred with Production Gate fail and basis over_capacity; ranked below S-009's eight admitted slots.
+
+## F-021 — WAND_CAP_VOID alias
+- Type: defect
+- Disposition: deferred
+- Severity: low
+- Confidence: high
+- Source IDs: S-003, S-004, S-005
+- Audit IDs/Reports: A-012 / reports/A-012-void-equipment-runtime.md:124-137
+- Oracle: TC4 exposes public `ConfigItems.WAND_CAP_VOID`.
+- Observed: port has only `caps.get("void")`; internal NBT works but common source linkage can fail with missing field.
+- Expected: restore `public static WandCap WAND_CAP_VOID` as alias to canonical void cap.
+- Exact deltas: public field absent -> present; cap identity, tag `void`, modifier `.8`, meta 7/8, cost 9 unchanged.
+- Affected paths/symbols: `ConfigItems.java:56-64`, `Thaumcraft.java:365-369`.
+- Primary evidence: A-012:124-137.
+- Production Gate: fail
+- Admission Basis: over_capacity
+- Production Trigger/Reachability: The cited report path is retained as evidence, but it is not admitted for this S-009 pass. port has only `caps.get("void")`; internal NBT works but common source linkage can fail with missing field.
+- Concrete Impact/Contract: The exact delta remains durable evidence, but this candidate was ranked below S-009's eight admitted slots and receives no fix capacity. restore `public static WandCap WAND_CAP_VOID` as alias to canonical void cap.
+- Admission Evidence: A-012:124-137.; S-009 priority ranking/deferred scope.
+- Admission Budget: reproduce_attempts=0; fix_checkpoints=0; review_passes=0
+- Admission Attempts Used: 0
+- Speculation Boundary: the direct cited finding only; no adjacent hardening, migration, policy, addon, or cleanup scope.
+- Regression hazards: keep public `thaumcraft.api.*` signatures and canonical cap registration.
+- Outcome: none
+- Notes/Disposition reason: E-0006 explicitly restores compatibility alias.; deferred with Production Gate fail and basis over_capacity; ranked below S-009's eight admitted slots.
+
+## F-022 — Advanced furnace listener fields
+- Type: defect
+- Disposition: deferred
+- Severity: high
+- Confidence: high
+- Source IDs: S-003, S-004, S-005
+- Audit IDs/Reports: A-013 / reports/A-013-advanced-furnace-runtime.md:71-89
+- Oracle: TC4 sends five listener fields IDs 0 cook, 1 burn, 2 current burn, 3 vis, 4 smelt.
+- Observed: port container has slots but no listener/property sender or client updater; GUI reads client tile directly.
+- Expected: send/update all five fields with 16-bit safety and distance handling.
+- Exact deltas: listener field sends `5 -> 0`.
+- Affected paths/symbols: `ContainerAlchemyFurnace.java:12-74`, `GuiAlchemyFurnace.java:38-50`, `TileAlchemyFurnace.java:410-435`.
+- Primary evidence: A-013:71-89.
+- Production Gate: fail
+- Admission Basis: over_capacity
+- Production Trigger/Reachability: The cited report path is retained as evidence, but it is not admitted for this S-009 pass. port container has slots but no listener/property sender or client updater; GUI reads client tile directly.
+- Concrete Impact/Contract: The exact delta remains durable evidence, but this candidate was ranked below S-009's eight admitted slots and receives no fix capacity. send/update all five fields with 16-bit safety and distance handling.
+- Admission Evidence: A-013:71-89.; S-009 priority ranking/deferred scope.
+- Admission Budget: reproduce_attempts=0; fix_checkpoints=0; review_passes=0
+- Admission Attempts Used: 0
+- Speculation Boundary: the direct cited finding only; no adjacent hardening, migration, policy, addon, or cleanup scope.
+- Regression hazards: preserve slots, GUI ID, live gauges and 1.12 listener API.
+- Outcome: none
+- Notes/Disposition reason: basic furnace client synchronization defect.; deferred with Production Gate fail and basis over_capacity; ranked below S-009's eight admitted slots.
+
+## F-023 — Basic furnace shift-click fuel priority
+- Type: defect
+- Disposition: deferred
+- Severity: medium
+- Confidence: high
+- Source IDs: S-003, S-004, S-005
+- Audit IDs/Reports: A-013 / reports/A-013-advanced-furnace-runtime.md:91-103
+- Oracle: TC4 checks fuel first.
+- Observed: port tests input before fuel; coal is routed to aspect slot 0 instead of fuel slot 1.
+- Expected: fuel-first, then input fallback, preserving transfer ranges and empty-stack behavior.
+- Exact deltas: coal destination slot `0 -> 1`.
+- Affected paths/symbols: `ContainerAlchemyFurnace.java:50-72`, `TileAlchemyFurnace.java:382-390`.
+- Primary evidence: A-013:91-103.
+- Production Gate: fail
+- Admission Basis: over_capacity
+- Production Trigger/Reachability: The cited report path is retained as evidence, but it is not admitted for this S-009 pass. port tests input before fuel; coal is routed to aspect slot 0 instead of fuel slot 1.
+- Concrete Impact/Contract: The exact delta remains durable evidence, but this candidate was ranked below S-009's eight admitted slots and receives no fix capacity. fuel-first, then input fallback, preserving transfer ranges and empty-stack behavior.
+- Admission Evidence: A-013:91-103.; S-009 priority ranking/deferred scope.
+- Admission Budget: reproduce_attempts=0; fix_checkpoints=0; review_passes=0
+- Admission Attempts Used: 0
+- Speculation Boundary: the direct cited finding only; no adjacent hardening, migration, policy, addon, or cleanup scope.
+- Regression hazards: preserve coal as both fuel and `ENERGY 2`.
+- Outcome: none
+- Notes/Disposition reason: confirmed routing defect.; deferred with Production Gate fail and basis over_capacity; ranked below S-009's eight admitted slots.
+
+## F-024 — Basic furnace sided insertion
+- Type: defect
+- Disposition: deferred
+- Severity: medium
+- Confidence: high
+- Source IDs: S-003, S-004, S-005
+- Audit IDs/Reports: A-013 / reports/A-013-advanced-furnace-runtime.md:105-120
+- Oracle: TC4 permits fuel insertion when side is not UP; DOWN is valid.
+- Observed: port rejects every DOWN insertion despite advertising DOWN `[1]`; UP `[]`, horizontal `[0]` remain.
+- Expected: DOWN fuel insertion works; no UP insertion; horizontal input and bucket-only bottom extraction remain.
+- Exact deltas: DOWN insertion `accepted -> rejected` in port.
+- Affected paths/symbols: `TileAlchemyFurnace.java:24-26,393-406`.
+- Primary evidence: A-013:105-120.
+- Production Gate: fail
+- Admission Basis: over_capacity
+- Production Trigger/Reachability: The cited report path is retained as evidence, but it is not admitted for this S-009 pass. port rejects every DOWN insertion despite advertising DOWN `[1]`; UP `[]`, horizontal `[0]` remain.
+- Concrete Impact/Contract: The exact delta remains durable evidence, but this candidate was ranked below S-009's eight admitted slots and receives no fix capacity. DOWN fuel insertion works; no UP insertion; horizontal input and bucket-only bottom extraction remain.
+- Admission Evidence: A-013:105-120.; S-009 priority ranking/deferred scope.
+- Admission Budget: reproduce_attempts=0; fix_checkpoints=0; review_passes=0
+- Admission Attempts Used: 0
+- Speculation Boundary: the direct cited finding only; no adjacent hardening, migration, policy, addon, or cleanup scope.
+- Regression hazards: preserve advertised slot map and bottom extraction.
+- Outcome: none
+- Notes/Disposition reason: confirmed sided-inventory defect.; deferred with Production Gate fail and basis over_capacity; ranked below S-009's eight admitted slots.
+
+## F-025 — Basic furnace activation sneak gate
+- Type: defect
+- Disposition: deferred
+- Severity: low
+- Confidence: high
+- Source IDs: S-003, S-004, S-005
+- Audit IDs/Reports: A-013 / reports/A-013-advanced-furnace-runtime.md:220-232
+- Oracle: GUI 9 opens only for meta 0, correct tile, and not sneaking.
+- Observed: port opens for sneaking too.
+- Expected: sneaking returns no activation; retain GUI ID 9 and server tile creation.
+- Exact deltas: missing `!player.isSneaking()` gate.
+- Affected paths/symbols: `BlockStoneDevice.java:192-200`.
+- Primary evidence: A-013:220-232.
+- Production Gate: fail
+- Admission Basis: over_capacity
+- Production Trigger/Reachability: The cited report path is retained as evidence, but it is not admitted for this S-009 pass. port opens for sneaking too.
+- Concrete Impact/Contract: The exact delta remains durable evidence, but this candidate was ranked below S-009's eight admitted slots and receives no fix capacity. sneaking returns no activation; retain GUI ID 9 and server tile creation.
+- Admission Evidence: A-013:220-232.; S-009 priority ranking/deferred scope.
+- Admission Budget: reproduce_attempts=0; fix_checkpoints=0; review_passes=0
+- Admission Attempts Used: 0
+- Speculation Boundary: the direct cited finding only; no adjacent hardening, migration, policy, addon, or cleanup scope.
+- Regression hazards: preserve client interaction and GUI identity.
+- Outcome: none
+- Notes/Disposition reason: confirmed basic furnace interaction defect.; deferred with Production Gate fail and basis over_capacity; ranked below S-009's eight admitted slots.
+
+## F-026 — Alembic AIR transfer
+- Type: defect
+- Disposition: deferred
+- Severity: medium
+- Confidence: high
+- Source IDs: S-003, S-004, S-005
+- Audit IDs/Reports: A-013 / reports/A-013-advanced-furnace-runtime.md:234-246
+- Oracle: existing alembic AIR/filter FIRE/amount <32/furnace AIR transfers one AIR at normal 20/40 interval before filter inspection.
+- Observed: port transfers none in this state.
+- Expected: transfer one AIR; empty/matching filters remain unchanged.
+- Exact deltas: normal transfer `1 -> 0`.
+- Affected paths/symbols: `TileAlchemyFurnace.java:102-143`, `TileAlembic.java:19-55`.
+- Primary evidence: A-013:234-246.
+- Production Gate: fail
+- Admission Basis: over_capacity
+- Production Trigger/Reachability: The cited report path is retained as evidence, but it is not admitted for this S-009 pass. port transfers none in this state.
+- Concrete Impact/Contract: The exact delta remains durable evidence, but this candidate was ranked below S-009's eight admitted slots and receives no fix capacity. transfer one AIR; empty/matching filters remain unchanged.
+- Admission Evidence: A-013:234-246.; S-009 priority ranking/deferred scope.
+- Admission Budget: reproduce_attempts=0; fix_checkpoints=0; review_passes=0
+- Admission Attempts Used: 0
+- Speculation Boundary: the direct cited finding only; no adjacent hardening, migration, policy, addon, or cleanup scope.
+- Regression hazards: preserve NBT/addon-visible branch and ordinary filter behavior.
+- Outcome: none
+- Notes/Disposition reason: E-0006 places NBT/addon-visible branch in scope.; deferred with Production Gate fail and basis over_capacity; ranked below S-009's eight admitted slots.
+
+## F-027 — Advanced furnace heat debt
+- Type: defect
+- Disposition: deferred
+- Severity: high
+- Confidence: high
+- Source IDs: S-003, S-004, S-005
+- Audit IDs/Reports: A-013 / reports/A-013-advanced-furnace-runtime.md:122-138
+- Oracle: every fifth tick executes `int pt = heat--` unconditionally.
+- Observed: guarded decay leaves heat 0; with four FIRE, port gets 4 instead of TC4 `-1+4=3` and does not accumulate negative debt.
+- Expected: unconditionally decrement, then request 50-unit FIRE/ENTROPY/WATER under `<= maxPower`.
+- Exact deltas: first powered cycle `4 -> 3`; starvation negative debt must be retained.
+- Affected paths/symbols: `TileAlchemyFurnaceAdvanced.java:88-109`.
+- Primary evidence: A-013:122-138 and `VisNetworkChargingRuntimeTest:222-240`.
+- Production Gate: fail
+- Admission Basis: over_capacity
+- Production Trigger/Reachability: The cited report path is retained as evidence, but it is not admitted for this S-009 pass. guarded decay leaves heat 0; with four FIRE, port gets 4 instead of TC4 `-1+4=3` and does not accumulate negative debt.
+- Concrete Impact/Contract: The exact delta remains durable evidence, but this candidate was ranked below S-009's eight admitted slots and receives no fix capacity. unconditionally decrement, then request 50-unit FIRE/ENTROPY/WATER under `<= maxPower`.
+- Admission Evidence: A-013:122-138 and `VisNetworkChargingRuntimeTest:222-240`.; S-009 priority ranking/deferred scope.
+- Admission Budget: reproduce_attempts=0; fix_checkpoints=0; review_passes=0
+- Admission Attempts Used: 0
+- Speculation Boundary: the direct cited finding only; no adjacent hardening, migration, policy, addon, or cleanup scope.
+- Regression hazards: preserve five-tick cadence, server mutation and power bounds.
+- Outcome: none
+- Notes/Disposition reason: confirmed charging branch defect.; deferred with Production Gate fail and basis over_capacity; ranked below S-009's eight admitted slots.
+
+## F-028 — Advanced furnace formation FX
+- Type: defect
+- Disposition: deferred
+- Severity: low
+- Confidence: high
+- Source IDs: S-003, S-004, S-005
+- Audit IDs/Reports: A-013 / reports/A-013-advanced-furnace-runtime.md:170-182
+- Oracle: FX loops `aa=-1..1`, `bb=0..1`, `cc=-1..1`.
+- Observed: port sends center and center.up only.
+- Expected: 18 sparkle packets, one sound, radius 32.
+- Exact deltas: sparkle packets `2 -> 18`; positions are all 18 ring/layer coordinates.
+- Affected paths/symbols: `WandManager.java:1164-1173`.
+- Primary evidence: A-013:170-182.
+- Production Gate: fail
+- Admission Basis: over_capacity
+- Production Trigger/Reachability: The cited report path is retained as evidence, but it is not admitted for this S-009 pass. port sends center and center.up only.
+- Concrete Impact/Contract: The exact delta remains durable evidence, but this candidate was ranked below S-009's eight admitted slots and receives no fix capacity. 18 sparkle packets, one sound, radius 32.
+- Admission Evidence: A-013:170-182.; S-009 priority ranking/deferred scope.
+- Admission Budget: reproduce_attempts=0; fix_checkpoints=0; review_passes=0
+- Admission Attempts Used: 0
+- Speculation Boundary: the direct cited finding only; no adjacent hardening, migration, policy, addon, or cleanup scope.
+- Regression hazards: preserve formation state, authority, sound and radius.
+- Outcome: none
+- Notes/Disposition reason: confirmed visual/network FX defect.; deferred with Production Gate fail and basis over_capacity; ranked below S-009's eight admitted slots.
+
+## F-029 — Reservoir no-coordinate fallthrough
+- Type: defect
+- Disposition: deferred
+- Severity: medium
+- Confidence: high
+- Source IDs: S-003, S-004, S-005
+- Audit IDs/Reports: A-014 / reports/A-014-reservoir-runtime.md:39-51
+- Oracle: no-coordinate callback returns null, allowing focus fallthrough.
+- Observed: port returns held wand stack and `ItemWandCasting` treats non-null as success.
+- Expected: no-coordinate return null; coordinate-facing callback remains intact.
+- Exact deltas: no-coordinate result `wandstack -> null`.
+- Affected paths/symbols: `TileEssentiaReservoir.java:269-270`, `ItemWandCasting.java:592-622`.
+- Primary evidence: A-014:39-51.
+- Production Gate: fail
+- Admission Basis: over_capacity
+- Production Trigger/Reachability: The cited report path is retained as evidence, but it is not admitted for this S-009 pass. port returns held wand stack and `ItemWandCasting` treats non-null as success.
+- Concrete Impact/Contract: The exact delta remains durable evidence, but this candidate was ranked below S-009's eight admitted slots and receives no fix capacity. no-coordinate return null; coordinate-facing callback remains intact.
+- Admission Evidence: A-014:39-51.; S-009 priority ranking/deferred scope.
+- Admission Budget: reproduce_attempts=0; fix_checkpoints=0; review_passes=0
+- Admission Attempts Used: 0
+- Speculation Boundary: the direct cited finding only; no adjacent hardening, migration, policy, addon, or cleanup scope.
+- Regression hazards: preserve coordinate facing, swing, sync and return 0.
+- Outcome: none
+- Notes/Disposition reason: confirmed focus-routing defect.; deferred with Production Gate fail and basis over_capacity; ranked below S-009's eight admitted slots.
+
+## F-030 — Reservoir null container amount
+- Type: defect
+- Disposition: deferred
+- Severity: low
+- Confidence: high
+- Source IDs: S-003, S-004, S-005
+- Audit IDs/Reports: A-014 / reports/A-014-reservoir-runtime.md:53-65
+- Oracle: `containerContains(null)` delegates `getAmount(null)` and returns 0.
+- Observed: port null query sums all stored aspects.
+- Expected: public null query returns 0; internal total users use `visSize()`/private total.
+- Exact deltas: null query `0 -> total`; non-null queries remain exact.
+- Affected paths/symbols: `TileEssentiaReservoir.java:145-153,186-195,222-235`, `AspectList.java:119-124`.
+- Primary evidence: A-014:53-65.
+- Production Gate: fail
+- Admission Basis: over_capacity
+- Production Trigger/Reachability: The cited report path is retained as evidence, but it is not admitted for this S-009 pass. port null query sums all stored aspects.
+- Concrete Impact/Contract: The exact delta remains durable evidence, but this candidate was ranked below S-009's eight admitted slots and receives no fix capacity. public null query returns 0; internal total users use `visSize()`/private total.
+- Admission Evidence: A-014:53-65.; S-009 priority ranking/deferred scope.
+- Admission Budget: reproduce_attempts=0; fix_checkpoints=0; review_passes=0
+- Admission Attempts Used: 0
+- Speculation Boundary: the direct cited finding only; no adjacent hardening, migration, policy, addon, or cleanup scope.
+- Regression hazards: preserve capacity, suction and internal total amount.
+- Outcome: none
+- Notes/Disposition reason: confirmed API semantic defect.; deferred with Production Gate fail and basis over_capacity; ranked below S-009's eight admitted slots.
+
+## F-031 — Sanity Checker right click
+- Type: defect
+- Disposition: deferred
+- Severity: medium
+- Confidence: high
+- Source IDs: S-003, S-004, S-005
+- Audit IDs/Reports: A-015 / reports/A-015-sanity-checker-runtime.md:77-90
+- Oracle: TC4 has no checker right-click override; inherited result is PASS with no message.
+- Observed: port sums permanent+sticky+temporary, sends `tc.sanity` action bar, returns SUCCESS including offhand.
+- Expected: strict no-action right click, no message and PASS.
+- Exact deltas: added total/message/SUCCESS branch -> absent/PASS.
+- Affected paths/symbols: `ItemSanityChecker.java:30-42`.
+- Primary evidence: A-015:77-90.
+- Production Gate: fail
+- Admission Basis: over_capacity
+- Production Trigger/Reachability: The cited report path is retained as evidence, but it is not admitted for this S-009 pass. port sums permanent+sticky+temporary, sends `tc.sanity` action bar, returns SUCCESS including offhand.
+- Concrete Impact/Contract: The exact delta remains durable evidence, but this candidate was ranked below S-009's eight admitted slots and receives no fix capacity. strict no-action right click, no message and PASS.
+- Admission Evidence: A-015:77-90.; S-009 priority ranking/deferred scope.
+- Admission Budget: reproduce_attempts=0; fix_checkpoints=0; review_passes=0
+- Admission Attempts Used: 0
+- Speculation Boundary: the direct cited finding only; no adjacent hardening, migration, policy, addon, or cleanup scope.
+- Regression hazards: retain item identity, HUD behavior and ordinary use.
+- Outcome: none
+- Notes/Disposition reason: E-0006 explicitly selects strict TC4 behavior.; deferred with Production Gate fail and basis over_capacity; ranked below S-009's eight admitted slots.
+
+## F-032 — Sanity HUD scale
+- Type: defect
+- Disposition: deferred
+- Severity: medium
+- Confidence: high
+- Source IDs: S-003, S-004, S-005
+- Audit IDs/Reports: A-015 / reports/A-015-sanity-checker-runtime.md:92-105
+- Oracle: TC4 draws gauge 20x76 directly.
+- Observed: port scales by `0.625F`; nominal dimensions become 12.5x47.5 and fill 8 -> 5.
+- Expected: remove scale; retain coordinates/UV/colors/category arithmetic and matrix setup.
+- Exact deltas: scale `0.625 -> 1.0`; width/height `12.5x47.5 -> 20x76`.
+- Affected paths/symbols: `RenderEventHandler.java:297-360`, scale at `:330`.
+- Primary evidence: A-015:92-105.
+- Production Gate: fail
+- Admission Basis: over_capacity
+- Production Trigger/Reachability: The cited report path is retained as evidence, but it is not admitted for this S-009 pass. port scales by `0.625F`; nominal dimensions become 12.5x47.5 and fill 8 -> 5.
+- Concrete Impact/Contract: The exact delta remains durable evidence, but this candidate was ranked below S-009's eight admitted slots and receives no fix capacity. remove scale; retain coordinates/UV/colors/category arithmetic and matrix setup.
+- Admission Evidence: A-015:92-105.; S-009 priority ranking/deferred scope.
+- Admission Budget: reproduce_attempts=0; fix_checkpoints=0; review_passes=0
+- Admission Attempts Used: 0
+- Speculation Boundary: the direct cited finding only; no adjacent hardening, migration, policy, addon, or cleanup scope.
+- Regression hazards: preserve GL restoration and exact gauge arithmetic.
+- Outcome: none
+- Notes/Disposition reason: confirmed client geometry defect.; deferred with Production Gate fail and basis over_capacity; ranked below S-009's eight admitted slots.
+
+## F-033 — Sanity HUD render order
+- Type: defect
+- Disposition: deferred
+- Severity: low
+- Confidence: high
+- Source IDs: S-003, S-004, S-005
+- Audit IDs/Reports: A-015 / reports/A-015-sanity-checker-runtime.md:107-118
+- Oracle: TC4 renders at render-tick END after ordinary overlay.
+- Observed: port draws in `RenderGameOverlayEvent.Text` before later demo/F3 strings.
+- Expected: post-overlay, once per frame, safe GL restore.
+- Exact deltas: event phase `Text-before-later-overlay -> render-tick END`.
+- Affected paths/symbols: `RenderEventHandler.java:284-295`.
+- Primary evidence: A-015:107-118.
+- Production Gate: fail
+- Admission Basis: over_capacity
+- Production Trigger/Reachability: The cited report path is retained as evidence, but it is not admitted for this S-009 pass. port draws in `RenderGameOverlayEvent.Text` before later demo/F3 strings.
+- Concrete Impact/Contract: The exact delta remains durable evidence, but this candidate was ranked below S-009's eight admitted slots and receives no fix capacity. post-overlay, once per frame, safe GL restore.
+- Admission Evidence: A-015:107-118.; S-009 priority ranking/deferred scope.
+- Admission Budget: reproduce_attempts=0; fix_checkpoints=0; review_passes=0
+- Admission Attempts Used: 0
+- Speculation Boundary: the direct cited finding only; no adjacent hardening, migration, policy, addon, or cleanup scope.
+- Regression hazards: preserve one-frame rendering and overlay state.
+- Outcome: none
+- Notes/Disposition reason: confirmed ordering defect.; deferred with Production Gate fail and basis over_capacity; ranked below S-009's eight admitted slots.
+
+## F-034 — Capability warp deserialization clamp
+- Type: defect
+- Disposition: deferred
+- Severity: medium
+- Confidence: high
+- Source IDs: S-003, S-004, S-005
+- Audit IDs/Reports: A-015 / reports/A-015-sanity-checker-runtime.md:120-131; A-023 / reports/A-023-knowledge-persistence.md:119-128
+- Oracle: TC4 loading uses clamping setters for warp categories.
+- Observed: port `deserializeNBT` assigns `warpPerm`, `warpSticky`, `warpTemp` directly; malformed negatives survive, while packet copy clamps.
+- Expected: route all four values through setters for category clamps; counter retains direct semantics.
+- Exact deltas: negative category values `<0 -> 0`; counter unchanged in semantics.
+- Affected paths/symbols: `PlayerKnowledgeCapability.java:61-109,337-373`, `PacketSyncWarp.java:54-68`.
+- Primary evidence: A-015:120-131; A-023:119-128.
+- Production Gate: fail
+- Admission Basis: over_capacity
+- Production Trigger/Reachability: The cited report path is retained as evidence, but it is not admitted for this S-009 pass. port `deserializeNBT` assigns `warpPerm`, `warpSticky`, `warpTemp` directly; malformed negatives survive, while packet copy clamps.
+- Concrete Impact/Contract: The exact delta remains durable evidence, but this candidate was ranked below S-009's eight admitted slots and receives no fix capacity. route all four values through setters for category clamps; counter retains direct semantics.
+- Admission Evidence: A-015:120-131; A-023:119-128.; S-009 priority ranking/deferred scope.
+- Admission Budget: reproduce_attempts=0; fix_checkpoints=0; review_passes=0
+- Admission Attempts Used: 0
+- Speculation Boundary: the direct cited finding only; no adjacent hardening, migration, policy, addon, or cleanup scope.
+- Regression hazards: preserve valid values and counter behavior.
+- Outcome: none
+- Notes/Disposition reason: same atomic invariant across A-015/A-023.; deferred with Production Gate fail and basis over_capacity; ranked below S-009's eight admitted slots.
+
+## F-035 — Outer crystal support
+- Type: defect
+- Disposition: required
+- Severity: high
+- Confidence: high
+- Source IDs: S-003, S-004, S-005, S-009
+- Audit IDs/Reports: A-016 / reports/A-016-outer-world-runtime.md:80-100
+- Oracle: TC4 crystal stay checks recorded face/orientation and exact non-air support.
+- Observed: port ordinary metas 0..6 and meta 7 accept any side-solid neighbor; generation places meta 7 beside non-full `BlockEldritch` meta 4 then writes orientation, causing removal.
+- Expected: validate recorded face and exact oriented non-air support before retaining generated crystals.
+- Exact deltas: support predicate broadens from face/orientation exactness to any side-solid; generated crystal becomes dropped.
+- Affected paths/symbols: `BlockCrystal.onBlockAdded`, `neighborChanged`, `checkAndDropBlock`, `canBlockStay`, `GenCommon.processDecorations`, `TileCrystal.orientation`.
+- Primary evidence: A-016:80-100.
+- Production Gate: pass
+- Admission Basis: deterministic_supported_path
+- Production Trigger/Reachability: shipped Outer generation reaches the crystal placement branch, then the support check removes the just-placed meta-7 crystal.
+- Concrete Impact/Contract: normal shipped Outer generation loses a required meta-7 crystal, so the generated structure is observably wrong.
+- Admission Evidence: A-016 report evidence directly traces meta-7 placement into the removing support check; S-009 is the capacity authority.
+- Admission Budget: reproduce_attempts=0; fix_checkpoints=1; review_passes=0
+- Admission Attempts Used: 0
+- Speculation Boundary: meta-7 crystal placement/support-check ordering only; other Outer generation, migration, and portal behavior are excluded.
+- Regression hazards: preserve generation topology, orientation NBT and all non-crystal Outer adaptations.
+- Outcome: R-002
+- Notes/Disposition reason: confirmed Outer block lifecycle defect.; admitted by the S-009 priority grant as one of exactly eight production findings.
+
+## F-036 — Orb effect
+- Type: defect
+- Disposition: deferred
+- Severity: high
+- Confidence: high
+- Source IDs: S-003, S-004, S-005
+- Audit IDs/Reports: A-017 / reports/A-017-outer-entities-drops.md:74-86
+- Oracle: TC4 applies Weakness for 160 ticks.
+- Observed: The port applies Wither for 160 ticks.
+- Expected: TC4 applies Weakness for 160 ticks.
+- Exact deltas: Wither -> Weakness; duration remains 160 ticks.
+- Affected paths/symbols: EntityEldritchOrb.java:35-59
+- Primary evidence: A-017:74-86
+- Production Gate: fail
+- Admission Basis: over_capacity
+- Production Trigger/Reachability: The cited report path is retained as evidence, but it is not admitted for this S-009 pass. The port applies Wither for 160 ticks.
+- Concrete Impact/Contract: The exact delta remains durable evidence, but this candidate was ranked below S-009's eight admitted slots and receives no fix capacity. TC4 applies Weakness for 160 ticks.
+- Admission Evidence: A-017:74-86; S-009 priority ranking/deferred scope.
+- Admission Budget: reproduce_attempts=0; fix_checkpoints=0; review_passes=0
+- Admission Attempts Used: 0
+- Speculation Boundary: the direct cited finding only; no adjacent hardening, migration, policy, addon, or cleanup scope.
+- Regression hazards: preserve orb damage, targeting, and projectile lifecycle.
+- Outcome: none
+- Notes/Disposition reason: confirmed atomic A-017 parity defect.; deferred with Production Gate fail and basis over_capacity; ranked below S-009's eight admitted slots.
+
+## F-037 — Guardian sonic effect
+- Type: defect
+- Disposition: deferred
+- Severity: high
+- Confidence: high
+- Source IDs: S-003, S-004, S-005
+- Audit IDs/Reports: A-017 / reports/A-017-outer-entities-drops.md:88-100
+- Oracle: TC4's 10% sonic branch applies Wither for 400 ticks.
+- Observed: The port applies Blindness for 400 ticks.
+- Expected: TC4's 10% sonic branch applies Wither for 400 ticks.
+- Exact deltas: Blindness -> Wither in the sonic 10% branch; duration remains 400 ticks.
+- Affected paths/symbols: EntityEldritchGuardian.java:279-315
+- Primary evidence: A-017:88-100
+- Production Gate: fail
+- Admission Basis: over_capacity
+- Production Trigger/Reachability: The cited report path is retained as evidence, but it is not admitted for this S-009 pass. The port applies Blindness for 400 ticks.
+- Concrete Impact/Contract: The exact delta remains durable evidence, but this candidate was ranked below S-009's eight admitted slots and receives no fix capacity. TC4's 10% sonic branch applies Wither for 400 ticks.
+- Admission Evidence: A-017:88-100; S-009 priority ranking/deferred scope.
+- Admission Budget: reproduce_attempts=0; fix_checkpoints=0; review_passes=0
+- Admission Attempts Used: 0
+- Speculation Boundary: the direct cited finding only; no adjacent hardening, migration, policy, addon, or cleanup scope.
+- Regression hazards: preserve sonic range, chance, damage, and status registration.
+- Outcome: none
+- Notes/Disposition reason: confirmed atomic A-017 parity defect.; deferred with Production Gate fail and basis over_capacity; ranked below S-009's eight admitted slots.
+
+## F-038 — Guardian armor value
+- Type: defect
+- Disposition: required
+- Severity: high
+- Confidence: high
+- Source IDs: S-003, S-004, S-005, S-009
+- Audit IDs/Reports: A-017 / reports/A-017-outer-entities-drops.md:102-114
+- Oracle: TC4 guardian armor value is 4.
+- Observed: The port replaces the missing armor override with getMaxSpawnedInChunk() and armor is 0.
+- Expected: TC4 guardian armor value is 4.
+- Exact deltas: getMaxSpawnedInChunk() -> getTotalArmorValue() semantics; armor 0 -> 4.
+- Affected paths/symbols: EntityEldritchGuardian.java:87-90
+- Primary evidence: A-017:102-114
+- Production Gate: pass
+- Admission Basis: deterministic_supported_path
+- Production Trigger/Reachability: normal Guardian combat reaches the missing armor method on the supported entity path; the deterministic armor value is 4 -> 0.
+- Concrete Impact/Contract: normal Guardian combat uses armor 0 instead of the TC4 contract of 4.
+- Admission Evidence: A-017:102-114 directly identifies the missing armor method and observed value 0 versus 4; S-009 is the capacity authority.
+- Admission Budget: reproduce_attempts=0; fix_checkpoints=1; review_passes=0
+- Admission Attempts Used: 0
+- Speculation Boundary: Guardian armor method/value only; spawn-cap and unrelated boss attributes are excluded.
+- Regression hazards: preserve spawn-cap behavior separately from armor calculation.
+- Outcome: R-003
+- Notes/Disposition reason: confirmed atomic A-017 parity defect.; admitted by the S-009 priority grant as one of exactly eight production findings.
+
+## F-039 — Guardian XP and talk interval
+- Type: defect
+- Disposition: required
+- Severity: high
+- Confidence: high
+- Source IDs: S-003, S-004, S-005, S-009
+- Audit IDs/Reports: A-017 / reports/A-017-outer-entities-drops.md:116-128
+- Oracle: TC4 gives XP 20 and uses a talk interval of about 500 ticks.
+- Observed: The port gives XP 500 and uses approximately 80 ticks for the talk interval.
+- Expected: TC4 gives XP 20 and uses a talk interval of about 500 ticks.
+- Exact deltas: XP 500 -> 20; talk interval approximately 80 -> 500 ticks.
+- Affected paths/symbols: EntityEldritchGuardian.java:44-50,165-168
+- Primary evidence: A-017:116-128
+- Production Gate: pass
+- Admission Basis: deterministic_supported_path
+- Production Trigger/Reachability: normal Guardian death/ambient behavior reaches the XP and talk-interval paths; deterministic output is XP 500 vs 20 and talk about 80 vs 500 ticks.
+- Concrete Impact/Contract: normal Guardian death yields XP 500 instead of 20 and the ambient talk interval is about 80 instead of 500 ticks.
+- Admission Evidence: A-017:116-128 directly records the normal death/ambient paths and exact values; S-009 is the capacity authority.
+- Admission Budget: reproduce_attempts=0; fix_checkpoints=1; review_passes=0
+- Admission Attempts Used: 0
+- Speculation Boundary: Guardian XP and talk interval constants/branches only; drops, status timing, and unrelated entity behavior are excluded.
+- Regression hazards: preserve boss drops and ordinary talk/status timing outside this interval.
+- Outcome: R-004
+- Notes/Disposition reason: confirmed atomic A-017 parity defect.; admitted by the S-009 priority grant as one of exactly eight production findings.
+
+## F-040 — Warden damage immunity
+- Type: defect
+- Disposition: deferred
+- Severity: high
+- Confidence: high
+- Source IDs: S-003, S-004, S-005
+- Audit IDs/Reports: A-017 / reports/A-017-outer-entities-drops.md:130-142
+- Oracle: TC4 immunity covers Drown and Wither damage.
+- Observed: The port immunity covers Out-of-World and generic Magic damage.
+- Expected: TC4 immunity covers Drown and Wither damage.
+- Exact deltas: immunity set Out-of-World/Magic -> Drown/Wither.
+- Affected paths/symbols: EntityEldritchWarden.java:294-304
+- Primary evidence: A-017:130-142
+- Production Gate: fail
+- Admission Basis: over_capacity
+- Production Trigger/Reachability: The cited report path is retained as evidence, but it is not admitted for this S-009 pass. The port immunity covers Out-of-World and generic Magic damage.
+- Concrete Impact/Contract: The exact delta remains durable evidence, but this candidate was ranked below S-009's eight admitted slots and receives no fix capacity. TC4 immunity covers Drown and Wither damage.
+- Admission Evidence: A-017:130-142; S-009 priority ranking/deferred scope.
+- Admission Budget: reproduce_attempts=0; fix_checkpoints=0; review_passes=0
+- Admission Attempts Used: 0
+- Speculation Boundary: the direct cited finding only; no adjacent hardening, migration, policy, addon, or cleanup scope.
+- Regression hazards: preserve other damage-source handling and boss health behavior.
+- Outcome: none
+- Notes/Disposition reason: confirmed atomic A-017 parity defect.; deferred with Production Gate fail and basis over_capacity; ranked below S-009's eight admitted slots.
+
+## F-041 — Guardian home movement
+- Type: defect
+- Disposition: deferred
+- Severity: medium
+- Confidence: high
+- Source IDs: S-003, S-004, S-005
+- Audit IDs/Reports: A-017 / reports/A-017-outer-entities-drops.md:144-156
+- Oracle: TC4 permits movement outside home and relies on return-home AI.
+- Observed: The port suppresses movement outside home.
+- Expected: TC4 permits movement outside home and relies on return-home AI.
+- Exact deltas: outside-home movement suppression -> normal movement with return-home AI.
+- Affected paths/symbols: EntityEldritchGuardian.java:255-258
+- Primary evidence: A-017:144-156
+- Production Gate: fail
+- Admission Basis: over_capacity
+- Production Trigger/Reachability: The cited report path is retained as evidence, but it is not admitted for this S-009 pass. The port suppresses movement outside home.
+- Concrete Impact/Contract: The exact delta remains durable evidence, but this candidate was ranked below S-009's eight admitted slots and receives no fix capacity. TC4 permits movement outside home and relies on return-home AI.
+- Admission Evidence: A-017:144-156; S-009 priority ranking/deferred scope.
+- Admission Budget: reproduce_attempts=0; fix_checkpoints=0; review_passes=0
+- Admission Attempts Used: 0
+- Speculation Boundary: the direct cited finding only; no adjacent hardening, migration, policy, addon, or cleanup scope.
+- Regression hazards: preserve home checks and recovery destination.
+- Outcome: none
+- Notes/Disposition reason: confirmed atomic A-017 parity defect.; deferred with Production Gate fail and basis over_capacity; ranked below S-009's eight admitted slots.
+
+## F-042 — Warden status 18 client branch
+- Type: defect
+- Disposition: deferred
+- Severity: medium
+- Confidence: high
+- Source IDs: S-003, S-004, S-005
+- Audit IDs/Reports: A-017 / reports/A-017-outer-entities-drops.md:158-170
+- Oracle: TC4 handles spawn status 18 on the client and synchronizes the timer at 150.
+- Observed: The server sends status 18 at timer 150 but the client has no receive branch; the synchronized timer is 0.
+- Expected: TC4 handles spawn status 18 on the client and synchronizes the timer at 150.
+- Exact deltas: client status-18 branch missing -> present; timer 0 -> 150.
+- Affected paths/symbols: EntityEldritchWarden.java:171-175,320-331
+- Primary evidence: A-017:158-170
+- Production Gate: fail
+- Admission Basis: over_capacity
+- Production Trigger/Reachability: The cited report path is retained as evidence, but it is not admitted for this S-009 pass. The server sends status 18 at timer 150 but the client has no receive branch; the synchronized timer is 0.
+- Concrete Impact/Contract: The exact delta remains durable evidence, but this candidate was ranked below S-009's eight admitted slots and receives no fix capacity. TC4 handles spawn status 18 on the client and synchronizes the timer at 150.
+- Admission Evidence: A-017:158-170; S-009 priority ranking/deferred scope.
+- Admission Budget: reproduce_attempts=0; fix_checkpoints=0; review_passes=0
+- Admission Attempts Used: 0
+- Speculation Boundary: the direct cited finding only; no adjacent hardening, migration, policy, addon, or cleanup scope.
+- Regression hazards: preserve other status codes and server/client authority.
+- Outcome: none
+- Notes/Disposition reason: confirmed atomic A-017 parity defect.; deferred with Production Gate fail and basis over_capacity; ranked below S-009's eight admitted slots.
+
+## F-043 — Boss aggro and player scaling
+- Type: defect
+- Disposition: deferred
+- Severity: high
+- Confidence: high
+- Source IDs: S-003, S-004, S-005
+- Audit IDs/Reports: A-017 / reports/A-017-outer-entities-drops.md:172-184
+- Oracle: TC4 uses the order-dependent >25 and 10% loop for target selection and scaling.
+- Observed: The port deterministically cleans aggro, selects the highest target, and scales all resolved players.
+- Expected: TC4 uses the order-dependent >25 and 10% loop for target selection and scaling.
+- Exact deltas: TC4 order-dependent loop -> exact TC4 branch and values; no silent improvement.
+- Affected paths/symbols: EntityThaumcraftBoss.updateAggroAndPlayerScaling:192-245
+- Primary evidence: A-017:172-184
+- Production Gate: fail
+- Admission Basis: over_capacity
+- Production Trigger/Reachability: The cited report path is retained as evidence, but it is not admitted for this S-009 pass. The port deterministically cleans aggro, selects the highest target, and scales all resolved players.
+- Concrete Impact/Contract: The exact delta remains durable evidence, but this candidate was ranked below S-009's eight admitted slots and receives no fix capacity. TC4 uses the order-dependent >25 and 10% loop for target selection and scaling.
+- Admission Evidence: A-017:172-184; S-009 priority ranking/deferred scope.
+- Admission Budget: reproduce_attempts=0; fix_checkpoints=0; review_passes=0
+- Admission Attempts Used: 0
+- Speculation Boundary: the direct cited finding only; no adjacent hardening, migration, policy, addon, or cleanup scope.
+- Regression hazards: preserve boss target validity, difficulty, and multiplayer synchronization.
+- Outcome: none
+- Notes/Disposition reason: confirmed atomic A-017 parity defect.; deferred with Production Gate fail and basis over_capacity; ranked below S-009's eight admitted slots.
+
+## F-044 — Boss web immunity
+- Type: defect
+- Disposition: deferred
+- Severity: high
+- Confidence: high
+- Source IDs: S-003, S-004, S-005
+- Audit IDs/Reports: A-017 / reports/A-017-outer-entities-drops.md:186-198
+- Oracle: TC4 overrides setInWeb with an empty implementation for bosses.
+- Observed: The port inherits web slowdown.
+- Expected: TC4 overrides setInWeb with an empty implementation for bosses.
+- Exact deltas: inherited slowdown -> empty boss setInWeb behavior.
+- Affected paths/symbols: EntityThaumcraftBoss missing setInWeb override
+- Primary evidence: A-017:186-198
+- Production Gate: fail
+- Admission Basis: over_capacity
+- Production Trigger/Reachability: The cited report path is retained as evidence, but it is not admitted for this S-009 pass. The port inherits web slowdown.
+- Concrete Impact/Contract: The exact delta remains durable evidence, but this candidate was ranked below S-009's eight admitted slots and receives no fix capacity. TC4 overrides setInWeb with an empty implementation for bosses.
+- Admission Evidence: A-017:186-198; S-009 priority ranking/deferred scope.
+- Admission Budget: reproduce_attempts=0; fix_checkpoints=0; review_passes=0
+- Admission Attempts Used: 0
+- Speculation Boundary: the direct cited finding only; no adjacent hardening, migration, policy, addon, or cleanup scope.
+- Regression hazards: preserve normal movement and other environmental effects.
+- Outcome: none
+- Notes/Disposition reason: confirmed atomic A-017 parity defect.; deferred with Production Gate fail and basis over_capacity; ranked below S-009's eight admitted slots.
+
+## F-045 — Crab hard-mode spawn effect
+- Type: defect
+- Disposition: deferred
+- Severity: medium
+- Confidence: high
+- Source IDs: S-003, S-004, S-005
+- Audit IDs/Reports: A-017 / reports/A-017-outer-entities-drops.md:200-212
+- Oracle: TC4 performs the EntitySpider.GroupData hard/local-difficulty roll for the permanent random spider potion.
+- Observed: The port has no GroupData or hard roll and the permanent random effect is absent.
+- Expected: TC4 performs the EntitySpider.GroupData hard/local-difficulty roll for the permanent random spider potion.
+- Exact deltas: hard/local difficulty roll absent -> TC4 spawn roll and effect branch.
+- Affected paths/symbols: EntityEldritchCrab.onInitialSpawn:98-106
+- Primary evidence: A-017:200-212
+- Production Gate: fail
+- Admission Basis: over_capacity
+- Production Trigger/Reachability: The cited report path is retained as evidence, but it is not admitted for this S-009 pass. The port has no GroupData or hard roll and the permanent random effect is absent.
+- Concrete Impact/Contract: The exact delta remains durable evidence, but this candidate was ranked below S-009's eight admitted slots and receives no fix capacity. TC4 performs the EntitySpider.GroupData hard/local-difficulty roll for the permanent random spider potion.
+- Admission Evidence: A-017:200-212; S-009 priority ranking/deferred scope.
+- Admission Budget: reproduce_attempts=0; fix_checkpoints=0; review_passes=0
+- Admission Attempts Used: 0
+- Speculation Boundary: the direct cited finding only; no adjacent hardening, migration, policy, addon, or cleanup scope.
+- Regression hazards: preserve crab spawn data, helmet state, and effect duration semantics.
+- Outcome: none
+- Notes/Disposition reason: confirmed atomic A-017 parity defect.; deferred with Production Gate fail and basis over_capacity; ranked below S-009's eight admitted slots.
+
+## F-046 — Helmeted Crab speed
+- Type: defect
+- Disposition: deferred
+- Severity: medium
+- Confidence: high
+- Source IDs: S-003, S-004, S-005
+- Audit IDs/Reports: A-017 / reports/A-017-outer-entities-drops.md:214-226
+- Oracle: TC4 normal helmeted Crab runtime speed remains 0.3 and sets 0.3 only on break.
+- Observed: The port sets helmeted Crab speed to 0.275.
+- Expected: TC4 normal helmeted Crab runtime speed remains 0.3 and sets 0.3 only on break.
+- Exact deltas: speed 0.275 -> 0.3 while helmeted; break behavior remains distinct.
+- Affected paths/symbols: EntityEldritchCrab.setHelm:58-64
+- Primary evidence: A-017:214-226
+- Production Gate: fail
+- Admission Basis: over_capacity
+- Production Trigger/Reachability: The cited report path is retained as evidence, but it is not admitted for this S-009 pass. The port sets helmeted Crab speed to 0.275.
+- Concrete Impact/Contract: The exact delta remains durable evidence, but this candidate was ranked below S-009's eight admitted slots and receives no fix capacity. TC4 normal helmeted Crab runtime speed remains 0.3 and sets 0.3 only on break.
+- Admission Evidence: A-017:214-226; S-009 priority ranking/deferred scope.
+- Admission Budget: reproduce_attempts=0; fix_checkpoints=0; review_passes=0
+- Admission Attempts Used: 0
+- Speculation Boundary: the direct cited finding only; no adjacent hardening, migration, policy, addon, or cleanup scope.
+- Regression hazards: preserve helmet durability, visibility, and break transition.
+- Outcome: none
+- Notes/Disposition reason: confirmed atomic A-017 parity defect.; deferred with Production Gate fail and basis over_capacity; ranked below S-009's eight admitted slots.
+
+## F-047 — Guardian Eldritch team relation
+- Type: defect
+- Disposition: deferred
+- Severity: medium
+- Confidence: high
+- Source IDs: S-003, S-004, S-005
+- Audit IDs/Reports: A-017 / reports/A-017-outer-entities-drops.md:228-240
+- Oracle: TC4 guardian is on the same team as an IEldritchMob.
+- Observed: The port falls through to the vanilla team result.
+- Expected: TC4 guardian is on the same team as an IEldritchMob.
+- Exact deltas: IEldritchMob relation missing -> TC4 same-team result.
+- Affected paths/symbols: EntityEldritchGuardian
+- Primary evidence: A-017:228-240
+- Production Gate: fail
+- Admission Basis: over_capacity
+- Production Trigger/Reachability: The cited report path is retained as evidence, but it is not admitted for this S-009 pass. The port falls through to the vanilla team result.
+- Concrete Impact/Contract: The exact delta remains durable evidence, but this candidate was ranked below S-009's eight admitted slots and receives no fix capacity. TC4 guardian is on the same team as an IEldritchMob.
+- Admission Evidence: A-017:228-240; S-009 priority ranking/deferred scope.
+- Admission Budget: reproduce_attempts=0; fix_checkpoints=0; review_passes=0
+- Admission Attempts Used: 0
+- Speculation Boundary: the direct cited finding only; no adjacent hardening, migration, policy, addon, or cleanup scope.
+- Regression hazards: preserve vanilla team behavior for non-Eldritch entities.
+- Outcome: none
+- Notes/Disposition reason: confirmed atomic A-017 parity defect.; deferred with Production Gate fail and basis over_capacity; ranked below S-009's eight admitted slots.
+
+## F-048 — Crab same-species team relation
+- Type: defect
+- Disposition: deferred
+- Severity: medium
+- Confidence: high
+- Source IDs: S-003, S-004, S-005
+- Audit IDs/Reports: A-017 / reports/A-017-outer-entities-drops.md:242-254
+- Oracle: TC4 Crab treats the same species as allied.
+- Observed: The port lacks the same-species team relation.
+- Expected: TC4 Crab treats the same species as allied.
+- Exact deltas: same-species relation absent -> TC4 allied result.
+- Affected paths/symbols: EntityEldritchCrab
+- Primary evidence: A-017:242-254
+- Production Gate: fail
+- Admission Basis: over_capacity
+- Production Trigger/Reachability: The cited report path is retained as evidence, but it is not admitted for this S-009 pass. The port lacks the same-species team relation.
+- Concrete Impact/Contract: The exact delta remains durable evidence, but this candidate was ranked below S-009's eight admitted slots and receives no fix capacity. TC4 Crab treats the same species as allied.
+- Admission Evidence: A-017:242-254; S-009 priority ranking/deferred scope.
+- Admission Budget: reproduce_attempts=0; fix_checkpoints=0; review_passes=0
+- Admission Attempts Used: 0
+- Speculation Boundary: the direct cited finding only; no adjacent hardening, migration, policy, addon, or cleanup scope.
+- Regression hazards: preserve hostility to unrelated mobs and player targeting.
+- Outcome: none
+- Notes/Disposition reason: confirmed atomic A-017 parity defect.; deferred with Production Gate fail and basis over_capacity; ranked below S-009's eight admitted slots.
+
+## F-049 — Boss initial spawn
+- Type: defect
+- Disposition: deferred
+- Severity: high
+- Confidence: high
+- Source IDs: S-003, S-004, S-005
+- Audit IDs/Reports: A-017 / reports/A-017-outer-entities-drops.md:256-268
+- Oracle: TC4 skips superclass initial spawn effects and truncates coordinates.
+- Observed: The port calls 1.12 super.onInitialSpawn and floors BlockPos coordinates.
+- Expected: TC4 skips superclass initial spawn effects and truncates coordinates.
+- Exact deltas: super initial spawn call -> skipped; floor coordinates -> TC4 truncation.
+- Affected paths/symbols: EntityThaumcraftBoss.java:108-113
+- Primary evidence: A-017:256-268
+- Production Gate: fail
+- Admission Basis: over_capacity
+- Production Trigger/Reachability: The cited report path is retained as evidence, but it is not admitted for this S-009 pass. The port calls 1.12 super.onInitialSpawn and floors BlockPos coordinates.
+- Concrete Impact/Contract: The exact delta remains durable evidence, but this candidate was ranked below S-009's eight admitted slots and receives no fix capacity. TC4 skips superclass initial spawn effects and truncates coordinates.
+- Admission Evidence: A-017:256-268; S-009 priority ranking/deferred scope.
+- Admission Budget: reproduce_attempts=0; fix_checkpoints=0; review_passes=0
+- Admission Attempts Used: 0
+- Speculation Boundary: the direct cited finding only; no adjacent hardening, migration, policy, addon, or cleanup scope.
+- Regression hazards: preserve explicit boss attributes, spawn data, and difficulty application.
+- Outcome: none
+- Notes/Disposition reason: confirmed atomic A-017 parity defect.; deferred with Production Gate fail and basis over_capacity; ranked below S-009's eight admitted slots.
+
+## F-050 — Warden follow range
+- Type: defect
+- Disposition: deferred
+- Severity: medium
+- Confidence: high
+- Source IDs: S-003, S-004, S-005
+- Audit IDs/Reports: A-017 / reports/A-017-outer-entities-drops.md:270-282
+- Oracle: TC4 Warden follow range is 40 before spawn modifiers.
+- Observed: The port uses 48.
+- Expected: TC4 Warden follow range is 40 before spawn modifiers.
+- Exact deltas: follow range 48 -> 40.
+- Affected paths/symbols: EntityEldritchWarden.java:71-78
+- Primary evidence: A-017:270-282
+- Production Gate: fail
+- Admission Basis: over_capacity
+- Production Trigger/Reachability: The cited report path is retained as evidence, but it is not admitted for this S-009 pass. The port uses 48.
+- Concrete Impact/Contract: The exact delta remains durable evidence, but this candidate was ranked below S-009's eight admitted slots and receives no fix capacity. TC4 Warden follow range is 40 before spawn modifiers.
+- Admission Evidence: A-017:270-282; S-009 priority ranking/deferred scope.
+- Admission Budget: reproduce_attempts=0; fix_checkpoints=0; review_passes=0
+- Admission Attempts Used: 0
+- Speculation Boundary: the direct cited finding only; no adjacent hardening, migration, policy, addon, or cleanup scope.
+- Regression hazards: preserve later spawn modifiers and target acquisition.
+- Outcome: none
+- Notes/Disposition reason: confirmed atomic A-017 parity defect.; deferred with Production Gate fail and basis over_capacity; ranked below S-009's eight admitted slots.
+
+## F-051 — Warden ward ceiling
+- Type: defect
+- Disposition: deferred
+- Severity: high
+- Confidence: high
+- Source IDs: S-003, S-004, S-005
+- Audit IDs/Reports: A-017 / reports/A-017-outer-entities-drops.md:284-296
+- Oracle: TC4 ward ceiling is based on effective maximum health after modifiers.
+- Observed: The port uses base health 200*0.66 = 132.
+- Expected: TC4 ward ceiling is based on effective maximum health after modifiers.
+- Exact deltas: base-health ceiling 132 -> effective-max-health ceiling.
+- Affected paths/symbols: EntityEldritchWarden.java:81-85,119-128
+- Primary evidence: A-017:284-296
+- Production Gate: fail
+- Admission Basis: over_capacity
+- Production Trigger/Reachability: The cited report path is retained as evidence, but it is not admitted for this S-009 pass. The port uses base health 200*0.66 = 132.
+- Concrete Impact/Contract: The exact delta remains durable evidence, but this candidate was ranked below S-009's eight admitted slots and receives no fix capacity. TC4 ward ceiling is based on effective maximum health after modifiers.
+- Admission Evidence: A-017:284-296; S-009 priority ranking/deferred scope.
+- Admission Budget: reproduce_attempts=0; fix_checkpoints=0; review_passes=0
+- Admission Attempts Used: 0
+- Speculation Boundary: the direct cited finding only; no adjacent hardening, migration, policy, addon, or cleanup scope.
+- Regression hazards: preserve ward amount, health modifiers, and cap semantics.
+- Outcome: none
+- Notes/Disposition reason: confirmed atomic A-017 parity defect.; deferred with Production Gate fail and basis over_capacity; ranked below S-009's eight admitted slots.
+
+## F-052 — Warden talk interval
+- Type: defect
+- Disposition: deferred
+- Severity: medium
+- Confidence: high
+- Source IDs: S-003, S-004, S-005
+- Audit IDs/Reports: A-017 / reports/A-017-outer-entities-drops.md:298-310
+- Oracle: TC4 Warden talk interval is 500 ticks.
+- Observed: The port inherits approximately 80 ticks.
+- Expected: TC4 Warden talk interval is 500 ticks.
+- Exact deltas: talk interval approximately 80 -> 500 ticks.
+- Affected paths/symbols: EntityEldritchWarden
+- Primary evidence: A-017:298-310
+- Production Gate: fail
+- Admission Basis: over_capacity
+- Production Trigger/Reachability: The cited report path is retained as evidence, but it is not admitted for this S-009 pass. The port inherits approximately 80 ticks.
+- Concrete Impact/Contract: The exact delta remains durable evidence, but this candidate was ranked below S-009's eight admitted slots and receives no fix capacity. TC4 Warden talk interval is 500 ticks.
+- Admission Evidence: A-017:298-310; S-009 priority ranking/deferred scope.
+- Admission Budget: reproduce_attempts=0; fix_checkpoints=0; review_passes=0
+- Admission Attempts Used: 0
+- Speculation Boundary: the direct cited finding only; no adjacent hardening, migration, policy, addon, or cleanup scope.
+- Regression hazards: preserve talk selection and other boss timers.
+- Outcome: none
+- Notes/Disposition reason: confirmed atomic A-017 parity defect.; deferred with Production Gate fail and basis over_capacity; ranked below S-009's eight admitted slots.
+
+## F-053 — Champion name generation
+- Type: defect
+- Disposition: deferred
+- Severity: medium
+- Confidence: high
+- Source IDs: S-003, S-004, S-005
+- Audit IDs/Reports: A-017 / reports/A-017-outer-entities-drops.md:312-324
+- Oracle: TC4 Warden and Golem champion names include localized title and modifier names.
+- Observed: The port's name generation is empty.
+- Expected: TC4 Warden and Golem champion names include localized title and modifier names.
+- Exact deltas: empty generated name -> localized title/modifier name.
+- Affected paths/symbols: EntityThaumcraftBoss.generateName:298; Warden/Golem subclass generation
+- Primary evidence: A-017:312-324
+- Production Gate: fail
+- Admission Basis: over_capacity
+- Production Trigger/Reachability: The cited report path is retained as evidence, but it is not admitted for this S-009 pass. The port's name generation is empty.
+- Concrete Impact/Contract: The exact delta remains durable evidence, but this candidate was ranked below S-009's eight admitted slots and receives no fix capacity. TC4 Warden and Golem champion names include localized title and modifier names.
+- Admission Evidence: A-017:312-324; S-009 priority ranking/deferred scope.
+- Admission Budget: reproduce_attempts=0; fix_checkpoints=0; review_passes=0
+- Admission Attempts Used: 0
+- Speculation Boundary: the direct cited finding only; no adjacent hardening, migration, policy, addon, or cleanup scope.
+- Regression hazards: preserve custom name persistence and localization keys.
+- Outcome: none
+- Notes/Disposition reason: confirmed atomic A-017 parity defect.; deferred with Production Gate fail and basis over_capacity; ranked below S-009's eight admitted slots.
+
+## F-054 — Ranged attack pursuit
+- Type: defect
+- Disposition: deferred
+- Severity: high
+- Confidence: high
+- Source IDs: S-003, S-004, S-005
+- Audit IDs/Reports: A-017 / reports/A-017-outer-entities-drops.md:326-338
+- Oracle: TC4 rejects targets only below minimum range and pursues targets beyond firing range 24.
+- Observed: The port rejects targets beyond firing range 24.
+- Expected: TC4 rejects targets only below minimum range and pursues targets beyond firing range 24.
+- Exact deltas: far-target rejection -> continued pursuit until firing range.
+- Affected paths/symbols: AILongRangeAttack.java:25-45
+- Primary evidence: A-017:326-338
+- Production Gate: fail
+- Admission Basis: over_capacity
+- Production Trigger/Reachability: The cited report path is retained as evidence, but it is not admitted for this S-009 pass. The port rejects targets beyond firing range 24.
+- Concrete Impact/Contract: The exact delta remains durable evidence, but this candidate was ranked below S-009's eight admitted slots and receives no fix capacity. TC4 rejects targets only below minimum range and pursues targets beyond firing range 24.
+- Admission Evidence: A-017:326-338; S-009 priority ranking/deferred scope.
+- Admission Budget: reproduce_attempts=0; fix_checkpoints=0; review_passes=0
+- Admission Attempts Used: 0
+- Speculation Boundary: the direct cited finding only; no adjacent hardening, migration, policy, addon, or cleanup scope.
+- Regression hazards: preserve minimum-range rejection, attack cadence, and navigation.
+- Outcome: none
+- Notes/Disposition reason: confirmed atomic A-017 parity defect.; deferred with Production Gate fail and basis over_capacity; ranked below S-009's eight admitted slots.
+
+## F-055 — Warden home teleport
+- Type: defect
+- Disposition: deferred
+- Severity: high
+- Confidence: high
+- Source IDs: S-003, S-004, S-005
+- Audit IDs/Reports: A-017 / reports/A-017-outer-entities-drops.md:340-352
+- Oracle: TC4 tries exact home first and emits 128 portal particles.
+- Observed: The port tries random offsets first and emits no 128-particle trail.
+- Expected: TC4 tries exact home first and emits 128 portal particles.
+- Exact deltas: random-first/no particles -> exact-home-first/128 portal particles.
+- Affected paths/symbols: EntityEldritchWarden.teleportHome:250-292
+- Primary evidence: A-017:340-352
+- Production Gate: fail
+- Admission Basis: over_capacity
+- Production Trigger/Reachability: The cited report path is retained as evidence, but it is not admitted for this S-009 pass. The port tries random offsets first and emits no 128-particle trail.
+- Concrete Impact/Contract: The exact delta remains durable evidence, but this candidate was ranked below S-009's eight admitted slots and receives no fix capacity. TC4 tries exact home first and emits 128 portal particles.
+- Admission Evidence: A-017:340-352; S-009 priority ranking/deferred scope.
+- Admission Budget: reproduce_attempts=0; fix_checkpoints=0; review_passes=0
+- Admission Attempts Used: 0
+- Speculation Boundary: the direct cited finding only; no adjacent hardening, migration, policy, addon, or cleanup scope.
+- Regression hazards: preserve safe teleport validation and cooldown.
+- Outcome: none
+- Notes/Disposition reason: confirmed atomic A-017 parity defect.; deferred with Production Gate fail and basis over_capacity; ranked below S-009's eight admitted slots.
+
+## F-056 — Warden field cleanup
+- Type: defect
+- Disposition: deferred
+- Severity: high
+- Confidence: high
+- Source IDs: S-003, S-004, S-005
+- Audit IDs/Reports: A-017 / reports/A-017-outer-entities-drops.md:354-366
+- Oracle: TC4 schedules cleanup only for the frenzy ring.
+- Observed: The port also schedules normal airy meta-11 field cleanup at 250..399 ticks.
+- Expected: TC4 schedules cleanup only for the frenzy ring.
+- Exact deltas: normal-field cleanup scheduled -> frenzy-ring-only cleanup.
+- Affected paths/symbols: EntityEldritchWarden.fillEldritchField/performFieldFrenzy:204-248
+- Primary evidence: A-017:354-366
+- Production Gate: fail
+- Admission Basis: over_capacity
+- Production Trigger/Reachability: The cited report path is retained as evidence, but it is not admitted for this S-009 pass. The port also schedules normal airy meta-11 field cleanup at 250..399 ticks.
+- Concrete Impact/Contract: The exact delta remains durable evidence, but this candidate was ranked below S-009's eight admitted slots and receives no fix capacity. TC4 schedules cleanup only for the frenzy ring.
+- Admission Evidence: A-017:354-366; S-009 priority ranking/deferred scope.
+- Admission Budget: reproduce_attempts=0; fix_checkpoints=0; review_passes=0
+- Admission Attempts Used: 0
+- Speculation Boundary: the direct cited finding only; no adjacent hardening, migration, policy, addon, or cleanup scope.
+- Regression hazards: preserve frenzy radius, metadata, and cleanup timing.
+- Outcome: none
+- Notes/Disposition reason: confirmed atomic A-017 parity defect.; deferred with Production Gate fail and basis over_capacity; ranked below S-009's eight admitted slots.
+
+## F-057 — Golem Orb impact burst
+- Type: defect
+- Disposition: deferred
+- Severity: medium
+- Confidence: high
+- Source IDs: S-003, S-004, S-005
+- Audit IDs/Reports: A-017 / reports/A-017-outer-entities-drops.md:368-380
+- Oracle: TC4 calls Thaumcraft.proxy.burst with scale 1.0f on impact.
+- Observed: The port omits the burst call.
+- Expected: TC4 calls Thaumcraft.proxy.burst with scale 1.0f on impact.
+- Exact deltas: burst missing -> burst(..., 1.0f).
+- Affected paths/symbols: EntityGolemOrb.java:53-66
+- Primary evidence: A-017:368-380
+- Production Gate: fail
+- Admission Basis: over_capacity
+- Production Trigger/Reachability: The cited report path is retained as evidence, but it is not admitted for this S-009 pass. The port omits the burst call.
+- Concrete Impact/Contract: The exact delta remains durable evidence, but this candidate was ranked below S-009's eight admitted slots and receives no fix capacity. TC4 calls Thaumcraft.proxy.burst with scale 1.0f on impact.
+- Admission Evidence: A-017:368-380; S-009 priority ranking/deferred scope.
+- Admission Budget: reproduce_attempts=0; fix_checkpoints=0; review_passes=0
+- Admission Attempts Used: 0
+- Speculation Boundary: the direct cited finding only; no adjacent hardening, migration, policy, addon, or cleanup scope.
+- Regression hazards: preserve impact damage, sound, and server-only effects.
+- Outcome: none
+- Notes/Disposition reason: confirmed atomic A-017 parity defect.; deferred with Production Gate fail and basis over_capacity; ranked below S-009's eight admitted slots.
+
+## F-058 — Crab hurt sound
+- Type: defect
+- Disposition: deferred
+- Severity: medium
+- Confidence: high
+- Source IDs: S-003, S-004, S-005
+- Audit IDs/Reports: A-017 / reports/A-017-outer-entities-drops.md:382-394
+- Oracle: TC4 Crab uses the generic hostile hurt sound.
+- Observed: The port uses Guardian hurt sound.
+- Expected: TC4 Crab uses the generic hostile hurt sound.
+- Exact deltas: Guardian hurt -> generic hostile hurt.
+- Affected paths/symbols: EntityEldritchCrab.java:133-135
+- Primary evidence: A-017:382-394
+- Production Gate: fail
+- Admission Basis: over_capacity
+- Production Trigger/Reachability: The cited report path is retained as evidence, but it is not admitted for this S-009 pass. The port uses Guardian hurt sound.
+- Concrete Impact/Contract: The exact delta remains durable evidence, but this candidate was ranked below S-009's eight admitted slots and receives no fix capacity. TC4 Crab uses the generic hostile hurt sound.
+- Admission Evidence: A-017:382-394; S-009 priority ranking/deferred scope.
+- Admission Budget: reproduce_attempts=0; fix_checkpoints=0; review_passes=0
+- Admission Attempts Used: 0
+- Speculation Boundary: the direct cited finding only; no adjacent hardening, migration, policy, addon, or cleanup scope.
+- Regression hazards: preserve hurt volume, pitch, and death sound.
+- Outcome: none
+- Notes/Disposition reason: confirmed atomic A-017 parity defect.; deferred with Production Gate fail and basis over_capacity; ranked below S-009's eight admitted slots.
+
+## F-059 — Crab step sound
+- Type: defect
+- Disposition: deferred
+- Severity: medium
+- Confidence: high
+- Source IDs: S-003, S-004, S-005
+- Audit IDs/Reports: A-017 / reports/A-017-outer-entities-drops.md:396-408
+- Oracle: TC4 Crab plays mob.spider.step at volume 0.15 and pitch 1.0.
+- Observed: The port lacks playStepSound.
+- Expected: TC4 Crab plays mob.spider.step at volume 0.15 and pitch 1.0.
+- Exact deltas: step sound absent -> mob.spider.step, volume 0.15, pitch 1.0.
+- Affected paths/symbols: EntityEldritchCrab missing playStepSound
+- Primary evidence: A-017:396-408
+- Production Gate: fail
+- Admission Basis: over_capacity
+- Production Trigger/Reachability: The cited report path is retained as evidence, but it is not admitted for this S-009 pass. The port lacks playStepSound.
+- Concrete Impact/Contract: The exact delta remains durable evidence, but this candidate was ranked below S-009's eight admitted slots and receives no fix capacity. TC4 Crab plays mob.spider.step at volume 0.15 and pitch 1.0.
+- Admission Evidence: A-017:396-408; S-009 priority ranking/deferred scope.
+- Admission Budget: reproduce_attempts=0; fix_checkpoints=0; review_passes=0
+- Admission Attempts Used: 0
+- Speculation Boundary: the direct cited finding only; no adjacent hardening, migration, policy, addon, or cleanup scope.
+- Regression hazards: preserve movement cadence and other entity sounds.
+- Outcome: none
+- Notes/Disposition reason: confirmed atomic A-017 parity defect.; deferred with Production Gate fail and basis over_capacity; ranked below S-009's eight admitted slots.
+
+## F-060 — Balanced shard and derived aspects
+- Type: defect
+- Disposition: deferred
+- Severity: high
+- Confidence: high
+- Source IDs: S-003, S-004, S-005
+- Audit IDs/Reports: A-018 / reports/A-018-aspects-scans-data.md:38-74
+- Oracle: recipe-derived balanced shard tags `[MAGIC 1,AIR 2,CRYSTAL 1,FIRE 1,WATER 1,EARTH 1,ORDER 1,ENTROPY 1]` and TC4 Focus derivation.
+- Observed: port explicitly tags shard with six elemental 2 plus `CRYSTAL 1`; Focus final list `[CRYSTAL 27,FIRE 11,WATER 11,EARTH 11,ORDER 11,ENTROPY 11]`.
+- Expected: TC4 result `[CRYSTAL 18,GREED 14,AIR 11,WATER 10,ORDER 10,ENTROPY 10]`, preserving `MAN/HUNGER` prerequisite; causal Gold `[METAL 3,GREED 2]`, Diamond `[CRYSTAL 4,GREED 4]`, Quartz `[CRYSTAL 1,ENERGY 1]`.
+- Exact deltas: explicit shard tags replace recipe-derived values; causal parent tags are missing/different.
+- Affected paths/symbols: `ConfigAspects.java:133-211,311-355`, recipe/tag generation.
+- Primary evidence: A-018:38-74.
+- Production Gate: fail
+- Admission Basis: over_capacity
+- Production Trigger/Reachability: The cited report path is retained as evidence, but it is not admitted for this S-009 pass. port explicitly tags shard with six elemental 2 plus `CRYSTAL 1`; Focus final list `[CRYSTAL 27,FIRE 11,WATER 11,EARTH 11,ORDER 11,ENTROPY 11]`.
+- Concrete Impact/Contract: The exact delta remains durable evidence, but this candidate was ranked below S-009's eight admitted slots and receives no fix capacity. TC4 result `[CRYSTAL 18,GREED 14,AIR 11,WATER 10,ORDER 10,ENTROPY 10]`, preserving `MAN/HUNGER` prerequisite; causal Gold `[METAL 3,GREED 2]`, Diamond `[CRYSTAL 4,GREED 4]`, Quartz `[CRYSTAL 1,ENERGY 1]`.
+- Admission Evidence: A-018:38-74.; S-009 priority ranking/deferred scope.
+- Admission Budget: reproduce_attempts=0; fix_checkpoints=0; review_passes=0
+- Admission Attempts Used: 0
+- Speculation Boundary: the direct cited finding only; no adjacent hardening, migration, policy, addon, or cleanup scope.
+- Regression hazards: preserve exact/wildcard precedence and downstream recipe derivation.
+- Outcome: none
+- Notes/Disposition reason: confirmed causal aspect-data defect.; deferred with Production Gate fail and basis over_capacity; ranked below S-009's eight admitted slots.
+
+## F-061 — Void cap derived aspects
+- Type: defect
+- Disposition: deferred
+- Severity: high
+- Confidence: high
+- Source IDs: S-003, S-004, S-005
+- Audit IDs/Reports: A-018 / reports/A-018-aspects-scans-data.md:76-100
+- Oracle: TC4 cap final tags `[ENTROPY 6,ORDER 6,FIRE 6,AIR 9,MAGIC 9,ELDRITCH 4]`.
+- Observed: port `[ENTROPY 9,ORDER 9,FIRE 9,AIR 9,EARTH 6,MAGIC 6]`.
+- Expected: restore TC4 tags, including `ELDRITCH` and Void/Darkness parent prerequisite.
+- Exact deltas: entropy/order `9 -> 6`, magic `6 -> 9`, earth `6` is spurious, eldritch `0 -> 4`.
+- Affected paths/symbols: `ConfigAspects.java`, `ConfigRecipesArcaneSlice.java:305-312`, `ConfigRecipesInfusionSlice.java:45-56`.
+- Primary evidence: A-018:76-100.
+- Production Gate: fail
+- Admission Basis: over_capacity
+- Production Trigger/Reachability: The cited report path is retained as evidence, but it is not admitted for this S-009 pass. port `[ENTROPY 9,ORDER 9,FIRE 9,AIR 9,EARTH 6,MAGIC 6]`.
+- Concrete Impact/Contract: The exact delta remains durable evidence, but this candidate was ranked below S-009's eight admitted slots and receives no fix capacity. restore TC4 tags, including `ELDRITCH` and Void/Darkness parent prerequisite.
+- Admission Evidence: A-018:76-100.; S-009 priority ranking/deferred scope.
+- Admission Budget: reproduce_attempts=0; fix_checkpoints=0; review_passes=0
+- Admission Attempts Used: 0
+- Speculation Boundary: the direct cited finding only; no adjacent hardening, migration, policy, addon, or cleanup scope.
+- Regression hazards: fix causal tags with F-060; do not cull cap-specific data.
+- Outcome: none
+- Notes/Disposition reason: confirmed derived prerequisite defect.; deferred with Production Gate fail and basis over_capacity; ranked below S-009's eight admitted slots.
+
+## F-062 — Metal Device cauldron aspect
+- Type: defect
+- Disposition: deferred
+- Severity: medium
+- Confidence: high
+- Source IDs: S-003, S-004, S-005
+- Audit IDs/Reports: A-018 / reports/A-018-aspects-scans-data.md:102-113
+- Oracle: cauldron-derived `blockMetalDevice:0` is `[METAL 21,CRAFT 4,MAGIC 4]`.
+- Observed: port hard-codes `METAL 4`.
+- Expected: seven iron * 4 * .75 yields METAL 21; CRAFT/MAGIC remain 4.
+- Exact deltas: METAL `4 -> 21`.
+- Affected paths/symbols: `ConfigAspects.java:393`, `ThaumcraftCraftingManager.java:411-427`.
+- Primary evidence: A-018:102-113.
+- Production Gate: fail
+- Admission Basis: over_capacity
+- Production Trigger/Reachability: The cited report path is retained as evidence, but it is not admitted for this S-009 pass. port hard-codes `METAL 4`.
+- Concrete Impact/Contract: The exact delta remains durable evidence, but this candidate was ranked below S-009's eight admitted slots and receives no fix capacity. seven iron * 4 * .75 yields METAL 21; CRAFT/MAGIC remain 4.
+- Admission Evidence: A-018:102-113.; S-009 priority ranking/deferred scope.
+- Admission Budget: reproduce_attempts=0; fix_checkpoints=0; review_passes=0
+- Admission Attempts Used: 0
+- Speculation Boundary: the direct cited finding only; no adjacent hardening, migration, policy, addon, or cleanup scope.
+- Regression hazards: preserve recipe derivation and culling limits.
+- Outcome: none
+- Notes/Disposition reason: confirmed scan/aspect data defect.; deferred with Production Gate fail and basis over_capacity; ranked below S-009's eight admitted slots.
+
+## F-063 — Field plane camera translation
+- Type: defect
+- Disposition: deferred
+- Severity: high
+- Confidence: high
+- Source IDs: S-003, S-004, S-005, S-007
+- Audit IDs/Reports: A-019 / reports/A-019-client-visuals.md:47-58
+- Oracle: TC4 uses separate dispatcher-camera and projected-camera spaces.
+- Observed: The shared helper subtracts interpolated world camera from TESR-relative planes.
+- Expected: TC4 uses separate dispatcher-camera and projected-camera spaces.
+- Exact deltas: TESR-relative substitution -> separate dispatcher/projected camera spaces.
+- Affected paths/symbols: LayeredFieldPlaneHelper.java:36-65,99-100,121-189 and Hole/Mirror/Nothing/Obelisk callers
+- Primary evidence: A-019:47-58
+- Production Gate: fail
+- Admission Basis: over_capacity
+- Production Trigger/Reachability: The cited report path is retained as evidence, but it is not admitted for this S-009 pass. The shared helper subtracts interpolated world camera from TESR-relative planes.
+- Concrete Impact/Contract: The exact delta remains durable evidence, but this candidate was ranked below S-009's eight admitted slots and receives no fix capacity. TC4 uses separate dispatcher-camera and projected-camera spaces.
+- Admission Evidence: A-019:47-58; S-009 priority ranking/deferred scope.
+- Admission Budget: reproduce_attempts=0; fix_checkpoints=0; review_passes=0
+- Admission Attempts Used: 0
+- Speculation Boundary: the direct cited finding only; no adjacent hardening, migration, policy, addon, or cleanup scope.
+- Regression hazards: preserve all supported faces and origin/sign translation invariance.
+- Outcome: none
+- Notes/Disposition reason: confirmed atomic A-019 visual parity defect.; deferred with Production Gate fail and basis over_capacity; ranked below S-009's eight admitted slots.
+
+## F-064 — Field plane parallax camera
+- Type: defect
+- Disposition: deferred
+- Severity: high
+- Confidence: high
+- Source IDs: S-003, S-004, S-005, S-007
+- Audit IDs/Reports: A-019 / reports/A-019-client-visuals.md:60-71
+- Oracle: TC4 uses projected camera coordinates for parallax.
+- Observed: The helper uses ActiveRenderInfo rotation getters as parallax numerators.
+- Expected: TC4 uses projected camera coordinates for parallax.
+- Exact deltas: rotation getters -> projected camera coordinates.
+- Affected paths/symbols: LayeredFieldPlaneHelper.java:191-232
+- Primary evidence: A-019:60-71
+- Production Gate: fail
+- Admission Basis: over_capacity
+- Production Trigger/Reachability: The cited report path is retained as evidence, but it is not admitted for this S-009 pass. The helper uses ActiveRenderInfo rotation getters as parallax numerators.
+- Concrete Impact/Contract: The exact delta remains durable evidence, but this candidate was ranked below S-009's eight admitted slots and receives no fix capacity. TC4 uses projected camera coordinates for parallax.
+- Admission Evidence: A-019:60-71; S-009 priority ranking/deferred scope.
+- Admission Budget: reproduce_attempts=0; fix_checkpoints=0; review_passes=0
+- Admission Attempts Used: 0
+- Speculation Boundary: the direct cited finding only; no adjacent hardening, migration, policy, addon, or cleanup scope.
+- Regression hazards: preserve camera movement, yaw, and pitch behavior after translation fix.
+- Outcome: none
+- Notes/Disposition reason: confirmed atomic A-019 visual parity defect.; deferred with Production Gate fail and basis over_capacity; ranked below S-009's eight admitted slots.
+
+## F-065 — Primal Arrow aura
+- Type: defect
+- Disposition: deferred
+- Severity: high
+- Confidence: high
+- Source IDs: S-003, S-004, S-005, S-007
+- Audit IDs/Reports: A-019 / reports/A-019-client-visuals.md:73-84
+- Oracle: TC4 renders six-type wisp.png 16-frame fullbright aura, size 0.5, alpha fade, depth mask, and additive/alpha blend split.
+- Observed: The port renders only flat arrow tint.
+- Expected: TC4 renders six-type wisp.png 16-frame fullbright aura, size 0.5, alpha fade, depth mask, and additive/alpha blend split.
+- Exact deltas: aura missing -> six-type/16-frame aura with size 0.5, fade, depth, and blend behavior.
+- Affected paths/symbols: RenderPrimalArrow.java:13-38
+- Primary evidence: A-019:73-84
+- Production Gate: fail
+- Admission Basis: over_capacity
+- Production Trigger/Reachability: The cited report path is retained as evidence, but it is not admitted for this S-009 pass. The port renders only flat arrow tint.
+- Concrete Impact/Contract: The exact delta remains durable evidence, but this candidate was ranked below S-009's eight admitted slots and receives no fix capacity. TC4 renders six-type wisp.png 16-frame fullbright aura, size 0.5, alpha fade, depth mask, and additive/alpha blend split.
+- Admission Evidence: A-019:73-84; S-009 priority ranking/deferred scope.
+- Admission Budget: reproduce_attempts=0; fix_checkpoints=0; review_passes=0
+- Admission Attempts Used: 0
+- Speculation Boundary: the direct cited finding only; no adjacent hardening, migration, policy, addon, or cleanup scope.
+- Regression hazards: preserve arrow geometry, type mapping, and byte-identical wisp.png.
+- Outcome: none
+- Notes/Disposition reason: confirmed atomic A-019 visual parity defect.; deferred with Production Gate fail and basis over_capacity; ranked below S-009's eight admitted slots.
+
+## F-066 — Linked Mirror visibility
+- Type: defect
+- Disposition: deferred
+- Severity: medium
+- Confidence: high
+- Source IDs: S-003, S-004, S-005, S-007
+- Audit IDs/Reports: A-019 / reports/A-019-client-visuals.md:86-97
+- Oracle: TC4 uses FOV/third-person/near-cap visibility, with near <2 and practical visibility <400.
+- Observed: The port uses a <=64 squared visibility check, equivalent to 8 blocks.
+- Expected: TC4 uses FOV/third-person/near-cap visibility, with near <2 and practical visibility <400.
+- Exact deltas: 64 squared/8 blocks -> TC4 FOV/third-person/near visibility.
+- Affected paths/symbols: TileMirrorRenderer.java:38-46,98-119
+- Primary evidence: A-019:86-97
+- Production Gate: fail
+- Admission Basis: over_capacity
+- Production Trigger/Reachability: The cited report path is retained as evidence, but it is not admitted for this S-009 pass. The port uses a <=64 squared visibility check, equivalent to 8 blocks.
+- Concrete Impact/Contract: The exact delta remains durable evidence, but this candidate was ranked below S-009's eight admitted slots and receives no fix capacity. TC4 uses FOV/third-person/near-cap visibility, with near <2 and practical visibility <400.
+- Admission Evidence: A-019:86-97; S-009 priority ranking/deferred scope.
+- Admission Budget: reproduce_attempts=0; fix_checkpoints=0; review_passes=0
+- Admission Attempts Used: 0
+- Speculation Boundary: the direct cited finding only; no adjacent hardening, migration, policy, addon, or cleanup scope.
+- Regression hazards: preserve linked target selection and mirror texture state.
+- Outcome: none
+- Notes/Disposition reason: confirmed atomic A-019 visual parity defect.; deferred with Production Gate fail and basis over_capacity; ranked below S-009's eight admitted slots.
+
+## F-067 — Nothing layered threshold
+- Type: defect
+- Disposition: deferred
+- Severity: medium
+- Confidence: high
+- Source IDs: S-003, S-004, S-005, S-007
+- Audit IDs/Reports: A-019 / reports/A-019-client-visuals.md:99-110
+- Oracle: TC4 layered threshold is squared 512, about 22.627 blocks linear.
+- Observed: The port uses squared 144, 12 blocks linear.
+- Expected: TC4 layered threshold is squared 512, about 22.627 blocks linear.
+- Exact deltas: 144 squared/12 -> 512 squared/about 22.627.
+- Affected paths/symbols: TileEldritchNothingRenderer.java:28-55
+- Primary evidence: A-019:99-110
+- Production Gate: fail
+- Admission Basis: over_capacity
+- Production Trigger/Reachability: The cited report path is retained as evidence, but it is not admitted for this S-009 pass. The port uses squared 144, 12 blocks linear.
+- Concrete Impact/Contract: The exact delta remains durable evidence, but this candidate was ranked below S-009's eight admitted slots and receives no fix capacity. TC4 layered threshold is squared 512, about 22.627 blocks linear.
+- Admission Evidence: A-019:99-110; S-009 priority ranking/deferred scope.
+- Admission Budget: reproduce_attempts=0; fix_checkpoints=0; review_passes=0
+- Admission Attempts Used: 0
+- Speculation Boundary: the direct cited finding only; no adjacent hardening, migration, policy, addon, or cleanup scope.
+- Regression hazards: preserve connected volumes, signed coordinates, and distant fallback.
+- Outcome: none
+- Notes/Disposition reason: confirmed atomic A-019 visual parity defect.; deferred with Production Gate fail and basis over_capacity; ranked below S-009's eight admitted slots.
+
+## F-068 — Nothing TESR dispatch
+- Type: defect
+- Disposition: deferred
+- Severity: medium
+- Confidence: high
+- Source IDs: S-003, S-004, S-005, S-007
+- Audit IDs/Reports: A-019 / reports/A-019-client-visuals.md:112-123
+- Oracle: TC4 uses the inherited TESR dispatch range.
+- Observed: The port dispatches at squared 256, 16 blocks linear, making the far fallback unreachable beyond 16.
+- Expected: TC4 uses the inherited TESR dispatch range.
+- Exact deltas: port dispatch 256 squared/16 -> inherited/default TC4 dispatch.
+- Affected paths/symbols: TileEldritchNothing.java:20-29
+- Primary evidence: A-019:112-123
+- Production Gate: fail
+- Admission Basis: over_capacity
+- Production Trigger/Reachability: The cited report path is retained as evidence, but it is not admitted for this S-009 pass. The port dispatches at squared 256, 16 blocks linear, making the far fallback unreachable beyond 16.
+- Concrete Impact/Contract: The exact delta remains durable evidence, but this candidate was ranked below S-009's eight admitted slots and receives no fix capacity. TC4 uses the inherited TESR dispatch range.
+- Admission Evidence: A-019:112-123; S-009 priority ranking/deferred scope.
+- Admission Budget: reproduce_attempts=0; fix_checkpoints=0; review_passes=0
+- Admission Attempts Used: 0
+- Speculation Boundary: the direct cited finding only; no adjacent hardening, migration, policy, addon, or cleanup scope.
+- Regression hazards: preserve tile registration and far fallback behavior.
+- Outcome: none
+- Notes/Disposition reason: confirmed atomic A-019 visual parity defect.; deferred with Production Gate fail and basis over_capacity; ranked below S-009's eight admitted slots.
+
+## F-069 — Nothing adjacent-face suppression
+- Type: defect
+- Disposition: deferred
+- Severity: medium
+- Confidence: high
+- Source IDs: S-003, S-004, S-005, S-007
+- Audit IDs/Reports: A-019 / reports/A-019-client-visuals.md:125-136
+- Oracle: TC4 suppresses only faces adjacent to opaque blocks.
+- Observed: The port additionally suppresses adjacent Nothing faces.
+- Expected: TC4 suppresses only faces adjacent to opaque blocks.
+- Exact deltas: Nothing-neighbor suppression -> opaque-neighbor-only suppression.
+- Affected paths/symbols: TileEldritchNothingRenderer.java:45-76
+- Primary evidence: A-019:125-136
+- Production Gate: fail
+- Admission Basis: over_capacity
+- Production Trigger/Reachability: The cited report path is retained as evidence, but it is not admitted for this S-009 pass. The port additionally suppresses adjacent Nothing faces.
+- Concrete Impact/Contract: The exact delta remains durable evidence, but this candidate was ranked below S-009's eight admitted slots and receives no fix capacity. TC4 suppresses only faces adjacent to opaque blocks.
+- Admission Evidence: A-019:125-136; S-009 priority ranking/deferred scope.
+- Admission Budget: reproduce_attempts=0; fix_checkpoints=0; review_passes=0
+- Admission Attempts Used: 0
+- Speculation Boundary: the direct cited finding only; no adjacent hardening, migration, policy, addon, or cleanup scope.
+- Regression hazards: preserve opaque occlusion and connected Nothing geometry.
+- Outcome: none
+- Notes/Disposition reason: confirmed atomic A-019 visual parity defect.; deferred with Production Gate fail and basis over_capacity; ranked below S-009's eight admitted slots.
+
+## F-070 — Lock field LOD
+- Type: defect
+- Disposition: deferred
+- Severity: medium
+- Confidence: high
+- Source IDs: S-003, S-004, S-005, S-007
+- Audit IDs/Reports: A-019 / reports/A-019-client-visuals.md:138-149
+- Oracle: TC4 Lock field LOD threshold is squared 512, about 22.627 blocks linear.
+- Observed: The port uses squared 1024, 32 blocks linear.
+- Expected: TC4 Lock field LOD threshold is squared 512, about 22.627 blocks linear.
+- Exact deltas: 1024 squared/32 -> 512 squared/about 22.627.
+- Affected paths/symbols: TileEldritchLockRenderer.java:39-60,118-181
+- Primary evidence: A-019:138-149
+- Production Gate: fail
+- Admission Basis: over_capacity
+- Production Trigger/Reachability: The cited report path is retained as evidence, but it is not admitted for this S-009 pass. The port uses squared 1024, 32 blocks linear.
+- Concrete Impact/Contract: The exact delta remains durable evidence, but this candidate was ranked below S-009's eight admitted slots and receives no fix capacity. TC4 Lock field LOD threshold is squared 512, about 22.627 blocks linear.
+- Admission Evidence: A-019:138-149; S-009 priority ranking/deferred scope.
+- Admission Budget: reproduce_attempts=0; fix_checkpoints=0; review_passes=0
+- Admission Attempts Used: 0
+- Speculation Boundary: the direct cited finding only; no adjacent hardening, migration, policy, addon, or cleanup scope.
+- Regression hazards: preserve field texture, face orientation, and sampled lighting.
+- Outcome: none
+- Notes/Disposition reason: confirmed atomic A-019 visual parity defect.; deferred with Production Gate fail and basis over_capacity; ranked below S-009's eight admitted slots.
+
+## F-071 — Lock rings and key gate
+- Type: defect
+- Disposition: deferred
+- Severity: medium
+- Confidence: high
+- Source IDs: S-003, S-004, S-005, S-007
+- Audit IDs/Reports: A-019 / reports/A-019-client-visuals.md:151-162
+- Oracle: TC4 renders rings and key whenever TESR dispatches, independent of field LOD.
+- Observed: The port gates rings and key on the field LOD threshold.
+- Expected: TC4 renders rings and key whenever TESR dispatches, independent of field LOD.
+- Exact deltas: field-LOD gate -> dispatch-only gate for rings/key.
+- Affected paths/symbols: TileEldritchLockRenderer.java:42-116
+- Primary evidence: A-019:151-162
+- Production Gate: fail
+- Admission Basis: over_capacity
+- Production Trigger/Reachability: The cited report path is retained as evidence, but it is not admitted for this S-009 pass. The port gates rings and key on the field LOD threshold.
+- Concrete Impact/Contract: The exact delta remains durable evidence, but this candidate was ranked below S-009's eight admitted slots and receives no fix capacity. TC4 renders rings and key whenever TESR dispatches, independent of field LOD.
+- Admission Evidence: A-019:151-162; S-009 priority ranking/deferred scope.
+- Admission Budget: reproduce_attempts=0; fix_checkpoints=0; review_passes=0
+- Admission Attempts Used: 0
+- Speculation Boundary: the direct cited finding only; no adjacent hardening, migration, policy, addon, or cleanup scope.
+- Regression hazards: preserve inactive/active/key states and ring animation.
+- Outcome: none
+- Notes/Disposition reason: confirmed atomic A-019 visual parity defect.; deferred with Production Gate fail and basis over_capacity; ranked below S-009's eight admitted slots.
+
+## F-072 — Lock render range
+- Type: defect
+- Disposition: deferred
+- Severity: medium
+- Confidence: high
+- Source IDs: S-003, S-004, S-005, S-007
+- Audit IDs/Reports: A-019 / reports/A-019-client-visuals.md:164-175
+- Oracle: TC4 Lock render range is squared 9216, 96 blocks linear.
+- Observed: The port uses squared 2304, 48 blocks linear.
+- Expected: TC4 Lock render range is squared 9216, 96 blocks linear.
+- Exact deltas: 2304 squared/48 -> 9216 squared/96.
+- Affected paths/symbols: TileEldritchLock.java:359-369
+- Primary evidence: A-019:164-175
+- Production Gate: fail
+- Admission Basis: over_capacity
+- Production Trigger/Reachability: The cited report path is retained as evidence, but it is not admitted for this S-009 pass. The port uses squared 2304, 48 blocks linear.
+- Concrete Impact/Contract: The exact delta remains durable evidence, but this candidate was ranked below S-009's eight admitted slots and receives no fix capacity. TC4 Lock render range is squared 9216, 96 blocks linear.
+- Admission Evidence: A-019:164-175; S-009 priority ranking/deferred scope.
+- Admission Budget: reproduce_attempts=0; fix_checkpoints=0; review_passes=0
+- Admission Attempts Used: 0
+- Speculation Boundary: the direct cited finding only; no adjacent hardening, migration, policy, addon, or cleanup scope.
+- Regression hazards: preserve the 96-block dispatch and the field LOD distinction.
+- Outcome: none
+- Notes/Disposition reason: confirmed atomic A-019 visual parity defect.; deferred with Production Gate fail and basis over_capacity; ranked below S-009's eight admitted slots.
+
+## F-073 — Focus depth shell
+- Type: defect
+- Disposition: deferred
+- Severity: medium
+- Confidence: high
+- Source IDs: S-003, S-004, S-005, S-007
+- Audit IDs/Reports: A-019 / reports/A-019-client-visuals.md:177-188
+- Oracle: TC4 stitches and returns focus_primal_depth.png and uses depth-present alpha 0.6.
+- Observed: The depth asset is neither stitched nor returned and the port uses alpha 0.95.
+- Expected: TC4 stitches and returns focus_primal_depth.png and uses depth-present alpha 0.6.
+- Exact deltas: depth asset absent from stitch/return; alpha .95 -> .6.
+- Affected paths/symbols: FocusPrimal.java:19-92; ClientModelRegistry.java:44-45,73-80; ModelWand.java:155-201
+- Primary evidence: A-019:177-188
+- Production Gate: fail
+- Admission Basis: over_capacity
+- Production Trigger/Reachability: The cited report path is retained as evidence, but it is not admitted for this S-009 pass. The depth asset is neither stitched nor returned and the port uses alpha 0.95.
+- Concrete Impact/Contract: The exact delta remains durable evidence, but this candidate was ranked below S-009's eight admitted slots and receives no fix capacity. TC4 stitches and returns focus_primal_depth.png and uses depth-present alpha 0.6.
+- Admission Evidence: A-019:177-188; S-009 priority ranking/deferred scope.
+- Admission Budget: reproduce_attempts=0; fix_checkpoints=0; review_passes=0
+- Admission Attempts Used: 0
+- Speculation Boundary: the direct cited finding only; no adjacent hardening, migration, policy, addon, or cleanup scope.
+- Regression hazards: preserve byte-identical depth asset and mounted wand/sceptre/staff models.
+- Outcome: none
+- Notes/Disposition reason: confirmed atomic A-019 visual parity defect.; deferred with Production Gate fail and basis over_capacity; ranked below S-009's eight admitted slots.
+
+## F-074 — Hole LOD
+- Type: defect
+- Disposition: deferred
+- Severity: medium
+- Confidence: high
+- Source IDs: S-003, S-004, S-005, S-007
+- Audit IDs/Reports: A-019 / reports/A-019-client-visuals.md:190-201
+- Oracle: TC4 switches at strict squared 512 to one shade-0.5 particlefield32 quad.
+- Observed: The port always passes near-detail true.
+- Expected: TC4 switches at strict squared 512 to one shade-0.5 particlefield32 quad.
+- Exact deltas: always near-detail -> squared-distance <512 near else one shade-.5 fallback.
+- Affected paths/symbols: TileHoleRenderer.java:21-59
+- Primary evidence: A-019:190-201
+- Production Gate: fail
+- Admission Basis: over_capacity
+- Production Trigger/Reachability: The cited report path is retained as evidence, but it is not admitted for this S-009 pass. The port always passes near-detail true.
+- Concrete Impact/Contract: The exact delta remains durable evidence, but this candidate was ranked below S-009's eight admitted slots and receives no fix capacity. TC4 switches at strict squared 512 to one shade-0.5 particlefield32 quad.
+- Admission Evidence: A-019:190-201; S-009 priority ranking/deferred scope.
+- Admission Budget: reproduce_attempts=0; fix_checkpoints=0; review_passes=0
+- Admission Attempts Used: 0
+- Speculation Boundary: the direct cited finding only; no adjacent hardening, migration, policy, addon, or cleanup scope.
+- Regression hazards: preserve face orientation, floor/ceiling/wall, and merged openings.
+- Outcome: none
+- Notes/Disposition reason: confirmed atomic A-019 visual parity defect.; deferred with Production Gate fail and basis over_capacity; ranked below S-009's eight admitted slots.
+
+## F-075 — Primal Orb lightmap restore
+- Type: defect
+- Disposition: deferred
+- Severity: medium
+- Confidence: high
+- Source IDs: S-003, S-004, S-005, S-007
+- Audit IDs/Reports: A-019 / reports/A-019-client-visuals.md:203-214
+- Oracle: TC4 does not mutate global lightmap state for Primal Orb rendering.
+- Observed: The renderer writes lightmap (240,240) without restoring lastBrightnessX/Y.
+- Expected: TC4 does not mutate global lightmap state for Primal Orb rendering.
+- Exact deltas: unbalanced fullbright write -> restore prior lastBrightnessX/Y.
+- Affected paths/symbols: RenderPrimalOrb.java:87-118
+- Primary evidence: A-019:203-214
+- Production Gate: fail
+- Admission Basis: over_capacity
+- Production Trigger/Reachability: The cited report path is retained as evidence, but it is not admitted for this S-009 pass. The renderer writes lightmap (240,240) without restoring lastBrightnessX/Y.
+- Concrete Impact/Contract: The exact delta remains durable evidence, but this candidate was ranked below S-009's eight admitted slots and receives no fix capacity. TC4 does not mutate global lightmap state for Primal Orb rendering.
+- Admission Evidence: A-019:203-214; S-009 priority ranking/deferred scope.
+- Admission Budget: reproduce_attempts=0; fix_checkpoints=0; review_passes=0
+- Admission Attempts Used: 0
+- Speculation Boundary: the direct cited finding only; no adjacent hardening, migration, policy, addon, or cleanup scope.
+- Regression hazards: preserve intended orb brightness and neighboring render ordering.
+- Outcome: none
+- Notes/Disposition reason: confirmed atomic A-019 visual parity defect.; deferred with Production Gate fail and basis over_capacity; ranked below S-009's eight admitted slots.
+
+## F-076 — Eldritch Orb lightmap restore
+- Type: defect
+- Disposition: deferred
+- Severity: medium
+- Confidence: high
+- Source IDs: S-003, S-004, S-005, S-007
+- Audit IDs/Reports: A-019 / reports/A-019-client-visuals.md:216-227
+- Oracle: TC4 does not mutate global lightmap state for Eldritch Orb rendering.
+- Observed: The renderer writes lightmap (240,240) without restoring lastBrightnessX/Y.
+- Expected: TC4 does not mutate global lightmap state for Eldritch Orb rendering.
+- Exact deltas: unbalanced fullbright write -> restore prior lastBrightnessX/Y.
+- Affected paths/symbols: RenderEldritchOrb.java:87-117
+- Primary evidence: A-019:216-227
+- Production Gate: fail
+- Admission Basis: over_capacity
+- Production Trigger/Reachability: The cited report path is retained as evidence, but it is not admitted for this S-009 pass. The renderer writes lightmap (240,240) without restoring lastBrightnessX/Y.
+- Concrete Impact/Contract: The exact delta remains durable evidence, but this candidate was ranked below S-009's eight admitted slots and receives no fix capacity. TC4 does not mutate global lightmap state for Eldritch Orb rendering.
+- Admission Evidence: A-019:216-227; S-009 priority ranking/deferred scope.
+- Admission Budget: reproduce_attempts=0; fix_checkpoints=0; review_passes=0
+- Admission Attempts Used: 0
+- Speculation Boundary: the direct cited finding only; no adjacent hardening, migration, policy, addon, or cleanup scope.
+- Regression hazards: preserve intended orb brightness and neighboring render ordering.
+- Outcome: none
+- Notes/Disposition reason: confirmed atomic A-019 visual parity defect.; deferred with Production Gate fail and basis over_capacity; ranked below S-009's eight admitted slots.
+
+## F-077 — Obelisk field LOD
+- Type: defect
+- Disposition: deferred
+- Severity: medium
+- Confidence: high
+- Source IDs: S-003, S-004, S-005, S-007
+- Audit IDs/Reports: A-019 / reports/A-019-client-visuals.md:229-240
+- Oracle: TC4 Obelisk field LOD threshold is squared 512, about 22.627 blocks linear.
+- Observed: The port uses squared 9216, 96 blocks linear.
+- Expected: TC4 Obelisk field LOD threshold is squared 512, about 22.627 blocks linear.
+- Exact deltas: 9216 squared/96 -> 512 squared/about 22.627.
+- Affected paths/symbols: TileEldritchObeliskRenderer.java:38-54,101-127
+- Primary evidence: A-019:229-240
+- Production Gate: fail
+- Admission Basis: over_capacity
+- Production Trigger/Reachability: The cited report path is retained as evidence, but it is not admitted for this S-009 pass. The port uses squared 9216, 96 blocks linear.
+- Concrete Impact/Contract: The exact delta remains durable evidence, but this candidate was ranked below S-009's eight admitted slots and receives no fix capacity. TC4 Obelisk field LOD threshold is squared 512, about 22.627 blocks linear.
+- Admission Evidence: A-019:229-240; S-009 priority ranking/deferred scope.
+- Admission Budget: reproduce_attempts=0; fix_checkpoints=0; review_passes=0
+- Admission Attempts Used: 0
+- Speculation Boundary: the direct cited finding only; no adjacent hardening, migration, policy, addon, or cleanup scope.
+- Regression hazards: preserve sampled-light capture/restore and normal/Outer textures.
+- Outcome: none
+- Notes/Disposition reason: confirmed atomic A-019 visual parity defect.; deferred with Production Gate fail and basis over_capacity; ranked below S-009's eight admitted slots.
+
+## F-078 — Obelisk shell and caps gate
+- Type: defect
+- Disposition: deferred
+- Severity: medium
+- Confidence: high
+- Source IDs: S-003, S-004, S-005, S-007
+- Audit IDs/Reports: A-019 / reports/A-019-client-visuals.md:242-253
+- Oracle: TC4 renders shell and caps whenever TESR dispatches.
+- Observed: The port gates shell and caps on field LOD.
+- Expected: TC4 renders shell and caps whenever TESR dispatches.
+- Exact deltas: field-LOD gate -> dispatch-only gate for shell/caps.
+- Affected paths/symbols: TileEldritchObeliskRenderer.java:54-85
+- Primary evidence: A-019:242-253
+- Production Gate: fail
+- Admission Basis: over_capacity
+- Production Trigger/Reachability: The cited report path is retained as evidence, but it is not admitted for this S-009 pass. The port gates shell and caps on field LOD.
+- Concrete Impact/Contract: The exact delta remains durable evidence, but this candidate was ranked below S-009's eight admitted slots and receives no fix capacity. TC4 renders shell and caps whenever TESR dispatches.
+- Admission Evidence: A-019:242-253; S-009 priority ranking/deferred scope.
+- Admission Budget: reproduce_attempts=0; fix_checkpoints=0; review_passes=0
+- Admission Attempts Used: 0
+- Speculation Boundary: the direct cited finding only; no adjacent hardening, migration, policy, addon, or cleanup scope.
+- Regression hazards: preserve caps, shell, and texture selection across field boundaries.
+- Outcome: none
+- Notes/Disposition reason: confirmed atomic A-019 visual parity defect.; deferred with Production Gate fail and basis over_capacity; ranked below S-009's eight admitted slots.
+
+## F-079 — Obelisk dispatch
+- Type: defect
+- Disposition: deferred
+- Severity: medium
+- Confidence: high
+- Source IDs: S-003, S-004, S-005, S-007
+- Audit IDs/Reports: A-019 / reports/A-019-client-visuals.md:255-266
+- Oracle: TC4 Obelisk dispatch range is squared 9216, 96 blocks linear.
+- Observed: The port dispatches at squared 20736, 144 blocks linear.
+- Expected: TC4 Obelisk dispatch range is squared 9216, 96 blocks linear.
+- Exact deltas: 20736 squared/144 -> 9216 squared/96.
+- Affected paths/symbols: TileEldritchObelisk.java:62-71
+- Primary evidence: A-019:255-266
+- Production Gate: fail
+- Admission Basis: over_capacity
+- Production Trigger/Reachability: The cited report path is retained as evidence, but it is not admitted for this S-009 pass. The port dispatches at squared 20736, 144 blocks linear.
+- Concrete Impact/Contract: The exact delta remains durable evidence, but this candidate was ranked below S-009's eight admitted slots and receives no fix capacity. TC4 Obelisk dispatch range is squared 9216, 96 blocks linear.
+- Admission Evidence: A-019:255-266; S-009 priority ranking/deferred scope.
+- Admission Budget: reproduce_attempts=0; fix_checkpoints=0; review_passes=0
+- Admission Attempts Used: 0
+- Speculation Boundary: the direct cited finding only; no adjacent hardening, migration, policy, addon, or cleanup scope.
+- Regression hazards: preserve normal/Outer dispatch and TESR lifecycle.
+- Outcome: none
+- Notes/Disposition reason: confirmed atomic A-019 visual parity defect.; deferred with Production Gate fail and basis over_capacity; ranked below S-009's eight admitted slots.
+
+## F-080 — Research clue namespace identity
+- Type: defect
+- Disposition: deferred
+- Severity: P2
+- Confidence: high
+- Source IDs: S-003, S-004, S-005
+- Audit IDs/Reports: A-021 / reports/A-021-research-gating.md; duplicate A-022 / reports/A-022-research-notes.md:A-022.1
+- Oracle: TC4 clue comparison uses exact string equality.
+- Observed: port expands dotted/namespaced/path-only forms; `othermod:primalorb` intersects `Thaumcraft.PrimalOrb` through path-only `primalorb`.
+- Expected: retain `Thaumcraft.PrimalOrb -> thaumcraft:primalorb`, reject unrelated namespace.
+- Exact deltas: `othermod:primalorb` can prematurely grant `@ROD_primal_staff`; TC4 rejects.
+- Affected paths/symbols: `ResearchManager.entityTriggerMatches`, `expandEntityTriggerForms:818-850`.
+- Primary evidence: A-021 report and A-022.1; focused tests listed A-021: runtime command.
+- Production Gate: fail
+- Admission Basis: over_capacity
+- Production Trigger/Reachability: The cited report path is retained as evidence, but it is not admitted for this S-009 pass. port expands dotted/namespaced/path-only forms; `othermod:primalorb` intersects `Thaumcraft.PrimalOrb` through path-only `primalorb`.
+- Concrete Impact/Contract: The exact delta remains durable evidence, but this candidate was ranked below S-009's eight admitted slots and receives no fix capacity. retain `Thaumcraft.PrimalOrb -> thaumcraft:primalorb`, reject unrelated namespace.
+- Admission Evidence: A-021 report and A-022.1; focused tests listed A-021: runtime command.; S-009 priority ranking/deferred scope.
+- Admission Budget: reproduce_attempts=0; fix_checkpoints=0; review_passes=0
+- Admission Attempts Used: 0
+- Speculation Boundary: the direct cited finding only; no adjacent hardening, migration, policy, addon, or cleanup scope.
+- Regression hazards: preserve case normalization and legacy conversion only for canonical equivalent namespace.
+- Outcome: none
+- Notes/Disposition reason: A-022.1 is duplicate view, not independent outcome.; deferred with Production Gate fail and basis over_capacity; ranked below S-009's eight admitted slots.
+
+## F-081 — Research note ring start
+- Type: defect
+- Disposition: deferred
+- Severity: medium
+- Confidence: high
+- Source IDs: S-003, S-004, S-005
+- Audit IDs/Reports: A-022 / reports/A-022-research-notes.md:A-022.2
+- Oracle: TC4 samples ring random value but initializes `pos=0`.
+- Observed: port initializes `pos=start` from `random.nextInt(ring.size())`.
+- Expected: sampled start must not rotate endpoint sequence; radius `1+min(3,complexity)`, blank count `complexity*2` unchanged.
+- Exact deltas: same RNG state rotates every endpoint in port; complexity 1/2/3 topology changes.
+- Affected paths/symbols: `HexUtils.java:50-59`, `ResearchManager.createNote:614-666`.
+- Primary evidence: A-022.2 and TC4 `HexUtils.distributeRingRandomly`.
+- Production Gate: fail
+- Admission Basis: over_capacity
+- Production Trigger/Reachability: The cited report path is retained as evidence, but it is not admitted for this S-009 pass. port initializes `pos=start` from `random.nextInt(ring.size())`.
+- Concrete Impact/Contract: The exact delta remains durable evidence, but this candidate was ranked below S-009's eight admitted slots and receives no fix capacity. sampled start must not rotate endpoint sequence; radius `1+min(3,complexity)`, blank count `complexity*2` unchanged.
+- Admission Evidence: A-022.2 and TC4 `HexUtils.distributeRingRandomly`.; S-009 priority ranking/deferred scope.
+- Admission Budget: reproduce_attempts=0; fix_checkpoints=0; review_passes=0
+- Admission Attempts Used: 0
+- Speculation Boundary: the direct cited finding only; no adjacent hardening, migration, policy, addon, or cleanup scope.
+- Regression hazards: preserve spacing, six-neighbor geometry and blank connectivity.
+- Outcome: none
+- Notes/Disposition reason: confirmed puzzle topology defect.; deferred with Production Gate fail and basis over_capacity; ranked below S-009's eight admitted slots.
+
+## F-082 — Research note paper consumption
+- Type: defect
+- Disposition: deferred
+- Severity: medium
+- Confidence: high
+- Source IDs: S-003, S-004, S-005
+- Audit IDs/Reports: A-022 / reports/A-022-research-notes.md:A-022.3
+- Oracle: TC4 consumes ink and creates note but does not consume paper.
+- Observed: port removes one `Items.PAPER` after successful note creation.
+- Expected: paper remains; ink checks/consumption, missing-resource atomicity and note/direct routing remain.
+- Exact deltas: successful type-1 note paper `-1 -> 0` consumption in port versus unchanged TC4.
+- Affected paths/symbols: `ResearchManager.java:378-405`, `PacketPlayerCompleteToServer.java:79`.
+- Primary evidence: A-022.3.
+- Production Gate: fail
+- Admission Basis: over_capacity
+- Production Trigger/Reachability: The cited report path is retained as evidence, but it is not admitted for this S-009 pass. port removes one `Items.PAPER` after successful note creation.
+- Concrete Impact/Contract: The exact delta remains durable evidence, but this candidate was ranked below S-009's eight admitted slots and receives no fix capacity. paper remains; ink checks/consumption, missing-resource atomicity and note/direct routing remain.
+- Admission Evidence: A-022.3.; S-009 priority ranking/deferred scope.
+- Admission Budget: reproduce_attempts=0; fix_checkpoints=0; review_passes=0
+- Admission Attempts Used: 0
+- Speculation Boundary: the direct cited finding only; no adjacent hardening, migration, policy, addon, or cleanup scope.
+- Regression hazards: do not regress ink charge or missing-paper early return.
+- Outcome: none
+- Notes/Disposition reason: confirmed workflow resource defect.; deferred with Production Gate fail and basis over_capacity; ranked below S-009's eight admitted slots.
+
+## F-083 — Research table duplicate destination
+- Type: defect
+- Disposition: deferred
+- Severity: low
+- Confidence: high
+- Source IDs: S-003, S-004, S-005
+- Audit IDs/Reports: A-022 / reports/A-022-research-notes.md:A-022.4
+- Oracle: TC4 increments source table slot stack count.
+- Observed: port creates count-1 duplicate into player inventory or drops it.
+- Expected: retain source note in slot 1 and increment its count; preserve cost, feather/paper, metadata 64 and copies.
+- Exact deltas: destination `table slot count++ -> inventory/drop new stack`.
+- Affected paths/symbols: `TileResearchTable.duplicate:236-289`.
+- Primary evidence: A-022.4.
+- Production Gate: fail
+- Admission Basis: over_capacity
+- Production Trigger/Reachability: The cited report path is retained as evidence, but it is not admitted for this S-009 pass. port creates count-1 duplicate into player inventory or drops it.
+- Concrete Impact/Contract: The exact delta remains durable evidence, but this candidate was ranked below S-009's eight admitted slots and receives no fix capacity. retain source note in slot 1 and increment its count; preserve cost, feather/paper, metadata 64 and copies.
+- Admission Evidence: A-022.4.; S-009 priority ranking/deferred scope.
+- Admission Budget: reproduce_attempts=0; fix_checkpoints=0; review_passes=0
+- Admission Attempts Used: 0
+- Speculation Boundary: the direct cited finding only; no adjacent hardening, migration, policy, addon, or cleanup scope.
+- Regression hazards: preserve aspect cost and full-inventory behavior policy around the source slot.
+- Outcome: none
+- Notes/Disposition reason: confirmed table-state defect.; deferred with Production Gate fail and basis over_capacity; ranked below S-009's eight admitted slots.
+
+## F-084 — Research note primary color
+- Type: defect
+- Disposition: deferred
+- Severity: low
+- Confidence: high
+- Source IDs: S-003, S-004, S-005
+- Audit IDs/Reports: A-022 / reports/A-022-research-notes.md:A-022.5
+- Oracle: TC4 chooses first aspect with strictly highest amount.
+- Observed: `ResearchManager.getResearchPrimaryTag` chooses first non-null aspect; `AspectList` insertion order makes this deterministic.
+- Expected: highest amount, first-in-order tie; examples OCULUS `TRAVEL 6` instead of first `MIND 3`, VOIDMETAL `VOID 5`, reservoir merged `VOID 8`, rod `MAGIC 12`.
+- Exact deltas: first-non-null selection -> strict maximum selection.
+- Affected paths/symbols: `ResearchManager.java:857-862`, `ResearchItem.java:257-267`, `createNote:603-610`.
+- Primary evidence: A-022.5.
+- Production Gate: fail
+- Admission Basis: over_capacity
+- Production Trigger/Reachability: The cited report path is retained as evidence, but it is not admitted for this S-009 pass. `ResearchManager.getResearchPrimaryTag` chooses first non-null aspect; `AspectList` insertion order makes this deterministic.
+- Concrete Impact/Contract: The exact delta remains durable evidence, but this candidate was ranked below S-009's eight admitted slots and receives no fix capacity. highest amount, first-in-order tie; examples OCULUS `TRAVEL 6` instead of first `MIND 3`, VOIDMETAL `VOID 5`, reservoir merged `VOID 8`, rod `MAGIC 12`.
+- Admission Evidence: A-022.5.; S-009 priority ranking/deferred scope.
+- Admission Budget: reproduce_attempts=0; fix_checkpoints=0; review_passes=0
+- Admission Attempts Used: 0
+- Speculation Boundary: the direct cited finding only; no adjacent hardening, migration, policy, addon, or cleanup scope.
+- Regression hazards: preserve tag order, duplicate merge and color NBT serialization.
+- Outcome: none
+- Notes/Disposition reason: confirmed note-color defect.; deferred with Production Gate fail and basis over_capacity; ranked below S-009's eight admitted slots.
+
+## F-085 — Dedicated-client research/aspect cache
+- Type: defect
+- Disposition: required
+- Severity: high
+- Confidence: high
+- Source IDs: S-003, S-004, S-005, S-009
+- Audit IDs/Reports: A-023 / reports/A-023-knowledge-persistence.md:A-023-F02; duplicate A-025 / reports/A-025-research-browser.md:A-025-F01
+- Oracle: TC4 sync updates client research manager before browser/read APIs.
+- Observed: port sync mutates capability only; username APIs require server or process-local cache, so remote client `isResearchComplete(name,key)` can be false and Eldritch browser remains hidden.
+- Expected: synchronized client research/aspects are visible to username APIs and browser without mutating server state.
+- Exact deltas: capability state present but cache lookup absent after `PacketSyncResearch/Aspects`; browser `ELDRITCHMINOR` gate can remain false.
+- Affected paths/symbols: `ResearchManager.java:205-235,913-926`, `PacketSyncResearch.java:55-65`, `PacketSyncAspects.java:70-77`, browser/table/recipe callers.
+- Primary evidence: A-023-F02 and A-025-F01 report locators and dedicated-client cases.
+- Production Gate: pass
+- Admission Basis: deterministic_supported_path
+- Production Trigger/Reachability: supported remote dedicated-client sync mutates the capability while shipped browser/table/recipe username APIs read the unsynced cache.
+- Concrete Impact/Contract: the remote client can read false research state and hide shipped Eldritch browser/table/recipe content after synchronization.
+- Admission Evidence: A-023-F02 and A-025-F01 directly identify the remote sync/cache split and shipped username API callers; S-009 is the capacity authority.
+- Admission Budget: reproduce_attempts=0; fix_checkpoints=2; review_passes=0
+- Admission Attempts Used: 0
+- Speculation Boundary: one-hop capability-to-username-cache synchronization only; server authority, reconnect behavior, and unrelated browser changes are excluded.
+- Regression hazards: preserve server authority, capability sync and reconnect behavior.
+- Outcome: R-005
+- Notes/Disposition reason: A-025-F01 duplicate view retained.; admitted by the S-009 priority grant as one of exactly eight production findings.
+
+## F-086 — Negative aspect debit
+- Type: defect
+- Disposition: deferred
+- Severity: low-medium
+- Confidence: high
+- Source IDs: S-003, S-004, S-005
+- Audit IDs/Reports: A-023 / reports/A-023-knowledge-persistence.md:A-023-F04
+- Oracle: TC4 only adds positive new aspect entries and refuses overdraw.
+- Observed: port creates unseen entry then clamps negative result to zero; debiting two by five consumes to zero.
+- Expected: unseen `-1` no-op with no zero entry; overdraw leaves two; positive additions remain.
+- Exact deltas: overdraw `2 -> 0` in port versus `2`; unseen entry created versus absent.
+- Affected paths/symbols: `PlayerKnowledgeCapability.addAspectPool:187-195`.
+- Primary evidence: A-023-F04.
+- Production Gate: fail
+- Admission Basis: over_capacity
+- Production Trigger/Reachability: The cited report path is retained as evidence, but it is not admitted for this S-009 pass. port creates unseen entry then clamps negative result to zero; debiting two by five consumes to zero.
+- Concrete Impact/Contract: The exact delta remains durable evidence, but this candidate was ranked below S-009's eight admitted slots and receives no fix capacity. unseen `-1` no-op with no zero entry; overdraw leaves two; positive additions remain.
+- Admission Evidence: A-023-F04.; S-009 priority ranking/deferred scope.
+- Admission Budget: reproduce_attempts=0; fix_checkpoints=0; review_passes=0
+- Admission Attempts Used: 0
+- Speculation Boundary: the direct cited finding only; no adjacent hardening, migration, policy, addon, or cleanup scope.
+- Regression hazards: preserve table/combination balance checks and server authority.
+- Outcome: none
+- Notes/Disposition reason: confirmed knowledge invariant defect.; deferred with Production Gate fail and basis over_capacity; ranked below S-009's eight admitted slots.
+
+## F-087 — Fixed research-table endpoints
+- Type: defect
+- Disposition: required
+- Severity: high
+- Confidence: high
+- Source IDs: S-003, S-004, S-005, S-009
+- Audit IDs/Reports: A-024 / reports/A-024-research-networking.md:A-024-F01
+- Oracle: TC4 behavior is inherited but E-0006 promotes server-authority hardening.
+- Observed: authenticated packet accepts supplied coordinates without current-cell-type validation; null can replace type-1 fixed endpoint with type-0.
+- Expected: fixed endpoints remain immutable and minimum endpoint invariant is server-enforced.
+- Exact deltas: endpoint type `1 -> 0` possible; path can complete with `main.size()==0` without valid endpoint/aspect cost.
+- Affected paths/symbols: `PacketAspectPlaceToServer.java:80-101`, `TileResearchTable.java:319-372`, `ResearchManager.java:755-781`.
+- Primary evidence: A-024-F01.
+- Production Gate: pass
+- Admission Basis: deterministic_supported_path
+- Production Trigger/Reachability: an authenticated active research-table packet can erase fixed endpoints and complete an invalid note.
+- Concrete Impact/Contract: a supported authenticated request can remove a fixed endpoint and allow completion with no valid endpoint/aspect cost, violating server data integrity.
+- Admission Evidence: A-024-F01 directly identifies the authenticated packet and invalid completion path; S-009 is the capacity authority.
+- Admission Budget: reproduce_attempts=0; fix_checkpoints=2; review_passes=0
+- Admission Attempts Used: 0
+- Speculation Boundary: fixed endpoint validation and the directly reached completion invariant only; authentication, distance, container, and normal type-0/type-2 paths are excluded.
+- Regression hazards: preserve authenticated sender/dimension/container/tile/distance checks and normal type-0/type-2 behavior.
+- Outcome: R-006
+- Notes/Disposition reason: inherited TC4 vulnerability explicitly hardened, not a parity control.; admitted by the S-009 priority grant as one of exactly eight production findings.
+
+## F-088 — Hidden/lost clue server bypass
+- Type: defect
+- Disposition: required
+- Severity: high
+- Confidence: high
+- Source IDs: S-003, S-004, S-005, S-009
+- Audit IDs/Reports: A-024 / reports/A-024-research-networking.md:A-024-F02
+- Oracle: server completion must enforce hidden/lost clue ownership under approved hardening.
+- Observed: packet checks parents but not `@KEY`; `PRIMPEARL`/`OUTERREV` can be purchased or note-completed without clue.
+- Expected: require corresponding clue before direct or note completion; reject without cost/note/unlock/warp/callback/sync.
+- Exact deltas: clue check absent; default difficulty 0 permits configured primal costs and grant with no `@PRIMPEARL`.
+- Affected paths/symbols: `PacketPlayerCompleteToServer.java:63-80`, `ResearchManager.java:363-375`, `GuiResearchBrowser.java:392-395`.
+- Primary evidence: A-024-F02 and exact Eldritch repro values.
+- Production Gate: pass
+- Admission Basis: deterministic_supported_path
+- Production Trigger/Reachability: an authenticated completion/note request for PRIMPEARL/OUTERREV checks parents but not the @KEY clue.
+- Concrete Impact/Contract: supported research completion can bypass required @KEY clue ownership for PRIMPEARL/OUTERREV.
+- Admission Evidence: A-024-F02 directly identifies the authenticated request, parent check, and missing @KEY check; S-009 is the capacity authority.
+- Admission Budget: reproduce_attempts=0; fix_checkpoints=1; review_passes=0
+- Admission Attempts Used: 0
+- Speculation Boundary: the direct @KEY clue ownership check only; other research prerequisites, clues, and note flow are excluded.
+- Regression hazards: preserve ordinary-parent checks, valid clue flow and authenticated sender checks.
+- Outcome: R-007
+- Notes/Disposition reason: inherited vulnerability promoted by approved hardening.; admitted by the S-009 priority grant as one of exactly eight production findings.
+
+## F-089 — Replayed note feedback
+- Type: defect
+- Disposition: deferred
+- Severity: low
+- Confidence: high
+- Source IDs: S-003, S-004, S-005
+- Audit IDs/Reports: A-024 / reports/A-024-research-networking.md:A-024-F03
+- Oracle: repeated valid request must not duplicate/charge; feedback must be idempotent or bounded.
+- Observed: existing incomplete note is returned without resource use, but every successful type-1 request broadcasts `TCSounds.LEARN`.
+- Expected: preserve no duplicate/charge and deduplicate or explicitly bound repeated success feedback.
+- Exact deltas: repeated request emits learn sound each time instead of one bounded event.
+- Affected paths/symbols: `ResearchManager.java:382-385`, `PacketPlayerCompleteToServer.java:55-80`.
+- Primary evidence: A-024-F03.
+- Production Gate: fail
+- Admission Basis: over_capacity
+- Production Trigger/Reachability: The cited report path is retained as evidence, but it is not admitted for this S-009 pass. existing incomplete note is returned without resource use, but every successful type-1 request broadcasts `TCSounds.LEARN`.
+- Concrete Impact/Contract: The exact delta remains durable evidence, but this candidate was ranked below S-009's eight admitted slots and receives no fix capacity. preserve no duplicate/charge and deduplicate or explicitly bound repeated success feedback.
+- Admission Evidence: A-024-F03.; S-009 priority ranking/deferred scope.
+- Admission Budget: reproduce_attempts=0; fix_checkpoints=0; review_passes=0
+- Admission Attempts Used: 0
+- Speculation Boundary: the direct cited finding only; no adjacent hardening, migration, policy, addon, or cleanup scope.
+- Regression hazards: preserve note creation and valid completion feedback.
+- Outcome: none
+- Notes/Disposition reason: approved research protocol hardening.; deferred with Production Gate fail and basis over_capacity; ranked below S-009's eight admitted slots.
+
+## F-090 — Research sync malformed count
+- Type: defect
+- Disposition: deferred
+- Severity: low
+- Confidence: high
+- Source IDs: S-003, S-004, S-005
+- Audit IDs/Reports: A-024 / reports/A-024-research-networking.md:A-024-F04
+- Oracle: TC4 signed-short count bounds sync payload.
+- Observed: port reads raw signed int, negative count clears client research, oversized/truncated count loops or throws; clears before validation.
+- Expected: bounded/readable count validation and atomic rejection before clearing; valid full sync unchanged.
+- Exact deltas: signed-short bounded count -> unbounded int; malformed packet can clear or abort client state.
+- Affected paths/symbols: `PacketSyncResearch.java:28-64`.
+- Primary evidence: A-024-F04.
+- Production Gate: fail
+- Admission Basis: over_capacity
+- Production Trigger/Reachability: The cited report path is retained as evidence, but it is not admitted for this S-009 pass. port reads raw signed int, negative count clears client research, oversized/truncated count loops or throws; clears before validation.
+- Concrete Impact/Contract: The exact delta remains durable evidence, but this candidate was ranked below S-009's eight admitted slots and receives no fix capacity. bounded/readable count validation and atomic rejection before clearing; valid full sync unchanged.
+- Admission Evidence: A-024-F04.; S-009 priority ranking/deferred scope.
+- Admission Budget: reproduce_attempts=0; fix_checkpoints=0; review_passes=0
+- Admission Attempts Used: 0
+- Speculation Boundary: the direct cited finding only; no adjacent hardening, migration, policy, addon, or cleanup scope.
+- Regression hazards: preserve bounded UTF-8 keys and valid full-sync behavior.
+- Outcome: none
+- Notes/Disposition reason: protocol robustness hardening.; deferred with Production Gate fail and basis over_capacity; ranked below S-009's eight admitted slots.
+
+## F-091 — Browser tooltip layout
+- Type: defect
+- Disposition: deferred
+- Severity: high
+- Confidence: high
+- Source IDs: S-003, S-004, S-005
+- Audit IDs/Reports: A-025 / reports/A-025-research-browser.md:A-025-F02
+- Oracle: TC4 separates base text height and extra rows; width divisors `/1.9` and missing-tooltip `/1.5`.
+- Observed: port accumulates primary/secondary/warp rows into base `tooltipHeight` and uses `/2` widths.
+- Expected: TC4 vertical separation and width formulas.
+- Exact deltas: secondary row displacement 29 px; primary/warp 9 px each; width divisor `/2 -> /1.9` and missing `/1.5`.
+- Affected paths/symbols: `GuiResearchBrowser.java:561-633,638`.
+- Primary evidence: A-025-F02.
+- Production Gate: fail
+- Admission Basis: over_capacity
+- Production Trigger/Reachability: The cited report path is retained as evidence, but it is not admitted for this S-009 pass. port accumulates primary/secondary/warp rows into base `tooltipHeight` and uses `/2` widths.
+- Concrete Impact/Contract: The exact delta remains durable evidence, but this candidate was ranked below S-009's eight admitted slots and receives no fix capacity. TC4 vertical separation and width formulas.
+- Admission Evidence: A-025-F02.; S-009 priority ranking/deferred scope.
+- Admission Budget: reproduce_attempts=0; fix_checkpoints=0; review_passes=0
+- Admission Attempts Used: 0
+- Speculation Boundary: the direct cited finding only; no adjacent hardening, migration, policy, addon, or cleanup scope.
+- Regression hazards: preserve node visibility, aspect values and completed/locked row ordering.
+- Outcome: none
+- Notes/Disposition reason: confirmed browser layout defect.; deferred with Production Gate fail and basis over_capacity; ranked below S-009's eight admitted slots.
+
+## F-092 — Browser forbidden aura
+- Type: defect
+- Disposition: deferred
+- Severity: medium
+- Confidence: high
+- Source IDs: S-003, S-004, S-005
+- Audit IDs/Reports: A-025 / reports/A-025-research-browser.md:A-025-F03
+- Oracle: TC4 centered animated quad strip 80 px, size .66, frame divisor 32, strip 5, tint `0x440055`.
+- Observed: port draws 16x16 and samples V 5/8..6/8.
+- Expected: restore 80 px strip/UV/frame parameters.
+- Exact deltas: size `16 -> 80`; frame divisor `8 -> 32`; missing strip parameter 5 and exact tint.
+- Affected paths/symbols: `GuiResearchBrowser.java:821-835`, `UtilsFX.renderAnimatedQuadStrip`.
+- Primary evidence: A-025-F03.
+- Production Gate: fail
+- Admission Basis: over_capacity
+- Production Trigger/Reachability: The cited report path is retained as evidence, but it is not admitted for this S-009 pass. port draws 16x16 and samples V 5/8..6/8.
+- Concrete Impact/Contract: The exact delta remains durable evidence, but this candidate was ranked below S-009's eight admitted slots and receives no fix capacity. restore 80 px strip/UV/frame parameters.
+- Admission Evidence: A-025-F03.; S-009 priority ranking/deferred scope.
+- Admission Budget: reproduce_attempts=0; fix_checkpoints=0; review_passes=0
+- Admission Attempts Used: 0
+- Speculation Boundary: the direct cited finding only; no adjacent hardening, migration, policy, addon, or cleanup scope.
+- Regression hazards: preserve node state and animation timing.
+- Outcome: none
+- Notes/Disposition reason: confirmed browser rendering defect.; deferred with Production Gate fail and basis over_capacity; ranked below S-009's eight admitted slots.
+
+## F-093 — Browser locked item dimming
+- Type: defect
+- Disposition: deferred
+- Severity: medium
+- Confidence: high
+- Source IDs: S-003, S-004, S-005
+- Audit IDs/Reports: A-025 / reports/A-025-research-browser.md:A-025-F04
+- Oracle: TC4 disables item render color for locked item and restores it.
+- Observed: port sets GL color but `RenderItem.renderItemModelIntoGUI` resets white.
+- Expected: explicit item-render dimming equivalent.
+- Exact deltas: locked item icon color `dimmed -> full white` in port; affected examples `VOIDMETAL`, `ADVALCHEMYFURNACE`, `ESSENTIARESERVOIR`.
+- Affected paths/symbols: `GuiResearchBrowser.java:426-428`, local RenderItem path.
+- Primary evidence: A-025-F04.
+- Production Gate: fail
+- Admission Basis: over_capacity
+- Production Trigger/Reachability: The cited report path is retained as evidence, but it is not admitted for this S-009 pass. port sets GL color but `RenderItem.renderItemModelIntoGUI` resets white.
+- Concrete Impact/Contract: The exact delta remains durable evidence, but this candidate was ranked below S-009's eight admitted slots and receives no fix capacity. explicit item-render dimming equivalent.
+- Admission Evidence: A-025-F04.; S-009 priority ranking/deferred scope.
+- Admission Budget: reproduce_attempts=0; fix_checkpoints=0; review_passes=0
+- Admission Attempts Used: 0
+- Speculation Boundary: the direct cited finding only; no adjacent hardening, migration, policy, addon, or cleanup scope.
+- Regression hazards: preserve resource-backed locked rendering and GL restoration.
+- Outcome: none
+- Notes/Disposition reason: confirmed visual defect.; deferred with Production Gate fail and basis over_capacity; ranked below S-009's eight admitted slots.
+
+## F-094 — Browser completion particle sheet
+- Type: defect
+- Disposition: deferred
+- Severity: low
+- Confidence: high
+- Source IDs: S-003, S-004, S-005
+- Audit IDs/Reports: A-025 / reports/A-025-research-browser.md:A-025-F05
+- Oracle: TC4 uses `thaumcraft:textures/misc/particles.png` via `ParticleEngine.particleTexture`.
+- Observed: port binds `textures/particle/particles.png` vanilla 128x128.
+- Expected: bind Thaumcraft 256x256 sheet.
+- Exact deltas: resource path and sheet size differ; port hash `c66a...4935a` vs Thaumcraft `1fb5...ae9b3`.
+- Affected paths/symbols: `GuiResearchBrowser.java:51,435,505`.
+- Primary evidence: A-025-F05 and hashes in proposal.
+- Production Gate: fail
+- Admission Basis: over_capacity
+- Production Trigger/Reachability: The cited report path is retained as evidence, but it is not admitted for this S-009 pass. port binds `textures/particle/particles.png` vanilla 128x128.
+- Concrete Impact/Contract: The exact delta remains durable evidence, but this candidate was ranked below S-009's eight admitted slots and receives no fix capacity. bind Thaumcraft 256x256 sheet.
+- Admission Evidence: A-025-F05 and hashes in proposal.; S-009 priority ranking/deferred scope.
+- Admission Budget: reproduce_attempts=0; fix_checkpoints=0; review_passes=0
+- Admission Attempts Used: 0
+- Speculation Boundary: the direct cited finding only; no adjacent hardening, migration, policy, addon, or cleanup scope.
+- Regression hazards: preserve animation coordinates and resource identifiers.
+- Outcome: none
+- Notes/Disposition reason: confirmed artwork binding defect.; deferred with Production Gate fail and basis over_capacity; ranked below S-009's eight admitted slots.
+
+## F-095 — Research page arcane row truncation
+- Type: defect
+- Disposition: deferred
+- Severity: high
+- Confidence: high
+- Source IDs: S-003, S-004, S-005
+- Audit IDs/Reports: A-026 / reports/A-026-research-page-rendering.md:A-026-F01
+- Oracle: TC4 iterates full aspect collection.
+- Observed: port `perRow=5`; FOCUSPRIMAL page 2 displays 5 of 6 aspects and total 125.
+- Expected: all six 25-vis entries and total 150.
+- Exact deltas: entries `6 -> 5`; displayed vis `150 -> 125`; one icon omitted.
+- Affected paths/symbols: `GuiResearchRecipe.java:293,500-515`.
+- Primary evidence: A-026-F01.
+- Production Gate: fail
+- Admission Basis: over_capacity
+- Production Trigger/Reachability: The cited report path is retained as evidence, but it is not admitted for this S-009 pass. port `perRow=5`; FOCUSPRIMAL page 2 displays 5 of 6 aspects and total 125.
+- Concrete Impact/Contract: The exact delta remains durable evidence, but this candidate was ranked below S-009's eight admitted slots and receives no fix capacity. all six 25-vis entries and total 150.
+- Admission Evidence: A-026-F01.; S-009 priority ranking/deferred scope.
+- Admission Budget: reproduce_attempts=0; fix_checkpoints=0; review_passes=0
+- Admission Attempts Used: 0
+- Speculation Boundary: the direct cited finding only; no adjacent hardening, migration, policy, addon, or cleanup scope.
+- Regression hazards: preserve other page layouts.
+- Outcome: none
+- Notes/Disposition reason: confirmed page rendering defect.; deferred with Production Gate fail and basis over_capacity; ranked below S-009's eight admitted slots.
+
+## F-096 — Recipe click-through/history
+- Type: defect
+- Disposition: deferred
+- Severity: medium
+- Confidence: high
+- Source IDs: S-003, S-004, S-005
+- Audit IDs/Reports: A-026 / reports/A-026-research-page-rendering.md:A-026-F02
+- Oracle: TC4 hover action calls `getCraftingRecipeKey`, stores history, navigates, and returns.
+- Observed: port has ordinary tooltips but no click-through, history, return control, or localized actions.
+- Expected: all four interactions for listed Eldritch recipe pages.
+- Exact deltas: action/navigation/history/return `present -> absent`.
+- Affected paths/symbols: `GuiResearchRecipe.java:818-853`, `ThaumcraftApi.java:177-214`.
+- Primary evidence: A-026-F02.
+- Production Gate: fail
+- Admission Basis: over_capacity
+- Production Trigger/Reachability: The cited report path is retained as evidence, but it is not admitted for this S-009 pass. port has ordinary tooltips but no click-through, history, return control, or localized actions.
+- Concrete Impact/Contract: The exact delta remains durable evidence, but this candidate was ranked below S-009's eight admitted slots and receives no fix capacity. all four interactions for listed Eldritch recipe pages.
+- Admission Evidence: A-026-F02.; S-009 priority ranking/deferred scope.
+- Admission Budget: reproduce_attempts=0; fix_checkpoints=0; review_passes=0
+- Admission Attempts Used: 0
+- Speculation Boundary: the direct cited finding only; no adjacent hardening, migration, policy, addon, or cleanup scope.
+- Regression hazards: preserve existing recipe rendering and typed lookup.
+- Outcome: none
+- Notes/Disposition reason: confirmed navigation defect.; deferred with Production Gate fail and basis over_capacity; ranked below S-009's eight admitted slots.
+
+## F-097 — Compound overlay transform
+- Type: defect
+- Disposition: deferred
+- Severity: medium
+- Confidence: high
+- Source IDs: S-003, S-004, S-005
+- Audit IDs/Reports: A-026 / reports/A-026-research-page-rendering.md:A-026-F03
+- Oracle: TC4 ground formula yields `y+63` and includes `dy*50` vertical layer.
+- Observed: port formula omits dy and yields `y+102` for dx=3,dz=3.
+- Expected: TC4 formula `y+108+yoff*(1-sz)-119+...+dy*50`; ground `y+63`.
+- Exact deltas: port is `+39` px at ground and cannot represent vertical layers.
+- Affected paths/symbols: `GuiResearchRecipe.java:404`.
+- Primary evidence: A-026-F03.
+- Production Gate: fail
+- Admission Basis: over_capacity
+- Production Trigger/Reachability: The cited report path is retained as evidence, but it is not admitted for this S-009 pass. port formula omits dy and yields `y+102` for dx=3,dz=3.
+- Concrete Impact/Contract: The exact delta remains durable evidence, but this candidate was ranked below S-009's eight admitted slots and receives no fix capacity. TC4 formula `y+108+yoff*(1-sz)-119+...+dy*50`; ground `y+63`.
+- Admission Evidence: A-026-F03.; S-009 priority ranking/deferred scope.
+- Admission Budget: reproduce_attempts=0; fix_checkpoints=0; review_passes=0
+- Admission Attempts Used: 0
+- Speculation Boundary: the direct cited finding only; no adjacent hardening, migration, policy, addon, or cleanup scope.
+- Regression hazards: preserve structure-layer transforms.
+- Outcome: none
+- Notes/Disposition reason: confirmed compound-page geometry defect.; deferred with Production Gate fail and basis over_capacity; ranked below S-009's eight admitted slots.
+
+## F-098 — Normal workbench element overlay
+- Type: defect
+- Disposition: deferred
+- Severity: medium
+- Confidence: high
+- Source IDs: S-003, S-004, S-005
+- Audit IDs/Reports: A-026 / reports/A-026-research-page-rendering.md:A-026-F04
+- Oracle: normal recipes draw 52x52 backing plus 16x16 element overlay from UV/source `(20,12)`.
+- Observed: nine Void normal pages draw only backing.
+- Expected: one `(20,12)` overlay each; `(20,7)` remains arcane-only.
+- Exact deltas: missing one 16x16 overlay on each of nine pages.
+- Affected paths/symbols: `GuiResearchRecipe.java:254,672-680`.
+- Primary evidence: A-026-F04.
+- Production Gate: fail
+- Admission Basis: over_capacity
+- Production Trigger/Reachability: The cited report path is retained as evidence, but it is not admitted for this S-009 pass. nine Void normal pages draw only backing.
+- Concrete Impact/Contract: The exact delta remains durable evidence, but this candidate was ranked below S-009's eight admitted slots and receives no fix capacity. one `(20,12)` overlay each; `(20,7)` remains arcane-only.
+- Admission Evidence: A-026-F04.; S-009 priority ranking/deferred scope.
+- Admission Budget: reproduce_attempts=0; fix_checkpoints=0; review_passes=0
+- Admission Attempts Used: 0
+- Speculation Boundary: the direct cited finding only; no adjacent hardening, migration, policy, addon, or cleanup scope.
+- Regression hazards: preserve normal/arcane UV distinction.
+- Outcome: none
+- Notes/Disposition reason: confirmed page artwork defect.; deferred with Production Gate fail and basis over_capacity; ranked below S-009's eight admitted slots.
+
+## F-099 — Research text color
+- Type: defect
+- Disposition: deferred
+- Severity: low
+- Confidence: high
+- Source IDs: S-003, S-004, S-005
+- Audit IDs/Reports: A-026 / reports/A-026-research-page-rendering.md:A-026-F05
+- Oracle: TC4 passes color 0, normalized opaque black.
+- Observed: port passes `0x303030`.
+- Expected: color 0/opaque black.
+- Exact deltas: `0x303030 -> 0x000000`.
+- Affected paths/symbols: `GuiResearchRecipe.java:568`, `TCFontRenderer.java:396-410`.
+- Primary evidence: A-026-F05.
+- Production Gate: fail
+- Admission Basis: over_capacity
+- Production Trigger/Reachability: The cited report path is retained as evidence, but it is not admitted for this S-009 pass. port passes `0x303030`.
+- Concrete Impact/Contract: The exact delta remains durable evidence, but this candidate was ranked below S-009's eight admitted slots and receives no fix capacity. color 0/opaque black.
+- Admission Evidence: A-026-F05.; S-009 priority ranking/deferred scope.
+- Admission Budget: reproduce_attempts=0; fix_checkpoints=0; review_passes=0
+- Admission Attempts Used: 0
+- Speculation Boundary: the direct cited finding only; no adjacent hardening, migration, policy, addon, or cleanup scope.
+- Regression hazards: preserve markup/layout wrapping.
+- Outcome: none
+- Notes/Disposition reason: confirmed text color defect.; deferred with Production Gate fail and basis over_capacity; ranked below S-009's eight admitted slots.
+
+## F-100 — Research page hitboxes and feedback
+- Type: defect
+- Disposition: deferred
+- Severity: low
+- Confidence: high
+- Source IDs: S-003, S-004, S-005
+- Audit IDs/Reports: A-026 / reports/A-026-research-page-rendering.md:A-026-F06
+- Oracle: arrows 14x10 with bobbing/page sound; arcane output hover y+27..y+43.
+- Observed: arrows 12x8, fixed/no sound; output hover y+22..y+38.
+- Expected: exact TC4 dimensions/positions and feedback.
+- Exact deltas: arrow width/height `12x8 -> 14x10`; output hover top/bottom each 5 px too high.
+- Affected paths/symbols: `GuiResearchRecipe.java:104-120,150-157`.
+- Primary evidence: A-026-F06.
+- Production Gate: fail
+- Admission Basis: over_capacity
+- Production Trigger/Reachability: The cited report path is retained as evidence, but it is not admitted for this S-009 pass. arrows 12x8, fixed/no sound; output hover y+22..y+38.
+- Concrete Impact/Contract: The exact delta remains durable evidence, but this candidate was ranked below S-009's eight admitted slots and receives no fix capacity. exact TC4 dimensions/positions and feedback.
+- Admission Evidence: A-026-F06.; S-009 priority ranking/deferred scope.
+- Admission Budget: reproduce_attempts=0; fix_checkpoints=0; review_passes=0
+- Admission Attempts Used: 0
+- Speculation Boundary: the direct cited finding only; no adjacent hardening, migration, policy, addon, or cleanup scope.
+- Regression hazards: preserve spread navigation and page sound semantics.
+- Outcome: none
+- Notes/Disposition reason: confirmed input geometry/feedback defect.; deferred with Production Gate fail and basis over_capacity; ranked below S-009's eight admitted slots.
+
+## F-101 — Inline image geometry
+- Type: defect
+- Disposition: deferred
+- Severity: low
+- Confidence: high
+- Source IDs: S-003, S-004, S-005
+- Audit IDs/Reports: A-026 / reports/A-026-research-page-rendering.md:A-026-F07
+- Oracle: TC4 retains 127.5 logical pixels, applies `-3` center offset and advances sourceHeight*.5 - FONT_HEIGHT.
+- Observed: port rounds to 128, omits `-3`, advances rounded bottom.
+- Expected: exact half-scale geometry and flow.
+- Exact deltas: image about +2.5 px right; flow about +1 px difference.
+- Affected paths/symbols: inline image path in `GuiResearchRecipe.java`, `TCFontRenderer` behavior.
+- Primary evidence: A-026-F07.
+- Production Gate: fail
+- Admission Basis: over_capacity
+- Production Trigger/Reachability: The cited report path is retained as evidence, but it is not admitted for this S-009 pass. port rounds to 128, omits `-3`, advances rounded bottom.
+- Concrete Impact/Contract: The exact delta remains durable evidence, but this candidate was ranked below S-009's eight admitted slots and receives no fix capacity. exact half-scale geometry and flow.
+- Admission Evidence: A-026-F07.; S-009 priority ranking/deferred scope.
+- Admission Budget: reproduce_attempts=0; fix_checkpoints=0; review_passes=0
+- Admission Attempts Used: 0
+- Speculation Boundary: the direct cited finding only; no adjacent hardening, migration, policy, addon, or cleanup scope.
+- Regression hazards: preserve text/image wrapping at supported GUI scales.
+- Outcome: none
+- Notes/Disposition reason: confirmed arithmetic geometry defect.; deferred with Production Gate fail and basis over_capacity; ranked below S-009's eight admitted slots.
+
+## F-102 — Damageable wildcard cycle bound
+- Type: defect
+- Disposition: deferred
+- Severity: low
+- Confidence: high
+- Source IDs: S-003, S-004, S-005
+- Audit IDs/Reports: A-026 / reports/A-026-research-page-rendering.md:A-026-F08
+- Oracle: TC4 modulus `maxDamage`, values `0..maxDamage-1`.
+- Observed: port modulus `maxDamage+1`, values `0..maxDamage`.
+- Expected: exclusive upper bound.
+- Exact deltas: invalid metadata equal to max can display.
+- Affected paths/symbols: `InventoryUtils.java:472-475`; wildcard components on `PRIMALCRUSHER` page.
+- Primary evidence: A-026-F08.
+- Production Gate: fail
+- Admission Basis: over_capacity
+- Production Trigger/Reachability: The cited report path is retained as evidence, but it is not admitted for this S-009 pass. port modulus `maxDamage+1`, values `0..maxDamage`.
+- Concrete Impact/Contract: The exact delta remains durable evidence, but this candidate was ranked below S-009's eight admitted slots and receives no fix capacity. exclusive upper bound.
+- Admission Evidence: A-026-F08.; S-009 priority ranking/deferred scope.
+- Admission Budget: reproduce_attempts=0; fix_checkpoints=0; review_passes=0
+- Admission Attempts Used: 0
+- Speculation Boundary: the direct cited finding only; no adjacent hardening, migration, policy, addon, or cleanup scope.
+- Regression hazards: preserve wildcard cycle and item rendering.
+- Outcome: none
+- Notes/Disposition reason: confirmed display-state boundary defect.; deferred with Production Gate fail and basis over_capacity; ranked below S-009's eight admitted slots.
+
+## F-103 — Locale `%n` formatting
+- Type: defect
+- Disposition: deferred
+- Severity: high
+- Confidence: high
+- Source IDs: S-003, S-004, S-005
+- Audit IDs/Reports: A-028 / reports/A-028-localization-loader.md:A-028-F01
+- Oracle: TC4 raw translation replaces literal `%n` with localized level.
+- Observed: Forge `I18n.format` Java-formats `%n` into platform newline before replacement, yielding `Forbidden knowledge (\n)` and missing level.
+- Expected: raw translation/custom-token replacement as `ItemResearchNotes` and `ClientProxy.localizeOrFallback`.
+- Exact deltas: `%n` literal -> newline; level text omitted.
+- Affected paths/symbols: `GuiResearchBrowser.java:570-572`, `en_us.lang:842-847`.
+- Primary evidence: A-028-F01 and Forge loader path.
+- Production Gate: fail
+- Admission Basis: over_capacity
+- Production Trigger/Reachability: The cited report path is retained as evidence, but it is not admitted for this S-009 pass. Forge `I18n.format` Java-formats `%n` into platform newline before replacement, yielding `Forbidden knowledge (\n)` and missing level.
+- Concrete Impact/Contract: The exact delta remains durable evidence, but this candidate was ranked below S-009's eight admitted slots and receives no fix capacity. raw translation/custom-token replacement as `ItemResearchNotes` and `ClientProxy.localizeOrFallback`.
+- Admission Evidence: A-028-F01 and Forge loader path.; S-009 priority ranking/deferred scope.
+- Admission Budget: reproduce_attempts=0; fix_checkpoints=0; review_passes=0
+- Admission Attempts Used: 0
+- Speculation Boundary: the direct cited finding only; no adjacent hardening, migration, policy, addon, or cleanup scope.
+- Regression hazards: preserve localized level selection and other printf formatting behavior.
+- Outcome: none
+- Notes/Disposition reason: confirmed localization runtime defect.; deferred with Production Gate fail and basis over_capacity; ranked below S-009's eight admitted slots.
+
+## F-104 — Uppercase locale alias precedence
+- Type: defect
+- Disposition: deferred
+- Severity: low
+- Confidence: high
+- Source IDs: S-005, S-001
+- Audit IDs/Reports: A-028 / reports/A-028-localization-loader.md:A-028-F02
+- Oracle: Forge standard lowercase locale/resource-pack precedence.
+- Observed: `processResources` emits byte-identical `en_us.lang` and `en_US.lang`; locale list can load lowercase pack override then mod uppercase alias, overwriting it.
+- Expected: preserve lowercase exact content while removing/fixing uppercase alias precedence; no pack override overwrite.
+- Exact deltas: generated alias path `en_US.lang` is reachable and second-load overwrite exists; both generated files are 187408 bytes hash `e20d7240...f585d`.
+- Affected paths/symbols: `build.gradle:106-122`, generated lang resources, `LanguageManager/Locale` load chain.
+- Primary evidence: A-028-F02.
+- Production Gate: fail
+- Admission Basis: over_capacity
+- Production Trigger/Reachability: The cited report path is retained as evidence, but it is not admitted for this S-009 pass. `processResources` emits byte-identical `en_us.lang` and `en_US.lang`; locale list can load lowercase pack override then mod uppercase alias, overwriting it.
+- Concrete Impact/Contract: The exact delta remains durable evidence, but this candidate was ranked below S-009's eight admitted slots and receives no fix capacity. preserve lowercase exact content while removing/fixing uppercase alias precedence; no pack override overwrite.
+- Admission Evidence: A-028-F02.; S-009 priority ranking/deferred scope.
+- Admission Budget: reproduce_attempts=0; fix_checkpoints=0; review_passes=0
+- Admission Attempts Used: 0
+- Speculation Boundary: the direct cited finding only; no adjacent hardening, migration, policy, addon, or cleanup scope.
+- Regression hazards: preserve identifiers, content, Java/Forge/build versions and lowercase lookup.
+- Outcome: none
+- Notes/Disposition reason: E-0006 requires fixing precedence, not silently dropping exact content.; deferred with Production Gate fail and basis over_capacity; ranked below S-009's eight admitted slots.
+
+## F-105 — Scan phenomenon pass-through
+- Type: defect
+- Disposition: required
+- Severity: high
+- Confidence: high
+- Source IDs: S-003, S-004, S-005, S-009
+- Audit IDs/Reports: A-029 / reports/A-029-scan-engine.md:A-029-F01
+- Oracle: TC4 `ScanManager.scanPhenomena` returns null unconditionally, allowing later handlers.
+- Observed: port scans any nonempty held stack, creates type-1 result, calls `completeScan`, and first non-null stops handler chain; thaumometer then rejects active scan after mutating state.
+- Expected: built-in phenomenon method side-effect-free and null unless distinct phenomenon dispatch exists.
+- Exact deltas: later handler reach `allowed -> starved`; client scan state mutates on failed fallback.
+- Affected paths/symbols: `ScanManager.java:47-60`, `Thaumcraft.java:110-112`, `ItemThaumometer.java:111-117,205-211`.
+- Primary evidence: A-029-F01; `BlockEldritchNothing` fallthrough.
+- Production Gate: pass
+- Admission Basis: deterministic_supported_path
+- Production Trigger/Reachability: shipped thaumometer handler order invokes built-in ScanManager first and its non-null self-scan starves the later phenomenon handler.
+- Concrete Impact/Contract: ordinary shipped thaumometer scanning can terminate at the built-in handler, mutate scan state, and prevent the later phenomenon handler from running.
+- Admission Evidence: A-029-F01 directly identifies shipped handler order, the non-null self-scan, and starved later handler; S-009 is the capacity authority.
+- Admission Budget: reproduce_attempts=0; fix_checkpoints=1; review_passes=0
+- Admission Attempts Used: 0
+- Speculation Boundary: ScanManager phenomenon return/side-effect and the direct handler-order boundary only; explicit End Portal bridge and unrelated scan policy are excluded.
+- Regression hazards: preserve explicit End Portal bridge and scan precedence.
+- Outcome: R-008
+- Notes/Disposition reason: confirmed native scan-chain defect.; admitted by the S-009 priority grant as one of exactly eight production findings.
+
+## F-106 — Empty-aspect block scan feedback
+- Type: defect
+- Disposition: deferred
+- Severity: medium
+- Confidence: high
+- Source IDs: S-003, S-004, S-005
+- Audit IDs/Reports: A-029 / reports/A-029-scan-engine.md:A-029-F02
+- Oracle: TC4 creates timed block result even with empty aspects, then emits unknown-object feedback at completion.
+- Observed: port `toTaggedItemScan` rejects empty stack/zero aspects before timed target; `BlockEldritchNothing` fails silently.
+- Expected: target acquisition succeeds; aspect validity is decided at completion and invalid notification emitted.
+- Exact deltas: timed scan + feedback -> no target/silent failure.
+- Affected paths/symbols: `ItemThaumometer.java:164,173,178,331-346`, `BlockEldritchNothing.java:78-90`.
+- Primary evidence: A-029-F02.
+- Production Gate: fail
+- Admission Basis: over_capacity
+- Production Trigger/Reachability: The cited report path is retained as evidence, but it is not admitted for this S-009 pass. port `toTaggedItemScan` rejects empty stack/zero aspects before timed target; `BlockEldritchNothing` fails silently.
+- Concrete Impact/Contract: The exact delta remains durable evidence, but this candidate was ranked below S-009's eight admitted slots and receives no fix capacity. target acquisition succeeds; aspect validity is decided at completion and invalid notification emitted.
+- Admission Evidence: A-029-F02.; S-009 priority ranking/deferred scope.
+- Admission Budget: reproduce_attempts=0; fix_checkpoints=0; review_passes=0
+- Admission Attempts Used: 0
+- Speculation Boundary: the direct cited finding only; no adjacent hardening, migration, policy, addon, or cleanup scope.
+- Regression hazards: isolate from F-105 handler ordering and preserve completion validation.
+- Outcome: none
+- Notes/Disposition reason: confirmed Eldritch-facing scan defect.; deferred with Production Gate fail and basis over_capacity; ranked below S-009's eight admitted slots.
+
+## F-107 — R-001 proof
+- Type: test_debt
+- Disposition: deferred
+- Severity: high
+- Confidence: high
+- Source IDs: S-005
+- Audit IDs/Reports: A-006, A-009 / corresponding terminal reports
+- Oracle: the minimum focused evidence for exactly one promoted outcome.
+- Observed: the outcome's exact branches and values lack a dedicated minimum proof surface.
+- Expected: Verify VoidSeed WHEAT_SEEDS catalyst, cultist/leader armor tuples, Crimson CVOID stats, three-piece robe surface, and conditional cap creative metas.
+- Exact deltas: missing focused proof for this outcome only.
+- Affected paths/symbols: test surfaces named by the cited reports
+- Primary evidence: focused registry/recipe/material tests and fresh-game creative inspection.
+- Production Gate: fail
+- Admission Basis: adjacent_non_requirement
+- Production Trigger/Reachability: The cited test gap is not an independent production trigger; it is verification work for another finding or optional coverage.
+- Concrete Impact/Contract: No separate product outcome is admitted; minimum test edits for selected findings are charged to those findings' fix checkpoint/evidence budget.
+- Admission Evidence: focused registry/recipe/material tests and fresh-game creative inspection.; no separate production admission.
+- Admission Budget: reproduce_attempts=0; fix_checkpoints=0; review_passes=0
+- Admission Attempts Used: 0
+- Speculation Boundary: minimum proof for an admitted finding only; no independent test/product scope or broad coverage expansion.
+- Regression hazards: do not promote optional migration, policy, JEI, addon-only, or broad snapshot debt.
+- Outcome: none
+- Notes/Disposition reason: required minimum proof debt for this outcome; deferred debt remains separate.; deferred under adjacent_non_requirement because selected-finding test edits are charged to the selected finding budget.
+
+## F-108 — R-002 proof
+- Type: test_debt
+- Disposition: deferred
+- Severity: high
+- Confidence: high
+- Source IDs: S-005
+- Audit IDs/Reports: A-010 / corresponding terminal reports
+- Oracle: the minimum focused evidence for exactly one promoted outcome.
+- Observed: the outcome's exact branches and values lack a dedicated minimum proof surface.
+- Expected: Verify first OCULUS use returns false without vis or activation and PRIMNODE writes state meta 8.
+- Exact deltas: missing focused proof for this outcome only.
+- Affected paths/symbols: test surfaces named by the cited reports
+- Primary evidence: focused server interaction and block-state tests plus server smoke.
+- Production Gate: fail
+- Admission Basis: adjacent_non_requirement
+- Production Trigger/Reachability: The cited test gap is not an independent production trigger; it is verification work for another finding or optional coverage.
+- Concrete Impact/Contract: No separate product outcome is admitted; minimum test edits for selected findings are charged to those findings' fix checkpoint/evidence budget.
+- Admission Evidence: focused server interaction and block-state tests plus server smoke.; no separate production admission.
+- Admission Budget: reproduce_attempts=0; fix_checkpoints=0; review_passes=0
+- Admission Attempts Used: 0
+- Speculation Boundary: minimum proof for an admitted finding only; no independent test/product scope or broad coverage expansion.
+- Regression hazards: do not promote optional migration, policy, JEI, addon-only, or broad snapshot debt.
+- Outcome: none
+- Notes/Disposition reason: required minimum proof debt for this outcome; deferred debt remains separate.; deferred under adjacent_non_requirement because selected-finding test edits are charged to the selected finding budget.
+
+## F-109 — R-003 proof
+- Type: test_debt
+- Disposition: deferred
+- Severity: high
+- Confidence: high
+- Source IDs: S-005
+- Audit IDs/Reports: A-011 / corresponding terminal reports
+- Oracle: the minimum focused evidence for exactly one promoted outcome.
+- Observed: the outcome's exact branches and values lack a dedicated minimum proof surface.
+- Expected: Verify primal launch/impact, air-only placement, Crusher eligibility/event/repair, wand dispatch, offhand swing, and RNG consumption.
+- Exact deltas: missing focused proof for this outcome only.
+- Affected paths/symbols: test surfaces named by the cited reports
+- Primary evidence: focused projectile/world/Crusher interaction tests plus server smoke.
+- Production Gate: fail
+- Admission Basis: adjacent_non_requirement
+- Production Trigger/Reachability: The cited test gap is not an independent production trigger; it is verification work for another finding or optional coverage.
+- Concrete Impact/Contract: No separate product outcome is admitted; minimum test edits for selected findings are charged to those findings' fix checkpoint/evidence budget.
+- Admission Evidence: focused projectile/world/Crusher interaction tests plus server smoke.; no separate production admission.
+- Admission Budget: reproduce_attempts=0; fix_checkpoints=0; review_passes=0
+- Admission Attempts Used: 0
+- Speculation Boundary: minimum proof for an admitted finding only; no independent test/product scope or broad coverage expansion.
+- Regression hazards: do not promote optional migration, policy, JEI, addon-only, or broad snapshot debt.
+- Outcome: none
+- Notes/Disposition reason: required minimum proof debt for this outcome; deferred debt remains separate.; deferred under adjacent_non_requirement because selected-finding test edits are charged to the selected finding budget.
+
+## F-110 — R-004 proof
+- Type: test_debt
+- Disposition: deferred
+- Severity: high
+- Confidence: high
+- Source IDs: S-005
+- Audit IDs/Reports: A-012 / corresponding terminal reports
+- Oracle: the minimum focused evidence for exactly one promoted outcome.
+- Observed: the outcome's exact branches and values lack a dedicated minimum proof surface.
+- Expected: Verify one equipped armor repair, exact tool attack values, zero Void Hoe entity-hit durability, and WAND_CAP_VOID alias.
+- Exact deltas: missing focused proof for this outcome only.
+- Affected paths/symbols: test surfaces named by the cited reports
+- Primary evidence: focused equipment attribute/callback/API tests plus server smoke.
+- Production Gate: fail
+- Admission Basis: adjacent_non_requirement
+- Production Trigger/Reachability: The cited test gap is not an independent production trigger; it is verification work for another finding or optional coverage.
+- Concrete Impact/Contract: No separate product outcome is admitted; minimum test edits for selected findings are charged to those findings' fix checkpoint/evidence budget.
+- Admission Evidence: focused equipment attribute/callback/API tests plus server smoke.; no separate production admission.
+- Admission Budget: reproduce_attempts=0; fix_checkpoints=0; review_passes=0
+- Admission Attempts Used: 0
+- Speculation Boundary: minimum proof for an admitted finding only; no independent test/product scope or broad coverage expansion.
+- Regression hazards: do not promote optional migration, policy, JEI, addon-only, or broad snapshot debt.
+- Outcome: none
+- Notes/Disposition reason: required minimum proof debt for this outcome; deferred debt remains separate.; deferred under adjacent_non_requirement because selected-finding test edits are charged to the selected finding budget.
+
+## F-111 — R-005 proof
+- Type: test_debt
+- Disposition: deferred
+- Severity: high
+- Confidence: high
+- Source IDs: S-005
+- Audit IDs/Reports: A-013 / corresponding terminal reports
+- Oracle: the minimum focused evidence for exactly one promoted outcome.
+- Observed: the outcome's exact branches and values lack a dedicated minimum proof surface.
+- Expected: Verify five furnace listener fields, fuel-first and sided insertion, sneak gate, AIR transfer, and alembic branch.
+- Exact deltas: missing focused proof for this outcome only.
+- Affected paths/symbols: test surfaces named by the cited reports
+- Primary evidence: focused container/tile/GUI synchronization tests plus server smoke.
+- Production Gate: fail
+- Admission Basis: adjacent_non_requirement
+- Production Trigger/Reachability: The cited test gap is not an independent production trigger; it is verification work for another finding or optional coverage.
+- Concrete Impact/Contract: No separate product outcome is admitted; minimum test edits for selected findings are charged to those findings' fix checkpoint/evidence budget.
+- Admission Evidence: focused container/tile/GUI synchronization tests plus server smoke.; no separate production admission.
+- Admission Budget: reproduce_attempts=0; fix_checkpoints=0; review_passes=0
+- Admission Attempts Used: 0
+- Speculation Boundary: minimum proof for an admitted finding only; no independent test/product scope or broad coverage expansion.
+- Regression hazards: do not promote optional migration, policy, JEI, addon-only, or broad snapshot debt.
+- Outcome: none
+- Notes/Disposition reason: required minimum proof debt for this outcome; deferred debt remains separate.; deferred under adjacent_non_requirement because selected-finding test edits are charged to the selected finding budget.
+
+## F-112 — R-006 proof
+- Type: test_debt
+- Disposition: deferred
+- Severity: high
+- Confidence: high
+- Source IDs: S-005
+- Audit IDs/Reports: A-013 / corresponding terminal reports
+- Oracle: the minimum focused evidence for exactly one promoted outcome.
+- Observed: the outcome's exact branches and values lack a dedicated minimum proof surface.
+- Expected: Verify unconditional heat decrement/negative debt and all 18 formation FX packets.
+- Exact deltas: missing focused proof for this outcome only.
+- Affected paths/symbols: test surfaces named by the cited reports
+- Primary evidence: focused advanced-furnace heat and FX packet tests plus server smoke.
+- Production Gate: fail
+- Admission Basis: adjacent_non_requirement
+- Production Trigger/Reachability: The cited test gap is not an independent production trigger; it is verification work for another finding or optional coverage.
+- Concrete Impact/Contract: No separate product outcome is admitted; minimum test edits for selected findings are charged to those findings' fix checkpoint/evidence budget.
+- Admission Evidence: focused advanced-furnace heat and FX packet tests plus server smoke.; no separate production admission.
+- Admission Budget: reproduce_attempts=0; fix_checkpoints=0; review_passes=0
+- Admission Attempts Used: 0
+- Speculation Boundary: minimum proof for an admitted finding only; no independent test/product scope or broad coverage expansion.
+- Regression hazards: do not promote optional migration, policy, JEI, addon-only, or broad snapshot debt.
+- Outcome: none
+- Notes/Disposition reason: required minimum proof debt for this outcome; deferred debt remains separate.; deferred under adjacent_non_requirement because selected-finding test edits are charged to the selected finding budget.
+
+## F-113 — R-007 proof
+- Type: test_debt
+- Disposition: deferred
+- Severity: high
+- Confidence: high
+- Source IDs: S-005
+- Audit IDs/Reports: A-014 / corresponding terminal reports
+- Oracle: the minimum focused evidence for exactly one promoted outcome.
+- Observed: the outcome's exact branches and values lack a dedicated minimum proof surface.
+- Expected: Verify reservoir no-coordinate null fallthrough and null container amount 0.
+- Exact deltas: missing focused proof for this outcome only.
+- Affected paths/symbols: test surfaces named by the cited reports
+- Primary evidence: focused reservoir callback/API tests plus server smoke.
+- Production Gate: fail
+- Admission Basis: adjacent_non_requirement
+- Production Trigger/Reachability: The cited test gap is not an independent production trigger; it is verification work for another finding or optional coverage.
+- Concrete Impact/Contract: No separate product outcome is admitted; minimum test edits for selected findings are charged to those findings' fix checkpoint/evidence budget.
+- Admission Evidence: focused reservoir callback/API tests plus server smoke.; no separate production admission.
+- Admission Budget: reproduce_attempts=0; fix_checkpoints=0; review_passes=0
+- Admission Attempts Used: 0
+- Speculation Boundary: minimum proof for an admitted finding only; no independent test/product scope or broad coverage expansion.
+- Regression hazards: do not promote optional migration, policy, JEI, addon-only, or broad snapshot debt.
+- Outcome: none
+- Notes/Disposition reason: required minimum proof debt for this outcome; deferred debt remains separate.; deferred under adjacent_non_requirement because selected-finding test edits are charged to the selected finding budget.
+
+## F-114 — R-008 proof
+- Type: test_debt
+- Disposition: deferred
+- Severity: high
+- Confidence: high
+- Source IDs: S-005
+- Audit IDs/Reports: A-015 / corresponding terminal reports
+- Oracle: the minimum focused evidence for exactly one promoted outcome.
+- Observed: the outcome's exact branches and values lack a dedicated minimum proof surface.
+- Expected: Verify strict Sanity Checker no-action right click, exact HUD scale, and render-tick-end order.
+- Exact deltas: missing focused proof for this outcome only.
+- Affected paths/symbols: test surfaces named by the cited reports
+- Primary evidence: focused item/HUD tests and manual overlay observation.
+- Production Gate: fail
+- Admission Basis: adjacent_non_requirement
+- Production Trigger/Reachability: The cited test gap is not an independent production trigger; it is verification work for another finding or optional coverage.
+- Concrete Impact/Contract: No separate product outcome is admitted; minimum test edits for selected findings are charged to those findings' fix checkpoint/evidence budget.
+- Admission Evidence: focused item/HUD tests and manual overlay observation.; no separate production admission.
+- Admission Budget: reproduce_attempts=0; fix_checkpoints=0; review_passes=0
+- Admission Attempts Used: 0
+- Speculation Boundary: minimum proof for an admitted finding only; no independent test/product scope or broad coverage expansion.
+- Regression hazards: do not promote optional migration, policy, JEI, addon-only, or broad snapshot debt.
+- Outcome: none
+- Notes/Disposition reason: required minimum proof debt for this outcome; deferred debt remains separate.; deferred under adjacent_non_requirement because selected-finding test edits are charged to the selected finding budget.
+
+## F-115 — R-009 proof
+- Type: test_debt
+- Disposition: deferred
+- Severity: high
+- Confidence: high
+- Source IDs: S-005
+- Audit IDs/Reports: A-016 / corresponding terminal reports
+- Oracle: the minimum focused evidence for exactly one promoted outcome.
+- Observed: the outcome's exact branches and values lack a dedicated minimum proof surface.
+- Expected: Verify crystal face/orientation support and generated meta-7 survival.
+- Exact deltas: missing focused proof for this outcome only.
+- Affected paths/symbols: test surfaces named by the cited reports
+- Primary evidence: focused world-generation/lifecycle tests plus server smoke.
+- Production Gate: fail
+- Admission Basis: adjacent_non_requirement
+- Production Trigger/Reachability: The cited test gap is not an independent production trigger; it is verification work for another finding or optional coverage.
+- Concrete Impact/Contract: No separate product outcome is admitted; minimum test edits for selected findings are charged to those findings' fix checkpoint/evidence budget.
+- Admission Evidence: focused world-generation/lifecycle tests plus server smoke.; no separate production admission.
+- Admission Budget: reproduce_attempts=0; fix_checkpoints=0; review_passes=0
+- Admission Attempts Used: 0
+- Speculation Boundary: minimum proof for an admitted finding only; no independent test/product scope or broad coverage expansion.
+- Regression hazards: do not promote optional migration, policy, JEI, addon-only, or broad snapshot debt.
+- Outcome: none
+- Notes/Disposition reason: required minimum proof debt for this outcome; deferred debt remains separate.; deferred under adjacent_non_requirement because selected-finding test edits are charged to the selected finding budget.
+
+## F-116 — R-010 proof
+- Type: test_debt
+- Disposition: deferred
+- Severity: high
+- Confidence: high
+- Source IDs: S-005
+- Audit IDs/Reports: A-017 / corresponding terminal reports
+- Oracle: the minimum focused evidence for exactly one promoted outcome.
+- Observed: the outcome's exact branches and values lack a dedicated minimum proof surface.
+- Expected: Verify each A-017-F01 through F24 effect, value, branch, entity AI, spawn, team, name, projectile, teleport, field, and sound delta.
+- Exact deltas: missing focused proof for this outcome only.
+- Affected paths/symbols: test surfaces named by the cited reports
+- Primary evidence: focused entity tests plus server smoke; client status-18 observation.
+- Production Gate: fail
+- Admission Basis: adjacent_non_requirement
+- Production Trigger/Reachability: The cited test gap is not an independent production trigger; it is verification work for another finding or optional coverage.
+- Concrete Impact/Contract: No separate product outcome is admitted; minimum test edits for selected findings are charged to those findings' fix checkpoint/evidence budget.
+- Admission Evidence: focused entity tests plus server smoke; client status-18 observation.; no separate production admission.
+- Admission Budget: reproduce_attempts=0; fix_checkpoints=0; review_passes=0
+- Admission Attempts Used: 0
+- Speculation Boundary: minimum proof for an admitted finding only; no independent test/product scope or broad coverage expansion.
+- Regression hazards: do not promote optional migration, policy, JEI, addon-only, or broad snapshot debt.
+- Outcome: none
+- Notes/Disposition reason: required minimum proof debt for this outcome; deferred debt remains separate.; deferred under adjacent_non_requirement because selected-finding test edits are charged to the selected finding budget.
+
+## F-117 — R-011 proof
+- Type: test_debt
+- Disposition: deferred
+- Severity: high
+- Confidence: high
+- Source IDs: S-005
+- Audit IDs/Reports: A-018 / corresponding terminal reports
+- Oracle: the minimum focused evidence for exactly one promoted outcome.
+- Observed: the outcome's exact branches and values lack a dedicated minimum proof surface.
+- Expected: Verify balanced shard, Void cap, Gold/Diamond/Quartz causal aspect lists and Metal Device derivation.
+- Exact deltas: missing focused proof for this outcome only.
+- Affected paths/symbols: test surfaces named by the cited reports
+- Primary evidence: focused aspect-resolution tests plus server smoke.
+- Production Gate: fail
+- Admission Basis: adjacent_non_requirement
+- Production Trigger/Reachability: The cited test gap is not an independent production trigger; it is verification work for another finding or optional coverage.
+- Concrete Impact/Contract: No separate product outcome is admitted; minimum test edits for selected findings are charged to those findings' fix checkpoint/evidence budget.
+- Admission Evidence: focused aspect-resolution tests plus server smoke.; no separate production admission.
+- Admission Budget: reproduce_attempts=0; fix_checkpoints=0; review_passes=0
+- Admission Attempts Used: 0
+- Speculation Boundary: minimum proof for an admitted finding only; no independent test/product scope or broad coverage expansion.
+- Regression hazards: do not promote optional migration, policy, JEI, addon-only, or broad snapshot debt.
+- Outcome: none
+- Notes/Disposition reason: required minimum proof debt for this outcome; deferred debt remains separate.; deferred under adjacent_non_requirement because selected-finding test edits are charged to the selected finding budget.
+
+## F-118 — R-012 proof
+- Type: test_debt
+- Disposition: deferred
+- Severity: high
+- Confidence: high
+- Source IDs: S-005
+- Audit IDs/Reports: A-019 / corresponding terminal reports
+- Oracle: the minimum focused evidence for exactly one promoted outcome.
+- Observed: the outcome's exact branches and values lack a dedicated minimum proof surface.
+- Expected: Verify Primal Arrow aura, Focus depth shell, Hole-adjacent manual depth behavior only where linked, and both orb lightmap restores.
+- Exact deltas: missing focused proof for this outcome only.
+- Affected paths/symbols: test surfaces named by the cited reports
+- Primary evidence: focused client guards, manual M-019-02/M-019-06/M-019-08, and build.
+- Production Gate: fail
+- Admission Basis: adjacent_non_requirement
+- Production Trigger/Reachability: The cited test gap is not an independent production trigger; it is verification work for another finding or optional coverage.
+- Concrete Impact/Contract: No separate product outcome is admitted; minimum test edits for selected findings are charged to those findings' fix checkpoint/evidence budget.
+- Admission Evidence: focused client guards, manual M-019-02/M-019-06/M-019-08, and build.; no separate production admission.
+- Admission Budget: reproduce_attempts=0; fix_checkpoints=0; review_passes=0
+- Admission Attempts Used: 0
+- Speculation Boundary: minimum proof for an admitted finding only; no independent test/product scope or broad coverage expansion.
+- Regression hazards: do not promote optional migration, policy, JEI, addon-only, or broad snapshot debt.
+- Outcome: none
+- Notes/Disposition reason: required minimum proof debt for this outcome; deferred debt remains separate.; deferred under adjacent_non_requirement because selected-finding test edits are charged to the selected finding budget.
+
+## F-119 — R-013 proof
+- Type: test_debt
+- Disposition: deferred
+- Severity: high
+- Confidence: high
+- Source IDs: S-005
+- Audit IDs/Reports: A-019 / corresponding terminal reports
+- Oracle: the minimum focused evidence for exactly one promoted outcome.
+- Observed: the outcome's exact branches and values lack a dedicated minimum proof surface.
+- Expected: Verify field camera spaces/parallax, Mirror visibility, Nothing 512/144/256 values and face suppression, Lock 512/9216/ring gate, Hole 512 branch, and Obelisk 512/9216 values and shell gate.
+- Exact deltas: missing focused proof for this outcome only.
+- Affected paths/symbols: test surfaces named by the cited reports
+- Primary evidence: focused client guards, manual M-019-01/M-019-03..05/M-019-07/M-019-09, and build.
+- Production Gate: fail
+- Admission Basis: adjacent_non_requirement
+- Production Trigger/Reachability: The cited test gap is not an independent production trigger; it is verification work for another finding or optional coverage.
+- Concrete Impact/Contract: No separate product outcome is admitted; minimum test edits for selected findings are charged to those findings' fix checkpoint/evidence budget.
+- Admission Evidence: focused client guards, manual M-019-01/M-019-03..05/M-019-07/M-019-09, and build.; no separate production admission.
+- Admission Budget: reproduce_attempts=0; fix_checkpoints=0; review_passes=0
+- Admission Attempts Used: 0
+- Speculation Boundary: minimum proof for an admitted finding only; no independent test/product scope or broad coverage expansion.
+- Regression hazards: do not promote optional migration, policy, JEI, addon-only, or broad snapshot debt.
+- Outcome: none
+- Notes/Disposition reason: required minimum proof debt for this outcome; deferred debt remains separate.; deferred under adjacent_non_requirement because selected-finding test edits are charged to the selected finding budget.
+
+## F-120 — R-014 proof
+- Type: test_debt
+- Disposition: deferred
+- Severity: high
+- Confidence: high
+- Source IDs: S-005
+- Audit IDs/Reports: A-021, A-022 / corresponding terminal reports
+- Oracle: the minimum focused evidence for exactly one promoted outcome.
+- Observed: the outcome's exact branches and values lack a dedicated minimum proof surface.
+- Expected: Verify exact namespace rejection for entity clues.
+- Exact deltas: missing focused proof for this outcome only.
+- Affected paths/symbols: test surfaces named by the cited reports
+- Primary evidence: focused research trigger test.
+- Production Gate: fail
+- Admission Basis: adjacent_non_requirement
+- Production Trigger/Reachability: The cited test gap is not an independent production trigger; it is verification work for another finding or optional coverage.
+- Concrete Impact/Contract: No separate product outcome is admitted; minimum test edits for selected findings are charged to those findings' fix checkpoint/evidence budget.
+- Admission Evidence: focused research trigger test.; no separate production admission.
+- Admission Budget: reproduce_attempts=0; fix_checkpoints=0; review_passes=0
+- Admission Attempts Used: 0
+- Speculation Boundary: minimum proof for an admitted finding only; no independent test/product scope or broad coverage expansion.
+- Regression hazards: do not promote optional migration, policy, JEI, addon-only, or broad snapshot debt.
+- Outcome: none
+- Notes/Disposition reason: required minimum proof debt for this outcome; deferred debt remains separate.; deferred under adjacent_non_requirement because selected-finding test edits are charged to the selected finding budget.
+
+## F-121 — R-015 proof
+- Type: test_debt
+- Disposition: deferred
+- Severity: high
+- Confidence: high
+- Source IDs: S-005
+- Audit IDs/Reports: A-015, A-022, A-023 / corresponding terminal reports
+- Oracle: the minimum focused evidence for exactly one promoted outcome.
+- Observed: the outcome's exact branches and values lack a dedicated minimum proof surface.
+- Expected: Verify note ring start, paper preservation, table count increment, primary color maximum, client cache, and aspect debit invariants.
+- Exact deltas: missing focused proof for this outcome only.
+- Affected paths/symbols: test surfaces named by the cited reports
+- Primary evidence: focused research-note, capability, and dedicated-client cache tests.
+- Production Gate: fail
+- Admission Basis: adjacent_non_requirement
+- Production Trigger/Reachability: The cited test gap is not an independent production trigger; it is verification work for another finding or optional coverage.
+- Concrete Impact/Contract: No separate product outcome is admitted; minimum test edits for selected findings are charged to those findings' fix checkpoint/evidence budget.
+- Admission Evidence: focused research-note, capability, and dedicated-client cache tests.; no separate production admission.
+- Admission Budget: reproduce_attempts=0; fix_checkpoints=0; review_passes=0
+- Admission Attempts Used: 0
+- Speculation Boundary: minimum proof for an admitted finding only; no independent test/product scope or broad coverage expansion.
+- Regression hazards: do not promote optional migration, policy, JEI, addon-only, or broad snapshot debt.
+- Outcome: none
+- Notes/Disposition reason: required minimum proof debt for this outcome; deferred debt remains separate.; deferred under adjacent_non_requirement because selected-finding test edits are charged to the selected finding budget.
+
+## F-122 — R-016 proof
+- Type: test_debt
+- Disposition: deferred
+- Severity: high
+- Confidence: high
+- Source IDs: S-005
+- Audit IDs/Reports: A-024 / corresponding terminal reports
+- Oracle: the minimum focused evidence for exactly one promoted outcome.
+- Observed: the outcome's exact branches and values lack a dedicated minimum proof surface.
+- Expected: Verify fixed endpoints, clue ownership, bounded replay feedback, and atomic malformed research sync rejection.
+- Exact deltas: missing focused proof for this outcome only.
+- Affected paths/symbols: test surfaces named by the cited reports
+- Primary evidence: focused packet/security tests plus server smoke.
+- Production Gate: fail
+- Admission Basis: adjacent_non_requirement
+- Production Trigger/Reachability: The cited test gap is not an independent production trigger; it is verification work for another finding or optional coverage.
+- Concrete Impact/Contract: No separate product outcome is admitted; minimum test edits for selected findings are charged to those findings' fix checkpoint/evidence budget.
+- Admission Evidence: focused packet/security tests plus server smoke.; no separate production admission.
+- Admission Budget: reproduce_attempts=0; fix_checkpoints=0; review_passes=0
+- Admission Attempts Used: 0
+- Speculation Boundary: minimum proof for an admitted finding only; no independent test/product scope or broad coverage expansion.
+- Regression hazards: do not promote optional migration, policy, JEI, addon-only, or broad snapshot debt.
+- Outcome: none
+- Notes/Disposition reason: required minimum proof debt for this outcome; deferred debt remains separate.; deferred under adjacent_non_requirement because selected-finding test edits are charged to the selected finding budget.
+
+## F-123 — R-017 proof
+- Type: test_debt
+- Disposition: deferred
+- Severity: high
+- Confidence: high
+- Source IDs: S-005
+- Audit IDs/Reports: A-025 / corresponding terminal reports
+- Oracle: the minimum focused evidence for exactly one promoted outcome.
+- Observed: the outcome's exact branches and values lack a dedicated minimum proof surface.
+- Expected: Verify browser tooltip dimensions, forbidden aura, locked item dimming, and Thaumcraft particle sheet.
+- Exact deltas: missing focused proof for this outcome only.
+- Affected paths/symbols: test surfaces named by the cited reports
+- Primary evidence: focused client GUI tests and manual browser observation.
+- Production Gate: fail
+- Admission Basis: adjacent_non_requirement
+- Production Trigger/Reachability: The cited test gap is not an independent production trigger; it is verification work for another finding or optional coverage.
+- Concrete Impact/Contract: No separate product outcome is admitted; minimum test edits for selected findings are charged to those findings' fix checkpoint/evidence budget.
+- Admission Evidence: focused client GUI tests and manual browser observation.; no separate production admission.
+- Admission Budget: reproduce_attempts=0; fix_checkpoints=0; review_passes=0
+- Admission Attempts Used: 0
+- Speculation Boundary: minimum proof for an admitted finding only; no independent test/product scope or broad coverage expansion.
+- Regression hazards: do not promote optional migration, policy, JEI, addon-only, or broad snapshot debt.
+- Outcome: none
+- Notes/Disposition reason: required minimum proof debt for this outcome; deferred debt remains separate.; deferred under adjacent_non_requirement because selected-finding test edits are charged to the selected finding budget.
+
+## F-124 — R-018 proof
+- Type: test_debt
+- Disposition: deferred
+- Severity: high
+- Confidence: high
+- Source IDs: S-005
+- Audit IDs/Reports: A-026 / corresponding terminal reports
+- Oracle: the minimum focused evidence for exactly one promoted outcome.
+- Observed: the outcome's exact branches and values lack a dedicated minimum proof surface.
+- Expected: Verify full arcane rows, recipe click-through/history, compound and normal transforms, text color, hitboxes, inline geometry, and wildcard bound.
+- Exact deltas: missing focused proof for this outcome only.
+- Affected paths/symbols: test surfaces named by the cited reports
+- Primary evidence: focused client GUI tests and manual research-page observation.
+- Production Gate: fail
+- Admission Basis: adjacent_non_requirement
+- Production Trigger/Reachability: The cited test gap is not an independent production trigger; it is verification work for another finding or optional coverage.
+- Concrete Impact/Contract: No separate product outcome is admitted; minimum test edits for selected findings are charged to those findings' fix checkpoint/evidence budget.
+- Admission Evidence: focused client GUI tests and manual research-page observation.; no separate production admission.
+- Admission Budget: reproduce_attempts=0; fix_checkpoints=0; review_passes=0
+- Admission Attempts Used: 0
+- Speculation Boundary: minimum proof for an admitted finding only; no independent test/product scope or broad coverage expansion.
+- Regression hazards: do not promote optional migration, policy, JEI, addon-only, or broad snapshot debt.
+- Outcome: none
+- Notes/Disposition reason: required minimum proof debt for this outcome; deferred debt remains separate.; deferred under adjacent_non_requirement because selected-finding test edits are charged to the selected finding budget.
+
+## F-125 — R-019 proof
+- Type: test_debt
+- Disposition: deferred
+- Severity: high
+- Confidence: high
+- Source IDs: S-005
+- Audit IDs/Reports: A-028 / corresponding terminal reports
+- Oracle: the minimum focused evidence for exactly one promoted outcome.
+- Observed: the outcome's exact branches and values lack a dedicated minimum proof surface.
+- Expected: Verify literal %n custom-token localization and lowercase locale precedence without overwrite.
+- Exact deltas: missing focused proof for this outcome only.
+- Affected paths/symbols: test surfaces named by the cited reports
+- Primary evidence: focused localization/resource-loading test.
+- Production Gate: fail
+- Admission Basis: adjacent_non_requirement
+- Production Trigger/Reachability: The cited test gap is not an independent production trigger; it is verification work for another finding or optional coverage.
+- Concrete Impact/Contract: No separate product outcome is admitted; minimum test edits for selected findings are charged to those findings' fix checkpoint/evidence budget.
+- Admission Evidence: focused localization/resource-loading test.; no separate production admission.
+- Admission Budget: reproduce_attempts=0; fix_checkpoints=0; review_passes=0
+- Admission Attempts Used: 0
+- Speculation Boundary: minimum proof for an admitted finding only; no independent test/product scope or broad coverage expansion.
+- Regression hazards: do not promote optional migration, policy, JEI, addon-only, or broad snapshot debt.
+- Outcome: none
+- Notes/Disposition reason: required minimum proof debt for this outcome; deferred debt remains separate.; deferred under adjacent_non_requirement because selected-finding test edits are charged to the selected finding budget.
+
+## F-126 — R-020 proof
+- Type: test_debt
+- Disposition: deferred
+- Severity: high
+- Confidence: high
+- Source IDs: S-005
+- Audit IDs/Reports: A-029 / corresponding terminal reports
+- Oracle: the minimum focused evidence for exactly one promoted outcome.
+- Observed: the outcome's exact branches and values lack a dedicated minimum proof surface.
+- Expected: Verify phenomenon null pass-through and empty-aspect timed scan with completion feedback.
+- Exact deltas: missing focused proof for this outcome only.
+- Affected paths/symbols: test surfaces named by the cited reports
+- Primary evidence: focused scan-engine tests plus server smoke.
+- Production Gate: fail
+- Admission Basis: adjacent_non_requirement
+- Production Trigger/Reachability: The cited test gap is not an independent production trigger; it is verification work for another finding or optional coverage.
+- Concrete Impact/Contract: No separate product outcome is admitted; minimum test edits for selected findings are charged to those findings' fix checkpoint/evidence budget.
+- Admission Evidence: focused scan-engine tests plus server smoke.; no separate production admission.
+- Admission Budget: reproduce_attempts=0; fix_checkpoints=0; review_passes=0
+- Admission Attempts Used: 0
+- Speculation Boundary: minimum proof for an admitted finding only; no independent test/product scope or broad coverage expansion.
+- Regression hazards: do not promote optional migration, policy, JEI, addon-only, or broad snapshot debt.
+- Outcome: none
+- Notes/Disposition reason: required minimum proof debt for this outcome; deferred debt remains separate.; deferred under adjacent_non_requirement because selected-finding test edits are charged to the selected finding budget.
+
+## F-127 — Positive declaration, recipe, registry, and localization controls
+- Type: parity
+- Disposition: preserve
+- Severity: informational
+- Confidence: high
+- Source IDs: S-003, S-004, S-005
+- Audit IDs/Reports: A-001, A-002, A-003, A-004, A-005, A-006, A-007, A-008, A-009 / terminal report paths
+- Oracle: exact declaration/recipe/resource matrices in proposals A001-A005 and A006-A010.
+- Observed: category/icon/background, all 16 research metadata/page/flag/parent/trigger/warp tuples, nine PNG hashes/dimensions, 56-key English corpus, recipe payloads/handles/order, typed helpers, empty-stack center, registry/meta/entity/tile maps match specified matrices.
+- Expected: retain every exact value: roots `(1,0)/(-1,0)`, OCULUS aspects `MIND3,DARKNESS3,EXCHANGE3,TRAVEL6,ELDRITCH6`, Void/Primal/device recipe values, localization 56 keys and markup counts, asset hashes, IDs/metas/tracking tuples.
+- Exact deltas: no product defect in these controls; benign chronology only: ELDRITCHMAJOR before MINOR and SANITYCHECK after FOCUSPRIMAL; typed helpers/namespaced lowercase/empty stack are adaptations.
+- Affected paths/symbols: `ConfigResearch*`, `ConfigRecipes*`, `ConfigAspects`, `ConfigItems/Blocks/Entities`, `ResearchPage`, lang/assets, `build.gradle`.
+- Primary evidence: A-001..A-009 report matrices and proposals A001-A005/A006-A010.
+- Production Gate: not_applicable
+- Admission Basis: preserve_control
+- Production Trigger/Reachability: The cited supported behavior or platform adaptation remains a required preserve control.
+- Concrete Impact/Contract: No defect is admitted; changing this control would regress the preserved contract.
+- Admission Evidence: A-001..A-009 report matrices and proposals A001-A005/A006-A010.; preserve-control evidence only.
+- Admission Budget: reproduce_attempts=0; fix_checkpoints=0; review_passes=0
+- Admission Attempts Used: 0
+- Speculation Boundary: preserve control only; no new defect, cleanup, or parity scope.
+- Regression hazards: preserve all recipe patterns, aspects, flags, ordered parents/pages, exact asset hashes, lower-case identifiers, normal VoidBoots, and no silent chronology reorder.
+- Outcome: none
+- Notes/Disposition reason: grouped exact positive controls by audit; local control IDs are crosswalked below.
+
+## F-128 — Runtime, Outer, entity, aspect, visual, and schema controls
+- Type: parity
+- Disposition: preserve
+- Severity: informational
+- Confidence: high
+- Source IDs: S-003, S-004, S-005, S-006, S-007
+- Audit IDs/Reports: A-010, A-011, A-012, A-013, A-014, A-015, A-016, A-017, A-018, A-019, A-020 / terminal report paths
+- Oracle: exact positive-control matrices in proposals A006-A010, A011-A015, and A016-A020.
+- Observed: server authority, synchronous maze publication, safe portal arrival, finite-fluid level 7/eight-quanta translation, capability lifecycle, null/empty safety where retained, valid recipes/warp/trigger tables, Outer biome/maze/structure/portal/tiles, entity core/loot/NBT, aspect precedence/formulas, renderer assets/negative controls, and research schema matrices match the cited controls.
+- Expected: retain all exact values and branches in proposal locators, including Crusher level 5/uses 500, reservoir capacity 256/suction 24, furnace costs 50, Sanity coordinates/UVs, Outer direction bits and lock defaults, entity IDs/tracking, exact scan precedence and schema flags.
+- Exact deltas: no promoted defect in these controls; A-011 center duplicate is corrected without removing secondary checks; A-019 96-block Lock dispatch supersedes A-016 reduced-range performance claim; Crystalizer lightmap behavior remains untouched.
+- Affected paths/symbols: runtime paths and renderer/schema symbols listed in A-011..A-020 reports.
+- Primary evidence: A-010-PC01..PC08, A-011-PC01..PC07, A-012-PC01..PC07, A-013-PC01..PC09, A-014-PC01..PC07, A-015-PC01..PC08, A-016-PC01..PC07, A-017-PC01..PC12, A-018-PC01..PC06, A-019 controls, A-020-PC01..PC05.
+- Production Gate: not_applicable
+- Admission Basis: preserve_control
+- Production Trigger/Reachability: The cited supported behavior or platform adaptation remains a required preserve control.
+- Concrete Impact/Contract: No defect is admitted; changing this control would regress the preserved contract.
+- Admission Evidence: A-010-PC01..PC08, A-011-PC01..PC07, A-012-PC01..PC07, A-013-PC01..PC09, A-014-PC01..PC07, A-015-PC01..PC08, A-016-PC01..PC07, A-017-PC01..PC12, A-018-PC01..PC06, A-019 controls, A-020-PC01..PC05.; preserve-control evidence only.
+- Admission Budget: reproduce_attempts=0; fix_checkpoints=0; review_passes=0
+- Admission Attempts Used: 0
+- Speculation Boundary: preserve control only; no new defect, cleanup, or parity scope.
+- Regression hazards: preserve safe dead-projectile return, save/sync hardening, data-preserving formation migration, server authority, exact registry/NBT/packet/dimension boundaries and TC4 Crystalizer behavior.
+- Outcome: none
+- Notes/Disposition reason: grouped positive controls by audit while retaining exact matrices and all local IDs in crosswalk.
+
+## F-129 — FollowingItem coordinate payload
+- Type: benign_delta
+- Disposition: preserve
+- Severity: informational
+- Confidence: high
+- Source IDs: S-005, S-006
+- Audit IDs/Reports: A-017 / reports/A-017-outer-entities-drops.md:410-422
+- Oracle: TC4's coordinate-only payload is broken; the port supplies a complete entity target.
+- Observed: The port supplies the complete coordinate/entity target used by BlockUtils.
+- Expected: retain the complete target instead of the coordinate-only payload.
+- Exact deltas: BlockUtils.java:154-173; FollowingItem
+- Affected paths/symbols: A-017:410-422
+- Primary evidence: preserve homing and network behavior; do not regress without a concrete compatibility requirement.
+- Production Gate: not_applicable
+- Admission Basis: preserve_control
+- Production Trigger/Reachability: The cited supported behavior or platform adaptation remains a required preserve control.
+- Concrete Impact/Contract: No defect is admitted; changing this control would regress the preserved contract.
+- Admission Evidence: preserve homing and network behavior; do not regress without a concrete compatibility requirement.; preserve-control evidence only.
+- Admission Budget: reproduce_attempts=0; fix_checkpoints=0; review_passes=0
+- Admission Attempts Used: 0
+- Speculation Boundary: preserve control only; no new defect, cleanup, or parity scope.
+- Regression hazards: none
+- Outcome: none
+- Notes/Disposition reason: charter-approved runtime/network repair.
+
+## F-130 — FollowingItem lifespan restoration
+- Type: benign_delta
+- Disposition: preserve
+- Severity: informational
+- Confidence: high
+- Source IDs: S-005, S-006
+- Audit IDs/Reports: A-017 / reports/A-017-outer-entities-drops.md:424-436
+- Oracle: TC4's theoretical infinite lifetime becomes expiry after about 2.147 billion ticks when continuously loaded.
+- Observed: The port restores Integer.MAX_VALUE lifespan after NBT load as practical persistence.
+- Expected: finite expiry after about 2.147 billion ticks is retained as a benign adaptation.
+- Exact deltas: FollowingItem NBT load/lifespan
+- Affected paths/symbols: A-017:424-436
+- Primary evidence: preserve practical persistence and NBT compatibility.
+- Production Gate: not_applicable
+- Admission Basis: preserve_control
+- Production Trigger/Reachability: The cited supported behavior or platform adaptation remains a required preserve control.
+- Concrete Impact/Contract: No defect is admitted; changing this control would regress the preserved contract.
+- Admission Evidence: preserve practical persistence and NBT compatibility.; preserve-control evidence only.
+- Admission Budget: reproduce_attempts=0; fix_checkpoints=0; review_passes=0
+- Admission Attempts Used: 0
+- Speculation Boundary: preserve control only; no new defect, cleanup, or parity scope.
+- Regression hazards: none
+- Outcome: none
+- Notes/Disposition reason: charter-approved practical persistence adaptation.
+
+## F-131 — Benign platform and policy adaptations
+- Type: benign_delta
+- Disposition: preserve
+- Severity: informational
+- Confidence: high
+- Source IDs: S-005, S-006, S-007
+- Audit IDs/Reports: A-001, A-002, A-003, A-006, A-007, A-008, A-009, A-010, A-011, A-012, A-013, A-014, A-015, A-016, A-017, A-020, A-023, A-024, A-027, A-028, A-029 / terminal report paths
+- Oracle: Forge 1.12-compatible implementation where charter explicitly preserves adaptation.
+- Observed: typed recipe helpers, split initializers, renamed fields, namespaced registries, `ItemStack.EMPTY`, state metadata conversion, Forge capabilities/EntityDataManager/BossInfoServer, packet scheduling, scoped maze persistence, safe teleporter, empty-stack/nozzle guards, save/sync hardening, dynamic NBT recipes and lowercase locale convention coexist with literal differences.
+- Expected: retain these adaptations unless an atomic finding explicitly changes them; preserve server authority and safe current-format behavior.
+- Exact deltas: each local adaptation and benign delta remains at its report locator; notable accepted deltas are synchronous maze publication, finite-fluid level 7, secondary protection checks, safe dead-projectile return, current Forge capability architecture, and data-preserving furnace migration.
+- Affected paths/symbols: adaptation paths listed in six proposal files.
+- Primary evidence: adaptation sections of normalize-A001-A005, A006-A010, A011-A015, A016-A020, A021-A025, A026-A029.
+- Production Gate: not_applicable
+- Admission Basis: preserve_control
+- Production Trigger/Reachability: The cited supported behavior or platform adaptation remains a required preserve control.
+- Concrete Impact/Contract: No defect is admitted; changing this control would regress the preserved contract.
+- Admission Evidence: adaptation sections of normalize-A001-A005, A006-A010, A011-A015, A016-A020, A021-A025, A026-A029.; preserve-control evidence only.
+- Admission Budget: reproduce_attempts=0; fix_checkpoints=0; review_passes=0
+- Admission Attempts Used: 0
+- Speculation Boundary: preserve control only; no new defect, cleanup, or parity scope.
+- Regression hazards: no broad refactor, API/dependency upgrade, persisted-ID deletion, or TC4 unsafe behavior restoration.
+- Outcome: none
+- Notes/Disposition reason: preserve charter-approved platform behavior.
+
+## F-132 — Deferred migration and policy boundaries
+- Type: constraint
+- Disposition: deferred
+- Severity: critical
+- Confidence: high
+- Source IDs: S-001, S-002, S-005
+- Audit IDs/Reports: A-009, A-012, A-015, A-016, A-019, A-023 / terminal report paths
+- Oracle: separate support decision required for legacy `.thaum` and `DIM-42` worlds and invented Void Robe boots persisted stacks.
+- Observed: port reads ForgeCaps/current `DIM_OUTERLANDS`; legacy sidecars and `DIM-42` are not imported; extra boots may exist in WIP saves.
+- Expected: no silent migration, folder switch, or persisted-ID deletion without explicit support policy and fixtures.
+- Exact deltas: `.thaum`/`.thaumback`, current/legacy UUID, `DIM-42`/`DIM_OUTERLANDS`, nondefault dimensions, regions/entities/tiles, and extra boots policy are unresolved by this goal.
+- Affected paths/symbols: `EventHandlerEntity`, `ResearchManager`, `PlayerKnowledgeCapability`, `WorldProviderOuter.getSaveFolder`, `MazeHandler`, `ConfigItems` boots registration.
+- Primary evidence: A-015-F01, A-016-F01, A-019-F18, A-009 unknown; E-0006.
+- Production Gate: fail
+- Admission Basis: outside_scope
+- Production Trigger/Reachability: Legacy migration/persisted-ID behavior is explicitly outside the current production envelope pending a separate support decision.
+- Concrete Impact/Contract: No supported fresh/current-format production contract is established for this migration candidate.
+- Admission Evidence: A-015-F01, A-016-F01, A-019-F18, A-009 unknown; E-0006.; S-009 priority ranking/deferred scope.
+- Admission Budget: reproduce_attempts=0; fix_checkpoints=0; review_passes=0
+- Admission Attempts Used: 0
+- Speculation Boundary: the direct cited finding only; no adjacent hardening, migration, policy, addon, or cleanup scope.
+- Regression hazards: preserve current ForgeCaps and existing port worlds; use hidden compatibility/tombstone registry for boots.
+- Outcome: none
+- Notes/Disposition reason: E-0006 explicitly defers `.thaum` and `DIM-42`; no blocking question remains because this is a deferred non-goal.; deferred with Production Gate fail and basis outside_scope; ranked below S-009's eight admitted slots.
+
+## F-133 — Deferred crafting and scan policy
+- Type: constraint
+- Disposition: constraint
+- Severity: low
+- Confidence: high
+- Source IDs: S-005
+- Audit IDs/Reports: A-027, A-029 / reports/A-027-crafting-visibility.md; reports/A-029-scan-engine.md
+- Oracle: current report evidence does not authorize policy changes.
+- Observed: dynamic JEI wrappers are absent though recipes craft; `doLimitedCrafting` can gate ordinary Arcane Workbench recipes; native packet accepts only `@`; addon/late-registration derivations differ.
+- Expected: preserve craftability/research gates, normal crafting behavior, packet prefix contract, native lifecycle and exact scan precedence until separate policy decisions.
+- Exact deltas: dynamic JEI omission, recipe-book gate, first `#` base award, null caching, EE3 exclusion, duplicate output, catalyst recursion, entity hash distinctions remain deferred/constraint.
+- Affected paths/symbols: `JeiRecipeData`, `ArcaneWandRecipe`, `ArcaneWorkbenchRecipeResolver`, `ScanManager`, `ThaumcraftCraftingManager`, `PacketScannedToServer`.
+- Primary evidence: A-027-F01/F02 and A-029-F03..F08.
+- Production Gate: not_applicable
+- Admission Basis: constraint
+- Production Trigger/Reachability: The cited policy or boundary constrains this goal rather than exposing an admitted production defect.
+- Concrete Impact/Contract: No product fix is authorized until the separate policy or scope decision changes.
+- Admission Evidence: A-027-F01/F02 and A-029-F03..F08.; constraint evidence only.
+- Admission Budget: reproduce_attempts=0; fix_checkpoints=0; review_passes=0
+- Admission Attempts Used: 0
+- Speculation Boundary: the stated policy/constraint only; no workaround or adjacent product change.
+- Regression hazards: do not turn visibility into enforcement or replace TC4 precedence with TC6 behavior.
+- Outcome: none
+- Notes/Disposition reason: E-0006 explicitly defers these policy/addon deltas.
+
+## F-134 — Deferred and duplicate proof debt
+- Type: test_debt
+- Disposition: deferred
+- Severity: low
+- Confidence: high
+- Source IDs: S-005
+- Audit IDs/Reports: A-001, A-002, A-003, A-004, A-005, A-007, A-008, A-009, A-010, A-016, A-017, A-018, A-019, A-020, A-023, A-027, A-028, A-029 / terminal report paths
+- Oracle: optional future regression coverage, not minimum evidence for promoted findings.
+- Observed: broad declaration/asset/positive-control snapshots, migration fixtures, visual/manual matrices, JEI/limited-crafting/addon derivation tests are absent.
+- Expected: remain deferred unless a later implementation makes one the minimum proof for a required finding.
+- Exact deltas: all deferred debt families are listed in the crosswalk, including A-001-T01, A-002-F05, A-003-T01, A-004-T01..04, A-005-T01, A-007-F06, A-008 debt, A-009 positive controls, A-010-F05, A-016..A-020 debt, A-023 N-030/N-039 migration portions, A-027 debt, A-028 manual resource-pack, A-029 addon deltas.
+- Affected paths/symbols: report-specific test surfaces.
+- Primary evidence: proposal completeness matrices and report Test Debt sections.
+- Production Gate: fail
+- Admission Basis: adjacent_non_requirement
+- Production Trigger/Reachability: The cited test gap is not an independent production trigger; it is verification work for another finding or optional coverage.
+- Concrete Impact/Contract: No separate product outcome is admitted; minimum test edits for selected findings are charged to those findings' fix checkpoint/evidence budget.
+- Admission Evidence: proposal completeness matrices and report Test Debt sections.; no separate production admission.
+- Admission Budget: reproduce_attempts=0; fix_checkpoints=0; review_passes=0
+- Admission Attempts Used: 0
+- Speculation Boundary: minimum proof for an admitted finding only; no independent test/product scope or broad coverage expansion.
+- Regression hazards: do not misclassify deferred coverage as product parity or silently discard it.
+- Outcome: none
+- Notes/Disposition reason: only minimum proof for F-001..F-106 is promoted in the one outcome-specific proof blocks F-107..F-126.; deferred under adjacent_non_requirement because selected-finding test edits are charged to the selected finding budget.
+
+## RECON Adjudication
+
+- Duplicates retained with links and reasons: A-022.1 -> F-080; A-025-F01 -> F-085; A-012-F02/A-009-F03/A-019-F18 -> F-005 with each runtime/visual locator retained; A-011-F06 and A-014-F01 remain distinct (dispatch order versus reservoir return); A-011-F05 and A-013-F05 remain distinct (event multiplicity versus sync cadence); A-011-F08 and A-012-F01 remain distinct (Crusher creative repair versus armor callback repair). Declaration/control overlaps retain separate report provenance under F-127/F-128.
+- Conflicts and direct adjudication: `.thaum` and `DIM-42` migration are deferred/non-goals pending separate support decision. Extra Void Robe boots, `WAND_CAP_VOID`, Sanity Checker right click, the A-013 alembic branch, non-selected A-017/A-019 parity deltas, and uppercase locale alias precedence retain their exact expected behavior but are deferred from this S-009 priority pass by `over_capacity`; no such fix is implied. Synchronous maze publication, secondary protection checks, safe dead-projectile return, save/sync hardening, finite-fluid translation, server authority, and the five preserve blocks remain protected.
+- Material unknowns: only deferred legacy migration/persisted-ID policy and explicitly deferred addon/policy surfaces remain unknown; none blocks fresh-game Eldritch normalization.
+- Rejected candidates: dynamic JEI wrappers, `doLimitedCrafting` bypass, alternate `#` route, addon-only scan derivations, broad non-English localization, and unsafe literal TC4 migration are not promoted.
+- Positive parity controls: F-127 and F-128 contain exact grouped matrices; F-131 contains charter-approved adaptations. Their local PC IDs and adaptation IDs are fully crosswalked below.
+
+## RECON Closure
+
+- All A-* assignments terminal: yes
+- Every report claim normalized or explicitly rejected: yes
+- Exact deltas preserved: yes
+- Production Admission Gate applied: yes
+- Non-admitted candidates explicitly deferred: yes
+- Promotion policy applied: yes
+- Material conflicts resolved or blocking: yes
+- Hard budgets frozen: yes; required findings 8/8; fix checkpoints 10/12; audit assignments 29/29; audit waves 3/3; scope amendments 0/0
+- Ready to freeze: yes
+
+## Complete Local Crosswalk
+
+Every report-local finding, positive control, adaptation, constraint, unknown, duplicate, and debt family is represented by a stable F block above. Proof-debt inventories F-107 through F-126 are deferred rather than independent product outcomes; minimum assertions for the eight admitted findings are charged to those findings' checkpoint budgets. Optional, migration, and policy debt remains deferred.
+
+- A-001: findings and controls -> F-127; adaptations -> F-131; unknown/T01 -> F-134.
+- A-002: F01-F04/PC01-PC17 -> F-127; F05/test debt -> F-134; AD01-AD04 -> F-131; residual constraint -> F-133.
+- A-003: F01-F08 -> F-127; test debt -> F-134.
+- A-004: corpus/result/markup/encoding/packaging -> F-127; exclusions -> F-133; T01-T04 -> F-134.
+- A-005: F01-F04 -> F-127; test debt/gaps -> F-133/F-134.
+- A-006: F01 -> F-001; F02 -> F-002; P01-P16/handles/pages -> F-127; ordering adaptation -> F-131; deferred proof debt -> F-107; remaining debt -> F-134.
+- A-007: F01-F04 -> F-127; F05 -> F-131; F06 -> F-134.
+- A-008: F01-F05 -> F-127; F06-F07 -> F-131; test debt -> F-134.
+- A-009: F01 -> F-003; F02 -> F-004; F03/unknown -> F-005/F-132; F04 -> F-006; P01-P03 -> F-127; deferred proof debt -> F-107; positive-control debt -> F-134.
+- A-010: F01 -> F-007; F02 -> F-008; F03/F04 -> F-108; F05 -> F-134; PC01-PC08 -> F-128; adaptation -> F-131.
+- A-011: F01-F06,F08,F10-F11 -> F-009..F-017 as locally specified; F07/F09 -> F-131; F12/per-finding debt -> F-109; PC01-PC07/constraints -> F-128/F-131.
+- A-012: F01 -> F-018; F02 -> F-005; F03-F05 -> F-019..F-021; deferred proof debt -> F-110; controls/adaptations -> F-128/F-131; migration -> F-132.
+- A-013: F01-F04,F07,F10-F11 -> F-022..F-030 as locally specified; deferred proof debt -> F-111/F-112; remaining runtime controls -> F-128/F-131; remaining debt -> F-134.
+- A-014: F01-F02 -> F-029/F-030; deferred proof debt -> F-113; controls/adaptations -> F-128/F-131; remaining debt -> F-134.
+- A-015: F01 -> F-132; F02-F05 -> F-031..F-034; deferred proof debt -> F-114; controls/adaptations -> F-128/F-131; migration -> F-134.
+- A-016: F01 -> F-132; F02 -> F-035; deferred proof debt -> F-115; controls/adaptations -> F-128/F-131; migration debt -> F-134.
+- A-017: F01-F24 -> F-036-F-059 one-to-one; F25/F26 -> F-129/F-130; deferred proof debt -> F-116; PC01-PC12/adaptations -> F-128/F-131; remaining debt -> F-134.
+- A-018: F01-F03 -> F-060-F-062; deferred proof debt -> F-117; controls/adaptations -> F-128/F-131; runtime debt -> F-134.
+- A-019: F01 -> F-063; F02 -> F-064; F03 -> F-065; F04-F10 -> F-066-F-072; F11 -> F-073; F12 -> F-074; F13-F14 -> F-075/F-076; F15-F17 -> F-077-F-079; F18 -> F-005/F-132; deferred proof debt -> F-118/F-119; assets/negative controls -> F-128; M-019-01..10 -> F-118/F-119; remaining debt -> F-134.
+- A-020: F01 -> F-131; F02/schema debt -> F-134; PC01-PC05 -> F-128/F-131.
+- A-021: F01 -> F-080; N-019 controls -> F-128; N-025 proof -> F-120.
+- A-022: A-022.1 -> F-080; A-022.2-F05 -> F-081-F-084; N-020 controls -> F-128; N-017/N-018/N-019/N-020 proof -> F-121.
+- A-023: F01/N-007 -> F-132; F02 -> F-085; F03 -> F-034; F04 -> F-086; controls -> F-128/F-131; current-runtime proof -> F-121; migration -> F-134.
+- A-024: F01-F04 -> F-087-F-090; N-022 controls -> F-128; N-034-N-037 proof -> F-122.
+- A-025: F01 -> F-085; F02-F05 -> F-091-F-094; N-023 controls -> F-128; N-031/N-038 proof -> F-123.
+- A-026: F01-F08 -> F-095-F-102; page/manual proof -> F-124.
+- A-027: F01/F02 -> F-133; F03-F05 controls -> F-128; deferred policy debt -> F-134.
+- A-028: F01/F02 -> F-103/F-104; P01-P06/loader/build/package controls -> F-127/F-128; browser/resource-pack debt -> F-134; deferred proof debt -> F-125.
+- A-029: F01/F02 -> F-105/F-106; F03/bounded deltas -> F-133; P01/scan controls -> F-128; deferred proof debt -> F-126; addon/late-lifecycle debt -> F-134.
