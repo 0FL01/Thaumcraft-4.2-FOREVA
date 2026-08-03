@@ -44,6 +44,7 @@ import thaumcraft.api.nodes.NodeType;
 import thaumcraft.api.research.ResearchCategories;
 import thaumcraft.api.research.ResearchCategoryList;
 import thaumcraft.api.research.ResearchItem;
+import thaumcraft.api.research.IScanEventHandler;
 import thaumcraft.api.research.ScanResult;
 import thaumcraft.common.CommonProxy;
 import thaumcraft.common.Thaumcraft;
@@ -76,6 +77,7 @@ public class ScanProgressionRuntimeTest {
     private ConcurrentHashMap<List, AspectList> oldObjectTags;
     private ConcurrentHashMap<List, int[]> oldGroupedObjectTags;
     private ArrayList<ThaumcraftApi.EntityTags> oldScanEntities;
+    private ArrayList<IScanEventHandler> oldScanEventHandlers;
 
     @BeforeClass
     public static void bootstrapMinecraftStatics() {
@@ -90,6 +92,7 @@ public class ScanProgressionRuntimeTest {
         this.oldObjectTags = new ConcurrentHashMap<>(ThaumcraftApi.objectTags);
         this.oldGroupedObjectTags = new ConcurrentHashMap<>(ThaumcraftApi.groupedObjectTags);
         this.oldScanEntities = new ArrayList<>(ThaumcraftApi.scanEntities);
+        this.oldScanEventHandlers = new ArrayList<>(ThaumcraftApi.scanEventhandlers);
 
         ResearchCategories.researchCategories.clear();
         ResearchCategories.registerCategory("TEST", new ResourceLocation("thaumcraft", "textures/test/icon.png"), new ResourceLocation("thaumcraft", "textures/test/background.png"));
@@ -98,6 +101,7 @@ public class ScanProgressionRuntimeTest {
         ThaumcraftApi.objectTags.clear();
         ThaumcraftApi.groupedObjectTags.clear();
         ThaumcraftApi.scanEntities.clear();
+        ThaumcraftApi.scanEventhandlers.clear();
         clearResearchCaches();
     }
 
@@ -113,6 +117,8 @@ public class ScanProgressionRuntimeTest {
         ThaumcraftApi.groupedObjectTags.putAll(this.oldGroupedObjectTags);
         ThaumcraftApi.scanEntities.clear();
         ThaumcraftApi.scanEntities.addAll(this.oldScanEntities);
+        ThaumcraftApi.scanEventhandlers.clear();
+        ThaumcraftApi.scanEventhandlers.addAll(this.oldScanEventHandlers);
         clearResearchCaches();
     }
 
@@ -190,6 +196,33 @@ public class ScanProgressionRuntimeTest {
         assertEquals(2, aspects.size());
         assertEquals(4, aspects.getAmount(Aspect.ELDRITCH));
         assertEquals(4, aspects.getAmount(Aspect.TRAVEL));
+    }
+
+    @Test
+    public void builtInPhenomenaHandlerPassesThroughWithoutStarvingLaterHandlers() {
+        ThaumcraftApi.registerObjectTag(new ItemStack(Items.STICK), new AspectList().add(Aspect.AIR, 1));
+        ScanWorld world = new ScanWorld();
+        TestPlayer player = new TestPlayer(world, "phenomena_passthrough");
+        ItemStack held = new ItemStack(Items.STICK);
+        ScanManager builtIn = new ScanManager();
+        ScanResult laterResult = new ScanResult((byte) 3, 0, 0, null, "LATER_HANDLER");
+        int[] laterCalls = new int[1];
+        ThaumcraftApi.scanEventhandlers.add(builtIn);
+        ThaumcraftApi.scanEventhandlers.add((stack, scanWorld, scanPlayer) -> {
+            laterCalls[0]++;
+            return laterResult;
+        });
+
+        assertEquals(null, builtIn.scanPhenomena(held, world, player));
+        assertTrue(player.knowledge().getScannedItems().isEmpty());
+        assertEquals(0, player.knowledge().getAspectPoolFor(Aspect.AIR));
+
+        ScanResult result = new ItemThaumometer().findRawScanTarget(held, world, player);
+
+        assertTrue(result == laterResult);
+        assertEquals(1, laterCalls[0]);
+        assertTrue(player.knowledge().getScannedItems().isEmpty());
+        assertEquals(0, player.knowledge().getAspectPoolFor(Aspect.AIR));
     }
 
     @Test

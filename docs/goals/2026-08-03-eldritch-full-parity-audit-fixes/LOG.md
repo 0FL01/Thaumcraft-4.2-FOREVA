@@ -316,3 +316,26 @@ Log-Policy: append-only; correct prior entries with a new event
 - Preserve Result: Without clues, research/note/input/cost state remains unchanged. Matching clues restore success. Existing ordinary primary/secondary, parent, difficulty, cost, sibling, and workflow-mismatch tests remain green.
 - Budget: F-088 consumed 1/1 fix checkpoint and 0 material replans.
 - Next: Commit the R-007 checkpoint excluding user-owned `SKILL.md`, then begin R-008/F-105.
+
+## E-0029 — 2026-08-03 — checkpoint_start
+
+- State-Revision: 28
+- Outcomes/Findings: R-008 / F-105
+- Git before/after: `c8567267` / `c8567267`; only user-owned `SKILL.md` dirty
+- Prior checkpoint commit: R-007/F-088 -> `c8567267 fix(research): require hidden research clues`.
+- Action: Started the single allowed F-105 checkpoint and incremented `checkpoints_started` to 1/1.
+- Hypothesis: The interface phenomenon override is the only intercepting path and can return null exactly like TC4; explicit keyed scanning is a distinct overload.
+- Expected Evidence: Focused runtime/static evidence proves null/no mutation and later handler reachability while End Portal and ordinary scan paths pass.
+- Stop/Replan: Stop if the change affects explicit scan APIs, target ordering beyond this handler, awards, or addon policy.
+- Next: Inspect and change only the bounded phenomenon override and focused cases.
+
+## E-0030 — 2026-08-03 — checkpoint_closed
+
+- State-Revision: 29
+- Outcomes/Findings: R-008 / F-105 -> verified
+- Git before/after: `c8567267` / scan override, two focused tests, STATE/LOG ready for commit
+- Action: Restored the `IScanEventHandler.scanPhenomena(ItemStack,...)` override to unconditional null. Added isolated handler-list lifecycle, no-scan/no-award assertions, exact later-handler reachability, and static overload/iteration guards.
+- Evidence: Frozen focused scan command -> BUILD SUCCESSFUL in 18s; `./scripts/dev.sh validate --smoke` -> PASS; `git diff --check` -> PASS.
+- Preserve Result: Explicit `scanItem`, `scanEntity`, keyed `scanPhenomena(player,key)`, End Portal bridge, item/entity awards, timed invalid feedback, and handler ordering after null remain green/unchanged.
+- Budget: F-105 consumed 1/1 fix checkpoint and 0 material replans.
+- Next: Commit the R-008 checkpoint excluding user-owned `SKILL.md`, then begin the single closure review pass.

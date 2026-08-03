@@ -45,7 +45,7 @@ public class ScanManager implements IScanEventHandler {
 
     @Override
     public ScanResult scanPhenomena(ItemStack stack, World world, EntityPlayer player) {
-        return stack == null || stack.isEmpty() ? null : scanItem(player, stack);
+        return null;
     }
 
     public static ScanResult scanEntity(EntityPlayer player, Entity entity) {

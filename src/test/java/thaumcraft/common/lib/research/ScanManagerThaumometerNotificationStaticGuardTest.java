@@ -8,6 +8,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertFalse;
 
 public class ScanManagerThaumometerNotificationStaticGuardTest {
     @Test
@@ -24,5 +25,11 @@ public class ScanManagerThaumometerNotificationStaticGuardTest {
         assertTrue(clientProxy.contains(".replace(\"%n\", aspect.getName())"));
         assertTrue(clientProxy.contains("aspect.getLocalizedDescription()"));
         assertTrue(clientProxy.contains("tc.aspect.help."));
+
+        String phenomenonOverride = "public ScanResult scanPhenomena(ItemStack stack, World world, EntityPlayer player) {\n        return null;\n    }";
+        assertTrue(source.contains(phenomenonOverride));
+        assertFalse(source.contains("return stack == null || stack.isEmpty() ? null : scanItem(player, stack);"));
+        assertTrue(item.contains("for (IScanEventHandler handler : ThaumcraftApi.scanEventhandlers)"));
+        assertTrue(item.contains("if (result != null)"));
     }
 }
