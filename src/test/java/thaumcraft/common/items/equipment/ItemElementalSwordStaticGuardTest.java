@@ -32,7 +32,9 @@ public class ItemElementalSwordStaticGuardTest {
                         && source.contains("false, 0, 8, -1, 8, 0, 0.8F, 1"));
         assertTrue("ItemElementalSword must keep chain-hit sweep contract",
                 source.contains("entity.getEntityBoundingBox().grow(1.2D, 1.1D, 1.2D)")
-                        && source.contains("player.attackTargetEntityWithCurrentItem(candidate);")
+                        && source.contains("this.attackSecondaryTarget((EntityLivingBase) candidate, player);")
+                        && source.contains("MinecraftForge.EVENT_BUS.post(new AttackEntityEvent(player, target))")
+                        && !source.contains("player.attackTargetEntityWithCurrentItem(candidate);")
                         && source.contains("TCSounds.SWING"));
     }
 

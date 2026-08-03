@@ -1,20 +1,30 @@
 package thaumcraft.common.items.equipment;
 
+import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.passive.EntityTameable;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.init.MobEffects;
 import net.minecraft.item.EnumAction;
 import net.minecraft.item.EnumRarity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemSword;
+import net.minecraft.stats.StatList;
 import net.minecraft.util.ActionResult;
+import net.minecraft.util.DamageSource;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
+import net.minecraftforge.common.ForgeHooks;
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.ForgeEventFactory;
+import net.minecraftforge.event.entity.player.AttackEntityEvent;
+import net.minecraftforge.event.entity.player.CriticalHitEvent;
 import thaumcraft.common.Thaumcraft;
 import thaumcraft.api.IRepairable;
 import thaumcraft.common.config.ConfigItems;
@@ -160,7 +170,7 @@ public class ItemElementalSword extends ItemSword implements IRepairable {
                 if (candidate.isOnSameTeam(player)) {
                     continue;
                 }
-                player.attackTargetEntityWithCurrentItem(candidate);
+                this.attackSecondaryTarget((EntityLivingBase) candidate, player);
                 count++;
             }
             if (count > 0) {
@@ -170,5 +180,93 @@ public class ItemElementalSword extends ItemSword implements IRepairable {
             }
         }
         return super.onLeftClickEntity(stack, player, entity);
+    }
+
+    private void attackSecondaryTarget(EntityLivingBase target, EntityPlayer player) {
+        if (MinecraftForge.EVENT_BUS.post(new AttackEntityEvent(player, target))
+                || !target.canBeAttackedWithItem()
+                || target.hitByEntity(player)) {
+            return;
+        }
+
+        float damage = (float) player.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).getAttributeValue();
+        float enchantmentDamage = EnchantmentHelper.getModifierForCreature(
+                player.getHeldItemMainhand(), target.getCreatureAttribute());
+        float attackStrength = player.getCooledAttackStrength(0.5F);
+        enchantmentDamage *= attackStrength;
+        damage *= 0.2F + attackStrength * attackStrength * 0.8F;
+        if (damage <= 0.0F && enchantmentDamage <= 0.0F) {
+            return;
+        }
+
+        boolean fullyCharged = attackStrength > 0.9F;
+        int knockback = EnchantmentHelper.getKnockbackModifier(player);
+        if (player.isSprinting() && fullyCharged) {
+            knockback++;
+        }
+
+        boolean vanillaCritical = fullyCharged
+                && player.fallDistance > 0.0F
+                && !player.onGround
+                && !player.isOnLadder()
+                && !player.isInWater()
+                && !player.isPotionActive(MobEffects.BLINDNESS)
+                && !player.isRiding()
+                && !player.isSprinting();
+        CriticalHitEvent criticalHit = ForgeHooks.getCriticalHit(
+                player, target, vanillaCritical, vanillaCritical ? 1.5F : 1.0F);
+        boolean critical = criticalHit != null;
+        if (critical) {
+            damage *= criticalHit.getDamageModifier();
+        }
+        damage += enchantmentDamage;
+
+        int fireAspect = EnchantmentHelper.getFireAspectModifier(player);
+        boolean litTarget = false;
+        if (fireAspect > 0 && !target.isBurning()) {
+            litTarget = true;
+            target.setFire(1);
+        }
+
+        float healthBefore = target.getHealth();
+        boolean hit = target.attackEntityFrom(DamageSource.causePlayerDamage(player), damage);
+        if (hit) {
+            if (knockback > 0) {
+                target.knockBack(player, knockback * 0.5F,
+                        MathHelper.sin(player.rotationYaw * (float) Math.PI / 180.0F),
+                        -MathHelper.cos(player.rotationYaw * (float) Math.PI / 180.0F));
+                player.motionX *= 0.6D;
+                player.motionZ *= 0.6D;
+                player.setSprinting(false);
+            }
+            if (critical) {
+                player.onCriticalHit(target);
+            }
+            if (enchantmentDamage > 0.0F) {
+                player.onEnchantmentCritical(target);
+            }
+            player.setLastAttackedEntity(target);
+            EnchantmentHelper.applyThornEnchantments(target, player);
+            EnchantmentHelper.applyArthropodEnchantments(player, target);
+
+            ItemStack held = player.getHeldItemMainhand();
+            if (!held.isEmpty()) {
+                ItemStack beforeHit = held.copy();
+                held.hitEntity(target, player);
+                if (held.isEmpty()) {
+                    ForgeEventFactory.onPlayerDestroyItem(player, beforeHit, EnumHand.MAIN_HAND);
+                    player.setHeldItem(EnumHand.MAIN_HAND, ItemStack.EMPTY);
+                }
+            }
+
+            float damageDealt = healthBefore - target.getHealth();
+            player.addStat(StatList.DAMAGE_DEALT, Math.round(damageDealt * 10.0F));
+            if (fireAspect > 0) {
+                target.setFire(fireAspect * 4);
+            }
+        } else if (litTarget) {
+            target.extinguish();
+        }
+        player.addExhaustion(0.1F);
     }
 }
