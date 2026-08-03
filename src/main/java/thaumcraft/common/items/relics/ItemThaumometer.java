@@ -179,6 +179,11 @@ public class ItemThaumometer extends Item {
                 if (result != null) return result;
             }
 
+            // End Portal has no ItemBlock in 1.12, so preserve its TC4 object scan as phenomena.
+            if (block == Blocks.END_PORTAL) {
+                return new ScanResult((byte) 3, 0, 0, null, ScanManager.ELDRITCH_END_PORTAL_PHENOMENA);
+            }
+
             // 4. Explicit fluid fallback (bucket items).
             // Tag phenomena so the renderer can show "Water" / "Lava" instead of bucket names.
             if (block == Blocks.WATER || block == Blocks.FLOWING_WATER) {

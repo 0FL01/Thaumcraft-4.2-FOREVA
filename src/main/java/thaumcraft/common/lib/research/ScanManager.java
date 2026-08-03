@@ -39,6 +39,7 @@ import java.util.Arrays;
 import java.util.Random;
 
 public class ScanManager implements IScanEventHandler {
+    public static final String ELDRITCH_END_PORTAL_PHENOMENA = "BLOCK:minecraft:end_portal";
     private static final long DEBUG_LOG_INTERVAL_MS = 1500L;
     private static long lastValidScanDebugLogMs = 0L;
 
@@ -314,6 +315,9 @@ public class ScanManager implements IScanEventHandler {
                 return getObjectAspects(getScannedItemStack((EntityItem)scan.entity));
             }
             return generateEntityAspects(scan.entity);
+        }
+        if (scan.type == 3 && ELDRITCH_END_PORTAL_PHENOMENA.equals(scan.phenomena)) {
+            return new AspectList().add(Aspect.ELDRITCH, 4).add(Aspect.TRAVEL, 4);
         }
         if (scan.type == 3 && scan.phenomena != null && scan.phenomena.startsWith("NODE")) {
             return generateNodeAspects(world, scan.phenomena.substring(4));

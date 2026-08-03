@@ -62,8 +62,8 @@ Complete the frozen Required Outcomes using the listed Change Envelope and Prima
   - Source: RECON findings for `ConfigAspects`, aspect display keys, advanced furnace naming, Focus Primal, and Void equipment names.
   - Acceptance: Ender Pearl, Far, Nether Star, Dragon Egg, End Portal, and End Portal Frame expose the TC4 Eldritch scan aspects; port-only direct tags are retained only where final resolved object aspects match the original recipe-derived result; missing aspect/block display keys and audited item names resolve to the canonical English values.
   - Primary evidence: Focused aspect registry tests compare final resolved tags and metadata to a checked TC4 fixture, localization tests resolve every audited key, and checkpoint server smoke passes.
-  - Status: pending
-  - Evidence:
+  - Status: verified
+  - Evidence: Ender Pearl, Far record, Nether Star, Dragon Egg, and End Portal Frame now register the exact TC4 aspect lists; the itemless End Portal uses the existing phenomena scan path with `alienis 4 + iter 4`. Direct Void equipment bases reproduce TC4 recipe derivation and resolve through the original armor/tool bonuses, including the sword damage mapping. The audited aspect, advanced furnace, Primal Focus, Void tool, armor, and robe English values are canonical. Focused registry/scan/localization tests, `./scripts/dev.sh validate --smoke`, and `./scripts/dev.sh build` passed on 2026-08-03.
 
 - R8: Restore Essentia Reservoir and Sanity Checker parity.
   - Source: RECON findings for `TileEssentiaReservoir`, `BlockEssentiaReservoir`, wand interaction, and `ItemSanityChecker`.
@@ -106,7 +106,7 @@ Complete the frozen Required Outcomes using the listed Change Envelope and Prima
   - Primal: `FocusPrimal`, `EntityPrimalOrb`, `ItemPrimalCrusher`, directly required harvest/FX helpers, and focused tests.
   - Outer: `BlockEldritchNothing`, its state/model/tile routing as needed, `TeleporterThaumcraft`, Eldritch Guardian/Crab/Warden, altar spawn logic, special-drop helpers, and focused tests.
   - Equipment: `ConfigItems`, Void tool/armor/robe classes, armor material definitions and direct consumers, and focused tests.
-  - Aspects/resources: `ConfigAspects`, `en_us.lang`, final-tag fixtures/tests, and only directly affected localization consumers.
+  - Aspects/resources: `ConfigAspects`, `ThaumcraftCraftingManager` bonus resolution, the minimal `ItemThaumometer`/`ScanManager` fallback for the itemless End Portal block, `en_us.lang`, final-tag fixtures/tests, and only directly affected localization consumers.
   - Devices: Essentia Reservoir block/tile/item interaction, Sanity Checker interaction, and focused tests.
   - Goal state: this document.
 - Allowed artifacts: Java source, lang/blockstate/model resources when required by an accepted behavior, focused tests/fixtures, and this goal document.
@@ -115,17 +115,17 @@ Complete the frozen Required Outcomes using the listed Change Envelope and Prima
 
 ## Current Checkpoint
 
-- Closes: R7.
-- Smallest next action: Restore the six audited vanilla Eldritch scan aspect mappings, compare final resolved Void/cultist output tags to TC4 recipe-derived results, and restore the audited canonical English display values.
-- Expected evidence: Focused final-tag tests prove exact aspect lists and metadata after initialization; localization tests resolve all audited aspect, block, focus, Void tool, armor, and robe keys to the TC4 English values.
-- Stop or replan if: A port-only direct tag cannot be adjudicated without changing recipe definitions or another already exact R9 corpus.
+- Closes: R8.
+- Smallest next action: Restore Reservoir copy/extraction/destruction/wand callback semantics and remove the Sanity Checker actionbar overwrite while preserving valid 1.12 sync and finite-fluid behavior.
+- Expected evidence: Focused Reservoir runtime tests prove alias isolation, all-or-nothing extraction, spill/explosion/retry behavior, and one wand callback; Sanity Checker interaction evidence proves no overwritten duplicate message.
+- Stop or replan if: TC4 parity would require reverting the accepted finite-fluid level translation or explicit 1.12 tile synchronization.
 
 ## Current State
 
-- Resolved: R1-R6 are verified. Research, Primal, Outer progression, and Void equipment behavior now follow the audited TC4 contracts.
-- Last relevant evidence: Void equipment/armor focused tests and `./scripts/dev.sh validate --smoke` passed on 2026-08-03.
+- Resolved: R1-R7 are verified. Research, Primal, Outer progression, Void equipment, Eldritch scan aspects, and audited English display values now follow the TC4 contracts.
+- Last relevant evidence: R7 focused registry/scan/localization tests, `./scripts/dev.sh validate --smoke`, and `./scripts/dev.sh build` passed on 2026-08-03.
 - Blocker: None.
-- Next: Commit R6, then begin R7 with final resolved aspect-tag fixtures.
+- Next: Commit R7, then begin R8 with Reservoir runtime contracts.
 
 ## Material Decisions
 
@@ -134,6 +134,7 @@ Complete the frozen Required Outcomes using the listed Change Envelope and Prima
 - 2026-08-03: Existing tests that assert an audited regression, notably Wither on Void tools and static primary/secondary packet gating, must be replaced with behavioral parity evidence rather than preserved.
 - 2026-08-03: Commits are required and remain checkpoint-scoped.
 - 2026-08-03: Direct CFR of `EntitySpecialItem` corrected the RECON wording: Primordial Pearls are explosion-immune special drops but retain normal `EntityItem` despawn lifetime; only key-room tablets use `EntityPermanentItem`.
+- 2026-08-03: Forge 1.12 exposes no `ItemBlock` for `Blocks.END_PORTAL`, so the TC4 End Portal object tag cannot pass through the item-only scan path. R7 minimally expands to an existing type-3 phenomena fallback in `ItemThaumometer`/`ScanManager`; this is limited to the canonical End Portal aspect list and does not create a second registry.
 
 ## Checkpoint History
 
@@ -146,6 +147,7 @@ Complete the frozen Required Outcomes using the listed Change Envelope and Prima
 - 2026-08-03: R4 verified. Eldritch Nothing recovered TC4 block identity, exposure/render-tile sparsity, and void damage; portal transfers now retain their destination cache per live world. Focused tests and `./scripts/dev.sh validate --smoke` passed.
 - 2026-08-03: R5 verified. Guardian Eye rarity and Outer ward/spawn gates, explosion-immune Pearl drops, Crab attachment/combat/drop behavior, and Warden room home ordering were restored. Focused entity tests and `./scripts/dev.sh validate --smoke` passed.
 - 2026-08-03: R6 verified. Void tool material/effect/repair behavior, Void robe material, Forge slot-mapped Void/Fortress protection, and original living/creative self-repair semantics were restored. Focused item/armor tests and `./scripts/dev.sh validate --smoke` passed.
+- 2026-08-03: R7 verified. Exact vanilla Eldritch scan tags, the itemless End Portal phenomena fallback, TC4-derived final Void equipment tags, and canonical audited English display values were restored. Focused tests, server smoke, and build passed.
 
 ## Completion
 

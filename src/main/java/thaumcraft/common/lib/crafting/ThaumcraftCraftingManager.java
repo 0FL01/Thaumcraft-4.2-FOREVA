@@ -90,7 +90,9 @@ public class ThaumcraftCraftingManager {
         if (item instanceof ItemArmor) {
             bonus.merge(Aspect.ARMOR, ((ItemArmor)item).damageReduceAmount);
         } else if (item instanceof ItemSword) {
-            int damage = (int)(((ItemSword)item).getAttackDamage() + 1.0F);
+            // TC4 sword damage was material + 4 and the aspect bonus added one;
+            // Forge 1.12 exposes only the material component through this getter.
+            int damage = (int)(((ItemSword)item).getAttackDamage() + 5.0F);
             if (damage > 0) bonus.merge(Aspect.WEAPON, damage);
         } else if (item instanceof ItemBow) {
             bonus.merge(Aspect.WEAPON, 3).merge(Aspect.FLIGHT, 1);

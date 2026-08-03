@@ -82,6 +82,12 @@ public class ConfigAspects {
         ThaumcraftApi.registerObjectTag(new ItemStack(Blocks.NETHERRACK), new AspectList().add(Aspect.EARTH, 1).add(Aspect.FIRE, 2));
         ThaumcraftApi.registerObjectTag(new ItemStack(Blocks.SOUL_SAND), new AspectList().add(Aspect.EARTH, 1).add(Aspect.SOUL, 2).add(Aspect.DEATH, 1));
 
+        // The End
+        ThaumcraftApi.registerObjectTag(new ItemStack(Blocks.DRAGON_EGG),
+                new AspectList().add(Aspect.ELDRITCH, 8).add(Aspect.BEAST, 8).add(Aspect.MAGIC, 8));
+        ThaumcraftApi.registerObjectTag(new ItemStack(Blocks.END_PORTAL_FRAME, 1, OreDictionary.WILDCARD_VALUE),
+                new AspectList().add(Aspect.ELDRITCH, 4).add(Aspect.MECHANISM, 4).add(Aspect.TRAVEL, 4));
+
         // Tall grass / fern (meta 0=dead shrub is handled by DEADBUSH; tags only for 1=grass, 2=fern)
         ThaumcraftApi.registerObjectTag(
                 new ItemStack(Blocks.TALLGRASS, 1, 1),
@@ -177,7 +183,8 @@ public class ConfigAspects {
         ThaumcraftApi.registerObjectTag(new ItemStack(Items.LEATHER), new AspectList().add(Aspect.BEAST, 2).add(Aspect.FLESH, 1));
         ThaumcraftApi.registerObjectTag(new ItemStack(Items.BONE), new AspectList().add(Aspect.UNDEAD, 2).add(Aspect.EARTH, 1));
         ThaumcraftApi.registerObjectTag(new ItemStack(Items.GUNPOWDER), new AspectList().add(Aspect.FIRE, 2).add(Aspect.ENERGY, 2).add(Aspect.ENTROPY, 1));
-        ThaumcraftApi.registerObjectTag(new ItemStack(Items.ENDER_PEARL), new AspectList().add(Aspect.VOID, 4).add(Aspect.TRAVEL, 2));
+        ThaumcraftApi.registerObjectTag(new ItemStack(Items.ENDER_PEARL),
+                new AspectList().add(Aspect.ELDRITCH, 4).add(Aspect.MAGIC, 2).add(Aspect.TRAVEL, 4));
 
         // Mob drops
         ThaumcraftApi.registerObjectTag(new ItemStack(Items.ROTTEN_FLESH), new AspectList().add(Aspect.UNDEAD, 2).add(Aspect.FLESH, 2).add(Aspect.DEATH, 1));
@@ -198,6 +205,10 @@ public class ConfigAspects {
         ThaumcraftApi.registerObjectTag(new ItemStack(Items.PAPER), new AspectList().add(Aspect.TREE, 1).add(Aspect.MIND, 1));
         ThaumcraftApi.registerObjectTag(new ItemStack(Items.FLINT), new AspectList().add(Aspect.EARTH, 1).add(Aspect.TOOL, 1));
         ThaumcraftApi.registerObjectTag(new ItemStack(Items.BUCKET), new AspectList().add(Aspect.METAL, 3).add(Aspect.VOID, 1));
+        ThaumcraftApi.registerObjectTag(new ItemStack(Items.RECORD_FAR),
+                new AspectList().add(Aspect.SENSES, 4).add(Aspect.AIR, 4).add(Aspect.ELDRITCH, 4).add(Aspect.GREED, 4));
+        ThaumcraftApi.registerObjectTag(new ItemStack(Items.NETHER_STAR),
+                new AspectList().add(Aspect.ELDRITCH, 8).add(Aspect.MAGIC, 8).add(Aspect.ORDER, 8).add(Aspect.LIGHT, 8));
 
         // Fluid bucket item tags (used by placed fluid scan fallback)
         ThaumcraftApi.registerObjectTag(
@@ -477,15 +488,31 @@ public class ConfigAspects {
         ThaumcraftApi.registerObjectTag(new ItemStack(ConfigItems.itemShovelThaumium), new AspectList().add(Aspect.METAL, 6).add(Aspect.TOOL, 4).add(Aspect.MAGIC, 2));
         ThaumcraftApi.registerObjectTag(new ItemStack(ConfigItems.itemHoeThaumium), new AspectList().add(Aspect.METAL, 6).add(Aspect.TOOL, 4).add(Aspect.MAGIC, 2));
 
-        ThaumcraftApi.registerObjectTag(new ItemStack(ConfigItems.itemHelmVoid), new AspectList().add(Aspect.METAL, 10).add(Aspect.ARMOR, 6).add(Aspect.VOID, 3).add(Aspect.MAGIC, 2));
-        ThaumcraftApi.registerObjectTag(new ItemStack(ConfigItems.itemChestVoid), new AspectList().add(Aspect.METAL, 14).add(Aspect.ARMOR, 8).add(Aspect.VOID, 4).add(Aspect.MAGIC, 2));
-        ThaumcraftApi.registerObjectTag(new ItemStack(ConfigItems.itemLegsVoid), new AspectList().add(Aspect.METAL, 12).add(Aspect.ARMOR, 7).add(Aspect.VOID, 3).add(Aspect.MAGIC, 2));
-        ThaumcraftApi.registerObjectTag(new ItemStack(ConfigItems.itemBootsVoid), new AspectList().add(Aspect.METAL, 8).add(Aspect.ARMOR, 5).add(Aspect.VOID, 2).add(Aspect.MAGIC, 2));
-        ThaumcraftApi.registerObjectTag(new ItemStack(ConfigItems.itemSwordVoid), new AspectList().add(Aspect.METAL, 8).add(Aspect.WEAPON, 5).add(Aspect.VOID, 2).add(Aspect.MAGIC, 2));
-        ThaumcraftApi.registerObjectTag(new ItemStack(ConfigItems.itemPickVoid), new AspectList().add(Aspect.METAL, 8).add(Aspect.TOOL, 5).add(Aspect.VOID, 2).add(Aspect.MAGIC, 2));
-        ThaumcraftApi.registerObjectTag(new ItemStack(ConfigItems.itemAxeVoid), new AspectList().add(Aspect.METAL, 8).add(Aspect.TOOL, 5).add(Aspect.VOID, 2).add(Aspect.MAGIC, 2));
-        ThaumcraftApi.registerObjectTag(new ItemStack(ConfigItems.itemShovelVoid), new AspectList().add(Aspect.METAL, 6).add(Aspect.TOOL, 4).add(Aspect.VOID, 1).add(Aspect.MAGIC, 2));
-        ThaumcraftApi.registerObjectTag(new ItemStack(ConfigItems.itemHoeVoid), new AspectList().add(Aspect.METAL, 6).add(Aspect.TOOL, 4).add(Aspect.VOID, 1).add(Aspect.MAGIC, 2));
+        ThaumcraftApi.registerObjectTag(new ItemStack(ConfigItems.itemHelmVoid), getVoidEquipmentRecipeTags(5, 0));
+        ThaumcraftApi.registerObjectTag(new ItemStack(ConfigItems.itemChestVoid), getVoidEquipmentRecipeTags(8, 0));
+        ThaumcraftApi.registerObjectTag(new ItemStack(ConfigItems.itemLegsVoid), getVoidEquipmentRecipeTags(7, 0));
+        ThaumcraftApi.registerObjectTag(new ItemStack(ConfigItems.itemBootsVoid), getVoidEquipmentRecipeTags(4, 0));
+        ThaumcraftApi.registerObjectTag(new ItemStack(ConfigItems.itemSwordVoid), getVoidEquipmentRecipeTags(2, 1));
+        ThaumcraftApi.registerObjectTag(new ItemStack(ConfigItems.itemPickVoid), getVoidEquipmentRecipeTags(3, 2));
+        ThaumcraftApi.registerObjectTag(new ItemStack(ConfigItems.itemAxeVoid), getVoidEquipmentRecipeTags(3, 2));
+        ThaumcraftApi.registerObjectTag(new ItemStack(ConfigItems.itemShovelVoid), getVoidEquipmentRecipeTags(1, 2));
+        ThaumcraftApi.registerObjectTag(new ItemStack(ConfigItems.itemHoeVoid), getVoidEquipmentRecipeTags(2, 2));
+    }
+
+    static AspectList getVoidEquipmentRecipeTags(int ingotCount, int stickCount) {
+        AspectList ingredients = new AspectList();
+        for (int i = 0; i < ingotCount; ++i) {
+            // TC4 recipe-derived Void ingot: Void Seed catalyst tags plus sqrt(METAL 8).
+            ingredients.add(Aspect.ELDRITCH, 5).add(Aspect.MAGIC, 2).add(Aspect.TRAVEL, 4)
+                    .add(Aspect.DARKNESS, 2).add(Aspect.VOID, 2).add(Aspect.METAL, 2);
+        }
+        ingredients.add(Aspect.TREE, stickCount);
+        AspectList result = new AspectList();
+        for (Aspect aspect : ingredients.getAspects()) {
+            int amount = (int) (ingredients.getAmount(aspect) * 0.75F);
+            if (amount > 0) result.add(aspect, amount);
+        }
+        return result;
     }
 
     private static void registerEntityAspects() {

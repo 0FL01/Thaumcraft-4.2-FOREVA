@@ -173,6 +173,26 @@ public class ScanProgressionRuntimeTest {
     }
 
     @Test
+    public void itemlessEndPortalUsesTc4EldritchPhenomenaAspects() {
+        ScanWorld world = new ScanWorld();
+        BlockPos pos = new BlockPos(0, 1, 4);
+        world.setBlock(pos, Blocks.END_PORTAL.getDefaultState());
+        world.setHit(new RayTraceResult(new Vec3d(0.5D, 1.0D, 4.5D), EnumFacing.UP, pos));
+        TestPlayer player = new TestPlayer(world, "end_portal_scan");
+        ItemThaumometer thaumometer = new ItemThaumometer();
+
+        ScanResult scan = thaumometer.findRawScanTarget(new ItemStack(thaumometer), world, player);
+
+        assertNotNull(scan);
+        assertEquals(3, scan.type);
+        assertEquals(ScanManager.ELDRITCH_END_PORTAL_PHENOMENA, scan.phenomena);
+        AspectList aspects = ScanManager.getScanAspects(scan, world);
+        assertEquals(2, aspects.size());
+        assertEquals(4, aspects.getAmount(Aspect.ELDRITCH));
+        assertEquals(4, aspects.getAmount(Aspect.TRAVEL));
+    }
+
+    @Test
     public void blockedThaumometerScanNotifiesOnceAfterTheTimedAttempt() {
         ThaumcraftApi.registerObjectTag(new ItemStack(Blocks.LOG, 1, 0), new AspectList().add(Aspect.TREE, 1));
         ScanWorld world = new ScanWorld(true);
