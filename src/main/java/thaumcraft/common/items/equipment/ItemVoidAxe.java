@@ -17,7 +17,7 @@ import java.util.Set;
 public class ItemVoidAxe extends ItemAxe implements IRepairable, IWarpingGear {
 
     public ItemVoidAxe(ToolMaterial material) {
-        super(material, 9.0f, -3.0f);
+        super(material, 6.0f, -3.0f);
         this.setCreativeTab(CreativeTabThaumcraft.tabThaumcraft);
     }
 
@@ -39,7 +39,7 @@ public class ItemVoidAxe extends ItemAxe implements IRepairable, IWarpingGear {
     @Override
     public boolean onLeftClickEntity(ItemStack stack, EntityPlayer player, Entity entity) {
         if (entity instanceof EntityLivingBase) {
-            ItemVoidSword.tryApplyVoidWither((EntityLivingBase) entity, player, 80);
+            ItemVoidSword.tryApplyVoidWeakness((EntityLivingBase) entity, player, 80);
         }
         return super.onLeftClickEntity(stack, player, entity);
     }

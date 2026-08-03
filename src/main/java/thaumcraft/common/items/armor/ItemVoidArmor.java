@@ -1,6 +1,7 @@
 package thaumcraft.common.items.armor;
 
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.item.EnumRarity;
@@ -65,8 +66,9 @@ public class ItemVoidArmor extends ItemArmor implements IRepairable, IRunicArmor
     }
 
     static void repairVoidArmor(ItemStack stack, World world, Entity entity) {
-        if (!world.isRemote && stack.isItemDamaged() && entity != null && entity.ticksExisted % 20 == 0) {
-            stack.setItemDamage(Math.max(0, stack.getItemDamage() - 1));
+        if (!world.isRemote && stack.isItemDamaged() && entity instanceof EntityLivingBase
+                && entity.ticksExisted % 20 == 0) {
+            stack.damageItem(-1, (EntityLivingBase) entity);
         }
     }
 }

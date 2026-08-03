@@ -36,7 +36,7 @@ public class ItemVoidHoe extends ItemHoe implements IRepairable, IWarpingGear {
     @Override
     public boolean onLeftClickEntity(ItemStack stack, EntityPlayer player, Entity entity) {
         if (entity instanceof EntityLivingBase) {
-            ItemVoidSword.tryApplyVoidWither((EntityLivingBase) entity, player, 80);
+            ItemVoidSword.tryApplyVoidWeakness((EntityLivingBase) entity, player, 80);
         }
         return super.onLeftClickEntity(stack, player, entity);
     }

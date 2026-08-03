@@ -42,7 +42,7 @@ public class ItemVoidSword extends ItemSword implements IRepairable, IWarpingGea
 
     @Override
     public boolean hitEntity(ItemStack stack, EntityLivingBase target, EntityLivingBase attacker) {
-        tryApplyVoidWither(target, attacker, 60);
+        tryApplyVoidWeakness(target, attacker, 60);
         return super.hitEntity(stack, target, attacker);
     }
 
@@ -81,15 +81,16 @@ public class ItemVoidSword extends ItemSword implements IRepairable, IWarpingGea
         return true;
     }
 
-    static void tryApplyVoidWither(EntityLivingBase target, EntityLivingBase hitter, int durationTicks) {
+    static void tryApplyVoidWeakness(EntityLivingBase target, EntityLivingBase hitter, int durationTicks) {
         if (canApplyVoidCombatDebuff(target, hitter)) {
-            target.addPotionEffect(new PotionEffect(MobEffects.WITHER, durationTicks));
+            target.addPotionEffect(new PotionEffect(MobEffects.WEAKNESS, durationTicks));
         }
     }
 
     static void repairVoid(ItemStack stack, World world, Entity entity) {
-        if (!world.isRemote && stack.isItemDamaged() && entity != null && entity.ticksExisted % 20 == 0) {
-            stack.setItemDamage(Math.max(0, stack.getItemDamage() - 1));
+        if (!world.isRemote && stack.isItemDamaged() && entity instanceof EntityLivingBase
+                && entity.ticksExisted % 20 == 0) {
+            stack.damageItem(-1, (EntityLivingBase) entity);
         }
     }
 }

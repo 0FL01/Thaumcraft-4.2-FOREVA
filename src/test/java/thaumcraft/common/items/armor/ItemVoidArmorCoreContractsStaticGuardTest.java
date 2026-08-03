@@ -15,6 +15,7 @@ public class ItemVoidArmorCoreContractsStaticGuardTest {
     public void voidArmorFamilyKeepsReferenceRarityRepairAndRevealerContracts() throws IOException {
         String voidArmor = readFile("src/main/java/thaumcraft/common/items/armor/ItemVoidArmor.java");
         String voidRobe = readFile("src/main/java/thaumcraft/common/items/armor/ItemVoidRobeArmor.java");
+        String configItems = readFile("src/main/java/thaumcraft/common/config/ConfigItems.java");
         String clientProxy = readFile("src/main/java/thaumcraft/client/ClientProxy.java");
         String voidRobeHelmModel = readFile("src/main/resources/assets/thaumcraft/models/item/itemhelmetvoidfortress.json");
         String voidRobeChestModel = readFile("src/main/resources/assets/thaumcraft/models/item/itemchestplatevoidfortress.json");
@@ -26,6 +27,8 @@ public class ItemVoidArmorCoreContractsStaticGuardTest {
         assertTrue("ItemVoidRobeArmor must keep epic rarity and void-ingot repair baseline",
                 voidRobe.contains("return EnumRarity.EPIC;")
                         && voidRobe.contains("ItemVoidArmor.isVoidArmorRepair(repair)"));
+        assertTrue("Void robes must use the original Void armor material",
+                configItems.contains("ARMOR_VOID_ROBE = ARMOR_VOID;"));
         assertTrue("ItemVoidRobeArmor must keep revealer/goggles/special-armor interface surface",
                 voidRobe.contains("implements IRepairable, IRunicArmor, IVisDiscountGear, IGoggles, IRevealer, ISpecialArmor, IWarpingGear"));
         assertTrue("ItemVoidRobeArmor must keep vis-discount tooltip and helmet-only revealer gates",

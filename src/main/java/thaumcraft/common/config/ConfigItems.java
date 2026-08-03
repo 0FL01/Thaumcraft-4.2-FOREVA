@@ -214,7 +214,7 @@ public class ConfigItems {
 
         // Initialize tool materials
         TOOLMAT_THAUMIUM = EnumHelper.addToolMaterial("THAUMIUM", 3, 500, 7.0f, 2.5f, 18);
-        TOOLMAT_VOID = EnumHelper.addToolMaterial("VOID", 4, 600, 8.0f, 3.0f, 20);
+        TOOLMAT_VOID = thaumcraft.api.ThaumcraftApi.toolMatVoid;
         TOOLMAT_ELEMENTAL = EnumHelper.addToolMaterial("ELEMENTAL", 4, 1561, 10.0f, 4.0f, 22);
         TOOLMAT_PRIMALVOID = EnumHelper.addToolMaterial("PRIMALVOID", 5, 500, 8.0f, 4.0f, 20);
 
@@ -223,7 +223,7 @@ public class ConfigItems {
         ARMOR_VOID = thaumcraft.api.ThaumcraftApi.armorMatVoid;
         ARMOR_FORTRESS = thaumcraft.api.ThaumcraftApi.armorMatThaumiumFortress;
         ARMOR_ROBE = thaumcraft.api.ThaumcraftApi.armorMatSpecial;
-        ARMOR_VOID_ROBE = thaumcraft.api.ThaumcraftApi.armorMatVoidFortress;
+        ARMOR_VOID_ROBE = ARMOR_VOID;
         ARMOR_CULTIST = thaumcraft.api.ThaumcraftApi.armorMatSpecial;
         ARMOR_CULTIST_PLATE = thaumcraft.api.ThaumcraftApi.armorMatThaumium;
         ARMOR_CULTIST_LEADER = thaumcraft.api.ThaumcraftApi.armorMatVoid;
@@ -884,7 +884,6 @@ public class ConfigItems {
 
         setRepairItem(TOOLMAT_THAUMIUM, thaumium);
         setRepairItem(TOOLMAT_ELEMENTAL, thaumium);
-        setRepairItem(TOOLMAT_VOID, voidIngot);
         setRepairItem(TOOLMAT_PRIMALVOID, new ItemStack(itemResource, 1, ItemResource.META_CHARM));
 
         setRepairItem(ARMOR_THAUMIUM, thaumium);

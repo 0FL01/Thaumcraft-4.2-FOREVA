@@ -55,8 +55,8 @@ Complete the frozen Required Outcomes using the listed Change Envelope and Prima
   - Source: RECON findings for Void tools, Void armor, Fortress armor, Void robes, and `CAP_void` consumers.
   - Acceptance: Void tools apply Weakness with original duration, use original durability/enchantability/attack intent and repair ingredients; Void robes use the original material; armor protection is remapped correctly for 1.12 slot ordering; the audited creative/self-repair and robe NBT deltas no longer alter valid TC4 gameplay state.
   - Primary evidence: Focused item and armor tests prove potion identity, material tuples, attack modifiers, repair inputs, per-slot durability/protection, robe vis/warp behavior, and repair cadence; checkpoint server smoke passes.
-  - Status: pending
-  - Evidence:
+  - Status: verified
+  - Evidence: Void tools now reuse the TC4 API material tuple (`4/150/8/3/10`), apply Weakness for the original durations, accept charm rather than a port-only void-ingot material repair, and retain a Forge 1.12 attack-speed mapping with the Void axe restored to the original six-point attack intent. Void robes reuse `armorMatVoid`; Void and Fortress protection arrays are remapped to Forge's feet-to-head slot order; living-only self-repair uses the original negative durability path and does not repair creative stacks. Focused equipment/armor tests and `./scripts/dev.sh validate --smoke` passed on 2026-08-03.
 
 - R7: Restore Eldritch aspects and player-facing localization.
   - Source: RECON findings for `ConfigAspects`, aspect display keys, advanced furnace naming, Focus Primal, and Void equipment names.
@@ -115,17 +115,17 @@ Complete the frozen Required Outcomes using the listed Change Envelope and Prima
 
 ## Current Checkpoint
 
-- Closes: R6.
-- Smallest next action: Restore the TC4 Void tool material/effect/repair contracts and remap Void/Fortress armor materials and slot protection for Forge 1.12, then cover valid self-repair and robe state with focused tests.
-- Expected evidence: Focused item/armor tests prove Weakness duration, tool tuples and repair inputs, attack intent, per-slot durability/protection, robe vis/warp behavior, and repair cadence.
-- Stop or replan if: Correct slot protection requires changing a public `thaumcraft.api.*` signature rather than adapting the existing 1.12 material construction inside the R6 envelope.
+- Closes: R7.
+- Smallest next action: Restore the six audited vanilla Eldritch scan aspect mappings, compare final resolved Void/cultist output tags to TC4 recipe-derived results, and restore the audited canonical English display values.
+- Expected evidence: Focused final-tag tests prove exact aspect lists and metadata after initialization; localization tests resolve all audited aspect, block, focus, Void tool, armor, and robe keys to the TC4 English values.
+- Stop or replan if: A port-only direct tag cannot be adjudicated without changing recipe definitions or another already exact R9 corpus.
 
 ## Current State
 
-- Resolved: R1-R5 are verified. Research, Primal, Outer void/portal, and Outer progression entity/drop behavior now follow the audited TC4 contracts.
-- Last relevant evidence: Outer progression entity focused tests and `./scripts/dev.sh validate --smoke` passed on 2026-08-03.
+- Resolved: R1-R6 are verified. Research, Primal, Outer progression, and Void equipment behavior now follow the audited TC4 contracts.
+- Last relevant evidence: Void equipment/armor focused tests and `./scripts/dev.sh validate --smoke` passed on 2026-08-03.
 - Blocker: None.
-- Next: Commit R5, then begin R6 with Void tool potion/material/repair parity.
+- Next: Commit R6, then begin R7 with final resolved aspect-tag fixtures.
 
 ## Material Decisions
 
@@ -145,6 +145,7 @@ Complete the frozen Required Outcomes using the listed Change Envelope and Prima
 - 2026-08-03: R3 verified. Primal Crusher now uses the exact TC4 effective matrix, Forge-safe player harvesting, following drops, and original wear accounting. Focused tests and `./scripts/dev.sh validate --smoke` passed.
 - 2026-08-03: R4 verified. Eldritch Nothing recovered TC4 block identity, exposure/render-tile sparsity, and void damage; portal transfers now retain their destination cache per live world. Focused tests and `./scripts/dev.sh validate --smoke` passed.
 - 2026-08-03: R5 verified. Guardian Eye rarity and Outer ward/spawn gates, explosion-immune Pearl drops, Crab attachment/combat/drop behavior, and Warden room home ordering were restored. Focused entity tests and `./scripts/dev.sh validate --smoke` passed.
+- 2026-08-03: R6 verified. Void tool material/effect/repair behavior, Void robe material, Forge slot-mapped Void/Fortress protection, and original living/creative self-repair semantics were restored. Focused item/armor tests and `./scripts/dev.sh validate --smoke` passed.
 
 ## Completion
 

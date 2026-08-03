@@ -19,13 +19,14 @@ public class ItemVoidCrimsonToolsStaticGuardTest {
         String voidShovel = readFile("src/main/java/thaumcraft/common/items/equipment/ItemVoidShovel.java");
         String voidHoe = readFile("src/main/java/thaumcraft/common/items/equipment/ItemVoidHoe.java");
         String crimsonSword = readFile("src/main/java/thaumcraft/common/items/equipment/ItemCrimsonSword.java");
+        String configItems = readFile("src/main/java/thaumcraft/common/config/ConfigItems.java");
         String lang = readFile("src/main/resources/assets/thaumcraft/lang/en_us.lang");
 
-        assertTrue("ItemVoidSword must keep uncommon rarity, charm repair and pvp-gated wither helper contracts",
+        assertTrue("ItemVoidSword must keep uncommon rarity, charm repair and pvp-gated Weakness contracts",
                 voidSword.contains("return EnumRarity.UNCOMMON;")
                         && voidSword.contains("return !repair.isEmpty() && repair.getItem() == ConfigItems.itemResource && repair.getMetadata() == ItemResource.META_CHARM;")
                         && voidSword.contains("canApplyVoidCombatDebuff(")
-                        && voidSword.contains("target.addPotionEffect(new PotionEffect(MobEffects.WITHER, durationTicks));")
+                        && voidSword.contains("target.addPotionEffect(new PotionEffect(MobEffects.WEAKNESS, durationTicks));")
                         && voidSword.contains("I18n.translateToLocal(\"enchantment.special.sapless\")"));
         assertTrue("Void tools must keep uncommon rarity and toolclass contracts where applicable",
                 voidAxe.contains("ImmutableSet.of(\"axe\")")
@@ -36,11 +37,15 @@ public class ItemVoidCrimsonToolsStaticGuardTest {
                         && voidShovel.contains("return EnumRarity.UNCOMMON;")
                         && voidHoe.contains("return EnumRarity.UNCOMMON;")
                         && voidHoe.contains("return 5;"));
-        assertTrue("Void tools must keep shared wither-on-hit and self-repair contracts",
-                voidAxe.contains("ItemVoidSword.tryApplyVoidWither((EntityLivingBase) entity, player, 80);")
-                        && voidPickaxe.contains("ItemVoidSword.tryApplyVoidWither((EntityLivingBase) entity, player, 80);")
-                        && voidShovel.contains("ItemVoidSword.tryApplyVoidWither((EntityLivingBase) entity, player, 80);")
-                        && voidHoe.contains("ItemVoidSword.tryApplyVoidWither((EntityLivingBase) entity, player, 80);")
+        assertTrue("Void tools must use the TC4 API material without a port-only void-ingot repair item",
+                configItems.contains("TOOLMAT_VOID = thaumcraft.api.ThaumcraftApi.toolMatVoid;")
+                        && !configItems.contains("setRepairItem(TOOLMAT_VOID, voidIngot);")
+                        && voidAxe.contains("super(material, 6.0f, -3.0f);"));
+        assertTrue("Void tools must keep shared Weakness-on-hit and self-repair contracts",
+                voidAxe.contains("ItemVoidSword.tryApplyVoidWeakness((EntityLivingBase) entity, player, 80);")
+                        && voidPickaxe.contains("ItemVoidSword.tryApplyVoidWeakness((EntityLivingBase) entity, player, 80);")
+                        && voidShovel.contains("ItemVoidSword.tryApplyVoidWeakness((EntityLivingBase) entity, player, 80);")
+                        && voidHoe.contains("ItemVoidSword.tryApplyVoidWeakness((EntityLivingBase) entity, player, 80);")
                         && voidAxe.contains("ItemVoidSword.repairVoid(stack, world, entityIn);")
                         && voidPickaxe.contains("ItemVoidSword.repairVoid(stack, world, entityIn);")
                         && voidShovel.contains("ItemVoidSword.repairVoid(stack, world, entityIn);")
