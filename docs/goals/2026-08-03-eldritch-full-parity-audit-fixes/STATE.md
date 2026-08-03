@@ -2,7 +2,7 @@
 
 Goal-ID: goal-20260803-eldritch-full-parity-audit-fixes
 Goal-Status: active
-State-Revision: 11
+State-Revision: 13
 Last-Updated: 2026-08-03
 Contract-Version: 2.1
 Contract-SHA256: 8e61c9d38410bccb4bc113123852bade9e62a44d9b9c388a3382ad4ba53605fd
@@ -11,8 +11,8 @@ Recon-SHA256: 446b153014e62315f935223a765cbafdec9f2ace5e622faaa548202e336b79c6
 Sources-SHA256: 627bad6dfae656e2f98998eacfa70f10c2c2a92db4c4126731a772f7fb3dc714
 Reports-SHA256: 2563ac1d90f12a2cd83bb06486ea9782c7ad7c48d45242cabc180b4a213500f5
 Git-Branch: master
-Git-HEAD: f27fddfb4b003f76f870d2ce6010f473b2e153cb
-Expected-Dirty-Paths: `src/main/java/thaumcraft/common/items/armor/ItemVoidArmor.java`, `src/main/java/thaumcraft/common/items/armor/ItemVoidRobeArmor.java`, `src/test/java/thaumcraft/common/items/armor/ItemVoidArmorParityTest.java`, `docs/goals/2026-08-03-eldritch-full-parity-audit-fixes/{STATE.md,LOG.md}`
+Git-HEAD: aa0ab9eb
+Expected-Dirty-Paths: `src/main/java/thaumcraft/common/blocks/BlockCrystal.java`, `src/main/java/thaumcraft/common/lib/world/dim/GenCommon.java`, `src/test/java/thaumcraft/common/lib/world/dim/OuterDungeonGenerationStaticGuardTest.java`, `docs/goals/2026-08-03-eldritch-full-parity-audit-fixes/{STATE.md,LOG.md}`
 Last-Durable-Flush: 2026-08-03
 
 <protect>
@@ -21,13 +21,13 @@ Last-Durable-Flush: 2026-08-03
 - Active Outcomes: none
 - Active Findings: none
 - Checkpoint Status: closed
-- Hypothesis: Confirmed; 1.12 `InventoryPlayer.decrementAnimations` reaches equipped armor through ordinary `onUpdate`, so removing the duplicate armor callback preserves both equipped and stored repair with one invocation.
-- Smallest Next Action: Commit R-001/F-018, then start R-002/F-035 from that commit.
-- Expected Evidence: The checkpoint commit contains only the two Void armor callback removals, the focused lifecycle assertion, and ledger state; user-owned `SKILL.md` remains excluded.
-- Stop/Replan If: commit contents include a deferred candidate or any unrelated product/toolkit path.
-- Working Set: R-001 product/test diff and STATE/LOG until commit
+- Hypothesis: Confirmed with the narrower TC4 lifecycle: placement performs no premature stay check; subsequent neighbor checks resolve the recorded orientation, requiring side-solid support for metas 0..6 and exact non-air support for meta 7.
+- Smallest Next Action: Commit R-002/F-035, then start R-003/F-038 from that commit.
+- Expected Evidence: The checkpoint commit contains only `BlockCrystal`, the focused Outer static evidence, and ledger state; `GenCommon` topology/order remains unchanged.
+- Stop/Replan If: commit contents include other Outer/world candidates or any unrelated product/toolkit path.
+- Working Set: R-002 product/test diff and STATE/LOG until commit
 - Last Material Command: `./scripts/dev.sh validate --smoke`
-- Last Material Result: PASS (`git-status compile+test+reobf check-jar smoke-server`); focused `ItemVoidArmorParityTest` also passed, BUILD SUCCESSFUL in 18s
+- Last Material Result: PASS (`git-status compile+test+reobf check-jar smoke-server`); focused `OuterDungeonGenerationStaticGuardTest` passed, BUILD SUCCESSFUL in 15s
 - Blocker: none
 - First Re-entry Action: verify hashes and Git, then read active R/F entries before edits
 </protect>
@@ -35,7 +35,7 @@ Last-Durable-Flush: 2026-08-03
 ## Outcome Status
 
 - R-001 | verified | evidence: focused lifecycle test and `validate --smoke`, E-0012
-- R-002 | pending | evidence: none
+- R-002 | verified | evidence: focused support/placement static evidence and `validate --smoke`, E-0014
 - R-003 | pending | evidence: none
 - R-004 | pending | evidence: none
 - R-005 | pending | evidence: none
@@ -46,7 +46,7 @@ Last-Durable-Flush: 2026-08-03
 ## Finding Status
 
 - F-018 | verified | evidence: equipped base/robe and stored base each repair `5 -> 4` through `InventoryPlayer.decrementAnimations`; E-0012
-- F-035 | pending | evidence: none
+- F-035 | verified | evidence: no placement-time drop; exact recorded support predicates for ordinary/meta-7 crystals; E-0014
 - F-038 | pending | evidence: none
 - F-039 | pending | evidence: none
 - F-085 | pending | evidence: none
@@ -63,7 +63,7 @@ Last-Durable-Flush: 2026-08-03
 ## Finding Work Counters
 
 - F-018 | checkpoints_started=1 | material_replans=0
-- F-035 | checkpoints_started=0 | material_replans=0
+- F-035 | checkpoints_started=1 | material_replans=0
 - F-038 | checkpoints_started=0 | material_replans=0
 - F-039 | checkpoints_started=0 | material_replans=0
 - F-085 | checkpoints_started=0 | material_replans=0
@@ -81,13 +81,13 @@ Last-Durable-Flush: 2026-08-03
 
 ## Current Diff/Reconciliation
 
-- Git status: user-owned `SKILL.md` remains dirty; ledger committed at `f27fddfb`; no product paths dirty at checkpoint start
-- Relevant diff summary: removed duplicate `onArmorTick` repair callbacks from base/robe armor; added one focused inventory-lifecycle test; R-001 evidence passed
+- Git status: user-owned `SKILL.md` remains dirty; R-001 committed as `aa0ab9eb`; no product paths dirty at R-002 start
+- Relevant diff summary: removed premature crystal placement validation; neighbor validation now follows recorded attachment and metadata-specific support; added focused source guard
 - Unexpected paths/state: HEAD advanced from `6737687` to `866fea24` during the second interrupted report wave through an unrelated general-agent configuration commit.
-- Reconciliation decision: preserve user-updated `SKILL.md`; use `f27fddfb` as R-001 baseline; freeze exactly 8 findings/10 checkpoints and exclude every deferred candidate from implementation.
+- Reconciliation decision: preserve user-updated `SKILL.md`; use `aa0ab9eb` as R-002 baseline; keep F-035 isolated from deferred Outer/world findings.
 
 ## Queued Next Checkpoint
 
-- Outcomes/Findings: R-002 / F-035 after the R-001 checkpoint commit
-- Why it is next: next smallest deterministic supported-path finding
-- Preconditions: R-001 targeted evidence and common/server smoke pass; checkpoint commit exists
+- Outcomes/Findings: R-003 / F-038 after the R-002 checkpoint commit
+- Why it is next: next one-checkpoint deterministic gameplay mapping fix
+- Preconditions: R-002 focused evidence and common/server smoke pass; checkpoint commit exists

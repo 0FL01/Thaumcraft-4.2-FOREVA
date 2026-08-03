@@ -134,3 +134,26 @@ Log-Policy: append-only; correct prior entries with a new event
 - Result: At tick 20 each supported stack repairs exactly `5 -> 4`; stored-stack repair, server/living-owner guards, cadence, and creative no-repair behavior remain intact.
 - Decision/Reason: Close F-018 and derive R-001 verified. The change is confined to its one-checkpoint envelope and does not alter global Forge inventory lifecycle.
 - Next: Commit the R-001 checkpoint excluding user-owned `SKILL.md`, then start R-002/F-035.
+
+## E-0013 — 2026-08-03 — checkpoint_start
+
+- State-Revision: 12
+- Outcomes/Findings: R-002 / F-035
+- Git before/after: `aa0ab9eb` / `aa0ab9eb`; only user-owned `SKILL.md` dirty
+- Prior checkpoint commit: R-001/F-018 -> `aa0ab9eb fix(armor): restore Void repair cadence`.
+- Action: Started the single allowed F-035 fix checkpoint and incremented `checkpoints_started` to 1/1.
+- Hypothesis: Metadata/orientation-aware support validation plus orientation-before-validation in the shipped generator will preserve generated meta-7 crystals and exact-face attachment semantics without changing global block solidity.
+- Expected Evidence: Focused Outer generation evidence covers meta-7 placement survival and exact support removal; no crystal drop/probability/rendering delta.
+- Stop/Replan: Stop if the narrow lifecycle cannot be restored inside `BlockCrystal` and directly necessary `GenCommon` ordering.
+- Next: Read the frozen outcome/finding and direct crystal/generation/test paths, then make the minimum support-lifecycle change.
+
+## E-0014 — 2026-08-03 — checkpoint_closed
+
+- State-Revision: 13
+- Outcomes/Findings: R-002 / F-035
+- Git before/after: `aa0ab9eb` / checkpoint commit pending
+- Action: Removed the non-original placement-time stay check and replaced any-neighbor retention with recorded-orientation validation: metas 0..6 require the exact side-solid support face; meta 7 requires the exact opposite support to remain non-air.
+- Evidence: `./scripts/dev.sh gradle test --tests thaumcraft.common.lib.world.dim.OuterDungeonGenerationStaticGuardTest` -> BUILD SUCCESSFUL; `./scripts/dev.sh validate --smoke` -> PASS; focused product diff check clean.
+- Result: The shipped `GenCommon` placement-before-orientation sequence is retained and no longer drops meta-7 crystals before orientation assignment; later support changes use TC4 metadata/orientation semantics.
+- Decision/Reason: Close F-035 and derive R-002 verified. No `GenCommon` topology/probability edit or global Eldritch side-solid change was needed.
+- Next: Commit the R-002 checkpoint excluding user-owned `SKILL.md`, then start R-003/F-038.

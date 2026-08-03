@@ -142,12 +142,6 @@ implements IInfusionStabiliser {
     }
 
     @Override
-    public void onBlockAdded(World worldIn, BlockPos pos, IBlockState state) {
-        super.onBlockAdded(worldIn, pos, state);
-        this.checkAndDropBlock(worldIn, pos, state);
-    }
-
-    @Override
     public void neighborChanged(IBlockState state, World worldIn, BlockPos pos, net.minecraft.block.Block blockIn, BlockPos fromPos) {
         super.neighborChanged(state, worldIn, pos, blockIn, fromPos);
         this.checkAndDropBlock(worldIn, pos, state);
@@ -161,13 +155,17 @@ implements IInfusionStabiliser {
     }
 
     private boolean canBlockStay(World worldIn, BlockPos pos, IBlockState state) {
-        if (worldIn.isSideSolid(pos.east(), net.minecraft.util.EnumFacing.WEST)) return true;
-        if (worldIn.isSideSolid(pos.west(), net.minecraft.util.EnumFacing.EAST)) return true;
-        if (worldIn.isSideSolid(pos.north(), net.minecraft.util.EnumFacing.SOUTH)) return true;
-        if (worldIn.isSideSolid(pos.south(), net.minecraft.util.EnumFacing.NORTH)) return true;
-        if (worldIn.isSideSolid(pos.down(), net.minecraft.util.EnumFacing.UP)) return true;
-        if (worldIn.isSideSolid(pos.up(), net.minecraft.util.EnumFacing.DOWN)) return true;
-        return false;
+        TileEntity tile = worldIn.getTileEntity(pos);
+        if (!(tile instanceof TileCrystal)) {
+            return false;
+        }
+        TileCrystal crystal = (TileCrystal) tile;
+        EnumFacing attachment = EnumFacing.byIndex(crystal.orientation);
+        BlockPos support = pos.offset(attachment.getOpposite());
+        if (this.getMetaFromState(state) == 7) {
+            return !worldIn.isAirBlock(support);
+        }
+        return worldIn.isSideSolid(support, attachment);
     }
 
     @Override

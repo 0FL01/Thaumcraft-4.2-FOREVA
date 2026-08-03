@@ -27,6 +27,7 @@ public class OuterDungeonGenerationStaticGuardTest {
         String loot = read("src/main/java/thaumcraft/common/blocks/BlockLoot.java");
         String permanentItem = read("src/main/java/thaumcraft/common/entities/EntityPermanentItem.java");
         String crabSpawner = read("src/main/java/thaumcraft/common/tiles/TileEldritchCrabSpawner.java");
+        String crystal = read("src/main/java/thaumcraft/common/blocks/BlockCrystal.java");
 
         assertTrue(common.contains("b == STONE && cell.feature == 7")
                 && common.contains("b = CRUST;")
@@ -61,6 +62,14 @@ public class OuterDungeonGenerationStaticGuardTest {
         assertTrue(crabSpawner.contains("for (int i = 0; i < 3; i++)")
                 && crabSpawner.contains("this.world.rand.nextInt(20) == 0")
                 && crabSpawner.contains("Thaumcraft.proxy.drawVentParticles("));
+
+        assertTrue(common.contains("world.setBlockState(crystalPos, ConfigBlocks.blockCrystal.getStateFromMeta(7), 3);")
+                && common.contains("((TileCrystal) te).orientation = (short) facing.ordinal();"));
+        assertFalse(crystal.contains("void onBlockAdded("));
+        assertTrue(crystal.contains("EnumFacing attachment = EnumFacing.byIndex(crystal.orientation);")
+                && crystal.contains("BlockPos support = pos.offset(attachment.getOpposite());")
+                && crystal.contains("return !worldIn.isAirBlock(support);")
+                && crystal.contains("return worldIn.isSideSolid(support, attachment);"));
     }
 
     private static String read(String path) throws IOException {
