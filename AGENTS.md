@@ -87,6 +87,7 @@ Each final report must include:
 
 ## Development practices
 
+- Put all temporary files and disposable artifacts in the workspace-root `.tmp/` directory.
 - Keep original package names.
 - Prefer original field/method names when practical for traceability.
 - Prefer porting original behavior over inventing new behavior.

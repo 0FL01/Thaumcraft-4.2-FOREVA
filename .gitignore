@@ -30,6 +30,9 @@ Thumbs.db
 
 # Temp
 *.tmp
+!.tmp/
+.tmp/*
+!.tmp/.gitkeep
 .smoke/
 
 # Python
