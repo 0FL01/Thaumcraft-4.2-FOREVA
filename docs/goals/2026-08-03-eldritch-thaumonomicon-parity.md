@@ -1,6 +1,6 @@
 # Goal: Eldritch Thaumonomicon parity restoration
 
-Status: active
+Status: complete
 Source: User instructions dated 2026-08-03 and the completed Eldritch RECON against Thaumcraft 4.2.3.5
 Last updated: 2026-08-03
 
@@ -76,8 +76,8 @@ Complete the frozen Required Outcomes using the listed Change Envelope and Prima
   - Source: RECON results: 16/16 research entries, 24/24 recipe handles/definitions, 55/55 English research keys, and 9/9 referenced PNG files match the original.
   - Acceptance: Those four parity corpora remain exact after R1-R8; all focused tests, the repository validation pipeline, dedicated-server smoke, and final jar build pass; every implementation checkpoint is committed with the repository message format.
   - Primary evidence: Existing graph/recipe/resource guards, `./scripts/dev.sh validate --smoke`, and final `./scripts/dev.sh build` pass on a clean worktree except for the active goal update.
-  - Status: pending
-  - Evidence:
+  - Status: verified
+  - Evidence: The research graph/fingerprint and recipe handle/key/type preservation suite passed, retaining the audited 16 Eldritch entries, 24 recipe handles/definitions, and 55 English research keys. Direct binary comparison confirmed all 9 referenced PNG assets still match TC4. `./scripts/dev.sh validate --smoke` and the final `./scripts/dev.sh build` passed on 2026-08-03 after all R1-R8 implementation commits.
 
 ### Constraints
 
@@ -115,17 +115,17 @@ Complete the frozen Required Outcomes using the listed Change Envelope and Prima
 
 ## Current Checkpoint
 
-- Closes: R9.
-- Smallest next action: Run the frozen graph/recipe/resource preservation guards, final repository validation and server smoke, then build the distributable jar and perform the closure check.
-- Expected evidence: The 16 research entries, 24 recipe handles/definitions, 55 English research keys, and 9 PNG fixtures remain exact; `./scripts/dev.sh validate --smoke` and `./scripts/dev.sh build` pass with every R-item resolved.
-- Stop or replan if: A final mandatory gate fails due to an R1-R8 change or any frozen parity corpus differs.
+- Closes: None; the closure check passed.
+- Smallest next action: Stop. The frozen objective is complete.
+- Expected evidence: No further evidence is required for this objective.
+- Stop or replan if: A new authoritative instruction creates a separate objective.
 
 ## Current State
 
-- Resolved: R1-R8 are verified. All audited runtime, progression, equipment, aspect, localization, Reservoir, and Sanity outcomes now follow their frozen contracts.
-- Last relevant evidence: R8 focused Reservoir/Sanity tests and `./scripts/dev.sh validate --smoke` passed on 2026-08-03.
+- Resolved: R1-R9 are verified; the frozen Eldritch parity objective is complete.
+- Last relevant evidence: Preservation guards, 9/9 PNG binary comparisons, `./scripts/dev.sh validate --smoke`, and `./scripts/dev.sh build` passed on 2026-08-03.
 - Blocker: None.
-- Next: Commit R8, then run the R9 preservation and closure gates.
+- Next: None.
 
 ## Material Decisions
 
@@ -149,10 +149,11 @@ Complete the frozen Required Outcomes using the listed Change Envelope and Prima
 - 2026-08-03: R6 verified. Void tool material/effect/repair behavior, Void robe material, Forge slot-mapped Void/Fortress protection, and original living/creative self-repair semantics were restored. Focused item/armor tests and `./scripts/dev.sh validate --smoke` passed.
 - 2026-08-03: R7 verified. Exact vanilla Eldritch scan tags, the itemless End Portal phenomena fallback, TC4-derived final Void equipment tags, and canonical audited English display values were restored. Focused tests, server smoke, and build passed.
 - 2026-08-03: R8 verified. Reservoir copy/extraction/spill/explosion/wand-routing semantics and the single Sanity Checker actionbar message were restored while preserving 1.12 sync and finite-fluid adaptations. Focused tests and `./scripts/dev.sh validate --smoke` passed.
+- 2026-08-03: R9 verified and closure passed. Research graph/recipe/resource guards, direct 9/9 PNG comparison, final validation/server smoke, and distributable build all passed after the R1-R8 commits.
 
 ## Completion
 
-- Resolved outcomes:
-- Commands and artifacts:
-- Constraint and diff-scope check:
-- Final status:
+- Resolved outcomes: R1-R9 verified. Research runtime, Primal mechanics, Outer progression, Void equipment, Eldritch aspects/localization, Reservoir/Sanity behavior, and preservation of the exact Thaumonomicon declarations all meet the frozen acceptance criteria.
+- Commands and artifacts: Checkpoint-focused JUnit suites; repeated `./scripts/dev.sh validate --smoke`; client/final `./scripts/dev.sh build`; final graph/fingerprint/recipe preservation suite; direct `cmp` of the 9 referenced PNG pairs.
+- Constraint and diff-scope check: Reference classes/resources and both jars remained unmodified; Java/Forge/dependency and public API constraints were preserved; accepted 1.12 adaptations remained intact; commits stayed grouped by frozen checkpoint.
+- Final status: complete on 2026-08-03.
