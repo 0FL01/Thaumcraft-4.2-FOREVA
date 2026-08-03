@@ -1,6 +1,8 @@
 package thaumcraft.common.entities.golems;
 
 import com.mojang.authlib.GameProfile;
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.passive.EntityCow;
@@ -34,6 +36,8 @@ import net.minecraftforge.fluids.FluidRegistry;
 import net.minecraftforge.fluids.FluidStack;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import thaumcraft.api.entities.GolemIds;
+import thaumcraft.api.entities.IGolemInfo;
 import thaumcraft.common.config.ConfigItems;
 import thaumcraft.common.container.SlotGhostFluid;
 
@@ -183,7 +187,7 @@ public class GolemR8ContractsRuntimeTest {
 
     @Test
     public void synchronizedTypeUpgradesAndFluidCoverSpawnSnapshotAndLiveChanges() throws Exception {
-        EntityGolemBase server = new EntityGolemBase(new TestWorld(false), EnumGolemType.THAUMIUM, false);
+        EntityGolemBase server = new EntityGolemBase(new TestWorld(false), EnumGolemType.THAUMIUM, true);
         server.setCore((byte) 5);
         server.setUpgrade(0, (byte) 1);
         server.setUpgrade(1, (byte) 1);
@@ -191,12 +195,19 @@ public class GolemR8ContractsRuntimeTest {
         server.updateCarried();
 
         EntityGolemBase client = new EntityGolemBase(new TestWorld(true));
-        client.setCore((byte) 5);
         copySyncedState(server, client);
+        ByteBuf spawnData = Unpooled.buffer();
+        server.writeSpawnData(spawnData);
+        client.readSpawnData(spawnData);
+
+        IGolemInfo info = client;
 
         assertSame(EnumGolemType.WOOD, client.golemType);
         assertSame(EnumGolemType.THAUMIUM, client.getGolemType());
-        assertEquals(2, client.getUpgradeAmount(1));
+        assertEquals(GolemIds.TYPE_THAUMIUM, info.getGolemTypeId());
+        assertEquals(GolemIds.CORE_DECANTING, info.getCore());
+        assertTrue(info.isAdvancedGolem());
+        assertEquals(2, info.getUpgradeAmount(GolemIds.UPGRADE_EARTH));
         assertEquals(64, client.getCarryLimit());
         assertNull(client.fluidCarried);
         assertSame(FluidRegistry.WATER, client.getFluidCarried().getFluid());
@@ -209,8 +220,8 @@ public class GolemR8ContractsRuntimeTest {
         server.updateCarried();
         copySyncedState(server, client);
 
-        assertEquals(1, client.getUpgradeAmount(0));
-        assertEquals(1, client.getUpgradeAmount(1));
+        assertEquals(1, info.getUpgradeAmount(GolemIds.UPGRADE_AIR));
+        assertEquals(1, info.getUpgradeAmount(GolemIds.UPGRADE_EARTH));
         assertEquals(48, client.getCarryLimit());
         assertSame(FluidRegistry.LAVA, client.getFluidCarried().getFluid());
         assertEquals(70001, client.getFluidCarried().amount);

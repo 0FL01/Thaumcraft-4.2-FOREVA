@@ -3,10 +3,11 @@ package thaumcraft.common.entities.golems;
 import net.minecraft.pathfinding.PathNavigate;
 import net.minecraft.pathfinding.PathNavigateGround;
 import net.minecraft.pathfinding.PathNodeType;
+import thaumcraft.api.entities.IGolemInfo;
 import thaumcraft.common.Thaumcraft;
 import thaumcraft.common.lib.TCSounds;
 
-public class EntityGolemBase extends net.minecraft.entity.monster.EntityGolem implements net.minecraftforge.fml.common.registry.IEntityAdditionalSpawnData {
+public class EntityGolemBase extends net.minecraft.entity.monster.EntityGolem implements net.minecraftforge.fml.common.registry.IEntityAdditionalSpawnData, IGolemInfo {
 
     public thaumcraft.common.entities.InventoryMob inventory;
     public net.minecraft.item.ItemStack itemCarried;
@@ -483,6 +484,8 @@ public class EntityGolemBase extends net.minecraft.entity.monster.EntityGolem im
     public byte getCore() { return this.dataManager.get(CORE); }
     public void setCore(byte core) { this.dataManager.set(CORE, core); }
     public EnumGolemType getGolemType() { return EnumGolemType.getType(this.dataManager.get(GOLEM_TYPE)); }
+    @Override public int getGolemTypeId() { return this.getGolemType().ordinal(); }
+    @Override public boolean isAdvancedGolem() { return this.advanced; }
     public String getGolemDecoration() { return this.dataManager.get(DECORATION); }
     public void setGolemDecoration(String s) { this.dataManager.set(DECORATION, s); }
     public boolean[] getToggles() { return thaumcraft.common.lib.utils.Utils.unpack(this.dataManager.get(TOGGLES)); }

@@ -1,0 +1,5 @@
+# Optional Hwyla golem tooltip integration smoke.
+# Format: jar | sha256 | source/note | direct/dev-remap
+# Baubles is intentionally omitted because it is already on the Gradle classpath.
+# expect-log: Thaumcraft Waila golem integration registered
+Hwyla-1.8.26-B41_1.12.2.jar | e9ddecd4920ee9a57e11e4b43fb1dd395bbf37e276be726a99a2590272304124 | https://edge.forgecdn.net/files/2568/751/Hwyla-1.8.26-B41_1.12.2.jar | direct
