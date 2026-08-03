@@ -15,6 +15,7 @@ import thaumcraft.common.lib.capabilities.PlayerKnowledgeProvider;
 import thaumcraft.common.lib.network.PacketHandler;
 import thaumcraft.api.research.ResearchCategories;
 import thaumcraft.api.research.ResearchItem;
+import thaumcraft.common.config.Config;
 import thaumcraft.common.lib.network.PacketBase;
 import thaumcraft.common.lib.research.ResearchManager;
 
@@ -70,13 +71,20 @@ public class PacketPlayerCompleteToServer extends PacketBase {
             player.sendMessage(new TextComponentTranslation("tc.researcherror"));
             return false;
         }
-        if (type == 0 && research.isSecondary()) {
+        boolean directPurchase = isDirectPurchase(research);
+        if (type == 0 && directPurchase) {
             return consumeResearchCost(player, research) && completeResearch(player, research);
         }
-        if (type == 1 && !research.isSecondary()) {
+        if (type == 1 && !directPurchase) {
             return !ResearchManager.createResearchNoteForPlayer(player.world, player, key).isEmpty();
         }
         return false;
+    }
+
+    static boolean isDirectPurchase(ResearchItem research) {
+        return research != null && research.tags != null && research.tags.size() > 0
+                && (Config.researchDifficulty == -1
+                || (Config.researchDifficulty == 0 && research.isSecondary()));
     }
 
     private static boolean completeResearch(EntityPlayer player, ResearchItem research) {

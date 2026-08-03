@@ -20,8 +20,8 @@ Complete the frozen Required Outcomes using the listed Change Envelope and Prima
   - Source: RECON findings for research engine/UI and the user instruction to implement the audit from beginning to end.
   - Acceptance: All supported `researchDifficulty` values choose the same purchase/note path as the TC4 GUI/server contract; clue and normal completion restore their original client feedback; matching and persisted completion membership no longer retain the audited TC4-incompatible states.
   - Primary evidence: Focused `PacketPlayerComplete*`, `ResearchManager*`, and client notification tests pass for difficulties `-1`, `0`, and positive values, followed by `./scripts/dev.sh validate --smoke` for the checkpoint.
-  - Status: pending
-  - Evidence:
+  - Status: in_progress
+  - Evidence: Difficulty-aware packet workflow is implemented and covered for `-1`, `0`, and positive values; focused tests and `./scripts/dev.sh validate --smoke` passed on 2026-08-03. Client feedback, matching, and persisted membership remain.
 
 - R2: Restore Primal Focus and Primal Orb behavior.
   - Source: RECON findings for `FocusPrimal` and `EntityPrimalOrb`.
@@ -116,16 +116,16 @@ Complete the frozen Required Outcomes using the listed Change Envelope and Prima
 ## Current Checkpoint
 
 - Closes: R1.
-- Smallest next action: Add difficulty-matrix tests that reproduce the current packet deadlocks, then make packet validation follow the GUI-selected workflow without weakening prerequisite, cost, dimension, or identity authority checks.
-- Expected evidence: Focused packet tests fail before the implementation change and pass afterward for `-1`, `0`, and positive difficulty.
-- Stop or replan if: The TC4 binary and current GUI prove a different workflow contract, or a required fix would change a public API/packet id rather than only validation semantics.
+- Smallest next action: Restore `PacketResearchComplete` clue notification/sound, non-virtual research popup/highlights, and live browser cache refresh through the existing client notification/render surfaces.
+- Expected evidence: Focused client static/runtime guards prove the TC4 packet branches and popup queue/render routing; affected tests and build pass.
+- Stop or replan if: Restoring feedback requires a packet id or wire-format change rather than consuming the existing research key.
 
 ## Current State
 
-- Resolved: RECON and fan-out comparison are complete. Research graph, recipes, research English text, and directly referenced PNG assets are exact.
-- Last relevant evidence: Nine read-only audit workstreams compared graph, recipes, research runtime, localization/assets, registries/aspects, Void, Primal, Outer, and devices against the TC4 4.2.3.5 binary.
+- Resolved: RECON and fan-out comparison are complete. Research graph, recipes, research English text, and directly referenced PNG assets are exact. The server now accepts only the effective GUI workflow for each research difficulty without deadlocking valid primary or secondary research.
+- Last relevant evidence: Focused packet tests and `./scripts/dev.sh validate --smoke` passed on 2026-08-03 after the difficulty workflow correction.
 - Blocker: None.
-- Next: Commit this frozen contract, then execute R1 from its smallest failing test.
+- Next: Commit the difficulty workflow checkpoint, then restore incremental completion feedback.
 
 ## Material Decisions
 
@@ -137,6 +137,7 @@ Complete the frozen Required Outcomes using the listed Change Envelope and Prima
 ## Checkpoint History
 
 - 2026-08-03: SEARCH PROBE located the Forge 1.12.2 port and TC4 4.2.3.5 binary/resource baseline. Nine atomic audits completed with no workspace edits and produced the frozen R1-R9 scope.
+- 2026-08-03: R1 difficulty workflow checkpoint passed focused packet tests and `./scripts/dev.sh validate --smoke`; valid `-1`, `0`, and positive difficulty paths now follow the same effective workflow as `GuiResearchBrowser`.
 
 ## Completion
 

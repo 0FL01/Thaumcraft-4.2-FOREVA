@@ -58,10 +58,11 @@ public class ResearchClueProgressionStaticGuardTest {
                         && notes.contains("ItemStack note = ResearchManager.createNote(stack, key, world);")
                         && notes.contains("stack.setItemDamage(0);")
                         && notes.contains("if (!ResearchManager.doesPlayerHaveRequisites(player, data.key))"));
-        assertTrue("PacketPlayerCompleteToServer must keep primary note-creation and secondary direct-completion split",
-                completePacket.contains("if (type == 0 && research.isSecondary())")
+        assertTrue("PacketPlayerCompleteToServer must keep difficulty-aware note and direct-completion workflows",
+                completePacket.contains("boolean directPurchase = isDirectPurchase(research);")
+                        && completePacket.contains("if (type == 0 && directPurchase)")
                         && completePacket.contains("return consumeResearchCost(player, research) && completeResearch(player, research);")
-                        && completePacket.contains("if (type == 1 && !research.isSecondary())")
+                        && completePacket.contains("if (type == 1 && !directPurchase)")
                         && completePacket.contains("return !ResearchManager.createResearchNoteForPlayer(player.world, player, key).isEmpty();")
                         && completePacket.contains("if (!ResearchManager.doesPlayerHaveRequisites(player, key))"));
     }

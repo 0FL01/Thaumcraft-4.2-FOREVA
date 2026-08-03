@@ -28,6 +28,7 @@ import thaumcraft.api.aspects.AspectList;
 import thaumcraft.api.research.ResearchCategories;
 import thaumcraft.api.research.ResearchCategoryList;
 import thaumcraft.api.research.ResearchItem;
+import thaumcraft.common.config.Config;
 import thaumcraft.common.config.ConfigItems;
 import thaumcraft.common.items.ItemResearchNotes;
 import thaumcraft.common.lib.capabilities.PlayerKnowledgeCapability;
@@ -48,6 +49,7 @@ public class PacketPlayerCompleteRuntimeTest {
 
     private Map<String, ResearchCategoryList> oldCategories;
     private ItemResearchNotes oldResearchNotes;
+    private int oldResearchDifficulty;
 
     @BeforeClass
     public static void bootstrapMinecraftStatics() {
@@ -58,6 +60,8 @@ public class PacketPlayerCompleteRuntimeTest {
     public void setUp() throws Exception {
         this.oldCategories = new LinkedHashMap<>(ResearchCategories.researchCategories);
         this.oldResearchNotes = ConfigItems.itemResearchNotes;
+        this.oldResearchDifficulty = Config.researchDifficulty;
+        Config.researchDifficulty = 0;
         ResearchCategories.researchCategories.clear();
         ResearchCategories.registerCategory("TEST", new ResourceLocation("thaumcraft", "textures/test/icon.png"), new ResourceLocation("thaumcraft", "textures/test/background.png"));
         ConfigItems.itemResearchNotes = new ItemResearchNotes();
@@ -69,6 +73,7 @@ public class PacketPlayerCompleteRuntimeTest {
         ResearchCategories.researchCategories.clear();
         ResearchCategories.researchCategories.putAll(this.oldCategories);
         ConfigItems.itemResearchNotes = this.oldResearchNotes;
+        Config.researchDifficulty = this.oldResearchDifficulty;
         clearResearchCaches();
     }
 
@@ -129,7 +134,42 @@ public class PacketPlayerCompleteRuntimeTest {
     }
 
     @Test
-    public void packetRejectsWrongTypeOrInsufficientAspectCostWithoutMutation() {
+    public void easyDifficultyAllowsTaggedPrimaryResearchToBePurchasedDirectly() {
+        Config.researchDifficulty = -1;
+        registerResearch(new ResearchItem("BASE", "TEST", new AspectList().add(Aspect.AIR, 1), 0, 0, 1, new ItemStack(Items.BOOK)));
+        registerResearch(new ResearchItem("PRIMARY", "TEST", new AspectList().add(Aspect.FIRE, 2), 1, 0, 1, new ItemStack(Items.PAPER)).setParents("BASE"));
+
+        TestWorld world = new TestWorld();
+        TestPlayer player = new TestPlayer(world, "easy_primary");
+        player.knowledge().addResearch("BASE");
+        player.knowledge().setAspectPool(Aspect.FIRE, 3);
+
+        assertTrue(PacketPlayerCompleteToServer.processRequest(player, "PRIMARY", world.provider.getDimension(), player.getName(), (byte) 0));
+        assertTrue(ResearchManager.isResearchComplete(player, "PRIMARY"));
+        assertEquals(1, player.knowledge().getAspectPoolFor(Aspect.FIRE));
+    }
+
+    @Test
+    public void hardDifficultyCreatesNoteForSecondaryResearch() {
+        Config.researchDifficulty = 1;
+        registerResearch(new ResearchItem("BASE", "TEST", new AspectList().add(Aspect.AIR, 1), 0, 0, 1, new ItemStack(Items.BOOK)));
+        registerResearch(new ResearchItem("SECONDARY", "TEST", new AspectList().add(Aspect.FIRE, 2), 1, 0, 1, new ItemStack(Items.PAPER))
+                .setParents("BASE")
+                .setSecondary());
+
+        TestWorld world = new TestWorld();
+        TestPlayer player = new TestPlayer(world, "hard_secondary");
+        player.knowledge().addResearch("BASE");
+        player.inventory.mainInventory.set(0, new ItemStack(new TestScribeTools()));
+        player.inventory.mainInventory.set(1, new ItemStack(Items.PAPER, 1));
+
+        assertTrue(PacketPlayerCompleteToServer.processRequest(player, "SECONDARY", world.provider.getDimension(), player.getName(), (byte) 1));
+        assertFalse(ResearchManager.isResearchComplete(player, "SECONDARY"));
+        assertTrue(ResearchManager.getResearchSlot(player, "SECONDARY") >= 0);
+    }
+
+    @Test
+    public void packetRejectsWorkflowMismatchOrInsufficientAspectCostWithoutMutation() {
         registerResearch(new ResearchItem("BASE", "TEST", new AspectList().add(Aspect.AIR, 1), 0, 0, 1, new ItemStack(Items.BOOK)));
         registerResearch(new ResearchItem("PRIMARY", "TEST", new AspectList().add(Aspect.FIRE, 2), 1, 0, 1, new ItemStack(Items.PAPER)).setParents("BASE"));
         registerResearch(new ResearchItem("SECONDARY", "TEST", new AspectList().add(Aspect.AIR, 3), 2, 0, 1, new ItemStack(Items.FEATHER)).setParents("BASE").setSecondary());
