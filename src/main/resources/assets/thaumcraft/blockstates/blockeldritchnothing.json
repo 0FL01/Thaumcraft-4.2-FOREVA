@@ -1,5 +1,6 @@
 {
   "variants": {
-    "normal": { "model": "thaumcraft:blockeldritch_0" }
+    "exposed=false": { "model": "thaumcraft:blockeldritch_0" },
+    "exposed=true": { "model": "thaumcraft:blockeldritch_0" }
   }
 }

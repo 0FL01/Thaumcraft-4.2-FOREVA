@@ -11,12 +11,29 @@ import net.minecraft.world.WorldServer;
 import thaumcraft.common.config.Config;
 import thaumcraft.common.config.ConfigBlocks;
 
+import java.util.Collections;
+import java.util.Map;
+import java.util.WeakHashMap;
+
 public class TeleporterThaumcraft extends Teleporter {
 
     private static final int SEARCH_RADIUS = 128;
+    private static final Map<WorldServer, TeleporterThaumcraft> WORLD_TELEPORTERS =
+            Collections.synchronizedMap(new WeakHashMap<WorldServer, TeleporterThaumcraft>());
 
     public TeleporterThaumcraft(WorldServer ws) {
         super(ws);
+    }
+
+    public static TeleporterThaumcraft forWorld(WorldServer world) {
+        synchronized (WORLD_TELEPORTERS) {
+            TeleporterThaumcraft teleporter = WORLD_TELEPORTERS.get(world);
+            if (teleporter == null) {
+                teleporter = new TeleporterThaumcraft(world);
+                WORLD_TELEPORTERS.put(world, teleporter);
+            }
+            return teleporter;
+        }
     }
 
     @Override

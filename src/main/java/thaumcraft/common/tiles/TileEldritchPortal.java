@@ -69,7 +69,8 @@ public class TileEldritchPortal extends TileEntity implements ITickable {
         if (targetWorld == null) return;
 
         player.timeUntilPortal = 100;
-        player.getServer().getPlayerList().transferPlayerToDimension(player, targetDim, new TeleporterThaumcraft(targetWorld));
+        player.getServer().getPlayerList().transferPlayerToDimension(
+                player, targetDim, TeleporterThaumcraft.forWorld(targetWorld));
         if (targetDim == Config.dimensionOuterId && !ResearchManager.isResearchComplete(player, "ENTEROUTER")) {
             ResearchManager.addResearch(player, "ENTEROUTER");
         }

@@ -1,9 +1,21 @@
 package thaumcraft.common.tiles;
 
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
+import thaumcraft.common.blocks.BlockEldritchNothing;
 
 public class TileEldritchNothing extends TileEntity {
+
+    @Override
+    public boolean shouldRefresh(World world, BlockPos pos, IBlockState oldState, IBlockState newState) {
+        return oldState.getBlock() != newState.getBlock()
+                || oldState.getBlock() instanceof BlockEldritchNothing
+                && oldState.getValue(BlockEldritchNothing.EXPOSED)
+                != newState.getValue(BlockEldritchNothing.EXPOSED);
+    }
 
     @Override
     public double getMaxRenderDistanceSquared() {

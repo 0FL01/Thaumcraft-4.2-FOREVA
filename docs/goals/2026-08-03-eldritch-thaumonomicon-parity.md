@@ -41,8 +41,8 @@ Complete the frozen Required Outcomes using the listed Change Envelope and Prima
   - Source: RECON findings for `BlockEldritchNothing` and `TeleporterThaumcraft`.
   - Acceptance: Eldritch Nothing remains a non-air, unbreakable, no-collision Outer void block with original exposure state and delayed void damage without allocating one TileEntity per generated cell; repeated portal transfers reuse the original long-lived destination cache semantics.
   - Primary evidence: Focused block/world and teleporter tests prove material/air identity, hardness/resistance/light, exposure state, collision, damage cadence, absence of mass TileEntities, and cache reuse; checkpoint server smoke passes.
-  - Status: pending
-  - Evidence:
+  - Status: verified
+  - Evidence: Eldritch Nothing is again a non-air, unbreakable rock-material block with original light/resistance intent, inset selection, empty collision, exposure metadata, boundary-only render tiles, and eight-point post-age-20 void damage. Outer transfers reuse one teleporter and inherited destination cache per live target world. Focused block/teleporter tests and `./scripts/dev.sh validate --smoke` passed on 2026-08-03.
 
 - R5: Restore Outer progression entity and drop behavior.
   - Source: RECON findings for Eldritch Guardians, protected boss drops, Eldritch Crabs, altar spawning, and Warden room ownership.
@@ -115,17 +115,17 @@ Complete the frozen Required Outcomes using the listed Change Envelope and Prima
 
 ## Current Checkpoint
 
-- Closes: R4.
-- Smallest next action: Restore `BlockEldritchNothing` state/material/damage behavior without per-cell TileEntities, then make Outer portal transfers reuse a long-lived teleporter cache.
-- Expected evidence: Focused tests prove non-air identity, unbreakability, exposure state, delayed void damage, no TileEntity allocation, and cache reuse across transfers.
-- Stop or replan if: Preserving the existing renderer requires a state carrier that cannot be represented without the forbidden mass TileEntity allocation.
+- Closes: R5.
+- Smallest next action: Restore rare Guardian Eye drops and protected Primordial Pearl entities, then close the coupled Guardian/Crab/Warden behavior deltas with focused entity tests.
+- Expected evidence: Focused entity tests prove rare-drop routing, protected Pearl lifetime/damage behavior, ward regeneration, altar gates, Crab phases/drops, and post-spawn Warden home.
+- Stop or replan if: A TC4 entity phase depends on a removed vanilla riding API that cannot be represented through the existing 1.12 passenger API inside the R5 envelope.
 
 ## Current State
 
-- Resolved: R1-R3 are verified. Research runtime, Primal Focus/Orb, and Primal Crusher behavior now follow the audited TC4 contracts.
-- Last relevant evidence: Primal Crusher focused tests and `./scripts/dev.sh validate --smoke` passed on 2026-08-03.
+- Resolved: R1-R4 are verified. Research, Primal, and Outer void/portal behavior now follow the audited TC4 contracts.
+- Last relevant evidence: Eldritch Nothing/teleporter focused tests and `./scripts/dev.sh validate --smoke` passed on 2026-08-03.
 - Blocker: None.
-- Next: Commit R3, then restore the R4 Outer void block before changing portal cache ownership.
+- Next: Commit R4, then begin R5 with progression-critical Eye and Pearl drop routing.
 
 ## Material Decisions
 
@@ -142,6 +142,7 @@ Complete the frozen Required Outcomes using the listed Change Envelope and Prima
 - 2026-08-03: R1 verified after restoring exact `findMatchingResearch` difficulty precedence, rejecting unknown plain completion keys, and filtering unknown, auto-unlock, and redundant clue keys from persisted capability state. Focused tests and `./scripts/dev.sh validate --smoke` passed.
 - 2026-08-03: R2 verified. Primal Orb launch, impact/water/special-effect semantics, taint placement, focus color/hand animation, and TC4 wisp feedback were restored. Focused tests, server smoke, and build passed; manual visual inspection was not run.
 - 2026-08-03: R3 verified. Primal Crusher now uses the exact TC4 effective matrix, Forge-safe player harvesting, following drops, and original wear accounting. Focused tests and `./scripts/dev.sh validate --smoke` passed.
+- 2026-08-03: R4 verified. Eldritch Nothing recovered TC4 block identity, exposure/render-tile sparsity, and void damage; portal transfers now retain their destination cache per live world. Focused tests and `./scripts/dev.sh validate --smoke` passed.
 
 ## Completion
 

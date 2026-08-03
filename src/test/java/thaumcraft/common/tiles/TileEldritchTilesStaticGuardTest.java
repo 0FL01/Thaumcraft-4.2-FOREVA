@@ -62,7 +62,7 @@ public class TileEldritchTilesStaticGuardTest {
         assertTrue(source.contains("public AxisAlignedBB getRenderBoundingBox()"));
         assertTrue(source.contains("this.pos.add(-1, -1, -1)"));
         assertTrue(source.contains("this.pos.add(2, 2, 2)"));
-        assertTrue(source.contains("transferPlayerToDimension(player, targetDim, new TeleporterThaumcraft(targetWorld))"));
+        assertTrue(source.contains("TeleporterThaumcraft.forWorld(targetWorld)"));
         assertTrue(source.contains("ResearchManager.addResearch(player, \"ENTEROUTER\")"));
     }
 

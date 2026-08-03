@@ -14,6 +14,7 @@ public class OuterLandsArrivalAndSpawnStaticGuardTest {
     @Test
     public void teleporterPreparesChunksAndUsesAnInteriorPortalApproach() throws IOException {
         String source = read("src/main/java/thaumcraft/common/lib/world/dim/TeleporterThaumcraft.java");
+        String portal = read("src/main/java/thaumcraft/common/tiles/TileEldritchPortal.java");
 
         assertTrue(source.contains("this.prepareDestination(entity, 1);")
                 && source.contains("this.prepareDestination(entity, 2);")
@@ -24,6 +25,10 @@ public class OuterLandsArrivalAndSpawnStaticGuardTest {
                 source.contains("this.world.provider.getDimension() == Config.dimensionOuterId")
                         && source.indexOf("this.findSafeInterior(entity)")
                         < source.indexOf("this.world.getTopSolidOrLiquidBlock"));
+        assertTrue("Transfers must reuse one teleporter and its destination cache per live world",
+                source.contains("WeakHashMap<WorldServer, TeleporterThaumcraft>")
+                        && source.contains("public static TeleporterThaumcraft forWorld(WorldServer world)")
+                        && portal.contains("TeleporterThaumcraft.forWorld(targetWorld)"));
     }
 
     @Test
