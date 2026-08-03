@@ -67,6 +67,10 @@ public class PacketPlayerCompleteToServer extends PacketBase {
         if (ResearchManager.isResearchComplete(player, key)) return false;
         ResearchItem research = ResearchCategories.getResearch(key);
         if (research == null) return false;
+        if ((research.isHidden() || research.isLost())
+                && !ResearchManager.isResearchComplete(player, "@" + key)) {
+            return false;
+        }
         if (!ResearchManager.doesPlayerHaveRequisites(player, key)) {
             player.sendMessage(new TextComponentTranslation("tc.researcherror"));
             return false;

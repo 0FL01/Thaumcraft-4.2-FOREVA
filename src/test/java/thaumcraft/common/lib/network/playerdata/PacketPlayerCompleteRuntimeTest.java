@@ -169,6 +169,58 @@ public class PacketPlayerCompleteRuntimeTest {
     }
 
     @Test
+    public void lostSecondaryRequiresClueBeforeDirectPurchase() {
+        registerResearch(new ResearchItem("BASE", "TEST", new AspectList().add(Aspect.AIR, 1), 0, 0, 1, new ItemStack(Items.BOOK)));
+        registerResearch(new ResearchItem("PRIMPEARL", "TEST", new AspectList().add(Aspect.AIR, 2), 1, 0, 1, new ItemStack(Items.ENDER_PEARL))
+                .setParents("BASE")
+                .setSecondary()
+                .setLost());
+
+        TestWorld world = new TestWorld();
+        TestPlayer player = new TestPlayer(world, "lost_direct");
+        player.knowledge().addResearch("BASE");
+        player.knowledge().setAspectPool(Aspect.AIR, 3);
+
+        assertFalse(PacketPlayerCompleteToServer.processRequest(
+                player, "PRIMPEARL", world.provider.getDimension(), player.getName(), (byte) 0));
+        assertFalse(ResearchManager.isResearchComplete(player, "PRIMPEARL"));
+        assertEquals(3, player.knowledge().getAspectPoolFor(Aspect.AIR));
+
+        player.knowledge().addResearch("@PRIMPEARL");
+        assertTrue(PacketPlayerCompleteToServer.processRequest(
+                player, "PRIMPEARL", world.provider.getDimension(), player.getName(), (byte) 0));
+        assertTrue(ResearchManager.isResearchComplete(player, "PRIMPEARL"));
+        assertEquals(1, player.knowledge().getAspectPoolFor(Aspect.AIR));
+    }
+
+    @Test
+    public void lostResearchRequiresClueBeforeNoteCreation() {
+        Config.researchDifficulty = 1;
+        registerResearch(new ResearchItem("BASE", "TEST", new AspectList().add(Aspect.AIR, 1), 0, 0, 1, new ItemStack(Items.BOOK)));
+        registerResearch(new ResearchItem("OUTERREV", "TEST", new AspectList().add(Aspect.FIRE, 2), 1, 0, 1, new ItemStack(Items.PAPER))
+                .setParents("BASE")
+                .setSecondary()
+                .setLost());
+
+        TestWorld world = new TestWorld();
+        TestPlayer player = new TestPlayer(world, "lost_note");
+        player.knowledge().addResearch("BASE");
+        player.inventory.mainInventory.set(0, new ItemStack(new TestScribeTools()));
+        player.inventory.mainInventory.set(1, new ItemStack(Items.PAPER, 1));
+
+        assertFalse(PacketPlayerCompleteToServer.processRequest(
+                player, "OUTERREV", world.provider.getDimension(), player.getName(), (byte) 1));
+        assertEquals(-1, ResearchManager.getResearchSlot(player, "OUTERREV"));
+        assertEquals(1, countItem(player, Items.PAPER));
+        assertEquals(0, player.inventory.mainInventory.get(0).getItemDamage());
+
+        player.knowledge().addResearch("@OUTERREV");
+        assertTrue(PacketPlayerCompleteToServer.processRequest(
+                player, "OUTERREV", world.provider.getDimension(), player.getName(), (byte) 1));
+        assertTrue(ResearchManager.getResearchSlot(player, "OUTERREV") >= 0);
+    }
+
+    @Test
     public void packetRejectsWorkflowMismatchOrInsufficientAspectCostWithoutMutation() {
         registerResearch(new ResearchItem("BASE", "TEST", new AspectList().add(Aspect.AIR, 1), 0, 0, 1, new ItemStack(Items.BOOK)));
         registerResearch(new ResearchItem("PRIMARY", "TEST", new AspectList().add(Aspect.FIRE, 2), 1, 0, 1, new ItemStack(Items.PAPER)).setParents("BASE"));

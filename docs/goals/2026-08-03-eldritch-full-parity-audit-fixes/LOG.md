@@ -293,3 +293,26 @@ Log-Policy: append-only; correct prior entries with a new event
 - Preserve Result: Both fixed endpoint aspects and count 2 remain unchanged; note stays incomplete/meta 0; aspect pool and ink stay unchanged. Existing type-0 placement and new type-2 erasure consume ink normally. Packet authentication, cost/refund rules, and completion traversal were untouched.
 - Budget: F-087 consumed 2/2 fix checkpoints and 0 material replans.
 - Next: Commit the R-006 checkpoint excluding user-owned `SKILL.md`, then begin R-007/F-088.
+
+## E-0027 — 2026-08-03 — checkpoint_start
+
+- State-Revision: 26
+- Outcomes/Findings: R-007 / F-088
+- Git before/after: `f7570d16` / `f7570d16`; only user-owned `SKILL.md` dirty
+- Prior checkpoint commit: R-006/F-087 -> `f7570d16 fix(research): protect fixed note endpoints`.
+- Action: Started the single allowed F-088 checkpoint and incremented `checkpoints_started` to 1/1.
+- Hypothesis: The authenticated packet already resolves a `ResearchItem`; requiring `@<key>` when that entry is hidden or lost before type routing closes both direct and note requests.
+- Expected Evidence: Focused runtime cases cover hidden/lost with no clue, matching clue, and ordinary research; all rejected paths remain mutation-free.
+- Stop/Replan: Stop if clue ownership cannot be checked before cost/note paths without changing shared progression semantics.
+- Next: Inspect and apply only the packet-level clue authority check and focused cases.
+
+## E-0028 — 2026-08-03 — checkpoint_closed
+
+- State-Revision: 27
+- Outcomes/Findings: R-007 / F-088 -> verified
+- Git before/after: `f7570d16` / packet, focused test, STATE/LOG ready for commit
+- Action: Added a hidden/lost `@KEY` ownership check immediately after authoritative research lookup and before prerequisite/type routing. Added exact PRIMPEARL direct-purchase and OUTERREV hard-note cases.
+- Evidence: `./scripts/dev.sh gradle test --tests thaumcraft.common.lib.network.playerdata.PacketPlayerCompleteRuntimeTest` -> BUILD SUCCESSFUL in 17s; `./scripts/dev.sh validate --smoke` -> PASS; `git diff --check` -> PASS.
+- Preserve Result: Without clues, research/note/input/cost state remains unchanged. Matching clues restore success. Existing ordinary primary/secondary, parent, difficulty, cost, sibling, and workflow-mismatch tests remain green.
+- Budget: F-088 consumed 1/1 fix checkpoint and 0 material replans.
+- Next: Commit the R-007 checkpoint excluding user-owned `SKILL.md`, then begin R-008/F-105.
