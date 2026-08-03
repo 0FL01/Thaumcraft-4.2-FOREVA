@@ -27,6 +27,10 @@ public class EntityEldritchGuardianStaticGuardTest {
         assertTrue(source.contains("public int getTotalArmorValue() {")
                 && source.contains("return 4;"));
         assertFalse(source.contains("public int getMaxSpawnedInChunk() {"));
+        assertTrue(source.contains("this.experienceValue = 20;"));
+        assertFalse(source.contains("public int getExperiencePoints(EntityPlayer player) {"));
+        assertTrue(source.contains("public int getTalkInterval() {")
+                && source.contains("return 500;"));
     }
 
     private static String readFile(String path) throws IOException {

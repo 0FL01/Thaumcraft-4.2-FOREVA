@@ -163,7 +163,7 @@ public class EntityEldritchGuardian extends EntityMob implements IRangedAttackMo
     }
 
     @Override
-    public int getExperiencePoints(EntityPlayer player) {
+    public int getTalkInterval() {
         return 500;
     }
 

@@ -180,3 +180,26 @@ Log-Policy: append-only; correct prior entries with a new event
 - Result: Guardian intrinsic armor is restored from 0 to 4 while inherited spawn-cap behavior remains unchanged.
 - Decision/Reason: Close F-038 and derive R-003 verified; no other Guardian attributes, AI, isolation, or entity behavior changed.
 - Next: Commit the R-003 checkpoint excluding user-owned `SKILL.md`, then start R-004/F-039.
+
+## E-0017 — 2026-08-03 — checkpoint_start
+
+- State-Revision: 16
+- Outcomes/Findings: R-004 / F-039
+- Git before/after: `7b2f1909` / `7b2f1909`; only user-owned `SKILL.md` dirty
+- Prior checkpoint commit: R-003/F-038 -> `7b2f1909 fix(entities): restore Guardian armor`.
+- Action: Started the single allowed F-039 fix checkpoint and incremented `checkpoints_started` to 1/1.
+- Hypothesis: The port already stores XP 20 in the constructor; the stray method returns the TC4 talk interval as XP. Removing it and adding the mapped talk method restores both values.
+- Expected Evidence: Focused source evidence proves XP 20, no XP override, and talk interval 500; smoke confirms common/server compatibility.
+- Stop/Replan: Stop if either value is controlled by a shared lifecycle outside the Guardian class.
+- Next: Apply only the Guardian XP/talk mapping correction and its focused assertions.
+
+## E-0018 — 2026-08-03 — checkpoint_closed
+
+- State-Revision: 17
+- Outcomes/Findings: R-004 / F-039 -> verified
+- Git before/after: `7b2f1909` / product/test plus STATE/LOG ready for checkpoint commit
+- Action: Removed `getExperiencePoints(...) -> 500`, retained constructor `experienceValue = 20`, and added `getTalkInterval() -> 500`; extended the focused Guardian guard.
+- Evidence: `./scripts/dev.sh gradle test --tests thaumcraft.common.entities.monster.EntityEldritchGuardianStaticGuardTest` -> BUILD SUCCESSFUL in 17s; `./scripts/dev.sh validate --smoke` -> PASS; `git diff --check` -> PASS.
+- Preserve Result: Guardian ambient/hurt/death sound and drop methods were unchanged; R-003 armor method remains guarded.
+- Budget: F-039 consumed 1/1 fix checkpoint and 0 material replans.
+- Next: Commit the R-004 checkpoint excluding user-owned `SKILL.md`, then begin R-005/F-085 checkpoint 1/2.
