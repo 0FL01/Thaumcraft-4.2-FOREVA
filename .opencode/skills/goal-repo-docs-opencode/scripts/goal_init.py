@@ -109,7 +109,7 @@ def main() -> int:
         pointer.write_text(relative_goal + "\n", encoding="utf-8")
 
     print(goal_dir.relative_to(root).as_posix())
-    print("Next: register sources, replace all template placeholders, define the audit map, then run goal_lint.py.")
+    print("Next: register sources, freeze production envelope and finite budgets, define the audit map, apply the Production Admission Gate, then run goal_lint.py.")
     return 0
 
 

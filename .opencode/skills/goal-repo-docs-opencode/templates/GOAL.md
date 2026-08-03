@@ -13,15 +13,18 @@ Last-Updated: {{DATE}}
 
 ## Execution Directive
 
-Complete the frozen outcomes through their linked atomic findings and approved change envelope. Work on the smallest unresolved finding set. Do not add requirements from reviews, tests, tools, speculative risks, optional source text, or adjacent discoveries. Preserve every listed parity control. Finish when all required findings and affected constraints have current evidence and the closure check passes.
+Complete only the frozen outcomes through their linked admitted findings and approved change envelope. Work on the smallest unresolved finding set. A confirmed delta is not automatically actionable. Do not add requirements from reviews, tests, tools, speculative risks, optional source text, adjacent discoveries, cleanup, hardening, or future-proofing. Preserve every listed parity control. Finish when all required findings and affected constraints have current evidence and the closure check passes; then stop.
 
 ## Scope Promotion
 
-- Policy: <explicit_only | confirmed_in_scope | triage>
+- Policy: <explicit_only | production_gate | triage>
 - Authority: <S-* entries that authorize the policy>
-- Freeze decision: <what classes of findings were promoted and why>
+- Production envelope: <RECON production-envelope section>
+- Freeze decision: <which exact findings passed admission and why>
 
 ## Required Outcomes
+
+<If zero findings pass admission, write `none — close terminally`; otherwise use R-* blocks below.>
 
 ## R-001 — <observable outcome>
 
@@ -29,8 +32,8 @@ Complete the frozen outcomes through their linked atomic findings and approved c
 - Acceptance: <observable end state; exact details live in linked F-* entries>
 - Primary evidence: <smallest direct command/artifact/runtime observation>
 - Mandatory broader gates: <none or exact gate>
-- Change envelope/budget: <smallest allowed surface>
-- Stop/Replan if: <falsifiable boundary or blocker>
+- Change envelope/budget: <finite surface and numeric checkpoint cap; Resource Governor applies>
+- Stop/Replan if: <falsifiable boundary, cap, or blocker>
 
 ## Preserve Controls
 
@@ -43,6 +46,7 @@ Complete the frozen outcomes through their linked atomic findings and approved c
 ## Non-goals
 
 - <explicit boundary; not an audit checklist>
+- Deferred RECON candidates, unsupported paths, synthetic-only failures, generic hardening, cleanup, and adjacent bugs are not implementation work.
 
 ## Change Envelope
 
@@ -51,7 +55,22 @@ Complete the frozen outcomes through their linked atomic findings and approved c
 - Allowed artifacts:
 - Forbidden artifacts:
 - API/platform/dependency boundaries:
-- User or harness budget:
+- User or harness budget: <finite; refer to Resource Governor; no “as needed” or “until clean”>
+
+## Resource Governor
+
+- Max Required Findings: 8
+- Frozen Required Finding Count: <exact integer equal to required F-* count>
+- Max Total Fix Checkpoints: 12
+- Frozen Total Fix Checkpoints: <exact sum of required F-* fix_checkpoints>
+- Max Candidate Reproduction Attempts Per Finding: 1
+- Max Material Replans Per Required Finding: 2
+- Max Implementation Subagent Waves: 0
+- Max Closure Review Passes: 1
+- Max Scope Amendments: 0
+- Adjacent Finding Auto-Promotions: 0
+- Post-Closure Work Items: 0
+- Budget Authority: skill-default
 
 ## Validation Ladder
 
@@ -73,6 +92,8 @@ Complete the frozen outcomes through their linked atomic findings and approved c
 - Every R-* derives to a successful terminal state.
 - Preserve controls are current after the final relevant diff.
 - Constraints and change envelope remain satisfied.
+- Resource counters remain within the frozen governor.
 - Required validation and commits pass.
 - Goal lint and hashes pass.
-- Completion is terminal.
+- Deferred findings do not block completion and are not silently promoted.
+- Completion is terminal; no cleanup, hardening, extra review, or post-closure bug fixing.

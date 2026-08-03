@@ -11,10 +11,12 @@ Last-Updated: {{DATE}}
 - Scope:
 - Anti-scope:
 - Oracle and comparison direction:
+- Supported production envelope:
 - Questions:
 - Expected evidence:
 - Read/write permissions: product files read-only; this report writable
 - Effort/tool budget:
+- Candidate reproduction budget: at most one bounded attempt; no escalating synthetic construction
 - Stop conditions:
 - Continuation predecessor: none
 
@@ -22,6 +24,7 @@ Last-Updated: {{DATE}}
 
 - Files/symbols inspected:
 - Oracle surfaces inspected:
+- Supported production entry points inspected:
 - Commands/tools used:
 - Uncovered scope:
 
@@ -38,8 +41,13 @@ Last-Updated: {{DATE}}
 - Exact deltas:
 - Affected paths/symbols:
 - Evidence/reproduction:
+- Production Trigger/Reachability:
+- Concrete Impact/Contract:
+- Admission Evidence Type: <production incident | deterministic supported path | current diff | critical risk | explicit source | synthetic only | none>
+- Bounded Reproduction Result: <not needed | reproduced | not reproduced within budget>
+- Speculation/Reachability Limits:
 - Regression hazards:
-- Candidate disposition:
+- Candidate recommendation: <admit | defer | preserve | invalidate; orchestrator decides>
 
 ## Positive Parity
 
@@ -51,7 +59,11 @@ Last-Updated: {{DATE}}
 
 ## Test Debt
 
-- <wrong guard, missing behavior test, exact path/lines>
+- <wrong guard, missing behavior test, exact path/lines; not automatically product work>
+
+## Deferred/Non-Production Candidates
+
+- <finding, failed gate, no implementation recommendation>
 
 ## Handoff
 

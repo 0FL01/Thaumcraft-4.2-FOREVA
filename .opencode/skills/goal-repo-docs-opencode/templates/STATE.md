@@ -24,12 +24,12 @@ Last-Durable-Flush: {{DATE}}
 - Hypothesis: <what is currently believed and why>
 - Smallest Next Action: <one concrete action>
 - Expected Evidence: <falsifiable result>
-- Stop/Replan If: <condition>
+- Stop/Replan If: <condition or frozen cap>
 - Working Set: <paths/symbols>
 - Last Material Command: none
 - Last Material Result: none
 - Blocker: none
-- First Re-entry Action: verify hashes and Git, then read active R/F entries before edits
+- First Re-entry Action: verify hashes, budgets, and Git; then read active R/F entries before edits
 </protect>
 
 ## Outcome Status
@@ -39,6 +39,18 @@ Last-Durable-Flush: {{DATE}}
 ## Finding Status
 
 - F-001 | pending | evidence: none
+
+## Finding Work Counters
+
+- F-001 | checkpoints_started=0 | material_replans=0
+
+## Resource Counters
+
+- Implementation Subagent Waves Used: 0
+- Closure Review Passes Used: 0
+- Scope Amendments Used: 0
+- Adjacent Finding Auto-Promotions Used: 0
+- Post-Closure Work Items Used: 0
 
 ## Current Diff/Reconciliation
 

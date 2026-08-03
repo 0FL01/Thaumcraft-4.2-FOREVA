@@ -20,6 +20,7 @@ Last-Updated: {{DATE}}
 - Version/Date/Commit: {{DATE}}
 - Fingerprint: not_available
 - Relevant scope: <what this source authorizes or constrains>
+- Budget Grant: none
 - Durable excerpt/snapshot: <path or concise exact excerpt>
 - Notes:
 
@@ -29,4 +30,5 @@ Last-Updated: {{DATE}}
 - Binary/archive: record path, version, and SHA-256.
 - Web/CRW: record query or URL, retrieval timestamp, snapshot/excerpt path, and hash when practical.
 - Chat-only claim: copy the exact material instruction into a durable source entry before relying on it.
+- Higher-than-default capacity: use exact `Budget Grant` syntax only when the source explicitly grants those finite numbers; never infer a grant from broad wording.
 - Never store secrets or indiscriminate full dumps.

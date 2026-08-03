@@ -38,6 +38,16 @@ function ids(value: string, prefix: "R" | "F" | "S"): Set<string> {
   return found
 }
 
+function extractSection(markdown: string, heading: string): string {
+  const lines = markdown.split(/\r?\n/)
+  const marker = `## ${heading}`
+  const start = lines.indexOf(marker)
+  if (start < 0) return ""
+  let end = start + 1
+  while (end < lines.length && !lines[end].startsWith("## ")) end += 1
+  return lines.slice(start, end).join("\n").trim()
+}
+
 function extractBlocks(markdown: string, wanted: Set<string>, prefix: "R" | "F" | "S"): string {
   if (wanted.size === 0) return "(none selected)"
   const lines = markdown.split(/\r?\n/)
@@ -93,6 +103,9 @@ export const GoalCompactionPlugin: Plugin = async ({ worktree, directory, client
         const activeOutcomes = ids(bulletField(state, "Active Outcomes"), "R")
         const activeFindings = ids(bulletField(state, "Active Findings"), "F")
         const activeGoal = extractBlocks(goal, activeOutcomes, "R")
+        const scopePromotion = extractSection(goal, "Scope Promotion")
+        const resourceGovernor = extractSection(goal, "Resource Governor")
+        const productionEnvelope = extractSection(recon, "Production Relevance Envelope")
         const activeRecon = extractBlocks(recon, activeFindings, "F")
         const sourceIds = ids(activeRecon, "S")
         const activeSources = extractBlocks(sources, sourceIds, "S")
@@ -103,6 +116,9 @@ Active goal path: ${pointer}
 
 ### Authoritative STATE.md
 ${clip(state, MAX_STATE_CHARS)}
+
+### Frozen scope and resource firewall
+${clip([scopePromotion, resourceGovernor, productionEnvelope].filter(Boolean).join("\n\n") || "(missing; run goal_lint.py)", MAX_ACTIVE_GOAL_CHARS)}
 
 ### Active outcome definitions
 ${clip(activeGoal, MAX_ACTIVE_GOAL_CHARS)}
@@ -118,9 +134,10 @@ ${clip(log.slice(-MAX_LOG_TAIL_CHARS), MAX_LOG_TAIL_CHARS)}
 
 ### Compaction continuation rules
 - The repository Goal Ledger and Git evidence are authoritative; this generated summary is only a navigation aid.
-- Preserve the exact active goal path, State-Revision, Contract/RECON versions and all frozen bundle hashes, active R/F IDs, hypothesis, smallest next action, expected evidence, stop/replan condition, Git branch/HEAD, working set, and blockers.
-- Do not infer that a finding or outcome is verified, waived, complete, or clean unless STATE.md says so with evidence.
-- The first post-compaction action is to read the active pointer and STATE.md, verify hashes, inspect live Git status/HEAD/diff, and reload active R/F/S entries before editing.
+- Preserve the exact active goal path, State-Revision, Contract/RECON versions and all frozen bundle hashes, promotion policy, Production Admission Gate, Resource Governor/counters, active R/F IDs, hypothesis, smallest next action, expected evidence, stop/replan condition, Git branch/HEAD, working set, and blockers.
+- Confirmed findings are not automatic scope. Never promote adjacent discoveries, synthetic-only failures, cleanup, hardening, or review findings unless a versioned user/source-authorized amendment passes the gate.
+- Do not infer that a finding or outcome is verified, waived, complete, or clean unless STATE.md says so with evidence. Stop at the frozen reproduction/replan/review budget; do not review the review.
+- The first post-compaction action is to read the active pointer and STATE.md, verify hashes and resource counters, inspect live Git status/HEAD/diff, and reload active R/F/S entries before editing.
 `)
       } catch (error) {
         const message = error instanceof Error ? error.message : String(error)

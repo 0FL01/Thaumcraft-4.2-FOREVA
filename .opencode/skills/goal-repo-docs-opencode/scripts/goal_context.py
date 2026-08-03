@@ -39,6 +39,19 @@ def extract_field(text: str, name: str) -> str:
     return match.group(1).strip() if match else "none"
 
 
+def extract_level2_section(text: str, heading: str) -> str:
+    lines = text.splitlines()
+    marker = f"## {heading}"
+    try:
+        start = lines.index(marker)
+    except ValueError:
+        return ""
+    end = start + 1
+    while end < len(lines) and not lines[end].startswith("## "):
+        end += 1
+    return "\n".join(lines[start:end]).strip()
+
+
 def extract_level2_blocks(text: str, wanted: set[str]) -> str:
     lines = text.splitlines()
     blocks: list[str] = []
@@ -141,6 +154,9 @@ def main() -> int:
     active_r = {x for x in ID_RE.findall(extract_field(state, "Active Outcomes")) if x.startswith("R-")}
     active_f = {x for x in ID_RE.findall(extract_field(state, "Active Findings")) if x.startswith("F-")}
     goal_blocks = extract_level2_blocks(goal, active_r)
+    scope_promotion = extract_level2_section(goal, "Scope Promotion")
+    resource_governor = extract_level2_section(goal, "Resource Governor")
+    production_envelope = extract_level2_section(recon, "Production Relevance Envelope")
     finding_blocks = extract_level2_blocks(recon, active_f)
     source_ids = extract_source_ids(finding_blocks)
     source_blocks = extract_source_blocks(sources, source_ids)
@@ -154,13 +170,19 @@ def main() -> int:
         ]
     )
 
-    per_section = max(4000, args.max_chars // 5)
+    per_section = max(3500, args.max_chars // 6)
+    firewall = "\n\n".join(
+        part for part in (scope_promotion, resource_governor, production_envelope) if part
+    ) or "(missing; run goal_lint.py)"
     output = f"""# Goal Ledger rehydration capsule
 
 Active goal: {goal_dir.relative_to(root).as_posix()}
 
 ## Authoritative STATE.md
 {clip(state, per_section)}
+
+## Frozen scope and resource firewall
+{clip(firewall, per_section)}
 
 ## Active GOAL outcomes
 {clip(goal_blocks or '(none selected)', per_section)}
@@ -177,7 +199,7 @@ Active goal: {goal_dir.relative_to(root).as_posix()}
 ## Live Git anchor
 {git_state}
 
-Continuation rule: repository files and Git evidence are authoritative. Verify hashes and reconcile discrepancies before edits. Never infer verified or complete status from a compaction summary.
+Continuation rule: repository files and Git evidence are authoritative. Verify hashes, Production Admission Gate, resource counters, and Git before edits. Confirmed findings are not automatic scope. Never infer verified or complete status from a compaction summary, never auto-promote adjacent findings, and stop at the frozen budget.
 """
     print(clip(output, args.max_chars))
     return 0

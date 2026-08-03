@@ -4,7 +4,15 @@ Goal-ID: {{GOAL_ID}}
 Recon-Version: 1
 Recon-Status: collecting
 Last-Updated: {{DATE}}
-Audit-Promotion-Policy: <explicit_only | confirmed_in_scope | triage>
+Audit-Promotion-Policy: <explicit_only | production_gate | triage>
+Budget-Authority: skill-default
+Audit-Assignments-Cap: 12
+Audit-Waves-Cap: 1
+Audit-Waves-Used: 0
+Candidate-Reproduction-Cap-Per-Finding: 1
+Required-Findings-Cap: 8
+Total-Fix-Checkpoints-Cap: 12
+Scope-Amendments-Cap: 0
 
 ## Audit Charter
 
@@ -14,7 +22,16 @@ Audit-Promotion-Policy: <explicit_only | confirmed_in_scope | triage>
 - Anti-scope: <explicit exclusions>
 - Platform adaptations to preserve: <known valid deltas or none>
 - Required gates: <commands/runtime checks>
-- Stop conditions: <coverage complete, blocker, budget>
+- Stop conditions: <coverage complete, blocker, or frozen budget>
+
+## Production Relevance Envelope
+
+- Supported versions/configurations: <actual supported production envelope>
+- Supported entry points/data/lifecycle: <real reachable triggers>
+- Production invariants: <facts that make paths reachable or unreachable>
+- Explicitly excluded/unreachable paths: <unsupported, retired, synthetic-only>
+- Concrete impact threshold: <user/contract/security/data/safety/performance threshold>
+- Critical-risk exception policy: <authoritative concrete policy or none>
 
 ## Audit Coverage
 
@@ -38,16 +55,24 @@ Terminal assignment statuses: `complete`, `no_findings`, `blocked`, `superseded`
 - Exact deltas: <numbers, branches, conditions, metadata, lifecycle, protocol>
 - Affected paths/symbols: <paths and symbols>
 - Primary evidence: <command, artifact, runtime observation, fixture>
+- Production Gate: <pass | fail | not_applicable>
+- Admission Basis: <allowed exact basis from production-admission.md>
+- Production Trigger/Reachability: <supported concrete trigger or why absent>
+- Concrete Impact/Contract: <observable harm/contract or why none>
+- Admission Evidence: <direct evidence; synthetic-only is insufficient>
+- Admission Budget: reproduce_attempts=<0 or 1>; fix_checkpoints=<finite integer>; review_passes=<0 or 1>
+- Admission Attempts Used: <0 or 1>
+- Speculation Boundary: <one-hop direct cause; adjacent work excluded>
 - Regression hazards: <nearby behavior that must not change>
 - Outcome: <R-001 or none until freeze>
-- Notes/Disposition reason:
+- Notes/Disposition reason: <why required/deferred/etc.; never blank>
 
 ## RECON Adjudication
 
 - Duplicates retained with links and reasons:
 - Conflicts and direct adjudication:
 - Material unknowns:
-- Rejected candidates:
+- Deferred candidates and failed gate reasons:
 - Positive parity controls:
 
 ## RECON Closure
@@ -55,6 +80,9 @@ Terminal assignment statuses: `complete`, `no_findings`, `blocked`, `superseded`
 - All A-* assignments terminal: no
 - Every report claim normalized or explicitly rejected: no
 - Exact deltas preserved: no
+- Production Admission Gate applied: no
+- Non-admitted candidates explicitly deferred: no
 - Promotion policy applied: no
 - Material conflicts resolved or blocking: no
+- Hard budgets frozen: no
 - Ready to freeze: no

@@ -11,5 +11,5 @@ Log-Policy: append-only; correct prior entries with a new event
 - Action: Created the durable Goal Ledger before RECON or implementation.
 - Evidence: <source/command/artifact>
 - Result: draft
-- Decision/Reason: <promotion policy or pending decision>
-- Next: Register sources and freeze the audit charter.
+- Decision/Reason: <promotion/admission/budget decision or pending authority>
+- Next: Register sources, production envelope, and hard resource budgets before fan-out.

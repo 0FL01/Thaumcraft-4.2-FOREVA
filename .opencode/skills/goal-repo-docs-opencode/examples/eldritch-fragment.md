@@ -1,8 +1,15 @@
-# Eldritch migration fragment
+# Eldritch migration fragment with Sol recursion firewall
 
-Этот файл показывает, как часть пользовательского RECON должна пережить переход в Goal Ledger. Это иллюстрация схемы, а не полный готовый goal для репозитория Thaumcraft.
+Это иллюстрация того, как один и тот же подтверждённый RECON разделяется на **реальные обязательные исправления** и **подтверждённые, но отложенные дельты**. `Confidence: confirmed` не означает `Disposition: required`.
 
-## RECON atomic findings
+Предполагаемая policy:
+
+```text
+Audit-Promotion-Policy: production_gate
+Candidate-Reproduction-Cap-Per-Finding: 1
+```
+
+Production envelope: поддерживаемый Forge 1.12.2 gameplay path, обычные игровые конфигурации и реальные пользовательские действия. Exact TC4 parity сама по себе не является обязательной, если дельта не влияет на поддерживаемое поведение и пользователь отдельно не потребовал byte/behavior-exact parity.
 
 ## F-001 — Primal Orb has no initial launch velocity
 
@@ -12,15 +19,23 @@
 - Confidence: confirmed
 - Source IDs: S-001, S-002
 - Audit IDs/Reports: A-007 / reports/A-007-primal.md
-- Oracle: Thaumcraft 4.2.3.5 projectile launch behavior
-- Observed: `EntityPrimalOrb.java:25-30`; the created projectile receives no effective initial speed and practically does not fly.
-- Expected: casting initializes the original launch velocity through the Forge 1.12-compatible representation.
-- Exact deltas: initial velocity missing; do not merge this with impact probability or FX.
-- Affected paths/symbols: `src/main/java/.../EntityPrimalOrb.java`, `FocusPrimal`
-- Primary evidence: focused runtime launch-motion test plus server smoke
+- Oracle: Thaumcraft 4.2.3.5 projectile launch behavior and supported cast path
+- Observed: the created projectile receives no effective initial speed and practically does not fly.
+- Expected: a normal supported cast initializes a non-zero launch vector through the valid Forge 1.12 representation.
+- Exact deltas: initial velocity missing; impact probability and FX are separate findings.
+- Affected paths/symbols: `EntityPrimalOrb`, `FocusPrimal`
+- Primary evidence: supported cast path deterministically constructs the zero-motion projectile.
+- Production Gate: pass
+- Admission Basis: deterministic_supported_path
+- Production Trigger/Reachability: every ordinary Primal Focus cast enters this constructor.
+- Concrete Impact/Contract: the primary projectile action is visibly non-functional for every cast.
+- Admission Evidence: direct call path plus focused launch observation; no synthetic state required.
+- Admission Budget: reproduce_attempts=0; fix_checkpoints=1; review_passes=1
+- Admission Attempts Used: 0
+- Speculation Boundary: direct launch assignment and minimum focused evidence only; no projectile refactor.
 - Regression hazards: hand routing, focus NBT, valid 1.12 server authority
 - Outcome: R-002
-- Notes/Disposition reason: confirmed P0 inside delegated Eldritch audit-and-fix scope
+- Notes/Disposition reason: admitted because the supported production path deterministically hits the fault.
 
 ## F-002 — Primal Orb underwater explosion strength differs
 
@@ -35,66 +50,72 @@
 - Expected: underwater explosion strength is `2`.
 - Exact deltas: `4 -> 2` only in the underwater branch.
 - Affected paths/symbols: `EntityPrimalOrb` impact handling
-- Primary evidence: focused underwater-impact runtime test
-- Regression hazards: normal impact branch and block-hit eligibility
+- Primary evidence: supported water-impact path and one focused runtime observation
+- Production Gate: pass
+- Admission Basis: deterministic_supported_path
+- Production Trigger/Reachability: an ordinary projectile can impact while submerged in supported gameplay.
+- Concrete Impact/Contract: every submerged impact doubles the intended explosion strength.
+- Admission Evidence: direct branch conditions use a supported world state; one bounded runtime probe reproduces it.
+- Admission Budget: reproduce_attempts=1; fix_checkpoints=1; review_passes=1
+- Admission Attempts Used: 1
+- Speculation Boundary: underwater constant/branch only; normal impact and generic explosion cleanup excluded.
+- Regression hazards: normal impact strength and block-hit eligibility
 - Outcome: R-002
-- Notes/Disposition reason: independently verifiable from launch behavior
+- Notes/Disposition reason: admitted after one realistic supported reproduction.
 
-## F-003 — Primal Orb special-effect probability boundary differs
+## F-003 — Primal Orb probability expression differs
 
-- Type: defect
-- Disposition: required
-- Severity: P1
+- Type: benign_delta
+- Disposition: deferred
+- Severity: P2
 - Confidence: confirmed
 - Source IDs: S-001, S-002
 - Audit IDs/Reports: A-007 / reports/A-007-primal.md
 - Oracle: Thaumcraft 4.2.3.5 probability branch
-- Observed: port behavior is described as `1/10%`.
-- Expected: original behavior is described as `2/11%`.
-- Exact deltas: preserve the exact random bound/comparison recovered by the oracle; do not paraphrase as “same chance”.
+- Observed: port expression differs from the original random bound/comparison.
+- Expected: no change is required by the current production-focused objective.
+- Exact deltas: port was summarized as `1/10%`; oracle as `2/11%`.
 - Affected paths/symbols: `EntityPrimalOrb` special-effect random branch
-- Primary evidence: deterministic boundary test against a checked oracle fixture
+- Primary evidence: static oracle comparison
+- Production Gate: fail
+- Admission Basis: no_concrete_impact
+- Production Trigger/Reachability: the branch is reachable, but no concrete harmful gameplay outcome or source contract was established.
+- Concrete Impact/Contract: tiny probability parity delta only; exact parity is not the frozen finish line.
+- Admission Evidence: comparison proves a delta, not production harm.
+- Admission Budget: reproduce_attempts=0; fix_checkpoints=0; review_passes=0
+- Admission Attempts Used: 0
+- Speculation Boundary: do not generate large statistical suites to manufacture importance.
 - Regression hazards: eligibility and placement conditions
-- Outcome: R-002
-- Notes/Disposition reason: exact branch expression must be copied into the real report/fixture
+- Outcome: none
+- Notes/Disposition reason: confirmed delta, deferred because confidence is not actionability.
 
-## F-004 — Primal Orb trail and impact feedback are absent
+## F-004 — Primal Orb trail and impact FX are absent
 
 - Type: defect
-- Disposition: required
-- Severity: P1
+- Disposition: deferred
+- Severity: P2
 - Confidence: confirmed
 - Source IDs: S-001, S-002
 - Audit IDs/Reports: A-007 / reports/A-007-primal.md
 - Oracle: Thaumcraft 4.2.3.5 client FX dispatch
 - Observed: trail and impact FX are absent.
-- Expected: original trail and impact feedback is dispatched through valid 1.12 client representation.
-- Exact deltas: both trail and impact surfaces are missing; they close independently from projectile physics.
+- Expected: no implementation in this production-critical goal; retain as a future UX candidate.
+- Exact deltas: both trail and impact visual surfaces are missing.
 - Affected paths/symbols: `EntityPrimalOrb`, direct FX consumers
-- Primary evidence: focused FX dispatch guard/runtime observation
+- Primary evidence: direct client-code comparison
+- Production Gate: fail
+- Admission Basis: over_budget
+- Production Trigger/Reachability: supported and visible, but it does not block gameplay correctness.
+- Concrete Impact/Contract: cosmetic feedback only; user did not make visual parity mandatory.
+- Admission Evidence: direct comparison, no gameplay failure.
+- Admission Budget: reproduce_attempts=0; fix_checkpoints=0; review_passes=0
+- Admission Attempts Used: 0
+- Speculation Boundary: no client FX framework or broad rendering audit.
 - Regression hazards: no client-authoritative gameplay mutation
-- Outcome: R-002
-- Notes/Disposition reason:
+- Outcome: none
+- Notes/Disposition reason: explicitly deferred to keep the frozen production-fix budget bounded.
 
-## F-005 — Void tool material tuple differs
-
-- Type: defect
-- Disposition: required
-- Severity: P0
-- Confidence: confirmed
-- Source IDs: S-001, S-002
-- Audit IDs/Reports: A-006 / reports/A-006-void.md
-- Oracle: Thaumcraft 4.2.3.5 Void tool material
-- Observed: durability `600`, enchantability `20`.
-- Expected: durability `150`, enchantability `10`.
-- Exact deltas: durability `600 -> 150`; enchantability `20 -> 10`.
-- Affected paths/symbols: Void tool material registration and direct consumers
-- Primary evidence: material tuple test
-- Regression hazards: registry names and valid repair behavior
-- Outcome: R-006
-- Notes/Disposition reason:
-
-## F-006 — Void Axe attack modifier differs
+## F-005 — Void tools apply Wither instead of Weakness
 
 - Type: defect
 - Disposition: required
@@ -102,35 +123,51 @@
 - Confidence: confirmed
 - Source IDs: S-001, S-002
 - Audit IDs/Reports: A-006 / reports/A-006-void.md
-- Oracle: Thaumcraft 4.2.3.5 Void Axe attack modifier
-- Observed: attack modifier `9`.
-- Expected: attack modifier `6`.
-- Exact deltas: `9 -> 6`.
-- Affected paths/symbols: Void Axe construction/attributes
-- Primary evidence: focused attribute test
-- Regression hazards: tool material tuple and attack-speed adaptation
+- Oracle: supported Void tool hit behavior and TC4 effect contract
+- Observed: a normal successful hit applies `Wither`.
+- Expected: a normal successful hit applies `Weakness` for the original duration.
+- Exact deltas: potion identity `Wither -> Weakness`; preserve the supported hit trigger and duration.
+- Affected paths/symbols: Void tool hit behavior and direct effect consumer
+- Primary evidence: every normal successful supported hit enters the wrong effect branch.
+- Production Gate: pass
+- Admission Basis: deterministic_supported_path
+- Production Trigger/Reachability: ordinary combat with a Void tool reaches this branch.
+- Concrete Impact/Contract: every supported hit applies the wrong gameplay debuff.
+- Admission Evidence: deterministic hit path plus focused effect observation.
+- Admission Budget: reproduce_attempts=0; fix_checkpoints=1; review_passes=1
+- Admission Attempts Used: 0
+- Speculation Boundary: potion identity and direct assertion only; no equipment architecture refactor.
+- Regression hazards: original duration, successful-hit condition, registry names
 - Outcome: R-006
-- Notes/Disposition reason:
+- Notes/Disposition reason: admitted because the wrong effect occurs on the normal supported combat path.
 
-## F-007 — Ender Pearl Eldritch aspect tuple differs
+## F-006 — Existing test encodes the wrong Void effect
 
-- Type: defect
-- Disposition: required
-- Severity: P0
+- Type: test_debt
+- Disposition: deferred
+- Severity: P1
 - Confidence: confirmed
 - Source IDs: S-001, S-002
-- Audit IDs/Reports: A-005 / reports/A-005-aspects.md
-- Oracle: Thaumcraft 4.2.3.5 resolved object aspects
-- Observed: `alienis 4` and `praecantatio 2` are missing; `iter` is `2`.
-- Expected: include `alienis 4`, `praecantatio 2`, and `iter 4` in the final resolved tuple.
-- Exact deltas: add `alienis 4`; add `praecantatio 2`; `iter 2 -> 4`.
-- Affected paths/symbols: `ConfigAspects`, Ender Pearl final tag resolution
-- Primary evidence: final resolved aspect fixture, not merely direct-tag source text
-- Regression hazards: port-only direct tags may compensate for recipe-derived TC4 tags and must be judged by final tuple
-- Outcome: R-007
-- Notes/Disposition reason:
+- Audit IDs/Reports: A-006 / reports/A-006-void.md
+- Oracle: admitted F-005 requires Weakness; current test asserts Wither.
+- Observed: the existing assertion freezes the audited regression.
+- Expected: change only this assertion as minimum evidence while implementing F-005; do not make test debt a separate product outcome.
+- Exact deltas: asserted effect `Wither -> Weakness`; no broad test expansion.
+- Affected paths/symbols: named test and Void hit behavior
+- Primary evidence: direct verification artifact for F-005
+- Production Gate: fail
+- Admission Basis: adjacent_non_requirement
+- Production Trigger/Reachability: not an independent production behavior.
+- Concrete Impact/Contract: the assertion is handled inside F-005's evidence budget, not as another required finding.
+- Admission Evidence: exact assertion is directly coupled to F-005.
+- Admission Budget: reproduce_attempts=0; fix_checkpoints=0; review_passes=0
+- Admission Attempts Used: 0
+- Speculation Boundary: one assertion only; no test-suite cleanup or matrix.
+- Regression hazards: test must not invent additional product requirements
+- Outcome: none
+- Notes/Disposition reason: durable test debt, but no independent implementation slot; minimum edit is authorized by F-005.
 
-## F-008 — Research declaration corpus is exact
+## F-007 — Research declaration corpus is exact
 
 - Type: parity
 - Disposition: preserve
@@ -141,62 +178,62 @@
 - Oracle: Thaumcraft 4.2.3.5 research graph corpus
 - Observed: `16/16` entries match.
 - Expected: remain `16/16` after implementation.
-- Exact deltas: none; this is a zero-delta preserve control.
+- Exact deltas: none; zero-delta preserve control.
 - Affected paths/symbols: research graph declarations
 - Primary evidence: existing graph fingerprint guard
-- Regression hazards: broad research-runtime edits must not rewrite declarations
+- Production Gate: not_applicable
+- Admission Basis: preserve_control
+- Production Trigger/Reachability: not applicable; this is already-correct behavior.
+- Concrete Impact/Contract: broad edits must not regress the exact corpus.
+- Admission Evidence: current `16/16` fingerprint.
+- Admission Budget: reproduce_attempts=0; fix_checkpoints=0; review_passes=0
+- Admission Attempts Used: 0
+- Speculation Boundary: validation only; no declaration rewrite.
+- Regression hazards: research-runtime edits must not rewrite declarations
 - Outcome: none
-- Notes/Disposition reason: positive parity promoted to a closure control
+- Notes/Disposition reason: positive parity retained as a closure control.
 
-## F-009 — Existing Void tool test encodes the audited regression
+## Outcome mapping
 
-- Type: test_debt
-- Disposition: required
-- Severity: P0
-- Confidence: confirmed
-- Source IDs: S-001, S-002
-- Audit IDs/Reports: A-006 / reports/A-006-void.md
-- Oracle: original tool effect is Weakness
-- Observed: `ItemVoidCrimsonToolsStaticGuardTest.java:24-43` asserts Wither.
-- Expected: replace the wrong static contract with behavioral parity evidence for Weakness and original duration.
-- Exact deltas: test contract `Wither -> Weakness`; retain exact duration from oracle packet.
-- Affected paths/symbols: named test and Void tool hit behavior
-- Primary evidence: corrected focused test fails before implementation and passes after
-- Regression hazards: do not accept a production-only change while the wrong guard remains
-- Outcome: R-006
-- Notes/Disposition reason: required as minimum evidence for the covered product finding
+## R-002 — Restore production-relevant Primal Orb behavior
 
-## GOAL outcome mapping
-
-## R-002 — Restore Primal Orb behavior
-
-- Covers: F-001, F-002, F-003, F-004
-- Acceptance: every linked physics, probability, and feedback finding is verified against its exact RECON entry.
-- Primary evidence: focused launch, underwater, deterministic probability, and FX tests
+- Covers: F-001, F-002
+- Acceptance: normal casts launch correctly and supported underwater impacts use strength `2`.
+- Primary evidence: focused launch and one underwater-impact test
 - Mandatory broader gates: checkpoint server smoke
-- Change envelope/budget: projectile/focus and direct FX consumers only
-- Stop/Replan if: a valid 1.12 representation requires public API or packet changes outside the frozen envelope
+- Change envelope/budget: projectile launch/underwater branch and direct tests only; max 2 checkpoints; Resource Governor applies
+- Stop/Replan if: two materially different direct attempts fail or the fix needs public API changes
 
-## R-006 — Restore Void equipment behavior and tests
+`F-003` and `F-004` do not block `R-002`, because they were not admitted.
 
-- Covers: F-005, F-006, F-009
-- Acceptance: linked material, attack, effect, repair, armor and test findings are independently verified.
-- Primary evidence: focused item/material/effect tests
+## R-006 — Restore admitted Void hit behavior
+
+- Covers: F-005
+- Acceptance: normal Void-tool hits apply `Weakness`; the focused gate verifies only that admitted behavior.
+- Primary evidence: focused hit-effect test
 - Mandatory broader gates: checkpoint server smoke
-- Change envelope/budget: equipment definitions, direct consumers and focused tests
-- Stop/Replan if: a registry/API compatibility boundary would be crossed
-
-## R-007 — Restore Eldritch aspect tuples
-
-- Covers: F-007
-- Acceptance: final resolved aspect tuples match the checked oracle, including exact amounts.
-- Primary evidence: resolved-object fixture
-- Mandatory broader gates: aspect registry suite
-- Change envelope/budget: aspects and directly required fixture/test only
-- Stop/Replan if: direct tags and recipe-derived tags cannot be adjudicated by final resolved output
+- Change envelope/budget: direct hit-effect branch and its minimum focused assertion; max 1 checkpoint; Resource Governor applies
+- Stop/Replan if: a registry/API boundary or the frozen replan cap is reached
 
 ## Preserve Controls
 
-- F-008 — Research graph remains exactly `16/16`.
+- F-007 — Research graph remains exactly `16/16`.
 
-The important property is mechanical: fixing only launch velocity leaves F-002/F-003/F-004 unresolved, so R-002 cannot become verified.
+## Resource Governor fragment
+
+```text
+Budget-Authority: skill-default
+Max Required Findings: 8
+Frozen Required Finding Count: 3
+Max Total Fix Checkpoints: 12
+Frozen Total Fix Checkpoints: 3
+Max Candidate Reproduction Attempts Per Finding: 1
+Max Material Replans Per Required Finding: 2
+Max Implementation Subagent Waves: 0
+Max Closure Review Passes: 1
+Max Scope Amendments: 0
+Adjacent Finding Auto-Promotions: 0
+Post-Closure Work Items: 0
+```
+
+Главное свойство: Sol видит F-003/F-004, но не имеет права тратить на них implementation-токены. Они durable, не забыты, однако не входят в finish line.
