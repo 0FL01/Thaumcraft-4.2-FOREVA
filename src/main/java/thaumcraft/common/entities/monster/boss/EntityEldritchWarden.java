@@ -16,6 +16,7 @@ import net.minecraft.pathfinding.PathNavigateGround;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.text.translation.I18n;
 import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
@@ -28,12 +29,14 @@ import thaumcraft.common.entities.ai.combat.AIAttackOnCollide;
 import thaumcraft.common.entities.ai.combat.AILongRangeAttack;
 import thaumcraft.common.entities.monster.EntityCultist;
 import thaumcraft.common.entities.monster.EntityEldritchGuardian;
+import thaumcraft.common.entities.monster.mods.ChampionModifier;
 import thaumcraft.common.entities.projectile.EntityEldritchOrb;
 import thaumcraft.common.lib.TCSounds;
 import thaumcraft.common.lib.network.PacketHandler;
 import thaumcraft.common.lib.network.fx.PacketFXBlockArc;
 import thaumcraft.common.lib.network.fx.PacketFXBlockSparkle;
 import thaumcraft.common.lib.network.fx.PacketFXSonic;
+import thaumcraft.common.lib.utils.EntityUtils;
 
 public class EntityEldritchWarden extends EntityThaumcraftBoss implements net.minecraft.entity.IRangedAttackMob, thaumcraft.api.entities.IEldritchMob {
     public static final String[] TITLES = {"Aphoom-Zhah", "Basatan", "Chaugnar Faugn", "Mnomquah", "Nyogtha", "Oorn", "Shaikorth", "Rhan-Tegoth", "Rhogog", "Shudde M'ell", "Vulthoom", "Yag-Kosha", "Yibb-Tstll", "Zathog", "Zushakon"};
@@ -60,6 +63,17 @@ public class EntityEldritchWarden extends EntityThaumcraftBoss implements net.mi
         this.targetTasks.addTask(1, new net.minecraft.entity.ai.EntityAIHurtByTarget(this, false));
         this.targetTasks.addTask(2, new EntityAINearestAttackableTarget(this, EntityPlayer.class, true));
         this.targetTasks.addTask(3, new EntityAINearestAttackableTarget(this, thaumcraft.common.entities.monster.EntityCultist.class, true));
+    }
+
+    @Override
+    public void generateName() {
+        int type = EntityUtils.getChampionModifierType(this);
+        if (type >= 0 && type < ChampionModifier.mods.length) {
+            this.setCustomNameTag(String.format(
+                    I18n.translateToLocal("entity.thaumcraft.eldritchwarden.champion.name"),
+                    this.getTitle(),
+                    ChampionModifier.mods[type].getModNameLocalized()));
+        }
     }
 
     @Override

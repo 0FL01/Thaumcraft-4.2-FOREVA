@@ -17,13 +17,16 @@ import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.text.translation.I18n;
 import net.minecraft.world.DifficultyInstance;
 import thaumcraft.common.Thaumcraft;
 import thaumcraft.common.blocks.BlockLoot;
 import thaumcraft.common.entities.ai.combat.AIAttackOnCollide;
 import thaumcraft.common.entities.ai.combat.AILongRangeAttack;
+import thaumcraft.common.entities.monster.mods.ChampionModifier;
 import thaumcraft.common.entities.projectile.EntityGolemOrb;
 import thaumcraft.common.lib.TCSounds;
+import thaumcraft.common.lib.utils.EntityUtils;
 
 public class EntityEldritchGolem extends EntityThaumcraftBoss implements thaumcraft.api.entities.IEldritchMob, net.minecraft.entity.IRangedAttackMob {
     private static final DataParameter<Boolean> HEADLESS = EntityDataManager.createKey(EntityEldritchGolem.class, DataSerializers.BOOLEAN);
@@ -48,6 +51,16 @@ public class EntityEldritchGolem extends EntityThaumcraftBoss implements thaumcr
         this.tasks.addTask(8, new EntityAILookIdle(this));
         this.targetTasks.addTask(1, new net.minecraft.entity.ai.EntityAIHurtByTarget(this, true));
         this.targetTasks.addTask(2, new EntityAINearestAttackableTarget(this, EntityPlayer.class, true));
+    }
+
+    @Override
+    public void generateName() {
+        int type = EntityUtils.getChampionModifierType(this);
+        if (type >= 0 && type < ChampionModifier.mods.length) {
+            this.setCustomNameTag(String.format(
+                    I18n.translateToLocal("entity.thaumcraft.eldritchgolem.champion.name"),
+                    ChampionModifier.mods[type].getModNameLocalized()));
+        }
     }
 
     @Override
