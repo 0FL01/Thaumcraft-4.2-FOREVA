@@ -34,8 +34,8 @@ Complete the frozen Required Outcomes using the listed Change Envelope and Prima
   - Source: RECON findings for `ItemPrimalCrusher`.
   - Acceptance: The original effective-block matrix, 3x3 plane, player-aware secondary harvesting, Silk Touch/Fortune/XP callbacks, following drops, and durability accounting are preserved through a Forge 1.12-compatible path.
   - Primary evidence: Focused Crusher runtime tests prove effective and excluded blocks, enchanted secondary harvest, drops/XP callbacks, and wear; checkpoint server smoke passes.
-  - Status: pending
-  - Evidence:
+  - Status: verified
+  - Evidence: The exact TC4 effective block set and material-speed rules are restored. Secondary blocks now use the Forge-safe player harvest path with the held enchanted tool, convert fresh drops into target-following entities, and charge durability before each eligible harvest without adding superclass wear. Focused runtime/static tests and `./scripts/dev.sh validate --smoke` passed on 2026-08-03.
 
 - R4: Restore Outer Lands void and portal behavior.
   - Source: RECON findings for `BlockEldritchNothing` and `TeleporterThaumcraft`.
@@ -115,17 +115,17 @@ Complete the frozen Required Outcomes using the listed Change Envelope and Prima
 
 ## Current Checkpoint
 
-- Closes: R3.
-- Smallest next action: Reconstruct the TC4 player-aware secondary harvest helper from `BlockUtils.class`, then add focused Crusher tests before replacing `world.destroyBlock`.
-- Expected evidence: Tests distinguish ordinary destruction from player harvest and prove Silk Touch/Fortune, XP/callback, following-drop, and wear semantics on secondary blocks.
-- Stop or replan if: The original helper depends on an unported global hook whose smallest compatible restoration crosses the R3 change envelope.
+- Closes: R4.
+- Smallest next action: Restore `BlockEldritchNothing` state/material/damage behavior without per-cell TileEntities, then make Outer portal transfers reuse a long-lived teleporter cache.
+- Expected evidence: Focused tests prove non-air identity, unbreakability, exposure state, delayed void damage, no TileEntity allocation, and cache reuse across transfers.
+- Stop or replan if: Preserving the existing renderer requires a state carrier that cannot be represented without the forbidden mass TileEntity allocation.
 
 ## Current State
 
-- Resolved: R1 and R2 are verified. Research runtime and Primal Focus/Orb behavior now follow the audited TC4 contracts.
-- Last relevant evidence: Primal Orb focused tests, `./scripts/dev.sh validate --smoke`, and `./scripts/dev.sh build` passed on 2026-08-03.
+- Resolved: R1-R3 are verified. Research runtime, Primal Focus/Orb, and Primal Crusher behavior now follow the audited TC4 contracts.
+- Last relevant evidence: Primal Crusher focused tests and `./scripts/dev.sh validate --smoke` passed on 2026-08-03.
 - Blocker: None.
-- Next: Commit R2, then begin R3 with the smallest player-aware Crusher harvest path.
+- Next: Commit R3, then restore the R4 Outer void block before changing portal cache ownership.
 
 ## Material Decisions
 
@@ -141,6 +141,7 @@ Complete the frozen Required Outcomes using the listed Change Envelope and Prima
 - 2026-08-03: R1 feedback checkpoint restored the TC4 clue notification/sound, queued research-complete overlay, Thaumonomicon highlights, and live browser refresh. Focused guards and `./scripts/dev.sh build` passed; manual in-game overlay inspection remains part of final client limitations rather than a semantic blocker.
 - 2026-08-03: R1 verified after restoring exact `findMatchingResearch` difficulty precedence, rejecting unknown plain completion keys, and filtering unknown, auto-unlock, and redundant clue keys from persisted capability state. Focused tests and `./scripts/dev.sh validate --smoke` passed.
 - 2026-08-03: R2 verified. Primal Orb launch, impact/water/special-effect semantics, taint placement, focus color/hand animation, and TC4 wisp feedback were restored. Focused tests, server smoke, and build passed; manual visual inspection was not run.
+- 2026-08-03: R3 verified. Primal Crusher now uses the exact TC4 effective matrix, Forge-safe player harvesting, following drops, and original wear accounting. Focused tests and `./scripts/dev.sh validate --smoke` passed.
 
 ## Completion
 

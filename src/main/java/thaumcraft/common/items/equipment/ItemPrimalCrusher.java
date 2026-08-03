@@ -16,6 +16,7 @@ import net.minecraft.item.ItemTool;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.World;
+import net.minecraftforge.common.ForgeHooks;
 import thaumcraft.api.IRepairable;
 import thaumcraft.api.IWarpingGear;
 import thaumcraft.common.config.ConfigBlocks;
@@ -26,18 +27,18 @@ import thaumcraft.common.lib.CreativeTabThaumcraft;
 public class ItemPrimalCrusher extends ItemTool implements IRepairable, IWarpingGear {
 
     private static final Set<Block> EFFECTIVE_BLOCKS = new HashSet<>(Arrays.asList(
-            Blocks.STONE, Blocks.COBBLESTONE, Blocks.STONEBRICK, Blocks.MOSSY_COBBLESTONE,
-            Blocks.SANDSTONE, Blocks.OBSIDIAN, Blocks.IRON_ORE, Blocks.IRON_BLOCK,
-            Blocks.GOLD_ORE, Blocks.GOLD_BLOCK, Blocks.DIAMOND_ORE, Blocks.DIAMOND_BLOCK,
-            Blocks.EMERALD_ORE, Blocks.EMERALD_BLOCK, Blocks.REDSTONE_ORE, Blocks.LIT_REDSTONE_ORE,
-            Blocks.LAPIS_ORE, Blocks.LAPIS_BLOCK, Blocks.COAL_ORE, Blocks.COAL_BLOCK,
-            Blocks.NETHERRACK, Blocks.QUARTZ_ORE, Blocks.GRASS, Blocks.DIRT, Blocks.SAND,
-            Blocks.GRAVEL, Blocks.CLAY, Blocks.SNOW, Blocks.SNOW_LAYER, Blocks.SOUL_SAND,
-            Blocks.MYCELIUM, Blocks.WEB, Blocks.CONCRETE, Blocks.CONCRETE_POWDER, ConfigBlocks.blockTaint,
-            ConfigBlocks.blockTaintFibres
+            Blocks.COBBLESTONE, Blocks.DOUBLE_STONE_SLAB, Blocks.STONE_SLAB, Blocks.STONE,
+            Blocks.SANDSTONE, Blocks.MOSSY_COBBLESTONE, Blocks.IRON_ORE, Blocks.IRON_BLOCK,
+            Blocks.COAL_ORE, Blocks.GOLD_BLOCK, Blocks.GOLD_ORE, Blocks.DIAMOND_ORE,
+            Blocks.DIAMOND_BLOCK, Blocks.ICE, Blocks.NETHERRACK, Blocks.LAPIS_ORE,
+            Blocks.LAPIS_BLOCK, Blocks.REDSTONE_ORE, Blocks.LIT_REDSTONE_ORE, Blocks.RAIL,
+            Blocks.DETECTOR_RAIL, Blocks.GOLDEN_RAIL, Blocks.ACTIVATOR_RAIL, Blocks.GRASS,
+            Blocks.DIRT, Blocks.SAND, Blocks.GRAVEL, Blocks.SNOW_LAYER, Blocks.SNOW,
+            Blocks.CLAY, Blocks.FARMLAND, Blocks.SOUL_SAND, Blocks.MYCELIUM,
+            ConfigBlocks.blockTaint, ConfigBlocks.blockTaintFibres, Blocks.OBSIDIAN
     ));
 
-    private int side = 1;
+    private int side = 0;
 
     public ItemPrimalCrusher(ToolMaterial material) {
         super(3.5F, -2.8F, material, EFFECTIVE_BLOCKS);
@@ -63,9 +64,7 @@ public class ItemPrimalCrusher extends ItemTool implements IRepairable, IWarping
     @Override
     public float getDestroySpeed(ItemStack stack, IBlockState state) {
         Material material = state.getMaterial();
-        if (material == Material.ROCK || material == Material.IRON || material == Material.ANVIL
-                || material == Material.GROUND || material == Material.GRASS || material == Material.SAND
-                || material == Material.CLAY || material == Material.GLASS) {
+        if (material == Material.ROCK || material == Material.IRON || material == Material.ANVIL) {
             return this.efficiency;
         }
         return super.getDestroySpeed(stack, state);
@@ -82,7 +81,11 @@ public class ItemPrimalCrusher extends ItemTool implements IRepairable, IWarping
 
     @Override
     public boolean onBlockDestroyed(ItemStack stack, World world, IBlockState state, BlockPos pos, EntityLivingBase entity) {
-        if (!entity.isSneaking() && !world.isRemote && entity instanceof EntityPlayer && this.isEffectiveAgainst(state)) {
+        if (entity.isSneaking()) {
+            return super.onBlockDestroyed(stack, world, state, pos, entity);
+        }
+        if (!world.isRemote && entity instanceof EntityPlayer
+                && (ForgeHooks.isToolEffective(world, pos, stack) || this.isEffectiveAgainst(state))) {
             for (int aa = -1; aa <= 1; ++aa) {
                 for (int bb = -1; bb <= 1; ++bb) {
                     int xx = 0;
@@ -99,16 +102,18 @@ public class ItemPrimalCrusher extends ItemTool implements IRepairable, IWarping
                         yy = bb;
                     }
                     BlockPos target = pos.add(xx, yy, zz);
-                    if (target.equals(pos) || !world.isBlockModifiable((EntityPlayer) entity, target)) continue;
+                    if (!world.isBlockModifiable((EntityPlayer) entity, target)) continue;
                     IBlockState targetState = world.getBlockState(target);
-                    if (!this.isEffectiveAgainst(targetState) || targetState.getBlockHardness(world, target) < 0.0F) continue;
-                    if (world.destroyBlock(target, true)) {
-                        stack.damageItem(1, entity);
-                    }
+                    if (targetState.getBlockHardness(world, target) < 0.0F
+                            || !ForgeHooks.isToolEffective(world, target, stack)
+                            && !this.isEffectiveAgainst(targetState)) continue;
+                    stack.damageItem(1, entity);
+                    thaumcraft.common.lib.utils.BlockUtils.harvestBlock(
+                            world, target, (EntityPlayer) entity, true, 2);
                 }
             }
         }
-        return super.onBlockDestroyed(stack, world, state, pos, entity);
+        return true;
     }
 
     private boolean isEffectiveAgainst(IBlockState state) {

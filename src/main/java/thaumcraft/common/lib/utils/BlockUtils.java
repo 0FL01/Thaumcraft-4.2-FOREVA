@@ -3,6 +3,7 @@ package thaumcraft.common.lib.utils;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -19,8 +20,10 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.ForgeHooks;
 import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.event.world.BlockEvent;
+import thaumcraft.common.entities.EntityFollowingItem;
 
 import javax.annotation.Nullable;
+import java.util.List;
 
 public class BlockUtils {
 
@@ -108,6 +111,11 @@ public class BlockUtils {
     }
 
     public static boolean harvestBlock(World world, BlockPos pos, @Nullable EntityPlayer player) {
+        return harvestBlock(world, pos, player, false, 0);
+    }
+
+    public static boolean harvestBlock(World world, BlockPos pos, @Nullable EntityPlayer player,
+                                       boolean followItem, int color) {
         if (world == null || world.isRemote) return false;
         IBlockState state = world.getBlockState(pos);
         Block block = state.getBlock();
@@ -135,9 +143,33 @@ public class BlockUtils {
         block.onBlockHarvested(world, pos, state, player);
         if (!block.removedByPlayer(state, world, pos, player, canHarvest)) return false;
         block.onPlayerDestroy(world, pos, state);
-        if (canHarvest) block.harvestBlock(world, player, pos, state, tile, tool);
+        if (canHarvest) {
+            block.harvestBlock(world, player, pos, state, tile, tool);
+            if (followItem) replaceFreshDropsWithFollowing(world, pos, player, color);
+        }
         if (!creative && xp > 0) block.dropXpOnBlockBreak(world, pos, xp);
         return true;
+    }
+
+    private static void replaceFreshDropsWithFollowing(World world, BlockPos pos, EntityPlayer player, int color) {
+        List<EntityItem> drops = world.getEntitiesWithinAABB(
+                EntityItem.class,
+                new net.minecraft.util.math.AxisAlignedBB(pos).grow(2.0D));
+        for (Entity entity : drops) {
+            if (entity.isDead || !(entity instanceof EntityItem)
+                    || entity.ticksExisted != 0 || entity instanceof EntityFollowingItem) {
+                continue;
+            }
+            EntityItem dropped = (EntityItem) entity;
+            EntityFollowingItem following = new EntityFollowingItem(
+                    world, dropped.posX, dropped.posY, dropped.posZ,
+                    dropped.getItem().copy(), player, color);
+            following.motionX = dropped.motionX;
+            following.motionY = dropped.motionY;
+            following.motionZ = dropped.motionZ;
+            world.spawnEntity(following);
+            dropped.setDead();
+        }
     }
 
     public static void destroyBlockPartially(World world, int breakerId, BlockPos pos, int progress) {
