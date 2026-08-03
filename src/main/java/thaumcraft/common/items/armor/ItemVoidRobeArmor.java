@@ -123,11 +123,6 @@ public class ItemVoidRobeArmor extends ItemArmor implements IRepairable, IRunicA
     }
 
     @Override
-    public void onArmorTick(World world, EntityPlayer player, ItemStack stack) {
-        ItemVoidArmor.repairVoidArmor(stack, world, player);
-    }
-
-    @Override
     public boolean showNodes(ItemStack itemstack, EntityLivingBase player) {
         return this.armorType == EntityEquipmentSlot.HEAD;
     }

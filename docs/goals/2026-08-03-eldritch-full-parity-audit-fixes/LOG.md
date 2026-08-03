@@ -112,3 +112,25 @@ Log-Policy: append-only; correct prior entries with a new event
 - Result: Both runs passed with zero errors and zero warnings; contract/recon/source/report hashes are recorded in STATE.
 - Decision/Reason: The ledger is eligible for the S-002-required pre-implementation commit. The user-owned toolkit `SKILL.md` remains outside this commit.
 - Next: Commit only `.opencode/active-goal` and `docs/goals/2026-08-03-eldritch-full-parity-audit-fixes/**`, then begin R-001/F-018.
+
+## E-0011 — 2026-08-03 — checkpoint_start
+
+- State-Revision: 10
+- Outcomes/Findings: R-001 / F-018
+- Git before/after: `f27fddfb` / `f27fddfb`; only user-owned `SKILL.md` dirty
+- Action: Started the single allowed F-018 fix checkpoint and incremented `checkpoints_started` to 1/1.
+- Hypothesis: The port's 1.12 inventory lifecycle invokes both `onUpdate` and `onArmorTick` for equipped Void armor; retaining one equipped repair path and the ordinary stored-stack path restores TC4's one-point cadence.
+- Expected Evidence: Focused lifecycle assertions show exactly one repair at tick multiples of 20 for equipped and stored pieces; no global inventory behavior changes.
+- Stop/Replan: Stop if base and robe armor require different callbacks or if a global Forge lifecycle change would be needed.
+- Next: Read the frozen outcome/finding and direct product/test paths, then apply the smallest callback fix.
+
+## E-0012 — 2026-08-03 — checkpoint_closed
+
+- State-Revision: 11
+- Outcomes/Findings: R-001 / F-018
+- Git before/after: `f27fddfb` / checkpoint commit pending
+- Action: Removed the redundant `onArmorTick` repair callbacks from base Void armor and Void Robe armor while retaining ordinary `onUpdate`; added a focused real-inventory lifecycle assertion for equipped base, equipped robe, and stored base stacks.
+- Evidence: `./scripts/dev.sh gradle test --tests thaumcraft.common.items.armor.ItemVoidArmorParityTest` -> BUILD SUCCESSFUL; `./scripts/dev.sh validate --smoke` -> PASS (`git-status compile+test+reobf check-jar smoke-server`); product diff check clean.
+- Result: At tick 20 each supported stack repairs exactly `5 -> 4`; stored-stack repair, server/living-owner guards, cadence, and creative no-repair behavior remain intact.
+- Decision/Reason: Close F-018 and derive R-001 verified. The change is confined to its one-checkpoint envelope and does not alter global Forge inventory lifecycle.
+- Next: Commit the R-001 checkpoint excluding user-owned `SKILL.md`, then start R-002/F-035.

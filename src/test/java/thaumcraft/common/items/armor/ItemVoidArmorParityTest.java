@@ -101,6 +101,34 @@ public class ItemVoidArmorParityTest {
         assertEquals(5, creativeStack.getItemDamage());
     }
 
+    @Test
+    public void equippedAndStoredVoidArmorEachRepairOncePerCadence() {
+        TestWorld world = new TestWorld();
+        assertRepairsOnceThroughInventoryLifecycle(world,
+                new ItemVoidArmor(ThaumcraftApi.armorMatVoid, 0, EntityEquipmentSlot.CHEST), true);
+        assertRepairsOnceThroughInventoryLifecycle(world,
+                new ItemVoidRobeArmor(ThaumcraftApi.armorMatVoid, 0, EntityEquipmentSlot.CHEST), true);
+        assertRepairsOnceThroughInventoryLifecycle(world,
+                new ItemVoidArmor(ThaumcraftApi.armorMatVoid, 0, EntityEquipmentSlot.CHEST), false);
+    }
+
+    private static void assertRepairsOnceThroughInventoryLifecycle(TestWorld world, ItemArmor armor,
+                                                                    boolean equipped) {
+        TestPlayer player = new TestPlayer(world);
+        ItemStack stack = new ItemStack(armor);
+        stack.setItemDamage(5);
+        player.ticksExisted = 20;
+        if (equipped) {
+            player.setItemStackToSlot(EntityEquipmentSlot.CHEST, stack);
+        } else {
+            player.inventory.setInventorySlotContents(0, stack);
+        }
+
+        player.inventory.decrementAnimations();
+
+        assertEquals(4, stack.getItemDamage());
+    }
+
     private static void assertArmorMaterial(ItemArmor.ArmorMaterial material, int durabilityFactor,
                                             int head, int chest, int legs, int feet) {
         assertEquals(head, material.getDamageReductionAmount(EntityEquipmentSlot.HEAD));

@@ -44,11 +44,6 @@ public class ItemVoidArmor extends ItemArmor implements IRepairable, IRunicArmor
     }
 
     @Override
-    public void onArmorTick(World world, EntityPlayer player, ItemStack stack) {
-        repairVoidArmor(stack, world, player);
-    }
-
-    @Override
     public int getWarp(ItemStack itemstack, EntityPlayer player) {
         return 1;
     }
