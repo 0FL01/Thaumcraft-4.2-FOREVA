@@ -23,6 +23,8 @@ public class ConfigResearchRecipeKeyCoverageTest {
     private static final Pattern RECIPE_GET_PATTERN = Pattern.compile(
             "(?:recipes\\.get|recipeI|recipeArcane|recipeCrucible|recipeInfusion|recipeInfusionEnchantment|recipeList)\\(\"([^\"]+)\"\\)");
     private static final Pattern RECIPE_PUT_PATTERN = Pattern.compile("recipes\\.put\\(\"([^\"]+)\"");
+    private static final Pattern NUMBERED_RECIPE_PUT_PATTERN =
+            Pattern.compile("recipes\\.put\\(\"([^\"]+)\"\\s*\\+\\s*\\w+\\s*,");
     private static final Pattern SPECIAL_RECIPE_HANDLE_PATTERN = Pattern.compile("specialResearchRecipeHandles\\.put\\(\"([^\"]+)\"");
     private static final Pattern SPECIAL_RECIPE_HANDLE_BRIDGE_PATTERN = Pattern.compile("addSpecialResearchRecipeHandle\\(\"([^\"]+)\"");
     private static final Pattern ARCANE_PATTERN = Pattern.compile("registerArcaneRecipe\\(\"([^\"]+)\"");
@@ -44,6 +46,13 @@ public class ConfigResearchRecipeKeyCoverageTest {
         availableKeys.addAll(extract(recipesSource, SHAPELESS_ARCANE_PATTERN));
         availableKeys.addAll(extract(recipesSource, INFUSION_PATTERN));
         availableKeys.addAll(extract(recipesSource, INFUSION_ENCHANT_PATTERN));
+        for (String prefix : extract(recipesSource, NUMBERED_RECIPE_PUT_PATTERN)) {
+            for (String key : lookedUpKeys) {
+                if (key.startsWith(prefix)) {
+                    availableKeys.add(key);
+                }
+            }
+        }
 
         List<String> missing = new ArrayList<>();
         for (String key : lookedUpKeys) {

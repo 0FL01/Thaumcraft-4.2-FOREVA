@@ -8,6 +8,7 @@ import net.minecraft.util.ResourceLocation;
 import thaumcraft.api.ThaumcraftApi;
 import thaumcraft.api.aspects.Aspect;
 import thaumcraft.api.aspects.AspectList;
+import thaumcraft.api.crafting.CrucibleRecipe;
 import thaumcraft.api.research.ResearchItem;
 import thaumcraft.api.research.ResearchPage;
 import thaumcraft.common.config.Config;
@@ -48,6 +49,13 @@ final class ConfigResearchAlchemy {
                         new ResearchPage("tc.research_page.CRUCIBLE.3"),
                         new ResearchPage(ConfigResearch.recipeList("Crucible")),
                         new ResearchPage("tc.research_page.CRUCIBLE.4"),
+                        new ResearchPage(new CrucibleRecipe[]{
+                                ConfigResearch.recipeCrucible("BalancedShard_0"),
+                                ConfigResearch.recipeCrucible("BalancedShard_1"),
+                                ConfigResearch.recipeCrucible("BalancedShard_2"),
+                                ConfigResearch.recipeCrucible("BalancedShard_3"),
+                                ConfigResearch.recipeCrucible("BalancedShard_4"),
+                                ConfigResearch.recipeCrucible("BalancedShard_5")}),
                         new ResearchPage("tc.research_page.CRUCIBLE.5"),
                         new ResearchPage(new ItemStack(ConfigItems.itemShard, 1, 6)))
                 .setStub()

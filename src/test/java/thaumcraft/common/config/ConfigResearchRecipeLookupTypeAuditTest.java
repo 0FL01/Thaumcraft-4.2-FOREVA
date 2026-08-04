@@ -37,6 +37,8 @@ public class ConfigResearchRecipeLookupTypeAuditTest {
     private static final Pattern INFUSION_ENCHANT_REGISTER_PATTERN = Pattern.compile("registerInfusionEnchantmentRecipe\\(\"([^\"]+)\"");
     private static final Pattern CRUCIBLE_REGISTER_PATTERN =
             Pattern.compile("recipes\\.put\\(\"([^\"]+)\"\\s*,\\s*ThaumcraftApi\\.addCrucibleRecipe\\(");
+    private static final Pattern NUMBERED_CRUCIBLE_REGISTER_PATTERN =
+            Pattern.compile("recipes\\.put\\(\"([^\"]+)\"\\s*\\+\\s*\\w+\\s*,\\s*ThaumcraftApi\\.addCrucibleRecipe\\(");
     private static final Pattern CRUCIBLE_FIELD_DECL_PATTERN = Pattern.compile("private\\s+static\\s+CrucibleRecipe\\s+(\\w+)\\s*;");
     private static final Pattern DIRECT_VAR_PUT_PATTERN = Pattern.compile("recipes\\.put\\(\"([^\"]+)\"\\s*,\\s*(\\w+)\\s*\\);");
     private static final Pattern LIST_REGISTER_PATTERN =
@@ -65,6 +67,13 @@ public class ConfigResearchRecipeLookupTypeAuditTest {
 
         Set<String> arcaneRegistered = extract(recipesSource, ARCANE_REGISTER_PATTERN);
         Set<String> crucibleRegistered = extract(recipesSource, CRUCIBLE_REGISTER_PATTERN);
+        for (String prefix : extract(recipesSource, NUMBERED_CRUCIBLE_REGISTER_PATTERN)) {
+            for (String key : lookupFamilies.get("Crucible")) {
+                if (key.startsWith(prefix)) {
+                    crucibleRegistered.add(key);
+                }
+            }
+        }
         crucibleRegistered.addAll(extractKeysBackedByDeclaredType(
                 recipesSource,
                 CRUCIBLE_FIELD_DECL_PATTERN,
