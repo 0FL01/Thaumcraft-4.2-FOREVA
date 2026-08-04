@@ -3,6 +3,7 @@ package thaumcraft.common.container;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.Container;
+import net.minecraft.inventory.IContainerListener;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
@@ -11,6 +12,11 @@ import thaumcraft.common.tiles.TileAlchemyFurnace;
 
 public class ContainerAlchemyFurnace extends Container {
     private final TileAlchemyFurnace furnace;
+    private int lastCookTime;
+    private int lastBurnTime;
+    private int lastItemBurnTime;
+    private int lastVis;
+    private int lastSmeltTime;
 
     public ContainerAlchemyFurnace() {
         this(null, null);
@@ -47,6 +53,58 @@ public class ContainerAlchemyFurnace extends Container {
     }
 
     @Override
+    public void addListener(IContainerListener listener) {
+        super.addListener(listener);
+        if (this.furnace == null) return;
+        listener.sendWindowProperty(this, 0, this.furnace.furnaceCookTime);
+        listener.sendWindowProperty(this, 1, this.furnace.furnaceBurnTime);
+        listener.sendWindowProperty(this, 2, this.furnace.currentItemBurnTime);
+        listener.sendWindowProperty(this, 3, this.furnace.vis);
+        listener.sendWindowProperty(this, 4, this.furnace.smeltTime);
+    }
+
+    @Override
+    public void detectAndSendChanges() {
+        super.detectAndSendChanges();
+        if (this.furnace == null) return;
+        for (IContainerListener listener : this.listeners) {
+            if (this.lastCookTime != this.furnace.furnaceCookTime) {
+                listener.sendWindowProperty(this, 0, this.furnace.furnaceCookTime);
+            }
+            if (this.lastBurnTime != this.furnace.furnaceBurnTime) {
+                listener.sendWindowProperty(this, 1, this.furnace.furnaceBurnTime);
+            }
+            if (this.lastItemBurnTime != this.furnace.currentItemBurnTime) {
+                listener.sendWindowProperty(this, 2, this.furnace.currentItemBurnTime);
+            }
+            if (this.lastVis != this.furnace.vis) {
+                listener.sendWindowProperty(this, 3, this.furnace.vis);
+            }
+            if (this.lastSmeltTime != this.furnace.smeltTime) {
+                listener.sendWindowProperty(this, 4, this.furnace.smeltTime);
+            }
+        }
+        this.lastCookTime = this.furnace.furnaceCookTime;
+        this.lastBurnTime = this.furnace.furnaceBurnTime;
+        this.lastItemBurnTime = this.furnace.currentItemBurnTime;
+        this.lastVis = this.furnace.vis;
+        this.lastSmeltTime = this.furnace.smeltTime;
+    }
+
+    @Override
+    public void updateProgressBar(int id, int data) {
+        if (this.furnace == null) return;
+        switch (id) {
+            case 0: this.furnace.furnaceCookTime = data; break;
+            case 1: this.furnace.furnaceBurnTime = data; break;
+            case 2: this.furnace.currentItemBurnTime = data; break;
+            case 3: this.furnace.vis = data; break;
+            case 4: this.furnace.smeltTime = data; break;
+            default: break;
+        }
+    }
+
+    @Override
     public ItemStack transferStackInSlot(EntityPlayer playerIn, int index) {
         ItemStack original = ItemStack.EMPTY;
         Slot slot = index >= 0 && index < this.inventorySlots.size() ? this.inventorySlots.get(index) : null;
@@ -55,10 +113,12 @@ public class ContainerAlchemyFurnace extends Container {
         original = stack.copy();
         if (index < 2) {
             if (!this.mergeItemStack(stack, 2, this.inventorySlots.size(), true)) return ItemStack.EMPTY;
+        } else if (TileAlchemyFurnace.isItemFuel(stack)) {
+            if (!this.mergeItemStack(stack, 1, 2, false)
+                    && (this.furnace == null || !this.furnace.isItemValidForSlot(0, stack)
+                    || !this.mergeItemStack(stack, 0, 1, false))) return ItemStack.EMPTY;
         } else if (this.furnace != null && this.furnace.isItemValidForSlot(0, stack)) {
             if (!this.mergeItemStack(stack, 0, 1, false)) return ItemStack.EMPTY;
-        } else if (TileAlchemyFurnace.isItemFuel(stack)) {
-            if (!this.mergeItemStack(stack, 1, 2, false)) return ItemStack.EMPTY;
         } else if (index >= 2 && index < 29) {
             if (!this.mergeItemStack(stack, 29, 38, false)) return ItemStack.EMPTY;
         } else if (index >= 29 && index < 38) {
