@@ -1,6 +1,6 @@
 # Goal: TC4 mob drop parity restoration
 
-Status: active
+Status: complete
 Source: User-approved mob drop parity audit and implementation instruction dated 2026-08-04
 Last updated: 2026-08-04
 
@@ -48,8 +48,8 @@ Complete the frozen Required Outcomes using the listed Change Envelope and Prima
   - Source: User instruction to implement iteratively with commits and `AGENTS.md` common/server workflow.
   - Acceptance: R1-R4 are committed independently; focused suites, `./scripts/dev.sh validate --smoke`, `git diff --check`, and final `./scripts/dev.sh build` pass; the distributable jar is current.
   - Primary evidence: Commit history, successful commands, and `build/libs/Thaumcraft-1.0.0-universal.jar`.
-  - Status: pending
-  - Evidence:
+  - Status: verified
+  - Evidence: R1-R4 were committed as `5f5bf7a3`, `245f27b6`, `a9bda8cb`, and `2d065699`. Every checkpoint passed focused tests and `./scripts/dev.sh validate --smoke`; the closure diff check passed and final `./scripts/dev.sh build` produced the current universal jar on 2026-08-04.
 
 ### Constraints
 
@@ -82,17 +82,17 @@ Complete the frozen Required Outcomes using the listed Change Envelope and Prima
 
 ## Current Checkpoint
 
-- Closes: R5.
-- Smallest next action: Commit R4, run the closure diff/constraint check, then build the final distributable jar.
-- Expected evidence: Scoped commit history, `git diff --check`, clean status except the goal closure update, and `./scripts/dev.sh build` pass.
-- Stop or replan if: The closure check finds an unresolved R-item or a final gate fails because of the current commits.
+- Closes: None; the closure check passed.
+- Smallest next action: Stop. The frozen objective is complete.
+- Expected evidence: No further evidence is required for this objective.
+- Stop or replan if: A new authoritative instruction creates a separate objective.
 
 ## Current State
 
-- Resolved: R1-R4 are verified.
-- Last relevant evidence: Focused `DropEdgeParityRuntimeTest`, affected static guards, full validation, and dedicated-server smoke passed on 2026-08-04.
+- Resolved: R1-R5 are verified; the frozen mob drop parity objective is complete.
+- Last relevant evidence: Final closure diff check and `./scripts/dev.sh build` passed on 2026-08-04 after all focused suites and dedicated-server smoke checkpoints.
 - Blocker: None.
-- Next: Commit R4 and close R5 with the final build.
+- Next: None.
 
 ## Material Decisions
 
@@ -109,10 +109,11 @@ Complete the frozen Required Outcomes using the listed Change Envelope and Prima
 - 2026-08-04: R2 verified. Portal XP/talk mapping and Spore/Swarmer size-XP plus talk intervals were restored; focused tests and `./scripts/dev.sh validate --smoke` passed.
 - 2026-08-04: R3 verified. Original recently-hit aspect-orb eligibility and inheritance-aware champion whitelist matching were restored without replacing public/config contracts; focused tests and `./scripts/dev.sh validate --smoke` passed.
 - 2026-08-04: R4 verified. Pech equipment chance, Giant Taintacle vertical duplicate suppression, and all-36-slot trunk spilling were restored; focused tests and `./scripts/dev.sh validate --smoke` passed.
+- 2026-08-04: R5 verified and closure passed. The four implementation checkpoints are committed, the full validation/server-smoke gate remained green, the aggregate diff check passed, and the final distributable build succeeded.
 
 ## Completion
 
-- Resolved outcomes:
-- Commands and artifacts:
-- Constraint and diff-scope check:
-- Final status:
+- Resolved outcomes: R1-R5 verified. Audited direct drops, XP/talk mappings, global death rewards, Pech/Giant/Trunk edge cases, validation, commits, and distributable artifact meet the frozen acceptance criteria.
+- Commands and artifacts: Focused Gradle suites for `EntityDropParityRuntimeTest`, `EntityExperienceParityRuntimeTest`, `EventHandlerDropParityRuntimeTest`, `DropEdgeParityRuntimeTest`, and affected guards; `./scripts/dev.sh validate --smoke` after every common/server checkpoint; `git diff --check`; final `./scripts/dev.sh build`; `build/libs/Thaumcraft-1.0.0-universal.jar`.
+- Constraint and diff-scope check: Reference source/jars remained unmodified; Java/Forge/dependency/public API and identifier contracts were preserved; changes stayed within the eleven approved defects and focused tests; each independent implementation checkpoint has a scoped commit.
+- Final status: complete on 2026-08-04.
