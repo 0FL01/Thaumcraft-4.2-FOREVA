@@ -12,6 +12,8 @@ Read these files before changing code:
 
 Use `thaumcraft_src/**` and `Thaumcraft-1.7.10-4.2.3.5.jar` as read-only original 1.7.10 reference material. Use `Thaumcraft-1.12.2-6.1.BETA26.jar` as a read-only Thaumcraft 6 (1.12.2) donor reference for display transforms, model conventions, and positioning values.
 
+The original 1.7.10 material is a behavioral and asset reference only. It does not define a save-migration or backward-compatibility requirement.
+
 Asset origin: assets (textures, sounds, models, lang, shaders, etc.) for the port can be copied from `thaumcraft_src/assets/` into `src/main/resources/assets/thaumcraft/`. This is the source of truth for all ported assets — do not recreate assets from scratch when a working original exists in `thaumcraft_src/assets/`.
 
 ## Hard rules
@@ -27,6 +29,13 @@ Asset origin: assets (textures, sounds, models, lang, shaders, etc.) for the por
 - Do not make unrelated dependency changes.
 - Do not claim parity based on compile success alone.
 - Preserve existing behavior unless the current task explicitly authorizes a behavior change.
+
+## Save compatibility baseline
+
+- This port supports fresh Forge 1.12.2 worlds only.
+- Worlds, player data, entity or tile NBT, inventories, research data, and configuration data created by the original Thaumcraft 4.2.3.5 on Minecraft 1.7.10 are unsupported inputs. There is no supported in-place upgrade or migration path from 1.7.10.
+- Do not add, audit, test, or treat legacy 1.7.10 save/NBT migration as parity work unless the user explicitly requests it.
+- Save compatibility requirements apply only to data created by this Forge 1.12.2 port.
 
 ## Project stack
 
