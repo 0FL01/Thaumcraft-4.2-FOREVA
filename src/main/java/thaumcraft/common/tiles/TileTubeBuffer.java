@@ -15,6 +15,7 @@ import thaumcraft.api.aspects.Aspect;
 import thaumcraft.api.aspects.AspectList;
 import thaumcraft.api.aspects.IAspectContainer;
 import thaumcraft.api.aspects.IEssentiaTransport;
+import thaumcraft.api.ThaumcraftApiHelper;
 import thaumcraft.api.wands.IWandable;
 import thaumcraft.common.lib.TCSounds;
 
@@ -141,6 +142,24 @@ public class TileTubeBuffer extends TileThaumcraft implements ITickable, IAspect
     @Override
     public int takeEssentia(Aspect aspect, int amount, EnumFacing face) {
         if (!this.canOutputTo(face)) return 0;
+        TileEntity requested = ThaumcraftApiHelper.getConnectableTile(this.world,
+                this.pos.getX(), this.pos.getY(), this.pos.getZ(), face);
+        int requestedSuction = requested instanceof IEssentiaTransport
+                ? ((IEssentiaTransport) requested).getSuctionAmount(face.getOpposite()) : 0;
+        for (EnumFacing direction : EnumFacing.values()) {
+            if (!this.canOutputTo(direction) || direction == face) continue;
+            TileEntity neighbour = ThaumcraftApiHelper.getConnectableTile(this.world,
+                    this.pos.getX(), this.pos.getY(), this.pos.getZ(), direction);
+            if (!(neighbour instanceof IEssentiaTransport)) continue;
+            IEssentiaTransport transport = (IEssentiaTransport) neighbour;
+            int neighbourSuction = transport.getSuctionAmount(direction.getOpposite());
+            Aspect suctionType = transport.getSuctionType(direction.getOpposite());
+            if ((suctionType == null || suctionType == aspect)
+                    && requestedSuction < neighbourSuction
+                    && this.getSuctionAmount(direction) < neighbourSuction) {
+                return 0;
+            }
+        }
         int take = Math.min(amount, this.aspects.getAmount(aspect));
         return take > 0 && this.takeFromContainer(aspect, take) ? take : 0;
     }
