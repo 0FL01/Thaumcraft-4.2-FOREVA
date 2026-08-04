@@ -14,6 +14,7 @@ import thaumcraft.api.aspects.AspectList;
 import thaumcraft.common.Thaumcraft;
 import thaumcraft.common.blocks.BlockJarItem;
 import thaumcraft.common.config.Config;
+import thaumcraft.common.config.ConfigBlocks;
 import thaumcraft.common.items.baubles.ItemGirdleHover;
 import thaumcraft.common.lib.TCSounds;
 import thaumcraft.common.lib.network.PacketHandler;
@@ -74,8 +75,6 @@ public class Hover {
         Float prevStep = PREV_STEP.remove(playerId);
         if (prevStep != null) {
             player.stepHeight = prevStep;
-        } else if (player.stepHeight > 0.5F) {
-            player.stepHeight = 0.5F;
         }
     }
 
@@ -128,6 +127,8 @@ public class Hover {
 
         setHover(player.getEntityId(), hover);
         tag.setBoolean("hover", hover);
+        boolean abilitiesChanged = !player.capabilities.isCreativeMode
+                && (player.capabilities.allowFlying != hover || player.capabilities.isFlying != hover);
         if (!player.capabilities.isCreativeMode) {
             player.capabilities.allowFlying = hover;
             player.capabilities.isFlying = hover;
@@ -141,7 +142,7 @@ public class Hover {
         } else if (player.fallDistance > 0.0F) {
             player.fallDistance *= 0.75F;
         }
-        if (!player.world.isRemote && player instanceof EntityPlayerMP) {
+        if (abilitiesChanged && !player.world.isRemote && player instanceof EntityPlayerMP) {
             ((EntityPlayerMP) player).sendPlayerAbilities();
         }
     }
@@ -154,10 +155,7 @@ public class Hover {
     public static boolean expendCharge(EntityPlayer player, ItemStack harness, boolean doit) {
         if (!harness.hasTagCompound() || !harness.getTagCompound().hasKey("jar")) return false;
         ItemStack jar = new ItemStack(harness.getTagCompound().getCompoundTag("jar"));
-        if (jar.isEmpty() || !(jar.getItem() instanceof BlockJarItem)) return false;
-        BlockJarItem container = (BlockJarItem) jar.getItem();
-        AspectList aspects = container.getAspects(jar);
-        if (aspects == null || aspects.getAmount(Aspect.ENERGY) <= 0) return false;
+        if (!isNormalEnergyJar(jar)) return false;
 
         int charge = harness.getTagCompound().getShort("charge") & 65535;
         int threshold = Math.max(1, Math.round(360.0F * getEfficiency(player)));
@@ -167,18 +165,31 @@ public class Hover {
             return true;
         }
 
-        charge = 0;
-        aspects.remove(Aspect.ENERGY, 1);
-        container.setAspects(jar, aspects);
+        return consumeEnergyUnit(harness, jar);
+    }
+
+    static boolean consumeEnergyUnit(ItemStack harness, ItemStack jar) {
+        if (!isNormalEnergyJar(jar)) return false;
+        harness.getTagCompound().setShort("charge", (short) 0);
+        BlockJarItem container = (BlockJarItem) jar.getItem();
+        AspectList aspects = container.getAspects(jar);
+        int energy = aspects.getAmount(Aspect.ENERGY) - 1;
+        container.setAspects(jar, energy > 0
+                ? new AspectList().add(Aspect.ENERGY, energy) : new AspectList());
         NBTTagCompound jarTag = new NBTTagCompound();
         jar.writeToNBT(jarTag);
         harness.getTagCompound().setTag("jar", jarTag);
-        if (aspects.getAmount(Aspect.ENERGY) <= 0) {
-            harness.getTagCompound().setShort("charge", (short) charge);
+        return energy > 0;
+    }
+
+    public static boolean isNormalEnergyJar(ItemStack jar) {
+        if (jar == null || jar.isEmpty() || !(jar.getItem() instanceof BlockJarItem)
+                || ((BlockJarItem) jar.getItem()).getBlock() != ConfigBlocks.blockJar
+                || jar.getMetadata() != 0) {
             return false;
         }
-        harness.getTagCompound().setShort("charge", (short) charge);
-        return true;
+        AspectList aspects = ((BlockJarItem) jar.getItem()).getAspects(jar);
+        return aspects != null && aspects.size() > 0 && aspects.getAmount(Aspect.ENERGY) > 0;
     }
 
     private static void applyClientHoverMotion(EntityPlayer player, ItemStack harness) {

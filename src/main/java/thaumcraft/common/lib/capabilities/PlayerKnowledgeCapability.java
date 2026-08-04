@@ -332,7 +332,6 @@ public class PlayerKnowledgeCapability implements IPlayerKnowledge {
     private static final String TAG_SCANNED_ITEMS = "scannedItems";
     private static final String TAG_SCANNED_PHENOMENA = "scannedPhenomena";
     private static final String TAG_RESEARCH_COMPLETE = "researchComplete";
-    private static final String TAG_RUNIC_CHARGE = "runicCharge";
 
     @Override
     public NBTTagCompound serializeNBT() {
@@ -342,7 +341,6 @@ public class PlayerKnowledgeCapability implements IPlayerKnowledge {
         nbt.setInteger(TAG_WARP_STICKY, warpSticky);
         nbt.setInteger(TAG_WARP_TEMP, warpTemp);
         nbt.setInteger(TAG_WARP_COUNTER, warpCounter);
-        nbt.setInteger(TAG_RUNIC_CHARGE, runicCharge);
         nbt.setBoolean(TAG_INITIALIZED_ASPECTS, initializedAspects);
 
         writeAspectList(nbt, TAG_DISCOVERED_ASPECTS, discoveredAspects);
@@ -362,7 +360,7 @@ public class PlayerKnowledgeCapability implements IPlayerKnowledge {
         warpSticky = nbt.getInteger(TAG_WARP_STICKY);
         warpTemp = nbt.getInteger(TAG_WARP_TEMP);
         warpCounter = nbt.getInteger(TAG_WARP_COUNTER);
-        runicCharge = nbt.getInteger(TAG_RUNIC_CHARGE);
+        runicCharge = 0;
         initializedAspects = nbt.getBoolean(TAG_INITIALIZED_ASPECTS);
 
         readAspectList(nbt, TAG_DISCOVERED_ASPECTS, discoveredAspects);

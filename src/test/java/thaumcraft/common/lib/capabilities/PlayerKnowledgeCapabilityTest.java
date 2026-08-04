@@ -51,7 +51,8 @@ public class PlayerKnowledgeCapabilityTest {
         assertEquals(2, copy.getWarpSticky());
         assertEquals(1, copy.getWarpTemp());
         assertEquals(9, copy.getWarpCounter());
-        assertEquals(4, copy.getRunicCharge());
+        assertFalse(nbt.hasKey("runicCharge"));
+        assertEquals(0, copy.getRunicCharge());
     }
 
     @Test
@@ -106,6 +107,18 @@ public class PlayerKnowledgeCapabilityTest {
         assertEquals(0, knowledge.getWarpSticky());
         assertEquals(0, knowledge.getWarpTemp());
         assertEquals(0, knowledge.getWarpCounter());
+        assertEquals(0, knowledge.getRunicCharge());
+    }
+
+    @Test
+    public void legacyRunicChargeIsIgnoredOnLoad() {
+        NBTTagCompound legacy = new NBTTagCompound();
+        legacy.setInteger("runicCharge", 12);
+        PlayerKnowledgeCapability knowledge = new PlayerKnowledgeCapability();
+        knowledge.setRunicCharge(3);
+
+        knowledge.deserializeNBT(legacy);
+
         assertEquals(0, knowledge.getRunicCharge());
     }
 

@@ -30,12 +30,9 @@ import thaumcraft.common.items.baubles.ItemGirdleRunic;
 import thaumcraft.common.items.baubles.ItemRingRunic;
 import thaumcraft.common.items.wands.WandManager;
 import thaumcraft.common.lib.TCSounds;
-import thaumcraft.common.lib.capabilities.IPlayerKnowledge;
-import thaumcraft.common.lib.capabilities.PlayerKnowledgeProvider;
 import thaumcraft.common.lib.network.PacketHandler;
 import thaumcraft.common.lib.network.fx.PacketFXShield;
 import thaumcraft.common.lib.network.playerdata.PacketRunicCharge;
-import thaumcraft.common.lib.research.ResearchManager;
 import thaumcraft.common.lib.utils.EntityUtils;
 
 import java.util.HashMap;
@@ -326,11 +323,6 @@ public class EventHandlerRunic {
     private void setRunicCharge(EntityPlayer player, int charge, int max, boolean send) {
         int safeCharge = Math.max(0, charge);
         this.runicCharge.put(player.getEntityId(), safeCharge);
-        IPlayerKnowledge knowledge = player.getCapability(PlayerKnowledgeProvider.PLAYER_KNOWLEDGE, null);
-        if (knowledge != null) {
-            knowledge.setRunicCharge(safeCharge);
-            ResearchManager.updateCache(player.getName(), knowledge);
-        }
         if (send) {
             syncRunicCharge(player, safeCharge, max);
         }

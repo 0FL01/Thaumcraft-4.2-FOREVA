@@ -4,7 +4,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.particle.Particle;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.monster.EntityMob;
@@ -13,11 +13,18 @@ import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.lwjgl.opengl.GL11;
+import thaumcraft.codechicken.lib.render.CCModel;
+import thaumcraft.codechicken.lib.render.CCRenderState;
+import thaumcraft.codechicken.lib.vec.Vector3;
 import thaumcraft.common.entities.monster.EntityCultist;
+
+import java.util.Map;
 
 @SideOnly(Side.CLIENT)
 public class FXShieldRunes extends Particle {
-    private static final int LIGHTMAP_FULLBRIGHT = 0x00F000F0;
+    private static final ResourceLocation MODEL =
+            new ResourceLocation("thaumcraft", "textures/models/hemis.obj");
+    private static final CCModel SHIELD_MODEL = loadShieldModel();
 
     private final Entity target;
     private final float yaw;
@@ -62,9 +69,6 @@ public class FXShieldRunes extends Particle {
             return;
         }
 
-        Tessellator tessellator = Tessellator.getInstance();
-        BufferBuilder buffer = tessellator.getBuffer();
-
         float progress = (this.particleAge + partialTicks) / (float) this.particleMaxAge;
         int frame = Math.min(15, (int) (14.0F * progress) + 1);
         boolean useRipple = this.target instanceof EntityMob && !(this.target instanceof EntityCultist);
@@ -90,12 +94,14 @@ public class FXShieldRunes extends Particle {
         GlStateManager.scale(0.4D * this.target.height, 0.4D * this.target.height, 0.4D * this.target.height);
         GlStateManager.color(tint, tint, tint, alpha);
 
-        buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.PARTICLE_POSITION_TEX_COLOR_LMAP);
-        addLitVertex(buffer, -1.0D, -1.0D, 0.0D, 0.0D, 1.0D, tint, alpha, LIGHTMAP_FULLBRIGHT);
-        addLitVertex(buffer,  1.0D, -1.0D, 0.0D, 1.0D, 1.0D, tint, alpha, LIGHTMAP_FULLBRIGHT);
-        addLitVertex(buffer,  1.0D,  1.0D, 0.0D, 1.0D, 0.0D, tint, alpha, LIGHTMAP_FULLBRIGHT);
-        addLitVertex(buffer, -1.0D,  1.0D, 0.0D, 0.0D, 0.0D, tint, alpha, LIGHTMAP_FULLBRIGHT);
-        tessellator.draw();
+        float previousLightX = OpenGlHelper.lastBrightnessX;
+        float previousLightY = OpenGlHelper.lastBrightnessY;
+        OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, 220.0F, 0.0F);
+        try {
+            renderModel(SHIELD_MODEL);
+        } finally {
+            OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, previousLightX, previousLightY);
+        }
 
         GlStateManager.disableBlend();
         GlStateManager.enableCull();
@@ -104,15 +110,29 @@ public class FXShieldRunes extends Particle {
         GlStateManager.popMatrix();
     }
 
-    private void addLitVertex(BufferBuilder buffer, double x, double y, double z,
-                              double u, double v, float red, float alpha, int lightmap) {
-        int lightU = lightmap & 0xFFFF;
-        int lightV = lightmap >> 16 & 0xFFFF;
-        buffer.pos(x, y, z)
-                .tex(u, v)
-                .color(red, red, red, alpha)
-                .lightmap(lightU, lightV)
-                .endVertex();
+    private static CCModel loadShieldModel() {
+        Map<String, CCModel> models = CCModel.parseObjModels(MODEL);
+        CCModel model = models.get("GeoSphere001");
+        if (model == null) {
+            throw new IllegalStateException("Runic shield OBJ is missing GeoSphere001");
+        }
+        CCModel corrected = model.backfacedCopy();
+        Vector3[] normals = corrected.normals();
+        if (normals != null) {
+            for (Vector3 normal : normals) {
+                if (normal != null) {
+                    normal.negate();
+                }
+            }
+        }
+        return corrected;
+    }
+
+    private static void renderModel(CCModel model) {
+        CCRenderState.reset();
+        CCRenderState.startDrawing(GL11.GL_TRIANGLES, DefaultVertexFormats.OLDMODEL_POSITION_TEX_NORMAL);
+        model.render(CCRenderState.normalAttrib);
+        CCRenderState.draw();
     }
 
     @Override

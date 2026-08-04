@@ -42,10 +42,15 @@ public class HoverHarnessSoundLifecycleContractTest {
         assertTrue(handle.contains("boolean hover = tag.getBoolean(\"hover\");")
                 && handle.contains("setHover(player, harness, false);")
                 && handle.contains("notifyClientHoverChange(player, false);")
+                && handle.contains("boolean abilitiesChanged")
                 && handle.contains("player.capabilities.allowFlying = hover;")
-                && handle.contains("player.capabilities.isFlying = hover;"));
+                && handle.contains("player.capabilities.isFlying = hover;")
+                && handle.contains("if (abilitiesChanged && !player.world.isRemote"));
         assertTrue(expend.indexOf("if (charge < threshold)") < expend.indexOf("charge + 1")
-                && expend.indexOf("charge + 1") < expend.indexOf("aspects.remove(Aspect.ENERGY, 1)"));
+                && expend.indexOf("charge + 1") < expend.indexOf("consumeEnergyUnit(harness, jar)"));
+        assertTrue(expend.contains("isNormalEnergyJar(jar)")
+                && expend.contains("aspects.getAmount(Aspect.ENERGY) - 1")
+                && expend.contains("new AspectList().add(Aspect.ENERGY, energy)"));
         assertFalse(expend.contains("capabilities.isCreativeMode"));
     }
 

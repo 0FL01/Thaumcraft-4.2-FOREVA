@@ -9,9 +9,7 @@ import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.world.World;
-import thaumcraft.api.aspects.Aspect;
-import thaumcraft.api.aspects.AspectList;
-import thaumcraft.common.blocks.BlockJarItem;
+import thaumcraft.common.items.armor.Hover;
 import thaumcraft.common.items.armor.ItemHoverHarness;
 
 public class ContainerHoverHarness extends Container {
@@ -178,9 +176,7 @@ public class ContainerHoverHarness extends Container {
 
         @Override
         public boolean isItemValidForSlot(int index, ItemStack stack) {
-            if (stack == null || stack.isEmpty() || !(stack.getItem() instanceof BlockJarItem)) return false;
-            AspectList aspects = ((BlockJarItem) stack.getItem()).getAspects(stack);
-            return aspects != null && aspects.size() > 0 && aspects.getAmount(Aspect.ENERGY) > 0;
+            return Hover.isNormalEnergyJar(stack);
         }
 
         @Override

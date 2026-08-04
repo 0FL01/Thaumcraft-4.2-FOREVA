@@ -212,7 +212,7 @@ public class EventHandlerEntity {
                 knowledge.setPlayer(player);
                 ResearchManager.initializeFreshPlayerData(player);
                 if (Thaumcraft.instance != null && Thaumcraft.instance.runicEventHandler != null) {
-                    Thaumcraft.instance.runicEventHandler.runicCharge.put(player.getEntityId(), knowledge.getRunicCharge());
+                    Thaumcraft.instance.runicEventHandler.runicCharge.remove(player.getEntityId());
                     Thaumcraft.instance.runicEventHandler.isDirty = true;
                 }
                 ResearchManager.updateCache(player.getName(), knowledge);
@@ -309,9 +309,12 @@ public class EventHandlerEntity {
         PacketHandler.INSTANCE.sendTo(new PacketSyncScannedPhenomena(knowledge.getScannedPhenomena()), (EntityPlayerMP) player);
         PacketHandler.INSTANCE.sendTo(new PacketSyncWarp(knowledge.getWarpPerm(), knowledge.getWarpSticky(), knowledge.getWarpTemp(), knowledge.getWarpCounter()), (EntityPlayerMP) player);
         if (Thaumcraft.instance != null && Thaumcraft.instance.runicEventHandler != null) {
-            Integer[] info = Thaumcraft.instance.runicEventHandler.runicInfo.get(player.getEntityId());
+            EventHandlerRunic handler = Thaumcraft.instance.runicEventHandler;
+            Integer[] info = handler.runicInfo.get(player.getEntityId());
             int max = info == null || info.length == 0 ? 0 : info[0];
-            PacketHandler.INSTANCE.sendTo(new PacketRunicCharge(player.getEntityId(), knowledge.getRunicCharge(), max), (EntityPlayerMP) player);
+            int charge = handler.runicCharge.containsKey(player.getEntityId())
+                    ? handler.runicCharge.get(player.getEntityId()) : 0;
+            PacketHandler.INSTANCE.sendTo(new PacketRunicCharge(player.getEntityId(), charge, max), (EntityPlayerMP) player);
         }
         ResearchManager.updateCache(player.getName(), knowledge);
     }
@@ -325,7 +328,15 @@ public class EventHandlerEntity {
     public void onLivingUpdate(LivingEvent.LivingUpdateEvent event) {
         EntityLivingBase living = event.getEntityLiving();
         if (living instanceof EntityPlayer) {
-            enforceHoverHarnessEquipped((EntityPlayer) living);
+            EntityPlayer player = (EntityPlayer) living;
+            enforceHoverHarnessEquipped(player);
+            applyTravellerHasteMovement(player);
+            if (living.world.isRemote) {
+                ItemStack boots = player.inventory.armorInventory.get(0);
+                if (player.isSneaking() || boots.isEmpty() || boots.getItem() != ConfigItems.itemBootsTraveller) {
+                    Hover.resetHover(player);
+                }
+            }
         }
         if (living.world.isRemote) {
             return;
@@ -347,7 +358,6 @@ public class EventHandlerEntity {
             if (!player.capabilities.isCreativeMode && player.ticksExisted % 40 == 0) {
                 repairPlayerEquipment(player);
             }
-            applyTravellerHasteMovement(player);
             enforceHoverFlightBounds(player);
         }
 
@@ -825,7 +835,7 @@ public class EventHandlerEntity {
             return;
         }
         ItemStack boots = player.inventory.armorInventory.get(0);
-        if (boots.isEmpty() || boots.getItem() != ConfigItems.itemBootsTraveller || player.moveForward <= 0.0F) {
+        if (boots.isEmpty() || player.moveForward <= 0.0F) {
             return;
         }
 

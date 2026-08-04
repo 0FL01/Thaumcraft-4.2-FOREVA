@@ -18,8 +18,18 @@ public class ClientLayer3ParticleRenderContractTest {
         assertLayer3SelfContained("src/main/java/thaumcraft/client/fx/particles/FXBreaking.java");
         assertLayer3SelfContained("src/main/java/thaumcraft/client/fx/particles/FXSmokeSpiral.java");
         assertLayer3SelfContained("src/main/java/thaumcraft/client/fx/other/FXSonic.java");
-        assertLayer3SelfContained("src/main/java/thaumcraft/client/fx/other/FXShieldRunes.java");
+        assertLayer3Model("src/main/java/thaumcraft/client/fx/other/FXShieldRunes.java");
         assertLayer3SelfContained("src/main/java/thaumcraft/client/fx/other/FXBlockWard.java");
+    }
+
+    private static void assertLayer3Model(String path) throws IOException {
+        String source = read(path);
+        assertTrue(path + " must stay on layer 3 custom rendering", source.contains("return 3;"));
+        assertTrue(path + " must render the authored triangle model",
+                source.contains("CCRenderState.startDrawing(GL11.GL_TRIANGLES, DefaultVertexFormats.OLDMODEL_POSITION_TEX_NORMAL)")
+                        && source.contains("CCRenderState.draw();"));
+        assertEquals(path + " must not retain a flat quad pass", 0,
+                countOccurrences(source, "buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.PARTICLE_POSITION_TEX_COLOR_LMAP);"));
     }
 
     private static void assertLayer3SelfContained(String path) throws IOException {
