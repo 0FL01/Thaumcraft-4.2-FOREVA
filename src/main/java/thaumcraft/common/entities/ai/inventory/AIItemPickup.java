@@ -71,7 +71,7 @@ public class AIItemPickup extends EntityAIBase {
             if (ei.getItem().isEmpty()) continue;
             if (hasPickupDelay(ei)) continue;
             if (!theGolem.inventory.allEmpty() && theGolem.inventory.getAmountNeededSmart(ei.getItem(),
-                theGolem.checkOreDict()) <= 0) continue;
+                theGolem.getUpgradeAmount(5) > 0) <= 0) continue;
             if (theGolem.getCarried() != null && !theGolem.getCarried().isEmpty()
                 && (!InventoryUtils.areItemStacksEqualStrict(theGolem.getCarried(), ei.getItem())
                 || ei.getItem().getCount() > theGolem.getCarrySpace())) continue;
@@ -189,7 +189,7 @@ public class AIItemPickup extends EntityAIBase {
         }
         if (amount == 0) return;
         theGolem.world.playSound(null, theGolem.getPosition(),
-            net.minecraft.util.SoundEvent.REGISTRY.getObject(new net.minecraft.util.ResourceLocation("random.pop")),
+            net.minecraft.init.SoundEvents.ENTITY_ITEM_PICKUP,
             net.minecraft.util.SoundCategory.NEUTRAL, 0.2F,
             ((theGolem.world.rand.nextFloat() - theGolem.world.rand.nextFloat()) * 0.7F + 1.0F) * 2.0F);
     }

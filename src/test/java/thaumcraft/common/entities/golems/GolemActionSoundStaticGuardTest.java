@@ -36,6 +36,13 @@ public class GolemActionSoundStaticGuardTest {
         }
     }
 
+    @Test
+    public void itemPickupUsesRegistered112Sound() throws IOException {
+        String source = read("src/main/java/thaumcraft/common/entities/ai/inventory/AIItemPickup.java");
+        assertTrue(source.contains("SoundEvents.ENTITY_ITEM_PICKUP"));
+        assertFalse(source.contains("random.pop"));
+    }
+
     private static String read(String path) throws IOException {
         return new String(Files.readAllBytes(Paths.get(path)), StandardCharsets.UTF_8);
     }

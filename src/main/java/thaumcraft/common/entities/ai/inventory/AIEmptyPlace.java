@@ -57,7 +57,7 @@ public class AIEmptyPlace extends EntityAIBase {
                 if (dc != null) {
                     for (Integer side : GolemHelper.getMarkedSides(theGolem, tile, color)) {
                         ItemStack is = InventoryUtils.placeItemStackIntoInventory(theGolem.getCarried(), (IInventory) dc, side, false);
-                        if (!ItemStack.areItemStacksEqual(is, theGolem.itemCarried)) continue;
+                        if (ItemStack.areItemStacksEqual(is, theGolem.itemCarried)) continue;
                         this.xx = pos.getX();
                         this.yy = pos.getY();
                         this.zz = pos.getZ();

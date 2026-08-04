@@ -216,6 +216,7 @@ public class GolemHelper {
         if (tile == null) return null;
 
         ArrayList<ItemStack> qr = new ArrayList<>();
+        boolean fuzzyAmount = golem.getUpgradeAmount(5) > 0;
         for (int q = 0; q < slotCount; q++) {
             ItemStack toCheck = golem.inventory.inventory[q];
             if (toCheck == null || toCheck.isEmpty()) continue;
@@ -235,12 +236,12 @@ public class GolemHelper {
                             golem.checkOreDict(), golem.ignoreDamage(), golem.ignoreNBT())) {
                             foundAmount += slotStack.getCount();
                             if (foundAmount >= golem.inventory.getAmountNeededSmart(slotStack,
-                                golem.checkOreDict())) {
+                                fuzzyAmount)) {
                                 break;
                             }
                         }
                     }
-                    if (foundAmount >= golem.inventory.getAmountNeededSmart(toCheck, golem.checkOreDict())) {
+                    if (foundAmount >= golem.inventory.getAmountNeededSmart(toCheck, fuzzyAmount)) {
                         break;
                     }
                 } else if (currentTile instanceof IInventory) {
@@ -253,12 +254,12 @@ public class GolemHelper {
                             golem.checkOreDict(), golem.ignoreDamage(), golem.ignoreNBT())) {
                             foundAmount += slotStack.getCount();
                             if (foundAmount >= golem.inventory.getAmountNeededSmart(slotStack,
-                                golem.checkOreDict())) {
+                                fuzzyAmount)) {
                                 break;
                             }
                         }
                     }
-                    if (foundAmount >= golem.inventory.getAmountNeededSmart(toCheck, golem.checkOreDict())) {
+                    if (foundAmount >= golem.inventory.getAmountNeededSmart(toCheck, fuzzyAmount)) {
                         break;
                     }
                 } else {
@@ -288,11 +289,11 @@ public class GolemHelper {
         ArrayList<ItemStack> needed = null;
         switch (golem.getCore()) {
             case 1:
-                needed = golem.inventory.getItemsNeeded(fuzzy);
+                needed = golem.inventory.getItemsNeeded(golem.getUpgradeAmount(5) > 0);
                 if (needed == null || needed.isEmpty()) return null;
                 return filterEmptyCore(golem, needed);
             case 8:
-                needed = golem.inventory.getItemsNeeded(fuzzy);
+                needed = golem.inventory.getItemsNeeded(golem.getUpgradeAmount(5) > 0);
                 if (needed == null || needed.isEmpty()) return null;
                 return filterUseCore(golem, needed);
             case 10:
@@ -492,46 +493,26 @@ public class GolemHelper {
     // --- First item with timeout ---
 
     public static ItemStack getFirstItemUsingTimeout(EntityGolemBase golem, IInventory inventory, int side, boolean doit) {
-        ItemStack stack1 = null;
         EnumFacing face = (side >= 0 && side < EnumFacing.VALUES.length) ? EnumFacing.VALUES[side] : null;
-
+        int[] slots;
         if (inventory instanceof ISidedInventory && face != null) {
-            ISidedInventory sided = (ISidedInventory) inventory;
-            int[] aint = sided.getSlotsForFace(face);
-            for (int slot : aint) {
-                ItemStack slotStack = inventory.getStackInSlot(slot);
-                if (slotStack.isEmpty()) continue;
-                if (isOnTimeOut(golem, slotStack)) continue;
-                if (stack1 == null) {
-                    stack1 = slotStack.copy();
-                    stack1.setCount(golem.getCarrySpace());
-                }
-                if (stack1 != null) {
-                    stack1 = InventoryUtils.attemptExtraction(inventory, stack1, slot, face, false, false, false, doit);
-                }
-                if (stack1 == null) break;
-            }
+            slots = ((ISidedInventory) inventory).getSlotsForFace(face);
         } else {
-            int k = inventory.getSizeInventory();
-            for (int l = 0; l < k; l++) {
-                ItemStack slotStack = inventory.getStackInSlot(l);
-                if (slotStack.isEmpty()) continue;
-                if (isOnTimeOut(golem, slotStack)) continue;
-                if (stack1 == null) {
-                    stack1 = slotStack.copy();
-                    stack1.setCount(golem.getCarrySpace());
-                }
-                if (stack1 != null) {
-                    stack1 = InventoryUtils.attemptExtraction(inventory, stack1, l, face, false, false, false, doit);
-                }
-                if (stack1 == null) break;
-            }
+            slots = new int[inventory.getSizeInventory()];
+            for (int slot = 0; slot < slots.length; slot++) slots[slot] = slot;
         }
-        if (stack1 == null || stack1.isEmpty()) {
-            if (doit) inventory.markDirty();
-            return ItemStack.EMPTY;
+
+        for (int slot : slots) {
+            ItemStack slotStack = inventory.getStackInSlot(slot);
+            if (slotStack.isEmpty() || isOnTimeOut(golem, slotStack)) continue;
+            ItemStack requested = slotStack.copy();
+            requested.setCount(golem.getCarrySpace());
+            ItemStack extracted = InventoryUtils.attemptExtraction(
+                inventory, requested, slot, face, false, false, false, doit);
+            if (extracted != null && !extracted.isEmpty()) return extracted.copy();
         }
-        return stack1.copy();
+        if (doit) inventory.markDirty();
+        return ItemStack.EMPTY;
     }
 
     // --- Home Container ---

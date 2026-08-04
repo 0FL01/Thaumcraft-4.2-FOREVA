@@ -37,17 +37,15 @@ public class AIFillGoto extends EntityAIBase {
         if (mi == null || mi.isEmpty()) return false;
 
         ArrayList<ItemStack> missingItems = new ArrayList<>();
-        if (theGolem.checkOreDict()) {
+        if (theGolem.getUpgradeAmount(5) > 0) {
             for (ItemStack stack : mi) {
                 int[] ids = net.minecraftforge.oredict.OreDictionary.getOreIDs(stack);
                 if (ids.length > 0) {
-                    for (int id : ids) {
-                        String oreName = net.minecraftforge.oredict.OreDictionary.getOreName(id);
-                        if (oreName != null && !oreName.isEmpty()) {
-                            net.minecraft.util.NonNullList<ItemStack> ores = net.minecraftforge.oredict.OreDictionary.getOres(oreName);
-                            for (ItemStack ore : ores) {
-                                missingItems.add(ore.copy());
-                            }
+                    String oreName = net.minecraftforge.oredict.OreDictionary.getOreName(ids[0]);
+                    if (oreName != null && !oreName.isEmpty()) {
+                        net.minecraft.util.NonNullList<ItemStack> ores = net.minecraftforge.oredict.OreDictionary.getOres(oreName);
+                        for (ItemStack ore : ores) {
+                            missingItems.add(ore.copy());
                         }
                     }
                 } else {

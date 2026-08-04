@@ -147,13 +147,11 @@ public class InventoryMob implements IInventory {
             if (fuzzy) {
                 int[] ids = net.minecraftforge.oredict.OreDictionary.getOreIDs(this.inventory[a]);
                 if (ids.length > 0) {
-                    for (int id : ids) {
-                        String oreName = net.minecraftforge.oredict.OreDictionary.getOreName(id);
-                        if (oreName != null && !oreName.isEmpty()) {
-                            net.minecraft.util.NonNullList<ItemStack> ores = net.minecraftforge.oredict.OreDictionary.getOres(oreName);
-                            for (ItemStack ore : ores) {
-                                needed.add(ore.copy());
-                            }
+                    String oreName = net.minecraftforge.oredict.OreDictionary.getOreName(ids[0]);
+                    if (oreName != null && !oreName.isEmpty()) {
+                        net.minecraft.util.NonNullList<ItemStack> ores = net.minecraftforge.oredict.OreDictionary.getOres(oreName);
+                        for (ItemStack ore : ores) {
+                            needed.add(ore.copy());
                         }
                     }
                     continue;

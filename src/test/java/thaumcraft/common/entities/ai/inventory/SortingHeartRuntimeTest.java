@@ -7,6 +7,7 @@ import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.ISidedInventory;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.profiler.Profiler;
 import net.minecraft.tileentity.TileEntity;
@@ -25,6 +26,7 @@ import net.minecraft.world.biome.Biome;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.IChunkProvider;
 import net.minecraft.world.storage.WorldInfo;
+import net.minecraftforge.oredict.OreDictionary;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import thaumcraft.common.config.Config;
@@ -48,10 +50,100 @@ public class SortingHeartRuntimeTest {
     private static final BlockPos HOME = new BlockPos(0, 64, 0);
     private static final BlockPos SOURCE = HOME.down();
     private static int nextEntityId = 3000;
+    private static Item fuzzyFilter;
+    private static Item fuzzyFirst;
+    private static Item fuzzyOther;
 
     @BeforeClass
     public static void bootstrapMinecraftStatics() {
         Bootstrap.register();
+        fuzzyFilter = Items.CHORUS_FRUIT;
+        Item primary = Items.CHORUS_FRUIT_POPPED;
+        Item secondary = Items.BEETROOT;
+        OreDictionary.registerOre("tcR13CandidatesPrimary", new ItemStack(fuzzyFilter));
+        OreDictionary.registerOre("tcR13CandidatesPrimary", new ItemStack(primary));
+        OreDictionary.registerOre("tcR13CandidatesSecondary", new ItemStack(fuzzyFilter));
+        OreDictionary.registerOre("tcR13CandidatesSecondary", new ItemStack(secondary));
+        boolean primaryFirst = "tcR13CandidatesPrimary".equals(OreDictionary.getOreName(
+                OreDictionary.getOreIDs(new ItemStack(fuzzyFilter))[0]));
+        fuzzyFirst = primaryFirst ? primary : secondary;
+        fuzzyOther = primaryFirst ? secondary : primary;
+    }
+
+    @Test
+    public void unfilteredExtractionSkipsInaccessibleFirstCandidateAndReturnsFirstSuccess() {
+        EntityGolemBase golem = sortingGolem(new TestWorld());
+        PartiallyExtractableInventory inventory = new PartiallyExtractableInventory();
+        inventory.setInventorySlotContents(0, new ItemStack(Items.APPLE, 3));
+        inventory.setInventorySlotContents(1, new ItemStack(Items.PAPER, 5));
+
+        ItemStack simulated = GolemHelper.getFirstItemUsingTimeout(
+                golem, inventory, EnumFacing.UP.ordinal(), false);
+        assertSame(Items.PAPER, simulated.getItem());
+        assertEquals(4, simulated.getCount());
+        assertEquals(5, inventory.getStackInSlot(1).getCount());
+
+        ItemStack extracted = GolemHelper.getFirstItemUsingTimeout(
+                golem, inventory, EnumFacing.UP.ordinal(), true);
+        assertSame(Items.PAPER, extracted.getItem());
+        assertEquals(4, extracted.getCount());
+        assertEquals(1, inventory.getStackInSlot(1).getCount());
+    }
+
+    @Test
+    public void perditioControlsFirstOreCandidateExpansionWhileToggleControlsComparison() {
+        TestWorld world = new TestWorld();
+        BlockPos targetPos = new BlockPos(2, 64, 0);
+        world.addTile(targetPos, new TestInventory(3));
+        EntityGolemBase golem = configuredGolem(world, 1);
+        golem.inventory.setInventorySlotContents(0, new ItemStack(fuzzyFilter, 7));
+        golem.setToggle(5, true);
+        setMarkers(golem, marker(targetPos, EnumFacing.UP, -1));
+
+        ArrayList<ItemStack> withoutPerditio = GolemHelper.getItemsNeeded(golem, true);
+        assertTrue(containsItem(withoutPerditio, fuzzyFilter));
+        assertFalse(containsItem(withoutPerditio, fuzzyFirst));
+
+        golem.setUpgrade(0, (byte) 5);
+        ArrayList<ItemStack> withPerditio = GolemHelper.getItemsNeeded(golem, false);
+        assertTrue(containsItem(withPerditio, fuzzyFirst));
+        assertFalse(containsItem(withPerditio, fuzzyOther));
+        assertFalse(thaumcraft.common.lib.utils.InventoryUtils.areItemStacksEqual(
+                new ItemStack(fuzzyFilter), new ItemStack(fuzzyFirst), false, false, false));
+        assertTrue(thaumcraft.common.lib.utils.InventoryUtils.areItemStacksEqual(
+                new ItemStack(fuzzyFilter), new ItemStack(fuzzyFirst), true, false, false));
+    }
+
+    @Test
+    public void emptyHeartUsesPartnerHalfWhenMarkedChestHalfIsFull() {
+        TestWorld world = new TestWorld();
+        BlockPos leftPos = new BlockPos(1, 64, 0);
+        BlockPos rightPos = leftPos.east();
+        TileEntityChest left = world.addTile(leftPos, new TileEntityChest());
+        TileEntityChest right = world.addTile(rightPos, new TileEntityChest());
+        left.adjacentChestXPos = right;
+        right.adjacentChestXNeg = left;
+        for (int slot = 0; slot < left.getSizeInventory(); slot++) {
+            left.setInventorySlotContents(slot, new ItemStack(Items.APPLE, 64));
+        }
+        EntityGolemBase golem = configuredGolem(world, 1);
+        golem.setPosition(leftPos.getX() + 0.5, leftPos.getY() + 0.5, leftPos.getZ() + 0.5);
+        golem.setCarried(new ItemStack(Items.PAPER, 3));
+        setMarkers(golem, marker(leftPos, EnumFacing.UP, -1));
+
+        AIEmptyPlace place = new AIEmptyPlace(golem);
+        assertTrue(place.shouldExecute());
+        boolean oldChestInteract = Config.golemChestInteract;
+        Config.golemChestInteract = false;
+        try {
+            place.startExecuting();
+        } finally {
+            Config.golemChestInteract = oldChestInteract;
+        }
+
+        assertEquals(64, left.getStackInSlot(0).getCount());
+        assertEquals(3, right.getStackInSlot(0).getCount());
+        assertTrue(golem.getCarried().isEmpty());
     }
 
     @Test
@@ -208,15 +300,27 @@ public class SortingHeartRuntimeTest {
     }
 
     private static EntityGolemBase sortingGolem(TestWorld world) {
+        return configuredGolem(world, 10);
+    }
+
+    private static EntityGolemBase configuredGolem(TestWorld world, int core) {
         EntityGolemBase golem = new EntityGolemBase(world, EnumGolemType.WOOD, false);
         golem.setEntityId(nextEntityId++);
-        golem.setCore((byte) 10);
+        golem.setCore((byte) core);
         golem.homeFacing = EnumFacing.UP.ordinal();
         golem.setHomePosAndDistance(HOME, 32);
         golem.setPosition(HOME.getX() + 0.5, HOME.getY() + 0.5, HOME.getZ() + 0.5);
         golem.setupGolem();
         golem.setupGolemInventory();
         return golem;
+    }
+
+    private static boolean containsItem(ArrayList<ItemStack> stacks, Item item) {
+        if (stacks == null) return false;
+        for (ItemStack stack : stacks) {
+            if (!stack.isEmpty() && stack.getItem() == item) return true;
+        }
+        return false;
     }
 
     private static Marker marker(BlockPos pos, EnumFacing side, int color) {
@@ -320,6 +424,27 @@ public class SortingHeartRuntimeTest {
         @Override
         public boolean canExtractItem(int index, ItemStack stack, EnumFacing direction) {
             return direction == allowedFace;
+        }
+    }
+
+    private static final class PartiallyExtractableInventory extends TestInventory implements ISidedInventory {
+        private PartiallyExtractableInventory() {
+            super(2);
+        }
+
+        @Override
+        public int[] getSlotsForFace(EnumFacing side) {
+            return new int[]{0, 1};
+        }
+
+        @Override
+        public boolean canInsertItem(int index, ItemStack itemStackIn, EnumFacing direction) {
+            return true;
+        }
+
+        @Override
+        public boolean canExtractItem(int index, ItemStack stack, EnumFacing direction) {
+            return index == 1;
         }
     }
 

@@ -110,6 +110,16 @@ public class InventoryUtilsRuntimeTest {
     }
 
     @Test
+    public void fuzzyCandidateExpansionUsesOnlyTheFiltersFirstOreId() {
+        InventoryMob inventory = new InventoryMob(1);
+        inventory.setInventorySlotContents(0, new ItemStack(oreFilter, 19));
+
+        java.util.ArrayList<ItemStack> needed = inventory.getItemsNeeded(true);
+        assertTrue(containsItem(needed, oreFirst));
+        assertFalse(containsItem(needed, oreOther));
+    }
+
+    @Test
     public void comparisonRestoresDamageMetadataWildcardAndNbtToggles() {
         ItemStack damagedA = new ItemStack(Items.IRON_PICKAXE, 1, 3);
         ItemStack damagedB = new ItemStack(Items.IRON_PICKAXE, 1, 9);
@@ -150,6 +160,13 @@ public class InventoryUtilsRuntimeTest {
         tag.setInteger("filter", value);
         stack.setTagCompound(tag);
         return stack;
+    }
+
+    private static boolean containsItem(java.util.ArrayList<ItemStack> stacks, Item item) {
+        for (ItemStack stack : stacks) {
+            if (!stack.isEmpty() && stack.getItem() == item) return true;
+        }
+        return false;
     }
 
     private static final class TestSidedInventory extends InventoryBasic implements ISidedInventory {
