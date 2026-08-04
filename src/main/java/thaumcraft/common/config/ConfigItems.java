@@ -213,7 +213,7 @@ public class ConfigItems {
         CreativeTabThaumcraft tab = CreativeTabThaumcraft.tabThaumcraft;
 
         // Initialize tool materials
-        TOOLMAT_THAUMIUM = EnumHelper.addToolMaterial("THAUMIUM", 3, 500, 7.0f, 2.5f, 18);
+        TOOLMAT_THAUMIUM = thaumcraft.api.ThaumcraftApi.toolMatThaumium;
         TOOLMAT_VOID = thaumcraft.api.ThaumcraftApi.toolMatVoid;
         TOOLMAT_ELEMENTAL = thaumcraft.api.ThaumcraftApi.toolMatElemental;
         TOOLMAT_PRIMALVOID = EnumHelper.addToolMaterial("PRIMALVOID", 5, 500, 8.0f, 4.0f, 20);
