@@ -1,0 +1,7 @@
+{
+  "parent": "item/generated",
+  "textures": {
+    "layer0": "thaumcraft:items/golem_tallow",
+    "layer1": "thaumcraft:items/golem_over_adv"
+  }
+}

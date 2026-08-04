@@ -47,7 +47,7 @@ public class ItemGolemPlacerCoreContractsStaticGuardTest {
     }
 
     @Test
-    public void golemPlacerModelsShowTheStoredCoreOverlay() throws IOException {
+    public void golemPlacerModelsShowStoredCoreAndAdvancedOverlays() throws IOException {
         String placerSource = readFile("src/main/java/thaumcraft/common/entities/golems/ItemGolemPlacer.java");
         String bellSource = readFile("src/main/java/thaumcraft/common/entities/golems/ItemGolemBell.java");
 
@@ -56,12 +56,17 @@ public class ItemGolemPlacerCoreContractsStaticGuardTest {
         assertTrue("ItemGolemPlacer must expose the stored core to item model overrides",
                 placerSource.contains("new ResourceLocation(\"thaumcraft\", \"core\")")
                         && placerSource.contains("stack.hasTagCompound() && stack.getTagCompound().hasKey(\"core\")"));
+        assertTrue("ItemGolemPlacer must expose the advanced state to item model overrides",
+                placerSource.contains("new ResourceLocation(\"thaumcraft\", \"advanced\")")
+                        && placerSource.contains("stack.getTagCompound().getBoolean(\"advanced\")"));
 
         String[] materials = {"straw", "wood", "tallow", "clay", "flesh", "stone", "iron", "thaumium"};
         for (String material : materials) {
             String modelName = "itemgolemplacer_" + material;
             String baseModel = readFile("src/main/resources/assets/thaumcraft/models/item/" + modelName + ".json");
             String coreModel = readFile("src/main/resources/assets/thaumcraft/models/item/" + modelName + "_core.json");
+            String advancedModel = readFile("src/main/resources/assets/thaumcraft/models/item/" + modelName + "_advanced.json");
+            String combinedModel = readFile("src/main/resources/assets/thaumcraft/models/item/" + modelName + "_advanced_core.json");
 
             assertTrue(modelName + " must select its core-overlay model from the NBT property",
                     baseModel.contains("\"thaumcraft:core\": 1.0")
@@ -69,6 +74,15 @@ public class ItemGolemPlacerCoreContractsStaticGuardTest {
             assertTrue(modelName + " core model must retain its material and use the original heart overlay",
                     coreModel.contains("\"layer0\": \"thaumcraft:items/golem_" + material + "\"")
                             && coreModel.contains("\"layer1\": \"thaumcraft:items/golem_over_core\""));
+            assertTrue(modelName + " must select advanced-only and combined overlays",
+                    baseModel.contains("\"thaumcraft:advanced\": 1.0")
+                            && baseModel.contains("\"model\": \"thaumcraft:item/" + modelName + "_advanced\"")
+                            && baseModel.contains("\"model\": \"thaumcraft:item/" + modelName + "_advanced_core\""));
+            assertTrue(modelName + " advanced models must retain ordered TC4 overlays",
+                    advancedModel.contains("\"layer0\": \"thaumcraft:items/golem_" + material + "\"")
+                            && advancedModel.contains("\"layer1\": \"thaumcraft:items/golem_over_adv\"")
+                            && combinedModel.contains("\"layer1\": \"thaumcraft:items/golem_over_adv\"")
+                            && combinedModel.contains("\"layer2\": \"thaumcraft:items/golem_over_core\""));
         }
     }
 

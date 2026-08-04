@@ -9,6 +9,19 @@
         "thaumcraft:core": 1.0
       },
       "model": "thaumcraft:item/itemgolemplacer_iron_core"
+    },
+    {
+      "predicate": {
+        "thaumcraft:advanced": 1.0
+      },
+      "model": "thaumcraft:item/itemgolemplacer_iron_advanced"
+    },
+    {
+      "predicate": {
+        "thaumcraft:core": 1.0,
+        "thaumcraft:advanced": 1.0
+      },
+      "model": "thaumcraft:item/itemgolemplacer_iron_advanced_core"
     }
   ]
 }

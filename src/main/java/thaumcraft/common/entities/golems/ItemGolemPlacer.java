@@ -33,6 +33,8 @@ public class ItemGolemPlacer extends Item {
         this.setCreativeTab(CreativeTabThaumcraft.tabThaumcraft);
         this.addPropertyOverride(new ResourceLocation("thaumcraft", "core"),
                 (stack, world, entity) -> stack.hasTagCompound() && stack.getTagCompound().hasKey("core") ? 1.0F : 0.0F);
+        this.addPropertyOverride(new ResourceLocation("thaumcraft", "advanced"),
+                (stack, world, entity) -> stack.hasTagCompound() && stack.getTagCompound().getBoolean("advanced") ? 1.0F : 0.0F);
     }
 
     @Override

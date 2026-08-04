@@ -25,6 +25,7 @@ Implement R10-R17 in dependency order using small reversible commits. TC4 behavi
 - Correct `ADVANCEDGOLEM` research to use the wildcard placer tagged `advanced=1` and restore research Warp 5.
 - Restore advanced, core, and combined placer item overlays for all eight material models.
 - Acceptance: focused metadata/model guards pass and one manual item/research view confirms the advanced identity.
+- Status: implementation and automated validation verified; manual item/research view remains pending.
 
 ### R12: Restore Fetter and base lifecycle invariants
 
@@ -101,8 +102,8 @@ Implement R10-R17 in dependency order using small reversible commits. TC4 behavi
 
 ## Current Checkpoint
 
-- Now: R11, Advanced Golem research identity and item overlays.
-- Next: R12, Fetter and base lifecycle invariants.
+- Now: R12, Fetter and base lifecycle invariants.
+- Next: R13, shared inventory and configuration authority.
 - Stop or replan if: oracle evidence is ambiguous, a proposed deviation fails the `AGENTS.md` threshold, or a fix would break a stable current-port save/API contract.
 
 ## Prior Verified Foundation (R1-R9, 2026-08-02)

@@ -2,6 +2,7 @@ package thaumcraft.common.config.research;
 
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagByte;
 import net.minecraft.util.ResourceLocation;
 import thaumcraft.api.ThaumcraftApi;
 import thaumcraft.api.aspects.Aspect;
@@ -741,6 +742,8 @@ final class ConfigResearchGolemancy {
                 .setParents("CORELIQUID", "INFUSION")
                 .registerResearchItem();
 
+        ItemStack advancedGolem = new ItemStack(ConfigItems.itemGolemPlacer, 1, Short.MAX_VALUE);
+        advancedGolem.setTagInfo("advanced", new NBTTagByte((byte) 1));
         new ResearchItem(
                 "ADVANCEDGOLEM",
                 "GOLEMANCY",
@@ -752,7 +755,7 @@ final class ConfigResearchGolemancy {
                 8,
                 0,
                 2,
-                new ItemStack(ConfigItems.itemGolemPlacer, 1, 8))
+                advancedGolem)
                 .setPages(
                         new ResearchPage("tc.research_page.ADVANCEDGOLEM.1"),
                         new ResearchPage(ConfigResearch.recipeInfusion("AdvancedGolem")))
@@ -766,5 +769,6 @@ final class ConfigResearchGolemancy {
                         "UPGRADEORDER",
                         "UPGRADEENTROPY")
                 .registerResearchItem();
+        ThaumcraftApi.addWarpToResearch("ADVANCEDGOLEM", 5);
     }
 }
