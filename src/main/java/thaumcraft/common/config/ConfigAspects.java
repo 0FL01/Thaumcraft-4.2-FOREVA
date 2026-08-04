@@ -27,7 +27,7 @@ public class ConfigAspects {
 
     private static void registerVanillaBlocks() {
         // Stone and earth
-        ThaumcraftApi.registerObjectTag(new ItemStack(Blocks.STONE), new AspectList().add(Aspect.EARTH, 3));
+        ThaumcraftApi.registerObjectTag(new ItemStack(Blocks.STONE), new AspectList().add(Aspect.EARTH, 2));
         ThaumcraftApi.registerObjectTag(new ItemStack(Blocks.COBBLESTONE), new AspectList().add(Aspect.EARTH, 2));
         ThaumcraftApi.registerObjectTag(new ItemStack(Blocks.GRASS), new AspectList().add(Aspect.EARTH, 1).add(Aspect.PLANT, 1));
         ThaumcraftApi.registerObjectTag(new ItemStack(Blocks.DIRT), new AspectList().add(Aspect.EARTH, 2));
@@ -65,7 +65,7 @@ public class ConfigAspects {
         ThaumcraftApi.registerObjectTag(new ItemStack(Blocks.CLAY), new AspectList().add(Aspect.EARTH, 1).add(Aspect.WATER, 1));
 
         // Water/Lava
-        ThaumcraftApi.registerObjectTag(new ItemStack(Blocks.WATER), new AspectList().add(Aspect.WATER, 3));
+        ThaumcraftApi.registerObjectTag(new ItemStack(Blocks.WATER), new AspectList().add(Aspect.WATER, 4));
         ThaumcraftApi.registerObjectTag(new ItemStack(Blocks.FLOWING_WATER), new AspectList().add(Aspect.WATER, 2));
         ThaumcraftApi.registerObjectTag(new ItemStack(Blocks.LAVA), new AspectList().add(Aspect.FIRE, 3).add(Aspect.EARTH, 1));
         ThaumcraftApi.registerObjectTag(new ItemStack(Blocks.FLOWING_LAVA), new AspectList().add(Aspect.FIRE, 2));
@@ -172,7 +172,8 @@ public class ConfigAspects {
 
         // Materials
         ThaumcraftApi.registerObjectTag(new ItemStack(Items.IRON_INGOT), new AspectList().add(Aspect.METAL, 4));
-        ThaumcraftApi.registerObjectTag(new ItemStack(Items.GOLD_INGOT), new AspectList().add(Aspect.METAL, 6));
+        ThaumcraftApi.registerObjectTag(new ItemStack(Items.GOLD_INGOT), new AspectList().add(Aspect.METAL, 3).add(Aspect.GREED, 2));
+        ThaumcraftApi.registerObjectTag(new ItemStack(Items.GOLD_NUGGET), new AspectList().add(Aspect.METAL, 1));
         ThaumcraftApi.registerObjectTag(new ItemStack(Items.DIAMOND), new AspectList().add(Aspect.CRYSTAL, 8));
         ThaumcraftApi.registerObjectTag(new ItemStack(Items.EMERALD), new AspectList().add(Aspect.CRYSTAL, 6).add(Aspect.EXCHANGE, 2));
         ThaumcraftApi.registerObjectTag(new ItemStack(Items.REDSTONE), new AspectList().add(Aspect.ENERGY, 3));
@@ -204,7 +205,7 @@ public class ConfigAspects {
         ThaumcraftApi.registerObjectTag(new ItemStack(Items.BOOK), new AspectList().add(Aspect.TREE, 2).add(Aspect.MIND, 2));
         ThaumcraftApi.registerObjectTag(new ItemStack(Items.PAPER), new AspectList().add(Aspect.TREE, 1).add(Aspect.MIND, 1));
         ThaumcraftApi.registerObjectTag(new ItemStack(Items.FLINT), new AspectList().add(Aspect.EARTH, 1).add(Aspect.TOOL, 1));
-        ThaumcraftApi.registerObjectTag(new ItemStack(Items.BUCKET), new AspectList().add(Aspect.METAL, 3).add(Aspect.VOID, 1));
+        ThaumcraftApi.registerObjectTag(new ItemStack(Items.BUCKET), new AspectList().add(Aspect.METAL, 8).add(Aspect.VOID, 1));
         ThaumcraftApi.registerObjectTag(new ItemStack(Items.RECORD_FAR),
                 new AspectList().add(Aspect.SENSES, 4).add(Aspect.AIR, 4).add(Aspect.ELDRITCH, 4).add(Aspect.GREED, 4));
         ThaumcraftApi.registerObjectTag(new ItemStack(Items.NETHER_STAR),
@@ -213,10 +214,10 @@ public class ConfigAspects {
         // Fluid bucket item tags (used by placed fluid scan fallback)
         ThaumcraftApi.registerObjectTag(
                 new ItemStack(Items.WATER_BUCKET),
-                new AspectList().add(Aspect.WATER, 3));
+                new AspectList().add(Aspect.METAL, 8).add(Aspect.VOID, 1).add(Aspect.WATER, 4));
         ThaumcraftApi.registerObjectTag(
                 new ItemStack(Items.LAVA_BUCKET),
-                new AspectList().add(Aspect.FIRE, 3).add(Aspect.EARTH, 1));
+                new AspectList().add(Aspect.METAL, 8).add(Aspect.VOID, 1).add(Aspect.FIRE, 4).add(Aspect.EARTH, 1));
     }
 
     private static void registerVanillaUtilityAndMechanismTags() {
@@ -263,48 +264,35 @@ public class ConfigAspects {
     private static void registerOreDictionary() {
         // Ore dictionary entries
         if (thaumcraft.common.config.Config.foundCopperIngot) {
-            ThaumcraftApi.registerObjectTag("ingotCopper", new AspectList().add(Aspect.METAL, 3));
             ThaumcraftApi.registerObjectTag("nuggetCopper", new AspectList().add(Aspect.METAL, 1));
-            ThaumcraftApi.registerObjectTag("dustCopper", new AspectList().add(Aspect.METAL, 2).add(Aspect.ENTROPY, 1));
-        }
-        if (thaumcraft.common.config.Config.foundTinIngot) {
-            ThaumcraftApi.registerObjectTag("ingotTin", new AspectList().add(Aspect.METAL, 3));
-            ThaumcraftApi.registerObjectTag("nuggetTin", new AspectList().add(Aspect.METAL, 1));
-            ThaumcraftApi.registerObjectTag("dustTin", new AspectList().add(Aspect.METAL, 2).add(Aspect.ENTROPY, 1));
-        }
-        if (thaumcraft.common.config.Config.foundSilverIngot) {
-            ThaumcraftApi.registerObjectTag("ingotSilver", new AspectList().add(Aspect.METAL, 4));
-            ThaumcraftApi.registerObjectTag("nuggetSilver", new AspectList().add(Aspect.METAL, 1));
-            ThaumcraftApi.registerObjectTag("dustSilver", new AspectList().add(Aspect.METAL, 2).add(Aspect.ENTROPY, 1));
-        }
-        if (thaumcraft.common.config.Config.foundLeadIngot) {
-            ThaumcraftApi.registerObjectTag("ingotLead", new AspectList().add(Aspect.METAL, 3));
-            ThaumcraftApi.registerObjectTag("nuggetLead", new AspectList().add(Aspect.METAL, 1));
-            ThaumcraftApi.registerObjectTag("dustLead", new AspectList().add(Aspect.METAL, 2).add(Aspect.ENTROPY, 1));
-        }
-
-        if (thaumcraft.common.config.Config.foundCopperOre) {
-            ThaumcraftApi.registerObjectTag("oreCopper", new AspectList().add(Aspect.EARTH, 2).add(Aspect.METAL, 3));
-            ThaumcraftApi.registerObjectTag(
-                    new ItemStack(ConfigItems.itemNugget, 1, 17),
+            ThaumcraftApi.registerObjectTag("ingotCopper", new AspectList().add(Aspect.METAL, 3).add(Aspect.EXCHANGE, 1));
+            ThaumcraftApi.registerObjectTag("dustCopper", new AspectList().add(Aspect.METAL, 2).add(Aspect.ENTROPY, 1).add(Aspect.EXCHANGE, 1));
+            ThaumcraftApi.registerObjectTag("oreCopper", new AspectList().add(Aspect.METAL, 2).add(Aspect.EARTH, 1).add(Aspect.EXCHANGE, 1));
+            ThaumcraftApi.registerObjectTag(new ItemStack(ConfigItems.itemNugget, 1, 17),
                     new AspectList().add(Aspect.ORDER, 1).add(Aspect.METAL, 5).add(Aspect.EARTH, 1).add(Aspect.EXCHANGE, 2));
         }
-        if (thaumcraft.common.config.Config.foundTinOre) {
-            ThaumcraftApi.registerObjectTag("oreTin", new AspectList().add(Aspect.EARTH, 2).add(Aspect.METAL, 3));
-            ThaumcraftApi.registerObjectTag(
-                    new ItemStack(ConfigItems.itemNugget, 1, 18),
+        if (thaumcraft.common.config.Config.foundTinIngot) {
+            ThaumcraftApi.registerObjectTag("nuggetTin", new AspectList().add(Aspect.METAL, 1));
+            ThaumcraftApi.registerObjectTag("ingotTin", new AspectList().add(Aspect.METAL, 3).add(Aspect.CRYSTAL, 1));
+            ThaumcraftApi.registerObjectTag("dustTin", new AspectList().add(Aspect.METAL, 2).add(Aspect.ENTROPY, 1).add(Aspect.CRYSTAL, 1));
+            ThaumcraftApi.registerObjectTag("oreTin", new AspectList().add(Aspect.METAL, 3).add(Aspect.ENTROPY, 1).add(Aspect.CRYSTAL, 1));
+            ThaumcraftApi.registerObjectTag(new ItemStack(ConfigItems.itemNugget, 1, 18),
                     new AspectList().add(Aspect.ORDER, 1).add(Aspect.METAL, 5).add(Aspect.EARTH, 1).add(Aspect.CRYSTAL, 2));
         }
-        if (thaumcraft.common.config.Config.foundSilverOre) {
-            ThaumcraftApi.registerObjectTag("oreSilver", new AspectList().add(Aspect.EARTH, 2).add(Aspect.METAL, 4));
-            ThaumcraftApi.registerObjectTag(
-                    new ItemStack(ConfigItems.itemNugget, 1, 19),
+        if (thaumcraft.common.config.Config.foundSilverIngot) {
+            ThaumcraftApi.registerObjectTag("nuggetSilver", new AspectList().add(Aspect.METAL, 1));
+            ThaumcraftApi.registerObjectTag("ingotSilver", new AspectList().add(Aspect.METAL, 3).add(Aspect.GREED, 1));
+            ThaumcraftApi.registerObjectTag("dustSilver", new AspectList().add(Aspect.METAL, 2).add(Aspect.ENTROPY, 1).add(Aspect.GREED, 1));
+            ThaumcraftApi.registerObjectTag("oreSilver", new AspectList().add(Aspect.METAL, 3).add(Aspect.ENTROPY, 1).add(Aspect.GREED, 1));
+            ThaumcraftApi.registerObjectTag(new ItemStack(ConfigItems.itemNugget, 1, 19),
                     new AspectList().add(Aspect.ORDER, 1).add(Aspect.METAL, 5).add(Aspect.EARTH, 1).add(Aspect.GREED, 2));
         }
-        if (thaumcraft.common.config.Config.foundLeadOre) {
-            ThaumcraftApi.registerObjectTag("oreLead", new AspectList().add(Aspect.EARTH, 2).add(Aspect.METAL, 3));
-            ThaumcraftApi.registerObjectTag(
-                    new ItemStack(ConfigItems.itemNugget, 1, 20),
+        if (thaumcraft.common.config.Config.foundLeadIngot) {
+            ThaumcraftApi.registerObjectTag("nuggetLead", new AspectList().add(Aspect.METAL, 1));
+            ThaumcraftApi.registerObjectTag("ingotLead", new AspectList().add(Aspect.METAL, 3).add(Aspect.ORDER, 1));
+            ThaumcraftApi.registerObjectTag("dustLead", new AspectList().add(Aspect.METAL, 2).add(Aspect.ENTROPY, 1).add(Aspect.ORDER, 1));
+            ThaumcraftApi.registerObjectTag("oreLead", new AspectList().add(Aspect.METAL, 3).add(Aspect.ENTROPY, 1).add(Aspect.ORDER, 1));
+            ThaumcraftApi.registerObjectTag(new ItemStack(ConfigItems.itemNugget, 1, 20),
                     new AspectList().add(Aspect.ORDER, 1).add(Aspect.METAL, 5).add(Aspect.EARTH, 1).add(Aspect.ORDER, 2));
         }
 
