@@ -5,8 +5,12 @@ import net.minecraft.entity.monster.EntityZombie;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.DamageSource;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 import thaumcraft.common.config.ConfigItems;
+
+import javax.annotation.Nullable;
 
 public class EntityBrainyZombie extends net.minecraft.entity.monster.EntityZombie {
     public EntityBrainyZombie(World world) {
@@ -29,6 +33,39 @@ public class EntityBrainyZombie extends net.minecraft.entity.monster.EntityZombi
         int v = super.getMaxSpawnedInChunk() + 3;
         if (v > 20) v = 20;
         return v;
+    }
+
+    @Nullable
+    @Override
+    protected ResourceLocation getLootTable() {
+        return null;
+    }
+
+    @Override
+    protected void dropLoot(boolean wasRecentlyHit, int lootingModifier, DamageSource source) {
+        if (this.isChild()) {
+            return;
+        }
+        super.dropLoot(wasRecentlyHit, lootingModifier, source);
+        if (wasRecentlyHit) {
+            int rareRoll = this.rand.nextInt(200) - lootingModifier;
+            if (rareRoll < 5) {
+                this.dropRareDrop(rareRoll <= 0 ? 1 : 0);
+            }
+        }
+    }
+
+    protected void dropRareDrop(int chance) {
+        switch (this.rand.nextInt(3)) {
+            case 0:
+                this.dropItem(Items.IRON_INGOT, 1);
+                break;
+            case 1:
+                this.dropItem(Items.CARROT, 1);
+                break;
+            default:
+                this.dropItem(Items.POTATO, 1);
+        }
     }
 
     @Override

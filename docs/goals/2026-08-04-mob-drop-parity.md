@@ -20,8 +20,8 @@ Complete the frozen Required Outcomes using the listed Change Envelope and Prima
   - Source: Approved RECON findings for Brainy/Giant Brainy Zombies, Taint Spider, Fire Bat, and Taint Pig.
   - Acceptance: Brainy zombie custom drops and original rare zombie rewards execute instead of the inherited zombie loot table; Giant Brainy additionally restores its four-way rare reward and 2.0F brain offset; Taint Spider reaches its 1/6 taint-resource path; non-summoned Fire Bats use inherited Gunpowder count/Looting behavior while summoned bats drop none; Taint Pig has the original outer 1/3 gate and 50/50 resource selection.
   - Primary evidence: Focused runtime tests invoke the effective `dropLoot` route and verify item/count/metadata, recent-hit/child/summoned gates, and the loot-table bypass repair.
-  - Status: pending
-  - Evidence:
+  - Status: verified
+  - Evidence: Brainy/Giant now bypass inherited zombie loot tables through the Forge fallback, retain equipment ordering, restore child suppression and original rare selections, and use the Giant's 2.0F brain offset. Taint Spider uses its custom fallback, Fire Bat uses inherited Gunpowder count/Looting with summoned suppression, and Taint Pig restores the nested gate. Focused effective-`dropLoot` runtime tests and `./scripts/dev.sh validate --smoke` passed on 2026-08-04.
 
 - R2: Restore audited XP and talk intervals.
   - Source: Approved mapping audit for Cultist Portal, Taint Spore, and Taint Spore Swarmer.
@@ -82,17 +82,17 @@ Complete the frozen Required Outcomes using the listed Change Envelope and Prima
 
 ## Current Checkpoint
 
-- Closes: R1.
-- Smallest next action: Implement the five class-local drop corrections and focused effective-`dropLoot` regression coverage.
-- Expected evidence: Focused mob drop parity tests and `./scripts/dev.sh validate --smoke` pass before the R1 commit.
-- Stop or replan if: Forge's effective death route cannot be tested without materially expanding the approved test envelope.
+- Closes: R2.
+- Smallest next action: Correct Portal/Spore/Swarmer XP and talk mappings with focused construction/resize/NBT coverage.
+- Expected evidence: Focused XP/talk runtime tests and `./scripts/dev.sh validate --smoke` pass before the R2 commit.
+- Stop or replan if: Correct mapping requires changing the existing size-to-XP lifecycle rather than preserving it.
 
 ## Current State
 
-- Resolved: Completed multi-agent RECON and independent plan audit; finish line is frozen.
-- Last relevant evidence: Direct TC4 bytecode/mapping and Forge 1.12.2 death-pipeline reconciliation recorded in the approved audit.
+- Resolved: R1 class-local drops are verified.
+- Last relevant evidence: Focused `EntityDropParityRuntimeTest`, affected static guard, full validation, and dedicated-server smoke passed on 2026-08-04.
 - Blocker: None.
-- Next: R1 class-local drop implementation.
+- Next: R2 XP/talk mapping implementation.
 
 ## Material Decisions
 
@@ -105,6 +105,7 @@ Complete the frozen Required Outcomes using the listed Change Envelope and Prima
 ## Checkpoint History
 
 - 2026-08-04: SEARCH PROBE, canonical mob inventory, parallel family audits, direct mapping reconciliation, and independent plan review completed without source edits. R1-R5 frozen from the user-approved minimal plan.
+- 2026-08-04: R1 verified. Effective Forge drop routing and the audited Brainy/Giant, Taint Spider, Fire Bat, and Taint Pig item distributions were restored; focused tests and `./scripts/dev.sh validate --smoke` passed.
 
 ## Completion
 

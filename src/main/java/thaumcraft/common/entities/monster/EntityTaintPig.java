@@ -76,9 +76,11 @@ public class EntityTaintPig extends net.minecraft.entity.monster.EntityMob imple
     @Override
     protected void dropFewItems(boolean wasRecentlyHit, int looting) {
         if (this.world.rand.nextInt(3) == 0) {
-            this.entityDropItem(new net.minecraft.item.ItemStack(thaumcraft.common.config.ConfigItems.itemResource, 1, 11), this.height / 2.0f);
-        } else {
-            this.entityDropItem(new net.minecraft.item.ItemStack(thaumcraft.common.config.ConfigItems.itemResource, 1, 12), this.height / 2.0f);
+            if (this.world.rand.nextBoolean()) {
+                this.entityDropItem(new net.minecraft.item.ItemStack(thaumcraft.common.config.ConfigItems.itemResource, 1, 11), this.height / 2.0f);
+            } else {
+                this.entityDropItem(new net.minecraft.item.ItemStack(thaumcraft.common.config.ConfigItems.itemResource, 1, 12), this.height / 2.0f);
+            }
         }
     }
 }

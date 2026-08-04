@@ -75,7 +75,24 @@ public class EntityGiantBrainyZombie extends thaumcraft.common.entities.monster.
             }
         }
         if (this.world.rand.nextInt(10) - looting <= 4) {
-            this.entityDropItem(new net.minecraft.item.ItemStack(ConfigItems.itemZombieBrain), 1.5F);
+            this.entityDropItem(new net.minecraft.item.ItemStack(ConfigItems.itemZombieBrain), 2.0F);
+        }
+    }
+
+    @Override
+    protected void dropRareDrop(int chance) {
+        switch (this.rand.nextInt(4)) {
+            case 0:
+                this.entityDropItem(new net.minecraft.item.ItemStack(ConfigItems.itemResource, 1, 2), 2.0F);
+                break;
+            case 1:
+                this.entityDropItem(new net.minecraft.item.ItemStack(net.minecraft.init.Items.CARROT), 2.0F);
+                break;
+            case 2:
+                this.entityDropItem(new net.minecraft.item.ItemStack(net.minecraft.init.Items.POTATO), 2.0F);
+                break;
+            default:
+                this.entityDropItem(new net.minecraft.item.ItemStack(ConfigItems.itemResource, 1, 6), 2.0F);
         }
     }
 

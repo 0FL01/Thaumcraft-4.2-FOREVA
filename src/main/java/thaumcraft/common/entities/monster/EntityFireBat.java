@@ -283,12 +283,6 @@ public class EntityFireBat extends EntityMob {
     // --- Drops ---
     @Override
     protected Item getDropItem() {
-        return this.getIsSummoned() ? null : Items.COAL;
-    }
-
-    @Override
-    protected void dropFewItems(boolean wasRecentlyHit, int looting) {
-        if (!this.getIsSummoned() && this.rand.nextInt(3) == 0)
-            this.dropItem(Items.COAL, 1);
+        return this.getIsSummoned() ? null : Items.GUNPOWDER;
     }
 }
