@@ -23,7 +23,7 @@ public class ItemGolemPlacerCoreContractsStaticGuardTest {
                         && source.contains("I18n.translateToLocal(\"tc.adv\")")
                         && source.contains("I18n.translateToLocal(\"item.ItemGolemUpgrade.\" + b + \".name\")")
                         && source.contains("I18n.translateToLocal(\"tc.markedloc\")")
-                        && source.contains("I18n.translateToLocal(\"item.ItemGolemDecoration.6.name\")"));
+                        && source.contains("I18n.translateToLocal(\"item.ItemGolemDecoration.7.name\")"));
         assertTrue("ItemGolemPlacer tooltip labels must keep their original English localization",
                 lang.contains("tc.adv=Advanced")
                         && lang.contains("tc.markedloc=marked locations")
@@ -36,7 +36,7 @@ public class ItemGolemPlacerCoreContractsStaticGuardTest {
             assertTrue("Missing golem upgrade localization " + upgrade,
                     lang.contains("item.ItemGolemUpgrade." + upgrade + ".name="));
         }
-        for (int decoration = 0; decoration <= 6; decoration++) {
+        for (int decoration = 0; decoration <= 7; decoration++) {
             assertTrue("Missing golem decoration localization " + decoration,
                     lang.contains("item.ItemGolemDecoration." + decoration + ".name="));
         }

@@ -506,6 +506,7 @@ public class ClientProxyEntityRendererRegistrationStaticGuardTest {
                         && golemAccessoriesModel.contains("golemHeadJar")
                         && golemAccessoriesModel.contains("golemEvilHead")
                         && golemAccessoriesModel.contains("golem.getGolemDecoration()")
+                        && golemAccessoriesModel.contains("golem.getCore() == 5 && golem.getFluidCarried() != null")
                         && golemAccessoriesModel.contains("golem.advanced"));
         String golemEntity = readFile("src/main/java/thaumcraft/common/entities/golems/EntityGolemBase.java");
         assertTrue("EntityGolemBase must expose renderer-facing action and health-percentage accessors",

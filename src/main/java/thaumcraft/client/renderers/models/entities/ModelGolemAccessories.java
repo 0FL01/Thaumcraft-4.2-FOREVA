@@ -203,6 +203,8 @@ public class ModelGolemAccessories extends ModelBase {
         }
         EntityGolemBase golem = (EntityGolemBase) entity;
         int actionTimer = golem.getActionTimer();
+        boolean carrying = !golem.getCarriedForDisplay().isEmpty()
+                || golem.getCore() == 5 && golem.getFluidCarried() != null;
         if (actionTimer > 0) {
             float angle = -2.0F + 1.5F * triangleWave((float) actionTimer - partialTickTime, 10.0F);
             this.golemDartgun.rotateAngleX = angle;
@@ -214,7 +216,7 @@ public class ModelGolemAccessories extends ModelBase {
             if (golem.rightArm > 0) {
                 this.golemMace.rotateAngleX = -2.0F + 1.5F * triangleWave((float) golem.rightArm - partialTickTime, 10.0F);
             }
-        } else if (!golem.getCarriedForDisplay().isEmpty()) {
+        } else if (carrying) {
             this.golemDartgun.rotateAngleX = -1.0F;
             this.golemMace.rotateAngleX = -1.0F;
         } else {

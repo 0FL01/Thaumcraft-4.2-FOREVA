@@ -39,6 +39,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import thaumcraft.api.entities.GolemIds;
 import thaumcraft.api.entities.IGolemInfo;
+import thaumcraft.client.renderers.models.entities.ModelGolemAccessories;
 import thaumcraft.common.config.ConfigItems;
 import thaumcraft.common.container.SlotGhostFluid;
 
@@ -249,6 +250,10 @@ public class GolemR8ContractsRuntimeTest {
         assertEquals(123456789, client.getFluidCarried().amount);
         assertSame(server.fluidCarried, server.getFluidCarried());
         assertTrue(server.getCarriedForDisplay().isEmpty());
+        ModelGolemAccessories accessories = new ModelGolemAccessories();
+        accessories.setLivingAnimations(client, 3.0F, 1.0F, 0.0F);
+        assertEquals(-1.0F, accessories.golemDartgun.rotateAngleX, 0.0F);
+        assertEquals(-1.0F, accessories.golemMace.rotateAngleX, 0.0F);
 
         server.setUpgrade(0, (byte) 0);
         server.fluidCarried = new FluidStack(FluidRegistry.LAVA, 70001);

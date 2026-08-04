@@ -89,6 +89,7 @@ public class ItemGolemPlacer extends Item {
             if (deco.contains("R")) decoDesc = decoDesc + I18n.translateToLocal("item.ItemGolemDecoration.4.name") + " ";
             if (deco.contains("V")) decoDesc = decoDesc + I18n.translateToLocal("item.ItemGolemDecoration.5.name") + " ";
             if (deco.contains("P")) decoDesc = decoDesc + I18n.translateToLocal("item.ItemGolemDecoration.6.name") + " ";
+            if (deco.contains("M")) decoDesc = decoDesc + I18n.translateToLocal("item.ItemGolemDecoration.7.name") + " ";
             tooltip.add(decoDesc);
         }
     }

@@ -69,6 +69,7 @@ Implement R10-R17 in dependency order using small reversible commits. TC4 behavi
 - Correct Dart/Mace carried-fluid pose behavior.
 - Manually check only touched views: advanced placer, eight accessories on one representative material, Fetter, Hungry ingestion animation, and Trunk hop/Earth GUI.
 - Acceptance: mapping/model guards pass and manual evidence is reported honestly; no pixel-perfect claim is made.
+- Status: implementation and automated validation verified; manual touched-view evidence remains pending and is not claimed.
 
 ### R17: Produce the validated artifact
 
@@ -106,8 +107,8 @@ Implement R10-R17 in dependency order using small reversible commits. TC4 behavi
 
 ## Current Checkpoint
 
-- Now: R16, scoped client/decorations parity.
-- Next: R17, final validation and artifact.
+- Now: R17, final validation and artifact.
+- Next: report automated completion and the outstanding manual visual matrix.
 - Stop or replan if: oracle evidence is ambiguous, a proposed deviation fails the `AGENTS.md` threshold, or a fix would break a stable current-port save/API contract.
 
 ## Prior Verified Foundation (R1-R9, 2026-08-02)
