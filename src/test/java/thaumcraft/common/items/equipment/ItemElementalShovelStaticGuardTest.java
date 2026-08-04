@@ -32,10 +32,10 @@ public class ItemElementalShovelStaticGuardTest {
         assertTrue("ItemElementalShovel must keep burst-mining and side-capture contracts",
                 source.contains("onBlockStartBreak(ItemStack stack, BlockPos pos, EntityPlayer player)")
                         && source.contains("this.side = hit.sideHit.getIndex();")
-                        && source.contains("onBlockDestroyed(ItemStack stack, World world, IBlockState state, BlockPos pos, EntityLivingBase entity)")
-                        && source.contains("ForgeHooks.isToolEffective(world, pos, stack)")
-                        && source.contains("world.destroyBlock(target, true)")
-                        && source.contains("stack.damageItem(1, entity);"));
+                         && source.contains("onBlockDestroyed(ItemStack stack, World world, IBlockState state, BlockPos pos, EntityLivingBase entity)")
+                         && source.contains("ForgeHooks.isToolEffective(world, pos, stack)")
+                         && source.contains("BlockUtils.harvestBlock(world, target, (EntityPlayer) entity, true, 3)")
+                         && source.contains("stack.damageItem(1, entity);"));
         assertTrue("ItemElementalShovel must keep architect preview + orientation NBT contracts",
                 source.contains("getArchitectBlocks(ItemStack stack, World world, int x, int y, int z, int side, EntityPlayer player)")
                         && source.contains("showAxis(ItemStack stack, World world, EntityPlayer player, int side, IArchitect.EnumAxis axis)")

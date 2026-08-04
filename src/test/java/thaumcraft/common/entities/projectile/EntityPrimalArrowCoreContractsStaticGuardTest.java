@@ -17,9 +17,9 @@ public class EntityPrimalArrowCoreContractsStaticGuardTest {
 
         assertTrue("EntityPrimalArrow must keep reference coordinate and typed launch constructors",
                 source.contains("public EntityPrimalArrow(World world, double x, double y, double z)")
-                        && source.contains("public EntityPrimalArrow(World world, EntityLivingBase shooter, float velocity, int type)")
-                        && source.contains("this.setArrowType(type);")
-                        && source.contains("this.shoot(shooter, shooter.rotationPitch, shooter.rotationYaw, 0.0F, velocity * 1.5F, 1.0F);"));
+                         && source.contains("public EntityPrimalArrow(World world, EntityLivingBase shooter, float velocity, int type)")
+                         && source.contains("this.setArrowType(type);")
+                         && source.contains("this.shoot(-MathHelper.sin(yaw) * MathHelper.cos(pitch), -MathHelper.sin(pitch),"));
         assertTrue("EntityPrimalArrow must keep reference-like spawn payload for motion, rotation, type and shooter id",
                 source.contains("buf.writeDouble(this.motionX);")
                         && source.contains("buf.writeFloat(this.rotationYaw);")
@@ -27,8 +27,16 @@ public class EntityPrimalArrowCoreContractsStaticGuardTest {
                         && source.contains("buf.writeInt(this.shootingEntity != null ? this.shootingEntity.getEntityId() : this.shootingEntityId);")
                         && source.contains("this.motionX = buf.readDouble();")
                         && source.contains("this.prevRotationPitch = this.rotationPitch;")
-                        && source.contains("this.setArrowType(buf.readByte());")
-                        && source.contains("this.shootingEntityId = buf.readInt();"));
+                         && source.contains("this.setArrowType(buf.readByte());")
+                         && source.contains("this.shootingEntityId = buf.readInt();"));
+        assertTrue("EntityPrimalArrow must keep TC4 damage, lifetime, water drag, and no-pickup contracts",
+                source.contains("this.setDamage(2.1D);")
+                        && source.contains("if (type == 3) return damage * 1.5D;")
+                        && source.contains("if (type == 4 || type == 5) return damage * 0.8D;")
+                        && source.contains("this.timeInGround >= 100")
+                        && source.contains("this.motionX *= 4.0D / 3.0D;")
+                        && source.contains("this.motionY = this.motionY * 4.0D / 3.0D + 1.0D / 60.0D;")
+                        && source.contains("this.pickupStatus = PickupStatus.DISALLOWED;"));
     }
 
     private static String readFile(String path) throws IOException {

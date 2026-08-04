@@ -178,6 +178,11 @@ public class BlockUtils {
 
     /** Break the furthest connected block of the given type from the start position. Used by lumber/harvest golems. */
     public static boolean breakFurthestBlock(World world, BlockPos pos, @Nullable EntityPlayer player) {
+        return breakFurthestBlock(world, pos, player, false, 0);
+    }
+
+    public static boolean breakFurthestBlock(World world, BlockPos pos, @Nullable EntityPlayer player,
+                                             boolean followItem, int color) {
         if (world == null || world.isRemote) return false;
         IBlockState originState = world.getBlockState(pos);
         Block originBlock = originState.getBlock();
@@ -212,7 +217,7 @@ public class BlockUtils {
             current = next;
         }
 
-        if (!harvestBlock(world, current, player)) return false;
+        if (!harvestBlock(world, current, player, followItem, color)) return false;
         world.markBlockRangeForRenderUpdate(pos, pos);
         world.markBlockRangeForRenderUpdate(current, current);
         for (int xx = -3; xx <= 3; xx++) {

@@ -24,7 +24,18 @@ public class ItemBowBoneStaticGuardTest {
                 source.contains("onUsingTick(ItemStack stack, EntityLivingBase entity, int count)")
                         && source.contains("int ticks = this.getMaxItemUseDuration(stack) - count;")
                         && source.contains("ticks > 18")
-                        && source.contains("((EntityPlayer) entity).stopActiveHand();"));
+                         && source.contains("((EntityPlayer) entity).stopActiveHand();"));
+        assertTrue("ItemBowBone must keep the TC4 normal-arrow release curve and bonus",
+                source.contains("onPlayerStoppedUsing(ItemStack stack, World world, EntityLivingBase entity, int timeLeft)")
+                        && source.contains("ForgeEventFactory.onArrowLoose")
+                        && source.contains("(float) charge / 10.0F")
+                        && source.contains("velocity * 2.5F")
+                         && source.contains("arrow.setDamage(arrow.getDamage() + 0.5D)")
+                         && !source.contains("arrow.setIsCritical(true)"));
+        assertTrue("ItemBowBone must allow TC4 Infinity nocking without inventory arrows",
+                source.contains("onItemRightClick(World world, EntityPlayer player, EnumHand hand)")
+                        && source.contains("EnchantmentHelper.getEnchantmentLevel(Enchantments.INFINITY, stack) > 0")
+                        && source.contains("player.setActiveHand(hand);"));
     }
 
     private static String readFile(String path) throws IOException {

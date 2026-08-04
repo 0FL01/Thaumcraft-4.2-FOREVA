@@ -28,6 +28,7 @@ import thaumcraft.api.IRepairable;
 import thaumcraft.common.Thaumcraft;
 import thaumcraft.common.config.ConfigItems;
 import thaumcraft.common.lib.CreativeTabThaumcraft;
+import thaumcraft.common.lib.utils.BlockUtils;
 import thaumcraft.common.lib.utils.InventoryUtils;
 
 import java.util.ArrayList;
@@ -185,7 +186,7 @@ public class ItemElementalShovel extends ItemSpade implements IRepairable, IArch
                     if (!ForgeHooks.isToolEffective(world, target, stack) && !isEffectiveAgainst(targetState.getBlock())) {
                         continue;
                     }
-                    if (world.destroyBlock(target, true)) {
+                    if (BlockUtils.harvestBlock(world, target, (EntityPlayer) entity, true, 3)) {
                         stack.damageItem(1, entity);
                     }
                 }

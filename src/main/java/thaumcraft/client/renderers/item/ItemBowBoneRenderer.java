@@ -58,11 +58,11 @@ public class ItemBowBoneRenderer extends TileEntityItemStackRenderer {
             return BOW;
         }
 
-        float pull = (stack.getMaxItemUseDuration() - (player.getItemInUseCount() - partialTicks)) / 20.0F;
-        if (pull > 0.9F) {
+        float pullTicks = stack.getMaxItemUseDuration() - (player.getItemInUseCount() - partialTicks);
+        if (pullTicks >= 13.0F) {
             return BOW_PULLING_2;
         }
-        if (pull > 0.65F) {
+        if (pullTicks > 7.0F) {
             return BOW_PULLING_1;
         }
         return BOW_PULLING_0;

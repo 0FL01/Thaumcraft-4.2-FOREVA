@@ -215,7 +215,7 @@ public class ConfigItems {
         // Initialize tool materials
         TOOLMAT_THAUMIUM = EnumHelper.addToolMaterial("THAUMIUM", 3, 500, 7.0f, 2.5f, 18);
         TOOLMAT_VOID = thaumcraft.api.ThaumcraftApi.toolMatVoid;
-        TOOLMAT_ELEMENTAL = EnumHelper.addToolMaterial("ELEMENTAL", 4, 1561, 10.0f, 4.0f, 22);
+        TOOLMAT_ELEMENTAL = thaumcraft.api.ThaumcraftApi.toolMatElemental;
         TOOLMAT_PRIMALVOID = EnumHelper.addToolMaterial("PRIMALVOID", 5, 500, 8.0f, 4.0f, 20);
 
         // Use armor materials from ThaumcraftApi (defined there with EnumHelper)

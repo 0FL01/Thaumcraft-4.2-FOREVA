@@ -33,10 +33,10 @@ public class BowBoneItemRendererContractTest {
                         && hasVanillaBowDisplay(pulling1Model)
                         && hasVanillaBowDisplay(pulling2Model));
 
-        assertTrue("Bone bow should keep vanilla pull override thresholds on the normal item model",
-                itemModel.contains("\"pulling\": 1")
-                        && itemModel.contains("\"pull\": 0.65")
-                        && itemModel.contains("\"pull\": 0.9")
+        assertTrue("Bone bow should keep TC4 pull-stage thresholds on the normal item model",
+                 itemModel.contains("\"pulling\": 1")
+                         && itemModel.contains("\"pull\": 0.4")
+                         && itemModel.contains("\"pull\": 0.65")
                         && itemModel.contains("\"model\": \"thaumcraft:item/itembowbone_pulling_0\"")
                         && itemModel.contains("\"model\": \"thaumcraft:item/itembowbone_pulling_1\"")
                         && itemModel.contains("\"model\": \"thaumcraft:item/itembowbone_pulling_2\""));

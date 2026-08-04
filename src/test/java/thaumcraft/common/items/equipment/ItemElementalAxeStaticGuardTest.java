@@ -28,8 +28,8 @@ public class ItemElementalAxeStaticGuardTest {
                         && source.contains("clamp(itemEntity.motionX, -0.35D, 0.35D)")
                         && source.contains("Thaumcraft.proxy.crucibleBubble("));
         assertTrue("ItemElementalAxe must keep wood-log chain-break FX packet contract",
-                source.contains("!player.isSneaking() && Utils.isWoodLog(world, pos)")
-                        && source.contains("BlockUtils.breakFurthestBlock(world, pos, player)")
+                 source.contains("!player.isSneaking() && Utils.isWoodLog(world, pos)")
+                         && source.contains("BlockUtils.breakFurthestBlock(world, pos, player, true, 10)")
                         && source.contains("new PacketFXBlockBubble(")
                         && source.contains("PacketHandler.INSTANCE.sendToAllAround(")
                         && source.contains("new NetworkRegistry.TargetPoint(")

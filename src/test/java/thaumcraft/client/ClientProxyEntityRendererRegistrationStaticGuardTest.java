@@ -219,11 +219,15 @@ public class ClientProxyEntityRendererRegistrationStaticGuardTest {
                         && dartRenderer.contains("new ResourceLocation(\"textures/entity/arrow.png\")"));
         String primalArrowRenderer = readFile("src/main/java/thaumcraft/client/renderers/entity/RenderPrimalArrow.java");
         assertTrue("RenderPrimalArrow must provide dedicated typed arrow renderer baseline",
-                primalArrowRenderer.contains("extends RenderArrow<EntityPrimalArrow>")
-                        && primalArrowRenderer.contains("new ResourceLocation(\"textures/entity/arrow.png\")")
-                        && primalArrowRenderer.contains("entity.getArrowType()")
-                        && primalArrowRenderer.contains("BlockCustomOreItem.colors")
-                        && primalArrowRenderer.contains("GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F)"));
+                primalArrowRenderer.contains("extends Render<EntityPrimalArrow>")
+                         && primalArrowRenderer.contains("new ResourceLocation(\"textures/entity/arrow.png\")")
+                         && primalArrowRenderer.contains("entity.getArrowType()")
+                         && primalArrowRenderer.contains("BlockCustomOreItem.colors")
+                         && primalArrowRenderer.contains("textures/misc/wisp.png")
+                         && primalArrowRenderer.contains("entity.getArrowType() < 5")
+                         && primalArrowRenderer.contains("this.renderArrowShaft(entity, x, y, z, partialTicks, alpha);")
+                         && primalArrowRenderer.contains("0.25F - 0.01F / 16.0F")
+                         && primalArrowRenderer.contains("GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F)"));
         String golemBobberRenderer = readFile("src/main/java/thaumcraft/client/renderers/entity/RenderGolemBobber.java");
         assertTrue("RenderGolemBobber must provide particles-atlas bobber quad plus fisher tether baseline",
                 golemBobberRenderer.contains("extends Render<EntityGolemBobber>")

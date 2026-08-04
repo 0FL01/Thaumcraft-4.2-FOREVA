@@ -78,6 +78,29 @@ public class ItemElementalSwordRuntimeTest {
         assertEquals(3, stack.getItemDamage());
     }
 
+    @Test
+    public void secondarySweepNeverHitsAnotherPlayer() {
+        TestWorld world = new TestWorld();
+        TestPlayer attacker = new TestPlayer(world);
+        TestPlayer bystander = new TestPlayer(world);
+        RecordingZombie primary = new RecordingZombie(world);
+        place(attacker, 0.0D);
+        place(primary, 1.0D);
+        place(bystander, 1.5D);
+        world.addEntity(attacker);
+        world.addEntity(primary);
+        world.addEntity(bystander);
+
+        ItemElementalSword sword = new TestElementalSword();
+        ItemStack stack = new ItemStack(sword);
+        attacker.setHeldItem(net.minecraft.util.EnumHand.MAIN_HAND, stack);
+        float health = bystander.getHealth();
+
+        sword.onLeftClickEntity(stack, attacker, primary);
+
+        assertEquals(health, bystander.getHealth(), 0.0F);
+    }
+
     private static void place(Entity entity, double x) {
         entity.setPosition(x, 64.0D, 0.0D);
     }

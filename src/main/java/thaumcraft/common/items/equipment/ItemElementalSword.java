@@ -155,16 +155,14 @@ public class ItemElementalSword extends ItemSword implements IRepairable {
                     entity.getEntityBoundingBox().grow(1.2D, 1.1D, 1.2D));
             int count = 0;
             for (Entity candidate : nearby) {
-                if (!candidate.isEntityAlive() || !(candidate instanceof EntityLivingBase) || candidate == entity) {
+                if (!candidate.isEntityAlive() || !(candidate instanceof EntityLivingBase)
+                        || candidate instanceof EntityPlayer || candidate == entity) {
                     continue;
                 }
                 if (candidate instanceof EntityGolemBase && player.getName().equals(((EntityGolemBase) candidate).getOwnerName())) {
                     continue;
                 }
                 if (candidate instanceof EntityTameable && ((EntityTameable) candidate).isOwner(player)) {
-                    continue;
-                }
-                if (candidate instanceof EntityPlayer && player.getName().equals(((EntityPlayer) candidate).getName())) {
                     continue;
                 }
                 if (candidate.isOnSameTeam(player)) {
