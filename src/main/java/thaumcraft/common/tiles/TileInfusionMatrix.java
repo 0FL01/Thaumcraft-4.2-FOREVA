@@ -109,7 +109,7 @@ public class TileInfusionMatrix extends TileThaumcraft implements ITickable, IWa
     public boolean validLocation() {
         if (this.world == null) return false;
         TileEntity center = this.world.getTileEntity(this.pos.down(2));
-        if (!(center instanceof TilePedestal)) return false;
+        if (!isInfusionPedestal(center)) return false;
         if (!(this.world.getTileEntity(this.pos.add(1, -2, 1)) instanceof TileInfusionPillar)) return false;
         if (!(this.world.getTileEntity(this.pos.add(1, -2, -1)) instanceof TileInfusionPillar)) return false;
         if (!(this.world.getTileEntity(this.pos.add(-1, -2, -1)) instanceof TileInfusionPillar)) return false;
@@ -412,14 +412,18 @@ public class TileInfusionMatrix extends TileThaumcraft implements ITickable, IWa
 
     private TilePedestal getCenterPedestal() {
         TileEntity tile = this.world == null ? null : this.world.getTileEntity(this.pos.down(2));
-        return tile instanceof TilePedestal ? (TilePedestal) tile : null;
+        return isInfusionPedestal(tile) ? (TilePedestal) tile : null;
+    }
+
+    public static boolean isInfusionPedestal(TileEntity tile) {
+        return tile instanceof TilePedestal && !(tile instanceof TileWandPedestal);
     }
 
     private ArrayList<ItemStack> getPedestalComponents() {
         ArrayList<ItemStack> components = new ArrayList<ItemStack>();
         for (BlockPos pedestalPos : this.pedestals) {
             TileEntity tile = this.world.getTileEntity(pedestalPos);
-            if (!(tile instanceof TilePedestal)) continue;
+            if (!isInfusionPedestal(tile)) continue;
             ItemStack stack = ((TilePedestal) tile).getStackInSlot(0);
             if (!stack.isEmpty()) components.add(this.copySingle(stack));
         }
@@ -479,7 +483,7 @@ public class TileInfusionMatrix extends TileThaumcraft implements ITickable, IWa
         if (ingredient == null || ingredient.isEmpty()) return null;
         for (BlockPos pedestalPos : this.pedestals) {
             TileEntity tile = this.world.getTileEntity(pedestalPos);
-            if (!(tile instanceof TilePedestal)) continue;
+            if (!isInfusionPedestal(tile)) continue;
             ItemStack stack = ((TilePedestal) tile).getStackInSlot(0);
             if (!stack.isEmpty() && InfusionRecipe.areItemStacksEqual(stack, ingredient, true)) return pedestalPos;
         }
@@ -488,7 +492,7 @@ public class TileInfusionMatrix extends TileThaumcraft implements ITickable, IWa
 
     private void consumePedestalIngredient(BlockPos pedestalPos) {
         TileEntity tile = this.world.getTileEntity(pedestalPos);
-        if (!(tile instanceof TilePedestal)) return;
+        if (!isInfusionPedestal(tile)) return;
         TilePedestal pedestal = (TilePedestal) tile;
         ItemStack stack = pedestal.getStackInSlot(0);
         if (stack.isEmpty()) return;
@@ -615,7 +619,7 @@ public class TileInfusionMatrix extends TileThaumcraft implements ITickable, IWa
         for (int tries = 0; tries < 50 && !this.pedestals.isEmpty(); ++tries) {
             BlockPos pedestalPos = this.pedestals.get(this.world.rand.nextInt(this.pedestals.size()));
             TileEntity tile = this.world.getTileEntity(pedestalPos);
-            if (!(tile instanceof TilePedestal) || ((TilePedestal) tile).getStackInSlot(0).isEmpty()) continue;
+            if (!isInfusionPedestal(tile) || ((TilePedestal) tile).getStackInSlot(0).isEmpty()) continue;
 
             if (type < 3 || type == 5) {
                 InventoryUtils.dropItems(this.world, pedestalPos.getX(), pedestalPos.getY(), pedestalPos.getZ());
@@ -692,7 +696,7 @@ public class TileInfusionMatrix extends TileThaumcraft implements ITickable, IWa
                     BlockPos scan = this.pos.add(xx, -yy, zz);
                     if (!this.world.isBlockLoaded(scan)) continue;
                     TileEntity tile = this.world.getTileEntity(scan);
-                    if (!foundPedestalInColumn && yy > 0 && Math.abs(xx) <= 8 && Math.abs(zz) <= 8 && tile instanceof TilePedestal) {
+                    if (!foundPedestalInColumn && yy > 0 && Math.abs(xx) <= 8 && Math.abs(zz) <= 8 && isInfusionPedestal(tile)) {
                         this.pedestals.add(scan.toImmutable());
                         foundPedestalInColumn = true;
                     }
@@ -705,14 +709,14 @@ public class TileInfusionMatrix extends TileThaumcraft implements ITickable, IWa
         for (BlockPos pedestalPos : this.pedestals) {
             boolean hasItem = false;
             TileEntity tile = this.world.getTileEntity(pedestalPos);
-            if (tile instanceof TilePedestal) {
+            if (isInfusionPedestal(tile)) {
                 this.symmetry += 2;
                 hasItem = !((TilePedestal) tile).getStackInSlot(0).isEmpty();
                 if (hasItem) ++this.symmetry;
             }
             BlockPos mirror = this.pos.add(this.pos.getX() - pedestalPos.getX(), pedestalPos.getY() - this.pos.getY(), this.pos.getZ() - pedestalPos.getZ());
             TileEntity mirrorTile = this.world.getTileEntity(mirror);
-            if (mirrorTile instanceof TilePedestal) {
+            if (isInfusionPedestal(mirrorTile)) {
                 this.symmetry -= 2;
                 if (hasItem && !((TilePedestal) mirrorTile).getStackInSlot(0).isEmpty()) --this.symmetry;
             }
@@ -820,7 +824,7 @@ public class TileInfusionMatrix extends TileThaumcraft implements ITickable, IWa
                 }
             } else {
                 TileEntity tile = this.world.getTileEntity(fx.loc);
-                if (tile instanceof TilePedestal) {
+                if (isInfusionPedestal(tile)) {
                     ItemStack stack = ((TilePedestal) tile).getStackInSlot(0);
                     if (!stack.isEmpty()) {
                         if (this.world.rand.nextInt(3) == 0) {
@@ -898,58 +902,41 @@ public class TileInfusionMatrix extends TileThaumcraft implements ITickable, IWa
 
     @Override
     public void setAspects(AspectList aspects) {
-        this.recipeEssentia = aspects == null ? new AspectList() : aspects.copy();
-        this.markDirtyAndSync();
     }
 
     @Override
     public int addToContainer(Aspect tag, int amount) {
-        if (tag == null || amount <= 0) return amount;
-        this.recipeEssentia.add(tag, amount);
-        this.markDirtyAndSync();
         return 0;
     }
 
     @Override
     public boolean takeFromContainer(Aspect tag, int amount) {
-        if (tag == null || amount <= 0 || this.recipeEssentia.getAmount(tag) < amount) return false;
-        this.recipeEssentia.remove(tag, amount);
-        this.markDirtyAndSync();
-        return true;
+        return false;
     }
 
     @Override
     public boolean takeFromContainer(AspectList aspects) {
-        if (aspects == null || !this.doesContainerContain(aspects)) return false;
-        for (Aspect aspect : aspects.getAspects()) {
-            this.recipeEssentia.remove(aspect, aspects.getAmount(aspect));
-        }
-        this.markDirtyAndSync();
-        return true;
+        return false;
     }
 
     @Override
     public boolean doesContainerContainAmount(Aspect tag, int amount) {
-        return tag != null && this.recipeEssentia.getAmount(tag) >= amount;
+        return false;
     }
 
     @Override
     public boolean doesContainerContain(AspectList aspects) {
-        if (aspects == null) return false;
-        for (Aspect aspect : aspects.getAspects()) {
-            if (this.recipeEssentia.getAmount(aspect) < aspects.getAmount(aspect)) return false;
-        }
-        return true;
+        return false;
     }
 
     @Override
     public int containerContains(Aspect tag) {
-        return tag == null ? this.recipeEssentia.visSize() : this.recipeEssentia.getAmount(tag);
+        return 0;
     }
 
     @Override
     public boolean doesContainerAccept(Aspect tag) {
-        return tag != null;
+        return true;
     }
 
     public static class SourceFX {

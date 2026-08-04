@@ -44,11 +44,11 @@ public class BlockStoneDeviceContractTest {
         assertTrue("break and comparator contracts should keep infusion-matrix blast, inventory comparators, and wand fill output",
                 source.contains("if (te instanceof TileInfusionMatrix && ((TileInfusionMatrix) te).crafting) {")
                         && source.contains("worldIn.createExplosion(null, pos.getX() + 0.5D, pos.getY() + 0.5D, pos.getZ() + 0.5D, 2.0F, true);")
-                        && source.contains("return Container.calcRedstoneFromInventory((IInventory) te);")
-                        && source.contains("wand.getAllVis(stack).visSize()")
-                        && source.indexOf("if (te instanceof TileWandPedestal)")
-                        < source.indexOf("if (te instanceof TilePedestal || te instanceof TileAlchemyFurnace)")
-                        && source.contains("/ ((float) ItemWandCasting.getMaxVis(stack) * 6.0F);")
+                         && source.contains("return Container.calcRedstoneFromInventory((IInventory) te);")
+                         && source.contains("wand.getAllVis(stack).visSize()")
+                         && source.indexOf("if (te instanceof TileWandPedestal)")
+                         < source.indexOf("if (TileInfusionMatrix.isInfusionPedestal(te) || te instanceof TileAlchemyFurnace)")
+                         && source.contains("/ ((float) ItemWandCasting.getMaxVis(stack) * 6.0F);")
                         && source.contains("return MathHelper.floor(fill * 14.0F) + 1;"));
 
         assertTrue("wand pedestal and compound focus should route restricted insert, extraction, and focus placement",

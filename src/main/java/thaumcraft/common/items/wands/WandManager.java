@@ -44,7 +44,6 @@ import thaumcraft.common.tiles.TileInfusionMatrix;
 import thaumcraft.common.tiles.TileInfusionPillar;
 import thaumcraft.common.tiles.TileJarNode;
 import thaumcraft.common.tiles.TileEldritchAltar;
-import thaumcraft.common.tiles.TilePedestal;
 import thaumcraft.common.tiles.TileNode;
 import thaumcraft.common.tiles.TileThaumatorium;
 import net.minecraftforge.oredict.OreDictionary;
@@ -639,7 +638,7 @@ public class WandManager implements IWandTriggerManager {
                     if (expected == null) {
                         if (xx == 1 && zz == 1 && yy == 2) {
                             TileEntity tile = world.getTileEntity(target);
-                            if (tile instanceof TilePedestal) {
+                            if (TileInfusionMatrix.isInfusionPedestal(tile)) {
                                 continue;
                             }
                             return false;
@@ -682,6 +681,7 @@ public class WandManager implements IWandTriggerManager {
                     BlockPos target = new BlockPos(x + xx, y - yy + 2, z + zz);
                     if (code == 1) {
                         world.setBlockState(target, ConfigBlocks.blockStoneDevice.getDefaultState().withProperty(thaumcraft.common.blocks.BlockStoneDevice.TYPE, 4), 3);
+                        world.addBlockEvent(target, ConfigBlocks.blockStoneDevice, 1, 0);
                         world.notifyNeighborsOfStateChange(target, ConfigBlocks.blockStoneDevice, false);
                         continue;
                     }
@@ -693,6 +693,7 @@ public class WandManager implements IWandTriggerManager {
                             tile.markDirty();
                         }
                         world.notifyBlockUpdate(target, world.getBlockState(target), world.getBlockState(target), 3);
+                        world.addBlockEvent(target, ConfigBlocks.blockStoneDevice, 1, 0);
                         world.notifyNeighborsOfStateChange(target, ConfigBlocks.blockStoneDevice, false);
                         continue;
                     }

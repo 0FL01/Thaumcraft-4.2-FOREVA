@@ -11,7 +11,6 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import thaumcraft.common.Thaumcraft;
 import thaumcraft.common.lib.network.PacketBase;
 import thaumcraft.common.tiles.TileInfusionMatrix;
-import thaumcraft.common.tiles.TilePedestal;
 
 public class PacketFXInfusionSource extends PacketBase {
     private int x;
@@ -73,7 +72,7 @@ public class PacketFXInfusionSource extends PacketBase {
 
             int ticks = 15;
             TileEntity sourceTile = world.getTileEntity(new BlockPos(sx, sy, sz));
-            if (sourceTile instanceof TilePedestal) {
+            if (TileInfusionMatrix.isInfusionPedestal(sourceTile)) {
                 ticks = 60;
             }
 

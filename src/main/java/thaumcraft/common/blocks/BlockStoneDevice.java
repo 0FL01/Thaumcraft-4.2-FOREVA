@@ -12,6 +12,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Blocks;
 import net.minecraft.init.SoundEvents;
 import net.minecraft.inventory.Container;
 import net.minecraft.inventory.IInventory;
@@ -213,14 +214,6 @@ extends BlockContainer {
             }
             return false;
         }
-        if (te instanceof TileInfusionMatrix) {
-            ItemStack held = playerIn.getHeldItem(hand);
-            if (!held.isEmpty() && held.getItem() instanceof ItemWandCasting) {
-                return ((TileInfusionMatrix) te).onWandRightClick(worldIn, held, playerIn,
-                        pos.getX(), pos.getY(), pos.getZ(), facing.getIndex(), state.getValue(TYPE)) >= 0;
-            }
-            return false;
-        }
         if (te instanceof TileFocalManipulator) {
             if (!worldIn.isRemote) {
                 playerIn.openGui(Thaumcraft.instance, CommonProxy.GUI_FOCAL_MANIPULATOR, worldIn, pos.getX(), pos.getY(), pos.getZ());
@@ -368,10 +361,22 @@ extends BlockContainer {
                 return MathHelper.floor(fill * 14.0F) + 1;
             }
         }
-        if (te instanceof TilePedestal || te instanceof TileAlchemyFurnace) {
+        if (TileInfusionMatrix.isInfusionPedestal(te) || te instanceof TileAlchemyFurnace) {
             return Container.calcRedstoneFromInventory((IInventory) te);
         }
         return 0;
+    }
+
+    @Override
+    public boolean eventReceived(IBlockState state, World worldIn, BlockPos pos, int id, int param) {
+        if (id == 1) {
+            if (worldIn.isRemote) {
+                Thaumcraft.proxy.blockSparkle(worldIn, pos.getX(), pos.getY(), pos.getZ(), 11960575, 2);
+                worldIn.playEvent(2001, pos, Block.getStateId(Blocks.QUARTZ_BLOCK.getDefaultState()));
+            }
+            return true;
+        }
+        return super.eventReceived(state, worldIn, pos, id, param);
     }
 
     @Override

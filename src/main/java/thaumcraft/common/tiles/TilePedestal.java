@@ -10,6 +10,7 @@ import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import thaumcraft.api.TileThaumcraft;
+import thaumcraft.common.Thaumcraft;
 
 public class TilePedestal
 extends TileThaumcraft
@@ -76,9 +77,6 @@ implements ISidedInventory {
 
     public void setInventorySlotContentsFromInfusion(int index, ItemStack stack) {
         this.setInventorySlotContents(index, stack);
-        if (this.world != null && !this.world.isRemote) {
-            this.world.addBlockEvent(this.pos, this.world.getBlockState(this.pos).getBlock(), 12, 0);
-        }
     }
 
     @Override
@@ -148,7 +146,24 @@ implements ISidedInventory {
 
     @Override
     public boolean receiveClientEvent(int id, int type) {
-        if (id == 11 || id == 12) return true;
+        if (id == 11) {
+            if (this.world != null && this.world.isRemote) {
+                for (int i = 0; i < Thaumcraft.proxy.particleCount(5); ++i) {
+                    Thaumcraft.proxy.blockSparkle(this.world, this.pos.getX(), this.pos.getY() + 1,
+                            this.pos.getZ(), 0xC000C0, 2);
+                }
+            }
+            return true;
+        }
+        if (id == 12) {
+            if (this.world != null && this.world.isRemote) {
+                for (int i = 0; i < Thaumcraft.proxy.particleCount(10); ++i) {
+                    Thaumcraft.proxy.blockSparkle(this.world, this.pos.getX(), this.pos.getY() + 1,
+                            this.pos.getZ(), -9999, 2);
+                }
+            }
+            return true;
+        }
         return super.receiveClientEvent(id, type);
     }
 
