@@ -16,6 +16,7 @@ public class TravelingTrunkRendererFidelityStaticGuardTest {
         String entity = read("src/main/java/thaumcraft/common/entities/golems/EntityTravelingTrunk.java");
         String renderer = read("src/main/java/thaumcraft/client/renderers/entity/RenderTravelingTrunk.java");
         String model = read("src/main/java/thaumcraft/client/renderers/models/entities/ModelTrunk.java");
+        String gui = read("src/main/java/thaumcraft/client/gui/GuiTravelingTrunk.java");
 
         assertTrue("EntityTravelingTrunk must keep synced open/stay/upgrade/rows/anger data surface",
                 entity.contains("DataParameter<java.lang.Boolean> OPEN")
@@ -66,6 +67,9 @@ public class TravelingTrunkRendererFidelityStaticGuardTest {
                         && model.contains("getParticleIcon(ConfigItems.itemGolemUpgrade, upgrade)")
                         && model.contains("TextureMap.LOCATION_BLOCKS_TEXTURE")
                         && model.contains("buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);"));
+        assertTrue("Earth upgrade must draw the fourth inventory strip at the TC4 destination and texture coordinates",
+                gui.contains("this.drawTexturedModalRect(this.guiLeft, this.guiTop + 80, 0, 206, this.xSize, 27);")
+                        && !gui.contains("this.trunk.setOpen(false);"));
     }
 
     private static String read(String path) throws IOException {

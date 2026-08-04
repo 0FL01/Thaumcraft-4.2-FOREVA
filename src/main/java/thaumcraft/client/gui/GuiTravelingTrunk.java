@@ -62,7 +62,7 @@ public class GuiTravelingTrunk extends GuiContainer {
         this.drawTexturedModalRect(this.guiLeft + 134, this.guiTop + 2, 176, 16, health, 6);
 
         if (this.trunk.getUpgrade() == 1) {
-            this.drawTexturedModalRect(this.guiLeft + 80, this.guiTop, 206, 0, this.xSize, 27);
+            this.drawTexturedModalRect(this.guiLeft, this.guiTop + 80, 0, 206, this.xSize, 27);
         }
 
         if (this.trunk.getStay()) {
@@ -84,7 +84,6 @@ public class GuiTravelingTrunk extends GuiContainer {
 
     @Override
     public void onGuiClosed() {
-        this.trunk.setOpen(false);
         super.onGuiClosed();
     }
 

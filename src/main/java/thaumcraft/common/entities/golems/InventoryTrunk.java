@@ -88,14 +88,14 @@ public class InventoryTrunk implements IInventory {
 
     @Override
     public void openInventory(EntityPlayer player) {
-        if (this.ent != null) {
+        if (this.ent != null && this.ent.world != null && !this.ent.world.isRemote) {
             this.ent.setOpen(true);
         }
     }
 
     @Override
     public void closeInventory(EntityPlayer player) {
-        if (this.ent != null) {
+        if (this.ent != null && this.ent.world != null && !this.ent.world.isRemote) {
             this.ent.setOpen(false);
         }
     }

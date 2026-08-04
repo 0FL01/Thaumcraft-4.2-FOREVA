@@ -61,6 +61,7 @@ Implement R10-R17 in dependency order using small reversible commits. TC4 behavi
 - Preserve safe teleport behavior and current `OwnerUUID` fresh-world persistence; do not implement legacy `Owner` migration.
 - Verify observable cross-dimension behavior: non-Stay follows once without loss/duplication, Stay remains behind. Change the current transfer route only if this contract fails.
 - Acceptance: focused state/runtime tests and a compact six-upgrade/manual check pass.
+- Status: implementation and automated validation verified; compact manual upgrade/view check remains pending.
 
 ### R16: Close scoped client/decorations parity
 
@@ -105,8 +106,8 @@ Implement R10-R17 in dependency order using small reversible commits. TC4 behavi
 
 ## Current Checkpoint
 
-- Now: R15, Traveling Trunk behavior.
-- Next: R16, scoped client/decorations parity.
+- Now: R16, scoped client/decorations parity.
+- Next: R17, final validation and artifact.
 - Stop or replan if: oracle evidence is ambiguous, a proposed deviation fails the `AGENTS.md` threshold, or a fix would break a stable current-port save/API contract.
 
 ## Prior Verified Foundation (R1-R9, 2026-08-02)

@@ -20,9 +20,10 @@ public class ContainerTravelingTrunk extends Container {
         this.trunkInv = trunk != null ? trunk.inventory : null;
         if (this.trunkInv != null) {
             this.trunkInv.openInventory(playerInv.player);
-        }
-        if (this.trunk != null) {
-            this.trunk.setOpen(true);
+            if (!world.isRemote) {
+                this.trunk.playSound(net.minecraft.init.SoundEvents.BLOCK_CHEST_OPEN, 0.5F,
+                        world.rand.nextFloat() * 0.1F + 0.9F);
+            }
         }
 
         int rows = this.trunk != null ? this.trunk.getRows() : 0;
@@ -49,12 +50,13 @@ public class ContainerTravelingTrunk extends Container {
 
     @Override
     public boolean canInteractWith(EntityPlayer player) {
-        return this.trunk != null && !this.trunk.isDead && player.getDistanceSq(this.trunk) <= 64.0D;
+        return this.trunk != null && !this.trunk.isDead && player.getDistanceSq(this.trunk) <= 64.0D
+                && (this.trunk.getUpgrade() != 3 || this.trunk.isOwnedBy(player));
     }
 
     @Override
     public boolean enchantItem(EntityPlayer playerIn, int id) {
-        if (id == 1 && this.trunk != null && !this.trunk.isDead) {
+        if (id == 1 && this.trunk != null && !this.trunk.isDead && this.trunk.isOwnedBy(playerIn)) {
             this.trunk.setStay(!this.trunk.getStay());
             return true;
         }
@@ -84,9 +86,10 @@ public class ContainerTravelingTrunk extends Container {
         super.onContainerClosed(player);
         if (this.trunkInv != null) {
             this.trunkInv.closeInventory(player);
-        }
-        if (this.trunk != null) {
-            this.trunk.setOpen(false);
+            if (!player.world.isRemote) {
+                this.trunk.playSound(net.minecraft.init.SoundEvents.BLOCK_CHEST_CLOSE, 0.5F,
+                        player.world.rand.nextFloat() * 0.1F + 0.9F);
+            }
         }
     }
 }

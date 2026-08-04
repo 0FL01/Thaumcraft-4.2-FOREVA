@@ -218,7 +218,9 @@ public class EntityTravelingTrunk extends net.minecraft.entity.EntityLiving impl
         }
 
         java.util.List<net.minecraft.entity.item.EntityItem> nearbyItems = this.world.getEntitiesWithinAABB(
-                net.minecraft.entity.item.EntityItem.class, this.getEntityBoundingBox().grow(3.0D));
+                net.minecraft.entity.item.EntityItem.class,
+                new net.minecraft.util.math.AxisAlignedBB(this.posX - 3.0D, this.posY - 3.0D, this.posZ - 3.0D,
+                        this.posX + 3.0D, this.posY + 3.0D, this.posZ + 3.0D));
         for (net.minecraft.entity.item.EntityItem itemEntity : nearbyItems) {
             double dx = itemEntity.posX - this.posX;
             double dy = itemEntity.posY - this.posY + this.height * 0.8F;
@@ -321,7 +323,7 @@ public class EntityTravelingTrunk extends net.minecraft.entity.EntityLiving impl
         }
         net.minecraft.item.ItemStack stack = player.getHeldItem(hand);
         if (!stack.isEmpty() && stack.getItem() == thaumcraft.common.config.ConfigItems.itemGolemBell) {
-            return this.getUpgrade() == 3 && !this.isOwner(player);
+            return this.getUpgrade() == 3 && !this.isOwnedBy(player);
         }
         if (this.getUpgrade() == -1 && !stack.isEmpty()
                 && stack.getItem() == thaumcraft.common.config.ConfigItems.itemGolemUpgrade) {
@@ -352,7 +354,7 @@ public class EntityTravelingTrunk extends net.minecraft.entity.EntityLiving impl
             return true;
         }
         if (!this.world.isRemote) {
-            if (this.getUpgrade() == 3 && !this.isOwner(player)) {
+            if (this.getUpgrade() == 3 && !this.isOwnedBy(player)) {
                 return true;
             }
             player.openGui(thaumcraft.common.Thaumcraft.instance, thaumcraft.common.CommonProxy.GUI_TRAVELING_TRUNK, this.world, this.getEntityId(), 0, 0);
@@ -360,12 +362,16 @@ public class EntityTravelingTrunk extends net.minecraft.entity.EntityLiving impl
         return true;
     }
 
-    private boolean isOwner(net.minecraft.entity.player.EntityPlayer player) {
+    public boolean isOwnedBy(net.minecraft.entity.player.EntityPlayer player) {
         java.util.UUID ownerId = this.getOwnerId();
         return ownerId == null || ownerId.equals(player.getUniqueID());
     }
 
     public boolean transferToOwnerDimension(net.minecraft.entity.player.EntityPlayerMP player) {
+        return this.transferToOwnerWorld(player);
+    }
+
+    private boolean transferToOwnerWorld(net.minecraft.entity.player.EntityPlayer player) {
         if (player == null || this.world.isRemote || this.getStay() || this.isDead || player.world == this.world) {
             return false;
         }
@@ -409,6 +415,11 @@ public class EntityTravelingTrunk extends net.minecraft.entity.EntityLiving impl
             this.inventory.dropAllItems();
         }
         super.onDeath(cause);
+    }
+
+    @Override
+    protected net.minecraft.util.SoundEvent getDeathSound() {
+        return net.minecraft.init.SoundEvents.ENTITY_ITEM_BREAK;
     }
 
     @Override
