@@ -1,6 +1,6 @@
 package thaumcraft.api.crafting;
 
-import java.util.ArrayList;
+import java.util.List;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.oredict.OreDictionary;
 import thaumcraft.api.ThaumcraftApiHelper;
@@ -28,8 +28,8 @@ public class CrucibleRecipe {
         }
         if (cat instanceof ItemStack) {
             hc = hc + ((ItemStack)cat).toString();
-        } else if (cat instanceof ArrayList && ((ArrayList<ItemStack>)this.catalyst).size() > 0) {
-            for (ItemStack is : (ArrayList<ItemStack>)this.catalyst) {
+        } else if (this.catalyst instanceof List && !((List<?>)this.catalyst).isEmpty()) {
+            for (ItemStack is : this.getCatalystItems()) {
                 hc = hc + is.toString();
             }
         }
@@ -41,7 +41,7 @@ public class CrucibleRecipe {
         if (this.catalyst instanceof ItemStack && !ThaumcraftApiHelper.itemMatches((ItemStack)this.catalyst, cat, false)) {
             return false;
         }
-        if (this.catalyst instanceof ArrayList && ((ArrayList<ItemStack>)this.catalyst).size() > 0 && !ThaumcraftApiHelper.containsMatch(false, new ItemStack[]{cat}, ores = ((ArrayList<ItemStack>)this.catalyst).toArray(new ItemStack[0]))) {
+        if (this.catalyst instanceof List && !((List<?>)this.catalyst).isEmpty() && !ThaumcraftApiHelper.containsMatch(false, new ItemStack[]{cat}, ores = this.getCatalystItems().toArray(new ItemStack[0]))) {
             return false;
         }
         if (itags == null) {
@@ -59,7 +59,12 @@ public class CrucibleRecipe {
         if (this.catalyst instanceof ItemStack && ThaumcraftApiHelper.itemMatches((ItemStack)this.catalyst, cat, false)) {
             return true;
         }
-        return this.catalyst instanceof ArrayList && ((ArrayList<ItemStack>)this.catalyst).size() > 0 && ThaumcraftApiHelper.containsMatch(false, new ItemStack[]{cat}, ores = ((ArrayList<ItemStack>)this.catalyst).toArray(new ItemStack[0]));
+        return this.catalyst instanceof List && !((List<?>)this.catalyst).isEmpty() && ThaumcraftApiHelper.containsMatch(false, new ItemStack[]{cat}, ores = this.getCatalystItems().toArray(new ItemStack[0]));
+    }
+
+    @SuppressWarnings("unchecked")
+    private List<ItemStack> getCatalystItems() {
+        return (List<ItemStack>)this.catalyst;
     }
 
     public AspectList removeMatching(AspectList itags) {
@@ -76,4 +81,3 @@ public class CrucibleRecipe {
         return this.recipeOutput;
     }
 }
-
