@@ -1,6 +1,6 @@
 # Goal: Complete TC4 Golemancy section parity
 
-Status: automated implementation complete; manual visual acceptance pending
+Status: closed by user; automated implementation complete
 Source: User-approved RECON, plan review, and implementation directive dated 2026-08-04
 Last updated: 2026-08-04
 
@@ -76,6 +76,10 @@ Implement R10-R17 in dependency order using small reversible commits. TC4 behavi
 - Acceptance: affected focused suites pass, `git diff --check` passes, `./scripts/dev.sh validate --smoke` reaches dedicated-server ready state without crash markers, and `./scripts/dev.sh build` produces `build/libs/Thaumcraft-1.0.0-universal.jar`.
 - Status: verified; universal jar SHA-256 is `7c780d395da8bbd0013691b444681062a3b1da53d07a7107a9688419aa8777b3`.
 
+### Closure
+
+- Closed by user on 2026-08-04. The follow-up Advanced Golem behavior RECON produced no authorized code changes; its proposed range corrections and the manual visual matrix remain unimplemented/unverified.
+
 ## Constraints
 
 - Support fresh Forge 1.12.2 worlds and data created by this port only; TC4 1.7.10 save/NBT migration is unsupported.
@@ -108,8 +112,8 @@ Implement R10-R17 in dependency order using small reversible commits. TC4 behavi
 
 ## Current Checkpoint
 
-- Now: manual touched-view acceptance only: advanced placer/research, eight accessories, powered Fetter, Hungry ingestion, and Trunk hop/Earth GUI.
-- Next: none for automated implementation; report the visual matrix honestly when checked in-game.
+- Now: none; goal closed by user.
+- Next: none.
 - Stop or replan if: oracle evidence is ambiguous, a proposed deviation fails the `AGENTS.md` threshold, or a fix would break a stable current-port save/API contract.
 
 ## Prior Verified Foundation (R1-R9, 2026-08-02)
