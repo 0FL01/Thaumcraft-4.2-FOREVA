@@ -45,16 +45,16 @@ extends TileJar implements ITickable {
         if (this.xp < this.xpMax) {
             entity = this.getClosestXPOrb();
             if (entity != null && this.eatDelay == 0) {
-                double dx = ((double) pos.getX() + 0.5D - entity.posX) / 25.0D;
-                double dy = ((double) pos.getY() + 0.5D - entity.posY) / 25.0D;
-                double dz = ((double) pos.getZ() + 0.5D - entity.posZ) / 25.0D;
+                double dx = ((double) pos.getX() + 0.5D - entity.posX) / 7.0D;
+                double dy = ((double) pos.getY() + 0.5D - entity.posY) / 7.0D;
+                double dz = ((double) pos.getZ() + 0.5D - entity.posZ) / 7.0D;
                 double dist = Math.sqrt(dx * dx + dy * dy + dz * dz);
                 double strength = 1.0 - dist;
                 if (strength > 0.0D && dist > 0.0D) {
                     strength *= strength;
-                    entity.motionX += dx / dist * strength * 0.3;
-                    entity.motionY += dy / dist * strength * 0.5;
-                    entity.motionZ += dz / dist * strength * 0.3;
+                    entity.motionX += dx / dist * strength * 0.15;
+                    entity.motionY += dy / dist * strength * 0.33;
+                    entity.motionZ += dz / dist * strength * 0.15;
                 }
             }
         }
@@ -120,7 +120,7 @@ extends TileJar implements ITickable {
     public EntityXPOrb getClosestXPOrb() {
         double cdist = Double.MAX_VALUE;
         EntityXPOrb orb = null;
-        List<EntityXPOrb> ents = world.getEntitiesWithinAABB(EntityXPOrb.class, new AxisAlignedBB(pos.getX(), pos.getY(), pos.getZ(), pos.getX() + 1, pos.getY() + 1, pos.getZ() + 1).grow(8.0, 8.0, 8.0));
+        List<EntityXPOrb> ents = world.getEntitiesWithinAABB(EntityXPOrb.class, new AxisAlignedBB(pos.getX(), pos.getY(), pos.getZ(), pos.getX() + 1, pos.getY() + 1, pos.getZ() + 1).grow(6.0, 6.0, 6.0));
         if (ents.size() > 0) {
             for (EntityXPOrb eo : ents) {
                 double d = this.getDistanceTo(eo.posX, eo.posY, eo.posZ);

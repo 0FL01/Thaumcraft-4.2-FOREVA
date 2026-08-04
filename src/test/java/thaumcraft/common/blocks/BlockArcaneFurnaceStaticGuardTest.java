@@ -40,7 +40,8 @@ public class BlockArcaneFurnaceStaticGuardTest {
         assertTrue(source.contains("this.getMetaFromState(world.getBlockState(pos.east())) == 0"));
         assertTrue(source.contains("this.getMetaFromState(world.getBlockState(pos.north())) == 0"));
         assertTrue(source.contains("return EnumFacing.SOUTH;"));
-        assertTrue(source.contains("entityIn instanceof EntityItem"));
+        assertTrue(source.contains("if (entityIn instanceof EntityItem) {"));
+        assertTrue(source.contains("if (entityIn.onGround && !worldIn.isRemote) {"));
         assertTrue(source.contains("((TileArcaneFurnace) tile).addItemsToInventory(stack.copy())"));
         assertTrue(source.contains("entityIn.attackEntityFrom(net.minecraft.util.DamageSource.HOT_FLOOR, 3.0F);"));
         assertTrue(source.contains("entityIn.setFire(10);"));

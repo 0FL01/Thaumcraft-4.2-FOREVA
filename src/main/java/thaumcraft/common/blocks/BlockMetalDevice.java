@@ -298,7 +298,9 @@ public class BlockMetalDevice extends BlockContainer {
         }
         int meta = state.getValue(TYPE);
         boolean powered = worldIn.isBlockPowered(pos);
-        onPoweredBlockChange(worldIn, pos, powered);
+        if (powered || blockIn.canProvidePower(blockIn.getDefaultState())) {
+            onPoweredBlockChange(worldIn, pos, powered);
+        }
         if (meta == 10) {
             IBlockState above = worldIn.getBlockState(pos.up());
             IBlockState below = worldIn.getBlockState(pos.down());

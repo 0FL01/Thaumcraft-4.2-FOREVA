@@ -18,7 +18,7 @@ public class TileArcaneLampFertilityStaticGuardTest {
         assertTrue(source.contains("public class TileArcaneLampFertility extends TileThaumcraft implements ITickable, IEssentiaTransport"));
         assertTrue(source.contains("public int charges = 0;"));
         assertTrue(source.contains("if (this.charges < 4 && this.drawEssentia())"));
-        assertTrue(source.contains("if (this.charges > 1 && ++this.count % 300 == 0)"));
+        assertTrue(source.contains("if (this.charges > 1 && this.count++ % 300 == 0)"));
         assertTrue(source.contains("this.world.getEntitiesWithinAABB(EntityAnimal.class, new AxisAlignedBB(this.pos).grow(7.0D))"));
         assertTrue(source.contains("animal.getGrowingAge() != 0 || animal.isInLove()"));
         assertTrue(source.contains("sameClass.size() > 7"));

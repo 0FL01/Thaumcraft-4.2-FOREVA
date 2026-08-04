@@ -201,7 +201,7 @@ public class BlockArcaneFurnace extends BlockContainer {
 
         if (entityIn instanceof EntityItem) {
             entityIn.motionY = 0.025F;
-            if (!worldIn.isRemote) {
+            if (entityIn.onGround && !worldIn.isRemote) {
                 TileEntity tile = worldIn.getTileEntity(pos);
                 if (tile instanceof TileArcaneFurnace) {
                     ItemStack stack = ((EntityItem) entityIn).getItem();

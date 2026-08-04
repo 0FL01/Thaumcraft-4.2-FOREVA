@@ -8,6 +8,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertFalse;
 
 public class TileResearchTableRuntimeContractTest {
 
@@ -37,6 +38,18 @@ public class TileResearchTableRuntimeContractTest {
                         && source.contains("this.world.rand.nextInt(15) == 0")
                         && source.contains("} else if (block == ConfigBlocks.blockCustomOre && md == 3) {")
                         && source.contains("this.world.rand.nextInt(20) == 0"));
+    }
+
+    @Test
+    public void duplicateResearchNotesStayStackedInTheTable() throws IOException {
+        String source = read("src/main/java/thaumcraft/common/tiles/TileResearchTable.java");
+
+        assertTrue(source.contains("data.copies++;"));
+        assertTrue(source.contains("ResearchManager.updateData(notesStack, data);"));
+        assertTrue(source.contains("notesStack.grow(1);"));
+        assertTrue(source.contains("setInventorySlotContents(1, notesStack);"));
+        assertFalse(source.contains("player.inventory.addItemStackToInventory(duplicate)"));
+        assertFalse(source.contains("player.dropItem(duplicate, false)"));
     }
 
     private static String read(String path) throws IOException {

@@ -275,13 +275,8 @@ implements IInventory, ITickable {
 
         data.copies++;
         ResearchManager.updateData(notesStack, data);
+        notesStack.grow(1);
         setInventorySlotContents(1, notesStack);
-
-        ItemStack duplicate = notesStack.copy();
-        duplicate.setCount(1);
-        if (!player.inventory.addItemStackToInventory(duplicate)) {
-            player.dropItem(duplicate, false);
-        }
 
         this.world.addBlockEvent(this.pos, ConfigBlocks.blockTable, 1, 1);
         markDirty();

@@ -23,10 +23,10 @@ public class BrainJarAndPechClientFeedbackStaticGuardTest {
         assertTrue(source.contains("this.lastsigh = System.currentTimeMillis() + 5000L + this.world.rand.nextInt(25000);"));
         assertTrue(source.contains("this.field_40066_q = (float) Math.atan2(d1, d);"));
         assertTrue(source.contains("this.rota += f * 0.04F;"));
-        assertTrue(source.contains("/ 25.0D"));
-        assertTrue(source.contains("strength * 0.3"));
-        assertTrue(source.contains("strength * 0.5"));
-        assertTrue(source.contains(".grow(8.0, 8.0, 8.0)"));
+        assertTrue(source.contains("/ 7.0D"));
+        assertTrue(source.contains("strength * 0.15"));
+        assertTrue(source.contains("strength * 0.33"));
+        assertTrue(source.contains(".grow(6.0, 6.0, 6.0)"));
     }
 
     @Test

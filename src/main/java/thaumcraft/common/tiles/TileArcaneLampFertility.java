@@ -40,7 +40,7 @@ public class TileArcaneLampFertility extends TileThaumcraft implements ITickable
             ++this.charges;
             this.world.notifyBlockUpdate(this.pos, this.world.getBlockState(this.pos), this.world.getBlockState(this.pos), 3);
         }
-        if (this.charges > 1 && ++this.count % 300 == 0) {
+        if (this.charges > 1 && this.count++ % 300 == 0) {
             this.updateAnimals();
         }
     }

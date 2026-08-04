@@ -366,7 +366,7 @@ public class ConfigBlocks {
                 .setRegistryName(blockStoneDevice.getRegistryName()));
         registry.register(new BlockWoodenDeviceItem(blockWoodenDevice)
                 .setRegistryName(blockWoodenDevice.getRegistryName()));
-        registry.register(new BlockMetadataItem(blockMetalDevice)
+        registry.register(new BlockMetalDeviceItem(blockMetalDevice)
                 .setRegistryName(blockMetalDevice.getRegistryName()));
         registry.register(new BlockTubeItem(blockTube)
                 .setRegistryName(blockTube.getRegistryName()));
