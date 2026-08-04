@@ -1,0 +1,10 @@
+{
+  "$schema": "https://raw.githubusercontent.com/Opencode-DCP/opencode-dynamic-context-pruning/master/dcp.schema.json",
+  "protectedFilePatterns": [
+    "**/.opencode/goal.md",
+    "**/.opencode/goal-notes/**"
+  ],
+  "compress": {
+    "protectTags": true
+  }
+}
