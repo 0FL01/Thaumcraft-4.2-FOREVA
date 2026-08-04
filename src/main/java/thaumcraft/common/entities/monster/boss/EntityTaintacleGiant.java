@@ -135,8 +135,8 @@ public class EntityTaintacleGiant extends thaumcraft.common.entities.monster.Ent
     @Override
     protected void dropFewItems(boolean wasRecentlyHit, int looting) {
         List<EntityTaintacleGiant> nearby = this.world.getEntitiesWithinAABB(EntityTaintacleGiant.class,
-                new AxisAlignedBB(this.posX - 48, this.posY - 24, this.posZ - 48,
-                                  this.posX + 48, this.posY + 24, this.posZ + 48));
+                new AxisAlignedBB(this.posX - 48, this.posY - 48, this.posZ - 48,
+                                  this.posX + 48, this.posY + 48, this.posZ + 48));
         if (nearby.size() <= 1) {
             EntityUtils.entityDropSpecialItem(
                     this, new ItemStack(ConfigItems.itemEldritchObject, 1, 3), this.height / 2.0F);

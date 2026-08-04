@@ -159,7 +159,7 @@ public class InventoryTrunk implements IInventory {
 
     public void dropAllItems() {
         if (this.ent == null || this.ent.world.isRemote) return;
-        for (int i = 0; i < this.getSizeInventory(); i++) {
+        for (int i = 0; i < this.contents.size(); i++) {
             ItemStack stack = this.getStackInSlot(i);
             if (!stack.isEmpty()) {
                 this.ent.entityDropItem(stack, 0.0F);

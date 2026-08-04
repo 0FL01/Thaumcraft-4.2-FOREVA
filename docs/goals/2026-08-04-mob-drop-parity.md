@@ -41,8 +41,8 @@ Complete the frozen Required Outcomes using the listed Change Envelope and Prima
   - Source: Approved RECON findings for Pech equipment chance, Giant Taintacle duplicate suppression, and Traveling Trunk backing slots.
   - Acceptance: Pech main-hand baseline drop chance is 0.2F with the wand override still 0.1F; Giant Taintacle checks 48 blocks on all axes before its unique drop; trunk spilling processes all 36 backing slots, including hidden persisted slots.
   - Primary evidence: Focused literal/runtime tests verify both Pech chances, vertical suppression at 32 blocks, and visible/hidden trunk slots being emitted and cleared.
-  - Status: pending
-  - Evidence:
+  - Status: verified
+  - Evidence: Pech now initializes the main-hand chance to 0.2F while retaining the 0.1F wand path; Giant Taintacle duplicate suppression spans ±48 on Y as well as X/Z; trunk spilling iterates all 36 backing slots. Focused runtime/static tests, including a second giant at Y+32 and persisted slot 35, and `./scripts/dev.sh validate --smoke` passed on 2026-08-04.
 
 - R5: Close the audited objective with current repository gates and scoped commits.
   - Source: User instruction to implement iteratively with commits and `AGENTS.md` common/server workflow.
@@ -82,17 +82,17 @@ Complete the frozen Required Outcomes using the listed Change Envelope and Prima
 
 ## Current Checkpoint
 
-- Closes: R4.
-- Smallest next action: Restore Pech baseline equipment chance, Giant Taintacle all-axis suppression range, and all-36-slot trunk spilling with focused edge coverage.
-- Expected evidence: Focused Pech/giant/trunk tests and `./scripts/dev.sh validate --smoke` pass before the R4 commit.
-- Stop or replan if: Hidden-slot verification requires changing visible inventory size or the trunk NBT contract.
+- Closes: R5.
+- Smallest next action: Commit R4, run the closure diff/constraint check, then build the final distributable jar.
+- Expected evidence: Scoped commit history, `git diff --check`, clean status except the goal closure update, and `./scripts/dev.sh build` pass.
+- Stop or replan if: The closure check finds an unresolved R-item or a final gate fails because of the current commits.
 
 ## Current State
 
-- Resolved: R1 class-local drops, R2 XP/talk mappings, and R3 global death rewards are verified.
-- Last relevant evidence: Focused `EventHandlerDropParityRuntimeTest`, updated aspect-orb guard, champion regression suites, full validation, and dedicated-server smoke passed on 2026-08-04.
+- Resolved: R1-R4 are verified.
+- Last relevant evidence: Focused `DropEdgeParityRuntimeTest`, affected static guards, full validation, and dedicated-server smoke passed on 2026-08-04.
 - Blocker: None.
-- Next: R4 low-risk drop edge implementation.
+- Next: Commit R4 and close R5 with the final build.
 
 ## Material Decisions
 
@@ -108,6 +108,7 @@ Complete the frozen Required Outcomes using the listed Change Envelope and Prima
 - 2026-08-04: R1 verified. Effective Forge drop routing and the audited Brainy/Giant, Taint Spider, Fire Bat, and Taint Pig item distributions were restored; focused tests and `./scripts/dev.sh validate --smoke` passed.
 - 2026-08-04: R2 verified. Portal XP/talk mapping and Spore/Swarmer size-XP plus talk intervals were restored; focused tests and `./scripts/dev.sh validate --smoke` passed.
 - 2026-08-04: R3 verified. Original recently-hit aspect-orb eligibility and inheritance-aware champion whitelist matching were restored without replacing public/config contracts; focused tests and `./scripts/dev.sh validate --smoke` passed.
+- 2026-08-04: R4 verified. Pech equipment chance, Giant Taintacle vertical duplicate suppression, and all-36-slot trunk spilling were restored; focused tests and `./scripts/dev.sh validate --smoke` passed.
 
 ## Completion
 

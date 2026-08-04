@@ -86,6 +86,7 @@ public class EntityPech extends net.minecraft.entity.monster.EntityMob implement
     public EntityPech(World world) {
         super(world);
         this.setSize(0.6F, 1.8F);
+        this.setDropChance(EntityEquipmentSlot.MAINHAND, 0.2F);
 
         // PathNavigateGround-specific settings (1.12.2: setBreakDoors moved from base PathNavigate)
         PathNavigate nav = this.getNavigator();
