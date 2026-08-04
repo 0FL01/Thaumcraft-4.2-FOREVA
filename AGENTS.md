@@ -14,6 +14,14 @@ Use `thaumcraft_src/**` and `Thaumcraft-1.7.10-4.2.3.5.jar` as read-only origina
 
 The original 1.7.10 material is a behavioral and asset reference only. It does not define a save-migration or backward-compatibility requirement.
 
+## Parity baseline
+
+Reproduce TC4 behavior by default. A deviation is allowed only when supported by at least one of these conditions:
+
+- a reproducible bug in the original;
+- a conflict with shipped research text or a gameplay invariant;
+- a direct port is impossible because of the Minecraft or Forge 1.12 API.
+
 Asset origin: assets (textures, sounds, models, lang, shaders, etc.) for the port can be copied from `thaumcraft_src/assets/` into `src/main/resources/assets/thaumcraft/`. This is the source of truth for all ported assets — do not recreate assets from scratch when a working original exists in `thaumcraft_src/assets/`.
 
 ## Hard rules
