@@ -116,7 +116,7 @@ public class GolemFilterContractsRuntimeTest {
 
         assertTrue(slot instanceof SlotGhostFluid);
         assertFalse(slot.isItemValid(new ItemStack(Items.PAPER)));
-        assertTrue(slot.isItemValid(new ItemStack(Items.BUCKET)));
+        assertFalse(slot.isItemValid(new ItemStack(Items.BUCKET)));
         assertTrue(slot.isItemValid(new ItemStack(Items.WATER_BUCKET)));
 
         player.inventory.setItemStack(new ItemStack(Items.PAPER));
@@ -125,8 +125,7 @@ public class GolemFilterContractsRuntimeTest {
 
         player.inventory.setItemStack(new ItemStack(Items.BUCKET, 8));
         container.slotClick(0, 0, ClickType.PICKUP, player);
-        assertEquals(Items.BUCKET, slot.getStack().getItem());
-        assertEquals(1, slot.getStack().getCount());
+        assertTrue(slot.getStack().isEmpty());
     }
 
     @Test

@@ -17,10 +17,12 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.fluids.FluidUtil;
 import org.lwjgl.opengl.GL11;
 import thaumcraft.client.renderers.models.entities.ModelGolem;
 import thaumcraft.client.renderers.models.entities.ModelGolemAccessories;
+import thaumcraft.codechicken.lib.render.CCModel;
+import thaumcraft.codechicken.lib.render.CCRenderState;
+import thaumcraft.codechicken.lib.vec.Vector3;
 import thaumcraft.common.blocks.BlockJarItem;
 import thaumcraft.common.config.ConfigItems;
 import thaumcraft.common.entities.golems.EntityGolemBase;
@@ -39,9 +41,15 @@ public class RenderGolemBase extends RenderLiving<EntityGolemBase> {
             new ResourceLocation("thaumcraft", "textures/models/golem_decoration.png");
     private static final ResourceLocation GOLEM_UPGRADE_EMPTY_TEXTURE =
             new ResourceLocation("thaumcraft", "textures/items/golem_upgrade_empty.png");
+    private static final ResourceLocation GOLEM_BUCKET_MODEL =
+            new ResourceLocation("thaumcraft", "textures/models/bucket.obj");
+    private static final ResourceLocation GOLEM_BUCKET_TEXTURE =
+            new ResourceLocation("thaumcraft", "textures/models/bucket.png");
+    private final CCModel bucketModel;
 
     public RenderGolemBase(RenderManager renderManager) {
         super(renderManager, new ModelGolem(false), 0.25F);
+        this.bucketModel = loadBucketModel();
         this.addLayer(new GolemCoreLayer(this));
         this.addLayer(new GolemAccessoriesLayer(this));
         this.addLayer(new GolemDamageLayer(this));
@@ -79,6 +87,28 @@ public class RenderGolemBase extends RenderLiving<EntityGolemBase> {
         textures.put(EnumGolemType.IRON, new ResourceLocation("thaumcraft", "textures/models/golem_iron.png"));
         textures.put(EnumGolemType.THAUMIUM, new ResourceLocation("thaumcraft", "textures/models/golem_thaumium.png"));
         return textures;
+    }
+
+    private static CCModel loadBucketModel() {
+        CCModel parsed = CCModel.parseObjModels(GOLEM_BUCKET_MODEL).get("Bucket");
+        if (parsed == null) {
+            throw new IllegalStateException("Golem bucket OBJ is missing Bucket");
+        }
+        CCModel corrected = parsed.backfacedCopy();
+        Vector3[] normals = corrected.normals();
+        if (normals != null) {
+            for (Vector3 normal : normals) {
+                if (normal != null) normal.negate();
+            }
+        }
+        return corrected;
+    }
+
+    private static void renderModel(CCModel model) {
+        CCRenderState.reset();
+        CCRenderState.startDrawing(GL11.GL_TRIANGLES, DefaultVertexFormats.OLDMODEL_POSITION_TEX_NORMAL);
+        model.render(CCRenderState.normalAttrib);
+        CCRenderState.draw();
     }
 
     private static final class GolemCoreLayer implements LayerRenderer<EntityGolemBase> {
@@ -344,33 +374,15 @@ public class RenderGolemBase extends RenderLiving<EntityGolemBase> {
 
         private void renderFluidBucket(EntityGolemBase entity) {
             FluidStack fluidStack = entity.getFluidCarried();
-            if (fluidStack == null || fluidStack.amount <= 0) return;
 
             GlStateManager.pushMatrix();
             GlStateManager.scale(0.4F, 0.4F, 0.4F);
+            GlStateManager.translate(0.0F, 3.0F, -1.1F);
+            GlStateManager.rotate(90.0F, 1.0F, 0.0F, 0.0F);
+            Minecraft.getMinecraft().getTextureManager().bindTexture(GOLEM_BUCKET_TEXTURE);
+            renderModel(this.renderer.bucketModel);
 
-            ModelGolem model = (ModelGolem) this.renderer.getMainModel();
-            model.golemRightArm.postRender(0.0625F);
-            GlStateManager.translate(-10.0F * 0.0625F, 20.0F * 0.0625F, 0.0F);
-            GlStateManager.rotate(-90.0F, 1.0F, 0.0F, 0.0F);
-            GlStateManager.rotate(180.0F, 0.0F, 1.0F, 0.0F);
-
-            // Try to render a filled bucket item if a bucket is registered for this fluid
-            ItemStack bucketStack = FluidUtil.getFilledBucket(fluidStack);
-            boolean useEmptyBucket = bucketStack.isEmpty();
-
-            if (useEmptyBucket) {
-                // No registered bucket item — render empty bucket + fluid overlay
-                bucketStack = new ItemStack(Items.BUCKET);
-            }
-
-            Minecraft.getMinecraft().getItemRenderer().renderItemSide(
-                    entity, bucketStack,
-                    ItemCameraTransforms.TransformType.THIRD_PERSON_RIGHT_HAND, false);
-
-            // When a vanilla filled-bucket was used, the fluid is already shown in the model.
-            // When falling back to empty bucket + overlay, draw the fluid sprite here.
-            if (useEmptyBucket && fluidStack.getFluid() != null) {
+            if (fluidStack != null && fluidStack.amount > 0 && fluidStack.getFluid() != null) {
                 renderFluidFillIndicator(entity, fluidStack);
             }
 
@@ -404,18 +416,16 @@ public class RenderGolemBase extends RenderLiving<EntityGolemBase> {
             GlStateManager.disableLighting();
             GlStateManager.color(r, g, b, 1.0F);
 
-            // Position slightly forward and up to sit inside/atop the bucket opening
-            GlStateManager.translate(0.0F, 0.25F, -0.35F);
-            float quadSize = 0.35F;
-            GlStateManager.scale(quadSize, quadSize * fillRatio, quadSize);
+            GlStateManager.translate(0.0F, 0.0F, 0.2F + 0.8F * fillRatio);
+            GlStateManager.scale(0.8F, 0.8F, 0.8F);
 
             Tessellator tessellator = Tessellator.getInstance();
             BufferBuilder buf = tessellator.getBuffer();
             buf.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
-            buf.pos(-1.0D, -1.0D, 0.0D).tex(fluidSprite.getMinU(), fluidSprite.getMaxV()).endVertex();
-            buf.pos(1.0D, -1.0D, 0.0D).tex(fluidSprite.getMaxU(), fluidSprite.getMaxV()).endVertex();
-            buf.pos(1.0D, 1.0D, 0.0D).tex(fluidSprite.getMaxU(), fluidSprite.getMinV()).endVertex();
-            buf.pos(-1.0D, 1.0D, 0.0D).tex(fluidSprite.getMinU(), fluidSprite.getMinV()).endVertex();
+            buf.pos(-0.5D, -0.5D, 0.0D).tex(fluidSprite.getMinU(), fluidSprite.getMaxV()).endVertex();
+            buf.pos(0.5D, -0.5D, 0.0D).tex(fluidSprite.getMaxU(), fluidSprite.getMaxV()).endVertex();
+            buf.pos(0.5D, 0.5D, 0.0D).tex(fluidSprite.getMaxU(), fluidSprite.getMinV()).endVertex();
+            buf.pos(-0.5D, 0.5D, 0.0D).tex(fluidSprite.getMinU(), fluidSprite.getMinV()).endVertex();
             tessellator.draw();
 
             GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);

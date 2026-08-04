@@ -17,6 +17,7 @@ public class EntityRendererAssetCoverageTest {
                 "textures/misc/wisp.png",
                 "textures/misc/wispy.png",
                 "textures/models/bucket.obj",
+                "textures/models/bucket.png",
                 "textures/models/orb.obj",
                 "textures/models/bzombie.png",
                 "textures/models/bzombievil.png",

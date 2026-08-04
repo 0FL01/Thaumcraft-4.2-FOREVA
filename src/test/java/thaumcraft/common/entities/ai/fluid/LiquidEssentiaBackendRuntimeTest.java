@@ -39,6 +39,7 @@ import thaumcraft.common.entities.golems.EntityGolemBase;
 import thaumcraft.common.entities.golems.EnumGolemType;
 import thaumcraft.common.entities.golems.GolemHelper;
 import thaumcraft.common.entities.golems.Marker;
+import thaumcraft.common.tiles.TileCrucible;
 import thaumcraft.common.tiles.TileEssentiaReservoir;
 
 import java.lang.reflect.Field;
@@ -202,6 +203,64 @@ public class LiquidEssentiaBackendRuntimeTest {
         assertEquals(1000, first.tank.getFluidAmount() + second.tank.getFluidAmount());
         assertTrue(first.requestedFaces.contains(EnumFacing.EAST));
         assertTrue(second.requestedFaces.contains(EnumFacing.SOUTH));
+    }
+
+    @Test
+    public void markedVanillaWaterFillsRealCrucible() {
+        TestWorld world = new TestWorld(0);
+        TileCrucible crucible = world.addTile(HOME.down(), new TileCrucible());
+        EntityGolemBase golem = fluidGolem(world, EnumGolemType.STONE);
+        BlockPos source = HOME.east();
+        world.setBlock(source, Blocks.WATER.getDefaultState());
+        setMarkers(golem, marker(source, EnumFacing.UP, -1, 0));
+        golem.itemWatched = new ItemStack(Items.BUCKET);
+
+        AILiquidGather gather = new AILiquidGather(golem);
+        assertTrue(gather.shouldExecute());
+        gather.startExecuting();
+        for (int tick = 0; tick < 10; tick++) gather.updateTask();
+
+        assertNotNull(golem.fluidCarried);
+        assertSame(FluidRegistry.WATER, golem.fluidCarried.getFluid());
+        assertEquals(1000, golem.fluidCarried.amount);
+
+        AILiquidEmpty empty = new AILiquidEmpty(golem);
+        assertTrue(empty.shouldExecute());
+        empty.startExecuting();
+
+        IFluidHandler handler = crucible.getCapability(
+                CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, EnumFacing.UP);
+        assertNotNull(handler);
+        assertEquals(1000, handler.getTankProperties()[0].getContents().amount);
+        assertNull(golem.fluidCarried);
+    }
+
+    @Test
+    public void negativeMarkerCoordinatesUseTheMarkedBlockForApproachChecks() throws Exception {
+        TestWorld world = new TestWorld(0);
+        BlockPos home = new BlockPos(-5, 64, 0);
+        world.addTile(home.down(), SidedFluidTile.sink(EnumFacing.UP, FluidRegistry.WATER));
+        EntityGolemBase golem = new EntityGolemBase(world, EnumGolemType.STONE, false);
+        golem.setEntityId(nextEntityId++);
+        golem.homeFacing = EnumFacing.UP.getIndex();
+        golem.setHomePosAndDistance(home, 32);
+        golem.setPosition(home.getX() + 0.5, home.getY() + 0.5, home.getZ() + 0.5);
+        golem.setCore((byte) 5);
+        golem.setupGolem();
+        golem.setupGolemInventory();
+
+        BlockPos source = new BlockPos(-3, 64, 0);
+        world.setBlock(source, Blocks.WATER.getDefaultState());
+        setMarkers(golem, marker(source, EnumFacing.UP, -1, 0));
+
+        AILiquidGoto goTo = new AILiquidGoto(golem);
+        assertTrue(goTo.shouldExecute());
+        Field waterX = AILiquidGoto.class.getDeclaredField("waterX");
+        Field waterZ = AILiquidGoto.class.getDeclaredField("waterZ");
+        waterX.setAccessible(true);
+        waterZ.setAccessible(true);
+        assertEquals(source.getX() - 0.5D, waterX.getDouble(goTo), 0.0D);
+        assertEquals(source.getZ() + 0.5D, waterZ.getDouble(goTo), 0.0D);
     }
 
     @Test

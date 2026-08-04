@@ -22,6 +22,13 @@ public class GolemClientStateSyncStaticGuardTest {
                 entity.contains("new net.minecraft.item.ItemStack(fluidBlock, 1, this.fluidCarried.amount)"));
         assertTrue(renderer.contains("FluidStack fluidStack = entity.getFluidCarried();"));
         assertFalse(renderer.contains("entity.fluidCarried"));
+        assertTrue("Decanting golems must always render the original bucket shell",
+                renderer.contains("textures/models/bucket.obj")
+                        && renderer.contains("textures/models/bucket.png")
+                        && renderer.contains("renderModel(this.renderer.bucketModel);")
+                        && renderer.contains("if (fluidStack != null && fluidStack.amount > 0"));
+        assertFalse("An empty Decanting golem must not skip its bucket shell",
+                renderer.contains("if (fluidStack == null || fluidStack.amount <= 0) return;"));
     }
 
     private static String read(String path) throws Exception {

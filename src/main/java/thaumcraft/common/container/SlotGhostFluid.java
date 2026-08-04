@@ -1,6 +1,7 @@
 package thaumcraft.common.container;
 
 import net.minecraft.inventory.IInventory;
+import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.fluids.FluidUtil;
 
@@ -11,6 +12,8 @@ public class SlotGhostFluid extends SlotGhost {
 
     @Override
     public boolean isItemValid(ItemStack stack) {
-        return super.isItemValid(stack) && FluidUtil.getFluidHandler(stack) != null;
+        return super.isItemValid(stack)
+                && stack.getItem() != Items.BUCKET
+                && FluidUtil.getFluidContained(stack) != null;
     }
 }

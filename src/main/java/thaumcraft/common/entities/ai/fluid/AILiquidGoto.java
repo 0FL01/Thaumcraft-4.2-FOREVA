@@ -52,10 +52,11 @@ public class AILiquidGoto extends EntityAIBase {
             this.waterY = var1.y;
             this.waterZ = var1.z;
             double dd = this.theGolem.getDistanceSq(this.waterX, this.waterY, this.waterZ);
+            BlockPos markerPos = new BlockPos(var1.x, var1.y, var1.z);
             for (int xx = -1; xx <= 1; ++xx) {
                 for (int zz = -1; zz <= 1; ++zz) {
                     double dd2 = this.theGolem.getDistanceSq(var1.x + xx, this.waterY, var1.z + zz);
-                    BlockPos checkPos = new BlockPos((int) var1.x + xx, (int) this.waterY, (int) var1.z + zz);
+                    BlockPos checkPos = markerPos.add(xx, 0, zz);
                     if (dd2 < dd && this.theGolem.world.isAirBlock(checkPos)) {
                         this.waterX = var1.x + xx;
                         this.waterZ = var1.z + zz;
