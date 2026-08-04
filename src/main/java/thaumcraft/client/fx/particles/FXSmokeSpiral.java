@@ -2,17 +2,15 @@ package thaumcraft.client.fx.particles;
 
 import net.minecraft.client.particle.Particle;
 import net.minecraft.client.renderer.BufferBuilder;
-import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import org.lwjgl.opengl.GL11;
+import thaumcraft.client.fx.ITCParticle;
 
 @SideOnly(Side.CLIENT)
-public class FXSmokeSpiral extends Particle {
+public class FXSmokeSpiral extends Particle implements ITCParticle {
     private float radius = 1.0f;
     private int start = 0;
     private int miny = 0;
@@ -32,7 +30,7 @@ public class FXSmokeSpiral extends Particle {
 
     @Override
     public int getFXLayer() {
-        return 3;
+        return 1;
     }
 
     @Override
@@ -48,11 +46,8 @@ public class FXSmokeSpiral extends Particle {
     }
 
     @Override
-    public void renderParticle(BufferBuilder ignored, Entity entityIn, float partialTicks,
+    public void renderParticle(BufferBuilder buffer, Entity entityIn, float partialTicks,
                                float rotationX, float rotationZ, float rotationYZ, float rotationXY, float rotationXZ) {
-        Tessellator tessellator = Tessellator.getInstance();
-        BufferBuilder buffer = tessellator.getBuffer();
-
         int particle = 1 + (int) (this.particleAge / (float) this.particleMaxAge * 4.0F);
         float r1 = this.start + 720.0F * ((this.particleAge + partialTicks) / (float) this.particleMaxAge);
         float r2 = 90.0F - 180.0F * ((this.particleAge + partialTicks) / (float) this.particleMaxAge);
@@ -72,10 +67,9 @@ public class FXSmokeSpiral extends Particle {
         float py = (float) (Math.max(this.posY + mY, this.miny + 0.1F) - Particle.interpPosY);
         float pz = (float) (this.posZ + mZ - Particle.interpPosZ);
         int brightness = this.getBrightnessForRender(partialTicks);
-        int lightU = brightness & 0xFFFF;
-        int lightV = brightness >> 16 & 0xFFFF;
+        int lightU = brightness >> 16 & 0xFFFF;
+        int lightV = brightness & 0xFFFF;
 
-        buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.PARTICLE_POSITION_TEX_COLOR_LMAP);
         buffer.pos(px - rotationX * size - rotationXY * size, py - rotationZ * size, pz - rotationYZ * size - rotationXZ * size)
                 .tex(u1, v1)
                 .color(this.particleRed, this.particleGreen, this.particleBlue, 0.66F * this.particleAlpha)
@@ -96,6 +90,10 @@ public class FXSmokeSpiral extends Particle {
                 .color(this.particleRed, this.particleGreen, this.particleBlue, 0.66F * this.particleAlpha)
                 .lightmap(lightU, lightV)
                 .endVertex();
-        tessellator.draw();
+    }
+
+    @Override
+    public int getTCParticleLayer() {
+        return 1;
     }
 }

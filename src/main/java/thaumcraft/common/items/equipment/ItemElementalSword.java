@@ -17,6 +17,7 @@ import net.minecraft.util.ActionResult;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumHand;
+import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
@@ -129,13 +130,11 @@ public class ItemElementalSword extends ItemSword implements IRepairable {
                 float yaw = player.world.rand.nextFloat() * 360.0F;
                 float mx = -MathHelper.sin(yaw / 180.0F * (float) Math.PI) / 5.0F;
                 float mz = MathHelper.cos(yaw / 180.0F * (float) Math.PI) / 5.0F;
-                Thaumcraft.proxy.drawGenericParticles(player.world,
+                player.world.spawnParticle(EnumParticleTypes.SMOKE_NORMAL,
                         player.posX,
                         player.getEntityBoundingBox().minY + 0.1F,
                         player.posZ,
-                        mx, 0.0D, mz,
-                        0.25F, 0.25F, 0.25F, 0.8F,
-                        false, 0, 8, -1, 8, 0, 0.8F, 1);
+                        mx, 0.0D, mz);
             }
         } else if (ticks == 0 || ticks % 20 == 0) {
             player.world.playSound(null, player.posX, player.posY, player.posZ,

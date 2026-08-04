@@ -16,10 +16,27 @@ public class ClientLayer3ParticleRenderContractTest {
     public void layer3CustomParticlesShouldOwnExactlyOneInternalBeginDrawPass() throws IOException {
         assertLayer3SelfContained("src/main/java/thaumcraft/client/fx/particles/FXBurst.java");
         assertLayer3SelfContained("src/main/java/thaumcraft/client/fx/particles/FXBreaking.java");
-        assertLayer3SelfContained("src/main/java/thaumcraft/client/fx/particles/FXSmokeSpiral.java");
         assertLayer3SelfContained("src/main/java/thaumcraft/client/fx/other/FXSonic.java");
         assertLayer3Model("src/main/java/thaumcraft/client/fx/other/FXShieldRunes.java");
         assertLayer3SelfContained("src/main/java/thaumcraft/client/fx/other/FXBlockWard.java");
+    }
+
+    @Test
+    public void smokeSpiralUsesEngineOwnedThaumcraftLayerOneBatch() throws IOException {
+        String source = read("src/main/java/thaumcraft/client/fx/particles/FXSmokeSpiral.java");
+
+        assertTrue("FXSmokeSpiral must route through the TC particle sheet layer 1",
+                source.contains("class FXSmokeSpiral extends Particle implements ITCParticle")
+                        && source.contains("public int getFXLayer()")
+                        && countOccurrences(source, "return 1;") == 2
+                        && source.contains("public int getTCParticleLayer()"));
+        assertEquals("FXSmokeSpiral must append to the engine-owned buffer", 0,
+                countOccurrences(source, "buffer.begin("));
+        assertEquals("FXSmokeSpiral must not close the engine-owned buffer", 0,
+                countOccurrences(source, "tessellator.draw();"));
+        assertTrue("FXSmokeSpiral must preserve the 1.12 packed-light component order",
+                source.contains("int lightU = brightness >> 16 & 0xFFFF;")
+                        && source.contains("int lightV = brightness & 0xFFFF;"));
     }
 
     private static void assertLayer3Model(String path) throws IOException {

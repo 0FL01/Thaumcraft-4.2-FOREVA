@@ -45,10 +45,10 @@ public class ClientSheetParticleBurstContractTest {
         assertTrue("ClientProxy taint/slime breaking helpers must use the slime-ball reference sprite baseline",
                 clientProxy.contains("Items.SLIME_BALL")
                         && !clientProxy.contains("Items.SNOWBALL"));
-        assertTrue("Elemental Sword, Crystal, Candle, Jar, WoodenDevice sensor, Mirror, ArcaneFurnace, Dart, FireBat, and InhabitedZombie must route their client-only fallback particles through proxy generic sheet FX",
-                elementalSword.contains("Thaumcraft.proxy.drawGenericParticles(player.world")
-                        && !elementalSword.contains("EnumParticleTypes.SMOKE_NORMAL")
-                        && blockCrystal.contains("Thaumcraft.proxy.drawGenericParticles(worldIn")
+        assertTrue("Elemental Sword must retain TC4's grounded vanilla smoke cue",
+                elementalSword.contains("player.world.spawnParticle(EnumParticleTypes.SMOKE_NORMAL,"));
+        assertTrue("Crystal, Candle, Jar, WoodenDevice sensor, Mirror, ArcaneFurnace, Dart, FireBat, and InhabitedZombie must route their client-only fallback particles through proxy generic sheet FX",
+                blockCrystal.contains("Thaumcraft.proxy.drawGenericParticles(worldIn")
                         && !blockCrystal.contains("EnumParticleTypes.SPELL_MOB")
                         && blockCandle.contains("Thaumcraft.proxy.drawGenericParticles(worldIn")
                         && !blockCandle.contains("EnumParticleTypes.SMOKE_NORMAL")

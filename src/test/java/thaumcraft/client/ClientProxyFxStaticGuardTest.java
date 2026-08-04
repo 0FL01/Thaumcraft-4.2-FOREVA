@@ -366,10 +366,13 @@ public class ClientProxyFxStaticGuardTest {
                         && smokeDriftFx.contains("return 0;")
                         && !smokeDriftFx.contains("EnumParticleTypes.SMOKE_NORMAL"));
         assertTrue("Dedicated FXSmokeSpiral particle must keep spiral smoke billboard baseline",
-                smokeSpiralFx.contains("class FXSmokeSpiral extends Particle")
+                smokeSpiralFx.contains("class FXSmokeSpiral extends Particle implements ITCParticle")
                         && smokeSpiralFx.contains("public int getFXLayer()")
+                        && smokeSpiralFx.contains("public int getTCParticleLayer()")
                         && smokeSpiralFx.contains("particle = 1 + (int) (this.particleAge / (float) this.particleMaxAge * 4.0F)")
                         && smokeSpiralFx.contains("Math.max(this.posY + mY, this.miny + 0.1F)")
+                        && !smokeSpiralFx.contains("buffer.begin(")
+                        && !smokeSpiralFx.contains("tessellator.draw()")
                         && !smokeSpiralFx.contains("EnumParticleTypes.SMOKE_NORMAL"));
         assertTrue("Dedicated FXSpark particle must keep TC particles2 sparkle baseline",
                 sparkFx.contains("class FXSpark extends Particle implements ITCParticle")
