@@ -4,10 +4,12 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.OpenGlHelper;
@@ -25,8 +27,10 @@ import net.minecraft.nbt.NBTBase;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.common.crafting.IShapedRecipe;
 import org.lwjgl.opengl.GL11;
+import thaumcraft.api.ThaumcraftApi;
 import thaumcraft.api.ThaumcraftApiHelper;
 import thaumcraft.api.aspects.Aspect;
 import thaumcraft.api.aspects.AspectList;
@@ -36,8 +40,10 @@ import thaumcraft.api.crafting.InfusionEnchantmentRecipe;
 import thaumcraft.api.crafting.InfusionRecipe;
 import thaumcraft.api.crafting.ShapedArcaneRecipe;
 import thaumcraft.api.crafting.ShapelessArcaneRecipe;
+import thaumcraft.api.research.ResearchCategories;
 import thaumcraft.api.research.ResearchItem;
 import thaumcraft.api.research.ResearchPage;
+import thaumcraft.common.lib.TCSounds;
 import thaumcraft.common.lib.utils.InventoryUtils;
 
 public class GuiResearchRecipe extends GuiScreen {
@@ -47,6 +53,7 @@ public class GuiResearchRecipe extends GuiScreen {
     private static final int PAGE_WIDTH = 139;
     private static final int LEFT_PAGE_OFFSET = -15;
     private static final int PAGE_STRIDE = 152;
+    private static final LinkedList<Object[]> HISTORY = new LinkedList<Object[]>();
 
     private final int paneWidth = 256;
     private final int paneHeight = 181;
@@ -95,6 +102,7 @@ public class GuiResearchRecipe extends GuiScreen {
     @Override
     protected void keyTyped(char typedChar, int keyCode) throws IOException {
         if (keyCode == this.mc.gameSettings.keyBindInventory.getKeyCode() || keyCode == 1) {
+            HISTORY.clear();
             this.mc.displayGuiScreen(new GuiResearchBrowser(this.guiMapX, this.guiMapY));
             return;
         }
@@ -108,6 +116,7 @@ public class GuiResearchRecipe extends GuiScreen {
         if (this.page > 0 && mouseX >= left - 16 && mouseX < left - 4 && mouseY >= top + 190 && mouseY < top + 198) {
             this.page = Math.max(0, this.page - 2);
             this.resetRecipeCycle();
+            this.playPageTurn();
             return;
         }
         if (this.page < this.maxPages - 2 && mouseX >= left + 262 && mouseX < left + 274 && mouseY >= top + 190 && mouseY < top + 198) {
@@ -116,6 +125,27 @@ public class GuiResearchRecipe extends GuiScreen {
                 --this.page;
             }
             this.resetRecipeCycle();
+            this.playPageTurn();
+            return;
+        }
+        if (!HISTORY.isEmpty() && mouseX >= left + 118 && mouseX < left + 138
+                && mouseY >= top + 189 && mouseY < top + 201) {
+            Object[] previous = HISTORY.pop();
+            ResearchItem target = ResearchCategories.getResearch((String) previous[0]);
+            if (target != null) {
+                this.playPageTurn();
+                this.mc.displayGuiScreen(new GuiResearchRecipe(target, (Integer) previous[1], this.guiMapX, this.guiMapY));
+            }
+            return;
+        }
+        Object[] reference = this.findRecipeReference(this.tooltipStack);
+        if (reference != null && !reference[0].equals(this.research.key)) {
+            ResearchItem target = ResearchCategories.getResearch((String) reference[0]);
+            if (target != null) {
+                HISTORY.push(new Object[]{this.research.key, this.page});
+                this.playPageTurn();
+                this.mc.displayGuiScreen(new GuiResearchRecipe(target, (Integer) reference[1], this.guiMapX, this.guiMapY));
+            }
             return;
         }
         super.mouseClicked(mouseX, mouseY, mouseButton);
@@ -155,12 +185,18 @@ public class GuiResearchRecipe extends GuiScreen {
         if (this.page < this.maxPages - 2) {
             this.drawTexturedModalRect(left + 262, top + 190, 12, 184, 12, 8);
         }
+        if (!HISTORY.isEmpty()) {
+            this.drawTexturedModalRect(left + 118, top + 189, 38, 202, 20, 12);
+        }
 
         super.drawScreen(mouseX, mouseY, partialTicks);
         if (!this.tooltipStack.isEmpty()) {
-            this.renderToolTip(this.tooltipStack, this.tooltipX, this.tooltipY);
+            this.drawLinkedItemTooltip(this.tooltipStack, this.tooltipX, this.tooltipY);
         } else if (this.tooltip != null && !this.tooltip.isEmpty()) {
             this.drawHoveringText(this.tooltip, this.tooltipX, this.tooltipY);
+        } else if (!HISTORY.isEmpty() && mouseX >= left + 118 && mouseX < left + 138
+                && mouseY >= top + 189 && mouseY < top + 201) {
+            this.drawHoveringText(Collections.singletonList(I18n.format("recipe.return")), mouseX, mouseY);
         }
     }
 
@@ -398,14 +434,18 @@ public class GuiResearchRecipe extends GuiScreen {
         this.drawOverlayScaled(x + start + 48, y + 174, 0, 0, 68, 76, 12, 12, 2.0F, aspects == null || aspects.size() <= 0 ? 0.0F : 0.4F);
         this.drawAspectCostRow(aspects, x + start + 14, y + 182, 5, mouseX, mouseY, 1);
 
-        this.mc.getTextureManager().bindTexture(OVERLAY);
-        GlStateManager.color(1.0F, 1.0F, 1.0F, 0.5F);
-        GlStateManager.enableBlend();
-        this.drawOverlayScaled(x + start - 8, y + 78 + Math.max(3 - dx, 3 - dz) * 8 + dx * 4 + dz * 4, 0, 0, 0, 72, 64, 44, 2.0F, 0.5F);
-
         int xoff = 64 - (dx * 16 + dz * 16) / 2;
         int yoff = -dy * 25;
         float scale = dy > 3 ? Math.max(0.4F, 1.0F - (dy - 3) * 0.2F) : 1.0F;
+        float shrink = 1.0F - scale;
+        int groundTerm = Math.max(3 - dx, 3 - dz) * 8 + dx * 4 + dz * 4;
+        int groundX = (int) (x + start + xoff * (1.0F + shrink) + (-8 - xoff) * scale);
+        int groundY = (int) (y + 108 + yoff * scale + (-119 + groundTerm + dy * 50) * scale);
+        this.mc.getTextureManager().bindTexture(OVERLAY);
+        GlStateManager.color(1.0F, 1.0F, 1.0F, 0.5F);
+        GlStateManager.enableBlend();
+        this.drawOverlayScaled(groundX, groundY, 0, 0, 0, 72, 64, 44, 2.0F * scale, 0.5F);
+
         int index = 0;
         for (int j = 0; j < dy; ++j) {
             for (int k = dz - 1; k >= 0; --k) {
@@ -850,6 +890,38 @@ public class GuiResearchRecipe extends GuiScreen {
         this.tooltipStack = stack;
         this.tooltipX = x;
         this.tooltipY = y;
+    }
+
+    private Object[] findRecipeReference(ItemStack stack) {
+        if (stack == null || stack.isEmpty() || this.mc.player == null) {
+            return null;
+        }
+        return ThaumcraftApi.getCraftingRecipeKey(this.mc.player, stack);
+    }
+
+    private void drawLinkedItemTooltip(ItemStack stack, int x, int y) {
+        Object[] reference = this.findRecipeReference(stack);
+        if (reference == null || reference[0].equals(this.research.key)) {
+            this.renderToolTip(stack, x, y);
+            return;
+        }
+        ITooltipFlag flag = this.mc.gameSettings.advancedItemTooltips
+                ? ITooltipFlag.TooltipFlags.ADVANCED : ITooltipFlag.TooltipFlags.NORMAL;
+        List<String> lines = stack.getTooltip(this.mc.player, flag);
+        if (!lines.isEmpty()) {
+            lines.set(0, stack.getRarity().color + lines.get(0));
+            for (int i = 1; i < lines.size(); ++i) {
+                lines.set(i, TextFormatting.GRAY + lines.get(i));
+            }
+        }
+        lines.add(TextFormatting.DARK_GRAY.toString() + TextFormatting.ITALIC + I18n.format("recipe.clickthrough"));
+        this.drawHoveringText(lines, x, y);
+    }
+
+    private void playPageTurn() {
+        if (this.mc.player != null) {
+            this.mc.player.playSound(TCSounds.PAGE, 0.66F, 1.0F);
+        }
     }
 
     private boolean isMouseIn(int mouseX, int mouseY, int x, int y, int width, int height) {

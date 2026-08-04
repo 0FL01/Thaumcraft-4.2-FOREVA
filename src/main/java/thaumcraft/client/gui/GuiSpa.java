@@ -64,8 +64,12 @@ public class GuiSpa extends GuiContainer {
                 (float) (color & 255) / 255.0F,
                 1.0F);
         this.mc.getTextureManager().bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
-        this.drawTexturedModalRect(this.guiLeft + 107, this.guiTop + 15 + 48 - fill, sprite, 8, fill);
+        for (int row = 0; row < 6; ++row) {
+            this.drawTexturedModalRect(this.guiLeft + 107, this.guiTop + 15 + row * 8, sprite, 8, 8);
+        }
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+        this.mc.getTextureManager().bindTexture(TEXTURE);
+        this.drawTexturedModalRect(this.guiLeft + 107, this.guiTop + 15, 107, 15, 10, 48 - fill);
     }
 
     @Override

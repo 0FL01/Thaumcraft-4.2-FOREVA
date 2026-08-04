@@ -50,6 +50,7 @@ import net.minecraftforge.fml.client.registry.RenderingRegistry;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import org.lwjgl.opengl.GL11;
 import thaumcraft.api.aspects.Aspect;
+import thaumcraft.api.aspects.AspectList;
 import thaumcraft.api.research.ResearchCategories;
 import thaumcraft.api.research.ResearchItem;
 import thaumcraft.client.gui.GuiArcaneBore;
@@ -799,6 +800,19 @@ public class ClientProxy extends CommonProxy {
             Minecraft.getMinecraft().getItemColors().registerItemColorHandler(
                     (stack, tintIndex) -> ConfigItems.itemEssence.getColorFromItemStack(stack, tintIndex),
                     ConfigItems.itemEssence
+            );
+        }
+        if (ConfigItems.itemResource != null) {
+            Minecraft.getMinecraft().getItemColors().registerItemColorHandler(
+                    (stack, tintIndex) -> {
+                        if (tintIndex != 1 || stack.getMetadata() != thaumcraft.common.items.ItemResource.META_LABEL) {
+                            return -1;
+                        }
+                        AspectList aspects = ConfigItems.itemResource.getAspects(stack);
+                        Aspect[] labels = aspects == null ? null : aspects.getAspects();
+                        return labels == null || labels.length == 0 || labels[0] == null ? -1 : labels[0].getColor();
+                    },
+                    ConfigItems.itemResource
             );
         }
         if (ConfigItems.itemCrystalEssence != null) {

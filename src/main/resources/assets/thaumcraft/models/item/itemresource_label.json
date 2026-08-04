@@ -1,6 +1,7 @@
 {
   "parent": "item/generated",
   "textures": {
-    "layer0": "thaumcraft:items/label"
+    "layer0": "thaumcraft:items/label",
+    "layer1": "thaumcraft:items/label_over"
   }
 }

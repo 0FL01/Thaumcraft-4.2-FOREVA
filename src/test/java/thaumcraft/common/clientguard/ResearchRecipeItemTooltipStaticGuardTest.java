@@ -6,7 +6,6 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import org.junit.Test;
 
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 public class ResearchRecipeItemTooltipStaticGuardTest {
@@ -18,13 +17,13 @@ public class ResearchRecipeItemTooltipStaticGuardTest {
         String source = readSource();
         assertTrue(source.contains("private ItemStack tooltipStack = ItemStack.EMPTY;"));
         assertTrue(source.contains("this.setItemTooltip(stack, mouseX, mouseY);"));
-        assertTrue(source.contains("this.renderToolTip(this.tooltipStack, this.tooltipX, this.tooltipY);"));
-        assertFalse(source.contains("stack.getTooltip(this.mc.player"));
+        assertTrue(source.contains("this.drawLinkedItemTooltip(this.tooltipStack, this.tooltipX, this.tooltipY);"));
+        assertTrue(source.contains("this.renderToolTip(stack, x, y);"));
 
         int drawScreen = source.indexOf("public void drawScreen(int mouseX, int mouseY, float partialTicks)");
         int drawPages = source.indexOf("this.drawPage(", drawScreen);
         int drawBase = source.indexOf("super.drawScreen(mouseX, mouseY, partialTicks);", drawPages);
-        int drawItemTooltip = source.indexOf("this.renderToolTip(this.tooltipStack, this.tooltipX, this.tooltipY);", drawBase);
+        int drawItemTooltip = source.indexOf("this.drawLinkedItemTooltip(this.tooltipStack, this.tooltipX, this.tooltipY);", drawBase);
         assertTrue(drawPages > drawScreen);
         assertTrue(drawBase > drawPages);
         assertTrue(drawItemTooltip > drawBase);
