@@ -32,6 +32,9 @@ import net.minecraft.init.SoundEvents;
 import net.minecraftforge.fluids.FluidUtil;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import thaumcraft.api.aspects.Aspect;
+import thaumcraft.api.aspects.AspectList;
+import thaumcraft.api.aspects.IEssentiaContainerItem;
 import thaumcraft.api.visnet.VisNetHandler;
 import thaumcraft.common.Thaumcraft;
 import thaumcraft.common.CommonProxy;
@@ -211,6 +214,15 @@ public class BlockMetalDevice extends BlockContainer {
                     return true;
                 }
             }
+            if (state.getValue(TYPE) == 1 && !playerIn.isSneaking()) {
+                TileAlembic alembic = (TileAlembic) tileEntity;
+                if (this.applyAlembicLabel(worldIn, pos, state, playerIn, held, alembic)) {
+                    return true;
+                }
+                if (this.fillJarFromAlembic(worldIn, pos, state, playerIn, held, alembic)) {
+                    return true;
+                }
+            }
         }
         if (state.getValue(TYPE) == 5) {
             toggleGrate(worldIn, pos, state, 6, playerIn);
@@ -241,6 +253,77 @@ public class BlockMetalDevice extends BlockContainer {
         return super.onBlockActivated(worldIn, pos, state, playerIn, hand, facing, hitX, hitY, hitZ);
     }
 
+    private boolean applyAlembicLabel(World world, BlockPos pos, IBlockState state, EntityPlayer player,
+                                      ItemStack held, TileAlembic alembic) {
+        if (held.isEmpty() || alembic.aspectFilter != null || held.getItem() != ConfigItems.itemResource
+                || held.getMetadata() != 13 || !(held.getItem() instanceof IEssentiaContainerItem)) {
+            return false;
+        }
+        Aspect labelAspect = null;
+        AspectList labelAspects = ((IEssentiaContainerItem) held.getItem()).getAspects(held);
+        if (labelAspects != null && labelAspects.size() > 0) {
+            labelAspect = labelAspects.getAspects()[0];
+        }
+        if (alembic.amount == 0 && labelAspect == null) return true;
+        if (world.isRemote) return true;
+
+        if (alembic.amount == 0) {
+            alembic.aspect = labelAspect;
+        }
+        alembic.aspectFilter = alembic.aspect;
+        held.shrink(1);
+        this.syncAlembic(world, pos, state, alembic);
+        world.playSound(null, pos, TCSounds.PAGE, SoundCategory.BLOCKS, 1.0F, 0.9F);
+        return true;
+    }
+
+    private boolean fillJarFromAlembic(World world, BlockPos pos, IBlockState state, EntityPlayer player,
+                                       ItemStack held, TileAlembic alembic) {
+        if (held.isEmpty() || alembic.aspect == null || alembic.amount <= 0
+                || !(held.getItem() instanceof BlockJarItem)
+                || held.getMetadata() != 0 && held.getMetadata() != 3) {
+            return false;
+        }
+        BlockJarItem jarItem = (BlockJarItem) held.getItem();
+        Aspect filter = held.hasTagCompound() && held.getTagCompound().hasKey("AspectFilter")
+                ? Aspect.getAspect(held.getTagCompound().getString("AspectFilter")) : null;
+        AspectList storedAspects = jarItem.getAspects(held);
+        Aspect storedAspect = storedAspects == null || storedAspects.size() == 0
+                ? null : storedAspects.getAspects()[0];
+        if (storedAspect != null && storedAspect != alembic.aspect || filter != null && filter != alembic.aspect) {
+            return true;
+        }
+        int stored = storedAspect == null ? 0 : storedAspects.getAmount(storedAspect);
+        int moved = held.getMetadata() == 3 ? alembic.amount : Math.min(64 - stored, alembic.amount);
+        if (moved <= 0 || world.isRemote) return true;
+
+        ItemStack filled = held.getCount() == 1 ? held : held.copy();
+        filled.setCount(1);
+        int retained = Math.min(64, stored + moved);
+        jarItem.setAspects(filled, new AspectList().add(alembic.aspect, retained));
+        alembic.amount -= moved;
+        if (alembic.amount <= 0) {
+            alembic.amount = 0;
+            alembic.aspect = null;
+        }
+        if (held.getCount() > 1) {
+            held.shrink(1);
+            if (!player.inventory.addItemStackToInventory(filled)) {
+                player.dropItem(filled, false);
+            }
+        }
+        player.inventoryContainer.detectAndSendChanges();
+        this.syncAlembic(world, pos, state, alembic);
+        world.playSound(null, pos, SoundEvents.ENTITY_PLAYER_SWIM, SoundCategory.BLOCKS,
+                0.5F, 1.0F + (world.rand.nextFloat() - world.rand.nextFloat()) * 0.3F);
+        return true;
+    }
+
+    private void syncAlembic(World world, BlockPos pos, IBlockState state, TileAlembic alembic) {
+        alembic.markDirty();
+        world.notifyBlockUpdate(pos, state, state, 3);
+    }
+
     @Override
     public void breakBlock(World worldIn, BlockPos pos, IBlockState state) {
         TileEntity te = worldIn.getTileEntity(pos);
@@ -248,6 +331,10 @@ public class BlockMetalDevice extends BlockContainer {
             ((TileCrucible) te).spillRemnants();
         } else if (te instanceof TileArcaneLamp) {
             ((TileArcaneLamp) te).removeLights();
+        } else if (te instanceof TileAlembic && ((TileAlembic) te).aspectFilter != null) {
+            worldIn.spawnEntity(new EntityItem(worldIn,
+                    pos.getX() + 0.5D, pos.getY() + 0.5D, pos.getZ() + 0.5D,
+                    new ItemStack(ConfigItems.itemResource, 1, 13)));
         } else if (te instanceof IInventory) {
             IInventory inventory = (IInventory) te;
             for (int i = 0; i < inventory.getSizeInventory(); ++i) {

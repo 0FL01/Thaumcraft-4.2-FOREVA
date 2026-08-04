@@ -2,10 +2,13 @@ package thaumcraft.common.blocks;
 
 import com.mojang.authlib.GameProfile;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Bootstrap;
 import net.minecraft.init.Blocks;
 import net.minecraft.profiler.Profiler;
+import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
@@ -23,16 +26,22 @@ import net.minecraft.world.storage.WorldInfo;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import thaumcraft.api.aspects.Aspect;
+import thaumcraft.api.aspects.AspectList;
+import thaumcraft.common.config.ConfigBlocks;
+import thaumcraft.common.config.ConfigItems;
 import thaumcraft.common.tiles.TileAlembic;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
 public class BlockMetalDeviceAlembicInteractionTest {
@@ -40,6 +49,8 @@ public class BlockMetalDeviceAlembicInteractionTest {
     @BeforeClass
     public static void bootstrapMinecraftStatics() {
         Bootstrap.register();
+        if (ConfigBlocks.blockJar == null) ConfigBlocks.init();
+        if (ConfigItems.itemResource == null) ConfigItems.init();
     }
 
     @Test
@@ -61,6 +72,86 @@ public class BlockMetalDeviceAlembicInteractionTest {
         assertEquals(0, alembic.amount);
         assertNull(alembic.aspect);
         assertTrue(world.notified.contains(pos));
+    }
+
+    @Test
+    public void aspectLabelInstallsFilterAndConsumesOneLabel() {
+        AlembicWorld world = new AlembicWorld();
+        BlockMetalDevice block = ConfigBlocks.blockMetalDevice;
+        BlockPos pos = new BlockPos(0, 64, 0);
+        IBlockState state = block.getStateFromMeta(1);
+        TileAlembic alembic = new TestAlembic();
+        world.attach(pos, alembic);
+        TestPlayer player = new TestPlayer(world);
+        ItemStack label = new ItemStack(ConfigItems.itemResource, 1, 13);
+        ConfigItems.itemResource.setAspects(label, new AspectList().add(Aspect.FIRE, 0));
+        player.setHeldItem(EnumHand.MAIN_HAND, label);
+
+        assertTrue(block.onBlockActivated(world, pos, state, player, EnumHand.MAIN_HAND,
+                EnumFacing.NORTH, 0.5F, 0.5F, 0.5F));
+
+        assertSame(Aspect.FIRE, alembic.aspect);
+        assertSame(Aspect.FIRE, alembic.aspectFilter);
+        assertTrue(player.getHeldItem(EnumHand.MAIN_HAND).isEmpty());
+        assertTrue(world.notified.contains(pos));
+    }
+
+    @Test
+    public void emptyAndVoidJarsReceiveAlembicContentsWithTc4CapacityRules() {
+        AlembicWorld world = new AlembicWorld();
+        BlockMetalDevice block = ConfigBlocks.blockMetalDevice;
+        BlockPos pos = new BlockPos(0, 64, 0);
+        IBlockState state = block.getStateFromMeta(1);
+        TileAlembic alembic = new TestAlembic();
+        alembic.aspect = Aspect.AIR;
+        alembic.amount = 20;
+        world.attach(pos, alembic);
+        TestPlayer player = new TestPlayer(world);
+        BlockJarItem jarItem = new BlockJarItem(ConfigBlocks.blockJar);
+        ItemStack jar = new ItemStack(jarItem, 1, 0);
+        player.setHeldItem(EnumHand.MAIN_HAND, jar);
+
+        assertTrue(block.onBlockActivated(world, pos, state, player, EnumHand.MAIN_HAND,
+                EnumFacing.NORTH, 0.5F, 0.5F, 0.5F));
+        assertEquals(20, jarItem.getAspects(jar).getAmount(Aspect.AIR));
+        assertEquals(0, alembic.amount);
+        assertNull(alembic.aspect);
+
+        alembic.aspect = Aspect.AIR;
+        alembic.amount = 32;
+        ItemStack voidJar = new ItemStack(jarItem, 1, 3);
+        jarItem.setAspects(voidJar, new AspectList().add(Aspect.AIR, 60));
+        player.setHeldItem(EnumHand.MAIN_HAND, voidJar);
+
+        assertTrue(block.onBlockActivated(world, pos, state, player, EnumHand.MAIN_HAND,
+                EnumFacing.NORTH, 0.5F, 0.5F, 0.5F));
+        assertEquals(64, jarItem.getAspects(voidJar).getAmount(Aspect.AIR));
+        assertEquals(0, alembic.amount);
+        assertNull(alembic.aspect);
+    }
+
+    @Test
+    public void extractionSynchronizesAndBreakingFilteredAlembicDropsLabel() {
+        AlembicWorld world = new AlembicWorld();
+        BlockMetalDevice block = ConfigBlocks.blockMetalDevice;
+        BlockPos pos = new BlockPos(0, 64, 0);
+        IBlockState state = block.getStateFromMeta(1);
+        TileAlembic alembic = new TestAlembic();
+        alembic.aspect = Aspect.ORDER;
+        alembic.aspectFilter = Aspect.ORDER;
+        alembic.amount = 8;
+        world.attach(pos, alembic);
+
+        assertTrue(alembic.takeFromContainer(Aspect.ORDER, 1));
+        assertTrue(world.notified.contains(pos));
+        world.notified.clear();
+
+        block.breakBlock(world, pos, state);
+
+        assertEquals(1, world.spawned.size());
+        ItemStack drop = world.spawned.get(0).getItem();
+        assertSame(ConfigItems.itemResource, drop.getItem());
+        assertEquals(13, drop.getMetadata());
     }
 
     private static class TestPlayer extends EntityPlayer {
@@ -88,6 +179,7 @@ public class BlockMetalDeviceAlembicInteractionTest {
     private static class AlembicWorld extends World {
         private final Map<BlockPos, TileEntity> tiles = new HashMap<>();
         private final Set<BlockPos> notified = new HashSet<>();
+        private final List<EntityItem> spawned = new ArrayList<>();
 
         AlembicWorld() {
             super(null,
@@ -116,6 +208,17 @@ public class BlockMetalDeviceAlembicInteractionTest {
         @Override
         public void notifyBlockUpdate(BlockPos pos, IBlockState oldState, IBlockState newState, int flags) {
             this.notified.add(pos.toImmutable());
+        }
+
+        @Override
+        public boolean spawnEntity(Entity entity) {
+            if (entity instanceof EntityItem) this.spawned.add((EntityItem) entity);
+            return true;
+        }
+
+        @Override
+        public void removeTileEntity(BlockPos pos) {
+            this.tiles.remove(pos);
         }
 
         @Override

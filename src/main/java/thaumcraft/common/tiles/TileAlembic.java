@@ -103,6 +103,10 @@ public class TileAlembic extends TileThaumcraft implements IAspectContainer, IEs
             this.amount = 0;
         }
         this.markDirty();
+        if (this.world != null && !this.world.isRemote) {
+            this.world.notifyBlockUpdate(this.pos, this.world.getBlockState(this.pos),
+                    this.world.getBlockState(this.pos), 3);
+        }
         return true;
     }
 
