@@ -15,8 +15,15 @@ import thaumcraft.api.aspects.AspectList;
 import thaumcraft.api.crafting.InfusionEnchantmentRecipe;
 import thaumcraft.common.items.armor.ItemHoverHarness;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
+import java.util.Properties;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 public class ArtificeEnchantmentsParityTest {
@@ -59,6 +66,23 @@ public class ArtificeEnchantmentsParityTest {
         assertEquals(6, recipeXp(repair));
         assertFalse(repair.isCompatibleWith(Enchantments.UNBREAKING));
         assertTrue(repair.isCompatibleWith(Enchantments.EFFICIENCY));
+    }
+
+    @Test
+    public void artificeEnchantmentsUseExactTc4EnglishNames() throws IOException {
+        EnchantmentHaste haste = new EnchantmentHaste();
+        EnchantmentRepair repair = new EnchantmentRepair();
+        assertEquals("enchantment.haste", haste.getName());
+        assertEquals("enchantment.repair", repair.getName());
+
+        Properties language = new Properties();
+        try (InputStream input = this.getClass().getClassLoader()
+                .getResourceAsStream("assets/thaumcraft/lang/en_us.lang")) {
+            assertNotNull("Processed en_us.lang resource is missing", input);
+            language.load(new InputStreamReader(input, StandardCharsets.UTF_8));
+        }
+        assertEquals("Haste", language.getProperty(haste.getName()));
+        assertEquals("Repair", language.getProperty(repair.getName()));
     }
 
     private static int recipeXp(net.minecraft.enchantment.Enchantment enchantment) {

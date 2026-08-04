@@ -1,6 +1,8 @@
 # Thaumcraft Stage 5 item/static GUI language entries
 # Generated from ConfigItems translation keys; original 1.7 strings remain source reference.
 itemGroup.thaumcraft=Thaumcraft
+enchantment.haste=Haste
+enchantment.repair=Repair
 enchantment.special.sapless=Lesser Sapping
 enchantment.special.sapgreat=Greater Sapping
 # Potions
