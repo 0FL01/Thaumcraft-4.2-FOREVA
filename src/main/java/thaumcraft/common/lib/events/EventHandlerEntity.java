@@ -63,6 +63,8 @@ import net.minecraftforge.event.entity.living.LivingEntityUseItemEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.eventhandler.Event;
 import thaumcraft.api.ThaumcraftApi;
+import thaumcraft.api.IRepairable;
+import thaumcraft.api.IRepairableExtended;
 import thaumcraft.api.aspects.Aspect;
 import thaumcraft.api.aspects.AspectList;
 import thaumcraft.api.damagesource.DamageSourceThaumcraft;
@@ -93,7 +95,9 @@ import thaumcraft.common.entities.monster.mods.ChampionModifier;
 import thaumcraft.common.entities.projectile.EntityPrimalArrow;
 import thaumcraft.common.items.ItemBathSalts;
 import thaumcraft.common.items.armor.Hover;
+import thaumcraft.common.items.armor.ItemHoverHarness;
 import thaumcraft.common.items.equipment.ItemBowBone;
+import thaumcraft.common.items.wands.WandManager;
 import thaumcraft.common.lib.WarpEvents;
 import thaumcraft.common.lib.capabilities.IPlayerKnowledge;
 import thaumcraft.common.lib.capabilities.PlayerKnowledgeProvider;
@@ -106,6 +110,7 @@ import thaumcraft.common.lib.network.playerdata.PacketSyncScannedPhenomena;
 import thaumcraft.common.lib.network.playerdata.PacketSyncWarp;
 import thaumcraft.common.lib.network.playerdata.PacketSyncWipe;
 import thaumcraft.common.lib.network.playerdata.PacketRunicCharge;
+import thaumcraft.common.lib.crafting.ThaumcraftCraftingManager;
 import thaumcraft.common.lib.research.ResearchManager;
 import thaumcraft.common.lib.research.ScanManager;
 import thaumcraft.common.lib.utils.EntityUtils;
@@ -339,6 +344,9 @@ public class EventHandlerEntity {
             if (player.ticksExisted % 10 == 0 && player.isPotionActive(Config.potionDeathGaze)) {
                 WarpEvents.checkDeathGaze(player);
             }
+            if (!player.capabilities.isCreativeMode && player.ticksExisted % 40 == 0) {
+                repairPlayerEquipment(player);
+            }
             applyTravellerHasteMovement(player);
             enforceHoverFlightBounds(player);
         }
@@ -352,6 +360,52 @@ public class EventHandlerEntity {
                     ChampionModifier.mods[type].effect.performEffect(mob, null, null, 0.0F);
                 }
             }
+        }
+    }
+
+    private static void repairPlayerEquipment(EntityPlayer player) {
+        for (int slot = 0; slot < net.minecraft.entity.player.InventoryPlayer.getHotbarSize(); slot++) {
+            ItemStack stack = player.inventory.mainInventory.get(slot);
+            if (!stack.isEmpty() && stack.getItemDamage() > 0
+                    && stack.getItem() instanceof IRepairable
+                    && !(stack.getItem() instanceof ItemHoverHarness)) {
+                doRepair(stack, player);
+            }
+        }
+        for (ItemStack stack : player.inventory.armorInventory) {
+            if (!stack.isEmpty() && stack.getItemDamage() > 0 && stack.getItem() instanceof IRepairable) {
+                doRepair(stack, player);
+            }
+        }
+    }
+
+    public static void doRepair(ItemStack stack, EntityPlayer player) {
+        int level = Config.enchRepair == null ? 0 : EnchantmentHelper.getEnchantmentLevel(Config.enchRepair, stack);
+        if (level <= 0) {
+            return;
+        }
+        level = Math.min(level, 2);
+
+        AspectList tags = ThaumcraftCraftingManager.getObjectTags(stack);
+        if (tags == null || tags.size() == 0) {
+            return;
+        }
+        tags = ResearchManager.reduceToPrimals(tags);
+        if (tags == null || tags.size() == 0) {
+            return;
+        }
+
+        AspectList cost = new AspectList();
+        for (Aspect aspect : tags.getAspects()) {
+            if (aspect != null) {
+                cost.merge(aspect, (int) Math.sqrt(tags.getAmount(aspect) * 2) * level);
+            }
+        }
+
+        boolean repair = !(stack.getItem() instanceof IRepairableExtended)
+                || ((IRepairableExtended) stack.getItem()).doRepair(stack, player, level);
+        if (repair && WandManager.consumeVisFromInventory(player, cost)) {
+            stack.damageItem(-level, player);
         }
     }
 

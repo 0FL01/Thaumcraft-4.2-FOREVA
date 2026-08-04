@@ -8,6 +8,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.monster.EntitySkeleton;
 import net.minecraft.entity.monster.EntityZombie;
+import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.MathHelper;
 import thaumcraft.common.items.armor.ItemFortressArmor;
@@ -513,11 +514,12 @@ extends ModelBiped {
     private void checkSet(Entity entity) {
         if (entity instanceof EntityLivingBase && entity.ticksExisted % 20 == 0) {
             int set = 0;
-            for (int a = 1; a < 4; ++a) {
-                ItemStack piece = ((EntityLivingBase)entity).getItemStackFromSlot(net.minecraft.inventory.EntityEquipmentSlot.values()[a + 1]);
+            for (EntityEquipmentSlot slot : new EntityEquipmentSlot[]{
+                    EntityEquipmentSlot.LEGS, EntityEquipmentSlot.CHEST, EntityEquipmentSlot.HEAD}) {
+                ItemStack piece = ((EntityLivingBase) entity).getItemStackFromSlot(slot);
                 if (piece.isEmpty() || !(piece.getItem() instanceof ItemFortressArmor)) continue;
                 ++set;
-                if (a != 3) continue;
+                if (slot != EntityEquipmentSlot.HEAD) continue;
                 if (piece.hasTagCompound() && piece.getTagCompound().hasKey("mask")) {
                     hasMask.put(entity.getEntityId(), piece.getTagCompound().getInteger("mask"));
                 } else {

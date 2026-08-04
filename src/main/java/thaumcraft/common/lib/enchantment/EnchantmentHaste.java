@@ -3,12 +3,17 @@ package thaumcraft.common.lib.enchantment;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnumEnchantmentType;
 import net.minecraft.inventory.EntityEquipmentSlot;
+import net.minecraft.item.ItemArmor;
+import net.minecraft.item.ItemBook;
+import net.minecraft.item.ItemStack;
+import thaumcraft.common.items.armor.ItemHoverHarness;
 
 public class EnchantmentHaste extends Enchantment {
 
     public EnchantmentHaste() {
-        super(Rarity.UNCOMMON, EnumEnchantmentType.DIGGER, new EntityEquipmentSlot[]{
-                EntityEquipmentSlot.MAINHAND, EntityEquipmentSlot.OFFHAND
+        super(Rarity.UNCOMMON, EnumEnchantmentType.ARMOR, new EntityEquipmentSlot[]{
+                EntityEquipmentSlot.HEAD, EntityEquipmentSlot.CHEST,
+                EntityEquipmentSlot.LEGS, EntityEquipmentSlot.FEET
         });
         this.setName("haste");
         this.setRegistryName("thaumcraft", "haste");
@@ -16,7 +21,7 @@ public class EnchantmentHaste extends Enchantment {
 
     @Override
     public int getMinEnchantability(int level) {
-        return 10 + (level - 1) * 8;
+        return 15 + (level - 1) * 9;
     }
 
     @Override
@@ -32,5 +37,18 @@ public class EnchantmentHaste extends Enchantment {
     @Override
     public boolean isAllowedOnBooks() {
         return true;
+    }
+
+    @Override
+    public boolean canApply(ItemStack stack) {
+        return !stack.isEmpty() && ((stack.getItem() instanceof ItemArmor
+                && ((ItemArmor) stack.getItem()).armorType == EntityEquipmentSlot.FEET)
+                || stack.getItem() instanceof ItemHoverHarness
+                || stack.getItem() instanceof ItemBook);
+    }
+
+    @Override
+    public boolean canApplyAtEnchantingTable(ItemStack stack) {
+        return this.canApply(stack);
     }
 }
