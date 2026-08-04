@@ -2,6 +2,9 @@
 
 An unofficial community port of Azanor's Thaumcraft 4.2.3.5 for Minecraft 1.12.2.
 
+> ## Port is ~90% complete
+> Most features are working; only hidden bugs remain to be found and fixed.
+
 ## Showcase
 
 <p align="center">
@@ -13,7 +16,7 @@ An unofficial community port of Azanor's Thaumcraft 4.2.3.5 for Minecraft 1.12.2
 
 ## Status
 
-The port is under active development. Its main gameplay systems are available, while runtime and visual parity remain under validation.
+The port is approximately 90% complete and remains under active development. Most gameplay systems are fully functional, with the remaining work focused on finding and fixing hidden bugs.
 
 - Research, scanning, and the Thaumonomicon
 - Arcane crafting, crucible alchemy, and infusion
