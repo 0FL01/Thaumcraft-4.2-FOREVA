@@ -31,6 +31,8 @@ import org.junit.Test;
 import thaumcraft.common.blocks.ItemBlocks.BlockWoodenDeviceItem;
 import thaumcraft.common.config.ConfigBlocks;
 import thaumcraft.common.config.ConfigItems;
+import thaumcraft.common.tiles.TileArcanePressurePlate;
+import thaumcraft.common.tiles.TileOwned;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -122,6 +124,36 @@ public class ArcanePlateDoorSupportRuntimeTest {
         }
     }
 
+    @Test
+    public void plateAndDoorShareDecodedKeyAccessIdentities() {
+        BlockArcaneDoor door = ConfigBlocks.blockArcaneDoor;
+        SupportWorld world = doorWorld(door, Blocks.STONE.getDefaultState());
+        TileOwned doorTile = new TileOwned();
+        doorTile.owner = "doorOwner";
+        doorTile.accessList.add("0sharedPlayer");
+        world.putTile(POS, doorTile);
+
+        BlockPos platePos = POS.east();
+        world.put(platePos, ConfigBlocks.blockWoodenDevice.getStateFromMeta(3));
+        TileArcanePressurePlate plate = new TileArcanePressurePlate();
+        plate.owner = "plateOwner";
+        plate.accessList.add("1sharedPlayer");
+        world.putTile(platePos, plate);
+
+        door.neighborChanged(world.getBlockState(POS), world, POS, ConfigBlocks.blockWoodenDevice, platePos);
+        assertTrue(world.getBlockState(POS).getValue(BlockArcaneDoor.OPEN));
+
+        world.put(platePos, ConfigBlocks.blockWoodenDevice.getStateFromMeta(2));
+        door.neighborChanged(world.getBlockState(POS), world, POS, ConfigBlocks.blockWoodenDevice, platePos);
+        assertFalse(world.getBlockState(POS).getValue(BlockArcaneDoor.OPEN));
+
+        plate.accessList.clear();
+        plate.accessList.add("1someoneElse");
+        world.put(platePos, ConfigBlocks.blockWoodenDevice.getStateFromMeta(3));
+        door.neighborChanged(world.getBlockState(POS), world, POS, ConfigBlocks.blockWoodenDevice, platePos);
+        assertFalse(world.getBlockState(POS).getValue(BlockArcaneDoor.OPEN));
+    }
+
     private static SupportWorld doorWorld(BlockArcaneDoor door, IBlockState support) {
         SupportWorld world = new SupportWorld();
         world.put(POS.down(), support);
@@ -142,6 +174,7 @@ public class ArcanePlateDoorSupportRuntimeTest {
 
     private static final class SupportWorld extends World {
         private final Map<BlockPos, IBlockState> states = new HashMap<>();
+        private final Map<BlockPos, TileEntity> tiles = new HashMap<>();
         private final List<ItemStack> drops = new ArrayList<>();
         private int destroyCalls;
         private boolean dropRequested;
@@ -157,6 +190,12 @@ public class ArcanePlateDoorSupportRuntimeTest {
 
         private void put(BlockPos pos, IBlockState state) {
             this.states.put(pos.toImmutable(), state);
+        }
+
+        private void putTile(BlockPos pos, TileEntity tile) {
+            tile.setWorld(this);
+            tile.setPos(pos);
+            this.tiles.put(pos.toImmutable(), tile);
         }
 
         @Override
@@ -206,7 +245,7 @@ public class ArcanePlateDoorSupportRuntimeTest {
             return true;
         }
 
-        @Override public TileEntity getTileEntity(BlockPos pos) { return null; }
+        @Override public TileEntity getTileEntity(BlockPos pos) { return this.tiles.get(pos); }
         @Override public Explosion createExplosion(Entity entityIn, double x, double y, double z,
                                                    float strength, boolean isSmoking) { return null; }
         @Override public void notifyBlockUpdate(BlockPos pos, IBlockState oldState,
@@ -215,6 +254,10 @@ public class ArcanePlateDoorSupportRuntimeTest {
                                                            boolean updateObservers) { }
         @Override public void markChunkDirty(BlockPos pos, TileEntity unusedTileEntity) { }
         @Override public void updateComparatorOutputLevel(BlockPos pos, Block blockIn) { }
+        @Override public void markBlockRangeForRenderUpdate(BlockPos rangeMin, BlockPos rangeMax) { }
+        @Override public void playSound(net.minecraft.entity.player.EntityPlayer player, BlockPos pos,
+                                        net.minecraft.util.SoundEvent soundIn, net.minecraft.util.SoundCategory category,
+                                        float volume, float pitch) { }
 
         @Override
         protected IChunkProvider createChunkProvider() {

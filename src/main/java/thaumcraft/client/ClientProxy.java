@@ -663,6 +663,16 @@ public class ClientProxy extends CommonProxy {
                 }
                 continue;
             }
+            if (item == ConfigItems.itemKey) {
+                ModelResourceLocation iron = new ModelResourceLocation(
+                        new ResourceLocation("thaumcraft", "arcanedoorkey_iron"), "inventory");
+                ModelResourceLocation gold = new ModelResourceLocation(registryName, "inventory");
+                ModelLoader.setCustomModelResourceLocation(item, 0, iron);
+                for (int meta = 1; meta < 64; meta++) {
+                    ModelLoader.setCustomModelResourceLocation(item, meta, gold);
+                }
+                continue;
+            }
             ModelResourceLocation model = new ModelResourceLocation(registryName, "inventory");
             for (int meta = 0; meta < 64; meta++) {
                 ModelLoader.setCustomModelResourceLocation(item, meta, model);

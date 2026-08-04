@@ -26,6 +26,7 @@ import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.world.World;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.Explosion;
@@ -247,6 +248,12 @@ public class BlockWoodenDevice extends BlockContainer {
             if (!worldIn.isRemote && canEditPressurePlate((TileArcanePressurePlate) te, playerIn)) {
                 TileArcanePressurePlate plate = (TileArcanePressurePlate) te;
                 plate.setting = (byte) ((plate.setting + 1) % 3);
+                String feedback = plate.setting == 0
+                        ? "It will now trigger on everything."
+                        : plate.setting == 1
+                        ? "It will now trigger on everything except you."
+                        : "It will now trigger on just you.";
+                playerIn.sendMessage(new TextComponentTranslation(feedback));
                 worldIn.playSound(null, pos, SoundEvents.UI_BUTTON_CLICK, SoundCategory.BLOCKS, 0.1F, 0.9F);
                 worldIn.notifyBlockUpdate(pos, state, state, 3);
                 plate.markDirty();

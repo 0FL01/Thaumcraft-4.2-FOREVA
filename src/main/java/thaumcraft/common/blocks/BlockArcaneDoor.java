@@ -294,16 +294,8 @@ public class BlockArcaneDoor extends BlockContainer {
             return;
         }
 
-        Set<String> identities = new HashSet<>();
         TileOwned door = (TileOwned) tile;
-        identities.add(door.owner == null ? "" : door.owner);
-        if (door.accessList != null) {
-            for (String access : door.accessList) {
-                if (access != null && access.length() > 1) {
-                    identities.add(access.substring(1));
-                }
-            }
-        }
+        Set<String> identities = collectIdentities(door);
 
         boolean matchingUnpressedPlate = false;
         for (EnumFacing direction : EnumFacing.HORIZONTALS) {
@@ -333,13 +325,27 @@ public class BlockArcaneDoor extends BlockContainer {
     }
 
     private static boolean matchesPlate(TileArcanePressurePlate plate, Set<String> identities) {
-        for (String identity : identities) {
-            if (identity.equals(plate.owner)
-                    || plate.accessList != null && plate.accessList.contains(identity)) {
-                return true;
-            }
+        // TC4 compared decoded door entries with prefixed plate entries, contradicting WARDEDARCANA.3.
+        for (String identity : collectIdentities(plate)) {
+            if (identities.contains(identity)) return true;
         }
         return false;
+    }
+
+    private static Set<String> collectIdentities(TileOwned owned) {
+        Set<String> identities = new HashSet<>();
+        if (owned.owner != null && !owned.owner.isEmpty()) {
+            identities.add(owned.owner);
+        }
+        if (owned.accessList != null) {
+            for (String access : owned.accessList) {
+                if (access != null && access.length() > 1
+                        && (access.charAt(0) == '0' || access.charAt(0) == '1')) {
+                    identities.add(access.substring(1));
+                }
+            }
+        }
+        return identities;
     }
 
     @Override
