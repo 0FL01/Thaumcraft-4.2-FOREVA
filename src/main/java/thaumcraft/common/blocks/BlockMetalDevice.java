@@ -336,17 +336,7 @@ public class BlockMetalDevice extends BlockContainer {
                     pos.getX() + 0.5D, pos.getY() + 0.5D, pos.getZ() + 0.5D,
                     new ItemStack(ConfigItems.itemResource, 1, 13)));
         } else if (te instanceof IInventory) {
-            IInventory inventory = (IInventory) te;
-            for (int i = 0; i < inventory.getSizeInventory(); ++i) {
-                ItemStack stack = inventory.getStackInSlot(i);
-                if (!stack.isEmpty()) {
-                    worldIn.spawnEntity(new EntityItem(worldIn,
-                            (double) pos.getX() + 0.5D,
-                            (double) pos.getY() + 0.5D,
-                            (double) pos.getZ() + 0.5D,
-                            stack.copy()));
-                }
-            }
+            InventoryUtils.dropItems(worldIn, pos.getX(), pos.getY(), pos.getZ());
         }
         super.breakBlock(worldIn, pos, state);
     }
