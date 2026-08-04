@@ -27,7 +27,7 @@ public class BlockTubeItem extends BlockMetadataItem {
                 tile.markDirty();
                 world.notifyBlockUpdate(pos, world.getBlockState(pos), world.getBlockState(pos), 3);
             } else if (tile instanceof TileEssentiaCrystalizer) {
-                ((TileEssentiaCrystalizer) tile).facing = side;
+                ((TileEssentiaCrystalizer) tile).facing = side.getOpposite();
                 tile.markDirty();
                 world.notifyBlockUpdate(pos, world.getBlockState(pos), world.getBlockState(pos), 3);
             }

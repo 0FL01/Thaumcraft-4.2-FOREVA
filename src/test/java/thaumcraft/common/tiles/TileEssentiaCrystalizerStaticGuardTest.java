@@ -26,7 +26,7 @@ public class TileEssentiaCrystalizerStaticGuardTest {
         assertTrue(blockTube.contains("this.getMetaFromState(state) == 7 ? FULL_BLOCK_AABB : TUBE_AABB"));
 
         assertTrue(blockTubeItem.contains("tile instanceof TileEssentiaCrystalizer"));
-        assertTrue(blockTubeItem.contains("((TileEssentiaCrystalizer) tile).facing = side;"));
+        assertTrue(blockTubeItem.contains("((TileEssentiaCrystalizer) tile).facing = side.getOpposite();"));
 
         assertTrue(configBlocks.contains("new TileRegistration(TileEssentiaCrystalizer.class, \"TileEssentiaCrystalizer\")"));
         assertTrue(recipeSlice.contains("new ItemStack(ConfigBlocks.blockTube, 1, 7)"));

@@ -120,18 +120,30 @@ public class BlockTube extends BlockContainer {
             }
             return true;
         }
-        if (!held.isEmpty() && held.getItem() instanceof IEssentiaContainerItem && filter.aspectFilter == null) {
+        if (!held.isEmpty() && held.getItem() == ConfigItems.itemResource
+                && held.getMetadata() == ItemResource.META_LABEL
+                && held.getItem() instanceof IEssentiaContainerItem && filter.aspectFilter == null) {
             AspectList aspects = ((IEssentiaContainerItem) held.getItem()).getAspects(held);
-            if (aspects != null && aspects.getAspects().length > 0) {
+            if (aspects != null && aspects.size() > 0) {
                 if (!world.isRemote) {
                     filter.aspectFilter = aspects.getAspects()[0];
-                    if (!player.capabilities.isCreativeMode) held.shrink(1);
+                    held.shrink(1);
                     filter.markDirtyAndSync();
                 }
                 return true;
             }
         }
         return false;
+    }
+
+    @Override
+    public void breakBlock(World world, BlockPos pos, IBlockState state) {
+        TileEntity tile = world.getTileEntity(pos);
+        if (!world.isRemote && tile instanceof TileTubeFilter
+                && ((TileTubeFilter) tile).aspectFilter != null) {
+            spawnAsEntity(world, pos, new ItemStack(ConfigItems.itemResource, 1, ItemResource.META_LABEL));
+        }
+        super.breakBlock(world, pos, state);
     }
 
     @Override
