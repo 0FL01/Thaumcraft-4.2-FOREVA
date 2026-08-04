@@ -43,6 +43,7 @@ import thaumcraft.api.aspects.Aspect;
 import thaumcraft.api.nodes.NodeModifier;
 import thaumcraft.api.nodes.NodeType;
 import thaumcraft.common.Thaumcraft;
+import thaumcraft.common.config.ConfigItems;
 import thaumcraft.common.lib.TCSounds;
 import thaumcraft.common.tiles.TileJarBrain;
 import thaumcraft.common.tiles.TileJarFillable;
@@ -344,44 +345,46 @@ extends BlockContainer {
 
             // Sneak + click on filter side = remove filter
             if (playerIn.isSneaking() && jar.aspectFilter != null && facing.getIndex() == jar.facing) {
-                jar.aspectFilter = null;
                 if (worldIn.isRemote) {
-                    worldIn.playSound(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP, SoundCategory.BLOCKS, 1.0f, 1.0f, false);
+                    return true;
                 } else {
+                    jar.aspectFilter = null;
+                    jar.markDirty();
+                    worldIn.notifyBlockUpdate(pos, state, state, 3);
                     EnumFacing fd = facing;
-                    worldIn.spawnEntity(new EntityItem(worldIn, pos.getX() + 0.5 + fd.getXOffset() / 3.0f, pos.getY() + 0.5, pos.getZ() + 0.5 + fd.getZOffset() / 3.0f, new ItemStack(net.minecraft.init.Items.PAPER)));
+                    worldIn.spawnEntity(new EntityItem(worldIn, pos.getX() + 0.5 + fd.getXOffset() / 3.0f, pos.getY() + 0.5, pos.getZ() + 0.5 + fd.getZOffset() / 3.0f, new ItemStack(ConfigItems.itemResource, 1, 13)));
+                    worldIn.playSound(null, pos, TCSounds.PAGE, SoundCategory.BLOCKS, 1.0F, 1.0F);
                 }
                 return true;
             }
 
             // Sneak + empty hand = empty jar
             if (playerIn.isSneaking() && heldItem.isEmpty()) {
+                if (worldIn.isRemote) return true;
                 jar.amount = 0;
-                if (jar.aspectFilter == null) {
-                    jar.aspect = null;
-                }
-                if (worldIn.isRemote) {
-                    worldIn.playSound(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, TCSounds.JAR, SoundCategory.BLOCKS, 0.4f, 1.0f, false);
-                    worldIn.playSound(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, net.minecraft.init.SoundEvents.ENTITY_PLAYER_SWIM, SoundCategory.BLOCKS, 0.5f, 1.0f + (worldIn.rand.nextFloat() - worldIn.rand.nextFloat()) * 0.3f, false);
-                }
+                if (jar.aspectFilter == null) jar.aspect = null;
+                jar.markDirty();
+                worldIn.notifyBlockUpdate(pos, state, state, 3);
+                worldIn.playSound(null, pos, TCSounds.JAR, SoundCategory.BLOCKS, 0.4F, 1.0F);
+                worldIn.playSound(null, pos, SoundEvents.ENTITY_PLAYER_SWIM, SoundCategory.BLOCKS,
+                        0.5F, 1.0F + (worldIn.rand.nextFloat() - worldIn.rand.nextFloat()) * 0.3F);
                 return true;
             }
 
-            // Apply label (paper with aspect) as filter
-            if (!heldItem.isEmpty() && jar.aspectFilter == null && heldItem.getItem() == net.minecraft.init.Items.PAPER) {
-                if (heldItem.hasTagCompound() && heldItem.getTagCompound().hasKey("AspectFilter")) {
-                    String tag = heldItem.getTagCompound().getString("AspectFilter");
-                    Aspect filter = Aspect.getAspect(tag);
-                    if (filter != null) {
-                        jar.aspectFilter = filter;
-                        jar.aspect = filter;
-                        heldItem.shrink(1);
-                        if (worldIn.isRemote) {
-                            worldIn.playSound(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, SoundEvents.BLOCK_GLASS_BREAK, SoundCategory.BLOCKS, 0.4f, 1.0f, false);
-                        }
-                        return true;
-                    }
-                }
+            // Apply label as the original single-aspect filter.
+            if (!heldItem.isEmpty() && jar.aspectFilter == null
+                    && heldItem.getItem() == ConfigItems.itemResource && heldItem.getMetadata() == 13) {
+                AspectList labelAspects = ((IEssentiaContainerItem) heldItem.getItem()).getAspects(heldItem);
+                Aspect labelAspect = labelAspects == null || labelAspects.size() == 0
+                        ? null : labelAspects.getAspects()[0];
+                if (jar.amount == 0 && labelAspect == null) return true;
+                if (worldIn.isRemote) return true;
+                if (jar.amount == 0) jar.aspect = labelAspect;
+                jar.aspectFilter = jar.aspect;
+                heldItem.shrink(1);
+                this.onBlockPlacedBy(worldIn, pos, state, playerIn, ItemStack.EMPTY);
+                worldIn.playSound(null, pos, TCSounds.JAR, SoundCategory.BLOCKS, 0.4F, 1.0F);
+                return true;
             }
         }
 

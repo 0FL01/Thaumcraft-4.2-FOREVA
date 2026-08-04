@@ -46,6 +46,21 @@ implements IEssentiaContainerItem {
         return super.getTranslationKey() + "." + stack.getItemDamage();
     }
 
+    @Override
+    public int getItemStackLimit(ItemStack stack) {
+        if ((stack.getItemDamage() == 0 || stack.getItemDamage() == 3)
+                && (this.hasStoredEssentia(stack)
+                || stack.hasTagCompound() && stack.getTagCompound().hasKey(ASPECT_FILTER_KEY))) {
+            return 1;
+        }
+        return super.getItemStackLimit(stack);
+    }
+
+    private boolean hasStoredEssentia(ItemStack stack) {
+        AspectList aspects = this.getAspects(stack);
+        return aspects != null && aspects.size() > 0 && aspects.visSize() > 0;
+    }
+
     @SideOnly(Side.CLIENT)
     @Override
     public void addInformation(ItemStack stack, @Nullable World worldIn, List<String> tooltip, ITooltipFlag flagIn) {
