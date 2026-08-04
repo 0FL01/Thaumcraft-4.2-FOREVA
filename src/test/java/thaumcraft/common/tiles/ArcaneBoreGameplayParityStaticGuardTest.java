@@ -39,6 +39,9 @@ public class ArcaneBoreGameplayParityStaticGuardTest {
                 && source.contains("instanceof IRepairableExtended")
                 && source.contains("instanceof TileArcaneLamp")
                 && source.contains("withProperty(BlockAiry.TYPE, 3)"));
+        assertTrue("Bore automation must preserve the one-focus/one-pickaxe invariant",
+                source.contains("public int getInventoryStackLimit() {")
+                        && source.contains("return 1;"));
     }
 
     @Test
@@ -59,8 +62,24 @@ public class ArcaneBoreGameplayParityStaticGuardTest {
         String source = read("src/main/java/thaumcraft/common/tiles/TileArcaneBore.java");
 
         assertTrue(source.contains("System.currentTimeMillis() + 1200L +")
-                && source.contains("this.world.playEvent(2001, target, Block.getStateId(state));")
-                && source.contains("getHitSound()"));
+                && source.contains("sound.getBreakSound()")
+                && source.contains("(sound.getVolume() + 1.0F) / 2.0F")
+                && source.contains("sound.getPitch() * 0.8F"));
+        assertFalse("The custom Bore event already owns its destruction cue",
+                source.contains("this.world.playEvent(2001, target, Block.getStateId(state));"));
+    }
+
+    @Test
+    public void essentiaRechargeUsesOnlyTheBaseCachedByPoweredMining() throws IOException {
+        String source = read("src/main/java/thaumcraft/common/tiles/TileArcaneBore.java");
+
+        assertTrue(source.contains("private TileArcaneBoreBase base = null;"));
+        assertTrue(source.contains("if (this.base != null && this.base.drawEssentia())"));
+        int updateMining = source.indexOf("private void updateMining()");
+        int resolve = source.indexOf("if (this.base == null) {\n            this.base = this.getBase();", updateMining);
+        assertTrue("Only the powered mining path should discover the Base", updateMining >= 0 && resolve > updateMining);
+        int recharge = source.indexOf("private void rechargeSpeedyTime()");
+        assertFalse(source.substring(recharge, updateMining).contains("this.getBase()"));
     }
 
     @Test

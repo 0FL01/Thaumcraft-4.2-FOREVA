@@ -61,9 +61,9 @@ public class TileArcaneBoreRenderer extends TileEntitySpecialRenderer<TileArcane
         GlStateManager.popMatrix();
 
         float rotation = ticks % 45.0F;
-        renderVortexLayer(-0.17F, -(rotation * 8.0F), 10.0F, 0.40F, 0xFFFFFFFF);
-        renderVortexLayer(-0.21F, rotation * 8.0F, 10.0F, 0.30F, 0xCCFFFFFF);
-        renderVortexLayer(-0.25F, -(rotation * 8.0F), -10.0F, 0.20F, 0xCCFFFFFF);
+        renderVortexLayer(-0.17F, -(rotation * 8.0F), 10.0F, 0.20F, 0xFFFFFFFF);
+        renderVortexLayer(-0.21F, rotation * 8.0F, 10.0F, 0.15F, 0xCCFFFFFF);
+        renderVortexLayer(-0.25F, -(rotation * 8.0F), -10.0F, 0.10F, 0xCCFFFFFF);
 
         GlStateManager.pushMatrix();
         bindTexture(JAR_TEXTURE);

@@ -174,6 +174,8 @@ public class ClientProxyFxStaticGuardTest {
         assertTrue("CommonProxy and ClientProxy must keep boreDigFx proxy surface with dedicated client FX routing",
                 commonProxy.contains("public void boreDigFx(World world,")
                         && source.contains("public void boreDigFx(World world,")
+                        && source.contains("(state != null || item != null) && world.rand.nextInt(10) == 0")
+                        && source.contains("new FXBoreSparkle(world, x, y, z, tx, ty, tz)")
                         && source.contains("new FXBoreParticles("));
         assertTrue("ClientProxy must override sparkle for firebat/lifter visuals",
                 source.contains("public void sparkle(")

@@ -45,8 +45,11 @@ public class ArcaneBoreRendererFidelityStaticGuardTest {
                          && renderer.contains("if (tile.baseOrientation == EnumFacing.DOWN) {")
                          && renderer.indexOf("GlStateManager.pushMatrix();\n        bindTexture(BORE_TEXTURE);")
                          < renderer.indexOf("if (tile.baseOrientation == EnumFacing.DOWN) {")
-                         && renderer.contains("GlStateManager.rotate(tile.topRotation, 0.0F, 1.0F, 0.0F);")
-                         && renderer.contains("emitModel.render(MODEL_SCALE, tile.hasFocus);"));
+                          && renderer.contains("GlStateManager.rotate(tile.topRotation, 0.0F, 1.0F, 0.0F);")
+                         && renderer.contains("emitModel.render(MODEL_SCALE, tile.hasFocus);")
+                         && renderer.contains("10.0F, 0.20F, 0xFFFFFFFF")
+                         && renderer.contains("10.0F, 0.15F, 0xCCFFFFFF")
+                         && renderer.contains("-10.0F, 0.10F, 0xCCFFFFFF"));
     }
 
     private static String read(String path) throws IOException {

@@ -3,6 +3,7 @@ package thaumcraft.common.tiles;
 import com.mojang.authlib.GameProfile;
 import java.util.UUID;
 import net.minecraft.block.Block;
+import net.minecraft.block.SoundType;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.item.EntityItem;
@@ -98,6 +99,7 @@ public class TileArcaneBore extends TileThaumcraft implements ITickable, IInvent
     private final AspectList repairCost = new AspectList();
     private final AspectList currentRepairVis = new AspectList();
     private FakePlayer fakePlayer = null;
+    private TileArcaneBoreBase base = null;
     private float speedyTime = 0.0F;
     private int digX;
     private int digY;
@@ -147,8 +149,7 @@ public class TileArcaneBore extends TileThaumcraft implements ITickable, IInvent
             this.speedyTime += (float) drained / 5.0F;
         }
         if (this.speedyTime < 20.0F) {
-            TileArcaneBoreBase base = this.getBase();
-            if (base != null && base.drawEssentia()) {
+            if (this.base != null && this.base.drawEssentia()) {
                 this.speedyTime += 20.0F;
             }
         }
@@ -330,7 +331,8 @@ public class TileArcaneBore extends TileThaumcraft implements ITickable, IInvent
 
     @Override
     public int getInventoryStackLimit() {
-        return 64;
+        // A Bore has one installed focus and one installed pickaxe; keep automation aligned with its GUI.
+        return 1;
     }
 
     @Override
@@ -412,6 +414,9 @@ public class TileArcaneBore extends TileThaumcraft implements ITickable, IInvent
 
     private void updateMining() {
         if (this.fakePlayer == null || this.rotX != this.tarX || this.rotZ != this.tarZ) return;
+        if (this.base == null) {
+            this.base = this.getBase();
+        }
         if (--this.count > 0) return;
 
         boolean dug = false;
@@ -630,7 +635,6 @@ public class TileArcaneBore extends TileThaumcraft implements ITickable, IInvent
         this.collectExistingDrops(target, drops);
         this.world.addBlockEvent(this.pos, ConfigBlocks.blockWoodenDevice, 99,
                 (Block.getIdFromBlock(block) & 0xFFF) | ((meta & 0xFF) << 12));
-        this.world.playEvent(2001, target, Block.getStateId(state));
         this.world.setBlockToAir(target);
         for (ItemStack drop : drops) {
             this.ejectOrStore(this.applySpecialMiningResult(drop, silk, dropFortune));
@@ -790,14 +794,16 @@ public class TileArcaneBore extends TileThaumcraft implements ITickable, IInvent
         int sx = this.pos.getX() + this.orientation.getXOffset();
         int sy = this.pos.getY() + this.orientation.getYOffset();
         int sz = this.pos.getZ() + this.orientation.getZOffset();
+        SoundType sound = block.getSoundType(state, this.world,
+                new BlockPos(this.digX, this.digY, this.digZ), null);
         this.world.playSound(
                 this.digX + 0.5D,
                 this.digY + 0.5D,
                 this.digZ + 0.5D,
-                block.getSoundType(state, this.world, new BlockPos(this.digX, this.digY, this.digZ), null).getHitSound(),
+                sound.getBreakSound(),
                 SoundCategory.BLOCKS,
-                0.45F,
-                0.85F,
+                (sound.getVolume() + 1.0F) / 2.0F,
+                sound.getPitch() * 0.8F,
                 false);
         for (int i = 0; i < thaumcraft.common.Thaumcraft.proxy.particleCount(10); i++) {
             double px = this.digX + this.world.rand.nextFloat();
@@ -883,7 +889,7 @@ public class TileArcaneBore extends TileThaumcraft implements ITickable, IInvent
     }
 
     private void placeTunnelLight() {
-        TileArcaneBoreBase base = this.getBase();
+        TileArcaneBoreBase base = this.base;
         if (base == null) return;
         for (EnumFacing facing : EnumFacing.HORIZONTALS) {
             if (!(this.world.getTileEntity(base.getPos().offset(facing)) instanceof TileArcaneLamp)) continue;
@@ -926,7 +932,7 @@ public class TileArcaneBore extends TileThaumcraft implements ITickable, IInvent
     private void ejectOrStore(ItemStack stack) {
         if (stack == null || stack.isEmpty()) return;
         ItemStack remaining = stack.copy();
-        TileArcaneBoreBase base = this.getBase();
+        TileArcaneBoreBase base = this.base;
         if (base != null) {
             TileEntity tile = this.world.getTileEntity(base.getPos().offset(base.orientation));
             if (tile instanceof IInventory) {

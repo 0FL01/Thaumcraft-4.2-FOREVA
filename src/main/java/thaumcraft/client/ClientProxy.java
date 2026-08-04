@@ -2206,7 +2206,9 @@ public class ClientProxy extends CommonProxy {
                           @Nullable Item item,
                           int meta) {
         if (world == null || !world.isRemote) return;
-        if (state != null) {
+        if ((state != null || item != null) && world.rand.nextInt(10) == 0) {
+            ParticleEngine.addEffect(world, new FXBoreSparkle(world, x, y, z, tx, ty, tz));
+        } else if (state != null) {
             ParticleEngine.addEffect(world, new FXBoreParticles(world, x, y, z, tx, ty, tz, state));
         } else if (item != null) {
             ParticleEngine.addEffect(world, new FXBoreParticles(world, x, y, z, tx, ty, tz, item, meta));
