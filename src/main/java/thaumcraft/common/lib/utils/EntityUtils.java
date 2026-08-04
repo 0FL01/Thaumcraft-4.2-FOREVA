@@ -59,6 +59,19 @@ public class EntityUtils {
         }
     }
 
+    public static int getRecentlyHit(Entity entity) {
+        if (entity instanceof EntityLivingBase) {
+            try {
+                Integer recentlyHit = net.minecraftforge.fml.common.ObfuscationReflectionHelper.getPrivateValue(
+                        EntityLivingBase.class, (EntityLivingBase) entity,
+                        "recentlyHit", "field_70718_bc");
+                return recentlyHit == null ? 0 : recentlyHit;
+            } catch (Exception ignored) {
+            }
+        }
+        return 0;
+    }
+
     /**
      * Find all entities of the given class within range of a position.
      */

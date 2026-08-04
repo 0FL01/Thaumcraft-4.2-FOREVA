@@ -22,23 +22,30 @@ public class AspectOrbDropStaticGuardTest {
     @Test
     public void onLivingDeathShouldDropAspectOrbsTC4Parity() throws IOException {
         String source = readFile("src/main/java/thaumcraft/common/lib/events/EventHandlerEntity.java");
+        int methodStart = source.indexOf("public void onLivingDeath(LivingDeathEvent event)");
+        int methodEnd = source.indexOf("private boolean tryConvertTaintedDeath", methodStart);
+        String method = source.substring(methodStart, methodEnd);
 
         assertTrue("onLivingDeath must call ScanManager.generateEntityAspects",
-                source.contains("ScanManager.generateEntityAspects("));
+                method.contains("ScanManager.generateEntityAspects("));
         assertTrue("onLivingDeath must call ResearchManager.reduceToPrimals",
-                source.contains("ResearchManager.reduceToPrimals("));
+                method.contains("ResearchManager.reduceToPrimals("));
         assertTrue("onLivingDeath must spawn EntityAspectOrb",
-                source.contains("new EntityAspectOrb("));
+                method.contains("new EntityAspectOrb("));
         assertTrue("onLivingDeath must use 50% chance (nextBoolean)",
-                source.contains("world.rand.nextBoolean()"));
+                method.contains("world.rand.nextBoolean()"));
         assertTrue("onLivingDeath must use 1+nextInt(amount) value formula",
-                source.contains("1 + event.getEntityLiving().world.rand.nextInt(aspects.getAmount(aspect))"));
-        assertTrue("onLivingDeath must skip ITaintedMob",
-                source.contains("instanceof ITaintedMob"));
-        assertTrue("onLivingDeath must check player kill via damage source",
-                source.contains("getTrueSource() instanceof EntityPlayer"));
-        assertTrue("onLivingDeath must exclude FakePlayer",
-                source.contains("instanceof FakePlayer"));
+                method.contains("1 + event.getEntityLiving().world.rand.nextInt(aspects.getAmount(aspect))"));
+        assertTrue("taint conversion must take precedence over aspect-orb eligibility",
+                method.indexOf("tryConvertTaintedDeath") < method.indexOf("isAspectOrbEligible"));
+        assertTrue("onLivingDeath must use recently-hit eligibility",
+                method.contains("isAspectOrbEligible(event.getEntityLiving())"));
+        assertFalse("aspect-orb eligibility must not exclude existing tainted mobs",
+                method.contains("instanceof ITaintedMob"));
+        assertFalse("aspect-orb eligibility must not depend on the final damage source",
+                method.contains("getTrueSource()"));
+        assertFalse("aspect-orb eligibility must not exclude FakePlayer hits",
+                method.contains("instanceof FakePlayer"));
     }
 
     @Test

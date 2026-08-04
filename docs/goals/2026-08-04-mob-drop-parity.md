@@ -34,8 +34,8 @@ Complete the frozen Required Outcomes using the listed Change Envelope and Prima
   - Source: Approved RECON findings for aspect-orb eligibility and champion whitelist inheritance.
   - Acceptance: Aspect orbs use the original post-conversion `recentlyHit > 0` eligibility, including tainted mobs, FakePlayers, tame-owned hits, and delayed deaths; champion whitelist entries retain existing string/IMC formats and maximum tier while matching eligible subclasses with the original assignability direction.
   - Primary evidence: Focused helper/runtime tests verify conversion precedence, recently-hit positive/zero cases, inherited and non-inherited whitelist matches, token formats, and maximum tier selection.
-  - Status: pending
-  - Evidence:
+  - Status: verified
+  - Evidence: Aspect-orb eligibility now follows reflected `recentlyHit > 0` after conversion precedence, without tainted-mob, final-source, or FakePlayer exclusions. Champion matching preserves the string map and exact forms while walking class ancestry and resolving registry/bare vanilla entries with correct assignability and maximum tier. Focused helper/runtime/static tests and `./scripts/dev.sh validate --smoke` passed on 2026-08-04.
 
 - R4: Restore audited low-risk drop edge cases.
   - Source: Approved RECON findings for Pech equipment chance, Giant Taintacle duplicate suppression, and Traveling Trunk backing slots.
@@ -82,17 +82,17 @@ Complete the frozen Required Outcomes using the listed Change Envelope and Prima
 
 ## Current Checkpoint
 
-- Closes: R3.
-- Smallest next action: Restore recently-hit aspect-orb eligibility and inheritance-aware champion whitelist matching without changing public string/IMC contracts.
-- Expected evidence: Focused global reward helper/runtime tests and `./scripts/dev.sh validate --smoke` pass before the R3 commit.
-- Stop or replan if: Correct inherited matching requires replacing the existing whitelist map or adding registry caches/lifecycle machinery.
+- Closes: R4.
+- Smallest next action: Restore Pech baseline equipment chance, Giant Taintacle all-axis suppression range, and all-36-slot trunk spilling with focused edge coverage.
+- Expected evidence: Focused Pech/giant/trunk tests and `./scripts/dev.sh validate --smoke` pass before the R4 commit.
+- Stop or replan if: Hidden-slot verification requires changing visible inventory size or the trunk NBT contract.
 
 ## Current State
 
-- Resolved: R1 class-local drops and R2 XP/talk mappings are verified.
-- Last relevant evidence: Focused `EntityExperienceParityRuntimeTest`, affected static guards, full validation, and dedicated-server smoke passed on 2026-08-04.
+- Resolved: R1 class-local drops, R2 XP/talk mappings, and R3 global death rewards are verified.
+- Last relevant evidence: Focused `EventHandlerDropParityRuntimeTest`, updated aspect-orb guard, champion regression suites, full validation, and dedicated-server smoke passed on 2026-08-04.
 - Blocker: None.
-- Next: R3 global death reward implementation.
+- Next: R4 low-risk drop edge implementation.
 
 ## Material Decisions
 
@@ -107,6 +107,7 @@ Complete the frozen Required Outcomes using the listed Change Envelope and Prima
 - 2026-08-04: SEARCH PROBE, canonical mob inventory, parallel family audits, direct mapping reconciliation, and independent plan review completed without source edits. R1-R5 frozen from the user-approved minimal plan.
 - 2026-08-04: R1 verified. Effective Forge drop routing and the audited Brainy/Giant, Taint Spider, Fire Bat, and Taint Pig item distributions were restored; focused tests and `./scripts/dev.sh validate --smoke` passed.
 - 2026-08-04: R2 verified. Portal XP/talk mapping and Spore/Swarmer size-XP plus talk intervals were restored; focused tests and `./scripts/dev.sh validate --smoke` passed.
+- 2026-08-04: R3 verified. Original recently-hit aspect-orb eligibility and inheritance-aware champion whitelist matching were restored without replacing public/config contracts; focused tests and `./scripts/dev.sh validate --smoke` passed.
 
 ## Completion
 

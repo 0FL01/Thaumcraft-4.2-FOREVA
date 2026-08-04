@@ -122,6 +122,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
 
@@ -358,7 +359,7 @@ public class EventHandlerEntity {
      * On mob death (TC4 parity):
      * - Converts mobs killed while taint-poisoned into tainted variants
      * - Drops EntityAspectOrb for each primal aspect (50% chance each)
-     * - Only for non-tainted mobs recently hit by a player
+     * - Requires the original recently-hit state after conversion is ruled out
      */
     @SubscribeEvent
     public void onLivingDeath(LivingDeathEvent event) {
@@ -370,12 +371,7 @@ public class EventHandlerEntity {
 
         if (tryConvertTaintedDeath(event.getEntityLiving())) return;
 
-        // TC4 parity: drop aspect orbs from non-tainted mobs killed by players.
-        // TC4 checks recentlyHit > 0; in 1.12 recentlyHit is protected, so we
-        // check the damage source's true source instead.
-        if (event.getEntityLiving() instanceof ITaintedMob) return;
-        if (!(event.getSource().getTrueSource() instanceof EntityPlayer)) return;
-        if (event.getSource().getTrueSource() instanceof FakePlayer) return;
+        if (!isAspectOrbEligible(event.getEntityLiving())) return;
 
         AspectList aspectsCompound = ScanManager.generateEntityAspects(event.getEntity());
         if (aspectsCompound == null || aspectsCompound.size() == 0) return;
@@ -392,6 +388,10 @@ public class EventHandlerEntity {
                     1 + event.getEntityLiving().world.rand.nextInt(aspects.getAmount(aspect)));
             event.getEntityLiving().world.spawnEntity(orb);
         }
+    }
+
+    static boolean isAspectOrbEligible(EntityLivingBase entity) {
+        return EntityUtils.getRecentlyHit(entity) > 0;
     }
 
     private boolean tryConvertTaintedDeath(EntityLivingBase dying) {
@@ -879,26 +879,55 @@ public class EventHandlerEntity {
         return EntityUtils.ensureChampionModAttribute(mob);
     }
 
-    private int getChampionWhitelistTier(Entity entity) {
+    int getChampionWhitelistTier(Entity entity) {
         ResourceLocation entityKey = EntityList.getKey(entity);
-        String className = entity.getClass().getName();
-        String legacyClassKey = className.replace("thaumcraft.common.entities.", "Thaumcraft.");
-        String simpleClassKey = entity.getClass().getSimpleName();
         int tier = -1;
         for (Map.Entry<String, Integer> entry : ConfigEntities.CHAMPION_WHITELIST.entrySet()) {
             String key = entry.getKey();
             if (key == null || key.isEmpty()) {
                 continue;
             }
-            boolean matches = key.equals(className)
-                    || key.equals(legacyClassKey)
-                    || key.equals(simpleClassKey)
-                    || (entityKey != null && key.equals(entityKey.toString()));
-            if (matches) {
+            if (matchesChampionWhitelistEntry(key, entity, entityKey)) {
                 tier = Math.max(tier, entry.getValue() == null ? 0 : entry.getValue());
             }
         }
         return tier;
+    }
+
+    private boolean matchesChampionWhitelistEntry(String key, Entity entity, ResourceLocation entityKey) {
+        if (entityKey != null && key.equals(entityKey.toString())) {
+            return true;
+        }
+
+        for (Class<?> type = entity.getClass(); type != null && Entity.class.isAssignableFrom(type);
+             type = type.getSuperclass()) {
+            String className = type.getName();
+            if (key.equals(className)
+                    || key.equals(className.replace("thaumcraft.common.entities.", "Thaumcraft."))
+                    || key.equals(type.getSimpleName())) {
+                return true;
+            }
+        }
+
+        Class<? extends Entity> whitelistClass = resolveChampionWhitelistClass(key);
+        return whitelistClass != null && whitelistClass.isAssignableFrom(entity.getClass());
+    }
+
+    private Class<? extends Entity> resolveChampionWhitelistClass(String key) {
+        try {
+            ResourceLocation location;
+            if (key.indexOf(':') >= 0) {
+                location = new ResourceLocation(key);
+            } else if (key.indexOf('.') < 0) {
+                String path = key.startsWith("Entity") ? key.substring("Entity".length()) : key;
+                location = new ResourceLocation("minecraft", path.toLowerCase(Locale.ROOT));
+            } else {
+                return null;
+            }
+            return EntityList.getClass(location);
+        } catch (IllegalArgumentException ignored) {
+            return null;
+        }
     }
 
     private boolean isDangerousLocation(World world, int x, int y, int z) {
