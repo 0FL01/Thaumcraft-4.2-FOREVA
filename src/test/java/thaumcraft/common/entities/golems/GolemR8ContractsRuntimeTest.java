@@ -207,6 +207,7 @@ public class GolemR8ContractsRuntimeTest {
         assertEquals(GolemIds.TYPE_THAUMIUM, info.getGolemTypeId());
         assertEquals(GolemIds.CORE_DECANTING, info.getCore());
         assertTrue(info.isAdvancedGolem());
+        assertEquals(server.getMaxHealth(), client.getMaxHealth(), 0.0F);
         assertEquals(2, info.getUpgradeAmount(GolemIds.UPGRADE_EARTH));
         assertEquals(64, client.getCarryLimit());
         assertNull(client.fluidCarried);
@@ -225,6 +226,21 @@ public class GolemR8ContractsRuntimeTest {
         assertEquals(48, client.getCarryLimit());
         assertSame(FluidRegistry.LAVA, client.getFluidCarried().getFluid());
         assertEquals(70001, client.getFluidCarried().amount);
+    }
+
+    @Test
+    public void pausedAndFetteredGolemsDisableAi() {
+        EntityGolemBase golem = new EntityGolemBase(new TestWorld(false), EnumGolemType.WOOD, false);
+        assertFalse(golem.isAIDisabled());
+
+        golem.paused = true;
+        assertTrue(golem.isAIDisabled());
+        assertEquals(0.0F, golem.getAIMoveSpeed(), 0.0F);
+
+        golem.paused = false;
+        golem.inactive = true;
+        assertTrue(golem.isAIDisabled());
+        assertEquals(0.0F, golem.getAIMoveSpeed(), 0.0F);
     }
 
     @Test

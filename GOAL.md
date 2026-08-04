@@ -33,6 +33,7 @@ Implement R10-R17 in dependency order using small reversible commits. TC4 behavi
 - Make paused/inactive golems actually disable AI while retaining the movement guard.
 - Synchronize configured max health in initial client spawn state.
 - Acceptance: focused runtime tests cover placement, power transitions, drops, AI disable/enable, and non-default client max health.
+- Status: verified by focused runtime tests, dedicated-server smoke, and build.
 
 ### R13: Repair shared inventory and configuration authority
 
@@ -102,8 +103,8 @@ Implement R10-R17 in dependency order using small reversible commits. TC4 behavi
 
 ## Current Checkpoint
 
-- Now: R12, Fetter and base lifecycle invariants.
-- Next: R13, shared inventory and configuration authority.
+- Now: R13, shared inventory and configuration authority.
+- Next: R14, independent device and residual-heart defects.
 - Stop or replan if: oracle evidence is ambiguous, a proposed deviation fails the `AGENTS.md` threshold, or a fix would break a stable current-port save/API contract.
 
 ## Prior Verified Foundation (R1-R9, 2026-08-02)

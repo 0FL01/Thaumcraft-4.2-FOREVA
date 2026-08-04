@@ -881,6 +881,11 @@ public class EntityGolemBase extends net.minecraft.entity.monster.EntityGolem im
 
     // --- Misc ---
     @Override
+    public boolean isAIDisabled() {
+        return super.isAIDisabled() || this.paused || this.inactive;
+    }
+
+    @Override
     public float getAIMoveSpeed() {
         if (this.paused || this.inactive) return 0.0f;
         float speed = (float)this.getGolemType().speed * (this.decoration.contains("B") ? 1.1f : 1.0f);
@@ -942,6 +947,7 @@ public class EntityGolemBase extends net.minecraft.entity.monster.EntityGolem im
         buf.writeBoolean(this.advanced);
         buf.writeByte(this.upgrades.length);
         for (byte b : this.upgrades) buf.writeByte(b);
+        buf.writeFloat(this.getMaxHealth());
     }
 
     @Override
@@ -954,6 +960,8 @@ public class EntityGolemBase extends net.minecraft.entity.monster.EntityGolem im
             }
             this.upgrades = new byte[buf.readByte()];
             for (int a = 0; a < this.upgrades.length; a++) this.upgrades[a] = buf.readByte();
+            this.getEntityAttribute(net.minecraft.entity.SharedMonsterAttributes.MAX_HEALTH)
+                    .setBaseValue(buf.readFloat());
         } catch (Exception e) {}
     }
 }

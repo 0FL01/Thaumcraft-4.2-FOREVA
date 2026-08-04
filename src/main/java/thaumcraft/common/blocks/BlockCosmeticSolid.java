@@ -53,6 +53,8 @@ public class BlockCosmeticSolid extends Block {
     public static final int TYPE_TRAVEL = 2;
     public static final int TYPE_WARDING = 3;
     public static final int TYPE_CHARGED_TOTEM = 8;
+    public static final int TYPE_GOLEM_FETTER = 9;
+    public static final int TYPE_GOLEM_FETTER_ACTIVE = 10;
     public static final int TOTEM_STYLE_BASE = 0;
     public static final int TOTEM_STYLE_SHADED = 1;
     public static final int TOTEM_STYLE_RUNED = 2;
@@ -74,7 +76,7 @@ public class BlockCosmeticSolid extends Block {
     @Override
     public void getSubBlocks(CreativeTabs tab, NonNullList<ItemStack> list) {
         for (int i = 0; i < 16; i++) {
-            if (types[i] != null) {
+            if (types[i] != null && i != TYPE_GOLEM_FETTER_ACTIVE) {
                 list.add(new ItemStack(this, 1, i));
             }
         }
@@ -83,6 +85,7 @@ public class BlockCosmeticSolid extends Block {
     @Override
     public int damageDropped(IBlockState state) {
         int meta = this.getMetaFromState(state);
+        if (meta == TYPE_GOLEM_FETTER_ACTIVE) return TYPE_GOLEM_FETTER;
         return meta == TYPE_CHARGED_TOTEM ? TYPE_OBSIDIAN_TILE : meta;
     }
 
@@ -263,7 +266,32 @@ public class BlockCosmeticSolid extends Block {
 
     @Override
     public IBlockState getStateForPlacement(World worldIn, BlockPos pos, EnumFacing facing, float hitX, float hitY, float hitZ, int meta, EntityLivingBase placer, EnumHand hand) {
-        return this.getDefaultState().withProperty(TYPE, MathHelper.clamp(meta, 0, 15));
+        int placedType = MathHelper.clamp(meta, 0, 15);
+        if (placedType == TYPE_GOLEM_FETTER && worldIn.isBlockPowered(pos)) {
+            placedType = TYPE_GOLEM_FETTER_ACTIVE;
+        }
+        return this.getDefaultState().withProperty(TYPE, placedType);
+    }
+
+    @Override
+    public void onBlockAdded(World worldIn, BlockPos pos, IBlockState state) {
+        super.onBlockAdded(worldIn, pos, state);
+        this.updateGolemFetterState(worldIn, pos, state);
+    }
+
+    @Override
+    public void neighborChanged(IBlockState state, World worldIn, BlockPos pos, Block blockIn, BlockPos fromPos) {
+        this.updateGolemFetterState(worldIn, pos, state);
+        super.neighborChanged(state, worldIn, pos, blockIn, fromPos);
+    }
+
+    private void updateGolemFetterState(World world, BlockPos pos, IBlockState state) {
+        int type = state.getValue(TYPE);
+        if (type != TYPE_GOLEM_FETTER && type != TYPE_GOLEM_FETTER_ACTIVE) return;
+        int target = world.isBlockPowered(pos) ? TYPE_GOLEM_FETTER_ACTIVE : TYPE_GOLEM_FETTER;
+        if (type != target) {
+            world.setBlockState(pos, state.withProperty(TYPE, target), 3);
+        }
     }
 
     private static final class IntUnlistedProperty implements IUnlistedProperty<Integer> {
