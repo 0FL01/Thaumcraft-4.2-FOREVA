@@ -50,15 +50,24 @@ public class BlockArcaneFurnaceStaticGuardTest {
     @Test
     public void blockArcaneFurnaceShouldKeepRestoreDropAndBlazeContracts() throws IOException {
         String source = readFile("src/main/java/thaumcraft/common/blocks/BlockArcaneFurnace.java");
+        int restoringGuard = source.indexOf("this.restoring = true;");
+        int releaseBlaze = source.indexOf("this.releaseBlaze(worldIn, pos);");
+        int conversionLoop = source.indexOf("for (int yy = -1; yy <= 1; ++yy)", releaseBlaze);
 
         assertTrue(source.contains("public void getDrops(NonNullList<ItemStack> drops, IBlockAccess world, BlockPos pos, IBlockState state, int fortune)"));
         assertTrue(source.contains("IBlockState restoredState = this.getRestoredState(this.getMetaFromState(state));"));
         assertTrue(source.contains("if (restoredState.getBlock() != Blocks.AIR) {"));
         assertTrue(source.contains("restoredState.getBlock().damageDropped(restoredState)"));
-        assertTrue(source.contains("public void onPlayerDestroy(World worldIn, BlockPos pos, IBlockState state)"));
+        assertTrue(!source.contains("public void onPlayerDestroy(World worldIn, BlockPos pos, IBlockState state)"));
+        assertTrue(source.contains("TC4 released the Blaze from onBlockPreDestroy while the core tile still existed"));
+        assertTrue(restoringGuard >= 0 && releaseBlaze > restoringGuard && conversionLoop > releaseBlaze);
+        assertTrue(source.contains("private void releaseBlaze(World worldIn, BlockPos core)"));
+        assertTrue(source.contains("TileEntity tile = worldIn.getTileEntity(core);"));
+        assertTrue(source.contains("if (worldIn.isRemote || !(tile instanceof TileArcaneFurnace))"));
         assertTrue(source.contains("new EntityBlaze(worldIn);"));
-        assertTrue(source.contains("new PotionEffect(MobEffects.RESISTANCE, 6000, 2, false, true)"));
-        assertTrue(source.contains("new PotionEffect(MobEffects.FIRE_RESISTANCE, 12000, 0, false, true)"));
+        assertTrue(source.contains("new PotionEffect(MobEffects.REGENERATION, 6000, 2, false, true)"));
+        assertTrue(source.contains("new PotionEffect(MobEffects.RESISTANCE, 12000, 0, false, true)"));
+        assertTrue(!source.contains("MobEffects.FIRE_RESISTANCE"));
         assertTrue(source.contains("public void breakBlock(World worldIn, BlockPos pos, IBlockState state)"));
         assertTrue(source.contains("if (!worldIn.isRemote && !this.restoring) {"));
         assertTrue(source.contains("BlockPos core = this.findCore(worldIn, pos, state);"));

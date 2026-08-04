@@ -220,18 +220,6 @@ public class BlockArcaneFurnace extends BlockContainer {
     }
 
     @Override
-    public void onPlayerDestroy(World worldIn, BlockPos pos, IBlockState state) {
-        if (this.getMetaFromState(state) == 0 && !worldIn.isRemote) {
-            EntityBlaze blaze = new EntityBlaze(worldIn);
-            blaze.setPositionAndRotation(pos.getX() + 0.5D, pos.getY() + 1.0D, pos.getZ() + 0.5D, 0.0F, 0.0F);
-            blaze.addPotionEffect(new PotionEffect(MobEffects.RESISTANCE, 6000, 2, false, true));
-            blaze.addPotionEffect(new PotionEffect(MobEffects.FIRE_RESISTANCE, 12000, 0, false, true));
-            worldIn.spawnEntity(blaze);
-        }
-        super.onPlayerDestroy(worldIn, pos, state);
-    }
-
-    @Override
     public void breakBlock(World worldIn, BlockPos pos, IBlockState state) {
         if (!worldIn.isRemote && !this.restoring) {
             BlockPos core = this.findCore(worldIn, pos, state);
@@ -362,6 +350,13 @@ public class BlockArcaneFurnace extends BlockContainer {
         }
         this.restoring = true;
         try {
+            /*
+             * TC4 released the Blaze from onBlockPreDestroy while the core tile still existed.
+             * Forge 1.12 removed that callback, so every collapse must emulate it here, before
+             * the conversion loop removes the core. Keep it inside the reentrancy guard: breaking
+             * a shell converts the core recursively and must still release exactly one Blaze.
+             */
+            this.releaseBlaze(worldIn, pos);
             for (int yy = -1; yy <= 1; ++yy) {
                 for (int xx = -1; xx <= 1; ++xx) {
                     for (int zz = -1; zz <= 1; ++zz) {
@@ -379,6 +374,18 @@ public class BlockArcaneFurnace extends BlockContainer {
         } finally {
             this.restoring = false;
         }
+    }
+
+    private void releaseBlaze(World worldIn, BlockPos core) {
+        TileEntity tile = worldIn.getTileEntity(core);
+        if (worldIn.isRemote || !(tile instanceof TileArcaneFurnace)) {
+            return;
+        }
+        EntityBlaze blaze = new EntityBlaze(worldIn);
+        blaze.setPositionAndRotation(core.getX() + 0.5D, core.getY() + 1.0D, core.getZ() + 0.5D, 0.0F, 0.0F);
+        blaze.addPotionEffect(new PotionEffect(MobEffects.REGENERATION, 6000, 2, false, true));
+        blaze.addPotionEffect(new PotionEffect(MobEffects.RESISTANCE, 12000, 0, false, true));
+        worldIn.spawnEntity(blaze);
     }
 
     private boolean isArcaneFurnaceBroken(World worldIn, BlockPos pos) {
