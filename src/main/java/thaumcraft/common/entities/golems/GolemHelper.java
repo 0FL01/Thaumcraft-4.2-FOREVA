@@ -827,7 +827,7 @@ public class GolemHelper {
 
             // Check proximity
             double dist = golem.getDistanceSq(marker.x + 0.5, marker.y + 0.5, marker.z + 0.5);
-            if (dist > ADJACENT_RANGE) continue;
+            if (dist >= ADJACENT_RANGE) continue;
 
             IFluidHandler handler = te.getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, side);
             if (handler == null) continue;
@@ -917,6 +917,15 @@ public class GolemHelper {
 
     public static Vec3d findPossibleLiquid(FluidStack ls, EntityGolemBase golem) {
         if (ls == null) return null;
+        Marker nearest = findPossibleLiquidMarker(ls, golem, true);
+        if (nearest == null) {
+            nearest = findPossibleLiquidMarker(ls, golem, false);
+        }
+        return nearest == null ? null
+                : new Vec3d(nearest.x + 0.5, nearest.y + 0.5, nearest.z + 0.5);
+    }
+
+    private static Marker findPossibleLiquidMarker(FluidStack ls, EntityGolemBase golem, boolean handlers) {
         Marker nearest = null;
         double nearestDistance = Double.MAX_VALUE;
         double rangeSq = golem.getRange() * golem.getRange();
@@ -928,9 +937,11 @@ public class GolemHelper {
             double distance = golem.getDistanceSq(marker.x + 0.5, marker.y + 0.5, marker.z + 0.5);
             if (distance > rangeSq || distance >= nearestDistance) continue;
 
-            boolean valid = false;
-            TileEntity te = golem.world.getTileEntity(pos);
-            if (te != null) {
+            boolean valid;
+            if (handlers) {
+                valid = false;
+                TileEntity te = golem.world.getTileEntity(pos);
+                if (te == null) continue;
                 EnumFacing side = EnumFacing.VALUES[marker.side % EnumFacing.VALUES.length];
                 if (te.hasCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, side)) {
                     IFluidHandler handler = te.getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, side);
@@ -943,8 +954,7 @@ public class GolemHelper {
                         valid = probe != null && probe.amount > 0 && probe.isFluidEqual(ls);
                     }
                 }
-            }
-            if (!valid) {
+            } else {
                 FluidStack drained = drainWorldFluidBlock(golem.world, pos, false);
                 valid = drained != null && drained.amount > 0 && drained.isFluidEqual(ls);
             }
@@ -953,8 +963,7 @@ public class GolemHelper {
                 nearestDistance = distance;
             }
         }
-        return nearest == null ? null
-                : new Vec3d(nearest.x + 0.5, nearest.y + 0.5, nearest.z + 0.5);
+        return nearest;
     }
 
     // --- Inner class for timeout ---

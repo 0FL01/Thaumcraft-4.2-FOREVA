@@ -458,7 +458,7 @@ public class Config {
                 registerCompatTag(entries, new AspectList().add(Aspect.CRYSTAL, 1).add(Aspect.ENERGY, 1));
                 continue;
             }
-            if ("woodLog".equals(ore)) {
+            if ("logWood".equals(ore)) {
                 for (ItemStack is : entries) {
                     ItemElementalAxe.oreDictLogs.add(Arrays.<Object>asList(Item.getIdFromItem(is.getItem()), is.getItemDamage()));
                 }

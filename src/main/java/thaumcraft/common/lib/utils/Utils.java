@@ -3,6 +3,7 @@ package thaumcraft.common.lib.utils;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Items;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.NetHandlerPlayServer;
@@ -14,10 +15,12 @@ import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.storage.ExtendedBlockStorage;
 import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
+import net.minecraftforge.oredict.OreDictionary;
 import thaumcraft.api.WorldCoordinates;
 import thaumcraft.api.internal.WeightedRandomLoot;
 import thaumcraft.common.config.ConfigItems;
 import thaumcraft.common.items.ItemResource;
+import thaumcraft.common.items.equipment.ItemElementalAxe;
 import thaumcraft.common.lib.network.PacketHandler;
 import thaumcraft.common.lib.network.fx.PacketFXVisDrain;
 import thaumcraft.common.lib.network.misc.PacketBiomeChange;
@@ -277,10 +280,22 @@ public class Utils {
     }
 
     public static boolean isWoodLog(net.minecraft.world.IBlockAccess world, BlockPos pos) {
-        net.minecraft.block.Block block = world.getBlockState(pos).getBlock();
+        IBlockState state = world.getBlockState(pos);
+        net.minecraft.block.Block block = state.getBlock();
         if (block == net.minecraft.init.Blocks.AIR) return false;
-        // Check if the block can sustain leaves (all vanilla and most mod logs do this)
-        if (block.canSustainLeaves(world.getBlockState(pos), world, pos)) return true;
+        if (block.canSustainLeaves(state, world, pos)) return true;
+
+        int itemId = Item.getIdFromItem(Item.getItemFromBlock(block));
+        int metadata = block.getMetaFromState(state);
+        for (List<?> log : ItemElementalAxe.oreDictLogs) {
+            if (log.size() < 2 || !(log.get(0) instanceof Number) || !(log.get(1) instanceof Number)) continue;
+            int registeredId = ((Number) log.get(0)).intValue();
+            int registeredMetadata = ((Number) log.get(1)).intValue();
+            if (itemId == registeredId
+                    && (registeredMetadata == OreDictionary.WILDCARD_VALUE || metadata == registeredMetadata)) {
+                return true;
+            }
+        }
         return false;
     }
 }

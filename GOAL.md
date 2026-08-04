@@ -52,6 +52,7 @@ Implement R10-R17 in dependency order using small reversible commits. TC4 behavi
 - Lumber: restore `logWood`/wildcard OreDictionary log recognition.
 - Liquid: retain colored marker routing and bounded capacity while restoring handler-first source priority and the strict adjacency boundary.
 - Acceptance: narrow Hungry, Lumber, and Liquid runtime tests pass together with the existing R1-R9 heart suites; no universal heart lifecycle rewrite is added.
+- Status: verified by focused runtime tests, dedicated-server smoke, and build.
 
 ### R15: Restore Traveling Trunk behavior
 
@@ -104,8 +105,8 @@ Implement R10-R17 in dependency order using small reversible commits. TC4 behavi
 
 ## Current Checkpoint
 
-- Now: R14, independent device and residual-heart defects.
-- Next: R15, Traveling Trunk behavior.
+- Now: R15, Traveling Trunk behavior.
+- Next: R16, scoped client/decorations parity.
 - Stop or replan if: oracle evidence is ambiguous, a proposed deviation fails the `AGENTS.md` threshold, or a fix would break a stable current-port save/API contract.
 
 ## Prior Verified Foundation (R1-R9, 2026-08-02)

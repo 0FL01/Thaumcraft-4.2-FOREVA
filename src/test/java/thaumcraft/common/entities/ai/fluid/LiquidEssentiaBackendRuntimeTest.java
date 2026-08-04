@@ -69,7 +69,7 @@ public class LiquidEssentiaBackendRuntimeTest {
     }
 
     @Test
-    public void sourceSelectionUsesHomeAndClickedFacesAndNearestMarkedInRangeSource() {
+    public void sourceSelectionUsesHomeClickedFacesAndHandlerPriority() {
         TestWorld world = new TestWorld(0);
         SidedFluidTile home = world.addTile(HOME.down(),
                 SidedFluidTile.sink(EnumFacing.UP, FluidRegistry.WATER));
@@ -101,9 +101,9 @@ public class LiquidEssentiaBackendRuntimeTest {
         Vec3d selected = GolemHelper.findPossibleLiquid(
                 new FluidStack(FluidRegistry.WATER, Integer.MAX_VALUE), golem);
         assertNotNull(selected);
-        assertEquals(markedWorldSource.getX() + 0.5, selected.x, 0.0);
-        assertEquals(markedWorldSource.getY() + 0.5, selected.y, 0.0);
-        assertEquals(markedWorldSource.getZ() + 0.5, selected.z, 0.0);
+        assertEquals(markedHandler.getX() + 0.5, selected.x, 0.0);
+        assertEquals(markedHandler.getY() + 0.5, selected.y, 0.0);
+        assertEquals(markedHandler.getZ() + 0.5, selected.z, 0.0);
         assertTrue(handler.requestedFaces.contains(EnumFacing.EAST));
         assertFalse(handler.requestedFaces.contains(EnumFacing.WEST));
 
@@ -113,6 +113,26 @@ public class LiquidEssentiaBackendRuntimeTest {
         empty.startExecuting();
         assertEquals(500, home.tank.getFluidAmount());
         assertNull(golem.fluidCarried);
+    }
+
+    @Test
+    public void adjacentHandlerRangeUsesStrictTwoBlockBoundary() {
+        TestWorld world = new TestWorld(0);
+        world.addTile(HOME.down(), SidedFluidTile.sink(EnumFacing.UP, FluidRegistry.WATER));
+        EntityGolemBase golem = fluidGolem(world, EnumGolemType.WOOD);
+        BlockPos inside = HOME.east();
+        BlockPos boundary = HOME.east(2);
+        world.addTile(inside, SidedFluidTile.source(EnumFacing.UP, FluidRegistry.WATER, 1000));
+        world.addTile(boundary, SidedFluidTile.source(EnumFacing.UP, FluidRegistry.WATER, 1000));
+        setMarkers(golem,
+                marker(inside, EnumFacing.UP, -1, 0),
+                marker(boundary, EnumFacing.UP, -1, 0));
+
+        ArrayList<Marker> adjacent = GolemHelper.getMarkedFluidHandlersAdjacentToGolem(
+                new FluidStack(FluidRegistry.WATER, 1000), world, golem);
+
+        assertEquals(1, adjacent.size());
+        assertEquals(inside.getX(), adjacent.get(0).x);
     }
 
     @Test

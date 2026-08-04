@@ -206,31 +206,6 @@ public class TileChestHungry extends TileThaumcraft implements IInventory, ITick
             this.eatCloseActive = false;
         }
 
-        if ((!shouldOpen && this.lidAngle > 0.0F) || (shouldOpen && this.lidAngle < 1.0F)) {
-            float previous = this.lidAngle;
-            this.lidAngle = shouldOpen ? this.lidAngle + delta : this.lidAngle - delta;
-
-            if (this.lidAngle > 1.0F) {
-                this.lidAngle = 1.0F;
-            }
-
-            if (this.lidAngle < 0.5F && previous >= 0.5F) {
-                this.world.playSound(null, this.pos, net.minecraft.init.SoundEvents.BLOCK_CHEST_CLOSE,
-                        net.minecraft.util.SoundCategory.BLOCKS, 0.5F, this.world.rand.nextFloat() * 0.1F + 0.9F);
-            }
-
-            if (this.lidAngle < 0.0F) {
-                this.lidAngle = 0.0F;
-            }
-        }
-
-        if (this.forcedLidTicks > 0) {
-            --this.forcedLidTicks;
-        }
-
-        if (this.eatCloseActive && this.forcedLidTicks == 0 && this.lidAngle == 0.0F) {
-            this.eatCloseActive = false;
-        }
     }
 
     @Override
@@ -248,6 +223,7 @@ public class TileChestHungry extends TileThaumcraft implements IInventory, ITick
         }
         if (id == 3) {
             this.forcedLidTicks = Math.max(this.forcedLidTicks, type);
+            this.eatCloseActive = true;
             return true;
         }
         return super.receiveClientEvent(id, type);
