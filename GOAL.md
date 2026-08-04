@@ -44,6 +44,7 @@ Implement R10-R17 in dependency order using small reversible commits. TC4 behavi
 - Reject invalid marker sides, normalize invalid colors to wildcard, and retain full-width dimensions.
 - Preserve Fill precise-count behavior through 256 across persistence and live container synchronization.
 - Acceptance: focused runtime tests cover the two extraction edges, Perditio/toggle matrix, partner-only double chest, raw unauthorized actions, cross-owner pickup, malformed marker boundaries, count 128/255/256 synchronization, and configure-to-Bell-to-placer round trip.
+- Status: verified by focused runtime tests, dedicated-server smoke, and build.
 
 ### R14: Close independent device and residual-heart defects
 
@@ -103,8 +104,8 @@ Implement R10-R17 in dependency order using small reversible commits. TC4 behavi
 
 ## Current Checkpoint
 
-- Now: R13, shared inventory and configuration authority.
-- Next: R14, independent device and residual-heart defects.
+- Now: R14, independent device and residual-heart defects.
+- Next: R15, Traveling Trunk behavior.
 - Stop or replan if: oracle evidence is ambiguous, a proposed deviation fails the `AGENTS.md` threshold, or a fix would break a stable current-port save/API contract.
 
 ## Prior Verified Foundation (R1-R9, 2026-08-02)

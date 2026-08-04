@@ -12,6 +12,17 @@ public class Marker extends java.lang.Object {
         this.dim = dim; this.side = side; this.color = color;
     }
 
+    public static Marker canonical(int x, int y, int z, int dim, byte side, byte color) {
+        if (side < 0 || side >= 6) return null;
+        byte canonicalColor = color >= -1 && color <= 15 ? color : -1;
+        return new Marker(x, y, z, dim, side, canonicalColor);
+    }
+
+    public static Marker canonical(Marker marker) {
+        if (marker == null) return null;
+        return canonical(marker.x, marker.y, marker.z, marker.dim, marker.side, marker.color);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (!(o instanceof Marker)) return false;

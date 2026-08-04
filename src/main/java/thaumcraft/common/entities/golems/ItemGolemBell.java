@@ -59,8 +59,9 @@ public class ItemGolemBell extends Item {
             NBTTagList tagList = stack.getTagCompound().getTagList("markers", 10);
             for (int i = 0; i < tagList.tagCount(); i++) {
                 NBTTagCompound tag = tagList.getCompoundTagAt(i);
-                markers.add(new Marker(tag.getInteger("x"), tag.getInteger("y"), tag.getInteger("z"),
-                        tag.getInteger("dim"), tag.getByte("side"), tag.getByte("color")));
+                Marker marker = Marker.canonical(tag.getInteger("x"), tag.getInteger("y"), tag.getInteger("z"),
+                        tag.getInteger("dim"), tag.getByte("side"), tag.getByte("color"));
+                if (marker != null) markers.add(marker);
             }
         }
         return markers;
@@ -71,6 +72,7 @@ public class ItemGolemBell extends Item {
         int id = getGolemId(stack);
         Entity entity = id >= 0 ? world.getEntityByID(id) : null;
         if (entity instanceof EntityGolemBase) {
+            if (!((EntityGolemBase) entity).isOwnedBy(player)) return;
             getOrCreateTag(stack).setTag("markers", new NBTTagList());
             ((EntityGolemBase) entity).setMarkers(new ArrayList<Marker>());
             world.playSound(null, player.getPosition(), SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP, SoundCategory.PLAYERS, 0.7F, 1.0F + world.rand.nextFloat() * 0.1F);
@@ -84,6 +86,7 @@ public class ItemGolemBell extends Item {
         int id = getGolemId(stack);
         if (id > -1) {
             linked = world.getEntityByID(id);
+            if (linked instanceof EntityGolemBase && !((EntityGolemBase) linked).isOwnedBy(player)) return;
             if (linked instanceof EntityGolemBase && ((EntityGolemBase) linked).getUpgradeAmount(4) > 0) {
                 markMultipleColors = true;
             }
@@ -143,6 +146,7 @@ public class ItemGolemBell extends Item {
         }
         if (!target.world.isRemote) {
             EntityGolemBase golem = (EntityGolemBase) target;
+            if (!golem.isOwnedBy(player)) return false;
             NBTTagCompound tag = getOrCreateTag(stack);
             clearLinkedGolem(stack);
             tag.setTag("markers", writeMarkers(golem.getMarkers()));
@@ -209,6 +213,7 @@ public class ItemGolemBell extends Item {
     }
 
     private static boolean pickupGolem(EntityPlayer player, EntityGolemBase golem) {
+        if (!golem.isOwnedBy(player)) return false;
         if (golem.world.isRemote) {
             player.swingArm(EnumHand.MAIN_HAND);
             return true;
@@ -268,6 +273,8 @@ public class ItemGolemBell extends Item {
     static NBTTagList writeMarkers(ArrayList<Marker> markers) {
         NBTTagList tagList = new NBTTagList();
         for (Marker marker : markers) {
+            marker = Marker.canonical(marker);
+            if (marker == null) continue;
             NBTTagCompound tag = new NBTTagCompound();
             tag.setInteger("x", marker.x);
             tag.setInteger("y", marker.y);

@@ -6,6 +6,7 @@ import net.minecraft.inventory.Slot;
 
 public class SlotGhost extends Slot {
     private final int limit;
+    private boolean networkSyncView;
 
     public SlotGhost(IInventory inventory, int index, int xPosition, int yPosition) {
         this(inventory, index, xPosition, yPosition, 256);
@@ -19,6 +20,21 @@ public class SlotGhost extends Slot {
     @Override
     public int getSlotStackLimit() {
         return this.limit;
+    }
+
+    @Override
+    public net.minecraft.item.ItemStack getStack() {
+        net.minecraft.item.ItemStack stack = super.getStack();
+        if (!this.networkSyncView || stack.isEmpty() || stack.getCount() <= Byte.MAX_VALUE) {
+            return stack;
+        }
+        net.minecraft.item.ItemStack safe = stack.copy();
+        safe.setCount(Byte.MAX_VALUE);
+        return safe;
+    }
+
+    public void setNetworkSyncView(boolean networkSyncView) {
+        this.networkSyncView = networkSyncView;
     }
 
     @Override

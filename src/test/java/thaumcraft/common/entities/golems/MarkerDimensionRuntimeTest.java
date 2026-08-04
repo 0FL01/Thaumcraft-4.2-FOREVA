@@ -59,6 +59,44 @@ public class MarkerDimensionRuntimeTest {
         assertEntityRoundTrip(-300);
     }
 
+    @Test
+    public void malformedMarkerSidesAreDroppedAndColorsBecomeWildcardAtPersistenceBoundaries() {
+        NBTTagList raw = new NBTTagList();
+        raw.appendTag(markerTag(1, 2, 3, 300, -1, 4));
+        raw.appendTag(markerTag(4, 5, 6, 300, 6, 4));
+        raw.appendTag(markerTag(7, 8, 9, 300, EnumFacing.UP.getIndex(), 99));
+        ItemStack bell = new ItemStack(new ItemGolemBell());
+        NBTTagCompound bellNbt = new NBTTagCompound();
+        bellNbt.setTag("markers", raw);
+        bell.setTagCompound(bellNbt);
+
+        ArrayList<Marker> bellMarkers = ItemGolemBell.getMarkers(bell);
+        assertEquals(1, bellMarkers.size());
+        assertEquals(EnumFacing.UP.getIndex(), bellMarkers.get(0).side);
+        assertEquals(-1, bellMarkers.get(0).color);
+        assertEquals(300, bellMarkers.get(0).dim);
+
+        EntityGolemBase golem = new EntityGolemBase(new TestWorld(300), EnumGolemType.WOOD, false);
+        ArrayList<Marker> assigned = new ArrayList<>();
+        assigned.add(new Marker(1, 2, 3, 300, (byte) -1, (byte) 4));
+        assigned.add(new Marker(7, 8, 9, 300, (byte) EnumFacing.DOWN.getIndex(), (byte) -9));
+        golem.setMarkers(assigned);
+        assertEquals(1, golem.getMarkers().size());
+        assertEquals(EnumFacing.DOWN.getIndex(), golem.getMarkers().get(0).side);
+        assertEquals(-1, golem.getMarkers().get(0).color);
+    }
+
+    private static NBTTagCompound markerTag(int x, int y, int z, int dim, int side, int color) {
+        NBTTagCompound tag = new NBTTagCompound();
+        tag.setInteger("x", x);
+        tag.setInteger("y", y);
+        tag.setInteger("z", z);
+        tag.setInteger("dim", dim);
+        tag.setByte("side", (byte) side);
+        tag.setByte("color", (byte) color);
+        return tag;
+    }
+
     private static void assertEntityRoundTrip(int dimension) {
         TestWorld world = new TestWorld(dimension);
         EntityGolemBase source = new EntityGolemBase(world, EnumGolemType.WOOD, false);

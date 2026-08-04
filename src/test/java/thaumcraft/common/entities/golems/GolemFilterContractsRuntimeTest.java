@@ -1,20 +1,26 @@
 package thaumcraft.common.entities.golems;
 
 import com.mojang.authlib.GameProfile;
+import io.netty.buffer.Unpooled;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Biomes;
 import net.minecraft.init.Bootstrap;
 import net.minecraft.init.Items;
 import net.minecraft.inventory.ClickType;
+import net.minecraft.inventory.Container;
+import net.minecraft.inventory.IContainerListener;
+import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
+import net.minecraft.network.PacketBuffer;
 import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.profiler.Profiler;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.NonNullList;
 import net.minecraft.world.Explosion;
 import net.minecraft.world.GameType;
 import net.minecraft.world.World;
@@ -37,6 +43,8 @@ import thaumcraft.common.container.SlotGhostFluid;
 import java.lang.reflect.Field;
 import java.nio.charset.StandardCharsets;
 import java.util.IdentityHashMap;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 import static org.junit.Assert.assertArrayEquals;
@@ -153,6 +161,71 @@ public class GolemFilterContractsRuntimeTest {
     }
 
     @Test
+    public void preciseGhostCountsUseByteSafeStacksAndExactLiveProperties() throws Exception {
+        for (int count : new int[]{128, 255, 256}) {
+            TestWorld serverWorld = new TestWorld(false);
+            TestPlayer serverPlayer = new TestPlayer(serverWorld);
+            EntityGolemBase serverGolem = golemForCore(serverWorld, 0);
+            serverGolem.inventory.setInventorySlotContents(0, new ItemStack(Items.PAPER, count));
+            ContainerGolem server = new ContainerGolem(serverPlayer.inventory, serverGolem);
+            GhostSyncListener listener = new GhostSyncListener();
+            server.addListener(listener);
+
+            ItemStack networkStack = listener.contents.get(0);
+            assertFalse(networkStack.isEmpty());
+            assertTrue(networkStack.getCount() <= Byte.MAX_VALUE);
+            PacketBuffer buffer = new PacketBuffer(Unpooled.buffer());
+            buffer.writeItemStack(networkStack);
+            ItemStack decoded = buffer.readItemStack();
+            assertEquals(Items.PAPER, decoded.getItem());
+            int countProperty = listener.propertyValues.entrySet().stream()
+                    .filter(entry -> entry.getValue() == count)
+                    .findFirst().get().getKey();
+
+            TestWorld clientWorld = new TestWorld(true);
+            TestPlayer clientPlayer = new TestPlayer(clientWorld);
+            ContainerGolem client = new ContainerGolem(clientPlayer.inventory, golemForCore(clientWorld, 0));
+            client.getSlot(0).putStack(decoded);
+            client.updateProgressBar(countProperty, count);
+            assertEquals(count, client.getSlot(0).getStack().getCount());
+        }
+    }
+
+    @Test
+    public void rawConfigurationActionsRequireOwnerCoreAndUpgrades() {
+        TestWorld world = new TestWorld(false);
+        TestPlayer owner = new TestPlayer(world, "filter_owner");
+        EntityGolemBase fill = golemForCore(world, 0);
+        fill.setOwner(owner.getName());
+        ContainerGolem fillContainer = new ContainerGolem(owner.inventory, fill);
+
+        assertTrue(fillContainer.enchantItem(owner, 50));
+        assertTrue(fill.getToggles()[0]);
+        assertFalse(fillContainer.enchantItem(owner, 55));
+        assertFalse(fillContainer.enchantItem(owner, 0));
+        fill.setUpgrade(0, (byte) 4);
+        assertTrue(fillContainer.enchantItem(owner, 0));
+        assertEquals(15, fill.getColors(0));
+        assertFalse(fillContainer.enchantItem(owner, 99));
+
+        EntityGolemBase guard = golemForCore(world, 4);
+        guard.setOwner(owner.getName());
+        ContainerGolem guardContainer = new ContainerGolem(owner.inventory, guard);
+        assertFalse(guardContainer.enchantItem(owner, 51));
+        guard.setUpgrade(0, (byte) 4);
+        assertTrue(guardContainer.enchantItem(owner, 51));
+
+        TestPlayer intruder = new TestPlayer(world, "filter_intruder");
+        EntityGolemBase protectedGolem = golemForCore(world, 0);
+        protectedGolem.setOwner(owner.getName());
+        ContainerGolem rejected = new ContainerGolem(intruder.inventory, protectedGolem);
+        assertFalse(protectedGolem.paused);
+        assertFalse(rejected.canInteractWith(intruder));
+        assertFalse(rejected.enchantItem(intruder, 50));
+        assertFalse(protectedGolem.getToggles()[0]);
+    }
+
+    @Test
     @SuppressWarnings("unchecked")
     public void liveClientUpgradeDataUpdatesTheBackingArray() throws Exception {
         EntityGolemBase golem = new EntityGolemBase(new TestWorld(true), EnumGolemType.THAUMIUM, false);
@@ -197,8 +270,11 @@ public class GolemFilterContractsRuntimeTest {
 
     private static final class TestPlayer extends EntityPlayer {
         private TestPlayer(World world) {
-            super(world, new GameProfile(UUID.nameUUIDFromBytes("r2_golem_filter".getBytes(StandardCharsets.UTF_8)),
-                    "r2_golem_filter"));
+            this(world, "r2_golem_filter");
+        }
+
+        private TestPlayer(World world, String name) {
+            super(world, new GameProfile(UUID.nameUUIDFromBytes(name.getBytes(StandardCharsets.UTF_8)), name));
         }
 
         @Override
@@ -209,6 +285,32 @@ public class GolemFilterContractsRuntimeTest {
         @Override
         public boolean isCreative() {
             return false;
+        }
+    }
+
+    private static final class GhostSyncListener implements IContainerListener {
+        private NonNullList<ItemStack> contents = NonNullList.create();
+        private final Map<Integer, ItemStack> slotUpdates = new HashMap<>();
+        private final Map<Integer, Integer> propertyValues = new HashMap<>();
+
+        @Override
+        public void sendAllContents(Container containerToSend, NonNullList<ItemStack> itemsList) {
+            this.contents = NonNullList.create();
+            for (ItemStack stack : itemsList) this.contents.add(stack.copy());
+        }
+
+        @Override
+        public void sendSlotContents(Container containerToSend, int slotInd, ItemStack stack) {
+            this.slotUpdates.put(slotInd, stack.copy());
+        }
+
+        @Override
+        public void sendWindowProperty(Container containerIn, int varToUpdate, int newValue) {
+            this.propertyValues.put(varToUpdate, newValue);
+        }
+
+        @Override
+        public void sendAllWindowProperties(Container containerIn, IInventory inventory) {
         }
     }
 

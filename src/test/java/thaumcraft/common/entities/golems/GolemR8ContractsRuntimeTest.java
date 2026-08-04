@@ -5,6 +5,7 @@ import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.passive.EntityCow;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Biomes;
@@ -132,13 +133,18 @@ public class GolemR8ContractsRuntimeTest {
     }
 
     @Test
-    public void bellPlacerRoundTripPreservesConfigurationAndExistingState() {
+    public void bellPickupAndPlacerRoundTripPreserveConfiguredState() {
         TestWorld world = new TestWorld(false);
-        EntityGolemBase source = new EntityGolemBase(world, EnumGolemType.THAUMIUM, false);
+        TestPlayer owner = new TestPlayer(world);
+        EntityGolemBase source = new EntityGolemBase(world, EnumGolemType.THAUMIUM, true);
+        source.setOwner(owner.getName());
         source.setCore((byte) 0);
         source.setUpgrade(0, (byte) 2);
         source.setUpgrade(1, (byte) 4);
         source.setupGolemInventory();
+        source.decoration = "M";
+        source.setGolemDecoration(source.decoration);
+        source.setCustomNameTag("Audited Golem");
         source.setTogglesValue((byte) 0xA5);
         source.setColors(0, 3);
         source.setColors(11, 15);
@@ -148,19 +154,47 @@ public class GolemR8ContractsRuntimeTest {
         source.setMarkers(markers);
 
         ItemGolemPlacer placerItem = new ItemGolemPlacer();
-        ItemStack placer = new ItemStack(placerItem, 1, EnumGolemType.THAUMIUM.ordinal());
-        ItemGolemBell.writeGolemStateToPlacer(placer, source);
-        assertTrue(placer.getTagCompound().hasKey("toggles"));
-        assertTrue(placer.getTagCompound().hasKey("colors"));
+        Item previousPlacer = ConfigItems.itemGolemPlacer;
+        ConfigItems.itemGolemPlacer = placerItem;
+        try {
+            ItemStack bell = new ItemStack(new ItemGolemBell());
+            assertTrue(((ItemGolemBell) bell.getItem()).onLeftClickEntity(bell, owner, source));
+            assertTrue(source.isDead);
+            ItemStack placer = world.lastDropped;
+            assertNotNull(placer);
+            assertTrue(placer.getTagCompound().hasKey("toggles"));
+            assertTrue(placer.getTagCompound().hasKey("colors"));
 
-        assertTrue(placerItem.spawnCreature(world, 0.5D, 64.0D, 0.5D, 1, placer, new TestPlayer(world)));
-        EntityGolemBase restored = world.lastSpawned;
-        assertNotNull(restored);
-        assertEquals(source.getTogglesValue(), restored.getTogglesValue());
-        assertArrayEquals(source.colors, restored.colors);
-        assertArrayEquals(source.upgrades, restored.upgrades);
-        assertEquals(32, restored.inventory.getStackInSlot(0).getCount());
-        assertEquals(markers, restored.getMarkers());
+            assertTrue(placerItem.spawnCreature(world, 0.5D, 64.0D, 0.5D, 1, placer, owner));
+            EntityGolemBase restored = world.lastSpawned;
+            assertNotNull(restored);
+            assertSame(EnumGolemType.THAUMIUM, restored.getGolemType());
+            assertTrue(restored.advanced);
+            assertEquals((byte) 0, restored.getCore());
+            assertEquals("M", restored.decoration);
+            assertEquals("Audited Golem", restored.getCustomNameTag());
+            assertEquals(owner.getName(), restored.getOwnerName());
+            assertEquals(source.getTogglesValue(), restored.getTogglesValue());
+            assertArrayEquals(source.colors, restored.colors);
+            assertArrayEquals(source.upgrades, restored.upgrades);
+            assertEquals(32, restored.inventory.getStackInSlot(0).getCount());
+            assertEquals(markers, restored.getMarkers());
+        } finally {
+            ConfigItems.itemGolemPlacer = previousPlacer;
+        }
+    }
+
+    @Test
+    public void bellPickupRejectsAnotherPlayersGolem() {
+        TestWorld world = new TestWorld(false);
+        EntityGolemBase golem = new EntityGolemBase(world, EnumGolemType.WOOD, false);
+        golem.setOwner("another_owner");
+        TestPlayer intruder = new TestPlayer(world);
+        ItemStack bell = new ItemStack(new ItemGolemBell());
+
+        assertFalse(((ItemGolemBell) bell.getItem()).onLeftClickEntity(bell, intruder, golem));
+        assertFalse(golem.isDead);
+        assertNull(world.lastDropped);
     }
 
     @Test
@@ -354,6 +388,7 @@ public class GolemR8ContractsRuntimeTest {
 
     private static final class TestWorld extends World {
         private EntityGolemBase lastSpawned;
+        private ItemStack lastDropped;
 
         private TestWorld(boolean remote) {
             super(null,
@@ -367,6 +402,7 @@ public class GolemR8ContractsRuntimeTest {
         @Override
         public boolean spawnEntity(Entity entityIn) {
             if (entityIn instanceof EntityGolemBase) this.lastSpawned = (EntityGolemBase) entityIn;
+            if (entityIn instanceof EntityItem) this.lastDropped = ((EntityItem) entityIn).getItem().copy();
             return true;
         }
 

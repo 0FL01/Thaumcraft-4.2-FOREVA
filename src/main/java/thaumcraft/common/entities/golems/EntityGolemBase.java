@@ -327,14 +327,7 @@ public class EntityGolemBase extends net.minecraft.entity.monster.EntityGolem im
         if (this.itemCarried != null) this.itemCarried.writeToNBT(itemNBT);
         nbt.setTag("ItemCarried", itemNBT);
         nbt.setString("Owner", this.getOwnerName() != null ? this.getOwnerName() : "");
-        net.minecraft.nbt.NBTTagList tl = new net.minecraft.nbt.NBTTagList();
-        for (Marker m : this.markers) {
-            net.minecraft.nbt.NBTTagCompound tc = new net.minecraft.nbt.NBTTagCompound();
-            tc.setInteger("x", m.x); tc.setInteger("y", m.y); tc.setInteger("z", m.z);
-            tc.setInteger("dim", m.dim); tc.setByte("side", m.side); tc.setByte("color", m.color);
-            tl.appendTag(tc);
-        }
-        nbt.setTag("Markers", tl);
+        nbt.setTag("Markers", ItemGolemBell.writeMarkers(this.markers));
         if (this.inventory != null) nbt.setTag("Inventory", this.inventory.writeToNBT(new net.minecraft.nbt.NBTTagList()));
     }
 
@@ -365,12 +358,15 @@ public class EntityGolemBase extends net.minecraft.entity.monster.EntityGolem im
         this.setGolemDecoration(this.decoration);
         String owner = nbt.getString("Owner");
         if (owner.length() > 0) this.setOwner(owner);
+        java.util.ArrayList<Marker> loadedMarkers = new java.util.ArrayList<>();
         net.minecraft.nbt.NBTTagList markersList = nbt.getTagList("Markers", 10);
         for (int i = 0; i < markersList.tagCount(); i++) {
             net.minecraft.nbt.NBTTagCompound tc = markersList.getCompoundTagAt(i);
-            this.markers.add(new Marker(tc.getInteger("x"), tc.getInteger("y"), tc.getInteger("z"),
-                tc.getInteger("dim"), tc.getByte("side"), tc.getByte("color")));
+            Marker marker = Marker.canonical(tc.getInteger("x"), tc.getInteger("y"), tc.getInteger("z"),
+                tc.getInteger("dim"), tc.getByte("side"), tc.getByte("color"));
+            if (marker != null) loadedMarkers.add(marker);
         }
+        this.setMarkers(loadedMarkers);
         byte[] savedUpgrades = nbt.getByteArray("upgrades");
         this.upgrades = new byte[this.golemType.upgrades + (this.advanced ? 1 : 0)];
         java.util.Arrays.fill(this.upgrades, (byte) -1);
@@ -390,6 +386,7 @@ public class EntityGolemBase extends net.minecraft.entity.monster.EntityGolem im
     // --- Interaction ---
     @Override
     public boolean processInteract(net.minecraft.entity.player.EntityPlayer player, net.minecraft.util.EnumHand hand) {
+        if (!this.isOwnedBy(player)) return false;
         if (player.isSneaking()) return false;
         net.minecraft.item.ItemStack stack = player.getHeldItem(hand);
         if (stack.isEmpty()) return this.customInteraction(player, stack, hand);
@@ -481,6 +478,11 @@ public class EntityGolemBase extends net.minecraft.entity.monster.EntityGolem im
     // --- Data watcher accessors ---
     public String getOwnerName() { return this.dataManager.get(OWNER); }
     public void setOwner(String name) { this.dataManager.set(OWNER, name); }
+    public boolean isOwnedBy(net.minecraft.entity.player.EntityPlayer player) {
+        if (player == null) return false;
+        String owner = this.getOwnerName();
+        return owner == null || owner.isEmpty() || owner.equals(player.getName());
+    }
     public byte getCore() { return this.dataManager.get(CORE); }
     public void setCore(byte core) { this.dataManager.set(CORE, core); }
     public EnumGolemType getGolemType() { return EnumGolemType.getType(this.dataManager.get(GOLEM_TYPE)); }
@@ -681,7 +683,14 @@ public class EntityGolemBase extends net.minecraft.entity.monster.EntityGolem im
     }
 
     // --- Markers ---
-    public void setMarkers(java.util.ArrayList<Marker> markers) { this.markers = markers; }
+    public void setMarkers(java.util.ArrayList<Marker> markers) {
+        this.markers = new java.util.ArrayList<>();
+        if (markers == null) return;
+        for (Marker marker : markers) {
+            Marker canonical = Marker.canonical(marker);
+            if (canonical != null) this.markers.add(canonical);
+        }
+    }
     public java.util.ArrayList<Marker> getMarkers() { this.validateMarkers(); return this.markers; }
     protected void validateMarkers() {
         java.util.ArrayList<Marker> newMarkers = new java.util.ArrayList<>();
