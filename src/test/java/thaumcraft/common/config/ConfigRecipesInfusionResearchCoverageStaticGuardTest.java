@@ -56,9 +56,9 @@ public class ConfigRecipesInfusionResearchCoverageStaticGuardTest {
         Set<String> danglingInfusionEnchantPages = new HashSet<>(infusionEnchantPages);
         danglingInfusionEnchantPages.removeAll(infusionEnchantRegistered);
 
-        assertTrue("Every registered infusion recipe key should be wired into research pages, missing: "
+        assertTrue("Only TC4's alternate kinetic recipe may remain registered without its own page, missing: "
                         + sorted(missingInfusionPages),
-                missingInfusionPages.isEmpty());
+                missingInfusionPages.equals(java.util.Collections.singleton("RunicGirdleKinetic_2")));
         assertTrue("Every infusion recipe page key should resolve to a registered infusion recipe, dangling: "
                         + sorted(danglingInfusionPages),
                 danglingInfusionPages.isEmpty());

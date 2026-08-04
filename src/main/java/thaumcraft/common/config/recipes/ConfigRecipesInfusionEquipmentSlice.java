@@ -1,9 +1,12 @@
 package thaumcraft.common.config.recipes;
 
 import net.minecraft.init.Items;
+import net.minecraft.init.PotionTypes;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagByte;
 import net.minecraft.nbt.NBTTagInt;
+import net.minecraft.potion.PotionType;
+import net.minecraft.potion.PotionUtils;
 import net.minecraftforge.oredict.OreDictionary;
 import thaumcraft.api.aspects.Aspect;
 import thaumcraft.api.aspects.AspectList;
@@ -40,7 +43,7 @@ class ConfigRecipesInfusionEquipmentSlice {
         ConfigRecipesInfusionSlice.registerInfusionRecipe("RunicAmuletEmergency", "RUNICEMERGENCY", new ItemStack(ConfigItems.itemAmuletRunic, 1, 1), 7,
                 new AspectList().add(Aspect.ARMOR, 20).add(Aspect.MAGIC, 35).add(Aspect.EARTH, 32).add(Aspect.VOID, 32),
                 new ItemStack(ConfigItems.itemAmuletRunic, 1, 0), new ItemStack(ConfigItems.itemShard, 1, 6), new ItemStack(ConfigItems.itemShard, 1, 3),
-                new ItemStack(ConfigItems.itemShard, 1, 3), new ItemStack(Items.POTIONITEM, 1, 8233), new ItemStack(ConfigItems.itemShard, 1, 3),
+                new ItemStack(ConfigItems.itemShard, 1, 3), drinkablePotion(PotionTypes.STRONG_STRENGTH), new ItemStack(ConfigItems.itemShard, 1, 3),
                 new ItemStack(ConfigItems.itemShard, 1, 3));
 
         ConfigRecipesInfusionSlice.registerInfusionRecipe("RunicRing", "RUNICARMOR", new ItemStack(ConfigItems.itemRingRunic, 1, 1), 3,
@@ -51,13 +54,13 @@ class ConfigRecipesInfusionEquipmentSlice {
         ConfigRecipesInfusionSlice.registerInfusionRecipe("RunicRingCharged", "RUNICCHARGED", new ItemStack(ConfigItems.itemRingRunic, 1, 2), 6,
                 new AspectList().add(Aspect.ARMOR, 16).add(Aspect.MAGIC, 16).add(Aspect.ENERGY, 64),
                 new ItemStack(ConfigItems.itemRingRunic, 1, 1), new ItemStack(ConfigItems.itemShard, 1, 6), new ItemStack(ConfigItems.itemShard, 1, 1),
-                new ItemStack(ConfigItems.itemShard, 1, 1), new ItemStack(Items.POTIONITEM, 1, 8226), new ItemStack(ConfigItems.itemShard, 1, 1),
+                new ItemStack(ConfigItems.itemShard, 1, 1), drinkablePotion(PotionTypes.STRONG_SWIFTNESS), new ItemStack(ConfigItems.itemShard, 1, 1),
                 new ItemStack(ConfigItems.itemShard, 1, 1));
 
         ConfigRecipesInfusionSlice.registerInfusionRecipe("RunicRingHealing", "RUNICHEALING", new ItemStack(ConfigItems.itemRingRunic, 1, 3), 6,
                 new AspectList().add(Aspect.ARMOR, 16).add(Aspect.MAGIC, 16).add(Aspect.WATER, 32).add(Aspect.HEAL, 32),
                 new ItemStack(ConfigItems.itemRingRunic, 1, 1), new ItemStack(ConfigItems.itemShard, 1, 6), new ItemStack(ConfigItems.itemShard, 1, 2),
-                new ItemStack(ConfigItems.itemShard, 1, 2), new ItemStack(Items.POTIONITEM, 1, 8257), new ItemStack(ConfigItems.itemShard, 1, 2),
+                new ItemStack(ConfigItems.itemShard, 1, 2), drinkablePotion(PotionTypes.LONG_REGENERATION), new ItemStack(ConfigItems.itemShard, 1, 2),
                 new ItemStack(ConfigItems.itemShard, 1, 2));
 
         ConfigRecipesInfusionSlice.registerInfusionRecipe("RunicGirdle", "RUNICARMOR", new ItemStack(ConfigItems.itemGirdleRunic, 1, 0), 4,
@@ -69,13 +72,13 @@ class ConfigRecipesInfusionEquipmentSlice {
         ConfigRecipesInfusionSlice.registerInfusionRecipe("RunicGirdleKinetic", "RUNICKINETIC", new ItemStack(ConfigItems.itemGirdleRunic, 1, 1), 7,
                 new AspectList().add(Aspect.ARMOR, 33).add(Aspect.MAGIC, 55).add(Aspect.AIR, 64),
                 new ItemStack(ConfigItems.itemGirdleRunic, 1, 0), new ItemStack(ConfigItems.itemShard, 1, 6), new ItemStack(ConfigItems.itemShard, 1, 0),
-                new ItemStack(ConfigItems.itemShard, 1, 0), new ItemStack(Items.POTIONITEM, 1, 16428), new ItemStack(ConfigItems.itemShard, 1, 0),
+                new ItemStack(ConfigItems.itemShard, 1, 0), splashPotion(PotionTypes.STRONG_HARMING), new ItemStack(ConfigItems.itemShard, 1, 0),
                 new ItemStack(ConfigItems.itemShard, 1, 0));
 
         ConfigRecipesInfusionSlice.registerInfusionRecipe("RunicGirdleKinetic_2", "RUNICKINETIC", new ItemStack(ConfigItems.itemGirdleRunic, 1, 1), 7,
                 new AspectList().add(Aspect.ARMOR, 33).add(Aspect.MAGIC, 55).add(Aspect.AIR, 64),
                 new ItemStack(ConfigItems.itemGirdleRunic, 1, 0), new ItemStack(ConfigItems.itemShard, 1, 6), new ItemStack(ConfigItems.itemShard, 1, 0),
-                new ItemStack(ConfigItems.itemShard, 1, 0), new ItemStack(Items.POTIONITEM, 1, 24620), new ItemStack(ConfigItems.itemShard, 1, 0),
+                new ItemStack(ConfigItems.itemShard, 1, 0), splashPotion(PotionTypes.STRONG_HARMING), new ItemStack(ConfigItems.itemShard, 1, 0),
                 new ItemStack(ConfigItems.itemShard, 1, 0));
 
         ConfigRecipesInfusionSlice.registerInfusionRecipe("ElementalAxe", "ELEMENTALAXE", new ItemStack(ConfigItems.itemAxeElemental), 1,
@@ -188,5 +191,13 @@ class ConfigRecipesInfusionEquipmentSlice {
         ConfigRecipesInfusionSlice.registerInfusionRecipe("EldritchEye", "OCULUS", new ItemStack(ConfigItems.itemEldritchObject), 5,
                 new AspectList().add(Aspect.ELDRITCH, 64).add(Aspect.VOID, 16).add(Aspect.DARKNESS, 16).add(Aspect.TRAVEL, 16),
                 new ItemStack(Items.ENDER_EYE), new ItemStack(ConfigItems.itemResource, 1, 17), new ItemStack(Items.GOLD_INGOT));
+    }
+
+    static ItemStack drinkablePotion(PotionType type) {
+        return PotionUtils.addPotionToItemStack(new ItemStack(Items.POTIONITEM), type);
+    }
+
+    static ItemStack splashPotion(PotionType type) {
+        return PotionUtils.addPotionToItemStack(new ItemStack(Items.SPLASH_POTION), type);
     }
 }
