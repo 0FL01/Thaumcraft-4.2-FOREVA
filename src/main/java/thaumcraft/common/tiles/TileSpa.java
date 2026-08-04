@@ -1,17 +1,25 @@
 package thaumcraft.common.tiles;
 
+import net.minecraft.block.Block;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Blocks;
 import net.minecraft.inventory.ISidedInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ITickable;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.fluids.Fluid;
+import net.minecraftforge.fluids.FluidRegistry;
+import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.FluidTank;
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import thaumcraft.api.TileThaumcraft;
+import thaumcraft.common.config.ConfigBlocks;
 import thaumcraft.common.items.ItemBathSalts;
 
 public class TileSpa extends TileThaumcraft implements ISidedInventory, ITickable {
@@ -21,6 +29,7 @@ public class TileSpa extends TileThaumcraft implements ISidedInventory, ITickabl
     public final FluidTank tank;
     private final ItemStack[] itemStacks = new ItemStack[]{ItemStack.EMPTY};
     private boolean mix = true;
+    private int counter;
 
     public TileSpa() {
         this.tank = new FluidTank(5000) {
@@ -200,6 +209,69 @@ public class TileSpa extends TileThaumcraft implements ISidedInventory, ITickabl
 
     @Override
     public void update() {
+        if (this.world == null || this.world.isRemote || this.counter++ % 40 != 0
+                || this.world.isBlockPowered(this.pos) || !this.hasIngredients()) {
+            return;
+        }
+
+        Block target = this.mix ? ConfigBlocks.blockFluidPure : this.tank.getFluid().getFluid().getBlock();
+        if (target == null) return;
+        BlockPos above = this.pos.up();
+        IBlockState aboveState = this.world.getBlockState(above);
+        if (aboveState.getBlock() == target && target.getMetaFromState(aboveState) == 0) {
+            for (int xx = -2; xx <= 2; ++xx) {
+                for (int zz = -2; zz <= 2; ++zz) {
+                    BlockPos candidate = above.add(xx, 0, zz);
+                    if (this.isValidLocation(candidate, true, target)) {
+                        this.placeFluid(candidate, target);
+                        return;
+                    }
+                }
+            }
+        } else if (this.isValidLocation(above, false, target)) {
+            this.placeFluid(above, target);
+        }
+    }
+
+    private boolean hasIngredients() {
+        FluidStack fluid = this.tank.getFluid();
+        if (this.mix) {
+            return fluid != null && fluid.containsFluid(new FluidStack(FluidRegistry.WATER, 1000))
+                    && !this.itemStacks[0].isEmpty()
+                    && this.itemStacks[0].getItem() instanceof ItemBathSalts;
+        }
+        return fluid != null && fluid.amount >= 1000 && fluid.getFluid().canBePlacedInWorld();
+    }
+
+    private void placeFluid(BlockPos targetPos, Block target) {
+        if (this.mix) {
+            this.decrStackSize(0, 1);
+        }
+        this.tank.drain(1000, true);
+        this.world.setBlockState(targetPos, target.getDefaultState(), 3);
+    }
+
+    private boolean isValidLocation(BlockPos targetPos, boolean mustBeAdjacent, Block target) {
+        Fluid fluid = this.mix ? ConfigBlocks.FLUIDPURE : this.tank.getFluid().getFluid();
+        if ((fluid == FluidRegistry.WATER || fluid == FluidRegistry.LAVA)
+                && this.world.provider.doesWaterVaporize()) {
+            return false;
+        }
+        IBlockState state = this.world.getBlockState(targetPos);
+        IBlockState support = this.world.getBlockState(targetPos.down());
+        if (!support.isSideSolid(this.world, targetPos.down(), EnumFacing.UP)
+                || !state.getBlock().isReplaceable(this.world, targetPos)
+                || state.getBlock() == target && target.getMetaFromState(state) == 0) {
+            return false;
+        }
+        if (!mustBeAdjacent) return true;
+        for (EnumFacing facing : EnumFacing.VALUES) {
+            IBlockState adjacent = this.world.getBlockState(targetPos.offset(facing));
+            if (adjacent.getBlock() == target && target.getMetaFromState(adjacent) == 0) {
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override

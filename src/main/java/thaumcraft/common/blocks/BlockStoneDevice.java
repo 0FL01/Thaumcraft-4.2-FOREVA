@@ -32,6 +32,9 @@ import net.minecraft.world.World;
 import net.minecraftforge.common.property.ExtendedBlockState;
 import net.minecraftforge.common.property.IExtendedBlockState;
 import net.minecraftforge.common.property.IUnlistedProperty;
+import net.minecraftforge.fluids.FluidStack;
+import net.minecraftforge.fluids.FluidUtil;
+import net.minecraftforge.fluids.capability.IFluidHandlerItem;
 import thaumcraft.common.Thaumcraft;
 import thaumcraft.common.CommonProxy;
 import thaumcraft.common.items.baubles.ItemAmuletVis;
@@ -75,6 +78,11 @@ extends BlockContainer {
     @Override
     public boolean isFullCube(IBlockState state) {
         return false;
+    }
+
+    @Override
+    public boolean isSideSolid(IBlockState state, IBlockAccess world, BlockPos pos, EnumFacing side) {
+        return state.getValue(TYPE) == 12 || super.isSideSolid(state, world, pos, side);
     }
 
     @Override
@@ -221,12 +229,43 @@ extends BlockContainer {
             return true;
         }
         if (te instanceof TileSpa) {
-            if (!worldIn.isRemote) {
+            if (playerIn.isSneaking()) return false;
+            if (worldIn.isRemote) return true;
+            ItemStack held = playerIn.getHeldItem(hand);
+            FluidStack fluid = FluidUtil.getFluidContained(held);
+            if (fluid == null) {
                 playerIn.openGui(Thaumcraft.instance, CommonProxy.GUI_SPA, worldIn, pos.getX(), pos.getY(), pos.getZ());
+            } else {
+                this.fillSpaFromContainer(worldIn, pos, playerIn, held, (TileSpa) te, fluid);
             }
             return true;
         }
         return false;
+    }
+
+    private void fillSpaFromContainer(World world, BlockPos pos, EntityPlayer player, ItemStack held,
+                                      TileSpa spa, FluidStack fluid) {
+        FluidStack stored = spa.tank.getFluid();
+        if (spa.tank.getFluidAmount() >= spa.tank.getCapacity()
+                || stored != null && !stored.isFluidEqual(fluid)) {
+            return;
+        }
+        ItemStack single = held.copy();
+        single.setCount(1);
+        IFluidHandlerItem handler = FluidUtil.getFluidHandler(single);
+        if (handler == null || spa.tank.fill(fluid, true) <= 0) return;
+
+        handler.drain(Integer.MAX_VALUE, true);
+        ItemStack empty = handler.getContainer();
+        held.shrink(1);
+        if (!empty.isEmpty() && !player.inventory.addItemStackToInventory(empty)) {
+            player.dropItem(empty, false);
+        }
+        player.inventoryContainer.detectAndSendChanges();
+        spa.markDirty();
+        world.notifyBlockUpdate(pos, world.getBlockState(pos), world.getBlockState(pos), 3);
+        world.playSound(null, pos, SoundEvents.ENTITY_PLAYER_SWIM, SoundCategory.BLOCKS,
+                0.33F, 1.0F + (world.rand.nextFloat() - world.rand.nextFloat()) * 0.3F);
     }
 
     private boolean handleWandPedestalActivation(World world, BlockPos pos, EntityPlayer player, EnumHand hand,
