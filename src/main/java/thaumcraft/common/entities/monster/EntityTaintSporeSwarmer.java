@@ -112,7 +112,7 @@ public class EntityTaintSporeSwarmer extends EntityTaintSpore {
     }
 
     @Override
-    public int getExperiencePoints(EntityPlayer player) {
+    public int getTalkInterval() {
         return 200;
     }
 

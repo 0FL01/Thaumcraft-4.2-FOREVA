@@ -34,6 +34,7 @@ public class EntityCultistPortal extends EntityThaumcraftBoss {
 
     public EntityCultistPortal(World world) {
         super(world);
+        this.experienceValue = 30;
         this.noClip = true;
         this.enablePersistence();
         this.setSize(1.5f, 3.0f);
@@ -279,7 +280,7 @@ public class EntityCultistPortal extends EntityThaumcraftBoss {
     }
 
     @Override
-    protected int getExperiencePoints(EntityPlayer player) {
+    public int getTalkInterval() {
         return 540;
     }
 

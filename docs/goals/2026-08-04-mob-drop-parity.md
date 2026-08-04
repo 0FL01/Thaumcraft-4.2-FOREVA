@@ -27,8 +27,8 @@ Complete the frozen Required Outcomes using the listed Change Envelope and Prima
   - Source: Approved mapping audit for Cultist Portal, Taint Spore, and Taint Spore Swarmer.
   - Acceptance: Portal XP is 30 and talk interval 540; Spore and Swarmer XP remains size-based and their talk interval is 200, including construction and NBT size restoration.
   - Primary evidence: Focused runtime tests read effective XP and talk intervals for default, resized, and NBT-loaded entities.
-  - Status: pending
-  - Evidence:
+  - Status: verified
+  - Evidence: Cultist Portal now sets XP 30 and exposes talk interval 540. Taint Spore and Swarmer retain size-driven XP through construction, resizing, and NBT load while exposing talk interval 200. Focused runtime/static tests and `./scripts/dev.sh validate --smoke` passed on 2026-08-04.
 
 - R3: Restore audited global death rewards.
   - Source: Approved RECON findings for aspect-orb eligibility and champion whitelist inheritance.
@@ -82,17 +82,17 @@ Complete the frozen Required Outcomes using the listed Change Envelope and Prima
 
 ## Current Checkpoint
 
-- Closes: R2.
-- Smallest next action: Correct Portal/Spore/Swarmer XP and talk mappings with focused construction/resize/NBT coverage.
-- Expected evidence: Focused XP/talk runtime tests and `./scripts/dev.sh validate --smoke` pass before the R2 commit.
-- Stop or replan if: Correct mapping requires changing the existing size-to-XP lifecycle rather than preserving it.
+- Closes: R3.
+- Smallest next action: Restore recently-hit aspect-orb eligibility and inheritance-aware champion whitelist matching without changing public string/IMC contracts.
+- Expected evidence: Focused global reward helper/runtime tests and `./scripts/dev.sh validate --smoke` pass before the R3 commit.
+- Stop or replan if: Correct inherited matching requires replacing the existing whitelist map or adding registry caches/lifecycle machinery.
 
 ## Current State
 
-- Resolved: R1 class-local drops are verified.
-- Last relevant evidence: Focused `EntityDropParityRuntimeTest`, affected static guard, full validation, and dedicated-server smoke passed on 2026-08-04.
+- Resolved: R1 class-local drops and R2 XP/talk mappings are verified.
+- Last relevant evidence: Focused `EntityExperienceParityRuntimeTest`, affected static guards, full validation, and dedicated-server smoke passed on 2026-08-04.
 - Blocker: None.
-- Next: R2 XP/talk mapping implementation.
+- Next: R3 global death reward implementation.
 
 ## Material Decisions
 
@@ -106,6 +106,7 @@ Complete the frozen Required Outcomes using the listed Change Envelope and Prima
 
 - 2026-08-04: SEARCH PROBE, canonical mob inventory, parallel family audits, direct mapping reconciliation, and independent plan review completed without source edits. R1-R5 frozen from the user-approved minimal plan.
 - 2026-08-04: R1 verified. Effective Forge drop routing and the audited Brainy/Giant, Taint Spider, Fire Bat, and Taint Pig item distributions were restored; focused tests and `./scripts/dev.sh validate --smoke` passed.
+- 2026-08-04: R2 verified. Portal XP/talk mapping and Spore/Swarmer size-XP plus talk intervals were restored; focused tests and `./scripts/dev.sh validate --smoke` passed.
 
 ## Completion
 
