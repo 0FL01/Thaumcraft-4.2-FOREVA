@@ -64,30 +64,88 @@ public class EntityTravelingTrunk extends net.minecraft.entity.EntityLiving impl
                 && (this.getUpgrade() == 3 || this.ticksExisted % 50 == 0)) {
             this.heal(1.0F);
         }
+        if (!this.world.isRemote && this.isInWater()) {
+            this.setAir(300);
+        }
+    }
+
+    @Override
+    protected void updateAITasks() {
+        if (this.world.isRemote) {
+            return;
+        }
         if (this.getAnger() > 0) {
             this.setAnger(this.getAnger() - 1);
         }
         if (this.attackCooldown > 0) {
-            this.attackCooldown--;
+            --this.attackCooldown;
         }
+
         net.minecraft.entity.Entity ownerEntity = this.getOwner();
-        net.minecraft.entity.EntityLivingBase owner = (ownerEntity instanceof net.minecraft.entity.EntityLivingBase) ? (net.minecraft.entity.EntityLivingBase)ownerEntity : null;
-        if (!this.world.isRemote && owner != null) {
-            thaumcraft.common.lib.events.EventHandlerEntity.linkTravelingTrunk(this, owner.getUniqueID());
+        net.minecraft.entity.EntityLivingBase owner = ownerEntity instanceof net.minecraft.entity.EntityLivingBase
+                ? (net.minecraft.entity.EntityLivingBase) ownerEntity : null;
+        if (owner == null) {
+            return;
         }
-        if (!this.world.isRemote) {
-            this.updateDefensiveTarget(owner);
-            if (this.isInWater()) {
-                this.setAir(300);
+        thaumcraft.common.lib.events.EventHandlerEntity.linkTravelingTrunk(this, owner.getUniqueID());
+
+        if (!this.getStay() && this.getDistance(owner) > 20.0F && this.tryTeleportToOwner(owner)) {
+            return;
+        }
+
+        net.minecraft.entity.EntityLivingBase target = this.getAttackTarget();
+        if (target != null && target.isDead) {
+            this.setAttackTarget(null);
+            this.setAnger(5);
+            target = null;
+        }
+        if (!this.getStay() && this.getUpgrade() == 2 && this.getAnger() == 0 && target == null) {
+            net.minecraft.entity.EntityLivingBase ownerTarget = owner.getRevengeTarget();
+            if (this.isValidDefensiveTarget(owner, ownerTarget)) {
+                this.setAnger(600);
+                this.setAttackTarget(ownerTarget);
+                target = ownerTarget;
             }
         }
-        boolean teleported = !this.world.isRemote
-                && !this.getStay()
-                && owner != null
-                && this.getDistance(owner) > 20.0F
-                && this.tryTeleportToOwner(owner);
-        if (!teleported && !this.getStay() && owner != null && this.getAttackTarget() == null && this.getDistance(owner) > 4.0f) {
-            this.getNavigator().tryMoveToEntityLiving(owner, this.getUpgrade() == 0 ? 0.65 : 0.5);
+
+        boolean move = false;
+        if (this.getAnger() > 0 && target != null && !target.isDead && target != owner) {
+            this.faceEntity(target, 10.0F, 20.0F);
+            move = true;
+            if (this.attackCooldown <= 0 && this.getDistance(target) < 1.5F
+                    && target.getEntityBoundingBox().maxY > this.getEntityBoundingBox().minY
+                    && target.getEntityBoundingBox().minY < this.getEntityBoundingBox().maxY) {
+                this.attackCooldown = 10 + this.rand.nextInt(5);
+                target.attackEntityFrom(net.minecraft.util.DamageSource.causeMobDamage(this), 4.0F);
+                this.world.setEntityState(this, (byte) 17);
+                this.playSound(net.minecraft.init.SoundEvents.ENTITY_BLAZE_HURT, 0.5F,
+                        this.rand.nextFloat() * 0.1F + 0.9F);
+            }
+        }
+        if (this.getAnger() == 0 && !this.getStay() && this.getDistance(owner) > 5.0F) {
+            this.faceEntity(owner, 10.0F, 20.0F);
+            move = true;
+        }
+
+        if ((this.onGround || this.isInWater()) && this.jumpDelay-- <= 0 && move) {
+            boolean fast = this.getUpgrade() == 0;
+            this.jumpDelay = (this.rand.nextInt(10) + 5) / 3;
+            this.getJumpHelper().setJumping();
+            this.field_768_a = 1.0F;
+            this.setAIMoveSpeed(fast ? 0.04F : 0.03F);
+            this.moveStrafing = 1.0F - this.rand.nextFloat() * 2.0F;
+            this.moveForward = fast ? 8.0F : 6.0F;
+            if (this.isInWater()) {
+                this.moveForward *= 0.75F;
+            }
+            this.playSound(net.minecraft.init.SoundEvents.BLOCK_CHEST_CLOSE, 0.1F,
+                    this.rand.nextFloat() * 0.1F + 0.9F);
+        } else {
+            this.isJumping = false;
+            if (this.onGround) {
+                this.moveForward = 0.0F;
+                this.moveStrafing = 0.0F;
+            }
         }
     }
 
@@ -121,48 +179,8 @@ public class EntityTravelingTrunk extends net.minecraft.entity.EntityLiving impl
             this.field_768_a = -0.5F;
         } else if (!this.onGround && wasOnGround) {
             this.field_768_a = 1.0F;
-        } else if (this.onGround && (this.motionX * this.motionX + this.motionZ * this.motionZ) > 0.0025D && this.jumpDelay-- <= 0) {
-            this.field_768_a = 0.35F;
-            this.jumpDelay = this.rand.nextInt(10) + 5;
         }
         this.field_768_a *= 0.6F;
-    }
-
-    private void updateDefensiveTarget(net.minecraft.entity.EntityLivingBase owner) {
-        net.minecraft.entity.EntityLivingBase target = this.getAttackTarget();
-        if (target != null && (!target.isEntityAlive() || target == owner)) {
-            this.setAttackTarget(null);
-            this.setAnger(5);
-            target = null;
-        }
-        if (target != null && this.getAnger() <= 0) {
-            this.setAttackTarget(null);
-            target = null;
-        }
-        if (!this.getStay() && this.getUpgrade() == 2 && this.getAnger() == 0 && target == null && owner != null) {
-            net.minecraft.entity.EntityLivingBase ownerTarget = owner.getRevengeTarget();
-            if (ownerTarget == null && owner instanceof net.minecraft.entity.EntityLiving) {
-                ownerTarget = ((net.minecraft.entity.EntityLiving) owner).getAttackTarget();
-            }
-            if (this.isValidDefensiveTarget(owner, ownerTarget)) {
-                this.setAnger(600);
-                this.setAttackTarget(ownerTarget);
-                target = ownerTarget;
-            }
-        }
-        if (this.getAnger() > 0 && target != null && target.isEntityAlive() && target != owner) {
-            this.faceEntity(target, 10.0F, 20.0F);
-            this.getNavigator().tryMoveToEntityLiving(target, 0.6D);
-            if (this.attackCooldown <= 0 && this.getDistance(target) < 1.5F
-                    && target.getEntityBoundingBox().maxY > this.getEntityBoundingBox().minY
-                    && target.getEntityBoundingBox().minY < this.getEntityBoundingBox().maxY) {
-                this.attackCooldown = 10 + this.rand.nextInt(5);
-                float damage = (float)this.getEntityAttribute(net.minecraft.entity.SharedMonsterAttributes.ATTACK_DAMAGE).getAttributeValue();
-                target.attackEntityFrom(net.minecraft.util.DamageSource.causeMobDamage(this), damage);
-                this.world.setEntityState(this, (byte) 17);
-                this.playSound(net.minecraft.init.SoundEvents.ENTITY_BLAZE_HURT, 0.5F, this.rand.nextFloat() * 0.1F + 0.9F);
-            }
-        }
     }
 
     private boolean isValidDefensiveTarget(net.minecraft.entity.EntityLivingBase owner, net.minecraft.entity.EntityLivingBase target) {

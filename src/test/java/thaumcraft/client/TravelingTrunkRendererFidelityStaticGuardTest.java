@@ -45,7 +45,8 @@ public class TravelingTrunkRendererFidelityStaticGuardTest {
                         && entity.contains("this.lidrot += 0.035F;")
                         && entity.contains("this.field_768_a = -0.5F;")
                         && entity.contains("this.field_768_a = 1.0F;")
-                        && entity.contains("this.field_768_a = 0.35F;")
+                        && entity.contains("this.getJumpHelper().setJumping();")
+                        && !entity.contains("this.field_768_a = 0.35F;")
                         && entity.contains("this.lidrot = 0.15F;"));
         assertTrue("RenderTravelingTrunk must keep dedicated trunk model and squish/lid transform path",
                 renderer.contains("new ModelTrunk()")
