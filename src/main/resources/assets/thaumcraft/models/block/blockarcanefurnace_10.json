@@ -1,64 +1,38 @@
 {
-  "comment": "Nozzle (type=10) — designed for south-facing. Overlays at z=12-15 inside block volume, 'south' faces visible from +z viewer. Blockstate y:180 for north-facing flips to z=1-4 with 'north' faces.",
+  "comment": "Meta 10 is the former iron-bars nozzle. FACING points toward the lava core, so this north-core base uses SOUTH faces toward the exterior. Keep the TC4 depth order grate (10/16), grin (0.8), then fire (0.9); reversing the faces makes all three sheets backface-culled in Forge 1.12.",
   "ambientocclusion": false,
   "textures": {
-    "particle": "thaumcraft:blocks/furnace10",
-    "side": "thaumcraft:blocks/furnace10",
-    "front": "thaumcraft:blocks/furnace13",
-    "trim": "thaumcraft:blocks/furnace15",
-    "inner": "thaumcraft:blocks/furnace9",
+    "particle": "thaumcraft:blocks/furnace13",
+    "grate": "thaumcraft:blocks/furnace13",
+    "grin": "thaumcraft:blocks/furnace15",
     "fire": "minecraft:blocks/fire_layer_0"
   },
   "elements": [
     {
-      "comment": "Nozzle body half-block — north half (back of nozzle)",
-      "from": [0, 0, 0],
-      "to": [16, 16, 8],
+      "comment": "Outermost grate at z=6/16 for a core to the north",
+      "from": [0, 0, 5],
+      "to": [16, 16, 6],
+      "shade": false,
       "faces": {
-        "down": { "texture": "#side" },
-        "up": { "texture": "#side" },
-        "north": { "texture": "#inner" },
-        "south": { "texture": "#inner" },
-        "west": { "texture": "#side" },
-        "east": { "texture": "#side" }
+        "south": { "texture": "#grate" }
       }
     },
     {
-      "comment": "Inner throat cavity — dark interior visible through opening",
-      "from": [4, 4, 8],
-      "to": [12, 12, 12],
+      "comment": "Grinning trim behind the grate at z=3.2/16",
+      "from": [0, 0, 2.2],
+      "to": [16, 16, 3.2],
+      "shade": false,
       "faces": {
-        "down": { "texture": "#inner" },
-        "up": { "texture": "#inner" },
-        "north": { "texture": "#inner" },
-        "south": { "texture": "#inner" },
-        "west": { "texture": "#inner" },
-        "east": { "texture": "#inner" }
+        "south": { "texture": "#grin" }
       }
     },
     {
-      "comment": "Opening face — furnace13 brick frame with transparent flame center",
-      "from": [0, 0, 12],
-      "to": [16, 16, 13],
-      "faces": {
-        "south": { "texture": "#front" }
-      }
-    },
-    {
-      "comment": "Fire face — behind decorative accents, shade=false",
-      "from": [0, 0, 13],
-      "to": [16, 16, 14],
+      "comment": "Animated fire deepest at z=1.6/16 and 1.5 blocks tall, as in TC4",
+      "from": [0, 0, 0.6],
+      "to": [16, 24, 1.6],
       "shade": false,
       "faces": {
         "south": { "texture": "#fire" }
-      }
-    },
-    {
-      "comment": "Trim face — furnace15 decorative accents above fire",
-      "from": [0, 0, 14],
-      "to": [16, 16, 15],
-      "faces": {
-        "south": { "texture": "#trim" }
       }
     }
   ]

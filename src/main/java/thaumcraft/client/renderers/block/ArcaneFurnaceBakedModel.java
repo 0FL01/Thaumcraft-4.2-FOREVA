@@ -28,6 +28,8 @@ import java.util.Map;
 public final class ArcaneFurnaceBakedModel implements IBakedModel {
     private static final FaceBakery FACE_BAKERY = new FaceBakery();
     private static final BlockFaceUV FULL_UV = new BlockFaceUV(new float[]{0.0F, 0.0F, 16.0F, 16.0F}, 0);
+    static final int NOZZLE_FIRE_TEXTURE = -1;
+    private static final float NOZZLE_SHEET_THICKNESS = 1.0F;
     private final IBakedModel delegate;
     private final int fallbackType;
     private final Map<String, List<BakedQuad>> cache = new HashMap<>();
@@ -72,10 +74,85 @@ public final class ArcaneFurnaceBakedModel implements IBakedModel {
     }
 
     private void addNozzleQuads(List<BakedQuad> quads, EnumFacing facing) {
-        ModelRotation rotation = this.nozzleRotation(facing);
-        this.addFace(quads, 0, 0, 12, 16, 16, 13, EnumFacing.SOUTH, this.sprite(13), rotation, true);
-        this.addFace(quads, 0, 0, 13, 16, 16, 14, EnumFacing.SOUTH, this.sprite("minecraft:blocks/fire_layer_0"), rotation, false);
-        this.addFace(quads, 0, 0, 14, 16, 16, 15, EnumFacing.SOUTH, this.sprite(15), rotation, true);
+        for (NozzlePlane plane : nozzleGeometry(facing)) {
+            TextureAtlasSprite texture = plane.textureIndex == NOZZLE_FIRE_TEXTURE
+                    ? this.sprite("minecraft:blocks/fire_layer_0")
+                    : this.sprite(plane.textureIndex);
+            this.addFace(quads,
+                    plane.minX, 0.0F, plane.minZ,
+                    plane.maxX, plane.maxY, plane.maxZ,
+                    plane.outwardFace, texture, ModelRotation.X0_Y0, false);
+        }
+    }
+
+    /**
+     * TC4's FACING equivalent points from the replaced iron-bars nozzle toward the lava core,
+     * while the three visible sheets face away from that core. Do not rotate a face toward
+     * {@code coreFacing}: Forge 1.12 terrain rendering culls the resulting backfaces and the
+     * grate, grin, and flame all disappear. The depths below preserve the original RenderBlocks
+     * calls (10/16, 0.8, and 0.9) and their grate -> grin -> fire order.
+     */
+    static List<NozzlePlane> nozzleGeometry(EnumFacing coreFacing) {
+        if (coreFacing == null || coreFacing.getAxis().isVertical()) {
+            coreFacing = EnumFacing.SOUTH;
+        }
+        return ImmutableList.of(
+                createNozzlePlane(coreFacing, 13, 10.0F, 16.0F),
+                createNozzlePlane(coreFacing, 15, 12.8F, 16.0F),
+                createNozzlePlane(coreFacing, NOZZLE_FIRE_TEXTURE, 14.4F, 24.0F));
+    }
+
+    private static NozzlePlane createNozzlePlane(EnumFacing coreFacing, int textureIndex,
+                                                  float sourceDepth, float maxY) {
+        float coordinate = coreFacing.getAxisDirection() == EnumFacing.AxisDirection.POSITIVE
+                ? sourceDepth
+                : 16.0F - sourceDepth;
+        EnumFacing outwardFace = coreFacing.getOpposite();
+        float minX = 0.0F;
+        float maxX = 16.0F;
+        float minZ = 0.0F;
+        float maxZ = 16.0F;
+        switch (outwardFace) {
+            case EAST:
+                minX = coordinate - NOZZLE_SHEET_THICKNESS;
+                maxX = coordinate;
+                break;
+            case WEST:
+                minX = coordinate;
+                maxX = coordinate + NOZZLE_SHEET_THICKNESS;
+                break;
+            case SOUTH:
+                minZ = coordinate - NOZZLE_SHEET_THICKNESS;
+                maxZ = coordinate;
+                break;
+            case NORTH:
+            default:
+                minZ = coordinate;
+                maxZ = coordinate + NOZZLE_SHEET_THICKNESS;
+                break;
+        }
+        return new NozzlePlane(textureIndex, outwardFace, minX, maxX, minZ, maxZ, maxY);
+    }
+
+    static final class NozzlePlane {
+        final int textureIndex;
+        final EnumFacing outwardFace;
+        final float minX;
+        final float maxX;
+        final float minZ;
+        final float maxZ;
+        final float maxY;
+
+        private NozzlePlane(int textureIndex, EnumFacing outwardFace,
+                            float minX, float maxX, float minZ, float maxZ, float maxY) {
+            this.textureIndex = textureIndex;
+            this.outwardFace = outwardFace;
+            this.minX = minX;
+            this.maxX = maxX;
+            this.minZ = minZ;
+            this.maxZ = maxZ;
+            this.maxY = maxY;
+        }
     }
 
     private int textureForSide(int meta, int level, int nozzleSide, EnumFacing face) {
@@ -180,20 +257,6 @@ public final class ArcaneFurnaceBakedModel implements IBakedModel {
                 null,
                 false,
                 shade));
-    }
-
-    private ModelRotation nozzleRotation(EnumFacing facing) {
-        switch (facing) {
-            case NORTH:
-                return ModelRotation.X0_Y180;
-            case EAST:
-                return ModelRotation.X0_Y90;
-            case WEST:
-                return ModelRotation.X0_Y270;
-            case SOUTH:
-            default:
-                return ModelRotation.X0_Y0;
-        }
     }
 
     private TextureAtlasSprite sprite(int index) {

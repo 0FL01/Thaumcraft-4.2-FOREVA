@@ -19,53 +19,38 @@ public class ArcaneFurnaceVisualShellContractTest {
         String blockstate = read("src/main/resources/assets/thaumcraft/blockstates/blockarcanefurnace.json");
         String nozzleModel = read("src/main/resources/assets/thaumcraft/models/block/blockarcanefurnace_10.json");
         String itemBlock = read("src/main/java/thaumcraft/common/blocks/ItemBlocks/BlockArcaneFurnaceItem.java");
-        int openingLayer = nozzleModel.indexOf("\"comment\": \"Opening face");
-        int fireLayer = nozzleModel.indexOf("\"comment\": \"Fire face");
-        int trimLayer = nozzleModel.indexOf("\"comment\": \"Trim face");
+        int grateLayer = nozzleModel.indexOf("\"comment\": \"Outermost grate");
+        int grinLayer = nozzleModel.indexOf("\"comment\": \"Grinning trim");
+        int fireLayer = nozzleModel.indexOf("\"comment\": \"Animated fire");
 
         assertTrue("Arcane Furnace item metadata should resolve through the new facing-aware blockstate variant keys",
                 clientProxy.contains("registerBlockItemModel(arcaneFurnaceItem, meta, \"type=\" + meta + \",facing=north\");"));
 
-        assertTrue("Arcane Furnace blockstate should provide every facing/type permutation with correct rotations: y:180 for north (flip south-designed model), no rotation for south, y:90 for east, y:270 for west",
+        assertTrue("Arcane Furnace blockstate should rotate the north-core fallback toward the core while its sheets face the exterior",
                 blockstate.contains("\"facing=north,type=0\"")
                         && blockstate.contains("\"facing=east,type=0\"")
                         && blockstate.contains("\"facing=west,type=8\": {\n      \"model\": \"thaumcraft:blockarcanefurnace_7\"")
-                        && blockstate.contains("\"facing=north,type=10\"")
+                        && blockstate.contains("\"facing=north,type=10\": {\n      \"model\": \"thaumcraft:blockarcanefurnace_10\"\n    }")
                         && blockstate.contains("\"facing=east,type=10\"")
-                        && blockstate.contains("\"facing=south,type=10\"")
+                        && blockstate.contains("\"facing=south,type=10\": {\n      \"model\": \"thaumcraft:blockarcanefurnace_10\",\n      \"y\": 180")
                         && blockstate.contains("\"facing=west,type=10\"")
                         && blockstate.contains("\"y\": 90")
                         && blockstate.contains("\"y\": 270"));
 
-        assertTrue("Arcane Furnace nozzle model should keep the decorative face in front of fire so its opaque pixels remain visible",
+        assertTrue("Arcane Furnace fallback should keep only TC4's exterior-facing grate, grin, and tall fire sheets",
                 nozzleModel.contains("\"ambientocclusion\": false")
-                        && nozzleModel.contains("\"front\": \"thaumcraft:blocks/furnace13\"")
-                        && nozzleModel.contains("\"trim\": \"thaumcraft:blocks/furnace15\"")
-                        && nozzleModel.contains("\"inner\": \"thaumcraft:blocks/furnace9\"")
+                        && nozzleModel.contains("\"grate\": \"thaumcraft:blocks/furnace13\"")
+                        && nozzleModel.contains("\"grin\": \"thaumcraft:blocks/furnace15\"")
                         && nozzleModel.contains("\"fire\": \"minecraft:blocks/fire_layer_0\"")
-                        // Body half-block in north half (z=0..8), south face = furnace9
-                        && nozzleModel.contains("\"from\": [0, 0, 0]")
-                        && nozzleModel.contains("\"to\": [16, 16, 8]")
-                        // Inner throat cavity (z=8..12)
-                        && nozzleModel.contains("\"from\": [4, 4, 8]")
-                        && nozzleModel.contains("\"to\": [12, 12, 12]")
-                        // Opening face (furnace13) at z=12-13
-                        && nozzleModel.contains("\"from\": [0, 0, 12]")
-                        && nozzleModel.contains("\"to\": [16, 16, 13]")
-                        // Fire is behind the decorative face at z=13-14.
-                        && openingLayer >= 0 && fireLayer > openingLayer && trimLayer > fireLayer
-                        && nozzleModel.substring(fireLayer, trimLayer).contains("\"from\": [0, 0, 13]")
-                        && nozzleModel.substring(fireLayer, trimLayer).contains("\"to\": [16, 16, 14]")
-                        && nozzleModel.contains("\"shade\": false")
-                        // furnace15 is outermost at z=14-15.
-                        && nozzleModel.substring(trimLayer).contains("\"from\": [0, 0, 14]")
-                        && nozzleModel.substring(trimLayer).contains("\"to\": [16, 16, 15]")
-                        // South faces on overlays (for south-facing viewer)
-                        && nozzleModel.contains("\"south\": { \"texture\": \"#front\" }")
-                        && nozzleModel.contains("\"south\": { \"texture\": \"#trim\" }")
+                        && grateLayer >= 0 && grinLayer > grateLayer && fireLayer > grinLayer
+                        && nozzleModel.substring(grateLayer, grinLayer).contains("\"to\": [16, 16, 6]")
+                        && nozzleModel.substring(grinLayer, fireLayer).contains("\"to\": [16, 16, 3.2]")
+                        && nozzleModel.substring(fireLayer).contains("\"to\": [16, 24, 1.6]")
+                        && nozzleModel.contains("FACING points toward the lava core")
+                        && nozzleModel.contains("\"south\": { \"texture\": \"#grate\" }")
+                        && nozzleModel.contains("\"south\": { \"texture\": \"#grin\" }")
                         && nozzleModel.contains("\"south\": { \"texture\": \"#fire\" }")
-                        && bakedModel.contains("this.addFace(quads, 0, 0, 13, 16, 16, 14, EnumFacing.SOUTH, this.sprite(\"minecraft:blocks/fire_layer_0\"), rotation, false);")
-                        && bakedModel.contains("this.addFace(quads, 0, 0, 14, 16, 16, 15, EnumFacing.SOUTH, this.sprite(15), rotation, true);")
+                        && !nozzleModel.contains("Inner throat cavity")
                         && !nozzleModel.contains("\"parent\": \"block/cube_all\""));
 
         assertTrue("Arcane Furnace world rendering should be replaced with a baked model that mirrors the 1.7.10 per-face texture resolver instead of cube_all-per-meta mosaics",
@@ -74,6 +59,12 @@ public class ArcaneFurnaceVisualShellContractTest {
                         && bakedModel.contains("textureForSide(int meta, int level, int nozzleSide, EnumFacing face)")
                         && bakedModel.contains("BlockArcaneFurnace.RENDER_LEVEL")
                         && bakedModel.contains("BlockArcaneFurnace.NOZZLE_SIDE")
+                        && bakedModel.contains("static List<NozzlePlane> nozzleGeometry(EnumFacing coreFacing)")
+                        && bakedModel.contains("coreFacing.getOpposite()")
+                        && bakedModel.contains("grate -> grin -> fire")
+                        && bakedModel.contains("createNozzlePlane(coreFacing, 13, 10.0F, 16.0F)")
+                        && bakedModel.contains("createNozzlePlane(coreFacing, 15, 12.8F, 16.0F)")
+                        && bakedModel.contains("createNozzlePlane(coreFacing, NOZZLE_FIRE_TEXTURE, 14.4F, 24.0F)")
                         && bakedModel.contains("minecraft:blocks/lava_still")
                         && bakedModel.contains("return 2 + level + nozzleOffset;")
                         && bakedModel.contains("return level != 9 ? 7 : 6;")
