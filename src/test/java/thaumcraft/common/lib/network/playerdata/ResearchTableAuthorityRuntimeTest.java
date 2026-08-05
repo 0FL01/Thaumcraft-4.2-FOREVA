@@ -177,19 +177,32 @@ public class ResearchTableAuthorityRuntimeTest {
         player.knowledge().addDiscoveredAspect(Aspect.ORDER.getTag());
         player.knowledge().setAspectPool(Aspect.AIR, 1);
         player.knowledge().setAspectPool(Aspect.ORDER, 1);
-
-        assertNull(PacketAspectCombinationToServer.consumeCombinationInputs(
-                player, table, player.knowledge(), Aspect.AIR, Aspect.ORDER, true, false));
-        assertEquals(1, player.knowledge().getAspectPoolFor(Aspect.AIR));
-        assertEquals(1, player.knowledge().getAspectPoolFor(Aspect.ORDER));
-
+        table.bonusAspects.add(Aspect.AIR, 1);
         table.bonusAspects.add(Aspect.ORDER, 1);
-        Aspect combo = PacketAspectCombinationToServer.consumeCombinationInputs(
-                player, table, player.knowledge(), Aspect.AIR, Aspect.ORDER, false, true);
-        assertSame(ResearchManager.getCombinationResult(Aspect.AIR, Aspect.ORDER), combo);
+
+        assertTrue(PacketAspectCombinationToServer.consumeCombinationInputs(
+                player, table, player.knowledge(), Aspect.AIR, Aspect.ORDER, true, true));
         assertEquals(0, player.knowledge().getAspectPoolFor(Aspect.AIR));
-        assertEquals(1, player.knowledge().getAspectPoolFor(Aspect.ORDER));
+        assertEquals(0, player.knowledge().getAspectPoolFor(Aspect.ORDER));
+        assertEquals("Personal pools must be consumed before table bonuses", 1,
+                table.bonusAspects.getAmount(Aspect.AIR));
+        assertEquals("Personal pools must be consumed before table bonuses", 1,
+                table.bonusAspects.getAmount(Aspect.ORDER));
+
+        player.knowledge().setAspectPool(Aspect.AIR, 1);
+        player.knowledge().setAspectPool(Aspect.ORDER, 0);
+        table.bonusAspects.remove(Aspect.AIR);
+        assertTrue(PacketAspectCombinationToServer.consumeCombinationInputs(
+                player, table, player.knowledge(), Aspect.AIR, Aspect.ORDER, false, true));
+        assertEquals(0, player.knowledge().getAspectPoolFor(Aspect.AIR));
+        assertEquals(0, player.knowledge().getAspectPoolFor(Aspect.ORDER));
         assertEquals(0, table.bonusAspects.getAmount(Aspect.ORDER));
+
+        player.knowledge().setAspectPool(Aspect.AIR, 2);
+        assertTrue(PacketAspectCombinationToServer.consumeCombinationInputs(
+                player, table, player.knowledge(), Aspect.AIR, Aspect.AIR, false, false));
+        assertEquals("Failed TC4 combinations still consume both submitted components",
+                0, player.knowledge().getAspectPoolFor(Aspect.AIR));
     }
 
     @Test

@@ -94,44 +94,43 @@ public class PacketAspectCombinationToServer extends PacketBase {
         if (researchTable == null) return false;
         IPlayerKnowledge knowledge = thaumcraft.common.CommonProxy.getPlayerKnowledge(player);
         if (knowledge == null) return false;
-        Aspect combo = consumeCombinationInputs(player, researchTable, knowledge, aspect1, aspect2, useBonus1, useBonus2);
-        if (combo == null) return false;
-        ScanManager.checkAndSyncAspectKnowledge(player, combo, 1);
+        if (!consumeCombinationInputs(player, researchTable, knowledge, aspect1, aspect2, useBonus1, useBonus2)) {
+            return false;
+        }
+        Aspect combo = ResearchManager.getCombinationResult(aspect1, aspect2);
+        if (combo != null) {
+            ScanManager.checkAndSyncAspectKnowledge(player, combo, 1);
+        }
         ResearchManager.updateCache(player.getName(), knowledge);
         return true;
     }
 
-    static Aspect consumeCombinationInputs(EntityPlayer player,
-                                           TileResearchTable researchTable,
-                                           IPlayerKnowledge knowledge,
-                                           Aspect aspect1,
-                                           Aspect aspect2,
-                                           boolean useBonus1,
-                                           boolean useBonus2) {
+    static boolean consumeCombinationInputs(EntityPlayer player,
+                                            TileResearchTable researchTable,
+                                            IPlayerKnowledge knowledge,
+                                            Aspect aspect1,
+                                            Aspect aspect2,
+                                            boolean useBonus1,
+                                            boolean useBonus2) {
         if (player == null || researchTable == null || knowledge == null || aspect1 == null || aspect2 == null) {
-            return null;
+            return false;
         }
         if (!knowledge.hasDiscoveredAspect(aspect1) || !knowledge.hasDiscoveredAspect(aspect2)) {
-            return null;
-        }
-        Aspect combo = ResearchManager.getCombinationResult(aspect1, aspect2);
-        if (combo == null) {
-            return null;
+            return false;
         }
 
         Map<Aspect, Integer> poolCosts = new HashMap<>();
         Map<Aspect, Integer> bonusCosts = new HashMap<>();
-        addCost(useBonus1 ? bonusCosts : poolCosts, aspect1);
-        addCost(useBonus2 ? bonusCosts : poolCosts, aspect2);
-        if (!hasAvailableCosts(knowledge, poolCosts, researchTable, bonusCosts)) {
-            return null;
+        if (!allocateCost(knowledge, researchTable, poolCosts, bonusCosts, aspect1, useBonus1)
+                || !allocateCost(knowledge, researchTable, poolCosts, bonusCosts, aspect2, useBonus2)) {
+            return false;
         }
 
         for (Map.Entry<Aspect, Integer> entry : poolCosts.entrySet()) {
             Aspect aspect = entry.getKey();
             int amount = entry.getValue();
             if (!knowledge.addAspectPool(aspect, -amount)) {
-                return null;
+                return false;
             }
             if (player instanceof EntityPlayerMP) {
                 PacketHandler.INSTANCE.sendTo(
@@ -153,27 +152,29 @@ public class PacketAspectCombinationToServer extends PacketBase {
                     3);
             researchTable.markDirty();
         }
-        return combo;
+        return true;
     }
 
     private static void addCost(Map<Aspect, Integer> costs, Aspect aspect) {
         costs.put(aspect, costs.getOrDefault(aspect, 0) + 1);
     }
 
-    private static boolean hasAvailableCosts(IPlayerKnowledge knowledge,
-                                             Map<Aspect, Integer> poolCosts,
-                                             TileResearchTable researchTable,
-                                             Map<Aspect, Integer> bonusCosts) {
-        for (Map.Entry<Aspect, Integer> entry : poolCosts.entrySet()) {
-            if (knowledge.getAspectPoolFor(entry.getKey()) < entry.getValue()) {
-                return false;
-            }
+    private static boolean allocateCost(IPlayerKnowledge knowledge,
+                                        TileResearchTable researchTable,
+                                        Map<Aspect, Integer> poolCosts,
+                                        Map<Aspect, Integer> bonusCosts,
+                                        Aspect aspect,
+                                        boolean allowBonus) {
+        int poolCost = poolCosts.getOrDefault(aspect, 0);
+        if (knowledge.getAspectPoolFor(aspect) > poolCost) {
+            addCost(poolCosts, aspect);
+            return true;
         }
-        for (Map.Entry<Aspect, Integer> entry : bonusCosts.entrySet()) {
-            if (researchTable.bonusAspects.getAmount(entry.getKey()) < entry.getValue()) {
-                return false;
-            }
+        int bonusCost = bonusCosts.getOrDefault(aspect, 0);
+        if (allowBonus && researchTable.bonusAspects.getAmount(aspect) > bonusCost) {
+            addCost(bonusCosts, aspect);
+            return true;
         }
-        return true;
+        return false;
     }
 }

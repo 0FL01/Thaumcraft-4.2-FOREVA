@@ -276,7 +276,6 @@ implements IInventory, ITickable {
         data.copies++;
         ResearchManager.updateData(notesStack, data);
         notesStack.grow(1);
-        setInventorySlotContents(1, notesStack);
 
         this.world.addBlockEvent(this.pos, ConfigBlocks.blockTable, 1, 1);
         markDirty();

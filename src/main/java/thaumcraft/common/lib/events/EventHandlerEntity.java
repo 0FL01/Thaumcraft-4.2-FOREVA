@@ -285,6 +285,7 @@ public class EventHandlerEntity {
         if (oldCap != null && newCap != null) {
             newCap.deserializeNBT(oldCap.serializeNBT());
             newCap.setPlayer(clone);
+            grantAutoUnlockResearch(clone);
             ResearchManager.updateCache(clone.getName(), newCap);
         }
 
@@ -746,9 +747,15 @@ public class EventHandlerEntity {
             return;
         }
 
-        // Grant all isAutoUnlock() research on every load.
-        // This matches original TC4 1.7.10 behavior: auto-unlock research is always
-        // re-granted on player load, never persisted in save files.
+        grantAutoUnlockResearch(player);
+    }
+
+    static void grantAutoUnlockResearch(EntityPlayer player) {
+        if (player == null || player.world == null || player.world.isRemote) {
+            return;
+        }
+        // Auto-unlock research is deliberately omitted from capability NBT, so it
+        // must be restored both after file loads and after Forge clones a player.
         for (ResearchCategoryList category : ResearchCategories.researchCategories.values()) {
             for (ResearchItem ri : category.research.values()) {
                 if (ri != null && ri.isAutoUnlock()) {

@@ -23,7 +23,13 @@ public class EventHandlerEntityCloneStaticGuardTest {
         assertTrue("Clone handler must preserve capability copy flow",
                 source.contains("newCap.deserializeNBT(oldCap.serializeNBT());")
                         && source.contains("newCap.setPlayer(clone);")
+                        && source.contains("grantAutoUnlockResearch(clone);")
                         && source.contains("ResearchManager.updateCache(clone.getName(), newCap);"));
+        assertTrue("Auto-unlock research omitted from NBT must be restored after both load and clone",
+                source.contains("grantAutoUnlockResearch(player);")
+                        && source.contains("static void grantAutoUnlockResearch(EntityPlayer player)")
+                        && source.contains("ri != null && ri.isAutoUnlock()")
+                        && source.contains("ResearchManager.addResearch(player, ri.key);"));
     }
 
     private static String readFile(String path) throws IOException {

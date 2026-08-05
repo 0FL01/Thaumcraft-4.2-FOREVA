@@ -47,7 +47,7 @@ public class TileResearchTableRuntimeContractTest {
         assertTrue(source.contains("data.copies++;"));
         assertTrue(source.contains("ResearchManager.updateData(notesStack, data);"));
         assertTrue(source.contains("notesStack.grow(1);"));
-        assertTrue(source.contains("setInventorySlotContents(1, notesStack);"));
+        assertFalse(source.contains("setInventorySlotContents(1, notesStack);"));
         assertFalse(source.contains("player.inventory.addItemStackToInventory(duplicate)"));
         assertFalse(source.contains("player.dropItem(duplicate, false)"));
     }
