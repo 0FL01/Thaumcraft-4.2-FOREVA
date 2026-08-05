@@ -124,6 +124,9 @@ public class AmbientBiomeVisualParityStaticGuardTest {
         assertTrue(airy.contains("0.3F - rand.nextFloat() * 0.1F, 0.0F"));
         assertTrue(airy.contains("0.5F + rand.nextFloat() * 0.2F, 1.0F"));
         assertTrue(airy.contains("Thaumcraft.proxy.spark("));
+        assertTrue(airy.contains("if (rand.nextInt(50) == 0)"));
+        assertTrue(airy.contains("TCSounds.JACOBS, SoundCategory.MASTER"));
+        assertTrue(airy.contains("0.5F, 1.0F + (rand.nextFloat() - rand.nextFloat()) * 0.2F, false"));
     }
 
     private static String read(String path) throws IOException {

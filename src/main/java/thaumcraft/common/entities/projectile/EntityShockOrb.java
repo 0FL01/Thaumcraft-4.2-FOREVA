@@ -12,17 +12,24 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.common.registry.IThrowableEntity;
+import thaumcraft.common.Thaumcraft;
 import thaumcraft.common.blocks.BlockAiry;
 import thaumcraft.common.config.ConfigBlocks;
 import thaumcraft.common.lib.TCSounds;
 
-public class EntityShockOrb extends EntityThrowable {
+public class EntityShockOrb extends EntityThrowable implements IThrowableEntity {
     public int area = 4;
     public int damage = 5;
 
     public EntityShockOrb(World world) { super(world); }
     public EntityShockOrb(World world, EntityLivingBase shooter) { super(world, shooter); }
     public EntityShockOrb(World world, double x, double y, double z) { super(world, x, y, z); }
+
+    @Override
+    public void setThrower(Entity entity) {
+        this.thrower = entity instanceof EntityLivingBase ? (EntityLivingBase) entity : null;
+    }
 
     @Override
     protected float getGravityVelocity() { return 0.05f; }
@@ -79,6 +86,7 @@ public class EntityShockOrb extends EntityThrowable {
                     .withProperty(BlockAiry.TYPE, 10), 3);
             }
         }
+        Thaumcraft.proxy.burst(this.world, this.posX, this.posY, this.posZ, 3.0F);
         this.playSound(TCSounds.SHOCK, 1.0F, 1.0F + (this.rand.nextFloat() - this.rand.nextFloat()) * 0.2F);
         this.setDead();
     }

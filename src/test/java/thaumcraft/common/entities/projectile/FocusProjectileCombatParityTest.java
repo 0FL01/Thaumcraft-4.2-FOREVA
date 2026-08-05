@@ -25,8 +25,12 @@ import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.IChunkProvider;
 import net.minecraft.world.storage.WorldInfo;
 import net.minecraftforge.fml.common.registry.IThrowableEntity;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import thaumcraft.common.CommonProxy;
+import thaumcraft.common.Thaumcraft;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -44,9 +48,24 @@ import static org.junit.Assert.assertTrue;
 
 public class FocusProjectileCombatParityTest {
 
+    private CommonProxy oldProxy;
+    private RecordingProxy proxy;
+
     @BeforeClass
     public static void bootstrapMinecraftStatics() {
         Bootstrap.register();
+    }
+
+    @Before
+    public void installRecordingProxy() {
+        this.oldProxy = Thaumcraft.proxy;
+        this.proxy = new RecordingProxy();
+        Thaumcraft.proxy = this.proxy;
+    }
+
+    @After
+    public void restoreProxy() {
+        Thaumcraft.proxy = this.oldProxy;
     }
 
     @Test
@@ -82,6 +101,32 @@ public class FocusProjectileCombatParityTest {
         assertNull(throwable.getThrower());
         throwable.setThrower(thrower);
         assertSame(thrower, throwable.getThrower());
+    }
+
+    @Test
+    public void shockOrbExposesThrowerToForgeSpawnProtocol() {
+        TestWorld world = new TestWorld();
+        RecordingPlayer thrower = new RecordingPlayer(world);
+        EntityShockOrb orb = new EntityShockOrb(world, thrower);
+
+        assertTrue(orb instanceof IThrowableEntity);
+        IThrowableEntity throwable = orb;
+        assertSame(thrower, throwable.getThrower());
+        throwable.setThrower(null);
+        assertNull(throwable.getThrower());
+        throwable.setThrower(thrower);
+        assertSame(thrower, throwable.getThrower());
+    }
+
+    @Test
+    public void earthShockImpactKeepsBurstBeforeSoundAndDeath() throws IOException {
+        String source = read("src/main/java/thaumcraft/common/entities/projectile/EntityShockOrb.java");
+        int placement = source.indexOf("this.world.setBlockState(above,");
+        int burst = source.indexOf("Thaumcraft.proxy.burst(this.world, this.posX, this.posY, this.posZ, 3.0F);");
+        int sound = source.indexOf("this.playSound(TCSounds.SHOCK", burst);
+        int death = source.indexOf("this.setDead();", sound);
+
+        assertTrue(placement >= 0 && burst > placement && sound > burst && death > sound);
     }
 
     @Test
@@ -152,6 +197,12 @@ public class FocusProjectileCombatParityTest {
         assertSame(orb, corner.source.getImmediateSource());
         assertSame(thrower, corner.source.getTrueSource());
         assertTrue(world.sawImpactToCornerRay);
+        assertEquals(1, this.proxy.bursts);
+        assertSame(world, this.proxy.world);
+        assertEquals(0.0D, this.proxy.x, 0.0D);
+        assertEquals(64.0D, this.proxy.y, 0.0D);
+        assertEquals(0.0D, this.proxy.z, 0.0D);
+        assertEquals(3.0F, this.proxy.scale, 0.0F);
     }
 
     private static void assertLaunchBeforeSpawn(String source, String construction) {
@@ -225,6 +276,25 @@ public class FocusProjectileCombatParityTest {
             this.source = source;
             this.damage = amount;
             return true;
+        }
+    }
+
+    private static final class RecordingProxy extends CommonProxy {
+        private int bursts;
+        private World world;
+        private double x;
+        private double y;
+        private double z;
+        private float scale;
+
+        @Override
+        public void burst(World world, double x, double y, double z, float scale) {
+            ++this.bursts;
+            this.world = world;
+            this.x = x;
+            this.y = y;
+            this.z = z;
+            this.scale = scale;
         }
     }
 

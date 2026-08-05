@@ -63,6 +63,7 @@ public class BlockAiry extends BlockContainer {
         this.setSoundType(SoundType.CLOTH);
         this.setCreativeTab(Thaumcraft.tabTC);
         this.setDefaultState(this.blockState.getBaseState().withProperty(TYPE, 0));
+        this.setTickRandomly(true);
     }
 
     @Override
@@ -258,6 +259,10 @@ public class BlockAiry extends BlockContainer {
         } else {
             Thaumcraft.proxy.spark(x, y, z, scale, 0.3F - rand.nextFloat() * 0.1F, 0.0F,
                     0.5F + rand.nextFloat() * 0.2F, 1.0F);
+        }
+        if (rand.nextInt(50) == 0) {
+            world.playSound(pos.getX(), pos.getY(), pos.getZ(), TCSounds.JACOBS, SoundCategory.MASTER,
+                    0.5F, 1.0F + (rand.nextFloat() - rand.nextFloat()) * 0.2F, false);
         }
     }
 
