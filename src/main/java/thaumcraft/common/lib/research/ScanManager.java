@@ -17,6 +17,7 @@ import net.minecraft.world.World;
 import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import thaumcraft.api.ThaumcraftApi;
+import thaumcraft.api.WorldCoordinates;
 import thaumcraft.api.aspects.Aspect;
 import thaumcraft.api.aspects.AspectList;
 import thaumcraft.api.nodes.INode;
@@ -25,6 +26,7 @@ import thaumcraft.api.research.IScanEventHandler;
 import thaumcraft.api.research.ScanResult;
 import thaumcraft.common.Thaumcraft;
 import thaumcraft.common.config.Config;
+import thaumcraft.common.tiles.TileNode;
 import thaumcraft.common.lib.capabilities.IPlayerKnowledge;
 import thaumcraft.common.lib.capabilities.PlayerKnowledgeProvider;
 import thaumcraft.common.lib.crafting.ThaumcraftCraftingManager;
@@ -345,32 +347,25 @@ public class ScanManager implements IScanEventHandler {
 
     private static AspectList generateNodeAspects(World world, String nodeKey) {
         if (world == null || nodeKey == null) return new AspectList();
-        String[] parts = nodeKey.startsWith(":") ? nodeKey.substring(1).split(":") : nodeKey.split(":");
-        if (parts.length < 4) return new AspectList();
-        try {
-            int dim = Integer.parseInt(parts[0]);
-            if (dim != world.provider.getDimension()) return new AspectList();
-            BlockPos pos = new BlockPos(Integer.parseInt(parts[1]), Integer.parseInt(parts[2]), Integer.parseInt(parts[3]));
-            TileEntity tile = world.getTileEntity(pos);
-            if (!(tile instanceof INode)) return new AspectList();
-            INode node = (INode)tile;
-            AspectList tags = new AspectList();
-            AspectList nodeAspects = node.getAspects();
-            if (nodeAspects != null) {
-                for (Aspect aspect : nodeAspects.getAspectsSorted()) {
-                    if (aspect != null) tags.merge(aspect, Math.max(4, nodeAspects.getAmount(aspect) / 10));
-                }
+        WorldCoordinates location = TileNode.locations.get(nodeKey);
+        if (location == null || location.dim != world.provider.getDimension()) return new AspectList();
+        TileEntity tile = world.getTileEntity(new BlockPos(location.x, location.y, location.z));
+        if (!(tile instanceof INode)) return new AspectList();
+        INode node = (INode)tile;
+        AspectList tags = new AspectList();
+        AspectList nodeAspects = node.getAspects();
+        if (nodeAspects != null) {
+            for (Aspect aspect : nodeAspects.getAspectsSorted()) {
+                if (aspect != null) tags.merge(aspect, Math.max(4, nodeAspects.getAmount(aspect) / 10));
             }
-            NodeType type = node.getNodeType();
-            if (type == NodeType.UNSTABLE) tags.merge(Aspect.ENTROPY, 4);
-            else if (type == NodeType.HUNGRY) tags.merge(Aspect.HUNGER, 4);
-            else if (type == NodeType.TAINTED) tags.merge(Aspect.TAINT, 4);
-            else if (type == NodeType.PURE) tags.merge(Aspect.HEAL, 2).add(Aspect.ORDER, 2);
-            else if (type == NodeType.DARK) tags.merge(Aspect.DEATH, 2).add(Aspect.DARKNESS, 2);
-            return tags;
-        } catch (NumberFormatException ignored) {
-            return new AspectList();
         }
+        NodeType type = node.getNodeType();
+        if (type == NodeType.UNSTABLE) tags.merge(Aspect.ENTROPY, 4);
+        else if (type == NodeType.HUNGRY) tags.merge(Aspect.HUNGER, 4);
+        else if (type == NodeType.TAINTED) tags.merge(Aspect.TAINT, 4);
+        else if (type == NodeType.PURE) tags.merge(Aspect.HEAL, 2).add(Aspect.ORDER, 2);
+        else if (type == NodeType.DARK) tags.merge(Aspect.DEATH, 2).add(Aspect.DARKNESS, 2);
+        return tags;
     }
 
     private static AspectList getObjectAspects(ItemStack stack) {

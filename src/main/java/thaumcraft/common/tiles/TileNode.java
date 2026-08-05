@@ -51,12 +51,14 @@ import thaumcraft.common.lib.world.ThaumcraftWorldGenerator;
 
 import java.awt.Color;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 public class TileNode
 extends TileThaumcraft
 implements ITickable, INode, IAspectContainer, IWandable {
 
+    public static HashMap<String, WorldCoordinates> locations = new HashMap<>();
     public String id = "";
     private AspectList aspects = new AspectList();
     private AspectList aspectsBase = new AspectList();
@@ -81,6 +83,7 @@ implements ITickable, INode, IAspectContainer, IWandable {
     public void readCustomNBT(NBTTagCompound nbttagcompound) {
         this.aspects.readFromNBT(nbttagcompound);
         this.id = nbttagcompound.getString("nodeId");
+        updateNodeLocation();
         this.lastActive = nbttagcompound.getLong("lastActive");
         String drainer = nbttagcompound.getString("drainer");
         if (drainer != null && !drainer.isEmpty() && this.world != null) {
@@ -130,6 +133,11 @@ implements ITickable, INode, IAspectContainer, IWandable {
     }
 
     public void writeCustomNBT(NBTTagCompound nbttagcompound) {
+        if (this.id == null || this.id.isEmpty()) {
+            generateId();
+        } else {
+            updateNodeLocation();
+        }
         this.aspects.writeToNBT(nbttagcompound);
         nbttagcompound.setString("nodeId", this.id);
         nbttagcompound.setLong("lastActive", this.lastActive);
@@ -216,8 +224,17 @@ implements ITickable, INode, IAspectContainer, IWandable {
             this.aspectsBase.reduce(aspect, this.aspectsBase.getAmount(aspect) - visBase);
         }
     }
-    public String getId() { return this.id; }
-    public void setId(String id) { this.id = id; }
+    public String getId() {
+        if ((this.id == null || this.id.isEmpty()) && this.world != null) {
+            this.id = generateId();
+        }
+        return this.id;
+    }
+    public void setId(String id) {
+        removeNodeLocation();
+        this.id = id;
+        updateNodeLocation();
+    }
 
     // IWandable
     @Override
@@ -308,7 +325,41 @@ implements ITickable, INode, IAspectContainer, IWandable {
     }
 
     private String generateId() {
-        return this.world.provider.getDimension() + ":" + this.pos.getX() + ":" + this.pos.getY() + ":" + this.pos.getZ();
+        this.id = this.world.provider.getDimension() + ":" + this.pos.getX() + ":" + this.pos.getY() + ":" + this.pos.getZ();
+        updateNodeLocation();
+        return this.id;
+    }
+
+    @Override
+    public void onLoad() {
+        super.onLoad();
+        if (this.id == null || this.id.isEmpty()) {
+            generateId();
+        } else {
+            updateNodeLocation();
+        }
+    }
+
+    @Override
+    public void onChunkUnload() {
+        removeNodeLocation();
+        super.onChunkUnload();
+    }
+
+    private void updateNodeLocation() {
+        if (this.world != null && this.id != null && !this.id.isEmpty()) {
+            locations.put(this.id, new WorldCoordinates(this));
+        }
+    }
+
+    private void removeNodeLocation() {
+        if (this.world == null || this.id == null || this.id.isEmpty()) {
+            return;
+        }
+        WorldCoordinates current = locations.get(this.id);
+        if (new WorldCoordinates(this).equals(current)) {
+            locations.remove(this.id);
+        }
     }
 
     private static void setActiveWandHand(EntityPlayer player, ItemStack wandstack) {

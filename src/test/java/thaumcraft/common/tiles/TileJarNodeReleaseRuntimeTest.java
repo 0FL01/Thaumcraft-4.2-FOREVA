@@ -30,6 +30,7 @@ import thaumcraft.api.aspects.Aspect;
 import thaumcraft.api.aspects.AspectList;
 import thaumcraft.api.nodes.NodeModifier;
 import thaumcraft.api.nodes.NodeType;
+import thaumcraft.api.research.ScanResult;
 import thaumcraft.api.wands.IWandable;
 import thaumcraft.api.wands.StaffRod;
 import thaumcraft.api.wands.WandRod;
@@ -37,6 +38,7 @@ import thaumcraft.common.blocks.BlockAiry;
 import thaumcraft.common.blocks.BlockJar;
 import thaumcraft.common.config.ConfigBlocks;
 import thaumcraft.common.items.wands.ItemWandCasting;
+import thaumcraft.common.lib.research.ScanManager;
 
 import java.util.UUID;
 
@@ -60,6 +62,7 @@ public class TileJarNodeReleaseRuntimeTest {
     @After
     public void removeTestStaffRod() {
         WandRod.rods.remove(TEST_STAFF_TAG);
+        TileNode.locations.remove("released-node");
     }
 
     @Test
@@ -109,6 +112,13 @@ public class TileJarNodeReleaseRuntimeTest {
         assertSame(NodeType.HUNGRY, node.getNodeType());
         assertSame(NodeModifier.BRIGHT, node.getNodeModifier());
         assertEquals("released-node", node.getId());
+        assertEquals(JAR_POS.getX(), TileNode.locations.get("released-node").x);
+        assertEquals(JAR_POS.getY(), TileNode.locations.get("released-node").y);
+        assertEquals(JAR_POS.getZ(), TileNode.locations.get("released-node").z);
+        AspectList scanned = ScanManager.getScanAspects(
+                new ScanResult((byte) 3, 0, 0, null, "NODEreleased-node"), world);
+        assertEquals(4, scanned.getAmount(Aspect.MAGIC));
+        assertEquals(4, scanned.getAmount(Aspect.AIR));
         assertEquals(2001, world.playedEvent);
         assertSame(SoundEvents.BLOCK_GLASS_BREAK, world.playedSound);
     }

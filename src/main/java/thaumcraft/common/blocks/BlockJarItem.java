@@ -48,6 +48,9 @@ implements IEssentiaContainerItem {
 
     @Override
     public int getItemStackLimit(ItemStack stack) {
+        if (stack.getItemDamage() == 2) {
+            return 1;
+        }
         if ((stack.getItemDamage() == 0 || stack.getItemDamage() == 3)
                 && (this.hasStoredEssentia(stack)
                 || stack.hasTagCompound() && stack.getTagCompound().hasKey(ASPECT_FILTER_KEY))) {

@@ -355,7 +355,7 @@ public class BlockAiry extends BlockContainer {
                     if (aspect == null || aspects.getAmount(aspect) < 5) {
                         continue;
                     }
-                    for (int a = 0; a < aspects.getAmount(aspect) / 10; ++a) {
+                    for (int a = 0; a < getNodeEssenceDropCount(aspects.getAmount(aspect)); ++a) {
                         ItemStack itemstack = new ItemStack(ConfigItems.itemWispEssence);
                         ((ItemWispEssence) itemstack.getItem()).setAspects(itemstack, new AspectList().add(aspect, 2));
                         spawnAsEntity(worldIn, pos, itemstack);
@@ -364,6 +364,10 @@ public class BlockAiry extends BlockContainer {
             }
         }
         super.harvestBlock(worldIn, player, pos, state, te, stack);
+    }
+
+    static int getNodeEssenceDropCount(int aspectAmount) {
+        return aspectAmount < 5 ? 0 : aspectAmount / 10 + 1;
     }
 
     @Override

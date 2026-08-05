@@ -874,6 +874,7 @@ public class WandManager implements IWandTriggerManager {
                             jar.setNodeType(NodeType.values()[nodeType]);
                             jar.setId(nodeId);
                             jar.markDirty();
+                            world.addBlockEvent(target, ConfigBlocks.blockJar, 9, 0);
                         }
                         world.notifyNeighborsOfStateChange(target, ConfigBlocks.blockJar, false);
                     } else {

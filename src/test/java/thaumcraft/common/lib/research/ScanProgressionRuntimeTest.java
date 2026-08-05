@@ -36,6 +36,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import thaumcraft.api.ThaumcraftApi;
+import thaumcraft.api.WorldCoordinates;
 import thaumcraft.api.aspects.Aspect;
 import thaumcraft.api.aspects.AspectList;
 import thaumcraft.api.nodes.INode;
@@ -54,10 +55,12 @@ import thaumcraft.common.items.ItemResource;
 import thaumcraft.common.items.relics.ItemThaumometer;
 import thaumcraft.common.lib.capabilities.PlayerKnowledgeCapability;
 import thaumcraft.common.lib.capabilities.PlayerKnowledgeProvider;
+import thaumcraft.common.tiles.TileNode;
 
 import java.lang.reflect.Field;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -78,6 +81,7 @@ public class ScanProgressionRuntimeTest {
     private ConcurrentHashMap<List, int[]> oldGroupedObjectTags;
     private ArrayList<ThaumcraftApi.EntityTags> oldScanEntities;
     private ArrayList<IScanEventHandler> oldScanEventHandlers;
+    private HashMap<String, WorldCoordinates> oldNodeLocations;
 
     @BeforeClass
     public static void bootstrapMinecraftStatics() {
@@ -93,6 +97,7 @@ public class ScanProgressionRuntimeTest {
         this.oldGroupedObjectTags = new ConcurrentHashMap<>(ThaumcraftApi.groupedObjectTags);
         this.oldScanEntities = new ArrayList<>(ThaumcraftApi.scanEntities);
         this.oldScanEventHandlers = new ArrayList<>(ThaumcraftApi.scanEventhandlers);
+        this.oldNodeLocations = new HashMap<>(TileNode.locations);
 
         ResearchCategories.researchCategories.clear();
         ResearchCategories.registerCategory("TEST", new ResourceLocation("thaumcraft", "textures/test/icon.png"), new ResourceLocation("thaumcraft", "textures/test/background.png"));
@@ -102,6 +107,7 @@ public class ScanProgressionRuntimeTest {
         ThaumcraftApi.groupedObjectTags.clear();
         ThaumcraftApi.scanEntities.clear();
         ThaumcraftApi.scanEventhandlers.clear();
+        TileNode.locations.clear();
         clearResearchCaches();
     }
 
@@ -119,6 +125,8 @@ public class ScanProgressionRuntimeTest {
         ThaumcraftApi.scanEntities.addAll(this.oldScanEntities);
         ThaumcraftApi.scanEventhandlers.clear();
         ThaumcraftApi.scanEventhandlers.addAll(this.oldScanEventHandlers);
+        TileNode.locations.clear();
+        TileNode.locations.putAll(this.oldNodeLocations);
         clearResearchCaches();
     }
 
@@ -169,6 +177,7 @@ public class ScanProgressionRuntimeTest {
         world.node = new TestNodeTile();
         world.node.setWorld(world);
         world.node.setPos(pos);
+        TileNode.locations.put("0:0:1:4", new WorldCoordinates(pos.getX(), pos.getY(), pos.getZ(), 0));
 
         TestPlayer player = new TestPlayer(world, "node_scan");
         ScanResult scan = new ScanResult((byte)3, 0, 0, null, "NODE0:0:1:4");

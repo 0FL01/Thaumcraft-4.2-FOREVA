@@ -64,6 +64,7 @@ public class WandManagerTriggerStaticGuardTest {
         assertTrue(source.contains("ConfigBlocks.blockJar.getDefaultState().withProperty(thaumcraft.common.blocks.BlockJar.TYPE, 2)"));
         assertTrue(source.contains("jar.setNodeType(NodeType.values()[nodeType]);"));
         assertTrue(source.contains("jar.setId(nodeId);"));
+        assertTrue(source.contains("world.addBlockEvent(target, ConfigBlocks.blockJar, 9, 0);"));
         assertTrue(source.contains("private static boolean createOculus("));
         assertTrue(source.contains("return ((TileEldritchAltar) tile).onWandRightClick(world, wandStack, player, x, y, z, side, meta) == 1;"));
         assertTrue(source.contains("private static boolean createAdvancedAlchemicalFurnace("));

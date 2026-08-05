@@ -96,6 +96,9 @@ public class BlockJarLabelRuntimeTest {
         ItemStack empty = new ItemStack(item, 1, 0);
         assertEquals(64, item.getItemStackLimit(empty));
 
+        ItemStack nodeJar = new ItemStack(item, 1, 2);
+        assertEquals(1, item.getItemStackLimit(nodeJar));
+
         ItemStack filled = new ItemStack(item, 1, 0);
         item.setAspects(filled, new AspectList().add(Aspect.AIR, 37));
         assertEquals(1, item.getItemStackLimit(filled));
