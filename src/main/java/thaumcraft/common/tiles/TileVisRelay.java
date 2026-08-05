@@ -242,13 +242,20 @@ public class TileVisRelay extends TileVisNode implements IWandable {
 
     private void cycleColor() {
         if (this.world == null) return;
-        this.color++;
-        if (this.color > 5) this.color = -1;
+        byte nextColor = (byte) (this.color + 1);
+        if (nextColor > 5) nextColor = -1;
+        this.setRelayColor(nextColor);
+    }
+
+    public boolean setRelayColor(byte color) {
+        if (this.world == null || this.color == color) return false;
         this.removeThisNode();
-        this.attunement = this.color;
+        this.color = color;
+        this.attunement = color;
         this.nodeRefresh = true;
         this.markDirty();
         this.world.notifyBlockUpdate(this.pos, this.world.getBlockState(this.pos), this.world.getBlockState(this.pos), 3);
         this.world.playSound(null, this.pos, TCSounds.CRYSTAL, SoundCategory.BLOCKS, 0.2F, 1.0F);
+        return true;
     }
 }

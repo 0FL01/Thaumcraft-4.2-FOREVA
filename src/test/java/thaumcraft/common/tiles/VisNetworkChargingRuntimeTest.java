@@ -6,8 +6,13 @@ import net.minecraft.init.Blocks;
 import net.minecraft.init.Bootstrap;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.network.play.server.SPacketUpdateTileEntity;
 import net.minecraft.profiler.Profiler;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.SoundCategory;
+import net.minecraft.util.SoundEvent;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
@@ -19,11 +24,13 @@ import net.minecraft.world.WorldType;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.IChunkProvider;
 import net.minecraft.world.storage.WorldInfo;
+import net.minecraftforge.fml.common.registry.GameRegistry;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import thaumcraft.api.ThaumcraftApiHelper;
+import thaumcraft.api.WorldCoordinates;
 import thaumcraft.api.aspects.Aspect;
 import thaumcraft.api.visnet.TileVisNode;
 import thaumcraft.api.visnet.VisNetHandler;
@@ -32,6 +39,8 @@ import thaumcraft.common.config.ConfigBlocks;
 
 import java.awt.Color;
 import java.lang.ref.WeakReference;
+import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -48,17 +57,20 @@ public class VisNetworkChargingRuntimeTest {
         if (ConfigBlocks.blockFluxGoo == null || ConfigBlocks.blockFluxGas == null) {
             ConfigBlocks.init();
         }
+        GameRegistry.registerTileEntity(TileVisRelay.class, new ResourceLocation("thaumcraft", "tilevisrelay"));
     }
 
     @Before
     public void clearVisNetwork() {
         VisNetHandler.sources.clear();
+        nearbyNodes().clear();
         TileVisRelay.nearbyPlayers.clear();
     }
 
     @After
     public void cleanVisNetwork() {
         VisNetHandler.sources.clear();
+        nearbyNodes().clear();
         TileVisRelay.nearbyPlayers.clear();
     }
 
@@ -240,26 +252,39 @@ public class VisNetworkChargingRuntimeTest {
     }
 
     @Test
-    public void relaySyncsParentOffsetAndPropagatesColoredClientPulse() {
+    public void relayUpdatePacketRoundTripsPlacementColorAndParentState() {
         VisWorld serverWorld = new VisWorld(false);
         TestEnergizedNode parent = new TestEnergizedNode();
-        TestRelay relay = new TestRelay();
+        TileVisRelay relay = new TileVisRelay();
         serverWorld.attach(new BlockPos(2, 63, 1), parent);
         serverWorld.attach(new BlockPos(7, 64, -3), relay);
+        relay.orientation = (byte) EnumFacing.EAST.getIndex();
+        relay.color = 4;
+        relay.setAttunement((byte) 4);
         relay.setParent(new WeakReference<TileVisNode>(parent));
 
-        NBTTagCompound sync = new NBTTagCompound();
-        relay.writeCustomNBT(sync);
+        SPacketUpdateTileEntity packet = relay.getUpdatePacket();
+        NBTTagCompound sync = packet.getNbtCompound();
+        assertEquals(EnumFacing.EAST.getIndex(), sync.getByte("orientation"));
+        assertEquals(4, sync.getByte("color"));
+        assertEquals(4, sync.getByte("attunement"));
         assertEquals(5, sync.getByte("px"));
         assertEquals(1, sync.getByte("py"));
         assertEquals(-4, sync.getByte("pz"));
 
-        TestRelay restored = new TestRelay();
-        restored.readCustomNBT(sync);
+        TileVisRelay restored = new TileVisRelay();
+        restored.onDataPacket(null, packet);
+        assertEquals(EnumFacing.EAST.getIndex(), restored.orientation);
+        assertEquals(4, restored.color);
+        assertEquals(4, restored.getAttunement());
         assertTrue(restored.parentLoaded);
         assertEquals(5, restored.px);
         assertEquals(1, restored.py);
         assertEquals(-4, restored.pz);
+    }
+
+    @Test
+    public void relayPropagatesColoredClientPulse() {
 
         VisWorld clientWorld = new VisWorld(true);
         TestRelay upstream = new TestRelay();
@@ -276,6 +301,74 @@ public class VisNetworkChargingRuntimeTest {
         assertEquals(downstream.pRed, upstream.pRed, 0.0001F);
         assertEquals(downstream.pGreen, upstream.pGreen, 0.0001F);
         assertEquals(downstream.pBlue, upstream.pBlue, 0.0001F);
+    }
+
+    @Test
+    public void removingRelayClearsAndRecomputesCachedDrainerRoute() {
+        VisWorld world = new VisWorld(false);
+        TestEnergizedNode source = new TestEnergizedNode();
+        TestRelay relay = new TestRelay();
+        BlockPos sourcePos = new BlockPos(0, 64, 0);
+        BlockPos relayPos = new BlockPos(7, 64, 0);
+        BlockPos drainerPos = new BlockPos(14, 64, 0);
+        world.attach(sourcePos, source);
+        world.attach(relayPos, relay);
+        world.putState(sourcePos, Blocks.STONE.getDefaultState());
+        world.putState(relayPos, Blocks.STONE.getDefaultState());
+        source.update();
+        relay.update();
+
+        assertEquals(1, VisNetHandler.drainVis(world, drainerPos.getX(), drainerPos.getY(), drainerPos.getZ(),
+                Aspect.AIR, 1));
+        WorldCoordinates drainer = new WorldCoordinates(drainerPos.getX(), drainerPos.getY(), drainerPos.getZ(), 0);
+        assertSame(relay, nearbyNodes().get(drainer).get(0).get());
+
+        relay.removeThisNode();
+        assertTrue(nearbyNodes().isEmpty());
+        source.update();
+        assertEquals(0, VisNetHandler.drainVis(world, drainerPos.getX(), drainerPos.getY(), drainerPos.getZ(),
+                Aspect.AIR, 1));
+        assertTrue(nearbyNodes().containsKey(drainer));
+        assertTrue(nearbyNodes().get(drainer).isEmpty());
+    }
+
+    @Test
+    public void retuningRelayClearsAndRecomputesCachedDrainerRoute() {
+        VisWorld world = new VisWorld(false);
+        TestEnergizedNode source = new TestEnergizedNode();
+        TestRelay relay = new TestRelay();
+        BlockPos sourcePos = new BlockPos(0, 64, 0);
+        BlockPos relayPos = new BlockPos(7, 64, 0);
+        BlockPos drainerPos = new BlockPos(14, 64, 0);
+        world.attach(sourcePos, source);
+        world.attach(relayPos, relay);
+        world.putState(sourcePos, Blocks.STONE.getDefaultState());
+        world.putState(relayPos, Blocks.STONE.getDefaultState());
+        source.update();
+        relay.update();
+
+        assertEquals(1, VisNetHandler.drainVis(world, drainerPos.getX(), drainerPos.getY(), drainerPos.getZ(),
+                Aspect.AIR, 1));
+        assertFalse(nearbyNodes().isEmpty());
+
+        assertTrue(relay.setRelayColor((byte) 1));
+        assertTrue(nearbyNodes().isEmpty());
+        relay.update();
+        assertEquals(1, VisNetHandler.drainVis(world, drainerPos.getX(), drainerPos.getY(), drainerPos.getZ(),
+                Aspect.AIR, 1));
+        WorldCoordinates drainer = new WorldCoordinates(drainerPos.getX(), drainerPos.getY(), drainerPos.getZ(), 0);
+        assertSame(relay, nearbyNodes().get(drainer).get(0).get());
+    }
+
+    @SuppressWarnings("unchecked")
+    private static Map<WorldCoordinates, ArrayList<WeakReference<TileVisNode>>> nearbyNodes() {
+        try {
+            Field field = VisNetHandler.class.getDeclaredField("nearbyNodes");
+            field.setAccessible(true);
+            return (Map<WorldCoordinates, ArrayList<WeakReference<TileVisNode>>>) field.get(null);
+        } catch (ReflectiveOperationException e) {
+            throw new AssertionError(e);
+        }
     }
 
     private static RayTraceResult trace(World world, BlockPos source, BlockPos target) {
@@ -410,6 +503,11 @@ public class VisNetworkChargingRuntimeTest {
         @Override
         public void addBlockEvent(BlockPos pos, Block blockIn, int eventID, int eventParam) {
             this.blockEvents++;
+        }
+
+        @Override
+        public void playSound(net.minecraft.entity.player.EntityPlayer player, BlockPos pos, SoundEvent sound,
+                              SoundCategory category, float volume, float pitch) {
         }
 
         @Override

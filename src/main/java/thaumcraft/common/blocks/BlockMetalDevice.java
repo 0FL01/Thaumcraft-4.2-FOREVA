@@ -178,8 +178,21 @@ public class BlockMetalDevice extends BlockContainer {
             return true;
         }
         TileEntity tileEntity = worldIn.getTileEntity(pos);
+        int metadata = state.getValue(TYPE);
+        ItemStack held = playerIn.getHeldItem(hand);
+        if ((metadata == 14 || metadata == 2) && tileEntity instanceof TileVisRelay
+                && !held.isEmpty() && held.getItem() == ConfigItems.itemShard) {
+            if (!worldIn.isRemote) {
+                int shardColor = held.getMetadata();
+                if (shardColor >= 0 && shardColor <= 6) {
+                    TileVisRelay relay = (TileVisRelay) tileEntity;
+                    byte targetColor = shardColor == 6 || relay.color == shardColor ? (byte) -1 : (byte) shardColor;
+                    relay.setRelayColor(targetColor);
+                }
+            }
+            return true;
+        }
         if (tileEntity instanceof TileAlembic) {
-            ItemStack held = playerIn.getHeldItem(hand);
             if (!held.isEmpty() && held.getItem() instanceof ItemWandCasting) {
                 return ((TileAlembic) tileEntity).onWandRightClick(worldIn, held, playerIn,
                         pos.getX(), pos.getY(), pos.getZ(), facing.getIndex(), state.getValue(TYPE)) >= 0;
@@ -432,6 +445,17 @@ public class BlockMetalDevice extends BlockContainer {
             if (te instanceof TileArcaneLampFertility) {
                 TileArcaneLampFertility lamp = (TileArcaneLampFertility) te;
                 if (worldIn.isAirBlock(pos.offset(lamp.facing))) {
+                    worldIn.destroyBlock(pos, true);
+                }
+            }
+            return;
+        }
+        if (meta == 14) {
+            TileEntity te = worldIn.getTileEntity(pos);
+            if (te instanceof TileVisRelay) {
+                TileVisRelay relay = (TileVisRelay) te;
+                BlockPos support = pos.offset(EnumFacing.byIndex(relay.orientation).getOpposite());
+                if (worldIn.isAirBlock(support)) {
                     worldIn.destroyBlock(pos, true);
                 }
             }

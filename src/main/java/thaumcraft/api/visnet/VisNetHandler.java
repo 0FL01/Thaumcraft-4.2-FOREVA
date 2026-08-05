@@ -27,6 +27,10 @@ public class VisNetHandler {
     static ArrayList<WorldCoordinates> cache = new ArrayList<>();
     private static HashMap<WorldCoordinates, ArrayList<WeakReference<TileVisNode>>> nearbyNodes = new HashMap<>();
 
+    static void clearNearbyNodes() {
+        nearbyNodes.clear();
+    }
+
     // Tick counter for source reference cleanup.
     private static int tickCounter = 0;
 

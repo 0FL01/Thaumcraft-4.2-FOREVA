@@ -23,6 +23,7 @@ import thaumcraft.common.config.ConfigBlocks;
 import thaumcraft.common.tiles.TileArcaneLamp;
 import thaumcraft.common.tiles.TileArcaneLampFertility;
 import thaumcraft.common.tiles.TileArcaneLampGrowth;
+import thaumcraft.common.tiles.TileVisRelay;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -59,6 +60,25 @@ public class BlockMetalDeviceItemRuntimeTest {
                 assertEquals(side.getOpposite().getIndex(), saved.getInteger("orientation"));
                 assertEquals(1, world.blockUpdates);
             }
+        }
+    }
+
+    @Test
+    public void visRelayStoresEveryClickedSideAndSynchronizesIt() {
+        BlockMetalDeviceItem item = new BlockMetalDeviceItem(ConfigBlocks.blockMetalDevice);
+        IBlockState state = ConfigBlocks.blockMetalDevice.getStateFromMeta(14);
+        for (EnumFacing side : EnumFacing.values()) {
+            PlacementWorld world = new PlacementWorld();
+
+            assertTrue(item.placeBlockAt(new ItemStack(item, 1, 14), null, world, POS, side,
+                    0.5F, 0.5F, 0.5F, state));
+
+            TileVisRelay relay = (TileVisRelay) world.getTileEntity(POS);
+            assertEquals(side.getIndex(), relay.orientation);
+            NBTTagCompound sync = new NBTTagCompound();
+            relay.writeCustomNBT(sync);
+            assertEquals(side.getIndex(), sync.getByte("orientation"));
+            assertEquals(1, world.blockUpdates);
         }
     }
 

@@ -8,6 +8,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertFalse;
 
 public class TileVisRelayStaticGuardTest {
 
@@ -16,12 +17,21 @@ public class TileVisRelayStaticGuardTest {
         String source = readFile("src/main/java/thaumcraft/common/tiles/TileVisRelay.java");
 
         assertTrue(source.contains("public byte orientation = 1;"));
-        assertTrue(source.contains("this.color++;"));
-        assertTrue(source.contains("if (this.color > 5) this.color = -1;"));
+        assertTrue(source.contains("this.setRelayColor(nextColor);"));
         assertTrue(source.contains("this.removeThisNode();"));
         assertTrue(source.contains("this.world.playSound(null, this.pos, TCSounds.CRYSTAL, SoundCategory.BLOCKS, 0.2F, 1.0F);"));
         assertTrue(source.contains("public ItemStack onWandRightClick(World world, ItemStack wandstack, EntityPlayer player)"));
         assertTrue(source.contains("return null;"));
+    }
+
+    @Test
+    public void chunkUnloadMustNotTearDownTheVisGraph() throws IOException {
+        String source = readFile("src/main/java/thaumcraft/common/tiles/TileVisRelay.java");
+        int start = source.indexOf("public void onChunkUnload()");
+        int end = source.indexOf("\n    }", start);
+
+        assertTrue(start >= 0 && end > start);
+        assertFalse(source.substring(start, end).contains("removeThisNode"));
     }
 
     @Test

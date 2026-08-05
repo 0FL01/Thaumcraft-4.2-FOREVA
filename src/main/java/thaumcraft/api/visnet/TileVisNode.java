@@ -51,6 +51,7 @@ public abstract class TileVisNode extends TileThaumcraft implements ITickable {
     }
 
     public void removeThisNode() {
+        VisNetHandler.clearNearbyNodes();
         for (WeakReference<TileVisNode> n : this.getChildren()) {
             if (n != null && n.get() != null) {
                 n.get().removeThisNode();

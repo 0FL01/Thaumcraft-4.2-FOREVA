@@ -12,6 +12,7 @@ import thaumcraft.common.blocks.BlockMetalDevice;
 import thaumcraft.common.tiles.TileArcaneLamp;
 import thaumcraft.common.tiles.TileArcaneLampFertility;
 import thaumcraft.common.tiles.TileArcaneLampGrowth;
+import thaumcraft.common.tiles.TileVisRelay;
 
 public class BlockMetalDeviceItem extends BlockMetadataItem {
     public BlockMetalDeviceItem(Block block) {
@@ -34,6 +35,8 @@ public class BlockMetalDeviceItem extends BlockMetadataItem {
             ((TileArcaneLampGrowth) tile).facing = support;
         } else if (metadata == 13 && tile instanceof TileArcaneLampFertility) {
             ((TileArcaneLampFertility) tile).facing = support;
+        } else if (metadata == 14 && tile instanceof TileVisRelay) {
+            ((TileVisRelay) tile).orientation = (byte) side.getIndex();
         } else {
             return true;
         }
