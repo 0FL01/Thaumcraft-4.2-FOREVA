@@ -51,6 +51,7 @@ public class FocusFire extends ItemFocusBasic {
         if (this.isUpgradedWith(focusStack, fireball)) {
             if (!world.isRemote && wand.consumeAllVis(wandStack, player, this.getVisCost(focusStack), true, false)) {
                 EntityExplosiveOrb orb = new EntityExplosiveOrb(world, (EntityLivingBase) player);
+                orb.shoot(player, player.rotationPitch, player.rotationYaw, 0.0F, 1.5F, 1.0F);
                 orb.strength += (float) wand.getFocusPotency(wandStack) * 0.4F;
                 orb.onFire = this.isUpgradedWith(focusStack, FocusUpgradeType.alchemistsfire);
                 world.spawnEntity(orb);

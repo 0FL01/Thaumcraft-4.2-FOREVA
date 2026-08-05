@@ -6,6 +6,7 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.projectile.EntityThrowable;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.RayTraceResult;
@@ -39,27 +40,20 @@ public class EntityShockOrb extends EntityThrowable {
     protected void onImpact(RayTraceResult result) {
         if (result == null) return;
         if (!this.world.isRemote) {
-            // AOE damage within 'area' blocks
-            List<Entity> list = this.world.getEntitiesWithinAABBExcludingEntity(
-                this,
-                this.getEntityBoundingBox().grow((double)this.area, (double)this.area, (double)this.area));
+            List<Entity> list = this.world.getEntitiesWithinAABB(
+                Entity.class,
+                new AxisAlignedBB(this.posX, this.posY, this.posZ, this.posX, this.posY, this.posZ)
+                    .grow((double) this.area, (double) this.area, (double) this.area));
             for (Entity entity : list) {
-                if (!(entity instanceof EntityLivingBase)) continue;
-                double dx = entity.posX - this.posX;
-                double dy = entity.getEntityBoundingBox().minY + (double)entity.height * 0.5 - this.posY;
-                double dz = entity.posZ - this.posZ;
-                double dist = MathHelper.sqrt(dx * dx + dy * dy + dz * dz);
-                if (dist <= (double)this.area) {
-                    // Line of sight check
-                    net.minecraft.util.math.RayTraceResult sight = this.world.rayTraceBlocks(
-                        new net.minecraft.util.math.Vec3d(this.posX, this.posY + (double)this.getEyeHeight(), this.posZ),
-                        new net.minecraft.util.math.Vec3d(entity.posX, entity.posY + (double)entity.getEyeHeight(), entity.posZ),
-                        false, true, false);
-                    if (sight == null || sight.typeOfHit != net.minecraft.util.math.RayTraceResult.Type.BLOCK) {
-                        entity.attackEntityFrom(
-                            DamageSource.causeIndirectDamage(this, this.getThrower()),
-                            (float)this.damage);
-                    }
+                if (entity == this) continue;
+                RayTraceResult sight = this.world.rayTraceBlocks(
+                    new Vec3d(this.posX, this.posY, this.posZ),
+                    new Vec3d(entity.posX, entity.posY, entity.posZ),
+                    false);
+                if (sight == null) {
+                    entity.attackEntityFrom(
+                        DamageSource.causeIndirectMagicDamage(this, this.getThrower()),
+                        (float) this.damage);
                 }
             }
             // Place blockAiry (type=10 = fire) in a random pattern within area

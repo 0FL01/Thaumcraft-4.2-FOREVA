@@ -59,6 +59,7 @@ public class FocusShock extends ItemFocusBasic {
         if (this.isUpgradedWith(focusStack, earthshock)) {
             if (!world.isRemote && wand.consumeAllVis(wandStack, player, this.getVisCost(focusStack), true, false)) {
                 EntityShockOrb orb = new EntityShockOrb(world, (EntityLivingBase) player);
+                orb.shoot(player, player.rotationPitch, player.rotationYaw, 0.0F, 1.5F, 1.0F);
                 orb.area += this.getUpgradeLevel(focusStack, FocusUpgradeType.enlarge) * 2;
                 orb.damage += (int) ((double) wand.getFocusPotency(wandStack) * 1.33D);
                 world.spawnEntity(orb);
@@ -100,7 +101,7 @@ public class FocusShock extends ItemFocusBasic {
             player.stopActiveHand();
             return;
         }
-        Entity target = this.getPointedEntity(player.world, player, 20.0D);
+        Entity target = EntityUtils.getPointedEntity(player.world, player, 0.0D, 20.0D, 1.1F);
         if (!player.world.isRemote && wand.consumeAllVis(wandStack, player, this.getVisCost(focusStack), true, false)) {
             int potency = wand.getFocusPotency(wandStack);
             player.world.playSound(null, player.posX, player.posY, player.posZ, TCSounds.SHOCK, SoundCategory.PLAYERS, 0.25F, 1.0F);
@@ -190,24 +191,6 @@ public class FocusShock extends ItemFocusBasic {
             hit.add(closest.getEntityId());
             center = closest;
         }
-    }
-
-    private Entity getPointedEntity(World world, EntityPlayer player, double range) {
-        Vec3d eyes = player.getPositionEyes(1.0F);
-        Vec3d look = player.getLook(1.0F);
-        Vec3d end = eyes.add(look.x * range, look.y * range, look.z * range);
-        Entity pointed = null;
-        double closest = range * range;
-        for (Entity entity : world.getEntitiesInAABBexcluding(player, player.getEntityBoundingBox().expand(look.x * range, look.y * range, look.z * range).grow(1.0D), entity -> entity instanceof EntityLivingBase && entity.canBeCollidedWith())) {
-            RayTraceResult hit = entity.getEntityBoundingBox().grow(0.3D).calculateIntercept(eyes, end);
-            if (hit == null) continue;
-            double distance = eyes.squareDistanceTo(hit.hitVec);
-            if (distance < closest) {
-                pointed = entity;
-                closest = distance;
-            }
-        }
-        return pointed;
     }
 
     @Override

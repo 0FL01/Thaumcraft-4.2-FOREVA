@@ -129,7 +129,7 @@ public class EntityFrostShard extends EntityThrowable implements IEntityAddition
             double my = result.entityHit.motionY;
             double mz = result.entityHit.motionZ;
             result.entityHit.attackEntityFrom(
-                DamageSource.causeIndirectDamage(this, this.getThrower()),
+                DamageSource.causeThrownDamage(this, this.getThrower()),
                 this.getDamage());
             if (result.entityHit instanceof EntityLivingBase && this.getFrosty() > 0) {
                 ((EntityLivingBase)result.entityHit).addPotionEffect(
