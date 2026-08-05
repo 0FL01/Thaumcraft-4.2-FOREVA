@@ -1,6 +1,7 @@
 package thaumcraft.common.entities.projectile;
 
 import io.netty.buffer.ByteBuf;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.projectile.EntityThrowable;
@@ -8,9 +9,11 @@ import net.minecraft.util.DamageSource;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.registry.IEntityAdditionalSpawnData;
+import net.minecraftforge.fml.common.registry.IThrowableEntity;
+import thaumcraft.common.Thaumcraft;
 import thaumcraft.common.lib.TCSounds;
 
-public class EntityGolemOrb extends EntityThrowable implements IEntityAdditionalSpawnData {
+public class EntityGolemOrb extends EntityThrowable implements IEntityAdditionalSpawnData, IThrowableEntity {
     private int targetId = 0;
     private EntityLivingBase target;
     public boolean red = false;
@@ -20,6 +23,11 @@ public class EntityGolemOrb extends EntityThrowable implements IEntityAdditional
         super(world, shooter);
         this.target = t;
         this.red = r;
+    }
+
+    @Override
+    public void setThrower(Entity entity) {
+        this.thrower = entity instanceof EntityLivingBase ? (EntityLivingBase) entity : null;
     }
 
     @Override
@@ -61,6 +69,7 @@ public class EntityGolemOrb extends EntityThrowable implements IEntityAdditional
                 DamageSource.causeIndirectDamage(this, this.getThrower()),
                 atk * (this.red ? 1.0f : 0.6f));
         }
+        Thaumcraft.proxy.burst(this.world, this.posX, this.posY, this.posZ, 1.0F);
         this.playSound(TCSounds.SHOCK, 1.0F, 1.0F + (this.rand.nextFloat() - this.rand.nextFloat()) * 0.2F);
         this.setDead();
     }
