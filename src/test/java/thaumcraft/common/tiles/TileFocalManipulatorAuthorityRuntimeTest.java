@@ -15,6 +15,7 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.SoundEvent;
+import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.GameType;
 import net.minecraft.world.World;
@@ -24,15 +25,20 @@ import net.minecraft.world.WorldType;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.IChunkProvider;
 import net.minecraft.world.storage.WorldInfo;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import thaumcraft.api.aspects.Aspect;
 import thaumcraft.api.aspects.AspectList;
 import thaumcraft.api.wands.FocusUpgradeType;
 import thaumcraft.api.wands.ItemFocusBasic;
+import thaumcraft.common.CommonProxy;
+import thaumcraft.common.Thaumcraft;
 import thaumcraft.common.container.ContainerFocalManipulator;
 import thaumcraft.common.lib.TCSounds;
 
+import java.util.Random;
 import java.util.UUID;
 
 import static org.junit.Assert.assertEquals;
@@ -46,10 +52,103 @@ public class TileFocalManipulatorAuthorityRuntimeTest {
             new ResourceLocation("thaumcraft", "textures/foci/potency.png"),
             "test.focal.name", "test.focal.text", new AspectList().add(Aspect.AIR, 1));
     private static final TestFocus FOCUS = new TestFocus();
+    private CommonProxy oldProxy;
+    private RecordingProxy proxy;
 
     @BeforeClass
     public static void bootstrapMinecraftStatics() {
         Bootstrap.register();
+    }
+
+    @Before
+    public void setUpProxy() {
+        this.oldProxy = Thaumcraft.proxy;
+        this.proxy = new RecordingProxy();
+        Thaumcraft.proxy = this.proxy;
+    }
+
+    @After
+    public void restoreProxy() {
+        Thaumcraft.proxy = this.oldProxy;
+    }
+
+    @Test
+    public void renderBoundsMatchExactTc4ManipulatorExtent() {
+        TestTile tile = new TestTile();
+        tile.setPos(POS);
+
+        assertEquals(new AxisAlignedBB(0.0D, 63.0D, 0.0D, 1.0D, 65.0D, 1.0D),
+                tile.getRenderBoundingBox());
+    }
+
+    @Test
+    public void activeClientTickEmitsOneExactTc4CraftingParticleWithoutMutation() {
+        long seed = 0xC8B1234L;
+        TestWorld world = new TestWorld(true, seed);
+        TestTile tile = world.attach(new TestTile());
+        setActive(tile);
+        AspectList originalAspects = tile.aspects;
+        Random oracle = new Random(seed);
+
+        double expectedX = POS.getX() + 0.5D + (oracle.nextFloat() - oracle.nextFloat()) * 0.3F;
+        double expectedY = POS.getY() + 1.25D + (oracle.nextFloat() - oracle.nextFloat()) * 0.3F;
+        double expectedZ = POS.getZ() + 0.5D + (oracle.nextFloat() - oracle.nextFloat()) * 0.3F;
+        float expectedRed = 0.5F + oracle.nextFloat() * 0.4F;
+        float expectedGreen = 1.0F - oracle.nextFloat() * 0.4F;
+        float expectedBlue = 1.0F - oracle.nextFloat() * 0.4F;
+        int expectedAge = 6 + oracle.nextInt(5);
+        float expectedScale = 0.7F + oracle.nextFloat() * 0.4F;
+
+        tile.update();
+
+        assertEquals(1, this.proxy.calls);
+        assertSame(world, this.proxy.world);
+        assertEquals(expectedX, this.proxy.x, 0.0D);
+        assertEquals(expectedY, this.proxy.y, 0.0D);
+        assertEquals(expectedZ, this.proxy.z, 0.0D);
+        assertTrue(this.proxy.x >= POS.getX() + 0.2D && this.proxy.x <= POS.getX() + 0.8D);
+        assertTrue(this.proxy.y >= POS.getY() + 0.95D && this.proxy.y <= POS.getY() + 1.55D);
+        assertTrue(this.proxy.z >= POS.getZ() + 0.2D && this.proxy.z <= POS.getZ() + 0.8D);
+        assertEquals(0.0D, this.proxy.mx, 0.0D);
+        assertEquals(0.0D, this.proxy.my, 0.0D);
+        assertEquals(0.0D, this.proxy.mz, 0.0D);
+        assertEquals(expectedRed, this.proxy.red, 0.0F);
+        assertEquals(expectedGreen, this.proxy.green, 0.0F);
+        assertEquals(expectedBlue, this.proxy.blue, 0.0F);
+        assertTrue(this.proxy.red >= 0.5F && this.proxy.red <= 0.9F);
+        assertTrue(this.proxy.green >= 0.6F && this.proxy.green <= 1.0F);
+        assertTrue(this.proxy.blue >= 0.6F && this.proxy.blue <= 1.0F);
+        assertEquals(0.8F, this.proxy.alpha, 0.0F);
+        assertFalse(this.proxy.loop);
+        assertEquals(112, this.proxy.start);
+        assertEquals(9, this.proxy.num);
+        assertEquals(1, this.proxy.inc);
+        assertEquals(expectedAge, this.proxy.age);
+        assertEquals(0, this.proxy.delay);
+        assertEquals(expectedScale, this.proxy.scale, 0.0F);
+        assertTrue(this.proxy.age >= 6 && this.proxy.age <= 10);
+        assertTrue(this.proxy.scale >= 0.7F && this.proxy.scale <= 1.1F);
+        assertSame(originalAspects, tile.aspects);
+        assertEquals(100, tile.size);
+        assertEquals(1, tile.rank);
+        assertEquals(TEST_UPGRADE.id, tile.upgrade);
+    }
+
+    @Test
+    public void inactiveClientAndServerTicksEmitNoCraftingParticle() {
+        for (int size : new int[]{0, -1}) {
+            TestWorld clientWorld = new TestWorld(true, 1L);
+            TestTile clientTile = clientWorld.attach(new TestTile());
+            clientTile.size = size;
+            clientTile.update();
+        }
+        assertEquals(0, this.proxy.calls);
+
+        TestWorld serverWorld = new TestWorld(false, 1L);
+        TestTile serverTile = serverWorld.attach(new TestTile());
+        setActive(serverTile);
+        serverTile.update();
+        assertEquals(0, this.proxy.calls);
     }
 
     @Test
@@ -289,10 +388,15 @@ public class TileFocalManipulatorAuthorityRuntimeTest {
         private SoundEvent lastSound;
 
         private TestWorld() {
+            this(false, 0L);
+        }
+
+        private TestWorld(boolean remote, long seed) {
             super(null, new WorldInfo(new WorldSettings(0L, GameType.SURVIVAL, false, false, WorldType.DEFAULT),
-                    "focal_authority"), new WorldProviderSurface(), new Profiler(), false);
+                    "focal_authority"), new WorldProviderSurface(), new Profiler(), remote);
             this.provider.setWorld(this);
             this.chunkProvider = this.createChunkProvider();
+            this.rand.setSeed(seed);
         }
 
         private TestTile attach(TestTile tile) {
@@ -323,6 +427,54 @@ public class TileFocalManipulatorAuthorityRuntimeTest {
                 @Override public String makeString() { return "focal_authority_dummy"; }
                 @Override public boolean isChunkGeneratedAt(int x, int z) { return true; }
             };
+        }
+    }
+
+    private static final class RecordingProxy extends CommonProxy {
+        private int calls;
+        private World world;
+        private double x;
+        private double y;
+        private double z;
+        private double mx;
+        private double my;
+        private double mz;
+        private float red;
+        private float green;
+        private float blue;
+        private float alpha;
+        private boolean loop;
+        private int start;
+        private int num;
+        private int inc;
+        private int age;
+        private int delay;
+        private float scale;
+
+        @Override
+        public void drawGenericParticles(World world, double x, double y, double z,
+                                         double mx, double my, double mz,
+                                         float red, float green, float blue, float alpha,
+                                         boolean loop, int start, int num, int inc, int age, int delay, float scale) {
+            ++this.calls;
+            this.world = world;
+            this.x = x;
+            this.y = y;
+            this.z = z;
+            this.mx = mx;
+            this.my = my;
+            this.mz = mz;
+            this.red = red;
+            this.green = green;
+            this.blue = blue;
+            this.alpha = alpha;
+            this.loop = loop;
+            this.start = start;
+            this.num = num;
+            this.inc = inc;
+            this.age = age;
+            this.delay = delay;
+            this.scale = scale;
         }
     }
 }

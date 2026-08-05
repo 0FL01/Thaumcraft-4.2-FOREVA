@@ -8,12 +8,16 @@ import net.minecraft.nbt.NBTTagList;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ITickable;
 import net.minecraft.util.SoundCategory;
+import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import thaumcraft.api.TileThaumcraft;
 import thaumcraft.api.aspects.Aspect;
 import thaumcraft.api.aspects.AspectList;
 import thaumcraft.api.visnet.VisNetHandler;
 import thaumcraft.api.wands.FocusUpgradeType;
 import thaumcraft.api.wands.ItemFocusBasic;
+import thaumcraft.common.Thaumcraft;
 import thaumcraft.common.lib.TCSounds;
 
 public class TileFocalManipulator extends TileThaumcraft implements ITickable, ISidedInventory {
@@ -30,8 +34,30 @@ public class TileFocalManipulator extends TileThaumcraft implements ITickable, I
     private ItemStack[] itemStacks = new ItemStack[]{ItemStack.EMPTY};
 
     @Override
+    @SideOnly(Side.CLIENT)
+    public AxisAlignedBB getRenderBoundingBox() {
+        return new AxisAlignedBB(this.pos.getX(), this.pos.getY() - 1, this.pos.getZ(),
+                this.pos.getX() + 1, this.pos.getY() + 1, this.pos.getZ() + 1);
+    }
+
+    @Override
     public void update() {
-        if (this.world == null || this.world.isRemote) return;
+        if (this.world == null) return;
+        if (this.world.isRemote) {
+            if (this.size > 0) {
+                Thaumcraft.proxy.drawGenericParticles(this.world,
+                        this.pos.getX() + 0.5D + (this.world.rand.nextFloat() - this.world.rand.nextFloat()) * 0.3F,
+                        this.pos.getY() + 1.25D + (this.world.rand.nextFloat() - this.world.rand.nextFloat()) * 0.3F,
+                        this.pos.getZ() + 0.5D + (this.world.rand.nextFloat() - this.world.rand.nextFloat()) * 0.3F,
+                        0.0D, 0.0D, 0.0D,
+                        0.5F + this.world.rand.nextFloat() * 0.4F,
+                        1.0F - this.world.rand.nextFloat() * 0.4F,
+                        1.0F - this.world.rand.nextFloat() * 0.4F,
+                        0.8F, false, 112, 9, 1, 6 + this.world.rand.nextInt(5), 0,
+                        0.7F + this.world.rand.nextFloat() * 0.4F);
+            }
+            return;
+        }
 
         boolean complete = false;
         boolean upgraded = false;
