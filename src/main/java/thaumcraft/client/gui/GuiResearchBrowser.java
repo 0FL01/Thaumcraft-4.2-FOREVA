@@ -42,6 +42,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Set;
 
 public class GuiResearchBrowser extends GuiScreen {
@@ -49,6 +50,7 @@ public class GuiResearchBrowser extends GuiScreen {
     private static final ResourceLocation GUI_TEXTURE = new ResourceLocation("thaumcraft", "textures/gui/gui_research.png");
     private static final ResourceLocation UNKNOWN_ASPECT_TEXTURE = new ResourceLocation("thaumcraft", "textures/aspects/_unknown.png");
     private static final ResourceLocation PARTICLE_TEXTURE = new ResourceLocation("textures/particle/particles.png");
+    private static final int TOOLTIP_DETAIL_MAX_WIDTH = 190;
 
     private static int guiMapTop;
     private static int guiMapLeft;
@@ -548,107 +550,169 @@ public class GuiResearchBrowser extends GuiScreen {
         String name = this.currentHighlight.getName();
         int tooltipX = mouseX + 6;
         int tooltipY = mouseY - 4;
-        FontRenderer renderer = this.fontRenderer;
-        if (!completed.contains(this.currentHighlight.key) && !this.canUnlockResearch(this.currentHighlight)) {
-            renderer = this.galFontRenderer;
-        }
-        if (this.canUnlockResearch(this.currentHighlight)) {
+        boolean canUnlock = this.canUnlockResearch(this.currentHighlight);
+        FontRenderer titleRenderer = !completed.contains(this.currentHighlight.key) && !canUnlock
+                ? this.galFontRenderer : this.fontRenderer;
+        float detailScale = this.fontRenderer.getUnicodeFlag() ? 1.0F : 0.5F;
+        int titleHeight = titleRenderer.FONT_HEIGHT;
+        int tooltipWidth = titleRenderer.getStringWidth(name);
+
+        if (canUnlock) {
             boolean secondary = !completed.contains(this.currentHighlight.key)
                     && this.currentHighlight.tags != null && this.currentHighlight.tags.size() > 0
                     && (Config.researchDifficulty == -1 || (Config.researchDifficulty == 0 && this.currentHighlight.isSecondary()));
             boolean primary = !secondary && !completed.contains(this.currentHighlight.key);
-            int tooltipWidth = Math.max(renderer.getStringWidth(name), renderer.getStringWidth(this.currentHighlight.getText()) / 2);
-            int tooltipHeight = this.getWrappedHeight(renderer, name, tooltipWidth) + 5;
-            int tooltipExtraHeight = 0;
+            ScaledTextBlock summary = this.layoutTooltipText(this.currentHighlight.getText(), detailScale);
+            tooltipWidth = Math.max(tooltipWidth, summary.width);
+
+            int cursorY = tooltipY + titleHeight + 2;
+            int summaryY = cursorY;
+            cursorY += summary.height;
+
+            String statusText = null;
+            int statusColor = 0xFFFFFF;
             if (primary) {
-                tooltipExtraHeight += 9;
-                tooltipWidth = Math.max(tooltipWidth, renderer.getStringWidth(net.minecraft.client.resources.I18n.format("tc.research.shortprim")) / 2);
+                int noteSlot = this.mc.player == null ? -1 : ResearchManager.getResearchSlot(this.mc.player, this.currentHighlight.key);
+                if (noteSlot >= 0) {
+                    statusText = net.minecraft.client.resources.I18n.format("tc.research.hasnote");
+                    statusColor = 0xFFAA00;
+                } else if (this.hasScribestuff) {
+                    statusText = net.minecraft.client.resources.I18n.format("tc.research.getprim");
+                    statusColor = 0x87D1AB;
+                } else {
+                    statusText = net.minecraft.client.resources.I18n.format("tc.research.shortprim");
+                    statusColor = 0xDC141C;
+                }
             }
-            if (secondary) {
-                tooltipExtraHeight += 29;
-                tooltipWidth = Math.max(tooltipWidth, renderer.getStringWidth(net.minecraft.client.resources.I18n.format("tc.research.short")) / 2);
-            }
+
             int warp = Math.min(ThaumcraftApi.getWarp(this.currentHighlight.key), 5);
             String warpLine = net.minecraft.util.text.translation.I18n.translateToLocal("tc.forbidden")
                     .replace("%n", net.minecraft.client.resources.I18n.format("tc.forbidden.level." + warp));
+            ScaledTextBlock warpBlock = null;
+            int warpY = 0;
             if (ThaumcraftApi.getWarp(this.currentHighlight.key) > 0) {
-                tooltipExtraHeight += 9;
-                tooltipWidth = Math.max(tooltipWidth, renderer.getStringWidth(warpLine) / 2);
+                warpBlock = this.layoutTooltipText(warpLine, detailScale);
+                tooltipWidth = Math.max(tooltipWidth, warpBlock.width);
+                cursorY += 2;
+                warpY = cursorY;
+                cursorY += warpBlock.height;
             }
-            this.drawGradientRect(tooltipX - 3, tooltipY - 3, tooltipX + tooltipWidth + 3,
-                    tooltipY + tooltipHeight + tooltipExtraHeight + 6, -1073741824, -1073741824);
-            GlStateManager.pushMatrix();
-            GlStateManager.translate(tooltipX, tooltipY + tooltipHeight - 1, 0.0F);
-            GlStateManager.scale(0.5F, 0.5F, 0.5F);
-            this.fontRenderer.drawString(this.currentHighlight.getText(), 0, 0, -7302913);
-            GlStateManager.popMatrix();
-            if (warp > 0) {
-                GlStateManager.pushMatrix();
-                GlStateManager.translate(tooltipX, tooltipY + tooltipHeight + 8, 0.0F);
-                GlStateManager.scale(0.5F, 0.5F, 0.5F);
-                this.fontRenderer.drawString(warpLine, 0, 0, 0xFFFFFF);
-                GlStateManager.popMatrix();
-                tooltipHeight += 9;
-            }
+
+            boolean enough = true;
+            IPlayerKnowledge knowledge = null;
+            int aspectsY = 0;
+            ScaledTextBlock statusBlock = null;
+            int statusY = 0;
             if (primary) {
-                GlStateManager.pushMatrix();
-                GlStateManager.translate(tooltipX, tooltipY + tooltipHeight + 8, 0.0F);
-                GlStateManager.scale(0.5F, 0.5F, 0.5F);
-                int noteSlot = this.mc.player == null ? -1 : ResearchManager.getResearchSlot(this.mc.player, this.currentHighlight.key);
-                if (noteSlot >= 0) {
-                    this.fontRenderer.drawString(net.minecraft.client.resources.I18n.format("tc.research.hasnote"), 0, 0, 0xFFAA00);
-                } else if (this.hasScribestuff) {
-                    this.fontRenderer.drawString(net.minecraft.client.resources.I18n.format("tc.research.getprim"), 0, 0, 0x87D1AB);
-                } else {
-                    this.fontRenderer.drawString(net.minecraft.client.resources.I18n.format("tc.research.shortprim"), 0, 0, 0xDC141C);
-                }
-                GlStateManager.popMatrix();
+                statusBlock = this.layoutTooltipText(statusText, detailScale);
+                tooltipWidth = Math.max(tooltipWidth, statusBlock.width);
+                cursorY += 2;
+                statusY = cursorY;
+                cursorY += statusBlock.height;
             } else if (secondary) {
-                IPlayerKnowledge knowledge = this.getKnowledge();
-                boolean enough = true;
+                knowledge = this.getKnowledge();
+                for (Aspect aspect : this.currentHighlight.tags.getAspectsSortedAmount()) {
+                    if (knowledge == null || !knowledge.hasDiscoveredAspect(aspect)
+                            || knowledge.getAspectPoolFor(aspect) < this.currentHighlight.tags.getAmount(aspect)) {
+                        enough = false;
+                    }
+                }
+                statusText = net.minecraft.client.resources.I18n.format(enough ? "tc.research.purchase" : "tc.research.short");
+                statusColor = enough ? 0x87D1AB : 0xDC141C;
+                statusBlock = this.layoutTooltipText(statusText, detailScale);
+                tooltipWidth = Math.max(tooltipWidth, Math.max(statusBlock.width, this.currentHighlight.tags.size() * 16));
+                cursorY += 3;
+                aspectsY = cursorY;
+                cursorY += 16;
+                cursorY += 2;
+                statusY = cursorY;
+                cursorY += statusBlock.height;
+            }
+
+            this.drawGradientRect(tooltipX - 3, tooltipY - 3, tooltipX + tooltipWidth + 3,
+                    cursorY + 3, -1073741824, -1073741824);
+            this.drawTooltipText(summary, tooltipX, summaryY, -7302913);
+            if (warpBlock != null) {
+                this.drawTooltipText(warpBlock, tooltipX, warpY, 0xFFFFFF);
+            }
+            if (secondary) {
                 int count = 0;
                 for (Aspect aspect : this.currentHighlight.tags.getAspectsSortedAmount()) {
                     if (knowledge != null && knowledge.hasDiscoveredAspect(aspect)) {
                         float alpha = 1.0F;
                         if (knowledge.getAspectPoolFor(aspect) < this.currentHighlight.tags.getAmount(aspect)) {
                             alpha = (float) Math.sin((Minecraft.getSystemTime() % 600L) / 600.0 * Math.PI * 2.0) * 0.25F + 0.75F;
-                            enough = false;
                         }
-                        GlStateManager.pushMatrix();
-                        UtilsFX.drawTag(tooltipX + count * 16, tooltipY + tooltipHeight + 8, aspect, this.currentHighlight.tags.getAmount(aspect), 0, 0.0, GL11.GL_ONE_MINUS_SRC_ALPHA, alpha, false);
-                        GlStateManager.popMatrix();
+                        UtilsFX.drawTag(tooltipX + count * 16, aspectsY, aspect,
+                                this.currentHighlight.tags.getAmount(aspect), 0, 0.0,
+                                GL11.GL_ONE_MINUS_SRC_ALPHA, alpha, false, true);
                     } else {
-                        enough = false;
                         GlStateManager.pushMatrix();
                         UtilsFX.bindTexture(UNKNOWN_ASPECT_TEXTURE);
                         GlStateManager.color(0.5F, 0.5F, 0.5F, 0.5F);
-                        GlStateManager.translate(tooltipX + count * 16, tooltipY + tooltipHeight + 8, 0.0F);
+                        GlStateManager.translate(tooltipX + count * 16, aspectsY, 0.0F);
                         UtilsFX.drawTexturedQuadFull(0, 0, 0.0);
                         GlStateManager.popMatrix();
                     }
                     ++count;
                 }
-                GlStateManager.pushMatrix();
-                GlStateManager.translate(tooltipX, tooltipY + tooltipHeight + 27, 0.0F);
-                GlStateManager.scale(0.5F, 0.5F, 0.5F);
-                this.fontRenderer.drawString(net.minecraft.client.resources.I18n.format(enough ? "tc.research.purchase" : "tc.research.short"), 0, 0, enough ? 0x87D1AB : 0xDC141C);
-                GlStateManager.popMatrix();
+            }
+            if (statusBlock != null) {
+                this.drawTooltipText(statusBlock, tooltipX, statusY, statusColor);
             }
         } else {
-            GlStateManager.pushMatrix();
             String missing = net.minecraft.client.resources.I18n.format("tc.researchmissing");
-            int tooltipWidth = Math.max(renderer.getStringWidth(name), renderer.getStringWidth(missing) / 2);
-            int tooltipHeight = this.getWrappedHeight(renderer, missing, tooltipWidth * 2);
-            this.drawGradientRect(tooltipX - 3, tooltipY - 3, tooltipX + tooltipWidth + 3, tooltipY + tooltipHeight + 10, -1073741824, -1073741824);
-            GlStateManager.translate(tooltipX, tooltipY + 12, 0.0F);
-            GlStateManager.scale(0.5F, 0.5F, 0.5F);
-            this.fontRenderer.drawSplitString(missing, 0, 0, tooltipWidth * 2, -9416624);
-            GlStateManager.popMatrix();
+            ScaledTextBlock missingBlock = this.layoutTooltipText(missing, detailScale);
+            tooltipWidth = Math.max(tooltipWidth, missingBlock.width);
+            int missingY = tooltipY + titleHeight + 2;
+            this.drawGradientRect(tooltipX - 3, tooltipY - 3, tooltipX + tooltipWidth + 3,
+                    missingY + missingBlock.height + 3, -1073741824, -1073741824);
+            this.drawTooltipText(missingBlock, tooltipX, missingY, -9416624);
         }
-        renderer.drawString(name, tooltipX, tooltipY,
-                this.canUnlockResearch(this.currentHighlight)
+        titleRenderer.drawString(name, tooltipX, tooltipY,
+                canUnlock
                         ? (this.currentHighlight.isSpecial() ? 0xFFFFFF80 : 0xFFFFFFFF)
                         : (this.currentHighlight.isSpecial() ? 0xFF808080 : 0xFF8080A0));
+    }
+
+    private ScaledTextBlock layoutTooltipText(String text, float scale) {
+        int wrapWidth = Math.max(1, (int) Math.floor(TOOLTIP_DETAIL_MAX_WIDTH / scale));
+        List<String> lines = this.fontRenderer.listFormattedStringToWidth(text == null ? "" : text, wrapWidth);
+        if (lines.isEmpty()) {
+            lines = Arrays.asList("");
+        }
+        int width = 0;
+        for (String line : lines) {
+            width = Math.max(width, Math.round(this.fontRenderer.getStringWidth(line) * scale));
+        }
+        int height = Math.max(1, Math.round(lines.size() * this.fontRenderer.FONT_HEIGHT * scale));
+        return new ScaledTextBlock(lines, scale, width, height);
+    }
+
+    private void drawTooltipText(ScaledTextBlock block, int x, int y, int color) {
+        GlStateManager.pushMatrix();
+        GlStateManager.translate(x, y, 0.0F);
+        GlStateManager.scale(block.scale, block.scale, 1.0F);
+        int lineY = 0;
+        for (String line : block.lines) {
+            this.fontRenderer.drawString(line, 0, lineY, color);
+            lineY += this.fontRenderer.FONT_HEIGHT;
+        }
+        GlStateManager.popMatrix();
+    }
+
+    private static final class ScaledTextBlock {
+        private final List<String> lines;
+        private final float scale;
+        private final int width;
+        private final int height;
+
+        private ScaledTextBlock(List<String> lines, float scale, int width, int height) {
+            this.lines = lines;
+            this.scale = scale;
+            this.width = width;
+            this.height = height;
+        }
     }
 
     @Override

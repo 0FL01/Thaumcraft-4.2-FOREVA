@@ -156,7 +156,17 @@ public class UtilsFX {
         drawTag((double) x, (double) y, aspect, amount, bonus, z, blend, alpha, bw);
     }
 
+    public static void drawTag(int x, int y, Aspect aspect, float amount, int bonus, double z, int blend,
+                               float alpha, boolean bw, boolean readableAmount) {
+        drawTag((double) x, (double) y, aspect, amount, bonus, z, blend, alpha, bw, readableAmount);
+    }
+
     public static void drawTag(double x, double y, Aspect aspect, float amount, int bonus, double z, int blend, float alpha, boolean bw) {
+        drawTag(x, y, aspect, amount, bonus, z, blend, alpha, bw, false);
+    }
+
+    public static void drawTag(double x, double y, Aspect aspect, float amount, int bonus, double z, int blend,
+                               float alpha, boolean bw, boolean readableAmount) {
         if (aspect == null || aspect.getImage() == null) {
             return;
         }
@@ -188,20 +198,23 @@ public class UtilsFX {
 
         if (amount > 0.0F) {
             GlStateManager.pushMatrix();
-            GlStateManager.scale(0.5F, 0.5F, 0.5F);
+            float textScale = readableAmount && mc.fontRenderer.getUnicodeFlag() ? 1.0F : 0.5F;
+            GlStateManager.scale(textScale, textScale, 1.0F);
             GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
             String am = FORMATTER.format(amount);
             int sw = mc.fontRenderer.getStringWidth(am);
+            int textX = Math.round((float) (x + 16.0D) / textScale) - sw;
+            int textY = Math.round((float) (y + 16.0D) / textScale) - mc.fontRenderer.FONT_HEIGHT;
             if (blend > 1) {
                 for (int a = -1; a <= 1; ++a) {
                     for (int b = -1; b <= 1; ++b) {
                         if ((a != 0 || b != 0) && (a == 0 || b == 0)) {
-                            mc.fontRenderer.drawString(am, a + 32 - sw + (int) x * 2, b + 32 - mc.fontRenderer.FONT_HEIGHT + (int) y * 2, 0);
+                            mc.fontRenderer.drawString(am, textX + a, textY + b, 0);
                         }
                     }
                 }
             }
-            mc.fontRenderer.drawString(am, 32 - sw + (int) x * 2, 32 - mc.fontRenderer.FONT_HEIGHT + (int) y * 2, 0xFFFFFF);
+            mc.fontRenderer.drawString(am, textX, textY, 0xFFFFFF);
             GlStateManager.popMatrix();
         }
 

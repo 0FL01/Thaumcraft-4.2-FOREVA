@@ -693,7 +693,7 @@ public class GuiResearchRecipe extends GuiScreen {
     }
 
     private void drawAspectTag(int x, int y, Aspect aspect, int amount) {
-        thaumcraft.client.lib.UtilsFX.drawTag(x, y, aspect, amount, 0, this.zLevel, 771, 1.0F, false);
+        thaumcraft.client.lib.UtilsFX.drawTag(x, y, aspect, amount, 0, this.zLevel, 771, 1.0F, false, true);
         GlStateManager.disableLighting();
         GlStateManager.enableBlend();
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);

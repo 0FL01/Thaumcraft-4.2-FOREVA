@@ -41,10 +41,10 @@ public class GuiResearchBasicsParityStaticGuardTest {
         String browser = read("src/main/java/thaumcraft/client/gui/GuiResearchBrowser.java");
 
         assertTrue(browser.contains("minecraft.standardGalacticFontRenderer"));
-        assertTrue(browser.contains("int tooltipExtraHeight = 0;")
-                && browser.contains("tooltipExtraHeight += 9;")
-                && browser.contains("tooltipExtraHeight += 29;")
-                && browser.contains("tooltipY + tooltipHeight + tooltipExtraHeight + 6"));
+        assertTrue(browser.contains("ScaledTextBlock summary = this.layoutTooltipText")
+                && browser.contains("cursorY += summary.height;")
+                && browser.contains("cursorY += 16;")
+                && browser.contains("cursorY + 3"));
     }
 
     @Test
