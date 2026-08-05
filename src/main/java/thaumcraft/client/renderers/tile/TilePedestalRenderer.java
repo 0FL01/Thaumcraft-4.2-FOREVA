@@ -9,6 +9,7 @@ import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
+import thaumcraft.common.items.wands.ItemWandCasting;
 import thaumcraft.common.tiles.TilePedestal;
 
 public class TilePedestalRenderer extends TileEntitySpecialRenderer<TilePedestal> {
@@ -28,17 +29,20 @@ public class TilePedestalRenderer extends TileEntitySpecialRenderer<TilePedestal
         float scale = stack.getItem() instanceof ItemBlock ? 2.0F : 1.0F;
         ItemStack renderStack = stack.copy();
         renderStack.setCount(1);
-        World renderWorld = tile.getWorld() != null ? tile.getWorld() : Minecraft.getMinecraft().world;
-        IBakedModel model = Minecraft.getMinecraft().getRenderItem()
-                .getItemModelWithOverrides(renderStack, renderWorld, null);
-        float groundLift = 0.25F * model.getItemCameraTransforms()
-                .getTransform(ItemCameraTransforms.TransformType.GROUND).scale.y;
+        float groundLift = 0.0F;
+        if (!(renderStack.getItem() instanceof ItemWandCasting)) {
+            World renderWorld = tile.getWorld() != null ? tile.getWorld() : Minecraft.getMinecraft().world;
+            IBakedModel model = Minecraft.getMinecraft().getRenderItem()
+                    .getItemModelWithOverrides(renderStack, renderWorld, null);
+            groundLift = 0.25F * model.getItemCameraTransforms()
+                    .getTransform(ItemCameraTransforms.TransformType.GROUND).scale.y;
+        }
 
         GlStateManager.pushMatrix();
         GlStateManager.translate(x + 0.5D, y + 1.15D + bob, z + 0.5D);
         GlStateManager.rotate(ticks % 360.0F, 0.0F, 1.0F, 0.0F);
         GlStateManager.scale(scale, scale, scale);
-        // Forge 1.12 adds this model-dependent lift on top of the legacy EntityItem bob.
+        // Wand EntityItems compensate this lift together with the missing TC4 helper in their TEISR.
         GlStateManager.translate(0.0F, -groundLift, 0.0F);
         TileRenderHelper.renderEntityItem(tile, renderStack, 0.0F);
         if (!Minecraft.isFancyGraphicsEnabled()) {

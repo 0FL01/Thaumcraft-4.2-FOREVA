@@ -1,8 +1,6 @@
 package thaumcraft.client.renderers.entity;
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.entity.Render;
-import net.minecraft.client.renderer.entity.RenderEntityItem;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.entity.item.EntityItem;
@@ -14,11 +12,11 @@ public class RenderFollowingItem extends Render<EntityItem> {
 
     private static final ResourceLocation DEFAULT_ITEM_TEXTURE = TextureMap.LOCATION_BLOCKS_TEXTURE;
 
-    private final RenderEntityItem itemRenderer;
+    private final RenderWandEntityItem itemRenderer;
 
     public RenderFollowingItem(RenderManager renderManager) {
         super(renderManager);
-        this.itemRenderer = new RenderEntityItem(renderManager, Minecraft.getMinecraft().getRenderItem());
+        this.itemRenderer = new RenderWandEntityItem(renderManager);
         this.shadowSize = 0.15F;
         this.shadowOpaque = 0.75F;
     }

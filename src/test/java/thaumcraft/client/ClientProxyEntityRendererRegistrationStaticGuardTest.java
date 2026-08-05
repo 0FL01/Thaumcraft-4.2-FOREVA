@@ -15,9 +15,18 @@ public class ClientProxyEntityRendererRegistrationStaticGuardTest {
     public void entityRendererBootstrapStaysWired() throws IOException {
         String source = readFile("src/main/java/thaumcraft/client/ClientProxy.java");
         String noopRenderer = readFile("src/main/java/thaumcraft/client/renderers/entity/RenderNoop.java");
+        String wandEntityItemRenderer = readFile(
+                "src/main/java/thaumcraft/client/renderers/entity/RenderWandEntityItem.java");
 
         assertTrue("ClientProxy must keep setupEntityRenderers entry-point",
                 source.contains("private void setupEntityRenderers()"));
+        assertTrue("Vanilla EntityItems should retain their renderer while exposing wand drop context",
+                source.contains("registerEntityRenderer(EntityItem.class, RenderWandEntityItem::new, registered);")
+                        && wandEntityItemRenderer.contains("extends RenderEntityItem")
+                        && wandEntityItemRenderer.contains("instanceof ItemWandCasting")
+                        && wandEntityItemRenderer.contains("ItemWandRenderer.beginEntityItemRender();")
+                        && wandEntityItemRenderer.contains("finally")
+                        && wandEntityItemRenderer.contains("ItemWandRenderer.endEntityItemRender();"));
         assertTrue("ClientProxy must keep dedicated special-item renderer registrations for item-like entities",
                 source.contains("registerEntityRenderer(EntitySpecialItem.class, RenderSpecialItem::new, registered);")
                         && source.contains("registerEntityRenderer(EntityPermanentItem.class, RenderSpecialItem::new, registered);")
@@ -154,12 +163,12 @@ public class ClientProxyEntityRendererRegistrationStaticGuardTest {
         assertTrue("RenderSpecialItem and RenderFollowingItem must provide dedicated special-item render baselines",
                 specialItemRenderer.contains("extends Render<EntityItem>")
                         && specialItemRenderer.contains("renderBurst(")
-                        && specialItemRenderer.contains("RenderEntityItem")
+                        && specialItemRenderer.contains("RenderWandEntityItem")
                         && specialItemRenderer.contains("Random(245L)")
                         && specialItemRenderer.contains("GL11.GL_TRIANGLE_FAN")
                         && specialItemRenderer.contains("255, 0, 255, 0")
                         && followingItemRenderer.contains("extends Render<EntityItem>")
-                        && followingItemRenderer.contains("RenderEntityItem")
+                        && followingItemRenderer.contains("RenderWandEntityItem")
                         && followingItemRenderer.contains("!entity.getItem().isEmpty()")
                         && followingItemRenderer.contains("this.itemRenderer.doRender(entity, x, y, z, entityYaw, partialTicks)"));
         String electricOrbRenderer = readFile("src/main/java/thaumcraft/client/renderers/entity/RenderElectricOrb.java");

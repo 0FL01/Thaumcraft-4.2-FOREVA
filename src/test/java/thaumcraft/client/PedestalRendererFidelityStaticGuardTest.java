@@ -24,17 +24,21 @@ public class PedestalRendererFidelityStaticGuardTest {
                         && pedestal.contains("stack.getItem() instanceof ItemBlock ? 2.0F : 1.0F")
                         && pedestal.contains("TileRenderHelper.renderEntityItem(tile, renderStack, 0.0F);")
                         && pedestal.contains("if (!Minecraft.isFancyGraphicsEnabled())"));
-        assertTrue("TilePedestalRenderer should cancel only Forge 1.12's model-dependent EntityItem ground lift",
+        assertTrue("TilePedestalRenderer should retain the 1.12 ground-lift cancellation only for non-wands",
                 pedestal.contains("renderStack.setCount(1);")
+                        && pedestal.contains("float groundLift = 0.0F;")
+                        && pedestal.contains("if (!(renderStack.getItem() instanceof ItemWandCasting))")
                         && pedestal.contains("getItemModelWithOverrides(renderStack, renderWorld, null)")
                         && pedestal.contains("getTransform(ItemCameraTransforms.TransformType.GROUND).scale.y")
-                        && pedestal.contains("float groundLift = 0.25F *")
+                        && pedestal.contains("groundLift = 0.25F *")
                         && pedestal.contains("GlStateManager.translate(0.0F, -groundLift, 0.0F);"));
-        int scale = pedestal.indexOf("GlStateManager.scale(scale, scale, scale);");
+        int wandExemption = pedestal.indexOf("if (!(renderStack.getItem() instanceof ItemWandCasting))");
+        int calculation = pedestal.indexOf("groundLift = 0.25F *");
         int compensation = pedestal.indexOf("GlStateManager.translate(0.0F, -groundLift, 0.0F);");
         int render = pedestal.indexOf("TileRenderHelper.renderEntityItem(tile, renderStack, 0.0F);");
-        assertTrue("Ground-lift cancellation must occur inside the TC4 ItemBlock scale and before both draws",
-                scale >= 0 && scale < compensation && compensation < render);
+        assertTrue("Wands must avoid the old partial correction before the exact EntityItem helper runs",
+                wandExemption >= 0 && wandExemption < calculation
+                        && calculation < compensation && compensation < render);
         assertFalse("TilePedestalRenderer should not regress to generic floating helper path",
                 pedestal.contains("TileRenderHelper.renderFloatingItem("));
         assertFalse("Arcane Pedestal height compensation must not alter shared EntityItem helper callers",

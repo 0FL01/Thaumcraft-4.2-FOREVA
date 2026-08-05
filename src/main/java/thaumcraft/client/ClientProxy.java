@@ -17,13 +17,13 @@ import net.minecraft.client.model.ModelSpider;
 import net.minecraft.client.renderer.RenderItem;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.client.renderer.block.statemap.StateMap;
-import net.minecraft.client.renderer.entity.RenderEntityItem;
 import net.minecraft.client.renderer.entity.RenderSnowball;
 import net.minecraft.client.renderer.entity.RenderSpider;
 import net.minecraft.client.renderer.entity.RenderZombie;
 import net.minecraft.client.renderer.tileentity.TileEntityItemStackRenderer;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
 import net.minecraft.init.SoundEvents;
@@ -145,6 +145,7 @@ import thaumcraft.client.renderers.entity.RenderWatcher;
 import thaumcraft.client.renderers.entity.RenderWisp;
 import thaumcraft.client.renderers.entity.RenderCultist;
 import thaumcraft.client.renderers.entity.RenderSpecialItem;
+import thaumcraft.client.renderers.entity.RenderWandEntityItem;
 import thaumcraft.client.renderers.item.ItemEldritchRenderer;
 import thaumcraft.client.renderers.item.ItemEssentiaReservoirRenderer;
 import thaumcraft.client.renderers.item.ItemJarRenderer;
@@ -922,6 +923,7 @@ public class ClientProxy extends CommonProxy {
         // RenderItem-dependent factories (RenderSnowball) retrieve it lazily at factory execution time.
         Set<Class<? extends Entity>> registered = new HashSet<>();
 
+        registerEntityRenderer(EntityItem.class, RenderWandEntityItem::new, registered);
         registerEntityRenderer(EntitySpecialItem.class, RenderSpecialItem::new, registered);
         registerEntityRenderer(EntityPermanentItem.class, RenderSpecialItem::new, registered);
         registerEntityRenderer(EntityFollowingItem.class, RenderFollowingItem::new, registered);

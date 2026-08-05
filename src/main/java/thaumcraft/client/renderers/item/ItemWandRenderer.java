@@ -30,6 +30,7 @@ import java.io.File;
  * <p>Transform application order is fixed:
  * <pre>
  *   pushMatrix
+ *     [if EntityItem GROUND] compose legacy Forge entity helper
  *     translate(preTranslate)
  *     translate(translate)
  *     [if first person] scale(firstPersonScale)
@@ -58,6 +59,8 @@ public class ItemWandRenderer extends TileEntityItemStackRenderer {
 
     private static final ThreadLocal<ItemCameraTransforms.TransformType> CURRENT_TRANSFORM =
             ThreadLocal.withInitial(() -> ItemCameraTransforms.TransformType.NONE);
+    private static final ThreadLocal<Integer> ENTITY_ITEM_RENDER_DEPTH =
+            ThreadLocal.withInitial(() -> 0);
 
     /** Directory for optional debug JSON dumps ({@code -Dthaumcraft.debugWandRender=true}). */
     private static final File DUMP_DIR = new File("run/render-dumps/wand");
@@ -69,6 +72,19 @@ public class ItemWandRenderer extends TileEntityItemStackRenderer {
 
     public static void setTransformType(ItemCameraTransforms.TransformType transformType) {
         CURRENT_TRANSFORM.set(transformType == null ? ItemCameraTransforms.TransformType.NONE : transformType);
+    }
+
+    public static void beginEntityItemRender() {
+        ENTITY_ITEM_RENDER_DEPTH.set(ENTITY_ITEM_RENDER_DEPTH.get() + 1);
+    }
+
+    public static void endEntityItemRender() {
+        int depth = ENTITY_ITEM_RENDER_DEPTH.get();
+        if (depth <= 1) {
+            ENTITY_ITEM_RENDER_DEPTH.remove();
+        } else {
+            ENTITY_ITEM_RENDER_DEPTH.set(depth - 1);
+        }
     }
 
     @Override
@@ -91,6 +107,9 @@ public class ItemWandRenderer extends TileEntityItemStackRenderer {
 
         GlStateManager.pushMatrix();
         try {
+            if (transformType == ItemCameraTransforms.TransformType.GROUND && isEntityItemRender()) {
+                applyLegacyEntityItemHelperCompensation();
+            }
             applyBasePose(t, transformType);
             GlStateManager.enableBlend();
             GlStateManager.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
@@ -108,6 +127,20 @@ public class ItemWandRenderer extends TileEntityItemStackRenderer {
             setTransformType(ItemCameraTransforms.TransformType.NONE);
             GlStateManager.popMatrix();
         }
+    }
+
+    private static boolean isEntityItemRender() {
+        return ENTITY_ITEM_RENDER_DEPTH.get() > 0;
+    }
+
+    /**
+     * Recreates Forge 1.7's non-BLOCK_3D EntityItem helper after the Forge 1.12 entity lift and
+     * built-in-model centering. Together these produce the original 0.5 scale about the entity
+     * origin without changing direct users of the GROUND camera transform.
+     */
+    private static void applyLegacyEntityItemHelperCompensation() {
+        GlStateManager.translate(0.5F, 0.25F, 0.5F);
+        GlStateManager.scale(0.5F, 0.5F, 0.5F);
     }
 
     /**

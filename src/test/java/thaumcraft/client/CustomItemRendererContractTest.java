@@ -265,6 +265,89 @@ public class CustomItemRendererContractTest {
         assertMatrixEquals(tc4, port, 0.000001);
     }
 
+    @Test
+    public void droppedWandKindsShouldComposeTheLegacyForgeEntityHelperExactly() throws IOException {
+        String renderer = read("src/main/java/thaumcraft/client/renderers/item/ItemWandRenderer.java");
+        String compactRenderer = renderer.replaceAll("\\s+", "");
+        String entityRenderer = read(
+                "src/main/java/thaumcraft/client/renderers/entity/RenderWandEntityItem.java");
+
+        assertTrue("EntityItem compensation must be scoped to the GROUND transform and active wrapper",
+                compactRenderer.contains("if(transformType==ItemCameraTransforms.TransformType.GROUND"
+                        + "&&isEntityItemRender()){applyLegacyEntityItemHelperCompensation();}"));
+        assertTrue("The exact Forge 1.7 entity helper conversion must precede the local pose",
+                compactRenderer.contains("GlStateManager.translate(0.5F,0.25F,0.5F);"
+                        + "GlStateManager.scale(0.5F,0.5F,0.5F);"));
+        assertTrue("The wrapper must mark only casting-wand EntityItems and always restore context",
+                entityRenderer.contains("instanceof ItemWandCasting")
+                        && entityRenderer.contains("ItemWandRenderer.beginEntityItemRender();")
+                        && entityRenderer.contains("finally")
+                        && entityRenderer.contains("ItemWandRenderer.endEntityItemRender();"));
+
+        JsonObject kinds = new JsonParser()
+                .parse(read("src/main/resources/assets/thaumcraft/render_calibration/wand_casting.json"))
+                .getAsJsonObject().getAsJsonObject("kinds");
+        JsonObject wandGround = kinds.getAsJsonObject("wand")
+                .getAsJsonObject("contexts").getAsJsonObject("GROUND");
+        JsonObject staffGround = kinds.getAsJsonObject("staff")
+                .getAsJsonObject("contexts").getAsJsonObject("GROUND");
+        assertVector(wandGround, "translate", 0.0F, 1.0F, 0.0F);
+        assertVector(wandGround, "scale", 1.0F, 1.0F, 1.0F);
+        assertVector(staffGround, "translate", 0.0F, 1.5F, 0.0F);
+        assertVector(staffGround, "scale", 0.9F, 0.9F, 0.9F);
+
+        double[] bobs = {-0.01, 0.1, 0.2};
+        double[] spins = {-137.0, 0.0, 73.0, 311.0};
+        for (double bob : bobs) {
+            for (double spin : spins) {
+                assertDroppedWandMatrix(bob, spin, false);
+                assertDroppedWandMatrix(bob, spin, true);
+            }
+        }
+    }
+
+    private static void assertDroppedWandMatrix(double bob, double spin, boolean staff) {
+        double[][] tc4;
+        double[][] port;
+        if (staff) {
+            tc4 = compose(
+                    translation(2.0, bob, -4.0),
+                    rotateY(spin),
+                    scale(0.5, 0.5, 0.5),
+                    translation(0.0, 0.5, 0.0),
+                    translation(0.0, 1.5, 0.0),
+                    scale(0.9, 0.9, 0.9),
+                    rotateX(180.0));
+            port = compose(
+                    translation(2.0, bob + 0.25, -4.0),
+                    rotateY(spin),
+                    translation(-0.5, -0.5, -0.5),
+                    translation(0.5, 0.25, 0.5),
+                    scale(0.5, 0.5, 0.5),
+                    translation(0.0, 0.5, 0.0),
+                    translation(0.0, 1.5, 0.0),
+                    scale(0.9, 0.9, 0.9),
+                    rotateX(180.0));
+        } else {
+            // Sceptres use the same outer matrix; their additional cap is internal to ModelWand.
+            tc4 = compose(
+                    translation(2.0, bob, -4.0),
+                    rotateY(spin),
+                    scale(0.5, 0.5, 0.5),
+                    translation(0.0, 1.0, 0.0),
+                    rotateX(180.0));
+            port = compose(
+                    translation(2.0, bob + 0.25, -4.0),
+                    rotateY(spin),
+                    translation(-0.5, -0.5, -0.5),
+                    translation(0.5, 0.25, 0.5),
+                    scale(0.5, 0.5, 0.5),
+                    translation(0.0, 1.0, 0.0),
+                    rotateX(180.0));
+        }
+        assertMatrixEquals(tc4, port, 0.000001);
+    }
+
     private static void assertVector(JsonObject context, String name, float x, float y, float z) {
         JsonArray values = context.getAsJsonArray(name);
         assertEquals(name + " vector length", 3, values.size());
