@@ -1,5 +1,6 @@
 package thaumcraft.common.tiles;
 
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.ISidedInventory;
 import net.minecraft.item.ItemStack;
@@ -187,7 +188,9 @@ implements ISidedInventory {
     private void markDirtyAndSync() {
         this.markDirty();
         if (this.world != null && !this.world.isRemote) {
-            this.world.notifyBlockUpdate(this.pos, this.world.getBlockState(this.pos), this.world.getBlockState(this.pos), 3);
+            IBlockState state = this.world.getBlockState(this.pos);
+            this.world.notifyBlockUpdate(this.pos, state, state, 3);
+            this.world.updateComparatorOutputLevel(this.pos, state.getBlock());
         }
     }
 }

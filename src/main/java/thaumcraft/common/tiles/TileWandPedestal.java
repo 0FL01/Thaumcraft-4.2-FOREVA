@@ -72,7 +72,11 @@ implements ITickable, IAspectContainer {
         ItemStack stack = this.getStackInSlot(0);
 
         if (this.counter % 20 == 0 && this.somethingChanged && this.nodes != null && !this.nodes.isEmpty() && !stack.isEmpty()) {
-            this.world.notifyBlockUpdate(this.pos, this.world.getBlockState(this.pos), this.world.getBlockState(this.pos), 3);
+            IBlockState state = this.world.getBlockState(this.pos);
+            this.world.notifyBlockUpdate(this.pos, state, state, 3);
+            if (!this.world.isRemote) {
+                this.world.updateComparatorOutputLevel(this.pos, state.getBlock());
+            }
             this.somethingChanged = false;
         }
 

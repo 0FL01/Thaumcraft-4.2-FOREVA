@@ -32,6 +32,7 @@ import org.junit.Test;
 import thaumcraft.api.ThaumcraftApiHelper;
 import thaumcraft.api.WorldCoordinates;
 import thaumcraft.api.aspects.Aspect;
+import thaumcraft.api.wands.StaffRod;
 import thaumcraft.api.visnet.TileVisNode;
 import thaumcraft.api.visnet.VisNetHandler;
 import thaumcraft.common.items.wands.ItemWandCasting;
@@ -134,8 +135,87 @@ public class VisNetworkChargingRuntimeTest {
         for (Aspect aspect : Aspect.getPrimalAspects()) {
             assertEquals("energized node should provide its four CV/tick for " + aspect.getTag(),
                     4, ItemWandCasting.getVis(wand, aspect));
+            assertEquals("charging must not duplicate vis for " + aspect.getTag(),
+                    0, source.vis.getAmount(aspect));
         }
         assertEquals("each relay should emit one rate-limited pulse event like TC4", 2, world.blockEvents);
+    }
+
+    @Test
+    public void workbenchChargerRejectsStaffsWithoutDrainingSource() {
+        VisWorld world = new VisWorld(false);
+        BlockPos sourcePos = new BlockPos(0, 64, 0);
+        BlockPos relayPos = new BlockPos(7, 64, 0);
+        BlockPos chargerPos = new BlockPos(14, 64, 0);
+        TestEnergizedNode source = new TestEnergizedNode();
+        TestRelay relay = new TestRelay();
+        TestCharger charger = new TestCharger();
+        TestWorkbench workbench = new TestWorkbench();
+        ItemWandCasting wandItem = new ItemWandCasting();
+        ItemStack staff = new ItemStack(wandItem);
+        ItemWandCasting.setRod(staff, new StaffRod("charger_test", 50, new ItemStack(Blocks.LOG), 1));
+
+        world.attach(sourcePos, source);
+        world.attach(relayPos, relay);
+        world.attach(chargerPos, charger);
+        world.attach(chargerPos.down(), workbench);
+        world.putState(sourcePos, Blocks.STONE.getDefaultState());
+        world.putState(relayPos, Blocks.STONE.getDefaultState());
+        world.putState(chargerPos, Blocks.STONE.getDefaultState());
+        world.putState(chargerPos.down(), Blocks.STONE.getDefaultState());
+        workbench.setInventorySlotContents(10, staff);
+
+        source.update();
+        relay.update();
+        charger.update();
+
+        assertTrue(wandItem.isStaff(staff));
+        for (Aspect aspect : Aspect.getPrimalAspects()) {
+            assertEquals(0, ItemWandCasting.getVis(staff, aspect));
+            assertEquals(4, source.vis.getAmount(aspect));
+        }
+    }
+
+    @Test
+    public void workbenchChargerCapsVisAndConsumesOnlyWhatItStores() {
+        VisWorld world = new VisWorld(false);
+        BlockPos sourcePos = new BlockPos(0, 64, 0);
+        BlockPos relayPos = new BlockPos(7, 64, 0);
+        BlockPos chargerPos = new BlockPos(14, 64, 0);
+        TestEnergizedNode source = new TestEnergizedNode();
+        TestRelay relay = new TestRelay();
+        TestCharger charger = new TestCharger();
+        TestWorkbench workbench = new TestWorkbench();
+        ItemWandCasting wandItem = new ItemWandCasting();
+        ItemStack wand = new ItemStack(wandItem);
+        int capacity = ItemWandCasting.getMaxVis(wand);
+        for (Aspect aspect : Aspect.getPrimalAspects()) {
+            ItemWandCasting.setVis(wand, aspect, capacity);
+        }
+        ItemWandCasting.setVis(wand, Aspect.AIR, capacity - 2);
+
+        world.attach(sourcePos, source);
+        world.attach(relayPos, relay);
+        world.attach(chargerPos, charger);
+        world.attach(chargerPos.down(), workbench);
+        world.putState(sourcePos, Blocks.STONE.getDefaultState());
+        world.putState(relayPos, Blocks.STONE.getDefaultState());
+        world.putState(chargerPos, Blocks.STONE.getDefaultState());
+        world.putState(chargerPos.down(), Blocks.STONE.getDefaultState());
+        workbench.setInventorySlotContents(10, wand);
+
+        source.update();
+        relay.update();
+        charger.update();
+
+        assertEquals(capacity, ItemWandCasting.getVis(wand, Aspect.AIR));
+        assertEquals(2, source.vis.getAmount(Aspect.AIR));
+        for (Aspect aspect : Aspect.getPrimalAspects()) {
+            if (aspect != Aspect.AIR) {
+                assertEquals(capacity, ItemWandCasting.getVis(wand, aspect));
+                assertEquals(4, source.vis.getAmount(aspect));
+            }
+        }
     }
 
     @Test

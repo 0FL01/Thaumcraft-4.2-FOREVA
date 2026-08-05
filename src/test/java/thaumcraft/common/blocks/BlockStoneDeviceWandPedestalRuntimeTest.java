@@ -125,6 +125,20 @@ public class BlockStoneDeviceWandPedestalRuntimeTest {
         assertEquals(8, block.getComparatorInputOverride(block.getStateFromMeta(5), world, pos));
     }
 
+    @Test
+    public void nodeTransducerAndSpaKeepReferenceSideSolidity() {
+        PedestalWorld world = new PedestalWorld(false);
+        BlockStoneDevice block = ConfigBlocks.blockStoneDevice;
+        BlockPos pos = new BlockPos(0, 64, 0);
+
+        for (EnumFacing side : EnumFacing.values()) {
+            assertEquals(side == EnumFacing.UP,
+                    block.isSideSolid(block.getStateFromMeta(11), world, pos, side));
+            assertTrue(block.isSideSolid(block.getStateFromMeta(12), world, pos, side));
+            assertFalse(block.isSideSolid(block.getStateFromMeta(0), world, pos, side));
+        }
+    }
+
     private static boolean playerHasItem(EntityPlayer player, net.minecraft.item.Item item) {
         for (ItemStack stack : player.inventory.mainInventory) {
             if (!stack.isEmpty() && stack.getItem() == item) return true;

@@ -82,7 +82,14 @@ extends BlockContainer {
 
     @Override
     public boolean isSideSolid(IBlockState state, IBlockAccess world, BlockPos pos, EnumFacing side) {
-        return state.getValue(TYPE) == 12 || super.isSideSolid(state, world, pos, side);
+        int type = state.getValue(TYPE);
+        if (type == 11 && side == EnumFacing.UP) {
+            return true;
+        }
+        if (type == 12) {
+            return true;
+        }
+        return super.isSideSolid(state, world, pos, side);
     }
 
     @Override

@@ -1,5 +1,6 @@
 package thaumcraft.common.tiles;
 
+import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Bootstrap;
 import net.minecraft.init.Blocks;
@@ -30,7 +31,9 @@ import thaumcraft.common.config.ConfigBlocks;
 import thaumcraft.common.items.baubles.ItemAmuletVis;
 import thaumcraft.common.items.wands.ItemWandCasting;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
@@ -143,6 +146,91 @@ public class TileWandPedestalRuntimeTest {
         assertEquals(1, node.getAspects().getAmount(Aspect.ORDER));
     }
 
+    @Test
+    public void pedestalSlotMutationsNotifyComparatorsOnlyOnServer() {
+        PedestalWorld world = new PedestalWorld(false);
+        TilePedestal pedestal = new TestPedestal();
+        BlockPos pos = new BlockPos(0, 64, 0);
+        world.attach(pos, pedestal);
+        world.putState(pos, ConfigBlocks.blockStoneDevice.getStateFromMeta(1));
+
+        pedestal.setInventorySlotContents(0, new ItemStack(Items.DIAMOND));
+        assertEquals(1, world.comparatorUpdates);
+        world.resetComparatorUpdates();
+
+        pedestal.decrStackSize(0, 1);
+        assertEquals(1, world.comparatorUpdates);
+        pedestal.setInventorySlotContents(0, new ItemStack(Items.DIAMOND));
+        world.resetComparatorUpdates();
+
+        pedestal.removeStackFromSlot(0);
+        assertEquals(1, world.comparatorUpdates);
+        pedestal.setInventorySlotContents(0, new ItemStack(Items.DIAMOND));
+        world.resetComparatorUpdates();
+
+        pedestal.clear();
+        assertEquals(1, world.comparatorUpdates);
+        world.resetComparatorUpdates();
+
+        pedestal.setInventorySlotContentsFromInfusion(0, new ItemStack(Items.DIAMOND));
+        assertEquals(1, world.comparatorUpdates);
+        assertEquals(pos, world.lastComparatorPos);
+        assertEquals(ConfigBlocks.blockStoneDevice, world.lastComparatorBlock);
+
+        PedestalWorld clientWorld = new PedestalWorld(true);
+        TilePedestal clientPedestal = new TestPedestal();
+        clientWorld.attach(pos, clientPedestal);
+        clientWorld.putState(pos, ConfigBlocks.blockStoneDevice.getStateFromMeta(1));
+        clientPedestal.setInventorySlotContents(0, new ItemStack(Items.DIAMOND));
+        clientPedestal.decrStackSize(0, 1);
+        clientPedestal.setInventorySlotContentsFromInfusion(0, new ItemStack(Items.DIAMOND));
+        clientPedestal.removeStackFromSlot(0);
+        clientPedestal.setInventorySlotContents(0, new ItemStack(Items.DIAMOND));
+        clientPedestal.clear();
+        assertEquals(0, clientWorld.comparatorUpdates);
+    }
+
+    @Test
+    public void wandChargingUpdatesComparatorOnTwentyTickBatchCadence() {
+        PedestalWorld world = new PedestalWorld(false);
+        TestWandPedestal pedestal = attachPedestal(world);
+        AspectList nodeAspects = new AspectList();
+        for (Aspect aspect : Aspect.getPrimalAspects()) {
+            nodeAspects.add(aspect, 3);
+        }
+        world.attach(new BlockPos(2, 64, 0), new TestNode(nodeAspects));
+
+        ItemWandCasting wandItem = new ItemWandCasting();
+        ItemStack wand = new ItemStack(wandItem);
+        ItemWandCasting.setCap(wand, new WandCap("pedestal_comparator_cap", 1.0F,
+                new ItemStack(Items.IRON_NUGGET), 1));
+        ItemWandCasting.setRod(wand, new WandRod("pedestal_comparator_rod", 1,
+                new ItemStack(Items.STICK), 1));
+        pedestal.setInventorySlotContents(0, wand);
+        world.resetComparatorUpdates();
+
+        Block block = ConfigBlocks.blockStoneDevice;
+        IBlockState state = block.getStateFromMeta(5);
+        assertEquals(1, block.getComparatorInputOverride(state, world, pedestal.getPos()));
+
+        tick(pedestal, 5);
+        assertEquals(3, block.getComparatorInputOverride(state, world, pedestal.getPos()));
+        assertEquals(0, world.comparatorUpdates);
+        tick(pedestal, 10);
+        assertEquals(8, block.getComparatorInputOverride(state, world, pedestal.getPos()));
+        assertEquals(0, world.comparatorUpdates);
+        tick(pedestal, 5);
+        assertEquals(10, block.getComparatorInputOverride(state, world, pedestal.getPos()));
+        assertEquals(1, world.comparatorUpdates);
+        assertEquals(Integer.valueOf(8), world.comparatorLevels.get(0));
+
+        tick(pedestal, 19);
+        assertEquals(1, world.comparatorUpdates);
+        tick(pedestal, 1);
+        assertEquals(2, world.comparatorUpdates);
+        assertEquals(Integer.valueOf(15), world.comparatorLevels.get(1));
+    }
+
     private static TestWandPedestal attachPedestal(PedestalWorld world) {
         TestWandPedestal pedestal = new TestWandPedestal();
         world.attach(new BlockPos(0, 64, 0), pedestal);
@@ -166,6 +254,12 @@ public class TileWandPedestalRuntimeTest {
     }
 
     private static class TestWandPedestal extends TileWandPedestal {
+        @Override
+        public void markDirty() {
+        }
+    }
+
+    private static class TestPedestal extends TilePedestal {
         @Override
         public void markDirty() {
         }
@@ -214,14 +308,29 @@ public class TileWandPedestalRuntimeTest {
     private static class PedestalWorld extends World {
         private final Map<BlockPos, IBlockState> states = new HashMap<>();
         private final Map<BlockPos, TileEntity> tiles = new HashMap<>();
+        private final List<Integer> comparatorLevels = new ArrayList<>();
+        private int comparatorUpdates;
+        private BlockPos lastComparatorPos;
+        private Block lastComparatorBlock;
 
         PedestalWorld() {
+            this(false);
+        }
+
+        PedestalWorld(boolean remote) {
             super(null,
                     new WorldInfo(new WorldSettings(0L, GameType.CREATIVE, false, false, WorldType.DEFAULT),
                             "wand_pedestal_charge_runtime"),
-                    new WorldProviderSurface(), new Profiler(), false);
+                    new WorldProviderSurface(), new Profiler(), remote);
             this.provider.setWorld(this);
             this.chunkProvider = this.createChunkProvider();
+        }
+
+        void resetComparatorUpdates() {
+            this.comparatorUpdates = 0;
+            this.comparatorLevels.clear();
+            this.lastComparatorPos = null;
+            this.lastComparatorBlock = null;
         }
 
         void attach(BlockPos pos, TileEntity tile) {
@@ -247,6 +356,17 @@ public class TileWandPedestalRuntimeTest {
 
         @Override
         public void notifyBlockUpdate(BlockPos pos, IBlockState oldState, IBlockState newState, int flags) {
+        }
+
+        @Override
+        public void updateComparatorOutputLevel(BlockPos pos, Block blockIn) {
+            this.comparatorUpdates++;
+            this.lastComparatorPos = pos;
+            this.lastComparatorBlock = blockIn;
+            IBlockState state = this.getBlockState(pos);
+            if (blockIn.hasComparatorInputOverride(state)) {
+                this.comparatorLevels.add(blockIn.getComparatorInputOverride(state, this, pos));
+            }
         }
 
         @Override
