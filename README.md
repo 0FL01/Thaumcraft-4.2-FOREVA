@@ -4,6 +4,8 @@ An unofficial community port of Azanor's Thaumcraft 4.2.3.5 for Minecraft 1.12.2
 
 > ## Port is ~90% complete
 > Most features are working; only hidden bugs remain to be found and fixed.
+>
+> Addon ports are planned for the future, starting with **Thaumic Tinkerer**.
 
 ## Showcase
 
