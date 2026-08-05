@@ -1,10 +1,10 @@
 package thaumcraft.common.tiles;
 
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ITickable;
 import net.minecraft.util.SoundCategory;
-import net.minecraft.util.math.BlockPos;
 import thaumcraft.api.TileThaumcraft;
 import thaumcraft.api.aspects.Aspect;
 import thaumcraft.api.aspects.AspectList;
@@ -25,9 +25,7 @@ public class TileNodeConverter extends TileThaumcraft implements ITickable {
             return;
         }
 
-        if (this.count == -1) {
-            this.checkStatus();
-        }
+        this.refreshStatus();
 
         TileEntity tile;
         if (this.status == 1 && this.world != null && !this.world.isRemote && this.count >= 1000
@@ -120,7 +118,7 @@ public class TileNodeConverter extends TileThaumcraft implements ITickable {
                 this.pos.getZ() + 0.5F,
                 0x66CCFF, 4);
 
-        if (this.world.rand.nextBoolean() && this.hasStabilizer()) {
+        if (this.world.rand.nextBoolean() && this.hasActiveStabilizer()) {
             Thaumcraft.proxy.bolt(this.world,
                     this.pos.getX() + 0.25F + this.world.rand.nextFloat() * 0.5F,
                     this.pos.getY() - 1.5F,
@@ -132,45 +130,51 @@ public class TileNodeConverter extends TileThaumcraft implements ITickable {
         }
     }
 
-    private boolean hasStabilizer() {
-        if (this.world == null || this.pos == null) {
-            return false;
-        }
-        BlockPos below = this.pos.down(2);
-        TileEntity te = this.world.getTileEntity(below);
-        return !this.world.isAirBlock(below) && te instanceof TileNodeStabilizer;
+    public boolean hasActiveStabilizer() {
+        return this.world != null && this.pos != null
+                && NodeStabilizerHelper.getActiveLock(this.world, this.pos.down(2), true) > 0;
     }
 
     public void checkStatus() {
+        this.refreshStatus();
+    }
+
+    private void refreshStatus() {
         if (this.world == null || this.pos == null) {
             return;
         }
+        int previousStatus = this.status;
+        int previousCount = this.count;
         if (this.count == -1) {
             this.count = 0;
         }
-        if (!(this.status != 2 || this.count <= 50 || this.hasStabilizer()
-                && this.world.getBlockState(this.pos.down()).getBlock() == ConfigBlocks.blockAiry
-                && this.world.getBlockState(this.pos.down()).getValue(BlockAiry.TYPE) == 5)) {
+
+        IBlockState nodeState = this.world.getBlockState(this.pos.down());
+        boolean naturalNode = nodeState.getBlock() == ConfigBlocks.blockAiry
+                && nodeState.getValue(BlockAiry.TYPE) == 0;
+        boolean energizedNode = nodeState.getBlock() == ConfigBlocks.blockAiry
+                && nodeState.getValue(BlockAiry.TYPE) == 5;
+        boolean activeStabilizer = this.hasActiveStabilizer();
+
+        if (this.status == 2 && this.count > 50 && (!energizedNode || !activeStabilizer)) {
             BlockAiry.explodify(this.getWorld(), this.pos.getX(), this.pos.getY() - 1, this.pos.getZ());
             this.status = 0;
             this.count = 50;
-            this.markDirty();
-            this.world.notifyBlockUpdate(this.pos, this.world.getBlockState(this.pos), this.world.getBlockState(this.pos), 3);
-        } else if (this.world.isBlockPowered(this.pos)
-                && this.world.getBlockState(this.pos.down()).getBlock() == ConfigBlocks.blockAiry
-                && this.world.getBlockState(this.pos.down()).getValue(BlockAiry.TYPE) == 0
-                && this.hasStabilizer()) {
+        } else if (this.status == 2 && energizedNode) {
+            // Keep the existing reverse countdown, including the <= 50 safety window.
+        } else if (this.world.isBlockPowered(this.pos) && naturalNode && activeStabilizer) {
             this.status = 1;
-            this.markDirty();
-            this.world.notifyBlockUpdate(this.pos, this.world.getBlockState(this.pos), this.world.getBlockState(this.pos), 3);
-        } else if (this.world.getBlockState(this.pos.down()).getBlock() == ConfigBlocks.blockAiry
-                && this.world.getBlockState(this.pos.down()).getValue(BlockAiry.TYPE) == 5) {
+        } else if (energizedNode) {
             this.status = 2;
             this.count = 1000;
-            this.markDirty();
-            this.world.notifyBlockUpdate(this.pos, this.world.getBlockState(this.pos), this.world.getBlockState(this.pos), 3);
         } else {
             this.status = 0;
+        }
+
+        boolean initializedCount = previousCount == -1 && this.count == 0;
+        if (this.status != previousStatus || this.count != previousCount && !initializedCount) {
+            this.markDirty();
+            this.world.notifyBlockUpdate(this.pos, this.world.getBlockState(this.pos), this.world.getBlockState(this.pos), 3);
         }
     }
 

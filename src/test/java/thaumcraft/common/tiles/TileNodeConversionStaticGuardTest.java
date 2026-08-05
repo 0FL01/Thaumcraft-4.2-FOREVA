@@ -42,8 +42,10 @@ public class TileNodeConversionStaticGuardTest {
         String source = readFile("src/main/java/thaumcraft/common/tiles/TileNodeConverter.java");
 
         assertTrue(source.contains("this.world.isBlockPowered(this.pos)"));
-        assertTrue(source.contains("private boolean hasStabilizer()"));
-        assertTrue(source.contains("te instanceof TileNodeStabilizer"));
+        assertTrue(source.contains("public boolean hasActiveStabilizer()"));
+        assertTrue(source.contains("NodeStabilizerHelper.getActiveLock(this.world, this.pos.down(2), true) > 0"));
+        assertTrue(source.contains("private void refreshStatus()"));
+        assertTrue(source.contains("this.status == 2 && energizedNode"));
         assertTrue(source.contains("Thaumcraft.proxy.bolt(this.world,"));
         assertTrue(source.contains("nbt.setInteger(\"status\", this.status);"));
         assertTrue(source.contains("nbt.setInteger(\"count\", this.count);"));
@@ -65,6 +67,7 @@ public class TileNodeConversionStaticGuardTest {
         assertTrue(airy.contains("world.createExplosion(null, x + 0.5D, y + 0.5D, z + 0.5D, 3.0F, false);"));
         assertTrue(airy.contains("ConfigBlocks.blockFluxGoo.getStateFromMeta(8)"));
         assertTrue(airy.contains("ConfigBlocks.blockFluxGas.getStateFromMeta(8)"));
+        assertTrue(airy.contains("((TileNodeConverter) te).hasActiveStabilizer()"));
 
         assertTrue(stoneDevice.contains("else if (te instanceof TileNodeConverter)"));
         assertTrue(stoneDevice.contains("((TileNodeConverter) te).checkStatus();"));

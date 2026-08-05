@@ -46,7 +46,6 @@ import thaumcraft.common.lib.world.ThaumcraftWorldGenerator;
 import thaumcraft.common.tiles.TileNode;
 import thaumcraft.common.tiles.TileNodeConverter;
 import thaumcraft.common.tiles.TileNodeEnergized;
-import thaumcraft.common.tiles.TileNodeStabilizer;
 import thaumcraft.common.tiles.TileNitor;
 import thaumcraft.common.tiles.TileWardingStoneFence;
 
@@ -176,15 +175,10 @@ public class BlockAiry extends BlockContainer {
     @Override
     public void neighborChanged(IBlockState state, World worldIn, BlockPos pos, Block blockIn, BlockPos fromPos) {
         if (state.getValue(TYPE) == 5) {
-            BlockPos stabilizerPos = pos.down();
-            TileEntity te = worldIn.getTileEntity(stabilizerPos);
-            if (worldIn.isAirBlock(stabilizerPos) || !(te instanceof TileNodeStabilizer)) {
+            TileEntity te = worldIn.getTileEntity(pos.up());
+            if (!(te instanceof TileNodeConverter)
+                    || !((TileNodeConverter) te).hasActiveStabilizer()) {
                 explodify(worldIn, pos.getX(), pos.getY(), pos.getZ());
-            } else {
-                te = worldIn.getTileEntity(pos.up());
-                if (!(te instanceof TileNodeConverter)) {
-                    explodify(worldIn, pos.getX(), pos.getY(), pos.getZ());
-                }
             }
         }
         super.neighborChanged(state, worldIn, pos, blockIn, fromPos);

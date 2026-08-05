@@ -77,6 +77,17 @@ public class BlockAiryEnergizedNodeRuntimeTest {
     }
 
     @Test
+    public void poweringStabilizerInvalidatesEnergizedNodeStructure() {
+        ConversionFixture fixture = new ConversionFixture();
+
+        fixture.world.powered.put(STABILIZER_POS, true);
+        fixture.notifyEnergizedNode(STABILIZER_POS);
+
+        assertTrue(fixture.world.explosions > 0);
+        assertFalse(fixture.world.isEnergizedNodePresent());
+    }
+
+    @Test
     public void breakingEnergizedNodeStillExplodesThroughConverter() {
         ConversionFixture fixture = new ConversionFixture();
 
@@ -112,6 +123,7 @@ public class BlockAiryEnergizedNodeRuntimeTest {
     private static final class ConversionWorld extends World {
         private final Map<BlockPos, IBlockState> states = new HashMap<>();
         private final Map<BlockPos, TileEntity> tiles = new HashMap<>();
+        private final Map<BlockPos, Boolean> powered = new HashMap<>();
         private int explosions;
 
         private ConversionWorld() {
@@ -155,6 +167,11 @@ public class BlockAiryEnergizedNodeRuntimeTest {
         @Override
         public TileEntity getTileEntity(BlockPos pos) {
             return this.tiles.get(pos);
+        }
+
+        @Override
+        public boolean isBlockPowered(BlockPos pos) {
+            return Boolean.TRUE.equals(this.powered.get(pos));
         }
 
         @Override
