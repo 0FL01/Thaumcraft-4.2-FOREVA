@@ -20,12 +20,16 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.ForgeHooks;
 import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.event.world.BlockEvent;
+import thaumcraft.common.Thaumcraft;
 import thaumcraft.common.entities.EntityFollowingItem;
 
 import javax.annotation.Nullable;
+import java.lang.reflect.Method;
 import java.util.List;
 
 public class BlockUtils {
+
+    private static final Method GET_SILK_TOUCH_DROP = findSilkTouchDropMethod();
 
     public static boolean isBlockBreakable(World world, BlockPos pos) {
         IBlockState state = world.getBlockState(pos);
@@ -38,15 +42,39 @@ public class BlockUtils {
 
     public static ItemStack createStackedBlock(Block block, int meta) {
         if (block == null) return ItemStack.EMPTY;
+        if (GET_SILK_TOUCH_DROP != null) {
+            try {
+                ItemStack stack = (ItemStack) GET_SILK_TOUCH_DROP.invoke(block, block.getStateFromMeta(meta));
+                return stack == null ? ItemStack.EMPTY : stack;
+            } catch (ReflectiveOperationException | RuntimeException e) {
+                Thaumcraft.log.warn("Could not invoke Block.getSilkTouchDrop for {}", block, e);
+            }
+        }
         Item item = Item.getItemFromBlock(block);
         if (item == Items.AIR) return ItemStack.EMPTY;
         return new ItemStack(item, 1, meta);
     }
 
+    private static Method findSilkTouchDropMethod() {
+        ReflectiveOperationException failure = null;
+        for (String name : new String[]{"getSilkTouchDrop", "func_180643_i"}) {
+            try {
+                Method method = Block.class.getDeclaredMethod(name, IBlockState.class);
+                method.setAccessible(true);
+                return method;
+            } catch (ReflectiveOperationException e) {
+                failure = e;
+            }
+        }
+        Thaumcraft.log.warn("Could not resolve Block.getSilkTouchDrop", failure);
+        return null;
+    }
+
     public static boolean isBlockExposed(World world, int x, int y, int z) {
         BlockPos pos = new BlockPos(x, y, z);
         for (EnumFacing facing : EnumFacing.VALUES) {
-            if (world.isAirBlock(pos.offset(facing))) return true;
+            IBlockState neighborState = world.getBlockState(pos.offset(facing));
+            if (!neighborState.isOpaqueCube()) return true;
         }
         return false;
     }

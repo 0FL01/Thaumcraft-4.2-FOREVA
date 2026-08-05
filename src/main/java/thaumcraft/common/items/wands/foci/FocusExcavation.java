@@ -87,7 +87,9 @@ public class FocusExcavation extends ItemFocusBasic {
             return;
         }
 
-        RayTraceResult mop = this.rayTrace(player.world, player, false);
+        Vec3d start = player.getPositionEyes(1.0F);
+        Vec3d end = start.add(player.getLookVec().scale(10.0D));
+        RayTraceResult mop = player.world.rayTraceBlocks(start, end, false, true, false);
         this.updateBeam(player, mop, key);
         if (mop == null || mop.typeOfHit != RayTraceResult.Type.BLOCK || !player.world.isBlockModifiable(player, mop.getBlockPos())) {
             this.resetBreakProgress(player);

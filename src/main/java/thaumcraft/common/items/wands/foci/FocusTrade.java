@@ -9,6 +9,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -52,6 +53,7 @@ public class FocusTrade extends ItemFocusBasic implements IArchitect {
     public ItemStack onFocusRightClick(ItemStack wandStack, World world, EntityPlayer player, RayTraceResult movingobjectposition) {
         if (!(wandStack.getItem() instanceof ItemWandCasting)) return wandStack;
         if (movingobjectposition == null || movingobjectposition.typeOfHit != RayTraceResult.Type.BLOCK) return wandStack;
+        EnumHand hand = ItemWandCasting.getHandHoldingWand(player, wandStack);
 
         BlockPos pos = movingobjectposition.getBlockPos();
         IBlockState state = world.getBlockState(pos);
@@ -68,7 +70,7 @@ public class FocusTrade extends ItemFocusBasic implements IArchitect {
                     this.storePickedBlock(wandStack, picked);
                 }
             }
-            player.swingArm(net.minecraft.util.EnumHand.MAIN_HAND);
+            player.swingArm(hand);
             return wandStack;
         }
 
@@ -77,7 +79,7 @@ public class FocusTrade extends ItemFocusBasic implements IArchitect {
             return wandStack;
         }
         if (world.isRemote) {
-            player.swingArm(net.minecraft.util.EnumHand.MAIN_HAND);
+            player.swingArm(hand);
             return wandStack;
         }
         if (world.getTileEntity(pos) != null || !this.canSwapBlock(world, pos, player)) return wandStack;
@@ -88,13 +90,13 @@ public class FocusTrade extends ItemFocusBasic implements IArchitect {
             for (BlockCoordinates c : this.getArchitectBlocks(wandStack, world, pos.getX(), pos.getY(), pos.getZ(), movingobjectposition.sideHit.getIndex(), player)) {
                 BlockPos cpos = new BlockPos(c.x, c.y, c.z);
                 IBlockState cstate = world.getBlockState(cpos);
-                ServerTickEventsFML.addSwapper(world, c.x, c.y, c.z, cstate.getBlock(), cstate.getBlock().getMetaFromState(cstate), picked.copy(), 0, player, player.inventory.currentItem);
+                ServerTickEventsFML.addSwapper(world, c.x, c.y, c.z, cstate.getBlock(), cstate.getBlock().getMetaFromState(cstate), picked.copy(), 0, player, hand, wandStack);
             }
         } else {
             ServerTickEventsFML.addSwapper(world, pos.getX(), pos.getY(), pos.getZ(), block, meta, picked.copy(),
-                    3 + this.getUpgradeLevel(focusStack, FocusUpgradeType.enlarge), player, player.inventory.currentItem);
+                    3 + this.getUpgradeLevel(focusStack, FocusUpgradeType.enlarge), player, hand, wandStack);
         }
-        player.swingArm(net.minecraft.util.EnumHand.MAIN_HAND);
+        player.swingArm(hand);
         return wandStack;
     }
 
@@ -107,7 +109,8 @@ public class FocusTrade extends ItemFocusBasic implements IArchitect {
             return false;
         }
         IBlockState state = player.world.getBlockState(pos);
-        ServerTickEventsFML.addSwapper(player.world, x, y, z, state.getBlock(), state.getBlock().getMetaFromState(state), picked.copy(), 0, player, player.inventory.currentItem);
+        EnumHand hand = ItemWandCasting.getHandHoldingWand(player, wandStack);
+        ServerTickEventsFML.addSwapper(player.world, x, y, z, state.getBlock(), state.getBlock().getMetaFromState(state), picked.copy(), 0, player, hand, wandStack);
         return true;
     }
 

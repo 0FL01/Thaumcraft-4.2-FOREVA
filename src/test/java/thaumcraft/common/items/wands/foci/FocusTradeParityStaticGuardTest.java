@@ -20,7 +20,7 @@ public class FocusTradeParityStaticGuardTest {
         String clientFeedback = source.substring(pickedStart, serverWork);
 
         assertTrue(clientFeedback.contains("if (world.isRemote)"));
-        assertTrue(clientFeedback.contains("player.swingArm(net.minecraft.util.EnumHand.MAIN_HAND);"));
+        assertTrue(clientFeedback.contains("player.swingArm(hand);"));
     }
 
     @Test
@@ -31,6 +31,9 @@ public class FocusTradeParityStaticGuardTest {
         assertFalse(tickSwap.contains("breakFurthestBlock"));
         assertTrue(tickSwap.contains("BlockUtils.isBlockExposed(world, np.getX(), np.getY(), np.getZ())"));
         assertTrue(tickSwap.contains("queue.offer(new VirtualSwapper"));
+
+        String focus = read("src/main/java/thaumcraft/common/items/wands/foci/FocusTrade.java");
+        assertTrue(focus.contains("BlockUtils.isBlockExposed(world, pos.x, pos.y, pos.z)"));
     }
 
     @Test

@@ -63,9 +63,9 @@ public class BlockEldritchNothingParityTest {
         TestWorld world = new TestWorld();
         BlockPos pos = new BlockPos(0, 64, 0);
         world.states.put(pos, block.getDefaultState());
-        world.states.put(pos.east(), Blocks.AIR.getDefaultState());
+        world.states.put(pos.east(), Blocks.GLASS.getDefaultState());
 
-        block.neighborChanged(world.getBlockState(pos), world, pos, Blocks.AIR, pos.east());
+        block.neighborChanged(world.getBlockState(pos), world, pos, Blocks.GLASS, pos.east());
         IBlockState exposed = world.getBlockState(pos);
         assertTrue(exposed.getValue(BlockEldritchNothing.EXPOSED));
         assertTrue(block.hasTileEntity(exposed));

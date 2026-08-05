@@ -9,9 +9,12 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.EnumHand;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
@@ -21,6 +24,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.common.ForgeHooks;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import thaumcraft.api.wands.FocusUpgradeType;
@@ -126,19 +130,23 @@ public class ServerTickEventsFML {
             ItemFocusBasic focus = null;
             ItemStack focusStack = null;
 
-            if (vs.player != null
-                    && !vs.player.inventory.getStackInSlot(vs.wand).isEmpty()
-                    && vs.player.inventory.getStackInSlot(vs.wand).getItem() instanceof ItemWandCasting) {
-                ItemStack wandStack = vs.player.inventory.getStackInSlot(vs.wand);
+            if (vs.player != null && vs.hand != null && vs.wandStack != null
+                    && vs.player.getHeldItem(vs.hand) == vs.wandStack
+                    && vs.wandStack.getItem() instanceof ItemWandCasting) {
+                ItemStack wandStack = vs.wandStack;
                 wand = (ItemWandCasting) wandStack.getItem();
                 focusStack = wand.getFocusItem(wandStack);
                 focus = wand.getFocus(wandStack);
             }
 
+            if (vs.player == null) continue;
             if (!world.isBlockModifiable(vs.player, pos)) continue;
             if (vs.target.isItemEqual(new ItemStack(currentBlock, 1, currentMeta))) continue;
             if (wand == null || focus == null) continue;
-            if (!wand.consumeAllVis(vs.player.inventory.getStackInSlot(vs.wand), vs.player,
+            Vec3d hitVec = new Vec3d((double) pos.getX() + 0.5D, (double) pos.getY() + 1.0D,
+                    (double) pos.getZ() + 0.5D);
+            if (ForgeHooks.onRightClickBlock(vs.player, vs.hand, pos, EnumFacing.UP, hitVec).isCanceled()) continue;
+            if (!wand.consumeAllVis(vs.wandStack, vs.player,
                     focus.getVisCost(focusStack), false, false)) continue;
 
             int slot = InventoryUtils.isPlayerCarrying(vs.player, vs.target);
@@ -160,7 +168,7 @@ public class ServerTickEventsFML {
             boolean silk = false;
             NonNullList<ItemStack> drops = NonNullList.create();
             if (!vs.player.capabilities.isCreativeMode) {
-                fortune = wand.getFocusTreasure(vs.player.inventory.getStackInSlot(vs.wand));
+                fortune = wand.getFocusTreasure(vs.wandStack);
                 silk = focus.isUpgradedWith(focusStack, FocusUpgradeType.silktouch);
                 if (silk && currentBlock.canSilkHarvest(world, pos, sourceState, vs.player)) {
                     ItemStack silked = BlockUtils.createStackedBlock(currentBlock, currentMeta);
@@ -189,7 +197,7 @@ public class ServerTickEventsFML {
                     }
                 }
 
-                wand.consumeAllVis(vs.player.inventory.getStackInSlot(vs.wand), vs.player,
+                wand.consumeAllVis(vs.wandStack, vs.player,
                         focus.getVisCost(focusStack), true, false);
             }
 
@@ -212,7 +220,7 @@ public class ServerTickEventsFML {
                                     && BlockUtils.isBlockExposed(world, np.getX(), np.getY(), np.getZ())) {
                                 queue.offer(new VirtualSwapper(vs.x + xx, vs.y + yy, vs.z + zz,
                                         vs.bSource, vs.mSource, vs.target,
-                                        vs.lifespan - 1, vs.player, vs.wand));
+                                        vs.lifespan - 1, vs.player, vs.hand, vs.wandStack));
                             }
                         }
                     }
@@ -227,6 +235,14 @@ public class ServerTickEventsFML {
      */
     public static void addSwapper(World world, int x, int y, int z, Block bs, int ms, ItemStack target,
                                   int life, EntityPlayer player, int wand) {
+        ItemStack wandStack = player == null ? ItemStack.EMPTY : player.inventory.getStackInSlot(wand);
+        EnumHand hand = player != null && player.getHeldItem(EnumHand.OFF_HAND) == wandStack
+                ? EnumHand.OFF_HAND : EnumHand.MAIN_HAND;
+        addSwapper(world, x, y, z, bs, ms, target, life, player, hand, wandStack);
+    }
+
+    public static void addSwapper(World world, int x, int y, int z, Block bs, int ms, ItemStack target,
+                                  int life, EntityPlayer player, EnumHand hand, ItemStack wandStack) {
         int dim = world.provider.getDimension();
         if (target.isEmpty() || Block.getBlockFromItem(target.getItem()) == Blocks.AIR) return;
         // Don't swap air or unbreakable blocks
@@ -242,7 +258,7 @@ public class ServerTickEventsFML {
             queue = new LinkedList<>();
             swapList.put(dim, queue);
         }
-        queue.offer(new VirtualSwapper(x, y, z, bs, ms, target, life, player, wand));
+        queue.offer(new VirtualSwapper(x, y, z, bs, ms, target, life, player, hand, wandStack));
 
         world.playSound(null, pos, TCSounds.WAND, SoundCategory.PLAYERS, 0.25f, 1.0f);
     }
@@ -286,10 +302,12 @@ public class ServerTickEventsFML {
         public Block bSource;
         public int mSource = 0;
         public ItemStack target;
-        public int wand = 0;
+        public EnumHand hand;
+        public ItemStack wandStack;
         public EntityPlayer player;
 
-        public VirtualSwapper(int x, int y, int z, Block bs, int ms, ItemStack t, int life, EntityPlayer p, int wand) {
+        public VirtualSwapper(int x, int y, int z, Block bs, int ms, ItemStack t, int life, EntityPlayer p,
+                              EnumHand hand, ItemStack wandStack) {
             this.x = x;
             this.y = y;
             this.z = z;
@@ -298,7 +316,8 @@ public class ServerTickEventsFML {
             this.target = t;
             this.lifespan = life;
             this.player = p;
-            this.wand = wand;
+            this.hand = hand;
+            this.wandStack = wandStack;
         }
     }
 }
