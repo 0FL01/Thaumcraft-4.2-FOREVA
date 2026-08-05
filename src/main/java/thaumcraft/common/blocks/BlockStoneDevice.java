@@ -27,6 +27,9 @@ import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.text.Style;
+import net.minecraft.util.text.TextComponentTranslation;
+import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.common.property.ExtendedBlockState;
@@ -35,6 +38,7 @@ import net.minecraftforge.common.property.IUnlistedProperty;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.FluidUtil;
 import net.minecraftforge.fluids.capability.IFluidHandlerItem;
+import thaumcraft.api.ThaumcraftApiHelper;
 import thaumcraft.common.Thaumcraft;
 import thaumcraft.common.CommonProxy;
 import thaumcraft.common.items.baubles.ItemAmuletVis;
@@ -229,9 +233,16 @@ extends BlockContainer {
             }
             return false;
         }
-        if (te instanceof TileFocalManipulator) {
+        if (state.getValue(TYPE) == 13 && te instanceof TileFocalManipulator) {
+            if (playerIn.isSneaking()) return false;
             if (!worldIn.isRemote) {
-                playerIn.openGui(Thaumcraft.instance, CommonProxy.GUI_FOCAL_MANIPULATOR, worldIn, pos.getX(), pos.getY(), pos.getZ());
+                if (ThaumcraftApiHelper.isResearchComplete(playerIn.getName(), "FOCALMANIPULATION")) {
+                    playerIn.openGui(Thaumcraft.instance, CommonProxy.GUI_FOCAL_MANIPULATOR, worldIn,
+                            pos.getX(), pos.getY(), pos.getZ());
+                } else {
+                    playerIn.sendMessage(new TextComponentTranslation("tc.researchmissing")
+                            .setStyle(new Style().setColor(TextFormatting.RED)));
+                }
             }
             return true;
         }

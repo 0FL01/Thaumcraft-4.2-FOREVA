@@ -29,9 +29,10 @@ public class GuiFocalManipulatorLayoutStaticGuardTest {
                         && source.contains("if (canStartUpgrade() && isMouseIn(mouseX, mouseY, START_X, START_Y, START_WIDTH, START_HEIGHT))"));
         assertTrue("Start click must keep the vanilla enchant-packet route",
                 source.contains("this.mc.playerController.sendEnchantPacket(this.inventorySlots.windowId, this.selected);"));
-        assertTrue("Creative players must be allowed to start without experience",
-                source.contains("this.mc.player.capabilities.isCreativeMode")
-                        && source.contains("this.mc.player.experienceLevel >= required"));
+        assertTrue("All players must possess the displayed experience level",
+                source.contains("this.mc.player.experienceLevel >= required"));
+        assertFalse("Creative mode must not bypass the experience prerequisite",
+                source.contains("this.mc.player.capabilities.isCreativeMode"));
 
         assertTrue("Selected upgrades must use the original 200,0 texture highlight",
                 source.contains("this.drawTexturedModalRect(x, y, 200, 0, OPTION_SIZE, OPTION_SIZE);"));

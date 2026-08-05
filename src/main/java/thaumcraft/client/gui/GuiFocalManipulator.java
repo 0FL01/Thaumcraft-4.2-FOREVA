@@ -298,8 +298,7 @@ public class GuiFocalManipulator extends GuiContainer {
     }
 
     private boolean hasEnoughExperience(int required) {
-        return this.mc.player != null && (this.mc.player.capabilities.isCreativeMode
-                || this.mc.player.experienceLevel >= required);
+        return this.mc.player != null && this.mc.player.experienceLevel >= required;
     }
 
     private boolean isMouseIn(int mouseX, int mouseY, int x, int y, int width, int height) {

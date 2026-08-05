@@ -1,10 +1,11 @@
 package thaumcraft.common.tiles;
 
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.inventory.IInventory;
+import net.minecraft.inventory.ISidedInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ITickable;
 import net.minecraft.util.SoundCategory;
 import thaumcraft.api.TileThaumcraft;
@@ -15,7 +16,8 @@ import thaumcraft.api.wands.FocusUpgradeType;
 import thaumcraft.api.wands.ItemFocusBasic;
 import thaumcraft.common.lib.TCSounds;
 
-public class TileFocalManipulator extends TileThaumcraft implements ITickable, IInventory {
+public class TileFocalManipulator extends TileThaumcraft implements ITickable, ISidedInventory {
+    private static final int[] SLOTS = new int[]{0};
     public AspectList aspects = new AspectList();
     public int size = 0;
     public int upgrade = -1;
@@ -88,7 +90,7 @@ public class TileFocalManipulator extends TileThaumcraft implements ITickable, I
         if (this.rank > 5) return false;
 
         int xp = this.rank * XP_MULT;
-        if (player.experienceLevel < xp && !player.capabilities.isCreativeMode) return false;
+        if (player.experienceLevel < xp) return false;
 
         FocusUpgradeType[] allowed = focus.getPossibleUpgradesByRank(focusStack, this.rank);
         if (allowed == null) return false;
@@ -211,7 +213,7 @@ public class TileFocalManipulator extends TileThaumcraft implements ITickable, I
 
     @Override
     public void setInventorySlotContents(int index, ItemStack stack) {
-        if (index != 0) return;
+        if (index != 0 || (this.size > 0 && !stack.isEmpty())) return;
         this.itemStacks[0] = stack;
         this.aspects = new AspectList();
         this.reset = this.world != null && this.world.isRemote;
@@ -254,7 +256,22 @@ public class TileFocalManipulator extends TileThaumcraft implements ITickable, I
 
     @Override
     public boolean isItemValidForSlot(int index, ItemStack stack) {
-        return index == 0 && !stack.isEmpty() && stack.getItem() instanceof ItemFocusBasic;
+        return this.size <= 0 && index == 0 && !stack.isEmpty() && stack.getItem() instanceof ItemFocusBasic;
+    }
+
+    @Override
+    public int[] getSlotsForFace(EnumFacing side) {
+        return SLOTS;
+    }
+
+    @Override
+    public boolean canInsertItem(int index, ItemStack stack, EnumFacing direction) {
+        return this.itemStacks[0].isEmpty() && this.isItemValidForSlot(index, stack);
+    }
+
+    @Override
+    public boolean canExtractItem(int index, ItemStack stack, EnumFacing direction) {
+        return index == 0;
     }
 
     @Override

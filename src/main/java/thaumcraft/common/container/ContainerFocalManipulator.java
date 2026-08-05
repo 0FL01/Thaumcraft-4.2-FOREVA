@@ -22,7 +22,12 @@ public class ContainerFocalManipulator extends Container {
     public ContainerFocalManipulator(InventoryPlayer playerInventory, TileFocalManipulator table) {
         this.table = table;
         if (table != null) {
-            this.addSlotToContainer(new SlotLimitedByClass(ItemFocusBasic.class, table, 0, 88, 60, 1));
+            this.addSlotToContainer(new SlotLimitedByClass(ItemFocusBasic.class, table, 0, 88, 60, 1) {
+                @Override
+                public boolean isItemValid(ItemStack stack) {
+                    return super.isItemValid(stack) && table.isItemValidForSlot(0, stack);
+                }
+            });
         }
         if (playerInventory != null) {
             for (int row = 0; row < 3; ++row) {
@@ -68,6 +73,7 @@ public class ContainerFocalManipulator extends Container {
         if (index == 0) {
             if (!this.mergeItemStack(stack, 1, this.inventorySlots.size(), false)) return ItemStack.EMPTY;
         } else if (stack.getItem() instanceof ItemFocusBasic) {
+            if (this.table != null && this.table.size > 0) return ItemStack.EMPTY;
             if (!this.mergeItemStack(stack, 0, 1, false)) return ItemStack.EMPTY;
         } else if (index >= 1 && index < 28) {
             if (!this.mergeItemStack(stack, 28, 37, false)) return ItemStack.EMPTY;
