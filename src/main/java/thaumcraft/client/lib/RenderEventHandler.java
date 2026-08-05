@@ -48,11 +48,13 @@ import net.minecraftforge.oredict.OreDictionary;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL14;
 import thaumcraft.api.IGoggles;
+import thaumcraft.api.IArchitect;
 import thaumcraft.api.aspects.Aspect;
 import thaumcraft.api.aspects.AspectList;
 import thaumcraft.api.aspects.IAspectContainer;
 import thaumcraft.api.nodes.INode;
 import thaumcraft.api.research.ScanResult;
+import thaumcraft.api.wands.ItemFocusBasic;
 import thaumcraft.client.renderers.item.FirstPersonWandTipOrigin;
 import thaumcraft.client.renderers.item.ItemThaumometerRenderer;
 import thaumcraft.client.renderers.tile.HoleRenderBatchCache;
@@ -397,32 +399,37 @@ public class RenderEventHandler {
     @SubscribeEvent
     public void blockHighlight(DrawBlockHighlightEvent event) {
         EntityPlayer player = event.getPlayer();
-        if (!canShowGogglesPopups(player)) {
-            return;
-        }
         RayTraceResult target = event.getTarget();
-        if (target == null || target.typeOfHit != RayTraceResult.Type.BLOCK || target.getBlockPos() == null) {
-            return;
-        }
-        TileEntity tile = player.world.getTileEntity(target.getBlockPos());
-        if (!(tile instanceof IAspectContainer) || tile instanceof INode) {
-            return;
-        }
-        AspectList aspects = resolveAspectTags(tile);
-        if (aspects == null || aspects.size() <= 0) {
+        if (player == null || target == null || target.typeOfHit != RayTraceResult.Type.BLOCK
+                || target.getBlockPos() == null || target.sideHit == null) {
             return;
         }
 
-        BlockPos pos = target.getBlockPos();
-        EnumFacing side = target.sideHit == null ? EnumFacing.UP : target.sideHit;
-        boolean spaceAbove = player.world.isAirBlock(pos.up());
-        double x = pos.getX() + 0.5D + side.getXOffset() * 0.55D;
-        double y = pos.getY() + 0.5D + side.getYOffset() * 0.55D;
-        double z = pos.getZ() + 0.5D + side.getZOffset() * 0.55D;
-        if (spaceAbove) {
-            y = Math.max(y, pos.getY() + 1.15D);
+        if (canShowGogglesPopups(player)) {
+            TileEntity tile = player.world.getTileEntity(target.getBlockPos());
+            if (tile instanceof IAspectContainer && !(tile instanceof INode)) {
+                AspectList aspects = resolveAspectTags(tile);
+                if (aspects != null && aspects.size() > 0) {
+                    BlockPos pos = target.getBlockPos();
+                    EnumFacing side = target.sideHit;
+                    boolean spaceAbove = player.world.isAirBlock(pos.up());
+                    double x = pos.getX() + 0.5D + side.getXOffset() * 0.55D;
+                    double y = pos.getY() + 0.5D + side.getYOffset() * 0.55D;
+                    double z = pos.getZ() + 0.5D + side.getZOffset() * 0.55D;
+                    if (spaceAbove) {
+                        y = Math.max(y, pos.getY() + 1.15D);
+                    }
+                    drawTagsOnContainer(x, y, z, aspects, 220, side, event.getPartialTicks());
+                }
+            }
         }
-        drawTagsOnContainer(x, y, z, aspects, 220, side, event.getPartialTicks());
+
+        ItemStack held = player.getHeldItemMainhand();
+        if (!held.isEmpty() && held.getItem() instanceof IArchitect
+                && !(held.getItem() instanceof ItemFocusBasic)
+                && this.wandHandler.handleArchitectOverlay(held, event, player.ticksExisted, target)) {
+            event.setCanceled(true);
+        }
     }
 
     @SubscribeEvent

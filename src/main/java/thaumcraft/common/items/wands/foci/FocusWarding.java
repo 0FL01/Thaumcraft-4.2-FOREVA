@@ -5,6 +5,8 @@ import java.util.HashMap;
 import java.util.Map;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
@@ -16,6 +18,8 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import thaumcraft.api.BlockCoordinates;
 import thaumcraft.api.IArchitect;
 import thaumcraft.api.aspects.Aspect;
@@ -32,6 +36,8 @@ import thaumcraft.common.tiles.TileWarded;
 
 public class FocusWarding extends ItemFocusBasic implements IArchitect {
 
+    private static final String DEPTH_SPRITE = "thaumcraft:items/focus_warding_depth";
+    private static final String ORNAMENT_SPRITE = "thaumcraft:items/focus_warding_orn";
     private static final Map<String, Long> DELAY = new HashMap<>();
     private final ArrayList<BlockCoordinates> checked = new ArrayList<>();
 
@@ -42,7 +48,19 @@ public class FocusWarding extends ItemFocusBasic implements IArchitect {
 
     @Override
     public int getFocusColor(ItemStack stack) {
-        return 0xFFEFAF;
+        return 0xFFE9CF;
+    }
+
+    @Override
+    @SideOnly(Side.CLIENT)
+    public TextureAtlasSprite getFocusDepthLayerIcon(ItemStack stack) {
+        return Minecraft.getMinecraft().getTextureMapBlocks().getAtlasSprite(DEPTH_SPRITE);
+    }
+
+    @Override
+    @SideOnly(Side.CLIENT)
+    public TextureAtlasSprite getOrnament(ItemStack stack) {
+        return Minecraft.getMinecraft().getTextureMapBlocks().getAtlasSprite(ORNAMENT_SPRITE);
     }
 
     @Override

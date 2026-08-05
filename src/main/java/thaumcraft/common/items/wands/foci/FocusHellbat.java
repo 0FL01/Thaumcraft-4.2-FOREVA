@@ -42,7 +42,7 @@ public class FocusHellbat extends ItemFocusBasic {
 
     @Override
     public int getFocusColor(ItemStack stack) {
-        return 0xFF0000;
+        return 0xDC3602;
     }
 
     @Override

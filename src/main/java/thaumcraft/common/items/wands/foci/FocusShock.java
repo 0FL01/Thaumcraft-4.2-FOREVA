@@ -42,7 +42,7 @@ public class FocusShock extends ItemFocusBasic {
 
     @Override
     public int getFocusColor(ItemStack stack) {
-        return 0xFFFF7E;
+        return 0x9FB3BF;
     }
 
     @Override

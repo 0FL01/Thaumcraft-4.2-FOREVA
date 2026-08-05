@@ -34,7 +34,7 @@ public class FocusFire extends ItemFocusBasic {
 
     @Override
     public int getFocusColor(ItemStack stack) {
-        return 0xFF4500;
+        return 0xE55104;
     }
 
     @Override

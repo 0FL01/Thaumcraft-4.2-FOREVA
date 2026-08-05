@@ -7,10 +7,19 @@ import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.RenderItem;
+import net.minecraft.client.renderer.BufferBuilder;
+import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.client.renderer.texture.TextureMap;
+import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.client.util.ITooltipFlag;
+import net.minecraftforge.client.event.DrawBlockHighlightEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -18,6 +27,8 @@ import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
 import thaumcraft.api.wands.ItemFocusBasic;
+import thaumcraft.api.BlockCoordinates;
+import thaumcraft.api.IArchitect;
 import thaumcraft.api.aspects.Aspect;
 import thaumcraft.api.aspects.AspectList;
 import thaumcraft.common.config.Config;
@@ -27,10 +38,15 @@ import thaumcraft.common.items.wands.WandManager;
 import thaumcraft.common.items.wands.foci.FocusTrade;
 import thaumcraft.common.lib.network.PacketHandler;
 import thaumcraft.common.lib.network.misc.PacketFocusChangeToServer;
+import thaumcraft.common.lib.utils.ConnectedTextureUtils;
 
 import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.TreeMap;
 
 @SideOnly(Side.CLIENT)
@@ -50,6 +66,20 @@ public class REHWandHandler {
     private final int[][] oldVis = new int[9][6];
     private final boolean[] oldVisValid = new boolean[9];
     private long nextVisSnapshot = 0L;
+    private static final String ARCHITECT_ARROW_TEXTURE = "textures/misc/architect_arrows.png";
+    private final ArchitectRefreshLimiter architectRefreshLimiter = new ArchitectRefreshLimiter();
+    private List<BlockCoordinates> architectBlocks = Collections.emptyList();
+    private Set<BlockPos> architectBlockSet = Collections.emptySet();
+    private EntityPlayer architectPlayer;
+    private Object architectWorld;
+    private ItemStack architectWandStack;
+    private ItemStack architectFocusStack = ItemStack.EMPTY;
+    private BlockPos architectTarget;
+    private int architectSide = -1;
+    private int architectAreaX;
+    private int architectAreaY;
+    private int architectAreaZ;
+    private int architectAreaDim;
 
     public void handleCastingWandHud(Minecraft mc, long time, RenderGameOverlayEvent event) {
         if (mc.player == null || !mc.inGameHasFocus || mc.isGamePaused()) {
@@ -207,6 +237,269 @@ public class REHWandHandler {
             oldVis[slot][i] = vis.getAmount(primals.get(i));
         }
         oldVisValid[slot] = true;
+    }
+
+    public boolean handleArchitectOverlay(ItemStack stack, DrawBlockHighlightEvent event, int playerTicks,
+                                          RayTraceResult target) {
+        if (stack.isEmpty() || !(stack.getItem() instanceof IArchitect) || target.getBlockPos() == null
+                || target.sideHit == null) {
+            return false;
+        }
+
+        EntityPlayer player = event.getPlayer();
+        IArchitect architect = (IArchitect) stack.getItem();
+        ItemStack focusStack = ItemStack.EMPTY;
+        int areaX = 0;
+        int areaY = 0;
+        int areaZ = 0;
+        int areaDim = 0;
+        if (stack.getItem() instanceof ItemWandCasting) {
+            ItemWandCasting wand = (ItemWandCasting) stack.getItem();
+            ItemFocusBasic focus = wand.getFocus(stack);
+            focusStack = wand.getFocusItem(stack);
+            if (focus != null && !focusStack.isEmpty()) {
+                int max = focus.getMaxAreaSize(focusStack);
+                areaX = WandManager.getAreaX(stack, max);
+                areaY = WandManager.getAreaY(stack, max);
+                areaZ = WandManager.getAreaZ(stack, max);
+                areaDim = WandManager.getAreaDim(stack);
+            }
+        }
+
+        BlockPos targetPos = target.getBlockPos().toImmutable();
+        int side = target.sideHit.getIndex();
+        boolean contextChanged = player != this.architectPlayer
+                || player.world != this.architectWorld
+                || stack != this.architectWandStack
+                || !ItemStack.areItemStacksEqual(focusStack, this.architectFocusStack)
+                || !targetPos.equals(this.architectTarget)
+                || side != this.architectSide
+                || areaX != this.architectAreaX
+                || areaY != this.architectAreaY
+                || areaZ != this.architectAreaZ
+                || areaDim != this.architectAreaDim;
+        if (contextChanged) {
+            this.architectPlayer = player;
+            this.architectWorld = player.world;
+            this.architectWandStack = stack;
+            this.architectFocusStack = focusStack.copy();
+            this.architectTarget = targetPos;
+            this.architectSide = side;
+            this.architectAreaX = areaX;
+            this.architectAreaY = areaY;
+            this.architectAreaZ = areaZ;
+            this.architectAreaDim = areaDim;
+            this.architectBlocks = Collections.emptyList();
+            this.architectBlockSet = Collections.emptySet();
+        }
+
+        if (this.architectRefreshLimiter.shouldRefresh(playerTicks)) {
+            ArrayList<BlockCoordinates> blocks = architect.getArchitectBlocks(stack, player.world,
+                    targetPos.getX(), targetPos.getY(), targetPos.getZ(), side, player);
+            if (blocks == null || blocks.isEmpty()) {
+                this.architectBlocks = Collections.emptyList();
+                this.architectBlockSet = Collections.emptySet();
+            } else {
+                this.architectBlocks = new ArrayList<>(blocks);
+                Set<BlockPos> positions = new HashSet<>(blocks.size());
+                for (BlockCoordinates coordinates : blocks) {
+                    positions.add(new BlockPos(coordinates.x, coordinates.y, coordinates.z));
+                }
+                this.architectBlockSet = positions;
+            }
+        }
+
+        if (this.architectBlocks.isEmpty()) {
+            return false;
+        }
+        drawArchitectAxis(targetPos, event.getPartialTicks(), player,
+                architect.showAxis(stack, player.world, player, side, IArchitect.EnumAxis.X),
+                architect.showAxis(stack, player.world, player, side, IArchitect.EnumAxis.Y),
+                architect.showAxis(stack, player.world, player, side, IArchitect.EnumAxis.Z));
+        drawArchitectBlocks(playerTicks, event.getPartialTicks(), player);
+        GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+        return true;
+    }
+
+    private void drawArchitectBlocks(int ticks, float partialTicks, EntityPlayer player) {
+        double playerX = player.lastTickPosX + (player.posX - player.lastTickPosX) * partialTicks;
+        double playerY = player.lastTickPosY + (player.posY - player.lastTickPosY) * partialTicks;
+        double playerZ = player.lastTickPosZ + (player.posZ - player.lastTickPosZ) * partialTicks;
+        Minecraft mc = Minecraft.getMinecraft();
+
+        GL11.glPushAttrib(GL11.GL_ALL_ATTRIB_BITS);
+        GlStateManager.pushMatrix();
+        try {
+            GlStateManager.translate(-playerX, -playerY, -playerZ);
+            GlStateManager.depthMask(false);
+            GlStateManager.disableDepth();
+            GlStateManager.disableCull();
+            GlStateManager.disableLighting();
+            GlStateManager.enableBlend();
+            GlStateManager.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE);
+            GlStateManager.alphaFunc(GL11.GL_GREATER, 0.003921569F);
+            mc.getTextureManager().bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
+
+            BufferBuilder buffer = Tessellator.getInstance().getBuffer();
+            buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX_COLOR);
+            for (BlockPos pos : this.architectBlockSet) {
+                float red = MathHelper.sin(ticks / 2.0F + pos.getX()) * 0.2F + 0.3F;
+                float green = MathHelper.sin(ticks / 3.0F + pos.getY()) * 0.2F + 0.3F;
+                float blue = MathHelper.sin(ticks / 4.0F + pos.getZ()) * 0.2F + 0.8F;
+                for (EnumFacing face : EnumFacing.VALUES) {
+                    if (!isArchitectFaceExterior(this.architectBlockSet, pos, face)) {
+                        continue;
+                    }
+                    int texture = ConnectedTextureUtils.getTextureIndex(pos, face.getIndex(),
+                            this.architectBlockSet::contains);
+                    TextureAtlasSprite sprite = mc.getTextureMapBlocks().getAtlasSprite(
+                            "thaumcraft:blocks/warded_glass_" + (texture + 1));
+                    addArchitectFace(buffer, pos, face, sprite, red, green, blue);
+                }
+            }
+            Tessellator.getInstance().draw();
+        } finally {
+            GlStateManager.popMatrix();
+            GL11.glPopAttrib();
+        }
+    }
+
+    static boolean isArchitectFaceExterior(Set<BlockPos> blocks, BlockPos pos, EnumFacing face) {
+        return !blocks.contains(pos.offset(face));
+    }
+
+    private static void addArchitectFace(BufferBuilder buffer, BlockPos pos, EnumFacing face,
+                                         TextureAtlasSprite sprite, float red, float green, float blue) {
+        double minX = pos.getX() - 0.001D;
+        double minY = pos.getY() - 0.001D;
+        double minZ = pos.getZ() - 0.001D;
+        double maxX = pos.getX() + 1.001D;
+        double maxY = pos.getY() + 1.001D;
+        double maxZ = pos.getZ() + 1.001D;
+        float minU = sprite.getMinU();
+        float maxU = sprite.getMaxU();
+        float minV = sprite.getMinV();
+        float maxV = sprite.getMaxV();
+        switch (face) {
+            case DOWN:
+                addArchitectVertex(buffer, minX, minY, maxZ, minU, maxV, red, green, blue);
+                addArchitectVertex(buffer, maxX, minY, maxZ, maxU, maxV, red, green, blue);
+                addArchitectVertex(buffer, maxX, minY, minZ, maxU, minV, red, green, blue);
+                addArchitectVertex(buffer, minX, minY, minZ, minU, minV, red, green, blue);
+                break;
+            case UP:
+                addArchitectVertex(buffer, minX, maxY, minZ, minU, maxV, red, green, blue);
+                addArchitectVertex(buffer, maxX, maxY, minZ, maxU, maxV, red, green, blue);
+                addArchitectVertex(buffer, maxX, maxY, maxZ, maxU, minV, red, green, blue);
+                addArchitectVertex(buffer, minX, maxY, maxZ, minU, minV, red, green, blue);
+                break;
+            case NORTH:
+                addArchitectVertex(buffer, maxX, minY, minZ, minU, maxV, red, green, blue);
+                addArchitectVertex(buffer, minX, minY, minZ, maxU, maxV, red, green, blue);
+                addArchitectVertex(buffer, minX, maxY, minZ, maxU, minV, red, green, blue);
+                addArchitectVertex(buffer, maxX, maxY, minZ, minU, minV, red, green, blue);
+                break;
+            case SOUTH:
+                addArchitectVertex(buffer, minX, minY, maxZ, minU, maxV, red, green, blue);
+                addArchitectVertex(buffer, maxX, minY, maxZ, maxU, maxV, red, green, blue);
+                addArchitectVertex(buffer, maxX, maxY, maxZ, maxU, minV, red, green, blue);
+                addArchitectVertex(buffer, minX, maxY, maxZ, minU, minV, red, green, blue);
+                break;
+            case WEST:
+                addArchitectVertex(buffer, minX, minY, minZ, minU, maxV, red, green, blue);
+                addArchitectVertex(buffer, minX, minY, maxZ, maxU, maxV, red, green, blue);
+                addArchitectVertex(buffer, minX, maxY, maxZ, maxU, minV, red, green, blue);
+                addArchitectVertex(buffer, minX, maxY, minZ, minU, minV, red, green, blue);
+                break;
+            case EAST:
+                addArchitectVertex(buffer, maxX, minY, maxZ, minU, maxV, red, green, blue);
+                addArchitectVertex(buffer, maxX, minY, minZ, maxU, maxV, red, green, blue);
+                addArchitectVertex(buffer, maxX, maxY, minZ, maxU, minV, red, green, blue);
+                addArchitectVertex(buffer, maxX, maxY, maxZ, minU, minV, red, green, blue);
+                break;
+        }
+    }
+
+    private static void addArchitectVertex(BufferBuilder buffer, double x, double y, double z, float u, float v,
+                                           float red, float green, float blue) {
+        buffer.pos(x, y, z).tex(u, v).color(red, green, blue, 0.2F).endVertex();
+    }
+
+    private static void drawArchitectAxis(BlockPos pos, float partialTicks, EntityPlayer player,
+                                          boolean showX, boolean showY, boolean showZ) {
+        if (!showX && !showY && !showZ) {
+            return;
+        }
+        double playerX = player.lastTickPosX + (player.posX - player.lastTickPosX) * partialTicks;
+        double playerY = player.lastTickPosY + (player.posY - player.lastTickPosY) * partialTicks;
+        double playerZ = player.lastTickPosZ + (player.posZ - player.lastTickPosZ) * partialTicks;
+        float red = MathHelper.sin(player.ticksExisted / 4.0F + pos.getX()) * 0.2F + 0.3F;
+        float green = MathHelper.sin(player.ticksExisted / 3.0F + pos.getY()) * 0.2F + 0.3F;
+        float blue = MathHelper.sin(player.ticksExisted / 2.0F + pos.getZ()) * 0.2F + 0.8F;
+
+        GL11.glPushAttrib(GL11.GL_ALL_ATTRIB_BITS);
+        GlStateManager.pushMatrix();
+        try {
+            GlStateManager.depthMask(false);
+            GlStateManager.disableDepth();
+            GlStateManager.disableCull();
+            GlStateManager.enableBlend();
+            GlStateManager.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE);
+            GlStateManager.translate(pos.getX() + 0.5D - playerX, pos.getY() + 0.5D - playerY,
+                    pos.getZ() + 0.5D - playerZ);
+            UtilsFX.bindTexture(ARCHITECT_ARROW_TEXTURE);
+            GlStateManager.rotate(90.0F, 1.0F, 0.0F, 0.0F);
+            if (showX) {
+                drawArchitectArrow(red, green, blue);
+                GlStateManager.pushMatrix();
+                GlStateManager.rotate(90.0F, 1.0F, 0.0F, 0.0F);
+                drawArchitectArrow(red, green, blue);
+                GlStateManager.popMatrix();
+            }
+            if (showZ) {
+                GlStateManager.pushMatrix();
+                GlStateManager.rotate(90.0F, 0.0F, 0.0F, 1.0F);
+                drawArchitectArrow(red, green, blue);
+                GlStateManager.rotate(90.0F, 1.0F, 0.0F, 0.0F);
+                drawArchitectArrow(red, green, blue);
+                GlStateManager.popMatrix();
+            }
+            if (showY) {
+                GlStateManager.pushMatrix();
+                GlStateManager.rotate(90.0F, 0.0F, 1.0F, 0.0F);
+                drawArchitectArrow(red, green, blue);
+                GlStateManager.rotate(90.0F, 1.0F, 0.0F, 0.0F);
+                drawArchitectArrow(red, green, blue);
+                GlStateManager.popMatrix();
+            }
+        } finally {
+            GlStateManager.popMatrix();
+            GL11.glPopAttrib();
+        }
+    }
+
+    private static void drawArchitectArrow(float red, float green, float blue) {
+        BufferBuilder buffer = Tessellator.getInstance().getBuffer();
+        buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX_COLOR);
+        buffer.pos(-0.5D, 0.5D, 0.0D).tex(0.0D, 1.0D).color(red, green, blue, 0.33F).endVertex();
+        buffer.pos(0.5D, 0.5D, 0.0D).tex(1.0D, 1.0D).color(red, green, blue, 0.33F).endVertex();
+        buffer.pos(0.5D, -0.5D, 0.0D).tex(1.0D, 0.0D).color(red, green, blue, 0.33F).endVertex();
+        buffer.pos(-0.5D, -0.5D, 0.0D).tex(0.0D, 0.0D).color(red, green, blue, 0.33F).endVertex();
+        Tessellator.getInstance().draw();
+    }
+
+    static final class ArchitectRefreshLimiter {
+        static final int REFRESH_TICKS = 5;
+        private int lastRefreshTick = Integer.MIN_VALUE;
+
+        boolean shouldRefresh(int playerTicks) {
+            if (this.lastRefreshTick == Integer.MIN_VALUE || playerTicks < this.lastRefreshTick
+                    || playerTicks - this.lastRefreshTick >= REFRESH_TICKS) {
+                this.lastRefreshTick = playerTicks;
+                return true;
+            }
+            return false;
+        }
     }
 
     public void handleFociRadial(Minecraft mc, long time, RenderGameOverlayEvent event) {

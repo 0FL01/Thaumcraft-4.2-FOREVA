@@ -43,6 +43,12 @@ public final class ClientModelRegistry {
             new ModelResourceLocation("thaumcraft:blockcosmeticopaque", "type=2");
     static final ResourceLocation FOCUS_PECH_DEPTH_SPRITE =
             new ResourceLocation("thaumcraft", "items/focus_pech_depth");
+    static final ResourceLocation FOCUS_WARDING_DEPTH_SPRITE =
+            new ResourceLocation("thaumcraft", "items/focus_warding_depth");
+    static final ResourceLocation FOCUS_WARDING_ORNAMENT_SPRITE =
+            new ResourceLocation("thaumcraft", "items/focus_warding_orn");
+    static final ResourceLocation FOCUS_TRADE_ORNAMENT_SPRITE =
+            new ResourceLocation("thaumcraft", "items/focus_trade_orn");
     static final ResourceLocation FROST_SHARD_SPRITE =
             new ResourceLocation("thaumcraft", "blocks/frostshard");
     static final ResourceLocation PIPE_VALVE_SPRITE =
@@ -73,6 +79,9 @@ public final class ClientModelRegistry {
     @SubscribeEvent
     public static void onTextureStitchPre(TextureStitchEvent.Pre event) {
         event.getMap().registerSprite(FOCUS_PECH_DEPTH_SPRITE);
+        event.getMap().registerSprite(FOCUS_WARDING_DEPTH_SPRITE);
+        event.getMap().registerSprite(FOCUS_WARDING_ORNAMENT_SPRITE);
+        event.getMap().registerSprite(FOCUS_TRADE_ORNAMENT_SPRITE);
         event.getMap().registerSprite(FROST_SHARD_SPRITE);
         event.getMap().registerSprite(PIPE_VALVE_SPRITE);
         event.getMap().registerSprite(ADVANCED_FURNACE_FLUXGOO_SPRITE);
