@@ -9,6 +9,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import thaumcraft.api.wands.FocusUpgradeType;
 import thaumcraft.api.wands.ItemFocusBasic;
+import thaumcraft.client.lib.UtilsFX;
 import thaumcraft.common.container.ContainerArcaneBore;
 import thaumcraft.common.items.equipment.ItemElementalPickaxe;
 import thaumcraft.common.items.wands.foci.FocusExcavation;
@@ -52,21 +53,21 @@ public class GuiArcaneBore extends GuiContainer {
         GlStateManager.pushMatrix();
         GlStateManager.translate((float) (this.guiLeft + 112), (float) (this.guiTop + 8), 505.0F);
         GlStateManager.scale(0.5F, 0.5F, 0.0F);
-        this.fontRenderer.drawString("Width: " + (1 + (this.bore.area + this.bore.maxRadius) * 2), 0, 0, 0xFFFFFF);
-        this.fontRenderer.drawString("Speed: +" + this.bore.speed, 0, 10, 0xFFFFFF);
-        this.fontRenderer.drawString("Other properties:", 0, 24, 0xFFFFFF);
+        UtilsFX.drawCompactString(this.fontRenderer, "Width: " + (1 + (this.bore.area + this.bore.maxRadius) * 2), 0, 0, 0xFFFFFF);
+        UtilsFX.drawCompactString(this.fontRenderer, "Speed: +" + this.bore.speed, 0, 10, 0xFFFFFF);
+        UtilsFX.drawCompactString(this.fontRenderer, "Other properties:", 0, 24, 0xFFFFFF);
 
         int offset = 0;
         if (hasNativeClusters(pickaxe)) {
-            this.fontRenderer.drawString("Native Clusters", 4, 34 + offset, 0xC0C0C0);
+            UtilsFX.drawCompactString(this.fontRenderer, "Native Clusters", 4, 34 + offset, 0xC0C0C0);
             offset += 9;
         }
         if (this.bore.fortune > 0) {
-            this.fontRenderer.drawString("Fortune " + this.bore.fortune, 4, 34 + offset, 0xEECACA);
+            UtilsFX.drawCompactString(this.fontRenderer, "Fortune " + this.bore.fortune, 4, 34 + offset, 0xEECACA);
             offset += 9;
         }
         if (hasSilkTouch(pickaxe)) {
-            this.fontRenderer.drawString("Silk Touch", 4, 34 + offset, 0x8080FF);
+            UtilsFX.drawCompactString(this.fontRenderer, "Silk Touch", 4, 34 + offset, 0x8080FF);
         }
         GlStateManager.popMatrix();
     }

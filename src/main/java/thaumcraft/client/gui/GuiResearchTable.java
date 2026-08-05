@@ -127,7 +127,8 @@ public class GuiResearchTable extends GuiContainer {
                 }
                 int count = 0;
                 for (Aspect aspect : al.getAspectsSorted()) {
-                    UtilsFX.drawTag(gx + 100 + 48 + count * 16, gy + 21, aspect, (float) al.getAmount(aspect), 0, this.zLevel, 771, 1.0f, false);
+                    UtilsFX.drawTag(gx + 100 + 48 + count * 16, gy + 21, aspect,
+                            (float) al.getAmount(aspect), 0, this.zLevel, 771, 1.0f, false, true);
                     ++count;
                 }
                 GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
@@ -258,7 +259,8 @@ public class GuiResearchTable extends GuiContainer {
                 int xx = drawn / 5 * 16;
                 int yy = drawn % 5 * 16;
                 UtilsFX.drawTag(x + xx, y + yy, aspect, (float) aspects.getAmount(aspect),
-                        this.tileEntity.bonusAspects.getAmount(aspect), this.zLevel, 771, faded ? 0.33f : 1.0f, false);
+                        this.tileEntity.bonusAspects.getAmount(aspect), this.zLevel, 771,
+                        faded ? 0.33f : 1.0f, false, true);
                 ++drawn;
             }
         }

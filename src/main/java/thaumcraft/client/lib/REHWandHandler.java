@@ -157,11 +157,11 @@ public class REHWandHandler {
                 if (mc.player.isSneaking()) {
                     GlStateManager.rotate(-90.0F, 0.0F, 0.0F, 1.0F);
                     String stored = Integer.toString(amount / 100);
-                    mc.fontRenderer.drawString(stored, -32, -4, 0xFFFFFF);
+                    UtilsFX.drawCompactString(mc.fontRenderer, stored, -32, -4, 0xFFFFFF);
                     if (usedByFocus) {
                         float cost = focusCost.getAmount(aspect)
                                 * ItemWandCasting.getConsumptionModifier(held, mc.player, aspect, false) / 100.0F;
-                        mc.fontRenderer.drawString(VIS_FORMAT.format(cost), 8, -4, 0xFFFFFF);
+                        UtilsFX.drawCompactString(mc.fontRenderer, VIS_FORMAT.format(cost), 8, -4, 0xFFFFFF);
                     }
                 }
                 GlStateManager.popMatrix();
@@ -202,11 +202,11 @@ public class REHWandHandler {
         }
         if (count >= 0) {
             String text = Integer.toString(count);
-            int width = mc.fontRenderer.getStringWidth(text);
+            int width = UtilsFX.getCompactStringWidth(mc.fontRenderer, text);
             GlStateManager.pushMatrix();
             GlStateManager.translate(0.0F, -mc.fontRenderer.FONT_HEIGHT, 500.0F);
             GlStateManager.scale(0.5F, 0.5F, 0.5F);
-            mc.fontRenderer.drawString(text, 16 - width, 24, 0xFFFFFF);
+            UtilsFX.drawCompactString(mc.fontRenderer, text, 16 - width, 24, 0xFFFFFF);
             GlStateManager.popMatrix();
         }
         float cooldown = WandManager.getCooldown(mc.player);
@@ -215,7 +215,7 @@ public class REHWandHandler {
             GlStateManager.pushMatrix();
             GlStateManager.translate(0.0F, 0.0F, 150.0F);
             GlStateManager.scale(0.5F, 0.5F, 0.5F);
-            mc.fontRenderer.drawString(text, -mc.fontRenderer.getStringWidth(text) / 2, -4, 0xFFFFFF);
+            UtilsFX.drawCompactCenteredString(mc.fontRenderer, text, 0.0F, -4, 0xFFFFFF);
             GlStateManager.popMatrix();
         }
         GlStateManager.popMatrix();

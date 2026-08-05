@@ -628,15 +628,15 @@ public class RenderEventHandler {
                     GlStateManager.scale(0.5F, 0.5F, 0.5F);
                     GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
                     String amountText = Integer.toString(amount);
-                    int width = mc.fontRenderer.getStringWidth(amountText);
-                    if (blend > 1) {
-                        mc.fontRenderer.drawString(amountText, 31 - width + x * 2, 32 - mc.fontRenderer.FONT_HEIGHT + y * 2, 0);
-                        mc.fontRenderer.drawString(amountText, 33 - width + x * 2, 32 - mc.fontRenderer.FONT_HEIGHT + y * 2, 0);
-                        mc.fontRenderer.drawString(amountText, 32 - width + x * 2, 31 - mc.fontRenderer.FONT_HEIGHT + y * 2, 0);
-                        mc.fontRenderer.drawString(amountText, 32 - width + x * 2, 33 - mc.fontRenderer.FONT_HEIGHT + y * 2, 0);
-                    }
-                    mc.fontRenderer.drawString(amountText, 32 - width + x * 2,
-                            32 - mc.fontRenderer.FONT_HEIGHT + y * 2, 0xFFFFFF);
+                int width = UtilsFX.getCompactStringWidth(mc.fontRenderer, amountText);
+                if (blend > 1) {
+                    UtilsFX.drawCompactString(mc.fontRenderer, amountText, 31 - width + x * 2, 32 - mc.fontRenderer.FONT_HEIGHT + y * 2, 0);
+                    UtilsFX.drawCompactString(mc.fontRenderer, amountText, 33 - width + x * 2, 32 - mc.fontRenderer.FONT_HEIGHT + y * 2, 0);
+                    UtilsFX.drawCompactString(mc.fontRenderer, amountText, 32 - width + x * 2, 31 - mc.fontRenderer.FONT_HEIGHT + y * 2, 0);
+                    UtilsFX.drawCompactString(mc.fontRenderer, amountText, 32 - width + x * 2, 33 - mc.fontRenderer.FONT_HEIGHT + y * 2, 0);
+                }
+                UtilsFX.drawCompactString(mc.fontRenderer, amountText, 32 - width + x * 2,
+                        32 - mc.fontRenderer.FONT_HEIGHT + y * 2, 0xFFFFFF);
                 } finally {
                     GlStateManager.popMatrix();
                 }

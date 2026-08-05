@@ -126,7 +126,7 @@ public class ItemAspectTooltipHandler {
             int curX = tooltipX;
             for (Aspect aspect : row) {
                 int amount = aspects.getAmount(aspect);
-                UtilsFX.drawTag(curX, curY, aspect, (float) amount, 0, 0.0, 771, 1.0f, false);
+                UtilsFX.drawTag(curX, curY, aspect, (float) amount, 0, 0.0, 771, 1.0f, false, true);
                 curX += step;
             }
             curY += step;

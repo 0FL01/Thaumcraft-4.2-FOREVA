@@ -40,7 +40,8 @@ abstract class ThaumcraftRecipeWrapper implements IRecipeWrapper {
         for (int i = 0; i < tags.length; i++) {
             int x = aspectX(i, tags.length);
             int y = this.aspectY + (i / ASPECT_COLUMNS) * 18;
-            UtilsFX.drawTag(x, y, tags[i], this.aspects.getAmount(tags[i]), 0, 0.0D, 771, 1.0F, false);
+            UtilsFX.drawTag(x, y, tags[i], this.aspects.getAmount(tags[i]),
+                    0, 0.0D, 771, 1.0F, false, true);
             GlStateManager.disableLighting();
             GlStateManager.enableBlend();
             GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);

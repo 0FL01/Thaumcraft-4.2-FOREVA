@@ -275,6 +275,15 @@ public class UtilsFX {
         }
     }
 
+    public static int getCompactStringWidth(FontRenderer renderer, String text) {
+        boolean compactAscii = beginCompactAscii(renderer, text);
+        try {
+            return renderer.getStringWidth(text);
+        } finally {
+            endCompactAscii(renderer, compactAscii);
+        }
+    }
+
     private static boolean beginCompactAscii(FontRenderer renderer, String text) {
         if (renderer == null || !renderer.getUnicodeFlag() || text == null) {
             return false;

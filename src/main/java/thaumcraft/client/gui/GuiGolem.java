@@ -10,6 +10,7 @@ import net.minecraft.util.ResourceLocation;
 import thaumcraft.common.entities.golems.ContainerGolem;
 import thaumcraft.common.entities.golems.EntityGolemBase;
 import thaumcraft.common.entities.golems.ItemGolemCore;
+import thaumcraft.client.lib.UtilsFX;
 import thaumcraft.common.lib.utils.Utils;
 
 public class GuiGolem extends GuiContainer {
@@ -157,7 +158,7 @@ public class GuiGolem extends GuiContainer {
         GlStateManager.pushMatrix();
         GlStateManager.translate(this.guiLeft + x, this.guiTop + y, 0.0F);
         GlStateManager.scale(0.5F, 0.5F, 1.0F);
-        this.fontRenderer.drawString(text, 0, 0, color);
+        UtilsFX.drawCompactString(this.fontRenderer, text, 0, 0, color);
         GlStateManager.popMatrix();
     }
 
@@ -165,7 +166,7 @@ public class GuiGolem extends GuiContainer {
         GlStateManager.pushMatrix();
         GlStateManager.translate(this.guiLeft + x, this.guiTop + y, 0.0F);
         GlStateManager.scale(0.5F, 0.5F, 1.0F);
-        this.fontRenderer.drawString(text, -this.fontRenderer.getStringWidth(text) / 2, 0, color);
+        UtilsFX.drawCompactCenteredString(this.fontRenderer, text, 0.0F, 0, color);
         GlStateManager.popMatrix();
     }
 
