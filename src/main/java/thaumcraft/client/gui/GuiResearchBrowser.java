@@ -569,7 +569,7 @@ public class GuiResearchBrowser extends GuiScreen {
                 tooltipWidth = Math.max(tooltipWidth, renderer.getStringWidth(net.minecraft.client.resources.I18n.format("tc.research.short")) / 2);
             }
             int warp = Math.min(ThaumcraftApi.getWarp(this.currentHighlight.key), 5);
-            String warpLine = net.minecraft.client.resources.I18n.format("tc.forbidden")
+            String warpLine = net.minecraft.util.text.translation.I18n.translateToLocal("tc.forbidden")
                     .replace("%n", net.minecraft.client.resources.I18n.format("tc.forbidden.level." + warp));
             if (ThaumcraftApi.getWarp(this.currentHighlight.key) > 0) {
                 tooltipExtraHeight += 9;

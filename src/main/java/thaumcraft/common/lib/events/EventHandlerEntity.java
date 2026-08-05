@@ -591,7 +591,7 @@ public class EventHandlerEntity {
                 && ((EntityGolemBase) event.getTarget()).getOwnerName().length() > 0
                 && !((EntityGolemBase) event.getTarget()).getOwnerName().equals(event.getEntityPlayer().getName())) {
             if (!event.getWorld().isRemote) {
-                event.getEntityPlayer().sendMessage(new TextComponentTranslation("You are not my Master!"));
+                event.getEntityPlayer().sendMessage(new TextComponentTranslation("tc.golem.notowner"));
             }
             event.setCanceled(true);
         }

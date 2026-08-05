@@ -18,7 +18,7 @@ public class EventHandlerEntityInteractStaticGuardTest {
         assertTrue("Entity interact path must guard non-owner interactions with golems",
                 source.contains("event.getTarget() instanceof EntityGolemBase")
                         && source.contains("getOwnerName().length() > 0")
-                        && source.contains("sendMessage(new TextComponentTranslation(\"You are not my Master!\"))")
+                        && source.contains("sendMessage(new TextComponentTranslation(\"tc.golem.notowner\"))")
                         && source.contains("event.setCanceled(true);"));
     }
 

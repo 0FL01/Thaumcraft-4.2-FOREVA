@@ -249,10 +249,10 @@ public class BlockWoodenDevice extends BlockContainer {
                 TileArcanePressurePlate plate = (TileArcanePressurePlate) te;
                 plate.setting = (byte) ((plate.setting + 1) % 3);
                 String feedback = plate.setting == 0
-                        ? "It will now trigger on everything."
+                        ? "tc.pressureplate.everything"
                         : plate.setting == 1
-                        ? "It will now trigger on everything except you."
-                        : "It will now trigger on just you.";
+                        ? "tc.pressureplate.except_owner"
+                        : "tc.pressureplate.owner_only";
                 playerIn.sendMessage(new TextComponentTranslation(feedback));
                 worldIn.playSound(null, pos, SoundEvents.UI_BUTTON_CLICK, SoundCategory.BLOCKS, 0.1F, 0.9F);
                 worldIn.notifyBlockUpdate(pos, state, state, 3);

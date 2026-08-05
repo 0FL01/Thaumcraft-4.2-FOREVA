@@ -14,9 +14,9 @@ public class WardedArcanaParityStaticGuardTest {
     public void pressurePlateReportsEachTc4Setting() throws IOException {
         String source = read("src/main/java/thaumcraft/common/blocks/BlockWoodenDevice.java");
 
-        assertTrue(source.contains("It will now trigger on everything."));
-        assertTrue(source.contains("It will now trigger on everything except you."));
-        assertTrue(source.contains("It will now trigger on just you."));
+        assertTrue(source.contains("tc.pressureplate.everything"));
+        assertTrue(source.contains("tc.pressureplate.except_owner"));
+        assertTrue(source.contains("tc.pressureplate.owner_only"));
         assertTrue(source.contains("playerIn.sendMessage(new TextComponentTranslation(feedback));"));
     }
 
