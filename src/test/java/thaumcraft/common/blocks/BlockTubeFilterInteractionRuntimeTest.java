@@ -33,7 +33,9 @@ import thaumcraft.api.aspects.AspectList;
 import thaumcraft.common.config.ConfigBlocks;
 import thaumcraft.common.config.ConfigItems;
 import thaumcraft.common.items.ItemResource;
+import thaumcraft.common.items.wands.ItemWandCasting;
 import thaumcraft.common.tiles.TileTubeFilter;
+import thaumcraft.common.tiles.TileTubeValve;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -83,7 +85,41 @@ public class BlockTubeFilterInteractionRuntimeTest {
         assertEquals(ItemResource.META_LABEL, returned.getMetadata());
     }
 
+    @Test
+    public void heldWandLeavesTubeDispatchAndValveFlowToWandItem() {
+        TubeWorld world = new TubeWorld();
+        BlockTube block = ConfigBlocks.blockTube;
+        IBlockState state = block.getStateFromMeta(1);
+        TestValve valve = new TestValve();
+        world.attach(POS, state, valve);
+        TestPlayer player = new TestPlayer(world);
+        player.setHeldItem(EnumHand.MAIN_HAND, new ItemStack(new ItemWandCasting()));
+
+        assertFalse(block.onBlockActivated(world, POS, state, player, EnumHand.MAIN_HAND,
+                EnumFacing.NORTH, 0.5F, 0.5F, 0.5F));
+        assertTrue(valve.allowFlow);
+        assertEquals(0, valve.wandClicks);
+
+        player.setHeldItem(EnumHand.MAIN_HAND, ItemStack.EMPTY);
+        assertTrue(block.onBlockActivated(world, POS, state, player, EnumHand.MAIN_HAND,
+                EnumFacing.NORTH, 0.5F, 0.5F, 0.5F));
+        assertFalse(valve.allowFlow);
+    }
+
     private static final class TestFilter extends TileTubeFilter {
+        @Override public void markDirtyAndSync() { }
+    }
+
+    private static final class TestValve extends TileTubeValve {
+        private int wandClicks;
+
+        @Override
+        public int onWandRightClick(World world, ItemStack wandstack, EntityPlayer player,
+                                    int x, int y, int z, int side, int md) {
+            this.wandClicks++;
+            return super.onWandRightClick(world, wandstack, player, x, y, z, side, md);
+        }
+
         @Override public void markDirtyAndSync() { }
     }
 

@@ -22,7 +22,6 @@ import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import thaumcraft.api.aspects.AspectList;
 import thaumcraft.api.aspects.IEssentiaContainerItem;
-import thaumcraft.api.wands.IWandable;
 import thaumcraft.common.Thaumcraft;
 import thaumcraft.common.config.ConfigItems;
 import thaumcraft.common.items.ItemResource;
@@ -90,10 +89,7 @@ public class BlockTube extends BlockContainer {
                                     EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
         TileEntity tile = world.getTileEntity(pos);
         ItemStack held = player.getHeldItem(hand);
-        if (!held.isEmpty() && held.getItem() instanceof ItemWandCasting && tile instanceof IWandable) {
-            return ((IWandable) tile).onWandRightClick(world, held, player,
-                    pos.getX(), pos.getY(), pos.getZ(), facing.getIndex(), this.getMetaFromState(state)) >= 0;
-        }
+        if (!held.isEmpty() && held.getItem() instanceof ItemWandCasting) return false;
         if (tile instanceof TileTubeValve) {
             if (!world.isRemote) {
                 TileTubeValve valve = (TileTubeValve) tile;

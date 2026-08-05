@@ -6,6 +6,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraftforge.fml.common.network.ByteBufUtils;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
+import thaumcraft.common.container.ContainerFocusPouch;
 import thaumcraft.common.lib.network.PacketBase;
 import thaumcraft.common.items.wands.ItemWandCasting;
 import thaumcraft.common.items.wands.WandManager;
@@ -42,11 +43,16 @@ public class PacketFocusChangeToServer extends PacketBase {
         this.scheduleServer(ctx, player -> {
             if (player.getEntityId() != this.playerid) return;
             if (player.world.provider.getDimension() != this.dim) return;
-            ItemStack held = player.getHeldItemMainhand();
-            if (!held.isEmpty() && held.getItem() instanceof ItemWandCasting) {
-                WandManager.changeFocus(held, player.world, player, this.focus);
-            }
+            handleFocusChange(player, this.focus);
         });
         return null;
+    }
+
+    static void handleFocusChange(EntityPlayer player, String focus) {
+        ItemStack held = player.getHeldItemMainhand();
+        if (held.isEmpty() || !(held.getItem() instanceof ItemWandCasting)
+                || ItemWandCasting.isSceptre(held)
+                || player.openContainer instanceof ContainerFocusPouch) return;
+        WandManager.changeFocus(held, player.world, player, focus);
     }
 }
