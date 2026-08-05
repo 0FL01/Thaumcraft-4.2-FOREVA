@@ -32,8 +32,8 @@ import java.util.Map;
  *
  * <p>Transforms for the wand/staff/sceptre TEISR are resolved from a JSON document and cached.
  * If the JSON is missing or malformed, the {@link #buildDefaultCalibration()} Java defaults are
- * used. Those defaults reproduce the pre-calibration hardcoded constants exactly, so absence of
- * the JSON is a no-op visually.
+ * used. Those defaults mirror the bundled calibration, so absence of the JSON is a no-op
+ * visually.
  *
  * <p>Application order is fixed and documented in {@link ItemWandRenderer#applyBasePose}:
  * <pre>
@@ -352,9 +352,8 @@ public final class WandRenderCalibration {
     // ------------------------------------------------------------------ Java defaults
 
     /**
-     * Built-in defaults. These reproduce the constants that were hardcoded in
-     * {@code ItemWandRenderer} before calibration was introduced, byte-for-byte, so a missing or
-     * malformed JSON changes nothing visually.
+     * Built-in defaults. These mirror the bundled calibration so a missing or malformed JSON
+     * changes nothing visually.
      *
      * <p>Constants mirrored here (original code references):
      * <ul>
@@ -363,7 +362,8 @@ public final class WandRenderCalibration {
      *   <li>wand GROUND/FIXED: translate(0,1,0)</li>
      *   <li>wand hand: translate(0.5,1.0,0.5) [fp: scale(1,1.1,1)] scale(0.5)</li>
      *   <li>wand NONE: translate(0.5,1.5,0.5)</li>
-     *   <li>staff preTranslate(0,0.5,0); staff GUI scaleMul(0.8) postAdd(-0.7,0.6,0);
+     *   <li>staff preTranslate(0,0.5,0); staff GUI translate(0.5,0.27063294,1.28125),
+     *       scale(0.625), scaleMul(0.8), rotate(30,-45,66), postAdd(-0.7,0.6,0);
      *       staff GROUND/FIXED translate(0,1.5,0) scale(0.9)</li>
      *   <li>sceptre: identical to wand (separate kind so it can diverge later)</li>
      * </ul>
@@ -406,9 +406,9 @@ public final class WandRenderCalibration {
         EnumMap<ItemCameraTransforms.TransformType, Transform> staff = new EnumMap<>(ItemCameraTransforms.TransformType.class);
         // preTranslate [0,0.5,0] applied to all staff contexts
         putContext(staff, ItemCameraTransforms.TransformType.GUI,
-                0f,0.5f,0f,  0.5f,0.5f,0f,
-                1f,1.1f,1f,  0.6f,0.6f,0.6f,  0.8f,0.8f,0.8f,
-                20f,-45f,45f,  -0.7f,1.2f,0f,  finalRotate, false);
+                0f,0.5f,0f,  0.5f,0.27063294f,1.28125f,
+                1f,1.1f,1f,  0.625f,0.625f,0.625f,  0.8f,0.8f,0.8f,
+                30f,-45f,66f,  -0.7f,1.2f,0f,  finalRotate, false);
         putContext(staff, ItemCameraTransforms.TransformType.GROUND,
                 0f,0.5f,0f,  0f,1.5f,0f,  1f,1.1f,1f,  0.9f,0.9f,0.9f,  1f,1f,1f,
                 0f,0f,0f,  0f,0f,0f,  finalRotate, false);

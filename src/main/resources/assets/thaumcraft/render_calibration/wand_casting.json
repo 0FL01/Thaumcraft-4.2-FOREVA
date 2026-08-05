@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "notes": "Calibration for ItemWandCasting TEISR. These values reproduce the original hardcoded port constants. Order of application (see ItemWandRenderer): preTranslate -> translate -> [if first person] firstPersonScale -> scale -> scaleMultiplier -> rotateX -> rotateY -> rotateZ -> postTranslate -> optional use pose -> finalRotate. Hot reload: edit this file (or the config/thaumcraft/render_calibration/wand_casting.json override) and press F3+T.",
+  "notes": "Calibration for ItemWandCasting TEISR. The staff GUI context exactly composes the TC4 Forge INVENTORY_BLOCK helper into the Forge 1.12 TEISR basis. Order of application (see ItemWandRenderer): preTranslate -> translate -> [if first person] firstPersonScale -> scale -> scaleMultiplier -> rotateX -> rotateY -> rotateZ -> postTranslate -> optional use pose -> finalRotate. Hot reload: edit this file (or the config/thaumcraft/render_calibration/wand_casting.json override) and press F3+T.",
   "common": {
     "finalRotate": [180.0, 0.0, 0.0]
   },
@@ -51,6 +51,9 @@
       "preTranslate": [0.0, 0.5, 0.0],
       "contexts": {
         "GUI": {
+          "translate": [0.5, 0.27063294, 1.28125],
+          "rotate": [30.0, -45.0, 66.0],
+          "scale": [0.625, 0.625, 0.625],
           "scaleMultiplier": [0.8, 0.8, 0.8],
           "postTranslateAdd": [-0.7, 0.6, 0.0]
         },

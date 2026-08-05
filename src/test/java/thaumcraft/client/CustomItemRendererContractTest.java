@@ -1,5 +1,8 @@
 package thaumcraft.client;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -7,6 +10,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
@@ -65,12 +69,12 @@ public class CustomItemRendererContractTest {
         assertFalse("ModelWand must not restore player lighting while it is rendered at a tile",
                 wandModel.contains("getBrightnessForRender()"));
 
-        assertTrue("WandRenderCalibration must keep the wand/staff/sceptre kinds, the TC4 final-rotate basis, and Java defaults that reproduce the prior port constants byte-for-byte",
+        assertTrue("WandRenderCalibration must keep the wand/staff/sceptre kinds, the TC4 final-rotate basis, and Java defaults that mirror the bundled calibration",
                 wandCalibration.contains("KIND_WAND = \"wand\"")
                         && wandCalibration.contains("KIND_STAFF = \"staff\"")
                         && wandCalibration.contains("KIND_SCEPTRE = \"sceptre\"")
                         && wandCalibration.contains("buildDefaultCalibration()")
-                        // prior port constants preserved as Java defaults
+                        // Current wand values and TC4 staff GUI values are both mirrored in fallback defaults.
                         && wandCalibration.contains("180f, 0f, 0f")
                         && wandCalibration.contains("0.5f,0.5f,0f")
                         && wandCalibration.contains("0.6f,0.6f,0.6f")
@@ -162,6 +166,163 @@ public class CustomItemRendererContractTest {
                         && wandItemModel.contains("\"rotation\": [0, 0, 0]")
                         && wandItemModel.contains("\"translation\": [0, 0, 0]")
                         && wandItemModel.contains("\"scale\": [1.0, 1.0, 1.0]"));
+    }
+
+    @Test
+    public void staffInventoryPoseShouldUseTheTc4CompensatedProjection() throws IOException {
+        String calibrationSource = read("src/main/java/thaumcraft/client/renderers/item/WandRenderCalibration.java");
+        String compactSource = calibrationSource.replaceAll("\\s+", "");
+        assertTrue("Java fallback must preserve the compensated TC4 staff inventory matrix",
+                compactSource.contains("putContext(staff,ItemCameraTransforms.TransformType.GUI,"
+                        + "0f,0.5f,0f,0.5f,0.27063294f,1.28125f,"
+                        + "1f,1.1f,1f,0.625f,0.625f,0.625f,0.8f,0.8f,0.8f,"
+                        + "30f,-45f,66f,-0.7f,1.2f,0f,finalRotate,false);"));
+
+        JsonObject kinds = new JsonParser()
+                .parse(read("src/main/resources/assets/thaumcraft/render_calibration/wand_casting.json"))
+                .getAsJsonObject().getAsJsonObject("kinds");
+        JsonObject wandGui = kinds.getAsJsonObject("wand").getAsJsonObject("contexts").getAsJsonObject("GUI");
+        JsonObject staffGui = kinds.getAsJsonObject("staff").getAsJsonObject("contexts").getAsJsonObject("GUI");
+
+        assertVector(wandGui, "translate", 0.5F, 0.5F, 0.0F);
+        assertVector(wandGui, "rotate", 20.0F, -45.0F, 45.0F);
+        assertVector(staffGui, "translate", 0.5F, 0.27063294F, 1.28125F);
+        assertVector(staffGui, "rotate", 30.0F, -45.0F, 66.0F);
+        assertVector(staffGui, "scale", 0.625F, 0.625F, 0.625F);
+        assertVector(staffGui, "scaleMultiplier", 0.8F, 0.8F, 0.8F);
+        assertVector(staffGui, "postTranslateAdd", -0.7F, 0.6F, 0.0F);
+    }
+
+    @Test
+    public void staffInventoryPoseShouldComposeTheLegacyForgeHelperExactly() {
+        // Slot-local matrices. The common GUI zLevel translation is intentionally omitted.
+        double[][] tc4 = compose(
+                translation(-2.0, 3.0, 0.0),
+                scale(10.0, 10.0, 10.0),
+                translation(1.0, 0.5, 1.0),
+                scale(1.0, 1.0, -1.0),
+                rotateX(210.0),
+                rotateY(45.0),
+                rotateY(-90.0),
+                translation(0.0, 0.5, 0.0),
+                scale(0.8, 0.8, 0.8),
+                rotateZ(66.0),
+                translation(0.0, 0.6, 0.0),
+                translation(-0.7, 0.6, 0.0),
+                rotateX(180.0));
+
+        double[][] port = compose(
+                translation(8.0, 8.0, 0.0),
+                scale(16.0, -16.0, 16.0),
+                translation(-0.5, -0.5, -0.5),
+                translation(0.0, 0.5, 0.0),
+                translation(0.5, 0.27063294, 1.28125),
+                scale(0.625, 0.625, 0.625),
+                scale(0.8, 0.8, 0.8),
+                rotateX(30.0),
+                rotateY(-45.0),
+                rotateZ(66.0),
+                translation(-0.7, 1.2, 0.0),
+                rotateX(180.0));
+
+        assertMatrixEquals(tc4, port, 0.000001);
+    }
+
+    private static void assertVector(JsonObject context, String name, float x, float y, float z) {
+        JsonArray values = context.getAsJsonArray(name);
+        assertEquals(name + " vector length", 3, values.size());
+        assertEquals(name + " x", x, values.get(0).getAsFloat(), 0.0001F);
+        assertEquals(name + " y", y, values.get(1).getAsFloat(), 0.0001F);
+        assertEquals(name + " z", z, values.get(2).getAsFloat(), 0.0001F);
+    }
+
+    private static void assertMatrixEquals(double[][] expected, double[][] actual, double delta) {
+        for (int row = 0; row < 4; row++) {
+            for (int column = 0; column < 4; column++) {
+                assertEquals("matrix[" + row + "][" + column + "]",
+                        expected[row][column], actual[row][column], delta);
+            }
+        }
+    }
+
+    private static double[][] compose(double[][]... transforms) {
+        double[][] result = identity();
+        for (double[][] transform : transforms) {
+            result = multiply(result, transform);
+        }
+        return result;
+    }
+
+    private static double[][] multiply(double[][] left, double[][] right) {
+        double[][] result = new double[4][4];
+        for (int row = 0; row < 4; row++) {
+            for (int column = 0; column < 4; column++) {
+                for (int index = 0; index < 4; index++) {
+                    result[row][column] += left[row][index] * right[index][column];
+                }
+            }
+        }
+        return result;
+    }
+
+    private static double[][] identity() {
+        double[][] matrix = new double[4][4];
+        for (int index = 0; index < 4; index++) {
+            matrix[index][index] = 1.0;
+        }
+        return matrix;
+    }
+
+    private static double[][] translation(double x, double y, double z) {
+        double[][] matrix = identity();
+        matrix[0][3] = x;
+        matrix[1][3] = y;
+        matrix[2][3] = z;
+        return matrix;
+    }
+
+    private static double[][] scale(double x, double y, double z) {
+        double[][] matrix = identity();
+        matrix[0][0] = x;
+        matrix[1][1] = y;
+        matrix[2][2] = z;
+        return matrix;
+    }
+
+    private static double[][] rotateX(double degrees) {
+        double[][] matrix = identity();
+        double radians = Math.toRadians(degrees);
+        double cosine = Math.cos(radians);
+        double sine = Math.sin(radians);
+        matrix[1][1] = cosine;
+        matrix[1][2] = -sine;
+        matrix[2][1] = sine;
+        matrix[2][2] = cosine;
+        return matrix;
+    }
+
+    private static double[][] rotateY(double degrees) {
+        double[][] matrix = identity();
+        double radians = Math.toRadians(degrees);
+        double cosine = Math.cos(radians);
+        double sine = Math.sin(radians);
+        matrix[0][0] = cosine;
+        matrix[0][2] = sine;
+        matrix[2][0] = -sine;
+        matrix[2][2] = cosine;
+        return matrix;
+    }
+
+    private static double[][] rotateZ(double degrees) {
+        double[][] matrix = identity();
+        double radians = Math.toRadians(degrees);
+        double cosine = Math.cos(radians);
+        double sine = Math.sin(radians);
+        matrix[0][0] = cosine;
+        matrix[0][1] = -sine;
+        matrix[1][0] = sine;
+        matrix[1][1] = cosine;
+        return matrix;
     }
 
     private static String read(String path) throws IOException {
