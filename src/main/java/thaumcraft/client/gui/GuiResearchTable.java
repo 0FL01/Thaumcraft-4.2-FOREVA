@@ -657,7 +657,7 @@ public class GuiResearchTable extends GuiContainer {
         }
 
         // RESEARCHER_2: right-click combine from aspect grid
-        if (this.isCtrlKeyDown() && RESEARCHER_2) {
+        if (this.isShiftKeyDown() && RESEARCHER_2) {
             Aspect aspect = this.getClickedAspect(mouseX, mouseY, gx, gy, true);
             if (aspect != null && !aspect.isPrimal()) {
                 IPlayerKnowledge knowledge = CommonProxy.getPlayerKnowledge(this.player);

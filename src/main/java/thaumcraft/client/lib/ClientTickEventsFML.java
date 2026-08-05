@@ -19,6 +19,8 @@ import thaumcraft.common.items.wands.ItemWandCasting;
 import thaumcraft.common.lib.events.EssentiaHandler;
 import thaumcraft.common.tiles.TileInfusionMatrix;
 import thaumcraft.client.gui.GuiResearchPopup;
+import thaumcraft.client.gui.GuiResearchRecipe;
+import thaumcraft.client.gui.MappingThread;
 
 @SideOnly(Side.CLIENT)
 public class ClientTickEventsFML {
@@ -36,6 +38,7 @@ public class ClientTickEventsFML {
     };
     private int tickCount = 0;
     private boolean wandUseReleasePending;
+    private boolean mappingStarted;
 
     @SubscribeEvent
     public void playerTick(TickEvent.PlayerTickEvent event) {
@@ -46,6 +49,13 @@ public class ClientTickEventsFML {
         EntityPlayer player = mc.player;
         if (player == null || event.player == null || event.player.getEntityId() != player.getEntityId()) {
             return;
+        }
+
+        if (!this.mappingStarted && GuiResearchRecipe.isItemCacheEmpty()) {
+            Thread mappingThread = new Thread(new MappingThread(), "Thaumcraft item aspect mapper");
+            mappingThread.setDaemon(true);
+            mappingThread.start();
+            this.mappingStarted = true;
         }
 
         this.checkShaders(player, mc);

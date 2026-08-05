@@ -91,7 +91,7 @@ public class GuiResearchBrowser extends GuiScreen {
         this.field_74115_n = this.field_74123_r;
         this.updateResearch();
         Minecraft minecraft = Minecraft.getMinecraft();
-        this.galFontRenderer = minecraft.fontRenderer;
+        this.galFontRenderer = minecraft.standardGalacticFontRenderer;
         this.player = minecraft.player == null ? "" : minecraft.player.getName();
     }
 
@@ -102,7 +102,7 @@ public class GuiResearchBrowser extends GuiScreen {
         this.field_74115_n = this.field_74123_r;
         this.updateResearch();
         Minecraft minecraft = Minecraft.getMinecraft();
-        this.galFontRenderer = minecraft.fontRenderer;
+        this.galFontRenderer = minecraft.standardGalacticFontRenderer;
         this.player = minecraft.player == null ? "" : minecraft.player.getName();
     }
 
@@ -559,22 +559,24 @@ public class GuiResearchBrowser extends GuiScreen {
             boolean primary = !secondary && !completed.contains(this.currentHighlight.key);
             int tooltipWidth = Math.max(renderer.getStringWidth(name), renderer.getStringWidth(this.currentHighlight.getText()) / 2);
             int tooltipHeight = this.getWrappedHeight(renderer, name, tooltipWidth) + 5;
+            int tooltipExtraHeight = 0;
             if (primary) {
-                tooltipHeight += 9;
+                tooltipExtraHeight += 9;
                 tooltipWidth = Math.max(tooltipWidth, renderer.getStringWidth(net.minecraft.client.resources.I18n.format("tc.research.shortprim")) / 2);
             }
             if (secondary) {
-                tooltipHeight += 29;
+                tooltipExtraHeight += 29;
                 tooltipWidth = Math.max(tooltipWidth, renderer.getStringWidth(net.minecraft.client.resources.I18n.format("tc.research.short")) / 2);
             }
             int warp = Math.min(ThaumcraftApi.getWarp(this.currentHighlight.key), 5);
             String warpLine = net.minecraft.client.resources.I18n.format("tc.forbidden")
                     .replace("%n", net.minecraft.client.resources.I18n.format("tc.forbidden.level." + warp));
             if (ThaumcraftApi.getWarp(this.currentHighlight.key) > 0) {
-                tooltipHeight += 9;
+                tooltipExtraHeight += 9;
                 tooltipWidth = Math.max(tooltipWidth, renderer.getStringWidth(warpLine) / 2);
             }
-            this.drawGradientRect(tooltipX - 3, tooltipY - 3, tooltipX + tooltipWidth + 3, tooltipY + tooltipHeight + 6, -1073741824, -1073741824);
+            this.drawGradientRect(tooltipX - 3, tooltipY - 3, tooltipX + tooltipWidth + 3,
+                    tooltipY + tooltipHeight + tooltipExtraHeight + 6, -1073741824, -1073741824);
             GlStateManager.pushMatrix();
             GlStateManager.translate(tooltipX, tooltipY + tooltipHeight - 1, 0.0F);
             GlStateManager.scale(0.5F, 0.5F, 0.5F);

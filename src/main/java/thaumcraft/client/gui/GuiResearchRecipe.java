@@ -4,8 +4,11 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiScreen;
@@ -44,6 +47,9 @@ import thaumcraft.api.research.ResearchCategories;
 import thaumcraft.api.research.ResearchItem;
 import thaumcraft.api.research.ResearchPage;
 import thaumcraft.common.lib.TCSounds;
+import thaumcraft.common.lib.capabilities.IPlayerKnowledge;
+import thaumcraft.common.lib.capabilities.PlayerKnowledgeProvider;
+import thaumcraft.common.lib.crafting.ThaumcraftCraftingManager;
 import thaumcraft.common.lib.utils.InventoryUtils;
 
 public class GuiResearchRecipe extends GuiScreen {
@@ -54,6 +60,7 @@ public class GuiResearchRecipe extends GuiScreen {
     private static final int LEFT_PAGE_OFFSET = -15;
     private static final int PAGE_STRIDE = 152;
     private static final LinkedList<Object[]> HISTORY = new LinkedList<Object[]>();
+    private static final ConcurrentHashMap<Integer, ItemStack> ITEM_CACHE = new ConcurrentHashMap<Integer, ItemStack>();
 
     private final int paneWidth = 256;
     private final int paneHeight = 181;
@@ -61,6 +68,7 @@ public class GuiResearchRecipe extends GuiScreen {
     private final double guiMapX;
     private final double guiMapY;
     private final FontRenderer researchFontRenderer;
+    private final Map<Aspect, List<ItemStack>> aspectItems = new HashMap<Aspect, List<ItemStack>>();
     private ResearchPage[] pages;
     private int page;
     private int maxPages;
@@ -88,6 +96,31 @@ public class GuiResearchRecipe extends GuiScreen {
             }
             visiblePages.add(visiblePage);
         }
+        if (research != null && "ASPECTS".equals(research.key) && player != null) {
+            IPlayerKnowledge knowledge = player.getCapability(PlayerKnowledgeProvider.PLAYER_KNOWLEDGE, null);
+            if (knowledge != null) {
+                this.buildAspectItemIndex(knowledge);
+                AspectList discovered = knowledge.getAspectsDiscovered();
+                if (discovered != null) {
+                    AspectList aspectPage = new AspectList();
+                    int count = 0;
+                    for (Aspect aspect : discovered.getAspectsSorted()) {
+                        if (aspect == null) {
+                            continue;
+                        }
+                        aspectPage.add(aspect, discovered.getAmount(aspect));
+                        if (++count == 4) {
+                            visiblePages.add(new ResearchPage(aspectPage.copy()));
+                            aspectPage = new AspectList();
+                            count = 0;
+                        }
+                    }
+                    if (count > 0) {
+                        visiblePages.add(new ResearchPage(aspectPage));
+                    }
+                }
+            }
+        }
         this.pages = visiblePages.toArray(new ResearchPage[0]);
         this.maxPages = this.pages.length;
         if ((page & 1) == 1) {
@@ -96,6 +129,54 @@ public class GuiResearchRecipe extends GuiScreen {
         this.page = Math.max(0, Math.min(page, Math.max(0, this.maxPages - 1)));
         if ((this.page & 1) == 1) {
             --this.page;
+        }
+    }
+
+    public static void putToCache(int key, ItemStack stack) {
+        if (stack != null && !stack.isEmpty()) {
+            ITEM_CACHE.put(key, stack.copy());
+        }
+    }
+
+    public static ItemStack getFromCache(int key) {
+        ItemStack stack = ITEM_CACHE.get(key);
+        return stack == null ? ItemStack.EMPTY : stack.copy();
+    }
+
+    public static boolean isItemCacheEmpty() {
+        return ITEM_CACHE.isEmpty();
+    }
+
+    private void buildAspectItemIndex(IPlayerKnowledge knowledge) {
+        for (String scanned : knowledge.getScannedItems()) {
+            if (scanned == null || scanned.length() < 2) {
+                continue;
+            }
+            try {
+                ItemStack scannedStack = getFromCache(Integer.parseInt(scanned.substring(1)));
+                if (scannedStack.isEmpty()) {
+                    continue;
+                }
+                AspectList tags = ThaumcraftCraftingManager.getObjectTags(scannedStack);
+                tags = ThaumcraftCraftingManager.getBonusTags(scannedStack, tags);
+                if (tags == null || tags.size() <= 0) {
+                    continue;
+                }
+                for (Aspect aspect : tags.getAspects()) {
+                    if (aspect == null) {
+                        continue;
+                    }
+                    List<ItemStack> items = this.aspectItems.get(aspect);
+                    if (items == null) {
+                        items = new ArrayList<ItemStack>();
+                        this.aspectItems.put(aspect, items);
+                    }
+                    ItemStack display = scannedStack.copy();
+                    display.setCount(tags.getAmount(aspect));
+                    items.add(display);
+                }
+            } catch (NumberFormatException ignored) {
+            }
         }
     }
 
@@ -432,7 +513,8 @@ public class GuiResearchRecipe extends GuiScreen {
         int start = side * PAGE_STRIDE;
         this.drawCenteredScaledString(I18n.format("recipe.type.construct"), x + start + 56, y, 112, 0x505050);
         this.drawOverlayScaled(x + start + 48, y + 174, 0, 0, 68, 76, 12, 12, 2.0F, aspects == null || aspects.size() <= 0 ? 0.0F : 0.4F);
-        this.drawAspectCostRow(aspects, x + start + 14, y + 182, 5, mouseX, mouseY, 1);
+        this.drawAspectCostRow(aspects, x + start + 14, y + 182,
+                aspects == null ? 0 : aspects.size(), mouseX, mouseY, 1);
 
         int xoff = 64 - (dx * 16 + dz * 16) / 2;
         int yoff = -dy * 25;
@@ -493,8 +575,27 @@ public class GuiResearchRecipe extends GuiScreen {
             } else {
                 this.fontRenderer.drawString(I18n.format("tc.aspect.primal"), x + start + 48, rowY + 12, 0x444444);
             }
-            this.addAspectTooltip(aspect, mouseX, mouseY, x + start, rowY, 40, 40, 1);
+            if (this.isMouseIn(mouseX, mouseY, x + start, rowY, 40, 40)) {
+                this.drawAspectSources(aspect, mouseX, mouseY);
+            }
             ++count;
+        }
+    }
+
+    private void drawAspectSources(Aspect aspect, int mouseX, int mouseY) {
+        List<ItemStack> items = this.aspectItems.get(aspect);
+        if (items == null || items.isEmpty()) {
+            return;
+        }
+        int xCount = 0;
+        int yCount = 0;
+        int baseY = mouseY - (4 + items.size() / 8 * 8);
+        for (ItemStack item : items) {
+            this.drawItemStack(item, mouseX + 8 + xCount * 17, baseY + yCount * 17);
+            if (++xCount >= 8) {
+                xCount = 0;
+                ++yCount;
+            }
         }
     }
 
