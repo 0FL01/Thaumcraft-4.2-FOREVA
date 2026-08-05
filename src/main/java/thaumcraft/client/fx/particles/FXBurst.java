@@ -7,7 +7,6 @@ import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.Entity;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -16,14 +15,14 @@ import thaumcraft.client.renderers.tile.TileNodeRenderer;
 
 @SideOnly(Side.CLIENT)
 public class FXBurst extends Particle {
-    private static final ResourceLocation PARTICLE_TEXTURE = new ResourceLocation("textures/particle/particles.png");
     private static final int LIGHTMAP_FULLBRIGHT = 0x00F000F0;
 
-    private final float scale;
-
-    public FXBurst(World world, double x, double y, double z, float scale, int density) {
+    public FXBurst(World world, double x, double y, double z, float scale) {
         super(world, x, y, z, 0.0D, 0.0D, 0.0D);
-        this.scale = Math.max(0.2F, scale) * (0.9F + Math.min(1.1F, Math.max(1, density) * 0.04F));
+        this.motionX = 0.0D;
+        this.motionY = 0.0D;
+        this.motionZ = 0.0D;
+        this.particleScale *= scale;
         this.particleRed = 1.0F;
         this.particleGreen = 1.0F;
         this.particleBlue = 1.0F;
@@ -43,7 +42,7 @@ public class FXBurst extends Particle {
             this.setExpired();
             return;
         }
-        if (++this.particleAge >= this.particleMaxAge) {
+        if (this.particleAge++ >= this.particleMaxAge) {
             this.setExpired();
         }
     }
@@ -59,7 +58,7 @@ public class FXBurst extends Particle {
         float u1 = u0 + 0.03125F;
         float v0 = 0.96875F;
         float v1 = 1.0F;
-        float size = this.scale;
+        float size = this.particleScale;
         float px = (float) (this.prevPosX + (this.posX - this.prevPosX) * partialTicks - Particle.interpPosX);
         float py = (float) (this.prevPosY + (this.posY - this.prevPosY) * partialTicks - Particle.interpPosY);
         float pz = (float) (this.prevPosZ + (this.posZ - this.prevPosZ) * partialTicks - Particle.interpPosZ);

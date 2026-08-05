@@ -1864,9 +1864,7 @@ public class ClientProxy extends CommonProxy {
     @Override
     public void burst(World world, double x, double y, double z, float scale) {
         if (world == null || !world.isRemote) return;
-        int amount = particleCount(Math.max(6, (int) (scale * 12.0f)));
-        if (amount <= 0) return;
-        ParticleEngine.addEffect(world, new FXBurst(world, x, y, z, scale, amount));
+        ParticleEngine.addEffect(world, new FXBurst(world, x, y, z, scale));
     }
 
     @Override

@@ -69,7 +69,9 @@ public class ClientProxyFxStaticGuardTest {
         assertTrue("ClientProxy bolt must contain non-noop bolt particle path",
                 source.contains("public void bolt(") && source.contains("speed * 2"));
         assertTrue("ClientProxy must override burst for direct entity FX call sites",
-                source.contains("public void burst(") && source.contains("new FXBurst("));
+                source.contains("public void burst(")
+                        && source.contains("new FXBurst(world, x, y, z, scale)")
+                        && !source.contains("new FXBurst(world, x, y, z, scale, amount)"));
         assertTrue("ClientProxy must expose dedicated sonicFX path through ParticleEngine",
                 source.contains("public void sonicFX(")
                         && source.contains("new FXSonic("));
@@ -306,6 +308,13 @@ public class ClientProxyFxStaticGuardTest {
                 burstFx.contains("class FXBurst extends Particle")
                         && burstFx.contains("TileNodeRenderer.NODES_TEXTURE")
                         && burstFx.contains("this.particleMaxAge = 31")
+                        && burstFx.contains("this.particleScale *= scale;")
+                        && burstFx.contains("this.motionX = 0.0D;")
+                        && burstFx.contains("this.motionY = 0.0D;")
+                        && burstFx.contains("this.motionZ = 0.0D;")
+                        && burstFx.contains("this.particleAge++ >= this.particleMaxAge")
+                        && burstFx.contains("float size = this.particleScale;")
+                        && !burstFx.contains("density")
                         && !burstFx.contains("EnumParticleTypes.EXPLOSION_NORMAL"));
         assertTrue("Dedicated FXBubble particle must keep froth controls and water-bubble emission baseline",
                 bubbleFx.contains("class FXBubble extends Particle")
