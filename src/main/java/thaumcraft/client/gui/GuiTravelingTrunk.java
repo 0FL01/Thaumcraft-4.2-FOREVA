@@ -39,9 +39,14 @@ public class GuiTravelingTrunk extends GuiContainer {
         Entity owner = this.trunk.getOwner();
         String ownerName = owner instanceof EntityPlayer ? owner.getName() : this.player.getName();
         String title = ownerName + I18n.translateToLocal("entity.trunk.guiname");
+        float textScale = this.fontRenderer.getUnicodeFlag() ? 1.0F : 0.5F;
+        int availableWidth = 120;
+        String displayedTitle = this.fontRenderer.trimStringToWidth(title,
+                Math.max(1, (int) (availableWidth / textScale)));
         GlStateManager.pushMatrix();
-        GlStateManager.scale(0.5F, 0.5F, 1.0F);
-        this.fontRenderer.drawString(title, 16, 8, 12624112);
+        GlStateManager.translate(8.0F, 4.0F, 0.0F);
+        GlStateManager.scale(textScale, textScale, 1.0F);
+        this.fontRenderer.drawString(displayedTitle, 0, 0, 12624112);
         GlStateManager.popMatrix();
     }
 

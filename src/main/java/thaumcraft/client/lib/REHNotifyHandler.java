@@ -32,7 +32,9 @@ public class REHNotifyHandler {
 
     public void renderNotifyHUD(Minecraft mc, double sw, double sh, long time) {
         ArrayList<PlayerNotifications.Notification> notifications = PlayerNotifications.getListAndUpdate(time);
-        float shift = -8.0F;
+        float textScale = mc.fontRenderer.getUnicodeFlag() ? 1.0F : 0.5F;
+        int rowStep = mc.fontRenderer.getUnicodeFlag() ? mc.fontRenderer.FONT_HEIGHT + 2 : 8;
+        float shift = -rowStep;
 
         GlStateManager.pushMatrix();
         GlStateManager.disableDepth();
@@ -45,26 +47,26 @@ public class REHNotifyHandler {
         for (int entry = 0; entry < notifications.size() && entry < Config.notificationMax; ++entry) {
             PlayerNotifications.Notification notification = notifications.get(entry);
             String text = notification.text;
-            int size = mc.fontRenderer.getStringWidth(text) / 2;
+            float size = mc.fontRenderer.getStringWidth(text) * textScale;
             int alpha = 255;
             if (entry == notifications.size() - 1 && notification.created > time) {
                 alpha = 255 - (int) ((float) (notification.created - time) / (float) (Config.notificationDelay / 4) * 240.0F);
             }
             if (notification.expire < time + Config.notificationDelay) {
                 alpha = (int) (255.0F - (float) (time + Config.notificationDelay - notification.expire) / (float) Config.notificationDelay * 240.0F);
-                shift = -8.0F * ((float) alpha / 255.0F);
+                shift = -rowStep * ((float) alpha / 255.0F);
             }
 
             int textColor = (alpha / 2 << 24) | 0xFFFFFF;
             GlStateManager.pushMatrix();
-            GlStateManager.translate(width - size - 10.0F, (float) (height - entry * 8) + shift, 0.0F);
-            GlStateManager.scale(0.5F, 0.5F, 0.5F);
+            GlStateManager.translate(width - size - 10.0F, (float) (height - entry * rowStep) + shift, 0.0F);
+            GlStateManager.scale(textScale, textScale, textScale);
             mc.fontRenderer.drawStringWithShadow(text, -4.0F, -8.0F, textColor);
             GlStateManager.popMatrix();
 
             if (notification.image != null) {
                 GlStateManager.pushMatrix();
-                GlStateManager.translate(width - 9.0F, (float) (height - entry * 8) + shift - 6.0F, 0.0F);
+                GlStateManager.translate(width - 9.0F, (float) (height - entry * rowStep) + shift - 6.0F, 0.0F);
                 GlStateManager.scale(0.03125F, 0.03125F, 0.03125F);
                 mc.getTextureManager().bindTexture(notification.image);
                 Color color = new Color(notification.color);
@@ -78,7 +80,7 @@ public class REHNotifyHandler {
                 alpha = 255 - (int) (scale * 240.0F);
                 GlStateManager.pushMatrix();
                 GlStateManager.translate((width - 5.0F) - 8.0F * scale - (1.0F - scale) * (1.0F - scale) * (1.0F - scale) * size * 3.0F,
-                        (float) (height - entry * 8) + shift - 2.0F - 8.0F * scale,
+                        (float) (height - entry * rowStep) + shift - 2.0F - 8.0F * scale,
                         0.0F);
                 GlStateManager.scale(scale, scale, scale);
                 GlStateManager.color(1.0F, 1.0F, 1.0F, 0.5F - alpha / 511.0F);

@@ -18,6 +18,7 @@ public class GuiGolem extends GuiContainer {
     private static final ResourceLocation TEXTURE = new ResourceLocation("thaumcraft", "textures/gui/guigolem.png");
     private static final int GOLEM_PREVIEW_X = 18;
     private static final int GOLEM_PREVIEW_Y = 45;
+    private static final int BLURB_WIDTH = 55;
 
     private final EntityGolemBase golem;
     private int threat = -1;
@@ -41,9 +42,12 @@ public class GuiGolem extends GuiContainer {
     protected void drawGuiContainerForegroundLayer(int mouseX, int mouseY) {
         String blurbKey = this.threat >= 0 ? "golemthreat." + this.threat + ".text"
                 : "golemblurb." + this.golem.getCore() + ".text";
+        float blurbScale = this.fontRenderer.getUnicodeFlag() ? 0.75F : 0.5F;
         GlStateManager.pushMatrix();
-        GlStateManager.scale(0.5F, 0.5F, 1.0F);
-        this.fontRenderer.drawSplitString(I18n.format(blurbKey), 80, 22, 110, 0xDDDDDD);
+        GlStateManager.translate(40.0F, 11.0F, 0.0F);
+        GlStateManager.scale(blurbScale, blurbScale, 1.0F);
+        this.fontRenderer.drawSplitString(I18n.format(blurbKey), 0, 0,
+                Math.max(1, (int) (BLURB_WIDTH / blurbScale)), 0xDDDDDD);
         GlStateManager.popMatrix();
 
         ContainerGolem container = getContainer();
