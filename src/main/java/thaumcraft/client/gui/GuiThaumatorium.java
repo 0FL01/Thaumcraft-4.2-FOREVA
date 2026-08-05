@@ -10,6 +10,7 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.MathHelper;
 import thaumcraft.api.aspects.Aspect;
 import thaumcraft.api.crafting.CrucibleRecipe;
+import thaumcraft.client.lib.UtilsFX;
 import thaumcraft.common.container.ContainerThaumatorium;
 import thaumcraft.common.lib.TCSounds;
 import thaumcraft.common.tiles.TileThaumatorium;
@@ -140,29 +141,35 @@ public class GuiThaumatorium extends GuiContainer {
     private void drawAspects(CrucibleRecipe recipe) {
         if (recipe.aspects == null) return;
         Aspect[] aspects = recipe.aspects.getAspectsSorted();
-        int drawn = 0;
-        for (int i = 0; i < aspects.length && drawn < 6; ++i) {
-            Aspect aspect = aspects[i];
-            if (i < this.startAspect || aspect == null) continue;
-            int x = this.guiLeft + 40 + 16 * drawn;
-            int y = this.guiTop + 40;
-            this.mc.getTextureManager().bindTexture(aspect.getImage());
-            GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
-            this.drawModalRectWithCustomSizedTexture(x, y, 0, 0, 16, 16, 16.0F, 16.0F);
-
-            this.mc.getTextureManager().bindTexture(TEXTURE);
-            this.drawTexturedModalRect(this.guiLeft + 41 + 16 * drawn, this.guiTop + 57, 176, 8, 14, 6);
-            if (isSelected(recipe)) {
+        if (isSelected(recipe)) {
+            int gauge = 0;
+            for (int i = 0; i < aspects.length && gauge < 6; ++i) {
+                Aspect aspect = aspects[i];
+                if (i < this.startAspect || aspect == null) continue;
                 int required = Math.max(1, recipe.aspects.getAmount(aspect));
+                this.mc.getTextureManager().bindTexture(TEXTURE);
+                GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+                this.drawTexturedModalRect(this.guiLeft + 41 + 16 * gauge, this.guiTop + 57, 176, 8, 14, 6);
                 int fill = MathHelper.clamp((int) ((float) this.inventory.essentia.getAmount(aspect) / (float) required * 12.0F), 0, 12);
                 int color = aspect.getColor();
                 GlStateManager.color((float) (color >> 16 & 255) / 255.0F,
                         (float) (color >> 8 & 255) / 255.0F,
                         (float) (color & 255) / 255.0F,
                         1.0F);
-                this.drawTexturedModalRect(this.guiLeft + 42 + 16 * drawn, this.guiTop + 58, 176, 0, fill, 4);
-                GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+                this.drawTexturedModalRect(this.guiLeft + 42 + 16 * gauge, this.guiTop + 58, 176, 0, fill, 4);
+                ++gauge;
             }
+            GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+        }
+
+        int drawn = 0;
+        for (int i = 0; i < aspects.length && drawn < 6; ++i) {
+            Aspect aspect = aspects[i];
+            if (i < this.startAspect || aspect == null) continue;
+            int x = this.guiLeft + 40 + 16 * drawn;
+            int y = this.guiTop + 40;
+            int required = Math.max(1, recipe.aspects.getAmount(aspect));
+            UtilsFX.drawTag(x, y, aspect, required, 0, this.zLevel, 771, 1.0F, false, true);
             ++drawn;
         }
     }
@@ -171,8 +178,8 @@ public class GuiThaumatorium extends GuiContainer {
         ItemStack output = recipe.getRecipeOutput();
         if (output.isEmpty()) return;
 
-        boolean disabled = this.inventory.recipeHash.size() >= this.inventory.maxRecipes && !isSelected(recipe);
-        if (disabled) {
+        boolean canToggle = this.inventory.recipeHash.size() < this.inventory.maxRecipes || isSelected(recipe);
+        if (canToggle) {
             float alpha = 0.6F + MathHelper.sin((float) this.mc.player.ticksExisted / 4.0F) * 0.3F;
             GlStateManager.color(0.5F, 0.5F, 0.5F, alpha);
         }
@@ -190,7 +197,7 @@ public class GuiThaumatorium extends GuiContainer {
         GlStateManager.pushMatrix();
         GlStateManager.translate((float) (this.guiLeft + 136), (float) (this.guiTop + 33), 0.0F);
         GlStateManager.scale(0.5F, 0.5F, 1.0F);
-        this.fontRenderer.drawString(text, -this.fontRenderer.getStringWidth(text) / 2, 0, 0xFFFFFF);
+        UtilsFX.drawCompactCenteredString(this.fontRenderer, text, 0.0F, 0.0F, 0xFFFFFF);
         GlStateManager.popMatrix();
     }
 
