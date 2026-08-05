@@ -279,6 +279,7 @@ public class REHWandHandler {
                 || areaZ != this.architectAreaZ
                 || areaDim != this.architectAreaDim;
         if (contextChanged) {
+            this.architectRefreshLimiter.invalidate();
             this.architectPlayer = player;
             this.architectWorld = player.world;
             this.architectWandStack = stack;
@@ -499,6 +500,10 @@ public class REHWandHandler {
                 return true;
             }
             return false;
+        }
+
+        void invalidate() {
+            this.lastRefreshTick = Integer.MIN_VALUE;
         }
     }
 

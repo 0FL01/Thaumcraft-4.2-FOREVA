@@ -30,6 +30,18 @@ public class ArchitectOverlayCacheRuntimeTest {
     }
 
     @Test
+    public void changedTargetContextRecomputesImmediatelyWithoutBreakingStableCadence() {
+        REHWandHandler.ArchitectRefreshLimiter limiter = new REHWandHandler.ArchitectRefreshLimiter();
+
+        assertTrue(limiter.shouldRefresh(20));
+        assertFalse(limiter.shouldRefresh(21));
+        limiter.invalidate();
+        assertTrue("a changed target must not leave the architect overlay blank", limiter.shouldRefresh(21));
+        assertFalse("the rebuilt context resumes the five-tick cadence", limiter.shouldRefresh(22));
+        assertTrue(limiter.shouldRefresh(26));
+    }
+
+    @Test
     public void adjacentArchitectCoordinatesOnlyExposeExteriorFaces() {
         Set<BlockPos> blocks = new HashSet<>(Arrays.asList(BlockPos.ORIGIN, BlockPos.ORIGIN.east()));
         int exteriorFaces = 0;
