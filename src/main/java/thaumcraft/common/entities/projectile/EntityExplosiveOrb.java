@@ -8,6 +8,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
+import thaumcraft.common.Thaumcraft;
 
 public class EntityExplosiveOrb extends EntityThrowable {
     public float strength = 1.0f;
@@ -44,6 +45,15 @@ public class EntityExplosiveOrb extends EntityThrowable {
     @Override
     public void onUpdate() {
         super.onUpdate();
+        if (this.world.isRemote) {
+            Thaumcraft.proxy.drawGenericParticles(this.world,
+                    this.prevPosX + (this.rand.nextFloat() - this.rand.nextFloat()) * 0.3F,
+                    this.prevPosY + (this.rand.nextFloat() - this.rand.nextFloat()) * 0.3F,
+                    this.prevPosZ + (this.rand.nextFloat() - this.rand.nextFloat()) * 0.3F,
+                    0.0D, 0.0D, 0.0D,
+                    1.0F, 1.0F, 1.0F, 0.8F,
+                    false, 151, 9, 1, 7 + this.rand.nextInt(5), 0, 2.0F + this.rand.nextFloat());
+        }
         if (this.ticksExisted > 500) this.setDead();
     }
 

@@ -57,6 +57,18 @@ public class FocusProjectileCombatParityTest {
     }
 
     @Test
+    public void explosiveOrbRestoresClientTrail() throws IOException {
+        String source = read("src/main/java/thaumcraft/common/entities/projectile/EntityExplosiveOrb.java");
+
+        assertTrue(source.contains("if (this.world.isRemote) {"));
+        assertTrue(source.contains("Thaumcraft.proxy.drawGenericParticles(this.world,"));
+        assertTrue(source.contains("this.prevPosX + (this.rand.nextFloat() - this.rand.nextFloat()) * 0.3F"));
+        assertTrue(source.contains("this.prevPosY + (this.rand.nextFloat() - this.rand.nextFloat()) * 0.3F"));
+        assertTrue(source.contains("this.prevPosZ + (this.rand.nextFloat() - this.rand.nextFloat()) * 0.3F"));
+        assertTrue(source.contains("false, 151, 9, 1, 7 + this.rand.nextInt(5), 0, 2.0F + this.rand.nextFloat()"));
+    }
+
+    @Test
     public void initialShockTargetUsesSharedLosAwareHelper() throws IOException {
         String source = read("src/main/java/thaumcraft/common/items/wands/foci/FocusShock.java");
 
