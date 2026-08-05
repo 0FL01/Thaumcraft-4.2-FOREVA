@@ -3,9 +3,11 @@ package thaumcraft.common.entities.ai.pech;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.EntityAIBase;
 import net.minecraft.entity.item.EntityItem;
+import net.minecraft.init.SoundEvents;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.pathfinding.PathPoint;
+import net.minecraft.util.SoundCategory;
 import thaumcraft.common.config.Config;
 import thaumcraft.common.entities.monster.EntityPech;
 
@@ -104,8 +106,7 @@ public class AIPechItemEntityGoto extends EntityAIBase {
             }
             if (is == null || is.isEmpty() || is.getCount() != am) {
                 this.targetEntity.world.playSound(null, this.targetEntity.getPosition(),
-                    net.minecraft.util.SoundEvent.REGISTRY.getObject(new net.minecraft.util.ResourceLocation("random.pop")),
-                    net.minecraft.util.SoundCategory.NEUTRAL, 0.2f,
+                    SoundEvents.ENTITY_ITEM_PICKUP, SoundCategory.NEUTRAL, 0.2f,
                     ((this.targetEntity.world.rand.nextFloat() - this.targetEntity.world.rand.nextFloat()) * 0.7f + 1.0f) * 2.0f);
             }
         }

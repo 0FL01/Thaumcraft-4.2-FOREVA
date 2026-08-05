@@ -9,6 +9,10 @@ import org.junit.Test;
 import thaumcraft.common.config.ConfigItems;
 import thaumcraft.common.items.wands.ItemWandCasting;
 
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -39,5 +43,14 @@ public class ConfigRecipesWandBasicOutputTest {
         assertEquals("iron", output.getTagCompound().getString(ItemWandCasting.TAG_CAP));
         assertEquals("wood", output.getTagCompound().getString(ItemWandCasting.TAG_ROD));
         assertEquals(2, output.getTagCompound().getKeySet().size());
+    }
+
+    @Test
+    public void compoundResearchStructuresUseTheCanonicalTaggedBasicWand() throws Exception {
+        String source = new String(Files.readAllBytes(Paths.get(
+                "src/main/java/thaumcraft/common/config/ConfigRecipes.java")), StandardCharsets.UTF_8);
+
+        assertTrue(source.contains(
+                "ItemStack basicWand = ConfigRecipesSpecialSlice.createBasicWandRecipeOutput();"));
     }
 }

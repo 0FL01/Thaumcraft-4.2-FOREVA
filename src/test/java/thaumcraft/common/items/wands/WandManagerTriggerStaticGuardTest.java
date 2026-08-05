@@ -101,10 +101,10 @@ public class WandManagerTriggerStaticGuardTest {
     }
 
     @Test
-    public void thaumonomiconTriggerShouldWorkWithEquippedFocus() throws IOException {
+    public void thaumonomiconTriggerShouldRejectEquippedFocusLikeTc4() throws IOException {
         String source = readFile("src/main/java/thaumcraft/common/items/wands/WandManager.java");
 
-        assertFalse("Creating the Thaumonomicon from a bookshelf must not be blocked by an equipped wand focus; the block trigger runs before focus casting and should still consume the bookshelf.",
+        assertTrue("TC4 leaves the bookshelf untouched when the casting wand has an equipped focus",
                 source.contains("if (wand.getFocus(wandStack) != null) return false;"));
     }
 

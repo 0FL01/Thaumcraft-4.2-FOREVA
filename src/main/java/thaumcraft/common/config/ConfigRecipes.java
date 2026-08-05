@@ -152,7 +152,7 @@ public class ConfigRecipes {
         if (recipeVoidSeed != null) {
             ConfigResearch.recipes.put("VoidSeed", recipeVoidSeed);
         }
-        ItemStack basicWand = new ItemStack(ConfigItems.itemWandCasting, 1, 0);
+        ItemStack basicWand = ConfigRecipesSpecialSlice.createBasicWandRecipeOutput();
         ConfigResearch.recipes.put("Thaumonomicon",
                 Arrays.asList(new AspectList(), 1, 2, 1,
                         Arrays.asList(basicWand, new ItemStack(Blocks.BOOKSHELF))));

@@ -771,7 +771,7 @@ public class ConfigRecipesSpecialSlice {
         bridge.markSpecialRecipesRegistered();
     }
 
-    static ItemStack createBasicWandRecipeOutput() {
+    public static ItemStack createBasicWandRecipeOutput() {
         ItemStack output = new ItemStack(ConfigItems.itemWandCasting, 1, 0);
         NBTTagCompound tag = ItemWandCasting.ensureTag(output);
         tag.setString(ItemWandCasting.TAG_CAP, "iron");

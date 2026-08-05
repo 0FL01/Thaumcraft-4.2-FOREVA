@@ -436,6 +436,8 @@ public class WandManager implements IWandTriggerManager {
 
     public static boolean createThaumonomicon(ItemStack wandStack, EntityPlayer player, World world, int x, int y, int z) {
         if (world.isRemote || wandStack.isEmpty() || !(wandStack.getItem() instanceof ItemWandCasting)) return false;
+        ItemWandCasting wand = (ItemWandCasting) wandStack.getItem();
+        if (wand.getFocus(wandStack) != null) return false;
 
         BlockPos pos = new BlockPos(x, y, z);
         world.setBlockToAir(pos);
