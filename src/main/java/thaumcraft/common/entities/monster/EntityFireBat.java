@@ -20,6 +20,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 import thaumcraft.common.Thaumcraft;
+import thaumcraft.common.lib.utils.EntityUtils;
 
 public class EntityFireBat extends EntityMob {
     public static final byte FLAG_HANGING = 1;
@@ -82,7 +83,12 @@ public class EntityFireBat extends EntityMob {
     public boolean getIsExplosive() { return getFlag(FLAG_EXPLOSIVE); }
     public void setIsExplosive(boolean v) { setFlag(FLAG_EXPLOSIVE, v); }
     public boolean getIsDevil() { return getFlag(FLAG_DEVIL); }
-    public void setIsDevil(boolean v) { setFlag(FLAG_DEVIL, v); }
+    public void setIsDevil(boolean v) {
+        setFlag(FLAG_DEVIL, v);
+        if (v) {
+            this.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).setBaseValue(3.0 + this.damBonus);
+        }
+    }
     public boolean getIsVampire() { return getFlag(FLAG_VAMPIRE); }
     public void setIsVampire(boolean v) { setFlag(FLAG_VAMPIRE, v); }
 
@@ -90,6 +96,16 @@ public class EntityFireBat extends EntityMob {
     @Override
     protected void updateAITasks() {
         super.updateAITasks();
+
+        EntityLivingBase target = this.getAttackTarget();
+        if (target != null && !target.isEntityAlive()) {
+            this.setAttackTarget(null);
+            target = null;
+        }
+        if (target == null && !this.getIsSummoned()) {
+            target = this.world.getNearestAttackablePlayer(this, 12.0, 12.0);
+            this.setAttackTarget(target);
+        }
 
         if (this.getIsBatHanging()) {
             // Hanging mode: check ceiling, wake on player proximity
@@ -108,7 +124,7 @@ public class EntityFireBat extends EntityMob {
             }
         } else {
             // Flying mode
-            if (this.getAttackTarget() == null) {
+            if (target == null) {
                 // Summoned bats take damage over time
                 if (this.getIsSummoned()) {
                     this.attackEntityFrom(DamageSource.STARVE, 2.0f);
@@ -140,20 +156,20 @@ public class EntityFireBat extends EntityMob {
                 }
             } else {
                 // Has target: steer toward it
-                double tx = this.getAttackTarget().posX - this.posX;
-                double ty = this.getAttackTarget().posY + (double)(this.getAttackTarget().getEyeHeight() * 0.66f) - this.posY;
-                double tz = this.getAttackTarget().posZ - this.posZ;
+                double tx = target.posX - this.posX;
+                double ty = target.posY + (double)(target.getEyeHeight() * 0.66f) - this.posY;
+                double tz = target.posZ - this.posZ;
                 this.motionX += (Math.signum(tx) * 0.5 - this.motionX) * 0.1;
                 this.motionY += (Math.signum(ty) * 0.7 - this.motionY) * 0.1;
                 this.motionZ += (Math.signum(tz) * 0.5 - this.motionZ) * 0.1;
                 float yaw = (float)(Math.atan2(this.motionZ, this.motionX) * 180.0 / Math.PI) - 90.0f;
                 this.rotationYaw += MathHelper.wrapDegrees(yaw - this.rotationYaw);
                 // Melee attack when close
-                float dist = this.getDistance(this.getAttackTarget());
-                if (this.attackCooldown <= 0 && dist < Math.max(2.5f, this.getAttackTarget().width * 1.1f)
-                    && this.getAttackTarget().getEntityBoundingBox().maxY > this.getEntityBoundingBox().minY
-                    && this.getAttackTarget().getEntityBoundingBox().minY < this.getEntityBoundingBox().maxY) {
-                    this.onHitTarget(this.getAttackTarget());
+                float dist = this.getDistance(target);
+                if (this.attackCooldown <= 0 && dist < Math.max(2.5f, target.width * 1.1f)
+                    && target.getEntityBoundingBox().maxY > this.getEntityBoundingBox().minY
+                    && target.getEntityBoundingBox().minY < this.getEntityBoundingBox().maxY) {
+                    this.onHitTarget(target);
                 }
             }
             // Nullify creative mode target
@@ -165,8 +181,8 @@ public class EntityFireBat extends EntityMob {
 
     // --- Melee attack logic (was attackEntity(Entity, float)) ---
     protected void onHitTarget(Entity entity) {
-        if (this.getIsSummoned() && entity instanceof EntityLivingBase) {
-            ((EntityLivingBase)entity).hurtResistantTime = 100;
+        if (this.getIsSummoned()) {
+            EntityUtils.setRecentlyHit(entity, 100);
         }
         if (this.getIsVampire()) {
             if (this.owner != null && !this.owner.isPotionActive(net.minecraft.init.MobEffects.REGENERATION)) {
@@ -175,15 +191,24 @@ public class EntityFireBat extends EntityMob {
             this.heal(1.0f);
         }
         this.attackCooldown = 20;
-        boolean explode = this.getIsExplosive() && this.rand.nextInt(10) == 0 && !this.world.isRemote && !this.getIsDevil();
+        boolean explode = !this.world.isRemote && !this.getIsDevil()
+            && (this.getIsExplosive() || this.rand.nextInt(10) == 0);
         if (explode) {
             entity.hurtResistantTime = 0;
             this.world.createExplosion(this, this.posX, this.posY, this.posZ,
                 1.5f + (this.getIsExplosive() ? (float)this.damBonus * 0.33f : 0.0f), false);
             this.setDead();
         } else {
-            this.attackEntityAsMob(entity);
-            if (!(this.getIsVampire() || this.rand.nextBoolean())) {
+            if (this.getIsVampire() || this.rand.nextBoolean()) {
+                double mx = entity.motionX;
+                double my = entity.motionY;
+                double mz = entity.motionZ;
+                this.attackEntityAsMob(entity);
+                entity.isAirBorne = false;
+                entity.motionX = mx;
+                entity.motionY = my;
+                entity.motionZ = mz;
+            } else {
                 entity.setFire(this.getIsSummoned() ? 4 : 2);
             }
         }
@@ -229,14 +254,6 @@ public class EntityFireBat extends EntityMob {
                 0.0, 0.0, 0.0,
                 1.0F, 1.0F, 1.0F, 0.85F,
                 false, 48, 1, 1, 12, 0, 0.35F, 1);
-        }
-
-        // Explosive timeout
-        if (!this.world.isRemote && this.getIsExplosive() && this.getIsSummoned()) {
-            if (this.ticksExisted > 100) {
-                this.world.createExplosion(this, this.posX, this.posY, this.posZ, 1.5f + (float)this.damBonus * 0.33f, false);
-                this.setDead();
-            }
         }
     }
 
