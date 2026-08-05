@@ -26,7 +26,7 @@ public class GuiUnicodeLocalizedLayoutStaticGuardTest {
     @Test
     public void denseGolemBlurbsShouldUseAReadableBoundedUnicodeLayout() throws Exception {
         String source = read("src/main/java/thaumcraft/client/gui/GuiGolem.java");
-        assertTrue(source.contains("this.fontRenderer.getUnicodeFlag() ? 0.75F : 0.5F"));
+        assertTrue(source.contains("this.fontRenderer.getUnicodeFlag() ? 0.875F : 0.5F"));
         assertTrue(source.contains("Math.max(1, (int) (BLURB_WIDTH / blurbScale))"));
         assertTrue(source.contains("UtilsFX.drawCompactString(this.fontRenderer, text"));
         assertTrue(source.contains("UtilsFX.drawCompactCenteredString(this.fontRenderer, text"));

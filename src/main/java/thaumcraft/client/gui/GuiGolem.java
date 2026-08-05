@@ -42,7 +42,7 @@ public class GuiGolem extends GuiContainer {
     protected void drawGuiContainerForegroundLayer(int mouseX, int mouseY) {
         String blurbKey = this.threat >= 0 ? "golemthreat." + this.threat + ".text"
                 : "golemblurb." + this.golem.getCore() + ".text";
-        float blurbScale = this.fontRenderer.getUnicodeFlag() ? 0.75F : 0.5F;
+        float blurbScale = this.fontRenderer.getUnicodeFlag() ? 0.875F : 0.5F;
         GlStateManager.pushMatrix();
         GlStateManager.translate(40.0F, 11.0F, 0.0F);
         GlStateManager.scale(blurbScale, blurbScale, 1.0F);
