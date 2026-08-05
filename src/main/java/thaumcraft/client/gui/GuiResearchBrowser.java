@@ -890,14 +890,14 @@ public class GuiResearchBrowser extends GuiScreen {
         int frame = frames - 1 - tick % frames;
         float u0 = frame / (float) frames;
         float u1 = (frame + 1) / (float) frames;
-        float v0 = 5.0F / 8.0F;
-        float v1 = 6.0F / 8.0F;
+        float v0 = 5.0F / frames;
+        float v1 = 6.0F / frames;
         GlStateManager.pushMatrix();
         GlStateManager.enableBlend();
         GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
         UtilsFX.bindTexture(TileNodeRenderer.NODES_TEXTURE);
         GlStateManager.color(0.266F, 0.0F, 0.333F, 0.66F);
-        this.drawQuad(x - 8.0, y - 8.0, 16.0, 16.0, u0, v0, u1, v1, 0.0);
+        this.drawQuad(x - 40.0, y - 40.0, 80.0, 80.0, u0, v0, u1, v1, 0.0);
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
         GlStateManager.disableBlend();
         GlStateManager.popMatrix();
