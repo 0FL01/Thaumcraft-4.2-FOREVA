@@ -1,8 +1,10 @@
 package thaumcraft.common.tiles;
 
+import java.util.UUID;
 import javax.annotation.Nullable;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
@@ -23,6 +25,7 @@ public class TileHole extends TileThaumcraft implements net.minecraft.util.ITick
     public short countdownmax = 120;
     public byte count = 0;
     public byte direction = 0;
+    private UUID ownerUUID;
 
     public TileHole() {
     }
@@ -32,14 +35,19 @@ public class TileHole extends TileThaumcraft implements net.minecraft.util.ITick
     }
 
     public void setStoredBlock(IBlockState state, @Nullable TileEntity tile, short max, byte count, byte direction) {
+        this.setStoredBlock(state, tile == null ? null : tile.writeToNBT(new NBTTagCompound()),
+                max, count, direction, null);
+    }
+
+    public void setStoredBlock(IBlockState state, @Nullable NBTTagCompound tileData, short max, byte count,
+                               byte direction, @Nullable UUID ownerUUID) {
         this.oldblock = state.getBlock();
         this.oldmeta = this.oldblock.getMetaFromState(state);
         this.countdownmax = max;
         this.count = count;
         this.direction = direction;
-        if (tile != null) {
-            this.tileEntityCompound = tile.writeToNBT(new NBTTagCompound());
-        }
+        this.tileEntityCompound = tileData == null ? null : tileData.copy();
+        this.ownerUUID = ownerUUID;
         this.markDirty();
     }
 
@@ -61,11 +69,18 @@ public class TileHole extends TileThaumcraft implements net.minecraft.util.ITick
         }
 
         if (!this.world.isRemote && this.countdown == 0 && this.count > 1 && this.direction != -1) {
-            this.createOpeningPlane();
-            BlockPos next = this.pos.offset(net.minecraft.util.EnumFacing.byIndex(this.direction).getOpposite());
-            if (!FocusPortableHole.createHole(this.world, next.getX(), next.getY(), next.getZ(),
-                    this.direction, (byte) (this.count - 1), this.countdownmax)) {
+            EntityPlayer owner = this.ownerUUID == null ? null : this.world.getPlayerEntityByUUID(this.ownerUUID);
+            if (owner == null || owner.isDead) {
                 this.count = 0;
+                this.markDirty();
+            } else {
+                this.createOpeningPlane(owner);
+                BlockPos next = this.pos.offset(net.minecraft.util.EnumFacing.byIndex(this.direction).getOpposite());
+                if (!FocusPortableHole.createHole(this.world, next.getX(), next.getY(), next.getZ(),
+                        this.direction, (byte) (this.count - 1), this.countdownmax, owner)) {
+                    this.count = 0;
+                    this.markDirty();
+                }
             }
         }
 
@@ -136,7 +151,7 @@ public class TileHole extends TileThaumcraft implements net.minecraft.util.ITick
         Thaumcraft.proxy.sparkle(x, y, z, 2);
     }
 
-    private void createOpeningPlane() {
+    private void createOpeningPlane(EntityPlayer owner) {
         switch (this.direction) {
             case 0:
             case 1:
@@ -144,7 +159,8 @@ public class TileHole extends TileThaumcraft implements net.minecraft.util.ITick
                     for (int z = -1; z <= 1; z++) {
                         if (x == 0 && z == 0) continue;
                         BlockPos p = this.pos.add(x, 0, z);
-                        FocusPortableHole.createHole(this.world, p.getX(), p.getY(), p.getZ(), -1, (byte) 1, this.countdownmax);
+                        FocusPortableHole.createHole(this.world, p.getX(), p.getY(), p.getZ(),
+                                -1, (byte) 1, this.countdownmax, owner);
                     }
                 }
                 break;
@@ -154,7 +170,8 @@ public class TileHole extends TileThaumcraft implements net.minecraft.util.ITick
                     for (int y = -1; y <= 1; y++) {
                         if (x == 0 && y == 0) continue;
                         BlockPos p = this.pos.add(x, y, 0);
-                        FocusPortableHole.createHole(this.world, p.getX(), p.getY(), p.getZ(), -1, (byte) 1, this.countdownmax);
+                        FocusPortableHole.createHole(this.world, p.getX(), p.getY(), p.getZ(),
+                                -1, (byte) 1, this.countdownmax, owner);
                     }
                 }
                 break;
@@ -164,7 +181,8 @@ public class TileHole extends TileThaumcraft implements net.minecraft.util.ITick
                     for (int z = -1; z <= 1; z++) {
                         if (y == 0 && z == 0) continue;
                         BlockPos p = this.pos.add(0, y, z);
-                        FocusPortableHole.createHole(this.world, p.getX(), p.getY(), p.getZ(), -1, (byte) 1, this.countdownmax);
+                        FocusPortableHole.createHole(this.world, p.getX(), p.getY(), p.getZ(),
+                                -1, (byte) 1, this.countdownmax, owner);
                     }
                 }
                 break;
@@ -176,21 +194,23 @@ public class TileHole extends TileThaumcraft implements net.minecraft.util.ITick
     private void restoreBlock() {
         World world = this.world;
         BlockPos pos = this.pos;
+        IBlockState oldState = world.getBlockState(pos);
         IBlockState restoreState = this.getStoredState();
-        world.setBlockState(pos, restoreState, 3);
+        if (!world.setBlockState(pos, restoreState, 0)) return;
         if (this.tileEntityCompound != null) {
             TileEntity tile = world.getTileEntity(pos);
             if (tile != null) {
-                this.tileEntityCompound.setInteger("x", pos.getX());
-                this.tileEntityCompound.setInteger("y", pos.getY());
-                this.tileEntityCompound.setInteger("z", pos.getZ());
-                tile.readFromNBT(this.tileEntityCompound);
+                NBTTagCompound tileData = this.tileEntityCompound.copy();
+                tileData.setInteger("x", pos.getX());
+                tileData.setInteger("y", pos.getY());
+                tileData.setInteger("z", pos.getZ());
+                tile.readFromNBT(tileData);
             }
         }
+        world.notifyBlockUpdate(pos, oldState, restoreState, 2);
         if (restoreState.getBlock() != Blocks.AIR) {
             world.scheduleUpdate(pos, restoreState.getBlock(), 2);
         }
-        world.notifyNeighborsRespectDebug(pos, restoreState.getBlock(), false);
     }
 
     @Override
@@ -210,6 +230,7 @@ public class TileHole extends TileThaumcraft implements net.minecraft.util.ITick
         this.countdownmax = nbt.getShort("countdownmax");
         this.count = nbt.getByte("count");
         this.direction = nbt.getByte("direction");
+        this.ownerUUID = nbt.hasUniqueId("ownerUUID") ? nbt.getUniqueId("ownerUUID") : null;
     }
 
     @Override
@@ -225,5 +246,8 @@ public class TileHole extends TileThaumcraft implements net.minecraft.util.ITick
         nbt.setShort("countdownmax", this.countdownmax);
         nbt.setByte("count", this.count);
         nbt.setByte("direction", this.direction);
+        if (this.ownerUUID != null) {
+            nbt.setUniqueId("ownerUUID", this.ownerUUID);
+        }
     }
 }

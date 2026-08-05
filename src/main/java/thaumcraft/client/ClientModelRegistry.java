@@ -43,6 +43,8 @@ public final class ClientModelRegistry {
             new ModelResourceLocation("thaumcraft:blockcosmeticopaque", "type=2");
     static final ResourceLocation FOCUS_PECH_DEPTH_SPRITE =
             new ResourceLocation("thaumcraft", "items/focus_pech_depth");
+    static final ResourceLocation FOCUS_PORTABLE_HOLE_DEPTH_SPRITE =
+            new ResourceLocation("thaumcraft", "items/focus_portablehole_depth");
     static final ResourceLocation FOCUS_WARDING_DEPTH_SPRITE =
             new ResourceLocation("thaumcraft", "items/focus_warding_depth");
     static final ResourceLocation FOCUS_WARDING_ORNAMENT_SPRITE =
@@ -79,6 +81,7 @@ public final class ClientModelRegistry {
     @SubscribeEvent
     public static void onTextureStitchPre(TextureStitchEvent.Pre event) {
         event.getMap().registerSprite(FOCUS_PECH_DEPTH_SPRITE);
+        event.getMap().registerSprite(FOCUS_PORTABLE_HOLE_DEPTH_SPRITE);
         event.getMap().registerSprite(FOCUS_WARDING_DEPTH_SPRITE);
         event.getMap().registerSprite(FOCUS_WARDING_ORNAMENT_SPRITE);
         event.getMap().registerSprite(FOCUS_TRADE_ORNAMENT_SPRITE);
