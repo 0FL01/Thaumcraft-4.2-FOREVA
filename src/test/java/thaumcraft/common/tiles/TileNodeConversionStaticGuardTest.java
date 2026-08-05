@@ -73,6 +73,7 @@ public class TileNodeConversionStaticGuardTest {
     @Test
     public void tileNodeShouldKeepDischargeLockAndRechargeDelayContracts() throws IOException {
         String source = readFile("src/main/java/thaumcraft/common/tiles/TileNode.java");
+        String helper = readFile("src/main/java/thaumcraft/common/tiles/NodeStabilizerHelper.java");
 
         assertTrue(source.contains("private int wait = 0;"));
         assertTrue(source.contains("private byte nodeLock = 0;"));
@@ -81,9 +82,11 @@ public class TileNodeConversionStaticGuardTest {
         assertTrue(source.contains("changed |= handleDischarge();"));
         assertTrue(source.contains("this.regeneration > 0 && this.wait == 0 && this.count % this.regeneration == 0"));
         assertTrue(source.contains("private void checkLock()"));
-        assertTrue(source.contains("this.world.getBlockState(this.pos.down()).getBlock() == ConfigBlocks.blockStoneDevice"));
-        assertTrue(source.contains("if (meta == 9)"));
-        assertTrue(source.contains("} else if (meta == 10)"));
+        assertTrue(source.contains("NodeStabilizerHelper.getActiveLock(this.world, this.pos.down(), false)"));
+        assertTrue(helper.contains("state.getBlock() != ConfigBlocks.blockStoneDevice"));
+        assertTrue(helper.contains("world.isBlockPowered(stabilizerPos)"));
+        assertTrue(helper.contains("requireTile && !(world.getTileEntity(stabilizerPos) instanceof TileNodeStabilizer)"));
+        assertTrue(helper.contains("meta == 9 ? (byte) 1 : meta == 10 ? (byte) 2 : 0"));
         assertTrue(source.contains("private boolean handleDischarge()"));
         assertTrue(source.contains("this.world.getBlockState(this.pos).getBlock() != ConfigBlocks.blockAiry || this.getLock() == 1"));
         assertTrue(source.contains("this.getNodeModifier() == NodeModifier.FADING"));
@@ -99,6 +102,24 @@ public class TileNodeConversionStaticGuardTest {
         assertTrue(source.contains("new NetworkRegistry.TargetPoint("));
         assertTrue(source.contains("nbttagcompound.setTag(\"AspectsBase\", tlist);"));
         assertTrue(source.contains("this.world.notifyBlockUpdate(this.pos"));
+    }
+
+    @Test
+    public void tileNodeShouldKeepNaturalLifecycleOrderAndExactRngContracts() throws IOException {
+        String source = readFile("src/main/java/thaumcraft/common/tiles/TileNode.java");
+
+        assertTrue(source.indexOf("this.count++;") < source.indexOf("checkLock();"));
+        assertTrue(source.indexOf("changed |= handleDischarge();") < source.indexOf("handleNaturalErosion();"));
+        assertTrue(source.indexOf("handleNaturalErosion();") < source.indexOf("if (this.wait > 0)"));
+        assertTrue(source.indexOf("changed = handleTaintNode(changed);")
+                < source.indexOf("changed = handleNodeStability(changed);"));
+        assertTrue(source.indexOf("changed = handleNodeStability(changed);")
+                < source.indexOf("changed = handleDarkNode(changed);"));
+        assertTrue(source.contains("this.aspects.reduce(tt, am)"));
+        assertTrue(source.contains("this.world.rand.nextInt(20) == 0 || this.getNodeVisBase(aspect) <= 0"));
+        assertTrue(source.contains("this.world.rand.nextInt(10000 / this.getLock()) == 42"));
+        assertTrue(source.contains("this.world.rand.nextInt(12500 / this.getLock()) == 69"));
+        assertTrue(source.contains("new EntityAspectOrb(this.world,"));
     }
 
     @Test

@@ -38,6 +38,7 @@ import thaumcraft.common.Thaumcraft;
 import thaumcraft.common.blocks.BlockTaintFibres;
 import thaumcraft.common.config.Config;
 import thaumcraft.common.config.ConfigBlocks;
+import thaumcraft.common.entities.EntityAspectOrb;
 import thaumcraft.common.entities.monster.EntityGiantBrainyZombie;
 import thaumcraft.common.items.ItemCompassStone;
 import thaumcraft.common.items.wands.ItemWandCasting;
@@ -176,8 +177,7 @@ implements ITickable, INode, IAspectContainer, IWandable {
         return out;
     }
     public boolean takeFromContainer(Aspect tt, int am) {
-        if (this.aspects.getAmount(tt) >= am) {
-            this.aspects.remove(tt, am);
+        if (this.aspects.reduce(tt, am)) {
             this.markDirty();
             return true;
         }
@@ -288,6 +288,7 @@ implements ITickable, INode, IAspectContainer, IWandable {
             changed |= handleCatchUpRecharge();
         }
         changed |= handleDischarge();
+        handleNaturalErosion();
         if (this.wait > 0) {
             --this.wait;
         }
@@ -296,6 +297,7 @@ implements ITickable, INode, IAspectContainer, IWandable {
             changed |= rechargeOneMissingAspect();
         }
         changed = handleTaintNode(changed);
+        changed = handleNodeStability(changed);
         changed = handleDarkNode(changed);
         changed = handlePureNode(changed);
         changed = handleHungryNodeSecond(changed);
@@ -498,6 +500,44 @@ implements ITickable, INode, IAspectContainer, IWandable {
         return true;
     }
 
+    private void handleNaturalErosion() {
+        if (this.count % 1200 != 0) {
+            return;
+        }
+        for (Aspect aspect : this.getAspects().getAspects()) {
+            if (this.getAspects().getAmount(aspect) > 0) {
+                continue;
+            }
+            this.setNodeVisBase(aspect, (short) (this.getNodeVisBase(aspect) - 1));
+            if (this.world.rand.nextInt(20) == 0 || this.getNodeVisBase(aspect) <= 0) {
+                this.getAspects().remove(aspect);
+                if (this.world.rand.nextInt(5) == 0) {
+                    if (this.getNodeModifier() == NodeModifier.BRIGHT) {
+                        this.setNodeModifier(null);
+                    } else if (this.getNodeModifier() == null) {
+                        this.setNodeModifier(NodeModifier.PALE);
+                    }
+                    if (this.getNodeModifier() == NodeModifier.PALE && this.world.rand.nextInt(5) == 0) {
+                        this.setNodeModifier(NodeModifier.FADING);
+                    }
+                }
+                nodeChange();
+                break;
+            }
+            nodeChange();
+        }
+        if (this.getAspects().size() <= 0) {
+            this.invalidate();
+            IBlockState state = this.world.getBlockState(this.pos);
+            if (state.getBlock() == ConfigBlocks.blockAiry) {
+                this.world.setBlockToAir(this.pos);
+            } else if (state.getBlock() == ConfigBlocks.blockMagicalLog) {
+                int meta = state.getBlock().getMetaFromState(state);
+                this.world.setBlockState(this.pos, state.getBlock().getStateFromMeta(meta - 1), 3);
+            }
+        }
+    }
+
     private boolean handleHungryNodeFirst(boolean changed) {
         if (this.getNodeType() != NodeType.HUNGRY) {
             return changed;
@@ -641,6 +681,41 @@ implements ITickable, INode, IAspectContainer, IWandable {
         return true;
     }
 
+    private boolean handleNodeStability(boolean changed) {
+        if (this.count % 100 == 0) {
+            if (this.getNodeType() == NodeType.UNSTABLE && this.world.rand.nextBoolean()) {
+                if (this.getLock() == 0) {
+                    Aspect aspect = takeRandomPrimalFromSource();
+                    if (aspect != null) {
+                        EntityAspectOrb orb = new EntityAspectOrb(this.world,
+                                this.pos.getX() + 0.5D, this.pos.getY() + 0.5D, this.pos.getZ() + 0.5D,
+                                aspect, 1);
+                        this.world.spawnEntity(orb);
+                        changed = true;
+                    }
+                } else if (this.world.rand.nextInt(10000 / this.getLock()) == 42) {
+                    this.setNodeType(NodeType.NORMAL);
+                    changed = true;
+                }
+            }
+            if (this.getNodeModifier() == NodeModifier.FADING && this.getLock() > 0
+                    && this.world.rand.nextInt(12500 / this.getLock()) == 69) {
+                this.setNodeModifier(NodeModifier.PALE);
+                changed = true;
+            }
+        }
+        return changed;
+    }
+
+    private Aspect takeRandomPrimalFromSource() {
+        Aspect[] primals = this.aspects.getPrimalAspects();
+        Aspect aspect = primals[this.world.rand.nextInt(primals.length)];
+        if (aspect != null && this.aspects.reduce(aspect, 1)) {
+            return aspect;
+        }
+        return null;
+    }
+
     private boolean handleDarkNode(boolean changed) {
         int dim = this.world.provider.getDimension();
         int dimBlacklist = ThaumcraftWorldGenerator.getDimBlacklist(dim);
@@ -740,17 +815,7 @@ implements ITickable, INode, IAspectContainer, IWandable {
                 && this.pos.getY() > 0
                 && this.world.getBlockState(this.pos).getBlock() == ConfigBlocks.blockAiry) {
             byte oldLock = this.nodeLock;
-            this.nodeLock = 0;
-            if (!this.world.isAirBlock(this.pos.down())
-                    && this.world.getBlockState(this.pos.down()).getBlock() == ConfigBlocks.blockStoneDevice) {
-                int meta = this.world.getBlockState(this.pos.down()).getBlock()
-                        .getMetaFromState(this.world.getBlockState(this.pos.down()));
-                if (meta == 9) {
-                    this.nodeLock = 1;
-                } else if (meta == 10) {
-                    this.nodeLock = 2;
-                }
-            }
+            this.nodeLock = NodeStabilizerHelper.getActiveLock(this.world, this.pos.down(), false);
             if (oldLock != this.nodeLock) {
                 this.regeneration = -1;
             }

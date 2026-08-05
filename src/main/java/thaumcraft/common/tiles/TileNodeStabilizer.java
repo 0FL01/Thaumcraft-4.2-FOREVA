@@ -19,9 +19,7 @@ public class TileNodeStabilizer extends TileThaumcraft implements ITickable {
         if (this.world == null || !this.world.isRemote) {
             return;
         }
-        if (this.lock == 0) {
-            this.lock = getStabilizerLockFromState();
-        }
+        this.lock = NodeStabilizerHelper.getActiveLock(this.world, this.pos, false);
         if (this.pos.getY() >= this.world.getHeight() - 1) {
             return;
         }
@@ -29,18 +27,13 @@ public class TileNodeStabilizer extends TileThaumcraft implements ITickable {
         if (this.world.getBlockState(above).getBlock() == ConfigBlocks.blockAiry
                 && (this.world.getBlockState(above).getValue(BlockAiry.TYPE) == 0
                 || this.world.getBlockState(above).getValue(BlockAiry.TYPE) == 5)
-                && !this.world.isAirBlock(this.pos)) {
+                && this.lock > 0) {
             if (this.count < 37) {
                 ++this.count;
             }
         } else if (this.count > 0) {
             --this.count;
         }
-    }
-
-    private int getStabilizerLockFromState() {
-        int meta = this.world.getBlockState(this.pos).getBlock().getMetaFromState(this.world.getBlockState(this.pos));
-        return meta == 9 ? 1 : 2;
     }
 
     @Override
