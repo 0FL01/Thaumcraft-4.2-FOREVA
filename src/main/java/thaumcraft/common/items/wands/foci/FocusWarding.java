@@ -70,7 +70,7 @@ public class FocusWarding extends ItemFocusBasic implements IArchitect {
         ItemWandCasting wand = (ItemWandCasting) wandStack.getItem();
         if (tile instanceof TileWarded) {
             TileWarded warded = (TileWarded) tile;
-            if (warded.owner == player.getName().hashCode()) {
+            if (warded.isOwner(player)) {
                 for (BlockCoordinates c : this.getArchitectBlocks(wandStack, world, pos.getX(), pos.getY(), pos.getZ(),
                         movingobjectposition.sideHit.getIndex(), player)) {
                     unwardBlock(world, new BlockPos(c.x, c.y, c.z), player);
@@ -115,14 +115,14 @@ public class FocusWarding extends ItemFocusBasic implements IArchitect {
         world.setBlockState(pos, ConfigBlocks.blockWarded.getDefaultState(), 3);
         TileEntity tile = world.getTileEntity(pos);
         if (tile instanceof TileWarded) {
-            ((TileWarded) tile).setStoredBlock(state, light, player.getName());
+            ((TileWarded) tile).setStoredBlock(state, light, player);
             world.notifyBlockUpdate(pos, state, ConfigBlocks.blockWarded.getDefaultState(), 3);
         }
     }
 
     private static void unwardBlock(World world, BlockPos pos, EntityPlayer player) {
         TileEntity tile = world.getTileEntity(pos);
-        if (tile instanceof TileWarded && ((TileWarded) tile).owner == player.getName().hashCode()) {
+        if (tile instanceof TileWarded && ((TileWarded) tile).isOwner(player)) {
             IBlockState old = world.getBlockState(pos);
             IBlockState stored = ((TileWarded) tile).getStoredState();
             ((TileWarded) tile).restoreBlock(world, pos);
@@ -207,7 +207,7 @@ public class FocusWarding extends ItemFocusBasic implements IArchitect {
         BlockPos blockPos = new BlockPos(pos.x, pos.y, pos.z);
         TileEntity tile = world.getTileEntity(blockPos);
         if (tiles) {
-            if (!(tile instanceof TileWarded) || ((TileWarded) tile).owner != player.getName().hashCode()) return;
+            if (!(tile instanceof TileWarded) || !((TileWarded) tile).isOwner(player)) return;
         } else if (!isWardable(world, blockPos, player)) {
             return;
         }

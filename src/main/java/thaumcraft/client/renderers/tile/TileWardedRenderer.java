@@ -73,7 +73,7 @@ public class TileWardedRenderer extends TileEntitySpecialRenderer<TileWarded> {
         }
 
         float ticks = player.ticksExisted + partialTicks;
-        boolean owner = tile.owner == player.getName().hashCode();
+        boolean owner = tile.isOwner(player);
         float r = (float) (Math.sin(ticks / 8.0F + tile.getPos().getX()) * 0.2F + 0.8F);
         float g = (float) (Math.sin(ticks / 10.0F + tile.getPos().getY()) * 0.2F + (owner ? 0.7F : 0.28F));
         float b = (float) (Math.sin(ticks / 12.0F + tile.getPos().getZ()) * 0.2F + 0.28F);

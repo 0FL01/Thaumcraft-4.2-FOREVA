@@ -25,6 +25,24 @@ public class TileWardedSyncStaticGuardTest {
         assertTrue(clientProxy.contains("TileWardedRenderer.invalidate(world, pos)"));
     }
 
+    @Test
+    public void wardingFocusAndOwnerTintUseTileAuthority() throws IOException {
+        String tile = read("src/main/java/thaumcraft/common/tiles/TileWarded.java");
+        String focus = read("src/main/java/thaumcraft/common/items/wands/foci/FocusWarding.java");
+        String renderer = read("src/main/java/thaumcraft/client/renderers/tile/TileWardedRenderer.java");
+
+        assertTrue(tile.contains("public boolean isOwner(EntityPlayer player)")
+                && tile.contains("nbt.hasUniqueId(OWNER_UUID_NBT)")
+                && tile.contains("nbt.setUniqueId(OWNER_UUID_NBT, this.ownerUUID)"));
+        assertTrue(focus.contains("warded.isOwner(player)")
+                && focus.contains("((TileWarded) tile).isOwner(player)")
+                && focus.contains("!((TileWarded) tile).isOwner(player)")
+                && !focus.contains("getName().hashCode()")
+                && !focus.contains(".owner"));
+        assertTrue(renderer.contains("boolean owner = tile.isOwner(player);")
+                && !renderer.contains("player.getName().hashCode()"));
+    }
+
     private static String read(String path) throws IOException {
         return new String(Files.readAllBytes(Paths.get(path)), StandardCharsets.UTF_8);
     }

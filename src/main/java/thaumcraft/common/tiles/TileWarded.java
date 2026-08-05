@@ -1,7 +1,9 @@
 package thaumcraft.common.tiles;
 
+import java.util.UUID;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.NetworkManager;
@@ -15,7 +17,11 @@ import thaumcraft.common.Thaumcraft;
 import thaumcraft.common.config.ConfigBlocks;
 
 public class TileWarded extends TileThaumcraft {
+    // Additive 1.12 owner identity; its presence takes precedence over the existing oi field.
+    private static final String OWNER_UUID_NBT = "ownerUUID";
+
     public int owner = 0;
+    private UUID ownerUUID;
     public Block block = Blocks.AIR;
     public byte blockMd = 0;
     public boolean safeToRemove = false;
@@ -33,12 +39,33 @@ public class TileWarded extends TileThaumcraft {
         }
     }
 
+    public void setStoredBlock(IBlockState state, int light, EntityPlayer ownerPlayer) {
+        this.block = state.getBlock();
+        this.blockMd = (byte) this.block.getMetaFromState(state);
+        this.light = (byte) light;
+        this.owner = ownerPlayer != null ? ownerPlayer.getName().hashCode() : 0;
+        this.ownerUUID = ownerPlayer != null ? ownerPlayer.getUniqueID() : null;
+        this.markDirty();
+    }
+
+    /** Retains the current-port common-class contract when no UUID-bearing player is available. */
     public void setStoredBlock(IBlockState state, int light, String ownerName) {
         this.block = state.getBlock();
         this.blockMd = (byte) this.block.getMetaFromState(state);
         this.light = (byte) light;
         this.owner = ownerName != null ? ownerName.hashCode() : 0;
+        this.ownerUUID = null;
         this.markDirty();
+    }
+
+    public boolean isOwner(EntityPlayer player) {
+        if (player == null) {
+            return false;
+        }
+        if (this.ownerUUID != null) {
+            return this.ownerUUID.equals(player.getUniqueID());
+        }
+        return this.owner != 0 && this.owner == player.getName().hashCode();
     }
 
     public void restoreBlock(World world, BlockPos pos) {
@@ -62,6 +89,7 @@ public class TileWarded extends TileThaumcraft {
         if (this.owner == 0 && nbt.hasKey("owner")) {
             this.owner = nbt.getString("owner").hashCode();
         }
+        this.ownerUUID = nbt.hasUniqueId(OWNER_UUID_NBT) ? nbt.getUniqueId(OWNER_UUID_NBT) : null;
     }
 
     @Override
@@ -72,6 +100,9 @@ public class TileWarded extends TileThaumcraft {
         nbt.setByte("md", this.blockMd);
         nbt.setByte("ll", this.light);
         nbt.setInteger("oi", this.owner);
+        if (this.ownerUUID != null) {
+            nbt.setUniqueId(OWNER_UUID_NBT, this.ownerUUID);
+        }
     }
 
     @Override
