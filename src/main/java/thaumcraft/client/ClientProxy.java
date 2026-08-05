@@ -407,6 +407,17 @@ public class ClientProxy extends CommonProxy {
                 }
                 continue;
             }
+            if (item == ConfigItems.itemAmuletVis) {
+                ModelResourceLocation lesserModel = new ModelResourceLocation(
+                        new ResourceLocation("thaumcraft", "itemamuletvis_lesser"), "inventory");
+                ModelResourceLocation normalModel = new ModelResourceLocation(registryName, "inventory");
+                ModelLoader.setCustomModelResourceLocation(item, 0, lesserModel);
+                ModelLoader.setCustomModelResourceLocation(item, 1, normalModel);
+                for (int meta = 2; meta < 64; meta++) {
+                    ModelLoader.setCustomModelResourceLocation(item, meta, normalModel);
+                }
+                continue;
+            }
             if (item == ConfigItems.itemRingRunic) {
                 ModelResourceLocation lesserModel = new ModelResourceLocation(
                         new ResourceLocation("thaumcraft", "itemringrunic_lesser"), "inventory");

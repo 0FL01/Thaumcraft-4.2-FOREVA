@@ -17,7 +17,6 @@ import net.minecraft.world.World;
 import thaumcraft.api.IRunicArmor;
 import thaumcraft.api.aspects.Aspect;
 import thaumcraft.api.aspects.AspectList;
-import thaumcraft.api.aspects.IEssentiaContainerItem;
 import thaumcraft.common.items.wands.ItemWandCasting;
 import thaumcraft.common.lib.CreativeTabThaumcraft;
 import thaumcraft.common.lib.research.ResearchManager;
@@ -27,7 +26,7 @@ import java.text.DecimalFormat;
 import java.lang.ref.WeakReference;
 import java.util.List;
 
-public class ItemAmuletVis extends Item implements IBauble, IEssentiaContainerItem, IRunicArmor {
+public class ItemAmuletVis extends Item implements IBauble, IRunicArmor {
     private static final DecimalFormat VIS_FORMAT = new DecimalFormat("#######.##");
 
     public ItemAmuletVis() {
@@ -201,18 +200,5 @@ public class ItemAmuletVis extends Item implements IBauble, IEssentiaContainerIt
     @Override
     public int getRunicCharge(ItemStack itemstack) {
         return 0;
-    }
-
-    @Override
-    public AspectList getAspects(ItemStack itemstack) {
-        return this.getAllVis(itemstack);
-    }
-
-    @Override
-    public void setAspects(ItemStack itemstack, AspectList aspects) {
-        if (aspects == null) return;
-        for (Aspect aspect : aspects.getAspects()) {
-            this.storeVis(itemstack, aspect, aspects.getAmount(aspect));
-        }
     }
 }
