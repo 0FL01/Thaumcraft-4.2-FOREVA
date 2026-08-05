@@ -358,7 +358,8 @@ public final class WandRenderCalibration {
      * <p>Constants mirrored here (original code references):
      * <ul>
      *   <li>common final rotate: 180 about X</li>
-     *   <li>wand GUI: translate(0.5,0.5,0) scale(0.6) rotate(20,-45,45) translate(0,0.6,0)</li>
+     *   <li>wand/sceptre GUI: translate(0.5,0.5,1.125), scale(0.625),
+     *       rotate(30,-45,66), translate(0,0.6,0)</li>
      *   <li>wand GROUND/FIXED: translate(0,1,0)</li>
      *   <li>wand hand: translate(0.5,1.0,0.5) [fp: scale(1,1.1,1)] scale(0.5)</li>
      *   <li>wand NONE: translate(0.5,1.5,0.5)</li>
@@ -376,9 +377,9 @@ public final class WandRenderCalibration {
         // ---- wand ----
         EnumMap<ItemCameraTransforms.TransformType, Transform> wand = new EnumMap<>(ItemCameraTransforms.TransformType.class);
         putContext(wand, ItemCameraTransforms.TransformType.GUI,
-                0,0,0,  0.5f,0.5f,0f,
-                1f,1.1f,1f,  0.6f,0.6f,0.6f,  1f,1f,1f,
-                20f,-45f,45f,  0f,0.6f,0f,  finalRotate, false);
+                0,0,0,  0.5f,0.5f,1.125f,
+                1f,1.1f,1f,  0.625f,0.625f,0.625f,  1f,1f,1f,
+                30f,-45f,66f,  0f,0.6f,0f,  finalRotate, false);
         putContext(wand, ItemCameraTransforms.TransformType.GROUND,
                 0,0,0,  0f,1f,0f,  1f,1.1f,1f,  1f,1f,1f,  1f,1f,1f,
                 0f,0f,0f,  0f,0f,0f,  finalRotate, false);

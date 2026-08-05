@@ -76,9 +76,9 @@ public class CustomItemRendererContractTest {
                         && wandCalibration.contains("buildDefaultCalibration()")
                         // Current wand values and TC4 staff GUI values are both mirrored in fallback defaults.
                         && wandCalibration.contains("180f, 0f, 0f")
-                        && wandCalibration.contains("0.5f,0.5f,0f")
-                        && wandCalibration.contains("0.6f,0.6f,0.6f")
-                        && wandCalibration.contains("20f,-45f,45f")
+                        && wandCalibration.contains("0.5f,0.5f,1.125f")
+                        && wandCalibration.contains("0.625f,0.625f,0.625f")
+                        && wandCalibration.contains("30f,-45f,66f")
                         && wandCalibration.contains("0f,0.6f,0f")
                         && wandCalibration.contains("0f,1f,0f")
                         && wandCalibration.contains("0.5f,1f,0.5f")
@@ -169,7 +169,7 @@ public class CustomItemRendererContractTest {
     }
 
     @Test
-    public void staffInventoryPoseShouldUseTheTc4CompensatedProjection() throws IOException {
+    public void wandKindsInventoryPoseShouldUseTheTc4CompensatedProjection() throws IOException {
         String calibrationSource = read("src/main/java/thaumcraft/client/renderers/item/WandRenderCalibration.java");
         String compactSource = calibrationSource.replaceAll("\\s+", "");
         assertTrue("Java fallback must preserve the compensated TC4 staff inventory matrix",
@@ -183,14 +183,21 @@ public class CustomItemRendererContractTest {
                 .getAsJsonObject().getAsJsonObject("kinds");
         JsonObject wandGui = kinds.getAsJsonObject("wand").getAsJsonObject("contexts").getAsJsonObject("GUI");
         JsonObject staffGui = kinds.getAsJsonObject("staff").getAsJsonObject("contexts").getAsJsonObject("GUI");
+        JsonObject sceptre = kinds.getAsJsonObject("sceptre");
 
-        assertVector(wandGui, "translate", 0.5F, 0.5F, 0.0F);
-        assertVector(wandGui, "rotate", 20.0F, -45.0F, 45.0F);
+        assertVector(wandGui, "translate", 0.5F, 0.5F, 1.125F);
+        assertVector(wandGui, "rotate", 30.0F, -45.0F, 66.0F);
+        assertVector(wandGui, "scale", 0.625F, 0.625F, 0.625F);
         assertVector(staffGui, "translate", 0.5F, 0.27063294F, 1.28125F);
         assertVector(staffGui, "rotate", 30.0F, -45.0F, 66.0F);
         assertVector(staffGui, "scale", 0.625F, 0.625F, 0.625F);
         assertVector(staffGui, "scaleMultiplier", 0.8F, 0.8F, 0.8F);
         assertVector(staffGui, "postTranslateAdd", -0.7F, 0.6F, 0.0F);
+        assertEquals("Sceptre GUI should inherit the exact wand projection", "wand",
+                sceptre.get("inherit").getAsString());
+        assertFalse("Sceptre should not override the inherited wand contexts", sceptre.has("contexts"));
+        assertTrue("Java fallback should copy every wand context into the sceptre kind",
+                compactSource.contains("sceptre.put(type,copy(wand.get(type)));"));
     }
 
     @Test
@@ -223,6 +230,36 @@ public class CustomItemRendererContractTest {
                 rotateY(-45.0),
                 rotateZ(66.0),
                 translation(-0.7, 1.2, 0.0),
+                rotateX(180.0));
+
+        assertMatrixEquals(tc4, port, 0.000001);
+    }
+
+    @Test
+    public void wandAndSceptreInventoryPoseShouldComposeTheLegacyForgeHelperExactly() {
+        // Sceptres use this same outer transform; ModelWand adds their extra cap geometry later.
+        double[][] tc4 = compose(
+                translation(-2.0, 3.0, 0.0),
+                scale(10.0, 10.0, 10.0),
+                translation(1.0, 0.5, 1.0),
+                scale(1.0, 1.0, -1.0),
+                rotateX(210.0),
+                rotateY(45.0),
+                rotateY(-90.0),
+                rotateZ(66.0),
+                translation(0.0, 0.6, 0.0),
+                rotateX(180.0));
+
+        double[][] port = compose(
+                translation(8.0, 8.0, 0.0),
+                scale(16.0, -16.0, 16.0),
+                translation(-0.5, -0.5, -0.5),
+                translation(0.5, 0.5, 1.125),
+                scale(0.625, 0.625, 0.625),
+                rotateX(30.0),
+                rotateY(-45.0),
+                rotateZ(66.0),
+                translation(0.0, 0.6, 0.0),
                 rotateX(180.0));
 
         assertMatrixEquals(tc4, port, 0.000001);
