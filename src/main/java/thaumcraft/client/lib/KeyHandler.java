@@ -23,12 +23,15 @@ import thaumcraft.common.lib.network.misc.PacketItemKeyToServer;
 
 @SideOnly(Side.CLIENT)
 public class KeyHandler {
-    public final KeyBinding keyF = new KeyBinding("Change Wand Focus",
-            KeyConflictContext.IN_GAME, Keyboard.KEY_F, "key.categories.misc");
+    static final int DEFAULT_FOCUS_KEY = Keyboard.KEY_G;
+    static final int DEFAULT_MISC_KEY = Keyboard.KEY_NONE;
+
+    public final KeyBinding keyF = new KeyBinding("Wand Focus Selector",
+            KeyConflictContext.IN_GAME, DEFAULT_FOCUS_KEY, "key.categories.misc");
     public final KeyBinding keyH = new KeyBinding("Activate Hover Harness",
             KeyConflictContext.IN_GAME, Keyboard.KEY_H, "key.categories.misc");
     public final KeyBinding keyG = new KeyBinding("Misc Wand Toggle",
-            KeyConflictContext.IN_GAME, Keyboard.KEY_G, "key.categories.misc");
+            KeyConflictContext.IN_GAME, DEFAULT_MISC_KEY, "key.categories.misc");
 
     public static boolean radialActive = false;
     public static boolean radialLock = false;
@@ -115,7 +118,9 @@ public class KeyHandler {
     }
 
     private void handleMiscKey(EntityPlayer player) {
-        if (this.keyG.isKeyDown()) {
+        boolean focusDown = this.keyF.isKeyDown();
+        boolean miscDown = this.keyG.isKeyDown();
+        if (shouldHandleMiscKey(focusDown, this.keyF.getKeyCode(), miscDown, this.keyG.getKeyCode())) {
             if (player != null && !this.keyPressedG) {
                 lastPressG = System.currentTimeMillis();
                 PacketHandler.INSTANCE.sendToServer(new PacketItemKeyToServer(player, 1));
@@ -127,6 +132,10 @@ public class KeyHandler {
             }
             this.keyPressedG = false;
         }
+    }
+
+    static boolean shouldHandleMiscKey(boolean focusDown, int focusKey, boolean miscDown, int miscKey) {
+        return miscDown && (!focusDown || focusKey != miscKey);
     }
 
     private void releaseAllKeys() {

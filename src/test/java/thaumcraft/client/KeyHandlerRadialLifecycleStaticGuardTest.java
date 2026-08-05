@@ -31,7 +31,8 @@ public class KeyHandlerRadialLifecycleStaticGuardTest {
 
         assertTrue(globalRelease.contains("radialActive = false;"));
         assertTrue(globalRelease.contains("this.keyPressedF = false;"));
-        assertTrue(source.contains("new KeyBinding(\"Change Wand Focus\","));
+        assertTrue(source.contains("new KeyBinding(\"Wand Focus Selector\","));
+        assertTrue(source.contains("KeyConflictContext.IN_GAME, DEFAULT_FOCUS_KEY"));
         assertTrue(source.contains("new KeyBinding(\"Misc Wand Toggle\","));
     }
 
