@@ -161,8 +161,8 @@ public class ConfigRecipesSpecialSlice {
 
         IRecipe recipeScribe2 = new ShapelessOreRecipe(null,
                 new ItemStack(ConfigItems.itemInkwell),
+                Items.GLASS_BOTTLE,
                 Items.FEATHER,
-                Items.DYE,
                 "dyeBlack")
                 .setRegistryName("thaumcraft", "scribe2");
         registry.register(recipeScribe2);
@@ -181,7 +181,7 @@ public class ConfigRecipesSpecialSlice {
                 " 1 ",
                 "IGI",
                 " 1 ",
-                'I', Items.IRON_INGOT,
+                'I', Items.GOLD_INGOT,
                 'G', Blocks.GLASS,
                 '1', new ItemStack(ConfigItems.itemShard, 1, OreDictionary.WILDCARD_VALUE))
                 .setRegistryName("thaumcraft", "thaumometer");
