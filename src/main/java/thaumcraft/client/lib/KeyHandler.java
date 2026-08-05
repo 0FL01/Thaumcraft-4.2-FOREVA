@@ -12,6 +12,7 @@ import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.lwjgl.input.Keyboard;
+import org.lwjgl.opengl.Display;
 import thaumcraft.common.entities.golems.ItemGolemBell;
 import thaumcraft.common.items.armor.Hover;
 import thaumcraft.common.items.armor.ItemHoverHarness;
@@ -49,12 +50,16 @@ public class KeyHandler {
     public void clientTick(TickEvent.ClientTickEvent event) {
         if (event.phase != TickEvent.Phase.START) return;
         Minecraft minecraft = Minecraft.getMinecraft();
+        EntityPlayer player = minecraft.player;
         if (!minecraft.inGameHasFocus) {
-            releaseAllKeys();
+            if (radialActive && minecraft.currentScreen == null && Display.isActive()) {
+                handleFocusKey(player);
+            } else {
+                releaseAllKeys();
+            }
             return;
         }
 
-        EntityPlayer player = minecraft.player;
         handleFocusKey(player);
         handleHoverKey(player);
         handleMiscKey(player);
