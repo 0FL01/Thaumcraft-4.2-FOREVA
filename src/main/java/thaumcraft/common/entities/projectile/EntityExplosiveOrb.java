@@ -1,5 +1,6 @@
 package thaumcraft.common.entities.projectile;
 
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.projectile.EntityThrowable;
 import net.minecraft.util.DamageSource;
@@ -8,15 +9,21 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.common.registry.IThrowableEntity;
 import thaumcraft.common.Thaumcraft;
 
-public class EntityExplosiveOrb extends EntityThrowable {
+public class EntityExplosiveOrb extends EntityThrowable implements IThrowableEntity {
     public float strength = 1.0f;
     public boolean onFire = false;
 
     public EntityExplosiveOrb(World world) { super(world); }
     public EntityExplosiveOrb(World world, EntityLivingBase shooter) { super(world, shooter); }
     public EntityExplosiveOrb(World world, double x, double y, double z) { super(world, x, y, z); }
+
+    @Override
+    public void setThrower(Entity entity) {
+        this.thrower = entity instanceof EntityLivingBase ? (EntityLivingBase) entity : null;
+    }
 
     @Override
     protected float getGravityVelocity() { return 0.01f; }

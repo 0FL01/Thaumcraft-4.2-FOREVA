@@ -24,6 +24,7 @@ import net.minecraft.world.WorldType;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.IChunkProvider;
 import net.minecraft.world.storage.WorldInfo;
+import net.minecraftforge.fml.common.registry.IThrowableEntity;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -66,6 +67,21 @@ public class FocusProjectileCombatParityTest {
         assertTrue(source.contains("this.prevPosY + (this.rand.nextFloat() - this.rand.nextFloat()) * 0.3F"));
         assertTrue(source.contains("this.prevPosZ + (this.rand.nextFloat() - this.rand.nextFloat()) * 0.3F"));
         assertTrue(source.contains("false, 151, 9, 1, 7 + this.rand.nextInt(5), 0, 2.0F + this.rand.nextFloat()"));
+    }
+
+    @Test
+    public void explosiveOrbExposesThrowerToForgeSpawnProtocol() {
+        TestWorld world = new TestWorld();
+        RecordingPlayer thrower = new RecordingPlayer(world);
+        EntityExplosiveOrb orb = new EntityExplosiveOrb(world, thrower);
+
+        assertTrue(orb instanceof IThrowableEntity);
+        IThrowableEntity throwable = orb;
+        assertSame(thrower, throwable.getThrower());
+        throwable.setThrower(null);
+        assertNull(throwable.getThrower());
+        throwable.setThrower(thrower);
+        assertSame(thrower, throwable.getThrower());
     }
 
     @Test
