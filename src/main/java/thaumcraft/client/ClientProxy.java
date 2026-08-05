@@ -32,6 +32,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemArmor;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.EnumHand;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.BlockPos;
@@ -1402,8 +1403,10 @@ public class ClientProxy extends CommonProxy {
             return null;
         }
         switch (ID) {
-            case GUI_FOCUS_POUCH:
-                return new GuiFocusPouch(player.inventory, world, x, y, z);
+            case GUI_FOCUS_POUCH: {
+                EnumHand[] hands = EnumHand.values();
+                return x >= 0 && x < hands.length ? new GuiFocusPouch(player.inventory, world, hands[x]) : null;
+            }
             case GUI_HAND_MIRROR:
                 return new GuiHandMirror(player.inventory, world, x, y, z);
             case GUI_HOVER_HARNESS:

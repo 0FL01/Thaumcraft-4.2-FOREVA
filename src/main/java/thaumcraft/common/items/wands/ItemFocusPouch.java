@@ -11,7 +11,6 @@ import net.minecraft.util.ActionResult;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.NonNullList;
-import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 import thaumcraft.common.Thaumcraft;
 import thaumcraft.common.CommonProxy;
@@ -43,7 +42,7 @@ public class ItemFocusPouch extends Item {
         ItemStack stack = player.getHeldItem(hand);
         if (!world.isRemote) {
             player.openGui(Thaumcraft.instance, CommonProxy.GUI_FOCUS_POUCH, world,
-                    MathHelper.floor(player.posX), MathHelper.floor(player.posY), MathHelper.floor(player.posZ));
+                    hand.ordinal(), 0, 0);
         }
         return new ActionResult<>(EnumActionResult.SUCCESS, stack);
     }

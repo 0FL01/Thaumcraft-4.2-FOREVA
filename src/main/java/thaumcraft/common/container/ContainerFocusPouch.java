@@ -7,6 +7,7 @@ import net.minecraft.inventory.Container;
 import net.minecraft.inventory.InventoryBasic;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.EnumHand;
 import net.minecraft.world.World;
 import thaumcraft.api.wands.ItemFocusBasic;
 import thaumcraft.common.items.wands.ItemFocusPouch;
@@ -14,6 +15,7 @@ import thaumcraft.common.items.wands.ItemFocusPouch;
 public class ContainerFocusPouch extends Container {
     private final EntityPlayer player;
     private final World worldObj;
+    private final EnumHand hand;
     private final ItemStack pouchStack;
     private final ItemFocusPouch pouchItem;
     private final InventoryFocusPouch pouchInventory;
@@ -21,23 +23,22 @@ public class ContainerFocusPouch extends Container {
     private final int blockedContainerSlot;
 
     public ContainerFocusPouch() {
-        this(null, null, 0, 0, 0);
+        this(null, null, null);
     }
 
-    public ContainerFocusPouch(InventoryPlayer playerInventory, World world, int x, int y, int z) {
+    public ContainerFocusPouch(InventoryPlayer playerInventory, World world, EnumHand hand) {
         this.player = playerInventory != null ? playerInventory.player : null;
         this.worldObj = world;
-        this.pouchPlayerSlot = findPouchSlot(playerInventory);
+        this.hand = hand;
+        this.pouchPlayerSlot = playerInventory != null && hand == EnumHand.MAIN_HAND
+                ? playerInventory.currentItem : -1;
         this.blockedContainerSlot = toContainerSlot(this.pouchPlayerSlot);
-        this.pouchStack = findPouch(playerInventory, this.pouchPlayerSlot);
+        this.pouchStack = this.player != null && hand != null ? this.player.getHeldItem(hand) : ItemStack.EMPTY;
         this.pouchItem = !this.pouchStack.isEmpty() && this.pouchStack.getItem() instanceof ItemFocusPouch
                 ? (ItemFocusPouch) this.pouchStack.getItem() : null;
         this.pouchInventory = new InventoryFocusPouch();
         if (this.pouchItem != null) {
-            ItemStack[] stacks = this.pouchItem.getInventory(this.pouchStack);
-            for (int i = 0; i < stacks.length; i++) {
-                this.pouchInventory.setInventorySlotContents(i, stacks[i]);
-            }
+            this.pouchInventory.load(this.pouchItem.getInventory(this.pouchStack));
         }
 
         for (int row = 0; row < 3; row++) {
@@ -60,24 +61,28 @@ public class ContainerFocusPouch extends Container {
 
     @Override
     public boolean canInteractWith(EntityPlayer playerIn) {
-        return playerIn != null && playerIn == this.player && !playerIn.isDead && playerIn.world == this.worldObj
-                && this.pouchItem != null && !this.pouchStack.isEmpty();
+        return this.hasValidBinding(playerIn);
     }
 
     @Override
     public void onContainerClosed(EntityPlayer playerIn) {
         super.onContainerClosed(playerIn);
-        if (this.pouchItem == null || this.pouchStack.isEmpty()) return;
+        if (this.hasValidBinding(playerIn)) this.persistInventory();
+    }
+
+    private void persistInventory() {
+        if (this.worldObj == null || this.worldObj.isRemote || !this.hasValidBinding(this.player)) return;
         ItemStack[] stacks = new ItemStack[18];
         for (int i = 0; i < stacks.length; i++) {
             stacks[i] = this.pouchInventory.getStackInSlot(i);
         }
         this.pouchItem.setInventory(this.pouchStack, stacks);
+        this.player.inventory.markDirty();
     }
 
     @Override
     public ItemStack transferStackInSlot(EntityPlayer playerIn, int index) {
-        if (index == this.blockedContainerSlot) return ItemStack.EMPTY;
+        if (!this.hasValidBinding(playerIn) || index == this.blockedContainerSlot) return ItemStack.EMPTY;
         ItemStack copy = ItemStack.EMPTY;
         Slot slot = index >= 0 && index < this.inventorySlots.size() ? this.inventorySlots.get(index) : null;
         if (slot != null && slot.getHasStack()) {
@@ -97,8 +102,23 @@ public class ContainerFocusPouch extends Container {
 
     @Override
     public ItemStack slotClick(int slotId, int dragType, ClickType clickTypeIn, EntityPlayer player) {
-        if (slotId == this.blockedContainerSlot) return ItemStack.EMPTY;
+        if (clickTypeIn == ClickType.SWAP || !this.hasValidBinding(player)
+                || slotId == this.blockedContainerSlot) return ItemStack.EMPTY;
         return super.slotClick(slotId, dragType, clickTypeIn, player);
+    }
+
+    private boolean hasValidBinding(EntityPlayer playerIn) {
+        if (playerIn == null || playerIn != this.player || playerIn.isDead || this.worldObj == null
+                || playerIn.world != this.worldObj || this.hand == null || this.pouchItem == null
+                || this.pouchStack.isEmpty() || !(this.pouchStack.getItem() instanceof ItemFocusPouch)) {
+            return false;
+        }
+        if (this.hand == EnumHand.MAIN_HAND
+                && (playerIn.inventory.currentItem != this.pouchPlayerSlot
+                || playerIn.inventory.mainInventory.get(this.pouchPlayerSlot) != this.pouchStack)) {
+            return false;
+        }
+        return playerIn.getHeldItem(this.hand) == this.pouchStack;
     }
 
     private void addPlayerSlot(InventoryPlayer inventory, int index, int x, int y) {
@@ -119,41 +139,49 @@ public class ContainerFocusPouch extends Container {
         }
     }
 
-    private static ItemStack findPouch(InventoryPlayer inventory, int slot) {
-        if (inventory == null) return ItemStack.EMPTY;
-        ItemStack main = inventory.player.getHeldItemMainhand();
-        if (!main.isEmpty() && main.getItem() instanceof ItemFocusPouch) return main;
-        ItemStack off = inventory.player.getHeldItemOffhand();
-        if (!off.isEmpty() && off.getItem() instanceof ItemFocusPouch) return off;
-        if (slot >= 0 && slot < inventory.mainInventory.size()) {
-            ItemStack stack = inventory.mainInventory.get(slot);
-            if (!stack.isEmpty() && stack.getItem() instanceof ItemFocusPouch) return stack;
-        }
-        ItemStack current = inventory.getCurrentItem();
-        if (!current.isEmpty() && current.getItem() instanceof ItemFocusPouch) return current;
-        return ItemStack.EMPTY;
-    }
-
-    private static int findPouchSlot(InventoryPlayer inventory) {
-        if (inventory == null) return -1;
-        ItemStack held = inventory.player.getHeldItemMainhand();
-        if (!held.isEmpty() && held.getItem() instanceof ItemFocusPouch) return inventory.currentItem;
-        for (int i = 0; i < inventory.mainInventory.size(); i++) {
-            ItemStack stack = inventory.mainInventory.get(i);
-            if (!stack.isEmpty() && stack.getItem() instanceof ItemFocusPouch) return i;
-        }
-        return -1;
-    }
-
     private static int toContainerSlot(int playerSlot) {
         if (playerSlot >= 0 && playerSlot < 9) return 45 + playerSlot;
         if (playerSlot >= 9 && playerSlot < 36) return 18 + (playerSlot - 9);
         return -1;
     }
 
-    private static final class InventoryFocusPouch extends InventoryBasic {
+    private final class InventoryFocusPouch extends InventoryBasic {
+        private boolean loading;
+
         InventoryFocusPouch() {
             super("container.focus_pouch", false, 18);
+        }
+
+        void load(ItemStack[] stacks) {
+            this.loading = true;
+            try {
+                for (int i = 0; i < this.getSizeInventory(); i++) {
+                    this.setInventorySlotContents(i, i < stacks.length ? stacks[i] : ItemStack.EMPTY);
+                }
+            } finally {
+                this.loading = false;
+            }
+        }
+
+        @Override
+        public void markDirty() {
+            if (this.loading) return;
+            super.markDirty();
+            ContainerFocusPouch.this.persistInventory();
+        }
+
+        @Override
+        public ItemStack removeStackFromSlot(int index) {
+            ItemStack removed = super.removeStackFromSlot(index);
+            if (!removed.isEmpty()) this.markDirty();
+            return removed;
+        }
+
+        @Override
+        public void clear() {
+            boolean wasEmpty = this.isEmpty();
+            super.clear();
+            if (!wasEmpty) this.markDirty();
         }
 
         @Override

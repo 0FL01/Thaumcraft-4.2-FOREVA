@@ -16,7 +16,8 @@ public class ProxyUtilityGuiRoutingStaticGuardTest {
         String commonProxySource = readFile("src/main/java/thaumcraft/common/CommonProxy.java");
 
         assertTrue("CommonProxy should keep focus pouch server route",
-                commonProxySource.contains("case GUI_FOCUS_POUCH: return new ContainerFocusPouch(player.inventory, world, x, y, z);"));
+                commonProxySource.contains("new ContainerFocusPouch(player.inventory, world, hands[x])")
+                        && commonProxySource.contains("x >= 0 && x < hands.length"));
         assertTrue("CommonProxy should keep hand mirror server route",
                 commonProxySource.contains("case GUI_HAND_MIRROR: return new ContainerHandMirror(player.inventory, world, x, y, z);"));
         assertTrue("CommonProxy should keep hover harness server route",
@@ -35,7 +36,8 @@ public class ProxyUtilityGuiRoutingStaticGuardTest {
 
         assertTrue("ClientProxy should keep focus pouch client route",
                 clientProxySource.contains("case GUI_FOCUS_POUCH:")
-                        && clientProxySource.contains("new GuiFocusPouch(player.inventory, world, x, y, z)"));
+                        && clientProxySource.contains("new GuiFocusPouch(player.inventory, world, hands[x])")
+                        && clientProxySource.contains("x >= 0 && x < hands.length"));
         assertTrue("ClientProxy should keep hand mirror client route",
                 clientProxySource.contains("case GUI_HAND_MIRROR:")
                         && clientProxySource.contains("new GuiHandMirror(player.inventory, world, x, y, z)"));

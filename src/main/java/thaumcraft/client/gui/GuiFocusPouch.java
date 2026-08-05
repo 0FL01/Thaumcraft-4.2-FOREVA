@@ -3,6 +3,7 @@ package thaumcraft.client.gui;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.player.InventoryPlayer;
+import net.minecraft.util.EnumHand;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 import thaumcraft.common.container.ContainerFocusPouch;
@@ -11,8 +12,8 @@ public class GuiFocusPouch extends GuiContainer {
 
     private static final ResourceLocation TEXTURE = new ResourceLocation("thaumcraft", "textures/gui/gui_focuspouch.png");
 
-    public GuiFocusPouch(InventoryPlayer playerInventory, World world, int x, int y, int z) {
-        super(new ContainerFocusPouch(playerInventory, world, x, y, z));
+    public GuiFocusPouch(InventoryPlayer playerInventory, World world, EnumHand hand) {
+        super(new ContainerFocusPouch(playerInventory, world, hand));
         this.xSize = 175;
         this.ySize = 232;
     }

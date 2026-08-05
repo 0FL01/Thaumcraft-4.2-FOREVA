@@ -280,6 +280,22 @@ public class REHWandHandler {
                     }
                 }
 
+                ItemStack offhand = player.getHeldItemOffhand();
+                if (!offhand.isEmpty() && offhand.getItem() instanceof ItemFocusPouch) {
+                    ++pouchCount;
+                    ItemStack[] inv = ((ItemFocusPouch) offhand.getItem()).getInventory(offhand);
+                    for (int q = 0; q < inv.length; q++) {
+                        ItemStack focus = inv[q];
+                        if (!focus.isEmpty() && focus.getItem() instanceof ItemFocusBasic) {
+                            String key = ((ItemFocusBasic) focus.getItem()).getSortingHelper(focus);
+                            foci.put(key, q + pouchCount * 1000);
+                            fociItem.put(key, focus.copy());
+                            fociScale.put(key, 1.0F);
+                            fociHover.put(key, false);
+                        }
+                    }
+                }
+
                 // Grab mouse so we can track position
                 if (!foci.isEmpty() && mc.inGameHasFocus) {
                     mc.inGameHasFocus = false;

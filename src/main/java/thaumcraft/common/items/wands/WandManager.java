@@ -13,6 +13,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.EnumHand;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -50,6 +51,7 @@ import net.minecraftforge.oredict.OreDictionary;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -132,7 +134,7 @@ public class WandManager implements IWandTriggerManager {
         if (focusKey == null) focusKey = "";
 
         TreeMap<String, FocusLocation> foci = new TreeMap<>();
-        Map<Integer, PouchLocation> pouches = new HashMap<>();
+        Map<Integer, PouchLocation> pouches = new LinkedHashMap<>();
         int pouchCount = 0;
 
         IBaublesItemHandler baubles = BaublesApi.getBaublesHandler(player);
@@ -140,7 +142,7 @@ public class WandManager implements IWandTriggerManager {
             for (int slot = 0; slot < baubles.getSlots(); slot++) {
                 ItemStack stack = baubles.getStackInSlot(slot);
                 if (!stack.isEmpty() && stack.getItem() instanceof ItemFocusPouch) {
-                    PouchLocation pouch = new PouchLocation(++pouchCount, slot, true);
+                    PouchLocation pouch = new PouchLocation(++pouchCount, slot, true, false);
                     pouches.put(pouch.id, pouch);
                     addPouchFoci(foci, (ItemFocusPouch) stack.getItem(), stack, pouch);
                 }
@@ -152,10 +154,17 @@ public class WandManager implements IWandTriggerManager {
             if (!stack.isEmpty() && stack.getItem() instanceof ItemFocusBasic) {
                 foci.put(((ItemFocusBasic) stack.getItem()).getSortingHelper(stack), FocusLocation.inventory(slot));
             } else if (!stack.isEmpty() && stack.getItem() instanceof ItemFocusPouch) {
-                PouchLocation pouch = new PouchLocation(++pouchCount, slot, false);
+                PouchLocation pouch = new PouchLocation(++pouchCount, slot, false, false);
                 pouches.put(pouch.id, pouch);
                 addPouchFoci(foci, (ItemFocusPouch) stack.getItem(), stack, pouch);
             }
+        }
+
+        ItemStack offhand = player.getHeldItemOffhand();
+        if (!offhand.isEmpty() && offhand.getItem() instanceof ItemFocusPouch) {
+            PouchLocation pouch = new PouchLocation(++pouchCount, 0, false, true);
+            pouches.put(pouch.id, pouch);
+            addPouchFoci(foci, (ItemFocusPouch) offhand.getItem(), offhand, pouch);
         }
 
         if ("REMOVE".equals(focusKey) || foci.isEmpty()) {
@@ -263,6 +272,7 @@ public class WandManager implements IWandTriggerManager {
             IBaublesItemHandler baubles = BaublesApi.getBaublesHandler(player);
             return baubles == null ? ItemStack.EMPTY : baubles.getStackInSlot(pouch.slot);
         }
+        if (pouch.offhand) return player.getHeldItemOffhand();
         return player.inventory.mainInventory.get(pouch.slot);
     }
 
@@ -270,6 +280,9 @@ public class WandManager implements IWandTriggerManager {
         if (pouch.bauble) {
             IBaublesItemHandler baubles = BaublesApi.getBaublesHandler(player);
             if (baubles != null) baubles.setStackInSlot(pouch.slot, stack);
+        } else if (pouch.offhand) {
+            player.setHeldItem(EnumHand.OFF_HAND, stack);
+            player.inventory.markDirty();
         } else {
             player.inventory.mainInventory.set(pouch.slot, stack);
             player.inventory.markDirty();
@@ -1177,11 +1190,13 @@ public class WandManager implements IWandTriggerManager {
         final int id;
         final int slot;
         final boolean bauble;
+        final boolean offhand;
 
-        PouchLocation(int id, int slot, boolean bauble) {
+        PouchLocation(int id, int slot, boolean bauble, boolean offhand) {
             this.id = id;
             this.slot = slot;
             this.bauble = bauble;
+            this.offhand = offhand;
         }
     }
 

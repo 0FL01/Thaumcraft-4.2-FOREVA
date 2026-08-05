@@ -9,6 +9,7 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.item.Item;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.network.IGuiHandler;
@@ -87,7 +88,10 @@ public class CommonProxy implements IGuiHandler {
                 TileEntity tile = world.getTileEntity(pos);
                 return tile instanceof TileThaumatorium ? new ContainerThaumatorium(player.inventory, (TileThaumatorium) tile) : null;
             }
-            case GUI_FOCUS_POUCH: return new ContainerFocusPouch(player.inventory, world, x, y, z);
+            case GUI_FOCUS_POUCH: {
+                EnumHand[] hands = EnumHand.values();
+                return x >= 0 && x < hands.length ? new ContainerFocusPouch(player.inventory, world, hands[x]) : null;
+            }
             case GUI_DECONSTRUCTION_TABLE: {
                 TileEntity tile = world.getTileEntity(pos);
                 return tile instanceof TileDeconstructionTable ? new ContainerDeconstructionTable(player.inventory, (TileDeconstructionTable) tile) : null;
