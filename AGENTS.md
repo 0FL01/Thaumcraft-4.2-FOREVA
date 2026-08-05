@@ -10,6 +10,8 @@ Read these files before changing code:
 - `build.gradle`
 - `Dockerfile`
 
+If `.opencode/goal.md` exists, read it completely and check its `Status` before starting or resuming work. When the status is `active`, use it as the durable task anchor, reconciled with the latest user instructions and live Git state; do not treat a completed or stale goal as active work.
+
 Use `thaumcraft_src/**` and `Thaumcraft-1.7.10-4.2.3.5.jar` as read-only original 1.7.10 reference material. Use `Thaumcraft-1.12.2-6.1.BETA26.jar` as a read-only Thaumcraft 6 (1.12.2) donor reference for display transforms, model conventions, and positioning values.
 
 The original 1.7.10 material is a behavioral and asset reference only. It does not define a save-migration or backward-compatibility requirement.
