@@ -202,19 +202,24 @@ public class UtilsFX {
             GlStateManager.scale(textScale, textScale, 1.0F);
             GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
             String am = FORMATTER.format(amount);
-            int sw = mc.fontRenderer.getStringWidth(am);
-            int textX = Math.round((float) (x + 16.0D) / textScale) - sw;
-            int textY = Math.round((float) (y + 16.0D) / textScale) - mc.fontRenderer.FONT_HEIGHT;
-            if (blend > 1) {
-                for (int a = -1; a <= 1; ++a) {
-                    for (int b = -1; b <= 1; ++b) {
-                        if ((a != 0 || b != 0) && (a == 0 || b == 0)) {
-                            mc.fontRenderer.drawString(am, textX + a, textY + b, 0);
+            boolean compactAscii = !readableAmount && beginCompactAscii(mc.fontRenderer, am);
+            try {
+                int sw = mc.fontRenderer.getStringWidth(am);
+                int textX = Math.round((float) (x + 16.0D) / textScale) - sw;
+                int textY = Math.round((float) (y + 16.0D) / textScale) - mc.fontRenderer.FONT_HEIGHT;
+                if (blend > 1) {
+                    for (int a = -1; a <= 1; ++a) {
+                        for (int b = -1; b <= 1; ++b) {
+                            if ((a != 0 || b != 0) && (a == 0 || b == 0)) {
+                                mc.fontRenderer.drawString(am, textX + a, textY + b, 0);
+                            }
                         }
                     }
                 }
+                mc.fontRenderer.drawString(am, textX, textY, 0xFFFFFF);
+            } finally {
+                endCompactAscii(mc.fontRenderer, compactAscii);
             }
-            mc.fontRenderer.drawString(am, textX, textY, 0xFFFFFF);
             GlStateManager.popMatrix();
         }
 
@@ -227,17 +232,22 @@ public class UtilsFX {
             if (bonus > 1) {
                 GlStateManager.scale(0.5F, 0.5F, 0.5F);
                 String am = Integer.toString(bonus);
-                int sw = mc.fontRenderer.getStringWidth(am) / 2;
-                if (blend > 1) {
-                    for (int a = -1; a <= 1; ++a) {
-                        for (int b = -1; b <= 1; ++b) {
-                            if ((a != 0 || b != 0) && (a == 0 || b == 0)) {
-                                mc.fontRenderer.drawString(am, 8 - sw + a + (int) x * 2, 15 + b - mc.fontRenderer.FONT_HEIGHT + (int) y * 2, 0);
+                boolean compactAscii = beginCompactAscii(mc.fontRenderer, am);
+                try {
+                    int sw = mc.fontRenderer.getStringWidth(am) / 2;
+                    if (blend > 1) {
+                        for (int a = -1; a <= 1; ++a) {
+                            for (int b = -1; b <= 1; ++b) {
+                                if ((a != 0 || b != 0) && (a == 0 || b == 0)) {
+                                    mc.fontRenderer.drawString(am, 8 - sw + a + (int) x * 2, 15 + b - mc.fontRenderer.FONT_HEIGHT + (int) y * 2, 0);
+                                }
                             }
                         }
                     }
+                    mc.fontRenderer.drawString(am, 8 - sw + (int) x * 2, 15 - mc.fontRenderer.FONT_HEIGHT + (int) y * 2, 0xFFFFFF);
+                } finally {
+                    endCompactAscii(mc.fontRenderer, compactAscii);
                 }
-                mc.fontRenderer.drawString(am, 8 - sw + (int) x * 2, 15 - mc.fontRenderer.FONT_HEIGHT + (int) y * 2, 0xFFFFFF);
             }
             GlStateManager.popMatrix();
         }
@@ -245,6 +255,43 @@ public class UtilsFX {
         GlStateManager.disableBlend();
         GlStateManager.enableLighting();
         GlStateManager.popMatrix();
+    }
+
+    public static int drawCompactString(FontRenderer renderer, String text, float x, float y, int color) {
+        boolean compactAscii = beginCompactAscii(renderer, text);
+        try {
+            return renderer.drawString(text, x, y, color, false);
+        } finally {
+            endCompactAscii(renderer, compactAscii);
+        }
+    }
+
+    public static int drawCompactCenteredString(FontRenderer renderer, String text, float centerX, float y, int color) {
+        boolean compactAscii = beginCompactAscii(renderer, text);
+        try {
+            return renderer.drawString(text, centerX - renderer.getStringWidth(text) / 2.0F, y, color, false);
+        } finally {
+            endCompactAscii(renderer, compactAscii);
+        }
+    }
+
+    private static boolean beginCompactAscii(FontRenderer renderer, String text) {
+        if (renderer == null || !renderer.getUnicodeFlag() || text == null) {
+            return false;
+        }
+        for (int index = 0; index < text.length(); ++index) {
+            if (text.charAt(index) > 0x7f) {
+                return false;
+            }
+        }
+        renderer.setUnicodeFlag(false);
+        return true;
+    }
+
+    private static void endCompactAscii(FontRenderer renderer, boolean restoreUnicode) {
+        if (restoreUnicode) {
+            renderer.setUnicodeFlag(true);
+        }
     }
 
     public static void renderQuadCenteredFromTexture(String texture, float scale, float red, float green, float blue, int brightness, int blend, float opacity) {

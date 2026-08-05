@@ -129,7 +129,7 @@ public class GuiArcaneWorkbench extends GuiContainer {
 
             int x = this.guiLeft + this.aspectLocations[i][0] - 8;
             int y = this.guiTop + this.aspectLocations[i][1] - 8;
-            UtilsFX.drawTag(x, y, primal, drawAmount, 0, this.zLevel, 771, alpha, false);
+            UtilsFX.drawTag(x, y, primal, drawAmount, 0, this.zLevel, 771, alpha, false, true);
         }
     }
 
@@ -145,7 +145,7 @@ public class GuiArcaneWorkbench extends GuiContainer {
         GlStateManager.translate((float) (this.guiLeft + 168), (float) (this.guiTop + 46), 0.0F);
         GlStateManager.scale(0.5F, 0.5F, 1.0F);
         String text = "Insufficient vis";
-        this.fontRenderer.drawString(text, -this.fontRenderer.getStringWidth(text) / 2, 0, 0xEE6E6E);
+        UtilsFX.drawCompactCenteredString(this.fontRenderer, text, 0.0F, 0.0F, 0xEE6E6E);
         GlStateManager.popMatrix();
 
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);

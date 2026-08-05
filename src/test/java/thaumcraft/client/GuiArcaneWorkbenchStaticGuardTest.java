@@ -22,9 +22,9 @@ public class GuiArcaneWorkbenchStaticGuardTest {
                         && !source.contains("ThaumcraftCraftingManager.findMatchingArcaneRecipe("));
         assertTrue("GuiArcaneWorkbench must render primal aspect-based vis costs",
                 source.contains("Aspect.getPrimalAspects()")
-                        && source.contains("drawArcaneCostTags(")
-                        && source.contains("wand.getConsumptionModifier(")
-                        && source.contains("UtilsFX.drawTag(x, y, primal, drawAmount, 0, this.zLevel, 771, alpha, false);"));
+                         && source.contains("drawArcaneCostTags(")
+                         && source.contains("wand.getConsumptionModifier(")
+                         && source.contains("UtilsFX.drawTag(x, y, primal, drawAmount, 0, this.zLevel, 771, alpha, false, true);"));
         assertTrue("GuiArcaneWorkbench must tint baked ghost vertices and handle builtin results without relying on RenderItem's reset GL color",
                 source.contains("LightUtil.renderQuadColor(buffer, quad, ghostColor(color));")
                         && source.contains("GHOST_ALPHA = 168")
@@ -34,6 +34,7 @@ public class GuiArcaneWorkbenchStaticGuardTest {
                 source.contains("GlStateManager.color(0.33F, 0.33F, 0.33F, 0.66F)"));
         assertTrue("GuiArcaneWorkbench must keep the insufficient vis warning surface",
                 source.contains("Insufficient vis")
-                        && source.contains("drawInsufficientVisResult("));
+                        && source.contains("drawInsufficientVisResult(")
+                        && source.contains("UtilsFX.drawCompactCenteredString(this.fontRenderer, text"));
     }
 }

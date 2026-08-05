@@ -41,7 +41,7 @@ public class GuiFocalManipulatorLayoutStaticGuardTest {
                         && source.contains("this.guiLeft + 125, this.guiTop + 64"));
         assertTrue("Vis costs must use the original compact half-scale aspect list",
                 source.contains("GlStateManager.scale(0.5F, 0.5F, 0.5F);")
-                        && source.contains("this.fontRenderer.drawString(aspect.getName(), 0, row * 10, aspect.getColor());"));
+                        && source.contains("UtilsFX.drawCompactString(this.fontRenderer, aspect.getName(), 0, row * 10, aspect.getColor());"));
 
         assertFalse("The shifted port-only rank label must stay removed", source.contains("String rankText"));
         assertFalse("Vis costs must not return to large horizontal aspect icons",

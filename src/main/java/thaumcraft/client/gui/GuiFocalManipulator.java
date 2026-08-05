@@ -16,6 +16,7 @@ import thaumcraft.api.aspects.Aspect;
 import thaumcraft.api.aspects.AspectList;
 import thaumcraft.api.wands.FocusUpgradeType;
 import thaumcraft.api.wands.ItemFocusBasic;
+import thaumcraft.client.lib.UtilsFX;
 import thaumcraft.common.container.ContainerFocalManipulator;
 import thaumcraft.common.lib.TCSounds;
 import thaumcraft.common.tiles.TileFocalManipulator;
@@ -196,8 +197,9 @@ public class GuiFocalManipulator extends GuiContainer {
         int row = 0;
         for (Aspect aspect : aspects) {
             if (aspect == null) continue;
-            this.fontRenderer.drawString(aspect.getName(), 0, row * 10, aspect.getColor());
-            this.fontRenderer.drawString(VIS_FORMAT.format((float) this.selectedCost.getAmount(aspect) / 100.0F),
+            UtilsFX.drawCompactString(this.fontRenderer, aspect.getName(), 0, row * 10, aspect.getColor());
+            UtilsFX.drawCompactString(this.fontRenderer,
+                    VIS_FORMAT.format((float) this.selectedCost.getAmount(aspect) / 100.0F),
                     48, row * 10, aspect.getColor());
             ++row;
         }
