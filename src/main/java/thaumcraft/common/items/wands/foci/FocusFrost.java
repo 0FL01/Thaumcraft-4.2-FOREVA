@@ -45,7 +45,7 @@ public class FocusFrost extends ItemFocusBasic {
         ItemWandCasting wand = (ItemWandCasting) wandStack.getItem();
         ItemStack focusStack = wand.getFocusItem(wandStack);
         if (!world.isRemote && wand.consumeAllVis(wandStack, player, this.getVisCost(focusStack), true, false)) {
-            int potency = this.getUpgradeLevel(focusStack, FocusUpgradeType.potency);
+            int potency = wand.getFocusPotency(wandStack);
             int frosty = this.getUpgradeLevel(focusStack, FocusUpgradeType.alchemistsfrost);
             EntityFrostShard shard = null;
             if (this.isUpgradedWith(focusStack, scattershot)) {

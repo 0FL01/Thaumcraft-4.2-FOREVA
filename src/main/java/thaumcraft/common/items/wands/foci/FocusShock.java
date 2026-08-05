@@ -60,7 +60,7 @@ public class FocusShock extends ItemFocusBasic {
             if (!world.isRemote && wand.consumeAllVis(wandStack, player, this.getVisCost(focusStack), true, false)) {
                 EntityShockOrb orb = new EntityShockOrb(world, (EntityLivingBase) player);
                 orb.area += this.getUpgradeLevel(focusStack, FocusUpgradeType.enlarge) * 2;
-                orb.damage += (int) ((double) this.getUpgradeLevel(focusStack, FocusUpgradeType.potency) * 1.33D);
+                orb.damage += (int) ((double) wand.getFocusPotency(wandStack) * 1.33D);
                 world.spawnEntity(orb);
                 orb.playSound(TCSounds.ZAP, 1.0F, 1.0F + (world.rand.nextFloat() - world.rand.nextFloat()) * 0.2F);
             }
@@ -102,7 +102,7 @@ public class FocusShock extends ItemFocusBasic {
         }
         Entity target = this.getPointedEntity(player.world, player, 20.0D);
         if (!player.world.isRemote && wand.consumeAllVis(wandStack, player, this.getVisCost(focusStack), true, false)) {
-            int potency = this.getUpgradeLevel(focusStack, FocusUpgradeType.potency);
+            int potency = wand.getFocusPotency(wandStack);
             player.world.playSound(null, player.posX, player.posY, player.posZ, TCSounds.SHOCK, SoundCategory.PLAYERS, 0.25F, 1.0F);
             if (target instanceof EntityLivingBase && this.canDamageTarget(player, target)) {
                 int chainUpgrade = this.getUpgradeLevel(focusStack, chainlightning);

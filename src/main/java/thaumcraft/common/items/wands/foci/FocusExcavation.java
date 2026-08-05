@@ -115,7 +115,7 @@ public class FocusExcavation extends ItemFocusBasic {
         }
 
         float bc = breakcount.containsKey(key) ? breakcount.get(key) : 0.0F;
-        float speed = this.getBreakSpeed(block, state, this.getUpgradeLevel(focusStack, FocusUpgradeType.potency));
+        float speed = this.getBreakSpeed(block, state, wand.getFocusPotency(wandStack));
         if (player.world.isRemote) {
             if (bc > 0.0F) {
                 int progress = (int) (bc / hardness * 9.0F);

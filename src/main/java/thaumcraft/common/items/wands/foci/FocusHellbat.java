@@ -87,7 +87,7 @@ public class FocusHellbat extends ItemFocusBasic {
 
             firebat.setLocationAndAngles(px, py + (double) firebat.height, pz, player.rotationYaw, 0.0F);
             firebat.setAttackTarget((EntityLivingBase) pointed);
-            firebat.damBonus = this.getUpgradeLevel(focusStack, FocusUpgradeType.potency);
+            firebat.damBonus = wand.getFocusPotency(wandStack);
             firebat.setIsSummoned(true);
             firebat.setIsBatHanging(false);
             if (this.isUpgradedWith(focusStack, devilbats)) {

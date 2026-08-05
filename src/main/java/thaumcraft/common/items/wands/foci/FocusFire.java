@@ -51,7 +51,7 @@ public class FocusFire extends ItemFocusBasic {
         if (this.isUpgradedWith(focusStack, fireball)) {
             if (!world.isRemote && wand.consumeAllVis(wandStack, player, this.getVisCost(focusStack), true, false)) {
                 EntityExplosiveOrb orb = new EntityExplosiveOrb(world, (EntityLivingBase) player);
-                orb.strength += (float) this.getUpgradeLevel(focusStack, FocusUpgradeType.potency) * 0.4F;
+                orb.strength += (float) wand.getFocusPotency(wandStack) * 0.4F;
                 orb.onFire = this.isUpgradedWith(focusStack, FocusUpgradeType.alchemistsfire);
                 world.spawnEntity(orb);
                 orb.playSound(TCSounds.FIRELOOP, 0.33F, 2.0F);
@@ -98,7 +98,7 @@ public class FocusFire extends ItemFocusBasic {
             return;
         }
         if (!player.world.isRemote && wand.consumeAllVis(wandStack, player, this.getVisCost(focusStack), true, false)) {
-            int potency = this.getUpgradeLevel(focusStack, FocusUpgradeType.potency);
+            int potency = wand.getFocusPotency(wandStack);
             if (this.soundDelay < System.currentTimeMillis()) {
                 player.world.playSound(null, player.posX, player.posY, player.posZ, TCSounds.FIRELOOP, SoundCategory.PLAYERS, 0.33F, 2.0F);
                 this.soundDelay = System.currentTimeMillis() + 500L;
