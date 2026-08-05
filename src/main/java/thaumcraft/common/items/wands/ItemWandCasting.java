@@ -13,6 +13,7 @@ import net.minecraft.item.EnumAction;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTTagList;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumFacing;
@@ -84,25 +85,11 @@ public class ItemWandCasting extends Item implements IArchitect {
     public static void setRod(ItemStack stack, WandRod rod) {
         NBTTagCompound tag = ensureTag(stack);
         tag.setString(TAG_ROD, rod.getTag());
-        // Staff attack/speed attribute modifiers are now provided dynamically via
-        // getAttributeModifiers(). Strip any legacy NBT AttributeModifiers so the
-        // override is reached instead of the stale NBT path.
-        if (tag.hasKey("AttributeModifiers")) {
-            tag.removeTag("AttributeModifiers");
-        }
     }
 
     public static WandRod getRod(ItemStack stack) {
-        if (stack.hasTagCompound()) {
-            // Lazy migration: strip legacy NBT AttributeModifiers so the
-            // getAttributeModifiers() override is used instead of stale NBT.
-            NBTTagCompound tag = stack.getTagCompound();
-            if (tag.hasKey("AttributeModifiers")) {
-                tag.removeTag("AttributeModifiers");
-            }
-            if (tag.hasKey(TAG_ROD)) {
-                return WandRod.rods.get(tag.getString(TAG_ROD));
-            }
+        if (stack.hasTagCompound() && stack.getTagCompound().hasKey(TAG_ROD)) {
+            return WandRod.rods.get(stack.getTagCompound().getString(TAG_ROD));
         }
         return WandRod.rods.get("wood");
     }
@@ -358,6 +345,90 @@ public class ItemWandCasting extends Item implements IArchitect {
         return multimap;
     }
 
+    private static void migrateLegacyStaffAttributeModifiers(ItemStack stack) {
+        if (!stack.hasTagCompound()
+                || !stack.getTagCompound().hasKey("AttributeModifiers", 9)) {
+            return;
+        }
+
+        NBTTagCompound tag = stack.getTagCompound();
+        NBTTagList modifiers = (NBTTagList) tag.getTag("AttributeModifiers");
+        if (!modifiers.isEmpty() && modifiers.getTagType() != 10) {
+            return;
+        }
+        boolean staff = getRod(stack) instanceof StaffRod;
+        int knownAttack = 0;
+        int knownSpeed = 0;
+        int unknown = 0;
+        boolean canonicalAttack = false;
+        boolean canonicalSpeed = false;
+
+        for (int i = 0; i < modifiers.tagCount(); i++) {
+            NBTTagCompound modifier = modifiers.getCompoundTagAt(i);
+            if (hasUuid(modifier, STAFF_ATTACK_UUID)) {
+                knownAttack++;
+                canonicalAttack |= isCanonicalStaffModifier(modifier,
+                        SharedMonsterAttributes.ATTACK_DAMAGE.getName(), 6.0D);
+            } else if (hasUuid(modifier, STAFF_SPEED_UUID)) {
+                knownSpeed++;
+                canonicalSpeed |= isCanonicalStaffModifier(modifier,
+                        SharedMonsterAttributes.ATTACK_SPEED.getName(), -3.2D);
+            } else {
+                unknown++;
+            }
+        }
+
+        if (knownAttack == 0 && knownSpeed == 0) {
+            return;
+        }
+        if (staff && unknown > 0 && knownAttack == 1 && knownSpeed == 1
+                && canonicalAttack && canonicalSpeed) {
+            return;
+        }
+        if (!staff && knownAttack == 0 && knownSpeed == 0) {
+            return;
+        }
+
+        for (int i = modifiers.tagCount() - 1; i >= 0; i--) {
+            NBTTagCompound modifier = modifiers.getCompoundTagAt(i);
+            if (hasUuid(modifier, STAFF_ATTACK_UUID) || hasUuid(modifier, STAFF_SPEED_UUID)) {
+                modifiers.removeTag(i);
+            }
+        }
+
+        if (!staff || modifiers.isEmpty()) {
+            if (modifiers.isEmpty()) {
+                tag.removeTag("AttributeModifiers");
+            }
+            return;
+        }
+
+        modifiers.appendTag(createStaffModifier(SharedMonsterAttributes.ATTACK_DAMAGE.getName(),
+                STAFF_ATTACK_UUID, "Weapon modifier", 6.0D));
+        modifiers.appendTag(createStaffModifier(SharedMonsterAttributes.ATTACK_SPEED.getName(),
+                STAFF_SPEED_UUID, "Weapon speed modifier", -3.2D));
+    }
+
+    private static boolean hasUuid(NBTTagCompound modifier, UUID uuid) {
+        return modifier.getLong("UUIDMost") == uuid.getMostSignificantBits()
+                && modifier.getLong("UUIDLeast") == uuid.getLeastSignificantBits();
+    }
+
+    private static boolean isCanonicalStaffModifier(NBTTagCompound modifier, String attribute, double amount) {
+        return attribute.equals(modifier.getString("AttributeName"))
+                && Double.compare(amount, modifier.getDouble("Amount")) == 0
+                && modifier.getInteger("Operation") == 0
+                && EntityEquipmentSlot.MAINHAND.getName().equals(modifier.getString("Slot"));
+    }
+
+    private static NBTTagCompound createStaffModifier(String attribute, UUID uuid, String name, double amount) {
+        NBTTagCompound modifier = SharedMonsterAttributes.writeAttributeModifierToNBT(
+                new AttributeModifier(uuid, name, amount, 0));
+        modifier.setString("AttributeName", attribute);
+        modifier.setString("Slot", EntityEquipmentSlot.MAINHAND.getName());
+        return modifier;
+    }
+
     public void setObjectInUse(ItemStack stack, int x, int y, int z) {
         NBTTagCompound tag = ensureTag(stack);
         tag.setInteger("IIUX", x);
@@ -402,11 +473,14 @@ public class ItemWandCasting extends Item implements IArchitect {
 
     @Override
     public void onUpdate(ItemStack stack, World world, Entity entity, int itemSlot, boolean isSelected) {
-        if (!world.isRemote && entity instanceof EntityPlayer) {
-            EntityPlayer player = (EntityPlayer) entity;
-            WandRod rod = getRod(stack);
-            if (rod != null && rod.getOnUpdate() != null) {
-                rod.getOnUpdate().onUpdate(stack, player);
+        if (!world.isRemote) {
+            migrateLegacyStaffAttributeModifiers(stack);
+            if (entity instanceof EntityPlayer) {
+                EntityPlayer player = (EntityPlayer) entity;
+                WandRod rod = getRod(stack);
+                if (rod != null && rod.getOnUpdate() != null) {
+                    rod.getOnUpdate().onUpdate(stack, player);
+                }
             }
         }
     }

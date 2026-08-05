@@ -4,6 +4,7 @@ import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.IRecipe;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.oredict.OreDictionary;
 import net.minecraftforge.oredict.ShapedOreRecipe;
 import net.minecraftforge.oredict.ShapelessOreRecipe;
@@ -16,6 +17,7 @@ import thaumcraft.common.config.ConfigItems;
 import thaumcraft.common.config.ConfigRecipes;
 import thaumcraft.common.items.armor.RecipesRobeArmorDyes;
 import thaumcraft.common.items.armor.RecipesVoidRobeArmorDyes;
+import thaumcraft.common.items.wands.ItemWandCasting;
 import thaumcraft.common.lib.crafting.ShapelessNBTOreRecipe;
 
 public class ConfigRecipesSpecialSlice {
@@ -196,7 +198,7 @@ public class ConfigRecipesSpecialSlice {
         bridge.setRecipeWandCapIron(recipeWandCapIron);
 
         IRecipe recipeWandBasic = new ShapedOreRecipe(null,
-                new ItemStack(ConfigItems.itemWandCasting, 1, 0),
+                createBasicWandRecipeOutput(),
                 "  I",
                 " S ",
                 "I  ",
@@ -767,5 +769,13 @@ public class ConfigRecipesSpecialSlice {
         registry.register(recipeCluster6);
 
         bridge.markSpecialRecipesRegistered();
+    }
+
+    static ItemStack createBasicWandRecipeOutput() {
+        ItemStack output = new ItemStack(ConfigItems.itemWandCasting, 1, 0);
+        NBTTagCompound tag = ItemWandCasting.ensureTag(output);
+        tag.setString(ItemWandCasting.TAG_CAP, "iron");
+        tag.setString(ItemWandCasting.TAG_ROD, "wood");
+        return output;
     }
 }
