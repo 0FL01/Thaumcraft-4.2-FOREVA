@@ -15,6 +15,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Stream;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -79,6 +80,27 @@ public class CompleteLocalizationContractTest {
             }
             assertTrue(fileName + " is below the required 99% reviewed translation coverage: " + untranslated,
                     untranslated <= english.values.size() / 100);
+        }
+    }
+
+    @Test
+    public void resourcePackShouldUseNative112LowercaseLocalePaths() throws Exception {
+        String metadata = readSource("src/main/resources/pack.mcmeta");
+        assertTrue("Minecraft 1.12 resources must use pack format 3",
+                Pattern.compile("\\\"pack_format\\\"\\s*:\\s*3").matcher(metadata).find());
+
+        String build = readSource("build.gradle");
+        assertFalse("Format-3 packs must not emit the legacy en_US locale alias",
+                build.contains("en_US.lang"));
+
+        try (Stream<Path> files = Files.list(LANG_DIR)) {
+            for (Path file : (Iterable<Path>) files::iterator) {
+                String fileName = file.getFileName().toString();
+                if (fileName.endsWith(".lang")) {
+                    assertEquals("Locale resource paths must remain lowercase",
+                            fileName.toLowerCase(Locale.ROOT), fileName);
+                }
+            }
         }
     }
 
