@@ -115,6 +115,8 @@ public class TileTube extends TileThaumcraft implements ITickable, IEssentiaTran
                 if (filter != null && remoteSuction != null && remoteSuction != filter) continue;
                 if (filter == null && this.getEssentiaAmount(dir) > 0 && remoteSuction != null
                         && this.getEssentiaType(dir) != remoteSuction) continue;
+                if (filter != null && this.getEssentiaAmount(dir) > 0 && this.getEssentiaType(dir) != null
+                        && remoteSuction != null && this.getEssentiaType(dir) != remoteSuction) continue;
                 int amount = transport.getSuctionAmount(remote);
                 if (amount <= 0 || amount <= this.suction + 1) continue;
                 this.setSuction(remoteSuction == null ? filter : remoteSuction, restrict ? amount / 2 : amount - 1);

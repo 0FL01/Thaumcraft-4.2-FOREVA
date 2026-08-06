@@ -61,9 +61,44 @@ public class TileTubeBufferRoutingRuntimeTest {
         assertEquals(1, buffer.takeEssentia(Aspect.AIR, 1, EnumFacing.EAST));
     }
 
+    @Test
+    public void filteredTubeDoesNotAdoptSuctionIncompatibleWithStoredEssentia() {
+        BufferWorld world = new BufferWorld();
+        TestTube tube = new TestTube();
+        world.attach(POS, tube);
+        world.attach(POS.east(), new SuctionTile(8, Aspect.FIRE));
+
+        tube.setContents(Aspect.AIR, 1);
+        tube.calculate(Aspect.FIRE);
+        assertEquals(0, tube.suctionAmount());
+
+        tube.setContents(Aspect.FIRE, 1);
+        tube.calculate(Aspect.FIRE);
+        assertEquals(7, tube.suctionAmount());
+
+        tube.setContents(null, 0);
+        tube.calculate(Aspect.FIRE);
+        assertEquals(7, tube.suctionAmount());
+    }
+
     private static final class TestBuffer extends TileTubeBuffer {
         @Override public void markDirty() { }
         @Override public void markDirtyAndSync() { }
+    }
+
+    private static final class TestTube extends TileTube {
+        void setContents(Aspect aspect, int amount) {
+            this.essentiaType = aspect;
+            this.essentiaAmount = amount;
+        }
+
+        void calculate(Aspect filter) {
+            this.calculateSuction(filter, false, false);
+        }
+
+        int suctionAmount() {
+            return this.suction;
+        }
     }
 
     private static final class SuctionTile extends TileEntity implements IEssentiaTransport {
