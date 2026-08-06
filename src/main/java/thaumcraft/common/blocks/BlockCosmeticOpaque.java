@@ -54,8 +54,8 @@ public class BlockCosmeticOpaque extends Block {
 
     public BlockCosmeticOpaque() {
         super(Material.ROCK);
-        this.setHardness(2.0f);
-        this.setResistance(10.0f);
+        this.setHardness(1.5f);
+        this.setResistance(5.0f);
         this.setSoundType(SoundType.STONE);
         this.setCreativeTab(Thaumcraft.tabTC);
         this.setDefaultState(this.blockState.getBaseState().withProperty(TYPE, 0));

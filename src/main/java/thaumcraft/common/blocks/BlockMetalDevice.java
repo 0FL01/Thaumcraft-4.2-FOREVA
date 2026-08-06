@@ -73,7 +73,7 @@ public class BlockMetalDevice extends BlockContainer {
     public BlockMetalDevice() {
         super(Material.IRON);
         this.setHardness(3.0f);
-        this.setResistance(10.0f);
+        this.setResistance(17.0f);
         this.setSoundType(SoundType.METAL);
         this.setCreativeTab(Thaumcraft.tabTC);
         this.setDefaultState(this.blockState.getBaseState().withProperty(TYPE, 0));

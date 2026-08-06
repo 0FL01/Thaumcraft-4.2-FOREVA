@@ -102,15 +102,6 @@ implements IInfusionStabiliser {
     }
 
     @Override
-    public int getLightValue(IBlockState state, IBlockAccess world, BlockPos pos) {
-        int md = this.getMetaFromState(state);
-        if (md < 6) {
-            return 8;
-        }
-        return super.getLightValue(state, world, pos);
-    }
-
-    @Override
     public int getPackedLightmapCoords(IBlockState state, IBlockAccess source, BlockPos pos) {
         int md = this.getMetaFromState(state);
         if (md < 6) {

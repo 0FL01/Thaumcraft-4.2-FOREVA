@@ -66,8 +66,8 @@ extends BlockContainer {
 
     public BlockStoneDevice() {
         super(Material.ROCK);
-        this.setHardness(2.0f);
-        this.setResistance(10.0f);
+        this.setHardness(3.0f);
+        this.setResistance(25.0f);
         this.setSoundType(SoundType.STONE);
         this.setCreativeTab(Thaumcraft.tabTC);
         this.setDefaultState(this.blockState.getBaseState().withProperty(TYPE, 0));

@@ -185,4 +185,14 @@ public class BlockCustomPlant extends BlockBush {
             world.setBlockState(pos, this.getStateFromMeta(1));
         }
     }
+
+    @Override
+    public int getFlammability(IBlockAccess world, BlockPos pos, net.minecraft.util.EnumFacing face) {
+        return 100;
+    }
+
+    @Override
+    public int getFireSpreadSpeed(IBlockAccess world, BlockPos pos, net.minecraft.util.EnumFacing face) {
+        return 60;
+    }
 }

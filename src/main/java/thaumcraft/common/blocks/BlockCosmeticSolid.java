@@ -119,6 +119,7 @@ public class BlockCosmeticSolid extends Block {
     public float getExplosionResistance(World world, BlockPos pos, net.minecraft.entity.Entity exploder) {
         int meta = this.getMetaFromState(world.getBlockState(pos));
         if (meta == 0 || meta == 1 || meta == 8) return 999.0f;
+        if (meta == 4 || meta == 6 || meta == 7) return 20.0f;
         return super.getExplosionResistance(exploder);
     }
 

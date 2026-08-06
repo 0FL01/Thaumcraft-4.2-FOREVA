@@ -37,7 +37,7 @@ public class BlockCustomOre extends Block {
 
     public BlockCustomOre() {
         super(Material.ROCK);
-        this.setHardness(3.0f);
+        this.setHardness(1.5f);
         this.setResistance(5.0f);
         this.setSoundType(SoundType.STONE);
         this.setCreativeTab(Thaumcraft.tabTC);

@@ -60,7 +60,8 @@ public class BlockWoodenDevice extends BlockContainer {
 
     public BlockWoodenDevice() {
         super(Material.WOOD);
-        this.setHardness(2.0f);
+        this.setHardness(2.5f);
+        this.setResistance(10.0f);
         this.setSoundType(SoundType.WOOD);
         this.setCreativeTab(Thaumcraft.tabTC);
         this.setDefaultState(this.blockState.getBaseState().withProperty(TYPE, 0));

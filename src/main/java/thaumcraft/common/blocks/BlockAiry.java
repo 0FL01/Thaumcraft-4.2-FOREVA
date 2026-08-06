@@ -58,8 +58,6 @@ public class BlockAiry extends BlockContainer {
 
     public BlockAiry() {
         super(Config.airyMaterial);
-        this.setHardness(2.0f);
-        this.setResistance(200.0f);
         this.setSoundType(SoundType.CLOTH);
         this.setCreativeTab(Thaumcraft.tabTC);
         this.setDefaultState(this.blockState.getBaseState().withProperty(TYPE, 0));
@@ -132,9 +130,10 @@ public class BlockAiry extends BlockContainer {
     @Override
     public float getBlockHardness(IBlockState state, World world, BlockPos pos) {
         int meta = this.getMetaFromState(world.getBlockState(pos));
+        if (meta == 0 || meta == 5) return 2.0f;
         if (meta == 10 || meta == 11) return 100.0f;
         if (meta == 12) return -1.0f;
-        return 2.0f;
+        return super.getBlockHardness(state, world, pos);
     }
 
     public float getExplosionResistance(World world, BlockPos pos, Entity exploder) {

@@ -38,8 +38,8 @@ public class BlockTaint extends Block {
 
     public BlockTaint() {
         super(Config.taintMaterial);
-        this.setHardness(1.5f);
-        this.setResistance(3.0f);
+        this.setHardness(2.0f);
+        this.setResistance(10.0f);
         this.setSoundType(SoundType.GROUND);
         this.setCreativeTab(Thaumcraft.tabTC);
         this.setTickRandomly(true);
@@ -160,6 +160,15 @@ public class BlockTaint extends Block {
     @Override
     public int quantityDropped(Random random) {
         return 9;
+    }
+
+    @Override
+    public float getBlockHardness(IBlockState state, World world, BlockPos pos) {
+        int meta = this.getMetaFromState(state);
+        if (meta == 0) return 1.75F;
+        if (meta == 1) return 1.5F;
+        if (meta == 2) return 0.2F;
+        return super.getBlockHardness(state, world, pos);
     }
 
     @Override

@@ -61,7 +61,8 @@ public class BlockTaintFibres extends Block {
 
     public BlockTaintFibres() {
         super(Config.taintMaterial);
-        this.setHardness(0.5f);
+        this.setHardness(1.0f);
+        this.setResistance(5.0f);
         this.setSoundType(SoundType.PLANT);
         this.setCreativeTab(Thaumcraft.tabTC);
         this.setTickRandomly(true);
