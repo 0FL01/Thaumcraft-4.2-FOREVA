@@ -55,7 +55,6 @@ public class BlockArcaneFurnace extends BlockContainer {
         this.setSoundType(SoundType.STONE);
         this.setCreativeTab(Thaumcraft.tabTC);
         this.setDefaultState(this.blockState.getBaseState().withProperty(TYPE, 0).withProperty(FACING, EnumFacing.NORTH));
-        this.setHarvestLevel("pickaxe", 2);
     }
 
     @Override

@@ -42,7 +42,8 @@ public class BlockCustomOre extends Block {
         this.setSoundType(SoundType.STONE);
         this.setCreativeTab(Thaumcraft.tabTC);
         this.setDefaultState(this.blockState.getBaseState().withProperty(TYPE, 0));
-        this.setHarvestLevel("pickaxe", 2);
+        this.setHarvestLevel("pickaxe", 2, this.getDefaultState().withProperty(TYPE, 0));
+        this.setHarvestLevel("pickaxe", 2, this.getDefaultState().withProperty(TYPE, 7));
     }
 
     @Override

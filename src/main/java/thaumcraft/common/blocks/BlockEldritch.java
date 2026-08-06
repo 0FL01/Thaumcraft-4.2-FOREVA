@@ -56,7 +56,6 @@ public class BlockEldritch extends Block {
         this.setDefaultState(this.blockState.getBaseState()
                 .withProperty(TYPE, 4)
                 .withProperty(CRUST_NEIGHBOR_MASK, 0));
-        this.setHarvestLevel("pickaxe", 2);
         this.setLightOpacity(0);
         this.useNeighborBrightness = true;
     }

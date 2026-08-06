@@ -44,7 +44,6 @@ public class BlockTaint extends Block {
         this.setCreativeTab(Thaumcraft.tabTC);
         this.setTickRandomly(true);
         this.setDefaultState(this.blockState.getBaseState().withProperty(TYPE, 0));
-        this.setHarvestLevel("shovel", 0);
     }
 
     @Override

@@ -43,7 +43,6 @@ implements IInfusionStabiliser {
         this.setSoundType(new CustomStepSound("crystal", 1.0f, 1.0f));
         this.setCreativeTab(Thaumcraft.tabTC);
         this.setDefaultState(this.blockState.getBaseState().withProperty(TYPE, 0));
-        this.setHarvestLevel("pickaxe", 0);
     }
 
     @Override

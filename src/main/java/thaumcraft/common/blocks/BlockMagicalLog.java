@@ -35,7 +35,6 @@ public class BlockMagicalLog extends BlockLog {
         this.setSoundType(SoundType.WOOD);
         this.setCreativeTab(Thaumcraft.tabTC);
         this.setDefaultState(this.blockState.getBaseState().withProperty(TYPE, 0).withProperty(LOG_AXIS, BlockLog.EnumAxis.Y));
-        this.setHarvestLevel("axe", 0);
     }
 
     @Override

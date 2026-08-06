@@ -59,7 +59,6 @@ public class BlockCosmeticOpaque extends Block {
         this.setSoundType(SoundType.STONE);
         this.setCreativeTab(Thaumcraft.tabTC);
         this.setDefaultState(this.blockState.getBaseState().withProperty(TYPE, 0));
-        this.setHarvestLevel("pickaxe", 0);
     }
 
     @Override

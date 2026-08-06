@@ -167,7 +167,7 @@ public class BlockWarded extends BlockContainer {
 
     @Override
     public boolean canHarvestBlock(IBlockAccess world, BlockPos pos, EntityPlayer player) {
-        return false;
+        return true;
     }
 
     @Override

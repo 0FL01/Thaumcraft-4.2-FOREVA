@@ -77,7 +77,6 @@ public class BlockMetalDevice extends BlockContainer {
         this.setSoundType(SoundType.METAL);
         this.setCreativeTab(Thaumcraft.tabTC);
         this.setDefaultState(this.blockState.getBaseState().withProperty(TYPE, 0));
-        this.setHarvestLevel("pickaxe", 1);
     }
 
     @Override

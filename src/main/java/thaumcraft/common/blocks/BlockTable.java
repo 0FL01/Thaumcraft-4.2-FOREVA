@@ -50,7 +50,6 @@ implements IWandable {
         this.setSoundType(SoundType.WOOD);
         this.setCreativeTab(Thaumcraft.tabTC);
         this.setDefaultState(this.blockState.getBaseState().withProperty(TYPE, 0));
-        this.setHarvestLevel("axe", 0);
     }
 
     @Override

@@ -38,7 +38,6 @@ public abstract class BlockCosmeticWoodSlab extends BlockSlab {
         this.setHardness(2.0F);
         this.setResistance(5.0F);
         this.setSoundType(SoundType.WOOD);
-        this.setHarvestLevel("axe", 0);
         this.setLightOpacity(0);
     }
 

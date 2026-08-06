@@ -38,7 +38,6 @@ public abstract class BlockCosmeticStoneSlab extends BlockSlab {
         this.setHardness(2.0F);
         this.setResistance(10.0F);
         this.setSoundType(SoundType.STONE);
-        this.setHarvestLevel("pickaxe", 0);
     }
 
     @Override
