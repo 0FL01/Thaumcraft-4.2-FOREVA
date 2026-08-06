@@ -153,6 +153,7 @@ public class ConfigRecipes {
             ConfigResearch.recipes.put("VoidSeed", recipeVoidSeed);
         }
         ItemStack basicWand = ConfigRecipesSpecialSlice.createBasicWandRecipeOutput();
+        ItemStack structureMarker = new ItemStack(ConfigBlocks.blockHole, 1, 15);
         ConfigResearch.recipes.put("Thaumonomicon",
                 Arrays.asList(new AspectList(), 1, 2, 1,
                         Arrays.asList(basicWand, new ItemStack(Blocks.BOOKSHELF))));
@@ -174,7 +175,7 @@ public class ConfigRecipes {
                         3,
                         Arrays.asList(
                                 new ItemStack(Blocks.NETHER_BRICK), new ItemStack(Blocks.OBSIDIAN), new ItemStack(Blocks.NETHER_BRICK),
-                                new ItemStack(Blocks.OBSIDIAN), ItemStack.EMPTY, new ItemStack(Blocks.OBSIDIAN),
+                                new ItemStack(Blocks.OBSIDIAN), structureMarker, new ItemStack(Blocks.OBSIDIAN),
                                 new ItemStack(Blocks.NETHER_BRICK), new ItemStack(Blocks.OBSIDIAN), new ItemStack(Blocks.NETHER_BRICK),
 
                                 new ItemStack(Blocks.NETHER_BRICK), new ItemStack(Blocks.OBSIDIAN), new ItemStack(Blocks.NETHER_BRICK),
@@ -192,9 +193,9 @@ public class ConfigRecipes {
                         3,
                         3,
                         Arrays.asList(
-                                ItemStack.EMPTY, null, ItemStack.EMPTY,
+                                structureMarker, null, structureMarker,
                                 null, new ItemStack(ConfigBlocks.blockStoneDevice, 1, 2), null,
-                                ItemStack.EMPTY, null, ItemStack.EMPTY,
+                                structureMarker, null, structureMarker,
 
                                 new ItemStack(ConfigBlocks.blockCosmeticSolid, 1, 6), null, new ItemStack(ConfigBlocks.blockCosmeticSolid, 1, 6),
                                 null, null, null,
@@ -244,7 +245,7 @@ public class ConfigRecipes {
                         3,
                         Arrays.asList(
                                 new ItemStack(ConfigBlocks.blockMetalDevice, 1, 1), new ItemStack(ConfigBlocks.blockMetalDevice, 1, 9), new ItemStack(ConfigBlocks.blockMetalDevice, 1, 1),
-                                new ItemStack(ConfigBlocks.blockMetalDevice, 1, 9), ItemStack.EMPTY, new ItemStack(ConfigBlocks.blockMetalDevice, 1, 9),
+                                new ItemStack(ConfigBlocks.blockMetalDevice, 1, 9), structureMarker, new ItemStack(ConfigBlocks.blockMetalDevice, 1, 9),
                                 new ItemStack(ConfigBlocks.blockMetalDevice, 1, 1), new ItemStack(ConfigBlocks.blockMetalDevice, 1, 9), new ItemStack(ConfigBlocks.blockMetalDevice, 1, 1),
 
                                 new ItemStack(ConfigBlocks.blockMetalDevice, 1, 3), new ItemStack(ConfigBlocks.blockMetalDevice, 1, 3), new ItemStack(ConfigBlocks.blockMetalDevice, 1, 3),

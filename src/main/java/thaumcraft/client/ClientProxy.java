@@ -1010,6 +1010,7 @@ public class ClientProxy extends CommonProxy {
         registerBuiltinItemModel(ConfigBlocks.blockFluxGooItem, 0, "blockfluxgoo");
         registerBuiltinItemModel(ConfigBlocks.blockFluxGasItem, 0, "blockfluxgas");
         registerBuiltinItemModel(Item.getItemFromBlock(ConfigBlocks.blockHole), 0, "blockhole");
+        registerBuiltinItemModel(Item.getItemFromBlock(ConfigBlocks.blockHole), 15, "blockhole_empty");
         registerBuiltinItemModel(Item.getItemFromBlock(ConfigBlocks.blockWarded), 0, "blockwarded");
         registerBuiltinItemModel(Item.getItemFromBlock(ConfigBlocks.blockEldritchNothing), 0, "blockeldritchnothing");
         registerBlockItemModel(ConfigBlocks.blockMagicalLeavesItem, 0, "type=0");
