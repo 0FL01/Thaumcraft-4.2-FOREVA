@@ -47,8 +47,9 @@ public class BlockBreakingFlowStaticGuardTest {
                 source.contains("ForgeHooks.onBlockBreakEvent"));
         assertTrue(source.contains("new BlockEvent.BreakEvent(this.world, target, state, this.fakePlayer)")
                 && source.contains("MinecraftForge.EVENT_BUS.post(event);")
-                && source.contains("if (event.isCanceled()) return false;")
-                && source.contains("int xp = event.getExpToDrop();"));
+                && source.contains("if (event.isCanceled()) return false;"));
+        assertFalse("TC4 Arcane Bore must not emit block XP",
+                source.contains("getExpToDrop()") || source.contains("dropXpOnBlockBreak"));
     }
 
     @Test

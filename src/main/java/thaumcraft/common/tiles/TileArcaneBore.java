@@ -613,7 +613,6 @@ public class TileArcaneBore extends TileThaumcraft implements ITickable, IInvent
         BlockEvent.BreakEvent event = new BlockEvent.BreakEvent(this.world, target, state, this.fakePlayer);
         MinecraftForge.EVENT_BUS.post(event);
         if (event.isCanceled()) return false;
-        int xp = event.getExpToDrop();
 
         int dropFortune = this.fortune;
         boolean silk = EnchantmentHelper.getEnchantmentLevel(Enchantments.SILK_TOUCH, this.getStackInSlot(1)) > 0;
@@ -629,7 +628,6 @@ public class TileArcaneBore extends TileThaumcraft implements ITickable, IInvent
             if (!stack.isEmpty()) drops.add(stack);
         } else {
             block.getDrops(drops, (IBlockAccess) this.world, target, state, dropFortune);
-            block.dropXpOnBlockBreak(this.world, target, xp);
         }
 
         this.collectExistingDrops(target, drops);
