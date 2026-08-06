@@ -53,6 +53,34 @@ def anchor_path(root: Path) -> Path:
     return root / ANCHOR
 
 
+def git_ignored(root: Path, path: Path) -> bool:
+    try:
+        relative = path.resolve().relative_to(root.resolve())
+        result = subprocess.run(
+            ["git", "-C", str(root), "check-ignore", "-q", "--no-index", relative.as_posix()],
+            check=False,
+            capture_output=True,
+            text=True,
+        )
+    except (FileNotFoundError, ValueError):
+        return False
+    return result.returncode == 0
+
+
+def git_tracked(root: Path, path: Path) -> bool:
+    try:
+        relative = path.resolve().relative_to(root.resolve())
+        result = subprocess.run(
+            ["git", "-C", str(root), "ls-files", "--error-unmatch", "--", relative.as_posix()],
+            check=False,
+            capture_output=True,
+            text=True,
+        )
+    except (FileNotFoundError, ValueError):
+        return False
+    return result.returncode == 0
+
+
 def status_of(text: str) -> str | None:
     match = re.search(r"(?m)^Status:\s*([a-z_]+)\s*$", text)
     return match.group(1) if match else None
@@ -91,6 +119,10 @@ def cmd_init(args: argparse.Namespace, root: Path) -> int:
     template = template_path.read_text(encoding="utf-8")
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(render_template(template, args.title, root), encoding="utf-8")
+    if git_tracked(root, path):
+        print(f"warning: {ANCHOR} is tracked; ignore rules will not keep it out of product diffs", file=sys.stderr)
+    elif not git_ignored(root, path):
+        print(f"warning: {ANCHOR} is not ignored; commit it intentionally or add it to .git/info/exclude", file=sys.stderr)
     print(ANCHOR.as_posix())
     return 0
 
@@ -209,6 +241,14 @@ def cmd_archive(args: argparse.Namespace, root: Path) -> int:
     target_dir = root / ".opencode" / "goal-history"
     target_dir.mkdir(parents=True, exist_ok=True)
     target = target_dir / f"{stamp}-{slugify(title)}.md"
+    if target.exists():
+        print(f"error: archive target already exists: {target.relative_to(root)}", file=sys.stderr)
+        return 1
+    if not git_ignored(root, target):
+        print(
+            "warning: .opencode/goal-history/ is not ignored; the archived anchor will appear as untracked",
+            file=sys.stderr,
+        )
     shutil.move(str(path), target)
     print(target.relative_to(root).as_posix())
     return 0

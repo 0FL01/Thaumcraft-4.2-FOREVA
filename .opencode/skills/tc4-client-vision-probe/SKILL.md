@@ -1,101 +1,114 @@
 ---
 name: tc4-client-vision-probe
-description: "Use when a TC4 client GUI or renderer bug must be verified visually in the headless Forge 1.12.2 client. Covers temporary probe mods, launching an integrated server, constructing real GUI fixtures, saving labeled screenshots, and inspecting PNGs with vision."
+description: "Use when a TC4 client GUI or renderer fix needs reproducible visual evidence in the headless Forge 1.12.2 client. Covers collision-safe temporary probe mods, integrated-world startup, client-thread fixtures, named screenshots, vision inspection, and exact cleanup."
 ---
 
-# TC4 Client Vision Probe
+# TC4 client vision probe
 
 ## When to use
 
-Use this skill when source comparison and tests are insufficient to prove a
-visual fix, for example:
+Use this workflow when source/tests cannot prove a visual result:
 
-- tiny or missing Unicode text;
-- clipped or overlapping translated labels;
-- incorrect GUI layering, tint, alpha, UVs, or animation;
-- a TESR, HUD, or GUI that needs a real `Minecraft`, player, or world;
-- a fix that compiles but still needs an in-game screenshot.
+- tiny, clipped, overlapping, or untranslated text;
+- wrong tint, alpha, UV, layering, transforms, or animation state;
+- a GUI/TESR/HUD requiring a real Minecraft client, player, or world;
+- compile/build succeeds but an actual rendered frame is still required.
 
-This workflow was used to verify the TC4 Unicode fixes in the Focal
-Manipulator, Arcane Workbench, Thaumatorium, Golem GUI, Traveling Trunk, and
-notification HUD.
+Keep probes outside `src/main`: use a unique `.tmp/` directory and one uniquely
+named JAR under `run/mods/`.
 
-Do not add probe code to `src/main`. Keep it disposable under `.tmp/` and
-`run/mods/`.
+`smoke-client PASSED` proves client startup only. The screenshot must be opened
+with vision and judged against explicit acceptance criteria.
 
-## Core workflow
+## Safety contract
 
-```text
-compile product classes
-  -> create temporary client-only Forge mod
-  -> start the normal headless smoke client
-  -> launch an integrated world on the client thread
-  -> wait for mc.player and mc.world
-  -> construct the real GUI/tile/entity state
-  -> display it on the client thread
-  -> wait for at least one rendered frame
-  -> save a labeled PNG with ScreenShotHelper
-  -> open the PNG with the read/vision tool
-  -> inspect readability, clipping, layering, color, and geometry
-  -> clean all temporary state
-```
+The shared `run/` directory can contain user options, worlds, mods, and
+screenshots. A probe must:
 
-`smoke-server` alone cannot render a GUI. Use `smoke-client` and launch an
-integrated server from the probe when the screen requires a player or world.
+1. generate a unique run ID;
+2. refuse collisions;
+3. record the existing mod set;
+4. back up and restore `run/options.txt` according to whether it originally
+   existed;
+5. remove only its exact JAR, world, and named screenshots;
+6. never run `rm -rf run/screenshots`, `run/mods`, or `run/saves`;
+7. use a cleanup trap in one orchestration shell, so interruption also restores
+   state.
 
-## 1. Establish the acceptance matrix
+`run/` is ignored by Git, so `git status` cannot detect accidental data loss.
 
-Before writing the probe, list the states that distinguish the bug:
+## 1. Define the visual matrix
 
-| Dimension | Useful values |
+List states that distinguish success from failure:
+
+| Dimension | Examples |
 |---|---|
-| Language | `en_us`, `ru_ru`, affected locale |
-| Force Unicode | `false`, `true` |
-| GUI scale | `1`, `2`, `Auto` |
-| Screen state | selected/unselected, enough/missing resources, short/long text |
-| Renderer state | known/unknown aspect, near/far target, completed/locked research |
+| language | `en_us`, `ru_ru`, affected locale |
+| font | automatic Unicode, forced Unicode, bitmap |
+| GUI scale | 1, 2, Auto |
+| screen state | selected/unselected, full/empty, short/long |
+| renderer state | near/far, known/unknown, completed/locked |
 
-For the Russian font bug, the decisive configuration was:
+For Russian, `forceUnicodeFont:false` does not imply a bitmap renderer.
+Minecraft normally sets `fontRenderer.getUnicodeFlag()` true from locale
+coverage. Log the runtime flag when font mode is part of the diagnosis.
 
-```properties
-lang:ru_ru
-guiScale:2
-forceUnicodeFont:false
-tutorialStep:none
-```
+## 2. Allocate collision-safe paths
 
-Minecraft still sets `fontRenderer.getUnicodeFlag()` to `true` for Russian.
-Log the runtime flag if the diagnosis depends on it; do not infer it only from
-the option.
-
-## 2. Compile current product code first
-
-The probe compiles against `build/classes/java/main`, so update those classes
-before launching it:
+Create a persistent session directory and state file. This is safe across
+separate OpenCode Bash calls; source `state.env` in every later shell block.
 
 ```bash
+set -euo pipefail
+
+run_id="tc4-vision-$(date +%Y%m%d-%H%M%S)-$$"
+probe="$PWD/.tmp/$run_id"
+probe_jar="$PWD/run/mods/$run_id.jar"
+staged_jar="$probe/$run_id.jar"
+world_name="TC4Vision-$run_id"
+world_dir="$PWD/run/saves/$world_name"
+options="$PWD/run/options.txt"
+options_backup="$probe/options.original"
+
+test ! -e "$probe"
+mkdir -p "$probe/src/probe" "$probe/classes"
+declare -p run_id probe probe_jar staged_jar world_name world_dir \
+  options options_backup > "$probe/state.env"
+printf '[TC4-VISION-SESSION] %s\n' "$probe"
+```
+
+Keep the printed path. Later blocks begin with:
+
+```bash
+source "/absolute/path/printed/above/state.env"
+```
+
+Keep `$probe` and its evidence manifest until the task report is complete.
+
+Existing mods are not automatically isolated by `smoke-client`. Record them
+and report the mod set. If a controlled empty mod directory is required, build
+a separate preservation/restore step that moves the whole directory and is
+covered by the launch block's trap; never delete it.
+
+## 3. Compile current product classes
+
+```text
 ./scripts/dev.sh compileJava
 ```
 
-A focused Gradle test that executes `compileJava` is also sufficient.
+The probe compiles against `build/classes/java/main`. Do not run a stale probe
+against old product classes.
 
-## 3. Create a disposable client-only probe mod
+## 4. Create a client-only probe mod
 
-Suggested layout:
-
-```text
-.tmp/gui-visual-probe/
-├── src/probe/GuiVisualProbe.java
-└── classes/
-
-run/mods/gui-visual-probe.jar
-```
-
-Minimal lifecycle skeleton:
+The worker thread may orchestrate delays, but every Minecraft state read,
+fixture construction, screen change, and screenshot must execute on the client
+thread. Readiness polling needs a deadline.
 
 ```java
 package probe;
 
+import java.util.concurrent.Callable;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.util.ScreenShotHelper;
@@ -105,12 +118,11 @@ import net.minecraft.world.WorldType;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLLoadCompleteEvent;
 
-@Mod(
-        modid = "guivisualprobe",
-        name = "GUI Visual Probe",
-        version = "1",
-        clientSideOnly = true)
-public class GuiVisualProbe {
+@Mod(modid = "tc4visionprobe", name = "TC4 Vision Probe",
+        version = "1", clientSideOnly = true)
+public class Tc4VisionProbe {
+    private static final String RUN_ID = "REPLACE_RUN_ID";
+    private static final String WORLD = "REPLACE_WORLD_NAME";
 
     @Mod.EventHandler
     public void loadComplete(FMLLoadCompleteEvent event) {
@@ -118,70 +130,76 @@ public class GuiVisualProbe {
         Thread runner = new Thread(() -> {
             try {
                 Thread.sleep(1000L);
-                schedule(mc, () -> mc.launchIntegratedServer(
-                        "GuiVisualProbe",
-                        "GuiVisualProbe",
-                        new WorldSettings(1L, GameType.CREATIVE,
-                                false, false, WorldType.DEFAULT)));
+                call(mc, () -> {
+                    mc.launchIntegratedServer(WORLD, WORLD,
+                            new WorldSettings(1L, GameType.CREATIVE,
+                                    false, false, WorldType.DEFAULT));
+                    return null;
+                });
 
-                while (mc.player == null || mc.world == null) {
+                long deadline = System.currentTimeMillis() + 60000L;
+                while (!call(mc, () -> mc.player != null && mc.world != null)) {
+                    if (System.currentTimeMillis() >= deadline) {
+                        throw new IllegalStateException("integrated world timeout");
+                    }
                     Thread.sleep(250L);
                 }
-                Thread.sleep(1000L);
 
-                GuiScreen screen = createScreen(mc);
-                showAndCapture(mc, screen, "reported-state");
-            } catch (Exception error) {
+                GuiScreen screen = call(mc, () -> createScreen(mc));
+                capture(mc, screen, "reported-state");
+            } catch (Throwable error) {
+                System.err.println("[TC4-VISION-FAIL] " + RUN_ID);
                 error.printStackTrace();
             }
-        }, "gui-visual-probe");
+        }, RUN_ID);
         runner.setDaemon(true);
         runner.start();
     }
 
     private static GuiScreen createScreen(Minecraft mc) throws Exception {
-        // Construct the real TC4 GUI and its tile/entity fixture here.
+        // Construct the real GUI and tile/entity fixture on the client thread.
         throw new UnsupportedOperationException("supply fixture");
     }
 
-    private static void showAndCapture(
-            Minecraft mc, GuiScreen screen, String label) throws Exception {
-        schedule(mc, () -> mc.displayGuiScreen(screen));
-        Thread.sleep(1200L);
-        schedule(mc, () -> System.out.println(
-                "[GUI-VISUAL] " + label + " "
-                        + ScreenShotHelper.saveScreenshot(
-                                mc.gameDir,
-                                mc.displayWidth,
-                                mc.displayHeight,
-                                mc.getFramebuffer()).getUnformattedText()));
-        Thread.sleep(1200L);
+    private static void capture(Minecraft mc, GuiScreen screen, String label)
+            throws Exception {
+        call(mc, () -> {
+            mc.displayGuiScreen(screen);
+            return null;
+        });
+        Thread.sleep(1200L); // allow a normal rendered frame
+        call(mc, () -> {
+            String file = RUN_ID + "-" + label + ".png";
+            String result = ScreenShotHelper.saveScreenshot(
+                    mc.gameDir, file, mc.displayWidth, mc.displayHeight,
+                    mc.getFramebuffer()).getUnformattedText();
+            System.out.println("[TC4-VISION] " + label + " " + file
+                    + " :: " + result);
+            return null;
+        });
     }
 
-    private static void schedule(Minecraft mc, Runnable action)
+    private static <T> T call(Minecraft mc, Callable<T> action)
             throws Exception {
-        mc.addScheduledTask(action).get();
+        return mc.addScheduledTask(action).get();
     }
 }
 ```
 
-Important properties:
+Replace both constants with the shell-generated names before compiling. The
+named screenshot overload avoids timestamp ambiguity and does not require
+one-second sleeps between differently labeled captures.
 
-- `launchIntegratedServer`, `displayGuiScreen`, and screenshot capture execute
-  on the client thread via `addScheduledTask`.
-- The worker thread only handles delays and orchestration.
-- The screenshot is delayed after opening the screen, allowing normal texture,
-  container, and framebuffer rendering.
-- Every screenshot prints a stable marker and human label to the log.
+After the run, require:
 
-## 4. Construct real screen fixtures
+- no `[TC4-VISION-FAIL]` marker;
+- one `[TC4-VISION]` marker per expected label;
+- every named PNG exists and is non-empty.
 
-Prefer the actual GUI class over a fake drawing surface. The screenshot must
-exercise the same method that contains the bug.
+## 5. Build real fixtures
 
-### Tile GUI
-
-Typical pattern:
+Prefer the actual product GUI/renderer. Populate real tile/entity fields on the
+client thread and use worst-case data.
 
 ```java
 TileFocalManipulator tile = new TileFocalManipulator();
@@ -197,271 +215,226 @@ tile.aspects = new AspectList()
         .add(Aspect.EARTH, 12)
         .add(Aspect.ORDER, 12)
         .add(Aspect.ENTROPY, 12);
-
 return new GuiFocalManipulator(mc.player.inventory, tile);
 ```
 
-Choose worst-case data: six rows, two- or three-digit values, long translated
-text, partially filled bars, or the maximum number of controls.
-
-### Entity GUI
+For entity GUIs:
 
 ```java
 EntityGolemBase golem = new EntityGolemBase(mc.world);
-golem.setCore((byte) 2); // long translated blurb
+golem.setCore((byte) 2);
 return new GuiGolem(mc.player, golem);
 ```
 
-### Container result that is difficult to craft naturally
+When normal crafting state is prohibitively difficult, a probe-only subclass
+may override the real container's preview getters. Reflection is acceptable in
+the disposable fixture only. Keep the actual GUI and its normal draw methods;
+never move probe shortcuts into product code.
 
-For a visual-only fixture, subclass the real container and override only the
-preview getters. Replace the GUI's private preview container by reflection.
-Keep the real GUI and normal draw method.
-
-```java
-final class FakeArcaneContainer extends ContainerArcaneWorkbench {
-    private final AspectList cost;
-
-    FakeArcaneContainer(InventoryPlayer inventory, TileArcaneWorkbench tile) {
-        super(inventory, tile);
-        cost = new AspectList().add(Aspect.AIR, 16).add(Aspect.FIRE, 17);
-    }
-
-    @Override public void refreshResult() {}
-    @Override public ItemStack getArcanePreviewResult() {
-        return new ItemStack(Items.DIAMOND);
-    }
-    @Override public AspectList getArcanePreviewCost() {
-        return cost;
-    }
-}
-```
-
-Reflection is acceptable only inside the disposable probe. Never copy this
-fixture technique into product code.
-
-### Multiple visual states
-
-Capture each state separately and label it:
+Capture separate labeled states rather than mutating one screenshot claim:
 
 ```java
-showAndCapture(mc, unselected, "thaumatorium-unselected");
-showAndCapture(mc, selectedPartial, "thaumatorium-selected-partial");
-showAndCapture(mc, fullCapacity, "thaumatorium-full-capacity");
+capture(mc, unselected, "thaumatorium-unselected");
+capture(mc, selectedPartial, "thaumatorium-selected-partial");
 ```
 
-Sleep for more than one second between captures because Minecraft screenshot
-filenames have second-level timestamp resolution.
+## 6. Compile the probe from the canonical cache
 
-## 5. Compile and package the probe
+The project cache is not necessarily `$HOME/.gradle`:
 
 ```bash
-probe=.tmp/gui-visual-probe
-forge="$HOME/.gradle/caches/minecraft/net/minecraftforge/forge/1.12.2-14.23.5.2847/stable/39/forgeBin-1.12.2-14.23.5.2847.jar"
-guava=$(find "$HOME/.gradle/caches/modules-2/files-2.1/com.google.guava/guava" \
-        -name '*.jar' | head -1)
+source "/absolute/probe/path/state.env"
+gradle_home="${THAUMCRAFT_GRADLE_HOME:-$PWD/.gradle_home}"
+forge=$(find "$gradle_home/caches/minecraft/net/minecraftforge/forge/1.12.2-14.23.5.2847/stable/39" \
+  -maxdepth 1 -name 'forgeSrc-1.12.2-14.23.5.2847.jar' -print -quit)
+guava=$(find "$gradle_home/caches/modules-2/files-2.1/com.google.guava/guava/21.0" \
+  -name '*.jar' -print -quit)
 
-rm -rf "$probe/classes"
-mkdir -p "$probe/classes" run/mods
+test -n "$forge" && test -f "$forge"
+test -n "$guava" && test -f "$guava"
+javac -version 2>&1 | grep -Eq 'javac 1\.8(\.|$)'
 
 javac -source 8 -target 8 \
   -cp "$forge:$guava:build/classes/java/main" \
   -d "$probe/classes" \
-  "$probe/src/probe/GuiVisualProbe.java"
-
-jar cf run/mods/gui-visual-probe.jar -C "$probe/classes" .
+  "$probe/src/probe/Tc4VisionProbe.java"
+jar cf "$staged_jar" -C "$probe/classes" .
 ```
 
-Guava is needed because `Minecraft.addScheduledTask` returns a
-`ListenableFuture`, even if the source does not name that type directly.
-
-## 6. Run the headless client
-
-Back up any existing run configuration before replacing it:
+Stop if Java 8 is unavailable; compile inside `${THAUMCRAFT_DOCKER_IMAGE:-thaumcraft-dev}`
+with the same workspace and Gradle-cache mounts rather than using a newer
+`javac` silently. Exact fallback:
 
 ```bash
-options_backup=.tmp/gui-visual-probe-options.txt
-test ! -f run/options.txt || cp run/options.txt "$options_backup"
+source "/absolute/probe/path/state.env"
+probe_rel="${probe#$PWD/}"
+gradle_home="${THAUMCRAFT_GRADLE_HOME:-$PWD/.gradle_home}"
+docker run --rm \
+  -v "$PWD:/workspace/thaumcraft" \
+  -v "$gradle_home:/home/ubuntu/.gradle" \
+  -e PROBE_REL="$probe_rel" \
+  -e STAGED_NAME="$(basename "$staged_jar")" \
+  --user "$(id -u):$(id -g)" \
+  --entrypoint /bin/bash \
+  "${THAUMCRAFT_DOCKER_IMAGE:-thaumcraft-dev}" -lc '
+    set -eu
+    cd /workspace/thaumcraft
+    forge=$(find /home/ubuntu/.gradle/caches/minecraft/net/minecraftforge/forge/1.12.2-14.23.5.2847/stable/39 -maxdepth 1 -name "forgeSrc-1.12.2-14.23.5.2847.jar" -print -quit)
+    guava=$(find /home/ubuntu/.gradle/caches/modules-2/files-2.1/com.google.guava/guava/21.0 -name "*.jar" -print -quit)
+    javac -source 8 -target 8 -cp "$forge:$guava:build/classes/java/main" -d "$PROBE_REL/classes" "$PROBE_REL/src/probe/Tc4VisionProbe.java"
+    jar cf "$PROBE_REL/$STAGED_NAME" -C "$PROBE_REL/classes" .
+  '
+```
 
-cat > run/options.txt <<'EOF'
+## 7. Configure and launch in one trapped shell
+
+This is the only block that mutates shared `run/` state. Execute it as one Bash
+call. List every expected screenshot explicitly; add more labels as needed.
+
+```bash
+set -euo pipefail
+source "/absolute/probe/path/state.env"
+mkdir -p "$PWD/run/mods" "$PWD/run/screenshots"
+
+screenshots=(
+  "$PWD/run/screenshots/$run_id-reported-state.png"
+)
+
+test -f "$staged_jar"
+test ! -e "$probe_jar"
+test ! -e "$world_dir"
+for image in "${screenshots[@]}"; do test ! -e "$image"; done
+printf '%s\n' "${screenshots[@]}" > "$probe/screenshots.txt"
+find "$PWD/run/mods" -maxdepth 1 -type f -printf '%f\n' \
+  | sort > "$probe/preexisting-mods.txt"
+
+had_options=0
+if test -e "$options"; then
+  had_options=1
+  cp -p "$options" "$options_backup"
+fi
+
+cleanup() {
+  rm -f "$probe_jar"
+  rm -rf "$world_dir"
+  if test "$had_options" -eq 1; then
+    cp -p "$options_backup" "$options"
+  else
+    rm -f "$options"
+  fi
+}
+trap cleanup EXIT
+trap 'exit 130' INT TERM
+
+cp "$staged_jar" "$probe_jar"
+cat > "$options" <<'EOF'
 lang:ru_ru
 guiScale:2
 forceUnicodeFont:false
 tutorialStep:none
 EOF
-
-rm -rf run/saves/GuiVisualProbe run/screenshots
-mkdir -p run/screenshots
+cp "$options" "$probe/effective-options.txt"
 
 ./scripts/dev.sh smoke-client
+
+! grep -Fq '[TC4-VISION-FAIL]' run/smoke-client.log
+test "$(grep -Fc '[TC4-VISION]' run/smoke-client.log)" -eq "${#screenshots[@]}"
+for image in "${screenshots[@]}"; do test -s "$image"; done
+
+cleanup
+trap - EXIT INT TERM
 ```
 
-The repository script starts Xorg with the dummy display and software OpenGL.
-It also checks crash markers and successful Forge loading.
-
-Find the probe evidence:
+Find only this run's evidence:
 
 ```bash
-grep -n -a 'GUI-VISUAL' run/smoke-client.log
-find run/screenshots -maxdepth 1 -type f -name '*.png' -printf '%p\n' | sort
+source "/absolute/probe/path/state.env"
+grep -n -a -E 'TC4-VISION|TC4-VISION-FAIL' run/smoke-client.log
+cat "$probe/screenshots.txt"
 ```
 
-Do not count `smoke-client PASSED` as visual proof. It only proves successful
-client loading. The PNG must still be inspected.
+Do not generalize a successful client marker into visual success.
 
-## 7. Inspect screenshots with vision
+## 8. Inspect with vision and record evidence
 
-Open each PNG with the local file read tool. Image reads invoke vision and are
-the primary visual assertion.
+Open every expected PNG with the local file-read/vision tool. Check concrete
+acceptance properties: readability, complete lines, overlap, clipping,
+anchoring, state-specific elements, tint/alpha, layering, and centering.
 
-Inspect concrete properties:
-
-- Are glyphs actually legible rather than merely present?
-- Is every translated line visible?
-- Does text overlap slots, icons, gauges, or the player inventory?
-- Are counts anchored to the intended icon corner?
-- Are selected-only elements absent in the unselected screenshot?
-- Are alpha/tint states visible and correctly layered?
-- Is the longest line clipped?
-- Does the GUI remain centered at the selected scale?
-
-For a small region, create a disposable crop and inspect it separately:
+Optional crop, only when available:
 
 ```bash
-magick run/screenshots/example.png \
-  -crop 160x100+300+120 +repage .tmp/gui-visual-probe/crop.png
-```
-
-Then read `.tmp/gui-visual-probe/crop.png` with vision.
-
-If text is technically visible but difficult to read in the screenshot, the
-check failed. Compile/smoke success is not a substitute for readability.
-
-## 8. Iterate safely
-
-After a visual failure:
-
-1. Record the exact issue: clipped last line, blurred half-scale digits,
-   overlap, wrong state, or screenshot timing.
-2. Change the smallest product layout or probe fixture.
-3. Recompile product classes.
-4. Recompile the temporary probe if its fixture changed.
-5. Capture only the failing state when possible.
-6. Re-open the new PNG with vision.
-
-Example from the Golem GUI:
-
-- Unicode scale `0.75` fit but remained hard to read.
-- Scale `1.0` was readable but clipped the final wrapped line.
-- Scale `0.875` plus measured wrap width was readable and fit the complete
-  Russian blurb above the inventory.
-
-This is why source math alone is insufficient for dense translated layouts.
-
-## 9. Common failure modes
-
-### Black or partially rendered screenshot
-
-Cause: capturing directly inside `FMLLoadCompleteEvent` before a normal frame.
-
-Fix: schedule GUI opening after startup, wait about 1.2 seconds, then schedule
-the screenshot on the client thread.
-
-### Screenshot shows the main menu instead of the probe GUI
-
-Cause: the normal startup flow replaced a screen opened too early.
-
-Fix: delay from a daemon worker, then call `displayGuiScreen` through
-`addScheduledTask` after the integrated world is available.
-
-### Client tick subscriber never captures
-
-Cause: lifecycle/tick bus timing in the short smoke session.
-
-Fix: use the daemon-worker plus `addScheduledTask(...).get()` orchestration.
-
-### Probe compiles with `ListenableFuture` missing
-
-Cause: Guava absent from the `javac` classpath.
-
-Fix: add the cached Guava JAR as shown above.
-
-### GUI constructor has no useful data
-
-Cause: normal recipes/research/container synchronization did not occur in the
-synthetic world.
-
-Fix: populate real tile/entity fields, add a synthetic API recipe, or replace
-only the preview container in the temporary probe.
-
-### Screenshot filenames overwrite or gain suffixes
-
-Cause: captures occurred in the same second.
-
-Fix: sleep longer than one second and always use log labels instead of relying
-only on filenames.
-
-### Tutorial card obscures the GUI
-
-Fix: add `tutorialStep:none` to the temporary `run/options.txt`.
-
-## 10. Cleanup
-
-Remove all disposable artifacts after evidence is recorded:
-
-```bash
-options_backup=.tmp/gui-visual-probe-options.txt
-if test -f "$options_backup"; then
-  cp "$options_backup" run/options.txt
-else
-  rm -f run/options.txt
+if command -v magick >/dev/null 2>&1; then
+  magick "run/screenshots/$run_id-reported-state.png" \
+    -crop 160x100+300+120 +repage "$probe/crop.png"
 fi
-
-rm -rf \
-  .tmp/gui-visual-probe \
-  "$options_backup" \
-  run/mods/gui-visual-probe.jar \
-  run/screenshots \
-  run/saves/GuiVisualProbe
 ```
 
-Restore options before deleting the backup.
-
-Finally run:
+Create a session-local manifest before cleanup:
 
 ```bash
+source "/absolute/probe/path/state.env"
+mapfile -t screenshots < "$probe/screenshots.txt"
+{
+  printf 'run_id=%s\n' "$run_id"
+  printf 'mods_manifest=%s\n' "$probe/preexisting-mods.txt"
+  sha256sum "$probe/effective-options.txt"
+  sha256sum "${screenshots[@]}"
+} > "$probe/evidence.txt"
+```
+
+Add label-by-label vision verdicts to that file and summarize them in the final
+report. Images may remain session-local; do not claim durable repository proof
+after deleting them. If durable evidence is required, intentionally commit an
+approved artifact or note rather than relying on ignored `run/` state.
+
+## 9. Cleanup and validation
+
+Shared options/JAR/world state was already restored by the trapped launch
+block. After the report/evidence is recorded, remove only the explicit image
+list and this session directory:
+
+```bash
+source "/absolute/probe/path/state.env"
+mapfile -t screenshots < "$probe/screenshots.txt"
+rm -f -- "${screenshots[@]}"
+rm -rf "$probe"
 git status --short
 ```
 
-Only intentional product/test/docs files may remain.
+Visual proof supplements normal gates:
 
-## Product validation after visual proof
-
-Visual proof supplements normal gates; it does not replace them:
-
-```bash
+```text
 git diff --check
-./scripts/dev.sh validate --smoke
+./scripts/dev.sh validate
 ./scripts/dev.sh build
 ```
 
-Report separately:
+For client-only GUI/renderer/model changes, server smoke is not routine. Use
+`validate --smoke` only when common/server loading or behavior also changed.
 
-- configurations visually inspected;
-- screenshot states inspected with vision;
-- focused tests and validation commands;
-- states covered only statically and not captured;
-- final artifact path.
+## Common failures
+
+- **Black/partial image:** capture happened before a normal frame; delay after
+  `displayGuiScreen`.
+- **Main menu instead of GUI:** screen opened during startup and was replaced;
+  schedule it after integrated-world readiness.
+- **No client ticks in short smoke:** use the bounded worker plus scheduled
+  callables, not an event-bus tick subscriber.
+- **Missing `ListenableFuture`:** compile with the canonical Guava JAR.
+- **No useful data:** populate real fixtures or override only probe preview
+  getters.
+- **Tutorial overlay:** set `tutorialStep:none` in the temporary options.
+- **Unexpected rendering/mod interaction:** inspect the recorded preexisting
+  mod manifest and rerun with an explicitly preserved isolated mod directory.
 
 ## Anti-patterns
 
-- Do not claim visual success from compile or smoke logs alone.
-- Do not screenshot before a normal rendered frame.
-- Do not launch worlds or change screens from the worker thread directly.
-- Do not use a fake canvas when the real GUI can be constructed.
-- Do not leave probe mods, saves, options, or screenshots in the workspace.
-- Do not silently use production code reflection; reflection belongs only in
-  the disposable visual fixture.
-- Do not inspect one easy state and generalize to selected/unselected,
-  resource-full/resource-empty, or short/long translations.
-- Do not infer the active font renderer from the Force Unicode option alone.
+- Do not mutate Minecraft state or construct fixtures on the worker thread.
+- Do not poll player/world forever.
+- Do not clear shared run directories.
+- Do not restore an old backup whose ownership/run ID is unknown.
+- Do not use fake canvases when the real GUI can be constructed.
+- Do not infer font mode from options alone.
+- Do not claim visual parity from build, smoke logs, or uninspected PNGs.
+- Do not inspect one easy state and generalize to all state branches.

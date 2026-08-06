@@ -46,6 +46,22 @@ python3 <skill-dir>/scripts/goal.py init --title "<objective>"
 
 After Compact, DCP compression, a model/agent switch, a long subagent result, or memory uncertainty, repeat this re-entry sequence before editing.
 
+Helper commands, run from the repository root:
+
+```bash
+goal=.opencode/skills/goal-repo-docs-opencode/scripts/goal.py
+python3 "$goal" init --title "<objective>"
+python3 "$goal" show
+python3 "$goal" check
+python3 "$goal" archive
+```
+
+`check` expects the current template headings and Resume fields. For a manual or
+pre-v3 anchor, migrate it before relying on the result: change `## Done
+criteria` to `## Done`, add `Non-goals`, Resume `Why`, `Decisions`,
+`Verification` with `Pending`/`Passed`, and `Sources`. Do not discard material
+state merely to satisfy the schema.
+
 ## The one-file contract
 
 Keep `.opencode/goal.md` concise: aim below 6,000 characters; treat 12,000 as a soft ceiling. It contains only:
@@ -61,7 +77,16 @@ Keep `.opencode/goal.md` concise: aim below 6,000 characters; treat 12,000 as a 
 
 Do not store command transcripts, repeated file summaries, speculative branches, generic lessons, full web pages, secrets, or a history of every action. Git already records code history. Todo tools may mirror the immediate step but are not durable authority. Rewrite stale bullets instead of appending an event log.
 
-Treat the anchor, history, and optional notes as operational state. Keep them out of the product diff with `.git/info/exclude` when they are local-only; commit them only when durable team handoff is intentional.
+Treat the anchor, history, and optional notes as operational state. Keep them out of the product diff with `.git/info/exclude` when they are local-only; commit them only when durable team handoff is intentional. For local-only use, ensure all three paths are covered:
+
+```text
+.opencode/goal.md
+.opencode/goal-history/
+.opencode/goal-notes/
+```
+
+The helper warns when its init/archive target is not ignored, but it does not
+rewrite Git excludes automatically.
 
 The helper `check` command is only a structural smoke test. Run it after scaffolding/migration or once at closure, not after every update.
 
@@ -149,7 +174,20 @@ Record a source only when it changes a requirement, decision, version assumption
 - Native Compact may happen without warning; keeping the anchor current at material boundaries is the defense.
 - After any compression, the first substantive action is rehydration from the anchor and live Git.
 
-The optional files under `integrations/opencode/` protect the anchor in DCP and inject it into OpenCode's native compaction prompt. They improve continuity but are not correctness dependencies.
+The files under `integrations/opencode/` are **inactive templates**. Merely
+shipping them inside the skill does not install anything:
+
+- copy/adapt `command-goal.md` to `.opencode/commands/goal.md` for a command;
+- copy/adapt `goal-anchor-compaction.js` to `.opencode/plugins/` for the
+  compaction hook;
+- merge `dcp.merge.jsonc` into the active DCP configuration;
+- merge `AGENTS-snippet.md` only when equivalent repository instructions are
+  absent.
+
+Inspect installed OpenCode/DCP versions and review the destination diff before
+activation. Restart OpenCode after adding or changing project skills, commands,
+or plugins; the active session may retain its startup discovery catalog. These
+integrations improve continuity but are not correctness dependencies.
 
 ## Recovery
 
@@ -173,4 +211,4 @@ Complete only when every explicit done criterion has current evidence and mandat
 - give the user the result;
 - stop substantive work. Do not spend leftover context on cleanup, hardening, extra tests, or a new audit.
 
-For the next unrelated objective, archive or replace the completed anchor rather than appending another goal to it.
+For the next unrelated objective, archive or replace the completed anchor rather than appending another goal to it. Before archiving local-only state, verify `.opencode/goal-history/` is ignored; otherwise the archived file will immediately appear as an untracked product diff.
