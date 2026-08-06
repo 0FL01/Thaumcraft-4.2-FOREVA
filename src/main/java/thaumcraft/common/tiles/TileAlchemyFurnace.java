@@ -109,7 +109,6 @@ public class TileAlchemyFurnace extends TileThaumcraft implements ITickable, ISi
 
             TileAlembic alembic = (TileAlembic) tile;
             if (alembic.aspect != null && alembic.amount < alembic.maxAmount
-                    && (alembic.aspectFilter == null || alembic.aspectFilter == alembic.aspect)
                     && this.aspects.getAmount(alembic.aspect) > 0) {
                 Aspect aspect = alembic.aspect;
                 if (this.takeFromContainer(aspect, 1) && alembic.addToContainer(aspect, 1) == 0) {
@@ -398,7 +397,7 @@ public class TileAlchemyFurnace extends TileThaumcraft implements ITickable, ISi
 
     @Override
     public boolean canInsertItem(int index, ItemStack stack, EnumFacing direction) {
-        return direction != EnumFacing.DOWN && this.isItemValidForSlot(index, stack);
+        return direction != EnumFacing.UP && this.isItemValidForSlot(index, stack);
     }
 
     @Override

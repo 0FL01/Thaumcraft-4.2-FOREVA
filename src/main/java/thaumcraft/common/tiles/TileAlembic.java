@@ -84,14 +84,18 @@ public class TileAlembic extends TileThaumcraft implements IAspectContainer, IEs
 
     @Override
     public int addToContainer(Aspect tag, int requested) {
-        if (!this.doesContainerAccept(tag)) return requested;
-        if (this.aspect == null) {
+        if ((this.amount < this.maxAmount && tag == this.aspect) || this.amount == 0) {
             this.aspect = tag;
+            int add = Math.min(requested, this.maxAmount - this.amount);
+            this.amount += add;
+            requested -= add;
         }
-        int add = Math.min(requested, this.maxAmount - this.amount);
-        this.amount += add;
         this.markDirty();
-        return requested - add;
+        if (this.world != null && !this.world.isRemote) {
+            this.world.notifyBlockUpdate(this.pos, this.world.getBlockState(this.pos),
+                    this.world.getBlockState(this.pos), 3);
+        }
+        return requested;
     }
 
     @Override

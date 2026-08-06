@@ -3,9 +3,12 @@ package thaumcraft.common.tiles;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Bootstrap;
 import net.minecraft.init.Blocks;
+import net.minecraft.init.Items;
+import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.profiler.Profiler;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.GameType;
 import net.minecraft.world.EnumSkyBlock;
@@ -98,6 +101,58 @@ public class TileAlchemyFurnaceSyncRuntimeTest {
     public void transfersNotifyEmptyAndAlreadyFilledAlembicClients() {
         assertAlembicNotified(null, 0);
         assertAlembicNotified(Aspect.AIR, 1);
+    }
+
+    @Test
+    public void sidedInsertionRejectsTheTopAndAllowsFuelFromBelow() {
+        TestFurnace furnace = new TestFurnace();
+        ItemStack coal = new ItemStack(Items.COAL);
+
+        assertFalse(furnace.canInsertItem(1, coal, EnumFacing.UP));
+        assertTrue(furnace.canInsertItem(1, coal, EnumFacing.DOWN));
+        assertEquals(0, furnace.getSlotsForFace(EnumFacing.UP).length);
+        assertEquals(1, furnace.getSlotsForFace(EnumFacing.DOWN)[0]);
+    }
+
+    @Test
+    public void occupiedAlembicRefillsItsStoredAspectDespiteMismatchedFilter() {
+        SyncWorld world = new SyncWorld();
+        BlockPos furnacePos = new BlockPos(0, 64, 0);
+        TestFurnace furnace = new TestFurnace();
+        TestAlembic alembic = new TestAlembic();
+        alembic.aspect = Aspect.AIR;
+        alembic.aspectFilter = Aspect.WATER;
+        alembic.amount = 1;
+        world.attach(furnacePos, furnace);
+        world.attach(furnacePos.up(), alembic);
+        furnace.aspects.add(Aspect.AIR, 1);
+        furnace.vis = 1;
+
+        for (int i = 0; i < 40; ++i) furnace.update();
+
+        assertEquals(2, alembic.amount);
+        assertEquals(Aspect.AIR, alembic.aspect);
+        assertEquals(Aspect.WATER, alembic.aspectFilter);
+        assertEquals(0, furnace.vis);
+    }
+
+    @Test
+    public void alembicUsesTc4AmountTypeCapacityAndRemainderRules() {
+        TestAlembic alembic = new TestAlembic();
+        alembic.aspect = Aspect.AIR;
+        alembic.amount = 30;
+
+        assertEquals(4, alembic.addToContainer(Aspect.AIR, 6));
+        assertEquals(32, alembic.amount);
+        assertEquals(Aspect.AIR, alembic.aspect);
+        assertEquals(3, alembic.addToContainer(Aspect.WATER, 3));
+        assertEquals(32, alembic.amount);
+        assertEquals(Aspect.AIR, alembic.aspect);
+
+        alembic.amount = 0;
+        assertEquals(0, alembic.addToContainer(Aspect.WATER, 2));
+        assertEquals(2, alembic.amount);
+        assertEquals(Aspect.WATER, alembic.aspect);
     }
 
     private static void assertAlembicNotified(Aspect initialAspect, int initialAmount) {

@@ -35,7 +35,7 @@ public class TileAlembicStaticGuardTest {
 
         assertTrue(source.contains("public boolean doesContainerAccept(Aspect tag)"));
         assertTrue(source.contains("return true;"));
-        assertTrue(source.contains("if (!this.doesContainerAccept(tag)) return requested;"));
+        assertTrue(source.contains("(this.amount < this.maxAmount && tag == this.aspect) || this.amount == 0"));
         assertTrue(source.contains("int add = Math.min(requested, this.maxAmount - this.amount);"));
         assertTrue(source.contains("return face != EnumFacing.byIndex(this.facing) && face != EnumFacing.DOWN;"));
         assertTrue(source.contains("public boolean canInputFrom(EnumFacing face)"));
