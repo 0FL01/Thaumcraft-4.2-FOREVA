@@ -13,13 +13,16 @@ import static org.junit.Assert.assertTrue;
 public class ItemNuggetEdibleStaticGuardTest {
 
     @Test
-    public void itemNuggetEdibleKeepsReferenceSubtypeAndUseDurationContracts() throws IOException {
+    public void itemNuggetEdibleKeepsReferenceItemsAndLegacyCarrierContracts() throws IOException {
         String source = readFile("src/main/java/thaumcraft/common/items/ItemNuggetEdible.java");
 
         assertTrue("ItemNuggetEdible should use reference saturation baseline",
                 source.contains("super(1, 0.3f, false)"));
-        assertTrue("ItemNuggetEdible should expose edible nugget subtypes",
-                source.contains("this.setHasSubtypes(true)"));
+        assertTrue("ItemNuggetEdible should support separate TC4 items and the hidden legacy subtype carrier",
+                source.contains("public ItemNuggetEdible(boolean legacySubtypes)")
+                        && source.contains("this.setHasSubtypes(legacySubtypes)")
+                        && source.contains("if (!legacySubtypes)")
+                        && source.contains("this.setCreativeTab(CreativeTabThaumcraft.tabThaumcraft)"));
         assertTrue("ItemNuggetEdible should keep 10-tick consume duration",
                 source.contains("public int getMaxItemUseDuration(ItemStack stack)")
                         && source.contains("return 10;"));

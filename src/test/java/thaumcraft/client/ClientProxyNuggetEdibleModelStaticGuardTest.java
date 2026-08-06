@@ -18,6 +18,10 @@ public class ClientProxyNuggetEdibleModelStaticGuardTest {
         String beefModel = readFile("src/main/resources/assets/thaumcraft/models/item/itemnuggetedible_beef.json");
         String porkModel = readFile("src/main/resources/assets/thaumcraft/models/item/itemnuggetedible_pork.json");
         String fishModel = readFile("src/main/resources/assets/thaumcraft/models/item/itemnuggetedible_fish.json");
+        String chickenItemModel = readFile("src/main/resources/assets/thaumcraft/models/item/itemnuggetchicken.json");
+        String beefItemModel = readFile("src/main/resources/assets/thaumcraft/models/item/itemnuggetbeef.json");
+        String porkItemModel = readFile("src/main/resources/assets/thaumcraft/models/item/itemnuggetpork.json");
+        String fishItemModel = readFile("src/main/resources/assets/thaumcraft/models/item/itemnuggetfish.json");
 
         assertTrue("ClientProxy should map itemNuggetEdible subtype metas to dedicated models",
                 source.contains("if (item == ConfigItems.itemNuggetEdible)")
@@ -37,6 +41,11 @@ public class ClientProxyNuggetEdibleModelStaticGuardTest {
                 porkModel.contains("\"layer0\": \"thaumcraft:items/nuggetpork\""));
         assertTrue("Fish edible nugget model should reference fish texture",
                 fishModel.contains("\"layer0\": \"thaumcraft:items/nuggetfish\""));
+        assertTrue("Separate TC4 edible nugget items should keep the same four textures",
+                chickenItemModel.contains("thaumcraft:items/nuggetchicken")
+                        && beefItemModel.contains("thaumcraft:items/nuggetbeef")
+                        && porkItemModel.contains("thaumcraft:items/nuggetpork")
+                        && fishItemModel.contains("thaumcraft:items/nuggetfish"));
     }
 
     private static String readFile(String path) throws IOException {

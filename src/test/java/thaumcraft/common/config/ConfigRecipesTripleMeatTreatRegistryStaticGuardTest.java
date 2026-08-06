@@ -20,11 +20,11 @@ public class ConfigRecipesTripleMeatTreatRegistryStaticGuardTest {
                         && source.contains("setRegistryName(\"thaumcraft\", \"triplemeattreat_chicken_beef_fish\")")
                         && source.contains("setRegistryName(\"thaumcraft\", \"triplemeattreat_chicken_pork_fish\")")
                         && source.contains("setRegistryName(\"thaumcraft\", \"triplemeattreat_beef_pork_fish\")"));
-        assertTrue("ConfigRecipes triple-meat recipes should consume edible nuggets by type meta",
-                source.contains("new ItemStack(ConfigItems.itemNuggetEdible, 1, 0)")
-                        && source.contains("new ItemStack(ConfigItems.itemNuggetEdible, 1, 1)")
-                        && source.contains("new ItemStack(ConfigItems.itemNuggetEdible, 1, 2)")
-                        && source.contains("new ItemStack(ConfigItems.itemNuggetEdible, 1, 3)"));
+        assertTrue("ConfigRecipes triple-meat recipes should consume the four TC4 nugget items",
+                source.contains("new ItemStack(ConfigItems.itemNuggetChicken)")
+                        && source.contains("new ItemStack(ConfigItems.itemNuggetBeef)")
+                        && source.contains("new ItemStack(ConfigItems.itemNuggetPork)")
+                        && source.contains("new ItemStack(ConfigItems.itemNuggetFish)"));
     }
 
     private static String readFile(String path) throws IOException {

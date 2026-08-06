@@ -657,9 +657,9 @@ public class ConfigRecipesSpecialSlice {
                 null,
                 new ItemStack(ConfigItems.itemTripleMeatTreat),
                 new ItemStack(Items.SUGAR),
-                new ItemStack(ConfigItems.itemNuggetEdible, 1, 0),
-                new ItemStack(ConfigItems.itemNuggetEdible, 1, 1),
-                new ItemStack(ConfigItems.itemNuggetEdible, 1, 2))
+                new ItemStack(ConfigItems.itemNuggetChicken),
+                new ItemStack(ConfigItems.itemNuggetBeef),
+                new ItemStack(ConfigItems.itemNuggetPork))
                 .setRegistryName("thaumcraft", "triplemeattreat_chicken_beef_pork");
         registry.register(recipeTripleMeatTreat0);
 
@@ -667,9 +667,9 @@ public class ConfigRecipesSpecialSlice {
                 null,
                 new ItemStack(ConfigItems.itemTripleMeatTreat),
                 new ItemStack(Items.SUGAR),
-                new ItemStack(ConfigItems.itemNuggetEdible, 1, 0),
-                new ItemStack(ConfigItems.itemNuggetEdible, 1, 1),
-                new ItemStack(ConfigItems.itemNuggetEdible, 1, 3))
+                new ItemStack(ConfigItems.itemNuggetChicken),
+                new ItemStack(ConfigItems.itemNuggetBeef),
+                new ItemStack(ConfigItems.itemNuggetFish))
                 .setRegistryName("thaumcraft", "triplemeattreat_chicken_beef_fish");
         registry.register(recipeTripleMeatTreat1);
 
@@ -677,9 +677,9 @@ public class ConfigRecipesSpecialSlice {
                 null,
                 new ItemStack(ConfigItems.itemTripleMeatTreat),
                 new ItemStack(Items.SUGAR),
-                new ItemStack(ConfigItems.itemNuggetEdible, 1, 0),
-                new ItemStack(ConfigItems.itemNuggetEdible, 1, 2),
-                new ItemStack(ConfigItems.itemNuggetEdible, 1, 3))
+                new ItemStack(ConfigItems.itemNuggetChicken),
+                new ItemStack(ConfigItems.itemNuggetPork),
+                new ItemStack(ConfigItems.itemNuggetFish))
                 .setRegistryName("thaumcraft", "triplemeattreat_chicken_pork_fish");
         registry.register(recipeTripleMeatTreat2);
 
@@ -687,9 +687,9 @@ public class ConfigRecipesSpecialSlice {
                 null,
                 new ItemStack(ConfigItems.itemTripleMeatTreat),
                 new ItemStack(Items.SUGAR),
-                new ItemStack(ConfigItems.itemNuggetEdible, 1, 1),
-                new ItemStack(ConfigItems.itemNuggetEdible, 1, 2),
-                new ItemStack(ConfigItems.itemNuggetEdible, 1, 3))
+                new ItemStack(ConfigItems.itemNuggetBeef),
+                new ItemStack(ConfigItems.itemNuggetPork),
+                new ItemStack(ConfigItems.itemNuggetFish))
                 .setRegistryName("thaumcraft", "triplemeattreat_beef_pork_fish");
         registry.register(recipeTripleMeatTreat3);
 

@@ -17,13 +17,21 @@ public class ItemNuggetEdible extends ItemFood {
             "nuggetpork",
             "nuggetfish"
     };
+    private final boolean legacySubtypes;
 
     public ItemNuggetEdible() {
+        this(true);
+    }
+
+    public ItemNuggetEdible(boolean legacySubtypes) {
         super(1, 0.3f, false);
-        this.setHasSubtypes(true);
+        this.legacySubtypes = legacySubtypes;
+        this.setHasSubtypes(legacySubtypes);
         this.setMaxDamage(0);
         this.setMaxStackSize(64);
-        this.setCreativeTab(CreativeTabThaumcraft.tabThaumcraft);
+        if (!legacySubtypes) {
+            this.setCreativeTab(CreativeTabThaumcraft.tabThaumcraft);
+        }
     }
 
     @Override
@@ -33,6 +41,9 @@ public class ItemNuggetEdible extends ItemFood {
 
     @Override
     public String getTranslationKey(ItemStack stack) {
+        if (!this.legacySubtypes) {
+            return super.getTranslationKey(stack);
+        }
         int meta = stack.getItemDamage();
         if (meta >= 0 && meta < NAMES.length) {
             return super.getTranslationKey() + "." + NAMES[meta];
@@ -42,7 +53,9 @@ public class ItemNuggetEdible extends ItemFood {
 
     @Override
     public void getSubItems(CreativeTabs tab, NonNullList<ItemStack> items) {
-        if (this.isInCreativeTab(tab)) {
+        if (!this.legacySubtypes) {
+            super.getSubItems(tab, items);
+        } else if (this.isInCreativeTab(tab)) {
             for (int meta = 0; meta < NAMES.length; meta++) {
                 items.add(new ItemStack(this, 1, meta));
             }

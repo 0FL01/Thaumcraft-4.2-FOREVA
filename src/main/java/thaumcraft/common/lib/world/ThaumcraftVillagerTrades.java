@@ -178,14 +178,14 @@ public class ThaumcraftVillagerTrades {
             new SellForEmeralds(new ItemStack(ConfigItems.itemResource, 1, 1), 1, 1),
         },
         {
-            // Buy itemNuggetEdible (meta 0) 24-31 → 1 Emerald (chicken nugget equivalent)
-            new BuyForEmeralds(new ItemStack(ConfigItems.itemNugget, 1, 0), 24, 31),
+            // Buy chicken nuggets 24-31 → 1 Emerald
+            new BuyForEmeralds(new ItemStack(ConfigItems.itemNuggetChicken), 24, 31),
 
             // Buy Books 4-6 + Emerald → TC Resource (meta 9) 1
             new BuyWithEmeraldForItem(new ItemStack(Items.BOOK), 4, 6, new ItemStack(ConfigItems.itemResource, 1, 9)),
 
-            // Buy itemNugget (meta 1, beef) 24-31 → 1 Emerald
-            new BuyForEmeralds(new ItemStack(ConfigItems.itemNugget, 1, 1), 24, 31),
+            // Buy beef nuggets 24-31 → 1 Emerald
+            new BuyForEmeralds(new ItemStack(ConfigItems.itemNuggetBeef), 24, 31),
         },
         {
             // 1 Emerald → Sell Random Aspect Shard 2-3

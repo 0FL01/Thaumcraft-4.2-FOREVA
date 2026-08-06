@@ -20,11 +20,11 @@ public class ConfigAspectsCompatClusterFoodTagCoverageTest {
                         && source.contains("new ItemStack(ConfigItems.itemNugget, 1, 18)")
                         && source.contains("new ItemStack(ConfigItems.itemNugget, 1, 19)")
                         && source.contains("new ItemStack(ConfigItems.itemNugget, 1, 20)"));
-        assertTrue("ConfigAspects should preserve edible nugget subtype hunger tags",
-                source.contains("new ItemStack(ConfigItems.itemNuggetEdible, 1, 0)")
-                        && source.contains("new ItemStack(ConfigItems.itemNuggetEdible, 1, 1)")
-                        && source.contains("new ItemStack(ConfigItems.itemNuggetEdible, 1, 2)")
-                        && source.contains("new ItemStack(ConfigItems.itemNuggetEdible, 1, 3)"));
+        assertTrue("ConfigAspects should preserve TC4 edible nugget hunger tags",
+                source.contains("new ItemStack(ConfigItems.itemNuggetChicken, 1, OreDictionary.WILDCARD_VALUE)")
+                        && source.contains("new ItemStack(ConfigItems.itemNuggetBeef, 1, OreDictionary.WILDCARD_VALUE)")
+                        && source.contains("new ItemStack(ConfigItems.itemNuggetPork, 1, OreDictionary.WILDCARD_VALUE)")
+                        && source.contains("new ItemStack(ConfigItems.itemNuggetFish, 1, OreDictionary.WILDCARD_VALUE)"));
         assertTrue("ConfigAspects should register TripleMeatTreat complex object tag baseline",
                 source.contains("registerComplexObjectTag(")
                         && source.contains("new ItemStack(ConfigItems.itemTripleMeatTreat, 1, OreDictionary.WILDCARD_VALUE)")

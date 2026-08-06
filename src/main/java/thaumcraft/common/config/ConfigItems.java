@@ -167,7 +167,12 @@ public class ConfigItems {
     public static ItemEssence itemEssence;
     public static ItemCrystalEssence itemCrystalEssence;
     public static ItemNugget itemNugget;
+    /** Retained as a hidden carrier for worlds created by earlier 1.12 port builds. */
     public static ItemNuggetEdible itemNuggetEdible;
+    public static ItemNuggetEdible itemNuggetChicken;
+    public static ItemNuggetEdible itemNuggetBeef;
+    public static ItemNuggetEdible itemNuggetPork;
+    public static ItemNuggetEdible itemNuggetFish;
     public static ItemEldritchObject itemEldritchObject;
     public static ItemLootBag itemLootBag;
 
@@ -356,6 +361,23 @@ public class ConfigItems {
                 .setTranslationKey("thaumcraft.nugget_edible")
                 .setCreativeTab(tab);
         allItems.add(itemNuggetEdible);
+
+        itemNuggetChicken = (ItemNuggetEdible) new ItemNuggetEdible(false)
+                .setRegistryName("thaumcraft", ConfigBlocks.legacyPath("ItemNuggetChicken"))
+                .setTranslationKey("thaumcraft.nugget_edible.nuggetchicken");
+        allItems.add(itemNuggetChicken);
+        itemNuggetBeef = (ItemNuggetEdible) new ItemNuggetEdible(false)
+                .setRegistryName("thaumcraft", ConfigBlocks.legacyPath("ItemNuggetBeef"))
+                .setTranslationKey("thaumcraft.nugget_edible.nuggetbeef");
+        allItems.add(itemNuggetBeef);
+        itemNuggetPork = (ItemNuggetEdible) new ItemNuggetEdible(false)
+                .setRegistryName("thaumcraft", ConfigBlocks.legacyPath("ItemNuggetPork"))
+                .setTranslationKey("thaumcraft.nugget_edible.nuggetpork");
+        allItems.add(itemNuggetPork);
+        itemNuggetFish = (ItemNuggetEdible) new ItemNuggetEdible(false)
+                .setRegistryName("thaumcraft", ConfigBlocks.legacyPath("ItemNuggetFish"))
+                .setTranslationKey("thaumcraft.nugget_edible.nuggetfish");
+        allItems.add(itemNuggetFish);
 
         itemEldritchObject = (ItemEldritchObject) new ItemEldritchObject()
                 .setRegistryName("thaumcraft", ConfigBlocks.legacyPath("ItemEldritchObject"))
