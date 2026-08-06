@@ -69,7 +69,7 @@ public class ItemAmuletVis extends Item implements IBauble, IRunicArmor {
         if (!stack.hasTagCompound()) {
             stack.setTagCompound(new NBTTagCompound());
         }
-        stack.getTagCompound().setInteger(aspect.getTag(), Math.max(0, Math.min(amount, this.getMaxVis(stack))));
+        stack.getTagCompound().setInteger(aspect.getTag(), amount);
     }
 
     public int addVis(ItemStack stack, Aspect aspect, int amount, boolean doit) {
