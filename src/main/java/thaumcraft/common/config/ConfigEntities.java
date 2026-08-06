@@ -165,7 +165,7 @@ public class ConfigEntities {
         );
         PROFESSIONS.add(PROF_BANKER);
 
-        // Initialize villager careers with level-gated trade lists.
+        // Forge careers need a level, so expose the original flat TC4 lists at level 1.
         VillagerRegistry.VillagerCareer wizardCareer = new VillagerRegistry.VillagerCareer(PROF_WIZARD, "wizard");
         registerCareerTrades(wizardCareer, ThaumcraftVillagerTrades.WIZARD_TRADE_LEVELS);
 
@@ -174,12 +174,28 @@ public class ConfigEntities {
     }
 
     private static void registerCareerTrades(VillagerRegistry.VillagerCareer career, EntityVillager.ITradeList[][] tradeLevels) {
-        for (int i = 0; i < tradeLevels.length; i++) {
-            EntityVillager.ITradeList[] trades = tradeLevels[i];
-            if (trades != null && trades.length > 0) {
-                career.addTrade(i + 1, trades);
+        EntityVillager.ITradeList[] trades = flattenTradeLevels(tradeLevels);
+        if (trades.length > 0) {
+            career.addTrade(1, trades);
+        }
+    }
+
+    static EntityVillager.ITradeList[] flattenTradeLevels(EntityVillager.ITradeList[][] tradeLevels) {
+        int size = 0;
+        for (EntityVillager.ITradeList[] level : tradeLevels) {
+            if (level != null) {
+                size += level.length;
             }
         }
+        EntityVillager.ITradeList[] flat = new EntityVillager.ITradeList[size];
+        int offset = 0;
+        for (EntityVillager.ITradeList[] level : tradeLevels) {
+            if (level != null && level.length > 0) {
+                System.arraycopy(level, 0, flat, offset, level.length);
+                offset += level.length;
+            }
+        }
+        return flat;
     }
 
     public static void initEntitySpawns() {
