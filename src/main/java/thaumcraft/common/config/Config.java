@@ -4,15 +4,21 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.MapColor;
 import net.minecraft.block.material.Material;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.init.Blocks;
+import net.minecraft.init.Items;
+import net.minecraft.init.PotionTypes;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.potion.PotionType;
+import net.minecraft.potion.PotionUtils;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.biome.Biome;
+import net.minecraft.world.storage.loot.LootTableList;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.common.config.Property;
 import net.minecraftforge.fml.common.registry.ForgeRegistries;
@@ -23,6 +29,8 @@ import thaumcraft.api.aspects.AspectList;
 import thaumcraft.api.potions.PotionFluxTaint;
 import thaumcraft.api.potions.PotionVisExhaust;
 import thaumcraft.common.items.equipment.ItemElementalAxe;
+import thaumcraft.common.items.baubles.ItemAmuletVis;
+import thaumcraft.common.lib.events.LootHandler;
 import thaumcraft.common.lib.utils.CropUtils;
 import thaumcraft.common.lib.utils.Utils;
 import thaumcraft.common.lib.world.ThaumcraftWorldGenerator;
@@ -42,6 +50,7 @@ import thaumcraft.common.lib.potions.PotionWarpWard;
 public class Config {
 
     public static Configuration config;
+    private static boolean lootInitialized;
 
     // Categories
     public static final String CATEGORY_ENCH = "Enchantments";
@@ -360,7 +369,113 @@ public class Config {
     }
 
     public static void initLoot() {
-        // Phase 4: add loot table entries
+        if (lootInitialized) {
+            return;
+        }
+        lootInitialized = true;
+
+        Random rand = new Random(System.currentTimeMillis());
+        ItemStack amulet = new ItemStack(ConfigItems.itemAmuletVis, 1, 0);
+        ItemAmuletVis amuletItem = (ItemAmuletVis) amulet.getItem();
+        for (Aspect aspect : Aspect.getPrimalAspects()) {
+            amuletItem.addVis(amulet, aspect, rand.nextInt(5), true);
+        }
+
+        ThaumcraftApi.addLootBagItem(new ItemStack(ConfigItems.itemResource, 1, 18), 2500, 0);
+        ThaumcraftApi.addLootBagItem(new ItemStack(ConfigItems.itemResource, 2, 18), 2250, 1);
+        ThaumcraftApi.addLootBagItem(new ItemStack(ConfigItems.itemResource, 3, 18), 2000, 2);
+        ThaumcraftApi.addLootBagItem(new ItemStack(ConfigItems.itemEldritchObject, 1, 3), 1, 2);
+        ThaumcraftApi.addLootBagItem(new ItemStack(Items.NETHER_STAR), 1, 2);
+        ThaumcraftApi.addLootBagItem(new ItemStack(Items.DIAMOND), 10, 0);
+        ThaumcraftApi.addLootBagItem(new ItemStack(Items.DIAMOND), 50, 1, 2);
+        ThaumcraftApi.addLootBagItem(new ItemStack(Items.EMERALD), 15, 0);
+        ThaumcraftApi.addLootBagItem(new ItemStack(Items.EMERALD), 75, 1, 2);
+        ThaumcraftApi.addLootBagItem(new ItemStack(Items.GOLD_INGOT), 100, 0, 1, 2);
+        ThaumcraftApi.addLootBagItem(new ItemStack(Items.ENDER_PEARL), 100, 0, 1, 2);
+        ThaumcraftApi.addLootBagItem(new ItemStack(ConfigItems.itemResource, 1, 9), 25, 0, 1, 2);
+        ThaumcraftApi.addLootBagItem(new ItemStack(ConfigItems.itemBaubleBlanks, 1, 0), 10, 0);
+        ThaumcraftApi.addLootBagItem(new ItemStack(ConfigItems.itemBaubleBlanks, 1, 1), 10, 0);
+        ThaumcraftApi.addLootBagItem(new ItemStack(ConfigItems.itemBaubleBlanks, 1, 2), 10, 0);
+        for (int meta = 3; meta <= 8; meta++) {
+            ThaumcraftApi.addLootBagItem(new ItemStack(ConfigItems.itemBaubleBlanks, 1, meta), 5, 1);
+            ThaumcraftApi.addLootBagItem(new ItemStack(ConfigItems.itemBaubleBlanks, 1, meta), 7, 2);
+        }
+        ThaumcraftApi.addLootBagItem(amulet.copy(), 6, 1, 2);
+        ThaumcraftApi.addLootBagItem(new ItemStack(ConfigItems.itemRingRunic, 1, 0), 5, 1, 2);
+        ThaumcraftApi.addLootBagItem(new ItemStack(Items.EXPERIENCE_BOTTLE), 5, 0);
+        ThaumcraftApi.addLootBagItem(new ItemStack(Items.EXPERIENCE_BOTTLE), 10, 1);
+        ThaumcraftApi.addLootBagItem(new ItemStack(Items.EXPERIENCE_BOTTLE), 20, 2);
+        ThaumcraftApi.addLootBagItem(new ItemStack(Items.GOLDEN_APPLE, 1, 1), 1, 0);
+        ThaumcraftApi.addLootBagItem(new ItemStack(Items.GOLDEN_APPLE, 1, 1), 2, 1);
+        ThaumcraftApi.addLootBagItem(new ItemStack(Items.GOLDEN_APPLE, 1, 1), 3, 2);
+        ThaumcraftApi.addLootBagItem(new ItemStack(Items.GOLDEN_APPLE, 1, 0), 3, 0);
+        ThaumcraftApi.addLootBagItem(new ItemStack(Items.GOLDEN_APPLE, 1, 0), 6, 1);
+        ThaumcraftApi.addLootBagItem(new ItemStack(Items.GOLDEN_APPLE, 1, 0), 9, 2);
+        ThaumcraftApi.addLootBagItem(new ItemStack(Items.BOOK), 10, 0, 1, 2);
+
+        addPotionLoot(new PotionType[]{PotionTypes.NIGHT_VISION, PotionTypes.INVISIBILITY,
+                PotionTypes.FIRE_RESISTANCE, PotionTypes.SWIFTNESS,
+                PotionTypes.SLOWNESS, PotionTypes.WATER_BREATHING, PotionTypes.HEALING,
+                PotionTypes.HARMING, PotionTypes.POISON, PotionTypes.REGENERATION,
+                PotionTypes.STRENGTH, PotionTypes.WEAKNESS}, 1);
+        addPotionLoot(new PotionType[]{PotionTypes.LONG_NIGHT_VISION, PotionTypes.LONG_INVISIBILITY,
+                PotionTypes.LONG_FIRE_RESISTANCE, PotionTypes.LONG_SWIFTNESS,
+                PotionTypes.LONG_SLOWNESS, PotionTypes.LONG_WATER_BREATHING, PotionTypes.LONG_POISON,
+                PotionTypes.LONG_REGENERATION, PotionTypes.LONG_STRENGTH, PotionTypes.LONG_WEAKNESS}, 2);
+        addPotionLoot(new PotionType[]{PotionTypes.STRONG_SWIFTNESS, PotionTypes.STRONG_HEALING,
+                PotionTypes.STRONG_HARMING, PotionTypes.STRONG_POISON,
+                PotionTypes.STRONG_REGENERATION, PotionTypes.STRONG_STRENGTH}, 3);
+
+        ItemStack[] commonLoot = {new ItemStack(ConfigItems.itemLootBag, 1, 0),
+                new ItemStack(ConfigItems.itemResource, 1, 2), new ItemStack(ConfigItems.itemResource, 1, 6)};
+        ItemStack[] uncommonLoot = {new ItemStack(ConfigItems.itemLootBag, 1, 1),
+                new ItemStack(ConfigItems.itemBaubleBlanks, 1, 0),
+                new ItemStack(ConfigItems.itemBaubleBlanks, 1, 1),
+                new ItemStack(ConfigItems.itemBaubleBlanks, 1, 2),
+                new ItemStack(ConfigItems.itemResource, 1, 9)};
+        ItemStack[] rareLoot = {new ItemStack(ConfigItems.itemLootBag, 1, 2),
+                new ItemStack(ConfigItems.itemThaumonomicon), new ItemStack(ConfigItems.itemSwordThaumium),
+                new ItemStack(ConfigItems.itemPickThaumium), new ItemStack(ConfigItems.itemAxeThaumium),
+                new ItemStack(ConfigItems.itemHoeThaumium), new ItemStack(ConfigItems.itemRingRunic),
+                new ItemStack(ConfigItems.itemBaubleBlanks, 1, 3),
+                new ItemStack(ConfigItems.itemBaubleBlanks, 1, 4),
+                new ItemStack(ConfigItems.itemBaubleBlanks, 1, 5),
+                new ItemStack(ConfigItems.itemBaubleBlanks, 1, 6),
+                new ItemStack(ConfigItems.itemBaubleBlanks, 1, 7),
+                new ItemStack(ConfigItems.itemBaubleBlanks, 1, 8), amulet};
+        ResourceLocation[] highWeightTables = {LootTableList.CHESTS_SIMPLE_DUNGEON,
+                LootTableList.CHESTS_JUNGLE_TEMPLE, LootTableList.CHESTS_DESERT_PYRAMID};
+        ResourceLocation[] lowerWeightTables = {LootTableList.CHESTS_ABANDONED_MINESHAFT,
+                LootTableList.CHESTS_STRONGHOLD_CORRIDOR, LootTableList.CHESTS_STRONGHOLD_CROSSING,
+                LootTableList.CHESTS_STRONGHOLD_LIBRARY};
+        addChestLoot(commonLoot, 1, 3, 5, highWeightTables);
+        addChestLoot(commonLoot, 1, 3, 4, lowerWeightTables);
+        addChestLoot(uncommonLoot, 1, 2, 4, highWeightTables);
+        addChestLoot(uncommonLoot, 1, 2, 3, lowerWeightTables);
+        LootHandler.addLoot(LootTableList.CHESTS_STRONGHOLD_LIBRARY,
+                new ItemStack(ConfigItems.itemResource, 1, 9), 3, 6, 20);
+        addChestLoot(rareLoot, 1, 1, 1, highWeightTables);
+        addChestLoot(rareLoot, 1, 1, 1, lowerWeightTables);
+        LootHandler.addLoot(LootTableList.CHESTS_VILLAGE_BLACKSMITH,
+                new ItemStack(ConfigItems.itemResource, 1, 2), 1, 3, 10);
+    }
+
+    private static void addPotionLoot(PotionType[] types, int weight) {
+        for (PotionType type : types) {
+            ThaumcraftApi.addLootBagItem(
+                    PotionUtils.addPotionToItemStack(new ItemStack(Items.POTIONITEM), type), weight, 0, 1, 2);
+            ThaumcraftApi.addLootBagItem(
+                    PotionUtils.addPotionToItemStack(new ItemStack(Items.SPLASH_POTION), type), weight, 0, 1, 2);
+        }
+    }
+
+    private static void addChestLoot(ItemStack[] loot, int minCount, int maxCount, int weight,
+                                     ResourceLocation[] tables) {
+        for (ItemStack stack : loot) {
+            for (ResourceLocation table : tables) {
+                LootHandler.addLoot(table, stack, minCount, maxCount, weight);
+            }
+        }
     }
 
     public static void initModCompatibility() {

@@ -53,6 +53,7 @@ import thaumcraft.common.lib.capabilities.PlayerKnowledgeProvider;
 import thaumcraft.common.lib.events.EventHandlerEntity;
 import thaumcraft.common.lib.events.EventHandlerRunic;
 import thaumcraft.common.lib.events.EventHandlerWorld;
+import thaumcraft.common.lib.events.LootHandler;
 import thaumcraft.common.lib.events.ServerTickEventsFML;
 import thaumcraft.common.lib.events.CommandThaumcraft;
 import thaumcraft.common.lib.CreativeTabThaumcraft;
@@ -127,6 +128,7 @@ public class Thaumcraft {
         MinecraftForge.EVENT_BUS.register(this);
         MinecraftForge.EVENT_BUS.register(new EventHandlerWorld());
         MinecraftForge.EVENT_BUS.register(new EventHandlerEntity());
+        MinecraftForge.EVENT_BUS.register(new LootHandler());
         MinecraftForge.EVENT_BUS.register(runicEventHandler);
         MinecraftForge.EVENT_BUS.register(new ServerTickEventsFML());
         MinecraftForge.TERRAIN_GEN_BUS.register(new EventHandlerWorld());
