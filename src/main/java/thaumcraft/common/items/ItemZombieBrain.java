@@ -1,30 +1,40 @@
 package thaumcraft.common.items;
 
-import net.minecraft.creativetab.CreativeTabs;
+import java.util.Random;
+import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.MobEffects;
 import net.minecraft.item.ItemFood;
 import net.minecraft.item.ItemStack;
 import net.minecraft.potion.PotionEffect;
-import net.minecraft.util.NonNullList;
 import net.minecraft.world.World;
-import net.minecraft.entity.player.EntityPlayer;
+import thaumcraft.common.Thaumcraft;
 import thaumcraft.common.lib.CreativeTabThaumcraft;
 
 public class ItemZombieBrain extends ItemFood {
 
     public ItemZombieBrain() {
-        super(2, 0.1f, false);
+        super(4, 0.2f, true);
         this.setHasSubtypes(false);
         this.setMaxDamage(0);
-        this.setMaxStackSize(64);
+        this.setPotionEffect(new PotionEffect(MobEffects.HUNGER, 600, 0), 0.8f);
         this.setCreativeTab(CreativeTabThaumcraft.tabThaumcraft);
     }
 
     @Override
-    protected void onFoodEaten(ItemStack stack, World world, EntityPlayer player) {
-        if (!world.isRemote) {
-            player.addPotionEffect(new PotionEffect(MobEffects.NAUSEA, 200, 0));
-            player.addPotionEffect(new PotionEffect(MobEffects.HUNGER, 200, 0));
+    public ItemStack onItemUseFinish(ItemStack stack, World world, EntityLivingBase entity) {
+        if (!world.isRemote && entity instanceof EntityPlayerMP) {
+            this.applyWarp((EntityPlayer) entity, world.rand);
+        }
+        return super.onItemUseFinish(stack, world, entity);
+    }
+
+    void applyWarp(EntityPlayer player, Random random) {
+        if (random.nextFloat() < 0.1f) {
+            Thaumcraft.addStickyWarpToPlayer(player, 1);
+        } else {
+            Thaumcraft.addWarpToPlayer(player, 1 + random.nextInt(3), true);
         }
     }
 }
