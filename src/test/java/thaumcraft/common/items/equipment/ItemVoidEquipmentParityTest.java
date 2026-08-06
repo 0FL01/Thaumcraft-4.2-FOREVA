@@ -142,8 +142,8 @@ public class ItemVoidEquipmentParityTest {
         @Override public boolean isCreative() { return this.capabilities.isCreativeMode; }
     }
 
-    private static final class TestWorld extends World {
-        private TestWorld() {
+    static final class TestWorld extends World {
+        TestWorld() {
             super(null,
                     new WorldInfo(new WorldSettings(0L, GameType.SURVIVAL, false, false, WorldType.DEFAULT), "void_equipment"),
                     new WorldProviderSurface(), new Profiler(), false);

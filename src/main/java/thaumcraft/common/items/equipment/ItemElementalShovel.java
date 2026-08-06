@@ -45,6 +45,7 @@ public class ItemElementalShovel extends ItemSpade implements IRepairable, IArch
 
     public ItemElementalShovel(ToolMaterial material) {
         super(material);
+        this.attackDamage = 4.0F;
         this.setCreativeTab(CreativeTabThaumcraft.tabThaumcraft);
     }
 

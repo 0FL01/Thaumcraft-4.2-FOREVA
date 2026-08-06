@@ -16,6 +16,17 @@ public class ItemThaumiumSword extends ItemSword implements IRepairable {
     }
 
     @Override
+    public float getAttackDamage() {
+        return 6.0F;
+    }
+
+    @Override
+    public com.google.common.collect.Multimap<String, net.minecraft.entity.ai.attributes.AttributeModifier> getAttributeModifiers(
+            net.minecraft.inventory.EntityEquipmentSlot slot, ItemStack stack) {
+        return ToolAttributeHelper.withMainHandDamage(super.getAttributeModifiers(slot, stack), slot, 6.0D);
+    }
+
+    @Override
     public EnumRarity getRarity(ItemStack stack) {
         return EnumRarity.UNCOMMON;
     }

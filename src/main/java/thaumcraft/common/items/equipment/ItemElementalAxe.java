@@ -37,7 +37,7 @@ public class ItemElementalAxe extends ItemAxe implements IRepairable {
     public static List<List<?>> oreDictLogs = new ArrayList<>();
 
     public ItemElementalAxe(ToolMaterial material) {
-        super(material, 8.0f, -3.0f);
+        super(material, 6.0f, -3.0f);
         this.setCreativeTab(CreativeTabThaumcraft.tabThaumcraft);
     }
 

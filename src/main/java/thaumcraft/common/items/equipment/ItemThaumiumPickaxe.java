@@ -14,6 +14,7 @@ public class ItemThaumiumPickaxe extends ItemPickaxe implements IRepairable {
 
     public ItemThaumiumPickaxe(ToolMaterial material) {
         super(material);
+        this.attackDamage = 4.0F;
         this.setCreativeTab(CreativeTabThaumcraft.tabThaumcraft);
     }
 

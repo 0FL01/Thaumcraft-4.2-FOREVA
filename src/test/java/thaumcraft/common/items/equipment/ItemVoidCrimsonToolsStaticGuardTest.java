@@ -52,10 +52,11 @@ public class ItemVoidCrimsonToolsStaticGuardTest {
                         && voidHoe.contains("ItemVoidSword.repairVoid(stack, world, entityIn);"));
         assertTrue("ItemCrimsonSword must keep rare rarity, void-charm repair, dual debuff and warp contracts",
                 crimsonSword.contains("implements IRepairable, IWarpingGear")
+                        && crimsonSword.contains("\"CVOID\", 4, 200, 8.0F, 3.5F, 20")
                         && crimsonSword.contains("return EnumRarity.RARE;")
                         && crimsonSword.contains("return ItemVoidSword.isVoidToolRepair(repair) || super.getIsRepairable(toRepair, repair);")
-                        && crimsonSword.contains("target.addPotionEffect(new PotionEffect(MobEffects.WITHER, 60));")
-                        && crimsonSword.contains("target.addPotionEffect(new PotionEffect(MobEffects.WEAKNESS, 120));")
+                        && crimsonSword.contains("target.addPotionEffect(new PotionEffect(MobEffects.WEAKNESS, 60));")
+                        && crimsonSword.contains("target.addPotionEffect(new PotionEffect(MobEffects.HUNGER, 120));")
                         && crimsonSword.contains("I18n.translateToLocal(\"enchantment.special.sapgreat\")")
                         && crimsonSword.contains("ItemVoidSword.repairVoid(stack, world, entityIn);")
                         && crimsonSword.contains("return 2;"));

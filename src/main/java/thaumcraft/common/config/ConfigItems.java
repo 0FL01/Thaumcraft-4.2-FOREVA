@@ -544,7 +544,7 @@ public class ConfigItems {
                 .setCreativeTab(tab);
         allItems.add(itemBowBone);
 
-        itemCrimsonSword = (ItemCrimsonSword) new ItemCrimsonSword(TOOLMAT_VOID)
+        itemCrimsonSword = (ItemCrimsonSword) new ItemCrimsonSword()
                 .setRegistryName("thaumcraft", ConfigBlocks.legacyPath("ItemSwordCrimson"))
                 .setTranslationKey("thaumcraft.crimson_sword")
                 .setCreativeTab(tab);

@@ -44,6 +44,17 @@ public class ItemElementalSword extends ItemSword implements IRepairable {
     }
 
     @Override
+    public float getAttackDamage() {
+        return 7.0F;
+    }
+
+    @Override
+    public com.google.common.collect.Multimap<String, net.minecraft.entity.ai.attributes.AttributeModifier> getAttributeModifiers(
+            net.minecraft.inventory.EntityEquipmentSlot slot, ItemStack stack) {
+        return ToolAttributeHelper.withMainHandDamage(super.getAttributeModifiers(slot, stack), slot, 7.0D);
+    }
+
+    @Override
     public boolean getIsRepairable(ItemStack toRepair, ItemStack repair) {
         ItemStack thaumiumIngot = new ItemStack(ConfigItems.itemResource, 1, 2);
         return repair.isItemEqual(thaumiumIngot) || super.getIsRepairable(toRepair, repair);

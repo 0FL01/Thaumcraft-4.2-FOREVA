@@ -31,6 +31,17 @@ public class ItemVoidSword extends ItemSword implements IRepairable, IWarpingGea
     }
 
     @Override
+    public float getAttackDamage() {
+        return 7.0F;
+    }
+
+    @Override
+    public com.google.common.collect.Multimap<String, net.minecraft.entity.ai.attributes.AttributeModifier> getAttributeModifiers(
+            net.minecraft.inventory.EntityEquipmentSlot slot, ItemStack stack) {
+        return ToolAttributeHelper.withMainHandDamage(super.getAttributeModifiers(slot, stack), slot, 7.0D);
+    }
+
+    @Override
     public EnumRarity getRarity(ItemStack stack) {
         return EnumRarity.UNCOMMON;
     }

@@ -18,6 +18,7 @@ public class ItemVoidPickaxe extends ItemPickaxe implements IRepairable, IWarpin
 
     public ItemVoidPickaxe(ToolMaterial material) {
         super(material);
+        this.attackDamage = 5.0F;
         this.setCreativeTab(CreativeTabThaumcraft.tabThaumcraft);
     }
 

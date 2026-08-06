@@ -18,6 +18,7 @@ public class ItemVoidShovel extends ItemSpade implements IRepairable, IWarpingGe
 
     public ItemVoidShovel(ToolMaterial material) {
         super(material);
+        this.attackDamage = 4.0F;
         this.setCreativeTab(CreativeTabThaumcraft.tabThaumcraft);
     }
 

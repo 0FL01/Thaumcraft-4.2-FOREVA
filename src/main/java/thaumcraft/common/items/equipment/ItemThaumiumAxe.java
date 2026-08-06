@@ -13,7 +13,7 @@ import java.util.Set;
 public class ItemThaumiumAxe extends ItemAxe implements IRepairable {
 
     public ItemThaumiumAxe(ToolMaterial material) {
-        super(material, 8.0f, -3.2f);
+        super(material, 5.0f, -3.2f);
         this.setCreativeTab(CreativeTabThaumcraft.tabThaumcraft);
     }
 

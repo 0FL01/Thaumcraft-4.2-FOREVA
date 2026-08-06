@@ -14,6 +14,7 @@ public class ItemThaumiumShovel extends ItemSpade implements IRepairable {
 
     public ItemThaumiumShovel(ToolMaterial material) {
         super(material);
+        this.attackDamage = 3.0F;
         this.setCreativeTab(CreativeTabThaumcraft.tabThaumcraft);
     }
 
