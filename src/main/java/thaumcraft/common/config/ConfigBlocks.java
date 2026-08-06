@@ -62,6 +62,7 @@ public class ConfigBlocks {
     public static BlockLoot blockLootUrn;
     public static BlockLoot blockLootCrate;
     public static BlockChestHungry blockChestHungry;
+    public static BlockMagicBox blockMagicBox;
     public static BlockArcaneDoor blockArcaneDoor;
     public static BlockLifter blockLifter;
     public static BlockHole blockHole;
@@ -240,6 +241,10 @@ public class ConfigBlocks {
                 .setRegistryName("thaumcraft", legacyPath("blockChestHungry"))
                 .setTranslationKey("thaumcraft.hungry_chest");
 
+        blockMagicBox = (BlockMagicBox) new BlockMagicBox()
+                .setRegistryName("thaumcraft", legacyPath("blockMagicBox"))
+                .setTranslationKey("thaumcraft.magic_box");
+
         blockArcaneDoor = (BlockArcaneDoor) new BlockArcaneDoor()
                 .setRegistryName("thaumcraft", legacyPath("blockArcaneDoor"))
                 .setTranslationKey("thaumcraft.arcane_door");
@@ -338,6 +343,7 @@ public class ConfigBlocks {
                 blockLootUrn,
                 blockLootCrate,
                 blockChestHungry,
+                blockMagicBox,
                 blockArcaneDoor,
                 blockLifter,
                 blockHole,
@@ -410,6 +416,8 @@ public class ConfigBlocks {
                 .setRegistryName(blockLootCrate.getRegistryName()));
         registry.register(new net.minecraft.item.ItemBlock(blockChestHungry)
                 .setRegistryName(blockChestHungry.getRegistryName()));
+        registry.register(new net.minecraft.item.ItemBlock(blockMagicBox)
+                .setRegistryName(blockMagicBox.getRegistryName()));
         registry.register(new net.minecraft.item.ItemBlock(blockLifter)
                 .setRegistryName(blockLifter.getRegistryName()));
     }
@@ -553,6 +561,7 @@ public class ConfigBlocks {
             new TileRegistration(TileWardingStone.class, "TileWardingStone"),
             new TileRegistration(TileWardingStoneFence.class, "TileWardingStoneFence"),
             new TileRegistration(TileNitor.class, "TileNitor"),
+            new TileRegistration(TileMagicBox.class, "TileMagicBox"),
             new TileRegistration(TileEldritchPortal.class, "TileEldritchPortal"),
             new TileRegistration(TileEldritchNothing.class, "TileEldritchNothing"),
             new TileRegistration(TileEldritchLock.class, "TileEldritchLock"),

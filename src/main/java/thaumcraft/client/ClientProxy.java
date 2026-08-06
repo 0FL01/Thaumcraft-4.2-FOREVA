@@ -1174,6 +1174,7 @@ public class ClientProxy extends CommonProxy {
         registerBuiltinItemModel(manaPodItem, 0, "blockmanapod");
         Item chestItem = Item.getItemFromBlock(ConfigBlocks.blockChestHungry);
         registerBuiltinItemModel(chestItem, 0, "blockchesthungry");
+        registerBuiltinItemModel(Item.getItemFromBlock(ConfigBlocks.blockMagicBox), 0, "blockmagicbox");
     }
 
     private static void registerBlockItemModel(Item item, int meta, String variant) {
