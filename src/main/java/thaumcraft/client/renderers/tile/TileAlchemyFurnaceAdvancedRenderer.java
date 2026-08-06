@@ -17,13 +17,10 @@ import org.lwjgl.opengl.GL12;
 import org.lwjgl.opengl.GL14;
 import thaumcraft.codechicken.lib.render.CCModel;
 import thaumcraft.codechicken.lib.render.CCRenderState;
-import thaumcraft.codechicken.lib.render.Vertex5;
+import thaumcraft.codechicken.lib.vec.Vector3;
 import thaumcraft.common.tiles.TileAlchemyFurnaceAdvanced;
 
 public class TileAlchemyFurnaceAdvancedRenderer extends TileEntitySpecialRenderer<TileAlchemyFurnaceAdvanced> {
-    private static final int BASE_FLOOR_VERTEX_COUNT = 18 * 3;
-    private static final float BASE_FLOOR_Z_OFFSET = 0.002F;
-    private static final double OBJ_UV_INSET = 0.0005D;
     private static final ResourceLocation FURNACE_MODEL =
             new ResourceLocation("thaumcraft", "textures/models/adv_alch_furnace.obj");
     private static final ResourceLocation FURNACE =
@@ -45,8 +42,8 @@ public class TileAlchemyFurnaceAdvancedRenderer extends TileEntitySpecialRendere
         if (parsedBase == null || parsedTank == null) {
             throw new IllegalStateException("Advanced alchemical furnace OBJ is missing Base or Tank");
         }
-        this.base = prepareLegacyObjModel(parsedBase);
-        this.tank = prepareLegacyObjModel(parsedTank);
+        this.base = restoreObjFaceOrder(parsedBase);
+        this.tank = restoreObjFaceOrder(parsedTank);
     }
 
     @Override
@@ -82,7 +79,7 @@ public class TileAlchemyFurnaceAdvancedRenderer extends TileEntitySpecialRendere
             GlStateManager.enableCull();
 
             bindTexture(tile.heat > 100 ? FURNACE_ON : FURNACE);
-            renderBase(this.base);
+            renderModel(this.base);
 
             bindTexture(tile.vis > 0 ? TANK_ON : TANK);
             for (int side = 0; side < 4; ++side) {
@@ -95,7 +92,6 @@ public class TileAlchemyFurnaceAdvancedRenderer extends TileEntitySpecialRendere
                 }
             }
 
-            GlStateManager.disableCull();
             if (tile.vis > 0) {
                 renderVis(tile, fluxgoo, metalbase);
             }
@@ -224,46 +220,21 @@ public class TileAlchemyFurnaceAdvancedRenderer extends TileEntitySpecialRendere
     }
 
     private static void renderModel(CCModel model) {
-        renderModel(model, 0, model.verts.length);
-    }
-
-    private static void renderBase(CCModel model) {
-        renderModel(model, BASE_FLOOR_VERTEX_COUNT, model.verts.length);
-        GlStateManager.pushMatrix();
-        try {
-            GlStateManager.translate(0.0F, 0.0F, BASE_FLOOR_Z_OFFSET);
-            renderModel(model, 0, BASE_FLOOR_VERTEX_COUNT);
-        } finally {
-            GlStateManager.popMatrix();
-        }
-    }
-
-    private static void renderModel(CCModel model, int start, int end) {
         CCRenderState.reset();
         CCRenderState.startDrawing(GL11.GL_TRIANGLES, DefaultVertexFormats.OLDMODEL_POSITION_TEX_NORMAL);
-        model.render(start, end, CCRenderState.normalAttrib);
+        model.render(CCRenderState.normalAttrib);
         CCRenderState.draw();
     }
 
-    private static CCModel prepareLegacyObjModel(CCModel model) {
-        // CCL reverses OBJ faces. Forge 1.7 rendered source winding with flat face normals
-        // and moved each face's UVs slightly inward to avoid texture-edge bleeding.
+    private static CCModel restoreObjFaceOrder(CCModel model) {
+        // CCL reverses OBJ triangle winding; reverse it back without changing the authored normals.
         CCModel corrected = model.backfacedCopy();
-        corrected.computeNormals();
-        for (int start = 0; start < corrected.verts.length; start += corrected.vp) {
-            double averageU = 0.0D;
-            double averageV = 0.0D;
-            for (int corner = 0; corner < corrected.vp; ++corner) {
-                Vertex5 vertex = corrected.verts[start + corner];
-                averageU += vertex.uv.u;
-                averageV += vertex.uv.v;
-            }
-            averageU /= corrected.vp;
-            averageV /= corrected.vp;
-            for (int corner = 0; corner < corrected.vp; ++corner) {
-                Vertex5 vertex = corrected.verts[start + corner];
-                vertex.uv.u += vertex.uv.u > averageU ? -OBJ_UV_INSET : OBJ_UV_INSET;
-                vertex.uv.v += vertex.uv.v > averageV ? -OBJ_UV_INSET : OBJ_UV_INSET;
+        Vector3[] normals = corrected.normals();
+        if (normals != null) {
+            for (Vector3 normal : normals) {
+                if (normal != null) {
+                    normal.negate();
+                }
             }
         }
         return corrected;

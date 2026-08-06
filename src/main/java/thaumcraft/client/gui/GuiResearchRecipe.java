@@ -59,8 +59,6 @@ public class GuiResearchRecipe extends GuiScreen {
     private static final int PAGE_WIDTH = 139;
     private static final int LEFT_PAGE_OFFSET = -15;
     private static final int PAGE_STRIDE = 152;
-    private static final float COMPOUND_BASE_Z = 60.0F;
-    private static final float COMPOUND_LAYER_Z_STEP = 10.0F;
     private static final LinkedList<Object[]> HISTORY = new LinkedList<Object[]>();
     private static final ConcurrentHashMap<Integer, ItemStack> ITEM_CACHE = new ConcurrentHashMap<Integer, ItemStack>();
 
@@ -544,8 +542,7 @@ public class GuiResearchRecipe extends GuiScreen {
                     }
                     int slotX = (int) (x + start + xoff * (1.0F + (1.0F - scale)) + (i * 16 + k * 16) * scale);
                     int slotY = (int) (y + 108 + yoff * scale + (-i * 8 + k * 8 + j * 50) * scale);
-                    this.drawItemStack(stack, slotX, slotY, scale,
-                            COMPOUND_BASE_Z - j * COMPOUND_LAYER_Z_STEP);
+                    this.drawItemStack(stack, slotX, slotY, scale);
                     this.addItemTooltip(stack, mouseX, mouseY, slotX, slotY, (int) (16 * scale), (int) (16 * scale));
                 }
             }
@@ -943,15 +940,11 @@ public class GuiResearchRecipe extends GuiScreen {
     }
 
     private void drawItemStack(ItemStack stack, int x, int y, float scale) {
-        this.drawItemStack(stack, x, y, scale, 100.0F);
-    }
-
-    private void drawItemStack(ItemStack stack, int x, int y, float scale, float depth) {
         if (this.isEmpty(stack)) {
             return;
         }
         GlStateManager.pushMatrix();
-        GlStateManager.translate(x, y, depth);
+        GlStateManager.translate(x, y, 100.0F);
         GlStateManager.scale(scale, scale, 1.0F);
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
         RenderHelper.enableGUIStandardItemLighting();

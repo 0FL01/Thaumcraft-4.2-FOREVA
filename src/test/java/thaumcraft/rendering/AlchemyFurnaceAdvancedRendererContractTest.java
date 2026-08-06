@@ -88,15 +88,16 @@ public class AlchemyFurnaceAdvancedRendererContractTest {
     }
 
     @Test
-    public void objFacesShouldUseLegacyWavefrontWindingNormalsUvsAndFloorDepth() throws IOException {
+    public void objFacesShouldRenderWithTheirAuthoredOutwardWinding() throws IOException {
         String renderer = read(RENDERER);
         String[] lines = new String(Files.readAllBytes(Paths.get(OBJ)), StandardCharsets.US_ASCII)
                 .split("\\R");
         List<double[]> vertices = new ArrayList<>();
+        List<double[]> normals = new ArrayList<>();
         String group = "";
         int baseFaces = 0;
         int tankFaces = 0;
-        int baseFloorFaces = 0;
+        int outwardFaces = 0;
         for (String rawLine : lines) {
             String line = rawLine.trim();
             if (line.startsWith("v ")) {
@@ -106,19 +107,35 @@ public class AlchemyFurnaceAdvancedRendererContractTest {
                         Double.parseDouble(values[2]),
                         Double.parseDouble(values[3])
                 });
+            } else if (line.startsWith("vn ")) {
+                String[] values = line.split("\\s+");
+                normals.add(new double[] {
+                        Double.parseDouble(values[1]),
+                        Double.parseDouble(values[2]),
+                        Double.parseDouble(values[3])
+                });
             } else if (line.startsWith("g ")) {
                 group = line.substring(2);
             } else if (("Base".equals(group) || "Tank".equals(group)) && line.startsWith("f ")) {
                 String[] corners = line.split("\\s+");
+                String[] first = corners[1].split("/");
+                String[] second = corners[2].split("/");
+                String[] third = corners[3].split("/");
+                double[] a = vertices.get(Integer.parseInt(first[0]) - 1);
+                double[] b = vertices.get(Integer.parseInt(second[0]) - 1);
+                double[] c = vertices.get(Integer.parseInt(third[0]) - 1);
+                double[] normal = normals.get(Integer.parseInt(first[2]) - 1);
+                double[] ab = {b[0] - a[0], b[1] - a[1], b[2] - a[2]};
+                double[] ac = {c[0] - a[0], c[1] - a[1], c[2] - a[2]};
+                double[] cross = {
+                        ab[1] * ac[2] - ab[2] * ac[1],
+                        ab[2] * ac[0] - ab[0] * ac[2],
+                        ab[0] * ac[1] - ab[1] * ac[0]
+                };
+                if (cross[0] * normal[0] + cross[1] * normal[1] + cross[2] * normal[2] > 0.0D) {
+                    ++outwardFaces;
+                }
                 if ("Base".equals(group)) {
-                    boolean floor = true;
-                    for (int corner = 1; corner < corners.length; ++corner) {
-                        int vertexIndex = Integer.parseInt(corners[corner].split("/")[0]) - 1;
-                        floor &= Math.abs(vertices.get(vertexIndex)[2]) < 0.000001D;
-                    }
-                    if (floor) {
-                        ++baseFloorFaces;
-                    }
                     ++baseFaces;
                 } else {
                     ++tankFaces;
@@ -128,24 +145,17 @@ public class AlchemyFurnaceAdvancedRendererContractTest {
 
         assertEquals(116, baseFaces);
         assertEquals(64, tankFaces);
-        assertEquals("Only the 18 authored bottom triangles may receive the depth offset", 18, baseFloorFaces);
-        assertTrue(renderer.contains("this.base = prepareLegacyObjModel(parsedBase);")
-                && renderer.contains("this.tank = prepareLegacyObjModel(parsedTank);")
+        assertEquals("Every source OBJ face must agree with its authored outward normal",
+                baseFaces + tankFaces, outwardFaces);
+        assertTrue(renderer.contains("this.base = restoreObjFaceOrder(parsedBase);")
+                && renderer.contains("this.tank = restoreObjFaceOrder(parsedTank);")
                 && renderer.contains("CCModel corrected = model.backfacedCopy();")
-                && renderer.contains("corrected.computeNormals();")
-                && renderer.contains("OBJ_UV_INSET = 0.0005D")
-                && renderer.contains("vertex.uv.u += vertex.uv.u > averageU ? -OBJ_UV_INSET : OBJ_UV_INSET;")
-                && renderer.contains("vertex.uv.v += vertex.uv.v > averageV ? -OBJ_UV_INSET : OBJ_UV_INSET;")
-                && !renderer.contains("normal.negate();")
-                && renderer.contains("BASE_FLOOR_VERTEX_COUNT = 18 * 3")
-                && renderer.contains("BASE_FLOOR_Z_OFFSET = 0.002F")
-                && renderer.contains("renderModel(model, BASE_FLOOR_VERTEX_COUNT, model.verts.length);")
-                && renderer.contains("GlStateManager.translate(0.0F, 0.0F, BASE_FLOOR_Z_OFFSET);")
-                && renderer.contains("renderModel(model, 0, BASE_FLOOR_VERTEX_COUNT);")
+                && renderer.contains("normal.negate();")
                 && renderer.contains("boolean cullEnabled = GL11.glIsEnabled(GL11.GL_CULL_FACE)")
                 && renderer.contains("GlStateManager.enableCull();")
                 && renderer.contains("GlStateManager.disableCull();")
-                && renderer.contains("renderBase(this.base)"));
+                && !renderer.contains("BASE_FLOOR_Z_OFFSET")
+                && !renderer.contains("renderBase("));
     }
 
     @Test
