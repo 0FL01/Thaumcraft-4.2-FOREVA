@@ -14,6 +14,7 @@ public class TileThaumatoriumRenderer extends TileEntitySpecialRenderer<TileThau
 
     private static final ResourceLocation THAUMATORIUM_TEXTURE =
             new ResourceLocation("thaumcraft", "textures/models/thaumatorium.png");
+    private static final double OUTPUT_ITEM_Y_OFFSET = 1.025D;
     private final ModelThaumatorium model = new ModelThaumatorium();
 
     @Override
@@ -57,7 +58,7 @@ public class TileThaumatoriumRenderer extends TileEntitySpecialRenderer<TileThau
 
         EnumFacing facing = tile.facing == null ? EnumFacing.NORTH : tile.facing;
         double ix = x + 0.5D + facing.getXOffset() / 1.99D;
-        double iy = y + 1.325D;
+        double iy = y + OUTPUT_ITEM_Y_OFFSET;
         double iz = z + 0.5D + facing.getZOffset() / 1.99D;
 
         GlStateManager.pushMatrix();
