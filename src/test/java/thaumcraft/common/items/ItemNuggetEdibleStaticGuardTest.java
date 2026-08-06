@@ -28,6 +28,8 @@ public class ItemNuggetEdibleStaticGuardTest {
                         && source.contains("\"nuggetbeef\"")
                         && source.contains("\"nuggetpork\"")
                         && source.contains("\"nuggetfish\""));
+        assertFalse("ItemNuggetEdible should require normal hunger",
+                source.contains("setAlwaysEdible"));
         assertFalse("ItemNuggetEdible should not apply non-reference speed buff on eat",
                 source.contains("MobEffects.SPEED"));
     }

@@ -4,6 +4,7 @@ import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.NonNullList;
+import thaumcraft.common.config.Config;
 import thaumcraft.common.lib.CreativeTabThaumcraft;
 
 public class ItemNugget extends Item {
@@ -52,11 +53,25 @@ public class ItemNugget extends Item {
     @Override
     public void getSubItems(CreativeTabs tab, NonNullList<ItemStack> items) {
         if (this.isInCreativeTab(tab)) {
-            for (int i = 0; i < NAMES.length; i++) {
-                if (!NAMES[i].isEmpty()) {
-                    items.add(new ItemStack(this, 1, i));
-                }
-            }
+            items.add(new ItemStack(this, 1, META_IRON));
+            items.add(new ItemStack(this, 1, META_QUICKSILVER));
+            items.add(new ItemStack(this, 1, META_CLUSTER_CINNABAR));
+            items.add(new ItemStack(this, 1, META_THAUMIUM));
+            items.add(new ItemStack(this, 1, META_VOID));
+            items.add(new ItemStack(this, 1, META_CLUSTER_IRON));
+            items.add(new ItemStack(this, 1, META_CLUSTER_GOLD));
+            addOptionalPair(items, Config.foundCopperIngot, META_COPPER, META_CLUSTER_COPPER);
+            addOptionalPair(items, Config.foundTinIngot, META_TIN, META_CLUSTER_TIN);
+            addOptionalPair(items, Config.foundSilverIngot, META_SILVER, META_CLUSTER_SILVER);
+            addOptionalPair(items, Config.foundLeadIngot, META_LEAD, META_CLUSTER_LEAD);
+        }
+    }
+
+    private void addOptionalPair(NonNullList<ItemStack> items, boolean enabled,
+            int nuggetMeta, int clusterMeta) {
+        if (enabled) {
+            items.add(new ItemStack(this, 1, nuggetMeta));
+            items.add(new ItemStack(this, 1, clusterMeta));
         }
     }
 }

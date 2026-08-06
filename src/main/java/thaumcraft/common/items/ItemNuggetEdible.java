@@ -23,7 +23,6 @@ public class ItemNuggetEdible extends ItemFood {
         this.setHasSubtypes(true);
         this.setMaxDamage(0);
         this.setMaxStackSize(64);
-        this.setAlwaysEdible();
         this.setCreativeTab(CreativeTabThaumcraft.tabThaumcraft);
     }
 
