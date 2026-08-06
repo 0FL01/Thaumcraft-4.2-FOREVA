@@ -26,8 +26,7 @@ public class WorldGenMound extends WorldGenerator {
             return false;
         }
 
-        buildBarrowShell(world, rand, pos);
-        buildInterior(world, rand, pos);
+        WorldGenMoundTemplate.place(world, pos);
         placeLoot(world, rand, pos);
         placeSpawner(world, pos.add(4, 5, 4), new ResourceLocation("minecraft", "skeleton"));
         placeSpawner(world, pos.add(4, 5, 14), new ResourceLocation("minecraft", "zombie"));
@@ -64,74 +63,6 @@ public class WorldGenMound extends WorldGenerator {
             }
         }
         return false;
-    }
-
-    private static void buildBarrowShell(World world, Random rand, BlockPos origin) {
-        BlockPos center = origin.add(9, 0, 9);
-        for (int dx = 0; dx <= 18; dx++) {
-            for (int dz = 0; dz <= 18; dz++) {
-                double distance = Math.sqrt(Math.pow(dx - 9, 2) + Math.pow(dz - 9, 2));
-                if (distance > 9.5) {
-                    continue;
-                }
-
-                int top = 8 + Math.max(0, (int) Math.floor((9.5 - distance) / 2.0));
-                for (int dy = 0; dy <= top; dy++) {
-                    BlockPos at = origin.add(dx, dy, dz);
-                    if (dy == top) {
-                        world.setBlockState(at, Blocks.GRASS.getDefaultState(), 3);
-                    } else if (dy >= 8) {
-                        world.setBlockState(at, Blocks.DIRT.getDefaultState(), 3);
-                    } else if (isRoomBoundary(dx, dy, dz)) {
-                        world.setBlockState(at, rand.nextInt(4) == 0
-                                ? Blocks.MOSSY_COBBLESTONE.getDefaultState()
-                                : Blocks.COBBLESTONE.getDefaultState(), 3);
-                    } else if (isInsideRoom(dx, dy, dz)) {
-                        world.setBlockToAir(at);
-                    } else {
-                        world.setBlockState(at, Blocks.COBBLESTONE.getDefaultState(), 3);
-                    }
-                }
-            }
-        }
-
-        for (int dy = 2; dy <= 9; dy++) {
-            world.setBlockToAir(center.up(dy));
-        }
-    }
-
-    private static void buildInterior(World world, Random rand, BlockPos origin) {
-        for (int dx = 4; dx <= 13; dx++) {
-            for (int dz = 4; dz <= 14; dz++) {
-                for (int dy = 2; dy <= 6; dy++) {
-                    world.setBlockToAir(origin.add(dx, dy, dz));
-                }
-            }
-        }
-
-        for (int dz = 7; dz <= 11; dz++) {
-            world.setBlockToAir(origin.add(9, 1, dz));
-            world.setBlockToAir(origin.add(10, 1, dz));
-        }
-
-        for (int dx = 5; dx <= 13; dx += 4) {
-            for (int dz = 5; dz <= 13; dz += 4) {
-                if (rand.nextBoolean()) {
-                    world.setBlockState(origin.add(dx, 2, dz), Blocks.COBBLESTONE.getDefaultState(), 3);
-                }
-            }
-        }
-    }
-
-    private static boolean isInsideRoom(int dx, int dy, int dz) {
-        return dx >= 4 && dx <= 13 && dz >= 4 && dz <= 14 && dy >= 1 && dy <= 7;
-    }
-
-    private static boolean isRoomBoundary(int dx, int dy, int dz) {
-        if (!isInsideRoom(dx, dy, dz)) {
-            return false;
-        }
-        return dx == 4 || dx == 13 || dz == 4 || dz == 14 || dy == 1 || dy == 7;
     }
 
     private static void placeLoot(World world, Random rand, BlockPos origin) {
