@@ -12,7 +12,6 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.gen.feature.WorldGenerator;
-import net.minecraft.world.storage.loot.LootTableList;
 import thaumcraft.common.config.ConfigBlocks;
 
 import java.util.Random;
@@ -158,7 +157,8 @@ public class WorldGenHilltopStones extends WorldGenerator {
         world.setBlockState(pos, Blocks.CHEST.getDefaultState(), 3);
         TileEntity tile = world.getTileEntity(pos);
         if (tile instanceof TileEntityChest) {
-            ((TileEntityChest) tile).setLootTable(LootTableList.CHESTS_SIMPLE_DUNGEON, rand.nextLong());
+            WorldgenLootHelper.fillDungeonChest(world, rand, (TileEntityChest) tile);
+            WorldgenLootHelper.fillDungeonChest(world, rand, (TileEntityChest) tile);
         }
     }
 

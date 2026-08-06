@@ -15,7 +15,6 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraft.world.gen.feature.WorldGenAbstractTree;
-import net.minecraft.world.storage.loot.LootTableList;
 import thaumcraft.common.config.ConfigBlocks;
 
 import java.util.Random;
@@ -444,7 +443,7 @@ public class WorldGenGreatwoodTrees extends WorldGenAbstractTree {
         world.setBlockState(chestPos, Blocks.CHEST.getDefaultState(), 3);
         TileEntity chestTile = world.getTileEntity(chestPos);
         if (chestTile instanceof TileEntityChest) {
-            ((TileEntityChest) chestTile).setLootTable(LootTableList.CHESTS_SIMPLE_DUNGEON, rand.nextLong());
+            WorldgenLootHelper.fillDungeonChest(world, rand, (TileEntityChest) chestTile);
         }
     }
 

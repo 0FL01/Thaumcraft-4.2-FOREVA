@@ -162,19 +162,18 @@ public class ComponentWizardTower extends StructureVillagePieces.Village {
     /**
      * Returns a random loot item for the wizard tower chest.
      */
-    private static ItemStack getRandomTowerLoot(Random random) {
-        int roll = random.nextInt(100);
-        if (roll < 3)  return new ItemStack(Items.BOOK, 1 + random.nextInt(3));              // 3% Book
-        if (roll < 13) return new ItemStack(Items.PAPER, 1 + random.nextInt(5));             // 10% Paper
-        if (roll < 18) return new ItemStack(Items.EMERALD, 1 + random.nextInt(3));           // 5% Emerald
-        if (roll < 23) return new ItemStack(Items.FILLED_MAP);                               // 5% Empty Map
-        if (roll < 26) return new ItemStack(Items.ENDER_PEARL);                              // 3% Ender Pearl
-        if (roll < 46) return new ItemStack(ConfigItems.itemResource, 1 + random.nextInt(3), 9); // 20% TC Resource (meta 9)
-        if (roll < 51) return new ItemStack(ConfigItems.itemResource, 1, 0);                 // 5% TC Resource (meta 0)
-        if (roll < 56) return new ItemStack(ConfigItems.itemResource, 1, 1);                 // 5% TC Resource (meta 1)
-        if (roll < 61) return new ItemStack(ConfigItems.itemResource, 1 + random.nextInt(2), 2); // 5% TC Resource (meta 2)
-        if (roll < 81) return new ItemStack(ConfigItems.itemThaumonomicon);                  // 20% Thaumonomicon
-        return ItemStack.EMPTY;
+    static ItemStack getRandomTowerLoot(Random random) {
+        int roll = random.nextInt(81);
+        if (roll < 3)  return new ItemStack(Items.BOOK, 1 + random.nextInt(3));                  // weight 3
+        if (roll < 13) return new ItemStack(Items.PAPER, 1 + random.nextInt(5));                 // weight 10
+        if (roll < 18) return new ItemStack(Items.EMERALD, 1 + random.nextInt(3));               // weight 5
+        if (roll < 23) return new ItemStack(Items.FILLED_MAP);                                   // weight 5
+        if (roll < 26) return new ItemStack(Items.ENDER_PEARL);                                  // weight 3
+        if (roll < 46) return new ItemStack(ConfigItems.itemResource, 1 + random.nextInt(3), 9); // weight 20
+        if (roll < 51) return new ItemStack(ConfigItems.itemResource, 1, 0);                     // weight 5
+        if (roll < 56) return new ItemStack(ConfigItems.itemResource, 1, 1);                     // weight 5
+        if (roll < 61) return new ItemStack(ConfigItems.itemResource, 1 + random.nextInt(2), 2); // weight 5
+        return new ItemStack(ConfigItems.itemThaumonomicon);                                    // weight 20
     }
 
     @Override

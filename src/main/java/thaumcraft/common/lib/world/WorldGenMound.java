@@ -11,7 +11,6 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.gen.feature.WorldGenerator;
-import net.minecraft.world.storage.loot.LootTableList;
 import thaumcraft.common.config.ConfigBlocks;
 
 public class WorldGenMound extends WorldGenerator {
@@ -79,7 +78,10 @@ public class WorldGenMound extends WorldGenerator {
 
         TileEntity tile = world.getTileEntity(chestPos);
         if (tile instanceof TileEntityChest) {
-            ((TileEntityChest) tile).setLootTable(LootTableList.CHESTS_SIMPLE_DUNGEON, rand.nextLong());
+            WorldgenLootHelper.fillDungeonChest(world, rand, (TileEntityChest) tile);
+            if (rand.nextInt(5) == 0) {
+                WorldgenLootHelper.fillDungeonChest(world, rand, (TileEntityChest) tile);
+            }
         }
     }
 
