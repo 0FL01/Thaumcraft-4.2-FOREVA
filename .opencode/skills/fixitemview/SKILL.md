@@ -1,126 +1,97 @@
 ---
 name: fixitemview
-description: "Use when a TC4 port block renders correctly in the world but shows a wrong or full-size 3D model as an item in hand/inventory/drop. Covers item/generated routing, registerBuiltinItemModel, and per-meta item model JSON creation."
+description: "Use when a TC4 block is correct in the world but its block-backed item resolves to the wrong baked model and the intended inventory/hand/drop appearance is a simple generated or layered sprite. Covers model-route diagnosis, dedicated item JSONs, metadata registration, and visual verification."
 ---
 
-# Fix Block Item View: world model correct, item model wrong
+# Fix a block-backed item model route
 
-## When to use
+## Use this skill when
 
-Use this skill when:
-- A block renders correctly in the world (via blockstate → block model)
-- The block's item in hand/inventory/drop shows:
-  - a placeholder (magenta/black checkerboard)
-  - the wrong texture (e.g., a candle model instead of a mushroom)
-  - a full-size 3D block model instead of a miniature sprite
-- You need to create a flat 2D sprite (`item/generated`) for the item
+- the world block already renders correctly;
+- the affected stack is the `ItemBlock` form of that block;
+- TC4/reference evidence says the item should be a flat or layered sprite; and
+- inventory, hand, frame, or dropped-item rendering selects the wrong model.
 
-## Quick outline
+Do not use it merely because an item is 3D. Use:
 
-```
-Diagnosis → blockstate/block model ✅, item model ❌
-  → create models/item/<block>_item_<meta>.json (parent: item/generated, layer0: blocks/<texture>)
-  → replace registerBlockItemModel with registerBuiltinItemModel in ClientProxy.setupBlockRenderers()
-  → fix fallback models/item/<block>.json
-```
+- `tex4port` for a cuboid/`ModelRenderer` item shell, UV conversion, or display transforms;
+- `tesr-obj-parity` for selected OBJ groups, topology, or raw OBJ UVs;
+- `tc4-client-vision-probe` for screenshot proof.
 
-## Diagnosis
+## Important routing semantics
 
-| Symptom | Cause | Fix |
-|---------|-------|-----|
-| Magenta/black checkerboard | Item model references nonexistent texture or parent | See step 1 |
-| Wrong texture (candle etc.) | `models/item/<block>.json` has wrong parent | See step 1 |
-| Full-size 3D model in hand | Uses `registerBlockItemModel`, which resolves the block model (e.g. `block/cross`) | See steps 2-4 |
+The helper name `registerBuiltinItemModel` is historical and misleading. In
+this repository it only selects a dedicated model location:
 
-## Step-by-step algorithm
-
-### 1. Check current state
-
-Identify which files are involved:
-
-```
-# Item model (may have wrong parent)
-cat src/main/resources/assets/thaumcraft/models/item/<registry>.json
-
-# Registration in ClientProxy
-grep -n '<blockField>' src/main/java/thaumcraft/client/ClientProxy.java
-```
-
-Typical errors in `models/item/<block>.json`:
-
-```json
-// ❌ Wrong — parent points to an unrelated model
-{ "parent": "thaumcraft:block/blockcandle" }
-
-// ❌ Wrong — parent points to a block model, item looks like a block
-{ "parent": "thaumcraft:block/blockcustomplant_5" }
-```
-
-### 2. Create item model JSON for each subtype
-
-```
-src/main/resources/assets/thaumcraft/models/item/<block>_item_<meta>.json
-```
-
-Format (single line, no extra whitespace):
-
-```json
-{"parent":"item/generated","textures":{"layer0":"thaumcraft:blocks/<texture_name>"}}
-```
-
-- `layer0` points to the block texture from `textures/blocks/`
-- If the texture lives in `textures/items/`, use `thaumcraft:items/<name>`
-- `item/generated` — vanilla parent for flat 2D sprites (flowers, saplings, plates)
-
-For a block with N subtypes, N files are needed:
-
-```
-blockcustomplant_item_0.json → layer0: thaumcraft:blocks/greatwoodsapling
-blockcustomplant_item_1.json → layer0: thaumcraft:blocks/silverwoodsapling
-blockcustomplant_item_2.json → layer0: thaumcraft:blocks/shimmerleaf
-...
-```
-
-### 3. Switch registration in ClientProxy
-
-In `thaumcraft/client/ClientProxy.java`, method `setupBlockRenderers()`:
-
-```java
-// ❌ Before — uses blockstate variant, renders block model
-registerBlockItemModel(plantItem, meta, "type=" + meta);
-
-// ✅ After — uses a separate item model JSON
-String[] itemModels = {
-    "blockcustomplant_item_0", "blockcustomplant_item_1", ...,
-    "blockcustomplant_item_N"
-};
-registerBuiltinItemModel(plantItem, meta, itemModels[meta]);
-```
-
-Method comparison:
-
-| Method | Model | Item appearance |
-|--------|-------|-----------------|
-| `registerBlockItemModel(item, meta, variant)` | `blockstates/<block>.json#variant` → block model | 3D block |
-| `registerBuiltinItemModel(item, meta, path)` | `models/item/<path>.json` | Flat 2D sprite |
-
-`registerBuiltinItemModel` internally does:
 ```java
 ModelLoader.setCustomModelResourceLocation(item, meta,
-    new ModelResourceLocation(new ResourceLocation("thaumcraft", path), "inventory"));
+        new ModelResourceLocation(
+                new ResourceLocation("thaumcraft", modelPath), "inventory"));
 ```
 
-### 4. Fix fallback item model
+The selected JSON determines the appearance:
 
-The file `models/item/<block>.json` is used for metas without explicit registration (e.g., meta >= 6 for a 6-subtype block). Ensure it doesn't reference a nonexistent texture:
+| JSON route | Result |
+|---|---|
+| `"parent": "item/generated"` | flat sprite |
+| `"parent": "block/block"` plus elements/inheritance | baked 3D item |
+| `"parent": "builtin/entity"` plus an assigned TEISR | dynamic item renderer |
 
-```json
-{
-  "parent": "thaumcraft:block/blockcustomplant_5"
-}
+`registerBlockItemModel` selects the block registry name plus a blockstate
+variant. That is correct when the block and item should share a baked model.
+It is not inherently a full-size or incorrect route.
+
+For the non-damageable subtype `ItemBlock`s covered here, Forge resolves exact
+item/metadata registrations. An unregistered metadata does **not** fall back to
+metadata zero or automatically use `models/item/<registry>.json`; it normally
+resolves to the missing model unless a mesh definition or another explicit
+route exists. Damageable items are a separate case: vanilla model lookup
+normalizes their damage value to metadata zero.
+
+## Workflow
+
+### 1. Prove the expected item appearance
+
+Inspect, in order:
+
+1. original TC4 inventory renderer/item icon;
+2. current `ClientProxy.setupBlockRenderers()` route for the exact metadata;
+3. the selected `models/item/*.json`;
+4. inherited parent and referenced textures;
+5. whether a TEISR is assigned in `setupTileLinkedItemRenderers()`.
+
+Do not convert a block item to `item/generated` solely from its block class or
+render layer.
+
+### 2. Choose the route
+
+Keep the blockstate route when the item should share the world baked model:
+
+```java
+registerBlockItemModel(item, meta, "type=" + meta);
 ```
 
-or also `item/generated`:
+Choose a dedicated item model when the item has a distinct sprite:
+
+```java
+registerBuiltinItemModel(item, meta, "blockcustomplant_item_" + meta);
+```
+
+Current repository organization:
+
+- `setupItemRenderers()` — ordinary `ConfigItems` model locations during the
+  model-registry event;
+- `setupBlockRenderers()` — block-backed item model locations during the
+  model-registry event;
+- `setupTileLinkedItemRenderers()` — block-backed TEISR assignment from client
+  display initialization.
+
+These lifecycle placements are current project conventions, not Forge API
+requirements.
+
+### 3. Create the dedicated sprite model
+
+Example:
 
 ```json
 {
@@ -131,73 +102,53 @@ or also `item/generated`:
 }
 ```
 
-### 5. Verify block models
+Use `thaumcraft:items/...` for item textures. Preserve extra layers,
+`tintindex`, animation metadata, and overrides when the reference requires
+them. Multiple metadata values may share a model; one file per metadata is not
+a universal requirement.
 
-Block models `models/block/<block>_<meta>.json` stay unchanged — they handle world rendering:
+### 4. Keep world rendering independent
 
-```json
-{
-  "parent": "block/cross",
-  "textures": {
-    "cross": "thaumcraft:blocks/manashroom"
-  }
-}
+Changing an item model route should not silently alter blockstates or world
+models. World rendering may be baked, TESR-only, or split baked/TESR.
+
+Current Custom Plant example:
+
+- item metas 0-5 route to dedicated generated models;
+- world metas 0-3 and 5 use `block/cross` models;
+- Ethereal Bloom meta 4 uses a TESR and an empty baked world model carrying a
+  particle texture;
+- `models/item/blockcustomplant.json` is a tracked registry-name model, not an
+  invalid-metadata fallback.
+
+## Verification
+
+Add a focused guard that proves, for each affected metadata:
+
+- the exact model registration path;
+- the selected JSON parent and texture;
+- referenced resources exist;
+- unrelated metadata routes remain unchanged.
+
+Then run:
+
+```text
+./scripts/dev.sh gradle test --tests <focused-test>
+./scripts/dev.sh build
 ```
 
-### 6. JSON file structure summary
-
-```
-models/block/
-├── blockcustomplant_0.json   ← block/cross → greatwoodsapling (world)
-├── blockcustomplant_5.json   ← block/cross → manashroom (world)
-
-models/item/
-├── blockcustomplant.json          ← fallback (e.g. blockcustomplant_5)
-├── blockcustomplant_item_0.json   ← item/generated → greatwoodsapling (item)
-├── blockcustomplant_item_5.json   ← item/generated → manashroom (item)
-
-blockstates/
-└── blockcustomplant.json    ← type=N → blockcustomplant_N (world only)
-
-ClientProxy.java (setupBlockRenderers):
-    registerBuiltinItemModel(customPlantItem, 0, "blockcustomplant_item_0");
-    registerBuiltinItemModel(customPlantItem, 5, "blockcustomplant_item_5");
-```
-
-## Example: BlockCustomPlant (Vishroom fix)
-
-Before:
-- `models/item/blockcustomplant.json`: `"parent": "thaumcraft:block/blockcandle"` → magenta texture
-- `ClientProxy`: `registerBlockItemModel(plantItem, meta, "type=" + meta)` → 3D cross in inventory
-
-After:
-- 6 new files `models/item/blockcustomplant_item_0..5.json`: `item/generated` with `layer0: blocks/<texture>`
-- `ClientProxy`: `registerBuiltinItemModel(plantItem, meta, plantItemModels[meta])` → flat 2D sprite
-- `models/item/blockcustomplant.json`: `"parent": "thaumcraft:block/blockcustomplant_5"` (fallback)
-
-## Validation
-
-- `./scripts/dev.sh compileJava` — compilation (new JSON files don't need compilation, but ClientProxy changes do)
-- `./scripts/dev.sh validate --smoke` — runtime smoke
-- **Client visual check**: verify that inventory/hand/drop show a flat sprite, not a 3D block
-
-## Known cases
-
-| Block | Meta | Block model | Texture | Item model |
-|-------|------|-------------|---------|------------|
-| BlockCustomPlant | 0-5 | `block/cross` | `blocks/*.png` | `blockcustomplant_item_N.json` → `item/generated` |
-
-## Related files
-
-- `src/main/java/thaumcraft/client/ClientProxy.java` — `setupBlockRenderers()` (registration), `setupItemRenderers()` (do NOT touch for blocks)
-- `src/main/java/thaumcraft/client/ClientProxy.java` — `registerBlockItemModel()` and `registerBuiltinItemModel()` (around line 879-885)
-- `src/main/resources/assets/thaumcraft/models/item/*.json` — item models
-- `src/main/resources/assets/thaumcraft/models/block/*.json` — block models (do NOT touch)
-- `src/main/resources/assets/thaumcraft/blockstates/*.json` — blockstate variants
+Compilation does not prove item appearance. Inspect inventory, first/third
+person, dropped, fixed/frame, and GUI contexts. Use
+`tc4-client-vision-probe` when a reproducible screenshot is needed. Server
+smoke is required only if common/server registration or loading also changed.
 
 ## Anti-patterns
 
-- **Do NOT use `registerBlockItemModel` for plant-type blocks** — it renders a 3D block, not a flat sprite
-- **Do NOT edit `setupItemRenderers()` for blocks** — it handles items; blocks register in `setupBlockRenderers()`
-- **Do NOT remove `registerBlockItemModel` for blocks whose item and block look identical** (full blocks like ore) — blockstate variants are correct for them
-- **Do NOT copy textures** — `item/generated` references the existing block texture via `layer0`
+- Do not infer appearance from the registration helper name.
+- Do not assume all plants or crossed blocks need flat item sprites.
+- Do not describe a base item JSON as metadata fallback without proving the
+  actual model lookup path.
+- Do not edit world block models to repair an item-only route.
+- Do not add or remove TEISR assignment without checking the exact `Item` and
+  all metadata that share it.
+- Do not claim success from compile/build without client visual evidence.

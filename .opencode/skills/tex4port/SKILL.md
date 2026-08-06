@@ -1,239 +1,196 @@
 ---
 name: tex4port
-description: "Use when porting TC4 (1.7.10) model-rendered block visuals to Forge 1.12.2 baked item/block models. Covers non-square TC4 textures, ModelRenderer-to-JSON translation, UV mapping, display transforms, and inventory routing."
+description: "Use when converting a TC4 ModelRenderer cuboid or inventory renderer into a Forge 1.12.2 baked item shell, or diagnosing its atlas UVs and display transforms. Covers TC4-first geometry evidence, non-square static textures, baked versus TEISR routing, and multi-context visual checks."
 ---
 
-# Texture Porting: TC4 ModelRenderer -> Forge 1.12.2 Baked Item Models
+# TC4 cuboid model to a 1.12 baked item shell
 
-## When to use
+## Scope
 
-Use this skill when porting a TC4 block/item that originally renders via TESR + `ModelRenderer` (Java) to a baked JSON model for inventory/hand in the 1.12.2 port. World rendering stays on TESR.
+Use this skill when the desired item appearance comes from TC4
+`ModelRenderer.addBox(...)`, `renderInventoryBlock`, or equivalent cuboid
+geometry and needs a baked 1.12 item model.
 
-## Quick outline
+Hand off instead when:
 
+- the desired item is a simple flat sprite: `fixitemview`;
+- the defect is selected OBJ groups/topology/raw OBJ UVs: `tesr-obj-parity`;
+- the model is already correct and only needs screenshot proof:
+  `tc4-client-vision-probe`.
+
+World rendering does not always remain a full TESR. Current routes include:
+
+- full TESR world rendering;
+- baked world shell plus TESR animated parts;
+- fully baked items while the world still has a TESR.
+
+Treat world TESR, item TEISR, and model-location registration as separate
+decisions.
+
+## Evidence order
+
+1. Inspect original TC4 model and the exact world/inventory renderer call.
+2. Record cuboids, texture offsets/dimensions, rotation points, child models,
+   mirror/inflation, and renderer transforms.
+3. Inspect current block/item route and any TEISR assignment.
+4. Use TC6 only as secondary evidence for a proven 1.12 API adaptation. Never
+   substitute TC6 geometry or transforms merely because it is available.
+
+## Geometry conversion
+
+There is no universal one-line `ModelRenderer` to JSON formula. The mapping
+depends on the renderer anchor and axis transforms.
+
+For an audited unrotated part whose X/Z axes align with JSON and whose
+ModelRenderer downward-positive Y must be converted to JSON upward-positive Y,
+a limited mapping is:
+
+```text
+from.x = anchorX + rotationPointX + boxX
+from.y = anchorY - (rotationPointY + boxY + boxHeight)
+from.z = anchorZ + rotationPointZ + boxZ
+to     = from + [boxWidth, boxHeight, boxDepth]
 ```
-ClientProxy → registerBuiltinItemModel(item, meta, "model_name")
-  → JSON: "textures": { "surface": "thaumcraft:models/..._inventory" }
-  → JSON: "elements": [ ... baked box per ModelRenderer part ]
-  → JSON: "display": { ... TC6/Forge block display transforms }
-  → texture: square PNG copy from TC4 model texture
+
+The anchor is renderer-specific; examples in this repository use different
+centres such as `(8,16,8)` and `(8,8,8)`. Do not reuse the formula unchanged
+for rotated parts, child models, mirrored boxes, inflation, or a renderer that
+swaps/flips axes. Transform all eight corners or reproduce the original
+transform chain instead.
+
+## Texture and UV conversion
+
+Start from original TC4 pixel coordinates:
+
+```text
+u = pixelX * 16 / sourceWidth
+v = pixelY * 16 / sourceHeight
 ```
 
-## Step-by-step algorithm
+Forge's static atlas path rejects the non-square textures used by several TC4
+models unless they have valid animation metadata. For an audited static
+`W x H` source, one current adaptation is a nearest-neighbour square derivative.
 
-### 1. Study the reference
+If a `128x64` source is stretched to `128x128`, transform source Y coordinates
+by the same factor before dividing by the new height:
 
-- Find the class in `thaumcraft_src/**` or decompile from the corresponding jar.
-- For a block, determine which `TileEntitySpecialRenderer` draws it.
-- Record all `ModelRenderer` calls: `new ModelRenderer(this, offsetX, offsetY)`, `addBox`, `setRotationPoint`, `textureWidth`, `textureHeight`.
-- Map Java classes:
+```text
+atlasY = sourceY * 2
+v = atlasY * 16 / 128
+```
 
-  | TC4 Java class | Used by |
-  |---|---|
-  | `ModelTable` | Table |
-  | `ModelArcaneWorkbench` | Arcane Workbench, Deconstruction Table, Focal Manipulator |
-  | (others) | — |
+Equivalently, keep source coordinates and divide by the original source
+height. Do not stretch the PNG and then divide unchanged source Y values by
+the square height; that halves the sampled region.
 
-### 2. Create square atlas copy of the texture
-
-TC4 model textures are often non-square (`64x32`, `128x64`). Forge 1.12 block atlas rejects non-square sprites → magenta missing texture.
-
-**Rule**: create a square copy with NEAREST scaling.
+Use a reproducible repository path and document the derivative:
 
 ```python
+from pathlib import Path
 from PIL import Image
-img = Image.open('textures/models/name.png').convert('RGBA')
-side = max(img.size)
-img.resize((side, side), Image.Resampling.NEAREST).save('textures/models/name_inventory.png')
+
+src = Path("src/main/resources/assets/thaumcraft/textures/models/name.png")
+dst = src.with_name("name_inventory.png")
+image = Image.open(src).convert("RGBA")
+side = max(image.size)
+image.resize((side, side), Image.Resampling.NEAREST).save(dst)
 ```
 
-Place the file next to the original: `textures/models/name_inventory.png`.
+Pillow is a host-side aid, not guaranteed by the project image. Validate the
+output dimensions and pixel relationship in a focused test.
 
-### 3. Calculate UV for JSON faces
+## Choose baked versus TEISR item rendering
 
-Formula for converting texture pixels to Minecraft UV coordinates (0–16):
+### Baked item shell
 
-```
-u = pixelX * 16 / textureWidth
-v = pixelY * 16 / textureHeight
-```
-
-For the square copy `textureWidth == textureHeight == side`, so
-division simplifies, but v may be scaled by half if the original was half
-as tall.
-
-**ModelRenderer face → JSON face**:
-
-| ModelRenderer offset box | JSON element `from`/`to` |
-|--------------------------|--------------------------|
-| `addBox(x, y, z, w, h, d)` at `setRotationPoint(px, py, pz)` | `from = [px+8, 16-py-d, pz+8]` (flip Y) |
-| Dimensions: `w×h×d` | `to = [from[0]+w, from[1]+h, from[2]+d]` |
-
-**180° X rotation** in TESR means up/down in JSON must be checked
-visually. For `worktable`/`wandtable` the correct pair is:
-
-```json
-"up":   { "uv": [2, 0, 4, 4] },
-"down": { "uv": [4, 0, 6, 4] }
-```
-
-### 4. Display transforms — axis guide and debug workflow
-
-Format: `"rotation": [X, Y, Z]`
-
-| Axis | Effect | Example change |
-|------|--------|---------------|
-| X | Tilt (pitch) — look down/up at item | `0 → 30` (tilt down for isometric) |
-| Y | Facing (yaw) — which side faces viewer | `45 → 225` (180° flip, show front instead of back) |
-| Z | Flip (roll) — upright vs upside-down | `0 → 180` (flip top-to-bottom) |
-
-**Debug workflow:**
-
-1. Start by fixing **Y** (facing). The item shows the wrong face (back instead of front). Add/remove 180°.
-2. Fix **Z** (flip). The item faces correctly but is upside-down. Add 180° to Z.
-3. Fix **X** (tilt) last if the viewing angle is off.
-
-Always fix the **same context first** (e.g. `firstperson_righthand`), then mirror to the opposite hand by adding 180° to Y:
-```
-right hand Y = 45  → left hand Y = 225
-right hand Y = 225 → left hand Y = 45
-```
-
-### 5. Item JSON structure
-
-Required sections:
+Use a dedicated item JSON with elements or a verified parent. Explicit
+`display` is optional when inherited from a parent such as `block/block`.
 
 ```json
 {
-  "ambientocclusion": false,
-  "display": {
-    "gui":   { "rotation": [30, 225, 0], "translation": [0, 0, 0], "scale": [0.625, 0.625, 0.625] },
-    "fixed": { "rotation": [0, 0, 0],    "translation": [0, 0, 0], "scale": [0.5, 0.5, 0.5] },
-    "ground":  { "rotation": [0, 0, 0], "translation": [0, 3, 0], "scale": [0.25, 0.25, 0.25] },
-    "thirdperson_righthand":  { "rotation": [75, 45, 0], "translation": [0, 2.5, 0], "scale": [0.375, 0.375, 0.375] },
-    "thirdperson_lefthand":   { "rotation": [75, 225, 0], "translation": [0, 2.5, 0], "scale": [0.375, 0.375, 0.375] },
-    "firstperson_righthand":  { "rotation": [0, 45, 0], "translation": [0, 0, 0], "scale": [0.4, 0.4, 0.4] },
-    "firstperson_lefthand":   { "rotation": [0, 225, 0], "translation": [0, 0, 0], "scale": [0.4, 0.4, 0.4] }
-  },
+  "parent": "block/block",
   "textures": {
-    "particle": "thaumcraft:blocks/name",
+    "particle": "thaumcraft:blocks/arcane_stone",
     "surface": "thaumcraft:models/name_inventory"
   },
-  "elements": [
-    { "from": [...], "to": [...], "faces": { ... } }
-  ]
+  "elements": []
 }
 ```
 
-Copy display transforms from TC6 donor `models/item/*.json` if there are
-no special requirements.
+The particle reference must resolve to a stitchable, valid sprite. Directory
+name alone does not decide atlas eligibility; existence, dimensions/animation,
+and the consuming model path do.
 
-**Important:** `"particle"` texture for block models must be in the block atlas domain (`textures/blocks/`). Referencing `textures/models/` via `#variable` may fail to stitch into the block atlas, causing purple break particles. Either copy the texture to `textures/blocks/` and reference directly, or use a block texture.
+### TEISR item
 
-### 6. Routing in ClientProxy
+Use `"parent": "builtin/entity"` and assign a TEISR to the `Item`. JSON camera
+transforms and TEISR-local transforms compose; neither layer universally
+replaces the other.
 
-```java
-// Normal blockstate variants
-for (int meta = 0; meta <= maxMeta; meta++) {
-    registerBlockItemModel(item, meta, "type=" + meta);
-}
-// Override specific metas
-registerBuiltinItemModel(item, meta, "blockname_meta_inventory");
-// Other metas that need TEISR
-registerBuiltinItemModel(item, otherMeta, "blockname_tesr");
-// TEISR for remaining
-item.setTileEntityItemStackRenderer(new ItemXxxRenderer());
+Reproduce the original model origin deliberately. Current item renderers such
+as table, wooden-device, and crystal renderers contain legitimate local
+translations/rotations/scales. A no-transform TEISR is one possible audited
+case, not a rule.
+
+Remember that TEISR assignment is per `Item`, while model routing is per
+metadata. Audit every metadata sharing that item before changing assignment.
+
+## Display transforms
+
+Treat each context independently:
+
+- GUI;
+- fixed/item frame;
+- ground/drop;
+- first-person left/right;
+- third-person left/right.
+
+Axis labels are only a debugging aid. Do not assume a fixed Y-then-Z-then-X
+workflow or derive the opposite hand by blindly adding 180 degrees. Parent
+transforms, model basis, and TEISR-local transforms can change the result.
+
+## Current route examples
+
+| Case | Active route | Notes |
+|---|---|---|
+| Table meta 0 | `blocktable_0_inventory` | baked shell; square derivative |
+| Deconstruction Table meta 14 | `blocktable_tesr` | active TEISR; old inventory JSON/PNG are inactive artifacts |
+| Arcane Worktable meta 15 | `blocktable_tesr` | active TEISR |
+| Focal Manipulator meta 13 | `blockstonedevice_13_inventory` | baked shell; square derivative |
+| Runic Matrix meta 2 | `blockstonedevice_2_inventory` | baked model with documented donor-equivalent geometry |
+| Hungry Chest meta 0 | `blockchesthungry` | complete baked item; no active chest TEISR |
+| Centrifuge meta 2 | `blocktube_2_inventory` | baked item plus split baked/TESR world rendering |
+
+Do not infer active use from a tracked historical model or renderer. Trace the
+current `ClientProxy` route and TEISR assignment.
+
+## Verification
+
+Prefer parsed JSON/image assertions over string markers:
+
+- selected model route for every affected metadata;
+- parent, textures, elements, UV bounds, and referenced assets;
+- square derivative dimensions/pixel mapping when used;
+- TEISR assignment and exact local transform chain when used;
+- unaffected metadata remain routed as before.
+
+Then run focused tests and the final client build:
+
+```text
+./scripts/dev.sh gradle test --tests <focused-test>
+./scripts/dev.sh build
 ```
 
-### 7. TEISR for split-model blocks (body in JSON, animated parts in TESR)
-
-For blocks where the static body is baked into a JSON block model and only the animated parts (lid, door, knob) remain in the TESR:
-
-```java
-// In ClientProxy.setupTileLinkedItemRenderers():
-Item item = Item.getItemFromBlock(ConfigBlocks.blockXxx);
-if (item != null) {
-    item.setTileEntityItemStackRenderer(new ItemXxxRenderer());
-}
-
-// In ClientProxy.setupBlockRenderers():
-registerBuiltinItemModel(item, 0, "blockxxx_tesr"); // → models/item/blockxxx_tesr.json
-```
-
-The TEISR pattern for such blocks:
-
-```java
-public class ItemXxxRenderer extends TileEntityItemStackRenderer {
-    private static final ResourceLocation TEXTURE = new ResourceLocation("thaumcraft", "textures/models/xxx.png");
-    private final ModelXxx model = new ModelXxx();
-
-    @Override
-    public void renderByItem(ItemStack stack, float partialTicks) {
-        // Bind texture, push matrix, render full model, pop matrix
-        // NO scale(1, -1, -1) — the display transforms in the JSON handle orientation
-        Minecraft.getMinecraft().renderEngine.bindTexture(TEXTURE);
-        GlStateManager.pushMatrix();
-        model.renderAll();
-        GlStateManager.popMatrix();
-    }
-}
-```
-
-Key rules:
-- `models/item/blockxxx_tesr.json`: `"parent": "builtin/entity"` + **full set of display transforms** (copy from `blockstonedevice_tesr` template)
-- TEISR renders `model.renderAll()` (body + lid + knob for the full item)
-- World rendering: JSON block model handles the static body; TESR adds animated parts
-- The display transforms in the JSON are responsible for positioning and orientation — do NOT add `translate`/`scale`/`rotate` in the TEISR unless absolutely necessary
-- The `builtin/entity` parent provides identity transforms; the `display` section overrides per-context
-
-### 8. Update guard tests
-
-For every changed JSON, add a check in an existing or new **static guard test**:
-
-```java
-String model = read("path/to/model.json");
-assertTrue("description", model.contains("\"surface\": \"thaumcraft:models/..._inventory\"")
-        && model.contains("\"from\": [0, 8, 0]")
-        && model.contains("\"thirdperson_righthand\"")
-        && model.contains("[75, 45, 0]"));
-```
-
-Check:
-- texture path (for `_inventory`)
-- display transforms
-- at least one geometry marker
-- up/down UV for top-visible blocks
-
-## Known cases
-
-| Block | Meta | TC4 Model | Texture | Square atlas |
-|-------|------|-----------|---------|--------------|
-| Table | 0 | ModelTable | `table.png` 64×32 | `table_inventory.png` 64×64 |
-| Deconstruction Table | 14 | ModelArcaneWorkbench | `decontable.png` 128×64 | `decontable_inventory.png` 128×128 |
-| Arcane Worktable | 15 | ModelArcaneWorkbench | `worktable.png` 128×64 | `worktable_inventory.png` 128×128 |
-| Focal Manipulator | 13 | ModelArcaneWorkbench | `wandtable.png` 128×64 | `wandtable_inventory.png` 128×128 |
-| Runic Matrix | 2 | TileRunicMatrixRenderer (hardcoded cluster) | `arcane_stone` block texture | not needed (block texture) |
-| Hungry Chest | 0 | ModelChest (vanilla) | `chesthungry.png` 64×64 | square (no copy needed) |
-| Hungry Chest (item) | 0 | — | `chesthungry.png` 64×64 | TEISR + `builtin/entity` + display transforms |
+Inspect all seven item contexts. Build and server smoke do not prove visual
+parity; use `tc4-client-vision-probe` or an in-game TC4/port comparison.
 
 ## Anti-patterns
 
-- **Do NOT copy TC6 geometry** — it gives correct coordinates but
-  wrong texture placement and silhouette.
-- **Do NOT reference `thaumcraft:models/table` directly** (without `_inventory`)
-  if the texture is non-square — you'll get magenta missing texture.
-- **Do NOT remove TEISR entirely** — world rendering still needs the
-  TileEntitySpecialRenderer.
-- **Do NOT invent UV** — use exact pixel offsets from `ModelRenderer`
-  atlas layout, recalculated to 0–16.
-- **Do NOT use `scale(1, -1, -1)` in TEISR when display transforms are
-  present** — the scale flips Y in the already-rotated display-transform
-  space, causing position drift. Use Z rotation (180°) in `display`
-  transforms instead to fix upside-down orientation.
-- **Do NOT apply `translate`/`scale` in TEISR unnecessarily** — the
-  `display` transforms in the model JSON handle positioning. Only add
-  TEISR transforms when the model needs special handling that display
-  transforms cannot express.
-- **Do NOT reference `textures/models/` for `"particle"`** — block atlas
-  may not stitch non-block-domain textures. Copy to `textures/blocks/`
-  and reference directly.
+- Do not use TC6 as the first geometry source.
+- Do not apply an anchor-free cuboid formula.
+- Do not confuse world TESR removal with item TEISR removal.
+- Do not prohibit or add TEISR transforms without comparing both transform
+  chains.
+- Do not treat every non-square texture identically; check animation metadata
+  and the consuming atlas path.
+- Do not call a tracked asset active without tracing its current route.
