@@ -95,7 +95,7 @@ public class PlayerKnowledgeCapabilityTest {
     }
 
     @Test
-    public void negativeWarpAndRunicValuesClampToZero() {
+    public void warpTotalsAndRunicClampButCounterKeepsSignedValue() {
         PlayerKnowledgeCapability knowledge = new PlayerKnowledgeCapability();
         knowledge.setWarpPerm(-1);
         knowledge.setWarpSticky(-2);
@@ -106,8 +106,36 @@ public class PlayerKnowledgeCapabilityTest {
         assertEquals(0, knowledge.getWarpPerm());
         assertEquals(0, knowledge.getWarpSticky());
         assertEquals(0, knowledge.getWarpTemp());
-        assertEquals(0, knowledge.getWarpCounter());
+        assertEquals(-4, knowledge.getWarpCounter());
         assertEquals(0, knowledge.getRunicCharge());
+    }
+
+    @Test
+    public void signedAspectPoolsKeepTc4MutationAndPersistenceSemantics() {
+        PlayerKnowledgeCapability knowledge = new PlayerKnowledgeCapability();
+        assertTrue(knowledge.setAspectPool(Aspect.AIR, -3));
+        assertEquals(-3, knowledge.getAspectPoolFor(Aspect.AIR));
+        assertTrue(knowledge.addAspectPool(Aspect.AIR, 5));
+        assertEquals(2, knowledge.getAspectPoolFor(Aspect.AIR));
+
+        assertTrue(knowledge.addAspectPool(Aspect.AIR, -5));
+        assertEquals("TC4 reports overdraw success without changing the pool",
+                2, knowledge.getAspectPoolFor(Aspect.AIR));
+        assertTrue(knowledge.addAspectPool(Aspect.AIR, -2));
+        assertEquals(0, knowledge.getAspectPoolFor(Aspect.AIR));
+        assertFalse(knowledge.addAspectPool(Aspect.AIR, -1));
+
+        AspectList incoming = new AspectList();
+        incoming.aspects.put(Aspect.FIRE, -7);
+        knowledge.setAspectsDiscovered(incoming);
+        knowledge.setWarpCounter(-9);
+
+        PlayerKnowledgeCapability copy = new PlayerKnowledgeCapability();
+        copy.deserializeNBT(knowledge.serializeNBT());
+        assertEquals(-7, copy.getAspectPoolFor(Aspect.FIRE));
+        assertEquals(-9, copy.getWarpCounter());
+        assertFalse(copy.addAspectPool(Aspect.FIRE, -1));
+        assertEquals(-7, copy.getAspectPoolFor(Aspect.FIRE));
     }
 
     @Test

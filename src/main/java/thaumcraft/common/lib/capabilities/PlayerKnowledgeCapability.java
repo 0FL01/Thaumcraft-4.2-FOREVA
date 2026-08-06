@@ -115,7 +115,7 @@ public class PlayerKnowledgeCapability implements IPlayerKnowledge {
 
     @Override
     public void setWarpCounter(int counter) {
-        this.warpCounter = Math.max(0, counter);
+        this.warpCounter = counter;
     }
 
     // ---- Aspect Discovery ----
@@ -151,7 +151,7 @@ public class PlayerKnowledgeCapability implements IPlayerKnowledge {
         if (aspects != null) {
             for (Aspect aspect : aspects.getAspects()) {
                 if (aspect != null) {
-                    discoveredAspects.aspects.put(aspect, Math.max(0, aspects.getAmount(aspect)));
+                    discoveredAspects.aspects.put(aspect, aspects.getAmount(aspect));
                 }
             }
         }
@@ -180,25 +180,27 @@ public class PlayerKnowledgeCapability implements IPlayerKnowledge {
 
     @Override
     public int getAspectPoolFor(Aspect aspect) {
-        return aspect == null ? 0 : Math.max(0, discoveredAspects.getAmount(aspect));
+        return aspect == null ? 0 : discoveredAspects.getAmount(aspect);
     }
 
     @Override
     public boolean addAspectPool(Aspect aspect, int amount) {
         if (aspect == null || amount == 0) return false;
-        if (!discoveredAspects.aspects.containsKey(aspect)) {
-            discoveredAspects.add(aspect, 0);
+        if (amount > 0) {
+            discoveredAspects.add(aspect, amount);
+            return true;
         }
-        int current = discoveredAspects.getAmount(aspect);
-        int updated = Math.max(0, current + amount);
-        discoveredAspects.aspects.put(aspect, updated);
-        return updated != current;
+        if (discoveredAspects.getAmount(aspect) > 0) {
+            discoveredAspects.reduce(aspect, -amount);
+            return true;
+        }
+        return false;
     }
 
     @Override
     public boolean setAspectPool(Aspect aspect, int amount) {
         if (aspect == null) return false;
-        discoveredAspects.aspects.put(aspect, Math.max(0, amount));
+        discoveredAspects.aspects.put(aspect, amount);
         return true;
     }
 
@@ -413,7 +415,7 @@ public class PlayerKnowledgeCapability implements IPlayerKnowledge {
             if (aspect == null) continue;
             NBTTagCompound entry = new NBTTagCompound();
             entry.setString("key", aspect.getTag());
-            entry.setInteger("amount", Math.max(0, aspects.getAmount(aspect)));
+            entry.setInteger("amount", aspects.getAmount(aspect));
             list.appendTag(entry);
         }
         nbt.setTag(tag, list);
@@ -427,7 +429,7 @@ public class PlayerKnowledgeCapability implements IPlayerKnowledge {
             NBTTagCompound entry = list.getCompoundTagAt(i);
             Aspect aspect = Aspect.getAspect(entry.getString("key"));
             if (aspect != null) {
-                aspects.aspects.put(aspect, Math.max(0, entry.getInteger("amount")));
+                aspects.aspects.put(aspect, entry.getInteger("amount"));
             }
         }
     }
