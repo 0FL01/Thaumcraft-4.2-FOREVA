@@ -9,6 +9,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Bootstrap;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.profiler.Profiler;
 import net.minecraft.tileentity.TileEntity;
@@ -132,7 +133,7 @@ public class WardedOwnershipRuntimeContractTest {
             Config.wardedStone = true;
             assertEquals(-1.0F, glass.getBlockHardness(glassState, world, glassPos), 0.0F);
             assertEquals(-1.0F, woodenDevice.getBlockHardness(plateState, world, platePos), 0.0F);
-            assertSame(Items.AIR, glass.getItemDropped(glassState, world.rand, 0));
+            assertSame(Item.getItemFromBlock(glass), glass.getItemDropped(glassState, world.rand, 0));
             assertSame(Items.AIR, woodenDevice.getItemDropped(plateState, world.rand, 0));
             assertFalse(glass.canEntityDestroy(glassState, world, glassPos, null));
             assertFalse(woodenDevice.canEntityDestroy(plateState, world, platePos, null));

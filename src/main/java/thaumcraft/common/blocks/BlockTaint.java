@@ -152,6 +152,7 @@ public class BlockTaint extends Block {
     @Override
     public Item getItemDropped(IBlockState state, Random rand, int fortune) {
         int meta = this.getMetaFromState(state);
+        if (meta == 1) return Item.getItemFromBlock(Blocks.DIRT);
         if (meta == 2) return Items.ROTTEN_FLESH;
         return Items.AIR;
     }

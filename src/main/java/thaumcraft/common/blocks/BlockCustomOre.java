@@ -34,6 +34,7 @@ public class BlockCustomOre extends Block {
 
     public static final String[] oreTypes = {"cinnabar", "infusedAir", "infusedFire", "infusedWater", "infusedEarth", "infusedOrder", "infusedEntropy", "amber"};
     public static final PropertyInteger TYPE = PropertyInteger.create("type", 0, 7);
+    private final Random random = new Random();
 
     public BlockCustomOre() {
         super(Material.ROCK);
@@ -106,7 +107,10 @@ public class BlockCustomOre extends Block {
         } else if (meta == 7) {
             drops.add(new ItemStack(ConfigItems.itemResource, 1 + rand.nextInt(1 + fortune), 6));
         } else if (meta >= 1 && meta <= 6) {
-            drops.add(new ItemStack(ConfigItems.itemShard, 1 + rand.nextInt(1 + fortune), meta - 1));
+            int quantity = 1 + rand.nextInt(2 + fortune);
+            for (int i = 0; i < quantity; i++) {
+                drops.add(new ItemStack(ConfigItems.itemShard, 1, meta - 1));
+            }
         } else {
             drops.add(new ItemStack(this, 1, meta));
         }
@@ -116,9 +120,8 @@ public class BlockCustomOre extends Block {
     @Override
     public int getExpDrop(IBlockState state, IBlockAccess world, BlockPos pos, int fortune) {
         int meta = this.getMetaFromState(state);
-        if (meta == 0) return 2;
-        if (meta == 7) return 3;
-        if (meta >= 1 && meta <= 6) return 4;
+        if (meta == 7) return MathHelper.getInt(this.random, 1, 4);
+        if (meta >= 1 && meta <= 6) return MathHelper.getInt(this.random, 0, 3);
         return 0;
     }
 

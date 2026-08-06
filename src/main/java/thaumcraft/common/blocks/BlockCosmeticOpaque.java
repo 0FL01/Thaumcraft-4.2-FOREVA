@@ -158,7 +158,7 @@ public class BlockCosmeticOpaque extends Block {
 
     @Override
     public Item getItemDropped(IBlockState state, Random rand, int fortune) {
-        return state.getValue(TYPE) == 2 && Config.wardedStone ? Items.AIR : super.getItemDropped(state, rand, fortune);
+        return super.getItemDropped(state, rand, fortune);
     }
 
     @Override

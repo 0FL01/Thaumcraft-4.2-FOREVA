@@ -145,7 +145,7 @@ public class BlockCosmeticSolid extends Block {
             if (aspects != null && aspects.size() > 0) {
                 for (Aspect aspect : aspects.getAspects()) {
                     if (aspect == null || aspects.getAmount(aspect) < 5) continue;
-                    for (int a = 0; a < aspects.getAmount(aspect) / 10; ++a) {
+                    for (int a = 0; a <= aspects.getAmount(aspect) / 10; ++a) {
                         ItemStack essence = new ItemStack(ConfigItems.itemWispEssence);
                         ((ItemWispEssence) essence.getItem()).setAspects(essence,
                                 new AspectList().add(aspect, 2));

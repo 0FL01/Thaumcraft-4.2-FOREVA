@@ -16,6 +16,7 @@ import net.minecraft.init.Blocks;
 import net.minecraft.init.SoundEvents;
 import net.minecraft.inventory.Container;
 import net.minecraft.inventory.IInventory;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
@@ -41,6 +42,7 @@ import net.minecraftforge.fluids.capability.IFluidHandlerItem;
 import thaumcraft.api.ThaumcraftApiHelper;
 import thaumcraft.common.Thaumcraft;
 import thaumcraft.common.CommonProxy;
+import thaumcraft.common.config.ConfigBlocks;
 import thaumcraft.common.items.baubles.ItemAmuletVis;
 import thaumcraft.common.items.wands.ItemWandCasting;
 import thaumcraft.common.lib.utils.InventoryUtils;
@@ -48,6 +50,7 @@ import thaumcraft.common.tiles.*;
 
 import javax.annotation.Nullable;
 import java.util.List;
+import java.util.Random;
 
 public class BlockStoneDevice
 extends BlockContainer {
@@ -151,6 +154,14 @@ extends BlockContainer {
         if (meta == 3) return 7;
         if (meta == 4) return 6;
         return meta;
+    }
+
+    @Override
+    public Item getItemDropped(IBlockState state, Random rand, int fortune) {
+        int meta = getMetaFromState(state);
+        return meta == 3 || meta == 4
+                ? Item.getItemFromBlock(ConfigBlocks.blockCosmeticSolid)
+                : super.getItemDropped(state, rand, fortune);
     }
 
     @Override
