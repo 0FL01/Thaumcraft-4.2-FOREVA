@@ -2,7 +2,6 @@ package thaumcraft.common.lib.events;
 
 import net.minecraft.block.Block;
 import net.minecraft.enchantment.EnchantmentHelper;
-import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -41,6 +40,8 @@ import thaumcraft.common.lib.network.PacketHandler;
 import thaumcraft.common.lib.utils.EntityUtils;
 import thaumcraft.common.lib.utils.Utils;
 import thaumcraft.common.lib.world.ChunkLoc;
+import thaumcraft.common.lib.world.dim.Cell;
+import thaumcraft.common.lib.world.dim.CellLoc;
 import thaumcraft.common.lib.world.dim.MazeHandler;
 import thaumcraft.common.tiles.TileSensor;
 
@@ -308,9 +309,16 @@ public class EventHandlerWorld {
 
         if (player == null || player.capabilities.isCreativeMode) return false;
 
-        List<Entity> bosses = world.getEntitiesWithinAABB(EntityThaumcraftBoss.class,
-                player.getEntityBoundingBox().grow(32.0));
+        Cell cell = MazeHandler.getFromHashMap(new CellLoc(pos.getX() >> 4, pos.getZ() >> 4));
+        if (!isBossPlacementCell(cell)) return false;
+
+        List<EntityThaumcraftBoss> bosses = EntityUtils.getEntitiesInRange(world,
+                pos.getX(), pos.getY(), pos.getZ(), null, EntityThaumcraftBoss.class, 32.0);
 
         return !bosses.isEmpty();
+    }
+
+    static boolean isBossPlacementCell(Cell cell) {
+        return cell != null && cell.feature >= 2 && cell.feature <= 5;
     }
 }

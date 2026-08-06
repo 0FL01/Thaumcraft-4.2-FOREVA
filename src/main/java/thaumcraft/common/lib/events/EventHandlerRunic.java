@@ -134,7 +134,7 @@ public class EventHandlerRunic {
                     && this.nextCycle.get(player.getEntityId()) < time
                     && WandManager.consumeVisFromInventory(player,
                     new AspectList().add(Aspect.AIR, Config.shieldCost).add(Aspect.EARTH, Config.shieldCost))) {
-                long interval = Math.max(0, Config.shieldRecharge - this.runicInfo.get(player.getEntityId())[1] * 500L);
+                long interval = rechargeInterval(Config.shieldRecharge, this.runicInfo.get(player.getEntityId())[1]);
                 this.nextCycle.put(player.getEntityId(), time + interval);
                 setRunicCharge(player, ++charge, maxCharge, false);
             }
@@ -144,6 +144,10 @@ public class EventHandlerRunic {
                 this.lastCharge.put(player.getEntityId(), charge);
             }
         }
+    }
+
+    static long rechargeInterval(int base, int chargedPieces) {
+        return base - chargedPieces * 500L;
     }
 
     @SubscribeEvent
