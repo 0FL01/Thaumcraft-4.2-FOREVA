@@ -27,7 +27,7 @@ public class TileArcaneFurnaceStaticGuardTest {
         assertTrue(source.contains("this.world.addBlockEvent(this.pos, this.world.getBlockState(this.pos).getBlock(), 3, 0);"));
         assertTrue(source.contains("private int calcCookTime()"));
         assertTrue(source.contains("(this.speedyTime > 0 ? 80 : 140) - 20 * this.getBellows()"));
-        assertTrue(source.contains("ItemStack bonus = ThaumcraftApi.getSmeltingBonus(furnaceItemStack);"));
+        assertTrue(source.contains("createSmeltingBonus(ThaumcraftApi.getSmeltingBonus(furnaceItemStack), this.world.rand, bellows)"));
         assertTrue(source.contains("EntityXPOrb.getXPSplit(xpAmount)"));
     }
 

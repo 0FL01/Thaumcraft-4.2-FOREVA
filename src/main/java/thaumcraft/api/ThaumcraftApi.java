@@ -69,11 +69,11 @@ public class ThaumcraftApi {
     }
 
     public static void addSmeltingBonus(ItemStack in, ItemStack out) {
-        smeltingBonus.put(Arrays.asList(in.getItem(), in.getMetadata()), new ItemStack(out.getItem(), 0, out.getMetadata()));
+        smeltingBonus.put(Arrays.asList(in.getItem(), in.getMetadata()), new ItemStack(out.getItem(), 1, out.getMetadata()));
     }
 
     public static void addSmeltingBonus(String in, ItemStack out) {
-        smeltingBonus.put(in, new ItemStack(out.getItem(), 0, out.getMetadata()));
+        smeltingBonus.put(in, new ItemStack(out.getItem(), 1, out.getMetadata()));
     }
 
     public static void addSmeltingBonus(Object in, ItemStack out, float chance) {

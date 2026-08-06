@@ -1,5 +1,6 @@
 package thaumcraft.common.tiles;
 
+import java.util.Random;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.item.EntityXPOrb;
 import net.minecraft.init.SoundEvents;
@@ -263,29 +264,15 @@ public class TileArcaneFurnace extends TileThaumcraft implements ITickable {
         entityItem.motionZ = mz;
         this.world.spawnEntity(entityItem);
 
-        ItemStack bonus = ThaumcraftApi.getSmeltingBonus(furnaceItemStack);
-        if (bonus != null && !bonus.isEmpty()) {
-            bonus = bonus.copy();
-            if (bellows == 0) {
-                if (this.world.rand.nextInt(4) == 0) {
-                    bonus.grow(1);
-                }
-            } else {
-                for (int a = 0; a < bellows; ++a) {
-                    if (this.world.rand.nextFloat() < 0.44F) {
-                        bonus.grow(1);
-                    }
-                }
-            }
-            if (bonus.getCount() > 0) {
-                mx = this.facingX == 0 ? (this.world.rand.nextFloat() - this.world.rand.nextFloat()) * 0.03F : this.facingX * 0.13F;
-                mz = this.facingZ == 0 ? (this.world.rand.nextFloat() - this.world.rand.nextFloat()) * 0.03F : this.facingZ * 0.13F;
-                EntityItem bonusItem = new EntityItem(this.world, this.pos.getX() + lx, this.pos.getY() + 0.4F, this.pos.getZ() + lz, bonus);
-                bonusItem.motionX = mx;
-                bonusItem.motionY = 0.0D;
-                bonusItem.motionZ = mz;
-                this.world.spawnEntity(bonusItem);
-            }
+        ItemStack bonus = createSmeltingBonus(ThaumcraftApi.getSmeltingBonus(furnaceItemStack), this.world.rand, bellows);
+        if (!bonus.isEmpty()) {
+            mx = this.facingX == 0 ? (this.world.rand.nextFloat() - this.world.rand.nextFloat()) * 0.03F : this.facingX * 0.13F;
+            mz = this.facingZ == 0 ? (this.world.rand.nextFloat() - this.world.rand.nextFloat()) * 0.03F : this.facingZ * 0.13F;
+            EntityItem bonusItem = new EntityItem(this.world, this.pos.getX() + lx, this.pos.getY() + 0.4F, this.pos.getZ() + lz, bonus);
+            bonusItem.motionX = mx;
+            bonusItem.motionY = 0.0D;
+            bonusItem.motionZ = mz;
+            this.world.spawnEntity(bonusItem);
         }
 
         int xpAmount = items.getCount();
@@ -310,6 +297,30 @@ public class TileArcaneFurnace extends TileThaumcraft implements ITickable {
             xp.motionZ = mz;
             this.world.spawnEntity(xp);
         }
+    }
+
+    static ItemStack createSmeltingBonus(ItemStack prototype, Random random, int bellows) {
+        if (prototype == null || prototype.isEmpty()) {
+            return ItemStack.EMPTY;
+        }
+        int count = 0;
+        if (bellows == 0) {
+            if (random.nextInt(4) == 0) {
+                count++;
+            }
+        } else {
+            for (int a = 0; a < bellows; ++a) {
+                if (random.nextFloat() < 0.44F) {
+                    count++;
+                }
+            }
+        }
+        if (count == 0) {
+            return ItemStack.EMPTY;
+        }
+        ItemStack bonus = prototype.copy();
+        bonus.setCount(count);
+        return bonus;
     }
 
     private boolean canSmelt(int slot) {
