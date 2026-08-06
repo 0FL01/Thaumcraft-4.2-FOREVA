@@ -20,6 +20,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
+import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.RayTraceResult;
@@ -37,6 +38,16 @@ import thaumcraft.common.tiles.TileManaPod;
 public class BlockManaPod extends Block {
 
     public static final PropertyInteger TYPE = PropertyInteger.create("type", 0, 7);
+    private static final AxisAlignedBB[] POD_AABBS = {
+        new AxisAlignedBB(0.25D, 0.75D, 0.25D, 0.75D, 1.0D, 0.75D),
+        new AxisAlignedBB(0.25D, 0.625D, 0.25D, 0.75D, 1.0D, 0.75D),
+        new AxisAlignedBB(0.25D, 0.5D, 0.25D, 0.75D, 1.0D, 0.75D),
+        new AxisAlignedBB(0.25D, 0.375D, 0.25D, 0.75D, 1.0D, 0.75D),
+        new AxisAlignedBB(0.25D, 0.3125D, 0.25D, 0.75D, 1.0D, 0.75D),
+        new AxisAlignedBB(0.25D, 0.25D, 0.25D, 0.75D, 1.0D, 0.75D),
+        new AxisAlignedBB(0.25D, 0.1875D, 0.25D, 0.75D, 1.0D, 0.75D),
+        new AxisAlignedBB(0.25D, 0.125D, 0.25D, 0.75D, 1.0D, 0.75D)
+    };
     private static final Map<String, Aspect> ASPECT_DROP_CACHE = new HashMap<>();
 
     public BlockManaPod() {
@@ -82,6 +93,11 @@ public class BlockManaPod extends Block {
     @Override
     public boolean isFullCube(IBlockState state) {
         return false;
+    }
+
+    @Override
+    public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess world, BlockPos pos) {
+        return POD_AABBS[state.getValue(TYPE)];
     }
 
     @Override

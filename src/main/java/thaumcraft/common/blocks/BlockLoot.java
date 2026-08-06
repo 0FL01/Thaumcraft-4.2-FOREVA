@@ -95,7 +95,7 @@ public class BlockLoot extends Block {
 
     @Override
     public AxisAlignedBB getCollisionBoundingBox(IBlockState state, IBlockAccess world, BlockPos pos) {
-        return this.getBoundingBox(state, world, pos);
+        return FULL_BLOCK_AABB;
     }
 
     @Override

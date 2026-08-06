@@ -26,7 +26,6 @@ public class BlockFluxGoo extends BlockFluidFinite {
 
     /** Non-null zero-size AABB — replaces NULL_AABB which is null in 1.12.2. */
     private static final AxisAlignedBB ZERO_AABB = new AxisAlignedBB(0, 0, 0, 0, 0, 0);
-    private static final int THAUMIC_SLIME_GROWTH_INTERVAL_TICKS = 20;
 
     public BlockFluxGoo() {
         super(ConfigBlocks.FLUXGOO, Config.fluxGoomaterial);
@@ -61,7 +60,6 @@ public class BlockFluxGoo extends BlockFluidFinite {
             EntityThaumicSlime slime = (EntityThaumicSlime) entity;
             if (!world.isRemote
                     && slime.getSlimeSize() < meta
-                    && slime.ticksExisted % THAUMIC_SLIME_GROWTH_INTERVAL_TICKS == 0
                     && world.rand.nextBoolean()) {
                 slime.setSlimeSize(slime.getSlimeSize() + 1);
                 if (meta > 1) {
