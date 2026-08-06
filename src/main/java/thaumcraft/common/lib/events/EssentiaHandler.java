@@ -14,6 +14,7 @@ import thaumcraft.api.aspects.Aspect;
 import thaumcraft.api.aspects.IAspectSource;
 import thaumcraft.common.lib.network.PacketHandler;
 import thaumcraft.common.lib.network.fx.PacketFXEssentiaSource;
+import thaumcraft.common.tiles.TileMirrorEssentia;
 
 public class EssentiaHandler {
     private static final int DELAY = 5000;
@@ -42,6 +43,7 @@ public class EssentiaHandler {
                 iterator.remove();
                 continue;
             }
+            if (ignoreMirror && sourceTile instanceof TileMirrorEssentia) continue;
             IAspectSource aspectSource = (IAspectSource) sourceTile;
             if (!aspectSource.takeFromContainer(aspect, 1)) continue;
             PacketHandler.INSTANCE.sendToAllAround(
@@ -100,12 +102,18 @@ public class EssentiaHandler {
         }
 
         ArrayList<SourceKey> sourceList = new ArrayList<SourceKey>();
+        TileEntity originTile = world.getTileEntity(tileLoc.pos);
         List<BlockPos> scan = buildScan(tileLoc.pos, direction, range);
         for (BlockPos pos : scan) {
             if (pos.equals(tileLoc.pos)) continue;
             if (!world.isBlockLoaded(pos)) continue;
             TileEntity te = world.getTileEntity(pos);
             if (te instanceof IAspectSource) {
+                if (originTile instanceof TileMirrorEssentia && te instanceof TileMirrorEssentia) {
+                    TileMirrorEssentia mirror = (TileMirrorEssentia) te;
+                    if (mirror.linkX == tileLoc.pos.getX() && mirror.linkY == tileLoc.pos.getY()
+                            && mirror.linkZ == tileLoc.pos.getZ() && mirror.linkDim == tileLoc.dim) continue;
+                }
                 sourceList.add(new SourceKey(pos, world.provider.getDimension()));
             }
         }
