@@ -6,6 +6,8 @@ import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import org.lwjgl.opengl.GL11;
 
 public class ModelThaumatorium {
+    private static final float OBJ_UV_INSET = 0.0005F;
+
     private static final float[][] VERTICES = {
             {-0.4375F, -0.4375F, 0.1250F},
             {-0.4375F, 0.4375F, 0.1250F},
@@ -488,17 +490,48 @@ public class ModelThaumatorium {
         BufferBuilder buf = tess.getBuffer();
         buf.begin(GL11.GL_TRIANGLES, DefaultVertexFormats.POSITION_TEX_NORMAL);
         for (int[] triangle : TRIANGLES) {
-            addVertex(buf, triangle, 0);
-            addVertex(buf, triangle, 3);
-            addVertex(buf, triangle, 6);
+            addTriangle(buf, triangle);
         }
         tess.draw();
     }
 
-    private static void addVertex(BufferBuilder buf, int[] triangle, int offset) {
+    private static void addTriangle(BufferBuilder buf, int[] triangle) {
+        // TC4's Wavefront loader flips V before applying this per-face centroid inset.
+        float averageU = 0.0F;
+        float averageV = 0.0F;
+        for (int offset = 0; offset < triangle.length; offset += 3) {
+            float[] uv = UVS[triangle[offset + 1] - 1];
+            averageU += uv[0];
+            averageV += 1.0F - uv[1];
+        }
+        averageU /= 3.0F;
+        averageV /= 3.0F;
+
+        addVertex(buf, triangle, 0, averageU, averageV);
+        addVertex(buf, triangle, 3, averageU, averageV);
+        addVertex(buf, triangle, 6, averageU, averageV);
+    }
+
+    private static void addVertex(BufferBuilder buf, int[] triangle, int offset,
+                                  float averageU, float averageV) {
         float[] pos = VERTICES[triangle[offset] - 1];
         float[] uv = UVS[triangle[offset + 1] - 1];
         float[] normal = NORMALS[triangle[offset + 2] - 1];
-        buf.pos(pos[0], pos[1], pos[2]).tex(uv[0], uv[1]).normal(normal[0], normal[1], normal[2]).endVertex();
+        buf.pos(pos[0], pos[1], pos[2])
+                .tex(legacyTextureU(uv[0], averageU), legacyTextureV(uv[1], averageV))
+                .normal(normal[0], normal[1], normal[2])
+                .endVertex();
+    }
+
+    static float legacyTextureU(float rawU, float averageU) {
+        return insetTextureCoordinate(rawU, averageU);
+    }
+
+    static float legacyTextureV(float rawV, float averageV) {
+        return insetTextureCoordinate(1.0F - rawV, averageV);
+    }
+
+    private static float insetTextureCoordinate(float coordinate, float average) {
+        return coordinate + (coordinate > average ? -OBJ_UV_INSET : OBJ_UV_INSET);
     }
 }

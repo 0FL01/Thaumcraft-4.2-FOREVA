@@ -44,6 +44,10 @@ public class TileFocalManipulatorRendererStaticGuardTest {
         assertTrue(thaumatoriumModel.contains("private static final float[][] NORMALS"));
         assertTrue(thaumatoriumModel.contains("private static final int[][] TRIANGLES"));
         assertTrue(thaumatoriumModel.contains("DefaultVertexFormats.POSITION_TEX_NORMAL"));
+        assertTrue(thaumatoriumModel.contains("private static final float OBJ_UV_INSET = 0.0005F;"));
+        assertTrue(thaumatoriumModel.contains("averageV += 1.0F - uv[1];"));
+        assertTrue(thaumatoriumModel.contains("legacyTextureV(uv[1], averageV)"));
+        assertTrue(!thaumatoriumModel.contains(".tex(uv[0], uv[1])"));
         assertTrue(!thaumatoriumModel.contains("extends ModelBase"));
         assertTrue(!thaumatoriumModel.contains("new ModelRenderer("));
 
