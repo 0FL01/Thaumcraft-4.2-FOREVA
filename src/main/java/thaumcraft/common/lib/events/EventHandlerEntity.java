@@ -102,6 +102,7 @@ import thaumcraft.common.lib.WarpEvents;
 import thaumcraft.common.lib.capabilities.IPlayerKnowledge;
 import thaumcraft.common.lib.capabilities.PlayerKnowledgeProvider;
 import thaumcraft.common.lib.network.PacketHandler;
+import thaumcraft.common.lib.network.misc.PacketConfig;
 import thaumcraft.common.lib.network.playerdata.PacketSyncAspects;
 import thaumcraft.common.lib.network.playerdata.PacketSyncResearch;
 import thaumcraft.common.lib.network.playerdata.PacketSyncScannedEntities;
@@ -299,6 +300,7 @@ public class EventHandlerEntity {
     public static void syncAllData(EntityPlayer player) {
         if (player.getEntityWorld().isRemote || !(player instanceof EntityPlayerMP)) return;
 
+        PacketHandler.INSTANCE.sendTo(new PacketConfig(), (EntityPlayerMP) player);
         IPlayerKnowledge knowledge = player.getCapability(PlayerKnowledgeProvider.PLAYER_KNOWLEDGE, null);
         if (knowledge == null) return;
 

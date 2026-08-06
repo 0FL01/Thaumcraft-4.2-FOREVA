@@ -48,6 +48,7 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.player.ItemTooltipEvent;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.client.registry.RenderingRegistry;
+import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import org.lwjgl.opengl.GL11;
 import thaumcraft.api.aspects.Aspect;
@@ -239,6 +240,7 @@ import thaumcraft.common.entities.EntitySpecialItem;
 import thaumcraft.common.entities.golems.EntityGolemBobber;
 import thaumcraft.common.lib.TCSounds;
 import thaumcraft.common.lib.events.EventHandlerRunic;
+import thaumcraft.common.lib.network.EventHandlerNetwork;
 import thaumcraft.common.entities.monster.EntityBrainyZombie;
 import thaumcraft.common.entities.monster.EntityGiantBrainyZombie;
 import thaumcraft.common.entities.monster.EntityInhabitedZombie;
@@ -1273,6 +1275,7 @@ public class ClientProxy extends CommonProxy {
 
     @Override
     public void registerHandlers() {
+        FMLCommonHandler.instance().bus().register(new EventHandlerNetwork());
         MinecraftForge.EVENT_BUS.register(new ClientTickEventsFML());
         MinecraftForge.EVENT_BUS.register(new RenderEventHandler());
         MinecraftForge.EVENT_BUS.register(ParticleEngine.INSTANCE);
