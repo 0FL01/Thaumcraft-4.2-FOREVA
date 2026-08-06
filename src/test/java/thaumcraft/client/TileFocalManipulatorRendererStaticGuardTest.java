@@ -38,7 +38,7 @@ public class TileFocalManipulatorRendererStaticGuardTest {
         assertTrue(thaumatorium.contains("model.renderAll();"));
         assertTrue(thaumatorium.contains("TileRenderHelper.renderEntityItem(tile, output, 0.0F);"));
         assertTrue(thaumatorium.contains("GlStateManager.scale(0.75F, 0.75F, 0.75F);"));
-        assertTrue(thaumatorium.contains("private static final double OUTPUT_ITEM_Y_OFFSET = 1.025D;"));
+        assertTrue(thaumatorium.contains("private static final double OUTPUT_ITEM_Y_OFFSET = 1.175D;"));
         assertTrue(thaumatorium.contains("double iy = y + OUTPUT_ITEM_Y_OFFSET;"));
         assertTrue(thaumatoriumModel.contains("Wavefront thaumatorium.obj triangles"));
         assertTrue(thaumatoriumModel.contains("private static final float[][] VERTICES"));

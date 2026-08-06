@@ -14,7 +14,7 @@ public class TileThaumatoriumRenderer extends TileEntitySpecialRenderer<TileThau
 
     private static final ResourceLocation THAUMATORIUM_TEXTURE =
             new ResourceLocation("thaumcraft", "textures/models/thaumatorium.png");
-    private static final double OUTPUT_ITEM_Y_OFFSET = 1.025D;
+    private static final double OUTPUT_ITEM_Y_OFFSET = 1.175D;
     private final ModelThaumatorium model = new ModelThaumatorium();
 
     @Override
