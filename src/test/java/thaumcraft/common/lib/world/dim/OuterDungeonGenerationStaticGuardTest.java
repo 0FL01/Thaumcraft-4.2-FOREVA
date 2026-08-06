@@ -45,7 +45,9 @@ public class OuterDungeonGenerationStaticGuardTest {
         assertTrue(boss.contains("if (dir == null) return;"));
         assertTrue(mazeGenerator.contains("if (!connected) {")
                 && mazeGenerator.contains("success = false;"));
-        assertFalse(mazeThread.contains("(short) 0"));
+        assertTrue(mazeThread.contains("MazeHandler.putToHashMapRaw(reservation, (short) 0);")
+                && mazeThread.contains("if (MazeHandler.getFromHashMapRaw(reservation) == 0)")
+                && mazeThread.contains("MazeHandler.removeFromHashMap(reservation);"));
         assertFalse(worldGenerator.contains("new Thread(new MazeThread"));
         assertFalse(altar.contains("new Thread(new MazeThread"));
         assertTrue(chunkProvider.contains("try {")
@@ -70,6 +72,29 @@ public class OuterDungeonGenerationStaticGuardTest {
                 && crystal.contains("BlockPos support = pos.offset(attachment.getOpposite());")
                 && crystal.contains("return !worldIn.isAirBlock(support);")
                 && crystal.contains("return worldIn.isSideSolid(support, attachment);"));
+    }
+
+    @Test
+    public void synchronousMazeReservationsLeaveNoZeroSentinels() {
+        MazeHandler.clearHashMap();
+        try {
+            MazeThread task = new MazeThread(40, -20, 5, 5, 12345L);
+            CellLoc[] reservations = task.reservationCells();
+            assertTrue(reservations.length == 5);
+
+            task.run();
+
+            assertTrue(!MazeHandler.labyrinth.isEmpty());
+            for (Short value : MazeHandler.labyrinth.values()) {
+                assertTrue(value != null && value.shortValue() > 0);
+            }
+            for (CellLoc reservation : reservations) {
+                assertTrue(MazeHandler.getFromHashMapRaw(reservation) > 0
+                        || !MazeHandler.labyrinth.containsKey(reservation));
+            }
+        } finally {
+            MazeHandler.clearHashMap();
+        }
     }
 
     private static String read(String path) throws IOException {

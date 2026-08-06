@@ -14,6 +14,11 @@ public class MazeThread implements Runnable {
 
     @Override
     public void run() {
+        CellLoc[] reservations = reservationCells();
+        for (CellLoc reservation : reservations) {
+            MazeHandler.putToHashMapRaw(reservation, (short) 0);
+        }
+
         MazeGenerator maze = new MazeGenerator(this.w, this.h, this.seed++);
         while (!maze.generate()) {
             maze = new MazeGenerator(this.w, this.h, this.seed++);
@@ -27,5 +32,21 @@ public class MazeThread implements Runnable {
                 MazeHandler.putToHashMapRaw(new CellLoc(col + colOffset, row + rowOffset), (short) maze.grid[row][col]);
             }
         }
+
+        for (CellLoc reservation : reservations) {
+            if (MazeHandler.getFromHashMapRaw(reservation) == 0) {
+                MazeHandler.removeFromHashMap(reservation);
+            }
+        }
+    }
+
+    CellLoc[] reservationCells() {
+        return new CellLoc[] {
+            new CellLoc(this.x, this.z),
+            new CellLoc(this.x - this.w, this.z - this.h),
+            new CellLoc(this.x + this.w, this.z + this.h),
+            new CellLoc(this.x - this.w, this.z + this.h),
+            new CellLoc(this.x + this.w, this.z - this.h)
+        };
     }
 }
