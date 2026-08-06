@@ -321,7 +321,7 @@ public class Config {
         specialNodeRarity = config.get("general", "special_node_rarity", 18).getInt();
         if (specialNodeRarity < 3) specialNodeRarity = 3;
         showTags = config.get("general", "display_aspects", false).getBoolean(false);
-        allowCheatSheet = config.get("general", "allow_cheat_sheet", true).getBoolean(false);
+        allowCheatSheet = config.get("general", "allow_cheat_sheet", false).getBoolean(false);
         CallowCheatSheet = allowCheatSheet;
         wardedStone = config.get("general", "allow_warded_stone", true).getBoolean(false);
         CwardedStone = wardedStone;

@@ -200,10 +200,10 @@ public class ConfigEntities {
         if (Config.spawnFireBat) {
             addSpawn(EntityFireBat.class, 10, 1, 2, EnumCreatureType.MONSTER,
                     biome -> BiomeDictionary.hasType(biome, BiomeDictionary.Type.NETHER));
-        }
-        if (isHalloween()) {
-            addSpawn(EntityFireBat.class, 5, 1, 2, EnumCreatureType.MONSTER,
-                    biome -> !biome.getSpawnableList(EnumCreatureType.MONSTER).isEmpty());
+            if (isHalloween()) {
+                addSpawn(EntityFireBat.class, 5, 1, 2, EnumCreatureType.MONSTER,
+                        biome -> !biome.getSpawnableList(EnumCreatureType.MONSTER).isEmpty());
+            }
         }
         if (Config.spawnWisp) {
             addSpawn(EntityWisp.class, 5, 1, 1, EnumCreatureType.MONSTER,
