@@ -100,12 +100,12 @@ public class BiomeMagicalForest extends Biome {
         }
         for (int mx = 0; mx < 4; ++mx) {
             for (int mz = 0; mz < 4; ++mz) {
-                if (rand.nextInt(40) != 0) {
-                    continue;
-                }
                 int bx = x + mx * 4 + 1 + 8 + rand.nextInt(3);
                 int bz = z + mz * 4 + 1 + 8 + rand.nextInt(3);
                 BlockPos mpos = world.getHeight(new BlockPos(bx, 0, bz));
+                if (rand.nextInt(40) != 0) {
+                    continue;
+                }
                 (new WorldGenBigMushroom()).generate(world, rand, mpos);
             }
         }

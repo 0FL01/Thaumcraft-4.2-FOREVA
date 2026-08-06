@@ -459,10 +459,10 @@ public class ThaumcraftWorldGenerator implements IWorldGenerator {
     }
 
     private void generateVegetation(World world, Random rand, int x, int z, Biome biome) {
-        if (rand.nextInt(120) == 3) {
+        if (rand.nextInt(60) == 3) {
             generateSilverwood(world, rand, x, z, biome);
         }
-        if (rand.nextInt(50) == 7) {
+        if (rand.nextInt(25) == 7) {
             generateGreatwood(world, rand, x >> 4, z >> 4);
         }
 
@@ -546,7 +546,7 @@ public class ThaumcraftWorldGenerator implements IWorldGenerator {
         float chance = BiomeHandler.getBiomeSupportsGreatwood(biome);
         if (chance > 0 && rand.nextFloat() < chance) {
             BlockPos pos = world.getHeight(new BlockPos(bx, 0, bz));
-            new WorldGenGreatwoodTrees(false).generate(world, rand, pos.getX(), pos.getY(), pos.getZ(), rand.nextInt(16) == 0);
+            new WorldGenGreatwoodTrees(false).generate(world, rand, pos.getX(), pos.getY(), pos.getZ(), rand.nextInt(8) == 0);
         }
     }
 
@@ -555,15 +555,23 @@ public class ThaumcraftWorldGenerator implements IWorldGenerator {
         int bz = z + rand.nextInt(16);
         BlockPos pos = world.getHeight(new BlockPos(bx, 0, bz));
 
-        boolean shouldGen = biome == biomeMagicalForest
-                || biome == biomeTaint
-                || !BiomeDictionary.hasType(biome, BiomeDictionary.Type.MAGICAL)
-                && biome != Biome.getBiome(0)  // ocean
-                && biome != Biome.getBiome(1); // plains
-
-        if (shouldGen) {
+        if (isSilverwoodBiomeEligible(biome)) {
             new WorldGenSilverwoodTrees(false, 7, 4).generate(world, rand, pos);
         }
+    }
+
+    static boolean isSilverwoodBiomeEligible(Biome biome) {
+        return isSilverwoodBiomeEligible(
+                biome == biomeMagicalForest,
+                biome == biomeTaint,
+                BiomeDictionary.hasType(biome, BiomeDictionary.Type.MAGICAL),
+                biome == Biome.getBiome(0),
+                biome == Biome.getBiome(1));
+    }
+
+    static boolean isSilverwoodBiomeEligible(boolean magicalForest, boolean taint,
+            boolean magical, boolean ocean, boolean plains) {
+        return !(magicalForest || taint || !magical && !ocean && !plains);
     }
 
     public static void generateFlowers(World world, Random rand, int x, int z, int flowerType) {
