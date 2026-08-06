@@ -25,8 +25,10 @@ public class BlockMagicalLeavesRenderContractTest {
                 blockSource.contains("this.setLightOpacity(1);")
                         && blockSource.contains("public boolean isOpaqueCube(IBlockState state) {\n        return false;")
                         && blockSource.contains("public boolean isFullCube(IBlockState state) {\n        return true;"));
-        assertTrue("BlockMagicalLeavesItem metadata contract must preserve only the type bit",
-                itemSource.contains("return damage & 1;"));
+        assertTrue("BlockMagicalLeavesItem metadata contract must mark player-placed leaves",
+                itemSource.contains("return damage | 4;"));
+        assertTrue("Client model routing must ignore runtime-only decay properties",
+                clientSource.contains("ignore(BlockMagicalLeaves.DECAYABLE, BlockMagicalLeaves.CHECK_DECAY)"));
         assertTrue("ClientProxy must register a biome foliage tint handler for greatwood leaves",
                 clientSource.contains("BiomeColorHelper.getFoliageColorAtPos(world, pos)")
                         && clientSource.contains("ColorizerFoliage.getFoliageColorBasic()")

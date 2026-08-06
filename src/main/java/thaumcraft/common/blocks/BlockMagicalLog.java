@@ -9,6 +9,7 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.particle.ParticleManager;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
@@ -21,7 +22,13 @@ import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import javax.annotation.Nullable;
+import thaumcraft.api.aspects.Aspect;
+import thaumcraft.api.aspects.AspectList;
+import thaumcraft.api.nodes.INode;
 import thaumcraft.common.Thaumcraft;
+import thaumcraft.common.config.ConfigItems;
+import thaumcraft.common.items.ItemWispEssence;
 import thaumcraft.common.lib.TCSounds;
 import thaumcraft.common.tiles.TileNode;
 
@@ -78,7 +85,28 @@ public class BlockMagicalLog extends BlockLog {
     @Override
     public int getLightValue(IBlockState state, IBlockAccess world, BlockPos pos) {
         int type = state.getValue(TYPE);
-        return (type == 1 || type == 2) ? 7 : super.getLightValue(state, world, pos);
+        return (type & 2) == 2 ? 7 : super.getLightValue(state, world, pos);
+    }
+
+    @Override
+    public void harvestBlock(World world, EntityPlayer player, BlockPos pos, IBlockState state,
+            @Nullable TileEntity tile, ItemStack tool) {
+        if (state.getValue(TYPE) == 2 && !world.isRemote
+                && tile instanceof INode && ConfigItems.itemWispEssence != null) {
+            AspectList aspects = ((INode) tile).getAspects();
+            if (aspects != null && aspects.size() > 0) {
+                for (Aspect aspect : aspects.getAspects()) {
+                    if (aspect == null || aspects.getAmount(aspect) < 5) continue;
+                    for (int count = 0; count < BlockAiry.getNodeEssenceDropCount(aspects.getAmount(aspect)); count++) {
+                        ItemStack essence = new ItemStack(ConfigItems.itemWispEssence);
+                        ((ItemWispEssence) essence.getItem()).setAspects(essence,
+                                new AspectList().add(aspect, 2));
+                        spawnAsEntity(world, pos, essence);
+                    }
+                }
+            }
+        }
+        super.harvestBlock(world, player, pos, state, tile, tool);
     }
 
     @Override

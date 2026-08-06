@@ -1007,6 +1007,8 @@ public class ClientProxy extends CommonProxy {
     private void setupBlockRenderers() {
         ModelLoader.setCustomStateMapper(ConfigBlocks.blockEldritch,
                 new StateMap.Builder().ignore(BlockEldritch.CRUST_NEIGHBOR_MASK).build());
+        ModelLoader.setCustomStateMapper(ConfigBlocks.blockMagicalLeaves,
+                new StateMap.Builder().ignore(BlockMagicalLeaves.DECAYABLE, BlockMagicalLeaves.CHECK_DECAY).build());
         registerBuiltinItemModel(ConfigBlocks.blockFluxGooItem, 0, "blockfluxgoo");
         registerBuiltinItemModel(ConfigBlocks.blockFluxGasItem, 0, "blockfluxgas");
         registerBuiltinItemModel(Item.getItemFromBlock(ConfigBlocks.blockHole), 0, "blockhole");

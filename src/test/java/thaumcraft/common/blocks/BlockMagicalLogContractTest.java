@@ -21,8 +21,12 @@ public class BlockMagicalLogContractTest {
                         && source.contains("new ItemStack(this, 1, 1)"));
         assertTrue("BlockMagicalLog knot and legacy alias should drop silverwood meta 1",
                 source.contains("if (type == 2 || type == 3) return 1;"));
-        assertTrue("BlockMagicalLog should keep silverwood and silverwood-knot light baseline",
-                source.contains("return (type == 1 || type == 2) ? 7"));
+        assertTrue("BlockMagicalLog should light only TC4 metadata types 2 and 3",
+                source.contains("return (type & 2) == 2 ? 7"));
+        assertTrue("Silverwood knots should release the TC4 node essence count when harvested",
+                source.contains("tile instanceof INode")
+                        && source.contains("BlockAiry.getNodeEssenceDropCount")
+                        && source.contains("new AspectList().add(aspect, 2)"));
         assertTrue("Block magical log blockstate must use 1.12 axis property names and silverwood type 1 routing",
                 blockstate.contains("\"axis=z,type=1\"")
                         && blockstate.contains("\"thaumcraft:blockmagicallog_silverwood\"")
