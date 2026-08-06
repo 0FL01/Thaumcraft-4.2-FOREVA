@@ -277,7 +277,7 @@ public class ConfigRecipesCrucibleSlice {
                 ThaumcraftApi.addCrucibleRecipe(
                         "GOLEMSTONE",
                         new ItemStack(ConfigItems.itemGolemPlacer, 1, 5),
-                        new ItemStack(Blocks.STONE),
+                        new ItemStack(Blocks.STONEBRICK),
                         new AspectList().add(Aspect.MAN, 4).add(Aspect.MOTION, 4).add(Aspect.SOUL, 4)));
         ConfigResearch.recipes.put("GolemIron",
                 ThaumcraftApi.addCrucibleRecipe(

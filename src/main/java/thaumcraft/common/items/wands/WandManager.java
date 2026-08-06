@@ -34,6 +34,7 @@ import thaumcraft.common.config.ConfigItems;
 import thaumcraft.common.blocks.BlockArcaneFurnace;
 import thaumcraft.common.entities.EntitySpecialItem;
 import thaumcraft.common.items.baubles.ItemAmuletVis;
+import thaumcraft.common.items.wands.foci.FocusTrade;
 import thaumcraft.common.lib.TCSounds;
 import thaumcraft.common.lib.network.PacketHandler;
 import thaumcraft.common.lib.network.fx.PacketFXBlockSparkle;
@@ -297,9 +298,7 @@ public class WandManager implements IWandTriggerManager {
         if (!(focus instanceof IArchitect) || focusStack.isEmpty() || !focus.isUpgradedWith(focusStack, FocusUpgradeType.architect)) return;
 
         if (player != null && player.isSneaking()) {
-            int dim = getAreaDim(wandStack) + 1;
-            if (dim > 3) dim = 0;
-            setAreaDim(wandStack, dim);
+            setAreaDim(wandStack, getNextAreaDim(focus, getAreaDim(wandStack)));
         } else {
             int max = focus.getMaxAreaSize(focusStack);
             int dim = getAreaDim(wandStack);
@@ -324,6 +323,11 @@ public class WandManager implements IWandTriggerManager {
         if (world != null && player != null) {
             world.playSound(null, player.getPosition(), TCSounds.CAMERATICKS, SoundCategory.PLAYERS, 0.3F, 1.0F);
         }
+    }
+
+    static int getNextAreaDim(ItemFocusBasic focus, int current) {
+        int next = current + 1;
+        return next > (focus instanceof FocusTrade ? 2 : 3) ? 0 : next;
     }
 
     public static int getAreaDim(ItemStack stack) {
