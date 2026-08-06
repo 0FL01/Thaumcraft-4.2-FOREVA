@@ -23,6 +23,10 @@ public class AlchemyClientParityStaticGuardTest {
         assertTrue(source.contains("I18n.format(\"recipe.return\")"));
         assertTrue(source.contains("(-119 + groundTerm + dy * 50) * scale"));
         assertTrue(source.contains("2.0F * scale"));
+        assertTrue(source.contains("COMPOUND_BASE_Z = 60.0F"));
+        assertTrue(source.contains("COMPOUND_LAYER_Z_STEP = 10.0F"));
+        assertTrue(source.contains("COMPOUND_BASE_Z - j * COMPOUND_LAYER_Z_STEP"));
+        assertTrue(source.contains("GlStateManager.translate(x, y, depth)"));
         assertTrue(lang.contains("recipe.return=Return"));
         assertTrue(lang.contains("recipe.clickthrough=Click for research"));
     }
