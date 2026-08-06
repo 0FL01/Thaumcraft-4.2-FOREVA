@@ -44,7 +44,7 @@ public class ItemGoggles extends ItemArmor implements IRepairable, IVisDiscountG
 
     @Override
     public boolean getIsRepairable(ItemStack toRepair, ItemStack repair) {
-        return !repair.isEmpty() && repair.getItem() == Items.LEATHER || super.getIsRepairable(toRepair, repair);
+        return !repair.isEmpty() && repair.getItem() == Items.GOLD_INGOT;
     }
 
     @Override

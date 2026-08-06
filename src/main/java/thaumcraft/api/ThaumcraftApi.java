@@ -37,11 +37,11 @@ public class ThaumcraftApi {
     public static Item.ToolMaterial toolMatThaumium = EnumHelper.addToolMaterial((String)"THAUMIUM", (int)3, (int)400, (float)7.0f, (float)2.0f, (int)22);
     public static Item.ToolMaterial toolMatVoid = EnumHelper.addToolMaterial((String)"VOID", (int)4, (int)150, (float)8.0f, (float)3.0f, (int)10);
     public static Item.ToolMaterial toolMatElemental = EnumHelper.addToolMaterial((String)"THAUMIUM_ELEMENTAL", (int)3, (int)1500, (float)10.0f, (float)3.0f, (int)18);
-    public static ItemArmor.ArmorMaterial armorMatThaumium = EnumHelper.addArmorMaterial("THAUMIUM", "thaumcraft:thaumium", 25, new int[]{2, 6, 5, 2}, 25, (SoundEvent)null, 0.0f);
-    public static ItemArmor.ArmorMaterial armorMatSpecial = EnumHelper.addArmorMaterial("SPECIAL", "thaumcraft:special", 25, new int[]{1, 3, 2, 1}, 25, (SoundEvent)null, 0.0f);
+    public static ItemArmor.ArmorMaterial armorMatThaumium = EnumHelper.addArmorMaterial("THAUMIUM", "thaumcraft:thaumium", 25, new int[]{2, 5, 6, 2}, 25, (SoundEvent)null, 0.0f);
+    public static ItemArmor.ArmorMaterial armorMatSpecial = EnumHelper.addArmorMaterial("SPECIAL", "thaumcraft:special", 25, new int[]{1, 2, 3, 1}, 25, (SoundEvent)null, 0.0f);
     public static ItemArmor.ArmorMaterial armorMatThaumiumFortress = EnumHelper.addArmorMaterial("FORTRESS", "thaumcraft:fortress", 40, new int[]{3, 6, 7, 3}, 25, (SoundEvent)null, 0.0f);
     public static ItemArmor.ArmorMaterial armorMatVoid = EnumHelper.addArmorMaterial("VOID", "thaumcraft:void", 10, new int[]{3, 6, 7, 3}, 10, (SoundEvent)null, 0.0f);
-    public static ItemArmor.ArmorMaterial armorMatVoidFortress = EnumHelper.addArmorMaterial("VOIDFORTRESS", "thaumcraft:voidfortress", 18, new int[]{4, 8, 7, 4}, 10, (SoundEvent)null, 0.0f);
+    public static ItemArmor.ArmorMaterial armorMatVoidFortress = EnumHelper.addArmorMaterial("VOIDFORTRESS", "thaumcraft:voidfortress", 18, new int[]{4, 7, 8, 4}, 10, (SoundEvent)null, 0.0f);
     public static int enchantFrugal;
     public static int enchantPotency;
     public static int enchantWandFortune;

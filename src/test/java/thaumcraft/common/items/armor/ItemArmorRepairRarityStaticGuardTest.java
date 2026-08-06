@@ -20,9 +20,9 @@ public class ItemArmorRepairRarityStaticGuardTest {
                 thaumium.contains("return EnumRarity.UNCOMMON;")
                         && thaumium.contains("new ItemStack(ConfigItems.itemResource, 1, 2)")
                         && thaumium.contains("repair.isItemEqual(thaumiumIngot)"));
-        assertTrue("ItemGoggles must keep rare rarity and leather repair contract",
+        assertTrue("ItemGoggles must keep rare rarity and gold repair contract",
                 goggles.contains("return EnumRarity.RARE;")
-                        && goggles.contains("repair.getItem() == Items.LEATHER")
+                        && goggles.contains("repair.getItem() == Items.GOLD_INGOT")
                         && goggles.contains("I18n.translateToLocal(\"tc.visdiscount\")"));
     }
 

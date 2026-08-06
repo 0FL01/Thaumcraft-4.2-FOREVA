@@ -40,7 +40,7 @@ public class ItemCultistPlateArmor extends ItemArmor implements IRepairable, IRu
 
     @Override
     public boolean getIsRepairable(ItemStack toRepair, ItemStack repair) {
-        return !repair.isEmpty() && repair.getItem() == Items.LEATHER || super.getIsRepairable(toRepair, repair);
+        return !repair.isEmpty() && repair.getItem() == Items.IRON_INGOT;
     }
 
     @Override

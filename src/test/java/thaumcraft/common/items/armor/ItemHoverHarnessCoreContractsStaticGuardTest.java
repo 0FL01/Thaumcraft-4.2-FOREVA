@@ -15,9 +15,9 @@ public class ItemHoverHarnessCoreContractsStaticGuardTest {
     public void hoverHarnessKeepsReferenceCoreContracts() throws IOException {
         String source = readFile("src/main/java/thaumcraft/common/items/armor/ItemHoverHarness.java");
 
-        assertTrue("ItemHoverHarness must keep epic rarity, iron repair and vis-discount contracts",
+        assertTrue("ItemHoverHarness must keep epic rarity, gold repair and vis-discount contracts",
                 source.contains("return EnumRarity.EPIC;")
-                        && source.contains("repair.getItem() == Items.IRON_INGOT")
+                        && source.contains("repair.getItem() == Items.GOLD_INGOT")
                         && source.contains("return aspect == Aspect.AIR ? 5 : 2;"));
         assertTrue("ItemHoverHarness must keep hover tick gate and handler dispatch",
                 source.contains("if (!player.capabilities.isCreativeMode)")

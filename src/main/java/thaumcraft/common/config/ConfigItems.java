@@ -224,10 +224,10 @@ public class ConfigItems {
         ARMOR_FORTRESS = thaumcraft.api.ThaumcraftApi.armorMatThaumiumFortress;
         ARMOR_ROBE = thaumcraft.api.ThaumcraftApi.armorMatSpecial;
         ARMOR_VOID_ROBE = ARMOR_VOID;
-        ARMOR_CULTIST = thaumcraft.api.ThaumcraftApi.armorMatSpecial;
-        ARMOR_CULTIST_PLATE = thaumcraft.api.ThaumcraftApi.armorMatThaumium;
-        ARMOR_CULTIST_LEADER = thaumcraft.api.ThaumcraftApi.armorMatVoid;
-        ARMOR_CULTIST_BOOTS = thaumcraft.api.ThaumcraftApi.armorMatSpecial;
+        ARMOR_CULTIST = ArmorMaterial.IRON;
+        ARMOR_CULTIST_PLATE = ArmorMaterial.IRON;
+        ARMOR_CULTIST_LEADER = thaumcraft.api.ThaumcraftApi.armorMatThaumiumFortress;
+        ARMOR_CULTIST_BOOTS = ArmorMaterial.IRON;
         ARMOR_GOGGLES = thaumcraft.api.ThaumcraftApi.armorMatSpecial;
         ARMOR_TRAVELLER = thaumcraft.api.ThaumcraftApi.armorMatSpecial;
         ARMOR_HOVER = thaumcraft.api.ThaumcraftApi.armorMatSpecial;
@@ -891,13 +891,6 @@ public class ConfigItems {
         setRepairItem(ARMOR_VOID, voidIngot);
         setRepairItem(ARMOR_VOID_ROBE, voidIngot);
         setRepairItem(ARMOR_ROBE, cloth);
-        setRepairItem(ARMOR_CULTIST, cloth);
-        setRepairItem(ARMOR_CULTIST_PLATE, thaumium);
-        setRepairItem(ARMOR_CULTIST_LEADER, voidIngot);
-        setRepairItem(ARMOR_CULTIST_BOOTS, cloth);
-        setRepairItem(ARMOR_GOGGLES, cloth);
-        setRepairItem(ARMOR_TRAVELLER, cloth);
-        setRepairItem(ARMOR_HOVER, cloth);
     }
 
     private static void setRepairItem(ToolMaterial material, ItemStack repairItem) {
