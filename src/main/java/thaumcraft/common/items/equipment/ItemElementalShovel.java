@@ -161,6 +161,7 @@ public class ItemElementalShovel extends ItemSpade implements IRepairable, IArch
             return super.onBlockDestroyed(stack, world, state, pos, entity);
         }
         if (!world.isRemote && entity instanceof EntityPlayer && (ForgeHooks.isToolEffective(world, pos, stack) || isEffectiveAgainst(state.getBlock()))) {
+            stack.damageItem(1, entity);
             for (int aa = -1; aa <= 1; aa++) {
                 for (int bb = -1; bb <= 1; bb++) {
                     int xx = 0;

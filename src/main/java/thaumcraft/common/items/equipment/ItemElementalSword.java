@@ -275,6 +275,6 @@ public class ItemElementalSword extends ItemSword implements IRepairable {
         } else if (litTarget) {
             target.extinguish();
         }
-        player.addExhaustion(0.1F);
+        player.addExhaustion(0.3F);
     }
 }

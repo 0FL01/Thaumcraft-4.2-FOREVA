@@ -76,6 +76,7 @@ public class ItemElementalSwordRuntimeTest {
         assertEquals(primary.getHealth(), secondary.getHealth(), 0.0F);
         assertEquals(primary.getHealth(), tertiary.getHealth(), 0.0F);
         assertEquals(3, stack.getItemDamage());
+        assertEquals(0.7F, player.exhaustion, 0.000001F);
     }
 
     @Test
@@ -132,6 +133,8 @@ public class ItemElementalSwordRuntimeTest {
     }
 
     private static final class TestPlayer extends EntityPlayer {
+        private float exhaustion;
+
         private TestPlayer(World world) {
             super(world, new GameProfile(
                     UUID.nameUUIDFromBytes("elemental_sword".getBytes(StandardCharsets.UTF_8)),
@@ -140,6 +143,11 @@ public class ItemElementalSwordRuntimeTest {
 
         private void chargeAttack() {
             this.ticksSinceLastSwing = 100;
+        }
+
+        @Override
+        public void addExhaustion(float exhaustion) {
+            this.exhaustion += exhaustion;
         }
 
         @Override public boolean isSpectator() { return false; }
