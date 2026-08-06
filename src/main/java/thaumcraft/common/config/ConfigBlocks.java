@@ -433,8 +433,8 @@ public class ConfigBlocks {
                     new ResourceLocation("thaumcraft", "blocks/fluidpure"),
                     new ResourceLocation("thaumcraft", "blocks/fluidpure"))
                     .setGaseous(false)
-                    .setLuminosity(8)
-                    .setViscosity(1500)
+                    .setLuminosity(10)
+                    .setViscosity(1000)
                     .setRarity(EnumRarity.RARE);
             FluidRegistry.registerFluid(FLUIDPURE);
         }
