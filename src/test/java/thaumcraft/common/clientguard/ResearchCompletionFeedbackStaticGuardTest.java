@@ -35,12 +35,15 @@ public class ResearchCompletionFeedbackStaticGuardTest {
                 && proxy.contains("((GuiResearchBrowser) mc.currentScreen).updateResearch();"));
         assertTrue(popup.contains("class GuiResearchPopup extends Gui")
                 && popup.contains("DISPLAY_TIME_MS = 3000L")
+                && popup.contains("new ResourceLocation(\"textures/gui/toasts.png\")")
+                && popup.contains("drawTexturedModalRect(x, y, 0, 0, 160, 32)")
                 && popup.contains("I18n.format(\"research.complete\")")
                 && popup.contains("renderItemAndEffectIntoGUI")
                 && popup.contains("UtilsFX.drawTexturedQuadFull"));
         int lightingReset = popup.indexOf("GlStateManager.disableLighting();");
         int titleDraw = popup.indexOf("drawString(I18n.format(\"research.complete\")");
         assertTrue(lightingReset >= 0 && lightingReset < titleDraw);
+        assertFalse(popup.contains("achievement_background.png"));
         assertFalse(popup.contains("drawString(\"Research Completed!\""));
         assertTrue(ticks.contains("public static GuiResearchPopup researchPopup;")
                 && ticks.contains("researchPopup.updateResearchWindow();"));

@@ -20,7 +20,7 @@ import thaumcraft.common.lib.utils.InventoryUtils;
 
 @SideOnly(Side.CLIENT)
 public class GuiResearchPopup extends Gui {
-    private static final ResourceLocation TEXTURE = new ResourceLocation("textures/gui/achievement/achievement_background.png");
+    private static final ResourceLocation TEXTURE = new ResourceLocation("textures/gui/toasts.png");
     private static final long DISPLAY_TIME_MS = 3000L;
 
     private final Minecraft game;
@@ -84,7 +84,7 @@ public class GuiResearchPopup extends Gui {
         GlStateManager.enableTexture2D();
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
         this.game.getTextureManager().bindTexture(TEXTURE);
-        this.drawTexturedModalRect(x, y, 96, 202, 160, 32);
+        this.drawTexturedModalRect(x, y, 0, 0, 160, 32);
         this.game.fontRenderer.drawString(I18n.format("research.complete"), x + 30, y + 7, 0xFFFF00);
         int nameWidth = this.game.fontRenderer.getStringWidth(research.getName());
         if (nameWidth <= 125) {
