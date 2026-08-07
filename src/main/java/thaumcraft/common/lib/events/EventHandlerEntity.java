@@ -287,7 +287,6 @@ public class EventHandlerEntity {
             newCap.deserializeNBT(oldCap.serializeNBT());
             newCap.setPlayer(clone);
             grantAutoUnlockResearch(clone);
-            ResearchManager.updateCache(clone.getName(), newCap);
         }
 
         if (!clone.getEntityWorld().isRemote) {
@@ -756,15 +755,20 @@ public class EventHandlerEntity {
         if (player == null || player.world == null || player.world.isRemote) {
             return;
         }
-        // Auto-unlock research is deliberately omitted from capability NBT, so it
-        // must be restored both after file loads and after Forge clones a player.
+        IPlayerKnowledge knowledge = player.getCapability(PlayerKnowledgeProvider.PLAYER_KNOWLEDGE, null);
+        if (knowledge == null) {
+            return;
+        }
+        // Auto-unlock research is derived state omitted from capability NBT. Restore
+        // it without firing genuine-completion packets, warp, or callbacks.
         for (ResearchCategoryList category : ResearchCategories.researchCategories.values()) {
             for (ResearchItem ri : category.research.values()) {
-                if (ri != null && ri.isAutoUnlock()) {
-                    ResearchManager.addResearch(player, ri.key);
+                if (ri != null && ri.isAutoUnlock() && !knowledge.isResearchComplete(ri.key)) {
+                    knowledge.addResearch(ri.key);
                 }
             }
         }
+        ResearchManager.updateCache(player.getName(), knowledge);
     }
 
     /**

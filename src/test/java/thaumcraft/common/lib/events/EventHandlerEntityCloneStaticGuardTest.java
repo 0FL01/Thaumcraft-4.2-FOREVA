@@ -7,6 +7,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 public class EventHandlerEntityCloneStaticGuardTest {
@@ -23,13 +24,19 @@ public class EventHandlerEntityCloneStaticGuardTest {
         assertTrue("Clone handler must preserve capability copy flow",
                 source.contains("newCap.deserializeNBT(oldCap.serializeNBT());")
                         && source.contains("newCap.setPlayer(clone);")
-                        && source.contains("grantAutoUnlockResearch(clone);")
-                        && source.contains("ResearchManager.updateCache(clone.getName(), newCap);"));
-        assertTrue("Auto-unlock research omitted from NBT must be restored after both load and clone",
+                        && source.contains("grantAutoUnlockResearch(clone);"));
+        assertTrue("Auto-unlock research omitted from NBT must be restored silently after both load and clone",
                 source.contains("grantAutoUnlockResearch(player);")
                         && source.contains("static void grantAutoUnlockResearch(EntityPlayer player)")
                         && source.contains("ri != null && ri.isAutoUnlock()")
-                        && source.contains("ResearchManager.addResearch(player, ri.key);"));
+                        && source.contains("knowledge.addResearch(ri.key);")
+                        && source.contains("ResearchManager.updateCache(player.getName(), knowledge);"));
+        int restoreStart = source.indexOf("static void grantAutoUnlockResearch(EntityPlayer player)");
+        int restoreEnd = source.indexOf("\n    /**", restoreStart);
+        assertTrue(restoreStart >= 0 && restoreEnd > restoreStart);
+        String restore = source.substring(restoreStart, restoreEnd);
+        assertFalse("Derived auto-unlock restoration must not emit completion feedback",
+                restore.contains("ResearchManager.addResearch"));
     }
 
     private static String readFile(String path) throws IOException {
