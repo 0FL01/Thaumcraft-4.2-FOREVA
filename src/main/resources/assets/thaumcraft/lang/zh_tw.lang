@@ -895,6 +895,7 @@ tc.research.shortprim=你需要筆與墨以及紙張才能獲取研究筆記
 tc.research.hasnote=研究筆記已存在於物品欄內
 tc.research.popup=有關%1$s的研究筆記已放入物品欄
 tc.addclue=您已發現新研究的線索！
+research.complete=研究完成！
 tc.research.copy=複製此項研究需耗費：
 tc.forbidden=§l§5禁忌研究(%n)§0
 tc.forbidden.level.1=無害

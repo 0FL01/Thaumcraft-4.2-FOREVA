@@ -895,6 +895,7 @@ tc.research.shortprim=Necesitas herramientas de escritura y papel para obtener e
 tc.research.hasnote=Ya tienes esta nota de investigación en tu inventario
 tc.research.popup=Nota de investigación añadida a tu inventario por %1$s
 tc.addclue=¡Has descubierto una pista de una nueva investigación!
+research.complete=¡Investigación completada!
 tc.research.copy=Costo para copiar esta investigación:
 tc.forbidden=§l§5Conocimiento Prohibido (%n)§0
 tc.forbidden.level.1=Mayormente inofensivo

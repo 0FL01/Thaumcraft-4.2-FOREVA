@@ -5,6 +5,7 @@ import java.util.List;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.ScaledResolution;
+import net.minecraft.client.resources.I18n;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.RenderItem;
@@ -79,10 +80,12 @@ public class GuiResearchPopup extends Gui {
 
         GlStateManager.disableDepth();
         GlStateManager.depthMask(false);
+        GlStateManager.disableLighting();
+        GlStateManager.enableTexture2D();
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
         this.game.getTextureManager().bindTexture(TEXTURE);
         this.drawTexturedModalRect(x, y, 96, 202, 160, 32);
-        this.game.fontRenderer.drawString("Research Completed!", x + 30, y + 7, 0xFFFF00);
+        this.game.fontRenderer.drawString(I18n.format("research.complete"), x + 30, y + 7, 0xFFFF00);
         int nameWidth = this.game.fontRenderer.getStringWidth(research.getName());
         if (nameWidth <= 125) {
             this.game.fontRenderer.drawString(research.getName(), x + 30, y + 18, 0xFFFFFF);

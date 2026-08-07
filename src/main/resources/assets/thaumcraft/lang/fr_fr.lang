@@ -895,6 +895,7 @@ tc.research.shortprim=Vous avez besoin d'outils de scribe et de papier pour obte
 tc.research.hasnote=Vous avez déjà la note de recherche dans votre inventaire
 tc.research.popup=Note de recherche ajoutée dans votre inventaire pour %1$s
 tc.addclue=Vous avez découvert un indice d'une nouvelle recherche !
+research.complete=Recherche terminée !
 tc.research.copy=Prix de copie de la recherche:
 tc.forbidden=§l§5Connaissance interdite (%n)§0
 tc.forbidden.level.1=généralement inoffensif
