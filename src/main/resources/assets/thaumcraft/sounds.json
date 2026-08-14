@@ -356,7 +356,7 @@
       "category": "master",
       "sounds": [
          {
-            "name": "thaumcraft:runicShieldEffect",
+            "name": "thaumcraft:runicshieldeffect",
             "stream": false
          }
       ]
@@ -365,7 +365,7 @@
       "category": "master",
       "sounds": [
          {
-            "name": "thaumcraft:runicShieldCharge",
+            "name": "thaumcraft:runicshieldcharge",
             "stream": false
          }
       ]

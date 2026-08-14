@@ -2,7 +2,7 @@
   "parent": "block/block",
   "ambientocclusion": false,
   "textures": {
-    "particle": "#surface",
+    "particle": "thaumcraft:blocks/grate",
     "surface": "thaumcraft:blocks/grate",
     "hatch": "thaumcraft:blocks/grate_hatch"
   },

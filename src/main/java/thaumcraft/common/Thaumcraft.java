@@ -254,6 +254,7 @@ public class Thaumcraft {
         // Register ItemBlocks for blocks (via ConfigBlocks helper + manual jar)
         event.getRegistry().register(new BlockJarItem(ConfigBlocks.blockJar).setRegistryName(ConfigBlocks.blockJar.getRegistryName()));
         ConfigBlocks.registerItemBlocks(event.getRegistry());
+        ConfigItems.registerOreDictionary();
     }
 
     @SubscribeEvent

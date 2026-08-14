@@ -892,7 +892,6 @@ public class ConfigItems {
 
         ThaumcraftSixCompatibility.initItemAliases();
         FLUX_CRYSTAL = ThaumcraftApiHelper.makeCrystal(Aspect.FLUX);
-        registerOreDictionary();
     }
 
     public static Item[] getAllItems() {
@@ -937,7 +936,7 @@ public class ConfigItems {
         }
     }
 
-    private static void registerOreDictionary() {
+    public static void registerOreDictionary() {
         OreDictionary.registerOre("oreCinnabar", new ItemStack(ConfigBlocks.blockCustomOre, 1, 0));
         OreDictionary.registerOre("oreInfusedAir", new ItemStack(ConfigBlocks.blockCustomOre, 1, 1));
         OreDictionary.registerOre("oreInfusedFire", new ItemStack(ConfigBlocks.blockCustomOre, 1, 2));

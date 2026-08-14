@@ -87,8 +87,29 @@ public class MissingTextureParticleAssetContractTest {
         assertParticle("blockessentiareservoir.json", "thaumcraft:blocks/essentiareservoir");
     }
 
+    @Test
+    public void concreteModelsUseDirectParticleTextures() throws IOException {
+        assertParticle("blockmirror_0.json", "thaumcraft:blocks/mirrorframe");
+        assertParticle("blockmirror_up_0.json", "thaumcraft:blocks/mirrorframe");
+        assertParticle("blockmirror_down_0.json", "thaumcraft:blocks/mirrorframe");
+        assertParticle("blockmirror_6.json", "thaumcraft:blocks/mirrorframe2");
+        assertParticle("blockmirror_up_6.json", "thaumcraft:blocks/mirrorframe2");
+        assertParticle("blockmirror_down_6.json", "thaumcraft:blocks/mirrorframe2");
+        assertParticle("blockmetaldevice_5.json", "thaumcraft:blocks/grate");
+        assertParticle("blockmetaldevice_6.json", "thaumcraft:blocks/grate");
+        assertItemParticle("blockmetaldevice_5_inventory.json", "thaumcraft:blocks/grate");
+        assertItemParticle("blockmetaldevice_7_inventory.json", "thaumcraft:blocks/lamp_side");
+        assertItemParticle("blockmetaldevice_8_inventory.json", "thaumcraft:blocks/lamp_grow_side");
+        assertItemParticle("blockmetaldevice_13_inventory.json", "thaumcraft:blocks/lamp_fert_side");
+    }
+
     private static void assertParticle(String model, String expected) throws IOException {
         JsonObject json = parse(ASSET_ROOT.resolve("models/block").resolve(model));
+        assertEquals(expected, json.getAsJsonObject("textures").get("particle").getAsString());
+    }
+
+    private static void assertItemParticle(String model, String expected) throws IOException {
+        JsonObject json = parse(ASSET_ROOT.resolve("models/item").resolve(model));
         assertEquals(expected, json.getAsJsonObject("textures").get("particle").getAsString());
     }
 

@@ -40,6 +40,14 @@ public class RunicShieldRenderContractTest {
         assertEquals(160, countLines(obj, "f "));
     }
 
+    @Test
+    public void packagedSoundsUseLowercaseRuntimePathsAndExactTc4Audio() throws IOException {
+        assertArrayEquals(Files.readAllBytes(Paths.get("thaumcraft_src/assets/thaumcraft/sounds/runicShieldEffect.ogg")),
+                Files.readAllBytes(Paths.get("src/main/resources/assets/thaumcraft/sounds/runicshieldeffect.ogg")));
+        assertArrayEquals(Files.readAllBytes(Paths.get("thaumcraft_src/assets/thaumcraft/sounds/runicShieldCharge.ogg")),
+                Files.readAllBytes(Paths.get("src/main/resources/assets/thaumcraft/sounds/runicshieldcharge.ogg")));
+    }
+
     private static int countLines(String source, String prefix) {
         int count = 0;
         for (String line : source.split("\\R")) {

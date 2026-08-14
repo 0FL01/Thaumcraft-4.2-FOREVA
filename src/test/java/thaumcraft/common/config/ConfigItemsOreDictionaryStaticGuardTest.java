@@ -7,6 +7,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 public class ConfigItemsOreDictionaryStaticGuardTest {
@@ -14,9 +15,15 @@ public class ConfigItemsOreDictionaryStaticGuardTest {
     @Test
     public void configItemsKeepsReferenceOreDictionaryRegistrationBaseline() throws IOException {
         String source = readFile("src/main/java/thaumcraft/common/config/ConfigItems.java");
+        String lifecycle = readFile("src/main/java/thaumcraft/common/Thaumcraft.java");
 
-        assertTrue("ConfigItems.init must keep ore dictionary registration hook",
+        assertFalse("ConfigItems.init must not register stacks before Forge registry events",
                 source.contains("registerOreDictionary();"));
+        int items = lifecycle.indexOf("event.getRegistry().registerAll(ConfigItems.getAllItems());");
+        int itemBlocks = lifecycle.indexOf("ConfigBlocks.registerItemBlocks(event.getRegistry());", items);
+        int oreDictionary = lifecycle.indexOf("ConfigItems.registerOreDictionary();", itemBlocks);
+        assertTrue("Ore dictionary registration must run after items and ItemBlocks are registered",
+                items >= 0 && itemBlocks > items && oreDictionary > itemBlocks);
         assertTrue("ConfigItems must keep reference ore dictionary aliases for nuggets and thaumic ingots",
                 source.contains("OreDictionary.registerOre(\"nuggetCopper\", new ItemStack(itemNugget, 1, 1));")
                         && source.contains("OreDictionary.registerOre(\"nuggetTin\", new ItemStack(itemNugget, 1, 2));")

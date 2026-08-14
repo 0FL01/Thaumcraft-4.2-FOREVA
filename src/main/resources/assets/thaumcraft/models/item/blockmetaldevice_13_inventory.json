@@ -2,7 +2,7 @@
   "parent": "block/block",
   "ambientocclusion": false,
   "textures": {
-    "particle": "#side",
+    "particle": "thaumcraft:blocks/lamp_fert_side",
     "top": "thaumcraft:blocks/lamp_fert_top",
     "side": "thaumcraft:blocks/lamp_fert_side"
   },
