@@ -42,6 +42,10 @@ Minecraft 1.12.2, Forge 14.23.5.2847, Java 8, and Baubles. JEI 4.16.1.1012 is op
 2. Download `Thaumcraft-1.0.0-universal.jar` from the [latest release](https://github.com/0FL01/Thaumcraft-4.2-FOREVA/releases/latest).
 3. Place the jar in the Minecraft `mods/` directory.
 
+## Modpacks and Addons
+
+You may include this port in modpacks and create addons or other modifications based on it under the terms of the [MIT License](LICENSE).
+
 ## Development
 
 ```bash
