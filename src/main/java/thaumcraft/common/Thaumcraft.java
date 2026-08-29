@@ -258,6 +258,16 @@ public class Thaumcraft {
     }
 
     @SubscribeEvent
+    public void remapItems(RegistryEvent.MissingMappings<Item> event) {
+        ResourceLocation removedRobeHood = new ResourceLocation(MODID, "itemhelmetrobe");
+        for (RegistryEvent.MissingMappings.Mapping<Item> mapping : event.getMappings()) {
+            if (removedRobeHood.equals(mapping.key)) {
+                mapping.remap(ConfigItems.itemGoggles);
+            }
+        }
+    }
+
+    @SubscribeEvent
     public void registerRecipes(RegistryEvent.Register<IRecipe> event) {
         log.info("Registering recipes");
         ConfigRecipes.registerSpecialRecipes(event.getRegistry());

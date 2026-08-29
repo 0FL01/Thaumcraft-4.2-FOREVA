@@ -58,7 +58,7 @@ public class CompleteLocalizationContractTest {
     @Test
     public void completeLocalesShouldMatchCanonicalSchemaAndFormattingContracts() throws Exception {
         LocaleData english = readLocale("en_us.lang");
-        assertEquals(1639, english.values.size());
+        assertEquals(1638, english.values.size());
 
         for (String fileName : COMPLETE_LOCALES) {
             assertEquals(fileName.toLowerCase(Locale.ROOT), fileName);

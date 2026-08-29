@@ -116,7 +116,6 @@ public class ConfigItems {
     public static ItemFortressArmor itemChestFortress;
     public static ItemFortressArmor itemLegsFortress;
     public static ItemFortressArmor itemBootsFortress;
-    public static ItemRobeArmor itemHelmRobe;
     public static ItemRobeArmor itemChestRobe;
     public static ItemRobeArmor itemLegsRobe;
     public static ItemRobeArmor itemBootsRobe;
@@ -656,12 +655,6 @@ public class ConfigItems {
                 .setTranslationKey("thaumcraft.boots_fortress")
                 .setCreativeTab(tab);
         allItems.add(itemBootsFortress);
-
-        itemHelmRobe = (ItemRobeArmor) new ItemRobeArmor(ARMOR_ROBE, 0, EntityEquipmentSlot.HEAD)
-                .setRegistryName("thaumcraft", ConfigBlocks.legacyPath("ItemHelmetRobe"))
-                .setTranslationKey("thaumcraft.helm_robe")
-                .setCreativeTab(tab);
-        allItems.add(itemHelmRobe);
 
         itemChestRobe = (ItemRobeArmor) new ItemRobeArmor(ARMOR_ROBE, 0, EntityEquipmentSlot.CHEST)
                 .setRegistryName("thaumcraft", ConfigBlocks.legacyPath("ItemChestplateRobe"))
