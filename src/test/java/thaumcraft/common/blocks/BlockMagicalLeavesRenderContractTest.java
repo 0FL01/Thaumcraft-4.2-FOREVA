@@ -18,13 +18,17 @@ public class BlockMagicalLeavesRenderContractTest {
         String itemSource = readFile("src/main/java/thaumcraft/common/blocks/ItemBlocks/BlockMagicalLeavesItem.java");
         String clientSource = readFile("src/main/java/thaumcraft/client/ClientProxy.java");
 
-        assertTrue("BlockMagicalLeaves must render in CUTOUT_MIPPED layer",
+        assertTrue("BlockMagicalLeaves must follow vanilla fancy/fast layer parity",
                 blockSource.contains("public BlockRenderLayer getRenderLayer()")
-                        && blockSource.contains("return BlockRenderLayer.CUTOUT_MIPPED;"));
+                        && blockSource.contains("BlockRenderLayer.CUTOUT_MIPPED")
+                        && blockSource.contains("BlockRenderLayer.SOLID")
+                        && blockSource.contains("this.leavesFancy"));
         assertTrue("BlockMagicalLeaves must keep the TC4 leaf lighting and full-cube geometry contracts",
                 blockSource.contains("this.setLightOpacity(1);")
-                        && blockSource.contains("public boolean isOpaqueCube(IBlockState state) {\n        return false;")
+                        && blockSource.contains("return !this.leavesFancy;")
                         && blockSource.contains("public boolean isFullCube(IBlockState state) {\n        return true;"));
+        assertTrue("BlockMagicalLeaves must expose its graphics mode for the client resync ticker",
+                blockSource.contains("public boolean isFancy()"));
         assertTrue("BlockMagicalLeavesItem metadata contract must mark player-placed leaves",
                 itemSource.contains("return damage | 4;"));
         assertTrue("Client model routing must ignore runtime-only decay properties",
@@ -34,6 +38,13 @@ public class BlockMagicalLeavesRenderContractTest {
                         && clientSource.contains("ColorizerFoliage.getFoliageColorBasic()")
                         && clientSource.contains("ConfigBlocks.blockMagicalLeaves")
                         && clientSource.contains("ConfigBlocks.blockMagicalLeavesItem"));
+        assertTrue("ClientProxy must seed magical leaves graphics level (vanilla only syncs its own)",
+                clientSource.contains("blockMagicalLeaves.setGraphicsLevel"));
+        String tickSource = readFile("src/main/java/thaumcraft/client/lib/ClientTickEventsFML.java");
+        assertTrue("Client tick must resync magical leaves when fancy/fast changes",
+                tickSource.contains("syncLeafGraphics")
+                        && tickSource.contains("gameSettings.fancyGraphics")
+                        && tickSource.contains("loadRenderers()"));
     }
 
     @Test

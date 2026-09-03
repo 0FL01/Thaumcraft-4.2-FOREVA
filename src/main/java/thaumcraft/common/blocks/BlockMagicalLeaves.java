@@ -80,7 +80,9 @@ public class BlockMagicalLeaves extends BlockLeaves {
 
     @Override
     public boolean isOpaqueCube(IBlockState state) {
-        return false;
+        // Vanilla parity: opaque in Fast graphics (inner faces culled),
+        // transparent in Fancy graphics (inner faces rendered).
+        return !this.leavesFancy;
     }
 
     @Override
@@ -91,8 +93,24 @@ public class BlockMagicalLeaves extends BlockLeaves {
     @Override
     @SideOnly(Side.CLIENT)
     public BlockRenderLayer getRenderLayer() {
-        return BlockRenderLayer.CUTOUT_MIPPED;
+        // Vanilla parity: SOLID fills the cutout holes in Fast mode,
+        // CUTOUT_MIPPED keeps per-pixel holes in Fancy mode.
+        return this.leavesFancy ? BlockRenderLayer.CUTOUT_MIPPED : BlockRenderLayer.SOLID;
     }
+
+    /**
+     * Exposes the client graphics mode for the resync ticker.
+     * Field exists on both sides, so this is safe to call anywhere,
+     * but only the client ever updates it via setGraphicsLevel.
+     */
+    public boolean isFancy() {
+        return this.leavesFancy;
+    }
+
+    // shouldSideBeRendered intentionally inherited from BlockLeaves:
+    // it culls shared inner faces only when !leavesFancy, matching
+    // isOpaqueCube/getRenderLayer above. Overriding it with a constant
+    // (always cull / never cull) reintroduces the see-through canopy bug.
 
     @Override
     public boolean isShearable(ItemStack item, IBlockAccess world, BlockPos pos) {

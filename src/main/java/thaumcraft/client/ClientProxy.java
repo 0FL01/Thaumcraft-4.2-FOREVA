@@ -1279,6 +1279,12 @@ public class ClientProxy extends CommonProxy {
 
     @Override
     public void registerHandlers() {
+        // Vanilla RenderGlobal only syncs its own leaves on graphics change,
+        // so sync ours from the start (runtime resync lives in ClientTickEventsFML).
+        if (ConfigBlocks.blockMagicalLeaves != null) {
+            ConfigBlocks.blockMagicalLeaves.setGraphicsLevel(
+                    Minecraft.getMinecraft().gameSettings.fancyGraphics);
+        }
         FMLCommonHandler.instance().bus().register(new EventHandlerNetwork());
         MinecraftForge.EVENT_BUS.register(new ClientTickEventsFML());
         MinecraftForge.EVENT_BUS.register(new RenderEventHandler());

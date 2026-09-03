@@ -15,6 +15,7 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import thaumcraft.common.Thaumcraft;
 import thaumcraft.common.config.Config;
+import thaumcraft.common.config.ConfigBlocks;
 import thaumcraft.common.items.wands.ItemWandCasting;
 import thaumcraft.common.lib.events.EssentiaHandler;
 import thaumcraft.common.tiles.TileInfusionMatrix;
@@ -37,6 +38,7 @@ public class ClientTickEventsFML {
             new ResourceLocation("shaders/post/sunscorned.json")
     };
     private int tickCount = 0;
+    private int leafGraphicsCooldown = 0;
     private boolean wandUseReleasePending;
     private boolean mappingStarted;
 
@@ -163,11 +165,12 @@ public class ClientTickEventsFML {
         if (event.side != Side.CLIENT) {
             return;
         }
-        Minecraft mc = Minecraft.getMinecraft();
         if (event.phase == TickEvent.Phase.END) {
-            this.ensureWandUseRelease(mc);
+            this.ensureWandUseRelease(Minecraft.getMinecraft());
+            this.syncLeafGraphics(Minecraft.getMinecraft());
             return;
         }
+        Minecraft mc = Minecraft.getMinecraft();
         if (mc.world == null) {
             return;
         }
@@ -203,6 +206,29 @@ public class ClientTickEventsFML {
 
             fx.ticks--;
             EssentiaHandler.sourceFX.put(fxKey, fx);
+        }
+    }
+
+    /**
+     * Vanilla RenderGlobal.loadRenderers() only calls setGraphicsLevel on its own
+     * leaves, so mirror gameSettings.fancyGraphics onto our magical leaves here.
+     * Runs in menu too (world may be null): flag sync is harmless then, chunk
+     * rebuild is skipped until a world is loaded. Throttled to ~1/sec.
+     */
+    private void syncLeafGraphics(Minecraft mc) {
+        if (mc == null || mc.gameSettings == null || ConfigBlocks.blockMagicalLeaves == null) {
+            return;
+        }
+        if (--this.leafGraphicsCooldown > 0) {
+            return;
+        }
+        this.leafGraphicsCooldown = 20;
+        boolean fancy = mc.gameSettings.fancyGraphics;
+        if (ConfigBlocks.blockMagicalLeaves.isFancy() != fancy) {
+            ConfigBlocks.blockMagicalLeaves.setGraphicsLevel(fancy);
+            if (mc.world != null && mc.renderGlobal != null) {
+                mc.renderGlobal.loadRenderers();
+            }
         }
     }
 
