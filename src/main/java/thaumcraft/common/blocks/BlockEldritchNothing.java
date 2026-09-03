@@ -19,7 +19,6 @@ import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
-import thaumcraft.client.lib.EldritchDiagnostics;
 import thaumcraft.common.lib.utils.BlockUtils;
 import thaumcraft.common.tiles.TileEldritchNothing;
 
@@ -55,7 +54,6 @@ public class BlockEldritchNothing extends Block {
 
     @Override
     public EnumBlockRenderType getRenderType(IBlockState state) {
-        EldritchDiagnostics.logRenderType("INVISIBLE");
         return EnumBlockRenderType.INVISIBLE;
     }
 
