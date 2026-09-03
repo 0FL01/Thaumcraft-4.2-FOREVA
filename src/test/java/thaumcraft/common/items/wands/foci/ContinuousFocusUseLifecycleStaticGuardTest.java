@@ -25,7 +25,7 @@ public class ContinuousFocusUseLifecycleStaticGuardTest {
         assertAuthoritativeStop(excavation);
         assertTrue("client must send release on physical key-up even if active-hand sync was lost",
                 clientTicks.contains("private boolean wandUseReleasePending;")
-                        && clientTicks.contains("this.ensureWandUseRelease(mc);")
+                        && clientTicks.contains("this.ensureWandUseRelease(Minecraft.getMinecraft());")
                         && clientTicks.contains("mc.gameSettings.keyBindUseItem.isKeyDown()")
                         && clientTicks.contains("mc.playerController.onStoppedUsingItem(mc.player);"));
         assertTrue("continuous wand beams must die as soon as active use ends",
