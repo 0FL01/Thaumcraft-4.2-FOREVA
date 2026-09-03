@@ -793,7 +793,7 @@ public class EventHandlerEntity {
 
         EntityPlayer player = (EntityPlayer) event.getEntityLiving();
         ItemStack used = event.getItem();
-        Potion unHunger = Potion.getPotionById(Config.potionUnHungerID);
+        Potion unHunger = Config.potionUnnaturalHunger;
 
         if (used.isEmpty() || !(used.getItem() instanceof ItemFood)) return;
 
