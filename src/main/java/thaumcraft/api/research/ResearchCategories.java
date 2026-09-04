@@ -40,7 +40,7 @@ public class ResearchCategories extends ResearchCategoriesCompat {
 
     public static void registerCategory(String key, ResourceLocation icon, ResourceLocation background) {
         if (ResearchCategories.getResearchList(key) == null) {
-            ResearchCategoryList rl = new ResearchCategoryList(icon, background);
+            ResearchCategoryList rl = new ResearchCategory(key, null, null, icon, background);
             researchCategories.put(key, rl);
         }
     }

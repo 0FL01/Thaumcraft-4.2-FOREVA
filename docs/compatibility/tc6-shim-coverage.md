@@ -20,6 +20,7 @@ contract shims guarded by unit tests and smoke modsets.
 | Botania CEu | canonical `warpward` registry identity with legacy remap, TC6 item interfaces, and object-aspect lookup | `Issues15To19ThaumcraftSixCompatibilityStaticGuardTest`, corpus resolver | `scripts/smoke-modsets/botania.txt` |
 | Just Enough Magiculture | projected loot/item fields and unregistered TC4-backed entity class-token aliases | `Issues15To19ThaumcraftSixCompatibilityStaticGuardTest`, corpus resolver | `scripts/smoke-modsets/justenoughmagiculture.txt` |
 | JAOPCA + WrapUp | dual TC4/TC6 research lookup return descriptors and projected recipe registration | `Issues15To19ThaumcraftSixCompatibilityStaticGuardTest`, corpus resolver | `scripts/smoke-modsets/jaopca.txt` |
+| Thaumic Energistics (partial) | TC6-compatible built-in research categories published during Forge init; remaining API gaps are not yet supported | `ResearchCategoryAddonCompatibilityTest` | none |
 | Astral Sorcery | No local evidence yet; keep as pending RECON before adding dependencies or shims | none | none |
 
 Exact per-symbol support levels and known unsupported operations are recorded in

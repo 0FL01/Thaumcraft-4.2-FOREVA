@@ -88,7 +88,7 @@ public class ConfigResearch {
         }
     }
 
-    private static void initCategories() {
+    public static void initCategories() {
         ResearchCategories.registerCategory(
                 "BASICS",
                 new ResourceLocation("thaumcraft", "textures/items/thaumonomiconcheat.png"),
