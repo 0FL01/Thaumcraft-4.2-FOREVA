@@ -17,10 +17,12 @@ public class EventHandlerEntityUnhungerStaticGuardTest {
         String source = readFile("src/main/java/thaumcraft/common/lib/events/EventHandlerEntity.java");
         String lang = readFile("src/main/resources/assets/thaumcraft/lang/en_us.lang");
 
-        assertTrue(source.contains("Potion unHunger = Config.potionUnnaturalHunger;"));
+        assertTrue(source.contains("handleUnnaturalHungerFood(player, used);"));
+        assertTrue(source.contains("PotionEffect effect = player.getActivePotionEffect(Config.potionUnnaturalHunger);"));
+        assertTrue(source.contains("if (effect == null) return;"));
         assertFalse(source.contains("Potion.getPotionById(Config.potionUnHungerID)"));
         assertTrue(source.contains("used.getItem() == Items.ROTTEN_FLESH || used.getItem() == ConfigItems.itemZombieBrain"));
-        assertTrue(source.contains("player.removePotionEffect(unHunger);"));
+        assertTrue(source.contains("player.removePotionEffect(Config.potionUnnaturalHunger);"));
         assertTrue(source.contains("reduced.getCurativeItems().add(new ItemStack(Items.ROTTEN_FLESH));"));
         assertTrue(source.contains("new TextComponentTranslation(\"warp.text.hunger.2\")"));
         assertTrue(source.contains("new TextComponentTranslation(\"warp.text.hunger.1\")"));

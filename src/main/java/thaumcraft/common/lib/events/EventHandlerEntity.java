@@ -27,7 +27,6 @@ import net.minecraft.init.Items;
 import net.minecraft.init.MobEffects;
 import net.minecraft.item.ItemFood;
 import net.minecraft.item.ItemStack;
-import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionEffect;
 import net.minecraft.init.SoundEvents;
 import net.minecraft.util.ResourceLocation;
@@ -793,38 +792,44 @@ public class EventHandlerEntity {
 
         EntityPlayer player = (EntityPlayer) event.getEntityLiving();
         ItemStack used = event.getItem();
-        Potion unHunger = Config.potionUnnaturalHunger;
 
         if (used.isEmpty() || !(used.getItem() instanceof ItemFood)) return;
 
-        if (unHunger != null && player.isPotionActive(unHunger)) {
-            if (used.getItem() == Items.ROTTEN_FLESH || used.getItem() == ConfigItems.itemZombieBrain) {
-                PotionEffect effect = player.getActivePotionEffect(unHunger);
-                if (effect != null) {
-                    int amplifier = effect.getAmplifier() - 1;
-                    int duration = effect.getDuration() - 600;
-                    player.removePotionEffect(unHunger);
-                    if (duration > 0 && amplifier >= 0) {
-                        PotionEffect reduced = new PotionEffect(unHunger, duration, amplifier, true, true);
-                        reduced.getCurativeItems().clear();
-                        reduced.getCurativeItems().add(new ItemStack(Items.ROTTEN_FLESH));
-                        player.addPotionEffect(reduced);
-                    }
-                }
-                TextComponentTranslation msg = new TextComponentTranslation("warp.text.hunger.2");
-                msg.getStyle().setItalic(true).setColor(TextFormatting.DARK_GREEN);
-                player.sendMessage(msg);
-            } else {
-                TextComponentTranslation msg = new TextComponentTranslation("warp.text.hunger.1");
-                msg.getStyle().setItalic(true).setColor(TextFormatting.DARK_RED);
-                player.sendMessage(msg);
-            }
-        }
+        handleUnnaturalHungerFood(player, used);
 
         int warp = ThaumcraftApi.getWarp(used);
         if (warp > 0) {
             Thaumcraft.addStickyWarpToPlayer(player, warp);
         }
+    }
+
+    private void handleUnnaturalHungerFood(EntityPlayer player, ItemStack used) {
+        if (Config.potionUnnaturalHunger == null) return;
+
+        PotionEffect effect = player.getActivePotionEffect(Config.potionUnnaturalHunger);
+        if (effect == null) return;
+
+        if (used.getItem() == Items.ROTTEN_FLESH || used.getItem() == ConfigItems.itemZombieBrain) {
+            int amplifier = effect.getAmplifier() - 1;
+            int duration = effect.getDuration() - 600;
+            player.removePotionEffect(Config.potionUnnaturalHunger);
+            if (duration > 0 && amplifier >= 0) {
+                PotionEffect reduced = new PotionEffect(
+                        Config.potionUnnaturalHunger, duration, amplifier, true, true);
+                reduced.getCurativeItems().clear();
+                reduced.getCurativeItems().add(new ItemStack(Items.ROTTEN_FLESH));
+                player.addPotionEffect(reduced);
+            }
+
+            TextComponentTranslation msg = new TextComponentTranslation("warp.text.hunger.2");
+            msg.getStyle().setItalic(true).setColor(TextFormatting.DARK_GREEN);
+            player.sendMessage(msg);
+            return;
+        }
+
+        TextComponentTranslation msg = new TextComponentTranslation("warp.text.hunger.1");
+        msg.getStyle().setItalic(true).setColor(TextFormatting.DARK_RED);
+        player.sendMessage(msg);
     }
 
     /**

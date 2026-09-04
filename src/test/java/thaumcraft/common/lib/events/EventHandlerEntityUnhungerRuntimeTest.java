@@ -8,6 +8,8 @@ import net.minecraft.init.MobEffects;
 import net.minecraft.item.ItemStack;
 import net.minecraft.potion.PotionEffect;
 import net.minecraft.profiler.Profiler;
+import net.minecraft.util.SoundCategory;
+import net.minecraft.util.SoundEvent;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.world.GameType;
@@ -34,6 +36,7 @@ import java.util.UUID;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertTrue;
 
 public class EventHandlerEntityUnhungerRuntimeTest {
@@ -56,32 +59,58 @@ public class EventHandlerEntityUnhungerRuntimeTest {
     }
 
     @Test
-    public void rottenFleshDoesNotTreatVanillaHungerAsUnnaturalHunger() {
-        TestPlayer player = new TestPlayer(new TestWorld(), "vanilla_hunger");
-        player.addPotionEffect(new PotionEffect(MobEffects.HUNGER, 600, 0));
+    public void realRottenFleshUseKeepsVanillaHungerWithoutThaumcraftMessage() {
+        TestWorld world = new TestWorld();
+        TestPlayer player = new TestPlayer(world, "vanilla_hunger");
+        player.getFoodStats().setFoodLevel(10);
+        world.rand.setSeed(1L);
 
-        finishUsing(player, new ItemStack(Items.ROTTEN_FLESH));
+        consumeFood(player, new ItemStack(Items.ROTTEN_FLESH));
 
         PotionEffect hunger = player.getActivePotionEffect(MobEffects.HUNGER);
         assertNotNull(hunger);
         assertEquals(600, hunger.getDuration());
         assertEquals(0, hunger.getAmplifier());
+        assertEquals(14, player.getFoodStats().getFoodLevel());
+        assertNotSame(MobEffects.HUNGER, Config.potionUnnaturalHunger);
         assertFalse(player.isPotionActive(Config.potionUnnaturalHunger));
         assertTrue(player.messages.isEmpty());
     }
 
     @Test
-    public void rottenFleshReducesOnlyUnnaturalHunger() {
-        TestPlayer player = new TestPlayer(new TestWorld(), "unnatural_hunger");
+    public void realRottenFleshUseKeepsVanillaHungerAndReducesOnlyUnnaturalHunger() {
+        TestWorld world = new TestWorld();
+        TestPlayer player = new TestPlayer(world, "unnatural_hunger");
+        player.getFoodStats().setFoodLevel(10);
         player.addPotionEffect(new PotionEffect(Config.potionUnnaturalHunger, 5000, 2, true, true));
+        world.rand.setSeed(1L);
 
-        finishUsing(player, new ItemStack(Items.ROTTEN_FLESH));
+        consumeFood(player, new ItemStack(Items.ROTTEN_FLESH));
 
-        PotionEffect hunger = player.getActivePotionEffect(Config.potionUnnaturalHunger);
-        assertNotNull(hunger);
-        assertEquals(4400, hunger.getDuration());
-        assertEquals(1, hunger.getAmplifier());
+        PotionEffect vanillaHunger = player.getActivePotionEffect(MobEffects.HUNGER);
+        assertNotNull(vanillaHunger);
+        assertEquals(600, vanillaHunger.getDuration());
+        PotionEffect unnaturalHunger = player.getActivePotionEffect(Config.potionUnnaturalHunger);
+        assertNotNull(unnaturalHunger);
+        assertEquals(4400, unnaturalHunger.getDuration());
+        assertEquals(1, unnaturalHunger.getAmplifier());
+        assertEquals(14, player.getFoodStats().getFoodLevel());
         assertTranslation(player.messages, "warp.text.hunger.2");
+    }
+
+    @Test
+    public void realRawChickenUseCannotTurnVanillaHungerIntoThaumcraftWarning() {
+        TestWorld world = new TestWorld();
+        TestPlayer player = new TestPlayer(world, "vanilla_chicken_hunger");
+        player.getFoodStats().setFoodLevel(10);
+        world.rand.setSeed(1L);
+
+        consumeFood(player, new ItemStack(Items.CHICKEN));
+
+        assertNotNull(player.getActivePotionEffect(MobEffects.HUNGER));
+        assertEquals(12, player.getFoodStats().getFoodLevel());
+        assertFalse(player.isPotionActive(Config.potionUnnaturalHunger));
+        assertTrue(player.messages.isEmpty());
     }
 
     @Test
@@ -89,7 +118,7 @@ public class EventHandlerEntityUnhungerRuntimeTest {
         TestPlayer player = new TestPlayer(new TestWorld(), "unnatural_hunger_food");
         player.addPotionEffect(new PotionEffect(Config.potionUnnaturalHunger, 5000, 2, true, true));
 
-        finishUsing(player, new ItemStack(Items.BREAD));
+        consumeFood(player, new ItemStack(Items.BREAD));
 
         PotionEffect hunger = player.getActivePotionEffect(Config.potionUnnaturalHunger);
         assertNotNull(hunger);
@@ -98,10 +127,16 @@ public class EventHandlerEntityUnhungerRuntimeTest {
         assertTranslation(player.messages, "warp.text.hunger.1");
     }
 
-    private static void finishUsing(EntityPlayer player, ItemStack stack) {
+    private static void finishUsing(EntityPlayer player, ItemStack used, ItemStack result) {
         LivingEntityUseItemEvent.Finish event = new LivingEntityUseItemEvent.Finish(
-                player, stack, 0, ItemStack.EMPTY);
+                player, used, 0, result);
         new EventHandlerEntity().onItemUseFinish(event);
+    }
+
+    private static void consumeFood(EntityPlayer player, ItemStack stack) {
+        ItemStack used = stack.copy();
+        ItemStack result = stack.onItemUseFinish(player.world, player);
+        finishUsing(player, used, result);
     }
 
     private static void assertTranslation(List<ITextComponent> messages, String key) {
@@ -135,6 +170,11 @@ public class EventHandlerEntityUnhungerRuntimeTest {
                     new WorldProviderSurface(), new Profiler(), false);
             this.provider.setWorld(this);
             this.chunkProvider = this.createChunkProvider();
+        }
+
+        @Override
+        public void playSound(EntityPlayer player, double x, double y, double z, SoundEvent sound,
+                              SoundCategory category, float volume, float pitch) {
         }
 
         @Override
