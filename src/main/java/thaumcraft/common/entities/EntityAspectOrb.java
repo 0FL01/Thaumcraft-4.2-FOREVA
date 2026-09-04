@@ -80,7 +80,7 @@ public class EntityAspectOrb extends Entity implements IEntityAdditionalSpawnDat
 
     @Override
     public boolean handleWaterMovement() {
-        return this.world.isMaterialInBB(this.getEntityBoundingBox(), Material.WATER);
+        return this.world.handleMaterialAcceleration(this.getEntityBoundingBox(), Material.WATER, this);
     }
 
     // ------------------------------------------------------------------
@@ -102,8 +102,8 @@ public class EntityAspectOrb extends Entity implements IEntityAdditionalSpawnDat
         // Gravity
         this.motionY -= 0.03D;
 
-        // Water splash
-        if (this.world.getBlockState(this.getPosition()).getMaterial() == Material.WATER) {
+        // Lava bounce
+        if (this.world.getBlockState(this.getPosition()).getMaterial() == Material.LAVA) {
             this.motionY = 0.2D;
             this.motionX = (this.rand.nextFloat() - this.rand.nextFloat()) * 0.2F;
             this.motionZ = (this.rand.nextFloat() - this.rand.nextFloat()) * 0.2F;

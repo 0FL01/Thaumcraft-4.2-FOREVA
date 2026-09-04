@@ -63,4 +63,21 @@ public class AspectOrbDropStaticGuardTest {
         assertTrue("EntityAspectOrb attraction must use isWandInHotbarWithRoom",
                 source.contains("InventoryUtils.isWandInHotbarWithRoom("));
     }
+
+    @Test
+    public void entityAspectOrbShouldKeepOriginalFluidBranches() throws IOException {
+        String source = readFile("src/main/java/thaumcraft/common/entities/EntityAspectOrb.java");
+        int updateStart = source.indexOf("public void onUpdate()");
+        int pushOut = source.indexOf("this.pushOutOfBlocks", updateStart);
+        String initialUpdate = source.substring(updateStart, pushOut);
+
+        assertTrue("Water handling must retain fluid acceleration",
+                source.contains("world.handleMaterialAcceleration(this.getEntityBoundingBox(), Material.WATER, this)"));
+        assertTrue("The fizz and bounce branch belongs to lava",
+                initialUpdate.contains("getMaterial() == Material.LAVA"));
+        assertFalse("Water must not trigger the lava fizz and bounce branch",
+                initialUpdate.contains("getMaterial() == Material.WATER"));
+        assertTrue("The original fizz sound must remain in the lava branch",
+                initialUpdate.contains("SoundEvents.BLOCK_FIRE_EXTINGUISH"));
+    }
 }
