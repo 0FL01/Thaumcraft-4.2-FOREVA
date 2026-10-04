@@ -3,6 +3,7 @@ package thaumcraft.client.renderers.tile;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.OpenGlHelper;
+import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
@@ -412,7 +413,12 @@ public class TileNodeRenderer extends TileEntitySpecialRenderer<TileEntity> {
 
         GlStateManager.pushMatrix();
         GlStateManager.translate(x, y, z);
-        TileRenderHelper.orientBillboardToPlayer();
+        // Front face toward the camera, as TC4's ActiveRenderInfo quad: culling stays valid and u0 is screen-left.
+        RenderManager rm = Minecraft.getMinecraft().getRenderManager();
+        GlStateManager.rotate(-rm.playerViewY, 0.0F, 1.0F, 0.0F);
+        GlStateManager.rotate((rm.options != null && rm.options.thirdPersonView == 2 ? -1 : 1) * rm.playerViewX,
+                1.0F, 0.0F, 0.0F);
+        GlStateManager.rotate(180.0F, 0.0F, 1.0F, 0.0F);
         GlStateManager.rotate((float) Math.toDegrees(angle), 0.0F, 0.0F, 1.0F);
         TileRenderHelper.drawTexturedQuad(scale, argb, u0, u1, v0, v1);
         GlStateManager.popMatrix();
