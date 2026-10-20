@@ -1,8 +1,8 @@
-# Thaumcraft 4.2.3.5 — Forge 1.12.2 Port
+# Thaumcraft 4.2.3.5 — Forge 1.12.2 Clean-Room Implementation
 
-An unofficial community port of Azanor's Thaumcraft 4.2.3.5 for Minecraft 1.12.2.
+A clean-room implementation inspired by Azanor's Thaumcraft 4.2.3.5 for Minecraft 1.12.2. All code is written from scratch for Forge 1.12.2; it is not an unofficial port and contains no original binaries or sources.
 
-> ## Port is ~90% complete
+> ## Implementation is ~90% complete
 > Most features are working; only hidden bugs remain to be found and fixed.
 >
 > Addon ports are planned for the future, starting with **Thaumic Tinkerer**.
@@ -18,7 +18,7 @@ An unofficial community port of Azanor's Thaumcraft 4.2.3.5 for Minecraft 1.12.2
 
 ## Status
 
-The port is approximately 90% complete and remains under active development. Most gameplay systems are fully functional, with the remaining work focused on finding and fixing hidden bugs.
+The implementation is approximately 90% complete and remains under active development. Most gameplay systems are fully functional, with the remaining work focused on finding and fixing hidden bugs.
 
 - Research, scanning, and the Thaumonomicon
 - Arcane crafting, crucible alchemy, and infusion
@@ -44,7 +44,7 @@ Minecraft 1.12.2, Forge 14.23.5.2847, Java 8, and Baubles. JEI 4.16.1.1012 is op
 
 ## Modpacks and Addons
 
-You may include this port in modpacks and create addons or other modifications based on it under the terms of the [MIT License](LICENSE).
+You may include this implementation in modpacks and create addons or other modifications based on it under the terms of the [MIT License](LICENSE).
 
 ## Development
 
